@@ -232,7 +232,6 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
             new ContentTypeCommonRepository(scopeAccessor, TemplateRepository, appCaches, ShortStringHelper);
 
         return new ContentTypeRepository(
-            scopeAccessor,
             appCaches,
             LoggerFactory.CreateLogger<ContentTypeRepository>(),
             commonRepository,

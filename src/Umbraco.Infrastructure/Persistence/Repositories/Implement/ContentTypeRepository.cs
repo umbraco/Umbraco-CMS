@@ -1,61 +1,45 @@
 using System.Data;
 using System.Globalization;
-using System.Xml.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
-using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Cache;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence.Factories;
-using Umbraco.Cms.Infrastructure.Persistence.Querying;
-using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
-using Umbraco.Cms.Infrastructure.Scoping;
+using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.EFCore;
 using Umbraco.Extensions;
-using EfContentType2ContentTypeDto = Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.ContentType2ContentTypeDto;
-using EfContentTypeAllowedContentTypeDto = Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.ContentTypeAllowedContentTypeDto;
-using EfContentTypeDto = Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.ContentTypeDto;
-using EfContentTypeTemplateDto = Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.ContentTypeTemplateDto;
-using EfContentVersionCleanupPolicyDto = Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.ContentVersionCleanupPolicyDto;
-using EfDataTypeDto = Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.DataTypeDto;
-using EfNodeDto = Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.NodeDto;
-using EfPropertyTypeDto = Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.PropertyTypeDto;
-using EfPropertyTypeGroupDto = Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.PropertyTypeGroupDto;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
 /// <summary>
-///     Represents a repository for doing CRUD operations for <see cref="IContentType" />
+///     Represents a repository for doing CRUD operations for <see cref="IContentType" />.
 /// </summary>
-internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContentType>, IContentTypeRepository
+/// <remarks>
+///     This repository runs entirely on the EF Core <see cref="UmbracoDbContext"/> (async base) while still
+///     exposing the synchronous <see cref="IContentTypeRepository"/> contract that the shared content-type
+///     service layer calls; the sync members bridge to the async base. Tables not modelled in EF Core
+///     (content-instance tables owned by other repositories) are accessed with EF raw SQL on the same context.
+/// </remarks>
+internal sealed partial class ContentTypeRepository : AsyncEntityRepositoryBase<Guid, IContentType>, IContentTypeRepository
 {
-    private readonly IRepositoryCacheVersionService _repositoryCacheVersionService;
-    private readonly ICacheSyncService _cacheSyncService;
-    private readonly IEFCoreScopeAccessor<UmbracoDbContext> _efCoreScopeAccessor;
+    private readonly IShortStringHelper _shortStringHelper;
     private readonly IIdKeyMap _idKeyMap;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ContentTypeRepository"/> class.
     /// </summary>
-    /// <param name="scopeAccessor">Provides access to the current database scope.</param>
-    /// <param name="cache">The application-level cache manager.</param>
-    /// <param name="logger">The logger used for logging repository operations.</param>
-    /// <param name="commonRepository">Repository for common content type operations.</param>
-    /// <param name="languageRepository">Repository for managing languages.</param>
-    /// <param name="shortStringHelper">Helper for generating and manipulating short strings.</param>
-    /// <param name="repositoryCacheVersionService">Service for managing repository cache versions.</param>
-    /// <param name="idKeyMap">Service for mapping between IDs and keys.</param>
-    /// <param name="cacheSyncService">Service for synchronizing cache across distributed environments.</param>
-    /// <param name="efCoreScopeAccessor">Provides access to the current EF Core database scope.</param>
     public ContentTypeRepository(
-        IScopeAccessor scopeAccessor,
         AppCaches cache,
         ILogger<ContentTypeRepository> logger,
         IContentTypeCommonRepository commonRepository,
@@ -66,25 +50,141 @@ internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContent
         ICacheSyncService cacheSyncService,
         IEFCoreScopeAccessor<UmbracoDbContext> efCoreScopeAccessor)
         : base(
-            scopeAccessor,
+            efCoreScopeAccessor,
             cache,
             logger,
-            commonRepository,
-            languageRepository,
-            shortStringHelper,
             repositoryCacheVersionService,
-            idKeyMap,
             cacheSyncService)
     {
-        _repositoryCacheVersionService = repositoryCacheVersionService;
-        _cacheSyncService = cacheSyncService;
-        _efCoreScopeAccessor = efCoreScopeAccessor;
+        CommonRepository = commonRepository;
+        LanguageRepository = languageRepository;
+        _shortStringHelper = shortStringHelper;
         _idKeyMap = idKeyMap;
     }
 
-    protected override bool SupportsPublishing => ContentType.SupportsPublishingConst;
+    private IContentTypeCommonRepository CommonRepository { get; }
 
-    protected override Guid NodeObjectTypeId => Constants.ObjectTypes.DocumentType;
+    private ILanguageRepository LanguageRepository { get; }
+
+    private static Guid NodeObjectTypeId => Constants.ObjectTypes.DocumentType;
+
+    // ----------------------------------------------------------------------------------------------------
+    // Async EF Core base overrides + cache policy. Bodies are synchronous-in-substance (the EF work runs
+    // synchronously and is returned via completed tasks), so the sync bridge below never blocks on real I/O.
+    // ----------------------------------------------------------------------------------------------------
+
+    /// <inheritdoc />
+    protected override IAsyncRepositoryCachePolicy<IContentType, Guid> CreateCachePolicy()
+        => new AsyncFullDataSetRepositoryCachePolicy<IContentType, Guid>(
+            GlobalIsolatedCache,
+            ScopeAccessor,
+            RepositoryCacheVersionService,
+            CacheSyncService,
+            entity => entity.Key,
+            /*expires:*/ true);
+
+    /// <inheritdoc />
+    protected override Task<IContentType?> PerformGetAsync(Guid key)
+        => Task.FromResult(GetAllCached().FirstOrDefault(x => x.Key == key));
+
+    /// <inheritdoc />
+    protected override Task<IEnumerable<IContentType>?> PerformGetAllAsync()
+        => Task.FromResult(CommonRepository.GetAllTypes()?.OfType<IContentType>());
+
+    /// <inheritdoc />
+    protected override Task<IEnumerable<IContentType>?> PerformGetManyAsync(Guid[]? keys)
+    {
+        IEnumerable<IContentType> all = GetAllCached();
+        if (keys is { Length: > 0 })
+        {
+            var set = keys.ToHashSet();
+            all = all.Where(x => set.Contains(x.Key));
+        }
+
+        return Task.FromResult<IEnumerable<IContentType>?>(all);
+    }
+
+    /// <inheritdoc />
+    protected override Task<bool> PerformExistsAsync(Guid key)
+        => Task.FromResult(GetAllCached().Any(x => x.Key == key));
+
+    /// <inheritdoc />
+    protected override Task PersistNewItemAsync(IContentType item)
+    {
+        PersistNewItem(item);
+        return Task.CompletedTask;
+    }
+
+    /// <inheritdoc />
+    protected override Task PersistUpdatedItemAsync(IContentType item)
+    {
+        PersistUpdatedItem(item);
+        return Task.CompletedTask;
+    }
+
+    /// <inheritdoc />
+    protected override Task PersistDeletedItemAsync(IContentType entity)
+    {
+        PersistDeletedItem(entity);
+        return Task.CompletedTask;
+    }
+
+    // ----------------------------------------------------------------------------------------------------
+    // Synchronous IContentTypeRepository contract (consumed by the shared sync content-type service base).
+    // Reads are served from the FullDataSet cache; writes/deletes bridge to the async base.
+    // ----------------------------------------------------------------------------------------------------
+
+    private IEnumerable<IContentType> GetAllCached()
+        => GetAllAsync(CancellationToken.None).GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    public IContentType? Get(int id)
+        => GetAllCached().FirstOrDefault(x => x.Id == id);
+
+    /// <inheritdoc />
+    public IEnumerable<IContentType> GetMany(params int[]? ids)
+    {
+        IEnumerable<IContentType> all = GetAllCached();
+        return ids is { Length: > 0 } ? all.Where(x => ids.Contains(x.Id)) : all;
+    }
+
+    /// <inheritdoc />
+    public bool Exists(int id) => GetAllCached().Any(x => x.Id == id);
+
+    /// <inheritdoc />
+    public IContentType? Get(Guid id)
+        => GetAllCached().FirstOrDefault(x => x.Key == id);
+
+    /// <remarks>
+    ///     Explicit implementation to disambiguate from the <see cref="int"/>-keyed <see cref="GetMany(int[])"/>.
+    /// </remarks>
+    IEnumerable<IContentType> IReadRepository<Guid, IContentType>.GetMany(params Guid[]? ids)
+    {
+        IEnumerable<IContentType> all = GetAllCached();
+        return ids is { Length: > 0 } ? all.Where(x => ids.Contains(x.Key)) : all;
+    }
+
+    /// <inheritdoc />
+    public bool Exists(Guid id) => GetAllCached().Any(x => x.Key == id);
+
+    /// <inheritdoc />
+    public IContentType? Get(string alias)
+        => GetAllCached().FirstOrDefault(x => x.Alias.InvariantEquals(alias));
+
+    /// <inheritdoc />
+    public void Save(IContentType entity)
+        => SaveAsync(entity, CancellationToken.None).GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    public void Delete(IContentType entity)
+        => DeleteAsync(entity, CancellationToken.None).GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    public IEnumerable<IContentType> Get(IQuery<IContentType> query)
+        => PerformGetByQuery(query).WhereNotNull();
+
+    /// <inheritdoc />
+    public int Count(IQuery<IContentType>? query) => PerformCount(query);
 
     /// <inheritdoc />
     public IEnumerable<IContentType> GetByQuery(IQuery<PropertyType> query)
@@ -96,7 +196,6 @@ internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContent
     /// <summary>
     ///     Gets all property type aliases.
     /// </summary>
-    /// <returns></returns>
     public IEnumerable<string> GetAllPropertyTypeAliases()
         => ExecuteEfScope(db => db.PropertyTypes
             .Select(x => x.Alias!)
@@ -105,17 +204,12 @@ internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContent
             .ToList());
 
     /// <summary>
-    ///     Gets all content type aliases
+    ///     Gets all content type aliases.
     /// </summary>
-    /// <param name="objectTypes">
-    ///     If this list is empty, it will return all content type aliases for media, members and content, otherwise
-    ///     it will only return content type aliases for the object types specified
-    /// </param>
-    /// <returns></returns>
     public IEnumerable<string> GetAllContentTypeAliases(params Guid[] objectTypes)
         => ExecuteEfScope(db =>
         {
-            IQueryable<EfContentTypeDto> query = db.ContentTypes;
+            IQueryable<ContentTypeDto> query = db.ContentTypes;
 
             if (objectTypes.Any())
             {
@@ -127,10 +221,8 @@ internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContent
         });
 
     /// <summary>
-    /// Retrieves the IDs of all content types that match the specified aliases.
+    ///     Retrieves the IDs of all content types that match the specified aliases.
     /// </summary>
-    /// <param name="aliases">An array of content type aliases for which to retrieve the corresponding IDs.</param>
-    /// <returns>An <see cref="IEnumerable{Int32}"/> containing the IDs of content types that match the provided aliases. If no aliases are specified, returns an empty collection.</returns>
     public IEnumerable<int> GetAllContentTypeIds(string[] aliases)
     {
         if (aliases.Length == 0)
@@ -144,121 +236,140 @@ internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContent
             .ToList());
     }
 
-    protected override IRepositoryCachePolicy<IContentType, int> CreateCachePolicy() =>
-        new FullDataSetRepositoryCachePolicy<IContentType, int>(GlobalIsolatedCache, ScopeAccessor, _repositoryCacheVersionService, _cacheSyncService, GetEntityId, /*expires:*/ true);
-
-    // Note: PerformGet(int) is passed as a callback to the cache policy's Get(TId) method,
-    // but FullDataSetRepositoryCachePolicy.Get() never invokes it — it uses GetAllCached()
-    // internally and clones only the matched entity. This override exists only as a required
-    // implementation of the abstract base and as a fallback for non-FullDataSet policies.
-    protected override IContentType? PerformGet(int id)
-        => GetMany().FirstOrDefault(x => x.Id == id);
-
-    protected override IEnumerable<IContentType>? GetAllWithFullCachePolicy() =>
-        CommonRepository.GetAllTypes()?.OfType<IContentType>();
-
-    // The IQuery<T> read path deliberately stays on NPoco: IQuery translates predicates straight to SQL and
-    // discards the expression, so it cannot be evaluated in-memory against the cached set, and the queries
-    // are read-only (they fetch ids that are then hydrated from the FullDataSet cache). GetBaseQuery /
-    // GetBaseWhereClause / PerformGetByQuery / GetByQuery remain NPoco for this reason.
-    protected override IEnumerable<IContentType> PerformGetByQuery(IQuery<IContentType> query)
+    // ----------------------------------------------------------------------------------------------------
+    // IQuery read path — the where clauses captured by the IQuery (SQL text + args) are appended to a
+    // hand-written id-select and executed by EF Core as raw SQL; matching entities are then hydrated from
+    // the cached full set.
+    // ----------------------------------------------------------------------------------------------------
+    private IEnumerable<IContentType> PerformGetByQuery(IQuery<IContentType> query)
     {
-        Sql<ISqlContext> baseQuery = GetBaseQuery(false);
-        var translator = new SqlTranslator<IContentType>(baseQuery, query);
-        Sql<ISqlContext> sql = translator.Translate();
-        var ids = Database.Fetch<int>(sql).Distinct().ToArray();
+        // note: Guid values must be bound as parameters (not string literals) — providers store/bind them
+        // in provider-specific formats (e.g. uppercase TEXT on SQLite, uniqueidentifier on SQL Server).
+        (var whereSql, var clauseArgs) = TranslateWhereClauses(query.GetWhereClauses(), parameterOffset: 1);
+        var p0 = "{0}";
+        var sql =
+            $"""
+             SELECT DISTINCT {ContentTypeDto.TableName}.{ContentTypeDto.NodeIdColumnName} AS Value
+             FROM {ContentTypeDto.TableName}
+             INNER JOIN {NodeDto.TableName} ON {ContentTypeDto.TableName}.{ContentTypeDto.NodeIdColumnName} = {NodeDto.TableName}.{NodeDto.PrimaryKeyColumnName}
+             LEFT JOIN {ContentTypeTemplateDto.TableName} ON {ContentTypeTemplateDto.TableName}.{ContentTypeTemplateDto.ContentTypeNodeIdColumnName} = {ContentTypeDto.TableName}.{ContentTypeDto.NodeIdColumnName}
+             WHERE {NodeDto.TableName}.{NodeDto.NodeObjectTypeColumnName} = {p0}{whereSql}
+             """;
+        var args = new object[clauseArgs.Length + 1];
+        args[0] = NodeObjectTypeId;
+        clauseArgs.CopyTo(args, 1);
 
-        return ids.Length > 0
-            ? GetMany(ids).OrderBy(x => x.Name)
+        List<int> ids = ExecuteEfScope(db => db.Database.SqlQueryRaw<int>(sql, args).ToList());
+
+        return ids.Count > 0
+            ? GetMany(ids.ToArray()).OrderBy(x => x.Name)
             : Enumerable.Empty<IContentType>();
     }
 
     private IEnumerable<int> PerformGetByQuery(IQuery<PropertyType> query)
     {
-        // used by DataTypeService to remove properties
-        // from content types if they have a deleted data type - see
-        // notes in DataTypeService.Delete as it's a bit weird
-        Sql<ISqlContext> sqlClause = Sql()
-            .SelectAll()
-            .From<PropertyTypeDto>()
-            .LeftJoin<PropertyTypeGroupDto>()
-            .On<PropertyTypeGroupDto, PropertyTypeDto>(left => left.Id, right => right.PropertyTypeGroupId)
-            .InnerJoin<DataTypeDto>()
-            .On<PropertyTypeDto, DataTypeDto>(left => left.DataTypeId, right => right.NodeId);
+        // used by DataTypeService to remove properties from content types if they have a deleted data type.
+        // Matches the legacy behaviour of resolving the content type through the property GROUP — ungrouped
+        // property types resolve to 0 and are filtered out.
+        (var whereSql, var args) = TranslateWhereClauses(query.GetWhereClauses());
+        var sql =
+            $"""
+             SELECT DISTINCT COALESCE({PropertyTypeGroupDto.TableName}.{PropertyTypeGroupDto.ContentTypeNodeIdColumnName}, 0) AS Value
+             FROM {PropertyTypeDto.TableName}
+             LEFT JOIN {PropertyTypeGroupDto.TableName} ON {PropertyTypeGroupDto.TableName}.{PropertyTypeGroupDto.PrimaryKeyColumnName} = {PropertyTypeDto.TableName}.{PropertyTypeDto.PropertyTypeGroupIdColumnName}
+             INNER JOIN {DataTypeDto.TableName} ON {PropertyTypeDto.TableName}.{PropertyTypeDto.DataTypeIdColumnName} = {DataTypeDto.TableName}.nodeId
+             WHERE 1 = 1{whereSql}
+             """;
 
-        var translator = new SqlTranslator<PropertyType>(sqlClause, query);
-        Sql<ISqlContext> sql = translator.Translate()
-            .OrderBy<PropertyTypeDto>(x => x.PropertyTypeGroupId);
-
-        return Database
-            .FetchOneToMany<PropertyTypeGroupDto>(x => x.PropertyTypeDtos, sql)
-            .Select(x => x.ContentTypeNodeId).Distinct();
+        return ExecuteEfScope(db => db.Database.SqlQueryRaw<int>(sql, args).ToList())
+            .Where(id => id > 0)
+            .Distinct();
     }
 
-    protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
+    private int PerformCount(IQuery<IContentType>? query)
     {
-        Sql<ISqlContext> sql = Sql();
+        (var whereSql, var clauseArgs) = query is null
+            ? (string.Empty, Array.Empty<object>())
+            : TranslateWhereClauses(query.GetWhereClauses(), parameterOffset: 1);
+        var p0 = "{0}";
+        var sql =
+            $"""
+             SELECT COUNT(*) AS Value
+             FROM {ContentTypeDto.TableName}
+             INNER JOIN {NodeDto.TableName} ON {ContentTypeDto.TableName}.{ContentTypeDto.NodeIdColumnName} = {NodeDto.TableName}.{NodeDto.PrimaryKeyColumnName}
+             LEFT JOIN {ContentTypeTemplateDto.TableName} ON {ContentTypeTemplateDto.TableName}.{ContentTypeTemplateDto.ContentTypeNodeIdColumnName} = {ContentTypeDto.TableName}.{ContentTypeDto.NodeIdColumnName}
+             WHERE {NodeDto.TableName}.{NodeDto.NodeObjectTypeColumnName} = {p0}{whereSql}
+             """;
+        var args = new object[clauseArgs.Length + 1];
+        args[0] = NodeObjectTypeId;
+        clauseArgs.CopyTo(args, 1);
 
-        sql = isCount
-            ? sql.SelectCount()
-            : sql.Select<ContentTypeDto>(x => x.NodeId);
-
-        sql
-            .From<ContentTypeDto>()
-            .InnerJoin<NodeDto>().On<ContentTypeDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-            .LeftJoin<ContentTypeTemplateDto>()
-            .On<ContentTypeTemplateDto, ContentTypeDto>(left => left.ContentTypeNodeId, right => right.NodeId)
-            .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
-
-        return sql;
+        return ExecuteEfScope(db => db.Database.SqlQueryRaw<int>(sql, args).Single());
     }
-
-    protected override string GetBaseWhereClause() => $"{QuoteTableName(NodeDto.TableName)}.id = @id";
 
     /// <summary>
-    ///     Deletes a content type
+    /// Translates the SQL where clauses captured by an <see cref="IQuery{T}"/> into a fragment that EF Core
+    /// can execute as raw SQL: each clause's local <c>@N</c> parameter placeholders are renumbered into EF's
+    /// positional <c>{N}</c> form, offset by the parameters already present in the surrounding statement and
+    /// by the parameters of the preceding clauses.
     /// </summary>
-    /// <param name="entity"></param>
-    /// <remarks>
-    ///     First checks for children and removes those first
-    /// </remarks>
-    protected override void PersistDeletedItem(IContentType entity)
+    private static (string Sql, object[] Args) TranslateWhereClauses(
+        IEnumerable<Tuple<string, object[]>> clauses,
+        int parameterOffset = 0)
     {
-        IQuery<IContentType> query = Query<IContentType>().Where(x => x.ParentId == entity.Id);
-        IEnumerable<IContentType> children = Get(query);
+        var sb = new StringBuilder();
+        var args = new List<object>();
+        foreach (Tuple<string, object[]> clause in clauses)
+        {
+            var offset = parameterOffset + args.Count;
+            var clauseSql = Regex.Replace(
+                clause.Item1,
+                @"@(\d+)",
+                m => "{" + (int.Parse(m.Groups[1].Value, CultureInfo.InvariantCulture) + offset) + "}");
+            sb.Append(" AND (").Append(clauseSql).Append(')');
+            args.AddRange(clause.Item2);
+        }
+
+        return (sb.ToString(), args.ToArray());
+    }
+
+    // ----------------------------------------------------------------------------------------------------
+    // Persist (sync) — invoked by the async Persist*ItemAsync wrappers above.
+    // ----------------------------------------------------------------------------------------------------
+
+    /// <summary>
+    ///     Deletes a content type. First checks for children and removes those first.
+    /// </summary>
+    private void PersistDeletedItem(IContentType entity)
+    {
+        IContentType[] children = GetAllCached().Where(x => x.ParentId == entity.Id).ToArray();
         foreach (IContentType child in children)
         {
             PersistDeletedItem(child);
         }
 
-        // The cascade tables below (property data, tags, notifications, granular permissions) belong to other
-        // repositories and are not modelled in EF Core, so their cleanup stays on NPoco. They share the bridged
-        // scope/transaction with the EF Core definition-table deletes that follow.
+        // The cascade tables below (property data, notifications, tags, granular permissions) belong to other
+        // repositories and are not modelled in EF Core — raw SQL on the shared context.
+        ExecuteEfScope(db =>
+        {
+            // Before deleting the definition tables, clear any leftover property data linked to this content
+            // type. A document-type switch can leave property data pointing at the previous type (FK on cmsPropertyType).
+            db.Database.ExecuteSqlRaw(
+                $"""
+                 DELETE FROM {Constants.DatabaseSchema.Tables.PropertyData} WHERE propertyTypeId IN (
+                 SELECT {PropertyTypeDto.PrimaryKeyColumnName} FROM {PropertyTypeDto.TableName} WHERE {PropertyTypeDto.ContentTypeIdColumnName} = {entity.Id})
+                 """);
 
-        // Before deleting the definition tables, clear any leftover property data linked to this content type.
-        // Normally the ContentTypeService deletes the associated content first, but a document-type switch can
-        // leave property data pointing at the previous type, so we ensure it is removed (FK on cmsPropertyType).
-        Sql<ISqlContext> sql = Sql()
-            .SelectDistinct<PropertyDataDto>(c => c.PropertyTypeId)
-            .From<PropertyDataDto>()
-            .InnerJoin<PropertyTypeDto>()
-            .On<PropertyDataDto, PropertyTypeDto>(dto => dto.PropertyTypeId, dto => dto.Id)
-            .InnerJoin<ContentTypeDto>()
-            .On<ContentTypeDto, PropertyTypeDto>(dto => dto.NodeId, dto => dto.ContentTypeId)
-            .Where<ContentTypeDto>(dto => dto.NodeId == entity.Id);
+            db.Database.ExecuteSqlRaw(
+                $"DELETE FROM {Constants.DatabaseSchema.Tables.User2NodeNotify} WHERE nodeId = {entity.Id}");
+            db.Database.ExecuteSqlRaw(
+                $"DELETE FROM {Constants.DatabaseSchema.Tables.TagRelationship} WHERE nodeId = {entity.Id}");
 
-        // Delete all PropertyData where propertytypeid EXISTS in the subquery above
-        Database.Execute(SqlSyntax.GetDeleteSubquery(PropertyDataDto.TableName, "propertyTypeId", sql));
-
-        Database.Execute(
-            $"DELETE FROM {QuoteTableName(User2NodeNotifyDto.TableName)} WHERE {QuoteColumnName(User2NodeNotifyDto.NodeIdColumnName)} = @id",
-            new { id = entity.Id });
-        Database.Execute(
-            $"DELETE FROM {QuoteTableName(TagRelationshipDto.TableName)} WHERE {QuoteColumnName(TagRelationshipDto.NodeIdColumnName)} = @id",
-            new { id = entity.Id });
-
-        // delete all granular permissions for this content type
-        Database.Delete<UserGroup2GranularPermissionDto>(Sql().Where<UserGroup2GranularPermissionDto>(dto => dto.UniqueId == entity.Key));
+            // delete all granular permissions for this content type
+            db.Database.ExecuteSqlRaw(
+                $"DELETE FROM {Constants.DatabaseSchema.Tables.UserGroup2GranularPermission} WHERE uniqueId = {{0}}",
+                entity.Key);
+        });
 
         // Definition tables modelled in EF Core.
         PersistDeletedBaseContentTypeEFCore(entity);
@@ -270,10 +381,8 @@ internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContent
     /// <summary>
     /// EF Core implementation of the content-type-definition delete path. Removes the cmsPropertyType +
     /// cmsPropertyTypeGroup + cmsContentTypeAllowedContentType + cmsContentType2ContentType + cmsDocumentType +
-    /// umbracoContentVersionCleanupPolicy + cmsContentType + umbracoNode rows through the EF Core
-    /// <see cref="UmbracoDbContext"/>, in FK-safe order (children before parents). The cascade tables not
-    /// modelled in EF Core are removed by the caller via NPoco. <c>ExecuteDelete</c> is set-based and bypasses
-    /// the change tracker, so it never conflicts with entities the shared bridged context already tracks.
+    /// umbracoContentVersionCleanupPolicy + cmsContentType + umbracoNode rows in FK-safe order. <c>ExecuteDelete</c>
+    /// is set-based and bypasses the change tracker.
     /// </summary>
     private void PersistDeletedBaseContentTypeEFCore(IContentType entity)
     {
@@ -291,7 +400,7 @@ internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContent
         });
     }
 
-    protected override void PersistNewItem(IContentType entity)
+    private void PersistNewItem(IContentType entity)
     {
         if (string.IsNullOrWhiteSpace(entity.Alias))
         {
@@ -323,10 +432,9 @@ internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContent
             // remove and re-insert. ExecuteDelete is set-based and bypasses the change tracker.
             db.ContentTypeTemplates.Where(x => x.ContentTypeNodeId == entity.Id).ExecuteDelete();
 
-            // we could do it all in foreach if we assume that the default template is an allowed template??
             if (defaultTemplateId > 0)
             {
-                db.ContentTypeTemplates.Add(new EfContentTypeTemplateDto
+                db.ContentTypeTemplates.Add(new ContentTypeTemplateDto
                 {
                     ContentTypeNodeId = entity.Id,
                     TemplateNodeId = defaultTemplateId,
@@ -336,7 +444,7 @@ internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContent
 
             foreach (ITemplate template in allowedTemplates)
             {
-                db.ContentTypeTemplates.Add(new EfContentTypeTemplateDto
+                db.ContentTypeTemplates.Add(new ContentTypeTemplateDto
                 {
                     ContentTypeNodeId = entity.Id,
                     TemplateNodeId = template.Id,
@@ -348,7 +456,7 @@ internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContent
         });
     }
 
-    protected override void PersistUpdatedItem(IContentType entity)
+    private void PersistUpdatedItem(IContentType entity)
     {
         ValidateAlias(entity);
 
@@ -382,7 +490,6 @@ internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContent
     private void PersistHistoryCleanup(IContentType entity)
     {
         // historyCleanup property is not mandatory for api endpoint, handle the case where it's not present.
-        // DocumentTypeSave doesn't handle this for us like ContentType constructors do.
         if (entity is IContentType entityWithHistoryCleanup)
         {
             var updated = DateTime.UtcNow;
@@ -403,7 +510,7 @@ internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContent
 
                 if (affected == 0)
                 {
-                    db.ContentVersionCleanupPolicies.Add(new EfContentVersionCleanupPolicyDto
+                    db.ContentVersionCleanupPolicies.Add(new ContentVersionCleanupPolicyDto
                     {
                         ContentTypeId = entity.Id,
                         Updated = updated,
@@ -418,18 +525,15 @@ internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContent
     }
 
     /// <summary>
-    /// EF Core implementation of the content-type-definition insert path. Mirrors
-    /// <see cref="ContentTypeRepositoryBase{TEntity}.PersistNewBaseContentType"/> but writes the
-    /// umbracoNode + cmsContentType + composition + allowed-type + property group/type rows through
-    /// the EF Core <see cref="UmbracoDbContext"/>. Runs in the ambient (bridged) scope so it shares the
-    /// same transaction as the NPoco writes that follow (templates, history cleanup).
+    /// EF Core implementation of the content-type-definition insert path: writes the umbracoNode +
+    /// cmsContentType + composition + allowed-type + property group/type rows through the EF Core
+    /// <see cref="UmbracoDbContext"/>.
     /// </summary>
     private void PersistNewBaseContentTypeEFCore(IContentTypeComposition entity)
     {
         ValidateVariations(entity);
 
-        // Reuse the existing NPoco factory to build the DTO shape, then translate to EF Core DTOs.
-        ContentTypeDto npocoDto = ContentTypeFactory.BuildContentTypeDto(entity);
+        ContentTypeDto contentTypeDto = ContentTypeFactory.BuildEFCoreContentTypeDto(entity);
         (IContentType Entity, int SortOrder)[] allowedContentTypes = GetAllowedContentTypes(entity);
 
         ExecuteEfScope(db =>
@@ -443,12 +547,12 @@ internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContent
             }
 
             // Logic for setting Path, Level and SortOrder
-            EfNodeDto? parent = db.Nodes.FirstOrDefault(x => x.NodeId == entity.ParentId);
+            NodeDto? parent = db.Nodes.FirstOrDefault(x => x.NodeId == entity.ParentId);
             var level = (parent?.Level ?? 0) + 1;
             var sortOrder = db.Nodes.Count(x => x.ParentId == entity.ParentId && x.NodeObjectType == NodeObjectTypeId);
 
             // Create the (base) node data - umbracoNode
-            EfNodeDto nodeDto = ToEfNodeDto(npocoDto.NodeDto);
+            NodeDto nodeDto = contentTypeDto.NodeDto;
             nodeDto.Path = parent?.Path ?? Constants.System.RootString;
             nodeDto.Level = short.Parse(level.ToString(CultureInfo.InvariantCulture));
             nodeDto.SortOrder = sortOrder;
@@ -466,7 +570,6 @@ internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContent
             entity.Level = level;
 
             // Insert new ContentType entry
-            EfContentTypeDto contentTypeDto = ToEfContentTypeDto(npocoDto);
             contentTypeDto.NodeId = nodeDto.NodeId;
             db.ContentTypes.Add(contentTypeDto);
             db.SaveChanges();
@@ -481,7 +584,7 @@ internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContent
 
                 if (composition.HasIdentity)
                 {
-                    db.ContentTypeComposition.Add(new EfContentType2ContentTypeDto { ParentId = composition.Id, ChildId = entity.Id });
+                    db.ContentTypeComposition.Add(new ContentType2ContentTypeDto { ParentId = composition.Id, ChildId = entity.Id });
                 }
                 else
                 {
@@ -492,7 +595,7 @@ internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContent
                         .FirstOrDefault();
                     if (parentId.HasValue)
                     {
-                        db.ContentTypeComposition.Add(new EfContentType2ContentTypeDto { ParentId = parentId.Value, ChildId = entity.Id });
+                        db.ContentTypeComposition.Add(new ContentType2ContentTypeDto { ParentId = parentId.Value, ChildId = entity.Id });
                     }
                 }
             }
@@ -502,7 +605,7 @@ internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContent
             // Insert collection of allowed content types
             foreach ((IContentType allowedEntity, int allowedSortOrder) in allowedContentTypes)
             {
-                db.ContentTypeAllowedContentTypes.Add(new EfContentTypeAllowedContentTypeDto
+                db.ContentTypeAllowedContentTypes.Add(new ContentTypeAllowedContentTypeDto
                 {
                     Id = entity.Id,
                     AllowedId = allowedEntity.Id,
@@ -515,13 +618,11 @@ internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContent
             // Insert Tabs
             foreach (PropertyGroup propertyGroup in entity.PropertyGroups)
             {
-                EfPropertyTypeGroupDto tabDto = ToEfPropertyTypeGroupDto(PropertyGroupFactory.BuildGroupDto(propertyGroup, nodeDto.NodeId));
+                PropertyTypeGroupDto tabDto = PropertyGroupFactory.BuildEFCoreGroupDto(propertyGroup, nodeDto.NodeId);
                 db.PropertyTypeGroups.Add(tabDto);
                 db.SaveChanges();
                 propertyGroup.Id = tabDto.Id; // Set Id on PropertyGroup
 
-                // Ensure that the PropertyGroup's Id is set on the PropertyTypes within a group
-                // unless the PropertyGroupId has already been changed.
                 if (propertyGroup.PropertyTypes is not null)
                 {
                     foreach (IPropertyType propertyType in propertyGroup.PropertyTypes)
@@ -540,19 +641,17 @@ internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContent
             {
                 var tabId = propertyType.PropertyGroupId != null ? propertyType.PropertyGroupId.Value : default;
 
-                // If the Id of the DataType is not set, we resolve it from the db by its PropertyEditorAlias
                 if (propertyType.DataTypeId == 0 || propertyType.DataTypeId == default)
                 {
                     AssignDataTypeIdFromProvidedKeyOrPropertyEditor(db, propertyType);
                 }
 
-                EfPropertyTypeDto propertyTypeDto = ToEfPropertyTypeDto(PropertyGroupFactory.BuildPropertyTypeDto(tabId, propertyType, nodeDto.NodeId));
+                PropertyTypeDto propertyTypeDto = PropertyGroupFactory.BuildEFCorePropertyTypeDto(tabId, propertyType, nodeDto.NodeId);
                 db.PropertyTypes.Add(propertyTypeDto);
                 db.SaveChanges();
                 propertyType.Id = propertyTypeDto.Id; // Set Id on new PropertyType
 
-                // Update the current PropertyType with correct PropertyEditorAlias and DatabaseType
-                EfDataTypeDto? dataTypeDto = db.DataTypes.FirstOrDefault(x => x.NodeId == propertyType.DataTypeId);
+                DataTypeDto? dataTypeDto = db.DataTypes.FirstOrDefault(x => x.NodeId == propertyType.DataTypeId);
                 if (dataTypeDto is not null)
                 {
                     propertyType.PropertyEditorAlias = dataTypeDto.EditorAlias;
@@ -565,28 +664,22 @@ internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContent
     }
 
     /// <summary>
-    /// EF Core implementation of the content-type-definition update path. Mirrors
-    /// <see cref="ContentTypeRepositoryBase{TEntity}.PersistUpdatedBaseContentType"/> but writes the
-    /// umbracoNode + cmsContentType + composition + allowed-type + property group/type rows through EF Core.
-    /// The variation cascade and content-instance cleanup (removed-composition property data, variant data
-    /// movement, redirects, scheduled publishing, property-type deletion) stay on NPoco via the base helpers,
-    /// sharing the same bridged scope/transaction.
+    /// EF Core implementation of the content-type-definition update path. The variation cascade and
+    /// content-instance cleanup run as EF raw SQL (variant engine), sharing the same bridged scope.
     /// </summary>
     private void PersistUpdatedBaseContentTypeEFCore(IContentTypeComposition entity)
     {
         CorrectPropertyTypeVariations(entity);
         ValidateVariations(entity);
 
-        // Reuse the existing NPoco factory to build the DTO shape, then translate to EF Core DTOs.
-        ContentTypeDto dto = ContentTypeFactory.BuildContentTypeDto(entity);
+        ContentTypeDto dto = ContentTypeFactory.BuildEFCoreContentTypeDto(entity);
 
         ContentVariation oldContentTypeVariation = default;
 
         ExecuteEfScope(db =>
         {
-            // The bridged context is shared across repository operations within the ambient scope and
-            // accumulates tracked entities from prior inserts/saves (everything prior has already been
-            // saved). Clear it so the junction-table re-inserts below (compositions, allowed types) don't
+            // The bridged context is shared across repository operations within the ambient scope and accumulates
+            // tracked entities from prior inserts/saves. Clear it so the junction-table re-inserts below don't
             // collide with already-tracked instances carrying the same composite key.
             db.ChangeTracker.Clear();
 
@@ -600,21 +693,18 @@ internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContent
                 throw new DuplicateNameException("An item with the alias " + dto.Alias + " already exists");
             }
 
-            // capture the current (old) variation, needed below to decide whether the content type
-            // variation is changing.
+            // capture the current (old) variation
             oldContentTypeVariation = (ContentVariation)db.ContentTypes
                 .Where(x => x.NodeId == dto.NodeId)
                 .Select(x => x.Variations)
                 .First();
 
-            // handle (update) the node. ExecuteUpdate is set-based and does not use the change tracker,
-            // so it never conflicts with entities the shared bridged context already tracks (e.g. from a
-            // prior insert in the same scope).
+            // handle (update) the node (ExecuteUpdate is set-based and tracking-free)
             NodeDto nodeDto = dto.NodeDto;
             db.Nodes.Where(x => x.NodeId == nodeDto.NodeId).ExecuteUpdate(s => s
                 .SetProperty(x => x.UniqueId, nodeDto.UniqueId)
                 .SetProperty(x => x.ParentId, nodeDto.ParentId)
-                .SetProperty(x => x.Level, (short)nodeDto.Level)
+                .SetProperty(x => x.Level, nodeDto.Level)
                 .SetProperty(x => x.Path, nodeDto.Path)
                 .SetProperty(x => x.SortOrder, nodeDto.SortOrder)
                 .SetProperty(x => x.Trashed, nodeDto.Trashed)
@@ -639,13 +729,13 @@ internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContent
             db.ContentTypeComposition.Where(x => x.ChildId == entity.Id).ExecuteDelete();
             foreach (IContentTypeComposition composition in entity.ContentTypeComposition)
             {
-                db.ContentTypeComposition.Add(new EfContentType2ContentTypeDto { ParentId = composition.Id, ChildId = entity.Id });
+                db.ContentTypeComposition.Add(new ContentType2ContentTypeDto { ParentId = composition.Id, ChildId = entity.Id });
             }
 
             db.SaveChanges();
         });
 
-        // removing a ContentType from a composition (U4-1690): content-instance cleanup stays on NPoco
+        // removing a ContentType from a composition (U4-1690): content-instance cleanup (EF raw SQL)
         ClearPropertyDataForRemovedContentTypes(entity);
 
         // delete the allowed content type entries before re-inserting the collection of allowed content types
@@ -658,7 +748,7 @@ internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContent
             {
                 foreach ((IContentType allowedEntity, int sortOrder) in allowedContentTypes)
                 {
-                    db.ContentTypeAllowedContentTypes.Add(new EfContentTypeAllowedContentTypeDto
+                    db.ContentTypeAllowedContentTypes.Add(new ContentTypeAllowedContentTypeDto
                     {
                         Id = entity.Id,
                         AllowedId = allowedEntity.Id,
@@ -682,7 +772,7 @@ internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContent
             IEnumerable<int> propertyTypeToDeleteIds = dbPropertyTypeIds.Except(entityPropertyTypes);
             foreach (var propertyTypeId in propertyTypeToDeleteIds)
             {
-                DeletePropertyType(entity, propertyTypeId); // NPoco: clears tag/property-data/permission dependencies too
+                DeletePropertyType(entity, propertyTypeId); // also clears tag/property-data/permission dependencies
             }
         }
 
@@ -702,8 +792,6 @@ internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContent
 
                 if (groupsToDelete.Length > 0)
                 {
-                    // if the tab contains properties, move them to 'generic properties' (group = null)
-                    // and keep track of them so leftover orphans can be removed later.
                     orphanPropertyTypeIds = db.PropertyTypes
                         .Where(x => x.PropertyTypeGroupId != null && groupsToDelete.Contains(x.PropertyTypeGroupId.Value))
                         .Select(x => x.Id)
@@ -721,7 +809,7 @@ internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContent
         {
             foreach (PropertyGroup propertyGroup in entity.PropertyGroups)
             {
-                EfPropertyTypeGroupDto groupDto = ToEfPropertyTypeGroupDto(PropertyGroupFactory.BuildGroupDto(propertyGroup, entity.Id));
+                PropertyTypeGroupDto groupDto = PropertyGroupFactory.BuildEFCoreGroupDto(propertyGroup, entity.Id);
                 int groupId;
                 if (propertyGroup.HasIdentity)
                 {
@@ -742,7 +830,6 @@ internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContent
                     propertyGroup.Id = groupId;
                 }
 
-                // assign properties to the group
                 if (propertyGroup.PropertyTypes is not null)
                 {
                     foreach (IPropertyType propertyType in propertyGroup.PropertyTypes)
@@ -753,7 +840,7 @@ internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContent
             }
         });
 
-        // check if the content type variation has been changed (content-instance cascade stays on NPoco)
+        // check if the content type variation has been changed (content-instance cascade runs as EF raw SQL)
         var contentTypeVariationDirty = entity.IsPropertyDirty("Variations");
         ContentVariation newContentTypeVariation = entity.Variations;
         var contentTypeVariationChanging =
@@ -776,14 +863,11 @@ internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContent
             }
         }
 
-        // figure out dirty property types that have actually changed, before we insert or update
-        // properties, so we can read the old variations
         Dictionary<int, (ContentVariation FromVariation, ContentVariation ToVariation)>? propertyTypeVariationChanges =
             propertyTypeVariationDirty != null
                 ? GetPropertyVariationChanges(propertyTypeVariationDirty)
                 : null;
 
-        // deal with composition property types that change due to this content type variations change
         if (contentTypeVariationChanging)
         {
             propertyTypeVariationChanges ??= new Dictionary<int, (ContentVariation, ContentVariation)>();
@@ -807,7 +891,6 @@ internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContent
         {
             foreach (IPropertyType propertyType in entity.PropertyTypes)
             {
-                // if the Id of the DataType is not set, we resolve it from the db by its PropertyEditorAlias
                 if (propertyType.DataTypeId == 0 || propertyType.DataTypeId == default)
                 {
                     AssignDataTypeIdFromProvidedKeyOrPropertyEditor(db, propertyType);
@@ -816,7 +899,7 @@ internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContent
                 ValidateAlias(propertyType);
 
                 var groupId = propertyType.PropertyGroupId?.Value ?? default;
-                EfPropertyTypeDto propertyTypeDto = ToEfPropertyTypeDto(PropertyGroupFactory.BuildPropertyTypeDto(groupId, propertyType, entity.Id));
+                PropertyTypeDto propertyTypeDto = PropertyGroupFactory.BuildEFCorePropertyTypeDto(groupId, propertyType, entity.Id);
                 int typeId;
                 if (propertyType.HasIdentity)
                 {
@@ -850,8 +933,8 @@ internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContent
             }
         });
 
-        // restrict property data changes to impacted content types (content-instance cascade stays on NPoco)
-        IEnumerable<IContentType>? all = PerformGetAll();
+        // restrict property data changes to impacted content types (content-instance cascade runs as EF raw SQL)
+        IEnumerable<IContentType> all = GetAllCached();
         IEnumerable<IContentTypeComposition> impacted = GetImpactedContentTypes(entity, all);
 
         if (propertyTypeVariationChanges?.Count > 0)
@@ -872,8 +955,8 @@ internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContent
     }
 
     /// <summary>
-    /// EF Core variant of the base's data-type resolution: tries the key via <see cref="IIdKeyMap"/>,
-    /// then falls back to looking up a data type by its property editor alias.
+    /// EF Core variant of the data-type resolution: tries the key via <see cref="IIdKeyMap"/>, then falls back to
+    /// looking up a data type by its property editor alias.
     /// </summary>
     private void AssignDataTypeIdFromProvidedKeyOrPropertyEditor(UmbracoDbContext db, IPropertyType propertyType)
     {
@@ -893,10 +976,8 @@ internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContent
                 propertyType.DataTypeKey);
         }
 
-        // Otherwise if a property editor alias is provided, try to find a data type that uses that alias.
         if (propertyType.PropertyEditorAlias.IsNullOrWhiteSpace())
         {
-            // We cannot try to assign a data type if it's empty.
             return;
         }
 
@@ -922,8 +1003,8 @@ internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContent
 
     /// <summary>
     /// Executes the given action against the ambient EF Core <see cref="UmbracoDbContext"/>, bridging the
-    /// synchronous repository contract onto the async-only scope API. The action runs synchronously so
-    /// there is no real await and no deadlock risk.
+    /// synchronous repository contract onto the async-only scope API. The action runs synchronously so there is
+    /// no real await and no deadlock risk.
     /// </summary>
     private void ExecuteEfScope(Action<UmbracoDbContext> action)
         => ExecuteEfScope(db =>
@@ -933,67 +1014,6 @@ internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContent
         });
 
     private T ExecuteEfScope<T>(Func<UmbracoDbContext, T> func)
-    {
-        IEFCoreScope<UmbracoDbContext> scope = _efCoreScopeAccessor.AmbientScope
-            ?? throw new InvalidOperationException("Cannot run a repository without an ambient EF Core scope.");
+        => AmbientScope.ExecuteWithContextAsync(db => Task.FromResult(func(db))).GetAwaiter().GetResult();
 
-        return scope.ExecuteWithContextAsync(db => Task.FromResult(func(db))).GetAwaiter().GetResult();
-    }
-
-    private static EfNodeDto ToEfNodeDto(NodeDto dto) => new()
-    {
-        NodeId = dto.NodeId,
-        UniqueId = dto.UniqueId,
-        ParentId = dto.ParentId,
-        Level = dto.Level,
-        Path = dto.Path,
-        SortOrder = dto.SortOrder,
-        Trashed = dto.Trashed,
-        UserId = dto.UserId,
-        Text = dto.Text,
-        NodeObjectType = dto.NodeObjectType,
-        CreateDate = dto.CreateDate,
-    };
-
-    private static EfContentTypeDto ToEfContentTypeDto(ContentTypeDto dto) => new()
-    {
-        NodeId = dto.NodeId,
-        Alias = dto.Alias,
-        Icon = dto.Icon,
-        Thumbnail = dto.Thumbnail,
-        Description = dto.Description,
-        ListView = dto.ListView,
-        IsElement = dto.IsElement,
-        AllowedInLibrary = dto.AllowedInLibrary,
-        AllowAtRoot = dto.AllowAtRoot,
-        Variations = dto.Variations,
-    };
-
-    private static EfPropertyTypeGroupDto ToEfPropertyTypeGroupDto(PropertyTypeGroupDto dto) => new()
-    {
-        UniqueId = dto.UniqueId,
-        ContentTypeNodeId = dto.ContentTypeNodeId,
-        Type = dto.Type,
-        Text = dto.Text,
-        Alias = dto.Alias,
-        SortOrder = dto.SortOrder,
-    };
-
-    private static EfPropertyTypeDto ToEfPropertyTypeDto(PropertyTypeDto dto) => new()
-    {
-        DataTypeId = dto.DataTypeId,
-        ContentTypeId = dto.ContentTypeId,
-        PropertyTypeGroupId = dto.PropertyTypeGroupId,
-        Alias = dto.Alias,
-        Name = dto.Name,
-        SortOrder = dto.SortOrder,
-        Mandatory = dto.Mandatory,
-        MandatoryMessage = dto.MandatoryMessage,
-        ValidationRegExp = dto.ValidationRegExp,
-        ValidationRegExpMessage = dto.ValidationRegExpMessage,
-        Description = dto.Description,
-        LabelOnTop = dto.LabelOnTop,
-        Variations = dto.Variations,
-        UniqueId = dto.UniqueId,
-    };
 }

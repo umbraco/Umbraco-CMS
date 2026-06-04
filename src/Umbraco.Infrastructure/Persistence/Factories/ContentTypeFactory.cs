@@ -5,6 +5,8 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using EFCoreContentTypeDto = Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.ContentTypeDto;
+using EFCoreNodeDto = Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.NodeDto;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Factories;
 
@@ -163,6 +165,66 @@ internal static class ContentTypeFactory
         };
         return contentTypeDto;
     }
+
+    /// <summary>
+    /// Creates an EF Core <see cref="Dtos.EFCore.ContentTypeDto"/> (including its nested
+    /// <see cref="Dtos.EFCore.NodeDto"/>) from the specified <see cref="IContentTypeBase"/> entity.
+    /// Determines the appropriate node object type based on the entity's concrete type (content, media, or member type).
+    /// </summary>
+    /// <param name="entity">The <see cref="IContentTypeBase"/> entity to convert to a DTO.</param>
+    /// <returns>An EF Core <see cref="Dtos.EFCore.ContentTypeDto"/> that represents the provided content type entity.</returns>
+    public static EFCoreContentTypeDto BuildEFCoreContentTypeDto(IContentTypeBase entity)
+    {
+        Guid nodeObjectType;
+        if (entity is IContentType)
+        {
+            nodeObjectType = Constants.ObjectTypes.DocumentType;
+        }
+        else if (entity is IMediaType)
+        {
+            nodeObjectType = Constants.ObjectTypes.MediaType;
+        }
+        else if (entity is IMemberType)
+        {
+            nodeObjectType = Constants.ObjectTypes.MemberType;
+        }
+        else
+        {
+            throw new Exception("Invalid entity.");
+        }
+
+        return new EFCoreContentTypeDto
+        {
+            Alias = entity.Alias,
+            Description = entity.Description,
+            Icon = entity.Icon,
+            Thumbnail = entity.Thumbnail,
+            NodeId = entity.Id,
+            AllowAtRoot = entity.AllowedAsRoot,
+            ListView = entity.ListView,
+            IsElement = entity.IsElement,
+            AllowedInLibrary = entity.AllowedInLibrary,
+            Variations = (byte)entity.Variations,
+            NodeDto = BuildEFCoreNodeDto(entity, nodeObjectType),
+        };
+    }
+
+    private static EFCoreNodeDto BuildEFCoreNodeDto(IUmbracoEntity entity, Guid nodeObjectType) => new()
+    {
+        CreateDate = entity.CreateDate,
+        NodeId = entity.Id,
+        Level = short.Parse(entity.Level.ToString(CultureInfo.InvariantCulture)),
+        NodeObjectType = nodeObjectType,
+        ParentId = entity.ParentId,
+        Path = entity.Path,
+        SortOrder = entity.SortOrder,
+        Text = entity.Name,
+        Trashed = false,
+        UniqueId = entity.Key,
+        // EF Core writes the backing field directly, bypassing the UserId getter's 0-to-null coalescing,
+        // so an unknown creator must be coalesced here to avoid violating the nodeUser FK.
+        UserId = entity.CreatorId == 0 ? null : entity.CreatorId,
+    };
 
     #endregion
 
