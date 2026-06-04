@@ -22,4 +22,5 @@ public enum EFCoreMigration
     AddPublicAccessDto = 14,
     AddDistributedJobDto = 15,
     AddConsentDto = 16,
+    AddDictionaryDto = 17,
 }
