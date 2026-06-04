@@ -344,8 +344,7 @@ public sealed class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IO
         var schemaId = GetSchemaId(jsonTypeInfo);
 
         // Types that produce 'true' in JSON Schema (unconstrained: JsonNode, object, custom-converter types) should be inline {} rather than named components.
-        JsonNode rawSchema = JsonSchemaExporter.GetJsonSchemaAsNode(jsonTypeInfo);
-        if (rawSchema.GetValueKind() == JsonValueKind.True)
+        if (jsonTypeInfo.Kind == JsonTypeInfoKind.None && jsonTypeInfo.GetJsonSchemaAsNode().GetValueKind() == JsonValueKind.True)
         {
             return new OpenApiSchema();
         }
