@@ -1,11 +1,13 @@
 import { UMB_TREE_PICKER_MODAL } from '../../tree-picker-modal/index.js';
 import type { UmbTreeItemModel } from '../../types.js';
+import type { UmbTreeRepository } from '../../data/tree-repository.interface.js';
 import type { UmbMoveRepository } from './move-repository.interface.js';
 import type { MetaEntityActionMoveToKind } from './types.js';
 import { UmbEntityActionBase, UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import { linkEntityExpansionEntries } from '@umbraco-cms/backoffice/utils';
 
 export class UmbMoveToEntityAction extends UmbEntityActionBase<MetaEntityActionMoveToKind> {
 	protected async _getPickableFilter(unique: string): Promise<((item: UmbTreeItemModel) => boolean) | undefined> {
@@ -16,11 +18,18 @@ export class UmbMoveToEntityAction extends UmbEntityActionBase<MetaEntityActionM
 		if (!this.args.unique) throw new Error('Unique is not available');
 		if (!this.args.entityType) throw new Error('Entity Type is not available');
 
+		const treeRepository = await createExtensionApiByAlias<UmbTreeRepository>(this, this.args.meta.treeRepositoryAlias);
+		const { data: ancestors } =
+			(await treeRepository?.requestTreeItemAncestors({
+				treeItem: { unique: this.args.unique, entityType: this.args.entityType },
+			})) ?? {};
+
 		const value = await umbOpenModal(this, UMB_TREE_PICKER_MODAL, {
 			data: {
 				treeAlias: this.args.meta.treeAlias,
 				foldersOnly: this.args.meta.foldersOnly,
 				expandTreeRoot: true,
+				expansion: ancestors ? linkEntityExpansionEntries(ancestors) : [],
 				pickableFilter: await this._getPickableFilter(this.args.unique),
 			},
 		});
