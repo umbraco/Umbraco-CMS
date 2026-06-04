@@ -49,7 +49,7 @@ internal sealed class ElementContainerDeletedDistributedCacheNotificationHandler
     /// (now non-existent) id and nested elements stay invisible in the tree until the application is restarted.
     /// </summary>
     [Test]
-    public async Task Child_Element_Is_Returned_After_Container_Recreated_Under_Same_Key()
+    public async Task Can_Resolve_Children_After_Container_Recreated_Under_Same_Key()
     {
         IContentType elementType = await CreateElementTypeAsync();
         var containerKey = Guid.NewGuid();
@@ -57,6 +57,7 @@ internal sealed class ElementContainerDeletedDistributedCacheNotificationHandler
         // Create the container and resolve its children once, so its key->id mapping is cached in IdKeyMap.
         EntityContainer firstContainer = await CreateContainerAsync(containerKey, "Container v1");
         Attempt<int> warmResolve = IdKeyMap.GetIdForKey(containerKey, UmbracoObjectTypes.ElementContainer);
+        Assert.IsTrue(warmResolve.Success, "Expected IdKeyMap to resolve the newly created container key.");
         Assert.AreEqual(firstContainer.Id, warmResolve.Result);
 
         // Delete and recreate under the same key - the recreated container gets a new id.
@@ -72,6 +73,7 @@ internal sealed class ElementContainerDeletedDistributedCacheNotificationHandler
         // Without the fix, the stale containerKey->firstContainer.Id mapping survives and the children query
         // resolves to the old (now non-existent) parent id, returning nothing.
         Attempt<int> resolvedAfter = IdKeyMap.GetIdForKey(containerKey, UmbracoObjectTypes.ElementContainer);
+        Assert.IsTrue(resolvedAfter.Success, "Expected IdKeyMap to resolve the recreated container key.");
         Assert.AreEqual(secondContainer.Id, resolvedAfter.Result, "Container key should resolve to the recreated container id.");
 
         AssertChildrenContains(containerKey, element.Key);
