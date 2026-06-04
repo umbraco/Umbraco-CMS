@@ -58,6 +58,12 @@ export class DocumentApiHelper {
     return await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/tree/document/root?skip=0&take=10000');
   }
 
+  async getAllAtRootNames() {
+    const response = await this.getAllAtRoot();
+    const root = await response.json();
+    return root.items.map((item) => item.variants[0].name);
+  }
+
   async getChildren(id: string) {
     const response = await this.api.get(`${this.api.baseUrl}/umbraco/management/api/v1/tree/document/children?parentId=${id}&skip=0&take=10000`);
     const items = await response.json();

@@ -23,6 +23,8 @@ export class MediaUiHelper extends UiBaseLocators {
   private readonly mediaTreeItem: Locator;
   private readonly mediaPopoverLayout: Locator;
   private readonly mediaWorkspace: Locator;
+  private readonly sortChildrenBtn: Locator;
+  private readonly sortBtn: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -46,6 +48,8 @@ export class MediaUiHelper extends UiBaseLocators {
     this.mediaTreeItem = page.locator('umb-media-tree-item');
     this.mediaPopoverLayout = page.locator('umb-popover-layout');
     this.mediaWorkspace = page.locator('umb-media-workspace-editor');
+    this.sortChildrenBtn = page.getByRole('button', {name: 'Sort children'});
+    this.sortBtn = page.getByLabel('Sort', {exact: true});
   }
 
   async clickCreateMediaItemButton() {
@@ -129,7 +133,7 @@ export class MediaUiHelper extends UiBaseLocators {
       await this.clickMediaCaretButtonForName(name);
     }
   }
-  
+
   async doesMediaGridValuesMatch(expectedValues: string[]) {
     return expectedValues.forEach((text, index) => {
       expect(this.mediaCardItemsValues.nth(index)).toHaveText(text);
@@ -226,5 +230,40 @@ export class MediaUiHelper extends UiBaseLocators {
 
   async clickChooseModalButtonAndWaitForMediaItemsToBeMoved(movedMediaItems: number) {
     return await this.waitForMultipleResponsesAfterExecutingPromise('/move', this.clickChooseModalButton(), 200, movedMediaItems);
+  }
+
+  async clickSortChildrenButton() {
+    await this.click(this.sortChildrenBtn);
+  }
+
+  async clickSortButton() {
+    await this.click(this.sortBtn);
+  }
+
+  async sortChildrenDragAndDrop(dragFromSelector: Locator, dragToSelector: Locator, verticalOffset: number = 0, horizontalOffset: number = 0, steps: number = 5,) {
+    await this.waitForVisible(dragFromSelector);
+    await this.waitForVisible(dragToSelector);
+    const targetLocation = await dragToSelector.boundingBox();
+    const elementCenterX = targetLocation!.x + targetLocation!.width / 2;
+    const elementCenterY = targetLocation!.y + targetLocation!.height / 2;
+    await this.hover(dragFromSelector);
+    await this.page.mouse.move(10, 10);
+    await this.hover(dragFromSelector);
+    await this.page.mouse.down();
+    await this.page.waitForTimeout(ConstantHelper.wait.debounce);
+    await this.page.mouse.move(elementCenterX + horizontalOffset, elementCenterY + verticalOffset, {steps: steps},);
+    await this.page.waitForTimeout(ConstantHelper.wait.debounce);
+    await this.hover(dragToSelector);
+    await this.page.mouse.up();
+  }
+
+  async doesIndexMediaInTreeContainName(parentName: string, childName: string, index: number) {
+    await expect(
+      this.mediaTreeItem
+        .locator(`[label="${parentName}"]`)
+        .locator('umb-tree-item')
+        .nth(index)
+        .locator('#label'),
+    ).toHaveText(childName);
   }
 }

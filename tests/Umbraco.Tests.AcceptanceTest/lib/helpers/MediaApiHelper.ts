@@ -30,6 +30,12 @@ export class MediaApiHelper {
     return await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/tree/media/root?skip=0&take=10000');
   }
 
+  async getAllAtRootNames() {
+    const response = await this.getAllAtRoot();
+    const root = await response.json();
+    return root.items.map((item) => item.variants[0].name);
+  }
+
   private async recurseChildren(name: string, id: string, toDelete: boolean) {
     const items = await this.getChildren(id);
 
