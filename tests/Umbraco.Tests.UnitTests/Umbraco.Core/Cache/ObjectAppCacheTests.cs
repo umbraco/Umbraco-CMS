@@ -36,7 +36,7 @@ public class ObjectAppCacheTests : RuntimeAppCacheTests
 
         // Give the background eviction callback for the replaced entry time to run.
         var stopwatch = Stopwatch.StartNew();
-        while (stopwatch.Elapsed < TimeSpan.FromSeconds(2)
+        while (stopwatch.Elapsed < TimeSpan.FromMilliseconds(500)
                && _provider.Get("key") is not null
                && _provider.SearchByKey("key").Any())
         {

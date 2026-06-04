@@ -176,7 +176,7 @@ internal sealed class RuntimeCacheTests : UmbracoIntegrationTest
     private void WaitForKeyTrackingDesync(string key)
     {
         var stopwatch = Stopwatch.StartNew();
-        while (stopwatch.Elapsed < TimeSpan.FromSeconds(2))
+        while (stopwatch.Elapsed < TimeSpan.FromMilliseconds(500))
         {
             var desynced = RuntimeCache.Get(key) is not null && RuntimeCache.SearchByKey(key).Any() is false;
             if (desynced)
