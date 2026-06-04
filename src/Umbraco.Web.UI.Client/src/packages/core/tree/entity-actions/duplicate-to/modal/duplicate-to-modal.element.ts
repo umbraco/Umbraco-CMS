@@ -16,7 +16,7 @@ export class UmbDuplicateToModalElement extends UmbModalBaseElement<UmbDuplicate
 	@state()
 	private _treeExpansion: UmbEntityExpansionModel = [];
 
-	protected override updated(_changedProperties: PropertyValueMap<unknown> | Map<PropertyKey, unknown>) {
+	protected override updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>) {
 		super.updated(_changedProperties);
 		if (_changedProperties.has('data')) {
 			this._treeExpansion = this.data?.treeExpansion ?? [];
