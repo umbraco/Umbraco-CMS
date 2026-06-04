@@ -119,6 +119,11 @@ internal sealed class AsyncDocumentRepository
     public override Task<IEnumerable<IContent>> GetAllVersionsAsync(Guid nodeKey, CancellationToken cancellationToken) =>
         AmbientScope.ExecuteWithContextAsync(async db =>
         {
+            // All versions for the node, no Current filter — mirrors NPoco GetBaseQuery(current: false).
+            // Published LEFT JOIN is keyed on NodeId so every version row carries the same published-version
+            // context (which template is live, etc.), exactly as NPoco does.
+            // Ordering must happen on the anonymous intermediate type before projecting into DocumentRow —
+            // EF Core cannot translate member access on a record constructor call.
             var publishedSubquery = db.ContentVersions
                 .Join(
                     db.DocumentVersions.Where(documentVersion => documentVersion.Published),
@@ -126,11 +131,6 @@ internal sealed class AsyncDocumentRepository
                     documentVersion => documentVersion.Id,
                     (contentVersion, documentVersion) => new { contentVersion, documentVersion });
 
-            // All versions for the node, no Current filter — mirrors NPoco GetBaseQuery(current: false).
-            // Published LEFT JOIN is keyed on NodeId so every version row carries the same published-version
-            // context (which template is live, etc.), exactly as NPoco does.
-            // Ordering must happen on the anonymous intermediate type before projecting into DocumentRow —
-            // EF Core cannot translate member access on a record constructor call.
             List<DocumentRow> rows = await db.ContentVersions
                 .Join(
                     db.Nodes.Where(node => node.UniqueId == nodeKey && node.NodeObjectType == NodeObjectTypeKey),
@@ -184,6 +184,8 @@ internal sealed class AsyncDocumentRepository
     public override Task<IContent?> GetVersionAsync(Guid versionKey, CancellationToken cancellationToken) =>
         AmbientScope.ExecuteWithContextAsync(async db =>
         {
+            // Filter by the version GUID key; no Current filter — historical versions are valid targets.
+            // The Nodes join guards against returning versions that belong to a different object type.
             var publishedSubquery = db.ContentVersions
                 .Join(
                     db.DocumentVersions.Where(documentVersion => documentVersion.Published),
@@ -191,8 +193,6 @@ internal sealed class AsyncDocumentRepository
                     documentVersion => documentVersion.Id,
                     (contentVersion, documentVersion) => new { contentVersion, documentVersion });
 
-            // Filter by the version GUID key; no Current filter — historical versions are valid targets.
-            // The Nodes join guards against returning versions that belong to a different object type.
             DocumentRow? row = await db.ContentVersions
                 .Where(contentVersion => contentVersion.Key == versionKey)
                 .Join(
@@ -319,6 +319,7 @@ internal sealed class AsyncDocumentRepository
         DocumentVersionDto DocumentVersion,
         ContentVersionDto? PublishedContentVersion,
         DocumentVersionDto? PublishedDocumentVersion);
+
 
     private Task<List<IContent>> PerformGetRangeAsync(Guid[]? keys) =>
         AmbientScope.ExecuteWithContextAsync(async db =>

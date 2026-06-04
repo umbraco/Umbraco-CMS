@@ -655,6 +655,124 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         }
     }
 
+    // --- Group 10: EF Core / NPoco parity for version methods (temporary) ---
+    // These tests exist to build confidence that the EF Core version methods
+    // return the same data as the NPoco equivalents. Remove once parity is established.
+
+    [Test]
+    public async Task GetVersionAsync_MatchesNPocoOnScalarFields()
+    {
+        var scopeAccessor = GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>();
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        Guid versionKey = await scopeAccessor.AmbientScope!.ExecuteWithContextAsync(db =>
+            db.ContentVersions
+                .Where(contentVersion => contentVersion.NodeId == _publishedPage.Id && contentVersion.Current)
+                .Select(contentVersion => contentVersion.Key)
+                .FirstOrDefaultAsync());
+
+        IContent? fromEfCore = await repository.GetVersionAsync(versionKey, CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(fromEfCore, Is.Not.Null);
+        IContent? fromNPoco = ContentService.GetVersion(fromEfCore!.VersionId);
+        Assert.That(fromNPoco, Is.Not.Null);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(fromEfCore.Key, Is.EqualTo(fromNPoco!.Key));
+            Assert.That(fromEfCore.Name, Is.EqualTo(fromNPoco.Name));
+            Assert.That(fromEfCore.Path, Is.EqualTo(fromNPoco.Path));
+            Assert.That(fromEfCore.Level, Is.EqualTo(fromNPoco.Level));
+            Assert.That(fromEfCore.ParentId, Is.EqualTo(fromNPoco.ParentId));
+            Assert.That(fromEfCore.Published, Is.EqualTo(fromNPoco.Published));
+            Assert.That(fromEfCore.ContentType.Alias, Is.EqualTo(fromNPoco.ContentType.Alias));
+            Assert.That(fromEfCore.VersionId, Is.EqualTo(fromNPoco.VersionId));
+        });
+    }
+
+    [Test]
+    public async Task GetVersionAsync_MatchesNPocoOnProperties()
+    {
+        var scopeAccessor = GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>();
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        Guid versionKey = await scopeAccessor.AmbientScope!.ExecuteWithContextAsync(db =>
+            db.ContentVersions
+                .Where(contentVersion => contentVersion.NodeId == _publishedPage.Id && contentVersion.Current)
+                .Select(contentVersion => contentVersion.Key)
+                .FirstOrDefaultAsync());
+
+        IContent? fromEfCore = await repository.GetVersionAsync(versionKey, CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(fromEfCore, Is.Not.Null);
+        IContent? fromNPoco = ContentService.GetVersion(fromEfCore!.VersionId);
+        Assert.That(fromNPoco, Is.Not.Null);
+
+        foreach (IProperty property in fromNPoco!.Properties)
+        {
+            Assert.That(
+                fromEfCore.GetValue(property.Alias),
+                Is.EqualTo(fromNPoco.GetValue(property.Alias)),
+                $"Property '{property.Alias}' differs between EF Core and NPoco for GetVersionAsync");
+        }
+    }
+
+    [Test]
+    public async Task GetAllVersionsAsync_MatchesNPocoOnCount()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        IEnumerable<IContent> fromEfCore = await repository.GetAllVersionsAsync(_publishedPage.Key, CancellationToken.None);
+        scope.Complete();
+
+        IContent[] efCoreVersions = fromEfCore.ToArray();
+        IContent[] npocoVersions = ContentService.GetVersions(_publishedPage.Id).ToArray();
+
+        Assert.That(efCoreVersions, Has.Length.EqualTo(npocoVersions.Length));
+    }
+
+    [Test]
+    public async Task GetAllVersionsAsync_MatchesNPocoOnScalarFieldsPerVersion()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        IEnumerable<IContent> fromEfCore = await repository.GetAllVersionsAsync(_publishedPage.Key, CancellationToken.None);
+        scope.Complete();
+
+        Dictionary<int, IContent> efCoreByVersionId = fromEfCore.ToDictionary(version => version.VersionId);
+        Dictionary<int, IContent> npocoByVersionId = ContentService.GetVersions(_publishedPage.Id)
+            .ToDictionary(version => version.VersionId);
+
+        Assert.That(efCoreByVersionId.Keys, Is.EquivalentTo(npocoByVersionId.Keys),
+            "EF Core and NPoco should return the same set of version IDs");
+
+        foreach (KeyValuePair<int, IContent> efCorePair in efCoreByVersionId)
+        {
+            IContent efCoreVersion = efCorePair.Value;
+            IContent npocoVersion = npocoByVersionId[efCorePair.Key];
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(efCoreVersion.Key, Is.EqualTo(npocoVersion.Key),
+                    $"Key differs for VersionId {efCorePair.Key}");
+                Assert.That(efCoreVersion.Name, Is.EqualTo(npocoVersion.Name),
+                    $"Name differs for VersionId {efCorePair.Key}");
+                Assert.That(efCoreVersion.Published, Is.EqualTo(npocoVersion.Published),
+                    $"Published differs for VersionId {efCorePair.Key}");
+                Assert.That(efCoreVersion.ContentType.Alias, Is.EqualTo(npocoVersion.ContentType.Alias),
+                    $"ContentType.Alias differs for VersionId {efCorePair.Key}");
+            });
+        }
+    }
+
     // --- Variant published/draft property split ---
 
     [Test]
