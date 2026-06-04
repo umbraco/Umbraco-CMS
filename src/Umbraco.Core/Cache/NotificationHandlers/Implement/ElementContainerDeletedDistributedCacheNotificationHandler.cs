@@ -39,6 +39,6 @@ public sealed class ElementContainerDeletedDistributedCacheNotificationHandler
             return;
         }
 
-        _distributedCache.RefreshElementCache(elementContainers);
+        _distributedCache.RemoveElementContainerCache(elementContainers);
     }
 }
