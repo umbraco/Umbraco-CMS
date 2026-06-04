@@ -11,6 +11,8 @@ import type { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui'
 import type { UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbTreeElement } from '@umbraco-cms/backoffice/tree';
 import type { UmbDocumentTreeItemModel } from '../../../types.js';
+import type { UmbEntityExpansionModel } from '@umbraco-cms/backoffice/utils';
+import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 
 const elementName = 'umb-document-duplicate-to-modal';
 @customElement(elementName)
@@ -20,6 +22,16 @@ export class UmbDocumentDuplicateToModalElement extends UmbModalBaseElement<
 > {
 	@state()
 	private _destinationUnique?: string | null;
+
+	@state()
+	private _treeExpansion: UmbEntityExpansionModel = [];
+
+	protected override updated(_changedProperties: PropertyValueMap<unknown> | Map<PropertyKey, unknown>) {
+		super.updated(_changedProperties);
+		if (_changedProperties.has('data')) {
+			this._treeExpansion = this.data?.expansion ?? [];
+		}
+	}
 
 	#onTreeSelectionChange(event: UmbSelectionChangeEvent) {
 		const target = event.target as UmbTreeElement;
@@ -58,11 +70,14 @@ export class UmbDocumentDuplicateToModalElement extends UmbModalBaseElement<
 							expandTreeRoot: true,
 							hideTreeItemActions: true,
 							selectableFilter: this.#selectableFilter,
+							expansion: this._treeExpansion,
 						}}
 						@selection-change=${this.#onTreeSelectionChange}></umb-tree>
 				</uui-box>
 				<uui-box headline=${this.localize.term('general_options')}>
-					<umb-property-layout label=${this.localize.term('defaultdialogs_relateToOriginalLabel')} orientation="vertical"
+					<umb-property-layout
+						label=${this.localize.term('defaultdialogs_relateToOriginalLabel')}
+						orientation="vertical"
 						><div slot="editor">
 							<uui-toggle
 								@change=${this.#onRelateToOriginalChange}
@@ -85,7 +100,10 @@ export class UmbDocumentDuplicateToModalElement extends UmbModalBaseElement<
 
 	#renderActions() {
 		return html`
-			<uui-button slot="actions" label=${this.localize.term('general_cancel')} @click="${this._rejectModal}"></uui-button>
+			<uui-button
+				slot="actions"
+				label=${this.localize.term('general_cancel')}
+				@click="${this._rejectModal}"></uui-button>
 			<uui-button
 				slot="actions"
 				color="positive"

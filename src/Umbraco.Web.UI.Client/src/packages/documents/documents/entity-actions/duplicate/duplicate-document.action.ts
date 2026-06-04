@@ -2,6 +2,8 @@ import { UMB_DOCUMENT_ENTITY_TYPE, UMB_DOCUMENT_ROOT_ENTITY_TYPE } from '../../e
 import { UmbDocumentItemRepository } from '../../item/index.js';
 import { UMB_DUPLICATE_DOCUMENT_MODAL } from './modal/index.js';
 import { UmbDuplicateDocumentRepository } from './repository/index.js';
+import { UMB_DOCUMENT_TREE_REPOSITORY_ALIAS } from '../../tree/manifests.js';
+import type { UmbTreeRepository } from '@umbraco-cms/backoffice/tree';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbEntityActionBase, UmbRequestReloadChildrenOfEntityEvent } from '@umbraco-cms/backoffice/entity-action';
@@ -9,6 +11,8 @@ import {
 	UmbDocumentTypeDetailRepository,
 	UmbDocumentTypeStructureRepository,
 } from '@umbraco-cms/backoffice/document-type';
+import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
+import { linkEntityExpansionEntries } from '@umbraco-cms/backoffice/utils';
 
 export class UmbDuplicateDocumentEntityAction extends UmbEntityActionBase<never> {
 	override async execute() {
@@ -18,11 +22,18 @@ export class UmbDuplicateDocumentEntityAction extends UmbEntityActionBase<never>
 		const duplicateRepository = new UmbDuplicateDocumentRepository(this);
 		const selectableFilter = await this.#getSelectableFilterByDocumentUnique(this.args.unique);
 
+		const treeRepository = await createExtensionApiByAlias<UmbTreeRepository>(this, UMB_DOCUMENT_TREE_REPOSITORY_ALIAS);
+		const { data: ancestors } =
+			(await treeRepository?.requestTreeItemAncestors({
+				treeItem: { unique: this.args.unique, entityType: this.args.entityType },
+			})) ?? {};
+
 		const value = await umbOpenModal(this, UMB_DUPLICATE_DOCUMENT_MODAL, {
 			data: {
 				unique: this.args.unique,
 				entityType: this.args.entityType,
 				selectableFilter,
+				expansion: ancestors ? linkEntityExpansionEntries(ancestors) : [],
 			},
 		});
 
