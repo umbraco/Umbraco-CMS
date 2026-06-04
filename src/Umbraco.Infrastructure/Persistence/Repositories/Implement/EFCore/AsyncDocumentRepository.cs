@@ -96,15 +96,11 @@ internal sealed class AsyncDocumentRepository
 
     /// <inheritdoc />
     protected override async Task<IEnumerable<IContent>?> PerformGetAllAsync()
-    {
-        return await PerformGetRangeAsync(null);
-    }
+            => await PerformGetRangeAsync(null);
 
     /// <inheritdoc />
     protected override async Task<IEnumerable<IContent>?> PerformGetManyAsync(Guid[] keys)
-    {
-        return await PerformGetRangeAsync(keys);
-    }
+        => await PerformGetRangeAsync(keys);
 
     /// <inheritdoc />
     protected override Task PersistNewItemAsync(IContent item) =>
@@ -203,24 +199,35 @@ internal sealed class AsyncDocumentRepository
                 nodeQuery = nodeQuery.Where(node => keys.Contains(node.UniqueId));
             }
 
-            var rows = await nodeQuery
-                .Join(db.Documents,
-                    node => node.NodeId,
-                    document => document.NodeId,
-                    (node, document) => new { node, document })
-                .Join(db.Content,
-                    joined => joined.node.NodeId,
-                    content => content.NodeId,
-                    (joined, content) => new { joined.node, joined.document, content })
-                .Join(db.ContentVersions.Where(contentVersion => contentVersion.Current),
-                    joined => joined.node.NodeId,
-                    contentVersion => contentVersion.NodeId,
-                    (joined, contentVersion) => new { joined.node, joined.document, joined.content, contentVersion })
-                .Join(db.DocumentVersions,
-                    joined => joined.contentVersion.Id,
-                    documentVersion => documentVersion.Id,
-                    (joined, documentVersion) => new { joined.node, joined.document, joined.content, joined.contentVersion, documentVersion })
-                .ToListAsync();
+            // Published version pairs: ContentVersion + DocumentVersion where Published = true.
+            // Used as the inner side of the LEFT JOIN below so the published version is fetched
+            // in the same round-trip as the current version (mirrors NPoco's nested LEFT JOIN in GetBaseQuery).
+            var publishedSubquery =
+                from pcv in db.ContentVersions
+                join pdv in db.DocumentVersions.Where(x => x.Published) on pcv.Id equals pdv.Id
+                select new { pcv, pdv };
+
+            // Single round-trip: current version rows with the published version LEFT JOINed inline.
+            // publishedContentVersion / publishedDocumentVersion are null for unpublished documents.
+            var rows = await (
+                from node in nodeQuery
+                join document in db.Documents on node.NodeId equals document.NodeId
+                join content in db.Content on node.NodeId equals content.NodeId
+                join contentVersion in db.ContentVersions.Where(x => x.Current) on node.NodeId equals contentVersion.NodeId
+                join documentVersion in db.DocumentVersions on contentVersion.Id equals documentVersion.Id
+                join pub in publishedSubquery on node.NodeId equals pub.pcv.NodeId into pubGroup
+                from pub in pubGroup.DefaultIfEmpty()
+                select new
+                {
+                    node,
+                    document,
+                    content,
+                    contentVersion,
+                    documentVersion,
+                    publishedContentVersion = pub.pcv,
+                    publishedDocumentVersion = pub.pdv,
+                })
+            .ToListAsync();
 
             if (rows.Count == 0)
             {
@@ -229,18 +236,15 @@ internal sealed class AsyncDocumentRepository
 
             int[] nodeIds = rows.Select(row => row.node.NodeId).ToArray();
 
-            // Published versions (one per node at most)
-            var publishedByNodeId = await db.ContentVersions
-                .Join(db.DocumentVersions.Where(documentVersion => documentVersion.Published),
-                    contentVersion => contentVersion.Id,
-                    documentVersion => documentVersion.Id,
-                    (contentVersion, documentVersion) => new { contentVersion, documentVersion })
-                .Where(joined => nodeIds.Contains(joined.contentVersion.NodeId))
-                .ToDictionaryAsync(joined => joined.contentVersion.NodeId);
-
-            // All relevant version IDs (current + published)
-            var allVersionIds = rows.Select(row => row.contentVersion.Id).ToList();
-            allVersionIds.AddRange(publishedByNodeId.Values.Select(joined => joined.contentVersion.Id));
+            // All relevant version IDs (current + published, deduplicated).
+            // Current and published are always different IDs after the first publish.
+            var allVersionIds = rows
+                .Select(row => row.contentVersion.Id)
+                .Concat(rows
+                    .Where(row => row.publishedContentVersion is not null)
+                    .Select(row => row.publishedContentVersion!.Id))
+                .Distinct()
+                .ToList();
 
             // TODO: batch allVersionIds/nodeIds IN queries when > Constants.Sql.MaxParameterCount
 
@@ -251,44 +255,53 @@ internal sealed class AsyncDocumentRepository
                 .GroupBy(propertyData => propertyData.VersionId)
                 .ToDictionary(group => group.Key, group => group.ToList());
 
-            // Content version culture variations (draft + published names per culture)
-            var cvVariationsByVersionId = (await db.ContentVersionCultureVariations
-                .Where(variation => allVersionIds.Contains(variation.VersionId))
-                .ToListAsync())
-                .GroupBy(variation => variation.VersionId)
-                .ToDictionary(group => group.Key, group => (IReadOnlyList<ContentVersionCultureVariationDto>)group.ToList());
-
-            // Document culture variations (edited flag per culture per node)
-            var dcVariationsByNodeId = (await db.DocumentCultureVariations
-                .Where(variation => nodeIds.Contains(variation.NodeId))
-                .ToListAsync())
-                .GroupBy(variation => variation.NodeId)
-                .ToDictionary(group => group.Key, group => (IReadOnlyList<DocumentCultureVariationDto>)group.ToList());
-
+            // Pre-populate content type map. ContentTypeRepository caches, so no extra DB round-trips
+            // after the first call per type — and we need the types up front to gate variation queries.
             var contentTypeMap = new Dictionary<int, IContentType?>();
+            foreach (int contentTypeId in rows.Select(row => row.content.ContentTypeId).Distinct())
+            {
+                contentTypeMap[contentTypeId] = ContentTypeRepository.Get(contentTypeId);
+            }
+
+            // Skip variation queries entirely when no loaded content type varies by culture —
+            // the common case for sites with only invariant content types.
+            Dictionary<int, IReadOnlyList<ContentVersionCultureVariationDto>> cvVariationsByVersionId = new();
+            Dictionary<int, IReadOnlyList<DocumentCultureVariationDto>> dcVariationsByNodeId = new();
+
+            if (contentTypeMap.Values.Any(ct => ct?.VariesByCulture() ?? false))
+            {
+                // Content version culture variations (draft + published names per culture)
+                cvVariationsByVersionId = (await db.ContentVersionCultureVariations
+                    .Where(variation => allVersionIds.Contains(variation.VersionId))
+                    .ToListAsync())
+                    .GroupBy(variation => variation.VersionId)
+                    .ToDictionary(group => group.Key, group => (IReadOnlyList<ContentVersionCultureVariationDto>)group.ToList());
+
+                // Document culture variations (edited flag per culture per node)
+                dcVariationsByNodeId = (await db.DocumentCultureVariations
+                    .Where(variation => nodeIds.Contains(variation.NodeId))
+                    .ToListAsync())
+                    .GroupBy(variation => variation.NodeId)
+                    .ToDictionary(group => group.Key, group => (IReadOnlyList<DocumentCultureVariationDto>)group.ToList());
+            }
+
             var entities = new List<IContent>(rows.Count);
 
             foreach (var row in rows)
             {
-                if (!contentTypeMap.TryGetValue(row.content.ContentTypeId, out IContentType? contentType))
-                {
-                    contentType = ContentTypeRepository.Get(row.content.ContentTypeId);
-                    contentTypeMap[row.content.ContentTypeId] = contentType;
-                }
-
-                publishedByNodeId.TryGetValue(row.node.NodeId, out var publishedJoined);
+                contentTypeMap.TryGetValue(row.content.ContentTypeId, out IContentType? contentType);
 
                 // Wire nav properties (mirrors what NPoco [Reference] does automatically)
                 row.content.NodeDto = row.node;
                 row.documentVersion.ContentVersionDto = row.contentVersion;
-                if (publishedJoined is not null)
+                if (row.publishedDocumentVersion is not null)
                 {
-                    publishedJoined.documentVersion.ContentVersionDto = publishedJoined.contentVersion;
+                    row.publishedDocumentVersion.ContentVersionDto = row.publishedContentVersion!;
                 }
 
                 row.document.ContentDto = row.content;
                 row.document.CurrentVersion = row.documentVersion;
-                row.document.PublishedVersion = publishedJoined?.documentVersion;
+                row.document.PublishedVersion = row.publishedDocumentVersion;
 
                 IContent entity = ContentBaseFactory.BuildEntity(row.document, contentType);
 
@@ -298,8 +311,8 @@ internal sealed class AsyncDocumentRepository
                     versionPropertyDtos.AddRange(currentProps);
                 }
 
-                if (publishedJoined is not null &&
-                    propertyDtosByVersionId.TryGetValue(publishedJoined.contentVersion.Id, out var pubProps))
+                if (row.publishedContentVersion is not null &&
+                    propertyDtosByVersionId.TryGetValue(row.publishedContentVersion.Id, out var pubProps))
                 {
                     versionPropertyDtos.AddRange(pubProps);
                 }
@@ -309,13 +322,13 @@ internal sealed class AsyncDocumentRepository
                     await PropertyFactory.BuildEntities(
                         compositionProperties,
                         versionPropertyDtos,
-                        publishedJoined?.contentVersion.Id ?? 0,
+                        row.publishedContentVersion?.Id ?? 0,
                         LanguageRepository));
 
                 await ApplyVariationsAsync(
                     entity,
                     row.contentVersion.Id,
-                    publishedJoined?.contentVersion.Id ?? 0,
+                    row.publishedContentVersion?.Id ?? 0,
                     cvVariationsByVersionId,
                     dcVariationsByNodeId.GetValueOrDefault(row.node.NodeId, []));
 
