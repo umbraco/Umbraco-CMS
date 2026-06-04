@@ -1,6 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using Microsoft.EntityFrameworkCore;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
@@ -548,6 +549,110 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
             "fr was never published so it should not have publish info");
         Assert.That(result.GetPublishName("en-US"), Is.EqualTo("English Name"));
         Assert.That(result.GetPublishName("fr"), Is.Null);
+    }
+
+    // --- Group 8: GetVersionAsync ---
+
+    [Test]
+    public async Task GetVersionAsync_WithValidVersionKey_ReturnsVersion()
+    {
+        var scopeAccessor = GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>();
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        Guid versionKey = await scopeAccessor.AmbientScope!.ExecuteWithContextAsync(db =>
+            db.ContentVersions
+                .Where(contentVersion => contentVersion.NodeId == _publishedPage.Id && contentVersion.Current)
+                .Select(contentVersion => contentVersion.Key)
+                .FirstOrDefaultAsync());
+
+        IContent? result = await repository.GetVersionAsync(versionKey, CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result!.Key, Is.EqualTo(_publishedPage.Key));
+        Assert.That(result.Name, Is.EqualTo(_publishedPage.Name));
+    }
+
+    [Test]
+    public async Task GetVersionAsync_WithNonExistentVersionKey_ReturnsNull()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        IContent? result = await repository.GetVersionAsync(Guid.NewGuid(), CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(result, Is.Null);
+    }
+
+    [Test]
+    public async Task GetVersionAsync_PopulatesProperties()
+    {
+        var scopeAccessor = GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>();
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        Guid versionKey = await scopeAccessor.AmbientScope!.ExecuteWithContextAsync(db =>
+            db.ContentVersions
+                .Where(contentVersion => contentVersion.NodeId == _publishedPage.Id && contentVersion.Current)
+                .Select(contentVersion => contentVersion.Key)
+                .FirstOrDefaultAsync());
+
+        IContent? result = await repository.GetVersionAsync(versionKey, CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result!.Properties, Is.Not.Empty);
+    }
+
+    // --- Group 9: GetAllVersionsAsync ---
+
+    [Test]
+    public async Task GetAllVersionsAsync_WithMultipleVersions_ReturnsAllInOrder()
+    {
+        // _publishedPage was created via SaveAndPublish which inserts two ContentVersion rows:
+        // one pre-publish draft and one post-publish current version. That guarantees >= 2 versions.
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        IEnumerable<IContent> results = await repository.GetAllVersionsAsync(_publishedPage.Key, CancellationToken.None);
+        scope.Complete();
+
+        IContent[] versions = results.ToArray();
+        Assert.That(versions, Has.Length.GreaterThanOrEqualTo(2));
+        // Current version (Current = true) is ordered first, and it is the published one.
+        Assert.That(versions[0].Published, Is.True, "first result should be the current published version");
+    }
+
+    [Test]
+    public async Task GetAllVersionsAsync_WithNonExistentNodeKey_ReturnsEmpty()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        IEnumerable<IContent> results = await repository.GetAllVersionsAsync(Guid.NewGuid(), CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(results, Is.Empty);
+    }
+
+    [Test]
+    public async Task GetAllVersionsAsync_EachVersionHasProperties()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        IEnumerable<IContent> results = await repository.GetAllVersionsAsync(_publishedPage.Key, CancellationToken.None);
+        scope.Complete();
+
+        foreach (IContent version in results)
+        {
+            Assert.That(version.Properties, Is.Not.Empty,
+                $"Version with VersionId {version.VersionId} should have properties");
+        }
     }
 
     // --- Variant published/draft property split ---
