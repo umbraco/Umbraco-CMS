@@ -166,6 +166,10 @@ internal sealed class MediaEditingService
         => await HandleSortAsync(parentKey, sortingModels, userKey);
 
     /// <inheritdoc />
+    public async Task<ContentEditingOperationStatus> SortByFieldAsync(Guid? parentKey, ContentSortField field, Direction direction, string? culture, Guid userKey)
+        => await HandleSortByFieldAsync(parentKey, field, direction, culture, userKey);
+
+    /// <inheritdoc />
     protected override IMedia New(string? name, int parentId, IMediaType mediaType)
         => new Models.Media(name, parentId, mediaType);
 
@@ -187,8 +191,8 @@ internal sealed class MediaEditingService
         => ContentService.Delete(media, userId).Result;
 
     /// <inheritdoc />
-    protected override IEnumerable<IMedia> GetPagedChildren(int parentId, int pageIndex, int pageSize, out long total)
-        => ContentService.GetPagedChildren(parentId, pageIndex, pageSize, out total);
+    protected override IEnumerable<IMedia> GetPagedChildren(int parentId, int pageIndex, int pageSize, Ordering? ordering, out long total)
+        => ContentService.GetPagedChildren(parentId, pageIndex, pageSize, out total, filter: null, ordering: ordering);
 
     /// <inheritdoc />
     protected override ContentEditingOperationStatus Sort(IEnumerable<IMedia> items, int userId)

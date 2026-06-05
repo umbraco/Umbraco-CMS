@@ -86,9 +86,10 @@ internal abstract class ContentEditingServiceWithSortingBase<TContent, TContentT
     /// <param name="parentId">The parent identifier.</param>
     /// <param name="pageIndex">The zero-based page index.</param>
     /// <param name="pageSize">The page size.</param>
+    /// <param name="ordering">The ordering to apply, or <c>null</c> to use the default (sort order).</param>
     /// <param name="total">The total number of children.</param>
     /// <returns>The paged children.</returns>
-    protected abstract IEnumerable<TContent> GetPagedChildren(int parentId, int pageIndex, int pageSize, out long total);
+    protected abstract IEnumerable<TContent> GetPagedChildren(int parentId, int pageIndex, int pageSize, Ordering? ordering, out long total);
 
     /// <summary>
     /// Handles the sorting operation asynchronously.
@@ -111,16 +112,7 @@ internal abstract class ContentEditingServiceWithSortingBase<TContent, TContentT
             return ContentEditingOperationStatus.NotFound;
         }
 
-        const int pageSize = 500;
-        var pageNumber = 0;
-        IEnumerable<TContent> page = GetPagedChildren(contentId.Value, pageNumber++, pageSize, out var total);
-        var children = new List<TContent>((int)total);
-        children.AddRange(page);
-        while (pageNumber * pageSize < total)
-        {
-            page = GetPagedChildren(contentId.Value, pageNumber++, pageSize, out _);
-            children.AddRange(page);
-        }
+        List<TContent> children = LoadAllChildren(contentId.Value, ordering: null);
 
         try
         {
@@ -138,4 +130,76 @@ internal abstract class ContentEditingServiceWithSortingBase<TContent, TContentT
             return ContentEditingOperationStatus.SortingInvalid;
         }
     }
+
+    /// <summary>
+    /// Handles sorting a parent's children by a system field asynchronously.
+    /// </summary>
+    /// <param name="parentKey">The optional parent key.</param>
+    /// <param name="field">The system field to sort the children by.</param>
+    /// <param name="direction">The direction to sort in.</param>
+    /// <param name="culture">The culture whose variant name to sort by, or <c>null</c> to sort by the invariant name. Only applies when sorting by <see cref="ContentSortField.Name"/>. The culture is not validated: a child that does not vary by the given culture - or an unrecognised culture - falls back to the invariant name.</param>
+    /// <param name="userKey">The user key performing the operation.</param>
+    /// <returns>The operation status.</returns>
+    protected async Task<ContentEditingOperationStatus> HandleSortByFieldAsync(
+        Guid? parentKey,
+        ContentSortField field,
+        Direction direction,
+        string? culture,
+        Guid userKey)
+    {
+        var contentId = parentKey.HasValue
+            ? ContentService.GetById(parentKey.Value)?.Id
+            : Constants.System.Root;
+
+        if (contentId.HasValue is false)
+        {
+            return ContentEditingOperationStatus.NotFound;
+        }
+
+        Ordering? ordering = BuildOrdering(field, direction, culture);
+        if (ordering is null)
+        {
+            return ContentEditingOperationStatus.SortingInvalid;
+        }
+
+        // The database does the ordering (matching the list view and the order shown in the sort UI),
+        // then we persist the resulting order as the children's sort order.
+        List<TContent> orderedChildren = LoadAllChildren(contentId.Value, ordering);
+        if (orderedChildren.Count == 0)
+        {
+            // Nothing to sort - the order is trivially correct.
+            return ContentEditingOperationStatus.Success;
+        }
+
+        var userId = await GetUserIdAsync(userKey);
+
+        return Sort(orderedChildren, userId);
+    }
+
+    private List<TContent> LoadAllChildren(int contentId, Ordering? ordering)
+    {
+        const int pageSize = 500;
+        var pageNumber = 0;
+        IEnumerable<TContent> page = GetPagedChildren(contentId, pageNumber++, pageSize, ordering, out var total);
+        var children = new List<TContent>((int)total);
+        children.AddRange(page);
+        while (pageNumber * pageSize < total)
+        {
+            page = GetPagedChildren(contentId, pageNumber++, pageSize, ordering, out _);
+            children.AddRange(page);
+        }
+
+        return children;
+    }
+
+    private static Ordering? BuildOrdering(ContentSortField field, Direction direction, string? culture)
+        => field switch
+        {
+            // Name is variant - the culture selects the variant name to order by (invariant content and media
+            // ignore it). Create and update dates are node-level, so the culture does not apply.
+            ContentSortField.Name => Ordering.By("name", direction, culture),
+            ContentSortField.CreateDate => Ordering.By("createDate", direction),
+            ContentSortField.UpdateDate => Ordering.By("updateDate", direction),
+            _ => null,
+        };
 }
