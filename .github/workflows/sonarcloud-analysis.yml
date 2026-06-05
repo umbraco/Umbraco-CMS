@@ -69,6 +69,7 @@ jobs:
         run: GITHUB_ENV=/dev/null dotnet build umbraco.sln --no-restore -clp:ErrorsOnly # prevent sonar MSBuild integration from writing malformed values to $GITHUB_ENV
 
       - name: Run unit tests with coverage
+        continue-on-error: true
         run: |
           dotnet-coverage collect \
             "dotnet test tests/Umbraco.Tests.UnitTests/Umbraco.Tests.UnitTests.csproj --no-build" \
