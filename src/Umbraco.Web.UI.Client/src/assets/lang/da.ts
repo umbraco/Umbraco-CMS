@@ -1475,6 +1475,7 @@ export default {
 	},
 	sections: {
 		content: 'Indhold',
+		library: 'Bibliotek',
 		media: 'Mediearkiv',
 		member: 'Medlemmer',
 		packages: 'Pakker',

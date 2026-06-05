@@ -14,7 +14,7 @@ const elementTypeName = 'TestElementType';
 let elementTypeId = null;
 
 test.beforeEach(async ({umbracoApi}) => {
-  elementTypeId = await umbracoApi.documentType.createEmptyElementType(elementTypeName);
+  elementTypeId = await umbracoApi.documentType.createEmptyElementType(elementTypeName, true);
   rootFolderId = await umbracoApi.element.createDefaultElementFolder(rootFolderName);
   childElementOneId = await umbracoApi.element.createDefaultElementWithParent(childElementOneName, elementTypeId, rootFolderId);
   await umbracoApi.element.createDefaultElementWithParent(childElementTwoName, elementTypeId, rootFolderId);

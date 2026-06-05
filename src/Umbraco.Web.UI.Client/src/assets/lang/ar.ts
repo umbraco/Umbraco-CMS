@@ -1259,6 +1259,7 @@ export default {
 	},
 	sections: {
 		content: 'المحتوى',
+		library: 'المكتبة',
 		media: 'الوسائط',
 		member: 'الأعضاء',
 		packages: 'الحزم',
