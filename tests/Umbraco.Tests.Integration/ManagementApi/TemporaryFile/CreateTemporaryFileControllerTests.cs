@@ -1,8 +1,6 @@
 using System.Linq.Expressions;
 using System.Net;
-using System.Net.Http.Json;
 using Umbraco.Cms.Api.Management.Controllers.TemporaryFile;
-using Umbraco.Cms.Api.Management.ViewModels.TemporaryFile;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.TemporaryFile;
 
@@ -42,8 +40,10 @@ public class CreateTemporaryFileControllerTests : ManagementApiUserGroupTestBase
 
     protected override async Task<HttpResponseMessage> ClientRequest()
     {
-        CreateTemporaryFileRequestModel createTemporaryFileRequest = new() { Id = Guid.NewGuid(), File = null! };
+        // The endpoint only consumes multipart/form-data, so the request must be sent as such to reach the action.
+        // The required file is intentionally omitted, yielding the expected BadRequest for authenticated users.
+        var content = new MultipartFormDataContent { { new StringContent(Guid.NewGuid().ToString()), "Id" } };
 
-        return await Client.PostAsync(Url, JsonContent.Create(createTemporaryFileRequest));
+        return await Client.PostAsync(Url, content);
     }
 }
