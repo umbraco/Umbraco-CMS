@@ -38,6 +38,12 @@ jobs:
       - name: Setup .NET from global.json
         uses: actions/setup-dotnet@v5
 
+      - name: Setup Java 21
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "21"
+
       - name: Cache SonarQube packages
         uses: actions/cache@v5
         with:
@@ -60,7 +66,8 @@ jobs:
           dotnet-sonarscanner begin \
             /k:"$SONAR_PROJECT_KEY" \
             /o:"$SONAR_ORGANIZATION" \
-            /d:sonar.token="$SONAR_TOKEN"
+            /d:sonar.token="$SONAR_TOKEN" \
+            /d:sonar.scanner.skipJreProvisioning=true
 
       - name: Restore
         run: dotnet restore umbraco.sln
