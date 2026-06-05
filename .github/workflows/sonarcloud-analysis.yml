@@ -68,7 +68,6 @@ jobs:
             /o:"$SONAR_ORGANIZATION" \
             /d:sonar.token="$SONAR_TOKEN" \
             /d:sonar.scanner.skipJreProvisioning=true
-          echo "SONARQUBE_SCANNER_PARAMS=" >> $GITHUB_ENV
 
       - name: Restore
         run: dotnet restore umbraco.sln
