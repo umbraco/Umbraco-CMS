@@ -126,8 +126,8 @@ public interface IAsyncContentRepository<TEntity> : IAsyncReadWriteRepository<Gu
     ///     Gets a paged list of direct children of a content node.
     /// </summary>
     /// <param name="parentKey">The Guid key of the parent node.</param>
-    /// <param name="pageIndex">The zero-based page index.</param>
-    /// <param name="pageSize">The number of items per page.</param>
+    /// <param name="skip">The number of items to skip.</param>
+    /// <param name="take">The maximum number of items to return.</param>
     /// <param name="propertyAliases">
     ///     Optional array of property aliases to load. If <c>null</c>, all properties are loaded.
     ///     If empty, no custom properties are loaded (only system properties).
@@ -135,18 +135,18 @@ public interface IAsyncContentRepository<TEntity> : IAsyncReadWriteRepository<Gu
     /// <param name="ordering">The ordering specification, or <c>null</c> for default ordering.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A paged result containing the matching children and the total record count.</returns>
-    Task<PagedModel<TEntity>> GetChildrenAsync(Guid parentKey, long pageIndex, int pageSize, string[]? propertyAliases, Ordering? ordering, CancellationToken cancellationToken);
+    Task<PagedModel<TEntity>> GetChildrenAsync(Guid parentKey, int skip, int take, string[]? propertyAliases, Ordering? ordering, CancellationToken cancellationToken);
 
     /// <summary>
     ///     Gets a paged list of all descendants of a content node.
     /// </summary>
     /// <param name="ancestorKey">The Guid key of the ancestor node.</param>
-    /// <param name="pageIndex">The zero-based page index.</param>
-    /// <param name="pageSize">The number of items per page.</param>
+    /// <param name="skip">The number of items to skip.</param>
+    /// <param name="take">The maximum number of items to return.</param>
     /// <param name="ordering">The ordering specification, or <c>null</c> for default ordering.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A paged result containing the matching descendants and the total record count.</returns>
-    Task<PagedModel<TEntity>> GetDescendantsAsync(Guid ancestorKey, long pageIndex, int pageSize, Ordering? ordering, CancellationToken cancellationToken);
+    Task<PagedModel<TEntity>> GetDescendantsAsync(Guid ancestorKey, int skip, int take, Ordering? ordering, CancellationToken cancellationToken);
 
     /// <summary>
     ///     Gets all content items currently in the recycle bin.

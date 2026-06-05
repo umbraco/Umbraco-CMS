@@ -246,17 +246,17 @@ internal abstract class AsyncContentRepositoryBase<TEntity, TRepository>
             .Where(joined => joined.node.NodeObjectType == NodeObjectTypeKey && joined.contentType.Alias == contentTypeAlias)
             .Select(joined => joined.node);
 
-    private static Task<int> ResolveNodeIdAsync(UmbracoDbContext db, Guid key, CancellationToken cancellationToken) =>
+    protected static Task<int> ResolveNodeIdAsync(UmbracoDbContext db, Guid key, CancellationToken cancellationToken) =>
         db.Nodes
             .Where(node => node.UniqueId == key)
             .Select(node => node.NodeId)
             .SingleOrDefaultAsync(cancellationToken);
 
     /// <inheritdoc />
-    public abstract Task<PagedModel<TEntity>> GetChildrenAsync(Guid parentKey, long pageIndex, int pageSize, string[]? propertyAliases, Ordering? ordering, CancellationToken cancellationToken);
+    public abstract Task<PagedModel<TEntity>> GetChildrenAsync(Guid parentKey, int skip, int take, string[]? propertyAliases, Ordering? ordering, CancellationToken cancellationToken);
 
     /// <inheritdoc />
-    public abstract Task<PagedModel<TEntity>> GetDescendantsAsync(Guid ancestorKey, long pageIndex, int pageSize, Ordering? ordering, CancellationToken cancellationToken);
+    public abstract Task<PagedModel<TEntity>> GetDescendantsAsync(Guid ancestorKey, int skip, int take, Ordering? ordering, CancellationToken cancellationToken);
 
     /// <inheritdoc />
     public abstract Task<IEnumerable<TEntity>> GetRecycleBinAsync(CancellationToken cancellationToken);

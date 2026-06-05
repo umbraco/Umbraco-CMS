@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
@@ -242,12 +243,193 @@ internal sealed class AsyncDocumentRepository
         });
 
     /// <inheritdoc />
-    public override Task<PagedModel<IContent>> GetChildrenAsync(Guid parentKey, long pageIndex, int pageSize, string[]? propertyAliases, Ordering? ordering, CancellationToken cancellationToken) =>
-        throw new NotImplementedException();
+    public override Task<PagedModel<IContent>> GetChildrenAsync(
+        Guid parentKey, int skip, int take, string[]? propertyAliases, Ordering? ordering, CancellationToken cancellationToken) =>
+        AmbientScope.ExecuteWithContextAsync(async db =>
+        {
+            int parentNodeId = await ResolveNodeIdAsync(db, parentKey, cancellationToken);
+
+            int total = await db.Nodes
+                .Where(node => node.NodeObjectType == NodeObjectTypeKey && node.ParentId == parentNodeId)
+                .CountAsync(cancellationToken);
+
+            if (total == 0)
+            {
+                return new PagedModel<IContent> { Total = 0, Items = Enumerable.Empty<IContent>() };
+            }
+
+            var publishedSubquery = db.ContentVersions
+                .Join(
+                    db.DocumentVersions.Where(documentVersion => documentVersion.Published),
+                    contentVersion => contentVersion.Id,
+                    documentVersion => documentVersion.Id,
+                    (contentVersion, documentVersion) => new { contentVersion, documentVersion });
+
+            // The ContentTypes JOIN is always included so contentTypeAlias is available for ordering.
+            var baseQuery = db.Nodes
+                .Where(node => node.NodeObjectType == NodeObjectTypeKey && node.ParentId == parentNodeId)
+                .Join(
+                    db.Documents,
+                    node => node.NodeId,
+                    document => document.NodeId,
+                    (node, document) => new { node, document })
+                .Join(
+                    db.Content,
+                    joined => joined.node.NodeId,
+                    content => content.NodeId,
+                    (joined, content) => new { joined.node, joined.document, content })
+                .Join(
+                    db.ContentVersions.Where(contentVersion => contentVersion.Current),
+                    joined => joined.node.NodeId,
+                    contentVersion => contentVersion.NodeId,
+                    (joined, contentVersion) => new { joined.node, joined.document, joined.content, contentVersion })
+                .Join(
+                    db.DocumentVersions,
+                    joined => joined.contentVersion.Id,
+                    documentVersion => documentVersion.Id,
+                    (joined, documentVersion) => new { joined.node, joined.document, joined.content, joined.contentVersion, documentVersion })
+                .Join(
+                    db.ContentTypes,
+                    joined => joined.content.ContentTypeId,
+                    contentType => contentType.NodeId,
+                    (joined, contentType) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, contentType })
+                .GroupJoin(
+                    publishedSubquery,
+                    joined => joined.node.NodeId,
+                    pub => pub.contentVersion.NodeId,
+                    (joined, pubGroup) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, joined.contentType, pubGroup })
+                .SelectMany(
+                    joined => joined.pubGroup.DefaultIfEmpty(),
+                    (joined, pub) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, joined.contentType, pub });
+
+            var orderedQuery = ApplyDocumentOrdering(
+                baseQuery,
+                ordering,
+                sortOrderSelector: joined => joined.node.SortOrder,
+                textSelector: joined => joined.node.Text,
+                createDateSelector: joined => joined.node.CreateDate,
+                versionDateSelector: joined => joined.contentVersion.VersionDate,
+                idSelector: joined => joined.node.NodeId,
+                ownerSelector: joined => joined.node.UserId,
+                publishedSelector: joined => joined.documentVersion.Published,
+                contentTypeAliasSelector: joined => joined.contentType.Alias);
+
+            List<DocumentRow> rows = await orderedQuery
+                .Skip(skip)
+                .Take(take)
+                .Select(joined => new DocumentRow(
+                    joined.node,
+                    joined.document,
+                    joined.content,
+                    joined.contentVersion,
+                    joined.documentVersion,
+                    joined.pub!.contentVersion,
+                    joined.pub!.documentVersion))
+                .ToListAsync(cancellationToken);
+
+            if (rows.Count == 0)
+            {
+                return new PagedModel<IContent> { Total = total, Items = Enumerable.Empty<IContent>() };
+            }
+
+            List<IContent> items = await AssembleEntitiesAsync(rows, db, propertyAliases);
+            return new PagedModel<IContent> { Total = total, Items = items };
+        });
 
     /// <inheritdoc />
-    public override Task<PagedModel<IContent>> GetDescendantsAsync(Guid ancestorKey, long pageIndex, int pageSize, Ordering? ordering, CancellationToken cancellationToken) =>
-        throw new NotImplementedException();
+    public override Task<PagedModel<IContent>> GetDescendantsAsync(
+        Guid ancestorKey, int skip, int take, Ordering? ordering, CancellationToken cancellationToken) =>
+        AmbientScope.ExecuteWithContextAsync(async db =>
+        {
+            int parentNodeId = await ResolveNodeIdAsync(db, ancestorKey, cancellationToken);
+
+            string pathMatch = parentNodeId == -1 ? "-1," : $",{parentNodeId},";
+
+            int total = await db.Nodes
+                .Where(node => node.NodeObjectType == NodeObjectTypeKey && EF.Functions.Like(node.Path, $"%{pathMatch}%"))
+                .CountAsync(cancellationToken);
+
+            if (total == 0)
+            {
+                return new PagedModel<IContent> { Total = 0, Items = Enumerable.Empty<IContent>() };
+            }
+
+            var publishedSubquery = db.ContentVersions
+                .Join(
+                    db.DocumentVersions.Where(documentVersion => documentVersion.Published),
+                    contentVersion => contentVersion.Id,
+                    documentVersion => documentVersion.Id,
+                    (contentVersion, documentVersion) => new { contentVersion, documentVersion });
+
+            var baseQuery = db.Nodes
+                .Where(node => node.NodeObjectType == NodeObjectTypeKey && EF.Functions.Like(node.Path, $"%{pathMatch}%"))
+                .Join(
+                    db.Documents,
+                    node => node.NodeId,
+                    document => document.NodeId,
+                    (node, document) => new { node, document })
+                .Join(
+                    db.Content,
+                    joined => joined.node.NodeId,
+                    content => content.NodeId,
+                    (joined, content) => new { joined.node, joined.document, content })
+                .Join(
+                    db.ContentVersions.Where(contentVersion => contentVersion.Current),
+                    joined => joined.node.NodeId,
+                    contentVersion => contentVersion.NodeId,
+                    (joined, contentVersion) => new { joined.node, joined.document, joined.content, contentVersion })
+                .Join(
+                    db.DocumentVersions,
+                    joined => joined.contentVersion.Id,
+                    documentVersion => documentVersion.Id,
+                    (joined, documentVersion) => new { joined.node, joined.document, joined.content, joined.contentVersion, documentVersion })
+                .Join(
+                    db.ContentTypes,
+                    joined => joined.content.ContentTypeId,
+                    contentType => contentType.NodeId,
+                    (joined, contentType) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, contentType })
+                .GroupJoin(
+                    publishedSubquery,
+                    joined => joined.node.NodeId,
+                    pub => pub.contentVersion.NodeId,
+                    (joined, pubGroup) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, joined.contentType, pubGroup })
+                .SelectMany(
+                    joined => joined.pubGroup.DefaultIfEmpty(),
+                    (joined, pub) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, joined.contentType, pub });
+
+            var orderedQuery = ApplyDocumentOrdering(
+                baseQuery,
+                ordering,
+                sortOrderSelector: joined => joined.node.SortOrder,
+                textSelector: joined => joined.node.Text,
+                createDateSelector: joined => joined.node.CreateDate,
+                versionDateSelector: joined => joined.contentVersion.VersionDate,
+                idSelector: joined => joined.node.NodeId,
+                ownerSelector: joined => joined.node.UserId,
+                publishedSelector: joined => joined.documentVersion.Published,
+                contentTypeAliasSelector: joined => joined.contentType.Alias);
+
+            List<DocumentRow> rows = await orderedQuery
+                .Skip(skip)
+                .Take(take)
+                .Select(joined => new DocumentRow(
+                    joined.node,
+                    joined.document,
+                    joined.content,
+                    joined.contentVersion,
+                    joined.documentVersion,
+                    joined.pub!.contentVersion,
+                    joined.pub!.documentVersion))
+                .ToListAsync(cancellationToken);
+
+            if (rows.Count == 0)
+            {
+                return new PagedModel<IContent> { Total = total, Items = Enumerable.Empty<IContent>() };
+            }
+
+            List<IContent> items = await AssembleEntitiesAsync(rows, db);
+            return new PagedModel<IContent> { Total = total, Items = items };
+        });
 
     /// <inheritdoc />
     public override Task<IEnumerable<IContent>> GetRecycleBinAsync(CancellationToken cancellationToken) =>
@@ -274,12 +456,22 @@ internal sealed class AsyncDocumentRepository
     // --- IAsyncDocumentRepository: paged overloads with loadTemplates ---
 
     /// <inheritdoc />
-    public Task<PagedModel<IContent>> GetChildrenAsync(Guid parentKey, long pageIndex, int pageSize, string[]? propertyAliases, Ordering? ordering, bool loadTemplates, CancellationToken cancellationToken) =>
-        throw new NotImplementedException();
+    public Task<PagedModel<IContent>> GetChildrenAsync(
+        Guid parentKey, int skip, int take, string[]? propertyAliases, Ordering? ordering, bool loadTemplates, CancellationToken cancellationToken)
+    {
+        // TODO: skip the published version LEFT JOIN when loadTemplates == false for a performance win;
+        // for now templates are always loaded from the published DocumentVersionDto join.
+        return GetChildrenAsync(parentKey, skip, take, propertyAliases, ordering, cancellationToken);
+    }
 
     /// <inheritdoc />
-    public Task<PagedModel<IContent>> GetDescendantsAsync(Guid ancestorKey, long pageIndex, int pageSize, Ordering? ordering, bool loadTemplates, CancellationToken cancellationToken) =>
-        throw new NotImplementedException();
+    public Task<PagedModel<IContent>> GetDescendantsAsync(
+        Guid ancestorKey, int skip, int take, Ordering? ordering, bool loadTemplates, CancellationToken cancellationToken)
+    {
+        // TODO: skip the published version LEFT JOIN when loadTemplates == false for a performance win;
+        // for now templates are always loaded from the published DocumentVersionDto join.
+        return GetDescendantsAsync(ancestorKey, skip, take, ordering, cancellationToken);
+    }
 
     // --- IAsyncDocumentRepository: permissions ---
 
@@ -320,6 +512,54 @@ internal sealed class AsyncDocumentRepository
         ContentVersionDto? PublishedContentVersion,
         DocumentVersionDto? PublishedDocumentVersion);
 
+    // Applies document ordering to any anonymous intermediate query type T before it is projected
+    // to DocumentRow. Ordering must happen while the anonymous type is still live — EF Core cannot
+    // translate member access on named record-type constructor calls in OrderBy key selectors.
+    // The typed Expression<Func<T, TKey>> selectors allow EF Core to generate correct SQL ORDER BY
+    // clauses through the anonymous type, which it can trace back to the original DTO columns.
+    private static IOrderedQueryable<T> ApplyDocumentOrdering<T>(
+        IQueryable<T> source,
+        Ordering? ordering,
+        Expression<Func<T, int>> sortOrderSelector,
+        Expression<Func<T, string?>> textSelector,
+        Expression<Func<T, DateTime>> createDateSelector,
+        Expression<Func<T, DateTime>> versionDateSelector,
+        Expression<Func<T, int>> idSelector,
+        Expression<Func<T, int?>> ownerSelector,
+        Expression<Func<T, bool>> publishedSelector,
+        Expression<Func<T, string?>> contentTypeAliasSelector)
+    {
+        bool descending = ordering?.Direction == Direction.Descending;
+        return ordering?.OrderBy?.ToLowerInvariant() switch
+        {
+            // TODO: implement culture-specific name ordering (requires ContentVersionCultureVariation JOIN)
+            "name" => descending
+                ? source.OrderByDescending(textSelector)
+                : source.OrderBy(textSelector),
+            "createdate" => descending
+                ? source.OrderByDescending(createDateSelector)
+                : source.OrderBy(createDateSelector),
+            "versiondate" or "updatedate" => descending
+                ? source.OrderByDescending(versionDateSelector)
+                : source.OrderBy(versionDateSelector),
+            "id" => descending
+                ? source.OrderByDescending(idSelector)
+                : source.OrderBy(idSelector),
+            "owner" => descending
+                ? source.OrderByDescending(ownerSelector)
+                : source.OrderBy(ownerSelector),
+            "published" => descending
+                ? source.OrderByDescending(publishedSelector)
+                : source.OrderBy(publishedSelector),
+            "contenttypealias" => descending
+                ? source.OrderByDescending(contentTypeAliasSelector)
+                : source.OrderBy(contentTypeAliasSelector),
+            // TODO: implement custom property field ordering (requires PropertyData subquery join)
+            _ => descending
+                ? source.OrderByDescending(sortOrderSelector)
+                : source.OrderBy(sortOrderSelector),
+        };
+    }
 
     private Task<List<IContent>> PerformGetRangeAsync(Guid[]? keys) =>
         AmbientScope.ExecuteWithContextAsync(async db =>
@@ -389,7 +629,7 @@ internal sealed class AsyncDocumentRepository
             return await AssembleEntitiesAsync(rows, db);
         });
 
-    private async Task<List<IContent>> AssembleEntitiesAsync(IReadOnlyList<DocumentRow> rows, UmbracoDbContext db)
+    private async Task<List<IContent>> AssembleEntitiesAsync(IReadOnlyList<DocumentRow> rows, UmbracoDbContext db, string[]? propertyAliases = null)
     {
         int[] nodeIds = rows.Select(row => row.Node.NodeId).ToArray();
 
@@ -404,7 +644,7 @@ internal sealed class AsyncDocumentRepository
             .ToList();
 
         Dictionary<int, List<PropertyDataDto>> propertyDtosByVersionId =
-            await LoadPropertyDataAsync(db, allVersionIds);
+            await LoadPropertyDataAsync(db, allVersionIds, propertyAliases);
 
         // Pre-populate content type map. ContentTypeRepository caches, so no extra DB round-trips
         // after the first call per type — and we need the types up front to gate variation queries.
@@ -472,17 +712,39 @@ internal sealed class AsyncDocumentRepository
     }
 
     private async Task<Dictionary<int, List<PropertyDataDto>>> LoadPropertyDataAsync(
-        UmbracoDbContext db, List<int> versionIds)
+        UmbracoDbContext db, List<int> versionIds, string[]? propertyAliases = null)
     {
+        // Empty alias list means "no custom properties" — skip the query entirely.
+        if (propertyAliases is { Length: 0 })
+        {
+            return new Dictionary<int, List<PropertyDataDto>>();
+        }
+
         // Batched to stay within SQL Server's 2100-parameter limit.
         // allVersionIds can reach 2× the document count (current + published version per document).
         var allPropertyData = new List<PropertyDataDto>();
         foreach (IEnumerable<int> batch in versionIds.InGroupsOf(Constants.Sql.MaxParameterCount))
         {
             var batchIds = batch.ToList();
-            allPropertyData.AddRange(await db.PropertyData
-                .Where(propertyData => batchIds.Contains(propertyData.VersionId))
-                .ToListAsync());
+
+            if (propertyAliases is { Length: > 0 })
+            {
+                List<string> aliases = new(propertyAliases);
+                allPropertyData.AddRange(await db.PropertyData
+                    .Where(propertyData => batchIds.Contains(propertyData.VersionId))
+                    .Join(
+                        db.PropertyTypes.Where(propertyType => propertyType.Alias != null && aliases.Contains(propertyType.Alias)),
+                        propertyData => propertyData.PropertyTypeId,
+                        propertyType => propertyType.Id,
+                        (propertyData, propertyType) => propertyData)
+                    .ToListAsync());
+            }
+            else
+            {
+                allPropertyData.AddRange(await db.PropertyData
+                    .Where(propertyData => batchIds.Contains(propertyData.VersionId))
+                    .ToListAsync());
+            }
         }
 
         return allPropertyData

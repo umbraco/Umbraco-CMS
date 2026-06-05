@@ -773,6 +773,162 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         }
     }
 
+    // --- Group 11: GetChildrenAsync ---
+
+    [Test]
+    public async Task GetChildrenAsync_WithChildren_ReturnsDirectChildrenOnly()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        PagedModel<IContent> result = await repository.GetChildrenAsync(
+            _textpage.Key, skip: 0, take: 100, propertyAliases: null, ordering: null, CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(result.Total, Is.EqualTo(2));
+        Assert.That(result.Items.Count(), Is.EqualTo(2));
+        Assert.That(result.Items.Any(c => c.Key == _subpage.Key), Is.True);
+        Assert.That(result.Items.Any(c => c.Key == _subpage2.Key), Is.True);
+        Assert.That(result.Items.All(c => c.ParentId == _textpage.Id), Is.True,
+            "GetChildrenAsync should return only direct children, not grandchildren");
+    }
+
+    [Test]
+    public async Task GetChildrenAsync_WithPaging_ReturnsCorrectPage()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        PagedModel<IContent> result = await repository.GetChildrenAsync(
+            _textpage.Key, skip: 1, take: 1, propertyAliases: null, ordering: null, CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(result.Total, Is.EqualTo(2), "Total should be 2 regardless of paging");
+        Assert.That(result.Items.Count(), Is.EqualTo(1), "take=1 should return exactly 1 item");
+    }
+
+    [Test]
+    public async Task GetChildrenAsync_WithNonExistentParentKey_ReturnsEmpty()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        PagedModel<IContent> result = await repository.GetChildrenAsync(
+            Guid.NewGuid(), skip: 0, take: 100, propertyAliases: null, ordering: null, CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(result.Total, Is.EqualTo(0));
+        Assert.That(result.Items, Is.Empty);
+    }
+
+    [Test]
+    public async Task GetChildrenAsync_DefaultOrdering_ReturnsBySortOrder()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        PagedModel<IContent> result = await repository.GetChildrenAsync(
+            _textpage.Key, skip: 0, take: 100, propertyAliases: null, ordering: null, CancellationToken.None);
+        scope.Complete();
+
+        IContent[] children = result.Items.ToArray();
+        Assert.That(children, Has.Length.EqualTo(2));
+        Assert.That(children[0].SortOrder, Is.LessThanOrEqualTo(children[1].SortOrder),
+            "Children should be ordered by SortOrder ascending by default");
+    }
+
+    [Test]
+    public async Task GetChildrenAsync_PropertyAliasNull_LoadsAllProperties()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        PagedModel<IContent> result = await repository.GetChildrenAsync(
+            _textpage.Key, skip: 0, take: 1, propertyAliases: null, ordering: null, CancellationToken.None);
+        scope.Complete();
+
+        IContent child = result.Items.First();
+        Assert.That(child.Properties, Is.Not.Empty, "null propertyAliases should load all properties");
+    }
+
+    [Test]
+    public async Task GetChildrenAsync_PropertyAliasEmpty_LoadsNoProperties()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        PagedModel<IContent> result = await repository.GetChildrenAsync(
+            _textpage.Key, skip: 0, take: 1, propertyAliases: [], ordering: null, CancellationToken.None);
+        scope.Complete();
+
+        IContent child = result.Items.First();
+        Assert.That(child.Properties.Where(p => p.GetValue() != null), Is.Empty,
+            "empty propertyAliases should load no property data");
+    }
+
+    // --- Group 12: GetDescendantsAsync ---
+
+    [Test]
+    public async Task GetDescendantsAsync_WithDescendants_ReturnsAllDescendants()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        PagedModel<IContent> result = await repository.GetDescendantsAsync(
+            _textpage.Key, skip: 0, take: 100, ordering: null, CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(result.Total, Is.EqualTo(2));
+        Assert.That(result.Items.Count(), Is.EqualTo(2));
+        Assert.That(result.Items.Any(c => c.Key == _subpage.Key), Is.True);
+        Assert.That(result.Items.Any(c => c.Key == _subpage2.Key), Is.True);
+    }
+
+    [Test]
+    public async Task GetDescendantsAsync_WithPaging_ReturnsCorrectPage()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        PagedModel<IContent> result = await repository.GetDescendantsAsync(
+            _textpage.Key, skip: 0, take: 1, ordering: null, CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(result.Total, Is.EqualTo(2), "Total should be 2 regardless of paging");
+        Assert.That(result.Items.Count(), Is.EqualTo(1), "take=1 should return exactly 1 item");
+    }
+
+    [Test]
+    public async Task GetDescendantsAsync_WithNonExistentAncestorKey_ReturnsEmpty()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        PagedModel<IContent> result = await repository.GetDescendantsAsync(
+            Guid.NewGuid(), skip: 0, take: 100, ordering: null, CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(result.Total, Is.EqualTo(0));
+        Assert.That(result.Items, Is.Empty);
+    }
+
+    [Test]
+    public async Task GetDescendantsAsync_EachDescendantHasProperties()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        PagedModel<IContent> result = await repository.GetDescendantsAsync(
+            _textpage.Key, skip: 0, take: 100, ordering: null, CancellationToken.None);
+        scope.Complete();
+
+        foreach (IContent descendant in result.Items)
+        {
+            Assert.That(descendant.Properties, Is.Not.Empty,
+                $"Descendant {descendant.Key} should have properties populated");
+        }
+    }
+
     // --- Variant published/draft property split ---
 
     [Test]
