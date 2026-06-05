@@ -38,6 +38,11 @@ public sealed class ElementContainerCacheRefresher : PayloadCacheRefresherBase<E
     /// </summary>
     public class JsonPayload
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="JsonPayload"/> class.
+        /// </summary>
+        /// <param name="id">The unique integer identifier for the container.</param>
+        /// <param name="key">The unique GUID key associated with the container.</param>
         public JsonPayload(int id, Guid key)
         {
             Id = id;

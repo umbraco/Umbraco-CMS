@@ -474,13 +474,6 @@ public static class DistributedCacheExtensions
     /// </summary>
     /// <param name="dc">The distributed cache.</param>
     /// <param name="deletedContainers">The element containers that were deleted.</param>
-    /// <remarks>
-    ///     A deleted container's node id is never reused, so its key→id mapping in
-    ///     <see cref="Umbraco.Cms.Core.Services.IIdKeyMap"/> must be evicted on every server. Otherwise a
-    ///     container recreated under the same key resolves to the stale id and the element tree's children
-    ///     query returns nothing until the next app restart. This is targeted at the id/key map only -
-    ///     container changes do not affect element data, so it avoids the broader element cache invalidation.
-    /// </remarks>
     public static void RemoveElementContainerCache(this DistributedCache dc, IEnumerable<EntityContainer> deletedContainers)
         => dc.RefreshByPayload(
             ElementContainerCacheRefresher.UniqueId,

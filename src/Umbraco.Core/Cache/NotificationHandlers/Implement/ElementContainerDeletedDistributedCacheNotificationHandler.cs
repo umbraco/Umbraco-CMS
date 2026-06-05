@@ -11,9 +11,8 @@ namespace Umbraco.Cms.Core.Cache;
 /// <remarks>
 /// Element container deletions only publish <see cref="EntityContainerDeletedNotification"/> and an
 /// <see cref="ElementTreeChangeNotification"/> for the contained elements - never for the container node
-/// itself. Without this handler the container's stale mapping survives until the next app restart, and a
-/// container recreated under the same key resolves to the old id, so the element tree's children query
-/// returns nothing (see #23072).
+/// itself, so without this handler the container's stale id/key mapping survives until the next app
+/// restart (see #23072).
 /// </remarks>
 public sealed class ElementContainerDeletedDistributedCacheNotificationHandler
     : DeletedDistributedCacheNotificationHandlerBase<EntityContainer, EntityContainerDeletedNotification>
@@ -31,7 +30,7 @@ public sealed class ElementContainerDeletedDistributedCacheNotificationHandler
     protected override void Handle(IEnumerable<EntityContainer> entities, IDictionary<string, object?> state)
     {
         EntityContainer[] elementContainers = entities
-            .Where(container => container.ContainedObjectType == Constants.ObjectTypes.Element)
+            .Where(container => container.ContainerObjectType == Constants.ObjectTypes.ElementContainer)
             .ToArray();
 
         if (elementContainers.Length == 0)
