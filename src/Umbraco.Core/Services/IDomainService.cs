@@ -19,7 +19,6 @@ public interface IDomainService : IService
     /// <param name="domainName">The domain name to check.</param>
     /// <returns><c>true</c> if the domain exists; otherwise, <c>false</c>.</returns>
     Task<bool> ExistsAsync(string domainName);
-
     /// <summary>
     ///     Gets a domain by its name.
     /// </summary>

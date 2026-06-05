@@ -1,14 +1,14 @@
+import { UmbElementVariantState } from './variant-state.js';
 import type { UmbElementVariantOptionModel } from './types.js';
-import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 type VariantType = UmbElementVariantOptionModel;
 
 const variantStatesOrder = {
-	[DocumentVariantStateModel.PUBLISHED_PENDING_CHANGES]: 1,
-	[DocumentVariantStateModel.PUBLISHED]: 1,
-	[DocumentVariantStateModel.DRAFT]: 2,
-	[DocumentVariantStateModel.NOT_CREATED]: 3,
-	[DocumentVariantStateModel.TRASHED]: 4,
+	[UmbElementVariantState.PUBLISHED_PENDING_CHANGES]: 1,
+	[UmbElementVariantState.PUBLISHED]: 1,
+	[UmbElementVariantState.DRAFT]: 2,
+	[UmbElementVariantState.NOT_CREATED]: 3,
+	[UmbElementVariantState.TRASHED]: 4,
 };
 
 const getVariantStateOrderValue = (variant?: VariantType['variant']) => {
@@ -29,8 +29,8 @@ function compareDefault(a: VariantType, b: VariantType) {
 // Make sure mandatory variants go on top, unless they are published, cause then they already go to the top and then we want to mix them with other published variants.
 // eslint-disable-next-line jsdoc/require-jsdoc
 function compareMandatory(a: VariantType, b: VariantType) {
-	return a.variant?.state === DocumentVariantStateModel.PUBLISHED_PENDING_CHANGES ||
-		a.variant?.state === DocumentVariantStateModel.PUBLISHED
+	return a.variant?.state === UmbElementVariantState.PUBLISHED_PENDING_CHANGES ||
+		a.variant?.state === UmbElementVariantState.PUBLISHED
 		? 0
 		: (a.language?.isMandatory ? -1 : 1) - (b.language?.isMandatory ? -1 : 1);
 }

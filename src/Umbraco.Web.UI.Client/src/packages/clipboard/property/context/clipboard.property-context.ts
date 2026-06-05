@@ -190,7 +190,7 @@ export class UmbClipboardPropertyContext extends UmbContextBase {
 			throw new Error('No clipboard entry selected');
 		}
 
-		let propertyValues: Array<any> = [];
+		let propertyValues: Array<any>;
 
 		if (args.multiple) {
 			throw new Error('Multiple clipboard entries not supported');

@@ -205,11 +205,16 @@ public abstract class FolderTreeControllerBase<TItem> : NamedEntityTreeControlle
 
     protected virtual async Task<TItem[]> MapSearchTreeItemViewModelsAsync(IEntitySlim[] entities)
     {
-        IEnumerable<Task<TItem>> tasks = entities.Select(entity => MapTreeItemViewModelAsync(GetSearchResultParentKey(entity), entity));
-        return await Task.WhenAll(tasks);
+        List<TItem> result = [];
+        foreach (IEntitySlim entity in entities)
+        {
+            result.Add(await MapTreeItemViewModelAsync(await GetSearchResultParentKey(entity), entity));
+        }
+
+        return result.ToArray();
     }
 
-    private Guid? GetSearchResultParentKey(IEntitySlim entity)
+    private async Task<Guid?> GetSearchResultParentKey(IEntitySlim entity)
     {
         if (entity.ParentId == Constants.System.Root)
         {
@@ -218,14 +223,14 @@ public abstract class FolderTreeControllerBase<TItem> : NamedEntityTreeControlle
 
         if (FolderObjectType != UmbracoObjectTypes.Unknown)
         {
-            Attempt<Guid> getKeyAttempt = IdKeyMap.GetKeyForId(entity.ParentId, FolderObjectType);
+            Attempt<Guid> getKeyAttempt = await IdKeyMap.GetKeyForIdAsync(entity.ParentId, FolderObjectType);
             if (getKeyAttempt.Success)
             {
                 return getKeyAttempt.Result;
             }
         }
 
-        Attempt<Guid> itemKeyAttempt = IdKeyMap.GetKeyForId(entity.ParentId, ItemObjectType);
+        Attempt<Guid> itemKeyAttempt = await IdKeyMap.GetKeyForIdAsync(entity.ParentId, ItemObjectType);
         if (itemKeyAttempt.Success)
         {
             return itemKeyAttempt.Result;

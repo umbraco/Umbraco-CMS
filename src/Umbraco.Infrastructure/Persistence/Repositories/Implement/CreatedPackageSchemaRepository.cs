@@ -26,7 +26,7 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
     private readonly ILanguageService _languageService;
     private readonly string _createdPackagesFolderPath;
     private readonly IDataTypeService _dataTypeService;
-    private readonly IFileService _fileService;
+    private readonly IStylesheetService _stylesheetService;
     private readonly FileSystems _fileSystems;
     private readonly IHostingEnvironment _hostingEnvironment;
     private readonly MediaFileManager _mediaFileManager;
@@ -43,7 +43,7 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
     /// <param name="fileSystems">Manages access to various file systems used by the application.</param>
     /// <param name="serializer">Serializes and deserializes entities to and from XML.</param>
     /// <param name="dataTypeService">Service for managing data types.</param>
-    /// <param name="fileService">Service for managing files and file-related operations.</param>
+    /// <param name="stylesheetService">Service for managing stylesheets.</param>
     /// <param name="mediaService">Service for managing media items.</param>
     /// <param name="mediaTypeService">Service for managing media types.</param>
     /// <param name="contentService">Service for managing content items.</param>
@@ -60,7 +60,7 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
         FileSystems fileSystems,
         IEntityXmlSerializer serializer,
         IDataTypeService dataTypeService,
-        IFileService fileService,
+        IStylesheetService stylesheetService,
         IMediaService mediaService,
         IMediaTypeService mediaTypeService,
         IContentService contentService,
@@ -77,7 +77,7 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
         _fileSystems = fileSystems;
         _serializer = serializer;
         _dataTypeService = dataTypeService;
-        _fileService = fileService;
+        _stylesheetService = stylesheetService;
         _mediaService = mediaService;
         _mediaTypeService = mediaTypeService;
         _contentService = contentService;
@@ -745,7 +745,7 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
             throw new ArgumentException("Value cannot be null or whitespace.", nameof(path));
         }
 
-        IStylesheet? stylesheet = _fileService.GetStylesheet(path);
+        IStylesheet? stylesheet = _stylesheetService.GetAsync(path).GetAwaiter().GetResult();
         if (stylesheet == null)
         {
             return null;

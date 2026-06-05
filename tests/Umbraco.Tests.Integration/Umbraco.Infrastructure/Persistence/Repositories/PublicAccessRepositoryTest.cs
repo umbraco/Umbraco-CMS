@@ -1,17 +1,15 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Collections.Generic;
-using System.Linq;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
-using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
-using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
@@ -27,227 +25,226 @@ internal sealed class PublicAccessRepositoryTest : UmbracoIntegrationTest
 
     private DocumentRepository DocumentRepository => (DocumentRepository)GetRequiredService<IDocumentRepository>();
 
+    private PublicAccessRepository CreateRepository() =>
+        new(
+            GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>(),
+            AppCaches,
+            LoggerFactory.CreateLogger<PublicAccessRepository>(),
+            Mock.Of<IRepositoryCacheVersionService>(),
+            Mock.Of<ICacheSyncService>());
+
     [Test]
-    public void Can_Delete()
+    public async Task Can_Delete()
     {
         var content = CreateTestData(3).ToArray();
 
-        var provider = ScopeProvider;
-        using (var scope = provider.CreateScope())
-        {
-            var repo = new PublicAccessRepository((IScopeAccessor)provider, AppCaches, LoggerFactory.CreateLogger<PublicAccessRepository>(), Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
+        using var scope = NewScopeProvider.CreateScope();
+        var repo = CreateRepository();
 
-            PublicAccessRule[] rules = { new PublicAccessRule { RuleValue = "test", RuleType = "RoleName" } };
-            var entry = new PublicAccessEntry(content[0], content[1], content[2], rules);
-            repo.Save(entry);
+        PublicAccessRule[] rules = { new() { RuleValue = "test", RuleType = "RoleName" } };
+        var entry = new PublicAccessEntry(content[0], content[1], content[2], rules);
+        await repo.SaveAsync(entry, CancellationToken.None);
 
-            repo.Delete(entry);
+        await repo.DeleteAsync(entry, CancellationToken.None);
 
-            entry = repo.Get(entry.Key);
-            Assert.IsNull(entry);
-        }
+        var found = await repo.GetAsync(entry.Key, CancellationToken.None);
+        Assert.IsNull(found);
+
+        scope.Complete();
     }
 
     [Test]
-    public void Can_Add()
+    public async Task Can_Add()
     {
         var content = CreateTestData(3).ToArray();
 
-        var provider = ScopeProvider;
-        using (var scope = provider.CreateScope())
-        {
-            ScopeAccessor.AmbientScope.Database.AsUmbracoDatabase().EnableSqlTrace = true;
-            var repo = new PublicAccessRepository((IScopeAccessor)provider, AppCaches, LoggerFactory.CreateLogger<PublicAccessRepository>(), Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
+        using var scope = NewScopeProvider.CreateScope();
+        var repo = CreateRepository();
 
-            PublicAccessRule[] rules = { new PublicAccessRule { RuleValue = "test", RuleType = "RoleName" } };
-            var entry = new PublicAccessEntry(content[0], content[1], content[2], rules);
-            repo.Save(entry);
+        PublicAccessRule[] rules = { new() { RuleValue = "test", RuleType = "RoleName" } };
+        var entry = new PublicAccessEntry(content[0], content[1], content[2], rules);
+        await repo.SaveAsync(entry, CancellationToken.None);
 
-            var found = repo.GetMany().ToArray();
+        var found = (await repo.GetAllAsync(CancellationToken.None)).ToArray();
 
-            Assert.AreEqual(1, found.Length);
-            Assert.AreEqual(content[0].Id, found[0].ProtectedNodeId);
-            Assert.AreEqual(content[1].Id, found[0].LoginNodeId);
-            Assert.AreEqual(content[2].Id, found[0].NoAccessNodeId);
-            Assert.IsTrue(found[0].HasIdentity);
-            Assert.AreNotEqual(default(DateTime), found[0].CreateDate);
-            Assert.AreNotEqual(default(DateTime), found[0].UpdateDate);
-            Assert.AreEqual(1, found[0].Rules.Count());
-            Assert.AreEqual("test", found[0].Rules.First().RuleValue);
-            Assert.AreEqual("RoleName", found[0].Rules.First().RuleType);
-            Assert.AreNotEqual(default(DateTime), found[0].Rules.First().CreateDate);
-            Assert.AreNotEqual(default(DateTime), found[0].Rules.First().UpdateDate);
-            Assert.IsTrue(found[0].Rules.First().HasIdentity);
-        }
+        Assert.AreEqual(1, found.Length);
+        Assert.AreEqual(content[0].Id, found[0].ProtectedNodeId);
+        Assert.AreEqual(content[1].Id, found[0].LoginNodeId);
+        Assert.AreEqual(content[2].Id, found[0].NoAccessNodeId);
+        Assert.IsTrue(found[0].HasIdentity);
+        Assert.AreNotEqual(default(DateTime), found[0].CreateDate);
+        Assert.AreNotEqual(default(DateTime), found[0].UpdateDate);
+        Assert.AreEqual(1, found[0].Rules.Count());
+        Assert.AreEqual("test", found[0].Rules.First().RuleValue);
+        Assert.AreEqual("RoleName", found[0].Rules.First().RuleType);
+        Assert.AreNotEqual(default(DateTime), found[0].Rules.First().CreateDate);
+        Assert.AreNotEqual(default(DateTime), found[0].Rules.First().UpdateDate);
+        Assert.IsTrue(found[0].Rules.First().HasIdentity);
+
+        scope.Complete();
     }
 
     [Test]
     [LongRunning]
-    public void Can_Add2()
+    public async Task Can_Add2()
     {
         var content = CreateTestData(3).ToArray();
 
-        var provider = ScopeProvider;
-        using (var scope = provider.CreateScope())
+        using var scope = NewScopeProvider.CreateScope();
+        var repo = CreateRepository();
+
+        PublicAccessRule[] rules =
         {
-            ScopeAccessor.AmbientScope.Database.AsUmbracoDatabase().EnableSqlTrace = true;
-            var repo = new PublicAccessRepository((IScopeAccessor)provider, AppCaches, LoggerFactory.CreateLogger<PublicAccessRepository>(), Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
+            new() { RuleValue = "test", RuleType = "RoleName" },
+            new() { RuleValue = "test2", RuleType = "RoleName2" },
+        };
+        var entry = new PublicAccessEntry(content[0], content[1], content[2], rules);
+        await repo.SaveAsync(entry, CancellationToken.None);
 
-            PublicAccessRule[] rules =
-            {
-                new PublicAccessRule {RuleValue = "test", RuleType = "RoleName"},
-                new PublicAccessRule {RuleValue = "test2", RuleType = "RoleName2"}
-            };
-            var entry = new PublicAccessEntry(content[0], content[1], content[2], rules);
-            repo.Save(entry);
+        var found = (await repo.GetAllAsync(CancellationToken.None)).ToArray();
 
-            var found = repo.GetMany().ToArray();
+        Assert.AreEqual(1, found.Length);
+        Assert.AreEqual(content[0].Id, found[0].ProtectedNodeId);
+        Assert.AreEqual(content[1].Id, found[0].LoginNodeId);
+        Assert.AreEqual(content[2].Id, found[0].NoAccessNodeId);
+        Assert.IsTrue(found[0].HasIdentity);
+        Assert.AreNotEqual(default(DateTime), found[0].CreateDate);
+        Assert.AreNotEqual(default(DateTime), found[0].UpdateDate);
+        Assert.That(entry.Rules, Is.EquivalentTo(found[0].Rules));
+        Assert.AreNotEqual(default(DateTime), found[0].Rules.First().CreateDate);
+        Assert.AreNotEqual(default(DateTime), found[0].Rules.First().UpdateDate);
+        Assert.IsTrue(found[0].Rules.First().HasIdentity);
 
-            Assert.AreEqual(1, found.Length);
-            Assert.AreEqual(content[0].Id, found[0].ProtectedNodeId);
-            Assert.AreEqual(content[1].Id, found[0].LoginNodeId);
-            Assert.AreEqual(content[2].Id, found[0].NoAccessNodeId);
-            Assert.IsTrue(found[0].HasIdentity);
-            Assert.AreNotEqual(default(DateTime), found[0].CreateDate);
-            Assert.AreNotEqual(default(DateTime), found[0].UpdateDate);
-            Assert.That(entry.Rules, Is.EquivalentTo(found[0].Rules));
-            Assert.AreNotEqual(default(DateTime), found[0].Rules.First().CreateDate);
-            Assert.AreNotEqual(default(DateTime), found[0].Rules.First().UpdateDate);
-            Assert.IsTrue(found[0].Rules.First().HasIdentity);
-        }
+        scope.Complete();
     }
 
     [Test]
-    public void Can_Update()
+    public async Task Can_Update()
     {
         var content = CreateTestData(3).ToArray();
 
-        var provider = ScopeProvider;
-        using (var scope = provider.CreateScope())
-        {
-            var repo = new PublicAccessRepository((IScopeAccessor)provider, AppCaches, LoggerFactory.CreateLogger<PublicAccessRepository>(), Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
+        using var scope = NewScopeProvider.CreateScope();
+        var repo = CreateRepository();
 
-            PublicAccessRule[] rules = { new PublicAccessRule { RuleValue = "test", RuleType = "RoleName" } };
-            var entry = new PublicAccessEntry(content[0], content[1], content[2], rules);
-            repo.Save(entry);
+        PublicAccessRule[] rules = { new() { RuleValue = "test", RuleType = "RoleName" } };
+        var entry = new PublicAccessEntry(content[0], content[1], content[2], rules);
+        await repo.SaveAsync(entry, CancellationToken.None);
 
-            // re-get
-            entry = repo.Get(entry.Key);
+        // re-get
+        entry = await repo.GetAsync(entry.Key, CancellationToken.None);
 
-            entry.Rules.First().RuleValue = "blah";
-            entry.Rules.First().RuleType = "asdf";
-            repo.Save(entry);
+        entry.Rules.First().RuleValue = "blah";
+        entry.Rules.First().RuleType = "asdf";
+        await repo.SaveAsync(entry, CancellationToken.None);
 
-            // re-get
-            entry = repo.Get(entry.Key);
+        // re-get
+        entry = await repo.GetAsync(entry.Key, CancellationToken.None);
 
-            Assert.AreEqual("blah", entry.Rules.First().RuleValue);
-            Assert.AreEqual("asdf", entry.Rules.First().RuleType);
-        }
+        Assert.AreEqual("blah", entry.Rules.First().RuleValue);
+        Assert.AreEqual("asdf", entry.Rules.First().RuleType);
+
+        scope.Complete();
     }
 
     [Test]
-    public void Get_By_Id()
+    public async Task Get_By_Id()
     {
         var content = CreateTestData(3).ToArray();
 
-        var provider = ScopeProvider;
-        using (var scope = provider.CreateScope())
-        {
-            var repo = new PublicAccessRepository((IScopeAccessor)provider, AppCaches, LoggerFactory.CreateLogger<PublicAccessRepository>(),Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
+        using var scope = NewScopeProvider.CreateScope();
+        var repo = CreateRepository();
 
-            PublicAccessRule[] rules = { new PublicAccessRule { RuleValue = "test", RuleType = "RoleName" } };
-            var entry = new PublicAccessEntry(content[0], content[1], content[2], rules);
-            repo.Save(entry);
+        PublicAccessRule[] rules = { new() { RuleValue = "test", RuleType = "RoleName" } };
+        var entry = new PublicAccessEntry(content[0], content[1], content[2], rules);
+        await repo.SaveAsync(entry, CancellationToken.None);
 
-            // re-get
-            entry = repo.Get(entry.Key);
+        // re-get
+        entry = await repo.GetAsync(entry.Key, CancellationToken.None);
 
-            Assert.IsNotNull(entry);
-        }
+        Assert.IsNotNull(entry);
+
+        scope.Complete();
     }
 
     [Test]
-    public void Get_All()
+    public async Task Get_All()
     {
         var content = CreateTestData(30).ToArray();
 
-        var provider = ScopeProvider;
-        using (var scope = provider.CreateScope())
+        using var scope = NewScopeProvider.CreateScope();
+        var repo = CreateRepository();
+
+        var allEntries = new List<PublicAccessEntry>();
+        for (var i = 0; i < 10; i++)
         {
-            var repo = new PublicAccessRepository((IScopeAccessor)provider, AppCaches, LoggerFactory.CreateLogger<PublicAccessRepository>(), Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
-
-            var allEntries = new List<PublicAccessEntry>();
-            for (var i = 0; i < 10; i++)
+            var rules = new List<PublicAccessRule>();
+            for (var j = 0; j < 50; j++)
             {
-                var rules = new List<PublicAccessRule>();
-                for (var j = 0; j < 50; j++)
-                {
-                    rules.Add(new PublicAccessRule { RuleValue = "test" + j, RuleType = "RoleName" + j });
-                }
-
-                var entry1 = new PublicAccessEntry(content[i], content[i + 1], content[i + 2], rules);
-                repo.Save(entry1);
-
-                allEntries.Add(entry1);
+                rules.Add(new PublicAccessRule { RuleValue = "test" + j, RuleType = "RoleName" + j });
             }
 
-            // now remove a few rules from a few of the items and then add some more, this will put things 'out of order' which
-            // we need to verify our sort order is working for the relator
-            // TODO: no "relator" in v8?!
-            for (var i = 0; i < allEntries.Count; i++)
+            var entry1 = new PublicAccessEntry(content[i], content[i + 1], content[i + 2], rules);
+            await repo.SaveAsync(entry1, CancellationToken.None);
+
+            allEntries.Add(entry1);
+        }
+
+        // now remove a few rules from a few of the items and then add some more, this will put things 'out of order' which
+        // we need to verify our sort order is working for the relator
+        // TODO: no "relator" in v8?!
+        for (var i = 0; i < allEntries.Count; i++)
+        {
+            // all the even ones
+            if (i % 2 == 0)
             {
-                // all the even ones
-                if (i % 2 == 0)
+                var rules = allEntries[i].Rules.ToArray();
+                for (var j = 0; j < rules.Length; j++)
                 {
-                    var rules = allEntries[i].Rules.ToArray();
-                    for (var j = 0; j < rules.Length; j++)
+                    // all the even ones
+                    if (j % 2 == 0)
                     {
-                        // all the even ones
-                        if (j % 2 == 0)
-                        {
-                            allEntries[i].RemoveRule(rules[j]);
-                        }
+                        allEntries[i].RemoveRule(rules[j]);
                     }
-
-                    allEntries[i].AddRule("newrule" + i, "newrule" + i);
-                    repo.Save(allEntries[i]);
                 }
-            }
 
-            var found = repo.GetMany().ToArray();
-            Assert.AreEqual(10, found.Length);
-
-            foreach (var publicAccessEntry in found)
-            {
-                var matched = allEntries.First(x => x.Key == publicAccessEntry.Key);
-
-                Assert.AreEqual(matched.Rules.Count(), publicAccessEntry.Rules.Count());
+                allEntries[i].AddRule("newrule" + i, "newrule" + i);
+                await repo.SaveAsync(allEntries[i], CancellationToken.None);
             }
         }
+
+        var found = (await repo.GetAllAsync(CancellationToken.None)).ToArray();
+        Assert.AreEqual(10, found.Length);
+
+        foreach (var publicAccessEntry in found)
+        {
+            var matched = allEntries.First(x => x.Key == publicAccessEntry.Key);
+
+            Assert.AreEqual(matched.Rules.Count(), publicAccessEntry.Rules.Count());
+        }
+
+        scope.Complete();
     }
 
     [Test]
-    public void Get_All_With_Id()
+    public async Task Get_All_With_Id()
     {
         var content = CreateTestData(3).ToArray();
 
-        var provider = ScopeProvider;
-        using (var scope = provider.CreateScope())
-        {
-            var repo = new PublicAccessRepository((IScopeAccessor)provider, AppCaches, LoggerFactory.CreateLogger<PublicAccessRepository>(),  Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
+        using var scope = NewScopeProvider.CreateScope();
+        var repo = CreateRepository();
 
-            PublicAccessRule[] rules1 = { new PublicAccessRule { RuleValue = "test", RuleType = "RoleName" } };
-            var entry1 = new PublicAccessEntry(content[0], content[1], content[2], rules1);
-            repo.Save(entry1);
+        PublicAccessRule[] rules1 = { new() { RuleValue = "test", RuleType = "RoleName" } };
+        var entry1 = new PublicAccessEntry(content[0], content[1], content[2], rules1);
+        await repo.SaveAsync(entry1, CancellationToken.None);
 
-            PublicAccessRule[] rules2 = { new PublicAccessRule { RuleValue = "test", RuleType = "RoleName" } };
-            var entry2 = new PublicAccessEntry(content[1], content[0], content[2], rules2);
-            repo.Save(entry2);
+        PublicAccessRule[] rules2 = { new() { RuleValue = "test", RuleType = "RoleName" } };
+        var entry2 = new PublicAccessEntry(content[1], content[0], content[2], rules2);
+        await repo.SaveAsync(entry2, CancellationToken.None);
 
-            var found = repo.GetMany(entry1.Key).ToArray();
-            Assert.AreEqual(1, found.Count());
-        }
+        var found = (await repo.GetManyAsync(new[] { entry1.Key }, CancellationToken.None)).ToArray();
+        Assert.AreEqual(1, found.Length);
+
+        scope.Complete();
     }
 
     private IEnumerable<IContent> CreateTestData(int count)
@@ -269,6 +266,52 @@ internal sealed class PublicAccessRepositoryTest : UmbracoIntegrationTest
             scope.Complete();
 
             return result;
+        }
+    }
+
+    [Test]
+    public async Task Get_By_Guid_Returns_Deep_Clone_Not_Cached_Instance()
+    {
+        var content = CreateTestData(3).ToArray();
+        var provider = ScopeProvider;
+        using (var scope = provider.CreateScope())
+        {
+            var repo = CreateRepository();
+            PublicAccessRule[] rules = { new PublicAccessRule { RuleValue = "test", RuleType = "RoleName" } };
+            var entry = new PublicAccessEntry(content[0], content[1], content[2], rules);
+            await repo.SaveAsync(entry, CancellationToken.None);
+
+            var first = await repo.GetAsync(entry.Key, CancellationToken.None);
+            var second = await repo.GetAsync(entry.Key, CancellationToken.None);
+
+            Assert.IsNotNull(first);
+            Assert.IsNotNull(second);
+            Assert.AreEqual(first!.Key, second!.Key);
+            Assert.AreNotSame(first, second);
+        }
+    }
+
+    [Test]
+    public async Task Get_By_Guid_Mutation_Does_Not_Affect_Subsequent_Get()
+    {
+        var content = CreateTestData(3).ToArray();
+        var provider = ScopeProvider;
+        using (var scope = provider.CreateScope())
+        {
+            var repo = CreateRepository();
+            PublicAccessRule[] rules = { new PublicAccessRule { RuleValue = "test", RuleType = "RoleName" } };
+            var entry = new PublicAccessEntry(content[0], content[1], content[2], rules);
+            await repo.SaveAsync(entry, CancellationToken.None);
+
+            var first = await repo.GetAsync(entry.Key, CancellationToken.None);
+            Assert.IsNotNull(first);
+            var originalNodeId = first!.ProtectedNodeId;
+            first.ClearRules();
+
+            var second = await repo.GetAsync(entry.Key, CancellationToken.None);
+            Assert.IsNotNull(second);
+            Assert.AreEqual(originalNodeId, second!.ProtectedNodeId);
+            Assert.AreEqual(1, second.Rules.Count(), "Mutation of a returned entity should not affect the cached copy");
         }
     }
 }

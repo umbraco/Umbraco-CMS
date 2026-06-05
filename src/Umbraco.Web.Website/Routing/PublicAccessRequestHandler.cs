@@ -63,7 +63,7 @@ public class PublicAccessRequestHandler : IPublicAccessRequestHandler
 
             var path = publishedContent.Path;
 
-            Attempt<PublicAccessEntry?> publicAccessAttempt = _publicAccessService.IsProtected(path);
+            Attempt<PublicAccessEntry?> publicAccessAttempt = await _publicAccessService.IsProtectedAsync(path);
 
             if (publicAccessAttempt.Success)
             {

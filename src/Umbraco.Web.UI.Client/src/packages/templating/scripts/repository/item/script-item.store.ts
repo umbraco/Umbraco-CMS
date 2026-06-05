@@ -16,7 +16,7 @@ export class UmbScriptItemStore extends UmbItemStoreBase<UmbScriptItemModel> {
 	 * @memberof UmbScriptItemStore
 	 */
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_SCRIPT_ITEM_STORE_CONTEXT.toString());
+		super(host, UMB_SCRIPT_ITEM_STORE_CONTEXT);
 	}
 }
 

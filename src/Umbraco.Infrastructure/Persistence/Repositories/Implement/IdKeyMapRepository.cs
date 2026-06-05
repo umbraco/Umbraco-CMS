@@ -1,11 +1,9 @@
-using Microsoft.Extensions.Logging;
-using NPoco;
+using Microsoft.EntityFrameworkCore;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
-using Umbraco.Cms.Infrastructure.Persistence.Dtos;
-using Umbraco.Cms.Infrastructure.Scoping;
-using Umbraco.Extensions;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
@@ -13,8 +11,13 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 ///     Repository for mapping between integer IDs and GUID keys for Umbraco objects.
 ///     Provides methods to retrieve an ID for a given key and object type, and vice versa.
 /// </summary>
-public class IdKeyMapRepository(IScopeAccessor scopeAccessor) : IIdKeyMapRepository
+public class IdKeyMapRepository : IIdKeyMapRepository
 {
+    private readonly IEFCoreScopeAccessor<UmbracoDbContext> _scopeAccessor;
+
+    public IdKeyMapRepository(IEFCoreScopeAccessor<UmbracoDbContext> scopeAccessor) =>
+        _scopeAccessor = scopeAccessor;
+
     /// <summary>
     /// Retrieves the unique identifier (ID) for a specified key and object type.
     /// </summary>
@@ -25,36 +28,31 @@ public class IdKeyMapRepository(IScopeAccessor scopeAccessor) : IIdKeyMapReposit
     /// <param name="umbracoObjectType">The type of the Umbraco object to filter the query. Use <see cref="UmbracoObjectTypes.Unknown"/> to ignore the
     /// object type in the query.</param>
     /// <returns>The unique identifier (ID) of the object if found; otherwise, <see langword="null"/>.</returns>
-    public int? GetIdForKey(Guid key, UmbracoObjectTypes umbracoObjectType)
+    public async Task<int?> GetIdForKeyAsync(Guid key, UmbracoObjectTypes umbracoObjectType)
     {
-        if (scopeAccessor.AmbientScope is null)
+        if (_scopeAccessor.AmbientScope is null)
         {
             return null;
         }
 
-        ISqlContext sqlContext = scopeAccessor.AmbientScope.SqlContext;
-        IUmbracoDatabase database = scopeAccessor.AmbientScope.Database;
-        Sql<ISqlContext>? sql;
-
-        // if it's unknown don't include the nodeObjectType in the query
-        if (umbracoObjectType == UmbracoObjectTypes.Unknown)
+        return await _scopeAccessor.AmbientScope.ExecuteWithContextAsync(async db =>
         {
-            sql = sqlContext.Sql()
-                .Select<NodeDto>(c => c.NodeId)
-                .From<NodeDto>()
-                .Where<NodeDto>(n => n.UniqueId == key);
-            return database?.ExecuteScalar<int?>(sql);
-        }
+            if (umbracoObjectType == UmbracoObjectTypes.Unknown)
+            {
+                return await db.Nodes
+                    .Where(x => x.UniqueId == key)
+                    .Select(node => (int?)node.NodeId) // Cast needed to ensure null is returned if not found.
+                    .FirstOrDefaultAsync();
+            }
 
-        Guid type = GetNodeObjectTypeGuid(umbracoObjectType);
-        sql = sqlContext.Sql()
-            .Select<NodeDto>(c => c.NodeId)
-            .From<NodeDto>()
-            .Where<NodeDto>(n =>
-                n.UniqueId == key
-                && (n.NodeObjectType == type
-                    || n.NodeObjectType == Constants.ObjectTypes.IdReservation));
-        return database.ExecuteScalar<int?>(sql);
+            Guid type = GetNodeObjectTypeGuid(umbracoObjectType);
+            return await db.Nodes
+                .Where(x => x.UniqueId == key
+                            && (x.NodeObjectType == type
+                                || x.NodeObjectType == Constants.ObjectTypes.IdReservation))
+                .Select(node => (int?)node.NodeId) // Cast needed to ensure null is returned if not found.
+                .FirstOrDefaultAsync();
+        });
     }
 
     /// <summary>
@@ -67,42 +65,32 @@ public class IdKeyMapRepository(IScopeAccessor scopeAccessor) : IIdKeyMapReposit
     /// <param name="umbracoObjectType">The type of the Umbraco object to filter by. If set to <see cref="UmbracoObjectTypes.Unknown"/>,  the object
     /// type is not included in the query.</param>
     /// <returns>The unique identifier (GUID) of the node if found; otherwise, <see langword="null"/>.</returns>
-    public Guid? GetIdForKey(int id, UmbracoObjectTypes umbracoObjectType)
+    public async Task<Guid?> GetKeyForIdAsync(int id, UmbracoObjectTypes umbracoObjectType)
     {
-        if (scopeAccessor.AmbientScope is null)
+        if (_scopeAccessor.AmbientScope is null)
         {
             return null;
         }
 
-        ISqlContext sqlContext = scopeAccessor.AmbientScope.SqlContext;
-        IUmbracoDatabase database = scopeAccessor.AmbientScope.Database;
-        Sql<ISqlContext> sql;
-
-        // if it's unknown don't include the nodeObjectType in the query
-        if (umbracoObjectType == UmbracoObjectTypes.Unknown)
+        return await _scopeAccessor.AmbientScope.ExecuteWithContextAsync(async db =>
         {
-            sql = sqlContext.Sql()
-                .Select<NodeDto>(c => c.UniqueId)
-                .From<NodeDto>()
-                .Where<NodeDto>(n => n.NodeId == id);
+            // if it's unknown don't include the nodeObjectType in the query
+            if (umbracoObjectType == UmbracoObjectTypes.Unknown)
+            {
+                return await db.Nodes
+                    .Where(x => x.NodeId == id)
+                    .Select(node => (Guid?)node.UniqueId) // Cast needed to ensure null is returned if not found.
+                    .FirstOrDefaultAsync();
+            }
 
-            // We must use FirstOrDefault over ExecuteScalar when retrieving a nullable Guid, to ensure we go through the full NPoco mapping pipeline.
-            // Without that, though it will succeed on SQLite and SQLServer, it could fail on other database providers.
-            return database?.FirstOrDefault<Guid?>(sql);
-        }
-
-        Guid type = GetNodeObjectTypeGuid(umbracoObjectType);
-        sql = sqlContext.Sql()
-            .Select<NodeDto>(c => c.UniqueId)
-            .From<NodeDto>()
-            .Where<NodeDto>(n =>
-                n.NodeId == id
-                && (n.NodeObjectType == type
-                    || n.NodeObjectType == Constants.ObjectTypes.IdReservation));
-
-        // We must use FirstOrDefault over ExecuteScalar when retrieving a nullable Guid, to ensure we go through the full NPoco mapping pipeline.
-        // Without that, though it will succeed on SQLite and SQLServer, it could fail on other database providers.
-        return database?.FirstOrDefault<Guid?>(sql);
+            Guid type = GetNodeObjectTypeGuid(umbracoObjectType);
+            return await db.Nodes
+                .Where(x => x.NodeId == id
+                            && (x.NodeObjectType == type
+                                || x.NodeObjectType == Constants.ObjectTypes.IdReservation))
+                .Select(node => (Guid?)node.UniqueId) // Cast needed to ensure null is returned if not found.
+                .FirstOrDefaultAsync();
+        });
     }
 
     private Guid GetNodeObjectTypeGuid(UmbracoObjectTypes umbracoObjectType)

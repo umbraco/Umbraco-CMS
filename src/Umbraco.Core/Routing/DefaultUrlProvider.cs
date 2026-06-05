@@ -82,7 +82,7 @@ public class DefaultUrlProvider : IUrlProvider
     /// </remarks>
     public virtual IEnumerable<UrlInfo> GetOtherUrls(int id, Uri current)
     {
-        Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForId(id, UmbracoObjectTypes.Document);
+        Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForIdAsync(id, UmbracoObjectTypes.Document).GetAwaiter().GetResult();
 
         if (keyAttempt.Success is false)
         {
@@ -123,7 +123,7 @@ public class DefaultUrlProvider : IUrlProvider
 
             // although we are passing in culture here, if any node in this path is invariant, it ignores the culture anyways so this is ok
             var route = GetLegacyRouteFormatById(key, culture);
-            if (route == null || route == "#")
+            if (route == null || route == Constants.Routing.Unroutable)
             {
                 continue;
             }
@@ -184,7 +184,7 @@ public class DefaultUrlProvider : IUrlProvider
         var isDraft = _umbracoContextAccessor.GetRequiredUmbracoContext().InPreviewMode;
         if (isDraft is false && string.IsNullOrWhiteSpace(culture) is false && content.Cultures.Any() && content.IsInvariantOrHasCulture(culture) is false)
         {
-            route = "#";
+            route = Constants.Routing.Unroutable;
         }
         else
         {
@@ -206,7 +206,7 @@ public class DefaultUrlProvider : IUrlProvider
         UrlMode mode,
         string? culture)
     {
-        if (string.IsNullOrWhiteSpace(route) || route.Equals("#"))
+        if (string.IsNullOrWhiteSpace(route) || route.Equals(Constants.Routing.Unroutable))
         {
             if (_logger.IsEnabled(LogLevel.Debug))
             {

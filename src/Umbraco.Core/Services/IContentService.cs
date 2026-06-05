@@ -92,27 +92,12 @@ public interface IContentService : IPublishableContentService<IContent>
     /// <returns>The document, or null if not found.</returns>
     IContent? GetById(int id);
 
-
-    /// <summary>
-    ///     Gets publish/unpublish schedule for a content node.
-    /// </summary>
-    /// <param name="contentId">The identifier of the content to load schedule for.</param>
-    /// <returns>The <see cref="ContentScheduleCollection" />.</returns>
-    ContentScheduleCollection GetContentScheduleByContentId(int contentId);
-
     /// <summary>
     ///     Gets documents.
     /// </summary>
     /// <param name="ids">The identifiers of the documents.</param>
     /// <returns>The documents.</returns>
     IEnumerable<IContent> GetByIds(IEnumerable<int> ids);
-
-    /// <summary>
-    ///     Gets documents.
-    /// </summary>
-    /// <param name="ids">The unique identifiers of the documents.</param>
-    /// <returns>The documents.</returns>
-    IEnumerable<IContent> GetByIds(IEnumerable<Guid> ids);
 
     /// <summary>
     ///     Gets documents at a given level.

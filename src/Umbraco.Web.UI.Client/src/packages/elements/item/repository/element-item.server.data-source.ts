@@ -45,7 +45,7 @@ const mapper = (item: ElementItemResponseModel): UmbElementItemModel => {
 		},
 		entityType: UMB_ELEMENT_ENTITY_TYPE,
 		hasChildren: item.hasChildren,
-		isTrashed: false, //item.isTrashed,
+		isTrashed: item.isTrashed,
 		parent: item.parent ? { unique: item.parent.id } : null,
 		unique: item.id,
 		variants: item.variants.map((variant) => {
@@ -54,7 +54,7 @@ const mapper = (item: ElementItemResponseModel): UmbElementItemModel => {
 				name: variant.name,
 				state: variant.state,
 				flags: variant.flags,
-				// TODO: [v17] Implement dates when available in the API. [LK]
+				// TODO: [v18] Implement dates when available in the API. [LK]
 				//createDate: new Date(variant.createDate),
 				//updateDate: new Date(variant.updateDate),
 			};

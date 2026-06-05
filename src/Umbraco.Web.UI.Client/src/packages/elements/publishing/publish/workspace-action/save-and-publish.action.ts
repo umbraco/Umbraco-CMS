@@ -6,6 +6,10 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 export class UmbElementSaveAndPublishWorkspaceAction extends UmbWorkspaceActionBase {
 	constructor(host: UmbControllerHost, args: UmbWorkspaceActionArgs<never>) {
 		super(host, args);
+
+		// Opt in to isExecuting feedback so the workspace-action element waits
+		// for the variant-picker modal (when present) before showing the spinner.
+		this.setExecuting(false);
 	}
 
 	async hasAdditionalOptions() {
@@ -19,11 +23,17 @@ export class UmbElementSaveAndPublishWorkspaceAction extends UmbWorkspaceActionB
 	}
 
 	override async execute() {
-		const workspaceContext = await this.getContext(UMB_ELEMENT_PUBLISHING_WORKSPACE_CONTEXT);
-		if (!workspaceContext) {
-			throw new Error('The workspace context is missing');
+		try {
+			const workspaceContext = await this.getContext(UMB_ELEMENT_PUBLISHING_WORKSPACE_CONTEXT);
+			if (!workspaceContext) {
+				throw new Error('The workspace context is missing');
+			}
+			await workspaceContext.saveAndPublish({
+				onActionStarting: () => this.setExecuting(true),
+			});
+		} finally {
+			this.setExecuting(false);
 		}
-		return workspaceContext.saveAndPublish();
 	}
 }
 

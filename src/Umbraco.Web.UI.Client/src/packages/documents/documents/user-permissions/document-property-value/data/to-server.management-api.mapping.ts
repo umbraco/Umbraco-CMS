@@ -1,7 +1,7 @@
 import type { UmbDocumentPropertyValueUserPermissionModel } from '../types.js';
 import type { UmbDataSourceDataMapping } from '@umbraco-cms/backoffice/repository';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import type { DocumentPropertyValuePermissionPresentationModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { IPermissionPresentationModelDocumentPropertyValuePermissionPresentationModel as DocumentPropertyValuePermissionPresentationModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 export class UmbDocumentPropertyValueUserPermissionToManagementApiDataMapping
 	extends UmbControllerBase

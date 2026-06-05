@@ -104,7 +104,7 @@ internal sealed class ExamineExternalIndexTests : ExamineBaseTest
         var contentType = new ContentTypeBuilder()
             .WithId(0)
             .Build();
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var content = new ContentBuilder()
             .WithId(0)
@@ -140,7 +140,7 @@ internal sealed class ExamineExternalIndexTests : ExamineBaseTest
         var contentType = new ContentTypeBuilder()
             .WithId(0)
             .Build();
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var content = new ContentBuilder()
             .WithId(0)

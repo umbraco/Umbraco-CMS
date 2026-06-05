@@ -2,6 +2,7 @@ using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.RedirectUrlManagement;
 
@@ -32,11 +33,13 @@ public class DeleteByKeyRedirectUrlManagementController : RedirectUrlManagementC
     [MapToApiVersion("1.0")]
     [HttpDelete("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [EndpointSummary("Deletes a redirect URL.")]
     [EndpointDescription("Deletes a redirect URL identified by the provided Id.")]
-    public async Task<IActionResult> DeleteByKey(CancellationToken cancellationToken, Guid id)
+    public Task<IActionResult> DeleteByKey(CancellationToken cancellationToken, Guid id)
     {
-        await _redirectUrlService.DeleteAsync(id);
-        return Ok();
+        RedirectUrlOperationStatus status = _redirectUrlService.DeleteWithStatus(id);
+        return Task.FromResult(RedirectUrlOperationStatusResult(status));
     }
 }

@@ -142,7 +142,7 @@ public class ContentValueSetValidator : ValueSetValidator, IContentValueSetValid
             // explicit scope since we may be in a background thread
             using (_scopeProvider.CreateScope(autoComplete: true))
             {
-                if (_publicAccessService.IsProtected(path).Success)
+                if (_publicAccessService.IsProtectedAsync(path).GetAwaiter().GetResult().Success)
                 {
                     return false;
                 }

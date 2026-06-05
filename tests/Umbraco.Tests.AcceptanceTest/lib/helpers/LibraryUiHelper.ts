@@ -231,7 +231,7 @@ export class LibraryUiHelper extends UiBaseLocators {
     this.selectAVariantBtn = page.getByRole('button', {name: 'Open version selector'});
     this.variantAddModeBtn = page.locator('.switch-button.add-mode').locator('.variant-name');
     this.saveAndCloseBtn = page.getByLabel('Save and close');
-    this.elementTreeItem = page.locator('umb-element-tree-item');
+    this.elementTreeItem = page.locator('umb-tree-item');
     this.elementLanguageSelect = page.locator('umb-app-language-select');
     this.elementLanguageSelectPopover = page.locator('umb-popover-layout');
     this.elementReadOnly = this.elementWorkspace.locator('#name-input').getByText('Read-only');
@@ -282,7 +282,7 @@ export class LibraryUiHelper extends UiBaseLocators {
     this.duplicateBtn = page.getByLabel('Duplicate', {exact: true});
     this.elementTreeRefreshBtn = page.locator('#header').getByLabel('#actions_refreshNode');
     this.sortChildrenBtn = page.getByRole('button', {name: 'Sort children'});
-    this.rollbackBtn = page.getByRole('button', { name: 'Rollback…' });
+    this.rollbackBtn = page.getByTestId('audit-log-action:Umb.AuditLogAction.Element.Rollback');
     this.rollbackContainerBtn = this.container.getByLabel('Rollback');
     this.publicAccessBtn = page.getByRole('button', {name: 'Public Access'});
     this.uuiCheckbox = page.locator('uui-checkbox');
@@ -374,7 +374,7 @@ export class LibraryUiHelper extends UiBaseLocators {
     this.collectionMenu = page.locator('umb-collection-menu');
     this.entityPickerTree = page.locator('umb-tree[alias="Umb.Tree.EntityDataPicker"]');
     this.languageToggle = page.getByTestId('input:entity-name').locator('#toggle');
-    this.elementVariantDropdown = page.locator('umb-workspace-split-view-variant-selector uui-popover-container #dropdown');
+    this.elementVariantDropdown = page.locator('umb-element-workspace-split-view-variant-selector uui-popover-container #dropdown');
     this.blockProperty = page.locator('umb-block-workspace-view-edit-property');
     // Multi URL Picker
     this.linkPickerAddBtn = this.linkPickerModal.getByRole('button', {name: 'Add', exact: true});
@@ -500,6 +500,25 @@ export class LibraryUiHelper extends UiBaseLocators {
 
   async doesHistoryHaveText(text: string) {
     await this.hasText(this.historyItems, text);
+  }
+
+  async doesHistoryItemHaveTag(tagText: string, index: number = 0) {
+    const tag = this.historyItems.nth(index).locator('.log-type uui-tag');
+    await this.containsText(tag, tagText);
+  }
+
+  async doesHistoryItemHaveDescription(descriptionText: string, index: number = 0) {
+    const description = this.historyItems.nth(index).locator('.log-type span');
+    await this.hasText(description, descriptionText);
+  }
+
+  async doesHistoryItemHaveUsername(usernameText: string, index: number = 0) {
+    const username = this.historyItems.nth(index).locator('.user-info .name');
+    await this.containsText(username, usernameText);
+  }
+
+  async doesHistoryHaveCount(count: number) {
+    await this.hasCount(this.historyItems, count);
   }
 
   async doesElementStateHaveText(text: string) {

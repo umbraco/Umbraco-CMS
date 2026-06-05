@@ -1,3 +1,4 @@
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services.AuthorizationStatus;
 using Umbraco.Extensions;
@@ -9,6 +10,7 @@ namespace Umbraco.Cms.Core.Services;
 /// </summary>
 public interface IElementPermissionService
 {
+
     /// <summary>
     ///     Authorize that a user has access to an element.
     /// </summary>
@@ -88,4 +90,12 @@ public interface IElementPermissionService
     /// <param name="culturesToCheck">The collection of cultures to authorize.</param>
     /// <returns>A task resolving into a <see cref="ElementAuthorizationStatus"/>.</returns>
     Task<ElementAuthorizationStatus> AuthorizeCultureAccessAsync(IUser user, ISet<string> culturesToCheck);
+
+    /// <summary>
+    ///     Gets the effective permissions for a user on the specified element items.
+    /// </summary>
+    /// <param name="user"><see cref="IUser" /> to get permissions for.</param>
+    /// <param name="elementKeys">The identifiers of the element items to get permissions for.</param>
+    /// <returns>A task resolving into the effective permissions for each element item.</returns>
+    Task<IEnumerable<NodePermissions>> GetPermissionsAsync(IUser user, IEnumerable<Guid> elementKeys);
 }

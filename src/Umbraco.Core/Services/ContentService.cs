@@ -1,6 +1,5 @@
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 using System.Runtime.InteropServices;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -248,36 +247,6 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
 
     #endregion
 
-    /// <summary>
-    /// Rolls back an <see cref="IContent"/> item to a previous version.
-    /// </summary>
-    /// <param name="id">The ID of the content to roll back.</param>
-    /// <param name="versionId">The version ID to roll back to.</param>
-    /// <param name="culture">The culture to roll back, or "*" for all cultures.</param>
-    /// <param name="userId">The optional ID of the user performing the rollback.</param>
-    /// <returns>An <see cref="OperationResult"/> indicating the result of the operation.</returns>
-    /// <summary>
-    /// Gets the count of published <see cref="IContent"/> items.
-    /// </summary>
-    /// <param name="contentTypeAlias">The optional content type alias to filter by.</param>
-    /// <returns>The count of published content items.</returns>
-    /// <summary>
-    /// Gets the count of all <see cref="IContent"/> items.
-    /// </summary>
-    /// <param name="contentTypeAlias">The optional content type alias to filter by.</param>
-    /// <returns>The count of content items.</returns>
-    /// <summary>
-    /// Gets the count of child <see cref="IContent"/> items under a specified parent.
-    /// </summary>
-    /// <param name="parentId">The ID of the parent content.</param>
-    /// <param name="contentTypeAlias">The optional content type alias to filter by.</param>
-    /// <returns>The count of child content items.</returns>
-    /// <summary>
-    /// Gets the count of descendant <see cref="IContent"/> items under a specified parent.
-    /// </summary>
-    /// <param name="parentId">The ID of the parent content.</param>
-    /// <param name="contentTypeAlias">The optional content type alias to filter by.</param>
-    /// <returns>The count of descendant content items.</returns>
     #region Permissions
 
     /// <summary>
@@ -516,17 +485,6 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
     #region Get, Has, Is
 
     /// <summary>
-    /// <summary>
-    /// Gets the content schedule collection for the specified content key.
-    /// </summary>
-    /// <param name="contentId">The unique key of the content to retrieve the schedule for.</param>
-    /// <returns>The <see cref="ContentScheduleCollection"/> for the specified content, or an empty collection if not found.</returns>
-
-    /// <inheritdoc />
-    Attempt<OperationResult?> IContentServiceBase<IContent>.Save(IEnumerable<IContent> contents, int userId) =>
-        Attempt.Succeed(Save(contents, userId));
-
-    /// <summary>
     ///     Gets a collection of <see cref="IContent" /> objects by Level
     /// </summary>
     /// <param name="level">The level to retrieve Content from</param>
@@ -757,7 +715,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
         var intKeyedResults = new Dictionary<int, IEnumerable<ContentSchedule>>(guidKeyedResults.Count);
         foreach (KeyValuePair<Guid, IEnumerable<ContentSchedule>> entry in guidKeyedResults)
         {
-            Attempt<int> contentId = _idKeyMap.GetIdForKey(entry.Key, UmbracoObjectTypes.Document);
+            Attempt<int> contentId = _idKeyMap.GetIdForKeyAsync(entry.Key, UmbracoObjectTypes.Document).GetAwaiter().GetResult();
             if (contentId.Success)
             {
                 intKeyedResults[contentId.Result] = entry.Value;
@@ -841,7 +799,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
             // TODO: Await this properly when adjusting this service to our new EF Core approach.
             var allLangs = _languageRepository.GetAllAsync(CancellationToken.None).GetAwaiter().GetResult().ToList();
 
-            PublishResult result = CommitDocumentChangesInternal(scope, content, evtMsgs, allLangs, savingNotification.State, userId);
+            PublishResult result = CommitContentChangesInternal(scope, content, evtMsgs, allLangs, savingNotification.State, userId);
             scope.Complete();
             return result;
         }
@@ -1138,7 +1096,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
             return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, document);
         }
 
-        PublishResult result = CommitDocumentChangesInternal(scope, document, evtMsgs, allLangs, savingNotification.State, userId, true, isRoot);
+        PublishResult result = CommitContentChangesInternal(scope, document, evtMsgs, allLangs, savingNotification.State, userId, true, isRoot);
         if (result.Success)
         {
             publishedDocuments.Add(document);
@@ -1237,7 +1195,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
             }
 
             TryGetParentKey(parentId, out Guid? parentKey);
-            var moveEventInfo = new MoveEventInfo<IContent>(content, content.Path, parentId, parentKey);
+            var moveEventInfo = new MoveEventInfo<IContent>(content, content.Path, parentKey);
 
             var movingNotification = new ContentMovingNotification(moveEventInfo, eventMessages);
             if (scope.Notifications.PublishCancelable(movingNotification))
@@ -1271,7 +1229,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
                 .Select(x =>
                 {
                     TryGetParentKey(x.Item1.ParentId, out Guid? itemParentKey);
-                    return new MoveEventInfo<IContent>(x.Item1, x.Item2, x.Item1.ParentId, itemParentKey);
+                    return new MoveEventInfo<IContent>(x.Item1, x.Item2, itemParentKey);
                 })
                 .ToArray();
 
@@ -1389,8 +1347,9 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
                 int[]? relateParentOnDeleteRelationTypeIds = null;
                 if (_contentSettings.DisableDeleteWhenReferenced)
                 {
-                    IRelationType? relateParentOnDeleteRelationType = _relationService.GetRelationTypeByAlias(
-                        Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteAlias);
+                    IRelationType? relateParentOnDeleteRelationType = _relationService
+                        .GetRelationTypeByAliasAsync(Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteAlias)
+                        .GetAwaiter().GetResult();
                     if (relateParentOnDeleteRelationType is not null)
                     {
                         relateParentOnDeleteRelationTypeIds = [relateParentOnDeleteRelationType.Id];
@@ -1399,7 +1358,10 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
 
                 foreach (IContent content in contents)
                 {
-                    if (_contentSettings.DisableDeleteWhenReferenced && _relationService.IsRelated(content.Id, RelationDirectionFilter.Child, excludeRelationTypeIds: relateParentOnDeleteRelationTypeIds))
+                    if (_contentSettings.DisableDeleteWhenReferenced
+                        && _relationService
+                            .IsRelatedAsync(content.Id, RelationDirectionFilter.Child, excludeRelationTypeIds: relateParentOnDeleteRelationTypeIds)
+                            .GetAwaiter().GetResult())
                     {
                         continue;
                     }
@@ -1495,6 +1457,10 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
                 copy.Published = false;
             }
 
+            // clear any per-culture published state copied from the source - the copy is unpublished,
+            // so no culture variations should be marked as published either (see #22540).
+            copy.ClearPublishInfos();
+
             copy.CreatorId = userId;
             copy.WriterId = userId;
 
@@ -1559,6 +1525,10 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
                             descendantCopy.Published = false;
                         }
 
+                        // clear any per-culture published state copied from the source - the copy is unpublished,
+                        // so no culture variations should be marked as published either (see #22540).
+                        descendantCopy.ClearPublishInfos();
+
                         descendantCopy.CreatorId = userId;
                         descendantCopy.WriterId = userId;
 
@@ -1597,7 +1567,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
 
     private bool TryGetParentKey(int parentId, [NotNullWhen(true)] out Guid? parentKey)
     {
-        Attempt<Guid> parentKeyAttempt = _idKeyMap.GetKeyForId(parentId, UmbracoObjectTypes.Document);
+        Attempt<Guid> parentKeyAttempt = _idKeyMap.GetKeyForIdAsync(parentId, UmbracoObjectTypes.Document).GetAwaiter().GetResult();
         parentKey = parentKeyAttempt.Success ? parentKeyAttempt.Result : null;
         return parentKeyAttempt.Success;
     }
@@ -1792,31 +1762,16 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
         return OperationResult.Succeed(eventMessages);
     }
 
-    /// <summary>
-    /// Checks the data integrity of the content tree and optionally fixes issues.
-    /// </summary>
-    /// <param name="options">The options for the data integrity check.</param>
-    /// <returns>A <see cref="ContentDataIntegrityReport"/> containing the results of the integrity check.</returns>
-    public ContentDataIntegrityReport CheckDataIntegrity(ContentDataIntegrityReportOptions options)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            scope.WriteLock(Constants.Locks.ContentTree);
-
-            ContentDataIntegrityReport report = _documentRepository.CheckDataIntegrity(options);
-
-            if (report.FixedIssues.Count > 0)
+    /// <inheritdoc />
+    public override ContentDataIntegrityReport CheckDataIntegrity(ContentDataIntegrityReportOptions options)
+        => CheckDataIntegrity(
+            options,
+            scope =>
             {
                 // The event args needs a content item so we'll make a fake one with enough properties to not cause a null ref
                 var root = new Content("root", -1, new ContentType(_shortStringHelper, -1)) { Id = -1, Key = Guid.Empty };
                 scope.Notifications.Publish(new ContentTreeChangeNotification(root, TreeChangeTypes.RefreshAll, EventMessagesFactory.Get()));
-            }
-
-            scope.Complete();
-
-            return report;
-        }
-    }
+            });
 
     #endregion
 
@@ -1848,14 +1803,6 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
     /// </remarks>
     #endregion
 
-    #region Private Methods
-
-    // TODO ELEMENTS: not used? clean up!
-    private bool IsMandatoryCulture(IReadOnlyCollection<ILanguage> langs, string culture) =>
-        langs.Any(x => x.IsMandatory && x.IsoCode.InvariantEquals(culture));
-
-    #endregion
-
     #region Content Types
 
     /// <summary>
@@ -1870,7 +1817,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
     /// </remarks>
     /// <param name="contentTypeIds">Id of the <see cref="IContentType" /></param>
     /// <param name="userId">Optional Id of the user issuing the delete operation</param>
-    public void DeleteOfTypes(IEnumerable<int> contentTypeIds, int userId = Constants.Security.SuperUserId)
+    public override void DeleteOfTypes(IEnumerable<int> contentTypeIds, int userId = Constants.Security.SuperUserId)
     {
         // TODO: This currently this is called from the ContentTypeService but that needs to change,
         // if we are deleting a content type, we should just delete the data and do this operation slightly differently.
@@ -2237,12 +2184,6 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
     protected override bool SupportsBranchPublishing => true;
 
     protected override ILogger<ContentService> Logger => _logger;
-
-    protected override IContent CreateContentInstance(string name, int parentId, IContentType contentType, int userId)
-        => new Content(name, parentId, contentType, userId);
-
-    protected override IContent CreateContentInstance(string name, IContent parent, IContentType contentType, int userId)
-        => new Content(name, parent, contentType, userId);
 
     protected override void DeleteLocked(ICoreScope scope, IContent content, EventMessages evtMsgs)
     {

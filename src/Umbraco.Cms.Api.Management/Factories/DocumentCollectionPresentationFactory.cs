@@ -35,12 +35,12 @@ public class DocumentCollectionPresentationFactory : ContentCollectionPresentati
     }
 
     /// <inheritdoc/>
-    protected override Task SetUnmappedProperties(ListViewPagedModel<IContent> contentCollection, List<DocumentCollectionResponseModel> collectionResponseModels)
+    protected override async Task SetUnmappedProperties(ListViewPagedModel<IContent> contentCollection, List<DocumentCollectionResponseModel> collectionResponseModels)
     {
         // Retrieve all public access entries once (single scope) instead of
         // calling IsProtected per item which creates N scopes.
         var protectedNodeIds = new HashSet<int>(
-            _publicAccessService.GetAll().Select(entry => entry.ProtectedNodeId));
+            (await _publicAccessService.GetAllAsync()).Select(entry => entry.ProtectedNodeId));
 
         // All items in a collection are siblings (same parent), so with omitSelf
         // they share the same ancestor array. Compute once, reuse for all.
@@ -62,8 +62,6 @@ public class DocumentCollectionPresentationFactory : ContentCollectionPresentati
                 .ToArray();
             item.Ancestors = sharedAncestors;
         }
-
-        return Task.CompletedTask;
     }
 
     /// <summary>

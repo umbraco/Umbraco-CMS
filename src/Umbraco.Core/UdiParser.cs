@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Core;
 /// </summary>
 public sealed class UdiParser
 {
-    private static readonly ConcurrentDictionary<string, Udi> RootUdis = new();
+    private static readonly ConcurrentDictionary<string, Udi> _rootUdis = new();
 
     static UdiParser() =>
 
@@ -125,16 +125,16 @@ public sealed class UdiParser
     /// <returns>A root UDI for the entity type.</returns>
     /// <exception cref="ArgumentException">Thrown when the entity type is unknown.</exception>
     internal static Udi GetRootUdi(string entityType) =>
-        RootUdis.GetOrAdd(entityType, x =>
+        _rootUdis.GetOrAdd(entityType, static x =>
         {
             if (UdiTypes.TryGetValue(x, out UdiType udiType) == false)
             {
-                throw new ArgumentException(string.Format("Unknown entity type \"{0}\".", entityType));
+                throw new ArgumentException($"Unknown entity type \"{x}\".");
             }
 
             return udiType == UdiType.StringUdi
-                ? new StringUdi(entityType, string.Empty)
-                : new GuidUdi(entityType, Guid.Empty);
+                ? new StringUdi(x, string.Empty)
+                : new GuidUdi(x, Guid.Empty);
         });
 
     private static bool ParseInternal(string? s, bool tryParse, bool knownTypes, [MaybeNullWhen(false)] out Udi udi)
@@ -148,7 +148,7 @@ public sealed class UdiParser
                 return false;
             }
 
-            throw new FormatException(string.Format("String \"{0}\" is not a valid udi.", s));
+            throw new FormatException($"String \"{s}\" is not a valid udi.");
         }
 
         var entityType = uri.Host;
@@ -167,7 +167,7 @@ public sealed class UdiParser
                 return false;
             }
 
-            throw new FormatException(string.Format("Unknown entity type \"{0}\".", entityType));
+            throw new FormatException($"Unknown entity type \"{entityType}\".");
         }
 
         var path = uri.AbsolutePath.TrimStart('/');
@@ -187,7 +187,7 @@ public sealed class UdiParser
                     return false;
                 }
 
-                throw new FormatException(string.Format("String \"{0}\" is not a valid udi.", s));
+                throw new FormatException($"String \"{s}\" is not a valid udi.");
             }
 
             udi = new GuidUdi(uri.Host, guid);
@@ -205,7 +205,7 @@ public sealed class UdiParser
             return false;
         }
 
-        throw new InvalidOperationException(string.Format("Invalid udi type \"{0}\".", udiType));
+        throw new InvalidOperationException($"Invalid udi type \"{udiType}\".");
     }
 
     /// <summary>

@@ -36,6 +36,14 @@ public static partial class Constants
             ///     The key used to store the Umbraco pre-migrations upgrade plan state.
             /// </summary>
             public const string UmbracoUpgradePlanPremigrationsKey = KeyValuePrefix + UmbracoUpgradePlanPremigrationsName;
+
+            /// <summary>
+            ///     The key used to coordinate migration leadership across servers in a load-balanced
+            ///     environment. The value is either empty (no active leader) or
+            ///     <c>"{machineIdentifier}|{claimedAtUtc:O}"</c> when a server holds the claim,
+            ///     where <c>machineIdentifier</c> is the value returned by <see cref="Umbraco.Cms.Core.Factories.IMachineInfoFactory.GetMachineIdentifier"/>.
+            /// </summary>
+            public const string UpgradeLockKey = "Umbraco.Core.Upgrader.Lock";
         }
 
         /// <summary>
@@ -258,6 +266,18 @@ public static partial class Constants
             ///     if a role starts with __umbracoRole we won't show it as it's an internal role used for public access
             /// </summary>
             public static readonly string InternalRolePrefix = "__umbracoRole";
+
+            /// <summary>
+            ///     Notification-state key that flags a save as touching only login-related properties
+            ///     (e.g. <c>LastLoginDate</c>, <c>SecurityStamp</c>).
+            /// </summary>
+            public const string LoginPropertiesOnlyStateKey = "LoginPropertiesOnly";
+
+            /// <summary>
+            ///     Notification-state key that indicates whether any indexable field changed as part of the save.
+            ///     When explicitly set to <c>false</c>, Examine indexing for the affected member is skipped.
+            /// </summary>
+            public const string IndexableFieldsChangedStateKey = "IndexableFieldsChanged";
         }
 
         /// <summary>

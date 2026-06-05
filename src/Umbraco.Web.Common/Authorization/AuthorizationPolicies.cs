@@ -20,6 +20,8 @@ public static class AuthorizationPolicies
 
     public const string ElementPermissionByResource = nameof(ElementPermissionByResource);
 
+    public const string ElementFolderPermissionByResource = nameof(ElementFolderPermissionByResource);
+
     // Single section access
     public const string SectionAccessContent = nameof(SectionAccessContent);
     public const string SectionAccessPackages = nameof(SectionAccessPackages);

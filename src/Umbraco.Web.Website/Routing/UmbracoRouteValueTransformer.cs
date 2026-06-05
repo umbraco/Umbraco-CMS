@@ -171,9 +171,9 @@ public class UmbracoRouteValueTransformer : DynamicRouteValueTransformer
     }
 
     /// <summary>
-    ///     Check whether dynamic routing is currently active in an request where no exception has occured.
+    ///     Check whether dynamic routing is currently active in an request where no exception has occurred.
     /// </summary>
-    /// <returns>[true] if dynamic routing is active, [false] if inactive or an exception has occured.</returns>
+    /// <returns>[true] if dynamic routing is active, [false] if inactive or an exception has occurred.</returns>
     private static bool CheckActiveDynamicRoutingAndNoException(HttpContext httpContext)
     {
         // Don't execute if there are already UmbracoRouteValues assigned.
@@ -187,7 +187,7 @@ public class UmbracoRouteValueTransformer : DynamicRouteValueTransformer
             return false;
         }
 
-        // There is dynamic routing active so we have to check whether an exception occured in the current request.
+        // There is dynamic routing active so we have to check whether an exception occurred in the current request.
         // If this is the case we do want dynamic routing since it might be an Umbraco content page which is used as an error page.
         IExceptionHandlerFeature? exceptionHandlerFeature = httpContext.Features.Get<IExceptionHandlerFeature>();
 

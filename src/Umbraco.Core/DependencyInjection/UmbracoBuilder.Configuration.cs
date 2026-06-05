@@ -59,8 +59,6 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IValidateOptions<SecuritySettings>, SecuritySettingsValidator>();
 
         // Register configuration sections.
-        // TODO (V18): Remove the registrations of UserPasswordConfigurationSettings and MemberPasswordConfigurationSettings.
-        // Update any class taking these as constructor dependencies to instead take SecuritySettings and read the UserPassword or MemberPassword properties.
         builder
             .AddUmbracoOptions<ModelsBuilderSettings>()
             .AddUmbracoOptions<IndexCreatorSettings>()
@@ -102,7 +100,9 @@ public static partial class UmbracoBuilderExtensions
             .AddUmbracoOptions<CacheSettings>()
             .AddUmbracoOptions<SystemDateMigrationSettings>()
             .AddUmbracoOptions<DistributedJobSettings>()
-            .AddUmbracoOptions<BackOfficeTokenCookieSettings>();
+            .AddUmbracoOptions<BackOfficeTokenCookieSettings>()
+            .AddUmbracoOptions<WebsiteSettings>()
+            .AddUmbracoOptions<SignalRSettings>();
 
         // Configure connection string and ensure it's updated when the configuration changes
         builder.Services.AddSingleton<IConfigureOptions<ConnectionStrings>, ConfigureConnectionStrings>();

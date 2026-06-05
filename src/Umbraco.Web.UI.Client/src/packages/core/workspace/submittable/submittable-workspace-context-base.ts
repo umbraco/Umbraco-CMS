@@ -51,7 +51,7 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 	//isDirty = this.#isNew.asObservable();
 
 	constructor(host: UmbControllerHost, workspaceAlias: string) {
-		super(host, UMB_WORKSPACE_CONTEXT.toString());
+		super(host, UMB_WORKSPACE_CONTEXT);
 		this.workspaceAlias = workspaceAlias;
 		// TODO: Consider if we can move this consumption to #resolveSubmit, just as a getContext, but it depends if others use the modalContext prop.. [NL]
 		this.consumeContext(UMB_MODAL_CONTEXT, (context) => {
