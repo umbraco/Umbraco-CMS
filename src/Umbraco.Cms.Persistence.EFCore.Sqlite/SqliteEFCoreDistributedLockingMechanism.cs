@@ -11,6 +11,7 @@ using Umbraco.Cms.Core.DistributedLocking.Exceptions;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore.Extensions;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
+using Umbraco.Cms.Persistence.EFCore;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.EFCore.Locking;

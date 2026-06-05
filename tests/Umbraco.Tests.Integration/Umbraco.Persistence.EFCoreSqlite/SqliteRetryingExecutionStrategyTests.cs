@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using SQLitePCL;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore.Extensions;
 using Umbraco.Cms.Persistence.EFCore.Sqlite;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
