@@ -526,4 +526,38 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
     }
 
     #endregion
+
+    [Test]
+    public void SortChildren_Persists_The_Supplied_Order()
+    {
+        var folderMediaType = MediaTypeService.Get(Constants.Conventions.MediaTypes.Folder)!;
+
+        var root = MediaBuilder.CreateMediaFolder(folderMediaType, Constants.System.Root);
+        root.Name = "Root";
+        MediaService.Save(root);
+
+        var childIds = new List<int>();
+        for (var i = 0; i < 5; i++)
+        {
+            var child = MediaBuilder.CreateMediaFolder(folderMediaType, root.Id);
+            child.Name = $"Folder {i}";
+            MediaService.Save(child);
+            childIds.Add(child.Id);
+        }
+
+        int[] ChildIdsInSortOrder() => MediaService
+            .GetPagedChildren(root.Id, 0, 100, out _)
+            .OrderBy(child => child.SortOrder)
+            .Select(child => child.Id)
+            .ToArray();
+
+        // Children were created in ascending sort order.
+        Assert.AreEqual(childIds.ToArray(), ChildIdsInSortOrder());
+
+        var reversed = Enumerable.Reverse(childIds).ToArray();
+        var result = MediaService.SortChildren(root.Id, reversed, Constants.Security.SuperUserId);
+
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(reversed, ChildIdsInSortOrder());
+    }
 }

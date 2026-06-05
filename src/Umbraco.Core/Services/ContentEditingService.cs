@@ -403,6 +403,13 @@ internal sealed class ContentEditingService
         return OperationResultToOperationStatus(result);
     }
 
+    /// <inheritdoc />
+    protected override ContentEditingOperationStatus SortChildrenInBulk(int parentId, IReadOnlyList<int> orderedChildIds, int userId)
+    {
+        OperationResult result = ContentService.SortChildren(parentId, orderedChildIds, userId);
+        return OperationResultToOperationStatus(result);
+    }
+
     private async Task<ContentEditingOperationStatus> Save(IContent content, Guid userKey)
     {
         try

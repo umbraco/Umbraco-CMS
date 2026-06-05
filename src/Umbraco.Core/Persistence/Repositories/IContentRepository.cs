@@ -17,6 +17,19 @@ public interface IContentRepository<in TId, TEntity> : IReadWriteQueryRepository
     int RecycleBinId { get; }
 
     /// <summary>
+    ///     Updates the sort order of the specified nodes so that each node's sort order matches its
+    ///     position in the supplied (already ordered) collection, in a single set-based update.
+    /// </summary>
+    /// <param name="orderedNodeIds">The node identifiers in their desired order.</param>
+    /// <remarks>
+    ///     This persists the sort order directly and does not load the entities or fire any notifications;
+    ///     callers are responsible for any required cache refresh and auditing.
+    /// </remarks>
+    // TODO (V19): Remove the default implementation.
+    void UpdateSortOrder(IReadOnlyCollection<int> orderedNodeIds)
+        => throw new NotImplementedException();
+
+    /// <summary>
     ///     Gets versions.
     /// </summary>
     /// <remarks>Current version is first, and then versions are ordered with most recent first.</remarks>

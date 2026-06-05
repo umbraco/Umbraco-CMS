@@ -1452,6 +1452,42 @@ namespace Umbraco.Cms.Core.Services
 
         }
 
+        /// <inheritdoc />
+        public OperationResult SortChildren(int parentId, IReadOnlyList<int> orderedChildIds, int userId = Constants.Security.SuperUserId)
+        {
+            EventMessages evtMsgs = EventMessagesFactory.Get();
+            if (orderedChildIds.Count == 0)
+            {
+                return new OperationResult(OperationResultType.NoOperation, evtMsgs);
+            }
+
+            using ICoreScope scope = ScopeProvider.CreateCoreScope();
+            scope.WriteLock(Constants.Locks.MediaTree);
+
+            _mediaRepository.UpdateSortOrder(orderedChildIds);
+
+            // The published and repository caches read sort order live from umbracoNode, so refreshing the
+            // affected branch is enough for them to pick up the new order without re-saving each child.
+            if (parentId == Constants.System.Root)
+            {
+                IMedia[] roots = GetByIds(orderedChildIds).ToArray();
+                scope.Notifications.Publish(new MediaTreeChangeNotification(roots, TreeChangeTypes.RefreshNode, evtMsgs));
+            }
+            else
+            {
+                IMedia? parent = GetById(parentId);
+                if (parent is not null)
+                {
+                    scope.Notifications.Publish(new MediaTreeChangeNotification(parent, TreeChangeTypes.RefreshBranch, evtMsgs));
+                }
+            }
+
+            Audit(AuditType.Sort, userId, parentId);
+
+            scope.Complete();
+            return OperationResult.Succeed(evtMsgs);
+        }
+
         /// <summary>
         ///     Checks the data integrity of the media tree and optionally fixes detected issues.
         /// </summary>

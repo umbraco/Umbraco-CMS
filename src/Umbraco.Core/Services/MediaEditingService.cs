@@ -203,6 +203,13 @@ internal sealed class MediaEditingService
             : ContentEditingOperationStatus.CancelledByNotification;
     }
 
+    /// <inheritdoc />
+    protected override ContentEditingOperationStatus SortChildrenInBulk(int parentId, IReadOnlyList<int> orderedChildIds, int userId)
+    {
+        OperationResult result = ContentService.SortChildren(parentId, orderedChildIds, userId);
+        return OperationResultToOperationStatus(result);
+    }
+
     /// <summary>
     ///     Saves a media item to the repository.
     /// </summary>

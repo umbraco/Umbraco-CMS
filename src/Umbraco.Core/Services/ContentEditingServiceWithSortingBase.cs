@@ -162,18 +162,56 @@ internal abstract class ContentEditingServiceWithSortingBase<TContent, TContentT
             return ContentEditingOperationStatus.SortingInvalid;
         }
 
-        // The database does the ordering (matching the list view and the order shown in the sort UI),
-        // then we persist the resulting order as the children's sort order.
-        List<TContent> orderedChildren = LoadAllChildren(contentId.Value, ordering);
-        if (orderedChildren.Count == 0)
+        // The database does the ordering (matching the list view and the order shown in the sort UI).
+        if (ContentSettings.SortChildrenByFieldFiresNotifications)
+        {
+            // Opt-in path: load the children and persist via the standard sort, firing per-item
+            // save/sort notifications (and therefore webhooks), at the cost of loading every child.
+            List<TContent> orderedChildren = LoadAllChildren(contentId.Value, ordering);
+            if (orderedChildren.Count == 0)
+            {
+                return ContentEditingOperationStatus.Success;
+            }
+
+            return Sort(orderedChildren, await GetUserIdAsync(userKey));
+        }
+
+        // Default path: persist the resulting order with a single set-based update and a branch cache
+        // refresh, without loading every child or firing per-item notifications.
+        List<int> orderedChildIds = LoadOrderedChildIds(contentId.Value, ordering);
+        if (orderedChildIds.Count == 0)
         {
             // Nothing to sort - the order is trivially correct.
             return ContentEditingOperationStatus.Success;
         }
 
-        var userId = await GetUserIdAsync(userKey);
+        return SortChildrenInBulk(contentId.Value, orderedChildIds, await GetUserIdAsync(userKey));
+    }
 
-        return Sort(orderedChildren, userId);
+    /// <summary>
+    /// Persists the supplied (already ordered) child identifiers as the new sort order, without loading
+    /// the children or firing per-item notifications.
+    /// </summary>
+    /// <param name="parentId">The parent identifier, or the root identifier for root-level sorting.</param>
+    /// <param name="orderedChildIds">The child identifiers in their desired order.</param>
+    /// <param name="userId">The user performing the operation.</param>
+    /// <returns>The operation status.</returns>
+    protected abstract ContentEditingOperationStatus SortChildrenInBulk(int parentId, IReadOnlyList<int> orderedChildIds, int userId);
+
+    private List<int> LoadOrderedChildIds(int contentId, Ordering ordering)
+    {
+        const int pageSize = 500;
+        var pageNumber = 0;
+        IEnumerable<TContent> page = GetPagedChildren(contentId, pageNumber++, pageSize, ordering, out var total);
+        var ids = new List<int>((int)total);
+        ids.AddRange(page.Select(child => child.Id));
+        while (pageNumber * pageSize < total)
+        {
+            page = GetPagedChildren(contentId, pageNumber++, pageSize, ordering, out _);
+            ids.AddRange(page.Select(child => child.Id));
+        }
+
+        return ids;
     }
 
     private List<TContent> LoadAllChildren(int contentId, Ordering? ordering)
