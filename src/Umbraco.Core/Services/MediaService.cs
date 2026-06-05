@@ -1466,8 +1466,9 @@ namespace Umbraco.Cms.Core.Services
 
             _mediaRepository.UpdateSortOrder(orderedChildIds);
 
-            // The published and repository caches read sort order live from umbracoNode, so refreshing the
-            // affected branch is enough for them to pick up the new order without re-saving each child.
+            // Sort order lives in umbracoNode; neither the published cache nor the media repository cache keeps
+            // a separate serialized copy of it, so refreshing the affected branch (which invalidates both and has
+            // them reload from umbracoNode) is enough to pick up the new order without re-saving each child.
             if (parentId == Constants.System.Root)
             {
                 IMedia[] roots = GetByIds(orderedChildIds).ToArray();

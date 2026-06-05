@@ -199,35 +199,27 @@ internal abstract class ContentEditingServiceWithSortingBase<TContent, TContentT
     protected abstract ContentEditingOperationStatus SortChildrenInBulk(int parentId, IReadOnlyList<int> orderedChildIds, int userId);
 
     private List<int> LoadOrderedChildIds(int contentId, Ordering ordering)
-    {
-        const int pageSize = 500;
-        var pageNumber = 0;
-        IEnumerable<TContent> page = GetPagedChildren(contentId, pageNumber++, pageSize, ordering, out var total);
-        var ids = new List<int>((int)total);
-        ids.AddRange(page.Select(child => child.Id));
-        while (pageNumber * pageSize < total)
-        {
-            page = GetPagedChildren(contentId, pageNumber++, pageSize, ordering, out _);
-            ids.AddRange(page.Select(child => child.Id));
-        }
-
-        return ids;
-    }
+        => LoadAllChildren(contentId, ordering, child => child.Id);
 
     private List<TContent> LoadAllChildren(int contentId, Ordering? ordering)
+        => LoadAllChildren(contentId, ordering, child => child);
+
+    // Pages through all children, projecting each page with the selector so callers that only need a
+    // lightweight value (e.g. the id) don't retain every loaded child.
+    private List<TResult> LoadAllChildren<TResult>(int contentId, Ordering? ordering, Func<TContent, TResult> selector)
     {
         const int pageSize = 500;
         var pageNumber = 0;
         IEnumerable<TContent> page = GetPagedChildren(contentId, pageNumber++, pageSize, ordering, out var total);
-        var children = new List<TContent>((int)total);
-        children.AddRange(page);
+        var results = new List<TResult>((int)total);
+        results.AddRange(page.Select(selector));
         while (pageNumber * pageSize < total)
         {
             page = GetPagedChildren(contentId, pageNumber++, pageSize, ordering, out _);
-            children.AddRange(page);
+            results.AddRange(page.Select(selector));
         }
 
-        return children;
+        return results;
     }
 
     private static Ordering? BuildOrdering(ContentSortField field, Direction direction, string? culture)
