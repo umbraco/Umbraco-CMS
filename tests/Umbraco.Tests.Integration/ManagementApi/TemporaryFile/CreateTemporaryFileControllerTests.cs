@@ -42,7 +42,8 @@ public class CreateTemporaryFileControllerTests : ManagementApiUserGroupTestBase
     {
         // The endpoint only consumes multipart/form-data, so the request must be sent as such to reach the action.
         // The required file is intentionally omitted, yielding the expected BadRequest for authenticated users.
-        var content = new MultipartFormDataContent { { new StringContent(Guid.NewGuid().ToString()), "Id" } };
+        using var content = new MultipartFormDataContent();
+        content.Add(new StringContent(Guid.NewGuid().ToString()), "Id");
 
         return await Client.PostAsync(Url, content);
     }
