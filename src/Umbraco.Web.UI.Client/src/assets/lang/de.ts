@@ -1310,7 +1310,7 @@ export default {
 	},
 	sections: {
 		content: 'Inhalte',
-		forms: 'Formulare',
+		library: 'Bibliothek',
 		media: 'Medien',
 		member: 'Mitglieder',
 		packages: 'Pakete',
