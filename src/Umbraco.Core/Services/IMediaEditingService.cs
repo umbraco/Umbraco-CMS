@@ -124,10 +124,10 @@ public interface IMediaEditingService
     /// <param name="parentKey">The unique identifier of the parent, or <c>null</c> for root-level sorting.</param>
     /// <param name="field">The system field to sort the children by.</param>
     /// <param name="direction">The direction to sort in.</param>
-    /// <param name="culture">The culture whose variant name to sort by. Media items never vary by culture, so this is ignored; accepted for parity with content.</param>
     /// <param name="userKey">The unique identifier of the user performing the operation.</param>
     /// <returns>The operation status indicating the operation outcome.</returns>
-    Task<ContentEditingOperationStatus> SortByFieldAsync(Guid? parentKey, ContentSortField field, Direction direction, string? culture, Guid userKey)
+    /// <remarks>Media items never vary by culture, so children are always ordered by the invariant name.</remarks>
+    Task<ContentEditingOperationStatus> SortByFieldAsync(Guid? parentKey, ContentSortField field, Direction direction, Guid userKey)
         => throw new NotImplementedException(); // TODO (V19): Remove default implementation.
 
     /// <summary>

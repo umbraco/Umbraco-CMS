@@ -17,5 +17,5 @@ public abstract class SortChildrenByFieldRequestModelBase
     /// <summary>
     /// Gets or sets the direction to sort in.
     /// </summary>
-    public Direction Direction { get; init; } = Direction.Ascending;
+    public required Direction Direction { get; init; }
 }

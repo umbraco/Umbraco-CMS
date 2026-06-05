@@ -26,7 +26,7 @@ public interface IContentRepository<in TId, TEntity> : IReadWriteQueryRepository
     ///     callers are responsible for any required cache refresh and auditing.
     /// </remarks>
     // TODO (V19): Remove the default implementation.
-    void UpdateSortOrder(IReadOnlyCollection<int> orderedNodeIds)
+    void UpdateSortOrder(IReadOnlyList<int> orderedNodeIds)
         => throw new NotImplementedException();
 
     /// <summary>

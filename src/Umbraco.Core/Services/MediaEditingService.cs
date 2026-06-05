@@ -166,8 +166,10 @@ internal sealed class MediaEditingService
         => await HandleSortAsync(parentKey, sortingModels, userKey);
 
     /// <inheritdoc />
-    public async Task<ContentEditingOperationStatus> SortByFieldAsync(Guid? parentKey, ContentSortField field, Direction direction, string? culture, Guid userKey)
-        => await HandleSortByFieldAsync(parentKey, field, direction, culture, userKey);
+    public async Task<ContentEditingOperationStatus> SortByFieldAsync(Guid? parentKey, ContentSortField field, Direction direction, Guid userKey)
+
+        // Media never varies by culture, so children are always ordered by the invariant name.
+        => await HandleSortByFieldAsync(parentKey, field, direction, culture: null, userKey);
 
     /// <inheritdoc />
     protected override IMedia New(string? name, int parentId, IMediaType mediaType)

@@ -1298,7 +1298,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         public abstract int RecycleBinId { get; }
 
         /// <inheritdoc />
-        public void UpdateSortOrder(IReadOnlyCollection<int> orderedNodeIds)
+        public void UpdateSortOrder(IReadOnlyList<int> orderedNodeIds)
         {
             if (orderedNodeIds.Count == 0)
             {

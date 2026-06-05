@@ -54,7 +54,7 @@ public class SortChildrenMediaController : MediaControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [EndpointSummary("Sorts the children of a media item by a field.")]
-    [EndpointDescription("Sorts the children of the specified parent media item by a system field in the given direction. Media items do not vary by culture, so any supplied culture is ignored.")]
+    [EndpointDescription("Sorts the children of the specified parent media item by a system field in the given direction.")]
     public async Task<IActionResult> SortChildren(CancellationToken cancellationToken, Guid id, SortMediaChildrenByFieldRequestModel requestModel)
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
@@ -71,7 +71,6 @@ public class SortChildrenMediaController : MediaControllerBase
             id,
             requestModel.Field,
             requestModel.Direction,
-            culture: null,
             CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result == ContentEditingOperationStatus.Success
