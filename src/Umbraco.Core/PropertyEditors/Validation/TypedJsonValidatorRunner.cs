@@ -46,7 +46,11 @@ public class TypedJsonValidatorRunner<TValue, TConfiguration> : IValueValidator
         }
 
         TValue? deserializedValue = null;
-        if (value is not null && _jsonSerializer.TryDeserialize(value, out deserializedValue) is false)
+        if (value is string str && Guid.TryParse(str, out _))
+        {
+            deserializedValue = (TValue)(object)str;
+        }
+        else if (value is not null && _jsonSerializer.TryDeserialize(value, out deserializedValue) is false)
         {
             return validationResults;
         }

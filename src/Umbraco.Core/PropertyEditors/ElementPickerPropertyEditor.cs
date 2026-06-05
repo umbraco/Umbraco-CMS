@@ -52,7 +52,8 @@ public class ElementPickerPropertyEditor : DataEditor
             : base(shortStringHelper, jsonSerializer, ioHelper, attribute)
         {
             _jsonSerializer = jsonSerializer;
-            Validators.Add(new ElementPickerValidatorRunner(
+            Validators.Add(new TypedJsonValidatorRunner<Guid[], ElementPickerConfiguration>(
+                _jsonSerializer,
                 new AllowedTypeValidator(localizedTextService, elementService, coreScopeProvider)));
         }
 
@@ -77,31 +78,6 @@ public class ElementPickerPropertyEditor : DataEditor
         }
     }
 
-    internal sealed class ElementPickerValidatorRunner : IValueValidator
-    {
-        private readonly AllowedTypeValidator _validator;
-
-        public ElementPickerValidatorRunner(AllowedTypeValidator validator)
-            => _validator = validator;
-
-        public IEnumerable<ValidationResult> Validate(
-            object? value,
-            string? valueType,
-            object? dataTypeConfiguration,
-            PropertyValidationContext validationContext)
-        {
-            if (dataTypeConfiguration is not ElementPickerConfiguration configuration)
-            {
-                return [];
-            }
-
-            Guid[]? guids = value is IEnumerable<string> strings
-                ? strings.Select(s => Guid.TryParse(s, out Guid g) ? g : (Guid?)null).Where(g => g.HasValue).Select(g => g!.Value).ToArray()
-                : null;
-
-            return _validator.Validate(guids, configuration, valueType, validationContext);
-        }
-    }
     /// <summary>
     /// Validator for the allowed types of the element picker, validating that the selected elements are of an allowed content type.
     /// </summary>
@@ -148,7 +124,7 @@ public class ElementPickerPropertyEditor : DataEditor
             {
                 return [
                     new ValidationResult(
-                        _localizedTextService.Localize("validation", "invalidObjectType"),
+                        _localizedTextService.Localize("validation", "missingContent"),
                         ["value"])
                 ];
             }

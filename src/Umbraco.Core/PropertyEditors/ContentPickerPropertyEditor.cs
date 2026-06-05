@@ -1,12 +1,16 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Nodes;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
+using Umbraco.Cms.Core.Models.Validation;
+using Umbraco.Cms.Core.PropertyEditors.Validation;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
@@ -35,6 +39,7 @@ public class ContentPickerPropertyEditor : DataEditor, IValueSchemaProvider
     {
         _ioHelper = ioHelper;
         SupportsReadOnly = true;
+
     }
 
     /// <inheritdoc />
@@ -63,6 +68,8 @@ public class ContentPickerPropertyEditor : DataEditor, IValueSchemaProvider
     /// </summary>
     internal sealed class ContentPickerPropertyValueEditor : DataValueEditor, IDataValueReference
     {
+        private readonly IJsonSerializer _jsonSerializer;
+
         /// <summary>
         ///     Initializes a new instance of the <see cref="ContentPickerPropertyValueEditor" /> class.
         /// </summary>
@@ -74,9 +81,16 @@ public class ContentPickerPropertyEditor : DataEditor, IValueSchemaProvider
             IShortStringHelper shortStringHelper,
             IJsonSerializer jsonSerializer,
             IIOHelper ioHelper,
-            DataEditorAttribute attribute)
+            DataEditorAttribute attribute,
+            ICoreScopeProvider coreScopeProvider,
+            IContentService contentService,
+            ILocalizedTextService localizedTextService)
             : base(shortStringHelper, jsonSerializer, ioHelper, attribute)
         {
+            _jsonSerializer = jsonSerializer;
+            Validators.Add(new TypedJsonValidatorRunner<string, ContentPickerConfiguration>(
+                _jsonSerializer,
+                new AllowedTypeValidator(coreScopeProvider, contentService, localizedTextService)));
         }
 
         /// <inheritdoc />
@@ -133,5 +147,76 @@ public class ContentPickerPropertyEditor : DataEditor, IValueSchemaProvider
 
             return guidUdi.Guid;
         }
+    }
+
+    /// <summary>
+    ///    Validates that the selected content matches the allowed content types configured for the property editor.
+    /// </summary>
+    /// <param name="coreScopeProvider"></param>
+    /// <param name="contentService"></param>
+    internal sealed class AllowedTypeValidator(ICoreScopeProvider coreScopeProvider, IContentService contentService, ILocalizedTextService localizedTextService)
+        : ITypedJsonValidator<string, ContentPickerConfiguration>
+    {
+        public IEnumerable<ValidationResult> Validate(
+            string? value,
+            ContentPickerConfiguration? configuration,
+            string? valueType,
+            PropertyValidationContext validationContext)
+        {
+            if (string.IsNullOrEmpty(value) || configuration is null || !Guid.TryParse(value, out Guid id))
+            {
+                return [];
+            }
+
+            HashSet<Guid> allowedContentTypeKeys = ParseAllowedContentTypeKeys(configuration.AllowedContentTypeIds);
+            // No filter configured — all element types are allowed.
+            if (allowedContentTypeKeys.Count == 0)
+            {
+                return [];
+            }
+
+            using ICoreScope scope = coreScopeProvider.CreateCoreScope();
+            Guid? key = contentService.GetById(id)?.ContentType?.Key;
+            scope.Complete();
+
+            if (key is null)
+            {
+                return [new ValidationResult(
+                            localizedTextService.Localize(
+                                "validation",
+                                "missingContent"),
+                            ["value"])];
+            }
+
+            if (allowedContentTypeKeys.Contains(key.Value) is false)
+            {
+                return [new ValidationResult(
+                            localizedTextService.Localize(
+                                "validation",
+                                "invalidObjectType"),
+                            ["value"])];
+            }
+
+            return [];
+        }
+    }
+
+    private static HashSet<Guid> ParseAllowedContentTypeKeys(string? configValue)
+    {
+        if (configValue.IsNullOrWhiteSpace())
+        {
+            return [];
+        }
+
+        var result = new HashSet<Guid>();
+        foreach (var entry in configValue.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries))
+        {
+            if (Guid.TryParse(entry, out Guid guid))
+            {
+                result.Add(guid);
+            }
+        }
+
+        return result;
     }
 }
