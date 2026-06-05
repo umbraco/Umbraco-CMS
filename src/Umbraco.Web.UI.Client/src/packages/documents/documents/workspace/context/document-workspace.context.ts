@@ -396,16 +396,9 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	/**
-	 * Finalizes the workspace lifecycle after a NEW document has been created (and published) via a
-	 * single-transaction endpoint orchestrated by another context (the publishing workspace context). The
-	 * HTTP call and the subsequent reload are the caller's responsibility; this only applies the create
-	 * side-effects the base save flow would: reconcile the data state to what was saved, mark the
-	 * workspace as no longer new, and notify the tree.
-	 *
-	 * Both persisted AND current are reconciled to `savedData` BEFORE flipping isNew, so the new->edit
-	 * redirect that flip triggers can never observe a dirty state and pop a spurious "Discard unsaved
-	 * changes" dialog (reported by Andy Butland). Edited-but-unpublished variants are temporarily absent
-	 * from current until the caller's reload + transferPublishedVariantsToCurrent restores them (dirty again).
+	 * Applies the workspace side-effects of a document having been created externally: reconciles the
+	 * persisted and current data states to the saved data, marks the workspace as no longer new, and
+	 * requests a reload of the parent's structure and children.
 	 * @param {UmbDocumentDetailModel} savedData - The data that was sent to the server (constructSaveData)
 	 * @returns {Promise<void>}
 	 * @memberof UmbDocumentWorkspaceContext
@@ -414,12 +407,10 @@ export class UmbDocumentWorkspaceContext
 		const parent = this._internal_getCreateUnderParent();
 		if (!parent) throw new Error('Parent is not set');
 
-		// Set persisted AND current to the same data before flipping isNew. The flip triggers the new->edit
-		// redirect, whose navigation guard compares the two states with an order-sensitive jsonStringComparison.
+		// Reconcile persisted AND current before flipping isNew: the flip triggers the new->edit redirect,
+		// whose navigation guard compares the two states with an order-sensitive jsonStringComparison.
 		// `savedData` is a merge-processed projection of the draft (its values array can be ordered
-		// differently, and resolver-backed editors may rewrite values), so reconciling only persisted can
-		// still leave a spurious mismatch -> dialog. The edited-but-unpublished variants are restored (and
-		// become dirty again) by the caller's reload + transferPublishedVariantsToCurrent.
+		// differently), so reconciling only persisted can still leave a spurious mismatch -> dialog.
 		this._data.setPersisted(savedData);
 		this._data.setCurrent(savedData);
 		this.setIsNew(false);
@@ -436,16 +427,19 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	/**
-	 * Finalizes the workspace lifecycle after an EXISTING document has been updated (and published) via a
-	 * single-transaction endpoint orchestrated by another context. The HTTP call and the subsequent reload
-	 * are the caller's responsibility; this only notifies the tree/structure and emits the workspace's own
-	 * UmbEntityUpdatedEvent (stamped so the workspace ignores its own update).
+	 * Applies the workspace side-effects of a document having been updated externally: reconciles the
+	 * persisted and current data states to the saved data, requests a reload of the entity's structure,
+	 * and emits the workspace's own UmbEntityUpdatedEvent (stamped so the workspace ignores its own update).
+	 * @param {UmbDocumentDetailModel} savedData - The data that was sent to the server (constructSaveData)
 	 * @returns {Promise<void>}
 	 * @memberof UmbDocumentWorkspaceContext
 	 */
-	public async finalizeUpdate(): Promise<void> {
+	public async finalizeUpdate(savedData: UmbDocumentDetailModel): Promise<void> {
 		const unique = this.getUnique()!;
 		const entityType = this.getEntityType();
+
+		this._data.setPersisted(savedData);
+		this._data.setCurrent(savedData);
 
 		const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 		if (!eventContext) throw new Error('Event context is missing');
@@ -457,21 +451,20 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	/**
-	 * Restores the current data state after a reload following save-and-publish.
-	 * The reload sets both persisted and current to the complete server document; this re-applies the
-	 * still-unpublished, edited variants from the pre-publish draft so they remain dirty (and the
-	 * Discard-Changes guard keeps firing), while the published variants stay as the clean server data.
-	 * @param {UmbDocumentDetailModel | undefined} dirtyData - The current data captured before the reload
+	 * Sets the current data state to the given data, with the published variants (and the invariant
+	 * culture) replaced by their values from the persisted data state. Unpublished variants keep their
+	 * values from the given data and thereby remain dirty.
+	 * @param {UmbDocumentDetailModel | undefined} currentData - The data to set as current
 	 * @param {Array<UmbVariantId>} variantIds - The variants that were published
 	 * @returns {Promise<void>}
 	 * @memberof UmbDocumentWorkspaceContext
 	 */
 	public async transferPublishedVariantsToCurrent(
-		dirtyData: UmbDocumentDetailModel | undefined,
+		currentData: UmbDocumentDetailModel | undefined,
 		variantIds: Array<UmbVariantId>,
 	): Promise<void> {
 		const serverData = this._data.getPersisted();
-		if (!serverData || !dirtyData) return;
+		if (!serverData || !currentData) return;
 
 		const invariantVariantId = UmbVariantId.CreateInvariant();
 		let selectedVariants = [...variantIds];
@@ -492,7 +485,7 @@ export class UmbDocumentWorkspaceContext
 		}
 
 		const merged = await new UmbMergeContentVariantDataController(this).process(
-			dirtyData,
+			currentData,
 			serverData,
 			selectedVariants,
 			variantsToStore,

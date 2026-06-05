@@ -458,7 +458,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 			const { error } = await this.#publishingRepository.updateAndPublish(saveData, variantIds);
 			if (error) throw new Error('Error updating and publishing document');
 
-			await documentWorkspaceContext.finalizeUpdate();
+			await documentWorkspaceContext.finalizeUpdate(saveData);
 		}
 	}
 
