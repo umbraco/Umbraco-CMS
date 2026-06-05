@@ -15,10 +15,10 @@ internal sealed partial class MediaEditingServiceTests
     // produces a distinct expected ordering (see ContentEditingServiceTests.SortByField for the rationale).
     private static readonly (string Name, int CreateOffset, int UpdateOffset)[] SortByFieldFolders =
     {
-        ("delta", 0, 3),   // index 0
-        ("bravo", 1, 1),   // index 1
-        ("echo", 2, 4),    // index 2
-        ("alpha", 3, 0),   // index 3
+        ("delta", 0, 0),   // index 0
+        ("bravo", 1, 3),   // index 1
+        ("echo", 2, 1),    // index 2
+        ("alpha", 3, 4),   // index 3
         ("charlie", 4, 2), // index 4
     };
 
@@ -26,8 +26,8 @@ internal sealed partial class MediaEditingServiceTests
     [TestCase(ContentSortField.Name, Direction.Descending, new[] { 2, 0, 4, 1, 3 })]
     [TestCase(ContentSortField.CreateDate, Direction.Ascending, new[] { 0, 1, 2, 3, 4 })]
     [TestCase(ContentSortField.CreateDate, Direction.Descending, new[] { 4, 3, 2, 1, 0 })]
-    [TestCase(ContentSortField.UpdateDate, Direction.Ascending, new[] { 3, 1, 4, 0, 2 })]
-    [TestCase(ContentSortField.UpdateDate, Direction.Descending, new[] { 2, 0, 4, 1, 3 })]
+    [TestCase(ContentSortField.UpdateDate, Direction.Ascending, new[] { 0, 2, 4, 1, 3 })]
+    [TestCase(ContentSortField.UpdateDate, Direction.Descending, new[] { 3, 1, 4, 2, 0 })]
     public async Task Can_Sort_Children_By_Field(ContentSortField field, Direction direction, int[] expectedChildIndexes)
     {
         (IMedia root, Guid[] childKeysByIndex) = await CreateRootWithChildrenForFieldSorting();
@@ -61,6 +61,38 @@ internal sealed partial class MediaEditingServiceTests
         Assert.AreEqual(ContentEditingOperationStatus.SortingInvalid, result);
     }
 
+    [TestCase(ContentSortField.Name, Direction.Ascending, new[] { 3, 1, 4, 0, 2 })]
+    [TestCase(ContentSortField.Name, Direction.Descending, new[] { 2, 0, 4, 1, 3 })]
+    [TestCase(ContentSortField.CreateDate, Direction.Ascending, new[] { 0, 1, 2, 3, 4 })]
+    [TestCase(ContentSortField.CreateDate, Direction.Descending, new[] { 4, 3, 2, 1, 0 })]
+    [TestCase(ContentSortField.UpdateDate, Direction.Ascending, new[] { 0, 2, 4, 1, 3 })]
+    [TestCase(ContentSortField.UpdateDate, Direction.Descending, new[] { 3, 1, 4, 2, 0 })]
+    public async Task Can_Sort_Root_Media_By_Field(ContentSortField field, Direction direction, int[] expectedRootIndexes)
+    {
+        Guid[] rootKeysByIndex = await CreateRootMediaForFieldSorting();
+
+        var result = await MediaEditingService.SortByFieldAsync(parentKey: null, field, direction, culture: null, Constants.Security.SuperUserKey);
+        Assert.AreEqual(ContentEditingOperationStatus.Success, result);
+
+        var actualRootKeys = MediaService
+            .GetPagedChildren(Constants.System.Root, 0, 100, out _)
+            .OrderBy(c => c.SortOrder)
+            .Select(c => c.Key)
+            .ToArray();
+        var expectedRootKeys = expectedRootIndexes.Select(i => rootKeysByIndex[i]).ToArray();
+
+        Assert.AreEqual(expectedRootKeys, actualRootKeys);
+    }
+
+    [Test]
+    public async Task Sort_Children_By_Field_With_No_Children_Returns_Success()
+    {
+        var folder = await CreateFolderMediaAsync("Childless");
+
+        var result = await MediaEditingService.SortByFieldAsync(folder.Key, ContentSortField.Name, Direction.Ascending, culture: null, Constants.Security.SuperUserKey);
+        Assert.AreEqual(ContentEditingOperationStatus.Success, result);
+    }
+
     private async Task<(IMedia Root, Guid[] ChildKeysByIndex)> CreateRootWithChildrenForFieldSorting()
     {
         var root = await CreateFolderMediaAsync("Root");
@@ -81,5 +113,25 @@ internal sealed partial class MediaEditingServiceTests
         }
 
         return (root, childKeys);
+    }
+
+    private async Task<Guid[]> CreateRootMediaForFieldSorting()
+    {
+        var baseDate = new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        var rootKeys = new Guid[SortByFieldFolders.Length];
+        for (var i = 0; i < SortByFieldFolders.Length; i++)
+        {
+            (string name, int createOffset, int updateOffset) = SortByFieldFolders[i];
+
+            var media = await CreateFolderMediaAsync(name);
+            rootKeys[i] = media.Key;
+
+            // Setting the dates marks them dirty, so they are persisted as-is rather than being stamped with "now".
+            media.CreateDate = baseDate.AddDays(createOffset);
+            media.UpdateDate = baseDate.AddDays(100 + updateOffset);
+            MediaService.Save(media);
+        }
+
+        return rootKeys;
     }
 }

@@ -14,10 +14,10 @@ public partial class ContentEditingServiceTests
     // a sort applied against the wrong field cannot coincidentally produce the right result.
     private static readonly (string Name, int CreateOffset, int UpdateOffset)[] _sortByFieldChildren =
     {
-        ("delta", 0, 3),   // index 0
-        ("bravo", 1, 1),   // index 1
-        ("echo", 2, 4),    // index 2
-        ("alpha", 3, 0),   // index 3
+        ("delta", 0, 0),   // index 0
+        ("bravo", 1, 3),   // index 1
+        ("echo", 2, 1),    // index 2
+        ("alpha", 3, 4),   // index 3
         ("charlie", 4, 2), // index 4
     };
 
@@ -25,8 +25,8 @@ public partial class ContentEditingServiceTests
     [TestCase(ContentSortField.Name, Direction.Descending, new[] { 2, 0, 4, 1, 3 })]
     [TestCase(ContentSortField.CreateDate, Direction.Ascending, new[] { 0, 1, 2, 3, 4 })]
     [TestCase(ContentSortField.CreateDate, Direction.Descending, new[] { 4, 3, 2, 1, 0 })]
-    [TestCase(ContentSortField.UpdateDate, Direction.Ascending, new[] { 3, 1, 4, 0, 2 })]
-    [TestCase(ContentSortField.UpdateDate, Direction.Descending, new[] { 2, 0, 4, 1, 3 })]
+    [TestCase(ContentSortField.UpdateDate, Direction.Ascending, new[] { 0, 2, 4, 1, 3 })]
+    [TestCase(ContentSortField.UpdateDate, Direction.Descending, new[] { 3, 1, 4, 2, 0 })]
     public async Task Can_Sort_Children_By_Field(ContentSortField field, Direction direction, int[] expectedChildIndexes)
     {
         (IContent root, Guid[] childKeysByIndex) = await CreateRootWithChildrenForFieldSorting();
@@ -125,12 +125,17 @@ public partial class ContentEditingServiceTests
         Assert.AreEqual(expectedChildKeys, actualChildKeys);
     }
 
-    [Test]
-    public async Task Can_Sort_Root_Content_By_Field()
+    [TestCase(ContentSortField.Name, Direction.Ascending, new[] { 3, 1, 4, 0, 2 })]
+    [TestCase(ContentSortField.Name, Direction.Descending, new[] { 2, 0, 4, 1, 3 })]
+    [TestCase(ContentSortField.CreateDate, Direction.Ascending, new[] { 0, 1, 2, 3, 4 })]
+    [TestCase(ContentSortField.CreateDate, Direction.Descending, new[] { 4, 3, 2, 1, 0 })]
+    [TestCase(ContentSortField.UpdateDate, Direction.Ascending, new[] { 0, 2, 4, 1, 3 })]
+    [TestCase(ContentSortField.UpdateDate, Direction.Descending, new[] { 3, 1, 4, 2, 0 })]
+    public async Task Can_Sort_Root_Content_By_Field(ContentSortField field, Direction direction, int[] expectedRootIndexes)
     {
         Guid[] rootKeysByIndex = await CreateRootContentForFieldSorting();
 
-        var result = await ContentEditingService.SortByFieldAsync(parentKey: null, ContentSortField.Name, Direction.Ascending, culture: null, Constants.Security.SuperUserKey);
+        var result = await ContentEditingService.SortByFieldAsync(parentKey: null, field, direction, culture: null, Constants.Security.SuperUserKey);
         Assert.AreEqual(ContentEditingOperationStatus.Success, result);
 
         var actualRootKeys = ContentService
@@ -138,8 +143,7 @@ public partial class ContentEditingServiceTests
             .OrderBy(c => c.SortOrder)
             .Select(c => c.Key)
             .ToArray();
-        // Names ascending: alpha(3), bravo(1), charlie(4), delta(0), echo(2).
-        var expectedRootKeys = new[] { 3, 1, 4, 0, 2 }.Select(i => rootKeysByIndex[i]).ToArray();
+        var expectedRootKeys = expectedRootIndexes.Select(i => rootKeysByIndex[i]).ToArray();
 
         Assert.AreEqual(expectedRootKeys, actualRootKeys);
     }
@@ -195,10 +199,11 @@ public partial class ContentEditingServiceTests
         rootContentType.AllowedAsRoot = true;
         await ContentTypeService.CreateAsync(rootContentType, Constants.Security.SuperUserKey);
 
+        var baseDate = new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc);
         var rootKeys = new Guid[_sortByFieldChildren.Length];
         for (var i = 0; i < _sortByFieldChildren.Length; i++)
         {
-            (string name, _, _) = _sortByFieldChildren[i];
+            (string name, int createOffset, int updateOffset) = _sortByFieldChildren[i];
 
             var root = (await ContentEditingService.CreateAsync(
                 new ContentCreateModel
@@ -207,6 +212,11 @@ public partial class ContentEditingServiceTests
                 },
                 Constants.Security.SuperUserKey)).Result.Content!;
             rootKeys[i] = root.Key;
+
+            // Setting the dates marks them dirty, so they are persisted as-is rather than being stamped with "now".
+            root.CreateDate = baseDate.AddDays(createOffset);
+            root.UpdateDate = baseDate.AddDays(100 + updateOffset);
+            ContentService.Save(root);
         }
 
         return rootKeys;

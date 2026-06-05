@@ -106,6 +106,9 @@
     <Compile Update="Umbraco.Infrastructure\Services\MediaEditingServiceTests.MoveToRecycleBin.cs">
       <DependentUpon>MediaEditingServiceTests.cs</DependentUpon>
     </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\MediaEditingServiceTests.SortByField.cs">
+      <DependentUpon>MediaEditingServiceTests.cs</DependentUpon>
+    </Compile>
     <Compile Update="Umbraco.Infrastructure\Services\ContentPublishingServiceTests.Publish.cs">
       <DependentUpon>ContentPublishingServiceTests.cs</DependentUpon>
     </Compile>
