@@ -67,8 +67,7 @@ export class UmbMediaWorkspaceEditorElement extends UmbLitElement {
 
 	private async _generateRoutes() {
 		if (!this.#variants || this.#variants.length === 0) {
-			this._routes = [];
-			this.#ensureForbiddenRoute(this._routes);
+			this._routes = [this.#createNotFoundRoute()];
 			return;
 		}
 
@@ -113,25 +112,19 @@ export class UmbMediaWorkspaceEditorElement extends UmbLitElement {
 			});
 		}
 
-		this.#ensureForbiddenRoute(routes);
+		routes.push(this.#createNotFoundRoute());
 
 		this._routes = routes;
 	}
 
-	/**
-	 * Ensure that there is a route to handle forbidden access.
-	 * This route will display a forbidden message when the user does not have permission to access certain resources.
-	 * Also handles not found routes.
-	 * @param {Array<UmbRoute>} routes - The array of routes to append the forbidden route to
-	 */
-	#ensureForbiddenRoute(routes: Array<UmbRoute> = []) {
-		routes.push({
+	#createNotFoundRoute(): UmbRoute {
+		return {
 			path: '**',
 			component: async () => {
 				const router = await import('@umbraco-cms/backoffice/router');
 				return this.#isForbidden ? router.UmbRouteForbiddenElement : router.UmbRouteNotFoundElement;
 			},
-		});
+		};
 	}
 
 	private _gotWorkspaceRoute = (e: UmbRouterSlotInitEvent) => {
