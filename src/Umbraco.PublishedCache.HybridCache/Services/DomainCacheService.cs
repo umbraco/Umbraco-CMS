@@ -22,7 +22,7 @@ public class DomainCacheService : IDomainCacheService
 {
     private readonly IDomainService _domainService;
     private readonly ICoreScopeProvider _coreScopeProvider;
-    private readonly object _initializationLock = new();
+    private readonly Lock _initializationLock = new();
 
     // Both fields are written under _initializationLock but read on the hot path (request routing) without
     // it. Marking them volatile makes those lock-free reads acquire-reads, so a reader is guaranteed to see
