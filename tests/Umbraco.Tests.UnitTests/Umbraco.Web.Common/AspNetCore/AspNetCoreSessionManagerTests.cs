@@ -19,7 +19,7 @@ public class AspNetCoreSessionManagerTests
     private const string SessionId = "test-session-id";
 
     [Test]
-    public void SessionId_Returns_Zero_When_Sessions_Not_Available()
+    public void Can_Resolve_SessionId_As_Zero_When_Sessions_Not_Available()
     {
         var httpContext = new DefaultHttpContext();
         var sessionManager = CreateSessionManager(httpContext);
@@ -28,7 +28,7 @@ public class AspNetCoreSessionManagerTests
     }
 
     [Test]
-    public void SessionId_Does_Not_Load_Session_When_No_Session_Cookie_Present()
+    public void Cannot_Load_Session_Without_Cookie_Present()
     {
         var session = new TrackingSession(SessionId);
         var httpContext = new DefaultHttpContext();
@@ -45,7 +45,7 @@ public class AspNetCoreSessionManagerTests
     }
 
     [Test]
-    public void SessionId_Returns_Id_When_Session_Cookie_Present()
+    public void Can_Resolve_SessionId_When_Session_Cookie_Present()
     {
         var session = new TrackingSession(SessionId);
         var httpContext = new DefaultHttpContext();
