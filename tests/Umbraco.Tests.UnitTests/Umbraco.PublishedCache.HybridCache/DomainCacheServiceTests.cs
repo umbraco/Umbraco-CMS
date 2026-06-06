@@ -48,6 +48,7 @@ internal sealed class DomainCacheServiceTests
         IDomain configuredDomain = CreateDomain(1, "https://site-one.example/", 1001, "en-US", isWildcard: false);
 
         using var loadStarted = new ManualResetEventSlim(false);
+        using var secondCallerReady = new ManualResetEventSlim(false);
         using var releaseLoad = new ManualResetEventSlim(false);
 
         var domainService = new Mock<IDomainService>();
@@ -58,7 +59,13 @@ internal sealed class DomainCacheServiceTests
             .Returns(() =>
             {
                 loadStarted.Set();
-                releaseLoad.Wait(TimeSpan.FromSeconds(10));
+
+                // Fail loudly if the test never releases the load: returning anyway would let the test
+                // pass while the synchronization it depends on silently broke (and hide any hang).
+                Assert.IsTrue(
+                    releaseLoad.Wait(TimeSpan.FromSeconds(10)),
+                    "Timed out waiting for the gated domain load to be released.");
+
                 return [configuredDomain];
             });
 
@@ -70,14 +77,22 @@ internal sealed class DomainCacheServiceTests
 
         Assert.IsTrue(loadStarted.Wait(TimeSpan.FromSeconds(10)), "Initialization did not start.");
 
-        // A second caller arrives while initialization is still in progress. With the unfixed code it
-        // observes the initialized flag (set before the load completed), skips loading, and reads an
-        // empty cache - the failure that makes a multi-site setup fall back to the first root node.
-        Task<Domain[]> secondCaller = Task.Run(() => sut.GetAll(false).ToArray());
+        // A second caller arrives while initialization is still in progress.
+        Task<Domain[]> secondCaller = Task.Run(() =>
+        {
+            // Confirm the caller has reached the cache before we assert on its blocking behaviour.
+            secondCallerReady.Set();
+            return sut.GetAll(false).ToArray();
+        });
 
-        // Give the second caller time to reach the cache (and, on the unfixed code, return empty)
-        // before we allow the load to complete.
-        await Task.Delay(250);
+        Assert.IsTrue(secondCallerReady.Wait(TimeSpan.FromSeconds(10)), "Second caller did not start.");
+
+        // A correctly initialized cache makes the second caller block until the gated load completes, so it
+        // cannot finish while the load is still held. Observing an empty cache would instead let it return
+        // immediately. Completing here - before we release the load - therefore signals the empty-cache
+        // regression (and the result would be empty). Because this asserts a blocking invariant, it holds
+        // regardless of scheduler timing: a blocked caller never completes within any timeout.
+        var completedWhileLoadGated = secondCaller.Wait(TimeSpan.FromSeconds(1));
 
         releaseLoad.Set();
 
@@ -87,6 +102,7 @@ internal sealed class DomainCacheServiceTests
         // Assert
         Assert.Multiple(() =>
         {
+            Assert.IsFalse(completedWhileLoadGated, "Second caller returned before initialization completed - it observed an empty domain cache.");
             Assert.AreEqual(1, firstResult.Length, "The caller that initialized the cache should see the configured domain.");
             Assert.AreEqual(1, secondResult.Length, "A caller racing with initialization must not observe an empty domain cache.");
         });
@@ -126,6 +142,38 @@ internal sealed class DomainCacheServiceTests
             Assert.AreEqual(1, afterUpdate.Length, "Refreshing an existing domain must update in place, not add a duplicate.");
             Assert.AreEqual("https://renamed.example/", afterUpdate[0].Name);
             Assert.AreEqual(3003, afterUpdate[0].ContentId);
+        });
+    }
+
+    [Test]
+    public void Can_Replace_Entire_Cache_On_RefreshAll()
+    {
+        IDomain first = CreateDomain(1, "https://site-one.example/", 1001, "en-US", isWildcard: false);
+        IDomain second = CreateDomain(2, "https://site-two.example/", 1002, "da-DK", isWildcard: false);
+
+        var current = new List<IDomain> { first, second };
+        var domainService = new Mock<IDomainService>();
+        domainService
+#pragma warning disable CS0618 // Type or member is obsolete. This test is for the DomainCacheService, which still calls the obsolete GetAll(bool) method.
+            .Setup(x => x.GetAll(true))
+#pragma warning restore CS0618 // Type or member is obsolete
+            .Returns(() => current.ToArray());
+
+        var sut = new DomainCacheService(domainService.Object, CreateScopeProvider());
+
+        // The initial lazy load sees both domains.
+        Assert.AreEqual(2, sut.GetAll(false).Count());
+
+        // A domain is removed at the source, then a RefreshAll rebuilds the whole cache from scratch.
+        current.Remove(second);
+        sut.Refresh([new DomainCacheRefresher.JsonPayload(0, DomainChangeTypes.RefreshAll)]);
+
+        Domain[] afterRefreshAll = sut.GetAll(false).ToArray();
+
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(1, afterRefreshAll.Length, "RefreshAll should fully replace the cache, dropping removed domains.");
+            Assert.AreEqual(first.Id, afterRefreshAll[0].Id);
         });
     }
 

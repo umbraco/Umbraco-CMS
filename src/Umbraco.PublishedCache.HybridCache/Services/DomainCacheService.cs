@@ -23,7 +23,13 @@ public class DomainCacheService : IDomainCacheService
     private readonly IDomainService _domainService;
     private readonly ICoreScopeProvider _coreScopeProvider;
     private readonly object _initializationLock = new();
-    private ConcurrentDictionary<int, Domain> _domains = new();
+
+    // Both fields are written under _initializationLock but read on the hot path (request routing) without
+    // it. Marking them volatile makes those lock-free reads acquire-reads, so a reader is guaranteed to see
+    // the fully populated dictionary and the completed-initialization flag together, never a stale or
+    // half-published value. This is required for correctness on weak memory models such as ARM; on x86/x64
+    // ordinary reads already have acquire semantics, but we cannot rely on that.
+    private volatile ConcurrentDictionary<int, Domain> _domains = new();
     private volatile bool _initialized;
 
     /// <summary>
@@ -143,10 +149,10 @@ public class DomainCacheService : IDomainCacheService
     /// </summary>
     private void LoadDomains()
     {
-        // Build the replacement set in a local dictionary and swap it in atomically, rather than mutating
-        // the live one in place. This avoids a transient window (during a RefreshAll rebuild) where a
-        // concurrent reader could observe a partially populated cache, and ensures domains removed since
-        // the last load are dropped rather than lingering.
+        // Build the replacement set in a local dictionary and publish it with a single write to the
+        // (volatile) _domains field. A reader never observes a partially populated cache during a RefreshAll
+        // rebuild, and the published set contains exactly the current domains (any removed since the last
+        // load are absent).
         var newDomains = new ConcurrentDictionary<int, Domain>();
         using (ICoreScope scope = _coreScopeProvider.CreateCoreScope())
         {
@@ -161,6 +167,6 @@ public class DomainCacheService : IDomainCacheService
             scope.Complete();
         }
 
-        Interlocked.Exchange(ref _domains, newDomains);
+        _domains = newDomains;
     }
 }
