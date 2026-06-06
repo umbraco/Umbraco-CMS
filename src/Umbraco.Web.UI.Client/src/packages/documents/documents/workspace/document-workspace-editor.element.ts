@@ -1,4 +1,3 @@
-import type { UmbDocumentVariantOptionModel } from '../types.js';
 import { UmbDocumentWorkspaceSplitViewElement } from './document-workspace-split-view.element.js';
 import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from './context/document-workspace.context-token.js';
 import { customElement, state, css, html } from '@umbraco-cms/backoffice/external/lit';
@@ -6,6 +5,8 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbRoute, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
 import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
+import { createObservablePart } from '@umbraco-cms/backoffice/observable-api';
+import type { UmbDocumentVariantOptionModel } from '../types.js';
 
 // TODO: This seem fully identical with Media Workspace Editor, so we can refactor this to a generic component. [NL]
 @customElement('umb-document-workspace-editor')
@@ -19,8 +20,7 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 
 	#workspaceRoute?: string;
 	#appCulture?: string;
-	#variants?: Array<UmbDocumentVariantOptionModel>;
-	#isForbidden = false;
+	#variants?: Array<Pick<UmbDocumentVariantOptionModel, 'culture' | 'segment' | 'unique'>>;
 
 	@state()
 	private _routes?: Array<UmbRoute>;
@@ -36,7 +36,10 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 			this.observe(this.#appLanguage?.appLanguageCulture, (appCulture) => {
 				const previousCulture = this.#appCulture;
 				this.#appCulture = appCulture;
-				this.#generateRoutes();
+				if (previousCulture === undefined) {
+					// Only relevant to call generate routes initially, a later update of appCulture has no effect on the routes.
+					this.#generateRoutes();
+				}
 				this.#syncUrlToCulture(previousCulture, appCulture);
 			});
 		});
@@ -44,21 +47,20 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 		this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
 			this.observe(
-				this.#workspaceContext?.variantOptions,
+				this.#workspaceContext
+					? createObservablePart(this.#workspaceContext.variantOptions, (variants) =>
+							variants.map((v) => ({
+								culture: v.culture,
+								segment: v.segment,
+								unique: v.unique,
+							})),
+						)
+					: undefined,
 				(variants) => {
 					this.#variants = variants;
 					this.#generateRoutes();
 				},
 				'_observeVariants',
-			);
-
-			this.observe(
-				this.#workspaceContext?.forbidden.isOn,
-				(isForbidden) => {
-					this.#isForbidden = isForbidden ?? false;
-					this.#generateRoutes();
-				},
-				'_observeForbidden',
 			);
 
 			this.observe(
@@ -188,7 +190,9 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 			path: '**',
 			component: async () => {
 				const router = await import('@umbraco-cms/backoffice/router');
-				return this.#isForbidden ? router.UmbRouteForbiddenElement : router.UmbRouteNotFoundElement;
+				return this.#workspaceContext?.forbidden.getIsOn()
+					? router.UmbRouteForbiddenElement
+					: router.UmbRouteNotFoundElement;
 			},
 		};
 	}
