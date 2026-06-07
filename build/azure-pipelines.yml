@@ -144,7 +144,7 @@ stages:
               arguments: '--configuration $(buildConfiguration) --no-restore --property:ContinuousIntegrationBuild=true --property:GeneratePackageOnBuild=true --property:PackageOutputPath=$(Build.ArtifactStagingDirectory)/nupkg'
           - powershell: |
               dotnet tool install --global CycloneDX
-              dotnet-CycloneDX $(solution) --output $(Build.ArtifactStagingDirectory)/bom --filename bom-dotnet.xml
+              dotnet-CycloneDX $(solution) --spec-version 1.5 --output $(Build.ArtifactStagingDirectory)/bom --filename bom-dotnet.xml
             displayName: 'Generate Backend BOM'
           - task: PublishPipelineArtifact@1
             displayName: Publish nupkg
