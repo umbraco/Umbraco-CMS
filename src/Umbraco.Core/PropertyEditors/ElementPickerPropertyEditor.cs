@@ -54,6 +54,7 @@ public class ElementPickerPropertyEditor : DataEditor
             _jsonSerializer = jsonSerializer;
             Validators.Add(new TypedJsonValidatorRunner<Guid[], ElementPickerConfiguration>(
                 _jsonSerializer,
+                new MinMaxValidator(localizedTextService),
                 new AllowedTypeValidator(localizedTextService, elementService, coreScopeProvider)));
         }
 
@@ -79,7 +80,63 @@ public class ElementPickerPropertyEditor : DataEditor
     }
 
     /// <summary>
-    /// Validator for the allowed types of the element picker, validating that the selected elements are of an allowed content type.
+    /// Validator to ensure that the number of selected elements is within the configured min/max limits, if any.
+    /// </summary>
+    internal sealed class MinMaxValidator : ITypedJsonValidator<Guid[], ElementPickerConfiguration>
+    {
+        private readonly ILocalizedTextService _localizedTextService;
+
+        public MinMaxValidator(ILocalizedTextService localizedTextService)
+        {
+            _localizedTextService = localizedTextService;
+        }
+
+        public IEnumerable<ValidationResult> Validate(
+            Guid[]? value,
+            ElementPickerConfiguration? configuration,
+            string? valueType,
+            PropertyValidationContext validationContext)
+        {
+            var validationResults = new List<ValidationResult>();
+
+            if (configuration is null || configuration.ValidationLimit is null)
+            {
+                return validationResults;
+            }
+
+            if (configuration.ValidationLimit.Min > 0 && (value is null || value.Length < configuration.ValidationLimit.Min))
+            {
+                validationResults.Add(new ValidationResult(
+                    _localizedTextService.Localize(
+                        "validation",
+                        "entriesShort",
+                        [configuration.ValidationLimit.Min.ToString(), (configuration.ValidationLimit.Min - (value?.Length ?? 0)).ToString()
+                        ]),
+                    ["value"]));
+            }
+
+            if (value is null)
+            {
+                return validationResults;
+            }
+
+            if (configuration.ValidationLimit.Max > 0 && value.Length > configuration.ValidationLimit.Max)
+            {
+                validationResults.Add(new ValidationResult(
+                    _localizedTextService.Localize(
+                        "validation",
+                        "entriesExceed",
+                        [configuration.ValidationLimit.Max.ToString(), (value.Length - configuration.ValidationLimit.Max).ToString()
+                        ]),
+                    ["value"]));
+            }
+
+            return validationResults;
+        }
+    }
+
+    /// <summary>
+    /// Validator to ensure that all selected elements are of an allowed content type, if any are configured.
     /// </summary>
     internal sealed class AllowedTypeValidator : ITypedJsonValidator<Guid[], ElementPickerConfiguration>
     {

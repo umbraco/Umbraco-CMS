@@ -402,6 +402,7 @@
     <key alias="invalidMediaType">The chosen media type is invalid.</key>
     <key alias="invalidContentType">The chosen content is of invalid type.</key>
     <key alias="missingContent">The chosen content does not exist.</key>
+    <key alias="missingMedia">The chosen media does not exist.</key>
     <key alias="multipleMediaNotAllowed">Multiple selected media is not allowed.</key>
     <key alias="notOneOfOptions">The value '%0%' is not one of the available options.</key>
     <key alias="multipleNotOneOfOptions">The values '%0%' are not found in the the available options.</key>

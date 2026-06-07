@@ -619,6 +619,16 @@ public class MediaPicker3PropertyEditor : DataEditor, IValueSchemaProvider
                     .Where(x => x.MediaTypeAlias.IsNullOrWhiteSpace())
                     .Select(x => x.MediaKey);
                 IEnumerable<IMedia> retrievedMedia = _mediaService.GetByIds(retrievedMediaKeys);
+
+                if(retrievedMedia.Count() != value.Count())
+                {
+                    return [
+                        new ValidationResult(
+                            _localizedTextService.Localize("validation", "missingMedia"),
+                            ["value"])
+                    ];
+                }
+
                 IEnumerable<string> retrievedTypeAliases = retrievedMedia
                     .Select(x => x.ContentType.Alias);
 

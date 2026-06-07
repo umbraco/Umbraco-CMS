@@ -132,7 +132,6 @@ public class ContentPickerPropertyEditorValidationTests
         contentTypeMock.Setup(x => x.Key).Returns(contentTypeKey);
 
         var contentMock = new Mock<IContent>();
-        contentMock.Setup(x => x.Key).Returns(contentKey);
         contentMock.Setup(x => x.ContentType).Returns(contentTypeMock.Object);
 
         return contentMock.Object;
