@@ -620,7 +620,7 @@ public class MediaPicker3PropertyEditor : DataEditor, IValueSchemaProvider
                     .Select(x => x.MediaKey);
                 IEnumerable<IMedia> retrievedMedia = _mediaService.GetByIds(retrievedMediaKeys);
 
-                if(retrievedMedia.Count() != value.Count())
+                if (retrievedMedia.Count() != retrievedMediaKeys.Count())
                 {
                     return [
                         new ValidationResult(
