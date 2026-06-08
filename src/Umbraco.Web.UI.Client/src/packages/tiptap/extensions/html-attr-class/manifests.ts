@@ -3,7 +3,8 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'tiptapExtension',
 		alias: 'Umb.Tiptap.HtmlAttributeClass',
 		name: 'Class HTML Attribute Tiptap Extension',
-		api: () => import('./html-attr-class.tiptap-api.js'),
+		api: () =>
+			import('../extension-apis.bundle.js').then((m) => ({ default: m.UmbTiptapHtmlAttributeClassExtensionApi })),
 		meta: {
 			icon: 'icon-barcode',
 			label: '`class` attributes',
