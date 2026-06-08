@@ -1414,6 +1414,7 @@ export default {
 	},
 	sections: {
 		content: 'Nội dung',
+		library: 'Thư viện',
 		media: 'Phương tiện',
 		member: 'Thành viên',
 		packages: 'Gói mở rộng',

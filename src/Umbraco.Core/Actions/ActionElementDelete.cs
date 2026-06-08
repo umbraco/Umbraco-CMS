@@ -21,7 +21,7 @@ public class ActionElementDelete : IAction
     public string Alias => ActionAlias;
 
     /// <inheritdoc />
-    public bool ShowInNotifier => true;
+    public bool ShowInNotifier => false;
 
     /// <inheritdoc />
     public bool CanBePermissionAssigned => true;
