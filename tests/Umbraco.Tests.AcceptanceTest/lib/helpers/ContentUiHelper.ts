@@ -750,6 +750,10 @@ export class ContentUiHelper extends UiBaseLocators {
     await this.containsText(this.linkContent, link);
   }
 
+  async doesDocumentNotHaveLink(link: string) {
+    await this.doesNotContainText(this.linkContent, link);
+  }
+
   async doesHistoryHaveText(text: string) {
     await this.hasText(this.historyItems, text);
   }
