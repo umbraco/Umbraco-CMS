@@ -97,42 +97,7 @@ internal sealed class PackageManifestService : IPackageManifestService
 
         foreach (PackageManifest manifest in packageManifests)
         {
-            PackageManifestImportmap? importmap = manifest.Importmap;
-            if (importmap is null)
-            {
-                continue;
-            }
-
-            var stamp = manifest.AllowCacheBusting;
-
-            // When busting is enabled, use the package's own version hash (falling back to the global hash). When it is
-            // disabled we still resolve an explicit %CACHE_BUSTER% token, but to the global hash only (legacy behaviour).
-            var hash = stamp
-                ? PackageManifestCacheBuster.ResolvePackageCacheBustHash(manifest.Version, globalHash)
-                : globalHash;
-
-            string Stamp(string value) => PackageManifestCacheBuster.ApplyCacheBust(value, hash, stamp);
-
-            foreach ((var key, var value) in importmap.Imports)
-            {
-                importDict[key] = Stamp(value);
-            }
-
-            if (importmap.Scopes is null)
-            {
-                continue;
-            }
-
-            foreach ((var scopeKey, Dictionary<string, string> scopeImports) in importmap.Scopes)
-            {
-                var stampedScope = new Dictionary<string, string>();
-                foreach ((var key, var value) in scopeImports)
-                {
-                    stampedScope[key] = Stamp(value);
-                }
-
-                scopesDict[scopeKey] = stampedScope;
-            }
+            AppendStampedImportmap(manifest, globalHash, importDict, scopesDict);
         }
 
         return new PackageManifestImportmap
@@ -140,5 +105,47 @@ internal sealed class PackageManifestService : IPackageManifestService
             Imports = importDict,
             Scopes = scopesDict,
         };
+    }
+
+    private static void AppendStampedImportmap(
+        PackageManifest manifest,
+        string globalHash,
+        Dictionary<string, string> importDict,
+        Dictionary<string, Dictionary<string, string>> scopesDict)
+    {
+        PackageManifestImportmap? importmap = manifest.Importmap;
+        if (importmap is null)
+        {
+            return;
+        }
+
+        var stamp = manifest.AllowCacheBusting;
+
+        // When busting is enabled, use the package's own version hash (falling back to the global hash). When it is
+        // disabled we still resolve an explicit %CACHE_BUSTER% token, but to the global hash only (legacy behaviour).
+        var hash = stamp
+            ? PackageManifestCacheBuster.ResolvePackageCacheBustHash(manifest.Version, globalHash)
+            : globalHash;
+
+        foreach ((var key, var value) in importmap.Imports)
+        {
+            importDict[key] = PackageManifestCacheBuster.ApplyCacheBust(value, hash, stamp);
+        }
+
+        foreach ((var scopeKey, Dictionary<string, string> scopeImports) in importmap.Scopes ?? new Dictionary<string, Dictionary<string, string>>())
+        {
+            scopesDict[scopeKey] = StampScope(scopeImports, hash, stamp);
+        }
+    }
+
+    private static Dictionary<string, string> StampScope(Dictionary<string, string> scopeImports, string hash, bool stamp)
+    {
+        var stampedScope = new Dictionary<string, string>();
+        foreach ((var key, var value) in scopeImports)
+        {
+            stampedScope[key] = PackageManifestCacheBuster.ApplyCacheBust(value, hash, stamp);
+        }
+
+        return stampedScope;
     }
 }

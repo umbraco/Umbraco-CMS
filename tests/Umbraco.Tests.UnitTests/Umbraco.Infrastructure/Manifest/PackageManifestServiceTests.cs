@@ -47,47 +47,29 @@ public class PackageManifestServiceTests
             Importmap = new PackageManifestImportmap { Imports = imports },
         };
 
-    [Test]
-    public async Task GetPackageManifestImportmapAsync_StampsVersionHashOnAppPluginsImport()
+    private static readonly string VersionHash = "2.0.0".GenerateHash();
+    private static readonly string GlobalHash = new SemVersion(17, 0, 0).ToSemanticString().GenerateHash();
+
+    private static IEnumerable<TestCaseData> SingleImportCases()
     {
-        var service = CreateService(Manifest(
-            "Pkg",
-            "2.0.0",
-            allowCacheBusting: true,
-            new Dictionary<string, string> { ["pkg"] = "/App_Plugins/Pkg/index.js" }));
-
-        var result = await service.GetPackageManifestImportmapAsync();
-
-        Assert.That(result.Imports["pkg"], Is.EqualTo($"/App_Plugins/Pkg/index.js?umb__rnd={"2.0.0".GenerateHash()}"));
+        yield return new TestCaseData("2.0.0", true, "/App_Plugins/Pkg/index.js", $"/App_Plugins/Pkg/index.js?umb__rnd={VersionHash}")
+            .SetName("Stamps the version hash on a clean /App_Plugins import");
+        yield return new TestCaseData("2.0.0", false, "/App_Plugins/Pkg/index.js", "/App_Plugins/Pkg/index.js")
+            .SetName("Does not stamp when busting is disabled");
+        yield return new TestCaseData((string?)null, true, "/App_Plugins/Pkg/index.js", $"/App_Plugins/Pkg/index.js?umb__rnd={GlobalHash}")
+            .SetName("Falls back to the global hash when the package has no version");
+        yield return new TestCaseData("2.0.0", true, "/App_Plugins/Pkg/index.js?v=%CACHE_BUSTER%", $"/App_Plugins/Pkg/index.js?v={VersionHash}")
+            .SetName("Resolves an explicit %CACHE_BUSTER% token to the version hash");
     }
 
-    [Test]
-    public async Task GetPackageManifestImportmapAsync_DoesNotStampWhenDisabled()
+    [TestCaseSource(nameof(SingleImportCases))]
+    public async Task GetPackageManifestImportmapAsync_StampsSingleImport(string? version, bool allowCacheBusting, string importUrl, string expected)
     {
-        var service = CreateService(Manifest(
-            "Pkg",
-            "2.0.0",
-            allowCacheBusting: false,
-            new Dictionary<string, string> { ["pkg"] = "/App_Plugins/Pkg/index.js" }));
+        var service = CreateService(Manifest("Pkg", version, allowCacheBusting, new Dictionary<string, string> { ["pkg"] = importUrl }));
 
         var result = await service.GetPackageManifestImportmapAsync();
 
-        Assert.That(result.Imports["pkg"], Is.EqualTo("/App_Plugins/Pkg/index.js"));
-    }
-
-    [Test]
-    public async Task GetPackageManifestImportmapAsync_FallsBackToGlobalHashWhenNoVersion()
-    {
-        var service = CreateService(Manifest(
-            "Pkg",
-            version: null,
-            allowCacheBusting: true,
-            new Dictionary<string, string> { ["pkg"] = "/App_Plugins/Pkg/index.js" }));
-
-        var result = await service.GetPackageManifestImportmapAsync();
-
-        var expectedGlobal = new SemVersion(17, 0, 0).ToSemanticString().GenerateHash();
-        Assert.That(result.Imports["pkg"], Is.EqualTo($"/App_Plugins/Pkg/index.js?umb__rnd={expectedGlobal}"));
+        Assert.That(result.Imports["pkg"], Is.EqualTo(expected));
     }
 
     [Test]
@@ -132,20 +114,6 @@ public class PackageManifestServiceTests
         var result = await service.GetPackageManifestImportmapAsync();
 
         Assert.That(result.Scopes!["/App_Plugins/Pkg/"]["pkg"], Is.EqualTo($"/App_Plugins/Pkg/scoped.js?umb__rnd={"2.0.0".GenerateHash()}"));
-    }
-
-    [Test]
-    public async Task GetPackageManifestImportmapAsync_ResolvesCacheBusterTokenToVersionHash()
-    {
-        var service = CreateService(Manifest(
-            "Pkg",
-            "2.0.0",
-            allowCacheBusting: true,
-            new Dictionary<string, string> { ["pkg"] = "/App_Plugins/Pkg/index.js?v=%CACHE_BUSTER%" }));
-
-        var result = await service.GetPackageManifestImportmapAsync();
-
-        Assert.That(result.Imports["pkg"], Is.EqualTo($"/App_Plugins/Pkg/index.js?v={"2.0.0".GenerateHash()}"));
     }
 
     [Test]
