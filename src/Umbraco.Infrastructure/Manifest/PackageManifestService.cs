@@ -1,6 +1,8 @@
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Manifest;
 using Umbraco.Extensions;
 
@@ -11,6 +13,8 @@ internal sealed class PackageManifestService : IPackageManifestService
     private readonly IEnumerable<IPackageManifestReader> _packageManifestReaders;
     private readonly IAppPolicyCache _cache;
     private RuntimeSettings _runtimeSettings;
+    private readonly IHostingEnvironment _hostingEnvironment;
+    private readonly IUmbracoVersion _umbracoVersion;
 
 
     /// <summary>
@@ -19,15 +23,21 @@ internal sealed class PackageManifestService : IPackageManifestService
     /// <param name="packageManifestReaders">A collection of <see cref="IPackageManifestReader"/> instances used to read package manifests.</param>
     /// <param name="appCaches">The <see cref="AppCaches"/> instance used for caching manifest data.</param>
     /// <param name="runtimeSettingsOptionsMonitor">An <see cref="IOptionsMonitor{RuntimeSettings}"/> used to monitor runtime configuration settings.</param>
+    /// <param name="hostingEnvironment">The <see cref="IHostingEnvironment"/> used to determine the current hosting environment (e.g. debug mode).</param>
+    /// <param name="umbracoVersion">The <see cref="IUmbracoVersion"/> used as a fallback cache-bust hash source when a package has no version.</param>
     public PackageManifestService(
         IEnumerable<IPackageManifestReader> packageManifestReaders,
         AppCaches appCaches,
-        IOptionsMonitor<RuntimeSettings> runtimeSettingsOptionsMonitor)
+        IOptionsMonitor<RuntimeSettings> runtimeSettingsOptionsMonitor,
+        IHostingEnvironment hostingEnvironment,
+        IUmbracoVersion umbracoVersion)
     {
         _packageManifestReaders = packageManifestReaders;
         _cache = appCaches.RuntimeCache;
         _runtimeSettings = runtimeSettingsOptionsMonitor.CurrentValue;
         runtimeSettingsOptionsMonitor.OnChange(runtimeSettings => _runtimeSettings = runtimeSettings);
+        _hostingEnvironment = hostingEnvironment;
+        _umbracoVersion = umbracoVersion;
     }
 
     /// <summary>
@@ -79,14 +89,45 @@ internal sealed class PackageManifestService : IPackageManifestService
     public async Task<PackageManifestImportmap> GetPackageManifestImportmapAsync()
     {
         IEnumerable<PackageManifest> packageManifests = await GetAllPackageManifestsAsync();
-        var manifests = packageManifests.Select(x => x.Importmap).WhereNotNull().ToList();
+        var globalHash = PackageManifestCacheBuster.GetGlobalCacheBustHash(_hostingEnvironment, _umbracoVersion);
 
-        var importDict = manifests
-            .SelectMany(x => x.Imports)
-            .ToDictionary(x => x.Key, x => x.Value);
-        var scopesDict = manifests
-            .SelectMany(x => x.Scopes ?? new Dictionary<string, Dictionary<string, string>>())
-            .ToDictionary(x => x.Key, x => x.Value);
+        var importDict = new Dictionary<string, string>();
+        var scopesDict = new Dictionary<string, Dictionary<string, string>>();
+
+        foreach (PackageManifest manifest in packageManifests)
+        {
+            PackageManifestImportmap? importmap = manifest.Importmap;
+            if (importmap is null)
+            {
+                continue;
+            }
+
+            var stamp = manifest.DisableCacheBusting is false;
+            var hash = stamp
+                ? PackageManifestCacheBuster.ResolvePackageCacheBustHash(manifest.Version, globalHash)
+                : string.Empty;
+
+            foreach ((var key, var value) in importmap.Imports)
+            {
+                importDict[key] = stamp ? PackageManifestCacheBuster.ApplyCacheBust(value, hash) : value;
+            }
+
+            if (importmap.Scopes is null)
+            {
+                continue;
+            }
+
+            foreach ((var scopeKey, Dictionary<string, string> scopeImports) in importmap.Scopes)
+            {
+                var stampedScope = new Dictionary<string, string>();
+                foreach ((var key, var value) in scopeImports)
+                {
+                    stampedScope[key] = stamp ? PackageManifestCacheBuster.ApplyCacheBust(value, hash) : value;
+                }
+
+                scopesDict[scopeKey] = stampedScope;
+            }
+        }
 
         return new PackageManifestImportmap
         {
