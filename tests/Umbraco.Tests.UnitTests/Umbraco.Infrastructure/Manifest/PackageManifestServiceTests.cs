@@ -37,12 +37,12 @@ public class PackageManifestServiceTests
             umbracoVersion.Object);
     }
 
-    private static PackageManifest Manifest(string name, string? version, bool disableCacheBusting, Dictionary<string, string> imports)
+    private static PackageManifest Manifest(string name, string? version, bool allowCacheBusting, Dictionary<string, string> imports)
         => new()
         {
             Name = name,
             Version = version,
-            DisableCacheBusting = disableCacheBusting,
+            AllowCacheBusting = allowCacheBusting,
             Extensions = Array.Empty<object>(),
             Importmap = new PackageManifestImportmap { Imports = imports },
         };
@@ -53,7 +53,7 @@ public class PackageManifestServiceTests
         var service = CreateService(Manifest(
             "Pkg",
             "2.0.0",
-            disableCacheBusting: false,
+            allowCacheBusting: true,
             new Dictionary<string, string> { ["pkg"] = "/App_Plugins/Pkg/index.js" }));
 
         var result = await service.GetPackageManifestImportmapAsync();
@@ -67,7 +67,7 @@ public class PackageManifestServiceTests
         var service = CreateService(Manifest(
             "Pkg",
             "2.0.0",
-            disableCacheBusting: true,
+            allowCacheBusting: false,
             new Dictionary<string, string> { ["pkg"] = "/App_Plugins/Pkg/index.js" }));
 
         var result = await service.GetPackageManifestImportmapAsync();
@@ -81,7 +81,7 @@ public class PackageManifestServiceTests
         var service = CreateService(Manifest(
             "Pkg",
             version: null,
-            disableCacheBusting: false,
+            allowCacheBusting: true,
             new Dictionary<string, string> { ["pkg"] = "/App_Plugins/Pkg/index.js" }));
 
         var result = await service.GetPackageManifestImportmapAsync();
@@ -96,7 +96,7 @@ public class PackageManifestServiceTests
         var service = CreateService(Manifest(
             "Pkg",
             "2.0.0",
-            disableCacheBusting: false,
+            allowCacheBusting: true,
             new Dictionary<string, string>
             {
                 ["bare"] = "@scope/pkg",
@@ -116,7 +116,7 @@ public class PackageManifestServiceTests
         {
             Name = "Pkg",
             Version = "2.0.0",
-            DisableCacheBusting = false,
+            AllowCacheBusting = true,
             Extensions = Array.Empty<object>(),
             Importmap = new PackageManifestImportmap
             {

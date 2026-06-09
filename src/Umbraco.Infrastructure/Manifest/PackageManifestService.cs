@@ -103,7 +103,7 @@ internal sealed class PackageManifestService : IPackageManifestService
                 continue;
             }
 
-            var stamp = manifest.DisableCacheBusting is false;
+            var stamp = manifest.AllowCacheBusting;
             var hash = stamp
                 ? PackageManifestCacheBuster.ResolvePackageCacheBustHash(manifest.Version, globalHash)
                 : string.Empty;

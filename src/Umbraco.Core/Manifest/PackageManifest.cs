@@ -27,10 +27,10 @@ public class PackageManifest
 
     /// <summary>
     ///     Gets or sets a value indicating whether automatic cache-busting of this package's
-    ///     <c>/App_Plugins</c> importmap assets is disabled. When <c>false</c> (default), Umbraco appends a
+    ///     <c>/App_Plugins</c> importmap assets is enabled. When <c>true</c> (default), Umbraco appends a
     ///     per-package <c>?umb__rnd</c> token derived from <see cref="Version"/> to the package's importmap URLs.
     /// </summary>
-    public bool DisableCacheBusting { get; set; }
+    public bool AllowCacheBusting { get; set; } = true;
 
     /// <summary>
     ///     Gets or sets a value indicating whether the package allows telemetry collection.
