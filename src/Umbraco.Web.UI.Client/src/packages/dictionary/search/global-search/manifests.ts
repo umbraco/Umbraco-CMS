@@ -5,7 +5,7 @@ import { UMB_TRANSLATION_SECTION_ALIAS } from '@umbraco-cms/backoffice/translati
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
-		name: '#globalSearch_dictionaryGlobalSearch',
+		name: 'Dictionary Global Search',
 		alias: UMB_DICTIONARY_GLOBAL_SEARCH_ALIAS,
 		type: 'globalSearch',
 		weight: 600,

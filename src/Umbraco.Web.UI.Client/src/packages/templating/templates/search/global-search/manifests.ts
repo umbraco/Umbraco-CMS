@@ -5,7 +5,7 @@ import { UMB_SETTINGS_SECTION_ALIAS } from '@umbraco-cms/backoffice/settings';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
-		name: '#globalSearch_templateGlobalSearch',
+		name: 'Template Global Search',
 		alias: UMB_TEMPLATE_GLOBAL_SEARCH_ALIAS,
 		type: 'globalSearch',
 		weight: 200,
