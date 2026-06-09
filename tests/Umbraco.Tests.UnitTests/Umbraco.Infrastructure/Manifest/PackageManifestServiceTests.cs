@@ -108,4 +108,29 @@ public class PackageManifestServiceTests
         Assert.That(result.Imports["bare"], Is.EqualTo("@scope/pkg"));
         Assert.That(result.Imports["cdn"], Is.EqualTo("https://cdn.example.com/x.js"));
     }
+
+    [Test]
+    public async Task GetPackageManifestImportmapAsync_StampsScopeImports()
+    {
+        var manifest = new PackageManifest
+        {
+            Name = "Pkg",
+            Version = "2.0.0",
+            DisableCacheBusting = false,
+            Extensions = Array.Empty<object>(),
+            Importmap = new PackageManifestImportmap
+            {
+                Imports = new Dictionary<string, string>(),
+                Scopes = new Dictionary<string, Dictionary<string, string>>
+                {
+                    ["/App_Plugins/Pkg/"] = new() { ["pkg"] = "/App_Plugins/Pkg/scoped.js" },
+                },
+            },
+        };
+        var service = CreateService(manifest);
+
+        var result = await service.GetPackageManifestImportmapAsync();
+
+        Assert.That(result.Scopes!["/App_Plugins/Pkg/"]["pkg"], Is.EqualTo($"/App_Plugins/Pkg/scoped.js?umb__rnd={"2.0.0".GenerateHash()}"));
+    }
 }

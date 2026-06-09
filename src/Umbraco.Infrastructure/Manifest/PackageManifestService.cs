@@ -91,6 +91,7 @@ internal sealed class PackageManifestService : IPackageManifestService
         IEnumerable<PackageManifest> packageManifests = await GetAllPackageManifestsAsync();
         var globalHash = PackageManifestCacheBuster.GetGlobalCacheBustHash(_hostingEnvironment, _umbracoVersion);
 
+        // Last-wins on duplicate import/scope keys across packages (the old ToDictionary threw, letting one package break the whole importmap).
         var importDict = new Dictionary<string, string>();
         var scopesDict = new Dictionary<string, Dictionary<string, string>>();
 
@@ -107,9 +108,11 @@ internal sealed class PackageManifestService : IPackageManifestService
                 ? PackageManifestCacheBuster.ResolvePackageCacheBustHash(manifest.Version, globalHash)
                 : string.Empty;
 
+            string Stamp(string value) => stamp ? PackageManifestCacheBuster.ApplyCacheBust(value, hash) : value;
+
             foreach ((var key, var value) in importmap.Imports)
             {
-                importDict[key] = stamp ? PackageManifestCacheBuster.ApplyCacheBust(value, hash) : value;
+                importDict[key] = Stamp(value);
             }
 
             if (importmap.Scopes is null)
@@ -122,7 +125,7 @@ internal sealed class PackageManifestService : IPackageManifestService
                 var stampedScope = new Dictionary<string, string>();
                 foreach ((var key, var value) in scopeImports)
                 {
-                    stampedScope[key] = stamp ? PackageManifestCacheBuster.ApplyCacheBust(value, hash) : value;
+                    stampedScope[key] = Stamp(value);
                 }
 
                 scopesDict[scopeKey] = stampedScope;
