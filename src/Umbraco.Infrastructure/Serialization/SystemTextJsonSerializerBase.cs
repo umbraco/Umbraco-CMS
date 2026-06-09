@@ -44,20 +44,9 @@ public abstract class SystemTextJsonSerializerBase : IJsonSerializer
             _ => null
         };
 
-        if (jsonString.IsNullOrWhiteSpace())
-        {
-            value = null;
-            return false;
-        }
-
-        try
-        {
-            value = Deserialize<T>(jsonString);
-        }
-        catch (JsonException)
-        {
-            value = null;
-        }
+        value = jsonString.IsNullOrWhiteSpace()
+            ? null
+            : Deserialize<T>(jsonString);
 
         return value != null;
     }
