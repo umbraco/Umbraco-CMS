@@ -407,6 +407,14 @@
     unpublish: 'Unpublish'
   }
 
+  public static readonly redirectUrlTrackerMessages = {
+    enabled: 'Enabled',
+    disabled: 'Disabled',
+    disableInstruction: 'Redirect URL tracking is configured through application settings. To disable tracking, set the following configuration key to true:',
+    enableInstruction: 'Redirect URL tracking is configured through application settings. To enable tracking, set the following configuration key to false:',
+    configurationKey: 'Umbraco:CMS:WebRouting:DisableRedirectUrlTracking'
+  }
+
   public static readonly elementTypeChangeMessages = {
     elementHasContent: 'Cannot change to document type because content has already been created with this element type.',
     documentHasContent: 'Cannot change to element type because content has already been created with this document type.',
