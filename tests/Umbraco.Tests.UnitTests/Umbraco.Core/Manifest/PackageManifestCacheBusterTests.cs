@@ -1,5 +1,9 @@
+using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Manifest;
+using Umbraco.Cms.Core.Semver;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Manifest;
@@ -23,6 +27,19 @@ public class PackageManifestCacheBusterTests
     {
         var result = PackageManifestCacheBuster.ResolvePackageCacheBustHash(version, GlobalHash);
         Assert.That(result, Is.EqualTo(GlobalHash));
+    }
+
+    [Test]
+    public void GetGlobalCacheBustHash_UsesVersionHash_WhenNotInDebugMode()
+    {
+        var hostingEnv = new Mock<IHostingEnvironment>();
+        hostingEnv.SetupGet(h => h.IsDebugMode).Returns(false);
+
+        var umbracoVersion = new Mock<IUmbracoVersion>();
+        umbracoVersion.SetupGet(v => v.SemanticVersion).Returns(new SemVersion(17, 0, 0));
+
+        var expected = new SemVersion(17, 0, 0).ToSemanticString().GenerateHash();
+        Assert.That(PackageManifestCacheBuster.GetGlobalCacheBustHash(hostingEnv.Object, umbracoVersion.Object), Is.EqualTo(expected));
     }
 
     [Test]
@@ -67,6 +84,13 @@ public class PackageManifestCacheBusterTests
     public void ApplyCacheBust_SkipsWhenCacheBusterTokenPresent()
     {
         const string url = "/App_Plugins/MyPkg/index.js?v=%CACHE_BUSTER%";
+        Assert.That(PackageManifestCacheBuster.ApplyCacheBust(url, "abc"), Is.EqualTo(url));
+    }
+
+    [Test]
+    public void ApplyCacheBust_SkipsWhenQuestionMarkInFragment()
+    {
+        const string url = "/App_Plugins/MyPkg/index.js#a?b";
         Assert.That(PackageManifestCacheBuster.ApplyCacheBust(url, "abc"), Is.EqualTo(url));
     }
 }
