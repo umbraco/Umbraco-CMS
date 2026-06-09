@@ -5,13 +5,13 @@ import { UMB_CONTENT_SECTION_ALIAS } from '@umbraco-cms/backoffice/content';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
-		name: 'Document Global Search',
+		name: '#globalSearch_documentGlobalSearch',
 		alias: UMB_DOCUMENT_GLOBAL_SEARCH_ALIAS,
 		type: 'globalSearch',
 		weight: 800,
 		api: () => import('./document-global-search.js'),
 		meta: {
-			label: 'Documents',
+			label: '#globalSearch_documents',
 			searchProviderAlias: UMB_DOCUMENT_SEARCH_PROVIDER_ALIAS,
 			sectionAlias: UMB_CONTENT_SECTION_ALIAS,
 		},

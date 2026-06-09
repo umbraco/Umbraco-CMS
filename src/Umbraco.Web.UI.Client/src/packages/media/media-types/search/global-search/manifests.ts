@@ -5,12 +5,12 @@ import { UMB_SETTINGS_SECTION_ALIAS } from '@umbraco-cms/backoffice/settings';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
-		name: 'Media Type Global Search',
+		name: '#globalSearch_mediaTypeGlobalSearch',
 		alias: UMB_MEDIA_TYPE_GLOBAL_SEARCH_ALIAS,
 		type: 'globalSearch',
 		weight: 500,
 		meta: {
-			label: 'Media Types',
+			label: '#treeHeaders_mediaTypes',
 			searchProviderAlias: UMB_MEDIA_TYPE_SEARCH_PROVIDER_ALIAS,
 			sectionAlias: UMB_SETTINGS_SECTION_ALIAS,
 		},

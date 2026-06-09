@@ -5,13 +5,13 @@ import { UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS } from '@umbraco-cms/backof
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
-		name: 'Media Global Search',
+		name: '#globalSearch_mediaGlobalSearch',
 		alias: UMB_MEDIA_GLOBAL_SEARCH_ALIAS,
 		type: 'globalSearch',
 		weight: 700,
 		api: () => import('./media-global-search.js'),
 		meta: {
-			label: 'Media',
+			label: '#sections_media',
 			searchProviderAlias: UMB_MEDIA_SEARCH_PROVIDER_ALIAS,
 			sectionAlias: UMB_MEDIA_SECTION_ALIAS,
 		},

@@ -5,12 +5,12 @@ import { UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS } from '@umbraco-cms/backof
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
-		name: 'Element Global Search',
+		name: '#globalSearch_elementGlobalSearch',
 		alias: UMB_ELEMENT_GLOBAL_SEARCH_ALIAS,
 		type: 'globalSearch',
 		weight: 700,
 		meta: {
-			label: 'Elements',
+			label: '#general_elements',
 			searchProviderAlias: UMB_ELEMENT_SEARCH_PROVIDER_ALIAS,
 			sectionAlias: UMB_LIBRARY_SECTION_ALIAS,
 		},
