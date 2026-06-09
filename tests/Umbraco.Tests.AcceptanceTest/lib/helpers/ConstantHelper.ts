@@ -407,6 +407,10 @@
     unpublish: 'Unpublish'
   }
 
+  public static readonly documentUrlInfoMessages = {
+    cannotBeRouted: 'This document is published but its URL cannot be routed'
+  }
+
   public static readonly elementTypeChangeMessages = {
     elementHasContent: 'Cannot change to document type because content has already been created with this element type.',
     documentHasContent: 'Cannot change to element type because content has already been created with this document type.',
