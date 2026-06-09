@@ -133,4 +133,43 @@ public class PackageManifestServiceTests
 
         Assert.That(result.Scopes!["/App_Plugins/Pkg/"]["pkg"], Is.EqualTo($"/App_Plugins/Pkg/scoped.js?umb__rnd={"2.0.0".GenerateHash()}"));
     }
+
+    [Test]
+    public async Task GetPackageManifestImportmapAsync_ResolvesCacheBusterTokenToVersionHash()
+    {
+        var service = CreateService(Manifest(
+            "Pkg",
+            "2.0.0",
+            allowCacheBusting: true,
+            new Dictionary<string, string> { ["pkg"] = "/App_Plugins/Pkg/index.js?v=%CACHE_BUSTER%" }));
+
+        var result = await service.GetPackageManifestImportmapAsync();
+
+        Assert.That(result.Imports["pkg"], Is.EqualTo($"/App_Plugins/Pkg/index.js?v={"2.0.0".GenerateHash()}"));
+    }
+
+    [Test]
+    public async Task GetPackageManifestImportmapAsync_WhenBustingDisabled_ResolvesTokenToGlobalHashButDoesNotStamp()
+    {
+        var service = CreateService(Manifest(
+            "Pkg",
+            "2.0.0",
+            allowCacheBusting: false,
+            new Dictionary<string, string>
+            {
+                ["tokenised"] = "/App_Plugins/Pkg/index.js?v=%CACHE_BUSTER%",
+                ["clean"] = "/App_Plugins/Pkg/clean.js",
+            }));
+
+        var result = await service.GetPackageManifestImportmapAsync();
+
+        var globalHash = new SemVersion(17, 0, 0).ToSemanticString().GenerateHash();
+        Assert.Multiple(() =>
+        {
+            // Explicit token still resolves, but to the global hash (legacy behaviour) when busting is disabled.
+            Assert.That(result.Imports["tokenised"], Is.EqualTo($"/App_Plugins/Pkg/index.js?v={globalHash}"));
+            // The clean path is left untouched because automatic stamping is off for this package.
+            Assert.That(result.Imports["clean"], Is.EqualTo("/App_Plugins/Pkg/clean.js"));
+        });
+    }
 }

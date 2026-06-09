@@ -45,21 +45,21 @@ public class PackageManifestCacheBusterTests
     [Test]
     public void ApplyCacheBust_StampsAppPluginsPath()
     {
-        var result = PackageManifestCacheBuster.ApplyCacheBust("/App_Plugins/MyPkg/index.js", "abc");
+        var result = PackageManifestCacheBuster.ApplyCacheBust("/App_Plugins/MyPkg/index.js", "abc", autoStamp: true);
         Assert.That(result, Is.EqualTo("/App_Plugins/MyPkg/index.js?umb__rnd=abc"));
     }
 
     [Test]
     public void ApplyCacheBust_IsCaseInsensitiveOnAppPluginsRoot()
     {
-        var result = PackageManifestCacheBuster.ApplyCacheBust("/app_plugins/MyPkg/index.js", "abc");
+        var result = PackageManifestCacheBuster.ApplyCacheBust("/app_plugins/MyPkg/index.js", "abc", autoStamp: true);
         Assert.That(result, Is.EqualTo("/app_plugins/MyPkg/index.js?umb__rnd=abc"));
     }
 
     [Test]
     public void ApplyCacheBust_InsertsBeforeFragment()
     {
-        var result = PackageManifestCacheBuster.ApplyCacheBust("/App_Plugins/MyPkg/index.js#frag", "abc");
+        var result = PackageManifestCacheBuster.ApplyCacheBust("/App_Plugins/MyPkg/index.js#frag", "abc", autoStamp: true);
         Assert.That(result, Is.EqualTo("/App_Plugins/MyPkg/index.js?umb__rnd=abc#frag"));
     }
 
@@ -70,27 +70,46 @@ public class PackageManifestCacheBusterTests
     [TestCase("./relative/index.js")]
     public void ApplyCacheBust_LeavesNonAppPluginsPathsUnchanged(string url)
     {
-        Assert.That(PackageManifestCacheBuster.ApplyCacheBust(url, "abc"), Is.EqualTo(url));
+        Assert.That(PackageManifestCacheBuster.ApplyCacheBust(url, "abc", autoStamp: true), Is.EqualTo(url));
     }
 
     [Test]
     public void ApplyCacheBust_SkipsWhenQueryAlreadyPresent()
     {
         const string url = "/App_Plugins/MyPkg/index.js?v=1";
-        Assert.That(PackageManifestCacheBuster.ApplyCacheBust(url, "abc"), Is.EqualTo(url));
-    }
-
-    [Test]
-    public void ApplyCacheBust_SkipsWhenCacheBusterTokenPresent()
-    {
-        const string url = "/App_Plugins/MyPkg/index.js?v=%CACHE_BUSTER%";
-        Assert.That(PackageManifestCacheBuster.ApplyCacheBust(url, "abc"), Is.EqualTo(url));
+        Assert.That(PackageManifestCacheBuster.ApplyCacheBust(url, "abc", autoStamp: true), Is.EqualTo(url));
     }
 
     [Test]
     public void ApplyCacheBust_SkipsWhenQuestionMarkInFragment()
     {
         const string url = "/App_Plugins/MyPkg/index.js#a?b";
-        Assert.That(PackageManifestCacheBuster.ApplyCacheBust(url, "abc"), Is.EqualTo(url));
+        Assert.That(PackageManifestCacheBuster.ApplyCacheBust(url, "abc", autoStamp: true), Is.EqualTo(url));
+    }
+
+    [Test]
+    public void ApplyCacheBust_ResolvesCacheBusterToken()
+    {
+        const string url = "/App_Plugins/MyPkg/index.js?v=%CACHE_BUSTER%";
+        Assert.That(
+            PackageManifestCacheBuster.ApplyCacheBust(url, "abc", autoStamp: true),
+            Is.EqualTo("/App_Plugins/MyPkg/index.js?v=abc"));
+    }
+
+    [Test]
+    public void ApplyCacheBust_ResolvesCacheBusterToken_OnAnyHost_RegardlessOfAutoStamp()
+    {
+        // The token is an explicit opt-in, so it resolves even on a non-/App_Plugins URL and when auto-stamping is off.
+        const string url = "https://cdn.example.com/pkg/index.js?v=%CACHE_BUSTER%";
+        Assert.That(
+            PackageManifestCacheBuster.ApplyCacheBust(url, "abc", autoStamp: false),
+            Is.EqualTo("https://cdn.example.com/pkg/index.js?v=abc"));
+    }
+
+    [Test]
+    public void ApplyCacheBust_DoesNotStampCleanPath_WhenAutoStampDisabled()
+    {
+        const string url = "/App_Plugins/MyPkg/index.js";
+        Assert.That(PackageManifestCacheBuster.ApplyCacheBust(url, "abc", autoStamp: false), Is.EqualTo(url));
     }
 }

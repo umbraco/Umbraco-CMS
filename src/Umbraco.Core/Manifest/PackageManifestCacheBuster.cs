@@ -30,25 +30,36 @@ public static class PackageManifestCacheBuster
             : umbracoVersion.SemanticVersion.ToSemanticString().GenerateHash();
 
     /// <summary>
-    ///     Appends <c>?umb__rnd=&lt;hash&gt;</c> to a URL when, and only when, it is a clean <c>/App_Plugins</c>-rooted
-    ///     path. URLs that carry the <c>%CACHE_BUSTER%</c> token, already have a query string, or point anywhere other
-    ///     than <c>/App_Plugins</c> (backoffice core, CDN, bare module specifiers, relative paths) are returned unchanged.
+    ///     Applies cache-busting to a single manifest URL using <paramref name="hash"/>.
+    ///     <para>
+    ///     An explicit <c>%CACHE_BUSTER%</c> token is always resolved to <paramref name="hash"/> wherever it appears
+    ///     (path or query, any host) — that is the author's deliberate opt-in. When <paramref name="autoStamp"/> is
+    ///     <c>true</c>, a clean <c>/App_Plugins</c>-rooted path additionally gets <c>?umb__rnd=&lt;hash&gt;</c> appended.
+    ///     Everything else — the backoffice core (<c>/umbraco/backoffice/...</c>), CDNs, protocol-relative URLs, bare
+    ///     module specifiers, relative paths, and URLs that already carry a query string — is returned unchanged.
+    ///     </para>
     /// </summary>
-    public static string ApplyCacheBust(string url, string hash)
+    public static string ApplyCacheBust(string url, string hash, bool autoStamp)
     {
         if (string.IsNullOrEmpty(url))
         {
             return url;
         }
 
-        // %CACHE_BUSTER% is the explicit opt-in token, resolved elsewhere to the global hash — never auto-stamp it.
+        // The explicit %CACHE_BUSTER% opt-in: resolve it wherever the author placed it, regardless of autoStamp.
+        // A URL the author already tokenised is never also auto-stamped.
         if (url.Contains(Constants.Web.CacheBusterToken, StringComparison.Ordinal))
+        {
+            return url.Replace(Constants.Web.CacheBusterToken, hash, StringComparison.Ordinal);
+        }
+
+        if (autoStamp is false)
         {
             return url;
         }
 
-        // Only ever touch the package's own /App_Plugins assets. This excludes the backoffice core
-        // (/umbraco/backoffice/...), CDNs, protocol-relative URLs, bare specifiers and relative paths.
+        // Automatic stamping only ever touches the package's own /App_Plugins assets. This excludes the backoffice
+        // core (/umbraco/backoffice/...), CDNs, protocol-relative URLs, bare specifiers and relative paths.
         if (url.StartsWith(Constants.SystemDirectories.AppPlugins, StringComparison.OrdinalIgnoreCase) is false)
         {
             return url;

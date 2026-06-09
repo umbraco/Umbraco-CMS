@@ -104,11 +104,14 @@ internal sealed class PackageManifestService : IPackageManifestService
             }
 
             var stamp = manifest.AllowCacheBusting;
+
+            // When busting is enabled, use the package's own version hash (falling back to the global hash). When it is
+            // disabled we still resolve an explicit %CACHE_BUSTER% token, but to the global hash only (legacy behaviour).
             var hash = stamp
                 ? PackageManifestCacheBuster.ResolvePackageCacheBustHash(manifest.Version, globalHash)
-                : string.Empty;
+                : globalHash;
 
-            string Stamp(string value) => stamp ? PackageManifestCacheBuster.ApplyCacheBust(value, hash) : value;
+            string Stamp(string value) => PackageManifestCacheBuster.ApplyCacheBust(value, hash, stamp);
 
             foreach ((var key, var value) in importmap.Imports)
             {
