@@ -68,7 +68,6 @@ public class ContentPickerPropertyEditor : DataEditor, IValueSchemaProvider
     /// </summary>
     internal sealed class ContentPickerPropertyValueEditor : DataValueEditor, IDataValueReference
     {
-        private readonly IJsonSerializer _jsonSerializer;
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="ContentPickerPropertyValueEditor" /> class.
@@ -87,9 +86,7 @@ public class ContentPickerPropertyEditor : DataEditor, IValueSchemaProvider
             ILocalizedTextService localizedTextService)
             : base(shortStringHelper, jsonSerializer, ioHelper, attribute)
         {
-            _jsonSerializer = jsonSerializer;
-            Validators.Add(new TypedJsonValidatorRunner<string, ContentPickerConfiguration>(
-                _jsonSerializer,
+            Validators.Add(new TypedValidatorRunner<string, ContentPickerConfiguration>(
                 new AllowedTypeValidator(coreScopeProvider, contentService, localizedTextService)));
         }
 

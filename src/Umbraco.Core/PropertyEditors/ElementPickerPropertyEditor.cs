@@ -52,8 +52,7 @@ public class ElementPickerPropertyEditor : DataEditor
             : base(shortStringHelper, jsonSerializer, ioHelper, attribute)
         {
             _jsonSerializer = jsonSerializer;
-            Validators.Add(new TypedJsonValidatorRunner<Guid[], ElementPickerConfiguration>(
-                _jsonSerializer,
+            Validators.Add(new TypedValidatorRunner<List<string>, ElementPickerConfiguration>(
                 new MinMaxValidator(localizedTextService),
                 new AllowedTypeValidator(localizedTextService, elementService, coreScopeProvider)));
         }
@@ -82,7 +81,7 @@ public class ElementPickerPropertyEditor : DataEditor
     /// <summary>
     /// Validator to ensure that the number of selected elements is within the configured min/max limits, if any.
     /// </summary>
-    internal sealed class MinMaxValidator : ITypedJsonValidator<Guid[], ElementPickerConfiguration>
+    internal sealed class MinMaxValidator : ITypedJsonValidator<List<string>, ElementPickerConfiguration>
     {
         private readonly ILocalizedTextService _localizedTextService;
 
@@ -92,7 +91,7 @@ public class ElementPickerPropertyEditor : DataEditor
         }
 
         public IEnumerable<ValidationResult> Validate(
-            Guid[]? value,
+            List<string>? value,
             ElementPickerConfiguration? configuration,
             string? valueType,
             PropertyValidationContext validationContext)
@@ -104,13 +103,13 @@ public class ElementPickerPropertyEditor : DataEditor
                 return validationResults;
             }
 
-            if (configuration.ValidationLimit.Min > 0 && (value is null || value.Length < configuration.ValidationLimit.Min))
+            if (configuration.ValidationLimit.Min > 0 && (value is null || value.Count < configuration.ValidationLimit.Min))
             {
                 validationResults.Add(new ValidationResult(
                     _localizedTextService.Localize(
                         "validation",
                         "entriesShort",
-                        [configuration.ValidationLimit.Min.ToString(), (configuration.ValidationLimit.Min - (value?.Length ?? 0)).ToString()
+                        [configuration.ValidationLimit.Min.ToString(), (configuration.ValidationLimit.Min - (value?.Count ?? 0)).ToString()
                         ]),
                     ["value"]));
             }
@@ -120,13 +119,13 @@ public class ElementPickerPropertyEditor : DataEditor
                 return validationResults;
             }
 
-            if (configuration.ValidationLimit.Max > 0 && value.Length > configuration.ValidationLimit.Max)
+            if (configuration.ValidationLimit.Max > 0 && value.Count > configuration.ValidationLimit.Max)
             {
                 validationResults.Add(new ValidationResult(
                     _localizedTextService.Localize(
                         "validation",
                         "entriesExceed",
-                        [configuration.ValidationLimit.Max.ToString(), (value.Length - configuration.ValidationLimit.Max).ToString()
+                        [configuration.ValidationLimit.Max.ToString(), (value.Count - configuration.ValidationLimit.Max).ToString()
                         ]),
                     ["value"]));
             }
@@ -138,7 +137,7 @@ public class ElementPickerPropertyEditor : DataEditor
     /// <summary>
     /// Validator to ensure that all selected elements are of an allowed content type, if any are configured.
     /// </summary>
-    internal sealed class AllowedTypeValidator : ITypedJsonValidator<Guid[], ElementPickerConfiguration>
+    internal sealed class AllowedTypeValidator : ITypedJsonValidator<List<string>, ElementPickerConfiguration>
     {
         private readonly ILocalizedTextService _localizedTextService;
         private readonly IElementService _elementService;
@@ -155,12 +154,12 @@ public class ElementPickerPropertyEditor : DataEditor
         }
 
         public IEnumerable<ValidationResult> Validate(
-            Guid[]? value,
+            List<string>? value,
             ElementPickerConfiguration? configuration,
             string? valueType,
             PropertyValidationContext validationContext)
         {
-            if (value is null || value.Length == 0 || configuration is null)
+            if (value is null || value.Count == 0 || configuration is null)
             {
                 return [];
             }
@@ -173,11 +172,16 @@ public class ElementPickerPropertyEditor : DataEditor
                 return [];
             }
 
+            Guid[] elementIds = value
+                .Where(v => Guid.TryParse(v, out _))
+                .Select(Guid.Parse)
+                .ToArray();
+
             using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
-            IElement[] elements = _elementService.GetByIds(value).ToArray();
+            IElement[] elements = _elementService.GetByIds(elementIds).ToArray();
             scope.Complete();
 
-            if (elements.Length != value.Length)
+            if (elements.Length != value.Count)
             {
                 return [
                     new ValidationResult(

@@ -43,7 +43,7 @@ public class ElementPickerPropertyEditorMinMaxValidationTests
             ValidationLimit = new ElementPickerConfiguration.NumberRange { Min = 1 }
         };
 
-        var result = validator.Validate(null, config, null, PropertyValidationContext.Empty());
+        var result = validator.Validate((List<string>?)null, config, null, PropertyValidationContext.Empty());
 
         Assert.That(result.Count(), Is.EqualTo(1));
     }
@@ -68,7 +68,7 @@ public class ElementPickerPropertyEditorMinMaxValidationTests
                 : new ElementPickerConfiguration.NumberRange { Min = min, Max = max }
         };
 
-        var value = Enumerable.Range(0, count).Select(_ => Guid.NewGuid()).ToArray();
+        List<string> value = Enumerable.Range(0, count).Select(_ => Guid.NewGuid().ToString()).ToList();
 
         var localizedTextServiceMock = new Mock<ILocalizedTextService>();
         localizedTextServiceMock

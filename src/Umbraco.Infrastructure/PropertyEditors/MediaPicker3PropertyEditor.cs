@@ -620,14 +620,14 @@ public class MediaPicker3PropertyEditor : DataEditor, IValueSchemaProvider
                     .Select(x => x.MediaKey);
                 IEnumerable<IMedia> retrievedMedia = _mediaService.GetByIds(retrievedMediaKeys);
 
-                if (retrievedMedia.Count() != retrievedMediaKeys.Count())
-                {
-                    return [
-                        new ValidationResult(
-                            _localizedTextService.Localize("validation", "missingMedia"),
-                            ["value"])
-                    ];
-                }
+                //if (retrievedMedia.Count() != retrievedMediaKeys.Count())
+                //{
+                //    return [
+                //        new ValidationResult(
+                //            _localizedTextService.Localize("validation", "missingMedia"),
+                //            ["value"])
+                //    ];
+                //}
 
                 IEnumerable<string> retrievedTypeAliases = retrievedMedia
                     .Select(x => x.ContentType.Alias);

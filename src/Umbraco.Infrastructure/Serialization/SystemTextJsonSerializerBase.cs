@@ -41,8 +41,7 @@ public abstract class SystemTextJsonSerializerBase : IJsonSerializer
         {
             JsonNode jsonNodeValue => jsonNodeValue.ToJsonString(),
             string stringValue when stringValue.DetectIsJson() => stringValue,
-            string => null,
-            _ => Serialize(input)
+            _ => null
         };
 
         if (jsonString.IsNullOrWhiteSpace())
