@@ -68,6 +68,8 @@ public class PackageManifestCacheBusterTests
     [TestCase("https://cdn.example.com/pkg/index.js")]
     [TestCase("//cdn.example.com/pkg/index.js")]
     [TestCase("./relative/index.js")]
+    [TestCase("/App_PluginsFoo/index.js")]
+    [TestCase("/App_Plugins")]
     public void ApplyCacheBust_LeavesNonAppPluginsPathsUnchanged(string url)
     {
         Assert.That(PackageManifestCacheBuster.ApplyCacheBust(url, "abc", autoStamp: true), Is.EqualTo(url));

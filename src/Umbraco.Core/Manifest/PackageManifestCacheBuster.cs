@@ -58,20 +58,21 @@ public static class PackageManifestCacheBuster
             return url;
         }
 
-        // Automatic stamping only ever touches the package's own /App_Plugins assets. This excludes the backoffice
-        // core (/umbraco/backoffice/...), CDNs, protocol-relative URLs, bare specifiers and relative paths.
-        if (url.StartsWith(Constants.SystemDirectories.AppPlugins, StringComparison.OrdinalIgnoreCase) is false)
+        // Automatic stamping only ever touches the package's own /App_Plugins assets. The trailing slash enforces a
+        // path-segment boundary so we never match e.g. "/App_PluginsFoo/...". This also excludes the backoffice core
+        // (/umbraco/backoffice/...), CDNs, protocol-relative URLs, bare specifiers and relative paths.
+        if (url.StartsWith($"{Constants.SystemDirectories.AppPlugins}/", StringComparison.OrdinalIgnoreCase) is false)
         {
             return url;
         }
 
         // The author already manages this URL's query — leave it alone.
-        if (url.Contains('?', StringComparison.Ordinal))
+        if (url.Contains('?'))
         {
             return url;
         }
 
-        var fragmentIndex = url.IndexOf('#', StringComparison.Ordinal);
+        var fragmentIndex = url.IndexOf('#');
         return fragmentIndex < 0
             ? $"{url}?{QueryParameterName}={hash}"
             : $"{url[..fragmentIndex]}?{QueryParameterName}={hash}{url[fragmentIndex..]}";
