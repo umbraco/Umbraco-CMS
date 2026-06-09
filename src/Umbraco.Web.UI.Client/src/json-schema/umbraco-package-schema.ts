@@ -42,6 +42,12 @@ export interface UmbracoPackage {
 	allowPublicAccess?: boolean;
 
 	/**
+	 * @title Decides if Umbraco automatically appends a per-package cache-busting token to this package's /App_Plugins importmap assets
+	 * @default false
+	 */
+	disableCacheBusting?: boolean;
+
+	/**
 	 * @title An array of Umbraco package manifest types that will be installed
 	 * @required
 	 */
