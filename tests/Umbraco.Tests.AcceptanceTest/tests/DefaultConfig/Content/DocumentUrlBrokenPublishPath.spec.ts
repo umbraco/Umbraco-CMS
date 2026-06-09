@@ -1,8 +1,8 @@
 import {ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 
+// Languages
 const danishIsoCode = 'da';
 const englishIsoCode = 'en-US';
-
 // Document type
 const documentTypeName = 'Broken Publish Path Document Type';
 // Content

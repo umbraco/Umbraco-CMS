@@ -1,9 +1,9 @@
 import {expect} from '@playwright/test';
 import {test} from '@umbraco/acceptance-test-helpers';
 
+// Languages
 const danishIsoCode = 'da';
 const englishIsoCode = 'en-US';
-
 // Document types
 const documentTypeName = 'Broken Publish Path Document Type';
 const invariantDocumentTypeName = 'Broken Publish Path Invariant Document Type';
