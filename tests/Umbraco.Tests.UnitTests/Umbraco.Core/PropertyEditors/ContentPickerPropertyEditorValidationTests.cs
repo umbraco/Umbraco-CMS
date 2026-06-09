@@ -18,128 +18,13 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 [TestFixture]
 public class ContentPickerPropertyEditorValidationTests
 {
-    [Test]
-    public void Can_Pass_Validation_When_No_Allowed_Type_Filter_Configured()
+    private ContentPickerPropertyEditor.ContentPickerPropertyValueEditor _valueEditor = null!;
+    private Mock<IContentService> _contentServiceMock = null!;
+
+    [SetUp]
+    public void SetUp()
     {
-        var documentKey = Guid.NewGuid();
-        var (valueEditor, contentServiceMock) = CreateValueEditor();
-
-        contentServiceMock
-            .Setup(x => x.GetById(It.IsAny<Guid>()))
-            .Returns(CreateContent(documentKey, Guid.NewGuid()));
-
-        // AllowedContentTypeIds is null — no restriction
-        valueEditor.ConfigurationObject = new ContentPickerConfiguration { AllowedContentTypeIds = null };
-
-        var result = Validate(valueEditor, documentKey);
-
-        Assert.IsEmpty(result);
-    }
-
-    [Test]
-    public void Can_Pass_Validation_When_Content_Matches_Allowed_Type()
-    {
-        var documentKey = Guid.NewGuid();
-        var contentTypeKey = Guid.NewGuid();
-        var (valueEditor, contentServiceMock) = CreateValueEditor();
-
-        contentServiceMock
-            .Setup(x => x.GetById(It.IsAny<Guid>()))
-            .Returns(CreateContent(documentKey, contentTypeKey));
-
-        valueEditor.ConfigurationObject = new ContentPickerConfiguration
-        {
-            AllowedContentTypeIds = contentTypeKey.ToString()
-        };
-
-        var result = Validate(valueEditor, documentKey);
-
-        Assert.IsEmpty(result);
-    }
-
-    [Test]
-    public void Cannot_Pass_Validation_When_Content_Does_Not_Match_Allowed_Type()
-    {
-        var documentKey = Guid.NewGuid();
-        var allowedContentTypeKey = Guid.NewGuid();
-        var actualContentTypeKey = Guid.NewGuid(); // different from allowed
-        var (valueEditor, contentServiceMock) = CreateValueEditor();
-
-        contentServiceMock
-            .Setup(x => x.GetById(It.IsAny<Guid>()))
-            .Returns(CreateContent(documentKey, actualContentTypeKey));
-
-        valueEditor.ConfigurationObject = new ContentPickerConfiguration
-        {
-            AllowedContentTypeIds = allowedContentTypeKey.ToString()
-        };
-
-        var result = Validate(valueEditor, documentKey);
-
-        Assert.That(result.Count(), Is.EqualTo(1));
-    }
-
-    [Test]
-    public void Can_Pass_Validation_When_Content_Matches_One_Of_Multiple_Allowed_Types()
-    {
-        var documentKey = Guid.NewGuid();
-        var allowedTypeA = Guid.NewGuid();
-        var allowedTypeB = Guid.NewGuid();
-        var (valueEditor, contentServiceMock) = CreateValueEditor();
-
-        contentServiceMock
-            .Setup(x => x.GetById(It.IsAny<Guid>()))
-            .Returns(CreateContent(documentKey, allowedTypeB));
-
-        valueEditor.ConfigurationObject = new ContentPickerConfiguration
-        {
-            AllowedContentTypeIds = $"{allowedTypeA},{allowedTypeB}"
-        };
-
-        var result = Validate(valueEditor, documentKey);
-
-        Assert.IsEmpty(result);
-    }
-
-    [Test]
-    public void Cannot_Pass_Validation_When_Content_Is_Not_Found()
-    {
-        var documentKey = Guid.NewGuid();
-        var (valueEditor, contentServiceMock) = CreateValueEditor();
-
-        contentServiceMock
-            .Setup(x => x.GetById(It.IsAny<Guid>()))
-            .Returns((IContent?)null);
-
-        valueEditor.ConfigurationObject = new ContentPickerConfiguration
-        {
-            AllowedContentTypeIds = Guid.NewGuid().ToString()
-        };
-
-        var result = Validate(valueEditor, documentKey);
-
-        Assert.That(result.Count(), Is.EqualTo(1));
-    }
-
-    private static IEnumerable<ValidationResult> Validate(
-        ContentPickerPropertyEditor.ContentPickerPropertyValueEditor valueEditor,
-        Guid documentKey)
-        => valueEditor.Validate(documentKey.ToString(), false, null, PropertyValidationContext.Empty());
-
-    private static IContent CreateContent(Guid contentKey, Guid contentTypeKey)
-    {
-        var contentTypeMock = new Mock<ISimpleContentType>();
-        contentTypeMock.Setup(x => x.Key).Returns(contentTypeKey);
-
-        var contentMock = new Mock<IContent>();
-        contentMock.Setup(x => x.ContentType).Returns(contentTypeMock.Object);
-
-        return contentMock.Object;
-    }
-
-    private static (ContentPickerPropertyEditor.ContentPickerPropertyValueEditor ValueEditor, Mock<IContentService> ContentServiceMock) CreateValueEditor()
-    {
-        var contentServiceMock = new Mock<IContentService>();
+        _contentServiceMock = new Mock<IContentService>();
 
         var localizedTextServiceMock = new Mock<ILocalizedTextService>();
         localizedTextServiceMock
@@ -159,18 +44,103 @@ public class ContentPickerPropertyEditorValidationTests
                 It.IsAny<bool>()))
             .Returns(mockScope.Object);
 
-        var valueEditor = new ContentPickerPropertyEditor.ContentPickerPropertyValueEditor(
+        _valueEditor = new ContentPickerPropertyEditor.ContentPickerPropertyValueEditor(
             Mock.Of<IShortStringHelper>(),
             new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory()),
             Mock.Of<IIOHelper>(),
             new DataEditorAttribute("alias"),
             mockScopeProvider.Object,
-            contentServiceMock.Object,
+            _contentServiceMock.Object,
             localizedTextServiceMock.Object)
         {
             ConfigurationObject = new ContentPickerConfiguration()
         };
+    }
 
-        return (valueEditor, contentServiceMock);
+    [Test]
+    public void Can_Pass_Validation_When_No_Allowed_Type_Filter_Configured()
+    {
+        var documentKey = Guid.NewGuid();
+
+        _contentServiceMock
+            .Setup(x => x.GetById(It.IsAny<Guid>()))
+            .Returns(CreateContent(documentKey, Guid.NewGuid()));
+
+        // AllowedContentTypeIds is null — no restriction
+        _valueEditor.ConfigurationObject = new ContentPickerConfiguration { AllowedContentTypeIds = null };
+
+        Assert.IsEmpty(Validate(documentKey));
+    }
+
+    [TestCase(false)]
+    [TestCase(true)]
+    public void Can_Pass_Validation_When_Content_Matches_Allowed_Types(bool hasMultipleAllowedTypes)
+    {
+        var documentKey = Guid.NewGuid();
+        var allowedContentTypeKey = Guid.NewGuid();
+
+        _contentServiceMock
+            .Setup(x => x.GetById(It.IsAny<Guid>()))
+            .Returns(CreateContent(documentKey, allowedContentTypeKey));
+
+        var extraAllowedKey = hasMultipleAllowedTypes ? Guid.NewGuid().ToString() : null;
+        _valueEditor.ConfigurationObject = new ContentPickerConfiguration
+        {
+            AllowedContentTypeIds = extraAllowedKey is not null
+                ? $"{extraAllowedKey},{allowedContentTypeKey}"
+                : allowedContentTypeKey.ToString()
+        };
+
+        Assert.IsEmpty(Validate(documentKey));
+    }
+
+    [Test]
+    public void Cannot_Pass_Validation_When_Content_Does_Not_Match_Allowed_Type()
+    {
+        var documentKey = Guid.NewGuid();
+        var allowedContentTypeKey = Guid.NewGuid();
+        var actualContentTypeKey = Guid.NewGuid(); // different from allowed
+
+        _contentServiceMock
+            .Setup(x => x.GetById(It.IsAny<Guid>()))
+            .Returns(CreateContent(documentKey, actualContentTypeKey));
+
+        _valueEditor.ConfigurationObject = new ContentPickerConfiguration
+        {
+            AllowedContentTypeIds = allowedContentTypeKey.ToString()
+        };
+
+        Assert.That(Validate(documentKey).Count(), Is.EqualTo(1));
+    }
+
+    [Test]
+    public void Cannot_Pass_Validation_When_Content_Is_Not_Found()
+    {
+        var documentKey = Guid.NewGuid();
+
+        _contentServiceMock
+            .Setup(x => x.GetById(It.IsAny<Guid>()))
+            .Returns((IContent?)null);
+
+        _valueEditor.ConfigurationObject = new ContentPickerConfiguration
+        {
+            AllowedContentTypeIds = Guid.NewGuid().ToString()
+        };
+
+        Assert.That(Validate(documentKey).Count(), Is.EqualTo(1));
+    }
+
+    private IEnumerable<ValidationResult> Validate(Guid documentKey)
+        => _valueEditor.Validate(documentKey.ToString(), false, null, PropertyValidationContext.Empty());
+
+    private static IContent CreateContent(Guid contentKey, Guid contentTypeKey)
+    {
+        var contentTypeMock = new Mock<ISimpleContentType>();
+        contentTypeMock.Setup(x => x.Key).Returns(contentTypeKey);
+
+        var contentMock = new Mock<IContent>();
+        contentMock.Setup(x => x.ContentType).Returns(contentTypeMock.Object);
+
+        return contentMock.Object;
     }
 }
