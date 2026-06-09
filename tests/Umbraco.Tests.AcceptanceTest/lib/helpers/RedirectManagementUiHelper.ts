@@ -3,8 +3,8 @@ import {UiBaseLocators} from "./UiBaseLocators";
 
 export class RedirectManagementUiHelper extends UiBaseLocators {
   private readonly redirectManagementTab: Locator;
-  private readonly enableURLTrackerBtn: Locator;
-  private readonly disableURLTrackerBtn: Locator;
+  private readonly trackerStatusButton: Locator;
+  private readonly urlTrackerInfoModal: Locator;
   private readonly originalUrlTxt: Locator;
   private readonly searchBtn: Locator;
   private readonly firstDeleteButton: Locator;
@@ -13,8 +13,8 @@ export class RedirectManagementUiHelper extends UiBaseLocators {
   constructor(page: Page) {
     super(page);
     this.redirectManagementTab = page.getByRole('tab', {name: 'Redirect URL Management'});
-    this.enableURLTrackerBtn = page.getByLabel('Enable URL tracker');
-    this.disableURLTrackerBtn = page.getByLabel('Disable URL tracker');
+    this.trackerStatusButton = page.locator('umb-dashboard-redirect-management #tracker-status');
+    this.urlTrackerInfoModal = page.locator('umb-info-modal');
     this.originalUrlTxt = page.getByLabel('Original URL');
     this.searchBtn = page.getByLabel('Search', { exact: true });
     this.firstDeleteButton = page.locator('uui-button[label="Delete"]').first().locator('svg');
@@ -25,12 +25,20 @@ export class RedirectManagementUiHelper extends UiBaseLocators {
     await this.click(this.redirectManagementTab);
   }
 
-  async clickEnableURLTrackerButton() {
-    await this.click(this.enableURLTrackerBtn);
+  async clickTrackerStatusButton() {
+    await this.click(this.trackerStatusButton);
   }
 
-  async clickDisableURLTrackerButton() {
-    await this.click(this.disableURLTrackerBtn);
+  async doesTrackerStatusHaveText(text: string) {
+    await this.containsText(this.trackerStatusButton, text);
+  }
+
+  async doesUrlTrackerInfoContainText(text: string) {
+    await this.containsText(this.urlTrackerInfoModal, text);
+  }
+
+  async closeUrlTrackerInfo() {
+    await this.click(this.urlTrackerInfoModal.getByLabel('Close'));
   }
 
   async enterOriginalUrl(url: string) {
