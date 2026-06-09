@@ -138,13 +138,16 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 
 		const stylesheets = this.configuration?.getValueByAlias<Array<string>>('stylesheets');
 		if (stylesheets?.length) {
-			stylesheets.forEach((stylesheet) => {
-				const linkHref =
-					stylesheet.startsWith('http') || stylesheet.startsWith(this.#stylesheetRootPath)
-						? stylesheet
-						: `${this.#stylesheetRootPath}${stylesheet}`;
-				this._stylesheets.add(linkHref);
-			});
+			const linkHrefs = stylesheets.map((stylesheet) =>
+				stylesheet.startsWith('http') || stylesheet.startsWith(this.#stylesheetRootPath)
+					? stylesheet
+					: `${this.#stylesheetRootPath}${stylesheet}`,
+			);
+
+			// Reassign a new Set so Lit's `@state()` identity check detects the change and re-renders;
+			// `Set.add()` would mutate in place and the configured stylesheets could be missed if the
+			// editor finishes loading before this (parallel) path resolves.
+			this._stylesheets = new Set([...this._stylesheets, ...linkHrefs]);
 		}
 	}
 
