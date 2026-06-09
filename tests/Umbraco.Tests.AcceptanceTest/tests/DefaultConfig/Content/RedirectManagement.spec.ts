@@ -1,7 +1,5 @@
 import {ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
-import {expect} from "@playwright/test";
 
-const disableStatus = 'Disabled';
 const enableStatus = 'Enabled';
 let documentTypeId = '';
 let contentId = '';
@@ -30,56 +28,29 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
 
-// On the latest version, the URL tracker will not be allowed through the UI, but the appsettings can be used to disable it.
+// The URL tracker can no longer be toggled from the UI - it is configured through application settings.
+// The dashboard only shows the current status and explains how to change it.
 // Related PR: https://github.com/umbraco/Umbraco-CMS/pull/22830
-test.fixme('can disable URL tracker', async ({umbracoApi, umbracoUi}) => {
+test('can see that the URL tracker is enabled', async ({umbracoUi}) => {
   // Act
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
   await umbracoUi.redirectManagement.clickRedirectManagementTab();
-  await umbracoUi.redirectManagement.clickDisableURLTrackerButton();
-  await umbracoUi.redirectManagement.clickDisableButton();
-  // Rename the published content
-  await umbracoUi.content.goToSection(ConstantHelper.sections.content, true, true);
-  await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoUi.content.enterContentName(updatedContentName);
-  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
 
   // Assert
-  // Verify that there is no redirects have been made
-  const contentUrl = await umbracoApi.document.getDocumentUrl(contentId);
-  await umbracoUi.content.goToSection(ConstantHelper.sections.content, true, true);
-  await umbracoUi.redirectManagement.clickRedirectManagementTab();
-  await umbracoUi.redirectManagement.isTextWithExactNameVisible(contentUrl, false);
-  // Verify that the status is Disable
-  const statusData = await umbracoApi.redirectManagement.getStatus();
-  expect(statusData.status).toBe(disableStatus);
+  await umbracoUi.redirectManagement.doesTrackerStatusHaveText(ConstantHelper.redirectUrlTrackerMessages.enabled);
 });
 
-// On the latest version, the URL tracker will not be allowed through the UI, but the appsettings can be used to disable it.
-// Related PR: https://github.com/umbraco/Umbraco-CMS/pull/22830
-test.fixme('can re-enable URL tracker', async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  await umbracoApi.redirectManagement.setStatus(disableStatus);
-
+test('cannot disable the URL tracker from the dashboard', async ({umbracoUi}) => {
   // Act
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
   await umbracoUi.redirectManagement.clickRedirectManagementTab();
-  await umbracoUi.redirectManagement.clickEnableURLTrackerButton();
-  // Rename the published content
-  await umbracoUi.content.goToSection(ConstantHelper.sections.content, true, true);
-  await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoUi.content.enterContentName(updatedContentName);
-  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
+  await umbracoUi.redirectManagement.clickTrackerStatusButton();
 
   // Assert
-  // Verify that there is one redirects have been made
-  const contentUrl = await umbracoApi.document.getDocumentUrl(contentId);
-  await umbracoUi.content.goToSection(ConstantHelper.sections.content, true, true);
-  await umbracoUi.redirectManagement.clickRedirectManagementTab();
-  await umbracoUi.redirectManagement.isTextWithExactNameVisible(contentUrl);
-  // Verify that the status is Enable
-  const statusData = await umbracoApi.redirectManagement.getStatus();
-  expect(statusData.status).toBe(enableStatus);
+  await umbracoUi.redirectManagement.doesUrlTrackerInfoContainText(ConstantHelper.redirectUrlTrackerMessages.disableInstruction);
+  await umbracoUi.redirectManagement.doesUrlTrackerInfoContainText(ConstantHelper.redirectUrlTrackerMessages.configurationKey);
+  await umbracoUi.redirectManagement.closeUrlTrackerInfo();
+  await umbracoUi.redirectManagement.doesTrackerStatusHaveText(ConstantHelper.redirectUrlTrackerMessages.enabled);
 });
 
 test('can search for original URL', async ({umbracoApi, umbracoUi}) => {
