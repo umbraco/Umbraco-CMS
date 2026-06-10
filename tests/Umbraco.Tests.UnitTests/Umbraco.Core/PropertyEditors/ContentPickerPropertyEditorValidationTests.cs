@@ -53,7 +53,7 @@ public class ContentPickerPropertyEditorValidationTests
             _contentServiceMock.Object,
             localizedTextServiceMock.Object)
         {
-            ConfigurationObject = new ContentPickerConfiguration()
+            ConfigurationObject = new ContentPickerConfiguration(),
         };
     }
 
@@ -88,7 +88,7 @@ public class ContentPickerPropertyEditorValidationTests
         {
             AllowedContentTypeIds = extraAllowedKey is not null
                 ? $"{extraAllowedKey},{allowedContentTypeKey}"
-                : allowedContentTypeKey.ToString()
+                : allowedContentTypeKey.ToString(),
         };
 
         Assert.IsEmpty(Validate(documentKey));
@@ -107,7 +107,7 @@ public class ContentPickerPropertyEditorValidationTests
 
         _valueEditor.ConfigurationObject = new ContentPickerConfiguration
         {
-            AllowedContentTypeIds = allowedContentTypeKey.ToString()
+            AllowedContentTypeIds = allowedContentTypeKey.ToString(),
         };
 
         Assert.That(Validate(documentKey).Count(), Is.EqualTo(1));
@@ -124,7 +124,7 @@ public class ContentPickerPropertyEditorValidationTests
 
         _valueEditor.ConfigurationObject = new ContentPickerConfiguration
         {
-            AllowedContentTypeIds = Guid.NewGuid().ToString()
+            AllowedContentTypeIds = Guid.NewGuid().ToString(),
         };
 
         Assert.That(Validate(documentKey).Count(), Is.EqualTo(1));
@@ -140,6 +140,7 @@ public class ContentPickerPropertyEditorValidationTests
 
         var contentMock = new Mock<IContent>();
         contentMock.Setup(x => x.ContentType).Returns(contentTypeMock.Object);
+        contentMock.Setup(x => x.Key).Returns(contentKey);
 
         return contentMock.Object;
     }

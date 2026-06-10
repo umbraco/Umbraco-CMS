@@ -39,7 +39,6 @@ public class ContentPickerPropertyEditor : DataEditor, IValueSchemaProvider
     {
         _ioHelper = ioHelper;
         SupportsReadOnly = true;
-
     }
 
     /// <inheritdoc />
@@ -68,7 +67,6 @@ public class ContentPickerPropertyEditor : DataEditor, IValueSchemaProvider
     /// </summary>
     internal sealed class ContentPickerPropertyValueEditor : DataValueEditor, IDataValueReference
     {
-
         /// <summary>
         ///     Initializes a new instance of the <see cref="ContentPickerPropertyValueEditor" /> class.
         /// </summary>
@@ -76,6 +74,9 @@ public class ContentPickerPropertyEditor : DataEditor, IValueSchemaProvider
         /// <param name="jsonSerializer">The JSON serializer.</param>
         /// <param name="ioHelper">The IO helper.</param>
         /// <param name="attribute">The data editor attribute.</param>
+        /// <param name="coreScopeProvider">The core scope provider.</param>
+        /// <param name="contentService">The content service.</param>
+        /// <param name="localizedTextService">The localized text service.</param>
         public ContentPickerPropertyValueEditor(
             IShortStringHelper shortStringHelper,
             IJsonSerializer jsonSerializer,
@@ -149,8 +150,9 @@ public class ContentPickerPropertyEditor : DataEditor, IValueSchemaProvider
     /// <summary>
     ///    Validates that the selected content matches the allowed content types configured for the property editor.
     /// </summary>
-    /// <param name="coreScopeProvider"></param>
-    /// <param name="contentService"></param>
+    /// <param name="coreScopeProvider">The core scope provider.</param>
+    /// <param name="contentService">The content service.</param>
+    /// <param name="localizedTextService">The localized text service.</param>
     internal sealed class AllowedTypeValidator(ICoreScopeProvider coreScopeProvider, IContentService contentService, ILocalizedTextService localizedTextService)
         : ITypedJsonValidator<string, ContentPickerConfiguration>
     {
@@ -166,6 +168,7 @@ public class ContentPickerPropertyEditor : DataEditor, IValueSchemaProvider
             }
 
             HashSet<Guid> allowedContentTypeKeys = ParseAllowedContentTypeKeys(configuration.AllowedContentTypeIds);
+
             // No filter configured — all element types are allowed.
             if (allowedContentTypeKeys.Count == 0)
             {
@@ -196,24 +199,24 @@ public class ContentPickerPropertyEditor : DataEditor, IValueSchemaProvider
 
             return [];
         }
-    }
 
-    private static HashSet<Guid> ParseAllowedContentTypeKeys(string? configValue)
-    {
-        if (configValue.IsNullOrWhiteSpace())
+        private static HashSet<Guid> ParseAllowedContentTypeKeys(string? configValue)
         {
-            return [];
-        }
-
-        var result = new HashSet<Guid>();
-        foreach (var entry in configValue.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries))
-        {
-            if (Guid.TryParse(entry, out Guid guid))
+            if (configValue.IsNullOrWhiteSpace())
             {
-                result.Add(guid);
+                return [];
             }
-        }
 
-        return result;
+            var result = new HashSet<Guid>();
+            foreach (var entry in configValue.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries))
+            {
+                if (Guid.TryParse(entry, out Guid guid))
+                {
+                    result.Add(guid);
+                }
+            }
+
+            return result;
+        }
     }
 }

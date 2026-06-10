@@ -53,7 +53,7 @@ public class ElementPickerPropertyEditorValidationTests
             _elementServiceMock.Object,
             mockScopeProvider.Object)
         {
-            ConfigurationObject = new ElementPickerConfiguration()
+            ConfigurationObject = new ElementPickerConfiguration(),
         };
     }
 
@@ -88,7 +88,7 @@ public class ElementPickerPropertyEditorValidationTests
         {
             AllowedContentTypeIds = extraAllowedKey is not null
                 ? $"{extraAllowedKey},{allowedContentTypeKey}"
-                : allowedContentTypeKey.ToString()
+                : allowedContentTypeKey.ToString(),
         };
 
         Assert.IsEmpty(Validate([elementKey]));
@@ -107,7 +107,7 @@ public class ElementPickerPropertyEditorValidationTests
 
         _valueEditor.ConfigurationObject = new ElementPickerConfiguration
         {
-            AllowedContentTypeIds = allowedContentTypeKey.ToString()
+            AllowedContentTypeIds = allowedContentTypeKey.ToString(),
         };
 
         Assert.That(Validate([elementKey]).Count(), Is.EqualTo(1));

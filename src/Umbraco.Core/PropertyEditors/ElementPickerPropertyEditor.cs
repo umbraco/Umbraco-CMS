@@ -13,7 +13,7 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Core.PropertyEditors;
 
 /// <summary>
-///     Element picker property editor that stores element keys
+///     Element picker property editor that stores element keys.
 /// </summary>
 [DataEditor(
     Constants.PropertyEditors.Aliases.ElementPicker,
@@ -23,6 +23,11 @@ public class ElementPickerPropertyEditor : DataEditor
 {
     private readonly IIOHelper _ioHelper;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="ElementPickerPropertyEditor" /> class.
+    /// </summary>
+    /// <param name="dataValueEditorFactory">The data value editor factory.</param>
+    /// <param name="ioHelper">The IO helper.</param>
     public ElementPickerPropertyEditor(IDataValueEditorFactory dataValueEditorFactory, IIOHelper ioHelper)
         : base(dataValueEditorFactory)
     {
@@ -34,13 +39,27 @@ public class ElementPickerPropertyEditor : DataEditor
     protected override IConfigurationEditor CreateConfigurationEditor() =>
         new ElementPickerConfigurationEditor(_ioHelper);
 
+    /// <inheritdoc/>
     protected override IDataValueEditor CreateValueEditor() =>
         DataValueEditorFactory.Create<ElementPickerPropertyValueEditor>(Attribute!);
 
+    /// <summary>
+    ///     Provides the value editor for the element picker property editor.
+    /// </summary>
     internal sealed class ElementPickerPropertyValueEditor : DataValueEditor, IDataValueReference
     {
         private readonly IJsonSerializer _jsonSerializer;
 
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="ElementPickerPropertyValueEditor" /> class.
+        /// </summary>
+        /// <param name="shortStringHelper">The short string helper.</param>
+        /// <param name="jsonSerializer">The JSON serializer.</param>
+        /// <param name="ioHelper">The IO helper.</param>
+        /// <param name="attribute">The data editor attribute.</param>
+        /// <param name="localizedTextService">The localized text service.</param>
+        /// <param name="elementService">The element service.</param>
+        /// <param name="coreScopeProvider">The core scope provider.</param>
         public ElementPickerPropertyValueEditor(
             IShortStringHelper shortStringHelper,
             IJsonSerializer jsonSerializer,
@@ -57,6 +76,7 @@ public class ElementPickerPropertyEditor : DataEditor
                 new AllowedTypeValidator(localizedTextService, elementService, coreScopeProvider)));
         }
 
+        /// <inheritdoc/>
         public IEnumerable<UmbracoEntityReference> GetReferences(object? value)
         {
             var asString = value as string ?? value?.ToString();
@@ -85,11 +105,14 @@ public class ElementPickerPropertyEditor : DataEditor
     {
         private readonly ILocalizedTextService _localizedTextService;
 
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="MinMaxValidator" /> class.
+        /// </summary>
+        /// <param name="localizedTextService">The localized text service.</param>
         public MinMaxValidator(ILocalizedTextService localizedTextService)
-        {
-            _localizedTextService = localizedTextService;
-        }
+            => _localizedTextService = localizedTextService;
 
+        /// <inheritdoc/>
         public IEnumerable<ValidationResult> Validate(
             List<string>? value,
             ElementPickerConfiguration? configuration,
@@ -143,6 +166,12 @@ public class ElementPickerPropertyEditor : DataEditor
         private readonly IElementService _elementService;
         private readonly ICoreScopeProvider _coreScopeProvider;
 
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="AllowedTypeValidator" /> class.
+        /// </summary>
+        /// <param name="localizedTextService">The localized text service.</param>
+        /// <param name="elementService">The element service.</param>
+        /// <param name="coreScopeProvider">The core scope provider.</param>
         public AllowedTypeValidator(
             ILocalizedTextService localizedTextService,
             IElementService elementService,
@@ -153,6 +182,7 @@ public class ElementPickerPropertyEditor : DataEditor
             _coreScopeProvider = coreScopeProvider;
         }
 
+        /// <inheritdoc/>
         public IEnumerable<ValidationResult> Validate(
             List<string>? value,
             ElementPickerConfiguration? configuration,
