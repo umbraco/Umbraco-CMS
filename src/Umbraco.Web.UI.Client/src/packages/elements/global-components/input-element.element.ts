@@ -16,8 +16,8 @@ export class UmbInputElementElement extends UmbFormControlMixin<string | undefin
 	@property({ type: Boolean })
 	folderOnly = false;
 
-	@property({ type: String })
-	allowedContentTypeIds?: string;
+	@property({ type: Array })
+	allowedContentTypeIds?: string[];
 
 	@property({ type: Number })
 	min = 0;

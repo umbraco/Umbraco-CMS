@@ -3,7 +3,7 @@ import { UmbElementItemRepository } from '../item/repository/element-item.reposi
 import { UmbElementTreeRepository } from '../tree/element-tree.repository.js';
 import type { UmbElementTreeChildrenOfRequestArgs, UmbElementTreeRootItemsRequestArgs } from '../tree/types.js';
 import type { UmbElementTreeItemModel } from '../tree/types.js';
-import { getConfigValue, splitStringToArray } from '@umbraco-cms/backoffice/utils';
+import { getConfigValue } from '@umbraco-cms/backoffice/utils';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbElementFolderItemDataResolver } from '../folder/data-resolver/element-folder-item-data-resolver.js';
 import { UmbElementItemDataResolver } from '../item/data-resolver/element-item-data-resolver.js';
@@ -46,8 +46,7 @@ export class UmbElementTreePickerDataSource extends UmbControllerBase implements
 	setConfig(config: UmbConfigCollectionModel | undefined) {
 		this.#folderOnly = Boolean(getConfigValue(config, 'folderOnly'));
 		this.#startNode = getConfigValue(config, 'startNode');
-		const allowedIds = getConfigValue(config, 'allowedContentTypeIds');
-		this.#allowedContentTypeIds = allowedIds ? splitStringToArray(allowedIds) : undefined;
+		this.#allowedContentTypeIds = getConfigValue(config, 'allowedContentTypeIds');
 	}
 
 	async requestTreeStartNode() {
