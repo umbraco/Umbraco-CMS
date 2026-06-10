@@ -464,7 +464,8 @@
 	    0: Comma delimitted list of failed folder paths
   	-->
     <key alias="umbracoApplicationUrlCheckResultTrue"><![CDATA[The appSetting 'Umbraco:CMS:WebRouting:UmbracoApplicationUrl' is set to <strong>%0%</strong>.]]></key>
-    <key alias="umbracoApplicationUrlCheckResultFalse">The appSetting 'Umbraco:CMS:WebRouting:UmbracoApplicationUrl' is not set.</key>
+    <key alias="umbracoApplicationUrlCheckResultFalse"><![CDATA[The appSetting 'Umbraco:CMS:WebRouting:UmbracoApplicationUrl' is not set, so the application URL will be auto-detected from incoming requests. Setting it explicitly is recommended.]]></key>
+    <key alias="umbracoApplicationUrlCheckResultError"><![CDATA[The appSetting 'Umbraco:CMS:WebRouting:UmbracoApplicationUrl' is not set and application URL auto-detection is disabled ('Umbraco:CMS:WebRouting:ApplicationUrlDetection' is 'None'). Features that require an absolute URL, such as password reset and invitation emails, will not work. Set the application URL explicitly, or enable auto-detection.]]></key>
     <!-- The following key get these tokens passed in:
 	    0: Comma delimitted list of headers found
   	-->

@@ -110,8 +110,8 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         IContent doc2 = ContentBuilder.CreateBasicContent(contentType2);
         ContentService.Save(doc2);
 
-        RedirectUrlService.Register("hello/world", doc.Key);
-        RedirectUrlService.Register("hello2/world2", doc2.Key);
+        RedirectUrlService.RegisterWithStatus("hello/world", doc.Key);
+        RedirectUrlService.RegisterWithStatus("hello2/world2", doc2.Key);
 
         // These 2 assertions should probably be moved to a test for the Register() method?
         Assert.AreEqual(1, RedirectUrlService.GetContentRedirectUrls(doc.Key).Count());

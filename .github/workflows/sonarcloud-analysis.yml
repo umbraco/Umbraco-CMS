@@ -1,9 +1,7 @@
 name: "SonarQube Cloud - Analysis"
 
-# This workflow runs without secrets so it is safe to trigger on fork PRs.
-# It compiles the solution, runs unit tests, and uploads the Roslyn analysis
-# output as an artifact. The upload workflow then picks it up and uploads
-# results to SonarCloud using the SONAR_TOKEN secret.
+# This workflow runs the full SonarCloud analysis with the SONAR_TOKEN secret.
+# It is skipped for fork PRs since secrets are not available in that context.
 
 on:
   push:
@@ -28,9 +26,10 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
-  build:
-    name: Build and collect analysis data
+  analyze:
+    name: Build and analyze
     runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork != true
     steps:
       - uses: actions/checkout@v6
         with:
@@ -52,22 +51,16 @@ jobs:
           dotnet tool install --global dotnet-coverage
 
       - name: Load sonar params
-        env:
-          IS_FORK: ${{ github.event.pull_request.head.repo.fork }}
-          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
-        run: |
-          if [ "$IS_FORK" = "true" ]; then
-            # For fork PRs, read sonar params from the default branch.
-            echo "SONARQUBE_SCANNER_PARAMS=$(git show origin/$DEFAULT_BRANCH:.github/workflows/sonarcloud/sonar-params.json | jq -c .)" >> $GITHUB_ENV
-          else
-            echo "SONARQUBE_SCANNER_PARAMS=$(jq -c . .github/workflows/sonarcloud/sonar-params.json)" >> $GITHUB_ENV
-          fi
+        run: echo "SONARQUBE_SCANNER_PARAMS=$(jq -c . .github/workflows/sonarcloud/sonar-params.json)" >> $GITHUB_ENV
 
       - name: Begin analysis
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
           dotnet-sonarscanner begin \
             /k:"$SONAR_PROJECT_KEY" \
-            /o:"$SONAR_ORGANIZATION"
+            /o:"$SONAR_ORGANIZATION" \
+            /d:sonar.token="$SONAR_TOKEN"
 
       - name: Restore
         run: dotnet restore umbraco.sln
@@ -82,12 +75,7 @@ jobs:
             --output TestResults/coverage.xml \
             --output-format xml
 
-      - name: Upload analysis data
-        uses: actions/upload-artifact@v7
-        with:
-          name: analysis-data
-          include-hidden-files: true # required to capture the .sonarqube directory
-          path: |
-            .sonarqube/
-            TestResults/
-          retention-days: 1
+      - name: End analysis
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: dotnet-sonarscanner end /d:sonar.token="$SONAR_TOKEN"
