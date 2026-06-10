@@ -88,7 +88,7 @@ public class ContentPickerPropertyEditor : DataEditor, IValueSchemaProvider
             : base(shortStringHelper, jsonSerializer, ioHelper, attribute)
         {
             Validators.Add(new TypedValidatorRunner<string, ContentPickerConfiguration>(
-                new AllowedTypeValidator(coreScopeProvider, contentService, localizedTextService)));
+                new AllowedTypeValidator(localizedTextService, contentService, coreScopeProvider)));
         }
 
         /// <inheritdoc />
@@ -150,10 +150,10 @@ public class ContentPickerPropertyEditor : DataEditor, IValueSchemaProvider
     /// <summary>
     ///    Validates that the selected content matches the allowed content types configured for the property editor.
     /// </summary>
-    /// <param name="coreScopeProvider">The core scope provider.</param>
-    /// <param name="contentService">The content service.</param>
     /// <param name="localizedTextService">The localized text service.</param>
-    internal sealed class AllowedTypeValidator(ICoreScopeProvider coreScopeProvider, IContentService contentService, ILocalizedTextService localizedTextService)
+    /// <param name="contentService">The content service.</param>
+    /// <param name="coreScopeProvider">The core scope provider.</param>
+    internal sealed class AllowedTypeValidator(ILocalizedTextService localizedTextService, IContentService contentService, ICoreScopeProvider coreScopeProvider)
         : ITypedValidator<string, ContentPickerConfiguration>
     {
         public IEnumerable<ValidationResult> Validate(
