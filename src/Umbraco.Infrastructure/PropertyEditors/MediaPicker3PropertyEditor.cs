@@ -511,7 +511,7 @@ public class MediaPicker3PropertyEditor : DataEditor, IValueSchemaProvider
         /// <summary>
         /// Validates the min/max configuration for the media picker property editor.
         /// </summary>
-        internal sealed class MinMaxValidator : ITypedJsonValidator<List<MediaWithCropsDto>, MediaPicker3Configuration>
+        internal sealed class MinMaxValidator : ITypedValidator<List<MediaWithCropsDto>, MediaPicker3Configuration>
         {
             private readonly ILocalizedTextService _localizedTextService;
 
@@ -573,7 +573,7 @@ public class MediaPicker3PropertyEditor : DataEditor, IValueSchemaProvider
         /// <summary>
         /// Validates the allowed type configuration for the media picker property editor.
         /// </summary>
-        internal sealed class AllowedTypeValidator : ITypedJsonValidator<List<MediaWithCropsDto>, MediaPicker3Configuration>
+        internal sealed class AllowedTypeValidator : ITypedValidator<List<MediaWithCropsDto>, MediaPicker3Configuration>
         {
             private readonly ILocalizedTextService _localizedTextService;
             private readonly IMediaService _mediaService;
@@ -654,7 +654,7 @@ public class MediaPicker3PropertyEditor : DataEditor, IValueSchemaProvider
         /// <summary>
         /// Validates the start node configuration for the media picker property editor.
         /// </summary>
-        internal sealed class StartNodeValidator : ITypedJsonValidator<List<MediaWithCropsDto>, MediaPicker3Configuration>
+        internal sealed class StartNodeValidator : ITypedValidator<List<MediaWithCropsDto>, MediaPicker3Configuration>
         {
             private readonly ILocalizedTextService _localizedTextService;
             private readonly IMediaNavigationQueryService _mediaNavigationQueryService;

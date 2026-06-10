@@ -1,6 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-using Umbraco.Cms.Core.Models.Validation;
-
 namespace Umbraco.Cms.Core.PropertyEditors.Validation;
 
 /// <summary>
@@ -9,19 +6,5 @@ namespace Umbraco.Cms.Core.PropertyEditors.Validation;
 /// </summary>
 /// <typeparam name="TValue">The type of the value consumed by the validator.</typeparam>
 /// <typeparam name="TConfiguration">The type of the configuration consumed by validator.</typeparam>
-public interface ITypedJsonValidator<TValue, TConfiguration>
-{
-    /// <summary>
-    ///     Validates the specified value against the configuration.
-    /// </summary>
-    /// <param name="value">The deserialized value to validate.</param>
-    /// <param name="configuration">The data type configuration.</param>
-    /// <param name="valueType">The value type.</param>
-    /// <param name="validationContext">The property validation context.</param>
-    /// <returns>A collection of validation results.</returns>
-    public abstract IEnumerable<ValidationResult> Validate(
-        TValue? value,
-        TConfiguration? configuration,
-        string? valueType,
-        PropertyValidationContext validationContext);
-}
+[Obsolete("Use ITypedValidator instead; the validator contract is not JSON-specific. Scheduled for removal in Umbraco 20.")]
+public interface ITypedJsonValidator<TValue, TConfiguration> : ITypedValidator<TValue, TConfiguration>;

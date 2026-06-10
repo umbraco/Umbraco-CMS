@@ -154,7 +154,7 @@ public class ContentPickerPropertyEditor : DataEditor, IValueSchemaProvider
     /// <param name="contentService">The content service.</param>
     /// <param name="localizedTextService">The localized text service.</param>
     internal sealed class AllowedTypeValidator(ICoreScopeProvider coreScopeProvider, IContentService contentService, ILocalizedTextService localizedTextService)
-        : ITypedJsonValidator<string, ContentPickerConfiguration>
+        : ITypedValidator<string, ContentPickerConfiguration>
     {
         public IEnumerable<ValidationResult> Validate(
             string? value,

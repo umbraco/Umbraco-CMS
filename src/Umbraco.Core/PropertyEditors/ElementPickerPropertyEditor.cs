@@ -101,7 +101,7 @@ public class ElementPickerPropertyEditor : DataEditor
     /// <summary>
     /// Validator to ensure that the number of selected elements is within the configured min/max limits, if any.
     /// </summary>
-    internal sealed class MinMaxValidator : ITypedJsonValidator<List<string>, ElementPickerConfiguration>
+    internal sealed class MinMaxValidator : ITypedValidator<List<string>, ElementPickerConfiguration>
     {
         private readonly ILocalizedTextService _localizedTextService;
 
@@ -160,7 +160,7 @@ public class ElementPickerPropertyEditor : DataEditor
     /// <summary>
     /// Validator to ensure that all selected elements are of an allowed content type, if any are configured.
     /// </summary>
-    internal sealed class AllowedTypeValidator : ITypedJsonValidator<List<string>, ElementPickerConfiguration>
+    internal sealed class AllowedTypeValidator : ITypedValidator<List<string>, ElementPickerConfiguration>
     {
         private readonly ILocalizedTextService _localizedTextService;
         private readonly IElementService _elementService;
