@@ -18,6 +18,13 @@ export const manifests: Array<UmbExtensionManifest> = [
 			settings: {
 				properties: [
 					{
+						alias: 'allowedContentTypes',
+						label: 'Accepted types',
+						description: 'Limit to specific types',
+						propertyEditorUiAlias: 'Umb.PropertyEditorUi.DocumentPicker.AllowedDocumentTypes',
+						weight: 10,
+					},
+					{
 						alias: 'startNodeId',
 						label: 'Start node',
 						description: '',
@@ -28,13 +35,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 								value: { min: 0, max: 1 },
 							},
 						],
-					},
-					{
-						alias: 'allowedContentTypes',
-						label: 'Allow items of type',
-						description: 'Select the applicable document types',
-						propertyEditorUiAlias: 'Umb.PropertyEditorUi.DocumentPicker.AllowedDocumentTypes',
-						weight: 120,
+						weight: 20,
 					},
 				],
 			},
