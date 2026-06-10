@@ -130,6 +130,18 @@ public class ContentPickerPropertyEditorValidationTests
         Assert.That(Validate(documentKey).Count(), Is.EqualTo(1));
     }
 
+    [Test]
+    public void Can_Pass_Validation_When_Value_Is_Empty()
+    {
+        // An empty selection is valid even when an allowed-type filter is configured.
+        _valueEditor.ConfigurationObject = new ContentPickerConfiguration
+        {
+            AllowedContentTypeIds = Guid.NewGuid().ToString(),
+        };
+
+        Assert.IsEmpty(_valueEditor.Validate(string.Empty, false, null, PropertyValidationContext.Empty()));
+    }
+
     private IEnumerable<ValidationResult> Validate(Guid documentKey)
         => _valueEditor.Validate(documentKey.ToString(), false, null, PropertyValidationContext.Empty());
 

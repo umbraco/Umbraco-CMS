@@ -113,6 +113,36 @@ public class ElementPickerPropertyEditorValidationTests
         Assert.That(Validate([elementKey]).Count(), Is.EqualTo(1));
     }
 
+    [Test]
+    public void Cannot_Pass_Validation_When_Element_Is_Not_Found()
+    {
+        var elementKey = Guid.NewGuid();
+
+        // The selected element cannot be found, so its type cannot be verified against the allowed types.
+        _elementServiceMock
+            .Setup(x => x.GetByIds(It.IsAny<IEnumerable<Guid>>()))
+            .Returns([]);
+
+        _valueEditor.ConfigurationObject = new ElementPickerConfiguration
+        {
+            AllowedContentTypeIds = Guid.NewGuid().ToString(),
+        };
+
+        Assert.That(Validate([elementKey]).Count(), Is.EqualTo(1));
+    }
+
+    [Test]
+    public void Can_Pass_Validation_When_Selection_Is_Empty()
+    {
+        // An empty selection is valid even when an allowed-type filter is configured.
+        _valueEditor.ConfigurationObject = new ElementPickerConfiguration
+        {
+            AllowedContentTypeIds = Guid.NewGuid().ToString(),
+        };
+
+        Assert.IsEmpty(Validate([]));
+    }
+
     private IEnumerable<ValidationResult> Validate(IEnumerable<Guid> elementKeys)
     {
         List<string> value = elementKeys.Select(k => k.ToString()).ToList();
