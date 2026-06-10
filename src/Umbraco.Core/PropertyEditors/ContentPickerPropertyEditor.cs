@@ -167,7 +167,7 @@ public class ContentPickerPropertyEditor : DataEditor, IValueSchemaProvider
                 return [];
             }
 
-            HashSet<Guid> allowedContentTypeKeys = ParseAllowedContentTypeKeys(configuration.AllowedContentTypeIds);
+            HashSet<Guid> allowedContentTypeKeys = AllowedContentTypeKeysParser.Parse(configuration.AllowedContentTypeIds);
 
             // No filter configured — all element types are allowed.
             if (allowedContentTypeKeys.Count == 0)
@@ -198,25 +198,6 @@ public class ContentPickerPropertyEditor : DataEditor, IValueSchemaProvider
             }
 
             return [];
-        }
-
-        private static HashSet<Guid> ParseAllowedContentTypeKeys(string? configValue)
-        {
-            if (configValue.IsNullOrWhiteSpace())
-            {
-                return [];
-            }
-
-            var result = new HashSet<Guid>();
-            foreach (var entry in configValue.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries))
-            {
-                if (Guid.TryParse(entry, out Guid guid))
-                {
-                    result.Add(guid);
-                }
-            }
-
-            return result;
         }
     }
 }
