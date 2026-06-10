@@ -126,14 +126,13 @@ public class ElementPickerPropertyEditor : DataEditor
                 return validationResults;
             }
 
-            if (configuration.ValidationLimit.Min > 0 && (value is null || value.Count < configuration.ValidationLimit.Min))
+            if (configuration.ValidationLimit.Min is int min and > 0 && (value is null || value.Count < min))
             {
                 validationResults.Add(new ValidationResult(
                     _localizedTextService.Localize(
                         "validation",
                         "entriesShort",
-                        [configuration.ValidationLimit.Min.ToString(), (configuration.ValidationLimit.Min - (value?.Count ?? 0)).ToString()
-                        ]),
+                        [min.ToString(), (min - (value?.Count ?? 0)).ToString()]),
                     ["value"]));
             }
 
@@ -142,14 +141,13 @@ public class ElementPickerPropertyEditor : DataEditor
                 return validationResults;
             }
 
-            if (configuration.ValidationLimit.Max > 0 && value.Count > configuration.ValidationLimit.Max)
+            if (configuration.ValidationLimit.Max is int max and > 0 && value.Count > max)
             {
                 validationResults.Add(new ValidationResult(
                     _localizedTextService.Localize(
                         "validation",
                         "entriesExceed",
-                        [configuration.ValidationLimit.Max.ToString(), (value.Count - configuration.ValidationLimit.Max).ToString()
-                        ]),
+                        [max.ToString(), (value.Count - max).ToString()]),
                     ["value"]));
             }
 
@@ -205,13 +203,16 @@ public class ElementPickerPropertyEditor : DataEditor
             Guid[] elementIds = value
                 .Where(v => Guid.TryParse(v, out _))
                 .Select(Guid.Parse)
+                .Distinct()
                 .ToArray();
 
             using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
             IElement[] elements = _elementService.GetByIds(elementIds).ToArray();
             scope.Complete();
 
-            if (elements.Length != value.Count)
+            // Compare against the distinct requested keys (not the raw value count, which may include
+            // duplicates or non-GUID entries) so existing elements aren't incorrectly reported as missing.
+            if (elements.Length != elementIds.Length)
             {
                 return [
                     new ValidationResult(

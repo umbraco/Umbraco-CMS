@@ -143,6 +143,46 @@ public class ElementPickerPropertyEditorValidationTests
         Assert.IsEmpty(Validate([]));
     }
 
+    [Test]
+    public void Can_Pass_Validation_When_Selection_Contains_Duplicate_Keys()
+    {
+        var elementKey = Guid.NewGuid();
+        var allowedContentTypeKey = Guid.NewGuid();
+
+        // The (deduplicated) key resolves to a single element.
+        _elementServiceMock
+            .Setup(x => x.GetByIds(It.IsAny<IEnumerable<Guid>>()))
+            .Returns([CreateElement(elementKey, allowedContentTypeKey)]);
+
+        _valueEditor.ConfigurationObject = new ElementPickerConfiguration
+        {
+            AllowedContentTypeIds = allowedContentTypeKey.ToString(),
+        };
+
+        // The same key selected twice must not be reported as missing.
+        Assert.IsEmpty(Validate([elementKey, elementKey]));
+    }
+
+    [Test]
+    public void Ignores_Non_Guid_Entries_When_Checking_For_Missing_Elements()
+    {
+        var elementKey = Guid.NewGuid();
+        var allowedContentTypeKey = Guid.NewGuid();
+
+        _elementServiceMock
+            .Setup(x => x.GetByIds(It.IsAny<IEnumerable<Guid>>()))
+            .Returns([CreateElement(elementKey, allowedContentTypeKey)]);
+
+        _valueEditor.ConfigurationObject = new ElementPickerConfiguration
+        {
+            AllowedContentTypeIds = allowedContentTypeKey.ToString(),
+        };
+
+        // A non-GUID entry is not a resolvable key and must not be reported as missing.
+        List<string> value = ["not-a-guid", elementKey.ToString()];
+        Assert.IsEmpty(_valueEditor.Validate(value, false, null, PropertyValidationContext.Empty()));
+    }
+
     private IEnumerable<ValidationResult> Validate(IEnumerable<Guid> elementKeys)
     {
         List<string> value = elementKeys.Select(k => k.ToString()).ToList();

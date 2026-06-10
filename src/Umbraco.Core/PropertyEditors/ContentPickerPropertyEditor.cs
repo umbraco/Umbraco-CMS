@@ -169,7 +169,7 @@ public class ContentPickerPropertyEditor : DataEditor, IValueSchemaProvider
 
             HashSet<Guid> allowedContentTypeKeys = AllowedContentTypeKeysParser.Parse(configuration.AllowedContentTypeIds);
 
-            // No filter configured — all element types are allowed.
+            // No filter configured — all content types are allowed.
             if (allowedContentTypeKeys.Count == 0)
             {
                 return [];

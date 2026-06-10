@@ -10,10 +10,10 @@ public class ElementPickerConfiguration : IIgnoreUserStartNodesConfig
     public bool IgnoreUserStartNodes { get; set; }
 
     /// <summary>
-    /// Gets or sets the validation limits for the number of blocks allowed.
+    /// Gets or sets the validation limits for the number of elements allowed.
     /// </summary>
     [ConfigurationField("validationLimit")]
-    public NumberRange ValidationLimit { get; set; } = new NumberRange();
+    public NumberRange? ValidationLimit { get; set; }
 
     /// <summary>
     /// Gets or sets the content type filter for allowed selections.
