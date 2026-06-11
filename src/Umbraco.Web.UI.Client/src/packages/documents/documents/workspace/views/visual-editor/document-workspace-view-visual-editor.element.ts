@@ -13,6 +13,7 @@ import {
 import type { BlockValue } from './visual-editor-block-helper.js';
 import { VisualEditorBlockManager } from './visual-editor-block-manager.js';
 import { UmbVisualEditorPreviewContext } from './visual-editor-preview.context.js';
+import { UmbVisualEditorMessageRouter } from './visual-editor-message-router.js';
 import { UMB_VISUAL_EDITOR_PROPERTY_MODAL } from './visual-editor-property-modal.token.js';
 import type {
 	UmbVisualEditorPropertyGroup,
@@ -619,7 +620,7 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 	}
 
 	#injectGuestScript() {
-		const iframe = this.shadowRoot?.querySelector('iframe') as HTMLIFrameElement | null;
+		const iframe = this.#getIframe();
 		if (!iframe) return;
 
 		try {
@@ -684,57 +685,57 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 		}
 	}
 
+	#getIframe(): HTMLIFrameElement | null {
+		return this.shadowRoot?.querySelector('iframe') ?? null;
+	}
+
+	#getServerOrigin(): string | undefined {
+		if (!this.#serverUrl) return undefined;
+		try {
+			return new URL(this.#serverUrl).origin;
+		} catch {
+			return undefined;
+		}
+	}
+
 	#postToIframe(message: Record<string, unknown>) {
-		const iframe = this.shadowRoot?.querySelector('iframe') as HTMLIFrameElement | null;
-		if (!iframe?.contentWindow) return;
-		iframe.contentWindow.postMessage(message, '*');
+		const iframe = this.#getIframe();
+		const origin = this.#getServerOrigin();
+		if (!iframe?.contentWindow || !origin) return;
+		iframe.contentWindow.postMessage(message, origin);
 	}
 
 	// --- PostMessage handling ---
 
 	override connectedCallback() {
 		super.connectedCallback();
-		window.addEventListener('message', this.#onMessage);
+		window.addEventListener('message', this.#messageRouter.onMessage);
 	}
 
 	override disconnectedCallback() {
 		super.disconnectedCallback();
-		window.removeEventListener('message', this.#onMessage);
+		window.removeEventListener('message', this.#messageRouter.onMessage);
 		this.#connection?.stop();
 		this.#connection = undefined;
 	}
 
-	#onMessage = (event: MessageEvent) => {
-		const data = event.data;
-		if (!data || data.source !== 'umb-visual-editor-guest') return;
-
-		switch (data.type) {
-			case 'umb:ve:property-selected':
-				this.#onPropertyClicked(data.propertyAlias);
-				break;
-			case 'umb:ve:block-selected':
-				this.#onBlockClicked(data.blockKey, data.contentTypeAlias);
-				break;
-			case 'umb:ve:block-add':
-				this.#onBlockAdd(data.siblingBlockKey, data.insertIndex ?? 0);
-				break;
-			case 'umb:ve:block-add-to-area':
-				this.#onBlockAddToArea(data.parentBlockKey, data.areaAlias, data.insertIndex ?? 0);
-				break;
-			case 'umb:ve:block-move':
-				this.#onBlockMove(data.blockKey, data.targetIndex ?? 0, data.targetParentBlockKey, data.targetAreaAlias);
-				break;
-			case 'umb:ve:block-delete':
-				this.#onBlockDelete(data.blockKey);
-				break;
-			case 'umb:ve:block-reorder':
-				this.#onBlockReorder(data.blockKey, data.toIndex ?? 0);
-				break;
-			case 'umb:ve:region-map':
-				this._hasRegions = (data.regions?.length ?? 0) > 0;
-				break;
-		}
-	};
+	#messageRouter = new UmbVisualEditorMessageRouter({
+		getExpectedOrigin: () => this.#getServerOrigin(),
+		getExpectedSource: () => this.#getIframe()?.contentWindow,
+		handlers: {
+			'umb:ve:property-selected': (d) => this.#onPropertyClicked(d.propertyAlias),
+			'umb:ve:block-selected': (d) => this.#onBlockClicked(d.blockKey, d.contentTypeAlias),
+			'umb:ve:block-add': (d) => this.#onBlockAdd(d.siblingBlockKey, d.insertIndex ?? 0),
+			'umb:ve:block-add-to-area': (d) => this.#onBlockAddToArea(d.parentBlockKey, d.areaAlias, d.insertIndex ?? 0),
+			'umb:ve:block-move': (d) =>
+				this.#onBlockMove(d.blockKey, d.targetIndex ?? 0, d.targetParentBlockKey, d.targetAreaAlias),
+			'umb:ve:block-delete': (d) => this.#onBlockDelete(d.blockKey),
+			'umb:ve:block-reorder': (d) => this.#onBlockReorder(d.blockKey, d.toIndex ?? 0),
+			'umb:ve:region-map': (d) => {
+				this._hasRegions = (d.regions?.length ?? 0) > 0;
+			},
+		},
+	});
 
 	// --- Property click → open routed modal ---
 
