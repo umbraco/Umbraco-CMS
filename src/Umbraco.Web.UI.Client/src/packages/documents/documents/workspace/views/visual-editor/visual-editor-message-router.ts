@@ -2,6 +2,7 @@
  * Map of guest-script message types to their handler signatures.
  * Mirrors the messages sent by `src/apps/visual-editor/injected.ts`.
  */
+/* eslint-disable @typescript-eslint/naming-convention -- keys are guest-script protocol message types */
 export type UmbVisualEditorGuestMessageHandlers = {
 	'umb:ve:property-selected': (data: { propertyAlias: string }) => void;
 	'umb:ve:block-selected': (data: { blockKey: string; contentTypeAlias: string }) => void;
@@ -18,6 +19,7 @@ export type UmbVisualEditorGuestMessageHandlers = {
 	'umb:ve:block-reorder': (data: { blockKey: string; toIndex?: number }) => void;
 	'umb:ve:region-map': (data: { regions?: Array<unknown> }) => void;
 };
+/* eslint-enable @typescript-eslint/naming-convention */
 
 /**
  * Routes postMessage events from the visual editor guest script to typed handlers.

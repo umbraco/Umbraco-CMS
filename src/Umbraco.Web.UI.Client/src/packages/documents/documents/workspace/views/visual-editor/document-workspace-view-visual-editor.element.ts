@@ -590,6 +590,7 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 	#messageRouter = new UmbVisualEditorMessageRouter({
 		getExpectedOrigin: () => this.#getServerOrigin(),
 		getExpectedSource: () => this.#getIframe()?.contentWindow,
+		/* eslint-disable @typescript-eslint/naming-convention -- keys are guest-script protocol message types */
 		handlers: {
 			'umb:ve:property-selected': (d) => this.#onPropertyClicked(d.propertyAlias),
 			'umb:ve:block-selected': (d) => this.#onBlockClicked(d.blockKey, d.contentTypeAlias),
@@ -604,6 +605,7 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 				this._hasRegions = (d.regions?.length ?? 0) > 0;
 			},
 		},
+		/* eslint-enable @typescript-eslint/naming-convention */
 	});
 
 	// --- Property click → open routed modal ---
