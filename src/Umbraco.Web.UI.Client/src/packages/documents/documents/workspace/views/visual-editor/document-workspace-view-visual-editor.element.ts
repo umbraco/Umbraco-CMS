@@ -594,6 +594,7 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 			'umb:ve:property-selected': (d) => this.#onPropertyClicked(d.propertyAlias),
 			'umb:ve:block-selected': (d) => this.#onBlockClicked(d.blockKey, d.contentTypeAlias),
 			'umb:ve:block-add': (d) => this.#onBlockAdd(d.siblingBlockKey, d.insertIndex ?? 0),
+			'umb:ve:block-add-to-property': (d) => this.#onBlockAddToProperty(d.propertyAlias, d.insertIndex ?? 0),
 			'umb:ve:block-add-to-area': (d) => this.#onBlockAddToArea(d.parentBlockKey, d.areaAlias, d.insertIndex ?? 0),
 			'umb:ve:block-move': (d) =>
 				this.#onBlockMove(d.blockKey, d.targetIndex ?? 0, d.targetParentBlockKey, d.targetAreaAlias),
@@ -731,11 +732,24 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 	async #onBlockAdd(siblingBlockKey: string, insertIndex: number) {
 		const found = this.#findBlock(siblingBlockKey);
 		if (!found) return;
+		if (!found.blockValue?.contentData) return;
 
-		const propertyAlias = found.propertyAlias;
-		const propertyValue = found.blockValue;
-		if (!propertyValue?.contentData) return;
+		await this.#addBlockToProperty(found.propertyAlias, found.blockValue, insertIndex);
+	}
 
+	async #onBlockAddToProperty(propertyAlias: string, insertIndex: number) {
+		if (!this.#structures.getDocumentProperty(propertyAlias)) return;
+
+		const raw = this.#getPropertyValue(propertyAlias) as BlockValue | undefined;
+		const propertyValue: BlockValue =
+			raw && Array.isArray(raw.contentData)
+				? raw
+				: { layout: {}, contentData: [], settingsData: [], expose: [] };
+
+		await this.#addBlockToProperty(propertyAlias, propertyValue, insertIndex);
+	}
+
+	async #addBlockToProperty(propertyAlias: string, propertyValue: BlockValue, insertIndex: number) {
 		const blocksConfig = this.#getBlocksConfig(propertyAlias);
 		if (!blocksConfig || blocksConfig.length === 0) return;
 

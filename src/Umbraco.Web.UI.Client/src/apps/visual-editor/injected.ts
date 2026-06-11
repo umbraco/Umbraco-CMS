@@ -12,12 +12,14 @@
  * - `data-umb-content-type` / `data-content-element-type-alias` — Block element type alias
  * - `data-umb-property` — Property alias (identifies a property region)
  * - `data-umb-content-key` — Document content key for a property region
+ * - `data-umb-block-property` — Property alias on a block list container (empty-state block creation)
  *
  * ## PostMessage protocol (sent to parent)
  * - `umb:ve:region-map` — Discovered regions on page load
  * - `umb:ve:block-selected` — User clicked/edited a block
  * - `umb:ve:block-delete` — User requested block deletion
  * - `umb:ve:block-add` — User clicked an inline create button
+ * - `umb:ve:block-add-to-property` — User clicked "Add content" on an empty block list
  * - `umb:ve:block-reorder` — User drag-sorted a block
  * - `umb:ve:property-selected` — User clicked a property region
  *
@@ -1045,14 +1047,21 @@
 			);
 		});
 
-		// Empty block lists at root level (not inside a grid area)
+		// Empty block lists at root level (not inside a grid area).
+		// The container carries data-umb-block-property (emitted by blocklist/default.cshtml
+		// in preview mode) so the property alias is known even with no blocks present.
 		document.querySelectorAll<HTMLElement>('.umb-block-list').forEach((list) => {
 			if (list.querySelector(BLOCK_SELECTOR)) return; // Has blocks
 			if (list.querySelector(`[${ADD_BTN_ATTR}]`)) return; // Already handled
 
-			// Find a sibling block key — for root-level empty lists there's none,
-			// so we can't determine the property alias. This is a limitation.
-			// TODO: annotate block list containers with property alias for empty state support.
+			const propertyAlias = list.dataset.umbBlockProperty || '';
+			if (!propertyAlias) return;
+
+			list.appendChild(
+				createEmptyPlaceholder(() => {
+					send({ type: 'umb:ve:block-add-to-property', propertyAlias, insertIndex: 0 });
+				}),
+			);
 		});
 	}
 

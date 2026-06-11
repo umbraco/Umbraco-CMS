@@ -6,6 +6,7 @@ export type UmbVisualEditorGuestMessageHandlers = {
 	'umb:ve:property-selected': (data: { propertyAlias: string }) => void;
 	'umb:ve:block-selected': (data: { blockKey: string; contentTypeAlias: string }) => void;
 	'umb:ve:block-add': (data: { siblingBlockKey: string; insertIndex?: number }) => void;
+	'umb:ve:block-add-to-property': (data: { propertyAlias: string; insertIndex?: number }) => void;
 	'umb:ve:block-add-to-area': (data: { parentBlockKey: string; areaAlias: string; insertIndex?: number }) => void;
 	'umb:ve:block-move': (data: {
 		blockKey: string;
