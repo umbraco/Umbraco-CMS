@@ -98,6 +98,26 @@ import morphdom from 'morphdom';
 	/** Selected region outline color (same as interactive). */
 	const COLOR_SELECTED = COLOR_INTERACTIVE;
 
+
+	// =====================================================================
+	// Drag-sort shared state — declared once at IIFE scope so every handler
+	// across every setupDragSort() run (including post-morph re-runs) closes
+	// over the SAME drag source and drop indicator. Function-local state would
+	// fragment across runs and break drags spanning surviving and new nodes.
+	// =====================================================================
+
+	let dragSrc: HTMLElement | null = null;
+
+	const dropIndicator = document.createElement('div');
+	Object.assign(dropIndicator.style, {
+		height: '3px',
+		background: COLOR_INTERACTIVE,
+		borderRadius: '2px',
+		margin: '2px 0',
+		pointerEvents: 'none',
+		display: 'none',
+	});
+
 	// =====================================================================
 	// Element helpers — extract data attributes from annotated DOM elements
 	// =====================================================================
@@ -647,17 +667,6 @@ import morphdom from 'morphdom';
 	 */
 	function setupDragSort() {
 		const blocks = document.querySelectorAll<HTMLElement>(BLOCK_SELECTOR);
-		let dragSrc: HTMLElement | null = null;
-
-		const dropIndicator = document.createElement('div');
-		Object.assign(dropIndicator.style, {
-			height: '3px',
-			background: COLOR_INTERACTIVE,
-			borderRadius: '2px',
-			margin: '2px 0',
-			pointerEvents: 'none',
-			display: 'none',
-		});
 
 		/** Get the immediate block container for an element. */
 		function getContainer(el: Element): Element | null {
