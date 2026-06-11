@@ -15,6 +15,7 @@ import { VisualEditorBlockManager } from './visual-editor-block-manager.js';
 import { UmbVisualEditorPreviewContext } from './visual-editor-preview.context.js';
 import { UmbVisualEditorMessageRouter } from './visual-editor-message-router.js';
 import { UmbVisualEditorSignalRController } from './visual-editor-signalr.controller.js';
+import { UmbVisualEditorRenderController } from './visual-editor-render.controller.js';
 import { UmbVisualEditorPropertyStructureResolver } from './visual-editor-property-structure.resolver.js';
 import { UMB_VISUAL_EDITOR_PROPERTY_MODAL } from './visual-editor-property-modal.token.js';
 import type {
@@ -78,6 +79,21 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 	#blockManagerPropertyAlias?: string;
 	#currentVariantId?: UmbVariantId;
 
+	#render = new UmbVisualEditorRenderController(this, {
+		getInput: () => {
+			const unique = this.#workspaceContext?.getUnique();
+			if (!unique) return undefined;
+			return {
+				unique,
+				culture: this.#currentVariantId?.culture ?? undefined,
+				segment: this.#currentVariantId?.segment ?? undefined,
+				values: this.#getAllValues().map((v) => ({ alias: v.alias, value: v.value })),
+			};
+		},
+		postRender: (html) => this.#postToIframe({ type: 'umb:ve:render', html }),
+		onError: () => console.warn('[VisualEditor] preview out of date — keeping last good DOM'),
+	});
+
 	/**
 	 * Ensure a block manager exists for the given property.
 	 * Creates a new manager (or reinitializes the existing one) with the property's
@@ -118,6 +134,7 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 			variantId: this.#currentVariantId,
 			onValueChanged: async (alias, value) => {
 				await this.#setPropertyValue(alias, value);
+				this.#afterMutation();
 			},
 		});
 		this.#blockManagerPropertyAlias = propertyAlias;
@@ -362,6 +379,7 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 					areaConfigs,
 				);
 				await this.#setPropertyValue(propertyAlias, updatedValue);
+				this.#afterMutation();
 
 				const hasProperties = await this.#blockHasEditableFields(contentTypeKey, propertyAlias);
 				if (hasProperties) {
@@ -379,6 +397,7 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 					selectedBlockConfig?.settingsElementTypeKey,
 				);
 				await this.#setPropertyValue(propertyAlias, updatedValue);
+				this.#afterMutation();
 
 				const hasProperties = await this.#blockHasEditableFields(contentTypeKey, propertyAlias);
 				if (hasProperties) {
@@ -470,6 +489,11 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 
 	async #setPropertyValue(alias: string, value: unknown) {
 		await this.#workspaceContext?.setPropertyValue(alias, value);
+	}
+
+	#afterMutation() {
+		this.#signalR.suppressSelfReload();
+		this.#render.requestRender();
 	}
 
 	#getAllValues(): Array<{ alias: string; value: unknown }> {
@@ -696,6 +720,7 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 		const entry = result.values.find((v) => v.alias === alias);
 		if (entry !== undefined) {
 			await this.#setPropertyValue(alias, entry.value);
+			this.#afterMutation();
 
 			// Optimistic text update for immediate feedback
 			this.#postToIframe({
@@ -703,8 +728,6 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 				propertyAlias: alias,
 				value: typeof entry.value === 'string' ? entry.value : '',
 			});
-
-
 		}
 	}
 
@@ -725,8 +748,8 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 			}
 
 			await this.#setPropertyValue(found.propertyAlias, updatedBlockValue);
+			this.#afterMutation();
 		}
-
 	}
 
 	// --- Block add ---
@@ -769,6 +792,7 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 				selectedBlockConfig?.settingsElementTypeKey,
 			);
 			await this.#setPropertyValue(propertyAlias, updatedValue);
+			this.#afterMutation();
 
 			const hasProperties = await this.#blockHasEditableFields(contentTypeKey, propertyAlias);
 			if (hasProperties) {
@@ -859,6 +883,7 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 		}
 
 		await this.#setPropertyValue(propertyAlias, updatedValue);
+		this.#afterMutation();
 	}
 
 	// --- Block delete ---
@@ -881,7 +906,7 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 
 		const updatedValue = removeBlockFromValue(found.blockValue, blockKey);
 		await this.#setPropertyValue(found.propertyAlias, updatedValue);
-
+		this.#afterMutation();
 	}
 
 	// --- Block reorder / move ---
@@ -907,7 +932,7 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 			areaConfigs,
 		);
 		await this.#setPropertyValue(found.propertyAlias, updatedValue);
-
+		this.#afterMutation();
 	}
 
 	async #onBlockReorder(blockKey: string, toIndex: number) {
@@ -916,7 +941,7 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 
 		const updatedValue = reorderBlockInValue(found.blockValue, blockKey, toIndex);
 		await this.#setPropertyValue(found.propertyAlias, updatedValue);
-
+		this.#afterMutation();
 	}
 
 	// --- Preview URL ---

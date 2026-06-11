@@ -11,10 +11,19 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 export class UmbVisualEditorSignalRController extends UmbControllerBase {
 	#connection?: HubConnection;
 	#onRefreshed: (documentKey: string) => void;
+	#suppressUntil = 0;
 
 	constructor(host: UmbControllerHost, onRefreshed: (documentKey: string) => void) {
 		super(host);
-		this.#onRefreshed = onRefreshed;
+		this.#onRefreshed = (documentKey) => {
+			if (Date.now() < this.#suppressUntil) return;
+			onRefreshed(documentKey);
+		};
+	}
+
+	/** Ignore `refreshed` events for the given window — used right after a local save so the editor doesn't full-reload its own change. */
+	suppressSelfReload(durationMs = 4000) {
+		this.#suppressUntil = Date.now() + durationMs;
 	}
 
 	async connect(serverUrl: string) {
