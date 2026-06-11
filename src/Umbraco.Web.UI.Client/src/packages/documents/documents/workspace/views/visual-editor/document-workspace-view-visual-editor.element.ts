@@ -15,6 +15,7 @@ import { VisualEditorBlockManager } from './visual-editor-block-manager.js';
 import { UmbVisualEditorPreviewContext } from './visual-editor-preview.context.js';
 import { UmbVisualEditorMessageRouter } from './visual-editor-message-router.js';
 import { UmbVisualEditorSignalRController } from './visual-editor-signalr.controller.js';
+import { UmbVisualEditorPropertyStructureResolver } from './visual-editor-property-structure.resolver.js';
 import { UMB_VISUAL_EDITOR_PROPERTY_MODAL } from './visual-editor-property-modal.token.js';
 import type {
 	UmbVisualEditorPropertyGroup,
@@ -37,7 +38,7 @@ import { UmbPropertyValueCloneController } from '@umbraco-cms/backoffice/propert
 import { UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS } from '@umbraco-cms/backoffice/block-list';
 import { UmbPreviewRepository } from '@umbraco-cms/backoffice/preview';
 import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
-import { DataTypeService, DocumentTypeService } from '@umbraco-cms/backoffice/external/backend-api';
+import { DocumentTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import type { UmbPropertyEditorConfig } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
@@ -70,11 +71,7 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 	#editingPropertyAlias?: string;
 	#editingBlockKey?: string;
 
-	// Cache resolved block property structures by content type key to avoid repeated API calls
-	#blockStructureCache = new Map<
-		string,
-		{ name: string; properties: UmbVisualEditorPropertyInfo[]; groups: UmbVisualEditorPropertyGroup[] }
-	>();
+	#structures = new UmbVisualEditorPropertyStructureResolver(this);
 
 	// --- Per-property block manager for workspace integration ---
 	#blockManager?: VisualEditorBlockManager;
@@ -87,7 +84,7 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 	 * current block types, config, and value so the standard block workspace can be opened.
 	 */
 	#ensureBlockManager(propertyAlias: string, blockValue: BlockValue): VisualEditorBlockManager {
-		const propStructure = this.#propertyStructures.find((p) => p.alias === propertyAlias);
+		const propStructure = this.#structures.getDocumentProperty(propertyAlias);
 		const config = (propStructure?.config ?? []) as UmbPropertyEditorConfig;
 
 		const blocksConfig = this.#getBlocksConfig(propertyAlias);
@@ -144,7 +141,7 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 			const alias = params.propertyAlias as string;
 			this.#editingPropertyAlias = alias;
 
-			const structure = this.#propertyStructures.find((p) => p.alias === alias);
+			const structure = this.#structures.getDocumentProperty(alias);
 			if (!structure?.editorUiAlias) {
 				return false;
 			}
@@ -192,7 +189,7 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 				name: blockName,
 				properties: blockProperties,
 				groups: blockGroups,
-			} = await this.#resolveBlockPropertyStructures(found.block.contentTypeKey);
+			} = await this.#structures.resolveBlockPropertyStructures(found.block.contentTypeKey);
 
 
 			const blockValues = (found.block.values || []).map((v: { alias: string; value: unknown }) => ({
@@ -207,7 +204,7 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 			let settingsValues: Array<{ alias: string; value: unknown }> | undefined;
 
 			if (blockTypeConfig?.settingsElementTypeKey) {
-				const settingsResult = await this.#resolveBlockPropertyStructures(blockTypeConfig.settingsElementTypeKey);
+				const settingsResult = await this.#structures.resolveBlockPropertyStructures(blockTypeConfig.settingsElementTypeKey);
 				if (settingsResult.properties.length > 0) {
 					let blockValue = found.blockValue;
 					let settingsKey: string | undefined;
@@ -280,7 +277,7 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 				return false;
 			}
 
-			const propStructure = this.#propertyStructures.find((p) => p.alias === this.#pendingAdd!.propertyAlias);
+			const propStructure = this.#structures.getDocumentProperty(this.#pendingAdd!.propertyAlias);
 
 			if (!propStructure?.config) return false;
 
@@ -393,9 +390,6 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 			this.#pendingAdd = undefined;
 		});
 
-	// --- Property structures cache (resolved from content type) ---
-	#propertyStructures: UmbVisualEditorPropertyInfo[] = [];
-
 	constructor() {
 		super();
 
@@ -459,7 +453,10 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 		});
 
 		// Resolve property structures from content type
-		await this.#fetchPropertyStructures();
+		const contentTypeUnique = this.#workspaceContext.getContentTypeUnique();
+		if (contentTypeUnique) {
+			await this.#structures.loadDocumentStructure(contentTypeUnique);
+		}
 
 		// Connect SignalR for live refresh
 		this.#signalR.connect(this.#serverUrl);
@@ -479,123 +476,6 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 		const values = this.#workspaceContext?.getValues();
 		if (!values) return [];
 		return values.map((v) => ({ alias: v.alias, value: v.value }));
-	}
-
-	// --- Property structures ---
-
-	async #fetchPropertyStructures() {
-		if (!this.#workspaceContext) return;
-
-		const contentTypeUnique = this.#workspaceContext.getContentTypeUnique();
-		if (!contentTypeUnique) return;
-
-		// Recursively resolve the full composition chain
-		const fetchedIds = new Set<string>();
-		const toFetch = [contentTypeUnique];
-		const allProperties: Array<{
-			alias: string;
-			name: string;
-			description?: string | null;
-			dataType: { id: string };
-			validation: any;
-		}> = [];
-
-		while (toFetch.length > 0) {
-			const batch = [...toFetch];
-			toFetch.length = 0;
-
-			for (const id of batch) {
-				if (fetchedIds.has(id)) continue;
-				fetchedIds.add(id);
-
-				const { data } = await tryExecute(this, DocumentTypeService.getDocumentTypeById({ path: { id } }));
-				if (!data) continue;
-
-				allProperties.push(...(data.properties ?? []));
-
-				for (const comp of data.compositions ?? []) {
-					if (!fetchedIds.has(comp.documentType.id)) {
-						toFetch.push(comp.documentType.id);
-					}
-				}
-			}
-		}
-
-		this.#propertyStructures = [];
-		for (const prop of allProperties) {
-			let editorUiAlias = '';
-			let config: UmbPropertyEditorConfig | undefined;
-
-			if (prop.dataType.id) {
-				const { data: dtData } = await tryExecute(
-					this,
-					DataTypeService.getDataTypeById({ path: { id: prop.dataType.id } }),
-				);
-				if (dtData) {
-					editorUiAlias = dtData.editorUiAlias ?? '';
-					config = dtData.values as UmbPropertyEditorConfig;
-				}
-			}
-
-			this.#propertyStructures.push({
-				alias: prop.alias,
-				name: prop.name ?? prop.alias,
-				description: prop.description ?? undefined,
-				editorUiAlias,
-				config,
-				validation: prop.validation,
-			});
-		}
-	}
-
-	async #resolveBlockPropertyStructures(
-		contentTypeKey: string,
-	): Promise<{ name: string; properties: UmbVisualEditorPropertyInfo[]; groups: UmbVisualEditorPropertyGroup[] }> {
-		const cached = this.#blockStructureCache.get(contentTypeKey);
-		if (cached) return cached;
-
-		const { data } = await tryExecute(
-			this,
-			DocumentTypeService.getDocumentTypeById({ path: { id: contentTypeKey } }),
-		);
-		if (!data?.properties) return { name: 'Block', properties: [], groups: [] };
-
-		const groups: UmbVisualEditorPropertyGroup[] = (data.containers ?? [])
-			.filter((c) => c.type === 'Group')
-			.map((c) => ({ id: c.id, name: c.name ?? '', sortOrder: c.sortOrder }))
-			.sort((a, b) => a.sortOrder - b.sortOrder);
-
-		const result: UmbVisualEditorPropertyInfo[] = [];
-		for (const prop of data.properties) {
-
-			let editorUiAlias = '';
-			let config: UmbPropertyEditorConfig | undefined;
-
-			if (prop.dataType.id) {
-				const { data: dtData } = await tryExecute(
-					this,
-					DataTypeService.getDataTypeById({ path: { id: prop.dataType.id } }),
-				);
-				if (dtData) {
-					editorUiAlias = dtData.editorUiAlias ?? '';
-					config = dtData.values as UmbPropertyEditorConfig;
-				}
-			}
-
-			result.push({
-				alias: prop.alias,
-				name: prop.name ?? prop.alias,
-				description: prop.description ?? undefined,
-				editorUiAlias: editorUiAlias || 'Umb.PropertyEditorUi.TextBox',
-				config,
-				validation: prop.validation,
-				containerId: prop.container?.id ?? null,
-			});
-		}
-
-		const resolved = { name: data.name ?? 'Block', properties: result, groups };
-		this.#blockStructureCache.set(contentTypeKey, resolved);
-		return resolved;
 	}
 
 	// --- Iframe ---
@@ -731,7 +611,7 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 		this.#selectedPropertyAlias = alias;
 		this.#selectedBlockKey = undefined;
 
-		const structure = this.#propertyStructures.find((p) => p.alias === alias);
+		const structure = this.#structures.getDocumentProperty(alias);
 		if (!structure?.editorUiAlias) return;
 
 		this.#propertyModalRegistration.open({ propertyAlias: alias });
@@ -744,7 +624,7 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 	}
 
 	#getBlocksConfig(propertyAlias: string) {
-		const propStructure = this.#propertyStructures.find((p) => p.alias === propertyAlias);
+		const propStructure = this.#structures.getDocumentProperty(propertyAlias);
 		if (!propStructure?.config) return undefined;
 		return (propStructure.config as Array<{ alias: string; value: unknown }>)?.find(
 			(c) => c.alias === 'blocks',
@@ -774,7 +654,7 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 	 * When propertyAlias is empty, searches all property structures for the block type config.
 	 */
 	async #blockHasEditableFields(contentTypeKey: string, propertyAlias?: string): Promise<boolean> {
-		const { properties } = await this.#resolveBlockPropertyStructures(contentTypeKey);
+		const { properties } = await this.#structures.resolveBlockPropertyStructures(contentTypeKey);
 		if (properties.length > 0) return true;
 
 		// Find settings element type key from block type config
@@ -783,7 +663,7 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 			settingsElementTypeKey = this.#findBlockTypeConfig(propertyAlias, contentTypeKey)?.settingsElementTypeKey;
 		} else {
 			// Search all property structures for a matching block type config
-			for (const prop of this.#propertyStructures) {
+			for (const prop of this.#structures.documentProperties) {
 				const config = this.#findBlockTypeConfig(prop.alias, contentTypeKey);
 				if (config) {
 					settingsElementTypeKey = config.settingsElementTypeKey;
@@ -793,7 +673,7 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 		}
 
 		if (settingsElementTypeKey) {
-			const { properties: settingsProps } = await this.#resolveBlockPropertyStructures(settingsElementTypeKey);
+			const { properties: settingsProps } = await this.#structures.resolveBlockPropertyStructures(settingsElementTypeKey);
 			if (settingsProps.length > 0) return true;
 		}
 
@@ -914,7 +794,7 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 		insertIndex: number,
 		clipboardSelection: Array<string>,
 	) {
-		const propStructure = this.#propertyStructures.find((p) => p.alias === propertyAlias);
+		const propStructure = this.#structures.getDocumentProperty(propertyAlias);
 		if (!propStructure?.editorUiAlias) return;
 
 		const editorUiAlias = propStructure.editorUiAlias;
@@ -971,7 +851,7 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 		const found = this.#findBlock(blockKey);
 		if (!found) return;
 
-		const { name: blockName } = await this.#resolveBlockPropertyStructures(found.block.contentTypeKey);
+		const { name: blockName } = await this.#structures.resolveBlockPropertyStructures(found.block.contentTypeKey);
 		try {
 			await umbConfirmModal(this, {
 				headline: this.localize.term('blockEditor_confirmDeleteBlockTitle', blockName),
