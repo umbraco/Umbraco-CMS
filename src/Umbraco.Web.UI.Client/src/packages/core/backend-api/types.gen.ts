@@ -3335,7 +3335,6 @@ export type ProfilingStatusResponseModel = {
 
 export type PropertyTypeAppearanceModel = {
     labelOnTop: boolean;
-    editableInVisualEditor: boolean;
 };
 
 export type PropertyTypeValidationModel = {
@@ -4594,6 +4593,24 @@ export type VerifyResetPasswordResponseModel = {
 export type VerifyResetPasswordTokenRequestModel = {
     user: ReferenceByIdModel;
     resetCode: string;
+};
+
+export type VisualEditorPropertyValueModel = {
+    alias: string;
+    value?: unknown;
+    culture?: null | string;
+    segment?: null | string;
+};
+
+export type VisualEditorRenderRequestModel = {
+    unique: string;
+    culture?: null | string;
+    segment?: null | string;
+    values: Array<VisualEditorPropertyValueModel>;
+};
+
+export type VisualEditorRenderResponseModel = {
+    html: string;
 };
 
 export type WebhookEventModel = {
@@ -20732,6 +20749,33 @@ export type PostUserGroupByIdUsersResponses = {
      */
     200: unknown;
 };
+
+export type PostVisualEditorRenderData = {
+    body: VisualEditorRenderRequestModel;
+    path?: never;
+    query?: never;
+    url: '/umbraco/management/api/v1/visual-editor/render';
+};
+
+export type PostVisualEditorRenderErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+};
+
+export type PostVisualEditorRenderResponses = {
+    /**
+     * OK
+     */
+    200: VisualEditorRenderResponseModel;
+};
+
+export type PostVisualEditorRenderResponse = PostVisualEditorRenderResponses[keyof PostVisualEditorRenderResponses];
 
 export type GetItemWebhookData = {
     body?: never;

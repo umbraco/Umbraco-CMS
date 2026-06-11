@@ -38519,6 +38519,76 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/visual-editor/render": {
+      "post": {
+        "tags": [
+          "Visual Editor"
+        ],
+        "summary": "Renders a document with unsaved visual editor values.",
+        "operationId": "PostVisualEditorRender",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VisualEditorRenderRequestModel"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VisualEditorRenderResponseModel"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": []
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/item/webhook": {
       "get": {
         "tags": [
@@ -53130,6 +53200,72 @@
             "$ref": "#/components/schemas/ReferenceByIdModel"
           },
           "resetCode": {
+            "type": "string"
+          }
+        }
+      },
+      "VisualEditorPropertyValueModel": {
+        "required": [
+          "alias"
+        ],
+        "type": "object",
+        "properties": {
+          "alias": {
+            "type": "string"
+          },
+          "value": {},
+          "culture": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "segment": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "VisualEditorRenderRequestModel": {
+        "required": [
+          "unique",
+          "values"
+        ],
+        "type": "object",
+        "properties": {
+          "unique": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "culture": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "segment": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "values": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VisualEditorPropertyValueModel"
+            }
+          }
+        }
+      },
+      "VisualEditorRenderResponseModel": {
+        "required": [
+          "html"
+        ],
+        "type": "object",
+        "properties": {
+          "html": {
             "type": "string"
           }
         }
