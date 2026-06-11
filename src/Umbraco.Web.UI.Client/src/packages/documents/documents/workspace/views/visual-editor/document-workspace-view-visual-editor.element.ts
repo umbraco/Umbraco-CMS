@@ -14,6 +14,7 @@ import type { BlockValue } from './visual-editor-block-helper.js';
 import { VisualEditorBlockManager } from './visual-editor-block-manager.js';
 import { UmbVisualEditorPreviewContext } from './visual-editor-preview.context.js';
 import { UmbVisualEditorMessageRouter } from './visual-editor-message-router.js';
+import { UmbVisualEditorSignalRController } from './visual-editor-signalr.controller.js';
 import { UMB_VISUAL_EDITOR_PROPERTY_MODAL } from './visual-editor-property-modal.token.js';
 import type {
 	UmbVisualEditorPropertyGroup,
@@ -35,11 +36,9 @@ import {
 import { UmbPropertyValueCloneController } from '@umbraco-cms/backoffice/property';
 import { UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS } from '@umbraco-cms/backoffice/block-list';
 import { UmbPreviewRepository } from '@umbraco-cms/backoffice/preview';
-import { HubConnectionBuilder } from '@umbraco-cms/backoffice/external/signalr';
 import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 import { DataTypeService, DocumentTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
-import type { HubConnection } from '@umbraco-cms/backoffice/external/signalr';
 import type { UmbPropertyEditorConfig } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
 import { UMB_VARIANT_CONTEXT } from '@umbraco-cms/backoffice/variant';
@@ -56,9 +55,12 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 	#workspaceContext?: typeof UMB_DOCUMENT_WORKSPACE_CONTEXT.TYPE;
 	#previewRepository = new UmbPreviewRepository(this);
 	#previewContext?: UmbVisualEditorPreviewContext;
-	#connection?: HubConnection;
 	#serverUrl = '';
-	#suppressRefresh = false;
+	#signalR = new UmbVisualEditorSignalRController(this, (documentKey) => {
+		if (documentKey === this.#workspaceContext?.getUnique()) {
+			this.#refreshIframe();
+		}
+	});
 
 	// Track selection for restore after iframe refresh
 	#selectedPropertyAlias?: string;
@@ -460,7 +462,7 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 		await this.#fetchPropertyStructures();
 
 		// Connect SignalR for live refresh
-		this.#initSignalR();
+		this.#signalR.connect(this.#serverUrl);
 	}
 
 	// --- Property value access (delegates to workspace context) ---
@@ -702,8 +704,7 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 	override disconnectedCallback() {
 		super.disconnectedCallback();
 		window.removeEventListener('message', this.#messageRouter.onMessage);
-		this.#connection?.stop();
-		this.#connection = undefined;
+		this.#signalR.disconnect();
 	}
 
 	#messageRouter = new UmbVisualEditorMessageRouter({
@@ -1037,33 +1038,6 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 		this._iframeReady = false;
 		this.#previewContext?.setIframeReady(false);
 		this.#setPreviewUrl();
-	}
-
-	// --- SignalR ---
-
-	async #initSignalR() {
-		if (!this.#serverUrl) return;
-
-		if (this.#connection) {
-			await this.#connection.stop();
-			this.#connection = undefined;
-		}
-
-		const hubUrl = `${this.#serverUrl}/umbraco/PreviewHub`;
-		this.#connection = new HubConnectionBuilder().withUrl(hubUrl).build();
-
-		this.#connection.on('refreshed', (payload: string) => {
-			const unique = this.#workspaceContext?.getUnique();
-			if (payload === unique && !this.#suppressRefresh) {
-				this.#refreshIframe();
-			}
-		});
-
-		try {
-			await this.#connection.start();
-		} catch (e) {
-			console.error('[VisualEditor] SignalR connection failed', e);
-		}
 	}
 
 	// --- Render ---
