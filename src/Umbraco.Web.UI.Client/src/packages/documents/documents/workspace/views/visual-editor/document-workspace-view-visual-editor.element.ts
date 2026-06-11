@@ -563,21 +563,8 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 			.map((c) => ({ id: c.id, name: c.name ?? '', sortOrder: c.sortOrder }))
 			.sort((a, b) => a.sortOrder - b.sortOrder);
 
-		// Check if any property has editableInVisualEditor explicitly enabled.
-		// If none do, include all properties (opt-out model — works out of the box).
-		const anyExplicitlyEnabled = data.properties.some((p) => {
-			const a = p.appearance as { editableInVisualEditor?: boolean } | undefined;
-			return a?.editableInVisualEditor === true;
-		});
-
 		const result: UmbVisualEditorPropertyInfo[] = [];
 		for (const prop of data.properties) {
-			// If any property is explicitly opted in, filter to only those.
-			// Otherwise include all properties (opt-out fallback).
-			if (anyExplicitlyEnabled) {
-				const appearance = prop.appearance as { editableInVisualEditor?: boolean } | undefined;
-				if (!appearance?.editableInVisualEditor) continue;
-			}
 
 			let editorUiAlias = '';
 			let config: UmbPropertyEditorConfig | undefined;
@@ -969,8 +956,7 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 
 				updatedValue = mergeBlockValueInto(updatedValue, pastedBlocks, insertIndex);
 				// Advance insert index so subsequent pastes go after the previous
-				const pastedLayoutCount =
-					pastedBlocks.layout[Object.keys(pastedBlocks.layout)[0] ?? '']?.length ?? 0;
+				const pastedLayoutCount = Object.values(pastedBlocks.layout)[0]?.length ?? 0;
 				insertIndex += pastedLayoutCount;
 			}
 		}
