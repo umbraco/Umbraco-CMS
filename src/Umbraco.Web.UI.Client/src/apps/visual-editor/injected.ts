@@ -27,7 +27,10 @@
  * - `umb:ve:clear-selection` — Clear all visual selection
  * - `umb:ve:update-property-text` — Optimistic text update for a property
  * - `umb:ve:select-region` — Programmatically select a region
+ * - `umb:ve:render` — Full re-rendered page HTML; morph <body> in place and re-init regions
  */
+import morphdom from 'morphdom';
+
 (function () {
 	'use strict';
 
@@ -60,6 +63,14 @@
 
 	/** Data attribute added to injected inline-create buttons. */
 	const ADD_BTN_ATTR = 'data-umb-add-block';
+
+	/**
+	 * Tracks elements that already have drag-sort listeners bound. A WeakSet
+	 * (not a DOM attribute) is used because morphdom strips attributes absent
+	 * from the re-rendered HTML on reused nodes, while their event listeners
+	 * survive — an attribute marker would be lost and cause double-binding.
+	 */
+	const dragBound = new WeakSet<Element>();
 
 
 	// =====================================================================
@@ -192,16 +203,18 @@
 	 * - `position: relative` on blocks to anchor the action bar
 	 * - Smooth transition so hover/select state changes feel polished
 	 */
-	document.querySelectorAll<HTMLElement>(ALL_SELECTOR).forEach((el) => {
-		el.style.cursor = 'pointer';
-		el.style.outline = DEFAULT_OUTLINE;
-		el.style.outlineOffset = DEFAULT_OUTLINE_OFFSET;
-		el.style.boxShadow = DEFAULT_BOX_SHADOW;
-		el.style.transition = 'outline 120ms, outline-offset 120ms, box-shadow 120ms';
-		if (isBlock(el)) {
-			el.style.position = el.style.position || 'relative';
-		}
-	});
+	function applyBaselineOutlines() {
+		document.querySelectorAll<HTMLElement>(ALL_SELECTOR).forEach((el) => {
+			el.style.cursor = 'pointer';
+			el.style.outline = DEFAULT_OUTLINE;
+			el.style.outlineOffset = DEFAULT_OUTLINE_OFFSET;
+			el.style.boxShadow = DEFAULT_BOX_SHADOW;
+			el.style.transition = 'outline 120ms, outline-offset 120ms, box-shadow 120ms';
+			if (isBlock(el)) {
+				el.style.position = el.style.position || 'relative';
+			}
+		});
+	}
 
 	// =====================================================================
 	// Highlight styles — outline management for hover/selection states
@@ -414,9 +427,12 @@
 	}
 
 	// Attach action bars to all blocks upfront (hidden via opacity).
-	document.querySelectorAll<HTMLElement>(BLOCK_SELECTOR).forEach((block) => {
-		block.appendChild(createActionBar(block));
-	});
+	function attachActionBars() {
+		document.querySelectorAll<HTMLElement>(BLOCK_SELECTOR).forEach((block) => {
+			if (block.querySelector(`[${ACTION_BAR_ATTR}]`)) return;
+			block.appendChild(createActionBar(block));
+		});
+	}
 
 	/** The block element whose action bar is currently visible, or `null`. */
 	let actionBarTarget: Element | null = null;
@@ -596,6 +612,28 @@
 				}
 			});
 		}
+
+		if (evt.data.type === 'umb:ve:render' && evt.data.html) {
+			const previouslySelected = selectedId;
+
+			const doc = new DOMParser().parseFromString(evt.data.html, 'text/html');
+			// Ignore empty renders (server returns '' when content is unavailable) so the
+			// last good DOM is preserved rather than blanked.
+			if (doc.body && doc.body.children.length > 0) {
+				morphdom(document.body, doc.body, { childrenOnly: true });
+
+				initRegions();
+
+				if (previouslySelected) {
+					document.querySelectorAll<HTMLElement>(ALL_SELECTOR).forEach((el) => {
+						if (getRegionId(el) === previouslySelected) {
+							selectedId = previouslySelected;
+							applyOutline(el, `2px solid ${COLOR_SELECTED}`, '-2px');
+						}
+					});
+				}
+			}
+		}
 	});
 
 	// =====================================================================
@@ -607,7 +645,7 @@
 	 * same-container reordering and cross-container moves (e.g. dragging
 	 * a block from root into an area, or between areas).
 	 */
-	(function () {
+	function setupDragSort() {
 		const blocks = document.querySelectorAll<HTMLElement>(BLOCK_SELECTOR);
 		let dragSrc: HTMLElement | null = null;
 
@@ -651,7 +689,11 @@
 		}
 
 		blocks.forEach((block) => {
+			// Re-assert draggable even on reused nodes — morphdom strips attributes
+			// absent from the re-rendered HTML, but the bound listeners survive.
 			block.setAttribute('draggable', 'true');
+			if (dragBound.has(block)) return;
+			dragBound.add(block);
 
 			block.addEventListener('dragstart', ((e: DragEvent) => {
 				e.stopPropagation();
@@ -746,6 +788,9 @@
 
 		// Make empty areas accept drops
 		document.querySelectorAll<HTMLElement>('.umb-block-grid__area').forEach((area) => {
+			if (dragBound.has(area)) return;
+			dragBound.add(area);
+
 			area.addEventListener('dragover', ((e: DragEvent) => {
 				if (!dragSrc) return;
 				if (isDragOverNestedBlock(e, area)) return;
@@ -787,7 +832,7 @@
 				});
 			}) as EventListener);
 		});
-	})();
+	}
 
 	// =====================================================================
 	// Inline create buttons — styled to match `<uui-button-inline-create>`
@@ -1069,6 +1114,18 @@
 	// Initialization
 	// =====================================================================
 
-	insertAddButtons();
-	discoverRegions();
+	/**
+	 * Apply all per-node setup (outlines, action bars, drag-sort, add buttons,
+	 * region discovery). Safe to re-run after a DOM morph — each step guards
+	 * against duplicating elements or listeners on reused nodes.
+	 */
+	function initRegions() {
+		applyBaselineOutlines();
+		attachActionBars();
+		setupDragSort();
+		insertAddButtons();
+		discoverRegions();
+	}
+
+	initRegions();
 })();

@@ -233,7 +233,8 @@
 		"npm": ">=10.9.2"
 	},
 	"dependencies": {
-		"element-internals-polyfill": "^3.0.2"
+		"element-internals-polyfill": "^3.0.2",
+		"morphdom": "^2.7.8"
 	},
 	"devDependencies": {
 		"@babel/core": "^7.29.0",
