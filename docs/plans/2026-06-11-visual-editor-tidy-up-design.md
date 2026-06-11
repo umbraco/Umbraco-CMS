@@ -1,6 +1,6 @@
 # Visual Editor Tidy-Up — Design
 
-**Status**: Approved design, pending implementation
+**Status**: Implemented (manual smoke pass pending)
 **Date**: 2026-06-11
 **Author**: Rick Butterfield + Claude
 **Scope**: Tidy-up round on `feature/visual-editor` after merging `main` — no new feature phases.
