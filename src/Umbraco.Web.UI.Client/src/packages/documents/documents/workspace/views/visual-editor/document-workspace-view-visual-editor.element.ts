@@ -142,7 +142,7 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 			this.#editingPropertyAlias = alias;
 
 			const structure = this.#structures.getDocumentProperty(alias);
-			if (!structure?.editorUiAlias) {
+			if (!structure?.editorUiAlias || !structure.editableInVisualEditor) {
 				return false;
 			}
 
@@ -615,7 +615,7 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 		this.#selectedBlockKey = undefined;
 
 		const structure = this.#structures.getDocumentProperty(alias);
-		if (!structure?.editorUiAlias) return;
+		if (!structure?.editorUiAlias || !structure.editableInVisualEditor) return;
 
 		this.#propertyModalRegistration.open({ propertyAlias: alias });
 	}

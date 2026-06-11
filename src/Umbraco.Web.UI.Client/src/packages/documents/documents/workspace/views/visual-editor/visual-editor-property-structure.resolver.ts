@@ -40,6 +40,7 @@ export class UmbVisualEditorPropertyStructureResolver extends UmbControllerBase 
 			description?: string | null;
 			dataType: { id: string };
 			validation: any;
+			appearance?: { editableInVisualEditor?: boolean } | null;
 		}> = [];
 
 		while (toFetch.length > 0) {
@@ -73,6 +74,7 @@ export class UmbVisualEditorPropertyStructureResolver extends UmbControllerBase 
 				description: prop.description ?? undefined,
 				editorUiAlias,
 				config,
+				editableInVisualEditor: prop.appearance?.editableInVisualEditor === true,
 				validation: prop.validation,
 			});
 		}

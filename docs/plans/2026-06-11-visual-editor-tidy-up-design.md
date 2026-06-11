@@ -42,9 +42,10 @@ The branch is functionally far ahead of its plan doc (Phases 1–2 complete plus
 ### 2. Strict opt-in semantics
 
 In the element's property-structure resolution:
-- Remove the `anyExplicitlyEnabled` hybrid; filter document properties to `appearance.editableInVisualEditor === true` only.
+- Remove the `anyExplicitlyEnabled` hybrid entirely.
+- Document property METADATA stays unfiltered (it doubles as block-config lookup for `#getBlocksConfig`); enforcement is at the interaction points instead: `#onPropertyClicked` and the property modal `onSetup` both require `editableInVisualEditor === true` (defense-in-depth on top of server-side annotation gating).
 - Remove the filter entirely from block content/settings structure resolution (blocks show all fields).
-- Replace `as { editableInVisualEditor?: boolean }` casts with the typed `UmbPropertyTypeAppearanceModel`.
+- Drop the `as { editableInVisualEditor?: boolean }` casts — the generated API types carry `appearance.editableInVisualEditor` natively; the resolver maps it onto `UmbVisualEditorPropertyInfo.editableInVisualEditor`.
 
 Backend is already strict — no backend change.
 

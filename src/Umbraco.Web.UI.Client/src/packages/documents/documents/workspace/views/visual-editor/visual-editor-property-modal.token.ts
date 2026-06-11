@@ -8,6 +8,7 @@ export interface UmbVisualEditorPropertyInfo {
 	description?: string;
 	editorUiAlias: string;
 	config?: UmbPropertyEditorConfig;
+	editableInVisualEditor?: boolean;
 	validation?: UmbPropertyTypeValidationModel;
 	containerId?: string | null;
 }
