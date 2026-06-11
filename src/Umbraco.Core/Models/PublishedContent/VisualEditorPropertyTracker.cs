@@ -23,6 +23,11 @@ public static class VisualEditorPropertyTracker
     public static void Enable() => _enabled.Value = true;
 
     /// <summary>
+    /// Disables tracking for the current async context. Pair with <see cref="Enable"/> in a finally block.
+    /// </summary>
+    public static void Disable() => _enabled.Value = false;
+
+    /// <summary>
     /// Whether tracking is currently enabled for this async context.
     /// </summary>
     public static bool IsEnabled => _enabled.Value;

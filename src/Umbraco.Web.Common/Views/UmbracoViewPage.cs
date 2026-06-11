@@ -144,7 +144,7 @@ public abstract class UmbracoViewPage<TModel> : RazorPage<TModel>
         if (propertyAccess.HasValue
             && value is not null
             && _attributeDepth == 0
-            && (UmbracoContext?.InPreviewMode ?? false))
+            && ((UmbracoContext?.InPreviewMode ?? false) || VisualEditorPropertyTracker.IsEnabled))
         {
             var access = propertyAccess.Value;
             var escapedAlias = System.Web.HttpUtility.HtmlAttributeEncode(access.Alias);

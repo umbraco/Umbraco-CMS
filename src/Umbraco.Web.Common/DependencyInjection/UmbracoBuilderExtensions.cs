@@ -343,6 +343,7 @@ public static partial class UmbracoBuilderExtensions
             .AddCheck<UmbracoReadinessHealthCheck>("umbraco-ready", tags: [UmbracoReadinessHealthCheck.ReadyTag]);
 
         builder.Services.AddUnique<ITemplateRenderer, TemplateRenderer>();
+        builder.Services.AddTransient<IVisualEditorRenderService, VisualEditorRenderService>();
         builder.Services.AddUnique<IPublicAccessChecker, PublicAccessChecker>();
 
         builder.Services.AddSingleton<ContentModelBinder>();
