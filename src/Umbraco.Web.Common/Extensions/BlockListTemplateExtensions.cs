@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.PublishedContent;
 
@@ -9,6 +10,12 @@ public static class BlockListTemplateExtensions
 {
     public const string DefaultFolder = "blocklist/";
     public const string DefaultTemplate = "default";
+
+    /// <summary>
+    /// ViewData key under which the block list property alias is passed to the partial view,
+    /// enabling the visual editor to annotate (and offer block creation on) empty block lists.
+    /// </summary>
+    public const string PropertyAliasViewDataKey = "umbBlockListPropertyAlias";
 
     #region Async
 
@@ -23,7 +30,7 @@ public static class BlockListTemplateExtensions
     }
 
     public static async Task<IHtmlContent> GetBlockListHtmlAsync(this IHtmlHelper html, IPublishedProperty property, string template = DefaultTemplate)
-        => await GetBlockListHtmlAsync(html, property.GetValue() as BlockListModel, template);
+        => await GetBlockListHtmlAsync(html, property.GetValue() as BlockListModel, template, property.Alias);
 
     public static async Task<IHtmlContent> GetBlockListHtmlAsync(this IHtmlHelper html, IPublishedContent contentItem, string propertyAlias)
         => await GetBlockListHtmlAsync(html, contentItem, propertyAlias, DefaultTemplate);
@@ -31,8 +38,12 @@ public static class BlockListTemplateExtensions
     public static async Task<IHtmlContent> GetBlockListHtmlAsync(this IHtmlHelper html, IPublishedContent contentItem, string propertyAlias, string template)
     {
         IPublishedProperty property = GetRequiredProperty(contentItem, propertyAlias);
-        return await GetBlockListHtmlAsync(html, property.GetValue() as BlockListModel, template);
+        return await GetBlockListHtmlAsync(html, property.GetValue() as BlockListModel, template, propertyAlias);
     }
+
+    private static async Task<IHtmlContent> GetBlockListHtmlAsync(IHtmlHelper html, BlockListModel? model, string template, string propertyAlias)
+        => await html.PartialAsync(DefaultFolderTemplate(template), model, WithPropertyAlias(html, propertyAlias));
+
     #endregion
 
     #region Sync
@@ -48,7 +59,7 @@ public static class BlockListTemplateExtensions
     }
 
     public static IHtmlContent GetBlockListHtml(this IHtmlHelper html, IPublishedProperty property, string template = DefaultTemplate)
-        => GetBlockListHtml(html, property.GetValue() as BlockListModel, template);
+        => GetBlockListHtml(html, property.GetValue() as BlockListModel, template, property.Alias);
 
     public static IHtmlContent GetBlockListHtml(this IHtmlHelper html, IPublishedContent contentItem, string propertyAlias)
         => GetBlockListHtml(html, contentItem, propertyAlias, DefaultTemplate);
@@ -56,10 +67,16 @@ public static class BlockListTemplateExtensions
     public static IHtmlContent GetBlockListHtml(this IHtmlHelper html, IPublishedContent contentItem, string propertyAlias, string template)
     {
         IPublishedProperty property = GetRequiredProperty(contentItem, propertyAlias);
-        return GetBlockListHtml(html, property.GetValue() as BlockListModel, template);
+        return GetBlockListHtml(html, property.GetValue() as BlockListModel, template, propertyAlias);
     }
 
+    private static IHtmlContent GetBlockListHtml(IHtmlHelper html, BlockListModel? model, string template, string propertyAlias)
+        => html.Partial(DefaultFolderTemplate(template), model, WithPropertyAlias(html, propertyAlias));
+
     #endregion
+
+    private static ViewDataDictionary WithPropertyAlias(IHtmlHelper html, string propertyAlias)
+        => new(html.ViewData) { [PropertyAliasViewDataKey] = propertyAlias };
 
     private static string DefaultFolderTemplate(string template) => $"{DefaultFolder}{template}";
 

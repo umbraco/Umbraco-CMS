@@ -1,15 +1,20 @@
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockListModel>
 @{
-    if (Model?.Any() != true) { return; }
+    var propertyAlias = ViewData[Umbraco.Extensions.BlockListTemplateExtensions.PropertyAliasViewDataKey] as string;
+    var annotate = (UmbracoContext?.InPreviewMode ?? false) && !string.IsNullOrEmpty(propertyAlias);
+    if (Model?.Any() != true && !annotate) { return; }
 }
-<div class="umb-block-list">
-    @foreach (var block in Model)
+<div class="umb-block-list" data-umb-block-property="@(annotate ? propertyAlias : null)">
+    @if (Model is not null)
     {
-        if (block?.ContentKey == null) { continue; }
-        var data = block.Content;
+        foreach (var block in Model)
+        {
+            if (block?.ContentKey == null) { continue; }
+            var data = block.Content;
 
-        <div data-umb-block-key="@block.ContentKey" data-umb-content-type="@data.ContentType.Alias">
-            @await Html.PartialAsync("blocklist/Components/" + data.ContentType.Alias, block)
-        </div>
+            <div data-umb-block-key="@block.ContentKey" data-umb-content-type="@data.ContentType.Alias">
+                @await Html.PartialAsync("blocklist/Components/" + data.ContentType.Alias, block)
+            </div>
+        }
     }
 </div>
