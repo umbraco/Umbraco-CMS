@@ -1,6 +1,6 @@
 # Visual Editor — Partial Re-render (Phase 3 remainder) — Design
 
-**Status**: Approved design; **gated on conversion spike** (must pass before the full implementation plan is written)
+**Status**: Approved design; **conversion spike PASSED 2026-06-11** (TextBox, Rich Text, Block List all convert editor→published without saving). Ready for the implementation plan.
 **Date**: 2026-06-11
 **Author**: Rick Butterfield + Claude
 **Scope**: The "Still to build" items of Phase 3 in `docs/plans/visual-page-builder.md` — server-side partial re-render with unsaved values, and client-side DOM patching. Block manipulation itself is already done.
@@ -47,11 +47,16 @@ The base is the **draft** content the iframe already renders (preview-mode cache
 
 | Unit | Project | Responsibility |
 |---|---|---|
-| `PropertyOverridePublishedContent` | `Umbraco.Web.Common` | `IPublishedContent` decorator. For each overridden alias it returns an override `IPublishedProperty` whose value is produced by running the editor-format value through `IDataValueEditor.FromEditor` → the property type's `IPropertyValueConverter` (the conversion path proven by the BlockPreview community package, §2.3). All non-overridden members delegate to the inner draft content. Variant-aware (override applies to the requested culture/segment). |
-| `IVisualEditorRenderService` + impl | `Umbraco.Web.Common` | Renders a supplied `IPublishedContent` to an HTML string. Modeled on `TemplateRenderer` (`src/Umbraco.Web.Common/Templates/TemplateRenderer.cs`): build an `IPublishedRequest` via `IPublishedRouter`, `SetPublishedContent(overriddenContent)`, set culture/segment + template, swap onto `UmbracoContext.PublishedRequest`, render the template view to a `StringWriter`, restore. Forces preview mode + enables `VisualEditorPropertyTracker` for the render scope so annotations are emitted. |
-| `RenderVisualEditorController` | `Umbraco.Cms.Api.Management` | `POST /umbraco/management/api/v1/visual-editor/render`, `[Authorize(Policy = BackOfficeAccess)]`. Ensures an `UmbracoContext`, resolves the draft content for `unique`, builds the decorator from the request `values`, calls the render service, returns `{ html }`. |
+| Override-content builder (conversion) | `Umbraco.PublishedCache.HybridCache` (or a public seam exposed from it) | Produce an `IPublishedContent` representing the draft + unsaved overrides. **Approach proven by the spike** (and mirroring the in-tree `BlockElementService.BuildElementAsync`): for each overridden alias, run the editor-format value through `dataType.Editor.GetValueEditor().FromEditor(new ContentPropertyData(value, dataType.ConfigurationObject), null)` to get the source value; reuse the existing saved source values (`property.GetValue(published)`) for non-overridden aliases; assemble `PropertyData[]` → `ContentData` → `ContentCacheNode` → `IPublishedContentFactory.ToIPublishedContent(node, preview: true).CreateModel(...)`. Threads `Culture`/`Segment` onto `PropertyData` and sets `ContentData.CultureInfos` for variant content. **Not** a `GetProperty` decorator — a cache-node rebuild. (`IPublishedContentFactory` is `internal` to HybridCache, hence this unit lives there or a small public seam is added — resolved in the plan.) |
+| `IVisualEditorRenderService` + impl | `Umbraco.Web.Common` | Renders a supplied `IPublishedContent` to an HTML string. Modeled on `TemplateRenderer` (`src/Umbraco.Web.Common/Templates/TemplateRenderer.cs`): build an `IPublishedRequest` via `IPublishedRouter`, `SetPublishedContent(overriddenContent)`, set culture/segment + template, swap onto `UmbracoContext.PublishedRequest`, render the template view to a `StringWriter`, restore. Forces preview mode + enables `VisualEditorPropertyTracker` for the render scope so annotations are emitted. RTE-embedded blocks render via the partial-view block engine, which this render context satisfies. |
+| `RenderVisualEditorController` | `Umbraco.Cms.Api.Management` | `POST /umbraco/management/api/v1/visual-editor/render`, `[Authorize(Policy = BackOfficeAccess)]`. Ensures an `UmbracoContext`, resolves the draft content for `unique`, builds the override content from the request `values`, calls the render service, returns `{ html }`. |
 
-**Highest risk — the value conversion.** Turning the workspace's editor-format value (block JSON, RTE HTML, media key/UDI, plain string) into the published value a template expects is the crux. It mirrors BlockPreview's `BlockDataConverter` (`FromEditor` + value converter). This is gated by a spike (below) before the full plan is written.
+**Value conversion — DE-RISKED by the spike (2026-06-11).** All three property kinds convert correctly via `IPublishedContentFactory.ToIPublishedContent`:
+- **TextBox** — `FromEditor` → string source → published string. Clean.
+- **Rich Text** — `FromEditor` → source JSON → `RteBlockRenderingValueConverter`; all link/url/image parsing happens at value-conversion time (no `IPublishedRequest` needed). RTE-*embedded blocks* additionally use the partial-view block engine at render time (covered by the full-page render context — smoke-test specifically).
+- **Block List** — `FromEditor` source IS the block JSON; the converter resolves element types from the published content-type cache (no parent content / `IPublishedRequest` needed). Blocks need an `Expose` entry for the relevant culture/segment to surface.
+
+Recommended primitive: reuse `IPublishedContentFactory` rather than hand-assembling per property. Variant content must populate `PropertyData` per culture/segment + `ContentData.CultureInfos`, and read-time resolution depends on the ambient `IVariationContextAccessor`.
 
 ## Client components
 
@@ -76,16 +81,16 @@ The base is the **draft** content the iframe already renders (preview-mode cache
 
 ## Testing
 
-- **Backend integration test** (the riskiest, and testable C#, unlike the UI surface): in `Umbraco.Tests.Integration`, render a seeded document through the render service with `PropertyOverridePublishedContent` overrides for a TextBox, an RTE, and a Block List property; assert the rendered HTML reflects the overridden values and carries the expected `data-umb-*` annotations.
+- **Backend integration test** (the riskiest, and testable C#, unlike the UI surface): the spike's throwaway test at `tests/Umbraco.Tests.Integration/Umbraco.Infrastructure/PropertyEditors/VisualEditorConversionSpikeTests.cs` (uncommitted) is the basis — the plan's first task formalizes it into a real test of the override-content builder for TextBox, RTE, and Block List (assert converted-without-saving == save-then-read). A second test renders a seeded document through the render service and asserts the HTML reflects overridden values and carries `data-umb-*` annotations.
 - **Frontend**: `npm run build` + `npm run lint` + manual smoke (no VE test harness exists; consistent with the prior phase).
 
-## Spike gate (must pass before the full implementation plan)
+## Spike outcome (2026-06-11) — PASSED
 
-Before writing the multi-task plan, validate the conversion + render feasibility as a standalone, throwaway investigation (most cheaply as a rough integration test in `Umbraco.Tests.Integration` that boots Umbraco on SQLite):
+A throwaway integration test (`VisualEditorConversionSpikeTests`, uncommitted) booted Umbraco on SQLite, seeded a doc with TextBox + Rich Text + Block List, and proved that each property's editor-format value converts to the correct published value **without saving**, via `FromEditor` + `IPublishedContentFactory.ToIPublishedContent`. All 3 assertions passed (convert-without-saving == save-then-read). Findings folded into "Server components" above:
 
-1. Construct/seed a document with a TextBox, an RTE, and a Block List property and an assigned template.
-2. Build a first-cut `PropertyOverridePublishedContent` that overrides each with an editor-format value via `FromEditor` + the property value converter.
-3. Render the template to a string via a render-service prototype (clone of `TemplateRenderer`) in preview mode with the tracker enabled.
-4. Assert the output reflects the overridden values for all three property kinds and contains `data-umb-property` / `data-umb-block-key` annotations.
+- Conversion primitive: `IPublishedContentFactory` (HybridCache, `internal`) — plan must resolve the access seam.
+- Approach is a cache-node rebuild, **not** a `GetProperty` decorator (in-tree precedent: `BlockElementService`).
+- Variants: thread `Culture`/`Segment` + `ContentData.CultureInfos`; read-time needs `IVariationContextAccessor`.
+- Render-to-string is independently de-risked by the existing `TemplateRenderer`; RTE-embedded-block partials are the one spot needing the render context (not the value conversion).
 
-**Report the spike result before committing to the full plan.** If the conversion path proves materially harder than BlockPreview's (e.g. block context resolution, variant edge cases), revise the design (fallback options: isolated-block render for blocks only, or accept save-and-reload for blocks while properties use re-render).
+No design fallback required — the approach is viable as chosen.
