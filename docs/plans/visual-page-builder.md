@@ -1,7 +1,7 @@
 # Visual Page Builder for Umbraco CMS
 
-**Status**: PoC Complete — click-to-edit properties with live preview updates working end-to-end
-**Date**: 2026-03-16
+**Status**: Phases 1–2 complete; block manipulation (add/remove/reorder/cross-area move, clipboard paste, settings editing) implemented. Tidy-up round 2026-06-11 — see `2026-06-11-visual-editor-tidy-up-design.md`.
+**Date**: 2026-03-16 (last updated 2026-06-11)
 **Author**: Rick Butterfield + Claude
 
 ---
@@ -1228,15 +1228,18 @@ The visual editor tab should only appear when:
 
 **What's remaining:**
 - Block editing should ideally open the existing `UMB_BLOCK_WORKSPACE_MODAL` (full workspace with tabs, settings, validation) rather than our custom property list modal
-- Block catalogue modal (`UMB_BLOCK_CATALOGUE_MODAL`) should be used for the "add block" type picker instead of auto-selecting the first type
-- Block value write-back via block manager context (currently uses raw JSON manipulation)
+- ~~Block catalogue modal (`UMB_BLOCK_CATALOGUE_MODAL`) should be used for the "add block" type picker~~ — DONE: the routed catalogue modal is used (with clipboard paste support); single-block-type properties skip it deliberately
+- Block value write-back via block manager context (currently uses raw JSON manipulation via `visual-editor-block-helper.ts`)
 
-### Phase 3: Block Manipulation + Partial Re-render
+### Phase 3: Block Manipulation + Partial Re-render (Block Manipulation COMPLETE)
 
 **Goal**: Blocks can be added, removed, and reordered visually. Changed regions re-render without full page reload.
 
-**What to build:**
-- Block add/remove/reorder via visual UI (overlay "+" buttons, drag handles)
+**Done:**
+- Block add (inline "+" buttons + catalogue modal, including empty-list and empty-area placeholders), remove (confirm dialog), reorder, and cross-area move via drag-and-drop
+- Clipboard paste with translator compatibility checks and expose entries
+
+**Still to build:**
 - Partial re-render API endpoint (extends BlockPreview pattern)
 - `PropertyOverridePublishedContent` decorator for rendering with unsaved values
 - Guest script DOM patching for partial updates
@@ -1423,15 +1426,12 @@ The visual editor tab should only appear when:
    - **Answer**: Automatic annotation via the Razor pipeline. `Value<T>()` records the access, `Write(string?)` wraps the output. Zero template changes needed for text properties. The editor-alias convention filters to safe property types only.
 
 11. **Standalone window vs embedded workspace view?**
-    - **Answer**: Standalone window. The visual editor will run as a separate app entry point (like `umb-preview`) in its own browser tab/window. Editing modals appear directly over the preview — no tab-switching. See [Architecture Evolution: Standalone Window](#10-architecture-evolution-standalone-window) for full design.
+    - **Answer (revised 2026-06-11)**: Embedded workspace view is the current architecture. The standalone window evolution (§10) is **deferred** — it remains a possible future direction but is not the next step.
 
 ### Still Open
 
-5. **Property type setting vs editor-alias convention for controlling annotation?**
-   - Current: hard-coded list of editor aliases (TextBox, TextArea, RichText, MarkdownEditor)
-   - Alternative: property type appearance setting "Editable in Visual Editor" — more flexible, allows per-property control
-   - Requires: backend model change, migration, API DTO, frontend toggle in property type settings
-   - Recommendation: Start with convention, add the setting in Phase 2 if needed
+5. **~~Property type setting vs editor-alias convention for controlling annotation?~~**
+   - **Answer**: Property type setting. `EditableInVisualEditor` is implemented end-to-end (DB column + migration, `IPropertyType`, Management API `appearance.editableInVisualEditor`, settings toggle). Semantics are **strict opt-in** for document properties: only flagged properties are annotated/editable. Block content/settings properties are NOT filtered — the block editing modal shows all of the element type's fields.
 
 6. **Should the visual editor be the default view for documents with templates?**
    - Current: opt-in tab (weight 150, between Content at 200 and Info at 100)
@@ -1457,7 +1457,9 @@ The visual editor tab should only appear when:
 
 ---
 
-## 10. Architecture Evolution: Standalone Window
+## 10. Architecture Evolution: Standalone Window (Deferred)
+
+> **Deferred 2026-06-11** — the embedded workspace view is the current architecture; this section is kept as a possible future direction.
 
 ### 10.1 Motivation
 
@@ -1955,6 +1957,7 @@ The existing `PreviewAuthenticationMiddleware`, `VisualEditorPropertyTracker`, a
 | `data-umb-content-type` | `blocklist/default.cshtml` | Alias | Block's content type alias |
 | `data-element-key` | `blockgrid/items.cshtml` (existing) | GUID | Block content key (Block Grid) |
 | `data-content-element-type-alias` | `blockgrid/items.cshtml` (existing) | Alias | Block's content type alias (Block Grid) |
+| `data-umb-block-property` | `blocklist/default.cshtml` (preview mode) | Property alias | Block list container annotation enabling empty-state block creation |
 
 **Planned for future phases:**
 
