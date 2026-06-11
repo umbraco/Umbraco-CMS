@@ -6,6 +6,8 @@ export interface UmbUserGroupDetailModel {
 	aliasCanBeChanged: boolean;
 	documentRootAccess: boolean;
 	documentStartNode: { unique: string } | null;
+	elementRootAccess: boolean;
+	elementStartNode: { unique: string } | null;
 	entityType: UmbUserGroupEntityType;
 	fallbackPermissions: Array<string>;
 	hasAccessToAllLanguages: boolean;

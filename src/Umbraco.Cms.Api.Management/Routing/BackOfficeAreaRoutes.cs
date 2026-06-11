@@ -1,8 +1,12 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Api.Management.Controllers.Security;
 using Umbraco.Cms.Api.Management.ServerEvents;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.Routing;
 using Umbraco.Extensions;
@@ -12,26 +16,36 @@ namespace Umbraco.Cms.Api.Management.Routing;
 /// <summary>
 /// Creates routes for the back office area.
 /// </summary>
-public sealed class BackOfficeAreaRoutes : IAreaRoutes
+public sealed class BackOfficeAreaRoutes : SignalRRoutesBase, IAreaRoutes
 {
-    private readonly IRuntimeState _runtimeState;
+    /// <summary>
+    /// Initializes a new instance of the <see cref="BackOfficeAreaRoutes" /> class.
+    /// </summary>
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
+    public BackOfficeAreaRoutes(IRuntimeState runtimeState)
+        : this(
+            runtimeState,
+            StaticServiceProvider.Instance.GetRequiredService<IOptions<SignalRSettings>>())
+    {
+    }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="BackOfficeAreaRoutes" /> class.
     /// </summary>
-    public BackOfficeAreaRoutes(IRuntimeState runtimeState)
-        => _runtimeState = runtimeState;
-
+    public BackOfficeAreaRoutes(IRuntimeState runtimeState, IOptions<SignalRSettings> signalRSettings)
+        : base(runtimeState, signalRSettings)
+    {
+    }
 
     /// <inheritdoc />
     public void CreateRoutes(IEndpointRouteBuilder endpoints)
     {
-        if (_runtimeState.Level is RuntimeLevel.Install or RuntimeLevel.Upgrade or RuntimeLevel.Upgrading or RuntimeLevel.Run)
+        if (RuntimeState.Level is RuntimeLevel.Install or RuntimeLevel.Upgrade or RuntimeLevel.Upgrading or RuntimeLevel.Run)
         {
             MapMinimalBackOffice(endpoints);
 
-            endpoints.MapHub<BackofficeHub>(Constants.System.UmbracoPathSegment + Constants.Web.BackofficeSignalRHub);
-            endpoints.MapHub<ServerEventHub>(Constants.System.UmbracoPathSegment + Constants.Web.ServerEventSignalRHub);
+            endpoints.MapHub<BackofficeHub>(Constants.System.UmbracoPathSegment + Constants.Web.BackofficeSignalRHub, ConfigureHubEndpoint);
+            endpoints.MapHub<ServerEventHub>(Constants.System.UmbracoPathSegment + Constants.Web.ServerEventSignalRHub, ConfigureHubEndpoint);
         }
     }
 

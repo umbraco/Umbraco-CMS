@@ -46,7 +46,8 @@ Enterprise-grade CMS built on .NET 10.0. This repository contains 21 production 
 - **ASP.NET Core** - Web framework
 - **Entity Framework Core** - Modern ORM
 - **OpenIddict** - OAuth 2.0/OpenID Connect authentication
-- **Swashbuckle** - OpenAPI/Swagger documentation
+- **Microsoft.AspNetCore.OpenApi** - OpenAPI document generation
+- **Swashbuckle.AspNetCore.SwaggerUI** - Swagger UI for API documentation
 - **Lucene.NET** - Full-text search via Examine
 - **ImageSharp** - Image processing
 
@@ -198,7 +199,7 @@ Use the format: `Area: Description (closes #IssueID)`
 - Describe the change and its impact
 - Be specific, not vague (describe "a golden retriever" not just "a dog")
 
-**Issue Linking**: Add `(closes #IssueID)` to auto-close linked issues on merge.
+**Issue Linking**: Add `(closes #IssueID)` to the title for readability, AND include a closing keyword on its own line in the PR body (e.g., `Fixes #IssueID`) so GitHub actually auto-links and auto-closes the issue on merge. GitHub only parses closing keywords (`closes`, `fixes`, `resolves`) from the PR body or commit messages — the title suffix is cosmetic and does **not** trigger auto-close on its own.
 
 ### Commit Messages
 
@@ -227,8 +228,10 @@ Project ownership is distributed across teams. Check individual project director
 
 1. **Layered Architecture with Dependency Inversion**
    - Core defines contracts (interfaces)
-   - Infrastructure implements contracts
+   - Infrastructure implements contracts that need Infrastructure-owned machinery
    - Web/APIs consume implementations via DI
+
+   **Where service implementations live**: Services whose dependencies are satisfiable from Core interfaces alone (repositories, scope, config, other Core services) live in `Umbraco.Core/Services/` — this covers the majority of domain services (`MemberService`, `ContentService`, `MediaService`, `ContentTypeService`, `EntityService`, `AuditService`, `ExternalMemberService`, etc.). Service implementations only live in `Umbraco.Infrastructure/Services/Implement/` when they genuinely need Infrastructure concerns — Examine indexes (`ContentSearchService`, `MediaSearchService`, `IndexedEntitySearchService`), log files (`LogViewerRepository`), packaging internals (`PackagingService`), webhook firing (`WebhookFiringService`), distributed-job coordination (`DistributedJobService`). When adding a new service, default to Core and only move to Infrastructure if a concrete dependency forces it.
 
 2. **Interface-First Design**
    - All services defined as interfaces in Core
@@ -364,15 +367,26 @@ public interface IMyService
 
 ### Centralized Package Management
 
-**All NuGet package versions** are centralized in `Directory.Packages.props`. Individual projects do NOT specify versions.
+**NuGet package versions** are centralized in `Directory.Packages.props`. There are two `Directory.Packages.props` files in the source tree, with multi-level merging enabled so the test file inherits from the root:
+
+| File | Scope |
+|------|-------|
+| `Directory.Packages.props` (root) | Production source code packages — referenced by all `src/**` projects |
+| `tests/Directory.Packages.props` | Test-only packages (NUnit, Moq, Bogus, BenchmarkDotNet, etc.) — adds entries on top of the inherited root file |
+
+When updating dependencies, decide which file the package belongs in:
+- A package used only by test projects → `tests/Directory.Packages.props`
+- A package used by any production project (or by both production and tests) → root `Directory.Packages.props`
 
 ```xml
 <!-- Individual projects reference WITHOUT version -->
-<PackageReference Include="Swashbuckle.AspNetCore" />
+<PackageReference Include="Microsoft.AspNetCore.OpenApi" />
 
 <!-- Versions defined in Directory.Packages.props -->
-<PackageVersion Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+<PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.0" />
 ```
+
+**Opt-out**: `src/Umbraco.Web.UI/Umbraco.Web.UI.csproj` sets `<ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>` and specifies versions inline (for `Microsoft.EntityFrameworkCore.Design`, `Microsoft.Build.Tasks.Core`, `Microsoft.ICU.ICU4C.Runtime`, etc.). Update those versions directly in that csproj when bumping. Two further `Directory.Packages.props` files exist under `templates/` for the project/extension templates and have their own version sets — keep `Microsoft.AspNetCore.OpenApi` aligned between the root file and `templates/UmbracoExtension/`.
 
 ### Build Configuration
 
@@ -417,7 +431,8 @@ All APIs use **OpenIddict** (OAuth 2.0/OpenID Connect):
 APIs use `Asp.Versioning.Mvc`:
 - Management API: `/umbraco/management/api/v{version}/*`
 - Delivery API: `/umbraco/delivery/api/v{version}/*`
-- OpenAPI/Swagger docs per version
+- OpenAPI docs: `/umbraco/openapi/management.json`, `/umbraco/openapi/delivery.json`
+- Swagger UI: `/umbraco/openapi/`
 
 ### Updating `OpenApi.json` (Management API)
 
@@ -433,6 +448,14 @@ When a PR changes Management API controllers or models, the `OpenApi.json` file 
 
 The backoffice is published to npm as `@umbraco-cms/backoffice`. Runtime dependencies are provided via importmap; npm peerDependencies provide types only. For full details on dependency hoisting, version range logic, and plugin development, see `/src/Umbraco.Web.UI.Client/CLAUDE.md` → "npm Package Publishing".
 
+### SQL Server 2100-parameter limit
+
+Any `WHERE IN (@0, @1, ...)` built from a runtime-sized collection risks hitting SQL Server's 2100-parameter ceiling and throwing `SqlException` 8003 in production.
+
+Batch with `IEnumerable<T>.InGroupsOf(Constants.Sql.MaxParameterCount)` or `Database.FetchByGroups(...)` whenever the collection size is driven by user data — not just when it currently fits. Watch for products of two scaling dimensions (documents × languages, properties × versions) and config-tunable batch sizes whose defaults are safe but ceilings aren't.
+
+Full guidance, safe patterns and decision rule: see `/src/Umbraco.Infrastructure/CLAUDE.md` → "Avoiding the SQL Server 2100-parameter limit".
+
 ### Known Limitations
 
 1. **Circular Dependencies**: Avoided via `Lazy<T>` or event notifications
@@ -441,29 +464,40 @@ The backoffice is published to npm as `@umbraco-cms/backoffice`. Runtime depende
 
 ---
 
-## 7. CI/CD — Claude Automated PR Review
+## 7. CI/CD — Claude AI Assistant
 
-Two GitHub Actions workflows provide automated code review using `anthropics/claude-code-action@v1` and the `umb-review` skill (`.claude/skills/umb-review/SKILL.md`). Reviews are advisory only — they do not block merging.
+Two GitHub Actions workflows powered by `anthropics/claude-code-action@v1`. Advisory only — does not block merging.
 
 ### Workflows
 
 | File | Trigger | Purpose |
 |------|---------|---------|
-| `claude-review-auto.yml` | `pull_request_target` + `workflow_dispatch` | Auto-review on PR open/push; manual re-run by PR number |
-| `claude-review-on-demand.yml` | `issue_comment` (`@claude review`) | On-demand review triggered by collaborator comment |
+| `claude-review.yml` | `pull_request: [opened, ready_for_review]` | Auto-review every non-draft PR using the `umb-review` skill |
+| `claude.yml` | `@claude` comments, issue assign/label | Interactive assistant for PRs and issues |
 
-### Key Design Decisions
+### Auto-Review (`claude-review.yml`)
 
-- **`pull_request_target`** (not `pull_request`) — runs in base repo context so it has write access for fork PRs. Checkout must explicitly use `refs/pull/{n}/head` to get the PR code.
-- **`fetch-depth: 0`** — the umb-review skill uses `git diff {target}...HEAD` (triple-dot), which requires the merge base. Shallow clones break this.
-- **SHA dedup** — the auto workflow checks existing PR comments for `Based on commit \`{full-sha}\`` to skip re-reviews of the same commit. Uses `github.paginate()` to handle PRs with many comments.
-- **Permission gate** (on-demand) — `admin`, `maintain`, and `write` collaborators can trigger; others are silently ignored.
-- **Concurrency** — one review at a time per PR number; new pushes cancel in-progress reviews.
-- **Skip conditions** — draft PRs, PRs with >150 changed files.
+Runs the full `.claude/skills/umb-review/SKILL.md` procedure on every newly opened or un-drafted PR. Produces inline comments per finding and one summary comment with a verdict. Skips draft PRs. No turn limit.
+
+### Interactive (`claude.yml`)
+
+Responds to `@claude` mentions on PRs and issues. The trigger phrase is stripped before Claude sees the message, so:
+
+- `@claude review` → light review using `gh pr diff` (not the umb-review skill)
+- `@claude fix ...` → implements a fix on a new branch
+- `@claude help` → answers questions about the codebase
+- `@claude label` → applies labels
+- `@claude` (empty) → defaults to `review` on PRs, `help` on issues
+
+Also triggers on issue assignment to `claude` or adding the `claude` label. Gated: only runs when `@claude` appears in the comment/issue body. Max 25 turns.
+
+**Allowed Bash tools**: `gh`, `git`, `npm`, `dotnet` (interactive only; auto-review allows `gh` and `git`).
 
 ### Labels
 
-Both workflows instruct Claude to apply labels based on changed files:
+Both workflows apply labels based on content:
+
+**On PRs** (based on changed files):
 
 | Label | Condition |
 |-------|-----------|
@@ -479,7 +513,50 @@ Both workflows instruct Claude to apply labels based on changed files:
 | `category/ux` | User-facing changes |
 | `category/ui` | UI layer changes |
 
+**On Issues** (based on content): same `area/*` and `category/*` labels, plus `affected/v14` through `affected/v17` and `affected/backoffice`.
+
 Labels are only added, never removed. Claude applies only labels it is confident about.
+
+### Key Implementation Notes
+
+- **Checkout required** — the action internally runs `git fetch origin main` for trusted file restoration. Without `actions/checkout`, it fails with `fatal: not a git repository`.
+- **`id-token: write` permission** — required for OIDC token exchange with the Claude GitHub App.
+- **Trigger phrase stripping** — the action strips `@claude` from comments before passing to Claude. Prompts must reference commands without the prefix (e.g., `review` not `@claude review`).
+- **PR number injection** — the interactive workflow injects the PR/issue number into the prompt via `${{ github.event.issue.number }}` since Claude can't discover it from `gh pr view` when checked out on `main`.
+
+---
+
+## 8. Code Comment Policy
+
+**Default to no comment.** Applies to all code in this repository — C#, TypeScript, Razor, build scripts. Well-named identifiers and small functions are the primary form of self-documentation; comments are a fallback for the rare cases where the code itself cannot carry the meaning.
+
+### When NOT to comment
+
+- **Don't restate what the code does.** A line calling `resetState()` does not need `// Reset state`. A method named `validateInput` does not need `// Validate input`.
+- **Don't narrate a sequence of calls.** If three lines run in order, the order is in the code — don't paraphrase it above.
+- **Don't reference the current task, fix, callers, or PR.** No `// Fix for X`, `// Used by Y`, `// Added for the Z flow`, `// See PR #1234`. That belongs in commit messages and PR descriptions; in source it rots as the codebase evolves.
+
+### When a comment IS justified
+
+Write a comment only when **removing it would leave a future reader confused**. Concretely:
+
+- **A non-obvious WHY.** A hidden constraint, business rule, or ordering requirement that is not visible from the code.
+- **A workaround for a specific bug or platform quirk.** Link the issue (`(#21996)`, `https://...`) so the comment can be deleted once the upstream fix lands.
+- **A subtle invariant** that the type system or method names do not enforce.
+- **An edge case the code intentionally handles** that would surprise a reader (e.g. "must run before X because Y").
+- **API documentation** — XML doc comments on C# members, JSDoc on exported TypeScript symbols. Required for the public contract; still keep them concise.
+
+### TODOs
+
+Allowed, but cheap to write and cheaper to leave behind. Keep them short and trackable: `// TODO (V19): remove once obsolete overload is gone` or `// TODO: pagination [NL]`. A TODO should have an author or a version trigger.
+
+---
+
+## 9. Testing Practices
+
+### Tests for a bug fix must fail before the fix
+
+Verify any test you add for a bug fix actually catches the bug: either write the failing test first (TDD), or temporarily revert the production change and confirm the test fails before re-applying. A test that passes both ways proves nothing. Watch for coincidental passes — default seed/sort orders can make a buggy path produce the right answer for the test's specific inputs; construct inputs so the broken and fixed behaviours give visibly different results.
 
 ---
 
@@ -540,6 +617,8 @@ For detailed information about individual projects, see their CLAUDE.md files:
 - **Core Architecture**: `/src/Umbraco.Core/CLAUDE.md` - Service contracts, notification patterns
 - **API Infrastructure**: `/src/Umbraco.Cms.Api.Common/CLAUDE.md` - OpenAPI, authentication, serialization
 - **Backoffice Frontend**: `/src/Umbraco.Web.UI.Client/CLAUDE.md` - Lit web components, extension system, auth client
+
+**Important**: When working on backoffice client code (anything under `src/Umbraco.Web.UI.Client/`), read `/src/Umbraco.Web.UI.Client/CLAUDE.md` first. It contains action-specific checklists (deprecation, testing, security, etc.) that are not duplicated here.
 
 ### Getting Help
 

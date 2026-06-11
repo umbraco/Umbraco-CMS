@@ -20,11 +20,7 @@ public interface IPublicAccessPresentationFactory
     /// Determines whether the entry is inherited from an ancestor by comparing the entry's protected node key against
     /// <paramref name="contentKey"/>.
     /// </remarks>
-    // TODO (V18): Remove the default implementation.
-    Attempt<PublicAccessResponseModel?, PublicAccessOperationStatus> CreatePublicAccessResponseModel(PublicAccessEntry entry, Guid contentKey)
-#pragma warning disable CS0618 // Type or member is obsolete
-        => CreatePublicAccessResponseModel(entry);
-#pragma warning restore CS0618 // Type or member is obsolete
+    Attempt<PublicAccessResponseModel?, PublicAccessOperationStatus> CreatePublicAccessResponseModel(PublicAccessEntry entry, Guid contentKey);
 
     /// <summary>
     /// Creates a <see cref="PublicAccessResponseModel"/> from a <see cref="PublicAccessEntry"/>.

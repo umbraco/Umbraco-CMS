@@ -234,6 +234,13 @@ export class DocumentApiHelper {
     return await this.create(document);
   }
 
+  async createPublishedDocumentForTemplate(documentName: string, documentTypeName: string, templateId: string) {
+    const documentTypeId = await this.api.documentType.createDocumentTypeWithAllowedTemplate(documentTypeName, templateId, true);
+    const documentId = await this.createDocumentWithTemplate(documentName, documentTypeId, templateId);
+    await this.publish(documentId);
+    return documentId;
+  }
+
   async createDocumentWithContentPicker(documentName: string, documentTypeId: string, contentPickerId: string) {
     await this.ensureNameNotExists(documentName);
 
@@ -1435,6 +1442,61 @@ export class DocumentApiHelper {
     return property.value === blockValue;
   }
 
+  async createDocumentWithMultipleCulturesAndSegmentValues(documentName: string, documentTypeId: string, dataTypeName: string, editorAlias: string, cultures: string[], values: {value: string, culture: string, segment: string | null}[]) {
+    await this.ensureNameNotExists(documentName);
+
+    const documentBuilder = new DocumentBuilder()
+      .withDocumentTypeId(documentTypeId);
+    
+    for (const culture of cultures) {
+      documentBuilder.addVariant()
+        .withName(documentName)
+        .withCulture(culture)
+        .done();
+    }
+    
+    const alias = AliasHelper.toAlias(dataTypeName);
+    for (const value of values) {
+      const valueBuilder = documentBuilder.addValue()
+        .withAlias(alias)
+        .withValue(value.value)
+        .withCulture(value.culture)
+        .withEditorAlias(editorAlias);
+      if (value.segment) {
+        valueBuilder.withSegment(value.segment);
+      }
+      valueBuilder.done();
+    }
+
+    const document = documentBuilder.build();
+    return await this.create(document);
+  }
+
+  async createDocumentWithMultipleSegmentValues(documentName: string, documentTypeId: string, dataTypeName: string, editorAlias: string, values: {value: string, segment: string | null}[]) {
+    await this.ensureNameNotExists(documentName);
+
+    const documentBuilder = new DocumentBuilder()
+      .withDocumentTypeId(documentTypeId)
+      .addVariant()
+        .withName(documentName)
+        .done();
+
+    const alias = AliasHelper.toAlias(dataTypeName);
+    for (const value of values) {
+      const valueBuilder = documentBuilder.addValue()
+        .withAlias(alias)
+        .withValue(value.value)
+        .withEditorAlias(editorAlias);
+      if (value.segment) {
+        valueBuilder.withSegment(value.segment);
+      }
+      valueBuilder.done();
+    }
+
+    const document = documentBuilder.build();
+    return await this.create(document);
+  }
+
   async publishDocumentWithCulture(id: string, culture: string) {
     const publishScheduleData = {
       "publishSchedules":[
@@ -1678,58 +1740,21 @@ export class DocumentApiHelper {
     return notifications.some((notification) => notification.actionId === actionId && notification.subscribed === true);
   }
 
-  async createDocumentWithMultipleCulturesAndSegmentValues(documentName: string, documentTypeId: string, dataTypeName: string, editorAlias: string, cultures: string[], values: {value: string, culture: string, segment: string | null}[]) {
+  async createDocumentWithElementPickers(documentName: string, documentTypeId: string, dataTypeName: string, elementPickerIds: string[]) {
     await this.ensureNameNotExists(documentName);
 
-    const documentBuilder = new DocumentBuilder()
-      .withDocumentTypeId(documentTypeId);
-
-    for (const culture of cultures) {
-      documentBuilder.addVariant()
-        .withName(documentName)
-        .withCulture(culture)
-        .done();
-    }
-
-    const alias = AliasHelper.toAlias(dataTypeName);
-    for (const value of values) {
-      const valueBuilder = documentBuilder.addValue()
-        .withAlias(alias)
-        .withValue(value.value)
-        .withCulture(value.culture)
-        .withEditorAlias(editorAlias);
-      if (value.segment !== null) {
-        valueBuilder.withSegment(value.segment);
-      }
-      valueBuilder.done();
-    }
-
-    const document = documentBuilder.build();
-    return await this.create(document);
-  }
-
-  async createDocumentWithMultipleSegmentValues(documentName: string, documentTypeId: string, dataTypeName: string, editorAlias: string, values: {value: string, segment: string | null}[]) {
-    await this.ensureNameNotExists(documentName);
-
-    const documentBuilder = new DocumentBuilder()
+    const document = new DocumentBuilder()
       .withDocumentTypeId(documentTypeId)
       .addVariant()
         .withName(documentName)
-        .done();
+        .done()
+      .addValue()
+        .withAlias(AliasHelper.toAlias(dataTypeName))
+        .withValue(elementPickerIds)
+        .done()
+      .build();
 
-    const alias = AliasHelper.toAlias(dataTypeName);
-    for (const value of values) {
-      const valueBuilder = documentBuilder.addValue()
-        .withAlias(alias)
-        .withValue(value.value)
-        .withEditorAlias(editorAlias);
-      if (value.segment !== null) {
-        valueBuilder.withSegment(value.segment);
-      }
-      valueBuilder.done();
-    }
-
-    const document = documentBuilder.build();
+    // Create document
     return await this.create(document);
   }
 
@@ -1782,5 +1807,30 @@ export class DocumentApiHelper {
     return culturesAndSegments.map(cs =>
       documentData.values.find(v => v.culture === cs.culture && v.segment === cs.segment)
     );
+  }
+
+  async createPublishedDocumentWithTwoNameVersionsAndTwoTextVersions(originalName: string, updatedName: string, documentTypeName: string, dataTypeName: string, originalText: string, updatedText: string) {
+    const dataTypeData = await this.api.dataType.getByName(dataTypeName);
+    const documentTypeId = await this.api.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
+    const documentId = await this.createDocumentWithTextContent(originalName, documentTypeId, originalText, dataTypeName);
+    await this.publish(documentId);
+    const documentData = await this.get(documentId);
+    documentData.variants[0].name = updatedName;
+    documentData.values[0].value = updatedText;
+    await this.update(documentId, documentData);
+    await this.publish(documentId);
+    return documentId;
+  }
+
+  async doesDocumentWithCultureHaveValue(documentId: string, expectedValue: string, culture: string | null) {
+    const documentData = await this.get(documentId);
+    const valueEntry = documentData.values.find(v => v.culture === culture);
+    expect(valueEntry?.value).toBe(expectedValue);
+  }
+
+  async doesDocumentWithCultureHaveName(documentId: string, expectedName: string, culture: string | null) {
+    const documentData = await this.get(documentId);
+    const variantEntry = documentData.variants.find(v => v.culture === culture);
+    expect(variantEntry?.name).toBe(expectedName);
   }
 }

@@ -22,6 +22,7 @@ export class MemberUiHelper extends UiBaseLocators {
   private readonly membersSidebar: Locator;
   private readonly membersSidebarBtn: Locator;
   private readonly memberTableCollectionRow: Locator;
+  private readonly memberGroupInput: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -44,6 +45,7 @@ export class MemberUiHelper extends UiBaseLocators {
     this.membersSidebar = page.getByTestId('section-sidebar:Umb.SectionSidebarApp.Menu.MemberManagement');
     this.membersSidebarBtn = this.membersSidebar.locator('uui-menu-item').filter({hasText: 'Members'});
     this.memberTableCollectionRow = page.locator('umb-member-table-collection-view').locator('uui-table-row');
+    this.memberGroupInput = page.getByTestId('input-member-group:member-group');
   }
 
   async clickMembersTab() {
@@ -98,6 +100,8 @@ export class MemberUiHelper extends UiBaseLocators {
     await this.clickChooseButton();
     await this.click(this.page.getByText(memberGroupName, {exact: true}));
     await this.clickChooseContainerButton();
+    // Waits until the member group is visible in the member
+    await expect(this.memberGroupInput.filter({hasText: memberGroupName})).toBeVisible();
   }
 
   async doesMemberInfoHaveValue(infoName: string, value: string) {
@@ -131,7 +135,7 @@ export class MemberUiHelper extends UiBaseLocators {
   async clickMembersMenu() {
     await this.click(this.membersMenu);
   }
-  
+
   async goToMembers() {
     await this.goToSection(ConstantHelper.sections.members);
     await this.clickMembersMenu();

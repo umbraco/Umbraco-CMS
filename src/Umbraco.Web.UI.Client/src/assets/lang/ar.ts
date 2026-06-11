@@ -373,16 +373,16 @@ export default {
 		enterFolderName: 'أدخل اسم المجلد',
 		updateData: 'اختر نوعًا وعنوانًا',
 		noDocumentTypes:
-			'لا توجد أنواع وثائق مسموح بها متاحة لإنشاء المحتوى هنا. يجب تمكينها في <strong>أنواع الوثائق</strong> ضمن قسم <strong>الإعدادات</strong>، عن طريق تعديل <strong>أنواع العقد الفرعية المسموح بها</strong> ضمن <strong>الأذونات</strong>.',
+			'لا توجد أنواع وثائق مسموح بها متاحة لإنشاء المحتوى هنا. يجب تمكينها في <strong>أنواع الوثائق</strong> ضمن قسم <strong>الإعدادات</strong>، عن طريق تعديل <strong>أنواع العقد الفرعية المسموح بها</strong> ضمن <strong>الهيكل</strong>.',
 		noDocumentTypesAtRoot:
 			'لا توجد أنواع وثائق متاحة لإنشاء المحتوى هنا. يجب عليك إنشاء هذه الأنواع في <strong>أنواع الوثائق</strong> ضمن قسم <strong>الإعدادات</strong>.',
 		noDocumentTypesWithNoSettingsAccess: 'الصفحة المحددة في شجرة المحتوى لا تسمح بإنشاء أي صفحات أسفلها.',
 		noDocumentTypesEditPermissions: 'تعديل الأذونات لهذا النوع من الوثائق',
 		noDocumentTypesCreateNew: 'إنشاء نوع وثيقة جديد',
 		noDocumentTypesAllowedAtRoot:
-			'لا توجد أنواع وثائق مسموح بها لإنشاء المحتوى هنا. يجب تمكينها في <strong>أنواع الوثائق</strong> ضمن قسم <strong>الإعدادات</strong>، عن طريق تغيير خيار <strong>السماح كجذر</strong> ضمن <strong>الأذونات</strong>.',
+			'لا توجد أنواع وثائق مسموح بها لإنشاء المحتوى هنا. يجب تمكينها في <strong>أنواع الوثائق</strong> ضمن قسم <strong>الإعدادات</strong>، عن طريق تغيير خيار <strong>السماح كجذر</strong> ضمن <strong>الهيكل</strong>.',
 		noMediaTypes:
-			'لا توجد أنواع وسائط مسموح بها لإنشاء الوسائط هنا. يجب تمكينها في <strong>أنواع الوسائط</strong> ضمن قسم <strong>الإعدادات</strong>، عن طريق تعديل <strong>أنواع العقد الفرعية المسموح بها</strong> ضمن <strong>الأذونات</strong>.',
+			'لا توجد أنواع وسائط مسموح بها لإنشاء الوسائط هنا. يجب تمكينها في <strong>أنواع الوسائط</strong> ضمن قسم <strong>الإعدادات</strong>، عن طريق تعديل <strong>أنواع العقد الفرعية المسموح بها</strong> ضمن <strong>الهيكل</strong>.',
 		noMediaTypesWithNoSettingsAccess: 'الوسائط المحددة في الشجرة لا تسمح بإنشاء أي وسائط أخرى أسفلها.',
 		noMediaTypesEditPermissions: 'تعديل الأذونات لهذا النوع من الوسائط',
 		documentTypeWithoutTemplate: 'نوع الوثيقة بدون قالب',
@@ -736,6 +736,7 @@ export default {
 		content: 'محتوى',
 		continue: 'متابعة',
 		copy: 'نسخ',
+		copied: 'تم النسخ!',
 		create: 'إنشاء',
 		cropSection: 'قسم الاقتصاص',
 		database: 'قاعدة بيانات',
@@ -1258,6 +1259,7 @@ export default {
 	},
 	sections: {
 		content: 'المحتوى',
+		library: 'المكتبة',
 		media: 'الوسائط',
 		member: 'الأعضاء',
 		packages: 'الحزم',
@@ -2025,6 +2027,8 @@ export default {
 	redirectUrls: {
 		disableUrlTracker: 'تعطيل تتبع URL',
 		enableUrlTracker: 'تمكين تتبع URL',
+		urlTrackerEnabled: 'ممكّن',
+		urlTrackerDisabled: 'معطّل',
 		culture: 'الثقافة',
 		originalUrl: 'URL الأصلي',
 		redirectedTo: 'تم إعادة التوجيه إلى',

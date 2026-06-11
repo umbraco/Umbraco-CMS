@@ -1,16 +1,13 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Factories;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
-using Umbraco.Cms.Core.Web;
 
 namespace Umbraco.Cms.Infrastructure.Sync;
 
@@ -61,89 +58,6 @@ public class BatchedDatabaseServerMessenger : DatabaseServerMessenger
             machineInfoFactory)
     {
         _requestCache = requestCache;
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="BatchedDatabaseServerMessenger"/> class.
-    /// </summary>
-    /// <param name="mainDom">The <see cref="IMainDom"/> instance managing main domain ownership.</param>
-    /// <param name="cacheRefreshers">A collection of <see cref="ICacheRefresher"/> used to refresh distributed caches.</param>
-    /// <param name="logger">The logger for logging diagnostic and operational information.</param>
-    /// <param name="syncBootStateAccessor">Accessor for the synchronization boot state.</param>
-    /// <param name="hostingEnvironment">Provides information about the hosting environment.</param>
-    /// <param name="cacheInstructionService">Service for handling cache instructions across servers.</param>
-    /// <param name="jsonSerializer">The serializer used for JSON operations.</param>
-    /// <param name="requestCache">The request-level cache implementation.</param>
-    /// <param name="lastSyncedFileManager">Manages the state of the last synchronized file.</param>
-    /// <param name="globalSettings">Monitors and provides access to global settings.</param>
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 18.")]
-    public BatchedDatabaseServerMessenger(
-        IMainDom mainDom,
-        CacheRefresherCollection cacheRefreshers,
-        ILogger<BatchedDatabaseServerMessenger> logger,
-        ISyncBootStateAccessor syncBootStateAccessor,
-        IHostingEnvironment hostingEnvironment,
-        ICacheInstructionService cacheInstructionService,
-        IJsonSerializer jsonSerializer,
-        IRequestCache requestCache,
-        LastSyncedFileManager lastSyncedFileManager,
-        IOptionsMonitor<GlobalSettings> globalSettings)
-        : this(
-            mainDom,
-            cacheRefreshers,
-            logger,
-            syncBootStateAccessor,
-            hostingEnvironment,
-            cacheInstructionService,
-            jsonSerializer,
-            requestCache,
-            StaticServiceProvider.Instance.GetRequiredService<ILastSyncedManager>(),
-            globalSettings,
-            StaticServiceProvider.Instance.GetRequiredService<IMachineInfoFactory>())
-    {
-    }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="BatchedDatabaseServerMessenger" /> class.
-    /// </summary>
-    /// <param name="mainDom">The <see cref="IMainDom"/> instance managing main domain locking.</param>
-    /// <param name="cacheRefreshers">A collection of cache refresher implementations.</param>
-    /// <param name="serverRoleAccessor">Provides access to the current server role.</param>
-    /// <param name="logger">The logger used for diagnostic and operational messages.</param>
-    /// <param name="syncBootStateAccessor">Provides access to the synchronization boot state.</param>
-    /// <param name="hostingEnvironment">The hosting environment abstraction.</param>
-    /// <param name="cacheInstructionService">Service for handling cache instructions.</param>
-    /// <param name="jsonSerializer">The serializer used for JSON operations.</param>
-    /// <param name="requestCache">The request-level cache instance.</param>
-    /// <param name="requestAccessor">Provides access to the current request context.</param>
-    /// <param name="lastSyncedFileManager">Manages the state of the last synchronized file.</param>
-    /// <param name="globalSettings">Monitors the global settings configuration.</param>
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 18.")]
-    public BatchedDatabaseServerMessenger(
-        IMainDom mainDom,
-        CacheRefresherCollection cacheRefreshers,
-        IServerRoleAccessor serverRoleAccessor,
-        ILogger<BatchedDatabaseServerMessenger> logger,
-        ISyncBootStateAccessor syncBootStateAccessor,
-        IHostingEnvironment hostingEnvironment,
-        ICacheInstructionService cacheInstructionService,
-        IJsonSerializer jsonSerializer,
-        IRequestCache requestCache,
-        IRequestAccessor requestAccessor,
-        LastSyncedFileManager lastSyncedFileManager,
-        IOptionsMonitor<GlobalSettings> globalSettings)
-        : this(
-            mainDom,
-            cacheRefreshers,
-            logger,
-            syncBootStateAccessor,
-            hostingEnvironment,
-            cacheInstructionService,
-            jsonSerializer,
-            requestCache,
-            lastSyncedFileManager,
-            globalSettings)
-    {
     }
 
     /// <inheritdoc />

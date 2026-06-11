@@ -43,9 +43,7 @@ internal abstract class ContentListViewServiceBase<TContent, TContentType, TCont
     /// <param name="user">The user to check access for.</param>
     /// <param name="keys">The keys of the content items to filter.</param>
     /// <returns>A set of keys that the user has access to.</returns>
-    // TODO (V18): Make this abstract rather than virtual (it's abstract only to avoid a breaking change).
-    protected virtual Task<ISet<Guid>> FilterAuthorizedKeysAsync(IUser user, IEnumerable<Guid> keys)
-        => Task.FromResult<ISet<Guid>>(new HashSet<Guid>());
+    protected abstract Task<ISet<Guid>> FilterAuthorizedKeysAsync(IUser user, IEnumerable<Guid> keys);
 
     protected async Task<Attempt<ListViewPagedModel<TContent>?, ContentCollectionOperationStatus>> GetListViewResultAsync(
         IUser user,

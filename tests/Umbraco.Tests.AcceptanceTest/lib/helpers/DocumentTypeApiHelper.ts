@@ -609,13 +609,14 @@ export class DocumentTypeApiHelper {
     return await this.create(documentType);
   }
 
-  async createEmptyElementType(elementTypeName: string) {
+  async createEmptyElementType(elementTypeName: string, isAllowedInLibrary: boolean = false) {
     await this.ensureNameNotExists(elementTypeName);
 
     const documentType = new DocumentTypeBuilder()
       .withName(elementTypeName)
       .withAlias(AliasHelper.toAlias(elementTypeName))
       .withIsElement(true)
+      .withAllowedInLibrary(isAllowedInLibrary)
       .withIcon("icon-plugin")
       .build();
 
@@ -683,6 +684,7 @@ export class DocumentTypeApiHelper {
       .withName(elementName)
       .withAlias(AliasHelper.toAlias(elementName))
       .withIsElement(true)
+      .withAllowedInLibrary(true)
       .addContainer()
         .withName(groupName)
         .withId(containerId)
@@ -709,6 +711,7 @@ export class DocumentTypeApiHelper {
       .withName(elementName)
       .withAlias(AliasHelper.toAlias(elementName))
       .withIsElement(true)
+      .withAllowedInLibrary(true)
       .withVariesByCulture(elementTypeVaryByCulture)
       .addContainer()
         .withName(groupName)
@@ -736,6 +739,7 @@ export class DocumentTypeApiHelper {
       .withName(elementName)
       .withAlias(AliasHelper.toAlias(elementName))
       .withIsElement(true)
+      .withAllowedInLibrary(true)
       .addContainer()
         .withName(groupName)
         .withId(containerId)
@@ -763,6 +767,7 @@ export class DocumentTypeApiHelper {
       .withName(elementName)
       .withAlias(AliasHelper.toAlias(elementName))
       .withIsElement(true)
+      .withAllowedInLibrary(true)
       .withIcon("icon-plugin")
       .addContainer()
         .withName(tabName)
@@ -1041,6 +1046,7 @@ export class DocumentTypeApiHelper {
       .withName(elementTypeName)
       .withAlias(AliasHelper.toAlias(elementTypeName))
       .withIsElement(true)
+      .withAllowedInLibrary(true)
       .withVariesByCulture(elementTypeVaryByCulture)
       .withIcon("icon-plugin")
       .addContainer()
@@ -1081,6 +1087,7 @@ export class DocumentTypeApiHelper {
       .withName(elementName)
       .withAlias(AliasHelper.toAlias(elementName))
       .withIsElement(true)
+      .withAllowedInLibrary(true)
       .withVariesByCulture(true)  // Element varies by culture
       .addContainer()
         .withName(groupName)
