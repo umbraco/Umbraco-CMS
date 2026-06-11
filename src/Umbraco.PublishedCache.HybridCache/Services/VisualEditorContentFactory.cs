@@ -60,16 +60,39 @@ internal sealed class VisualEditorContentFactory : IVisualEditorContentFactory
 
         foreach (VisualEditorPropertyOverride @override in overrides)
         {
-            object? source = await ConvertToSourceValueAsync(content, @override);
-            properties[@override.Alias] =
-            [
-                new PropertyData
-                {
-                    Culture = @override.Culture ?? string.Empty,
-                    Segment = @override.Segment ?? string.Empty,
-                    Value = source,
-                }
-            ];
+            (IDataValueEditor valueEditor, object? configuration)? resolved = await ResolveEditorAsync(content, @override);
+            if (resolved is null)
+            {
+                continue;
+            }
+
+            var editorValue = @override.EditorValue is string s ? s : _jsonSerializer.Serialize(@override.EditorValue);
+            object? source = resolved.Value.valueEditor.FromEditor(
+                new ContentPropertyData(editorValue, resolved.Value.configuration),
+                null);
+
+            string overrideCulture = @override.Culture ?? string.Empty;
+            string overrideSegment = @override.Segment ?? string.Empty;
+
+            var overrideEntry = new PropertyData
+            {
+                Culture = overrideCulture,
+                Segment = overrideSegment,
+                Value = source,
+            };
+
+            if (properties.TryGetValue(@override.Alias, out PropertyData[]? existing))
+            {
+                PropertyData[] merged = existing
+                    .Where(p => !(p.Culture == overrideCulture && p.Segment == overrideSegment))
+                    .Append(overrideEntry)
+                    .ToArray();
+                properties[@override.Alias] = merged;
+            }
+            else
+            {
+                properties[@override.Alias] = [overrideEntry];
+            }
         }
 
 #pragma warning disable CS0618 // ContentData ctor obsolete usage mirrored from the cache node source
@@ -98,7 +121,7 @@ internal sealed class VisualEditorContentFactory : IVisualEditorContentFactory
         return _publishedContentFactory.ToIPublishedContent(overriddenNode, preview: true);
     }
 
-    private async Task<object?> ConvertToSourceValueAsync(IContent content, VisualEditorPropertyOverride @override)
+    private async Task<(IDataValueEditor, object? configuration)?> ResolveEditorAsync(IContent content, VisualEditorPropertyOverride @override)
     {
         IProperty? property = content.Properties[@override.Alias];
         if (property is null)
@@ -112,11 +135,6 @@ internal sealed class VisualEditorContentFactory : IVisualEditorContentFactory
             return null;
         }
 
-        // FromEditor expects the serialized editor value for complex editors; a plain string passes through.
-        var editorValue = @override.EditorValue is string s ? s : _jsonSerializer.Serialize(@override.EditorValue);
-
-        return dataType.Editor.GetValueEditor().FromEditor(
-            new ContentPropertyData(editorValue, dataType.ConfigurationObject),
-            null);
+        return (dataType.Editor.GetValueEditor(), dataType.ConfigurationObject);
     }
 }

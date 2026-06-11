@@ -13,6 +13,12 @@ public interface IVisualEditorContentFactory
     /// <see cref="IPublishedContent"/> whose overridden aliases yield the converted unsaved values.
     /// Returns <c>null</c> if the document does not exist.
     /// </summary>
+    /// <param name="documentKey">The key of the document whose draft content will be used as the base.</param>
+    /// <param name="overrides">The unsaved property values to overlay on top of the draft content.</param>
+    /// <returns>
+    /// A preview <see cref="IPublishedContent"/> with the overrides applied,
+    /// or <c>null</c> if the document cannot be resolved.
+    /// </returns>
     Task<IPublishedContent?> CreateWithOverridesAsync(
         Guid documentKey,
         IReadOnlyCollection<VisualEditorPropertyOverride> overrides);

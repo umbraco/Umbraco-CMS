@@ -16,6 +16,7 @@ using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
+using Language = Umbraco.Cms.Core.Models.Language;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.PublishedCache;
 
@@ -32,6 +33,8 @@ internal sealed class VisualEditorContentFactoryTests : UmbracoIntegrationTest
     private IConfigurationEditorJsonSerializer ConfigurationEditorJsonSerializer => GetRequiredService<IConfigurationEditorJsonSerializer>();
 
     private PropertyEditorCollection PropertyEditorCollection => GetRequiredService<PropertyEditorCollection>();
+
+    private ILanguageService LanguageService => GetRequiredService<ILanguageService>();
 
     private IVisualEditorContentFactory VisualEditorContentFactory => GetRequiredService<IVisualEditorContentFactory>();
 
@@ -135,5 +138,62 @@ internal sealed class VisualEditorContentFactoryTests : UmbracoIntegrationTest
         Assert.IsNotNull(blockListModel, "Block List should convert to a BlockListModel");
         Assert.AreEqual(1, blockListModel!.Count);
         Assert.AreEqual("Block text value", blockListModel.First().Content.Value("singleLineText"));
+    }
+
+    [Test]
+    public async Task CreateWithOverrides_Merges_Variant_Override_Preserving_Other_Cultures()
+    {
+        var daDk = new Language("da-DK", "Danish");
+        await LanguageService.CreateAsync(daDk, Constants.Security.SuperUserKey);
+
+        var contentType = new ContentTypeBuilder()
+            .WithAlias("variantPage")
+            .WithName("Variant Page")
+            .WithContentVariation(ContentVariation.Culture)
+            .AddPropertyGroup()
+                .WithAlias("content")
+                .WithName("Content")
+                .WithSupportsPublishing(true)
+                .AddPropertyType()
+                    .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.TextBox)
+                    .WithDataTypeId(Constants.DataTypes.Textbox)
+                    .WithValueStorageType(ValueStorageType.Nvarchar)
+                    .WithAlias("title")
+                    .WithName("Title")
+                    .WithVariations(ContentVariation.Culture)
+                    .Done()
+                .Done()
+            .Build();
+        Assert.IsTrue((await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey)).Success);
+
+        var content = new ContentBuilder()
+            .WithContentType(contentType)
+            .WithCultureName("en-US", "EN")
+            .WithCultureName("da-DK", "DA")
+            .WithName("Variant Doc")
+            .Build();
+        content.SetValue("title", "en value", culture: "en-US");
+        content.SetValue("title", "da value", culture: "da-DK");
+        Assert.IsTrue(ContentService.Save(content).Success);
+        Assert.IsTrue(ContentService.Publish(content, ["en-US", "da-DK"]).Success);
+
+        var overrides = new[]
+        {
+            new VisualEditorPropertyOverride("title", "overridden en", "en-US", null),
+        };
+
+        IPublishedContent? result = await VisualEditorContentFactory.CreateWithOverridesAsync(content.Key, overrides);
+
+        Assert.IsNotNull(result);
+        Assert.AreEqual("overridden en", result!.Value("title", culture: "en-US"));
+        Assert.AreEqual("da value", result.Value("title", culture: "da-DK"), "da-DK value must be preserved after en-US override");
+    }
+
+    [Test]
+    public async Task CreateWithOverrides_Returns_Null_For_Unknown_Document_Key()
+    {
+        IPublishedContent? result = await VisualEditorContentFactory.CreateWithOverridesAsync(Guid.NewGuid(), []);
+
+        Assert.IsNull(result);
     }
 }
