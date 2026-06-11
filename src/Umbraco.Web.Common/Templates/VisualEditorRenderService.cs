@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -28,6 +29,7 @@ internal sealed class VisualEditorRenderService : IVisualEditorRenderService
     private readonly IModelMetadataProvider _modelMetadataProvider;
     private readonly ITempDataDictionaryFactory _tempDataDictionaryFactory;
     private readonly IVisualEditorContentFactory _contentFactory;
+    private readonly ILogger<VisualEditorRenderService> _logger;
 
     public VisualEditorRenderService(
         IUmbracoContextFactory umbracoContextFactory,
@@ -37,7 +39,8 @@ internal sealed class VisualEditorRenderService : IVisualEditorRenderService
         ICompositeViewEngine viewEngine,
         IModelMetadataProvider modelMetadataProvider,
         ITempDataDictionaryFactory tempDataDictionaryFactory,
-        IVisualEditorContentFactory contentFactory)
+        IVisualEditorContentFactory contentFactory,
+        ILogger<VisualEditorRenderService> logger)
     {
         _umbracoContextFactory = umbracoContextFactory;
         _publishedRouter = publishedRouter;
@@ -47,6 +50,7 @@ internal sealed class VisualEditorRenderService : IVisualEditorRenderService
         _modelMetadataProvider = modelMetadataProvider;
         _tempDataDictionaryFactory = tempDataDictionaryFactory;
         _contentFactory = contentFactory;
+        _logger = logger;
     }
 
     public async Task<string> RenderAsync(
@@ -61,12 +65,14 @@ internal sealed class VisualEditorRenderService : IVisualEditorRenderService
         IPublishedContent? content = await _contentFactory.CreateWithOverridesAsync(documentKey, overrides);
         if (content?.TemplateId is null)
         {
+            _logger.LogWarning("Visual editor render skipped: no draft content or template for document {DocumentKey}.", documentKey);
             return string.Empty;
         }
 
         ITemplate? template = await _templateService.GetAsync(content.TemplateId.Value);
         if (template is null)
         {
+            _logger.LogWarning("Visual editor render skipped: template {TemplateId} not found for document {DocumentKey}.", content.TemplateId.Value, documentKey);
             return string.Empty;
         }
 
@@ -87,6 +93,7 @@ internal sealed class VisualEditorRenderService : IVisualEditorRenderService
         finally
         {
             VisualEditorPropertyTracker.Disable();
+            VisualEditorPropertyTracker.Clear();
             umbracoContext.PublishedRequest = oldRequest;
         }
     }
@@ -97,8 +104,9 @@ internal sealed class VisualEditorRenderService : IVisualEditorRenderService
 
         // isMainPage is set to true here to ensure ViewStart(s) found in the view hierarchy are rendered
         ViewEngineResult viewResult = _viewEngine.GetView(null, $"~/Views/{request.GetTemplateAlias()}.cshtml", true);
-        if (viewResult.View is null)
+        if (viewResult.Success is false)
         {
+            _logger.LogWarning("Visual editor render skipped: view for template alias {TemplateAlias} not found.", request.GetTemplateAlias());
             return string.Empty;
         }
 
