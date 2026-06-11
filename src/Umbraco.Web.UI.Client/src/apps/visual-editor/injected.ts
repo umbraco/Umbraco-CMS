@@ -30,6 +30,20 @@
 	'use strict';
 
 	// =====================================================================
+	// Parent origin — all postMessage traffic is pinned to the embedding
+	// backoffice origin. Derived from document.referrer because in dev mode
+	// the backoffice (Vite) runs on a different origin than this page.
+	// =====================================================================
+
+	const PARENT_ORIGIN = (() => {
+		try {
+			return document.referrer ? new URL(document.referrer).origin : window.location.origin;
+		} catch {
+			return window.location.origin;
+		}
+	})();
+
+	// =====================================================================
 	// Selectors
 	// =====================================================================
 
@@ -141,7 +155,7 @@
 	 * @param message - Key/value payload to send.
 	 */
 	function send(message: Record<string, unknown>) {
-		window.parent.postMessage({ ...message, source: 'umb-visual-editor-guest' }, '*');
+		window.parent.postMessage({ ...message, source: 'umb-visual-editor-guest' }, PARENT_ORIGIN);
 	}
 
 	// =====================================================================
@@ -538,6 +552,7 @@
 	 * - `umb:ve:select-region` — Programmatically select and scroll to a region
 	 */
 	window.addEventListener('message', (evt: MessageEvent) => {
+		if (evt.origin !== PARENT_ORIGIN) return;
 		if (!evt.data) return;
 
 		if (evt.data.type === 'umb:ve:clear-selection') {
