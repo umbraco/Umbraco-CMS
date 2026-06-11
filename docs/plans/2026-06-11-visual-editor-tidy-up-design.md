@@ -62,9 +62,9 @@ The element keeps iframe lifecycle, modal registrations, selection state and pre
 
 ### 4. Root-level empty block lists
 
-- `BlockListTemplateExtensions` passes the property alias to the partial via `ViewData` (preview mode only).
-- `Views/Partials/blocklist/default.cshtml` emits `data-umb-property="<alias>"` on the list container.
-- `injected.ts` resolves the alias from the container for empty root-level lists and renders the existing "Add content" button (closes the `injected.ts:1040` TODO).
+- `BlockListTemplateExtensions` passes the property alias to the partial via `ViewData` (alias-aware overloads; empty models no longer short-circuit so the partial can render an annotated empty container in preview mode).
+- `Views/Partials/blocklist/default.cshtml` emits `data-umb-block-property="<alias>"` on the list container — a distinct attribute, because `data-umb-property` is the guest script's property-region selector and would turn the whole list into a clickable property region.
+- `injected.ts` resolves the alias from the container for empty root-level lists and renders the existing "Add content" button via a new `umb:ve:block-add-to-property` message (closes the `injected.ts:1040` TODO).
 
 ### 5. Docs & polish
 
