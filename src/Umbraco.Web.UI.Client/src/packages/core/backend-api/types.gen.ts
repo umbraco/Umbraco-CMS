@@ -3335,6 +3335,7 @@ export type ProfilingStatusResponseModel = {
 
 export type PropertyTypeAppearanceModel = {
     labelOnTop: boolean;
+    editableInVisualEditor: boolean;
 };
 
 export type PropertyTypeValidationModel = {

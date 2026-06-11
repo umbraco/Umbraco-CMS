@@ -49278,11 +49278,15 @@
       },
       "PropertyTypeAppearanceModel": {
         "required": [
-          "labelOnTop"
+          "labelOnTop",
+          "editableInVisualEditor"
         ],
         "type": "object",
         "properties": {
           "labelOnTop": {
+            "type": "boolean"
+          },
+          "editableInVisualEditor": {
             "type": "boolean"
           }
         }
