@@ -1239,10 +1239,12 @@ The visual editor tab should only appear when:
 - Block add (inline "+" buttons + catalogue modal, including empty-list and empty-area placeholders), remove (confirm dialog), reorder, and cross-area move via drag-and-drop
 - Clipboard paste with translator compatibility checks and expose entries
 
-**Still to build:**
-- Partial re-render API endpoint (extends BlockPreview pattern)
-- `PropertyOverridePublishedContent` decorator for rendering with unsaved values
-- Guest script DOM patching for partial updates
+**Done (2026-06-11):**
+- Partial re-render API endpoint (`POST /umbraco/management/api/v1/visual-editor/render`)
+- Unsaved-value rendering via `IVisualEditorContentFactory` (cache-node override) + `IVisualEditorRenderService`
+- Guest script DOM patching via morphdom + re-runnable `initRegions()`; self-reload suppressed after local save
+
+Phase 3 is complete.
 
 ### Phase 4: Inline Editing + Advanced Features
 

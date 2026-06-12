@@ -1,6 +1,6 @@
 # Visual Editor — Partial Re-render (Phase 3 remainder) — Design
 
-**Status**: Approved design; **conversion spike PASSED 2026-06-11** (TextBox, Rich Text, Block List all convert editor→published without saving). Ready for the implementation plan.
+**Status**: Implemented (spike passed 2026-06-11; see `2026-06-11-visual-editor-partial-rerender-plan.md`). Built via cache-node override + `IPublishedContentFactory` rather than a decorator — see the plan's "Deliberate deviation" note.
 **Date**: 2026-06-11
 **Author**: Rick Butterfield + Claude
 **Scope**: The "Still to build" items of Phase 3 in `docs/plans/visual-page-builder.md` — server-side partial re-render with unsaved values, and client-side DOM patching. Block manipulation itself is already done.
