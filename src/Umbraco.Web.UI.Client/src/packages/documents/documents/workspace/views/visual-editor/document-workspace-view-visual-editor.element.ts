@@ -87,7 +87,12 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 				unique,
 				culture: this.#currentVariantId?.culture ?? undefined,
 				segment: this.#currentVariantId?.segment ?? undefined,
-				values: this.#getAllValues().map((v) => ({ alias: v.alias, value: v.value })),
+				values: (this.#workspaceContext?.getValues() ?? []).map((v) => ({
+					alias: v.alias,
+					value: v.value,
+					culture: v.culture ?? undefined,
+					segment: v.segment ?? undefined,
+				})),
 			};
 		},
 		postRender: (html) => this.#postToIframe({ type: 'umb:ve:render', html }),
