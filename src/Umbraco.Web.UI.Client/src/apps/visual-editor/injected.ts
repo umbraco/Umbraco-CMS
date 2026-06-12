@@ -29,6 +29,9 @@
  * - `umb:ve:select-region` — Programmatically select a region
  * - `umb:ve:render` — Full re-rendered page HTML; morph <body> in place and re-init regions
  */
+// The guest runs in the preview iframe and is bundled standalone by esbuild (not via the backoffice
+// import map), so morphdom is imported directly from node_modules rather than proxied through external.
+// eslint-disable-next-line local-rules/enforce-umbraco-external-imports
 import morphdom from 'morphdom';
 
 (function () {
