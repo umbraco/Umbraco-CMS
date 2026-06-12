@@ -1,3 +1,4 @@
+using System.Collections;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
@@ -194,5 +195,84 @@ internal sealed class VisualEditorContentFactoryTests : UmbracoIntegrationTest
         IPublishedContent? result = await VisualEditorContentFactory.CreateWithOverridesAsync(Guid.NewGuid(), []);
 
         Assert.IsNull(result);
+    }
+}
+
+[TestFixture]
+[UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
+internal sealed class VisualEditorContentFactoryModelWrapTests : UmbracoIntegrationTest
+{
+    private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
+
+    private IContentService ContentService => GetRequiredService<IContentService>();
+
+    private IVisualEditorContentFactory VisualEditorContentFactory => GetRequiredService<IVisualEditorContentFactory>();
+
+    protected override void CustomTestSetup(IUmbracoBuilder builder)
+    {
+        builder.AddNotificationHandler<ContentTreeChangeNotification, ContentTreeChangeDistributedCacheNotificationHandler>();
+        builder.Services.AddUnique<IServerMessenger, ContentEventsTests.LocalServerMessenger>();
+        builder.Services.AddUnique<IPublishedModelFactory, MarkerModelFactory>();
+    }
+
+    [Test]
+    public async Task CreateWithOverrides_Wraps_Result_In_ModelsBuilder_Model()
+    {
+        var contentType = new ContentTypeBuilder()
+            .WithAlias("markerPage")
+            .WithName("Marker Page")
+            .AddPropertyGroup()
+                .WithAlias("content")
+                .WithName("Content")
+                .WithSupportsPublishing(true)
+                .AddPropertyType()
+                    .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.TextBox)
+                    .WithDataTypeId(Constants.DataTypes.Textbox)
+                    .WithValueStorageType(ValueStorageType.Nvarchar)
+                    .WithAlias("title").WithName("Title").Done()
+                .Done()
+            .Build();
+        Assert.IsTrue((await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey)).Success);
+
+        var content = new ContentBuilder()
+            .WithContentType(contentType)
+            .WithName("Marker Doc")
+            .WithPropertyValues(new { title = "Original title" })
+            .Build();
+        Assert.IsTrue(ContentService.Save(content).Success);
+        Assert.IsTrue(ContentService.Publish(content, []).Success);
+
+        var overrides = new[]
+        {
+            new VisualEditorPropertyOverride("title", "Overridden title", null, null),
+        };
+
+        IPublishedContent? result = await VisualEditorContentFactory.CreateWithOverridesAsync(content.Key, overrides);
+
+        Assert.IsNotNull(result);
+        Assert.That(result, Is.InstanceOf<MarkerPublishedContent>(), "Result must be wrapped via IPublishedModelFactory.CreateModel");
+        Assert.AreEqual("Overridden title", result!.Value("title"));
+    }
+
+    private sealed class MarkerPublishedContent : PublishedContentWrapped
+    {
+        public MarkerPublishedContent(IPublishedContent content)
+            : base(content)
+        {
+        }
+    }
+
+    private sealed class MarkerModelFactory : IPublishedModelFactory
+    {
+        private readonly NoopPublishedModelFactory _noop = new();
+
+        public IPublishedElement CreateModel(IPublishedElement element)
+            => element is IPublishedContent content ? new MarkerPublishedContent(content) : element;
+
+        public IList? CreateModelList(string? alias) => _noop.CreateModelList(alias);
+
+        public Type GetModelType(string? alias) => _noop.GetModelType(alias);
+
+        public Type MapModelType(Type type) => _noop.MapModelType(type);
     }
 }

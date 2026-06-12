@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.HybridCache.Factories;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache.Services;
 
@@ -17,6 +18,7 @@ internal sealed class VisualEditorContentFactory : IVisualEditorContentFactory
     private readonly ICacheNodeFactory _cacheNodeFactory;
     private readonly IPublishedContentFactory _publishedContentFactory;
     private readonly IJsonSerializer _jsonSerializer;
+    private readonly IPublishedModelFactory _publishedModelFactory;
 
     public VisualEditorContentFactory(
         IIdKeyMap idKeyMap,
@@ -24,7 +26,8 @@ internal sealed class VisualEditorContentFactory : IVisualEditorContentFactory
         IDataTypeService dataTypeService,
         ICacheNodeFactory cacheNodeFactory,
         IPublishedContentFactory publishedContentFactory,
-        IJsonSerializer jsonSerializer)
+        IJsonSerializer jsonSerializer,
+        IPublishedModelFactory publishedModelFactory)
     {
         _idKeyMap = idKeyMap;
         _contentService = contentService;
@@ -32,6 +35,7 @@ internal sealed class VisualEditorContentFactory : IVisualEditorContentFactory
         _cacheNodeFactory = cacheNodeFactory;
         _publishedContentFactory = publishedContentFactory;
         _jsonSerializer = jsonSerializer;
+        _publishedModelFactory = publishedModelFactory;
     }
 
     public async Task<IPublishedContent?> CreateWithOverridesAsync(
@@ -118,7 +122,7 @@ internal sealed class VisualEditorContentFactory : IVisualEditorContentFactory
         };
 #pragma warning restore CS0618
 
-        return _publishedContentFactory.ToIPublishedContent(overriddenNode, preview: true);
+        return _publishedContentFactory.ToIPublishedContent(overriddenNode, preview: true).CreateModel(_publishedModelFactory);
     }
 
     private async Task<(IDataValueEditor, object? configuration)?> ResolveEditorAsync(IContent content, VisualEditorPropertyOverride @override)
