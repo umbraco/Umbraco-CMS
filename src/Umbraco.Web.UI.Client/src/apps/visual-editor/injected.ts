@@ -12,7 +12,7 @@
  * - `data-umb-content-type` / `data-content-element-type-alias` — Block element type alias
  * - `data-umb-property` — Property alias (identifies a property region)
  * - `data-umb-content-key` — Document content key for a property region
- * - `data-umb-block-property` — Property alias on a block list or block grid container (empty-state block creation)
+ * - `data-umb-block-property` — Property alias on a block list, block grid, or single block container (empty-state block creation)
  *
  * ## PostMessage protocol (sent to parent)
  * - `umb:ve:region-map` — Discovered regions on page load
@@ -1021,6 +1021,8 @@ import morphdom from 'morphdom';
 			justifyContent: 'center',
 			gap: '8px',
 			width: '100%',
+			boxSizing: 'border-box',
+			gridColumn: '1 / -1',
 			minHeight: '80px',
 			padding: '16px',
 			border: `2px dashed ${COLOR_BORDER}`,
@@ -1130,6 +1132,22 @@ import morphdom from 'morphdom';
 			const propertyAlias = grid.dataset.umbBlockProperty || '';
 			if (!propertyAlias) return;
 			grid.appendChild(
+				createEmptyPlaceholder(() => {
+					send({ type: 'umb:ve:block-add-to-property', propertyAlias, insertIndex: 0 });
+				}),
+			);
+		});
+
+		// Empty single block at root level. The container carries data-umb-block-property
+		// (emitted by the single block helper in visual-editor mode).
+		document.querySelectorAll<HTMLElement>('.umb-single-block').forEach((single) => {
+			if (single.querySelector(BLOCK_SELECTOR)) return; // Has a block
+			if (single.querySelector(`[${ADD_BTN_ATTR}]`)) return; // Already handled
+
+			const propertyAlias = single.dataset.umbBlockProperty || '';
+			if (!propertyAlias) return;
+
+			single.appendChild(
 				createEmptyPlaceholder(() => {
 					send({ type: 'umb:ve:block-add-to-property', propertyAlias, insertIndex: 0 });
 				}),

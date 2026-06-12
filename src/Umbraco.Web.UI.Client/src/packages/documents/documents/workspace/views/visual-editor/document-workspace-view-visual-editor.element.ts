@@ -41,6 +41,10 @@ import {
 	UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS,
 	UMB_BLOCK_GRID_PROPERTY_EDITOR_UI_ALIAS,
 } from '@umbraco-cms/backoffice/block-grid';
+import {
+	UMB_BLOCK_SINGLE_PROPERTY_EDITOR_SCHEMA_ALIAS,
+	UMB_BLOCK_SINGLE_PROPERTY_EDITOR_UI_ALIAS,
+} from '@umbraco-cms/backoffice/block-single';
 import { UmbPreviewRepository } from '@umbraco-cms/backoffice/preview';
 import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 import { DocumentTypeService } from '@umbraco-cms/backoffice/external/backend-api';
@@ -663,9 +667,13 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 	 */
 	#resolveBlockSchemaAlias(propertyAlias: string): string {
 		const editorUiAlias = this.#structures.getDocumentProperty(propertyAlias)?.editorUiAlias ?? '';
-		return editorUiAlias === UMB_BLOCK_GRID_PROPERTY_EDITOR_UI_ALIAS
-			? UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS
-			: UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS;
+		if (editorUiAlias === UMB_BLOCK_GRID_PROPERTY_EDITOR_UI_ALIAS) {
+			return UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS;
+		}
+		if (editorUiAlias === UMB_BLOCK_SINGLE_PROPERTY_EDITOR_UI_ALIAS) {
+			return UMB_BLOCK_SINGLE_PROPERTY_EDITOR_SCHEMA_ALIAS;
+		}
+		return UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS;
 	}
 
 	#findBlock(blockKey: string) {

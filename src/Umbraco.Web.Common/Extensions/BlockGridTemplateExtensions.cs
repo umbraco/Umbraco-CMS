@@ -3,7 +3,6 @@
 
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.PublishedContent;
 
@@ -16,12 +15,6 @@ public static class BlockGridTemplateExtensions
     public const string DefaultItemsTemplate = "items";
     public const string DefaultItemAreasTemplate = "areas";
     public const string DefaultItemAreaTemplate = "area";
-
-    /// <summary>
-    /// ViewData key under which the block grid property alias is passed to the partial view,
-    /// enabling the visual editor to annotate (and offer block creation on) empty block grids.
-    /// </summary>
-    public const string PropertyAliasViewDataKey = "umbBlockGridPropertyAlias";
 
     #region Async
 
@@ -42,7 +35,7 @@ public static class BlockGridTemplateExtensions
     {
         if (model?.Count == 0)
         {
-            return new HtmlString(string.Empty);
+            return HtmlString.Empty;
         }
 
         return await html.PartialAsync(DefaultFolderTemplate(template), model);
@@ -50,7 +43,7 @@ public static class BlockGridTemplateExtensions
 
     /// <inheritdoc cref="GetBlockGridHtmlAsync(Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper,Umbraco.Cms.Core.Models.Blocks.BlockGridModel?,string)"/>
     public static async Task<IHtmlContent> GetBlockGridHtmlAsync(this IHtmlHelper html, IPublishedProperty property, string template = DefaultTemplate)
-        => await GetBlockGridHtmlAsync(html, property.GetValue() as BlockGridModel, template, property.Alias);
+        => await GetBlockGridHtmlAsync(html, property.GetValue() as BlockGridModel, template, property.Alias, property.PropertyType.EditableInVisualEditor);
 
     /// <inheritdoc cref="GetBlockGridHtmlAsync(Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper,Umbraco.Cms.Core.Models.Blocks.BlockGridModel?,string)"/>
     public static async Task<IHtmlContent> GetBlockGridHtmlAsync(this IHtmlHelper html, IPublishedContent contentItem, string propertyAlias)
@@ -59,11 +52,18 @@ public static class BlockGridTemplateExtensions
     public static async Task<IHtmlContent> GetBlockGridHtmlAsync(this IHtmlHelper html, IPublishedContent contentItem, string propertyAlias, string template)
     {
         IPublishedProperty prop = GetRequiredProperty(contentItem, propertyAlias);
-        return await GetBlockGridHtmlAsync(html, prop.GetValue() as BlockGridModel, template, propertyAlias);
+        return await GetBlockGridHtmlAsync(html, prop.GetValue() as BlockGridModel, template, prop.Alias, prop.PropertyType.EditableInVisualEditor);
     }
 
-    private static async Task<IHtmlContent> GetBlockGridHtmlAsync(IHtmlHelper html, BlockGridModel? model, string template, string propertyAlias)
-        => await html.PartialAsync(DefaultFolderTemplate(template), model, WithPropertyAlias(html, propertyAlias));
+    private static async Task<IHtmlContent> GetBlockGridHtmlAsync(IHtmlHelper html, BlockGridModel? model, string template, string propertyAlias, bool editableInVisualEditor)
+    {
+        if (model is null || model.Count == 0)
+        {
+            return BlockEmptyState.Container("umb-block-grid", propertyAlias, editableInVisualEditor);
+        }
+
+        return await html.PartialAsync(DefaultFolderTemplate(template), model);
+    }
 
     public static async Task<IHtmlContent> GetBlockGridItemsHtmlAsync(this IHtmlHelper html, IEnumerable<BlockGridItem> items, string template = DefaultItemsTemplate)
         => await html.PartialAsync(DefaultFolderTemplate(template), items);
@@ -94,7 +94,7 @@ public static class BlockGridTemplateExtensions
     {
         if (model?.Count == 0)
         {
-            return new HtmlString(string.Empty);
+            return HtmlString.Empty;
         }
 
         return html.Partial(DefaultFolderTemplate(template), model);
@@ -102,7 +102,7 @@ public static class BlockGridTemplateExtensions
 
     /// <inheritdoc cref="GetBlockGridHtmlAsync(Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper,Umbraco.Cms.Core.Models.Blocks.BlockGridModel?,string)"/>
     public static IHtmlContent GetBlockGridHtml(this IHtmlHelper html, IPublishedProperty property, string template = DefaultTemplate)
-        => GetBlockGridHtml(html, property.GetValue() as BlockGridModel, template, property.Alias);
+        => GetBlockGridHtml(html, property.GetValue() as BlockGridModel, template, property.Alias, property.PropertyType.EditableInVisualEditor);
 
     /// <inheritdoc cref="GetBlockGridHtmlAsync(Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper,Umbraco.Cms.Core.Models.Blocks.BlockGridModel?,string)"/>
     public static IHtmlContent GetBlockGridHtml(this IHtmlHelper html, IPublishedContent contentItem, string propertyAlias)
@@ -111,11 +111,18 @@ public static class BlockGridTemplateExtensions
     public static IHtmlContent GetBlockGridHtml(this IHtmlHelper html, IPublishedContent contentItem, string propertyAlias, string template)
     {
         IPublishedProperty prop = GetRequiredProperty(contentItem, propertyAlias);
-        return GetBlockGridHtml(html, prop.GetValue() as BlockGridModel, template, propertyAlias);
+        return GetBlockGridHtml(html, prop.GetValue() as BlockGridModel, template, prop.Alias, prop.PropertyType.EditableInVisualEditor);
     }
 
-    private static IHtmlContent GetBlockGridHtml(IHtmlHelper html, BlockGridModel? model, string template, string propertyAlias)
-        => html.Partial(DefaultFolderTemplate(template), model, WithPropertyAlias(html, propertyAlias));
+    private static IHtmlContent GetBlockGridHtml(IHtmlHelper html, BlockGridModel? model, string template, string propertyAlias, bool editableInVisualEditor)
+    {
+        if (model is null || model.Count == 0)
+        {
+            return BlockEmptyState.Container("umb-block-grid", propertyAlias, editableInVisualEditor);
+        }
+
+        return html.Partial(DefaultFolderTemplate(template), model);
+    }
 
     public static IHtmlContent GetBlockGridItemsHtml(this IHtmlHelper html, IEnumerable<BlockGridItem> items, string template = DefaultItemsTemplate)
         => html.Partial(DefaultFolderTemplate(template), items);
@@ -135,9 +142,6 @@ public static class BlockGridTemplateExtensions
     }
 
     #endregion
-
-    private static ViewDataDictionary WithPropertyAlias(IHtmlHelper html, string propertyAlias)
-        => new(html.ViewData) { [PropertyAliasViewDataKey] = propertyAlias };
 
     private static string DefaultFolderTemplate(string template) => $"{DefaultFolder}{template}";
 

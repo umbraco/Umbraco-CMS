@@ -25,7 +25,7 @@ public static class SingleBlockTemplateExtensions
     }
 
     public static async Task<IHtmlContent> GetBlockHtmlAsync(this IHtmlHelper html, IPublishedProperty property, string template = DefaultTemplate)
-        => await GetBlockHtmlAsync(html, property.GetValue() as BlockListItem, template);
+        => await GetBlockHtmlAsync(html, property.GetValue() as BlockListItem, template, property.Alias, property.PropertyType.EditableInVisualEditor);
 
     public static async Task<IHtmlContent> GetBlockHtmlAsync(this IHtmlHelper html, IPublishedContent contentItem, string propertyAlias)
         => await GetBlockHtmlAsync(html, contentItem, propertyAlias, DefaultTemplate);
@@ -33,8 +33,19 @@ public static class SingleBlockTemplateExtensions
     public static async Task<IHtmlContent> GetBlockHtmlAsync(this IHtmlHelper html, IPublishedContent contentItem, string propertyAlias, string template)
     {
         IPublishedProperty property = GetRequiredProperty(contentItem, propertyAlias);
-        return await GetBlockHtmlAsync(html, property.GetValue() as BlockListItem, template);
+        return await GetBlockHtmlAsync(html, property.GetValue() as BlockListItem, template, property.Alias, property.PropertyType.EditableInVisualEditor);
     }
+
+    private static async Task<IHtmlContent> GetBlockHtmlAsync(IHtmlHelper html, BlockListItem? model, string template, string propertyAlias, bool editableInVisualEditor)
+    {
+        if (model is null)
+        {
+            return BlockEmptyState.Container("umb-single-block", propertyAlias, editableInVisualEditor);
+        }
+
+        return await html.PartialAsync(DefaultFolderTemplate(template), model);
+    }
+
     #endregion
 
     #region Sync
@@ -50,7 +61,7 @@ public static class SingleBlockTemplateExtensions
     }
 
     public static IHtmlContent GetBlockHtml(this IHtmlHelper html, IPublishedProperty property, string template = DefaultTemplate)
-        => GetBlockHtml(html, property.GetValue() as BlockListItem, template);
+        => GetBlockHtml(html, property.GetValue() as BlockListItem, template, property.Alias, property.PropertyType.EditableInVisualEditor);
 
     public static IHtmlContent GetBlockHtml(this IHtmlHelper html, IPublishedContent contentItem, string propertyAlias)
         => GetBlockHtml(html, contentItem, propertyAlias, DefaultTemplate);
@@ -58,7 +69,17 @@ public static class SingleBlockTemplateExtensions
     public static IHtmlContent GetBlockHtml(this IHtmlHelper html, IPublishedContent contentItem, string propertyAlias, string template)
     {
         IPublishedProperty property = GetRequiredProperty(contentItem, propertyAlias);
-        return GetBlockHtml(html, property.GetValue() as BlockListItem, template);
+        return GetBlockHtml(html, property.GetValue() as BlockListItem, template, property.Alias, property.PropertyType.EditableInVisualEditor);
+    }
+
+    private static IHtmlContent GetBlockHtml(IHtmlHelper html, BlockListItem? model, string template, string propertyAlias, bool editableInVisualEditor)
+    {
+        if (model is null)
+        {
+            return BlockEmptyState.Container("umb-single-block", propertyAlias, editableInVisualEditor);
+        }
+
+        return html.Partial(DefaultFolderTemplate(template), model);
     }
 
     public static string SingleBlockPartialWithFallback(this IHtmlHelper html, string template, string fallbackTemplate)
