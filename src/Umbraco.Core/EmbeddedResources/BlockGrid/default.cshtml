@@ -1,10 +1,15 @@
 @using Umbraco.Extensions
+@using Umbraco.Cms.Core.Models.PublishedContent
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridModel>
 @{
-    if (Model?.Any() != true) { return; }
-    var gridColumns = Model.GridColumns?.ToString() ?? "12";
+    var propertyAlias = ViewData[BlockGridTemplateExtensions.PropertyAliasViewDataKey] as string;
+    var annotate = ((UmbracoContext?.InPreviewMode ?? false) || VisualEditorPropertyTracker.IsEnabled) && !string.IsNullOrEmpty(propertyAlias);
+    if (Model?.Any() != true && !annotate) { return; }
+    var gridColumns = Model?.GridColumns?.ToString() ?? "12";
 }
-
-<div class="umb-block-grid" data-grid-columns="@(gridColumns)" style="--umb-block-grid--grid-columns: @(gridColumns);">
-    @await Html.GetBlockGridItemsHtmlAsync(Model)
+<div class="umb-block-grid" data-grid-columns="@(gridColumns)" style="--umb-block-grid--grid-columns: @(gridColumns);" data-umb-block-property="@(annotate ? propertyAlias : null)">
+    @if (Model?.Any() == true)
+    {
+        @await Html.GetBlockGridItemsHtmlAsync(Model)
+    }
 </div>
