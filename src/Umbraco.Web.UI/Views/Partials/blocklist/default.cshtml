@@ -1,7 +1,7 @@
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockListModel>
 @{
-    var propertyAlias = ViewData[Umbraco.Extensions.BlockListTemplateExtensions.PropertyAliasViewDataKey] as string;
-    var annotate = ((UmbracoContext?.InPreviewMode ?? false) || Umbraco.Cms.Core.Models.PublishedContent.VisualEditorPropertyTracker.IsEnabled) && !string.IsNullOrEmpty(propertyAlias);
+    var propertyAlias = ViewData[global::Umbraco.Extensions.BlockListTemplateExtensions.PropertyAliasViewDataKey] as string;
+    var annotate = ((UmbracoContext?.InPreviewMode ?? false) || global::Umbraco.Cms.Core.Models.PublishedContent.VisualEditorPropertyTracker.IsEnabled) && !string.IsNullOrEmpty(propertyAlias);
     if (Model?.Any() != true && !annotate) { return; }
 }
 <div class="umb-block-list" data-umb-block-property="@(annotate ? propertyAlias : null)">

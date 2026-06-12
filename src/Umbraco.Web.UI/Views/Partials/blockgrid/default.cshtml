@@ -1,8 +1,8 @@
 @using Umbraco.Extensions
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridModel>
 @{
-    var propertyAlias = ViewData[Umbraco.Extensions.BlockGridTemplateExtensions.PropertyAliasViewDataKey] as string;
-    var annotate = ((UmbracoContext?.InPreviewMode ?? false) || Umbraco.Cms.Core.Models.PublishedContent.VisualEditorPropertyTracker.IsEnabled) && !string.IsNullOrEmpty(propertyAlias);
+    var propertyAlias = ViewData[global::Umbraco.Extensions.BlockGridTemplateExtensions.PropertyAliasViewDataKey] as string;
+    var annotate = ((UmbracoContext?.InPreviewMode ?? false) || global::Umbraco.Cms.Core.Models.PublishedContent.VisualEditorPropertyTracker.IsEnabled) && !string.IsNullOrEmpty(propertyAlias);
     if (Model?.Any() != true && !annotate) { return; }
     var gridColumns = Model?.GridColumns?.ToString() ?? "12";
 }
