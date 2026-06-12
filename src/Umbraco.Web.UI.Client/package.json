@@ -266,7 +266,7 @@
 		"madge": "^8.0.0",
 		"msw": "^2.13.5",
 		"playwright-msw": "^3.0.1",
-		"postcss": "^8.5.9",
+		"postcss": "^8.5.15",
 		"postcss-cli": "^11.0.1",
 		"prettier": "3.8.2",
 		"remark-gfm": "^4.0.1",
