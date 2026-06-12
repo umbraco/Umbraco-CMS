@@ -47,18 +47,18 @@ public class PackageManifestServiceTests
             Importmap = new PackageManifestImportmap { Imports = imports },
         };
 
-    private static readonly string VersionHash = "2.0.0".GenerateHash();
-    private static readonly string GlobalHash = new SemVersion(17, 0, 0).ToSemanticString().GenerateHash();
+    private static readonly string _versionHash = "2.0.0".GenerateHash();
+    private static readonly string _globalHash = new SemVersion(17, 0, 0).ToSemanticString().GenerateHash();
 
     private static IEnumerable<TestCaseData> SingleImportCases()
     {
-        yield return new TestCaseData("2.0.0", true, "/App_Plugins/Pkg/index.js", $"/App_Plugins/Pkg/index.js?umb__rnd={VersionHash}")
+        yield return new TestCaseData("2.0.0", true, "/App_Plugins/Pkg/index.js", $"/App_Plugins/Pkg/index.js?umb__rnd={_versionHash}")
             .SetName("Stamps the version hash on a clean /App_Plugins import");
         yield return new TestCaseData("2.0.0", false, "/App_Plugins/Pkg/index.js", "/App_Plugins/Pkg/index.js")
             .SetName("Does not stamp when busting is disabled");
-        yield return new TestCaseData((string?)null, true, "/App_Plugins/Pkg/index.js", $"/App_Plugins/Pkg/index.js?umb__rnd={GlobalHash}")
+        yield return new TestCaseData((string?)null, true, "/App_Plugins/Pkg/index.js", $"/App_Plugins/Pkg/index.js?umb__rnd={_globalHash}")
             .SetName("Falls back to the global hash when the package has no version");
-        yield return new TestCaseData("2.0.0", true, "/App_Plugins/Pkg/index.js?v=%CACHE_BUSTER%", $"/App_Plugins/Pkg/index.js?v={VersionHash}")
+        yield return new TestCaseData("2.0.0", true, "/App_Plugins/Pkg/index.js?v=%CACHE_BUSTER%", $"/App_Plugins/Pkg/index.js?v={_versionHash}")
             .SetName("Resolves an explicit %CACHE_BUSTER% token to the version hash");
     }
 

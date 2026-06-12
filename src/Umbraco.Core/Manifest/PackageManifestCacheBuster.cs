@@ -13,7 +13,7 @@ public static class PackageManifestCacheBuster
 
     // The /App_Plugins root with a trailing slash, so the StartsWith check honours a path-segment boundary
     // (and never matches e.g. "/App_PluginsFoo/...").
-    private static readonly string AppPluginsPrefix = Constants.SystemDirectories.AppPlugins.EnsureEndsWith('/');
+    private static readonly string _appPluginsPrefix = Constants.SystemDirectories.AppPlugins.EnsureEndsWith('/');
 
     /// <summary>
     ///     Returns the cache-bust hash for a package: a hash of its <paramref name="packageVersion"/> when present,
@@ -64,7 +64,7 @@ public static class PackageManifestCacheBuster
 
         // Automatic stamping only ever touches the package's own /App_Plugins assets. This also excludes the backoffice
         // core (/umbraco/backoffice/...), CDNs, protocol-relative URLs, bare specifiers and relative paths.
-        if (url.StartsWith(AppPluginsPrefix, StringComparison.OrdinalIgnoreCase) is false)
+        if (url.StartsWith(_appPluginsPrefix, StringComparison.OrdinalIgnoreCase) is false)
         {
             return url;
         }
