@@ -37,6 +37,10 @@ import {
 } from '@umbraco-cms/backoffice/clipboard';
 import { UmbPropertyValueCloneController } from '@umbraco-cms/backoffice/property';
 import { UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS } from '@umbraco-cms/backoffice/block-list';
+import {
+	UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS,
+	UMB_BLOCK_GRID_PROPERTY_EDITOR_UI_ALIAS,
+} from '@umbraco-cms/backoffice/block-grid';
 import { UmbPreviewRepository } from '@umbraco-cms/backoffice/preview';
 import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 import { DocumentTypeService } from '@umbraco-cms/backoffice/external/backend-api';
@@ -118,7 +122,7 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 		}));
 
 		// Determine the editor schema alias from the layout keys
-		const layoutKey = Object.keys(blockValue.layout)[0] ?? UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS;
+		const layoutKey = Object.keys(blockValue.layout)[0] ?? this.#resolveBlockSchemaAlias(propertyAlias);
 
 		if (this.#blockManager && this.#blockManagerPropertyAlias === propertyAlias) {
 			// Reuse existing manager — just reload with fresh data
@@ -397,7 +401,7 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 					propertyValue,
 					contentTypeKey,
 					insertIndex,
-					undefined,
+					this.#resolveBlockSchemaAlias(propertyAlias),
 					selectedBlockConfig?.areas,
 					selectedBlockConfig?.settingsElementTypeKey,
 				);
@@ -651,6 +655,19 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 
 	// --- Block config helpers ---
 
+	/**
+	 * Resolve the block editor schema alias (`Umbraco.BlockGrid` / `Umbraco.BlockList`)
+	 * for a property from its editor UI alias. Used as the fallback layout key when a
+	 * property's value has no existing layout (empty value), so an empty grid produces a
+	 * grid-shaped value rather than defaulting to list.
+	 */
+	#resolveBlockSchemaAlias(propertyAlias: string): string {
+		const editorUiAlias = this.#structures.getDocumentProperty(propertyAlias)?.editorUiAlias ?? '';
+		return editorUiAlias === UMB_BLOCK_GRID_PROPERTY_EDITOR_UI_ALIAS
+			? UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS
+			: UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS;
+	}
+
 	#findBlock(blockKey: string) {
 		return findBlockInValues(this.#getAllValues(), blockKey);
 	}
@@ -792,7 +809,7 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 				propertyValue,
 				contentTypeKey,
 				insertIndex,
-				undefined,
+				this.#resolveBlockSchemaAlias(propertyAlias),
 				selectedBlockConfig?.areas,
 				selectedBlockConfig?.settingsElementTypeKey,
 			);
@@ -848,7 +865,7 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 		const valueResolver = new UmbClipboardPastePropertyValueTranslatorValueResolver<BlockValue>(this);
 
 		// Determine the schema alias from the existing layout key
-		const layoutKey = Object.keys(propertyValue.layout)[0] ?? UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS;
+		const layoutKey = Object.keys(propertyValue.layout)[0] ?? this.#resolveBlockSchemaAlias(propertyAlias);
 
 		let updatedValue = propertyValue;
 

@@ -12,7 +12,7 @@
  * - `data-umb-content-type` / `data-content-element-type-alias` — Block element type alias
  * - `data-umb-property` — Property alias (identifies a property region)
  * - `data-umb-content-key` — Document content key for a property region
- * - `data-umb-block-property` — Property alias on a block list container (empty-state block creation)
+ * - `data-umb-block-property` — Property alias on a block list or block grid container (empty-state block creation)
  *
  * ## PostMessage protocol (sent to parent)
  * - `umb:ve:region-map` — Discovered regions on page load
@@ -1115,6 +1115,21 @@ import morphdom from 'morphdom';
 			if (!propertyAlias) return;
 
 			list.appendChild(
+				createEmptyPlaceholder(() => {
+					send({ type: 'umb:ve:block-add-to-property', propertyAlias, insertIndex: 0 });
+				}),
+			);
+		});
+
+		// Empty block grids at root level (no layout-container / no blocks).
+		// The container carries data-umb-block-property (emitted by blockgrid/default.cshtml
+		// in visual-editor mode) so the property alias is known even with no blocks present.
+		document.querySelectorAll<HTMLElement>('.umb-block-grid').forEach((grid) => {
+			if (grid.querySelector(BLOCK_SELECTOR)) return; // Has blocks
+			if (grid.querySelector(`[${ADD_BTN_ATTR}]`)) return; // Already handled
+			const propertyAlias = grid.dataset.umbBlockProperty || '';
+			if (!propertyAlias) return;
+			grid.appendChild(
 				createEmptyPlaceholder(() => {
 					send({ type: 'umb:ve:block-add-to-property', propertyAlias, insertIndex: 0 });
 				}),
