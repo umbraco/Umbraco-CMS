@@ -83,7 +83,7 @@ internal sealed class UnattendedPackageMigrationTests : UmbracoIntegrationTest
                 x => x.Configure(RuntimeLevel.BootFailed, RuntimeLevelReason.BootFailedOnException, It.IsNotNull<Exception>()),
                 Times.Once);
             Assert.That(capturedError, Is.Not.Null);
-            Assert.That(capturedError!.ToString(), Does.Contain(ThrowingMigration.ExceptionMessage));
+            Assert.That(capturedError?.ToString(), Does.Contain(ThrowingMigration.ExceptionMessage));
         });
     }
 }
@@ -109,5 +109,5 @@ internal sealed class ThrowingMigration : AsyncMigrationBase
     {
     }
 
-    protected override async Task MigrateAsync() => throw new InvalidOperationException(ExceptionMessage);
+    protected override Task MigrateAsync() => Task.FromException(new InvalidOperationException(ExceptionMessage));
 }
