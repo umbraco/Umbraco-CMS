@@ -86,28 +86,30 @@ internal sealed class UnattendedPackageMigrationTests : UmbracoIntegrationTest
             Assert.That(capturedError?.ToString(), Does.Contain(ThrowingMigration.ExceptionMessage));
         });
     }
-}
 
-internal sealed class ThrowingPackageMigrationPlan : PackageMigrationPlan
-{
-    public const string PlanName = "IntegrationThrowingPackage";
-
-    public ThrowingPackageMigrationPlan()
-        : base(PlanName)
+    // Nested + private so the TypeFinder (which excludes nested-private types) does not auto-discover this
+    // PackageMigrationPlan and run it during every other integration test that boots a full server.
+    private sealed class ThrowingPackageMigrationPlan : PackageMigrationPlan
     {
+        public const string PlanName = "IntegrationThrowingPackage";
+
+        public ThrowingPackageMigrationPlan()
+            : base(PlanName)
+        {
+        }
+
+        protected override void DefinePlan() => To<ThrowingMigration>("throw");
     }
 
-    protected override void DefinePlan() => To<ThrowingMigration>("throw");
-}
-
-internal sealed class ThrowingMigration : AsyncMigrationBase
-{
-    public const string ExceptionMessage = "Integration test package migration deliberately threw.";
-
-    public ThrowingMigration(IMigrationContext context)
-        : base(context)
+    private sealed class ThrowingMigration : AsyncMigrationBase
     {
-    }
+        public const string ExceptionMessage = "Integration test package migration deliberately threw.";
 
-    protected override Task MigrateAsync() => Task.FromException(new InvalidOperationException(ExceptionMessage));
+        public ThrowingMigration(IMigrationContext context)
+            : base(context)
+        {
+        }
+
+        protected override Task MigrateAsync() => Task.FromException(new InvalidOperationException(ExceptionMessage));
+    }
 }
