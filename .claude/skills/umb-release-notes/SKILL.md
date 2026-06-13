@@ -14,7 +14,7 @@ Takes a file of auto-generated GitHub release notes and produces an improved ver
 
 The result is written to a **new** file alongside the input, so the user can diff the two.
 
-**Run autonomously.** Do not use `AskUserQuestion`. Make the categorization calls yourself using the rules below; if a handful are genuinely borderline, place them anyway and note the borderline ones in your closing summary so the user can override.
+**Run autonomously.** Do NOT use `AskUserQuestion` once the required arguments (version and input file path) are available — only ask if one of them is missing from `$ARGUMENTS` and cannot be inferred (see Arguments). Beyond that, make the categorization calls yourself using the rules below; if a handful are genuinely borderline, place them anyway and note the borderline ones in your closing summary so the user can override.
 
 ## Arguments
 
@@ -62,8 +62,13 @@ If this equals 1000, the limit was hit — raise `--limit` and re-fetch before c
 ### 3. Reconcile
 
 - **Missing labelled PRs** (labelled but not in the input file): these must be **added**. Build a bullet as `* <title> by @<author> in https://github.com/umbraco/Umbraco-CMS/pull/<number>`.
-  - **Normalize the author handle.** `gh`'s `.author.login` returns bot accounts as `app/dependabot`, whereas GitHub's own generated notes render them as `@dependabot[bot]`. When the author login starts with `app/` (or is otherwise a bot), emit the `[bot]` form — e.g. `app/dependabot` → `@dependabot[bot]` — so added bullets match the existing ones.
-- **PRs in the file but not labelled**: keep them. The generated notes span a commit range (see the `Full Changelog` compare link), so they legitimately include backports / earlier-version PRs that lack the current label. For any of these you need to categorize, fetch its labels with `gh pr view <number> --repo umbraco/Umbraco-CMS --json number,title,labels --jq '...'`.
+  - **Author handle.** `<author>` in the template is the raw `.author.login` value — the bullet supplies the leading `@`, so do not prepend another. `gh`'s `.author.login` already returns bot accounts with the `[bot]` suffix as part of the login — Dependabot comes back as `dependabot[bot]`, not `dependabot` or `app/dependabot` (the `app/` form only appears in git committer metadata and CODEOWNERS, never in `gh`'s JSON). So the login is already in the right shape; use it verbatim (e.g. `.author.login` of `dependabot[bot]` renders as `@dependabot[bot]`, matching what GitHub's generator wrote for the existing bullets). The only thing to guard against is accidentally stripping or altering the `[bot]` suffix.
+- **PRs in the file but not labelled**: keep them. The generated notes span a commit range (see the `Full Changelog` compare link), so they legitimately include backports / earlier-version PRs that lack the current label. For any of these you need to categorize, fetch its labels with:
+
+  ```bash
+  gh pr view <number> --repo umbraco/Umbraco-CMS --json number,title,labels \
+    --jq '"\(.number)\t\([.labels[].name] | join(", "))\t\(.title)"'
+  ```
 
 Do **not** invent or alter the `New Contributors` section — carry it over verbatim. You cannot reliably recompute first-time contributors, so leave it as the generator produced it (mention this in the summary).
 
@@ -73,8 +78,8 @@ Use exactly these headings, in this order. Omit any heading that ends up with no
 
 | Heading | What goes here | Primary signal |
 |---|---|---|
-| `### 🙌 Notable Changes` | **Do not add or remove.** Label-driven. | label `category/notable` |
-| `### 💥 Breaking Changes` | **Do not add or remove.** Label-driven. | label `category/breaking` |
+| `### 🙌 Notable Changes` | **Don't recategorize existing entries.** Label-driven — but still add any missing PR carrying this label here. | label `category/notable` |
+| `### 💥 Breaking Changes` | **Don't recategorize existing entries.** Label-driven — but still add any missing PR carrying this label here. | label `category/breaking` |
 | `### 📦 Dependencies` | Dependency bumps | label `dependencies`; or dependabot author |
 | `### 🚀 New Features` | New user- or developer-facing capability | label `type/feature` / `category/feature`; or title introduces/adds a genuinely new capability |
 | `### 🚤 Performance` | Performance improvements | label `category/performance`; or `Performance:` title prefix |
@@ -86,7 +91,7 @@ Use exactly these headings, in this order. Omit any heading that ends up with no
 
 **Rules:**
 
-- **Notable and Breaking are off-limits** — never move PRs in or out of them; they are driven purely by their labels and the generator already placed them correctly.
+- **Notable and Breaking are off-limits for recategorization** — never move a PR that is *already in the input file* into or out of these sections; they are driven purely by their labels and the generator placed them correctly. This does **not** exempt them from completeness: a PR discovered as missing in step 3 that carries `category/notable` or `category/breaking` must still be **added** under the matching section.
 - Label signals beat title wording, except a `Performance:`/`Developer Experience:` title prefix is decisive for its section.
 - A PR with both `type/feature` and `category/refactor` whose title clearly describes a refactor (e.g. "swap relative imports", "re-export type") belongs under Code Quality, not New Features.
 - "Add ... tests"/"unit test coverage" → Testing, even if it also touches docs. If a PR adds XML documentation *and* tests, lead with where the title's emphasis lies (documentation → Code Quality; test coverage → Testing).
