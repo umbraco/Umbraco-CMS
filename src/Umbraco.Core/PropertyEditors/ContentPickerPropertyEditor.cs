@@ -156,13 +156,16 @@ public class ContentPickerPropertyEditor : DataEditor, IValueSchemaProvider
     internal sealed class AllowedTypeValidator(ILocalizedTextService localizedTextService, IContentService contentService, ICoreScopeProvider coreScopeProvider)
         : ITypedValidator<string, ContentPickerConfiguration>
     {
+        /// <inheritdoc/>
         public IEnumerable<ValidationResult> Validate(
             string? value,
             ContentPickerConfiguration? configuration,
             string? valueType,
             PropertyValidationContext validationContext)
         {
-            if (string.IsNullOrEmpty(value) || configuration is null || !Guid.TryParse(value, out Guid id))
+            if (string.IsNullOrEmpty(value) ||
+                configuration is null ||
+                Guid.TryParse(value, out Guid id) is false)
             {
                 return [];
             }
