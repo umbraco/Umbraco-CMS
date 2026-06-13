@@ -49,9 +49,23 @@ public class EagerMatcherPolicyTests
         Assert.That(candidates[0].Endpoint, Is.SameAs(dynamicEndpoint));
     }
 
-    private static EagerMatcherPolicy CreateSut(RuntimeLevel level, bool isReadyToServe, Endpoint renderEndpoint)
+    [Test]
+    public async Task ApplyAsync_WhenRunButNotReadyAndMaintenancePageDisabled_DoesNotReRoute()
     {
-        var settings = new GlobalSettings { ShowMaintenancePageWhenInUpgradeState = true };
+        // With the maintenance-page opt-out disabled, the front end is not gated even while not ready:
+        // HandleInstallUpgrade returns "not handled", leaving the dynamic content route intact.
+        Endpoint renderEndpoint = CreateRenderEndpoint();
+        EagerMatcherPolicy sut = CreateSut(RuntimeLevel.Run, isReadyToServe: false, renderEndpoint, showMaintenancePage: false);
+        CandidateSet candidates = CreateDynamicCandidateSet(out Endpoint dynamicEndpoint);
+
+        await sut.ApplyAsync(new DefaultHttpContext(), candidates);
+
+        Assert.That(candidates[0].Endpoint, Is.SameAs(dynamicEndpoint));
+    }
+
+    private static EagerMatcherPolicy CreateSut(RuntimeLevel level, bool isReadyToServe, Endpoint renderEndpoint, bool showMaintenancePage = true)
+    {
+        var settings = new GlobalSettings { ShowMaintenancePageWhenInUpgradeState = showMaintenancePage };
         return new EagerMatcherPolicy(
             Mock.Of<IRuntimeState>(s => s.Level == level),
             new DefaultEndpointDataSource(renderEndpoint),

@@ -276,6 +276,34 @@ public class UnattendedUpgradeBackgroundServiceTests
         });
     }
 
+    [Test]
+    public async Task ExecuteAsync_WhenInitializationFails_StillReopensReadinessGate()
+    {
+        // Even on a BootFailed exit the gate must re-open (guaranteed by the outer try/finally) so it can
+        // never wedge closed. Guards against a future refactor moving SetReady() into an inner block.
+        var runtimeState = CreateMockRuntimeState();
+        var eventAggregator = new Mock<IEventAggregator>();
+        eventAggregator
+            .Setup(x => x.PublishAsync(It.IsAny<RuntimePremigrationsUpgradeNotification>(), It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new InvalidOperationException("db gone"));
+
+        var readiness = new Mock<IRuntimeStartupReadinessControl>();
+
+        var sut = CreateSut(runtimeState.Object, eventAggregator.Object, readiness: readiness.Object);
+
+        await sut.StartAsync(CancellationToken.None);
+        await sut.ExecuteTask!;
+
+        Assert.Multiple(() =>
+        {
+            runtimeState.Verify(
+                x => x.Configure(RuntimeLevel.BootFailed, RuntimeLevelReason.BootFailedOnException, It.IsNotNull<Exception>()),
+                Times.Once);
+            readiness.Verify(x => x.SetNotReady(), Times.Once);
+            readiness.Verify(x => x.SetReady(), Times.Once);
+        });
+    }
+
     private static UnattendedUpgradeBackgroundService CreateSut(
         IRuntimeState runtimeState,
         IEventAggregator eventAggregator,
