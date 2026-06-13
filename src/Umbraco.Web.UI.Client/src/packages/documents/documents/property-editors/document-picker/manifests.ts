@@ -1,5 +1,4 @@
 import { manifest as schemaManifest } from './Umbraco.ContentPicker.js';
-import { manifest as allowedDocumentTypesManifest } from './allowed-document-types/manifests.js';
 import { manifests as valueSummaryManifests } from './value-summary/manifests.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
@@ -21,7 +20,8 @@ export const manifests: Array<UmbExtensionManifest> = [
 						alias: 'allowedContentTypes',
 						label: 'Accepted types',
 						description: 'Limit to specific types',
-						propertyEditorUiAlias: 'Umb.PropertyEditorUi.DocumentPicker.AllowedDocumentTypes',
+						propertyEditorUiAlias: 'Umb.PropertyEditorUi.DocumentTypePicker',
+						config: [{ alias: 'onlyPickDocumentTypes', value: true }],
 						weight: 10,
 					},
 					{
@@ -42,6 +42,5 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 	},
 	schemaManifest,
-	allowedDocumentTypesManifest,
 	...valueSummaryManifests,
 ];
