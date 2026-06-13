@@ -25,6 +25,7 @@ internal sealed class UnattendedUpgradeBackgroundService : BackgroundService
     private readonly ComponentCollection _components;
     private readonly IHostApplicationLifetime _hostApplicationLifetime;
     private readonly IMigrationCoordinator _coordinator;
+    private readonly IRuntimeStartupReadinessControl _readiness;
     private readonly ILogger<UnattendedUpgradeBackgroundService> _logger;
 
     /// <summary>
@@ -35,6 +36,7 @@ internal sealed class UnattendedUpgradeBackgroundService : BackgroundService
     /// <param name="components">The component collection to initialize after migration completes.</param>
     /// <param name="hostApplicationLifetime">The host application lifetime for registering started/stopped callbacks.</param>
     /// <param name="coordinator">Coordinates migration leadership across servers in a load-balanced environment.</param>
+    /// <param name="readiness">Gates front-end serving until post-migration initialization has completed.</param>
     /// <param name="logger">The logger.</param>
     public UnattendedUpgradeBackgroundService(
         IRuntimeState runtimeState,
@@ -42,6 +44,7 @@ internal sealed class UnattendedUpgradeBackgroundService : BackgroundService
         ComponentCollection components,
         IHostApplicationLifetime hostApplicationLifetime,
         IMigrationCoordinator coordinator,
+        IRuntimeStartupReadinessControl readiness,
         ILogger<UnattendedUpgradeBackgroundService> logger)
     {
         _runtimeState = runtimeState;
@@ -49,6 +52,7 @@ internal sealed class UnattendedUpgradeBackgroundService : BackgroundService
         _components = components;
         _hostApplicationLifetime = hostApplicationLifetime;
         _coordinator = coordinator;
+        _readiness = readiness;
         _logger = logger;
     }
 
@@ -63,73 +67,88 @@ internal sealed class UnattendedUpgradeBackgroundService : BackgroundService
 
         _logger.LogInformation("Unattended upgrade background service started.");
 
+        // Keep the front end gated for the entire background finalization, re-opening only once
+        // post-migration initialization (components + application-starting handlers, e.g. document URL
+        // routing) has completed. This must be set BEFORE TryBecomeLeaderAsync: on a follower the level
+        // flips to Run while polling inside that call, so the gate has to already be closed by then.
+        _readiness.SetNotReady();
+
         bool isLeader = false;
 
         try
         {
-            isLeader = await _coordinator.TryBecomeLeaderAsync(stoppingToken);
+            try
+            {
+                isLeader = await _coordinator.TryBecomeLeaderAsync(stoppingToken);
+
+                if (_runtimeState.Level == RuntimeLevel.BootFailed)
+                {
+                    return;
+                }
+
+                if (isLeader)
+                {
+                    // Belt-and-suspenders for graceful shutdowns (e.g. Azure SIGTERM): release the claim
+                    // as soon as the host begins stopping, even if a migration step is still blocking.
+                    _hostApplicationLifetime.ApplicationStopping.Register(() => _coordinator.ReleaseLeadership());
+                    await RunMigrationsAsync(stoppingToken);
+                }
+                else
+                {
+                    // Follower: rebuild per-server in-memory navigation and publish status
+                    // from the fully-migrated database.
+                    await _eventAggregator.PublishAsync(new PostRuntimePremigrationsUpgradeNotification(), stoppingToken);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unattended upgrade failed.");
+                _runtimeState.Configure(RuntimeLevel.BootFailed, RuntimeLevelReason.BootFailedOnException, ex);
+                return;
+            }
+            finally
+            {
+                // Always release the claim — even on leader failure — so other servers
+                // can detect completion or take over.
+                if (isLeader)
+                {
+                    _coordinator.ReleaseLeadership();
+                }
+            }
+
+            // For the leader: confirms migrations succeeded and level transitions to Run.
+            // For followers: level is already Run (set during TryBecomeLeaderAsync polling).
+            DetermineRuntimeLevel();
 
             if (_runtimeState.Level == RuntimeLevel.BootFailed)
             {
                 return;
             }
 
-            if (isLeader)
+            // Migrations complete: initialize components and fire application lifecycle events.
+            try
             {
-                // Belt-and-suspenders for graceful shutdowns (e.g. Azure SIGTERM): release the claim
-                // as soon as the host begins stopping, even if a migration step is still blocking.
-                _hostApplicationLifetime.ApplicationStopping.Register(() => _coordinator.ReleaseLeadership());
-                await RunMigrationsAsync(stoppingToken);
+                await _components.InitializeAsync(false, stoppingToken);
+                await _eventAggregator.PublishAsync(new UmbracoApplicationStartingNotification(_runtimeState.Level, false), stoppingToken);
+
+                _hostApplicationLifetime.ApplicationStarted.Register(
+                    () => _eventAggregator.Publish(new UmbracoApplicationStartedNotification(false)));
+                _hostApplicationLifetime.ApplicationStopped.Register(
+                    () => _eventAggregator.Publish(new UmbracoApplicationStoppedNotification(false)));
+
+                _logger.LogInformation("Unattended upgrade completed successfully.");
             }
-            else
+            catch (Exception ex)
             {
-                // Follower: rebuild per-server in-memory navigation and publish status
-                // from the fully-migrated database.
-                await _eventAggregator.PublishAsync(new PostRuntimePremigrationsUpgradeNotification(), stoppingToken);
+                _logger.LogError(ex, "Unattended upgrade post-migration initialization failed.");
+                _runtimeState.Configure(RuntimeLevel.BootFailed, RuntimeLevelReason.BootFailedOnException, ex);
             }
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Unattended upgrade failed.");
-            _runtimeState.Configure(RuntimeLevel.BootFailed, RuntimeLevelReason.BootFailedOnException, ex);
-            return;
         }
         finally
         {
-            // Always release the claim — even on leader failure — so other servers
-            // can detect completion or take over.
-            if (isLeader)
-            {
-                _coordinator.ReleaseLeadership();
-            }
-        }
-
-        // For the leader: confirms migrations succeeded and level transitions to Run.
-        // For followers: level is already Run (set during TryBecomeLeaderAsync polling).
-        DetermineRuntimeLevel();
-
-        if (_runtimeState.Level == RuntimeLevel.BootFailed)
-        {
-            return;
-        }
-
-        // Migrations complete: initialize components and fire application lifecycle events.
-        try
-        {
-            await _components.InitializeAsync(false, stoppingToken);
-            await _eventAggregator.PublishAsync(new UmbracoApplicationStartingNotification(_runtimeState.Level, false), stoppingToken);
-
-            _hostApplicationLifetime.ApplicationStarted.Register(
-                () => _eventAggregator.Publish(new UmbracoApplicationStartedNotification(false)));
-            _hostApplicationLifetime.ApplicationStopped.Register(
-                () => _eventAggregator.Publish(new UmbracoApplicationStoppedNotification(false)));
-
-            _logger.LogInformation("Unattended upgrade completed successfully.");
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Unattended upgrade post-migration initialization failed.");
-            _runtimeState.Configure(RuntimeLevel.BootFailed, RuntimeLevelReason.BootFailedOnException, ex);
+            // Always re-open the gate (on every exit path) so it can never wedge closed. On BootFailed the
+            // maintenance filter no longer matters because BootFailedMiddleware intercepts the request first.
+            _readiness.SetReady();
         }
     }
 

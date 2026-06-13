@@ -41,6 +41,7 @@ internal sealed class EagerMatcherPolicy : MatcherPolicy, IEndpointSelectorPolic
     private readonly UmbracoRequestPaths _umbracoRequestPaths;
     private readonly IUmbracoContextAccessor _umbracoContextAccessor;
     private readonly IPublishedRouter _publishedRouter;
+    private readonly IRuntimeStartupReadiness _readiness;
     private GlobalSettings _globalSettings;
     private readonly Lazy<Endpoint> _installEndpoint;
     private readonly Lazy<Endpoint> _renderEndpoint;
@@ -51,13 +52,15 @@ internal sealed class EagerMatcherPolicy : MatcherPolicy, IEndpointSelectorPolic
         UmbracoRequestPaths umbracoRequestPaths,
         IOptionsMonitor<GlobalSettings> globalSettings,
         IUmbracoContextAccessor umbracoContextAccessor,
-        IPublishedRouter publishedRouter)
+        IPublishedRouter publishedRouter,
+        IRuntimeStartupReadiness readiness)
     {
         _runtimeState = runtimeState;
         _endpointDataSource = endpointDataSource;
         _umbracoRequestPaths = umbracoRequestPaths;
         _umbracoContextAccessor = umbracoContextAccessor;
         _publishedRouter = publishedRouter;
+        _readiness = readiness;
         _globalSettings = globalSettings.CurrentValue;
         globalSettings.OnChange(settings => _globalSettings = settings);
         _installEndpoint = new Lazy<Endpoint>(GetInstallEndpoint);
@@ -72,7 +75,10 @@ internal sealed class EagerMatcherPolicy : MatcherPolicy, IEndpointSelectorPolic
 
     public async Task ApplyAsync(HttpContext httpContext, CandidateSet candidates)
     {
-        if (_runtimeState.Level != RuntimeLevel.Run)
+        // After an unattended upgrade the level flips to Run before post-migration initialization
+        // (e.g. document URL routing) completes. Treat that not-yet-ready window like an upgrade so the
+        // front end is re-routed to the maintenance page instead of routing against not-yet-initialized services.
+        if (_runtimeState.Level != RuntimeLevel.Run || _readiness.IsReadyToServe is false)
         {
             var handled = await HandleInstallUpgrade(httpContext, candidates);
             if (handled)
@@ -231,7 +237,13 @@ internal sealed class EagerMatcherPolicy : MatcherPolicy, IEndpointSelectorPolic
 
     private Task<bool> HandleInstallUpgrade(HttpContext httpContext, CandidateSet candidates)
     {
-        if (_runtimeState.Level is not RuntimeLevel.Upgrade and not RuntimeLevel.Upgrading)
+        // The front end is gated (re-routed to the maintenance page) during an upgrade, and also during the
+        // brief not-yet-ready window after an unattended upgrade flips the level to Run but before post-migration
+        // initialization completes. Everything else handled here is the install state.
+        var showMaintenance = _runtimeState.Level is RuntimeLevel.Upgrade or RuntimeLevel.Upgrading
+            || (_runtimeState.Level == RuntimeLevel.Run && _readiness.IsReadyToServe is false);
+
+        if (showMaintenance is false)
         {
             // We need to let the installer API requests through
             // Currently we do this with a check for the installer path
@@ -266,8 +278,7 @@ internal sealed class EagerMatcherPolicy : MatcherPolicy, IEndpointSelectorPolic
             }
         }
 
-        if (_runtimeState.Level is not RuntimeLevel.Upgrade and not RuntimeLevel.Upgrading
-            || _globalSettings.ShowMaintenancePageWhenInUpgradeState is false
+        if (_globalSettings.ShowMaintenancePageWhenInUpgradeState is false
             || hasStaticRoute)
         {
             return Task.FromResult(false);

@@ -229,11 +229,59 @@ public class UnattendedUpgradeBackgroundServiceTests
             Times.Once);
     }
 
+    [Test]
+    public async Task ExecuteAsync_OpensReadinessGate_OnlyAfterApplicationStartingInitialization()
+    {
+        // The front-end serving gate must close BEFORE leadership coordination (on a follower the level
+        // flips to Run while polling inside TryBecomeLeaderAsync), stay closed across the level flip, and
+        // only re-open after UmbracoApplicationStartingNotification has run post-migration initialization
+        // (e.g. document URL routing). Otherwise requests are served before routing is initialized.
+        var sequence = 0;
+        var setNotReadyOrder = 0;
+        var tryBecomeLeaderOrder = 0;
+        var applicationStartingOrder = 0;
+        var setReadyOrder = 0;
+
+        var runtimeState = CreateMockRuntimeState();
+        var eventAggregator = new Mock<IEventAggregator>();
+        SetupPublishAsync(eventAggregator, upgradeResult: RuntimeUnattendedUpgradeNotification.UpgradeResult.PackageMigrationComplete);
+        eventAggregator
+            .Setup(x => x.PublishAsync(It.IsAny<UmbracoApplicationStartingNotification>(), It.IsAny<CancellationToken>()))
+            .Callback(() => applicationStartingOrder = ++sequence)
+            .Returns(Task.CompletedTask);
+
+        var coordinator = new Mock<IMigrationCoordinator>();
+        coordinator
+            .Setup(x => x.TryBecomeLeaderAsync(It.IsAny<CancellationToken>()))
+            .Callback(() => tryBecomeLeaderOrder = ++sequence)
+            .ReturnsAsync(true);
+
+        var readiness = new Mock<IRuntimeStartupReadinessControl>();
+        readiness.Setup(x => x.SetNotReady()).Callback(() => setNotReadyOrder = ++sequence);
+        readiness.Setup(x => x.SetReady()).Callback(() => setReadyOrder = ++sequence);
+
+        var sut = CreateSut(runtimeState.Object, eventAggregator.Object, coordinator: coordinator.Object, readiness: readiness.Object);
+
+        await sut.StartAsync(CancellationToken.None);
+        await sut.ExecuteTask!;
+
+        Assert.Multiple(() =>
+        {
+            readiness.Verify(x => x.SetNotReady(), Times.Once);
+            readiness.Verify(x => x.SetReady(), Times.Once);
+            Assert.That(setNotReadyOrder, Is.GreaterThan(0), "The gate must be closed during finalization.");
+            Assert.That(tryBecomeLeaderOrder, Is.GreaterThan(setNotReadyOrder), "The gate must close before leadership coordination (followers flip to Run inside it).");
+            Assert.That(applicationStartingOrder, Is.GreaterThan(setNotReadyOrder), "Application-starting init must run while the gate is closed.");
+            Assert.That(setReadyOrder, Is.GreaterThan(applicationStartingOrder), "The gate must re-open only after application-starting initialization completes.");
+        });
+    }
+
     private static UnattendedUpgradeBackgroundService CreateSut(
         IRuntimeState runtimeState,
         IEventAggregator eventAggregator,
         IHostApplicationLifetime? hostApplicationLifetime = null,
-        IMigrationCoordinator? coordinator = null)
+        IMigrationCoordinator? coordinator = null,
+        IRuntimeStartupReadinessControl? readiness = null)
     {
         var components = new ComponentCollection(
             () => Enumerable.Empty<IAsyncComponent>(),
@@ -249,6 +297,7 @@ public class UnattendedUpgradeBackgroundServiceTests
             components,
             hostApplicationLifetime ?? CreateMockLifetime().Object,
             coordinator,
+            readiness ?? new RuntimeStartupReadiness(),
             NullLogger<UnattendedUpgradeBackgroundService>.Instance);
     }
 

@@ -85,6 +85,42 @@ public class MaintenanceModeActionFilterAttributeTests
     }
 
     [Test]
+    public void OnActionExecuting_MvcController_WhenRunButNotReady_SetsMaintenanceResult()
+    {
+        // After an unattended upgrade the level flips to Run before post-migration initialization completes;
+        // the front end must stay gated until ready to serve.
+        var settings = new GlobalSettings { ShowMaintenancePageWhenInUpgradeState = true };
+        var context = CreateMvcControllerContext();
+
+        InvokeFilter(RuntimeLevel.Run, settings, context, isReadyToServe: false);
+
+        Assert.That(context.Result, Is.InstanceOf<MaintenanceResult>());
+    }
+
+    [Test]
+    public void OnActionExecuting_MvcController_WhenRunButNotReadyAndMaintenanceDisabled_DoesNotSetResult()
+    {
+        var settings = new GlobalSettings { ShowMaintenancePageWhenInUpgradeState = false };
+        var context = CreateMvcControllerContext();
+
+        InvokeFilter(RuntimeLevel.Run, settings, context, isReadyToServe: false);
+
+        Assert.That(context.Result, Is.Null);
+    }
+
+    [Test]
+    public void OnActionExecuting_ApiController_WhenRunButNotReady_DoesNotSetResult()
+    {
+        // The API/health surface comes back as soon as the level is Run; only the front end is gated by readiness.
+        var settings = new GlobalSettings { ShowMaintenancePageWhenInUpgradeState = true };
+        var context = CreateApiControllerContext();
+
+        InvokeFilter(RuntimeLevel.Run, settings, context, isReadyToServe: false);
+
+        Assert.That(context.Result, Is.Null);
+    }
+
+    [Test]
     public void OnActionExecuting_ApiController_WhenUpgradingAndMaintenanceEnabled_SetsProblemDetailsResult()
     {
         var settings = new GlobalSettings { ShowMaintenancePageWhenInUpgradeState = true };
@@ -152,12 +188,13 @@ public class MaintenanceModeActionFilterAttributeTests
         Assert.That(context.Result, Is.Null);
     }
 
-    private static void InvokeFilter(RuntimeLevel level, GlobalSettings settings, ActionExecutingContext context)
+    private static void InvokeFilter(RuntimeLevel level, GlobalSettings settings, ActionExecutingContext context, bool isReadyToServe = true)
     {
         var attribute = new MaintenanceModeActionFilterAttribute();
         var services = new ServiceCollection()
             .AddSingleton(Mock.Of<IRuntimeState>(s => s.Level == level))
             .AddSingleton(Mock.Of<IOptionsMonitor<GlobalSettings>>(m => m.CurrentValue == settings))
+            .AddSingleton(Mock.Of<IRuntimeStartupReadiness>(r => r.IsReadyToServe == isReadyToServe))
             .BuildServiceProvider();
 
         var filter = (IActionFilter)attribute.CreateInstance(services);

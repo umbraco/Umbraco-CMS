@@ -26,11 +26,16 @@ public sealed class MaintenanceModeActionFilterAttribute : TypeFilterAttribute
     {
         private readonly IRuntimeState _runtimeState;
         private readonly IOptionsMonitor<GlobalSettings> _globalSettings;
+        private readonly IRuntimeStartupReadiness _readiness;
 
-        public MaintenanceModeActionFilter(IRuntimeState runtimeState, IOptionsMonitor<GlobalSettings> globalSettings)
+        public MaintenanceModeActionFilter(
+            IRuntimeState runtimeState,
+            IOptionsMonitor<GlobalSettings> globalSettings,
+            IRuntimeStartupReadiness readiness)
         {
             _runtimeState = runtimeState;
             _globalSettings = globalSettings;
+            _readiness = readiness;
         }
 
         public void OnActionExecuting(ActionExecutingContext context)
@@ -47,13 +52,18 @@ public sealed class MaintenanceModeActionFilterAttribute : TypeFilterAttribute
 
             bool isApiController = context.ActionDescriptor.EndpointMetadata.OfType<ApiControllerAttribute>().Any();
 
+            // After an unattended upgrade the level flips to Run before post-migration initialization
+            // (e.g. document URL routing) completes; keep the front end gated until it is ready to serve.
+            bool deferredStartupPending = _runtimeState.Level == RuntimeLevel.Run && _readiness.IsReadyToServe is false;
+
             // API controllers (Management/Delivery API) are only blocked during an unattended upgrade
             // (RuntimeLevel.Upgrading). During an attended upgrade (RuntimeLevel.Upgrade) the operator
             // needs API access to log in and trigger the upgrade from the backoffice.
-            // MVC controllers (website, surface) are blocked during both Upgrade and Upgrading.
+            // MVC controllers (website, surface) are blocked during both Upgrade and Upgrading, and also
+            // during the brief not-yet-ready window after the level flips to Run.
             bool shouldBlock = isApiController
                 ? _runtimeState.Level == RuntimeLevel.Upgrading
-                : _runtimeState.Level is RuntimeLevel.Upgrade or RuntimeLevel.Upgrading;
+                : _runtimeState.Level is RuntimeLevel.Upgrade or RuntimeLevel.Upgrading || deferredStartupPending;
 
             if (shouldBlock is false)
             {
@@ -72,7 +82,9 @@ public sealed class MaintenanceModeActionFilterAttribute : TypeFilterAttribute
                 return;
             }
 
-            context.Result = _runtimeState.Level == RuntimeLevel.Upgrading
+            // The not-yet-ready window is the tail end of an unattended upgrade, so show the same
+            // "upgrade in progress" page as during the upgrade itself.
+            context.Result = _runtimeState.Level == RuntimeLevel.Upgrading || deferredStartupPending
                 ? new MaintenanceResult(_globalSettings.CurrentValue.UpgradingViewPath)
                 : new MaintenanceResult();
         }

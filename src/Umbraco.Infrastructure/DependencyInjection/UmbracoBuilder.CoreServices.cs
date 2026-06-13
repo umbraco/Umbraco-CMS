@@ -95,6 +95,9 @@ public static partial class UmbracoBuilderExtensions
         builder.AddNotificationAsyncHandler<RuntimeUnattendedUpgradeNotification, UnattendedUpgrader>();
         builder.AddNotificationAsyncHandler<RuntimePremigrationsUpgradeNotification, PremigrationUpgrader>();
         builder.Services.AddSingleton<IMigrationCoordinator, MigrationCoordinator>();
+        builder.Services.AddSingleton<RuntimeStartupReadiness>();
+        builder.Services.AddSingleton<IRuntimeStartupReadiness>(factory => factory.GetRequiredService<RuntimeStartupReadiness>());
+        builder.Services.AddSingleton<IRuntimeStartupReadinessControl>(factory => factory.GetRequiredService<RuntimeStartupReadiness>());
         builder.Services.AddHostedService<UnattendedUpgradeBackgroundService>();
 
         // Database availability check.
