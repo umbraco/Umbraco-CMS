@@ -29,7 +29,7 @@ public class EagerMatcherPolicyTests
         // endpoint so the maintenance page is shown, instead of routing against not-yet-initialized services.
         Endpoint renderEndpoint = CreateRenderEndpoint();
         EagerMatcherPolicy sut = CreateSut(RuntimeLevel.Run, isReadyToServe: false, renderEndpoint);
-        CandidateSet candidates = CreateDynamicCandidateSet(out Endpoint dynamicEndpoint);
+        CandidateSet candidates = CreateDynamicCandidateSet(out _);
 
         await sut.ApplyAsync(new DefaultHttpContext(), candidates);
 
