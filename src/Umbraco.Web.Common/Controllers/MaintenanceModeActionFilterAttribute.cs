@@ -54,16 +54,14 @@ public sealed class MaintenanceModeActionFilterAttribute : TypeFilterAttribute
 
             // After an unattended upgrade the level flips to Run before post-migration initialization
             // (e.g. document URL routing) completes; keep the front end gated until it is ready to serve.
-            bool deferredStartupPending = _runtimeState.Level == RuntimeLevel.Run && _readiness.IsReadyToServe is false;
+            bool deferredStartupPending = IsDeferredStartupPending();
 
             // API controllers (Management/Delivery API) are only blocked during an unattended upgrade
             // (RuntimeLevel.Upgrading). During an attended upgrade (RuntimeLevel.Upgrade) the operator
             // needs API access to log in and trigger the upgrade from the backoffice.
             // MVC controllers (website, surface) are blocked during both Upgrade and Upgrading, and also
             // during the brief not-yet-ready window after the level flips to Run.
-            bool shouldBlock = isApiController
-                ? _runtimeState.Level == RuntimeLevel.Upgrading
-                : _runtimeState.Level is RuntimeLevel.Upgrade or RuntimeLevel.Upgrading || deferredStartupPending;
+            bool shouldBlock = ShouldBlockRequest(isApiController, deferredStartupPending);
 
             if (shouldBlock is false)
             {
@@ -88,6 +86,14 @@ public sealed class MaintenanceModeActionFilterAttribute : TypeFilterAttribute
                 ? new MaintenanceResult(_globalSettings.CurrentValue.UpgradingViewPath)
                 : new MaintenanceResult();
         }
+
+        private bool IsDeferredStartupPending() =>
+            _runtimeState.Level == RuntimeLevel.Run && _readiness.IsReadyToServe is false;
+
+        private bool ShouldBlockRequest(bool isApiController, bool deferredStartupPending) =>
+            isApiController
+                ? _runtimeState.Level == RuntimeLevel.Upgrading
+                : _runtimeState.Level is RuntimeLevel.Upgrade or RuntimeLevel.Upgrading || deferredStartupPending;
 
         public void OnActionExecuted(ActionExecutedContext context)
         {
