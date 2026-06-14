@@ -157,6 +157,10 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 		}
 	}
 
+	get #editPathBase(): string {
+		return `/section/settings/workspace/${this.data?.entityType ?? 'document-type'}/edit/`;
+	}
+
 	override render() {
 		return html`
 			<umb-body-layout headline="${this.localize.term('contentTypeEditor_compositions')}">
@@ -196,7 +200,7 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 					(item) => item.unique,
 					(item) => html`
 						<uui-ref-node-document-type
-							href=${'/section/settings/workspace/document-type/edit/' + item.unique}
+							href=${this.#editPathBase + item.unique}
 							name=${this.localize.string(item.name)}>
 							<umb-icon slot="icon" name=${item.icon}></umb-icon>
 						</uui-ref-node-document-type>

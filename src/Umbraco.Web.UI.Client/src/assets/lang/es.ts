@@ -1136,11 +1136,11 @@ export default {
 		compositionsDescriptionMemberType:
 			'Heredar pestañas y propiedades de un tipo de miembro existente. Nuevas pestañas serán añadidas al tipo de miembro actual o mezcladas si una pestaña con nombre idéntico ya existe.',
 		compositionInUse:
-			'Este tipo de contenido es usado en una composición, y por tanto no puede no puede ser compuesto.',
+			'Este tipo de contenido es usado en una composición, y por tanto no puede ser compuesto.',
 		compositionInUseMediaType:
-			'Este tipo de medio es usado en una composición, y por tanto no puede no puede ser compuesto.',
+			'Este tipo de medio es usado en una composición, y por tanto no puede ser compuesto.',
 		compositionInUseMemberType:
-			'Este tipo de miembro es usado en una composición, y por tanto no puede no puede ser compuesto.',
+			'Este tipo de miembro es usado en una composición, y por tanto no puede ser compuesto.',
 		noAvailableCompositions: 'No hay tipos de contenido disponibles para usar como composición.',
 		noAvailableCompositionsMediaType: 'No hay tipos de medio disponibles para usar como composición.',
 		noAvailableCompositionsMemberType: 'No hay tipos de miembro disponibles para usar como composición.',

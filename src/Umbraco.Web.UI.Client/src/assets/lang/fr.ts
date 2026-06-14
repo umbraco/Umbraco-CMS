@@ -1403,11 +1403,11 @@ export default {
 		childNodesDescription: 'Autorisez la création de contenu des types spécifiés sous le contenu de ce type-ci',
 		chooseChildNode: 'Choisissez les noeuds enfants',
 		compositionsDescription:
-			"Hériter des onglets et propriétés d'un type de document existant. De nouveaux onglets seront ajoutés au type de document actuel, ou fusionnés s'il existe un onglet avec un nom sililaire.",
+			"Hériter des onglets et propriétés d'un type de document existant. De nouveaux onglets seront ajoutés au type de document actuel, ou fusionnés s'il existe un onglet avec un nom similaire.",
 		compositionsDescriptionMediaType:
-			"Hériter des onglets et propriétés d'un type de media existant. De nouveaux onglets seront ajoutés au type de media actuel, ou fusionnés s'il existe un onglet avec un nom sililaire.",
+			"Hériter des onglets et propriétés d'un type de media existant. De nouveaux onglets seront ajoutés au type de media actuel, ou fusionnés s'il existe un onglet avec un nom similaire.",
 		compositionsDescriptionMemberType:
-			"Hériter des onglets et propriétés d'un type de membre existant. De nouveaux onglets seront ajoutés au type de membre actuel, ou fusionnés s'il existe un onglet avec un nom sililaire.",
+			"Hériter des onglets et propriétés d'un type de membre existant. De nouveaux onglets seront ajoutés au type de membre actuel, ou fusionnés s'il existe un onglet avec un nom similaire.",
 		compositionInUse:
 			'Ce type de contenu est utilisé dans une composition, et ne peut donc pas être lui-même un composé.',
 		compositionInUseMediaType:

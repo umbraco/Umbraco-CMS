@@ -1533,11 +1533,11 @@ export default {
 		compositionsDescriptionMemberType:
 			'Eredita schede e proprietà da un tipo di membro esistente. Le nuove schede verranno aggiunte al tipo di membro corrente o unite se esiste una scheda con un nome identico.',
 		compositionInUse:
-			'Questo tipo di contenuto è utlizzato in una composizione, e quindi non può essere composto da se stesso.',
+			'Questo tipo di contenuto è utilizzato in una composizione, e quindi non può essere composto da se stesso.',
 		compositionInUseMediaType:
-			'Questo tipo di media è utlizzato in una composizione, e quindi non può essere composto da se stesso.',
+			'Questo tipo di media è utilizzato in una composizione, e quindi non può essere composto da se stesso.',
 		compositionInUseMemberType:
-			'Questo tipo di membro è utlizzato in una composizione, e quindi non può essere composto da se stesso.',
+			'Questo tipo di membro è utilizzato in una composizione, e quindi non può essere composto da se stesso.',
 		noAvailableCompositions: 'Non ci sono tipi di contenuto utilizzabili come composizione.',
 		noAvailableCompositionsMediaType: 'Non ci sono tipi di media utilizzabili come composizione.',
 		noAvailableCompositionsMemberType: 'Non ci sono tipi di membro utilizzabili come composizione.',
