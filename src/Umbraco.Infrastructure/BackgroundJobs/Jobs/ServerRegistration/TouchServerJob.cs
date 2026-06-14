@@ -132,6 +132,7 @@ public class TouchServerJob : RecurringBackgroundJobBase
         try
         {
             await touchTask.WaitAsync(_touchTimeout, cancellationToken);
+            _logger.LogDebug("Touched server registration for {ServerAddress}.", serverAddress);
         }
         catch (TimeoutException)
         {

@@ -103,6 +103,7 @@ public class InstructionProcessJob : RecurringBackgroundJobBase
         try
         {
             await syncTask.WaitAsync(_syncTimeout, cancellationToken);
+            _logger.LogDebug("Synchronized cache instructions.");
         }
         catch (TimeoutException)
         {
