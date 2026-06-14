@@ -7,6 +7,7 @@ import type { UmbMediaTreeItemModel, UmbMediaSearchItemModel, UmbMediaItemModel 
 import { UmbMediaPickerContext } from './media-picker.context.js';
 import type { UmbMediaPathModel } from './types.js';
 import type { UmbMediaPickerFolderPathElement } from './components/media-picker-folder-path.element.js';
+import type { UmbMediaPickerTableColumnNameValue } from './components/media-picker-table-column-name.element.js';
 import type { UmbMediaPickerModalData, UmbMediaPickerModalValue } from './media-picker-modal.token.js';
 import {
 	css,
@@ -397,6 +398,11 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 		return this.#folderTypeUniques.has(item.mediaType.unique) || item.hasChildren;
 	}
 
+	#getAncestorPath(item: UmbMediaTreeItemModel | UmbMediaSearchItemModel): string {
+		const ancestors = 'ancestors' in item ? item.ancestors : undefined;
+		return ancestors?.length ? ancestors.map((a) => a.name || '(Untitled)').join(' / ') : '';
+	}
+
 	// TODO: move to search manager in context
 	#onSearchFromChange(e: CustomEvent) {
 		const checked = (e.target as HTMLInputElement).checked;
@@ -597,6 +603,11 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 			// When not in selection mode, navigable items open on click (matching card behaviour).
 			// Mark them as non-selectable so the row doesn't intercept the click for selection.
 			const selectableInTable = this._isSelectionMode ? selectable : !canNavigate && selectable;
+			const nameColumnValue: UmbMediaPickerTableColumnNameValue = {
+				name: item.name,
+				ancestorPath: this.#getAncestorPath(item) || undefined,
+				navigate: canNavigate && !this._isSelectionMode ? () => this.#onOpen(item) : undefined,
+			};
 			return {
 				id: item.unique,
 				icon: item.mediaType.icon,
@@ -604,19 +615,7 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 				data: [
 					{
 						columnAlias: 'name',
-						value:
-							canNavigate && !this._isSelectionMode
-								? html`<uui-button
-										look="default"
-										compact
-										label=${item.name}
-										@click=${(e: Event) => {
-											e.stopPropagation();
-											this.#onOpen(item);
-										}}
-										>${item.name}</uui-button
-									>`
-								: html`<span class="table-name">${item.name}</span>`,
+						value: nameColumnValue,
 					},
 					{
 						columnAlias: 'createDate',
@@ -644,6 +643,7 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 			{
 				name: this.localize.term('general_name'),
 				alias: 'name',
+				elementName: 'umb-media-picker-table-column-name',
 			},
 			{
 				name: this.localize.term('content_createDate'),
@@ -741,13 +741,6 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 			uui-pagination {
 				display: block;
 				margin-top: var(--uui-size-layout-1);
-			}
-
-			.table-name {
-				flex: 1;
-				overflow: hidden;
-				text-overflow: ellipsis;
-				white-space: nowrap;
 			}
 
 			#view-dropdown {
