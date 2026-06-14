@@ -53,6 +53,20 @@ public class InstructionProcessJobTests
         }
     }
 
+    [Test]
+    public async Task Falls_Back_And_Warns_When_SyncTimeout_Invalid()
+    {
+        // A non-positive timeout is misconfiguration; the job should warn and fall back to a sane default
+        // rather than treating every sync as immediately timed out.
+        var sut = CreateInstructionProcessJob(TimeSpan.Zero);
+
+        VerifyWarningLogged();
+
+        // The fallback timeout is generous, so a normal (fast) sync still completes successfully.
+        await sut.RunJobAsync(CancellationToken.None);
+        VerifyMessengerSynced();
+    }
+
     private InstructionProcessJob CreateInstructionProcessJob(TimeSpan? syncTimeout = null, Action? onSync = null)
     {
         _mockLogger = new Mock<ILogger<InstructionProcessJob>>();
@@ -79,9 +93,13 @@ public class InstructionProcessJobTests
 
     private void VerifyMessengerSyncedTimes(Times times) => _mockDatabaseServerMessenger.Verify(x => x.Sync(), times);
 
-    private void VerifyErrorLogged() => _mockLogger.Verify(
+    private void VerifyErrorLogged() => VerifyLogged(LogLevel.Error);
+
+    private void VerifyWarningLogged() => VerifyLogged(LogLevel.Warning);
+
+    private void VerifyLogged(LogLevel level) => _mockLogger.Verify(
         l => l.Log(
-            It.Is<LogLevel>(y => y == LogLevel.Error),
+            It.Is<LogLevel>(y => y == level),
             It.IsAny<EventId>(),
             It.IsAny<It.IsAnyType>(),
             It.IsAny<Exception>(),

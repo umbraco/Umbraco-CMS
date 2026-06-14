@@ -36,6 +36,12 @@ public class DatabaseServerMessengerSettings
     internal const string StaticSyncTimeout = "00:01:00"; // TimeSpan.FromMinutes(1);
 
     /// <summary>
+    ///     Gets the default timeout for a single synchronization operation, for use as a fallback when an invalid
+    ///     <see cref="SyncTimeout" /> is configured.
+    /// </summary>
+    public static readonly TimeSpan DefaultSyncTimeout = TimeSpan.Parse(StaticSyncTimeout);
+
+    /// <summary>
     ///     Gets or sets a value for the maximum number of instructions that can be processed at startup; otherwise the server
     ///     cold-boots (rebuilds its caches).
     /// </summary>
@@ -68,5 +74,5 @@ public class DatabaseServerMessengerSettings
     ///     not how long a stalled connection itself takes to recover (which is governed by the database timeouts).
     /// </summary>
     [DefaultValue(StaticSyncTimeout)]
-    public TimeSpan SyncTimeout { get; set; } = TimeSpan.Parse(StaticSyncTimeout);
+    public TimeSpan SyncTimeout { get; set; } = DefaultSyncTimeout;
 }

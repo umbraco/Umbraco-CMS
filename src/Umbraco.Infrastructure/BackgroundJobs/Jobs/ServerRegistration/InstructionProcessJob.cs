@@ -41,7 +41,25 @@ public class InstructionProcessJob : RecurringBackgroundJobBase
     {
         _messenger = messenger;
         _logger = logger;
-        _syncTimeout = globalSettings.Value.DatabaseServerMessenger.SyncTimeout;
+        _syncTimeout = ValidateSyncTimeout(globalSettings.Value.DatabaseServerMessenger.SyncTimeout);
+    }
+
+    // A non-positive timeout would make every sync "time out" immediately (or throw from WaitAsync for a
+    // negative value), so guard against misconfiguration and fall back to the default. Timeout.InfiniteTimeSpan
+    // is allowed as an explicit opt-out that restores the unbounded wait.
+    private TimeSpan ValidateSyncTimeout(TimeSpan configuredSyncTimeout)
+    {
+        if (configuredSyncTimeout > TimeSpan.Zero || configuredSyncTimeout == Timeout.InfiniteTimeSpan)
+        {
+            return configuredSyncTimeout;
+        }
+
+        _logger.LogWarning(
+            "Configured DatabaseServerMessenger.SyncTimeout of {ConfiguredSyncTimeout} is not valid; it must be positive (or Timeout.InfiniteTimeSpan to disable the timeout). Falling back to {DefaultSyncTimeout}.",
+            configuredSyncTimeout,
+            DatabaseServerMessengerSettings.DefaultSyncTimeout);
+
+        return DatabaseServerMessengerSettings.DefaultSyncTimeout;
     }
 
     /// <summary>

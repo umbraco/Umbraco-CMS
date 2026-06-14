@@ -18,6 +18,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.BackgroundJobs.Jobs
 public class TouchServerJobTests
 {
     private Mock<IServerRegistrationService> _mockServerRegistrationService;
+    private Mock<ILogger<TouchServerJob>> _mockLogger;
 
     private const string ApplicationUrl = "https://mysite.com/";
     private readonly TimeSpan _staleServerTimeout = TimeSpan.FromMinutes(2);
@@ -77,11 +78,52 @@ public class TouchServerJobTests
         Assert.AreEqual(waitTimeBetweenCalls, sut.Period);
     }
 
+    [Test]
+    public async Task Returns_And_Logs_When_Touch_Hangs()
+    {
+        using var gate = new ManualResetEventSlim(false);
+        var sut = CreateTouchServerTask(touchTimeout: TimeSpan.FromMilliseconds(50), onTouch: () => gate.Wait());
+
+        try
+        {
+            // A hung TouchServer() must not block the recurring loop: RunJobAsync should return after the timeout
+            // rather than awaiting the (synchronous, un-cancellable) call forever.
+            Task runTask = sut.RunJobAsync(CancellationToken.None);
+            Task winner = await Task.WhenAny(runTask, Task.Delay(TimeSpan.FromSeconds(10)));
+
+            Assert.AreSame(runTask, winner, "RunJobAsync did not return after the touch timed out.");
+            await runTask; // Must complete without throwing so the loop continues.
+
+            VerifyErrorLogged();
+        }
+        finally
+        {
+            // Release the abandoned touch so it does not leave a blocked thread-pool thread behind.
+            gate.Set();
+        }
+    }
+
+    [Test]
+    public async Task Falls_Back_And_Warns_When_TouchTimeout_Invalid()
+    {
+        // A non-positive timeout is misconfiguration; the job should warn and fall back to a sane default
+        // rather than treating every touch as immediately timed out.
+        var sut = CreateTouchServerTask(touchTimeout: TimeSpan.Zero);
+
+        VerifyWarningLogged();
+
+        // The fallback timeout is generous, so a normal (fast) touch still completes successfully.
+        await sut.RunJobAsync(CancellationToken.None);
+        VerifyServerTouched();
+    }
+
     private TouchServerJob CreateTouchServerTask(
         RuntimeLevel runtimeLevel = RuntimeLevel.Run,
         string applicationUrl = ApplicationUrl,
         bool useElection = true,
-        TimeSpan? waitTimeBetweenCalls = null)
+        TimeSpan? waitTimeBetweenCalls = null,
+        TimeSpan? touchTimeout = null,
+        Action? onTouch = null)
     {
         var mockRequestAccessor = new Mock<IHostingEnvironment>();
         mockRequestAccessor.SetupGet(x => x.ApplicationMainUrl)
@@ -90,17 +132,29 @@ public class TouchServerJobTests
         var mockRunTimeState = new Mock<IRuntimeState>();
         mockRunTimeState.SetupGet(x => x.Level).Returns(runtimeLevel);
 
-        var mockLogger = new Mock<ILogger<TouchServerJob>>();
+        _mockLogger = new Mock<ILogger<TouchServerJob>>();
 
         _mockServerRegistrationService = new Mock<IServerRegistrationService>();
+        if (onTouch is not null)
+        {
+            _mockServerRegistrationService
+                .Setup(x => x.TouchServer(It.IsAny<string>(), It.IsAny<TimeSpan>()))
+                .Callback(onTouch);
+        }
+
+        var registrarSettings = new DatabaseServerRegistrarSettings
+        {
+            StaleServerTimeout = _staleServerTimeout,
+            WaitTimeBetweenCalls = waitTimeBetweenCalls ?? TimeSpan.FromMinutes(1),
+        };
+        if (touchTimeout.HasValue)
+        {
+            registrarSettings.TouchTimeout = touchTimeout.Value;
+        }
 
         var settings = new GlobalSettings
         {
-            DatabaseServerRegistrar = new DatabaseServerRegistrarSettings
-            {
-                StaleServerTimeout = _staleServerTimeout,
-                WaitTimeBetweenCalls = waitTimeBetweenCalls ?? TimeSpan.FromMinutes(1),
-            },
+            DatabaseServerRegistrar = registrarSettings,
         };
 
         IServerRoleAccessor roleAccessor = useElection
@@ -110,7 +164,7 @@ public class TouchServerJobTests
         return new TouchServerJob(
             _mockServerRegistrationService.Object,
             mockRequestAccessor.Object,
-            mockLogger.Object,
+            _mockLogger.Object,
             new TestOptionsMonitor<GlobalSettings>(settings),
             roleAccessor);
     }
@@ -132,4 +186,17 @@ public class TouchServerJobTests
                 It.Is<string>(y => y == Environment.MachineName),
                 It.Is<TimeSpan>(y => y == _staleServerTimeout)),
             Times.Once());
+
+    private void VerifyErrorLogged() => VerifyLogged(LogLevel.Error);
+
+    private void VerifyWarningLogged() => VerifyLogged(LogLevel.Warning);
+
+    private void VerifyLogged(LogLevel level) => _mockLogger.Verify(
+        l => l.Log(
+            It.Is<LogLevel>(y => y == level),
+            It.IsAny<EventId>(),
+            It.IsAny<It.IsAnyType>(),
+            It.IsAny<Exception>(),
+            It.IsAny<Func<It.IsAnyType, Exception, string>>()),
+        Times.Once);
 }
