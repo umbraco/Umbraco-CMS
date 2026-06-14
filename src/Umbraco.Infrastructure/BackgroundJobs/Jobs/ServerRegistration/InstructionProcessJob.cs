@@ -26,6 +26,7 @@ public class InstructionProcessJob : RecurringBackgroundJobBase
     private readonly ILogger<InstructionProcessJob> _logger;
     private readonly IServerMessenger _messenger;
     private readonly TimeSpan _syncTimeout;
+    private Task? _inFlightSync;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="InstructionProcessJob" /> class.
@@ -72,19 +73,32 @@ public class InstructionProcessJob : RecurringBackgroundJobBase
     /// </returns>
     public override async Task RunJobAsync(CancellationToken cancellationToken)
     {
+        // If a previous sync is still running (e.g. blocked on a hung database connection after a timeout),
+        // skip starting another. This bounds us to a single in-flight call instead of accumulating blocked
+        // thread-pool threads, and logs the stall once rather than on every interval until it recovers.
+        if (_inFlightSync is { IsCompleted: false })
+        {
+            return;
+        }
+
         // IServerMessenger.Sync() is synchronous and cannot observe the cancellation token, so a hung database
         // connection would otherwise block this job's recurring loop indefinitely and silently stop cache
         // polling until the process is recycled. Offload it to the thread pool and bound the wait so the loop
-        // survives and keeps polling.
-        //
-        // This bounds the loop, not the stalled sync itself: the abandoned call still holds
-        // DatabaseServerMessenger's sync lock, so polls stay no-ops until that call finally faults (bounded by
-        // the database command/connection timeout, not by SyncTimeout), after which syncing resumes on its own
-        // without a recycle.
+        // survives and keeps polling; the in-flight call keeps running until its connection faults (bounded by
+        // the database command/connection timeout, not by SyncTimeout), after which syncing resumes without a recycle.
         //
         // The loop is already started under ExecutionContext.SuppressFlow() (see RecurringBackgroundJobHostedService.StartAsync),
         // which is what makes offloading the scope-creating Sync() to Task.Run safe for the static ambient scope stack.
         var syncTask = Task.Run(_messenger.Sync, cancellationToken);
+        _inFlightSync = syncTask;
+
+        // Observe the task's eventual fault on every exit path (timeout, shutdown cancellation, or a late
+        // failure once we have stopped awaiting it) so it never surfaces as an UnobservedTaskException.
+        _ = syncTask.ContinueWith(
+            static t => _ = t.Exception,
+            CancellationToken.None,
+            TaskContinuationOptions.OnlyOnFaulted | TaskContinuationOptions.ExecuteSynchronously,
+            TaskScheduler.Default);
 
         try
         {
@@ -95,14 +109,6 @@ public class InstructionProcessJob : RecurringBackgroundJobBase
             _logger.LogError(
                 "Cache instruction sync did not complete within {SyncTimeout} and may be stalled on a hung database connection. Cache updates are paused on this server until the stalled connection recovers.",
                 _syncTimeout);
-
-            // The stalled sync keeps running until its database connection faults; observe its eventual failure
-            // so it does not surface as an UnobservedTaskException.
-            _ = syncTask.ContinueWith(
-                static t => _ = t.Exception,
-                CancellationToken.None,
-                TaskContinuationOptions.OnlyOnFaulted | TaskContinuationOptions.ExecuteSynchronously,
-                TaskScheduler.Default);
         }
         catch (Exception e) when (e is not OperationCanceledException)
         {

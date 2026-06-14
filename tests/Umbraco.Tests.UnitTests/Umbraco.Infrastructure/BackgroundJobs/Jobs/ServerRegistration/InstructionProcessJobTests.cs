@@ -54,6 +54,28 @@ public class InstructionProcessJobTests
     }
 
     [Test]
+    public async Task Skips_Sync_While_Previous_Is_Still_Running()
+    {
+        using var gate = new ManualResetEventSlim(false);
+        var sut = CreateInstructionProcessJob(TimeSpan.FromMilliseconds(50), () => gate.Wait());
+
+        try
+        {
+            // First run starts a sync that hangs and times out, leaving it in-flight.
+            await sut.RunJobAsync(CancellationToken.None);
+
+            // Second run must skip rather than start (and block on) another sync while the first is still running.
+            await sut.RunJobAsync(CancellationToken.None);
+
+            VerifyMessengerSyncedTimes(Times.Once());
+        }
+        finally
+        {
+            gate.Set();
+        }
+    }
+
+    [Test]
     public async Task Falls_Back_And_Warns_When_SyncTimeout_Invalid()
     {
         // A non-positive timeout is misconfiguration; the job should warn and fall back to a sane default

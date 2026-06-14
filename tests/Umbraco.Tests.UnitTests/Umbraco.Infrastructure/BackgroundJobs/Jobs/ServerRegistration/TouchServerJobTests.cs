@@ -104,6 +104,28 @@ public class TouchServerJobTests
     }
 
     [Test]
+    public async Task Skips_Touch_While_Previous_Is_Still_Running()
+    {
+        using var gate = new ManualResetEventSlim(false);
+        var sut = CreateTouchServerTask(touchTimeout: TimeSpan.FromMilliseconds(50), onTouch: () => gate.Wait());
+
+        try
+        {
+            // First run starts a touch that hangs and times out, leaving it in-flight.
+            await sut.RunJobAsync(CancellationToken.None);
+
+            // Second run must skip rather than start (and block on) another touch while the first is still running.
+            await sut.RunJobAsync(CancellationToken.None);
+
+            VerifyServerTouchedTimes(Times.Once());
+        }
+        finally
+        {
+            gate.Set();
+        }
+    }
+
+    [Test]
     public async Task Falls_Back_And_Warns_When_TouchTimeout_Invalid()
     {
         // A non-positive timeout is misconfiguration; the job should warn and fall back to a sane default

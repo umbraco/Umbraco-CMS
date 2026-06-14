@@ -34,6 +34,7 @@ public class TouchServerJob : RecurringBackgroundJobBase
     private readonly IDisposable? _onChangeRegistration;
     private GlobalSettings _globalSettings;
     private TimeSpan _touchTimeout;
+    private Task? _inFlightTouch;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="TouchServerJob" /> class.
@@ -84,6 +85,15 @@ public class TouchServerJob : RecurringBackgroundJobBase
             return;
         }
 
+        // If a previous touch is still running (e.g. blocked on a hung database connection after a timeout),
+        // skip starting another. This bounds us to a single in-flight call instead of accumulating blocked
+        // thread-pool threads (each contending for the servers lock), and logs the stall once rather than on
+        // every interval until it recovers.
+        if (_inFlightTouch is { IsCompleted: false })
+        {
+            return;
+        }
+
         var serverAddress = _hostingEnvironment.ApplicationMainUrl?.ToString();
         if (string.IsNullOrWhiteSpace(serverAddress))
         {
@@ -109,6 +119,15 @@ public class TouchServerJob : RecurringBackgroundJobBase
         // (See InstructionProcessJob for the same pattern and the ExecutionContext.SuppressFlow rationale.)
         TimeSpan staleServerTimeout = _globalSettings.DatabaseServerRegistrar.StaleServerTimeout;
         var touchTask = Task.Run(() => _serverRegistrationService.TouchServer(serverAddress, staleServerTimeout), cancellationToken);
+        _inFlightTouch = touchTask;
+
+        // Observe the task's eventual fault on every exit path (timeout, shutdown cancellation, or a late
+        // failure once we have stopped awaiting it) so it never surfaces as an UnobservedTaskException.
+        _ = touchTask.ContinueWith(
+            static t => _ = t.Exception,
+            CancellationToken.None,
+            TaskContinuationOptions.OnlyOnFaulted | TaskContinuationOptions.ExecuteSynchronously,
+            TaskScheduler.Default);
 
         try
         {
@@ -119,14 +138,6 @@ public class TouchServerJob : RecurringBackgroundJobBase
             _logger.LogError(
                 "Touching the server registration did not complete within {TouchTimeout} and may be stalled on a hung database connection. Server registration is paused on this server until the stalled connection recovers.",
                 _touchTimeout);
-
-            // The stalled touch keeps running until its database connection faults; observe its eventual failure
-            // so it does not surface as an UnobservedTaskException.
-            _ = touchTask.ContinueWith(
-                static t => _ = t.Exception,
-                CancellationToken.None,
-                TaskContinuationOptions.OnlyOnFaulted | TaskContinuationOptions.ExecuteSynchronously,
-                TaskScheduler.Default);
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
