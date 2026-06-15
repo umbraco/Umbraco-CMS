@@ -63,8 +63,9 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 	@state()
 	private _contentTypeAlias?: string;
 
-	@state()
-	private _unsupported?: boolean;
+	// 'unsupported' attribute is used for styling purpose.
+	@property({ type: Boolean, attribute: 'unsupported', reflect: true })
+	unsupported?: boolean;
 
 	@state()
 	private _contentTypeName?: string;
@@ -165,7 +166,7 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 			(unsupported) => {
 				if (unsupported === undefined) return;
 				this.#updateBlockViewProps({ unsupported });
-				this._unsupported = unsupported;
+				this.unsupported = unsupported;
 			},
 			null,
 		);
@@ -250,7 +251,7 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 	}
 
 	readonly #filterBlockCustomViews = (manifest: ManifestBlockEditorCustomView) => {
-		if (this._unsupported) {
+		if (this.unsupported) {
 			return false;
 		}
 
@@ -284,7 +285,7 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 
 	#renderBlock() {
 		return when(
-			this.contentKey && (this._contentTypeAlias || this._unsupported),
+			this.contentKey && (this._contentTypeAlias || this.unsupported),
 			() => html`
 				<div>
 					<umb-extension-slot
@@ -315,7 +316,7 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 	}
 
 	#renderBuiltinBlockView = () => {
-		if (this._unsupported) {
+		if (this.unsupported) {
 			return this.#renderUnsupportedBlock();
 		}
 		return this.#renderRefBlock();
