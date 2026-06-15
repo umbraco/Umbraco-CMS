@@ -40,7 +40,7 @@ public class PackageManifestCacheBusterTests
     }
 
     [Test]
-    public void ResolvePackageCacheBust_FallsBackToGlobalAndDisablesStamping_WhenBustingDisallowed()
+    public void ResolvePackageCacheBust_UsesVersionHashButDisablesStamping_WhenBustingDisallowed()
     {
         var manifest = new PackageManifest { Name = "Pkg", Version = "1.2.3", AllowCacheBusting = false, Extensions = [] };
 
@@ -48,8 +48,23 @@ public class PackageManifestCacheBusterTests
 
         Assert.Multiple(() =>
         {
-            Assert.That(hash, Is.EqualTo(GlobalHash));
+            // AllowCacheBusting only governs auto-stamping; the hash (used to resolve an explicit token) is still the version hash.
+            Assert.That(hash, Is.EqualTo("1.2.3".GenerateHash()));
             Assert.That(autoStamp, Is.False);
+        });
+    }
+
+    [Test]
+    public void ResolvePackageCacheBust_FallsBackToGlobalHash_WhenPackageHasNoVersion()
+    {
+        var manifest = new PackageManifest { Name = "Pkg", Version = null, Extensions = [] };
+
+        var (hash, autoStamp) = PackageManifestCacheBuster.ResolvePackageCacheBust(manifest, GlobalHash);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(hash, Is.EqualTo(GlobalHash));
+            Assert.That(autoStamp, Is.True);
         });
     }
 

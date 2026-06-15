@@ -28,12 +28,12 @@ public abstract class ManifestControllerBase : ManagementApiControllerBase
 
     /// <summary>
     /// Applies cache-busting to each model's extension asset URLs using a per-package hash derived from the package's
-    /// <see cref="PackageManifest.Version"/> (falling back to <paramref name="globalHash"/>), honouring each package's
-    /// <see cref="PackageManifest.AllowCacheBusting"/> opt-out. When busting is enabled every clean
-    /// <c>/App_Plugins</c>-rooted URL (at any depth in the extension) is stamped with <c>?umb__rnd=&lt;hash&gt;</c> and an
-    /// explicit <c>%CACHE_BUSTER%</c> token is resolved to the same hash; when disabled only the token is resolved (to
-    /// <paramref name="globalHash"/>). URLs that already carry a query string are left untouched. The models are
-    /// expected to be in the same order as <paramref name="manifests"/>.
+    /// <see cref="PackageManifest.Version"/> (falling back to <paramref name="globalHash"/> only when the package has no
+    /// version). An explicit <c>%CACHE_BUSTER%</c> token (at any depth in the extension) always resolves to that hash.
+    /// When <see cref="PackageManifest.AllowCacheBusting"/> is enabled, clean <c>/App_Plugins</c>-rooted
+    /// <c>.js</c>/<c>.mjs</c> URLs are additionally stamped with <c>?umb__rnd=&lt;hash&gt;</c>; disabling it only turns
+    /// off that automatic stamping (the token still resolves). URLs that already carry a query string are left
+    /// untouched. The models are expected to be in the same order as <paramref name="manifests"/>.
     /// </summary>
     protected static void ReplaceCacheBusterTokens(
         IEnumerable<ManifestResponseModel> models, IEnumerable<PackageManifest> manifests, string globalHash)

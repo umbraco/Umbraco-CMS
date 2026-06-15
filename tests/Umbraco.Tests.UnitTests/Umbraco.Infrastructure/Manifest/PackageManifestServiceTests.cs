@@ -117,7 +117,7 @@ public class PackageManifestServiceTests
     }
 
     [Test]
-    public async Task GetPackageManifestImportmapAsync_WhenBustingDisabled_ResolvesTokenToGlobalHashButDoesNotStamp()
+    public async Task GetPackageManifestImportmapAsync_WhenBustingDisabled_ResolvesTokenToVersionHashButDoesNotStamp()
     {
         var service = CreateService(Manifest(
             "Pkg",
@@ -131,11 +131,10 @@ public class PackageManifestServiceTests
 
         var result = await service.GetPackageManifestImportmapAsync();
 
-        var globalHash = new SemVersion(17, 0, 0).ToSemanticString().GenerateHash();
         Assert.Multiple(() =>
         {
-            // Explicit token still resolves, but to the global hash (legacy behaviour) when busting is disabled.
-            Assert.That(result.Imports["tokenised"], Is.EqualTo($"/App_Plugins/Pkg/index.js?v={globalHash}"));
+            // Disabling busting turns off auto-stamping only; an explicit token still resolves to the package version hash.
+            Assert.That(result.Imports["tokenised"], Is.EqualTo($"/App_Plugins/Pkg/index.js?v={_versionHash}"));
             // The clean path is left untouched because automatic stamping is off for this package.
             Assert.That(result.Imports["clean"], Is.EqualTo("/App_Plugins/Pkg/clean.js"));
         });

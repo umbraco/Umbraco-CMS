@@ -297,7 +297,7 @@ public class ManifestControllerBaseTests
     }
 
     [Test]
-    public void ReplaceCacheBusterTokens_FallsBackToGlobalHash_WhenBustingDisabled()
+    public void ReplaceCacheBusterTokens_ResolvesTokenToVersionHash_WhenBustingDisabled()
     {
         var model = CreateModel(
             [
@@ -313,8 +313,9 @@ public class ManifestControllerBaseTests
         var json = JsonSerializer.Serialize(models[0].Extensions);
         Assert.Multiple(() =>
         {
-            // With busting disabled the explicit token still resolves, but to the global hash (legacy behaviour).
-            Assert.That(json, Does.Contain($"/App_Plugins/Foo/bundle.js?v={CacheBustHash}"));
+            // Disabling busting turns off auto-stamping only; an explicit token still resolves to the package version hash.
+            Assert.That(json, Does.Contain($"/App_Plugins/Foo/bundle.js?v={"1.2.3".GenerateHash()}"));
+            Assert.That(json, Does.Not.Contain(CacheBustHash));
             Assert.That(json, Does.Not.Contain(Constants.Web.CacheBusterToken));
         });
     }

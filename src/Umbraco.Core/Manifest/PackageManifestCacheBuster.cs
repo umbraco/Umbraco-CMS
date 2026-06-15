@@ -32,20 +32,14 @@ public static partial class PackageManifestCacheBuster
 
     /// <summary>
     ///     Resolves the cache-bust hash and auto-stamp flag for a package in one place, so every manifest-processing
-    ///     path (importmap and extensions) derives them identically. When the package opts into cache-busting the hash
-    ///     comes from its <see cref="PackageManifest.Version"/> (falling back to <paramref name="globalHash"/>) and
-    ///     auto-stamping is on; when it opts out the hash is <paramref name="globalHash"/> and auto-stamping is off (an
-    ///     explicit <c>%CACHE_BUSTER%</c> token still resolves, to the global hash).
+    ///     path (importmap and extensions) derives them identically. The hash is always the package's
+    ///     <see cref="PackageManifest.Version"/> hash (falling back to <paramref name="globalHash"/> only when the
+    ///     package has no version) — an explicit <c>%CACHE_BUSTER%</c> token is the author's opt-in and always resolves
+    ///     to it. <see cref="PackageManifest.AllowCacheBusting"/> governs only whether clean URLs are
+    ///     <em>automatically</em> stamped; it does not change the hash.
     /// </summary>
     public static (string Hash, bool AutoStamp) ResolvePackageCacheBust(PackageManifest manifest, string globalHash)
-    {
-        var autoStamp = manifest.AllowCacheBusting;
-        var hash = autoStamp
-            ? ResolvePackageCacheBustHash(manifest.Version, globalHash)
-            : globalHash;
-
-        return (hash, autoStamp);
-    }
+        => (ResolvePackageCacheBustHash(manifest.Version, globalHash), manifest.AllowCacheBusting);
 
     /// <summary>
     ///     Applies cache-busting to a single manifest URL using <paramref name="hash"/>.
