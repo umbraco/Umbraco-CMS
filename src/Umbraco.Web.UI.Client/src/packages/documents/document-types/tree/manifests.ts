@@ -6,7 +6,6 @@ import {
 	UMB_DOCUMENT_TYPE_TREE_REPOSITORY_ALIAS,
 	UMB_DOCUMENT_TYPE_FOLDER_ENTITY_TYPE,
 	UMB_DOCUMENT_TYPE_FOLDER_WORKSPACE_ALIAS,
-	UMB_DOCUMENT_TYPE_TREE_ITEM_CHILDREN_COLLECTION_ALIAS,
 } from './constants.js';
 import { manifests as folderManifests } from './folder/manifests.js';
 import { manifests as treeItemChildrenManifests } from './tree-item-children/manifests.js';
@@ -50,24 +49,6 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 			UMB_DOCUMENT_TYPE_ROOT_ENTITY_TYPE,
 			UMB_DOCUMENT_TYPE_ENTITY_TYPE,
 			UMB_DOCUMENT_TYPE_FOLDER_ENTITY_TYPE,
-		],
-	},
-	{
-		type: 'workspaceView',
-		kind: 'collection',
-		alias: 'Umb.WorkspaceView.DocumentType.TreeItemChildrenCollection',
-		name: 'Document Type Tree Item Children Collection Workspace View',
-		meta: {
-			label: '#general_design',
-			pathname: 'design',
-			icon: 'icon-member-dashed-line',
-			collectionAlias: UMB_DOCUMENT_TYPE_TREE_ITEM_CHILDREN_COLLECTION_ALIAS,
-		},
-		conditions: [
-			{
-				alias: UMB_WORKSPACE_CONDITION_ALIAS,
-				oneOf: [UMB_DOCUMENT_TYPE_ROOT_WORKSPACE_ALIAS, UMB_DOCUMENT_TYPE_FOLDER_WORKSPACE_ALIAS],
-			},
 		],
 	},
 	{
