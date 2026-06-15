@@ -2,21 +2,19 @@
 // See LICENSE for more details.
 
 using System.Data;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
-using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure;
-using Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
 using Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs.DistributedJobs;
-using Umbraco.Cms.Infrastructure.HostedServices;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.BackgroundJobs.Jobs;
 
@@ -76,13 +74,17 @@ public class ScheduledPublishingJobTests
                 It.IsAny<bool>()))
             .Returns(Mock.Of<IScope>());
 
+        var scheduledPublishingSettings =
+            Mock.Of<IOptionsMonitor<ScheduledPublishingSettings>>(x => x.CurrentValue == new ScheduledPublishingSettings());
+
         return new ScheduledPublishingJob(
             _mockContentService.Object,
             mockUmbracoContextFactory.Object,
             _mockLogger.Object,
             mockServerMessenger.Object,
             mockScopeProvider.Object,
-            TimeProvider.System);
+            TimeProvider.System,
+            scheduledPublishingSettings);
     }
 
     private void VerifyScheduledPublishingNotPerformed() => VerifyScheduledPublishingPerformed(Times.Never());

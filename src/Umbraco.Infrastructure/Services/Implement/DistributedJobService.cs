@@ -20,6 +20,10 @@ public class DistributedJobService : IDistributedJobService
     private readonly ILogger<DistributedJobService> _logger;
     private readonly DistributedJobSettings _settings;
 
+    // Captured once: which jobs align to the clock is a startup configuration concern (changing it requires a restart),
+    // so there's no need to re-evaluate it on every poll.
+    private readonly Lazy<HashSet<string>> _clockAlignedJobNames;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="DistributedJobService"/> class.
     /// </summary>
@@ -58,6 +62,8 @@ public class DistributedJobService : IDistributedJobService
         _distributedBackgroundJobs = distributedBackgroundJobs;
         _logger = logger;
         _settings = settings.Value;
+        _clockAlignedJobNames = new Lazy<HashSet<string>>(() =>
+            _distributedBackgroundJobs.Where(x => x.AlignToClock).Select(x => x.Name).ToHashSet());
     }
 
     /// <inheritdoc />
@@ -67,9 +73,13 @@ public class DistributedJobService : IDistributedJobService
 
         scope.EagerWriteLock(Constants.Locks.DistributedJobs);
 
+        DateTime utcNow = DateTime.UtcNow;
+        HashSet<string> clockAlignedJobNames = _clockAlignedJobNames.Value;
+
         IEnumerable<DistributedBackgroundJobModel> jobs = _distributedJobRepository.GetAll();
-        DistributedBackgroundJobModel? job = jobs.FirstOrDefault(x => x.LastRun < DateTime.UtcNow - x.Period
-                                                                      && (x.IsRunning is false || x.LastAttemptedRun < DateTime.UtcNow - x.Period - _settings.MaximumExecutionTime));
+        DistributedBackgroundJobModel? job = jobs.FirstOrDefault(x =>
+            IsDue(x, utcNow, clockAlignedJobNames.Contains(x.Name))
+            && (x.IsRunning is false || x.LastAttemptedRun < utcNow - x.Period - _settings.MaximumExecutionTime));
 
         if (job is null)
         {
@@ -95,6 +105,36 @@ public class DistributedJobService : IDistributedJobService
         }
 
         return distributedJob;
+    }
+
+    /// <summary>
+    ///     Determines whether a job is due to run.
+    /// </summary>
+    /// <param name="job">The job state.</param>
+    /// <param name="utcNow">The current UTC time.</param>
+    /// <param name="aligned">
+    ///     Whether the job's runs are aligned to clock boundaries (see <see cref="IDistributedBackgroundJob.AlignToClock" />).
+    /// </param>
+    /// <remarks>
+    ///     For non-aligned jobs the period counts from the previous run's completion (<c>LastRun + Period</c>, drifting).
+    ///     For aligned jobs the job is due once a clock boundary — a multiple of the period anchored at the UTC epoch —
+    ///     has fallen strictly after the previous run's completion. Boundaries are anchored to UTC, not the server's
+    ///     local time zone. This is overrun-safe: if a run takes longer than the period, the boundary it would have
+    ///     targeted has already passed, so the missed boundary is skipped rather than triggering back-to-back runs.
+    /// </remarks>
+    internal static bool IsDue(DistributedBackgroundJobModel job, DateTime utcNow, bool aligned)
+    {
+        if (aligned == false || job.Period <= TimeSpan.Zero)
+        {
+            return job.LastRun < utcNow - job.Period;
+        }
+
+        long periodTicks = job.Period.Ticks;
+
+        // Largest UTC clock boundary (a multiple of the period, anchored at the epoch) that is <= now.
+        long currentBoundaryTicks = utcNow.Ticks / periodTicks * periodTicks;
+
+        return currentBoundaryTicks > job.LastRun.Ticks;
     }
 
     /// <inheritdoc />
@@ -134,6 +174,20 @@ public class DistributedJobService : IDistributedJobService
         {
             _logger.LogInformation("No distributed background jobs to register");
             return;
+        }
+
+        // Clock-aligned jobs only hit their boundaries as tightly as the poll interval allows. If the poll interval
+        // is longer than the job's period, boundaries between polls are silently missed.
+        foreach (IDistributedBackgroundJob job in _distributedBackgroundJobs)
+        {
+            if (job.AlignToClock && job.Period < _settings.Period)
+            {
+                _logger.LogWarning(
+                    "Distributed background job '{JobName}' aligns to the clock with a period of {Period}, but the distributed job poll interval is longer ({PollInterval}). Clock boundaries shorter than the poll interval will be missed; set Umbraco:CMS:DistributedJobs:Period to be no longer than the job period.",
+                    job.Name,
+                    job.Period,
+                    _settings.Period);
+            }
         }
 
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
