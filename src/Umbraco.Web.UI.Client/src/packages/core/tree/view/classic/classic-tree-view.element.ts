@@ -8,9 +8,6 @@ export class UmbClassicTreeViewElement extends UmbTreeViewElementBase {
 	private _rootItems: UmbTreeItemModel[] = [];
 
 	@state()
-	private _currentPage = 1;
-
-	@state()
 	private _hasPreviousItems = false;
 
 	@state()
@@ -34,11 +31,6 @@ export class UmbClassicTreeViewElement extends UmbTreeViewElementBase {
 	protected override _observeContext() {
 		super._observeContext();
 		this.observe(this._treeContext?.rootItems, (rootItems) => (this._rootItems = rootItems ?? []), '_observeRootItems');
-		this.observe(
-			this._treeContext?.pagination.currentPage,
-			(value) => (this._currentPage = value ?? 1),
-			'_observeCurrentPage',
-		);
 		this.observe(
 			this._treeContext?.isLoadingPrevChildren,
 			(value) => (this._isLoadingPrevChildren = value ?? false),
@@ -79,8 +71,7 @@ export class UmbClassicTreeViewElement extends UmbTreeViewElementBase {
 
 	#onLoadNext(event: Event) {
 		event.stopPropagation();
-		const next = (this._currentPage = this._currentPage + 1);
-		this._treeContext?.pagination.setCurrentPageNumber(next);
+		this._treeContext?.loadMore?.();
 	}
 
 	override render() {

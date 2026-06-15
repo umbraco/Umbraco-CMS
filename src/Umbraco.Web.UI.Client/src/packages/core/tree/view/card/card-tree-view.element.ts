@@ -13,11 +13,9 @@ export class UmbCardTreeViewElement extends UmbTreeViewElementBase<UmbTreeItemMo
 		super._observeContext();
 
 		this.observe(
-			this._treeContext?.rootItems,
-			(items) => {
-				this._items = items ?? [];
-			},
-			'_observeRootItems',
+			this._treeContext?.currentPageItems,
+			(items) => (this._items = items ?? []),
+			'_observeCurrentPageItems',
 		);
 	}
 
@@ -34,6 +32,7 @@ export class UmbCardTreeViewElement extends UmbTreeViewElementBase<UmbTreeItemMo
 					`,
 				)}
 			</div>
+			<umb-tree-pagination></umb-tree-pagination>
 		`;
 	}
 

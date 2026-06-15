@@ -37,6 +37,7 @@ export interface UmbTreeContext<
 	readonly expansion: UmbTreeExpansionManager;
 
 	readonly rootItems: Observable<TreeItemType[]>;
+	readonly currentPageItems: Observable<TreeItemType[]>;
 	readonly hasChildren: Observable<boolean>;
 	readonly pagination: UmbPaginationManager;
 	readonly targetPagination: UmbTargetPaginationManager;
@@ -52,6 +53,7 @@ export interface UmbTreeContext<
 
 	loadTree(): void;
 	reloadTree(): void;
+	loadPage(pageNumber: number): void;
 	loadMore(): void;
 	loadPrevItems(): void;
 	loadNextItems(): void;

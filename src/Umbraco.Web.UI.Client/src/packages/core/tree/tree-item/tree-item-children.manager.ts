@@ -5,7 +5,6 @@ import { UmbRequestReloadTreeItemChildrenEvent } from '../entity-actions/reload-
 import { UMB_TREE_ITEM_CONTEXT } from './tree-item.context.token.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbArrayState, UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import {
 	UmbPaginationManager,
@@ -35,6 +34,9 @@ export class UmbTreeItemChildrenManager<
 
 	#children = new UmbArrayState<TreeItemType>([], (x) => x.unique);
 	public readonly children = this.#children.asObservable();
+
+	#currentPageChildren = new UmbArrayState<TreeItemType>([], (x) => x.unique);
+	public readonly currentPageChildren = this.#currentPageChildren.asObservable();
 
 	#hasChildren = new UmbBooleanState(false);
 	public readonly hasChildren = this.#hasChildren.asObservable();
@@ -73,9 +75,6 @@ export class UmbTreeItemChildrenManager<
 
 	constructor(host: UmbControllerHost) {
 		super(host);
-		// listen for page changes on the pagination manager
-		this.offsetPagination.addEventListener(UmbChangeEvent.TYPE, this.#onPageChange);
-
 		this.#listenForActionEvents();
 
 		this.consumeContext(UMB_TREE_CONTEXT, (treeContext) => {
@@ -307,6 +306,7 @@ export class UmbTreeItemChildrenManager<
 		if (data) {
 			const items = data.items as Array<TreeItemType>;
 			this.#children.setValue(items);
+			this.#currentPageChildren.setValue(items);
 			this.setHasChildren(data.total > 0);
 
 			this.offsetPagination.setTotalItems(data.total);
@@ -459,9 +459,11 @@ export class UmbTreeItemChildrenManager<
 		if (data) {
 			const items = data.items as Array<TreeItemType>;
 			this.#children.append(items);
+			this.#currentPageChildren.setValue(items);
 			this.setHasChildren(data.total > 0);
 
 			this.offsetPagination.setTotalItems(data.total);
+			this.offsetPagination.setCurrentPageNumber(this.offsetPagination.getCurrentPageNumber() + 1);
 
 			this.targetPagination.appendCurrentItems(data.items);
 			this.targetPagination.setTotalItems(data.total);
@@ -578,7 +580,11 @@ export class UmbTreeItemChildrenManager<
 		}
 	}
 
-	#onPageChange = () => this.loadNextChildren();
+	public async loadPage(pageNumber: number): Promise<void> {
+		this.offsetPagination.setCurrentPageNumber(pageNumber);
+		this.#children.setValue([]);
+		await this.#loadChildren();
+	}
 
 	#listenForActionEvents() {
 		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (instance) => {

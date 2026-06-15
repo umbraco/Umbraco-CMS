@@ -2,7 +2,15 @@ import type { UmbTreeItemModel } from '../../types.js';
 import { UmbTreeViewElementBase } from '../tree-view-element-base.js';
 import type { ManifestTreeViewTableKind, MetaTreeViewTableKindColumn } from './types.js';
 import { UmbDefaultTreeItemTableApi } from './default-tree-item-table.api.js';
-import { css, customElement, html, nothing, property, state, type PropertyValues } from '@umbraco-cms/backoffice/external/lit';
+import {
+	css,
+	customElement,
+	html,
+	nothing,
+	property,
+	state,
+	type PropertyValues,
+} from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbElementControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbEntityContext } from '@umbraco-cms/backoffice/entity';
@@ -136,7 +144,6 @@ export class UmbTableTreeViewElement extends UmbTreeViewElementBase<UmbTreeItemM
 			},
 			`_observeIsActive_${item.id}`,
 		);
-
 	};
 
 	#updateRowSelectable(id: string) {
@@ -196,12 +203,12 @@ export class UmbTableTreeViewElement extends UmbTreeViewElementBase<UmbTreeItemM
 		super._observeContext();
 
 		this.observe(
-			this._treeContext?.rootItems,
+			this._treeContext?.currentPageItems,
 			(items) => {
 				this._items = items ?? [];
 				this.#createTableRows();
 			},
-			'_observeRootItems',
+			'_observeCurrentPageItems',
 		);
 
 		this.observe(
@@ -355,6 +362,7 @@ export class UmbTableTreeViewElement extends UmbTreeViewElementBase<UmbTreeItemM
 				.onRowRendered=${this.#onRowRendered}
 				@selected=${this.#onSelected}
 				@deselected=${this.#onDeselected}></umb-table>
+			<umb-tree-pagination></umb-tree-pagination>
 		`;
 	}
 

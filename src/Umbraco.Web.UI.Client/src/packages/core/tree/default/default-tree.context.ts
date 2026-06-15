@@ -19,10 +19,10 @@ import { umbExtensionsRegistry, type ManifestRepository } from '@umbraco-cms/bac
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbDefaultTreeContext<
-		TreeItemType extends UmbTreeItemModel,
-		TreeRootType extends UmbTreeRootModel,
-		RequestArgsType extends UmbTreeRootItemsRequestArgs = UmbTreeRootItemsRequestArgs,
-	>
+	TreeItemType extends UmbTreeItemModel,
+	TreeRootType extends UmbTreeRootModel,
+	RequestArgsType extends UmbTreeRootItemsRequestArgs = UmbTreeRootItemsRequestArgs,
+>
 	extends UmbContextBase
 	implements UmbTreeContext<TreeItemType, TreeRootType, RequestArgsType>
 {
@@ -54,6 +54,7 @@ export class UmbDefaultTreeContext<
 
 	#treeItemChildrenManager = new UmbTreeItemChildrenManager<TreeItemType, TreeRootType, RequestArgsType>(this);
 	public readonly rootItems = this.#treeItemChildrenManager.children;
+	public readonly currentPageItems = this.#treeItemChildrenManager.currentPageChildren;
 	public readonly hasChildren = this.#treeItemChildrenManager.hasChildren;
 	public readonly pagination = this.#treeItemChildrenManager.offsetPagination;
 	public readonly targetPagination = this.#treeItemChildrenManager.targetPagination;
@@ -164,9 +165,12 @@ export class UmbDefaultTreeContext<
 
 	/**
 	 * Reloads the tree
+	 * @param pageNumber
 	 * @memberof UmbDefaultTreeContext
 	 * @returns {Promise<void>}
 	 */
+	public loadPage = (pageNumber: number): Promise<void> => this.#treeItemChildrenManager.loadPage(pageNumber);
+
 	public loadMore = (): Promise<void> => this.#treeItemChildrenManager.loadNextChildren();
 
 	/**
