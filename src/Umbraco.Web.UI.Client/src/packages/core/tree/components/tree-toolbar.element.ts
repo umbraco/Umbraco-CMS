@@ -28,7 +28,7 @@ export class UmbTreeToolbarElement extends UmbLitElement {
 				justify-content: space-between;
 				align-items: center;
 				width: 100%;
-				padding: var(--uui-size-space-3) var(--uui-size-space-4);
+				padding: 0 0 var(--uui-size-layout-1) 0;
 				box-sizing: border-box;
 			}
 		`,
