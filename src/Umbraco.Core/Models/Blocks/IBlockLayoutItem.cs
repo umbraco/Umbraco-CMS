@@ -39,8 +39,7 @@ public interface IBlockLayoutItem
     /// <summary>
     ///     Indicates if the content source is local or originates from the element service.
     /// </summary>
-    // TODO KJA: We need a proper name for this.
-    public bool IsSharedContent { get; set; }
+    public bool IsExternalContent { get; set; }
 
     /// <summary>
     ///     Determines whether this layout item references the specified content key.

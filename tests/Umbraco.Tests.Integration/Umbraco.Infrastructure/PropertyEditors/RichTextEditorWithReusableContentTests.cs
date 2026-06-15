@@ -36,7 +36,7 @@ internal class RichTextEditorWithReusableContentTests : BlockEditorWithReusableC
                 {
                     {
                         Constants.PropertyEditors.Aliases.RichText, [
-                            new RichTextBlockLayoutItem { ContentKey = reusableElementKey, IsSharedContent = true }
+                            new RichTextBlockLayoutItem { ContentKey = reusableElementKey, IsExternalContent = true }
                         ]
                     },
                 },

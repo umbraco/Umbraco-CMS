@@ -153,7 +153,7 @@ internal abstract class BlockValuePropertyIndexValueFactoryBase<TSerialized> : J
         //       such, so this "top-level aggregation" of shared content keys works in effect.
         Guid[] sharedElementKeys = layoutsAsArray
             .Union(layoutsAsArray.SelectMany(l => l.GetContainedLayouts()))
-            .Where(l => l.IsSharedContent)
+            .Where(l => l.IsExternalContent)
             .Select(l => l.ContentKey)
             .ToArray();
 

@@ -151,7 +151,7 @@ internal abstract class BlockPropertyValueCreatorBase<TBlockModel, TBlockItemMod
         {
             IPublishedElement? element = null;
             BlockItemData? data = null;
-            if (layout.IsSharedContent)
+            if (layout.IsExternalContent)
             {
                 element = await _elementCacheService.GetByKeyAsync(layout.ContentKey, preview);
 
@@ -181,7 +181,7 @@ internal abstract class BlockPropertyValueCreatorBase<TBlockModel, TBlockItemMod
                 : null;
 
             string? resolvedCulture = null;
-            if (layout.IsSharedContent is false)
+            if (layout.IsExternalContent is false)
             {
                 Fallback fallback = _propertyRenderingContextAccessor.PropertyRenderingContext?.Fallback ?? default;
                 if (BlockExposeFallbackHelper.IsBlockExposed(expose, element.Key, expectedBlockVariationCulture, expectedBlockVariationSegment, fallback, languagesByIsoCode, defaultIsoCode, out resolvedCulture) is false)

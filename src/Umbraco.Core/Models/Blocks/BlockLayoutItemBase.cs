@@ -15,7 +15,7 @@ public abstract class BlockLayoutItemBase : IBlockLayoutItem
     public Guid? SettingsKey { get; set; }
 
     /// <inheritdoc />
-    public bool IsSharedContent { get; set; }
+    public bool IsExternalContent { get; set; }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="BlockLayoutItemBase" /> class.

@@ -33,7 +33,7 @@ internal class BlockListWithReusableContentTest : BlockEditorWithReusableContent
                 {
                     Constants.PropertyEditors.Aliases.BlockList,
                     [
-                        new BlockListLayoutItem { ContentKey = reusableElementKey, IsSharedContent = true }
+                        new BlockListLayoutItem { ContentKey = reusableElementKey, IsExternalContent = true }
                     ]
                 },
             },
@@ -85,9 +85,9 @@ internal class BlockListWithReusableContentTest : BlockEditorWithReusableContent
                 {
                     Constants.PropertyEditors.Aliases.BlockList,
                     [
-                        new BlockListLayoutItem { ContentKey = reusableElementKey, IsSharedContent = true },
-                        new BlockListLayoutItem { ContentKey = reusableElementKey, IsSharedContent = true },
-                        new BlockListLayoutItem { ContentKey = reusableElementKey, IsSharedContent = true },
+                        new BlockListLayoutItem { ContentKey = reusableElementKey, IsExternalContent = true },
+                        new BlockListLayoutItem { ContentKey = reusableElementKey, IsExternalContent = true },
+                        new BlockListLayoutItem { ContentKey = reusableElementKey, IsExternalContent = true },
                     ]
                 },
             },
@@ -142,7 +142,7 @@ internal class BlockListWithReusableContentTest : BlockEditorWithReusableContent
                 {
                     Constants.PropertyEditors.Aliases.BlockList,
                     [
-                        new BlockListLayoutItem { ContentKey = reusableElementKey, SettingsKey = localElementKey, IsSharedContent = true }
+                        new BlockListLayoutItem { ContentKey = reusableElementKey, SettingsKey = localElementKey, IsExternalContent = true }
                     ]
                 },
             },
@@ -219,7 +219,7 @@ internal class BlockListWithReusableContentTest : BlockEditorWithReusableContent
                     Constants.PropertyEditors.Aliases.BlockList,
                     [
                         new BlockListLayoutItem { ContentKey = localElementKey },
-                        new BlockListLayoutItem { ContentKey = reusableElementKey, IsSharedContent = true }
+                        new BlockListLayoutItem { ContentKey = reusableElementKey, IsExternalContent = true }
                     ]
                 },
             },
@@ -299,7 +299,7 @@ internal class BlockListWithReusableContentTest : BlockEditorWithReusableContent
                     Constants.PropertyEditors.Aliases.BlockList,
                     [
                         new BlockListLayoutItem { ContentKey = localElementKey, SettingsKey = settingsForLocalElementKey },
-                        new BlockListLayoutItem { ContentKey = reusableElementKey, SettingsKey = settingsForReusableElementKey, IsSharedContent = true }
+                        new BlockListLayoutItem { ContentKey = reusableElementKey, SettingsKey = settingsForReusableElementKey, IsExternalContent = true }
                     ]
                 },
             },
@@ -415,7 +415,7 @@ internal class BlockListWithReusableContentTest : BlockEditorWithReusableContent
                     Constants.PropertyEditors.Aliases.BlockList,
                     [
                         new BlockListLayoutItem { ContentKey = localElementKey },
-                        new BlockListLayoutItem { ContentKey = reusableElementKey, IsSharedContent = true }
+                        new BlockListLayoutItem { ContentKey = reusableElementKey, IsExternalContent = true }
                     ]
                 },
             },
@@ -447,7 +447,7 @@ internal class BlockListWithReusableContentTest : BlockEditorWithReusableContent
                     Constants.PropertyEditors.Aliases.BlockList,
                     [
                         new BlockListLayoutItem { ContentKey = localElementKey },
-                        new BlockListLayoutItem { ContentKey = reusableElementKey, IsSharedContent = true }
+                        new BlockListLayoutItem { ContentKey = reusableElementKey, IsExternalContent = true }
                     ]
                 },
             },
@@ -535,7 +535,7 @@ internal class BlockListWithReusableContentTest : BlockEditorWithReusableContent
                     Constants.PropertyEditors.Aliases.BlockList,
                     [
                         new BlockListLayoutItem { ContentKey = localElementKey },
-                        new BlockListLayoutItem { ContentKey = reusableElementKey, IsSharedContent = true }
+                        new BlockListLayoutItem { ContentKey = reusableElementKey, IsExternalContent = true }
                     ]
                 },
             },
@@ -625,7 +625,7 @@ internal class BlockListWithReusableContentTest : BlockEditorWithReusableContent
                     Constants.PropertyEditors.Aliases.BlockList,
                     [
                         new BlockListLayoutItem { ContentKey = localElementKey },
-                        new BlockListLayoutItem { ContentKey = reusableElementKey, IsSharedContent = true }
+                        new BlockListLayoutItem { ContentKey = reusableElementKey, IsExternalContent = true }
                     ]
                 },
             },
@@ -729,7 +729,7 @@ internal class BlockListWithReusableContentTest : BlockEditorWithReusableContent
                 {
                     Constants.PropertyEditors.Aliases.BlockList,
                     [
-                        new BlockListLayoutItem { ContentKey = reusableElementKey, IsSharedContent = true }
+                        new BlockListLayoutItem { ContentKey = reusableElementKey, IsExternalContent = true }
                     ]
                 },
             },
@@ -800,7 +800,7 @@ internal class BlockListWithReusableContentTest : BlockEditorWithReusableContent
                 {
                     Constants.PropertyEditors.Aliases.BlockList,
                     [
-                        new BlockListLayoutItem { ContentKey = reusableElementKey, IsSharedContent = true }
+                        new BlockListLayoutItem { ContentKey = reusableElementKey, IsExternalContent = true }
                     ]
                 },
             },
@@ -863,7 +863,7 @@ internal class BlockListWithReusableContentTest : BlockEditorWithReusableContent
                 {
                     Constants.PropertyEditors.Aliases.BlockList,
                     [
-                        new BlockListLayoutItem { ContentKey = reusableElementKey, IsSharedContent = true }
+                        new BlockListLayoutItem { ContentKey = reusableElementKey, IsExternalContent = true }
                     ]
                 },
             },
