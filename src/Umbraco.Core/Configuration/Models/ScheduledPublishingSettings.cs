@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Core.Configuration.Models;
 public class ScheduledPublishingSettings
 {
     private const string StaticPeriod = "00:01:00";
-    private const bool StaticAlignToClock = false;
+    private const bool StaticAlignToClock = false; // TODO (V19): Switch this to true.
 
     /// <summary>
     /// Gets or sets a value for how often scheduled publishing runs.
