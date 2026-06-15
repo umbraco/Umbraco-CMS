@@ -63,7 +63,7 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 	@state()
 	private _contentTypeAlias?: string;
 
-	// 'unsupported' attribute is used for styling purpose.
+	/** Reflects whether the block's content type is no longer registered. Set internally by context — do not set externally. */
 	@property({ type: Boolean, attribute: 'unsupported', reflect: true })
 	unsupported?: boolean;
 
