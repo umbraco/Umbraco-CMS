@@ -74,16 +74,18 @@ public class PackageManifestCacheBusterTests
         Assert.That(result, Is.EqualTo("/App_Plugins/MyPkg/index.js?umb__rnd=abc#frag"));
     }
 
+    [TestCase("/App_Plugins/MyPkg/index.js", "/App_Plugins/MyPkg/index.js?umb__rnd=abc")]
     [TestCase("/App_Plugins/MyPkg/index.JS", "/App_Plugins/MyPkg/index.JS?umb__rnd=abc")]
+    [TestCase("/App_Plugins/MyPkg/module.mjs", "/App_Plugins/MyPkg/module.mjs?umb__rnd=abc")]
+    [TestCase("/App_Plugins/MyPkg/module.MJS", "/App_Plugins/MyPkg/module.MJS?umb__rnd=abc")]
     [TestCase("/App_Plugins/MyPkg/index.mjs.js", "/App_Plugins/MyPkg/index.mjs.js?umb__rnd=abc")]
-    public void ApplyCacheBust_StampsJavaScriptPath_RegardlessOfExtensionCase(string url, string expected)
+    public void ApplyCacheBust_StampsJavaScriptModuleExtensions(string url, string expected)
     {
         Assert.That(PackageManifestCacheBuster.ApplyCacheBust(url, "abc", autoStamp: true), Is.EqualTo(expected));
     }
 
     [TestCase("/App_Plugins/MyPkg/styles.css")]
     [TestCase("/App_Plugins/MyPkg/data.json")]
-    [TestCase("/App_Plugins/MyPkg/module.mjs")]
     [TestCase("/App_Plugins/MyPkg/icon.svg")]
     [TestCase("/App_Plugins/MyPkg/route")]
     [TestCase("/App_Plugins/MyPkg/")]

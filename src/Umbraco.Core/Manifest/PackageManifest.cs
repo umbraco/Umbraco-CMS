@@ -28,8 +28,9 @@ public class PackageManifest
     /// <summary>
     ///     Gets or sets a value indicating whether automatic cache-busting of this package's <c>/App_Plugins</c>
     ///     JavaScript assets is enabled. When <c>true</c> (default), Umbraco appends a per-package <c>?umb__rnd</c>
-    ///     token derived from <see cref="Version"/> to the package's clean <c>/App_Plugins</c> <c>.js</c> URLs, both in
-    ///     its importmap and in its extension definitions. URLs that already carry a query string are left untouched.
+    ///     token derived from <see cref="Version"/> to the package's clean <c>/App_Plugins</c> JavaScript URLs
+    ///     (<c>.js</c>/<c>.mjs</c>), both in its importmap and in its extension definitions. URLs that already carry a
+    ///     query string are left untouched.
     /// </summary>
     public bool AllowCacheBusting { get; set; } = true;
 

@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Manifest;
@@ -5,19 +6,20 @@ namespace Umbraco.Cms.Core.Manifest;
 /// <summary>
 ///     Computes and applies per-package cache-busting tokens for package manifest assets.
 /// </summary>
-public static class PackageManifestCacheBuster
+public static partial class PackageManifestCacheBuster
 {
     private const string QueryParameterName = "umb__rnd";
-
-    // Auto-stamping only targets JavaScript entrypoints — the non-bundler-hashed files that actually need a
-    // version-driven bust. Restricting by file extension keeps the algorithm type-agnostic (it never needs to know
-    // which manifest keys hold URLs) while avoiding rewriting a string that merely looks like an /App_Plugins path
-    // but isn't a fetchable script (a route, an icon path, an alias, etc.).
-    private const string JavaScriptExtension = ".js";
 
     // The /App_Plugins root with a trailing slash, so the StartsWith check honours a path-segment boundary
     // (and never matches e.g. "/App_PluginsFoo/...").
     private static readonly string _appPluginsPrefix = Constants.SystemDirectories.AppPlugins.EnsureEndsWith('/');
+
+    // Auto-stamping only targets JavaScript entrypoints (.js / .mjs) — the non-bundler-hashed files that actually
+    // need a version-driven bust. Matching by extension keeps the algorithm type-agnostic (it never needs to know
+    // which manifest keys hold URLs) while avoiding rewriting a string that merely looks like an /App_Plugins path
+    // but isn't a fetchable script (a route, an icon path, an alias, etc.).
+    [GeneratedRegex(@"\.m?js$", RegexOptions.IgnoreCase)]
+    private static partial Regex JavaScriptExtensionRegex();
 
     /// <summary>
     ///     Returns the cache-bust hash for a package: a hash of its <paramref name="packageVersion"/> when present,
@@ -50,7 +52,7 @@ public static class PackageManifestCacheBuster
     ///     <para>
     ///     An explicit <c>%CACHE_BUSTER%</c> token is always resolved to <paramref name="hash"/> wherever it appears
     ///     (path or query, any host) — that is the author's deliberate opt-in. When <paramref name="autoStamp"/> is
-    ///     <c>true</c>, a clean <c>/App_Plugins</c>-rooted <c>.js</c> path additionally gets
+    ///     <c>true</c>, a clean <c>/App_Plugins</c>-rooted JavaScript path (<c>.js</c>/<c>.mjs</c>) additionally gets
     ///     <c>?umb__rnd=&lt;hash&gt;</c> appended. Everything else — the backoffice core (<c>/umbraco/backoffice/...</c>),
     ///     CDNs, protocol-relative URLs, bare module specifiers, relative paths, non-JavaScript assets, and URLs that
     ///     already carry a query string — is returned unchanged.
@@ -92,7 +94,7 @@ public static class PackageManifestCacheBuster
         var path = fragmentIndex < 0 ? url : url[..fragmentIndex];
 
         // Only JavaScript entrypoints are auto-stamped; other asset shapes are left untouched.
-        if (path.EndsWith(JavaScriptExtension, StringComparison.OrdinalIgnoreCase) is false)
+        if (JavaScriptExtensionRegex().IsMatch(path) is false)
         {
             return url;
         }

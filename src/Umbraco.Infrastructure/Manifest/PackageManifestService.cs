@@ -14,8 +14,10 @@ internal sealed class PackageManifestService : IPackageManifestService
     private readonly IEnumerable<IPackageManifestReader> _packageManifestReaders;
     private readonly IAppPolicyCache _cache;
     private RuntimeSettings _runtimeSettings;
-    private readonly IHostingEnvironment _hostingEnvironment;
-    private readonly IUmbracoVersion _umbracoVersion;
+
+    // The global cache-bust hash only depends on the debug mode and Umbraco version, both fixed for the application's
+    // lifetime, so it is computed once here rather than on every importmap request (this service is a singleton).
+    private readonly string _globalCacheBustHash;
 
 
     /// <summary>
@@ -37,8 +39,7 @@ internal sealed class PackageManifestService : IPackageManifestService
         _cache = appCaches.RuntimeCache;
         _runtimeSettings = runtimeSettingsOptionsMonitor.CurrentValue;
         runtimeSettingsOptionsMonitor.OnChange(runtimeSettings => _runtimeSettings = runtimeSettings);
-        _hostingEnvironment = hostingEnvironment;
-        _umbracoVersion = umbracoVersion;
+        _globalCacheBustHash = CacheBustHashGenerator.Generate(hostingEnvironment, umbracoVersion);
     }
 
     /// <summary>
@@ -90,7 +91,6 @@ internal sealed class PackageManifestService : IPackageManifestService
     public async Task<PackageManifestImportmap> GetPackageManifestImportmapAsync()
     {
         IEnumerable<PackageManifest> packageManifests = await GetAllPackageManifestsAsync();
-        var globalHash = CacheBustHashGenerator.Generate(_hostingEnvironment, _umbracoVersion);
 
         // Last-wins on duplicate import/scope keys across packages (the old ToDictionary threw, letting one package break the whole importmap).
         var importDict = new Dictionary<string, string>();
@@ -98,7 +98,7 @@ internal sealed class PackageManifestService : IPackageManifestService
 
         foreach (PackageManifest manifest in packageManifests)
         {
-            AppendStampedImportmap(manifest, globalHash, importDict, scopesDict);
+            AppendStampedImportmap(manifest, _globalCacheBustHash, importDict, scopesDict);
         }
 
         return new PackageManifestImportmap
