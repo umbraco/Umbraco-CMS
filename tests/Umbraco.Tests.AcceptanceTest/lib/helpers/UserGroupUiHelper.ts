@@ -22,6 +22,7 @@ export class UserGroupUiHelper extends UiBaseLocators {
   private readonly sectionList: Locator;
   private readonly documentPermissionsGroups: Locator;
   private readonly elementPermissionsGroups: Locator;
+  private readonly elementFolderPermissionsGroups: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -44,6 +45,7 @@ export class UserGroupUiHelper extends UiBaseLocators {
     this.iconChecked = page.locator('uui-toggle').locator('#icon-checked').getByRole('img');
     this.documentPermissionsGroups = page.locator('umb-user-group-entity-type-permission-groups uui-box').filter({hasText: 'Document permissions'});
     this.elementPermissionsGroups = page.locator('umb-user-group-entity-type-permission-groups uui-box').filter({hasText: 'Element permissions'});
+    this.elementFolderPermissionsGroups = page.locator('umb-user-group-entity-type-permission-groups uui-box').filter({hasText: 'Element Folder permissions'});
   }
 
   async clickUserGroupsButton() {
@@ -232,6 +234,32 @@ export class UserGroupUiHelper extends UiBaseLocators {
     for (let index = 0; index < Object.keys(settings).length; index++) {
       const [name, description] = settings[index];
       const permissionItemLocator = this.elementPermissionsGroups.locator(this.permissionVerbBtn).nth(index);
+      await expect(permissionItemLocator.locator('#name')).toHaveText(name);
+      if (description !== '')
+        await expect(permissionItemLocator.locator('#setting small')).toHaveText(description);
+    }
+  }
+
+  async clickElementFolderPermissionsByName(permissionName: string[]) {
+    for (let i = 0; i < permissionName.length; i++) {
+      await this.click(this.elementFolderPermissionsGroups.getByText(permissionName[i], {exact: true}));
+    }
+  }
+
+  async doesUserGroupHaveElementFolderPermission(permissionName: string, hasPermission = true) {
+    await this.isVisible(this.elementFolderPermissionsGroups.locator('umb-input-user-permission-verb[label="' + permissionName + '"]').filter({has: this.iconChecked}), hasPermission);
+  }
+
+  async doesUserGroupHaveElementFolderPermissionsEnabled(permissionName: string[]) {
+    return await Promise.all(
+      permissionName.map(permission => this.doesUserGroupHaveElementFolderPermission(permission))
+    );
+  }
+
+  async doesElementFolderPermissionsSettingsHaveValue(settings) {
+    for (let index = 0; index < Object.keys(settings).length; index++) {
+      const [name, description] = settings[index];
+      const permissionItemLocator = this.elementFolderPermissionsGroups.locator(this.permissionVerbBtn).nth(index);
       await expect(permissionItemLocator.locator('#name')).toHaveText(name);
       if (description !== '')
         await expect(permissionItemLocator.locator('#setting small')).toHaveText(description);
