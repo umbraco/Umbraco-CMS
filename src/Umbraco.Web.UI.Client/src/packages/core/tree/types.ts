@@ -6,6 +6,7 @@ export type * from './extensions/types.js';
 export type * from './folder/types.js';
 export type * from './tree-menu-item/types.js';
 export type * from './tree-item-card/types.js';
+export type * from './workspace-view/types.js';
 
 export type { UmbTreePickerModalData, UmbTreePickerModalValue } from './tree-picker-modal/index.js';
 

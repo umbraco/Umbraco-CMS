@@ -6,6 +6,7 @@ import { manifests as treeMenuItemManifests } from './tree-menu-item/manifests.j
 import { manifests as treePickerManifests } from './tree-picker-modal/manifests.js';
 import { manifests as treeItemCardManifests } from './tree-item-card/manifests.js';
 import { manifests as treeViewManifests } from './view/manifests.js';
+import { manifests as workspaceViewManifests } from './workspace-view/manifests.js';
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
 export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
@@ -17,4 +18,5 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 	...treePickerManifests,
 	...treeItemCardManifests,
 	...treeViewManifests,
+	...workspaceViewManifests,
 ];
