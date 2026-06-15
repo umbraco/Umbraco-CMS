@@ -118,10 +118,11 @@ public class DistributedJobService : IDistributedJobService
     /// </param>
     /// <remarks>
     ///     For non-aligned jobs the period counts from the previous run's completion (<c>LastRun + Period</c>, drifting).
-    ///     For aligned jobs the job is due once a clock boundary — a multiple of the period anchored at the UTC epoch —
-    ///     has fallen strictly after the previous run's completion. Boundaries are anchored to UTC, not the server's
-    ///     local time zone. This is overrun-safe: if a run takes longer than the period, the boundary it would have
-    ///     targeted has already passed, so the missed boundary is skipped rather than triggering back-to-back runs.
+    ///     For aligned jobs the job is due once a clock boundary — a multiple of the period measured from a fixed UTC
+    ///     origin, so boundaries fall on round clock times such as on the minute — has fallen strictly after the previous
+    ///     run's completion. Boundaries are in UTC, not the server's local time zone. This is overrun-safe: if a run takes
+    ///     longer than the period, the boundary it would have targeted has already passed, so the missed boundary is
+    ///     skipped rather than triggering back-to-back runs.
     /// </remarks>
     internal static bool IsDue(DistributedBackgroundJobModel job, DateTime utcNow, bool aligned)
     {
@@ -132,8 +133,10 @@ public class DistributedJobService : IDistributedJobService
 
         long periodTicks = job.Period.Ticks;
 
-        // Largest UTC clock boundary (a multiple of the period, anchored at the epoch) that is <= now.
-        long currentBoundaryTicks = utcNow.Ticks / periodTicks * periodTicks;
+        // Floor the current UTC time to the most recent clock boundary. Ticks count from a fixed origin (0001-01-01), and
+        // a day divides evenly by any clean sub-hour period, so boundaries fall on round clock times (e.g. each :10s).
+        long ticksSinceBoundary = utcNow.Ticks % periodTicks;
+        long currentBoundaryTicks = utcNow.Ticks - ticksSinceBoundary;
 
         return currentBoundaryTicks > job.LastRun.Ticks;
     }
@@ -195,7 +198,7 @@ public class DistributedJobService : IDistributedJobService
         scope.WriteLock(Constants.Locks.DistributedJobs);
 
         DistributedBackgroundJobModel[] existingJobs = _distributedJobRepository.GetAll().ToArray();
-        var existingJobsByName = existingJobs.ToDictionary(x => x.Name);
+        Dictionary<string, DistributedBackgroundJobModel> existingJobsByName = existingJobs.ToDictionary(x => x.Name);
 
         // Collect all changes first, then execute - minimizes time spent in the critical section
         var jobsToAdd = new List<DistributedBackgroundJobModel>();

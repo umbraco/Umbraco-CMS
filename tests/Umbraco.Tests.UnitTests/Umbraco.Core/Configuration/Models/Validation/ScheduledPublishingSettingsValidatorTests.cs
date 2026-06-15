@@ -17,10 +17,11 @@ public class ScheduledPublishingSettingsValidatorTests
         Assert.True(result.Succeeded);
     }
 
-    [Test]
-    public void Cannot_Validate_Zero_Or_Negative_Period()
+    [TestCase(0)]
+    [TestCase(-5)]
+    public void Cannot_Validate_Zero_Or_Negative_Period(int seconds)
     {
-        var result = Validate(new ScheduledPublishingSettings { Period = TimeSpan.Zero });
+        var result = Validate(new ScheduledPublishingSettings { Period = TimeSpan.FromSeconds(seconds) });
         Assert.False(result.Succeeded);
     }
 

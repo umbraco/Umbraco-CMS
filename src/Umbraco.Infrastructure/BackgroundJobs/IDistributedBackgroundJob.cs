@@ -21,7 +21,8 @@ public interface IDistributedBackgroundJob
     /// </summary>
     /// <remarks>
     /// When <c>true</c>, the job becomes runnable on the next clock boundary that is a multiple of <see cref="Period" />
-    /// (anchored to the <strong>UTC</strong> epoch, e.g. on the minute or every N seconds) rather than at <c>LastRun + Period</c>.
+    /// (measured from a fixed <strong>UTC</strong> origin, so boundaries fall on round clock times such as on the minute
+    /// or every N seconds) rather than at <c>LastRun + Period</c>.
     /// For predictable boundaries <see cref="Period" /> should divide evenly into one hour.
     /// The scheduler may cache this value when it first evaluates registered jobs; changing it at runtime may require an application restart.
     /// Defaults to <c>false</c>, preserving the original drift-from-completion behaviour.

@@ -40,8 +40,25 @@ public class ScheduledPublishingJobTests
         VerifyScheduledPublishingPerformed();
     }
 
+    [Test]
+    public void Period_And_AlignToClock_Reflect_Configured_Settings()
+    {
+        var sut = CreateScheduledPublishing(settings: new ScheduledPublishingSettings
+        {
+            Period = TimeSpan.FromSeconds(10),
+            AlignToClock = true,
+        });
+
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(TimeSpan.FromSeconds(10), sut.Period);
+            Assert.IsTrue(sut.AlignToClock);
+        });
+    }
+
     private ScheduledPublishingJob CreateScheduledPublishing(
-        bool enabled = true)
+        bool enabled = true,
+        ScheduledPublishingSettings? settings = null)
     {
         if (enabled)
         {
@@ -75,7 +92,7 @@ public class ScheduledPublishingJobTests
             .Returns(Mock.Of<IScope>());
 
         var scheduledPublishingSettings =
-            Mock.Of<IOptionsMonitor<ScheduledPublishingSettings>>(x => x.CurrentValue == new ScheduledPublishingSettings());
+            Mock.Of<IOptionsMonitor<ScheduledPublishingSettings>>(x => x.CurrentValue == (settings ?? new ScheduledPublishingSettings()));
 
         return new ScheduledPublishingJob(
             _mockContentService.Object,

@@ -86,4 +86,13 @@ public class DistributedJobServiceTests
         // At :20 a fresh boundary has passed after the finish -> due.
         Assert.IsTrue(DistributedJobService.IsDue(job, _onBoundary.AddSeconds(20), aligned: true));
     }
+
+    [Test]
+    public void Can_Run_Aligned_Job_With_Zero_Period_Without_Dividing_By_Zero()
+    {
+        // A non-positive period must not divide by zero; alignment falls back to the drift rule (LastRun < now - period).
+        var job = Job(TimeSpan.Zero, _onBoundary.AddSeconds(-5));
+
+        Assert.IsTrue(DistributedJobService.IsDue(job, _onBoundary, aligned: true));
+    }
 }
