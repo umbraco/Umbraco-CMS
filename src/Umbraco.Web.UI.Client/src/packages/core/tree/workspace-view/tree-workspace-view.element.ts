@@ -1,6 +1,6 @@
 import { UMB_ENTITY_CONTEXT, type UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import type { ManifestWorkspaceViewTreekind } from './types.js';
-import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, state, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbTreeStartNode } from '../types.js';
 
@@ -37,6 +37,13 @@ export class UmbTreeWorkspaceViewElement extends UmbLitElement {
 				},
 			}}></umb-tree>`;
 	}
+
+	static override styles = css`
+		:host {
+			display: block;
+			padding: var(--uui-size-layout-1);
+		}
+	`;
 }
 
 export { UmbTreeWorkspaceViewElement as element };
