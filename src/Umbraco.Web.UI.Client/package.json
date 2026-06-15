@@ -149,8 +149,6 @@
 	"files": [
 		"dist-cms",
 		"examples",
-		"umbraco-package-schema.json",
-		"umbraco-package-schema.Umbraco.Cms.json",
 		"custom-elements.json",
 		"vscode-html-custom-data.json",
 		"README.md"
