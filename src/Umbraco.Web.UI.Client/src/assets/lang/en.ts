@@ -2139,7 +2139,7 @@ export default {
 		webhooks: 'Webhooks',
 	},
 	tree: {
-		classicViewLabel: 'Classic',
+		classicViewLabel: 'Tree',
 		cardViewLabel: 'Cards',
 		tableViewLabel: 'Table',
 	},
