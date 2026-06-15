@@ -15,6 +15,7 @@ import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/propert
 import type { UmbExtensionElementInitializer } from '@umbraco-cms/backoffice/extension-api';
 
 import '../ref-rte-block/index.js';
+import '../unsupported-rte-block/index.js';
 import '../../../block/action/block-action-list.element.js';
 
 /**
@@ -62,6 +63,9 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 
 	@state()
 	private _contentTypeAlias?: string;
+
+	@state()
+	private _unsupported?: boolean;
 
 	@state()
 	private _contentTypeName?: string;
@@ -157,6 +161,15 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 			},
 			null,
 		);
+		this.observe(
+			this.#context.unsupported,
+			(unsupported) => {
+				if (unsupported === undefined) return;
+				this.#updateBlockViewProps({ unsupported });
+				this._unsupported = unsupported;
+			},
+			null,
+		);
 
 		this.observe(this.#context.actionsVisibility, (showActions) => (this._showActions = showActions), null);
 
@@ -238,6 +251,9 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 	}
 
 	readonly #filterBlockCustomViews = (manifest: ManifestBlockEditorCustomView) => {
+		if (this._unsupported) {
+			return false;
+		}
 		const elementTypeAlias = this._contentTypeAlias ?? '';
 		const isForBlockEditor =
 			!manifest.forBlockEditor || stringOrStringArrayContains(manifest.forBlockEditor, UMB_BLOCK_RTE);
@@ -265,7 +281,7 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 	};
 
 	#renderBlock() {
-		return this.contentKey && this._contentTypeAlias
+		return this.contentKey && (this._contentTypeAlias || this._unsupported)
 			? html`
 					<div class="uui-text uui-font">
 						<umb-extension-slot
@@ -290,11 +306,14 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 		return html`<umb-block-action-list id="actions" block-editor=${UMB_BLOCK_RTE}></umb-block-action-list>`;
 	}
 
+	#renderUnsupportedBlock() {
+		return html`<umb-unsupported-rte-block></umb-unsupported-rte-block>`;
+	}
+
 	#renderBuiltinBlockView = () => {
-		// TODO: Missing unsupported rendering [NL]
-		/*if (this._unsupported) {
+		if (this._unsupported) {
 			return this.#renderUnsupportedBlock();
-		}*/
+		}
 		return this.#renderRefBlock();
 	};
 
