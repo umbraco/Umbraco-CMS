@@ -149,7 +149,7 @@ internal abstract class BlockPropertyValueCreatorBase<TBlockModel, TBlockItemMod
             BlockItemData? data = null;
             if (layout.IsSharedContent)
             {
-                element = _elementCacheService.GetByKeyAsync(layout.ContentKey, preview).GetAwaiter().GetResult();
+                element = await _elementCacheService.GetByKeyAsync(layout.ContentKey, preview);
 
                 if (preview is false && element?.IsPublished(variationContext.Culture) is false)
                 {

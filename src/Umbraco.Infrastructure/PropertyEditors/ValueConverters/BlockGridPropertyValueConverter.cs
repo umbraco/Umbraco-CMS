@@ -71,7 +71,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
         }
 
         /// <inheritdoc cref="BlockGridPropertyValueConverter(IProfilingLogger, BlockEditorConverter, IJsonSerializer, IApiElementBuilder, BlockGridPropertyValueConstructorCache, IVariationContextAccessor, BlockEditorVarianceHandler, ILanguageService, IPropertyRenderingContextAccessor)"/>
-        [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
+        [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 20.")]
         public BlockGridPropertyValueConverter(
             IProfilingLogger proflog,
             BlockEditorConverter blockConverter,

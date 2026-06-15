@@ -294,7 +294,7 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
         _blockEditorVarianceHandler.AlignExposeVariance(blockValue);
     }
 
-    // Ensures that all layout items have a key (for backwards data format compatability).
+    // Ensures that all layout items have a key (for backwards data format compatibility).
     private static void EnsureLayoutItemKeys(TValue blockValue)
     {
         if (!blockValue.Layout.TryGetValue(blockValue.PropertyEditorAlias, out IEnumerable<IBlockLayoutItem>? layout))
