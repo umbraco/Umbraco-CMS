@@ -52,7 +52,7 @@ test('can see Elements provider auto-selected when opening search from the Libra
 });
 
 const elementNameCases = [
-  //{label: 'a basic name', name: 'BackofficeSearchElementItem', searchKeyword: 'Back'}, - skipped because currently it return no search results
+  {label: 'a basic name', name: 'BackofficeSearchElementItem', searchKeyword: 'Back'},
   {label: 'a short name', name: 'Bse', searchKeyword: 'Bse'},
   {label: 'a long name', name: 'BackofficeSearchElementWithAVeryLongNameToTestBoundaryHandlingOfElementNameFieldsInSearchResults', searchKeyword: 'VeryLongName'},
   {label: 'a name with spaces', name: 'Backoffice Search Element With Spaces', searchKeyword: 'Spaces'},
@@ -63,7 +63,7 @@ const elementNameCases = [
 for (const elementNameCase of elementNameCases) {
   test(`can find an element by ${elementNameCase.label}`, async ({umbracoApi, umbracoUi}) => {
     // Arrange
-    const elementTypeId = await umbracoApi.documentType.createEmptyElementType(elementTypeName);
+    const elementTypeId = await umbracoApi.documentType.createEmptyElementType(elementTypeName, true);
     await umbracoApi.element.createDefaultElement(elementNameCase.name, elementTypeId);
     await umbracoUi.library.goToSection(ConstantHelper.sections.library);
 
@@ -100,7 +100,7 @@ for (const searchKeywordCase of searchKeywordCases) {
 
 test('can see a Trashed tag for a trashed element', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const elementTypeId = await umbracoApi.documentType.createEmptyElementType(elementTypeName);
+  const elementTypeId = await umbracoApi.documentType.createEmptyElementType(elementTypeName, true);
   const recycledElementId = await umbracoApi.element.createDefaultElement(recycledElementName, elementTypeId);
   await umbracoApi.element.publish(recycledElementId);
   await umbracoApi.element.moveToRecycleBin(recycledElementId);
@@ -117,7 +117,7 @@ test('can see a Trashed tag for a trashed element', async ({umbracoApi, umbracoU
 
 test('can see a Draft tag for an element with unpublished changes', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const elementTypeId = await umbracoApi.documentType.createEmptyElementType(elementTypeName);
+  const elementTypeId = await umbracoApi.documentType.createEmptyElementType(elementTypeName, true);
   await umbracoApi.element.createDefaultElement(unpublishedElementName, elementTypeId);
   await umbracoUi.library.goToSection(ConstantHelper.sections.library);
 
@@ -133,7 +133,7 @@ test('can see a Draft tag for an element with unpublished changes', async ({umbr
 
 test('can see the folder path as breadcrumb for an element inside folders', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const elementTypeId = await umbracoApi.documentType.createEmptyElementType(elementTypeName);
+  const elementTypeId = await umbracoApi.documentType.createEmptyElementType(elementTypeName, true);
   const folderId = await umbracoApi.element.createDefaultElementFolder(folderName);
   const subFolderId = await umbracoApi.element.createDefaultElementFolder(subFolderName, folderId);
   await umbracoApi.element.createDefaultElementWithParent(folderedElementName, elementTypeId, subFolderId);

@@ -161,7 +161,7 @@ test('can validate minimum amount in element picker', async ({umbracoApi, umbrac
   await umbracoUi.library.clickSaveAndPublishButton();
 
   // Assert
-  await umbracoUi.library.isValidationMessageVisible('You need to add at least ' + minAmount + ' items');
+  await umbracoUi.library.isTextWithExactNameVisible('Minimum ' + minAmount + ' entries, requires 1 more.');
   await umbracoUi.library.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
 });
 

@@ -1111,6 +1111,7 @@ export default {
 		text: 'Text',
 	},
 	globalSearch: {
+		documents: 'Documents',
 		navigateSearchProviders: 'Navigate search providers',
 		navigateSearchResults: 'Navigate search results',
 	},
