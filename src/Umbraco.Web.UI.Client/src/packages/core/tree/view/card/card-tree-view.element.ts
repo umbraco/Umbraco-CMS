@@ -45,7 +45,6 @@ export class UmbCardTreeViewElement extends UmbTreeViewElementBase<UmbTreeItemMo
 			display: grid;
 			grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
 			gap: var(--uui-size-space-4);
-			padding: var(--uui-size-space-4);
 		}
 	`;
 }
