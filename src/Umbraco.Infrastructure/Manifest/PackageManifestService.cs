@@ -4,6 +4,7 @@ using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Manifest;
+using Umbraco.Cms.Core.Web;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Manifest;
@@ -89,7 +90,7 @@ internal sealed class PackageManifestService : IPackageManifestService
     public async Task<PackageManifestImportmap> GetPackageManifestImportmapAsync()
     {
         IEnumerable<PackageManifest> packageManifests = await GetAllPackageManifestsAsync();
-        var globalHash = PackageManifestCacheBuster.GetGlobalCacheBustHash(_hostingEnvironment, _umbracoVersion);
+        var globalHash = CacheBustHashGenerator.Generate(_hostingEnvironment, _umbracoVersion);
 
         // Last-wins on duplicate import/scope keys across packages (the old ToDictionary threw, letting one package break the whole importmap).
         var importDict = new Dictionary<string, string>();
@@ -119,13 +120,7 @@ internal sealed class PackageManifestService : IPackageManifestService
             return;
         }
 
-        var stamp = manifest.AllowCacheBusting;
-
-        // When busting is enabled, use the package's own version hash (falling back to the global hash). When it is
-        // disabled we still resolve an explicit %CACHE_BUSTER% token, but to the global hash only (legacy behaviour).
-        var hash = stamp
-            ? PackageManifestCacheBuster.ResolvePackageCacheBustHash(manifest.Version, globalHash)
-            : globalHash;
+        (var hash, var stamp) = PackageManifestCacheBuster.ResolvePackageCacheBust(manifest, globalHash);
 
         foreach ((var key, var value) in importmap.Imports)
         {

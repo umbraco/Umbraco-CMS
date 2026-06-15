@@ -1,4 +1,3 @@
-using System.Globalization;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Web;
@@ -111,19 +110,7 @@ public static class UrlHelperExtensions
     /// </summary>
     /// <returns></returns>
     public static string GetCacheBustHash(IHostingEnvironment hostingEnvironment, IUmbracoVersion umbracoVersion)
-    {
-        // make a hash of umbraco and client dependency version
-        // in case the user bypasses the installer and just bumps the web.config or client dependency config
-
-        // if in debug mode, always burst the cache
-        if (hostingEnvironment.IsDebugMode)
-        {
-            return DateTime.Now.Ticks.ToString(CultureInfo.InvariantCulture).GenerateHash();
-        }
-
-        var version = umbracoVersion.SemanticVersion.ToSemanticString();
-        return $"{version}".GenerateHash();
-    }
+        => CacheBustHashGenerator.Generate(hostingEnvironment, umbracoVersion);
 
     public static IHtmlContent GetCropUrl(this IUrlHelper urlHelper, IPublishedContent? mediaItem, string cropAlias, bool htmlEncode = true, UrlMode urlMode = UrlMode.Default)
     {

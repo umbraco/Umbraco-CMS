@@ -49,7 +49,7 @@ public class ManifestControllerBaseTests
     }
 
     [Test]
-    public void ReplaceCacheBusterTokens_Leaves_Extensions_Without_Token_Untouched()
+    public void ReplaceCacheBusterTokens_Stamps_Clean_AppPlugins_Url()
     {
         var model = CreateModel(
             [
@@ -61,8 +61,88 @@ public class ManifestControllerBaseTests
         TestableManifestControllerBase.TestReplaceCacheBusterTokens(models, CacheBustHash);
 
         var json = JsonSerializer.Serialize(models[0].Extensions);
-        Assert.That(json, Does.Contain("/App_Plugins/Foo/bundle.js"));
-        Assert.That(json, Does.Not.Contain(CacheBustHash));
+        Assert.That(json, Does.Contain($"/App_Plugins/Foo/bundle.js?umb__rnd={CacheBustHash}"));
+    }
+
+    [Test]
+    public void ReplaceCacheBusterTokens_Stamps_Clean_Url_Nested_In_Extension()
+    {
+        var model = CreateModel(
+            [
+                JsonSerializer.Deserialize<JsonElement>(
+                    """{"type":"bundle","meta":{"loader":"/App_Plugins/Foo/loader.js"}}"""),
+            ]);
+
+        List<ManifestResponseModel> models = [model];
+        TestableManifestControllerBase.TestReplaceCacheBusterTokens(models, CacheBustHash);
+
+        var json = JsonSerializer.Serialize(models[0].Extensions);
+        Assert.That(json, Does.Contain($"/App_Plugins/Foo/loader.js?umb__rnd={CacheBustHash}"));
+    }
+
+    [Test]
+    public void ReplaceCacheBusterTokens_Leaves_Author_Managed_Query_Untouched()
+    {
+        // The author already provided a query string, so we assume they manage cache-busting themselves.
+        var model = CreateModel(
+            [
+                JsonSerializer.Deserialize<JsonElement>(
+                    """{"type":"js","js":"/App_Plugins/Foo/bundle.js?v=1"}"""),
+            ]);
+
+        List<ManifestResponseModel> models = [model];
+        TestableManifestControllerBase.TestReplaceCacheBusterTokens(models, CacheBustHash);
+
+        var json = JsonSerializer.Serialize(models[0].Extensions);
+        Assert.Multiple(() =>
+        {
+            Assert.That(json, Does.Contain("/App_Plugins/Foo/bundle.js?v=1"));
+            Assert.That(json, Does.Not.Contain("umb__rnd"));
+            Assert.That(json, Does.Not.Contain(CacheBustHash));
+        });
+    }
+
+    [Test]
+    public void ReplaceCacheBusterTokens_Leaves_Non_JavaScript_AppPlugins_Assets_Untouched()
+    {
+        // Stylesheets, icons and other non-.js /App_Plugins strings are exactly the false positives the .js filter guards against.
+        var model = CreateModel(
+            [
+                JsonSerializer.Deserialize<JsonElement>(
+                    """{"type":"css","css":"/App_Plugins/Foo/styles.css","meta":{"icon":"/App_Plugins/Foo/icon.svg"}}"""),
+            ]);
+
+        List<ManifestResponseModel> models = [model];
+        TestableManifestControllerBase.TestReplaceCacheBusterTokens(models, CacheBustHash);
+
+        var json = JsonSerializer.Serialize(models[0].Extensions);
+        Assert.Multiple(() =>
+        {
+            Assert.That(json, Does.Contain("/App_Plugins/Foo/styles.css"));
+            Assert.That(json, Does.Contain("/App_Plugins/Foo/icon.svg"));
+            Assert.That(json, Does.Not.Contain("umb__rnd"));
+        });
+    }
+
+    [Test]
+    public void ReplaceCacheBusterTokens_Leaves_Non_AppPlugins_Url_Untouched()
+    {
+        var model = CreateModel(
+            [
+                JsonSerializer.Deserialize<JsonElement>(
+                    """{"type":"js","js":"https://cdn.example.com/foo.js","element":"@my/bare-specifier"}"""),
+            ]);
+
+        List<ManifestResponseModel> models = [model];
+        TestableManifestControllerBase.TestReplaceCacheBusterTokens(models, CacheBustHash);
+
+        var json = JsonSerializer.Serialize(models[0].Extensions);
+        Assert.Multiple(() =>
+        {
+            Assert.That(json, Does.Contain("https://cdn.example.com/foo.js"));
+            Assert.That(json, Does.Contain("@my/bare-specifier"));
+            Assert.That(json, Does.Not.Contain("umb__rnd"));
+        });
     }
 
     [Test]
@@ -86,7 +166,7 @@ public class ManifestControllerBaseTests
             ],
             "PackageA");
 
-        var modelWithoutToken = CreateModel(
+        var modelWithCleanUrl = CreateModel(
             [
                 JsonSerializer.Deserialize<JsonElement>(
                     """{"js":"/App_Plugins/B/b.js"}"""),
@@ -95,7 +175,7 @@ public class ManifestControllerBaseTests
 
         var modelEmpty = CreateModel([], "PackageC");
 
-        List<ManifestResponseModel> models = [modelWithToken, modelWithoutToken, modelEmpty];
+        List<ManifestResponseModel> models = [modelWithToken, modelWithCleanUrl, modelEmpty];
         TestableManifestControllerBase.TestReplaceCacheBusterTokens(models, CacheBustHash);
 
         Assert.Multiple(() =>
@@ -105,8 +185,7 @@ public class ManifestControllerBaseTests
             Assert.That(jsonA, Does.Not.Contain(Constants.Web.CacheBusterToken));
 
             var jsonB = JsonSerializer.Serialize(models[1].Extensions);
-            Assert.That(jsonB, Does.Contain("/App_Plugins/B/b.js"));
-            Assert.That(jsonB, Does.Not.Contain(CacheBustHash));
+            Assert.That(jsonB, Does.Contain($"/App_Plugins/B/b.js?umb__rnd={CacheBustHash}"));
 
             Assert.That(models[2].Extensions, Is.Empty);
         });
@@ -164,9 +243,10 @@ public class ManifestControllerBaseTests
         var json = JsonSerializer.Serialize(models[0].Extensions);
         Assert.Multiple(() =>
         {
+            // The tokenised URLs resolve the token; the clean URL is auto-stamped.
             Assert.That(json, Does.Contain($"/App_Plugins/Foo/one.js?v={CacheBustHash}"));
             Assert.That(json, Does.Contain($"/App_Plugins/Foo/two.js?v={CacheBustHash}"));
-            Assert.That(json, Does.Contain("/App_Plugins/Foo/three.js"));
+            Assert.That(json, Does.Contain($"/App_Plugins/Foo/three.js?umb__rnd={CacheBustHash}"));
             Assert.That(json, Does.Not.Contain(Constants.Web.CacheBusterToken));
         });
     }
@@ -236,6 +316,50 @@ public class ManifestControllerBaseTests
             // With busting disabled the explicit token still resolves, but to the global hash (legacy behaviour).
             Assert.That(json, Does.Contain($"/App_Plugins/Foo/bundle.js?v={CacheBustHash}"));
             Assert.That(json, Does.Not.Contain(Constants.Web.CacheBusterToken));
+        });
+    }
+
+    [Test]
+    public void ReplaceCacheBusterTokens_Stamps_Clean_Url_With_Package_Version_Hash()
+    {
+        var model = CreateModel(
+            [
+                JsonSerializer.Deserialize<JsonElement>("""{"js":"/App_Plugins/Foo/bundle.js"}"""),
+            ],
+            "Foo");
+        var manifest = new PackageManifest { Name = "Foo", Version = "1.2.3", Extensions = model.Extensions };
+
+        List<ManifestResponseModel> models = [model];
+        TestableManifestControllerBase.TestReplaceCacheBusterTokens(models, [manifest], CacheBustHash);
+
+        var json = JsonSerializer.Serialize(models[0].Extensions);
+        Assert.Multiple(() =>
+        {
+            // The clean URL is auto-stamped with the package's own version hash, not the global Umbraco hash.
+            Assert.That(json, Does.Contain($"/App_Plugins/Foo/bundle.js?umb__rnd={"1.2.3".GenerateHash()}"));
+            Assert.That(json, Does.Not.Contain(CacheBustHash));
+        });
+    }
+
+    [Test]
+    public void ReplaceCacheBusterTokens_DoesNotStamp_CleanUrl_WhenBustingDisabled()
+    {
+        var model = CreateModel(
+            [
+                JsonSerializer.Deserialize<JsonElement>("""{"js":"/App_Plugins/Foo/bundle.js"}"""),
+            ],
+            "Foo");
+        var manifest = new PackageManifest { Name = "Foo", Version = "1.2.3", AllowCacheBusting = false, Extensions = model.Extensions };
+
+        List<ManifestResponseModel> models = [model];
+        TestableManifestControllerBase.TestReplaceCacheBusterTokens(models, [manifest], CacheBustHash);
+
+        var json = JsonSerializer.Serialize(models[0].Extensions);
+        Assert.Multiple(() =>
+        {
+            // Busting disabled: a clean URL without an explicit token is left exactly as authored.
+            Assert.That(json, Does.Contain("/App_Plugins/Foo/bundle.js"));
+            Assert.That(json, Does.Not.Contain("umb__rnd"));
         });
     }
 
