@@ -440,6 +440,19 @@ export class UmbInputMultiUrlElement extends UmbFormControlMixin<string, typeof 
 				margin-top: -20px;
 				padding-top: 20px;
 			}
+
+			uui-ref-node {
+				word-break: break-all;
+			}
+
+			uui-action-bar {
+				position: absolute;
+				right: 0;
+				top: 50%;
+				transform: translateY(-50%);
+				background-color: var(--uui-color-surface, #fff);
+				border-radius: 50px;
+			}
 		`,
 	];
 }
