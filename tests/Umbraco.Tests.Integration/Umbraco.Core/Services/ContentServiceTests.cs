@@ -85,6 +85,65 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
         .AddNotificationHandler<ContentSavingNotification, ContentNotificationHandler>();
 
     [Test]
+    public void Sort_Preserves_Template_And_Property_Data_When_Items_Loaded_Without_Them()
+    {
+        // The fixture's children share the content type's default template; assign it so we can verify it survives.
+        var templateId = ContentType.DefaultTemplateId;
+        Assert.That(templateId, Is.GreaterThan(0), "Test setup expects a default template on the content type.");
+
+        var childKeys = new[] { SubPageKey, SubPage2Key, SubPage3Key };
+        foreach (var key in childKeys)
+        {
+            IContent child = ContentService.GetById(new Guid(key));
+            child.TemplateId = templateId;
+            ContentService.Save(child);
+        }
+
+        // Load the children the way a collection view does: without templates or property data (#23120).
+        List<IContent> partialChildren = ContentService
+            .GetPagedChildren(Textpage.Id, 0, 100, out _, propertyAliases: [], filter: null, ordering: null, loadTemplates: false)
+            .ToList();
+        Assert.That(partialChildren, Has.Count.EqualTo(3));
+        Assert.Multiple(() =>
+        {
+            // Precondition for the bug: the loaded instances really are partial.
+            Assert.That(partialChildren.All(x => x.TemplateId is null), Is.True, "Expected templates not to be loaded.");
+            Assert.That(partialChildren.All(x => x.Properties.Count == 0), Is.True, "Expected properties not to be loaded.");
+        });
+
+        // Rotate the order so every item's sort order changes (and is therefore re-saved).
+        Dictionary<Guid, IContent> byKey = partialChildren.ToDictionary(x => x.Key, x => x);
+        IContent[] rotated =
+        [
+            byKey[new Guid(SubPage2Key)],
+            byKey[new Guid(SubPage3Key)],
+            byKey[new Guid(SubPageKey)],
+        ];
+
+        OperationResult result = ContentService.Sort(rotated);
+        Assert.That(result.Success, Is.True);
+
+        // Every sorted child must retain its template and property data.
+        foreach (var key in childKeys)
+        {
+            IContent reloaded = ContentService.GetById(new Guid(key));
+            Assert.Multiple(() =>
+            {
+                Assert.That(reloaded.TemplateId, Is.EqualTo(templateId), $"Template lost for {key}.");
+                Assert.That(reloaded.GetValue<string>("title"), Is.Not.Null.And.Not.Empty, $"Property data lost for {key}.");
+            });
+        }
+
+        // And the requested order must have been applied.
+        Assert.Multiple(() =>
+        {
+            Assert.That(ContentService.GetById(new Guid(SubPage2Key)).SortOrder, Is.EqualTo(0));
+            Assert.That(ContentService.GetById(new Guid(SubPage3Key)).SortOrder, Is.EqualTo(1));
+            Assert.That(ContentService.GetById(new Guid(SubPageKey)).SortOrder, Is.EqualTo(2));
+        });
+    }
+
+    [Test]
     public void Create_Blueprint()
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
