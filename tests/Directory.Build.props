@@ -16,6 +16,12 @@
     <Nullable>annotations</Nullable>
   </PropertyGroup>
 
+  <!-- Microsoft.Testing.Platform runner configuration (NUnit) for the executing test projects -->
+  <PropertyGroup>
+    <EnableNUnitRunner>true</EnableNUnitRunner>
+    <UseAppHost>false</UseAppHost>
+  </PropertyGroup>
+
   <!-- Specify rule set for all test projects -->
   <PropertyGroup>
     <CodeAnalysisRuleSet>$(MSBuildThisFileDirectory)codeanalysis.ruleset</CodeAnalysisRuleSet>
