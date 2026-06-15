@@ -18,42 +18,42 @@ internal class HasCollectionFlagProviderTests
     public void HasCollectionFlagProvider_Can_Provide_Document_Tree_Flags()
     {
         var sut = new HasCollectionFlagProvider();
-        Assert.IsTrue(sut.CanProvideFlags<DocumentTreeItemResponseModel>());
+        Assert.That(sut.CanProvideFlags<DocumentTreeItemResponseModel>(), Is.True);
     }
 
     [Test]
     public void HasCollectionFlagProvider_Can_Provide_Document_Collection_Flags()
     {
         var sut = new HasCollectionFlagProvider();
-        Assert.IsTrue(sut.CanProvideFlags<DocumentCollectionResponseModel>());
+        Assert.That(sut.CanProvideFlags<DocumentCollectionResponseModel>(), Is.True);
     }
 
     [Test]
     public void HasCollectionFlagProvider_Can_Provide_Document_Item_Flags()
     {
         var sut = new HasCollectionFlagProvider();
-        Assert.IsTrue(sut.CanProvideFlags<DocumentItemResponseModel>());
+        Assert.That(sut.CanProvideFlags<DocumentItemResponseModel>(), Is.True);
     }
 
     [Test]
     public void HasCollectionFlagProvider_Can_Provide_Media_Tree_Flags()
     {
         var sut = new HasCollectionFlagProvider();
-        Assert.IsTrue(sut.CanProvideFlags<MediaTreeItemResponseModel>());
+        Assert.That(sut.CanProvideFlags<MediaTreeItemResponseModel>(), Is.True);
     }
 
     [Test]
     public void HasCollectionFlagProvider_Can_Provide_Media_Collection_Flags()
     {
         var sut = new HasCollectionFlagProvider();
-        Assert.IsTrue(sut.CanProvideFlags<MediaCollectionResponseModel>());
+        Assert.That(sut.CanProvideFlags<MediaCollectionResponseModel>(), Is.True);
     }
 
     [Test]
     public void HasCollectionFlagProvider_Can_Provide_Media_Item_Flags()
     {
         var sut = new HasCollectionFlagProvider();
-        Assert.IsTrue(sut.CanProvideFlags<MediaItemResponseModel>());
+        Assert.That(sut.CanProvideFlags<MediaItemResponseModel>(), Is.True);
     }
 
     [Test]
@@ -72,11 +72,11 @@ internal class HasCollectionFlagProviderTests
 
         await sut.PopulateFlagsAsync(viewModels);
 
-        Assert.AreEqual(viewModels[0].Flags.Count(), 1);
-        Assert.AreEqual(viewModels[1].Flags.Count(), 0);
+        Assert.That(viewModels[0].Flags.Count(), Is.EqualTo(1));
+        Assert.That(viewModels[1].Flags.Count(), Is.EqualTo(0));
 
         var flagModel = viewModels[0].Flags.First();
-        Assert.AreEqual("Umb.HasCollection", flagModel.Alias);
+        Assert.That(flagModel.Alias, Is.EqualTo("Umb.HasCollection"));
     }
 
     [Test]
@@ -95,11 +95,11 @@ internal class HasCollectionFlagProviderTests
 
         await sut.PopulateFlagsAsync(viewModels);
 
-        Assert.AreEqual(viewModels[0].Flags.Count(), 1);
-        Assert.AreEqual(viewModels[1].Flags.Count(), 0);
+        Assert.That(viewModels[0].Flags.Count(), Is.EqualTo(1));
+        Assert.That(viewModels[1].Flags.Count(), Is.EqualTo(0));
 
         var flagModel = viewModels[0].Flags.First();
-        Assert.AreEqual("Umb.HasCollection", flagModel.Alias);
+        Assert.That(flagModel.Alias, Is.EqualTo("Umb.HasCollection"));
     }
 
     [Test]
@@ -118,11 +118,11 @@ internal class HasCollectionFlagProviderTests
 
         await sut.PopulateFlagsAsync(viewModels);
 
-        Assert.AreEqual(viewModels[0].Flags.Count(), 1);
-        Assert.AreEqual(viewModels[1].Flags.Count(), 0);
+        Assert.That(viewModels[0].Flags.Count(), Is.EqualTo(1));
+        Assert.That(viewModels[1].Flags.Count(), Is.EqualTo(0));
 
         var flagModel = viewModels[0].Flags.First();
-        Assert.AreEqual("Umb.HasCollection", flagModel.Alias);
+        Assert.That(flagModel.Alias, Is.EqualTo("Umb.HasCollection"));
     }
 
     [Test]
@@ -141,11 +141,11 @@ internal class HasCollectionFlagProviderTests
 
         await sut.PopulateFlagsAsync(viewModels);
 
-        Assert.AreEqual(viewModels[0].Flags.Count(), 1);
-        Assert.AreEqual(viewModels[1].Flags.Count(), 0);
+        Assert.That(viewModels[0].Flags.Count(), Is.EqualTo(1));
+        Assert.That(viewModels[1].Flags.Count(), Is.EqualTo(0));
 
         var flagModel = viewModels[0].Flags.First();
-        Assert.AreEqual("Umb.HasCollection", flagModel.Alias);
+        Assert.That(flagModel.Alias, Is.EqualTo("Umb.HasCollection"));
     }
 
     [Test]
@@ -164,11 +164,11 @@ internal class HasCollectionFlagProviderTests
 
         await sut.PopulateFlagsAsync(viewModels);
 
-        Assert.AreEqual(viewModels[0].Flags.Count(), 1);
-        Assert.AreEqual(viewModels[1].Flags.Count(), 0);
+        Assert.That(viewModels[0].Flags.Count(), Is.EqualTo(1));
+        Assert.That(viewModels[1].Flags.Count(), Is.EqualTo(0));
 
         var flagModel = viewModels[0].Flags.First();
-        Assert.AreEqual("Umb.HasCollection", flagModel.Alias);
+        Assert.That(flagModel.Alias, Is.EqualTo("Umb.HasCollection"));
     }
 
     [Test]
@@ -187,10 +187,10 @@ internal class HasCollectionFlagProviderTests
 
         await sut.PopulateFlagsAsync(viewModels);
 
-        Assert.AreEqual(viewModels[0].Flags.Count(), 1);
-        Assert.AreEqual(viewModels[1].Flags.Count(), 0);
+        Assert.That(viewModels[0].Flags.Count(), Is.EqualTo(1));
+        Assert.That(viewModels[1].Flags.Count(), Is.EqualTo(0));
 
         var flagModel = viewModels[0].Flags.First();
-        Assert.AreEqual("Umb.HasCollection", flagModel.Alias);
+        Assert.That(flagModel.Alias, Is.EqualTo("Umb.HasCollection"));
     }
 }

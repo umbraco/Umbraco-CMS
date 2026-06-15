@@ -38,7 +38,7 @@ internal class ItemAncestorServiceTests
             new HashSet<Guid>(),
             TestMapper);
 
-        Assert.IsEmpty(result);
+        Assert.That(result, Is.Empty);
     }
 
     [Test]
@@ -56,7 +56,7 @@ internal class ItemAncestorServiceTests
             new HashSet<Guid> { unknownKey },
             TestMapper);
 
-        Assert.IsEmpty(result);
+        Assert.That(result, Is.Empty);
     }
 
     [Test]
@@ -75,9 +75,9 @@ internal class ItemAncestorServiceTests
             new HashSet<Guid> { entityKey },
             TestMapper)).ToList();
 
-        Assert.AreEqual(1, result.Count);
-        Assert.AreEqual(entityKey, result[0].Id);
-        Assert.IsEmpty(result[0].Ancestors);
+        Assert.That(result, Has.Count.EqualTo(1));
+        Assert.That(result[0].Id, Is.EqualTo(entityKey));
+        Assert.That(result[0].Ancestors, Is.Empty);
     }
 
     [Test]
@@ -105,15 +105,15 @@ internal class ItemAncestorServiceTests
             new HashSet<Guid> { entityKey },
             TestMapper)).ToList();
 
-        Assert.AreEqual(1, result.Count);
-        Assert.AreEqual(entityKey, result[0].Id);
+        Assert.That(result, Has.Count.EqualTo(1));
+        Assert.That(result[0].Id, Is.EqualTo(entityKey));
 
         var ancestors = result[0].Ancestors.ToList();
-        Assert.AreEqual(2, ancestors.Count);
+        Assert.That(ancestors, Has.Count.EqualTo(2));
 
         // Root-first ordering (grandparent before parent).
-        Assert.AreEqual(grandparentKey, ancestors[0].Id);
-        Assert.AreEqual(parentKey, ancestors[1].Id);
+        Assert.That(ancestors[0].Id, Is.EqualTo(grandparentKey));
+        Assert.That(ancestors[1].Id, Is.EqualTo(parentKey));
     }
 
     [Test]
@@ -142,16 +142,16 @@ internal class ItemAncestorServiceTests
             new HashSet<Guid> { entity1Key, entity2Key },
             TestMapper)).ToList();
 
-        Assert.AreEqual(2, result.Count);
+        Assert.That(result, Has.Count.EqualTo(2));
 
         ItemAncestorsResponseModel<TestItemResponseModel> result1 = result.First(r => r.Id == entity1Key);
         ItemAncestorsResponseModel<TestItemResponseModel> result2 = result.First(r => r.Id == entity2Key);
 
-        Assert.AreEqual(1, result1.Ancestors.Count());
-        Assert.AreEqual(sharedParentKey, result1.Ancestors.First().Id);
+        Assert.That(result1.Ancestors.Count(), Is.EqualTo(1));
+        Assert.That(result1.Ancestors.First().Id, Is.EqualTo(sharedParentKey));
 
-        Assert.AreEqual(1, result2.Ancestors.Count());
-        Assert.AreEqual(sharedParentKey, result2.Ancestors.First().Id);
+        Assert.That(result2.Ancestors.Count(), Is.EqualTo(1));
+        Assert.That(result2.Ancestors.First().Id, Is.EqualTo(sharedParentKey));
     }
 
     [Test]
@@ -185,15 +185,15 @@ internal class ItemAncestorServiceTests
             UmbracoObjectTypes.DataTypeContainer,
             new HashSet<Guid> { entityKey })).ToList();
 
-        Assert.AreEqual(1, result.Count);
-        Assert.AreEqual(entityKey, result[0].Id);
+        Assert.That(result, Has.Count.EqualTo(1));
+        Assert.That(result[0].Id, Is.EqualTo(entityKey));
 
         var ancestors = result[0].Ancestors.ToList();
-        Assert.AreEqual(2, ancestors.Count);
+        Assert.That(ancestors, Has.Count.EqualTo(2));
 
         // Root-first: folder (100) before item ancestor (200).
-        Assert.AreEqual(folderKey, ancestors[0].Id);
-        Assert.AreEqual(itemAncestorKey, ancestors[1].Id);
+        Assert.That(ancestors[0].Id, Is.EqualTo(folderKey));
+        Assert.That(ancestors[1].Id, Is.EqualTo(itemAncestorKey));
     }
 
     [Test]
@@ -230,12 +230,12 @@ internal class ItemAncestorServiceTests
             UmbracoObjectTypes.DataTypeContainer,
             new HashSet<Guid> { folderKey })).ToList();
 
-        Assert.AreEqual(1, result.Count);
-        Assert.AreEqual(folderKey, result[0].Id);
+        Assert.That(result, Has.Count.EqualTo(1));
+        Assert.That(result[0].Id, Is.EqualTo(folderKey));
 
         var ancestors = result[0].Ancestors.ToList();
-        Assert.AreEqual(1, ancestors.Count);
-        Assert.AreEqual(parentFolderKey, ancestors[0].Id);
+        Assert.That(ancestors, Has.Count.EqualTo(1));
+        Assert.That(ancestors[0].Id, Is.EqualTo(parentFolderKey));
     }
 
     [Test]
@@ -256,8 +256,8 @@ internal class ItemAncestorServiceTests
             new HashSet<Guid> { foundKey, notFoundKey },
             TestMapper)).ToList();
 
-        Assert.AreEqual(1, result.Count);
-        Assert.AreEqual(foundKey, result[0].Id);
+        Assert.That(result, Has.Count.EqualTo(1));
+        Assert.That(result[0].Id, Is.EqualTo(foundKey));
     }
 
     [Test]
@@ -284,9 +284,9 @@ internal class ItemAncestorServiceTests
             TestMapper)).ToList();
 
         var ancestors = result[0].Ancestors.ToList();
-        Assert.AreEqual(1, ancestors.Count);
+        Assert.That(ancestors, Has.Count.EqualTo(1));
         Assert.That(ancestors.Select(a => a.Id), Does.Not.Contain(entityKey));
-        Assert.AreEqual(parentKey, ancestors[0].Id);
+        Assert.That(ancestors[0].Id, Is.EqualTo(parentKey));
     }
 
     [Test]
@@ -317,10 +317,10 @@ internal class ItemAncestorServiceTests
             TestMapper)).ToList();
 
         var ancestors = result[0].Ancestors.ToList();
-        Assert.AreEqual(3, ancestors.Count);
-        Assert.AreEqual(level1Key, ancestors[0].Id);
-        Assert.AreEqual(level2Key, ancestors[1].Id);
-        Assert.AreEqual(level3Key, ancestors[2].Id);
+        Assert.That(ancestors, Has.Count.EqualTo(3));
+        Assert.That(ancestors[0].Id, Is.EqualTo(level1Key));
+        Assert.That(ancestors[1].Id, Is.EqualTo(level2Key));
+        Assert.That(ancestors[2].Id, Is.EqualTo(level3Key));
     }
 
     [Test]
@@ -344,7 +344,7 @@ internal class ItemAncestorServiceTests
             new HashSet<Guid> { key1, key2, key3 },
             TestMapper)).ToList();
 
-        Assert.AreEqual(3, result.Count);
+        Assert.That(result, Has.Count.EqualTo(3));
         Assert.That(result, Has.All.Property(nameof(ItemAncestorsResponseModel<TestItemResponseModel>.Ancestors)).Empty);
     }
 
@@ -373,14 +373,14 @@ internal class ItemAncestorServiceTests
             new HashSet<Guid> { rootEntityKey, childEntityKey },
             TestMapper)).ToList();
 
-        Assert.AreEqual(2, result.Count);
+        Assert.That(result, Has.Count.EqualTo(2));
 
         ItemAncestorsResponseModel<TestItemResponseModel> rootResult = result.First(r => r.Id == rootEntityKey);
         ItemAncestorsResponseModel<TestItemResponseModel> childResult = result.First(r => r.Id == childEntityKey);
 
-        Assert.IsEmpty(rootResult.Ancestors);
-        Assert.AreEqual(1, childResult.Ancestors.Count());
-        Assert.AreEqual(parentKey, childResult.Ancestors.First().Id);
+        Assert.That(rootResult.Ancestors, Is.Empty);
+        Assert.That(childResult.Ancestors.Count(), Is.EqualTo(1));
+        Assert.That(childResult.Ancestors.First().Id, Is.EqualTo(parentKey));
     }
 
     [Test]
@@ -408,10 +408,10 @@ internal class ItemAncestorServiceTests
             UmbracoObjectTypes.DataTypeContainer,
             new HashSet<Guid> { entityKey })).ToList();
 
-        Assert.AreEqual(1, result.Count);
+        Assert.That(result, Has.Count.EqualTo(1));
         var ancestors = result[0].Ancestors.ToList();
-        Assert.AreEqual(1, ancestors.Count);
-        Assert.AreEqual(parentKey, ancestors[0].Id);
+        Assert.That(ancestors, Has.Count.EqualTo(1));
+        Assert.That(ancestors[0].Id, Is.EqualTo(parentKey));
 
         // Container Get(Guid) should not be called since entity was found as item type.
         _entityServiceMock.Verify(
@@ -453,9 +453,9 @@ internal class ItemAncestorServiceTests
             UmbracoObjectTypes.DataTypeContainer,
             new HashSet<Guid> { entityKey })).ToList();
 
-        Assert.AreEqual(1, result.Count);
-        Assert.AreEqual(entityKey, result[0].Id);
-        Assert.IsEmpty(result[0].Ancestors);
+        Assert.That(result, Has.Count.EqualTo(1));
+        Assert.That(result[0].Id, Is.EqualTo(entityKey));
+        Assert.That(result[0].Ancestors, Is.Empty);
     }
 
     [Test]
@@ -511,7 +511,7 @@ internal class ItemAncestorServiceTests
             UmbracoObjectTypes.DataTypeContainer,
             new HashSet<Guid> { unknownKey });
 
-        Assert.IsEmpty(result);
+        Assert.That(result, Is.Empty);
     }
 
     [Test]
@@ -538,7 +538,7 @@ internal class ItemAncestorServiceTests
             UmbracoObjectTypes.DataTypeContainer,
             new HashSet<Guid> { itemKey, folderKey })).ToList();
 
-        Assert.AreEqual(2, result.Count);
+        Assert.That(result, Has.Count.EqualTo(2));
 
         // Verify folder Get was called only for the folder key, not the item key.
         _entityServiceMock.Verify(
@@ -580,9 +580,9 @@ internal class ItemAncestorServiceTests
                 return TestMapper(receivedAncestors);
             })).ToList();
 
-        Assert.IsNotNull(receivedAncestors);
+        Assert.That(receivedAncestors, Is.Not.Null);
         var ancestorList = receivedAncestors!.ToList();
-        Assert.AreEqual(2, ancestorList.Count);
+        Assert.That(ancestorList, Has.Count.EqualTo(2));
         Assert.That(ancestorList.Select(a => a.Key), Is.EquivalentTo(new[] { grandparentKey, parentKey }));
     }
 

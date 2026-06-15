@@ -26,7 +26,7 @@ public class MediaBreadthFirstKeyProviderTests
 
         var result = sut.GetSeedKeys();
 
-        Assert.Zero(result.Count);
+        Assert.That(result.Count, Is.Zero);
     }
 
     [Test]
@@ -50,7 +50,7 @@ public class MediaBreadthFirstKeyProviderTests
 
         var result = sut.GetSeedKeys();
 
-        Assert.That(result.Count, Is.EqualTo(expected));
+        Assert.That(result, Has.Count.EqualTo(expected));
     }
 
     [Test]
@@ -110,6 +110,6 @@ public class MediaBreadthFirstKeyProviderTests
         var result = sut.GetSeedKeys();
 
         var expected = childrenCount + 1; // Root + children
-        Assert.That(result.Count, Is.EqualTo(expected));
+        Assert.That(result, Has.Count.EqualTo(expected));
     }
 }

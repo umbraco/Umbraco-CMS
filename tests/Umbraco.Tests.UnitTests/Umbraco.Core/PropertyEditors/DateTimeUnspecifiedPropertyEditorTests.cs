@@ -41,14 +41,14 @@ public class DateTimeUnspecifiedPropertyEditorTests
         var result = editor.Validate(value, false, null, PropertyValidationContext.Empty()).ToList();
         if (expectedSuccess)
         {
-            Assert.IsEmpty(result);
+            Assert.That(result, Is.Empty);
         }
         else
         {
-            Assert.AreEqual(1, result.Count);
+            Assert.That(result, Has.Count.EqualTo(1));
 
             var validationResult = result.First();
-            Assert.AreEqual("validation_invalidDate", validationResult.ErrorMessage);
+            Assert.That(validationResult.ErrorMessage, Is.EqualTo("validation_invalidDate"));
         }
     }
 
@@ -82,7 +82,7 @@ public class DateTimeUnspecifiedPropertyEditorTests
                     TimeZones = null,
                 }),
             null);
-        Assert.AreEqual(expectedJson, result);
+        Assert.That(result, Is.EqualTo(expectedJson));
     }
 
     private static readonly object[][] _dateTimeUnspecifiedParseValuesToEditorTestCases =
@@ -120,15 +120,15 @@ public class DateTimeUnspecifiedPropertyEditorTests
 
         if (expectedResult is null)
         {
-            Assert.IsNull(result);
+            Assert.That(result, Is.Null);
             return;
         }
 
-        Assert.IsNotNull(result);
-        Assert.IsInstanceOf<DateTimeEditorValue>(result);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result, Is.InstanceOf<DateTimeEditorValue>());
         var apiModel = (DateTimeEditorValue)result;
-        Assert.AreEqual(((DateTimeEditorValue)expectedResult).Date, apiModel.Date);
-        Assert.AreEqual(((DateTimeEditorValue)expectedResult).TimeZone, apiModel.TimeZone);
+        Assert.That(apiModel.Date, Is.EqualTo(((DateTimeEditorValue)expectedResult).Date));
+        Assert.That(apiModel.TimeZone, Is.EqualTo(((DateTimeEditorValue)expectedResult).TimeZone));
     }
 
     private DateTimePropertyEditorBase.DateTimeDataValueEditor CreateValueEditor(

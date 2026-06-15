@@ -127,7 +127,7 @@ public class ConfigurationExtensionsTests
 
     private static void AssertResults(string expectedConnectionString, string expectedProviderName, string connectionString, string providerName)
     {
-        Assert.AreEqual(expectedConnectionString, connectionString);
-        Assert.AreEqual(expectedProviderName, providerName);
+        Assert.That(connectionString, Is.EqualTo(expectedConnectionString));
+        Assert.That(providerName, Is.EqualTo(expectedProviderName));
     }
 }

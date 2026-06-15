@@ -25,7 +25,7 @@ public class CmsHelperCasingTests
     public void SpaceCamelCasing(string input, string expected)
     {
         var output = input.SpaceCamelCasing(ShortStringHelper);
-        Assert.AreEqual(expected, output);
+        Assert.That(output, Is.EqualTo(expected));
     }
 
     [TestCase("thisIsTheEnd", "This Is The End")]
@@ -37,6 +37,6 @@ public class CmsHelperCasingTests
     public void CompatibleDefaultReplacement(string input, string expected)
     {
         var output = input.Length < 2 ? input : ShortStringHelper.SplitPascalCasing(input, ' ').ToFirstUpperInvariant();
-        Assert.AreEqual(expected, output);
+        Assert.That(output, Is.EqualTo(expected));
     }
 }

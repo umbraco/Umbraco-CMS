@@ -16,7 +16,7 @@ public class PublishedMediaStatusFilteringServiceTests
 
         IPublishedContent[] taken = sut.FilterAvailable(items.Keys, null).Take(3).ToArray();
 
-        Assert.AreEqual(3, taken.Length);
+        Assert.That(taken.Length, Is.EqualTo(3));
         cacheMock.Verify(c => c.GetById(It.IsAny<Guid>()), Times.Exactly(3));
     }
 
@@ -27,7 +27,7 @@ public class PublishedMediaStatusFilteringServiceTests
 
         IPublishedContent? first = sut.FilterAvailable(items.Keys, null).FirstOrDefault();
 
-        Assert.IsNotNull(first);
+        Assert.That(first, Is.Not.Null);
         cacheMock.Verify(c => c.GetById(It.IsAny<Guid>()), Times.Once);
     }
 
@@ -38,7 +38,7 @@ public class PublishedMediaStatusFilteringServiceTests
 
         IPublishedContent[] all = sut.FilterAvailable(items.Keys, null).ToArray();
 
-        Assert.AreEqual(items.Count, all.Length);
+        Assert.That(all.Length, Is.EqualTo(items.Count));
         cacheMock.Verify(c => c.GetById(It.IsAny<Guid>()), Times.Exactly(items.Count));
     }
 

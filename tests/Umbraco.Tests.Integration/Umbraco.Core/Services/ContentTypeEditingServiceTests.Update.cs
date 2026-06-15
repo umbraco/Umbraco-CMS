@@ -31,20 +31,20 @@ internal sealed partial class ContentTypeEditingServiceTests
         updateModel.AllowedAsRoot = false;
 
         var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
 
         // Ensure it's actually persisted
         contentType = await ContentTypeService.GetAsync(result.Result!.Key);
-        Assert.IsNotNull(contentType);
+        Assert.That(contentType, Is.Not.Null);
 
-        Assert.AreEqual(isElement, contentType.IsElement);
-        Assert.AreEqual("test", contentType.Alias);
-        Assert.AreEqual("Test updated", contentType.Name);
-        Assert.AreEqual(result.Result.Id, contentType.Id);
-        Assert.AreEqual(result.Result.Key, contentType.Key);
-        Assert.AreEqual("This is the Test description updated", contentType.Description);
-        Assert.AreEqual("icon icon-something-updated", contentType.Icon);
-        Assert.IsFalse(contentType.AllowedAsRoot);
+        Assert.That(contentType.IsElement, Is.EqualTo(isElement));
+        Assert.That(contentType.Alias, Is.EqualTo("test"));
+        Assert.That(contentType.Name, Is.EqualTo("Test updated"));
+        Assert.That(contentType.Id, Is.EqualTo(result.Result.Id));
+        Assert.That(contentType.Key, Is.EqualTo(result.Result.Key));
+        Assert.That(contentType.Description, Is.EqualTo("This is the Test description updated"));
+        Assert.That(contentType.Icon, Is.EqualTo("icon icon-something-updated"));
+        Assert.That(contentType.AllowedAsRoot, Is.False);
 
         // expect RefreshOther when changing basic settings only
         AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.RefreshOther);
@@ -63,14 +63,14 @@ internal sealed partial class ContentTypeEditingServiceTests
 
         var updateModel = ContentTypeUpdateModel("Test updated", "testUpdated", isElement: isElement);
         var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
 
         // Ensure it's actually persisted
         contentType = await ContentTypeService.GetAsync(result.Result!.Key);
-        Assert.IsNotNull(contentType);
+        Assert.That(contentType, Is.Not.Null);
 
-        Assert.AreEqual(isElement, contentType.IsElement);
-        Assert.AreEqual("testUpdated", contentType.Alias);
+        Assert.That(contentType.IsElement, Is.EqualTo(isElement));
+        Assert.That(contentType.Alias, Is.EqualTo("testUpdated"));
 
         // expect AliasChanged (which includes RefreshMain) when changing alias
         AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.AliasChanged);
@@ -97,14 +97,14 @@ internal sealed partial class ContentTypeEditingServiceTests
         updateModel.VariesBySegment = !variesBySegment;
 
         var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
 
         // Ensure it's actually persisted
         contentType = await ContentTypeService.GetAsync(result.Result!.Key);
-        Assert.IsNotNull(contentType);
+        Assert.That(contentType, Is.Not.Null);
 
-        Assert.AreEqual(!variesByCulture, contentType.VariesByCulture());
-        Assert.AreEqual(!variesBySegment, contentType.VariesBySegment());
+        Assert.That(contentType.VariesByCulture(), Is.EqualTo(!variesByCulture));
+        Assert.That(contentType.VariesBySegment(), Is.EqualTo(!variesBySegment));
 
         // expect RefreshMain | VariationChanged when changing variation at content type level
         AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.VariationChanged);
@@ -131,8 +131,8 @@ internal sealed partial class ContentTypeEditingServiceTests
         var propertyType = contentType.PropertyTypes.Single();
         Assert.Multiple(() =>
         {
-            Assert.AreEqual("testProperty", propertyType.Alias);
-            Assert.IsTrue(propertyType.VariesByNothing());
+            Assert.That(propertyType.Alias, Is.EqualTo("testProperty"));
+            Assert.That(propertyType.VariesByNothing(), Is.True);
         });
 
         ContentTypeCacheRefresher.JsonPayload[]? refreshedPayloads = null;
@@ -151,18 +151,18 @@ internal sealed partial class ContentTypeEditingServiceTests
         updateModel.Properties = [propertyTypeModel];
 
         var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
 
         // Ensure it's actually persisted
         contentType = await ContentTypeService.GetAsync(result.Result!.Key);
-        Assert.IsNotNull(contentType);
+        Assert.That(contentType, Is.Not.Null);
 
         propertyType = contentType.PropertyTypes.Single();
         Assert.Multiple(() =>
         {
-            Assert.AreEqual("testProperty", propertyType.Alias);
-            Assert.AreEqual(variesByCulture, propertyType.VariesByCulture());
-            Assert.AreEqual(variesBySegment, propertyType.VariesBySegment());
+            Assert.That(propertyType.Alias, Is.EqualTo("testProperty"));
+            Assert.That(propertyType.VariesByCulture(), Is.EqualTo(variesByCulture));
+            Assert.That(propertyType.VariesBySegment(), Is.EqualTo(variesBySegment));
         });
 
         if (variesByCulture || variesBySegment)
@@ -202,17 +202,17 @@ internal sealed partial class ContentTypeEditingServiceTests
         };
 
         var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.IsNotNull(result.Result);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.Not.Null);
 
         contentType = await ContentTypeService.GetAsync(result.Result.Key);
-        Assert.IsNotNull(contentType);
+        Assert.That(contentType, Is.Not.Null);
 
         var allowedContentTypes = contentType.AllowedContentTypes?.ToArray();
-        Assert.IsNotNull(allowedContentTypes);
-        Assert.AreEqual(2, allowedContentTypes.Length);
-        Assert.IsTrue(allowedContentTypes.Any(c => c.Key == allowedOne.Key && c.SortOrder == 0 && c.Alias == allowedOne.Alias));
-        Assert.IsTrue(allowedContentTypes.Any(c => c.Key == allowedTwo.Key && c.SortOrder == 1 && c.Alias == allowedTwo.Alias));
+        Assert.That(allowedContentTypes, Is.Not.Null);
+        Assert.That(allowedContentTypes, Has.Length.EqualTo(2));
+        Assert.That(allowedContentTypes.Any(c => c.Key == allowedOne.Key && c.SortOrder == 0 && c.Alias == allowedOne.Alias), Is.True);
+        Assert.That(allowedContentTypes.Any(c => c.Key == allowedTwo.Key && c.SortOrder == 1 && c.Alias == allowedTwo.Alias), Is.True);
 
         // expect RefreshOther when changing allowed types
         AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.RefreshOther);
@@ -240,15 +240,15 @@ internal sealed partial class ContentTypeEditingServiceTests
         updateModel.AllowedContentTypes = Array.Empty<ContentTypeSort>();
 
         var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.IsNotNull(result.Result);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.Not.Null);
 
         contentType = await ContentTypeService.GetAsync(result.Result.Key);
-        Assert.IsNotNull(contentType);
+        Assert.That(contentType, Is.Not.Null);
 
         var allowedContentTypes = contentType.AllowedContentTypes?.ToArray();
-        Assert.IsNotNull(allowedContentTypes);
-        Assert.AreEqual(0, allowedContentTypes.Length);
+        Assert.That(allowedContentTypes, Is.Not.Null);
+        Assert.That(allowedContentTypes, Is.Empty);
 
         // expect RefreshOther when changing allowed types
         AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.RefreshOther);
@@ -280,17 +280,17 @@ internal sealed partial class ContentTypeEditingServiceTests
         };
 
         var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.IsNotNull(result.Result);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.Not.Null);
 
         contentType = await ContentTypeService.GetAsync(result.Result.Key);
-        Assert.IsNotNull(contentType);
+        Assert.That(contentType, Is.Not.Null);
 
         var allowedContentTypes = contentType.AllowedContentTypes?.ToArray();
-        Assert.IsNotNull(allowedContentTypes);
-        Assert.AreEqual(2, allowedContentTypes.Length);
-        Assert.IsTrue(allowedContentTypes.Any(c => c.Key == allowedOne.Key && c.SortOrder == 1 && c.Alias == allowedOne.Alias));
-        Assert.IsTrue(allowedContentTypes.Any(c => c.Key == allowedTwo.Key && c.SortOrder == 0 && c.Alias == allowedTwo.Alias));
+        Assert.That(allowedContentTypes, Is.Not.Null);
+        Assert.That(allowedContentTypes, Has.Length.EqualTo(2));
+        Assert.That(allowedContentTypes.Any(c => c.Key == allowedOne.Key && c.SortOrder == 1 && c.Alias == allowedOne.Alias), Is.True);
+        Assert.That(allowedContentTypes.Any(c => c.Key == allowedTwo.Key && c.SortOrder == 0 && c.Alias == allowedTwo.Alias), Is.True);
 
         // expect RefreshOther when only rearranging sort order (UnsortedSequenceEqual means AllowedContentTypes is not dirty)
         AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.RefreshOther);
@@ -314,16 +314,16 @@ internal sealed partial class ContentTypeEditingServiceTests
         };
 
         var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.IsNotNull(result.Result);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.Not.Null);
 
         contentType = await ContentTypeService.GetAsync(result.Result.Key);
-        Assert.IsNotNull(contentType);
+        Assert.That(contentType, Is.Not.Null);
 
         var allowedContentTypes = contentType.AllowedContentTypes?.ToArray();
-        Assert.IsNotNull(allowedContentTypes);
-        Assert.AreEqual(1, allowedContentTypes.Length);
-        Assert.IsTrue(allowedContentTypes.Any(c => c.Key == contentType.Key && c.SortOrder == 0 && c.Alias == contentType.Alias));
+        Assert.That(allowedContentTypes, Is.Not.Null);
+        Assert.That(allowedContentTypes, Has.Length.EqualTo(1));
+        Assert.That(allowedContentTypes.Any(c => c.Key == contentType.Key && c.SortOrder == 0 && c.Alias == contentType.Alias), Is.True);
 
         // expect RefreshOther when changing allowed types
         AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.RefreshOther);
@@ -354,27 +354,27 @@ internal sealed partial class ContentTypeEditingServiceTests
         updateModel.Properties = new[] { propertyType, newPropertyType };
 
         var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.IsNotNull(result.Result);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.Not.Null);
 
         // Ensure it's actually persisted
         contentType = await ContentTypeService.GetAsync(result.Result!.Key);
 
-        Assert.IsNotNull(contentType);
-        Assert.AreEqual(isElement, contentType.IsElement);
-        Assert.AreEqual(1, contentType.PropertyGroups.Count);
-        Assert.AreEqual(2, contentType.PropertyTypes.Count());
-        Assert.AreEqual(2, contentType.PropertyGroups.First().PropertyTypes!.Count);
+        Assert.That(contentType, Is.Not.Null);
+        Assert.That(contentType.IsElement, Is.EqualTo(isElement));
+        Assert.That(contentType.PropertyGroups, Has.Count.EqualTo(1));
+        Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(2));
+        Assert.That(contentType.PropertyGroups.First().PropertyTypes!, Has.Count.EqualTo(2));
 
         var allPropertyTypes = contentType.PropertyTypes.OrderBy(p => p.SortOrder).ToArray();
-        Assert.AreEqual("testProperty2", allPropertyTypes.First().Alias);
-        Assert.AreEqual("testProperty", allPropertyTypes.Last().Alias);
+        Assert.That(allPropertyTypes.First().Alias, Is.EqualTo("testProperty2"));
+        Assert.That(allPropertyTypes.Last().Alias, Is.EqualTo("testProperty"));
 
         var propertyTypesInContainer = contentType.PropertyGroups.First().PropertyTypes!.OrderBy(p => p.SortOrder).ToArray();
-        Assert.AreEqual("testProperty2", propertyTypesInContainer.First().Alias);
-        Assert.AreEqual("testProperty", propertyTypesInContainer.Last().Alias);
+        Assert.That(propertyTypesInContainer.First().Alias, Is.EqualTo("testProperty2"));
+        Assert.That(propertyTypesInContainer.Last().Alias, Is.EqualTo("testProperty"));
 
-        Assert.IsEmpty(contentType.NoGroupPropertyTypes);
+        Assert.That(contentType.NoGroupPropertyTypes, Is.Empty);
 
         // expect PropertyAdded (which includes RefreshOther) when adding properties
         AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.PropertyAdded);
@@ -402,18 +402,18 @@ internal sealed partial class ContentTypeEditingServiceTests
         updateModel.Properties = Array.Empty<ContentTypePropertyTypeModel>();
 
         var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.IsNotNull(result.Result);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.Not.Null);
 
         // Ensure it's actually persisted
         contentType = await ContentTypeService.GetAsync(result.Result!.Key);
 
-        Assert.IsNotNull(contentType);
-        Assert.AreEqual(isElement, contentType.IsElement);
-        Assert.AreEqual(0, contentType.PropertyGroups.Count);
-        Assert.AreEqual(0, contentType.PropertyTypes.Count());
+        Assert.That(contentType, Is.Not.Null);
+        Assert.That(contentType.IsElement, Is.EqualTo(isElement));
+        Assert.That(contentType.PropertyGroups, Is.Empty);
+        Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(0));
 
-        Assert.AreEqual(0, contentType.NoGroupPropertyTypes.Count());
+        Assert.That(contentType.NoGroupPropertyTypes.Count(), Is.EqualTo(0));
 
         // expect PropertyRemoved (which includes RefreshMain) when removing properties
         AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.PropertyRemoved);
@@ -434,8 +434,8 @@ internal sealed partial class ContentTypeEditingServiceTests
         ];
 
         var contentType = (await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
-        Assert.AreEqual(1, contentType.PropertyGroups.Count);
-        Assert.AreEqual(2, contentType.PropertyTypes.Count());
+        Assert.That(contentType.PropertyGroups, Has.Count.EqualTo(1));
+        Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(2));
 
         ContentTypeCacheRefresher.JsonPayload[]? refreshedPayloads = null;
         ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
@@ -449,19 +449,19 @@ internal sealed partial class ContentTypeEditingServiceTests
         ];
 
         var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.IsNotNull(result.Result);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.Not.Null);
 
         // Ensure it's actually persisted
         contentType = await ContentTypeService.GetAsync(result.Result!.Key);
 
-        Assert.IsNotNull(contentType);
-        Assert.AreEqual(isElement, contentType.IsElement);
-        Assert.AreEqual(1, contentType.PropertyGroups.Count);
-        Assert.AreEqual(1, contentType.PropertyTypes.Count());
-        Assert.AreEqual("testProperty2", contentType.PropertyTypes.Single().Alias);
+        Assert.That(contentType, Is.Not.Null);
+        Assert.That(contentType.IsElement, Is.EqualTo(isElement));
+        Assert.That(contentType.PropertyGroups, Has.Count.EqualTo(1));
+        Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(1));
+        Assert.That(contentType.PropertyTypes.Single().Alias, Is.EqualTo("testProperty2"));
 
-        Assert.AreEqual(0, contentType.NoGroupPropertyTypes.Count());
+        Assert.That(contentType.NoGroupPropertyTypes.Count(), Is.EqualTo(0));
 
         // expect PropertyRemoved (which includes RefreshMain) when removing properties
         AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.PropertyRemoved);
@@ -476,14 +476,14 @@ internal sealed partial class ContentTypeEditingServiceTests
         createModel.Properties = new[] { propertyType };
 
         var contentTypeCreateAttempt = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(contentTypeCreateAttempt.Success);
-        Assert.IsNotNull(contentTypeCreateAttempt.Result);
+        Assert.That(contentTypeCreateAttempt.Success, Is.True);
+        Assert.That(contentTypeCreateAttempt.Result, Is.Not.Null);
 
         // Verify the property was created without a container (should be in NoGroupPropertyTypes).
         var contentType = contentTypeCreateAttempt.Result;
-        Assert.AreEqual(1, contentType.NoGroupPropertyTypes.Count());
-        Assert.AreEqual("testProperty", contentType.NoGroupPropertyTypes.Single().Alias);
-        Assert.AreEqual(0, contentType.PropertyGroups.Count);
+        Assert.That(contentType.NoGroupPropertyTypes.Count(), Is.EqualTo(1));
+        Assert.That(contentType.NoGroupPropertyTypes.Single().Alias, Is.EqualTo("testProperty"));
+        Assert.That(contentType.PropertyGroups, Is.Empty);
 
         ContentTypeCacheRefresher.JsonPayload[]? refreshedPayloads = null;
         ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
@@ -494,17 +494,17 @@ internal sealed partial class ContentTypeEditingServiceTests
         updateModel.Properties = Array.Empty<ContentTypePropertyTypeModel>();
 
         var contentTypeUpdateAttempt = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(contentTypeUpdateAttempt.Success);
-        Assert.IsNotNull(contentTypeUpdateAttempt.Result);
+        Assert.That(contentTypeUpdateAttempt.Success, Is.True);
+        Assert.That(contentTypeUpdateAttempt.Result, Is.Not.Null);
 
         // Ensure it's actually persisted - retrieve from database to verify deletion.
         contentType = await ContentTypeService.GetAsync(contentTypeUpdateAttempt.Result.Key);
 
-        Assert.IsNotNull(contentType);
-        Assert.IsTrue(contentType.IsElement);
-        Assert.AreEqual(0, contentType.PropertyGroups.Count);
-        Assert.AreEqual(0, contentType.PropertyTypes.Count());
-        Assert.AreEqual(0, contentType.NoGroupPropertyTypes.Count());
+        Assert.That(contentType, Is.Not.Null);
+        Assert.That(contentType.IsElement, Is.True);
+        Assert.That(contentType.PropertyGroups, Is.Empty);
+        Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(0));
+        Assert.That(contentType.NoGroupPropertyTypes.Count(), Is.EqualTo(0));
 
         // expect PropertyRemoved (which includes RefreshMain) when removing properties
         AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.PropertyRemoved);
@@ -532,24 +532,24 @@ internal sealed partial class ContentTypeEditingServiceTests
         updateModel.Properties = new[] { propertyType };
 
         var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.IsNotNull(result.Result);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.Not.Null);
 
         // Ensure it's actually persisted
         contentType = await ContentTypeService.GetAsync(result.Result!.Key);
 
-        Assert.IsNotNull(contentType);
-        Assert.AreEqual(isElement, contentType.IsElement);
-        Assert.AreEqual(0, contentType.PropertyGroups.Count);
-        Assert.AreEqual(1, contentType.PropertyTypes.Count());
+        Assert.That(contentType, Is.Not.Null);
+        Assert.That(contentType.IsElement, Is.EqualTo(isElement));
+        Assert.That(contentType.PropertyGroups, Is.Empty);
+        Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(1));
 
         var property = contentType.PropertyTypes.First();
-        Assert.AreEqual("Test Property 2", property.Name);
-        Assert.AreEqual("testProperty", property.Alias);
-        Assert.AreEqual("The updated description", property.Description);
-        Assert.AreEqual(originalPropertyTypeKey, property.Key);
+        Assert.That(property.Name, Is.EqualTo("Test Property 2"));
+        Assert.That(property.Alias, Is.EqualTo("testProperty"));
+        Assert.That(property.Description, Is.EqualTo("The updated description"));
+        Assert.That(property.Key, Is.EqualTo(originalPropertyTypeKey));
 
-        Assert.AreEqual(1, contentType.NoGroupPropertyTypes.Count());
+        Assert.That(contentType.NoGroupPropertyTypes.Count(), Is.EqualTo(1));
 
         // expect RefreshOther when changing basic property info (not alias and not variance)
         AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.RefreshOther);
@@ -587,24 +587,24 @@ internal sealed partial class ContentTypeEditingServiceTests
         var createAttempt = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(createAttempt.Success);
-            Assert.AreEqual(ContentTypeOperationStatus.Success, createAttempt.Status);
-            Assert.IsNotNull(createAttempt.Result);
+            Assert.That(createAttempt.Success, Is.True);
+            Assert.That(createAttempt.Status, Is.EqualTo(ContentTypeOperationStatus.Success));
+            Assert.That(createAttempt.Result, Is.Not.Null);
 
-            Assert.AreEqual(4, createAttempt.Result.PropertyTypes.Count());
-            Assert.AreEqual(2, createAttempt.Result.PropertyGroups.Count);
+            Assert.That(createAttempt.Result.PropertyTypes.Count(), Is.EqualTo(4));
+            Assert.That(createAttempt.Result.PropertyGroups, Has.Count.EqualTo(2));
             var createdContainer1 = createAttempt.Result.PropertyGroups.SingleOrDefault(x => x.Key == container1.Key);
-            Assert.NotNull(createdContainer1);
-            Assert.NotNull(createdContainer1.PropertyTypes);
-            Assert.AreEqual(2, createdContainer1.PropertyTypes.Count);
-            Assert.AreEqual("Test Property 1", createdContainer1.PropertyTypes[0].Name);
-            Assert.AreEqual("Test Property 2", createdContainer1.PropertyTypes[1].Name);
+            Assert.That(createdContainer1, Is.Not.Null);
+            Assert.That(createdContainer1.PropertyTypes, Is.Not.Null);
+            Assert.That(createdContainer1.PropertyTypes, Has.Count.EqualTo(2));
+            Assert.That(createdContainer1.PropertyTypes[0].Name, Is.EqualTo("Test Property 1"));
+            Assert.That(createdContainer1.PropertyTypes[1].Name, Is.EqualTo("Test Property 2"));
             var createdContainer2 = createAttempt.Result.PropertyGroups.SingleOrDefault(x => x.Key == container2.Key);
-            Assert.NotNull(createdContainer2);
-            Assert.NotNull(createdContainer2.PropertyTypes);
-            Assert.AreEqual(2, createdContainer2.PropertyTypes?.Count);
-            Assert.AreEqual("Test Property 3", createdContainer2.PropertyTypes[0].Name);
-            Assert.AreEqual("Test Property 4", createdContainer2.PropertyTypes[1].Name);
+            Assert.That(createdContainer2, Is.Not.Null);
+            Assert.That(createdContainer2.PropertyTypes, Is.Not.Null);
+            Assert.That(createdContainer2.PropertyTypes?.Count, Is.EqualTo(2));
+            Assert.That(createdContainer2.PropertyTypes[0].Name, Is.EqualTo("Test Property 3"));
+            Assert.That(createdContainer2.PropertyTypes[1].Name, Is.EqualTo("Test Property 4"));
         });
 
         Content content = ContentBuilder.CreateBasicContent(createAttempt.Result!);
@@ -636,40 +636,40 @@ internal sealed partial class ContentTypeEditingServiceTests
         var updateAttempt = await ContentTypeEditingService.UpdateAsync(createAttempt.Result, updateModel, Constants.Security.SuperUserKey);
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(updateAttempt.Success);
-            Assert.AreEqual(ContentTypeOperationStatus.Success, updateAttempt.Status);
-            Assert.AreEqual(4, updateAttempt.Result!.PropertyTypes.Count());
-            Assert.AreEqual(2, updateAttempt.Result.PropertyGroups.Count);
+            Assert.That(updateAttempt.Success, Is.True);
+            Assert.That(updateAttempt.Status, Is.EqualTo(ContentTypeOperationStatus.Success));
+            Assert.That(updateAttempt.Result!.PropertyTypes.Count(), Is.EqualTo(4));
+            Assert.That(updateAttempt.Result.PropertyGroups, Has.Count.EqualTo(2));
 
             var updatedContainer1 = updateAttempt.Result.PropertyGroups.SingleOrDefault(x => x.Key == container1.Key);
-            Assert.NotNull(updatedContainer1?.PropertyTypes);
+            Assert.That(updatedContainer1?.PropertyTypes, Is.Not.Null);
             var updatedContainer2 = updateAttempt.Result.PropertyGroups.SingleOrDefault(x => x.Key == container2.Key);
-            Assert.NotNull(updatedContainer2?.PropertyTypes);
+            Assert.That(updatedContainer2?.PropertyTypes, Is.Not.Null);
             if (propertyMoveOperation == PropertyMoveOperation.ToEarlier)
             {
-                Assert.AreEqual(3, updatedContainer1.PropertyTypes.Count);
-                Assert.AreEqual("Test Property 1", updatedContainer1.PropertyTypes[0].Name);
-                Assert.AreEqual("Test Property 2", updatedContainer1.PropertyTypes[1].Name);
-                Assert.AreEqual("Test Property 3", updatedContainer1.PropertyTypes[2].Name);
-                Assert.AreEqual(1, updatedContainer2.PropertyTypes.Count);
-                Assert.AreEqual("Test Property 4", updatedContainer2.PropertyTypes[0].Name);
+                Assert.That(updatedContainer1.PropertyTypes, Has.Count.EqualTo(3));
+                Assert.That(updatedContainer1.PropertyTypes[0].Name, Is.EqualTo("Test Property 1"));
+                Assert.That(updatedContainer1.PropertyTypes[1].Name, Is.EqualTo("Test Property 2"));
+                Assert.That(updatedContainer1.PropertyTypes[2].Name, Is.EqualTo("Test Property 3"));
+                Assert.That(updatedContainer2.PropertyTypes, Has.Count.EqualTo(1));
+                Assert.That(updatedContainer2.PropertyTypes[0].Name, Is.EqualTo("Test Property 4"));
             }
             else
             {
-                Assert.AreEqual(1, updatedContainer1.PropertyTypes.Count);
-                Assert.AreEqual("Test Property 2", updatedContainer1.PropertyTypes[0].Name);
-                Assert.AreEqual(3, updatedContainer2.PropertyTypes.Count);
-                Assert.AreEqual("Test Property 1", updatedContainer2.PropertyTypes[0].Name);
-                Assert.AreEqual("Test Property 3", updatedContainer2.PropertyTypes[1].Name);
-                Assert.AreEqual("Test Property 4", updatedContainer2.PropertyTypes[2].Name);
+                Assert.That(updatedContainer1.PropertyTypes, Has.Count.EqualTo(1));
+                Assert.That(updatedContainer1.PropertyTypes[0].Name, Is.EqualTo("Test Property 2"));
+                Assert.That(updatedContainer2.PropertyTypes, Has.Count.EqualTo(3));
+                Assert.That(updatedContainer2.PropertyTypes[0].Name, Is.EqualTo("Test Property 1"));
+                Assert.That(updatedContainer2.PropertyTypes[1].Name, Is.EqualTo("Test Property 3"));
+                Assert.That(updatedContainer2.PropertyTypes[2].Name, Is.EqualTo("Test Property 4"));
             }
 
-            Assert.AreEqual(0, updateAttempt.Result.NoGroupPropertyTypes.Count());
+            Assert.That(updateAttempt.Result.NoGroupPropertyTypes.Count(), Is.EqualTo(0));
 
             var updatedContent = ContentService.GetById(content.Id);
             foreach (var property in properties)
             {
-                Assert.AreEqual(property.Name, updatedContent?.Properties[property.Alias]?.GetValue());
+                Assert.That(updatedContent?.Properties[property.Alias]?.GetValue(), Is.EqualTo(property.Name));
             }
         });
 
@@ -705,19 +705,19 @@ internal sealed partial class ContentTypeEditingServiceTests
         updateModel.Properties = new[] { propertyType1, propertyType2 };
 
         var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.IsNotNull(result.Result);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.Not.Null);
 
         // Ensure it's actually persisted
         contentType = await ContentTypeService.GetAsync(result.Result!.Key);
 
-        Assert.IsNotNull(contentType);
-        Assert.AreEqual(isElement, contentType.IsElement);
-        Assert.AreEqual(2, contentType.PropertyGroups.Count);
+        Assert.That(contentType, Is.Not.Null);
+        Assert.That(contentType.IsElement, Is.EqualTo(isElement));
+        Assert.That(contentType.PropertyGroups, Has.Count.EqualTo(2));
 
         var sortedPropertyGroups = contentType.PropertyGroups.OrderBy(g => g.SortOrder).ToArray();
-        Assert.AreEqual("testProperty2", sortedPropertyGroups.First().PropertyTypes!.Single().Alias);
-        Assert.AreEqual("testProperty1", sortedPropertyGroups.Last().PropertyTypes!.Single().Alias);
+        Assert.That(sortedPropertyGroups.First().PropertyTypes!.Single().Alias, Is.EqualTo("testProperty2"));
+        Assert.That(sortedPropertyGroups.Last().PropertyTypes!.Single().Alias, Is.EqualTo("testProperty1"));
 
         // expect RefreshOther when only rearranging container sort order (PropertyGroups is not dirty for reordering)
         AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.RefreshOther);
@@ -748,21 +748,21 @@ internal sealed partial class ContentTypeEditingServiceTests
         updateModel.Properties = [propertyType1, propertyType2];
 
         var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.IsNotNull(result.Result);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.Not.Null);
 
         // Ensure it's actually persisted
         contentType = await ContentTypeService.GetAsync(result.Result!.Key);
 
-        Assert.IsNotNull(contentType);
-        Assert.AreEqual(isElement, contentType.IsElement);
-        Assert.AreEqual(1, contentType.PropertyGroups.Count);
-        Assert.AreEqual(2, contentType.PropertyTypes.Count());
-        Assert.AreEqual(1, contentType.PropertyGroups.First().PropertyTypes!.Count);
-        Assert.AreEqual(1, contentType.NoGroupPropertyTypes.Count());
+        Assert.That(contentType, Is.Not.Null);
+        Assert.That(contentType.IsElement, Is.EqualTo(isElement));
+        Assert.That(contentType.PropertyGroups, Has.Count.EqualTo(1));
+        Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(2));
+        Assert.That(contentType.PropertyGroups.First().PropertyTypes!, Has.Count.EqualTo(1));
+        Assert.That(contentType.NoGroupPropertyTypes.Count(), Is.EqualTo(1));
 
-        Assert.AreEqual("testProperty1", contentType.PropertyGroups.First().PropertyTypes!.Single().Alias);
-        Assert.AreEqual("testProperty2", contentType.NoGroupPropertyTypes.Single().Alias);
+        Assert.That(contentType.PropertyGroups.First().PropertyTypes!.Single().Alias, Is.EqualTo("testProperty1"));
+        Assert.That(contentType.NoGroupPropertyTypes.Single().Alias, Is.EqualTo("testProperty2"));
 
         // expect RefreshOther when modifying container structure
         AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.RefreshOther);
@@ -794,19 +794,19 @@ internal sealed partial class ContentTypeEditingServiceTests
         };
 
         var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.IsNotNull(result.Result);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.Not.Null);
 
         // Ensure it's actually persisted
         contentType = await ContentTypeService.GetAsync(result.Result!.Key);
 
-        Assert.IsNotNull(contentType);
-        Assert.AreEqual(1, contentType.ContentTypeComposition.Count());
-        Assert.AreEqual(compositionContentType.Key, contentType.ContentTypeComposition.Single().Key);
+        Assert.That(contentType, Is.Not.Null);
+        Assert.That(contentType.ContentTypeComposition.Count(), Is.EqualTo(1));
+        Assert.That(contentType.ContentTypeComposition.Single().Key, Is.EqualTo(compositionContentType.Key));
         var propertyTypeAliases = contentType.CompositionPropertyTypes.Select(c => c.Alias).ToArray();
-        Assert.AreEqual(2, propertyTypeAliases.Length);
-        Assert.IsTrue(propertyTypeAliases.Contains("testProperty1"));
-        Assert.IsTrue(propertyTypeAliases.Contains("testProperty2"));
+        Assert.That(propertyTypeAliases, Has.Length.EqualTo(2));
+        Assert.That(propertyTypeAliases.Contains("testProperty1"), Is.True);
+        Assert.That(propertyTypeAliases.Contains("testProperty2"), Is.True);
 
         // expect CompositionAdded (which includes RefreshOther) when adding compositions
         AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.CompositionAdded);
@@ -842,19 +842,19 @@ internal sealed partial class ContentTypeEditingServiceTests
         };
 
         var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.IsNotNull(result.Result);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.Not.Null);
 
         // Ensure it's actually persisted
         contentType = await ContentTypeService.GetAsync(result.Result!.Key);
 
-        Assert.IsNotNull(contentType);
-        Assert.AreEqual(1, contentType.ContentTypeComposition.Count());
-        Assert.AreEqual(compositionContentType.Key, contentType.ContentTypeComposition.Single().Key);
+        Assert.That(contentType, Is.Not.Null);
+        Assert.That(contentType.ContentTypeComposition.Count(), Is.EqualTo(1));
+        Assert.That(contentType.ContentTypeComposition.Single().Key, Is.EqualTo(compositionContentType.Key));
         var propertyTypeAliases = contentType.CompositionPropertyTypes.Select(c => c.Alias).ToArray();
-        Assert.AreEqual(2, propertyTypeAliases.Length);
-        Assert.IsTrue(propertyTypeAliases.Contains("testProperty1"));
-        Assert.IsTrue(propertyTypeAliases.Contains("testProperty2"));
+        Assert.That(propertyTypeAliases, Has.Length.EqualTo(2));
+        Assert.That(propertyTypeAliases.Contains("testProperty1"), Is.True);
+        Assert.That(propertyTypeAliases.Contains("testProperty2"), Is.True);
 
         // expect RefreshOther when re-applying the same compositions (in principle, nothing changes)
         AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.RefreshOther);
@@ -887,16 +887,16 @@ internal sealed partial class ContentTypeEditingServiceTests
         updateModel.Compositions = Array.Empty<Composition>();
 
         var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.IsNotNull(result.Result);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.Not.Null);
 
         // Ensure it's actually persisted
         contentType = await ContentTypeService.GetAsync(result.Result!.Key);
 
-        Assert.IsNotNull(contentType);
-        Assert.IsEmpty(contentType.ContentTypeComposition);
-        Assert.AreEqual(1, contentType.CompositionPropertyTypes.Count());
-        Assert.AreEqual("testProperty2", contentType.CompositionPropertyTypes.Single().Alias);
+        Assert.That(contentType, Is.Not.Null);
+        Assert.That(contentType.ContentTypeComposition, Is.Empty);
+        Assert.That(contentType.CompositionPropertyTypes.Count(), Is.EqualTo(1));
+        Assert.That(contentType.CompositionPropertyTypes.Single().Alias, Is.EqualTo("testProperty2"));
 
         // expect CompositionRemoved (which includes RefreshMain) when removing compositions
         AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.CompositionRemoved);
@@ -929,16 +929,16 @@ internal sealed partial class ContentTypeEditingServiceTests
             });
 
         var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
 
         // Ensure it's actually persisted
         contentType = await ContentTypeService.GetAsync(result.Result!.Key);
 
-        Assert.IsNotNull(contentType);
-        Assert.AreEqual(1, contentType.ContentTypeComposition.Count());
-        Assert.AreEqual(parentContentType.Id, contentType.ParentId);
-        Assert.AreEqual(originalPath, contentType.Path);
-        Assert.AreEqual($"-1,{parentContentType.Id},{contentType.Id}", contentType.Path);
+        Assert.That(contentType, Is.Not.Null);
+        Assert.That(contentType.ContentTypeComposition.Count(), Is.EqualTo(1));
+        Assert.That(contentType.ParentId, Is.EqualTo(parentContentType.Id));
+        Assert.That(contentType.Path, Is.EqualTo(originalPath));
+        Assert.That(contentType.Path, Is.EqualTo($"-1,{parentContentType.Id},{contentType.Id}"));
 
         // expect RefreshOther when re-applying inheritance (in principle, nothing changes)
         AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.RefreshOther);
@@ -965,16 +965,16 @@ internal sealed partial class ContentTypeEditingServiceTests
         };
 
         var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
 
         // Ensure it's actually persisted
         contentType = await ContentTypeService.GetAsync(result.Result!.Key);
-        Assert.IsNotNull(contentType);
+        Assert.That(contentType, Is.Not.Null);
 
-        Assert.IsNotNull(contentType.HistoryCleanup);
-        Assert.IsFalse(contentType.HistoryCleanup.PreventCleanup);
-        Assert.AreEqual(234, contentType.HistoryCleanup.KeepAllVersionsNewerThanDays);
-        Assert.AreEqual(567, contentType.HistoryCleanup.KeepLatestVersionPerDayForDays);
+        Assert.That(contentType.HistoryCleanup, Is.Not.Null);
+        Assert.That(contentType.HistoryCleanup.PreventCleanup, Is.False);
+        Assert.That(contentType.HistoryCleanup.KeepAllVersionsNewerThanDays, Is.EqualTo(234));
+        Assert.That(contentType.HistoryCleanup.KeepLatestVersionPerDayForDays, Is.EqualTo(567));
 
         // expect RefreshOther when changing name.
         AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.RefreshOther);
@@ -1005,27 +1005,27 @@ internal sealed partial class ContentTypeEditingServiceTests
             compositions: [new() { CompositionType = CompositionType.Composition, Key = compositionContentType.Key }]);
 
         var result = await ContentTypeEditingService.UpdateAsync(parentContentType, updateModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
 
         // Ensure it's actually persisted
         parentContentType = await ContentTypeService.GetAsync(parentContentType.Key);
 
-        Assert.IsNotNull(parentContentType);
+        Assert.That(parentContentType, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual("Parent Updated", parentContentType.Name);
-            Assert.AreEqual(1, parentContentType.ContentTypeComposition.Count());
-            Assert.AreEqual(compositionContentType.Key, parentContentType.ContentTypeComposition.Single().Key);
+            Assert.That(parentContentType.Name, Is.EqualTo("Parent Updated"));
+            Assert.That(parentContentType.ContentTypeComposition.Count(), Is.EqualTo(1));
+            Assert.That(parentContentType.ContentTypeComposition.Single().Key, Is.EqualTo(compositionContentType.Key));
         });
 
         childContentType = await ContentTypeService.GetAsync(childContentType.Key);
 
-        Assert.IsNotNull(childContentType);
+        Assert.That(childContentType, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual("Child", childContentType.Name);
-            Assert.AreEqual(1, childContentType.ContentTypeComposition.Count());
-            Assert.AreEqual(parentContentType.Key, childContentType.ContentTypeComposition.Single().Key);
+            Assert.That(childContentType.Name, Is.EqualTo("Child"));
+            Assert.That(childContentType.ContentTypeComposition.Count(), Is.EqualTo(1));
+            Assert.That(childContentType.ContentTypeComposition.Single().Key, Is.EqualTo(parentContentType.Key));
         });
 
         // expect RefreshOther when re-applying compositions with a name change
@@ -1054,31 +1054,31 @@ internal sealed partial class ContentTypeEditingServiceTests
         var updateModel = ContentTypeUpdateModel("Parent Updated", alias: parentContentType.Alias, compositions: []);
 
         var result = await ContentTypeEditingService.UpdateAsync(parentContentType, updateModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
 
         // Ensure it's actually persisted
         parentContentType = await ContentTypeService.GetAsync(parentContentType.Key);
 
-        Assert.IsNotNull(parentContentType);
+        Assert.That(parentContentType, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual("Parent Updated", parentContentType.Name);
-            Assert.IsEmpty(parentContentType.ContentTypeComposition);
+            Assert.That(parentContentType.Name, Is.EqualTo("Parent Updated"));
+            Assert.That(parentContentType.ContentTypeComposition, Is.Empty);
         });
 
         childContentType = await ContentTypeService.GetAsync(childContentType.Key);
 
-        Assert.IsNotNull(childContentType);
+        Assert.That(childContentType, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual("Child", childContentType.Name);
-            Assert.AreEqual(1, childContentType.ContentTypeComposition.Count());
-            Assert.AreEqual(parentContentType.Key, childContentType.ContentTypeComposition.Single().Key);
+            Assert.That(childContentType.Name, Is.EqualTo("Child"));
+            Assert.That(childContentType.ContentTypeComposition.Count(), Is.EqualTo(1));
+            Assert.That(childContentType.ContentTypeComposition.Single().Key, Is.EqualTo(parentContentType.Key));
         });
 
         // expect CompositionRemoved for the parent and RefreshMain for the child (affected through composition propagation)
-        Assert.IsNotNull(refreshedPayloads);
-        Assert.AreEqual(2, refreshedPayloads.Length);
+        Assert.That(refreshedPayloads, Is.Not.Null);
+        Assert.That(refreshedPayloads, Has.Length.EqualTo(2));
         AssertContentTypeRefreshPayload([refreshedPayloads.First()], parentContentType.Id, ContentTypeChangeTypes.CompositionRemoved);
         AssertContentTypeRefreshPayload([refreshedPayloads.Last()], childContentType.Id, ContentTypeChangeTypes.RefreshMain);
     }
@@ -1106,11 +1106,11 @@ internal sealed partial class ContentTypeEditingServiceTests
         updateModel.Properties = new[] { property };
 
         var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentTypeOperationStatus.MissingContainer, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentTypeOperationStatus.MissingContainer));
 
         // no changes should have been notified
-        Assert.IsNull(refreshedPayloads);
+        Assert.That(refreshedPayloads, Is.Null);
     }
 
     [TestCase(false)]
@@ -1136,11 +1136,11 @@ internal sealed partial class ContentTypeEditingServiceTests
         updateModel.Properties = new[] { property };
 
         var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentTypeOperationStatus.MissingContainer, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentTypeOperationStatus.MissingContainer));
 
         // no changes should have been notified
-        Assert.IsNull(refreshedPayloads);
+        Assert.That(refreshedPayloads, Is.Null);
     }
 
     [Test]
@@ -1163,11 +1163,11 @@ internal sealed partial class ContentTypeEditingServiceTests
         };
 
         var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentTypeOperationStatus.InvalidComposition, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentTypeOperationStatus.InvalidComposition));
 
         // no changes should have been notified
-        Assert.IsNull(refreshedPayloads);
+        Assert.That(refreshedPayloads, Is.Null);
     }
 
     [Test]
@@ -1197,11 +1197,11 @@ internal sealed partial class ContentTypeEditingServiceTests
             });
 
         var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentTypeOperationStatus.InvalidInheritance, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentTypeOperationStatus.InvalidInheritance));
 
         // no changes should have been notified
-        Assert.IsNull(refreshedPayloads);
+        Assert.That(refreshedPayloads, Is.Null);
     }
 
     [Test]
@@ -1222,11 +1222,11 @@ internal sealed partial class ContentTypeEditingServiceTests
             });
 
         var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentTypeOperationStatus.InvalidInheritance, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentTypeOperationStatus.InvalidInheritance));
 
         // no changes should have been notified
-        Assert.IsNull(refreshedPayloads);
+        Assert.That(refreshedPayloads, Is.Null);
     }
 
     [Test]
@@ -1257,11 +1257,11 @@ internal sealed partial class ContentTypeEditingServiceTests
             });
 
         var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentTypeOperationStatus.InvalidInheritance, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentTypeOperationStatus.InvalidInheritance));
 
         // no changes should have been notified
-        Assert.IsNull(refreshedPayloads);
+        Assert.That(refreshedPayloads, Is.Null);
     }
 
     [Test]
@@ -1282,11 +1282,11 @@ internal sealed partial class ContentTypeEditingServiceTests
         };
 
         var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentTypeOperationStatus.InvalidInheritance, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentTypeOperationStatus.InvalidInheritance));
 
         // no changes should have been notified
-        Assert.IsNull(refreshedPayloads);
+        Assert.That(refreshedPayloads, Is.Null);
     }
 
     [Test]
@@ -1309,11 +1309,11 @@ internal sealed partial class ContentTypeEditingServiceTests
             });
 
         var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentTypeOperationStatus.InvalidInheritance, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentTypeOperationStatus.InvalidInheritance));
 
         // no changes should have been notified
-        Assert.IsNull(refreshedPayloads);
+        Assert.That(refreshedPayloads, Is.Null);
     }
 
     [TestCase(CompositionType.Composition, CompositionType.Inheritance)]
@@ -1341,11 +1341,11 @@ internal sealed partial class ContentTypeEditingServiceTests
         };
 
         var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentTypeOperationStatus.InvalidInheritance, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentTypeOperationStatus.InvalidInheritance));
 
         // no changes should have been notified
-        Assert.IsNull(refreshedPayloads);
+        Assert.That(refreshedPayloads, Is.Null);
     }
 
     [TestCase("something")]
@@ -1372,11 +1372,11 @@ internal sealed partial class ContentTypeEditingServiceTests
         updateModel.Properties = new[] { property };
 
         var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentTypeOperationStatus.InvalidContainerType, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentTypeOperationStatus.InvalidContainerType));
 
         // no changes should have been notified
-        Assert.IsNull(refreshedPayloads);
+        Assert.That(refreshedPayloads, Is.Null);
     }
 
 
@@ -1400,30 +1400,30 @@ internal sealed partial class ContentTypeEditingServiceTests
             compositions: [new() { CompositionType = CompositionType.Composition, Key = compositionContentType.Key }]);
 
         var result = await ContentTypeEditingService.UpdateAsync(parentContentType, updateModel, Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
+        Assert.That(result.Success, Is.False);
 
         // Ensure nothing was persisted
         parentContentType = await ContentTypeService.GetAsync(parentContentType.Key);
 
-        Assert.IsNotNull(parentContentType);
+        Assert.That(parentContentType, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual("Parent", parentContentType.Name);
-            Assert.AreEqual(0, parentContentType.ContentTypeComposition.Count());
+            Assert.That(parentContentType.Name, Is.EqualTo("Parent"));
+            Assert.That(parentContentType.ContentTypeComposition.Count(), Is.EqualTo(0));
         });
 
         childContentType = await ContentTypeService.GetAsync(childContentType.Key);
 
-        Assert.IsNotNull(childContentType);
+        Assert.That(childContentType, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual("Child", childContentType.Name);
-            Assert.AreEqual(1, childContentType.ContentTypeComposition.Count());
-            Assert.AreEqual(parentContentType.Key, childContentType.ContentTypeComposition.Single().Key);
+            Assert.That(childContentType.Name, Is.EqualTo("Child"));
+            Assert.That(childContentType.ContentTypeComposition.Count(), Is.EqualTo(1));
+            Assert.That(childContentType.ContentTypeComposition.Single().Key, Is.EqualTo(parentContentType.Key));
         });
 
         // no changes should have been notified
-        Assert.IsNull(refreshedPayloads);
+        Assert.That(refreshedPayloads, Is.Null);
     }
 
     [Test]
@@ -1455,12 +1455,12 @@ internal sealed partial class ContentTypeEditingServiceTests
 
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(result.Success);
-            Assert.AreEqual(ContentTypeOperationStatus.DuplicatePropertyTypeAlias, result.Status);
+            Assert.That(result.Success, Is.False);
+            Assert.That(result.Status, Is.EqualTo(ContentTypeOperationStatus.DuplicatePropertyTypeAlias));
         });
 
         // no changes should have been notified
-        Assert.IsNull(refreshedPayloads);
+        Assert.That(refreshedPayloads, Is.Null);
     }
 
     [Test]
@@ -1491,25 +1491,25 @@ internal sealed partial class ContentTypeEditingServiceTests
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(result.Success);
-            Assert.AreEqual(ContentTypeOperationStatus.Success, result.Status);
+            Assert.That(result.Success, Is.True);
+            Assert.That(result.Status, Is.EqualTo(ContentTypeOperationStatus.Success));
         });
 
         // Verify the composition was added and the property from the composition is accessible.
         var updatedContentType = result.Result!;
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(1, updatedContentType.ContentTypeComposition.Count());
-            Assert.AreEqual(compositionContentType.Key, updatedContentType.ContentTypeComposition.Single().Key);
+            Assert.That(updatedContentType.ContentTypeComposition.Count(), Is.EqualTo(1));
+            Assert.That(updatedContentType.ContentTypeComposition.Single().Key, Is.EqualTo(compositionContentType.Key));
 
             // The property should come from the composition, not be a local property
-            Assert.AreEqual(0, updatedContentType.PropertyTypes.Count());
+            Assert.That(updatedContentType.PropertyTypes.Count(), Is.EqualTo(0));
 
             // The property from the composition should be accessible via CompositionPropertyTypes
-            Assert.AreEqual(1, updatedContentType.CompositionPropertyTypes.Count());
+            Assert.That(updatedContentType.CompositionPropertyTypes.Count(), Is.EqualTo(1));
             var compositionProperty = updatedContentType.CompositionPropertyTypes.Single();
-            Assert.AreEqual("testProperty", compositionProperty.Alias);
-            Assert.AreEqual("Same Test Property Alias", compositionProperty.Name);
+            Assert.That(compositionProperty.Alias, Is.EqualTo("testProperty"));
+            Assert.That(compositionProperty.Name, Is.EqualTo("Same Test Property Alias"));
         });
 
         // expect PropertyRemoved (which includes RefreshMain), because a property was removed to "make room" for the
@@ -1519,14 +1519,14 @@ internal sealed partial class ContentTypeEditingServiceTests
 
     private static void AssertContentTypeRefreshPayload(ContentTypeCacheRefresher.JsonPayload[]? refreshedPayloads, int expectedContentTypeId, ContentTypeChangeTypes expectedChangeTypes)
     {
-        Assert.IsNotNull(refreshedPayloads);
-        Assert.AreEqual(1, refreshedPayloads.Length);
+        Assert.That(refreshedPayloads, Is.Not.Null);
+        Assert.That(refreshedPayloads, Has.Length.EqualTo(1));
         Assert.Multiple(() =>
         {
             var payload = refreshedPayloads.First();
-            Assert.AreEqual(expectedContentTypeId, payload.Id);
-            Assert.AreEqual(expectedChangeTypes, payload.ChangeTypes);
-            Assert.AreEqual(nameof(IContentType), payload.ItemType);
+            Assert.That(payload.Id, Is.EqualTo(expectedContentTypeId));
+            Assert.That(payload.ChangeTypes, Is.EqualTo(expectedChangeTypes));
+            Assert.That(payload.ItemType, Is.EqualTo(nameof(IContentType)));
         });
     }
 
@@ -1541,8 +1541,8 @@ internal sealed partial class ContentTypeEditingServiceTests
 
         var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
 
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentTypeOperationStatus.InvalidSegmentVariationForElementType, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentTypeOperationStatus.InvalidSegmentVariationForElementType));
     }
 
     [Test]
@@ -1557,8 +1557,8 @@ internal sealed partial class ContentTypeEditingServiceTests
 
         var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
 
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentTypeOperationStatus.InvalidSegmentVariationForElementType, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentTypeOperationStatus.InvalidSegmentVariationForElementType));
     }
 
     [Test]
@@ -1570,13 +1570,13 @@ internal sealed partial class ContentTypeEditingServiceTests
 
         var content = ContentService.Create("Test Content", Constants.System.Root, contentType.Alias);
         var saveResult = ContentService.Save(content);
-        Assert.IsTrue(saveResult.Success);
+        Assert.That(saveResult.Success, Is.True);
 
         var updateModel = ContentTypeUpdateModel("Test", "test", isElement: true);
         var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
 
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentTypeOperationStatus.InvalidElementFlagDocumentHasContent, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentTypeOperationStatus.InvalidElementFlagDocumentHasContent));
     }
 
     [Test]
@@ -1588,13 +1588,13 @@ internal sealed partial class ContentTypeEditingServiceTests
 
         var element = new Element("Test Element", contentType);
         var saveResult = ElementService.Save(element);
-        Assert.IsTrue(saveResult.Success);
+        Assert.That(saveResult.Success, Is.True);
 
         var updateModel = ContentTypeUpdateModel("Test", "test");
         var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
 
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentTypeOperationStatus.InvalidElementFlagElementHasContent, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentTypeOperationStatus.InvalidElementFlagElementHasContent));
     }
 
     [Test]
@@ -1609,12 +1609,12 @@ internal sealed partial class ContentTypeEditingServiceTests
             contentType.Key,
             elementSettingKey: null);
         var dataTypeResult = await DataTypeService.CreateAsync(dataType, Constants.Security.SuperUserKey);
-        Assert.IsTrue(dataTypeResult.Success);
+        Assert.That(dataTypeResult.Success, Is.True);
 
         var updateModel = ContentTypeUpdateModel("Test", "test");
         var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
 
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentTypeOperationStatus.InvalidElementFlagElementIsUsedInPropertyEditorConfiguration, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentTypeOperationStatus.InvalidElementFlagElementIsUsedInPropertyEditorConfiguration));
     }
 }

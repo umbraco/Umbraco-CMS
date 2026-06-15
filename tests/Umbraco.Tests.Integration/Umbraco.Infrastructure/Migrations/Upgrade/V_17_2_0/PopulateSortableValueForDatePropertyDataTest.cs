@@ -58,7 +58,7 @@ internal sealed class PopulateSortableValueForDatePropertyDataTest : UmbracoInte
         var rowsAffected = await ExecuteMigration();
 
         // Assert: Verify sortableValue is populated again with correct values.
-        Assert.AreEqual(contentItems.Length, rowsAffected);
+        Assert.That(rowsAffected, Is.EqualTo(contentItems.Length));
         await AssertSortableValuesPopulated(contentType.Id, contentItems.Length);
         await AssertSortableValuesAreCorrectlyFormatted(contentType.Id);
     }
@@ -76,7 +76,7 @@ internal sealed class PopulateSortableValueForDatePropertyDataTest : UmbracoInte
         var rowsAffected = await ExecuteMigration();
 
         // Assert: No rows should be affected since sortableValue is already populated.
-        Assert.AreEqual(0, rowsAffected);
+        Assert.That(rowsAffected, Is.EqualTo(0));
     }
 
     private async Task<(IContentType ContentType, IContent[] ContentItems)> PrepareTestData()
@@ -117,7 +117,7 @@ internal sealed class PopulateSortableValueForDatePropertyDataTest : UmbracoInte
             };
 
             var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-            Assert.IsTrue(result.Success, $"Failed to create content: {result.Status}");
+            Assert.That(result.Success, Is.True, $"Failed to create content: {result.Status}");
             contentItems[i] = result.Result.Content!;
         }
 
@@ -172,13 +172,13 @@ internal sealed class PopulateSortableValueForDatePropertyDataTest : UmbracoInte
     private async Task AssertSortableValuesPopulated(int contentTypeId, int expectedCount)
     {
         var results = await GetPropertyDataWithSortableValues(contentTypeId);
-        Assert.AreEqual(expectedCount, results.Count, "Expected sortableValue to be populated for all property data rows.");
+        Assert.That(results, Has.Count.EqualTo(expectedCount), "Expected sortableValue to be populated for all property data rows.");
     }
 
     private async Task AssertSortableValuesCleared(int contentTypeId)
     {
         var results = await GetPropertyDataWithSortableValues(contentTypeId);
-        Assert.AreEqual(0, results.Count, "Expected sortableValue to be NULL for all property data rows.");
+        Assert.That(results, Is.Empty, "Expected sortableValue to be NULL for all property data rows.");
     }
 
     private async Task AssertSortableValuesAreCorrectlyFormatted(int contentTypeId)
@@ -188,14 +188,14 @@ internal sealed class PopulateSortableValueForDatePropertyDataTest : UmbracoInte
         foreach (var dto in results)
         {
             // Verify the sortable value is in a valid ISO 8601 format.
-            Assert.IsNotNull(dto.SortableValue);
-            Assert.IsTrue(
-                DateTimeOffset.TryParse(dto.SortableValue, out _),
+            Assert.That(dto.SortableValue, Is.Not.Null);
+            Assert.That(
+                DateTimeOffset.TryParse(dto.SortableValue, out _), Is.True,
                 $"SortableValue '{dto.SortableValue}' is not a valid date format.");
 
             // Verify it's normalized to UTC (ends with Z or +00:00).
-            Assert.IsTrue(
-                dto.SortableValue.EndsWith("Z") || dto.SortableValue.EndsWith("+00:00"),
+            Assert.That(
+                dto.SortableValue.EndsWith("Z") || dto.SortableValue.EndsWith("+00:00"), Is.True,
                 $"SortableValue '{dto.SortableValue}' is not normalized to UTC.");
         }
     }

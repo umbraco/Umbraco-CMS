@@ -19,9 +19,9 @@ public class OrderedHashSetTests
             list.Add(item);
         }
 
-        Assert.AreEqual(1, list.Count);
-        Assert.AreEqual(items[2].Id, list[0].Id);
-        Assert.AreNotEqual(items[0].Id, list[0].Id);
+        Assert.That(list, Has.Count.EqualTo(1));
+        Assert.That(list[0].Id, Is.EqualTo(items[2].Id));
+        Assert.That(list[0].Id, Is.Not.EqualTo(items[0].Id));
     }
 
     [Test]
@@ -34,8 +34,8 @@ public class OrderedHashSetTests
             list.Add(item);
         }
 
-        Assert.AreEqual(1, list.Count);
-        Assert.AreEqual(items[0].Id, list[0].Id);
+        Assert.That(list, Has.Count.EqualTo(1));
+        Assert.That(list[0].Id, Is.EqualTo(items[0].Id));
     }
 
     private class MyClass : IEquatable<MyClass>

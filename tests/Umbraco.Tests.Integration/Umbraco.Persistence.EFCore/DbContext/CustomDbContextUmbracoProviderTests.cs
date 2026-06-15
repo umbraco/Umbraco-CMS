@@ -16,8 +16,8 @@ internal sealed class CustomDbContextUmbracoProviderTests : UmbracoIntegrationTe
     {
         var dbContext = Services.GetRequiredService<CustomDbContext>();
 
-        Assert.IsNotNull(dbContext);
-        Assert.IsNotEmpty(dbContext.Database.GetConnectionString());
+        Assert.That(dbContext, Is.Not.Null);
+        Assert.That(dbContext.Database.GetConnectionString(), Is.Not.Empty);
     }
 
     protected override void CustomTestSetup(IUmbracoBuilder builder)
@@ -47,8 +47,8 @@ public class CustomDbContextCustomSqliteProviderTests : UmbracoIntegrationTest
     {
         var dbContext = Services.GetRequiredService<CustomDbContext>();
 
-        Assert.IsNotNull(dbContext);
-        Assert.IsNotEmpty(dbContext.Database.GetConnectionString());
+        Assert.That(dbContext, Is.Not.Null);
+        Assert.That(dbContext.Database.GetConnectionString(), Is.Not.Empty);
     }
 
     protected override void CustomTestSetup(IUmbracoBuilder builder)

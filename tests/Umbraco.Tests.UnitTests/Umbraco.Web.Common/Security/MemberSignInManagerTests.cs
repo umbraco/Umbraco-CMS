@@ -128,7 +128,7 @@ public class MemberSignInManagerTests
         var actual = await sut.PasswordSignInAsync(fakeUser, password, isPersistent, lockoutOnFailure);
 
         // assert
-        Assert.IsTrue(actual.Succeeded);
+        Assert.That(actual.Succeeded, Is.True);
     }
 
     [Test]
@@ -145,7 +145,7 @@ public class MemberSignInManagerTests
         var actual = await sut.PasswordSignInAsync(fakeUser, password, isPersistent, lockoutOnFailure);
 
         // assert
-        Assert.IsFalse(actual.Succeeded);
+        Assert.That(actual.Succeeded, Is.False);
     }
 
     [Test]

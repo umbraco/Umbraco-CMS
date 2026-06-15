@@ -43,8 +43,8 @@ internal sealed class PublishContentTypeFactoryTest : UmbracoIntegrationTest
         await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
         var contentTypeCreateModel = ContentTypeEditingBuilder.CreateSimpleContentType("umbTextpage", "Textpage", defaultTemplateKey: template.Key);
         var contentTypeAttempt = await ContentTypeEditingService.CreateAsync(contentTypeCreateModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(contentTypeAttempt.Success);
-        Assert.IsNotNull(contentTypeAttempt.Result);
+        Assert.That(contentTypeAttempt.Success, Is.True);
+        Assert.That(contentTypeAttempt.Result, Is.Not.Null);
 
         // Fetch the content type to cache data types
         var contentType = contentTypeAttempt.Result;
@@ -54,7 +54,7 @@ internal sealed class PublishContentTypeFactoryTest : UmbracoIntegrationTest
             .WithId(0)
             .Build();
         var dataTypeCreateResult = await DataTypeService.CreateAsync(dataType, Constants.Security.SuperUserKey);
-        Assert.IsTrue(dataTypeCreateResult.Success);
+        Assert.That(dataTypeCreateResult.Success, Is.True);
 
         contentType.AddPropertyGroup("group", "Group");
         var propertyTypeAlias = "test";
@@ -69,7 +69,7 @@ internal sealed class PublishContentTypeFactoryTest : UmbracoIntegrationTest
         // Update the content type
         var contentTypeUpdate = ContentTypeUpdateHelper.CreateContentTypeUpdateModel(contentType);
         var updateResult = await ContentTypeEditingService.UpdateAsync(contentType, contentTypeUpdate, Constants.Security.SuperUserKey);
-        Assert.IsTrue(updateResult.Success);
+        Assert.That(updateResult.Success, Is.True);
 
 
         var publishedContentType = PublishedContentTypeFactory.CreateContentType(updateResult.Result);
@@ -87,14 +87,14 @@ internal sealed class PublishContentTypeFactoryTest : UmbracoIntegrationTest
             .Build();
         dataType.EditorUiAlias = "NotUpdated";
         var dataTypeCreateResult = await DataTypeService.CreateAsync(dataType, Constants.Security.SuperUserKey);
-        Assert.IsTrue(dataTypeCreateResult.Success);
+        Assert.That(dataTypeCreateResult.Success, Is.True);
         var createdDataType = dataTypeCreateResult.Result;
         PublishedDataType createdPublishedDataType = PublishedContentTypeFactory.GetDataType(createdDataType.Id);
         Assert.That(createdPublishedDataType.EditorUiAlias, Is.EqualTo("NotUpdated"));
 
         createdDataType.EditorUiAlias = "Updated";
         var dataTypeUpdateResult = await DataTypeService.UpdateAsync(createdDataType, Constants.Security.SuperUserKey);
-        Assert.IsTrue(dataTypeUpdateResult.Success);
+        Assert.That(dataTypeUpdateResult.Success, Is.True);
         var updatedPublishedDataType = PublishedContentTypeFactory.GetDataType(createdDataType.Id);
         Assert.That(updatedPublishedDataType.EditorUiAlias, Is.EqualTo("Updated"));
     }

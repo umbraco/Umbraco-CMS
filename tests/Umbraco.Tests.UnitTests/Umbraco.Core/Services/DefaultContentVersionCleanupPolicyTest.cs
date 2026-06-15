@@ -1,4 +1,4 @@
-using AutoFixture.NUnit3;
+using AutoFixture.NUnit4;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
@@ -47,7 +47,7 @@ public class DefaultContentVersionCleanupPolicyTest
 
         var results = sut.Apply(DateTime.Today, historicItems).ToList();
 
-        Assert.AreEqual(2, results.Count);
+        Assert.That(results, Has.Count.EqualTo(2));
     }
 
     [Test]
@@ -83,7 +83,7 @@ public class DefaultContentVersionCleanupPolicyTest
 
         var results = sut.Apply(DateTime.Today, historicItems).ToList();
 
-        Assert.AreEqual(0, results.Count);
+        Assert.That(results.Count, Is.EqualTo(0));
     }
 
     [Test]
@@ -131,12 +131,12 @@ public class DefaultContentVersionCleanupPolicyTest
         // 2 content types, one of which has 2 days of entries, the other only a single day
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(6, results.Count);
-            Assert.AreEqual(4, results.Count(x => x.ContentTypeId == 1));
-            Assert.AreEqual(2, results.Count(x => x.ContentTypeId == 2));
-            Assert.False(results.Any(x => x.VersionId == 9)); // Most recent for content type 2
-            Assert.False(results.Any(x => x.VersionId == 3)); // Most recent for content type 1 today
-            Assert.False(results.Any(x => x.VersionId == 6)); // Most recent for content type 1 yesterday
+            Assert.That(results, Has.Count.EqualTo(6));
+            Assert.That(results.Count(x => x.ContentTypeId == 1), Is.EqualTo(4));
+            Assert.That(results.Count(x => x.ContentTypeId == 2), Is.EqualTo(2));
+            Assert.That(results.Any(x => x.VersionId == 9), Is.False); // Most recent for content type 2
+            Assert.That(results.Any(x => x.VersionId == 3), Is.False); // Most recent for content type 1 today
+            Assert.That(results.Any(x => x.VersionId == 6), Is.False); // Most recent for content type 1 yesterday
         });
     }
 
@@ -180,7 +180,7 @@ public class DefaultContentVersionCleanupPolicyTest
 
         var results = sut.Apply(DateTime.Today, historicItems).ToList();
 
-        Assert.True(results.All(x => x.ContentTypeId == 1));
+        Assert.That(results.All(x => x.ContentTypeId == 1), Is.True);
     }
 
     [Test]
@@ -223,7 +223,7 @@ public class DefaultContentVersionCleanupPolicyTest
 
         var results = sut.Apply(DateTime.Today, historicItems).ToList();
 
-        Assert.True(results.All(x => x.ContentTypeId == 1));
+        Assert.That(results.All(x => x.ContentTypeId == 1), Is.True);
     }
 
     [Test]
@@ -277,9 +277,9 @@ public class DefaultContentVersionCleanupPolicyTest
         // version id 9 is most recent for content type 2, and should be filtered, all the rest should be present.
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(8, results.Count);
-            Assert.AreEqual(2, results.Count(x => x.ContentTypeId == 2));
-            Assert.False(results.Any(x => x.VersionId == 9));
+            Assert.That(results, Has.Count.EqualTo(8));
+            Assert.That(results.Count(x => x.ContentTypeId == 2), Is.EqualTo(2));
+            Assert.That(results.Any(x => x.VersionId == 9), Is.False);
         });
     }
 }

@@ -30,8 +30,8 @@ public class PublishedValueFallbackTests
 
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(result);
-            Assert.IsNull(value);
+            Assert.That(result, Is.False);
+            Assert.That(value, Is.Null);
         });
     }
 
@@ -52,8 +52,8 @@ public class PublishedValueFallbackTests
 
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(result);
-            Assert.IsNull(value);
+            Assert.That(result, Is.False);
+            Assert.That(value, Is.Null);
         });
     }
 
@@ -72,8 +72,8 @@ public class PublishedValueFallbackTests
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(result);
-            Assert.AreEqual("fallback-default", value);
+            Assert.That(result, Is.True);
+            Assert.That(value, Is.EqualTo("fallback-default"));
         });
     }
 
@@ -92,8 +92,8 @@ public class PublishedValueFallbackTests
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(result);
-            Assert.AreEqual("fallback-default", value);
+            Assert.That(result, Is.True);
+            Assert.That(value, Is.EqualTo("fallback-default"));
         });
     }
 

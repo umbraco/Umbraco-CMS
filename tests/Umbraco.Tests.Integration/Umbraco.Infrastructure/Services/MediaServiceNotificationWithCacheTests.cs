@@ -64,8 +64,8 @@ internal sealed class MediaServiceNotificationWithCacheTests : UmbracoIntegratio
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(createAttempt.Success);
-            Assert.IsNotNull(createAttempt.Result.Content);
+            Assert.That(createAttempt.Success, Is.True);
+            Assert.That(createAttempt.Result.Content, Is.Not.Null);
         });
 
         var savingWasCalled = false;
@@ -81,9 +81,9 @@ internal sealed class MediaServiceNotificationWithCacheTests : UmbracoIntegratio
 
             Assert.Multiple(() =>
             {
-                Assert.AreEqual("Updated name", saved.Name);
-                Assert.AreEqual("Initial name", documentById.Name);
-                Assert.AreEqual("Initial name", documentByKey.Name);
+                Assert.That(saved.Name, Is.EqualTo("Updated name"));
+                Assert.That(documentById.Name, Is.EqualTo("Initial name"));
+                Assert.That(documentByKey.Name, Is.EqualTo("Initial name"));
             });
         };
 
@@ -97,9 +97,9 @@ internal sealed class MediaServiceNotificationWithCacheTests : UmbracoIntegratio
 
             Assert.Multiple(() =>
             {
-                Assert.AreEqual("Updated name", saved.Name);
-                Assert.AreEqual("Updated name", documentById.Name);
-                Assert.AreEqual("Updated name", documentByKey.Name);
+                Assert.That(saved.Name, Is.EqualTo("Updated name"));
+                Assert.That(documentById.Name, Is.EqualTo("Updated name"));
+                Assert.That(documentByKey.Name, Is.EqualTo("Updated name"));
             });
         };
 
@@ -117,12 +117,12 @@ internal sealed class MediaServiceNotificationWithCacheTests : UmbracoIntegratio
 
             Assert.Multiple(() =>
             {
-                Assert.IsTrue(updateAttempt.Success);
-                Assert.IsNotNull(updateAttempt.Result.Content);
+                Assert.That(updateAttempt.Success, Is.True);
+                Assert.That(updateAttempt.Result.Content, Is.Not.Null);
             });
 
-            Assert.IsTrue(savingWasCalled);
-            Assert.IsTrue(savedWasCalled);
+            Assert.That(savingWasCalled, Is.True);
+            Assert.That(savedWasCalled, Is.True);
         }
         finally
         {

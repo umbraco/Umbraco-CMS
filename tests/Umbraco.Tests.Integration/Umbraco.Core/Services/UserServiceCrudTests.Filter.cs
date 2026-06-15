@@ -30,11 +30,11 @@ internal sealed partial class UserServiceCrudTests
         };
 
         var createAttempt = await userService.CreateAsync(Constants.Security.SuperUserKey, createModel, true);
-        Assert.IsTrue(createAttempt.Success);
+        Assert.That(createAttempt.Success, Is.True);
 
         var disableStatus =
             await userService.DisableAsync(Constants.Security.SuperUserKey, new HashSet<Guid> { createAttempt.Result.CreatedUser!.Key });
-        Assert.AreEqual(UserOperationStatus.Success, disableStatus);
+        Assert.That(disableStatus, Is.EqualTo(UserOperationStatus.Success));
 
         var filter = new UserFilter();
         if (includeState.HasValue)
@@ -43,8 +43,8 @@ internal sealed partial class UserServiceCrudTests
         }
 
         var filterAttempt = await userService.FilterAsync(Constants.Security.SuperUserKey, filter, 0, 1000);
-        Assert.IsTrue(filterAttempt.Success);
-        Assert.AreEqual(expectedCount, filterAttempt.Result.Items.Count());
+        Assert.That(filterAttempt.Success, Is.True);
+        Assert.That(filterAttempt.Result.Items.Count(), Is.EqualTo(expectedCount));
     }
 
     [Test]
@@ -64,7 +64,7 @@ internal sealed partial class UserServiceCrudTests
 
         var createEditorAttempt =
             await userService.CreateAsync(Constants.Security.SuperUserKey, nonSuperCreateModel, true);
-        Assert.IsTrue(createEditorAttempt.Success);
+        Assert.That(createEditorAttempt.Success, Is.True);
 
         var editor = createEditorAttempt.Result.CreatedUser;
 
@@ -72,13 +72,13 @@ internal sealed partial class UserServiceCrudTests
         var filter = new UserFilter();
         var filterAttempt = await userService.FilterAsync(editor!.Key, filter, 0, 10000);
 
-        Assert.IsTrue(filterAttempt.Success);
+        Assert.That(filterAttempt.Success, Is.True);
         var result = filterAttempt.Result;
-        Assert.IsNotNull(result);
-        Assert.AreEqual(1, result.Items.Count());
-        Assert.AreEqual(1, result.Total);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Items.Count(), Is.EqualTo(1));
+        Assert.That(result.Total, Is.EqualTo(1));
         var onlyUser = result.Items.First();
-        Assert.AreEqual(editor.Key, onlyUser.Key);
+        Assert.That(onlyUser.Key, Is.EqualTo(editor.Key));
     }
 
     [Test]
@@ -97,17 +97,17 @@ internal sealed partial class UserServiceCrudTests
 
         var createEditorAttempt =
             await userService.CreateAsync(Constants.Security.SuperUserKey, nonSuperCreateModel, true);
-        Assert.IsTrue(createEditorAttempt.Success);
+        Assert.That(createEditorAttempt.Success, Is.True);
 
         var filter = new UserFilter {NameFilters = new HashSet<string> {"admin"}};
 
         var filterAttempt = await userService.FilterAsync(Constants.Security.SuperUserKey, filter, 0, 10000);
-        Assert.IsTrue(filterAttempt.Success);
+        Assert.That(filterAttempt.Success, Is.True);
         var result = filterAttempt.Result;
 
-        Assert.AreEqual(1, result.Items.Count());
-        Assert.AreEqual(1, result.Total);
-        Assert.IsNotNull(result.Items.FirstOrDefault(x => x.Key == Constants.Security.SuperUserKey));
+        Assert.That(result.Items.Count(), Is.EqualTo(1));
+        Assert.That(result.Total, Is.EqualTo(1));
+        Assert.That(result.Items.FirstOrDefault(x => x.Key == Constants.Security.SuperUserKey), Is.Not.Null);
     }
 
     [Test]
@@ -137,16 +137,16 @@ internal sealed partial class UserServiceCrudTests
             await userService.CreateAsync(Constants.Security.SuperUserKey, editorCreateModel, true);
         var createAdminAttempt = await userService.CreateAsync(Constants.Security.SuperUserKey, adminCreateModel, true);
 
-        Assert.IsTrue(createEditorAttempt.Success);
-        Assert.IsTrue(createAdminAttempt.Success);
+        Assert.That(createEditorAttempt.Success, Is.True);
+        Assert.That(createAdminAttempt.Success, Is.True);
 
         var filter = new UserFilter {IncludedUserGroups = new HashSet<Guid> {adminGroup!.Key}};
 
         var editorFilterAttempt =
             await userService.FilterAsync(createEditorAttempt.Result.CreatedUser!.Key, filter, 0, 10000);
-        Assert.IsTrue(editorFilterAttempt.Success);
+        Assert.That(editorFilterAttempt.Success, Is.True);
         var editorAllUsers = editorFilterAttempt.Result.Items.ToList();
-        Assert.AreEqual(0, editorAllUsers.Count);
+        Assert.That(editorAllUsers, Is.Empty);
     }
 
     [Test]
@@ -176,17 +176,17 @@ internal sealed partial class UserServiceCrudTests
             await userService.CreateAsync(Constants.Security.SuperUserKey, editorCreateModel, true);
         var createAdminAttempt = await userService.CreateAsync(Constants.Security.SuperUserKey, adminCreateModel, true);
 
-        Assert.IsTrue(createEditorAttempt.Success);
-        Assert.IsTrue(createAdminAttempt.Success);
+        Assert.That(createEditorAttempt.Success, Is.True);
+        Assert.That(createAdminAttempt.Success, Is.True);
 
         var filter = new UserFilter {IncludedUserGroups = new HashSet<Guid> {adminGroup!.Key}};
 
         var adminFilterAttempt =
             await userService.FilterAsync(createAdminAttempt.Result.CreatedUser!.Key, filter, 0, 10000);
-        Assert.IsTrue(adminFilterAttempt.Success);
+        Assert.That(adminFilterAttempt.Success, Is.True);
         var adminAllUsers = adminFilterAttempt.Result.Items.ToList();
-        Assert.AreEqual(1, adminAllUsers.Count);
-        Assert.IsNotNull(adminAllUsers.FirstOrDefault(x => x.Key == createAdminAttempt.Result.CreatedUser!.Key));
+        Assert.That(adminAllUsers, Has.Count.EqualTo(1));
+        Assert.That(adminAllUsers.FirstOrDefault(x => x.Key == createAdminAttempt.Result.CreatedUser!.Key), Is.Not.Null);
     }
 
 
@@ -239,7 +239,7 @@ internal sealed partial class UserServiceCrudTests
         foreach (var model in createModels)
         {
             var result = await userService.CreateAsync(Constants.Security.SuperUserKey, model);
-            Assert.IsTrue(result.Success);
+            Assert.That(result.Success, Is.True);
         }
     }
 
@@ -257,10 +257,10 @@ internal sealed partial class UserServiceCrudTests
 
         var onlyWritesResult = await userService.FilterAsync(Constants.Security.SuperUserKey, filter, 0, 1000);
 
-        Assert.IsTrue(onlyWritesResult.Success);
+        Assert.That(onlyWritesResult.Success, Is.True);
         var users = onlyWritesResult.Result.Items.ToList();
-        Assert.IsTrue(users.Any());
-        Assert.IsFalse(users.Any(x => x.Groups.FirstOrDefault(y => y.Key == writerGroup.Key) is null));
+        Assert.That(users.Any(), Is.True);
+        Assert.That(users.Any(x => x.Groups.FirstOrDefault(y => y.Key == writerGroup.Key) is null), Is.False);
     }
 
     [Test]
@@ -276,10 +276,10 @@ internal sealed partial class UserServiceCrudTests
         };
 
         var noEditorResult = await userService.FilterAsync(Constants.Security.SuperUserKey, filter, 0, 1000);
-        Assert.IsTrue(noEditorResult);
+        Assert.That((bool)noEditorResult, Is.True);
         var users = noEditorResult.Result.Items.ToList();
-        Assert.IsTrue(users.Any());
-        Assert.IsFalse(users.Any(x => x.Groups.FirstOrDefault(y => y.Key == editorGroup.Key) is not null));
+        Assert.That(users.Any(), Is.True);
+        Assert.That(users.Any(x => x.Groups.FirstOrDefault(y => y.Key == editorGroup.Key) is not null), Is.False);
     }
 }
 

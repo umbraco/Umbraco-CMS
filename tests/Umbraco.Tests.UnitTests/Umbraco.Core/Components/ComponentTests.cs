@@ -163,11 +163,11 @@ public class ComponentTests
         builder.RegisterWith(register);
         var components = builder.CreateCollection(factory);
 
-        Assert.IsEmpty(components);
+        Assert.That(components, Is.Empty);
         await components.InitializeAsync(false, default);
-        Assert.IsEmpty(Initialized);
+        Assert.That(Initialized, Is.Empty);
         await components.TerminateAsync(false, default);
-        Assert.IsEmpty(Terminated);
+        Assert.That(Terminated, Is.Empty);
     }
 
     [Test]
@@ -240,9 +240,8 @@ public class ComponentTests
         }
         catch (Exception e)
         {
-            Assert.AreEqual(
-                "Broken composer dependency: Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Components.ComponentTests+Composer2 -> Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Components.ComponentTests+Composer4.",
-                e.Message);
+            Assert.That(
+                e.Message, Is.EqualTo("Broken composer dependency: Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Components.ComponentTests+Composer2 -> Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Components.ComponentTests+Composer4."));
         }
     }
 
@@ -306,7 +305,7 @@ public class ComponentTests
         Type[] types = { typeof(Composer1) };
         var composers = new ComposerGraph(composition, types, Enumerable.Empty<Attribute>(), Mock.Of<ILogger<ComposerGraph>>());
 
-        Assert.IsEmpty(Composed);
+        Assert.That(Composed, Is.Empty);
         composers.Compose();
 
         var builder = composition.WithCollectionBuilder<ComponentCollectionBuilder>();
@@ -324,9 +323,9 @@ public class ComponentTests
         var composers = new ComposerGraph(composition, types, Enumerable.Empty<Attribute>(), Mock.Of<ILogger<ComposerGraph>>());
         Composed.Clear();
         composers.Compose();
-        Assert.AreEqual(2, Composed.Count);
-        Assert.AreEqual(typeof(Composer6), Composed[0]);
-        Assert.AreEqual(typeof(Composer8), Composed[1]);
+        Assert.That(Composed, Has.Count.EqualTo(2));
+        Assert.That(Composed[0], Is.EqualTo(typeof(Composer6)));
+        Assert.That(Composed[1], Is.EqualTo(typeof(Composer8)));
     }
 
     [Test]
@@ -339,9 +338,9 @@ public class ComponentTests
         var composers = new ComposerGraph(composition, types, Enumerable.Empty<Attribute>(), Mock.Of<ILogger<ComposerGraph>>());
         Composed.Clear();
         composers.Compose();
-        Assert.AreEqual(3, Composed.Count);
-        Assert.AreEqual(typeof(Composer4), Composed[0]);
-        Assert.AreEqual(typeof(Composer2), Composed[1]);
+        Assert.That(Composed, Has.Count.EqualTo(3));
+        Assert.That(Composed[0], Is.EqualTo(typeof(Composer4)));
+        Assert.That(Composed[1], Is.EqualTo(typeof(Composer2)));
     }
 
     [Test]
@@ -359,10 +358,10 @@ public class ComponentTests
         var builder = composition.WithCollectionBuilder<ComponentCollectionBuilder>();
         builder.RegisterWith(register);
         var components = builder.CreateCollection(factory);
-        Assert.AreEqual(3, Composed.Count);
-        Assert.AreEqual(typeof(Composer4), Composed[0]);
-        Assert.AreEqual(typeof(Composer2), Composed[1]);
-        Assert.AreEqual(typeof(Composer9), Composed[2]);
+        Assert.That(Composed, Has.Count.EqualTo(3));
+        Assert.That(Composed[0], Is.EqualTo(typeof(Composer4)));
+        Assert.That(Composed[1], Is.EqualTo(typeof(Composer2)));
+        Assert.That(Composed[2], Is.EqualTo(typeof(Composer9)));
     }
 
     [Test]
@@ -375,8 +374,8 @@ public class ComponentTests
         var composers = new ComposerGraph(composition, types, Enumerable.Empty<Attribute>(), Mock.Of<ILogger<ComposerGraph>>());
         Composed.Clear();
         composers.Compose();
-        Assert.AreEqual(1, Composed.Count);
-        Assert.AreEqual(typeof(Composer10), Composed[0]);
+        Assert.That(Composed, Has.Count.EqualTo(1));
+        Assert.That(Composed[0], Is.EqualTo(typeof(Composer10)));
 
         types = new[] { typeof(Composer11) };
         composers = new ComposerGraph(composition, types, Enumerable.Empty<Attribute>(), Mock.Of<ILogger<ComposerGraph>>());
@@ -400,8 +399,8 @@ public class ComponentTests
         composers = new ComposerGraph(composition, types, Enumerable.Empty<Attribute>(), Mock.Of<ILogger<ComposerGraph>>());
         Composed.Clear();
         composers.Compose();
-        Assert.AreEqual(1, Composed.Count);
-        Assert.AreEqual(typeof(Composer12), Composed[0]);
+        Assert.That(Composed, Has.Count.EqualTo(1));
+        Assert.That(Composed[0], Is.EqualTo(typeof(Composer12)));
     }
 
     [Test]
@@ -414,9 +413,9 @@ public class ComponentTests
         var composers = new ComposerGraph(composition, types, Enumerable.Empty<Attribute>(), Mock.Of<ILogger<ComposerGraph>>());
         Composed.Clear();
         composers.Compose();
-        Assert.AreEqual(2, Composed.Count);
-        Assert.AreEqual(typeof(Composer6), Composed[0]);
-        Assert.AreEqual(typeof(Composer8), Composed[1]);
+        Assert.That(Composed, Has.Count.EqualTo(2));
+        Assert.That(Composed[0], Is.EqualTo(typeof(Composer6)));
+        Assert.That(Composed[1], Is.EqualTo(typeof(Composer8)));
     }
 
     [Test]
@@ -431,15 +430,15 @@ public class ComponentTests
             new ComposerGraph(composition, types, enableDisableAttributes, Mock.Of<ILogger<ComposerGraph>>());
         Composed.Clear();
         composers.Compose();
-        Assert.AreEqual(0, Composed.Count); // 26 gone
+        Assert.That(Composed.Count, Is.EqualTo(0)); // 26 gone
 
         types = new[] { typeof(Composer26), typeof(Composer27) }; // 26 disabled by assembly attribute, enabled by 27
         composers = new ComposerGraph(composition, types, enableDisableAttributes, Mock.Of<ILogger<ComposerGraph>>());
         Composed.Clear();
         composers.Compose();
-        Assert.AreEqual(2, Composed.Count); // both
-        Assert.AreEqual(typeof(Composer26), Composed[0]);
-        Assert.AreEqual(typeof(Composer27), Composed[1]);
+        Assert.That(Composed, Has.Count.EqualTo(2)); // both
+        Assert.That(Composed[0], Is.EqualTo(typeof(Composer26)));
+        Assert.That(Composed[1], Is.EqualTo(typeof(Composer27)));
     }
 
     [Test]
@@ -608,10 +607,10 @@ public class ComponentTests
 
     private static void AssertTypeArray(IReadOnlyList<Type> expected, IReadOnlyList<Type> test)
     {
-        Assert.AreEqual(expected.Count, test.Count);
+        Assert.That(test, Has.Count.EqualTo(expected.Count));
         for (var i = 0; i < expected.Count; i++)
         {
-            Assert.AreEqual(expected[i], test[i]);
+            Assert.That(test[i], Is.EqualTo(expected[i]));
         }
     }
 }

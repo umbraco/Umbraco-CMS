@@ -54,7 +54,7 @@ public class TrueFalsePropertyValueEditorTests
             // FromEditor returns 1 or 0, not true or false
             var actuallyExpected = expected ? 1 : 0;
             var fromEditor = FromEditor(value);
-            Assert.AreEqual(actuallyExpected, fromEditor, message: $"Failed for: {value}");
+            Assert.That(fromEditor, Is.EqualTo(actuallyExpected), message: $"Failed for: {value}");
         }
     }
 
@@ -64,7 +64,7 @@ public class TrueFalsePropertyValueEditorTests
         foreach (var (value, expected) in _valuesAndExpectedResults)
         {
             var toEditor = ToEditor(value);
-            Assert.AreEqual(expected, toEditor, message: $"Failed for: {value}");
+            Assert.That(toEditor, Is.EqualTo(expected), message: $"Failed for: {value}");
         }
     }
 
@@ -72,14 +72,14 @@ public class TrueFalsePropertyValueEditorTests
     public void Null_From_Editor_Yields_False()
     {
         var result = FromEditor(null);
-        Assert.AreEqual(0, result);
+        Assert.That(result, Is.EqualTo(0));
     }
 
     [Test]
     public void Null_To_Editor_Yields_False()
     {
         var result = ToEditor(null);
-        Assert.AreEqual(false, result);
+        Assert.That(result, Is.EqualTo(false));
     }
 
     private static object? FromEditor(object? value)

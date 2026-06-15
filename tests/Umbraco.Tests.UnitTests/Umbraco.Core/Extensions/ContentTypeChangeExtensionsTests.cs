@@ -29,7 +29,7 @@ public class ContentTypeChangeExtensionsTests
     [TestCase(ContentTypeChangeTypes.PropertyAdded, false)]
     [TestCase(ContentTypeChangeTypes.CompositionAdded, false)]
     public void IsStructuralChange(ContentTypeChangeTypes change, bool expected) =>
-        Assert.AreEqual(expected, change.IsStructuralChange());
+        Assert.That(change.IsStructuralChange(), Is.EqualTo(expected));
 
     // "Main" base flags
     [TestCase(ContentTypeChangeTypes.RefreshOther, true)]
@@ -51,18 +51,18 @@ public class ContentTypeChangeExtensionsTests
     // Mixed: structural + non-structural granular flags together (RefreshMain is set, so NOT non-structural)
     [TestCase(ContentTypeChangeTypes.PropertyRemoved | ContentTypeChangeTypes.PropertyAdded, false)]
     public void IsNonStructuralChange(ContentTypeChangeTypes change, bool expected) =>
-        Assert.AreEqual(expected, change.IsNonStructuralChange());
+        Assert.That(change.IsNonStructuralChange(), Is.EqualTo(expected));
 
     [Test]
     public void Granular_Structural_Flags_Include_RefreshMain_Bit()
     {
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(ContentTypeChangeTypes.AliasChanged.HasType(ContentTypeChangeTypes.RefreshMain));
-            Assert.IsTrue(ContentTypeChangeTypes.PropertyAliasChanged.HasType(ContentTypeChangeTypes.RefreshMain));
-            Assert.IsTrue(ContentTypeChangeTypes.PropertyRemoved.HasType(ContentTypeChangeTypes.RefreshMain));
-            Assert.IsTrue(ContentTypeChangeTypes.CompositionRemoved.HasType(ContentTypeChangeTypes.RefreshMain));
-            Assert.IsTrue(ContentTypeChangeTypes.PropertyVariationChanged.HasType(ContentTypeChangeTypes.RefreshMain));
+            Assert.That(ContentTypeChangeTypes.AliasChanged.HasType(ContentTypeChangeTypes.RefreshMain), Is.True);
+            Assert.That(ContentTypeChangeTypes.PropertyAliasChanged.HasType(ContentTypeChangeTypes.RefreshMain), Is.True);
+            Assert.That(ContentTypeChangeTypes.PropertyRemoved.HasType(ContentTypeChangeTypes.RefreshMain), Is.True);
+            Assert.That(ContentTypeChangeTypes.CompositionRemoved.HasType(ContentTypeChangeTypes.RefreshMain), Is.True);
+            Assert.That(ContentTypeChangeTypes.PropertyVariationChanged.HasType(ContentTypeChangeTypes.RefreshMain), Is.True);
         });
     }
 
@@ -71,8 +71,8 @@ public class ContentTypeChangeExtensionsTests
     {
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(ContentTypeChangeTypes.PropertyAdded.HasType(ContentTypeChangeTypes.RefreshOther));
-            Assert.IsTrue(ContentTypeChangeTypes.CompositionAdded.HasType(ContentTypeChangeTypes.RefreshOther));
+            Assert.That(ContentTypeChangeTypes.PropertyAdded.HasType(ContentTypeChangeTypes.RefreshOther), Is.True);
+            Assert.That(ContentTypeChangeTypes.CompositionAdded.HasType(ContentTypeChangeTypes.RefreshOther), Is.True);
         });
     }
 
@@ -81,8 +81,8 @@ public class ContentTypeChangeExtensionsTests
     {
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(ContentTypeChangeTypes.PropertyAdded.HasType(ContentTypeChangeTypes.RefreshMain));
-            Assert.IsFalse(ContentTypeChangeTypes.CompositionAdded.HasType(ContentTypeChangeTypes.RefreshMain));
+            Assert.That(ContentTypeChangeTypes.PropertyAdded.HasType(ContentTypeChangeTypes.RefreshMain), Is.False);
+            Assert.That(ContentTypeChangeTypes.CompositionAdded.HasType(ContentTypeChangeTypes.RefreshMain), Is.False);
         });
     }
 
@@ -93,14 +93,14 @@ public class ContentTypeChangeExtensionsTests
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(combined.HasType(ContentTypeChangeTypes.PropertyRemoved));
-            Assert.IsTrue(combined.HasType(ContentTypeChangeTypes.AliasChanged));
-            Assert.IsTrue(combined.HasType(ContentTypeChangeTypes.RefreshMain));
+            Assert.That(combined.HasType(ContentTypeChangeTypes.PropertyRemoved), Is.True);
+            Assert.That(combined.HasType(ContentTypeChangeTypes.AliasChanged), Is.True);
+            Assert.That(combined.HasType(ContentTypeChangeTypes.RefreshMain), Is.True);
             // HasTypesAll checks that ALL bits of the target are set, which is the correct way
             // to test for composite flags that share the RefreshMain bit
-            Assert.IsFalse(combined.HasTypesAll(ContentTypeChangeTypes.CompositionRemoved));
-            Assert.IsFalse(combined.HasTypesAll(ContentTypeChangeTypes.PropertyVariationChanged));
-            Assert.IsFalse(combined.HasType(ContentTypeChangeTypes.RefreshOther));
+            Assert.That(combined.HasTypesAll(ContentTypeChangeTypes.CompositionRemoved), Is.False);
+            Assert.That(combined.HasTypesAll(ContentTypeChangeTypes.PropertyVariationChanged), Is.False);
+            Assert.That(combined.HasType(ContentTypeChangeTypes.RefreshOther), Is.False);
         });
     }
 
@@ -112,7 +112,7 @@ public class ContentTypeChangeExtensionsTests
     [TestCase(ContentTypeChangeTypes.PropertyAdded, ContentTypeChangeTypes.RefreshOther)]
     [TestCase(ContentTypeChangeTypes.CompositionAdded, ContentTypeChangeTypes.RefreshOther)]
     public void Sub_Flag_Yields_Positive_For_Main_Flag(ContentTypeChangeTypes subFlag, ContentTypeChangeTypes mainFlag)
-        => Assert.IsTrue(subFlag.HasFlag(mainFlag));
+        => Assert.That(subFlag.HasFlag(mainFlag), Is.True);
 
     [TestCase(ContentTypeChangeTypes.AliasChanged, ContentTypeChangeTypes.RefreshMain)]
     [TestCase(ContentTypeChangeTypes.PropertyAliasChanged, ContentTypeChangeTypes.RefreshMain)]
@@ -122,7 +122,7 @@ public class ContentTypeChangeExtensionsTests
     [TestCase(ContentTypeChangeTypes.PropertyAdded, ContentTypeChangeTypes.RefreshOther)]
     [TestCase(ContentTypeChangeTypes.CompositionAdded, ContentTypeChangeTypes.RefreshOther)]
     public void Main_Flag_Yields_Negative_For_Sub_Flag(ContentTypeChangeTypes subFlag, ContentTypeChangeTypes mainFlag)
-        => Assert.IsFalse(mainFlag.HasFlag(subFlag));
+        => Assert.That(mainFlag.HasFlag(subFlag), Is.False);
 
     [TestCase(ContentTypeChangeTypes.AliasChanged, ContentTypeChangeTypes.PropertyAliasChanged)]
     [TestCase(ContentTypeChangeTypes.PropertyAliasChanged, ContentTypeChangeTypes.PropertyRemoved)]
@@ -132,5 +132,5 @@ public class ContentTypeChangeExtensionsTests
     [TestCase(ContentTypeChangeTypes.PropertyAdded, ContentTypeChangeTypes.CompositionAdded)]
     [TestCase(ContentTypeChangeTypes.CompositionAdded, ContentTypeChangeTypes.PropertyAdded)]
     public void Sub_Flag_Yields_Negative_For_Other_Sub_Flag(ContentTypeChangeTypes subFlag1, ContentTypeChangeTypes subFlag2)
-        => Assert.IsFalse(subFlag1.HasFlag(subFlag2));
+        => Assert.That(subFlag1.HasFlag(subFlag2), Is.False);
 }

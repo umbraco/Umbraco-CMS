@@ -116,7 +116,7 @@ public class PooledDbContextConnectionTaintingTests : UmbracoIntegrationTest
             originalConnectionString = pristineContext.Database.GetConnectionString();
         }
 
-        Assert.IsNotNull(originalConnectionString, "Precondition: factory context should have a connection string.");
+        Assert.That(originalConnectionString, Is.Not.Null, "Precondition: factory context should have a connection string.");
 
         // Step 2: Use and dispose an EFCore scope, which calls SetDbConnection(null) on cleanup.
         using (IEFCoreScope<PooledTestDbContext> scope = EFCoreScopeProvider.CreateScope())
@@ -133,8 +133,8 @@ public class PooledDbContextConnectionTaintingTests : UmbracoIntegrationTest
         var connectionStringAfterDisposal = reusedContext.Database.GetConnectionString();
 
         // Step 4: The connection string must still be set.
-        Assert.IsNotNull(connectionStringAfterDisposal, "Connection string must survive scope disposal for pooled contexts.");
-        Assert.AreEqual(originalConnectionString, connectionStringAfterDisposal);
+        Assert.That(connectionStringAfterDisposal, Is.Not.Null, "Connection string must survive scope disposal for pooled contexts.");
+        Assert.That(connectionStringAfterDisposal, Is.EqualTo(originalConnectionString));
     }
 
     internal class PooledTestDbContext : Microsoft.EntityFrameworkCore.DbContext

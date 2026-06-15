@@ -71,10 +71,10 @@ public class PublishedContentFallbackTests : UmbracoIntegrationTest
         // NOTE: the TextStringValueConverter.ConvertIntermediateToObject() explicitly converts a null source value to an empty string
 
         var segmentedResult = publishedContent.Value<string>(PublishedValueFallback, "title", segment: "s1");
-        Assert.AreEqual(expectedResult ?? string.Empty, segmentedResult);
+        Assert.That(segmentedResult, Is.EqualTo(expectedResult ?? string.Empty));
 
         var invariantResult = publishedContent.Value<string>(PublishedValueFallback, "title", segment: string.Empty);
-        Assert.AreEqual(invariantTitle ?? string.Empty, invariantResult);
+        Assert.That(invariantResult, Is.EqualTo(invariantTitle ?? string.Empty));
     }
 
     [TestCase("Invariant title", "Segmented title", "Segmented title")]
@@ -89,15 +89,15 @@ public class PublishedContentFallbackTests : UmbracoIntegrationTest
 
         VariationContextAccessor.VariationContext = new VariationContext(culture: null, segment: "s1");
         var apiContent = ApiContentBuilder.Build(publishedContent);
-        Assert.IsNotNull(apiContent);
-        Assert.IsTrue(apiContent.Properties.TryGetValue("title", out var segmentedValue));
-        Assert.AreEqual(expectedResult, segmentedValue);
+        Assert.That(apiContent, Is.Not.Null);
+        Assert.That(apiContent.Properties.TryGetValue("title", out var segmentedValue), Is.True);
+        Assert.That(segmentedValue, Is.EqualTo(expectedResult));
 
         VariationContextAccessor.VariationContext = new VariationContext(culture: null, segment: null);
         apiContent = ApiContentBuilder.Build(publishedContent);
-        Assert.IsNotNull(apiContent);
-        Assert.IsTrue(apiContent.Properties.TryGetValue("title", out var invariantValue));
-        Assert.AreEqual(invariantTitle, invariantValue);
+        Assert.That(apiContent, Is.Not.Null);
+        Assert.That(apiContent.Properties.TryGetValue("title", out var invariantValue), Is.True);
+        Assert.That(invariantValue, Is.EqualTo(invariantTitle));
     }
 
     [TestCase("Danish title", true)]
@@ -119,15 +119,15 @@ public class PublishedContentFallbackTests : UmbracoIntegrationTest
 
         VariationContextAccessor.VariationContext = new VariationContext(culture: "da-DK", segment: null);
         var danishValue = publishedContent.Value<string>(PublishedValueFallback, "title");
-        Assert.AreEqual(danishTitle ?? string.Empty, danishValue);
+        Assert.That(danishValue, Is.EqualTo(danishTitle ?? string.Empty));
 
         var fallback = performFallbackToDefaultLanguage ? Fallback.ToDefaultLanguage : Fallback.ToLanguage;
         var fallbackValue = publishedContent.Value<string>(PublishedValueFallback, "title", fallback: fallback);
-        Assert.AreEqual(danishTitle ?? englishTitle, fallbackValue);
+        Assert.That(fallbackValue, Is.EqualTo(danishTitle ?? englishTitle));
 
         VariationContextAccessor.VariationContext = new VariationContext(culture: "en-US", segment: null);
         var englishValue = publishedContent.Value<string>(PublishedValueFallback, "title");
-        Assert.AreEqual(englishTitle, englishValue);
+        Assert.That(englishValue, Is.EqualTo(englishTitle));
     }
 
     // Regression test for https://github.com/umbraco/Umbraco-CMS/issues/22759.
@@ -173,7 +173,7 @@ public class PublishedContentFallbackTests : UmbracoIntegrationTest
         // NOTE: the TextStringValueConverter.ConvertIntermediateToObject() explicitly converts a null source value to an empty string
         string? value = null;
         Assert.DoesNotThrow(() => value = publishedChild.Value<string>(PublishedValueFallback, "title", fallback: Fallback.ToAncestors));
-        Assert.AreEqual(string.Empty, value);
+        Assert.That(value, Is.EqualTo(string.Empty));
     }
 
     private async Task<IPublishedContent> SetupSegmentedContentAsync(string? invariantTitle, string? segmentedTitle)
@@ -243,7 +243,7 @@ public class PublishedContentFallbackTests : UmbracoIntegrationTest
         UmbracoContextAccessor.Clear();
         var umbracoContext = UmbracoContextFactory.EnsureUmbracoContext().UmbracoContext;
         var publishedContent = umbracoContext.Content.GetById(key);
-        Assert.IsNotNull(publishedContent);
+        Assert.That(publishedContent, Is.Not.Null);
 
         return publishedContent;
     }

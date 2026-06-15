@@ -45,40 +45,38 @@ public class EndpointRouteBuilderExtensionsTests
         {
             if (prefix.IsNullOrWhiteSpace())
             {
-                Assert.AreEqual(
-                    $"{umbracoPath}/{controllerNamePattern}/{{action}}/{{id?}}",
-                    endpoint.RoutePattern.RawText);
+                Assert.That(
+                    endpoint.RoutePattern.RawText, Is.EqualTo($"{umbracoPath}/{controllerNamePattern}/{{action}}/{{id?}}"));
             }
             else
             {
-                Assert.AreEqual(
-                    $"{umbracoPath}/{prefix}/{controllerNamePattern}/{{action}}/{{id?}}",
-                    endpoint.RoutePattern.RawText);
+                Assert.That(
+                    endpoint.RoutePattern.RawText, Is.EqualTo($"{umbracoPath}/{prefix}/{controllerNamePattern}/{{action}}/{{id?}}"));
             }
         }
         else
         {
             if (prefix.IsNullOrWhiteSpace())
             {
-                Assert.AreEqual($"{umbracoPath}/{{action}}/{{id?}}", endpoint.RoutePattern.RawText);
+                Assert.That(endpoint.RoutePattern.RawText, Is.EqualTo($"{umbracoPath}/{{action}}/{{id?}}"));
             }
             else
             {
-                Assert.AreEqual($"{umbracoPath}/{prefix}/{{action}}/{{id?}}", endpoint.RoutePattern.RawText);
+                Assert.That(endpoint.RoutePattern.RawText, Is.EqualTo($"{umbracoPath}/{prefix}/{{action}}/{{id?}}"));
             }
         }
 
         if (!area.IsNullOrWhiteSpace())
         {
-            Assert.AreEqual(area, endpoint.RoutePattern.Defaults[AreaToken]);
+            Assert.That(endpoint.RoutePattern.Defaults[AreaToken], Is.EqualTo(area));
         }
 
         if (!defaultAction.IsNullOrWhiteSpace())
         {
-            Assert.AreEqual(defaultAction, endpoint.RoutePattern.Defaults["action"]);
+            Assert.That(endpoint.RoutePattern.Defaults["action"], Is.EqualTo(defaultAction));
         }
 
-        Assert.AreEqual(controllerName, endpoint.RoutePattern.Defaults[ControllerToken]);
+        Assert.That(endpoint.RoutePattern.Defaults[ControllerToken], Is.EqualTo(controllerName));
     }
 
     private class Testing1Controller : ControllerBase

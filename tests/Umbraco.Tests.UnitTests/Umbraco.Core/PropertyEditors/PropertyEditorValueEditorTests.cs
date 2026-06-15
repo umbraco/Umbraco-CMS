@@ -26,7 +26,7 @@ public class PropertyEditorValueEditorTests
         var valueEditor = MockedValueEditors.CreateDataValueEditor(ValueTypes.String);
 
         var result = valueEditor.ToEditor(prop);
-        Assert.AreEqual(isOk, !(result is string));
+        Assert.That(!(result is string), Is.EqualTo(isOk));
     }
 
     [TestCase("STRING", "hello", "hello")]
@@ -39,8 +39,8 @@ public class PropertyEditorValueEditorTests
         var valueEditor = MockedValueEditors.CreateDataValueEditor(valueType);
 
         var result = valueEditor.TryConvertValueToCrlType(val);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(expected, result.Result);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.EqualTo(expected));
     }
 
     // The following decimal tests have not been added as [TestCase]s
@@ -51,8 +51,8 @@ public class PropertyEditorValueEditorTests
         var valueEditor = MockedValueEditors.CreateDataValueEditor(ValueTypes.Decimal);
 
         var result = valueEditor.TryConvertValueToCrlType("12.34");
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(12.34M, result.Result);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.EqualTo(12.34M));
     }
 
     [Test]
@@ -61,8 +61,8 @@ public class PropertyEditorValueEditorTests
         var valueEditor = MockedValueEditors.CreateDataValueEditor(ValueTypes.Decimal);
 
         var result = valueEditor.TryConvertValueToCrlType("12,34");
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(12.34M, result.Result);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.EqualTo(12.34M));
     }
 
     [Test]
@@ -71,8 +71,8 @@ public class PropertyEditorValueEditorTests
         var valueEditor = MockedValueEditors.CreateDataValueEditor(ValueTypes.Decimal);
 
         var result = valueEditor.TryConvertValueToCrlType(string.Empty);
-        Assert.IsTrue(result.Success);
-        Assert.IsNull(result.Result);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.Null);
     }
 
     [Test]
@@ -81,8 +81,8 @@ public class PropertyEditorValueEditorTests
         var valueEditor = MockedValueEditors.CreateDataValueEditor(ValueTypes.Date);
 
         var result = valueEditor.TryConvertValueToCrlType("2010-02-05");
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(new DateTime(2010, 2, 5), result.Result);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.EqualTo(new DateTime(2010, 2, 5)));
     }
 
     [TestCase(ValueTypes.String, "hello", "hello")]
@@ -98,7 +98,7 @@ public class PropertyEditorValueEditorTests
         var valueEditor = MockedValueEditors.CreateDataValueEditor(valueType);
 
         var result = valueEditor.ToEditor(prop);
-        Assert.AreEqual(expected, result);
+        Assert.That(result, Is.EqualTo(expected));
     }
 
     [Test]
@@ -111,7 +111,7 @@ public class PropertyEditorValueEditorTests
         prop.SetValue(value);
 
         var result = valueEditor.ToEditor(prop);
-        Assert.AreEqual("12.34", result);
+        Assert.That(result, Is.EqualTo("12.34"));
     }
 
     [Test]
@@ -123,7 +123,7 @@ public class PropertyEditorValueEditorTests
         prop.SetValue(string.Empty);
 
         var result = valueEditor.ToEditor(prop);
-        Assert.AreEqual(string.Empty, result);
+        Assert.That(result, Is.EqualTo(string.Empty));
     }
 
     [Test]
@@ -136,6 +136,6 @@ public class PropertyEditorValueEditorTests
         prop.SetValue(now);
 
         var result = valueEditor.ToEditor(prop);
-        Assert.AreEqual(now.ToIsoString(), result);
+        Assert.That(result, Is.EqualTo(now.ToIsoString()));
     }
 }

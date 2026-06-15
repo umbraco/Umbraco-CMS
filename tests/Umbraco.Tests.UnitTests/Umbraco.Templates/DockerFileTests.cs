@@ -15,8 +15,8 @@ public class DockerFileTests
     {
         var targetFrameworkVersion = GetNetVersionFromCurrentTargetFramework();
         (string dockerFileAspNetVersion, string dockerFileSdkVersion) = GetNetVersionsFromDockerFile();
-        Assert.AreEqual(dockerFileAspNetVersion, dockerFileSdkVersion);
-        Assert.AreEqual(targetFrameworkVersion, dockerFileAspNetVersion);
+        Assert.That(dockerFileSdkVersion, Is.EqualTo(dockerFileAspNetVersion));
+        Assert.That(dockerFileAspNetVersion, Is.EqualTo(targetFrameworkVersion));
     }
 
     private static string GetNetVersionFromCurrentTargetFramework()
@@ -24,7 +24,7 @@ public class DockerFileTests
         var targetFrameworkAttribute = Assembly.GetExecutingAssembly()
             .GetCustomAttributes(typeof(TargetFrameworkAttribute), false)
             .SingleOrDefault() as TargetFrameworkAttribute;
-        Assert.IsNotNull(targetFrameworkAttribute);
+        Assert.That(targetFrameworkAttribute, Is.Not.Null);
 
         return targetFrameworkAttribute.FrameworkName.Replace(".NETCoreApp,Version=v", string.Empty);
     }
@@ -42,7 +42,7 @@ public class DockerFileTests
             .Where(x => x.StartsWith("FROM mcr."))
             .ToList();
 
-        Assert.AreEqual(2, dockerFileFromLines.Count);
+        Assert.That(dockerFileFromLines, Has.Count.EqualTo(2));
 
         var dockerFileAspNetVersion = GetVersionFromDockerFromLine(dockerFileFromLines[0]);
         var dockerFileSdkVersion = GetVersionFromDockerFromLine(dockerFileFromLines[1]);

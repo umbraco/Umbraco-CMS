@@ -30,12 +30,12 @@ internal sealed class UserIdKeyResolverTests : UmbracoIntegrationTest
         };
 
         var creationResult = await UserService.CreateAsync(Constants.Security.SuperUserKey, userCreateModel);
-        Assert.IsTrue(creationResult.Success);
+        Assert.That(creationResult.Success, Is.True);
         var createdUser = creationResult.Result.CreatedUser;
-        Assert.IsNotNull(createdUser);
+        Assert.That(createdUser, Is.Not.Null);
 
         var resolvedKey = await UserIdKeyResolver.GetAsync(createdUser.Id);
-        Assert.AreEqual(createdUser.Key, resolvedKey);
+        Assert.That(resolvedKey, Is.EqualTo(createdUser.Key));
     }
 
     [Test]
@@ -51,26 +51,26 @@ internal sealed class UserIdKeyResolverTests : UmbracoIntegrationTest
         };
 
         var creationResult = await UserService.CreateAsync(Constants.Security.SuperUserKey, userCreateModel);
-        Assert.IsTrue(creationResult.Success);
+        Assert.That(creationResult.Success, Is.True);
         var createdUser = creationResult.Result.CreatedUser;
-        Assert.IsNotNull(createdUser);
+        Assert.That(createdUser, Is.Not.Null);
 
         var resolvedId = await UserIdKeyResolver.GetAsync(createdUser.Key);
-        Assert.AreEqual(createdUser.Id, resolvedId);
+        Assert.That(resolvedId, Is.EqualTo(createdUser.Id));
     }
 
     [Test]
     public async Task Can_Resolve_Super_User_Key_To_Id()
     {
         var resolvedId = await UserIdKeyResolver.GetAsync(Constants.Security.SuperUserKey);
-        Assert.AreEqual(Constants.Security.SuperUserId, resolvedId);
+        Assert.That(resolvedId, Is.EqualTo(Constants.Security.SuperUserId));
     }
 
     [Test]
     public async Task Can_Resolve_Super_User_Id_To_Key()
     {
         var resolvedKey = await UserIdKeyResolver.GetAsync(Constants.Security.SuperUserId);
-        Assert.AreEqual(Constants.Security.SuperUserKey, resolvedKey);
+        Assert.That(resolvedKey, Is.EqualTo(Constants.Security.SuperUserKey));
     }
 
     [Test]

@@ -16,13 +16,13 @@ public partial class ContentBlueprintEditingServiceTests
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(result.Success);
-            Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+            Assert.That(result.Success, Is.True);
+            Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.Success));
         });
 
         // re-get and verify deletion
         blueprint = await ContentBlueprintEditingService.GetAsync(blueprint.Key);
-        Assert.IsNull(blueprint);
+        Assert.That(blueprint, Is.Null);
     }
 
     [Test]
@@ -32,8 +32,8 @@ public partial class ContentBlueprintEditingServiceTests
 
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(result.Success);
-            Assert.AreEqual(ContentEditingOperationStatus.NotFound, result.Status);
+            Assert.That(result.Success, Is.False);
+            Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.NotFound));
         });
     }
 }

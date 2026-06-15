@@ -97,8 +97,8 @@ public partial class ContentEditingServiceTests
 
         if (expectSuccess)
         {
-            Assert.IsTrue(result.Success);
-            Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+            Assert.That(result.Success, Is.True);
+            Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.Success));
             VerifyCreate(result.Result.Content);
 
             // re-get and re-test
@@ -106,20 +106,20 @@ public partial class ContentEditingServiceTests
 
             void VerifyCreate(IContent? createdContent)
             {
-                Assert.IsNotNull(createdContent);
-                Assert.AreNotEqual(Guid.Empty, createdContent.Key);
-                Assert.IsTrue(createdContent.HasIdentity);
-                Assert.AreEqual("Test Create", createdContent.Name);
-                Assert.AreEqual("The title value", createdContent.GetValue<string>("title"));
+                Assert.That(createdContent, Is.Not.Null);
+                Assert.That(createdContent.Key, Is.Not.EqualTo(Guid.Empty));
+                Assert.That(createdContent.HasIdentity, Is.True);
+                Assert.That(createdContent.Name, Is.EqualTo("Test Create"));
+                Assert.That(createdContent.GetValue<string>("title"), Is.EqualTo("The title value"));
                 AssertBodyTextEquals("The body text", createdContent);
             }
         }
         else
         {
-            Assert.IsFalse(result.Success);
-            Assert.AreEqual(ContentEditingOperationStatus.NotAllowed, result.Status);
-            Assert.IsNotNull(result.Result);
-            Assert.IsNull(result.Result.Content);
+            Assert.That(result.Success, Is.False);
+            Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.NotAllowed));
+            Assert.That(result.Result, Is.Not.Null);
+            Assert.That(result.Result.Content, Is.Null);
         }
     }
 
@@ -228,23 +228,23 @@ public partial class ContentEditingServiceTests
 
         if (expectSuccess)
         {
-            Assert.IsTrue(result.Success);
-            Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+            Assert.That(result.Success, Is.True);
+            Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.Success));
 
             var createdContent = result.Result.Content;
-            Assert.NotNull(createdContent);
-            Assert.AreNotEqual(Guid.Empty, createdContent.Key);
-            Assert.IsTrue(createdContent.HasIdentity);
-            Assert.AreEqual("Test Create Child", createdContent.Name);
-            Assert.AreEqual("The child title value", createdContent.GetValue<string>("title"));
+            Assert.That(createdContent, Is.Not.Null);
+            Assert.That(createdContent.Key, Is.Not.EqualTo(Guid.Empty));
+            Assert.That(createdContent.HasIdentity, Is.True);
+            Assert.That(createdContent.Name, Is.EqualTo("Test Create Child"));
+            Assert.That(createdContent.GetValue<string>("title"), Is.EqualTo("The child title value"));
             AssertBodyTextEquals("The child body text", createdContent);
         }
         else
         {
-            Assert.IsFalse(result.Success);
-            Assert.AreEqual(ContentEditingOperationStatus.NotAllowed, result.Status);
-            Assert.IsNotNull(result.Result);
-            Assert.IsNull(result.Result.Content);
+            Assert.That(result.Success, Is.False);
+            Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.NotAllowed));
+            Assert.That(result.Result, Is.Not.Null);
+            Assert.That(result.Result.Content, Is.Null);
         }
     }
 
@@ -271,11 +271,11 @@ public partial class ContentEditingServiceTests
         };
 
         var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
-        Assert.IsNotNull(result.Result);
-        Assert.IsTrue(result.Result.Content!.HasIdentity);
-        Assert.AreEqual("The title value", result.Result.Content!.GetValue<string>("title"));
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.Success));
+        Assert.That(result.Result, Is.Not.Null);
+        Assert.That(result.Result.Content!.HasIdentity, Is.True);
+        Assert.That(result.Result.Content!.GetValue<string>("title"), Is.EqualTo("The title value"));
     }
 
     [Test]
@@ -299,12 +299,12 @@ public partial class ContentEditingServiceTests
         };
 
         var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
-        Assert.IsNotNull(result.Result);
-        Assert.IsTrue(result.Result.Content!.HasIdentity);
-        Assert.AreEqual(null, result.Result.Content!.GetValue<string>("title"));
-        Assert.AreEqual(null, result.Result.Content!.GetValue<string>("bodyText"));
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.Success));
+        Assert.That(result.Result, Is.Not.Null);
+        Assert.That(result.Result.Content!.HasIdentity, Is.True);
+        Assert.That(result.Result.Content!.GetValue<string>("title"), Is.EqualTo(null));
+        Assert.That(result.Result.Content!.GetValue<string>("bodyText"), Is.EqualTo(null));
     }
 
     [TestCase(true)]
@@ -340,21 +340,21 @@ public partial class ContentEditingServiceTests
         var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
 
         // success is expected regardless of property level validation - the validation error status is communicated in the attempt status (see below)
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(addValidProperties ? ContentEditingOperationStatus.Success : ContentEditingOperationStatus.PropertyValidationError, result.Status);
-        Assert.IsNotNull(result.Result);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(addValidProperties ? ContentEditingOperationStatus.Success : ContentEditingOperationStatus.PropertyValidationError));
+        Assert.That(result.Result, Is.Not.Null);
 
         if (addValidProperties is false)
         {
-            Assert.AreEqual(2, result.Result.ValidationResult.ValidationErrors.Count());
-            Assert.IsNotNull(result.Result.ValidationResult.ValidationErrors.FirstOrDefault(v => v.Alias == "title" && v.ErrorMessages.Length == 1));
-            Assert.IsNotNull(result.Result.ValidationResult.ValidationErrors.FirstOrDefault(v => v.Alias == "keywords" && v.ErrorMessages.Length == 1));
+            Assert.That(result.Result.ValidationResult.ValidationErrors.Count(), Is.EqualTo(2));
+            Assert.That(result.Result.ValidationResult.ValidationErrors.FirstOrDefault(v => v.Alias == "title" && v.ErrorMessages.Length == 1), Is.Not.Null);
+            Assert.That(result.Result.ValidationResult.ValidationErrors.FirstOrDefault(v => v.Alias == "keywords" && v.ErrorMessages.Length == 1), Is.Not.Null);
         }
 
         // NOTE: content creation must be successful, even if the mandatory property is missing (publishing however should not!)
-        Assert.IsTrue(result.Result.Content!.HasIdentity);
-        Assert.AreEqual(titleValue, result.Result.Content!.GetValue<string>("title"));
-        Assert.AreEqual(keywordsValue, result.Result.Content!.GetValue<string>("keywords"));
+        Assert.That(result.Result.Content!.HasIdentity, Is.True);
+        Assert.That(result.Result.Content!.GetValue<string>("title"), Is.EqualTo(titleValue));
+        Assert.That(result.Result.Content!.GetValue<string>("keywords"), Is.EqualTo(keywordsValue));
     }
 
     [Test]
@@ -375,10 +375,10 @@ public partial class ContentEditingServiceTests
         };
 
         var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.ParentNotFound, result.Status);
-        Assert.IsNotNull(result.Result);
-        Assert.IsNull(result.Result.Content);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.ParentNotFound));
+        Assert.That(result.Result, Is.Not.Null);
+        Assert.That(result.Result.Content, Is.Null);
     }
 
     [Test]
@@ -395,10 +395,10 @@ public partial class ContentEditingServiceTests
         };
 
         var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.ContentTypeNotFound, result.Status);
-        Assert.IsNotNull(result.Result);
-        Assert.IsNull(result.Result.Content);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.ContentTypeNotFound));
+        Assert.That(result.Result, Is.Not.Null);
+        Assert.That(result.Result.Content, Is.Null);
     }
 
     [Test]
@@ -423,10 +423,10 @@ public partial class ContentEditingServiceTests
         };
 
         var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.TemplateNotAllowed, result.Status);
-        Assert.IsNotNull(result.Result.Content);
-        Assert.IsFalse(result.Result.Content.HasIdentity);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.TemplateNotAllowed));
+        Assert.That(result.Result.Content, Is.Not.Null);
+        Assert.That(result.Result.Content.HasIdentity, Is.False);
     }
 
     [Test]
@@ -448,10 +448,10 @@ public partial class ContentEditingServiceTests
         };
 
         var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.TemplateNotFound, result.Status);
-        Assert.IsNotNull(result.Result.Content);
-        Assert.IsFalse(result.Result.Content.HasIdentity);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.TemplateNotFound));
+        Assert.That(result.Result.Content, Is.Not.Null);
+        Assert.That(result.Result.Content.HasIdentity, Is.False);
     }
 
     [Test]
@@ -478,10 +478,10 @@ public partial class ContentEditingServiceTests
         };
 
         var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.PropertyTypeNotFound, result.Status);
-        Assert.IsNotNull(result.Result);
-        Assert.IsNull(result.Result.Content);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.PropertyTypeNotFound));
+        Assert.That(result.Result, Is.Not.Null);
+        Assert.That(result.Result.Content, Is.Null);
     }
 
     [Test]
@@ -504,10 +504,10 @@ public partial class ContentEditingServiceTests
         };
 
         var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.ContentTypeCultureVarianceMismatch, result.Status);
-        Assert.IsNotNull(result.Result);
-        Assert.IsNull(result.Result.Content);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.ContentTypeCultureVarianceMismatch));
+        Assert.That(result.Result, Is.Not.Null);
+        Assert.That(result.Result.Content, Is.Null);
     }
 
     [Test]
@@ -538,10 +538,10 @@ public partial class ContentEditingServiceTests
         };
 
         var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.PropertyTypeCultureVarianceMismatch, result.Status);
-        Assert.IsNotNull(result.Result);
-        Assert.IsNull(result.Result.Content);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.PropertyTypeCultureVarianceMismatch));
+        Assert.That(result.Result, Is.Not.Null);
+        Assert.That(result.Result.Content, Is.Null);
     }
 
     [Test]
@@ -572,10 +572,10 @@ public partial class ContentEditingServiceTests
         };
 
         var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.PropertyTypeSegmentVarianceMismatch, result.Status);
-        Assert.IsNotNull(result.Result);
-        Assert.IsNull(result.Result.Content);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.PropertyTypeSegmentVarianceMismatch));
+        Assert.That(result.Result, Is.Not.Null);
+        Assert.That(result.Result.Content, Is.Null);
     }
 
     [Test]
@@ -601,9 +601,9 @@ public partial class ContentEditingServiceTests
         };
 
         var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
-        Assert.IsNotNull(result.Result.Content);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.Success));
+        Assert.That(result.Result.Content, Is.Not.Null);
         VerifyCreate(result.Result.Content);
 
         // re-get and re-test
@@ -611,12 +611,12 @@ public partial class ContentEditingServiceTests
 
         void VerifyCreate(IContent? createdContent)
         {
-            Assert.IsNotNull(createdContent);
-            Assert.AreEqual("The English Name", createdContent.GetCultureName("en-US"));
-            Assert.AreEqual("The Danish Name", createdContent.GetCultureName("da-DK"));
-            Assert.AreEqual("The Invariant Title", createdContent.GetValue<string>("invariantTitle"));
-            Assert.AreEqual("The English Title", createdContent.GetValue<string>("variantTitle", "en-US"));
-            Assert.AreEqual("The Danish Title", createdContent.GetValue<string>("variantTitle", "da-DK"));
+            Assert.That(createdContent, Is.Not.Null);
+            Assert.That(createdContent.GetCultureName("en-US"), Is.EqualTo("The English Name"));
+            Assert.That(createdContent.GetCultureName("da-DK"), Is.EqualTo("The Danish Name"));
+            Assert.That(createdContent.GetValue<string>("invariantTitle"), Is.EqualTo("The Invariant Title"));
+            Assert.That(createdContent.GetValue<string>("variantTitle", "en-US"), Is.EqualTo("The English Title"));
+            Assert.That(createdContent.GetValue<string>("variantTitle", "da-DK"), Is.EqualTo("The Danish Title"));
         }
     }
 
@@ -645,9 +645,9 @@ public partial class ContentEditingServiceTests
         };
 
         var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
-        Assert.IsNotNull(result.Result.Content);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.Success));
+        Assert.That(result.Result.Content, Is.Not.Null);
         VerifyCreate(result.Result.Content);
 
         // re-get and re-test
@@ -655,14 +655,14 @@ public partial class ContentEditingServiceTests
 
         void VerifyCreate(IContent? createdContent)
         {
-            Assert.IsNotNull(createdContent);
+            Assert.That(createdContent, Is.Not.Null);
             Assert.Multiple(() =>
             {
-                Assert.AreEqual("The Name", createdContent.Name);
-                Assert.AreEqual("The Invariant Title", createdContent.GetValue<string>("invariantTitle"));
-                Assert.AreEqual("The Default Title", createdContent.GetValue<string>("variantTitle", segment: null));
-                Assert.AreEqual("The Seg-1 Title", createdContent.GetValue<string>("variantTitle", segment: "seg-1"));
-                Assert.AreEqual("The Seg-2 Title", createdContent.GetValue<string>("variantTitle", segment: "seg-2"));
+                Assert.That(createdContent.Name, Is.EqualTo("The Name"));
+                Assert.That(createdContent.GetValue<string>("invariantTitle"), Is.EqualTo("The Invariant Title"));
+                Assert.That(createdContent.GetValue<string>("variantTitle", segment: null), Is.EqualTo("The Default Title"));
+                Assert.That(createdContent.GetValue<string>("variantTitle", segment: "seg-1"), Is.EqualTo("The Seg-1 Title"));
+                Assert.That(createdContent.GetValue<string>("variantTitle", segment: "seg-2"), Is.EqualTo("The Seg-2 Title"));
             });
         }
     }
@@ -698,9 +698,9 @@ public partial class ContentEditingServiceTests
         };
 
         var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
-        Assert.IsNotNull(result.Result.Content);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.Success));
+        Assert.That(result.Result.Content, Is.Not.Null);
         VerifyCreate(result.Result.Content);
 
         // re-get and re-test
@@ -708,18 +708,18 @@ public partial class ContentEditingServiceTests
 
         void VerifyCreate(IContent? createdContent)
         {
-            Assert.IsNotNull(createdContent);
+            Assert.That(createdContent, Is.Not.Null);
             Assert.Multiple(() =>
             {
-                Assert.AreEqual("The English Name", createdContent.GetCultureName("en-US"));
-                Assert.AreEqual("The Danish Name", createdContent.GetCultureName("da-DK"));
-                Assert.AreEqual("The Invariant Title", createdContent.GetValue<string>("invariantTitle"));
-                Assert.AreEqual("The Default Title in English", createdContent.GetValue<string>("variantTitle", culture: "en-US", segment: null));
-                Assert.AreEqual("The Seg-1 Title in English", createdContent.GetValue<string>("variantTitle", culture: "en-US", segment: "seg-1"));
-                Assert.AreEqual("The Seg-2 Title in English", createdContent.GetValue<string>("variantTitle", culture: "en-US", segment: "seg-2"));
-                Assert.AreEqual("The Default Title in Danish", createdContent.GetValue<string>("variantTitle", culture: "da-DK", segment: null));
-                Assert.AreEqual("The Seg-1 Title in Danish", createdContent.GetValue<string>("variantTitle", culture: "da-DK", segment: "seg-1"));
-                Assert.AreEqual("The Seg-2 Title in Danish", createdContent.GetValue<string>("variantTitle", culture: "da-DK", segment: "seg-2"));
+                Assert.That(createdContent.GetCultureName("en-US"), Is.EqualTo("The English Name"));
+                Assert.That(createdContent.GetCultureName("da-DK"), Is.EqualTo("The Danish Name"));
+                Assert.That(createdContent.GetValue<string>("invariantTitle"), Is.EqualTo("The Invariant Title"));
+                Assert.That(createdContent.GetValue<string>("variantTitle", culture: "en-US", segment: null), Is.EqualTo("The Default Title in English"));
+                Assert.That(createdContent.GetValue<string>("variantTitle", culture: "en-US", segment: "seg-1"), Is.EqualTo("The Seg-1 Title in English"));
+                Assert.That(createdContent.GetValue<string>("variantTitle", culture: "en-US", segment: "seg-2"), Is.EqualTo("The Seg-2 Title in English"));
+                Assert.That(createdContent.GetValue<string>("variantTitle", culture: "da-DK", segment: null), Is.EqualTo("The Default Title in Danish"));
+                Assert.That(createdContent.GetValue<string>("variantTitle", culture: "da-DK", segment: "seg-1"), Is.EqualTo("The Seg-1 Title in Danish"));
+                Assert.That(createdContent.GetValue<string>("variantTitle", culture: "da-DK", segment: "seg-2"), Is.EqualTo("The Seg-2 Title in Danish"));
             });
         }
     }
@@ -761,9 +761,9 @@ public partial class ContentEditingServiceTests
         };
 
         var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
-        Assert.IsNotNull(result.Result.Content);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.Success));
+        Assert.That(result.Result.Content, Is.Not.Null);
         VerifyCreate(result.Result.Content);
 
         // re-get and re-test
@@ -771,20 +771,20 @@ public partial class ContentEditingServiceTests
 
         void VerifyCreate(IContent? createdContent)
         {
-            Assert.IsNotNull(createdContent);
+            Assert.That(createdContent, Is.Not.Null);
             Assert.Multiple(() =>
             {
-                Assert.AreEqual("The English Name", createdContent.GetCultureName("en-US"));
-                Assert.AreEqual("The Danish Name", createdContent.GetCultureName("da-DK"));
-                Assert.AreEqual("The Default Segment Variant Title", createdContent.GetValue<string>("segmentVariantTitle"));
-                Assert.AreEqual("The Seg-1 Segment Variant Title", createdContent.GetValue<string>("segmentVariantTitle", segment: "seg-1"));
-                Assert.AreEqual("The Seg-2 Segment Variant Title", createdContent.GetValue<string>("segmentVariantTitle", segment: "seg-2"));
-                Assert.AreEqual("The Default Title in English", createdContent.GetValue<string>("variantTitle", culture: "en-US", segment: null));
-                Assert.AreEqual("The Seg-1 Title in English", createdContent.GetValue<string>("variantTitle", culture: "en-US", segment: "seg-1"));
-                Assert.AreEqual("The Seg-2 Title in English", createdContent.GetValue<string>("variantTitle", culture: "en-US", segment: "seg-2"));
-                Assert.AreEqual("The Default Title in Danish", createdContent.GetValue<string>("variantTitle", culture: "da-DK", segment: null));
-                Assert.AreEqual("The Seg-1 Title in Danish", createdContent.GetValue<string>("variantTitle", culture: "da-DK", segment: "seg-1"));
-                Assert.AreEqual("The Seg-2 Title in Danish", createdContent.GetValue<string>("variantTitle", culture: "da-DK", segment: "seg-2"));
+                Assert.That(createdContent.GetCultureName("en-US"), Is.EqualTo("The English Name"));
+                Assert.That(createdContent.GetCultureName("da-DK"), Is.EqualTo("The Danish Name"));
+                Assert.That(createdContent.GetValue<string>("segmentVariantTitle"), Is.EqualTo("The Default Segment Variant Title"));
+                Assert.That(createdContent.GetValue<string>("segmentVariantTitle", segment: "seg-1"), Is.EqualTo("The Seg-1 Segment Variant Title"));
+                Assert.That(createdContent.GetValue<string>("segmentVariantTitle", segment: "seg-2"), Is.EqualTo("The Seg-2 Segment Variant Title"));
+                Assert.That(createdContent.GetValue<string>("variantTitle", culture: "en-US", segment: null), Is.EqualTo("The Default Title in English"));
+                Assert.That(createdContent.GetValue<string>("variantTitle", culture: "en-US", segment: "seg-1"), Is.EqualTo("The Seg-1 Title in English"));
+                Assert.That(createdContent.GetValue<string>("variantTitle", culture: "en-US", segment: "seg-2"), Is.EqualTo("The Seg-2 Title in English"));
+                Assert.That(createdContent.GetValue<string>("variantTitle", culture: "da-DK", segment: null), Is.EqualTo("The Default Title in Danish"));
+                Assert.That(createdContent.GetValue<string>("variantTitle", culture: "da-DK", segment: "seg-1"), Is.EqualTo("The Seg-1 Title in Danish"));
+                Assert.That(createdContent.GetValue<string>("variantTitle", culture: "da-DK", segment: "seg-2"), Is.EqualTo("The Seg-2 Title in Danish"));
             });
         }
     }
@@ -825,9 +825,9 @@ public partial class ContentEditingServiceTests
         };
 
         var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
-        Assert.IsNotNull(result.Result.Content);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.Success));
+        Assert.That(result.Result.Content, Is.Not.Null);
         VerifyCreate(result.Result.Content);
 
         // re-get and re-test
@@ -835,19 +835,19 @@ public partial class ContentEditingServiceTests
 
         void VerifyCreate(IContent? createdContent)
         {
-            Assert.IsNotNull(createdContent);
+            Assert.That(createdContent, Is.Not.Null);
             Assert.Multiple(() =>
             {
-                Assert.AreEqual("The English Name", createdContent.GetCultureName("en-US"));
-                Assert.AreEqual("The Danish Name", createdContent.GetCultureName("da-DK"));
-                Assert.AreEqual("The English Culture Variant Title", createdContent.GetValue<string>("cultureVariantTitle", culture: "en-US"));
-                Assert.AreEqual("The Danish Culture Variant Title", createdContent.GetValue<string>("cultureVariantTitle", culture: "da-DK"));
-                Assert.AreEqual("The Default Title in English", createdContent.GetValue<string>("variantTitle", culture: "en-US", segment: null));
-                Assert.AreEqual("The Seg-1 Title in English", createdContent.GetValue<string>("variantTitle", culture: "en-US", segment: "seg-1"));
-                Assert.AreEqual("The Seg-2 Title in English", createdContent.GetValue<string>("variantTitle", culture: "en-US", segment: "seg-2"));
-                Assert.AreEqual("The Default Title in Danish", createdContent.GetValue<string>("variantTitle", culture: "da-DK", segment: null));
-                Assert.AreEqual("The Seg-1 Title in Danish", createdContent.GetValue<string>("variantTitle", culture: "da-DK", segment: "seg-1"));
-                Assert.AreEqual("The Seg-2 Title in Danish", createdContent.GetValue<string>("variantTitle", culture: "da-DK", segment: "seg-2"));
+                Assert.That(createdContent.GetCultureName("en-US"), Is.EqualTo("The English Name"));
+                Assert.That(createdContent.GetCultureName("da-DK"), Is.EqualTo("The Danish Name"));
+                Assert.That(createdContent.GetValue<string>("cultureVariantTitle", culture: "en-US"), Is.EqualTo("The English Culture Variant Title"));
+                Assert.That(createdContent.GetValue<string>("cultureVariantTitle", culture: "da-DK"), Is.EqualTo("The Danish Culture Variant Title"));
+                Assert.That(createdContent.GetValue<string>("variantTitle", culture: "en-US", segment: null), Is.EqualTo("The Default Title in English"));
+                Assert.That(createdContent.GetValue<string>("variantTitle", culture: "en-US", segment: "seg-1"), Is.EqualTo("The Seg-1 Title in English"));
+                Assert.That(createdContent.GetValue<string>("variantTitle", culture: "en-US", segment: "seg-2"), Is.EqualTo("The Seg-2 Title in English"));
+                Assert.That(createdContent.GetValue<string>("variantTitle", culture: "da-DK", segment: null), Is.EqualTo("The Default Title in Danish"));
+                Assert.That(createdContent.GetValue<string>("variantTitle", culture: "da-DK", segment: "seg-1"), Is.EqualTo("The Seg-1 Title in Danish"));
+                Assert.That(createdContent.GetValue<string>("variantTitle", culture: "da-DK", segment: "seg-2"), Is.EqualTo("The Seg-2 Title in Danish"));
             });
         }
     }
@@ -877,16 +877,16 @@ public partial class ContentEditingServiceTests
         };
 
         var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
-        Assert.IsNotNull(result.Result.Content);
-        Assert.IsTrue(result.Result.Content.HasIdentity);
-        Assert.AreEqual(key, result.Result.Content.Key);
-        Assert.AreEqual("The title value", result.Result.Content.GetValue<string>("title"));
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.Success));
+        Assert.That(result.Result.Content, Is.Not.Null);
+        Assert.That(result.Result.Content.HasIdentity, Is.True);
+        Assert.That(result.Result.Content.Key, Is.EqualTo(key));
+        Assert.That(result.Result.Content.GetValue<string>("title"), Is.EqualTo("The title value"));
 
         var content = await ContentEditingService.GetAsync(key);
-        Assert.IsNotNull(content);
-        Assert.AreEqual(result.Result.Content.Id, content.Id);
+        Assert.That(content, Is.Not.Null);
+        Assert.That(content.Id, Is.EqualTo(result.Result.Content.Id));
     }
 
     [Test]
@@ -910,10 +910,10 @@ public partial class ContentEditingServiceTests
         };
 
         var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.PropertyTypeCultureVarianceMismatch, result.Status);
-        Assert.IsNotNull(result.Result);
-        Assert.IsNull(result.Result.Content);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.PropertyTypeCultureVarianceMismatch));
+        Assert.That(result.Result, Is.Not.Null);
+        Assert.That(result.Result.Content, Is.Null);
     }
 
     [Test]
@@ -937,10 +937,10 @@ public partial class ContentEditingServiceTests
         };
 
         var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.PropertyTypeSegmentVarianceMismatch, result.Status);
-        Assert.IsNotNull(result.Result);
-        Assert.IsNull(result.Result.Content);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.PropertyTypeSegmentVarianceMismatch));
+        Assert.That(result.Result, Is.Not.Null);
+        Assert.That(result.Result.Content, Is.Null);
     }
 
     [Test]
@@ -980,10 +980,10 @@ public partial class ContentEditingServiceTests
             },
             Constants.Security.SuperUserKey);
 
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.InTrash, result.Status);
-        Assert.IsNotNull(result.Result);
-        Assert.IsNull(result.Result.Content);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.InTrash));
+        Assert.That(result.Result, Is.Not.Null);
+        Assert.That(result.Result.Content, Is.Null);
     }
 
     [Test]
@@ -1009,8 +1009,8 @@ public partial class ContentEditingServiceTests
         };
 
         var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.InvalidCulture, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.InvalidCulture));
     }
 
     [Test]
@@ -1036,19 +1036,19 @@ public partial class ContentEditingServiceTests
         };
 
         var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.ContentTypeSegmentVarianceMismatch, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.ContentTypeSegmentVarianceMismatch));
     }
 
     private void AssertBodyTextEquals(string expected, IContent content)
     {
         var bodyTextValue = content.GetValue<string>("bodyText");
-        Assert.IsTrue(
+        Assert.That(
             RichTextPropertyEditorHelper.TryParseRichTextEditorValue(
                 bodyTextValue,
                 JsonSerializer,
                 Mock.Of<ILogger>(),
-                out RichTextEditorValue? richTextEditorValue));
-        Assert.AreEqual(expected, richTextEditorValue!.Markup);
+                out RichTextEditorValue? richTextEditorValue), Is.True);
+        Assert.That(richTextEditorValue!.Markup, Is.EqualTo(expected));
     }
 }

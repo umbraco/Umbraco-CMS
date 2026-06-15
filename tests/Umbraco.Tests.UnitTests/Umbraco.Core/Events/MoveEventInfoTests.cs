@@ -13,7 +13,7 @@ public class MoveEventInfoTests
         var recycleBinMoveEvent = new MoveToRecycleBinEventInfo<string>(entity, originalPath);
         var recycleBinMoveEventTwo = new MoveToRecycleBinEventInfo<string>("entity", "path");
 
-        Assert.AreEqual(expectedResult, recycleBinMoveEvent.Equals(recycleBinMoveEventTwo));
+        Assert.That(recycleBinMoveEvent.Equals(recycleBinMoveEventTwo), Is.EqualTo(expectedResult));
     }
 
     [Test]
@@ -22,7 +22,7 @@ public class MoveEventInfoTests
         var recycleBinMoveEvent = new MoveToRecycleBinEventInfo<string>(string.Empty, string.Empty);
         var recycleBinMoveEventTwo = new MoveToRecycleBinEventInfo<string>(string.Empty, string.Empty);
 
-        Assert.IsTrue(recycleBinMoveEvent.Equals(recycleBinMoveEventTwo));
+        Assert.That(recycleBinMoveEvent, Is.EqualTo(recycleBinMoveEventTwo));
     }
 
     [Test]
@@ -30,7 +30,7 @@ public class MoveEventInfoTests
     {
         var moveEvent = new MoveEventInfo<string>("entity", "path",  null);
         var moveEventTwo = new MoveEventInfo<string>("entity", "path",  null);
-        Assert.IsTrue(moveEvent.Equals(moveEventTwo));
+        Assert.That(moveEvent, Is.EqualTo(moveEventTwo));
     }
 
     [Test]
@@ -38,7 +38,7 @@ public class MoveEventInfoTests
     {
         var moveEvent = new MoveEventInfo<string>(string.Empty, string.Empty, null);
         var moveEventTwo = new MoveEventInfo<string>(string.Empty, string.Empty, null);
-        Assert.IsTrue(moveEvent.Equals(moveEventTwo));
+        Assert.That(moveEvent, Is.EqualTo(moveEventTwo));
     }
 
     [TestCase("entity", "", "063897F1-194A-4C42-B406-CA80DBC12968", false)]
@@ -49,6 +49,6 @@ public class MoveEventInfoTests
     {
         var moveEvent = new MoveEventInfo<string>(entity, originalPath, parentKey);
         var moveEventTwo = new MoveEventInfo<string>("entity", "path",  new Guid("063897F1-194A-4C42-B406-CA80DBC12968"));
-        Assert.AreEqual(expectedResult, moveEvent.Equals(moveEventTwo));
+        Assert.That(moveEvent.Equals(moveEventTwo), Is.EqualTo(expectedResult));
     }
 }

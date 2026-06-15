@@ -37,21 +37,21 @@ public class FrameworkXmlTests
         doc1.LoadXml(Xml1);
 
         var node1 = doc1.SelectSingleNode("//item2");
-        Assert.IsNotNull(node1);
+        Assert.That(node1, Is.Not.Null);
 
         var doc2 = new XmlDocument();
         doc2.LoadXml("<nodes />");
         var node2 = doc2.ImportNode(node1, true);
         var root2 = doc2.DocumentElement;
-        Assert.IsNotNull(root2);
+        Assert.That(root2, Is.Not.Null);
         root2.AppendChild(node2);
 
         var node3 = doc2.SelectSingleNode("//item2");
 
-        Assert.AreNotSame(node1, node2); // has been cloned
-        Assert.AreSame(node2, node3); // has been appended
+        Assert.That(node2, Is.Not.SameAs(node1)); // has been cloned
+        Assert.That(node3, Is.SameAs(node2)); // has been appended
 
-        Assert.AreNotSame(node1.FirstChild, node2.FirstChild); // deep clone
+        Assert.That(node2.FirstChild, Is.Not.SameAs(node1.FirstChild)); // deep clone
     }
 
     // Umbraco: the CanRemove...NodeAndNavigate tests shows that if the underlying XmlDocument
@@ -66,35 +66,35 @@ public class FrameworkXmlTests
         doc1.LoadXml(Xml1);
         var nav1 = doc1.CreateNavigator();
 
-        Assert.IsTrue(nav1.MoveToFirstChild());
-        Assert.AreEqual("root", nav1.Name);
-        Assert.IsTrue(nav1.MoveToFirstChild());
-        Assert.AreEqual("items", nav1.Name);
-        Assert.IsTrue(nav1.MoveToFirstChild());
-        Assert.AreEqual("item1", nav1.Name);
-        Assert.IsTrue(nav1.MoveToNext());
-        Assert.AreEqual("item2", nav1.Name);
+        Assert.That(nav1.MoveToFirstChild(), Is.True);
+        Assert.That(nav1.Name, Is.EqualTo("root"));
+        Assert.That(nav1.MoveToFirstChild(), Is.True);
+        Assert.That(nav1.Name, Is.EqualTo("items"));
+        Assert.That(nav1.MoveToFirstChild(), Is.True);
+        Assert.That(nav1.Name, Is.EqualTo("item1"));
+        Assert.That(nav1.MoveToNext(), Is.True);
+        Assert.That(nav1.Name, Is.EqualTo("item2"));
 
         var node1 = doc1.SelectSingleNode("//item2");
-        Assert.IsNotNull(node1);
+        Assert.That(node1, Is.Not.Null);
         var parent1 = node1.ParentNode;
-        Assert.IsNotNull(parent1);
+        Assert.That(parent1, Is.Not.Null);
         parent1.RemoveChild(node1);
 
         // navigator now navigates on an isolated fragment
         // that is rooted on the node that was removed
-        Assert.AreEqual("item2", nav1.Name);
-        Assert.IsFalse(nav1.MoveToPrevious());
-        Assert.IsFalse(nav1.MoveToNext());
-        Assert.IsFalse(nav1.MoveToParent());
+        Assert.That(nav1.Name, Is.EqualTo("item2"));
+        Assert.That(nav1.MoveToPrevious(), Is.False);
+        Assert.That(nav1.MoveToNext(), Is.False);
+        Assert.That(nav1.MoveToParent(), Is.False);
 
-        Assert.IsTrue(nav1.MoveToFirstChild());
-        Assert.AreEqual("item21", nav1.Name);
-        Assert.IsTrue(nav1.MoveToParent());
-        Assert.AreEqual("item2", nav1.Name);
+        Assert.That(nav1.MoveToFirstChild(), Is.True);
+        Assert.That(nav1.Name, Is.EqualTo("item21"));
+        Assert.That(nav1.MoveToParent(), Is.True);
+        Assert.That(nav1.Name, Is.EqualTo("item2"));
 
         nav1.MoveToRoot();
-        Assert.AreEqual("item2", nav1.Name);
+        Assert.That(nav1.Name, Is.EqualTo("item2"));
     }
 
     [Test]
@@ -104,34 +104,34 @@ public class FrameworkXmlTests
         doc1.LoadXml(Xml1);
         var nav1 = doc1.CreateNavigator();
 
-        Assert.IsTrue(nav1.MoveToFirstChild());
-        Assert.AreEqual("root", nav1.Name);
-        Assert.IsTrue(nav1.MoveToFirstChild());
-        Assert.AreEqual("items", nav1.Name);
-        Assert.IsTrue(nav1.MoveToFirstChild());
-        Assert.AreEqual("item1", nav1.Name);
-        Assert.IsTrue(nav1.MoveToNext());
-        Assert.AreEqual("item2", nav1.Name);
-        Assert.IsTrue(nav1.MoveToFirstChild());
-        Assert.AreEqual("item21", nav1.Name);
+        Assert.That(nav1.MoveToFirstChild(), Is.True);
+        Assert.That(nav1.Name, Is.EqualTo("root"));
+        Assert.That(nav1.MoveToFirstChild(), Is.True);
+        Assert.That(nav1.Name, Is.EqualTo("items"));
+        Assert.That(nav1.MoveToFirstChild(), Is.True);
+        Assert.That(nav1.Name, Is.EqualTo("item1"));
+        Assert.That(nav1.MoveToNext(), Is.True);
+        Assert.That(nav1.Name, Is.EqualTo("item2"));
+        Assert.That(nav1.MoveToFirstChild(), Is.True);
+        Assert.That(nav1.Name, Is.EqualTo("item21"));
 
         var node1 = doc1.SelectSingleNode("//item2");
-        Assert.IsNotNull(node1);
+        Assert.That(node1, Is.Not.Null);
         var parent1 = node1.ParentNode;
-        Assert.IsNotNull(parent1);
+        Assert.That(parent1, Is.Not.Null);
         parent1.RemoveChild(node1);
 
         // navigator now navigates on an isolated fragment
         // that is rooted on the node that was removed
-        Assert.AreEqual("item21", nav1.Name);
-        Assert.IsTrue(nav1.MoveToParent());
-        Assert.AreEqual("item2", nav1.Name);
-        Assert.IsFalse(nav1.MoveToPrevious());
-        Assert.IsFalse(nav1.MoveToNext());
-        Assert.IsFalse(nav1.MoveToParent());
+        Assert.That(nav1.Name, Is.EqualTo("item21"));
+        Assert.That(nav1.MoveToParent(), Is.True);
+        Assert.That(nav1.Name, Is.EqualTo("item2"));
+        Assert.That(nav1.MoveToPrevious(), Is.False);
+        Assert.That(nav1.MoveToNext(), Is.False);
+        Assert.That(nav1.MoveToParent(), Is.False);
 
         nav1.MoveToRoot();
-        Assert.AreEqual("item2", nav1.Name);
+        Assert.That(nav1.Name, Is.EqualTo("item2"));
     }
 
     [Test]
@@ -141,31 +141,31 @@ public class FrameworkXmlTests
         doc1.LoadXml(Xml1);
         var nav1 = doc1.CreateNavigator();
 
-        Assert.IsTrue(nav1.MoveToFirstChild());
-        Assert.AreEqual("root", nav1.Name);
-        Assert.IsTrue(nav1.MoveToFirstChild());
-        Assert.AreEqual("items", nav1.Name);
-        Assert.IsTrue(nav1.MoveToFirstChild());
-        Assert.AreEqual("item1", nav1.Name);
-        Assert.IsTrue(nav1.MoveToNext());
-        Assert.AreEqual("item2", nav1.Name);
-        Assert.IsTrue(nav1.MoveToNext());
-        Assert.AreEqual("item3", nav1.Name);
-        Assert.IsTrue(nav1.MoveToNext());
-        Assert.AreEqual("item4", nav1.Name);
+        Assert.That(nav1.MoveToFirstChild(), Is.True);
+        Assert.That(nav1.Name, Is.EqualTo("root"));
+        Assert.That(nav1.MoveToFirstChild(), Is.True);
+        Assert.That(nav1.Name, Is.EqualTo("items"));
+        Assert.That(nav1.MoveToFirstChild(), Is.True);
+        Assert.That(nav1.Name, Is.EqualTo("item1"));
+        Assert.That(nav1.MoveToNext(), Is.True);
+        Assert.That(nav1.Name, Is.EqualTo("item2"));
+        Assert.That(nav1.MoveToNext(), Is.True);
+        Assert.That(nav1.Name, Is.EqualTo("item3"));
+        Assert.That(nav1.MoveToNext(), Is.True);
+        Assert.That(nav1.Name, Is.EqualTo("item4"));
 
         var node1 = doc1.SelectSingleNode("//item2");
-        Assert.IsNotNull(node1);
+        Assert.That(node1, Is.Not.Null);
         var parent1 = node1.ParentNode;
-        Assert.IsNotNull(parent1);
+        Assert.That(parent1, Is.Not.Null);
         parent1.RemoveChild(node1);
 
         // navigator sees the change
-        Assert.AreEqual("item4", nav1.Name);
-        Assert.IsTrue(nav1.MoveToPrevious());
-        Assert.AreEqual("item3", nav1.Name);
-        Assert.IsTrue(nav1.MoveToPrevious());
-        Assert.AreEqual("item1", nav1.Name);
+        Assert.That(nav1.Name, Is.EqualTo("item4"));
+        Assert.That(nav1.MoveToPrevious(), Is.True);
+        Assert.That(nav1.Name, Is.EqualTo("item3"));
+        Assert.That(nav1.MoveToPrevious(), Is.True);
+        Assert.That(nav1.Name, Is.EqualTo("item1"));
     }
 
     // Umbraco: the following test shows that if the underlying XmlDocument is modified while
@@ -183,17 +183,17 @@ public class FrameworkXmlTests
         var iter1 = nav1.Select("//items/*");
         var iter2 = nav1.Select("//items/*");
 
-        Assert.AreEqual(6, iter1.Count);
+        Assert.That(iter1, Has.Count.EqualTo(6));
 
         var node1 = doc1.SelectSingleNode("//item2");
-        Assert.IsNotNull(node1);
+        Assert.That(node1, Is.Not.Null);
         var parent1 = node1.ParentNode;
-        Assert.IsNotNull(parent1);
+        Assert.That(parent1, Is.Not.Null);
         parent1.RemoveChild(node1);
 
         // iterator partially sees the change
-        Assert.AreEqual(6, iter1.Count); // has been cached, not updated
-        Assert.AreEqual(5, iter2.Count); // not calculated yet, correct value
+        Assert.That(iter1, Has.Count.EqualTo(6)); // has been cached, not updated
+        Assert.That(iter2, Has.Count.EqualTo(5)); // not calculated yet, correct value
 
         var count = 0;
         while (iter1.MoveNext())
@@ -201,7 +201,7 @@ public class FrameworkXmlTests
             count++;
         }
 
-        Assert.AreEqual(5, count);
+        Assert.That(count, Is.EqualTo(5));
     }
 
     [Test]
@@ -222,6 +222,6 @@ public class FrameworkXmlTests
         iter2.MoveNext(); // /root/a/a2
 
         // used to fail because iter1 and iter2 would conflict
-        Assert.IsTrue(iter1.MoveNext()); // root/b
+        Assert.That(iter1.MoveNext(), Is.True); // root/b
     }
 }

@@ -35,8 +35,8 @@ internal sealed class RelationServiceTests : UmbracoIntegrationTest
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(result.Success);
-            Assert.AreEqual(RelationTypeOperationStatus.Success, result.Status);
+            Assert.That(result.Success, Is.True);
+            Assert.That(result.Status, Is.EqualTo(RelationTypeOperationStatus.Success));
         });
 
         AssertRelationTypesAreSame(relationType, result.Result);
@@ -60,8 +60,8 @@ internal sealed class RelationServiceTests : UmbracoIntegrationTest
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(result.Success);
-            Assert.AreEqual(RelationTypeOperationStatus.Success, result.Status);
+            Assert.That(result.Success, Is.True);
+            Assert.That(result.Status, Is.EqualTo(RelationTypeOperationStatus.Success));
         });
         AssertRelationTypesAreSame(relationType, result.Result);
     }
@@ -82,8 +82,8 @@ internal sealed class RelationServiceTests : UmbracoIntegrationTest
 
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(result.Success);
-            Assert.AreEqual(relationTypeOperationStatus, result.Status);
+            Assert.That(result.Success, Is.False);
+            Assert.That(result.Status, Is.EqualTo(relationTypeOperationStatus));
         });
     }
 
@@ -101,9 +101,9 @@ internal sealed class RelationServiceTests : UmbracoIntegrationTest
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(result.Success);
-            Assert.AreEqual(RelationTypeOperationStatus.Success, result.Status);
-            Assert.IsTrue(string.Equals(key, result.Result.Key.ToString(), StringComparison.OrdinalIgnoreCase));
+            Assert.That(result.Success, Is.True);
+            Assert.That(result.Status, Is.EqualTo(RelationTypeOperationStatus.Success));
+            Assert.That(string.Equals(key, result.Result.Key.ToString(), StringComparison.OrdinalIgnoreCase), Is.True);
         });
 
         AssertRelationTypesAreSame(relationType, result.Result);
@@ -126,8 +126,8 @@ internal sealed class RelationServiceTests : UmbracoIntegrationTest
 
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(result.Success);
-            Assert.AreEqual(RelationTypeOperationStatus.InvalidId, result.Status);
+            Assert.That(result.Success, Is.False);
+            Assert.That(result.Status, Is.EqualTo(RelationTypeOperationStatus.InvalidId));
         });
     }
 
@@ -140,10 +140,10 @@ internal sealed class RelationServiceTests : UmbracoIntegrationTest
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(result.Success);
-            Assert.AreEqual(RelationTypeOperationStatus.Success, result.Status);
-            Assert.IsNull(result.Result.ParentObjectType);
-            Assert.IsNull(result.Result.ChildObjectType);
+            Assert.That(result.Success, Is.True);
+            Assert.That(result.Status, Is.EqualTo(RelationTypeOperationStatus.Success));
+            Assert.That(result.Result.ParentObjectType, Is.Null);
+            Assert.That(result.Result.ChildObjectType, Is.Null);
         });
         AssertRelationTypesAreSame(relationType, result.Result);
     }
@@ -153,24 +153,24 @@ internal sealed class RelationServiceTests : UmbracoIntegrationTest
     {
         IRelationTypeWithIsDependency relationType = new RelationType("Test Relation", "testRelation", false, parentObjectType: null, childObjectType: null, false);
         Attempt<IRelationType, RelationTypeOperationStatus> createResult = await RelationService.CreateAsync(relationType, Constants.Security.SuperUserKey);
-        Assert.IsTrue(createResult.Success);
+        Assert.That(createResult.Success, Is.True);
 
         createResult.Result.Name = "Updated Name";
         Attempt<IRelationType, RelationTypeOperationStatus> updateResult = await RelationService.UpdateAsync(createResult.Result, Constants.Security.SuperUserKey);
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(updateResult.Success);
-            Assert.AreEqual(RelationTypeOperationStatus.Success, updateResult.Status);
+            Assert.That(updateResult.Success, Is.True);
+            Assert.That(updateResult.Status, Is.EqualTo(RelationTypeOperationStatus.Success));
         });
 
         IRelationType? persisted = RelationService.GetRelationTypeById(updateResult.Result.Key);
-        Assert.IsNotNull(persisted);
+        Assert.That(persisted, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual("Updated Name", persisted!.Name);
-            Assert.IsNull(persisted.ParentObjectType);
-            Assert.IsNull(persisted.ChildObjectType);
+            Assert.That(persisted!.Name, Is.EqualTo("Updated Name"));
+            Assert.That(persisted.ParentObjectType, Is.Null);
+            Assert.That(persisted.ChildObjectType, Is.Null);
         });
     }
 
@@ -178,16 +178,16 @@ internal sealed class RelationServiceTests : UmbracoIntegrationTest
     {
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(relationType.Name, result.Name);
-            Assert.AreEqual(relationType.ParentObjectType, result.ParentObjectType);
-            Assert.AreEqual(relationType.ChildObjectType, result.ChildObjectType);
-            Assert.AreEqual(relationType.IsBidirectional, result.IsBidirectional);
+            Assert.That(result.Name, Is.EqualTo(relationType.Name));
+            Assert.That(result.ParentObjectType, Is.EqualTo(relationType.ParentObjectType));
+            Assert.That(result.ChildObjectType, Is.EqualTo(relationType.ChildObjectType));
+            Assert.That(result.IsBidirectional, Is.EqualTo(relationType.IsBidirectional));
             var asWithDependency = (IRelationTypeWithIsDependency)result;
-            Assert.AreEqual(relationType.IsDependency, asWithDependency.IsDependency);
+            Assert.That(asWithDependency.IsDependency, Is.EqualTo(relationType.IsDependency));
         });
         var persistedRelationType = RelationService.GetRelationTypeById(result.Key);
 
-        Assert.AreEqual(result, persistedRelationType);
+        Assert.That(persistedRelationType, Is.EqualTo(result));
     }
 
 }

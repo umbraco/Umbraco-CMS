@@ -24,16 +24,16 @@ internal sealed partial class UserServiceCrudTests
         var userService = CreateUserService();
         var createAttempt = await userService.CreateAsync(Constants.Security.SuperUserKey, userCreateModel, false);
 
-        Assert.IsTrue(createAttempt.Success);
+        Assert.That(createAttempt.Success, Is.True);
         var user = createAttempt.Result.CreatedUser;
-        Assert.AreEqual(UserState.Disabled, user!.UserState);
+        Assert.That(user!.UserState, Is.EqualTo(UserState.Disabled));
 
         var enableStatus = await userService.EnableAsync(Constants.Security.SuperUserKey, new HashSet<Guid> { user.Key });
-        Assert.AreEqual(UserOperationStatus.Success, enableStatus);
+        Assert.That(enableStatus, Is.EqualTo(UserOperationStatus.Success));
 
         var updatedUser = await userService.GetAsync(user.Key);
         // The user has not logged in, so after enabling the user, the user state should be inactive
-        Assert.AreEqual(UserState.Inactive, updatedUser!.UserState);
+        Assert.That(updatedUser!.UserState, Is.EqualTo(UserState.Inactive));
     }
 
     [Test]
@@ -52,12 +52,12 @@ internal sealed partial class UserServiceCrudTests
         var userService = CreateUserService();
         var createAttempt = await userService.CreateAsync(Constants.Security.SuperUserKey, userCreateModel, true);
 
-        Assert.IsTrue(createAttempt.Success);
+        Assert.That(createAttempt.Success, Is.True);
         var user = createAttempt.Result.CreatedUser;
-        Assert.AreEqual(UserState.Inactive, user!.UserState);
+        Assert.That(user!.UserState, Is.EqualTo(UserState.Inactive));
 
         var disableStatus = await userService.DisableAsync(Constants.Security.SuperUserKey, new HashSet<Guid> { user.Key });
-        Assert.AreEqual(UserOperationStatus.Success, disableStatus);
+        Assert.That(disableStatus, Is.EqualTo(UserOperationStatus.Success));
     }
 
     [Test]
@@ -75,11 +75,11 @@ internal sealed partial class UserServiceCrudTests
 
         var userService = CreateUserService();
         var createAttempt = await userService.CreateAsync(Constants.Security.SuperUserKey, userCreateModel, true);
-        Assert.IsTrue(createAttempt.Success);
+        Assert.That(createAttempt.Success, Is.True);
 
         var createdUser = createAttempt.Result.CreatedUser;
         var disableStatus = await userService.DisableAsync(createdUser!.Key, new HashSet<Guid>{ createdUser.Key });
-        Assert.AreEqual(UserOperationStatus.CannotDisableSelf, disableStatus);
+        Assert.That(disableStatus, Is.EqualTo(UserOperationStatus.CannotDisableSelf));
     }
 
     [Test]
@@ -98,11 +98,11 @@ internal sealed partial class UserServiceCrudTests
         var userService = CreateUserService();
 
         var userInviteAttempt = await userService.InviteAsync(Constants.Security.SuperUserKey, userInviteModel);
-        Assert.IsTrue(userInviteAttempt.Success);
+        Assert.That(userInviteAttempt.Success, Is.True);
 
         var invitedUser = userInviteAttempt.Result.InvitedUser;
         var disableStatus = await userService.DisableAsync(Constants.Security.SuperUserKey, new HashSet<Guid> { invitedUser!.Key });
-        Assert.AreEqual(UserOperationStatus.CannotDisableInvitedUser, disableStatus);
+        Assert.That(disableStatus, Is.EqualTo(UserOperationStatus.CannotDisableInvitedUser));
     }
 
     [Test]
@@ -121,12 +121,12 @@ internal sealed partial class UserServiceCrudTests
         var userService = CreateUserService();
         var createAttempt = await userService.CreateAsync(Constants.Security.SuperUserKey, userCreateModel, false);
 
-        Assert.IsTrue(createAttempt.Success);
+        Assert.That(createAttempt.Success, Is.True);
         var user = createAttempt.Result.CreatedUser;
-        Assert.AreEqual(UserState.Disabled, user!.UserState);
+        Assert.That(user!.UserState, Is.EqualTo(UserState.Disabled));
 
         var enableStatus = await userService.EnableAsync(Constants.Security.SuperUserKey, new HashSet<Guid> { user.Key, Guid.NewGuid() });
-        Assert.AreEqual(UserOperationStatus.UserNotFound, enableStatus);
+        Assert.That(enableStatus, Is.EqualTo(UserOperationStatus.UserNotFound));
     }
 
     [Test]
@@ -145,10 +145,10 @@ internal sealed partial class UserServiceCrudTests
         var userService = CreateUserService();
         var createAttempt = await userService.CreateAsync(Constants.Security.SuperUserKey, userCreateModel, true);
 
-        Assert.IsTrue(createAttempt.Success);
+        Assert.That(createAttempt.Success, Is.True);
         var user = createAttempt.Result.CreatedUser;
 
         var enableStatus = await userService.DisableAsync(Constants.Security.SuperUserKey, new HashSet<Guid> { user.Key, Guid.NewGuid() });
-        Assert.AreEqual(UserOperationStatus.UserNotFound, enableStatus);
+        Assert.That(enableStatus, Is.EqualTo(UserOperationStatus.UserNotFound));
     }
 }

@@ -15,11 +15,11 @@ public class LoggingConfigurationTests
         var config = new LoggingConfiguration("c:\\logs\\", "UmbracoLogFile_{0}_{1}..json", "MachineName,EnvironmentName");
         var result = config.GetLogFileNameFormatArguments();
 
-        Assert.AreEqual(2, result.Length);
+        Assert.That(result.Length, Is.EqualTo(2));
 
         var expectedMachineName = Environment.MachineName;
         var expectedEnvironmentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
-        Assert.AreEqual(expectedMachineName, result[0]);
-        Assert.AreEqual(expectedEnvironmentName, result[1]);
+        Assert.That(result[0], Is.EqualTo(expectedMachineName));
+        Assert.That(result[1], Is.EqualTo(expectedEnvironmentName));
     }
 }

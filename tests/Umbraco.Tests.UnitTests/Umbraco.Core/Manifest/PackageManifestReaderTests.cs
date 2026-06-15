@@ -43,27 +43,27 @@ public class PackageManifestReaderTests
             .Returns(new List<IFileInfo> { CreatePackageManifestFile() }.GetEnumerator());
 
         var result = await _reader.ReadPackageManifestsAsync();
-        Assert.AreEqual(1, result.Count());
+        Assert.That(result.Count(), Is.EqualTo(1));
 
         var first = result.First();
-        Assert.AreEqual("My Package", first.Name);
-        Assert.AreEqual("1.2.3", first.Version);
-        Assert.AreEqual(2, first.Extensions.Length);
+        Assert.That(first.Name, Is.EqualTo("My Package"));
+        Assert.That(first.Version, Is.EqualTo("1.2.3"));
+        Assert.That(first.Extensions.Length, Is.EqualTo(2));
 
-        Assert.NotNull(first.Importmap);
+        Assert.That(first.Importmap, Is.Not.Null);
         var importmap = first.Importmap;
-        Assert.AreEqual(1, importmap.Imports.Count());
-        Assert.AreEqual("./module/shapes/square.js", importmap.Imports["square"]);
+        Assert.That(importmap.Imports.Count(), Is.EqualTo(1));
+        Assert.That(importmap.Imports["square"], Is.EqualTo("./module/shapes/square.js"));
 
-        Assert.NotNull(importmap.Scopes);
-        Assert.AreEqual(1, importmap.Scopes.Count());
+        Assert.That(importmap.Scopes, Is.Not.Null);
+        Assert.That(importmap.Scopes.Count(), Is.EqualTo(1));
         var scope = importmap.Scopes.First();
-        Assert.AreEqual("/modules/customshapes", scope.Key);
-        Assert.NotNull(scope.Value);
+        Assert.That(scope.Key, Is.EqualTo("/modules/customshapes"));
+        Assert.That(scope.Value, Is.Not.Null);
         var firstScope = scope.Value.First();
-        Assert.NotNull(firstScope);
-        Assert.AreEqual("square", firstScope.Key);
-        Assert.AreEqual("https://example.com/modules/shapes/square.js", firstScope.Value);
+        Assert.That(firstScope, Is.Not.Null);
+        Assert.That(firstScope.Key, Is.EqualTo("square"));
+        Assert.That(firstScope.Value, Is.EqualTo("https://example.com/modules/shapes/square.js"));
     }
 
     [Test]
@@ -89,20 +89,20 @@ public class PackageManifestReaderTests
             .Returns(new List<IFileInfo> { CreatePackageManifestFile(content) }.GetEnumerator());
 
         var result = await _reader.ReadPackageManifestsAsync();
-        Assert.AreEqual(1, result.Count());
+        Assert.That(result.Count(), Is.EqualTo(1));
 
         var first = result.First();
 
         // Ensure that the extensions are deserialized as JsonElement
-        Assert.IsTrue(first.Extensions.All(e => e is JsonObject));
+        Assert.That(first.Extensions.All(e => e is JsonObject), Is.True);
 
         // Test the deserialization of the first extension to make sure we don't break the JSON parsing
         JsonObject firstExtension = (JsonObject)first.Extensions.First();
-         Assert.AreEqual("tree", firstExtension["type"].GetValue<string>());
+        Assert.That(firstExtension["type"].GetValue<string>(), Is.EqualTo("tree"));
          var meta = firstExtension["meta"];
-         Assert.AreEqual("My Tree", meta["label"].GetValue<string>());
+        Assert.That(meta["label"].GetValue<string>(), Is.EqualTo("My Tree"));
          var someArray = meta["someArray"];
-         Assert.AreEqual(1, someArray[0].GetValue<int>());
+        Assert.That(someArray[0].GetValue<int>(), Is.EqualTo(1));
     }
 
     [Test]
@@ -115,9 +115,9 @@ public class PackageManifestReaderTests
             .Returns(new List<IFileInfo> { directoryOne, directoryTwo }.GetEnumerator());
 
         var result = await _reader.ReadPackageManifestsAsync();
-        Assert.AreEqual(2, result.Count());
-        Assert.AreEqual("Package One", result.First().Name);
-        Assert.AreEqual("Package Two", result.Last().Name);
+        Assert.That(result.Count(), Is.EqualTo(2));
+        Assert.That(result.First().Name, Is.EqualTo("Package One"));
+        Assert.That(result.Last().Name, Is.EqualTo("Package Two"));
     }
 
     [Test]
@@ -131,8 +131,8 @@ public class PackageManifestReaderTests
             .Returns(new List<IFileInfo> { emptyFolder, packageFolder }.GetEnumerator());
 
         var result = await _reader.ReadPackageManifestsAsync();
-        Assert.AreEqual(1, result.Count());
-        Assert.AreEqual("My Package", result.First().Name);
+        Assert.That(result.Count(), Is.EqualTo(1));
+        Assert.That(result.First().Name, Is.EqualTo("My Package"));
     }
 
     [Test]
@@ -152,8 +152,8 @@ public class PackageManifestReaderTests
             .Returns(new List<IFileInfo> { otherFolder, packageFolder }.GetEnumerator());
 
         var result = await _reader.ReadPackageManifestsAsync();
-        Assert.AreEqual(1, result.Count());
-        Assert.AreEqual("My Package", result.First().Name);
+        Assert.That(result.Count(), Is.EqualTo(1));
+        Assert.That(result.First().Name, Is.EqualTo("My Package"));
     }
 
     [Test]
@@ -166,7 +166,7 @@ public class PackageManifestReaderTests
             .Returns(folders.GetEnumerator());
 
         var result = await _reader.ReadPackageManifestsAsync();
-        Assert.AreEqual(0, result.Count());
+        Assert.That(result.Count(), Is.EqualTo(0));
     }
 
     [Test]
@@ -187,8 +187,8 @@ public class PackageManifestReaderTests
             .Returns(new List<IFileInfo> { CreatePackageManifestFile(content) }.GetEnumerator());
 
         var exception = Assert.ThrowsAsync<InvalidOperationException>(() => _reader.ReadPackageManifestsAsync());
-        Assert.NotNull(exception);
-        Assert.IsInstanceOf<JsonException>(exception.InnerException);
+        Assert.That(exception, Is.Not.Null);
+        Assert.That(exception.InnerException, Is.InstanceOf<JsonException>());
     }
 
     [Test]
@@ -204,8 +204,8 @@ public class PackageManifestReaderTests
             .Returns(new List<IFileInfo> { CreatePackageManifestFile(content) }.GetEnumerator());
 
         var exception = Assert.ThrowsAsync<InvalidOperationException>(() => _reader.ReadPackageManifestsAsync());
-        Assert.NotNull(exception);
-        Assert.IsInstanceOf<JsonException>(exception.InnerException);
+        Assert.That(exception, Is.Not.Null);
+        Assert.That(exception.InnerException, Is.InstanceOf<JsonException>());
     }
 
     [Test]
@@ -227,8 +227,8 @@ public class PackageManifestReaderTests
             .Returns(new List<IFileInfo> { CreatePackageManifestFile(content) }.GetEnumerator());
 
         var exception = Assert.ThrowsAsync<InvalidOperationException>(() => _reader.ReadPackageManifestsAsync());
-        Assert.NotNull(exception);
-        Assert.IsInstanceOf<JsonException>(exception.InnerException);
+        Assert.That(exception, Is.Not.Null);
+        Assert.That(exception.InnerException, Is.InstanceOf<JsonException>());
     }
 
     [TestCase("This is not JSON")]
@@ -240,8 +240,8 @@ public class PackageManifestReaderTests
             .Returns(new List<IFileInfo> { CreatePackageManifestFile(content) }.GetEnumerator());
 
         var exception = Assert.ThrowsAsync<InvalidOperationException>(() => _reader.ReadPackageManifestsAsync());
-        Assert.NotNull(exception);
-        Assert.IsInstanceOf<JsonException>(exception.InnerException);
+        Assert.That(exception, Is.Not.Null);
+        Assert.That(exception.InnerException, Is.InstanceOf<JsonException>());
     }
 
     private IFileInfo CreateDirectoryMock(string path, params IFileInfo[] children)

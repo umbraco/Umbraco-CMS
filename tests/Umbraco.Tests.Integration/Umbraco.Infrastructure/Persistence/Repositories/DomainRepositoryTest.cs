@@ -73,13 +73,13 @@ internal sealed class DomainRepositoryTest : UmbracoIntegrationTest
             // re-get
             domain = repo.Get(domain.Id);
 
-            Assert.NotNull(domain);
-            Assert.IsTrue(domain.HasIdentity);
-            Assert.Greater(domain.Id, 0);
-            Assert.AreEqual("test.com", domain.DomainName);
-            Assert.AreEqual(content.Id, domain.RootContentId);
-            Assert.AreEqual(lang.Id, domain.LanguageId);
-            Assert.AreEqual(lang.IsoCode, domain.LanguageIsoCode);
+            Assert.That(domain, Is.Not.Null);
+            Assert.That(domain.HasIdentity, Is.True);
+            Assert.That(domain.Id, Is.GreaterThan(0));
+            Assert.That(domain.DomainName, Is.EqualTo("test.com"));
+            Assert.That(domain.RootContentId, Is.EqualTo(content.Id));
+            Assert.That(domain.LanguageId, Is.EqualTo(lang.Id));
+            Assert.That(domain.LanguageIsoCode, Is.EqualTo(lang.IsoCode));
         }
     }
 
@@ -101,12 +101,12 @@ internal sealed class DomainRepositoryTest : UmbracoIntegrationTest
             // re-get
             domain = repo.Get(domain.Id);
 
-            Assert.NotNull(domain);
-            Assert.IsTrue(domain.HasIdentity);
-            Assert.Greater(domain.Id, 0);
-            Assert.AreEqual("test.com", domain.DomainName);
-            Assert.AreEqual(content.Id, domain.RootContentId);
-            Assert.IsFalse(domain.LanguageId.HasValue);
+            Assert.That(domain, Is.Not.Null);
+            Assert.That(domain.HasIdentity, Is.True);
+            Assert.That(domain.Id, Is.GreaterThan(0));
+            Assert.That(domain.DomainName, Is.EqualTo("test.com"));
+            Assert.That(domain.RootContentId, Is.EqualTo(content.Id));
+            Assert.That(domain.LanguageId.HasValue, Is.False);
         }
     }
 
@@ -153,7 +153,7 @@ internal sealed class DomainRepositoryTest : UmbracoIntegrationTest
             // re-get
             domain = repo.Get(domain.Id);
 
-            Assert.IsNull(domain);
+            Assert.That(domain, Is.Null);
         }
     }
 
@@ -191,10 +191,10 @@ internal sealed class DomainRepositoryTest : UmbracoIntegrationTest
             // re-get
             domain = repo.Get(domain.Id);
 
-            Assert.AreEqual("blah.com", domain.DomainName);
-            Assert.AreEqual(content2.Id, domain.RootContentId);
-            Assert.AreEqual(lang2.Id, domain.LanguageId);
-            Assert.AreEqual(lang2.IsoCode, domain.LanguageIsoCode);
+            Assert.That(domain.DomainName, Is.EqualTo("blah.com"));
+            Assert.That(domain.RootContentId, Is.EqualTo(content2.Id));
+            Assert.That(domain.LanguageId, Is.EqualTo(lang2.Id));
+            Assert.That(domain.LanguageIsoCode, Is.EqualTo(lang2.IsoCode));
         }
     }
 
@@ -220,7 +220,7 @@ internal sealed class DomainRepositoryTest : UmbracoIntegrationTest
 
             var found = repo.Exists("test1.com");
 
-            Assert.IsTrue(found);
+            Assert.That(found, Is.True);
         }
     }
 
@@ -246,7 +246,7 @@ internal sealed class DomainRepositoryTest : UmbracoIntegrationTest
 
             var found = repo.GetByName("test1.com");
 
-            Assert.IsNotNull(found);
+            Assert.That(found, Is.Not.Null);
         }
     }
 
@@ -272,7 +272,7 @@ internal sealed class DomainRepositoryTest : UmbracoIntegrationTest
 
             var all = repo.GetMany();
 
-            Assert.AreEqual(10, all.Count());
+            Assert.That(all.Count(), Is.EqualTo(10));
         }
     }
 
@@ -300,7 +300,7 @@ internal sealed class DomainRepositoryTest : UmbracoIntegrationTest
 
             var all = repo.GetMany(ids.Take(8).ToArray());
 
-            Assert.AreEqual(8, all.Count());
+            Assert.That(all.Count(), Is.EqualTo(8));
         }
     }
 
@@ -329,7 +329,7 @@ internal sealed class DomainRepositoryTest : UmbracoIntegrationTest
 
             var all = repo.GetAll(false);
 
-            Assert.AreEqual(5, all.Count());
+            Assert.That(all.Count(), Is.EqualTo(5));
         }
     }
 
@@ -367,13 +367,13 @@ internal sealed class DomainRepositoryTest : UmbracoIntegrationTest
             }
 
             var all1 = repo.GetAssignedDomains(contentItems[0].Id, true);
-            Assert.AreEqual(5, all1.Count());
+            Assert.That(all1.Count(), Is.EqualTo(5));
 
             var all2 = repo.GetAssignedDomains(contentItems[1].Id, true);
-            Assert.AreEqual(5, all2.Count());
+            Assert.That(all2.Count(), Is.EqualTo(5));
 
             var all3 = repo.GetAssignedDomains(contentItems[2].Id, true);
-            Assert.AreEqual(0, all3.Count());
+            Assert.That(all3.Count(), Is.EqualTo(0));
         }
     }
 
@@ -411,10 +411,10 @@ internal sealed class DomainRepositoryTest : UmbracoIntegrationTest
             }
 
             var all1 = repo.GetAssignedDomains(contentItems[0].Id, false);
-            Assert.AreEqual(5, all1.Count());
+            Assert.That(all1.Count(), Is.EqualTo(5));
 
             var all2 = repo.GetAssignedDomains(contentItems[1].Id, false);
-            Assert.AreEqual(0, all2.Count());
+            Assert.That(all2.Count(), Is.EqualTo(0));
         }
     }
 
@@ -434,10 +434,10 @@ internal sealed class DomainRepositoryTest : UmbracoIntegrationTest
             var first = repo.GetByName("clone-test.com");
             var second = repo.GetByName("clone-test.com");
 
-            Assert.IsNotNull(first);
-            Assert.IsNotNull(second);
-            Assert.AreEqual(first!.Id, second!.Id);
-            Assert.AreNotSame(first, second);
+            Assert.That(first, Is.Not.Null);
+            Assert.That(second, Is.Not.Null);
+            Assert.That(second!.Id, Is.EqualTo(first!.Id));
+            Assert.That(second, Is.Not.SameAs(first));
         }
     }
 
@@ -454,8 +454,8 @@ internal sealed class DomainRepositoryTest : UmbracoIntegrationTest
             var domain = (IDomain)new UmbracoDomain("exists-test.com") { RootContentId = content.Id, LanguageId = lang.Id };
             repo.Save(domain);
 
-            Assert.IsTrue(repo.Exists("exists-test.com"));
-            Assert.IsFalse(repo.Exists("nonexistent.com"));
+            Assert.That(repo.Exists("exists-test.com"), Is.True);
+            Assert.That(repo.Exists("nonexistent.com"), Is.False);
         }
     }
 
@@ -473,13 +473,13 @@ internal sealed class DomainRepositoryTest : UmbracoIntegrationTest
             repo.Save(domain);
 
             var first = repo.GetByName("mutation-test.com");
-            Assert.IsNotNull(first);
+            Assert.That(first, Is.Not.Null);
             var originalName = first!.DomainName;
             first.DomainName = "MUTATED_" + Guid.NewGuid();
 
             var second = repo.GetByName("mutation-test.com");
-            Assert.IsNotNull(second);
-            Assert.AreEqual(originalName, second!.DomainName, "Mutation of a returned entity should not affect the cached copy");
+            Assert.That(second, Is.Not.Null);
+            Assert.That(second!.DomainName, Is.EqualTo(originalName), "Mutation of a returned entity should not affect the cached copy");
         }
     }
 
@@ -498,10 +498,10 @@ internal sealed class DomainRepositoryTest : UmbracoIntegrationTest
             repo.Save((IDomain)new UmbracoDomain("assigned2.com") { RootContentId = content.Id, LanguageId = lang.Id });
 
             var assigned = repo.GetAssignedDomains(content.Id, true).ToArray();
-            Assert.AreEqual(2, assigned.Length);
+            Assert.That(assigned, Has.Length.EqualTo(2));
 
             var unassigned = repo.GetAssignedDomains(-999, true).ToArray();
-            Assert.AreEqual(0, unassigned.Length);
+            Assert.That(unassigned, Is.Empty);
         }
     }
 }

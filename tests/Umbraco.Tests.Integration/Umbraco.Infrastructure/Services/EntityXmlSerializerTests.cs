@@ -103,33 +103,30 @@ internal sealed class EntityXmlSerializerTests : UmbracoIntegrationTest
         // Assert
         Assert.That(element, Is.Not.Null);
         Assert.That(element.Name.LocalName, Is.EqualTo(nodeName));
-        Assert.AreEqual(content.Id.ToString(), (string)element.Attribute("id"));
-        Assert.AreEqual(content.ParentId.ToString(), (string)element.Attribute("parentID"));
-        Assert.AreEqual(content.Level.ToString(), (string)element.Attribute("level"));
-        Assert.AreEqual(content.CreatorId.ToString(), (string)element.Attribute("creatorID"));
-        Assert.AreEqual(content.SortOrder.ToString(), (string)element.Attribute("sortOrder"));
-        Assert.AreEqual(content.CreateDate.ToString("s"), (string)element.Attribute("createDate"));
-        Assert.AreEqual(content.UpdateDate.ToString("s"), (string)element.Attribute("updateDate"));
-        Assert.AreEqual(content.Name, (string)element.Attribute("nodeName"));
-        Assert.AreEqual(urlName, (string)element.Attribute("urlName"));
-        Assert.AreEqual(content.Path, (string)element.Attribute("path"));
-        Assert.AreEqual(string.Empty, (string)element.Attribute("isDoc"));
-        Assert.AreEqual(content.ContentType.Id.ToString(), (string)element.Attribute("nodeType"));
-        Assert.AreEqual(content.GetCreatorProfile(UserService).Name, (string)element.Attribute("creatorName"));
-        Assert.AreEqual(content.GetWriterProfile(UserService).Name, (string)element.Attribute("writerName"));
-        Assert.AreEqual(content.WriterId.ToString(), (string)element.Attribute("writerID"));
-        Assert.AreEqual(content.TemplateId.ToString(), (string)element.Attribute("template"));
+        Assert.That((string)element.Attribute("id"), Is.EqualTo(content.Id.ToString()));
+        Assert.That((string)element.Attribute("parentID"), Is.EqualTo(content.ParentId.ToString()));
+        Assert.That((string)element.Attribute("level"), Is.EqualTo(content.Level.ToString()));
+        Assert.That((string)element.Attribute("creatorID"), Is.EqualTo(content.CreatorId.ToString()));
+        Assert.That((string)element.Attribute("sortOrder"), Is.EqualTo(content.SortOrder.ToString()));
+        Assert.That((string)element.Attribute("createDate"), Is.EqualTo(content.CreateDate.ToString("s")));
+        Assert.That((string)element.Attribute("updateDate"), Is.EqualTo(content.UpdateDate.ToString("s")));
+        Assert.That((string)element.Attribute("nodeName"), Is.EqualTo(content.Name));
+        Assert.That((string)element.Attribute("urlName"), Is.EqualTo(urlName));
+        Assert.That((string)element.Attribute("path"), Is.EqualTo(content.Path));
+        Assert.That((string)element.Attribute("isDoc"), Is.EqualTo(string.Empty));
+        Assert.That((string)element.Attribute("nodeType"), Is.EqualTo(content.ContentType.Id.ToString()));
+        Assert.That((string)element.Attribute("creatorName"), Is.EqualTo(content.GetCreatorProfile(UserService).Name));
+        Assert.That((string)element.Attribute("writerName"), Is.EqualTo(content.GetWriterProfile(UserService).Name));
+        Assert.That((string)element.Attribute("writerID"), Is.EqualTo(content.WriterId.ToString()));
+        Assert.That((string)element.Attribute("template"), Is.EqualTo(content.TemplateId.ToString()));
 
-        Assert.AreEqual(content.Properties["title"].GetValue().ToString(), element.Elements("title").Single().Value);
-        Assert.AreEqual(
-            content.Properties["bodyText"].GetValue().ToString(),
-            element.Elements("bodyText").Single().Value);
-        Assert.AreEqual(
-            content.Properties["keywords"].GetValue().ToString(),
-            element.Elements("keywords").Single().Value);
-        Assert.AreEqual(
-            content.Properties["description"].GetValue().ToString(),
-            element.Elements("description").Single().Value);
+        Assert.That(element.Elements("title").Single().Value, Is.EqualTo(content.Properties["title"].GetValue().ToString()));
+        Assert.That(
+            element.Elements("bodyText").Single().Value, Is.EqualTo(content.Properties["bodyText"].GetValue().ToString()));
+        Assert.That(
+            element.Elements("keywords").Single().Value, Is.EqualTo(content.Properties["keywords"].GetValue().ToString()));
+        Assert.That(
+            element.Elements("description").Single().Value, Is.EqualTo(content.Properties["description"].GetValue().ToString()));
     }
 
     [Test]
@@ -176,31 +173,26 @@ internal sealed class EntityXmlSerializerTests : UmbracoIntegrationTest
         // Assert
         Assert.That(element, Is.Not.Null);
         Assert.That(element.Name.LocalName, Is.EqualTo(nodeName));
-        Assert.AreEqual(media.Id.ToString(), (string)element.Attribute("id"));
-        Assert.AreEqual(media.ParentId.ToString(), (string)element.Attribute("parentID"));
-        Assert.AreEqual(media.Level.ToString(), (string)element.Attribute("level"));
-        Assert.AreEqual(media.SortOrder.ToString(), (string)element.Attribute("sortOrder"));
-        Assert.AreEqual(media.CreateDate.ToString("s"), (string)element.Attribute("createDate"));
-        Assert.AreEqual(media.UpdateDate.ToString("s"), (string)element.Attribute("updateDate"));
-        Assert.AreEqual(media.Name, (string)element.Attribute("nodeName"));
-        Assert.AreEqual(urlName, (string)element.Attribute("urlName"));
-        Assert.AreEqual(media.Path, (string)element.Attribute("path"));
-        Assert.AreEqual(string.Empty, (string)element.Attribute("isDoc"));
-        Assert.AreEqual(media.ContentType.Id.ToString(), (string)element.Attribute("nodeType"));
-        Assert.AreEqual(media.GetCreatorProfile(UserService).Name, (string)element.Attribute("writerName"));
-        Assert.AreEqual(media.CreatorId.ToString(), (string)element.Attribute("writerID"));
-        Assert.IsNull(element.Attribute("template"));
+        Assert.That((string)element.Attribute("id"), Is.EqualTo(media.Id.ToString()));
+        Assert.That((string)element.Attribute("parentID"), Is.EqualTo(media.ParentId.ToString()));
+        Assert.That((string)element.Attribute("level"), Is.EqualTo(media.Level.ToString()));
+        Assert.That((string)element.Attribute("sortOrder"), Is.EqualTo(media.SortOrder.ToString()));
+        Assert.That((string)element.Attribute("createDate"), Is.EqualTo(media.CreateDate.ToString("s")));
+        Assert.That((string)element.Attribute("updateDate"), Is.EqualTo(media.UpdateDate.ToString("s")));
+        Assert.That((string)element.Attribute("nodeName"), Is.EqualTo(media.Name));
+        Assert.That((string)element.Attribute("urlName"), Is.EqualTo(urlName));
+        Assert.That((string)element.Attribute("path"), Is.EqualTo(media.Path));
+        Assert.That((string)element.Attribute("isDoc"), Is.EqualTo(string.Empty));
+        Assert.That((string)element.Attribute("nodeType"), Is.EqualTo(media.ContentType.Id.ToString()));
+        Assert.That((string)element.Attribute("writerName"), Is.EqualTo(media.GetCreatorProfile(UserService).Name));
+        Assert.That((string)element.Attribute("writerID"), Is.EqualTo(media.CreatorId.ToString()));
+        Assert.That(element.Attribute("template"), Is.Null);
 
-        Assert.AreEqual(media.Properties[Constants.Conventions.Media.File].GetValue().ToString(),
-            element.Elements(Constants.Conventions.Media.File).Single().Value);
-        Assert.AreEqual(media.Properties[Constants.Conventions.Media.Width].GetValue().ToString(),
-            element.Elements(Constants.Conventions.Media.Width).Single().Value);
-        Assert.AreEqual(media.Properties[Constants.Conventions.Media.Height].GetValue().ToString(),
-            element.Elements(Constants.Conventions.Media.Height).Single().Value);
-        Assert.AreEqual(media.Properties[Constants.Conventions.Media.Bytes].GetValue().ToString(),
-            element.Elements(Constants.Conventions.Media.Bytes).Single().Value);
-        Assert.AreEqual(media.Properties[Constants.Conventions.Media.Extension].GetValue().ToString(),
-            element.Elements(Constants.Conventions.Media.Extension).Single().Value);
+        Assert.That(element.Elements(Constants.Conventions.Media.File).Single().Value, Is.EqualTo(media.Properties[Constants.Conventions.Media.File].GetValue().ToString()));
+        Assert.That(element.Elements(Constants.Conventions.Media.Width).Single().Value, Is.EqualTo(media.Properties[Constants.Conventions.Media.Width].GetValue().ToString()));
+        Assert.That(element.Elements(Constants.Conventions.Media.Height).Single().Value, Is.EqualTo(media.Properties[Constants.Conventions.Media.Height].GetValue().ToString()));
+        Assert.That(element.Elements(Constants.Conventions.Media.Bytes).Single().Value, Is.EqualTo(media.Properties[Constants.Conventions.Media.Bytes].GetValue().ToString()));
+        Assert.That(element.Elements(Constants.Conventions.Media.Extension).Single().Value, Is.EqualTo(media.Properties[Constants.Conventions.Media.Extension].GetValue().ToString()));
     }
 
     [Test]
@@ -283,8 +275,8 @@ internal sealed class EntityXmlSerializerTests : UmbracoIntegrationTest
         };
         parentItem.Translations = parentTranslations;
         var result = await dictionaryItemService.CreateAsync(parentItem, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(parentKey, result.Result.Key);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result.Key, Is.EqualTo(parentKey));
 
         var childKey = Guid.Parse("e7dba0a9-d517-4ba4-8e18-2764d392c611");
         var childItem =
@@ -296,7 +288,7 @@ internal sealed class EntityXmlSerializerTests : UmbracoIntegrationTest
         };
         childItem.Translations = childTranslations;
         result = await dictionaryItemService.CreateAsync(childItem, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(childKey, result.Result.Key);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result.Key, Is.EqualTo(childKey));
     }
 }

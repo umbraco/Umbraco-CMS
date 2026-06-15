@@ -32,7 +32,7 @@ internal sealed class DocumentHybridCacheTemplateTests : UmbracoIntegrationTestW
     {
         // Arrange
         var textPageBefore = await PublishedContentHybridCache.GetByIdAsync(TextpageId, true);
-        Assert.AreEqual(textPageBefore.TemplateId, TemplateId);
+        Assert.That(TemplateId, Is.EqualTo(textPageBefore.TemplateId));
         var updateModel = new ContentUpdateModel();
         {
             updateModel.TemplateKey = null;
@@ -43,8 +43,8 @@ internal sealed class DocumentHybridCacheTemplateTests : UmbracoIntegrationTestW
         var updateContentResult = await ContentEditingService.UpdateAsync(textPageBefore.Key, updateModel, Constants.Security.SuperUserKey);
 
         // Assert
-        Assert.AreEqual(updateContentResult.Status, ContentEditingOperationStatus.Success);
+        Assert.That(updateContentResult.Status, Is.EqualTo(ContentEditingOperationStatus.Success));
         var textPageAfter = await PublishedContentHybridCache.GetByIdAsync(TextpageId, true);
-        Assert.AreEqual(textPageAfter.TemplateId, null);
+        Assert.That(null, Is.EqualTo(textPageAfter.TemplateId));
     }
 }

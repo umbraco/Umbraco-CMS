@@ -131,7 +131,7 @@ internal sealed class RelationTypeRepositoryTest : UmbracoIntegrationTest
 
             // Assert
             Assert.That(relationTypes, Is.Not.Null);
-            Assert.That(relationTypes.Length, Is.EqualTo(12));
+            Assert.That(relationTypes, Has.Length.EqualTo(12));
             Assert.That(relationTypes.Any(x => x == null), Is.False);
         }
     }
@@ -266,10 +266,10 @@ internal sealed class RelationTypeRepositoryTest : UmbracoIntegrationTest
             var first = repository.Get(relationType.Key);
             var second = repository.Get(relationType.Key);
 
-            Assert.IsNotNull(first);
-            Assert.IsNotNull(second);
-            Assert.AreEqual(first!.Id, second!.Id);
-            Assert.AreNotSame(first, second);
+            Assert.That(first, Is.Not.Null);
+            Assert.That(second, Is.Not.Null);
+            Assert.That(second!.Id, Is.EqualTo(first!.Id));
+            Assert.That(second, Is.Not.SameAs(first));
         }
     }
 
@@ -283,8 +283,8 @@ internal sealed class RelationTypeRepositoryTest : UmbracoIntegrationTest
             var relationType = new RelationType("Test Exists", "testExists", true, Constants.ObjectTypes.Document, Constants.ObjectTypes.Document, false);
             repository.Save(relationType);
 
-            Assert.IsTrue(repository.Exists(relationType.Key));
-            Assert.IsFalse(repository.Exists(Guid.NewGuid()));
+            Assert.That(repository.Exists(relationType.Key), Is.True);
+            Assert.That(repository.Exists(Guid.NewGuid()), Is.False);
         }
     }
 
@@ -299,13 +299,13 @@ internal sealed class RelationTypeRepositoryTest : UmbracoIntegrationTest
             repository.Save(relationType);
 
             var first = repository.Get(relationType.Key);
-            Assert.IsNotNull(first);
+            Assert.That(first, Is.Not.Null);
             var originalName = first!.Name;
             first.Name = "MUTATED_" + Guid.NewGuid();
 
             var second = repository.Get(relationType.Key);
-            Assert.IsNotNull(second);
-            Assert.AreEqual(originalName, second!.Name, "Mutation of a returned entity should not affect the cached copy");
+            Assert.That(second, Is.Not.Null);
+            Assert.That(second!.Name, Is.EqualTo(originalName), "Mutation of a returned entity should not affect the cached copy");
         }
     }
 }

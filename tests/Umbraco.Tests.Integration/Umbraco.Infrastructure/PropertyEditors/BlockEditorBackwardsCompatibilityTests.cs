@@ -29,8 +29,8 @@ internal sealed class BlockEditorBackwardsCompatibilityTests : UmbracoIntegratio
     private static void AssertValueEquals(BlockItemData blockItemData, string propertyAlias, string expectedValue)
     {
         var blockPropertyValue = blockItemData.Values.FirstOrDefault(v => v.Alias == propertyAlias);
-        Assert.IsNotNull(blockPropertyValue);
-        Assert.AreEqual(expectedValue, blockPropertyValue.Value);
+        Assert.That(blockPropertyValue, Is.Not.Null);
+        Assert.That(blockPropertyValue.Value, Is.EqualTo(expectedValue));
     }
 
     private async Task<IContentType> CreateElementType()

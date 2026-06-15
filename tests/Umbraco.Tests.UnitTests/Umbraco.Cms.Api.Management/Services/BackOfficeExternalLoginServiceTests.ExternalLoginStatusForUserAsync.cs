@@ -33,12 +33,12 @@ public partial class BackOfficeExternalLoginServiceTests
         // act
         var providersAttempt = await externalLoginService.ExternalLoginStatusForUserAsync(userId);
 
-        Assert.True(providersAttempt.Success);
+        Assert.That(providersAttempt.Success, Is.True);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(1, providersAttempt.Result.Count(p => p.ProviderSchemeName.Equals(firstProviderName)));
-            Assert.AreEqual(1, providersAttempt.Result.Count(p => p.ProviderSchemeName.Equals(secondProviderName)));
-            Assert.AreEqual(2, providersAttempt.Result.Count());
+            Assert.That(providersAttempt.Result.Count(p => p.ProviderSchemeName.Equals(firstProviderName)), Is.EqualTo(1));
+            Assert.That(providersAttempt.Result.Count(p => p.ProviderSchemeName.Equals(secondProviderName)), Is.EqualTo(1));
+            Assert.That(providersAttempt.Result.Count(), Is.EqualTo(2));
         });
     }
 
@@ -68,8 +68,8 @@ public partial class BackOfficeExternalLoginServiceTests
         // act
         var providersAttempt = await externalLoginService.ExternalLoginStatusForUserAsync(userId);
 
-        Assert.True(providersAttempt.Success);
-        Assert.IsTrue(providersAttempt.Result.Single(p => p.ProviderSchemeName == firstProviderName).IsLinkedOnUser);
+        Assert.That(providersAttempt.Success, Is.True);
+        Assert.That(providersAttempt.Result.Single(p => p.ProviderSchemeName == firstProviderName).IsLinkedOnUser, Is.True);
     }
 
     [TestCase(true)]
@@ -94,9 +94,8 @@ public partial class BackOfficeExternalLoginServiceTests
         // act
         var providersAttempt = await externalLoginService.ExternalLoginStatusForUserAsync(userId);
 
-        Assert.True(providersAttempt.Success);
-        Assert.AreEqual(
-            allowManualLinking,
-            providersAttempt.Result.Single(p => p.ProviderSchemeName == providerName).HasManualLinkingEnabled);
+        Assert.That(providersAttempt.Success, Is.True);
+        Assert.That(
+            providersAttempt.Result.Single(p => p.ProviderSchemeName == providerName).HasManualLinkingEnabled, Is.EqualTo(allowManualLinking));
     }
 }

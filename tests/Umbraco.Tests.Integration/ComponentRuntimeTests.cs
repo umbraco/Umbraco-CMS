@@ -30,13 +30,13 @@ public class ComponentRuntimeTests : UmbracoIntegrationTest
 
         var myComponent = components.OfType<MyComponent>().First();
 
-        Assert.IsTrue(mainDom.IsMainDom);
-        Assert.IsNull(runtimeState.BootFailedException);
-        Assert.IsTrue(myComponent.IsInit, "The component was not initialized");
+        Assert.That(mainDom.IsMainDom, Is.True);
+        Assert.That(runtimeState.BootFailedException, Is.Null);
+        Assert.That(myComponent.IsInit, Is.True, "The component was not initialized");
 
         // force stop now
         await runtime.StopAsync(CancellationToken.None);
-        Assert.IsTrue(myComponent.IsTerminated, "The component was not terminated");
+        Assert.That(myComponent.IsTerminated, Is.True, "The component was not terminated");
     }
 
     public class MyComposer : IComposer

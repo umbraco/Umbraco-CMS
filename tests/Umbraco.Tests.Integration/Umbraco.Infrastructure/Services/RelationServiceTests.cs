@@ -76,17 +76,17 @@ internal sealed class RelationServiceTests : UmbracoIntegrationTest
 
         var paged = RelationService.GetPagedByRelationTypeId(relType.Id, 0, 4, out var totalRecs).ToList();
 
-        Assert.AreEqual(9, totalRecs);
-        Assert.AreEqual(4, paged.Count);
+        Assert.That(totalRecs, Is.EqualTo(9));
+        Assert.That(paged, Has.Count.EqualTo(4));
 
         // next page
         paged.AddRange(RelationService.GetPagedByRelationTypeId(relType.Id, 1, 4, out totalRecs));
 
-        Assert.AreEqual(9, totalRecs);
-        Assert.AreEqual(8, paged.Count);
+        Assert.That(totalRecs, Is.EqualTo(9));
+        Assert.That(paged, Has.Count.EqualTo(8));
 
-        Assert.IsTrue(createdContent.Select(x => x.Id).ContainsAll(paged.Select(x => x.ParentId)));
-        Assert.IsTrue(createdMedia.Select(x => x.Id).ContainsAll(paged.Select(x => x.ChildId)));
+        Assert.That(createdContent.Select(x => x.Id).ContainsAll(paged.Select(x => x.ParentId)), Is.True);
+        Assert.That(createdMedia.Select(x => x.Id).ContainsAll(paged.Select(x => x.ChildId)), Is.True);
     }
 
     [Test]
@@ -119,10 +119,10 @@ internal sealed class RelationServiceTests : UmbracoIntegrationTest
 
         var relations = RelationService.GetByChildId(m1.Id, Constants.Conventions.RelationTypes.RelatedMediaAlias)
             .ToList();
-        Assert.AreEqual(6, relations.Count);
+        Assert.That(relations, Has.Count.EqualTo(6));
 
         var entities = RelationService.GetParentEntitiesFromRelations(relations).ToList();
-        Assert.AreEqual(6, entities.Count);
+        Assert.That(entities, Has.Count.EqualTo(6));
     }
 
     [Test]
@@ -152,10 +152,10 @@ internal sealed class RelationServiceTests : UmbracoIntegrationTest
         }
 
         var relations = RelationService.GetByChildId(member.Id, Constants.Conventions.RelationTypes.RelatedMemberAlias).ToList();
-        Assert.AreEqual(6, relations.Count);
+        Assert.That(relations, Has.Count.EqualTo(6));
 
         var entities = RelationService.GetParentEntitiesFromRelations(relations).ToList();
-        Assert.AreEqual(6, entities.Count);
+        Assert.That(entities, Has.Count.EqualTo(6));
     }
 
     [Test]
@@ -175,11 +175,11 @@ internal sealed class RelationServiceTests : UmbracoIntegrationTest
         // re-get
         rt = RelationService.GetRelationTypeById(rt.Id);
 
-        Assert.AreEqual("Test", rt.Name);
-        Assert.AreEqual("repeatedEventOccurence", rt.Alias);
-        Assert.AreEqual(false, rt.IsBidirectional);
-        Assert.AreEqual(Constants.ObjectTypes.Document, rt.ParentObjectType.Value);
-        Assert.AreEqual(Constants.ObjectTypes.Media, rt.ChildObjectType.Value);
+        Assert.That(rt.Name, Is.EqualTo("Test"));
+        Assert.That(rt.Alias, Is.EqualTo("repeatedEventOccurence"));
+        Assert.That(rt.IsBidirectional, Is.EqualTo(false));
+        Assert.That(rt.ParentObjectType.Value, Is.EqualTo(Constants.ObjectTypes.Document));
+        Assert.That(rt.ChildObjectType.Value, Is.EqualTo(Constants.ObjectTypes.Media));
     }
 
     [Test]
@@ -193,8 +193,8 @@ internal sealed class RelationServiceTests : UmbracoIntegrationTest
         // re-get
         rt = RelationService.GetRelationTypeById(rt.Id);
 
-        Assert.IsNull(rt.ChildObjectType);
-        Assert.IsNull(rt.ParentObjectType);
+        Assert.That(rt.ChildObjectType, Is.Null);
+        Assert.That(rt.ParentObjectType, Is.Null);
     }
 
     [Test]
@@ -202,8 +202,8 @@ internal sealed class RelationServiceTests : UmbracoIntegrationTest
     {
         var r = await CreateAndSaveRelation("Test", "test");
 
-        Assert.AreEqual(Constants.ObjectTypes.Document, r.ParentObjectType);
-        Assert.AreEqual(Constants.ObjectTypes.Media, r.ChildObjectType);
+        Assert.That(r.ParentObjectType, Is.EqualTo(Constants.ObjectTypes.Document));
+        Assert.That(r.ChildObjectType, Is.EqualTo(Constants.ObjectTypes.Media));
     }
 
     [Test]
@@ -214,8 +214,8 @@ internal sealed class RelationServiceTests : UmbracoIntegrationTest
         // re-get
         r = RelationService.GetById(r.Id);
 
-        Assert.AreEqual(Constants.ObjectTypes.Document, r.ParentObjectType);
-        Assert.AreEqual(Constants.ObjectTypes.Media, r.ChildObjectType);
+        Assert.That(r.ParentObjectType, Is.EqualTo(Constants.ObjectTypes.Document));
+        Assert.That(r.ChildObjectType, Is.EqualTo(Constants.ObjectTypes.Media));
     }
 
     [Test]
@@ -225,11 +225,11 @@ internal sealed class RelationServiceTests : UmbracoIntegrationTest
 
         var newRelations = await CreateRelations(10);
 
-        Assert.IsTrue(newRelations.All(x => !x.HasIdentity));
+        Assert.That(newRelations.All(x => !x.HasIdentity), Is.True);
 
         RelationService.Save(newRelations);
 
-        Assert.IsTrue(newRelations.All(x => x.HasIdentity));
+        Assert.That(newRelations.All(x => x.HasIdentity), Is.True);
     }
 
     [Test]
@@ -247,7 +247,7 @@ internal sealed class RelationServiceTests : UmbracoIntegrationTest
 
         // insert
         RelationService.Save(newRelations);
-        Assert.IsTrue(newRelations.All(x => x.UpdateDate == date));
+        Assert.That(newRelations.All(x => x.UpdateDate == date), Is.True);
 
         var newDate = DateTime.UtcNow.AddDays(-5);
         foreach (var r in newRelations)
@@ -257,7 +257,7 @@ internal sealed class RelationServiceTests : UmbracoIntegrationTest
 
         // update
         RelationService.Save(newRelations);
-        Assert.IsTrue(newRelations.All(x => x.UpdateDate == newDate));
+        Assert.That(newRelations.All(x => x.UpdateDate == newDate), Is.True);
     }
 
     private async Task<IRelation> CreateAndSaveRelation(string name, string alias)

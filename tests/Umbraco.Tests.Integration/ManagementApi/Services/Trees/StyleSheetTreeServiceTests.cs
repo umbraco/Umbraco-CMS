@@ -21,12 +21,12 @@ public class StyleSheetTreeServiceTests : FileSystemTreeServiceTestsBase
         FileSystemTreeItemPresentationModel[] treeModel = service.GetSiblingsViewModels($"file5{FileExtension}", 1, 1, out long before, out var after);
         int index = Array.FindIndex(treeModel, item => item.Name == $"file5{FileExtension}");
 
-        Assert.AreEqual(treeModel[index].Name, $"file5{FileExtension}");
-        Assert.AreEqual(treeModel[index - 1].Name, $"file4{FileExtension}");
-        Assert.AreEqual(treeModel[index + 1].Name, $"file6{FileExtension}");
-        Assert.That(treeModel.Length == 3);
-        Assert.AreEqual(after, 3);
-        Assert.AreEqual(before, 4);
+        Assert.That($"file5{FileExtension}", Is.EqualTo(treeModel[index].Name));
+        Assert.That($"file4{FileExtension}", Is.EqualTo(treeModel[index - 1].Name));
+        Assert.That($"file6{FileExtension}", Is.EqualTo(treeModel[index + 1].Name));
+        Assert.That(treeModel, Has.Length.EqualTo(3));
+        Assert.That(after, Is.EqualTo(3));
+        Assert.That(before, Is.EqualTo(4));
     }
 
     [Test]
@@ -37,9 +37,9 @@ public class StyleSheetTreeServiceTests : FileSystemTreeServiceTestsBase
         var path = Path.Join("tests", $"file5{FileExtension}");
         FileSystemTreeItemPresentationModel[] treeModels = service.GetAncestorModels(path, true);
 
-        Assert.IsNotEmpty(treeModels);
-        Assert.AreEqual(treeModels.Length, 2);
-        Assert.AreEqual(treeModels[0].Name, "tests");
+        Assert.That(treeModels, Is.Not.Empty);
+        Assert.That(treeModels, Has.Length.EqualTo(2));
+        Assert.That(treeModels[0].Name, Is.EqualTo("tests"));
     }
 
     [Test]
@@ -49,8 +49,8 @@ public class StyleSheetTreeServiceTests : FileSystemTreeServiceTestsBase
 
         FileSystemTreeItemPresentationModel[] treeModels = service.GetPathViewModels(string.Empty, 0, int.MaxValue, out var totalItems);
 
-        Assert.IsNotEmpty(treeModels);
-        Assert.AreEqual(treeModels.Length, totalItems);
+        Assert.That(treeModels, Is.Not.Empty);
+        Assert.That(totalItems, Is.EqualTo(treeModels.Length));
     }
 
     [Test]
@@ -65,7 +65,7 @@ public class StyleSheetTreeServiceTests : FileSystemTreeServiceTestsBase
 
         FileSystemTreeItemPresentationModel[] treeModels = service.GetPathViewModels(string.Empty, 0, int.MaxValue, out var totalItems);
 
-        Assert.IsEmpty(treeModels.Where(file => file.Name.Contains(".invalid")));
-        Assert.AreEqual(treeModels.Length, totalItems);
+        Assert.That(treeModels.Where(file => file.Name.Contains(".invalid")), Is.Empty);
+        Assert.That(totalItems, Is.EqualTo(treeModels.Length));
     }
 }

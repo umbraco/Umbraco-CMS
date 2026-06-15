@@ -37,14 +37,14 @@ internal sealed class MemberFilterServiceTests : UmbracoIntegrationTest
         PagedModel<MemberFilterItem> result = await MemberFilterService.FilterAsync(new MemberFilter());
 
         // Assert
-        Assert.AreEqual(1, result.Total);
+        Assert.That(result.Total, Is.EqualTo(1));
         var item = result.Items.First();
-        Assert.AreEqual("content@test.com", item.Email);
-        Assert.IsFalse(item.IsExternalOnly);
-        Assert.AreEqual(MemberKind.Default, item.Kind);
-        Assert.IsNotNull(item.MemberTypeKey);
-        Assert.AreNotEqual(Guid.Empty, item.MemberTypeKey);
-        Assert.IsNotNull(item.MemberTypeIcon);
+        Assert.That(item.Email, Is.EqualTo("content@test.com"));
+        Assert.That(item.IsExternalOnly, Is.False);
+        Assert.That(item.Kind, Is.EqualTo(MemberKind.Default));
+        Assert.That(item.MemberTypeKey, Is.Not.Null);
+        Assert.That(item.MemberTypeKey, Is.Not.EqualTo(Guid.Empty));
+        Assert.That(item.MemberTypeIcon, Is.Not.Null);
     }
 
     [Test]
@@ -57,13 +57,13 @@ internal sealed class MemberFilterServiceTests : UmbracoIntegrationTest
         PagedModel<MemberFilterItem> result = await MemberFilterService.FilterAsync(new MemberFilter());
 
         // Assert
-        Assert.AreEqual(1, result.Total);
+        Assert.That(result.Total, Is.EqualTo(1));
         var item = result.Items.First();
-        Assert.AreEqual("external@test.com", item.Email);
-        Assert.IsTrue(item.IsExternalOnly);
-        Assert.AreEqual(MemberKind.ExternalOnly, item.Kind);
-        Assert.IsNull(item.MemberTypeKey);
-        Assert.IsNull(item.MemberTypeIcon);
+        Assert.That(item.Email, Is.EqualTo("external@test.com"));
+        Assert.That(item.IsExternalOnly, Is.True);
+        Assert.That(item.Kind, Is.EqualTo(MemberKind.ExternalOnly));
+        Assert.That(item.MemberTypeKey, Is.Null);
+        Assert.That(item.MemberTypeIcon, Is.Null);
     }
 
     [Test]
@@ -77,9 +77,9 @@ internal sealed class MemberFilterServiceTests : UmbracoIntegrationTest
         PagedModel<MemberFilterItem> result = await MemberFilterService.FilterAsync(new MemberFilter());
 
         // Assert
-        Assert.AreEqual(2, result.Total);
-        Assert.IsTrue(result.Items.Any(i => !i.IsExternalOnly));
-        Assert.IsTrue(result.Items.Any(i => i.IsExternalOnly));
+        Assert.That(result.Total, Is.EqualTo(2));
+        Assert.That(result.Items.Any(i => !i.IsExternalOnly), Is.True);
+        Assert.That(result.Items.Any(i => i.IsExternalOnly), Is.True);
     }
 
     [Test]
@@ -97,14 +97,14 @@ internal sealed class MemberFilterServiceTests : UmbracoIntegrationTest
         PagedModel<MemberFilterItem> page2 = await MemberFilterService.FilterAsync(new MemberFilter(), orderBy: "username", skip: 2, take: 2);
 
         // Assert
-        Assert.AreEqual(3, page1.Total);
-        Assert.AreEqual(2, page1.Items.Count());
-        Assert.AreEqual(3, page2.Total);
-        Assert.AreEqual(1, page2.Items.Count());
+        Assert.That(page1.Total, Is.EqualTo(3));
+        Assert.That(page1.Items.Count(), Is.EqualTo(2));
+        Assert.That(page2.Total, Is.EqualTo(3));
+        Assert.That(page2.Items.Count(), Is.EqualTo(1));
 
         // All 3 members should appear across both pages with no duplicates.
         var allUsernames = page1.Items.Concat(page2.Items).Select(i => i.UserName).ToList();
-        Assert.AreEqual(3, allUsernames.Distinct().Count());
+        Assert.That(allUsernames.Distinct().Count(), Is.EqualTo(3));
     }
 
     [Test]
@@ -121,9 +121,9 @@ internal sealed class MemberFilterServiceTests : UmbracoIntegrationTest
 
         // Assert — should be sorted: a-external, m-content, z-content.
         var usernames = result.Items.Select(i => i.UserName).ToList();
-        Assert.AreEqual("a-external", usernames[0]);
-        Assert.AreEqual("m-content", usernames[1]);
-        Assert.AreEqual("z-content", usernames[2]);
+        Assert.That(usernames[0], Is.EqualTo("a-external"));
+        Assert.That(usernames[1], Is.EqualTo("m-content"));
+        Assert.That(usernames[2], Is.EqualTo("z-content"));
     }
 
     [TestCase("email", Direction.Ascending)]
@@ -148,8 +148,8 @@ internal sealed class MemberFilterServiceTests : UmbracoIntegrationTest
 
         // Assert — query executes for every supported orderBy column and direction,
         // guarding against typos or casing mismatches in MapOrderByColumn's QCol(...) literals.
-        Assert.AreEqual(2, result.Total);
-        Assert.AreEqual(2, result.Items.Count());
+        Assert.That(result.Total, Is.EqualTo(2));
+        Assert.That(result.Items.Count(), Is.EqualTo(2));
     }
 
     [Test]
@@ -168,8 +168,8 @@ internal sealed class MemberFilterServiceTests : UmbracoIntegrationTest
             new MemberFilter { MemberTypeId = memberType.Key });
 
         // Assert — only the content member should be returned.
-        Assert.AreEqual(1, result.Total);
-        Assert.IsFalse(result.Items.First().IsExternalOnly);
+        Assert.That(result.Total, Is.EqualTo(1));
+        Assert.That(result.Items.First().IsExternalOnly, Is.False);
     }
 
     [Test]
@@ -190,8 +190,8 @@ internal sealed class MemberFilterServiceTests : UmbracoIntegrationTest
             new MemberFilter { IsApproved = true });
 
         // Assert — only the approved content member.
-        Assert.AreEqual(1, result.Total);
-        Assert.AreEqual("approved-content", result.Items.First().UserName);
+        Assert.That(result.Total, Is.EqualTo(1));
+        Assert.That(result.Items.First().UserName, Is.EqualTo("approved-content"));
     }
 
     [Test]
@@ -207,8 +207,8 @@ internal sealed class MemberFilterServiceTests : UmbracoIntegrationTest
             new MemberFilter { Filter = "alice" });
 
         // Assert — both Alice members, not Bob.
-        Assert.AreEqual(2, result.Total);
-        Assert.IsTrue(result.Items.All(i => i.UserName.Contains("alice")));
+        Assert.That(result.Total, Is.EqualTo(2));
+        Assert.That(result.Items.All(i => i.UserName.Contains("alice")), Is.True);
     }
 
     [Test]
@@ -237,9 +237,9 @@ internal sealed class MemberFilterServiceTests : UmbracoIntegrationTest
             new MemberFilter { MemberTypeId = memberType.Key, MemberGroupName = "FilterTestGroup" });
 
         // Assert — only the content member that matches both type AND group.
-        Assert.AreEqual(1, result.Total);
-        Assert.AreEqual("grouped-user", result.Items.First().UserName);
-        Assert.IsFalse(result.Items.First().IsExternalOnly);
+        Assert.That(result.Total, Is.EqualTo(1));
+        Assert.That(result.Items.First().UserName, Is.EqualTo("grouped-user"));
+        Assert.That(result.Items.First().IsExternalOnly, Is.False);
     }
 
     [Test]
@@ -265,8 +265,8 @@ internal sealed class MemberFilterServiceTests : UmbracoIntegrationTest
             new MemberFilter { MemberGroupName = "ApprovalTestGroup", IsApproved = true });
 
         // Assert — only the approved content member.
-        Assert.AreEqual(1, result.Total);
-        Assert.AreEqual("approved-content", result.Items.First().UserName);
+        Assert.That(result.Total, Is.EqualTo(1));
+        Assert.That(result.Items.First().UserName, Is.EqualTo("approved-content"));
     }
 
     [Test]
@@ -288,9 +288,9 @@ internal sealed class MemberFilterServiceTests : UmbracoIntegrationTest
             new MemberFilter { MemberGroupName = "SharedGroup" });
 
         // Assert — both members from the shared group.
-        Assert.AreEqual(2, result.Total);
-        Assert.IsTrue(result.Items.Any(i => !i.IsExternalOnly));
-        Assert.IsTrue(result.Items.Any(i => i.IsExternalOnly));
+        Assert.That(result.Total, Is.EqualTo(2));
+        Assert.That(result.Items.Any(i => !i.IsExternalOnly), Is.True);
+        Assert.That(result.Items.Any(i => i.IsExternalOnly), Is.True);
     }
 
     [Test]
@@ -300,8 +300,8 @@ internal sealed class MemberFilterServiceTests : UmbracoIntegrationTest
         PagedModel<MemberFilterItem> result = await MemberFilterService.FilterAsync(new MemberFilter());
 
         // Assert
-        Assert.AreEqual(0, result.Total);
-        Assert.IsFalse(result.Items.Any());
+        Assert.That(result.Total, Is.EqualTo(0));
+        Assert.That(result.Items.Any(), Is.False);
     }
 
     private async Task CreateContentMemberAsync(string email, string username)

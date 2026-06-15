@@ -35,19 +35,19 @@ internal sealed partial class MediaNavigationServiceTests
         Assert.Multiple(() =>
         {
             // Verify siblings count has decreased by one
-            Assert.AreEqual(initialSiblingsKeys.Count() - 1, updatedSiblingsKeys.Count());
+            Assert.That(updatedSiblingsKeys.Count(), Is.EqualTo(initialSiblingsKeys.Count() - 1));
             if (targetParentKey is null)
             {
-                Assert.IsNull(restoredItemParentKey);
+                Assert.That(restoredItemParentKey, Is.Null);
             }
             else
             {
-                Assert.IsNotNull(restoredItemParentKey);
-                Assert.AreNotEqual(initialParentKey, restoredItemParentKey);
+                Assert.That(restoredItemParentKey, Is.Not.Null);
+                Assert.That(restoredItemParentKey, Is.Not.EqualTo(initialParentKey));
             }
 
-            Assert.AreEqual(beforeRestoreDescendants, afterRestoreDescendants);
-            Assert.AreEqual(targetParentKey, restoredItemParentKey);
+            Assert.That(afterRestoreDescendants, Is.EqualTo(beforeRestoreDescendants));
+            Assert.That(restoredItemParentKey, Is.EqualTo(targetParentKey));
         });
     }
 
@@ -71,12 +71,12 @@ internal sealed partial class MediaNavigationServiceTests
         if (targetParentKey is null)
         {
             MediaNavigationQueryService.TryGetRootKeys(out IEnumerable<Guid> rootKeys);
-            Assert.AreEqual(nodeToRestore, rootKeys.Last());
+            Assert.That(rootKeys.Last(), Is.EqualTo(nodeToRestore));
         }
         else
         {
             MediaNavigationQueryService.TryGetChildrenKeys(targetParentKey.Value, out IEnumerable<Guid> childrenKeys);
-            Assert.AreEqual(nodeToRestore, childrenKeys.Last());
+            Assert.That(childrenKeys.Last(), Is.EqualTo(nodeToRestore));
         }
     }
 }

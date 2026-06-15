@@ -111,8 +111,8 @@ public class PropertyValidationServiceTests
         var result =
             validationService.IsPropertyDataValid(content, out var invalid, CultureImpact.Explicit("en-US", true));
 
-        Assert.IsFalse(result);
-        Assert.AreEqual(2, invalid.Length);
+        Assert.That(result, Is.False);
+        Assert.That(invalid.Length, Is.EqualTo(2));
     }
 
     [Test]
@@ -158,8 +158,8 @@ public class PropertyValidationServiceTests
         var result =
             validationService.IsPropertyDataValid(content, out var invalid, CultureImpact.Explicit("en-US", false));
 
-        Assert.IsFalse(result);
-        Assert.AreEqual(2, invalid.Length);
+        Assert.That(result, Is.False);
+        Assert.That(invalid.Length, Is.EqualTo(2));
     }
 
     [Test]
@@ -203,8 +203,8 @@ public class PropertyValidationServiceTests
         var result =
             validationService.IsPropertyDataValid(content, out var invalid, CultureImpact.Explicit("en-US", false));
 
-        Assert.IsFalse(result);
-        Assert.AreEqual(2, invalid.Length);
+        Assert.That(result, Is.False);
+        Assert.That(invalid.Length, Is.EqualTo(2));
     }
 
     [Test]
@@ -246,8 +246,8 @@ public class PropertyValidationServiceTests
 
         var result = validationService.IsPropertyDataValid(content, out var invalid, CultureImpact.Invariant);
 
-        Assert.IsFalse(result);
-        Assert.AreEqual(2, invalid.Length);
+        Assert.That(result, Is.False);
+        Assert.That(invalid.Length, Is.EqualTo(2));
     }
 
     [Test]
@@ -289,8 +289,8 @@ public class PropertyValidationServiceTests
 
         var result = validationService.IsPropertyDataValid(content, out var invalid, CultureImpact.All);
 
-        Assert.IsFalse(result);
-        Assert.AreEqual(4, invalid.Length);
+        Assert.That(result, Is.False);
+        Assert.That(invalid.Length, Is.EqualTo(4));
     }
 
     [TestCase(null)]
@@ -307,7 +307,7 @@ public class PropertyValidationServiceTests
         };
 
         var result = validationService.ValidatePropertyValue(p1, value, PropertyValidationContext.Empty());
-        Assert.AreEqual(0, result.Count());
+        Assert.That(result.Count(), Is.EqualTo(0));
     }
 
     // used so we can inject a mock - we should fix the base class DataValueEditor to be able to have the ILocalizedTextField passed

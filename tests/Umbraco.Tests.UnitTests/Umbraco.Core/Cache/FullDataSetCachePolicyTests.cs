@@ -48,7 +48,7 @@ public class FullDataSetCachePolicyTests
             new FullDataSetRepositoryCachePolicy<AuditItem, object>(cache.Object, DefaultAccessor, new SingleServerCacheVersionService(), Mock.Of<ICacheSyncService>(), item => item.Id, false);
 
         var unused = policy.Get(1, id => new AuditItem(1, AuditType.Copy, 123, "test", "blah"), ids => getAll);
-        Assert.IsTrue(isCached);
+        Assert.That(isCached, Is.True);
     }
 
     [Test]
@@ -66,7 +66,7 @@ public class FullDataSetCachePolicyTests
             new FullDataSetRepositoryCachePolicy<AuditItem, object>(cache.Object, DefaultAccessor, new SingleServerCacheVersionService(), Mock.Of<ICacheSyncService>(), item => item.Id, false);
 
         var found = defaultPolicy.Get(1, id => null, ids => getAll);
-        Assert.IsNotNull(found);
+        Assert.That(found, Is.Not.Null);
     }
 
     [Test]
@@ -96,16 +96,16 @@ public class FullDataSetCachePolicyTests
 
         var found = policy.GetAll(new object[] { }, ids => getAll);
 
-        Assert.AreEqual(1, cached.Count);
-        Assert.IsNotNull(list);
+        Assert.That(cached, Has.Count.EqualTo(1));
+        Assert.That(list, Is.Not.Null);
 
         // Do it again, ensure that its coming from the cache!
         policy = new FullDataSetRepositoryCachePolicy<AuditItem, object>(cache.Object, DefaultAccessor, new SingleServerCacheVersionService(), Mock.Of<ICacheSyncService>(), item => item.Id, false);
 
         found = policy.GetAll(new object[] { }, ids => getAll);
 
-        Assert.AreEqual(1, cached.Count);
-        Assert.IsNotNull(list);
+        Assert.That(cached, Has.Count.EqualTo(1));
+        Assert.That(list, Is.Not.Null);
     }
 
     [Test]
@@ -135,8 +135,8 @@ public class FullDataSetCachePolicyTests
 
         var found = defaultPolicy.GetAll(new object[] { }, ids => getAll);
 
-        Assert.AreEqual(1, cached.Count);
-        Assert.IsNotNull(list);
+        Assert.That(cached, Has.Count.EqualTo(1));
+        Assert.That(list, Is.Not.Null);
     }
 
     [Test]
@@ -157,7 +157,7 @@ public class FullDataSetCachePolicyTests
             new FullDataSetRepositoryCachePolicy<AuditItem, object>(cache.Object, DefaultAccessor, new SingleServerCacheVersionService(), Mock.Of<ICacheSyncService>(), item => item.Id, false);
 
         var found = defaultPolicy.GetAll(new object[] { }, ids => getAll);
-        Assert.AreEqual(2, found.Length);
+        Assert.That(found.Length, Is.EqualTo(2));
     }
 
     [Test]
@@ -186,7 +186,7 @@ public class FullDataSetCachePolicyTests
         }
         finally
         {
-            Assert.IsTrue(cacheCleared);
+            Assert.That(cacheCleared, Is.True);
         }
     }
 
@@ -216,7 +216,7 @@ public class FullDataSetCachePolicyTests
         }
         finally
         {
-            Assert.IsTrue(cacheCleared);
+            Assert.That(cacheCleared, Is.True);
         }
     }
 
@@ -270,7 +270,7 @@ public class FullDataSetCachePolicyTests
                     });
 
                     // Verify result integrity.
-                    Assert.AreEqual(100, result.Length, "Result should contain all items");
+                    Assert.That(result.Length, Is.EqualTo(100), "Result should contain all items");
                 }
                 catch (Exception e)
                 {
@@ -299,8 +299,8 @@ public class FullDataSetCachePolicyTests
         }
 
         // Assert - no thread-safety violations.
-        Assert.IsEmpty(
-            threadSafetyExceptions,
+        Assert.That(
+            threadSafetyExceptions, Is.Empty,
             $"Thread safety violation detected: {string.Join(Environment.NewLine, threadSafetyExceptions.Select(e => e.Message))}");
 
         // After the fix, database should ideally be called only once due to locking.
@@ -362,8 +362,8 @@ public class FullDataSetCachePolicyTests
                         {
                             // Reader thread.
                             var result = policy.GetAll(null, _ => initialData);
-                            Assert.IsNotNull(result);
-                            Assert.IsTrue(result.Length > 0);
+                            Assert.That(result, Is.Not.Null);
+                            Assert.That(result.Length, Is.GreaterThan(0));
                         }
                         else
                         {
@@ -403,8 +403,8 @@ public class FullDataSetCachePolicyTests
         }
 
         // Assert - no thread-safety violations.
-        Assert.IsEmpty(
-            threadSafetyExceptions,
+        Assert.That(
+            threadSafetyExceptions, Is.Empty,
             $"Thread safety violation detected: {string.Join(Environment.NewLine, threadSafetyExceptions.Select(e => e.Message))}");
     }
 }

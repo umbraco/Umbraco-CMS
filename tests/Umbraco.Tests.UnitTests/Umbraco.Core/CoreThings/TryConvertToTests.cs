@@ -14,36 +14,36 @@ public class TryConvertToTests
     public void ConvertToBoolTest()
     {
         var conv = 1.TryConvertTo<bool>();
-        Assert.IsTrue(conv);
-        Assert.AreEqual(true, conv.Result);
+        Assert.That((bool)conv, Is.True);
+        Assert.That(conv.Result, Is.EqualTo(true));
 
         conv = "1".TryConvertTo<bool>();
-        Assert.IsTrue(conv);
-        Assert.AreEqual(true, conv.Result);
+        Assert.That((bool)conv, Is.True);
+        Assert.That(conv.Result, Is.EqualTo(true));
 
         conv = 0.TryConvertTo<bool>();
-        Assert.IsTrue(conv);
-        Assert.AreEqual(false, conv.Result);
+        Assert.That((bool)conv, Is.True);
+        Assert.That(conv.Result, Is.EqualTo(false));
 
         conv = "0".TryConvertTo<bool>();
-        Assert.IsTrue(conv);
-        Assert.AreEqual(false, conv.Result);
+        Assert.That((bool)conv, Is.True);
+        Assert.That(conv.Result, Is.EqualTo(false));
 
         conv = "Yes".TryConvertTo<bool>();
-        Assert.IsTrue(conv);
-        Assert.AreEqual(true, conv.Result);
+        Assert.That((bool)conv, Is.True);
+        Assert.That(conv.Result, Is.EqualTo(true));
 
         conv = "yes".TryConvertTo<bool>();
-        Assert.IsTrue(conv);
-        Assert.AreEqual(true, conv.Result);
+        Assert.That((bool)conv, Is.True);
+        Assert.That(conv.Result, Is.EqualTo(true));
 
         conv = "No".TryConvertTo<bool>();
-        Assert.IsTrue(conv);
-        Assert.AreEqual(false, conv.Result);
+        Assert.That((bool)conv, Is.True);
+        Assert.That(conv.Result, Is.EqualTo(false));
 
         conv = "no".TryConvertTo<bool>();
-        Assert.IsTrue(conv);
-        Assert.AreEqual(false, conv.Result);
+        Assert.That((bool)conv, Is.True);
+        Assert.That(conv.Result, Is.EqualTo(false));
     }
 
     [Test]
@@ -82,7 +82,7 @@ public class TryConvertToTests
         }
 
         var conv = input.TryConvertTo<int>();
-        Assert.IsTrue(conv);
+        Assert.That((bool)conv, Is.True);
 
         return conv.Result;
     }
@@ -91,43 +91,43 @@ public class TryConvertToTests
     public void ConvertToDecimalTest()
     {
         var conv = "100".TryConvertTo<decimal>();
-        Assert.IsTrue(conv);
-        Assert.AreEqual(100m, conv.Result);
+        Assert.That((bool)conv, Is.True);
+        Assert.That(conv.Result, Is.EqualTo(100m));
 
         conv = "100.000".TryConvertTo<decimal>();
-        Assert.IsTrue(conv);
-        Assert.AreEqual(100m, conv.Result);
+        Assert.That((bool)conv, Is.True);
+        Assert.That(conv.Result, Is.EqualTo(100m));
 
         conv = "100,000".TryConvertTo<decimal>();
-        Assert.IsTrue(conv);
-        Assert.AreEqual(100m, conv.Result);
+        Assert.That((bool)conv, Is.True);
+        Assert.That(conv.Result, Is.EqualTo(100m));
 
         conv = "100.001".TryConvertTo<decimal>();
-        Assert.IsTrue(conv);
-        Assert.AreEqual(100.001m, conv.Result);
+        Assert.That((bool)conv, Is.True);
+        Assert.That(conv.Result, Is.EqualTo(100.001m));
 
         conv = 100m.TryConvertTo<decimal>();
-        Assert.IsTrue(conv);
-        Assert.AreEqual(100m, conv.Result);
+        Assert.That((bool)conv, Is.True);
+        Assert.That(conv.Result, Is.EqualTo(100m));
 
         conv = 100.000m.TryConvertTo<decimal>();
-        Assert.IsTrue(conv);
-        Assert.AreEqual(100m, conv.Result);
+        Assert.That((bool)conv, Is.True);
+        Assert.That(conv.Result, Is.EqualTo(100m));
 
         conv = 100.001m.TryConvertTo<decimal>();
-        Assert.IsTrue(conv);
-        Assert.AreEqual(100.001m, conv.Result);
+        Assert.That((bool)conv, Is.True);
+        Assert.That(conv.Result, Is.EqualTo(100.001m));
 
         conv = 100.TryConvertTo<decimal>();
-        Assert.IsTrue(conv);
-        Assert.AreEqual(100m, conv.Result);
+        Assert.That((bool)conv, Is.True);
+        Assert.That(conv.Result, Is.EqualTo(100m));
     }
 
     [Test]
     public void ConvertToDateTimeTest()
     {
         var conv = "2016-06-07".TryConvertTo<DateTime>();
-        Assert.IsTrue(conv);
-        Assert.AreEqual(new DateTime(2016, 6, 7), conv.Result);
+        Assert.That((bool)conv, Is.True);
+        Assert.That(conv.Result, Is.EqualTo(new DateTime(2016, 6, 7)));
     }
 }

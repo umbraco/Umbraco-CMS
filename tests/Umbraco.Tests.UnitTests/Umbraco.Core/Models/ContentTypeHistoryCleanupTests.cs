@@ -13,12 +13,12 @@ public class ContentTypeHistoryCleanupTests
     {
         var contentType = ContentTypeBuilder.CreateBasicContentType();
 
-        Assert.IsFalse(contentType.IsDirty());
+        Assert.That(contentType.IsDirty(), Is.False);
 
         var newValue = 2;
         contentType.HistoryCleanup.KeepAllVersionsNewerThanDays = newValue;
-        Assert.IsTrue(contentType.IsDirty());
-        Assert.AreEqual(newValue, contentType.HistoryCleanup.KeepAllVersionsNewerThanDays);
+        Assert.That(contentType.IsDirty(), Is.True);
+        Assert.That(contentType.HistoryCleanup.KeepAllVersionsNewerThanDays, Is.EqualTo(newValue));
     }
 
     [Test]
@@ -26,12 +26,12 @@ public class ContentTypeHistoryCleanupTests
     {
         var contentType = ContentTypeBuilder.CreateBasicContentType();
 
-        Assert.IsFalse(contentType.IsDirty());
+        Assert.That(contentType.IsDirty(), Is.False);
 
         var newValue = 2;
         contentType.HistoryCleanup.KeepLatestVersionPerDayForDays = newValue;
-        Assert.IsTrue(contentType.IsDirty());
-        Assert.AreEqual(newValue, contentType.HistoryCleanup.KeepLatestVersionPerDayForDays);
+        Assert.That(contentType.IsDirty(), Is.True);
+        Assert.That(contentType.HistoryCleanup.KeepLatestVersionPerDayForDays, Is.EqualTo(newValue));
     }
 
     [Test]
@@ -39,24 +39,24 @@ public class ContentTypeHistoryCleanupTests
     {
         var contentType = ContentTypeBuilder.CreateBasicContentType();
 
-        Assert.IsFalse(contentType.IsDirty());
+        Assert.That(contentType.IsDirty(), Is.False);
 
         var newValue = true;
         contentType.HistoryCleanup.PreventCleanup = newValue;
-        Assert.IsTrue(contentType.IsDirty());
-        Assert.AreEqual(newValue, contentType.HistoryCleanup.PreventCleanup);
+        Assert.That(contentType.IsDirty(), Is.True);
+        Assert.That(contentType.HistoryCleanup.PreventCleanup, Is.EqualTo(newValue));
     }
 
     [Test]
     public void Replacing_History_Cleanup_Registers_As_Dirty()
     {
         var contentType = ContentTypeBuilder.CreateBasicContentType();
-        Assert.IsFalse(contentType.IsDirty());
+        Assert.That(contentType.IsDirty(), Is.False);
 
         contentType.HistoryCleanup = new HistoryCleanup();
 
-        Assert.IsTrue(contentType.IsDirty());
-        Assert.IsTrue(contentType.IsPropertyDirty(nameof(contentType.HistoryCleanup)));
+        Assert.That(contentType.IsDirty(), Is.True);
+        Assert.That(contentType.IsPropertyDirty(nameof(contentType.HistoryCleanup)), Is.True);
     }
 
     [Test]
@@ -70,7 +70,7 @@ public class ContentTypeHistoryCleanupTests
         contentType.PropertyChanged += (sender, args) =>
         {
             // Ensure that property changed is only invoked for history cleanup
-            Assert.AreEqual(nameof(contentType.HistoryCleanup), args.PropertyName);
+            Assert.That(args.PropertyName, Is.EqualTo(nameof(contentType.HistoryCleanup)));
         };
 
         // Since we're replacing the entire HistoryCleanup the changed property is no longer dirty, the entire HistoryCleanup is
@@ -78,11 +78,11 @@ public class ContentTypeHistoryCleanupTests
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(contentType.IsDirty());
-            Assert.IsFalse(contentType.WasDirty());
-            Assert.AreEqual(2, contentType.GetDirtyProperties().Count());
-            Assert.IsTrue(contentType.IsPropertyDirty(nameof(contentType.HistoryCleanup)));
-            Assert.IsTrue(contentType.IsPropertyDirty(nameof(contentType.Alias)));
+            Assert.That(contentType.IsDirty(), Is.True);
+            Assert.That(contentType.WasDirty(), Is.False);
+            Assert.That(contentType.GetDirtyProperties().Count(), Is.EqualTo(2));
+            Assert.That(contentType.IsPropertyDirty(nameof(contentType.HistoryCleanup)), Is.True);
+            Assert.That(contentType.IsPropertyDirty(nameof(contentType.Alias)), Is.True);
         });
     }
 
@@ -98,7 +98,7 @@ public class ContentTypeHistoryCleanupTests
 
         oldHistoryCleanup.KeepAllVersionsNewerThanDays = 2;
 
-        Assert.IsFalse(contentType.IsDirty());
-        Assert.IsFalse(contentType.WasDirty());
+        Assert.That(contentType.IsDirty(), Is.False);
+        Assert.That(contentType.WasDirty(), Is.False);
     }
 }

@@ -31,16 +31,16 @@ internal sealed class TouchServerJobTests : UmbracoIntegrationTest
         TouchServerJob job = CreateJob(ApplicationMainUrl(null));
 
         // Before the job runs nothing has been registered, so the role cannot be determined.
-        Assert.AreEqual(ServerRole.Unknown, ServerRegistrationService.GetCurrentServerRole());
+        Assert.That(ServerRegistrationService.GetCurrentServerRole(), Is.EqualTo(ServerRole.Unknown));
 
         await job.RunJobAsync(CancellationToken.None);
 
         // The server is registered despite having no application URL, so election resolves the role to Single.
-        Assert.AreEqual(ServerRole.Single, ServerRegistrationService.GetCurrentServerRole());
+        Assert.That(ServerRegistrationService.GetCurrentServerRole(), Is.EqualTo(ServerRole.Single));
 
         IServerRegistration[] activeServers = ServerRegistrationService.GetActiveServers(refresh: true).ToArray();
         Assert.That(activeServers, Has.Length.EqualTo(1));
-        Assert.AreEqual(Environment.MachineName, activeServers[0].ServerAddress);
+        Assert.That(activeServers[0].ServerAddress, Is.EqualTo(Environment.MachineName));
     }
 
     [Test]
@@ -50,11 +50,11 @@ internal sealed class TouchServerJobTests : UmbracoIntegrationTest
 
         await job.RunJobAsync(CancellationToken.None);
 
-        Assert.AreEqual(ServerRole.Single, ServerRegistrationService.GetCurrentServerRole());
+        Assert.That(ServerRegistrationService.GetCurrentServerRole(), Is.EqualTo(ServerRole.Single));
 
         IServerRegistration[] activeServers = ServerRegistrationService.GetActiveServers(refresh: true).ToArray();
         Assert.That(activeServers, Has.Length.EqualTo(1));
-        Assert.AreEqual(ApplicationUrl, activeServers[0].ServerAddress);
+        Assert.That(activeServers[0].ServerAddress, Is.EqualTo(ApplicationUrl));
     }
 
     [Test]
@@ -70,9 +70,8 @@ internal sealed class TouchServerJobTests : UmbracoIntegrationTest
         await job.RunJobAsync(CancellationToken.None);
 
         // First touch: registered with the placeholder.
-        Assert.AreEqual(
-            Environment.MachineName,
-            ServerRegistrationService.GetActiveServers(refresh: true).Single().ServerAddress);
+        Assert.That(
+            ServerRegistrationService.GetActiveServers(refresh: true).Single().ServerAddress, Is.EqualTo(Environment.MachineName));
 
         applicationMainUrl = new Uri(ApplicationUrl);
         await job.RunJobAsync(CancellationToken.None);
@@ -80,8 +79,8 @@ internal sealed class TouchServerJobTests : UmbracoIntegrationTest
         // Second touch: the same (single) registration now holds the real URL, and the role is still Single.
         IServerRegistration[] activeServers = ServerRegistrationService.GetActiveServers(refresh: true).ToArray();
         Assert.That(activeServers, Has.Length.EqualTo(1));
-        Assert.AreEqual(ApplicationUrl, activeServers[0].ServerAddress);
-        Assert.AreEqual(ServerRole.Single, ServerRegistrationService.GetCurrentServerRole());
+        Assert.That(activeServers[0].ServerAddress, Is.EqualTo(ApplicationUrl));
+        Assert.That(ServerRegistrationService.GetCurrentServerRole(), Is.EqualTo(ServerRole.Single));
     }
 
     private static IHostingEnvironment ApplicationMainUrl(Uri? url)

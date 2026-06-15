@@ -38,14 +38,14 @@ internal sealed partial class UserServiceTests
             .GetDocumentPermissionsAsync(user.Key, [child.Key]);
 
         // Assert
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
         var nodePermissions = result.Result.ToArray();
-        Assert.AreEqual(1, nodePermissions.Length);
-        Assert.AreEqual(child.Key, nodePermissions[0].NodeKey);
+        Assert.That(nodePermissions, Has.Length.EqualTo(1));
+        Assert.That(nodePermissions[0].NodeKey, Is.EqualTo(child.Key));
 
         // Child should inherit parent's explicit permissions (Browse + Delete)
-        Assert.IsTrue(nodePermissions[0].Permissions.Contains(ActionBrowse.ActionLetter));
-        Assert.IsTrue(nodePermissions[0].Permissions.Contains(ActionDelete.ActionLetter));
+        Assert.That(nodePermissions[0].Permissions.Contains(ActionBrowse.ActionLetter), Is.True);
+        Assert.That(nodePermissions[0].Permissions.Contains(ActionDelete.ActionLetter), Is.True);
     }
 
     [Test]
@@ -77,14 +77,14 @@ internal sealed partial class UserServiceTests
             .GetDocumentPermissionsAsync(user.Key, [grandchild.Key]);
 
         // Assert
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
         var nodePermissions = result.Result.ToArray();
-        Assert.AreEqual(1, nodePermissions.Length);
-        Assert.AreEqual(grandchild.Key, nodePermissions[0].NodeKey);
+        Assert.That(nodePermissions, Has.Length.EqualTo(1));
+        Assert.That(nodePermissions[0].NodeKey, Is.EqualTo(grandchild.Key));
 
         // Grandchild should inherit parent's explicit permissions
-        Assert.IsTrue(nodePermissions[0].Permissions.Contains(ActionBrowse.ActionLetter));
-        Assert.IsTrue(nodePermissions[0].Permissions.Contains(ActionMove.ActionLetter));
+        Assert.That(nodePermissions[0].Permissions.Contains(ActionBrowse.ActionLetter), Is.True);
+        Assert.That(nodePermissions[0].Permissions.Contains(ActionMove.ActionLetter), Is.True);
     }
 
     [Test]
@@ -116,14 +116,14 @@ internal sealed partial class UserServiceTests
             .GetDocumentPermissionsAsync(user.Key, [child.Key]);
 
         // Assert
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
         var nodePermissions = result.Result.ToArray();
-        Assert.AreEqual(1, nodePermissions.Length);
+        Assert.That(nodePermissions, Has.Length.EqualTo(1));
 
         // Child should use its own explicit permissions, not parent's
-        Assert.IsTrue(nodePermissions[0].Permissions.Contains(ActionBrowse.ActionLetter));
-        Assert.IsTrue(nodePermissions[0].Permissions.Contains(ActionMove.ActionLetter));
-        Assert.IsFalse(nodePermissions[0].Permissions.Contains(ActionDelete.ActionLetter));
+        Assert.That(nodePermissions[0].Permissions.Contains(ActionBrowse.ActionLetter), Is.True);
+        Assert.That(nodePermissions[0].Permissions.Contains(ActionMove.ActionLetter), Is.True);
+        Assert.That(nodePermissions[0].Permissions.Contains(ActionDelete.ActionLetter), Is.False);
     }
 
     [Test]
@@ -157,14 +157,14 @@ internal sealed partial class UserServiceTests
             .GetDocumentPermissionsAsync(user.Key, [grandchild.Key]);
 
         // Assert - grandchild should inherit from child (nearest ancestor), not parent
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
         var nodePermissions = result.Result.ToArray();
-        Assert.AreEqual(1, nodePermissions.Length);
-        Assert.AreEqual(grandchild.Key, nodePermissions[0].NodeKey);
+        Assert.That(nodePermissions, Has.Length.EqualTo(1));
+        Assert.That(nodePermissions[0].NodeKey, Is.EqualTo(grandchild.Key));
 
-        Assert.IsTrue(nodePermissions[0].Permissions.Contains(ActionBrowse.ActionLetter));
-        Assert.IsTrue(nodePermissions[0].Permissions.Contains(ActionMove.ActionLetter));
-        Assert.IsFalse(nodePermissions[0].Permissions.Contains(ActionDelete.ActionLetter));
+        Assert.That(nodePermissions[0].Permissions.Contains(ActionBrowse.ActionLetter), Is.True);
+        Assert.That(nodePermissions[0].Permissions.Contains(ActionMove.ActionLetter), Is.True);
+        Assert.That(nodePermissions[0].Permissions.Contains(ActionDelete.ActionLetter), Is.False);
     }
 
     [Test]
@@ -195,13 +195,13 @@ internal sealed partial class UserServiceTests
             .GetDocumentPermissionsAsync(user.Key, [child.Key]);
 
         // Assert - child should get the group's default permissions.
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
         var nodePermissions = result.Result.ToArray();
-        Assert.AreEqual(1, nodePermissions.Length);
-        Assert.AreEqual(child.Key, nodePermissions[0].NodeKey);
-        Assert.AreEqual(2, nodePermissions[0].Permissions.Count);
-        Assert.IsTrue(nodePermissions[0].Permissions.Contains(ActionBrowse.ActionLetter));
-        Assert.IsTrue(nodePermissions[0].Permissions.Contains(ActionUpdate.ActionLetter));
+        Assert.That(nodePermissions, Has.Length.EqualTo(1));
+        Assert.That(nodePermissions[0].NodeKey, Is.EqualTo(child.Key));
+        Assert.That(nodePermissions[0].Permissions, Has.Count.EqualTo(2));
+        Assert.That(nodePermissions[0].Permissions.Contains(ActionBrowse.ActionLetter), Is.True);
+        Assert.That(nodePermissions[0].Permissions.Contains(ActionUpdate.ActionLetter), Is.True);
     }
 
     [Test]
@@ -234,22 +234,22 @@ internal sealed partial class UserServiceTests
             .GetDocumentPermissionsAsync(user.Key, [parent.Key, child.Key]);
 
         // Assert
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
         var nodePermissions = result.Result.ToArray();
-        Assert.AreEqual(2, nodePermissions.Length);
+        Assert.That(nodePermissions, Has.Length.EqualTo(2));
 
         var parentPermissions = nodePermissions.Single(x => x.NodeKey == parent.Key);
         var childPermissions = nodePermissions.Single(x => x.NodeKey == child.Key);
 
         // Parent should have default permissions only, not influenced by child's explicit permissions
-        Assert.AreEqual(2, parentPermissions.Permissions.Count);
-        Assert.IsTrue(parentPermissions.Permissions.Contains(ActionBrowse.ActionLetter));
-        Assert.IsTrue(parentPermissions.Permissions.Contains(ActionUpdate.ActionLetter));
+        Assert.That(parentPermissions.Permissions, Has.Count.EqualTo(2));
+        Assert.That(parentPermissions.Permissions.Contains(ActionBrowse.ActionLetter), Is.True);
+        Assert.That(parentPermissions.Permissions.Contains(ActionUpdate.ActionLetter), Is.True);
 
         // Child should have its own explicit permissions
-        Assert.AreEqual(2, childPermissions.Permissions.Count);
-        Assert.IsTrue(childPermissions.Permissions.Contains(ActionDelete.ActionLetter));
-        Assert.IsTrue(childPermissions.Permissions.Contains(ActionMove.ActionLetter));
+        Assert.That(childPermissions.Permissions, Has.Count.EqualTo(2));
+        Assert.That(childPermissions.Permissions.Contains(ActionDelete.ActionLetter), Is.True);
+        Assert.That(childPermissions.Permissions.Contains(ActionMove.ActionLetter), Is.True);
     }
 
     [Test]
@@ -268,8 +268,8 @@ internal sealed partial class UserServiceTests
             .GetDocumentPermissionsAsync(Guid.NewGuid(), [content.Key]);
 
         // Assert
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(UserOperationStatus.UserNotFound, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(UserOperationStatus.UserNotFound));
     }
 
     [Test]
@@ -299,17 +299,17 @@ internal sealed partial class UserServiceTests
         // Assert - verify only the new permissions exist
         var result = await UserService.GetDocumentPermissionsAsync(user.Key, [content.Key]);
 
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
         var nodePermissions = result.Result.ToArray();
-        Assert.AreEqual(1, nodePermissions.Length);
+        Assert.That(nodePermissions, Has.Length.EqualTo(1));
 
         // Old permissions should be gone
-        Assert.IsFalse(nodePermissions[0].Permissions.Contains(ActionBrowse.ActionLetter));
-        Assert.IsFalse(nodePermissions[0].Permissions.Contains(ActionDelete.ActionLetter));
+        Assert.That(nodePermissions[0].Permissions.Contains(ActionBrowse.ActionLetter), Is.False);
+        Assert.That(nodePermissions[0].Permissions.Contains(ActionDelete.ActionLetter), Is.False);
 
         // New permissions should be set
-        Assert.IsTrue(nodePermissions[0].Permissions.Contains(ActionMove.ActionLetter));
-        Assert.IsTrue(nodePermissions[0].Permissions.Contains(ActionUpdate.ActionLetter));
+        Assert.That(nodePermissions[0].Permissions.Contains(ActionMove.ActionLetter), Is.True);
+        Assert.That(nodePermissions[0].Permissions.Contains(ActionUpdate.ActionLetter), Is.True);
     }
 
     [Test]
@@ -338,17 +338,17 @@ internal sealed partial class UserServiceTests
         // Assert - verify permissions on both content items
         var result = await UserService.GetDocumentPermissionsAsync(user.Key, [content1.Key, content2.Key]);
 
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
         var nodePermissions = result.Result.ToArray();
-        Assert.AreEqual(2, nodePermissions.Length);
+        Assert.That(nodePermissions, Has.Length.EqualTo(2));
 
         var perms1 = nodePermissions.Single(x => x.NodeKey == content1.Key);
         var perms2 = nodePermissions.Single(x => x.NodeKey == content2.Key);
 
-        Assert.IsTrue(perms1.Permissions.Contains(ActionBrowse.ActionLetter));
-        Assert.IsTrue(perms1.Permissions.Contains(ActionMove.ActionLetter));
-        Assert.IsTrue(perms2.Permissions.Contains(ActionBrowse.ActionLetter));
-        Assert.IsTrue(perms2.Permissions.Contains(ActionMove.ActionLetter));
+        Assert.That(perms1.Permissions.Contains(ActionBrowse.ActionLetter), Is.True);
+        Assert.That(perms1.Permissions.Contains(ActionMove.ActionLetter), Is.True);
+        Assert.That(perms2.Permissions.Contains(ActionBrowse.ActionLetter), Is.True);
+        Assert.That(perms2.Permissions.Contains(ActionMove.ActionLetter), Is.True);
     }
 
     [Test]
@@ -375,15 +375,15 @@ internal sealed partial class UserServiceTests
         // Assert - verify permissions on both content items
         var result = await UserService.GetDocumentPermissionsAsync(user.Key, [content1.Key, content2.Key]);
 
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
         var nodePermissions = result.Result.ToArray();
-        Assert.AreEqual(2, nodePermissions.Length);
+        Assert.That(nodePermissions, Has.Length.EqualTo(2));
 
         var perms1 = nodePermissions.Single(x => x.NodeKey == content1.Key);
         var perms2 = nodePermissions.Single(x => x.NodeKey == content2.Key);
 
-        Assert.IsTrue(perms1.Permissions.Contains(ActionBrowse.ActionLetter));
-        Assert.IsTrue(perms2.Permissions.Contains(ActionBrowse.ActionLetter));
+        Assert.That(perms1.Permissions.Contains(ActionBrowse.ActionLetter), Is.True);
+        Assert.That(perms2.Permissions.Contains(ActionBrowse.ActionLetter), Is.True);
     }
 
     [Test]
@@ -408,9 +408,9 @@ internal sealed partial class UserServiceTests
             .GetDocumentPermissionsAsync(user.Key, Array.Empty<Guid>());
 
         // Assert
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(UserOperationStatus.Success, result.Status);
-        Assert.IsEmpty(result.Result);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(UserOperationStatus.Success));
+        Assert.That(result.Result, Is.Empty);
     }
 
     [Test]
@@ -438,10 +438,10 @@ internal sealed partial class UserServiceTests
         // Assert - both permissions should exist
         var result = await UserService.GetDocumentPermissionsAsync(user.Key, [content.Key]);
 
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
         var nodePermissions = result.Result.ToArray();
-        Assert.AreEqual(1, nodePermissions.Length);
-        Assert.IsTrue(nodePermissions[0].Permissions.Contains(ActionBrowse.ActionLetter));
-        Assert.IsTrue(nodePermissions[0].Permissions.Contains(ActionDelete.ActionLetter));
+        Assert.That(nodePermissions, Has.Length.EqualTo(1));
+        Assert.That(nodePermissions[0].Permissions.Contains(ActionBrowse.ActionLetter), Is.True);
+        Assert.That(nodePermissions[0].Permissions.Contains(ActionDelete.ActionLetter), Is.True);
     }
 }

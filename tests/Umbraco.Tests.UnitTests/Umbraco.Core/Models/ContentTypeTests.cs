@@ -52,11 +52,11 @@ public class ContentTypeTests
     {
         var contentType = BuildContentTypeSort();
         var clone = (ContentTypeSort)contentType.DeepClone();
-        Assert.AreNotSame(clone, contentType);
-        Assert.AreEqual(clone, contentType);
-        Assert.AreEqual(clone.Key, contentType.Key);
-        Assert.AreEqual(clone.SortOrder, contentType.SortOrder);
-        Assert.AreEqual(clone.Alias, contentType.Alias);
+        Assert.That(contentType, Is.Not.SameAs(clone));
+        Assert.That(contentType, Is.EqualTo(clone));
+        Assert.That(contentType.Key, Is.EqualTo(clone.Key));
+        Assert.That(contentType.SortOrder, Is.EqualTo(clone.SortOrder));
+        Assert.That(contentType.Alias, Is.EqualTo(clone.Alias));
     }
 
     private ContentTypeSort BuildContentTypeSort()
@@ -77,22 +77,22 @@ public class ContentTypeTests
 
         var clone = (ContentType)contentType.DeepCloneWithResetIdentities("newAlias");
 
-        Assert.AreEqual("newAlias", clone.Alias);
-        Assert.AreNotEqual("newAlias", contentType.Alias);
-        Assert.IsFalse(clone.HasIdentity);
+        Assert.That(clone.Alias, Is.EqualTo("newAlias"));
+        Assert.That(contentType.Alias, Is.Not.EqualTo("newAlias"));
+        Assert.That(clone.HasIdentity, Is.False);
 
         foreach (var propertyGroup in clone.PropertyGroups)
         {
-            Assert.IsFalse(propertyGroup.HasIdentity);
+            Assert.That(propertyGroup.HasIdentity, Is.False);
             foreach (var propertyType in propertyGroup.PropertyTypes)
             {
-                Assert.IsFalse(propertyType.HasIdentity);
+                Assert.That(propertyType.HasIdentity, Is.False);
             }
         }
 
         foreach (var propertyType in clone.PropertyTypes.Where(x => x.HasIdentity))
         {
-            Assert.IsFalse(propertyType.HasIdentity);
+            Assert.That(propertyType.HasIdentity, Is.False);
         }
     }
 
@@ -106,59 +106,59 @@ public class ContentTypeTests
         var clone = (ContentType)contentType.DeepClone();
 
         // Assert
-        Assert.AreNotSame(clone, contentType);
-        Assert.AreEqual(clone, contentType);
-        Assert.AreEqual(clone.Id, contentType.Id);
-        Assert.AreEqual(clone.AllowedTemplates.Count(), contentType.AllowedTemplates.Count());
+        Assert.That(contentType, Is.Not.SameAs(clone));
+        Assert.That(contentType, Is.EqualTo(clone));
+        Assert.That(contentType.Id, Is.EqualTo(clone.Id));
+        Assert.That(contentType.AllowedTemplates.Count(), Is.EqualTo(clone.AllowedTemplates.Count()));
         for (var index = 0; index < contentType.AllowedTemplates.Count(); index++)
         {
-            Assert.AreNotSame(clone.AllowedTemplates.ElementAt(index), contentType.AllowedTemplates.ElementAt(index));
-            Assert.AreEqual(clone.AllowedTemplates.ElementAt(index), contentType.AllowedTemplates.ElementAt(index));
+            Assert.That(contentType.AllowedTemplates.ElementAt(index), Is.Not.SameAs(clone.AllowedTemplates.ElementAt(index)));
+            Assert.That(contentType.AllowedTemplates.ElementAt(index), Is.EqualTo(clone.AllowedTemplates.ElementAt(index)));
         }
 
-        Assert.AreNotSame(clone.PropertyGroups, contentType.PropertyGroups);
-        Assert.AreEqual(clone.PropertyGroups.Count, contentType.PropertyGroups.Count);
+        Assert.That(contentType.PropertyGroups, Is.Not.SameAs(clone.PropertyGroups));
+        Assert.That(contentType.PropertyGroups, Has.Count.EqualTo(clone.PropertyGroups.Count));
         for (var index = 0; index < contentType.PropertyGroups.Count; index++)
         {
-            Assert.AreNotSame(clone.PropertyGroups[index], contentType.PropertyGroups[index]);
-            Assert.AreEqual(clone.PropertyGroups[index], contentType.PropertyGroups[index]);
+            Assert.That(contentType.PropertyGroups[index], Is.Not.SameAs(clone.PropertyGroups[index]));
+            Assert.That(contentType.PropertyGroups[index], Is.EqualTo(clone.PropertyGroups[index]));
         }
 
-        Assert.AreNotSame(clone.PropertyTypes, contentType.PropertyTypes);
-        Assert.AreEqual(clone.PropertyTypes.Count(), contentType.PropertyTypes.Count());
-        Assert.AreEqual(0, clone.NoGroupPropertyTypes.Count());
+        Assert.That(contentType.PropertyTypes, Is.Not.SameAs(clone.PropertyTypes));
+        Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(clone.PropertyTypes.Count()));
+        Assert.That(clone.NoGroupPropertyTypes.Count(), Is.EqualTo(0));
         for (var index = 0; index < contentType.PropertyTypes.Count(); index++)
         {
-            Assert.AreNotSame(clone.PropertyTypes.ElementAt(index), contentType.PropertyTypes.ElementAt(index));
-            Assert.AreEqual(clone.PropertyTypes.ElementAt(index), contentType.PropertyTypes.ElementAt(index));
+            Assert.That(contentType.PropertyTypes.ElementAt(index), Is.Not.SameAs(clone.PropertyTypes.ElementAt(index)));
+            Assert.That(contentType.PropertyTypes.ElementAt(index), Is.EqualTo(clone.PropertyTypes.ElementAt(index)));
         }
 
-        Assert.AreEqual(clone.CreateDate, contentType.CreateDate);
-        Assert.AreEqual(clone.CreatorId, contentType.CreatorId);
-        Assert.AreEqual(clone.Key, contentType.Key);
-        Assert.AreEqual(clone.Level, contentType.Level);
-        Assert.AreEqual(clone.Path, contentType.Path);
-        Assert.AreEqual(clone.SortOrder, contentType.SortOrder);
-        Assert.AreNotSame(clone.DefaultTemplate, contentType.DefaultTemplate);
-        Assert.AreEqual(clone.DefaultTemplate, contentType.DefaultTemplate);
-        Assert.AreEqual(clone.DefaultTemplateId, contentType.DefaultTemplateId);
-        Assert.AreEqual(clone.Trashed, contentType.Trashed);
-        Assert.AreEqual(clone.UpdateDate, contentType.UpdateDate);
-        Assert.AreEqual(clone.Thumbnail, contentType.Thumbnail);
-        Assert.AreEqual(clone.Icon, contentType.Icon);
-        Assert.AreEqual(clone.ListView, contentType.ListView);
+        Assert.That(contentType.CreateDate, Is.EqualTo(clone.CreateDate));
+        Assert.That(contentType.CreatorId, Is.EqualTo(clone.CreatorId));
+        Assert.That(contentType.Key, Is.EqualTo(clone.Key));
+        Assert.That(contentType.Level, Is.EqualTo(clone.Level));
+        Assert.That(contentType.Path, Is.EqualTo(clone.Path));
+        Assert.That(contentType.SortOrder, Is.EqualTo(clone.SortOrder));
+        Assert.That(contentType.DefaultTemplate, Is.Not.SameAs(clone.DefaultTemplate));
+        Assert.That(contentType.DefaultTemplate, Is.EqualTo(clone.DefaultTemplate));
+        Assert.That(contentType.DefaultTemplateId, Is.EqualTo(clone.DefaultTemplateId));
+        Assert.That(contentType.Trashed, Is.EqualTo(clone.Trashed));
+        Assert.That(contentType.UpdateDate, Is.EqualTo(clone.UpdateDate));
+        Assert.That(contentType.Thumbnail, Is.EqualTo(clone.Thumbnail));
+        Assert.That(contentType.Icon, Is.EqualTo(clone.Icon));
+        Assert.That(contentType.ListView, Is.EqualTo(clone.ListView));
 
         // This double verifies by reflection
         var allProps = clone.GetType().GetProperties();
         foreach (var propertyInfo in allProps)
         {
-            Assert.AreEqual(propertyInfo.GetValue(clone, null), propertyInfo.GetValue(contentType, null));
+            Assert.That(propertyInfo.GetValue(contentType, null), Is.EqualTo(propertyInfo.GetValue(clone, null)));
         }
 
         // Need to ensure the event handlers are wired
         var asDirty = (ICanBeDirty)clone;
 
-        Assert.IsFalse(asDirty.IsPropertyDirty("PropertyTypes"));
+        Assert.That(asDirty.IsPropertyDirty("PropertyTypes"), Is.False);
 
         var propertyTypeBuilder = new PropertyTypeBuilder();
         var additionalPropertyType = propertyTypeBuilder
@@ -166,10 +166,10 @@ public class ContentTypeTests
             .Build();
 
         clone.AddPropertyType(additionalPropertyType);
-        Assert.IsTrue(asDirty.IsPropertyDirty("PropertyTypes"));
-        Assert.IsFalse(asDirty.IsPropertyDirty("PropertyGroups"));
+        Assert.That(asDirty.IsPropertyDirty("PropertyTypes"), Is.True);
+        Assert.That(asDirty.IsPropertyDirty("PropertyGroups"), Is.False);
         clone.AddPropertyGroup("hello", "hello");
-        Assert.IsTrue(asDirty.IsPropertyDirty("PropertyGroups"));
+        Assert.That(asDirty.IsPropertyDirty("PropertyGroups"), Is.True);
     }
 
     [Test]
@@ -198,40 +198,40 @@ public class ContentTypeTests
         var clone = (MediaType)contentType.DeepClone();
 
         // Assert
-        Assert.AreNotSame(clone, contentType);
-        Assert.AreEqual(clone, contentType);
-        Assert.AreEqual(clone.Id, contentType.Id);
-        Assert.AreEqual(clone.PropertyGroups.Count, contentType.PropertyGroups.Count);
+        Assert.That(contentType, Is.Not.SameAs(clone));
+        Assert.That(contentType, Is.EqualTo(clone));
+        Assert.That(contentType.Id, Is.EqualTo(clone.Id));
+        Assert.That(contentType.PropertyGroups, Has.Count.EqualTo(clone.PropertyGroups.Count));
         for (var index = 0; index < contentType.PropertyGroups.Count; index++)
         {
-            Assert.AreNotSame(clone.PropertyGroups[index], contentType.PropertyGroups[index]);
-            Assert.AreEqual(clone.PropertyGroups[index], contentType.PropertyGroups[index]);
+            Assert.That(contentType.PropertyGroups[index], Is.Not.SameAs(clone.PropertyGroups[index]));
+            Assert.That(contentType.PropertyGroups[index], Is.EqualTo(clone.PropertyGroups[index]));
         }
 
-        Assert.AreEqual(clone.PropertyTypes.Count(), contentType.PropertyTypes.Count());
+        Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(clone.PropertyTypes.Count()));
         for (var index = 0; index < contentType.PropertyTypes.Count(); index++)
         {
-            Assert.AreNotSame(clone.PropertyTypes.ElementAt(index), contentType.PropertyTypes.ElementAt(index));
-            Assert.AreEqual(clone.PropertyTypes.ElementAt(index), contentType.PropertyTypes.ElementAt(index));
+            Assert.That(contentType.PropertyTypes.ElementAt(index), Is.Not.SameAs(clone.PropertyTypes.ElementAt(index)));
+            Assert.That(contentType.PropertyTypes.ElementAt(index), Is.EqualTo(clone.PropertyTypes.ElementAt(index)));
         }
 
-        Assert.AreEqual(clone.CreateDate, contentType.CreateDate);
-        Assert.AreEqual(clone.CreatorId, contentType.CreatorId);
-        Assert.AreEqual(clone.Key, contentType.Key);
-        Assert.AreEqual(clone.Level, contentType.Level);
-        Assert.AreEqual(clone.Path, contentType.Path);
-        Assert.AreEqual(clone.SortOrder, contentType.SortOrder);
-        Assert.AreEqual(clone.Trashed, contentType.Trashed);
-        Assert.AreEqual(clone.UpdateDate, contentType.UpdateDate);
-        Assert.AreEqual(clone.Thumbnail, contentType.Thumbnail);
-        Assert.AreEqual(clone.Icon, contentType.Icon);
-        Assert.AreEqual(clone.ListView, contentType.ListView);
+        Assert.That(contentType.CreateDate, Is.EqualTo(clone.CreateDate));
+        Assert.That(contentType.CreatorId, Is.EqualTo(clone.CreatorId));
+        Assert.That(contentType.Key, Is.EqualTo(clone.Key));
+        Assert.That(contentType.Level, Is.EqualTo(clone.Level));
+        Assert.That(contentType.Path, Is.EqualTo(clone.Path));
+        Assert.That(contentType.SortOrder, Is.EqualTo(clone.SortOrder));
+        Assert.That(contentType.Trashed, Is.EqualTo(clone.Trashed));
+        Assert.That(contentType.UpdateDate, Is.EqualTo(clone.UpdateDate));
+        Assert.That(contentType.Thumbnail, Is.EqualTo(clone.Thumbnail));
+        Assert.That(contentType.Icon, Is.EqualTo(clone.Icon));
+        Assert.That(contentType.ListView, Is.EqualTo(clone.ListView));
 
         // This double verifies by reflection
         var allProps = clone.GetType().GetProperties();
         foreach (var propertyInfo in allProps)
         {
-            Assert.AreEqual(propertyInfo.GetValue(clone, null), propertyInfo.GetValue(contentType, null));
+            Assert.That(propertyInfo.GetValue(contentType, null), Is.EqualTo(propertyInfo.GetValue(clone, null)));
         }
     }
 
@@ -261,40 +261,40 @@ public class ContentTypeTests
         var clone = (MemberType)contentType.DeepClone();
 
         // Assert
-        Assert.AreNotSame(clone, contentType);
-        Assert.AreEqual(clone, contentType);
-        Assert.AreEqual(clone.Id, contentType.Id);
-        Assert.AreEqual(clone.PropertyGroups.Count, contentType.PropertyGroups.Count);
+        Assert.That(contentType, Is.Not.SameAs(clone));
+        Assert.That(contentType, Is.EqualTo(clone));
+        Assert.That(contentType.Id, Is.EqualTo(clone.Id));
+        Assert.That(contentType.PropertyGroups, Has.Count.EqualTo(clone.PropertyGroups.Count));
         for (var index = 0; index < contentType.PropertyGroups.Count; index++)
         {
-            Assert.AreNotSame(clone.PropertyGroups[index], contentType.PropertyGroups[index]);
-            Assert.AreEqual(clone.PropertyGroups[index], contentType.PropertyGroups[index]);
+            Assert.That(contentType.PropertyGroups[index], Is.Not.SameAs(clone.PropertyGroups[index]));
+            Assert.That(contentType.PropertyGroups[index], Is.EqualTo(clone.PropertyGroups[index]));
         }
 
-        Assert.AreEqual(clone.PropertyTypes.Count(), contentType.PropertyTypes.Count());
+        Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(clone.PropertyTypes.Count()));
         for (var index = 0; index < contentType.PropertyTypes.Count(); index++)
         {
-            Assert.AreNotSame(clone.PropertyTypes.ElementAt(index), contentType.PropertyTypes.ElementAt(index));
-            Assert.AreEqual(clone.PropertyTypes.ElementAt(index), contentType.PropertyTypes.ElementAt(index));
+            Assert.That(contentType.PropertyTypes.ElementAt(index), Is.Not.SameAs(clone.PropertyTypes.ElementAt(index)));
+            Assert.That(contentType.PropertyTypes.ElementAt(index), Is.EqualTo(clone.PropertyTypes.ElementAt(index)));
         }
 
-        Assert.AreEqual(clone.CreateDate, contentType.CreateDate);
-        Assert.AreEqual(clone.CreatorId, contentType.CreatorId);
-        Assert.AreEqual(clone.Key, contentType.Key);
-        Assert.AreEqual(clone.Level, contentType.Level);
-        Assert.AreEqual(clone.Path, contentType.Path);
-        Assert.AreEqual(clone.SortOrder, contentType.SortOrder);
-        Assert.AreEqual(clone.Trashed, contentType.Trashed);
-        Assert.AreEqual(clone.UpdateDate, contentType.UpdateDate);
-        Assert.AreEqual(clone.Thumbnail, contentType.Thumbnail);
-        Assert.AreEqual(clone.Icon, contentType.Icon);
-        Assert.AreEqual(clone.ListView, contentType.ListView);
+        Assert.That(contentType.CreateDate, Is.EqualTo(clone.CreateDate));
+        Assert.That(contentType.CreatorId, Is.EqualTo(clone.CreatorId));
+        Assert.That(contentType.Key, Is.EqualTo(clone.Key));
+        Assert.That(contentType.Level, Is.EqualTo(clone.Level));
+        Assert.That(contentType.Path, Is.EqualTo(clone.Path));
+        Assert.That(contentType.SortOrder, Is.EqualTo(clone.SortOrder));
+        Assert.That(contentType.Trashed, Is.EqualTo(clone.Trashed));
+        Assert.That(contentType.UpdateDate, Is.EqualTo(clone.UpdateDate));
+        Assert.That(contentType.Thumbnail, Is.EqualTo(clone.Thumbnail));
+        Assert.That(contentType.Icon, Is.EqualTo(clone.Icon));
+        Assert.That(contentType.ListView, Is.EqualTo(clone.ListView));
 
         // This double verifies by reflection
         var allProps = clone.GetType().GetProperties();
         foreach (var propertyInfo in allProps)
         {
-            Assert.AreEqual(propertyInfo.GetValue(clone, null), propertyInfo.GetValue(contentType, null));
+            Assert.That(propertyInfo.GetValue(contentType, null), Is.EqualTo(propertyInfo.GetValue(clone, null)));
         }
     }
 
@@ -329,9 +329,9 @@ public class ContentTypeTests
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(isSensitive, memberType.IsSensitiveProperty(propertyTypeAlias));
-            Assert.AreEqual(canView, memberType.MemberCanViewProperty(propertyTypeAlias));
-            Assert.AreEqual(canEdit, memberType.MemberCanEditProperty(propertyTypeAlias));
+            Assert.That(memberType.IsSensitiveProperty(propertyTypeAlias), Is.EqualTo(isSensitive));
+            Assert.That(memberType.MemberCanViewProperty(propertyTypeAlias), Is.EqualTo(canView));
+            Assert.That(memberType.MemberCanEditProperty(propertyTypeAlias), Is.EqualTo(canEdit));
         });
     }
 

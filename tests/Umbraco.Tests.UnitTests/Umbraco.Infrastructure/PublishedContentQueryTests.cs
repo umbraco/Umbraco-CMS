@@ -142,20 +142,20 @@ internal sealed class PublishedContentQueryTests
 
         Assert.Multiple(() =>
         {
-            Assert.AreSame(content, query.Content(contentId));
-            Assert.AreSame(content, query.Content(contentKey));
-            Assert.AreSame(content, query.Content(contentUdi));
-            Assert.AreSame(content, query.Content((object)contentId));
-            Assert.AreSame(content, query.Content((object)contentId.ToString(CultureInfo.InvariantCulture)));
-            Assert.AreSame(content, query.Content((object)contentKey));
-            Assert.AreSame(content, query.Content((object)contentKey.ToString()));
-            Assert.AreSame(content, query.Content((object)contentUdi));
-            Assert.AreSame(content, query.Content((object)contentUdi.ToString()));
+            Assert.That(query.Content(contentId), Is.SameAs(content));
+            Assert.That(query.Content(contentKey), Is.SameAs(content));
+            Assert.That(query.Content(contentUdi), Is.SameAs(content));
+            Assert.That(query.Content((object)contentId), Is.SameAs(content));
+            Assert.That(query.Content((object)contentId.ToString(CultureInfo.InvariantCulture)), Is.SameAs(content));
+            Assert.That(query.Content((object)contentKey), Is.SameAs(content));
+            Assert.That(query.Content((object)contentKey.ToString()), Is.SameAs(content));
+            Assert.That(query.Content((object)contentUdi), Is.SameAs(content));
+            Assert.That(query.Content((object)contentUdi.ToString()), Is.SameAs(content));
 
-            Assert.IsNull(query.Content((Udi?)null));
-            Assert.IsNull(query.Content(new StringUdi(Constants.UdiEntityType.Member, "member-a")));
-            Assert.IsNull(query.Content((object)"umb://member/member-a"));
-            Assert.IsNull(query.Content((object)new object()));
+            Assert.That(query.Content((Udi?)null), Is.Null);
+            Assert.That(query.Content(new StringUdi(Constants.UdiEntityType.Member, "member-a")), Is.Null);
+            Assert.That(query.Content((object)"umb://member/member-a"), Is.Null);
+            Assert.That(query.Content((object)new object()), Is.Null);
         });
     }
 
@@ -175,12 +175,12 @@ internal sealed class PublishedContentQueryTests
 
         Assert.Multiple(() =>
         {
-            CollectionAssert.AreEqual(new[] { contentId }, query.Content([contentId, 99]).Select(x => x.Id).ToArray());
-            CollectionAssert.AreEqual(new[] { contentId }, query.Content([contentKey, Guid.NewGuid()]).Select(x => x.Id).ToArray());
+            Assert.That(query.Content([contentId, 99]).Select(x => x.Id).ToArray(), Is.EqualTo(new[] { contentId }).AsCollection);
+            Assert.That(query.Content([contentKey, Guid.NewGuid()]).Select(x => x.Id).ToArray(), Is.EqualTo(new[] { contentId }).AsCollection);
 
             var objectResults = query.Content(
                 [contentId, contentKey.ToString(), contentUdi.ToString(), "not-a-guid", new object()]).ToArray();
-            Assert.AreEqual(3, objectResults.Length);
+            Assert.That(objectResults.Length, Is.EqualTo(3));
             Assert.That(objectResults.All(x => x.Id == contentId));
         });
     }
@@ -210,7 +210,7 @@ internal sealed class PublishedContentQueryTests
             contentCache: contentCache.Object,
             documentNavigationQueryService: navigationQueryService.Object);
 
-        CollectionAssert.AreEqual(new[] { 1, 2 }, query.ContentAtRoot().Select(x => x.Id).ToArray());
+        Assert.That(query.ContentAtRoot().Select(x => x.Id).ToArray(), Is.EqualTo(new[] { 1, 2 }).AsCollection);
     }
 
     [Test]
@@ -224,7 +224,7 @@ internal sealed class PublishedContentQueryTests
             contentCache: new Mock<IPublishedContentCache>(MockBehavior.Strict).Object,
             documentNavigationQueryService: navigationQueryService.Object);
 
-        Assert.IsEmpty(query.ContentAtRoot());
+        Assert.That(query.ContentAtRoot(), Is.Empty);
     }
 
     [Test]
@@ -243,20 +243,20 @@ internal sealed class PublishedContentQueryTests
 
         Assert.Multiple(() =>
         {
-            Assert.AreSame(media, query.Media(mediaId));
-            Assert.AreSame(media, query.Media(mediaKey));
-            Assert.AreSame(media, query.Media(mediaUdi));
-            Assert.AreSame(media, query.Media((object)mediaId));
-            Assert.AreSame(media, query.Media((object)mediaId.ToString(CultureInfo.InvariantCulture)));
-            Assert.AreSame(media, query.Media((object)mediaKey));
-            Assert.AreSame(media, query.Media((object)mediaKey.ToString()));
-            Assert.AreSame(media, query.Media((object)mediaUdi));
-            Assert.AreSame(media, query.Media((object)mediaUdi.ToString()));
+            Assert.That(query.Media(mediaId), Is.SameAs(media));
+            Assert.That(query.Media(mediaKey), Is.SameAs(media));
+            Assert.That(query.Media(mediaUdi), Is.SameAs(media));
+            Assert.That(query.Media((object)mediaId), Is.SameAs(media));
+            Assert.That(query.Media((object)mediaId.ToString(CultureInfo.InvariantCulture)), Is.SameAs(media));
+            Assert.That(query.Media((object)mediaKey), Is.SameAs(media));
+            Assert.That(query.Media((object)mediaKey.ToString()), Is.SameAs(media));
+            Assert.That(query.Media((object)mediaUdi), Is.SameAs(media));
+            Assert.That(query.Media((object)mediaUdi.ToString()), Is.SameAs(media));
 
-            Assert.IsNull(query.Media((Udi?)null));
-            Assert.IsNull(query.Media(new StringUdi(Constants.UdiEntityType.Member, "member-a")));
-            Assert.IsNull(query.Media((object)"umb://member/member-a"));
-            Assert.IsNull(query.Media((object)new object()));
+            Assert.That(query.Media((Udi?)null), Is.Null);
+            Assert.That(query.Media(new StringUdi(Constants.UdiEntityType.Member, "member-a")), Is.Null);
+            Assert.That(query.Media((object)"umb://member/member-a"), Is.Null);
+            Assert.That(query.Media((object)new object()), Is.Null);
         });
     }
 
@@ -276,12 +276,12 @@ internal sealed class PublishedContentQueryTests
 
         Assert.Multiple(() =>
         {
-            CollectionAssert.AreEqual(new[] { mediaId }, query.Media([mediaId, 99]).Select(x => x.Id).ToArray());
-            CollectionAssert.AreEqual(new[] { mediaId }, query.Media([mediaKey, Guid.NewGuid()]).Select(x => x.Id).ToArray());
+            Assert.That(query.Media([mediaId, 99]).Select(x => x.Id).ToArray(), Is.EqualTo(new[] { mediaId }).AsCollection);
+            Assert.That(query.Media([mediaKey, Guid.NewGuid()]).Select(x => x.Id).ToArray(), Is.EqualTo(new[] { mediaId }).AsCollection);
 
             var objectResults = query.Media(
                 [mediaId, mediaKey.ToString(), mediaUdi.ToString(), "not-a-guid", new object()]).ToArray();
-            Assert.AreEqual(3, objectResults.Length);
+            Assert.That(objectResults.Length, Is.EqualTo(3));
             Assert.That(objectResults.All(x => x.Id == mediaId));
         });
     }
@@ -304,7 +304,7 @@ internal sealed class PublishedContentQueryTests
             mediaCache: mediaCache.Object,
             mediaNavigationQueryService: mediaNavigationQueryService.Object);
 
-        CollectionAssert.AreEqual(new[] { 7 }, query.MediaAtRoot().Select(x => x.Id).ToArray());
+        Assert.That(query.MediaAtRoot().Select(x => x.Id).ToArray(), Is.EqualTo(new[] { 7 }).AsCollection);
         mediaCache.Verify(x => x.GetById(false, mediaKey), Times.Once);
         contentCache.VerifyNoOtherCalls();
     }
@@ -320,7 +320,7 @@ internal sealed class PublishedContentQueryTests
             mediaCache: new Mock<IPublishedMediaCache>(MockBehavior.Strict).Object,
             mediaNavigationQueryService: mediaNavigationQueryService.Object);
 
-        Assert.IsEmpty(query.MediaAtRoot());
+        Assert.That(query.MediaAtRoot(), Is.Empty);
     }
 
     [Test]
@@ -370,10 +370,10 @@ internal sealed class PublishedContentQueryTests
 
         var results = query.Search(queryExecutor).ToArray();
 
-        CollectionAssert.AreEqual(new[] { 11 }, results.Select(x => x.Content.Id).ToArray());
-        Assert.AreEqual(1, queryExecutor.ExecuteCount);
-        Assert.AreEqual(0, queryExecutor.LastQueryOptions.Skip);
-        Assert.AreEqual(100, queryExecutor.LastQueryOptions.Take);
+        Assert.That(results.Select(x => x.Content.Id).ToArray(), Is.EqualTo(new[] { 11 }).AsCollection);
+        Assert.That(queryExecutor.ExecuteCount, Is.EqualTo(1));
+        Assert.That(queryExecutor.LastQueryOptions.Skip, Is.EqualTo(0));
+        Assert.That(queryExecutor.LastQueryOptions.Take, Is.EqualTo(100));
     }
 
     [Test]
@@ -386,10 +386,10 @@ internal sealed class PublishedContentQueryTests
 
         var results = query.Search(queryExecutor, 3, 2, out var totalRecords).ToArray();
 
-        Assert.AreEqual(44, totalRecords);
-        CollectionAssert.AreEqual(new[] { 12 }, results.Select(x => x.Content.Id).ToArray());
-        Assert.AreEqual(3, queryExecutor.LastQueryOptions.Skip);
-        Assert.AreEqual(2, queryExecutor.LastQueryOptions.Take);
+        Assert.That(totalRecords, Is.EqualTo(44));
+        Assert.That(results.Select(x => x.Content.Id).ToArray(), Is.EqualTo(new[] { 12 }).AsCollection);
+        Assert.That(queryExecutor.LastQueryOptions.Skip, Is.EqualTo(3));
+        Assert.That(queryExecutor.LastQueryOptions.Take, Is.EqualTo(2));
     }
 
     [Test]
@@ -402,11 +402,10 @@ internal sealed class PublishedContentQueryTests
 
         var results = query.Search(ordering, 0, 0, out var totalRecords).ToArray();
 
-        Assert.AreEqual(1, totalRecords);
-        CollectionAssert.AreEquivalent(
-            new[] { ExamineFieldNames.ItemIdFieldName, ExamineFieldNames.CategoryFieldName },
-            ordering.SelectedFieldNames);
-        CollectionAssert.AreEqual(new[] { 99 }, results.Select(x => x.Content.Id).ToArray());
+        Assert.That(totalRecords, Is.EqualTo(1));
+        Assert.That(
+            ordering.SelectedFieldNames, Is.EquivalentTo(new[] { ExamineFieldNames.ItemIdFieldName, ExamineFieldNames.CategoryFieldName }));
+        Assert.That(results.Select(x => x.Content.Id).ToArray(), Is.EqualTo(new[] { 99 }).AsCollection);
     }
 
     [Test]
@@ -424,16 +423,16 @@ internal sealed class PublishedContentQueryTests
         var queryExecutor = new TestQueryExecutor(CreateSearchResults(1, "14"));
         var results = query.Search(queryExecutor, 0, 0, out _, "fr-FR");
 
-        Assert.AreEqual("en-US", variationContextAccessor.Object.VariationContext?.Culture);
+        Assert.That(variationContextAccessor.Object.VariationContext?.Culture, Is.EqualTo("en-US"));
 
         using (var enumerator = results.GetEnumerator())
         {
-            Assert.AreEqual("fr-FR", variationContextAccessor.Object.VariationContext?.Culture);
-            Assert.IsTrue(enumerator.MoveNext());
-            Assert.AreEqual(14, enumerator.Current.Content.Id);
+            Assert.That(variationContextAccessor.Object.VariationContext?.Culture, Is.EqualTo("fr-FR"));
+            Assert.That(enumerator.MoveNext(), Is.True);
+            Assert.That(enumerator.Current.Content.Id, Is.EqualTo(14));
         }
 
-        Assert.AreEqual("en-US", variationContextAccessor.Object.VariationContext?.Culture);
+        Assert.That(variationContextAccessor.Object.VariationContext?.Culture, Is.EqualTo("en-US"));
     }
 
     [Test]
@@ -453,12 +452,12 @@ internal sealed class PublishedContentQueryTests
 
         using (var enumerator = results.GetEnumerator())
         {
-            Assert.AreEqual("fr-FR", variationContextAccessor.Object.VariationContext?.Culture);
-            Assert.IsTrue(enumerator.MoveNext());
-            Assert.AreEqual(15, enumerator.Current.Content.Id);
+            Assert.That(variationContextAccessor.Object.VariationContext?.Culture, Is.EqualTo("fr-FR"));
+            Assert.That(enumerator.MoveNext(), Is.True);
+            Assert.That(enumerator.Current.Content.Id, Is.EqualTo(15));
         }
 
-        Assert.AreEqual("fr-FR", variationContextAccessor.Object.VariationContext?.Culture);
+        Assert.That(variationContextAccessor.Object.VariationContext?.Culture, Is.EqualTo("fr-FR"));
     }
 
     private class TestQueryExecutor : IQueryExecutor

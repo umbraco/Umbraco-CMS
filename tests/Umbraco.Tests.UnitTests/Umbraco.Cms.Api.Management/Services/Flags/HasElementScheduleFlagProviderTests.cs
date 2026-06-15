@@ -28,21 +28,21 @@ internal class HasElementScheduleFlagProviderTests
     public void Can_Provide_Element_Tree_Flags()
     {
         var sut = CreateSut();
-        Assert.IsTrue(sut.CanProvideFlags<ElementTreeItemResponseModel>());
+        Assert.That(sut.CanProvideFlags<ElementTreeItemResponseModel>(), Is.True);
     }
 
     [Test]
     public void Can_Provide_Element_Item_Flags()
     {
         var sut = CreateSut();
-        Assert.IsTrue(sut.CanProvideFlags<ElementItemResponseModel>());
+        Assert.That(sut.CanProvideFlags<ElementItemResponseModel>(), Is.True);
     }
 
     [Test]
     public void Cannot_Provide_Document_Flags()
     {
         var sut = CreateSut();
-        Assert.IsFalse(sut.CanProvideFlags<DocumentTreeItemResponseModel>());
+        Assert.That(sut.CanProvideFlags<DocumentTreeItemResponseModel>(), Is.False);
     }
 
     [Test]
@@ -92,12 +92,12 @@ internal class HasElementScheduleFlagProviderTests
 
         await sut.PopulateFlagsAsync(viewModels);
 
-        Assert.AreEqual(0, viewModels[0].Variants.First(x => x.Culture == "da-DA").Flags.Count());
-        Assert.AreEqual(1, viewModels[0].Variants.First(x => x.Culture == "en-EN").Flags.Count());
-        Assert.AreEqual(1, viewModels[1].Variants.First().Flags.Count());
+        Assert.That(viewModels[0].Variants.First(x => x.Culture == "da-DA").Flags.Count(), Is.EqualTo(0));
+        Assert.That(viewModels[0].Variants.First(x => x.Culture == "en-EN").Flags.Count(), Is.EqualTo(1));
+        Assert.That(viewModels[1].Variants.First().Flags.Count(), Is.EqualTo(1));
 
         var flagModel = viewModels[0].Variants.First(x => x.Culture == "en-EN").Flags.First();
-        Assert.AreEqual("Umb.ScheduledForPublish", flagModel.Alias);
+        Assert.That(flagModel.Alias, Is.EqualTo("Umb.ScheduledForPublish"));
     }
 
     [Test]
@@ -147,12 +147,12 @@ internal class HasElementScheduleFlagProviderTests
 
         await sut.PopulateFlagsAsync(viewModels);
 
-        Assert.AreEqual(0, viewModels[0].Variants.First(x => x.Culture == "da-DA").Flags.Count());
-        Assert.AreEqual(1, viewModels[0].Variants.First(x => x.Culture == "en-EN").Flags.Count());
-        Assert.AreEqual(1, viewModels[1].Variants.First().Flags.Count());
+        Assert.That(viewModels[0].Variants.First(x => x.Culture == "da-DA").Flags.Count(), Is.EqualTo(0));
+        Assert.That(viewModels[0].Variants.First(x => x.Culture == "en-EN").Flags.Count(), Is.EqualTo(1));
+        Assert.That(viewModels[1].Variants.First().Flags.Count(), Is.EqualTo(1));
 
         var flagModel = viewModels[0].Variants.First(x => x.Culture == "en-EN").Flags.First();
-        Assert.AreEqual("Umb.ScheduledForPublish", flagModel.Alias);
+        Assert.That(flagModel.Alias, Is.EqualTo("Umb.ScheduledForPublish"));
     }
 
     [Test]
@@ -181,7 +181,7 @@ internal class HasElementScheduleFlagProviderTests
 
         await sut.PopulateFlagsAsync(viewModels);
 
-        Assert.AreEqual(0, viewModels[0].Variants.First().Flags.Count());
+        Assert.That(viewModels[0].Variants.First().Flags.Count(), Is.EqualTo(0));
     }
 
     [Test]

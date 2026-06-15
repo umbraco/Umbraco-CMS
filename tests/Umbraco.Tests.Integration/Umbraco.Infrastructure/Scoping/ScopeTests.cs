@@ -27,7 +27,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
         private new ScopeProvider ScopeProvider => (ScopeProvider)base.ScopeProvider;
 
         [SetUp]
-        public void SetUp() => Assert.IsNull(ScopeProvider.AmbientScope); // gone
+        public void SetUp() => Assert.That(ScopeProvider.AmbientScope, Is.Null); // gone
 
         protected override void ConfigureTestServices(IServiceCollection services)
         {
@@ -46,7 +46,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
         {
             ScopeProvider scopeProvider = ScopeProvider;
 
-            Assert.IsNull(ScopeProvider.AmbientScope);
+            Assert.That(ScopeProvider.AmbientScope, Is.Null);
             IScope mainScope = scopeProvider.CreateScope();
 
             var t = Task.Run(() =>
@@ -69,7 +69,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
             // this all runs in the same execution context so the AmbientScope reference isn't a copy
             ScopeProvider scopeProvider = ScopeProvider;
 
-            Assert.IsNull(ScopeProvider.AmbientScope);
+            Assert.That(ScopeProvider.AmbientScope, Is.Null);
             IScope mainScope = scopeProvider.CreateScope();
 
             IScope nested = scopeProvider.CreateScope(); // not disposing
@@ -84,7 +84,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
         {
             ScopeProvider scopeProvider = ScopeProvider;
 
-            Assert.IsNull(ScopeProvider.AmbientScope);
+            Assert.That(ScopeProvider.AmbientScope, Is.Null);
             IScope mainScope = scopeProvider.CreateScope();
 
             var t = Task.Run(() =>
@@ -119,7 +119,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
         {
             ScopeProvider scopeProvider = ScopeProvider;
 
-            Assert.IsNull(ScopeProvider.AmbientScope);
+            Assert.That(ScopeProvider.AmbientScope, Is.Null);
             IScope mainScope = scopeProvider.CreateScope();
 
             // Task.Run will flow the execution context unless ExecutionContext.SuppressFlow() is explicitly called.
@@ -149,15 +149,15 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
         {
             ScopeProvider scopeProvider = ScopeProvider;
 
-            Assert.IsNull(ScopeProvider.AmbientScope);
+            Assert.That(ScopeProvider.AmbientScope, Is.Null);
             using (IScope scope = scopeProvider.CreateScope())
             {
-                Assert.IsInstanceOf<Scope>(scope);
-                Assert.IsNotNull(scopeProvider.AmbientScope);
-                Assert.AreSame(scope, scopeProvider.AmbientScope);
+                Assert.That(scope, Is.InstanceOf<Scope>());
+                Assert.That(scopeProvider.AmbientScope, Is.Not.Null);
+                Assert.That(scopeProvider.AmbientScope, Is.SameAs(scope));
             }
 
-            Assert.IsNull(scopeProvider.AmbientScope);
+            Assert.That(scopeProvider.AmbientScope, Is.Null);
         }
 
         [Test]
@@ -165,19 +165,19 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
         {
             ScopeProvider scopeProvider = ScopeProvider;
 
-            Assert.IsNull(scopeProvider.AmbientScope);
+            Assert.That(scopeProvider.AmbientScope, Is.Null);
             using (IScope scope = scopeProvider.CreateScope())
             {
-                Assert.IsInstanceOf<Scope>(scope);
-                Assert.IsNotNull(scopeProvider.AmbientScope);
-                Assert.AreSame(scope, scopeProvider.AmbientScope);
+                Assert.That(scope, Is.InstanceOf<Scope>());
+                Assert.That(scopeProvider.AmbientScope, Is.Not.Null);
+                Assert.That(scopeProvider.AmbientScope, Is.SameAs(scope));
 
-                Assert.IsNotNull(scopeProvider.AmbientContext);
-                Assert.IsNotNull(scopeProvider.Context);
+                Assert.That(scopeProvider.AmbientContext, Is.Not.Null);
+                Assert.That(scopeProvider.Context, Is.Not.Null);
             }
 
-            Assert.IsNull(scopeProvider.AmbientScope);
-            Assert.IsNull(scopeProvider.AmbientContext);
+            Assert.That(scopeProvider.AmbientScope, Is.Null);
+            Assert.That(scopeProvider.AmbientContext, Is.Null);
         }
 
         [Test]
@@ -187,19 +187,19 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
 
             IUmbracoDatabase database;
 
-            Assert.IsNull(scopeProvider.AmbientScope);
+            Assert.That(scopeProvider.AmbientScope, Is.Null);
             using (IScope scope = scopeProvider.CreateScope())
             {
-                Assert.IsInstanceOf<Scope>(scope);
-                Assert.IsNotNull(scopeProvider.AmbientScope);
-                Assert.AreSame(scope, scopeProvider.AmbientScope);
+                Assert.That(scope, Is.InstanceOf<Scope>());
+                Assert.That(scopeProvider.AmbientScope, Is.Not.Null);
+                Assert.That(scopeProvider.AmbientScope, Is.SameAs(scope));
                 database = ScopeAccessor.AmbientScope.Database; // populates scope's database
-                Assert.IsNotNull(database);
-                Assert.IsNotNull(database.Connection); // in a transaction
+                Assert.That(database, Is.Not.Null);
+                Assert.That(database.Connection, Is.Not.Null); // in a transaction
             }
 
-            Assert.IsNull(scopeProvider.AmbientScope);
-            Assert.IsNull(database.Connection); // poof gone
+            Assert.That(scopeProvider.AmbientScope, Is.Null);
+            Assert.That(database.Connection, Is.Null); // poof gone
         }
 
         [Test]
@@ -207,22 +207,22 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
         {
             ScopeProvider scopeProvider = ScopeProvider;
 
-            Assert.IsNull(scopeProvider.AmbientScope);
+            Assert.That(scopeProvider.AmbientScope, Is.Null);
             using (IScope scope = scopeProvider.CreateScope())
             {
-                Assert.IsInstanceOf<Scope>(scope);
-                Assert.IsNotNull(scopeProvider.AmbientScope);
-                Assert.AreSame(scope, scopeProvider.AmbientScope);
+                Assert.That(scope, Is.InstanceOf<Scope>());
+                Assert.That(scopeProvider.AmbientScope, Is.Not.Null);
+                Assert.That(scopeProvider.AmbientScope, Is.SameAs(scope));
                 using (IScope nested = scopeProvider.CreateScope())
                 {
-                    Assert.IsInstanceOf<Scope>(nested);
-                    Assert.IsNotNull(scopeProvider.AmbientScope);
-                    Assert.AreSame(nested, scopeProvider.AmbientScope);
-                    Assert.AreSame(scope, ((Scope)nested).ParentScope);
+                    Assert.That(nested, Is.InstanceOf<Scope>());
+                    Assert.That(scopeProvider.AmbientScope, Is.Not.Null);
+                    Assert.That(scopeProvider.AmbientScope, Is.SameAs(nested));
+                    Assert.That(((Scope)nested).ParentScope, Is.SameAs(scope));
                 }
             }
 
-            Assert.IsNull(scopeProvider.AmbientScope);
+            Assert.That(scopeProvider.AmbientScope, Is.Null);
         }
 
         [Test]
@@ -230,33 +230,33 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
         {
             ScopeProvider scopeProvider = ScopeProvider;
 
-            Assert.IsNull(scopeProvider.AmbientScope);
+            Assert.That(scopeProvider.AmbientScope, Is.Null);
             using (IScope scope = scopeProvider.CreateScope())
             {
-                Assert.IsInstanceOf<Scope>(scope);
-                Assert.IsNotNull(scopeProvider.AmbientScope);
-                Assert.AreSame(scope, scopeProvider.AmbientScope);
-                Assert.IsNotNull(scopeProvider.AmbientContext);
+                Assert.That(scope, Is.InstanceOf<Scope>());
+                Assert.That(scopeProvider.AmbientScope, Is.Not.Null);
+                Assert.That(scopeProvider.AmbientScope, Is.SameAs(scope));
+                Assert.That(scopeProvider.AmbientContext, Is.Not.Null);
 
                 IScopeContext context;
                 using (IScope nested = scopeProvider.CreateScope())
                 {
-                    Assert.IsInstanceOf<Scope>(nested);
-                    Assert.IsNotNull(scopeProvider.AmbientScope);
-                    Assert.AreSame(nested, scopeProvider.AmbientScope);
-                    Assert.AreSame(scope, ((Scope)nested).ParentScope);
+                    Assert.That(nested, Is.InstanceOf<Scope>());
+                    Assert.That(scopeProvider.AmbientScope, Is.Not.Null);
+                    Assert.That(scopeProvider.AmbientScope, Is.SameAs(nested));
+                    Assert.That(((Scope)nested).ParentScope, Is.SameAs(scope));
 
-                    Assert.IsNotNull(scopeProvider.Context);
-                    Assert.IsNotNull(scopeProvider.AmbientContext);
+                    Assert.That(scopeProvider.Context, Is.Not.Null);
+                    Assert.That(scopeProvider.AmbientContext, Is.Not.Null);
                     context = scopeProvider.Context;
                 }
 
-                Assert.IsNotNull(scopeProvider.AmbientContext);
-                Assert.AreSame(context, scopeProvider.AmbientContext);
+                Assert.That(scopeProvider.AmbientContext, Is.Not.Null);
+                Assert.That(scopeProvider.AmbientContext, Is.SameAs(context));
             }
 
-            Assert.IsNull(scopeProvider.AmbientScope);
-            Assert.IsNull(scopeProvider.AmbientContext);
+            Assert.That(scopeProvider.AmbientScope, Is.Null);
+            Assert.That(scopeProvider.AmbientContext, Is.Null);
         }
 
         [Test]
@@ -265,22 +265,22 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
             ScopeProvider scopeProvider = ScopeProvider;
             bool? scopeCompleted = null;
 
-            Assert.IsNull(scopeProvider.AmbientScope);
+            Assert.That(scopeProvider.AmbientScope, Is.Null);
             try
             {
                 using (IScope scope = scopeProvider.CreateScope())
                 {
                     scopeProvider.Context.Enlist("test", completed => scopeCompleted = completed);
 
-                    Assert.IsInstanceOf<Scope>(scope);
-                    Assert.IsNotNull(scopeProvider.AmbientScope);
-                    Assert.AreSame(scope, scopeProvider.AmbientScope);
+                    Assert.That(scope, Is.InstanceOf<Scope>());
+                    Assert.That(scopeProvider.AmbientScope, Is.Not.Null);
+                    Assert.That(scopeProvider.AmbientScope, Is.SameAs(scope));
                     using (IScope nested = scopeProvider.CreateScope())
                     {
-                        Assert.IsInstanceOf<Scope>(nested);
-                        Assert.IsNotNull(scopeProvider.AmbientScope);
-                        Assert.AreSame(nested, scopeProvider.AmbientScope);
-                        Assert.AreSame(scope, ((Scope)nested).ParentScope);
+                        Assert.That(nested, Is.InstanceOf<Scope>());
+                        Assert.That(scopeProvider.AmbientScope, Is.Not.Null);
+                        Assert.That(scopeProvider.AmbientScope, Is.SameAs(nested));
+                        Assert.That(((Scope)nested).ParentScope, Is.SameAs(scope));
                         nested.Complete();
                         throw new Exception("bang!");
                     }
@@ -298,9 +298,9 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
                 }
             }
 
-            Assert.IsNull(scopeProvider.AmbientScope);
-            Assert.IsNotNull(scopeCompleted);
-            Assert.IsFalse(scopeCompleted.Value);
+            Assert.That(scopeProvider.AmbientScope, Is.Null);
+            Assert.That(scopeCompleted, Is.Not.Null);
+            Assert.That(scopeCompleted.Value, Is.False);
         }
 
         [Test]
@@ -310,29 +310,29 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
 
             IUmbracoDatabase database;
 
-            Assert.IsNull(scopeProvider.AmbientScope);
+            Assert.That(scopeProvider.AmbientScope, Is.Null);
             using (IScope scope = scopeProvider.CreateScope())
             {
-                Assert.IsInstanceOf<Scope>(scope);
-                Assert.IsNotNull(scopeProvider.AmbientScope);
-                Assert.AreSame(scope, scopeProvider.AmbientScope);
+                Assert.That(scope, Is.InstanceOf<Scope>());
+                Assert.That(scopeProvider.AmbientScope, Is.Not.Null);
+                Assert.That(scopeProvider.AmbientScope, Is.SameAs(scope));
                 database = ScopeAccessor.AmbientScope.Database; // populates scope's database
-                Assert.IsNotNull(database);
-                Assert.IsNotNull(database.Connection); // in a transaction
+                Assert.That(database, Is.Not.Null);
+                Assert.That(database.Connection, Is.Not.Null); // in a transaction
                 using (IScope nested = scopeProvider.CreateScope())
                 {
-                    Assert.IsInstanceOf<Scope>(nested);
-                    Assert.IsNotNull(scopeProvider.AmbientScope);
-                    Assert.AreSame(nested, scopeProvider.AmbientScope);
-                    Assert.AreSame(scope, ((Scope)nested).ParentScope);
-                    Assert.AreSame(database, ScopeAccessor.AmbientScope.Database);
+                    Assert.That(nested, Is.InstanceOf<Scope>());
+                    Assert.That(scopeProvider.AmbientScope, Is.Not.Null);
+                    Assert.That(scopeProvider.AmbientScope, Is.SameAs(nested));
+                    Assert.That(((Scope)nested).ParentScope, Is.SameAs(scope));
+                    Assert.That(ScopeAccessor.AmbientScope.Database, Is.SameAs(database));
                 }
 
-                Assert.IsNotNull(database.Connection); // still
+                Assert.That(database.Connection, Is.Not.Null); // still
             }
 
-            Assert.IsNull(scopeProvider.AmbientScope);
-            Assert.IsNull(database.Connection); // poof gone
+            Assert.That(scopeProvider.AmbientScope, Is.Null);
+            Assert.That(database.Connection, Is.Null); // poof gone
         }
 
         [Test]
@@ -350,13 +350,13 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
             {
                 ScopeAccessor.AmbientScope.Database.Execute("INSERT INTO tmp3 (id, name) VALUES (1, 'a')");
                 string n = ScopeAccessor.AmbientScope.Database.ExecuteScalar<string>("SELECT name FROM tmp3 WHERE id=1");
-                Assert.AreEqual("a", n);
+                Assert.That(n, Is.EqualTo("a"));
             }
 
             using (IScope scope = scopeProvider.CreateScope())
             {
                 string n = ScopeAccessor.AmbientScope.Database.ExecuteScalar<string>("SELECT name FROM tmp3 WHERE id=1");
-                Assert.IsNull(n);
+                Assert.That(n, Is.Null);
             }
 
             using (IScope scope = scopeProvider.CreateScope())
@@ -368,7 +368,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
             using (IScope scope = scopeProvider.CreateScope())
             {
                 string n = ScopeAccessor.AmbientScope.Database.ExecuteScalar<string>("SELECT name FROM tmp3 WHERE id=1");
-                Assert.AreEqual("a", n);
+                Assert.That(n, Is.EqualTo("a"));
             }
         }
 
@@ -387,17 +387,17 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
             {
                 ScopeAccessor.AmbientScope.Database.Execute("INSERT INTO tmp1 (id, name) VALUES (1, 'a')");
                 string n = ScopeAccessor.AmbientScope.Database.ExecuteScalar<string>("SELECT name FROM tmp1 WHERE id=1");
-                Assert.AreEqual("a", n);
+                Assert.That(n, Is.EqualTo("a"));
 
                 using (IScope nested = scopeProvider.CreateScope())
                 {
                     ScopeAccessor.AmbientScope.Database.Execute("INSERT INTO tmp1 (id, name) VALUES (2, 'b')");
                     string nn = ScopeAccessor.AmbientScope.Database.ExecuteScalar<string>("SELECT name FROM tmp1 WHERE id=2");
-                    Assert.AreEqual("b", nn);
+                    Assert.That(nn, Is.EqualTo("b"));
                 }
 
                 n = ScopeAccessor.AmbientScope.Database.ExecuteScalar<string>("SELECT name FROM tmp1 WHERE id=2");
-                Assert.AreEqual("b", n);
+                Assert.That(n, Is.EqualTo("b"));
 
                 scope.Complete();
             }
@@ -405,9 +405,9 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
             using (IScope scope = scopeProvider.CreateScope())
             {
                 string n = ScopeAccessor.AmbientScope.Database.ExecuteScalar<string>("SELECT name FROM tmp1 WHERE id=1");
-                Assert.IsNull(n);
+                Assert.That(n, Is.Null);
                 n = ScopeAccessor.AmbientScope.Database.ExecuteScalar<string>("SELECT name FROM tmp1 WHERE id=2");
-                Assert.IsNull(n);
+                Assert.That(n, Is.Null);
             }
         }
 
@@ -426,26 +426,26 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
             {
                 ScopeAccessor.AmbientScope.Database.Execute("INSERT INTO tmp2 (id, name) VALUES (1, 'a')");
                 string n = ScopeAccessor.AmbientScope.Database.ExecuteScalar<string>("SELECT name FROM tmp2 WHERE id=1");
-                Assert.AreEqual("a", n);
+                Assert.That(n, Is.EqualTo("a"));
 
                 using (IScope nested = scopeProvider.CreateScope())
                 {
                     ScopeAccessor.AmbientScope.Database.Execute("INSERT INTO tmp2 (id, name) VALUES (2, 'b')");
                     string nn = ScopeAccessor.AmbientScope.Database.ExecuteScalar<string>("SELECT name FROM tmp2 WHERE id=2");
-                    Assert.AreEqual("b", nn);
+                    Assert.That(nn, Is.EqualTo("b"));
                     nested.Complete();
                 }
 
                 n = ScopeAccessor.AmbientScope.Database.ExecuteScalar<string>("SELECT name FROM tmp2 WHERE id=2");
-                Assert.AreEqual("b", n);
+                Assert.That(n, Is.EqualTo("b"));
             }
 
             using (IScope scope = scopeProvider.CreateScope())
             {
                 string n = ScopeAccessor.AmbientScope.Database.ExecuteScalar<string>("SELECT name FROM tmp2 WHERE id=1");
-                Assert.IsNull(n);
+                Assert.That(n, Is.Null);
                 n = ScopeAccessor.AmbientScope.Database.ExecuteScalar<string>("SELECT name FROM tmp2 WHERE id=2");
-                Assert.IsNull(n);
+                Assert.That(n, Is.Null);
             }
         }
 
@@ -464,27 +464,27 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
             {
                 ScopeAccessor.AmbientScope.Database.Execute("INSERT INTO tmp (id, name) VALUES (1, 'a')");
                 string n = ScopeAccessor.AmbientScope.Database.ExecuteScalar<string>("SELECT name FROM tmp WHERE id=1");
-                Assert.AreEqual("a", n);
+                Assert.That(n, Is.EqualTo("a"));
 
                 using (IScope nested = scopeProvider.CreateScope())
                 {
                     ScopeAccessor.AmbientScope.Database.Execute("INSERT INTO tmp (id, name) VALUES (2, 'b')");
                     string nn = ScopeAccessor.AmbientScope.Database.ExecuteScalar<string>("SELECT name FROM tmp WHERE id=2");
-                    Assert.AreEqual("b", nn);
+                    Assert.That(nn, Is.EqualTo("b"));
                     nested.Complete();
                 }
 
                 n = ScopeAccessor.AmbientScope.Database.ExecuteScalar<string>("SELECT name FROM tmp WHERE id=2");
-                Assert.AreEqual("b", n);
+                Assert.That(n, Is.EqualTo("b"));
                 scope.Complete();
             }
 
             using (IScope scope = scopeProvider.CreateScope())
             {
                 string n = ScopeAccessor.AmbientScope.Database.ExecuteScalar<string>("SELECT name FROM tmp WHERE id=1");
-                Assert.AreEqual("a", n);
+                Assert.That(n, Is.EqualTo("a"));
                 n = ScopeAccessor.AmbientScope.Database.ExecuteScalar<string>("SELECT name FROM tmp WHERE id=2");
-                Assert.AreEqual("b", n);
+                Assert.That(n, Is.EqualTo("b"));
             }
         }
 
@@ -495,36 +495,36 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
             ScopeProvider scopeProvider = ScopeProvider;
             using (IScope scope = scopeProvider.CreateScope())
             {
-                Assert.IsNotNull(scopeProvider.AmbientScope);
-                Assert.IsNotNull(scopeProvider.AmbientContext);
+                Assert.That(scopeProvider.AmbientScope, Is.Not.Null);
+                Assert.That(scopeProvider.AmbientContext, Is.Not.Null);
 
                 // Run on another thread without a flowed context
                 Task t = taskHelper.ExecuteBackgroundTask(() =>
                 {
-                    Assert.IsNull(scopeProvider.AmbientScope);
-                    Assert.IsNull(scopeProvider.AmbientContext);
+                    Assert.That(scopeProvider.AmbientScope, Is.Null);
+                    Assert.That(scopeProvider.AmbientContext, Is.Null);
 
                     using (IScope newScope = scopeProvider.CreateScope())
                     {
-                        Assert.IsNotNull(scopeProvider.AmbientScope);
-                        Assert.IsNull(scopeProvider.AmbientScope.ParentScope);
-                        Assert.IsNotNull(scopeProvider.AmbientContext);
+                        Assert.That(scopeProvider.AmbientScope, Is.Not.Null);
+                        Assert.That(scopeProvider.AmbientScope.ParentScope, Is.Null);
+                        Assert.That(scopeProvider.AmbientContext, Is.Not.Null);
                     }
 
-                    Assert.IsNull(scopeProvider.AmbientScope);
-                    Assert.IsNull(scopeProvider.AmbientContext);
+                    Assert.That(scopeProvider.AmbientScope, Is.Null);
+                    Assert.That(scopeProvider.AmbientContext, Is.Null);
 
                     return Task.CompletedTask;
                 });
 
                 Task.WaitAll(t);
 
-                Assert.IsNotNull(scopeProvider.AmbientScope);
-                Assert.AreSame(scope, scopeProvider.AmbientScope);
+                Assert.That(scopeProvider.AmbientScope, Is.Not.Null);
+                Assert.That(scopeProvider.AmbientScope, Is.SameAs(scope));
             }
 
-            Assert.IsNull(scopeProvider.AmbientScope);
-            Assert.IsNull(scopeProvider.AmbientContext);
+            Assert.That(scopeProvider.AmbientScope, Is.Null);
+            Assert.That(scopeProvider.AmbientContext, Is.Null);
         }
 
         [Test]
@@ -532,39 +532,39 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
         {
             var taskHelper = new TaskHelper(Mock.Of<ILogger<TaskHelper>>());
             ScopeProvider scopeProvider = ScopeProvider;
-            Assert.IsNull(scopeProvider.AmbientScope);
+            Assert.That(scopeProvider.AmbientScope, Is.Null);
 
             using (IScope scope = scopeProvider.CreateScope())
             {
-                Assert.IsNotNull(scopeProvider.AmbientScope);
-                Assert.IsNotNull(scopeProvider.AmbientContext);
+                Assert.That(scopeProvider.AmbientScope, Is.Not.Null);
+                Assert.That(scopeProvider.AmbientContext, Is.Not.Null);
 
                 // Run on another thread without a flowed context
                 Task t = taskHelper.ExecuteBackgroundTask(() =>
                 {
-                    Assert.IsNull(scopeProvider.AmbientScope);
-                    Assert.IsNull(scopeProvider.AmbientContext);
+                    Assert.That(scopeProvider.AmbientScope, Is.Null);
+                    Assert.That(scopeProvider.AmbientContext, Is.Null);
 
                     using (IScope newScope = scopeProvider.CreateScope())
                     {
-                        Assert.IsNotNull(scopeProvider.AmbientScope);
-                        Assert.IsNull(scopeProvider.AmbientScope.ParentScope);
-                        Assert.IsNotNull(scopeProvider.AmbientContext);
+                        Assert.That(scopeProvider.AmbientScope, Is.Not.Null);
+                        Assert.That(scopeProvider.AmbientScope.ParentScope, Is.Null);
+                        Assert.That(scopeProvider.AmbientContext, Is.Not.Null);
                     }
 
-                    Assert.IsNull(scopeProvider.AmbientScope);
-                    Assert.IsNull(scopeProvider.AmbientContext);
+                    Assert.That(scopeProvider.AmbientScope, Is.Null);
+                    Assert.That(scopeProvider.AmbientContext, Is.Null);
                     return Task.CompletedTask;
                 });
 
                 Task.WaitAll(t);
 
-                Assert.IsNotNull(scopeProvider.AmbientScope);
-                Assert.AreSame(scope, scopeProvider.AmbientScope);
+                Assert.That(scopeProvider.AmbientScope, Is.Not.Null);
+                Assert.That(scopeProvider.AmbientScope, Is.SameAs(scope));
             }
 
-            Assert.IsNull(scopeProvider.AmbientScope);
-            Assert.IsNull(scopeProvider.AmbientContext);
+            Assert.That(scopeProvider.AmbientScope, Is.Null);
+            Assert.That(scopeProvider.AmbientContext, Is.Null);
         }
 
         [Test]
@@ -574,13 +574,13 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
             Scope scope = (Scope) scopeProvider.CreateScope();
             Scope nested = (Scope) scopeProvider.CreateScope();
 
-            Assert.IsNotNull(scopeProvider.AmbientScope);
+            Assert.That(scopeProvider.AmbientScope, Is.Not.Null);
 
             var scopeRef = new HttpScopeReference(scopeProvider);
             scopeRef.Register();
             scopeRef.Dispose();
 
-            Assert.IsNull(scopeProvider.AmbientScope);
+            Assert.That(scopeProvider.AmbientScope, Is.Null);
 
             Assert.Throws<ObjectDisposedException>(() =>
             {
@@ -602,7 +602,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
             IScope ambientScope = null;
             IScopeContext ambientContext = null;
 
-            Assert.IsNull(scopeProvider.AmbientScope);
+            Assert.That(scopeProvider.AmbientScope, Is.Null);
             using (IScope scope = scopeProvider.CreateScope())
             {
                 scopeProvider.Context.Enlist("name", c =>
@@ -617,12 +617,12 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
                 }
             }
 
-            Assert.IsNull(scopeProvider.AmbientScope);
-            Assert.IsNull(scopeProvider.AmbientContext);
-            Assert.IsNotNull(completed);
-            Assert.AreEqual(complete, completed.Value);
-            Assert.IsNull(ambientScope); // the scope is gone
-            Assert.IsNotNull(ambientContext); // the context is still there
+            Assert.That(scopeProvider.AmbientScope, Is.Null);
+            Assert.That(scopeProvider.AmbientContext, Is.Null);
+            Assert.That(completed, Is.Not.Null);
+            Assert.That(completed.Value, Is.EqualTo(complete));
+            Assert.That(ambientScope, Is.Null); // the scope is gone
+            Assert.That(ambientContext, Is.Not.Null); // the context is still there
         }
 
         [TestCase(true)]
@@ -634,7 +634,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
             bool? completed = null;
             bool? completed2 = null;
 
-            Assert.IsNull(scopeProvider.AmbientScope);
+            Assert.That(scopeProvider.AmbientScope, Is.Null);
             using (IScope scope = scopeProvider.CreateScope())
             {
                 scopeProvider.Context.Enlist("name", c =>
@@ -651,11 +651,11 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
                 }
             }
 
-            Assert.IsNull(scopeProvider.AmbientScope);
-            Assert.IsNull(scopeProvider.AmbientContext);
-            Assert.IsNotNull(completed);
-            Assert.AreEqual(complete, completed.Value);
-            Assert.AreEqual(complete, completed2.Value);
+            Assert.That(scopeProvider.AmbientScope, Is.Null);
+            Assert.That(scopeProvider.AmbientContext, Is.Null);
+            Assert.That(completed, Is.Not.Null);
+            Assert.That(completed.Value, Is.EqualTo(complete));
+            Assert.That(completed2.Value, Is.EqualTo(complete));
         }
 
         [Test]
@@ -665,7 +665,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
 
             bool? completed = null;
 
-            Assert.IsNull(scopeProvider.AmbientScope);
+            Assert.That(scopeProvider.AmbientScope, Is.Null);
             using (IScope scope = scopeProvider.CreateScope())
             {
                 IScope detached = scopeProvider.CreateDetachedScope();
@@ -680,15 +680,15 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
 
                 // even though disposing of the scope has thrown, it has exited
                 // properly ie it has removed itself, and the app remains clean
-                Assert.AreSame(scope, scopeProvider.AmbientScope);
+                Assert.That(scopeProvider.AmbientScope, Is.SameAs(scope));
                 scope.Complete();
             }
 
-            Assert.IsNull(scopeProvider.AmbientScope);
-            Assert.IsNull(scopeProvider.AmbientContext);
+            Assert.That(scopeProvider.AmbientScope, Is.Null);
+            Assert.That(scopeProvider.AmbientContext, Is.Null);
 
-            Assert.IsNotNull(completed);
-            Assert.AreEqual(true, completed);
+            Assert.That(completed, Is.Not.Null);
+            Assert.That(completed, Is.EqualTo(true));
         }
 
         [Test]
@@ -696,22 +696,22 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
         {
             ScopeProvider scopeProvider = ScopeProvider;
 
-            Assert.IsNull(scopeProvider.AmbientScope);
+            Assert.That(scopeProvider.AmbientScope, Is.Null);
             using (IScope scope = scopeProvider.CreateScope())
             {
-                Assert.IsInstanceOf<Scope>(scope);
-                Assert.IsNotNull(scopeProvider.AmbientScope);
-                Assert.AreSame(scope, scopeProvider.AmbientScope);
+                Assert.That(scope, Is.InstanceOf<Scope>());
+                Assert.That(scopeProvider.AmbientScope, Is.Not.Null);
+                Assert.That(scopeProvider.AmbientScope, Is.SameAs(scope));
 
-                Assert.IsNotNull(scopeProvider.AmbientContext); // the ambient context
-                Assert.IsNotNull(scopeProvider.Context); // the ambient context too (getter only)
+                Assert.That(scopeProvider.AmbientContext, Is.Not.Null); // the ambient context
+                Assert.That(scopeProvider.Context, Is.Not.Null); // the ambient context too (getter only)
                 IScopeContext context = scopeProvider.Context;
 
                 IScope detached = scopeProvider.CreateDetachedScope();
                 scopeProvider.AttachScope(detached);
 
-                Assert.AreEqual(detached, scopeProvider.AmbientScope);
-                Assert.AreNotSame(context, scopeProvider.Context);
+                Assert.That(scopeProvider.AmbientScope, Is.EqualTo(detached));
+                Assert.That(scopeProvider.Context, Is.Not.SameAs(context));
 
                 // nesting under detached!
                 using (IScope nested = scopeProvider.CreateScope())
@@ -723,14 +723,14 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
                     nested.Complete();
                 }
 
-                Assert.AreEqual(detached, scopeProvider.AmbientScope);
-                Assert.AreNotSame(context, scopeProvider.Context);
+                Assert.That(scopeProvider.AmbientScope, Is.EqualTo(detached));
+                Assert.That(scopeProvider.Context, Is.Not.SameAs(context));
 
                 // can detach
-                Assert.AreSame(detached, scopeProvider.DetachScope());
+                Assert.That(scopeProvider.DetachScope(), Is.SameAs(detached));
 
-                Assert.AreSame(scope, scopeProvider.AmbientScope);
-                Assert.AreSame(context, scopeProvider.AmbientContext);
+                Assert.That(scopeProvider.AmbientScope, Is.SameAs(scope));
+                Assert.That(scopeProvider.AmbientContext, Is.SameAs(context));
 
                 Assert.Throws<InvalidOperationException>(() =>
 
@@ -743,12 +743,12 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
                 detached.Dispose();
 
                 // has self-detached, and is gone!
-                Assert.AreSame(scope, scopeProvider.AmbientScope);
-                Assert.AreSame(context, scopeProvider.AmbientContext);
+                Assert.That(scopeProvider.AmbientScope, Is.SameAs(scope));
+                Assert.That(scopeProvider.AmbientContext, Is.SameAs(context));
             }
 
-            Assert.IsNull(scopeProvider.AmbientScope);
-            Assert.IsNull(scopeProvider.AmbientContext);
+            Assert.That(scopeProvider.AmbientScope, Is.Null);
+            Assert.That(scopeProvider.AmbientContext, Is.Null);
         }
     }
 }

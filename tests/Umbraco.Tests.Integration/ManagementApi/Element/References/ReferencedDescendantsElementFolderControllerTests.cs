@@ -25,7 +25,7 @@ public class ReferencedDescendantsElementFolderControllerTests
             $"Test Folder {Guid.NewGuid()}",
             null,
             Constants.Security.SuperUserKey);
-        Assert.IsTrue(folderResult.Success);
+        Assert.That(folderResult.Success, Is.True);
         _folderKey = folderResult.Result!.Key;
     }
 

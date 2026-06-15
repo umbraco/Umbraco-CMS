@@ -34,10 +34,10 @@ internal sealed class StylesheetServiceTests : UmbracoIntegrationTest
 
         var result = await StylesheetService.CreateAsync(createModel, Constants.Security.SuperUserKey);
 
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(StylesheetOperationStatus.Success, result.Status);
-        Assert.IsNotNull(result.Result);
-        Assert.AreEqual("TestStylesheet.css", result.Result.Name);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(StylesheetOperationStatus.Success));
+        Assert.That(result.Result, Is.Not.Null);
+        Assert.That(result.Result.Name, Is.EqualTo("TestStylesheet.css"));
     }
 
     [Test]
@@ -49,7 +49,7 @@ internal sealed class StylesheetServiceTests : UmbracoIntegrationTest
             Content = "body { color: red; }"
         };
         var createResult = await StylesheetService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(createResult.Success);
+        Assert.That(createResult.Success, Is.True);
 
         var updateModel = new StylesheetUpdateModel
         {
@@ -58,9 +58,9 @@ internal sealed class StylesheetServiceTests : UmbracoIntegrationTest
 
         var result = await StylesheetService.UpdateAsync(createResult.Result!.Path, updateModel, Constants.Security.SuperUserKey);
 
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(StylesheetOperationStatus.Success, result.Status);
-        Assert.IsNotNull(result.Result);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(StylesheetOperationStatus.Success));
+        Assert.That(result.Result, Is.Not.Null);
         Assert.That(result.Result.Content, Does.Contain("blue"));
     }
 
@@ -73,14 +73,14 @@ internal sealed class StylesheetServiceTests : UmbracoIntegrationTest
             Content = "body { color: red; }"
         };
         var createResult = await StylesheetService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(createResult.Success);
+        Assert.That(createResult.Success, Is.True);
 
         var result = await StylesheetService.DeleteAsync(createResult.Result!.Path, Constants.Security.SuperUserKey);
 
-        Assert.AreEqual(StylesheetOperationStatus.Success, result);
+        Assert.That(result, Is.EqualTo(StylesheetOperationStatus.Success));
 
         var getResult = await StylesheetService.GetAsync(createResult.Result.Path);
-        Assert.IsNull(getResult);
+        Assert.That(getResult, Is.Null);
     }
 
     [Test]
@@ -92,7 +92,7 @@ internal sealed class StylesheetServiceTests : UmbracoIntegrationTest
             Content = "body { color: red; }"
         };
         var createResult = await StylesheetService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(createResult.Success);
+        Assert.That(createResult.Success, Is.True);
 
         var renameModel = new StylesheetRenameModel
         {
@@ -101,10 +101,10 @@ internal sealed class StylesheetServiceTests : UmbracoIntegrationTest
 
         var result = await StylesheetService.RenameAsync(createResult.Result!.Path, renameModel, Constants.Security.SuperUserKey);
 
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(StylesheetOperationStatus.Success, result.Status);
-        Assert.IsNotNull(result.Result);
-        Assert.AreEqual("RenamedStylesheet.css", result.Result.Name);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(StylesheetOperationStatus.Success));
+        Assert.That(result.Result, Is.Not.Null);
+        Assert.That(result.Result.Name, Is.EqualTo("RenamedStylesheet.css"));
     }
 
     // Cleans up via the service so DeleteAsync is exercised between tests; any deletion regression

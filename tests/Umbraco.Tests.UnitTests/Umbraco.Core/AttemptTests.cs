@@ -14,10 +14,10 @@ public class AttemptTests
     {
         // Just making sure that it is ok to use TryParse as a condition.
         var attempt = Attempt.If(int.TryParse("1234", out var value), value);
-        Assert.IsTrue(attempt.Success);
-        Assert.AreEqual(1234, attempt.Result);
+        Assert.That(attempt.Success, Is.True);
+        Assert.That(attempt.Result, Is.EqualTo(1234));
 
         attempt = Attempt.If(int.TryParse("12xxx34", out value), value);
-        Assert.IsFalse(attempt.Success);
+        Assert.That(attempt.Success, Is.False);
     }
 }

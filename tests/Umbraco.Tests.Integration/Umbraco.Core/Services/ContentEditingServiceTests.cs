@@ -75,11 +75,11 @@ internal sealed class ContentEditingServiceTests : UmbracoIntegrationTestWithCon
 
         var updatedContent = ContentService.GetById(documentKey)!;
 
-        Assert.AreEqual(originalPropertyValue, updatedContent.GetValue(propertyAlias,variantTestData.LangDa.IsoCode));
-        Assert.AreEqual(updatedPropertyValue, updatedContent.GetValue(propertyAlias, variantTestData.LangEn.IsoCode));
+        Assert.That(updatedContent.GetValue(propertyAlias,variantTestData.LangDa.IsoCode), Is.EqualTo(originalPropertyValue));
+        Assert.That(updatedContent.GetValue(propertyAlias, variantTestData.LangEn.IsoCode), Is.EqualTo(updatedPropertyValue));
 
-        Assert.AreEqual(variantTestData.LangDa.CultureName, updatedContent.GetCultureName(variantTestData.LangDa.IsoCode));
-        Assert.AreEqual(updatedPropertyValue, updatedContent.GetCultureName(variantTestData.LangEn.IsoCode));
+        Assert.That(updatedContent.GetCultureName(variantTestData.LangDa.IsoCode), Is.EqualTo(variantTestData.LangDa.CultureName));
+        Assert.That(updatedContent.GetCultureName(variantTestData.LangEn.IsoCode), Is.EqualTo(updatedPropertyValue));
     }
 
     private async Task<(ILanguage LangEn, ILanguage LangDa, IContentType contentType)> SetupVariantTest()

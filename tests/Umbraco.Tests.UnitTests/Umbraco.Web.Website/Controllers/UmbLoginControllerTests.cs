@@ -46,7 +46,7 @@ public class UmbLoginControllerTests
 
         IActionResult result = await controller.HandleLogin(new LoginModel());
 
-        Assert.IsInstanceOf<UmbracoPageResult>(result);
+        Assert.That(result, Is.InstanceOf<UmbracoPageResult>());
         _signInManagerMock.Verify(
             x => x.PasswordSignInAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>()),
             Times.Never);
@@ -69,9 +69,9 @@ public class UmbLoginControllerTests
         });
 
         var redirect = result as RedirectResult;
-        Assert.IsNotNull(redirect);
-        Assert.AreEqual("/after-login", redirect!.Url);
-        Assert.AreEqual(true, controller.TempData["LoginSuccess"]);
+        Assert.That(redirect, Is.Not.Null);
+        Assert.That(redirect!.Url, Is.EqualTo("/after-login"));
+        Assert.That(controller.TempData["LoginSuccess"], Is.EqualTo(true));
     }
 
     [Test]
@@ -85,8 +85,8 @@ public class UmbLoginControllerTests
 
         IActionResult result = await controller.HandleLogin(new LoginModel { Username = "user", Password = "pass" });
 
-        Assert.IsInstanceOf<RedirectToUmbracoUrlResult>(result);
-        Assert.AreEqual(true, controller.TempData["LoginSuccess"]);
+        Assert.That(result, Is.InstanceOf<RedirectToUmbracoUrlResult>());
+        Assert.That(controller.TempData["LoginSuccess"], Is.EqualTo(true));
     }
 
     [Test]
@@ -116,8 +116,8 @@ public class UmbLoginControllerTests
         });
 
         var redirect = result as RedirectResult;
-        Assert.IsNotNull(redirect);
-        Assert.AreEqual("/root-page", redirect!.Url);
+        Assert.That(redirect, Is.Not.Null);
+        Assert.That(redirect!.Url, Is.EqualTo("/root-page"));
     }
 
     [Test]
@@ -138,8 +138,8 @@ public class UmbLoginControllerTests
         });
 
         var redirect = result as RedirectResult;
-        Assert.IsNotNull(redirect);
-        Assert.AreEqual("/from-route", redirect!.Url);
+        Assert.That(redirect, Is.Not.Null);
+        Assert.That(redirect!.Url, Is.EqualTo("/from-route"));
     }
 
     [Test]
@@ -158,8 +158,8 @@ public class UmbLoginControllerTests
 
         IActionResult result = await controller.HandleLogin(new LoginModel { Username = "user", Password = "pass" });
 
-        Assert.IsInstanceOf<UmbracoPageResult>(result);
-        Assert.IsTrue(controller.ViewData.TryGetTwoFactorProviderNames(out var providerNames));
+        Assert.That(result, Is.InstanceOf<UmbracoPageResult>());
+        Assert.That(controller.ViewData.TryGetTwoFactorProviderNames(out var providerNames), Is.True);
         Assert.That(providerNames, Is.EquivalentTo(new[] { "UmbracoMemberAppAuthenticator" }));
     }
 
@@ -175,7 +175,7 @@ public class UmbLoginControllerTests
 
         IActionResult result = await controller.HandleLogin(new LoginModel { Username = "user", Password = "pass" });
 
-        Assert.IsInstanceOf<BadRequestObjectResult>(result);
+        Assert.That(result, Is.InstanceOf<BadRequestObjectResult>());
     }
 
     [Test]
@@ -189,8 +189,8 @@ public class UmbLoginControllerTests
 
         IActionResult result = await controller.HandleLogin(new LoginModel { Username = "user", Password = "pass" });
 
-        Assert.IsInstanceOf<UmbracoPageResult>(result);
-        Assert.IsTrue(controller.ModelState["loginModel"]!.Errors.Any(e => e.ErrorMessage == "Member is locked out"));
+        Assert.That(result, Is.InstanceOf<UmbracoPageResult>());
+        Assert.That(controller.ModelState["loginModel"]!.Errors.Any(e => e.ErrorMessage == "Member is locked out"), Is.True);
     }
 
     [Test]
@@ -204,8 +204,8 @@ public class UmbLoginControllerTests
 
         IActionResult result = await controller.HandleLogin(new LoginModel { Username = "user", Password = "pass" });
 
-        Assert.IsInstanceOf<UmbracoPageResult>(result);
-        Assert.IsTrue(controller.ModelState["loginModel"]!.Errors.Any(e => e.ErrorMessage == "Member is not allowed"));
+        Assert.That(result, Is.InstanceOf<UmbracoPageResult>());
+        Assert.That(controller.ModelState["loginModel"]!.Errors.Any(e => e.ErrorMessage == "Member is not allowed"), Is.True);
     }
 
     [Test]
@@ -219,9 +219,9 @@ public class UmbLoginControllerTests
 
         IActionResult result = await controller.HandleLogin(new LoginModel { Username = "user", Password = "wrong" });
 
-        Assert.IsInstanceOf<UmbracoPageResult>(result);
-        Assert.IsTrue(controller.ModelState["loginModel"]!.Errors
-            .Any(e => e.ErrorMessage == "Invalid username or password"));
+        Assert.That(result, Is.InstanceOf<UmbracoPageResult>());
+        Assert.That(controller.ModelState["loginModel"]!.Errors
+            .Any(e => e.ErrorMessage == "Invalid username or password"), Is.True);
     }
 
     private UmbLoginController CreateController(

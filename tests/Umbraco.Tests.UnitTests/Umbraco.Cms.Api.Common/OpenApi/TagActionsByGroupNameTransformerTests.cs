@@ -41,7 +41,7 @@ public class TagActionsByGroupNameTransformerTests
         await _transformer.TransformAsync(operation, context, CancellationToken.None);
 
         // Assert
-        Assert.IsNull(operation.Tags);
+        Assert.That(operation.Tags, Is.Null);
     }
 
     [Test]
@@ -64,9 +64,9 @@ public class TagActionsByGroupNameTransformerTests
         await _transformer.TransformAsync(operation, context, CancellationToken.None);
 
         // Assert
-        Assert.IsNotNull(operation.Tags);
-        Assert.AreEqual(1, operation.Tags.Count);
-        Assert.AreEqual(groupName, operation.Tags.First().Name);
+        Assert.That(operation.Tags, Is.Not.Null);
+        Assert.That(operation.Tags, Has.Count.EqualTo(1));
+        Assert.That(operation.Tags.First().Name, Is.EqualTo(groupName));
     }
 
     [Test]
@@ -89,9 +89,9 @@ public class TagActionsByGroupNameTransformerTests
         await _transformer.TransformAsync(operation, context, CancellationToken.None);
 
         // Assert
-        Assert.IsNotNull(document.Tags);
-        Assert.AreEqual(1, document.Tags.Count);
-        Assert.AreEqual(groupName, document.Tags.First().Name);
+        Assert.That(document.Tags, Is.Not.Null);
+        Assert.That(document.Tags, Has.Count.EqualTo(1));
+        Assert.That(document.Tags.First().Name, Is.EqualTo(groupName));
     }
 
     [Test]
@@ -117,7 +117,7 @@ public class TagActionsByGroupNameTransformerTests
         await _transformer.TransformAsync(operation, context, CancellationToken.None);
 
         // Assert
-        Assert.AreEqual(1, document.Tags.Count);
+        Assert.That(document.Tags, Has.Count.EqualTo(1));
     }
 
     #endregion
@@ -154,8 +154,8 @@ public class TagActionsByGroupNameTransformerTests
         await _transformer.TransformAsync(document, null!, CancellationToken.None);
 
         // Assert
-        Assert.AreEqual(1, document.Tags.Count);
-        Assert.AreEqual("UsedTag", document.Tags.First().Name);
+        Assert.That(document.Tags, Has.Count.EqualTo(1));
+        Assert.That(document.Tags.First().Name, Is.EqualTo("UsedTag"));
     }
 
     [Test]
@@ -198,7 +198,7 @@ public class TagActionsByGroupNameTransformerTests
         await _transformer.TransformAsync(document, null!, CancellationToken.None);
 
         // Assert
-        Assert.AreEqual(2, document.Tags.Count);
+        Assert.That(document.Tags, Has.Count.EqualTo(2));
     }
 
     [Test]
@@ -213,7 +213,7 @@ public class TagActionsByGroupNameTransformerTests
 
         // Act & Assert - should not throw
         await _transformer.TransformAsync(document, null!, CancellationToken.None);
-        Assert.IsNull(document.Tags);
+        Assert.That(document.Tags, Is.Null);
     }
 
     [Test]
@@ -230,7 +230,7 @@ public class TagActionsByGroupNameTransformerTests
         await _transformer.TransformAsync(document, null!, CancellationToken.None);
 
         // Assert - orphan tag should be removed
-        Assert.AreEqual(0, document.Tags.Count);
+        Assert.That(document.Tags.Count, Is.EqualTo(0));
     }
 
     [Test]
@@ -256,7 +256,7 @@ public class TagActionsByGroupNameTransformerTests
         await _transformer.TransformAsync(document, null!, CancellationToken.None);
 
         // Assert - unused tag should be removed
-        Assert.AreEqual(0, document.Tags.Count);
+        Assert.That(document.Tags.Count, Is.EqualTo(0));
     }
 
     [Test]
@@ -294,10 +294,10 @@ public class TagActionsByGroupNameTransformerTests
         await _transformer.TransformAsync(document, null!, CancellationToken.None);
 
         // Assert
-        Assert.AreEqual(2, document.Tags.Count);
-        Assert.IsTrue(document.Tags.Any(t => t.Name == "Tag1"));
-        Assert.IsTrue(document.Tags.Any(t => t.Name == "Tag2"));
-        Assert.IsFalse(document.Tags.Any(t => t.Name == "UnusedTag"));
+        Assert.That(document.Tags, Has.Count.EqualTo(2));
+        Assert.That(document.Tags.Any(t => t.Name == "Tag1"), Is.True);
+        Assert.That(document.Tags.Any(t => t.Name == "Tag2"), Is.True);
+        Assert.That(document.Tags.Any(t => t.Name == "UnusedTag"), Is.False);
     }
 
     [Test]
@@ -320,7 +320,7 @@ public class TagActionsByGroupNameTransformerTests
         await _transformer.TransformAsync(document, null!, CancellationToken.None);
 
         // Assert - unused tag should be removed
-        Assert.AreEqual(0, document.Tags.Count);
+        Assert.That(document.Tags.Count, Is.EqualTo(0));
     }
 
     #endregion

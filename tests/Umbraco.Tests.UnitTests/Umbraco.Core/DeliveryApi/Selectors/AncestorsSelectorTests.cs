@@ -53,9 +53,9 @@ public class AncestorsSelectorTests
             _documentNavigationQueryService);
 
         var result = subject.BuildSelectorOption("ancestors:/some/where");
-        Assert.AreEqual(2, result.Values.Length);
-        Assert.AreEqual("863e10d5-b0f8-421d-902d-5e4d1bd8e780", result.Values[0]);
-        Assert.AreEqual("11fc9bdc-8366-4a6b-a9c2-6b8b2717c4b8", result.Values[1]);
+        Assert.That(result.Values.Length, Is.EqualTo(2));
+        Assert.That(result.Values[0], Is.EqualTo("863e10d5-b0f8-421d-902d-5e4d1bd8e780"));
+        Assert.That(result.Values[1], Is.EqualTo("11fc9bdc-8366-4a6b-a9c2-6b8b2717c4b8"));
     }
 
     [Test]
@@ -69,8 +69,8 @@ public class AncestorsSelectorTests
             _documentNavigationQueryService);
 
         var result = subject.BuildSelectorOption($"ancestors:{_documentKey:D}");
-        Assert.AreEqual(2, result.Values.Length);
-        Assert.AreEqual("863e10d5-b0f8-421d-902d-5e4d1bd8e780", result.Values[0]);
-        Assert.AreEqual("11fc9bdc-8366-4a6b-a9c2-6b8b2717c4b8", result.Values[1]);
+        Assert.That(result.Values.Length, Is.EqualTo(2));
+        Assert.That(result.Values[0], Is.EqualTo("863e10d5-b0f8-421d-902d-5e4d1bd8e780"));
+        Assert.That(result.Values[1], Is.EqualTo("11fc9bdc-8366-4a6b-a9c2-6b8b2717c4b8"));
     }
 }

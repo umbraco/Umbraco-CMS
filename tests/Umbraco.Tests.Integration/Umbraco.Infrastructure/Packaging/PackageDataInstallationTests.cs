@@ -91,8 +91,8 @@ internal sealed class PackageDataInstallationTests : UmbracoIntegrationTestWithC
         var uBlogsyBasePage = contentTypes.First(x => x.Alias == "uBlogsyBasePage");
         Assert.That(uBlogsyBasePage.ContentTypeCompositionExists("uBlogsyBaseDocType"), Is.True);
         Assert.That(uBlogsyBasePage.PropertyTypes.Count(), Is.EqualTo(7));
-        Assert.That(uBlogsyBasePage.PropertyGroups.Count, Is.EqualTo(3));
-        Assert.That(uBlogsyBasePage.PropertyGroups["content"].PropertyTypes.Count, Is.EqualTo(3));
+        Assert.That(uBlogsyBasePage.PropertyGroups, Has.Count.EqualTo(3));
+        Assert.That(uBlogsyBasePage.PropertyGroups["content"].PropertyTypes, Has.Count.EqualTo(3));
         Assert.That(uBlogsyBasePage.PropertyGroups["sEO"].PropertyTypes.Count(), Is.EqualTo(3));
         Assert.That(uBlogsyBasePage.PropertyGroups["navigation"].PropertyTypes.Count(), Is.EqualTo(1));
         Assert.That(uBlogsyBasePage.CompositionPropertyTypes.Count(), Is.EqualTo(12));
@@ -129,7 +129,7 @@ internal sealed class PackageDataInstallationTests : UmbracoIntegrationTestWithC
         {
             var propertyTypeDto =
                 ScopeAccessor.AmbientScope.Database.First<PropertyTypeDto>("WHERE id = @id", new { id = propertyType.Id });
-            Assert.AreEqual(propertyTypeDto.UniqueId, propertyType.Key);
+            Assert.That(propertyType.Key, Is.EqualTo(propertyTypeDto.UniqueId));
         }
     }
 
@@ -194,8 +194,8 @@ internal sealed class PackageDataInstallationTests : UmbracoIntegrationTestWithC
         Assert.That(templates.Any(), Is.True);
         Assert.That(templates.Count(), Is.EqualTo(numberOfTemplates));
 
-        Assert.AreEqual(init + numberOfTemplates, allTemplates.Count());
-        Assert.IsTrue(allTemplates.All(x => x.Content.Contains("UmbracoViewPage")));
+        Assert.That(allTemplates.Count(), Is.EqualTo(init + numberOfTemplates));
+        Assert.That(allTemplates.All(x => x.Content.Contains("UmbracoViewPage")), Is.True);
     }
 
     [Test]
@@ -215,7 +215,7 @@ internal sealed class PackageDataInstallationTests : UmbracoIntegrationTestWithC
         Assert.That(templates.Count(), Is.EqualTo(1));
 
         var template = templates.First();
-        Assert.AreEqual(template.Name, "Articles");
+        Assert.That(template.Name, Is.EqualTo("Articles"));
     }
 
     [Test]
@@ -239,8 +239,8 @@ internal sealed class PackageDataInstallationTests : UmbracoIntegrationTestWithC
         Assert.That(templates.Count(), Is.EqualTo(1));
 
         var template = templates.First();
-        Assert.AreEqual(template.Name, "Articles");
-        Assert.AreEqual(template.Key, key);
+        Assert.That(template.Name, Is.EqualTo("Articles"));
+        Assert.That(key, Is.EqualTo(template.Key));
     }
 
     [Test]
@@ -424,14 +424,13 @@ internal sealed class PackageDataInstallationTests : UmbracoIntegrationTestWithC
         // Assert
         Assert.That(dataTypeDefinitions, Is.Not.Null);
         Assert.That(dataTypeDefinitions.Any(), Is.True);
-        Assert.AreEqual(Constants.PropertyEditors.Aliases.CheckBoxList, dataTypeDefinitions.First().EditorAlias);
+        Assert.That(dataTypeDefinitions.First().EditorAlias, Is.EqualTo(Constants.PropertyEditors.Aliases.CheckBoxList));
         Assert.That(contents, Is.Not.Null);
         Assert.That(contentTypes.Any(), Is.True);
         Assert.That(contents.Any(), Is.True);
         Assert.That(contents.Count(), Is.EqualTo(numberOfDocs));
-        Assert.AreEqual(
-            "{\"items\":[\"test\",\"test3\",\"test2\"]}",
-            configuration);
+        Assert.That(
+            configuration, Is.EqualTo("{\"items\":[\"test\",\"test3\",\"test2\"]}"));
     }
 
     [Test]
@@ -730,8 +729,8 @@ internal sealed class PackageDataInstallationTests : UmbracoIntegrationTestWithC
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.NotNull(contentTypes.Single().HistoryCleanup);
-            Assert.IsFalse(contentTypes.Single().HistoryCleanup.PreventCleanup);
+            Assert.That(contentTypes.Single().HistoryCleanup, Is.Not.Null);
+            Assert.That(contentTypes.Single().HistoryCleanup.PreventCleanup, Is.False);
         });
     }
 
@@ -749,10 +748,10 @@ internal sealed class PackageDataInstallationTests : UmbracoIntegrationTestWithC
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.NotNull(contentTypes.Single().HistoryCleanup);
-            Assert.IsTrue(contentTypes.Single().HistoryCleanup.PreventCleanup);
-            Assert.AreEqual(1, contentTypes.Single().HistoryCleanup.KeepAllVersionsNewerThanDays);
-            Assert.AreEqual(2, contentTypes.Single().HistoryCleanup.KeepLatestVersionPerDayForDays);
+            Assert.That(contentTypes.Single().HistoryCleanup, Is.Not.Null);
+            Assert.That(contentTypes.Single().HistoryCleanup.PreventCleanup, Is.True);
+            Assert.That(contentTypes.Single().HistoryCleanup.KeepAllVersionsNewerThanDays, Is.EqualTo(1));
+            Assert.That(contentTypes.Single().HistoryCleanup.KeepLatestVersionPerDayForDays, Is.EqualTo(2));
         });
     }
 
@@ -775,15 +774,15 @@ internal sealed class PackageDataInstallationTests : UmbracoIntegrationTestWithC
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.NotNull(contentTypes.Single().HistoryCleanup);
-            Assert.IsTrue(contentTypes.Single().HistoryCleanup.PreventCleanup);
-            Assert.AreEqual(1, contentTypes.Single().HistoryCleanup.KeepAllVersionsNewerThanDays);
-            Assert.AreEqual(2, contentTypes.Single().HistoryCleanup.KeepLatestVersionPerDayForDays);
+            Assert.That(contentTypes.Single().HistoryCleanup, Is.Not.Null);
+            Assert.That(contentTypes.Single().HistoryCleanup.PreventCleanup, Is.True);
+            Assert.That(contentTypes.Single().HistoryCleanup.KeepAllVersionsNewerThanDays, Is.EqualTo(1));
+            Assert.That(contentTypes.Single().HistoryCleanup.KeepLatestVersionPerDayForDays, Is.EqualTo(2));
 
-            Assert.NotNull(contentTypesUpdated.Single().HistoryCleanup);
-            Assert.IsTrue(contentTypesUpdated.Single().HistoryCleanup.PreventCleanup);
-            Assert.AreEqual(1, contentTypes.Single().HistoryCleanup.KeepAllVersionsNewerThanDays);
-            Assert.AreEqual(2, contentTypes.Single().HistoryCleanup.KeepLatestVersionPerDayForDays);
+            Assert.That(contentTypesUpdated.Single().HistoryCleanup, Is.Not.Null);
+            Assert.That(contentTypesUpdated.Single().HistoryCleanup.PreventCleanup, Is.True);
+            Assert.That(contentTypes.Single().HistoryCleanup.KeepAllVersionsNewerThanDays, Is.EqualTo(1));
+            Assert.That(contentTypes.Single().HistoryCleanup.KeepLatestVersionPerDayForDays, Is.EqualTo(2));
         });
     }
 
@@ -870,7 +869,7 @@ internal sealed class PackageDataInstallationTests : UmbracoIntegrationTestWithC
         Assert.That(await DictionaryItemService.ExistsAsync(dictionaryItemName), "DictionaryItem key does not exist");
         var dictionaryItem = await DictionaryItemService.GetAsync(dictionaryItemName);
         var translation = dictionaryItem.Translations.SingleOrDefault(i => i.LanguageIsoCode == cultureCode);
-        Assert.IsNotNull(translation, "Translation to {0} was not added", cultureCode);
+        Assert.That(translation, Is.Not.Null, $"Translation to {cultureCode} was not added");
         var value = translation.Value;
         Assert.That(value, Is.EqualTo(expectedValue), "Translation value was not set");
     }
@@ -892,8 +891,8 @@ internal sealed class PackageDataInstallationTests : UmbracoIntegrationTestWithC
                 }
             },
             Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(key, result.Result.Key);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result.Key, Is.EqualTo(key));
     }
 
     private async Task AddExistingEnglishAndNorwegianParentDictionaryItem(string expectedEnglishParentValue, string expectedNorwegianParentValue)
@@ -915,7 +914,7 @@ internal sealed class PackageDataInstallationTests : UmbracoIntegrationTestWithC
                 }
             },
             Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(key, result.Result.Key);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result.Key, Is.EqualTo(key));
     }
 }

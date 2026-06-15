@@ -48,6 +48,6 @@ public class PreviewServiceTests
                 It.Is<bool>(y => y == true),
                 It.Is<string>(y => y == SameSiteMode.None.ToString())));
 
-        Assert.IsTrue(result);
+        Assert.That(result, Is.True);
     }
 }

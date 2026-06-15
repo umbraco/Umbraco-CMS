@@ -92,12 +92,12 @@ internal sealed class CreatedPackagesRepositoryTests : UmbracoIntegrationTest
         var def1 = new PackageDefinition { Name = "test" };
 
         var result = PackageBuilder.SavePackage(def1);
-        Assert.IsTrue(result);
+        Assert.That(result, Is.True);
 
         PackageBuilder.Delete(def1.Id);
 
         def1 = PackageBuilder.GetById(def1.Id);
-        Assert.IsNull(def1);
+        Assert.That(def1, Is.Null);
     }
 
     [Test]
@@ -107,17 +107,17 @@ internal sealed class CreatedPackagesRepositoryTests : UmbracoIntegrationTest
 
         var result = PackageBuilder.SavePackage(def1);
 
-        Assert.IsTrue(result);
-        Assert.AreEqual(1, def1.Id);
-        Assert.AreNotEqual(default(Guid).ToString(), def1.PackageId);
+        Assert.That(result, Is.True);
+        Assert.That(def1.Id, Is.EqualTo(1));
+        Assert.That(def1.PackageId, Is.Not.EqualTo(default(Guid).ToString()));
 
         var def2 = new PackageDefinition { Name = "test2" };
 
         result = PackageBuilder.SavePackage(def2);
 
-        Assert.IsTrue(result);
-        Assert.AreEqual(2, def2.Id);
-        Assert.AreNotEqual(default(Guid).ToString(), def2.PackageId);
+        Assert.That(result, Is.True);
+        Assert.That(def2.Id, Is.EqualTo(2));
+        Assert.That(def2.PackageId, Is.Not.EqualTo(default(Guid).ToString()));
     }
 
     [Test]
@@ -131,7 +131,7 @@ internal sealed class CreatedPackagesRepositoryTests : UmbracoIntegrationTest
 
         var result = PackageBuilder.SavePackage(def);
 
-        Assert.IsFalse(result);
+        Assert.That(result, Is.False);
     }
 
     [Test]
@@ -147,24 +147,24 @@ internal sealed class CreatedPackagesRepositoryTests : UmbracoIntegrationTest
         def.Scripts.Add("TestScript1");
         def.Scripts.Add("TestScript2");
         result = PackageBuilder.SavePackage(def);
-        Assert.IsTrue(result);
+        Assert.That(result, Is.True);
         // re-get
         def = PackageBuilder.GetById(def.Id);
-        Assert.AreEqual("updated", def.Name);
+        Assert.That(def.Name, Is.EqualTo("updated"));
         Assert.Multiple(() =>
         {
-            Assert.AreEqual("updated", def.Name);
-            Assert.AreEqual("test", def.ContentNodeId);
-            Assert.AreEqual(2, def.Languages.Count());
-            Assert.AreEqual(2, def.Scripts.Count());
-            Assert.AreEqual(0, def.DataTypes.Count());
-            Assert.AreEqual(0, def.DictionaryItems.Count());
-            Assert.AreEqual(0, def.DocumentTypes.Count());
-            Assert.AreEqual(0, def.MediaTypes.Count());
-            Assert.AreEqual(0, def.MediaUdis.Count());
-            Assert.AreEqual(0, def.PartialViews.Count());
-            Assert.AreEqual(0, def.Stylesheets.Count());
-            Assert.AreEqual(0, def.Templates.Count());
+            Assert.That(def.Name, Is.EqualTo("updated"));
+            Assert.That(def.ContentNodeId, Is.EqualTo("test"));
+            Assert.That(def.Languages.Count(), Is.EqualTo(2));
+            Assert.That(def.Scripts.Count(), Is.EqualTo(2));
+            Assert.That(def.DataTypes.Count(), Is.EqualTo(0));
+            Assert.That(def.DictionaryItems.Count(), Is.EqualTo(0));
+            Assert.That(def.DocumentTypes.Count(), Is.EqualTo(0));
+            Assert.That(def.MediaTypes.Count(), Is.EqualTo(0));
+            Assert.That(def.MediaUdis.Count(), Is.EqualTo(0));
+            Assert.That(def.PartialViews.Count(), Is.EqualTo(0));
+            Assert.That(def.Stylesheets.Count(), Is.EqualTo(0));
+            Assert.That(def.Templates.Count(), Is.EqualTo(0));
         });
     }
 
@@ -200,17 +200,17 @@ internal sealed class CreatedPackagesRepositoryTests : UmbracoIntegrationTest
         {
             var packageXml = XDocument.Load(packageXmlStream);
             var dictionaryItems = packageXml.Root.Element("DictionaryItems");
-            Assert.IsNotNull(dictionaryItems);
+            Assert.That(dictionaryItems, Is.Not.Null);
             var rootItems = dictionaryItems.Elements("DictionaryItem").ToList();
-            Assert.AreEqual(2, rootItems.Count);
-            Assert.AreEqual("Child4", rootItems[0].AttributeValue<string>("Name"));
-            Assert.AreEqual("Parent", rootItems[1].AttributeValue<string>("Name"));
+            Assert.That(rootItems, Has.Count.EqualTo(2));
+            Assert.That(rootItems[0].AttributeValue<string>("Name"), Is.EqualTo("Child4"));
+            Assert.That(rootItems[1].AttributeValue<string>("Name"), Is.EqualTo("Parent"));
             var children = rootItems[1].Elements("DictionaryItem").ToList();
-            Assert.AreEqual(1, children.Count);
-            Assert.AreEqual("Child1", children[0].AttributeValue<string>("Name"));
+            Assert.That(children, Has.Count.EqualTo(1));
+            Assert.That(children[0].AttributeValue<string>("Name"), Is.EqualTo("Child1"));
             children = children[0].Elements("DictionaryItem").ToList();
-            Assert.AreEqual(1, children.Count);
-            Assert.AreEqual("Child2", children[0].AttributeValue<string>("Name"));
+            Assert.That(children, Has.Count.EqualTo(1));
+            Assert.That(children[0].AttributeValue<string>("Name"), Is.EqualTo("Child2"));
         }
     }
 
@@ -234,13 +234,13 @@ internal sealed class CreatedPackagesRepositoryTests : UmbracoIntegrationTest
         var def = new PackageDefinition { Name = "test", MediaUdis = new List<GuidUdi> { m1.GetUdi() } };
 
         var result = PackageBuilder.SavePackage(def);
-        Assert.IsTrue(result);
-        Assert.IsTrue(def.PackagePath.IsNullOrWhiteSpace());
+        Assert.That(result, Is.True);
+        Assert.That(def.PackagePath.IsNullOrWhiteSpace(), Is.True);
 
         var packageXmlPath = PackageBuilder.ExportPackage(def);
 
         def = PackageBuilder.GetById(def.Id); // re-get
-        Assert.IsNotNull(def.PackagePath);
+        Assert.That(def.PackagePath, Is.Not.Null);
 
         using (var packageZipStream = File.OpenRead(packageXmlPath))
         using (var zipArchive = PackageMigrationResource.GetPackageDataManifest(packageZipStream, out var packageXml))
@@ -249,19 +249,18 @@ internal sealed class CreatedPackagesRepositoryTests : UmbracoIntegrationTest
             Assert.Multiple(() =>
             {
                 var mediaEntry = zipArchive.GetEntry("media/media/test-file.txt");
-                Assert.AreEqual("umbPackage", packageXml.Root.Name.ToString());
-                Assert.IsNotNull(mediaEntry);
-                Assert.AreEqual(test, mediaEntry.Name);
-                Assert.IsNotNull(zipArchive.GetEntry("package.xml"));
-                Assert.AreEqual(
-                    $"<MediaItems><MediaSet><testImage id=\"{m1.Id}\" key=\"{m1.Key}\" parentID=\"-1\" level=\"1\" creatorID=\"-1\" sortOrder=\"0\" createDate=\"{m1.CreateDate:s}\" updateDate=\"{m1.UpdateDate:s}\" nodeName=\"Test File\" urlName=\"test-file\" path=\"{m1.Path}\" isDoc=\"\" nodeType=\"{mt.Id}\" nodeTypeAlias=\"testImage\" writerName=\"Administrator\" writerID=\"-1\" udi=\"{m1.GetUdi()}\" mediaFilePath=\"/media/test-file.txt\"><umbracoFile><![CDATA[/media/test-file.txt]]></umbracoFile><umbracoBytes><![CDATA[100]]></umbracoBytes><umbracoExtension><![CDATA[png]]></umbracoExtension></testImage></MediaSet></MediaItems>",
-                    packageXml.Element("umbPackage").Element("MediaItems").ToString(SaveOptions.DisableFormatting));
-                Assert.AreEqual(2, zipArchive.Entries.Count());
-                Assert.AreEqual(ZipArchiveMode.Read, zipArchive.Mode);
-                Assert.IsNull(packageXml.DocumentType);
-                Assert.IsNull(packageXml.NextNode);
-                Assert.IsNull(packageXml.Parent);
-                Assert.IsNull(packageXml.PreviousNode);
+                Assert.That(packageXml.Root.Name.ToString(), Is.EqualTo("umbPackage"));
+                Assert.That(mediaEntry, Is.Not.Null);
+                Assert.That(mediaEntry.Name, Is.EqualTo(test));
+                Assert.That(zipArchive.GetEntry("package.xml"), Is.Not.Null);
+                Assert.That(
+                    packageXml.Element("umbPackage").Element("MediaItems").ToString(SaveOptions.DisableFormatting), Is.EqualTo($"<MediaItems><MediaSet><testImage id=\"{m1.Id}\" key=\"{m1.Key}\" parentID=\"-1\" level=\"1\" creatorID=\"-1\" sortOrder=\"0\" createDate=\"{m1.CreateDate:s}\" updateDate=\"{m1.UpdateDate:s}\" nodeName=\"Test File\" urlName=\"test-file\" path=\"{m1.Path}\" isDoc=\"\" nodeType=\"{mt.Id}\" nodeTypeAlias=\"testImage\" writerName=\"Administrator\" writerID=\"-1\" udi=\"{m1.GetUdi()}\" mediaFilePath=\"/media/test-file.txt\"><umbracoFile><![CDATA[/media/test-file.txt]]></umbracoFile><umbracoBytes><![CDATA[100]]></umbracoBytes><umbracoExtension><![CDATA[png]]></umbracoExtension></testImage></MediaSet></MediaItems>"));
+                Assert.That(zipArchive.Entries.Count(), Is.EqualTo(2));
+                Assert.That(zipArchive.Mode, Is.EqualTo(ZipArchiveMode.Read));
+                Assert.That(packageXml.DocumentType, Is.Null);
+                Assert.That(packageXml.NextNode, Is.Null);
+                Assert.That(packageXml.Parent, Is.Null);
+                Assert.That(packageXml.PreviousNode, Is.Null);
             });
         }
     }
@@ -276,27 +275,26 @@ internal sealed class CreatedPackagesRepositoryTests : UmbracoIntegrationTest
 
         var def = new PackageDefinition { Name = "test", Templates = new[] { template.Id.ToString() } };
         var result = PackageBuilder.SavePackage(def);
-        Assert.IsTrue(result);
-        Assert.IsTrue(def.PackagePath.IsNullOrWhiteSpace());
+        Assert.That(result, Is.True);
+        Assert.That(def.PackagePath.IsNullOrWhiteSpace(), Is.True);
 
         var packageXmlPath = PackageBuilder.ExportPackage(def); // Get
 
         def = PackageBuilder.GetById(def.Id); // re-get
-        Assert.IsNotNull(def.PackagePath);
+        Assert.That(def.PackagePath, Is.Not.Null);
 
         using (var packageXmlStream = File.OpenRead(packageXmlPath))
         {
             var xml = XDocument.Load(packageXmlStream);
             Assert.Multiple(() =>
             {
-                Assert.AreEqual("umbPackage", xml.Root.Name.ToString());
-                Assert.AreEqual(
-                    $"<Templates><Template><Name>Text page</Name><Key>{template.Key}</Key><Alias>textPage</Alias><Design><![CDATA[@using Umbraco.Cms.Web.Common.PublishedModels;{Environment.NewLine}@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage{Environment.NewLine}@{{{Environment.NewLine}\tLayout = null;{Environment.NewLine}}}]]></Design></Template></Templates>",
-                    xml.Element("umbPackage").Element("Templates").ToString(SaveOptions.DisableFormatting));
-                Assert.IsNull(xml.DocumentType);
-                Assert.IsNull(xml.Parent);
-                Assert.IsNull(xml.NextNode);
-                Assert.IsNull(xml.PreviousNode);
+                Assert.That(xml.Root.Name.ToString(), Is.EqualTo("umbPackage"));
+                Assert.That(
+                    xml.Element("umbPackage").Element("Templates").ToString(SaveOptions.DisableFormatting), Is.EqualTo($"<Templates><Template><Name>Text page</Name><Key>{template.Key}</Key><Alias>textPage</Alias><Design><![CDATA[@using Umbraco.Cms.Web.Common.PublishedModels;{Environment.NewLine}@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage{Environment.NewLine}@{{{Environment.NewLine}\tLayout = null;{Environment.NewLine}}}]]></Design></Template></Templates>"));
+                Assert.That(xml.DocumentType, Is.Null);
+                Assert.That(xml.Parent, Is.Null);
+                Assert.That(xml.NextNode, Is.Null);
+                Assert.That(xml.PreviousNode, Is.Null);
             });
         }
     }

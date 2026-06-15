@@ -19,8 +19,8 @@ internal sealed class PropertyTypeUsageServiceTests : UmbracoIntegrationTestWith
     public async Task Can_Check_For_Saved_Property_Values(Guid contentTypeKey, string propertyAlias, bool expectedSuccess, bool expectedResult, PropertyTypeOperationStatus expectedOperationStatus)
     {
         Attempt<bool, PropertyTypeOperationStatus> resultAttempt = await PropertyTypeUsageService.HasSavedPropertyValuesAsync(contentTypeKey, propertyAlias);
-        Assert.AreEqual(expectedSuccess, resultAttempt.Success);
-        Assert.AreEqual(expectedResult, resultAttempt.Result);
-        Assert.AreEqual(expectedOperationStatus, resultAttempt.Status);
+        Assert.That(resultAttempt.Success, Is.EqualTo(expectedSuccess));
+        Assert.That(resultAttempt.Result, Is.EqualTo(expectedResult));
+        Assert.That(resultAttempt.Status, Is.EqualTo(expectedOperationStatus));
     }
 }

@@ -127,8 +127,8 @@ internal sealed class ExamineExternalIndexTests : ExamineBaseTest
 
         // Assert
         IEnumerable<ISearchResult> searchResults = actual.ToArray();
-        Assert.AreEqual(1, searchResults.Count());
-        Assert.AreEqual(searchResults.First().Values["nodeName"], ContentName);
+        Assert.That(searchResults.Count(), Is.EqualTo(1));
+        Assert.That(searchResults.First().Values["nodeName"], Is.EqualTo(ContentName));
     }
 
     [Test]
@@ -161,6 +161,6 @@ internal sealed class ExamineExternalIndexTests : ExamineBaseTest
         IEnumerable<ISearchResult> actual = ExamineExternalIndexSearch(ContentName);
 
         // Assert
-        Assert.AreEqual(0, actual.Count());
+        Assert.That(actual.Count(), Is.EqualTo(0));
     }
 }

@@ -112,7 +112,7 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
 
         // Initial request by Id should hit the database.
         repository.Get(template.Id);
-        Assert.Greater(database.SqlCount, 0);
+        Assert.That(database.SqlCount, Is.GreaterThan(0));
 
         // Reset counter.
         database.EnableSqlCount = false;
@@ -120,7 +120,7 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
 
         // Subsequent requests should use the cache.
         repository.Get(template.Id);
-        Assert.AreEqual(0, database.SqlCount);
+        Assert.That(database.SqlCount, Is.EqualTo(0));
     }
 
     [Test]
@@ -147,7 +147,7 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
 
         // Initial request by key should hit the database.
         repository.Get(template.Key);
-        Assert.Greater(database.SqlCount, 0);
+        Assert.That(database.SqlCount, Is.GreaterThan(0));
 
         // Reset counter.
         database.EnableSqlCount = false;
@@ -155,7 +155,7 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
 
         // Subsequent requests should use the cache.
         repository.Get(template.Key);
-        Assert.AreEqual(0, database.SqlCount);
+        Assert.That(database.SqlCount, Is.EqualTo(0));
     }
 
     [Test]
@@ -179,16 +179,16 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
 
         // Initial and subsequent requests should use the cache, since the cache by Id and Key was populated on save.
         repository.Get(template.Id);
-        Assert.AreEqual(0, database.SqlCount);
+        Assert.That(database.SqlCount, Is.EqualTo(0));
 
         repository.Get(template.Id);
-        Assert.AreEqual(0, database.SqlCount);
+        Assert.That(database.SqlCount, Is.EqualTo(0));
 
         repository.Get(template.Key);
-        Assert.AreEqual(0, database.SqlCount);
+        Assert.That(database.SqlCount, Is.EqualTo(0));
 
         repository.Get(template.Key);
-        Assert.AreEqual(0, database.SqlCount);
+        Assert.That(database.SqlCount, Is.EqualTo(0));
     }
 
     [Test]
@@ -215,7 +215,7 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
 
         // Initial request by ID should hit the database.
         repository.Get(template.Id);
-        Assert.Greater(database.SqlCount, 0);
+        Assert.That(database.SqlCount, Is.GreaterThan(0));
 
         // Reset counter.
         database.EnableSqlCount = false;
@@ -223,10 +223,10 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
 
         // Subsequent requests should use the cache, since the cache by Id and Key was populated on retrieval.
         repository.Get(template.Id);
-        Assert.AreEqual(0, database.SqlCount);
+        Assert.That(database.SqlCount, Is.EqualTo(0));
 
         repository.Get(template.Key);
-        Assert.AreEqual(0, database.SqlCount);
+        Assert.That(database.SqlCount, Is.EqualTo(0));
     }
 
     [Test]
@@ -253,7 +253,7 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
 
         // Initial request by key should hit the database.
         repository.Get(template.Key);
-        Assert.Greater(database.SqlCount, 0);
+        Assert.That(database.SqlCount, Is.GreaterThan(0));
 
         // Reset counter.
         database.EnableSqlCount = false;
@@ -261,10 +261,10 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
 
         // Subsequent requests should use the cache, since the cache by Id and Key was populated on retrieval.
         repository.Get(template.Key);
-        Assert.AreEqual(0, database.SqlCount);
+        Assert.That(database.SqlCount, Is.EqualTo(0));
 
         repository.Get(template.Id);
-        Assert.AreEqual(0, database.SqlCount);
+        Assert.That(database.SqlCount, Is.EqualTo(0));
     }
 
     [Test]
@@ -279,12 +279,12 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
 
         var template = CreateTemplate(repository);
         var retrievedTemplate = repository.Get(template.Key);
-        Assert.IsNotNull(retrievedTemplate);
+        Assert.That(retrievedTemplate, Is.Not.Null);
 
         repository.Delete(template);
 
         retrievedTemplate = repository.Get(template.Key);
-        Assert.IsNull(retrievedTemplate);
+        Assert.That(retrievedTemplate, Is.Null);
     }
 
     /// <summary>
@@ -309,7 +309,7 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
         var guidRepo = (IReadRepository<Guid, ITemplate>)repository;
 
         var result = guidRepo.GetMany().ToArray();
-        Assert.IsNotEmpty(result);
+        Assert.That(result, Is.Not.Empty);
     }
 
     private static AppCaches CreateAppCaches() =>
@@ -368,7 +368,7 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
             // Assert
             Assert.That(repository.Get("test"), Is.Not.Null);
             Assert.That(FileSystems.MvcViewsFileSystem.FileExists("test.cshtml"), Is.True);
-            Assert.AreEqual("mock-content", template.Content.StripWhitespace());
+            Assert.That(template.Content.StripWhitespace(), Is.EqualTo("mock-content"));
         }
     }
 
@@ -395,10 +395,9 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
             // Assert
             Assert.That(repository.Get("test2"), Is.Not.Null);
             Assert.That(FileSystems.MvcViewsFileSystem.FileExists("test2.cshtml"), Is.True);
-            Assert.AreEqual(
-                "@usingUmbraco.Cms.Web.Common.PublishedModels;@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage @{ Layout = \"test.cshtml\";}"
-                    .StripWhitespace(),
-                template2.Content.StripWhitespace());
+            Assert.That(
+                template2.Content.StripWhitespace(), Is.EqualTo("@usingUmbraco.Cms.Web.Common.PublishedModels;@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage @{ Layout = \"test.cshtml\";}"
+                    .StripWhitespace()));
         }
     }
 
@@ -420,7 +419,7 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
             repository.Save(template2);
 
             // Assert
-            Assert.AreEqual("test1", template2.Alias);
+            Assert.That(template2.Alias, Is.EqualTo("test1"));
         }
     }
 
@@ -445,7 +444,7 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
             repository.Save(template);
 
             // Assert
-            Assert.AreEqual("test11", template.Alias);
+            Assert.That(template.Alias, Is.EqualTo("test11"));
             Assert.That(FileSystems.MvcViewsFileSystem.FileExists("test11.cshtml"), Is.True);
             Assert.That(FileSystems.MvcViewsFileSystem.FileExists("test.cshtml"), Is.False);
         }
@@ -495,7 +494,7 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
             repository.Delete(templates);
 
             // Assert
-            Assert.IsNull(repository.Get("test"));
+            Assert.That(repository.Get("test"), Is.Null);
             Assert.That(FileSystems.MvcViewsFileSystem.FileExists("test.cshtml"), Is.False);
         }
     }
@@ -563,7 +562,7 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
             templateRepository.Delete(templates);
 
             // Assert
-            Assert.IsNull(templateRepository.Get("textPage"));
+            Assert.That(templateRepository.Get("textPage"), Is.Null);
         }
     }
 
@@ -596,7 +595,7 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
             repository.Delete(templates);
 
             // Assert
-            Assert.IsNull(repository.Get("test"));
+            Assert.That(repository.Get("test"), Is.Null);
         }
     }
 
@@ -618,14 +617,14 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
             var allById = repository.GetMany(created[0].Id, created[2].Id, created[4].Id, created[5].Id, 999999).ToArray();
 
             // Assert
-            Assert.AreEqual(9, all.Count());
-            Assert.AreEqual(9, all.DistinctBy(x => x.Id).Count());
+            Assert.That(all.Count(), Is.EqualTo(9));
+            Assert.That(all.DistinctBy(x => x.Id).Count(), Is.EqualTo(9));
 
-            Assert.AreEqual(3, allByAlias.Count());
-            Assert.AreEqual(3, allByAlias.DistinctBy(x => x.Id).Count());
+            Assert.That(allByAlias.Count(), Is.EqualTo(3));
+            Assert.That(allByAlias.DistinctBy(x => x.Id).Count(), Is.EqualTo(3));
 
-            Assert.AreEqual(4, allById.Count());
-            Assert.AreEqual(4, allById.DistinctBy(x => x.Id).Count());
+            Assert.That(allById.Count(), Is.EqualTo(4));
+            Assert.That(allById.DistinctBy(x => x.Id).Count(), Is.EqualTo(4));
         }
     }
 
@@ -645,8 +644,8 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
             var childrenById = repository.GetChildren(created[1].Id).ToArray();
 
             // Assert
-            Assert.AreEqual(2, childrenById.Count());
-            Assert.AreEqual(2, childrenById.DistinctBy(x => x.Id).Count());
+            Assert.That(childrenById.Count(), Is.EqualTo(2));
+            Assert.That(childrenById.DistinctBy(x => x.Id).Count(), Is.EqualTo(2));
         }
     }
 
@@ -666,8 +665,8 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
             var children = repository.GetChildren(-1).ToArray();
 
             // Assert
-            Assert.AreEqual(1, children.Count());
-            Assert.AreEqual(1, children.DistinctBy(x => x.Id).Count());
+            Assert.That(children.Count(), Is.EqualTo(1));
+            Assert.That(children.DistinctBy(x => x.Id).Count(), Is.EqualTo(1));
         }
     }
 
@@ -686,8 +685,8 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
             var descendantsById = repository.GetDescendants(created[1].Id).ToArray();
 
             // Assert
-            Assert.AreEqual(3, descendantsById.Count());
-            Assert.AreEqual(3, descendantsById.DistinctBy(x => x.Id).Count());
+            Assert.That(descendantsById.Count(), Is.EqualTo(3));
+            Assert.That(descendantsById.DistinctBy(x => x.Id).Count(), Is.EqualTo(3));
         }
     }
 
@@ -740,16 +739,16 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
             repository.Save(baby2);
 
             // Assert
-            Assert.AreEqual(string.Format("-1,{0}", parent.Id), parent.Path);
-            Assert.AreEqual(string.Format("-1,{0},{1}", parent.Id, child1.Id), child1.Path);
-            Assert.AreEqual(string.Format("-1,{0},{1}", parent.Id, child2.Id), child2.Path);
-            Assert.AreEqual(string.Format("-1,{0},{1}", parent.Id, child2.Id), child2.Path);
-            Assert.AreEqual(string.Format("-1,{0},{1},{2}", parent.Id, child1.Id, toddler1.Id), toddler1.Path);
-            Assert.AreEqual(string.Format("-1,{0},{1},{2}", parent.Id, child1.Id, toddler2.Id), toddler2.Path);
-            Assert.AreEqual(string.Format("-1,{0},{1},{2}", parent.Id, child2.Id, toddler3.Id), toddler3.Path);
-            Assert.AreEqual(string.Format("-1,{0},{1},{2}", parent.Id, child2.Id, toddler4.Id), toddler4.Path);
-            Assert.AreEqual(string.Format("-1,{0},{1},{2},{3}", parent.Id, child1.Id, toddler2.Id, baby1.Id), baby1.Path);
-            Assert.AreEqual(string.Format("-1,{0},{1},{2},{3}", parent.Id, child2.Id, toddler4.Id, baby2.Id), baby2.Path);
+            Assert.That(parent.Path, Is.EqualTo(string.Format("-1,{0}", parent.Id)));
+            Assert.That(child1.Path, Is.EqualTo(string.Format("-1,{0},{1}", parent.Id, child1.Id)));
+            Assert.That(child2.Path, Is.EqualTo(string.Format("-1,{0},{1}", parent.Id, child2.Id)));
+            Assert.That(child2.Path, Is.EqualTo(string.Format("-1,{0},{1}", parent.Id, child2.Id)));
+            Assert.That(toddler1.Path, Is.EqualTo(string.Format("-1,{0},{1},{2}", parent.Id, child1.Id, toddler1.Id)));
+            Assert.That(toddler2.Path, Is.EqualTo(string.Format("-1,{0},{1},{2}", parent.Id, child1.Id, toddler2.Id)));
+            Assert.That(toddler3.Path, Is.EqualTo(string.Format("-1,{0},{1},{2}", parent.Id, child2.Id, toddler3.Id)));
+            Assert.That(toddler4.Path, Is.EqualTo(string.Format("-1,{0},{1},{2}", parent.Id, child2.Id, toddler4.Id)));
+            Assert.That(baby1.Path, Is.EqualTo(string.Format("-1,{0},{1},{2},{3}", parent.Id, child1.Id, toddler2.Id, baby1.Id)));
+            Assert.That(baby2.Path, Is.EqualTo(string.Format("-1,{0},{1},{2},{3}", parent.Id, child2.Id, toddler4.Id, baby2.Id)));
         }
     }
 
@@ -790,7 +789,7 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
             repository.Save(toddler2);
 
             // Assert
-            Assert.AreEqual($"-1,{parent.Id},{child2.Id},{toddler2.Id}", toddler2.Path);
+            Assert.That(toddler2.Path, Is.EqualTo($"-1,{parent.Id},{child2.Id},{toddler2.Id}"));
         }
     }
 
@@ -820,7 +819,7 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
             repository.Save(child1);
 
             // Assert
-            Assert.AreEqual($"-1,{child1.Id}", child1.Path);
+            Assert.That(child1.Path, Is.EqualTo($"-1,{child1.Id}"));
         }
     }
 
@@ -871,7 +870,7 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
             var productionRepository = CreateRepository(provider, productionRuntimeSettings);
 
             var updatedTemplate = productionRepository.Get("productionTestUpdate");
-            Assert.IsNotNull(updatedTemplate);
+            Assert.That(updatedTemplate, Is.Not.Null);
 
             // Modify and try to save.
             updatedTemplate.Content = "modified-content";
@@ -906,7 +905,7 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
             var productionRepository = CreateRepository(provider, productionRuntimeSettings);
 
             var existingTemplate = productionRepository.Get("productionTestDelete");
-            Assert.IsNotNull(existingTemplate);
+            Assert.That(existingTemplate, Is.Not.Null);
 
             productionRepository.Delete(existingTemplate);
 
@@ -1031,10 +1030,10 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
             var first = repository.Get(template.Key);
             var second = repository.Get(template.Key);
 
-            Assert.IsNotNull(first);
-            Assert.IsNotNull(second);
-            Assert.AreEqual(first!.Id, second!.Id);
-            Assert.AreNotSame(first, second);
+            Assert.That(first, Is.Not.Null);
+            Assert.That(second, Is.Not.Null);
+            Assert.That(second!.Id, Is.EqualTo(first!.Id));
+            Assert.That(second, Is.Not.SameAs(first));
         }
     }
 
@@ -1051,8 +1050,8 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
             // Case-insensitive alias lookup.
             var result = repository.Get("ALIASLOOKUPTEST");
 
-            Assert.IsNotNull(result);
-            Assert.AreEqual(template.Id, result!.Id);
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result!.Id, Is.EqualTo(template.Id));
         }
     }
 
@@ -1069,10 +1068,10 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
             var first = repository.Get("aliasCloneTest");
             var second = repository.Get("aliasCloneTest");
 
-            Assert.IsNotNull(first);
-            Assert.IsNotNull(second);
-            Assert.AreEqual(first!.Id, second!.Id);
-            Assert.AreNotSame(first, second);
+            Assert.That(first, Is.Not.Null);
+            Assert.That(second, Is.Not.Null);
+            Assert.That(second!.Id, Is.EqualTo(first!.Id));
+            Assert.That(second, Is.Not.SameAs(first));
         }
     }
 
@@ -1086,8 +1085,8 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
             var template = new Template(ShortStringHelper, "existsTest", "existsTest");
             repository.Save(template);
 
-            Assert.IsTrue(repository.Exists(template.Key));
-            Assert.IsFalse(repository.Exists(Guid.NewGuid()));
+            Assert.That(repository.Exists(template.Key), Is.True);
+            Assert.That(repository.Exists(Guid.NewGuid()), Is.False);
         }
     }
 
@@ -1102,13 +1101,13 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
             repository.Save(template);
 
             var first = repository.Get(template.Key);
-            Assert.IsNotNull(first);
+            Assert.That(first, Is.Not.Null);
             var originalName = first!.Name;
             first.Name = "MUTATED_" + Guid.NewGuid();
 
             var second = repository.Get(template.Key);
-            Assert.IsNotNull(second);
-            Assert.AreEqual(originalName, second!.Name, "Mutation of a returned entity should not affect the cached copy");
+            Assert.That(second, Is.Not.Null);
+            Assert.That(second!.Name, Is.EqualTo(originalName), "Mutation of a returned entity should not affect the cached copy");
         }
     }
 }

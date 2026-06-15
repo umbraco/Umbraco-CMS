@@ -27,12 +27,12 @@ public class SiblingsElementTreeControllerTests : ManagementApiUserGroupTestBase
     {
         // Create two folders at root level (siblings of each other)
         var folder1Result = await ElementContainerService.CreateAsync(null, $"Folder1 {Guid.NewGuid()}", null, Constants.Security.SuperUserKey);
-        Assert.IsTrue(folder1Result.Success, $"Failed to create folder1: {folder1Result.Status}");
+        Assert.That(folder1Result.Success, Is.True, $"Failed to create folder1: {folder1Result.Status}");
         _folder1Key = folder1Result.Result!.Key;
         _folder1Id = folder1Result.Result!.Id;
 
         var folder2Result = await ElementContainerService.CreateAsync(null, $"Folder2 {Guid.NewGuid()}", null, Constants.Security.SuperUserKey);
-        Assert.IsTrue(folder2Result.Success, $"Failed to create folder2: {folder2Result.Status}");
+        Assert.That(folder2Result.Success, Is.True, $"Failed to create folder2: {folder2Result.Status}");
     }
 
     protected override Expression<Func<SiblingsElementTreeController, object>> MethodSelector =>
@@ -75,18 +75,18 @@ public class SiblingsElementTreeControllerTests : ManagementApiUserGroupTestBase
         // Get siblings of folder1 (folder2 is a sibling but user has no access)
         var response = await ClientRequest();
 
-        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, await response.Content.ReadAsStringAsync());
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK), await response.Content.ReadAsStringAsync());
 
         var result = await response.Content.ReadFromJsonAsync<SubsetViewModel<ElementTreeItemResponseModel>>(JsonSerializerOptions);
-        Assert.IsNotNull(result);
+        Assert.That(result, Is.Not.Null);
 
         // Only folder1 (the target) should be returned; folder2 should be filtered out completely
-        Assert.AreEqual(1, result.Items.Count(), "Only the target folder should be returned");
-        Assert.AreEqual(_folder1Key, result.Items.First().Id, "The target folder should be folder1");
+        Assert.That(result.Items.Count(), Is.EqualTo(1), "Only the target folder should be returned");
+        Assert.That(result.Items.First().Id, Is.EqualTo(_folder1Key), "The target folder should be folder1");
 
         // No accessible siblings before or after the target
-        Assert.AreEqual(0, result.TotalBefore, "No accessible siblings before");
-        Assert.AreEqual(0, result.TotalAfter, "No accessible siblings after");
+        Assert.That(result.TotalBefore, Is.EqualTo(0), "No accessible siblings before");
+        Assert.That(result.TotalAfter, Is.EqualTo(0), "No accessible siblings after");
     }
 }
 

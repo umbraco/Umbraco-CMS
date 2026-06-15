@@ -49,27 +49,27 @@ public class ContentTests
 
         const string langFr = "fr-FR";
 
-        Assert.IsFalse(content.IsPropertyDirty("CultureInfos")); // hasn't been changed
+        Assert.That(content.IsPropertyDirty("CultureInfos"), Is.False); // hasn't been changed
 
         Thread.Sleep(500); // The "Date" wont be dirty if the test runs too fast since it will be the same date
         content.SetCultureName("name-fr", langFr);
-        Assert.IsTrue(
-            content.IsPropertyDirty("CultureInfos")); // now it will be changed since the collection has changed
+        Assert.That(
+            content.IsPropertyDirty("CultureInfos"), Is.True); // now it will be changed since the collection has changed
         var frCultureName = content.CultureInfos[langFr];
-        Assert.IsTrue(frCultureName.IsPropertyDirty("Date"));
+        Assert.That(frCultureName.IsPropertyDirty("Date"), Is.True);
 
         content.ResetDirtyProperties();
         frCultureName.ResetDirtyProperties();
 
-        Assert.IsFalse(content.IsPropertyDirty("CultureInfos")); // it's been reset
-        Assert.IsTrue(content.WasPropertyDirty("CultureInfos"));
+        Assert.That(content.IsPropertyDirty("CultureInfos"), Is.False); // it's been reset
+        Assert.That(content.WasPropertyDirty("CultureInfos"), Is.True);
 
         Thread.Sleep(500); // The "Date" wont be dirty if the test runs too fast since it will be the same date
         content.SetCultureName(newName, langFr);
 
         // dirty is only true if we updated the name
-        Assert.AreEqual(expectedDirty, frCultureName.IsPropertyDirty("Date"));
-        Assert.AreEqual(expectedDirty, content.IsPropertyDirty("CultureInfos"));
+        Assert.That(frCultureName.IsPropertyDirty("Date"), Is.EqualTo(expectedDirty));
+        Assert.That(content.IsPropertyDirty("CultureInfos"), Is.EqualTo(expectedDirty));
     }
 
     [Test]
@@ -90,27 +90,27 @@ public class ContentTests
 
         content.ChangeContentType(contentType);
 
-        Assert.IsFalse(content.IsPropertyDirty("PublishCultureInfos")); // hasn't been changed
+        Assert.That(content.IsPropertyDirty("PublishCultureInfos"), Is.False); // hasn't been changed
 
         Thread.Sleep(500); // The "Date" wont be dirty if the test runs too fast since it will be the same date
         content.SetCultureName("name-fr", langFr);
         content.PublishCulture(CultureImpact.Explicit(langFr, false), DateTime.UtcNow, _propertyEditorCollection); // we've set the name, now we're publishing it
-        Assert.IsTrue(
-            content.IsPropertyDirty("PublishCultureInfos")); // now it will be changed since the collection has changed
+        Assert.That(
+            content.IsPropertyDirty("PublishCultureInfos"), Is.True); // now it will be changed since the collection has changed
         var frCultureName = content.PublishCultureInfos[langFr];
-        Assert.IsTrue(frCultureName.IsPropertyDirty("Date"));
+        Assert.That(frCultureName.IsPropertyDirty("Date"), Is.True);
 
         content.ResetDirtyProperties();
         frCultureName.ResetDirtyProperties();
 
-        Assert.IsFalse(content.IsPropertyDirty("PublishCultureInfos")); // it's been reset
-        Assert.IsTrue(content.WasPropertyDirty("PublishCultureInfos"));
+        Assert.That(content.IsPropertyDirty("PublishCultureInfos"), Is.False); // it's been reset
+        Assert.That(content.WasPropertyDirty("PublishCultureInfos"), Is.True);
 
         Thread.Sleep(500); // The "Date" wont be dirty if the test runs too fast since it will be the same date
         content.SetCultureName("name-fr", langFr);
         content.PublishCulture(CultureImpact.Explicit(langFr, false), DateTime.UtcNow, _propertyEditorCollection); // we've set the name, now we're publishing it
-        Assert.IsTrue(frCultureName.IsPropertyDirty("Date"));
-        Assert.IsTrue(content.IsPropertyDirty("PublishCultureInfos")); // it's true now since we've updated a name
+        Assert.That(frCultureName.IsPropertyDirty("Date"), Is.True);
+        Assert.That(content.IsPropertyDirty("PublishCultureInfos"), Is.True); // it's true now since we've updated a name
     }
 
     [Test]
@@ -139,8 +139,8 @@ public class ContentTests
 
         var nonGrouped = content.GetNonGroupedProperties();
 
-        Assert.AreEqual(2, nonGrouped.Count());
-        Assert.AreEqual(5, content.Properties.Count());
+        Assert.That(nonGrouped.Count(), Is.EqualTo(2));
+        Assert.That(content.Properties.Count(), Is.EqualTo(5));
     }
 
     [Test]
@@ -154,10 +154,10 @@ public class ContentTests
 
         content.ResetDirtyProperties(false);
 
-        Assert.IsFalse(content.IsDirty());
+        Assert.That(content.IsDirty(), Is.False);
         foreach (var prop in content.Properties)
         {
-            Assert.IsFalse(prop.IsDirty());
+            Assert.That(prop.IsDirty(), Is.False);
         }
     }
 
@@ -231,12 +231,12 @@ public class ContentTests
         var clone = content.DeepCloneWithResetIdentities();
 
         // Assert
-        Assert.AreNotSame(clone, content);
-        Assert.AreNotSame(clone.Id, content.Id);
-        Assert.AreNotSame(clone.VersionId, content.VersionId);
+        Assert.That(content, Is.Not.SameAs(clone));
+        Assert.That(content.Id, Is.Not.EqualTo(clone.Id));
+        Assert.That(content.VersionId, Is.Not.EqualTo(clone.VersionId));
         Assert.That(clone.HasIdentity, Is.False);
 
-        Assert.AreNotSame(content.Properties, clone.Properties);
+        Assert.That(clone.Properties, Is.Not.SameAs(content.Properties));
     }
 
     private static IProfilingLogger GetTestProfilingLogger()
@@ -338,62 +338,62 @@ public class ContentTests
         var clone = (Content)content.DeepClone();
 
         // Assert
-        Assert.AreNotSame(clone, content);
-        Assert.AreEqual(clone, content);
-        Assert.AreEqual(clone.Id, content.Id);
-        Assert.AreEqual(clone.VersionId, content.VersionId);
-        Assert.AreEqual(clone.ContentType, content.ContentType);
-        Assert.AreEqual(clone.ContentTypeId, content.ContentTypeId);
-        Assert.AreEqual(clone.CreateDate, content.CreateDate);
-        Assert.AreEqual(clone.CreatorId, content.CreatorId);
-        Assert.AreEqual(clone.Key, content.Key);
-        Assert.AreEqual(clone.Level, content.Level);
-        Assert.AreEqual(clone.Path, content.Path);
-        Assert.AreEqual(clone.Published, content.Published);
-        Assert.AreEqual(clone.PublishedState, content.PublishedState);
-        Assert.AreEqual(clone.SortOrder, content.SortOrder);
-        Assert.AreEqual(clone.PublishedState, content.PublishedState);
-        Assert.AreNotSame(clone.TemplateId, content.TemplateId);
-        Assert.AreEqual(clone.TemplateId, content.TemplateId);
-        Assert.AreEqual(clone.Trashed, content.Trashed);
-        Assert.AreEqual(clone.UpdateDate, content.UpdateDate);
-        Assert.AreEqual(clone.VersionId, content.VersionId);
-        Assert.AreEqual(clone.WriterId, content.WriterId);
-        Assert.AreNotSame(clone.Properties, content.Properties);
-        Assert.AreEqual(clone.Properties.Count(), content.Properties.Count());
+        Assert.That(content, Is.Not.SameAs(clone));
+        Assert.That(content, Is.EqualTo(clone));
+        Assert.That(content.Id, Is.EqualTo(clone.Id));
+        Assert.That(content.VersionId, Is.EqualTo(clone.VersionId));
+        Assert.That(content.ContentType, Is.EqualTo(clone.ContentType));
+        Assert.That(content.ContentTypeId, Is.EqualTo(clone.ContentTypeId));
+        Assert.That(content.CreateDate, Is.EqualTo(clone.CreateDate));
+        Assert.That(content.CreatorId, Is.EqualTo(clone.CreatorId));
+        Assert.That(content.Key, Is.EqualTo(clone.Key));
+        Assert.That(content.Level, Is.EqualTo(clone.Level));
+        Assert.That(content.Path, Is.EqualTo(clone.Path));
+        Assert.That(content.Published, Is.EqualTo(clone.Published));
+        Assert.That(content.PublishedState, Is.EqualTo(clone.PublishedState));
+        Assert.That(content.SortOrder, Is.EqualTo(clone.SortOrder));
+        Assert.That(content.PublishedState, Is.EqualTo(clone.PublishedState));
+        Assert.That(content.TemplateId, Is.Not.EqualTo(clone.TemplateId));
+        Assert.That(content.TemplateId, Is.EqualTo(clone.TemplateId));
+        Assert.That(content.Trashed, Is.EqualTo(clone.Trashed));
+        Assert.That(content.UpdateDate, Is.EqualTo(clone.UpdateDate));
+        Assert.That(content.VersionId, Is.EqualTo(clone.VersionId));
+        Assert.That(content.WriterId, Is.EqualTo(clone.WriterId));
+        Assert.That(content.Properties, Is.Not.SameAs(clone.Properties));
+        Assert.That(content.Properties.Count(), Is.EqualTo(clone.Properties.Count()));
         for (var index = 0; index < content.Properties.Count; index++)
         {
-            Assert.AreNotSame(clone.Properties[index], content.Properties[index]);
-            Assert.AreEqual(clone.Properties[index], content.Properties[index]);
+            Assert.That(content.Properties[index], Is.Not.SameAs(clone.Properties[index]));
+            Assert.That(content.Properties[index], Is.EqualTo(clone.Properties[index]));
         }
 
-        Assert.AreNotSame(clone.PublishCultureInfos, content.PublishCultureInfos);
-        Assert.AreEqual(clone.PublishCultureInfos.Count, content.PublishCultureInfos.Count);
+        Assert.That(content.PublishCultureInfos, Is.Not.SameAs(clone.PublishCultureInfos));
+        Assert.That(content.PublishCultureInfos, Has.Count.EqualTo(clone.PublishCultureInfos.Count));
         foreach (var key in content.PublishCultureInfos.Keys)
         {
-            Assert.AreNotSame(clone.PublishCultureInfos[key], content.PublishCultureInfos[key]);
-            Assert.AreEqual(clone.PublishCultureInfos[key], content.PublishCultureInfos[key]);
+            Assert.That(content.PublishCultureInfos[key], Is.Not.SameAs(clone.PublishCultureInfos[key]));
+            Assert.That(content.PublishCultureInfos[key], Is.EqualTo(clone.PublishCultureInfos[key]));
         }
 
-        Assert.AreNotSame(clone.CultureInfos, content.CultureInfos);
-        Assert.AreEqual(clone.CultureInfos.Count, content.CultureInfos.Count);
+        Assert.That(content.CultureInfos, Is.Not.SameAs(clone.CultureInfos));
+        Assert.That(content.CultureInfos, Has.Count.EqualTo(clone.CultureInfos.Count));
         foreach (var key in content.CultureInfos.Keys)
         {
-            Assert.AreNotSame(clone.CultureInfos[key], content.CultureInfos[key]);
-            Assert.AreEqual(clone.CultureInfos[key], content.CultureInfos[key]);
+            Assert.That(content.CultureInfos[key], Is.Not.SameAs(clone.CultureInfos[key]));
+            Assert.That(content.CultureInfos[key], Is.EqualTo(clone.CultureInfos[key]));
         }
 
         // This double verifies by reflection
         var allProps = clone.GetType().GetProperties();
         foreach (var propertyInfo in allProps)
         {
-            Assert.AreEqual(propertyInfo.GetValue(clone, null), propertyInfo.GetValue(content, null));
+            Assert.That(propertyInfo.GetValue(content, null), Is.EqualTo(propertyInfo.GetValue(clone, null)));
         }
 
         // Need to ensure the event handlers are wired
         var asDirty = (ICanBeDirty)clone;
 
-        Assert.IsFalse(asDirty.IsPropertyDirty("Properties"));
+        Assert.That(asDirty.IsPropertyDirty("Properties"), Is.False);
         var propertyType = new PropertyTypeBuilder()
             .WithAlias("blah")
             .Build();
@@ -404,7 +404,7 @@ public class ContentTests
         newProperty.SetValue("blah");
         clone.Properties.Add(newProperty);
 
-        Assert.IsTrue(asDirty.IsPropertyDirty("Properties"));
+        Assert.That(asDirty.IsPropertyDirty("Properties"), Is.True);
     }
 
     [Test]
@@ -445,38 +445,38 @@ public class ContentTests
         content.ResetDirtyProperties();
 
         // Assert
-        Assert.IsTrue(content.WasDirty());
-        Assert.IsTrue(content.WasPropertyDirty(nameof(Content.Id)));
-        Assert.IsTrue(content.WasPropertyDirty(nameof(Content.CreateDate)));
-        Assert.IsTrue(content.WasPropertyDirty(nameof(Content.CreatorId)));
-        Assert.IsTrue(content.WasPropertyDirty(nameof(Content.Key)));
-        Assert.IsTrue(content.WasPropertyDirty(nameof(Content.Level)));
-        Assert.IsTrue(content.WasPropertyDirty(nameof(Content.Path)));
-        Assert.IsTrue(content.WasPropertyDirty(nameof(Content.SortOrder)));
-        Assert.IsTrue(content.WasPropertyDirty(nameof(Content.TemplateId)));
-        Assert.IsTrue(content.WasPropertyDirty(nameof(Content.Trashed)));
-        Assert.IsTrue(content.WasPropertyDirty(nameof(Content.UpdateDate)));
-        Assert.IsTrue(content.WasPropertyDirty(nameof(Content.WriterId)));
+        Assert.That(content.WasDirty(), Is.True);
+        Assert.That(content.WasPropertyDirty(nameof(Content.Id)), Is.True);
+        Assert.That(content.WasPropertyDirty(nameof(Content.CreateDate)), Is.True);
+        Assert.That(content.WasPropertyDirty(nameof(Content.CreatorId)), Is.True);
+        Assert.That(content.WasPropertyDirty(nameof(Content.Key)), Is.True);
+        Assert.That(content.WasPropertyDirty(nameof(Content.Level)), Is.True);
+        Assert.That(content.WasPropertyDirty(nameof(Content.Path)), Is.True);
+        Assert.That(content.WasPropertyDirty(nameof(Content.SortOrder)), Is.True);
+        Assert.That(content.WasPropertyDirty(nameof(Content.TemplateId)), Is.True);
+        Assert.That(content.WasPropertyDirty(nameof(Content.Trashed)), Is.True);
+        Assert.That(content.WasPropertyDirty(nameof(Content.UpdateDate)), Is.True);
+        Assert.That(content.WasPropertyDirty(nameof(Content.WriterId)), Is.True);
         foreach (var prop in content.Properties)
         {
-            Assert.IsTrue(prop.WasDirty());
-            Assert.IsTrue(prop.WasPropertyDirty("Id"));
+            Assert.That(prop.WasDirty(), Is.True);
+            Assert.That(prop.WasPropertyDirty("Id"), Is.True);
         }
 
-        Assert.IsTrue(content.WasPropertyDirty("CultureInfos"));
+        Assert.That(content.WasPropertyDirty("CultureInfos"), Is.True);
         foreach (var culture in content.CultureInfos)
         {
-            Assert.IsTrue(culture.WasDirty());
-            Assert.IsTrue(culture.WasPropertyDirty("Name"));
-            Assert.IsTrue(culture.WasPropertyDirty("Date"));
+            Assert.That(culture.WasDirty(), Is.True);
+            Assert.That(culture.WasPropertyDirty("Name"), Is.True);
+            Assert.That(culture.WasPropertyDirty("Date"), Is.True);
         }
 
-        Assert.IsTrue(content.WasPropertyDirty("PublishCultureInfos"));
+        Assert.That(content.WasPropertyDirty("PublishCultureInfos"), Is.True);
         foreach (var culture in content.PublishCultureInfos)
         {
-            Assert.IsTrue(culture.WasDirty());
-            Assert.IsTrue(culture.WasPropertyDirty("Name"));
-            Assert.IsTrue(culture.WasPropertyDirty("Date"));
+            Assert.That(culture.WasDirty(), Is.True);
+            Assert.That(culture.WasPropertyDirty("Name"), Is.True);
+            Assert.That(culture.WasPropertyDirty("Date"), Is.True);
         }
     }
 
@@ -563,7 +563,7 @@ public class ContentTests
             new PropertyGroup(true) { Alias = "testGroup", Name = "Test Group", SortOrder = 3 });
 
         // Assert
-        Assert.That(contentType.PropertyGroups.Count, Is.EqualTo(3));
+        Assert.That(contentType.PropertyGroups, Has.Count.EqualTo(3));
     }
 
     [Test]
@@ -577,7 +577,7 @@ public class ContentTests
         contentType.PropertyGroups.Remove("content");
 
         // Assert
-        Assert.That(contentType.PropertyGroups.Count, Is.EqualTo(1));
+        Assert.That(contentType.PropertyGroups, Has.Count.EqualTo(1));
         //// Assert.That(contentType.IsPropertyDirty("PropertyGroups"), Is.True);
     }
 
@@ -595,7 +595,7 @@ public class ContentTests
         contentType.PropertyGroups["content"].PropertyTypes.Add(propertyType);
 
         // Assert
-        Assert.That(contentType.PropertyGroups["content"].PropertyTypes.Count, Is.EqualTo(3));
+        Assert.That(contentType.PropertyGroups["content"].PropertyTypes, Has.Count.EqualTo(3));
     }
 
     [Test]
@@ -646,7 +646,7 @@ public class ContentTests
         content.Properties.Add(newProperty);
 
         // Assert
-        Assert.That(content.Properties.Count, Is.EqualTo(5));
+        Assert.That(content.Properties, Has.Count.EqualTo(5));
         Assert.That(content.Properties["subtitle"].GetValue(), Is.EqualTo("Subtitle Test"));
         Assert.That(content.Properties["title"].GetValue(), Is.EqualTo("Textpage textpage"));
     }
@@ -669,7 +669,7 @@ public class ContentTests
         content.Properties.Add(new Property(propertyType));
 
         // Assert
-        Assert.That(content.Properties.Count, Is.EqualTo(4));
+        Assert.That(content.Properties, Has.Count.EqualTo(4));
         Assert.That(contentType.PropertyTypes.First(x => x.Alias == "title").SortOrder, Is.EqualTo(1));
         Assert.That(content.Properties["title"].GetValue(), Is.EqualTo("Textpage textpage"));
     }
@@ -692,7 +692,7 @@ public class ContentTests
         Assert.That(content.Properties.Contains("author"), Is.True);
 
         // Note: There were 4 properties, after changing ContentType 1 has been added (no properties are deleted).
-        Assert.That(content.Properties.Count, Is.EqualTo(5));
+        Assert.That(content.Properties, Has.Count.EqualTo(5));
     }
 
     [Test]
@@ -764,28 +764,28 @@ public class ContentTests
         content.ResetDirtyProperties();
         content.PublishedState = PublishedState.Publishing;
 
-        Assert.IsFalse(content.IsPropertyDirty("Published"));
-        Assert.IsFalse(content.Published);
-        Assert.IsFalse(content.IsPropertyDirty("Name"));
-        Assert.AreEqual(PublishedState.Publishing, content.PublishedState);
+        Assert.That(content.IsPropertyDirty("Published"), Is.False);
+        Assert.That(content.Published, Is.False);
+        Assert.That(content.IsPropertyDirty("Name"), Is.False);
+        Assert.That(content.PublishedState, Is.EqualTo(PublishedState.Publishing));
 
         // the repo would do
         content.Published = true;
 
         // and then
-        Assert.IsTrue(content.IsPropertyDirty("Published"));
-        Assert.IsTrue(content.Published);
-        Assert.IsFalse(content.IsPropertyDirty("Name"));
-        Assert.AreEqual(PublishedState.Published, content.PublishedState);
+        Assert.That(content.IsPropertyDirty("Published"), Is.True);
+        Assert.That(content.Published, Is.True);
+        Assert.That(content.IsPropertyDirty("Name"), Is.False);
+        Assert.That(content.PublishedState, Is.EqualTo(PublishedState.Published));
 
         // and before returning,
         content.ResetDirtyProperties();
 
         // and then
-        Assert.IsFalse(content.IsPropertyDirty("Published"));
-        Assert.IsTrue(content.Published);
-        Assert.IsFalse(content.IsPropertyDirty("Name"));
-        Assert.AreEqual(PublishedState.Published, content.PublishedState);
+        Assert.That(content.IsPropertyDirty("Published"), Is.False);
+        Assert.That(content.Published, Is.True);
+        Assert.That(content.IsPropertyDirty("Name"), Is.False);
+        Assert.That(content.PublishedState, Is.EqualTo(PublishedState.Published));
     }
 
     [Test]

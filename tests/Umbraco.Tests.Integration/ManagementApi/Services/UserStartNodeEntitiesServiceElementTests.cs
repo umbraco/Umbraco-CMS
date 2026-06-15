@@ -48,8 +48,8 @@ public partial class UserStartNodeEntitiesServiceElementTests : UserStartNodeEnt
                 $"C{rootNumber}",
                 null, // parent at root
                 Constants.Security.SuperUserKey);
-            Assert.IsTrue(rootContainerResult.Success);
-            Assert.NotNull(rootContainerResult.Result);
+            Assert.That(rootContainerResult.Success, Is.True);
+            Assert.That(rootContainerResult.Result, Is.Not.Null);
             var rootContainer = rootContainerResult.Result;
             ItemsByName[rootContainer.Name!] = (rootContainer.Id, rootContainer.Key);
 
@@ -61,8 +61,8 @@ public partial class UserStartNodeEntitiesServiceElementTests : UserStartNodeEnt
                     $"C{rootNumber}-C{childNumber}",
                     rootContainer.Key,
                     Constants.Security.SuperUserKey);
-                Assert.IsTrue(childContainerResult.Success);
-                Assert.NotNull(childContainerResult.Result);
+                Assert.That(childContainerResult.Success, Is.True);
+                Assert.That(childContainerResult.Result, Is.Not.Null);
                 var childContainer = childContainerResult.Result;
                 ItemsByName[childContainer.Name!] = (childContainer.Id, childContainer.Key);
 
@@ -74,7 +74,7 @@ public partial class UserStartNodeEntitiesServiceElementTests : UserStartNodeEnt
                         ParentId = childContainer.Id
                     };
                     var saveElementResult = ElementService.Save([element]);
-                    Assert.IsTrue(saveElementResult.Success);
+                    Assert.That(saveElementResult.Success, Is.True);
                     ItemsByName[element.Name!] = (element.Id, element.Key);
                 }
             }
@@ -87,7 +87,7 @@ public partial class UserStartNodeEntitiesServiceElementTests : UserStartNodeEnt
                     ParentId = rootContainer.Id
                 };
                 var saveElementResult = ElementService.Save([element]);
-                Assert.IsTrue(saveElementResult.Success);
+                Assert.That(saveElementResult.Success, Is.True);
                 ItemsByName[element.Name!] = (element.Id, element.Key);
             }
         }
@@ -97,7 +97,7 @@ public partial class UserStartNodeEntitiesServiceElementTests : UserStartNodeEnt
         {
             var element = new Core.Models.Element($"E{elementNumber}", contentType);
             var saveElementResult = ElementService.Save([element]);
-            Assert.IsTrue(saveElementResult.Success);
+            Assert.That(saveElementResult.Success, Is.True);
             ItemsByName[element.Name!] = (element.Id, element.Key);
         }
     }

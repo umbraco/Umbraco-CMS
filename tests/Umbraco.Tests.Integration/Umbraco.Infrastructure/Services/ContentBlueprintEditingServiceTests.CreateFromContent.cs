@@ -28,8 +28,8 @@ public partial class ContentBlueprintEditingServiceTests
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(createContentResult.Success);
-            Assert.IsNotNull(createContentResult.Result);
+            Assert.That(createContentResult.Success, Is.True);
+            Assert.That(createContentResult.Result, Is.Not.Null);
         });
 
         const string name = "Test Create From Content Blueprint";
@@ -42,8 +42,8 @@ public partial class ContentBlueprintEditingServiceTests
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(result.Success);
-            Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+            Assert.That(result.Success, Is.True);
+            Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.Success));
         });
         VerifyCreate(result.Result.Content);
 
@@ -52,19 +52,19 @@ public partial class ContentBlueprintEditingServiceTests
 
         void VerifyCreate(IContent? createdBlueprint)
         {
-            Assert.IsNotNull(createdBlueprint);
+            Assert.That(createdBlueprint, Is.Not.Null);
             Assert.Multiple(() =>
             {
-                Assert.AreNotEqual(Guid.Empty, createdBlueprint.Key);
-                Assert.IsTrue(createdBlueprint.HasIdentity);
-                Assert.AreEqual(name, createdBlueprint.Name);
-                Assert.AreEqual("The title value", createdBlueprint.GetValue<string>("title"));
+                Assert.That(createdBlueprint.Key, Is.Not.EqualTo(Guid.Empty));
+                Assert.That(createdBlueprint.HasIdentity, Is.True);
+                Assert.That(createdBlueprint.Name, Is.EqualTo(name));
+                Assert.That(createdBlueprint.GetValue<string>("title"), Is.EqualTo("The title value"));
             });
         }
 
         // ensures it's not found by normal content
         var contentFound = await ContentEditingService.GetAsync(result.Result.Content!.Key);
-        Assert.IsNull(contentFound);
+        Assert.That(contentFound, Is.Null);
     }
 
     [TestCase(true)]
@@ -84,21 +84,21 @@ public partial class ContentBlueprintEditingServiceTests
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(result.Success);
-            Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
-            Assert.IsNotNull(result.Result.Content);
+            Assert.That(result.Success, Is.True);
+            Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.Success));
+            Assert.That(result.Result.Content, Is.Not.Null);
         });
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(result.Result.Content.HasIdentity);
-            Assert.AreEqual(key, result.Result.Content.Key);
-            Assert.AreEqual(name, result.Result.Content.Name);
+            Assert.That(result.Result.Content.HasIdentity, Is.True);
+            Assert.That(result.Result.Content.Key, Is.EqualTo(key));
+            Assert.That(result.Result.Content.Name, Is.EqualTo(name));
         });
 
         // re-get and verify creation
         var blueprint = await ContentBlueprintEditingService.GetAsync(key);
-        Assert.IsNotNull(blueprint);
-        Assert.AreEqual(result.Result.Content.Id, blueprint.Id);
+        Assert.That(blueprint, Is.Not.Null);
+        Assert.That(blueprint.Id, Is.EqualTo(result.Result.Content.Id));
     }
 
     [TestCase(true)]
@@ -117,9 +117,9 @@ public partial class ContentBlueprintEditingServiceTests
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(result1.Success);
-            Assert.AreEqual(ContentEditingOperationStatus.Success, result1.Status);
-            Assert.IsNotNull(result1.Result);
+            Assert.That(result1.Success, Is.True);
+            Assert.That(result1.Status, Is.EqualTo(ContentEditingOperationStatus.Success));
+            Assert.That(result1.Result, Is.Not.Null);
         });
 
         // create another blueprint with the same name
@@ -131,10 +131,10 @@ public partial class ContentBlueprintEditingServiceTests
 
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(result2.Success);
-            Assert.AreEqual(ContentEditingOperationStatus.DuplicateName, result2.Status);
-            Assert.IsNotNull(result2.Result);
+            Assert.That(result2.Success, Is.False);
+            Assert.That(result2.Status, Is.EqualTo(ContentEditingOperationStatus.DuplicateName));
+            Assert.That(result2.Result, Is.Not.Null);
         });
-        Assert.IsNull(result2.Result.Content);
+        Assert.That(result2.Result.Content, Is.Null);
     }
 }

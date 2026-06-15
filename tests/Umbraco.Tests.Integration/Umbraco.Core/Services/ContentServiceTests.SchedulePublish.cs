@@ -25,7 +25,7 @@ internal sealed partial class ContentServiceTests
         var elementType = ContentTypeBuilder.CreateBasicElementType();
         elementType.AllowedAsRoot = true;
         var elementTypeResult = await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
-        Assert.IsTrue(elementTypeResult.Success, "Failed to create element content type");
+        Assert.That(elementTypeResult.Success, Is.True, "Failed to create element content type");
 
         var element = ElementBuilder.CreateBasicElement(elementType);
         ElementServiceForScheduling.Save(element);
@@ -40,13 +40,13 @@ internal sealed partial class ContentServiceTests
                 },
             ],
             Constants.Security.SuperUserKey);
-        Assert.IsTrue(elementScheduleAttempt.Success);
+        Assert.That(elementScheduleAttempt.Success, Is.True);
 
         // Create a document with a scheduled publish at the same time
         var docType = ContentTypeBuilder.CreateBasicContentType();
         docType.AllowedAsRoot = true;
         var docTypeResult = await ContentTypeService.CreateAsync(docType, Constants.Security.SuperUserKey);
-        Assert.IsTrue(docTypeResult.Success, "Failed to create document content type");
+        Assert.That(docTypeResult.Success, Is.True, "Failed to create document content type");
 
         var document = ContentBuilder.CreateBasicContent(docType);
         ContentService.Save(document);
@@ -61,20 +61,19 @@ internal sealed partial class ContentServiceTests
                 },
             ],
             Constants.Security.SuperUserKey);
-        Assert.IsTrue(docScheduleAttempt.Success);
+        Assert.That(docScheduleAttempt.Success, Is.True);
 
         // Run scheduled publishing for documents - should only process document schedules
         // Note: The base class (UmbracoIntegrationTestWithContent) creates a Subpage with a past
         // release schedule, so more than one result may be returned.
         var publishDate = _schedulePublishDate.AddMinutes(1);
         var docResults = ContentService.PerformScheduledPublish(publishDate).ToList();
-        Assert.IsNotEmpty(docResults, "Document scheduled publishing should process at least one document");
+        Assert.That(docResults, Is.Not.Empty, "Document scheduled publishing should process at least one document");
 
         // Verify the element schedule is still intact after document scheduled publishing ran
         var elementSchedulesAfterDocPublish = ElementServiceForScheduling.GetContentScheduleByContentId(element.Key);
-        Assert.AreEqual(
-            1,
-            elementSchedulesAfterDocPublish.FullSchedule.Count,
+        Assert.That(
+            elementSchedulesAfterDocPublish.FullSchedule, Has.Count.EqualTo(1),
             "Element schedule must not be cleared by document scheduled publishing");
     }
 
@@ -85,7 +84,7 @@ internal sealed partial class ContentServiceTests
         var elementType = ContentTypeBuilder.CreateBasicElementType();
         elementType.AllowedAsRoot = true;
         var elementTypeResult = await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
-        Assert.IsTrue(elementTypeResult.Success, "Failed to create element content type");
+        Assert.That(elementTypeResult.Success, Is.True, "Failed to create element content type");
 
         var element = ElementBuilder.CreateBasicElement(elementType);
         ElementServiceForScheduling.Save(element);
@@ -94,7 +93,7 @@ internal sealed partial class ContentServiceTests
             element.Key,
             [new() { Culture = Constants.System.InvariantCulture }],
             Constants.Security.SuperUserKey);
-        Assert.IsTrue(elementPublishAttempt.Success, "Element publish should succeed");
+        Assert.That(elementPublishAttempt.Success, Is.True, "Element publish should succeed");
 
         var elementScheduleAttempt = await ElementPublishingService.PublishAsync(
             element.Key,
@@ -106,13 +105,13 @@ internal sealed partial class ContentServiceTests
                 },
             ],
             Constants.Security.SuperUserKey);
-        Assert.IsTrue(elementScheduleAttempt.Success);
+        Assert.That(elementScheduleAttempt.Success, Is.True);
 
         // Create and publish a document, then schedule unpublish at the same time
         var docType = ContentTypeBuilder.CreateBasicContentType();
         docType.AllowedAsRoot = true;
         var docTypeResult = await ContentTypeService.CreateAsync(docType, Constants.Security.SuperUserKey);
-        Assert.IsTrue(docTypeResult.Success, "Failed to create document content type");
+        Assert.That(docTypeResult.Success, Is.True, "Failed to create document content type");
 
         var document = ContentBuilder.CreateBasicContent(docType);
         ContentService.Save(document);
@@ -121,7 +120,7 @@ internal sealed partial class ContentServiceTests
             document.Key,
             [new() { Culture = Constants.System.InvariantCulture }],
             Constants.Security.SuperUserKey);
-        Assert.IsTrue(docPublishAttempt.Success, "Document publish should succeed");
+        Assert.That(docPublishAttempt.Success, Is.True, "Document publish should succeed");
 
         var docScheduleAttempt = await ContentPublishingService.PublishAsync(
             document.Key,
@@ -133,18 +132,17 @@ internal sealed partial class ContentServiceTests
                 },
             ],
             Constants.Security.SuperUserKey);
-        Assert.IsTrue(docScheduleAttempt.Success);
+        Assert.That(docScheduleAttempt.Success, Is.True);
 
         // Run scheduled publishing for documents - should only process document schedules
         var unpublishDate = _scheduleUnPublishDate.AddMinutes(1);
         var docResults = ContentService.PerformScheduledPublish(unpublishDate).ToList();
-        Assert.IsNotEmpty(docResults, "Document scheduled publishing should process at least one document");
+        Assert.That(docResults, Is.Not.Empty, "Document scheduled publishing should process at least one document");
 
         // Verify the element expiration schedule is still intact
         var elementSchedulesAfterDocUnpublish = ElementServiceForScheduling.GetContentScheduleByContentId(element.Key);
-        Assert.AreEqual(
-            1,
-            elementSchedulesAfterDocUnpublish.FullSchedule.Count,
+        Assert.That(
+            elementSchedulesAfterDocUnpublish.FullSchedule, Has.Count.EqualTo(1),
             "Element expiration schedule must not be cleared by document scheduled publishing");
     }
 }

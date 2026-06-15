@@ -25,20 +25,20 @@ public class DictionaryTranslationTests
 
         var clone = (DictionaryTranslation)item.DeepClone();
 
-        Assert.AreNotSame(clone, item);
-        Assert.AreEqual(clone, item);
-        Assert.AreEqual(clone.CreateDate, item.CreateDate);
-        Assert.AreEqual(clone.Id, item.Id);
-        Assert.AreEqual(clone.Key, item.Key);
-        Assert.AreEqual(clone.UpdateDate, item.UpdateDate);
-        Assert.AreEqual(clone.LanguageIsoCode, item.LanguageIsoCode);
-        Assert.AreEqual(clone.Value, item.Value);
+        Assert.That(item, Is.Not.SameAs(clone));
+        Assert.That(item, Is.EqualTo(clone));
+        Assert.That(item.CreateDate, Is.EqualTo(clone.CreateDate));
+        Assert.That(item.Id, Is.EqualTo(clone.Id));
+        Assert.That(item.Key, Is.EqualTo(clone.Key));
+        Assert.That(item.UpdateDate, Is.EqualTo(clone.UpdateDate));
+        Assert.That(item.LanguageIsoCode, Is.EqualTo(clone.LanguageIsoCode));
+        Assert.That(item.Value, Is.EqualTo(clone.Value));
 
         // This double verifies by reflection
         var allProps = clone.GetType().GetProperties();
         foreach (var propertyInfo in allProps.Where(x => x.Name != "Language"))
         {
-            Assert.AreEqual(propertyInfo.GetValue(clone, null), propertyInfo.GetValue(item, null));
+            Assert.That(propertyInfo.GetValue(item, null), Is.EqualTo(propertyInfo.GetValue(clone, null)));
         }
     }
 

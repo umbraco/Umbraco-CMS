@@ -40,7 +40,7 @@ internal sealed class KeyValueRepositoryTests : UmbracoIntegrationTest
             var keyValue = repo.Get("foo");
             scope.Complete();
 
-            Assert.AreEqual("bar", keyValue.Value);
+            Assert.That(keyValue.Value, Is.EqualTo("bar"));
         }
 
         // Update value
@@ -61,7 +61,7 @@ internal sealed class KeyValueRepositoryTests : UmbracoIntegrationTest
             var keyValue = repo.Get("foo");
             scope.Complete();
 
-            Assert.AreEqual("buzz", keyValue.Value);
+            Assert.That(keyValue.Value, Is.EqualTo("buzz"));
         }
     }
 

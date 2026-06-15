@@ -34,21 +34,21 @@ public class SliderPropertyValueEditorTests
     public void Can_Handle_Invalid_Values_From_Editor(object value)
     {
         var fromEditor = FromEditor(value);
-        Assert.IsNull(fromEditor);
+        Assert.That(fromEditor, Is.Null);
     }
 
     [Test]
     public void Can_Handle_Invalid_Values_From_Editor_Guid()
     {
         var fromEditor = FromEditor(Guid.NewGuid());
-        Assert.IsNull(fromEditor);
+        Assert.That(fromEditor, Is.Null);
     }
 
     [Test]
     public void Can_Handle_Invalid_Values_From_Editor_Udi()
     {
         var fromEditor = FromEditor(new GuidUdi(Constants.UdiEntityType.Document, Guid.NewGuid()));
-        Assert.IsNull(fromEditor);
+        Assert.That(fromEditor, Is.Null);
     }
 
     [TestCase("1", 1)]
@@ -59,9 +59,9 @@ public class SliderPropertyValueEditorTests
     public void Can_Parse_Single_Value_To_Editor(string value, decimal expected)
     {
         var toEditor = ToEditor(value) as SliderPropertyEditor.SliderPropertyValueEditor.SliderRange;
-        Assert.IsNotNull(toEditor);
-        Assert.AreEqual(toEditor.From, expected);
-        Assert.AreEqual(toEditor.To, expected);
+        Assert.That(toEditor, Is.Not.Null);
+        Assert.That(expected, Is.EqualTo(toEditor.From));
+        Assert.That(expected, Is.EqualTo(toEditor.To));
     }
 
     [TestCase("1,1", 1, 1)]
@@ -74,9 +74,9 @@ public class SliderPropertyValueEditorTests
     public void Can_Parse_Range_Value_To_Editor(string value, decimal expectedFrom, decimal expectedTo)
     {
         var toEditor = ToEditor(value) as SliderPropertyEditor.SliderPropertyValueEditor.SliderRange;
-        Assert.IsNotNull(toEditor);
-        Assert.AreEqual(toEditor.From, expectedFrom);
-        Assert.AreEqual(toEditor.To, expectedTo);
+        Assert.That(toEditor, Is.Not.Null);
+        Assert.That(expectedFrom, Is.EqualTo(toEditor.From));
+        Assert.That(expectedTo, Is.EqualTo(toEditor.To));
     }
 
     [TestCase(0, 10, "0,10")]
@@ -92,28 +92,28 @@ public class SliderPropertyValueEditorTests
     {
         var value = JsonNode.Parse($"{{\"from\": {from}, \"to\": {to}}}");
         var fromEditor = FromEditor(value) as string;
-        Assert.AreEqual(expectedResult, fromEditor);
+        Assert.That(fromEditor, Is.EqualTo(expectedResult));
     }
 
     [TestCaseSource(nameof(InvalidCaseData))]
     public void Can_Handle_Invalid_Values_To_Editor(object value)
     {
         var toEditor = ToEditor(value);
-        Assert.IsNull(toEditor, message: $"Failed for: {value}");
+        Assert.That(toEditor, Is.Null, message: $"Failed for: {value}");
     }
 
     [Test]
     public void Null_From_Editor_Yields_Null()
     {
         var result = FromEditor(null);
-        Assert.IsNull(result);
+        Assert.That(result, Is.Null);
     }
 
     [Test]
     public void Null_To_Editor_Yields_Null()
     {
         var result = ToEditor(null);
-        Assert.IsNull(result);
+        Assert.That(result, Is.Null);
     }
 
     [TestCase(true, 1.1, 1.1, true)]
@@ -131,14 +131,14 @@ public class SliderPropertyValueEditorTests
         var result = editor.Validate(value, false, null, PropertyValidationContext.Empty());
         if (expectedSuccess)
         {
-            Assert.IsEmpty(result);
+            Assert.That(result, Is.Empty);
         }
         else
         {
-            Assert.AreEqual(1, result.Count());
+            Assert.That(result.Count(), Is.EqualTo(1));
 
             var validationResult = result.First();
-            Assert.AreEqual("validation_unexpectedRange", validationResult.ErrorMessage);
+            Assert.That(validationResult.ErrorMessage, Is.EqualTo("validation_unexpectedRange"));
         }
     }
 
@@ -156,14 +156,14 @@ public class SliderPropertyValueEditorTests
         var result = editor.Validate(value, false, null, PropertyValidationContext.Empty());
         if (expectedSuccess)
         {
-            Assert.IsEmpty(result);
+            Assert.That(result, Is.Empty);
         }
         else
         {
-            Assert.AreEqual(1, result.Count());
+            Assert.That(result.Count(), Is.EqualTo(1));
 
             var validationResult = result.First();
-            Assert.AreEqual("validation_invalidRange", validationResult.ErrorMessage);
+            Assert.That(validationResult.ErrorMessage, Is.EqualTo("validation_invalidRange"));
         }
     }
 
@@ -181,14 +181,14 @@ public class SliderPropertyValueEditorTests
         var result = editor.Validate(value, false, null, PropertyValidationContext.Empty());
         if (expectedSuccess)
         {
-            Assert.IsEmpty(result);
+            Assert.That(result, Is.Empty);
         }
         else
         {
-            Assert.AreEqual(1, result.Count());
+            Assert.That(result.Count(), Is.EqualTo(1));
 
             var validationResult = result.First();
-            Assert.AreEqual("validation_outOfRangeMinimum", validationResult.ErrorMessage);
+            Assert.That(validationResult.ErrorMessage, Is.EqualTo("validation_outOfRangeMinimum"));
         }
     }
 
@@ -206,14 +206,14 @@ public class SliderPropertyValueEditorTests
         var result = editor.Validate(value, false, null, PropertyValidationContext.Empty());
         if (expectedSuccess)
         {
-            Assert.IsEmpty(result);
+            Assert.That(result, Is.Empty);
         }
         else
         {
-            Assert.AreEqual(1, result.Count());
+            Assert.That(result.Count(), Is.EqualTo(1));
 
             var validationResult = result.First();
-            Assert.AreEqual("validation_outOfRangeMaximum", validationResult.ErrorMessage);
+            Assert.That(validationResult.ErrorMessage, Is.EqualTo("validation_outOfRangeMaximum"));
         }
     }
 
@@ -229,7 +229,7 @@ public class SliderPropertyValueEditorTests
         editor.ConfigurationObject = new SliderConfiguration();
 
         var result = editor.Validate(value, false, null, PropertyValidationContext.Empty());
-        Assert.IsEmpty(result);
+        Assert.That(result, Is.Empty);
     }
 
     [TestCase(0.2, 1.3, 1.7, true)]
@@ -247,14 +247,14 @@ public class SliderPropertyValueEditorTests
         var result = editor.Validate(value, false, null, PropertyValidationContext.Empty());
         if (expectedSuccess)
         {
-            Assert.IsEmpty(result);
+            Assert.That(result, Is.Empty);
         }
         else
         {
-            Assert.AreEqual(1, result.Count());
+            Assert.That(result.Count(), Is.EqualTo(1));
 
             var validationResult = result.First();
-            Assert.AreEqual("validation_invalidStep", validationResult.ErrorMessage);
+            Assert.That(validationResult.ErrorMessage, Is.EqualTo("validation_invalidStep"));
         }
     }
 
@@ -289,14 +289,14 @@ public class SliderPropertyValueEditorTests
         var result = editor.Validate(value, false, null, PropertyValidationContext.Empty());
         if (expectedSuccess)
         {
-            Assert.IsEmpty(result);
+            Assert.That(result, Is.Empty);
         }
         else
         {
-            Assert.AreEqual(1, result.Count());
+            Assert.That(result.Count(), Is.EqualTo(1));
 
             var validationResult = result.First();
-            Assert.AreEqual("validation_minimumRange", validationResult.ErrorMessage);
+            Assert.That(validationResult.ErrorMessage, Is.EqualTo("validation_minimumRange"));
         }
     }
 
@@ -312,11 +312,11 @@ public class SliderPropertyValueEditorTests
         var result = editor.Validate(value, false, null, PropertyValidationContext.Empty());
         if (expectedSuccess)
         {
-            Assert.IsEmpty(result);
+            Assert.That(result, Is.Empty);
         }
         else
         {
-            Assert.IsNotEmpty(result);
+            Assert.That(result, Is.Not.Empty);
         }
     }
 

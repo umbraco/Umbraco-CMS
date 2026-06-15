@@ -46,7 +46,7 @@ public class SingleItemsOnlyCachePolicyTests
                 new AuditItem(2, AuditType.Copy, 123, "test", "blah2"),
             });
 
-        Assert.AreEqual(0, cached.Count);
+        Assert.That(cached.Count, Is.EqualTo(0));
     }
 
     [Test]
@@ -60,6 +60,6 @@ public class SingleItemsOnlyCachePolicyTests
         var defaultPolicy = new SingleItemsOnlyRepositoryCachePolicy<AuditItem, object>(cache.Object, DefaultAccessor, new RepositoryCachePolicyOptions(), Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
 
         var unused = defaultPolicy.Get(1, id => new AuditItem(1, AuditType.Copy, 123, "test", "blah"), ids => null);
-        Assert.IsTrue(isCached);
+        Assert.That(isCached, Is.True);
     }
 }

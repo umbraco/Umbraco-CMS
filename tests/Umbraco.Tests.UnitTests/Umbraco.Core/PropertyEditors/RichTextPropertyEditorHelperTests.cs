@@ -16,10 +16,10 @@ public class RichTextPropertyEditorHelperTests
     public void Can_Parse_Pure_Markup_String()
     {
         var result = RichTextPropertyEditorHelper.TryParseRichTextEditorValue("<p>this is some markup</p>", JsonSerializer(), Logger(), out RichTextEditorValue? value);
-        Assert.IsTrue(result);
-        Assert.IsNotNull(value);
-        Assert.AreEqual("<p>this is some markup</p>", value.Markup);
-        Assert.IsNull(value.Blocks);
+        Assert.That(result, Is.True);
+        Assert.That(value, Is.Not.Null);
+        Assert.That(value.Markup, Is.EqualTo("<p>this is some markup</p>"));
+        Assert.That(value.Blocks, Is.Null);
     }
 
     [Test]
@@ -57,40 +57,40 @@ public class RichTextPropertyEditorHelperTests
                                   """");
 
         var result = RichTextPropertyEditorHelper.TryParseRichTextEditorValue(input, JsonSerializer(), Logger(), out RichTextEditorValue? value);
-        Assert.IsTrue(result);
-        Assert.IsNotNull(value);
-        Assert.AreEqual("<p>this is some markup</p><umb-rte-block data-content-key=\"36cc710a-d8a6-45d0-a07f-7bbd8742cf02\"><!--Umbraco-Block--></umb-rte-block>", value.Markup);
+        Assert.That(result, Is.True);
+        Assert.That(value, Is.Not.Null);
+        Assert.That(value.Markup, Is.EqualTo("<p>this is some markup</p><umb-rte-block data-content-key=\"36cc710a-d8a6-45d0-a07f-7bbd8742cf02\"><!--Umbraco-Block--></umb-rte-block>"));
 
-        Assert.IsNotNull(value.Blocks);
+        Assert.That(value.Blocks, Is.Not.Null);
 
-        Assert.AreEqual(1, value.Blocks.ContentData.Count);
+        Assert.That(value.Blocks.ContentData, Has.Count.EqualTo(1));
         var item = value.Blocks.ContentData.Single();
         var contentTypeGuid = Guid.Parse("b2f0806c-d231-4c78-88b2-3c97d26e1123");
         var itemGuid = Guid.Parse("36cc710a-d8a6-45d0-a07f-7bbd8742cf02");
-        Assert.AreEqual(contentTypeGuid, item.ContentTypeKey);
-        Assert.AreEqual(itemGuid, item.Key);
-        Assert.AreEqual(itemGuid, item.Key);
+        Assert.That(item.ContentTypeKey, Is.EqualTo(contentTypeGuid));
+        Assert.That(item.Key, Is.EqualTo(itemGuid));
+        Assert.That(item.Key, Is.EqualTo(itemGuid));
         var contentProperties = value.Blocks.ContentData.First().Values;
-        Assert.AreEqual(1, contentProperties.Count);
+        Assert.That(contentProperties, Has.Count.EqualTo(1));
         Assert.Multiple(() =>
         {
-            Assert.AreEqual("contentPropertyAlias", contentProperties.First().Alias);
-            Assert.AreEqual("A content property value", contentProperties.First().Value);
+            Assert.That(contentProperties.First().Alias, Is.EqualTo("contentPropertyAlias"));
+            Assert.That(contentProperties.First().Value, Is.EqualTo("A content property value"));
         });
 
-        Assert.AreEqual(1, value.Blocks.SettingsData.Count);
+        Assert.That(value.Blocks.SettingsData, Has.Count.EqualTo(1));
         item = value.Blocks.SettingsData.Single();
         contentTypeGuid = Guid.Parse("e7a9447f-e14d-44dd-9ae8-e68c3c3da598");
         itemGuid = Guid.Parse("d2eeef66-4111-42f4-a164-7a523eaffbc2");
-        Assert.AreEqual(contentTypeGuid, item.ContentTypeKey);
-        Assert.AreEqual(itemGuid, item.Key);
-        Assert.AreEqual(itemGuid, item.Key);
+        Assert.That(item.ContentTypeKey, Is.EqualTo(contentTypeGuid));
+        Assert.That(item.Key, Is.EqualTo(itemGuid));
+        Assert.That(item.Key, Is.EqualTo(itemGuid));
         var settingsProperties = value.Blocks.SettingsData.First().Values;
-        Assert.AreEqual(1, settingsProperties.Count);
+        Assert.That(settingsProperties, Has.Count.EqualTo(1));
         Assert.Multiple(() =>
         {
-            Assert.AreEqual("settingsPropertyAlias", settingsProperties.First().Alias);
-            Assert.AreEqual("A settings property value", settingsProperties.First().Value);
+            Assert.That(settingsProperties.First().Alias, Is.EqualTo("settingsPropertyAlias"));
+            Assert.That(settingsProperties.First().Value, Is.EqualTo("A settings property value"));
         });
     }
 
@@ -104,10 +104,10 @@ public class RichTextPropertyEditorHelperTests
                                    """");
 
         var result = RichTextPropertyEditorHelper.TryParseRichTextEditorValue(input, JsonSerializer(), Logger(), out RichTextEditorValue? value);
-        Assert.IsTrue(result);
-        Assert.IsNotNull(value);
-        Assert.AreEqual("<h2>Vælg et af vores mest populære produkter</h2>", value.Markup);
-        Assert.IsNull(value.Blocks);
+        Assert.That(result, Is.True);
+        Assert.That(value, Is.Not.Null);
+        Assert.That(value.Markup, Is.EqualTo("<h2>Vælg et af vores mest populære produkter</h2>"));
+        Assert.That(value.Blocks, Is.Null);
     }
 
     [TestCase(Constants.PropertyEditors.Aliases.RichText)]
@@ -147,47 +147,47 @@ public class RichTextPropertyEditorHelperTests
         input = input.Replace("[PropertyEditorAlias]", propertyEditorAlias);
 
         var result = RichTextPropertyEditorHelper.TryParseRichTextEditorValue(input, JsonSerializer(), Logger(), out RichTextEditorValue? value);
-        Assert.IsTrue(result);
-        Assert.IsNotNull(value);
-        Assert.AreEqual("<p>this is some markup</p><umb-rte-block data-content-key=\"36cc710a-d8a6-45d0-a07f-7bbd8742cf02\"><!--Umbraco-Block--></umb-rte-block>", value.Markup);
+        Assert.That(result, Is.True);
+        Assert.That(value, Is.Not.Null);
+        Assert.That(value.Markup, Is.EqualTo("<p>this is some markup</p><umb-rte-block data-content-key=\"36cc710a-d8a6-45d0-a07f-7bbd8742cf02\"><!--Umbraco-Block--></umb-rte-block>"));
 
-        Assert.IsNotNull(value.Blocks);
+        Assert.That(value.Blocks, Is.Not.Null);
 
-        Assert.AreEqual(1, value.Blocks.ContentData.Count);
+        Assert.That(value.Blocks.ContentData, Has.Count.EqualTo(1));
         var item = value.Blocks.ContentData.Single();
         var contentTypeGuid = Guid.Parse("b2f0806c-d231-4c78-88b2-3c97d26e1123");
         var itemGuid = Guid.Parse("36cc710a-d8a6-45d0-a07f-7bbd8742cf02");
-        Assert.AreEqual(contentTypeGuid, item.ContentTypeKey);
-        Assert.AreEqual(itemGuid, item.Key);
-        Assert.AreEqual(itemGuid, item.Key);
+        Assert.That(item.ContentTypeKey, Is.EqualTo(contentTypeGuid));
+        Assert.That(item.Key, Is.EqualTo(itemGuid));
+        Assert.That(item.Key, Is.EqualTo(itemGuid));
         var contentProperties = value.Blocks.ContentData.First().Values;
-        Assert.AreEqual(1, contentProperties.Count);
+        Assert.That(contentProperties, Has.Count.EqualTo(1));
         Assert.Multiple(() =>
         {
-            Assert.AreEqual("contentPropertyAlias", contentProperties.First().Alias);
-            Assert.AreEqual("A content property value", contentProperties.First().Value);
+            Assert.That(contentProperties.First().Alias, Is.EqualTo("contentPropertyAlias"));
+            Assert.That(contentProperties.First().Value, Is.EqualTo("A content property value"));
         });
 
-        Assert.AreEqual(1, value.Blocks.SettingsData.Count);
+        Assert.That(value.Blocks.SettingsData, Has.Count.EqualTo(1));
         item = value.Blocks.SettingsData.Single();
         contentTypeGuid = Guid.Parse("e7a9447f-e14d-44dd-9ae8-e68c3c3da598");
         itemGuid = Guid.Parse("d2eeef66-4111-42f4-a164-7a523eaffbc2");
-        Assert.AreEqual(contentTypeGuid, item.ContentTypeKey);
-        Assert.AreEqual(itemGuid, item.Key);
-        Assert.AreEqual(itemGuid, item.Key);
+        Assert.That(item.ContentTypeKey, Is.EqualTo(contentTypeGuid));
+        Assert.That(item.Key, Is.EqualTo(itemGuid));
+        Assert.That(item.Key, Is.EqualTo(itemGuid));
         var settingsProperties = value.Blocks.SettingsData.First().Values;
-        Assert.AreEqual(1, settingsProperties.Count);
+        Assert.That(settingsProperties, Has.Count.EqualTo(1));
         Assert.Multiple(() =>
         {
-            Assert.AreEqual("settingsPropertyAlias", settingsProperties.First().Alias);
-            Assert.AreEqual("A settings property value", settingsProperties.First().Value);
+            Assert.That(settingsProperties.First().Alias, Is.EqualTo("settingsPropertyAlias"));
+            Assert.That(settingsProperties.First().Value, Is.EqualTo("A settings property value"));
         });
 
-        Assert.IsTrue(value.Blocks.Layout.ContainsKey(Constants.PropertyEditors.Aliases.RichText));
+        Assert.That(value.Blocks.Layout.ContainsKey(Constants.PropertyEditors.Aliases.RichText), Is.True);
         var layout = value.Blocks.Layout[Constants.PropertyEditors.Aliases.RichText];
-        Assert.AreEqual(1, layout.Count());
-        Assert.AreEqual(Guid.Parse("36cc710a-d8a6-45d0-a07f-7bbd8742cf02"), layout.First().ContentKey);
-        Assert.AreEqual(Guid.Parse("d2eeef66-4111-42f4-a164-7a523eaffbc2"), layout.First().SettingsKey);
+        Assert.That(layout.Count(), Is.EqualTo(1));
+        Assert.That(layout.First().ContentKey, Is.EqualTo(Guid.Parse("36cc710a-d8a6-45d0-a07f-7bbd8742cf02")));
+        Assert.That(layout.First().SettingsKey, Is.EqualTo(Guid.Parse("d2eeef66-4111-42f4-a164-7a523eaffbc2")));
     }
 
     [Test]
@@ -217,28 +217,28 @@ public class RichTextPropertyEditorHelperTests
                              """;
 
         var result = RichTextPropertyEditorHelper.TryParseRichTextEditorValue(input, JsonSerializer(), Logger(), out RichTextEditorValue? value);
-        Assert.IsTrue(result);
-        Assert.IsNotNull(value);
-        Assert.AreEqual("<p>this is some markup</p><umb-rte-block data-content-key=\"36cc710a-d8a6-45d0-a07f-7bbd8742cf02\"></umb-rte-block>", value.Markup);
+        Assert.That(result, Is.True);
+        Assert.That(value, Is.Not.Null);
+        Assert.That(value.Markup, Is.EqualTo("<p>this is some markup</p><umb-rte-block data-content-key=\"36cc710a-d8a6-45d0-a07f-7bbd8742cf02\"></umb-rte-block>"));
 
-        Assert.IsNotNull(value.Blocks);
+        Assert.That(value.Blocks, Is.Not.Null);
 
-        Assert.AreEqual(1, value.Blocks.ContentData.Count);
+        Assert.That(value.Blocks.ContentData, Has.Count.EqualTo(1));
         var item = value.Blocks.ContentData.Single();
         var contentTypeGuid = Guid.Parse("b2f0806c-d231-4c78-88b2-3c97d26e1123");
         var itemGuid = Guid.Parse("36cc710a-d8a6-45d0-a07f-7bbd8742cf02");
-        Assert.AreEqual(contentTypeGuid, item.ContentTypeKey);
-        Assert.AreEqual(itemGuid, item.Key);
-        Assert.AreEqual(itemGuid, item.Key);
+        Assert.That(item.ContentTypeKey, Is.EqualTo(contentTypeGuid));
+        Assert.That(item.Key, Is.EqualTo(itemGuid));
+        Assert.That(item.Key, Is.EqualTo(itemGuid));
         var contentProperties = value.Blocks.ContentData.First().Values;
-        Assert.AreEqual(1, contentProperties.Count);
+        Assert.That(contentProperties, Has.Count.EqualTo(1));
         Assert.Multiple(() =>
         {
-            Assert.AreEqual("contentPropertyAlias", contentProperties.First().Alias);
-            Assert.AreEqual("A content property value", contentProperties.First().Value);
+            Assert.That(contentProperties.First().Alias, Is.EqualTo("contentPropertyAlias"));
+            Assert.That(contentProperties.First().Value, Is.EqualTo("A content property value"));
         });
 
-        Assert.AreEqual(0, value.Blocks.SettingsData.Count);
+        Assert.That(value.Blocks.SettingsData.Count, Is.EqualTo(0));
     }
 
     [Test]
@@ -272,24 +272,24 @@ public class RichTextPropertyEditorHelperTests
                              """;
 
         var result = RichTextPropertyEditorHelper.TryParseRichTextEditorValue(input, JsonSerializer(), Logger(), out RichTextEditorValue? value);
-        Assert.IsTrue(result);
-        Assert.IsNotNull(value);
-        Assert.AreEqual("<p>this is <umb-rte-block-inline data-content-key=\"36cc710a-d8a6-45d0-a07f-7bbd8742cf03\"></umb-rte-block-inline> some markup</p><umb-rte-block data-content-key=\"36cc710a-d8a6-45d0-a07f-7bbd8742cf02\"></umb-rte-block>", value.Markup);
+        Assert.That(result, Is.True);
+        Assert.That(value, Is.Not.Null);
+        Assert.That(value.Markup, Is.EqualTo("<p>this is <umb-rte-block-inline data-content-key=\"36cc710a-d8a6-45d0-a07f-7bbd8742cf03\"></umb-rte-block-inline> some markup</p><umb-rte-block data-content-key=\"36cc710a-d8a6-45d0-a07f-7bbd8742cf02\"></umb-rte-block>"));
 
-        Assert.IsNotNull(value.Blocks);
+        Assert.That(value.Blocks, Is.Not.Null);
 
         Guid[] contentTypeGuids = [Guid.Parse("b2f0806c-d231-4c78-88b2-3c97d26e1123"), Guid.Parse("b2f0806c-d231-4c78-88b2-3c97d26e1124")];
         Guid[] itemGuids = [Guid.Parse("36cc710a-d8a6-45d0-a07f-7bbd8742cf02"), Guid.Parse("36cc710a-d8a6-45d0-a07f-7bbd8742cf03")];
 
-        Assert.AreEqual(2, value.Blocks.ContentData.Count);
+        Assert.That(value.Blocks.ContentData, Has.Count.EqualTo(2));
         for (var i = 0; i < value.Blocks.ContentData.Count; i++)
         {
             var item = value.Blocks.ContentData[i];
-            Assert.AreEqual(contentTypeGuids[i], item.ContentTypeKey);
-            Assert.AreEqual(itemGuids[i], item.Key);
+            Assert.That(item.ContentTypeKey, Is.EqualTo(contentTypeGuids[i]));
+            Assert.That(item.Key, Is.EqualTo(itemGuids[i]));
         }
 
-        Assert.AreEqual(0, value.Blocks.SettingsData.Count);
+        Assert.That(value.Blocks.SettingsData.Count, Is.EqualTo(0));
     }
 
     private IJsonSerializer JsonSerializer() => new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());

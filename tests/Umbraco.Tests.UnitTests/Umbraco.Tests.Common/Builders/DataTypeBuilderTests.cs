@@ -30,9 +30,9 @@ public class DataTypeBuilderTests
             .Build();
 
         // Assert
-        Assert.AreEqual(testId, dataType.Id);
-        Assert.AreEqual(testEditorAlias, dataType.Editor.Alias);
-        Assert.AreEqual(2, dataType.Editor.DefaultConfiguration.Count);
-        Assert.AreEqual("value1", dataType.Editor.DefaultConfiguration["value1"]);
+        Assert.That(dataType.Id, Is.EqualTo(testId));
+        Assert.That(dataType.Editor.Alias, Is.EqualTo(testEditorAlias));
+        Assert.That(dataType.Editor.DefaultConfiguration, Has.Count.EqualTo(2));
+        Assert.That(dataType.Editor.DefaultConfiguration["value1"], Is.EqualTo("value1"));
     }
 }

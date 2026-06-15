@@ -28,13 +28,13 @@ public partial class ContentEditingServiceTests
         var content = await (variant ? CreateCultureVariantContent() : CreateInvariantContent());
         var result = await ContentEditingService.MoveToRecycleBinAsync(content.Key, Constants.Security.SuperUserKey);
 
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.Success));
 
         // re-get and verify move
         content = await ContentEditingService.GetAsync(content.Key);
-        Assert.IsNotNull(content);
-        Assert.IsTrue(content.Trashed);
+        Assert.That(content, Is.Not.Null);
+        Assert.That(content.Trashed, Is.True);
     }
 
     [Test]
@@ -44,13 +44,13 @@ public partial class ContentEditingServiceTests
         // Setup a relation where the page being deleted is related to another page as a child (e.g. the other page has a picker and has selected this page).
         Relate(Subpage2, Subpage);
         var moveAttempt = await ContentEditingService.MoveToRecycleBinAsync(Subpage.Key, Constants.Security.SuperUserKey);
-        Assert.IsFalse(moveAttempt.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.CannotMoveToRecycleBinWhenReferenced, moveAttempt.Status);
+        Assert.That(moveAttempt.Success, Is.False);
+        Assert.That(moveAttempt.Status, Is.EqualTo(ContentEditingOperationStatus.CannotMoveToRecycleBinWhenReferenced));
 
         // re-get and verify not moved
         var content = await ContentEditingService.GetAsync(Subpage.Key);
-        Assert.IsNotNull(content);
-        Assert.IsFalse(content.Trashed);
+        Assert.That(content, Is.Not.Null);
+        Assert.That(content.Trashed, Is.False);
     }
 
     [Test]
@@ -60,13 +60,13 @@ public partial class ContentEditingServiceTests
         // DisableUnpublishWhenReferenced should NOT block trashing — only unpublishing.
         Relate(Subpage2, Subpage);
         var moveAttempt = await ContentEditingService.MoveToRecycleBinAsync(Subpage.Key, Constants.Security.SuperUserKey);
-        Assert.IsTrue(moveAttempt.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.Success, moveAttempt.Status);
+        Assert.That(moveAttempt.Success, Is.True);
+        Assert.That(moveAttempt.Status, Is.EqualTo(ContentEditingOperationStatus.Success));
 
         // re-get and verify moved
         var content = await ContentEditingService.GetAsync(Subpage.Key);
-        Assert.IsNotNull(content);
-        Assert.IsTrue(content.Trashed);
+        Assert.That(content, Is.Not.Null);
+        Assert.That(content.Trashed, Is.True);
     }
 
     [Test]
@@ -76,21 +76,21 @@ public partial class ContentEditingServiceTests
         // Setup a relation where the page being deleted is related to another page as a child (e.g. the other page has a picker and has selected this page).
         Relate(Subpage, Subpage2);
         var moveAttempt = await ContentEditingService.MoveToRecycleBinAsync(Subpage.Key, Constants.Security.SuperUserKey);
-        Assert.IsTrue(moveAttempt.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.Success, moveAttempt.Status);
+        Assert.That(moveAttempt.Success, Is.True);
+        Assert.That(moveAttempt.Status, Is.EqualTo(ContentEditingOperationStatus.Success));
 
         // re-get and verify moved
         var content = await ContentEditingService.GetAsync(Subpage.Key);
-        Assert.IsNotNull(content);
-        Assert.IsTrue(content.Trashed);
+        Assert.That(content, Is.Not.Null);
+        Assert.That(content.Trashed, Is.True);
     }
 
     [Test]
     public async Task Cannot_Move_Non_Existing_To_Recycle_Bin()
     {
         var result = await ContentEditingService.MoveToRecycleBinAsync(Guid.NewGuid(), Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.NotFound, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.NotFound));
     }
 
     [TestCase(true)]
@@ -101,13 +101,13 @@ public partial class ContentEditingServiceTests
         await ContentEditingService.MoveToRecycleBinAsync(content.Key, Constants.Security.SuperUserKey);
         var result = await ContentEditingService.MoveToRecycleBinAsync(content.Key, Constants.Security.SuperUserKey);
 
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.InTrash, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.InTrash));
 
         // re-get and verify that it still is in the recycle bin
         content = await ContentEditingService.GetAsync(content.Key);
-        Assert.IsNotNull(content);
-        Assert.IsTrue(content.Trashed);
+        Assert.That(content, Is.Not.Null);
+        Assert.That(content.Trashed, Is.True);
     }
 
     // Companion to the media regression test for https://github.com/umbraco/Umbraco-CMS/issues/22661.
@@ -132,19 +132,19 @@ public partial class ContentEditingServiceTests
                 ],
             },
             creator.Key);
-        Assert.IsTrue(createResult.Success);
+        Assert.That(createResult.Success, Is.True);
         var content = createResult.Result.Content!;
-        Assert.AreEqual(creator.Id, content.CreatorId);
-        Assert.AreEqual(creator.Id, content.WriterId);
+        Assert.That(content.CreatorId, Is.EqualTo(creator.Id));
+        Assert.That(content.WriterId, Is.EqualTo(creator.Id));
 
         var trashAttempt = await ContentEditingService.MoveToRecycleBinAsync(content.Key, deleter.Key);
-        Assert.IsTrue(trashAttempt.Success);
+        Assert.That(trashAttempt.Success, Is.True);
 
         var trashedContent = await ContentEditingService.GetAsync(content.Key);
-        Assert.IsNotNull(trashedContent);
-        Assert.IsTrue(trashedContent.Trashed);
-        Assert.AreEqual(creator.Id, trashedContent.CreatorId, "CreatorId must not change on trash.");
-        Assert.AreEqual(deleter.Id, trashedContent.WriterId, "WriterId must reflect the user who trashed the item.");
+        Assert.That(trashedContent, Is.Not.Null);
+        Assert.That(trashedContent.Trashed, Is.True);
+        Assert.That(trashedContent.CreatorId, Is.EqualTo(creator.Id), "CreatorId must not change on trash.");
+        Assert.That(trashedContent.WriterId, Is.EqualTo(deleter.Id), "WriterId must reflect the user who trashed the item.");
     }
 
     [Test]
@@ -155,7 +155,7 @@ public partial class ContentEditingServiceTests
         var content = await CreateInvariantContent();
 
         var trashAttempt = await ContentEditingService.MoveToRecycleBinAsync(content.Key, deleter.Key);
-        Assert.IsTrue(trashAttempt.Success);
+        Assert.That(trashAttempt.Success, Is.True);
 
         var moveEntries = await auditService.GetItemsByEntityAsync(
             content.Id,
@@ -163,8 +163,8 @@ public partial class ContentEditingServiceTests
             take: 100,
             auditTypeFilter: [AuditType.Move]);
 
-        Assert.AreEqual(1, moveEntries.Items.Count(), "Expected one AuditType.Move entry for the trash operation.");
-        Assert.AreEqual(deleter.Id, moveEntries.Items.Single().UserId);
+        Assert.That(moveEntries.Items.Count(), Is.EqualTo(1), "Expected one AuditType.Move entry for the trash operation.");
+        Assert.That(moveEntries.Items.Single().UserId, Is.EqualTo(deleter.Id));
     }
 
     private async Task<IUser> CreateAdminUserAsync(string identifier)
@@ -179,7 +179,7 @@ public partial class ContentEditingServiceTests
         };
 
         var result = await UserService.CreateAsync(Constants.Security.SuperUserKey, createModel);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
         return result.Result.CreatedUser!;
     }
 }

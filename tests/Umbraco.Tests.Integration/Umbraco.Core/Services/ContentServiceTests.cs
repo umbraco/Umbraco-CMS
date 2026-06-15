@@ -104,11 +104,11 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         ContentService.SaveBlueprint(blueprint, null);
 
         var found = ContentService.GetBlueprintsForContentTypes().ToArray();
-        Assert.AreEqual(1, found.Length);
+        Assert.That(found, Has.Length.EqualTo(1));
 
         // ensures it's not found by normal content
         var contentFound = ContentService.GetById(found[0].Id);
-        Assert.IsNull(contentFound);
+        Assert.That(contentFound, Is.Null);
     }
 
     [Test]
@@ -131,7 +131,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         ContentService.DeleteBlueprint(blueprint);
 
         var found = ContentService.GetBlueprintsForContentTypes().ToArray();
-        Assert.AreEqual(0, found.Length);
+        Assert.That(found, Is.Empty);
     }
 
     [Test]
@@ -155,11 +155,11 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
             var fromContent = ContentService.CreateBlueprintFromContent(originalPage, "hello world");
             ContentService.SaveBlueprint(fromContent, originalPage);
 
-            Assert.IsTrue(fromContent.HasIdentity);
-            Assert.AreEqual("blueprint 1", fromContent.Properties["title"]?.GetValue());
-            Assert.AreEqual("blueprint 2", fromContent.Properties["bodyText"]?.GetValue());
-            Assert.AreEqual("blueprint 3", fromContent.Properties["keywords"]?.GetValue());
-            Assert.AreEqual("blueprint 4", fromContent.Properties["description"]?.GetValue());
+            Assert.That(fromContent.HasIdentity, Is.True);
+            Assert.That(fromContent.Properties["title"]?.GetValue(), Is.EqualTo("blueprint 1"));
+            Assert.That(fromContent.Properties["bodyText"]?.GetValue(), Is.EqualTo("blueprint 2"));
+            Assert.That(fromContent.Properties["keywords"]?.GetValue(), Is.EqualTo("blueprint 3"));
+            Assert.That(fromContent.Properties["description"]?.GetValue(), Is.EqualTo("blueprint 4"));
         }
     }
 
@@ -185,13 +185,13 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         }
 
         var found = ContentService.GetBlueprintsForContentTypes().ToArray();
-        Assert.AreEqual(10, found.Length);
+        Assert.That(found, Has.Length.EqualTo(10));
 
         found = ContentService.GetBlueprintsForContentTypes(ct1.Id).ToArray();
-        Assert.AreEqual(5, found.Length);
+        Assert.That(found, Has.Length.EqualTo(5));
 
         found = ContentService.GetBlueprintsForContentTypes(ct2.Id).ToArray();
-        Assert.AreEqual(5, found.Length);
+        Assert.That(found, Has.Length.EqualTo(5));
     }
 
     [Test]
@@ -229,7 +229,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
                 var contentSchedule =
                     ContentScheduleCollection.CreateWithEntry(now.AddSeconds(5), null); // release in 5 seconds
                 var r = ContentService.Save(c, contentSchedule: contentSchedule);
-                Assert.IsTrue(r.Success, r.Result.ToString());
+                Assert.That(r.Success, Is.True, r.Result.ToString());
             }
             else
             {
@@ -240,7 +240,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
                     ContentScheduleCollection.CreateWithEntry(null, now.AddSeconds(5)); // expire in 5 seconds
                 ContentService.PersistContentSchedule(c, contentSchedule);
 
-                Assert.IsTrue(r.Success, r.Result.ToString());
+                Assert.That(r.Success, Is.True, r.Result.ToString());
             }
 
             invariant.Add(c);
@@ -263,7 +263,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
                         now.AddSeconds(5),
                         null); // release in 5 seconds
                 var r = ContentService.Save(c, contentSchedule: contentSchedule);
-                Assert.IsTrue(r.Success, r.Result.ToString());
+                Assert.That(r.Success, Is.True, r.Result.ToString());
 
                 alternatingCulture = alternatingCulture == langFr.IsoCode ? langUk.IsoCode : langFr.IsoCode;
             }
@@ -279,7 +279,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
                         now.AddSeconds(5)); // expire in 5 seconds
                 ContentService.PersistContentSchedule(c, contentSchedule);
 
-                Assert.IsTrue(r.Success, r.Result.ToString());
+                Assert.That(r.Success, Is.True, r.Result.ToString());
             }
 
             variant.Add(c);
@@ -289,34 +289,29 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
             now.AddMinutes(1)).ToList(); // process anything scheduled before a minute from now
 
         // this is 21 because the test data installed before this test runs has a scheduled item!
-        Assert.AreEqual(21, runSched.Count);
-        Assert.AreEqual(
-            20,
-            runSched.Count(x => x.Success),
+        Assert.That(runSched, Has.Count.EqualTo(21));
+        Assert.That(
+            runSched.Count(x => x.Success), Is.EqualTo(20),
             string.Join(Environment.NewLine, runSched.Select(x => $"{x.Entity.Name} - {x.Result}")));
 
-        Assert.AreEqual(
-            5,
-            runSched.Count(x => x.Result == PublishResultType.SuccessPublish),
+        Assert.That(
+            runSched.Count(x => x.Result == PublishResultType.SuccessPublish), Is.EqualTo(5),
             string.Join(Environment.NewLine, runSched.Select(x => $"{x.Entity.Name} - {x.Result}")));
-        Assert.AreEqual(
-            5,
-            runSched.Count(x => x.Result == PublishResultType.SuccessUnpublish),
+        Assert.That(
+            runSched.Count(x => x.Result == PublishResultType.SuccessUnpublish), Is.EqualTo(5),
             string.Join(Environment.NewLine, runSched.Select(x => $"{x.Entity.Name} - {x.Result}")));
-        Assert.AreEqual(
-            5,
-            runSched.Count(x => x.Result == PublishResultType.SuccessPublishCulture),
+        Assert.That(
+            runSched.Count(x => x.Result == PublishResultType.SuccessPublishCulture), Is.EqualTo(5),
             string.Join(Environment.NewLine, runSched.Select(x => $"{x.Entity.Name} - {x.Result}")));
-        Assert.AreEqual(
-            5,
-            runSched.Count(x => x.Result == PublishResultType.SuccessUnpublishCulture),
+        Assert.That(
+            runSched.Count(x => x.Result == PublishResultType.SuccessUnpublishCulture), Is.EqualTo(5),
             string.Join(Environment.NewLine, runSched.Select(x => $"{x.Entity.Name} - {x.Result}")));
 
         // re-run the scheduled publishing, there should be no results
         runSched = ContentService.PerformScheduledPublish(
             now.AddMinutes(1)).ToList();
 
-        Assert.AreEqual(0, runSched.Count);
+        Assert.That(runSched, Is.Empty);
     }
 
     [Test]
@@ -329,20 +324,20 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         var contentSchedule = ContentScheduleCollection.CreateWithEntry(null, DateTime.UtcNow.AddHours(2));
         ContentService.Save(content, Constants.Security.SuperUserId, contentSchedule);
-        Assert.AreEqual(1, contentSchedule.FullSchedule.Count);
+        Assert.That(contentSchedule.FullSchedule, Has.Count.EqualTo(1));
 
         contentSchedule = ContentService.GetContentScheduleByContentId(content.Id);
         var sched = contentSchedule.FullSchedule;
-        Assert.AreEqual(1, sched.Count);
-        Assert.AreEqual(1, sched.Count(x => x.Culture == Constants.System.InvariantCulture));
+        Assert.That(sched, Has.Count.EqualTo(1));
+        Assert.That(sched.Count(x => x.Culture == Constants.System.InvariantCulture), Is.EqualTo(1));
         contentSchedule.Clear(ContentScheduleAction.Expire);
         ContentService.Save(content, Constants.Security.SuperUserId, contentSchedule);
 
         // Assert
         contentSchedule = ContentService.GetContentScheduleByContentId(content.Id);
         sched = contentSchedule.FullSchedule;
-        Assert.AreEqual(0, sched.Count);
-        Assert.IsTrue(ContentService.Publish(content, content.AvailableCultures.ToArray()).Success);
+        Assert.That(sched, Is.Empty);
+        Assert.That(ContentService.Publish(content, content.AvailableCultures.ToArray()).Success, Is.True);
     }
 
     [Test]
@@ -361,10 +356,10 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         // Assert
         var allVersions = ContentService.GetVersionIds(content.Id, int.MaxValue);
-        Assert.AreEqual(21, allVersions.Count());
+        Assert.That(allVersions.Count(), Is.EqualTo(21));
 
         var topVersions = ContentService.GetVersionIds(content.Id, 4);
-        Assert.AreEqual(4, topVersions.Count());
+        Assert.That(topVersions.Count(), Is.EqualTo(4));
     }
 
     [Test]
@@ -383,9 +378,9 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
             .ToArray();
 
         // Assert
-        Assert.AreEqual(sortedGet[0].Id, results[10].Id);
-        Assert.AreEqual(sortedGet[1].Id, results[5].Id);
-        Assert.AreEqual(sortedGet[2].Id, results[12].Id);
+        Assert.That(results[10].Id, Is.EqualTo(sortedGet[0].Id));
+        Assert.That(results[5].Id, Is.EqualTo(sortedGet[1].Id));
+        Assert.That(results[12].Id, Is.EqualTo(sortedGet[2].Id));
     }
 
     [Test]
@@ -399,7 +394,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         }
 
         // Assert
-        Assert.AreEqual(25, ContentService.Count());
+        Assert.That(ContentService.Count(), Is.EqualTo(25));
     }
 
     [Test]
@@ -420,7 +415,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         }
 
         // Assert
-        Assert.AreEqual(20, ContentService.Count("umbBlah"));
+        Assert.That(ContentService.Count("umbBlah"), Is.EqualTo(20));
     }
 
     [Test]
@@ -442,7 +437,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         }
 
         // Assert
-        Assert.AreEqual(20, ContentService.CountChildren(parent.Id));
+        Assert.That(ContentService.CountChildren(parent.Id), Is.EqualTo(20));
     }
 
     [Test]
@@ -465,7 +460,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         }
 
         // Assert
-        Assert.AreEqual(20, ContentService.CountDescendants(parent.Id));
+        Assert.That(ContentService.CountDescendants(parent.Id), Is.EqualTo(20));
     }
 
     [Test]
@@ -477,7 +472,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         var res = ContentService.GetAncestors(current.Object);
 
         // Assert
-        Assert.IsEmpty(res);
+        Assert.That(res, Is.Empty);
     }
 
     [Test]
@@ -589,14 +584,14 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     public void Can_Get_All_Versions_Of_Content()
     {
         var parent = ContentService.GetById(Textpage.Id);
-        Assert.IsFalse(parent.Published);
+        Assert.That(parent.Published, Is.False);
         ContentService.Save(parent); // publishing parent, so Text Page 2 can be updated.
         ContentService.Publish(parent, parent.AvailableCultures.ToArray());
 
         var content = ContentService.GetById(Subpage.Id);
-        Assert.IsFalse(content.Published);
+        Assert.That(content.Published, Is.False);
         var versions = ContentService.GetVersions(Subpage.Id).ToList();
-        Assert.AreEqual(1, versions.Count);
+        Assert.That(versions, Has.Count.EqualTo(1));
 
         var version1 = content.VersionId;
         Console.WriteLine($"1 e={content.VersionId} p={content.PublishedVersionId}");
@@ -618,24 +613,24 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Console.WriteLine($"3 e={content.VersionId} p={content.PublishedVersionId}");
 
         var content1 = ContentService.GetById(content.Id);
-        Assert.AreEqual("Bob Hope", content1.GetValue("author"));
-        Assert.AreEqual("Bob Hope", content1.GetValue("author", published: true));
+        Assert.That(content1.GetValue("author"), Is.EqualTo("Bob Hope"));
+        Assert.That(content1.GetValue("author", published: true), Is.EqualTo("Bob Hope"));
 
         content.Name = "Text Page 2 ReReUpdated";
         content.SetValue("author", "John Farr");
         ContentService.Save(content); // no new version
 
         content1 = ContentService.GetById(content.Id);
-        Assert.AreEqual("John Farr", content1.GetValue("author"));
-        Assert.AreEqual("Bob Hope", content1.GetValue("author", published: true));
+        Assert.That(content1.GetValue("author"), Is.EqualTo("John Farr"));
+        Assert.That(content1.GetValue("author", published: true), Is.EqualTo("Bob Hope"));
 
         versions = ContentService.GetVersions(Subpage.Id).ToList();
-        Assert.AreEqual(3, versions.Count);
+        Assert.That(versions, Has.Count.EqualTo(3));
 
         // versions come with most recent first
-        Assert.AreEqual(version3, versions[0].VersionId); // the edited version
-        Assert.AreEqual(version2, versions[1].VersionId); // the published version
-        Assert.AreEqual(version1, versions[2].VersionId); // the previously published version
+        Assert.That(versions[0].VersionId, Is.EqualTo(version3)); // the edited version
+        Assert.That(versions[1].VersionId, Is.EqualTo(version2)); // the published version
+        Assert.That(versions[2].VersionId, Is.EqualTo(version1)); // the previously published version
 
         // p is always the same, published version
         // e is changing, actual version we're loading
@@ -647,18 +642,17 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         // and proper values
         // first, the current (edited) version, with edited and published versions
-        Assert.AreEqual("John Farr", versions[0].GetValue("author")); // current version has the edited value
-        Assert.AreEqual(
-            "Bob Hope",
-            versions[0].GetValue("author", published: true)); // and the published published value
+        Assert.That(versions[0].GetValue("author"), Is.EqualTo("John Farr")); // current version has the edited value
+        Assert.That(
+            versions[0].GetValue("author", published: true), Is.EqualTo("Bob Hope")); // and the published published value
 
         // then, the current (published) version, with edited == published
-        Assert.AreEqual("Bob Hope", versions[1].GetValue("author")); // own edited version
-        Assert.AreEqual("Bob Hope", versions[1].GetValue("author", published: true)); // and published
+        Assert.That(versions[1].GetValue("author"), Is.EqualTo("Bob Hope")); // own edited version
+        Assert.That(versions[1].GetValue("author", published: true), Is.EqualTo("Bob Hope")); // and published
 
         // then, the first published version - with values as 'edited'
-        Assert.AreEqual("Jane Doe", versions[2].GetValue("author")); // own edited version
-        Assert.AreEqual("Bob Hope", versions[2].GetValue("author", published: true)); // and published
+        Assert.That(versions[2].GetValue("author"), Is.EqualTo("Jane Doe")); // own edited version
+        Assert.That(versions[2].GetValue("author", published: true), Is.EqualTo("Bob Hope")); // and published
     }
 
     [Test]
@@ -714,9 +708,9 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 #pragma warning restore CS0618 // Type or member is obsolete
 
         // Assert
-        Assert.AreEqual(1, keys.Count);
-        Assert.AreEqual(keys[0].Key, Subpage.Id);
-        Assert.AreEqual(keys[0].Value.First().Id, contentSchedule.FullSchedule.First().Id);
+        Assert.That(keys, Has.Count.EqualTo(1));
+        Assert.That(Subpage.Id, Is.EqualTo(keys[0].Key));
+        Assert.That(contentSchedule.FullSchedule.First().Id, Is.EqualTo(keys[0].Value.First().Id));
     }
 
     [Test]
@@ -734,9 +728,9 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         var results = ContentService.GetContentSchedulesByKeys([Textpage.Key, Subpage.Key, Subpage2.Key]).ToList();
 
         // Assert
-        Assert.AreEqual(1, results.Count);
-        Assert.AreEqual(Subpage.Key, results[0].Key);
-        Assert.AreEqual(contentSchedule.FullSchedule.First().Id, results[0].Value.First().Id);
+        Assert.That(results, Has.Count.EqualTo(1));
+        Assert.That(results[0].Key, Is.EqualTo(Subpage.Key));
+        Assert.That(results[0].Value.First().Id, Is.EqualTo(contentSchedule.FullSchedule.First().Id));
     }
 
     [Test]
@@ -747,7 +741,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         var contents = ContentService.GetContentForRelease(DateTime.UtcNow).ToList();
 
         // Assert
-        Assert.That(DateTime.UtcNow.AddMinutes(-5) <= DateTime.UtcNow);
+        Assert.That(DateTime.UtcNow.AddMinutes(-5), Is.LessThanOrEqualTo(DateTime.UtcNow));
         Assert.That(contents, Is.Not.Null);
         Assert.That(contents.Any(), Is.True);
         Assert.That(contents.Count(), Is.EqualTo(1));
@@ -771,7 +765,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     {
         // Arrange
         var content = ContentService.GetById(Textpage.Id);
-        Assert.IsNotNull(content);
+        Assert.That(content, Is.Not.Null);
         var published = ContentService.Publish(content, content.AvailableCultures.ToArray(), userId: -1);
 
         // Act
@@ -781,7 +775,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Assert.That(published.Success, Is.True);
         Assert.That(unpublished.Success, Is.True);
         Assert.That(content.Published, Is.False);
-        Assert.AreEqual(PublishResultType.SuccessUnpublish, unpublished.Result);
+        Assert.That(unpublished.Result, Is.EqualTo(PublishResultType.SuccessUnpublish));
     }
 
     [Test]
@@ -791,26 +785,26 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         var saved = ContentService.Save(content);
         var published = ContentService.Publish(content, new[] { langFr.IsoCode, langUk.IsoCode });
-        Assert.IsTrue(content.IsCulturePublished(langFr.IsoCode));
-        Assert.IsTrue(content.IsCulturePublished(langUk.IsoCode));
+        Assert.That(content.IsCulturePublished(langFr.IsoCode), Is.True);
+        Assert.That(content.IsCulturePublished(langUk.IsoCode), Is.True);
 
         // re-get
         content = ContentService.GetById(content.Id);
-        Assert.IsTrue(saved.Success);
-        Assert.IsTrue(published.Success);
-        Assert.IsTrue(content.IsCulturePublished(langFr.IsoCode));
-        Assert.IsTrue(content.IsCulturePublished(langUk.IsoCode));
+        Assert.That(saved.Success, Is.True);
+        Assert.That(published.Success, Is.True);
+        Assert.That(content.IsCulturePublished(langFr.IsoCode), Is.True);
+        Assert.That(content.IsCulturePublished(langUk.IsoCode), Is.True);
 
         var unpublished = ContentService.Unpublish(content, langFr.IsoCode);
-        Assert.IsTrue(unpublished.Success);
-        Assert.AreEqual(PublishResultType.SuccessUnpublishCulture, unpublished.Result);
-        Assert.IsFalse(content.IsCulturePublished(langFr.IsoCode));
-        Assert.IsTrue(content.IsCulturePublished(langUk.IsoCode));
+        Assert.That(unpublished.Success, Is.True);
+        Assert.That(unpublished.Result, Is.EqualTo(PublishResultType.SuccessUnpublishCulture));
+        Assert.That(content.IsCulturePublished(langFr.IsoCode), Is.False);
+        Assert.That(content.IsCulturePublished(langUk.IsoCode), Is.True);
 
         // re-get
         content = ContentService.GetById(content.Id);
-        Assert.IsFalse(content.IsCulturePublished(langFr.IsoCode));
-        Assert.IsTrue(content.IsCulturePublished(langUk.IsoCode));
+        Assert.That(content.IsCulturePublished(langFr.IsoCode), Is.False);
+        Assert.That(content.IsCulturePublished(langUk.IsoCode), Is.True);
     }
 
     [Test]
@@ -821,36 +815,36 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         ContentService.Save(content);
         var published = ContentService.Publish(content, new[] { langFr.IsoCode, langUk.IsoCode });
-        Assert.AreEqual(PublishedState.Published, content.PublishedState);
+        Assert.That(content.PublishedState, Is.EqualTo(PublishedState.Published));
 
         // re-get
         content = ContentService.GetById(content.Id);
 
         var unpublished = ContentService.Unpublish(content, langUk.IsoCode); // first culture
-        Assert.IsTrue(unpublished.Success);
-        Assert.AreEqual(PublishResultType.SuccessUnpublishCulture, unpublished.Result);
-        Assert.IsFalse(content.IsCulturePublished(langUk.IsoCode));
-        Assert.IsTrue(content.IsCulturePublished(langFr.IsoCode));
+        Assert.That(unpublished.Success, Is.True);
+        Assert.That(unpublished.Result, Is.EqualTo(PublishResultType.SuccessUnpublishCulture));
+        Assert.That(content.IsCulturePublished(langUk.IsoCode), Is.False);
+        Assert.That(content.IsCulturePublished(langFr.IsoCode), Is.True);
 
         content = ContentService.GetById(content.Id);
 
         unpublished = ContentService.Unpublish(content, langFr.IsoCode); // last culture
-        Assert.IsTrue(unpublished.Success);
-        Assert.AreEqual(PublishResultType.SuccessUnpublishLastCulture, unpublished.Result);
-        Assert.IsFalse(content.IsCulturePublished(langFr.IsoCode));
-        Assert.IsFalse(content.IsCulturePublished(langUk.IsoCode));
+        Assert.That(unpublished.Success, Is.True);
+        Assert.That(unpublished.Result, Is.EqualTo(PublishResultType.SuccessUnpublishLastCulture));
+        Assert.That(content.IsCulturePublished(langFr.IsoCode), Is.False);
+        Assert.That(content.IsCulturePublished(langUk.IsoCode), Is.False);
 
         content = ContentService.GetById(content.Id);
 
         published = ContentService.Publish(content, new[] { langUk.IsoCode });
-        Assert.AreEqual(PublishedState.Published, content.PublishedState);
-        Assert.IsTrue(content.IsCulturePublished(langUk.IsoCode));
-        Assert.IsFalse(content.IsCulturePublished(langFr.IsoCode));
+        Assert.That(content.PublishedState, Is.EqualTo(PublishedState.Published));
+        Assert.That(content.IsCulturePublished(langUk.IsoCode), Is.True);
+        Assert.That(content.IsCulturePublished(langFr.IsoCode), Is.False);
 
         content = ContentService.GetById(content.Id); // reget
-        Assert.AreEqual(PublishedState.Published, content.PublishedState);
-        Assert.IsTrue(content.IsCulturePublished(langUk.IsoCode));
-        Assert.IsFalse(content.IsCulturePublished(langFr.IsoCode));
+        Assert.That(content.PublishedState, Is.EqualTo(PublishedState.Published));
+        Assert.That(content.IsCulturePublished(langUk.IsoCode), Is.True);
+        Assert.That(content.IsCulturePublished(langFr.IsoCode), Is.False);
     }
 
     [Test]
@@ -860,43 +854,42 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         var saved = ContentService.Save(content);
         var published = ContentService.Publish(content, new[] { langFr.IsoCode, langUk.IsoCode });
-        Assert.IsTrue(content.IsCulturePublished(langFr.IsoCode));
-        Assert.IsTrue(content.IsCulturePublished(langUk.IsoCode));
-        Assert.IsTrue(saved.Success);
-        Assert.IsTrue(published.Success);
-        Assert.AreEqual(PublishedState.Published, content.PublishedState);
+        Assert.That(content.IsCulturePublished(langFr.IsoCode), Is.True);
+        Assert.That(content.IsCulturePublished(langUk.IsoCode), Is.True);
+        Assert.That(saved.Success, Is.True);
+        Assert.That(published.Success, Is.True);
+        Assert.That(content.PublishedState, Is.EqualTo(PublishedState.Published));
 
         // re-get
         content = ContentService.GetById(content.Id);
-        Assert.IsTrue(content.IsCulturePublished(langFr.IsoCode));
-        Assert.IsTrue(content.IsCulturePublished(langUk.IsoCode));
-        Assert.AreEqual(PublishedState.Published, content.PublishedState);
+        Assert.That(content.IsCulturePublished(langFr.IsoCode), Is.True);
+        Assert.That(content.IsCulturePublished(langUk.IsoCode), Is.True);
+        Assert.That(content.PublishedState, Is.EqualTo(PublishedState.Published));
 
         var unpublished = ContentService.Unpublish(content, langFr.IsoCode); // first culture
-        Assert.IsTrue(unpublished.Success);
-        Assert.AreEqual(PublishResultType.SuccessUnpublishCulture, unpublished.Result);
-        Assert.IsFalse(content.IsCulturePublished(langFr.IsoCode));
-        Assert.IsTrue(content.IsCulturePublished(langUk.IsoCode));
-        Assert.AreEqual(PublishedState.Published, content.PublishedState); // still published
+        Assert.That(unpublished.Success, Is.True);
+        Assert.That(unpublished.Result, Is.EqualTo(PublishResultType.SuccessUnpublishCulture));
+        Assert.That(content.IsCulturePublished(langFr.IsoCode), Is.False);
+        Assert.That(content.IsCulturePublished(langUk.IsoCode), Is.True);
+        Assert.That(content.PublishedState, Is.EqualTo(PublishedState.Published)); // still published
 
         // re-get
         content = ContentService.GetById(content.Id);
-        Assert.IsFalse(content.IsCulturePublished(langFr.IsoCode));
-        Assert.IsTrue(content.IsCulturePublished(langUk.IsoCode));
+        Assert.That(content.IsCulturePublished(langFr.IsoCode), Is.False);
+        Assert.That(content.IsCulturePublished(langUk.IsoCode), Is.True);
 
         unpublished = ContentService.Unpublish(content, langUk.IsoCode); // last culture
-        Assert.IsTrue(unpublished.Success);
-        Assert.AreEqual(PublishResultType.SuccessUnpublishLastCulture, unpublished.Result);
-        Assert.IsFalse(content.IsCulturePublished(langFr.IsoCode));
-        Assert.IsFalse(content.IsCulturePublished(langUk.IsoCode));
-        Assert.AreEqual(PublishedState.Unpublished,
-            content.PublishedState); // the last culture was unpublished so the document should also reflect this
+        Assert.That(unpublished.Success, Is.True);
+        Assert.That(unpublished.Result, Is.EqualTo(PublishResultType.SuccessUnpublishLastCulture));
+        Assert.That(content.IsCulturePublished(langFr.IsoCode), Is.False);
+        Assert.That(content.IsCulturePublished(langUk.IsoCode), Is.False);
+        Assert.That(content.PublishedState, Is.EqualTo(PublishedState.Unpublished)); // the last culture was unpublished so the document should also reflect this
 
         // re-get
         content = ContentService.GetById(content.Id);
-        Assert.AreEqual(PublishedState.Unpublished, content.PublishedState); // just double checking
-        Assert.IsFalse(content.IsCulturePublished(langFr.IsoCode));
-        Assert.IsFalse(content.IsCulturePublished(langUk.IsoCode));
+        Assert.That(content.PublishedState, Is.EqualTo(PublishedState.Unpublished)); // just double checking
+        Assert.That(content.IsCulturePublished(langFr.IsoCode), Is.False);
+        Assert.That(content.IsCulturePublished(langUk.IsoCode), Is.False);
     }
 
     [Test]
@@ -924,21 +917,21 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         var saved = ContentService.Save(content);
         var published = ContentService.Publish(content, new[] { langFr.IsoCode, langUk.IsoCode });
-        Assert.IsTrue(content.IsCulturePublished(langFr.IsoCode));
-        Assert.IsTrue(content.IsCulturePublished(langUk.IsoCode));
-        Assert.IsTrue(saved.Success);
-        Assert.IsTrue(published.Success);
-        Assert.AreEqual(PublishedState.Published, content.PublishedState);
+        Assert.That(content.IsCulturePublished(langFr.IsoCode), Is.True);
+        Assert.That(content.IsCulturePublished(langUk.IsoCode), Is.True);
+        Assert.That(saved.Success, Is.True);
+        Assert.That(published.Success, Is.True);
+        Assert.That(content.PublishedState, Is.EqualTo(PublishedState.Published));
 
         // re-get
         content = ContentService.GetById(content.Id);
 
         var unpublished = ContentService.Unpublish(content, langUk.IsoCode); // unpublish mandatory lang
-        Assert.IsTrue(unpublished.Success);
-        Assert.AreEqual(PublishResultType.SuccessUnpublishMandatoryCulture, unpublished.Result);
-        Assert.IsFalse(content.IsCulturePublished(langUk.IsoCode));
-        Assert.IsTrue(content.IsCulturePublished(langFr.IsoCode)); // remains published
-        Assert.AreEqual(PublishedState.Unpublished, content.PublishedState);
+        Assert.That(unpublished.Success, Is.True);
+        Assert.That(unpublished.Result, Is.EqualTo(PublishResultType.SuccessUnpublishMandatoryCulture));
+        Assert.That(content.IsCulturePublished(langUk.IsoCode), Is.False);
+        Assert.That(content.IsCulturePublished(langFr.IsoCode), Is.True); // remains published
+        Assert.That(content.PublishedState, Is.EqualTo(PublishedState.Unpublished));
     }
 
     [Test]
@@ -948,19 +941,19 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         var saved = ContentService.Save(content);
         var published = ContentService.Publish(content, new[] { langFr.IsoCode, langUk.IsoCode });
-        Assert.IsTrue(content.IsCulturePublished(langFr.IsoCode));
-        Assert.IsTrue(content.IsCulturePublished(langUk.IsoCode));
-        Assert.IsTrue(saved.Success);
-        Assert.IsTrue(published.Success);
-        Assert.AreEqual(PublishedState.Published, content.PublishedState);
+        Assert.That(content.IsCulturePublished(langFr.IsoCode), Is.True);
+        Assert.That(content.IsCulturePublished(langUk.IsoCode), Is.True);
+        Assert.That(saved.Success, Is.True);
+        Assert.That(published.Success, Is.True);
+        Assert.That(content.PublishedState, Is.EqualTo(PublishedState.Published));
 
         // re-get
         content = ContentService.GetById(content.Id);
 
         var unpublished = ContentService.Unpublish(content, langUk.IsoCode);
-        Assert.IsTrue(unpublished.Success);
-        Assert.AreEqual(PublishResultType.SuccessUnpublishCulture, unpublished.Result);
-        Assert.IsFalse(content.IsCulturePublished(langUk.IsoCode));
+        Assert.That(unpublished.Success, Is.True);
+        Assert.That(unpublished.Result, Is.EqualTo(PublishResultType.SuccessUnpublishCulture));
+        Assert.That(content.IsCulturePublished(langUk.IsoCode), Is.False);
 
         content = ContentService.GetById(content.Id);
 
@@ -968,14 +961,14 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         content.SetCultureName("content-en-updated", langUk.IsoCode);
 
         unpublished = ContentService.Unpublish(content, langUk.IsoCode); // unpublish again
-        Assert.IsTrue(unpublished.Success);
-        Assert.AreEqual(PublishResultType.SuccessUnpublishAlready, unpublished.Result);
-        Assert.IsFalse(content.IsCulturePublished(langUk.IsoCode));
+        Assert.That(unpublished.Success, Is.True);
+        Assert.That(unpublished.Result, Is.EqualTo(PublishResultType.SuccessUnpublishAlready));
+        Assert.That(content.IsCulturePublished(langUk.IsoCode), Is.False);
 
         content = ContentService.GetById(content.Id);
 
         // ensure that even though the culture was already unpublished that the data was still persisted
-        Assert.AreEqual("content-en-updated", content.GetCultureName(langUk.IsoCode));
+        Assert.That(content.GetCultureName(langUk.IsoCode), Is.EqualTo("content-en-updated"));
     }
 
     [Test]
@@ -985,11 +978,11 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         var saved = ContentService.Save(content);
         var published = ContentService.Publish(content, new[] { langFr.IsoCode, langUk.IsoCode });
-        Assert.IsTrue(content.IsCulturePublished(langFr.IsoCode));
-        Assert.IsTrue(content.IsCulturePublished(langUk.IsoCode));
-        Assert.IsTrue(saved.Success);
-        Assert.IsTrue(published.Success);
-        Assert.AreEqual(PublishedState.Published, content.PublishedState);
+        Assert.That(content.IsCulturePublished(langFr.IsoCode), Is.True);
+        Assert.That(content.IsCulturePublished(langUk.IsoCode), Is.True);
+        Assert.That(saved.Success, Is.True);
+        Assert.That(published.Success, Is.True);
+        Assert.That(content.PublishedState, Is.EqualTo(PublishedState.Published));
 
         // re-get
         content = ContentService.GetById(content.Id);
@@ -999,14 +992,14 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         saved = ContentService.Save(content);
         published = ContentService.Publish(content, new string[] { }); // publish without cultures
-        Assert.IsTrue(saved.Success);
-        Assert.AreEqual(PublishResultType.FailedPublishNothingToPublish, published.Result);
+        Assert.That(saved.Success, Is.True);
+        Assert.That(published.Result, Is.EqualTo(PublishResultType.FailedPublishNothingToPublish));
 
         // re-get
         content = ContentService.GetById(content.Id);
 
         // ensure that even though nothing was published that the data was still persisted
-        Assert.AreEqual("content-en-updated", content.GetCultureName(langUk.IsoCode));
+        Assert.That(content.GetCultureName(langUk.IsoCode), Is.EqualTo("content-en-updated"));
     }
 
     [Test]
@@ -1040,16 +1033,16 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         content.SetCultureName("content-en", langGb.IsoCode);
         content.SetCultureName("content-fr", langFr.IsoCode);
 
-        Assert.IsTrue(ContentService.Save(content).Success);
-        Assert.IsTrue(ContentService.Publish(content, new[] { langGb.IsoCode, langFr.IsoCode }).Success);
+        Assert.That(ContentService.Save(content).Success, Is.True);
+        Assert.That(ContentService.Publish(content, new[] { langGb.IsoCode, langFr.IsoCode }).Success, Is.True);
 
         // re-get
         content = ContentService.GetById(content.Id);
-        Assert.AreEqual(PublishedState.Published, content.PublishedState);
-        Assert.IsTrue(content.IsCulturePublished(langGb.IsoCode));
-        Assert.IsTrue(content.IsCulturePublished(langFr.IsoCode));
-        Assert.IsFalse(content.IsCultureEdited(langGb.IsoCode));
-        Assert.IsFalse(content.IsCultureEdited(langFr.IsoCode));
+        Assert.That(content.PublishedState, Is.EqualTo(PublishedState.Published));
+        Assert.That(content.IsCulturePublished(langGb.IsoCode), Is.True);
+        Assert.That(content.IsCulturePublished(langFr.IsoCode), Is.True);
+        Assert.That(content.IsCultureEdited(langGb.IsoCode), Is.False);
+        Assert.That(content.IsCultureEdited(langFr.IsoCode), Is.False);
 
         // update the invariant property and save a pending version
         content.SetValue("metakeywords", "hello");
@@ -1057,11 +1050,11 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         // re-get
         content = ContentService.GetById(content.Id);
-        Assert.AreEqual(PublishedState.Published, content.PublishedState);
-        Assert.IsTrue(content.IsCulturePublished(langGb.IsoCode));
-        Assert.IsTrue(content.IsCulturePublished(langFr.IsoCode));
-        Assert.IsTrue(content.IsCultureEdited(langGb.IsoCode));
-        Assert.IsFalse(content.IsCultureEdited(langFr.IsoCode));
+        Assert.That(content.PublishedState, Is.EqualTo(PublishedState.Published));
+        Assert.That(content.IsCulturePublished(langGb.IsoCode), Is.True);
+        Assert.That(content.IsCulturePublished(langFr.IsoCode), Is.True);
+        Assert.That(content.IsCultureEdited(langGb.IsoCode), Is.True);
+        Assert.That(content.IsCultureEdited(langFr.IsoCode), Is.False);
     }
 
     [Test]
@@ -1076,7 +1069,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         // audit log will only show that french was published
         var lastLog = (await AuditService.GetItemsByEntityAsync(content.Id, 0, 1)).Items.First();
-        Assert.AreEqual("Published languages: fr-FR", lastLog.Comment);
+        Assert.That(lastLog.Comment, Is.EqualTo("Published languages: fr-FR"));
 
         // re-get
         content = ContentService.GetById(content.Id);
@@ -1086,7 +1079,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         // audit log will only show that english was published
         lastLog = (await AuditService.GetItemsByEntityAsync(content.Id, 0, 1)).Items.First();
-        Assert.AreEqual("Published languages: en-GB", lastLog.Comment);
+        Assert.That(lastLog.Comment, Is.EqualTo("Published languages: en-GB"));
     }
 
     [Test]
@@ -1114,8 +1107,8 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         content.SetCultureName("content-gb", langGb.IsoCode);
         var saved = ContentService.Save(content);
         var published = ContentService.Publish(content, new[] { langGb.IsoCode, langFr.IsoCode });
-        Assert.IsTrue(saved.Success);
-        Assert.IsTrue(published.Success);
+        Assert.That(saved.Success, Is.True);
+        Assert.That(published.Success, Is.True);
 
         // re-get
         content = ContentService.GetById(content.Id);
@@ -1123,7 +1116,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         // audit log will only show that french was unpublished
         var lastLog = (await AuditService.GetItemsByEntityAsync(content.Id, 0, 1)).Items.First();
-        Assert.AreEqual("Unpublished languages: fr-FR", lastLog.Comment);
+        Assert.That(lastLog.Comment, Is.EqualTo("Unpublished languages: fr-FR"));
 
         // re-get
         content = ContentService.GetById(content.Id);
@@ -1132,8 +1125,8 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         // audit log will only show that english was published
         var logs = (await AuditService.GetItemsByEntityAsync(content.Id, 0, int.MaxValue, Direction.Ascending)).Items.ToList();
-        Assert.AreEqual("Unpublished languages: en-GB", logs[^2].Comment);
-        Assert.AreEqual("Unpublished (mandatory language unpublished)", logs[^1].Comment);
+        Assert.That(logs[^2].Comment, Is.EqualTo("Unpublished languages: en-GB"));
+        Assert.That(logs[^1].Comment, Is.EqualTo("Unpublished (mandatory language unpublished)"));
     }
 
     [Test]
@@ -1141,7 +1134,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     {
         // Arrange
         var content = ContentService.GetById(Textpage.Id);
-        Assert.IsNotNull(content);
+        Assert.That(content, Is.Not.Null);
 
         // Act
         var published = ContentService.Publish(content, content.AvailableCultures.ToArray(), userId: Constants.Security.SuperUserId);
@@ -1156,7 +1149,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     {
         // Arrange
         var content = ContentService.GetById(Textpage.Id);
-        Assert.IsNotNull(content);
+        Assert.That(content, Is.Not.Null);
 
         // Act
         var published = ContentService.Publish(content, content.AvailableCultures.ToArray(), userId: -1);
@@ -1177,9 +1170,9 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         var content = ContentService.Create("child", parent, "umbTextpage");
         ContentService.Save(content);
 
-        Assert.IsTrue(ContentService.IsPathPublishable(content));
+        Assert.That(ContentService.IsPathPublishable(content), Is.True);
         ContentService.Unpublish(parent);
-        Assert.IsFalse(ContentService.IsPathPublishable(content));
+        Assert.That(ContentService.IsPathPublishable(content), Is.False);
     }
 
     [Test]
@@ -1190,21 +1183,21 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         ContentNotificationHandler.SavingContent = notification =>
         {
-            Assert.AreEqual(1, notification.SavedEntities.Count());
+            Assert.That(notification.SavedEntities.Count(), Is.EqualTo(1));
             var entity = notification.SavedEntities.First();
-            Assert.AreEqual("foo", entity.Name);
+            Assert.That(entity.Name, Is.EqualTo("foo"));
 
             var e = ContentService.GetById(entity.Id);
-            Assert.AreEqual("Textpage", e.Name);
+            Assert.That(e.Name, Is.EqualTo("Textpage"));
 
             savingWasCalled = true;
         };
 
         ContentNotificationHandler.PublishingContent = notification =>
         {
-            Assert.AreEqual(1, notification.PublishedEntities.Count());
+            Assert.That(notification.PublishedEntities.Count(), Is.EqualTo(1));
             var entity = notification.PublishedEntities.First();
-            Assert.AreEqual("foo", entity.Name);
+            Assert.That(entity.Name, Is.EqualTo("foo"));
 
             publishingWasCalled = true;
         };
@@ -1212,7 +1205,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         try
         {
             var content = ContentService.GetById(Textpage.Id);
-            Assert.AreEqual("Textpage", content.Name);
+            Assert.That(content.Name, Is.EqualTo("Textpage"));
 
             content.Name = "foo";
             ContentService.Save(content);
@@ -1223,10 +1216,10 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
             Assert.That(content.Published, Is.True);
 
             var e = ContentService.GetById(content.Id);
-            Assert.AreEqual("foo", e.Name);
+            Assert.That(e.Name, Is.EqualTo("foo"));
 
-            Assert.IsTrue(savingWasCalled);
-            Assert.IsTrue(publishingWasCalled);
+            Assert.That(savingWasCalled, Is.True);
+            Assert.That(publishingWasCalled, Is.True);
         }
         finally
         {
@@ -1292,12 +1285,12 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         // parent can publish values
         // and therefore can be published
-        Assert.IsTrue(parentPublished.Success);
-        Assert.IsTrue(parent.Published);
+        Assert.That(parentPublished.Success, Is.True);
+        Assert.That(parent.Published, Is.True);
 
         var content = ContentBuilder.CreateSimpleContent(contentType, "Invalid Content", parentId);
         content.SetValue("author", string.Empty);
-        Assert.IsFalse(content.HasIdentity);
+        Assert.That(content.HasIdentity, Is.False);
 
         // content cannot publish values because they are invalid
         var propertyValidationService = new PropertyValidationService(PropertyEditorCollection, DataTypeService, LocalizedTextService, ValueEditorCache, Mock.Of<ICultureDictionary>(), Mock.Of<ILanguageService>(), Mock.Of<IOptions<ContentSettings>>());
@@ -1305,20 +1298,20 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
             content,
             out var invalidProperties,
             CultureImpact.Invariant);
-        Assert.IsFalse(isValid);
-        Assert.IsNotEmpty(invalidProperties);
+        Assert.That(isValid, Is.False);
+        Assert.That(invalidProperties, Is.Not.Empty);
 
         // and therefore cannot be published,
         // because it did not have a published version at all
         ContentService.Save(content);
         var contentPublished = ContentService.Publish(content, content.AvailableCultures.ToArray());
-        Assert.IsFalse(contentPublished.Success);
-        Assert.AreEqual(PublishResultType.FailedPublishContentInvalid, contentPublished.Result);
-        Assert.IsFalse(content.Published);
+        Assert.That(contentPublished.Success, Is.False);
+        Assert.That(contentPublished.Result, Is.EqualTo(PublishResultType.FailedPublishContentInvalid));
+        Assert.That(content.Published, Is.False);
 
         // Ensure it saved though
-        Assert.Greater(content.Id, 0);
-        Assert.IsTrue(content.HasIdentity);
+        Assert.That(content.Id, Is.GreaterThan(0));
+        Assert.That(content.HasIdentity, Is.True);
     }
 
     [Test]
@@ -1344,21 +1337,21 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         content.PublishCulture(CultureImpact.Explicit(langFr.IsoCode, langFr.IsDefault), DateTime.UtcNow, PropertyEditorCollection);
         var result = ContentService.CommitDocumentChanges(content);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
         content = ContentService.GetById(content.Id);
-        Assert.IsTrue(content.IsCulturePublished(langFr.IsoCode));
-        Assert.IsFalse(content.IsCulturePublished(langDa.IsoCode));
+        Assert.That(content.IsCulturePublished(langFr.IsoCode), Is.True);
+        Assert.That(content.IsCulturePublished(langDa.IsoCode), Is.False);
 
         content.UnpublishCulture(langFr.IsoCode);
         content.PublishCulture(CultureImpact.Explicit(langDa.IsoCode, langDa.IsDefault), DateTime.UtcNow, PropertyEditorCollection);
 
         result = ContentService.CommitDocumentChanges(content);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(PublishResultType.SuccessMixedCulture, result.Result);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.EqualTo(PublishResultType.SuccessMixedCulture));
 
         content = ContentService.GetById(content.Id);
-        Assert.IsFalse(content.IsCulturePublished(langFr.IsoCode));
-        Assert.IsTrue(content.IsCulturePublished(langDa.IsoCode));
+        Assert.That(content.IsCulturePublished(langFr.IsoCode), Is.False);
+        Assert.That(content.IsCulturePublished(langDa.IsoCode), Is.True);
     }
 
     // documents: an enumeration of documents, in tree order
@@ -1419,8 +1412,8 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         }
 
         // everything should be successful
-        Assert.IsTrue(parentPublished.All(x => x.Success));
-        Assert.IsTrue(parent.Published);
+        Assert.That(parentPublished.All(x => x.Success), Is.True);
+        Assert.That(parent.Published, Is.True);
 
         var
             children = ContentService.GetPagedChildren(
@@ -1433,7 +1426,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
                 ordering: null); // we only want the first so page size, etc.. is abitrary
 
         // children are published including ... that was released 5 mins ago
-        Assert.IsTrue(children.First(x => x.Id == Subpage.Id).Published);
+        Assert.That(children.First(x => x.Id == Subpage.Id).Published, Is.True);
     }
 
     [Test]
@@ -1445,7 +1438,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         ContentService.Save(content, contentSchedule: contentSchedule);
 
         var parent = ContentService.GetById(Textpage.Id);
-        Assert.IsNotNull(parent);
+        Assert.That(parent, Is.Not.Null);
         var parentPublished =
             ContentService.Publish(parent,
                 parent.AvailableCultures.ToArray(),
@@ -1459,7 +1452,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Assert.That(parentPublished.Success, Is.True);
         Assert.That(published.Success, Is.False);
         Assert.That(content.Published, Is.False);
-        Assert.AreEqual(PublishResultType.FailedPublishHasExpired, published.Result);
+        Assert.That(published.Result, Is.EqualTo(PublishResultType.FailedPublishHasExpired));
     }
 
     [Test]
@@ -1476,8 +1469,8 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         var published = ContentService.Publish(content, new[] { "en-US" });
 
-        Assert.IsFalse(published.Success);
-        Assert.AreEqual(PublishResultType.FailedPublishCultureHasExpired, published.Result);
+        Assert.That(published.Success, Is.False);
+        Assert.That(published.Result, Is.EqualTo(PublishResultType.FailedPublishCultureHasExpired));
         Assert.That(content.Published, Is.False);
     }
 
@@ -1490,7 +1483,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         ContentService.Save(content, Constants.Security.SuperUserId, contentSchedule);
 
         var parent = ContentService.GetById(Textpage.Id);
-        Assert.IsNotNull(parent);
+        Assert.That(parent, Is.Not.Null);
         var parentPublished =
             ContentService.Publish(parent,
                 parent.AvailableCultures.ToArray(),
@@ -1504,7 +1497,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Assert.That(parentPublished.Success, Is.True);
         Assert.That(published.Success, Is.False);
         Assert.That(content.Published, Is.False);
-        Assert.AreEqual(PublishResultType.FailedPublishAwaitingRelease, published.Result);
+        Assert.That(published.Result, Is.EqualTo(PublishResultType.FailedPublishAwaitingRelease));
     }
 
     [Test]
@@ -1551,12 +1544,12 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(result.Success);
-            Assert.IsTrue(result.Content.Published);
-            Assert.AreEqual(PublishResultType.FailedPublishAwaitingRelease, result.Result);
+            Assert.That(result.Success, Is.False);
+            Assert.That(result.Content.Published, Is.True);
+            Assert.That(result.Result, Is.EqualTo(PublishResultType.FailedPublishAwaitingRelease));
 
             // We changed property data
-            Assert.IsTrue(result.Content.Edited, "result.Content.Edited");
+            Assert.That(result.Content.Edited, Is.True, "result.Content.Edited");
         });
     }
 
@@ -1604,12 +1597,12 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(result.Success);
-            Assert.IsTrue(result.Content.Published);
-            Assert.AreEqual(PublishResultType.FailedPublishAwaitingRelease, result.Result);
+            Assert.That(result.Success, Is.False);
+            Assert.That(result.Content.Published, Is.True);
+            Assert.That(result.Result, Is.EqualTo(PublishResultType.FailedPublishAwaitingRelease));
 
             // We didn't change any property data
-            Assert.IsFalse(result.Content.Edited, "result.Content.Edited");
+            Assert.That(result.Content.Edited, Is.False, "result.Content.Edited");
         });
     }
 
@@ -1628,8 +1621,8 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         var published = ContentService.Publish(content, new[] { "en-US" });
 
-        Assert.IsFalse(published.Success);
-        Assert.AreEqual(PublishResultType.FailedPublishCultureAwaitingRelease, published.Result);
+        Assert.That(published.Success, Is.False);
+        Assert.That(published.Result, Is.EqualTo(PublishResultType.FailedPublishCultureAwaitingRelease));
         Assert.That(content.Published, Is.False);
     }
 
@@ -1653,7 +1646,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     {
         // Arrange
         var content = ContentService.GetById(Trashed.Id);
-        Assert.IsNotNull(content);
+        Assert.That(content, Is.Not.Null);
 
         // Act
         var published = ContentService.Publish(content, content.AvailableCultures.ToArray(), userId: Constants.Security.SuperUserId);
@@ -1678,8 +1671,8 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         // Assert
         Assert.That(content.HasIdentity, Is.True);
         Assert.That(content.Published, Is.True);
-        Assert.IsTrue(published.Success);
-        Assert.IsTrue(saved.Success);
+        Assert.That(published.Success, Is.True);
+        Assert.That(saved.Success, Is.True);
     }
 
     /// <summary>
@@ -1736,19 +1729,19 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         content.Properties["title"].SetValue(content.Properties["title"].GetValue() + " Saved");
         ContentService.Save(content);
-        Assert.AreEqual(publishedVersion, content.VersionId);
+        Assert.That(content.VersionId, Is.EqualTo(publishedVersion));
 
         // Act
         var publishedDescendants = ContentService.GetPublishedDescendants(root).ToList();
-        Assert.AreNotEqual(0, publishedDescendants.Count);
+        Assert.That(publishedDescendants, Is.Not.Empty);
 
         // Assert
-        Assert.IsTrue(rootPublished.Success);
-        Assert.IsTrue(contentPublished.Success);
+        Assert.That(rootPublished.Success, Is.True);
+        Assert.That(contentPublished.Success, Is.True);
 
         // Console.WriteLine(publishedVersion);
         // foreach (var d in publishedDescendants) Console.WriteLine(d.Version);
-        Assert.IsTrue(publishedDescendants.Any(x => x.VersionId == publishedVersion));
+        Assert.That(publishedDescendants.Any(x => x.VersionId == publishedVersion), Is.True);
 
         // Ensure that the published content version has the correct property value and is marked as published
         var publishedContentVersion = publishedDescendants.First(x => x.VersionId == publishedVersion);
@@ -1805,9 +1798,9 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         // re-get
         content = ContentService.GetById(content.Id);
-        Assert.AreEqual("another title of mine", content.GetValue("title"));
-        Assert.IsNull(content.GetValue("bodyText"));
-        Assert.AreEqual("new author", content.GetValue("author"));
+        Assert.That(content.GetValue("title"), Is.EqualTo("another title of mine"));
+        Assert.That(content.GetValue("bodyText"), Is.Null);
+        Assert.That(content.GetValue("author"), Is.EqualTo("new author"));
 
         content.SetValue("title", "new title");
         content.SetValue("bodyText", "new body text");
@@ -1822,15 +1815,15 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         // re-get
         content = ContentService.GetById(content.Id);
-        Assert.IsNull(content.GetValue("title")); // Test clearing the value worked with the non-published version
-        Assert.IsNull(content.GetValue("bodyText"));
-        Assert.AreEqual("new author text", content.GetValue("author"));
+        Assert.That(content.GetValue("title"), Is.Null); // Test clearing the value worked with the non-published version
+        Assert.That(content.GetValue("bodyText"), Is.Null);
+        Assert.That(content.GetValue("author"), Is.EqualTo("new author text"));
 
         // make sure that the published version remained the same
         var publishedContent = ContentService.GetVersion(content.PublishedVersionId);
-        Assert.AreEqual("another title of mine", publishedContent.GetValue("title"));
-        Assert.IsNull(publishedContent.GetValue("bodyText"));
-        Assert.AreEqual("new author", publishedContent.GetValue("author"));
+        Assert.That(publishedContent.GetValue("title"), Is.EqualTo("another title of mine"));
+        Assert.That(publishedContent.GetValue("bodyText"), Is.Null);
+        Assert.That(publishedContent.GetValue("author"), Is.EqualTo("new author"));
     }
 
     [Test]
@@ -1928,11 +1921,11 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
             descendants.AddRange(ContentService.GetPagedDescendants(content.Id, page++, pageSize, out total));
         }
 
-        Assert.AreNotEqual(-20, content.ParentId);
-        Assert.IsFalse(content.Trashed);
-        Assert.AreEqual(4, descendants.Count);
-        Assert.IsFalse(descendants.Any(x => x.Path.StartsWith("-1,-20,")));
-        Assert.IsFalse(descendants.Any(x => x.Trashed));
+        Assert.That(content.ParentId, Is.Not.EqualTo(-20));
+        Assert.That(content.Trashed, Is.False);
+        Assert.That(descendants, Has.Count.EqualTo(4));
+        Assert.That(descendants.Any(x => x.Path.StartsWith("-1,-20,")), Is.False);
+        Assert.That(descendants.Any(x => x.Trashed), Is.False);
 
         ContentService.MoveToRecycleBin(content);
 
@@ -1943,15 +1936,15 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
             descendants.AddRange(ContentService.GetPagedDescendants(content.Id, page++, pageSize, out total));
         }
 
-        Assert.AreEqual(-20, content.ParentId);
-        Assert.IsTrue(content.Trashed);
-        Assert.AreEqual(4, descendants.Count);
-        Assert.IsTrue(descendants.All(x => x.Path.StartsWith("-1,-20,")));
-        Assert.True(descendants.All(x => x.Trashed));
+        Assert.That(content.ParentId, Is.EqualTo(-20));
+        Assert.That(content.Trashed, Is.True);
+        Assert.That(descendants, Has.Count.EqualTo(4));
+        Assert.That(descendants.All(x => x.Path.StartsWith("-1,-20,")), Is.True);
+        Assert.That(descendants.All(x => x.Trashed), Is.True);
 
         ContentService.EmptyRecycleBin();
         var trashed = ContentService.GetPagedContentInRecycleBin(0, int.MaxValue, out var _).ToList();
-        Assert.IsEmpty(trashed);
+        Assert.That(trashed, Is.Empty);
     }
 
     [Test]
@@ -2003,8 +1996,8 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         // get the permissions and verify
         var permissions = UserService.GetPermissionsForPath(userGroup, copy.Path, true);
         var allPermissions = permissions.GetAllPermissions().ToArray();
-        Assert.AreEqual(1, allPermissions.Length);
-        Assert.AreEqual("A", allPermissions[0]);
+        Assert.That(allPermissions, Has.Length.EqualTo(1));
+        Assert.That(allPermissions[0], Is.EqualTo("A"));
     }
 
     [Test]
@@ -2047,14 +2040,14 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
             descendants.AddRange(ContentService.GetPagedDescendants(parentPage.Id, page++, pageSize, out total));
         }
 
-        Assert.AreEqual(3, descendants.Count);
+        Assert.That(descendants, Has.Count.EqualTo(3));
 
         foreach (var descendant in descendants)
         {
             var permissions = UserService.GetPermissionsForPath(userGroup, descendant.Path, true);
             var allPermissions = permissions.GetAllPermissions().ToArray();
-            Assert.AreEqual(1, allPermissions.Length);
-            Assert.AreEqual("A", allPermissions[0]);
+            Assert.That(allPermissions, Has.Length.EqualTo(1));
+            Assert.That(allPermissions[0], Is.EqualTo("A"));
         }
 
         // create a new parent with a new permission structure
@@ -2072,14 +2065,14 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
             descendants.AddRange(ContentService.GetPagedDescendants(parentPage2.Id, page++, pageSize, out total));
         }
 
-        Assert.AreEqual(3, descendants.Count);
+        Assert.That(descendants, Has.Count.EqualTo(3));
 
         foreach (var descendant in descendants)
         {
             var permissions = UserService.GetPermissionsForPath(userGroup, descendant.Path, true);
             var allPermissions = permissions.GetAllPermissions().ToArray();
-            Assert.AreEqual(1, allPermissions.Length);
-            Assert.AreEqual("B", allPermissions[0]);
+            Assert.That(allPermissions, Has.Length.EqualTo(1));
+            Assert.That(allPermissions[0], Is.EqualTo("B"));
         }
     }
 
@@ -2106,18 +2099,18 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         content1.PropertyValues(obj);
         content1.ResetDirtyProperties(false);
         ContentService.Save(content1);
-        Assert.IsTrue(ContentService.Publish(
+        Assert.That(ContentService.Publish(
             content1,
             content1.AvailableCultures.ToArray(),
-            userId: -1).Success);
+            userId: -1).Success, Is.True);
         var content2 = ContentBuilder.CreateBasicContent(contentType);
         content2.PropertyValues(obj);
         content2.ResetDirtyProperties(false);
         ContentService.Save(content2);
-        Assert.IsTrue(ContentService.Publish(
+        Assert.That(ContentService.Publish(
             content2,
             content2.AvailableCultures.ToArray(),
-            userId: -1).Success);
+            userId: -1).Success, Is.True);
 
         var editorGroup = await UserGroupService.GetAsync(Constants.Security.EditorGroupKey);
         editorGroup.StartContentId = content1.Id;
@@ -2134,19 +2127,19 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
             Constants.ObjectTypes.Document,
             Constants.ObjectTypes.Document,
             false));
-        Assert.IsNotNull(RelationService.Relate(content1, content2, "test"));
+        Assert.That(RelationService.Relate(content1, content2, "test"), Is.Not.Null);
 
         PublicAccessService.Save(new PublicAccessEntry(
             content1,
             content2,
             content2,
             new List<PublicAccessRule> { new() { RuleType = "test", RuleValue = "test" } }));
-        Assert.IsTrue(PublicAccessService.AddRule(content1, "test2", "test2").Success);
+        Assert.That(PublicAccessService.AddRule(content1, "test2", "test2").Success, Is.True);
 
         var user = await UserService.GetAsync(Constants.Security.SuperUserKey);
         var userGroup = await UserGroupService.GetAsync(user.Groups.First().Alias);
         NotificationService.TryCreateNotification(user, content1, "X", out Notification? notification);
-        Assert.IsNotNull(notification);
+        Assert.That(notification, Is.Not.Null);
 
         ContentService.SetPermission(content1, "A", new[] { userGroup.Id });
         var updateDomainResult = await DomainService.UpdateDomainsAsync(
@@ -2155,7 +2148,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
             {
                 Domains = new[] { new DomainModel { DomainName = "www.test.com", IsoCode = "en-US" } }
             });
-        Assert.IsTrue(updateDomainResult.Success);
+        Assert.That(updateDomainResult.Success, Is.True);
 
         // Act
         ContentService.MoveToRecycleBin(content1);
@@ -2194,10 +2187,10 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         // Assert
         Assert.That(copy, Is.Not.Null);
         Assert.That(copy.Id, Is.Not.EqualTo(content.Id));
-        Assert.AreNotSame(content, copy);
+        Assert.That(copy, Is.Not.SameAs(content));
         foreach (var property in copy.Properties)
         {
-            Assert.AreEqual(property.GetValue(), content.Properties[property.Alias].GetValue());
+            Assert.That(content.Properties[property.Alias].GetValue(), Is.EqualTo(property.GetValue()));
         }
 
         // Assert.AreNotEqual(content.Name, copy.Name);
@@ -2212,8 +2205,8 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         // Arrange
         var (content, langUk, langFr, _) = await CreateEnglishAndFrenchDocument();
 
-        Assert.IsTrue(ContentService.Save(content).Success);
-        Assert.IsTrue(ContentService.Publish(content, [langFr.IsoCode, langUk.IsoCode]).Success);
+        Assert.That(ContentService.Save(content).Success, Is.True);
+        Assert.That(ContentService.Publish(content, [langFr.IsoCode, langUk.IsoCode]).Success, Is.True);
 
         // re-get to ensure we copy from the persisted state
         content = ContentService.GetById(content.Id);
@@ -2239,14 +2232,14 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         IContent parent = new Content("parent", Constants.System.Root, contentType);
         parent.SetCultureName("parent-fr", langFr.IsoCode);
         parent.SetCultureName("parent-en", langUk.IsoCode);
-        Assert.IsTrue(ContentService.Save(parent).Success);
-        Assert.IsTrue(ContentService.Publish(parent, [langFr.IsoCode, langUk.IsoCode]).Success);
+        Assert.That(ContentService.Save(parent).Success, Is.True);
+        Assert.That(ContentService.Publish(parent, [langFr.IsoCode, langUk.IsoCode]).Success, Is.True);
 
         IContent child = new Content("child", parent.Id, contentType);
         child.SetCultureName("child-fr", langFr.IsoCode);
         child.SetCultureName("child-en", langUk.IsoCode);
-        Assert.IsTrue(ContentService.Save(child).Success);
-        Assert.IsTrue(ContentService.Publish(child, [langFr.IsoCode, langUk.IsoCode]).Success);
+        Assert.That(ContentService.Save(child).Success, Is.True);
+        Assert.That(ContentService.Publish(child, [langFr.IsoCode, langUk.IsoCode]).Success, Is.True);
 
         // re-get to ensure we copy from the persisted state
         parent = ContentService.GetById(parent.Id);
@@ -2286,8 +2279,8 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Assert.Multiple(() =>
         {
             // the actual bug: umbracoDocumentCultureVariation.published must be 0 on an unpublished copy
-            Assert.IsFalse(ukRow.Published, $"en-GB row on node {nodeId} should have published=0.");
-            Assert.IsFalse(frRow.Published, $"fr-FR row on node {nodeId} should have published=0.");
+            Assert.That(ukRow.Published, Is.False, $"en-GB row on node {nodeId} should have published=0.");
+            Assert.That(frRow.Published, Is.False, $"fr-FR row on node {nodeId} should have published=0.");
 
             // sanity: edit-side culture names are still preserved (Copy appends " (n)" to avoid sibling collisions)
             Assert.That(ukRow.Name, Does.StartWith(expectedUkNamePrefix));
@@ -2316,8 +2309,8 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
             var copyVal = notification.Copy.GetValue<string>("title");
             var origVal = notification.Original.GetValue<string>("title");
 
-            Assert.AreEqual("1", copyVal);
-            Assert.AreEqual("2", origVal);
+            Assert.That(copyVal, Is.EqualTo("1"));
+            Assert.That(origVal, Is.EqualTo("2"));
 
             copiedWasCalled = true;
         };
@@ -2334,10 +2327,10 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
             ContentService.Save(content);
 
             var copy = ContentService.Copy(content, content.ParentId, false);
-            Assert.AreEqual("1", copy.GetValue("title"));
+            Assert.That(copy.GetValue("title"), Is.EqualTo("1"));
 
-            Assert.IsTrue(copyingWasCalled);
-            Assert.IsTrue(copiedWasCalled);
+            Assert.That(copyingWasCalled, Is.True);
+            Assert.That(copiedWasCalled, Is.True);
         }
         finally
         {
@@ -2351,8 +2344,8 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     {
         // Arrange
         var temp = ContentService.GetById(Textpage.Id);
-        Assert.AreEqual("Textpage", temp.Name);
-        Assert.AreEqual(3, ContentService.CountChildren(temp.Id));
+        Assert.That(temp.Name, Is.EqualTo("Textpage"));
+        Assert.That(ContentService.CountChildren(temp.Id), Is.EqualTo(3));
 
         // Act
         var copy = ContentService.Copy(temp, temp.ParentId, false, true);
@@ -2361,14 +2354,14 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         // Assert
         Assert.That(copy, Is.Not.Null);
         Assert.That(copy.Id, Is.Not.EqualTo(content.Id));
-        Assert.AreNotSame(content, copy);
-        Assert.AreEqual(3, ContentService.CountChildren(copy.Id));
+        Assert.That(copy, Is.Not.SameAs(content));
+        Assert.That(ContentService.CountChildren(copy.Id), Is.EqualTo(3));
 
         var child = ContentService.GetById(Subpage.Id);
         var childCopy = ContentService.GetPagedChildren(copy.Id, 0, 500, out var total, propertyAliases: null, filter: null, ordering: null).First();
-        Assert.AreEqual(childCopy.Name, child.Name);
-        Assert.AreNotEqual(childCopy.Id, child.Id);
-        Assert.AreNotEqual(childCopy.Key, child.Key);
+        Assert.That(child.Name, Is.EqualTo(childCopy.Name));
+        Assert.That(child.Id, Is.Not.EqualTo(childCopy.Id));
+        Assert.That(child.Key, Is.Not.EqualTo(childCopy.Key));
     }
 
     [Test]
@@ -2376,8 +2369,8 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     {
         // Arrange
         var temp = ContentService.GetById(Textpage.Id);
-        Assert.AreEqual("Textpage", temp.Name);
-        Assert.AreEqual(3, ContentService.CountChildren(temp.Id));
+        Assert.That(temp.Name, Is.EqualTo("Textpage"));
+        Assert.That(ContentService.CountChildren(temp.Id), Is.EqualTo(3));
 
         // Act
         var copy = ContentService.Copy(temp, temp.ParentId, false, false);
@@ -2386,8 +2379,8 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         // Assert
         Assert.That(copy, Is.Not.Null);
         Assert.That(copy.Id, Is.Not.EqualTo(content.Id));
-        Assert.AreNotSame(content, copy);
-        Assert.AreEqual(0, ContentService.CountChildren(copy.Id));
+        Assert.That(copy, Is.Not.SameAs(content));
+        Assert.That(ContentService.CountChildren(copy.Id), Is.EqualTo(0));
     }
 
     [Test]
@@ -2418,31 +2411,31 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         ContentService.Save(content);
 
         // value has been set but no tags have been created (not published)
-        Assert.AreEqual("[\"hello\",\"world\"]", content.GetValue(propAlias));
+        Assert.That(content.GetValue(propAlias), Is.EqualTo("[\"hello\",\"world\"]"));
         var contentTags = TagService.GetTagsForEntity(content.Id).ToArray();
-        Assert.AreEqual(0, contentTags.Length);
+        Assert.That(contentTags, Is.Empty);
 
         // reloading the content yields the same result
         content = (Content)ContentService.GetById(content.Id);
-        Assert.AreEqual("[\"hello\",\"world\"]", content.GetValue(propAlias));
+        Assert.That(content.GetValue(propAlias), Is.EqualTo("[\"hello\",\"world\"]"));
         contentTags = TagService.GetTagsForEntity(content.Id).ToArray();
-        Assert.AreEqual(0, contentTags.Length);
+        Assert.That(contentTags, Is.Empty);
 
         // publish
         ContentService.Publish(content, new []{ "*" });
 
         // now tags have been set (published)
-        Assert.AreEqual("[\"hello\",\"world\"]", content.GetValue(propAlias));
+        Assert.That(content.GetValue(propAlias), Is.EqualTo("[\"hello\",\"world\"]"));
         contentTags = TagService.GetTagsForEntity(content.Id).ToArray();
-        Assert.AreEqual(2, contentTags.Length);
+        Assert.That(contentTags, Has.Length.EqualTo(2));
 
         // copy
         var copy = ContentService.Copy(content, content.ParentId, false);
 
         // copy is not published, so property has value, but no tags have been created
-        Assert.AreEqual("[\"hello\",\"world\"]", copy.GetValue(propAlias));
+        Assert.That(copy.GetValue(propAlias), Is.EqualTo("[\"hello\",\"world\"]"));
         var copiedTags = TagService.GetTagsForEntity(copy.Id).ToArray();
-        Assert.AreEqual(0, copiedTags.Length);
+        Assert.That(copiedTags, Is.Empty);
 
         // publish
         ContentService.Publish(copy, new []{ "*" });
@@ -2450,9 +2443,9 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         // now tags have been set (published)
         copiedTags = TagService.GetTagsForEntity(copy.Id).ToArray();
 
-        Assert.AreEqual(2, copiedTags.Length);
-        Assert.AreEqual("hello", copiedTags[0].Text);
-        Assert.AreEqual("world", copiedTags[1].Text);
+        Assert.That(copiedTags, Has.Length.EqualTo(2));
+        Assert.That(copiedTags[0].Text, Is.EqualTo("hello"));
+        Assert.That(copiedTags[1].Text, Is.EqualTo("world"));
     }
 
     [Test]
@@ -2460,15 +2453,15 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     {
         // Arrange
         var parent = ContentService.GetById(Textpage.Id);
-        Assert.IsFalse(parent.Published);
+        Assert.That(parent.Published, Is.False);
         ContentService.Save(parent);
         ContentService.Publish(parent, parent.AvailableCultures.ToArray()); // publishing parent, so Text Page 2 can be updated.
 
         var content = ContentService.GetById(Subpage.Id);
-        Assert.IsFalse(content.Published);
+        Assert.That(content.Published, Is.False);
 
         var versions = ContentService.GetVersions(Subpage.Id).ToList();
-        Assert.AreEqual(1, versions.Count);
+        Assert.That(versions, Has.Count.EqualTo(1));
 
         var version1 = content.VersionId;
 
@@ -2476,46 +2469,44 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         content.SetValue("author", "Francis Doe");
 
         // non published = edited
-        Assert.IsTrue(content.Edited);
+        Assert.That(content.Edited, Is.True);
 
         ContentService.Save(content);
         ContentService.Publish(content, content.AvailableCultures.ToArray()); // new version
         var version2 = content.VersionId;
-        Assert.AreNotEqual(version1, version2);
+        Assert.That(version2, Is.Not.EqualTo(version1));
 
-        Assert.IsTrue(content.Published);
-        Assert.IsFalse(content.Edited);
-        Assert.AreEqual("Francis Doe",
-            ContentService.GetById(content.Id).GetValue<string>("author")); // version2 author is Francis
+        Assert.That(content.Published, Is.True);
+        Assert.That(content.Edited, Is.False);
+        Assert.That(ContentService.GetById(content.Id).GetValue<string>("author"), Is.EqualTo("Francis Doe")); // version2 author is Francis
 
-        Assert.AreEqual("Text Page 2 Updated", content.Name);
-        Assert.AreEqual("Text Page 2 Updated", content.PublishName);
+        Assert.That(content.Name, Is.EqualTo("Text Page 2 Updated"));
+        Assert.That(content.PublishName, Is.EqualTo("Text Page 2 Updated"));
 
         content.Name = "Text Page 2 ReUpdated";
         content.SetValue("author", "Jane Doe");
 
         // is not actually 'edited' until changes have been saved
-        Assert.IsFalse(content.Edited);
+        Assert.That(content.Edited, Is.False);
         ContentService.Save(content); // just save changes
-        Assert.IsTrue(content.Edited);
+        Assert.That(content.Edited, Is.True);
 
-        Assert.AreEqual("Text Page 2 ReUpdated", content.Name);
-        Assert.AreEqual("Text Page 2 Updated", content.PublishName);
+        Assert.That(content.Name, Is.EqualTo("Text Page 2 ReUpdated"));
+        Assert.That(content.PublishName, Is.EqualTo("Text Page 2 Updated"));
 
         content.Name = "Text Page 2 ReReUpdated";
 
         ContentService.Save(content);
         ContentService.Publish(content, content.AvailableCultures.ToArray()); // new version
         var version3 = content.VersionId;
-        Assert.AreNotEqual(version2, version3);
+        Assert.That(version3, Is.Not.EqualTo(version2));
 
-        Assert.IsTrue(content.Published);
-        Assert.IsFalse(content.Edited);
-        Assert.AreEqual("Jane Doe",
-            ContentService.GetById(content.Id).GetValue<string>("author")); // version3 author is Jane
+        Assert.That(content.Published, Is.True);
+        Assert.That(content.Edited, Is.False);
+        Assert.That(ContentService.GetById(content.Id).GetValue<string>("author"), Is.EqualTo("Jane Doe")); // version3 author is Jane
 
-        Assert.AreEqual("Text Page 2 ReReUpdated", content.Name);
-        Assert.AreEqual("Text Page 2 ReReUpdated", content.PublishName);
+        Assert.That(content.Name, Is.EqualTo("Text Page 2 ReReUpdated"));
+        Assert.That(content.PublishName, Is.EqualTo("Text Page 2 ReReUpdated"));
 
         // here we have
         // version1, first published version
@@ -2529,20 +2520,19 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         rollback.Name = rollto.Name; // must do it explicitly
         ContentService.Save(rollback);
 
-        Assert.IsNotNull(rollback);
-        Assert.IsTrue(rollback.Published);
-        Assert.IsTrue(rollback.Edited);
-        Assert.AreEqual("Francis Doe",
-            ContentService.GetById(content.Id).GetValue<string>("author")); // author is now Francis again
-        Assert.AreEqual(version3, rollback.VersionId); // same version but with edits
+        Assert.That(rollback, Is.Not.Null);
+        Assert.That(rollback.Published, Is.True);
+        Assert.That(rollback.Edited, Is.True);
+        Assert.That(ContentService.GetById(content.Id).GetValue<string>("author"), Is.EqualTo("Francis Doe")); // author is now Francis again
+        Assert.That(rollback.VersionId, Is.EqualTo(version3)); // same version but with edits
 
         // props and name have rolled back
-        Assert.AreEqual("Francis Doe", rollback.GetValue<string>("author"));
-        Assert.AreEqual("Text Page 2 Updated", rollback.Name);
+        Assert.That(rollback.GetValue<string>("author"), Is.EqualTo("Francis Doe"));
+        Assert.That(rollback.Name, Is.EqualTo("Text Page 2 Updated"));
 
         // published props and name are still there
-        Assert.AreEqual("Jane Doe", rollback.GetValue<string>("author", published: true));
-        Assert.AreEqual("Text Page 2 ReReUpdated", rollback.PublishName);
+        Assert.That(rollback.GetValue<string>("author", published: true), Is.EqualTo("Jane Doe"));
+        Assert.That(rollback.PublishName, Is.EqualTo("Text Page 2 ReReUpdated"));
 
         // rollback all values to current version
         // special because... current has edits... this really is equivalent to rolling back to version2
@@ -2552,30 +2542,30 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         rollback2.Name = rollto2.PublishName; // must do it explicitely AND must pick the publish one!
         ContentService.Save(rollback2);
 
-        Assert.IsTrue(rollback2.Published);
-        Assert.IsTrue(rollback2.Edited); // Still edited, change of behaviour
+        Assert.That(rollback2.Published, Is.True);
+        Assert.That(rollback2.Edited, Is.True); // Still edited, change of behaviour
 
-        Assert.AreEqual("Jane Doe", rollback2.GetValue<string>("author"));
-        Assert.AreEqual("Text Page 2 ReReUpdated", rollback2.Name);
+        Assert.That(rollback2.GetValue<string>("author"), Is.EqualTo("Jane Doe"));
+        Assert.That(rollback2.Name, Is.EqualTo("Text Page 2 ReReUpdated"));
 
         // test rollback to self, again
         content = ContentService.GetById(content.Id);
-        Assert.AreEqual("Text Page 2 ReReUpdated", content.Name);
-        Assert.AreEqual("Jane Doe", content.GetValue<string>("author"));
+        Assert.That(content.Name, Is.EqualTo("Text Page 2 ReReUpdated"));
+        Assert.That(content.GetValue<string>("author"), Is.EqualTo("Jane Doe"));
         ContentService.Save(content);
         ContentService.Publish(content, content.AvailableCultures.ToArray());
-        Assert.IsFalse(content.Edited);
+        Assert.That(content.Edited, Is.False);
         content.Name = "Xxx";
         content.SetValue("author", "Bob Doe");
         ContentService.Save(content);
-        Assert.IsTrue(content.Edited);
+        Assert.That(content.Edited, Is.True);
         rollto = ContentService.GetVersion(content.VersionId);
         content.CopyFrom(rollto);
         content.Name = rollto.PublishName; // must do it explicitely AND must pick the publish one!
         ContentService.Save(content);
-        Assert.IsTrue(content.Edited); //Still edited, change of behaviour
-        Assert.AreEqual("Text Page 2 ReReUpdated", content.Name);
-        Assert.AreEqual("Jane Doe", content.GetValue("author"));
+        Assert.That(content.Edited, Is.True); //Still edited, change of behaviour
+        Assert.That(content.Name, Is.EqualTo("Text Page 2 ReReUpdated"));
+        Assert.That(content.GetValue("author"), Is.EqualTo("Jane Doe"));
     }
 
     [Test]
@@ -2656,58 +2646,58 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         // now get all versions
         var versions = ContentService.GetVersions(page.Id).ToArray();
 
-        Assert.AreEqual(5, versions.Length);
+        Assert.That(versions, Has.Length.EqualTo(5));
 
         // current version
-        Assert.AreEqual(versionId4, versions[0].VersionId);
-        Assert.AreEqual(versionId3, versions[0].PublishedVersionId);
+        Assert.That(versions[0].VersionId, Is.EqualTo(versionId4));
+        Assert.That(versions[0].PublishedVersionId, Is.EqualTo(versionId3));
 
         // published version
-        Assert.AreEqual(versionId3, versions[1].VersionId);
-        Assert.AreEqual(versionId3, versions[1].PublishedVersionId);
+        Assert.That(versions[1].VersionId, Is.EqualTo(versionId3));
+        Assert.That(versions[1].PublishedVersionId, Is.EqualTo(versionId3));
 
         // previous version
-        Assert.AreEqual(versionId2, versions[2].VersionId);
-        Assert.AreEqual(versionId3, versions[2].PublishedVersionId);
+        Assert.That(versions[2].VersionId, Is.EqualTo(versionId2));
+        Assert.That(versions[2].PublishedVersionId, Is.EqualTo(versionId3));
 
         // previous version
-        Assert.AreEqual(versionId1, versions[3].VersionId);
-        Assert.AreEqual(versionId3, versions[3].PublishedVersionId);
+        Assert.That(versions[3].VersionId, Is.EqualTo(versionId1));
+        Assert.That(versions[3].PublishedVersionId, Is.EqualTo(versionId3));
 
         // previous version
-        Assert.AreEqual(versionId0, versions[4].VersionId);
-        Assert.AreEqual(versionId3, versions[4].PublishedVersionId);
+        Assert.That(versions[4].VersionId, Is.EqualTo(versionId0));
+        Assert.That(versions[4].PublishedVersionId, Is.EqualTo(versionId3));
 
-        Assert.AreEqual("fr3", versions[4].GetPublishName(langFr.IsoCode));
-        Assert.AreEqual("fr3", versions[3].GetPublishName(langFr.IsoCode));
-        Assert.AreEqual("fr3", versions[2].GetPublishName(langFr.IsoCode));
-        Assert.AreEqual("fr3", versions[1].GetPublishName(langFr.IsoCode));
-        Assert.AreEqual("fr3", versions[0].GetPublishName(langFr.IsoCode));
+        Assert.That(versions[4].GetPublishName(langFr.IsoCode), Is.EqualTo("fr3"));
+        Assert.That(versions[3].GetPublishName(langFr.IsoCode), Is.EqualTo("fr3"));
+        Assert.That(versions[2].GetPublishName(langFr.IsoCode), Is.EqualTo("fr3"));
+        Assert.That(versions[1].GetPublishName(langFr.IsoCode), Is.EqualTo("fr3"));
+        Assert.That(versions[0].GetPublishName(langFr.IsoCode), Is.EqualTo("fr3"));
 
-        Assert.AreEqual("fr1", versions[4].GetCultureName(langFr.IsoCode));
-        Assert.AreEqual("fr2", versions[3].GetCultureName(langFr.IsoCode));
-        Assert.AreEqual("fr2", versions[2].GetCultureName(langFr.IsoCode));
-        Assert.AreEqual("fr3", versions[1].GetCultureName(langFr.IsoCode));
-        Assert.AreEqual("fr3", versions[0].GetCultureName(langFr.IsoCode));
+        Assert.That(versions[4].GetCultureName(langFr.IsoCode), Is.EqualTo("fr1"));
+        Assert.That(versions[3].GetCultureName(langFr.IsoCode), Is.EqualTo("fr2"));
+        Assert.That(versions[2].GetCultureName(langFr.IsoCode), Is.EqualTo("fr2"));
+        Assert.That(versions[1].GetCultureName(langFr.IsoCode), Is.EqualTo("fr3"));
+        Assert.That(versions[0].GetCultureName(langFr.IsoCode), Is.EqualTo("fr3"));
 
-        Assert.AreEqual("da3", versions[4].GetPublishName(langDa.IsoCode));
-        Assert.AreEqual("da3", versions[3].GetPublishName(langDa.IsoCode));
-        Assert.AreEqual("da3", versions[2].GetPublishName(langDa.IsoCode));
-        Assert.AreEqual("da3", versions[1].GetPublishName(langDa.IsoCode));
-        Assert.AreEqual("da3", versions[0].GetPublishName(langDa.IsoCode));
+        Assert.That(versions[4].GetPublishName(langDa.IsoCode), Is.EqualTo("da3"));
+        Assert.That(versions[3].GetPublishName(langDa.IsoCode), Is.EqualTo("da3"));
+        Assert.That(versions[2].GetPublishName(langDa.IsoCode), Is.EqualTo("da3"));
+        Assert.That(versions[1].GetPublishName(langDa.IsoCode), Is.EqualTo("da3"));
+        Assert.That(versions[0].GetPublishName(langDa.IsoCode), Is.EqualTo("da3"));
 
-        Assert.AreEqual("da1", versions[4].GetCultureName(langDa.IsoCode));
-        Assert.AreEqual("da1", versions[3].GetCultureName(langDa.IsoCode));
-        Assert.AreEqual("da2", versions[2].GetCultureName(langDa.IsoCode));
-        Assert.AreEqual("da3", versions[1].GetCultureName(langDa.IsoCode));
-        Assert.AreEqual("da3", versions[0].GetCultureName(langDa.IsoCode));
+        Assert.That(versions[4].GetCultureName(langDa.IsoCode), Is.EqualTo("da1"));
+        Assert.That(versions[3].GetCultureName(langDa.IsoCode), Is.EqualTo("da1"));
+        Assert.That(versions[2].GetCultureName(langDa.IsoCode), Is.EqualTo("da2"));
+        Assert.That(versions[1].GetCultureName(langDa.IsoCode), Is.EqualTo("da3"));
+        Assert.That(versions[0].GetCultureName(langDa.IsoCode), Is.EqualTo("da3"));
 
         // all versions have the same publish infos
         for (var i = 0; i < 5; i++)
         {
-            Assert.AreEqual(versions[0].PublishDate, versions[i].PublishDate);
-            Assert.AreEqual(versions[0].GetPublishDate(langFr.IsoCode), versions[i].GetPublishDate(langFr.IsoCode));
-            Assert.AreEqual(versions[0].GetPublishDate(langDa.IsoCode), versions[i].GetPublishDate(langDa.IsoCode));
+            Assert.That(versions[i].PublishDate, Is.EqualTo(versions[0].PublishDate));
+            Assert.That(versions[i].GetPublishDate(langFr.IsoCode), Is.EqualTo(versions[0].GetPublishDate(langFr.IsoCode)));
+            Assert.That(versions[i].GetPublishDate(langDa.IsoCode), Is.EqualTo(versions[0].GetPublishDate(langDa.IsoCode)));
         }
 
         for (var i = 0; i < 5; i++)
@@ -2721,24 +2711,24 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Console.WriteLine("-");
 
         // for all previous versions, UpdateDate is the published date
-        Assert.AreEqual(versions[4].UpdateDate, versions[4].GetUpdateDate(langFr.IsoCode));
-        Assert.AreEqual(versions[4].UpdateDate, versions[4].GetUpdateDate(langDa.IsoCode));
+        Assert.That(versions[4].GetUpdateDate(langFr.IsoCode), Is.EqualTo(versions[4].UpdateDate));
+        Assert.That(versions[4].GetUpdateDate(langDa.IsoCode), Is.EqualTo(versions[4].UpdateDate));
 
-        Assert.AreEqual(versions[3].UpdateDate, versions[3].GetUpdateDate(langFr.IsoCode));
-        Assert.AreEqual(versions[4].UpdateDate, versions[3].GetUpdateDate(langDa.IsoCode));
+        Assert.That(versions[3].GetUpdateDate(langFr.IsoCode), Is.EqualTo(versions[3].UpdateDate));
+        Assert.That(versions[3].GetUpdateDate(langDa.IsoCode), Is.EqualTo(versions[4].UpdateDate));
 
-        Assert.AreEqual(versions[3].UpdateDate, versions[2].GetUpdateDate(langFr.IsoCode));
-        Assert.AreEqual(versions[2].UpdateDate, versions[2].GetUpdateDate(langDa.IsoCode));
+        Assert.That(versions[2].GetUpdateDate(langFr.IsoCode), Is.EqualTo(versions[3].UpdateDate));
+        Assert.That(versions[2].GetUpdateDate(langDa.IsoCode), Is.EqualTo(versions[2].UpdateDate));
 
         // for the published version, UpdateDate is the published date
-        Assert.AreEqual(versions[1].UpdateDate, versions[1].GetUpdateDate(langFr.IsoCode));
-        Assert.AreEqual(versions[1].UpdateDate, versions[1].GetUpdateDate(langDa.IsoCode));
-        Assert.AreEqual(versions[1].PublishDate, versions[1].UpdateDate);
+        Assert.That(versions[1].GetUpdateDate(langFr.IsoCode), Is.EqualTo(versions[1].UpdateDate));
+        Assert.That(versions[1].GetUpdateDate(langDa.IsoCode), Is.EqualTo(versions[1].UpdateDate));
+        Assert.That(versions[1].UpdateDate, Is.EqualTo(versions[1].PublishDate));
 
         // for the current version, things are different
         // UpdateDate is the date it was last saved
-        Assert.AreEqual(versions[0].UpdateDate, versions[0].GetUpdateDate(langFr.IsoCode));
-        Assert.AreEqual(versions[0].UpdateDate, versions[0].GetUpdateDate(langDa.IsoCode));
+        Assert.That(versions[0].GetUpdateDate(langFr.IsoCode), Is.EqualTo(versions[0].UpdateDate));
+        Assert.That(versions[0].GetUpdateDate(langDa.IsoCode), Is.EqualTo(versions[0].UpdateDate));
 
         // so if we save again...
         page.SetCultureName("fr4", langFr.IsoCode);
@@ -2757,8 +2747,8 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         versions = ContentService.GetVersions(page.Id).ToArray();
 
         // we just update the current version
-        Assert.AreEqual(5, versions.Length);
-        Assert.AreEqual(versionId4, versionId5);
+        Assert.That(versions, Has.Length.EqualTo(5));
+        Assert.That(versionId5, Is.EqualTo(versionId4));
 
         for (var i = 0; i < 5; i++)
         {
@@ -2771,7 +2761,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Console.WriteLine("-");
 
         var versionsSlim = ContentService.GetVersionsSlim(page.Id, 0, 50).ToArray();
-        Assert.AreEqual(5, versionsSlim.Length);
+        Assert.That(versionsSlim, Has.Length.EqualTo(5));
 
         for (var i = 0; i < 5; i++)
         {
@@ -2787,13 +2777,13 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         var versionsSlimFr =
             versionsSlim.Where(x => x.UpdateDate == x.GetUpdateDate(langFr.IsoCode)).ToArray();
 
-        Assert.AreEqual(4, versionsSlimFr.Length);
+        Assert.That(versionsSlimFr, Has.Length.EqualTo(4));
 
         // alas, at the moment we do *not* properly track 'dirty' for cultures, meaning
         // that we cannot synchronize dates the way we do with publish dates - and so this
         // would fail - the version UpdateDate is greater than the cultures'.
-        Assert.AreEqual(versions[0].UpdateDate, versions[0].GetUpdateDate(langFr.IsoCode));
-        Assert.AreEqual(versions[0].UpdateDate, versions[0].GetUpdateDate(langDa.IsoCode));
+        Assert.That(versions[0].GetUpdateDate(langFr.IsoCode), Is.EqualTo(versions[0].UpdateDate));
+        Assert.That(versions[0].GetUpdateDate(langDa.IsoCode), Is.EqualTo(versions[0].UpdateDate));
 
         // now roll french back to its very first version
         page.CopyFrom(versions[4], langFr.IsoCode); // only the pure FR values
@@ -2802,8 +2792,8 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         ContentService.Save(page);
 
         // and voila, rolled back!
-        Assert.AreEqual(versions[4].GetPublishName(langFr.IsoCode), page.GetCultureName(langFr.IsoCode));
-        Assert.AreEqual(versions[4].GetValue(p1.Alias, langFr.IsoCode), page.GetValue(p1.Alias, langFr.IsoCode));
+        Assert.That(page.GetCultureName(langFr.IsoCode), Is.EqualTo(versions[4].GetPublishName(langFr.IsoCode)));
+        Assert.That(page.GetValue(p1.Alias, langFr.IsoCode), Is.EqualTo(versions[4].GetValue(p1.Alias, langFr.IsoCode)));
 
         // note that rolling back invariant values means we also rolled back... DA... at least partially
         // bah?
@@ -2833,11 +2823,11 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
             Assert.That(c.Value.HasIdentity, Is.True);
             Assert.That(c2.Value.HasIdentity, Is.True);
 
-            Assert.That(c.Value.Id > 0, Is.True);
-            Assert.That(c2.Value.Id > 0, Is.True);
+            Assert.That(c.Value.Id, Is.GreaterThan(0));
+            Assert.That(c2.Value.Id, Is.GreaterThan(0));
 
-            Assert.That(c.Value.ParentId > 0, Is.True);
-            Assert.That(c2.Value.ParentId > 0, Is.True);
+            Assert.That(c.Value.ParentId, Is.GreaterThan(0));
+            Assert.That(c2.Value.ParentId, Is.GreaterThan(0));
         }
     }
 
@@ -2926,10 +2916,10 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         }
 
         var entities = ContentService.GetPagedChildren(Constants.System.Root, 0, 6, out var total, propertyAliases: null, filter: null, ordering: null).ToArray();
-        Assert.That(entities.Length, Is.EqualTo(6));
+        Assert.That(entities, Has.Length.EqualTo(6));
         Assert.That(total, Is.EqualTo(10));
         entities = ContentService.GetPagedChildren(Constants.System.Root, 1, 6, out total, propertyAliases: null, filter: null, ordering: null).ToArray();
-        Assert.That(entities.Length, Is.EqualTo(4));
+        Assert.That(entities, Has.Length.EqualTo(4));
         Assert.That(total, Is.EqualTo(10));
     }
 
@@ -2964,18 +2954,18 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         // children in root including the folder - not the descendants in the folder
         var entities = ContentService.GetPagedChildren(Constants.System.Root, 0, 6, out var total, propertyAliases: null, filter: null, ordering: null).ToArray();
-        Assert.That(entities.Length, Is.EqualTo(6));
+        Assert.That(entities, Has.Length.EqualTo(6));
         Assert.That(total, Is.EqualTo(10));
         entities = ContentService.GetPagedChildren(Constants.System.Root, 1, 6, out total, propertyAliases: null, filter: null, ordering: null).ToArray();
-        Assert.That(entities.Length, Is.EqualTo(4));
+        Assert.That(entities, Has.Length.EqualTo(4));
         Assert.That(total, Is.EqualTo(10));
 
         // children in folder
         entities = ContentService.GetPagedChildren(willHaveChildren.Id, 0, 6, out total, propertyAliases: null, filter: null, ordering: null).ToArray();
-        Assert.That(entities.Length, Is.EqualTo(6));
+        Assert.That(entities, Has.Length.EqualTo(6));
         Assert.That(total, Is.EqualTo(10));
         entities = ContentService.GetPagedChildren(willHaveChildren.Id, 1, 6, out total, propertyAliases: null, filter: null, ordering: null).ToArray();
-        Assert.That(entities.Length, Is.EqualTo(4));
+        Assert.That(entities, Has.Length.EqualTo(4));
         Assert.That(total, Is.EqualTo(10));
     }
 
@@ -3090,7 +3080,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         // Act - default (no loadTemplates specified) should load templates (backwards compatible)
         var children = ContentService.GetPagedChildren(parentId, 0, 10, out var total, propertyAliases: null, filter: null, ordering: null).ToArray();
 
-        Assert.That(children.Length, Is.EqualTo(1));
+        Assert.That(children, Has.Length.EqualTo(1));
 
         // Assert - Template should be loaded by default
         Assert.That(children[0].TemplateId, Is.Not.Null);
@@ -3125,7 +3115,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     {
         var children = ContentService.GetPagedChildren(parentId, 0, 10, out var total, propertyAliases, filter: null, ordering: null).ToArray();
 
-        Assert.That(children.Length, Is.EqualTo(1));
+        Assert.That(children, Has.Length.EqualTo(1));
         Assert.That(total, Is.EqualTo(1));
 
         return children[0];
@@ -3139,7 +3129,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     {
         var children = ContentService.GetPagedChildren(parentId, 0, 10, out var total, propertyAliases: null, filter: null, ordering: null, loadTemplates: loadTemplates).ToArray();
 
-        Assert.That(children.Length, Is.EqualTo(1));
+        Assert.That(children, Has.Length.EqualTo(1));
         Assert.That(total, Is.EqualTo(1));
 
         return children[0];
@@ -3167,27 +3157,27 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         var content = ContentService.Create("foo", Constants.System.Root, "foo");
         ContentService.Save(content);
 
-        Assert.IsFalse(content.Published);
-        Assert.IsTrue(content.Edited);
+        Assert.That(content.Published, Is.False);
+        Assert.That(content.Edited, Is.True);
 
         content = ContentService.GetById(content.Id);
-        Assert.IsFalse(content.Published);
-        Assert.IsTrue(content.Edited);
+        Assert.That(content.Published, Is.False);
+        Assert.That(content.Edited, Is.True);
 
         content.SetValue("title", "foo");
-        Assert.IsTrue(content.Edited);
+        Assert.That(content.Edited, Is.True);
 
         ContentService.Save(content);
 
-        Assert.IsFalse(content.Published);
-        Assert.IsTrue(content.Edited);
+        Assert.That(content.Published, Is.False);
+        Assert.That(content.Edited, Is.True);
 
         content = ContentService.GetById(content.Id);
-        Assert.IsFalse(content.Published);
-        Assert.IsTrue(content.Edited);
+        Assert.That(content.Published, Is.False);
+        Assert.That(content.Edited, Is.True);
 
         var versions = ContentService.GetVersions(content.Id);
-        Assert.AreEqual(1, versions.Count());
+        Assert.That(versions.Count(), Is.EqualTo(1));
 
         // publish content
         // becomes Published, !Edited
@@ -3195,51 +3185,51 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         // can get published property values
         ContentService.Publish(content, new []{ "*" });
 
-        Assert.IsTrue(content.Published);
-        Assert.IsFalse(content.Edited);
+        Assert.That(content.Published, Is.True);
+        Assert.That(content.Edited, Is.False);
 
         content = ContentService.GetById(content.Id);
-        Assert.IsTrue(content.Published);
-        Assert.IsFalse(content.Edited);
+        Assert.That(content.Published, Is.True);
+        Assert.That(content.Edited, Is.False);
 
         versions = ContentService.GetVersions(content.Id);
-        Assert.AreEqual(2, versions.Count());
+        Assert.That(versions.Count(), Is.EqualTo(2));
 
-        Assert.AreEqual("foo", content.GetValue("title", published: true));
-        Assert.AreEqual("foo", content.GetValue("title"));
+        Assert.That(content.GetValue("title", published: true), Is.EqualTo("foo"));
+        Assert.That(content.GetValue("title"), Is.EqualTo("foo"));
 
         // unpublish content
         // becomes !Published, Edited
         ContentService.Unpublish(content);
 
-        Assert.IsFalse(content.Published);
-        Assert.IsTrue(content.Edited);
+        Assert.That(content.Published, Is.False);
+        Assert.That(content.Edited, Is.True);
 
-        Assert.IsNull(content.GetValue("title", published: true));
-        Assert.AreEqual("foo", content.GetValue("title"));
+        Assert.That(content.GetValue("title", published: true), Is.Null);
+        Assert.That(content.GetValue("title"), Is.EqualTo("foo"));
 
         var vpk = ((Content)content).VersionId;
         var ppk = ((Content)content).PublishedVersionId;
 
         content = ContentService.GetById(content.Id);
-        Assert.IsFalse(content.Published);
-        Assert.IsTrue(content.Edited);
+        Assert.That(content.Published, Is.False);
+        Assert.That(content.Edited, Is.True);
 
         // TODO: depending on 1 line in ContentBaseFactory.BuildEntity
         // the published infos can be gone or not
         // if gone, it's not consistent with above
-        Assert.AreEqual(vpk, ((Content)content).VersionId);
-        Assert.AreEqual(ppk, ((Content)content).PublishedVersionId); // still there
+        Assert.That(((Content)content).VersionId, Is.EqualTo(vpk));
+        Assert.That(((Content)content).PublishedVersionId, Is.EqualTo(ppk)); // still there
 
         // TODO: depending on 1 line in ContentRepository.MapDtoToContent
         // the published values can be null or not
         // if null, it's not consistent with above
         // Assert.IsNull(content.GetValue("title", published:  true));
-        Assert.AreEqual("foo", content.GetValue("title", published: true)); // still there
-        Assert.AreEqual("foo", content.GetValue("title"));
+        Assert.That(content.GetValue("title", published: true), Is.EqualTo("foo")); // still there
+        Assert.That(content.GetValue("title"), Is.EqualTo("foo"));
 
         versions = ContentService.GetVersions(content.Id);
-        Assert.AreEqual(2, versions.Count());
+        Assert.That(versions.Count(), Is.EqualTo(2));
 
         // ah - we have a problem here - since we're not published we don't have published values
         // and therefore we cannot "just" republish the content - we need to publish some values
@@ -3255,12 +3245,12 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         // do we want to "publish" only some variants, or the entire content?
         ContentService.Publish(content);
 
-        Assert.IsTrue(content.Published);
-        Assert.IsFalse(content.Edited);
+        Assert.That(content.Published, Is.True);
+        Assert.That(content.Edited, Is.False);
 
         // TODO: should it be 2 or 3
         versions = ContentService.GetVersions(content.Id);
-        Assert.AreEqual(2, versions.Count());
+        Assert.That(versions.Count(), Is.EqualTo(2));
 
         // TODO: now test rollbacks
         var version = ContentService.GetByVersion(content.Id); // test that it gets a version - should be GetVersion
@@ -3309,7 +3299,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         ContentService.Save(content);
 
         // the name will be set to the default culture variant name
-        Assert.AreEqual("name-us", content.Name);
+        Assert.That(content.Name, Is.EqualTo("name-us"));
 
         // TODO: should we always sync the invariant name even on update? see EnsureInvariantNameValues
         ////updating the default culture variant name should also update the invariant name so they stay in sync
@@ -3350,13 +3340,11 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
             child.SetCultureName("child", langUk.IsoCode);
             ContentService.Save(child);
 
-            Assert.AreEqual("child" + (i == 0 ? string.Empty : " (" + i + ")"),
-                child.GetCultureName(langUk.IsoCode));
+            Assert.That(child.GetCultureName(langUk.IsoCode), Is.EqualTo("child" + (i == 0 ? string.Empty : " (" + i + ")")));
 
             // Save it again to ensure that the unique check is not performed again against it's own name
             ContentService.Save(child);
-            Assert.AreEqual("child" + (i == 0 ? string.Empty : " (" + i + ")"),
-                child.GetCultureName(langUk.IsoCode));
+            Assert.That(child.GetCultureName(langUk.IsoCode), Is.EqualTo("child" + (i == 0 ? string.Empty : " (" + i + ")")));
         }
     }
 
@@ -3372,15 +3360,15 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         var child1 = new Content("Title", parent, contentType);
         ContentService.Save(child1);
-        Assert.AreEqual("Title", child1.Name);
+        Assert.That(child1.Name, Is.EqualTo("Title"));
 
         var child2 = new Content("Title.", parent, contentType);
         ContentService.Save(child2);
-        Assert.AreEqual("Title. (1)", child2.Name);
+        Assert.That(child2.Name, Is.EqualTo("Title. (1)"));
 
         // Save again to verify the name is stable (idempotent).
         ContentService.Save(child2);
-        Assert.AreEqual("Title. (1)", child2.Name);
+        Assert.That(child2.Name, Is.EqualTo("Title. (1)"));
     }
 
     [Test]
@@ -3410,16 +3398,16 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         var child1 = new Content(string.Empty, parent, contentType);
         child1.SetCultureName("Title", langUk.IsoCode);
         ContentService.Save(child1);
-        Assert.AreEqual("Title", child1.GetCultureName(langUk.IsoCode));
+        Assert.That(child1.GetCultureName(langUk.IsoCode), Is.EqualTo("Title"));
 
         var child2 = new Content(string.Empty, parent, contentType);
         child2.SetCultureName("Title.", langUk.IsoCode);
         ContentService.Save(child2);
-        Assert.AreEqual("Title. (1)", child2.GetCultureName(langUk.IsoCode));
+        Assert.That(child2.GetCultureName(langUk.IsoCode), Is.EqualTo("Title. (1)"));
 
         // Save again to verify the name is stable (idempotent).
         ContentService.Save(child2);
-        Assert.AreEqual("Title. (1)", child2.GetCultureName(langUk.IsoCode));
+        Assert.That(child2.GetCultureName(langUk.IsoCode), Is.EqualTo("Title. (1)"));
     }
 
     [Test]
@@ -3473,8 +3461,8 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         WriteList(list);
 
         // 10 items (there's already a Home content in there...)
-        Assert.AreEqual(11, total);
-        Assert.AreEqual(11, list.Count);
+        Assert.That(total, Is.EqualTo(11));
+        Assert.That(list, Has.Count.EqualTo(11));
 
         var sqlContext = GetRequiredService<ISqlContext>();
 
@@ -3488,8 +3476,8 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
             sqlContext.Query<IContent>().Where(x => x.Name.Contains("contentX")),
             Ordering.By("name", culture: langFr.IsoCode)).ToList();
 
-        Assert.AreEqual(0, total);
-        Assert.AreEqual(0, list.Count);
+        Assert.That(total, Is.EqualTo(0));
+        Assert.That(list, Is.Empty);
 
         // filter
         list = ContentService.GetPagedChildren(
@@ -3504,8 +3492,8 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Console.WriteLine("FILTER BY NAME da:'contentX'");
         WriteList(list);
 
-        Assert.AreEqual(10, total);
-        Assert.AreEqual(10, list.Count);
+        Assert.That(total, Is.EqualTo(10));
+        Assert.That(list, Has.Count.EqualTo(10));
 
         // filter
         list = ContentService.GetPagedChildren(
@@ -3520,12 +3508,12 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Console.WriteLine("FILTER BY NAME fr:'contentA', ORDER ASC");
         WriteList(list);
 
-        Assert.AreEqual(5, total);
-        Assert.AreEqual(5, list.Count);
+        Assert.That(total, Is.EqualTo(5));
+        Assert.That(list, Has.Count.EqualTo(5));
 
         for (var i = 0; i < 5; i++)
         {
-            Assert.AreEqual("contentA" + i + "fr", list[i].GetCultureName(langFr.IsoCode));
+            Assert.That(list[i].GetCultureName(langFr.IsoCode), Is.EqualTo("contentA" + i + "fr"));
         }
 
         list = ContentService.GetPagedChildren(
@@ -3540,12 +3528,12 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Console.WriteLine("FILTER BY NAME fr:'contentA', ORDER DESC");
         WriteList(list);
 
-        Assert.AreEqual(5, total);
-        Assert.AreEqual(5, list.Count);
+        Assert.That(total, Is.EqualTo(5));
+        Assert.That(list, Has.Count.EqualTo(5));
 
         for (var i = 0; i < 5; i++)
         {
-            Assert.AreEqual("contentA" + (4 - i) + "fr", list[i].GetCultureName(langFr.IsoCode));
+            Assert.That(list[i].GetCultureName(langFr.IsoCode), Is.EqualTo("contentA" + (4 - i) + "fr"));
         }
     }
 
@@ -3623,18 +3611,18 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         // it has names, but no publishNames, and no published cultures
         var content2 = ContentService.GetById(content.Id);
 
-        Assert.AreEqual("name-fr", content2.Name); // got the default culture name when saved
-        Assert.AreEqual("name-fr", content2.GetCultureName(langFr.IsoCode));
-        Assert.AreEqual("name-uk", content2.GetCultureName(langUk.IsoCode));
+        Assert.That(content2.Name, Is.EqualTo("name-fr")); // got the default culture name when saved
+        Assert.That(content2.GetCultureName(langFr.IsoCode), Is.EqualTo("name-fr"));
+        Assert.That(content2.GetCultureName(langUk.IsoCode), Is.EqualTo("name-uk"));
 
-        Assert.AreEqual("value-fr1", content2.GetValue("prop", langFr.IsoCode));
-        Assert.AreEqual("value-uk1", content2.GetValue("prop", langUk.IsoCode));
-        Assert.IsNull(content2.GetValue("prop", langFr.IsoCode, published: true));
-        Assert.IsNull(content2.GetValue("prop", langUk.IsoCode, published: true));
+        Assert.That(content2.GetValue("prop", langFr.IsoCode), Is.EqualTo("value-fr1"));
+        Assert.That(content2.GetValue("prop", langUk.IsoCode), Is.EqualTo("value-uk1"));
+        Assert.That(content2.GetValue("prop", langFr.IsoCode, published: true), Is.Null);
+        Assert.That(content2.GetValue("prop", langUk.IsoCode, published: true), Is.Null);
 
-        Assert.IsNull(content2.PublishName);
-        Assert.IsNull(content2.GetPublishName(langFr.IsoCode));
-        Assert.IsNull(content2.GetPublishName(langUk.IsoCode));
+        Assert.That(content2.PublishName, Is.Null);
+        Assert.That(content2.GetPublishName(langFr.IsoCode), Is.Null);
+        Assert.That(content2.GetPublishName(langUk.IsoCode), Is.Null);
 
         // only fr and uk have a name, and are available
         AssertPerCulture(
@@ -3676,22 +3664,22 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         // it has names, publishNames, and published cultures
         content2 = ContentService.GetById(content.Id);
 
-        Assert.AreEqual("name-fr", content2.Name); // got the default culture name when saved
-        Assert.AreEqual("name-fr", content2.GetCultureName(langFr.IsoCode));
-        Assert.AreEqual("name-uk", content2.GetCultureName(langUk.IsoCode));
+        Assert.That(content2.Name, Is.EqualTo("name-fr")); // got the default culture name when saved
+        Assert.That(content2.GetCultureName(langFr.IsoCode), Is.EqualTo("name-fr"));
+        Assert.That(content2.GetCultureName(langUk.IsoCode), Is.EqualTo("name-uk"));
 
         // we haven't published InvariantNeutral, but a document cannot be published without an invariant name,
         // so when we tried and published for the first time above the french culture, the french name was used
         // to populate the invariant name
-        Assert.AreEqual("name-fr", content2.PublishName);
+        Assert.That(content2.PublishName, Is.EqualTo("name-fr"));
 
-        Assert.AreEqual("name-fr", content2.GetPublishName(langFr.IsoCode));
-        Assert.AreEqual("name-uk", content2.GetPublishName(langUk.IsoCode));
+        Assert.That(content2.GetPublishName(langFr.IsoCode), Is.EqualTo("name-fr"));
+        Assert.That(content2.GetPublishName(langUk.IsoCode), Is.EqualTo("name-uk"));
 
-        Assert.AreEqual("value-fr1", content2.GetValue("prop", langFr.IsoCode));
-        Assert.AreEqual("value-uk1", content2.GetValue("prop", langUk.IsoCode));
-        Assert.AreEqual("value-fr1", content2.GetValue("prop", langFr.IsoCode, published: true));
-        Assert.AreEqual("value-uk1", content2.GetValue("prop", langUk.IsoCode, published: true));
+        Assert.That(content2.GetValue("prop", langFr.IsoCode), Is.EqualTo("value-fr1"));
+        Assert.That(content2.GetValue("prop", langUk.IsoCode), Is.EqualTo("value-uk1"));
+        Assert.That(content2.GetValue("prop", langFr.IsoCode, published: true), Is.EqualTo("value-fr1"));
+        Assert.That(content2.GetValue("prop", langUk.IsoCode, published: true), Is.EqualTo("value-uk1"));
 
         // no change
         AssertPerCulture(
@@ -3754,7 +3742,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         // now it has publish name for invariant neutral
         content2 = ContentService.GetById(content.Id);
 
-        Assert.AreEqual("name-fr", content2.PublishName);
+        Assert.That(content2.PublishName, Is.EqualTo("name-fr"));
 
         content.SetCultureName("Home US2", null);
         content.SetCultureName("name-fr2", langFr.IsoCode);
@@ -3768,21 +3756,21 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         // it has updated names, unchanged publishNames, and published cultures
         content2 = ContentService.GetById(content.Id);
 
-        Assert.AreEqual("name-fr2", content2.Name); // got the default culture name when saved
-        Assert.AreEqual("name-fr2", content2.GetCultureName(langFr.IsoCode));
-        Assert.AreEqual("name-uk2", content2.GetCultureName(langUk.IsoCode));
+        Assert.That(content2.Name, Is.EqualTo("name-fr2")); // got the default culture name when saved
+        Assert.That(content2.GetCultureName(langFr.IsoCode), Is.EqualTo("name-fr2"));
+        Assert.That(content2.GetCultureName(langUk.IsoCode), Is.EqualTo("name-uk2"));
 
-        Assert.AreEqual("name-fr", content2.PublishName);
-        Assert.AreEqual("name-fr", content2.GetPublishName(langFr.IsoCode));
-        Assert.AreEqual("name-uk", content2.GetPublishName(langUk.IsoCode));
+        Assert.That(content2.PublishName, Is.EqualTo("name-fr"));
+        Assert.That(content2.GetPublishName(langFr.IsoCode), Is.EqualTo("name-fr"));
+        Assert.That(content2.GetPublishName(langUk.IsoCode), Is.EqualTo("name-uk"));
 
-        Assert.AreEqual("Barack Obama2", content2.GetValue("author"));
-        Assert.AreEqual("Barack Obama", content2.GetValue("author", published: true));
+        Assert.That(content2.GetValue("author"), Is.EqualTo("Barack Obama2"));
+        Assert.That(content2.GetValue("author", published: true), Is.EqualTo("Barack Obama"));
 
-        Assert.AreEqual("value-fr2", content2.GetValue("prop", langFr.IsoCode));
-        Assert.AreEqual("value-uk2", content2.GetValue("prop", langUk.IsoCode));
-        Assert.AreEqual("value-fr1", content2.GetValue("prop", langFr.IsoCode, published: true));
-        Assert.AreEqual("value-uk1", content2.GetValue("prop", langUk.IsoCode, published: true));
+        Assert.That(content2.GetValue("prop", langFr.IsoCode), Is.EqualTo("value-fr2"));
+        Assert.That(content2.GetValue("prop", langUk.IsoCode), Is.EqualTo("value-uk2"));
+        Assert.That(content2.GetValue("prop", langFr.IsoCode, published: true), Is.EqualTo("value-fr1"));
+        Assert.That(content2.GetValue("prop", langUk.IsoCode, published: true), Is.EqualTo("value-uk1"));
 
         // no change
         AssertPerCulture(
@@ -3836,21 +3824,21 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         // (only if french is not mandatory, else everything would be gone!)
         content2 = ContentService.GetById(content.Id);
 
-        Assert.AreEqual("name-fr2", content2.Name); // got the default culture name when saved
-        Assert.AreEqual("name-fr2", content2.GetCultureName(langFr.IsoCode));
-        Assert.AreEqual("name-uk2", content2.GetCultureName(langUk.IsoCode));
+        Assert.That(content2.Name, Is.EqualTo("name-fr2")); // got the default culture name when saved
+        Assert.That(content2.GetCultureName(langFr.IsoCode), Is.EqualTo("name-fr2"));
+        Assert.That(content2.GetCultureName(langUk.IsoCode), Is.EqualTo("name-uk2"));
 
-        Assert.AreEqual("name-fr2", content2.PublishName);
-        Assert.IsNull(content2.GetPublishName(langFr.IsoCode));
-        Assert.AreEqual("name-uk", content2.GetPublishName(langUk.IsoCode));
+        Assert.That(content2.PublishName, Is.EqualTo("name-fr2"));
+        Assert.That(content2.GetPublishName(langFr.IsoCode), Is.Null);
+        Assert.That(content2.GetPublishName(langUk.IsoCode), Is.EqualTo("name-uk"));
 
-        Assert.AreEqual("value-fr2", content2.GetValue("prop", langFr.IsoCode));
-        Assert.AreEqual("value-uk2", content2.GetValue("prop", langUk.IsoCode));
-        Assert.IsNull(content2.GetValue("prop", langFr.IsoCode, published: true));
-        Assert.AreEqual("value-uk1", content2.GetValue("prop", langUk.IsoCode, published: true));
+        Assert.That(content2.GetValue("prop", langFr.IsoCode), Is.EqualTo("value-fr2"));
+        Assert.That(content2.GetValue("prop", langUk.IsoCode), Is.EqualTo("value-uk2"));
+        Assert.That(content2.GetValue("prop", langFr.IsoCode, published: true), Is.Null);
+        Assert.That(content2.GetValue("prop", langUk.IsoCode, published: true), Is.EqualTo("value-uk1"));
 
-        Assert.IsFalse(content.IsCulturePublished(langFr.IsoCode));
-        Assert.IsTrue(content.IsCulturePublished(langUk.IsoCode));
+        Assert.That(content.IsCulturePublished(langFr.IsoCode), Is.False);
+        Assert.That(content.IsCulturePublished(langUk.IsoCode), Is.True);
 
         // no change
         AssertPerCulture(
@@ -3907,22 +3895,21 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         // non-null or true below - always check against content.Published to be sure
         content2 = ContentService.GetById(content.Id);
 
-        Assert.IsFalse(content2.Published);
+        Assert.That(content2.Published, Is.False);
 
-        Assert.AreEqual("name-fr2", content2.Name); // got the default culture name when saved
-        Assert.AreEqual("name-fr2", content2.GetCultureName(langFr.IsoCode));
-        Assert.AreEqual("name-uk2", content2.GetCultureName(langUk.IsoCode));
+        Assert.That(content2.Name, Is.EqualTo("name-fr2")); // got the default culture name when saved
+        Assert.That(content2.GetCultureName(langFr.IsoCode), Is.EqualTo("name-fr2"));
+        Assert.That(content2.GetCultureName(langUk.IsoCode), Is.EqualTo("name-uk2"));
 
-        Assert.IsNull(content2.PublishName);
-        Assert.IsNull(content2.GetPublishName(langFr.IsoCode));
-        Assert.IsNull(content2.GetPublishName(langUk.IsoCode));
+        Assert.That(content2.PublishName, Is.Null);
+        Assert.That(content2.GetPublishName(langFr.IsoCode), Is.Null);
+        Assert.That(content2.GetPublishName(langUk.IsoCode), Is.Null);
 
-        Assert.AreEqual("value-fr2", content2.GetValue("prop", langFr.IsoCode));
-        Assert.AreEqual("value-uk2", content2.GetValue("prop", langUk.IsoCode));
-        Assert.IsNull(content2.GetValue("prop", langFr.IsoCode, published: true));
-        Assert.AreEqual(
-            "value-uk1",
-            content2.GetValue("prop", langUk.IsoCode, published: true)); // has value, see note above
+        Assert.That(content2.GetValue("prop", langFr.IsoCode), Is.EqualTo("value-fr2"));
+        Assert.That(content2.GetValue("prop", langUk.IsoCode), Is.EqualTo("value-uk2"));
+        Assert.That(content2.GetValue("prop", langFr.IsoCode, published: true), Is.Null);
+        Assert.That(
+            content2.GetValue("prop", langUk.IsoCode, published: true), Is.EqualTo("value-uk1")); // has value, see note above
 
         // no change
         AssertPerCulture(
@@ -4015,8 +4002,8 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         // but they change, on what's being saved, and when getting it back
 
         // changing the name = edited!
-        Assert.IsTrue(content.IsCultureEdited(langUk.IsoCode));
-        Assert.IsTrue(content2.IsCultureEdited(langUk.IsoCode));
+        Assert.That(content.IsCultureEdited(langUk.IsoCode), Is.True);
+        Assert.That(content2.IsCultureEdited(langUk.IsoCode), Is.True);
     }
 
     [Test]
@@ -4024,7 +4011,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     {
         var content = ContentService.Create("Test", Constants.System.Root, "umbTextpage");
         var publishResult = ContentService.Publish(content, new[] { "*" });
-        Assert.AreEqual(PublishResultType.FailedPublishUnsavedChanges, publishResult.Result);
+        Assert.That(publishResult.Result, Is.EqualTo(PublishResultType.FailedPublishUnsavedChanges));
     }
 
     [Test]
@@ -4035,7 +4022,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         content.Name = "Test2";
 
         var publishResult = ContentService.Publish(content, new[] { "*" });
-        Assert.AreEqual(PublishResultType.FailedPublishUnsavedChanges, publishResult.Result);
+        Assert.That(publishResult.Result, Is.EqualTo(PublishResultType.FailedPublishUnsavedChanges));
     }
 
     [Test]
@@ -4056,12 +4043,12 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         content = ContentService.GetById(content.Key)!;
         var result = ContentService.Publish(content, new[] { "*" });
 
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(PublishResultType.FailedPublishContentInvalid, result.Result);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Result, Is.EqualTo(PublishResultType.FailedPublishContentInvalid));
 
         // verify saved state
         content = ContentService.GetById(content.Key)!;
-        Assert.IsEmpty(content.PublishedCultures);
+        Assert.That(content.PublishedCultures, Is.Empty);
     }
 
     [Test]
@@ -4082,13 +4069,13 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         content = ContentService.GetById(content.Key)!;
         var result = ContentService.Publish(content, new[] { langEn.IsoCode });
 
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(PublishResultType.SuccessPublishCulture, result.Result);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.EqualTo(PublishResultType.SuccessPublishCulture));
 
         // verify saved state
         content = ContentService.GetById(content.Key)!;
-        Assert.AreEqual(1, content.PublishedCultures.Count());
-        Assert.AreEqual(langEn.IsoCode, content.PublishedCultures.First());
+        Assert.That(content.PublishedCultures.Count(), Is.EqualTo(1));
+        Assert.That(content.PublishedCultures.First(), Is.EqualTo(langEn.IsoCode));
     }
 
     private void AssertPerCulture<T>(
@@ -4099,9 +4086,8 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         foreach (var testCase in testCases)
         {
             var value = getter(item, testCase.Language.IsoCode);
-            Assert.AreEqual(
-                testCase.Result,
-                value,
+            Assert.That(
+                value, Is.EqualTo(testCase.Result),
                 $"Expected {testCase.Result} and got {value} for culture {testCase.Language.IsoCode}.");
         }
     }

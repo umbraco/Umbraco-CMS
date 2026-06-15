@@ -1,6 +1,6 @@
 using System.Diagnostics;
 using System.Linq;
-using AutoFixture.NUnit3;
+using AutoFixture.NUnit4;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
@@ -45,7 +45,7 @@ internal class ContentVersionCleanupServiceTest
                 x => x.PublishCancelable(
                     It.IsAny<ContentDeletingVersionsNotification>()),
                 Times.Exactly(someHistoricVersions.Count));
-            Assert.AreEqual(0, report.Count);
+            Assert.That(report.Count, Is.EqualTo(0));
         });
     }
 
@@ -97,8 +97,8 @@ internal class ContentVersionCleanupServiceTest
 
         Assert.Multiple(() =>
         {
-            Assert.Greater(report.Count, 0);
-            Assert.AreEqual(someHistoricVersions.Count, report.Count);
+            Assert.That(report.Count, Is.GreaterThan(0));
+            Assert.That(report, Has.Count.EqualTo(someHistoricVersions.Count));
         });
     }
 
@@ -130,7 +130,7 @@ internal class ContentVersionCleanupServiceTest
         Assert.Multiple(() =>
         {
             policy.Verify(x => x.Apply(aDateTime, someHistoricVersions), Times.Once);
-            Assert.AreEqual(someHistoricVersions.First(), report.Single());
+            Assert.That(report.Single(), Is.EqualTo(someHistoricVersions.First()));
         });
     }
 

@@ -50,9 +50,9 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
 
         // re-get
         member = MemberService.GetById(member.Id);
-        Assert.AreEqual("another title of mine", member.GetValue("title"));
-        Assert.IsNull(member.GetValue("bodyText"));
-        Assert.AreEqual("new author", member.GetValue("author"));
+        Assert.That(member.GetValue("title"), Is.EqualTo("another title of mine"));
+        Assert.That(member.GetValue("bodyText"), Is.Null);
+        Assert.That(member.GetValue("author"), Is.EqualTo("new author"));
     }
 
     [Test]
@@ -64,8 +64,8 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
 
         var member2 = MemberService.GetByUsername(member.Username);
 
-        Assert.IsNotNull(member2);
-        Assert.AreEqual(member.Email, member2.Email);
+        Assert.That(member2, Is.Not.Null);
+        Assert.That(member2.Email, Is.EqualTo(member.Email));
     }
 
     [Test]
@@ -108,7 +108,7 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
 
         member = MemberService.GetById(member.Id);
 
-        Assert.AreEqual(2, member.FailedPasswordAttempts);
+        Assert.That(member.FailedPasswordAttempts, Is.EqualTo(2));
     }
 
     [Test]
@@ -123,7 +123,7 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
 
         member = MemberService.GetById(member.Id);
 
-        Assert.IsFalse(member.IsApproved);
+        Assert.That(member.IsApproved, Is.False);
     }
 
     [Test]
@@ -139,7 +139,7 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
 
         member = MemberService.GetById(member.Id);
 
-        Assert.IsTrue(member.IsLockedOut);
+        Assert.That(member.IsLockedOut, Is.True);
     }
 
     [Test]
@@ -209,7 +209,7 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
         MemberService.Save(member);
 
         member = MemberService.GetById(member.Id);
-        Assert.AreEqual("xemail", member.Email);
+        Assert.That(member.Email, Is.EqualTo("xemail"));
 
         var pmember = PublishedContentFactory.ToPublishedMember(member);
 
@@ -225,10 +225,10 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
 
         var properties = pmember.Properties.ToList();
 
-        Assert.IsTrue(properties.Select(x => x.Alias).ContainsAll(aliases));
+        Assert.That(properties.Select(x => x.Alias).ContainsAll(aliases), Is.True);
 
         var email = properties[aliases.IndexOf(nameof(IMember.Email))];
-        Assert.AreEqual("xemail", email.GetSourceValue());
+        Assert.That(email.GetSourceValue(), Is.EqualTo("xemail"));
     }
 
     [Test]
@@ -239,10 +239,10 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
         IMember member = MemberBuilder.CreateSimpleMember(memberType, "test", "test@test.com", "pass", "test");
         MemberService.Save(member);
 
-        Assert.AreNotEqual(0, member.Id);
+        Assert.That(member.Id, Is.Not.EqualTo(0));
         var foundMember = MemberService.GetById(member.Id);
-        Assert.IsNotNull(foundMember);
-        Assert.AreEqual("test@test.com", foundMember.Email);
+        Assert.That(foundMember, Is.Not.Null);
+        Assert.That(foundMember.Email, Is.EqualTo("test@test.com"));
     }
 
     [Test]
@@ -253,10 +253,10 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
         IMember member = MemberBuilder.CreateSimpleMember(memberType, "test", "test@test.marketing", "pass", "test");
         MemberService.Save(member);
 
-        Assert.AreNotEqual(0, member.Id);
+        Assert.That(member.Id, Is.Not.EqualTo(0));
         var foundMember = MemberService.GetById(member.Id);
-        Assert.IsNotNull(foundMember);
-        Assert.AreEqual("test@test.marketing", foundMember.Email);
+        Assert.That(foundMember, Is.Not.Null);
+        Assert.That(foundMember.Email, Is.EqualTo("test@test.marketing"));
     }
 
     [Test]
@@ -266,8 +266,8 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
 
         var found = MemberService.GetAllRoles();
 
-        Assert.AreEqual(1, found.Count());
-        Assert.AreEqual("MyTestRole", found.Single().Name);
+        Assert.That(found.Count(), Is.EqualTo(1));
+        Assert.That(found.Single().Name, Is.EqualTo("MyTestRole"));
     }
 
     [Test]
@@ -278,8 +278,8 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
 
         var found = MemberService.GetAllRoles();
 
-        Assert.AreEqual(1, found.Count());
-        Assert.AreEqual("MyTestRole", found.Single().Name);
+        Assert.That(found.Count(), Is.EqualTo(1));
+        Assert.That(found.Single().Name, Is.EqualTo("MyTestRole"));
     }
 
     [Test]
@@ -291,7 +291,7 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
 
         var found = MemberService.GetAllRoles();
 
-        Assert.AreEqual(3, found.Count());
+        Assert.That(found.Count(), Is.EqualTo(3));
     }
 
     [Test]
@@ -303,7 +303,7 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
 
         var found = MemberService.GetAllRolesIds();
 
-        Assert.AreEqual(3, found.Count());
+        Assert.That(found.Count(), Is.EqualTo(3));
     }
 
     [Test]
@@ -317,12 +317,12 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
         string[] roleNames1 = { "TR1", "TR2" };
         MemberService.AssignRoles(new[] { member.Id }, roleNames1);
         var memberRoles = MemberService.GetAllRoles(member.Id);
-        CollectionAssert.AreEquivalent(roleNames1, memberRoles);
+        Assert.That(memberRoles, Is.EquivalentTo(roleNames1));
 
         string[] roleNames2 = { "TR3", "TR4" };
         MemberService.ReplaceRoles(new[] { member.Id }, roleNames2);
         memberRoles = MemberService.GetAllRoles(member.Id);
-        CollectionAssert.AreEquivalent(roleNames2, memberRoles);
+        Assert.That(memberRoles, Is.EquivalentTo(roleNames2));
     }
 
     [Test]
@@ -340,7 +340,7 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
 
         var memberRoles = MemberService.GetAllRoles(member.Id);
 
-        Assert.AreEqual(2, memberRoles.Count());
+        Assert.That(memberRoles.Count(), Is.EqualTo(2));
     }
 
     [Test]
@@ -358,7 +358,7 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
 
         var memberRoles = MemberService.GetAllRolesIds(member.Id);
 
-        Assert.AreEqual(2, memberRoles.Count());
+        Assert.That(memberRoles.Count(), Is.EqualTo(2));
     }
 
     [Test]
@@ -380,10 +380,10 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
         MemberService.AssignRoles(new[] { member.Id, member2.Id }, new[] { "MyTestRole1", "MyTestRole2" });
 
         var memberRoles = MemberService.GetAllRoles("test");
-        Assert.AreEqual(2, memberRoles.Count());
+        Assert.That(memberRoles.Count(), Is.EqualTo(2));
 
         var memberRoles2 = MemberService.GetAllRoles("test2@test.com");
-        Assert.AreEqual(2, memberRoles2.Count());
+        Assert.That(memberRoles2.Count(), Is.EqualTo(2));
     }
 
     [Test]
@@ -395,7 +395,7 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
 
         var memberRoles = MemberService.GetAllRoles();
 
-        Assert.AreEqual(0, memberRoles.Count());
+        Assert.That(memberRoles.Count(), Is.EqualTo(0));
     }
 
     [Test]
@@ -447,7 +447,7 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
         }
 
         var membersInRole = MemberService.GetMembersInRole("MyTestRole1");
-        Assert.AreEqual(2, membersInRole.Count());
+        Assert.That(membersInRole.Count(), Is.EqualTo(2));
     }
 
     [Test]
@@ -485,7 +485,7 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
         MemberService.AssignRoles(new[] { member1.Id, member2.Id, member3.Id }, new[] { roleName1 });
 
         var result = MemberService.FindMembersInRole(roleName1, usernameToMatch, matchType);
-        Assert.AreEqual(resultCount, result.Count());
+        Assert.That(result.Count(), Is.EqualTo(resultCount));
     }
 
     [Test]
@@ -501,14 +501,14 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
         MemberService.Save(member2);
 
         // temp make sure they exist
-        Assert.IsNotNull(MemberService.GetById(member1.Id));
-        Assert.IsNotNull(MemberService.GetById(member2.Id));
+        Assert.That(MemberService.GetById(member1.Id), Is.Not.Null);
+        Assert.That(MemberService.GetById(member2.Id), Is.Not.Null);
 
         MemberService.AssignRoles(new[] { member1.Id, member2.Id }, new[] { "MyTestRole1" });
 
         var membersInRole = MemberService.GetMembersInRole("MyTestRole1");
 
-        Assert.AreEqual(2, membersInRole.Count());
+        Assert.That(membersInRole.Count(), Is.EqualTo(2));
     }
 
     [Test]
@@ -524,14 +524,14 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
         MemberService.Save(member2);
 
         // temp make sure they exist
-        Assert.IsNotNull(MemberService.GetById(member1.Id));
-        Assert.IsNotNull(MemberService.GetById(member2.Id));
+        Assert.That(MemberService.GetById(member1.Id), Is.Not.Null);
+        Assert.That(MemberService.GetById(member2.Id), Is.Not.Null);
 
         MemberService.AssignRoles(new[] { member1.Id, member2.Id }, new[] { "mytestrole1" });
 
         var membersInRole = MemberService.GetMembersInRole("MyTestRole1");
 
-        Assert.AreEqual(2, membersInRole.Count());
+        Assert.That(membersInRole.Count(), Is.EqualTo(2));
     }
 
     [Test]
@@ -550,7 +550,7 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
 
         var membersInRole = MemberService.GetMembersInRole("MyTestRole1");
 
-        Assert.AreEqual(2, membersInRole.Count());
+        Assert.That(membersInRole.Count(), Is.EqualTo(2));
     }
 
     [Test]
@@ -569,7 +569,7 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
 
         var membersInRole = MemberService.GetMembersInRole("MyTestRole1");
 
-        Assert.AreEqual(2, membersInRole.Count());
+        Assert.That(membersInRole.Count(), Is.EqualTo(2));
     }
 
     [Test]
@@ -587,7 +587,7 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
 
         var membersInRole = MemberService.GetMembersInRole("MyTestRole1");
 
-        Assert.AreEqual(2, membersInRole.Count());
+        Assert.That(membersInRole.Count(), Is.EqualTo(2));
     }
 
     [Test]
@@ -606,9 +606,9 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
         MemberService.DissociateRoles(new[] { member1.Id, member2.Id }, new[] { "MyTestRole2" });
 
         var membersInRole = MemberService.GetMembersInRole("MyTestRole1");
-        Assert.AreEqual(1, membersInRole.Count());
+        Assert.That(membersInRole.Count(), Is.EqualTo(1));
         membersInRole = MemberService.GetMembersInRole("MyTestRole2");
-        Assert.AreEqual(0, membersInRole.Count());
+        Assert.That(membersInRole.Count(), Is.EqualTo(0));
     }
 
     [Test]
@@ -627,9 +627,9 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
         MemberService.DissociateRoles(new[] { member1.Username, member2.Username }, new[] { "MyTestRole2" });
 
         var membersInRole = MemberService.GetMembersInRole("MyTestRole1");
-        Assert.AreEqual(1, membersInRole.Count());
+        Assert.That(membersInRole.Count(), Is.EqualTo(1));
         membersInRole = MemberService.GetMembersInRole("MyTestRole2");
-        Assert.AreEqual(0, membersInRole.Count());
+        Assert.That(membersInRole.Count(), Is.EqualTo(0));
     }
 
     [Test]
@@ -692,9 +692,9 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
             MemberBuilder.CreateSimpleMember(memberType, "test", "test2@test.com", "pass", "test2@test.com");
         MemberService.Save(member2);
 
-        Assert.IsTrue(MemberService.Exists("test"));
-        Assert.IsFalse(MemberService.Exists("notFound"));
-        Assert.IsTrue(MemberService.Exists("test2@test.com"));
+        Assert.That(MemberService.Exists("test"), Is.True);
+        Assert.That(MemberService.Exists("notFound"), Is.False);
+        Assert.That(MemberService.Exists("test2@test.com"), Is.True);
     }
 
     [Test]
@@ -705,8 +705,8 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
         IMember member = MemberBuilder.CreateSimpleMember(memberType, "test", "test@test.com", "pass", "test");
         MemberService.Save(member);
 
-        Assert.IsTrue(MemberService.Exists(member.Id));
-        Assert.IsFalse(MemberService.Exists(9876));
+        Assert.That(MemberService.Exists(member.Id), Is.True);
+        Assert.That(MemberService.Exists(9876), Is.False);
     }
 
     [Test]
@@ -725,8 +725,8 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
         IMember member = MemberBuilder.CreateSimpleMember(memberType, "test", "test@test.com", "pass", "test");
         MemberService.Save(member);
 
-        Assert.IsNotNull(MemberService.GetByEmail(member.Email));
-        Assert.IsNull(MemberService.GetByEmail("do@not.find"));
+        Assert.That(MemberService.GetByEmail(member.Email), Is.Not.Null);
+        Assert.That(MemberService.GetByEmail("do@not.find"), Is.Null);
     }
 
     [Test]
@@ -738,7 +738,7 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
             MemberBuilder.CreateSimpleMember(memberType, "Test Real Name", "test@test.com", "pass", "testUsername");
         MemberService.Save(member);
 
-        Assert.AreEqual("Test Real Name", member.Name);
+        Assert.That(member.Name, Is.EqualTo("Test Real Name"));
     }
 
     [Test]
@@ -749,8 +749,8 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
         IMember member = MemberBuilder.CreateSimpleMember(memberType, "test", "test@test.com", "pass", "test");
         MemberService.Save(member);
 
-        Assert.IsNotNull(MemberService.GetByUsername(member.Username));
-        Assert.IsNull(MemberService.GetByUsername("notFound"));
+        Assert.That(MemberService.GetByUsername(member.Username), Is.Not.Null);
+        Assert.That(MemberService.GetByUsername("notFound"), Is.Null);
     }
 
     [Test]
@@ -761,8 +761,8 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
         IMember member = MemberBuilder.CreateSimpleMember(memberType, "test", "test@test.com", "pass", "test");
         MemberService.Save(member);
 
-        Assert.IsNotNull(MemberService.GetById(member.Id));
-        Assert.IsNull(MemberService.GetById(9876));
+        Assert.That(MemberService.GetById(member.Id), Is.Not.Null);
+        Assert.That(MemberService.GetById(9876), Is.Null);
     }
 
     [Test]
@@ -775,10 +775,10 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
 
         var found = MemberService.GetAll(0, 2, out var totalRecs);
 
-        Assert.AreEqual(2, found.Count());
-        Assert.AreEqual(10, totalRecs);
-        Assert.AreEqual("test0", found.First().Username);
-        Assert.AreEqual("test1", found.Last().Username);
+        Assert.That(found.Count(), Is.EqualTo(2));
+        Assert.That(totalRecs, Is.EqualTo(10));
+        Assert.That(found.First().Username, Is.EqualTo("test0"));
+        Assert.That(found.Last().Username, Is.EqualTo("test1"));
     }
 
     [Test]
@@ -799,16 +799,16 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
             null,
             "Member No-");
 
-        Assert.AreEqual(2, found.Count());
-        Assert.AreEqual(10, totalRecs);
-        Assert.AreEqual("test0", found.First().Username);
-        Assert.AreEqual("test1", found.Last().Username);
+        Assert.That(found.Count(), Is.EqualTo(2));
+        Assert.That(totalRecs, Is.EqualTo(10));
+        Assert.That(found.First().Username, Is.EqualTo("test0"));
+        Assert.That(found.Last().Username, Is.EqualTo("test1"));
 
         found = MemberService.GetAll(0, 2, out totalRecs, "username", Direction.Ascending, true, null, "Member No-5");
 
-        Assert.AreEqual(1, found.Count());
-        Assert.AreEqual(1, totalRecs);
-        Assert.AreEqual("test5", found.First().Username);
+        Assert.That(found.Count(), Is.EqualTo(1));
+        Assert.That(totalRecs, Is.EqualTo(1));
+        Assert.That(found.First().Username, Is.EqualTo("test5"));
     }
 
     [Test]
@@ -827,10 +827,10 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
             Direction.Ascending,
             memberType.Alias);
 
-        Assert.AreEqual(2, found.Count());
-        Assert.AreEqual(10, totalRecs);
-        Assert.AreEqual("test2", found.First().Username);
-        Assert.AreEqual("test3", found.Last().Username);
+        Assert.That(found.Count(), Is.EqualTo(2));
+        Assert.That(totalRecs, Is.EqualTo(10));
+        Assert.That(found.First().Username, Is.EqualTo("test2"));
+        Assert.That(found.Last().Username, Is.EqualTo("test3"));
     }
 
     [Test]
@@ -846,7 +846,7 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
 
         var found = MemberService.FindMembersByDisplayName("B", 0, 100, out var totalRecs);
 
-        Assert.AreEqual(1, found.Count());
+        Assert.That(found.Count(), Is.EqualTo(1));
     }
 
     [Test]
@@ -863,7 +863,7 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
 
         var found = MemberService.FindByEmail("tes", 0, 100, out var totalRecs);
 
-        Assert.AreEqual(10, found.Count());
+        Assert.That(found.Count(), Is.EqualTo(10));
     }
 
     [Test]
@@ -880,7 +880,7 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
 
         var found = MemberService.FindByEmail("test.com", 0, 100, out var totalRecs, StringPropertyMatchType.EndsWith);
 
-        Assert.AreEqual(11, found.Count());
+        Assert.That(found.Count(), Is.EqualTo(11));
     }
 
     [Test]
@@ -897,7 +897,7 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
 
         var found = MemberService.FindByEmail("test", 0, 100, out var totalRecs, StringPropertyMatchType.Contains);
 
-        Assert.AreEqual(11, found.Count());
+        Assert.That(found.Count(), Is.EqualTo(11));
     }
 
     [Test]
@@ -919,7 +919,7 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
             out var totalRecs,
             StringPropertyMatchType.Exact);
 
-        Assert.AreEqual(1, found.Count());
+        Assert.That(found.Count(), Is.EqualTo(1));
     }
 
     [Test]
@@ -936,7 +936,7 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
 
         var found = MemberService.FindByUsername("tes", 0, 100, out var totalRecs);
 
-        Assert.AreEqual(10, found.Count());
+        Assert.That(found.Count(), Is.EqualTo(10));
     }
 
     [Test]
@@ -953,7 +953,7 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
 
         var found = MemberService.FindByUsername("llo", 0, 100, out var totalRecs, StringPropertyMatchType.EndsWith);
 
-        Assert.AreEqual(1, found.Count());
+        Assert.That(found.Count(), Is.EqualTo(1));
     }
 
     [Test]
@@ -971,7 +971,7 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
 
         var found = MemberService.FindByUsername("test", 0, 100, out var totalRecs, StringPropertyMatchType.Contains);
 
-        Assert.AreEqual(11, found.Count());
+        Assert.That(found.Count(), Is.EqualTo(11));
     }
 
     [Test]
@@ -988,7 +988,7 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
 
         var found = MemberService.FindByUsername("hello", 0, 100, out var totalRecs, StringPropertyMatchType.Exact);
 
-        Assert.AreEqual(1, found.Count());
+        Assert.That(found.Count(), Is.EqualTo(1));
     }
 
     [Test]
@@ -1003,7 +1003,7 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
 
         var found = MemberService.GetCount(MemberCountType.All);
 
-        Assert.AreEqual(11, found);
+        Assert.That(found, Is.EqualTo(11));
     }
 
     [Test]
@@ -1021,7 +1021,7 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
 
         var found = MemberService.GetCount(MemberCountType.LockedOut);
 
-        Assert.AreEqual(6, found);
+        Assert.That(found, Is.EqualTo(6));
     }
 
     [Test]
@@ -1039,7 +1039,7 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
 
         var found = MemberService.GetCount(MemberCountType.Approved);
 
-        Assert.AreEqual(5, found);
+        Assert.That(found, Is.EqualTo(5));
     }
 
     [Test]
@@ -1049,7 +1049,7 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
         await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
         memberType.RemovePropertyType(Constants.Conventions.Member.Comments);
         await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
-        Assert.IsFalse(memberType.PropertyTypes.Any(x => x.Alias == Constants.Conventions.Member.Comments));
+        Assert.That(memberType.PropertyTypes.Any(x => x.Alias == Constants.Conventions.Member.Comments), Is.False);
 
         var customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
 
@@ -1059,7 +1059,7 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
 
         var found = MemberService.GetById(customMember.Id);
 
-        Assert.IsTrue(found.Comments.IsNullOrWhiteSpace());
+        Assert.That(found.Comments.IsNullOrWhiteSpace(), Is.True);
     }
 
     [Test]
@@ -1073,7 +1073,7 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
 
         var found = MemberService.GetById(customMember.Id);
 
-        Assert.IsTrue(found.IsApproved);
+        Assert.That(found.IsApproved, Is.True);
     }
 
     [Test]
@@ -1093,9 +1093,9 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
         var found = MemberService.GetById(member.Id);
 
         // Assert
-        Assert.IsNotNull(member, "Verifying a member instance has been created");
-        Assert.IsNotNull(found, "Verifying the created member instance has been retrieved");
-        Assert.IsTrue(found?.Name == member?.Name, "Verifying the retrieved member instance has the expected name");
+        Assert.That(member, Is.Not.Null, "Verifying a member instance has been created");
+        Assert.That(found, Is.Not.Null, "Verifying the created member instance has been retrieved");
+        Assert.That(found?.Name, Is.EqualTo(member?.Name), "Verifying the retrieved member instance has the expected name");
     }
 
     [Test]
@@ -1114,8 +1114,8 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
         var members = (await MemberService.GetByKeysAsync(memberA.Key, memberB.Key, memberC.Key)).ToArray();
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(3, members.Length);
-            CollectionAssert.AreEquivalent(new [] { memberA.Key, memberB.Key, memberC.Key }, members.Select(m => m.Key).ToArray());
+            Assert.That(members, Has.Length.EqualTo(3));
+            Assert.That(members.Select(m => m.Key).ToArray(), Is.EquivalentTo(new [] { memberA.Key, memberB.Key, memberC.Key }));
         });
     }
 
@@ -1147,36 +1147,36 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
 
         // Sort by name ascending: Alice, Bob, Charlie
         var result = await MemberService.FilterAsync(filter, "name", Direction.Ascending, skip: 0, take: 10);
-        Assert.AreEqual(3, result.Total);
-        Assert.AreEqual(new[] { "Alice", "Bob", "Charlie" }, result.Items.Select(m => m.Name).ToArray());
+        Assert.That(result.Total, Is.EqualTo(3));
+        Assert.That(result.Items.Select(m => m.Name).ToArray(), Is.EqualTo(new[] { "Alice", "Bob", "Charlie" }));
 
         // Sort by name descending: Charlie, Bob, Alice
         result = await MemberService.FilterAsync(filter, "name", Direction.Descending, skip: 0, take: 10);
-        Assert.AreEqual(new[] { "Charlie", "Bob", "Alice" }, result.Items.Select(m => m.Name).ToArray());
+        Assert.That(result.Items.Select(m => m.Name).ToArray(), Is.EqualTo(new[] { "Charlie", "Bob", "Alice" }));
 
         // Sort by username ascending: user_alice (Bob), user_bob (Charlie), user_charlie (Alice)
         result = await MemberService.FilterAsync(filter, "username", Direction.Ascending, skip: 0, take: 10);
-        Assert.AreEqual(new[] { "Bob", "Charlie", "Alice" }, result.Items.Select(m => m.Name).ToArray());
+        Assert.That(result.Items.Select(m => m.Name).ToArray(), Is.EqualTo(new[] { "Bob", "Charlie", "Alice" }));
 
         // Sort by username descending: user_charlie (Alice), user_bob (Charlie), user_alice (Bob)
         result = await MemberService.FilterAsync(filter, "username", Direction.Descending, skip: 0, take: 10);
-        Assert.AreEqual(new[] { "Alice", "Charlie", "Bob" }, result.Items.Select(m => m.Name).ToArray());
+        Assert.That(result.Items.Select(m => m.Name).ToArray(), Is.EqualTo(new[] { "Alice", "Charlie", "Bob" }));
 
         // Sort by email ascending: anna (Bob), mike (Alice), zara (Charlie)
         result = await MemberService.FilterAsync(filter, "email", Direction.Ascending, skip: 0, take: 10);
-        Assert.AreEqual(new[] { "Bob", "Alice", "Charlie" }, result.Items.Select(m => m.Name).ToArray());
+        Assert.That(result.Items.Select(m => m.Name).ToArray(), Is.EqualTo(new[] { "Bob", "Alice", "Charlie" }));
 
         // Sort by email descending: zara (Charlie), mike (Alice), anna (Bob)
         result = await MemberService.FilterAsync(filter, "email", Direction.Descending, skip: 0, take: 10);
-        Assert.AreEqual(new[] { "Charlie", "Alice", "Bob" }, result.Items.Select(m => m.Name).ToArray());
+        Assert.That(result.Items.Select(m => m.Name).ToArray(), Is.EqualTo(new[] { "Charlie", "Alice", "Bob" }));
 
         // Sort by memberType ascending: Alpha (Alice, Bob) before Beta (Charlie), secondary sort by name ascending
         result = await MemberService.FilterAsync(filter, "memberType", Direction.Ascending, skip: 0, take: 10);
-        Assert.AreEqual(new[] { "Alice", "Bob", "Charlie" }, result.Items.Select(m => m.Name).ToArray());
+        Assert.That(result.Items.Select(m => m.Name).ToArray(), Is.EqualTo(new[] { "Alice", "Bob", "Charlie" }));
 
         // Sort by memberType descending: Beta (Charlie) before Alpha (Alice, Bob), secondary sort by name descending
         result = await MemberService.FilterAsync(filter, "memberType", Direction.Descending, skip: 0, take: 10);
-        Assert.AreEqual(new[] { "Charlie", "Bob", "Alice" }, result.Items.Select(m => m.Name).ToArray());
+        Assert.That(result.Items.Select(m => m.Name).ToArray(), Is.EqualTo(new[] { "Charlie", "Bob", "Alice" }));
     }
 
     [Test]
@@ -1208,7 +1208,7 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
 
         var result = await MemberService.FilterAsync(filter, "name", Direction.Ascending, skip: 0, take: 10);
 
-        Assert.AreEqual(1, result.Total);
-        Assert.AreEqual("Alice", result.Items.First().Name);
+        Assert.That(result.Total, Is.EqualTo(1));
+        Assert.That(result.Items.First().Name, Is.EqualTo("Alice"));
     }
 }

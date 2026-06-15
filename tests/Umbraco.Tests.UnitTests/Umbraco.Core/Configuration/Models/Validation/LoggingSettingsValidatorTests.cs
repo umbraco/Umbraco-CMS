@@ -18,7 +18,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Configuration.Models.Validati
             var validator = new LoggingSettingsValidator();
             LoggingSettings options = BuildLoggingSettings();
             ValidateOptionsResult result = validator.Validate("settings", options);
-            Assert.True(result.Succeeded);
+            Assert.That(result.Succeeded, Is.True);
         }
 
         [Test]
@@ -27,7 +27,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Configuration.Models.Validati
             var validator = new LoggingSettingsValidator();
             LoggingSettings options = BuildLoggingSettings(fileNameFormatArguments: "MachineName,Invalid");
             ValidateOptionsResult result = validator.Validate("settings", options);
-            Assert.False(result.Succeeded);
+            Assert.That(result.Succeeded, Is.False);
         }
 
         [Test]
@@ -36,7 +36,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Configuration.Models.Validati
             var validator = new LoggingSettingsValidator();
             LoggingSettings options = BuildLoggingSettings(fileNameFormat: "InvalidAsTooManyPlaceholders_{0}_{1}");
             ValidateOptionsResult result = validator.Validate("settings", options);
-            Assert.False(result.Succeeded);
+            Assert.That(result.Succeeded, Is.False);
         }
 
         private static LoggingSettings BuildLoggingSettings(

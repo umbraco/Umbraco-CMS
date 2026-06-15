@@ -83,7 +83,7 @@ public class ContentTypeSchemaTransformerTests
         await transformer.TransformAsync(document, null!, CancellationToken.None);
 
         // Assert
-        Assert.IsNull(document.Components);
+        Assert.That(document.Components, Is.Null);
     }
 
     [Test]
@@ -100,7 +100,7 @@ public class ContentTypeSchemaTransformerTests
         await transformer.TransformAsync(document, null!, CancellationToken.None);
 
         // Assert
-        Assert.IsNull(document.Components.Schemas);
+        Assert.That(document.Components.Schemas, Is.Null);
     }
 
     [Test]
@@ -120,7 +120,7 @@ public class ContentTypeSchemaTransformerTests
         await transformer.TransformAsync(document, null!, CancellationToken.None);
 
         // Assert
-        Assert.AreEqual(0, document.Components.Schemas.Count);
+        Assert.That(document.Components.Schemas.Count, Is.EqualTo(0));
     }
 
     [Test]
@@ -150,19 +150,19 @@ public class ContentTypeSchemaTransformerTests
         await transformer.TransformAsync(document, null!, CancellationToken.None);
 
         // Assert
-        Assert.AreEqual(1, document.Components.Schemas.Count);
+        Assert.That(document.Components.Schemas, Has.Count.EqualTo(1));
         Assert.That(document.Components.Schemas.ContainsKey("TestSchema"));
 
         var schema = document.Components.Schemas["TestSchema"] as OpenApiSchema;
-        Assert.IsNotNull(schema);
-        Assert.AreEqual(JsonSchemaType.Object, schema.Type);
-        Assert.IsNotNull(schema.Properties);
-        Assert.AreEqual(1, schema.Properties.Count);
+        Assert.That(schema, Is.Not.Null);
+        Assert.That(schema.Type, Is.EqualTo(JsonSchemaType.Object));
+        Assert.That(schema.Properties, Is.Not.Null);
+        Assert.That(schema.Properties, Has.Count.EqualTo(1));
         Assert.That(schema.Properties.ContainsKey("TestProperty"));
 
         var propertySchema = schema.Properties["TestProperty"] as OpenApiSchema;
-        Assert.IsNotNull(propertySchema);
-        Assert.AreEqual(JsonSchemaType.String, propertySchema.Type);
+        Assert.That(propertySchema, Is.Not.Null);
+        Assert.That(propertySchema.Type, Is.EqualTo(JsonSchemaType.String));
     }
 
     [Test]
@@ -203,9 +203,9 @@ public class ContentTypeSchemaTransformerTests
 
         // Assert
         var parentSchema = document.Components.Schemas["ParentSchema"] as OpenApiSchema;
-        Assert.IsNotNull(parentSchema?.Properties);
+        Assert.That(parentSchema?.Properties, Is.Not.Null);
         var childProperty = parentSchema.Properties["ChildProperty"];
-        Assert.IsInstanceOf<OpenApiSchemaReference>(childProperty);
+        Assert.That(childProperty, Is.InstanceOf<OpenApiSchemaReference>());
         Assert.That(((OpenApiSchemaReference)childProperty).Reference.Id, Is.EqualTo("ChildSchema"));
     }
 
@@ -247,10 +247,10 @@ public class ContentTypeSchemaTransformerTests
 
         // Assert
         var composedSchema = document.Components.Schemas["ComposedSchema"] as OpenApiSchema;
-        Assert.IsNotNull(composedSchema);
-        Assert.IsNotNull(composedSchema.AllOf);
-        Assert.AreEqual(1, composedSchema.AllOf.Count);
-        Assert.IsInstanceOf<OpenApiSchemaReference>(composedSchema.AllOf[0]);
+        Assert.That(composedSchema, Is.Not.Null);
+        Assert.That(composedSchema.AllOf, Is.Not.Null);
+        Assert.That(composedSchema.AllOf, Has.Count.EqualTo(1));
+        Assert.That(composedSchema.AllOf[0], Is.InstanceOf<OpenApiSchemaReference>());
         var baseReference = (OpenApiSchemaReference)composedSchema.AllOf[0];
         Assert.That(baseReference.Reference?.Id, Is.EqualTo("BaseSchema"));
     }
@@ -297,12 +297,12 @@ public class ContentTypeSchemaTransformerTests
 
         // Assert
         var arraySchema = document.Components.Schemas["ArraySchema"] as OpenApiSchema;
-        Assert.IsNotNull(arraySchema);
-        Assert.IsNotNull(arraySchema.Properties);
+        Assert.That(arraySchema, Is.Not.Null);
+        Assert.That(arraySchema.Properties, Is.Not.Null);
         var itemsProperty = arraySchema.Properties["Items"] as OpenApiSchema;
-        Assert.IsNotNull(itemsProperty);
-        Assert.IsNotNull(itemsProperty.Items);
-        Assert.IsInstanceOf<OpenApiSchemaReference>(itemsProperty.Items);
+        Assert.That(itemsProperty, Is.Not.Null);
+        Assert.That(itemsProperty.Items, Is.Not.Null);
+        Assert.That(itemsProperty.Items, Is.InstanceOf<OpenApiSchemaReference>());
         var itemReference = (OpenApiSchemaReference)itemsProperty.Items;
         Assert.That(itemReference.Reference?.Id, Is.EqualTo("ItemSchema"));
     }
@@ -328,8 +328,8 @@ public class ContentTypeSchemaTransformerTests
         await transformer.TransformAsync(schema, context, CancellationToken.None);
 
         // Assert - Schema should remain unchanged (no discriminator added)
-        Assert.IsNull(schema.Discriminator);
-        Assert.IsNull(schema.OneOf);
+        Assert.That(schema.Discriminator, Is.Null);
+        Assert.That(schema.OneOf, Is.Null);
     }
 
     [Test]
@@ -358,14 +358,14 @@ public class ContentTypeSchemaTransformerTests
         // Assert - Only element types should be included
         _contentTypeSchemaServiceMock.Verify(x => x.GetDocumentTypes(), Times.Once);
 
-        Assert.IsNotNull(schema.Discriminator);
-        Assert.IsNotNull(schema.Discriminator.Mapping);
-        Assert.IsNotNull(schema.OneOf);
+        Assert.That(schema.Discriminator, Is.Not.Null);
+        Assert.That(schema.Discriminator.Mapping, Is.Not.Null);
+        Assert.That(schema.OneOf, Is.Not.Null);
 
-        Assert.AreEqual("contentType", schema.Discriminator.PropertyName);
-        Assert.AreEqual(1, schema.OneOf.Count);
-        Assert.IsTrue(schema.Discriminator.Mapping.ContainsKey("textBlock"));
-        Assert.IsFalse(schema.Discriminator.Mapping.ContainsKey("article"));
+        Assert.That(schema.Discriminator.PropertyName, Is.EqualTo("contentType"));
+        Assert.That(schema.OneOf, Has.Count.EqualTo(1));
+        Assert.That(schema.Discriminator.Mapping.ContainsKey("textBlock"), Is.True);
+        Assert.That(schema.Discriminator.Mapping.ContainsKey("article"), Is.False);
     }
 
     [Test]
@@ -394,14 +394,14 @@ public class ContentTypeSchemaTransformerTests
         // Assert - Only non-element types should be included
         _contentTypeSchemaServiceMock.Verify(x => x.GetDocumentTypes(), Times.Once);
 
-        Assert.IsNotNull(schema.Discriminator);
-        Assert.IsNotNull(schema.Discriminator.Mapping);
-        Assert.IsNotNull(schema.OneOf);
+        Assert.That(schema.Discriminator, Is.Not.Null);
+        Assert.That(schema.Discriminator.Mapping, Is.Not.Null);
+        Assert.That(schema.OneOf, Is.Not.Null);
 
-        Assert.AreEqual("contentType", schema.Discriminator.PropertyName);
-        Assert.AreEqual(1, schema.OneOf.Count);
-        Assert.IsTrue(schema.Discriminator.Mapping.ContainsKey("article"));
-        Assert.IsFalse(schema.Discriminator.Mapping.ContainsKey("textBlock"));
+        Assert.That(schema.Discriminator.PropertyName, Is.EqualTo("contentType"));
+        Assert.That(schema.OneOf, Has.Count.EqualTo(1));
+        Assert.That(schema.Discriminator.Mapping.ContainsKey("article"), Is.True);
+        Assert.That(schema.Discriminator.Mapping.ContainsKey("textBlock"), Is.False);
     }
 
     [Test]
@@ -430,14 +430,14 @@ public class ContentTypeSchemaTransformerTests
         // Assert - Only non-element types should be included for IApiContentResponse
         _contentTypeSchemaServiceMock.Verify(x => x.GetDocumentTypes(), Times.Once);
 
-        Assert.IsNotNull(schema.Discriminator);
-        Assert.IsNotNull(schema.Discriminator.Mapping);
-        Assert.IsNotNull(schema.OneOf);
+        Assert.That(schema.Discriminator, Is.Not.Null);
+        Assert.That(schema.Discriminator.Mapping, Is.Not.Null);
+        Assert.That(schema.OneOf, Is.Not.Null);
 
-        Assert.AreEqual("contentType", schema.Discriminator.PropertyName);
-        Assert.AreEqual(1, schema.OneOf.Count);
-        Assert.IsTrue(schema.Discriminator.Mapping.ContainsKey("article"));
-        Assert.IsFalse(schema.Discriminator.Mapping.ContainsKey("textBlock"));
+        Assert.That(schema.Discriminator.PropertyName, Is.EqualTo("contentType"));
+        Assert.That(schema.OneOf, Has.Count.EqualTo(1));
+        Assert.That(schema.Discriminator.Mapping.ContainsKey("article"), Is.True);
+        Assert.That(schema.Discriminator.Mapping.ContainsKey("textBlock"), Is.False);
     }
 
     [Test]
@@ -465,13 +465,13 @@ public class ContentTypeSchemaTransformerTests
         // Assert
         _contentTypeSchemaServiceMock.Verify(x => x.GetMediaTypes(), Times.Once);
 
-        Assert.IsNotNull(schema.Discriminator);
-        Assert.IsNotNull(schema.Discriminator.Mapping);
-        Assert.IsNotNull(schema.OneOf);
+        Assert.That(schema.Discriminator, Is.Not.Null);
+        Assert.That(schema.Discriminator.Mapping, Is.Not.Null);
+        Assert.That(schema.OneOf, Is.Not.Null);
 
-        Assert.AreEqual("mediaType", schema.Discriminator.PropertyName);
-        Assert.AreEqual(1, schema.OneOf.Count);
-        Assert.IsTrue(schema.Discriminator.Mapping.ContainsKey("image"));
+        Assert.That(schema.Discriminator.PropertyName, Is.EqualTo("mediaType"));
+        Assert.That(schema.OneOf, Has.Count.EqualTo(1));
+        Assert.That(schema.Discriminator.Mapping.ContainsKey("image"), Is.True);
     }
 
     [Test]
@@ -499,13 +499,13 @@ public class ContentTypeSchemaTransformerTests
         // Assert
         _contentTypeSchemaServiceMock.Verify(x => x.GetMediaTypes(), Times.Once);
 
-        Assert.IsNotNull(schema.Discriminator);
-        Assert.IsNotNull(schema.Discriminator.Mapping);
-        Assert.IsNotNull(schema.OneOf);
+        Assert.That(schema.Discriminator, Is.Not.Null);
+        Assert.That(schema.Discriminator.Mapping, Is.Not.Null);
+        Assert.That(schema.OneOf, Is.Not.Null);
 
-        Assert.AreEqual("mediaType", schema.Discriminator.PropertyName);
-        Assert.AreEqual(1, schema.OneOf.Count);
-        Assert.IsTrue(schema.Discriminator.Mapping.ContainsKey("image"));
+        Assert.That(schema.Discriminator.PropertyName, Is.EqualTo("mediaType"));
+        Assert.That(schema.OneOf, Has.Count.EqualTo(1));
+        Assert.That(schema.Discriminator.Mapping.ContainsKey("image"), Is.True);
     }
 
     [Test]
@@ -537,11 +537,11 @@ public class ContentTypeSchemaTransformerTests
         await transformer.TransformAsync(schema, context, CancellationToken.None);
 
         // Assert - the disallowed alias is filtered out before being emitted to the polymorphic union
-        Assert.IsNotNull(schema.Discriminator);
-        Assert.IsNotNull(schema.Discriminator.Mapping);
-        Assert.IsTrue(schema.Discriminator.Mapping.ContainsKey("publicArticle"));
-        Assert.IsFalse(schema.Discriminator.Mapping.ContainsKey("hiddenArticle"));
-        Assert.AreEqual(1, schema.OneOf?.Count);
+        Assert.That(schema.Discriminator, Is.Not.Null);
+        Assert.That(schema.Discriminator.Mapping, Is.Not.Null);
+        Assert.That(schema.Discriminator.Mapping.ContainsKey("publicArticle"), Is.True);
+        Assert.That(schema.Discriminator.Mapping.ContainsKey("hiddenArticle"), Is.False);
+        Assert.That(schema.OneOf?.Count, Is.EqualTo(1));
     }
 
     [Test]
@@ -574,12 +574,12 @@ public class ContentTypeSchemaTransformerTests
         await transformer.TransformAsync(schema, context, CancellationToken.None);
 
         // Assert - only the explicitly allowed aliases are emitted
-        Assert.IsNotNull(schema.Discriminator);
-        Assert.IsNotNull(schema.Discriminator.Mapping);
-        Assert.IsTrue(schema.Discriminator.Mapping.ContainsKey("articleA"));
-        Assert.IsFalse(schema.Discriminator.Mapping.ContainsKey("articleB"));
-        Assert.IsTrue(schema.Discriminator.Mapping.ContainsKey("articleC"));
-        Assert.AreEqual(2, schema.OneOf?.Count);
+        Assert.That(schema.Discriminator, Is.Not.Null);
+        Assert.That(schema.Discriminator.Mapping, Is.Not.Null);
+        Assert.That(schema.Discriminator.Mapping.ContainsKey("articleA"), Is.True);
+        Assert.That(schema.Discriminator.Mapping.ContainsKey("articleB"), Is.False);
+        Assert.That(schema.Discriminator.Mapping.ContainsKey("articleC"), Is.True);
+        Assert.That(schema.OneOf?.Count, Is.EqualTo(2));
     }
 
     private ContentTypeSchemaTransformer CreateTransformer() =>

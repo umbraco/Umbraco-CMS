@@ -38,8 +38,8 @@ public partial class ElementEditingServiceTests
             element.Key,
             validateModel,
             Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.Success));
     }
 
     [Test]
@@ -65,7 +65,7 @@ public partial class ElementEditingServiceTests
         };
 
         var createResult = await ElementEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(createResult.Success);
+        Assert.That(createResult.Success, Is.True);
 
         var validateModel = new ValidateElementUpdateModel
         {
@@ -84,12 +84,11 @@ public partial class ElementEditingServiceTests
             createResult.Result.Content!.Key,
             validateModel,
             Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.PropertyValidationError, result.Status);
-        Assert.AreEqual(1, result.Result.ValidationErrors.Count());
-        Assert.AreEqual(
-            "#validation_invalidNull",
-            result.Result.ValidationErrors.Single(x => x.Alias == "title").ErrorMessages[0]);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.PropertyValidationError));
+        Assert.That(result.Result.ValidationErrors.Count(), Is.EqualTo(1));
+        Assert.That(
+            result.Result.ValidationErrors.Single(x => x.Alias == "title").ErrorMessages[0], Is.EqualTo("#validation_invalidNull"));
     }
 
     [Test]
@@ -116,8 +115,8 @@ public partial class ElementEditingServiceTests
             element.Key,
             validateModel,
             Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.Success));
     }
 
     [Test]
@@ -144,12 +143,11 @@ public partial class ElementEditingServiceTests
             element.Key,
             validateModel,
             Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.PropertyValidationError, result.Status);
-        Assert.AreEqual(1, result.Result.ValidationErrors.Count());
-        Assert.AreEqual(
-            "#validation_invalidNull",
-            result.Result.ValidationErrors.Single(x => x.Alias == "variantTitle" && x.Culture == "da-DK").ErrorMessages[0]);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.PropertyValidationError));
+        Assert.That(result.Result.ValidationErrors.Count(), Is.EqualTo(1));
+        Assert.That(
+            result.Result.ValidationErrors.Single(x => x.Alias == "variantTitle" && x.Culture == "da-DK").ErrorMessages[0], Is.EqualTo("#validation_invalidNull"));
     }
 
     [Test]
@@ -175,8 +173,8 @@ public partial class ElementEditingServiceTests
         };
 
         var result = await ElementEditingService.ValidateCreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.Success));
     }
 
     [Test]
@@ -203,12 +201,11 @@ public partial class ElementEditingServiceTests
 
         var result = await ElementEditingService
             .ValidateCreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.PropertyValidationError, result.Status);
-        Assert.AreEqual(1, result.Result.ValidationErrors.Count());
-        Assert.AreEqual(
-            "#validation_invalidNull",
-            result.Result.ValidationErrors.Single(x => x.Alias == "title").ErrorMessages[0]);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.PropertyValidationError));
+        Assert.That(result.Result.ValidationErrors.Count(), Is.EqualTo(1));
+        Assert.That(
+            result.Result.ValidationErrors.Single(x => x.Alias == "title").ErrorMessages[0], Is.EqualTo("#validation_invalidNull"));
     }
 
     [Test]
@@ -232,8 +229,8 @@ public partial class ElementEditingServiceTests
         };
 
         var result = await ElementEditingService.ValidateUpdateAsync(element.Key, validateModel, englishEditor.Key);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.Success));
     }
 
     [Test]
@@ -252,8 +249,8 @@ public partial class ElementEditingServiceTests
             Guid.NewGuid(),
             validateModel,
             Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.NotFound, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.NotFound));
     }
 
     private async Task<IUser> CreateEnglishLanguageOnlyEditor()
@@ -267,7 +264,7 @@ public partial class ElementEditingServiceTests
 
         var createUserGroupResult = await UserGroupService
             .CreateAsync(userGroup, Constants.Security.SuperUserKey);
-        Assert.IsTrue(createUserGroupResult.Success);
+        Assert.That(createUserGroupResult.Success, Is.True);
 
         var createUserAttempt = await UserService.CreateAsync(Constants.Security.SuperUserKey, new UserCreateModel
         {
@@ -276,7 +273,7 @@ public partial class ElementEditingServiceTests
             UserName = "english-editor@test.com",
             UserGroupKeys = new[] { userGroup.Key }.ToHashSet(),
         });
-        Assert.IsTrue(createUserAttempt.Success);
+        Assert.That(createUserAttempt.Success, Is.True);
 
         return await UserService.GetAsync(createUserAttempt.Result.CreatedUser!.Key);
     }

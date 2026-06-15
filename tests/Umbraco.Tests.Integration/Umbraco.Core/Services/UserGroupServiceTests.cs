@@ -39,15 +39,15 @@ internal sealed class UserGroupServiceTests : UmbracoIntegrationTest
         var result = await UserGroupService.CreateAsync(userGroup, Constants.Security.SuperUserKey);
         var createdUserGroup = await UserGroupService.GetAsync(result.Result.Key);
 
-        Assert.IsTrue(result.Success);
-        Assert.IsNotNull(createdUserGroup);
-        Assert.AreEqual(userGroup.Name, createdUserGroup.Name);
-        Assert.AreEqual(userGroup.Alias, createdUserGroup.Alias);
-        Assert.AreEqual(userGroup.Description, createdUserGroup.Description);
-        Assert.AreEqual(userGroup.Icon, createdUserGroup.Icon);
-        Assert.AreEqual(userGroup.HasAccessToAllLanguages, createdUserGroup.HasAccessToAllLanguages);
-        CollectionAssert.AreEquivalent(userGroup.Permissions, createdUserGroup.Permissions);
-        CollectionAssert.AreEquivalent(userGroup.AllowedSections, createdUserGroup.AllowedSections);
+        Assert.That(result.Success, Is.True);
+        Assert.That(createdUserGroup, Is.Not.Null);
+        Assert.That(createdUserGroup.Name, Is.EqualTo(userGroup.Name));
+        Assert.That(createdUserGroup.Alias, Is.EqualTo(userGroup.Alias));
+        Assert.That(createdUserGroup.Description, Is.EqualTo(userGroup.Description));
+        Assert.That(createdUserGroup.Icon, Is.EqualTo(userGroup.Icon));
+        Assert.That(createdUserGroup.HasAccessToAllLanguages, Is.EqualTo(userGroup.HasAccessToAllLanguages));
+        Assert.That(createdUserGroup.Permissions, Is.EquivalentTo(userGroup.Permissions));
+        Assert.That(createdUserGroup.AllowedSections, Is.EquivalentTo(userGroup.AllowedSections));
     }
 
     [Test]
@@ -72,7 +72,7 @@ internal sealed class UserGroupServiceTests : UmbracoIntegrationTest
         var createResult = await UserGroupService.CreateAsync(userGroup, Constants.Security.SuperUserKey);
         var createdUserGroup = await UserGroupService.GetAsync(createResult.Result.Key);
 
-        Assert.IsTrue(createResult.Success);
+        Assert.That(createResult.Success, Is.True);
         createdUserGroup.Name = "Updated Name";
         createdUserGroup.Alias = "updatedAlias";
         createdUserGroup.Description = "Updated description";
@@ -85,15 +85,15 @@ internal sealed class UserGroupServiceTests : UmbracoIntegrationTest
         var updateResult = await UserGroupService.UpdateAsync(createdUserGroup, Constants.Security.SuperUserKey);
         var updatedUserGroup = await UserGroupService.GetAsync(updateResult.Result.Key);
 
-        Assert.IsTrue(updateResult.Success);
-        Assert.IsNotNull(updatedUserGroup);
-        Assert.AreEqual(createdUserGroup.Name, updatedUserGroup.Name);
-        Assert.AreEqual(createdUserGroup.Alias, updatedUserGroup.Alias);
-        Assert.AreEqual(createdUserGroup.Description, updatedUserGroup.Description);
-        Assert.AreEqual(createdUserGroup.Icon, updatedUserGroup.Icon);
-        Assert.AreEqual(createdUserGroup.HasAccessToAllLanguages, updatedUserGroup.HasAccessToAllLanguages);
-        CollectionAssert.AreEquivalent(createdUserGroup.Permissions, updatedUserGroup.Permissions);
-        CollectionAssert.AreEquivalent(createdUserGroup.AllowedSections, updatedUserGroup.AllowedSections);
+        Assert.That(updateResult.Success, Is.True);
+        Assert.That(updatedUserGroup, Is.Not.Null);
+        Assert.That(updatedUserGroup.Name, Is.EqualTo(createdUserGroup.Name));
+        Assert.That(updatedUserGroup.Alias, Is.EqualTo(createdUserGroup.Alias));
+        Assert.That(updatedUserGroup.Description, Is.EqualTo(createdUserGroup.Description));
+        Assert.That(updatedUserGroup.Icon, Is.EqualTo(createdUserGroup.Icon));
+        Assert.That(updatedUserGroup.HasAccessToAllLanguages, Is.EqualTo(createdUserGroup.HasAccessToAllLanguages));
+        Assert.That(updatedUserGroup.Permissions, Is.EquivalentTo(createdUserGroup.Permissions));
+        Assert.That(updatedUserGroup.AllowedSections, Is.EquivalentTo(createdUserGroup.AllowedSections));
     }
 
     [Test]
@@ -106,8 +106,8 @@ internal sealed class UserGroupServiceTests : UmbracoIntegrationTest
 
         var result = await UserGroupService.CreateAsync(userGroup, Constants.Security.SuperUserKey);
 
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(UserGroupOperationStatus.MissingName, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(UserGroupOperationStatus.MissingName));
     }
 
     [Test]
@@ -120,8 +120,8 @@ internal sealed class UserGroupServiceTests : UmbracoIntegrationTest
 
         var result = await UserGroupService.CreateAsync(userGroup, Constants.Security.SuperUserKey);
 
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(UserGroupOperationStatus.NameTooLong, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(UserGroupOperationStatus.NameTooLong));
     }
 
     [Test]
@@ -135,8 +135,8 @@ internal sealed class UserGroupServiceTests : UmbracoIntegrationTest
 
         var result = await UserGroupService.CreateAsync(userGroup, Constants.Security.SuperUserKey);
 
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(UserGroupOperationStatus.AliasTooLong, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(UserGroupOperationStatus.AliasTooLong));
     }
 
     [Test]
@@ -150,8 +150,8 @@ internal sealed class UserGroupServiceTests : UmbracoIntegrationTest
 
         var result = await UserGroupService.UpdateAsync(userGroup, Constants.Security.SuperUserKey);
 
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(UserGroupOperationStatus.NotFound, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(UserGroupOperationStatus.NotFound));
     }
 
     [Test]
@@ -165,12 +165,12 @@ internal sealed class UserGroupServiceTests : UmbracoIntegrationTest
 
         var result = await UserGroupService.CreateAsync(userGroup, Constants.Security.SuperUserKey);
 
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
 
         result = await UserGroupService.CreateAsync(userGroup, Constants.Security.SuperUserKey);
 
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(UserGroupOperationStatus.AlreadyExists, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(UserGroupOperationStatus.AlreadyExists));
     }
 
     [Test]
@@ -184,7 +184,7 @@ internal sealed class UserGroupServiceTests : UmbracoIntegrationTest
             Alias = alias
         };
         var setupResult = await UserGroupService.CreateAsync(existingUserGroup, Constants.Security.SuperUserKey);
-        Assert.IsTrue(setupResult.Success);
+        Assert.That(setupResult.Success, Is.True);
 
         var newUserGroup = new UserGroup(ShortStringHelper)
         {
@@ -193,8 +193,8 @@ internal sealed class UserGroupServiceTests : UmbracoIntegrationTest
         };
         var result = await UserGroupService.CreateAsync(newUserGroup, Constants.Security.SuperUserKey);
 
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(UserGroupOperationStatus.DuplicateAlias, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(UserGroupOperationStatus.DuplicateAlias));
     }
 
     [Test]
@@ -208,7 +208,7 @@ internal sealed class UserGroupServiceTests : UmbracoIntegrationTest
             Alias = alias
         };
         var setupResult = await UserGroupService.CreateAsync(existingUserGroup, Constants.Security.SuperUserKey);
-        Assert.IsTrue(setupResult.Success);
+        Assert.That(setupResult.Success, Is.True);
 
         IUserGroup userGroupToUpdate = new UserGroup(ShortStringHelper)
         {
@@ -216,7 +216,7 @@ internal sealed class UserGroupServiceTests : UmbracoIntegrationTest
             Alias = "somAlias",
         };
         var creationResult = await UserGroupService.CreateAsync(userGroupToUpdate, Constants.Security.SuperUserKey);
-        Assert.IsTrue(creationResult.Success);
+        Assert.That(creationResult.Success, Is.True);
 
 
         userGroupToUpdate = creationResult.Result;
@@ -224,8 +224,8 @@ internal sealed class UserGroupServiceTests : UmbracoIntegrationTest
         userGroupToUpdate.Alias = alias;
 
         var updateResult = await UserGroupService.UpdateAsync(userGroupToUpdate, Constants.Security.SuperUserKey);
-        Assert.IsFalse(updateResult.Success);
-        Assert.AreEqual(UserGroupOperationStatus.DuplicateAlias, updateResult.Status);
+        Assert.That(updateResult.Success, Is.False);
+        Assert.That(updateResult.Status, Is.EqualTo(UserGroupOperationStatus.DuplicateAlias));
     }
 
     [Test]
@@ -237,15 +237,15 @@ internal sealed class UserGroupServiceTests : UmbracoIntegrationTest
             Alias = "someAlias"
         };
         var setupResult = await UserGroupService.CreateAsync(userGroup, Constants.Security.SuperUserKey);
-        Assert.IsTrue(setupResult.Success);
+        Assert.That(setupResult.Success, Is.True);
 
 
         var updateName = "New Name";
         userGroup.Name = updateName;
         var updateResult = await UserGroupService.UpdateAsync(userGroup, Constants.Security.SuperUserKey);
-        Assert.IsTrue(updateResult.Success);
+        Assert.That(updateResult.Success, Is.True);
         var updatedGroup = updateResult.Result;
-        Assert.AreEqual(updateName, updatedGroup.Name);
+        Assert.That(updatedGroup.Name, Is.EqualTo(updateName));
     }
 
     [TestCase(Constants.Security.AdminGroupKeyString, "admin")]
@@ -256,13 +256,13 @@ internal sealed class UserGroupServiceTests : UmbracoIntegrationTest
         // since we can't use the constants as input, let's make sure we don't get false positives by double checking the group alias
         var key = Guid.Parse(userGroupKeyAsString);
         var userGroup = await UserGroupService.GetAsync(key);
-        Assert.IsNotNull(userGroup);
-        Assert.AreEqual(expectedGroupAlias, userGroup.Alias);
+        Assert.That(userGroup, Is.Not.Null);
+        Assert.That(userGroup.Alias, Is.EqualTo(expectedGroupAlias));
 
         var result = await UserGroupService.DeleteAsync(key);
 
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(UserGroupOperationStatus.CanNotDeleteIsSystemUserGroup, result.Result);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Result, Is.EqualTo(UserGroupOperationStatus.CanNotDeleteIsSystemUserGroup));
     }
 
     [TestCase( Constants.Security.EditorGroupKeyString, "editor")]
@@ -272,12 +272,12 @@ internal sealed class UserGroupServiceTests : UmbracoIntegrationTest
         // since we can't use the constants as input, let's make sure we don't get false positives by double checking the group alias
         var key = Guid.Parse(userGroupKeyAsString);
         var userGroup = await UserGroupService.GetAsync(key);
-        Assert.IsNotNull(userGroup);
-        Assert.AreEqual(expectedGroupAlias, userGroup.Alias);
+        Assert.That(userGroup, Is.Not.Null);
+        Assert.That(userGroup.Alias, Is.EqualTo(expectedGroupAlias));
 
         var result = await UserGroupService.DeleteAsync(key);
 
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(result.Result,UserGroupOperationStatus.Success);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.EqualTo(UserGroupOperationStatus.Success));
     }
 }

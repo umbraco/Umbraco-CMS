@@ -17,28 +17,28 @@ public class MachineInfoFactoryTests
     public void BuildMachineIdentifier_WithNoSiteName_ReturnsMachineNameOnly()
     {
         var result = MachineInfoFactory.BuildMachineIdentifier("SERVER01", null);
-        Assert.AreEqual("SERVER01", result);
+        Assert.That(result, Is.EqualTo("SERVER01"));
     }
 
     [Test]
     public void BuildMachineIdentifier_WithEmptySiteName_ReturnsMachineNameOnly()
     {
         var result = MachineInfoFactory.BuildMachineIdentifier("SERVER01", string.Empty);
-        Assert.AreEqual("SERVER01", result);
+        Assert.That(result, Is.EqualTo("SERVER01"));
     }
 
     [Test]
     public void BuildMachineIdentifier_WithWhitespaceSiteName_ReturnsMachineNameOnly()
     {
         var result = MachineInfoFactory.BuildMachineIdentifier("SERVER01", "   ");
-        Assert.AreEqual("SERVER01", result);
+        Assert.That(result, Is.EqualTo("SERVER01"));
     }
 
     [Test]
     public void BuildMachineIdentifier_WithSiteName_ReturnsMachineNameSlashSiteName()
     {
         var result = MachineInfoFactory.BuildMachineIdentifier("SERVER01", "site1");
-        Assert.AreEqual("SERVER01/site1", result);
+        Assert.That(result, Is.EqualTo("SERVER01/site1"));
     }
 
     [Test]
@@ -46,7 +46,7 @@ public class MachineInfoFactoryTests
     {
         var factory = CreateFactory(siteName: null);
         var result = factory.GetMachineIdentifier();
-        Assert.AreEqual(MachineInfoFactory.BuildMachineIdentifier(Environment.MachineName, null), result);
+        Assert.That(result, Is.EqualTo(MachineInfoFactory.BuildMachineIdentifier(Environment.MachineName, null)));
     }
 
     [Test]
@@ -54,7 +54,7 @@ public class MachineInfoFactoryTests
     {
         var factory = CreateFactory(siteName: string.Empty);
         var result = factory.GetMachineIdentifier();
-        Assert.AreEqual(MachineInfoFactory.BuildMachineIdentifier(Environment.MachineName, string.Empty), result);
+        Assert.That(result, Is.EqualTo(MachineInfoFactory.BuildMachineIdentifier(Environment.MachineName, string.Empty)));
     }
 
     [Test]
@@ -62,7 +62,7 @@ public class MachineInfoFactoryTests
     {
         var factory = CreateFactory(siteName: "   ");
         var result = factory.GetMachineIdentifier();
-        Assert.AreEqual(MachineInfoFactory.BuildMachineIdentifier(Environment.MachineName, "   "), result);
+        Assert.That(result, Is.EqualTo(MachineInfoFactory.BuildMachineIdentifier(Environment.MachineName, "   ")));
     }
 
     [Test]
@@ -70,7 +70,7 @@ public class MachineInfoFactoryTests
     {
         var factory = CreateFactory(siteName: "site1");
         var result = factory.GetMachineIdentifier();
-        Assert.AreEqual(MachineInfoFactory.BuildMachineIdentifier(Environment.MachineName, "site1"), result);
+        Assert.That(result, Is.EqualTo(MachineInfoFactory.BuildMachineIdentifier(Environment.MachineName, "site1")));
     }
 
     [Test]

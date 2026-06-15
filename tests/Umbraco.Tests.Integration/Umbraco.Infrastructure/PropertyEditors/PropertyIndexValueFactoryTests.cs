@@ -41,7 +41,7 @@ internal sealed class PropertyIndexValueFactoryTests : UmbracoIntegrationTest
 
         var dataTypeId = contentType.PropertyTypes.First(propertyType => propertyType.Alias == "bodyText").DataTypeId;
         var keyAttempt = IdKeyMap.GetKeyForId(dataTypeId, UmbracoObjectTypes.DataType);
-        Assert.IsTrue(keyAttempt.Success, $"Could not resolve a GUID key for data type id {dataTypeId}.");
+        Assert.That(keyAttempt.Success, Is.True, $"Could not resolve a GUID key for data type id {dataTypeId}.");
         var dataType = (await DataTypeService.GetAsync(keyAttempt.Result))!;
         var editor = dataType.Editor!;
 
@@ -89,17 +89,17 @@ internal sealed class PropertyIndexValueFactoryTests : UmbracoIntegrationTest
             });
 
         var indexValue = indexValues.FirstOrDefault(v => v.FieldName == "bodyText");
-        Assert.IsNotNull(indexValue);
+        Assert.That(indexValue, Is.Not.Null);
 
-        Assert.AreEqual(1, indexValue.Values.Count());
+        Assert.That(indexValue.Values.Count(), Is.EqualTo(1));
         var bodyTextIndexValue = indexValue.Values.First() as string;
-        Assert.IsNotNull(bodyTextIndexValue);
+        Assert.That(bodyTextIndexValue, Is.Not.Null);
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(bodyTextIndexValue.Contains("This is some markup"));
-            Assert.IsTrue(bodyTextIndexValue.Contains("The single line of text in the block"));
-            Assert.IsTrue(bodyTextIndexValue.Contains("The body text in the block"));
+            Assert.That(bodyTextIndexValue, Does.Contain("This is some markup"));
+            Assert.That(bodyTextIndexValue, Does.Contain("The single line of text in the block"));
+            Assert.That(bodyTextIndexValue, Does.Contain("The body text in the block"));
         });
     }
 
@@ -112,7 +112,7 @@ internal sealed class PropertyIndexValueFactoryTests : UmbracoIntegrationTest
 
         var dataTypeId = contentType.PropertyTypes.First(propertyType => propertyType.Alias == "bodyText").DataTypeId;
         var keyAttempt = IdKeyMap.GetKeyForId(dataTypeId, UmbracoObjectTypes.DataType);
-        Assert.IsTrue(keyAttempt.Success, $"Could not resolve a GUID key for data type id {dataTypeId}.");
+        Assert.That(keyAttempt.Success, Is.True, $"Could not resolve a GUID key for data type id {dataTypeId}.");
         var dataType = (await DataTypeService.GetAsync(keyAttempt.Result))!;
         var editor = dataType.Editor!;
 
@@ -132,12 +132,12 @@ internal sealed class PropertyIndexValueFactoryTests : UmbracoIntegrationTest
             });
 
         var indexValue = indexValues.FirstOrDefault(v => v.FieldName == "bodyText");
-        Assert.IsNotNull(indexValue);
+        Assert.That(indexValue, Is.Not.Null);
 
-        Assert.AreEqual(1, indexValue.Values.Count());
+        Assert.That(indexValue.Values.Count(), Is.EqualTo(1));
         var bodyTextIndexValue = indexValue.Values.First() as string;
-        Assert.IsNotNull(bodyTextIndexValue);
-        Assert.IsTrue(bodyTextIndexValue.Contains("This is some markup"));
+        Assert.That(bodyTextIndexValue, Is.Not.Null);
+        Assert.That(bodyTextIndexValue, Does.Contain("This is some markup"));
     }
 
     [Test]
@@ -216,16 +216,16 @@ internal sealed class PropertyIndexValueFactoryTests : UmbracoIntegrationTest
             });
 
         var indexValue = indexValues.FirstOrDefault(v => v.FieldName == "blocks");
-        Assert.IsNotNull(indexValue);
+        Assert.That(indexValue, Is.Not.Null);
 
-        Assert.AreEqual(1, indexValue.Values.Count());
+        Assert.That(indexValue.Values.Count(), Is.EqualTo(1));
         var blockIndexValue = indexValue.Values.First() as string;
-        Assert.IsNotNull(blockIndexValue);
+        Assert.That(blockIndexValue, Is.Not.Null);
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(blockIndexValue.Contains("The single line of text in the block"));
-            Assert.IsTrue(blockIndexValue.Contains("The body text in the block"));
+            Assert.That(blockIndexValue, Does.Contain("The single line of text in the block"));
+            Assert.That(blockIndexValue, Does.Contain("The body text in the block"));
         });
     }
 
@@ -345,18 +345,18 @@ internal sealed class PropertyIndexValueFactoryTests : UmbracoIntegrationTest
             });
 
         var indexValue = indexValues.FirstOrDefault(v => v.FieldName == "blocks");
-        Assert.IsNotNull(indexValue);
+        Assert.That(indexValue, Is.Not.Null);
 
-        Assert.AreEqual(1, indexValue.Values.Count());
+        Assert.That(indexValue.Values.Count(), Is.EqualTo(1));
         var blockIndexValue = indexValue.Values.First() as string;
-        Assert.IsNotNull(blockIndexValue);
+        Assert.That(blockIndexValue, Is.Not.Null);
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(blockIndexValue.Contains("The single line of text in the grid root"));
-            Assert.IsTrue(blockIndexValue.Contains("The body text in the grid root"));
-            Assert.IsTrue(blockIndexValue.Contains("The single line of text in the grid area"));
-            Assert.IsTrue(blockIndexValue.Contains("The body text in the grid area"));
+            Assert.That(blockIndexValue, Does.Contain("The single line of text in the grid root"));
+            Assert.That(blockIndexValue, Does.Contain("The body text in the grid root"));
+            Assert.That(blockIndexValue, Does.Contain("The single line of text in the grid area"));
+            Assert.That(blockIndexValue, Does.Contain("The body text in the grid area"));
         });
     }
 }

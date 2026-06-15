@@ -50,10 +50,10 @@ public class UmbExternalLoginControllerTests
 
         IActionResult result = await controller.ExternalLoginCallback("/after");
 
-        Assert.IsInstanceOf<UmbracoPageResult>(result);
+        Assert.That(result, Is.InstanceOf<UmbracoPageResult>());
         var errors = controller.ViewData.GetExternalSignInProviderErrors();
-        Assert.IsNotNull(errors);
-        Assert.Contains("Invalid response from the login provider", errors!.Errors.ToList());
+        Assert.That(errors, Is.Not.Null);
+        Assert.That(errors!.Errors.ToList(), Does.Contain("Invalid response from the login provider"));
     }
 
     [Test]
@@ -72,8 +72,8 @@ public class UmbExternalLoginControllerTests
         IActionResult result = await controller.ExternalLoginCallback("/after");
 
         var redirect = result as RedirectResult;
-        Assert.IsNotNull(redirect);
-        Assert.AreEqual("/after", redirect!.Url);
+        Assert.That(redirect, Is.Not.Null);
+        Assert.That(redirect!.Url, Is.EqualTo("/after"));
         _signInManagerMock.Verify(x => x.UpdateExternalAuthenticationTokensAsync(loginInfo), Times.Once);
     }
 
@@ -92,7 +92,7 @@ public class UmbExternalLoginControllerTests
 
         IActionResult result = await controller.ExternalLoginCallback("https://evil.com");
 
-        Assert.IsInstanceOf<RedirectToUmbracoPageResult>(result);
+        Assert.That(result, Is.InstanceOf<RedirectToUmbracoPageResult>());
     }
 
     [Test]
@@ -109,7 +109,7 @@ public class UmbExternalLoginControllerTests
 
         IActionResult result = await controller.ExternalLinkLoginCallback("https://evil.com");
 
-        Assert.IsInstanceOf<RedirectToUmbracoPageResult>(result);
+        Assert.That(result, Is.InstanceOf<RedirectToUmbracoPageResult>());
     }
 
     [Test]
@@ -125,7 +125,7 @@ public class UmbExternalLoginControllerTests
 
         IActionResult result = await controller.Disassociate("Provider", "key", "https://evil.com");
 
-        Assert.IsInstanceOf<RedirectToUmbracoPageResult>(result);
+        Assert.That(result, Is.InstanceOf<RedirectToUmbracoPageResult>());
     }
 
     [Test]
@@ -146,7 +146,7 @@ public class UmbExternalLoginControllerTests
 
         IActionResult result = await controller.ExternalLoginCallback("/after");
 
-        Assert.IsInstanceOf<BadRequestObjectResult>(result);
+        Assert.That(result, Is.InstanceOf<BadRequestObjectResult>());
     }
 
     [Test]
@@ -171,8 +171,8 @@ public class UmbExternalLoginControllerTests
 
         IActionResult result = await controller.ExternalLoginCallback("/after");
 
-        Assert.IsInstanceOf<UmbracoPageResult>(result);
-        Assert.IsTrue(controller.ViewData.TryGetTwoFactorProviderNames(out var names));
+        Assert.That(result, Is.InstanceOf<UmbracoPageResult>());
+        Assert.That(controller.ViewData.TryGetTwoFactorProviderNames(out var names), Is.True);
         Assert.That(names, Is.EquivalentTo(new[] { "AppAuth" }));
     }
 
@@ -191,9 +191,9 @@ public class UmbExternalLoginControllerTests
 
         IActionResult result = await controller.ExternalLoginCallback("/after");
 
-        Assert.IsInstanceOf<UmbracoPageResult>(result);
+        Assert.That(result, Is.InstanceOf<UmbracoPageResult>());
         var errors = controller.ViewData.GetExternalSignInProviderErrors();
-        Assert.IsNotNull(errors);
+        Assert.That(errors, Is.Not.Null);
         Assert.That(errors!.Errors.Single(), Does.Contain("is locked out"));
     }
 
@@ -212,9 +212,9 @@ public class UmbExternalLoginControllerTests
 
         IActionResult result = await controller.ExternalLoginCallback("/after");
 
-        Assert.IsInstanceOf<UmbracoPageResult>(result);
+        Assert.That(result, Is.InstanceOf<UmbracoPageResult>());
         var errors = controller.ViewData.GetExternalSignInProviderErrors();
-        Assert.IsNotNull(errors);
+        Assert.That(errors, Is.Not.Null);
         Assert.That(errors!.Errors.Single(), Does.Contain("has not been linked to an account"));
     }
 
@@ -229,10 +229,10 @@ public class UmbExternalLoginControllerTests
 
         IActionResult result = await controller.ExternalLinkLoginCallback("/after");
 
-        Assert.IsInstanceOf<UmbracoPageResult>(result);
+        Assert.That(result, Is.InstanceOf<UmbracoPageResult>());
         var errors = controller.ViewData.GetExternalSignInProviderErrors();
-        Assert.IsNotNull(errors);
-        Assert.Contains("Local user does not exist", errors!.Errors.ToList());
+        Assert.That(errors, Is.Not.Null);
+        Assert.That(errors!.Errors.ToList(), Does.Contain("Local user does not exist"));
     }
 
     [Test]
@@ -247,10 +247,10 @@ public class UmbExternalLoginControllerTests
 
         IActionResult result = await controller.ExternalLinkLoginCallback("/after");
 
-        Assert.IsInstanceOf<UmbracoPageResult>(result);
+        Assert.That(result, Is.InstanceOf<UmbracoPageResult>());
         var errors = controller.ViewData.GetExternalSignInProviderErrors();
-        Assert.IsNotNull(errors);
-        Assert.Contains("An error occurred, could not get external login info", errors!.Errors.ToList());
+        Assert.That(errors, Is.Not.Null);
+        Assert.That(errors!.Errors.ToList(), Does.Contain("An error occurred, could not get external login info"));
     }
 
     [Test]
@@ -268,8 +268,8 @@ public class UmbExternalLoginControllerTests
         IActionResult result = await controller.ExternalLinkLoginCallback("/after");
 
         var redirect = result as RedirectResult;
-        Assert.IsNotNull(redirect);
-        Assert.AreEqual("/after", redirect!.Url);
+        Assert.That(redirect, Is.Not.Null);
+        Assert.That(redirect!.Url, Is.EqualTo("/after"));
         _signInManagerMock.Verify(x => x.UpdateExternalAuthenticationTokensAsync(loginInfo), Times.Once);
     }
 
@@ -289,10 +289,10 @@ public class UmbExternalLoginControllerTests
 
         IActionResult result = await controller.ExternalLinkLoginCallback("/after");
 
-        Assert.IsInstanceOf<UmbracoPageResult>(result);
+        Assert.That(result, Is.InstanceOf<UmbracoPageResult>());
         var errors = controller.ViewData.GetExternalSignInProviderErrors();
-        Assert.IsNotNull(errors);
-        Assert.Contains("Already linked", errors!.Errors.ToList());
+        Assert.That(errors, Is.Not.Null);
+        Assert.That(errors!.Errors.ToList(), Does.Contain("Already linked"));
     }
 
     [Test]
@@ -309,8 +309,8 @@ public class UmbExternalLoginControllerTests
         IActionResult result = await controller.Disassociate("Provider", "key", "/after");
 
         var redirect = result as RedirectResult;
-        Assert.IsNotNull(redirect);
-        Assert.AreEqual("/after", redirect!.Url);
+        Assert.That(redirect, Is.Not.Null);
+        Assert.That(redirect!.Url, Is.EqualTo("/after"));
         _signInManagerMock.Verify(x => x.SignInAsync(user, false, null), Times.Once);
     }
 
@@ -327,8 +327,8 @@ public class UmbExternalLoginControllerTests
 
         IActionResult result = await controller.Disassociate("Provider", "key", "/after");
 
-        Assert.IsInstanceOf<UmbracoPageResult>(result);
-        Assert.IsTrue(controller.ModelState[string.Empty]!.Errors.Any(e => e.ErrorMessage == "Cannot remove last login"));
+        Assert.That(result, Is.InstanceOf<UmbracoPageResult>());
+        Assert.That(controller.ModelState[string.Empty]!.Errors.Any(e => e.ErrorMessage == "Cannot remove last login"), Is.True);
     }
 
     [Test]
@@ -338,7 +338,7 @@ public class UmbExternalLoginControllerTests
 
         IActionResult result = await controller.Disassociate("Provider", "key");
 
-        Assert.IsInstanceOf<UmbracoPageResult>(result);
+        Assert.That(result, Is.InstanceOf<UmbracoPageResult>());
         _memberManagerMock.Verify(x => x.RemoveLoginAsync(It.IsAny<MemberIdentityUser>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
     }
 
@@ -351,7 +351,7 @@ public class UmbExternalLoginControllerTests
 
         IActionResult result = await controller.Disassociate("Provider", "key");
 
-        Assert.IsInstanceOf<UmbracoPageResult>(result);
+        Assert.That(result, Is.InstanceOf<UmbracoPageResult>());
         _memberManagerMock.Verify(x => x.RemoveLoginAsync(It.IsAny<MemberIdentityUser>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
     }
 

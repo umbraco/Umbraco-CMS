@@ -17,7 +17,7 @@ public class HostingSettingsValidatorTests
         var validator = new HostingSettingsValidator();
         var options = new HostingSettings();
         var result = validator.Validate("settings", options);
-        Assert.True(result.Succeeded);
+        Assert.That(result.Succeeded, Is.True);
     }
 
     [Test]
@@ -26,7 +26,7 @@ public class HostingSettingsValidatorTests
         var validator = new HostingSettingsValidator();
         var options = new HostingSettings { SiteName = null };
         var result = validator.Validate("settings", options);
-        Assert.True(result.Succeeded);
+        Assert.That(result.Succeeded, Is.True);
     }
 
     [Test]
@@ -35,7 +35,7 @@ public class HostingSettingsValidatorTests
         var validator = new HostingSettingsValidator();
         var options = new HostingSettings { SiteName = "site1" };
         var result = validator.Validate("settings", options);
-        Assert.True(result.Succeeded);
+        Assert.That(result.Succeeded, Is.True);
     }
 
     [Test]
@@ -44,6 +44,6 @@ public class HostingSettingsValidatorTests
         var validator = new HostingSettingsValidator();
         var options = new HostingSettings { SiteName = new string('x', MachineInfoFactory.MaxMachineIdentifierLength) };
         var result = validator.Validate("settings", options);
-        Assert.False(result.Succeeded);
+        Assert.That(result.Succeeded, Is.False);
     }
 }

@@ -44,15 +44,15 @@ public class LocalizedTextServiceTests
 
         var result = txtService.GetAllStoredValues(culture);
 
-        Assert.AreEqual(4, result.Count);
-        Assert.AreEqual("testArea1/testKey1", result.ElementAt(0).Key);
-        Assert.AreEqual("testArea1/testKey2", result.ElementAt(1).Key);
-        Assert.AreEqual("testArea2/blah1", result.ElementAt(2).Key);
-        Assert.AreEqual("testArea2/blah2", result.ElementAt(3).Key);
-        Assert.AreEqual("testValue1", result["testArea1/testKey1"]);
-        Assert.AreEqual("testValue2", result["testArea1/testKey2"]);
-        Assert.AreEqual("blahValue1", result["testArea2/blah1"]);
-        Assert.AreEqual("blahValue2", result["testArea2/blah2"]);
+        Assert.That(result, Has.Count.EqualTo(4));
+        Assert.That(result.ElementAt(0).Key, Is.EqualTo("testArea1/testKey1"));
+        Assert.That(result.ElementAt(1).Key, Is.EqualTo("testArea1/testKey2"));
+        Assert.That(result.ElementAt(2).Key, Is.EqualTo("testArea2/blah1"));
+        Assert.That(result.ElementAt(3).Key, Is.EqualTo("testArea2/blah2"));
+        Assert.That(result["testArea1/testKey1"], Is.EqualTo("testValue1"));
+        Assert.That(result["testArea1/testKey2"], Is.EqualTo("testValue2"));
+        Assert.That(result["testArea2/blah1"], Is.EqualTo("blahValue1"));
+        Assert.That(result["testArea2/blah2"], Is.EqualTo("blahValue2"));
     }
 
     [Test]
@@ -82,15 +82,15 @@ public class LocalizedTextServiceTests
 
         var result = txtService.GetAllStoredValues(culture);
 
-        Assert.AreEqual(4, result.Count());
-        Assert.AreEqual("testArea1/testKey1", result.ElementAt(0).Key);
-        Assert.AreEqual("testArea1/testKey2", result.ElementAt(1).Key);
-        Assert.AreEqual("testArea2/blah1", result.ElementAt(2).Key);
-        Assert.AreEqual("testArea2/blah2", result.ElementAt(3).Key);
-        Assert.AreEqual("testValue1", result["testArea1/testKey1"]);
-        Assert.AreEqual("testValue2", result["testArea1/testKey2"]);
-        Assert.AreEqual("blahValue1", result["testArea2/blah1"]);
-        Assert.AreEqual("blahValue2", result["testArea2/blah2"]);
+        Assert.That(result.Count(), Is.EqualTo(4));
+        Assert.That(result.ElementAt(0).Key, Is.EqualTo("testArea1/testKey1"));
+        Assert.That(result.ElementAt(1).Key, Is.EqualTo("testArea1/testKey2"));
+        Assert.That(result.ElementAt(2).Key, Is.EqualTo("testArea2/blah1"));
+        Assert.That(result.ElementAt(3).Key, Is.EqualTo("testArea2/blah2"));
+        Assert.That(result["testArea1/testKey1"], Is.EqualTo("testValue1"));
+        Assert.That(result["testArea1/testKey2"], Is.EqualTo("testValue2"));
+        Assert.That(result["testArea2/blah1"], Is.EqualTo("blahValue1"));
+        Assert.That(result["testArea2/blah2"], Is.EqualTo("blahValue2"));
     }
 
     [Test]
@@ -115,7 +115,7 @@ public class LocalizedTextServiceTests
 
         var result = txtService.GetAllStoredValues(culture);
 
-        Assert.AreEqual(1, result.Count());
+        Assert.That(result.Count(), Is.EqualTo(1));
     }
 
     [Test]
@@ -138,7 +138,7 @@ public class LocalizedTextServiceTests
 
         var result = txtService.Localize("testArea/testKey", culture);
 
-        Assert.AreEqual("testValue", result);
+        Assert.That(result, Is.EqualTo("testValue"));
     }
 
     [Test]
@@ -161,7 +161,7 @@ public class LocalizedTextServiceTests
 
         var result = txtService.Localize("testKey", culture);
 
-        Assert.AreEqual("testValue", result);
+        Assert.That(result, Is.EqualTo("testValue"));
     }
 
     [Test]
@@ -185,7 +185,7 @@ public class LocalizedTextServiceTests
         var result = txtService.Localize("testArea/doNotFind", culture);
 
         // NOTE: Based on how legacy works, the default text does not contain the area, just the key
-        Assert.AreEqual("[doNotFind]", result);
+        Assert.That(result, Is.EqualTo("[doNotFind]"));
     }
 
     [Test]
@@ -208,7 +208,7 @@ public class LocalizedTextServiceTests
 
         var result = txtService.Localize("doNotFind", culture);
 
-        Assert.AreEqual("[doNotFind]", result);
+        Assert.That(result, Is.EqualTo("[doNotFind]"));
     }
 
     [Test]
@@ -237,7 +237,7 @@ public class LocalizedTextServiceTests
             culture,
             new Dictionary<string, string> { { "0", "world" }, { "1", "great" }, { "2", "planet" } });
 
-        Assert.AreEqual("Hello world, you are such a great planet", result);
+        Assert.That(result, Is.EqualTo("Hello world, you are such a great planet"));
     }
 
     [Test]
@@ -256,7 +256,7 @@ public class LocalizedTextServiceTests
 
         var result = txtService.Localize("testArea/testKey", culture);
 
-        Assert.AreEqual("testValue", result);
+        Assert.That(result, Is.EqualTo("testValue"));
     }
 
     [Test]
@@ -275,7 +275,7 @@ public class LocalizedTextServiceTests
 
         var result = txtService.Localize("testKey", culture);
 
-        Assert.AreEqual("testValue", result);
+        Assert.That(result, Is.EqualTo("testValue"));
     }
 
     [Test]
@@ -295,7 +295,7 @@ public class LocalizedTextServiceTests
         var result = txtService.Localize("testArea/doNotFind", culture);
 
         // NOTE: Based on how legacy works, the default text does not contain the area, just the key
-        Assert.AreEqual("[doNotFind]", result);
+        Assert.That(result, Is.EqualTo("[doNotFind]"));
     }
 
     [Test]
@@ -314,7 +314,7 @@ public class LocalizedTextServiceTests
 
         var result = txtService.Localize("doNotFind", culture);
 
-        Assert.AreEqual("[doNotFind]", result);
+        Assert.That(result, Is.EqualTo("[doNotFind]"));
     }
 
     [Test]
@@ -336,7 +336,7 @@ public class LocalizedTextServiceTests
 
         var result = txtService.Localize("testKey", culture, new Dictionary<string, string> { { "0", "world" }, { "1", "great" }, { "2", "planet" } });
 
-        Assert.AreEqual("Hello world, you are such a great planet", result);
+        Assert.That(result, Is.EqualTo("Hello world, you are such a great planet"));
     }
 
     [Test]
@@ -357,7 +357,7 @@ public class LocalizedTextServiceTests
             },
             s_loggerFactory.CreateLogger<LocalizedTextService>());
 
-        Assert.AreEqual("[testKey]", txtService.Localize("testArea/testKey", CultureInfo.GetCultureInfo("en-AU")));
+        Assert.That(txtService.Localize("testArea/testKey", CultureInfo.GetCultureInfo("en-AU")), Is.EqualTo("[testKey]"));
     }
 
     [Test]
@@ -374,6 +374,6 @@ public class LocalizedTextServiceTests
             },
             s_loggerFactory.CreateLogger<LocalizedTextService>());
 
-        Assert.AreEqual("[testKey]", txtService.Localize("testArea/testKey", CultureInfo.GetCultureInfo("en-AU")));
+        Assert.That(txtService.Localize("testArea/testKey", CultureInfo.GetCultureInfo("en-AU")), Is.EqualTo("[testKey]"));
     }
 }

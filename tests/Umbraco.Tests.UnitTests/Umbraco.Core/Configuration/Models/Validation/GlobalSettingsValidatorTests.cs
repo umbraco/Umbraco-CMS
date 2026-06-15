@@ -16,7 +16,7 @@ public class GlobalSettingsValidatorTests
         var validator = new GlobalSettingsValidator();
         var options = new GlobalSettings();
         var result = validator.Validate("settings", options);
-        Assert.True(result.Succeeded);
+        Assert.That(result.Succeeded, Is.True);
     }
 
     [Test]
@@ -26,7 +26,7 @@ public class GlobalSettingsValidatorTests
         var options = new GlobalSettings { Smtp = new SmtpSettings { From = "invalid" } };
 
         var result = validator.Validate("settings", options);
-        Assert.False(result.Succeeded);
+        Assert.That(result.Succeeded, Is.False);
     }
 
     [Test]
@@ -36,7 +36,7 @@ public class GlobalSettingsValidatorTests
         var options = new GlobalSettings { DistributedLockingWriteLockDefaultTimeout = TimeSpan.Parse("00:00:00.099") };
 
         var result = validator.Validate("settings", options);
-        Assert.False(result.Succeeded);
+        Assert.That(result.Succeeded, Is.False);
     }
 
     [Test]
@@ -46,6 +46,6 @@ public class GlobalSettingsValidatorTests
         var options = new GlobalSettings { DistributedLockingWriteLockDefaultTimeout = TimeSpan.Parse("00:00:20") };
 
         var result = validator.Validate("settings", options);
-        Assert.True(result.Succeeded);
+        Assert.That(result.Succeeded, Is.True);
     }
 }

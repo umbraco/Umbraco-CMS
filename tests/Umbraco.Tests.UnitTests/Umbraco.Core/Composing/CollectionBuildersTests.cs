@@ -37,9 +37,9 @@ public class CollectionBuildersTests
             .Append<Resolved1>()
             .Append<Resolved2>();
 
-        Assert.IsTrue(builder.Has<Resolved1>());
-        Assert.IsTrue(builder.Has<Resolved2>());
-        Assert.IsFalse(builder.Has<Resolved3>());
+        Assert.That(builder.Has<Resolved1>(), Is.True);
+        Assert.That(builder.Has<Resolved2>(), Is.True);
+        Assert.That(builder.Has<Resolved3>(), Is.False);
         //// Assert.IsFalse(col.ContainsType<Resolved4>()); // does not compile
 
         var factory = _composition.CreateServiceProvider();
@@ -55,8 +55,8 @@ public class CollectionBuildersTests
             .Append<Resolved2>();
 
         builder.Clear();
-        Assert.IsFalse(builder.Has<Resolved1>());
-        Assert.IsFalse(builder.Has<Resolved2>());
+        Assert.That(builder.Has<Resolved1>(), Is.False);
+        Assert.That(builder.Has<Resolved2>(), Is.False);
 
         var factory = _composition.CreateServiceProvider();
         var col = builder.CreateCollection(factory);
@@ -83,9 +83,9 @@ public class CollectionBuildersTests
         builder.Append<Resolved1>();
         builder.Append<Resolved2>();
 
-        Assert.IsTrue(builder.Has<Resolved1>());
-        Assert.IsTrue(builder.Has<Resolved2>());
-        Assert.IsFalse(builder.Has<Resolved3>());
+        Assert.That(builder.Has<Resolved1>(), Is.True);
+        Assert.That(builder.Has<Resolved2>(), Is.True);
+        Assert.That(builder.Has<Resolved3>(), Is.False);
 
         var factory = _composition.CreateServiceProvider();
         var col = builder.CreateCollection(factory);
@@ -133,9 +133,9 @@ public class CollectionBuildersTests
             .Append<Resolved2>()
             .Remove<Resolved2>();
 
-        Assert.IsTrue(builder.Has<Resolved1>());
-        Assert.IsFalse(builder.Has<Resolved2>());
-        Assert.IsFalse(builder.Has<Resolved3>());
+        Assert.That(builder.Has<Resolved1>(), Is.True);
+        Assert.That(builder.Has<Resolved2>(), Is.False);
+        Assert.That(builder.Has<Resolved3>(), Is.False);
 
         var factory = _composition.CreateServiceProvider();
         var col = builder.CreateCollection(factory);
@@ -175,9 +175,9 @@ public class CollectionBuildersTests
             .Append<Resolved2>()
             .Insert<Resolved3>();
 
-        Assert.IsTrue(builder.Has<Resolved1>());
-        Assert.IsTrue(builder.Has<Resolved2>());
-        Assert.IsTrue(builder.Has<Resolved3>());
+        Assert.That(builder.Has<Resolved1>(), Is.True);
+        Assert.That(builder.Has<Resolved2>(), Is.True);
+        Assert.That(builder.Has<Resolved3>(), Is.True);
 
         var factory = _composition.CreateServiceProvider();
         var col = builder.CreateCollection(factory);
@@ -240,9 +240,9 @@ public class CollectionBuildersTests
             .Append<Resolved2>()
             .InsertBefore<Resolved2, Resolved3>();
 
-        Assert.IsTrue(builder.Has<Resolved1>());
-        Assert.IsTrue(builder.Has<Resolved2>());
-        Assert.IsTrue(builder.Has<Resolved3>());
+        Assert.That(builder.Has<Resolved1>(), Is.True);
+        Assert.That(builder.Has<Resolved2>(), Is.True);
+        Assert.That(builder.Has<Resolved3>(), Is.True);
 
         var factory = _composition.CreateServiceProvider();
         var col = builder.CreateCollection(factory);
@@ -257,9 +257,9 @@ public class CollectionBuildersTests
             .Append<Resolved2>()
             .InsertAfter<Resolved1, Resolved3>();
 
-        Assert.IsTrue(builder.Has<Resolved1>());
-        Assert.IsTrue(builder.Has<Resolved2>());
-        Assert.IsTrue(builder.Has<Resolved3>());
+        Assert.That(builder.Has<Resolved1>(), Is.True);
+        Assert.That(builder.Has<Resolved2>(), Is.True);
+        Assert.That(builder.Has<Resolved3>(), Is.True);
 
         var factory = _composition.CreateServiceProvider();
         var col = builder.CreateCollection(factory);
@@ -274,9 +274,9 @@ public class CollectionBuildersTests
             .Append<Resolved2>()
             .InsertAfter<Resolved2, Resolved3>();
 
-        Assert.IsTrue(builder.Has<Resolved1>());
-        Assert.IsTrue(builder.Has<Resolved2>());
-        Assert.IsTrue(builder.Has<Resolved3>());
+        Assert.That(builder.Has<Resolved1>(), Is.True);
+        Assert.That(builder.Has<Resolved2>(), Is.True);
+        Assert.That(builder.Has<Resolved3>(), Is.True);
 
         var factory = _composition.CreateServiceProvider();
         var col = builder.CreateCollection(factory);
@@ -444,48 +444,48 @@ public class CollectionBuildersTests
     private static void AssertCollection(IEnumerable<Resolved> col, params Type[] expected)
     {
         var colA = col.ToArray();
-        Assert.AreEqual(expected.Length, colA.Length);
+        Assert.That(colA.Length, Is.EqualTo(expected.Length));
         for (var i = 0; i < expected.Length; i++)
         {
-            Assert.IsInstanceOf(expected[i], colA[i]);
+            Assert.That(colA[i], Is.InstanceOf(expected[i]));
         }
     }
 
     private static void AssertSameCollection(IServiceProvider factory, IEnumerable<Resolved> col1, IEnumerable<Resolved> col2)
     {
-        Assert.AreSame(col1, col2);
+        Assert.That(col2, Is.SameAs(col1));
 
         var col1A = col1.ToArray();
         var col2A = col2.ToArray();
 
-        Assert.AreEqual(col1A.Length, col2A.Length);
+        Assert.That(col2A.Length, Is.EqualTo(col1A.Length));
 
         // Ensure each item in each collection is the same but also
         // resolve each item from the factory to ensure it's also the same since
         // it should have the same lifespan.
         for (var i = 0; i < col1A.Length; i++)
         {
-            Assert.AreSame(col1A[i], col2A[i]);
+            Assert.That(col2A[i], Is.SameAs(col1A[i]));
 
             var itemA = factory.GetRequiredService(col1A[i].GetType());
             var itemB = factory.GetRequiredService(col2A[i].GetType());
 
-            Assert.AreSame(itemA, itemB);
+            Assert.That(itemB, Is.SameAs(itemA));
         }
     }
 
     private static void AssertNotSameCollection(IEnumerable<Resolved> col1, IEnumerable<Resolved> col2)
     {
-        Assert.AreNotSame(col1, col2);
+        Assert.That(col2, Is.Not.SameAs(col1));
 
         var col1A = col1.ToArray();
         var col2A = col2.ToArray();
 
-        Assert.AreEqual(col1A.Length, col2A.Length);
+        Assert.That(col2A.Length, Is.EqualTo(col1A.Length));
 
         for (var i = 0; i < col1A.Length; i++)
         {
-            Assert.AreNotSame(col1A[i], col2A[i]);
+            Assert.That(col2A[i], Is.Not.SameAs(col1A[i]));
         }
     }
 

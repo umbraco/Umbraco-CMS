@@ -130,7 +130,7 @@ public abstract class ContentEditingServiceTestsBase : UmbracoIntegrationTestWit
         };
 
         var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
         return result.Result.Content!;
     }
 
@@ -156,7 +156,7 @@ public abstract class ContentEditingServiceTestsBase : UmbracoIntegrationTestWit
         };
 
         var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
         return result.Result.Content!;
     }
 
@@ -184,7 +184,7 @@ public abstract class ContentEditingServiceTestsBase : UmbracoIntegrationTestWit
         };
 
         var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
         return result.Result.Content!;
     }
 
@@ -236,7 +236,7 @@ public abstract class ContentEditingServiceTestsBase : UmbracoIntegrationTestWit
         };
 
         var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
         return result.Result.Content!;
     }
 }

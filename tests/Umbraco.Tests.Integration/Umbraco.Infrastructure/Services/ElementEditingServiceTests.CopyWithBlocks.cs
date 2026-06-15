@@ -38,10 +38,10 @@ public partial class ElementEditingServiceTests
 
         var copyResult = await ElementEditingService
             .CopyAsync(element.Key, null, Constants.Security.SuperUserKey);
-        Assert.IsTrue(copyResult.Success);
+        Assert.That(copyResult.Success, Is.True);
 
         var copy = copyResult.Result!;
-        Assert.AreNotEqual(element.Key, copy.Key);
+        Assert.That(copy.Key, Is.Not.EqualTo(element.Key));
 
         List<Guid> newKeys = [];
         if (variant)
@@ -66,7 +66,7 @@ public partial class ElementEditingServiceTests
 
         foreach (var newKey in newKeys)
         {
-            Assert.IsFalse(originalBlockKeys.Contains(newKey), "Copied element blocks should have new keys.");
+            Assert.That(originalBlockKeys, Does.Not.Contain(newKey), "Copied element blocks should have new keys.");
         }
     }
 
@@ -82,7 +82,7 @@ public partial class ElementEditingServiceTests
         var (element, _) = await CreateElementWithBlocksEditor(variant, editorAlias);
 
         var copyResult = await ElementEditingService.CopyAsync(element.Key, null, Constants.Security.SuperUserKey);
-        Assert.IsTrue(copyResult.Success);
+        Assert.That(copyResult.Success, Is.True);
 
         var copy = copyResult.Result!;
 
@@ -108,8 +108,8 @@ public partial class ElementEditingServiceTests
     {
         var originalRaw = original.GetValue<string>(propertyAlias, culture);
         var copiedRaw = copy.GetValue<string>(propertyAlias, culture);
-        Assert.IsNotNull(originalRaw);
-        Assert.IsNotNull(copiedRaw);
+        Assert.That(originalRaw, Is.Not.Null);
+        Assert.That(copiedRaw, Is.Not.Null);
 
         var originalBlockValue = GetBlockValue(original, propertyAlias, editorAlias, culture);
         var copiedBlockValue = GetBlockValue(copy, propertyAlias, editorAlias, culture);
@@ -118,9 +118,8 @@ public partial class ElementEditingServiceTests
         var normalizedCopy = ReplaceBlockKeys(copiedRaw, copiedBlockValue);
 
         var cultureLabel = culture != null ? $" (culture: {culture})" : string.Empty;
-        Assert.AreEqual(
-            normalizedOriginal,
-            normalizedCopy,
+        Assert.That(
+            normalizedCopy, Is.EqualTo(normalizedOriginal),
             $"Copied block structure should match the original{cultureLabel}.");
     }
 
@@ -137,7 +136,7 @@ public partial class ElementEditingServiceTests
     private BlockValue GetBlockValue(IElement element, string propertyAlias, string editorAlias, string? culture = null)
     {
         var rawValue = element.GetValue<string>(propertyAlias, culture);
-        Assert.IsNotNull(rawValue, $"Property '{propertyAlias}' should have a value (culture: {culture ?? "invariant"}).");
+        Assert.That(rawValue, Is.Not.Null, $"Property '{propertyAlias}' should have a value (culture: {culture ?? "invariant"}).");
 
         return editorAlias switch
         {
@@ -173,7 +172,7 @@ public partial class ElementEditingServiceTests
             blockElementType.Key,
             settingsElementType.Key);
         var dataTypeAttempt = await DataTypeService.CreateAsync(dataType, Constants.Security.SuperUserKey);
-        Assert.True(dataTypeAttempt.Success, $"Failed to create data type: {dataTypeAttempt.Exception?.Message}");
+        Assert.That(dataTypeAttempt.Success, Is.True, $"Failed to create data type: {dataTypeAttempt.Exception?.Message}");
 
         // Create library element type with blocks property
         var elementType = new ContentTypeBuilder()
@@ -233,7 +232,7 @@ public partial class ElementEditingServiceTests
         }
 
         var result = await ElementEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
         return (result.Result.Content!, allBlockKeys);
     }
 

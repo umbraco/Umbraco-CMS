@@ -56,9 +56,9 @@ public class PublicAccessPresentationFactoryTests
         var result = _factory.CreatePublicAccessResponseModel(entry, contentKey);
 
         // Assert
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(PublicAccessOperationStatus.ContentNotFound, result.Status);
-        Assert.IsNull(result.Result);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(PublicAccessOperationStatus.ContentNotFound));
+        Assert.That(result.Result, Is.Null);
     }
 
     [Test]
@@ -77,8 +77,8 @@ public class PublicAccessPresentationFactoryTests
         var result = _factory.CreatePublicAccessResponseModel(entry, protectedNodeKey);
 
         // Assert
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(PublicAccessOperationStatus.LoginNodeNotFound, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(PublicAccessOperationStatus.LoginNodeNotFound));
     }
 
     [Test]
@@ -100,8 +100,8 @@ public class PublicAccessPresentationFactoryTests
         var result = _factory.CreatePublicAccessResponseModel(entry, protectedNodeKey);
 
         // Assert
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(PublicAccessOperationStatus.ErrorNodeNotFound, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(PublicAccessOperationStatus.ErrorNodeNotFound));
     }
 
     [Test]
@@ -121,9 +121,9 @@ public class PublicAccessPresentationFactoryTests
         var result = _factory.CreatePublicAccessResponseModel(entry, protectedNodeKey);
 
         // Assert
-        Assert.IsTrue(result.Success);
-        Assert.IsNotNull(result.Result);
-        Assert.IsFalse(result.Result!.IsProtectedByAncestor);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.Not.Null);
+        Assert.That(result.Result!.IsProtectedByAncestor, Is.False);
     }
 
     [Test]
@@ -144,9 +144,9 @@ public class PublicAccessPresentationFactoryTests
         var result = _factory.CreatePublicAccessResponseModel(entry, childContentKey);
 
         // Assert
-        Assert.IsTrue(result.Success);
-        Assert.IsNotNull(result.Result);
-        Assert.IsTrue(result.Result!.IsProtectedByAncestor);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.Not.Null);
+        Assert.That(result.Result!.IsProtectedByAncestor, Is.True);
     }
 
     [Test]
@@ -166,9 +166,9 @@ public class PublicAccessPresentationFactoryTests
         var result = _factory.CreatePublicAccessResponseModel(entry, protectedNodeKey);
 
         // Assert
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(loginNodeKey, result.Result!.LoginDocument.Id);
-        Assert.AreEqual(errorNodeKey, result.Result.ErrorDocument.Id);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result!.LoginDocument.Id, Is.EqualTo(loginNodeKey));
+        Assert.That(result.Result.ErrorDocument.Id, Is.EqualTo(errorNodeKey));
     }
 
     [Test]
@@ -203,9 +203,9 @@ public class PublicAccessPresentationFactoryTests
         var result = _factory.CreatePublicAccessResponseModel(entry, protectedNodeKey);
 
         // Assert
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(1, result.Result!.Members.Length);
-        Assert.AreEqual(memberKey, result.Result.Members[0].Id);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result!.Members.Length, Is.EqualTo(1));
+        Assert.That(result.Result.Members[0].Id, Is.EqualTo(memberKey));
     }
 
     [Test]
@@ -240,9 +240,9 @@ public class PublicAccessPresentationFactoryTests
         var result = _factory.CreatePublicAccessResponseModel(entry, protectedNodeKey);
 
         // Assert
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(1, result.Result!.Groups.Length);
-        Assert.AreEqual(groupKey, result.Result.Groups[0].Id);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result!.Groups.Length, Is.EqualTo(1));
+        Assert.That(result.Result.Groups[0].Id, Is.EqualTo(groupKey));
     }
 
     [Test]
@@ -272,8 +272,8 @@ public class PublicAccessPresentationFactoryTests
         var result = _factory.CreatePublicAccessResponseModel(entry, protectedNodeKey);
 
         // Assert
-        Assert.IsTrue(result.Success);
-        Assert.IsEmpty(result.Result!.Members);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result!.Members, Is.Empty);
     }
 
     [Test]
@@ -304,8 +304,8 @@ public class PublicAccessPresentationFactoryTests
         var result = _factory.CreatePublicAccessResponseModel(entry, protectedNodeKey);
 
         // Assert
-        Assert.IsTrue(result.Success);
-        Assert.IsEmpty(result.Result!.Groups);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result!.Groups, Is.Empty);
     }
 
     [Test]
@@ -348,11 +348,11 @@ public class PublicAccessPresentationFactoryTests
         var result = _factory.CreatePublicAccessResponseModel(entry, protectedNodeKey);
 
         // Assert
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(1, result.Result!.Members.Length);
-        Assert.AreEqual(memberKey, result.Result.Members[0].Id);
-        Assert.AreEqual(1, result.Result.Groups.Length);
-        Assert.AreEqual(groupKey, result.Result.Groups[0].Id);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result!.Members.Length, Is.EqualTo(1));
+        Assert.That(result.Result.Members[0].Id, Is.EqualTo(memberKey));
+        Assert.That(result.Result.Groups.Length, Is.EqualTo(1));
+        Assert.That(result.Result.Groups[0].Id, Is.EqualTo(groupKey));
     }
 
     [Test]
@@ -372,9 +372,9 @@ public class PublicAccessPresentationFactoryTests
         var result = _factory.CreatePublicAccessResponseModel(entry, protectedNodeKey);
 
         // Assert
-        Assert.IsTrue(result.Success);
-        Assert.IsEmpty(result.Result!.Members);
-        Assert.IsEmpty(result.Result.Groups);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result!.Members, Is.Empty);
+        Assert.That(result.Result.Groups, Is.Empty);
     }
 
     private void SetupNodeKeyResolution(int nodeId, Guid key)

@@ -67,9 +67,9 @@ internal class ContentVersionCleanupServiceTest : UmbracoIntegrationTest
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(2, after.ContentVersions); // current draft, current published
-            Assert.AreEqual(2, after.DocumentVersions);
-            Assert.AreEqual(6, after.PropertyData); // CreateSimpleContentType = 3 props
+            Assert.That(after.ContentVersions, Is.EqualTo(2)); // current draft, current published
+            Assert.That(after.DocumentVersions, Is.EqualTo(2));
+            Assert.That(after.PropertyData, Is.EqualTo(6)); // CreateSimpleContentType = 3 props
         });
     }
 
@@ -100,7 +100,7 @@ internal class ContentVersionCleanupServiceTest : UmbracoIntegrationTest
         // Total: 7 versions (1 initial save + 6 publishes). Current draft + current published = 2 active.
         // 5 historic versions.
         var before = GetReport();
-        Assert.AreEqual(7, before.ContentVersions);
+        Assert.That(before.ContentVersions, Is.EqualTo(7));
 
         // Backdate 3 of the historic versions to 10 days ago so they exceed the 7-day keep window.
         using (var scope = ScopeProvider.CreateScope(autoComplete: true))
@@ -122,8 +122,8 @@ internal class ContentVersionCleanupServiceTest : UmbracoIntegrationTest
         Assert.Multiple(() =>
         {
             // 3 backdated historic versions should be deleted. 2 active + 2 recent historic remain = 4.
-            Assert.AreEqual(4, after.ContentVersions);
-            Assert.AreEqual(4, after.DocumentVersions);
+            Assert.That(after.ContentVersions, Is.EqualTo(4));
+            Assert.That(after.DocumentVersions, Is.EqualTo(4));
         });
     }
 
@@ -153,7 +153,7 @@ internal class ContentVersionCleanupServiceTest : UmbracoIntegrationTest
         }
 
         var before = GetReport();
-        Assert.AreEqual(8, before.ContentVersions);
+        Assert.That(before.ContentVersions, Is.EqualTo(8));
 
         // Backdate versions into 3 "days":
         // Day 1 (10 days ago): versions 1, 2, 3 — should keep only version 3 (newest)
@@ -181,8 +181,8 @@ internal class ContentVersionCleanupServiceTest : UmbracoIntegrationTest
             // Deleted: versions 1, 2 (day 1 non-latest) + version 4 (day 2 non-latest) = 3 deleted
             // Remaining: version 3 (day 1 latest) + version 5 (day 2 latest) + version 6 (today latest)
             //           + version 7 (current draft) + version 8 (current published) = 5
-            Assert.AreEqual(5, after.ContentVersions);
-            Assert.AreEqual(5, after.DocumentVersions);
+            Assert.That(after.ContentVersions, Is.EqualTo(5));
+            Assert.That(after.DocumentVersions, Is.EqualTo(5));
         });
     }
 
@@ -219,7 +219,7 @@ internal class ContentVersionCleanupServiceTest : UmbracoIntegrationTest
         ContentService.Publish(contentB, []);
 
         var before = GetReport();
-        Assert.Greater(before.ContentVersions, 4);
+        Assert.That(before.ContentVersions, Is.GreaterThan(4));
 
         ContentVersionService.PerformContentVersionCleanup(DateTime.UtcNow.AddHours(1));
 
@@ -245,9 +245,9 @@ internal class ContentVersionCleanupServiceTest : UmbracoIntegrationTest
             Assert.Multiple(() =>
             {
                 // ContentTypeA: only active versions remain (current draft + current published = 2)
-                Assert.AreEqual(2, contentAVersions);
+                Assert.That(contentAVersions, Is.EqualTo(2));
                 // ContentTypeB: all versions preserved (preventCleanup override)
-                Assert.Greater(contentBVersions, 2);
+                Assert.That(contentBVersions, Is.GreaterThan(2));
             });
         }
     }
@@ -276,21 +276,21 @@ internal class ContentVersionCleanupServiceTest : UmbracoIntegrationTest
 
         // First cleanup run
         var firstResult = ContentVersionService.PerformContentVersionCleanup(DateTime.UtcNow.AddHours(1));
-        Assert.Greater(firstResult.Count, 0, "First run should delete some versions");
+        Assert.That(firstResult, Is.Not.Empty, "First run should delete some versions");
 
         var afterFirst = GetReport();
 
         // Second cleanup run — should have nothing to do
         var secondResult = ContentVersionService.PerformContentVersionCleanup(DateTime.UtcNow.AddHours(1));
-        Assert.AreEqual(0, secondResult.Count, "Second run should delete nothing");
+        Assert.That(secondResult, Is.Empty, "Second run should delete nothing");
 
         var afterSecond = GetReport();
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(afterFirst.ContentVersions, afterSecond.ContentVersions);
-            Assert.AreEqual(afterFirst.DocumentVersions, afterSecond.DocumentVersions);
-            Assert.AreEqual(afterFirst.PropertyData, afterSecond.PropertyData);
+            Assert.That(afterSecond.ContentVersions, Is.EqualTo(afterFirst.ContentVersions));
+            Assert.That(afterSecond.DocumentVersions, Is.EqualTo(afterFirst.DocumentVersions));
+            Assert.That(afterSecond.PropertyData, Is.EqualTo(afterFirst.PropertyData));
         });
     }
 
@@ -324,28 +324,28 @@ internal class ContentVersionCleanupServiceTest : UmbracoIntegrationTest
 
         // 10 versions total: 8 historic + current draft + current published.
         var before = GetReport();
-        Assert.AreEqual(10, before.ContentVersions);
+        Assert.That(before.ContentVersions, Is.EqualTo(10));
 
         // First run: MaxVersionsToDeletePerRun = 3, so only 3 historic versions should be deleted.
         var firstResult = ContentVersionService.PerformContentVersionCleanup(DateTime.UtcNow.AddHours(1));
-        Assert.AreEqual(3, firstResult.Count, "First run should delete exactly 3 (the per-run cap)");
+        Assert.That(firstResult, Has.Count.EqualTo(3), "First run should delete exactly 3 (the per-run cap)");
 
         var afterFirst = GetReport();
-        Assert.AreEqual(7, afterFirst.ContentVersions);
+        Assert.That(afterFirst.ContentVersions, Is.EqualTo(7));
 
         // Second run: another 3 deleted.
         var secondResult = ContentVersionService.PerformContentVersionCleanup(DateTime.UtcNow.AddHours(1));
-        Assert.AreEqual(3, secondResult.Count, "Second run should delete another 3");
+        Assert.That(secondResult, Has.Count.EqualTo(3), "Second run should delete another 3");
 
         var afterSecond = GetReport();
-        Assert.AreEqual(4, afterSecond.ContentVersions);
+        Assert.That(afterSecond.ContentVersions, Is.EqualTo(4));
 
         // Third run: only 2 historic remain, so fewer than cap deleted.
         var thirdResult = ContentVersionService.PerformContentVersionCleanup(DateTime.UtcNow.AddHours(1));
-        Assert.AreEqual(2, thirdResult.Count, "Third run should delete remaining 2");
+        Assert.That(thirdResult, Has.Count.EqualTo(2), "Third run should delete remaining 2");
 
         var afterThird = GetReport();
-        Assert.AreEqual(2, afterThird.ContentVersions); // Only current draft + current published remain.
+        Assert.That(afterThird.ContentVersions, Is.EqualTo(2)); // Only current draft + current published remain.
     }
 
     private Report GetReport()

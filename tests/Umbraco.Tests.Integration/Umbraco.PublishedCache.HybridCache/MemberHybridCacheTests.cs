@@ -37,12 +37,12 @@ internal sealed class MemberHybridCacheTests : UmbracoIntegrationTest
         var member = await PublishedMemberHybridCache.GetAsync(createdMember);
 
         // Assert
-        Assert.IsNotNull(member);
-        Assert.AreEqual("The title value", member.Value("title"));
-        Assert.AreEqual("test@test.com", member.Email);
-        Assert.AreEqual("test", member.UserName);
-        Assert.IsTrue(member.IsApproved);
-        Assert.AreEqual("T. Est", member.Name);
+        Assert.That(member, Is.Not.Null);
+        Assert.That(member.Value("title"), Is.EqualTo("The title value"));
+        Assert.That(member.Email, Is.EqualTo("test@test.com"));
+        Assert.That(member.UserName, Is.EqualTo("test"));
+        Assert.That(member.IsApproved, Is.True);
+        Assert.That(member.Name, Is.EqualTo("T. Est"));
     }
 
     private async Task<IMember> CreateMemberAsync(Guid? key = null, bool titleIsSensitive = false)
@@ -71,7 +71,7 @@ internal sealed class MemberHybridCacheTests : UmbracoIntegrationTest
         };
 
         var result = await MemberEditingService.CreateAsync(createModel, SuperUser());
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
         return result.Result.Content;
     }
 

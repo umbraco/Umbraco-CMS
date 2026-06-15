@@ -27,7 +27,7 @@ public class LegacyPasswordSecurityTests
 
         var result = passwordSecurity.VerifyPassword(passwordConfiguration.HashAlgorithmType, "ThisIsAHashedPassword", storedPassword);
 
-        Assert.IsTrue(result);
+        Assert.That(result, Is.True);
     }
 
     [Test]
@@ -47,7 +47,7 @@ public class LegacyPasswordSecurityTests
             "ThisIsAHashedPassword",
             storedPassword);
 
-        Assert.IsTrue(result);
+        Assert.That(result, Is.True);
     }
 
     [Test]
@@ -60,7 +60,7 @@ public class LegacyPasswordSecurityTests
 
         var result = new LegacyPasswordSecurity().VerifyLegacyHashedPassword(clearText, dbPassword);
 
-        Assert.IsTrue(result);
+        Assert.That(result, Is.True);
     }
 
     [Test]
@@ -75,7 +75,7 @@ public class LegacyPasswordSecurityTests
 
         var result = passwordSecurity.FormatPasswordForStorage(passwordConfiguration.HashAlgorithmType, stored, salt);
 
-        Assert.AreEqual(salt + "ThisIsAHashedPassword", result);
+        Assert.That(result, Is.EqualTo(salt + "ThisIsAHashedPassword"));
     }
 
     [Test]
@@ -91,7 +91,7 @@ public class LegacyPasswordSecurityTests
         var result =
             passwordSecurity.ParseStoredHashPassword(passwordConfiguration.HashAlgorithmType, stored, out _);
 
-        Assert.AreEqual("ThisIsAHashedPassword", result);
+        Assert.That(result, Is.EqualTo("ThisIsAHashedPassword"));
     }
 
     /// <summary>
@@ -107,7 +107,7 @@ public class LegacyPasswordSecurityTests
 
             if (i > 0)
             {
-                Assert.AreEqual(lastLength, result.Length);
+                Assert.That(result.Length, Is.EqualTo(lastLength));
             }
 
             lastLength = result.Length;

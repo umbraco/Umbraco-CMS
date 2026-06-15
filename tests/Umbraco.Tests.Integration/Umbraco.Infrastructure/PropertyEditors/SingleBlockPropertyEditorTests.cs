@@ -125,23 +125,23 @@ internal sealed class SingleBlockPropertyEditorTests : UmbracoIntegrationTest
 
         var valueEditor = await GetValueEditor(singleBlockContentType);
         var toEditorValue = valueEditor.ToEditor(content.Properties["block"]!) as SingleBlockValue;
-        Assert.IsNotNull(toEditorValue);
-        Assert.AreEqual(1, toEditorValue.ContentData.Count);
+        Assert.That(toEditorValue, Is.Not.Null);
+        Assert.That(toEditorValue.ContentData, Has.Count.EqualTo(1));
 
         var properties = toEditorValue.ContentData.First().Values;
-        Assert.AreEqual(1, properties.Count);
+        Assert.That(properties, Has.Count.EqualTo(1));
         Assert.Multiple(() =>
         {
             var property = properties.First();
-            Assert.AreEqual(elementTypeName == AllTypes ? "contentPicker" : "metadescription", property.Alias);
-            Assert.AreEqual(elementTypeName == AllTypes ? textPage.Key : "something very meta", property.Value);
+            Assert.That(property.Alias, Is.EqualTo(elementTypeName == AllTypes ? "contentPicker" : "metadescription"));
+            Assert.That(property.Value, Is.EqualTo(elementTypeName == AllTypes ? textPage.Key : "something very meta"));
         });
 
         // convert to updateModel and run validation
         var updateModel = await ContentEditingModelFactory.CreateFromAsync(content);
         var validationResult = await ContentValidationService.ValidatePropertiesAsync(updateModel, singleBlockContentType);
 
-        Assert.AreEqual(0, validationResult.ValidationErrors.Count());
+        Assert.That(validationResult.ValidationErrors.Count(), Is.EqualTo(0));
     }
 
     [Theory]
@@ -265,7 +265,7 @@ internal sealed class SingleBlockPropertyEditorTests : UmbracoIntegrationTest
         var updateModel = await ContentEditingModelFactory.CreateFromAsync(content);
         var validationResult = await ContentValidationService.ValidatePropertiesAsync(updateModel, singleBlockContentType);
 
-        Assert.AreEqual(shouldPass ? 0 : 1, validationResult.ValidationErrors.Count());
+        Assert.That(validationResult.ValidationErrors.Count(), Is.EqualTo(shouldPass ? 0 : 1));
     }
 
     /// <summary>
@@ -354,13 +354,13 @@ internal sealed class SingleBlockPropertyEditorTests : UmbracoIntegrationTest
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(1, validationResult.ValidationErrors.Count());
+            Assert.That(validationResult.ValidationErrors.Count(), Is.EqualTo(1));
             var validationError = validationResult.ValidationErrors.Single();
             var expectedErrorMessage = SingleBlockPropertyEditor.SingleBlockEditorPropertyValueEditor
                 .SingleBlockValidator
                 .BuildErrorMessage(LocalizedTextService, 1, 2);
-            Assert.AreEqual("block", validationError.Alias);
-            Assert.AreEqual(expectedErrorMessage, validationError.ErrorMessages.Single());
+            Assert.That(validationError.Alias, Is.EqualTo("block"));
+            Assert.That(validationError.ErrorMessages.Single(), Is.EqualTo(expectedErrorMessage));
         });
     }
 
@@ -422,10 +422,10 @@ internal sealed class SingleBlockPropertyEditorTests : UmbracoIntegrationTest
         var valueEditor = await GetValueEditor(singleBlockContentType);
 
         var references = valueEditor.GetReferences(content.GetValue("block")).ToArray();
-        Assert.AreEqual(1, references.Length);
+        Assert.That(references, Has.Length.EqualTo(1));
         var reference = references.First();
-        Assert.AreEqual(Constants.Conventions.RelationTypes.RelatedDocumentAlias, reference.RelationTypeAlias);
-        Assert.AreEqual(textPage.GetUdi(), reference.Udi);
+        Assert.That(reference.RelationTypeAlias, Is.EqualTo(Constants.Conventions.RelationTypes.RelatedDocumentAlias));
+        Assert.That(reference.Udi, Is.EqualTo(textPage.GetUdi()));
     }
 
     [Test]
@@ -480,10 +480,10 @@ internal sealed class SingleBlockPropertyEditorTests : UmbracoIntegrationTest
         var valueEditor = await GetValueEditor(singleBlockContentType);
 
         var tags = valueEditor.GetTags(content.GetValue("block"), null, null).ToArray();
-        Assert.AreEqual(3, tags.Length);
-        Assert.IsNotNull(tags.Single(tag => tag.Text == "Tag One" && tag.LanguageId == null));
-        Assert.IsNotNull(tags.Single(tag => tag.Text == "Tag Two" && tag.LanguageId == null));
-        Assert.IsNotNull(tags.Single(tag => tag.Text == "Tag Three" && tag.LanguageId == null));
+        Assert.That(tags, Has.Length.EqualTo(3));
+        Assert.That(tags.Single(tag => tag.Text == "Tag One" && tag.LanguageId == null), Is.Not.Null);
+        Assert.That(tags.Single(tag => tag.Text == "Tag Two" && tag.LanguageId == null), Is.Not.Null);
+        Assert.That(tags.Single(tag => tag.Text == "Tag Three" && tag.LanguageId == null), Is.Not.Null);
     }
 
     [Test]
@@ -491,7 +491,7 @@ internal sealed class SingleBlockPropertyEditorTests : UmbracoIntegrationTest
     {
         var result = await LanguageService.CreateAsync(
             new Language("da-DK", "Danish"), Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
         var daDkId = result.Result.Id;
 
         var elementType = ContentTypeBuilder.CreateAllTypesContentType("myElementType", "My Element Type");
@@ -556,13 +556,13 @@ internal sealed class SingleBlockPropertyEditorTests : UmbracoIntegrationTest
         var valueEditor = await GetValueEditor(singleBlockContentType);
 
         var tags = valueEditor.GetTags(content.GetValue("block"), null, null).ToArray();
-        Assert.AreEqual(6, tags.Length);
-        Assert.IsNotNull(tags.Single(tag => tag.Text == "Tag One EN" && tag.LanguageId == 1));
-        Assert.IsNotNull(tags.Single(tag => tag.Text == "Tag Two EN" && tag.LanguageId == 1));
-        Assert.IsNotNull(tags.Single(tag => tag.Text == "Tag Three EN" && tag.LanguageId == 1));
-        Assert.IsNotNull(tags.Single(tag => tag.Text == "Tag One DA" && tag.LanguageId == daDkId));
-        Assert.IsNotNull(tags.Single(tag => tag.Text == "Tag Two DA" && tag.LanguageId == daDkId));
-        Assert.IsNotNull(tags.Single(tag => tag.Text == "Tag Three DA" && tag.LanguageId == daDkId));
+        Assert.That(tags, Has.Length.EqualTo(6));
+        Assert.That(tags.Single(tag => tag.Text == "Tag One EN" && tag.LanguageId == 1), Is.Not.Null);
+        Assert.That(tags.Single(tag => tag.Text == "Tag Two EN" && tag.LanguageId == 1), Is.Not.Null);
+        Assert.That(tags.Single(tag => tag.Text == "Tag Three EN" && tag.LanguageId == 1), Is.Not.Null);
+        Assert.That(tags.Single(tag => tag.Text == "Tag One DA" && tag.LanguageId == daDkId), Is.Not.Null);
+        Assert.That(tags.Single(tag => tag.Text == "Tag Two DA" && tag.LanguageId == daDkId), Is.Not.Null);
+        Assert.That(tags.Single(tag => tag.Text == "Tag Three DA" && tag.LanguageId == daDkId), Is.Not.Null);
     }
 
     [Test]
@@ -623,25 +623,25 @@ internal sealed class SingleBlockPropertyEditorTests : UmbracoIntegrationTest
 
         var valueEditor = await GetValueEditor(singleBlockContentType);
         var toEditorValue = valueEditor.ToEditor(content.Properties["block"]!) as SingleBlockValue;
-        Assert.IsNotNull(toEditorValue);
-        Assert.AreEqual(1, toEditorValue.ContentData.Count);
+        Assert.That(toEditorValue, Is.Not.Null);
+        Assert.That(toEditorValue.ContentData, Has.Count.EqualTo(1));
 
         var properties = toEditorValue.ContentData.First().Values;
-        Assert.AreEqual(1, properties.Count);
+        Assert.That(properties, Has.Count.EqualTo(1));
         Assert.Multiple(() =>
         {
             var property = properties.First();
-            Assert.AreEqual("singleLineText", property.Alias);
-            Assert.AreEqual("The single line text", property.Value);
-            Assert.AreEqual("en-US", property.Culture);
+            Assert.That(property.Alias, Is.EqualTo("singleLineText"));
+            Assert.That(property.Value, Is.EqualTo("The single line text"));
+            Assert.That(property.Culture, Is.EqualTo("en-US"));
         });
 
-        Assert.AreEqual(1, toEditorValue.Expose.Count);
+        Assert.That(toEditorValue.Expose, Has.Count.EqualTo(1));
         Assert.Multiple(() =>
         {
             var itemVariation = toEditorValue.Expose[0];
-            Assert.AreEqual(contentElementKey, itemVariation.ContentKey);
-            Assert.AreEqual("en-US", itemVariation.Culture);
+            Assert.That(itemVariation.ContentKey, Is.EqualTo(contentElementKey));
+            Assert.That(itemVariation.Culture, Is.EqualTo("en-US"));
         });
     }
 
@@ -706,25 +706,25 @@ internal sealed class SingleBlockPropertyEditorTests : UmbracoIntegrationTest
 
         var valueEditor = await GetValueEditor(singleBlockContentType);
         var toEditorValue = valueEditor.ToEditor(content.Properties["block"]!) as SingleBlockValue;
-        Assert.IsNotNull(toEditorValue);
-        Assert.AreEqual(1, toEditorValue.ContentData.Count);
+        Assert.That(toEditorValue, Is.Not.Null);
+        Assert.That(toEditorValue.ContentData, Has.Count.EqualTo(1));
 
         var properties = toEditorValue.ContentData.First().Values;
-        Assert.AreEqual(1, properties.Count);
+        Assert.That(properties, Has.Count.EqualTo(1));
         Assert.Multiple(() =>
         {
             var property = properties.First();
-            Assert.AreEqual("singleLineText", property.Alias);
-            Assert.AreEqual("The single line text", property.Value);
-            Assert.AreEqual(null, property.Culture);
+            Assert.That(property.Alias, Is.EqualTo("singleLineText"));
+            Assert.That(property.Value, Is.EqualTo("The single line text"));
+            Assert.That(property.Culture, Is.EqualTo(null));
         });
 
-        Assert.AreEqual(1, toEditorValue.Expose.Count);
+        Assert.That(toEditorValue.Expose, Has.Count.EqualTo(1));
         Assert.Multiple(() =>
         {
             var itemVariation = toEditorValue.Expose[0];
-            Assert.AreEqual(contentElementKey, itemVariation.ContentKey);
-            Assert.AreEqual(null, itemVariation.Culture);
+            Assert.That(itemVariation.ContentKey, Is.EqualTo(contentElementKey));
+            Assert.That(itemVariation.Culture, Is.EqualTo(null));
         });
     }
 
@@ -768,9 +768,9 @@ internal sealed class SingleBlockPropertyEditorTests : UmbracoIntegrationTest
     private async Task<SingleBlockPropertyEditor.SingleBlockEditorPropertyValueEditor> GetValueEditor(IContentType contentType)
     {
         var dataType = await DataTypeService.GetAsync(contentType.PropertyTypes.First(propertyType => propertyType.Alias == "block").DataTypeKey);
-        Assert.IsNotNull(dataType?.Editor);
+        Assert.That(dataType?.Editor, Is.Not.Null);
         var valueEditor = dataType.Editor.GetValueEditor() as SingleBlockPropertyEditor.SingleBlockEditorPropertyValueEditor;
-        Assert.IsNotNull(valueEditor);
+        Assert.That(valueEditor, Is.Not.Null);
 
         return valueEditor;
     }

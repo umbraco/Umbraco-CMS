@@ -16,14 +16,14 @@ public class RepositoryCacheKeysTests
     public void GetKey_Returns_Expected_Key_For_Type()
     {
         var key = RepositoryCacheKeys.GetKey<IContent>();
-        Assert.AreEqual("uRepo_IContent_", key);
+        Assert.That(key, Is.EqualTo("uRepo_IContent_"));
     }
 
     [Test]
     public void GetKey_Returns_Expected_Key_For_Type_And_Id()
     {
         var key = RepositoryCacheKeys.GetKey<IContent, int>(1000);
-        Assert.AreEqual("uRepo_IContent_1000", key);
+        Assert.That(key, Is.EqualTo("uRepo_IContent_1000"));
     }
 
     [Test]
@@ -31,14 +31,14 @@ public class RepositoryCacheKeysTests
     {
         var guid = Guid.Parse("A1B2C3D4-E5F6-7890-ABCD-EF1234567890");
         var key = RepositoryCacheKeys.GetGuidKey<IContent>(guid);
-        Assert.AreEqual("uRepoGuid_IContent_a1b2c3d4-e5f6-7890-abcd-ef1234567890", key);
+        Assert.That(key, Is.EqualTo("uRepoGuid_IContent_a1b2c3d4-e5f6-7890-abcd-ef1234567890"));
     }
 
     [Test]
     public void GetGuidKey_Returns_Empty_For_Empty_Guid()
     {
         var key = RepositoryCacheKeys.GetGuidKey<IContent>(Guid.Empty);
-        Assert.AreEqual(string.Empty, key);
+        Assert.That(key, Is.EqualTo(string.Empty));
     }
 
     /// <summary>
@@ -133,8 +133,8 @@ public class RepositoryCacheKeysTests
         }
 
         // Assert - only fail on thread-safety violations.
-        Assert.IsEmpty(
-            threadSafetyExceptions,
+        Assert.That(
+            threadSafetyExceptions, Is.Empty,
             $"Thread safety violation detected: {string.Join(Environment.NewLine, threadSafetyExceptions.Select(e => e.Message))}");
     }
 

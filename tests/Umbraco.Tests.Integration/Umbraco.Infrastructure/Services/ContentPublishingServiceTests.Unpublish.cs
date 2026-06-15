@@ -26,8 +26,8 @@ public partial class ContentPublishingServiceTests
 
         var result = await ContentPublishingService.UnpublishAsync(Textpage.Key, null, Constants.Security.SuperUserKey);
 
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ContentPublishingOperationStatus.Success, result.Result);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.EqualTo(ContentPublishingOperationStatus.Success));
         VerifyIsNotPublished(Textpage.Key);
     }
 
@@ -41,8 +41,8 @@ public partial class ContentPublishingServiceTests
 
         var result = await ContentPublishingService.UnpublishAsync(Subpage.Key, null, Constants.Security.SuperUserKey);
 
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ContentPublishingOperationStatus.Success, result.Result);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.EqualTo(ContentPublishingOperationStatus.Success));
         VerifyIsPublished(Textpage.Key);
         VerifyIsNotPublished(Subpage.Key);
     }
@@ -61,17 +61,17 @@ public partial class ContentPublishingServiceTests
 
         var result = await ContentPublishingService.UnpublishAsync(Textpage.Key, null, Constants.Security.SuperUserKey);
 
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ContentPublishingOperationStatus.Success, result.Result);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.EqualTo(ContentPublishingOperationStatus.Success));
         VerifyIsNotPublished(Textpage.Key);
         // the sub pages are still published...
         VerifyIsPublished(Subpage.Key);
         VerifyIsPublished(Subpage2.Key);
         VerifyIsPublished(Subpage3.Key);
         // ... but should no longer be routable because the parent is unpublished
-        Assert.IsFalse(ContentService.IsPathPublished(Subpage));
-        Assert.IsFalse(ContentService.IsPathPublished(Subpage2));
-        Assert.IsFalse(ContentService.IsPathPublished(Subpage3));
+        Assert.That(ContentService.IsPathPublished(Subpage), Is.False);
+        Assert.That(ContentService.IsPathPublished(Subpage2), Is.False);
+        Assert.That(ContentService.IsPathPublished(Subpage3), Is.False);
     }
 
     [Test]
@@ -81,8 +81,8 @@ public partial class ContentPublishingServiceTests
 
         var result = await ContentPublishingService.UnpublishAsync(Textpage.Key, null, Constants.Security.SuperUserKey);
 
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ContentPublishingOperationStatus.Success, result.Result);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.EqualTo(ContentPublishingOperationStatus.Success));
         VerifyIsNotPublished(Textpage.Key);
     }
 
@@ -96,8 +96,8 @@ public partial class ContentPublishingServiceTests
 
         var result = await ContentPublishingService.UnpublishAsync(Textpage.Key, null, Constants.Security.SuperUserKey);
 
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentPublishingOperationStatus.CancelledByEvent, result.Result);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Result, Is.EqualTo(ContentPublishingOperationStatus.CancelledByEvent));
         VerifyIsPublished(Textpage.Key);
     }
 
@@ -113,8 +113,8 @@ public partial class ContentPublishingServiceTests
 
         var result = await ContentPublishingService.UnpublishAsync(Textpage.Key, null, Constants.Security.SuperUserKey);
 
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentPublishingOperationStatus.CannotUnpublishWhenReferenced, result.Result);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Result, Is.EqualTo(ContentPublishingOperationStatus.CannotUnpublishWhenReferenced));
         VerifyIsPublished(Textpage.Key);
     }
 
@@ -130,8 +130,8 @@ public partial class ContentPublishingServiceTests
 
         var result = await ContentPublishingService.UnpublishAsync(Textpage.Key, null, Constants.Security.SuperUserKey);
 
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ContentPublishingOperationStatus.Success, result.Result);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.EqualTo(ContentPublishingOperationStatus.Success));
         VerifyIsNotPublished(Textpage.Key);
     }
 
@@ -158,13 +158,13 @@ public partial class ContentPublishingServiceTests
         VerifyIsPublished(content.Key);
 
         var result = await ContentPublishingService.UnpublishAsync(content.Key, new HashSet<string> { langEn.IsoCode }, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ContentPublishingOperationStatus.Success, result.Result);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.EqualTo(ContentPublishingOperationStatus.Success));
         VerifyIsPublished(content.Key);
 
         content = ContentService.GetById(content.Key)!;
-        Assert.AreEqual(1, content.PublishedCultures.Count());
-        Assert.IsTrue(content.PublishedCultures.InvariantContains(langDa.IsoCode));
+        Assert.That(content.PublishedCultures.Count(), Is.EqualTo(1));
+        Assert.That(content.PublishedCultures.InvariantContains(langDa.IsoCode), Is.True);
     }
 
     [Test]
@@ -190,12 +190,12 @@ public partial class ContentPublishingServiceTests
         VerifyIsPublished(content.Key);
 
         var result = await ContentPublishingService.UnpublishAsync(content.Key, new HashSet<string>(){"*"}, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ContentPublishingOperationStatus.Success, result.Result);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.EqualTo(ContentPublishingOperationStatus.Success));
         VerifyIsNotPublished(content.Key);
 
         content = ContentService.GetById(content.Key)!;
-        Assert.AreEqual(0, content.PublishedCultures.Count());
+        Assert.That(content.PublishedCultures.Count(), Is.EqualTo(0));
     }
 
     [Test]
@@ -221,12 +221,12 @@ public partial class ContentPublishingServiceTests
         VerifyIsPublished(content.Key);
 
         var result = await ContentPublishingService.UnpublishAsync(content.Key, new HashSet<string>() { langEn.IsoCode, langDa.IsoCode }, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ContentPublishingOperationStatus.Success, result.Result);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.EqualTo(ContentPublishingOperationStatus.Success));
         VerifyIsNotPublished(content.Key);
 
         content = ContentService.GetById(content.Key)!;
-        Assert.AreEqual(0, content.PublishedCultures.Count());
+        Assert.That(content.PublishedCultures.Count(), Is.EqualTo(0));
     }
 
     [Test]
@@ -260,14 +260,14 @@ public partial class ContentPublishingServiceTests
 
         VerifyIsPublished(content.Key);
         content = ContentService.GetById(content.Key)!;
-        Assert.AreEqual(3, content.PublishedCultures.Count());
+        Assert.That(content.PublishedCultures.Count(), Is.EqualTo(3));
 
         var result = await ContentPublishingService.UnpublishAsync(content.Key, new HashSet<string> { langDa.IsoCode, langSe.IsoCode }, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ContentPublishingOperationStatus.Success, result.Result);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.EqualTo(ContentPublishingOperationStatus.Success));
         VerifyIsPublished(content.Key);
         content = ContentService.GetById(content.Key)!;
-        Assert.AreEqual(1, content.PublishedCultures.Count());
+        Assert.That(content.PublishedCultures.Count(), Is.EqualTo(1));
     }
 
     [Test]
@@ -294,15 +294,15 @@ public partial class ContentPublishingServiceTests
         VerifyIsPublished(content.Key);
 
         content = ContentService.GetById(content.Key)!;
-        Assert.AreEqual(2, content.PublishedCultures.Count());
+        Assert.That(content.PublishedCultures.Count(), Is.EqualTo(2));
 
         var result = await ContentPublishingService.UnpublishAsync(content.Key, new HashSet<string> { langEn.IsoCode }, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ContentPublishingOperationStatus.Success, result.Result);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.EqualTo(ContentPublishingOperationStatus.Success));
         VerifyIsNotPublished(content.Key);
 
         content = ContentService.GetById(content.Key)!;
-        Assert.AreEqual(0, content.PublishedCultures.Count());
+        Assert.That(content.PublishedCultures.Count(), Is.EqualTo(0));
     }
 
     [Test]
@@ -328,27 +328,27 @@ public partial class ContentPublishingServiceTests
         VerifyIsPublished(content.Key);
 
         content = ContentService.GetById(content.Key)!;
-        Assert.AreEqual(2, content.PublishedCultures.Count());
+        Assert.That(content.PublishedCultures.Count(), Is.EqualTo(2));
 
         var result = await ContentPublishingService.UnpublishAsync(content.Key, new HashSet<string>() { langDa.IsoCode }, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ContentPublishingOperationStatus.Success, result.Result);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.EqualTo(ContentPublishingOperationStatus.Success));
         VerifyIsPublished(content.Key);
 
         content = ContentService.GetById(content.Key)!;
-        Assert.AreEqual(1, content.PublishedCultures.Count());
+        Assert.That(content.PublishedCultures.Count(), Is.EqualTo(1));
     }
 
     [Test]
     public async Task Can_Unpublish_From_Trash()
     {
         ContentService.MoveToRecycleBin(Subpage);
-        Assert.IsTrue(ContentService.GetById(Subpage.Key)!.Trashed);
+        Assert.That(ContentService.GetById(Subpage.Key)!.Trashed, Is.True);
 
         var result = await ContentPublishingService.UnpublishAsync(Subpage.Key, null, Constants.Security.SuperUserKey);
 
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ContentPublishingOperationStatus.Success, result.Result);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.EqualTo(ContentPublishingOperationStatus.Success));
         VerifyIsNotPublished(Subpage.Key);
     }
 
@@ -376,12 +376,12 @@ public partial class ContentPublishingServiceTests
         VerifyIsPublished(content.Key);
 
         var result = await ContentPublishingService.UnpublishAsync(content.Key, new HashSet<string>() { cultureCode }, Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentPublishingOperationStatus.InvalidCulture, result.Result);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Result, Is.EqualTo(ContentPublishingOperationStatus.InvalidCulture));
         VerifyIsPublished(content.Key);
 
         content = ContentService.GetById(content.Key)!;
-        Assert.AreEqual(2, content.PublishedCultures.Count());
+        Assert.That(content.PublishedCultures.Count(), Is.EqualTo(2));
     }
 
     [TestCase("de-DE")]
@@ -409,33 +409,33 @@ public partial class ContentPublishingServiceTests
         VerifyIsPublished(content.Key);
 
         var result = await ContentPublishingService.UnpublishAsync(content.Key, new HashSet<string>() { cultureCode }, Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentPublishingOperationStatus.InvalidCulture, result.Result);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Result, Is.EqualTo(ContentPublishingOperationStatus.InvalidCulture));
         VerifyIsPublished(content.Key);
 
         content = ContentService.GetById(content.Key)!;
-        Assert.AreEqual(2, content.PublishedCultures.Count());
+        Assert.That(content.PublishedCultures.Count(), Is.EqualTo(2));
     }
 
     [Test]
     public async Task Can_Unpublish_Invariant_Content_With_Cultures_Provided_If_The_Default_Culture_Is_Exclusively_Provided()
     {
         var result = await ContentPublishingService.UnpublishAsync(Textpage.Key, new HashSet<string>() { "en-US" }, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
     }
 
     [Test]
     public async Task Can_Unpublish_Invariant_Content_With_Cultures_Provided_If_The_Default_Culture_Is_Provided_With_Other_Cultures()
     {
         var result = await ContentPublishingService.UnpublishAsync(Textpage.Key, new HashSet<string>() { "en-US", "da-DK" }, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
     }
 
     [Test]
     public async Task Cannot_Unpublish_Invariant_Content_With_Cultures_Provided_That_Do_Not_Include_The_Default_Culture()
     {
         var result = await ContentPublishingService.UnpublishAsync(Textpage.Key, new HashSet<string>() { "da-DK" }, Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentPublishingOperationStatus.CannotPublishVariantWhenNotVariant, result.Result);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Result, Is.EqualTo(ContentPublishingOperationStatus.CannotPublishVariantWhenNotVariant));
     }
 }

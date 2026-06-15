@@ -29,7 +29,7 @@ public class ContentNavigationServiceTest
 
         var success = contentNavigationService.TryGetLevel(rootKey, out var level);
 
-        Assert.IsTrue(success);
+        Assert.That(success, Is.True);
         Assert.That(level, Is.EqualTo(1));
     }
 
@@ -53,7 +53,7 @@ public class ContentNavigationServiceTest
 
         var success = contentNavigationService.TryGetLevel(childKey, out var level);
 
-        Assert.IsTrue(success);
+        Assert.That(success, Is.True);
         Assert.That(level, Is.EqualTo(2));
     }
 
@@ -77,7 +77,7 @@ public class ContentNavigationServiceTest
 
         var success = contentNavigationService.TryGetLevel(grandChildKey, out var level);
 
-        Assert.IsTrue(success);
+        Assert.That(success, Is.True);
         Assert.That(level, Is.EqualTo(3));
     }
 

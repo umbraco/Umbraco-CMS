@@ -58,7 +58,7 @@ internal sealed class UserGroupPresentationFactoryTests : UmbracoIntegrationTest
         };
 
         var attempt = await UserGroupPresentationFactory.CreateAsync(createModel);
-        Assert.IsTrue(attempt.Success);
+        Assert.That(attempt.Success, Is.True);
 
         var userGroupCreateAttempt = await UserGroupService.CreateAsync(attempt.Result, Constants.Security.SuperUserKey);
 
@@ -66,9 +66,9 @@ internal sealed class UserGroupPresentationFactoryTests : UmbracoIntegrationTest
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(userGroupCreateAttempt.Success);
-            Assert.IsNotNull(userGroup);
-            Assert.IsEmpty(userGroup.GranularPermissions);
+            Assert.That(userGroupCreateAttempt.Success, Is.True);
+            Assert.That(userGroup, Is.Not.Null);
+            Assert.That(userGroup.GranularPermissions, Is.Empty);
         });
     }
 
@@ -94,14 +94,14 @@ internal sealed class UserGroupPresentationFactoryTests : UmbracoIntegrationTest
         };
 
         var attempt = await UserGroupPresentationFactory.CreateAsync(createModel);
-        Assert.IsTrue(attempt.Success);
+        Assert.That(attempt.Success, Is.True);
 
         var userGroupCreateAttempt = await UserGroupService.CreateAsync(attempt.Result, Constants.Security.SuperUserKey);
 
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(userGroupCreateAttempt.Success);
-            Assert.AreEqual(UserGroupOperationStatus.DocumentPermissionKeyNotFound, userGroupCreateAttempt.Status);
+            Assert.That(userGroupCreateAttempt.Success, Is.False);
+            Assert.That(userGroupCreateAttempt.Status, Is.EqualTo(UserGroupOperationStatus.DocumentPermissionKeyNotFound));
         });
     }
 
@@ -128,14 +128,14 @@ internal sealed class UserGroupPresentationFactoryTests : UmbracoIntegrationTest
         };
 
         var attempt = await UserGroupPresentationFactory.CreateAsync(updateModel);
-        Assert.IsTrue(attempt.Success);
+        Assert.That(attempt.Success, Is.True);
 
         var userGroupCreateAttempt = await UserGroupService.CreateAsync(attempt.Result, Constants.Security.SuperUserKey);
 
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(userGroupCreateAttempt.Success);
-            Assert.AreEqual(UserGroupOperationStatus.DocumentTypePermissionKeyNotFound, userGroupCreateAttempt.Status);
+            Assert.That(userGroupCreateAttempt.Success, Is.False);
+            Assert.That(userGroupCreateAttempt.Status, Is.EqualTo(UserGroupOperationStatus.DocumentTypePermissionKeyNotFound));
         });
     }
 
@@ -163,18 +163,18 @@ internal sealed class UserGroupPresentationFactoryTests : UmbracoIntegrationTest
         };
 
         var attempt = await UserGroupPresentationFactory.CreateAsync(createModel);
-        Assert.IsTrue(attempt.Success);
+        Assert.That(attempt.Success, Is.True);
 
         var userGroupCreateAttempt = await UserGroupService.CreateAsync(attempt.Result, Constants.Security.SuperUserKey);
         var userGroup = userGroupCreateAttempt.Result;
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(userGroupCreateAttempt.Success);
-            Assert.IsNotNull(userGroup);
-            Assert.IsNotEmpty(userGroup.GranularPermissions);
-            Assert.AreEqual(contentKey, userGroup.GranularPermissions.First().Key);
-            Assert.AreEqual(string.Empty, userGroup.GranularPermissions.First().Permission);
+            Assert.That(userGroupCreateAttempt.Success, Is.True);
+            Assert.That(userGroup, Is.Not.Null);
+            Assert.That(userGroup.GranularPermissions, Is.Not.Empty);
+            Assert.That(userGroup.GranularPermissions.First().Key, Is.EqualTo(contentKey));
+            Assert.That(userGroup.GranularPermissions.First().Permission, Is.EqualTo(string.Empty));
         });
     }
 
@@ -210,25 +210,25 @@ internal sealed class UserGroupPresentationFactoryTests : UmbracoIntegrationTest
         };
 
         var attempt = await UserGroupPresentationFactory.CreateAsync(updateModel);
-        Assert.IsTrue(attempt.Success);
+        Assert.That(attempt.Success, Is.True);
 
         var userGroupCreateAttempt = await UserGroupService.CreateAsync(attempt.Result, Constants.Security.SuperUserKey);
         var userGroup = userGroupCreateAttempt.Result;
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(userGroupCreateAttempt.Success);
-            Assert.IsNotNull(userGroup);
+            Assert.That(userGroupCreateAttempt.Success, Is.True);
+            Assert.That(userGroup, Is.Not.Null);
         });
 
-        Assert.AreEqual(2, userGroup.GranularPermissions.Count);
+        Assert.That(userGroup.GranularPermissions, Has.Count.EqualTo(2));
         var documentTypeGranularPermissions = userGroup.GranularPermissions.OfType<DocumentPropertyValueGranularPermission>().ToArray();
-        Assert.AreEqual(2, documentTypeGranularPermissions.Length);
+        Assert.That(documentTypeGranularPermissions, Has.Length.EqualTo(2));
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(documentTypeGranularPermissions.All(x => x.Key == contentType.Key));
-            Assert.AreEqual($"{propertyType.Key}|Some", documentTypeGranularPermissions.First().Permission);
-            Assert.AreEqual($"{propertyType.Key}|Another", documentTypeGranularPermissions.Last().Permission);
+            Assert.That(documentTypeGranularPermissions.All(x => x.Key == contentType.Key), Is.True);
+            Assert.That(documentTypeGranularPermissions.First().Permission, Is.EqualTo($"{propertyType.Key}|Some"));
+            Assert.That(documentTypeGranularPermissions.Last().Permission, Is.EqualTo($"{propertyType.Key}|Another"));
         });
     }
 
@@ -264,24 +264,24 @@ internal sealed class UserGroupPresentationFactoryTests : UmbracoIntegrationTest
         };
 
         var attempt = await UserGroupPresentationFactory.CreateAsync(updateModel);
-        Assert.IsTrue(attempt.Success);
+        Assert.That(attempt.Success, Is.True);
 
         var userGroupCreateAttempt = await UserGroupService.CreateAsync(attempt.Result, Constants.Security.SuperUserKey);
         var userGroup = userGroupCreateAttempt.Result;
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(userGroupCreateAttempt.Success);
-            Assert.IsNotNull(userGroup);
+            Assert.That(userGroupCreateAttempt.Success, Is.True);
+            Assert.That(userGroup, Is.Not.Null);
         });
 
-        Assert.AreEqual(1, userGroup.GranularPermissions.Count);
+        Assert.That(userGroup.GranularPermissions, Has.Count.EqualTo(1));
         var documentTypeGranularPermissions = userGroup.GranularPermissions.OfType<DocumentPropertyValueGranularPermission>().ToArray();
-        Assert.AreEqual(1, documentTypeGranularPermissions.Length);
+        Assert.That(documentTypeGranularPermissions, Has.Length.EqualTo(1));
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(documentTypeGranularPermissions.All(x => x.Key == contentType.Key));
-            Assert.AreEqual($"{propertyType.Key}|", documentTypeGranularPermissions.First().Permission);
+            Assert.That(documentTypeGranularPermissions.All(x => x.Key == contentType.Key), Is.True);
+            Assert.That(documentTypeGranularPermissions.First().Permission, Is.EqualTo($"{propertyType.Key}|"));
         });
     }
 
@@ -330,16 +330,16 @@ internal sealed class UserGroupPresentationFactoryTests : UmbracoIntegrationTest
         var attempt = await UserGroupPresentationFactory.CreateAsync(updateModel);
 
         var userGroupCreateAttempt = await UserGroupService.CreateAsync(attempt.Result, Constants.Security.SuperUserKey);
-        Assert.IsTrue(userGroupCreateAttempt.Success);
-        Assert.AreEqual(4, userGroupCreateAttempt.Result!.GranularPermissions.Count);
+        Assert.That(userGroupCreateAttempt.Success, Is.True);
+        Assert.That(userGroupCreateAttempt.Result!.GranularPermissions, Has.Count.EqualTo(4));
 
         var deleteResult = await GetRequiredService<IContentTypeService>().DeleteAsync(contentType1.Key, Constants.Security.SuperUserKey);
-        Assert.AreEqual(ContentTypeOperationStatus.Success, deleteResult);
+        Assert.That(deleteResult, Is.EqualTo(ContentTypeOperationStatus.Success));
 
         var userGroup = await UserGroupService.GetAsync(userGroupCreateAttempt.Result!.Key);
-        Assert.IsNotNull(userGroup);
+        Assert.That(userGroup, Is.Not.Null);
 
-        Assert.AreEqual(2, userGroup.GranularPermissions.Count);
+        Assert.That(userGroup.GranularPermissions, Has.Count.EqualTo(2));
     }
 
     private async Task<Guid> CreateContent()
@@ -350,7 +350,7 @@ internal sealed class UserGroupPresentationFactoryTests : UmbracoIntegrationTest
         // Create and Save ContentType "umbTextpage" -> 1051 (template), 1052 (content type)
         var contentTypeCreateModel = ContentTypeEditingBuilder.CreateSimpleContentType("umbTextpage", "Textpage", defaultTemplateKey: template.Key);
         var contentTypeAttempt = await ContentTypeEditingService.CreateAsync(contentTypeCreateModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(contentTypeAttempt.Success);
+        Assert.That(contentTypeAttempt.Success, Is.True);
 
         var contentTypeResult = contentTypeAttempt.Result;
         var contentTypeUpdateModel = ContentTypeUpdateHelper.CreateContentTypeUpdateModel(contentTypeResult);
@@ -359,12 +359,12 @@ internal sealed class UserGroupPresentationFactoryTests : UmbracoIntegrationTest
             new ContentTypeSort(contentTypeResult.Key, 0, contentTypeCreateModel.Alias),
         };
         var updatedContentTypeResult = await ContentTypeEditingService.UpdateAsync(contentTypeResult, contentTypeUpdateModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(updatedContentTypeResult.Success);
+        Assert.That(updatedContentTypeResult.Success, Is.True);
 
         // Create and Save Content "Homepage" based on "umbTextpage" -> 1053
         var textPage = ContentEditingBuilder.CreateSimpleContent(updatedContentTypeResult.Result.Key);
         var createContentResultTextPage = await ContentEditingService.CreateAsync(textPage, Constants.Security.SuperUserKey);
-        Assert.IsTrue(createContentResultTextPage.Success);
+        Assert.That(createContentResultTextPage.Success, Is.True);
 
         return createContentResultTextPage.Result.Content.Key;
     }

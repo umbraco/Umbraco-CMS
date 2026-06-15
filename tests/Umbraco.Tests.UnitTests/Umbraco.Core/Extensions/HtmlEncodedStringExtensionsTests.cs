@@ -21,6 +21,6 @@ public class HtmlEncodedStringExtensionsTests
         var htmlEncodedString = htmlString == null ? null : Mock.Of<IHtmlEncodedString>(x => x.ToHtmlString() == htmlString);
         var result = htmlEncodedString.IsNullOrWhiteSpace(stripHtml: stripHtml);
 
-        Assert.AreEqual(expectedResult, result);
+        Assert.That(result, Is.EqualTo(expectedResult));
     }
 }

@@ -29,7 +29,7 @@ public class PreviewRoutesTests
         var endpoints = new TestRouteBuilder();
         routes.CreateRoutes(endpoints);
 
-        Assert.AreEqual(0, endpoints.DataSources.Count);
+        Assert.That(endpoints.DataSources.Count, Is.EqualTo(0));
     }
 
     [TestCase(RuntimeLevel.Run)]
@@ -41,14 +41,14 @@ public class PreviewRoutesTests
         var endpoints = new TestRouteBuilder();
         routes.CreateRoutes(endpoints);
 
-        Assert.AreEqual(1, endpoints.DataSources.Count);
+        Assert.That(endpoints.DataSources, Has.Count.EqualTo(1));
         var route = endpoints.DataSources.First();
-        Assert.AreEqual(2, route.Endpoints.Count);
+        Assert.That(route.Endpoints, Has.Count.EqualTo(2));
 
         var endpoint0 = (RouteEndpoint)route.Endpoints[0];
-        Assert.AreEqual($"{routes.GetPreviewHubRoute()}/negotiate", endpoint0.RoutePattern.RawText);
+        Assert.That(endpoint0.RoutePattern.RawText, Is.EqualTo($"{routes.GetPreviewHubRoute()}/negotiate"));
         var endpoint1 = (RouteEndpoint)route.Endpoints[1];
-        Assert.AreEqual($"{routes.GetPreviewHubRoute()}", endpoint1.RoutePattern.RawText);
+        Assert.That(endpoint1.RoutePattern.RawText, Is.EqualTo($"{routes.GetPreviewHubRoute()}"));
     }
 
     private PreviewRoutes GetRoutes(RuntimeLevel level)

@@ -140,10 +140,10 @@ public class VariationTests
         bool exactAndNoWildcards,
         bool nonExactAndWildcards)
     {
-        Assert.AreEqual(exactAndWildcards, variation.ValidateVariation(culture, segment, true, true, false));
-        Assert.AreEqual(nonExactAndNoWildcards, variation.ValidateVariation(culture, segment, false, false, false));
-        Assert.AreEqual(exactAndNoWildcards, variation.ValidateVariation(culture, segment, true, false, false));
-        Assert.AreEqual(nonExactAndWildcards, variation.ValidateVariation(culture, segment, false, true, false));
+        Assert.That(variation.ValidateVariation(culture, segment, true, true, false), Is.EqualTo(exactAndWildcards));
+        Assert.That(variation.ValidateVariation(culture, segment, false, false, false), Is.EqualTo(nonExactAndNoWildcards));
+        Assert.That(variation.ValidateVariation(culture, segment, true, false, false), Is.EqualTo(exactAndNoWildcards));
+        Assert.That(variation.ValidateVariation(culture, segment, false, true, false), Is.EqualTo(nonExactAndWildcards));
     }
 
     /// <summary>
@@ -167,8 +167,8 @@ public class VariationTests
         // and get edited and published value
         // because non-publishing
         prop.SetValue("a");
-        Assert.AreEqual("a", prop.GetValue());
-        Assert.AreEqual("a", prop.GetValue(published: true));
+        Assert.That(prop.GetValue(), Is.EqualTo("a"));
+        Assert.That(prop.GetValue(published: true), Is.EqualTo("a"));
 
         // illegal, 'cos non-publishing
         Assert.Throws<NotSupportedException>(() => prop.PublishValues());
@@ -178,29 +178,29 @@ public class VariationTests
 
         // can get value
         // and now published value is null
-        Assert.AreEqual("a", prop.GetValue());
-        Assert.IsNull(prop.GetValue(published: true));
+        Assert.That(prop.GetValue(), Is.EqualTo("a"));
+        Assert.That(prop.GetValue(published: true), Is.Null);
 
         // cannot set non-supported variation value
         Assert.Throws<NotSupportedException>(() => prop.SetValue("x", langFr));
-        Assert.IsNull(prop.GetValue(langFr));
+        Assert.That(prop.GetValue(langFr), Is.Null);
 
         // can publish value
         // and get edited and published values
         prop.PublishValues();
-        Assert.AreEqual("a", prop.GetValue());
-        Assert.AreEqual("a", prop.GetValue(published: true));
+        Assert.That(prop.GetValue(), Is.EqualTo("a"));
+        Assert.That(prop.GetValue(published: true), Is.EqualTo("a"));
 
         // can set value
         // and get edited and published values
         prop.SetValue("b");
-        Assert.AreEqual("b", prop.GetValue());
-        Assert.AreEqual("a", prop.GetValue(published: true));
+        Assert.That(prop.GetValue(), Is.EqualTo("b"));
+        Assert.That(prop.GetValue(published: true), Is.EqualTo("a"));
 
         // can clear value
         prop.UnpublishValues();
-        Assert.AreEqual("b", prop.GetValue());
-        Assert.IsNull(prop.GetValue(published: true));
+        Assert.That(prop.GetValue(), Is.EqualTo("b"));
+        Assert.That(prop.GetValue(published: true), Is.Null);
 
         // change - now we vary by culture
         propertyType.Variations |= ContentVariation.Culture;
@@ -208,47 +208,47 @@ public class VariationTests
         // can set value
         // and get values
         prop.SetValue("c", langFr);
-        Assert.IsNull(prop.GetValue()); // there is no invariant value anymore
-        Assert.IsNull(prop.GetValue(published: true));
-        Assert.AreEqual("c", prop.GetValue(langFr));
-        Assert.IsNull(prop.GetValue(langFr, published: true));
+        Assert.That(prop.GetValue(), Is.Null); // there is no invariant value anymore
+        Assert.That(prop.GetValue(published: true), Is.Null);
+        Assert.That(prop.GetValue(langFr), Is.EqualTo("c"));
+        Assert.That(prop.GetValue(langFr, published: true), Is.Null);
 
         // can publish value
         // and get edited and published values
         prop.PublishValues(langFr);
-        Assert.IsNull(prop.GetValue());
-        Assert.IsNull(prop.GetValue(published: true));
-        Assert.AreEqual("c", prop.GetValue(langFr));
-        Assert.AreEqual("c", prop.GetValue(langFr, published: true));
+        Assert.That(prop.GetValue(), Is.Null);
+        Assert.That(prop.GetValue(published: true), Is.Null);
+        Assert.That(prop.GetValue(langFr), Is.EqualTo("c"));
+        Assert.That(prop.GetValue(langFr, published: true), Is.EqualTo("c"));
 
         // can clear all
         prop.UnpublishValues();
-        Assert.IsNull(prop.GetValue());
-        Assert.IsNull(prop.GetValue(published: true));
-        Assert.AreEqual("c", prop.GetValue(langFr));
-        Assert.IsNull(prop.GetValue(langFr, published: true));
+        Assert.That(prop.GetValue(), Is.Null);
+        Assert.That(prop.GetValue(published: true), Is.Null);
+        Assert.That(prop.GetValue(langFr), Is.EqualTo("c"));
+        Assert.That(prop.GetValue(langFr, published: true), Is.Null);
 
         // can publish all
         prop.PublishValues();
-        Assert.IsNull(prop.GetValue());
-        Assert.IsNull(prop.GetValue(published: true));
-        Assert.AreEqual("c", prop.GetValue(langFr));
-        Assert.AreEqual("c", prop.GetValue(langFr, published: true));
+        Assert.That(prop.GetValue(), Is.Null);
+        Assert.That(prop.GetValue(published: true), Is.Null);
+        Assert.That(prop.GetValue(langFr), Is.EqualTo("c"));
+        Assert.That(prop.GetValue(langFr, published: true), Is.EqualTo("c"));
 
         // same for culture
         prop.UnpublishValues(langFr);
-        Assert.AreEqual("c", prop.GetValue(langFr));
-        Assert.IsNull(prop.GetValue(langFr, published: true));
+        Assert.That(prop.GetValue(langFr), Is.EqualTo("c"));
+        Assert.That(prop.GetValue(langFr, published: true), Is.Null);
         prop.PublishValues(langFr);
-        Assert.AreEqual("c", prop.GetValue(langFr));
-        Assert.AreEqual("c", prop.GetValue(langFr, published: true));
+        Assert.That(prop.GetValue(langFr), Is.EqualTo("c"));
+        Assert.That(prop.GetValue(langFr, published: true), Is.EqualTo("c"));
 
         prop.UnpublishValues(); // does not throw, internal, content item throws
-        Assert.IsNull(prop.GetValue());
-        Assert.IsNull(prop.GetValue(published: true));
+        Assert.That(prop.GetValue(), Is.Null);
+        Assert.That(prop.GetValue(published: true), Is.Null);
         prop.PublishValues(); // does not throw, internal, content item throws
-        Assert.IsNull(prop.GetValue());
-        Assert.IsNull(prop.GetValue(published: true));
+        Assert.That(prop.GetValue(), Is.Null);
+        Assert.That(prop.GetValue(published: true), Is.Null);
     }
 
     [Test]
@@ -273,23 +273,23 @@ public class VariationTests
 
         // invariant name works
         content.Name = "name";
-        Assert.AreEqual("name", content.GetCultureName(null));
+        Assert.That(content.GetCultureName(null), Is.EqualTo("name"));
         content.SetCultureName("name2", null);
-        Assert.AreEqual("name2", content.Name);
-        Assert.AreEqual("name2", content.GetCultureName(null));
+        Assert.That(content.Name, Is.EqualTo("name2"));
+        Assert.That(content.GetCultureName(null), Is.EqualTo("name2"));
 
         // variant names work
         content.SetCultureName("name-fr", langFr);
         content.SetCultureName("name-uk", langUk);
-        Assert.AreEqual("name-fr", content.GetCultureName(langFr));
-        Assert.AreEqual("name-uk", content.GetCultureName(langUk));
+        Assert.That(content.GetCultureName(langFr), Is.EqualTo("name-fr"));
+        Assert.That(content.GetCultureName(langUk), Is.EqualTo("name-uk"));
 
         // variant dictionary of names work
-        Assert.AreEqual(2, content.CultureInfos.Count);
-        Assert.IsTrue(content.CultureInfos.ContainsKey(langFr));
-        Assert.AreEqual("name-fr", content.CultureInfos[langFr].Name);
-        Assert.IsTrue(content.CultureInfos.ContainsKey(langUk));
-        Assert.AreEqual("name-uk", content.CultureInfos[langUk].Name);
+        Assert.That(content.CultureInfos, Has.Count.EqualTo(2));
+        Assert.That(content.CultureInfos.ContainsKey(langFr), Is.True);
+        Assert.That(content.CultureInfos[langFr].Name, Is.EqualTo("name-fr"));
+        Assert.That(content.CultureInfos.ContainsKey(langUk), Is.True);
+        Assert.That(content.CultureInfos[langUk].Name, Is.EqualTo("name-uk"));
     }
 
     [Test]
@@ -311,29 +311,29 @@ public class VariationTests
         // and get edited value, published is null
         // because publishing
         content.SetValue("prop", "a");
-        Assert.AreEqual("a", content.GetValue("prop"));
-        Assert.IsNull(content.GetValue("prop", published: true));
+        Assert.That(content.GetValue("prop"), Is.EqualTo("a"));
+        Assert.That(content.GetValue("prop", published: true), Is.Null);
 
         // cannot set non-supported variation value
         Assert.Throws<NotSupportedException>(() => content.SetValue("prop", "x", langFr));
-        Assert.IsNull(content.GetValue("prop", langFr));
+        Assert.That(content.GetValue("prop", langFr), Is.Null);
 
         // can publish value
         // and get edited and published values
-        Assert.IsTrue(content.PublishCulture(CultureImpact.All, DateTime.UtcNow, _propertyEditorCollection));
-        Assert.AreEqual("a", content.GetValue("prop"));
-        Assert.AreEqual("a", content.GetValue("prop", published: true));
+        Assert.That(content.PublishCulture(CultureImpact.All, DateTime.UtcNow, _propertyEditorCollection), Is.True);
+        Assert.That(content.GetValue("prop"), Is.EqualTo("a"));
+        Assert.That(content.GetValue("prop", published: true), Is.EqualTo("a"));
 
         // can set value
         // and get edited and published values
         content.SetValue("prop", "b");
-        Assert.AreEqual("b", content.GetValue("prop"));
-        Assert.AreEqual("a", content.GetValue("prop", published: true));
+        Assert.That(content.GetValue("prop"), Is.EqualTo("b"));
+        Assert.That(content.GetValue("prop", published: true), Is.EqualTo("a"));
 
         // can clear value
         content.UnpublishCulture();
-        Assert.AreEqual("b", content.GetValue("prop"));
-        Assert.IsNull(content.GetValue("prop", published: true));
+        Assert.That(content.GetValue("prop"), Is.EqualTo("b"));
+        Assert.That(content.GetValue("prop", published: true), Is.Null);
 
         // change - now we vary by culture
         contentType.Variations |= ContentVariation.Culture;
@@ -343,49 +343,49 @@ public class VariationTests
         // can set value
         // and get values
         content.SetValue("prop", "c", langFr);
-        Assert.IsNull(content.GetValue("prop")); // there is no invariant value anymore
-        Assert.IsNull(content.GetValue("prop", published: true));
-        Assert.AreEqual("c", content.GetValue("prop", langFr));
-        Assert.IsNull(content.GetValue("prop", langFr, published: true));
+        Assert.That(content.GetValue("prop"), Is.Null); // there is no invariant value anymore
+        Assert.That(content.GetValue("prop", published: true), Is.Null);
+        Assert.That(content.GetValue("prop", langFr), Is.EqualTo("c"));
+        Assert.That(content.GetValue("prop", langFr, published: true), Is.Null);
 
         // can publish value
         // and get edited and published values
-        Assert.IsFalse(content.PublishCulture(CultureImpact.Explicit(langFr, false), DateTime.UtcNow, _propertyEditorCollection)); // no name
+        Assert.That(content.PublishCulture(CultureImpact.Explicit(langFr, false), DateTime.UtcNow, _propertyEditorCollection), Is.False); // no name
         content.SetCultureName("name-fr", langFr);
-        Assert.IsTrue(content.PublishCulture(CultureImpact.Explicit(langFr, false), DateTime.UtcNow, _propertyEditorCollection));
-        Assert.IsNull(content.GetValue("prop"));
-        Assert.IsNull(content.GetValue("prop", published: true));
-        Assert.AreEqual("c", content.GetValue("prop", langFr));
-        Assert.AreEqual("c", content.GetValue("prop", langFr, published: true));
+        Assert.That(content.PublishCulture(CultureImpact.Explicit(langFr, false), DateTime.UtcNow, _propertyEditorCollection), Is.True);
+        Assert.That(content.GetValue("prop"), Is.Null);
+        Assert.That(content.GetValue("prop", published: true), Is.Null);
+        Assert.That(content.GetValue("prop", langFr), Is.EqualTo("c"));
+        Assert.That(content.GetValue("prop", langFr, published: true), Is.EqualTo("c"));
 
         // can clear all
         content.UnpublishCulture();
-        Assert.IsNull(content.GetValue("prop"));
-        Assert.IsNull(content.GetValue("prop", published: true));
-        Assert.AreEqual("c", content.GetValue("prop", langFr));
-        Assert.IsNull(content.GetValue("prop", langFr, published: true));
+        Assert.That(content.GetValue("prop"), Is.Null);
+        Assert.That(content.GetValue("prop", published: true), Is.Null);
+        Assert.That(content.GetValue("prop", langFr), Is.EqualTo("c"));
+        Assert.That(content.GetValue("prop", langFr, published: true), Is.Null);
 
         // can publish all
-        Assert.IsTrue(content.PublishCulture(CultureImpact.All, DateTime.UtcNow, _propertyEditorCollection));
-        Assert.IsNull(content.GetValue("prop"));
-        Assert.IsNull(content.GetValue("prop", published: true));
-        Assert.AreEqual("c", content.GetValue("prop", langFr));
-        Assert.AreEqual("c", content.GetValue("prop", langFr, published: true));
+        Assert.That(content.PublishCulture(CultureImpact.All, DateTime.UtcNow, _propertyEditorCollection), Is.True);
+        Assert.That(content.GetValue("prop"), Is.Null);
+        Assert.That(content.GetValue("prop", published: true), Is.Null);
+        Assert.That(content.GetValue("prop", langFr), Is.EqualTo("c"));
+        Assert.That(content.GetValue("prop", langFr, published: true), Is.EqualTo("c"));
 
         // same for culture
         content.UnpublishCulture(langFr);
-        Assert.AreEqual("c", content.GetValue("prop", langFr));
-        Assert.IsNull(content.GetValue("prop", langFr, published: true));
-        Assert.IsTrue(content.PublishCulture(CultureImpact.Explicit(langFr, false), DateTime.UtcNow, _propertyEditorCollection));
-        Assert.AreEqual("c", content.GetValue("prop", langFr));
-        Assert.AreEqual("c", content.GetValue("prop", langFr, published: true));
+        Assert.That(content.GetValue("prop", langFr), Is.EqualTo("c"));
+        Assert.That(content.GetValue("prop", langFr, published: true), Is.Null);
+        Assert.That(content.PublishCulture(CultureImpact.Explicit(langFr, false), DateTime.UtcNow, _propertyEditorCollection), Is.True);
+        Assert.That(content.GetValue("prop", langFr), Is.EqualTo("c"));
+        Assert.That(content.GetValue("prop", langFr, published: true), Is.EqualTo("c"));
 
         content.UnpublishCulture(); // clears invariant props if any
-        Assert.IsNull(content.GetValue("prop"));
-        Assert.IsNull(content.GetValue("prop", published: true));
-        Assert.IsTrue(content.PublishCulture(CultureImpact.All, DateTime.UtcNow, _propertyEditorCollection)); // publishes invariant props if any
-        Assert.IsNull(content.GetValue("prop"));
-        Assert.IsNull(content.GetValue("prop", published: true));
+        Assert.That(content.GetValue("prop"), Is.Null);
+        Assert.That(content.GetValue("prop", published: true), Is.Null);
+        Assert.That(content.PublishCulture(CultureImpact.All, DateTime.UtcNow, _propertyEditorCollection), Is.True); // publishes invariant props if any
+        Assert.That(content.GetValue("prop"), Is.Null);
+        Assert.That(content.GetValue("prop", published: true), Is.Null);
 
         var other = CreateContent(contentType, 2, "other");
 
@@ -394,17 +394,17 @@ public class VariationTests
 
         // can copy other's edited value
         content.CopyFrom(other);
-        Assert.IsNull(content.GetValue("prop"));
-        Assert.IsNull(content.GetValue("prop", published: true));
-        Assert.AreEqual("o1", content.GetValue("prop", langFr));
-        Assert.AreEqual("c", content.GetValue("prop", langFr, published: true));
+        Assert.That(content.GetValue("prop"), Is.Null);
+        Assert.That(content.GetValue("prop", published: true), Is.Null);
+        Assert.That(content.GetValue("prop", langFr), Is.EqualTo("o1"));
+        Assert.That(content.GetValue("prop", langFr, published: true), Is.EqualTo("c"));
 
         // can copy self's published value
         content.CopyFrom(content);
-        Assert.IsNull(content.GetValue("prop"));
-        Assert.IsNull(content.GetValue("prop", published: true));
-        Assert.AreEqual("c", content.GetValue("prop", langFr));
-        Assert.AreEqual("c", content.GetValue("prop", langFr, published: true));
+        Assert.That(content.GetValue("prop"), Is.Null);
+        Assert.That(content.GetValue("prop", published: true), Is.Null);
+        Assert.That(content.GetValue("prop", langFr), Is.EqualTo("c"));
+        Assert.That(content.GetValue("prop", langFr, published: true), Is.EqualTo("c"));
     }
 
     [Test]
@@ -441,24 +441,24 @@ public class VariationTests
         // for this test we'll make the french culture the default one - this is needed for publishing invariant property values
         var langFrImpact = CultureImpact.Explicit(langFr, true);
 
-        Assert.IsTrue(
-            content.PublishCulture(langFrImpact, DateTime.UtcNow, _propertyEditorCollection)); // succeeds because names are ok (not validating properties here)
-        Assert.IsFalse(
-            propertyValidationService.IsPropertyDataValid(content, out _, langFrImpact)); // fails because prop1 is mandatory
+        Assert.That(
+            content.PublishCulture(langFrImpact, DateTime.UtcNow, _propertyEditorCollection), Is.True); // succeeds because names are ok (not validating properties here)
+        Assert.That(
+            propertyValidationService.IsPropertyDataValid(content, out _, langFrImpact), Is.False); // fails because prop1 is mandatory
 
         content.SetValue("prop1", "a", langFr);
-        Assert.IsTrue(
-            content.PublishCulture(langFrImpact, DateTime.UtcNow, _propertyEditorCollection)); // succeeds because names are ok (not validating properties here)
+        Assert.That(
+            content.PublishCulture(langFrImpact, DateTime.UtcNow, _propertyEditorCollection), Is.True); // succeeds because names are ok (not validating properties here)
 
         // Fails because prop2 is mandatory and invariant and the item isn't published.
         // Invariant is validated against the default language except when there isn't a published version, in that case it's always validated.
-        Assert.IsFalse(propertyValidationService.IsPropertyDataValid(content, out _, langFrImpact));
+        Assert.That(propertyValidationService.IsPropertyDataValid(content, out _, langFrImpact), Is.False);
         content.SetValue("prop2", "x");
-        Assert.IsTrue(content.PublishCulture(langFrImpact, DateTime.UtcNow, _propertyEditorCollection)); // still ok...
-        Assert.IsTrue(propertyValidationService.IsPropertyDataValid(content, out _, langFrImpact)); // now it's ok
+        Assert.That(content.PublishCulture(langFrImpact, DateTime.UtcNow, _propertyEditorCollection), Is.True); // still ok...
+        Assert.That(propertyValidationService.IsPropertyDataValid(content, out _, langFrImpact), Is.True); // now it's ok
 
-        Assert.AreEqual("a", content.GetValue("prop1", langFr, published: true));
-        Assert.AreEqual("x", content.GetValue("prop2", published: true));
+        Assert.That(content.GetValue("prop1", langFr, published: true), Is.EqualTo("a"));
+        Assert.That(content.GetValue("prop2", published: true), Is.EqualTo("x"));
     }
 
     [Test]
@@ -490,35 +490,35 @@ public class VariationTests
         content.SetValue("prop", "a-es", langEs);
 
         // cannot publish without a name
-        Assert.IsFalse(content.PublishCulture(CultureImpact.Explicit(langFr, false), DateTime.UtcNow, _propertyEditorCollection));
+        Assert.That(content.PublishCulture(CultureImpact.Explicit(langFr, false), DateTime.UtcNow, _propertyEditorCollection), Is.False);
 
         // works with a name
         // and then FR is available, and published
         content.SetCultureName("name-fr", langFr);
-        Assert.IsTrue(content.PublishCulture(CultureImpact.Explicit(langFr, false), DateTime.UtcNow, _propertyEditorCollection));
+        Assert.That(content.PublishCulture(CultureImpact.Explicit(langFr, false), DateTime.UtcNow, _propertyEditorCollection), Is.True);
 
         // now UK is available too
         content.SetCultureName("name-uk", langUk);
 
         // test available, published
-        Assert.IsTrue(content.IsCultureAvailable(langFr));
-        Assert.IsTrue(content.IsCulturePublished(langFr));
-        Assert.AreEqual("name-fr", content.GetPublishName(langFr));
-        Assert.AreNotEqual(DateTime.MinValue, content.GetPublishDate(langFr));
-        Assert.IsFalse(content.IsCultureEdited(langFr)); // once published, edited is *wrong* until saved
+        Assert.That(content.IsCultureAvailable(langFr), Is.True);
+        Assert.That(content.IsCulturePublished(langFr), Is.True);
+        Assert.That(content.GetPublishName(langFr), Is.EqualTo("name-fr"));
+        Assert.That(content.GetPublishDate(langFr), Is.Not.EqualTo(DateTime.MinValue));
+        Assert.That(content.IsCultureEdited(langFr), Is.False); // once published, edited is *wrong* until saved
 
-        Assert.IsTrue(content.IsCultureAvailable(langUk));
-        Assert.IsFalse(content.IsCulturePublished(langUk));
-        Assert.IsNull(content.GetPublishName(langUk));
-        Assert.IsNull(content.GetPublishDate(langUk)); // not published
+        Assert.That(content.IsCultureAvailable(langUk), Is.True);
+        Assert.That(content.IsCulturePublished(langUk), Is.False);
+        Assert.That(content.GetPublishName(langUk), Is.Null);
+        Assert.That(content.GetPublishDate(langUk), Is.Null); // not published
 
-        Assert.IsFalse(content.IsCultureAvailable(langEs));
-        Assert.IsFalse(content.IsCultureEdited(langEs)); // not avail, so... not edited
-        Assert.IsFalse(content.IsCulturePublished(langEs));
+        Assert.That(content.IsCultureAvailable(langEs), Is.False);
+        Assert.That(content.IsCultureEdited(langEs), Is.False); // not avail, so... not edited
+        Assert.That(content.IsCulturePublished(langEs), Is.False);
 
         // not published!
-        Assert.IsNull(content.GetPublishName(langEs));
-        Assert.IsNull(content.GetPublishDate(langEs));
+        Assert.That(content.GetPublishName(langEs), Is.Null);
+        Assert.That(content.GetPublishDate(langEs), Is.Null);
 
         // cannot test IsCultureEdited here - as that requires the content service and repository
         // see: ContentServiceTests.Can_SaveRead_Variations
@@ -539,17 +539,17 @@ public class VariationTests
         var content = CreateContent(contentType);
 
         prop.SetValue("a");
-        Assert.AreEqual("a", prop.GetValue());
-        Assert.IsNull(prop.GetValue(published: true));
+        Assert.That(prop.GetValue(), Is.EqualTo("a"));
+        Assert.That(prop.GetValue(published: true), Is.Null);
 
-        Assert.IsTrue(prop.IsDirty());
+        Assert.That(prop.IsDirty(), Is.True);
 
         content.SetValue("prop", "a");
-        Assert.AreEqual("a", content.GetValue("prop"));
-        Assert.IsNull(content.GetValue("prop", published: true));
+        Assert.That(content.GetValue("prop"), Is.EqualTo("a"));
+        Assert.That(content.GetValue("prop", published: true), Is.Null);
 
-        Assert.IsTrue(content.IsDirty());
-        Assert.IsTrue(content.IsAnyUserPropertyDirty());
+        Assert.That(content.IsDirty(), Is.True);
+        Assert.That(content.IsAnyUserPropertyDirty(), Is.True);
         //// how can we tell which variation was dirty?
     }
 
@@ -564,17 +564,17 @@ public class VariationTests
         var prop = new Property(propertyType);
 
         prop.SetValue("a");
-        Assert.AreEqual("a", prop.GetValue());
-        Assert.IsNull(prop.GetValue(published: true));
+        Assert.That(prop.GetValue(), Is.EqualTo("a"));
+        Assert.That(prop.GetValue(published: true), Is.Null);
         var propertyValidationService = GetPropertyValidationService();
 
-        Assert.IsTrue(propertyValidationService.IsPropertyValid(prop, PropertyValidationContext.Empty()));
+        Assert.That(propertyValidationService.IsPropertyValid(prop, PropertyValidationContext.Empty()), Is.True);
 
         propertyType.Mandatory = true;
-        Assert.IsTrue(propertyValidationService.IsPropertyValid(prop, PropertyValidationContext.Empty()));
+        Assert.That(propertyValidationService.IsPropertyValid(prop, PropertyValidationContext.Empty()), Is.True);
 
         prop.SetValue(null);
-        Assert.IsFalse(propertyValidationService.IsPropertyValid(prop, PropertyValidationContext.Empty()));
+        Assert.That(propertyValidationService.IsPropertyValid(prop, PropertyValidationContext.Empty()), Is.False);
 
         // can publish, even though invalid
         prop.PublishValues();
@@ -607,12 +607,12 @@ public class VariationTests
         var propertyValidationService = GetPropertyValidationService();
 
         // "no value" is valid for non-mandatory properties
-        Assert.IsTrue(propertyValidationService.IsPropertyValid(prop, PropertyValidationContext.CultureAndSegment(culture, segment)));
+        Assert.That(propertyValidationService.IsPropertyValid(prop, PropertyValidationContext.CultureAndSegment(culture, segment)), Is.True);
 
         propertyType.Mandatory = true;
 
         // "no value" is NOT valid for mandatory properties
-        Assert.IsFalse(propertyValidationService.IsPropertyValid(prop, PropertyValidationContext.CultureAndSegment(culture, segment)));
+        Assert.That(propertyValidationService.IsPropertyValid(prop, PropertyValidationContext.CultureAndSegment(culture, segment)), Is.False);
 
         // can publish, even though invalid
         prop.PublishValues();

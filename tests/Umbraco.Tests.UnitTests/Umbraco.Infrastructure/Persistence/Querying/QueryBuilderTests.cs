@@ -35,8 +35,8 @@ public class QueryBuilderTests : BaseUsingSqlSyntax
         Assert.That(strResult, Is.Not.Empty);
         Assert.That(strResult, Is.EqualTo(expectedResult));
 
-        Assert.AreEqual(1, result.Arguments.Length);
-        Assert.AreEqual("-1%", sql.Arguments[0]);
+        Assert.That(result.Arguments.Length, Is.EqualTo(1));
+        Assert.That(sql.Arguments[0], Is.EqualTo("-1%"));
 
         Debug.Print(strResult);
     }
@@ -62,8 +62,8 @@ public class QueryBuilderTests : BaseUsingSqlSyntax
         Assert.That(strResult, Is.Not.Empty);
         Assert.That(strResult, Is.EqualTo(expectedResult));
 
-        Assert.AreEqual(1, result.Arguments.Length);
-        Assert.AreEqual(-1, sql.Arguments[0]);
+        Assert.That(result.Arguments.Length, Is.EqualTo(1));
+        Assert.That(sql.Arguments[0], Is.EqualTo(-1));
 
         Debug.Print(strResult);
     }
@@ -88,8 +88,8 @@ public class QueryBuilderTests : BaseUsingSqlSyntax
         // Assert
         Assert.That(strResult, Is.Not.Empty);
         Assert.That(strResult, Is.EqualTo(expectedResult));
-        Assert.AreEqual(1, result.Arguments.Length);
-        Assert.AreEqual("umbTextpage", sql.Arguments[0]);
+        Assert.That(result.Arguments.Length, Is.EqualTo(1));
+        Assert.That(sql.Arguments[0], Is.EqualTo("umbTextpage"));
 
         Debug.Print(strResult);
     }
@@ -110,9 +110,9 @@ public class QueryBuilderTests : BaseUsingSqlSyntax
         var translator = new SqlTranslator<IContent>(sql, query);
         var result = translator.Translate();
 
-        Assert.AreEqual("-1,1046,1076,1089%", result.Arguments[0]);
-        Assert.AreEqual(1046, result.Arguments[1]);
-        Assert.AreEqual(true, result.Arguments[2]);
-        Assert.AreEqual(false, result.Arguments[3]);
+        Assert.That(result.Arguments[0], Is.EqualTo("-1,1046,1076,1089%"));
+        Assert.That(result.Arguments[1], Is.EqualTo(1046));
+        Assert.That(result.Arguments[2], Is.EqualTo(true));
+        Assert.That(result.Arguments[3], Is.EqualTo(false));
     }
 }

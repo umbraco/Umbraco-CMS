@@ -19,7 +19,7 @@ public class DatePickerValueConverterTests
     public void Can_Parse_DateTime_Value(object? input, DateTime expected)
     {
         var result = DatePickerValueConverter.ParseDateTimeValue(input);
-        Assert.AreEqual(expected, result);
-        Assert.AreEqual(DateTimeKind.Unspecified, result.Kind);
+        Assert.That(result, Is.EqualTo(expected));
+        Assert.That(result.Kind, Is.EqualTo(DateTimeKind.Unspecified));
     }
 }

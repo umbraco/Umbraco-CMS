@@ -13,32 +13,32 @@ public class EventNameExtractorTests
     public void Find_Event_Ing()
     {
         var found = EventNameExtractor.FindEvent(this, new SaveEventArgs<string>("test"), EventNameExtractor.MatchIngNames);
-        Assert.IsTrue(found.Success);
-        Assert.AreEqual("FoundMe", found.Result.Name);
+        Assert.That(found.Success, Is.True);
+        Assert.That(found.Result.Name, Is.EqualTo("FoundMe"));
     }
 
     [Test]
     public void Find_Event_Non_Ing()
     {
         var found = EventNameExtractor.FindEvent(this, new SaveEventArgs<string>("test"), EventNameExtractor.MatchNonIngNames);
-        Assert.IsTrue(found.Success);
-        Assert.AreEqual("FindingMe", found.Result.Name);
+        Assert.That(found.Success, Is.True);
+        Assert.That(found.Result.Name, Is.EqualTo("FindingMe"));
     }
 
     [Test]
     public void Ambiguous_Match()
     {
         var found = EventNameExtractor.FindEvent(this, new SaveEventArgs<int>(0), EventNameExtractor.MatchIngNames);
-        Assert.IsFalse(found.Success);
-        Assert.AreEqual(EventNameExtractorError.Ambiguous, found.Result.Error);
+        Assert.That(found.Success, Is.False);
+        Assert.That(found.Result.Error, Is.EqualTo(EventNameExtractorError.Ambiguous));
     }
 
     [Test]
     public void No_Match()
     {
         var found = EventNameExtractor.FindEvent(this, new SaveEventArgs<double>(0), EventNameExtractor.MatchIngNames);
-        Assert.IsFalse(found.Success);
-        Assert.AreEqual(EventNameExtractorError.NoneFound, found.Result.Error);
+        Assert.That(found.Success, Is.False);
+        Assert.That(found.Result.Error, Is.EqualTo(EventNameExtractorError.NoneFound));
     }
 
     public static event EventHandler<SaveEventArgs<string>> FindingMe;

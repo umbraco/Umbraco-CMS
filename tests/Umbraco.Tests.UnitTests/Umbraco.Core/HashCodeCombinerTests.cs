@@ -33,11 +33,11 @@ public class HashCodeCombinerTests
         var combiner2 = new HashCodeCombiner();
         combiner2.AddCaseInsensitiveString("hello");
 
-        Assert.AreEqual(combiner1.GetCombinedHashCode(), combiner2.GetCombinedHashCode());
+        Assert.That(combiner2.GetCombinedHashCode(), Is.EqualTo(combiner1.GetCombinedHashCode()));
 
         combiner2.AddCaseInsensitiveString("world");
 
-        Assert.AreNotEqual(combiner1.GetCombinedHashCode(), combiner2.GetCombinedHashCode());
+        Assert.That(combiner2.GetCombinedHashCode(), Is.Not.EqualTo(combiner1.GetCombinedHashCode()));
     }
 
     [Test]
@@ -49,11 +49,11 @@ public class HashCodeCombinerTests
         var combiner2 = new HashCodeCombiner();
         combiner2.AddInt(1234);
 
-        Assert.AreEqual(combiner1.GetCombinedHashCode(), combiner2.GetCombinedHashCode());
+        Assert.That(combiner2.GetCombinedHashCode(), Is.EqualTo(combiner1.GetCombinedHashCode()));
 
         combiner2.AddInt(1);
 
-        Assert.AreNotEqual(combiner1.GetCombinedHashCode(), combiner2.GetCombinedHashCode());
+        Assert.That(combiner2.GetCombinedHashCode(), Is.Not.EqualTo(combiner1.GetCombinedHashCode()));
     }
 
     [Test]
@@ -66,11 +66,11 @@ public class HashCodeCombinerTests
         var combiner2 = new HashCodeCombiner();
         combiner2.AddDateTime(dt);
 
-        Assert.AreEqual(combiner1.GetCombinedHashCode(), combiner2.GetCombinedHashCode());
+        Assert.That(combiner2.GetCombinedHashCode(), Is.EqualTo(combiner1.GetCombinedHashCode()));
 
         combiner2.AddDateTime(DateTime.Now);
 
-        Assert.AreNotEqual(combiner1.GetCombinedHashCode(), combiner2.GetCombinedHashCode());
+        Assert.That(combiner2.GetCombinedHashCode(), Is.Not.EqualTo(combiner1.GetCombinedHashCode()));
     }
 
     [Test]
@@ -101,12 +101,12 @@ public class HashCodeCombinerTests
         var combiner3 = new HashCodeCombiner();
         combiner3.AddFile(new FileInfo(file2Path));
 
-        Assert.AreEqual(combiner1.GetCombinedHashCode(), combiner2.GetCombinedHashCode());
-        Assert.AreNotEqual(combiner1.GetCombinedHashCode(), combiner3.GetCombinedHashCode());
+        Assert.That(combiner2.GetCombinedHashCode(), Is.EqualTo(combiner1.GetCombinedHashCode()));
+        Assert.That(combiner3.GetCombinedHashCode(), Is.Not.EqualTo(combiner1.GetCombinedHashCode()));
 
         combiner2.AddFile(new FileInfo(file2Path));
 
-        Assert.AreNotEqual(combiner1.GetCombinedHashCode(), combiner2.GetCombinedHashCode());
+        Assert.That(combiner2.GetCombinedHashCode(), Is.Not.EqualTo(combiner1.GetCombinedHashCode()));
     }
 
     [Test]
@@ -127,7 +127,7 @@ public class HashCodeCombinerTests
         var combiner2 = new HashCodeCombiner();
         combiner2.AddFolder(dir);
 
-        Assert.AreEqual(combiner1.GetCombinedHashCode(), combiner2.GetCombinedHashCode());
+        Assert.That(combiner2.GetCombinedHashCode(), Is.EqualTo(combiner1.GetCombinedHashCode()));
 
         // now add a file to the folder
         var file2Path = Path.Combine(dir.FullName, "hastest2.txt");
@@ -141,6 +141,6 @@ public class HashCodeCombinerTests
         var combiner3 = new HashCodeCombiner();
         combiner3.AddFolder(dir);
 
-        Assert.AreNotEqual(combiner1.GetCombinedHashCode(), combiner3.GetCombinedHashCode());
+        Assert.That(combiner3.GetCombinedHashCode(), Is.Not.EqualTo(combiner1.GetCombinedHashCode()));
     }
 }

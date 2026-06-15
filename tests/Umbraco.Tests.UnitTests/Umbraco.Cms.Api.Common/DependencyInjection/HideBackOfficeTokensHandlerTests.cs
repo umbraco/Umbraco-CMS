@@ -118,9 +118,9 @@ internal class HideBackOfficeTokensHandlerTests
         await setup.Sut.HandleAsync(context);
 
         // Assert
-        Assert.AreEqual(AccessTokenValue, context.Response.AccessToken);
-        Assert.AreEqual(RefreshTokenValue, context.Response.RefreshToken);
-        Assert.IsEmpty(setup.ResponseCookies);
+        Assert.That(context.Response.AccessToken, Is.EqualTo(AccessTokenValue));
+        Assert.That(context.Response.RefreshToken, Is.EqualTo(RefreshTokenValue));
+        Assert.That(setup.ResponseCookies, Is.Empty);
     }
 
     [Test]
@@ -137,8 +137,8 @@ internal class HideBackOfficeTokensHandlerTests
         await setup.Sut.HandleAsync(context);
 
         // Assert
-        Assert.AreEqual(RedactedTokenValue, context.Response.AccessToken);
-        Assert.IsTrue(setup.ResponseCookies.ContainsKey(AccessTokenCookieName));
+        Assert.That(context.Response.AccessToken, Is.EqualTo(RedactedTokenValue));
+        Assert.That(setup.ResponseCookies.ContainsKey(AccessTokenCookieName), Is.True);
     }
 
     [Test]
@@ -155,8 +155,8 @@ internal class HideBackOfficeTokensHandlerTests
         await setup.Sut.HandleAsync(context);
 
         // Assert
-        Assert.AreEqual(RedactedTokenValue, context.Response.RefreshToken);
-        Assert.IsTrue(setup.ResponseCookies.ContainsKey(RefreshTokenCookieName));
+        Assert.That(context.Response.RefreshToken, Is.EqualTo(RedactedTokenValue));
+        Assert.That(setup.ResponseCookies.ContainsKey(RefreshTokenCookieName), Is.True);
     }
 
     [Test]
@@ -179,12 +179,12 @@ internal class HideBackOfficeTokensHandlerTests
         var unprotectedRefreshTokenCookieValue = setup.DataProtector.Object.Unprotect(refreshTokenCookieValue!);
 
         // Assert
-        Assert.AreEqual(RedactedTokenValue, context.Response.AccessToken);
-        Assert.AreEqual(RedactedTokenValue, context.Response.RefreshToken);
-        Assert.IsTrue(setup.ResponseCookies.ContainsKey(AccessTokenCookieName));
-        Assert.IsTrue(setup.ResponseCookies.ContainsKey(RefreshTokenCookieName));
-        Assert.AreEqual(AccessTokenValue, unprotectedAccessTokenCookieValue);
-        Assert.AreEqual(RefreshTokenValue, unprotectedRefreshTokenCookieValue);
+        Assert.That(context.Response.AccessToken, Is.EqualTo(RedactedTokenValue));
+        Assert.That(context.Response.RefreshToken, Is.EqualTo(RedactedTokenValue));
+        Assert.That(setup.ResponseCookies.ContainsKey(AccessTokenCookieName), Is.True);
+        Assert.That(setup.ResponseCookies.ContainsKey(RefreshTokenCookieName), Is.True);
+        Assert.That(unprotectedAccessTokenCookieValue, Is.EqualTo(AccessTokenValue));
+        Assert.That(unprotectedRefreshTokenCookieValue, Is.EqualTo(RefreshTokenValue));
     }
 
     [TestCase(true, false, true, TestName = "ApplyTokenResponse_UseHttpsTrue_HttpRequest_UsesSecurePrefix")]
@@ -207,13 +207,13 @@ internal class HideBackOfficeTokensHandlerTests
         var expectedAccessCookieName = setup.GetExpectedCookieName(AccessTokenCookieName, useHttps, isHttps);
         var expectedRefreshCookieName = setup.GetExpectedCookieName(RefreshTokenCookieName, useHttps, isHttps);
 
-        Assert.IsTrue(setup.ResponseCookies.ContainsKey(expectedAccessCookieName), $"Expected cookie '{expectedAccessCookieName}' not found");
-        Assert.IsTrue(setup.ResponseCookies.ContainsKey(expectedRefreshCookieName), $"Expected cookie '{expectedRefreshCookieName}' not found");
+        Assert.That(setup.ResponseCookies.ContainsKey(expectedAccessCookieName), Is.True, $"Expected cookie '{expectedAccessCookieName}' not found");
+        Assert.That(setup.ResponseCookies.ContainsKey(expectedRefreshCookieName), Is.True, $"Expected cookie '{expectedRefreshCookieName}' not found");
 
         if (!expectSecurePrefix)
         {
-            Assert.IsFalse(setup.ResponseCookies.ContainsKey($"{SecureCookiePrefix}{AccessTokenCookieName}"));
-            Assert.IsFalse(setup.ResponseCookies.ContainsKey($"{SecureCookiePrefix}{RefreshTokenCookieName}"));
+            Assert.That(setup.ResponseCookies.ContainsKey($"{SecureCookiePrefix}{AccessTokenCookieName}"), Is.False);
+            Assert.That(setup.ResponseCookies.ContainsKey($"{SecureCookiePrefix}{RefreshTokenCookieName}"), Is.False);
         }
     }
 
@@ -232,10 +232,10 @@ internal class HideBackOfficeTokensHandlerTests
         await setup.Sut.HandleAsync(context);
 
         // Assert
-        Assert.IsFalse(setup.ResponseCookies.ContainsKey(AccessTokenCookieName));
-        Assert.IsFalse(setup.ResponseCookies.ContainsKey(RefreshTokenCookieName));
-        Assert.IsTrue(setup.ResponseCookies.ContainsKey($"{AccessTokenCookieName}-test-site-name"));
-        Assert.IsTrue(setup.ResponseCookies.ContainsKey($"{RefreshTokenCookieName}-test-site-name"));
+        Assert.That(setup.ResponseCookies.ContainsKey(AccessTokenCookieName), Is.False);
+        Assert.That(setup.ResponseCookies.ContainsKey(RefreshTokenCookieName), Is.False);
+        Assert.That(setup.ResponseCookies.ContainsKey($"{AccessTokenCookieName}-test-site-name"), Is.True);
+        Assert.That(setup.ResponseCookies.ContainsKey($"{RefreshTokenCookieName}-test-site-name"), Is.True);
     }
 
     #endregion
@@ -255,8 +255,8 @@ internal class HideBackOfficeTokensHandlerTests
         await setup.Sut.HandleAsync(context);
 
         // Assert
-        Assert.AreEqual(PkceCodeValue, context.Response.Code);
-        Assert.IsEmpty(setup.ResponseCookies);
+        Assert.That(context.Response.Code, Is.EqualTo(PkceCodeValue));
+        Assert.That(setup.ResponseCookies, Is.Empty);
     }
 
     [Test]
@@ -273,8 +273,8 @@ internal class HideBackOfficeTokensHandlerTests
         await setup.Sut.HandleAsync(context);
 
         // Assert
-        Assert.AreEqual(RedactedTokenValue, context.Response.Code);
-        Assert.IsTrue(setup.ResponseCookies.ContainsKey(PkceCodeCookieName));
+        Assert.That(context.Response.Code, Is.EqualTo(RedactedTokenValue));
+        Assert.That(setup.ResponseCookies.ContainsKey(PkceCodeCookieName), Is.True);
     }
 
     [TestCase(true, false, true, TestName = "ApplyAuthorizationResponse_UseHttpsTrue_HttpRequest_UsesSecurePrefix")]
@@ -295,11 +295,11 @@ internal class HideBackOfficeTokensHandlerTests
 
         // Assert
         var expectedCookieName = setup.GetExpectedCookieName(PkceCodeCookieName, useHttps, isHttps);
-        Assert.IsTrue(setup.ResponseCookies.ContainsKey(expectedCookieName), $"Expected cookie '{expectedCookieName}' not found");
+        Assert.That(setup.ResponseCookies.ContainsKey(expectedCookieName), Is.True, $"Expected cookie '{expectedCookieName}' not found");
 
         if (!expectSecurePrefix)
         {
-            Assert.IsFalse(setup.ResponseCookies.ContainsKey($"{SecureCookiePrefix}{PkceCodeCookieName}"));
+            Assert.That(setup.ResponseCookies.ContainsKey($"{SecureCookiePrefix}{PkceCodeCookieName}"), Is.False);
         }
     }
 
@@ -318,8 +318,8 @@ internal class HideBackOfficeTokensHandlerTests
         await setup.Sut.HandleAsync(context);
 
         // Assert
-        Assert.IsFalse(setup.ResponseCookies.ContainsKey(PkceCodeCookieName));
-        Assert.IsTrue(setup.ResponseCookies.ContainsKey($"{PkceCodeCookieName}-test-site-name"));
+        Assert.That(setup.ResponseCookies.ContainsKey(PkceCodeCookieName), Is.False);
+        Assert.That(setup.ResponseCookies.ContainsKey($"{PkceCodeCookieName}-test-site-name"), Is.True);
     }
 
     #endregion
@@ -340,8 +340,8 @@ internal class HideBackOfficeTokensHandlerTests
         await setup.Sut.HandleAsync(context);
 
         // Assert - values should remain unchanged (handler skips non-back-office clients)
-        Assert.AreEqual(RedactedTokenValue, context.Request.Code);
-        Assert.AreEqual(RedactedTokenValue, context.Request.RefreshToken);
+        Assert.That(context.Request.Code, Is.EqualTo(RedactedTokenValue));
+        Assert.That(context.Request.RefreshToken, Is.EqualTo(RedactedTokenValue));
     }
 
     [Test]
@@ -359,7 +359,7 @@ internal class HideBackOfficeTokensHandlerTests
         await setup.Sut.HandleAsync(context);
 
         // Assert
-        Assert.AreEqual(PkceCodeValue, context.Request.Code);
+        Assert.That(context.Request.Code, Is.EqualTo(PkceCodeValue));
     }
 
     [Test]
@@ -377,7 +377,7 @@ internal class HideBackOfficeTokensHandlerTests
         await setup.Sut.HandleAsync(context);
 
         // Assert
-        Assert.IsTrue(setup.DeletedCookies.Contains(PkceCodeCookieName));
+        Assert.That(setup.DeletedCookies, Does.Contain(PkceCodeCookieName));
     }
 
     [Test]
@@ -394,7 +394,7 @@ internal class HideBackOfficeTokensHandlerTests
         await setup.Sut.HandleAsync(context);
 
         // Assert - code should be nullified for security
-        Assert.IsNull(context.Request.Code);
+        Assert.That(context.Request.Code, Is.Null);
     }
 
     [Test]
@@ -412,7 +412,7 @@ internal class HideBackOfficeTokensHandlerTests
         await setup.Sut.HandleAsync(context);
 
         // Assert
-        Assert.AreEqual(RefreshTokenValue, context.Request.RefreshToken);
+        Assert.That(context.Request.RefreshToken, Is.EqualTo(RefreshTokenValue));
     }
 
     [Test]
@@ -429,7 +429,7 @@ internal class HideBackOfficeTokensHandlerTests
         await setup.Sut.HandleAsync(context);
 
         // Assert - token should be nullified for security
-        Assert.IsNull(context.Request.RefreshToken);
+        Assert.That(context.Request.RefreshToken, Is.Null);
     }
 
     [TestCase(true, false, TestName = "ExtractTokenRequest_PkceCode_UseHttpsTrue_HttpRequest_UsesSecurePrefix")]
@@ -454,12 +454,12 @@ internal class HideBackOfficeTokensHandlerTests
         await setup.Sut.HandleAsync(context);
 
         // Assert
-        Assert.AreEqual(PkceCodeValue, context.Request.Code);
-        Assert.IsTrue(setup.DeletedCookies.Contains(expectedCookieName), $"Expected cookie '{expectedCookieName}' to be deleted");
+        Assert.That(context.Request.Code, Is.EqualTo(PkceCodeValue));
+        Assert.That(setup.DeletedCookies, Does.Contain(expectedCookieName), $"Expected cookie '{expectedCookieName}' to be deleted");
 
         if (!useHttps && !isHttps)
         {
-            Assert.IsFalse(setup.DeletedCookies.Contains($"{SecureCookiePrefix}{PkceCodeCookieName}"));
+            Assert.That(setup.DeletedCookies, Does.Not.Contain($"{SecureCookiePrefix}{PkceCodeCookieName}"));
         }
     }
 
@@ -485,7 +485,7 @@ internal class HideBackOfficeTokensHandlerTests
         await setup.Sut.HandleAsync(context);
 
         // Assert
-        Assert.AreEqual(RefreshTokenValue, context.Request.RefreshToken);
+        Assert.That(context.Request.RefreshToken, Is.EqualTo(RefreshTokenValue));
     }
 
     #endregion
@@ -506,7 +506,7 @@ internal class HideBackOfficeTokensHandlerTests
         await setup.Sut.HandleAsync(context);
 
         // Assert - values should remain unchanged (handler skips non-back-office clients)
-        Assert.AreEqual(RedactedTokenValue, context.Request.Token);
+        Assert.That(context.Request.Token, Is.EqualTo(RedactedTokenValue));
     }
 
     [Test]
@@ -524,7 +524,7 @@ internal class HideBackOfficeTokensHandlerTests
         await setup.Sut.HandleAsync(context);
 
         // Assert
-        Assert.AreEqual(AccessTokenValue, context.Request.Token);
+        Assert.That(context.Request.Token, Is.EqualTo(AccessTokenValue));
     }
 
     [Test]
@@ -542,7 +542,7 @@ internal class HideBackOfficeTokensHandlerTests
         await setup.Sut.HandleAsync(context);
 
         // Assert
-        Assert.AreEqual(RefreshTokenValue, context.Request.Token);
+        Assert.That(context.Request.Token, Is.EqualTo(RefreshTokenValue));
     }
 
     [Test]
@@ -559,7 +559,7 @@ internal class HideBackOfficeTokensHandlerTests
         await setup.Sut.HandleAsync(context);
 
         // Assert - token should be nullified for security
-        Assert.IsNull(context.Request.Token);
+        Assert.That(context.Request.Token, Is.Null);
     }
 
     [Test]
@@ -577,7 +577,7 @@ internal class HideBackOfficeTokensHandlerTests
         await setup.Sut.HandleAsync(context);
 
         // Assert - without a hint, it should default to access token cookie
-        Assert.AreEqual(AccessTokenValue, context.Request.Token);
+        Assert.That(context.Request.Token, Is.EqualTo(AccessTokenValue));
     }
 
     [Test]
@@ -594,7 +594,7 @@ internal class HideBackOfficeTokensHandlerTests
         await setup.Sut.HandleAsync(context);
 
         // Assert - token should be nullified to prevent IDX10400 errors downstream
-        Assert.IsNull(context.Request.Token);
+        Assert.That(context.Request.Token, Is.Null);
     }
 
     [TestCase(true, false, TestName = "ExtractRevocationRequest_UseHttpsTrue_HttpRequest_UsesSecurePrefix")]
@@ -619,7 +619,7 @@ internal class HideBackOfficeTokensHandlerTests
         await setup.Sut.HandleAsync(context);
 
         // Assert
-        Assert.AreEqual(AccessTokenValue, context.Request.Token);
+        Assert.That(context.Request.Token, Is.EqualTo(AccessTokenValue));
     }
 
     [TestCase(true, false, TestName = "ExtractRevocationRequest_RefreshToken_UseHttpsTrue_HttpRequest_UsesSecurePrefix")]
@@ -644,7 +644,7 @@ internal class HideBackOfficeTokensHandlerTests
         await setup.Sut.HandleAsync(context);
 
         // Assert
-        Assert.AreEqual(RefreshTokenValue, context.Request.Token);
+        Assert.That(context.Request.Token, Is.EqualTo(RefreshTokenValue));
     }
 
     #endregion
@@ -665,7 +665,7 @@ internal class HideBackOfficeTokensHandlerTests
         await setup.Sut.HandleAsync(context);
 
         // Assert - token should not be modified
-        Assert.AreEqual("actual-access-token", context.AccessToken);
+        Assert.That(context.AccessToken, Is.EqualTo("actual-access-token"));
     }
 
     [Test]
@@ -683,7 +683,7 @@ internal class HideBackOfficeTokensHandlerTests
         await setup.Sut.HandleAsync(context);
 
         // Assert
-        Assert.AreEqual(AccessTokenValue, context.AccessToken);
+        Assert.That(context.AccessToken, Is.EqualTo(AccessTokenValue));
     }
 
     [TestCase(true, false, TestName = "ProcessAuthentication_UseHttpsTrue_HttpRequest_UsesSecurePrefix")]
@@ -708,7 +708,7 @@ internal class HideBackOfficeTokensHandlerTests
         await setup.Sut.HandleAsync(context);
 
         // Assert
-        Assert.AreEqual(AccessTokenValue, context.AccessToken);
+        Assert.That(context.AccessToken, Is.EqualTo(AccessTokenValue));
     }
 
     #endregion
@@ -729,8 +729,8 @@ internal class HideBackOfficeTokensHandlerTests
         setup.Sut.Handle(notification);
 
         // Assert
-        Assert.IsTrue(setup.DeletedCookies.Contains(AccessTokenCookieName));
-        Assert.IsTrue(setup.DeletedCookies.Contains(RefreshTokenCookieName));
+        Assert.That(setup.DeletedCookies, Does.Contain(AccessTokenCookieName));
+        Assert.That(setup.DeletedCookies, Does.Contain(RefreshTokenCookieName));
     }
 
     [Test]
@@ -766,13 +766,13 @@ internal class HideBackOfficeTokensHandlerTests
         var expectedAccessCookieName = setup.GetExpectedCookieName(AccessTokenCookieName, useHttps, isHttps);
         var expectedRefreshCookieName = setup.GetExpectedCookieName(RefreshTokenCookieName, useHttps, isHttps);
 
-        Assert.IsTrue(setup.DeletedCookies.Contains(expectedAccessCookieName), $"Expected cookie '{expectedAccessCookieName}' to be deleted");
-        Assert.IsTrue(setup.DeletedCookies.Contains(expectedRefreshCookieName), $"Expected cookie '{expectedRefreshCookieName}' to be deleted");
+        Assert.That(setup.DeletedCookies, Does.Contain(expectedAccessCookieName), $"Expected cookie '{expectedAccessCookieName}' to be deleted");
+        Assert.That(setup.DeletedCookies, Does.Contain(expectedRefreshCookieName), $"Expected cookie '{expectedRefreshCookieName}' to be deleted");
 
         if (!expectSecurePrefix)
         {
-            Assert.IsFalse(setup.DeletedCookies.Contains($"{SecureCookiePrefix}{AccessTokenCookieName}"));
-            Assert.IsFalse(setup.DeletedCookies.Contains($"{SecureCookiePrefix}{RefreshTokenCookieName}"));
+            Assert.That(setup.DeletedCookies, Does.Not.Contain($"{SecureCookiePrefix}{AccessTokenCookieName}"));
+            Assert.That(setup.DeletedCookies, Does.Not.Contain($"{SecureCookiePrefix}{RefreshTokenCookieName}"));
         }
     }
 
@@ -799,8 +799,8 @@ internal class HideBackOfficeTokensHandlerTests
         await setup.Sut.HandleAsync(context);
 
         // Assert - token should remain redacted (not restored), triggering a 401
-        Assert.AreEqual(RedactedTokenValue, context.AccessToken);
-        Assert.IsTrue(setup.DeletedCookies.Contains(AccessTokenCookieName));
+        Assert.That(context.AccessToken, Is.EqualTo(RedactedTokenValue));
+        Assert.That(setup.DeletedCookies, Does.Contain(AccessTokenCookieName));
     }
 
     [Test]
@@ -827,10 +827,10 @@ internal class HideBackOfficeTokensHandlerTests
         await setup.Sut.HandleAsync(context);
 
         // Assert - both should be nulled since cookies couldn't be decrypted
-        Assert.IsNull(context.Request.Code);
-        Assert.IsNull(context.Request.RefreshToken);
-        Assert.IsTrue(setup.DeletedCookies.Contains(PkceCodeCookieName));
-        Assert.IsTrue(setup.DeletedCookies.Contains(RefreshTokenCookieName));
+        Assert.That(context.Request.Code, Is.Null);
+        Assert.That(context.Request.RefreshToken, Is.Null);
+        Assert.That(setup.DeletedCookies, Does.Contain(PkceCodeCookieName));
+        Assert.That(setup.DeletedCookies, Does.Contain(RefreshTokenCookieName));
     }
 
     [Test]
@@ -852,8 +852,8 @@ internal class HideBackOfficeTokensHandlerTests
         await setup.Sut.HandleAsync(context);
 
         // Assert - token should be nulled since cookie couldn't be decrypted
-        Assert.IsNull(context.Request.Token);
-        Assert.IsTrue(setup.DeletedCookies.Contains(AccessTokenCookieName));
+        Assert.That(context.Request.Token, Is.Null);
+        Assert.That(setup.DeletedCookies, Does.Contain(AccessTokenCookieName));
     }
 
     #endregion

@@ -24,9 +24,9 @@ internal sealed partial class DocumentNavigationServiceTests
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.IsNotEmpty(siblingsList);
-            Assert.AreEqual(initialRootNodeSiblingsCount + 1, siblingsList.Count);
-            Assert.AreEqual(createdItemKey, siblingsList.First());
+            Assert.That(siblingsList, Is.Not.Empty);
+            Assert.That(siblingsList, Has.Count.EqualTo(initialRootNodeSiblingsCount + 1));
+            Assert.That(siblingsList.First(), Is.EqualTo(createdItemKey));
         });
     }
 
@@ -49,9 +49,9 @@ internal sealed partial class DocumentNavigationServiceTests
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.IsNotEmpty(childrenList);
-            Assert.AreEqual(initialChild1ChildrenCount + 1, childrenList.Count);
-            Assert.IsTrue(childrenList.Contains(createdItemKey));
+            Assert.That(childrenList, Is.Not.Empty);
+            Assert.That(childrenList, Has.Count.EqualTo(initialChild1ChildrenCount + 1));
+            Assert.That(childrenList, Does.Contain(createdItemKey));
         });
     }
 
@@ -79,12 +79,12 @@ internal sealed partial class DocumentNavigationServiceTests
         if (parentKey is null)
         {
             DocumentNavigationQueryService.TryGetRootKeys(out IEnumerable<Guid> rootKeys);
-            Assert.AreEqual(newNodeKey, rootKeys.Last());
+            Assert.That(rootKeys.Last(), Is.EqualTo(newNodeKey));
         }
         else
         {
             DocumentNavigationQueryService.TryGetChildrenKeys(parentKey.Value, out IEnumerable<Guid> childrenKeys);
-            Assert.AreEqual(newNodeKey, childrenKeys.Last());
+            Assert.That(childrenKeys.Last(), Is.EqualTo(newNodeKey));
         }
     }
 }

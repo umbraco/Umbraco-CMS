@@ -62,27 +62,27 @@ public class NPocoSqlTemplateTests
             .Where<Thing1Dto>(x => x.Name == SqlTemplate.Arg<string>("value")));
 
         var sql = template.Sql("foo");
-        Assert.AreEqual(sqlBase + "(([zbThing1].[name] = @0))", sql.SQL.NoCrLf());
-        Assert.AreEqual(1, sql.Arguments.Length);
-        Assert.AreEqual("foo", sql.Arguments[0]);
+        Assert.That(sql.SQL.NoCrLf(), Is.EqualTo(sqlBase + "(([zbThing1].[name] = @0))"));
+        Assert.That(sql.Arguments.Length, Is.EqualTo(1));
+        Assert.That(sql.Arguments[0], Is.EqualTo("foo"));
 
         sql = template.Sql(123);
-        Assert.AreEqual(sqlBase + "(([zbThing1].[name] = @0))", sql.SQL.NoCrLf());
-        Assert.AreEqual(1, sql.Arguments.Length);
-        Assert.AreEqual(123, sql.Arguments[0]);
+        Assert.That(sql.SQL.NoCrLf(), Is.EqualTo(sqlBase + "(([zbThing1].[name] = @0))"));
+        Assert.That(sql.Arguments.Length, Is.EqualTo(1));
+        Assert.That(sql.Arguments[0], Is.EqualTo(123));
 
         template = sqlTemplates.Get("sql2", s => s.Select<Thing1Dto>().From<Thing1Dto>()
             .Where<Thing1Dto>(x => x.Name == SqlTemplate.Arg<string>("value")));
 
         sql = template.Sql(new { value = "foo" });
-        Assert.AreEqual(sqlBase + "(([zbThing1].[name] = @0))", sql.SQL.NoCrLf());
-        Assert.AreEqual(1, sql.Arguments.Length);
-        Assert.AreEqual("foo", sql.Arguments[0]);
+        Assert.That(sql.SQL.NoCrLf(), Is.EqualTo(sqlBase + "(([zbThing1].[name] = @0))"));
+        Assert.That(sql.Arguments.Length, Is.EqualTo(1));
+        Assert.That(sql.Arguments[0], Is.EqualTo("foo"));
 
         sql = template.Sql(new { value = 123 });
-        Assert.AreEqual(sqlBase + "(([zbThing1].[name] = @0))", sql.SQL.NoCrLf());
-        Assert.AreEqual(1, sql.Arguments.Length);
-        Assert.AreEqual(123, sql.Arguments[0]);
+        Assert.That(sql.SQL.NoCrLf(), Is.EqualTo(sqlBase + "(([zbThing1].[name] = @0))"));
+        Assert.That(sql.Arguments.Length, Is.EqualTo(1));
+        Assert.That(sql.Arguments[0], Is.EqualTo(123));
 
         Assert.Throws<InvalidOperationException>(() => template.Sql(new { xvalue = 123 }));
         Assert.Throws<InvalidOperationException>(() => template.Sql(new { value = 123, xvalue = 456 }));
@@ -93,14 +93,14 @@ public class NPocoSqlTemplateTests
             .Where<Thing1Dto>(x => x.Id == i));
 
         sql = template.Sql("foo");
-        Assert.AreEqual(sqlBase + "(([zbThing1].[id] = @0))", sql.SQL.NoCrLf());
-        Assert.AreEqual(1, sql.Arguments.Length);
-        Assert.AreEqual("foo", sql.Arguments[0]);
+        Assert.That(sql.SQL.NoCrLf(), Is.EqualTo(sqlBase + "(([zbThing1].[id] = @0))"));
+        Assert.That(sql.Arguments.Length, Is.EqualTo(1));
+        Assert.That(sql.Arguments[0], Is.EqualTo("foo"));
 
         sql = template.Sql(123);
-        Assert.AreEqual(sqlBase + "(([zbThing1].[id] = @0))", sql.SQL.NoCrLf());
-        Assert.AreEqual(1, sql.Arguments.Length);
-        Assert.AreEqual(123, sql.Arguments[0]);
+        Assert.That(sql.SQL.NoCrLf(), Is.EqualTo(sqlBase + "(([zbThing1].[id] = @0))"));
+        Assert.That(sql.Arguments.Length, Is.EqualTo(1));
+        Assert.That(sql.Arguments[0], Is.EqualTo(123));
 
         // but we cannot name them, because the arg name is the value of "i"
         // so we have to explicitely create the argument
@@ -108,25 +108,25 @@ public class NPocoSqlTemplateTests
             .Where<Thing1Dto>(x => x.Id == SqlTemplate.Arg<int>("i")));
 
         sql = template.Sql("foo");
-        Assert.AreEqual(sqlBase + "(([zbThing1].[id] = @0))", sql.SQL.NoCrLf());
-        Assert.AreEqual(1, sql.Arguments.Length);
-        Assert.AreEqual("foo", sql.Arguments[0]);
+        Assert.That(sql.SQL.NoCrLf(), Is.EqualTo(sqlBase + "(([zbThing1].[id] = @0))"));
+        Assert.That(sql.Arguments.Length, Is.EqualTo(1));
+        Assert.That(sql.Arguments[0], Is.EqualTo("foo"));
 
         sql = template.Sql(123);
-        Assert.AreEqual(sqlBase + "(([zbThing1].[id] = @0))", sql.SQL.NoCrLf());
-        Assert.AreEqual(1, sql.Arguments.Length);
-        Assert.AreEqual(123, sql.Arguments[0]);
+        Assert.That(sql.SQL.NoCrLf(), Is.EqualTo(sqlBase + "(([zbThing1].[id] = @0))"));
+        Assert.That(sql.Arguments.Length, Is.EqualTo(1));
+        Assert.That(sql.Arguments[0], Is.EqualTo(123));
 
         // and thanks to a patched visitor, this now works
         sql = template.Sql(new { i = "foo" });
-        Assert.AreEqual(sqlBase + "(([zbThing1].[id] = @0))", sql.SQL.NoCrLf());
-        Assert.AreEqual(1, sql.Arguments.Length);
-        Assert.AreEqual("foo", sql.Arguments[0]);
+        Assert.That(sql.SQL.NoCrLf(), Is.EqualTo(sqlBase + "(([zbThing1].[id] = @0))"));
+        Assert.That(sql.Arguments.Length, Is.EqualTo(1));
+        Assert.That(sql.Arguments[0], Is.EqualTo("foo"));
 
         sql = template.Sql(new { i = 123 });
-        Assert.AreEqual(sqlBase + "(([zbThing1].[id] = @0))", sql.SQL.NoCrLf());
-        Assert.AreEqual(1, sql.Arguments.Length);
-        Assert.AreEqual(123, sql.Arguments[0]);
+        Assert.That(sql.SQL.NoCrLf(), Is.EqualTo(sqlBase + "(([zbThing1].[id] = @0))"));
+        Assert.That(sql.Arguments.Length, Is.EqualTo(1));
+        Assert.That(sql.Arguments[0], Is.EqualTo(123));
 
         Assert.Throws<InvalidOperationException>(() => template.Sql(new { j = 123 }));
         Assert.Throws<InvalidOperationException>(() => template.Sql(new { i = 123, j = 456 }));
@@ -135,53 +135,53 @@ public class NPocoSqlTemplateTests
         template = sqlTemplates.Get("sql4a", s => s.Select<Thing1Dto>().From<Thing1Dto>()
             .Where<Thing1Dto>(x => x.Id == SqlTemplate.Arg<int>("i") && x.Name == SqlTemplate.Arg<string>("name")));
         sql = template.Sql(0, 1);
-        Assert.AreEqual(sqlBase + "((([zbThing1].[id] = @0) AND ([zbThing1].[name] = @1)))", sql.SQL.NoCrLf());
-        Assert.AreEqual(2, sql.Arguments.Length);
-        Assert.AreEqual(0, sql.Arguments[0]);
-        Assert.AreEqual(1, sql.Arguments[1]);
+        Assert.That(sql.SQL.NoCrLf(), Is.EqualTo(sqlBase + "((([zbThing1].[id] = @0) AND ([zbThing1].[name] = @1)))"));
+        Assert.That(sql.Arguments.Length, Is.EqualTo(2));
+        Assert.That(sql.Arguments[0], Is.EqualTo(0));
+        Assert.That(sql.Arguments[1], Is.EqualTo(1));
 
         template = sqlTemplates.Get("sql4b", s => s.Select<Thing1Dto>().From<Thing1Dto>()
             .Where<Thing1Dto>(x => x.Id == SqlTemplate.Arg<int>("i"))
             .Where<Thing1Dto>(x => x.Name == SqlTemplate.Arg<string>("name")));
         sql = template.Sql(0, 1);
-        Assert.AreEqual(sqlBase + "(([zbThing1].[id] = @0)) AND (([zbThing1].[name] = @1))", sql.SQL.NoCrLf());
-        Assert.AreEqual(2, sql.Arguments.Length);
-        Assert.AreEqual(0, sql.Arguments[0]);
-        Assert.AreEqual(1, sql.Arguments[1]);
+        Assert.That(sql.SQL.NoCrLf(), Is.EqualTo(sqlBase + "(([zbThing1].[id] = @0)) AND (([zbThing1].[name] = @1))"));
+        Assert.That(sql.Arguments.Length, Is.EqualTo(2));
+        Assert.That(sql.Arguments[0], Is.EqualTo(0));
+        Assert.That(sql.Arguments[1], Is.EqualTo(1));
 
         // works, magic
         template = sqlTemplates.Get("sql5", s => s.Select<Thing1Dto>().From<Thing1Dto>()
             .WhereIn<Thing1Dto>(x => x.Id, SqlTemplate.ArgIn<int>("i")));
 
         sql = template.Sql("foo");
-        Assert.AreEqual(sqlBase + "([zbThing1].[id] IN (@0))", sql.SQL.NoCrLf());
-        Assert.AreEqual(1, sql.Arguments.Length);
-        Assert.AreEqual("foo", sql.Arguments[0]);
+        Assert.That(sql.SQL.NoCrLf(), Is.EqualTo(sqlBase + "([zbThing1].[id] IN (@0))"));
+        Assert.That(sql.Arguments.Length, Is.EqualTo(1));
+        Assert.That(sql.Arguments[0], Is.EqualTo("foo"));
 
         sql = template.Sql(new[] { 1, 2, 3 });
-        Assert.AreEqual(sqlBase + "([zbThing1].[id] IN (@0,@1,@2))", sql.SQL.NoCrLf());
-        Assert.AreEqual(3, sql.Arguments.Length);
-        Assert.AreEqual(1, sql.Arguments[0]);
-        Assert.AreEqual(2, sql.Arguments[1]);
-        Assert.AreEqual(3, sql.Arguments[2]);
+        Assert.That(sql.SQL.NoCrLf(), Is.EqualTo(sqlBase + "([zbThing1].[id] IN (@0,@1,@2))"));
+        Assert.That(sql.Arguments.Length, Is.EqualTo(3));
+        Assert.That(sql.Arguments[0], Is.EqualTo(1));
+        Assert.That(sql.Arguments[1], Is.EqualTo(2));
+        Assert.That(sql.Arguments[2], Is.EqualTo(3));
 
         template = sqlTemplates.Get("sql5a", s => s.Select<Thing1Dto>().From<Thing1Dto>()
             .WhereIn<Thing1Dto>(x => x.Id, SqlTemplate.ArgIn<int>("i"))
             .Where<Thing1Dto>(x => x.Name == SqlTemplate.Arg<string>("name")));
 
         sql = template.Sql("foo", "bar");
-        Assert.AreEqual(sqlBase + "([zbThing1].[id] IN (@0)) AND (([zbThing1].[name] = @1))", sql.SQL.NoCrLf());
-        Assert.AreEqual(2, sql.Arguments.Length);
-        Assert.AreEqual("foo", sql.Arguments[0]);
-        Assert.AreEqual("bar", sql.Arguments[1]);
+        Assert.That(sql.SQL.NoCrLf(), Is.EqualTo(sqlBase + "([zbThing1].[id] IN (@0)) AND (([zbThing1].[name] = @1))"));
+        Assert.That(sql.Arguments.Length, Is.EqualTo(2));
+        Assert.That(sql.Arguments[0], Is.EqualTo("foo"));
+        Assert.That(sql.Arguments[1], Is.EqualTo("bar"));
 
         sql = template.Sql(new[] { 1, 2, 3 }, "bar");
-        Assert.AreEqual(sqlBase + "([zbThing1].[id] IN (@0,@1,@2)) AND (([zbThing1].[name] = @3))", sql.SQL.NoCrLf());
-        Assert.AreEqual(4, sql.Arguments.Length);
-        Assert.AreEqual(1, sql.Arguments[0]);
-        Assert.AreEqual(2, sql.Arguments[1]);
-        Assert.AreEqual(3, sql.Arguments[2]);
-        Assert.AreEqual("bar", sql.Arguments[3]);
+        Assert.That(sql.SQL.NoCrLf(), Is.EqualTo(sqlBase + "([zbThing1].[id] IN (@0,@1,@2)) AND (([zbThing1].[name] = @3))"));
+        Assert.That(sql.Arguments.Length, Is.EqualTo(4));
+        Assert.That(sql.Arguments[0], Is.EqualTo(1));
+        Assert.That(sql.Arguments[1], Is.EqualTo(2));
+        Assert.That(sql.Arguments[2], Is.EqualTo(3));
+        Assert.That(sql.Arguments[3], Is.EqualTo("bar"));
 
         // note however that using WhereIn in a template means that the SQL is going
         // to be parsed and arguments are going to be expanded etc - it *may* be a better
@@ -203,12 +203,12 @@ public class NPocoSqlTemplateTests
             .Append("AND whatever=@0", SqlTemplate.Arg("k")));
 
         sql = template.Sql(new { j = new[] { 1, 2, 3 }, k = "oops" });
-        Assert.AreEqual(sqlBase.TrimEnd("WHERE ") + "AND whatever=@0,@1,@2 AND whatever=@3", sql.SQL.NoCrLf());
-        Assert.AreEqual(4, sql.Arguments.Length);
-        Assert.AreEqual(1, sql.Arguments[0]);
-        Assert.AreEqual(2, sql.Arguments[1]);
-        Assert.AreEqual(3, sql.Arguments[2]);
-        Assert.AreEqual("oops", sql.Arguments[3]);
+        Assert.That(sql.SQL.NoCrLf(), Is.EqualTo(sqlBase.TrimEnd("WHERE ") + "AND whatever=@0,@1,@2 AND whatever=@3"));
+        Assert.That(sql.Arguments.Length, Is.EqualTo(4));
+        Assert.That(sql.Arguments[0], Is.EqualTo(1));
+        Assert.That(sql.Arguments[1], Is.EqualTo(2));
+        Assert.That(sql.Arguments[2], Is.EqualTo(3));
+        Assert.That(sql.Arguments[3], Is.EqualTo("oops"));
     }
 
     [TableName("zbThing1")]

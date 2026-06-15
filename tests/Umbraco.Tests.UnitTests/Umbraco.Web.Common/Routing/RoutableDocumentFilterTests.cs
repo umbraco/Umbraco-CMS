@@ -43,7 +43,7 @@ public class RoutableDocumentFilterTests
             new DefaultEndpointDataSource());
 
         // Will be false if it is a reserved path
-        Assert.IsFalse(routableDocFilter.IsDocumentRequest(url));
+        Assert.That(routableDocFilter.IsDocumentRequest(url), Is.False);
     }
 
     [TestCase("/base/somebasehandler")]
@@ -60,7 +60,7 @@ public class RoutableDocumentFilterTests
             new DefaultEndpointDataSource());
 
         // Will be true if it's not reserved
-        Assert.IsTrue(routableDocFilter.IsDocumentRequest(url));
+        Assert.That(routableDocFilter.IsDocumentRequest(url), Is.True);
     }
 
     [TestCase("/Do/Not/match", false)]
@@ -96,9 +96,8 @@ public class RoutableDocumentFilterTests
             GetHostingEnvironment(),
             endpointDataSource);
 
-        Assert.AreEqual(
-            !isReserved, // not reserved if it's a document request
-            routableDocFilter.IsDocumentRequest(url));
+        Assert.That(
+            routableDocFilter.IsDocumentRequest(url), Is.EqualTo(!isReserved));
     }
 
     [TestCase("/umbraco", true)]
@@ -124,9 +123,8 @@ public class RoutableDocumentFilterTests
             GetHostingEnvironment(),
             endpointDataSource);
 
-        Assert.AreEqual(
-            !isReserved, // not reserved if it's a document request
-            routableDocFilter.IsDocumentRequest(url));
+        Assert.That(
+            routableDocFilter.IsDocumentRequest(url), Is.EqualTo(!isReserved));
     }
 
     // borrowed from https://github.com/dotnet/aspnetcore/blob/19559e73da2b6d335b864ed2855dd8a0c7a207a0/src/Mvc/Mvc.Core/test/Routing/ControllerLinkGeneratorExtensionsTest.cs#L171

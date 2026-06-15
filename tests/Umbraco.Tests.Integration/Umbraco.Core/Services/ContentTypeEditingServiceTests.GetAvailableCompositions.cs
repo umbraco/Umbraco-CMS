@@ -27,13 +27,13 @@ internal sealed partial class ContentTypeEditingServiceTests
                 Enumerable.Empty<string>(),
                 isElement);
 
-        Assert.AreEqual(2, availableCompositions.Count());
+        Assert.That(availableCompositions.Count(), Is.EqualTo(2));
 
         // Verify that contentType2 and contentType3 are present in available compositions
-        Assert.IsTrue(availableCompositions.Any(compositionsResult =>
-            compositionsResult.Composition.Key == result2.Result!.Key && compositionsResult.Allowed));
-        Assert.IsTrue(availableCompositions.Any(compositionsResult =>
-            compositionsResult.Composition.Key == result3.Result!.Key && compositionsResult.Allowed));
+        Assert.That(availableCompositions.Any(compositionsResult =>
+            compositionsResult.Composition.Key == result2.Result!.Key && compositionsResult.Allowed), Is.True);
+        Assert.That(availableCompositions.Any(compositionsResult =>
+            compositionsResult.Composition.Key == result3.Result!.Key && compositionsResult.Allowed), Is.True);
     }
 
     [TestCase(true)]
@@ -59,7 +59,7 @@ internal sealed partial class ContentTypeEditingServiceTests
                 Enumerable.Empty<string>(),
                 false);
 
-        Assert.AreEqual(0, availableCompositions.Count());
+        Assert.That(availableCompositions.Count(), Is.EqualTo(0));
     }
 
     [TestCase(true)]
@@ -82,15 +82,15 @@ internal sealed partial class ContentTypeEditingServiceTests
                 Enumerable.Empty<string>(),
                 isElement);
 
-        Assert.AreEqual(3, availableCompositions.Count());
+        Assert.That(availableCompositions.Count(), Is.EqualTo(3));
 
         // Verify that all content types are present in available compositions
-        Assert.IsTrue(availableCompositions.Any(compositionsResult =>
-            compositionsResult.Composition.Key == result1.Result!.Key && compositionsResult.Allowed));
-        Assert.IsTrue(availableCompositions.Any(compositionsResult =>
-            compositionsResult.Composition.Key == result2.Result!.Key && compositionsResult.Allowed));
-        Assert.IsTrue(availableCompositions.Any(compositionsResult =>
-            compositionsResult.Composition.Key == result3.Result!.Key && compositionsResult.Allowed));
+        Assert.That(availableCompositions.Any(compositionsResult =>
+            compositionsResult.Composition.Key == result1.Result!.Key && compositionsResult.Allowed), Is.True);
+        Assert.That(availableCompositions.Any(compositionsResult =>
+            compositionsResult.Composition.Key == result2.Result!.Key && compositionsResult.Allowed), Is.True);
+        Assert.That(availableCompositions.Any(compositionsResult =>
+            compositionsResult.Composition.Key == result3.Result!.Key && compositionsResult.Allowed), Is.True);
     }
 
     [Test]
@@ -115,13 +115,13 @@ internal sealed partial class ContentTypeEditingServiceTests
                 Enumerable.Empty<string>(),
                 true);
 
-        Assert.AreEqual(2, availableCompositions.Count());
+        Assert.That(availableCompositions.Count(), Is.EqualTo(2));
 
         // Verify that only element types are present in available compositions
-        Assert.IsTrue(availableCompositions.Any(compositionsResult =>
-            compositionsResult.Composition.Key == result2.Result!.Key && compositionsResult.Allowed));
-        Assert.IsTrue(availableCompositions.Any(compositionsResult =>
-            compositionsResult.Composition.Key == result3.Result!.Key && compositionsResult.Allowed));
+        Assert.That(availableCompositions.Any(compositionsResult =>
+            compositionsResult.Composition.Key == result2.Result!.Key && compositionsResult.Allowed), Is.True);
+        Assert.That(availableCompositions.Any(compositionsResult =>
+            compositionsResult.Composition.Key == result3.Result!.Key && compositionsResult.Allowed), Is.True);
     }
 
     [Test]
@@ -149,17 +149,17 @@ internal sealed partial class ContentTypeEditingServiceTests
                 Enumerable.Empty<string>(),
                 false);
 
-        Assert.AreEqual(4, availableCompositions.Count());
+        Assert.That(availableCompositions.Count(), Is.EqualTo(4));
 
         // Verify that the rest of content types (element types included) are present in available compositions
-        Assert.IsTrue(availableCompositions.Any(compositionsResult =>
-            compositionsResult.Composition.Key == result1.Result!.Key && compositionsResult.Allowed));
-        Assert.IsTrue(availableCompositions.Any(compositionsResult =>
-            compositionsResult.Composition.Key == result2.Result!.Key && compositionsResult.Allowed));
-        Assert.IsTrue(availableCompositions.Any(compositionsResult =>
-            compositionsResult.Composition.Key == result3.Result!.Key && compositionsResult.Allowed));
-        Assert.IsTrue(availableCompositions.Any(compositionsResult =>
-            compositionsResult.Composition.Key == result5.Result!.Key && compositionsResult.Allowed));
+        Assert.That(availableCompositions.Any(compositionsResult =>
+            compositionsResult.Composition.Key == result1.Result!.Key && compositionsResult.Allowed), Is.True);
+        Assert.That(availableCompositions.Any(compositionsResult =>
+            compositionsResult.Composition.Key == result2.Result!.Key && compositionsResult.Allowed), Is.True);
+        Assert.That(availableCompositions.Any(compositionsResult =>
+            compositionsResult.Composition.Key == result3.Result!.Key && compositionsResult.Allowed), Is.True);
+        Assert.That(availableCompositions.Any(compositionsResult =>
+            compositionsResult.Composition.Key == result5.Result!.Key && compositionsResult.Allowed), Is.True);
     }
 
     [TestCase(true)]
@@ -183,15 +183,15 @@ internal sealed partial class ContentTypeEditingServiceTests
                 isElement);
 
         // Verify that all content types are present in available compositions
-        Assert.AreEqual(3, availableCompositions.Count());
+        Assert.That(availableCompositions.Count(), Is.EqualTo(3));
 
         // Verify that contentType2 is not allowed because it is selected as composition already, so cannot be picked again
-        Assert.IsTrue(availableCompositions.Any(compositionsResult =>
-            compositionsResult.Composition.Key == result1.Result!.Key && compositionsResult.Allowed));
-        Assert.IsTrue(availableCompositions.Any(compositionsResult =>
-            compositionsResult.Composition.Key == result2.Result!.Key && compositionsResult.Allowed == false));
-        Assert.IsTrue(availableCompositions.Any(compositionsResult =>
-            compositionsResult.Composition.Key == result3.Result!.Key && compositionsResult.Allowed));
+        Assert.That(availableCompositions.Any(compositionsResult =>
+            compositionsResult.Composition.Key == result1.Result!.Key && compositionsResult.Allowed), Is.True);
+        Assert.That(availableCompositions.Any(compositionsResult =>
+            compositionsResult.Composition.Key == result2.Result!.Key && compositionsResult.Allowed == false), Is.True);
+        Assert.That(availableCompositions.Any(compositionsResult =>
+            compositionsResult.Composition.Key == result3.Result!.Key && compositionsResult.Allowed), Is.True);
     }
 
     [TestCase(true)]
@@ -215,16 +215,16 @@ internal sealed partial class ContentTypeEditingServiceTests
                 isElement);
 
         // Verify that all content types are present in available compositions
-        Assert.AreEqual(3, availableCompositions.Count());
+        Assert.That(availableCompositions.Count(), Is.EqualTo(3));
 
         // Verify that contentType3 is not allowed because it has a matching property with the current state of the item we are using to look
         // for available compositions
-        Assert.IsTrue(availableCompositions.Any(compositionsResult =>
-            compositionsResult.Composition.Key == result1.Result!.Key && compositionsResult.Allowed));
-        Assert.IsTrue(availableCompositions.Any(compositionsResult =>
-            compositionsResult.Composition.Key == result2.Result!.Key && compositionsResult.Allowed));
-        Assert.IsTrue(availableCompositions.Any(compositionsResult =>
-            compositionsResult.Composition.Key == result3.Result!.Key && compositionsResult.Allowed == false));
+        Assert.That(availableCompositions.Any(compositionsResult =>
+            compositionsResult.Composition.Key == result1.Result!.Key && compositionsResult.Allowed), Is.True);
+        Assert.That(availableCompositions.Any(compositionsResult =>
+            compositionsResult.Composition.Key == result2.Result!.Key && compositionsResult.Allowed), Is.True);
+        Assert.That(availableCompositions.Any(compositionsResult =>
+            compositionsResult.Composition.Key == result3.Result!.Key && compositionsResult.Allowed == false), Is.True);
     }
 
     private ContentTypeCreateModel CreateBasicContentTypeModelWithSingleProperty(string contentTypeName, string propertyName, bool isElement)

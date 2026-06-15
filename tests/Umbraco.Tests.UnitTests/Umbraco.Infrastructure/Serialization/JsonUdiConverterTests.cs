@@ -25,7 +25,7 @@ public class JsonUdiConverterTests
         string serialized = JsonSerializer.Serialize(artifact, _jsonSerializerOptions);
 
         var expected = "{\"Udi\":\"umb://document/3382d5433b5749d08919bc9961422a1f\"}";
-        Assert.AreEqual(expected, serialized);
+        Assert.That(serialized, Is.EqualTo(expected));
     }
 
     [Test]
@@ -34,8 +34,8 @@ public class JsonUdiConverterTests
         var serialized = "{\"Udi\":\"umb://document/3382d5433b5749d08919bc9961422a1f\"}";
 
         Test? deserialized = JsonSerializer.Deserialize<Test>(serialized, _jsonSerializerOptions);
-        Assert.IsNotNull(deserialized);
-        Assert.AreEqual(Guid.Parse("3382d5433b5749d08919bc9961422a1f"), deserialized.Udi.Guid);
+        Assert.That(deserialized, Is.Not.Null);
+        Assert.That(deserialized.Udi.Guid, Is.EqualTo(Guid.Parse("3382d5433b5749d08919bc9961422a1f")));
     }
 
     [TestCase(null)]
@@ -47,8 +47,8 @@ public class JsonUdiConverterTests
         var serialized = "{\"Udi\":" + serializedUdiPart + "}";
 
         Test? deserialized = JsonSerializer.Deserialize<Test>(serialized, _jsonSerializerOptions);
-        Assert.IsNotNull(deserialized);
-        Assert.IsNull(deserialized.Udi);
+        Assert.That(deserialized, Is.Not.Null);
+        Assert.That(deserialized.Udi, Is.Null);
     }
 
     [Test]

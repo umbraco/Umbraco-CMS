@@ -22,13 +22,13 @@ public partial class ElementContainerServiceTests
         var deleteResult = await ElementContainerService.DeleteFromRecycleBinAsync(rootContainerKey, Constants.Security.SuperUserKey);
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(deleteResult.Success);
-            Assert.AreEqual(EntityContainerOperationStatus.Success, deleteResult.Status);
+            Assert.That(deleteResult.Success, Is.True);
+            Assert.That(deleteResult.Status, Is.EqualTo(EntityContainerOperationStatus.Success));
         });
 
         // verify that the deletion happened
         var rootContainer = await ElementContainerService.GetAsync(rootContainerKey);
-        Assert.IsNull(rootContainer);
+        Assert.That(rootContainer, Is.Null);
     }
 
     [Test]
@@ -40,20 +40,20 @@ public partial class ElementContainerServiceTests
         var moveResult = await ElementContainerService.MoveToRecycleBinAsync(setup.RootContainerKey, Constants.Security.SuperUserKey);
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(moveResult.Success);
-            Assert.AreEqual(EntityContainerOperationStatus.Success, moveResult.Result);
+            Assert.That(moveResult.Success, Is.True);
+            Assert.That(moveResult.Result, Is.EqualTo(EntityContainerOperationStatus.Success));
         });
 
-        Assert.AreNotEqual(0, EntityService.GetDescendants(Constants.System.RecycleBinElement).Count());
+        Assert.That(EntityService.GetDescendants(Constants.System.RecycleBinElement).Count(), Is.Not.EqualTo(0));
 
         var deleteResult = await ElementContainerService.DeleteFromRecycleBinAsync(setup.RootContainerKey, Constants.Security.SuperUserKey);
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(deleteResult.Success);
-            Assert.AreEqual(EntityContainerOperationStatus.Success, deleteResult.Status);
+            Assert.That(deleteResult.Success, Is.True);
+            Assert.That(deleteResult.Status, Is.EqualTo(EntityContainerOperationStatus.Success));
         });
 
-        Assert.AreEqual(0, EntityService.GetDescendants(Constants.System.RecycleBinElement).Count());
+        Assert.That(EntityService.GetDescendants(Constants.System.RecycleBinElement).Count(), Is.EqualTo(0));
     }
 
     [Test]
@@ -62,19 +62,19 @@ public partial class ElementContainerServiceTests
         var rootContainerKey = Guid.NewGuid();
         await ElementContainerService.CreateAsync(rootContainerKey, "Root Container", null, Constants.Security.SuperUserKey);
 
-        Assert.AreEqual(1, GetAtRoot().Length);
+        Assert.That(GetAtRoot(), Has.Length.EqualTo(1));
 
         var deleteResult = await ElementContainerService.DeleteFromRecycleBinAsync(rootContainerKey, Constants.Security.SuperUserKey);
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(deleteResult.Success);
-            Assert.AreEqual(EntityContainerOperationStatus.NotInTrash, deleteResult.Status);
+            Assert.That(deleteResult.Success, Is.False);
+            Assert.That(deleteResult.Status, Is.EqualTo(EntityContainerOperationStatus.NotInTrash));
         });
 
         // verify that the deletion did not happen
         var rootContainer = await ElementContainerService.GetAsync(rootContainerKey);
-        Assert.IsNotNull(rootContainer);
-        Assert.AreEqual(Constants.System.Root, rootContainer.ParentId);
+        Assert.That(rootContainer, Is.Not.Null);
+        Assert.That(rootContainer.ParentId, Is.EqualTo(Constants.System.Root));
     }
 
     [Test]
@@ -85,7 +85,7 @@ public partial class ElementContainerServiceTests
 
         var containerKey = Guid.NewGuid();
         var container = (await ElementContainerService.CreateAsync(containerKey, "The Container", null, Constants.Security.SuperUserKey)).Result;
-        Assert.IsNotNull(container);
+        Assert.That(container, Is.Not.Null);
 
         await ElementContainerService.MoveToRecycleBinAsync(containerKey, Constants.Security.SuperUserKey);
 
@@ -94,21 +94,21 @@ public partial class ElementContainerServiceTests
             EntityContainerNotificationHandler.DeletingContainer = notification =>
             {
                 deletingWasCalled = true;
-                Assert.AreEqual(containerKey, notification.DeletedEntities.Single().Key);
+                Assert.That(notification.DeletedEntities.Single().Key, Is.EqualTo(containerKey));
             };
 
             EntityContainerNotificationHandler.DeletedContainer = notification =>
             {
                 deletedWasCalled = true;
-                Assert.AreEqual(containerKey, notification.DeletedEntities.Single().Key);
+                Assert.That(notification.DeletedEntities.Single().Key, Is.EqualTo(containerKey));
             };
 
             var result = await ElementContainerService.DeleteFromRecycleBinAsync(containerKey, Constants.Security.SuperUserKey);
 
-            Assert.AreEqual(EntityContainerOperationStatus.Success, result.Status);
-            Assert.IsTrue(result.Success);
-            Assert.IsTrue(deletingWasCalled);
-            Assert.IsTrue(deletedWasCalled);
+            Assert.That(result.Status, Is.EqualTo(EntityContainerOperationStatus.Success));
+            Assert.That(result.Success, Is.True);
+            Assert.That(deletingWasCalled, Is.True);
+            Assert.That(deletedWasCalled, Is.True);
         }
         finally
         {
@@ -116,8 +116,8 @@ public partial class ElementContainerServiceTests
             EntityContainerNotificationHandler.DeletedContainer = null;
         }
 
-        Assert.AreEqual(0, GetAtRoot().Length);
-        Assert.IsNull(await ElementContainerService.GetAsync(containerKey));
+        Assert.That(GetAtRoot(), Is.Empty);
+        Assert.That(await ElementContainerService.GetAsync(containerKey), Is.Null);
     }
 
     [Test]
@@ -128,7 +128,7 @@ public partial class ElementContainerServiceTests
 
         var containerKey = Guid.NewGuid();
         var container = (await ElementContainerService.CreateAsync(containerKey, "The Container", null, Constants.Security.SuperUserKey)).Result;
-        Assert.IsNotNull(container);
+        Assert.That(container, Is.Not.Null);
 
         await ElementContainerService.MoveToRecycleBinAsync(containerKey, Constants.Security.SuperUserKey);
 
@@ -147,10 +147,10 @@ public partial class ElementContainerServiceTests
 
             var result = await ElementContainerService.DeleteFromRecycleBinAsync(containerKey, Constants.Security.SuperUserKey);
 
-            Assert.AreEqual(EntityContainerOperationStatus.CancelledByNotification, result.Status);
-            Assert.IsFalse(result.Success);
-            Assert.IsTrue(deletingWasCalled);
-            Assert.IsFalse(deletedWasCalled);
+            Assert.That(result.Status, Is.EqualTo(EntityContainerOperationStatus.CancelledByNotification));
+            Assert.That(result.Success, Is.False);
+            Assert.That(deletingWasCalled, Is.True);
+            Assert.That(deletedWasCalled, Is.False);
         }
         finally
         {
@@ -159,8 +159,8 @@ public partial class ElementContainerServiceTests
         }
 
         var entityContainer = await ElementContainerService.GetAsync(containerKey);
-        Assert.IsNotNull(entityContainer);
-        Assert.IsTrue(entityContainer.Trashed);
+        Assert.That(entityContainer, Is.Not.Null);
+        Assert.That(entityContainer.Trashed, Is.True);
     }
 
     [Test]
@@ -199,18 +199,18 @@ public partial class ElementContainerServiceTests
 
             var result = await ElementContainerService.DeleteFromRecycleBinAsync(rootContainerKey, Constants.Security.SuperUserKey);
 
-            Assert.IsTrue(result.Success);
-            Assert.AreEqual(EntityContainerOperationStatus.Success, result.Status);
+            Assert.That(result.Success, Is.True);
+            Assert.That(result.Status, Is.EqualTo(EntityContainerOperationStatus.Success));
 
             // Verify notifications were fired for descendant elements
-            Assert.AreEqual(2, deletedElementKeys.Count);
-            Assert.Contains(element1.Key, deletedElementKeys);
-            Assert.Contains(element2.Key, deletedElementKeys);
+            Assert.That(deletedElementKeys, Has.Count.EqualTo(2));
+            Assert.That(deletedElementKeys, Does.Contain(element1.Key));
+            Assert.That(deletedElementKeys, Does.Contain(element2.Key));
 
             // Verify notifications were fired for descendant containers (child + root)
-            Assert.AreEqual(2, deletedContainerKeys.Count);
-            Assert.Contains(childContainerKey, deletedContainerKeys);
-            Assert.Contains(rootContainerKey, deletedContainerKeys);
+            Assert.That(deletedContainerKeys, Has.Count.EqualTo(2));
+            Assert.That(deletedContainerKeys, Does.Contain(childContainerKey));
+            Assert.That(deletedContainerKeys, Does.Contain(rootContainerKey));
         }
         finally
         {
@@ -226,7 +226,7 @@ public partial class ElementContainerServiceTests
 
         var containerKey = Guid.NewGuid();
         var container = (await ElementContainerService.CreateAsync(containerKey, "Start Node Container", null, Constants.Security.SuperUserKey)).Result;
-        Assert.IsNotNull(container);
+        Assert.That(container, Is.Not.Null);
 
         var user = new UserBuilder()
             .WithName("StartNodeUser")
@@ -240,16 +240,16 @@ public partial class ElementContainerServiceTests
         var deleteResult = await ElementContainerService.DeleteFromRecycleBinAsync(containerKey, Constants.Security.SuperUserKey);
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(deleteResult.Success);
-            Assert.AreEqual(EntityContainerOperationStatus.Success, deleteResult.Status);
+            Assert.That(deleteResult.Success, Is.True);
+            Assert.That(deleteResult.Status, Is.EqualTo(EntityContainerOperationStatus.Success));
         });
 
-        Assert.IsNull(await ElementContainerService.GetAsync(containerKey));
+        Assert.That(await ElementContainerService.GetAsync(containerKey), Is.Null);
 
         // The user's start node reference should have been cleared.
         var updatedUser = userService.GetUserById(user.Id);
-        Assert.IsNotNull(updatedUser);
-        Assert.IsFalse(updatedUser!.StartElementIds?.Contains(container.Id) ?? false);
+        Assert.That(updatedUser, Is.Not.Null);
+        Assert.That(updatedUser!.StartElementIds?.Contains(container.Id) ?? false, Is.False);
     }
 
     [Test]
@@ -259,14 +259,14 @@ public partial class ElementContainerServiceTests
 
         var containerKey = Guid.NewGuid();
         var container = (await ElementContainerService.CreateAsync(containerKey, "Start Node Container", null, Constants.Security.SuperUserKey)).Result;
-        Assert.IsNotNull(container);
+        Assert.That(container, Is.Not.Null);
 
         var userGroup = new UserGroupBuilder()
             .WithAlias(Guid.NewGuid().ToString("N"))
             .WithStartElementId(container!.Id)
             .Build();
         var groupResult = await userGroupService.CreateAsync(userGroup, Constants.Security.SuperUserKey);
-        Assert.IsTrue(groupResult.Success);
+        Assert.That(groupResult.Success, Is.True);
 
         await ElementContainerService.MoveToRecycleBinAsync(containerKey, Constants.Security.SuperUserKey);
         await AssertContainerIsInRecycleBin(containerKey);
@@ -274,15 +274,15 @@ public partial class ElementContainerServiceTests
         var deleteResult = await ElementContainerService.DeleteFromRecycleBinAsync(containerKey, Constants.Security.SuperUserKey);
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(deleteResult.Success);
-            Assert.AreEqual(EntityContainerOperationStatus.Success, deleteResult.Status);
+            Assert.That(deleteResult.Success, Is.True);
+            Assert.That(deleteResult.Status, Is.EqualTo(EntityContainerOperationStatus.Success));
         });
 
-        Assert.IsNull(await ElementContainerService.GetAsync(containerKey));
+        Assert.That(await ElementContainerService.GetAsync(containerKey), Is.Null);
 
         // The user group's start node reference should have been cleared.
         var updatedGroup = await userGroupService.GetAsync(userGroup.Key);
-        Assert.IsNotNull(updatedGroup);
-        Assert.IsNull(updatedGroup!.StartElementId);
+        Assert.That(updatedGroup, Is.Not.Null);
+        Assert.That(updatedGroup!.StartElementId, Is.Null);
     }
 }

@@ -34,8 +34,8 @@ public class ContentSearchServiceTests : UmbracoIntegrationTest
         var result = await ContentSearchService.SearchChildrenAsync(null, null, null, 0, 1000);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(3, result.Total);
-            Assert.AreEqual(3, result.Items.Count());
+            Assert.That(result.Total, Is.EqualTo(3));
+            Assert.That(result.Items.Count(), Is.EqualTo(3));
         });
 
         var resultKeys = result.Items.Select(item => item.Key).ToArray();
@@ -45,7 +45,7 @@ public class ContentSearchServiceTests : UmbracoIntegrationTest
             _contentByName["Root 2"].Key,
             _contentByName["Root 3"].Key
         };
-        CollectionAssert.AreEqual(expectedKeys, resultKeys);
+        Assert.That(resultKeys, Is.EqualTo(expectedKeys).AsCollection);
     }
 
     [Test]
@@ -54,8 +54,8 @@ public class ContentSearchServiceTests : UmbracoIntegrationTest
         var result = await ContentSearchService.SearchChildrenAsync(null, _contentByName["Root 1"].Key, null, 0, 1000);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(5, result.Total);
-            Assert.AreEqual(5, result.Items.Count());
+            Assert.That(result.Total, Is.EqualTo(5));
+            Assert.That(result.Items.Count(), Is.EqualTo(5));
         });
 
         var resultKeys = result.Items.Select(item => item.Key).ToArray();
@@ -67,7 +67,7 @@ public class ContentSearchServiceTests : UmbracoIntegrationTest
             _contentByName["Root 1/Child 4"].Key,
             _contentByName["Root 1/Child 5"].Key
         };
-        CollectionAssert.AreEqual(expectedKeys, resultKeys);
+        Assert.That(resultKeys, Is.EqualTo(expectedKeys).AsCollection);
     }
 
     [Test]
@@ -76,8 +76,8 @@ public class ContentSearchServiceTests : UmbracoIntegrationTest
         var result = await ContentSearchService.SearchChildrenAsync(null, _contentByName["Root 2"].Key, Ordering.By("name"), 2, 2);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(5, result.Total);
-            Assert.AreEqual(2, result.Items.Count());
+            Assert.That(result.Total, Is.EqualTo(5));
+            Assert.That(result.Items.Count(), Is.EqualTo(2));
         });
 
         var resultKeys = result.Items.Select(item => item.Key).ToArray();
@@ -86,7 +86,7 @@ public class ContentSearchServiceTests : UmbracoIntegrationTest
             _contentByName["Root 2/Child 3"].Key,
             _contentByName["Root 2/Child 4"].Key
         };
-        CollectionAssert.AreEqual(expectedKeys, resultKeys);
+        Assert.That(resultKeys, Is.EqualTo(expectedKeys).AsCollection);
     }
 
     [Test]
@@ -95,11 +95,11 @@ public class ContentSearchServiceTests : UmbracoIntegrationTest
         var result = await ContentSearchService.SearchChildrenAsync("2", _contentByName["Root 3"].Key, null);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(1, result.Total);
-            Assert.AreEqual(1, result.Items.Count());
+            Assert.That(result.Total, Is.EqualTo(1));
+            Assert.That(result.Items.Count(), Is.EqualTo(1));
         });
 
-        Assert.AreEqual(_contentByName["Root 3/Child 2"].Key, result.Items.First().Key);
+        Assert.That(result.Items.First().Key, Is.EqualTo(_contentByName["Root 3/Child 2"].Key));
     }
 
     [SetUp]

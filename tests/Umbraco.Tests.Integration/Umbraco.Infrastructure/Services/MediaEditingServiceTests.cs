@@ -40,7 +40,7 @@ internal sealed partial class MediaEditingServiceTests : UmbracoIntegrationTest
         };
 
         var result = await MediaEditingService.CreateAsync(createModel, userKey);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
         return result.Result.Content!;
     }
 
@@ -56,7 +56,7 @@ internal sealed partial class MediaEditingServiceTests : UmbracoIntegrationTest
         };
 
         var result = await UserService.CreateAsync(Constants.Security.SuperUserKey, createModel);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
         return result.Result.CreatedUser!;
     }
 

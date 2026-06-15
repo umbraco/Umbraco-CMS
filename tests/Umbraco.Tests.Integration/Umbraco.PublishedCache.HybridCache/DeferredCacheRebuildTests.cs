@@ -39,7 +39,7 @@ internal sealed class DeferredCacheRebuildTests : UmbracoIntegrationTestWithCont
     {
         // Arrange — verify the property exists before the structural change.
         var oldTextPage = await PublishedContentHybridCache.GetByIdAsync(TextpageId, true);
-        Assert.IsNotNull(oldTextPage.Value("title"));
+        Assert.That(oldTextPage.Value("title"), Is.Not.Null);
 
         // Act — remove the property (structural change). In Deferred mode, the rebuild is queued.
         ContentType.RemovePropertyType("title");
@@ -50,7 +50,7 @@ internal sealed class DeferredCacheRebuildTests : UmbracoIntegrationTestWithCont
 
         // Assert — after the deferred rebuild, the property should be gone.
         var newTextPage = await PublishedContentHybridCache.GetByIdAsync(TextpageId, true);
-        Assert.IsNull(newTextPage.Value("title"));
+        Assert.That(newTextPage.Value("title"), Is.Null);
     }
 
     [Test]
@@ -58,9 +58,9 @@ internal sealed class DeferredCacheRebuildTests : UmbracoIntegrationTestWithCont
     {
         // Arrange — load content and verify.
         var oldTextPage = await PublishedContentHybridCache.GetByIdAsync(TextpageId, true);
-        Assert.IsNotNull(oldTextPage);
+        Assert.That(oldTextPage, Is.Not.Null);
         var originalTitle = oldTextPage.Value("title");
-        Assert.IsNotNull(originalTitle);
+        Assert.That(originalTitle, Is.Not.Null);
 
         // Act — non-structural change (rename). Should not trigger a rebuild at all.
         ContentType.Name = "Renamed Textpage";
@@ -68,7 +68,7 @@ internal sealed class DeferredCacheRebuildTests : UmbracoIntegrationTestWithCont
 
         // Assert — property values preserved (no rebuild needed).
         var newTextPage = await PublishedContentHybridCache.GetByIdAsync(TextpageId, true);
-        Assert.IsNotNull(newTextPage);
-        Assert.AreEqual(originalTitle, newTextPage.Value("title"));
+        Assert.That(newTextPage, Is.Not.Null);
+        Assert.That(newTextPage.Value("title"), Is.EqualTo(originalTitle));
     }
 }

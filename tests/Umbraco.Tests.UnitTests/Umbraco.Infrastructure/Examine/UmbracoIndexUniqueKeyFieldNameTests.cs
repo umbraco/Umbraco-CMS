@@ -15,13 +15,13 @@ public class UmbracoIndexUniqueKeyFieldNameTests
         // so the default interface implementation is exercised.
         IUmbracoIndex index = new StubUmbracoIndex();
 
-        Assert.AreEqual(UmbracoExamineFieldNames.NodeKeyFieldName, index.UniqueKeyFieldName);
+        Assert.That(index.UniqueKeyFieldName, Is.EqualTo(UmbracoExamineFieldNames.NodeKeyFieldName));
     }
 
     [Test]
     public void DeliveryApiContentIndex_ItemId_Constant_Matches_Expected_Value()
     {
-        Assert.AreEqual("itemId", UmbracoExamineFieldNames.DeliveryApiContentIndex.ItemId);
+        Assert.That(UmbracoExamineFieldNames.DeliveryApiContentIndex.ItemId, Is.EqualTo("itemId"));
     }
 
     /// <summary>

@@ -24,6 +24,6 @@ public class IntGuidIntConversionTests
         var intermediateValue = startValue.ToGuid();
         var endValue = intermediateValue.ToInt();
 
-        Assert.AreEqual(startValue, endValue);
+        Assert.That(endValue, Is.EqualTo(startValue));
     }
 }

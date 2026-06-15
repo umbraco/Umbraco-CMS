@@ -1,7 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using AutoFixture.NUnit3;
+using AutoFixture.NUnit4;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.FileProviders;
 using Moq;
@@ -42,7 +42,7 @@ internal class FileNameTests
         var fileName = GetViewName(viewResult);
         var views = GetUiFiles(new[] { "umbraco", "UmbracoBackOffice" });
 
-        Assert.True(views.Contains(fileName), $"Expected {fileName} to exist, but it didn't");
+        Assert.That(views, Does.Contain(fileName), $"Expected {fileName} to exist, but it didn't");
     }
 
     [Test]
@@ -57,9 +57,8 @@ internal class FileNameTests
 
         foreach (var fileName in files)
         {
-            Assert.AreEqual(
-                fileName.ToLower(),
-                fileName,
+            Assert.That(
+                fileName, Is.EqualTo(fileName.ToLower()),
                 $"Language files must be all lowercase but {fileName} is not lowercase.");
         }
     }

@@ -24,7 +24,7 @@ internal sealed class CreatedPackageSchemaTests : UmbracoIntegrationTest
         var packageDefinition = new PackageDefinition { Name = "NewPack", DocumentTypes = new List<string> { "Root" } };
         var result = CreatedPackageSchemaRepository.SavePackage(packageDefinition);
         scope.Complete();
-        Assert.IsTrue(result);
+        Assert.That(result, Is.True);
     }
 
     [Test]
@@ -43,9 +43,9 @@ internal sealed class CreatedPackageSchemaTests : UmbracoIntegrationTest
 
         var loadedPackageDefinitions = CreatedPackageSchemaRepository.GetAll().ToList();
         scope.Complete();
-        CollectionAssert.IsNotEmpty(loadedPackageDefinitions);
-        CollectionAssert.AllItemsAreUnique(loadedPackageDefinitions);
-        Assert.AreEqual(loadedPackageDefinitions.Count, 3);
+        Assert.That(loadedPackageDefinitions, Is.Not.Empty);
+        Assert.That(loadedPackageDefinitions, Is.Unique);
+        Assert.That(loadedPackageDefinitions, Has.Count.EqualTo(3));
     }
 
     [Test]
@@ -59,7 +59,7 @@ internal sealed class CreatedPackageSchemaTests : UmbracoIntegrationTest
         CreatedPackageSchemaRepository.SavePackage(packageDefinition);
         var results = CreatedPackageSchemaRepository.GetAll().ToList();
         scope.Complete();
-        Assert.AreEqual(1, results.Count);
-        Assert.AreEqual("UpdatedName", results.FirstOrDefault()?.Name);
+        Assert.That(results, Has.Count.EqualTo(1));
+        Assert.That(results.FirstOrDefault()?.Name, Is.EqualTo("UpdatedName"));
     }
 }

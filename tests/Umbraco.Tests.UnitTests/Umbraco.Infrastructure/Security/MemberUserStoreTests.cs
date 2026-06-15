@@ -48,8 +48,8 @@ public class MemberUserStoreTests
         await sut.SetNormalizedUserNameAsync(fakeUser, "NewName", CancellationToken.None);
 
         // Assert
-        Assert.AreEqual("NewName", fakeUser.UserName);
-        Assert.AreEqual("NewName", await sut.GetNormalizedUserNameAsync(fakeUser, CancellationToken.None));
+        Assert.That(fakeUser.UserName, Is.EqualTo("NewName"));
+        Assert.That(await sut.GetNormalizedUserNameAsync(fakeUser, CancellationToken.None), Is.EqualTo("NewName"));
     }
 
     [Test]
@@ -62,9 +62,9 @@ public class MemberUserStoreTests
         var actual = await sut.CreateAsync(null);
 
         // Assert
-        Assert.IsFalse(actual.Succeeded);
-        Assert.IsTrue(actual.Errors.Any(x =>
-            x.Code == "IdentityErrorUserStore" && x.Description == "Value cannot be null. (Parameter 'user')"));
+        Assert.That(actual.Succeeded, Is.False);
+        Assert.That(actual.Errors.Any(x =>
+            x.Code == "IdentityErrorUserStore" && x.Description == "Value cannot be null. (Parameter 'user')"), Is.True);
         _mockMemberService.VerifyNoOtherCalls();
     }
 
@@ -93,9 +93,9 @@ public class MemberUserStoreTests
         var actual = await sut.CreateAsync(null);
 
         // Assert
-        Assert.IsFalse(actual.Succeeded);
-        Assert.IsTrue(actual.Errors.Any(x =>
-            x.Code == "IdentityErrorUserStore" && x.Description == "Value cannot be null. (Parameter 'user')"));
+        Assert.That(actual.Succeeded, Is.False);
+        Assert.That(actual.Errors.Any(x =>
+            x.Code == "IdentityErrorUserStore" && x.Description == "Value cannot be null. (Parameter 'user')"), Is.True);
         _mockMemberService.VerifyNoOtherCalls();
     }
 
@@ -126,8 +126,8 @@ public class MemberUserStoreTests
         var identityResult = await sut.CreateAsync(fakeUser, CancellationToken.None);
 
         // Assert
-        Assert.IsTrue(identityResult.Succeeded);
-        Assert.IsTrue(!identityResult.Errors.Any());
+        Assert.That(identityResult.Succeeded, Is.True);
+        Assert.That(!identityResult.Errors.Any(), Is.True);
         _mockMemberService.Verify(x =>
             x.CreateMember(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()));
         _mockMemberService.Verify(x => x.Save(mockMember, PublishNotificationSaveOptions.Saving, Constants.Security.SuperUserId));
@@ -181,21 +181,21 @@ public class MemberUserStoreTests
         var identityResult = await sut.UpdateAsync(fakeUser, CancellationToken.None);
 
         // Assert
-        Assert.IsTrue(identityResult.Succeeded);
-        Assert.IsTrue(!identityResult.Errors.Any());
+        Assert.That(identityResult.Succeeded, Is.True);
+        Assert.That(!identityResult.Errors.Any(), Is.True);
 
-        Assert.AreEqual(fakeUser.Name, mockMember.Name);
-        Assert.AreEqual(fakeUser.Email, mockMember.Email);
-        Assert.AreEqual(fakeUser.UserName, mockMember.Username);
-        Assert.AreEqual(fakeUser.Comments, mockMember.Comments);
-        Assert.AreEqual(fakeUser.LastPasswordChangeDate, mockMember.LastPasswordChangeDate);
-        Assert.AreEqual(fakeUser.LastLoginDate, mockMember.LastLoginDate);
-        Assert.AreEqual(fakeUser.AccessFailedCount, mockMember.FailedPasswordAttempts);
-        Assert.AreEqual(fakeUser.IsLockedOut, mockMember.IsLockedOut);
-        Assert.AreEqual(fakeUser.IsApproved, mockMember.IsApproved);
-        Assert.AreEqual(fakeUser.PasswordHash, mockMember.RawPasswordValue);
-        Assert.AreEqual(fakeUser.SecurityStamp, mockMember.SecurityStamp);
-        Assert.AreNotEqual(DateTime.MinValue, mockMember.EmailConfirmedDate.Value);
+        Assert.That(mockMember.Name, Is.EqualTo(fakeUser.Name));
+        Assert.That(mockMember.Email, Is.EqualTo(fakeUser.Email));
+        Assert.That(mockMember.Username, Is.EqualTo(fakeUser.UserName));
+        Assert.That(mockMember.Comments, Is.EqualTo(fakeUser.Comments));
+        Assert.That(mockMember.LastPasswordChangeDate, Is.EqualTo(fakeUser.LastPasswordChangeDate));
+        Assert.That(mockMember.LastLoginDate, Is.EqualTo(fakeUser.LastLoginDate));
+        Assert.That(mockMember.FailedPasswordAttempts, Is.EqualTo(fakeUser.AccessFailedCount));
+        Assert.That(mockMember.IsLockedOut, Is.EqualTo(fakeUser.IsLockedOut));
+        Assert.That(mockMember.IsApproved, Is.EqualTo(fakeUser.IsApproved));
+        Assert.That(mockMember.RawPasswordValue, Is.EqualTo(fakeUser.PasswordHash));
+        Assert.That(mockMember.SecurityStamp, Is.EqualTo(fakeUser.SecurityStamp));
+        Assert.That(mockMember.EmailConfirmedDate.Value, Is.Not.EqualTo(DateTime.MinValue));
 
         _mockMemberService.Verify(x => x.Save(mockMember, Constants.Security.SuperUserId));
         _mockMemberService.Verify(x => x.GetById(123));
@@ -241,19 +241,19 @@ public class MemberUserStoreTests
         var identityResult = await sut.UpdateAsync(fakeUser, CancellationToken.None);
 
         // Assert
-        Assert.IsTrue(identityResult.Succeeded);
-        Assert.IsTrue(!identityResult.Errors.Any());
+        Assert.That(identityResult.Succeeded, Is.True);
+        Assert.That(!identityResult.Errors.Any(), Is.True);
 
-        Assert.AreEqual(fakeUser.Name, mockMember.Name);
-        Assert.AreEqual(fakeUser.Email, mockMember.Email);
-        Assert.AreEqual(fakeUser.UserName, mockMember.Username);
-        Assert.AreEqual(fakeUser.Comments, mockMember.Comments);
-        Assert.IsFalse(fakeUser.LastPasswordChangeDate.HasValue);
-        Assert.AreEqual(fakeUser.LastLoginDate.Value, mockMember.LastLoginDate);
-        Assert.AreEqual(fakeUser.AccessFailedCount, mockMember.FailedPasswordAttempts);
-        Assert.AreEqual(fakeUser.IsLockedOut, mockMember.IsLockedOut);
-        Assert.AreEqual(fakeUser.IsApproved, mockMember.IsApproved);
-        Assert.AreEqual(fakeUser.SecurityStamp, mockMember.SecurityStamp);
+        Assert.That(mockMember.Name, Is.EqualTo(fakeUser.Name));
+        Assert.That(mockMember.Email, Is.EqualTo(fakeUser.Email));
+        Assert.That(mockMember.Username, Is.EqualTo(fakeUser.UserName));
+        Assert.That(mockMember.Comments, Is.EqualTo(fakeUser.Comments));
+        Assert.That(fakeUser.LastPasswordChangeDate.HasValue, Is.False);
+        Assert.That(mockMember.LastLoginDate, Is.EqualTo(fakeUser.LastLoginDate.Value));
+        Assert.That(mockMember.FailedPasswordAttempts, Is.EqualTo(fakeUser.AccessFailedCount));
+        Assert.That(mockMember.IsLockedOut, Is.EqualTo(fakeUser.IsLockedOut));
+        Assert.That(mockMember.IsApproved, Is.EqualTo(fakeUser.IsApproved));
+        Assert.That(mockMember.SecurityStamp, Is.EqualTo(fakeUser.SecurityStamp));
 
         _mockMemberService.Verify(x => x.Save(mockMember, Constants.Security.SuperUserId), Times.Never);
         _mockMemberService.Verify(x => x.UpdateLoginPropertiesAsync(mockMember));
@@ -270,9 +270,9 @@ public class MemberUserStoreTests
         var actual = await sut.DeleteAsync(null);
 
         // Assert
-        Assert.IsTrue(actual.Succeeded == false);
-        Assert.IsTrue(actual.Errors.Any(x =>
-            x.Code == "IdentityErrorUserStore" && x.Description == "Value cannot be null. (Parameter 'user')"));
+        Assert.That(actual.Succeeded, Is.EqualTo(false));
+        Assert.That(actual.Errors.Any(x =>
+            x.Code == "IdentityErrorUserStore" && x.Description == "Value cannot be null. (Parameter 'user')"), Is.True);
         _mockMemberService.VerifyNoOtherCalls();
     }
 
@@ -304,8 +304,8 @@ public class MemberUserStoreTests
         var identityResult = await sut.DeleteAsync(fakeUser, fakeCancellationToken);
 
         // Assert
-        Assert.IsTrue(identityResult.Succeeded);
-        Assert.IsTrue(!identityResult.Errors.Any());
+        Assert.That(identityResult.Succeeded, Is.True);
+        Assert.That(!identityResult.Errors.Any(), Is.True);
         _mockMemberService.Verify(x => x.GetById(mockMember.Key));
         _mockMemberService.Verify(x => x.Delete(mockMember, Constants.Security.SuperUserId));
         _mockMemberService.VerifyNoOtherCalls();
@@ -336,9 +336,9 @@ public class MemberUserStoreTests
         var result = await sut.FindByEmailAsync(email, CancellationToken.None);
 
         // Assert
-        Assert.IsNotNull(result);
-        Assert.IsTrue(result!.IsExternalOnly);
-        Assert.AreEqual(email, result.Email);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result!.IsExternalOnly, Is.True);
+        Assert.That(result.Email, Is.EqualTo(email));
         _mockExternalMemberService.Verify(x => x.GetByEmailAsync(email), Times.Once);
     }
 
@@ -367,9 +367,9 @@ public class MemberUserStoreTests
         var result = await sut.FindByNameAsync(userName, CancellationToken.None);
 
         // Assert
-        Assert.IsNotNull(result);
-        Assert.IsTrue(result!.IsExternalOnly);
-        Assert.AreEqual(userName, result.UserName);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result!.IsExternalOnly, Is.True);
+        Assert.That(result.UserName, Is.EqualTo(userName));
         _mockExternalMemberService.Verify(x => x.GetByUsernameAsync(userName), Times.Once);
     }
 
@@ -386,7 +386,7 @@ public class MemberUserStoreTests
         var result = await sut.FindByEmailAsync(email, CancellationToken.None);
 
         // Assert
-        Assert.IsNull(result);
+        Assert.That(result, Is.Null);
     }
 
     [Test]
@@ -400,7 +400,7 @@ public class MemberUserStoreTests
         var result = sut.GetPublishedMember(fakeUser);
 
         // Assert
-        Assert.IsNull(result);
+        Assert.That(result, Is.Null);
         _mockMemberService.Verify(x => x.GetById(It.IsAny<Guid>()), Times.Never);
     }
 
@@ -439,7 +439,7 @@ public class MemberUserStoreTests
         var identityResult = await sut.CreateAsync(fakeUser, CancellationToken.None);
 
         // Assert
-        Assert.IsTrue(identityResult.Succeeded);
+        Assert.That(identityResult.Succeeded, Is.True);
         _mockExternalMemberService.Verify(x => x.CreateAsync(It.IsAny<ExternalMemberIdentity>(), null), Times.Once);
         _mockMemberService.Verify(
             x => x.CreateMember(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()),
@@ -462,7 +462,7 @@ public class MemberUserStoreTests
         var identityResult = await sut.DeleteAsync(fakeUser, CancellationToken.None);
 
         // Assert
-        Assert.IsTrue(identityResult.Succeeded);
+        Assert.That(identityResult.Succeeded, Is.True);
         _mockExternalMemberService.Verify(x => x.DeleteAsync(memberKey), Times.Once);
         _mockMemberService.Verify(x => x.GetById(It.IsAny<Guid>()), Times.Never);
         _mockMemberService.Verify(x => x.Delete(It.IsAny<IMember>(), It.IsAny<int>()), Times.Never);
@@ -496,7 +496,7 @@ public class MemberUserStoreTests
         var identityResult = await sut.UpdateAsync(fakeUser, CancellationToken.None);
 
         // Assert — always uses full UpdateAsync, even for login-only changes.
-        Assert.IsTrue(identityResult.Succeeded);
+        Assert.That(identityResult.Succeeded, Is.True);
         _mockExternalMemberService.Verify(
             x => x.UpdateAsync(It.IsAny<ExternalMemberIdentity>()),
             Times.Once);

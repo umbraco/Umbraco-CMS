@@ -18,16 +18,16 @@ public class IdKeyMapTests
     public void CanResolveContentRecycleBinIdFromKey()
     {
         var result = GetSubject().GetIdForKey(Constants.System.RecycleBinContentKey, UmbracoObjectTypes.Document);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(Constants.System.RecycleBinContent, result.Result);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.EqualTo(Constants.System.RecycleBinContent));
     }
 
     [Test]
     public void CanResolveMediaRecycleBinIdFromKey()
     {
         var result = GetSubject().GetIdForKey(Constants.System.RecycleBinMediaKey, UmbracoObjectTypes.Media);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(Constants.System.RecycleBinMedia, result.Result);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.EqualTo(Constants.System.RecycleBinMedia));
     }
 
     [TestCase(UmbracoObjectTypes.Element)]
@@ -35,24 +35,24 @@ public class IdKeyMapTests
     public void CanResolveElementRecycleBinIdFromKey(UmbracoObjectTypes objectType)
     {
         var result = GetSubject().GetIdForKey(Constants.System.RecycleBinElementKey, objectType);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(Constants.System.RecycleBinElement, result.Result);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.EqualTo(Constants.System.RecycleBinElement));
     }
 
     [Test]
     public void CanResolveContentRecycleBinKeyFromId()
     {
         var result = GetSubject().GetKeyForId(Constants.System.RecycleBinContent, UmbracoObjectTypes.Document);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(Constants.System.RecycleBinContentKey, result.Result);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.EqualTo(Constants.System.RecycleBinContentKey));
     }
 
     [Test]
     public void CanResolveMediaRecycleBinKeyFromId()
     {
         var result = GetSubject().GetKeyForId(Constants.System.RecycleBinMedia, UmbracoObjectTypes.Media);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(Constants.System.RecycleBinMediaKey, result.Result);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.EqualTo(Constants.System.RecycleBinMediaKey));
     }
 
     [TestCase(UmbracoObjectTypes.Element)]
@@ -60,7 +60,7 @@ public class IdKeyMapTests
     public void CanResolveElementRecycleBinKeyFromId(UmbracoObjectTypes objectType)
     {
         var result = GetSubject().GetKeyForId(Constants.System.RecycleBinElement, objectType);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(Constants.System.RecycleBinElementKey, result.Result);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.EqualTo(Constants.System.RecycleBinElementKey));
     }
 }

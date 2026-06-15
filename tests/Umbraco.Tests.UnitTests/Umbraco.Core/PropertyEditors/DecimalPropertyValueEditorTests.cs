@@ -47,7 +47,7 @@ public class DecimalPropertyValueEditorTests
         foreach (var (value, expected) in _valuesAndExpectedResults)
         {
             var fromEditor = FromEditor(value);
-            Assert.AreEqual(expected, fromEditor, message: $"Failed for: {value}");
+            Assert.That(fromEditor, Is.EqualTo(expected), message: $"Failed for: {value}");
         }
     }
 
@@ -60,7 +60,7 @@ public class DecimalPropertyValueEditorTests
     public void Can_Parse_Values_From_Editor_Using_Culture_With_Non_EnUs_Decimal_Separator(object value, decimal? expected)
     {
         var fromEditor = FromEditor(value);
-        Assert.AreEqual(expected, fromEditor);
+        Assert.That(fromEditor, Is.EqualTo(expected));
     }
 
     [Test]
@@ -69,7 +69,7 @@ public class DecimalPropertyValueEditorTests
         foreach (var (value, expected) in _valuesAndExpectedResults)
         {
             var toEditor = ToEditor(value);
-            Assert.AreEqual(expected, toEditor, message: $"Failed for: {value}");
+            Assert.That(toEditor, Is.EqualTo(expected), message: $"Failed for: {value}");
         }
     }
 
@@ -77,14 +77,14 @@ public class DecimalPropertyValueEditorTests
     public void Null_From_Editor_Yields_Null()
     {
         var result = FromEditor(null);
-        Assert.IsNull(result);
+        Assert.That(result, Is.Null);
     }
 
     [Test]
     public void Null_To_Editor_Yields_Null()
     {
         var result = ToEditor(null);
-        Assert.IsNull(result);
+        Assert.That(result, Is.Null);
     }
 
     [TestCase("x", false)]
@@ -95,14 +95,14 @@ public class DecimalPropertyValueEditorTests
         var result = editor.Validate(value, false, null, PropertyValidationContext.Empty());
         if (expectedSuccess)
         {
-            Assert.IsEmpty(result);
+            Assert.That(result, Is.Empty);
         }
         else
         {
-            Assert.AreEqual(1, result.Count());
+            Assert.That(result.Count(), Is.EqualTo(1));
 
             var validationResult = result.First();
-            Assert.AreEqual($"The value {value} is not a valid decimal", validationResult.ErrorMessage);
+            Assert.That(validationResult.ErrorMessage, Is.EqualTo($"The value {value} is not a valid decimal"));
         }
     }
 
@@ -115,14 +115,14 @@ public class DecimalPropertyValueEditorTests
         var result = editor.Validate(value, false, null, PropertyValidationContext.Empty());
         if (expectedSuccess)
         {
-            Assert.IsEmpty(result);
+            Assert.That(result, Is.Empty);
         }
         else
         {
-            Assert.AreEqual(1, result.Count());
+            Assert.That(result.Count(), Is.EqualTo(1));
 
             var validationResult = result.First();
-            Assert.AreEqual("validation_outOfRangeMinimum", validationResult.ErrorMessage);
+            Assert.That(validationResult.ErrorMessage, Is.EqualTo("validation_outOfRangeMinimum"));
         }
     }
 
@@ -135,14 +135,14 @@ public class DecimalPropertyValueEditorTests
         var result = editor.Validate(value, false, null, PropertyValidationContext.Empty());
         if (expectedSuccess)
         {
-            Assert.IsEmpty(result);
+            Assert.That(result, Is.Empty);
         }
         else
         {
-            Assert.AreEqual(1, result.Count());
+            Assert.That(result.Count(), Is.EqualTo(1));
 
             var validationResult = result.First();
-            Assert.AreEqual("validation_outOfRangeMaximum", validationResult.ErrorMessage);
+            Assert.That(validationResult.ErrorMessage, Is.EqualTo("validation_outOfRangeMaximum"));
         }
     }
 
@@ -154,14 +154,14 @@ public class DecimalPropertyValueEditorTests
         var result = editor.Validate(value, false, null, PropertyValidationContext.Empty());
         if (expectedSuccess)
         {
-            Assert.IsEmpty(result);
+            Assert.That(result, Is.Empty);
         }
         else
         {
-            Assert.AreEqual(1, result.Count());
+            Assert.That(result.Count(), Is.EqualTo(1));
 
             var validationResult = result.First();
-            Assert.AreEqual("validation_outOfRangeMaximum", validationResult.ErrorMessage);
+            Assert.That(validationResult.ErrorMessage, Is.EqualTo("validation_outOfRangeMaximum"));
         }
     }
 
@@ -174,14 +174,14 @@ public class DecimalPropertyValueEditorTests
         var result = editor.Validate(value, false, null, PropertyValidationContext.Empty());
         if (expectedSuccess)
         {
-            Assert.IsEmpty(result);
+            Assert.That(result, Is.Empty);
         }
         else
         {
-            Assert.AreEqual(1, result.Count());
+            Assert.That(result.Count(), Is.EqualTo(1));
 
             var validationResult = result.First();
-            Assert.AreEqual("validation_outOfRangeMaximum", validationResult.ErrorMessage);
+            Assert.That(validationResult.ErrorMessage, Is.EqualTo("validation_outOfRangeMaximum"));
         }
     }
 
@@ -194,14 +194,14 @@ public class DecimalPropertyValueEditorTests
         var result = editor.Validate(value, false, null, PropertyValidationContext.Empty());
         if (expectedSuccess)
         {
-            Assert.IsEmpty(result);
+            Assert.That(result, Is.Empty);
         }
         else
         {
-            Assert.AreEqual(1, result.Count());
+            Assert.That(result.Count(), Is.EqualTo(1));
 
             var validationResult = result.First();
-            Assert.AreEqual("validation_invalidStep", validationResult.ErrorMessage);
+            Assert.That(validationResult.ErrorMessage, Is.EqualTo("validation_invalidStep"));
         }
     }
 
@@ -214,14 +214,14 @@ public class DecimalPropertyValueEditorTests
         var result = editor.Validate(value, false, null, PropertyValidationContext.Empty());
         if (expectedSuccess)
         {
-            Assert.IsEmpty(result);
+            Assert.That(result, Is.Empty);
         }
         else
         {
-            Assert.AreEqual(1, result.Count());
+            Assert.That(result.Count(), Is.EqualTo(1));
 
             var validationResult = result.First();
-            Assert.AreEqual("validation_invalidStep", validationResult.ErrorMessage);
+            Assert.That(validationResult.ErrorMessage, Is.EqualTo("validation_invalidStep"));
         }
     }
 
@@ -233,14 +233,14 @@ public class DecimalPropertyValueEditorTests
         var result = editor.Validate(value, false, null, PropertyValidationContext.Empty());
         if (expectedSuccess)
         {
-            Assert.IsEmpty(result);
+            Assert.That(result, Is.Empty);
         }
         else
         {
-            Assert.AreEqual(1, result.Count());
+            Assert.That(result.Count(), Is.EqualTo(1));
 
             var validationResult = result.First();
-            Assert.AreEqual("validation_invalidStep", validationResult.ErrorMessage);
+            Assert.That(validationResult.ErrorMessage, Is.EqualTo("validation_invalidStep"));
         }
     }
 

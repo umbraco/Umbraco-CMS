@@ -14,12 +14,12 @@ public partial class ElementEditingServiceTests
         await ElementEditingService.MoveToRecycleBinAsync(element.Key,  Constants.Security.SuperUserKey);
 
         var result = await ElementEditingService.DeleteFromRecycleBinAsync(element.Key, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.Success));
 
         // re-get and verify deletion
         element = await ElementEditingService.GetAsync(element.Key);
-        Assert.IsNull(element);
+        Assert.That(element, Is.Null);
     }
 
     [Test]
@@ -28,19 +28,19 @@ public partial class ElementEditingServiceTests
         var element = await CreateInvariantElement();
 
         var result = await ElementEditingService.DeleteFromRecycleBinAsync(element.Key, Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.NotInTrash, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.NotInTrash));
 
         // re-get and verify that deletion failed
         element = await ElementEditingService.GetAsync(element.Key);
-        Assert.NotNull(element);
+        Assert.That(element, Is.Not.Null);
     }
 
     [Test]
     public async Task Cannot_DeleteRecycleBin_Non_Existing()
     {
         var result = await ElementEditingService.DeleteFromRecycleBinAsync(Guid.NewGuid(), Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.NotFound, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.NotFound));
     }
 }

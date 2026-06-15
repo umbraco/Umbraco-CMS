@@ -69,7 +69,7 @@ internal sealed class SearchTests : ExamineBaseTest
 
             var searcher = index.Searcher;
 
-            Assert.Greater(searcher.CreateQuery().All().Execute().TotalItemCount, 0);
+            Assert.That(searcher.CreateQuery().All().Execute().TotalItemCount, Is.GreaterThan(0));
 
             var numberSortedCriteria = searcher.CreateQuery()
                 .ParentId(1148)
@@ -81,11 +81,11 @@ internal sealed class SearchTests : ExamineBaseTest
                 .OrderBy(new SortableField("sortOrder")); //will default to string
             var stringSortedResult = stringSortedCriteria.Execute();
 
-            Assert.AreEqual(12, numberSortedResult.TotalItemCount);
-            Assert.AreEqual(12, stringSortedResult.TotalItemCount);
+            Assert.That(numberSortedResult.TotalItemCount, Is.EqualTo(12));
+            Assert.That(stringSortedResult.TotalItemCount, Is.EqualTo(12));
 
-            Assert.IsTrue(IsSortedByNumber(numberSortedResult));
-            Assert.IsFalse(IsSortedByNumber(stringSortedResult));
+            Assert.That(IsSortedByNumber(numberSortedResult), Is.True);
+            Assert.That(IsSortedByNumber(stringSortedResult), Is.False);
         }
     }
 

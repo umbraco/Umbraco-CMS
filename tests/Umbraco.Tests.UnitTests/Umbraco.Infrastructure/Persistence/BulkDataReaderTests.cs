@@ -66,12 +66,12 @@ public class BulkDataReaderTests
         {
             var columnMappings = testReader.ColumnMappings;
 
-            Assert.IsTrue(columnMappings.Count > 0);
-            Assert.AreEqual(columnMappings.Count, testReader.FieldCount);
+            Assert.That(columnMappings.Count, Is.GreaterThan(0));
+            Assert.That(testReader.FieldCount, Is.EqualTo(columnMappings.Count));
 
             foreach (var columnMapping in columnMappings)
             {
-                Assert.AreEqual(columnMapping.SourceColumn, columnMapping.DestinationColumn);
+                Assert.That(columnMapping.DestinationColumn, Is.EqualTo(columnMapping.SourceColumn));
             }
         }
     }
@@ -85,15 +85,14 @@ public class BulkDataReaderTests
     {
         using (var testReader = new BulkDataReaderSubclass())
         {
-            Assert.IsTrue(testReader.FieldCount > 0);
+            Assert.That(testReader.FieldCount, Is.GreaterThan(0));
 
             for (var currentColumn = 0; currentColumn < testReader.FieldCount; currentColumn++)
             {
                 var schemaTable = testReader.GetSchemaTable();
-                Assert.IsNotNull(schemaTable);
-                Assert.AreEqual(
-                    testReader.GetDataTypeName(currentColumn),
-                    ((Type)schemaTable.Rows[currentColumn][SchemaTableColumn.DataType]).Name);
+                Assert.That(schemaTable, Is.Not.Null);
+                Assert.That(
+                    ((Type)schemaTable.Rows[currentColumn][SchemaTableColumn.DataType]).Name, Is.EqualTo(testReader.GetDataTypeName(currentColumn)));
             }
         }
     }
@@ -107,15 +106,14 @@ public class BulkDataReaderTests
     {
         using (var testReader = new BulkDataReaderSubclass())
         {
-            Assert.IsTrue(testReader.FieldCount > 0);
+            Assert.That(testReader.FieldCount, Is.GreaterThan(0));
 
             for (var currentColumn = 0; currentColumn < testReader.FieldCount; currentColumn++)
             {
                 var schemaTable = testReader.GetSchemaTable();
-                Assert.IsNotNull(schemaTable);
-                Assert.AreEqual(
-                    testReader.GetFieldType(currentColumn),
-                    schemaTable.Rows[currentColumn][SchemaTableColumn.DataType]);
+                Assert.That(schemaTable, Is.Not.Null);
+                Assert.That(
+                    schemaTable.Rows[currentColumn][SchemaTableColumn.DataType], Is.EqualTo(testReader.GetFieldType(currentColumn)));
             }
         }
     }
@@ -129,14 +127,13 @@ public class BulkDataReaderTests
     {
         using (var testReader = new BulkDataReaderSubclass())
         {
-            Assert.IsTrue(testReader.FieldCount > 0);
+            Assert.That(testReader.FieldCount, Is.GreaterThan(0));
 
             for (var currentColumn = 0; currentColumn < testReader.FieldCount; currentColumn++)
             {
-                Assert.AreEqual(testReader.GetOrdinal(testReader.GetName(currentColumn)), currentColumn);
-                Assert.AreEqual(
-                    testReader.GetOrdinal(testReader.GetName(currentColumn).ToUpperInvariant()),
-                    currentColumn);
+                Assert.That(currentColumn, Is.EqualTo(testReader.GetOrdinal(testReader.GetName(currentColumn))));
+                Assert.That(
+                    currentColumn, Is.EqualTo(testReader.GetOrdinal(testReader.GetName(currentColumn).ToUpperInvariant())));
             }
         }
     }
@@ -155,9 +152,9 @@ public class BulkDataReaderTests
         {
             var schemaTable = testReader.GetSchemaTable();
 
-            Assert.IsNotNull(schemaTable);
-            Assert.IsTrue(schemaTable.Rows.Count > 0);
-            Assert.AreEqual(schemaTable.Rows.Count, BulkDataReaderSubclass.ExpectedResultSet.Count);
+            Assert.That(schemaTable, Is.Not.Null);
+            Assert.That(schemaTable.Rows.Count, Is.GreaterThan(0));
+            Assert.That(BulkDataReaderSubclass.ExpectedResultSet, Has.Count.EqualTo(schemaTable.Rows.Count));
         }
     }
 
@@ -2015,7 +2012,7 @@ public class BulkDataReaderTests
 
         testReader.Close();
 
-        Assert.IsTrue(testReader.IsClosed);
+        Assert.That(testReader.IsClosed, Is.True);
     }
 
     /// <summary>
@@ -2030,9 +2027,9 @@ public class BulkDataReaderTests
     {
         using (var testReader = new BulkDataReaderSubclass())
         {
-            Assert.IsTrue(testReader.Read());
+            Assert.That(testReader.Read(), Is.True);
 
-            Assert.AreEqual(0, testReader.Depth);
+            Assert.That(testReader.Depth, Is.EqualTo(0));
         }
     }
 
@@ -2048,11 +2045,11 @@ public class BulkDataReaderTests
     {
         using (var testReader = new BulkDataReaderSubclass())
         {
-            Assert.IsTrue(testReader.Read());
+            Assert.That(testReader.Read(), Is.True);
 
-            Assert.IsTrue(testReader.FieldCount > 0);
+            Assert.That(testReader.FieldCount, Is.GreaterThan(0));
 
-            Assert.IsNull(testReader.GetData(0));
+            Assert.That(testReader.GetData(0), Is.Null);
         }
     }
 
@@ -2067,24 +2064,22 @@ public class BulkDataReaderTests
     {
         using (var testReader = new BulkDataReaderSubclass())
         {
-            Assert.IsTrue(testReader.Read());
+            Assert.That(testReader.Read(), Is.True);
 
             // this[int]
             for (var column = 0; column < BulkDataReaderSubclass.ExpectedResultSet.Count; column++)
             {
-                Assert.AreEqual(testReader[column], BulkDataReaderSubclass.ExpectedResultSet[column]);
+                Assert.That(BulkDataReaderSubclass.ExpectedResultSet[column], Is.EqualTo(testReader[column]));
             }
 
             // this[string]
             for (var column = 0; column < BulkDataReaderSubclass.ExpectedResultSet.Count; column++)
             {
-                Assert.AreEqual(
-                    testReader[testReader.GetName(column)],
-                    BulkDataReaderSubclass.ExpectedResultSet[column]);
+                Assert.That(
+                    BulkDataReaderSubclass.ExpectedResultSet[column], Is.EqualTo(testReader[testReader.GetName(column)]));
 
-                Assert.AreEqual(
-                    testReader[testReader.GetName(column).ToUpperInvariant()],
-                    BulkDataReaderSubclass.ExpectedResultSet[column]);
+                Assert.That(
+                    BulkDataReaderSubclass.ExpectedResultSet[column], Is.EqualTo(testReader[testReader.GetName(column).ToUpperInvariant()]));
             }
 
             // GetValues
@@ -2092,212 +2087,181 @@ public class BulkDataReaderTests
                 var values = new object[BulkDataReaderSubclass.ExpectedResultSet.Count];
                 var expectedValues = new object[BulkDataReaderSubclass.ExpectedResultSet.Count];
 
-                Assert.AreEqual(testReader.GetValues(values), values.Length);
+                Assert.That(values.Length, Is.EqualTo(testReader.GetValues(values)));
 
                 BulkDataReaderSubclass.ExpectedResultSet.CopyTo(expectedValues, 0);
 
-                Assert.IsTrue(ArraysMatch(values, expectedValues));
+                Assert.That(ArraysMatch(values, expectedValues), Is.True);
             }
 
             // Typed getters
             {
                 var currentColumn = 0;
 
-                Assert.AreEqual(
-                    testReader.GetInt64(currentColumn),
-                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
+                Assert.That(
+                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn], Is.EqualTo(testReader.GetInt64(currentColumn)));
                 currentColumn++;
                 {
                     var expectedResult = (byte[])BulkDataReaderSubclass.ExpectedResultSet[currentColumn];
                     var expectedLength = expectedResult.Length;
                     var buffer = new byte[expectedLength];
 
-                    Assert.AreEqual(testReader.GetBytes(currentColumn, 0, buffer, 0, expectedLength), expectedLength);
+                    Assert.That(expectedLength, Is.EqualTo(testReader.GetBytes(currentColumn, 0, buffer, 0, expectedLength)));
 
-                    Assert.IsTrue(ArraysMatch(buffer, expectedResult));
+                    Assert.That(ArraysMatch(buffer, expectedResult), Is.True);
                 }
 
                 currentColumn++;
 
-                Assert.AreEqual(
-                    testReader.GetBoolean(currentColumn),
-                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
+                Assert.That(
+                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn], Is.EqualTo(testReader.GetBoolean(currentColumn)));
                 currentColumn++;
 
-                Assert.AreEqual(
-                    testReader.IsDBNull(currentColumn),
-                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn] == null);
+                Assert.That(
+                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn] == null, Is.EqualTo(testReader.IsDBNull(currentColumn)));
                 currentColumn++;
 
-                Assert.AreEqual(
-                    testReader.GetChar(currentColumn),
-                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
+                Assert.That(
+                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn], Is.EqualTo(testReader.GetChar(currentColumn)));
                 currentColumn++;
 
-                Assert.AreEqual(
-                    testReader.GetChar(currentColumn),
-                    ((char[])BulkDataReaderSubclass.ExpectedResultSet[currentColumn])[0]);
+                Assert.That(
+                    ((char[])BulkDataReaderSubclass.ExpectedResultSet[currentColumn])[0], Is.EqualTo(testReader.GetChar(currentColumn)));
                 currentColumn++;
 
-                Assert.AreEqual(
-                    testReader.GetChar(currentColumn),
-                    ((string)BulkDataReaderSubclass.ExpectedResultSet[currentColumn])[0]);
+                Assert.That(
+                    ((string)BulkDataReaderSubclass.ExpectedResultSet[currentColumn])[0], Is.EqualTo(testReader.GetChar(currentColumn)));
                 currentColumn++;
 
-                Assert.AreEqual(
-                    testReader.GetString(currentColumn),
-                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
+                Assert.That(
+                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn], Is.EqualTo(testReader.GetString(currentColumn)));
                 {
                     var expectedResult =
                         ((string)BulkDataReaderSubclass.ExpectedResultSet[currentColumn]).ToCharArray();
                     var expectedLength = expectedResult.Length;
                     var buffer = new char[expectedLength];
 
-                    Assert.AreEqual(testReader.GetChars(currentColumn, 0, buffer, 0, expectedLength), expectedLength);
+                    Assert.That(expectedLength, Is.EqualTo(testReader.GetChars(currentColumn, 0, buffer, 0, expectedLength)));
 
-                    Assert.IsTrue(ArraysMatch(buffer, expectedResult));
+                    Assert.That(ArraysMatch(buffer, expectedResult), Is.True);
                 }
 
                 currentColumn++;
 
-                Assert.AreEqual(
-                    testReader.GetDateTime(currentColumn),
-                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
+                Assert.That(
+                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn], Is.EqualTo(testReader.GetDateTime(currentColumn)));
                 currentColumn++;
 
-                Assert.AreEqual(
-                    testReader.GetDateTime(currentColumn),
-                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
+                Assert.That(
+                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn], Is.EqualTo(testReader.GetDateTime(currentColumn)));
                 currentColumn++;
 
-                Assert.AreEqual(
-                    testReader.GetDateTime(currentColumn),
-                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
+                Assert.That(
+                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn], Is.EqualTo(testReader.GetDateTime(currentColumn)));
                 currentColumn++;
 
-                Assert.AreEqual(
-                    testReader.GetDateTime(currentColumn),
-                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
+                Assert.That(
+                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn], Is.EqualTo(testReader.GetDateTime(currentColumn)));
                 currentColumn++;
 
-                Assert.AreEqual(
-                    testReader.GetDateTimeOffset(currentColumn),
-                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
+                Assert.That(
+                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn], Is.EqualTo(testReader.GetDateTimeOffset(currentColumn)));
                 currentColumn++;
 
-                Assert.AreEqual(
-                    testReader.GetDateTimeOffset(currentColumn),
-                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
+                Assert.That(
+                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn], Is.EqualTo(testReader.GetDateTimeOffset(currentColumn)));
                 currentColumn++;
 
-                Assert.AreEqual(
-                    testReader.GetDecimal(currentColumn),
-                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
+                Assert.That(
+                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn], Is.EqualTo(testReader.GetDecimal(currentColumn)));
                 currentColumn++;
 
-                Assert.AreEqual(
-                    testReader.GetDouble(currentColumn),
-                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
+                Assert.That(
+                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn], Is.EqualTo(testReader.GetDouble(currentColumn)));
                 currentColumn++;
                 {
                     var expectedResult = (byte[])BulkDataReaderSubclass.ExpectedResultSet[currentColumn];
                     var expectedLength = expectedResult.Length;
                     var buffer = new byte[expectedLength];
 
-                    Assert.AreEqual(testReader.GetBytes(currentColumn, 0, buffer, 0, expectedLength), expectedLength);
+                    Assert.That(expectedLength, Is.EqualTo(testReader.GetBytes(currentColumn, 0, buffer, 0, expectedLength)));
 
-                    Assert.IsTrue(ArraysMatch(buffer, expectedResult));
+                    Assert.That(ArraysMatch(buffer, expectedResult), Is.True);
                 }
 
                 currentColumn++;
 
-                Assert.AreEqual(
-                    testReader.GetInt32(currentColumn),
-                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
+                Assert.That(
+                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn], Is.EqualTo(testReader.GetInt32(currentColumn)));
                 currentColumn++;
 
-                Assert.AreEqual(
-                    testReader.GetDecimal(currentColumn),
-                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
+                Assert.That(
+                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn], Is.EqualTo(testReader.GetDecimal(currentColumn)));
                 currentColumn++;
 
-                Assert.AreEqual(
-                    testReader.GetString(currentColumn),
-                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
+                Assert.That(
+                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn], Is.EqualTo(testReader.GetString(currentColumn)));
                 currentColumn++;
 
-                Assert.AreEqual(
-                    testReader.GetString(currentColumn),
-                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
+                Assert.That(
+                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn], Is.EqualTo(testReader.GetString(currentColumn)));
                 currentColumn++;
 
-                Assert.AreEqual(
-                    testReader.GetString(currentColumn),
-                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
+                Assert.That(
+                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn], Is.EqualTo(testReader.GetString(currentColumn)));
                 currentColumn++;
 
-                Assert.AreEqual(
-                    testReader.GetString(currentColumn),
-                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
+                Assert.That(
+                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn], Is.EqualTo(testReader.GetString(currentColumn)));
                 currentColumn++;
 
-                Assert.AreEqual(
-                    testReader.GetFloat(currentColumn),
-                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
+                Assert.That(
+                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn], Is.EqualTo(testReader.GetFloat(currentColumn)));
                 currentColumn++;
 
-                Assert.AreEqual(
-                    testReader.GetDateTime(currentColumn),
-                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
+                Assert.That(
+                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn], Is.EqualTo(testReader.GetDateTime(currentColumn)));
                 currentColumn++;
 
-                Assert.AreEqual(
-                    testReader.GetInt16(currentColumn),
-                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
+                Assert.That(
+                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn], Is.EqualTo(testReader.GetInt16(currentColumn)));
                 currentColumn++;
 
-                Assert.AreEqual(
-                    testReader.GetDecimal(currentColumn),
-                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
+                Assert.That(
+                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn], Is.EqualTo(testReader.GetDecimal(currentColumn)));
                 currentColumn++;
 
-                Assert.AreEqual(
-                    testReader.GetString(currentColumn),
-                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
+                Assert.That(
+                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn], Is.EqualTo(testReader.GetString(currentColumn)));
                 currentColumn++;
 
-                Assert.AreEqual(
-                    testReader.GetTimeSpan(currentColumn),
-                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
+                Assert.That(
+                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn], Is.EqualTo(testReader.GetTimeSpan(currentColumn)));
                 currentColumn++;
 
-                Assert.AreEqual(
-                    testReader.GetTimeSpan(currentColumn),
-                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
+                Assert.That(
+                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn], Is.EqualTo(testReader.GetTimeSpan(currentColumn)));
                 currentColumn++;
 
-                Assert.AreEqual(
-                    testReader.GetByte(currentColumn),
-                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
+                Assert.That(
+                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn], Is.EqualTo(testReader.GetByte(currentColumn)));
                 currentColumn++;
 
-                Assert.AreEqual(
-                    testReader.GetValue(currentColumn),
-                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
+                Assert.That(
+                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn], Is.EqualTo(testReader.GetValue(currentColumn)));
                 currentColumn++;
 
-                Assert.AreEqual(
-                    testReader.GetGuid(currentColumn),
-                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
+                Assert.That(
+                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn], Is.EqualTo(testReader.GetGuid(currentColumn)));
                 currentColumn++;
                 {
                     var expectedResult = (byte[])BulkDataReaderSubclass.ExpectedResultSet[currentColumn];
                     var expectedLength = expectedResult.Length;
                     var buffer = new byte[expectedLength];
 
-                    Assert.AreEqual(testReader.GetBytes(currentColumn, 0, buffer, 0, expectedLength), expectedLength);
+                    Assert.That(expectedLength, Is.EqualTo(testReader.GetBytes(currentColumn, 0, buffer, 0, expectedLength)));
 
-                    Assert.IsTrue(ArraysMatch(buffer, expectedResult));
+                    Assert.That(ArraysMatch(buffer, expectedResult), Is.True);
                 }
 
                 currentColumn++;
@@ -2306,51 +2270,43 @@ public class BulkDataReaderTests
                     var expectedLength = expectedResult.Length;
                     var buffer = new byte[expectedLength];
 
-                    Assert.AreEqual(testReader.GetBytes(currentColumn, 0, buffer, 0, expectedLength), expectedLength);
+                    Assert.That(expectedLength, Is.EqualTo(testReader.GetBytes(currentColumn, 0, buffer, 0, expectedLength)));
 
-                    Assert.IsTrue(ArraysMatch(buffer, expectedResult));
+                    Assert.That(ArraysMatch(buffer, expectedResult), Is.True);
                 }
 
                 currentColumn++;
 
-                Assert.AreEqual(
-                    testReader.GetString(currentColumn),
-                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
+                Assert.That(
+                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn], Is.EqualTo(testReader.GetString(currentColumn)));
                 currentColumn++;
 
-                Assert.AreEqual(
-                    testReader.GetString(currentColumn),
-                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
+                Assert.That(
+                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn], Is.EqualTo(testReader.GetString(currentColumn)));
                 currentColumn++;
 
-                Assert.AreEqual(
-                    testReader.GetValue(currentColumn),
-                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
+                Assert.That(
+                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn], Is.EqualTo(testReader.GetValue(currentColumn)));
                 currentColumn++;
 
-                Assert.AreEqual(
-                    testReader.GetString(currentColumn),
-                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
+                Assert.That(
+                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn], Is.EqualTo(testReader.GetString(currentColumn)));
                 currentColumn++;
 
-                Assert.AreEqual(
-                    testReader.GetString(currentColumn),
-                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
+                Assert.That(
+                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn], Is.EqualTo(testReader.GetString(currentColumn)));
                 currentColumn++;
 
-                Assert.AreEqual(
-                    testReader.GetString(currentColumn),
-                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
+                Assert.That(
+                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn], Is.EqualTo(testReader.GetString(currentColumn)));
                 currentColumn++;
 
-                Assert.AreEqual(
-                    testReader.GetString(currentColumn),
-                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
+                Assert.That(
+                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn], Is.EqualTo(testReader.GetString(currentColumn)));
                 currentColumn++;
 
-                Assert.AreEqual(
-                    testReader.GetString(currentColumn),
-                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
+                Assert.That(
+                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn], Is.EqualTo(testReader.GetString(currentColumn)));
             }
         }
     }
@@ -2368,7 +2324,7 @@ public class BulkDataReaderTests
     {
         using (var testReader = new BulkDataReaderSubclass())
         {
-            Assert.IsTrue(testReader.Read());
+            Assert.That(testReader.Read(), Is.True);
 
             Assert.Throws<ArgumentOutOfRangeException>(() =>
             {
@@ -2390,7 +2346,7 @@ public class BulkDataReaderTests
     {
         using (var testReader = new BulkDataReaderSubclass())
         {
-            Assert.IsTrue(testReader.Read());
+            Assert.That(testReader.Read(), Is.True);
 
             Assert.Throws<ArgumentOutOfRangeException>(() =>
             {
@@ -2412,7 +2368,7 @@ public class BulkDataReaderTests
     {
         using (var testReader = new BulkDataReaderSubclass())
         {
-            Assert.IsTrue(testReader.Read());
+            Assert.That(testReader.Read(), Is.True);
 
             Assert.Throws<ArgumentOutOfRangeException>(() =>
             {
@@ -2433,7 +2389,7 @@ public class BulkDataReaderTests
     {
         using (var testReader = new BulkDataReaderSubclass())
         {
-            Assert.IsTrue(testReader.Read());
+            Assert.That(testReader.Read(), Is.True);
 
             Assert.Throws<ArgumentOutOfRangeException>(() =>
             {
@@ -2453,9 +2409,8 @@ public class BulkDataReaderTests
         {
             for (var currentColumn = 0; currentColumn < testReader.FieldCount; currentColumn++)
             {
-                Assert.AreEqual(
-                    testReader.IsDBNull(currentColumn),
-                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn] == null);
+                Assert.That(
+                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn] == null, Is.EqualTo(testReader.IsDBNull(currentColumn)));
             }
         }
     }
@@ -2472,7 +2427,7 @@ public class BulkDataReaderTests
     {
         using (var testReader = new BulkDataReaderSubclass())
         {
-            Assert.IsFalse(testReader.NextResult());
+            Assert.That(testReader.NextResult(), Is.False);
         }
     }
 
@@ -2488,9 +2443,9 @@ public class BulkDataReaderTests
     {
         using (var testReader = new BulkDataReaderSubclass())
         {
-            Assert.IsTrue(testReader.Read());
+            Assert.That(testReader.Read(), Is.True);
 
-            Assert.AreEqual(-1, testReader.RecordsAffected);
+            Assert.That(testReader.RecordsAffected, Is.EqualTo(-1));
         }
     }
 
@@ -2508,7 +2463,7 @@ public class BulkDataReaderTests
 
             testReader.Dispose();
 
-            Assert.IsTrue(testReader.IsClosed);
+            Assert.That(testReader.IsClosed, Is.True);
         }
 
         // Test the finalizer method

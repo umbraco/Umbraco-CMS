@@ -18,24 +18,24 @@ public class UdiTests
     public void StringUdiCtorTest()
     {
         var udi = new StringUdi(Constants.UdiEntityType.AnyString, "test-id");
-        Assert.AreEqual(Constants.UdiEntityType.AnyString, udi.EntityType);
-        Assert.AreEqual("test-id", udi.Id);
-        Assert.AreEqual("umb://" + Constants.UdiEntityType.AnyString + "/test-id", udi.ToString());
+        Assert.That(udi.EntityType, Is.EqualTo(Constants.UdiEntityType.AnyString));
+        Assert.That(udi.Id, Is.EqualTo("test-id"));
+        Assert.That(udi.ToString(), Is.EqualTo("umb://" + Constants.UdiEntityType.AnyString + "/test-id"));
     }
 
     [Test]
     public void StringUdiParseTest()
     {
         var udi = UdiParser.Parse("umb://" + Constants.UdiEntityType.AnyString + "/test-id");
-        Assert.AreEqual(Constants.UdiEntityType.AnyString, udi.EntityType);
-        Assert.IsInstanceOf<StringUdi>(udi);
+        Assert.That(udi.EntityType, Is.EqualTo(Constants.UdiEntityType.AnyString));
+        Assert.That(udi, Is.InstanceOf<StringUdi>());
         var stringEntityId = udi as StringUdi;
-        Assert.IsNotNull(stringEntityId);
-        Assert.AreEqual("test-id", stringEntityId.Id);
-        Assert.AreEqual("umb://" + Constants.UdiEntityType.AnyString + "/test-id", udi.ToString());
+        Assert.That(stringEntityId, Is.Not.Null);
+        Assert.That(stringEntityId.Id, Is.EqualTo("test-id"));
+        Assert.That(udi.ToString(), Is.EqualTo("umb://" + Constants.UdiEntityType.AnyString + "/test-id"));
 
         udi = UdiParser.Parse("umb://" + Constants.UdiEntityType.AnyString + "/DA845952BE474EE9BD6F6194272AC750");
-        Assert.IsInstanceOf<StringUdi>(udi);
+        Assert.That(udi, Is.InstanceOf<StringUdi>());
     }
 
     [Test]
@@ -43,29 +43,29 @@ public class UdiTests
     {
         // absolute path is unescaped
         var uri = new Uri("umb://" + Constants.UdiEntityType.AnyString + "/this%20is%20a%20test");
-        Assert.AreEqual("umb://" + Constants.UdiEntityType.AnyString + "/this is a test", uri.ToString());
-        Assert.AreEqual("umb://" + Constants.UdiEntityType.AnyString + "/this%20is%20a%20test", uri.AbsoluteUri);
-        Assert.AreEqual("/this%20is%20a%20test", uri.AbsolutePath);
+        Assert.That(uri.ToString(), Is.EqualTo("umb://" + Constants.UdiEntityType.AnyString + "/this is a test"));
+        Assert.That(uri.AbsoluteUri, Is.EqualTo("umb://" + Constants.UdiEntityType.AnyString + "/this%20is%20a%20test"));
+        Assert.That(uri.AbsolutePath, Is.EqualTo("/this%20is%20a%20test"));
 
-        Assert.AreEqual("/this is a test", Uri.UnescapeDataString(uri.AbsolutePath));
-        Assert.AreEqual("%2Fthis%20is%20a%20test", Uri.EscapeDataString("/this is a test"));
+        Assert.That(Uri.UnescapeDataString(uri.AbsolutePath), Is.EqualTo("/this is a test"));
+        Assert.That(Uri.EscapeDataString("/this is a test"), Is.EqualTo("%2Fthis%20is%20a%20test"));
 #pragma warning disable SYSLIB0013 // Uri.EscapeUriString is obsolete - testing legacy Uri escaping behavior
-        Assert.AreEqual("/this%20is%20a%20test", Uri.EscapeUriString("/this is a test"));
+        Assert.That(Uri.EscapeUriString("/this is a test"), Is.EqualTo("/this%20is%20a%20test"));
 #pragma warning restore SYSLIB0013
 
         var udi = UdiParser.Parse("umb://" + Constants.UdiEntityType.AnyString + "/this%20is%20a%20test");
-        Assert.AreEqual(Constants.UdiEntityType.AnyString, udi.EntityType);
-        Assert.IsInstanceOf<StringUdi>(udi);
+        Assert.That(udi.EntityType, Is.EqualTo(Constants.UdiEntityType.AnyString));
+        Assert.That(udi, Is.InstanceOf<StringUdi>());
         var stringEntityId = udi as StringUdi;
-        Assert.IsNotNull(stringEntityId);
-        Assert.AreEqual("this is a test", stringEntityId.Id);
-        Assert.AreEqual("umb://" + Constants.UdiEntityType.AnyString + "/this%20is%20a%20test", udi.ToString());
+        Assert.That(stringEntityId, Is.Not.Null);
+        Assert.That(stringEntityId.Id, Is.EqualTo("this is a test"));
+        Assert.That(udi.ToString(), Is.EqualTo("umb://" + Constants.UdiEntityType.AnyString + "/this%20is%20a%20test"));
 
         var udi2 = new StringUdi(Constants.UdiEntityType.AnyString, "this is a test");
-        Assert.AreEqual(udi, udi2);
+        Assert.That(udi2, Is.EqualTo(udi));
 
         var udi3 = new StringUdi(Constants.UdiEntityType.AnyString, "path to/this is a test.xyz");
-        Assert.AreEqual("umb://" + Constants.UdiEntityType.AnyString + "/path%20to/this%20is%20a%20test.xyz", udi3.ToString());
+        Assert.That(udi3.ToString(), Is.EqualTo("umb://" + Constants.UdiEntityType.AnyString + "/path%20to/this%20is%20a%20test.xyz"));
     }
 
     [Test]
@@ -73,22 +73,22 @@ public class UdiTests
     {
         // reserved = : / ? # [ ] @ ! $ & ' ( ) * + , ; =
         // unreserved = alpha digit - . _ ~
-        Assert.AreEqual("%3A%2F%3F%23%5B%5D%40%21%24%26%27%28%29%2B%2C%3B%3D.-_~%25", Uri.EscapeDataString(":/?#[]@!$&'()+,;=.-_~%"));
+        Assert.That(Uri.EscapeDataString(":/?#[]@!$&'()+,;=.-_~%"), Is.EqualTo("%3A%2F%3F%23%5B%5D%40%21%24%26%27%28%29%2B%2C%3B%3D.-_~%25"));
 #pragma warning disable SYSLIB0013 // Uri.EscapeUriString is obsolete - testing legacy Uri escaping behavior
-        Assert.AreEqual(":/?#[]@!$&'()+,;=.-_~%25", Uri.EscapeUriString(":/?#[]@!$&'()+,;=.-_~%"));
+        Assert.That(Uri.EscapeUriString(":/?#[]@!$&'()+,;=.-_~%"), Is.EqualTo(":/?#[]@!$&'()+,;=.-_~%25"));
 #pragma warning restore SYSLIB0013
 
         // we cannot have reserved chars at random places
         // we want to keep the / in string udis
         var r = string.Join("/", "path/to/View[1].cshtml".Split('/').Select(Uri.EscapeDataString));
-        Assert.AreEqual("path/to/View%5B1%5D.cshtml", r);
-        Assert.IsTrue(Uri.IsWellFormedUriString("umb://partial-view/" + r, UriKind.Absolute));
+        Assert.That(r, Is.EqualTo("path/to/View%5B1%5D.cshtml"));
+        Assert.That(Uri.IsWellFormedUriString("umb://partial-view/" + r, UriKind.Absolute), Is.True);
 
         // with the proper fix in StringUdi this should work:
         var udi1 = new StringUdi("partial-view", "path/to/View[1].cshtml");
-        Assert.AreEqual("umb://partial-view/path/to/View%5B1%5D.cshtml", udi1.ToString());
+        Assert.That(udi1.ToString(), Is.EqualTo("umb://partial-view/path/to/View%5B1%5D.cshtml"));
         var udi2 = UdiParser.Parse("umb://partial-view/path/to/View%5B1%5D.cshtml");
-        Assert.AreEqual("path/to/View[1].cshtml", ((StringUdi)udi2).Id);
+        Assert.That(((StringUdi)udi2).Id, Is.EqualTo("path/to/View[1].cshtml"));
     }
 
     [Test]
@@ -96,9 +96,9 @@ public class UdiTests
     {
         var guid = Guid.NewGuid();
         var udi = new GuidUdi(Constants.UdiEntityType.AnyGuid, guid);
-        Assert.AreEqual(Constants.UdiEntityType.AnyGuid, udi.EntityType);
-        Assert.AreEqual(guid, udi.Guid);
-        Assert.AreEqual("umb://" + Constants.UdiEntityType.AnyGuid + "/" + guid.ToString("N"), udi.ToString());
+        Assert.That(udi.EntityType, Is.EqualTo(Constants.UdiEntityType.AnyGuid));
+        Assert.That(udi.Guid, Is.EqualTo(guid));
+        Assert.That(udi.ToString(), Is.EqualTo("umb://" + Constants.UdiEntityType.AnyGuid + "/" + guid.ToString("N")));
     }
 
     [Test]
@@ -107,12 +107,12 @@ public class UdiTests
         var guid = Guid.NewGuid();
         var s = "umb://" + Constants.UdiEntityType.AnyGuid + "/" + guid.ToString("N");
         var udi = UdiParser.Parse(s);
-        Assert.AreEqual(Constants.UdiEntityType.AnyGuid, udi.EntityType);
-        Assert.IsInstanceOf<GuidUdi>(udi);
+        Assert.That(udi.EntityType, Is.EqualTo(Constants.UdiEntityType.AnyGuid));
+        Assert.That(udi, Is.InstanceOf<GuidUdi>());
         var gudi = udi as GuidUdi;
-        Assert.IsNotNull(gudi);
-        Assert.AreEqual(guid, gudi.Guid);
-        Assert.AreEqual(s, udi.ToString());
+        Assert.That(gudi, Is.Not.Null);
+        Assert.That(gudi.Guid, Is.EqualTo(guid));
+        Assert.That(udi.ToString(), Is.EqualTo(s));
     }
 
     [Test]
@@ -121,19 +121,19 @@ public class UdiTests
         var guid1 = Guid.NewGuid();
         var guid2 = Guid.NewGuid();
 
-        Assert.IsTrue(new GuidUdi("type", guid1).Equals(new GuidUdi("type", guid1)));
-        Assert.IsTrue(new GuidUdi("type", guid1) == new GuidUdi("type", guid1));
+        Assert.That(new GuidUdi("type", guid1), Is.EqualTo(new GuidUdi("type", guid1)));
+        Assert.That(new GuidUdi("type", guid1), Is.EqualTo(new GuidUdi("type", guid1)));
 
-        Assert.IsTrue(new GuidUdi("type", guid1).Equals(new GuidUdi("type", guid1)));
-        Assert.IsTrue(new GuidUdi("type", guid1) == new GuidUdi("type", guid1));
+        Assert.That(new GuidUdi("type", guid1), Is.EqualTo(new GuidUdi("type", guid1)));
+        Assert.That(new GuidUdi("type", guid1), Is.EqualTo(new GuidUdi("type", guid1)));
 
-        Assert.IsFalse(new GuidUdi("type", guid1).Equals(new GuidUdi("typex", guid1)));
-        Assert.IsFalse(new GuidUdi("type", guid1) == new GuidUdi("typex", guid1));
-        Assert.IsFalse(new GuidUdi("type", guid1).Equals(new GuidUdi("type", guid2)));
-        Assert.IsFalse(new GuidUdi("type", guid1) == new GuidUdi("type", guid2));
+        Assert.That(new GuidUdi("type", guid1), Is.Not.EqualTo(new GuidUdi("typex", guid1)));
+        Assert.That(new GuidUdi("type", guid1), Is.Not.EqualTo(new GuidUdi("typex", guid1)));
+        Assert.That(new GuidUdi("type", guid1), Is.Not.EqualTo(new GuidUdi("type", guid2)));
+        Assert.That(new GuidUdi("type", guid1), Is.Not.EqualTo(new GuidUdi("type", guid2)));
 
-        Assert.IsTrue(new GuidUdi("type", guid1).ToString() == new StringUdi("type", guid1.ToString("N")).ToString());
-        Assert.IsFalse(new GuidUdi("type", guid1) == new StringUdi("type", guid1.ToString("N")));
+        Assert.That(new GuidUdi("type", guid1).ToString(), Is.EqualTo(new StringUdi("type", guid1.ToString("N")).ToString()));
+        Assert.That(new GuidUdi("type", guid1), Is.Not.EqualTo(new StringUdi("type", guid1.ToString("N"))));
     }
 
     [Test]
@@ -146,7 +146,7 @@ public class UdiTests
             new GuidUdi(Constants.UdiEntityType.AnyGuid, guid1),
             new GuidUdi(Constants.UdiEntityType.AnyGuid, guid1),
         };
-        Assert.AreEqual(1, entities.Distinct().Count());
+        Assert.That(entities.Distinct().Count(), Is.EqualTo(1));
     }
 
     [Test]
@@ -154,8 +154,8 @@ public class UdiTests
     {
         var guid = Guid.NewGuid();
         var udi = Udi.Create(Constants.UdiEntityType.AnyGuid, guid);
-        Assert.AreEqual(Constants.UdiEntityType.AnyGuid, udi.EntityType);
-        Assert.AreEqual(guid, ((GuidUdi)udi).Guid);
+        Assert.That(udi.EntityType, Is.EqualTo(Constants.UdiEntityType.AnyGuid));
+        Assert.That(((GuidUdi)udi).Guid, Is.EqualTo(guid));
 
         // *not* testing whether Udi.Create(type, invalidValue) throws
         // because we don't throw anymore - see U4-10409
@@ -165,20 +165,20 @@ public class UdiTests
     public void CreateRootUdi_ForGuidEntityType_ReturnsRootGuidUdi()
     {
         var udi = Udi.Create(Constants.UdiEntityType.Document);
-        Assert.AreEqual(Constants.UdiEntityType.Document, udi.EntityType);
-        Assert.IsTrue(udi.IsRoot);
-        Assert.IsInstanceOf<GuidUdi>(udi);
-        Assert.AreEqual(Guid.Empty, ((GuidUdi)udi).Guid);
+        Assert.That(udi.EntityType, Is.EqualTo(Constants.UdiEntityType.Document));
+        Assert.That(udi.IsRoot, Is.True);
+        Assert.That(udi, Is.InstanceOf<GuidUdi>());
+        Assert.That(((GuidUdi)udi).Guid, Is.EqualTo(Guid.Empty));
     }
 
     [Test]
     public void CreateRootUdi_ForStringEntityType_ReturnsRootStringUdi()
     {
         var udi = Udi.Create(Constants.UdiEntityType.Language);
-        Assert.AreEqual(Constants.UdiEntityType.Language, udi.EntityType);
-        Assert.IsTrue(udi.IsRoot);
-        Assert.IsInstanceOf<StringUdi>(udi);
-        Assert.AreEqual(string.Empty, ((StringUdi)udi).Id);
+        Assert.That(udi.EntityType, Is.EqualTo(Constants.UdiEntityType.Language));
+        Assert.That(udi.IsRoot, Is.True);
+        Assert.That(udi, Is.InstanceOf<StringUdi>());
+        Assert.That(((StringUdi)udi).Id, Is.EqualTo(string.Empty));
     }
 
     [Test]
@@ -186,7 +186,7 @@ public class UdiTests
     {
         const string unknownType = "not-a-real-entity-type";
         ArgumentException? ex = Assert.Throws<ArgumentException>(() => Udi.Create(unknownType));
-        StringAssert.Contains(unknownType, ex!.Message);
+        Assert.That(ex!.Message, Does.Contain(unknownType));
     }
 
     [Test]
@@ -194,31 +194,31 @@ public class UdiTests
     {
         var first = Udi.Create(Constants.UdiEntityType.Media);
         var second = Udi.Create(Constants.UdiEntityType.Media);
-        Assert.AreSame(first, second);
+        Assert.That(second, Is.SameAs(first));
     }
 
     [Test]
     public void RootUdiTest()
     {
         var stringUdi = new StringUdi(Constants.UdiEntityType.AnyString, string.Empty);
-        Assert.IsTrue(stringUdi.IsRoot);
-        Assert.AreEqual("umb://any-string/", stringUdi.ToString());
+        Assert.That(stringUdi.IsRoot, Is.True);
+        Assert.That(stringUdi.ToString(), Is.EqualTo("umb://any-string/"));
 
         var guidUdi = new GuidUdi(Constants.UdiEntityType.AnyGuid, Guid.Empty);
-        Assert.IsTrue(guidUdi.IsRoot);
-        Assert.AreEqual("umb://any-guid/00000000000000000000000000000000", guidUdi.ToString());
+        Assert.That(guidUdi.IsRoot, Is.True);
+        Assert.That(guidUdi.ToString(), Is.EqualTo("umb://any-guid/00000000000000000000000000000000"));
 
         var udi = UdiParser.Parse("umb://any-string/");
-        Assert.IsTrue(udi.IsRoot);
-        Assert.IsInstanceOf<StringUdi>(udi);
+        Assert.That(udi.IsRoot, Is.True);
+        Assert.That(udi, Is.InstanceOf<StringUdi>());
 
         udi = UdiParser.Parse("umb://any-guid/00000000000000000000000000000000");
-        Assert.IsTrue(udi.IsRoot);
-        Assert.IsInstanceOf<GuidUdi>(udi);
+        Assert.That(udi.IsRoot, Is.True);
+        Assert.That(udi, Is.InstanceOf<GuidUdi>());
 
         udi = UdiParser.Parse("umb://any-guid/");
-        Assert.IsTrue(udi.IsRoot);
-        Assert.IsInstanceOf<GuidUdi>(udi);
+        Assert.That(udi.IsRoot, Is.True);
+        Assert.That(udi, Is.InstanceOf<GuidUdi>());
     }
 
     [Test]
@@ -226,13 +226,13 @@ public class UdiTests
     {
         // can parse open string udi
         var stringUdiString = "umb://" + Constants.UdiEntityType.AnyString;
-        Assert.IsTrue(UdiParser.TryParse(stringUdiString, out var stringUdi));
-        Assert.AreEqual(string.Empty, ((StringUdi)stringUdi).Id);
+        Assert.That(UdiParser.TryParse(stringUdiString, out var stringUdi), Is.True);
+        Assert.That(((StringUdi)stringUdi).Id, Is.EqualTo(string.Empty));
 
         // can parse open guid udi
         var guidUdiString = "umb://" + Constants.UdiEntityType.AnyGuid;
-        Assert.IsTrue(UdiParser.TryParse(guidUdiString, out var guidUdi));
-        Assert.AreEqual(Guid.Empty, ((GuidUdi)guidUdi).Guid);
+        Assert.That(UdiParser.TryParse(guidUdiString, out var guidUdi), Is.True);
+        Assert.That(((GuidUdi)guidUdi).Guid, Is.EqualTo(Guid.Empty));
 
         // can create a range
         var range = new UdiRange(stringUdi, Constants.DeploySelector.ChildrenOfThis);
@@ -253,7 +253,7 @@ public class UdiTests
         var expected = new UdiRange(Udi.Create(Constants.UdiEntityType.AnyGuid, Guid.NewGuid()), selector);
         var actual = UdiRange.Parse(expected.ToString());
 
-        Assert.AreEqual(expected, actual);
+        Assert.That(actual, Is.EqualTo(expected));
     }
 
     [Test]
@@ -261,20 +261,20 @@ public class UdiTests
     {
         // try parse to "Udi"
         var stringUdiString = "umb://document/b9a56165-6c4e-4e79-8277-620430174ad3";
-        Assert.IsTrue(UdiParser.TryParse(stringUdiString, out Udi udi1));
-        Assert.AreEqual("b9a56165-6c4e-4e79-8277-620430174ad3", udi1 is GuidUdi guidUdi1 ? guidUdi1.Guid.ToString() : string.Empty);
+        Assert.That(UdiParser.TryParse(stringUdiString, out Udi udi1), Is.True);
+        Assert.That(udi1 is GuidUdi guidUdi1 ? guidUdi1.Guid.ToString() : string.Empty, Is.EqualTo("b9a56165-6c4e-4e79-8277-620430174ad3"));
 
         // try parse to "Udi"
-        Assert.IsFalse(UdiParser.TryParse("nope", out Udi udi2));
-        Assert.IsNull(udi2);
+        Assert.That(UdiParser.TryParse("nope", out Udi udi2), Is.False);
+        Assert.That(udi2, Is.Null);
 
         // try parse to "GuidUdi?"
-        Assert.IsTrue(UdiParser.TryParse(stringUdiString, out GuidUdi? guidUdi3));
-        Assert.AreEqual("b9a56165-6c4e-4e79-8277-620430174ad3", guidUdi3.Guid.ToString());
+        Assert.That(UdiParser.TryParse(stringUdiString, out GuidUdi? guidUdi3), Is.True);
+        Assert.That(guidUdi3.Guid.ToString(), Is.EqualTo("b9a56165-6c4e-4e79-8277-620430174ad3"));
 
         // try parse to "GuidUdi?"
-        Assert.IsFalse(UdiParser.TryParse("nope", out GuidUdi? guidUdi4));
-        Assert.IsNull(guidUdi4);
+        Assert.That(UdiParser.TryParse("nope", out GuidUdi? guidUdi4), Is.False);
+        Assert.That(guidUdi4, Is.Null);
 
     }
 
@@ -305,11 +305,8 @@ public class UdiTests
             }
         }
 
-        Assert.AreEqual(
-            0,
-            types.Count,
-            "Error in class Constants.UdiEntityType, GetTypes declares types that don't exist ({0}).",
-            string.Join(",", types.Keys.Select(x => "\"" + x + "\"")));
+        Assert.That(
+            types.Count, Is.EqualTo(0), $"Error in class Constants.UdiEntityType, GetTypes declares types that don't exist ({string.Join(",", types.Keys.Select(x => "\"" + x + "\""))}).");
     }
 
     [Test]
@@ -317,21 +314,21 @@ public class UdiTests
     {
         // cannot parse an unknown type, udi is null
         // this will scan
-        Assert.IsFalse(UdiParser.TryParse("umb://whatever/1234", out var udi));
-        Assert.IsNull(udi);
+        Assert.That(UdiParser.TryParse("umb://whatever/1234", out var udi), Is.False);
+        Assert.That(udi, Is.Null);
 
         UdiParser.ResetUdiTypes();
 
         // unless we want to know
-        Assert.IsFalse(UdiParser.TryParse("umb://whatever/1234", true, out udi));
-        Assert.AreEqual(Constants.UdiEntityType.Unknown, udi.EntityType);
-        Assert.AreEqual("Umbraco.Cms.Core.UnknownTypeUdi", udi.GetType().FullName);
+        Assert.That(UdiParser.TryParse("umb://whatever/1234", true, out udi), Is.False);
+        Assert.That(udi.EntityType, Is.EqualTo(Constants.UdiEntityType.Unknown));
+        Assert.That(udi.GetType().FullName, Is.EqualTo("Umbraco.Cms.Core.UnknownTypeUdi"));
 
         UdiParser.ResetUdiTypes();
 
         // not known
-        Assert.IsFalse(UdiParser.TryParse("umb://foo/A87F65C8D6B94E868F6949BA92C93045", true, out udi));
-        Assert.AreEqual(Constants.UdiEntityType.Unknown, udi.EntityType);
-        Assert.AreEqual("Umbraco.Cms.Core.UnknownTypeUdi", udi.GetType().FullName);
+        Assert.That(UdiParser.TryParse("umb://foo/A87F65C8D6B94E868F6949BA92C93045", true, out udi), Is.False);
+        Assert.That(udi.EntityType, Is.EqualTo(Constants.UdiEntityType.Unknown));
+        Assert.That(udi.GetType().FullName, Is.EqualTo("Umbraco.Cms.Core.UnknownTypeUdi"));
     }
 }

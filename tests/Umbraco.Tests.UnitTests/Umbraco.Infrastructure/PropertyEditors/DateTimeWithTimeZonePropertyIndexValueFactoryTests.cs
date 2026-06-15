@@ -33,10 +33,10 @@ public class DateTimeWithTimeZonePropertyIndexValueFactoryTests
             new Dictionary<Guid, IContentType>())
             .ToList();
 
-        Assert.AreEqual(1, result.Count);
+        Assert.That(result, Has.Count.EqualTo(1));
         var indexValue = result.First();
-        Assert.AreEqual(indexValue.FieldName, "testAlias");
-        Assert.IsEmpty(indexValue.Values);
+        Assert.That(indexValue.FieldName, Is.EqualTo("testAlias"));
+        Assert.That(indexValue.Values, Is.Empty);
     }
 
     [Test]
@@ -59,11 +59,11 @@ public class DateTimeWithTimeZonePropertyIndexValueFactoryTests
             new Dictionary<Guid, IContentType>())
             .ToList();
 
-        Assert.AreEqual(1, result.Count);
+        Assert.That(result, Has.Count.EqualTo(1));
         var indexValue = result.First();
-        Assert.AreEqual(indexValue.FieldName, "testAlias");
-        Assert.AreEqual(1, indexValue.Values.Count());
+        Assert.That(indexValue.FieldName, Is.EqualTo("testAlias"));
+        Assert.That(indexValue.Values.Count(), Is.EqualTo(1));
         var value = indexValue.Values.First();
-        Assert.AreEqual("2023-01-18T11:00:00Z", value);
+        Assert.That(value, Is.EqualTo("2023-01-18T11:00:00Z"));
     }
 }

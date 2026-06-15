@@ -30,7 +30,7 @@ public class EncryptionHelperTests
         const string expectedResult =
             "c=FormController&a=FormAction&ar=&key1=value1&key2=value2&Key3=Value3&keY4=valuE4";
 
-        Assert.AreEqual(expectedResult, result);
+        Assert.That(result, Is.EqualTo(expectedResult));
     }
 
     [Test]
@@ -53,6 +53,6 @@ public class EncryptionHelperTests
         const string expectedResult =
             "c=FormController&a=FormAction&ar=&key1=value1&key2=value2&Key3=Value3&keY4=valuE4";
 
-        Assert.AreEqual(expectedResult, result);
+        Assert.That(result, Is.EqualTo(expectedResult));
     }
 }

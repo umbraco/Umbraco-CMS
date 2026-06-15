@@ -69,10 +69,10 @@ public class DataValueEditorReuseTests
 
         // textbox is set to reuse its data value editor when created *without* configuration
         var dataValueEditor1 = textboxPropertyEditor.GetValueEditor();
-        Assert.NotNull(dataValueEditor1);
+        Assert.That(dataValueEditor1, Is.Not.Null);
         var dataValueEditor2 = textboxPropertyEditor.GetValueEditor();
-        Assert.NotNull(dataValueEditor2);
-        Assert.AreSame(dataValueEditor1, dataValueEditor2);
+        Assert.That(dataValueEditor2, Is.Not.Null);
+        Assert.That(dataValueEditor2, Is.SameAs(dataValueEditor1));
         _dataValueEditorFactoryMock.Verify(
             m => m.Create<TextOnlyValueEditor>(It.IsAny<DataEditorAttribute>()),
             Times.Once);
@@ -87,12 +87,12 @@ public class DataValueEditorReuseTests
 
         // no matter what, a property editor should never reuse its data value editor when created *with* configuration
         var dataValueEditor1 = textboxPropertyEditor.GetValueEditor("config");
-        Assert.NotNull(dataValueEditor1);
-        Assert.AreEqual("config", ((DataValueEditor)dataValueEditor1).ConfigurationObject);
+        Assert.That(dataValueEditor1, Is.Not.Null);
+        Assert.That(((DataValueEditor)dataValueEditor1).ConfigurationObject, Is.EqualTo("config"));
         var dataValueEditor2 = textboxPropertyEditor.GetValueEditor("config");
-        Assert.NotNull(dataValueEditor2);
-        Assert.AreEqual("config", ((DataValueEditor)dataValueEditor2).ConfigurationObject);
-        Assert.AreNotSame(dataValueEditor1, dataValueEditor2);
+        Assert.That(dataValueEditor2, Is.Not.Null);
+        Assert.That(((DataValueEditor)dataValueEditor2).ConfigurationObject, Is.EqualTo("config"));
+        Assert.That(dataValueEditor2, Is.Not.SameAs(dataValueEditor1));
         _dataValueEditorFactoryMock.Verify(
             m => m.Create<TextOnlyValueEditor>(It.IsAny<DataEditorAttribute>()),
             Times.Exactly(2));
@@ -109,10 +109,10 @@ public class DataValueEditorReuseTests
 
         // block list is *not* set to reuse its data value editor
         var dataValueEditor1 = blockListPropertyEditor.GetValueEditor();
-        Assert.NotNull(dataValueEditor1);
+        Assert.That(dataValueEditor1, Is.Not.Null);
         var dataValueEditor2 = blockListPropertyEditor.GetValueEditor();
-        Assert.NotNull(dataValueEditor2);
-        Assert.AreNotSame(dataValueEditor1, dataValueEditor2);
+        Assert.That(dataValueEditor2, Is.Not.Null);
+        Assert.That(dataValueEditor2, Is.Not.SameAs(dataValueEditor1));
         _dataValueEditorFactoryMock.Verify(
             m => m.Create<BlockListPropertyEditorBase.BlockListEditorPropertyValueEditor>(It.IsAny<DataEditorAttribute>(), It.IsAny<BlockEditorDataConverter<BlockListValue, BlockListLayoutItem>>()),
             Times.Exactly(2));
@@ -129,12 +129,12 @@ public class DataValueEditorReuseTests
 
         // no matter what, a property editor should never reuse its data value editor when created *with* configuration
         var dataValueEditor1 = blockListPropertyEditor.GetValueEditor("config");
-        Assert.NotNull(dataValueEditor1);
-        Assert.AreEqual("config", ((DataValueEditor)dataValueEditor1).ConfigurationObject);
+        Assert.That(dataValueEditor1, Is.Not.Null);
+        Assert.That(((DataValueEditor)dataValueEditor1).ConfigurationObject, Is.EqualTo("config"));
         var dataValueEditor2 = blockListPropertyEditor.GetValueEditor("config");
-        Assert.NotNull(dataValueEditor2);
-        Assert.AreEqual("config", ((DataValueEditor)dataValueEditor2).ConfigurationObject);
-        Assert.AreNotSame(dataValueEditor1, dataValueEditor2);
+        Assert.That(dataValueEditor2, Is.Not.Null);
+        Assert.That(((DataValueEditor)dataValueEditor2).ConfigurationObject, Is.EqualTo("config"));
+        Assert.That(dataValueEditor2, Is.Not.SameAs(dataValueEditor1));
         _dataValueEditorFactoryMock.Verify(
             m => m.Create<BlockListPropertyEditorBase.BlockListEditorPropertyValueEditor>(It.IsAny<DataEditorAttribute>(), It.IsAny<BlockEditorDataConverter<BlockListValue, BlockListLayoutItem>>()),
             Times.Exactly(2));

@@ -34,17 +34,16 @@ public partial class ElementPublishingServiceTests
             ],
             Constants.Security.SuperUserKey);
 
-        Assert.IsTrue(scheduleAttempt.Success);
+        Assert.That(scheduleAttempt.Success, Is.True);
 
         var schedules = ElementService.GetContentScheduleByContentId(element.Key);
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(0, element.PublishedCultures.Count());
-            Assert.AreEqual(
-                _schedulePublishDate,
-                schedules.GetSchedule(Constants.System.InvariantCulture, ContentScheduleAction.Release).Single().Date);
-            Assert.AreEqual(1, schedules.FullSchedule.Count);
+            Assert.That(element.PublishedCultures.Count(), Is.EqualTo(0));
+            Assert.That(
+                schedules.GetSchedule(Constants.System.InvariantCulture, ContentScheduleAction.Release).Single().Date, Is.EqualTo(_schedulePublishDate));
+            Assert.That(schedules.FullSchedule, Has.Count.EqualTo(1));
         });
     }
 
@@ -65,17 +64,16 @@ public partial class ElementPublishingServiceTests
             ],
             Constants.Security.SuperUserKey);
 
-        Assert.IsTrue(scheduleAttempt.Success);
+        Assert.That(scheduleAttempt.Success, Is.True);
 
         var schedules = ElementService.GetContentScheduleByContentId(element.Key);
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(0, element.PublishedCultures.Count());
-            Assert.AreEqual(
-                _schedulePublishDate,
-                schedules.GetSchedule(langEn.IsoCode, ContentScheduleAction.Release).Single().Date);
-            Assert.AreEqual(1, schedules.FullSchedule.Count);
+            Assert.That(element.PublishedCultures.Count(), Is.EqualTo(0));
+            Assert.That(
+                schedules.GetSchedule(langEn.IsoCode, ContentScheduleAction.Release).Single().Date, Is.EqualTo(_schedulePublishDate));
+            Assert.That(schedules.FullSchedule, Has.Count.EqualTo(1));
         });
     }
 
@@ -100,20 +98,18 @@ public partial class ElementPublishingServiceTests
             ],
             Constants.Security.SuperUserKey);
 
-        Assert.IsTrue(scheduleAttempt.Success);
+        Assert.That(scheduleAttempt.Success, Is.True);
 
         var schedules = ElementService.GetContentScheduleByContentId(element.Key);
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(0, element.PublishedCultures.Count());
-            Assert.AreEqual(
-                _schedulePublishDate,
-                schedules.GetSchedule(Constants.System.InvariantCulture, ContentScheduleAction.Release).Single().Date);
-            Assert.AreEqual(
-                _scheduleUnPublishDate,
-                schedules.GetSchedule(Constants.System.InvariantCulture, ContentScheduleAction.Expire).Single().Date);
-            Assert.AreEqual(2, schedules.FullSchedule.Count);
+            Assert.That(element.PublishedCultures.Count(), Is.EqualTo(0));
+            Assert.That(
+                schedules.GetSchedule(Constants.System.InvariantCulture, ContentScheduleAction.Release).Single().Date, Is.EqualTo(_schedulePublishDate));
+            Assert.That(
+                schedules.GetSchedule(Constants.System.InvariantCulture, ContentScheduleAction.Expire).Single().Date, Is.EqualTo(_scheduleUnPublishDate));
+            Assert.That(schedules.FullSchedule, Has.Count.EqualTo(2));
         });
     }
 }

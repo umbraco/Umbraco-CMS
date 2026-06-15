@@ -75,16 +75,16 @@ internal sealed class DocumentHybridCacheVariantsTests : UmbracoIntegrationTest
 
         var result =
             await ContentEditingService.UpdateAsync(VariantPage.Key, updateModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
 
         // Act
         var textPage = await PublishedContentHybridCache.GetByIdAsync(VariantPage.Id, true);
 
         // Assert
         using var contextReference = UmbracoContextFactory.EnsureUmbracoContext();
-        Assert.AreEqual(updatedInvariantTitle, textPage.Value(_invariantTitleAlias, string.Empty, string.Empty));
-        Assert.AreEqual(updatedVariantTitle, textPage.Value(_variantTitleAlias, _englishIsoCode));
-        Assert.AreEqual(updatedVariantTitle, textPage.Value(_variantTitleAlias, _danishIsoCode));
+        Assert.That(textPage.Value(_invariantTitleAlias, string.Empty, string.Empty), Is.EqualTo(updatedInvariantTitle));
+        Assert.That(textPage.Value(_variantTitleAlias, _englishIsoCode), Is.EqualTo(updatedVariantTitle));
+        Assert.That(textPage.Value(_variantTitleAlias, _danishIsoCode), Is.EqualTo(updatedVariantTitle));
     }
 
     [Test]
@@ -110,16 +110,16 @@ internal sealed class DocumentHybridCacheVariantsTests : UmbracoIntegrationTest
 
         var result =
             await ContentEditingService.UpdateAsync(VariantPage.Key, updateModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
 
         // Act
         var textPage = await PublishedContentHybridCache.GetByIdAsync(VariantPage.Id, true);
 
         // Assert
         using var contextReference = UmbracoContextFactory.EnsureUmbracoContext();
-        Assert.AreEqual(updatedInvariantTitle, textPage.Value(_invariantTitleAlias, string.Empty, string.Empty));
-        Assert.AreEqual(updatedVariantTitle, textPage.Value(_variantTitleAlias, _englishIsoCode));
-        Assert.AreEqual(_variantTitleName, textPage.Value(_variantTitleAlias, _danishIsoCode));
+        Assert.That(textPage.Value(_invariantTitleAlias, string.Empty, string.Empty), Is.EqualTo(updatedInvariantTitle));
+        Assert.That(textPage.Value(_variantTitleAlias, _englishIsoCode), Is.EqualTo(updatedVariantTitle));
+        Assert.That(textPage.Value(_variantTitleAlias, _danishIsoCode), Is.EqualTo(_variantTitleName));
     }
 
     [TestCase("en-US")]
@@ -128,74 +128,74 @@ internal sealed class DocumentHybridCacheVariantsTests : UmbracoIntegrationTest
     {
         // Arrange
         var publishAttempt = await ContentPublishingService.PublishBranchAsync(VariantPage.Key, [_englishIsoCode, _danishIsoCode], PublishBranchFilter.All, Constants.Security.SuperUserKey, false);
-        Assert.IsTrue(publishAttempt.Success);
+        Assert.That(publishAttempt.Success, Is.True);
         Assert.That(publishAttempt.Result.SucceededItems.Count(), Is.EqualTo(1));
 
         var publishedPage = await PublishedContentHybridCache.GetByIdAsync(VariantPage.Id, false);
-        Assert.IsNotNull(publishedPage);
+        Assert.That(publishedPage, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(publishedPage.IsPublished(_englishIsoCode));
-            Assert.IsTrue(publishedPage.IsPublished(_danishIsoCode));
+            Assert.That(publishedPage.IsPublished(_englishIsoCode), Is.True);
+            Assert.That(publishedPage.IsPublished(_danishIsoCode), Is.True);
 
-            Assert.AreEqual(2, publishedPage.Cultures.Count);
-            CollectionAssert.AreEqual(new[] { _englishIsoCode, _danishIsoCode }, publishedPage.Cultures.Keys);
-            CollectionAssert.AreEqual(new[] { _englishIsoCode, _danishIsoCode }, publishedPage.Cultures.Values.Select(v => v.Name));
+            Assert.That(publishedPage.Cultures, Has.Count.EqualTo(2));
+            Assert.That(publishedPage.Cultures.Keys, Is.EqualTo(new[] { _englishIsoCode, _danishIsoCode }).AsCollection);
+            Assert.That(publishedPage.Cultures.Values.Select(v => v.Name), Is.EqualTo(new[] { _englishIsoCode, _danishIsoCode }).AsCollection);
 
-            Assert.AreEqual(_variantTitleName, publishedPage.Value<string>(_variantTitleAlias, _englishIsoCode));
-            Assert.AreEqual(_variantTitleName, publishedPage.Value<string>(_variantTitleAlias, _danishIsoCode));
+            Assert.That(publishedPage.Value<string>(_variantTitleAlias, _englishIsoCode), Is.EqualTo(_variantTitleName));
+            Assert.That(publishedPage.Value<string>(_variantTitleAlias, _danishIsoCode), Is.EqualTo(_variantTitleName));
         });
 
         var draftPage = await PublishedContentHybridCache.GetByIdAsync(VariantPage.Id, true);
-        Assert.IsNotNull(draftPage);
+        Assert.That(draftPage, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(draftPage.IsPublished(_englishIsoCode));
-            Assert.IsTrue(draftPage.IsPublished(_danishIsoCode));
+            Assert.That(draftPage.IsPublished(_englishIsoCode), Is.True);
+            Assert.That(draftPage.IsPublished(_danishIsoCode), Is.True);
 
-            Assert.AreEqual(2, draftPage.Cultures.Count);
-            CollectionAssert.AreEqual(new[] { _englishIsoCode, _danishIsoCode }, draftPage.Cultures.Keys);
-            CollectionAssert.AreEqual(new[] { _englishIsoCode, _danishIsoCode }, draftPage.Cultures.Values.Select(v => v.Name));
+            Assert.That(draftPage.Cultures, Has.Count.EqualTo(2));
+            Assert.That(draftPage.Cultures.Keys, Is.EqualTo(new[] { _englishIsoCode, _danishIsoCode }).AsCollection);
+            Assert.That(draftPage.Cultures.Values.Select(v => v.Name), Is.EqualTo(new[] { _englishIsoCode, _danishIsoCode }).AsCollection);
 
-            Assert.AreEqual(_variantTitleName, draftPage.Value<string>(_variantTitleAlias, _englishIsoCode));
-            Assert.AreEqual(_variantTitleName, draftPage.Value<string>(_variantTitleAlias, _danishIsoCode));
+            Assert.That(draftPage.Value<string>(_variantTitleAlias, _englishIsoCode), Is.EqualTo(_variantTitleName));
+            Assert.That(draftPage.Value<string>(_variantTitleAlias, _danishIsoCode), Is.EqualTo(_variantTitleName));
         });
 
         // Act
         var unpublishAttempt = await ContentPublishingService.UnpublishAsync(VariantPage.Key, new HashSet<string> { cultureToUnpublish }, Constants.Security.SuperUserKey);
-        Assert.IsTrue(unpublishAttempt.Success);
+        Assert.That(unpublishAttempt.Success, Is.True);
 
         // Assert
         var expectedPublishedCulture = cultureToUnpublish == _danishIsoCode ? _englishIsoCode : _danishIsoCode;
 
         publishedPage = await PublishedContentHybridCache.GetByIdAsync(VariantPage.Id, false);
-        Assert.IsNotNull(publishedPage);
+        Assert.That(publishedPage, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(publishedPage.IsPublished(expectedPublishedCulture));
-            Assert.IsFalse(publishedPage.IsPublished(cultureToUnpublish));
+            Assert.That(publishedPage.IsPublished(expectedPublishedCulture), Is.True);
+            Assert.That(publishedPage.IsPublished(cultureToUnpublish), Is.False);
 
-            Assert.AreEqual(1, publishedPage.Cultures.Count);
-            Assert.AreEqual(expectedPublishedCulture, publishedPage.Cultures.Single().Key);
-            Assert.AreEqual(expectedPublishedCulture, publishedPage.Cultures.Single().Value.Name);
+            Assert.That(publishedPage.Cultures, Has.Count.EqualTo(1));
+            Assert.That(publishedPage.Cultures.Single().Key, Is.EqualTo(expectedPublishedCulture));
+            Assert.That(publishedPage.Cultures.Single().Value.Name, Is.EqualTo(expectedPublishedCulture));
 
-            Assert.AreEqual(_variantTitleName, publishedPage.Value<string>(_variantTitleAlias, expectedPublishedCulture));
-            Assert.IsEmpty(publishedPage.Value<string>(_variantTitleAlias, cultureToUnpublish));
+            Assert.That(publishedPage.Value<string>(_variantTitleAlias, expectedPublishedCulture), Is.EqualTo(_variantTitleName));
+            Assert.That(publishedPage.Value<string>(_variantTitleAlias, cultureToUnpublish), Is.Empty);
         });
 
         draftPage = await PublishedContentHybridCache.GetByIdAsync(VariantPage.Id, true);
-        Assert.IsNotNull(draftPage);
+        Assert.That(draftPage, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(draftPage.IsPublished(expectedPublishedCulture));
-            Assert.IsFalse(draftPage.IsPublished(cultureToUnpublish));
+            Assert.That(draftPage.IsPublished(expectedPublishedCulture), Is.True);
+            Assert.That(draftPage.IsPublished(cultureToUnpublish), Is.False);
 
-            Assert.AreEqual(2, draftPage.Cultures.Count);
-            CollectionAssert.AreEqual(new[] { _englishIsoCode, _danishIsoCode }, draftPage.Cultures.Keys);
-            CollectionAssert.AreEqual(new[] { _englishIsoCode, _danishIsoCode }, draftPage.Cultures.Values.Select(v => v.Name));
+            Assert.That(draftPage.Cultures, Has.Count.EqualTo(2));
+            Assert.That(draftPage.Cultures.Keys, Is.EqualTo(new[] { _englishIsoCode, _danishIsoCode }).AsCollection);
+            Assert.That(draftPage.Cultures.Values.Select(v => v.Name), Is.EqualTo(new[] { _englishIsoCode, _danishIsoCode }).AsCollection);
 
-            Assert.AreEqual(_variantTitleName, draftPage.Value<string>(_variantTitleAlias, _englishIsoCode));
-            Assert.AreEqual(_variantTitleName, draftPage.Value<string>(_variantTitleAlias, _danishIsoCode));
+            Assert.That(draftPage.Value<string>(_variantTitleAlias, _englishIsoCode), Is.EqualTo(_variantTitleName));
+            Assert.That(draftPage.Value<string>(_variantTitleAlias, _danishIsoCode), Is.EqualTo(_variantTitleName));
         });
     }
 

@@ -81,7 +81,7 @@ internal sealed class AdvancedMigrationTests : UmbracoIntegrationTest
             var db = ScopeAccessor.AmbientScope.Database;
             var exists = ScopeAccessor.AmbientScope.SqlContext.SqlSyntax.DoesTableExist(db, "umbracoUser");
 
-            Assert.IsTrue(exists);
+            Assert.That(exists, Is.True);
         }
     }
 
@@ -238,8 +238,8 @@ internal sealed class AdvancedMigrationTests : UmbracoIntegrationTest
 
             Assert.Multiple(() =>
             {
-                Assert.NotNull(columnInfo);
-                Assert.IsTrue(columnInfo.DataType.Contains("nvarchar"));
+                Assert.That(columnInfo, Is.Not.Null);
+                Assert.That(columnInfo.DataType, Does.Contain("nvarchar"));
             });
         }
     }

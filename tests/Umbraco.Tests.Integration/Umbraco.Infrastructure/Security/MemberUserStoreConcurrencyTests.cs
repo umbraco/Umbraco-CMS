@@ -69,7 +69,7 @@ internal sealed class MemberUserStoreConcurrencyTests : UmbracoIntegrationTest
             failures.Add($"{pendingCount} operation(s) still blocked on database lock after 30 seconds");
         }
 
-        Assert.IsEmpty(failures, string.Join("\n", failures));
+        Assert.That(failures, Is.Empty, string.Join("\n", failures));
     }
 
     /// <summary>

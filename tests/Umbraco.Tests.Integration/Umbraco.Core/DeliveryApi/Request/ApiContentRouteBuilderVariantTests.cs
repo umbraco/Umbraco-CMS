@@ -89,12 +89,12 @@ public class ApiContentRouteBuilderVariantTests : ApiContentRouteBuilderTestBase
         SetVariationContext(culture);
         var publishedContent = GetPublishedContent(_contentByName[$"Root 1"].Key);
         var route = ApiContentRouteBuilder.Build(publishedContent);
-        Assert.IsNotNull(route);
+        Assert.That(route, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual("/", route.Path);
-            Assert.AreEqual($"root-1-{culture.ToLowerInvariant()}", route.StartItem.Path);
-            Assert.AreEqual(_contentByName[$"Root 1"].Key, route.StartItem.Id);
+            Assert.That(route.Path, Is.EqualTo("/"));
+            Assert.That(route.StartItem.Path, Is.EqualTo($"root-1-{culture.ToLowerInvariant()}"));
+            Assert.That(route.StartItem.Id, Is.EqualTo(_contentByName[$"Root 1"].Key));
         });
     }
 
@@ -105,12 +105,12 @@ public class ApiContentRouteBuilderVariantTests : ApiContentRouteBuilderTestBase
         SetVariationContext(culture);
         var publishedContent = GetPublishedContent(_contentByName["Root 3"].Key);
         var route = ApiContentRouteBuilder.Build(publishedContent);
-        Assert.IsNotNull(route);
+        Assert.That(route, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual($"/root-3-{culture.ToLowerInvariant()}/", route.Path);
-            Assert.AreEqual($"root-3-{culture.ToLowerInvariant()}", route.StartItem.Path);
-            Assert.AreEqual(_contentByName["Root 3"].Key, route.StartItem.Id);
+            Assert.That(route.Path, Is.EqualTo($"/root-3-{culture.ToLowerInvariant()}/"));
+            Assert.That(route.StartItem.Path, Is.EqualTo($"root-3-{culture.ToLowerInvariant()}"));
+            Assert.That(route.StartItem.Id, Is.EqualTo(_contentByName["Root 3"].Key));
         });
     }
 
@@ -125,12 +125,12 @@ public class ApiContentRouteBuilderVariantTests : ApiContentRouteBuilderTestBase
         SetVariationContext(culture);
         var publishedContent = GetPublishedContent(_contentByName[$"Root {root}/Child 1"].Key);
         var route = ApiContentRouteBuilder.Build(publishedContent);
-        Assert.IsNotNull(route);
+        Assert.That(route, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual($"/child-1-{culture.ToLowerInvariant()}/", route.Path);
-            Assert.AreEqual($"root-{root}-{culture.ToLowerInvariant()}", route.StartItem.Path);
-            Assert.AreEqual(_contentByName[$"Root {root}"].Key, route.StartItem.Id);
+            Assert.That(route.Path, Is.EqualTo($"/child-1-{culture.ToLowerInvariant()}/"));
+            Assert.That(route.StartItem.Path, Is.EqualTo($"root-{root}-{culture.ToLowerInvariant()}"));
+            Assert.That(route.StartItem.Id, Is.EqualTo(_contentByName[$"Root {root}"].Key));
         });
     }
 
@@ -145,12 +145,12 @@ public class ApiContentRouteBuilderVariantTests : ApiContentRouteBuilderTestBase
         SetVariationContext(culture);
         var publishedContent = GetPublishedContent(_contentByName[$"Root {root}/Child 3"].Key);
         var route = ApiContentRouteBuilder.Build(publishedContent);
-        Assert.IsNotNull(route);
+        Assert.That(route, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual($"/child-3-{culture.ToLowerInvariant()}/", route.Path);
-            Assert.AreEqual($"root-{root}-{culture.ToLowerInvariant()}", route.StartItem.Path);
-            Assert.AreEqual(_contentByName[$"Root {root}"].Key, route.StartItem.Id);
+            Assert.That(route.Path, Is.EqualTo($"/child-3-{culture.ToLowerInvariant()}/"));
+            Assert.That(route.StartItem.Path, Is.EqualTo($"root-{root}-{culture.ToLowerInvariant()}"));
+            Assert.That(route.StartItem.Id, Is.EqualTo(_contentByName[$"Root {root}"].Key));
         });
     }
 
@@ -165,12 +165,12 @@ public class ApiContentRouteBuilderVariantTests : ApiContentRouteBuilderTestBase
         SetVariationContext(culture);
         var publishedContent = GetPublishedContent(_contentByName[$"Root {root}/Child 1/Grandchild 1"].Key);
         var route = ApiContentRouteBuilder.Build(publishedContent);
-        Assert.IsNotNull(route);
+        Assert.That(route, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual($"/child-1-{culture.ToLowerInvariant()}/grandchild-1-{culture.ToLowerInvariant()}/", route.Path);
-            Assert.AreEqual($"root-{root}-{culture.ToLowerInvariant()}", route.StartItem.Path);
-            Assert.AreEqual(_contentByName[$"Root {root}"].Key, route.StartItem.Id);
+            Assert.That(route.Path, Is.EqualTo($"/child-1-{culture.ToLowerInvariant()}/grandchild-1-{culture.ToLowerInvariant()}/"));
+            Assert.That(route.StartItem.Path, Is.EqualTo($"root-{root}-{culture.ToLowerInvariant()}"));
+            Assert.That(route.StartItem.Id, Is.EqualTo(_contentByName[$"Root {root}"].Key));
         });
     }
 
@@ -185,12 +185,12 @@ public class ApiContentRouteBuilderVariantTests : ApiContentRouteBuilderTestBase
         SetVariationContext(culture);
         var publishedContent = GetPublishedContent(_contentByName[$"Root {root}/Child 3/Grandchild 3"].Key);
         var route = ApiContentRouteBuilder.Build(publishedContent);
-        Assert.IsNotNull(route);
+        Assert.That(route, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual($"/child-3-{culture.ToLowerInvariant()}/grandchild-3-{culture.ToLowerInvariant()}/", route.Path);
-            Assert.AreEqual($"root-{root}-{culture.ToLowerInvariant()}", route.StartItem.Path);
-            Assert.AreEqual(_contentByName[$"Root {root}"].Key, route.StartItem.Id);
+            Assert.That(route.Path, Is.EqualTo($"/child-3-{culture.ToLowerInvariant()}/grandchild-3-{culture.ToLowerInvariant()}/"));
+            Assert.That(route.StartItem.Path, Is.EqualTo($"root-{root}-{culture.ToLowerInvariant()}"));
+            Assert.That(route.StartItem.Id, Is.EqualTo(_contentByName[$"Root {root}"].Key));
         });
     }
 
@@ -206,12 +206,12 @@ public class ApiContentRouteBuilderVariantTests : ApiContentRouteBuilderTestBase
         SetVariationContext(culture);
         var publishedContent = GetPublishedContent(_contentByName[$"Root {root}"].Key);
         var route = ApiContentRouteBuilder.Build(publishedContent);
-        Assert.IsNotNull(route);
+        Assert.That(route, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual("/", route.Path);
-            Assert.AreEqual($"root-{root}-{culture.ToLowerInvariant()}", route.StartItem.Path);
-            Assert.AreEqual(_contentByName[$"Root {root}"].Key, route.StartItem.Id);
+            Assert.That(route.Path, Is.EqualTo("/"));
+            Assert.That(route.StartItem.Path, Is.EqualTo($"root-{root}-{culture.ToLowerInvariant()}"));
+            Assert.That(route.StartItem.Id, Is.EqualTo(_contentByName[$"Root {root}"].Key));
         });
     }
 
@@ -228,12 +228,12 @@ public class ApiContentRouteBuilderVariantTests : ApiContentRouteBuilderTestBase
         SetVariationContext(culture);
         var publishedContent = GetPublishedContent(_contentByName[$"Root {root}"].Key);
         var route = ApiContentRouteBuilder.Build(publishedContent);
-        Assert.IsNotNull(route);
+        Assert.That(route, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual("/", route.Path);
-            Assert.AreEqual($"root-{root}-{culture.ToLowerInvariant()}", route.StartItem.Path);
-            Assert.AreEqual(_contentByName[$"Root {root}"].Key, route.StartItem.Id);
+            Assert.That(route.Path, Is.EqualTo("/"));
+            Assert.That(route.StartItem.Path, Is.EqualTo($"root-{root}-{culture.ToLowerInvariant()}"));
+            Assert.That(route.StartItem.Id, Is.EqualTo(_contentByName[$"Root {root}"].Key));
         });
     }
 
@@ -249,12 +249,12 @@ public class ApiContentRouteBuilderVariantTests : ApiContentRouteBuilderTestBase
         SetVariationContext(culture);
         var publishedContent = GetPublishedContent(_contentByName[$"Root {root}"].Key);
         var route = ApiContentRouteBuilder.Build(publishedContent);
-        Assert.IsNotNull(route);
+        Assert.That(route, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(expectedPath, route.Path);
-            Assert.AreEqual($"root-{root}-{culture.ToLowerInvariant()}", route.StartItem.Path);
-            Assert.AreEqual(_contentByName[$"Root {root}"].Key, route.StartItem.Id);
+            Assert.That(route.Path, Is.EqualTo(expectedPath));
+            Assert.That(route.StartItem.Path, Is.EqualTo($"root-{root}-{culture.ToLowerInvariant()}"));
+            Assert.That(route.StartItem.Id, Is.EqualTo(_contentByName[$"Root {root}"].Key));
         });
     }
 
@@ -276,12 +276,12 @@ public class ApiContentRouteBuilderVariantTests : ApiContentRouteBuilderTestBase
         SetVariationContext(culture);
         var publishedContent = GetPublishedContent(_contentByName[$"Root {root}/Child {child}"].Key);
         var route = ApiContentRouteBuilder.Build(publishedContent);
-        Assert.IsNotNull(route);
+        Assert.That(route, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual($"/child-{child}-{culture.ToLowerInvariant()}", route.Path);
-            Assert.AreEqual($"root-{root}-{culture.ToLowerInvariant()}", route.StartItem.Path);
-            Assert.AreEqual(_contentByName[$"Root {root}"].Key, route.StartItem.Id);
+            Assert.That(route.Path, Is.EqualTo($"/child-{child}-{culture.ToLowerInvariant()}"));
+            Assert.That(route.StartItem.Path, Is.EqualTo($"root-{root}-{culture.ToLowerInvariant()}"));
+            Assert.That(route.StartItem.Id, Is.EqualTo(_contentByName[$"Root {root}"].Key));
         });
     }
 }

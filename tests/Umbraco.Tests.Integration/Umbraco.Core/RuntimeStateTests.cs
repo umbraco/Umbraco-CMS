@@ -41,8 +41,8 @@ internal sealed class RuntimeStateTests : UmbracoIntegrationTest
 
         RuntimeState.DetermineRuntimeLevel();
 
-        Assert.AreEqual(RuntimeLevel.Run, RuntimeState.Level);
-        Assert.AreEqual(RuntimeLevelReason.Run, RuntimeState.Reason);
+        Assert.That(RuntimeState.Level, Is.EqualTo(RuntimeLevel.Run));
+        Assert.That(RuntimeState.Reason, Is.EqualTo(RuntimeLevelReason.Run));
     }
 
     [Test]
@@ -50,8 +50,8 @@ internal sealed class RuntimeStateTests : UmbracoIntegrationTest
     {
         RuntimeState.DetermineRuntimeLevel();
 
-        Assert.AreEqual(RuntimeLevel.Upgrading, RuntimeState.Level);
-        Assert.AreEqual(RuntimeLevelReason.UpgradePackageMigrations, RuntimeState.Reason);
+        Assert.That(RuntimeState.Level, Is.EqualTo(RuntimeLevel.Upgrading));
+        Assert.That(RuntimeState.Reason, Is.EqualTo(RuntimeLevelReason.UpgradePackageMigrations));
     }
 
     [Test]
@@ -62,8 +62,8 @@ internal sealed class RuntimeStateTests : UmbracoIntegrationTest
 
         RuntimeState.DetermineRuntimeLevel();
 
-        Assert.AreEqual(RuntimeLevel.Run, RuntimeState.Level);
-        Assert.AreEqual(RuntimeLevelReason.Run, RuntimeState.Reason);
+        Assert.That(RuntimeState.Level, Is.EqualTo(RuntimeLevel.Run));
+        Assert.That(RuntimeState.Reason, Is.EqualTo(RuntimeLevelReason.Run));
     }
 
     private class TestMigrationPlan : PackageMigrationPlan

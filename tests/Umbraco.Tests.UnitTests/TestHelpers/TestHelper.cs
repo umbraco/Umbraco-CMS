@@ -212,13 +212,8 @@ public static class TestHelper
             // compare date & time with delta
             var actualDateTime = (DateTime)actual;
             var delta = (actualDateTime - expectedDateTime).TotalMilliseconds;
-            Assert.IsTrue(
-                Math.Abs(delta) <= dateDeltaMilliseconds,
-                "Property {0}.{1} does not match. Expected: {2} but was: {3}",
-                property.DeclaringType.Name,
-                property.Name,
-                expected,
-                actual);
+            Assert.That(
+                Math.Abs(delta), Is.LessThanOrEqualTo(dateDeltaMilliseconds), $"Property {property.DeclaringType.Name}.{property.Name} does not match. Expected: {expected} but was: {actual}");
         }
         else if (expected is Property expectedProperty)
         {
@@ -235,35 +230,27 @@ public static class TestHelper
 
             for (var i = 0; i < expectedPropertyValues.Length; i++)
             {
-                Assert.AreEqual(
-                    expectedPropertyValues[i].EditedValue,
-                    actualPropertyValues[i].EditedValue,
+                Assert.That(
+                    actualPropertyValues[i].EditedValue, Is.EqualTo(expectedPropertyValues[i].EditedValue),
                     $"{property.DeclaringType.Name}.{property.Name}: Expected draft value \"{expectedPropertyValues[i].EditedValue}\" but got \"{actualPropertyValues[i].EditedValue}\".");
-                Assert.AreEqual(
-                    expectedPropertyValues[i].PublishedValue,
-                    actualPropertyValues[i].PublishedValue,
+                Assert.That(
+                    actualPropertyValues[i].PublishedValue, Is.EqualTo(expectedPropertyValues[i].PublishedValue),
                     $"{property.DeclaringType.Name}.{property.Name}: Expected published value \"{expectedPropertyValues[i].EditedValue}\" but got \"{actualPropertyValues[i].EditedValue}\".");
             }
         }
         else if (expected is IDataEditor expectedEditor)
         {
-            Assert.IsInstanceOf<IDataEditor>(actual);
+            Assert.That(actual, Is.InstanceOf<IDataEditor>());
             var actualEditor = (IDataEditor)actual;
-            Assert.AreEqual(expectedEditor.Alias, actualEditor.Alias);
+            Assert.That(actualEditor.Alias, Is.EqualTo(expectedEditor.Alias));
 
             // what else shall we test?
         }
         else
         {
             // directly compare values
-            Assert.AreEqual(
-                expected,
-                actual,
-                "Property {0}.{1} does not match. Expected: {2} but was: {3}",
-                property.DeclaringType.Name,
-                property.Name,
-                expected?.ToString() ?? "<null>",
-                actual?.ToString() ?? "<null>");
+            Assert.That(
+                actual, Is.EqualTo(expected), $"Property {property.DeclaringType.Name}.{property.Name} does not match. Expected: {expected?.ToString() ?? "<null>"} but was: {actual?.ToString() ?? "<null>"}");
         }
     }
 

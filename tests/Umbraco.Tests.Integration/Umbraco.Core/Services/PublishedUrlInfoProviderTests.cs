@@ -39,9 +39,9 @@ internal sealed class PublishedUrlInfoProviderTests : PublishedUrlInfoProviderTe
 
         // Assert: Invariant content should only return ONE URL (for the default language)
         // not multiple URLs for each configured language
-        Assert.AreEqual(1, urls.Count, "Invariant content should only return one URL for the default language, not URLs for all configured languages");
-        Assert.IsNotNull(urls.First().Url);
-        Assert.AreEqual("en-US", urls.First().Culture, "The URL should be for the default language (en-US)");
+        Assert.That(urls, Has.Count.EqualTo(1), "Invariant content should only return one URL for the default language, not URLs for all configured languages");
+        Assert.That(urls.First().Url, Is.Not.Null);
+        Assert.That(urls.First().Culture, Is.EqualTo("en-US"), "The URL should be for the default language (en-US)");
     }
 
     [Test]
@@ -64,15 +64,15 @@ internal sealed class PublishedUrlInfoProviderTests : PublishedUrlInfoProviderTe
             {
                 Domains = [new DomainModel { DomainName = "test.dk", IsoCode = "da-DK" }],
             });
-        Assert.IsTrue(updateDomainResult.Success, "Domain assignment should succeed");
+        Assert.That(updateDomainResult.Success, Is.True, "Domain assignment should succeed");
 
         // Act: Get all URLs for a child of the root with the da-DK domain
         var urls = await PublishedUrlInfoProvider.GetAllAsync(Subpage);
 
         // Assert: Should contain only the da-DK domain URL, not the default culture fallback
-        Assert.AreEqual(1, urls.Count, "Should return exactly one URL (the domain-based URL)");
-        Assert.IsNotNull(urls.First().Url);
-        Assert.AreEqual("da-DK", urls.First().Culture, "The URL should be for the domain culture (da-DK)");
+        Assert.That(urls, Has.Count.EqualTo(1), "Should return exactly one URL (the domain-based URL)");
+        Assert.That(urls.First().Url, Is.Not.Null);
+        Assert.That(urls.First().Culture, Is.EqualTo("da-DK"), "The URL should be for the domain culture (da-DK)");
         Assert.That(urls.First().Url!.Host, Is.EqualTo("test.dk"), "The URL should use the assigned domain");
     }
 
@@ -97,15 +97,15 @@ internal sealed class PublishedUrlInfoProviderTests : PublishedUrlInfoProviderTe
         var subPageUrls = await PublishedUrlInfoProvider.GetAllAsync(Subpage);
         var childOfSecondRootUrls = await PublishedUrlInfoProvider.GetAllAsync(childOfSecondRoot);
 
-        Assert.AreEqual(1, subPageUrls.Count);
-        Assert.IsNotNull(subPageUrls.First().Url);
-        Assert.AreEqual("/textpage/text-page-1/", subPageUrls.First().Url!.ToString());
-        Assert.AreEqual(Constants.UrlProviders.Content, subPageUrls.First().Provider);
+        Assert.That(subPageUrls, Has.Count.EqualTo(1));
+        Assert.That(subPageUrls.First().Url, Is.Not.Null);
+        Assert.That(subPageUrls.First().Url!.ToString(), Is.EqualTo("/textpage/text-page-1/"));
+        Assert.That(subPageUrls.First().Provider, Is.EqualTo(Constants.UrlProviders.Content));
 
-        Assert.AreEqual(1, childOfSecondRootUrls.Count);
-        Assert.IsNotNull(childOfSecondRootUrls.First().Url);
-        Assert.AreEqual("/second-root/text-page-1/", childOfSecondRootUrls.First().Url!.ToString());
-        Assert.AreEqual(Constants.UrlProviders.Content, childOfSecondRootUrls.First().Provider);
+        Assert.That(childOfSecondRootUrls, Has.Count.EqualTo(1));
+        Assert.That(childOfSecondRootUrls.First().Url, Is.Not.Null);
+        Assert.That(childOfSecondRootUrls.First().Url!.ToString(), Is.EqualTo("/second-root/text-page-1/"));
+        Assert.That(childOfSecondRootUrls.First().Provider, Is.EqualTo(Constants.UrlProviders.Content));
     }
 
     [Test]
@@ -129,18 +129,18 @@ internal sealed class PublishedUrlInfoProviderTests : PublishedUrlInfoProviderTe
         var childOfSecondRootUrls = await PublishedUrlInfoProvider.GetAllAsync(childOfSecondRoot);
 
         // Assert the url of subpage is correct
-        Assert.AreEqual(1, subPageUrls.Count);
-        Assert.IsNotNull(subPageUrls.First().Url);
-        Assert.AreEqual("/text-page-1/", subPageUrls.First().Url!.ToString());
-        Assert.AreEqual(Constants.UrlProviders.Content, subPageUrls.First().Provider);
-        Assert.AreEqual(Subpage.Key, DocumentUrlService.GetDocumentKeyByRoute("/text-page-1/", "en-US", null, false));
+        Assert.That(subPageUrls, Has.Count.EqualTo(1));
+        Assert.That(subPageUrls.First().Url, Is.Not.Null);
+        Assert.That(subPageUrls.First().Url!.ToString(), Is.EqualTo("/text-page-1/"));
+        Assert.That(subPageUrls.First().Provider, Is.EqualTo(Constants.UrlProviders.Content));
+        Assert.That(DocumentUrlService.GetDocumentKeyByRoute("/text-page-1/", "en-US", null, false), Is.EqualTo(Subpage.Key));
 
         // Assert the url of child of second root is not exposed
-        Assert.AreEqual(1, childOfSecondRootUrls.Count);
-        Assert.IsNull(childOfSecondRootUrls.First().Url);
-        Assert.AreEqual(Constants.UrlProviders.Content, childOfSecondRootUrls.First().Provider);
+        Assert.That(childOfSecondRootUrls, Has.Count.EqualTo(1));
+        Assert.That(childOfSecondRootUrls.First().Url, Is.Null);
+        Assert.That(childOfSecondRootUrls.First().Provider, Is.EqualTo(Constants.UrlProviders.Content));
 
         // Ensure the url without hide top level is not finding the child of second root
-        Assert.AreNotEqual(childOfSecondRoot.Key, DocumentUrlService.GetDocumentKeyByRoute("/second-root/text-page-1/", "en-US", null, false));
+        Assert.That(DocumentUrlService.GetDocumentKeyByRoute("/second-root/text-page-1/", "en-US", null, false), Is.Not.EqualTo(childOfSecondRoot.Key));
     }
 }

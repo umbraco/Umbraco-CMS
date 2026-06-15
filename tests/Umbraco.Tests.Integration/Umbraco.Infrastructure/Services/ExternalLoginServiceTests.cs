@@ -68,10 +68,10 @@ internal sealed class ExternalLoginServiceTests : UmbracoIntegrationTest
         var logins = ExternalLoginService.GetExternalLogins(user.Key).ToList();
 
         // duplicates will be removed, keeping the latest entries
-        Assert.AreEqual(2, logins.Count);
+        Assert.That(logins, Has.Count.EqualTo(2));
 
         var test1 = logins.Single(x => x.LoginProvider == "test1");
-        Assert.Greater(test1.CreateDate, latest);
+        Assert.That(test1.CreateDate, Is.GreaterThan(latest));
     }
 
     [Test]
@@ -89,7 +89,7 @@ internal sealed class ExternalLoginServiceTests : UmbracoIntegrationTest
         ExternalLoginService.Save(user.Key, externalLogins);
 
         var logins = ExternalLoginService.GetExternalLogins(user.Key).ToList();
-        Assert.AreEqual(1, logins.Count);
+        Assert.That(logins, Has.Count.EqualTo(1));
     }
 
     [Test]
@@ -113,9 +113,9 @@ internal sealed class ExternalLoginServiceTests : UmbracoIntegrationTest
         ExternalLoginService.Save(user.Key, extLogins);
 
         var found = ExternalLoginService.GetExternalLogins(user.Key).OrderBy(x => x.LoginProvider).ToList();
-        Assert.AreEqual(2, found.Count);
-        Assert.AreEqual("123456", found[0].UserData);
-        Assert.AreEqual("987654", found[1].UserData);
+        Assert.That(found, Has.Count.EqualTo(2));
+        Assert.That(found[0].UserData, Is.EqualTo("123456"));
+        Assert.That(found[1].UserData, Is.EqualTo("987654"));
     }
 
     [Test]
@@ -133,9 +133,9 @@ internal sealed class ExternalLoginServiceTests : UmbracoIntegrationTest
         ExternalLoginService.Save(user.Key, extLogins);
 
         var found = ExternalLoginService.Find("test2", providerKey2).ToList();
-        Assert.AreEqual(1, found.Count);
+        Assert.That(found, Has.Count.EqualTo(1));
         var asExtended = found.ToList();
-        Assert.AreEqual(1, found.Count);
+        Assert.That(found, Has.Count.EqualTo(1));
     }
 
     [Test]
@@ -153,11 +153,11 @@ internal sealed class ExternalLoginServiceTests : UmbracoIntegrationTest
         ExternalLoginService.Save(user.Key, externalLogins);
 
         var logins = ExternalLoginService.GetExternalLogins(user.Key).OrderBy(x => x.LoginProvider).ToList();
-        Assert.AreEqual(2, logins.Count);
+        Assert.That(logins, Has.Count.EqualTo(2));
         for (var i = 0; i < logins.Count; i++)
         {
-            Assert.AreEqual(logins[i].ProviderKey, externalLogins[i].ProviderKey);
-            Assert.AreEqual(logins[i].LoginProvider, externalLogins[i].LoginProvider);
+            Assert.That(externalLogins[i].ProviderKey, Is.EqualTo(logins[i].ProviderKey));
+            Assert.That(externalLogins[i].LoginProvider, Is.EqualTo(logins[i].LoginProvider));
         }
     }
 
@@ -180,7 +180,7 @@ internal sealed class ExternalLoginServiceTests : UmbracoIntegrationTest
         ExternalLoginService.Save(user.Key, externalTokens);
 
         var tokens = ExternalLoginService.GetExternalLoginTokens(user.Key).ToList();
-        Assert.AreEqual(2, tokens.Count);
+        Assert.That(tokens, Has.Count.EqualTo(2));
     }
 
     [Test]
@@ -209,11 +209,11 @@ internal sealed class ExternalLoginServiceTests : UmbracoIntegrationTest
         ExternalLoginService.Save(user.Key, logins.Select(x => new ExternalLogin(x.LoginProvider, x.ProviderKey)));
 
         var updatedLogins = ExternalLoginService.GetExternalLogins(user.Key).OrderBy(x => x.LoginProvider).ToList();
-        Assert.AreEqual(4, updatedLogins.Count);
+        Assert.That(updatedLogins, Has.Count.EqualTo(4));
         for (var i = 0; i < updatedLogins.Count; i++)
         {
-            Assert.AreEqual(logins[i].LoginProvider, updatedLogins[i].LoginProvider);
-            Assert.AreEqual(logins[i].ProviderKey, updatedLogins[i].ProviderKey);
+            Assert.That(updatedLogins[i].LoginProvider, Is.EqualTo(logins[i].LoginProvider));
+            Assert.That(updatedLogins[i].ProviderKey, Is.EqualTo(logins[i].ProviderKey));
         }
     }
 
@@ -257,12 +257,12 @@ internal sealed class ExternalLoginServiceTests : UmbracoIntegrationTest
 
         var updatedTokens = ExternalLoginService.GetExternalLoginTokens(user.Key).OrderBy(x => x.LoginProvider)
             .ToList();
-        Assert.AreEqual(4, updatedTokens.Count);
+        Assert.That(updatedTokens, Has.Count.EqualTo(4));
         for (var i = 0; i < updatedTokens.Count; i++)
         {
-            Assert.AreEqual(tokens[i].LoginProvider, updatedTokens[i].LoginProvider);
-            Assert.AreEqual(tokens[i].Name, updatedTokens[i].Name);
-            Assert.AreEqual(tokens[i].Value, updatedTokens[i].Value);
+            Assert.That(updatedTokens[i].LoginProvider, Is.EqualTo(tokens[i].LoginProvider));
+            Assert.That(updatedTokens[i].Name, Is.EqualTo(tokens[i].Name));
+            Assert.That(updatedTokens[i].Value, Is.EqualTo(tokens[i].Value));
         }
     }
 
@@ -278,7 +278,7 @@ internal sealed class ExternalLoginServiceTests : UmbracoIntegrationTest
 
         var logins = ExternalLoginService.GetExternalLogins(user.Key).ToList();
 
-        Assert.AreEqual("hello world", logins[0].UserData);
+        Assert.That(logins[0].UserData, Is.EqualTo("hello world"));
     }
 
     [Test]
@@ -342,12 +342,12 @@ internal sealed class ExternalLoginServiceTests : UmbracoIntegrationTest
         // Assert
         var exceptionDetails = unexpectedExceptions.Select(e =>
             $"Type: {e.GetType().FullName}, Message: {e.Message}, Inner: {e.InnerException?.GetType().FullName}: {e.InnerException?.Message}");
-        Assert.IsEmpty(
-            unexpectedExceptions,
+        Assert.That(
+            unexpectedExceptions, Is.Empty,
             $"Expected no duplicate key exceptions but got {unexpectedExceptions.Count}:\n{string.Join("\n", exceptionDetails)}");
 
         var logins = ExternalLoginService.GetExternalLogins(user.Key).ToList();
-        Assert.AreEqual(1, logins.Count, "Should have exactly one login");
+        Assert.That(logins, Has.Count.EqualTo(1), "Should have exactly one login");
     }
 
     private static bool IsDeadlockException(Exception ex)

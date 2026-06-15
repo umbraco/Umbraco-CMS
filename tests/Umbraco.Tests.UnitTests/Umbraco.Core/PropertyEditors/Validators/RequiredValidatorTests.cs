@@ -29,7 +29,7 @@ public class RequiredValidatorTests
         var result = validator.ValidateRequired(value, ValueTypes.String);
         if (expectedSuccess)
         {
-            Assert.IsEmpty(result);
+            Assert.That(result, Is.Empty);
         }
         else
         {
@@ -50,7 +50,7 @@ public class RequiredValidatorTests
         var result = validator.ValidateRequired(value, ValueTypes.Json);
         if (expectedSuccess)
         {
-            Assert.IsEmpty(result);
+            Assert.That(result, Is.Empty);
         }
         else
         {
@@ -60,7 +60,7 @@ public class RequiredValidatorTests
 
     private static void AssertValidationFailed(IEnumerable<ValidationResult> result, string expectedMessage = Constants.Validation.ErrorMessages.Properties.Empty)
     {
-        Assert.AreEqual(1, result.Count());
-        Assert.AreEqual(expectedMessage, result.First().ErrorMessage);
+        Assert.That(result.Count(), Is.EqualTo(1));
+        Assert.That(result.First().ErrorMessage, Is.EqualTo(expectedMessage));
     }
 }

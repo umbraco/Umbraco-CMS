@@ -31,9 +31,9 @@ internal sealed class MediaHybridCacheTests : UmbracoIntegrationTestWithMediaEdi
         var media = await PublishedMediaHybridCache.GetByIdAsync(RootFolderId);
 
         // Assert
-        Assert.IsNotNull(media);
-        Assert.AreEqual("RootFolder", media.Name);
-        Assert.AreEqual(RootFolder.ContentTypeKey, media.ContentType.Key);
+        Assert.That(media, Is.Not.Null);
+        Assert.That(media.Name, Is.EqualTo("RootFolder"));
+        Assert.That(media.ContentType.Key, Is.EqualTo(RootFolder.ContentTypeKey));
     }
 
     [Test]
@@ -42,9 +42,9 @@ internal sealed class MediaHybridCacheTests : UmbracoIntegrationTestWithMediaEdi
         var media = await PublishedMediaHybridCache.GetByIdAsync(RootFolder.Key.Value);
 
         // Assert
-        Assert.IsNotNull(media);
-        Assert.AreEqual("RootFolder", media.Name);
-        Assert.AreEqual(RootFolder.ContentTypeKey, media.ContentType.Key);
+        Assert.That(media, Is.Not.Null);
+        Assert.That(media.Name, Is.EqualTo("RootFolder"));
+        Assert.That(media.ContentType.Key, Is.EqualTo(RootFolder.ContentTypeKey));
     }
 
     [Test]
@@ -54,10 +54,10 @@ internal sealed class MediaHybridCacheTests : UmbracoIntegrationTestWithMediaEdi
         var media = await PublishedMediaHybridCache.GetByIdAsync(SubImageId);
 
         // Assert
-        Assert.IsNotNull(media);
-        Assert.AreEqual("SubImage", media.Name);
-        Assert.AreEqual(SubImage.ContentTypeKey, media.ContentType.Key);
-        Assert.AreEqual(SubImage.ParentKey, RootFolder.Key);
+        Assert.That(media, Is.Not.Null);
+        Assert.That(media.Name, Is.EqualTo("SubImage"));
+        Assert.That(media.ContentType.Key, Is.EqualTo(SubImage.ContentTypeKey));
+        Assert.That(RootFolder.Key, Is.EqualTo(SubImage.ParentKey));
     }
 
 
@@ -67,10 +67,10 @@ internal sealed class MediaHybridCacheTests : UmbracoIntegrationTestWithMediaEdi
         var media = await PublishedMediaHybridCache.GetByIdAsync(SubImage.Key.Value);
 
         // Assert
-        Assert.IsNotNull(media);
-        Assert.AreEqual("SubImage", media.Name);
-        Assert.AreEqual(SubImage.ContentTypeKey, media.ContentType.Key);
-        Assert.AreEqual(SubImage.ParentKey, RootFolder.Key);
+        Assert.That(media, Is.Not.Null);
+        Assert.That(media.Name, Is.EqualTo("SubImage"));
+        Assert.That(media.ContentType.Key, Is.EqualTo(SubImage.ContentTypeKey));
+        Assert.That(RootFolder.Key, Is.EqualTo(SubImage.ParentKey));
     }
 
     [Test]
@@ -81,7 +81,7 @@ internal sealed class MediaHybridCacheTests : UmbracoIntegrationTestWithMediaEdi
         var media = await PublishedMediaHybridCache.GetByIdAsync(nonExistingId);
 
         // Assert
-        Assert.IsNull(media);
+        Assert.That(media, Is.Null);
     }
 
     [Test]
@@ -91,7 +91,7 @@ internal sealed class MediaHybridCacheTests : UmbracoIntegrationTestWithMediaEdi
         var media = await PublishedMediaHybridCache.GetByIdAsync(Guid.NewGuid());
 
         // Assert
-        Assert.IsNull(media);
+        Assert.That(media, Is.Null);
     }
 
     [Test]
@@ -101,9 +101,9 @@ internal sealed class MediaHybridCacheTests : UmbracoIntegrationTestWithMediaEdi
         var media = await PublishedMediaHybridCache.GetByIdAsync(SubTestMediaId);
 
         // Assert
-        Assert.IsNotNull(media);
-        Assert.AreEqual("SubTestMedia", media.Name);
-        Assert.AreEqual("This is a test", media.Value("testProperty"));
+        Assert.That(media, Is.Not.Null);
+        Assert.That(media.Name, Is.EqualTo("SubTestMedia"));
+        Assert.That(media.Value("testProperty"), Is.EqualTo("This is a test"));
     }
 
     [Test]
@@ -113,9 +113,9 @@ internal sealed class MediaHybridCacheTests : UmbracoIntegrationTestWithMediaEdi
         var media = await PublishedMediaHybridCache.GetByIdAsync(SubTestMedia.Key.Value);
 
         // Assert
-        Assert.IsNotNull(media);
-        Assert.AreEqual("SubTestMedia", media.Name);
-        Assert.AreEqual("This is a test", media.Value("testProperty"));
+        Assert.That(media, Is.Not.Null);
+        Assert.That(media.Name, Is.EqualTo("SubTestMedia"));
+        Assert.That(media.Value("testProperty"), Is.EqualTo("This is a test"));
     }
 
     [Test]
@@ -124,7 +124,7 @@ internal sealed class MediaHybridCacheTests : UmbracoIntegrationTestWithMediaEdi
         // Arrange
         const string newName = "NewImageName";
         var media = await PublishedMediaHybridCache.GetByIdAsync(SubImageId);
-        Assert.AreEqual(media.Name, "SubImage");
+        Assert.That(media.Name, Is.EqualTo("SubImage"));
 
         var mediaUpdateModel = new MediaUpdateModel
         {
@@ -137,8 +137,8 @@ internal sealed class MediaHybridCacheTests : UmbracoIntegrationTestWithMediaEdi
         var updatedMedia = await PublishedMediaHybridCache.GetByIdAsync(SubImageId);
 
         // Assert
-        Assert.IsNotNull(updatedMedia);
-        Assert.AreEqual(newName, updatedMedia.Name);
+        Assert.That(updatedMedia, Is.Not.Null);
+        Assert.That(updatedMedia.Name, Is.EqualTo(newName));
     }
 
     [Test]
@@ -147,7 +147,7 @@ internal sealed class MediaHybridCacheTests : UmbracoIntegrationTestWithMediaEdi
         // Arrange
         const string newName = "NewImageName";
         var media = await PublishedMediaHybridCache.GetByIdAsync(SubImage.Key.Value);
-        Assert.AreEqual(media.Name, "SubImage");
+        Assert.That(media.Name, Is.EqualTo("SubImage"));
 
         var mediaUpdateModel = new MediaUpdateModel
         {
@@ -160,8 +160,8 @@ internal sealed class MediaHybridCacheTests : UmbracoIntegrationTestWithMediaEdi
         var updatedMedia = await PublishedMediaHybridCache.GetByIdAsync(SubImageId);
 
         // Assert
-        Assert.IsNotNull(updatedMedia);
-        Assert.AreEqual(newName, updatedMedia.Name);
+        Assert.That(updatedMedia, Is.Not.Null);
+        Assert.That(updatedMedia.Name, Is.EqualTo(newName));
     }
 
     [Test]
@@ -169,15 +169,15 @@ internal sealed class MediaHybridCacheTests : UmbracoIntegrationTestWithMediaEdi
     {
         // Arrange
         var media = await PublishedMediaHybridCache.GetByIdAsync(SubImage.Key.Value);
-        Assert.IsNotNull(media, "Media should be in cache before trashing");
+        Assert.That(media, Is.Not.Null, "Media should be in cache before trashing");
 
         // Act
         var trashResult = await MediaEditingService.MoveToRecycleBinAsync(SubImage.Key.Value, Constants.Security.SuperUserKey);
-        Assert.IsTrue(trashResult.Success);
+        Assert.That(trashResult.Success, Is.True);
 
         // Assert
         var trashedMedia = await PublishedMediaHybridCache.GetByIdAsync(SubImage.Key.Value);
-        Assert.IsNull(trashedMedia, "Trashed media should not be in cache");
+        Assert.That(trashedMedia, Is.Null, "Trashed media should not be in cache");
     }
 
     [Test]
@@ -185,15 +185,15 @@ internal sealed class MediaHybridCacheTests : UmbracoIntegrationTestWithMediaEdi
     {
         // Arrange
         var media = await PublishedMediaHybridCache.GetByIdAsync(SubImageId);
-        Assert.IsNotNull(media, "Media should be in cache before trashing");
+        Assert.That(media, Is.Not.Null, "Media should be in cache before trashing");
 
         // Act
         var trashResult = await MediaEditingService.MoveToRecycleBinAsync(SubImage.Key.Value, Constants.Security.SuperUserKey);
-        Assert.IsTrue(trashResult.Success);
+        Assert.That(trashResult.Success, Is.True);
 
         // Assert
         var trashedMedia = await PublishedMediaHybridCache.GetByIdAsync(SubImageId);
-        Assert.IsNull(trashedMedia, "Trashed media should not be in cache");
+        Assert.That(trashedMedia, Is.Null, "Trashed media should not be in cache");
     }
 
     [Test]
@@ -201,21 +201,21 @@ internal sealed class MediaHybridCacheTests : UmbracoIntegrationTestWithMediaEdi
     {
         // Arrange - Verify media is in cache, then trash it
         var media = await PublishedMediaHybridCache.GetByIdAsync(SubImage.Key.Value);
-        Assert.IsNotNull(media, "Media should be in cache before trashing");
+        Assert.That(media, Is.Not.Null, "Media should be in cache before trashing");
 
         var trashResult = await MediaEditingService.MoveToRecycleBinAsync(SubImage.Key.Value, Constants.Security.SuperUserKey);
-        Assert.IsTrue(trashResult.Success);
+        Assert.That(trashResult.Success, Is.True);
 
         var trashedMedia = await PublishedMediaHybridCache.GetByIdAsync(SubImage.Key.Value);
-        Assert.IsNull(trashedMedia, "Trashed media should not be in cache");
+        Assert.That(trashedMedia, Is.Null, "Trashed media should not be in cache");
 
         // Act - Restore to root (original location)
         var restoreResult = await MediaEditingService.RestoreAsync(SubImage.Key.Value, null, Constants.Security.SuperUserKey);
-        Assert.IsTrue(restoreResult.Success);
+        Assert.That(restoreResult.Success, Is.True);
 
         // Assert - Restored media should be back in the cache
         var restoredMedia = await PublishedMediaHybridCache.GetByIdAsync(SubImage.Key.Value);
-        Assert.IsNotNull(restoredMedia, "Restored media should be in the cache");
+        Assert.That(restoredMedia, Is.Not.Null, "Restored media should be in the cache");
     }
 
     [Test]
@@ -223,7 +223,7 @@ internal sealed class MediaHybridCacheTests : UmbracoIntegrationTestWithMediaEdi
     {
         // Arrange
         var media = await PublishedMediaHybridCache.GetByIdAsync(SubImageId);
-        Assert.IsNotNull(media);
+        Assert.That(media, Is.Not.Null);
 
         await MediaEditingService.DeleteAsync(media.Key, Constants.Security.SuperUserKey);
 
@@ -231,7 +231,7 @@ internal sealed class MediaHybridCacheTests : UmbracoIntegrationTestWithMediaEdi
         var deletedMedia = await PublishedMediaHybridCache.GetByIdAsync(media.Id);
 
         // Assert
-        Assert.IsNull(deletedMedia);
+        Assert.That(deletedMedia, Is.Null);
     }
 
     [Test]
@@ -240,7 +240,7 @@ internal sealed class MediaHybridCacheTests : UmbracoIntegrationTestWithMediaEdi
         // Arrange
         var media = await PublishedMediaHybridCache.GetByIdAsync(SubImage.Key.Value);
 
-        Assert.IsNotNull(media);
+        Assert.That(media, Is.Not.Null);
 
         await MediaEditingService.DeleteAsync(media.Key, Constants.Security.SuperUserKey);
 
@@ -248,6 +248,6 @@ internal sealed class MediaHybridCacheTests : UmbracoIntegrationTestWithMediaEdi
         var deletedMedia = await PublishedMediaHybridCache.GetByIdAsync(media.Key);
 
         // Assert
-        Assert.IsNull(deletedMedia);
+        Assert.That(deletedMedia, Is.Null);
     }
 }

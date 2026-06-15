@@ -189,8 +189,8 @@ public class BackOfficeApplicationManagerTests
         // Assert
         Assert.That(capturedDescriptor, Is.Not.Null, "Descriptor should be captured");
         Assert.That(
-            capturedDescriptor!.RedirectUris.Count,
-            Is.EqualTo(3),
+            capturedDescriptor!.RedirectUris,
+Has.Count.EqualTo(3),
             "Should have 3 redirect URIs (2 existing valid + 1 new)");
 
         var redirectUriStrings = capturedDescriptor.RedirectUris.Select(u => u.ToString()).ToList();
@@ -235,8 +235,8 @@ public class BackOfficeApplicationManagerTests
         // Assert
         Assert.That(capturedDescriptor, Is.Not.Null);
         Assert.That(
-            capturedDescriptor!.RedirectUris.Count,
-            Is.EqualTo(1),
+            capturedDescriptor!.RedirectUris,
+Has.Count.EqualTo(1),
             "Should have only 1 redirect URI (deduplicated by authority)");
     }
 
@@ -283,8 +283,8 @@ public class BackOfficeApplicationManagerTests
         // Assert - should deduplicate by authority
         Assert.That(capturedDescriptor, Is.Not.Null);
         Assert.That(
-            capturedDescriptor!.RedirectUris.Count,
-            Is.EqualTo(1),
+            capturedDescriptor!.RedirectUris,
+Has.Count.EqualTo(1),
             "Should have only 1 redirect URI (deduplicated by authority, not full path)");
     }
 
@@ -363,8 +363,8 @@ public class BackOfficeApplicationManagerTests
         // Assert - all three hosts must be present: server1 (DB), server2 (middleware), configured-host (settings)
         Assert.That(capturedDescriptor, Is.Not.Null, "Descriptor should be captured");
         Assert.That(
-            capturedDescriptor!.RedirectUris.Count,
-            Is.EqualTo(3),
+            capturedDescriptor!.RedirectUris,
+Has.Count.EqualTo(3),
             "Should have 3 redirect URIs (server1 from DB + server2 from middleware + configured-host from settings)");
 
         var redirectUriStrings = capturedDescriptor.RedirectUris.Select(u => u.ToString()).ToList();
@@ -424,8 +424,8 @@ public class BackOfficeApplicationManagerTests
         // Assert - should have only 1 redirect URI (no duplication)
         Assert.That(capturedDescriptor, Is.Not.Null, "Descriptor should be captured");
         Assert.That(
-            capturedDescriptor!.RedirectUris.Count,
-            Is.EqualTo(1),
+            capturedDescriptor!.RedirectUris,
+Has.Count.EqualTo(1),
             "Should have only 1 redirect URI (no duplication when BackOfficeHost matches existing)");
 
         var redirectUriStrings = capturedDescriptor.RedirectUris.Select(u => u.ToString()).ToList();

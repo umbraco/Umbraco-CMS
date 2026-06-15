@@ -39,7 +39,7 @@ public class DefaultCachePolicyTests
             new DefaultRepositoryCachePolicy<AuditItem, object>(cache.Object, DefaultAccessor, new RepositoryCachePolicyOptions(), new SingleServerCacheVersionService(), Mock.Of<ICacheSyncService>());
 
         var unused = defaultPolicy.Get(1, id => new AuditItem(1, AuditType.Copy, 123, "test", "blah"), o => null);
-        Assert.IsTrue(isCached);
+        Assert.That(isCached, Is.True);
     }
 
     [Test]
@@ -52,7 +52,7 @@ public class DefaultCachePolicyTests
             new DefaultRepositoryCachePolicy<AuditItem, object>(cache.Object, DefaultAccessor, new RepositoryCachePolicyOptions(), new SingleServerCacheVersionService(), Mock.Of<ICacheSyncService>());
 
         var found = defaultPolicy.Get(1, id => null, ids => null);
-        Assert.IsNotNull(found);
+        Assert.That(found, Is.Not.Null);
     }
 
     [Test]
@@ -75,7 +75,7 @@ public class DefaultCachePolicyTests
                 new AuditItem(2, AuditType.Copy, 123, "test", "blah2"),
             });
 
-        Assert.AreEqual(2, cached.Count);
+        Assert.That(cached, Has.Count.EqualTo(2));
     }
 
     [Test]
@@ -92,7 +92,7 @@ public class DefaultCachePolicyTests
             new DefaultRepositoryCachePolicy<AuditItem, object>(cache.Object, DefaultAccessor, new RepositoryCachePolicyOptions(), new SingleServerCacheVersionService(), Mock.Of<ICacheSyncService>());
 
         var found = defaultPolicy.GetAll(new object[] { }, ids => new[] { (AuditItem)null });
-        Assert.AreEqual(2, found.Length);
+        Assert.That(found.Length, Is.EqualTo(2));
     }
 
     [Test]
@@ -115,7 +115,7 @@ public class DefaultCachePolicyTests
         }
         finally
         {
-            Assert.IsTrue(cacheCleared);
+            Assert.That(cacheCleared, Is.True);
         }
     }
 
@@ -139,7 +139,7 @@ public class DefaultCachePolicyTests
         }
         finally
         {
-            Assert.IsTrue(cacheCleared);
+            Assert.That(cacheCleared, Is.True);
         }
     }
 }

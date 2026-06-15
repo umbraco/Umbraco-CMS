@@ -58,13 +58,13 @@ public abstract class OutputExpansionStrategyTestBase : PropertyValueConverterTe
 
         var result = apiContentBuilder.Build(content.Object);
 
-        Assert.AreEqual(3, result.Properties.Count);
-        Assert.AreEqual("Delivery API value", result.Properties[DeliveryApiPropertyType.Alias]);
-        Assert.AreEqual("Default value", result.Properties[DefaultPropertyType.Alias]);
+        Assert.That(result.Properties, Has.Count.EqualTo(3));
+        Assert.That(result.Properties[DeliveryApiPropertyType.Alias], Is.EqualTo("Delivery API value"));
+        Assert.That(result.Properties[DefaultPropertyType.Alias], Is.EqualTo("Default value"));
         var contentPickerOutput = result.Properties["contentPicker"] as ApiContent;
-        Assert.IsNotNull(contentPickerOutput);
-        Assert.AreEqual(contentPickerContent.Key, contentPickerOutput.Id);
-        Assert.IsEmpty(contentPickerOutput.Properties);
+        Assert.That(contentPickerOutput, Is.Not.Null);
+        Assert.That(contentPickerOutput.Id, Is.EqualTo(contentPickerContent.Key));
+        Assert.That(contentPickerOutput.Properties, Is.Empty);
     }
 
     [Test]
@@ -84,19 +84,19 @@ public abstract class OutputExpansionStrategyTestBase : PropertyValueConverterTe
 
         var result = apiContentBuilder.Build(content.Object);
 
-        Assert.AreEqual(2, result.Properties.Count);
+        Assert.That(result.Properties, Has.Count.EqualTo(2));
 
         var contentPickerOneOutput = result.Properties["contentPickerOne"] as ApiContent;
-        Assert.IsNotNull(contentPickerOneOutput);
-        Assert.AreEqual(contentPickerOneContent.Key, contentPickerOneOutput.Id);
-        Assert.IsEmpty(contentPickerOneOutput.Properties);
+        Assert.That(contentPickerOneOutput, Is.Not.Null);
+        Assert.That(contentPickerOneOutput.Id, Is.EqualTo(contentPickerOneContent.Key));
+        Assert.That(contentPickerOneOutput.Properties, Is.Empty);
 
         var contentPickerTwoOutput = result.Properties["contentPickerTwo"] as ApiContent;
-        Assert.IsNotNull(contentPickerTwoOutput);
-        Assert.AreEqual(contentPickerTwoContent.Key, contentPickerTwoOutput.Id);
-        Assert.AreEqual(2, contentPickerTwoOutput.Properties.Count);
-        Assert.AreEqual(56, contentPickerTwoOutput.Properties["numberOne"]);
-        Assert.AreEqual(78, contentPickerTwoOutput.Properties["numberTwo"]);
+        Assert.That(contentPickerTwoOutput, Is.Not.Null);
+        Assert.That(contentPickerTwoOutput.Id, Is.EqualTo(contentPickerTwoContent.Key));
+        Assert.That(contentPickerTwoOutput.Properties, Has.Count.EqualTo(2));
+        Assert.That(contentPickerTwoOutput.Properties["numberOne"], Is.EqualTo(56));
+        Assert.That(contentPickerTwoOutput.Properties["numberTwo"], Is.EqualTo(78));
     }
 
     [TestCase(false)]
@@ -125,19 +125,19 @@ public abstract class OutputExpansionStrategyTestBase : PropertyValueConverterTe
 
         var result = apiMediaBuilder.Build(media.Object);
 
-        Assert.AreEqual(2, result.Properties.Count);
+        Assert.That(result.Properties, Has.Count.EqualTo(2));
 
         var mediaPickerOneOutput = (result.Properties["mediaPickerOne"] as IEnumerable<IApiMedia>)?.FirstOrDefault();
-        Assert.IsNotNull(mediaPickerOneOutput);
-        Assert.AreEqual(mediaPickerOneContent.Key, mediaPickerOneOutput.Id);
-        Assert.IsEmpty(mediaPickerOneOutput.Properties);
+        Assert.That(mediaPickerOneOutput, Is.Not.Null);
+        Assert.That(mediaPickerOneOutput.Id, Is.EqualTo(mediaPickerOneContent.Key));
+        Assert.That(mediaPickerOneOutput.Properties, Is.Empty);
 
         var mediaPickerTwoOutput = (result.Properties["mediaPickerTwo"] as IEnumerable<IApiMedia>)?.FirstOrDefault();
-        Assert.IsNotNull(mediaPickerTwoOutput);
-        Assert.AreEqual(mediaPickerTwoContent.Key, mediaPickerTwoOutput.Id);
-        Assert.AreEqual(2, mediaPickerTwoOutput.Properties.Count);
-        Assert.AreEqual(56, mediaPickerTwoOutput.Properties["numberOne"]);
-        Assert.AreEqual(78, mediaPickerTwoOutput.Properties["numberTwo"]);
+        Assert.That(mediaPickerTwoOutput, Is.Not.Null);
+        Assert.That(mediaPickerTwoOutput.Id, Is.EqualTo(mediaPickerTwoContent.Key));
+        Assert.That(mediaPickerTwoOutput.Properties, Has.Count.EqualTo(2));
+        Assert.That(mediaPickerTwoOutput.Properties["numberOne"], Is.EqualTo(56));
+        Assert.That(mediaPickerTwoOutput.Properties["numberTwo"], Is.EqualTo(78));
     }
 
     [Test]
@@ -157,21 +157,21 @@ public abstract class OutputExpansionStrategyTestBase : PropertyValueConverterTe
 
         var result = apiContentBuilder.Build(content.Object);
 
-        Assert.AreEqual(2, result.Properties.Count);
+        Assert.That(result.Properties, Has.Count.EqualTo(2));
 
         var contentPickerOneOutput = result.Properties["contentPickerOne"] as ApiContent;
-        Assert.IsNotNull(contentPickerOneOutput);
-        Assert.AreEqual(contentPickerOneContent.Key, contentPickerOneOutput.Id);
-        Assert.AreEqual(2, contentPickerOneOutput.Properties.Count);
-        Assert.AreEqual(12, contentPickerOneOutput.Properties["numberOne"]);
-        Assert.AreEqual(34, contentPickerOneOutput.Properties["numberTwo"]);
+        Assert.That(contentPickerOneOutput, Is.Not.Null);
+        Assert.That(contentPickerOneOutput.Id, Is.EqualTo(contentPickerOneContent.Key));
+        Assert.That(contentPickerOneOutput.Properties, Has.Count.EqualTo(2));
+        Assert.That(contentPickerOneOutput.Properties["numberOne"], Is.EqualTo(12));
+        Assert.That(contentPickerOneOutput.Properties["numberTwo"], Is.EqualTo(34));
 
         var contentPickerTwoOutput = result.Properties["contentPickerTwo"] as ApiContent;
-        Assert.IsNotNull(contentPickerTwoOutput);
-        Assert.AreEqual(contentPickerTwoContent.Key, contentPickerTwoOutput.Id);
-        Assert.AreEqual(2, contentPickerTwoOutput.Properties.Count);
-        Assert.AreEqual(56, contentPickerTwoOutput.Properties["numberOne"]);
-        Assert.AreEqual(78, contentPickerTwoOutput.Properties["numberTwo"]);
+        Assert.That(contentPickerTwoOutput, Is.Not.Null);
+        Assert.That(contentPickerTwoOutput.Id, Is.EqualTo(contentPickerTwoContent.Key));
+        Assert.That(contentPickerTwoOutput.Properties, Has.Count.EqualTo(2));
+        Assert.That(contentPickerTwoOutput.Properties["numberOne"], Is.EqualTo(56));
+        Assert.That(contentPickerTwoOutput.Properties["numberTwo"], Is.EqualTo(78));
     }
 
     [TestCase("contentPicker", "contentPicker")]
@@ -191,18 +191,18 @@ public abstract class OutputExpansionStrategyTestBase : PropertyValueConverterTe
 
         var result = apiContentBuilder.Build(content.Object);
 
-        Assert.AreEqual(1, result.Properties.Count);
+        Assert.That(result.Properties, Has.Count.EqualTo(1));
 
         var contentPickerOneOutput = result.Properties[rootPropertyTypeAlias] as ApiContent;
-        Assert.IsNotNull(contentPickerOneOutput);
-        Assert.AreEqual(contentPickerContent.Key, contentPickerOneOutput.Id);
-        Assert.AreEqual(2, contentPickerOneOutput.Properties.Count);
-        Assert.AreEqual(123, contentPickerOneOutput.Properties["number"]);
+        Assert.That(contentPickerOneOutput, Is.Not.Null);
+        Assert.That(contentPickerOneOutput.Id, Is.EqualTo(contentPickerContent.Key));
+        Assert.That(contentPickerOneOutput.Properties, Has.Count.EqualTo(2));
+        Assert.That(contentPickerOneOutput.Properties["number"], Is.EqualTo(123));
 
         var nestedContentPickerOutput = contentPickerOneOutput.Properties[nestedPropertyTypeAlias] as ApiContent;
-        Assert.IsNotNull(nestedContentPickerOutput);
-        Assert.AreEqual(nestedContentPickerContent.Key, nestedContentPickerOutput.Id);
-        Assert.IsEmpty(nestedContentPickerOutput.Properties);
+        Assert.That(nestedContentPickerOutput, Is.Not.Null);
+        Assert.That(nestedContentPickerOutput.Id, Is.EqualTo(nestedContentPickerContent.Key));
+        Assert.That(nestedContentPickerOutput.Properties, Is.Empty);
     }
 
     [Test]
@@ -224,8 +224,8 @@ public abstract class OutputExpansionStrategyTestBase : PropertyValueConverterTe
 
         var result = apiContentBuilder.Build(content.Object);
 
-        Assert.AreEqual(3, result.Properties.Count);
-        Assert.AreEqual(444, result.Properties["number"]);
+        Assert.That(result.Properties, Has.Count.EqualTo(3));
+        Assert.That(result.Properties["number"], Is.EqualTo(444));
 
         var expectedElementOutputs = new[]
         {
@@ -246,13 +246,13 @@ public abstract class OutputExpansionStrategyTestBase : PropertyValueConverterTe
         foreach (var expectedElementOutput in expectedElementOutputs)
         {
             var elementOutput = result.Properties[expectedElementOutput.PropertyAlias] as IApiElement;
-            Assert.IsNotNull(elementOutput);
-            Assert.AreEqual(2, elementOutput.Properties.Count);
-            Assert.AreEqual(expectedElementOutput.ElementNumber, elementOutput.Properties["number"]);
+            Assert.That(elementOutput, Is.Not.Null);
+            Assert.That(elementOutput.Properties, Has.Count.EqualTo(2));
+            Assert.That(elementOutput.Properties["number"], Is.EqualTo(expectedElementOutput.ElementNumber));
             var contentPickerOutput = elementOutput.Properties["contentPicker"] as IApiContent;
-            Assert.IsNotNull(contentPickerOutput);
-            Assert.AreEqual(expectedElementOutput.ElementContentPicker, contentPickerOutput.Id);
-            Assert.AreEqual(0, contentPickerOutput.Properties.Count);
+            Assert.That(contentPickerOutput, Is.Not.Null);
+            Assert.That(contentPickerOutput.Id, Is.EqualTo(expectedElementOutput.ElementContentPicker));
+            Assert.That(contentPickerOutput.Properties.Count, Is.EqualTo(0));
         }
     }
 
@@ -312,8 +312,8 @@ public abstract class OutputExpansionStrategyTestBase : PropertyValueConverterTe
 
         var result = apiContentBuilder.Build(content.Object);
 
-        Assert.AreEqual(1, result.Properties.Count);
-        Assert.AreEqual(expanding ? "Expanding" : "Not expanding", result.Properties["theAlias"] as string);
+        Assert.That(result.Properties, Has.Count.EqualTo(1));
+        Assert.That(result.Properties["theAlias"] as string, Is.EqualTo(expanding ? "Expanding" : "Not expanding"));
     }
 
     protected abstract IOutputExpansionStrategyAccessor CreateOutputExpansionStrategyAccessor(string? expand = null, string? fields = null);

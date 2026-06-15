@@ -20,7 +20,7 @@ public class ContentSettingsExtensionsTests
             AllowedUploadedFileExtensions = new[] { "jpg", "png" }.ToHashSet(),
         };
 
-        Assert.IsTrue(contentSettings.IsFileAllowedForUpload(extension));
+        Assert.That(contentSettings.IsFileAllowedForUpload(extension), Is.True);
     }
 
     [TestCase("gif")]
@@ -33,7 +33,7 @@ public class ContentSettingsExtensionsTests
             AllowedUploadedFileExtensions = new[] { "jpg", "png" }.ToHashSet(),
         };
 
-        Assert.IsFalse(contentSettings.IsFileAllowedForUpload(extension));
+        Assert.That(contentSettings.IsFileAllowedForUpload(extension), Is.False);
     }
 
     [TestCase("jpg")]
@@ -46,7 +46,7 @@ public class ContentSettingsExtensionsTests
             DisallowedUploadedFileExtensions = new[] { "gif", "png" }.ToHashSet(),
         };
 
-        Assert.IsTrue(contentSettings.IsFileAllowedForUpload(extension));
+        Assert.That(contentSettings.IsFileAllowedForUpload(extension), Is.True);
     }
 
     [TestCase("gif")]
@@ -59,7 +59,7 @@ public class ContentSettingsExtensionsTests
             DisallowedUploadedFileExtensions = new[] { "gif", "png" }.ToHashSet(),
         };
 
-        Assert.IsFalse(contentSettings.IsFileAllowedForUpload(extension));
+        Assert.That(contentSettings.IsFileAllowedForUpload(extension), Is.False);
     }
 
     [Test]
@@ -71,6 +71,6 @@ public class ContentSettingsExtensionsTests
             DisallowedUploadedFileExtensions = new[] { "jpg", }.ToHashSet(),
         };
 
-        Assert.IsTrue(contentSettings.IsFileAllowedForUpload("jpg"));
+        Assert.That(contentSettings.IsFileAllowedForUpload("jpg"), Is.True);
     }
 }

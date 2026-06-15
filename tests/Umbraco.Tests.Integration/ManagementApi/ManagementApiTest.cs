@@ -166,7 +166,7 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
                     NewPassword = password, ResetPasswordToken = token.Result.ToUrlBase64(), UserKey = userKey,
                 });
 
-            Assert.IsTrue(changePasswordAttempt.Success);
+            Assert.That(changePasswordAttempt.Success, Is.True);
 
             var backOfficeApplicationManager =
                 serviceScope.ServiceProvider.GetRequiredService<IBackOfficeApplicationManager>() as
@@ -182,7 +182,7 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
         var loginResponse = await client.PostAsync(
             GetManagementApiUrl<BackOfficeController>(x => x.Login(CancellationToken.None, null)), JsonContent.Create(loginModel));
 
-        Assert.AreEqual(HttpStatusCode.OK, loginResponse.StatusCode, await loginResponse.Content.ReadAsStringAsync());
+        Assert.That(loginResponse.StatusCode, Is.EqualTo(HttpStatusCode.OK), await loginResponse.Content.ReadAsStringAsync());
 
         const string codeVerifier = "12345"; // Just a dummy value we use in tests
         var codeChallenge = Convert.ToBase64String(_sha256.ComputeHash(Encoding.UTF8.GetBytes(codeVerifier)))
@@ -191,7 +191,7 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
         var authorizationUrl = GetManagementApiUrl<BackOfficeController>(x => x.Authorize(CancellationToken.None)) + $"?client_id={backofficeOpenIddictApplicationDescriptor.ClientId}&response_type=code&redirect_uri={WebUtility.UrlEncode(backofficeOpenIddictApplicationDescriptor.RedirectUris.FirstOrDefault()?.AbsoluteUri)}&code_challenge_method=S256&code_challenge={codeChallenge}";
         var authorizeResponse = await client.GetAsync(authorizationUrl);
 
-        Assert.AreEqual(HttpStatusCode.Found, authorizeResponse.StatusCode, await authorizeResponse.Content.ReadAsStringAsync());
+        Assert.That(authorizeResponse.StatusCode, Is.EqualTo(HttpStatusCode.Found), await authorizeResponse.Content.ReadAsStringAsync());
 
         var tokenResponse = await client.PostAsync("/umbraco/management/api/v1/security/back-office/token",
             new FormUrlEncodedContent(new Dictionary<string, string>

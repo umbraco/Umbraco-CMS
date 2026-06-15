@@ -14,7 +14,7 @@ internal sealed partial class MediaNavigationServiceTests
         await MediaEditingService.MoveToRecycleBinAsync(nodeInRecycleBin, Constants.Security.SuperUserKey);
         MediaNavigationQueryService.TryGetSiblingsKeysInBin(nodeInRecycleBin, out IEnumerable<Guid> initialSiblingsKeys);
         var beforeMoveRecycleBinSiblingsCount = initialSiblingsKeys.Count();
-        Assert.AreEqual(beforeMoveRecycleBinSiblingsCount, 0);
+        Assert.That(beforeMoveRecycleBinSiblingsCount, Is.EqualTo(0));
         MediaNavigationQueryService.TryGetParentKey(nodeToMoveToRecycleBin, out Guid? originalParentKey);
         MediaNavigationQueryService.TryGetDescendantsKeys(nodeToMoveToRecycleBin, out IEnumerable<Guid> initialDescendantsKeys);
         var beforeMoveDescendants = initialDescendantsKeys.ToList();
@@ -36,13 +36,13 @@ internal sealed partial class MediaNavigationServiceTests
 
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(nodeExists);
-            Assert.IsTrue(nodeExistsInRecycleBin);
-            Assert.AreNotEqual(originalParentKey, updatedParentKeyInRecycleBin);
-            Assert.IsNull(updatedParentKeyInRecycleBin); // Verify the node's parent is now located at the root of the recycle bin (null)
-            Assert.AreEqual(beforeMoveDescendants, afterMoveDescendants);
-            Assert.AreEqual(beforeMoveParentSiblingsCount - 1, afterMoveParentSiblingsCount);
-            Assert.AreEqual(beforeMoveRecycleBinSiblingsCount + 1, afterMoveRecycleBinSiblingsCount);
+            Assert.That(nodeExists, Is.False);
+            Assert.That(nodeExistsInRecycleBin, Is.True);
+            Assert.That(updatedParentKeyInRecycleBin, Is.Not.EqualTo(originalParentKey));
+            Assert.That(updatedParentKeyInRecycleBin, Is.Null); // Verify the node's parent is now located at the root of the recycle bin (null)
+            Assert.That(afterMoveDescendants, Is.EqualTo(beforeMoveDescendants));
+            Assert.That(afterMoveParentSiblingsCount, Is.EqualTo(beforeMoveParentSiblingsCount - 1));
+            Assert.That(afterMoveRecycleBinSiblingsCount, Is.EqualTo(beforeMoveRecycleBinSiblingsCount + 1));
         });
     }
 
@@ -63,8 +63,8 @@ internal sealed partial class MediaNavigationServiceTests
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(1, siblingsKeysAfterDeletionList.Count);
-            Assert.AreEqual(SubAlbum1.Key, siblingsKeysAfterDeletionList[0]);
+            Assert.That(siblingsKeysAfterDeletionList, Has.Count.EqualTo(1));
+            Assert.That(siblingsKeysAfterDeletionList[0], Is.EqualTo(SubAlbum1.Key));
         });
 
         // Create a new sibling under the same parent
@@ -78,9 +78,9 @@ internal sealed partial class MediaNavigationServiceTests
         // Verify sibling order after creating the new media
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(2, siblingsKeysAfterCreationList.Count);
-            Assert.AreEqual(SubAlbum1.Key, siblingsKeysAfterDeletionList[0]);
-            Assert.AreEqual(key, siblingsKeysAfterCreationList[1]);
+            Assert.That(siblingsKeysAfterCreationList, Has.Count.EqualTo(2));
+            Assert.That(siblingsKeysAfterDeletionList[0], Is.EqualTo(SubAlbum1.Key));
+            Assert.That(siblingsKeysAfterCreationList[1], Is.EqualTo(key));
         });
     }
 
@@ -108,11 +108,11 @@ internal sealed partial class MediaNavigationServiceTests
         // Verify children order in the bin
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(3, childrenKeysAfterDeletionList.Count);
-            Assert.AreEqual(Image2.Key, childrenKeysAfterDeletionList[0]);
-            Assert.AreEqual(Image3.Key, childrenKeysAfterDeletionList[1]);
-            Assert.AreEqual(key, childrenKeysAfterDeletionList[2]);
-            Assert.IsTrue(childrenKeysBeforeDeletionList.SequenceEqual(childrenKeysAfterDeletionList));
+            Assert.That(childrenKeysAfterDeletionList, Has.Count.EqualTo(3));
+            Assert.That(childrenKeysAfterDeletionList[0], Is.EqualTo(Image2.Key));
+            Assert.That(childrenKeysAfterDeletionList[1], Is.EqualTo(Image3.Key));
+            Assert.That(childrenKeysAfterDeletionList[2], Is.EqualTo(key));
+            Assert.That(childrenKeysBeforeDeletionList.SequenceEqual(childrenKeysAfterDeletionList), Is.True);
         });
     }
 }

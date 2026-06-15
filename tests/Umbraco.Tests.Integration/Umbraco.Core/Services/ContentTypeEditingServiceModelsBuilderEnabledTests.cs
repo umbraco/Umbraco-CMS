@@ -27,8 +27,8 @@ internal sealed class ContentTypeEditingServiceModelsBuilderEnabledTests : Conte
         var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(result.Success);
-            Assert.AreEqual(ContentTypeOperationStatus.InvalidPropertyTypeAlias, result.Status);
+            Assert.That(result.Success, Is.False);
+            Assert.That(result.Status, Is.EqualTo(ContentTypeOperationStatus.InvalidPropertyTypeAlias));
         });
     }
 }

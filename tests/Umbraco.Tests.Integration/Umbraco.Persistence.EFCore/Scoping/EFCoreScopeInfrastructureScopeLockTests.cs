@@ -44,7 +44,7 @@ internal sealed class EFCoreScopeInfrastructureScopeLockTests : UmbracoIntegrati
         {
             childScope.Locks.WriteLock(childScope.InstanceId, Constants.Locks.Servers);
             string n = childScope.Database.ExecuteScalar<string>("SELECT name FROM tmp3 WHERE id=1");
-            Assert.AreEqual("a", n);
+            Assert.That(n, Is.EqualTo("a"));
             childScope.Complete();
         }
 
@@ -66,7 +66,7 @@ internal sealed class EFCoreScopeInfrastructureScopeLockTests : UmbracoIntegrati
         {
             childScope.Locks.EagerWriteLock(childScope.InstanceId, Constants.Locks.Servers);
             string n = childScope.Database.ExecuteScalar<string>("SELECT name FROM tmp3 WHERE id=1");
-            Assert.AreEqual("a", n);
+            Assert.That(n, Is.EqualTo("a"));
             childScope.Complete();
         }
 
@@ -87,12 +87,12 @@ internal sealed class EFCoreScopeInfrastructureScopeLockTests : UmbracoIntegrati
             }
 
             // Assert notifications arent send on completion of scope
-            Assert.AreEqual(currentAssertCount, TestContext.CurrentContext.AssertCount);
+            Assert.That(TestContext.CurrentContext.AssertCount, Is.EqualTo(currentAssertCount));
 
             scope.Complete();
         }
 
-        Assert.AreEqual(currentAssertCount + 2, TestContext.CurrentContext.AssertCount);
+        Assert.That(TestContext.CurrentContext.AssertCount, Is.EqualTo(currentAssertCount + 2));
     }
 
     [Test]
@@ -109,12 +109,12 @@ internal sealed class EFCoreScopeInfrastructureScopeLockTests : UmbracoIntegrati
             }
 
             // Assert notifications arent send on completion of scope
-            Assert.AreEqual(currentAssertCount, TestContext.CurrentContext.AssertCount);
+            Assert.That(TestContext.CurrentContext.AssertCount, Is.EqualTo(currentAssertCount));
 
             scope.Complete();
         }
 
-        Assert.AreEqual(currentAssertCount + 2, TestContext.CurrentContext.AssertCount);
+        Assert.That(TestContext.CurrentContext.AssertCount, Is.EqualTo(currentAssertCount + 2));
     }
 
     private class TestSendNotification : INotification
@@ -128,7 +128,7 @@ internal sealed class EFCoreScopeInfrastructureScopeLockTests : UmbracoIntegrati
     private class TestSendNotificationHandler : INotificationHandler<TestSendNotification>
     {
         public void Handle(TestSendNotification notification)
-            => Assert.IsNotNull(notification);
+            => Assert.That(notification, Is.Not.Null);
     }
 
     private class TestDoNotSendNotificationHandler : INotificationHandler<TestDoNotSendNotification>

@@ -16,7 +16,7 @@ public class RequestHandlerSettingsValidatorTests
         var validator = new RequestHandlerSettingsValidator();
         var options = new RequestHandlerSettings();
         var result = validator.Validate("settings", options);
-        Assert.True(result.Succeeded);
+        Assert.That(result.Succeeded, Is.True);
     }
 
     [Test]
@@ -25,6 +25,6 @@ public class RequestHandlerSettingsValidatorTests
         var validator = new RequestHandlerSettingsValidator();
         var options = new RequestHandlerSettings { ConvertUrlsToAscii = "invalid" };
         var result = validator.Validate("settings", options);
-        Assert.False(result.Succeeded);
+        Assert.That(result.Succeeded, Is.False);
     }
 }

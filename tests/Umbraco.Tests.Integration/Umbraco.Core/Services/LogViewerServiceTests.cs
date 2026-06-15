@@ -60,8 +60,8 @@ internal sealed class LogViewerServiceTests : UmbracoIntegrationTest
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(attempt.Success);
-            Assert.AreEqual(attempt.Status, LogViewerOperationStatus.Success);
+            Assert.That(attempt.Success, Is.True);
+            Assert.That(attempt.Status, Is.EqualTo(LogViewerOperationStatus.Success));
         });
     }
 
@@ -72,11 +72,11 @@ internal sealed class LogViewerServiceTests : UmbracoIntegrationTest
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(attempt.Success);
-            Assert.AreEqual(attempt.Status, LogViewerOperationStatus.Success);
-            Assert.IsNotNull(attempt.Result);
-            Assert.IsNotEmpty(attempt.Result.Items);
-            Assert.AreEqual(362, attempt.Result.Total);
+            Assert.That(attempt.Success, Is.True);
+            Assert.That(attempt.Status, Is.EqualTo(LogViewerOperationStatus.Success));
+            Assert.That(attempt.Result, Is.Not.Null);
+            Assert.That(attempt.Result.Items, Is.Not.Empty);
+            Assert.That(attempt.Result.Total, Is.EqualTo(362));
         });
     }
 
@@ -92,11 +92,11 @@ internal sealed class LogViewerServiceTests : UmbracoIntegrationTest
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(attempt.Success);
-            Assert.AreEqual(LogViewerOperationStatus.Success, attempt.Status);
-            Assert.IsNotNull(attempt.Result);
-            Assert.IsNotEmpty(attempt.Result.Items);
-            Assert.AreEqual(6, attempt.Result.Total);
+            Assert.That(attempt.Success, Is.True);
+            Assert.That(attempt.Status, Is.EqualTo(LogViewerOperationStatus.Success));
+            Assert.That(attempt.Result, Is.Not.Null);
+            Assert.That(attempt.Result.Items, Is.Not.Empty);
+            Assert.That(attempt.Result.Total, Is.EqualTo(6));
         });
     }
 
@@ -108,11 +108,11 @@ internal sealed class LogViewerServiceTests : UmbracoIntegrationTest
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(attempt.Success);
-            Assert.AreEqual(LogViewerOperationStatus.Success, attempt.Status);
-            Assert.IsNotNull(attempt.Result);
-            Assert.IsNotEmpty(attempt.Result.Items);
-            Assert.AreEqual(6, attempt.Result.Total);
+            Assert.That(attempt.Success, Is.True);
+            Assert.That(attempt.Status, Is.EqualTo(LogViewerOperationStatus.Success));
+            Assert.That(attempt.Result, Is.Not.Null);
+            Assert.That(attempt.Result.Items, Is.Not.Empty);
+            Assert.That(attempt.Result.Total, Is.EqualTo(6));
         });
     }
 
@@ -123,14 +123,14 @@ internal sealed class LogViewerServiceTests : UmbracoIntegrationTest
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(attempt.Success);
-            Assert.AreEqual(attempt.Status, LogViewerOperationStatus.Success);
-            Assert.IsNotNull(attempt.Result);
-            Assert.AreEqual(341, attempt.Result.Information);
-            Assert.AreEqual(0, attempt.Result.Debug);
-            Assert.AreEqual(9, attempt.Result.Warning);
-            Assert.AreEqual(6, attempt.Result.Error);
-            Assert.AreEqual(6, attempt.Result.Fatal);
+            Assert.That(attempt.Success, Is.True);
+            Assert.That(attempt.Status, Is.EqualTo(LogViewerOperationStatus.Success));
+            Assert.That(attempt.Result, Is.Not.Null);
+            Assert.That(attempt.Result.Information, Is.EqualTo(341));
+            Assert.That(attempt.Result.Debug, Is.EqualTo(0));
+            Assert.That(attempt.Result.Warning, Is.EqualTo(9));
+            Assert.That(attempt.Result.Error, Is.EqualTo(6));
+            Assert.That(attempt.Result.Fatal, Is.EqualTo(6));
         });
     }
 
@@ -141,17 +141,17 @@ internal sealed class LogViewerServiceTests : UmbracoIntegrationTest
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(attempt.Success);
-            Assert.AreEqual(attempt.Status, LogViewerOperationStatus.Success);
-            Assert.IsNotNull(attempt.Result);
-            Assert.IsNotEmpty(attempt.Result.Items);
-            Assert.AreEqual(31, attempt.Result.Total);
+            Assert.That(attempt.Success, Is.True);
+            Assert.That(attempt.Status, Is.EqualTo(LogViewerOperationStatus.Success));
+            Assert.That(attempt.Result, Is.Not.Null);
+            Assert.That(attempt.Result.Items, Is.Not.Empty);
+            Assert.That(attempt.Result.Total, Is.EqualTo(31));
 
             // Assert its sorted correctly
             var mostPopularTemplate = attempt.Result.Items.First();
-            Assert.AreEqual("Create Index:\n {Sql}", mostPopularTemplate.MessageTemplate);
-            Assert.AreEqual(74, mostPopularTemplate.Count);
-            Assert.AreEqual(attempt.Result.Items, attempt.Result.Items.OrderByDescending(x => x.Count));
+            Assert.That(mostPopularTemplate.MessageTemplate, Is.EqualTo("Create Index:\n {Sql}"));
+            Assert.That(mostPopularTemplate.Count, Is.EqualTo(74));
+            Assert.That(attempt.Result.Items.OrderByDescending(x => x.Count), Is.EqualTo(attempt.Result.Items));
         });
     }
 
@@ -164,11 +164,11 @@ internal sealed class LogViewerServiceTests : UmbracoIntegrationTest
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(attempt.Success);
-            Assert.AreEqual(attempt.Status, LogViewerOperationStatus.Success);
-            Assert.IsNotNull(attempt.Result);
-            Assert.AreEqual(queryName, attempt.Result.Name);
-            Assert.AreEqual(query, attempt.Result.Query);
+            Assert.That(attempt.Success, Is.True);
+            Assert.That(attempt.Status, Is.EqualTo(LogViewerOperationStatus.Success));
+            Assert.That(attempt.Result, Is.Not.Null);
+            Assert.That(attempt.Result.Name, Is.EqualTo(queryName));
+            Assert.That(attempt.Result.Query, Is.EqualTo(query));
         });
     }
 
@@ -181,14 +181,14 @@ internal sealed class LogViewerServiceTests : UmbracoIntegrationTest
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(savedAttempt.Success);
-            Assert.AreEqual(savedAttempt.Status, LogViewerOperationStatus.Success);
-            Assert.IsNotNull(savedAttempt.Result);
+            Assert.That(savedAttempt.Success, Is.True);
+            Assert.That(savedAttempt.Status, Is.EqualTo(LogViewerOperationStatus.Success));
+            Assert.That(savedAttempt.Result, Is.Not.Null);
         });
 
         var getAttempt = await LogViewerService.GetSavedLogQueryByNameAsync(queryName);
 
-        Assert.AreEqual(getAttempt, savedAttempt.Result);
+        Assert.That(savedAttempt.Result, Is.EqualTo(getAttempt));
     }
 
     [Test]
@@ -200,18 +200,18 @@ internal sealed class LogViewerServiceTests : UmbracoIntegrationTest
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(savedAttempt.Success);
-            Assert.AreEqual(savedAttempt.Status, LogViewerOperationStatus.Success);
-            Assert.IsNotNull(savedAttempt.Result);
+            Assert.That(savedAttempt.Success, Is.True);
+            Assert.That(savedAttempt.Status, Is.EqualTo(LogViewerOperationStatus.Success));
+            Assert.That(savedAttempt.Result, Is.Not.Null);
         });
 
         var deleteAttempt = await LogViewerService.DeleteSavedLogQueryAsync(queryName);
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(deleteAttempt.Success);
-            Assert.AreEqual(deleteAttempt.Status, LogViewerOperationStatus.Success);
-            Assert.AreEqual(savedAttempt.Result, deleteAttempt.Result);
+            Assert.That(deleteAttempt.Success, Is.True);
+            Assert.That(deleteAttempt.Status, Is.EqualTo(LogViewerOperationStatus.Success));
+            Assert.That(deleteAttempt.Result, Is.EqualTo(savedAttempt.Result));
         });
     }
 }

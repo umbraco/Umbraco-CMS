@@ -23,12 +23,12 @@ public partial class ElementContainerServiceTests
             await ElementContainerService.MoveToRecycleBinAsync(key, Constants.Security.SuperUserKey);
         }
 
-        Assert.AreEqual(5, EntityService.GetDescendants(Constants.System.RecycleBinElement).Count());
+        Assert.That(EntityService.GetDescendants(Constants.System.RecycleBinElement).Count(), Is.EqualTo(5));
 
         var emptyResult = await ElementContainerService.EmptyRecycleBinAsync(Constants.Security.SuperUserKey);
 
-        Assert.IsTrue(emptyResult);
-        Assert.AreEqual(0, EntityService.GetDescendants(Constants.System.RecycleBinElement).Count());
+        Assert.That((bool)emptyResult, Is.True);
+        Assert.That(EntityService.GetDescendants(Constants.System.RecycleBinElement).Count(), Is.EqualTo(0));
     }
 
     [Test]
@@ -37,12 +37,12 @@ public partial class ElementContainerServiceTests
     {
         var setup = await CreateContainerWithDescendantContainersAndLotsOfElements(false);
         await ElementContainerService.MoveToRecycleBinAsync(setup.RootContainerKey, Constants.Security.SuperUserKey);
-        Assert.AreNotEqual(0, EntityService.GetDescendants(Constants.System.RecycleBinElement).Count());
+        Assert.That(EntityService.GetDescendants(Constants.System.RecycleBinElement).Count(), Is.Not.EqualTo(0));
 
         var emptyResult = await ElementContainerService.EmptyRecycleBinAsync(Constants.Security.SuperUserKey);
 
-        Assert.IsTrue(emptyResult);
-        Assert.AreEqual(0, EntityService.GetDescendants(Constants.System.RecycleBinElement).Count());
+        Assert.That((bool)emptyResult, Is.True);
+        Assert.That(EntityService.GetDescendants(Constants.System.RecycleBinElement).Count(), Is.EqualTo(0));
     }
 
     [Test]
@@ -64,29 +64,29 @@ public partial class ElementContainerServiceTests
             }
         }
 
-        Assert.AreEqual(1, EntityService.GetRootEntities(UmbracoObjectTypes.Element).Count());
+        Assert.That(EntityService.GetRootEntities(UmbracoObjectTypes.Element).Count(), Is.EqualTo(1));
         var rootEntities = EntityService.GetRootEntities(UmbracoObjectTypes.ElementContainer).ToArray();
-        Assert.AreEqual(2, rootEntities.Length);
+        Assert.That(rootEntities, Has.Length.EqualTo(2));
         foreach (var rootEntity in rootEntities)
         {
-            Assert.AreEqual(1, GetFolderChildren(rootEntity.Key).Length);
+            Assert.That(GetFolderChildren(rootEntity.Key), Has.Length.EqualTo(1));
         }
 
         // trashed root element + three trashed folders, each containing a single element
-        Assert.AreEqual(7, EntityService.GetDescendants(Constants.System.RecycleBinElement).Count());
+        Assert.That(EntityService.GetDescendants(Constants.System.RecycleBinElement).Count(), Is.EqualTo(7));
 
         var emptyResult = await ElementContainerService.EmptyRecycleBinAsync(Constants.Security.SuperUserKey);
-        Assert.IsTrue(emptyResult);
+        Assert.That((bool)emptyResult, Is.True);
 
-        Assert.AreEqual(1, EntityService.GetRootEntities(UmbracoObjectTypes.Element).Count());
+        Assert.That(EntityService.GetRootEntities(UmbracoObjectTypes.Element).Count(), Is.EqualTo(1));
         rootEntities = EntityService.GetRootEntities(UmbracoObjectTypes.ElementContainer).ToArray();
-        Assert.AreEqual(2, rootEntities.Length);
+        Assert.That(rootEntities, Has.Length.EqualTo(2));
         foreach (var rootEntity in rootEntities)
         {
-            Assert.AreEqual(1, GetFolderChildren(rootEntity.Key).Length);
+            Assert.That(GetFolderChildren(rootEntity.Key), Has.Length.EqualTo(1));
         }
 
-        Assert.AreEqual(0, EntityService.GetDescendants(Constants.System.RecycleBinElement).Count());
+        Assert.That(EntityService.GetDescendants(Constants.System.RecycleBinElement).Count(), Is.EqualTo(0));
     }
 
     [Test]
@@ -130,37 +130,36 @@ public partial class ElementContainerServiceTests
         // Move the container to recycle bin
         var trashResult =
             await ElementContainerService.MoveToRecycleBinAsync(containerKey, Constants.Security.SuperUserKey);
-        Assert.IsTrue(trashResult.Success);
+        Assert.That(trashResult.Success, Is.True);
 
         // Verify initial state
         var initialRecycleBinCount = EntityService.GetDescendants(Constants.System.RecycleBinElement).Count();
-        Assert.AreEqual(totalElements + 1, initialRecycleBinCount, "Should have all elements plus the container in recycle bin");
+        Assert.That(initialRecycleBinCount, Is.EqualTo(totalElements + 1), "Should have all elements plus the container in recycle bin");
 
         // Empty the recycle bin using the internal method with a small page size
         var emptyResult = await ((ElementContainerService)ElementContainerService)
             .EmptyRecycleBinAsync(Constants.Security.SuperUserKey, testPageSize);
-        Assert.IsTrue(emptyResult.Success);
+        Assert.That(emptyResult.Success, Is.True);
 
         // Verify that all unreferenced elements were deleted
         foreach (var element in unreferencedElements)
         {
             var found = await ElementEditingService.GetAsync(element.Key);
-            Assert.IsNull(found, $"Unreferenced element {element.Key} should have been deleted");
+            Assert.That(found, Is.Null, $"Unreferenced element {element.Key} should have been deleted");
         }
 
         // Verify that all referenced elements still exist
         foreach (var element in referencedElements)
         {
             var found = await ElementEditingService.GetAsync(element.Key);
-            Assert.IsNotNull(found, $"Referenced element {element.Key} should NOT have been deleted");
+            Assert.That(found, Is.Not.Null, $"Referenced element {element.Key} should NOT have been deleted");
         }
 
         // The container should also still exist (because it contains referenced items)
         // or alternatively all referenced items should still be in the recycle bin
         var remainingInRecycleBin = EntityService.GetDescendants(Constants.System.RecycleBinElement).Count();
-        Assert.AreEqual(
-            referencedElements.Count + 1,
-            remainingInRecycleBin,
+        Assert.That(
+            remainingInRecycleBin, Is.EqualTo(referencedElements.Count + 1),
             $"Should have {referencedElements.Count} referenced elements plus the container remaining in recycle bin");
     }
 

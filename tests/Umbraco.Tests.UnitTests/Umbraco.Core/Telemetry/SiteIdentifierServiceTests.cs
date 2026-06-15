@@ -25,15 +25,15 @@ public class SiteIdentifierServiceTests
 
         var result = sut.TryGetSiteIdentifier(out var siteIdentifier);
 
-        Assert.AreEqual(shouldSucceed, result);
+        Assert.That(result, Is.EqualTo(shouldSucceed));
         if (shouldSucceed)
         {
             // When toString is called on a GUID it will to lower, so do the same to our guidString
-            Assert.AreEqual(guidString.ToLower(), siteIdentifier.ToString());
+            Assert.That(siteIdentifier.ToString(), Is.EqualTo(guidString.ToLower()));
         }
         else
         {
-            Assert.AreEqual(Guid.Empty, siteIdentifier);
+            Assert.That(siteIdentifier, Is.EqualTo(Guid.Empty));
         }
     }
 
@@ -56,14 +56,14 @@ public class SiteIdentifierServiceTests
         if (shouldCreate)
         {
             configManipulatorMock.Verify(x => x.SetGlobalIdAsync(It.IsAny<string>()), Times.Once);
-            Assert.AreNotEqual(Guid.Empty, identifier);
-            Assert.IsTrue(result);
+            Assert.That(identifier, Is.Not.EqualTo(Guid.Empty));
+            Assert.That(result, Is.True);
         }
         else
         {
             configManipulatorMock.Verify(x => x.SetGlobalIdAsync(It.IsAny<string>()), Times.Never());
-            Assert.AreEqual(guidString.ToLower(), identifier.ToString());
-            Assert.IsTrue(result);
+            Assert.That(identifier.ToString(), Is.EqualTo(guidString.ToLower()));
+            Assert.That(result, Is.True);
         }
     }
 

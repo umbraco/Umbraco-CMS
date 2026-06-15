@@ -46,9 +46,9 @@ public class LongRunningOperationServiceTests
             .Setup(repo => repo.GetByTypeAsync("Test", It.IsAny<LongRunningOperationStatus[]>(), 0, 0))
             .Callback<string, LongRunningOperationStatus[], int, int>((_, statuses, _, _) =>
             {
-                Assert.AreEqual(2, statuses.Length);
-                Assert.Contains(LongRunningOperationStatus.Enqueued, statuses);
-                Assert.Contains(LongRunningOperationStatus.Running, statuses);
+                Assert.That(statuses.Length, Is.EqualTo(2));
+                Assert.That(statuses, Does.Contain(LongRunningOperationStatus.Enqueued));
+                Assert.That(statuses, Does.Contain(LongRunningOperationStatus.Running));
             })
             .ReturnsAsync(
                 new PagedModel<LongRunningOperation>
@@ -66,8 +66,8 @@ public class LongRunningOperationServiceTests
 
         _longRunningOperationRepositoryMock.VerifyAll();
 
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(LongRunningOperationEnqueueStatus.AlreadyRunning, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(LongRunningOperationEnqueueStatus.AlreadyRunning));
     }
 
     [Test]
@@ -83,9 +83,9 @@ public class LongRunningOperationServiceTests
             .Setup(repo => repo.CreateAsync(It.IsAny<LongRunningOperation>(), It.IsAny<DateTimeOffset>()))
             .Callback<LongRunningOperation, DateTimeOffset>((op, exp) =>
             {
-                Assert.AreEqual("Test", op.Type);
-                Assert.IsNotNull(op.Id);
-                Assert.AreEqual(LongRunningOperationStatus.Enqueued, op.Status);
+                Assert.That(op.Type, Is.EqualTo("Test"));
+                Assert.That(op.Id, Is.Not.Null);
+                Assert.That(op.Status, Is.EqualTo(LongRunningOperationStatus.Enqueued));
             })
             .Returns(Task.CompletedTask)
             .Verifiable(Times.Once);
@@ -104,7 +104,7 @@ public class LongRunningOperationServiceTests
         _longRunningOperationRepositoryMock.Setup(repo => repo.UpdateStatusAsync(It.IsAny<Guid>(), It.IsAny<LongRunningOperationStatus>(), It.IsAny<DateTimeOffset>()))
             .Callback<Guid, LongRunningOperationStatus, DateTimeOffset>((id, status, exp) =>
             {
-                Assert.Contains(status, expectedStatuses);
+                Assert.That(expectedStatuses, Does.Contain(status));
             })
             .Returns(Task.CompletedTask);
 
@@ -121,9 +121,9 @@ public class LongRunningOperationServiceTests
 
         _longRunningOperationRepositoryMock.VerifyAll();
 
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(LongRunningOperationEnqueueStatus.Success, result.Status);
-        Assert.AreEqual(1, opCalls, "Operation should have run and increased the call count, since it's not configured to run in the background.");
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(LongRunningOperationEnqueueStatus.Success));
+        Assert.That(opCalls, Is.EqualTo(1), "Operation should have run and increased the call count, since it's not configured to run in the background.");
     }
 
     [Test]
@@ -145,7 +145,7 @@ public class LongRunningOperationServiceTests
             },
             allowConcurrentExecution: true,
             runInBackground: false));
-        Assert.AreEqual(0, opCalls, "The operation should not have been called.");
+        Assert.That(opCalls, Is.EqualTo(0), "The operation should not have been called.");
     }
 
     [Test]
@@ -161,9 +161,9 @@ public class LongRunningOperationServiceTests
             .Setup(repo => repo.CreateAsync(It.IsAny<LongRunningOperation>(), It.IsAny<DateTimeOffset>()))
             .Callback<LongRunningOperation, DateTimeOffset>((op, exp) =>
             {
-                Assert.AreEqual("Test", op.Type);
-                Assert.IsNotNull(op.Id);
-                Assert.AreEqual(LongRunningOperationStatus.Enqueued, op.Status);
+                Assert.That(op.Type, Is.EqualTo("Test"));
+                Assert.That(op.Id, Is.Not.Null);
+                Assert.That(op.Status, Is.EqualTo(LongRunningOperationStatus.Enqueued));
             })
             .Returns(Task.CompletedTask)
             .Verifiable(Times.Once);
@@ -176,8 +176,8 @@ public class LongRunningOperationServiceTests
 
         _longRunningOperationRepositoryMock.VerifyAll();
 
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(LongRunningOperationEnqueueStatus.Success, result.Status);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(LongRunningOperationEnqueueStatus.Success));
     }
 
     [Test]
@@ -193,8 +193,8 @@ public class LongRunningOperationServiceTests
         var status = await _longRunningOperationService.GetStatusAsync(operationId);
 
         _longRunningOperationRepositoryMock.VerifyAll();
-        Assert.IsTrue(status.HasValue);
-        Assert.AreEqual(LongRunningOperationStatus.Running, status.Value);
+        Assert.That(status.HasValue, Is.True);
+        Assert.That(status.Value, Is.EqualTo(LongRunningOperationStatus.Running));
     }
 
     [Test]
@@ -210,7 +210,7 @@ public class LongRunningOperationServiceTests
         var status = await _longRunningOperationService.GetStatusAsync(operationId);
 
         _longRunningOperationRepositoryMock.VerifyAll();
-        Assert.IsFalse(status.HasValue);
+        Assert.That(status.HasValue, Is.False);
     }
 
     [Test]
@@ -227,9 +227,9 @@ public class LongRunningOperationServiceTests
             .Setup(repo => repo.GetByTypeAsync(operationType, It.IsAny<LongRunningOperationStatus[]>(), 0, 100))
             .Callback<string, LongRunningOperationStatus[], int, int>((_, statuses, _, _) =>
             {
-                Assert.AreEqual(2, statuses.Length);
-                Assert.Contains(LongRunningOperationStatus.Enqueued, statuses);
-                Assert.Contains(LongRunningOperationStatus.Running, statuses);
+                Assert.That(statuses.Length, Is.EqualTo(2));
+                Assert.That(statuses, Does.Contain(LongRunningOperationStatus.Enqueued));
+                Assert.That(statuses, Does.Contain(LongRunningOperationStatus.Running));
             })
             .ReturnsAsync(
                 new PagedModel<LongRunningOperation>
@@ -242,10 +242,10 @@ public class LongRunningOperationServiceTests
         var result = await _longRunningOperationService.GetByTypeAsync(operationType, 0, 100);
 
         _longRunningOperationRepositoryMock.VerifyAll();
-        Assert.IsNotNull(result);
-        Assert.AreEqual(2, result.Items.Count());
-        Assert.AreEqual(2, result.Total);
-        Assert.IsTrue(result.Items.All(op => op.Type == operationType));
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Items.Count(), Is.EqualTo(2));
+        Assert.That(result.Total, Is.EqualTo(2));
+        Assert.That(result.Items.All(op => op.Type == operationType), Is.True);
     }
 
     [Test]
@@ -261,8 +261,8 @@ public class LongRunningOperationServiceTests
             .Setup(repo => repo.GetByTypeAsync(operationType, It.IsAny<LongRunningOperationStatus[]>(), 0, 30))
             .Callback<string, LongRunningOperationStatus[], int, int>((type, statuses, _, _) =>
             {
-                Assert.AreEqual(1, statuses.Length);
-                Assert.Contains(LongRunningOperationStatus.Failed, statuses);
+                Assert.That(statuses.Length, Is.EqualTo(1));
+                Assert.That(statuses, Does.Contain(LongRunningOperationStatus.Failed));
             })
             .ReturnsAsync(
                 new PagedModel<LongRunningOperation>
@@ -275,10 +275,10 @@ public class LongRunningOperationServiceTests
         var result = await _longRunningOperationService.GetByTypeAsync(operationType, 0, 30, [LongRunningOperationStatus.Failed]);
 
         _longRunningOperationRepositoryMock.VerifyAll();
-        Assert.IsNotNull(result);
-        Assert.AreEqual(1, result.Total);
-        Assert.AreEqual(1, result.Items.Count());
-        Assert.IsTrue(result.Items.All(op => op.Type == operationType));
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Total, Is.EqualTo(1));
+        Assert.That(result.Items.Count(), Is.EqualTo(1));
+        Assert.That(result.Items.All(op => op.Type == operationType), Is.True);
     }
 
     [Test]
@@ -303,9 +303,9 @@ public class LongRunningOperationServiceTests
         var result = await _longRunningOperationService.GetResultAsync<string>(operationId);
 
         _longRunningOperationRepositoryMock.VerifyAll();
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(LongRunningOperationResultStatus.Success, result.Status);
-        Assert.AreEqual(expectedResult, result.Result);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(LongRunningOperationResultStatus.Success));
+        Assert.That(result.Result, Is.EqualTo(expectedResult));
     }
 
     [Test]
@@ -321,9 +321,9 @@ public class LongRunningOperationServiceTests
         var result = await _longRunningOperationService.GetResultAsync<string>(operationId);
 
         _longRunningOperationRepositoryMock.VerifyAll();
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(result.Status, LongRunningOperationResultStatus.OperationNotFound);
-        Assert.IsNull(result.Result);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(LongRunningOperationResultStatus.OperationNotFound));
+        Assert.That(result.Result, Is.Null);
     }
 
     [Test]
@@ -346,9 +346,9 @@ public class LongRunningOperationServiceTests
         var result = await _longRunningOperationService.GetResultAsync<string>(operationId);
 
         _longRunningOperationRepositoryMock.VerifyAll();
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(result.Status, LongRunningOperationResultStatus.OperationFailed);
-        Assert.IsNull(result.Result);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(LongRunningOperationResultStatus.OperationFailed));
+        Assert.That(result.Result, Is.Null);
     }
 
     [Test]
@@ -371,9 +371,9 @@ public class LongRunningOperationServiceTests
         var result = await _longRunningOperationService.GetResultAsync<string>(operationId);
 
         _longRunningOperationRepositoryMock.VerifyAll();
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(result.Status, LongRunningOperationResultStatus.OperationPending);
-        Assert.IsNull(result.Result);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(LongRunningOperationResultStatus.OperationPending));
+        Assert.That(result.Result, Is.Null);
     }
 
     [Test]
@@ -396,9 +396,9 @@ public class LongRunningOperationServiceTests
         var result = await _longRunningOperationService.GetResultAsync<string>(operationId);
 
         _longRunningOperationRepositoryMock.VerifyAll();
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(result.Status, LongRunningOperationResultStatus.OperationPending);
-        Assert.IsNull(result.Result);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(LongRunningOperationResultStatus.OperationPending));
+        Assert.That(result.Result, Is.Null);
     }
 
     private void SetupScopeProviderMock() =>

@@ -50,20 +50,20 @@ public class RelationBuilderTests
             .Build();
 
         // Assert
-        Assert.AreEqual(parentId, relation.ParentId);
-        Assert.AreEqual(childId, relation.ChildId);
-        Assert.AreEqual(id, relation.Id);
-        Assert.AreEqual(createDate, relation.CreateDate);
-        Assert.AreEqual(updateDate, relation.UpdateDate);
-        Assert.AreEqual(key, relation.Key);
-        Assert.AreEqual(comment, relation.Comment);
-        Assert.AreEqual(relationTypeId, relation.RelationType.Id);
-        Assert.AreEqual(relationTypeAlias, relation.RelationType.Alias);
-        Assert.AreEqual(relationTypeName, relation.RelationType.Name);
-        Assert.IsFalse(relation.RelationType.IsBidirectional);
+        Assert.That(relation.ParentId, Is.EqualTo(parentId));
+        Assert.That(relation.ChildId, Is.EqualTo(childId));
+        Assert.That(relation.Id, Is.EqualTo(id));
+        Assert.That(relation.CreateDate, Is.EqualTo(createDate));
+        Assert.That(relation.UpdateDate, Is.EqualTo(updateDate));
+        Assert.That(relation.Key, Is.EqualTo(key));
+        Assert.That(relation.Comment, Is.EqualTo(comment));
+        Assert.That(relation.RelationType.Id, Is.EqualTo(relationTypeId));
+        Assert.That(relation.RelationType.Alias, Is.EqualTo(relationTypeAlias));
+        Assert.That(relation.RelationType.Name, Is.EqualTo(relationTypeName));
+        Assert.That(relation.RelationType.IsBidirectional, Is.False);
 
-        Assert.IsTrue((relation.RelationType as IRelationTypeWithIsDependency).IsDependency);
-        Assert.AreEqual(parentObjectType, relation.RelationType.ParentObjectType);
-        Assert.AreEqual(childObjectType, relation.RelationType.ChildObjectType);
+        Assert.That((relation.RelationType as IRelationTypeWithIsDependency).IsDependency, Is.True);
+        Assert.That(relation.RelationType.ParentObjectType, Is.EqualTo(parentObjectType));
+        Assert.That(relation.RelationType.ChildObjectType, Is.EqualTo(childObjectType));
     }
 }

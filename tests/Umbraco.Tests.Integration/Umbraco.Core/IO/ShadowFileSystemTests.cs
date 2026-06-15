@@ -71,22 +71,22 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
         Directory.CreateDirectory(path + "/ShadowTests/d2");
 
         var files = fs.GetFiles(string.Empty);
-        Assert.AreEqual(0, files.Count());
+        Assert.That(files.Count(), Is.EqualTo(0));
 
         var dirs = fs.GetDirectories(string.Empty);
-        Assert.AreEqual(2, dirs.Count());
-        Assert.IsTrue(dirs.Contains("d1"));
-        Assert.IsTrue(dirs.Contains("d2"));
+        Assert.That(dirs.Count(), Is.EqualTo(2));
+        Assert.That(dirs, Does.Contain("d1"));
+        Assert.That(dirs, Does.Contain("d2"));
 
         ss.DeleteDirectory("d1");
 
-        Assert.IsTrue(Directory.Exists(path + "/ShadowTests/d1"));
-        Assert.IsTrue(fs.DirectoryExists("d1"));
-        Assert.IsFalse(ss.DirectoryExists("d1"));
+        Assert.That(Directory.Exists(path + "/ShadowTests/d1"), Is.True);
+        Assert.That(fs.DirectoryExists("d1"), Is.True);
+        Assert.That(ss.DirectoryExists("d1"), Is.False);
 
         dirs = ss.GetDirectories(string.Empty);
-        Assert.AreEqual(1, dirs.Count());
-        Assert.IsTrue(dirs.Contains("d2"));
+        Assert.That(dirs.Count(), Is.EqualTo(1));
+        Assert.That(dirs, Does.Contain("d2"));
     }
 
     /// <summary>
@@ -103,36 +103,36 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
         Directory.CreateDirectory(path + "/ShadowTests/sub/d2");
 
         var files = fs.GetFiles(string.Empty);
-        Assert.AreEqual(0, files.Count());
+        Assert.That(files.Count(), Is.EqualTo(0));
 
         var dirs = ss.GetDirectories(string.Empty);
-        Assert.AreEqual(1, dirs.Count());
-        Assert.IsTrue(dirs.Contains("sub"));
+        Assert.That(dirs.Count(), Is.EqualTo(1));
+        Assert.That(dirs, Does.Contain("sub"));
 
         dirs = fs.GetDirectories("sub");
-        Assert.AreEqual(2, dirs.Count());
-        Assert.IsTrue(dirs.Contains("sub/d1"));
-        Assert.IsTrue(dirs.Contains("sub/d2"));
+        Assert.That(dirs.Count(), Is.EqualTo(2));
+        Assert.That(dirs, Does.Contain("sub/d1"));
+        Assert.That(dirs, Does.Contain("sub/d2"));
 
         dirs = ss.GetDirectories("sub");
-        Assert.AreEqual(2, dirs.Count());
-        Assert.IsTrue(dirs.Contains("sub/d1"));
-        Assert.IsTrue(dirs.Contains("sub/d2"));
+        Assert.That(dirs.Count(), Is.EqualTo(2));
+        Assert.That(dirs, Does.Contain("sub/d1"));
+        Assert.That(dirs, Does.Contain("sub/d2"));
 
         ss.DeleteDirectory("sub/d1");
 
-        Assert.IsTrue(Directory.Exists(path + "/ShadowTests/sub/d1"));
-        Assert.IsTrue(fs.DirectoryExists("sub/d1"));
-        Assert.IsFalse(ss.DirectoryExists("sub/d1"));
+        Assert.That(Directory.Exists(path + "/ShadowTests/sub/d1"), Is.True);
+        Assert.That(fs.DirectoryExists("sub/d1"), Is.True);
+        Assert.That(ss.DirectoryExists("sub/d1"), Is.False);
 
         dirs = fs.GetDirectories("sub");
-        Assert.AreEqual(2, dirs.Count());
-        Assert.IsTrue(dirs.Contains("sub/d1"));
-        Assert.IsTrue(dirs.Contains("sub/d2"));
+        Assert.That(dirs.Count(), Is.EqualTo(2));
+        Assert.That(dirs, Does.Contain("sub/d1"));
+        Assert.That(dirs, Does.Contain("sub/d2"));
 
         dirs = ss.GetDirectories("sub");
-        Assert.AreEqual(1, dirs.Count());
-        Assert.IsTrue(dirs.Contains("sub/d2"));
+        Assert.That(dirs.Count(), Is.EqualTo(1));
+        Assert.That(dirs, Does.Contain("sub/d2"));
     }
 
     /// <summary>
@@ -148,27 +148,27 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
         File.WriteAllText(path + "/ShadowTests/f2.txt", "foo");
 
         var files = fs.GetFiles(string.Empty);
-        Assert.AreEqual(2, files.Count());
-        Assert.IsTrue(files.Contains("f1.txt"));
-        Assert.IsTrue(files.Contains("f2.txt"));
+        Assert.That(files.Count(), Is.EqualTo(2));
+        Assert.That(files, Does.Contain("f1.txt"));
+        Assert.That(files, Does.Contain("f2.txt"));
 
         files = ss.GetFiles(string.Empty);
-        Assert.AreEqual(2, files.Count());
-        Assert.IsTrue(files.Contains("f1.txt"));
-        Assert.IsTrue(files.Contains("f2.txt"));
+        Assert.That(files.Count(), Is.EqualTo(2));
+        Assert.That(files, Does.Contain("f1.txt"));
+        Assert.That(files, Does.Contain("f2.txt"));
 
         var dirs = ss.GetDirectories(string.Empty);
-        Assert.AreEqual(0, dirs.Count());
+        Assert.That(dirs.Count(), Is.EqualTo(0));
 
         ss.DeleteFile("f1.txt");
 
-        Assert.IsTrue(File.Exists(path + "/ShadowTests/f1.txt"));
-        Assert.IsTrue(fs.FileExists("f1.txt"));
-        Assert.IsFalse(ss.FileExists("f1.txt"));
+        Assert.That(File.Exists(path + "/ShadowTests/f1.txt"), Is.True);
+        Assert.That(fs.FileExists("f1.txt"), Is.True);
+        Assert.That(ss.FileExists("f1.txt"), Is.False);
 
         files = ss.GetFiles(string.Empty);
-        Assert.AreEqual(1, files.Count());
-        Assert.IsTrue(files.Contains("f2.txt"));
+        Assert.That(files.Count(), Is.EqualTo(1));
+        Assert.That(files, Does.Contain("f2.txt"));
     }
 
     /// <summary>
@@ -187,28 +187,28 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
         }
 
         var files = fs.GetFiles(string.Empty);
-        Assert.AreEqual(1, files.Count());
-        Assert.IsTrue(files.Contains("f1.txt"));
+        Assert.That(files.Count(), Is.EqualTo(1));
+        Assert.That(files, Does.Contain("f1.txt"));
 
         files = ss.GetFiles(string.Empty);
-        Assert.AreEqual(1, files.Count());
-        Assert.IsTrue(files.Contains("f1.txt"));
+        Assert.That(files.Count(), Is.EqualTo(1));
+        Assert.That(files, Does.Contain("f1.txt"));
 
         var dirs = ss.GetDirectories(string.Empty);
-        Assert.AreEqual(0, dirs.Count());
+        Assert.That(dirs.Count(), Is.EqualTo(0));
 
         ss.MoveFile("f1.txt", "f2.txt");
 
-        Assert.IsTrue(File.Exists(path + "/ShadowTests/f1.txt"));
-        Assert.IsFalse(File.Exists(path + "/ShadowTests/f2.txt"));
-        Assert.IsTrue(fs.FileExists("f1.txt"));
-        Assert.IsFalse(fs.FileExists("f2.txt"));
-        Assert.IsFalse(ss.FileExists("f1.txt"));
-        Assert.IsTrue(ss.FileExists("f2.txt"));
+        Assert.That(File.Exists(path + "/ShadowTests/f1.txt"), Is.True);
+        Assert.That(File.Exists(path + "/ShadowTests/f2.txt"), Is.False);
+        Assert.That(fs.FileExists("f1.txt"), Is.True);
+        Assert.That(fs.FileExists("f2.txt"), Is.False);
+        Assert.That(ss.FileExists("f1.txt"), Is.False);
+        Assert.That(ss.FileExists("f2.txt"), Is.True);
 
         files = ss.GetFiles(string.Empty);
-        Assert.AreEqual(1, files.Count());
-        Assert.IsTrue(files.Contains("f2.txt"));
+        Assert.That(files.Count(), Is.EqualTo(1));
+        Assert.That(files, Does.Contain("f2.txt"));
     }
 
     /// <summary>
@@ -225,42 +225,42 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
         File.WriteAllText(path + "/ShadowTests/sub/f2.txt", "foo");
 
         var files = fs.GetFiles(string.Empty);
-        Assert.AreEqual(0, files.Count());
+        Assert.That(files.Count(), Is.EqualTo(0));
 
         files = fs.GetFiles("sub");
-        Assert.AreEqual(2, files.Count());
-        Assert.IsTrue(files.Contains("sub/f1.txt"));
-        Assert.IsTrue(files.Contains("sub/f2.txt"));
+        Assert.That(files.Count(), Is.EqualTo(2));
+        Assert.That(files, Does.Contain("sub/f1.txt"));
+        Assert.That(files, Does.Contain("sub/f2.txt"));
 
         files = ss.GetFiles(string.Empty);
-        Assert.AreEqual(0, files.Count());
+        Assert.That(files.Count(), Is.EqualTo(0));
 
         var dirs = ss.GetDirectories(string.Empty);
-        Assert.AreEqual(1, dirs.Count());
-        Assert.IsTrue(dirs.Contains("sub"));
+        Assert.That(dirs.Count(), Is.EqualTo(1));
+        Assert.That(dirs, Does.Contain("sub"));
 
         files = ss.GetFiles("sub");
-        Assert.AreEqual(2, files.Count());
-        Assert.IsTrue(files.Contains("sub/f1.txt"));
-        Assert.IsTrue(files.Contains("sub/f2.txt"));
+        Assert.That(files.Count(), Is.EqualTo(2));
+        Assert.That(files, Does.Contain("sub/f1.txt"));
+        Assert.That(files, Does.Contain("sub/f2.txt"));
 
         dirs = ss.GetDirectories("sub");
-        Assert.AreEqual(0, dirs.Count());
+        Assert.That(dirs.Count(), Is.EqualTo(0));
 
         ss.DeleteFile("sub/f1.txt");
 
-        Assert.IsTrue(File.Exists(path + "/ShadowTests/sub/f1.txt"));
-        Assert.IsTrue(fs.FileExists("sub/f1.txt"));
-        Assert.IsFalse(ss.FileExists("sub/f1.txt"));
+        Assert.That(File.Exists(path + "/ShadowTests/sub/f1.txt"), Is.True);
+        Assert.That(fs.FileExists("sub/f1.txt"), Is.True);
+        Assert.That(ss.FileExists("sub/f1.txt"), Is.False);
 
         files = fs.GetFiles("sub");
-        Assert.AreEqual(2, files.Count());
-        Assert.IsTrue(files.Contains("sub/f1.txt"));
-        Assert.IsTrue(files.Contains("sub/f2.txt"));
+        Assert.That(files.Count(), Is.EqualTo(2));
+        Assert.That(files, Does.Contain("sub/f1.txt"));
+        Assert.That(files, Does.Contain("sub/f2.txt"));
 
         files = ss.GetFiles("sub");
-        Assert.AreEqual(1, files.Count());
-        Assert.IsTrue(files.Contains("sub/f2.txt"));
+        Assert.That(files.Count(), Is.EqualTo(1));
+        Assert.That(files, Does.Contain("sub/f2.txt"));
     }
 
     /// <summary>
@@ -299,20 +299,20 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
             ss.AddFile("f1.txt", ms);
         }
 
-        Assert.IsTrue(File.Exists(path + "/ShadowTests/f2.txt"));
-        Assert.IsFalse(File.Exists(path + "/ShadowSystem/f2.txt"));
-        Assert.IsTrue(fs.FileExists("f2.txt"));
-        Assert.IsTrue(ss.FileExists("f2.txt"));
+        Assert.That(File.Exists(path + "/ShadowTests/f2.txt"), Is.True);
+        Assert.That(File.Exists(path + "/ShadowSystem/f2.txt"), Is.False);
+        Assert.That(fs.FileExists("f2.txt"), Is.True);
+        Assert.That(ss.FileExists("f2.txt"), Is.True);
 
-        Assert.IsFalse(File.Exists(path + "/ShadowTests/f1.txt"));
-        Assert.IsTrue(File.Exists(path + "/ShadowSystem/f1.txt"));
-        Assert.IsFalse(fs.FileExists("f1.txt"));
-        Assert.IsTrue(ss.FileExists("f1.txt"));
+        Assert.That(File.Exists(path + "/ShadowTests/f1.txt"), Is.False);
+        Assert.That(File.Exists(path + "/ShadowSystem/f1.txt"), Is.True);
+        Assert.That(fs.FileExists("f1.txt"), Is.False);
+        Assert.That(ss.FileExists("f1.txt"), Is.True);
 
         var files = ss.GetFiles(string.Empty);
-        Assert.AreEqual(2, files.Count());
-        Assert.IsTrue(files.Contains("f1.txt"));
-        Assert.IsTrue(files.Contains("f2.txt"));
+        Assert.That(files.Count(), Is.EqualTo(2));
+        Assert.That(files, Does.Contain("f1.txt"));
+        Assert.That(files, Does.Contain("f2.txt"));
 
         string content;
         using (var stream = ss.OpenFile("f1.txt"))
@@ -320,7 +320,7 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
             content = new StreamReader(stream).ReadToEnd();
         }
 
-        Assert.AreEqual("foo", content);
+        Assert.That(content, Is.EqualTo("foo"));
     }
 
     /// <summary>
@@ -338,23 +338,23 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
             ss.AddFile("sub/f1.txt", ms);
         }
 
-        Assert.IsFalse(File.Exists(path + "/ShadowTests/sub/f1.txt"));
-        Assert.IsTrue(File.Exists(path + "/ShadowSystem/sub/f1.txt"));
-        Assert.IsFalse(fs.FileExists("sub/f1.txt"));
-        Assert.IsTrue(ss.FileExists("sub/f1.txt"));
+        Assert.That(File.Exists(path + "/ShadowTests/sub/f1.txt"), Is.False);
+        Assert.That(File.Exists(path + "/ShadowSystem/sub/f1.txt"), Is.True);
+        Assert.That(fs.FileExists("sub/f1.txt"), Is.False);
+        Assert.That(ss.FileExists("sub/f1.txt"), Is.True);
 
-        Assert.IsFalse(fs.DirectoryExists("sub"));
-        Assert.IsTrue(ss.DirectoryExists("sub"));
+        Assert.That(fs.DirectoryExists("sub"), Is.False);
+        Assert.That(ss.DirectoryExists("sub"), Is.True);
 
         var dirs = fs.GetDirectories(string.Empty);
-        Assert.AreEqual(0, dirs.Count());
+        Assert.That(dirs.Count(), Is.EqualTo(0));
 
         dirs = ss.GetDirectories(string.Empty);
-        Assert.AreEqual(1, dirs.Count());
-        Assert.IsTrue(dirs.Contains("sub"));
+        Assert.That(dirs.Count(), Is.EqualTo(1));
+        Assert.That(dirs, Does.Contain("sub"));
 
         var files = ss.GetFiles("sub");
-        Assert.AreEqual(1, files.Count());
+        Assert.That(files.Count(), Is.EqualTo(1));
 
         string content;
         using (var stream = ss.OpenFile("sub/f1.txt"))
@@ -362,7 +362,7 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
             content = new StreamReader(stream).ReadToEnd();
         }
 
-        Assert.AreEqual("foo", content);
+        Assert.That(content, Is.EqualTo("foo"));
     }
 
     /// <summary>
@@ -380,8 +380,8 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
         }
 
         // file is only written to the shadow fs
-        Assert.IsTrue(File.Exists(path + "/ShadowSystem/path/to/some/dir/f1.txt"));
-        Assert.IsFalse(File.Exists(path + "/ShadowTests/path/to/some/dir/f1.txt"));
+        Assert.That(File.Exists(path + "/ShadowSystem/path/to/some/dir/f1.txt"), Is.True);
+        Assert.That(File.Exists(path + "/ShadowTests/path/to/some/dir/f1.txt"), Is.False);
 
         // let the shadow fs die
     }
@@ -405,12 +405,12 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
 
         ss.DeleteFile("sub/sub/f2.txt");
 
-        Assert.IsTrue(File.Exists(path + "/ShadowSystem/path/to/some/dir/f1.txt"));
+        Assert.That(File.Exists(path + "/ShadowSystem/path/to/some/dir/f1.txt"), Is.True);
 
         ss.Complete();
 
-        Assert.IsTrue(File.Exists(path + "/ShadowTests/path/to/some/dir/f1.txt"));
-        Assert.IsFalse(File.Exists(path + "/ShadowTests/sub/sub/f2.txt"));
+        Assert.That(File.Exists(path + "/ShadowTests/path/to/some/dir/f1.txt"), Is.True);
+        Assert.That(File.Exists(path + "/ShadowTests/sub/sub/f2.txt"), Is.False);
     }
 
     /// <summary>
@@ -432,11 +432,11 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
         }
 
         // staged at original case
-        Assert.IsTrue(File.Exists(path + "/ShadowSystem/Views/PageNotFound.cshtml"));
+        Assert.That(File.Exists(path + "/ShadowSystem/Views/PageNotFound.cshtml"), Is.True);
 
         // case-insensitive lookups still resolve the staged file (Windows-like semantics)
-        Assert.IsTrue(ss.FileExists("Views/PageNotFound.cshtml"));
-        Assert.IsTrue(ss.FileExists("views/pagenotfound.cshtml"));
+        Assert.That(ss.FileExists("Views/PageNotFound.cshtml"), Is.True);
+        Assert.That(ss.FileExists("views/pagenotfound.cshtml"), Is.True);
 
         // staging-area operations via a different-cased path must still hit the staged file
         // (canonical-path tracking; otherwise on Linux these would throw FileNotFoundException
@@ -444,10 +444,10 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
         using (var stream = ss.OpenFile("views/pagenotfound.cshtml"))
         using (var reader = new StreamReader(stream))
         {
-            Assert.AreEqual("foo", reader.ReadToEnd());
+            Assert.That(reader.ReadToEnd(), Is.EqualTo("foo"));
         }
 
-        Assert.AreEqual(3, ss.GetSize("VIEWS/pagenotfound.cshtml"));
+        Assert.That(ss.GetSize("VIEWS/pagenotfound.cshtml"), Is.EqualTo(3));
 
         // re-staging the same logical path with a different case must overwrite the
         // canonical staged file (not create a second file in the shadow on Linux)
@@ -460,15 +460,15 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
         // (File.Exists for a different-cased path would return true on case-insensitive
         // file systems like Windows / default macOS, so we can't assert it.)
         var stagedFiles = Directory.GetFiles(path + "/ShadowSystem/Views");
-        Assert.AreEqual(1, stagedFiles.Length, "Re-staging with different case must not create a second file in the shadow.");
-        Assert.IsTrue(stagedFiles[0].EndsWith("PageNotFound.cshtml"), "Staged file name must keep the original case.");
+        Assert.That(stagedFiles, Has.Length.EqualTo(1), "Re-staging with different case must not create a second file in the shadow.");
+        Assert.That(stagedFiles[0], Does.EndWith("PageNotFound.cshtml"), "Staged file name must keep the original case.");
 
         ss.Complete();
 
         // committed at original case, with the latest content
         var committedPath = path + "/ShadowTests/Views/PageNotFound.cshtml";
-        Assert.IsTrue(File.Exists(committedPath));
-        Assert.AreEqual("bar-updated", File.ReadAllText(committedPath));
+        Assert.That(File.Exists(committedPath), Is.True);
+        Assert.That(File.ReadAllText(committedPath), Is.EqualTo("bar-updated"));
     }
 
     /// <summary>
@@ -490,8 +490,8 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
         }
 
         var dirs = ss.GetDirectories(string.Empty).ToList();
-        Assert.IsTrue(dirs.Contains("Views"), "Shadow directory entry must preserve the original case used to stage the file.");
-        Assert.IsFalse(dirs.Contains("views"), "Shadow must not surface a lower-cased duplicate of the staged directory.");
+        Assert.That(dirs, Does.Contain("Views"), "Shadow directory entry must preserve the original case used to stage the file.");
+        Assert.That(dirs, Does.Not.Contain("views"), "Shadow must not surface a lower-cased duplicate of the staged directory.");
     }
 
     /// <summary>
@@ -530,77 +530,77 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
             sw.AddFile("sub/f1.txt", ms);
         }
 
-        Assert.IsTrue(phy.FileExists("sub/f1.txt"));
+        Assert.That(phy.FileExists("sub/f1.txt"), Is.True);
 
         string id;
 
         // explicit shadow without scope does not work
         sw.Shadow(id = ShadowWrapper.CreateShadowId(HostingEnvironment));
-        Assert.IsTrue(Directory.Exists(shadowfs + "/" + id));
+        Assert.That(Directory.Exists(shadowfs + "/" + id), Is.True);
         using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
         {
             sw.AddFile("sub/f2.txt", ms);
         }
 
-        Assert.IsTrue(phy.FileExists("sub/f2.txt"));
+        Assert.That(phy.FileExists("sub/f2.txt"), Is.True);
         sw.UnShadow(true);
-        Assert.IsTrue(phy.FileExists("sub/f2.txt"));
-        Assert.IsFalse(Directory.Exists(shadowfs + "/" + id));
+        Assert.That(phy.FileExists("sub/f2.txt"), Is.True);
+        Assert.That(Directory.Exists(shadowfs + "/" + id), Is.False);
 
         // shadow with scope but no complete does not complete
         scopedFileSystems = true; // pretend we have a scope
         var scope = new ShadowFileSystems(fileSystems, id = ShadowWrapper.CreateShadowId(HostingEnvironment));
-        Assert.IsTrue(Directory.Exists(shadowfs + "/" + id));
+        Assert.That(Directory.Exists(shadowfs + "/" + id), Is.True);
         using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
         {
             sw.AddFile("sub/f3.txt", ms);
         }
 
-        Assert.IsFalse(phy.FileExists("sub/f3.txt"));
+        Assert.That(phy.FileExists("sub/f3.txt"), Is.False);
         var dirs = Directory.GetDirectories(shadowfs);
-        Assert.AreEqual(1, dirs.Length);
-        Assert.AreEqual((shadowfs + "/" + id).Replace('\\', '/'), dirs[0].Replace('\\', '/'));
+        Assert.That(dirs, Has.Length.EqualTo(1));
+        Assert.That(dirs[0].Replace('\\', '/'), Is.EqualTo((shadowfs + "/" + id).Replace('\\', '/')));
         dirs = Directory.GetDirectories(dirs[0]);
         var typedDir = dirs.FirstOrDefault(x => x.Replace('\\', '/').EndsWith("/x"));
-        Assert.IsNotNull(typedDir);
+        Assert.That(typedDir, Is.Not.Null);
         dirs = Directory.GetDirectories(typedDir);
         var scopedDir =
             dirs.FirstOrDefault(x => x.Replace('\\', '/').EndsWith("/" + shadowPath)); // this is where files go
-        Assert.IsNotNull(scopedDir);
+        Assert.That(scopedDir, Is.Not.Null);
         scope.Dispose();
         scopedFileSystems = false;
-        Assert.IsFalse(phy.FileExists("sub/f3.txt"));
-        TestHelper.TryAssert(() => Assert.IsFalse(Directory.Exists(shadowfs + "/" + id)));
+        Assert.That(phy.FileExists("sub/f3.txt"), Is.False);
+        TestHelper.TryAssert(() => Assert.That(Directory.Exists(shadowfs + "/" + id), Is.False));
 
         // shadow with scope and complete does complete
         scopedFileSystems = true; // pretend we have a scope
         scope = new ShadowFileSystems(fileSystems, id = ShadowWrapper.CreateShadowId(HostingEnvironment));
-        Assert.IsTrue(Directory.Exists(shadowfs + "/" + id));
+        Assert.That(Directory.Exists(shadowfs + "/" + id), Is.True);
         using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
         {
             sw.AddFile("sub/f4.txt", ms);
         }
 
-        Assert.IsFalse(phy.FileExists("sub/f4.txt"));
-        Assert.AreEqual(1, Directory.GetDirectories(shadowfs).Length);
+        Assert.That(phy.FileExists("sub/f4.txt"), Is.False);
+        Assert.That(Directory.GetDirectories(shadowfs), Has.Length.EqualTo(1));
         scope.Complete();
         scope.Dispose();
         scopedFileSystems = false;
-        TestHelper.TryAssert(() => Assert.AreEqual(0, Directory.GetDirectories(shadowfs).Length));
-        Assert.IsTrue(phy.FileExists("sub/f4.txt"));
-        Assert.IsFalse(Directory.Exists(shadowfs + "/" + id));
+        TestHelper.TryAssert(() => Assert.That(Directory.GetDirectories(shadowfs), Is.Empty));
+        Assert.That(phy.FileExists("sub/f4.txt"), Is.True);
+        Assert.That(Directory.Exists(shadowfs + "/" + id), Is.False);
 
         // test scope for "another thread"
 
         scopedFileSystems = true; // pretend we have a scope
         scope = new ShadowFileSystems(fileSystems, id = ShadowWrapper.CreateShadowId(HostingEnvironment));
-        Assert.IsTrue(Directory.Exists(shadowfs + "/" + id));
+        Assert.That(Directory.Exists(shadowfs + "/" + id), Is.True);
         using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
         {
             sw.AddFile("sub/f5.txt", ms);
         }
 
-        Assert.IsFalse(phy.FileExists("sub/f5.txt"));
+        Assert.That(phy.FileExists("sub/f5.txt"), Is.False);
 
         // pretend we're another thread w/out scope
         scopedFileSystems = false;
@@ -611,12 +611,12 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
 
         scopedFileSystems = true; // pretend we have a scope
 
-        Assert.IsTrue(phy.FileExists("sub/f6.txt")); // other thread has written out to fs
+        Assert.That(phy.FileExists("sub/f6.txt"), Is.True); // other thread has written out to fs
         scope.Complete();
         scope.Dispose();
         scopedFileSystems = false;
-        Assert.IsTrue(phy.FileExists("sub/f5.txt"));
-        TestHelper.TryAssert(() => Assert.IsFalse(Directory.Exists(shadowfs + "/" + id)));
+        Assert.That(phy.FileExists("sub/f5.txt"), Is.True);
+        TestHelper.TryAssert(() => Assert.That(Directory.Exists(shadowfs + "/" + id), Is.False));
     }
 
     /// <summary>
@@ -650,19 +650,19 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
             sw.AddFile("sub/f1.txt", ms);
         }
 
-        Assert.IsTrue(phy.FileExists("sub/f1.txt"));
+        Assert.That(phy.FileExists("sub/f1.txt"), Is.True);
 
         string id;
 
         scopedFileSystems = true; // pretend we have a scope
         var scope = new ShadowFileSystems(fileSystems, id = ShadowWrapper.CreateShadowId(HostingEnvironment));
-        Assert.IsTrue(Directory.Exists(shadowfs + "/" + id));
+        Assert.That(Directory.Exists(shadowfs + "/" + id), Is.True);
         using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
         {
             sw.AddFile("sub/f2.txt", ms);
         }
 
-        Assert.IsFalse(phy.FileExists("sub/f2.txt"));
+        Assert.That(phy.FileExists("sub/f2.txt"), Is.False);
 
         // pretend we're another thread w/out scope
         scopedFileSystems = false;
@@ -673,12 +673,12 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
 
         scopedFileSystems = true; // pretend we have a scope
 
-        Assert.IsTrue(phy.FileExists("sub/f2.txt")); // other thread has written out to fs
+        Assert.That(phy.FileExists("sub/f2.txt"), Is.True); // other thread has written out to fs
         scope.Complete();
         scope.Dispose();
         scopedFileSystems = false;
-        Assert.IsTrue(phy.FileExists("sub/f2.txt"));
-        TestHelper.TryAssert(() => Assert.IsFalse(Directory.Exists(shadowfs + "/" + id)));
+        Assert.That(phy.FileExists("sub/f2.txt"), Is.True);
+        TestHelper.TryAssert(() => Assert.That(Directory.Exists(shadowfs + "/" + id), Is.False));
 
         string text;
         using (var s = phy.OpenFile("sub/f2.txt"))
@@ -688,7 +688,7 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
         }
 
         // the shadow filesystem will happily overwrite anything it can
-        Assert.AreEqual("foo", text);
+        Assert.That(text, Is.EqualTo("foo"));
     }
 
     /// <summary>
@@ -725,19 +725,19 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
             sw.AddFile("sub/f1.txt", ms);
         }
 
-        Assert.IsTrue(phy.FileExists("sub/f1.txt"));
+        Assert.That(phy.FileExists("sub/f1.txt"), Is.True);
 
         string id;
 
         scopedFileSystems = true; // pretend we have a scope
         var scope = new ShadowFileSystems(fileSystems, id = ShadowWrapper.CreateShadowId(HostingEnvironment));
-        Assert.IsTrue(Directory.Exists(shadowfs + "/" + id));
+        Assert.That(Directory.Exists(shadowfs + "/" + id), Is.True);
         using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
         {
             sw.AddFile("sub/f2.txt", ms);
         }
 
-        Assert.IsFalse(phy.FileExists("sub/f2.txt"));
+        Assert.That(phy.FileExists("sub/f2.txt"), Is.False);
 
         // pretend we're another thread w/out scope
         scopedFileSystems = false;
@@ -748,14 +748,14 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
 
         scopedFileSystems = true; // pretend we have a scope
 
-        Assert.IsTrue(phy.FileExists("sub/f2.txt/f2.txt")); // other thread has written out to fs
+        Assert.That(phy.FileExists("sub/f2.txt/f2.txt"), Is.True); // other thread has written out to fs
 
         using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
         {
             sw.AddFile("sub/f3.txt", ms);
         }
 
-        Assert.IsFalse(phy.FileExists("sub/f3.txt"));
+        Assert.That(phy.FileExists("sub/f3.txt"), Is.False);
 
         scope.Complete();
 
@@ -768,20 +768,20 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
         }
         catch (AggregateException ae)
         {
-            Assert.AreEqual(1, ae.InnerExceptions.Count);
+            Assert.That(ae.InnerExceptions, Has.Count.EqualTo(1));
             var e = ae.InnerExceptions[0];
-            Assert.IsNotNull(e.InnerException);
-            Assert.IsInstanceOf<AggregateException>(e);
+            Assert.That(e.InnerException, Is.Not.Null);
+            Assert.That(e, Is.InstanceOf<AggregateException>());
             ae = (AggregateException)e;
 
-            Assert.AreEqual(1, ae.InnerExceptions.Count);
+            Assert.That(ae.InnerExceptions, Has.Count.EqualTo(1));
             e = ae.InnerExceptions[0];
-            Assert.IsNotNull(e.InnerException);
-            Assert.IsInstanceOf<Exception>(e.InnerException);
+            Assert.That(e.InnerException, Is.Not.Null);
+            Assert.That(e.InnerException, Is.InstanceOf<Exception>());
         }
 
         // still, the rest of the changes has been applied ok
-        Assert.IsTrue(phy.FileExists("sub/f3.txt"));
+        Assert.That(phy.FileExists("sub/f3.txt"), Is.True);
     }
 
     /// <summary>
@@ -802,13 +802,13 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
 
         path = NormPath(path);
         var files = Directory.GetFiles(path);
-        Assert.AreEqual(1, files.Length);
+        Assert.That(files, Has.Length.EqualTo(1));
         files = Directory.GetFiles(path, "*", SearchOption.AllDirectories);
-        Assert.AreEqual(3, files.Length);
+        Assert.That(files, Has.Length.EqualTo(3));
         var efiles = Directory.EnumerateFiles(path);
-        Assert.AreEqual(1, efiles.Count());
+        Assert.That(efiles.Count(), Is.EqualTo(1));
         efiles = Directory.EnumerateFiles(path, "*", SearchOption.AllDirectories);
-        Assert.AreEqual(3, efiles.Count());
+        Assert.That(efiles.Count(), Is.EqualTo(3));
     }
 
     /// <summary>
@@ -828,7 +828,7 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
 
         path = NormPath(path);
         TestHelper.Try(() => Directory.Delete(path, true));
-        TestHelper.TryAssert(() => Assert.IsFalse(File.Exists(path + "/test/inner/f3.txt")));
+        TestHelper.TryAssert(() => Assert.That(File.Exists(path + "/test/inner/f3.txt"), Is.False));
     }
 
     /// <summary>
@@ -849,12 +849,12 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
 
         // ensure we get 2 files from the shadow
         var getFiles = ss.GetFiles(string.Empty);
-        Assert.AreEqual(2, getFiles.Count());
+        Assert.That(getFiles.Count(), Is.EqualTo(2));
 
         var fsFiles = fs.GetFiles(string.Empty).ToArray();
-        Assert.AreEqual(1, fsFiles.Length);
+        Assert.That(fsFiles, Has.Length.EqualTo(1));
         var sfsFiles = sfs.GetFiles(string.Empty).ToArray();
-        Assert.AreEqual(1, sfsFiles.Length);
+        Assert.That(sfsFiles, Has.Length.EqualTo(1));
     }
 
     /// <summary>
@@ -874,12 +874,12 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
 
         // ensure we get 2 files from the shadow
         var getFiles = ss.GetFiles(string.Empty);
-        Assert.AreEqual(2, getFiles.Count());
+        Assert.That(getFiles.Count(), Is.EqualTo(2));
 
         var fsFiles = fs.GetFiles(string.Empty).ToArray();
-        Assert.AreEqual(1, fsFiles.Length);
+        Assert.That(fsFiles, Has.Length.EqualTo(1));
         var sfsFiles = sfs.GetFiles(string.Empty).ToArray();
-        Assert.AreEqual(1, sfsFiles.Length);
+        Assert.That(sfsFiles, Has.Length.EqualTo(1));
     }
 
     /// <summary>
@@ -899,16 +899,16 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
 
         // ensure we get 2 files from the shadow
         var getFiles = ss.GetFiles(string.Empty);
-        Assert.AreEqual(2, getFiles.Count());
+        Assert.That(getFiles.Count(), Is.EqualTo(2));
 
         // ensure we get 2 files when using null in filter parameter
         var getFilesWithNullFilter = ss.GetFiles(string.Empty, null);
-        Assert.AreEqual(2, getFilesWithNullFilter.Count());
+        Assert.That(getFilesWithNullFilter.Count(), Is.EqualTo(2));
 
         var fsFiles = fs.GetFiles(string.Empty).ToArray();
-        Assert.AreEqual(1, fsFiles.Length);
+        Assert.That(fsFiles, Has.Length.EqualTo(1));
         var sfsFiles = sfs.GetFiles(string.Empty).ToArray();
-        Assert.AreEqual(1, sfsFiles.Length);
+        Assert.That(sfsFiles, Has.Length.EqualTo(1));
     }
 
     /// <summary>
@@ -934,16 +934,16 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
 
         // ensure we get 4 files from the shadow
         var getFiles = ss.GetFiles(string.Empty);
-        Assert.AreEqual(4, getFiles.Count());
+        Assert.That(getFiles.Count(), Is.EqualTo(4));
 
         // ensure we get only 2 of 4 files from the shadow when using filter
         var getFilesWithWildcardFilter = ss.GetFiles(string.Empty, "*.doc");
-        Assert.AreEqual(2, getFilesWithWildcardFilter.Count());
+        Assert.That(getFilesWithWildcardFilter.Count(), Is.EqualTo(2));
 
         var fsFiles = fs.GetFiles(string.Empty).ToArray();
-        Assert.AreEqual(2, fsFiles.Length);
+        Assert.That(fsFiles, Has.Length.EqualTo(2));
         var sfsFiles = sfs.GetFiles(string.Empty).ToArray();
-        Assert.AreEqual(2, sfsFiles.Length);
+        Assert.That(sfsFiles, Has.Length.EqualTo(2));
     }
 
     /// <summary>
@@ -976,20 +976,20 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
 
         // ensure we get 6 files from the shadow
         var getFiles = ss.GetFiles(string.Empty);
-        Assert.AreEqual(6, getFiles.Count());
+        Assert.That(getFiles.Count(), Is.EqualTo(6));
 
         // ensure we get only 1 of 6 files from the shadow when using filter on shadow
         var getFilesWithWildcardSinglecharFilter = ss.GetFiles(string.Empty, "f1.d?c");
-        Assert.AreEqual(1, getFilesWithWildcardSinglecharFilter.Count());
+        Assert.That(getFilesWithWildcardSinglecharFilter.Count(), Is.EqualTo(1));
 
         // ensure we get only 1 of 6 files from the shadow when using filter on disk
         var getFilesWithWildcardSinglecharFilter2 = ss.GetFiles(string.Empty, "f2.d?c");
-        Assert.AreEqual(1, getFilesWithWildcardSinglecharFilter2.Count());
+        Assert.That(getFilesWithWildcardSinglecharFilter2.Count(), Is.EqualTo(1));
 
         var fsFiles = fs.GetFiles(string.Empty).ToArray();
-        Assert.AreEqual(3, fsFiles.Length);
+        Assert.That(fsFiles, Has.Length.EqualTo(3));
         var sfsFiles = sfs.GetFiles(string.Empty).ToArray();
-        Assert.AreEqual(3, sfsFiles.Length);
+        Assert.That(sfsFiles, Has.Length.EqualTo(3));
     }
 
     /// <summary>
@@ -1010,8 +1010,8 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
 
         var f1FullPath = ss.GetFullPath("f1.txt");
         var f2FullPath = ss.GetFullPath("f2.txt");
-        Assert.AreEqual(Path.Combine(path, "ShadowTests", "f1.txt"), f1FullPath);
-        Assert.AreEqual(Path.Combine(path, "ShadowSystem", "f2.txt"), f2FullPath);
+        Assert.That(f1FullPath, Is.EqualTo(Path.Combine(path, "ShadowTests", "f1.txt")));
+        Assert.That(f2FullPath, Is.EqualTo(Path.Combine(path, "ShadowSystem", "f2.txt")));
     }
 
     /// <summary>
@@ -1033,12 +1033,12 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
 
         var f1RelativePath = ss.GetRelativePath("f1.txt");
         var f2RelativePath = ss.GetRelativePath("f2.txt");
-        Assert.AreEqual("f1.txt", f1RelativePath);
-        Assert.AreEqual("f2.txt", f2RelativePath);
-        Assert.IsTrue(File.Exists(Path.Combine(path, "ShadowTests", "f1.txt")));
-        Assert.IsFalse(File.Exists(Path.Combine(path, "ShadowTests", "f2.txt")));
-        Assert.IsTrue(File.Exists(Path.Combine(path, "ShadowSystem", "f2.txt")));
-        Assert.IsFalse(File.Exists(Path.Combine(path, "ShadowSystem", "f1.txt")));
+        Assert.That(f1RelativePath, Is.EqualTo("f1.txt"));
+        Assert.That(f2RelativePath, Is.EqualTo("f2.txt"));
+        Assert.That(File.Exists(Path.Combine(path, "ShadowTests", "f1.txt")), Is.True);
+        Assert.That(File.Exists(Path.Combine(path, "ShadowTests", "f2.txt")), Is.False);
+        Assert.That(File.Exists(Path.Combine(path, "ShadowSystem", "f2.txt")), Is.True);
+        Assert.That(File.Exists(Path.Combine(path, "ShadowSystem", "f1.txt")), Is.False);
     }
 
     /// <summary>
@@ -1066,11 +1066,11 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
 
         var f1Url = ss.GetUrl("f1.txt");
         var f2Url = ss.GetUrl("f2.txt");
-        Assert.AreEqual("rootUrl/f1.txt", f1Url);
-        Assert.AreEqual("rootUrl/f2.txt", f2Url);
-        Assert.IsTrue(File.Exists(Path.Combine(root, "ShadowTests", "f1.txt")));
-        Assert.IsFalse(File.Exists(Path.Combine(root, "ShadowTests", "f2.txt")));
-        Assert.IsTrue(File.Exists(Path.Combine(root, "ShadowSystem", "f2.txt")));
-        Assert.IsFalse(File.Exists(Path.Combine(root, "ShadowSystem", "f1.txt")));
+        Assert.That(f1Url, Is.EqualTo("rootUrl/f1.txt"));
+        Assert.That(f2Url, Is.EqualTo("rootUrl/f2.txt"));
+        Assert.That(File.Exists(Path.Combine(root, "ShadowTests", "f1.txt")), Is.True);
+        Assert.That(File.Exists(Path.Combine(root, "ShadowTests", "f2.txt")), Is.False);
+        Assert.That(File.Exists(Path.Combine(root, "ShadowSystem", "f2.txt")), Is.True);
+        Assert.That(File.Exists(Path.Combine(root, "ShadowSystem", "f1.txt")), Is.False);
     }
 }

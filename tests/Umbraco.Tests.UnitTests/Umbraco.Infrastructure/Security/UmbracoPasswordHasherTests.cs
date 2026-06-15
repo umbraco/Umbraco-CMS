@@ -1,4 +1,4 @@
-using AutoFixture.NUnit3;
+using AutoFixture.NUnit4;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -31,7 +31,7 @@ public class UmbracoPasswordHasherTests
 
         var result = sut.VerifyHashedPassword(aUser, hashedPassword, providedPassword);
 
-        Assert.AreEqual(PasswordVerificationResult.SuccessRehashNeeded, result);
+        Assert.That(result, Is.EqualTo(PasswordVerificationResult.SuccessRehashNeeded));
     }
 
     [Test]
@@ -54,7 +54,7 @@ public class UmbracoPasswordHasherTests
 
         var result = sut.VerifyHashedPassword(aUser, hashedPassword, providedPassword);
 
-        Assert.AreEqual(PasswordVerificationResult.SuccessRehashNeeded, result);
+        Assert.That(result, Is.EqualTo(PasswordVerificationResult.SuccessRehashNeeded));
     }
 
     [Test]
@@ -73,7 +73,7 @@ public class UmbracoPasswordHasherTests
 
         var result = sut.VerifyHashedPassword(aUser, hashedPassword, providedPassword);
 
-        Assert.AreEqual(PasswordVerificationResult.Failed, result);
+        Assert.That(result, Is.EqualTo(PasswordVerificationResult.Failed));
     }
 
     [Test]
@@ -93,7 +93,7 @@ public class UmbracoPasswordHasherTests
         var identityV1Or2StyleHash = upstreamHasher.HashPassword(aUser, password);
         var result = sut.VerifyHashedPassword(aUser, identityV1Or2StyleHash, password);
 
-        Assert.AreEqual(PasswordVerificationResult.SuccessRehashNeeded, result);
+        Assert.That(result, Is.EqualTo(PasswordVerificationResult.SuccessRehashNeeded));
     }
 
     [Test]
@@ -113,7 +113,7 @@ public class UmbracoPasswordHasherTests
         var identityV1Or2StyleHash = upstreamHasher.HashPassword(aUser, password);
         var result = sut.VerifyHashedPassword(aUser, identityV1Or2StyleHash, password);
 
-        Assert.AreEqual(PasswordVerificationResult.Success, result);
+        Assert.That(result, Is.EqualTo(PasswordVerificationResult.Success));
     }
 
     public class TestUserStub : UmbracoIdentityUser

@@ -29,10 +29,10 @@ internal sealed class OpenApiSchemaServiceExtensionsTests
             sd.ServiceType.FullName == OpenApiSchemaServiceExtensions.OpenApiSchemaServiceFullName
             && Equals(sd.ServiceKey, documentName));
 
-        Assert.AreNotSame(originalDescriptor, replacedDescriptor);
-        Assert.IsNotNull(replacedDescriptor.KeyedImplementationFactory);
-        Assert.IsNull(replacedDescriptor.KeyedImplementationInstance);
-        Assert.IsNull(replacedDescriptor.KeyedImplementationType);
+        Assert.That(replacedDescriptor, Is.Not.SameAs(originalDescriptor));
+        Assert.That(replacedDescriptor.KeyedImplementationFactory, Is.Not.Null);
+        Assert.That(replacedDescriptor.KeyedImplementationInstance, Is.Null);
+        Assert.That(replacedDescriptor.KeyedImplementationType, Is.Null);
     }
 
     [Test]
@@ -56,7 +56,7 @@ internal sealed class OpenApiSchemaServiceExtensionsTests
         ServiceDescriptor otherAfter = services.Single(sd =>
             sd.ServiceType.FullName == OpenApiSchemaServiceExtensions.OpenApiSchemaServiceFullName
             && Equals(sd.ServiceKey, otherDocument));
-        Assert.AreSame(otherOriginal, otherAfter);
+        Assert.That(otherAfter, Is.SameAs(otherOriginal));
     }
 
     [Test]
@@ -68,8 +68,8 @@ internal sealed class OpenApiSchemaServiceExtensionsTests
         // Act + Assert
         InvalidOperationException ex = Assert.Throws<InvalidOperationException>(
             () => services.ReplaceOpenApiSchemaService("missing-doc", "json-opts"))!;
-        StringAssert.Contains(OpenApiSchemaServiceExtensions.OpenApiSchemaServiceFullName, ex.Message);
-        StringAssert.Contains("missing-doc", ex.Message);
+        Assert.That(ex.Message, Does.Contain(OpenApiSchemaServiceExtensions.OpenApiSchemaServiceFullName));
+        Assert.That(ex.Message, Does.Contain("missing-doc"));
     }
 
     [Test]

@@ -39,23 +39,21 @@ public partial class ContentBlueprintEditingServiceTests
                 }
             };
             var result = await ContentBlueprintEditingService.GetScaffoldedAsync(blueprint.Key);
-            Assert.IsNotNull(result);
-            Assert.AreNotEqual(blueprint.Key, result.Key);
-            Assert.AreEqual(
-                blueprint.ContentType.Key,
-                result.ContentType.Key,
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Key, Is.Not.EqualTo(blueprint.Key));
+            Assert.That(
+                result.ContentType.Key, Is.EqualTo(blueprint.ContentType.Key),
                 "The content type of the scaffolded content should match the original blueprint content type.");
-            Assert.AreEqual(
-                blueprint.Properties.Select(p => (p.Alias, p.PropertyType.Key)),
-                result.Properties.Select(p => (p.Alias, p.PropertyType.Key)),
+            Assert.That(
+                result.Properties.Select(p => (p.Alias, p.PropertyType.Key)), Is.EqualTo(blueprint.Properties.Select(p => (p.Alias, p.PropertyType.Key))),
                 "The properties of the scaffolded content should match the original blueprint properties.");
 
             var propertyValues = result.Properties.SelectMany(property => property.Values).ToArray();
-            Assert.IsNotEmpty(propertyValues);
+            Assert.That(propertyValues, Is.Not.Empty);
             Assert.Multiple(() =>
             {
-                Assert.IsTrue(propertyValues.All(value => value.EditedValue is string stringValue && stringValue.EndsWith(" scaffolded edited")));
-                Assert.IsTrue(propertyValues.All(value => value.PublishedValue is string stringValue && stringValue.EndsWith(" scaffolded published")));
+                Assert.That(propertyValues.All(value => value.EditedValue is string stringValue && stringValue.EndsWith(" scaffolded edited")), Is.True);
+                Assert.That(propertyValues.All(value => value.PublishedValue is string stringValue && stringValue.EndsWith(" scaffolded published")), Is.True);
             });
         }
         finally
@@ -68,7 +66,7 @@ public partial class ContentBlueprintEditingServiceTests
     public async Task Cannot_Get_Non_Existing_Scaffold()
     {
         var result = await ContentBlueprintEditingService.GetScaffoldedAsync(Guid.NewGuid());
-        Assert.IsNull(result);
+        Assert.That(result, Is.Null);
     }
 
     [TestCase(false, Constants.PropertyEditors.Aliases.BlockList)]
@@ -82,8 +80,8 @@ public partial class ContentBlueprintEditingServiceTests
     {
         var blueprint = await CreateBlueprintWithBlocksEditor(variant, editorAlias);
         var result = await ContentBlueprintEditingService.GetScaffoldedAsync(blueprint.Content.Key);
-        Assert.IsNotNull(result);
-        Assert.AreNotEqual(blueprint.Content.Key, result.Key);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Key, Is.Not.EqualTo(blueprint.Content.Key));
 
         List<Guid> newKeys = [];
         var newInvariantBlocklist = GetBlockValue("invariantBlocks");
@@ -106,7 +104,7 @@ public partial class ContentBlueprintEditingServiceTests
 
         foreach (var newKey in newKeys)
         {
-            Assert.IsFalse(blueprint.BlockKeys.Contains(newKey), "The blocks in a content item generated from a template should have new keys.");
+            Assert.That(blueprint.BlockKeys, Does.Not.Contain(newKey), "The blocks in a content item generated from a template should have new keys.");
         }
 
         return;
@@ -153,7 +151,7 @@ public partial class ContentBlueprintEditingServiceTests
         // Create blocks datatype using the created elements
         var dataType = DataTypeBuilder.CreateSimpleElementDataType(IOHelper, editorAlias, elementContentType.Key, settingsContentType.Key);
         var dataTypeAttempt = await DataTypeService.CreateAsync(dataType, Constants.Security.SuperUserKey);
-        Assert.True(dataTypeAttempt.Success, $"Failed to create data type: {dataTypeAttempt.Exception?.Message}");
+        Assert.That(dataTypeAttempt.Success, Is.True, $"Failed to create data type: {dataTypeAttempt.Exception?.Message}");
 
         // Create new blocks property types
         var invariantPropertyType = new PropertyTypeBuilder<ContentTypeBuilder>(new ContentTypeBuilder())
@@ -208,7 +206,7 @@ public partial class ContentBlueprintEditingServiceTests
         }
 
         var result = await ContentBlueprintEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
         return (result.Result.Content, allBlockKeys);
     }
 

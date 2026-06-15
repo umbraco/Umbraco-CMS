@@ -12,8 +12,8 @@ public class SystemTextJsonSerializerTests
     {
         var json = JsonNode.Parse("{\"myProperty\":\"value\"}");
         var subject = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
-        Assert.IsTrue(subject.TryDeserialize(json!, out MyItem myItem));
-        Assert.AreEqual("value", myItem.MyProperty);
+        Assert.That(subject.TryDeserialize(json!, out MyItem myItem), Is.True);
+        Assert.That(myItem.MyProperty, Is.EqualTo("value"));
     }
 
     [Test]
@@ -21,12 +21,12 @@ public class SystemTextJsonSerializerTests
     {
         var json = JsonNode.Parse("[{\"myProperty\":\"value1\"},{\"myProperty\":\"value2\"}]");
         var subject = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
-        Assert.IsTrue(subject.TryDeserialize(json!, out MyItem[] myItems));
-        Assert.AreEqual(2, myItems.Length);
+        Assert.That(subject.TryDeserialize(json!, out MyItem[] myItems), Is.True);
+        Assert.That(myItems.Length, Is.EqualTo(2));
         Assert.Multiple(() =>
         {
-            Assert.AreEqual("value1", myItems[0].MyProperty);
-            Assert.AreEqual("value2", myItems[1].MyProperty);
+            Assert.That(myItems[0].MyProperty, Is.EqualTo("value1"));
+            Assert.That(myItems[1].MyProperty, Is.EqualTo("value2"));
         });
     }
 
@@ -35,15 +35,15 @@ public class SystemTextJsonSerializerTests
     {
         var json = "{\"myProperty\":\"value\"}";
         var subject = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
-        Assert.IsTrue(subject.TryDeserialize(json, out MyItem myItem));
-        Assert.AreEqual("value", myItem.MyProperty);
+        Assert.That(subject.TryDeserialize(json, out MyItem myItem), Is.True);
+        Assert.That(myItem.MyProperty, Is.EqualTo("value"));
     }
 
     [Test]
     public void TryDeserialize_Cannot_Handle_RandomString()
     {
         var subject = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
-        Assert.IsFalse(subject.TryDeserialize<MyItem>("something something", out _));
+        Assert.That(subject.TryDeserialize<MyItem>("something something", out _), Is.False);
     }
 
     private class MyItem

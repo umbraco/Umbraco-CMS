@@ -46,8 +46,8 @@ public class EventAggregatorTests
         var childNotification = new ChildNotification();
         aggregator.Publish(childNotification);
 
-        Assert.AreEqual(A + B + C, notification.SubscriberCount, "Notification should be handled by all 3 registered INotificationHandlers (A, B and C).");
-        Assert.AreEqual(A, childNotification.SubscriberCount, "ChildNotification should only be handled by a single registered INotificationHandler (A).");
+        Assert.That(notification.SubscriberCount, Is.EqualTo(A + B + C), "Notification should be handled by all 3 registered INotificationHandlers (A, B and C).");
+        Assert.That(childNotification.SubscriberCount, Is.EqualTo(A), "ChildNotification should only be handled by a single registered INotificationHandler (A).");
     }
 
     [Test]
@@ -68,8 +68,8 @@ public class EventAggregatorTests
         var childNotification = new ChildNotification();
         await aggregator.PublishAsync(childNotification);
 
-        Assert.AreEqual(A + B + C, notification.SubscriberCount, "Notification should be handled by all 3 registered INotificationAsyncHandlers (A, B and C).");
-        Assert.AreEqual(A, childNotification.SubscriberCount, "ChildNotification should only be handled by a single registered INotificationAsyncHandler (A).");
+        Assert.That(notification.SubscriberCount, Is.EqualTo(A + B + C), "Notification should be handled by all 3 registered INotificationAsyncHandlers (A, B and C).");
+        Assert.That(childNotification.SubscriberCount, Is.EqualTo(A), "ChildNotification should only be handled by a single registered INotificationAsyncHandler (A).");
     }
 
     [Test]
@@ -92,9 +92,9 @@ public class EventAggregatorTests
         };
         aggregator.Publish(notifications);
 
-        Assert.AreEqual(A + B + C, notifications[0].SubscriberCount, "Notification should be handled by all 3 registered INotificationHandlers (A, B and C).");
-        Assert.AreEqual(A + B + C, notifications[1].SubscriberCount, "Notification should be handled by all 3 registered INotificationHandlers (A, B and C).");
-        Assert.AreEqual(A, notifications[2].SubscriberCount, "ChildNotification should only be handled by a single registered INotificationHandler (A).");
+        Assert.That(notifications[0].SubscriberCount, Is.EqualTo(A + B + C), "Notification should be handled by all 3 registered INotificationHandlers (A, B and C).");
+        Assert.That(notifications[1].SubscriberCount, Is.EqualTo(A + B + C), "Notification should be handled by all 3 registered INotificationHandlers (A, B and C).");
+        Assert.That(notifications[2].SubscriberCount, Is.EqualTo(A), "ChildNotification should only be handled by a single registered INotificationHandler (A).");
     }
 
     [Test]
@@ -117,9 +117,9 @@ public class EventAggregatorTests
         };
         await aggregator.PublishAsync(notifications);
 
-        Assert.AreEqual(A + B + C, notifications[0].SubscriberCount, "Notification should be handled by all 3 registered INotificationAsyncHandlers (A, B and C).");
-        Assert.AreEqual(A + B + C, notifications[1].SubscriberCount, "Notification should be handled by all 3 registered INotificationAsyncHandlers (A, B and C).");
-        Assert.AreEqual(A, notifications[2].SubscriberCount, "ChildNotification should only be handled by a single registered INotificationAsyncHandler (A).");
+        Assert.That(notifications[0].SubscriberCount, Is.EqualTo(A + B + C), "Notification should be handled by all 3 registered INotificationAsyncHandlers (A, B and C).");
+        Assert.That(notifications[1].SubscriberCount, Is.EqualTo(A + B + C), "Notification should be handled by all 3 registered INotificationAsyncHandlers (A, B and C).");
+        Assert.That(notifications[2].SubscriberCount, Is.EqualTo(A), "ChildNotification should only be handled by a single registered INotificationAsyncHandler (A).");
     }
 
     [Test]
@@ -140,8 +140,8 @@ public class EventAggregatorTests
         var childNotification = new ChildNotification();
         aggregator.Publish<INotification, IDistributedCacheNotificationHandler>(childNotification);
 
-        Assert.AreEqual(B, notification.SubscriberCount, "Notification should only be handled by a single registered IDistributedCacheNotificationHandler (B).");
-        Assert.AreEqual(0, childNotification.SubscriberCount, "ChildNotification should not be handled, since it has no registered IDistributedCacheNotificationHandler.");
+        Assert.That(notification.SubscriberCount, Is.EqualTo(B), "Notification should only be handled by a single registered IDistributedCacheNotificationHandler (B).");
+        Assert.That(childNotification.SubscriberCount, Is.EqualTo(0), "ChildNotification should not be handled, since it has no registered IDistributedCacheNotificationHandler.");
     }
 
     [Test]
@@ -162,8 +162,8 @@ public class EventAggregatorTests
         var childNotification = new ChildNotification();
         await aggregator.PublishAsync<INotification, IDistributedCacheNotificationHandler>(childNotification);
 
-        Assert.AreEqual(B, notification.SubscriberCount, "Notification should only be handled by a single registered IDistributedCacheNotificationHandler (B).");
-        Assert.AreEqual(0, childNotification.SubscriberCount, "ChildNotification should not be handled, since it has no registered IDistributedCacheNotificationHandler.");
+        Assert.That(notification.SubscriberCount, Is.EqualTo(B), "Notification should only be handled by a single registered IDistributedCacheNotificationHandler (B).");
+        Assert.That(childNotification.SubscriberCount, Is.EqualTo(0), "ChildNotification should not be handled, since it has no registered IDistributedCacheNotificationHandler.");
     }
 
     [Test]
@@ -186,9 +186,9 @@ public class EventAggregatorTests
         };
         aggregator.Publish<INotification, IDistributedCacheNotificationHandler>(notifications);
 
-        Assert.AreEqual(B, notifications[0].SubscriberCount, "Notification should only be handled by a single registered IDistributedCacheNotificationHandler (B).");
-        Assert.AreEqual(B, notifications[1].SubscriberCount, "Notification should only be handled by a single registered IDistributedCacheNotificationHandler (B).");
-        Assert.AreEqual(0, notifications[2].SubscriberCount, "ChildNotification should not be handled, since it has no registered IDistributedCacheNotificationHandler.");
+        Assert.That(notifications[0].SubscriberCount, Is.EqualTo(B), "Notification should only be handled by a single registered IDistributedCacheNotificationHandler (B).");
+        Assert.That(notifications[1].SubscriberCount, Is.EqualTo(B), "Notification should only be handled by a single registered IDistributedCacheNotificationHandler (B).");
+        Assert.That(notifications[2].SubscriberCount, Is.EqualTo(0), "ChildNotification should not be handled, since it has no registered IDistributedCacheNotificationHandler.");
     }
 
     [Test]
@@ -211,9 +211,9 @@ public class EventAggregatorTests
         };
         await aggregator.PublishAsync<INotification, IDistributedCacheNotificationHandler>(notifications);
 
-        Assert.AreEqual(B, notifications[0].SubscriberCount, "Notification should only be handled by a single registered IDistributedCacheNotificationHandler (B).");
-        Assert.AreEqual(B, notifications[1].SubscriberCount, "Notification should only be handled by a single registered IDistributedCacheNotificationHandler (B).");
-        Assert.AreEqual(0, notifications[2].SubscriberCount, "ChildNotification should not be handled, since it has no registered IDistributedCacheNotificationHandler.");
+        Assert.That(notifications[0].SubscriberCount, Is.EqualTo(B), "Notification should only be handled by a single registered IDistributedCacheNotificationHandler (B).");
+        Assert.That(notifications[1].SubscriberCount, Is.EqualTo(B), "Notification should only be handled by a single registered IDistributedCacheNotificationHandler (B).");
+        Assert.That(notifications[2].SubscriberCount, Is.EqualTo(0), "ChildNotification should not be handled, since it has no registered IDistributedCacheNotificationHandler.");
     }
 
     public class Notification : INotification

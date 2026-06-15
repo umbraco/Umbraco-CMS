@@ -61,7 +61,7 @@ public partial class BackOfficeExternalLoginServiceTests
                 ProviderKey(loginProviderName, providerKeyPostFix));
 
         // assert
-        Assert.AreEqual(expectedResult, providersAttempt.Result);
+        Assert.That(providersAttempt.Result, Is.EqualTo(expectedResult));
     }
 
     private ClaimsPrincipal BuildClaimsPrinciple(Guid? identityId)

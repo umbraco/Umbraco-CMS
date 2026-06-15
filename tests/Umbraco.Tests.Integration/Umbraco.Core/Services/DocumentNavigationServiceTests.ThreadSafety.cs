@@ -21,8 +21,8 @@ internal sealed partial class DocumentNavigationServiceTests
         await sut.RebuildAsync();
 
         // Confirm baseline: root keys are present.
-        Assert.IsTrue(sut.TryGetRootKeys(out IEnumerable<Guid> initialRootKeys), "Root keys should exist after initial rebuild");
-        Assert.IsTrue(initialRootKeys.Any(), "There should be at least one root key");
+        Assert.That(sut.TryGetRootKeys(out IEnumerable<Guid> initialRootKeys), Is.True, "Root keys should exist after initial rebuild");
+        Assert.That(initialRootKeys.Any(), Is.True, "There should be at least one root key");
 
         var emptyRootCount = 0;
         var exceptionCount = 0;
@@ -76,7 +76,7 @@ internal sealed partial class DocumentNavigationServiceTests
         var failureCount = emptyRootCount + exceptionCount;
 
         // Assert - root keys should never be transiently empty during a rebuild.
-        Assert.IsTrue(failureCount == 0, $"Expected all reads to see root keys, but {emptyRootCount} returned empty and {exceptionCount} threw exceptions (out of {totalReads} total reads)");
+        Assert.That(failureCount, Is.EqualTo(0), $"Expected all reads to see root keys, but {emptyRootCount} returned empty and {exceptionCount} threw exceptions (out of {totalReads} total reads)");
     }
 
     private static Task RunWithSuppressedExecutionContext(Func<Task> action)

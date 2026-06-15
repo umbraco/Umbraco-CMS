@@ -25,22 +25,22 @@ public class SiteDomainMapperTests
 
         var sites = siteDomainMapper.Sites;
 
-        Assert.AreEqual(2, sites.Count);
+        Assert.That(sites, Has.Count.EqualTo(2));
 
-        Assert.Contains("site1", sites.Keys);
-        Assert.Contains("site2", sites.Keys);
+        Assert.That(sites.Keys, Does.Contain("site1"));
+        Assert.That(sites.Keys, Does.Contain("site2"));
 
         var domains = sites["site1"];
-        Assert.AreEqual(3, domains.Length);
-        Assert.Contains("domain1.com", domains);
-        Assert.Contains("domain1.net", domains);
-        Assert.Contains("domain1.org", domains);
+        Assert.That(domains.Length, Is.EqualTo(3));
+        Assert.That(domains, Does.Contain("domain1.com"));
+        Assert.That(domains, Does.Contain("domain1.net"));
+        Assert.That(domains, Does.Contain("domain1.org"));
 
         domains = sites["site2"];
-        Assert.AreEqual(3, domains.Length);
-        Assert.Contains("domain2.com", domains);
-        Assert.Contains("domain2.net", domains);
-        Assert.Contains("domain2.org", domains);
+        Assert.That(domains.Length, Is.EqualTo(3));
+        Assert.That(domains, Does.Contain("domain2.com"));
+        Assert.That(domains, Does.Contain("domain2.net"));
+        Assert.That(domains, Does.Contain("domain2.org"));
     }
 
     [TestCase("foo")] // that one is suspect
@@ -83,9 +83,9 @@ public class SiteDomainMapperTests
         siteDomainMapper.RemoveSite("site1");
         siteDomainMapper.RemoveSite("site3");
 
-        Assert.AreEqual(1, sites.Count);
+        Assert.That(sites, Has.Count.EqualTo(1));
 
-        Assert.Contains("site2", sites.Keys);
+        Assert.That(sites.Keys, Does.Contain("site2"));
     }
 
     [Test]
@@ -98,14 +98,14 @@ public class SiteDomainMapperTests
 
         var sites = siteDomainMapper.Sites;
 
-        Assert.AreEqual(1, sites.Count);
+        Assert.That(sites, Has.Count.EqualTo(1));
 
-        Assert.Contains("site1", sites.Keys);
+        Assert.That(sites.Keys, Does.Contain("site1"));
 
         var domains = sites["site1"];
-        Assert.AreEqual(2, domains.Count());
-        Assert.Contains("domain2.com", domains);
-        Assert.Contains("domain1.net", domains);
+        Assert.That(domains.Count(), Is.EqualTo(2));
+        Assert.That(domains, Does.Contain("domain2.com"));
+        Assert.That(domains, Does.Contain("domain1.net"));
     }
 
     [Test]
@@ -122,17 +122,17 @@ public class SiteDomainMapperTests
 
         var bindings = siteDomainMapper.Bindings;
 
-        Assert.AreEqual(2, bindings.Count);
-        Assert.Contains("site1", bindings.Keys);
-        Assert.Contains("site2", bindings.Keys);
+        Assert.That(bindings, Has.Count.EqualTo(2));
+        Assert.That(bindings.Keys, Does.Contain("site1"));
+        Assert.That(bindings.Keys, Does.Contain("site2"));
 
         var others = bindings["site1"];
-        Assert.AreEqual(1, others.Count);
-        Assert.Contains("site2", others);
+        Assert.That(others, Has.Count.EqualTo(1));
+        Assert.That(others, Does.Contain("site2"));
 
         others = bindings["site2"];
-        Assert.AreEqual(1, others.Count);
-        Assert.Contains("site1", others);
+        Assert.That(others, Has.Count.EqualTo(1));
+        Assert.That(others, Does.Contain("site1"));
     }
 
     [Test]
@@ -150,25 +150,25 @@ public class SiteDomainMapperTests
 
         var bindings = siteDomainMapper.Bindings;
 
-        Assert.AreEqual(3, bindings.Count);
-        Assert.Contains("site1", bindings.Keys);
-        Assert.Contains("site2", bindings.Keys);
-        Assert.Contains("site3", bindings.Keys);
+        Assert.That(bindings, Has.Count.EqualTo(3));
+        Assert.That(bindings.Keys, Does.Contain("site1"));
+        Assert.That(bindings.Keys, Does.Contain("site2"));
+        Assert.That(bindings.Keys, Does.Contain("site3"));
 
         var others = bindings["site1"];
-        Assert.AreEqual(2, others.Count);
-        Assert.Contains("site2", others);
-        Assert.Contains("site3", others);
+        Assert.That(others, Has.Count.EqualTo(2));
+        Assert.That(others, Does.Contain("site2"));
+        Assert.That(others, Does.Contain("site3"));
 
         others = bindings["site2"];
-        Assert.AreEqual(2, others.Count);
-        Assert.Contains("site1", others);
-        Assert.Contains("site3", others);
+        Assert.That(others, Has.Count.EqualTo(2));
+        Assert.That(others, Does.Contain("site1"));
+        Assert.That(others, Does.Contain("site3"));
 
         others = bindings["site3"];
-        Assert.AreEqual(2, others.Count);
-        Assert.Contains("site1", others);
-        Assert.Contains("site2", others);
+        Assert.That(others, Has.Count.EqualTo(2));
+        Assert.That(others, Does.Contain("site1"));
+        Assert.That(others, Does.Contain("site2"));
     }
 
     private DomainAndUri[] DomainAndUris(Uri current, Domain[] domains) =>
@@ -196,7 +196,7 @@ public class SiteDomainMapperTests
         };
         var domainAndUris = DomainAndUris(current, domains);
         var output = siteDomainMapper.MapDomain(domainAndUris, current, s_cultureFr, s_cultureFr).Uri.ToString();
-        Assert.AreEqual("https://domain1.com/", output);
+        Assert.That(output, Is.EqualTo("https://domain1.com/"));
 
         // will pick it all right
         current = new Uri("https://domain1.com/foo/bar");
@@ -207,7 +207,7 @@ public class SiteDomainMapperTests
         };
         domainAndUris = DomainAndUris(current, domains);
         output = siteDomainMapper.MapDomain(domainAndUris, current, s_cultureFr, s_cultureFr).Uri.ToString();
-        Assert.AreEqual("https://domain1.com/", output);
+        Assert.That(output, Is.EqualTo("https://domain1.com/"));
 
         current = new Uri("https://domain1.com/foo/bar");
         domains = new[]
@@ -217,7 +217,7 @@ public class SiteDomainMapperTests
         };
         domainAndUris = DomainAndUris(current, domains);
         output = siteDomainMapper.MapDomain(domainAndUris, current, s_cultureFr, s_cultureFr).Uri.ToString();
-        Assert.AreEqual("https://domain1.com/", output);
+        Assert.That(output, Is.EqualTo("https://domain1.com/"));
 
         current = new Uri("https://domain4.com/foo/bar");
         domains = new[]
@@ -227,7 +227,7 @@ public class SiteDomainMapperTests
         };
         domainAndUris = DomainAndUris(current, domains);
         output = siteDomainMapper.MapDomain(domainAndUris, current, s_cultureFr, s_cultureFr).Uri.ToString();
-        Assert.AreEqual("https://domain4.com/", output);
+        Assert.That(output, Is.EqualTo("https://domain4.com/"));
     }
 
     [Test]
@@ -252,7 +252,7 @@ public class SiteDomainMapperTests
             current,
             s_cultureFr,
             s_cultureFr).Uri.ToString();
-        Assert.AreEqual("http://domain1.com/", output);
+        Assert.That(output, Is.EqualTo("http://domain1.com/"));
 
         // current is a site1 uri, domains do not contain current
         // so we'll get the corresponding site1 domain
@@ -266,7 +266,7 @@ public class SiteDomainMapperTests
             current,
             s_cultureFr,
             s_cultureFr).Uri.ToString();
-        Assert.AreEqual("http://domain1.net/", output);
+        Assert.That(output, Is.EqualTo("http://domain1.net/"));
 
         // current is a site1 uri, domains do not contain current
         // so we'll get the corresponding site1 domain
@@ -281,7 +281,7 @@ public class SiteDomainMapperTests
             current,
             s_cultureFr,
             s_cultureFr).Uri.ToString();
-        Assert.AreEqual("http://domain1.net/", output);
+        Assert.That(output, Is.EqualTo("http://domain1.net/"));
     }
 
     [Test]
@@ -315,8 +315,8 @@ public class SiteDomainMapperTests
             s_cultureFr,
             s_cultureFr).ToArray();
 
-        Assert.AreEqual(1, output.Length);
-        Assert.AreEqual("http://domain1.org/", output[0].Uri.ToString());
+        Assert.That(output.Length, Is.EqualTo(1));
+        Assert.That(output[0].Uri.ToString(), Is.EqualTo("http://domain1.org/"));
 
         // current is a site1 uri, domains does not contain current
         current = new Uri("http://domain1.com/foo/bar");
@@ -334,8 +334,8 @@ public class SiteDomainMapperTests
             s_cultureFr,
             s_cultureFr).ToArray();
 
-        Assert.AreEqual(1, output.Length);
-        Assert.AreEqual("http://domain1.org/", output[0].Uri.ToString());
+        Assert.That(output.Length, Is.EqualTo(1));
+        Assert.That(output[0].Uri.ToString(), Is.EqualTo("http://domain1.org/"));
 
         siteDomainMapper.BindSites("site1", "site3");
         siteDomainMapper.BindSites("site2", "site4");
@@ -357,10 +357,10 @@ public class SiteDomainMapperTests
             s_cultureFr,
             s_cultureFr).ToArray();
 
-        Assert.AreEqual(3, output.Length);
-        Assert.AreEqual("http://domain3.com/", output[0].Uri.ToString());
-        Assert.AreEqual("http://domain3.org/", output[1].Uri.ToString());
-        Assert.AreEqual("http://domain1.org/", output[2].Uri.ToString());
+        Assert.That(output.Length, Is.EqualTo(3));
+        Assert.That(output[0].Uri.ToString(), Is.EqualTo("http://domain3.com/"));
+        Assert.That(output[1].Uri.ToString(), Is.EqualTo("http://domain3.org/"));
+        Assert.That(output[2].Uri.ToString(), Is.EqualTo("http://domain1.org/"));
 
         // current is a site1 uri, domains does not contain current
         current = new Uri("http://domain1.com/foo/bar");
@@ -379,9 +379,9 @@ public class SiteDomainMapperTests
             s_cultureFr,
             s_cultureFr).ToArray();
 
-        Assert.AreEqual(3, output.Length);
-        Assert.AreEqual("http://domain3.com/", output[0].Uri.ToString());
-        Assert.AreEqual("http://domain3.org/", output[1].Uri.ToString());
-        Assert.AreEqual("http://domain1.org/", output[2].Uri.ToString());
+        Assert.That(output.Length, Is.EqualTo(3));
+        Assert.That(output[0].Uri.ToString(), Is.EqualTo("http://domain3.com/"));
+        Assert.That(output[1].Uri.ToString(), Is.EqualTo("http://domain3.org/"));
+        Assert.That(output[2].Uri.ToString(), Is.EqualTo("http://domain1.org/"));
     }
 }

@@ -46,7 +46,7 @@ internal sealed class RichTextPropertyEditorTests : UmbracoIntegrationTest
 
         var dataTypeId = contentType.PropertyTypes.First(propertyType => propertyType.Alias == "bodyText").DataTypeId;
         var keyAttempt = IdKeyMap.GetKeyForId(dataTypeId, UmbracoObjectTypes.DataType);
-        Assert.IsTrue(keyAttempt.Success, $"Could not resolve a GUID key for data type id {dataTypeId}.");
+        Assert.That(keyAttempt.Success, Is.True, $"Could not resolve a GUID key for data type id {dataTypeId}.");
         var dataType = (await DataTypeService.GetAsync(keyAttempt.Result))!;
         var editor = dataType.Editor!;
         var valueEditor = editor.GetValueEditor();
@@ -60,8 +60,8 @@ internal sealed class RichTextPropertyEditorTests : UmbracoIntegrationTest
         var toEditor = valueEditor.ToEditor(content.Properties["bodyText"]);
         var richTextEditorValue = toEditor as RichTextEditorValue;
 
-        Assert.IsNotNull(richTextEditorValue);
-        Assert.AreEqual(markup, richTextEditorValue.Markup);
+        Assert.That(richTextEditorValue, Is.Not.Null);
+        Assert.That(richTextEditorValue.Markup, Is.EqualTo(markup));
     }
 
     [Test]
@@ -73,7 +73,7 @@ internal sealed class RichTextPropertyEditorTests : UmbracoIntegrationTest
 
         var dataTypeId = contentType.PropertyTypes.First(propertyType => propertyType.Alias == "bodyText").DataTypeId;
         var keyAttempt = IdKeyMap.GetKeyForId(dataTypeId, UmbracoObjectTypes.DataType);
-        Assert.IsTrue(keyAttempt.Success, $"Could not resolve a GUID key for data type id {dataTypeId}.");
+        Assert.That(keyAttempt.Success, Is.True, $"Could not resolve a GUID key for data type id {dataTypeId}.");
         var dataType = (await DataTypeService.GetAsync(keyAttempt.Result))!;
         var editor = dataType.Editor!;
         var valueEditor = editor.GetValueEditor();
@@ -88,8 +88,8 @@ internal sealed class RichTextPropertyEditorTests : UmbracoIntegrationTest
         var toEditor = valueEditor.ToEditor(content.Properties["bodyText"]);
         var richTextEditorValue = toEditor as RichTextEditorValue;
 
-        Assert.IsNotNull(richTextEditorValue);
-        Assert.AreEqual(markup, richTextEditorValue.Markup);
+        Assert.That(richTextEditorValue, Is.Not.Null);
+        Assert.That(richTextEditorValue.Markup, Is.EqualTo(markup));
     }
 
     [Test]
@@ -108,7 +108,7 @@ internal sealed class RichTextPropertyEditorTests : UmbracoIntegrationTest
 
         var dataTypeId = contentType.PropertyTypes.First(propertyType => propertyType.Alias == "bodyText").DataTypeId;
         var keyAttempt = IdKeyMap.GetKeyForId(dataTypeId, UmbracoObjectTypes.DataType);
-        Assert.IsTrue(keyAttempt.Success, $"Could not resolve a GUID key for data type id {dataTypeId}.");
+        Assert.That(keyAttempt.Success, Is.True, $"Could not resolve a GUID key for data type id {dataTypeId}.");
         var dataType = (await DataTypeService.GetAsync(keyAttempt.Result))!;
         var editor = dataType.Editor!;
         var valueEditor = (BlockValuePropertyValueEditorBase<RichTextBlockValue, RichTextBlockLayoutItem>)editor.GetValueEditor();
@@ -145,10 +145,10 @@ internal sealed class RichTextPropertyEditorTests : UmbracoIntegrationTest
         ContentService.Save(content);
 
         var references = valueEditor.GetReferences(content.GetValue("bodyText")).ToArray();
-        Assert.AreEqual(1, references.Length);
+        Assert.That(references, Has.Length.EqualTo(1));
         var reference = references.First();
-        Assert.AreEqual(Constants.Conventions.RelationTypes.RelatedDocumentAlias, reference.RelationTypeAlias);
-        Assert.AreEqual(pickedContent.GetUdi(), reference.Udi);
+        Assert.That(reference.RelationTypeAlias, Is.EqualTo(Constants.Conventions.RelationTypes.RelatedDocumentAlias));
+        Assert.That(reference.Udi, Is.EqualTo(pickedContent.GetUdi()));
     }
 
     [Test]
@@ -164,7 +164,7 @@ internal sealed class RichTextPropertyEditorTests : UmbracoIntegrationTest
 
         var dataTypeId = contentType.PropertyTypes.First(propertyType => propertyType.Alias == "bodyText").DataTypeId;
         var keyAttempt = IdKeyMap.GetKeyForId(dataTypeId, UmbracoObjectTypes.DataType);
-        Assert.IsTrue(keyAttempt.Success, $"Could not resolve a GUID key for data type id {dataTypeId}.");
+        Assert.That(keyAttempt.Success, Is.True, $"Could not resolve a GUID key for data type id {dataTypeId}.");
         var dataType = (await DataTypeService.GetAsync(keyAttempt.Result))!;
         var editor = dataType.Editor!;
         var valueEditor = (BlockValuePropertyValueEditorBase<RichTextBlockValue, RichTextBlockLayoutItem>)editor.GetValueEditor();
@@ -201,10 +201,10 @@ internal sealed class RichTextPropertyEditorTests : UmbracoIntegrationTest
         ContentService.Save(content);
 
         var tags = valueEditor.GetTags(content.GetValue("bodyText"), null, null).ToArray();
-        Assert.AreEqual(3, tags.Length);
-        Assert.IsNotNull(tags.Single(tag => tag.Text == "Tag One"));
-        Assert.IsNotNull(tags.Single(tag => tag.Text == "Tag Two"));
-        Assert.IsNotNull(tags.Single(tag => tag.Text == "Tag Three"));
+        Assert.That(tags, Has.Length.EqualTo(3));
+        Assert.That(tags.Single(tag => tag.Text == "Tag One"), Is.Not.Null);
+        Assert.That(tags.Single(tag => tag.Text == "Tag Two"), Is.Not.Null);
+        Assert.That(tags.Single(tag => tag.Text == "Tag Three"), Is.Not.Null);
     }
 
     [TestCase(null, false)]
@@ -228,18 +228,18 @@ internal sealed class RichTextPropertyEditorTests : UmbracoIntegrationTest
             .Build();
 
         var contentResult = ContentService.Save(content);
-        Assert.IsTrue(contentResult.Success);
+        Assert.That(contentResult.Success, Is.True);
 
         var publishResult = ContentService.Publish(content, []);
-        Assert.IsTrue(publishResult.Success);
+        Assert.That(publishResult.Success, Is.True);
 
         var publishedContent = await PublishedContentCache.GetByIdAsync(content.Key);
-        Assert.IsNotNull(publishedContent);
+        Assert.That(publishedContent, Is.Not.Null);
 
         var publishedProperty = publishedContent.Properties.First(property => property.Alias == "rte");
-        Assert.AreEqual(expectedHasValue, publishedProperty.HasValue());
+        Assert.That(publishedProperty.HasValue(), Is.EqualTo(expectedHasValue));
 
-        Assert.AreEqual(expectedHasValue, publishedContent.HasValue("rte"));
+        Assert.That(publishedContent.HasValue("rte"), Is.EqualTo(expectedHasValue));
     }
 
     [TestCase(null, false)]
@@ -265,18 +265,18 @@ internal sealed class RichTextPropertyEditorTests : UmbracoIntegrationTest
             .Build();
 
         var contentResult = ContentService.Save(content);
-        Assert.IsTrue(contentResult.Success);
+        Assert.That(contentResult.Success, Is.True);
 
         var publishResult = ContentService.Publish(content, ["en-US"]);
-        Assert.IsTrue(publishResult.Success);
+        Assert.That(publishResult.Success, Is.True);
 
         var publishedContent = await PublishedContentCache.GetByIdAsync(content.Key);
-        Assert.IsNotNull(publishedContent);
+        Assert.That(publishedContent, Is.Not.Null);
 
         var publishedProperty = publishedContent.Properties.First(property => property.Alias == "rte");
-        Assert.AreEqual(expectedHasValue, publishedProperty.HasValue("en-US"));
+        Assert.That(publishedProperty.HasValue("en-US"), Is.EqualTo(expectedHasValue));
 
-        Assert.AreEqual(expectedHasValue, publishedContent.HasValue("rte", "en-US"));
+        Assert.That(publishedContent.HasValue("rte", "en-US"), Is.EqualTo(expectedHasValue));
     }
 
     private async Task<IContentType> CreateContentTypeForEmptyValueTests(ContentVariation contentVariation = ContentVariation.Nothing)
@@ -301,7 +301,7 @@ internal sealed class RichTextPropertyEditorTests : UmbracoIntegrationTest
             .Build();
 
         var contentTypeResult = await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
-        Assert.IsTrue(contentTypeResult.Success);
+        Assert.That(contentTypeResult.Success, Is.True);
 
         return contentType;
     }

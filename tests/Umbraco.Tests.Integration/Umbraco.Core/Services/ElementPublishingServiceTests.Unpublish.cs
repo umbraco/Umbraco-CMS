@@ -29,12 +29,12 @@ public partial class ElementPublishingServiceTests
             null,
             Constants.Security.SuperUserKey);
 
-        Assert.IsTrue(unpublishAttempt.Success);
+        Assert.That(unpublishAttempt.Success, Is.True);
         element = await ElementEditingService.GetAsync(element.Key);
-        Assert.IsNull(element!.PublishDate);
+        Assert.That(element!.PublishDate, Is.Null);
 
         var publishedElement = await ElementCacheService.GetByKeyAsync(element.Key, false);
-        Assert.IsNull(publishedElement);
+        Assert.That(publishedElement, Is.Null);
     }
 
     [Test]
@@ -53,12 +53,12 @@ public partial class ElementPublishingServiceTests
             new HashSet<string>([langEn.IsoCode]),
             Constants.Security.SuperUserKey);
 
-        Assert.IsTrue(unpublishAttempt.Success);
+        Assert.That(unpublishAttempt.Success, Is.True);
         element = await ElementEditingService.GetAsync(element.Key);
-        Assert.AreEqual(0, element!.PublishedCultures.Count());
+        Assert.That(element!.PublishedCultures.Count(), Is.EqualTo(0));
 
         var publishedElement = await ElementCacheService.GetByKeyAsync(element.Key, false);
-        Assert.IsNull(publishedElement);
+        Assert.That(publishedElement, Is.Null);
     }
 
     [Test]
@@ -81,15 +81,15 @@ public partial class ElementPublishingServiceTests
             new HashSet<string>([langEn.IsoCode, langDa.IsoCode]),
             Constants.Security.SuperUserKey);
 
-        Assert.IsTrue(unpublishAttempt.Success);
+        Assert.That(unpublishAttempt.Success, Is.True);
         element = await ElementEditingService.GetAsync(element.Key);
-        Assert.AreEqual(1, element!.PublishedCultures.Count());
+        Assert.That(element!.PublishedCultures.Count(), Is.EqualTo(1));
 
         var publishedElement = await ElementCacheService.GetByKeyAsync(element.Key, false);
-        Assert.NotNull(publishedElement);
-        Assert.IsFalse(publishedElement.IsPublished(langEn.IsoCode));
-        Assert.IsFalse(publishedElement.IsPublished(langDa.IsoCode));
-        Assert.IsTrue(publishedElement.IsPublished(langBe.IsoCode));
+        Assert.That(publishedElement, Is.Not.Null);
+        Assert.That(publishedElement.IsPublished(langEn.IsoCode), Is.False);
+        Assert.That(publishedElement.IsPublished(langDa.IsoCode), Is.False);
+        Assert.That(publishedElement.IsPublished(langBe.IsoCode), Is.True);
     }
 
     [Test]
@@ -112,12 +112,12 @@ public partial class ElementPublishingServiceTests
             new HashSet<string>([langEn.IsoCode, langDa.IsoCode, langBe.IsoCode]),
             Constants.Security.SuperUserKey);
 
-        Assert.IsTrue(unpublishAttempt.Success);
+        Assert.That(unpublishAttempt.Success, Is.True);
         element = await ElementEditingService.GetAsync(element.Key);
-        Assert.AreEqual(0, element!.PublishedCultures.Count());
+        Assert.That(element!.PublishedCultures.Count(), Is.EqualTo(0));
 
         var publishedElement = await ElementCacheService.GetByKeyAsync(element.Key, false);
-        Assert.IsNull(publishedElement);
+        Assert.That(publishedElement, Is.Null);
     }
 
     [Test]
@@ -141,12 +141,12 @@ public partial class ElementPublishingServiceTests
             null,
             Constants.Security.SuperUserKey);
 
-        Assert.IsFalse(unpublishAttempt.Success);
-        Assert.AreEqual(ContentPublishingOperationStatus.CannotUnpublishWhenReferenced, unpublishAttempt.Result);
+        Assert.That(unpublishAttempt.Success, Is.False);
+        Assert.That(unpublishAttempt.Result, Is.EqualTo(ContentPublishingOperationStatus.CannotUnpublishWhenReferenced));
 
         // Verify the referencedElement is still published
         var publishedElement = await ElementCacheService.GetByKeyAsync(referencedElement.Key, false);
-        Assert.IsNotNull(publishedElement);
+        Assert.That(publishedElement, Is.Not.Null);
     }
 
     [Test]
@@ -170,12 +170,12 @@ public partial class ElementPublishingServiceTests
             null,
             Constants.Security.SuperUserKey);
 
-        Assert.IsTrue(unpublishAttempt.Success);
-        Assert.AreEqual(ContentPublishingOperationStatus.Success, unpublishAttempt.Result);
+        Assert.That(unpublishAttempt.Success, Is.True);
+        Assert.That(unpublishAttempt.Result, Is.EqualTo(ContentPublishingOperationStatus.Success));
 
         // Verify the element is unpublished
         var publishedElement = await ElementCacheService.GetByKeyAsync(referencingElement.Key, false);
-        Assert.IsNull(publishedElement);
+        Assert.That(publishedElement, Is.Null);
     }
 
     public static void ConfigureDisableUnpublishWhenReferencedTrue(IUmbracoBuilder builder)

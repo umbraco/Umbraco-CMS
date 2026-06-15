@@ -38,12 +38,12 @@ public class PhysicalFileSystemTreeServiceTests : FileSystemTreeServiceTestsBase
 
         FileSystemTreeItemPresentationModel[] treeModels = service.GetSiblingsViewModels("wwwroot/css/test2.css", 1, 1, out long before, out var after);
 
-        Assert.AreEqual(3, treeModels.Length);
-        Assert.AreEqual(treeModels[0].Name, "test.css");
-        Assert.AreEqual(treeModels[1].Name, "test2.css");
-        Assert.AreEqual(treeModels[2].Name, "test3.css");
-        Assert.AreEqual(before, 0);
-        Assert.AreEqual(after, 1);
+        Assert.That(treeModels, Has.Length.EqualTo(3));
+        Assert.That(treeModels[0].Name, Is.EqualTo("test.css"));
+        Assert.That(treeModels[1].Name, Is.EqualTo("test2.css"));
+        Assert.That(treeModels[2].Name, Is.EqualTo("test3.css"));
+        Assert.That(before, Is.EqualTo(0));
+        Assert.That(after, Is.EqualTo(1));
     }
 
     [Test]
@@ -53,11 +53,11 @@ public class PhysicalFileSystemTreeServiceTests : FileSystemTreeServiceTestsBase
 
         FileSystemTreeItemPresentationModel[] treeModels = service.GetAncestorModels(Path.Join("wwwroot", "css", "test.css"), true);
 
-        Assert.IsNotEmpty(treeModels);
-        Assert.AreEqual(treeModels.Length, 3);
-        Assert.AreEqual(treeModels[0].Name, "wwwroot");
-        Assert.AreEqual(treeModels[1].Name, "css");
-        Assert.AreEqual(treeModels[2].Name, "test.css");
+        Assert.That(treeModels, Is.Not.Empty);
+        Assert.That(treeModels, Has.Length.EqualTo(3));
+        Assert.That(treeModels[0].Name, Is.EqualTo("wwwroot"));
+        Assert.That(treeModels[1].Name, Is.EqualTo("css"));
+        Assert.That(treeModels[2].Name, Is.EqualTo("test.css"));
     }
 
     [Test]
@@ -67,11 +67,11 @@ public class PhysicalFileSystemTreeServiceTests : FileSystemTreeServiceTestsBase
 
         FileSystemTreeItemPresentationModel[] treeModels = service.GetPathViewModels(string.Empty, 0, int.MaxValue, out var totalItems);
 
-        Assert.IsNotEmpty(treeModels);
-        Assert.AreEqual(totalItems, 2);
-        Assert.AreEqual(treeModels.Length, totalItems);
-        Assert.AreEqual(treeModels[0].Name, "App_Plugins");
-        Assert.AreEqual(treeModels[1].Name, "wwwroot");
+        Assert.That(treeModels, Is.Not.Empty);
+        Assert.That(totalItems, Is.EqualTo(2));
+        Assert.That(totalItems, Is.EqualTo(treeModels.Length));
+        Assert.That(treeModels[0].Name, Is.EqualTo("App_Plugins"));
+        Assert.That(treeModels[1].Name, Is.EqualTo("wwwroot"));
     }
 
     [Test]
@@ -81,10 +81,10 @@ public class PhysicalFileSystemTreeServiceTests : FileSystemTreeServiceTestsBase
 
         FileSystemTreeItemPresentationModel[] treeModels = service.GetPathViewModels("App_Plugins/test-extension", 0, int.MaxValue, out var totalItems);
 
-        Assert.IsNotEmpty(treeModels);
-        Assert.AreEqual(totalItems, 1);
-        Assert.AreEqual(treeModels.Length, totalItems);
-        Assert.AreEqual(treeModels[0].Name, "test.js");
+        Assert.That(treeModels, Is.Not.Empty);
+        Assert.That(totalItems, Is.EqualTo(1));
+        Assert.That(totalItems, Is.EqualTo(treeModels.Length));
+        Assert.That(treeModels[0].Name, Is.EqualTo("test.js"));
     }
 
     private PhysicalFileSystemTreeService CreateService()

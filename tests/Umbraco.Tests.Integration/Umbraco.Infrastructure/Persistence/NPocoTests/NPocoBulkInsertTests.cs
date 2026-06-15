@@ -200,10 +200,10 @@ internal sealed class NPocoBulkInsertTests : UmbracoIntegrationTest
         }
 
         // Assert
-        Assert.That(commands.Length, Is.EqualTo(5));
+        Assert.That(commands, Has.Length.EqualTo(5));
         foreach (var s in commands.Select(x => x.CommandText))
         {
-            Assert.LessOrEqual(Regex.Matches(s, "@\\d+").Count, 2000);
+            Assert.That(Regex.Matches(s, "@\\d+"), Has.Count.LessThanOrEqualTo(2000));
         }
     }
 

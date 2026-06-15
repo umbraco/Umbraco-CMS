@@ -34,7 +34,7 @@ public class DateTimeUnspecifiedValueConverterTests
 
         var result = converter.IsConverter(propertyType);
 
-        Assert.AreEqual(expected, result);
+        Assert.That(result, Is.EqualTo(expected));
     }
 
     [Test]
@@ -54,7 +54,7 @@ public class DateTimeUnspecifiedValueConverterTests
 
         var result = converter.GetPropertyValueType(propertyType);
 
-        Assert.AreEqual(typeof(DateTime?), result);
+        Assert.That(result, Is.EqualTo(typeof(DateTime?)));
     }
 
     private static readonly object[] _convertToIntermediateCases =
@@ -71,16 +71,16 @@ public class DateTimeUnspecifiedValueConverterTests
         var result = new DateTimeUnspecifiedValueConverter(_jsonSerializer, Mock.Of<ILogger<DateTimeUnspecifiedValueConverter>>()).ConvertSourceToIntermediate(null!, null!, input, false);
         if (expected is null)
         {
-            Assert.IsNull(result);
+            Assert.That(result, Is.Null);
             return;
         }
 
-        Assert.IsNotNull(result);
-        Assert.IsInstanceOf<DateTimeValueConverterBase.DateTimeDto>(result);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result, Is.InstanceOf<DateTimeValueConverterBase.DateTimeDto>());
         var dateTime = (DateTimeValueConverterBase.DateTimeDto)result;
-        Assert.IsInstanceOf<DateTimeValueConverterBase.DateTimeDto>(dateTime);
-        Assert.AreEqual(((DateTimeValueConverterBase.DateTimeDto)expected).Date, dateTime.Date);
-        Assert.AreEqual(((DateTimeValueConverterBase.DateTimeDto)expected).TimeZone, dateTime.TimeZone);
+        Assert.That(dateTime, Is.InstanceOf<DateTimeValueConverterBase.DateTimeDto>());
+        Assert.That(dateTime.Date, Is.EqualTo(((DateTimeValueConverterBase.DateTimeDto)expected).Date));
+        Assert.That(dateTime.TimeZone, Is.EqualTo(((DateTimeValueConverterBase.DateTimeDto)expected).TimeZone));
     }
 
     private static object[] _dateTimeUnspecifiedConvertToObjectCases =
@@ -112,11 +112,11 @@ public class DateTimeUnspecifiedValueConverterTests
             .ConvertIntermediateToObject(null!, propertyType.Object, PropertyCacheLevel.Unknown, input, false);
         if (expected is null)
         {
-            Assert.IsNull(result);
+            Assert.That(result, Is.Null);
             return;
         }
 
-        Assert.IsNotNull(result);
-        Assert.AreEqual(expected, result);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result, Is.EqualTo(expected));
     }
 }

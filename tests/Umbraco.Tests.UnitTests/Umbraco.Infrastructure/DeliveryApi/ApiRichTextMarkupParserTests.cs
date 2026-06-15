@@ -42,7 +42,7 @@ public class ApiRichTextMarkupParserTests
 
         var parsedHtml = parser.Parse(legacyHtml);
 
-        Assert.AreEqual(expectedOutput, parsedHtml);
+        Assert.That(parsedHtml, Is.EqualTo(expectedOutput));
     }
 
     [Test]
@@ -80,7 +80,7 @@ public class ApiRichTextMarkupParserTests
 
         var parsedHtml = parser.Parse(html);
 
-        Assert.AreEqual(expectedOutput, parsedHtml);
+        Assert.That(parsedHtml, Is.EqualTo(expectedOutput));
     }
 
     // PascalCase type — historic mis-cased values written by the (now fixed) ConvertLocalLinks migration for Umbraco 15 (see #22597).
@@ -109,7 +109,7 @@ public class ApiRichTextMarkupParserTests
 
         var parsedHtml = parser.Parse(html);
 
-        Assert.AreEqual(expectedOutput, parsedHtml);
+        Assert.That(parsedHtml, Is.EqualTo(expectedOutput));
     }
 
     [TestCase("#some-anchor")]
@@ -150,7 +150,7 @@ public class ApiRichTextMarkupParserTests
 
         var parsedHtml = parser.Parse(html);
 
-        Assert.AreEqual(expectedOutput, parsedHtml);
+        Assert.That(parsedHtml, Is.EqualTo(expectedOutput));
     }
 
     [Test]
@@ -175,7 +175,7 @@ public class ApiRichTextMarkupParserTests
 
         var parsedHtml = parser.Parse(legacyHtml);
 
-        Assert.AreEqual(expectedOutput, parsedHtml);
+        Assert.That(parsedHtml, Is.EqualTo(expectedOutput));
     }
 
     private ApiRichTextMarkupParser BuildDefaultSut(Dictionary<Guid, MockData> mockData)

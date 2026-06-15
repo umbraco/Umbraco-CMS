@@ -29,7 +29,7 @@ public class BackOfficeSerializationTests
 
         var json = JsonSerializer.Serialize(objectToSerialize, jsonOptions.JsonSerializerOptions);
 
-        Assert.AreEqual("{\"stringValue\":\"theValue\"}", json);
+        Assert.That(json, Is.EqualTo("{\"stringValue\":\"theValue\"}"));
     }
 
     // the limit is 64, but it seems like the functional limit is that minus 1
@@ -44,7 +44,7 @@ public class BackOfficeSerializationTests
         if (shouldPass)
         {
             var json = JsonSerializer.Serialize(objectToSerialize, jsonOptions.JsonSerializerOptions);
-            Assert.IsNotEmpty(json);
+            Assert.That(json, Is.Not.Empty);
         }
         else
         {
@@ -60,7 +60,7 @@ public class BackOfficeSerializationTests
         var json = JsonSerializer.Serialize(objectToSerialize, jsonOptions.JsonSerializerOptions);
 
         var expectedJson = "{\"problemDetails\":{\"type\":\"Test type\",\"title\":\"Test title\",\"status\":400,\"detail\":\"Test detail\",\"instance\":\"Test instance\",\"errors\":[{\"$.testError1\":[\"Test error 1a\",\"Test error 1b\"]},{\"$.testError2\":[\"Test error 2a\"]},{\"$.testError3.testError3a\":[\"Test error 3b\"]}],\"traceId\":\"traceValue\"}}";
-        Assert.AreEqual(expectedJson, json);
+        Assert.That(json, Is.EqualTo(expectedJson));
     }
 
     private static NestedJsonTestValue CreateNestedObject(int levels)

@@ -73,7 +73,7 @@ internal abstract class BlockEditorElementVariationTestBase : UmbracoIntegration
     protected void PublishContent(IContent content, string[] culturesToPublish)
     {
         var publishResult = ContentService.Publish(content, culturesToPublish);
-        Assert.IsTrue(publishResult.Success);
+        Assert.That(publishResult.Success, Is.True);
         DocumentCacheService.RefreshContentAsync(content).GetAwaiter().GetResult();
     }
 
@@ -127,7 +127,7 @@ internal abstract class BlockEditorElementVariationTestBase : UmbracoIntegration
         UmbracoContextAccessor.Clear();
         var umbracoContext = UmbracoContextFactory.EnsureUmbracoContext().UmbracoContext;
         var publishedContent = umbracoContext.Content?.GetById(key);
-        Assert.IsNotNull(publishedContent);
+        Assert.That(publishedContent, Is.Not.Null);
 
         return publishedContent;
     }

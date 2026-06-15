@@ -62,16 +62,16 @@ internal abstract class BackOfficeOpenApiDocumentWithJsonOptionsTestsBase : Umbr
         JsonObject document = await ParseDocumentAsync();
         JsonObject? schemas = document["components"]?["schemas"]?.AsObject();
 
-        Assert.IsNotNull(schemas, "Generated document has no component schemas.");
+        Assert.That(schemas, Is.Not.Null, "Generated document has no component schemas.");
 
         JsonObject? properties = schemas![nameof(TestWithJsonOptionsProduct) + "Model"]?["properties"]?.AsObject();
-        Assert.IsNotNull(properties, "Schema for the product payload was not generated.");
+        Assert.That(properties, Is.Not.Null, "Schema for the product payload was not generated.");
 
         // Snake-case naming policy renders MaxItemCount as max_item_count in the schema. The default ASP.NET
         // Core camelCase policy would render it as maxItemCount, so this assertion proves the WithJsonOptions
         // override actually reaches schema generation.
-        Assert.IsTrue(
-            properties!.ContainsKey("max_item_count"),
+        Assert.That(
+            properties!.ContainsKey("max_item_count"), Is.True,
             $"Expected snake_case property 'max_item_count' on schema. Properties: {string.Join(", ", properties!.Select(p => p.Key))}");
     }
 
@@ -85,7 +85,7 @@ internal abstract class BackOfficeOpenApiDocumentWithJsonOptionsTestsBase : Umbr
     {
         var spec = await FetchDocumentAsync();
         JsonObject? doc = JsonNode.Parse(spec)?.AsObject();
-        Assert.IsNotNull(doc, "Failed to parse OpenAPI document as JSON.");
+        Assert.That(doc, Is.Not.Null, "Failed to parse OpenAPI document as JSON.");
         return doc!;
     }
 }

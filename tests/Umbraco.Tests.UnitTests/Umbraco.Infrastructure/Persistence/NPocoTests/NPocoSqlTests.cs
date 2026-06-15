@@ -22,11 +22,10 @@ public class NPocoSqlTests : BaseUsingSqlSyntax
         var sql = Sql().SelectAll().From<NodeDto>()
             .Where<NodeDto>(x => x.Path.SqlStartsWith(content.Path, TextColumnType.NVarchar));
 
-        Assert.AreEqual(
-            "SELECT * FROM [umbracoNode] WHERE (upper([umbracoNode].[path]) LIKE upper(@0))",
-            sql.SQL.Replace("\n", " "));
-        Assert.AreEqual(1, sql.Arguments.Length);
-        Assert.AreEqual(content.Path + "%", sql.Arguments[0]);
+        Assert.That(
+            sql.SQL.Replace("\n", " "), Is.EqualTo("SELECT * FROM [umbracoNode] WHERE (upper([umbracoNode].[path]) LIKE upper(@0))"));
+        Assert.That(sql.Arguments.Length, Is.EqualTo(1));
+        Assert.That(sql.Arguments[0], Is.EqualTo(content.Path + "%"));
     }
 
     [Test]
@@ -36,12 +35,11 @@ public class NPocoSqlTests : BaseUsingSqlSyntax
         var sql = Sql().SelectAll().From<NodeDto>()
             .Where<NodeDto>(x => x.Path.StartsWith(content.Path) && x.NodeId != content.NodeId);
 
-        Assert.AreEqual(
-            "SELECT * FROM [umbracoNode] WHERE ((upper([umbracoNode].[path]) LIKE upper(@0) AND ([umbracoNode].[id] <> @1)))",
-            sql.SQL.Replace("\n", " "));
-        Assert.AreEqual(2, sql.Arguments.Length);
-        Assert.AreEqual(content.Path + "%", sql.Arguments[0]);
-        Assert.AreEqual(content.NodeId, sql.Arguments[1]);
+        Assert.That(
+            sql.SQL.Replace("\n", " "), Is.EqualTo("SELECT * FROM [umbracoNode] WHERE ((upper([umbracoNode].[path]) LIKE upper(@0) AND ([umbracoNode].[id] <> @1)))"));
+        Assert.That(sql.Arguments.Length, Is.EqualTo(2));
+        Assert.That(sql.Arguments[0], Is.EqualTo(content.Path + "%"));
+        Assert.That(sql.Arguments[1], Is.EqualTo(content.NodeId));
     }
 
     [Test]
@@ -51,12 +49,11 @@ public class NPocoSqlTests : BaseUsingSqlSyntax
         var sql = Sql().SelectAll().From<NodeDto>()
             .Where<NodeDto>(x => x.Level == level && !x.Path.StartsWith("-20"));
 
-        Assert.AreEqual(
-            "SELECT * FROM [umbracoNode] WHERE ((([umbracoNode].[level] = @0) AND NOT (upper([umbracoNode].[path]) LIKE upper(@1))))",
-            sql.SQL.Replace("\n", " "));
-        Assert.AreEqual(2, sql.Arguments.Length);
-        Assert.AreEqual(level, sql.Arguments[0]);
-        Assert.AreEqual("-20%", sql.Arguments[1]);
+        Assert.That(
+            sql.SQL.Replace("\n", " "), Is.EqualTo("SELECT * FROM [umbracoNode] WHERE ((([umbracoNode].[level] = @0) AND NOT (upper([umbracoNode].[path]) LIKE upper(@1))))"));
+        Assert.That(sql.Arguments.Length, Is.EqualTo(2));
+        Assert.That(sql.Arguments[0], Is.EqualTo(level));
+        Assert.That(sql.Arguments[1], Is.EqualTo("-20%"));
     }
 
     [Test]
@@ -66,12 +63,11 @@ public class NPocoSqlTests : BaseUsingSqlSyntax
         var sql = Sql().SelectAll().From<NodeDto>()
             .Where<NodeDto>(x => x.Level == level && x.Path.StartsWith("-20") == false);
 
-        Assert.AreEqual(
-            "SELECT * FROM [umbracoNode] WHERE ((([umbracoNode].[level] = @0) AND NOT (upper([umbracoNode].[path]) LIKE upper(@1))))",
-            sql.SQL.Replace("\n", " "));
-        Assert.AreEqual(2, sql.Arguments.Length);
-        Assert.AreEqual(level, sql.Arguments[0]);
-        Assert.AreEqual("-20%", sql.Arguments[1]);
+        Assert.That(
+            sql.SQL.Replace("\n", " "), Is.EqualTo("SELECT * FROM [umbracoNode] WHERE ((([umbracoNode].[level] = @0) AND NOT (upper([umbracoNode].[path]) LIKE upper(@1))))"));
+        Assert.That(sql.Arguments.Length, Is.EqualTo(2));
+        Assert.That(sql.Arguments[0], Is.EqualTo(level));
+        Assert.That(sql.Arguments[1], Is.EqualTo("-20%"));
     }
 
     [Test]
@@ -80,11 +76,10 @@ public class NPocoSqlTests : BaseUsingSqlSyntax
         var sql = Sql().SelectAll().From<NodeDto>()
             .Where<NodeDto>(x => x.Text.Equals("Hello@world.com"));
 
-        Assert.AreEqual(
-            "SELECT * FROM [umbracoNode] WHERE (upper([umbracoNode].[text]) = upper(@0))",
-            sql.SQL.Replace("\n", " "));
-        Assert.AreEqual(1, sql.Arguments.Length);
-        Assert.AreEqual("Hello@world.com", sql.Arguments[0]);
+        Assert.That(
+            sql.SQL.Replace("\n", " "), Is.EqualTo("SELECT * FROM [umbracoNode] WHERE (upper([umbracoNode].[text]) = upper(@0))"));
+        Assert.That(sql.Arguments.Length, Is.EqualTo(1));
+        Assert.That(sql.Arguments[0], Is.EqualTo("Hello@world.com"));
     }
 
     [Test]
@@ -93,9 +88,9 @@ public class NPocoSqlTests : BaseUsingSqlSyntax
         var sql = Sql().SelectAll().From<NodeDto>()
             .Where<NodeDto>(x => x.Trashed == false);
 
-        Assert.AreEqual("SELECT * FROM [umbracoNode] WHERE ([umbracoNode].[trashed] = @0)", sql.SQL.Replace("\n", " "));
-        Assert.AreEqual(1, sql.Arguments.Length);
-        Assert.AreEqual(false, sql.Arguments[0]);
+        Assert.That(sql.SQL.Replace("\n", " "), Is.EqualTo("SELECT * FROM [umbracoNode] WHERE ([umbracoNode].[trashed] = @0)"));
+        Assert.That(sql.Arguments.Length, Is.EqualTo(1));
+        Assert.That(sql.Arguments[0], Is.EqualTo(false));
     }
 
     [Test]
@@ -103,9 +98,9 @@ public class NPocoSqlTests : BaseUsingSqlSyntax
     {
         var sql = Sql().SelectAll().From<NodeDto>().Where<NodeDto>(x => x.Trashed == false);
 
-        Assert.AreEqual("SELECT * FROM [umbracoNode] WHERE ([umbracoNode].[trashed] = @0)", sql.SQL.Replace("\n", " "));
-        Assert.AreEqual(1, sql.Arguments.Length);
-        Assert.AreEqual(false, sql.Arguments[0]);
+        Assert.That(sql.SQL.Replace("\n", " "), Is.EqualTo("SELECT * FROM [umbracoNode] WHERE ([umbracoNode].[trashed] = @0)"));
+        Assert.That(sql.Arguments.Length, Is.EqualTo(1));
+        Assert.That(sql.Arguments[0], Is.EqualTo(false));
     }
 
     [Test]
@@ -114,9 +109,9 @@ public class NPocoSqlTests : BaseUsingSqlSyntax
         var sql = Sql().SelectAll().From<NodeDto>()
             .Where<NodeDto>(x => x.Trashed);
 
-        Assert.AreEqual("SELECT * FROM [umbracoNode] WHERE ([umbracoNode].[trashed] = @0)", sql.SQL.Replace("\n", " "));
-        Assert.AreEqual(1, sql.Arguments.Length);
-        Assert.AreEqual(true, sql.Arguments[0]);
+        Assert.That(sql.SQL.Replace("\n", " "), Is.EqualTo("SELECT * FROM [umbracoNode] WHERE ([umbracoNode].[trashed] = @0)"));
+        Assert.That(sql.Arguments.Length, Is.EqualTo(1));
+        Assert.That(sql.Arguments[0], Is.EqualTo(true));
     }
 
     [Test]
@@ -125,11 +120,10 @@ public class NPocoSqlTests : BaseUsingSqlSyntax
         var sql = Sql().SelectAll().From<NodeDto>()
             .Where<NodeDto>(x => x.Text.ToUpper() == "hello".ToUpper());
 
-        Assert.AreEqual(
-            "SELECT * FROM [umbracoNode] WHERE ((upper([umbracoNode].[text]) = upper(@0)))",
-            sql.SQL.Replace("\n", " "));
-        Assert.AreEqual(1, sql.Arguments.Length);
-        Assert.AreEqual("hello", sql.Arguments[0]);
+        Assert.That(
+            sql.SQL.Replace("\n", " "), Is.EqualTo("SELECT * FROM [umbracoNode] WHERE ((upper([umbracoNode].[text]) = upper(@0)))"));
+        Assert.That(sql.Arguments.Length, Is.EqualTo(1));
+        Assert.That(sql.Arguments[0], Is.EqualTo("hello"));
     }
 
     [Test]
@@ -138,9 +132,9 @@ public class NPocoSqlTests : BaseUsingSqlSyntax
         var sql = Sql().SelectAll().From<NodeDto>()
             .Where<NodeDto>(x => x.Text == 1.ToString());
 
-        Assert.AreEqual("SELECT * FROM [umbracoNode] WHERE (([umbracoNode].[text] = @0))", sql.SQL.Replace("\n", " "));
-        Assert.AreEqual(1, sql.Arguments.Length);
-        Assert.AreEqual("1", sql.Arguments[0]);
+        Assert.That(sql.SQL.Replace("\n", " "), Is.EqualTo("SELECT * FROM [umbracoNode] WHERE (([umbracoNode].[text] = @0))"));
+        Assert.That(sql.Arguments.Length, Is.EqualTo(1));
+        Assert.That(sql.Arguments[0], Is.EqualTo("1"));
     }
 
     [Test]
@@ -149,11 +143,10 @@ public class NPocoSqlTests : BaseUsingSqlSyntax
         var sql = Sql().SelectAll().From<NodeDto>()
             .Where<NodeDto>(x => x.Text.StartsWith("D"));
 
-        Assert.AreEqual(
-            "SELECT * FROM [umbracoNode] WHERE (upper([umbracoNode].[text]) LIKE upper(@0))",
-            sql.SQL.Replace("\n", " "));
-        Assert.AreEqual(1, sql.Arguments.Length);
-        Assert.AreEqual("D%", sql.Arguments[0]);
+        Assert.That(
+            sql.SQL.Replace("\n", " "), Is.EqualTo("SELECT * FROM [umbracoNode] WHERE (upper([umbracoNode].[text]) LIKE upper(@0))"));
+        Assert.That(sql.Arguments.Length, Is.EqualTo(1));
+        Assert.That(sql.Arguments[0], Is.EqualTo("D%"));
     }
 
     [Test]
@@ -162,9 +155,9 @@ public class NPocoSqlTests : BaseUsingSqlSyntax
         var sql = Sql().SelectAll().From<NodeDto>()
             .Where<NodeDto>(x => x.NodeId == 2);
 
-        Assert.AreEqual("SELECT * FROM [umbracoNode] WHERE (([umbracoNode].[id] = @0))", sql.SQL.Replace("\n", " "));
-        Assert.AreEqual(1, sql.Arguments.Length);
-        Assert.AreEqual(2, sql.Arguments[0]);
+        Assert.That(sql.SQL.Replace("\n", " "), Is.EqualTo("SELECT * FROM [umbracoNode] WHERE (([umbracoNode].[id] = @0))"));
+        Assert.That(sql.Arguments.Length, Is.EqualTo(1));
+        Assert.That(sql.Arguments[0], Is.EqualTo(2));
     }
 
     [Test]
@@ -173,12 +166,11 @@ public class NPocoSqlTests : BaseUsingSqlSyntax
         var sql = Sql().SelectAll().From<NodeDto>()
             .Where<NodeDto>(x => x.NodeId != 2 && x.NodeId != 3);
 
-        Assert.AreEqual(
-            "SELECT * FROM [umbracoNode] WHERE ((([umbracoNode].[id] <> @0) AND ([umbracoNode].[id] <> @1)))",
-            sql.SQL.Replace("\n", " "));
-        Assert.AreEqual(2, sql.Arguments.Length);
-        Assert.AreEqual(2, sql.Arguments[0]);
-        Assert.AreEqual(3, sql.Arguments[1]);
+        Assert.That(
+            sql.SQL.Replace("\n", " "), Is.EqualTo("SELECT * FROM [umbracoNode] WHERE ((([umbracoNode].[id] <> @0) AND ([umbracoNode].[id] <> @1)))"));
+        Assert.That(sql.Arguments.Length, Is.EqualTo(2));
+        Assert.That(sql.Arguments[0], Is.EqualTo(2));
+        Assert.That(sql.Arguments[1], Is.EqualTo(3));
     }
 
     [Test]
@@ -187,28 +179,26 @@ public class NPocoSqlTests : BaseUsingSqlSyntax
         var sql = Sql().SelectAll().From<NodeDto>()
             .Where<NodeDto>(x => x.Text == "hello" || x.NodeId == 3);
 
-        Assert.AreEqual(
-            "SELECT * FROM [umbracoNode] WHERE ((([umbracoNode].[text] = @0) OR ([umbracoNode].[id] = @1)))",
-            sql.SQL.Replace("\n", " "));
-        Assert.AreEqual(2, sql.Arguments.Length);
-        Assert.AreEqual("hello", sql.Arguments[0]);
-        Assert.AreEqual(3, sql.Arguments[1]);
+        Assert.That(
+            sql.SQL.Replace("\n", " "), Is.EqualTo("SELECT * FROM [umbracoNode] WHERE ((([umbracoNode].[text] = @0) OR ([umbracoNode].[id] = @1)))"));
+        Assert.That(sql.Arguments.Length, Is.EqualTo(2));
+        Assert.That(sql.Arguments[0], Is.EqualTo("hello"));
+        Assert.That(sql.Arguments[1], Is.EqualTo(3));
     }
 
     [Test]
     public void Where_Null()
     {
         var sql = Sql().SelectAll().From<NodeDto>().WhereNull<NodeDto>(x => x.NodeId);
-        Assert.AreEqual("SELECT * FROM [umbracoNode] WHERE (([umbracoNode].[id] IS NULL))", sql.SQL.Replace("\n", " "));
+        Assert.That(sql.SQL.Replace("\n", " "), Is.EqualTo("SELECT * FROM [umbracoNode] WHERE (([umbracoNode].[id] IS NULL))"));
     }
 
     [Test]
     public void Where_Not_Null()
     {
         var sql = Sql().SelectAll().From<NodeDto>().WhereNotNull<NodeDto>(x => x.NodeId);
-        Assert.AreEqual(
-            "SELECT * FROM [umbracoNode] WHERE (([umbracoNode].[id] IS NOT NULL))",
-            sql.SQL.Replace("\n", " "));
+        Assert.That(
+            sql.SQL.Replace("\n", " "), Is.EqualTo("SELECT * FROM [umbracoNode] WHERE (([umbracoNode].[id] IS NOT NULL))"));
     }
 
     [Test]
@@ -218,9 +208,8 @@ public class NPocoSqlTests : BaseUsingSqlSyntax
             s => s.Where<NodeDto>(x => x.NodeId == 1),
             s => s.Where<NodeDto>(x => x.NodeId == 2));
 
-        Assert.AreEqual(
-            "SELECT * FROM [umbracoNode] WHERE (( (([umbracoNode].[id] = @0)) ) OR ( (([umbracoNode].[id] = @1)) ))",
-            sql.SQL.Replace("\n", " "));
+        Assert.That(
+            sql.SQL.Replace("\n", " "), Is.EqualTo("SELECT * FROM [umbracoNode] WHERE (( (([umbracoNode].[id] = @0)) ) OR ( (([umbracoNode].[id] = @1)) ))"));
     }
 
     [Test]
@@ -332,14 +321,12 @@ public class NPocoSqlTests : BaseUsingSqlSyntax
             .From<UserLoginDto>()
             .Where<UserLoginDto>(x => x.SessionId == sessionId);
 
-        Assert.AreEqual(
-            "SELECT * FROM [umbracoUserLogin] WHERE (([umbracoUserLogin].[sessionId] = @0))",
-            sql.SQL.NoCrLf());
+        Assert.That(
+            sql.SQL.NoCrLf(), Is.EqualTo("SELECT * FROM [umbracoUserLogin] WHERE (([umbracoUserLogin].[sessionId] = @0))"));
 
         sql = sql.ForUpdate();
 
-        Assert.AreEqual(
-            "SELECT * FROM [umbracoUserLogin] WITH (UPDLOCK) WHERE (([umbracoUserLogin].[sessionId] = @0))",
-            sql.SQL.NoCrLf());
+        Assert.That(
+            sql.SQL.NoCrLf(), Is.EqualTo("SELECT * FROM [umbracoUserLogin] WITH (UPDLOCK) WHERE (([umbracoUserLogin].[sessionId] = @0))"));
     }
 }

@@ -36,7 +36,7 @@ internal sealed class RedirectUrlRepositoryTests : UmbracoIntegrationTest
             repo.Save(rurl);
             scope.Complete();
 
-            Assert.AreNotEqual(0, rurl.Id);
+            Assert.That(rurl.Id, Is.Not.EqualTo(0));
         }
 
         using (var scope = provider.CreateScope())
@@ -45,8 +45,8 @@ internal sealed class RedirectUrlRepositoryTests : UmbracoIntegrationTest
             var rurl = repo.GetMostRecentUrl("blah");
             scope.Complete();
 
-            Assert.IsNotNull(rurl);
-            Assert.AreEqual(_textpage.Id, rurl.ContentId);
+            Assert.That(rurl, Is.Not.Null);
+            Assert.That(rurl.ContentId, Is.EqualTo(_textpage.Id));
         }
     }
 
@@ -61,7 +61,7 @@ internal sealed class RedirectUrlRepositoryTests : UmbracoIntegrationTest
             repo.Save(rurl);
             scope.Complete();
 
-            Assert.AreNotEqual(0, rurl.Id);
+            Assert.That(rurl.Id, Is.Not.EqualTo(0));
         }
 
         using (var scope = ScopeProvider.CreateScope())
@@ -70,9 +70,9 @@ internal sealed class RedirectUrlRepositoryTests : UmbracoIntegrationTest
             var rurl = repo.GetMostRecentUrl("blah");
             scope.Complete();
 
-            Assert.IsNotNull(rurl);
-            Assert.AreEqual(_textpage.Id, rurl.ContentId);
-            Assert.AreEqual(culture, rurl.Culture);
+            Assert.That(rurl, Is.Not.Null);
+            Assert.That(rurl.ContentId, Is.EqualTo(_textpage.Id));
+            Assert.That(rurl.Culture, Is.EqualTo(culture));
         }
     }
 
@@ -81,7 +81,7 @@ internal sealed class RedirectUrlRepositoryTests : UmbracoIntegrationTest
     {
         var provider = ScopeProvider;
 
-        Assert.AreNotEqual(_textpage.Id, _otherpage.Id);
+        Assert.That(_otherpage.Id, Is.Not.EqualTo(_textpage.Id));
 
         using (var scope = provider.CreateScope())
         {
@@ -90,7 +90,7 @@ internal sealed class RedirectUrlRepositoryTests : UmbracoIntegrationTest
             repo.Save(rurl);
             scope.Complete();
 
-            Assert.AreNotEqual(0, rurl.Id);
+            Assert.That(rurl.Id, Is.Not.EqualTo(0));
 
             // TODO: too fast = same date = key violation?
             // and... can that happen in real life?
@@ -105,7 +105,7 @@ internal sealed class RedirectUrlRepositoryTests : UmbracoIntegrationTest
             repo.Save(rurl);
             scope.Complete();
 
-            Assert.AreNotEqual(0, rurl.Id);
+            Assert.That(rurl.Id, Is.Not.EqualTo(0));
         }
 
         using (var scope = provider.CreateScope())
@@ -114,8 +114,8 @@ internal sealed class RedirectUrlRepositoryTests : UmbracoIntegrationTest
             var rurl = repo.GetMostRecentUrl("blah");
             scope.Complete();
 
-            Assert.IsNotNull(rurl);
-            Assert.AreEqual(_otherpage.Id, rurl.ContentId);
+            Assert.That(rurl, Is.Not.Null);
+            Assert.That(rurl.ContentId, Is.EqualTo(_otherpage.Id));
         }
     }
 
@@ -124,7 +124,7 @@ internal sealed class RedirectUrlRepositoryTests : UmbracoIntegrationTest
     {
         var cultureA = "en";
         var cultureB = "de";
-        Assert.AreNotEqual(_textpage.Id, _otherpage.Id);
+        Assert.That(_otherpage.Id, Is.Not.EqualTo(_textpage.Id));
 
         using (var scope = ScopeProvider.CreateScope())
         {
@@ -133,7 +133,7 @@ internal sealed class RedirectUrlRepositoryTests : UmbracoIntegrationTest
             repo.Save(rurl);
             scope.Complete();
 
-            Assert.AreNotEqual(0, rurl.Id);
+            Assert.That(rurl.Id, Is.Not.EqualTo(0));
 
             // TODO: too fast = same date = key violation?
             // and... can that happen in real life?
@@ -149,7 +149,7 @@ internal sealed class RedirectUrlRepositoryTests : UmbracoIntegrationTest
             repo.Save(rurl);
             scope.Complete();
 
-            Assert.AreNotEqual(0, rurl.Id);
+            Assert.That(rurl.Id, Is.Not.EqualTo(0));
         }
 
         using (var scope = ScopeProvider.CreateScope())
@@ -158,9 +158,9 @@ internal sealed class RedirectUrlRepositoryTests : UmbracoIntegrationTest
             var rurl = repo.GetMostRecentUrl("blah", cultureA);
             scope.Complete();
 
-            Assert.IsNotNull(rurl);
-            Assert.AreEqual(_textpage.Id, rurl.ContentId);
-            Assert.AreEqual(cultureA, rurl.Culture);
+            Assert.That(rurl, Is.Not.Null);
+            Assert.That(rurl.ContentId, Is.EqualTo(_textpage.Id));
+            Assert.That(rurl.Culture, Is.EqualTo(cultureA));
         }
     }
 
@@ -176,7 +176,7 @@ internal sealed class RedirectUrlRepositoryTests : UmbracoIntegrationTest
             repo.Save(rurl);
             scope.Complete();
 
-            Assert.AreNotEqual(0, rurl.Id);
+            Assert.That(rurl.Id, Is.Not.EqualTo(0));
 
             // TODO: goes too fast and bam, errors, first is blah
             rurl = new RedirectUrl
@@ -188,7 +188,7 @@ internal sealed class RedirectUrlRepositoryTests : UmbracoIntegrationTest
             repo.Save(rurl);
             scope.Complete();
 
-            Assert.AreNotEqual(0, rurl.Id);
+            Assert.That(rurl.Id, Is.Not.EqualTo(0));
         }
 
         using (var scope = provider.CreateScope())
@@ -197,9 +197,9 @@ internal sealed class RedirectUrlRepositoryTests : UmbracoIntegrationTest
             var rurls = repo.GetContentUrls(_textpage.Key).ToArray();
             scope.Complete();
 
-            Assert.AreEqual(2, rurls.Length);
-            Assert.AreEqual("durg", rurls[0].Url);
-            Assert.AreEqual("blah", rurls[1].Url);
+            Assert.That(rurls, Has.Length.EqualTo(2));
+            Assert.That(rurls[0].Url, Is.EqualTo("durg"));
+            Assert.That(rurls[1].Url, Is.EqualTo("blah"));
         }
     }
 
@@ -215,13 +215,13 @@ internal sealed class RedirectUrlRepositoryTests : UmbracoIntegrationTest
             repo.Save(rurl);
             scope.Complete();
 
-            Assert.AreNotEqual(0, rurl.Id);
+            Assert.That(rurl.Id, Is.Not.EqualTo(0));
 
             rurl = new RedirectUrl { ContentKey = _otherpage.Key, Url = "durg" };
             repo.Save(rurl);
             scope.Complete();
 
-            Assert.AreNotEqual(0, rurl.Id);
+            Assert.That(rurl.Id, Is.Not.EqualTo(0));
         }
 
         using (var scope = provider.CreateScope())
@@ -232,7 +232,7 @@ internal sealed class RedirectUrlRepositoryTests : UmbracoIntegrationTest
 
             var rurls = repo.GetContentUrls(_textpage.Key);
 
-            Assert.AreEqual(0, rurls.Count());
+            Assert.That(rurls.Count(), Is.EqualTo(0));
         }
     }
 
@@ -282,7 +282,7 @@ internal sealed class RedirectUrlRepositoryTests : UmbracoIntegrationTest
 
             // Should find redirects for descendants of _textpage.
             // Note: The query uses path LIKE '%,{rootContentId},%' so it finds descendants, not the root itself.
-            Assert.That(rurls.Length, Is.GreaterThanOrEqualTo(2));
+            Assert.That(rurls, Has.Length.GreaterThanOrEqualTo(2));
             Assert.That(rurls.Any(r => r.Url == "subpage-redirect"), Is.True);
             Assert.That(rurls.Any(r => r.Url == "otherpage-redirect"), Is.True);
         }
@@ -327,8 +327,8 @@ internal sealed class RedirectUrlRepositoryTests : UmbracoIntegrationTest
             var rurls = repo.SearchUrls("products", 0, 100, out var total).ToArray();
             scope.Complete();
 
-            Assert.AreEqual(2, total);
-            Assert.AreEqual(2, rurls.Length);
+            Assert.That(total, Is.EqualTo(2));
+            Assert.That(rurls, Has.Length.EqualTo(2));
             Assert.That(rurls.All(r => r.Url.Contains("products")), Is.True);
             Assert.That(rurls.Any(r => r.Url == "/old-products/widget-123"), Is.True);
             Assert.That(rurls.Any(r => r.Url == "/old-products/gadget-456"), Is.True);
@@ -342,9 +342,9 @@ internal sealed class RedirectUrlRepositoryTests : UmbracoIntegrationTest
             var rurls = repo.SearchUrls("consulting", 0, 100, out var total).ToArray();
             scope.Complete();
 
-            Assert.AreEqual(1, total);
-            Assert.AreEqual(1, rurls.Length);
-            Assert.AreEqual("/old-services/consulting", rurls[0].Url);
+            Assert.That(total, Is.EqualTo(1));
+            Assert.That(rurls, Has.Length.EqualTo(1));
+            Assert.That(rurls[0].Url, Is.EqualTo("/old-services/consulting"));
         }
     }
 

@@ -136,11 +136,11 @@ public class ElementRepositoryTest : UmbracoIntegrationTest
 
             // go get it, this should already be cached since the default repository key is the INT
             repository.Get(content.Id);
-            Assert.AreEqual(0, udb.SqlCount);
+            Assert.That(udb.SqlCount, Is.EqualTo(0));
 
             // retrieve again, this should use cache
             repository.Get(content.Id);
-            Assert.AreEqual(0, udb.SqlCount);
+            Assert.That(udb.SqlCount, Is.EqualTo(0));
 
             // reset counter
             udb.EnableSqlCount = false;
@@ -149,11 +149,11 @@ public class ElementRepositoryTest : UmbracoIntegrationTest
             // now get by GUID, this will also be cached because of the sub-repo-by-key pattern in the entity service
             repository.Get(content.Key);
             var sqlCount = udb.SqlCount;
-            Assert.AreEqual(sqlCount, 0);
+            Assert.That(sqlCount, Is.EqualTo(0));
 
             // retrieve again, this should use cache now
             repository.Get(content.Key);
-            Assert.AreEqual(sqlCount, udb.SqlCount);
+            Assert.That(udb.SqlCount, Is.EqualTo(sqlCount));
         }
     }
 
@@ -184,15 +184,15 @@ public class ElementRepositoryTest : UmbracoIntegrationTest
             versions.Add(element1.VersionId); // NEW VERSION
 
             // new edit version has been created
-            Assert.AreNotEqual(versions[^2], versions[^1]);
-            Assert.IsTrue(element1.Published);
-            Assert.AreEqual(PublishedState.Published, element1.PublishedState);
-            Assert.AreEqual(versions[^1], repository.Get(element1.Id)!.VersionId);
+            Assert.That(versions[^1], Is.Not.EqualTo(versions[^2]));
+            Assert.That(element1.Published, Is.True);
+            Assert.That(element1.PublishedState, Is.EqualTo(PublishedState.Published));
+            Assert.That(repository.Get(element1.Id)!.VersionId, Is.EqualTo(versions[^1]));
 
             // misc checks
-            Assert.AreEqual(true, ScopeAccessor.AmbientScope.Database.ExecuteScalar<bool>(
+            Assert.That(ScopeAccessor.AmbientScope.Database.ExecuteScalar<bool>(
                     $"SELECT published FROM {Constants.DatabaseSchema.Tables.Element} WHERE nodeId=@id",
-                    new { id = element1.Id }));
+                    new { id = element1.Id }), Is.EqualTo(true));
 
             // change something
             // save = update the current (draft) version
@@ -203,16 +203,15 @@ public class ElementRepositoryTest : UmbracoIntegrationTest
             versions.Add(element1.VersionId); // the same version
 
             // no new version has been created
-            Assert.AreEqual(versions[^2], versions[^1]);
-            Assert.IsTrue(element1.Published);
-            Assert.AreEqual(versions[^1], repository.Get(element1.Id)!.VersionId);
+            Assert.That(versions[^1], Is.EqualTo(versions[^2]));
+            Assert.That(element1.Published, Is.True);
+            Assert.That(repository.Get(element1.Id)!.VersionId, Is.EqualTo(versions[^1]));
 
             // misc checks
-            Assert.AreEqual(
-                true,
+            Assert.That(
                 ScopeAccessor.AmbientScope.Database.ExecuteScalar<bool>(
                     $"SELECT published FROM {Constants.DatabaseSchema.Tables.Element} WHERE nodeId=@id",
-                    new { id = element1.Id }));
+                    new { id = element1.Id }), Is.EqualTo(true));
 
             // unpublish = no impact on versions
             element1.PublishedState = PublishedState.Unpublishing;
@@ -221,17 +220,16 @@ public class ElementRepositoryTest : UmbracoIntegrationTest
             versions.Add(element1.VersionId); // the same version
 
             // no new version has been created
-            Assert.AreEqual(versions[^2], versions[^1]);
-            Assert.IsFalse(element1.Published);
-            Assert.AreEqual(PublishedState.Unpublished, element1.PublishedState);
-            Assert.AreEqual(versions[^1], repository.Get(element1.Id)!.VersionId);
+            Assert.That(versions[^1], Is.EqualTo(versions[^2]));
+            Assert.That(element1.Published, Is.False);
+            Assert.That(element1.PublishedState, Is.EqualTo(PublishedState.Unpublished));
+            Assert.That(repository.Get(element1.Id)!.VersionId, Is.EqualTo(versions[^1]));
 
             // misc checks
-            Assert.AreEqual(
-                false,
+            Assert.That(
                 ScopeAccessor.AmbientScope.Database.ExecuteScalar<bool>(
                     $"SELECT published FROM {Constants.DatabaseSchema.Tables.Element} WHERE nodeId=@id",
-                    new { id = element1.Id }));
+                    new { id = element1.Id }), Is.EqualTo(false));
 
             // change something
             // save = update the current (draft) version
@@ -242,15 +240,14 @@ public class ElementRepositoryTest : UmbracoIntegrationTest
             versions.Add(element1.VersionId); // the same version
 
             // no new version has been created
-            Assert.AreEqual(versions[^2], versions[^1]);
-            Assert.AreEqual(versions[^1], repository.Get(element1.Id)!.VersionId);
+            Assert.That(versions[^1], Is.EqualTo(versions[^2]));
+            Assert.That(repository.Get(element1.Id)!.VersionId, Is.EqualTo(versions[^1]));
 
             // misc checks
-            Assert.AreEqual(
-                false,
+            Assert.That(
                 ScopeAccessor.AmbientScope.Database.ExecuteScalar<bool>(
                     $"SELECT published FROM {Constants.DatabaseSchema.Tables.Element} WHERE nodeId=@id",
-                    new { id = element1.Id }));
+                    new { id = element1.Id }), Is.EqualTo(false));
 
             // publish = version
             element1.PublishCulture(CultureImpact.Invariant, DateTime.Now, PropertyEditorCollection);
@@ -260,17 +257,16 @@ public class ElementRepositoryTest : UmbracoIntegrationTest
             versions.Add(element1.VersionId); // NEW VERSION
 
             // new version has been created
-            Assert.AreNotEqual(versions[^2], versions[^1]);
-            Assert.IsTrue(element1.Published);
-            Assert.AreEqual(PublishedState.Published, element1.PublishedState);
-            Assert.AreEqual(versions[^1], repository.Get(element1.Id)!.VersionId);
+            Assert.That(versions[^1], Is.Not.EqualTo(versions[^2]));
+            Assert.That(element1.Published, Is.True);
+            Assert.That(element1.PublishedState, Is.EqualTo(PublishedState.Published));
+            Assert.That(repository.Get(element1.Id)!.VersionId, Is.EqualTo(versions[^1]));
 
             // misc checks
-            Assert.AreEqual(
-                true,
+            Assert.That(
                 ScopeAccessor.AmbientScope.Database.ExecuteScalar<bool>(
                     $"SELECT published FROM {Constants.DatabaseSchema.Tables.Element} WHERE nodeId=@id",
-                    new { id = element1.Id }));
+                    new { id = element1.Id }), Is.EqualTo(true));
 
             // change something
             // save = update the current (draft) version
@@ -284,15 +280,14 @@ public class ElementRepositoryTest : UmbracoIntegrationTest
             versions.Add(element1.VersionId); // the same version
 
             // no new version has been created
-            Assert.AreEqual(versions[^2], versions[^1]);
-            Assert.AreEqual(versions[^1], repository.Get(element1.Id)!.VersionId);
+            Assert.That(versions[^1], Is.EqualTo(versions[^2]));
+            Assert.That(repository.Get(element1.Id)!.VersionId, Is.EqualTo(versions[^1]));
 
             // misc checks
-            Assert.AreEqual(
-                true,
+            Assert.That(
                 ScopeAccessor.AmbientScope.Database.ExecuteScalar<bool>(
                     $"SELECT published FROM {Constants.DatabaseSchema.Tables.Element} WHERE nodeId=@id",
-                    new { id = element1.Id }));
+                    new { id = element1.Id }), Is.EqualTo(true));
 
             // publish = new version
             element1.Name = "name-4";
@@ -304,28 +299,27 @@ public class ElementRepositoryTest : UmbracoIntegrationTest
             versions.Add(element1.VersionId); // NEW VERSION
 
             // a new version has been created
-            Assert.AreNotEqual(versions[^2], versions[^1]);
-            Assert.IsTrue(element1.Published);
-            Assert.AreEqual(PublishedState.Published, element1.PublishedState);
-            Assert.AreEqual(versions[^1], repository.Get(element1.Id)!.VersionId);
+            Assert.That(versions[^1], Is.Not.EqualTo(versions[^2]));
+            Assert.That(element1.Published, Is.True);
+            Assert.That(element1.PublishedState, Is.EqualTo(PublishedState.Published));
+            Assert.That(repository.Get(element1.Id)!.VersionId, Is.EqualTo(versions[^1]));
 
             // misc checks
-            Assert.AreEqual(
-                true,
+            Assert.That(
                 ScopeAccessor.AmbientScope.Database.ExecuteScalar<bool>(
                     $"SELECT published FROM {Constants.DatabaseSchema.Tables.Element} WHERE nodeId=@id",
-                    new { id = element1.Id }));
+                    new { id = element1.Id }), Is.EqualTo(true));
 
             // all versions
             var allVersions = repository.GetAllVersions(element1.Id).ToArray();
             Assert.Multiple(() =>
             {
-                Assert.AreEqual(4, allVersions.Length);
-                Assert.IsTrue(allVersions.All(v => v.PublishedVersionId == 3));
-                Assert.AreEqual(4, allVersions.DistinctBy(v => v.VersionId).Count());
+                Assert.That(allVersions, Has.Length.EqualTo(4));
+                Assert.That(allVersions.All(v => v.PublishedVersionId == 3), Is.True);
+                Assert.That(allVersions.DistinctBy(v => v.VersionId).Count(), Is.EqualTo(4));
                 for (var versionId = 1; versionId <= 4; versionId++)
                 {
-                    Assert.IsNotNull(allVersions.FirstOrDefault(v => v.VersionId == versionId));
+                    Assert.That(allVersions.FirstOrDefault(v => v.VersionId == versionId), Is.Not.Null);
                 }
             });
 
@@ -343,20 +337,20 @@ public class ElementRepositoryTest : UmbracoIntegrationTest
 
             // get older version
             var element = repository.GetVersion(versions[^4]);
-            Assert.AreNotEqual(0, element.VersionId);
-            Assert.AreEqual(versions[^4], element.VersionId);
-            Assert.AreEqual("name-4", element1.Name);
-            Assert.AreEqual("title-4", element1.GetValue("title"));
-            Assert.AreEqual("name-2", element.Name);
-            Assert.AreEqual("title-2", element.GetValue("title"));
+            Assert.That(element.VersionId, Is.Not.EqualTo(0));
+            Assert.That(element.VersionId, Is.EqualTo(versions[^4]));
+            Assert.That(element1.Name, Is.EqualTo("name-4"));
+            Assert.That(element1.GetValue("title"), Is.EqualTo("title-4"));
+            Assert.That(element.Name, Is.EqualTo("name-2"));
+            Assert.That(element.GetValue("title"), Is.EqualTo("title-2"));
 
             // get all versions - most recent first
             allVersions = repository.GetAllVersions(element1.Id).ToArray();
             var expVersions = versions.Distinct().Reverse().ToArray();
-            Assert.AreEqual(expVersions.Length, allVersions.Length);
+            Assert.That(allVersions, Has.Length.EqualTo(expVersions.Length));
             for (var i = 0; i < expVersions.Length; i++)
             {
-                Assert.AreEqual(expVersions[i], allVersions[i].VersionId);
+                Assert.That(allVersions[i].VersionId, Is.EqualTo(expVersions[i]));
             }
         }
     }

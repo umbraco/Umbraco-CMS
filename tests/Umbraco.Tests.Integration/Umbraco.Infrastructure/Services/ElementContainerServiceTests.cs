@@ -55,7 +55,7 @@ public partial class ElementContainerServiceTests : UmbracoIntegrationTest
             .Build();
 
         var result = await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
-        Assert.AreEqual(true, result.Success);
+        Assert.That(result.Success, Is.EqualTo(true));
         return elementType;
     }
 
@@ -72,7 +72,7 @@ public partial class ElementContainerServiceTests : UmbracoIntegrationTest
         };
 
         var result = await ElementEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
         return result.Result.Content!;
     }
 
@@ -80,18 +80,18 @@ public partial class ElementContainerServiceTests : UmbracoIntegrationTest
     {
         var rootContainerKey = Guid.NewGuid();
         var rootContainer = (await ElementContainerService.CreateAsync(rootContainerKey, "Root Container", null, Constants.Security.SuperUserKey)).Result;
-        Assert.NotNull(rootContainer);
+        Assert.That(rootContainer, Is.Not.Null);
 
         var childContainerKey = Guid.NewGuid();
         var childContainer = (await ElementContainerService.CreateAsync(childContainerKey, "Child Container", createChildContainerAtRoot ? null : rootContainerKey, Constants.Security.SuperUserKey)).Result;
-        Assert.NotNull(childContainer);
-        Assert.AreEqual(createChildContainerAtRoot ? Constants.System.Root : rootContainer.Id, childContainer.ParentId);
-        Assert.AreEqual($"{(createChildContainerAtRoot ? Constants.System.Root : rootContainer.Path)},{childContainer.Id}", childContainer.Path);
-        Assert.AreEqual(createChildContainerAtRoot ? 1 : 2, childContainer.Level);
+        Assert.That(childContainer, Is.Not.Null);
+        Assert.That(childContainer.ParentId, Is.EqualTo(createChildContainerAtRoot ? Constants.System.Root : rootContainer.Id));
+        Assert.That(childContainer.Path, Is.EqualTo($"{(createChildContainerAtRoot ? Constants.System.Root : rootContainer.Path)},{childContainer.Id}"));
+        Assert.That(childContainer.Level, Is.EqualTo(createChildContainerAtRoot ? 1 : 2));
 
         var grandchildContainerKey = Guid.NewGuid();
         var grandchildContainer = (await ElementContainerService.CreateAsync(grandchildContainerKey, "Grandchild Container", childContainerKey, Constants.Security.SuperUserKey)).Result;
-        Assert.NotNull(grandchildContainer);
+        Assert.That(grandchildContainer, Is.Not.Null);
 
         var elementType = await CreateElementType();
 
@@ -100,20 +100,20 @@ public partial class ElementContainerServiceTests : UmbracoIntegrationTest
         for (var i = 0; i < iterations; i++)
         {
             var element = await CreateElement(elementType.Key, childContainerKey);
-            Assert.AreEqual(childContainer.Id, element.ParentId);
-            Assert.AreEqual($"{childContainer.Path},{element.Id}", element.Path);
-            Assert.AreEqual(childContainer.Level + 1, element.Level);
+            Assert.That(element.ParentId, Is.EqualTo(childContainer.Id));
+            Assert.That(element.Path, Is.EqualTo($"{childContainer.Path},{element.Id}"));
+            Assert.That(element.Level, Is.EqualTo(childContainer.Level + 1));
 
             element = await CreateElement(elementType.Key, grandchildContainerKey);
-            Assert.AreEqual(grandchildContainer.Id, element.ParentId);
-            Assert.AreEqual($"{grandchildContainer.Path},{element.Id}", element.Path);
-            Assert.AreEqual(grandchildContainer.Level + 1, element.Level);
+            Assert.That(element.ParentId, Is.EqualTo(grandchildContainer.Id));
+            Assert.That(element.Path, Is.EqualTo($"{grandchildContainer.Path},{element.Id}"));
+            Assert.That(element.Level, Is.EqualTo(grandchildContainer.Level + 1));
         }
 
-        Assert.AreEqual(createChildContainerAtRoot ? 2 : 1, GetAtRoot().Length);
-        Assert.AreEqual(createChildContainerAtRoot ? 0 : 1, GetFolderChildren(rootContainerKey).Length);
-        Assert.AreEqual(506, GetFolderChildren(childContainerKey).Length);
-        Assert.AreEqual(505, GetFolderChildren(grandchildContainerKey).Length);
+        Assert.That(GetAtRoot(), Has.Length.EqualTo(createChildContainerAtRoot ? 2 : 1));
+        Assert.That(GetFolderChildren(rootContainerKey), Has.Length.EqualTo(createChildContainerAtRoot ? 0 : 1));
+        Assert.That(GetFolderChildren(childContainerKey), Has.Length.EqualTo(506));
+        Assert.That(GetFolderChildren(grandchildContainerKey), Has.Length.EqualTo(505));
 
         return new()
         {
@@ -130,12 +130,12 @@ public partial class ElementContainerServiceTests : UmbracoIntegrationTest
     private async Task AssertContainerIsInRecycleBin(Guid containerKey)
     {
         var container = await ElementContainerService.GetAsync(containerKey);
-        Assert.NotNull(container);
+        Assert.That(container, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(Constants.System.RecycleBinElement, container.ParentId);
-            Assert.AreEqual($"{Constants.System.RecycleBinElementPathPrefix}{container.Id}", container.Path);
-            Assert.IsTrue(container.Trashed);
+            Assert.That(container.ParentId, Is.EqualTo(Constants.System.RecycleBinElement));
+            Assert.That(container.Path, Is.EqualTo($"{Constants.System.RecycleBinElementPathPrefix}{container.Id}"));
+            Assert.That(container.Trashed, Is.True);
         });
 
         var recycleBinItems = EntityService
@@ -144,11 +144,11 @@ public partial class ElementContainerServiceTests : UmbracoIntegrationTest
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(1, total);
-            Assert.AreEqual(1, recycleBinItems.Length);
+            Assert.That(total, Is.EqualTo(1));
+            Assert.That(recycleBinItems, Has.Length.EqualTo(1));
         });
 
-        Assert.AreEqual(container.Key, recycleBinItems[0].Key);
+        Assert.That(recycleBinItems[0].Key, Is.EqualTo(container.Key));
     }
 
     public static void ConfigureDisableDeleteWhenReferenced(IUmbracoBuilder builder)

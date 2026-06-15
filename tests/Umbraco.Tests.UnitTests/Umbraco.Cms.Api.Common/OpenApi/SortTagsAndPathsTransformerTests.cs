@@ -32,7 +32,7 @@ public class SortTagsAndPathsTransformerTests
 
         // Assert
         var tagNames = document.Tags.Select(t => t.Name).ToList();
-        Assert.AreEqual(new[] { "Apple", "Mango", "Pineapple" }, tagNames);
+        Assert.That(tagNames, Is.EqualTo(new[] { "Apple", "Mango", "Pineapple" }));
     }
 
     [Test]
@@ -55,7 +55,7 @@ public class SortTagsAndPathsTransformerTests
 
         // Assert - Ordinal comparison: uppercase letters come before lowercase
         var tagNames = document.Tags.Select(t => t.Name).ToList();
-        Assert.AreEqual(new[] { "APPLE", "Apple", "apple" }, tagNames);
+        Assert.That(tagNames, Is.EqualTo(new[] { "APPLE", "Apple", "apple" }));
     }
 
     [Test]
@@ -96,7 +96,7 @@ public class SortTagsAndPathsTransformerTests
 
         // Assert - Sorted by tag name first, then by path key
         var pathKeys = document.Paths.Keys.ToList();
-        Assert.AreEqual(new[] { "/apple", "/banana", "/pineapple" }, pathKeys);
+        Assert.That(pathKeys, Is.EqualTo(new[] { "/apple", "/banana", "/pineapple" }));
     }
 
     [Test]
@@ -139,7 +139,7 @@ public class SortTagsAndPathsTransformerTests
 
         // Assert - /pineapple wins on "AppleTag" < "BananaTag" despite also carrying "PineappleTag".
         var pathKeys = document.Paths.Keys.ToList();
-        Assert.AreEqual(new[] { "/pineapple", "/banana" }, pathKeys);
+        Assert.That(pathKeys, Is.EqualTo(new[] { "/pineapple", "/banana" }));
     }
 
     [Test]
@@ -176,7 +176,7 @@ public class SortTagsAndPathsTransformerTests
 
         // Assert - /pineapple wins on "AppleTag" (from its POST) < "BananaTag" (from /banana's only operation).
         var pathKeys = document.Paths.Keys.ToList();
-        Assert.AreEqual(new[] { "/pineapple", "/banana" }, pathKeys);
+        Assert.That(pathKeys, Is.EqualTo(new[] { "/pineapple", "/banana" }));
     }
 
     [Test]
@@ -191,8 +191,8 @@ public class SortTagsAndPathsTransformerTests
 
         // Act & Assert - should not throw
         await _transformer.TransformAsync(document, null!, CancellationToken.None);
-        Assert.IsNotNull(document.Tags);
-        Assert.AreEqual(0, document.Tags.Count);
+        Assert.That(document.Tags, Is.Not.Null);
+        Assert.That(document.Tags.Count, Is.EqualTo(0));
     }
 
     [Test]
@@ -209,7 +209,7 @@ public class SortTagsAndPathsTransformerTests
         await _transformer.TransformAsync(document, null!, CancellationToken.None);
 
         // Assert
-        Assert.AreEqual(0, document.Paths.Count);
+        Assert.That(document.Paths.Count, Is.EqualTo(0));
     }
 
     [Test]
@@ -231,7 +231,7 @@ public class SortTagsAndPathsTransformerTests
 
         // Assert - Falls back to path key sorting
         var pathKeys = document.Paths.Keys.ToList();
-        Assert.AreEqual(new[] { "/path-a", "/path-b" }, pathKeys);
+        Assert.That(pathKeys, Is.EqualTo(new[] { "/path-a", "/path-b" }));
     }
 
     [Test]
@@ -265,6 +265,6 @@ public class SortTagsAndPathsTransformerTests
 
         // Assert - Falls back to path key sorting
         var pathKeys = document.Paths.Keys.ToList();
-        Assert.AreEqual(new[] { "/path-a", "/path-b" }, pathKeys);
+        Assert.That(pathKeys, Is.EqualTo(new[] { "/path-a", "/path-b" }));
     }
 }

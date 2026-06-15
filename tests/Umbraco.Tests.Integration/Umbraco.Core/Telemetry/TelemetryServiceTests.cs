@@ -69,19 +69,19 @@ internal sealed class TelemetryServiceTests : UmbracoIntegrationTest
 
         await MetricsConsentService.SetConsentLevelAsync(TelemetryLevel.Detailed);
         var telemetryReportData = await TelemetryService.GetTelemetryReportDataAsync();
-        Assert.IsNotNull(telemetryReportData);
+        Assert.That(telemetryReportData, Is.Not.Null);
 
         var detailed = telemetryReportData!.Detailed.ToArray();
 
         Assert.Multiple(() =>
         {
-            Assert.IsNotNull(detailed);
-            Assert.AreEqual(expectedData.Count, detailed.Length);
+            Assert.That(detailed, Is.Not.Null);
+            Assert.That(detailed, Has.Length.EqualTo(expectedData.Count));
 
             foreach (var expectedInfo in expectedData)
             {
                 var expected = detailed.FirstOrDefault(x => x.Name == expectedInfo);
-                Assert.IsNotNull(expected, $"Expected {expectedInfo} to exists in the detailed list");
+                Assert.That(expected, Is.Not.Null, $"Expected {expectedInfo} to exists in the detailed list");
             }
         });
     }

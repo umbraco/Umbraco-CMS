@@ -34,16 +34,16 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
             ],
             Constants.Security.SuperUserKey);
 
-        Assert.IsTrue(clearScheduleAttempt.Success);
+        Assert.That(clearScheduleAttempt.Success, Is.True);
 
         var schedules = ContentService.GetContentScheduleByContentId(content.Id);
         content = ContentService.GetById(content.Key);
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(0, content!.PublishedCultures.Count());
-            Assert.IsNull(content!.PublishDate);
-            Assert.AreEqual(0, schedules.FullSchedule.Count);
+            Assert.That(content!.PublishedCultures.Count(), Is.EqualTo(0));
+            Assert.That(content!.PublishDate, Is.Null);
+            Assert.That(schedules.FullSchedule, Is.Empty);
         });
     }
 
@@ -76,17 +76,17 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
             ],
             Constants.Security.SuperUserKey);
 
-        Assert.IsTrue(scheduleAttempt.Success);
+        Assert.That(scheduleAttempt.Success, Is.True);
 
         var schedules = ContentService.GetContentScheduleByContentId(content.Id);
         content = ContentService.GetById(content.Key);
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(0, content!.PublishedCultures.Count());
-            Assert.IsFalse(schedules.GetSchedule(setupInfo.LangEn.IsoCode, ContentScheduleAction.Release).Any());
-            Assert.IsFalse(schedules.GetSchedule(setupInfo.LangEn.IsoCode, ContentScheduleAction.Expire).Any());
-            Assert.AreEqual(4, schedules.FullSchedule.Count);
+            Assert.That(content!.PublishedCultures.Count(), Is.EqualTo(0));
+            Assert.That(schedules.GetSchedule(setupInfo.LangEn.IsoCode, ContentScheduleAction.Release).Any(), Is.False);
+            Assert.That(schedules.GetSchedule(setupInfo.LangEn.IsoCode, ContentScheduleAction.Expire).Any(), Is.False);
+            Assert.That(schedules.FullSchedule, Has.Count.EqualTo(4));
         });
     }
 
@@ -124,19 +124,19 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
             ],
             Constants.Security.SuperUserKey);
 
-        Assert.IsTrue(scheduleAttempt.Success);
+        Assert.That(scheduleAttempt.Success, Is.True);
 
         var schedules = ContentService.GetContentScheduleByContentId(content.Id);
         content = ContentService.GetById(content.Key);
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(0, content!.PublishedCultures.Count());
-            Assert.IsFalse(schedules.GetSchedule(setupInfo.LangEn.IsoCode, ContentScheduleAction.Release).Any());
-            Assert.IsFalse(schedules.GetSchedule(setupInfo.LangEn.IsoCode, ContentScheduleAction.Expire).Any());
-            Assert.IsFalse(schedules.GetSchedule(setupInfo.LangDa.IsoCode, ContentScheduleAction.Release).Any());
-            Assert.IsFalse(schedules.GetSchedule(setupInfo.LangDa.IsoCode, ContentScheduleAction.Expire).Any());
-            Assert.AreEqual(2, schedules.FullSchedule.Count);
+            Assert.That(content!.PublishedCultures.Count(), Is.EqualTo(0));
+            Assert.That(schedules.GetSchedule(setupInfo.LangEn.IsoCode, ContentScheduleAction.Release).Any(), Is.False);
+            Assert.That(schedules.GetSchedule(setupInfo.LangEn.IsoCode, ContentScheduleAction.Expire).Any(), Is.False);
+            Assert.That(schedules.GetSchedule(setupInfo.LangDa.IsoCode, ContentScheduleAction.Release).Any(), Is.False);
+            Assert.That(schedules.GetSchedule(setupInfo.LangDa.IsoCode, ContentScheduleAction.Expire).Any(), Is.False);
+            Assert.That(schedules.FullSchedule, Has.Count.EqualTo(2));
         });
     }
 
@@ -179,15 +179,15 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
             ],
             Constants.Security.SuperUserKey);
 
-        Assert.IsTrue(scheduleAttempt.Success);
+        Assert.That(scheduleAttempt.Success, Is.True);
 
         var schedules = ContentService.GetContentScheduleByContentId(content.Id);
         content = ContentService.GetById(content.Key);
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(0, content!.PublishedCultures.Count());
-            Assert.AreEqual(0, schedules.FullSchedule.Count);
+            Assert.That(content!.PublishedCultures.Count(), Is.EqualTo(0));
+            Assert.That(schedules.FullSchedule, Is.Empty);
         });
     }
 }

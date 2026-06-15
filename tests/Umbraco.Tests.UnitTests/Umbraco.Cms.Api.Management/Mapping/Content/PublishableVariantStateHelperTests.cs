@@ -18,7 +18,7 @@ public class PublishableVariantStateHelperTests
     public void Culture_Invariant_Content_State(bool edited, bool published, bool trashed, PublishableVariantState expectedResult)
     {
         var content = Mock.Of<IContent>(c => c.Id == 1 && c.Published == published && c.Edited == edited && c.Trashed == trashed);
-        Assert.AreEqual(expectedResult, PublishableVariantStateHelper.GetState(content, culture: null));
+        Assert.That(PublishableVariantStateHelper.GetState(content, culture: null), Is.EqualTo(expectedResult));
     }
 
     [TestCase(false, false)]
@@ -28,7 +28,7 @@ public class PublishableVariantStateHelperTests
     public void Culture_Invariant_Content_Not_Created_State(bool edited, bool published)
     {
         var content = Mock.Of<IContent>(c => c.Id == 0 && c.Published == published && c.Edited == edited);
-        Assert.AreEqual(PublishableVariantState.NotCreated, PublishableVariantStateHelper.GetState(content, culture: null));
+        Assert.That(PublishableVariantStateHelper.GetState(content, culture: null), Is.EqualTo(PublishableVariantState.NotCreated));
     }
 
     [TestCase(false, false, false, PublishableVariantState.Draft)]
@@ -46,7 +46,7 @@ public class PublishableVariantStateHelperTests
             && c.Published == published
             && c.PublishedCultures == (published ? new[] { culture } : Enumerable.Empty<string>())
             && c.Trashed == trashed);
-        Assert.AreEqual(expectedResult, PublishableVariantStateHelper.GetState(content, culture));
+        Assert.That(PublishableVariantStateHelper.GetState(content, culture), Is.EqualTo(expectedResult));
     }
 
     [TestCase(false, false)]
@@ -62,7 +62,7 @@ public class PublishableVariantStateHelperTests
             && c.EditedCultures == (edited ? new[] { culture } : Enumerable.Empty<string>())
             && c.Published == published
             && c.PublishedCultures == (published ? new[] { culture } : Enumerable.Empty<string>()));
-        Assert.AreEqual(PublishableVariantState.NotCreated, PublishableVariantStateHelper.GetState(content, "dk"));
+        Assert.That(PublishableVariantStateHelper.GetState(content, "dk"), Is.EqualTo(PublishableVariantState.NotCreated));
     }
 
     [TestCase(false, false, false, PublishableVariantState.Draft)]
@@ -73,7 +73,7 @@ public class PublishableVariantStateHelperTests
     public void Culture_Invariant_DocumentEntitySlim_State(bool edited, bool published, bool trashed, PublishableVariantState expectedResult)
     {
         var entity = Mock.Of<IDocumentEntitySlim>(c => c.Id == 1 && c.Published == published && c.Edited == edited && c.CultureNames == new Dictionary<string, string>() && c.Trashed == trashed);
-        Assert.AreEqual(expectedResult, PublishableVariantStateHelper.GetState(entity, culture: null));
+        Assert.That(PublishableVariantStateHelper.GetState(entity, culture: null), Is.EqualTo(expectedResult));
     }
 
     [TestCase(false, false)]
@@ -83,7 +83,7 @@ public class PublishableVariantStateHelperTests
     public void Culture_Invariant_DocumentEntitySlim_Not_Created_State(bool edited, bool published)
     {
         var entity = Mock.Of<IDocumentEntitySlim>(c => c.Id == 0 && c.Published == published && c.Edited == edited && c.CultureNames == new Dictionary<string, string>());
-        Assert.AreEqual(PublishableVariantState.NotCreated, PublishableVariantStateHelper.GetState(entity, culture: null));
+        Assert.That(PublishableVariantStateHelper.GetState(entity, culture: null), Is.EqualTo(PublishableVariantState.NotCreated));
     }
 
     [TestCase(false, false, false, PublishableVariantState.Draft)]
@@ -101,7 +101,7 @@ public class PublishableVariantStateHelperTests
             && c.Published == published
             && c.PublishedCultures == (published ? new[] { culture } : Enumerable.Empty<string>())
             && c.Trashed == trashed);
-        Assert.AreEqual(expectedResult, PublishableVariantStateHelper.GetState(entity, culture));
+        Assert.That(PublishableVariantStateHelper.GetState(entity, culture), Is.EqualTo(expectedResult));
     }
 
     [TestCase(false, false)]
@@ -117,6 +117,6 @@ public class PublishableVariantStateHelperTests
             && c.EditedCultures == (edited ? new[] { culture } : Enumerable.Empty<string>())
             && c.Published == published
             && c.PublishedCultures == (published ? new[] { culture } : Enumerable.Empty<string>()));
-        Assert.AreEqual(PublishableVariantState.NotCreated, PublishableVariantStateHelper.GetState(entity, "dk"));
+        Assert.That(PublishableVariantStateHelper.GetState(entity, "dk"), Is.EqualTo(PublishableVariantState.NotCreated));
     }
 }

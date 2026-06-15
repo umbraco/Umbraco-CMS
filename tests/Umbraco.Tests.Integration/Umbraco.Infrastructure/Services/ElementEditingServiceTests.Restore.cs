@@ -16,11 +16,11 @@ public partial class ElementEditingServiceTests
         var moveToRecycleBinResult = await ElementEditingService.MoveToRecycleBinAsync(
             element.Key,
             Constants.Security.SuperUserKey);
-        Assert.IsTrue(moveToRecycleBinResult.Success);
+        Assert.That(moveToRecycleBinResult.Success, Is.True);
 
         element = await ElementEditingService.GetAsync(element.Key);
-        Assert.NotNull(element);
-        Assert.IsTrue(element.Trashed);
+        Assert.That(element, Is.Not.Null);
+        Assert.That(element.Trashed, Is.True);
 
         var restoreResult = await ElementEditingService.RestoreAsync(
             element.Key,
@@ -28,17 +28,17 @@ public partial class ElementEditingServiceTests
             Constants.Security.SuperUserKey);
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(restoreResult.Success);
-            Assert.AreEqual(ContentEditingOperationStatus.Success, restoreResult.Result);
+            Assert.That(restoreResult.Success, Is.True);
+            Assert.That(restoreResult.Result, Is.EqualTo(ContentEditingOperationStatus.Success));
         });
 
         element = await ElementEditingService.GetAsync(element.Key);
-        Assert.NotNull(element);
+        Assert.That(element, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(element.Trashed);
-            Assert.AreEqual(Constants.System.Root, element.ParentId);
-            Assert.AreEqual($"{Constants.System.Root},{element.Id}", element.Path);
+            Assert.That(element.Trashed, Is.False);
+            Assert.That(element.ParentId, Is.EqualTo(Constants.System.Root));
+            Assert.That(element.Path, Is.EqualTo($"{Constants.System.Root},{element.Id}"));
         });
     }
 
@@ -57,11 +57,11 @@ public partial class ElementEditingServiceTests
         var moveToRecycleBinResult = await ElementEditingService.MoveToRecycleBinAsync(
             element.Key,
             Constants.Security.SuperUserKey);
-        Assert.IsTrue(moveToRecycleBinResult.Success);
+        Assert.That(moveToRecycleBinResult.Success, Is.True);
 
         element = await ElementEditingService.GetAsync(element.Key);
-        Assert.NotNull(element);
-        Assert.IsTrue(element.Trashed);
+        Assert.That(element, Is.Not.Null);
+        Assert.That(element.Trashed, Is.True);
 
         var restoreResult = await ElementEditingService.RestoreAsync(
             element.Key,
@@ -69,22 +69,22 @@ public partial class ElementEditingServiceTests
             Constants.Security.SuperUserKey);
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(restoreResult.Success);
-            Assert.AreEqual(ContentEditingOperationStatus.Success, restoreResult.Result);
+            Assert.That(restoreResult.Success, Is.True);
+            Assert.That(restoreResult.Result, Is.EqualTo(ContentEditingOperationStatus.Success));
         });
 
         element = await ElementEditingService.GetAsync(element.Key);
-        Assert.NotNull(element);
+        Assert.That(element, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(element.Trashed);
-            Assert.AreEqual(container.Id, element.ParentId);
-            Assert.AreEqual($"{container.Path},{element.Id}", element.Path);
+            Assert.That(element.Trashed, Is.False);
+            Assert.That(element.ParentId, Is.EqualTo(container.Id));
+            Assert.That(element.Path, Is.EqualTo($"{container.Path},{element.Id}"));
         });
 
         var folderChildren = GetFolderChildren(containerKey);
-        Assert.AreEqual(1, folderChildren.Length);
-        Assert.AreEqual(element.Key, folderChildren.First().Key);
+        Assert.That(folderChildren, Has.Length.EqualTo(1));
+        Assert.That(folderChildren.First().Key, Is.EqualTo(element.Key));
     }
 
     [Test]
@@ -98,13 +98,13 @@ public partial class ElementEditingServiceTests
             Constants.Security.SuperUserKey);
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(restoreResult.Success);
-            Assert.AreEqual(ContentEditingOperationStatus.NotInTrash, restoreResult.Result);
+            Assert.That(restoreResult.Success, Is.False);
+            Assert.That(restoreResult.Result, Is.EqualTo(ContentEditingOperationStatus.NotInTrash));
         });
 
         element = await ElementEditingService.GetAsync(element.Key);
-        Assert.NotNull(element);
-        Assert.IsFalse(element.Trashed);
+        Assert.That(element, Is.Not.Null);
+        Assert.That(element.Trashed, Is.False);
     }
 
     [Test]
@@ -115,7 +115,7 @@ public partial class ElementEditingServiceTests
         var moveToRecycleBinResult = await ElementEditingService.MoveToRecycleBinAsync(
             element.Key,
             Constants.Security.SuperUserKey);
-        Assert.IsTrue(moveToRecycleBinResult.Success);
+        Assert.That(moveToRecycleBinResult.Success, Is.True);
 
         var trashedContainerKey = Guid.NewGuid();
         await ElementContainerService.CreateAsync(
@@ -131,15 +131,15 @@ public partial class ElementEditingServiceTests
             Constants.Security.SuperUserKey);
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(restoreResult.Success);
-            Assert.AreEqual(ContentEditingOperationStatus.InTrash, restoreResult.Result);
+            Assert.That(restoreResult.Success, Is.False);
+            Assert.That(restoreResult.Result, Is.EqualTo(ContentEditingOperationStatus.InTrash));
         });
 
         element = await ElementEditingService.GetAsync(element.Key);
-        Assert.IsNotNull(element);
-        Assert.IsTrue(element.Trashed);
+        Assert.That(element, Is.Not.Null);
+        Assert.That(element.Trashed, Is.True);
 
-        Assert.AreEqual(0, GetFolderChildren(trashedContainerKey, true).Length);
+        Assert.That(GetFolderChildren(trashedContainerKey, true), Is.Empty);
     }
 
     [Test]
@@ -151,28 +151,28 @@ public partial class ElementEditingServiceTests
             element.Key,
             [new CulturePublishScheduleModel { Culture = "*" }],
             Constants.Security.SuperUserKey);
-        Assert.IsTrue(publishResult.Success);
+        Assert.That(publishResult.Success, Is.True);
 
         var moveToRecycleBinResult = await ElementEditingService.MoveToRecycleBinAsync(
             element.Key,
             Constants.Security.SuperUserKey);
-        Assert.IsTrue(moveToRecycleBinResult.Success);
+        Assert.That(moveToRecycleBinResult.Success, Is.True);
 
         element = await ElementEditingService.GetAsync(element.Key);
-        Assert.NotNull(element);
-        Assert.IsTrue(element.Published);
-        Assert.IsTrue(element.Trashed);
+        Assert.That(element, Is.Not.Null);
+        Assert.That(element.Published, Is.True);
+        Assert.That(element.Trashed, Is.True);
 
         var restoreResult = await ElementEditingService.RestoreAsync(
             element.Key,
             null,
             Constants.Security.SuperUserKey);
-        Assert.IsTrue(restoreResult.Success);
+        Assert.That(restoreResult.Success, Is.True);
 
         element = await ElementEditingService.GetAsync(element.Key);
-        Assert.NotNull(element);
-        Assert.IsFalse(element.Published);
-        Assert.IsFalse(element.Trashed);
+        Assert.That(element, Is.Not.Null);
+        Assert.That(element.Published, Is.False);
+        Assert.That(element.Trashed, Is.False);
     }
 
     [TestCase("en-US", "da-DK")]
@@ -202,7 +202,7 @@ public partial class ElementEditingServiceTests
         var result = await ElementEditingService.CreateAsync(
             createModel,
             Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
         var element = result.Result.Content!;
 
         var culturePublishScheduleModels = publishedCultures
@@ -212,30 +212,30 @@ public partial class ElementEditingServiceTests
             element.Key,
             culturePublishScheduleModels,
             Constants.Security.SuperUserKey);
-        Assert.IsTrue(publishResult.Success);
+        Assert.That(publishResult.Success, Is.True);
 
         var moveToRecycleBinResult = await ElementEditingService.MoveToRecycleBinAsync(
             element.Key,
             Constants.Security.SuperUserKey);
-        Assert.IsTrue(moveToRecycleBinResult.Success);
+        Assert.That(moveToRecycleBinResult.Success, Is.True);
 
         element = await ElementEditingService.GetAsync(element.Key);
-        Assert.NotNull(element);
-        Assert.IsTrue(element.Published);
-        CollectionAssert.AreEquivalent(publishedCultures, element.PublishedCultures);
-        Assert.IsTrue(element.Trashed);
+        Assert.That(element, Is.Not.Null);
+        Assert.That(element.Published, Is.True);
+        Assert.That(element.PublishedCultures, Is.EquivalentTo(publishedCultures));
+        Assert.That(element.Trashed, Is.True);
 
         var restoreResult = await ElementEditingService.RestoreAsync(
             element.Key,
             null,
             Constants.Security.SuperUserKey);
-        Assert.IsTrue(restoreResult.Success);
+        Assert.That(restoreResult.Success, Is.True);
 
         element = await ElementEditingService.GetAsync(element.Key);
-        Assert.NotNull(element);
-        Assert.IsFalse(element.Published);
-        Assert.IsEmpty(element.PublishedCultures);
-        Assert.IsFalse(element.Trashed);
+        Assert.That(element, Is.Not.Null);
+        Assert.That(element.Published, Is.False);
+        Assert.That(element.PublishedCultures, Is.Empty);
+        Assert.That(element.Trashed, Is.False);
     }
 
     [Test]
@@ -247,17 +247,17 @@ public partial class ElementEditingServiceTests
             element.Key,
             [new() { Culture = "*" }],
             Constants.Security.SuperUserKey);
-        Assert.IsTrue(publishResult.Success);
+        Assert.That(publishResult.Success, Is.True);
 
         var moveToRecycleBinResult = await ElementEditingService.MoveToRecycleBinAsync(
             element.Key,
             Constants.Security.SuperUserKey);
-        Assert.IsTrue(moveToRecycleBinResult.Success);
+        Assert.That(moveToRecycleBinResult.Success, Is.True);
 
         element = await ElementEditingService.GetAsync(element.Key);
-        Assert.NotNull(element);
-        Assert.IsTrue(element.Published);
-        Assert.IsTrue(element.Trashed);
+        Assert.That(element, Is.Not.Null);
+        Assert.That(element.Published, Is.True);
+        Assert.That(element.Trashed, Is.True);
 
         try
         {
@@ -267,12 +267,12 @@ public partial class ElementEditingServiceTests
                 element.Key,
                 null,
                 Constants.Security.SuperUserKey);
-            Assert.IsTrue(restoreResult.Success);
+            Assert.That(restoreResult.Success, Is.True);
 
             element = await ElementEditingService.GetAsync(element.Key);
-            Assert.NotNull(element);
-            Assert.IsTrue(element.Published);
-            Assert.IsFalse(element.Trashed);
+            Assert.That(element, Is.Not.Null);
+            Assert.That(element.Published, Is.True);
+            Assert.That(element.Trashed, Is.False);
         }
         finally
         {
@@ -291,10 +291,9 @@ public partial class ElementEditingServiceTests
             Constants.Security.SuperUserKey);
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(restoreResult.Success);
-            Assert.AreEqual(
-                ContentEditingOperationStatus.NotFound,
-                restoreResult.Result);
+            Assert.That(restoreResult.Success, Is.False);
+            Assert.That(
+                restoreResult.Result, Is.EqualTo(ContentEditingOperationStatus.NotFound));
         });
     }
 
@@ -306,7 +305,7 @@ public partial class ElementEditingServiceTests
         var moveToRecycleBinResult = await ElementEditingService.MoveToRecycleBinAsync(
             element.Key,
             Constants.Security.SuperUserKey);
-        Assert.IsTrue(moveToRecycleBinResult.Success);
+        Assert.That(moveToRecycleBinResult.Success, Is.True);
 
         var nonExistentContainerKey = Guid.NewGuid();
 
@@ -316,15 +315,14 @@ public partial class ElementEditingServiceTests
             Constants.Security.SuperUserKey);
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(restoreResult.Success);
-            Assert.AreEqual(
-                ContentEditingOperationStatus.ParentNotFound,
-                restoreResult.Result);
+            Assert.That(restoreResult.Success, Is.False);
+            Assert.That(
+                restoreResult.Result, Is.EqualTo(ContentEditingOperationStatus.ParentNotFound));
         });
 
         element = await ElementEditingService.GetAsync(element.Key);
-        Assert.IsNotNull(element);
-        Assert.IsTrue(element.Trashed);
+        Assert.That(element, Is.Not.Null);
+        Assert.That(element.Trashed, Is.True);
     }
 
     [Test]
@@ -335,7 +333,7 @@ public partial class ElementEditingServiceTests
         var moveToRecycleBinResult = await ElementEditingService.MoveToRecycleBinAsync(
             element.Key,
             Constants.Security.SuperUserKey);
-        Assert.IsTrue(moveToRecycleBinResult.Success);
+        Assert.That(moveToRecycleBinResult.Success, Is.True);
 
         var targetElement = await CreateInvariantElement();
 
@@ -345,14 +343,13 @@ public partial class ElementEditingServiceTests
             Constants.Security.SuperUserKey);
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(restoreResult.Success);
-            Assert.AreEqual(
-                ContentEditingOperationStatus.ParentNotFound,
-                restoreResult.Result);
+            Assert.That(restoreResult.Success, Is.False);
+            Assert.That(
+                restoreResult.Result, Is.EqualTo(ContentEditingOperationStatus.ParentNotFound));
         });
 
         element = await ElementEditingService.GetAsync(element.Key);
-        Assert.IsNotNull(element);
-        Assert.IsTrue(element.Trashed);
+        Assert.That(element, Is.Not.Null);
+        Assert.That(element.Trashed, Is.True);
     }
 }

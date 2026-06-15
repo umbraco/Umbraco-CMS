@@ -14,191 +14,191 @@ public class TypeExtensionsTests
     public void Can_Get_Public_Properties_Of_Interface()
     {
         var properties = typeof(ITheBaseThing).GetPublicProperties();
-        Assert.AreEqual(1, properties.Length);
+        Assert.That(properties.Length, Is.EqualTo(1));
 
         var propertyNames = properties.Select(p => p.Name).ToArray();
-        Assert.Contains(nameof(ITheBaseThing.TheBaseThingProperty), propertyNames);
+        Assert.That(propertyNames, Does.Contain(nameof(ITheBaseThing.TheBaseThingProperty)));
     }
 
     [Test]
     public void Get_Public_Properties_Of_Interface_Contains_Inherited_Properties()
     {
         var properties = typeof(ITheThing).GetPublicProperties();
-        Assert.AreEqual(2, properties.Length);
+        Assert.That(properties.Length, Is.EqualTo(2));
 
         var propertyNames = properties.Select(p => p.Name).ToArray();
-        Assert.Contains(nameof(ITheBaseThing.TheBaseThingProperty), propertyNames);
-        Assert.Contains(nameof(ITheThing.TheThingProperty), propertyNames);
+        Assert.That(propertyNames, Does.Contain(nameof(ITheBaseThing.TheBaseThingProperty)));
+        Assert.That(propertyNames, Does.Contain(nameof(ITheThing.TheThingProperty)));
     }
 
     [Test]
     public void Can_Get_Public_Properties_Of_Class()
     {
         var properties = typeof(TheBaseThing).GetPublicProperties();
-        Assert.AreEqual(1, properties.Length);
+        Assert.That(properties.Length, Is.EqualTo(1));
 
         var propertyNames = properties.Select(p => p.Name).ToArray();
-        Assert.Contains(nameof(TheBaseThing.TheBaseThingProperty), propertyNames);
+        Assert.That(propertyNames, Does.Contain(nameof(TheBaseThing.TheBaseThingProperty)));
     }
 
     [Test]
     public void Get_Public_Properties_Of_Class_Contains_Inherited_Properties()
     {
         var properties = typeof(TheThing).GetPublicProperties();
-        Assert.AreEqual(3, properties.Length);
+        Assert.That(properties.Length, Is.EqualTo(3));
 
         var propertyNames = properties.Select(p => p.Name).ToArray();
-        Assert.Contains(nameof(TheBaseThing.TheBaseThingProperty), propertyNames);
-        Assert.Contains(nameof(TheThing.TheThingProperty), propertyNames);
-        Assert.Contains(nameof(TheThing.TheExtraProperty), propertyNames);
+        Assert.That(propertyNames, Does.Contain(nameof(TheBaseThing.TheBaseThingProperty)));
+        Assert.That(propertyNames, Does.Contain(nameof(TheThing.TheThingProperty)));
+        Assert.That(propertyNames, Does.Contain(nameof(TheThing.TheExtraProperty)));
     }
 
     [Test]
     public void Get_All_Properties_Of_Class_Contains_Internal_Properties()
     {
         var properties = typeof(TheThing).GetAllProperties();
-        Assert.AreEqual(4, properties.Length);
+        Assert.That(properties.Length, Is.EqualTo(4));
 
         var propertyNames = properties.Select(p => p.Name).ToArray();
-        Assert.Contains(nameof(TheBaseThing.TheBaseThingProperty), propertyNames);
-        Assert.Contains(nameof(TheThing.TheThingProperty), propertyNames);
-        Assert.Contains(nameof(TheThing.TheExtraProperty), propertyNames);
-        Assert.Contains(nameof(TheThing.TheInternalProperty), propertyNames);
+        Assert.That(propertyNames, Does.Contain(nameof(TheBaseThing.TheBaseThingProperty)));
+        Assert.That(propertyNames, Does.Contain(nameof(TheThing.TheThingProperty)));
+        Assert.That(propertyNames, Does.Contain(nameof(TheThing.TheExtraProperty)));
+        Assert.That(propertyNames, Does.Contain(nameof(TheThing.TheInternalProperty)));
     }
 
     [Test]
     public void Can_Get_Public_Methods_Of_Interface()
     {
         var methods = typeof(ITheBaseThing).GetPublicMethods();
-        Assert.AreEqual(2, methods.Length);
+        Assert.That(methods.Length, Is.EqualTo(2));
 
         var methodNames = methods.Select(p => p.Name).ToArray();
-        Assert.Contains( $"get_{nameof(ITheBaseThing.TheBaseThingProperty)}", methodNames);
-        Assert.Contains( nameof(ITheBaseThing.TheBaseThingMethod), methodNames);
+        Assert.That( methodNames, Does.Contain($"get_{nameof(ITheBaseThing.TheBaseThingProperty)}"));
+        Assert.That( methodNames, Does.Contain(nameof(ITheBaseThing.TheBaseThingMethod)));
     }
 
     [Test]
     public void Get_Public_Methods_Of_Interface_Contains_Inherited_Methods()
     {
         var methods = typeof(ITheThing).GetPublicMethods();
-        Assert.AreEqual(5, methods.Length);
+        Assert.That(methods.Length, Is.EqualTo(5));
 
         var methodNames = methods.Select(p => p.Name).ToArray();
-        Assert.Contains( $"get_{nameof(ITheBaseThing.TheBaseThingProperty)}", methodNames);
-        Assert.Contains( nameof(ITheBaseThing.TheBaseThingMethod), methodNames);
-        Assert.Contains( $"get_{nameof(ITheThing.TheThingProperty)}", methodNames);
-        Assert.Contains( $"set_{nameof(ITheThing.TheThingProperty)}", methodNames);
-        Assert.Contains( nameof(ITheThing.TheThingMethod), methodNames);
+        Assert.That( methodNames, Does.Contain($"get_{nameof(ITheBaseThing.TheBaseThingProperty)}"));
+        Assert.That( methodNames, Does.Contain(nameof(ITheBaseThing.TheBaseThingMethod)));
+        Assert.That( methodNames, Does.Contain($"get_{nameof(ITheThing.TheThingProperty)}"));
+        Assert.That( methodNames, Does.Contain($"set_{nameof(ITheThing.TheThingProperty)}"));
+        Assert.That( methodNames, Does.Contain(nameof(ITheThing.TheThingMethod)));
     }
 
     [Test]
     public void Can_Get_Public_Methods_Of_Class()
     {
         var methods = typeof(TheBaseThing).GetPublicMethods();
-        Assert.AreEqual(3 + _publicObjectMethodNames.Length, methods.Length);
+        Assert.That(methods.Length, Is.EqualTo(3 + _publicObjectMethodNames.Length));
 
         var methodNames = methods.Select(p => p.Name).ToArray();
-        Assert.Contains( $"get_{nameof(TheBaseThing.TheBaseThingProperty)}", methodNames);
-        Assert.Contains( nameof(TheBaseThing.TheBaseThingMethod), methodNames);
-        Assert.Contains( nameof(TheBaseThing.TheExtraMethod), methodNames);
-        Assert.IsTrue(methodNames.ContainsAll(_publicObjectMethodNames));
+        Assert.That( methodNames, Does.Contain($"get_{nameof(TheBaseThing.TheBaseThingProperty)}"));
+        Assert.That( methodNames, Does.Contain(nameof(TheBaseThing.TheBaseThingMethod)));
+        Assert.That( methodNames, Does.Contain(nameof(TheBaseThing.TheExtraMethod)));
+        Assert.That(methodNames.ContainsAll(_publicObjectMethodNames), Is.True);
     }
 
     [Test]
     public void Get_Public_Methods_Of_Class_Contains_Inherited_Methods()
     {
         var methods = typeof(TheThing).GetPublicMethods();
-        Assert.AreEqual(7 + _publicObjectMethodNames.Length, methods.Length);
+        Assert.That(methods.Length, Is.EqualTo(7 + _publicObjectMethodNames.Length));
 
         var methodNames = methods.Select(p => p.Name).ToArray();
-        Assert.Contains( $"get_{nameof(TheBaseThing.TheBaseThingProperty)}", methodNames);
-        Assert.Contains( nameof(TheBaseThing.TheBaseThingMethod), methodNames);
-        Assert.Contains( nameof(TheBaseThing.TheExtraMethod), methodNames);
-        Assert.Contains( $"get_{nameof(TheThing.TheThingProperty)}", methodNames);
-        Assert.Contains( $"set_{nameof(TheThing.TheThingProperty)}", methodNames);
-        Assert.Contains( $"get_{nameof(TheThing.TheExtraProperty)}", methodNames);
-        Assert.Contains( nameof(TheThing.TheThingMethod), methodNames);
-        Assert.IsTrue(methodNames.ContainsAll(_publicObjectMethodNames));
+        Assert.That( methodNames, Does.Contain($"get_{nameof(TheBaseThing.TheBaseThingProperty)}"));
+        Assert.That( methodNames, Does.Contain(nameof(TheBaseThing.TheBaseThingMethod)));
+        Assert.That( methodNames, Does.Contain(nameof(TheBaseThing.TheExtraMethod)));
+        Assert.That( methodNames, Does.Contain($"get_{nameof(TheThing.TheThingProperty)}"));
+        Assert.That( methodNames, Does.Contain($"set_{nameof(TheThing.TheThingProperty)}"));
+        Assert.That( methodNames, Does.Contain($"get_{nameof(TheThing.TheExtraProperty)}"));
+        Assert.That( methodNames, Does.Contain(nameof(TheThing.TheThingMethod)));
+        Assert.That(methodNames.ContainsAll(_publicObjectMethodNames), Is.True);
     }
 
     [Test]
     public void Can_Get_All_Methods_Of_Class()
     {
         var methods = typeof(TheBaseThing).GetAllMethods();
-        Assert.AreEqual(4 + _publicObjectMethodNames.Length + _nonPublicObjectMethodNames.Length, methods.Length);
+        Assert.That(methods.Length, Is.EqualTo(4 + _publicObjectMethodNames.Length + _nonPublicObjectMethodNames.Length));
 
         var methodNames = methods.Select(p => p.Name).ToArray();
-        Assert.Contains( $"get_{nameof(TheBaseThing.TheBaseThingProperty)}", methodNames);
-        Assert.Contains( nameof(TheBaseThing.TheBaseThingMethod), methodNames);
-        Assert.Contains( nameof(TheBaseThing.TheExtraMethod), methodNames);
-        Assert.Contains( nameof(TheBaseThing.TheInternalMethod), methodNames);
-        Assert.IsTrue(methodNames.ContainsAll(_publicObjectMethodNames));
-        Assert.IsTrue(methodNames.ContainsAll(_nonPublicObjectMethodNames));
+        Assert.That( methodNames, Does.Contain($"get_{nameof(TheBaseThing.TheBaseThingProperty)}"));
+        Assert.That( methodNames, Does.Contain(nameof(TheBaseThing.TheBaseThingMethod)));
+        Assert.That( methodNames, Does.Contain(nameof(TheBaseThing.TheExtraMethod)));
+        Assert.That( methodNames, Does.Contain(nameof(TheBaseThing.TheInternalMethod)));
+        Assert.That(methodNames.ContainsAll(_publicObjectMethodNames), Is.True);
+        Assert.That(methodNames.ContainsAll(_nonPublicObjectMethodNames), Is.True);
     }
 
     [Test]
     public void Get_All_Methods_Of_Class_Contains_Inherited_Methods()
     {
         var methods = typeof(TheThing).GetAllMethods();
-        Assert.AreEqual(9 + _publicObjectMethodNames.Length + _nonPublicObjectMethodNames.Length, methods.Length);
+        Assert.That(methods.Length, Is.EqualTo(9 + _publicObjectMethodNames.Length + _nonPublicObjectMethodNames.Length));
 
         var methodNames = methods.Select(p => p.Name).ToArray();
-        Assert.Contains( $"get_{nameof(TheBaseThing.TheBaseThingProperty)}", methodNames);
-        Assert.Contains( nameof(TheBaseThing.TheBaseThingMethod), methodNames);
-        Assert.Contains( nameof(TheBaseThing.TheExtraMethod), methodNames);
-        Assert.Contains( nameof(TheBaseThing.TheInternalMethod), methodNames);
-        Assert.Contains( $"get_{nameof(TheThing.TheThingProperty)}", methodNames);
-        Assert.Contains( $"set_{nameof(TheThing.TheThingProperty)}", methodNames);
-        Assert.Contains( $"get_{nameof(TheThing.TheExtraProperty)}", methodNames);
-        Assert.Contains( $"get_{nameof(TheThing.TheInternalProperty)}", methodNames);
-        Assert.Contains( nameof(TheThing.TheThingMethod), methodNames);
-        Assert.IsTrue(methodNames.ContainsAll(_publicObjectMethodNames));
-        Assert.IsTrue(methodNames.ContainsAll(_nonPublicObjectMethodNames));
+        Assert.That( methodNames, Does.Contain($"get_{nameof(TheBaseThing.TheBaseThingProperty)}"));
+        Assert.That( methodNames, Does.Contain(nameof(TheBaseThing.TheBaseThingMethod)));
+        Assert.That( methodNames, Does.Contain(nameof(TheBaseThing.TheExtraMethod)));
+        Assert.That( methodNames, Does.Contain(nameof(TheBaseThing.TheInternalMethod)));
+        Assert.That( methodNames, Does.Contain($"get_{nameof(TheThing.TheThingProperty)}"));
+        Assert.That( methodNames, Does.Contain($"set_{nameof(TheThing.TheThingProperty)}"));
+        Assert.That( methodNames, Does.Contain($"get_{nameof(TheThing.TheExtraProperty)}"));
+        Assert.That( methodNames, Does.Contain($"get_{nameof(TheThing.TheInternalProperty)}"));
+        Assert.That( methodNames, Does.Contain(nameof(TheThing.TheThingMethod)));
+        Assert.That(methodNames.ContainsAll(_publicObjectMethodNames), Is.True);
+        Assert.That(methodNames.ContainsAll(_nonPublicObjectMethodNames), Is.True);
     }
 
     [Test]
     public void Can_Get_Public_Properties_Of_Interface_With_Internal_Declarations()
     {
         var properties = typeof(ITheInterfaceWithInternalDeclarations).GetPublicProperties();
-        Assert.AreEqual(1, properties.Length);
+        Assert.That(properties.Length, Is.EqualTo(1));
 
         var propertyNames = properties.Select(p => p.Name).ToArray();
-        Assert.Contains(nameof(ITheInterfaceWithInternalDeclarations.ThePublicProperty), propertyNames);
+        Assert.That(propertyNames, Does.Contain(nameof(ITheInterfaceWithInternalDeclarations.ThePublicProperty)));
     }
 
     [Test]
     public void Can_Get_All_Properties_Of_Interface_With_Internal_Declarations()
     {
         var properties = typeof(ITheInterfaceWithInternalDeclarations).GetAllProperties();
-        Assert.AreEqual(2, properties.Length);
+        Assert.That(properties.Length, Is.EqualTo(2));
 
         var propertyNames = properties.Select(p => p.Name).ToArray();
-        Assert.Contains(nameof(ITheInterfaceWithInternalDeclarations.ThePublicProperty), propertyNames);
-        Assert.Contains(nameof(ITheInterfaceWithInternalDeclarations.TheInternalProperty), propertyNames);
+        Assert.That(propertyNames, Does.Contain(nameof(ITheInterfaceWithInternalDeclarations.ThePublicProperty)));
+        Assert.That(propertyNames, Does.Contain(nameof(ITheInterfaceWithInternalDeclarations.TheInternalProperty)));
     }
 
     [Test]
     public void Can_Get_Public_Methods_Of_Interface_With_Internal_Declarations()
     {
         var properties = typeof(ITheInterfaceWithInternalDeclarations).GetPublicMethods();
-        Assert.AreEqual(2, properties.Length);
+        Assert.That(properties.Length, Is.EqualTo(2));
 
         var propertyNames = properties.Select(p => p.Name).ToArray();
-        Assert.Contains($"get_{nameof(ITheInterfaceWithInternalDeclarations.ThePublicProperty)}", propertyNames);
-        Assert.Contains(nameof(ITheInterfaceWithInternalDeclarations.ThePublicMethod), propertyNames);
+        Assert.That(propertyNames, Does.Contain($"get_{nameof(ITheInterfaceWithInternalDeclarations.ThePublicProperty)}"));
+        Assert.That(propertyNames, Does.Contain(nameof(ITheInterfaceWithInternalDeclarations.ThePublicMethod)));
     }
 
     [Test]
     public void Can_Get_All_Methods_Of_Interface_With_Internal_Declarations()
     {
         var properties = typeof(ITheInterfaceWithInternalDeclarations).GetAllMethods();
-        Assert.AreEqual(4, properties.Length);
+        Assert.That(properties.Length, Is.EqualTo(4));
 
         var propertyNames = properties.Select(p => p.Name).ToArray();
-        Assert.Contains($"get_{nameof(ITheInterfaceWithInternalDeclarations.ThePublicProperty)}", propertyNames);
-        Assert.Contains($"get_{nameof(ITheInterfaceWithInternalDeclarations.TheInternalProperty)}", propertyNames);
-        Assert.Contains(nameof(ITheInterfaceWithInternalDeclarations.ThePublicMethod), propertyNames);
-        Assert.Contains(nameof(ITheInterfaceWithInternalDeclarations.TheInternalMethod), propertyNames);
+        Assert.That(propertyNames, Does.Contain($"get_{nameof(ITheInterfaceWithInternalDeclarations.ThePublicProperty)}"));
+        Assert.That(propertyNames, Does.Contain($"get_{nameof(ITheInterfaceWithInternalDeclarations.TheInternalProperty)}"));
+        Assert.That(propertyNames, Does.Contain(nameof(ITheInterfaceWithInternalDeclarations.ThePublicMethod)));
+        Assert.That(propertyNames, Does.Contain(nameof(ITheInterfaceWithInternalDeclarations.TheInternalMethod)));
     }
 
     public interface ITheThing : ITheBaseThing

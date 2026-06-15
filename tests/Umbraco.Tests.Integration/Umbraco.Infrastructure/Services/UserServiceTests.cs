@@ -57,10 +57,10 @@ internal sealed partial class UserServiceTests : UmbracoIntegrationTest
         var permissions = UserService.GetPermissions(user, content[0].Id, content[1].Id, content[2].Id).ToArray();
 
         // Assert
-        Assert.AreEqual(3, permissions.Length);
-        Assert.AreEqual(17, permissions[0].AssignedPermissions.Count);
-        Assert.AreEqual(17, permissions[1].AssignedPermissions.Count);
-        Assert.AreEqual(17, permissions[2].AssignedPermissions.Count);
+        Assert.That(permissions, Has.Length.EqualTo(3));
+        Assert.That(permissions[0].AssignedPermissions, Has.Count.EqualTo(17));
+        Assert.That(permissions[1].AssignedPermissions, Has.Count.EqualTo(17));
+        Assert.That(permissions[2].AssignedPermissions, Has.Count.EqualTo(17));
     }
 
     [Test]
@@ -91,10 +91,10 @@ internal sealed partial class UserServiceTests : UmbracoIntegrationTest
         var permissions = UserService.GetPermissions(user, content[0].Id, content[1].Id, content[2].Id).OrderBy(x=>x.EntityId).ToArray();
 
         // Assert
-        Assert.AreEqual(3, permissions.Length);
-        Assert.AreEqual(3, permissions[0].AssignedPermissions.Count);
-        Assert.AreEqual(2, permissions[1].AssignedPermissions.Count);
-        Assert.AreEqual(1, permissions[2].AssignedPermissions.Count);
+        Assert.That(permissions, Has.Length.EqualTo(3));
+        Assert.That(permissions[0].AssignedPermissions, Has.Count.EqualTo(3));
+        Assert.That(permissions[1].AssignedPermissions, Has.Count.EqualTo(2));
+        Assert.That(permissions[2].AssignedPermissions, Has.Count.EqualTo(1));
     }
 
     [Test]
@@ -126,10 +126,10 @@ internal sealed partial class UserServiceTests : UmbracoIntegrationTest
             .ToArray();
 
         // Assert
-        Assert.AreEqual(3, permissions.Length);
-        Assert.AreEqual(3, permissions[0].AssignedPermissions.Count);
-        Assert.AreEqual(2, permissions[1].AssignedPermissions.Count);
-        Assert.AreEqual(1, permissions[2].AssignedPermissions.Count);
+        Assert.That(permissions, Has.Length.EqualTo(3));
+        Assert.That(permissions[0].AssignedPermissions, Has.Count.EqualTo(3));
+        Assert.That(permissions[1].AssignedPermissions, Has.Count.EqualTo(2));
+        Assert.That(permissions[2].AssignedPermissions, Has.Count.EqualTo(1));
     }
 
     [Test]
@@ -160,10 +160,10 @@ internal sealed partial class UserServiceTests : UmbracoIntegrationTest
             .ToArray();
 
         // Assert
-        Assert.AreEqual(3, permissions.Length);
-        Assert.AreEqual(3, permissions[0].AssignedPermissions.Count);
-        Assert.AreEqual(2, permissions[1].AssignedPermissions.Count);
-        Assert.AreEqual(17, permissions[2].AssignedPermissions.Count);
+        Assert.That(permissions, Has.Length.EqualTo(3));
+        Assert.That(permissions[0].AssignedPermissions, Has.Count.EqualTo(3));
+        Assert.That(permissions[1].AssignedPermissions, Has.Count.EqualTo(2));
+        Assert.That(permissions[2].AssignedPermissions, Has.Count.EqualTo(17));
     }
 
     [Test]
@@ -212,50 +212,46 @@ internal sealed partial class UserServiceTests : UmbracoIntegrationTest
         // Assert
 
         // there will be 3 since that is how many content items there are
-        Assert.AreEqual(3, permissions.Count);
+        Assert.That(permissions, Has.Count.EqualTo(3));
 
         // test permissions contains content[0]
-        Assert.IsTrue(permissions.ContainsKey(content[0].Id));
+        Assert.That(permissions.ContainsKey(content[0].Id), Is.True);
 
         // test that this permissions set contains permissions for all groups
-        Assert.IsTrue(permissions[content[0].Id].ContainsKey(userGroup1.Id));
-        Assert.IsTrue(permissions[content[0].Id].ContainsKey(userGroup2.Id));
-        Assert.IsTrue(permissions[content[0].Id].ContainsKey(userGroup3.Id));
+        Assert.That(permissions[content[0].Id].ContainsKey(userGroup1.Id), Is.True);
+        Assert.That(permissions[content[0].Id].ContainsKey(userGroup2.Id), Is.True);
+        Assert.That(permissions[content[0].Id].ContainsKey(userGroup3.Id), Is.True);
 
         // test that the correct number of permissions are returned for each group
-        Assert.AreEqual(2, permissions[content[0].Id][userGroup1.Id].SelectMany(x => x.AssignedPermissions).Count());
-        Assert.AreEqual(1, permissions[content[0].Id][userGroup2.Id].SelectMany(x => x.AssignedPermissions).Count());
-        Assert.AreEqual(defaultPermissionCount,
-            permissions[content[0].Id][userGroup3.Id].SelectMany(x => x.AssignedPermissions).Count());
+        Assert.That(permissions[content[0].Id][userGroup1.Id].SelectMany(x => x.AssignedPermissions).Count(), Is.EqualTo(2));
+        Assert.That(permissions[content[0].Id][userGroup2.Id].SelectMany(x => x.AssignedPermissions).Count(), Is.EqualTo(1));
+        Assert.That(permissions[content[0].Id][userGroup3.Id].SelectMany(x => x.AssignedPermissions).Count(), Is.EqualTo(defaultPermissionCount));
 
         // test permissions contains content[1]
-        Assert.IsTrue(permissions.ContainsKey(content[1].Id));
+        Assert.That(permissions.ContainsKey(content[1].Id), Is.True);
 
         // test that this permissions set contains permissions for all groups
-        Assert.IsTrue(permissions[content[1].Id].ContainsKey(userGroup1.Id));
-        Assert.IsTrue(permissions[content[1].Id].ContainsKey(userGroup2.Id));
-        Assert.IsTrue(permissions[content[1].Id].ContainsKey(userGroup3.Id));
+        Assert.That(permissions[content[1].Id].ContainsKey(userGroup1.Id), Is.True);
+        Assert.That(permissions[content[1].Id].ContainsKey(userGroup2.Id), Is.True);
+        Assert.That(permissions[content[1].Id].ContainsKey(userGroup3.Id), Is.True);
 
         // test that the correct number of permissions are returned for each group
-        Assert.AreEqual(1, permissions[content[1].Id][userGroup1.Id].SelectMany(x => x.AssignedPermissions).Count());
-        Assert.AreEqual(1, permissions[content[1].Id][userGroup2.Id].SelectMany(x => x.AssignedPermissions).Count());
-        Assert.AreEqual(defaultPermissionCount,
-            permissions[content[1].Id][userGroup3.Id].SelectMany(x => x.AssignedPermissions).Count());
+        Assert.That(permissions[content[1].Id][userGroup1.Id].SelectMany(x => x.AssignedPermissions).Count(), Is.EqualTo(1));
+        Assert.That(permissions[content[1].Id][userGroup2.Id].SelectMany(x => x.AssignedPermissions).Count(), Is.EqualTo(1));
+        Assert.That(permissions[content[1].Id][userGroup3.Id].SelectMany(x => x.AssignedPermissions).Count(), Is.EqualTo(defaultPermissionCount));
 
         // test permissions contains content[2]
-        Assert.IsTrue(permissions.ContainsKey(content[2].Id));
+        Assert.That(permissions.ContainsKey(content[2].Id), Is.True);
 
         // test that this permissions set contains permissions for all groups
-        Assert.IsTrue(permissions[content[2].Id].ContainsKey(userGroup1.Id));
-        Assert.IsTrue(permissions[content[2].Id].ContainsKey(userGroup2.Id));
-        Assert.IsTrue(permissions[content[2].Id].ContainsKey(userGroup3.Id));
+        Assert.That(permissions[content[2].Id].ContainsKey(userGroup1.Id), Is.True);
+        Assert.That(permissions[content[2].Id].ContainsKey(userGroup2.Id), Is.True);
+        Assert.That(permissions[content[2].Id].ContainsKey(userGroup3.Id), Is.True);
 
         // test that the correct number of permissions are returned for each group
-        Assert.AreEqual(1, permissions[content[2].Id][userGroup1.Id].SelectMany(x => x.AssignedPermissions).Count());
-        Assert.AreEqual(defaultPermissionCount,
-            permissions[content[2].Id][userGroup2.Id].SelectMany(x => x.AssignedPermissions).Count());
-        Assert.AreEqual(defaultPermissionCount,
-            permissions[content[2].Id][userGroup3.Id].SelectMany(x => x.AssignedPermissions).Count());
+        Assert.That(permissions[content[2].Id][userGroup1.Id].SelectMany(x => x.AssignedPermissions).Count(), Is.EqualTo(1));
+        Assert.That(permissions[content[2].Id][userGroup2.Id].SelectMany(x => x.AssignedPermissions).Count(), Is.EqualTo(defaultPermissionCount));
+        Assert.That(permissions[content[2].Id][userGroup3.Id].SelectMany(x => x.AssignedPermissions).Count(), Is.EqualTo(defaultPermissionCount));
     }
 
     [Test]
@@ -289,13 +285,13 @@ internal sealed partial class UserServiceTests : UmbracoIntegrationTest
             .ToDictionary(x => x.Key, x => x);
 
         // Assert
-        Assert.AreEqual(3, permissions.Count);
-        Assert.IsTrue(permissions.ContainsKey(content[0].Id));
-        Assert.AreEqual(3, permissions[content[0].Id].SelectMany(x => x.AssignedPermissions).Count());
-        Assert.IsTrue(permissions.ContainsKey(content[1].Id));
-        Assert.AreEqual(2, permissions[content[1].Id].SelectMany(x => x.AssignedPermissions).Count());
-        Assert.IsTrue(permissions.ContainsKey(content[2].Id));
-        Assert.AreEqual(1, permissions[content[2].Id].SelectMany(x => x.AssignedPermissions).Count());
+        Assert.That(permissions, Has.Count.EqualTo(3));
+        Assert.That(permissions.ContainsKey(content[0].Id), Is.True);
+        Assert.That(permissions[content[0].Id].SelectMany(x => x.AssignedPermissions).Count(), Is.EqualTo(3));
+        Assert.That(permissions.ContainsKey(content[1].Id), Is.True);
+        Assert.That(permissions[content[1].Id].SelectMany(x => x.AssignedPermissions).Count(), Is.EqualTo(2));
+        Assert.That(permissions.ContainsKey(content[2].Id), Is.True);
+        Assert.That(permissions[content[2].Id].SelectMany(x => x.AssignedPermissions).Count(), Is.EqualTo(1));
     }
 
     [Test]
@@ -366,44 +362,44 @@ internal sealed partial class UserServiceTests : UmbracoIntegrationTest
 
         // Permissions for document 4
         var result = UserService.CalculatePermissionsForPathForUser(permissions, pathIds);
-        Assert.AreEqual(4, result.EntityId);
+        Assert.That(result.EntityId, Is.EqualTo(4));
         var allPermissions = result.GetAllPermissions().ToArray();
-        Assert.AreEqual(6, allPermissions.Length, string.Join(",", allPermissions));
+        Assert.That(allPermissions, Has.Length.EqualTo(6), string.Join(",", allPermissions));
 
         // - has S, D, F from group A, R from group B (specific permission on document 2), Q, Z from group C (specific permission on document 3).
         // - doesn't have K or G due to specific permissions set on group B, document 2.
-        Assert.IsTrue(allPermissions.ContainsAll(["S", "D", "F", "R", "Q", "Z"]));
+        Assert.That(allPermissions.ContainsAll(["S", "D", "F", "R", "Q", "Z"]), Is.True);
 
         // Permissions for document 3
         result = UserService.CalculatePermissionsForPathForUser(permissions, pathIds.Skip(1).ToArray());
-        Assert.AreEqual(3, result.EntityId);
+        Assert.That(result.EntityId, Is.EqualTo(3));
         allPermissions = result.GetAllPermissions().ToArray();
-        Assert.AreEqual(6, allPermissions.Length, string.Join(",", allPermissions));
+        Assert.That(allPermissions, Has.Length.EqualTo(6), string.Join(",", allPermissions));
 
         // - has S, D, F from group A, R from group B (specific permission on document 2), Q, Z from group C (specific permission on document 3).
         // - doesn't have K or G due to specific permissions set on group B, document 2.
-        Assert.IsTrue(allPermissions.ContainsAll(["S", "D", "F", "R", "Q", "Z"]));
+        Assert.That(allPermissions.ContainsAll(["S", "D", "F", "R", "Q", "Z"]), Is.True);
 
         // Permissions for document 2
         result = UserService.CalculatePermissionsForPathForUser(permissions, pathIds.Skip(2).ToArray());
-        Assert.AreEqual(2, result.EntityId);
+        Assert.That(result.EntityId, Is.EqualTo(2));
         allPermissions = result.GetAllPermissions().ToArray();
-        Assert.AreEqual(5, allPermissions.Length, string.Join(",", allPermissions));
+        Assert.That(allPermissions, Has.Length.EqualTo(5), string.Join(",", allPermissions));
 
         // - has S, D, F from group A, G from group C, R from group B (specific permission on document 2).
         // - doesn't have K due to specific permissions set on group B, document 2.
         // - this would remove G too, but it's there as it's also defined in group C that doesn't have a specific permission override.
         // - doesn't have Q, Z as these specific permissions are added to a document further down the path.
-        Assert.IsTrue(allPermissions.ContainsAll(["S", "D", "F", "G", "R"]));
+        Assert.That(allPermissions.ContainsAll(["S", "D", "F", "G", "R"]), Is.True);
 
         // Permissions for document 1
         result = UserService.CalculatePermissionsForPathForUser(permissions, pathIds.Skip(3).ToArray());
-        Assert.AreEqual(1, result.EntityId);
+        Assert.That(result.EntityId, Is.EqualTo(1));
         allPermissions = result.GetAllPermissions().ToArray();
-        Assert.AreEqual(5, allPermissions.Length, string.Join(",", allPermissions));
+        Assert.That(allPermissions, Has.Length.EqualTo(5), string.Join(",", allPermissions));
 
         // - has S, D, F from group A, G, K from group B (also G from group C)
-        Assert.IsTrue(allPermissions.ContainsAll(["S", "D", "F", "G", "K"]));
+        Assert.That(allPermissions.ContainsAll(["S", "D", "F", "G", "K"]), Is.True);
     }
 
     [Test]
@@ -417,11 +413,11 @@ internal sealed partial class UserServiceTests : UmbracoIntegrationTest
             new(9876, 1, defaults, true), new(9876, 2, new[] {"B", "C", "D"}.ToHashSet(), false), new(9876, 3, defaults, true)
         };
         var result = UserService.GetPermissionsForPathForGroup(permissions, pathIds, true);
-        Assert.AreEqual(3, result.AssignedPermissions.Count);
-        Assert.IsFalse(result.IsDefaultPermissions);
-        Assert.IsTrue(result.AssignedPermissions.ContainsAll(new[] { "B", "C", "D" }));
-        Assert.AreEqual(2, result.EntityId);
-        Assert.AreEqual(9876, result.UserGroupId);
+        Assert.That(result.AssignedPermissions, Has.Count.EqualTo(3));
+        Assert.That(result.IsDefaultPermissions, Is.False);
+        Assert.That(result.AssignedPermissions.ContainsAll(new[] { "B", "C", "D" }), Is.True);
+        Assert.That(result.EntityId, Is.EqualTo(2));
+        Assert.That(result.UserGroupId, Is.EqualTo(9876));
     }
 
     [Test]
@@ -435,7 +431,7 @@ internal sealed partial class UserServiceTests : UmbracoIntegrationTest
             new(9876, 1, defaults, true), new(9876, 2, defaults, true), new(9876, 3, defaults, true)
         };
         var result = UserService.GetPermissionsForPathForGroup(permissions, pathIds);
-        Assert.IsNull(result);
+        Assert.That(result, Is.Null);
     }
 
     [Test]
@@ -449,11 +445,11 @@ internal sealed partial class UserServiceTests : UmbracoIntegrationTest
             new(9876, 1, defaults, true), new(9876, 2, defaults, true), new(9876, 3, defaults, true)
         };
         var result = UserService.GetPermissionsForPathForGroup(permissions, pathIds, true);
-        Assert.AreEqual(2, result.AssignedPermissions.Count);
-        Assert.IsTrue(result.IsDefaultPermissions);
-        Assert.IsTrue(result.AssignedPermissions.ContainsAll(defaults));
-        Assert.AreEqual(3, result.EntityId);
-        Assert.AreEqual(9876, result.UserGroupId);
+        Assert.That(result.AssignedPermissions, Has.Count.EqualTo(2));
+        Assert.That(result.IsDefaultPermissions, Is.True);
+        Assert.That(result.AssignedPermissions.ContainsAll(defaults), Is.True);
+        Assert.That(result.EntityId, Is.EqualTo(3));
+        Assert.That(result.UserGroupId, Is.EqualTo(9876));
     }
 
     [Test]
@@ -485,7 +481,7 @@ internal sealed partial class UserServiceTests : UmbracoIntegrationTest
 
         // Assert
         var allPermissions = permissions.GetAllPermissions().ToArray();
-        Assert.AreEqual(3, allPermissions.Length);
+        Assert.That(allPermissions, Has.Length.EqualTo(3));
     }
 
     [Test]
@@ -517,9 +513,9 @@ internal sealed partial class UserServiceTests : UmbracoIntegrationTest
     {
         var user = UserService.CreateUserWithIdentity("JohnDoe", "john@umbraco.io");
         var user2 = UserService.CreateUserWithIdentity("john2@umbraco.io", "john2@umbraco.io");
-        Assert.IsTrue(UserService.Exists("JohnDoe"));
-        Assert.IsFalse(UserService.Exists("notFound"));
-        Assert.IsTrue(UserService.Exists("john2@umbraco.io"));
+        Assert.That(UserService.Exists("JohnDoe"), Is.True);
+        Assert.That(UserService.Exists("notFound"), Is.False);
+        Assert.That(UserService.Exists("john2@umbraco.io"), Is.True);
     }
 
     [Test]
@@ -527,8 +523,8 @@ internal sealed partial class UserServiceTests : UmbracoIntegrationTest
     {
         var user = UserService.CreateUserWithIdentity("JohnDoe", "john@umbraco.io");
 
-        Assert.IsNotNull(UserService.GetByEmail(user.Email));
-        Assert.IsNull(UserService.GetByEmail("do@not.find"));
+        Assert.That(UserService.GetByEmail(user.Email), Is.Not.Null);
+        Assert.That(UserService.GetByEmail("do@not.find"), Is.Null);
     }
 
     [Test]
@@ -536,8 +532,8 @@ internal sealed partial class UserServiceTests : UmbracoIntegrationTest
     {
         var user = UserService.CreateUserWithIdentity("JohnDoe", "john@umbraco.io");
 
-        Assert.IsNotNull(UserService.GetByUsername(user.Username));
-        Assert.IsNull(UserService.GetByUsername("notFound"));
+        Assert.That(UserService.GetByUsername(user.Username), Is.Not.Null);
+        Assert.That(UserService.GetByUsername("notFound"), Is.Null);
     }
 
     [Test]
@@ -545,8 +541,8 @@ internal sealed partial class UserServiceTests : UmbracoIntegrationTest
     {
         var user = UserService.CreateUserWithIdentity("mydomain\\JohnDoe", "john@umbraco.io");
 
-        Assert.IsNotNull(UserService.GetByUsername(user.Username));
-        Assert.IsNull(UserService.GetByUsername("notFound"));
+        Assert.That(UserService.GetByUsername(user.Username), Is.Not.Null);
+        Assert.That(UserService.GetByUsername("notFound"), Is.Null);
     }
 
     [Test]
@@ -554,8 +550,8 @@ internal sealed partial class UserServiceTests : UmbracoIntegrationTest
     {
         var user = UserService.CreateUserWithIdentity("JohnDoe", "john@umbraco.io");
 
-        Assert.IsNotNull(UserService.GetUserById(user.Id));
-        Assert.IsNull(UserService.GetUserById(9876));
+        Assert.That(UserService.GetUserById(user.Id), Is.Not.Null);
+        Assert.That(UserService.GetUserById(9876), Is.Null);
     }
 
     [Test]
@@ -571,7 +567,7 @@ internal sealed partial class UserServiceTests : UmbracoIntegrationTest
 
         var found = UserService.FindByEmail("tes", 0, 100, out _);
 
-        Assert.AreEqual(10, found.Count());
+        Assert.That(found.Count(), Is.EqualTo(10));
     }
 
     [Test]
@@ -587,7 +583,7 @@ internal sealed partial class UserServiceTests : UmbracoIntegrationTest
 
         var found = UserService.FindByEmail("test.com", 0, 100, out _, StringPropertyMatchType.EndsWith);
 
-        Assert.AreEqual(11, found.Count());
+        Assert.That(found.Count(), Is.EqualTo(11));
     }
 
     [Test]
@@ -603,7 +599,7 @@ internal sealed partial class UserServiceTests : UmbracoIntegrationTest
 
         var found = UserService.FindByEmail("test", 0, 100, out _, StringPropertyMatchType.Contains);
 
-        Assert.AreEqual(11, found.Count());
+        Assert.That(found.Count(), Is.EqualTo(11));
     }
 
     [Test]
@@ -619,7 +615,7 @@ internal sealed partial class UserServiceTests : UmbracoIntegrationTest
 
         var found = UserService.FindByEmail("hello@test.com", 0, 100, out _, StringPropertyMatchType.Exact);
 
-        Assert.AreEqual(1, found.Count());
+        Assert.That(found.Count(), Is.EqualTo(1));
     }
 
     [Test]
@@ -630,12 +626,12 @@ internal sealed partial class UserServiceTests : UmbracoIntegrationTest
 
         var found = UserService.GetAll(0, 2, out var totalRecs);
 
-        Assert.AreEqual(2, found.Count());
+        Assert.That(found.Count(), Is.EqualTo(2));
 
         // + 1 because of the built in admin user
-        Assert.AreEqual(11, totalRecs);
-        Assert.AreEqual("admin", found.First().Username);
-        Assert.AreEqual("test0", found.Last().Username);
+        Assert.That(totalRecs, Is.EqualTo(11));
+        Assert.That(found.First().Username, Is.EqualTo("admin"));
+        Assert.That(found.Last().Username, Is.EqualTo("test0"));
     }
 
     [Test]
@@ -646,10 +642,10 @@ internal sealed partial class UserServiceTests : UmbracoIntegrationTest
 
         var found = UserService.GetAll(0, 2, out var totalRecs, "username", Direction.Ascending, filter: "test");
 
-        Assert.AreEqual(2, found.Count());
-        Assert.AreEqual(10, totalRecs);
-        Assert.AreEqual("test0", found.First().Username);
-        Assert.AreEqual("test1", found.Last().Username);
+        Assert.That(found.Count(), Is.EqualTo(2));
+        Assert.That(totalRecs, Is.EqualTo(10));
+        Assert.That(found.First().Username, Is.EqualTo("test0"));
+        Assert.That(found.Last().Username, Is.EqualTo("test1"));
     }
 
     [Test]
@@ -675,10 +671,10 @@ internal sealed partial class UserServiceTests : UmbracoIntegrationTest
             Direction.Ascending,
             includeUserGroups: new[] { userGroup.Alias });
 
-        Assert.AreEqual(2, found.Count());
-        Assert.AreEqual(5, totalRecs);
-        Assert.AreEqual("test0", found.First().Username);
-        Assert.AreEqual("test2", found.Last().Username);
+        Assert.That(found.Count(), Is.EqualTo(2));
+        Assert.That(totalRecs, Is.EqualTo(5));
+        Assert.That(found.First().Username, Is.EqualTo("test0"));
+        Assert.That(found.Last().Username, Is.EqualTo("test2"));
     }
 
     [Test]
@@ -711,10 +707,10 @@ internal sealed partial class UserServiceTests : UmbracoIntegrationTest
             userGroups: new[] { userGroup.Alias },
             filter: "blah");
 
-        Assert.AreEqual(2, found.Count());
-        Assert.AreEqual(2, totalRecs);
-        Assert.AreEqual("test0", found.First().Username);
-        Assert.AreEqual("test6", found.Last().Username);
+        Assert.That(found.Count(), Is.EqualTo(2));
+        Assert.That(totalRecs, Is.EqualTo(2));
+        Assert.That(found.First().Username, Is.EqualTo("test0"));
+        Assert.That(found.Last().Username, Is.EqualTo("test6"));
     }
 
     [Test]
@@ -728,7 +724,7 @@ internal sealed partial class UserServiceTests : UmbracoIntegrationTest
         var found = UserService.GetCount(MemberCountType.All);
 
         // + 1 because of the built in admin user
-        Assert.AreEqual(12, found);
+        Assert.That(found, Is.EqualTo(12));
     }
 
     [Ignore("why?")]
@@ -755,7 +751,7 @@ internal sealed partial class UserServiceTests : UmbracoIntegrationTest
 
         var found = UserService.GetCount(MemberCountType.LockedOut);
 
-        Assert.AreEqual(6, found);
+        Assert.That(found, Is.EqualTo(6));
     }
 
     [Test]
@@ -771,7 +767,7 @@ internal sealed partial class UserServiceTests : UmbracoIntegrationTest
         var found = UserService.GetCount(MemberCountType.Approved);
 
         // + 1 because of the built in admin user
-        Assert.AreEqual(6, found);
+        Assert.That(found, Is.EqualTo(6));
     }
 
     [Test]
@@ -820,7 +816,7 @@ internal sealed partial class UserServiceTests : UmbracoIntegrationTest
 
         var result1 = await UserGroupService.GetAsync(userGroup.Id);
 
-        Assert.AreEqual(2, result1.AllowedSections.Count());
+        Assert.That(result1.AllowedSections.Count(), Is.EqualTo(2));
 
         // adds some allowed sections
         userGroup.AddAllowedSection("test1");
@@ -831,7 +827,7 @@ internal sealed partial class UserServiceTests : UmbracoIntegrationTest
 
         result1 = await UserGroupService.GetAsync(userGroup.Id);
 
-        Assert.AreEqual(6, result1.AllowedSections.Count());
+        Assert.That(result1.AllowedSections.Count(), Is.EqualTo(6));
 
         // simulate clearing the sections
         foreach (var s in userGroup.AllowedSections)
@@ -847,7 +843,7 @@ internal sealed partial class UserServiceTests : UmbracoIntegrationTest
         // Assert
         // re-get
         result1 = await UserGroupService.GetAsync(userGroup.Id);
-        Assert.AreEqual(2, result1.AllowedSections.Count());
+        Assert.That(result1.AllowedSections.Count(), Is.EqualTo(2));
     }
 
     [Test]
@@ -870,8 +866,8 @@ internal sealed partial class UserServiceTests : UmbracoIntegrationTest
         // Assert
         var result1 = await UserGroupService.GetAsync(userGroup1.Id);
         var result2 = await UserGroupService.GetAsync(userGroup2.Id);
-        Assert.IsFalse(result1.AllowedSections.Contains("test"));
-        Assert.IsFalse(result2.AllowedSections.Contains("test"));
+        Assert.That(result1.AllowedSections, Does.Not.Contain("test"));
+        Assert.That(result2.AllowedSections, Does.Not.Contain("test"));
     }
 
     [Test]
@@ -892,9 +888,9 @@ internal sealed partial class UserServiceTests : UmbracoIntegrationTest
         var result1 = await UserGroupService.GetAsync(userGroup1.Id);
         var result2 = await UserGroupService.GetAsync(userGroup2.Id);
         var result3 = await UserGroupService.GetAsync(userGroup3.Id);
-        Assert.IsTrue(result1.AllowedSections.Contains("test"));
-        Assert.IsTrue(result2.AllowedSections.Contains("test"));
-        Assert.IsFalse(result3.AllowedSections.Contains("test"));
+        Assert.That(result1.AllowedSections, Does.Contain("test"));
+        Assert.That(result2.AllowedSections, Does.Contain("test"));
+        Assert.That(result3.AllowedSections, Does.Not.Contain("test"));
 
         // now add the section to all groups
         foreach (var userGroup in new[] { userGroup1, userGroup2, userGroup3 })
@@ -907,9 +903,9 @@ internal sealed partial class UserServiceTests : UmbracoIntegrationTest
         result1 = await UserGroupService.GetAsync(userGroup1.Id);
         result2 = await UserGroupService.GetAsync(userGroup2.Id);
         result3 = await UserGroupService.GetAsync(userGroup3.Id);
-        Assert.IsTrue(result1.AllowedSections.Contains("test"));
-        Assert.IsTrue(result2.AllowedSections.Contains("test"));
-        Assert.IsTrue(result3.AllowedSections.Contains("test"));
+        Assert.That(result1.AllowedSections, Does.Contain("test"));
+        Assert.That(result2.AllowedSections, Does.Contain("test"));
+        Assert.That(result3.AllowedSections, Does.Contain("test"));
     }
 
     [Test]
@@ -949,9 +945,9 @@ internal sealed partial class UserServiceTests : UmbracoIntegrationTest
         var profile = UserService.GetProfileByUserName(user.Username);
 
         // Assert
-        Assert.IsNotNull(profile);
-        Assert.AreEqual(user.Username, profile.Name);
-        Assert.AreEqual(user.Id, profile.Id);
+        Assert.That(profile, Is.Not.Null);
+        Assert.That(profile.Name, Is.EqualTo(user.Username));
+        Assert.That(profile.Id, Is.EqualTo(user.Id));
     }
 
     [Test]
@@ -964,9 +960,9 @@ internal sealed partial class UserServiceTests : UmbracoIntegrationTest
         var profile = UserService.GetProfileById(user.Id);
 
         // Assert
-        Assert.IsNotNull(profile);
-        Assert.AreEqual(user.Username, profile.Name);
-        Assert.AreEqual(user.Id, profile.Id);
+        Assert.That(profile, Is.Not.Null);
+        Assert.That(profile.Name, Is.EqualTo(user.Username));
+        Assert.That(profile.Id, Is.EqualTo(user.Id));
     }
 
     [Test]
@@ -975,7 +971,7 @@ internal sealed partial class UserServiceTests : UmbracoIntegrationTest
         var profile = UserService.GetProfileById(42);
 
         // Assert
-        Assert.IsNull(profile);
+        Assert.That(profile, Is.Null);
     }
 
     [Test]
@@ -984,7 +980,7 @@ internal sealed partial class UserServiceTests : UmbracoIntegrationTest
         var profiles = UserService.GetProfilesById(42);
 
         // Assert
-        CollectionAssert.IsEmpty(profiles);
+        Assert.That(profiles, Is.Empty);
     }
 
     [Test]
@@ -997,15 +993,15 @@ internal sealed partial class UserServiceTests : UmbracoIntegrationTest
         var updatedItem = (User)UserService.GetByUsername(originalUser.Username);
 
         // Assert
-        Assert.IsNotNull(updatedItem);
+        Assert.That(updatedItem, Is.Not.Null);
         Assert.That(updatedItem.Id, Is.EqualTo(originalUser.Id));
         Assert.That(updatedItem.Name, Is.EqualTo(originalUser.Name));
         Assert.That(updatedItem.Language, Is.EqualTo(originalUser.Language));
         Assert.That(updatedItem.IsApproved, Is.EqualTo(originalUser.IsApproved));
         Assert.That(updatedItem.RawPasswordValue, Is.EqualTo(originalUser.RawPasswordValue));
         Assert.That(updatedItem.IsLockedOut, Is.EqualTo(originalUser.IsLockedOut));
-        Assert.IsTrue(updatedItem.StartContentIds.UnsortedSequenceEqual(originalUser.StartContentIds));
-        Assert.IsTrue(updatedItem.StartMediaIds.UnsortedSequenceEqual(originalUser.StartMediaIds));
+        Assert.That(updatedItem.StartContentIds.UnsortedSequenceEqual(originalUser.StartContentIds), Is.True);
+        Assert.That(updatedItem.StartMediaIds.UnsortedSequenceEqual(originalUser.StartMediaIds), Is.True);
         Assert.That(updatedItem.Email, Is.EqualTo(originalUser.Email));
         Assert.That(updatedItem.Username, Is.EqualTo(originalUser.Username));
         Assert.That(updatedItem.AllowedSections.Count(), Is.EqualTo(originalUser.AllowedSections.Count()));
@@ -1026,7 +1022,7 @@ internal sealed partial class UserServiceTests : UmbracoIntegrationTest
 
         foreach (var user in usersInGroup)
         {
-            Assert.AreEqual(user.StartContentIds.Length, startContentItems.Length);
+            Assert.That(startContentItems, Has.Length.EqualTo(user.StartContentIds.Length));
         }
     }
 
@@ -1040,30 +1036,30 @@ internal sealed partial class UserServiceTests : UmbracoIntegrationTest
         // Act & Assert
         user = UserService.GetByUsername(user.Username);
 
-        Assert.IsNotNull(user);
-        Assert.AreEqual(1, user.Groups.Count());
-        Assert.AreEqual(userGroup1.Alias, user.Groups.First().Alias);
+        Assert.That(user, Is.Not.Null);
+        Assert.That(user.Groups.Count(), Is.EqualTo(1));
+        Assert.That(user.Groups.First().Alias, Is.EqualTo(userGroup1.Alias));
 
         // - add second group
         user.AddGroup(userGroup2);
         UserService.Save(user);
         user = UserService.GetByUsername(user.Username);
-        Assert.AreEqual(2, user.Groups.Count());
+        Assert.That(user.Groups.Count(), Is.EqualTo(2));
 
         // - remove first group
         user.RemoveGroup(userGroup1.Alias);
         UserService.Save(user);
         user = UserService.GetByUsername(user.Username);
-        Assert.AreEqual(1, user.Groups.Count());
-        Assert.AreEqual(userGroup2.Alias, user.Groups.First().Alias);
+        Assert.That(user.Groups.Count(), Is.EqualTo(1));
+        Assert.That(user.Groups.First().Alias, Is.EqualTo(userGroup2.Alias));
 
         // - remove second group and add first
         user.RemoveGroup(userGroup2.Alias);
         user.AddGroup(userGroup1.ToReadOnlyGroup());
         UserService.Save(user);
         user = UserService.GetByUsername(user.Username);
-        Assert.AreEqual(1, user.Groups.Count());
-        Assert.AreEqual(userGroup1.Alias, user.Groups.First().Alias);
+        Assert.That(user.Groups.Count(), Is.EqualTo(1));
+        Assert.That(user.Groups.First().Alias, Is.EqualTo(userGroup1.Alias));
     }
 
     [TestCase(UserKind.Default, UserClientCredentialsOperationStatus.InvalidUser)]
@@ -1077,7 +1073,7 @@ internal sealed partial class UserServiceTests : UmbracoIntegrationTest
         var result = await UserService.AddClientIdAsync(user.Key, "client-one");
 
         // Assert
-        Assert.AreEqual(expectedResult, result);
+        Assert.That(result, Is.EqualTo(expectedResult));
     }
 
     [TestCase("abcdefghijklmnopqrstuvwxyz", UserClientCredentialsOperationStatus.Success)]
@@ -1111,7 +1107,7 @@ internal sealed partial class UserServiceTests : UmbracoIntegrationTest
         var result = await UserService.AddClientIdAsync(user.Key, clientId);
 
         // Assert
-        Assert.AreEqual(expectedResult, result);
+        Assert.That(result, Is.EqualTo(expectedResult));
     }
 
     [TestCase("Less_Than_100_characters_0123456789012345678901234567890123456789012345678901234567890123456789", UserClientCredentialsOperationStatus.Success)]
@@ -1125,7 +1121,7 @@ internal sealed partial class UserServiceTests : UmbracoIntegrationTest
         var result = await UserService.AddClientIdAsync(user.Key, clientId);
 
         // Assert
-        Assert.AreEqual(expectedResult, result);
+        Assert.That(result, Is.EqualTo(expectedResult));
     }
 
     private async Task<Content[]> BuildContentItems(int numberToCreate)
@@ -1175,7 +1171,7 @@ internal sealed partial class UserServiceTests : UmbracoIntegrationTest
                 UserName = "test1@test.com",
                 UserGroupKeys = new HashSet<Guid> { userGroup.Key }
             });
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
         return result.Result.CreatedUser!;
     }
 

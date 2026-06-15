@@ -66,7 +66,7 @@ public class TouchServerJobTests
 
         // The touch job must run on every role (including Unknown/Subscriber); otherwise a server whose role
         // has not yet been elected would never register itself and the role could never be determined.
-        CollectionAssert.AreEquivalent(Enum.GetValues<ServerRole>(), sut.ServerRoles);
+        Assert.That(sut.ServerRoles, Is.EquivalentTo(Enum.GetValues<ServerRole>()));
     }
 
     [Test]
@@ -74,7 +74,7 @@ public class TouchServerJobTests
     {
         var waitTimeBetweenCalls = TimeSpan.FromSeconds(42);
         var sut = CreateTouchServerTask(waitTimeBetweenCalls: waitTimeBetweenCalls);
-        Assert.AreEqual(waitTimeBetweenCalls, sut.Period);
+        Assert.That(sut.Period, Is.EqualTo(waitTimeBetweenCalls));
     }
 
     private TouchServerJob CreateTouchServerTask(

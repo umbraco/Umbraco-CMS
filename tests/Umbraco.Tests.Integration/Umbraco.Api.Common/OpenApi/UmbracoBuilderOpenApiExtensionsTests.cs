@@ -61,7 +61,7 @@ internal sealed class UmbracoBuilderOpenApiExtensionsTests : UmbracoTestServerTe
     {
         JsonObject doc = await ParseDocumentAsync();
 
-        Assert.AreEqual(ApiTitle, (string?)doc["info"]?["title"]);
+        Assert.That((string?)doc["info"]?["title"], Is.EqualTo(ApiTitle));
     }
 
     [Test]
@@ -70,14 +70,14 @@ internal sealed class UmbracoBuilderOpenApiExtensionsTests : UmbracoTestServerTe
         JsonObject doc = await ParseDocumentAsync();
         JsonObject paths = doc["paths"]!.AsObject();
 
-        Assert.IsTrue(paths.ContainsKey($"/{ApiName}/apple/ping"), "Mapped endpoint missing from generated document.");
-        Assert.IsTrue(paths.ContainsKey($"/{ApiName}/apple/things"), "Mapped endpoint missing from generated document.");
-        Assert.IsTrue(paths.ContainsKey($"/{ApiName}/zebra/ping"), "Mapped endpoint missing from generated document.");
+        Assert.That(paths.ContainsKey($"/{ApiName}/apple/ping"), Is.True, "Mapped endpoint missing from generated document.");
+        Assert.That(paths.ContainsKey($"/{ApiName}/apple/things"), Is.True, "Mapped endpoint missing from generated document.");
+        Assert.That(paths.ContainsKey($"/{ApiName}/zebra/ping"), Is.True, "Mapped endpoint missing from generated document.");
 
         foreach (var path in paths)
         {
-            Assert.IsTrue(
-                path.Key.StartsWith($"/{ApiName}/apple") || path.Key.StartsWith($"/{ApiName}/zebra"),
+            Assert.That(
+                path.Key.StartsWith($"/{ApiName}/apple") || path.Key.StartsWith($"/{ApiName}/zebra"), Is.True,
                 $"Unexpected path '{path.Key}' in document — only endpoints matching MapToApi(\"{ApiName}\") should be included.");
         }
     }
@@ -87,12 +87,10 @@ internal sealed class UmbracoBuilderOpenApiExtensionsTests : UmbracoTestServerTe
     {
         JsonObject doc = await ParseDocumentAsync();
 
-        Assert.AreEqual(
-            "GetTestBackOfficeApiApplePing",
-            (string?)doc["paths"]?[$"/{ApiName}/apple/ping"]?["get"]?["operationId"]);
-        Assert.AreEqual(
-            "PostTestBackOfficeApiAppleThings",
-            (string?)doc["paths"]?[$"/{ApiName}/apple/things"]?["post"]?["operationId"]);
+        Assert.That(
+            (string?)doc["paths"]?[$"/{ApiName}/apple/ping"]?["get"]?["operationId"], Is.EqualTo("GetTestBackOfficeApiApplePing"));
+        Assert.That(
+            (string?)doc["paths"]?[$"/{ApiName}/apple/things"]?["post"]?["operationId"], Is.EqualTo("PostTestBackOfficeApiAppleThings"));
     }
 
     [Test]
@@ -102,9 +100,8 @@ internal sealed class UmbracoBuilderOpenApiExtensionsTests : UmbracoTestServerTe
 
         // [MapToApiVersion("2.0")] on the action — default API version is 1.0, so the transformer
         // appends "2.0" to the operation ID. Default-version actions (above) get no suffix.
-        Assert.AreEqual(
-            "GetTestBackOfficeApiAppleSpecial2.0",
-            (string?)doc["paths"]?[$"/{ApiName}/apple/special"]?["get"]?["operationId"]);
+        Assert.That(
+            (string?)doc["paths"]?[$"/{ApiName}/apple/special"]?["get"]?["operationId"], Is.EqualTo("GetTestBackOfficeApiAppleSpecial2.0"));
     }
 
     [Test]
@@ -113,12 +110,12 @@ internal sealed class UmbracoBuilderOpenApiExtensionsTests : UmbracoTestServerTe
         JsonObject doc = await ParseDocumentAsync();
         JsonObject? schemas = doc["components"]?["schemas"]?.AsObject();
 
-        Assert.IsNotNull(schemas, "Generated document has no component schemas.");
+        Assert.That(schemas, Is.Not.Null, "Generated document has no component schemas.");
 
         // TestPayload has no "Model" suffix in source. UmbracoSchemaIdGenerator should add one because the type
         // lives under the Umbraco.Cms namespace.
-        Assert.IsTrue(
-            schemas!.ContainsKey("TestPayloadModel"),
+        Assert.That(
+            schemas!.ContainsKey("TestPayloadModel"), Is.True,
             $"Expected schema 'TestPayloadModel'. Schemas in document: {string.Join(", ", schemas!.Select(s => s.Key))}");
     }
 
@@ -179,7 +176,7 @@ internal sealed class UmbracoBuilderOpenApiExtensionsTests : UmbracoTestServerTe
     {
         var spec = await FetchDocumentAsync();
         JsonObject? doc = JsonNode.Parse(spec)?.AsObject();
-        Assert.IsNotNull(doc, "Failed to parse OpenAPI document as JSON.");
+        Assert.That(doc, Is.Not.Null, "Failed to parse OpenAPI document as JSON.");
         return doc!;
     }
 }

@@ -14,15 +14,15 @@ public class GuidUtilsTests
         var a = Guid.NewGuid();
         var b = Guid.NewGuid();
 
-        Assert.AreEqual(GuidUtils.Combine(a, b).ToByteArray(), Combine(a, b));
+        Assert.That(Combine(a, b), Is.EqualTo(GuidUtils.Combine(a, b).ToByteArray()));
     }
 
     [Test]
     public void GuidThingTest()
     {
         var guid = new Guid("f918382f-2bba-453f-a3e2-1f594016ed3b");
-        Assert.AreEqual("f22br4n0fm5fli5c", GuidUtils.ToBase32String(guid, 16));
-        Assert.AreEqual("f22br4n0f", GuidUtils.ToBase32String(guid, 9));
+        Assert.That(GuidUtils.ToBase32String(guid, 16), Is.EqualTo("f22br4n0fm5fli5c"));
+        Assert.That(GuidUtils.ToBase32String(guid, 9), Is.EqualTo("f22br4n0f"));
     }
 
     // Reference implementation taken from original code.

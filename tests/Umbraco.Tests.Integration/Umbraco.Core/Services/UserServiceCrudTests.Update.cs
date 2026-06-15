@@ -57,8 +57,8 @@ internal sealed partial class UserServiceCrudTests
 
         var createExistingUser = await userService.CreateAsync(Constants.Security.SuperUserKey, createUserModel, true);
 
-        Assert.IsTrue(createExistingUser.Success);
-        Assert.IsNotNull(createExistingUser.Result.CreatedUser);
+        Assert.That(createExistingUser.Success, Is.True);
+        Assert.That(createExistingUser.Result.CreatedUser, Is.Not.Null);
 
         var savedUser = createExistingUser.Result.CreatedUser;
         var updateModel = await MapUserToUpdateModel(savedUser);
@@ -86,16 +86,16 @@ internal sealed partial class UserServiceCrudTests
 
         if (shouldSucceed is false)
         {
-            Assert.IsFalse(result.Success);
-            Assert.AreEqual(UserOperationStatus.EmailCannotBeChanged, result.Status);
+            Assert.That(result.Success, Is.False);
+            Assert.That(result.Status, Is.EqualTo(UserOperationStatus.EmailCannotBeChanged));
             return;
         }
 
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
         // We'll get the user again to ensure that the changes has been persisted
         var updatedUser = await userService.GetAsync(result.Result.Key);
-        Assert.IsNotNull(updatedUser);
-        Assert.AreEqual(updatedEmail, updatedUser.Email);
+        Assert.That(updatedUser, Is.Not.Null);
+        Assert.That(updatedUser.Email, Is.EqualTo(updatedEmail));
     }
 
     [Test]
@@ -115,16 +115,16 @@ internal sealed partial class UserServiceCrudTests
 
         if (shouldSucceed is false)
         {
-            Assert.IsFalse(result.Success);
-            Assert.AreEqual(UserOperationStatus.UserNameIsNotEmail, result.Status);
+            Assert.That(result.Success, Is.False);
+            Assert.That(result.Status, Is.EqualTo(UserOperationStatus.UserNameIsNotEmail));
             return;
         }
 
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
         var updatedUser = await userService.GetAsync(createdUser.Key);
-        Assert.IsNotNull(updatedUser);
-        Assert.AreEqual(userName, updatedUser.Username);
-        Assert.AreEqual(email, updatedUser.Email);
+        Assert.That(updatedUser, Is.Not.Null);
+        Assert.That(updatedUser.Username, Is.EqualTo(userName));
+        Assert.That(updatedUser.Email, Is.EqualTo(email));
     }
 
     [Test]
@@ -143,14 +143,14 @@ internal sealed partial class UserServiceCrudTests
 
         var result = await userService.UpdateAsync(Constants.Security.SuperUserKey, updateModel);
 
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
         var updatedUser = await userService.GetAsync(createdUser.Key);
         Assert.Multiple(() =>
         {
-            Assert.IsNotNull(updatedUser);
-            Assert.AreEqual(userName, updatedUser.Username);
-            Assert.AreEqual(email, updatedUser.Email);
-            Assert.AreEqual(name, updatedUser.Name);
+            Assert.That(updatedUser, Is.Not.Null);
+            Assert.That(updatedUser.Username, Is.EqualTo(userName));
+            Assert.That(updatedUser.Email, Is.EqualTo(email));
+            Assert.That(updatedUser.Name, Is.EqualTo(name));
         });
     }
 
@@ -165,8 +165,8 @@ internal sealed partial class UserServiceCrudTests
 
         var updateAttempt = await userService.UpdateAsync(Constants.Security.SuperUserKey, updateModel);
 
-        Assert.IsFalse(updateAttempt.Success);
-        Assert.AreEqual(UserOperationStatus.NoUserGroup, updateAttempt.Status);
+        Assert.That(updateAttempt.Success, Is.False);
+        Assert.That(updateAttempt.Status, Is.EqualTo(UserOperationStatus.NoUserGroup));
     }
 
     [Test]
@@ -186,7 +186,7 @@ internal sealed partial class UserServiceCrudTests
 
         var createExisting = await userService.CreateAsync(Constants.Security.SuperUserKey, createModel, true);
 
-        Assert.IsTrue(createExisting.Success);
+        Assert.That(createExisting.Success, Is.True);
 
         var (updateModel, _) = await CreateUserForUpdate(userService);
 
@@ -195,8 +195,8 @@ internal sealed partial class UserServiceCrudTests
 
         var updateAttempt = await userService.UpdateAsync(Constants.Security.SuperUserKey, updateModel);
 
-        Assert.IsFalse(updateAttempt.Success);
-        Assert.AreEqual(UserOperationStatus.DuplicateEmail, updateAttempt.Status);
+        Assert.That(updateAttempt.Success, Is.False);
+        Assert.That(updateAttempt.Status, Is.EqualTo(UserOperationStatus.DuplicateEmail));
     }
 
     [Test]
@@ -218,7 +218,7 @@ internal sealed partial class UserServiceCrudTests
         };
 
         var createExisting = await userService.CreateAsync(Constants.Security.SuperUserKey, createModel, true);
-        Assert.IsTrue(createExisting.Success);
+        Assert.That(createExisting.Success, Is.True);
 
         var (updateModel, _) = await CreateUserForUpdate(userService);
 
@@ -226,8 +226,8 @@ internal sealed partial class UserServiceCrudTests
         updateModel.UserName = updateUserName;
 
         var updateAttempt = await userService.UpdateAsync(Constants.Security.SuperUserKey, updateModel);
-        Assert.IsFalse(updateAttempt.Success);
-        Assert.AreEqual(UserOperationStatus.DuplicateUserName, updateAttempt.Status);
+        Assert.That(updateAttempt.Success, Is.False);
+        Assert.That(updateAttempt.Status, Is.EqualTo(UserOperationStatus.DuplicateUserName));
     }
 
     [Test]
@@ -246,16 +246,16 @@ internal sealed partial class UserServiceCrudTests
 
         if (shouldSucceed is false)
         {
-            Assert.IsFalse(result.Success);
-            Assert.AreEqual(UserOperationStatus.InvalidIsoCode, result.Status);
+            Assert.That(result.Success, Is.False);
+            Assert.That(result.Status, Is.EqualTo(UserOperationStatus.InvalidIsoCode));
             return;
         }
 
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
         // We'll get the user again to ensure that the changes has been persisted
         var updatedUser = await userService.GetAsync(result.Result.Key);
-        Assert.IsNotNull(updatedUser);
-        Assert.AreEqual(isoCode, updatedUser.Language);
+        Assert.That(updatedUser, Is.Not.Null);
+        Assert.That(updatedUser.Language, Is.EqualTo(isoCode));
     }
 
     // todo Ideally we would test content and media separately and together (Introduce Testcases for switching permutations)
@@ -268,7 +268,7 @@ internal sealed partial class UserServiceCrudTests
         var contentStartNode = contentService.GetRootContent().First();
         var mediaStartNode = mediaService.CreateMediaWithIdentity("test", -1, "Image");
         var elementContainerResult = await elementContainerService.CreateAsync(null, "TestElementFolder", null, Constants.Security.SuperUserKey);
-        Assert.IsTrue(elementContainerResult.Success);
+        Assert.That(elementContainerResult.Success, Is.True);
         var elementContainer = elementContainerResult.Result!;
 
         var userService = CreateUserService(securitySettings: new SecuritySettings { UsernameIsEmail = false });
@@ -280,19 +280,19 @@ internal sealed partial class UserServiceCrudTests
 
         var result = await userService.UpdateAsync(Constants.Security.SuperUserKey, updateModel);
 
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
         var updatedUser = await userService.GetAsync(createdUser.Key);
 
-        Assert.IsNotNull(updatedUser);
-        Assert.IsNotNull(updatedUser.StartContentIds);
-        Assert.AreEqual(1, updatedUser.StartContentIds.Length);
-        Assert.AreEqual(contentStartNode.Id, updatedUser.StartContentIds.First());
-        Assert.IsNotNull(updatedUser.StartMediaIds);
-        Assert.AreEqual(1, updatedUser.StartMediaIds.Length);
-        Assert.AreEqual(mediaStartNode.Id, updatedUser.StartMediaIds.First());
-        Assert.IsNotNull(updatedUser.StartElementIds);
-        Assert.AreEqual(1, updatedUser.StartElementIds.Length);
-        Assert.AreEqual(elementContainer.Id, updatedUser.StartElementIds.First());
+        Assert.That(updatedUser, Is.Not.Null);
+        Assert.That(updatedUser.StartContentIds, Is.Not.Null);
+        Assert.That(updatedUser.StartContentIds, Has.Length.EqualTo(1));
+        Assert.That(updatedUser.StartContentIds.First(), Is.EqualTo(contentStartNode.Id));
+        Assert.That(updatedUser.StartMediaIds, Is.Not.Null);
+        Assert.That(updatedUser.StartMediaIds, Has.Length.EqualTo(1));
+        Assert.That(updatedUser.StartMediaIds.First(), Is.EqualTo(mediaStartNode.Id));
+        Assert.That(updatedUser.StartElementIds, Is.Not.Null);
+        Assert.That(updatedUser.StartElementIds, Has.Length.EqualTo(1));
+        Assert.That(updatedUser.StartElementIds.First(), Is.EqualTo(elementContainer.Id));
     }
 
     [TestCase(false, false, false)]
@@ -312,41 +312,41 @@ internal sealed partial class UserServiceCrudTests
 
         var result = await userService.UpdateAsync(Constants.Security.SuperUserKey, updateModel);
 
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
         var updatedUser = await userService.GetAsync(createdUser.Key);
-        Assert.IsNotNull(updatedUser);
+        Assert.That(updatedUser, Is.Not.Null);
 
-        Assert.IsNotNull(updatedUser.StartContentIds);
+        Assert.That(updatedUser.StartContentIds, Is.Not.Null);
         if (contentRootAccess)
         {
-            Assert.AreEqual(1, updatedUser.StartContentIds.Length);
-            Assert.AreEqual(Constants.System.Root, updatedUser.StartContentIds.First());
+            Assert.That(updatedUser.StartContentIds, Has.Length.EqualTo(1));
+            Assert.That(updatedUser.StartContentIds.First(), Is.EqualTo(Constants.System.Root));
         }
         else
         {
-            Assert.IsEmpty(updatedUser.StartContentIds);
+            Assert.That(updatedUser.StartContentIds, Is.Empty);
         }
 
-        Assert.IsNotNull(updatedUser.StartMediaIds);
+        Assert.That(updatedUser.StartMediaIds, Is.Not.Null);
         if (mediaRootAccess)
         {
-            Assert.AreEqual(1, updatedUser.StartMediaIds.Length);
-            Assert.AreEqual(Constants.System.Root, updatedUser.StartMediaIds.First());
+            Assert.That(updatedUser.StartMediaIds, Has.Length.EqualTo(1));
+            Assert.That(updatedUser.StartMediaIds.First(), Is.EqualTo(Constants.System.Root));
         }
         else
         {
-            Assert.IsEmpty(updatedUser.StartMediaIds);
+            Assert.That(updatedUser.StartMediaIds, Is.Empty);
         }
 
-        Assert.IsNotNull(updatedUser.StartElementIds);
+        Assert.That(updatedUser.StartElementIds, Is.Not.Null);
         if (elementRootAccess)
         {
-            Assert.AreEqual(1, updatedUser.StartElementIds.Length);
-            Assert.AreEqual(Constants.System.Root, updatedUser.StartElementIds.First());
+            Assert.That(updatedUser.StartElementIds, Has.Length.EqualTo(1));
+            Assert.That(updatedUser.StartElementIds.First(), Is.EqualTo(Constants.System.Root));
         }
         else
         {
-            Assert.IsEmpty(updatedUser.StartElementIds);
+            Assert.That(updatedUser.StartElementIds, Is.Empty);
         }
     }
 
@@ -361,7 +361,7 @@ internal sealed partial class UserServiceCrudTests
         var mediaStartNode = mediaService.CreateMediaWithIdentity("test", -1, "Image");
 
         var elementContainerResult = await elementContainerService.CreateAsync(null, "TestElementFolder", null, Constants.Security.SuperUserKey);
-        Assert.IsTrue(elementContainerResult.Success);
+        Assert.That(elementContainerResult.Success, Is.True);
         var elementContainer = elementContainerResult.Result!;
 
         var userService = CreateUserService(securitySettings: new SecuritySettings { UsernameIsEmail = false });
@@ -374,10 +374,10 @@ internal sealed partial class UserServiceCrudTests
         await userService.UpdateAsync(Constants.Security.SuperUserKey, updateModel);
 
         var updatedUser = await userService.GetAsync(createdUser.Key);
-        Assert.IsNotNull(updatedUser);
-        Assert.IsNotEmpty(updatedUser.StartContentIds!);
-        Assert.IsNotEmpty(updatedUser.StartMediaIds!);
-        Assert.IsNotEmpty(updatedUser.StartElementIds!);
+        Assert.That(updatedUser, Is.Not.Null);
+        Assert.That(updatedUser.StartContentIds!, Is.Not.Empty);
+        Assert.That(updatedUser.StartMediaIds!, Is.Not.Empty);
+        Assert.That(updatedUser.StartElementIds!, Is.Not.Empty);
 
         updateModel = await MapUserToUpdateModel(updatedUser);
         updateModel.ContentStartNodeKeys = new HashSet<Guid>();
@@ -386,18 +386,18 @@ internal sealed partial class UserServiceCrudTests
 
         var result = await userService.UpdateAsync(Constants.Security.SuperUserKey, updateModel);
 
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
         updatedUser = await userService.GetAsync(createdUser.Key);
-        Assert.IsNotNull(updatedUser);
+        Assert.That(updatedUser, Is.Not.Null);
 
-        Assert.IsNotNull(updatedUser.StartContentIds);
-        Assert.IsEmpty(updatedUser.StartContentIds);
+        Assert.That(updatedUser.StartContentIds, Is.Not.Null);
+        Assert.That(updatedUser.StartContentIds, Is.Empty);
 
-        Assert.IsNotNull(updatedUser.StartMediaIds);
-        Assert.IsEmpty(updatedUser.StartMediaIds);
+        Assert.That(updatedUser.StartMediaIds, Is.Not.Null);
+        Assert.That(updatedUser.StartMediaIds, Is.Empty);
 
-        Assert.IsNotNull(updatedUser.StartElementIds);
-        Assert.IsEmpty(updatedUser.StartElementIds);
+        Assert.That(updatedUser.StartElementIds, Is.Not.Null);
+        Assert.That(updatedUser.StartElementIds, Is.Empty);
     }
 
     // todo Ideally we would test content and media separately and together (Introduce Testcases for switching permutations)
@@ -413,10 +413,10 @@ internal sealed partial class UserServiceCrudTests
 
         await userService.UpdateAsync(Constants.Security.SuperUserKey, updateModel);
         var updatedUser = await userService.GetAsync(createdUser.Key);
-        Assert.IsNotNull(updatedUser);
-        Assert.IsNotEmpty(updatedUser.StartContentIds!);
-        Assert.IsNotEmpty(updatedUser.StartMediaIds!);
-        Assert.IsNotEmpty(updatedUser.StartElementIds!);
+        Assert.That(updatedUser, Is.Not.Null);
+        Assert.That(updatedUser.StartContentIds!, Is.Not.Empty);
+        Assert.That(updatedUser.StartMediaIds!, Is.Not.Empty);
+        Assert.That(updatedUser.StartElementIds!, Is.Not.Empty);
 
         updateModel = await MapUserToUpdateModel(updatedUser);
         updateModel.HasContentRootAccess = false;
@@ -425,18 +425,18 @@ internal sealed partial class UserServiceCrudTests
 
         var result = await userService.UpdateAsync(Constants.Security.SuperUserKey, updateModel);
 
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
         updatedUser = await userService.GetAsync(createdUser.Key);
-        Assert.IsNotNull(updatedUser);
+        Assert.That(updatedUser, Is.Not.Null);
 
-        Assert.IsNotNull(updatedUser.StartContentIds);
-        Assert.IsEmpty(updatedUser.StartContentIds);
+        Assert.That(updatedUser.StartContentIds, Is.Not.Null);
+        Assert.That(updatedUser.StartContentIds, Is.Empty);
 
-        Assert.IsNotNull(updatedUser.StartMediaIds);
-        Assert.IsEmpty(updatedUser.StartMediaIds);
+        Assert.That(updatedUser.StartMediaIds, Is.Not.Null);
+        Assert.That(updatedUser.StartMediaIds, Is.Empty);
 
-        Assert.IsNotNull(updatedUser.StartElementIds);
-        Assert.IsEmpty(updatedUser.StartElementIds);
+        Assert.That(updatedUser.StartElementIds, Is.Not.Null);
+        Assert.That(updatedUser.StartElementIds, Is.Empty);
     }
 
     [TestCase(false, false)]
@@ -450,7 +450,7 @@ internal sealed partial class UserServiceCrudTests
             var (updateModel, _) = await CreateUserForUpdate(userService);
             updateModel.UserGroupKeys = new HashSet<Guid> { Constants.Security.AdminGroupKey };
             var updateResult = await userService.UpdateAsync(Constants.Security.SuperUserKey, updateModel);
-            Assert.IsTrue(updateResult.Success);
+            Assert.That(updateResult.Success, Is.True);
         }
 
         var adminUser = await userService.GetAsync(Constants.Security.SuperUserKey);
@@ -461,12 +461,12 @@ internal sealed partial class UserServiceCrudTests
 
         if (expectSuccess)
         {
-            Assert.IsTrue(adminUserUpdateResult.Success);
+            Assert.That(adminUserUpdateResult.Success, Is.True);
         }
         else
         {
-            Assert.IsFalse(adminUserUpdateResult.Success);
-            Assert.AreEqual(UserOperationStatus.AdminUserGroupMustNotBeEmpty, adminUserUpdateResult.Status);
+            Assert.That(adminUserUpdateResult.Success, Is.False);
+            Assert.That(adminUserUpdateResult.Status, Is.EqualTo(UserOperationStatus.AdminUserGroupMustNotBeEmpty));
         }
     }
 
@@ -482,10 +482,10 @@ internal sealed partial class UserServiceCrudTests
 
         var result = await userService.UpdateProfileAsync(createdUser.Key, model);
 
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
         var updatedUser = await userService.GetAsync(createdUser.Key);
-        Assert.IsNotNull(updatedUser);
-        Assert.AreEqual("da", updatedUser.Language);
+        Assert.That(updatedUser, Is.Not.Null);
+        Assert.That(updatedUser.Language, Is.EqualTo("da"));
     }
 
     [Test]
@@ -500,15 +500,15 @@ internal sealed partial class UserServiceCrudTests
 
         var result = await userService.UpdateProfileAsync(createdUser.Key, model);
 
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
         var updatedUser = await userService.GetAsync(createdUser.Key);
-        Assert.IsNotNull(updatedUser);
+        Assert.That(updatedUser, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual("da", updatedUser.Language);
-            Assert.AreEqual(createdUser.Email, updatedUser.Email);
-            Assert.AreEqual(createdUser.Username, updatedUser.Username);
-            Assert.AreEqual(createdUser.Name, updatedUser.Name);
+            Assert.That(updatedUser.Language, Is.EqualTo("da"));
+            Assert.That(updatedUser.Email, Is.EqualTo(createdUser.Email));
+            Assert.That(updatedUser.Username, Is.EqualTo(createdUser.Username));
+            Assert.That(updatedUser.Name, Is.EqualTo(createdUser.Name));
         });
     }
 
@@ -527,14 +527,14 @@ internal sealed partial class UserServiceCrudTests
 
         if (shouldSucceed is false)
         {
-            Assert.IsFalse(result.Success);
-            Assert.AreEqual(UserOperationStatus.InvalidIsoCode, result.Status);
+            Assert.That(result.Success, Is.False);
+            Assert.That(result.Status, Is.EqualTo(UserOperationStatus.InvalidIsoCode));
             return;
         }
 
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
         var updatedUser = await userService.GetAsync(createdUser.Key);
-        Assert.IsNotNull(updatedUser);
-        Assert.AreEqual(isoCode, updatedUser.Language);
+        Assert.That(updatedUser, Is.Not.Null);
+        Assert.That(updatedUser.Language, Is.EqualTo(isoCode));
     }
 }

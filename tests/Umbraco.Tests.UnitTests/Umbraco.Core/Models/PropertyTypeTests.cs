@@ -32,10 +32,10 @@ public class PropertyTypeTests
         var dt = BuildDataType();
         var pt = new PropertyType(shortStringHelper, dt);
 
-        Assert.AreEqual(dt.Id, pt.DataTypeId);
-        Assert.AreEqual(dt.Key, pt.DataTypeKey);
-        Assert.AreEqual(dt.EditorAlias, pt.PropertyEditorAlias);
-        Assert.AreEqual(dt.DatabaseType, pt.ValueStorageType);
+        Assert.That(pt.DataTypeId, Is.EqualTo(dt.Id));
+        Assert.That(pt.DataTypeKey, Is.EqualTo(dt.Key));
+        Assert.That(pt.PropertyEditorAlias, Is.EqualTo(dt.EditorAlias));
+        Assert.That(pt.ValueStorageType, Is.EqualTo(dt.DatabaseType));
     }
 
     [Test]
@@ -45,22 +45,22 @@ public class PropertyTypeTests
 
         var clone = (PropertyType)pt.DeepClone();
 
-        Assert.AreNotSame(clone, pt);
-        Assert.AreEqual(clone, pt);
-        Assert.AreEqual(clone.Id, pt.Id);
-        Assert.AreEqual(clone.Alias, pt.Alias);
-        Assert.AreEqual(clone.CreateDate, pt.CreateDate);
-        Assert.AreEqual(clone.DataTypeId, pt.DataTypeId);
-        Assert.AreEqual(clone.DataTypeKey, pt.DataTypeKey);
-        Assert.AreEqual(clone.Description, pt.Description);
-        Assert.AreEqual(clone.Key, pt.Key);
-        Assert.AreEqual(clone.Mandatory, pt.Mandatory);
-        Assert.AreEqual(clone.Name, pt.Name);
-        Assert.AreEqual(clone.PropertyGroupId.Value, pt.PropertyGroupId.Value);
-        Assert.AreEqual(clone.SortOrder, pt.SortOrder);
-        Assert.AreEqual(clone.UpdateDate, pt.UpdateDate);
-        Assert.AreEqual(clone.ValidationRegExp, pt.ValidationRegExp);
-        Assert.AreEqual(clone.ValueStorageType, pt.ValueStorageType);
+        Assert.That(pt, Is.Not.SameAs(clone));
+        Assert.That(pt, Is.EqualTo(clone));
+        Assert.That(pt.Id, Is.EqualTo(clone.Id));
+        Assert.That(pt.Alias, Is.EqualTo(clone.Alias));
+        Assert.That(pt.CreateDate, Is.EqualTo(clone.CreateDate));
+        Assert.That(pt.DataTypeId, Is.EqualTo(clone.DataTypeId));
+        Assert.That(pt.DataTypeKey, Is.EqualTo(clone.DataTypeKey));
+        Assert.That(pt.Description, Is.EqualTo(clone.Description));
+        Assert.That(pt.Key, Is.EqualTo(clone.Key));
+        Assert.That(pt.Mandatory, Is.EqualTo(clone.Mandatory));
+        Assert.That(pt.Name, Is.EqualTo(clone.Name));
+        Assert.That(pt.PropertyGroupId.Value, Is.EqualTo(clone.PropertyGroupId.Value));
+        Assert.That(pt.SortOrder, Is.EqualTo(clone.SortOrder));
+        Assert.That(pt.UpdateDate, Is.EqualTo(clone.UpdateDate));
+        Assert.That(pt.ValidationRegExp, Is.EqualTo(clone.ValidationRegExp));
+        Assert.That(pt.ValueStorageType, Is.EqualTo(clone.ValueStorageType));
 
         // This double verifies by reflection (don't test properties marked with [DoNotClone]
         var allProps = clone.GetType().GetProperties();
@@ -74,7 +74,7 @@ public class PropertyTypeTests
                 actual = ((Lazy<int>)actual).Value;
             }
 
-            Assert.AreEqual(expected, actual, $"Value of propery: '{propertyInfo.Name}': {expected} != {actual}");
+            Assert.That(actual, Is.EqualTo(expected), $"Value of propery: '{propertyInfo.Name}': {expected} != {actual}");
         }
     }
 

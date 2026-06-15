@@ -47,14 +47,14 @@ internal sealed class IndexTest : ExamineBaseTest
 
             // Ignored since the path isn't under 999
             index.IndexItems(new[] { valueSet });
-            Assert.AreEqual(0, searcher.CreateQuery().Id(valueSet.Id).Execute().TotalItemCount);
+            Assert.That(searcher.CreateQuery().Id(valueSet.Id).Execute().TotalItemCount, Is.EqualTo(0));
 
             // Change so that it's under 999 and verify
             var values = valueSet.Values.ToDictionary(x => x.Key, x => x.Value.ToList());
             values["path"] = new List<object> { "-1,999," + valueSet.Id };
             var newValueSet = new ValueSet(valueSet.Id, valueSet.Category, valueSet.ItemType, values.ToDictionary(x => x.Key, x => (IEnumerable<object>)x.Value));
             index.IndexItems(new[] { newValueSet });
-            Assert.AreEqual(1, searcher.CreateQuery().Id(valueSet.Id).Execute().TotalItemCount);
+            Assert.That(searcher.CreateQuery().Id(valueSet.Id).Execute().TotalItemCount, Is.EqualTo(1));
         }
     }
 
@@ -91,8 +91,8 @@ internal sealed class IndexTest : ExamineBaseTest
             var result = results.First();
 
             var key = $"{UmbracoExamineFieldNames.RawFieldPrefix}rte";
-            Assert.IsTrue(result.Values.ContainsKey(key));
-            Assert.Greater(result.Values[key].Length, luceneStringFieldMaxLength);
+            Assert.That(result.Values.ContainsKey(key), Is.True);
+            Assert.That(result.Values[key], Has.Length.GreaterThan(luceneStringFieldMaxLength));
         }
     }
 
@@ -110,7 +110,7 @@ internal sealed class IndexTest : ExamineBaseTest
 
             var result = index.Searcher.CreateQuery().All().Execute();
 
-            Assert.AreEqual(29, result.TotalItemCount);
+            Assert.That(result.TotalItemCount, Is.EqualTo(29));
         }
     }
 
@@ -126,14 +126,12 @@ internal sealed class IndexTest : ExamineBaseTest
             //create the whole thing
             contentRebuilder.Populate(index);
 
-            Assert.Greater(
-                index.Searcher.CreateQuery().All().Execute().TotalItemCount,
-                0);
+            Assert.That(
+                index.Searcher.CreateQuery().All().Execute().TotalItemCount, Is.GreaterThan(0));
 
-            Assert.AreEqual(
-                0,
+            Assert.That(
                 index.Searcher.CreateQuery().Id(ExamineDemoDataContentService.ProtectedNode.ToString()).Execute()
-                    .TotalItemCount);
+                    .TotalItemCount, Is.EqualTo(0));
         }
     }
 
@@ -151,14 +149,14 @@ internal sealed class IndexTest : ExamineBaseTest
                 .First(x => (int)x.Attribute("id") == 2112);
 
             var currPath = (string)node.Attribute("path"); //should be : -1,1111,2222,2112
-            Assert.AreEqual("-1,1111,2222,2112", currPath);
+            Assert.That(currPath, Is.EqualTo("-1,1111,2222,2112"));
 
             //ensure it's indexed
             index.IndexItem(node.ConvertToValueSet(IndexTypes.Media));
 
             //it will not exist because it exists under 2222
             var results = index.Searcher.CreateQuery().Id(2112).Execute();
-            Assert.AreEqual(0, results.Count());
+            Assert.That(results.Count(), Is.EqualTo(0));
 
             //now mimic moving 2112 to 1116
             //node.SetAttributeValue("path", currPath.Replace("2222", "1116"));
@@ -170,7 +168,7 @@ internal sealed class IndexTest : ExamineBaseTest
 
             //now ensure it exists
             results = index.Searcher.CreateQuery().Id(2112).Execute();
-            Assert.AreEqual(1, results.Count());
+            Assert.That(results.Count(), Is.EqualTo(1));
         }
     }
 
@@ -191,14 +189,14 @@ internal sealed class IndexTest : ExamineBaseTest
                 .First(x => (int)x.Attribute("id") == 2112);
 
             var currPath = (string)node.Attribute("path"); //should be : -1,1111,2222,2112
-            Assert.AreEqual("-1,1111,2222,2112", currPath);
+            Assert.That(currPath, Is.EqualTo("-1,1111,2222,2112"));
 
             //ensure it's indexed
             index.IndexItem(node.ConvertToValueSet(IndexTypes.Media));
 
             //it will exist because it exists under 2222
             var results = searcher.CreateQuery().Id(2112).Execute();
-            Assert.AreEqual(1, results.Count());
+            Assert.That(results.Count(), Is.EqualTo(1));
 
             //now mimic moving the node underneath 1116 instead of 2222
             node.SetAttributeValue("path", currPath.Replace("2222", "1116"));
@@ -209,7 +207,7 @@ internal sealed class IndexTest : ExamineBaseTest
 
             //now ensure it's deleted
             results = searcher.CreateQuery().Id(2112).Execute();
-            Assert.AreEqual(0, results.Count());
+            Assert.That(results.Count(), Is.EqualTo(0));
         }
     }
 
@@ -231,7 +229,7 @@ internal sealed class IndexTest : ExamineBaseTest
                 .CreateQuery()
                 .Field(ExamineFieldNames.CategoryFieldName, IndexTypes.Content)
                 .Execute();
-            Assert.AreEqual(21, result.TotalItemCount);
+            Assert.That(result.TotalItemCount, Is.EqualTo(21));
 
             //delete all content
             index.DeleteFromIndex(result.Select(x => x.Id));
@@ -239,7 +237,7 @@ internal sealed class IndexTest : ExamineBaseTest
             //ensure it's all gone
             result = index.Searcher.CreateQuery().Field(ExamineFieldNames.CategoryFieldName, IndexTypes.Content)
                 .Execute();
-            Assert.AreEqual(0, result.TotalItemCount);
+            Assert.That(result.TotalItemCount, Is.EqualTo(0));
 
             //call our indexing methods
             contentRebuilder.Populate(index);
@@ -249,7 +247,7 @@ internal sealed class IndexTest : ExamineBaseTest
                 .Field(ExamineFieldNames.CategoryFieldName, IndexTypes.Content)
                 .Execute();
 
-            Assert.AreEqual(21, result.TotalItemCount);
+            Assert.That(result.TotalItemCount, Is.EqualTo(21));
         }
     }
 
@@ -268,7 +266,7 @@ internal sealed class IndexTest : ExamineBaseTest
             contentRebuilder.Populate(index);
 
             var results = searcher.CreateQuery().Id(1141).Execute();
-            Assert.AreEqual(1, results.Count());
+            Assert.That(results.Count(), Is.EqualTo(1));
 
             //now delete a node that has children
 
@@ -276,10 +274,10 @@ internal sealed class IndexTest : ExamineBaseTest
             //this node had children: 1141 & 1142, let's ensure they are also removed
 
             results = searcher.CreateQuery().Id(1141).Execute();
-            Assert.AreEqual(0, results.Count());
+            Assert.That(results.Count(), Is.EqualTo(0));
 
             results = searcher.CreateQuery().Id(1142).Execute();
-            Assert.AreEqual(0, results.Count());
+            Assert.That(results.Count(), Is.EqualTo(0));
         }
     }
 

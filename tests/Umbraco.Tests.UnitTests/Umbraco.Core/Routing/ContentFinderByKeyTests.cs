@@ -1,4 +1,4 @@
-using AutoFixture.NUnit3;
+using AutoFixture.NUnit4;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -48,11 +48,11 @@ public class ContentFinderByKeyTests
 
         if (shouldSucceed)
         {
-            Assert.AreEqual(publishedRequestBuilder.PublishedContent!.Key, nodeKey);
+            Assert.That(nodeKey, Is.EqualTo(publishedRequestBuilder.PublishedContent!.Key));
         }
         else
         {
-            Assert.AreNotEqual(publishedRequestBuilder.PublishedContent!.Key, nodeKey);
+            Assert.That(nodeKey, Is.Not.EqualTo(publishedRequestBuilder.PublishedContent!.Key));
         }
     }
 }

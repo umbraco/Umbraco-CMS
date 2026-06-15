@@ -87,85 +87,85 @@ public class JsonBlockValueConverterTests
         var serialized = serializer.Serialize(blockGridValue);
         var deserialized = serializer.Deserialize<BlockGridValue>(serialized);
 
-        Assert.IsNotNull(deserialized);
+        Assert.That(deserialized, Is.Not.Null);
 
-        Assert.AreEqual(1, deserialized.Layout.Count);
-        Assert.IsTrue(deserialized.Layout.ContainsKey(Constants.PropertyEditors.Aliases.BlockGrid));
+        Assert.That(deserialized.Layout, Has.Count.EqualTo(1));
+        Assert.That(deserialized.Layout.ContainsKey(Constants.PropertyEditors.Aliases.BlockGrid), Is.True);
         var layoutItems = deserialized.Layout[Constants.PropertyEditors.Aliases.BlockGrid].OfType<BlockGridLayoutItem>().ToArray();
-        Assert.AreEqual(2, layoutItems.Count());
+        Assert.That(layoutItems.Count(), Is.EqualTo(2));
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(123, layoutItems[0].ColumnSpan);
-            Assert.AreEqual(456, layoutItems[0].RowSpan);
-            Assert.AreEqual(contentElementKey1, layoutItems[0].ContentKey);
-            Assert.AreEqual(settingsElementKey1, layoutItems[0].SettingsKey);
+            Assert.That(layoutItems[0].ColumnSpan, Is.EqualTo(123));
+            Assert.That(layoutItems[0].RowSpan, Is.EqualTo(456));
+            Assert.That(layoutItems[0].ContentKey, Is.EqualTo(contentElementKey1));
+            Assert.That(layoutItems[0].SettingsKey, Is.EqualTo(settingsElementKey1));
 
-            Assert.AreEqual(789, layoutItems[1].ColumnSpan);
-            Assert.AreEqual(123, layoutItems[1].RowSpan);
-            Assert.AreEqual(contentElementKey2, layoutItems[1].ContentKey);
-            Assert.AreEqual(settingsElementKey2, layoutItems[1].SettingsKey);
+            Assert.That(layoutItems[1].ColumnSpan, Is.EqualTo(789));
+            Assert.That(layoutItems[1].RowSpan, Is.EqualTo(123));
+            Assert.That(layoutItems[1].ContentKey, Is.EqualTo(contentElementKey2));
+            Assert.That(layoutItems[1].SettingsKey, Is.EqualTo(settingsElementKey2));
         });
 
-        Assert.AreEqual(1, layoutItems[0].Areas.Length);
-        Assert.AreEqual(1, layoutItems[0].Areas[0].Items.Length);
+        Assert.That(layoutItems[0].Areas.Length, Is.EqualTo(1));
+        Assert.That(layoutItems[0].Areas[0].Items.Length, Is.EqualTo(1));
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(12, layoutItems[0].Areas[0].Items[0].ColumnSpan);
-            Assert.AreEqual(34, layoutItems[0].Areas[0].Items[0].RowSpan);
-            Assert.AreEqual(contentElementKey3, layoutItems[0].Areas[0].Items[0].ContentKey);
-            Assert.AreEqual(settingsElementKey3, layoutItems[0].Areas[0].Items[0].SettingsKey);
+            Assert.That(layoutItems[0].Areas[0].Items[0].ColumnSpan, Is.EqualTo(12));
+            Assert.That(layoutItems[0].Areas[0].Items[0].RowSpan, Is.EqualTo(34));
+            Assert.That(layoutItems[0].Areas[0].Items[0].ContentKey, Is.EqualTo(contentElementKey3));
+            Assert.That(layoutItems[0].Areas[0].Items[0].SettingsKey, Is.EqualTo(settingsElementKey3));
         });
 
-        Assert.AreEqual(1, layoutItems[0].Areas[0].Items[0].Areas.Length);
-        Assert.AreEqual(1, layoutItems[0].Areas[0].Items[0].Areas[0].Items.Length);
+        Assert.That(layoutItems[0].Areas[0].Items[0].Areas.Length, Is.EqualTo(1));
+        Assert.That(layoutItems[0].Areas[0].Items[0].Areas[0].Items.Length, Is.EqualTo(1));
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(56, layoutItems[0].Areas[0].Items[0].Areas[0].Items[0].ColumnSpan);
-            Assert.AreEqual(78, layoutItems[0].Areas[0].Items[0].Areas[0].Items[0].RowSpan);
-            Assert.AreEqual(contentElementKey4, layoutItems[0].Areas[0].Items[0].Areas[0].Items[0].ContentKey);
-            Assert.AreEqual(settingsElementKey4, layoutItems[0].Areas[0].Items[0].Areas[0].Items[0].SettingsKey);
+            Assert.That(layoutItems[0].Areas[0].Items[0].Areas[0].Items[0].ColumnSpan, Is.EqualTo(56));
+            Assert.That(layoutItems[0].Areas[0].Items[0].Areas[0].Items[0].RowSpan, Is.EqualTo(78));
+            Assert.That(layoutItems[0].Areas[0].Items[0].Areas[0].Items[0].ContentKey, Is.EqualTo(contentElementKey4));
+            Assert.That(layoutItems[0].Areas[0].Items[0].Areas[0].Items[0].SettingsKey, Is.EqualTo(settingsElementKey4));
         });
 
-        Assert.AreEqual(4, deserialized.ContentData.Count);
+        Assert.That(deserialized.ContentData, Has.Count.EqualTo(4));
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(contentElementKey1, deserialized.ContentData[0].Key);
-            Assert.AreEqual(elementType1Key, deserialized.ContentData[0].ContentTypeKey);
-            Assert.AreEqual(string.Empty, deserialized.ContentData[0].ContentTypeAlias); // explicitly annotated to be ignored by the serializer
+            Assert.That(deserialized.ContentData[0].Key, Is.EqualTo(contentElementKey1));
+            Assert.That(deserialized.ContentData[0].ContentTypeKey, Is.EqualTo(elementType1Key));
+            Assert.That(deserialized.ContentData[0].ContentTypeAlias, Is.EqualTo(string.Empty)); // explicitly annotated to be ignored by the serializer
 
-            Assert.AreEqual(contentElementKey2, deserialized.ContentData[1].Key);
-            Assert.AreEqual(elementType2Key, deserialized.ContentData[1].ContentTypeKey);
-            Assert.AreEqual(string.Empty, deserialized.ContentData[1].ContentTypeAlias);
+            Assert.That(deserialized.ContentData[1].Key, Is.EqualTo(contentElementKey2));
+            Assert.That(deserialized.ContentData[1].ContentTypeKey, Is.EqualTo(elementType2Key));
+            Assert.That(deserialized.ContentData[1].ContentTypeAlias, Is.EqualTo(string.Empty));
 
-            Assert.AreEqual(contentElementKey3, deserialized.ContentData[2].Key);
-            Assert.AreEqual(elementType3Key, deserialized.ContentData[2].ContentTypeKey);
-            Assert.AreEqual(string.Empty, deserialized.ContentData[2].ContentTypeAlias);
+            Assert.That(deserialized.ContentData[2].Key, Is.EqualTo(contentElementKey3));
+            Assert.That(deserialized.ContentData[2].ContentTypeKey, Is.EqualTo(elementType3Key));
+            Assert.That(deserialized.ContentData[2].ContentTypeAlias, Is.EqualTo(string.Empty));
 
-            Assert.AreEqual(contentElementKey3, deserialized.ContentData[2].Key);
-            Assert.AreEqual(elementType3Key, deserialized.ContentData[2].ContentTypeKey);
-            Assert.AreEqual(string.Empty, deserialized.ContentData[2].ContentTypeAlias);
+            Assert.That(deserialized.ContentData[2].Key, Is.EqualTo(contentElementKey3));
+            Assert.That(deserialized.ContentData[2].ContentTypeKey, Is.EqualTo(elementType3Key));
+            Assert.That(deserialized.ContentData[2].ContentTypeAlias, Is.EqualTo(string.Empty));
         });
 
-        Assert.AreEqual(4, deserialized.SettingsData.Count);
+        Assert.That(deserialized.SettingsData, Has.Count.EqualTo(4));
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(settingsElementKey1, deserialized.SettingsData[0].Key);
-            Assert.AreEqual(elementType3Key, deserialized.SettingsData[0].ContentTypeKey);
-            Assert.AreEqual(string.Empty, deserialized.SettingsData[0].ContentTypeAlias);
+            Assert.That(deserialized.SettingsData[0].Key, Is.EqualTo(settingsElementKey1));
+            Assert.That(deserialized.SettingsData[0].ContentTypeKey, Is.EqualTo(elementType3Key));
+            Assert.That(deserialized.SettingsData[0].ContentTypeAlias, Is.EqualTo(string.Empty));
 
-            Assert.AreEqual(settingsElementKey2, deserialized.SettingsData[1].Key);
-            Assert.AreEqual(elementType4Key, deserialized.SettingsData[1].ContentTypeKey);
-            Assert.AreEqual(string.Empty, deserialized.SettingsData[1].ContentTypeAlias);
+            Assert.That(deserialized.SettingsData[1].Key, Is.EqualTo(settingsElementKey2));
+            Assert.That(deserialized.SettingsData[1].ContentTypeKey, Is.EqualTo(elementType4Key));
+            Assert.That(deserialized.SettingsData[1].ContentTypeAlias, Is.EqualTo(string.Empty));
 
-            Assert.AreEqual(settingsElementKey3, deserialized.SettingsData[2].Key);
-            Assert.AreEqual(elementType1Key, deserialized.SettingsData[2].ContentTypeKey);
-            Assert.AreEqual(string.Empty, deserialized.SettingsData[2].ContentTypeAlias);
+            Assert.That(deserialized.SettingsData[2].Key, Is.EqualTo(settingsElementKey3));
+            Assert.That(deserialized.SettingsData[2].ContentTypeKey, Is.EqualTo(elementType1Key));
+            Assert.That(deserialized.SettingsData[2].ContentTypeAlias, Is.EqualTo(string.Empty));
 
-            Assert.AreEqual(settingsElementKey4, deserialized.SettingsData[3].Key);
-            Assert.AreEqual(elementType2Key, deserialized.SettingsData[3].ContentTypeKey);
-            Assert.AreEqual(string.Empty, deserialized.SettingsData[3].ContentTypeAlias);
+            Assert.That(deserialized.SettingsData[3].Key, Is.EqualTo(settingsElementKey4));
+            Assert.That(deserialized.SettingsData[3].ContentTypeKey, Is.EqualTo(elementType2Key));
+            Assert.That(deserialized.SettingsData[3].ContentTypeAlias, Is.EqualTo(string.Empty));
         });
     }
 
@@ -177,12 +177,12 @@ public class JsonBlockValueConverterTests
         var serialized = serializer.Serialize(blockGridValue);
         var deserialized = serializer.Deserialize<BlockGridValue>(serialized);
 
-        Assert.IsNotNull(deserialized);
+        Assert.That(deserialized, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.IsEmpty(deserialized.Layout);
-            Assert.IsEmpty(deserialized.ContentData);
-            Assert.IsEmpty(deserialized.SettingsData);
+            Assert.That(deserialized.Layout, Is.Empty);
+            Assert.That(deserialized.ContentData, Is.Empty);
+            Assert.That(deserialized.SettingsData, Is.Empty);
         });
     }
 
@@ -221,43 +221,43 @@ public class JsonBlockValueConverterTests
         var serialized = serializer.Serialize(blockListValue);
         var deserialized = serializer.Deserialize<BlockListValue>(serialized);
 
-        Assert.IsNotNull(deserialized);
+        Assert.That(deserialized, Is.Not.Null);
 
-        Assert.AreEqual(1, deserialized.Layout.Count);
-        Assert.IsTrue(deserialized.Layout.ContainsKey(Constants.PropertyEditors.Aliases.BlockList));
+        Assert.That(deserialized.Layout, Has.Count.EqualTo(1));
+        Assert.That(deserialized.Layout.ContainsKey(Constants.PropertyEditors.Aliases.BlockList), Is.True);
         var layoutItems = deserialized.Layout[Constants.PropertyEditors.Aliases.BlockList].OfType<BlockListLayoutItem>().ToArray();
-        Assert.AreEqual(2, layoutItems.Count());
+        Assert.That(layoutItems.Count(), Is.EqualTo(2));
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(contentElementKey1, layoutItems.First().ContentKey);
-            Assert.AreEqual(settingsElementKey1, layoutItems.First().SettingsKey);
+            Assert.That(layoutItems.First().ContentKey, Is.EqualTo(contentElementKey1));
+            Assert.That(layoutItems.First().SettingsKey, Is.EqualTo(settingsElementKey1));
 
-            Assert.AreEqual(contentElementKey2, layoutItems.Last().ContentKey);
-            Assert.AreEqual(settingsElementKey2, layoutItems.Last().SettingsKey);
+            Assert.That(layoutItems.Last().ContentKey, Is.EqualTo(contentElementKey2));
+            Assert.That(layoutItems.Last().SettingsKey, Is.EqualTo(settingsElementKey2));
         });
 
-        Assert.AreEqual(2, deserialized.ContentData.Count);
+        Assert.That(deserialized.ContentData, Has.Count.EqualTo(2));
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(contentElementKey1, deserialized.ContentData.First().Key);
-            Assert.AreEqual(elementType1Key, deserialized.ContentData.First().ContentTypeKey);
-            Assert.AreEqual(string.Empty, deserialized.ContentData.First().ContentTypeAlias); // explicitly annotated to be ignored by the serializer
+            Assert.That(deserialized.ContentData.First().Key, Is.EqualTo(contentElementKey1));
+            Assert.That(deserialized.ContentData.First().ContentTypeKey, Is.EqualTo(elementType1Key));
+            Assert.That(deserialized.ContentData.First().ContentTypeAlias, Is.EqualTo(string.Empty)); // explicitly annotated to be ignored by the serializer
 
-            Assert.AreEqual(contentElementKey2, deserialized.ContentData.Last().Key);
-            Assert.AreEqual(elementType2Key, deserialized.ContentData.Last().ContentTypeKey);
-            Assert.AreEqual(string.Empty, deserialized.ContentData.Last().ContentTypeAlias);
+            Assert.That(deserialized.ContentData.Last().Key, Is.EqualTo(contentElementKey2));
+            Assert.That(deserialized.ContentData.Last().ContentTypeKey, Is.EqualTo(elementType2Key));
+            Assert.That(deserialized.ContentData.Last().ContentTypeAlias, Is.EqualTo(string.Empty));
         });
 
-        Assert.AreEqual(2, deserialized.SettingsData.Count);
+        Assert.That(deserialized.SettingsData, Has.Count.EqualTo(2));
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(settingsElementKey1, deserialized.SettingsData.First().Key);
-            Assert.AreEqual(elementType3Key, deserialized.SettingsData.First().ContentTypeKey);
-            Assert.AreEqual(string.Empty, deserialized.SettingsData.First().ContentTypeAlias);
+            Assert.That(deserialized.SettingsData.First().Key, Is.EqualTo(settingsElementKey1));
+            Assert.That(deserialized.SettingsData.First().ContentTypeKey, Is.EqualTo(elementType3Key));
+            Assert.That(deserialized.SettingsData.First().ContentTypeAlias, Is.EqualTo(string.Empty));
 
-            Assert.AreEqual(settingsElementKey2, deserialized.SettingsData.Last().Key);
-            Assert.AreEqual(elementType4Key, deserialized.SettingsData.Last().ContentTypeKey);
-            Assert.AreEqual(string.Empty, deserialized.SettingsData.Last().ContentTypeAlias);
+            Assert.That(deserialized.SettingsData.Last().Key, Is.EqualTo(settingsElementKey2));
+            Assert.That(deserialized.SettingsData.Last().ContentTypeKey, Is.EqualTo(elementType4Key));
+            Assert.That(deserialized.SettingsData.Last().ContentTypeAlias, Is.EqualTo(string.Empty));
         });
     }
 
@@ -269,12 +269,12 @@ public class JsonBlockValueConverterTests
         var serialized = serializer.Serialize(blockListValue);
         var deserialized = serializer.Deserialize<BlockListValue>(serialized);
 
-        Assert.IsNotNull(deserialized);
+        Assert.That(deserialized, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.IsEmpty(deserialized.Layout);
-            Assert.IsEmpty(deserialized.ContentData);
-            Assert.IsEmpty(deserialized.SettingsData);
+            Assert.That(deserialized.Layout, Is.Empty);
+            Assert.That(deserialized.ContentData, Is.Empty);
+            Assert.That(deserialized.SettingsData, Is.Empty);
         });
     }
 
@@ -319,46 +319,46 @@ public class JsonBlockValueConverterTests
         var serialized = serializer.Serialize(richTextEditorValue);
         var deserialized = serializer.Deserialize<RichTextEditorValue>(serialized);
 
-        Assert.IsNotNull(deserialized);
-        Assert.AreEqual("<p>This is some markup</p>", deserialized.Markup);
+        Assert.That(deserialized, Is.Not.Null);
+        Assert.That(deserialized.Markup, Is.EqualTo("<p>This is some markup</p>"));
 
         var deserializedBlocks = deserialized.Blocks;
-        Assert.IsNotNull(deserializedBlocks);
-        Assert.AreEqual(1, deserializedBlocks.Layout.Count);
-        Assert.IsTrue(deserializedBlocks.Layout.ContainsKey(Constants.PropertyEditors.Aliases.RichText));
+        Assert.That(deserializedBlocks, Is.Not.Null);
+        Assert.That(deserializedBlocks.Layout, Has.Count.EqualTo(1));
+        Assert.That(deserializedBlocks.Layout.ContainsKey(Constants.PropertyEditors.Aliases.RichText), Is.True);
         var layoutItems = deserializedBlocks.Layout[Constants.PropertyEditors.Aliases.RichText].OfType<RichTextBlockLayoutItem>().ToArray();
-        Assert.AreEqual(2, layoutItems.Count());
+        Assert.That(layoutItems.Count(), Is.EqualTo(2));
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(contentElementKey1, layoutItems.First().ContentKey);
-            Assert.AreEqual(settingsElementKey1, layoutItems.First().SettingsKey);
+            Assert.That(layoutItems.First().ContentKey, Is.EqualTo(contentElementKey1));
+            Assert.That(layoutItems.First().SettingsKey, Is.EqualTo(settingsElementKey1));
 
-            Assert.AreEqual(contentElementKey2, layoutItems.Last().ContentKey);
-            Assert.AreEqual(settingsElementKey2, layoutItems.Last().SettingsKey);
+            Assert.That(layoutItems.Last().ContentKey, Is.EqualTo(contentElementKey2));
+            Assert.That(layoutItems.Last().SettingsKey, Is.EqualTo(settingsElementKey2));
         });
 
-        Assert.AreEqual(2, deserializedBlocks.ContentData.Count);
+        Assert.That(deserializedBlocks.ContentData, Has.Count.EqualTo(2));
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(contentElementKey1, deserializedBlocks.ContentData.First().Key);
-            Assert.AreEqual(elementType1Key, deserializedBlocks.ContentData.First().ContentTypeKey);
-            Assert.AreEqual(string.Empty, deserializedBlocks.ContentData.First().ContentTypeAlias); // explicitly annotated to be ignored by the serializer
+            Assert.That(deserializedBlocks.ContentData.First().Key, Is.EqualTo(contentElementKey1));
+            Assert.That(deserializedBlocks.ContentData.First().ContentTypeKey, Is.EqualTo(elementType1Key));
+            Assert.That(deserializedBlocks.ContentData.First().ContentTypeAlias, Is.EqualTo(string.Empty)); // explicitly annotated to be ignored by the serializer
 
-            Assert.AreEqual(contentElementKey2, deserializedBlocks.ContentData.Last().Key);
-            Assert.AreEqual(elementType2Key, deserializedBlocks.ContentData.Last().ContentTypeKey);
-            Assert.AreEqual(string.Empty, deserializedBlocks.ContentData.Last().ContentTypeAlias);
+            Assert.That(deserializedBlocks.ContentData.Last().Key, Is.EqualTo(contentElementKey2));
+            Assert.That(deserializedBlocks.ContentData.Last().ContentTypeKey, Is.EqualTo(elementType2Key));
+            Assert.That(deserializedBlocks.ContentData.Last().ContentTypeAlias, Is.EqualTo(string.Empty));
         });
 
-        Assert.AreEqual(2, deserializedBlocks.SettingsData.Count);
+        Assert.That(deserializedBlocks.SettingsData, Has.Count.EqualTo(2));
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(settingsElementKey1, deserializedBlocks.SettingsData.First().Key);
-            Assert.AreEqual(elementType3Key, deserializedBlocks.SettingsData.First().ContentTypeKey);
-            Assert.AreEqual(string.Empty, deserializedBlocks.SettingsData.First().ContentTypeAlias);
+            Assert.That(deserializedBlocks.SettingsData.First().Key, Is.EqualTo(settingsElementKey1));
+            Assert.That(deserializedBlocks.SettingsData.First().ContentTypeKey, Is.EqualTo(elementType3Key));
+            Assert.That(deserializedBlocks.SettingsData.First().ContentTypeAlias, Is.EqualTo(string.Empty));
 
-            Assert.AreEqual(settingsElementKey2, deserializedBlocks.SettingsData.Last().Key);
-            Assert.AreEqual(elementType4Key, deserializedBlocks.SettingsData.Last().ContentTypeKey);
-            Assert.AreEqual(string.Empty, deserializedBlocks.SettingsData.Last().ContentTypeAlias);
+            Assert.That(deserializedBlocks.SettingsData.Last().Key, Is.EqualTo(settingsElementKey2));
+            Assert.That(deserializedBlocks.SettingsData.Last().ContentTypeKey, Is.EqualTo(elementType4Key));
+            Assert.That(deserializedBlocks.SettingsData.Last().ContentTypeAlias, Is.EqualTo(string.Empty));
         });
     }
 
@@ -375,14 +375,14 @@ public class JsonBlockValueConverterTests
         var serialized = serializer.Serialize(richTextEditorValue);
         var deserialized = serializer.Deserialize<RichTextEditorValue>(serialized);
 
-        Assert.IsNotNull(deserialized);
-        Assert.AreEqual("<p>This is some markup</p>", deserialized.Markup);
-        Assert.IsNotNull(deserialized.Blocks);
+        Assert.That(deserialized, Is.Not.Null);
+        Assert.That(deserialized.Markup, Is.EqualTo("<p>This is some markup</p>"));
+        Assert.That(deserialized.Blocks, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.IsEmpty(deserialized.Blocks.Layout);
-            Assert.IsEmpty(deserialized.Blocks.ContentData);
-            Assert.IsEmpty(deserialized.Blocks.SettingsData);
+            Assert.That(deserialized.Blocks.Layout, Is.Empty);
+            Assert.That(deserialized.Blocks.ContentData, Is.Empty);
+            Assert.That(deserialized.Blocks.SettingsData, Is.Empty);
         });
     }
 
@@ -429,16 +429,16 @@ public class JsonBlockValueConverterTests
         var serialized = serializer.Serialize(blockListValue);
         var deserialized = serializer.Deserialize<BlockListValue>(serialized);
 
-        Assert.IsNotNull(deserialized);
+        Assert.That(deserialized, Is.Not.Null);
 
-        Assert.AreEqual(1, deserialized.Layout.Count);
-        Assert.IsTrue(deserialized.Layout.ContainsKey(Constants.PropertyEditors.Aliases.BlockList));
+        Assert.That(deserialized.Layout, Has.Count.EqualTo(1));
+        Assert.That(deserialized.Layout.ContainsKey(Constants.PropertyEditors.Aliases.BlockList), Is.True);
         var layoutItems = deserialized.Layout[Constants.PropertyEditors.Aliases.BlockList].OfType<BlockListLayoutItem>().ToArray();
-        Assert.AreEqual(1, layoutItems.Count());
+        Assert.That(layoutItems.Count(), Is.EqualTo(1));
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(contentElementKey1, layoutItems.First().ContentKey);
-            Assert.AreEqual(settingsElementKey1, layoutItems.First().SettingsKey);
+            Assert.That(layoutItems.First().ContentKey, Is.EqualTo(contentElementKey1));
+            Assert.That(layoutItems.First().SettingsKey, Is.EqualTo(settingsElementKey1));
         });
     }
 
@@ -501,11 +501,11 @@ public class JsonBlockValueConverterTests
         var serializer = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
         var deserialized = serializer.Deserialize<BlockGridValue>(serialized);
 
-        Assert.IsNotNull(deserialized);
+        Assert.That(deserialized, Is.Not.Null);
 
-        Assert.AreEqual(1, deserialized.ContentData.Count);
-        Assert.AreEqual(2, deserialized.ContentData[0].RawPropertyValues.Count);
-        Assert.AreEqual("Text", deserialized.ContentData[0].RawPropertyValues["text"]);
-        Assert.AreEqual("Values", deserialized.ContentData[0].RawPropertyValues["values"]);
+        Assert.That(deserialized.ContentData, Has.Count.EqualTo(1));
+        Assert.That(deserialized.ContentData[0].RawPropertyValues, Has.Count.EqualTo(2));
+        Assert.That(deserialized.ContentData[0].RawPropertyValues["text"], Is.EqualTo("Text"));
+        Assert.That(deserialized.ContentData[0].RawPropertyValues["values"], Is.EqualTo("Values"));
     }
 }

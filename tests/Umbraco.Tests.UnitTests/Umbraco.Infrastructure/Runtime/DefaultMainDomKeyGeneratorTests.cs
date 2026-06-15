@@ -1,4 +1,4 @@
-using AutoFixture.NUnit3;
+using AutoFixture.NUnit4;
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -24,7 +24,7 @@ internal class DefaultMainDomKeyGeneratorTests
         globalSettings.MainDomKeyDiscriminator = aDiscriminator;
         var withDiscriminator = sut.GenerateKey();
 
-        Assert.AreNotEqual(withoutDiscriminator, withDiscriminator);
+        Assert.That(withDiscriminator, Is.Not.EqualTo(withoutDiscriminator));
     }
 
     [Test]
@@ -41,6 +41,6 @@ internal class DefaultMainDomKeyGeneratorTests
         var a = sut.GenerateKey();
         var b = sut.GenerateKey();
 
-        Assert.AreEqual(a, b);
+        Assert.That(b, Is.EqualTo(a));
     }
 }

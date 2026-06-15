@@ -22,7 +22,7 @@ public class StringExtensionsTests
     [TestCase("hello-world.png", "Hello World")]
     [TestCase("hello-world .png", "Hello World")]
     [TestCase("_hello-world __1.png", "Hello World 1")]
-    public void To_Friendly_Name(string first, string second) => Assert.AreEqual(first.ToFriendlyName(), second);
+    public void To_Friendly_Name(string first, string second) => Assert.That(second, Is.EqualTo(first.ToFriendlyName()));
 
     [TestCase("hello", "world", false)]
     [TestCase("hello", "hello", true)]
@@ -39,7 +39,7 @@ public class StringExtensionsTests
     {
         Debug.Print("First: " + first.ToGuid());
         Debug.Print("Second: " + second.ToGuid());
-        Assert.AreEqual(result, first.ToGuid() == second.ToGuid());
+        Assert.That(first.ToGuid() == second.ToGuid(), Is.EqualTo(result));
     }
 
     [TestCase("hello.txt", "hello")]
@@ -49,7 +49,7 @@ public class StringExtensionsTests
     public void Strip_File_Extension(string input, string result)
     {
         var stripped = input.StripFileExtension();
-        Assert.AreEqual(stripped, result);
+        Assert.That(result, Is.EqualTo(stripped));
     }
 
     [TestCase("../wtf.js?x=wtf", ".js")]
@@ -67,7 +67,7 @@ public class StringExtensionsTests
     public void Get_File_Extension(string input, string result)
     {
         var extension = input.GetFileExtension();
-        Assert.AreEqual(result, extension);
+        Assert.That(extension, Is.EqualTo(result));
     }
 
     [TestCase("'+alert(1234)+'", "+alert1234+")]
@@ -78,7 +78,7 @@ public class StringExtensionsTests
     public void Clean_From_XSS(string input, string result)
     {
         var cleaned = input.CleanForXss();
-        Assert.AreEqual(cleaned, result);
+        Assert.That(result, Is.EqualTo(cleaned));
     }
 
     [TestCase("Hello this is my string", " string", "Hello this is my")]
@@ -90,7 +90,7 @@ public class StringExtensionsTests
     public void TrimEnd(string input, string forTrimming, string shouldBe)
     {
         var trimmed = input.TrimEnd(forTrimming);
-        Assert.AreEqual(shouldBe, trimmed);
+        Assert.That(trimmed, Is.EqualTo(shouldBe));
     }
 
     [TestCase("Hello this is my string", "hello", " this is my string")]
@@ -100,7 +100,7 @@ public class StringExtensionsTests
     public void TrimStart(string input, string forTrimming, string shouldBe)
     {
         var trimmed = input.TrimStart(forTrimming);
-        Assert.AreEqual(shouldBe, trimmed);
+        Assert.That(trimmed, Is.EqualTo(shouldBe));
     }
 
     [TestCase(
@@ -143,7 +143,7 @@ public class StringExtensionsTests
         StringComparison stringComparison)
     {
         var replaced = input.Replace(oldString, newString, stringComparison);
-        Assert.AreEqual(shouldBe, replaced);
+        Assert.That(replaced, Is.EqualTo(shouldBe));
     }
 
     [TestCase(null, null)]
@@ -154,7 +154,7 @@ public class StringExtensionsTests
     public void ToFirstUpper(string input, string expected)
     {
         var output = input.ToFirstUpper();
-        Assert.AreEqual(expected, output);
+        Assert.That(output, Is.EqualTo(expected));
     }
 
     [TestCase(null, null)]
@@ -165,7 +165,7 @@ public class StringExtensionsTests
     public void ToFirstLower(string input, string expected)
     {
         var output = input.ToFirstLower();
-        Assert.AreEqual(expected, output);
+        Assert.That(output, Is.EqualTo(expected));
     }
 
     [TestCase("pineapple", new[] { "banana", "apple", "blueberry", "strawberry" }, StringComparison.CurrentCulture, true)]
@@ -178,7 +178,7 @@ public class StringExtensionsTests
     public void ContainsAny(string haystack, IEnumerable<string> needles, StringComparison comparison, bool expected)
     {
         var output = haystack.ContainsAny(needles, comparison);
-        Assert.AreEqual(expected, output);
+        Assert.That(output, Is.EqualTo(expected));
     }
 
     [TestCase("", true)]
@@ -202,7 +202,7 @@ public class StringExtensionsTests
         var result = value.IsNullOrWhiteSpace();
 
         // Assert
-        Assert.AreEqual(expected, result);
+        Assert.That(result, Is.EqualTo(expected));
     }
 
     [TestCase("hello", "aGVsbG8")]
@@ -213,11 +213,11 @@ public class StringExtensionsTests
         var bytes = Encoding.UTF8.GetBytes(value);
         Console.WriteLine("base64: " + Convert.ToBase64String(bytes));
         var encoded = bytes.UrlTokenEncode();
-        Assert.AreEqual(expected, encoded);
+        Assert.That(encoded, Is.EqualTo(expected));
 
         var backBytes = encoded.UrlTokenDecode();
         var backString = Encoding.UTF8.GetString(backBytes);
-        Assert.AreEqual(value, backString);
+        Assert.That(backString, Is.EqualTo(value));
     }
 
     // FORMAT STRINGS
@@ -228,77 +228,77 @@ public class StringExtensionsTests
     public void ToUrlAlias()
     {
         var output = "JUST-ANYTHING".ToUrlSegment(_mockShortStringHelper);
-        Assert.AreEqual("URL-SEGMENT::JUST-ANYTHING", output);
+        Assert.That(output, Is.EqualTo("URL-SEGMENT::JUST-ANYTHING"));
     }
 
     [Test]
     public void FormatUrl()
     {
         var output = "JUST-ANYTHING".ToUrlSegment(_mockShortStringHelper);
-        Assert.AreEqual("URL-SEGMENT::JUST-ANYTHING", output);
+        Assert.That(output, Is.EqualTo("URL-SEGMENT::JUST-ANYTHING"));
     }
 
     [Test]
     public void ToUmbracoAlias()
     {
         var output = "JUST-ANYTHING".ToSafeAlias(_mockShortStringHelper);
-        Assert.AreEqual("SAFE-ALIAS::JUST-ANYTHING", output);
+        Assert.That(output, Is.EqualTo("SAFE-ALIAS::JUST-ANYTHING"));
     }
 
     [Test]
     public void ToSafeAlias()
     {
         var output = "JUST-ANYTHING".ToSafeAlias(_mockShortStringHelper);
-        Assert.AreEqual("SAFE-ALIAS::JUST-ANYTHING", output);
+        Assert.That(output, Is.EqualTo("SAFE-ALIAS::JUST-ANYTHING"));
     }
 
     [Test]
     public void ToSafeAliasWithCulture()
     {
         var output = "JUST-ANYTHING".ToSafeAlias(_mockShortStringHelper, null);
-        Assert.AreEqual("SAFE-ALIAS-CULTURE::JUST-ANYTHING", output);
+        Assert.That(output, Is.EqualTo("SAFE-ALIAS-CULTURE::JUST-ANYTHING"));
     }
 
     [Test]
     public void ToUrlSegment()
     {
         var output = "JUST-ANYTHING".ToUrlSegment(_mockShortStringHelper);
-        Assert.AreEqual("URL-SEGMENT::JUST-ANYTHING", output);
+        Assert.That(output, Is.EqualTo("URL-SEGMENT::JUST-ANYTHING"));
     }
 
     [Test]
     public void ToUrlSegmentWithCulture()
     {
         var output = "JUST-ANYTHING".ToUrlSegment(_mockShortStringHelper, null);
-        Assert.AreEqual("URL-SEGMENT-CULTURE::JUST-ANYTHING", output);
+        Assert.That(output, Is.EqualTo("URL-SEGMENT-CULTURE::JUST-ANYTHING"));
     }
 
     [Test]
     public void ToSafeFileName()
     {
         var output = "JUST-ANYTHING".ToSafeFileName(_mockShortStringHelper);
-        Assert.AreEqual("SAFE-FILE-NAME::JUST-ANYTHING", output);
+        Assert.That(output, Is.EqualTo("SAFE-FILE-NAME::JUST-ANYTHING"));
     }
 
     [Test]
     public void ToSafeFileNameWithCulture()
     {
         var output = "JUST-ANYTHING".ToSafeFileName(_mockShortStringHelper, null);
-        Assert.AreEqual("SAFE-FILE-NAME-CULTURE::JUST-ANYTHING", output);
+        Assert.That(output, Is.EqualTo("SAFE-FILE-NAME-CULTURE::JUST-ANYTHING"));
     }
 
     [Test]
     public void ConvertCase()
     {
         var output = "JUST-ANYTHING".ToCleanString(_mockShortStringHelper, CleanStringType.Unchanged);
-        Assert.AreEqual("CLEAN-STRING-A::JUST-ANYTHING", output);
+        Assert.That(output, Is.EqualTo("CLEAN-STRING-A::JUST-ANYTHING"));
     }
 
     [Test]
     public void SplitPascalCasing()
     {
         var output = "JUST-ANYTHING".SplitPascalCasing(_mockShortStringHelper);
-        Assert.AreEqual("SPLIT-PASCAL-CASING::JUST-ANYTHING", output);
+        Assert.That(output, Is.EqualTo("SPLIT-PASCAL-CASING::JUST-ANYTHING"));
     }
 
     [Test] // can't do cases with an IDictionary
@@ -315,7 +315,7 @@ public class StringExtensionsTests
             { "&nbsp;", " " },
         };
         var output = input.ReplaceMany(replacements);
-        Assert.AreEqual(expected, output);
+        Assert.That(output, Is.EqualTo(expected));
     }
 
     [TestCase("val$id!ate|this|str'ing", "$!'", '-', "val-id-ate|this|str-ing")]
@@ -323,7 +323,7 @@ public class StringExtensionsTests
     public void ReplaceManyByOneChar(string input, string toReplace, char replacement, string expected)
     {
         var output = input.ReplaceMany(toReplace.ToArray(), replacement);
-        Assert.AreEqual(expected, output);
+        Assert.That(output, Is.EqualTo(expected));
     }
 
     [TestCase("test to test", "test", "release", "release to test")]
@@ -331,7 +331,7 @@ public class StringExtensionsTests
     public void ReplaceFirst(string input, string search, string replacement, string expected)
     {
         var output = input.ReplaceFirst(search, replacement);
-        Assert.AreEqual(expected, output);
+        Assert.That(output, Is.EqualTo(expected));
     }
 
     [Test]
@@ -373,19 +373,19 @@ public class StringExtensionsTests
     [TestCase(null, false)]
     [TestCase("", false)]
     [TestCase(" ", false)]
-    public void IsEmail(string? email, bool isEmail) => Assert.AreEqual(isEmail, email.IsEmail());
+    public void IsEmail(string? email, bool isEmail) => Assert.That(email.IsEmail(), Is.EqualTo(isEmail));
 
     private static void TryIsFullPath(string path, bool expectedIsFull, bool expectedIsValid = true)
     {
-        Assert.AreEqual(expectedIsFull, path.IsFullPath(), "IsFullPath('" + path + "')");
+        Assert.That(path.IsFullPath(), Is.EqualTo(expectedIsFull), "IsFullPath('" + path + "')");
 
         if (expectedIsFull)
         {
-            Assert.AreEqual(path, Path.GetFullPath(path));
+            Assert.That(Path.GetFullPath(path), Is.EqualTo(path));
         }
         else if (expectedIsValid)
         {
-            Assert.AreNotEqual(path, Path.GetFullPath(path));
+            Assert.That(Path.GetFullPath(path), Is.Not.EqualTo(path));
         }
     }
 
@@ -397,7 +397,7 @@ public class StringExtensionsTests
     public void GetIdsFromPath_ReturnsExpectedResult(string input, string expected)
     {
         var ids = input.GetIdsFromPath();
-        Assert.AreEqual(expected, string.Join(",", ids.Select(i => i.ToString(CultureInfo.InvariantCulture))));
+        Assert.That(string.Join(",", ids.Select(i => i.ToString(CultureInfo.InvariantCulture))), Is.EqualTo(expected));
     }
 
     [TestCase(null, "")]
@@ -408,7 +408,7 @@ public class StringExtensionsTests
     public void GetIdsFromPathReversed_ReturnsExpectedResult(string input, string expected)
     {
         var ids = input.GetIdsFromPathReversed();
-        Assert.AreEqual(expected, string.Join(",", ids.Select(i => i.ToString(CultureInfo.InvariantCulture))));
+        Assert.That(string.Join(",", ids.Select(i => i.ToString(CultureInfo.InvariantCulture))), Is.EqualTo(expected));
     }
 
     // Regression test for https://github.com/umbraco/Umbraco-CMS/issues/22610: under cultures whose
@@ -429,8 +429,8 @@ public class StringExtensionsTests
             culture.NumberFormat.NegativeSign = "؜-";
             CultureInfo.CurrentCulture = culture;
 
-            CollectionAssert.AreEqual(new[] { -1, 1234, 5678 }, "-1,1234,5678".GetIdsFromPath());
-            CollectionAssert.AreEqual(new[] { 5678, 1234, -1 }, "-1,1234,5678".GetIdsFromPathReversed());
+            Assert.That("-1,1234,5678".GetIdsFromPath(), Is.EqualTo(new[] { -1, 1234, 5678 }).AsCollection);
+            Assert.That("-1,1234,5678".GetIdsFromPathReversed(), Is.EqualTo(new[] { 5678, 1234, -1 }).AsCollection);
         }
         finally
         {
@@ -454,8 +454,8 @@ public class StringExtensionsTests
             culture.NumberFormat.NegativeSign = negativeSign;
             CultureInfo.CurrentCulture = culture;
 
-            CollectionAssert.AreEqual(new[] { -1, 1234, 5678 }, "-1,1234,5678".GetIdsFromPath());
-            CollectionAssert.AreEqual(new[] { 5678, 1234, -1 }, "-1,1234,5678".GetIdsFromPathReversed());
+            Assert.That("-1,1234,5678".GetIdsFromPath(), Is.EqualTo(new[] { -1, 1234, 5678 }).AsCollection);
+            Assert.That("-1,1234,5678".GetIdsFromPathReversed(), Is.EqualTo(new[] { 5678, 1234, -1 }).AsCollection);
         }
         finally
         {
@@ -472,7 +472,7 @@ public class StringExtensionsTests
     public void GetParentIdFromPath_ReturnsExpectedResult(string input, int expected)
     {
         var parentId = input.GetParentIdFromPath();
-        Assert.AreEqual(expected, parentId);
+        Assert.That(parentId, Is.EqualTo(expected));
     }
 
     [TestCase(null, null)]
@@ -482,7 +482,7 @@ public class StringExtensionsTests
     [TestCase("EN", "en")]
     [TestCase("en-US", "en-US")]
     [TestCase("en-gb", "en-GB")]
-    public void EnsureCultureCode_ReturnsExpectedResult(string? culture, string? expected) => Assert.AreEqual(expected, culture.EnsureCultureCode());
+    public void EnsureCultureCode_ReturnsExpectedResult(string? culture, string? expected) => Assert.That(culture.EnsureCultureCode(), Is.EqualTo(expected));
 
     [Test]
     [Platform(Include = "Win")]

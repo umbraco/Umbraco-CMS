@@ -10,8 +10,8 @@ internal sealed partial class MediaTypeEditingServiceTests
     public async Task Can_Get_Default_Folder_Media_Type()
     {
         var folderMediaTypes = await MediaTypeEditingService.GetFolderMediaTypes( 0, 100);
-        Assert.AreEqual(1, folderMediaTypes.Total);
-        Assert.AreEqual(Constants.Conventions.MediaTypes.Folder, folderMediaTypes.Items.First().Alias);
+        Assert.That(folderMediaTypes.Total, Is.EqualTo(1));
+        Assert.That(folderMediaTypes.Items.First().Alias, Is.EqualTo(Constants.Conventions.MediaTypes.Folder));
     }
 
     [Test]
@@ -32,12 +32,12 @@ internal sealed partial class MediaTypeEditingServiceTests
         await MediaTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
 
         var folderMediaTypes = await MediaTypeEditingService.GetFolderMediaTypes( 0, 100);
-        Assert.AreEqual(2, folderMediaTypes.Total);
+        Assert.That(folderMediaTypes.Total, Is.EqualTo(2));
         Assert.Multiple(() =>
         {
             var aliases = folderMediaTypes.Items.Select(i => i.Alias).ToArray();
-            Assert.IsTrue(aliases.Contains(Constants.Conventions.MediaTypes.Folder));
-            Assert.IsTrue(aliases.Contains("testMediaType"));
+            Assert.That(aliases.Contains(Constants.Conventions.MediaTypes.Folder), Is.True);
+            Assert.That(aliases.Contains("testMediaType"), Is.True);
         });
     }
 
@@ -56,13 +56,13 @@ internal sealed partial class MediaTypeEditingServiceTests
         updateModel.AllowedContentTypes = [];
 
         var updateResult = await MediaTypeEditingService.UpdateAsync(systemFolderMediaType, updateModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(updateResult.Success);
+        Assert.That(updateResult.Success, Is.True);
 
         // despite the system "Folder" media type no longer living up to the "folder" media type requirements,
         // it should still be considered a "folder"
         var folderMediaTypes = await MediaTypeEditingService.GetFolderMediaTypes( 0, 100);
-        Assert.AreEqual(1, folderMediaTypes.Total);
-        Assert.AreEqual(Constants.Conventions.MediaTypes.Folder, folderMediaTypes.Items.First().Alias);
+        Assert.That(folderMediaTypes.Total, Is.EqualTo(1));
+        Assert.That(folderMediaTypes.Items.First().Alias, Is.EqualTo(Constants.Conventions.MediaTypes.Folder));
     }
 
     [Test]
@@ -78,7 +78,7 @@ internal sealed partial class MediaTypeEditingServiceTests
         await MediaTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
 
         var folderMediaTypes = await MediaTypeEditingService.GetFolderMediaTypes( 0, 100);
-        Assert.AreEqual(1, folderMediaTypes.Total);
-        Assert.AreEqual(Constants.Conventions.MediaTypes.Folder, folderMediaTypes.Items.First().Alias);
+        Assert.That(folderMediaTypes.Total, Is.EqualTo(1));
+        Assert.That(folderMediaTypes.Items.First().Alias, Is.EqualTo(Constants.Conventions.MediaTypes.Folder));
     }
 }

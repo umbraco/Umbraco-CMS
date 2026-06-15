@@ -39,7 +39,7 @@ public class MultipleTextStringPropertyValueEditorTests
         foreach (var value in invalidValues)
         {
             var fromEditor = FromEditor(value);
-            Assert.IsNull(fromEditor, message: $"Failed for: {value}");
+            Assert.That(fromEditor, Is.Null, message: $"Failed for: {value}");
         }
     }
 
@@ -62,8 +62,8 @@ public class MultipleTextStringPropertyValueEditorTests
         foreach (var value in invalidValues)
         {
             var toEditor = ToEditor(value) as IEnumerable<string>;
-            Assert.IsNotNull(toEditor, message: $"Failed for: {value}");
-            Assert.IsEmpty(toEditor, message: $"Failed for: {value}");
+            Assert.That(toEditor, Is.Not.Null, message: $"Failed for: {value}");
+            Assert.That(toEditor, Is.Empty, message: $"Failed for: {value}");
         }
     }
 
@@ -71,14 +71,14 @@ public class MultipleTextStringPropertyValueEditorTests
     public void Can_Parse_Single_Value_From_Editor()
     {
         var fromEditor = FromEditor(new[] { "The Value" }) as string;
-        Assert.AreEqual("The Value", fromEditor);
+        Assert.That(fromEditor, Is.EqualTo("The Value"));
     }
 
     [Test]
     public void Can_Parse_Multi_Value_From_Editor()
     {
         var fromEditor = FromEditor(new[] { "The First Value", "The Second Value", "The Third Value" }) as string;
-        Assert.AreEqual("The First Value\nThe Second Value\nThe Third Value", fromEditor);
+        Assert.That(fromEditor, Is.EqualTo("The First Value\nThe Second Value\nThe Third Value"));
     }
 
     [Test]
@@ -86,48 +86,48 @@ public class MultipleTextStringPropertyValueEditorTests
     {
         var valueEditor = CreateValueEditor();
         var fromEditor = valueEditor.FromEditor(new ContentPropertyData(new[] { "One", "Two", "Three", "Four", "Five" }, new MultipleTextStringConfiguration { Max = 4 }), null) as string;
-        Assert.AreEqual("One\nTwo\nThree\nFour\nFive", fromEditor);
+        Assert.That(fromEditor, Is.EqualTo("One\nTwo\nThree\nFour\nFive"));
 
         var validationResults = valueEditor.Validate(fromEditor, false, null, PropertyValidationContext.Empty());
-        Assert.AreEqual(1, validationResults.Count());
+        Assert.That(validationResults.Count(), Is.EqualTo(1));
 
         var validationResult = validationResults.First();
-        Assert.AreEqual($"validation_outOfRangeMultipleItemsMaximum", validationResult.ErrorMessage);
+        Assert.That(validationResult.ErrorMessage, Is.EqualTo($"validation_outOfRangeMultipleItemsMaximum"));
     }
 
     [Test]
     public void Can_Parse_Single_Value_To_Editor()
     {
         var toEditor = ToEditor("The Value") as IEnumerable<string>;
-        Assert.IsNotNull(toEditor);
-        Assert.AreEqual(1, toEditor.Count());
-        Assert.AreEqual("The Value", toEditor.First());
+        Assert.That(toEditor, Is.Not.Null);
+        Assert.That(toEditor.Count(), Is.EqualTo(1));
+        Assert.That(toEditor.First(), Is.EqualTo("The Value"));
     }
 
     [Test]
     public void Can_Parse_Multi_Value_To_Editor()
     {
         var toEditor = ToEditor("The First Value\nThe Second Value\nThe Third Value") as IEnumerable<string>;
-        Assert.IsNotNull(toEditor);
-        Assert.AreEqual(3, toEditor.Count());
-        Assert.AreEqual("The First Value", toEditor.First());
-        Assert.AreEqual("The Second Value", toEditor.Skip(1).First());
-        Assert.AreEqual("The Third Value", toEditor.Last());
+        Assert.That(toEditor, Is.Not.Null);
+        Assert.That(toEditor.Count(), Is.EqualTo(3));
+        Assert.That(toEditor.First(), Is.EqualTo("The First Value"));
+        Assert.That(toEditor.Skip(1).First(), Is.EqualTo("The Second Value"));
+        Assert.That(toEditor.Last(), Is.EqualTo("The Third Value"));
     }
 
     [Test]
     public void Null_From_Editor_Yields_Null()
     {
         var result = FromEditor(null);
-        Assert.IsNull(result);
+        Assert.That(result, Is.Null);
     }
 
     [Test]
     public void Null_To_Editor_Yields_Empty_Collection()
     {
         var result = ToEditor(null) as IEnumerable<string>;
-        Assert.IsNotNull(result);
-        Assert.IsEmpty(result);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result, Is.Empty);
     }
 
     [Test]
@@ -135,10 +135,10 @@ public class MultipleTextStringPropertyValueEditorTests
     {
         var editor = CreateValueEditor();
         var result = editor.Validate(null, false, null, PropertyValidationContext.Empty());
-        Assert.AreEqual(1, result.Count());
+        Assert.That(result.Count(), Is.EqualTo(1));
 
         var validationResult = result.First();
-        Assert.AreEqual($"validation_outOfRangeMultipleItemsMinimum", validationResult.ErrorMessage);
+        Assert.That(validationResult.ErrorMessage, Is.EqualTo($"validation_outOfRangeMultipleItemsMinimum"));
     }
 
     [TestCase(0, false, "outOfRangeMultipleItemsMinimum")]
@@ -152,14 +152,14 @@ public class MultipleTextStringPropertyValueEditorTests
         var result = editor.Validate(value, false, null, PropertyValidationContext.Empty());
         if (expectedSuccess)
         {
-            Assert.IsEmpty(result);
+            Assert.That(result, Is.Empty);
         }
         else
         {
-            Assert.AreEqual(1, result.Count());
+            Assert.That(result.Count(), Is.EqualTo(1));
 
             var validationResult = result.First();
-            Assert.AreEqual($"validation_{expectedValidationMessageKey}", validationResult.ErrorMessage);
+            Assert.That(validationResult.ErrorMessage, Is.EqualTo($"validation_{expectedValidationMessageKey}"));
         }
     }
 
@@ -173,14 +173,14 @@ public class MultipleTextStringPropertyValueEditorTests
         var result = editor.Validate(value, false, null, PropertyValidationContext.Empty());
         if (expectedSuccess)
         {
-            Assert.IsEmpty(result);
+            Assert.That(result, Is.Empty);
         }
         else
         {
-            Assert.AreEqual(1, result.Count());
+            Assert.That(result.Count(), Is.EqualTo(1));
 
             var validationResult = result.First();
-            Assert.AreEqual($"validation_{expectedValidationMessageKey}", validationResult.ErrorMessage);
+            Assert.That(validationResult.ErrorMessage, Is.EqualTo($"validation_{expectedValidationMessageKey}"));
         }
     }
 
@@ -194,14 +194,14 @@ public class MultipleTextStringPropertyValueEditorTests
         var result = editor.Validate(value, false, null, PropertyValidationContext.Empty());
         if (expectedSuccess)
         {
-            Assert.IsEmpty(result);
+            Assert.That(result, Is.Empty);
         }
         else
         {
-            Assert.AreEqual(1, result.Count());
+            Assert.That(result.Count(), Is.EqualTo(1));
 
             var validationResult = result.First();
-            Assert.AreEqual("validation_outOfRangeMultipleItemsMaximum", validationResult.ErrorMessage);
+            Assert.That(validationResult.ErrorMessage, Is.EqualTo("validation_outOfRangeMultipleItemsMaximum"));
         }
     }
 
@@ -214,14 +214,14 @@ public class MultipleTextStringPropertyValueEditorTests
         var result = editor.Validate(value, false, null, PropertyValidationContext.Empty());
         if (expectedSuccess)
         {
-            Assert.IsEmpty(result);
+            Assert.That(result, Is.Empty);
         }
         else
         {
-            Assert.AreEqual(1, result.Count());
+            Assert.That(result.Count(), Is.EqualTo(1));
 
             var validationResult = result.First();
-            Assert.AreEqual("validation_outOfRangeMultipleItemsMaximum", validationResult.ErrorMessage);
+            Assert.That(validationResult.ErrorMessage, Is.EqualTo("validation_outOfRangeMultipleItemsMaximum"));
         }
     }
 
@@ -232,7 +232,7 @@ public class MultipleTextStringPropertyValueEditorTests
     {
         var editor = CreateValueEditor();
         var result = editor.Validate(value, false, null, PropertyValidationContext.Empty());
-        Assert.IsEmpty(result);
+        Assert.That(result, Is.Empty);
     }
 
     [Test]
@@ -243,35 +243,35 @@ public class MultipleTextStringPropertyValueEditorTests
         editor.ConfigurationObject = new MultipleTextStringConfiguration();
 
         var result = editor.Validate(value, false, null, PropertyValidationContext.Empty());
-        Assert.IsEmpty(result);
+        Assert.That(result, Is.Empty);
     }
 
     [Test]
     public void FromEditor_Filters_Empty_Strings()
     {
         var fromEditor = FromEditor(new[] { "one", string.Empty, "two", "  ", "three" }) as string;
-        Assert.AreEqual("one\ntwo\nthree", fromEditor);
+        Assert.That(fromEditor, Is.EqualTo("one\ntwo\nthree"));
     }
 
     [Test]
     public void FromEditor_Returns_Null_For_Empty_Collection()
     {
         var fromEditor = FromEditor(Array.Empty<string>());
-        Assert.IsNull(fromEditor);
+        Assert.That(fromEditor, Is.Null);
     }
 
     [Test]
     public void FromEditor_Returns_Null_When_All_Strings_Are_Empty()
     {
         var fromEditor = FromEditor(new[] { string.Empty, "  ", "\t" });
-        Assert.IsNull(fromEditor);
+        Assert.That(fromEditor, Is.Null);
     }
 
     [Test]
     public void FromEditor_Preserves_Non_Empty_Strings_Mixed_With_Empty()
     {
         var fromEditor = FromEditor(new[] { string.Empty, "valid@email.com", string.Empty }) as string;
-        Assert.AreEqual("valid@email.com", fromEditor);
+        Assert.That(fromEditor, Is.EqualTo("valid@email.com"));
     }
 
     [Test]
@@ -285,7 +285,7 @@ public class MultipleTextStringPropertyValueEditorTests
         var value = new[] { string.Empty, "valid@email.com" };
 
         var result = editor.Validate(value, false, emailRegex, PropertyValidationContext.Empty());
-        Assert.IsEmpty(result);
+        Assert.That(result, Is.Empty);
     }
 
     [Test]
@@ -298,7 +298,7 @@ public class MultipleTextStringPropertyValueEditorTests
         var value = new[] { "not-an-email", "valid@email.com" };
 
         var result = editor.Validate(value, false, emailRegex, PropertyValidationContext.Empty());
-        Assert.IsNotEmpty(result);
+        Assert.That(result, Is.Not.Empty);
     }
 
     [Test]
@@ -310,7 +310,7 @@ public class MultipleTextStringPropertyValueEditorTests
         // 2 non-empty + 2 empty = should count as 2, meeting min=2
         var value = new[] { "one", string.Empty, "two", string.Empty };
         var result = editor.Validate(value, false, null, PropertyValidationContext.Empty());
-        Assert.IsEmpty(result);
+        Assert.That(result, Is.Empty);
     }
 
     [Test]
@@ -322,8 +322,8 @@ public class MultipleTextStringPropertyValueEditorTests
         // 1 non-empty + 2 empty = should count as 1, failing min=2
         var value = new[] { "one", string.Empty, string.Empty };
         var result = editor.Validate(value, false, null, PropertyValidationContext.Empty());
-        Assert.AreEqual(1, result.Count());
-        Assert.AreEqual("validation_outOfRangeSingleItemMinimum", result.First().ErrorMessage);
+        Assert.That(result.Count(), Is.EqualTo(1));
+        Assert.That(result.First().ErrorMessage, Is.EqualTo("validation_outOfRangeSingleItemMinimum"));
     }
 
     [Test]
@@ -334,7 +334,7 @@ public class MultipleTextStringPropertyValueEditorTests
 
         var value = new[] { string.Empty, "  " };
         var result = editor.Validate(value, true, null, PropertyValidationContext.Empty());
-        Assert.IsNotEmpty(result);
+        Assert.That(result, Is.Not.Empty);
     }
 
     [Test]
@@ -345,7 +345,7 @@ public class MultipleTextStringPropertyValueEditorTests
 
         var value = new[] { string.Empty, "valid@email.com" };
         var result = editor.Validate(value, true, null, PropertyValidationContext.Empty());
-        Assert.IsEmpty(result);
+        Assert.That(result, Is.Empty);
     }
 
     private static object? FromEditor(object? value, int max = 0)

@@ -25,13 +25,13 @@ internal sealed partial class MediaTypeEditingServiceTests
         var result = await MediaTypeEditingService.GetMediaTypesForFileExtensionWithMatchInfoAsync(fileExtension, 0, 100);
 
         // Should contain the specific match and the File fallback.
-        Assert.IsTrue(result.Total >= 2);
+        Assert.That(result.Total, Is.GreaterThanOrEqualTo(2));
 
         MediaTypeFileExtensionMatchResult specific = result.Items.First(r => r.MediaType.Alias == expectedMediaTypeAlias);
-        Assert.IsTrue(specific.IsSpecificMatch);
+        Assert.That(specific.IsSpecificMatch, Is.True);
 
         MediaTypeFileExtensionMatchResult fallback = result.Items.First(r => r.MediaType.Alias == Constants.Conventions.MediaTypes.File);
-        Assert.IsFalse(fallback.IsSpecificMatch);
+        Assert.That(fallback.IsSpecificMatch, Is.False);
     }
 
     [TestCase("abc")]
@@ -40,11 +40,11 @@ internal sealed partial class MediaTypeEditingServiceTests
     {
         var result = await MediaTypeEditingService.GetMediaTypesForFileExtensionWithMatchInfoAsync(fileExtension, 0, 100);
 
-        Assert.AreEqual(1, result.Total);
+        Assert.That(result.Total, Is.EqualTo(1));
 
         MediaTypeFileExtensionMatchResult fallback = result.Items.First();
-        Assert.AreEqual(Constants.Conventions.MediaTypes.File, fallback.MediaType.Alias);
-        Assert.IsFalse(fallback.IsSpecificMatch);
+        Assert.That(fallback.MediaType.Alias, Is.EqualTo(Constants.Conventions.MediaTypes.File));
+        Assert.That(fallback.IsSpecificMatch, Is.False);
     }
 
     [TestCase("jpg")]
@@ -53,8 +53,8 @@ internal sealed partial class MediaTypeEditingServiceTests
     {
         var result = await MediaTypeEditingService.GetMediaTypesForFileExtensionWithMatchInfoAsync(fileExtension, 0, 100);
 
-        Assert.IsTrue(result.Total >= 2);
-        Assert.IsTrue(result.Items.Any(r => r.MediaType.Alias == Constants.Conventions.MediaTypes.Image && r.IsSpecificMatch));
+        Assert.That(result.Total, Is.GreaterThanOrEqualTo(2));
+        Assert.That(result.Items.Any(r => r.MediaType.Alias == Constants.Conventions.MediaTypes.Image && r.IsSpecificMatch), Is.True);
     }
 
     [Test]
@@ -72,16 +72,16 @@ internal sealed partial class MediaTypeEditingServiceTests
         var result = await MediaTypeEditingService.GetMediaTypesForFileExtensionWithMatchInfoAsync("jpg", 0, 100);
 
         // Should have Image (specific), Article (specific), File (fallback).
-        Assert.AreEqual(3, result.Total);
+        Assert.That(result.Total, Is.EqualTo(3));
 
         MediaTypeFileExtensionMatchResult image = result.Items.First(r => r.MediaType.Alias == Constants.Conventions.MediaTypes.Image);
-        Assert.IsTrue(image.IsSpecificMatch);
+        Assert.That(image.IsSpecificMatch, Is.True);
 
         MediaTypeFileExtensionMatchResult article = result.Items.First(r => r.MediaType.Alias == Constants.Conventions.MediaTypes.ArticleAlias);
-        Assert.IsTrue(article.IsSpecificMatch);
+        Assert.That(article.IsSpecificMatch, Is.True);
 
         MediaTypeFileExtensionMatchResult file = result.Items.First(r => r.MediaType.Alias == Constants.Conventions.MediaTypes.File);
-        Assert.IsFalse(file.IsSpecificMatch);
+        Assert.That(file.IsSpecificMatch, Is.False);
     }
 
     [Test]
@@ -98,16 +98,16 @@ internal sealed partial class MediaTypeEditingServiceTests
 
         // First page: should be a specific match.
         var result = await MediaTypeEditingService.GetMediaTypesForFileExtensionWithMatchInfoAsync("jpg", 0, 1);
-        Assert.AreEqual(3, result.Total);
-        Assert.AreEqual(1, result.Items.Count());
-        Assert.IsTrue(result.Items.First().IsSpecificMatch);
+        Assert.That(result.Total, Is.EqualTo(3));
+        Assert.That(result.Items.Count(), Is.EqualTo(1));
+        Assert.That(result.Items.First().IsSpecificMatch, Is.True);
 
         // Last page: should be the File fallback (specific matches come before fallbacks).
         result = await MediaTypeEditingService.GetMediaTypesForFileExtensionWithMatchInfoAsync("jpg", 2, 1);
-        Assert.AreEqual(3, result.Total);
-        Assert.AreEqual(1, result.Items.Count());
-        Assert.AreEqual(Constants.Conventions.MediaTypes.File, result.Items.First().MediaType.Alias);
-        Assert.IsFalse(result.Items.First().IsSpecificMatch);
+        Assert.That(result.Total, Is.EqualTo(3));
+        Assert.That(result.Items.Count(), Is.EqualTo(1));
+        Assert.That(result.Items.First().MediaType.Alias, Is.EqualTo(Constants.Conventions.MediaTypes.File));
+        Assert.That(result.Items.First().IsSpecificMatch, Is.False);
     }
 
     [TestCase("PDF")]
@@ -117,8 +117,8 @@ internal sealed partial class MediaTypeEditingServiceTests
     {
         var result = await MediaTypeEditingService.GetMediaTypesForFileExtensionWithMatchInfoAsync(fileExtension, 0, 100);
 
-        Assert.IsTrue(
-            result.Items.Any(r => r.MediaType.Alias == Constants.Conventions.MediaTypes.ArticleAlias && r.IsSpecificMatch),
+        Assert.That(
+            result.Items.Any(r => r.MediaType.Alias == Constants.Conventions.MediaTypes.ArticleAlias && r.IsSpecificMatch), Is.True,
             $"Article should be a specific match for extension '{fileExtension}'");
     }
 
@@ -131,8 +131,8 @@ internal sealed partial class MediaTypeEditingServiceTests
         // For .pdf, Article is a specific match, so File should NOT be returned.
         var result = await MediaTypeEditingService.GetMediaTypesForFileExtensionAsync("pdf", 0, 100);
 
-        Assert.AreEqual(1, result.Total);
-        Assert.AreEqual(Constants.Conventions.MediaTypes.ArticleAlias, result.Items.First().Alias);
+        Assert.That(result.Total, Is.EqualTo(1));
+        Assert.That(result.Items.First().Alias, Is.EqualTo(Constants.Conventions.MediaTypes.ArticleAlias));
     }
 #pragma warning restore CS0618 // Type or member is obsolete
 }

@@ -66,7 +66,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
 
             Assert.That(tag.HasIdentity, Is.True);
             Assert.That(tag2.HasIdentity, Is.True);
-            Assert.AreNotEqual(tag.Id, tag2.Id);
+            Assert.That(tag2.Id, Is.Not.EqualTo(tag.Id));
         }
     }
 
@@ -96,7 +96,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
                 tags,
                 false);
 
-            Assert.AreEqual(2, repository.GetTagsForEntity(content.Id).Count());
+            Assert.That(repository.GetTagsForEntity(content.Id).Count(), Is.EqualTo(2));
         }
     }
 
@@ -133,7 +133,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
                 tags2,
                 false);
 
-            Assert.AreEqual(4, repository.GetTagsForEntity(content.Id).Count());
+            Assert.That(repository.GetTagsForEntity(content.Id).Count(), Is.EqualTo(4));
         }
     }
 
@@ -170,9 +170,9 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
                 tags2);
 
             var result = repository.GetTagsForEntity(content.Id).ToArray();
-            Assert.AreEqual(2, result.Length);
-            Assert.AreEqual("tag3", result[0].Text);
-            Assert.AreEqual("tag4", result[1].Text);
+            Assert.That(result, Has.Length.EqualTo(2));
+            Assert.That(result[0].Text, Is.EqualTo("tag3"));
+            Assert.That(result[1].Text, Is.EqualTo("tag4"));
         }
     }
 
@@ -210,7 +210,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
                 false);
 
             var result = repository.GetTagsForEntity(content.Id);
-            Assert.AreEqual(3, result.Count());
+            Assert.That(result.Count(), Is.EqualTo(3));
         }
     }
 
@@ -246,7 +246,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
                 Enumerable.Empty<ITag>());
 
             var result = repository.GetTagsForEntity(content.Id);
-            Assert.AreEqual(0, result.Count());
+            Assert.That(result.Count(), Is.EqualTo(0));
         }
     }
 
@@ -287,9 +287,9 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
                 tagsToRemove);
 
             var result = repository.GetTagsForEntity(content.Id).ToArray();
-            Assert.AreEqual(2, result.Length);
-            Assert.AreEqual("tag1", result[0].Text);
-            Assert.AreEqual("tag4", result[1].Text);
+            Assert.That(result, Has.Length.EqualTo(2));
+            Assert.That(result[0].Text, Is.EqualTo("tag1"));
+            Assert.That(result[1].Text, Is.EqualTo("tag4"));
         }
     }
 
@@ -333,7 +333,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
                 false);
 
             var result = repository.GetTagsForEntity(content2.Id);
-            Assert.AreEqual(2, result.Count());
+            Assert.That(result.Count(), Is.EqualTo(2));
         }
     }
 
@@ -378,7 +378,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
 
             // get by key
             var result = repository.GetTagsForEntity(content2.Key);
-            Assert.AreEqual(2, result.Count());
+            Assert.That(result.Count(), Is.EqualTo(2));
         }
     }
 
@@ -415,7 +415,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
                 false);
 
             var result = repository.GetMany();
-            Assert.AreEqual(4, result.Count());
+            Assert.That(result.Count(), Is.EqualTo(4));
         }
     }
 
@@ -456,7 +456,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             var all = repository.GetMany().ToArray();
 
             var result = repository.GetMany(all[0].Id, all[1].Id, all[2].Id);
-            Assert.AreEqual(3, result.Count());
+            Assert.That(result.Count(), Is.EqualTo(3));
         }
     }
 
@@ -500,7 +500,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
                 false);
 
             var result = repository.GetTagsForEntity(content1.Id, "test1");
-            Assert.AreEqual(2, result.Count());
+            Assert.That(result.Count(), Is.EqualTo(2));
         }
     }
 
@@ -543,8 +543,8 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
 
             var result1 = repository.GetTagsForProperty(content1.Id, contentType.PropertyTypes.First().Alias).ToArray();
             var result2 = repository.GetTagsForProperty(content1.Id, contentType.PropertyTypes.Last().Alias).ToArray();
-            Assert.AreEqual(4, result1.Length);
-            Assert.AreEqual(2, result2.Length);
+            Assert.That(result1, Has.Length.EqualTo(4));
+            Assert.That(result2, Has.Length.EqualTo(2));
         }
     }
 
@@ -588,8 +588,8 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             var result1 = repository.GetTagsForProperty(content1.Key, contentType.PropertyTypes.First().Alias)
                 .ToArray();
             var result2 = repository.GetTagsForProperty(content1.Key, contentType.PropertyTypes.Last().Alias).ToArray();
-            Assert.AreEqual(4, result1.Length);
-            Assert.AreEqual(2, result2.Length);
+            Assert.That(result1, Has.Length.EqualTo(4));
+            Assert.That(result2, Has.Length.EqualTo(2));
         }
     }
 
@@ -635,8 +635,8 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             var result2 = repository.GetTagsForProperty(content1.Id, contentType.PropertyTypes.Last().Alias, "test1")
                 .ToArray();
 
-            Assert.AreEqual(2, result1.Length);
-            Assert.AreEqual(1, result2.Length);
+            Assert.That(result1, Has.Length.EqualTo(2));
+            Assert.That(result2, Has.Length.EqualTo(1));
         }
     }
 
@@ -717,9 +717,9 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             var result3 = repository.GetTagsForEntityType(TaggableObjectTypes.All).ToArray();
 
             const string ExpectedTags = "tag1,tag2,tag3";
-            Assert.AreEqual(ExpectedTags, string.Join(",", result1.Select(x => x.Text)));
-            Assert.AreEqual(ExpectedTags, string.Join(",", result2.Select(x => x.Text)));
-            Assert.AreEqual(ExpectedTags, string.Join(",", result3.Select(x => x.Text)));
+            Assert.That(string.Join(",", result1.Select(x => x.Text)), Is.EqualTo(ExpectedTags));
+            Assert.That(string.Join(",", result2.Select(x => x.Text)), Is.EqualTo(ExpectedTags));
+            Assert.That(string.Join(",", result3.Select(x => x.Text)), Is.EqualTo(ExpectedTags));
         }
     }
 
@@ -770,13 +770,13 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             var result2 = repository.GetTagsForEntityType(TaggableObjectTypes.Media).ToArray();
             var result3 = repository.GetTagsForEntityType(TaggableObjectTypes.All).ToArray();
 
-            Assert.AreEqual(3, result1.Length);
-            Assert.AreEqual(2, result2.Length);
-            Assert.AreEqual(4, result3.Length);
+            Assert.That(result1, Has.Length.EqualTo(3));
+            Assert.That(result2, Has.Length.EqualTo(2));
+            Assert.That(result3, Has.Length.EqualTo(4));
 
-            Assert.AreEqual(1, result1.Single(x => x.Text == "tag1").NodeCount);
-            Assert.AreEqual(2, result3.Single(x => x.Text == "tag1").NodeCount);
-            Assert.AreEqual(1, result3.Single(x => x.Text == "tag4").NodeCount);
+            Assert.That(result1.Single(x => x.Text == "tag1").NodeCount, Is.EqualTo(1));
+            Assert.That(result3.Single(x => x.Text == "tag1").NodeCount, Is.EqualTo(2));
+            Assert.That(result3.Single(x => x.Text == "tag4").NodeCount, Is.EqualTo(1));
         }
     }
 
@@ -826,8 +826,8 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             var result1 = repository.GetTagsForEntityType(TaggableObjectTypes.Content, "test1").ToArray();
             var result2 = repository.GetTagsForEntityType(TaggableObjectTypes.Media, "test1").ToArray();
 
-            Assert.AreEqual(2, result1.Length);
-            Assert.AreEqual(1, result2.Length);
+            Assert.That(result1, Has.Length.EqualTo(2));
+            Assert.That(result2, Has.Length.EqualTo(1));
         }
     }
 
@@ -863,9 +863,9 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
 
             DocumentRepository.Delete(content1);
 
-            Assert.AreEqual(0, ScopeAccessor.AmbientScope.Database.ExecuteScalar<int>(
+            Assert.That(ScopeAccessor.AmbientScope.Database.ExecuteScalar<int>(
                 "SELECT COUNT(*) FROM cmsTagRelationship WHERE nodeId=@nodeId AND propertyTypeId=@propTypeId",
-                new { nodeId = content1.Id, propTypeId = contentType.PropertyTypes.First().Id }));
+                new { nodeId = content1.Id, propTypeId = contentType.PropertyTypes.First().Id }), Is.EqualTo(0));
         }
     }
 
@@ -929,37 +929,35 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             var contentTestIds = repository.GetTaggedEntitiesByTagGroup(TaggableObjectTypes.Content, "test").ToArray();
 
             // there are two content items tagged against the 'test' group
-            Assert.AreEqual(2, contentTestIds.Length);
+            Assert.That(contentTestIds, Has.Length.EqualTo(2));
 
             // there are a total of two property types tagged against the 'test' group
-            Assert.AreEqual(2, contentTestIds.SelectMany(x => x.TaggedProperties).Count());
+            Assert.That(contentTestIds.SelectMany(x => x.TaggedProperties).Count(), Is.EqualTo(2));
 
             // there are a total of 2 tags tagged against the 'test' group
-            Assert.AreEqual(
-                2,
+            Assert.That(
                 contentTestIds.SelectMany(x => x.TaggedProperties).SelectMany(x => x.Tags).Select(x => x.Id).Distinct()
-                    .Count());
+                    .Count(), Is.EqualTo(2));
 
             var contentTest1Ids =
                 repository.GetTaggedEntitiesByTagGroup(TaggableObjectTypes.Content, "test1").ToArray();
 
             // there are two content items tagged against the 'test1' group
-            Assert.AreEqual(2, contentTest1Ids.Length);
+            Assert.That(contentTest1Ids, Has.Length.EqualTo(2));
 
             // there are a total of two property types tagged against the 'test1' group
-            Assert.AreEqual(2, contentTest1Ids.SelectMany(x => x.TaggedProperties).Count());
+            Assert.That(contentTest1Ids.SelectMany(x => x.TaggedProperties).Count(), Is.EqualTo(2));
 
             // there are a total of 1 tags tagged against the 'test1' group
-            Assert.AreEqual(
-                1,
+            Assert.That(
                 contentTest1Ids.SelectMany(x => x.TaggedProperties).SelectMany(x => x.Tags).Select(x => x.Id).Distinct()
-                    .Count());
+                    .Count(), Is.EqualTo(1));
 
             var mediaTestIds = repository.GetTaggedEntitiesByTagGroup(TaggableObjectTypes.Media, "test");
-            Assert.AreEqual(1, mediaTestIds.Count());
+            Assert.That(mediaTestIds.Count(), Is.EqualTo(1));
 
             var mediaTest1Ids = repository.GetTaggedEntitiesByTagGroup(TaggableObjectTypes.Media, "test1");
-            Assert.AreEqual(1, mediaTest1Ids.Count());
+            Assert.That(mediaTest1Ids.Count(), Is.EqualTo(1));
         }
     }
 
@@ -1019,33 +1017,31 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             var contentTestIds = repository.GetTaggedEntitiesByTag(TaggableObjectTypes.Content, "tag1").ToArray();
 
             // there are two content items tagged against the 'tag1' tag
-            Assert.AreEqual(2, contentTestIds.Length);
+            Assert.That(contentTestIds, Has.Length.EqualTo(2));
 
             // there are a total of two property types tagged against the 'tag1' tag
-            Assert.AreEqual(2, contentTestIds.SelectMany(x => x.TaggedProperties).Count());
+            Assert.That(contentTestIds.SelectMany(x => x.TaggedProperties).Count(), Is.EqualTo(2));
 
             // there are a total of 1 tags since we're only looking against one tag
-            Assert.AreEqual(
-                1,
+            Assert.That(
                 contentTestIds.SelectMany(x => x.TaggedProperties).SelectMany(x => x.Tags).Select(x => x.Id).Distinct()
-                    .Count());
+                    .Count(), Is.EqualTo(1));
 
             var contentTest1Ids = repository.GetTaggedEntitiesByTag(TaggableObjectTypes.Content, "tag3").ToArray();
 
             // there are 1 content items tagged against the 'tag3' tag
-            Assert.AreEqual(1, contentTest1Ids.Length);
+            Assert.That(contentTest1Ids, Has.Length.EqualTo(1));
 
             // there are a total of two property types tagged against the 'tag3' tag
-            Assert.AreEqual(1, contentTest1Ids.SelectMany(x => x.TaggedProperties).Count());
+            Assert.That(contentTest1Ids.SelectMany(x => x.TaggedProperties).Count(), Is.EqualTo(1));
 
             // there are a total of 1 tags since we're only looking against one tag
-            Assert.AreEqual(
-                1,
+            Assert.That(
                 contentTest1Ids.SelectMany(x => x.TaggedProperties).SelectMany(x => x.Tags).Select(x => x.Id).Distinct()
-                    .Count());
+                    .Count(), Is.EqualTo(1));
 
             var mediaTestIds = repository.GetTaggedEntitiesByTag(TaggableObjectTypes.Media, "tag1");
-            Assert.AreEqual(1, mediaTestIds.Count());
+            Assert.That(mediaTestIds.Count(), Is.EqualTo(1));
         }
     }
 
@@ -1078,10 +1074,10 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             // Only one tag should have been saved.
             var tagCount = scope.Database.ExecuteScalar<int>(
                 "SELECT COUNT(*) FROM cmsTags WHERE [group] = 'test'");
-            Assert.AreEqual(1, tagCount);
+            Assert.That(tagCount, Is.EqualTo(1));
 
             // Both content items should be found as tagged by the tag, even though one was assigned with the tag differing in case.
-            Assert.AreEqual(2, repository.GetTaggedEntitiesByTag(TaggableObjectTypes.Content, "tag1").Count());
+            Assert.That(repository.GetTaggedEntitiesByTag(TaggableObjectTypes.Content, "tag1").Count(), Is.EqualTo(2));
         }
     }
 
@@ -1114,14 +1110,14 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             // Only one tag/group should have been saved.
             var tagCount = scope.Database.ExecuteScalar<int>(
                 "SELECT COUNT(*) FROM cmsTags WHERE [tag] = 'tag1'");
-            Assert.AreEqual(1, tagCount);
+            Assert.That(tagCount, Is.EqualTo(1));
 
             var groupCount = scope.Database.ExecuteScalar<int>(
                 "SELECT COUNT(*) FROM cmsTags WHERE [group] = 'group1'");
-            Assert.AreEqual(1, groupCount);
+            Assert.That(groupCount, Is.EqualTo(1));
 
             // Both content items should be found as tagged by the tag, even though one was assigned with the group differing in case.
-            Assert.AreEqual(2, repository.GetTaggedEntitiesByTagGroup(TaggableObjectTypes.Content, "group1").Count());
+            Assert.That(repository.GetTaggedEntitiesByTagGroup(TaggableObjectTypes.Content, "group1").Count(), Is.EqualTo(2));
         }
     }
 

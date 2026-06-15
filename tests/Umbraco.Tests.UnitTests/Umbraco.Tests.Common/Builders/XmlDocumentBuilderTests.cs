@@ -24,6 +24,6 @@ public class XmlDocumentBuilderTests
             .Build();
 
         // Assert
-        Assert.AreEqual(content, xml.OuterXml);
+        Assert.That(xml.OuterXml, Is.EqualTo(content));
     }
 }

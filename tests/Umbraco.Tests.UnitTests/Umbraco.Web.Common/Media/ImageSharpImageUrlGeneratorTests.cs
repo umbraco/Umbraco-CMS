@@ -36,7 +36,7 @@ public class ImageSharpImageUrlGeneratorTests
             Height = 100,
         });
 
-        Assert.AreEqual(MediaPath + "?cc=0.58729977382575338,0.055768992440203169,0,0.32457553600198386&width=100&height=100", urlString);
+        Assert.That(urlString, Is.EqualTo(MediaPath + "?cc=0.58729977382575338,0.055768992440203169,0,0.32457553600198386&width=100&height=100"));
     }
 
     /// <summary>
@@ -52,7 +52,7 @@ public class ImageSharpImageUrlGeneratorTests
             Height = 300,
         });
 
-        Assert.AreEqual(MediaPath + "?rxy=0.96,0.80827067669172936&width=200&height=300", urlString);
+        Assert.That(urlString, Is.EqualTo(MediaPath + "?rxy=0.96,0.80827067669172936&width=200&height=300"));
     }
 
     /// <summary>
@@ -68,7 +68,7 @@ public class ImageSharpImageUrlGeneratorTests
             Height = 100,
         });
 
-        Assert.AreEqual(MediaPath + "?rxy=0.96,0.80827067669172936&width=100&height=100", urlString);
+        Assert.That(urlString, Is.EqualTo(MediaPath + "?rxy=0.96,0.80827067669172936&width=100&height=100"));
     }
 
     [Test]
@@ -82,7 +82,7 @@ public class ImageSharpImageUrlGeneratorTests
             FurtherOptions = "&filter=comic&roundedcorners=radius-26|bgcolor-fff",
         });
 
-        Assert.AreEqual(MediaPath + "?rxy=0.96,0.80827067669172936&width=200&height=300&filter=comic&roundedcorners=radius-26%7Cbgcolor-fff", urlString);
+        Assert.That(urlString, Is.EqualTo(MediaPath + "?rxy=0.96,0.80827067669172936&width=200&height=300&filter=comic&roundedcorners=radius-26%7Cbgcolor-fff"));
     }
 
     [Test]
@@ -93,10 +93,9 @@ public class ImageSharpImageUrlGeneratorTests
             Quality = 10,
             FurtherOptions = "format=webp",
         });
-        Assert.AreEqual(
-            MediaPath +
-            "?format=webp&quality=10",
-            urlString);
+        Assert.That(
+            urlString, Is.EqualTo(MediaPath +
+            "?format=webp&quality=10"));
     }
 
     [Test]
@@ -106,10 +105,9 @@ public class ImageSharpImageUrlGeneratorTests
         {
             FurtherOptions = "quality=10&format=webp",
         });
-        Assert.AreEqual(
-            MediaPath +
-            "?format=webp&quality=10",
-            urlString);
+        Assert.That(
+            urlString, Is.EqualTo(MediaPath +
+            "?format=webp&quality=10"));
     }
 
     /// <summary>
@@ -119,7 +117,7 @@ public class ImageSharpImageUrlGeneratorTests
     public void GivenEmptyStringImageUrl_ReturnsEmptyString()
     {
         var urlString = _generator.GetImageUrl(null);
-        Assert.AreEqual(null, urlString);
+        Assert.That(urlString, Is.EqualTo(null));
     }
 
     /// <summary>
@@ -129,7 +127,7 @@ public class ImageSharpImageUrlGeneratorTests
     public void GivenCrop_ReturnsExpectedQueryString()
     {
         var urlString = _generator.GetImageUrl(new ImageUrlGenerationOptions(null));
-        Assert.AreEqual(null, urlString);
+        Assert.That(urlString, Is.EqualTo(null));
     }
 
     /// <summary>
@@ -139,7 +137,7 @@ public class ImageSharpImageUrlGeneratorTests
     public void GivenWidth_ReturnsExpectedQueryString()
     {
         var urlString = _generator.GetImageUrl(new ImageUrlGenerationOptions(string.Empty));
-        Assert.AreEqual(string.Empty, urlString);
+        Assert.That(urlString, Is.EqualTo(string.Empty));
     }
 
     /// <summary>
@@ -155,7 +153,7 @@ public class ImageSharpImageUrlGeneratorTests
             Height = 100,
         });
 
-        Assert.AreEqual("?cc=0.58729977382575338,0.055768992440203169,0,0.32457553600198386&width=100&height=100", urlString);
+        Assert.That(urlString, Is.EqualTo("?cc=0.58729977382575338,0.055768992440203169,0,0.32457553600198386&width=100&height=100"));
     }
 
     /// <summary>
@@ -199,11 +197,11 @@ public class ImageSharpImageUrlGeneratorTests
             Height = 150,
         });
 
-        Assert.AreEqual(MediaPath + "?rmode=min&width=300&height=150", urlStringMin);
-        Assert.AreEqual(MediaPath + "?rmode=boxpad&width=300&height=150", urlStringBoxPad);
-        Assert.AreEqual(MediaPath + "?rmode=pad&width=300&height=150", urlStringPad);
-        Assert.AreEqual(MediaPath + "?rmode=max&width=300&height=150", urlStringMax);
-        Assert.AreEqual(MediaPath + "?rmode=stretch&width=300&height=150", urlStringStretch);
+        Assert.That(urlStringMin, Is.EqualTo(MediaPath + "?rmode=min&width=300&height=150"));
+        Assert.That(urlStringBoxPad, Is.EqualTo(MediaPath + "?rmode=boxpad&width=300&height=150"));
+        Assert.That(urlStringPad, Is.EqualTo(MediaPath + "?rmode=pad&width=300&height=150"));
+        Assert.That(urlStringMax, Is.EqualTo(MediaPath + "?rmode=max&width=300&height=150"));
+        Assert.That(urlStringStretch, Is.EqualTo(MediaPath + "?rmode=stretch&width=300&height=150"));
     }
 
     /// <summary>
@@ -220,7 +218,7 @@ public class ImageSharpImageUrlGeneratorTests
             FurtherOptions = input,
         });
 
-        Assert.AreEqual(MediaPath + expected, urlString);
+        Assert.That(urlString, Is.EqualTo(MediaPath + expected));
     }
 
     /// <summary>
@@ -235,7 +233,7 @@ public class ImageSharpImageUrlGeneratorTests
             Height = 150,
         });
 
-        Assert.AreEqual(MediaPath + "?width=300&height=150", urlString);
+        Assert.That(urlString, Is.EqualTo(MediaPath + "?width=300&height=150"));
     }
 
     /// <summary>
@@ -251,7 +249,7 @@ public class ImageSharpImageUrlGeneratorTests
             Height = 161,
         });
 
-        Assert.AreEqual(MediaPath + "?rxy=0.4275,0.41&width=270&height=161", urlString);
+        Assert.That(urlString, Is.EqualTo(MediaPath + "?rxy=0.4275,0.41&width=270&height=161"));
     }
 
     /// <summary>
@@ -265,7 +263,7 @@ public class ImageSharpImageUrlGeneratorTests
             Width = 200,
         });
 
-        Assert.AreEqual(MediaPath + "?width=200", urlString);
+        Assert.That(urlString, Is.EqualTo(MediaPath + "?width=200"));
     }
 
     /// <summary>
@@ -279,7 +277,7 @@ public class ImageSharpImageUrlGeneratorTests
             Height = 200,
         });
 
-        Assert.AreEqual(MediaPath + "?height=200", urlString);
+        Assert.That(urlString, Is.EqualTo(MediaPath + "?height=200"));
     }
 
     /// <summary>
@@ -301,7 +299,7 @@ public class ImageSharpImageUrlGeneratorTests
             ImageCropMode = ImageCropMode.Stretch,
         });
 
-        Assert.AreEqual(MediaPath + "?cc=0.58729977382575338,0.055768992440203169,0,0.32457553600198386&rxy=0.96,0.80827067669172936&rmode=stretch&ranchor=right&width=200&height=200&quality=50&more=options&v=buster", urlString);
+        Assert.That(urlString, Is.EqualTo(MediaPath + "?cc=0.58729977382575338,0.055768992440203169,0,0.32457553600198386&rxy=0.96,0.80827067669172936&rmode=stretch&ranchor=right&width=200&height=200&quality=50&more=options&v=buster"));
     }
 
     /// <summary>
@@ -336,18 +334,18 @@ public class ImageSharpImageUrlGeneratorTests
         };
 
         var actual = generator.GetImageUrl(options);
-        Assert.AreEqual(MediaPath + "?width=400&height=400&hmac=6335195986da0663e23eaadfb9bb32d537375aaeec253aae66b8f4388506b4b2", actual);
+        Assert.That(actual, Is.EqualTo(MediaPath + "?width=400&height=400&hmac=6335195986da0663e23eaadfb9bb32d537375aaeec253aae66b8f4388506b4b2"));
 
         // CacheBusterValue isn't included in HMAC generation
         options.CacheBusterValue = "not-included-in-hmac";
-        Assert.AreEqual(MediaPath + "?width=400&height=400&v=not-included-in-hmac&hmac=6335195986da0663e23eaadfb9bb32d537375aaeec253aae66b8f4388506b4b2", generator.GetImageUrl(options));
+        Assert.That(generator.GetImageUrl(options), Is.EqualTo(MediaPath + "?width=400&height=400&v=not-included-in-hmac&hmac=6335195986da0663e23eaadfb9bb32d537375aaeec253aae66b8f4388506b4b2"));
 
         // Removing height should generate a different HMAC
         options.Height = null;
-        Assert.AreEqual(MediaPath + "?width=400&v=not-included-in-hmac&hmac=5bd24a05de5ea068533579863773ddac9269482ad515575be4aace7e9e50c88c", generator.GetImageUrl(options));
+        Assert.That(generator.GetImageUrl(options), Is.EqualTo(MediaPath + "?width=400&v=not-included-in-hmac&hmac=5bd24a05de5ea068533579863773ddac9269482ad515575be4aace7e9e50c88c"));
 
         // But adding it again using FurtherOptions should include it (and produce the same HMAC as before)
         options.FurtherOptions = "height=400";
-        Assert.AreEqual(MediaPath + "?width=400&height=400&v=not-included-in-hmac&hmac=6335195986da0663e23eaadfb9bb32d537375aaeec253aae66b8f4388506b4b2", generator.GetImageUrl(options));
+        Assert.That(generator.GetImageUrl(options), Is.EqualTo(MediaPath + "?width=400&height=400&v=not-included-in-hmac&hmac=6335195986da0663e23eaadfb9bb32d537375aaeec253aae66b8f4388506b4b2"));
     }
 }

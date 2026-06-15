@@ -42,7 +42,7 @@ public class OriginalParentElementRecycleBinControllerTests : ElementRecycleBinC
             $"Parent Folder {Guid.NewGuid()}",
             null,
             Constants.Security.SuperUserKey);
-        Assert.IsTrue(folderResult.Success, $"Folder create failed with status: {folderResult.Status}");
+        Assert.That(folderResult.Success, Is.True, $"Folder create failed with status: {folderResult.Status}");
         var parentFolderKey = folderResult.Result!.Key;
 
         var elementType = new ContentTypeBuilder()
@@ -61,11 +61,11 @@ public class OriginalParentElementRecycleBinControllerTests : ElementRecycleBinC
             Variants = [new VariantModel { Name = "Test Element Instance" }],
         };
         var response = await ElementEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(response.Success, $"Create failed with status: {response.Status}");
+        Assert.That(response.Success, Is.True, $"Create failed with status: {response.Status}");
         _elementKey = response.Result!.Content!.Key;
 
         var moveResult = await ElementEditingService.MoveToRecycleBinAsync(_elementKey, Constants.Security.SuperUserKey);
-        Assert.IsTrue(moveResult.Success, $"Failed to move element to recycle bin: {moveResult.Result}");
+        Assert.That(moveResult.Success, Is.True, $"Failed to move element to recycle bin: {moveResult.Result}");
     }
 
     protected override Expression<Func<OriginalParentElementRecycleBinController, object>> MethodSelector =>

@@ -20,7 +20,7 @@ public class PublishedElementExtensionsTests
     {
         var element = CreateElement(cultureCodes: ["en-US", "da-DK"]);
 
-        Assert.IsTrue(element.Object.HasCulture("en-US"));
+        Assert.That(element.Object.HasCulture("en-US"), Is.True);
     }
 
     [Test]
@@ -28,7 +28,7 @@ public class PublishedElementExtensionsTests
     {
         var element = CreateElement(cultureCodes: ["en-US"]);
 
-        Assert.IsFalse(element.Object.HasCulture("da-DK"));
+        Assert.That(element.Object.HasCulture("da-DK"), Is.False);
     }
 
     [Test]
@@ -36,7 +36,7 @@ public class PublishedElementExtensionsTests
     {
         var element = CreateElement(cultureCodes: ["en-US"]);
 
-        Assert.IsTrue(element.Object.HasCulture("EN-us"));
+        Assert.That(element.Object.HasCulture("EN-us"), Is.True);
     }
 
     [Test]
@@ -44,7 +44,7 @@ public class PublishedElementExtensionsTests
     {
         var element = CreateElement(cultureCodes: [string.Empty]);
 
-        Assert.IsTrue(element.Object.HasCulture(null));
+        Assert.That(element.Object.HasCulture(null), Is.True);
     }
 
     [Test]
@@ -52,7 +52,7 @@ public class PublishedElementExtensionsTests
     {
         var element = CreateElement(variation: ContentVariation.Nothing);
 
-        Assert.IsTrue(element.Object.IsInvariantOrHasCulture("en-US"));
+        Assert.That(element.Object.IsInvariantOrHasCulture("en-US"), Is.True);
     }
 
     [Test]
@@ -60,7 +60,7 @@ public class PublishedElementExtensionsTests
     {
         var element = CreateElement(variation: ContentVariation.Culture, cultureCodes: ["en-US", "da-DK"]);
 
-        Assert.IsTrue(element.Object.IsInvariantOrHasCulture("en-US"));
+        Assert.That(element.Object.IsInvariantOrHasCulture("en-US"), Is.True);
     }
 
     [Test]
@@ -68,7 +68,7 @@ public class PublishedElementExtensionsTests
     {
         var element = CreateElement(variation: ContentVariation.Culture, cultureCodes: ["en-US"]);
 
-        Assert.IsFalse(element.Object.IsInvariantOrHasCulture("da-DK"));
+        Assert.That(element.Object.IsInvariantOrHasCulture("da-DK"), Is.False);
     }
 
     [Test]
@@ -80,7 +80,7 @@ public class PublishedElementExtensionsTests
 
         var variationContextAccessor = new TestVariationContextAccessor();
 
-        Assert.AreEqual(updateDate, element.Object.CultureDate(variationContextAccessor));
+        Assert.That(element.Object.CultureDate(variationContextAccessor), Is.EqualTo(updateDate));
     }
 
     [Test]
@@ -96,7 +96,7 @@ public class PublishedElementExtensionsTests
 
         var variationContextAccessor = new TestVariationContextAccessor();
 
-        Assert.AreEqual(cultureDate, element.Object.CultureDate(variationContextAccessor, "en-US"));
+        Assert.That(element.Object.CultureDate(variationContextAccessor, "en-US"), Is.EqualTo(cultureDate));
     }
 
     [Test]
@@ -106,7 +106,7 @@ public class PublishedElementExtensionsTests
 
         var variationContextAccessor = new TestVariationContextAccessor();
 
-        Assert.AreEqual(DateTime.MinValue, element.Object.CultureDate(variationContextAccessor, "da-DK"));
+        Assert.That(element.Object.CultureDate(variationContextAccessor, "da-DK"), Is.EqualTo(DateTime.MinValue));
     }
 
     [Test]
@@ -127,7 +127,7 @@ public class PublishedElementExtensionsTests
             VariationContext = new VariationContext("en-US"),
         };
 
-        Assert.AreEqual(expectedDate, element.Object.CultureDate(variationContextAccessor));
+        Assert.That(element.Object.CultureDate(variationContextAccessor), Is.EqualTo(expectedDate));
     }
 
     [Test]
@@ -135,7 +135,7 @@ public class PublishedElementExtensionsTests
     {
         var element = CreateElement(contentTypeAlias: "myElement");
 
-        Assert.IsTrue(element.Object.IsDocumentType("myElement"));
+        Assert.That(element.Object.IsDocumentType("myElement"), Is.True);
     }
 
     [Test]
@@ -143,7 +143,7 @@ public class PublishedElementExtensionsTests
     {
         var element = CreateElement(contentTypeAlias: "myElement");
 
-        Assert.IsTrue(element.Object.IsDocumentType("MYELEMENT"));
+        Assert.That(element.Object.IsDocumentType("MYELEMENT"), Is.True);
     }
 
     [Test]
@@ -151,7 +151,7 @@ public class PublishedElementExtensionsTests
     {
         var element = CreateElement(contentTypeAlias: "myElement");
 
-        Assert.IsFalse(element.Object.IsDocumentType("otherElement"));
+        Assert.That(element.Object.IsDocumentType("otherElement"), Is.False);
     }
 
     [Test]
@@ -159,7 +159,7 @@ public class PublishedElementExtensionsTests
     {
         var element = CreateElement(contentTypeAlias: "myElement", compositionAliases: ["baseElement"]);
 
-        Assert.IsTrue(element.Object.IsDocumentType("baseElement", true));
+        Assert.That(element.Object.IsDocumentType("baseElement", true), Is.True);
     }
 
     [Test]
@@ -167,7 +167,7 @@ public class PublishedElementExtensionsTests
     {
         var element = CreateElement(contentTypeAlias: "myElement", compositionAliases: ["baseElement"]);
 
-        Assert.IsFalse(element.Object.IsDocumentType("baseElement", false));
+        Assert.That(element.Object.IsDocumentType("baseElement", false), Is.False);
     }
 
     [Test]
@@ -178,7 +178,7 @@ public class PublishedElementExtensionsTests
         var element2 = CreateElement();
         element2.Setup(x => x.Id).Returns(123);
 
-        Assert.IsTrue(element1.Object.IsEqual(element2.Object));
+        Assert.That(element1.Object.IsEqual(element2.Object), Is.True);
     }
 
     [Test]
@@ -189,7 +189,7 @@ public class PublishedElementExtensionsTests
         var element2 = CreateElement();
         element2.Setup(x => x.Id).Returns(456);
 
-        Assert.IsFalse(element1.Object.IsEqual(element2.Object));
+        Assert.That(element1.Object.IsEqual(element2.Object), Is.False);
     }
 
     [Test]
@@ -200,7 +200,7 @@ public class PublishedElementExtensionsTests
         var element2 = CreateElement();
         element2.Setup(x => x.Id).Returns(456);
 
-        Assert.IsTrue(element1.Object.IsNotEqual(element2.Object));
+        Assert.That(element1.Object.IsNotEqual(element2.Object), Is.True);
     }
 
     [Test]
@@ -211,7 +211,7 @@ public class PublishedElementExtensionsTests
         var element2 = CreateElement();
         element2.Setup(x => x.Id).Returns(123);
 
-        Assert.IsFalse(element1.Object.IsNotEqual(element2.Object));
+        Assert.That(element1.Object.IsNotEqual(element2.Object), Is.False);
     }
 
     [Test]
@@ -226,7 +226,7 @@ public class PublishedElementExtensionsTests
         var userService = new Mock<IUserService>(MockBehavior.Strict);
         userService.Setup(x => x.GetProfileById(10)).Returns(profile.Object);
 
-        Assert.AreEqual("Admin", element.Object.GetCreatorName(userService.Object));
+        Assert.That(element.Object.GetCreatorName(userService.Object), Is.EqualTo("Admin"));
     }
 
     [Test]
@@ -238,7 +238,7 @@ public class PublishedElementExtensionsTests
         var userService = new Mock<IUserService>(MockBehavior.Strict);
         userService.Setup(x => x.GetProfileById(99)).Returns((IProfile?)null);
 
-        Assert.AreEqual(string.Empty, element.Object.GetCreatorName(userService.Object));
+        Assert.That(element.Object.GetCreatorName(userService.Object), Is.EqualTo(string.Empty));
     }
 
     [Test]
@@ -253,7 +253,7 @@ public class PublishedElementExtensionsTests
         var userService = new Mock<IUserService>(MockBehavior.Strict);
         userService.Setup(x => x.GetProfileById(20)).Returns(profile.Object);
 
-        Assert.AreEqual("Editor", element.Object.GetWriterName(userService.Object));
+        Assert.That(element.Object.GetWriterName(userService.Object), Is.EqualTo("Editor"));
     }
 
     [Test]
@@ -265,7 +265,7 @@ public class PublishedElementExtensionsTests
         var userService = new Mock<IUserService>(MockBehavior.Strict);
         userService.Setup(x => x.GetProfileById(99)).Returns((IProfile?)null);
 
-        Assert.AreEqual(string.Empty, element.Object.GetWriterName(userService.Object));
+        Assert.That(element.Object.GetWriterName(userService.Object), Is.EqualTo(string.Empty));
     }
 
     [Test]
@@ -279,7 +279,7 @@ public class PublishedElementExtensionsTests
 
         var fallback = new Mock<IPublishedValueFallback>(MockBehavior.Strict);
 
-        Assert.IsTrue(element.Object.HasValue(fallback.Object, "prop1"));
+        Assert.That(element.Object.HasValue(fallback.Object, "prop1"), Is.True);
     }
 
     [Test]
@@ -294,7 +294,7 @@ public class PublishedElementExtensionsTests
             .Setup(x => x.TryGetValue(element.Object, "prop1", null, null, It.IsAny<Fallback>(), null, out outValue))
             .Returns(true);
 
-        Assert.IsTrue(element.Object.HasValue(fallback.Object, "prop1"));
+        Assert.That(element.Object.HasValue(fallback.Object, "prop1"), Is.True);
     }
 
     [Test]
@@ -309,7 +309,7 @@ public class PublishedElementExtensionsTests
             .Setup(x => x.TryGetValue(element.Object, "prop1", null, null, It.IsAny<Fallback>(), null, out outValue))
             .Returns(false);
 
-        Assert.IsFalse(element.Object.HasValue(fallback.Object, "prop1"));
+        Assert.That(element.Object.HasValue(fallback.Object, "prop1"), Is.False);
     }
 
     private static Mock<IPublishedElement> CreateElement(

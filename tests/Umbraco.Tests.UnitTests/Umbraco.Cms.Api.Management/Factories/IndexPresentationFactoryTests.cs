@@ -60,7 +60,7 @@ public class IndexPresentationFactoryTests
         var responseModel = await factory.CreateAsync(indexMock.Object);
 
         // assert
-        Assert.AreEqual(indexDiagnosticsFailureMessage, responseModel.HealthStatus.Message);
+        Assert.That(responseModel.HealthStatus.Message, Is.EqualTo(indexDiagnosticsFailureMessage));
     }
 
     [Test]
@@ -112,7 +112,7 @@ public class IndexPresentationFactoryTests
         var responseModel = await factory.CreateAsync(indexMock.Object);
 
         // assert
-        Assert.AreEqual(expectedFieldName, responseModel.UniqueKeyFieldName);
+        Assert.That(responseModel.UniqueKeyFieldName, Is.EqualTo(expectedFieldName));
     }
 
     [Test]
@@ -158,7 +158,7 @@ public class IndexPresentationFactoryTests
         var responseModel = await factory.CreateAsync(indexMock.Object);
 
         // assert
-        Assert.IsNull(responseModel.UniqueKeyFieldName);
+        Assert.That(responseModel.UniqueKeyFieldName, Is.Null);
     }
 
     [Test]
@@ -194,6 +194,6 @@ public class IndexPresentationFactoryTests
         var responseModel = await factory.CreateAsync(indexMock.Object);
 
         // assert
-        Assert.AreEqual(expectedFieldName, responseModel.UniqueKeyFieldName);
+        Assert.That(responseModel.UniqueKeyFieldName, Is.EqualTo(expectedFieldName));
     }
 }

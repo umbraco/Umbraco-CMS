@@ -176,7 +176,7 @@ internal sealed class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithC
         };
 
         var publishResult = await ContentPublishingService.PublishAsync(Textpage.Key, [schedule], Constants.Security.SuperUserKey);
-        Assert.IsTrue(publishResult.Success);
+        Assert.That(publishResult.Success, Is.True);
         Textpage.Published = true;
         await _documentCacheService.DeleteItemAsync(Textpage);
 
@@ -199,7 +199,7 @@ internal sealed class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithC
         };
 
         var publishResult = await ContentPublishingService.PublishAsync(Textpage.Key, [schedule], Constants.Security.SuperUserKey);
-        Assert.IsTrue(publishResult.Success);
+        Assert.That(publishResult.Success, Is.True);
         Textpage.Published = true;
         await _documentCacheService.DeleteItemAsync(Textpage);
 
@@ -266,10 +266,10 @@ internal sealed class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithC
         var draftPage = await _mockedCache.GetByIdAsync(Textpage.Key, true);
         var publishedPage = await _mockedCache.GetByIdAsync(Textpage.Key, false);
 
-        Assert.IsNotNull(draftPage);
-        Assert.IsNotNull(publishedPage);
-        Assert.AreEqual(Textpage.Name, draftPage.Name);
-        Assert.AreEqual(Textpage.Name, publishedPage.Name);
+        Assert.That(draftPage, Is.Not.Null);
+        Assert.That(publishedPage, Is.Not.Null);
+        Assert.That(draftPage.Name, Is.EqualTo(Textpage.Name));
+        Assert.That(publishedPage.Name, Is.EqualTo(Textpage.Name));
 
         // Verify no additional repository calls were made (content served from cache).
         _mockDatabaseCacheRepository.Verify(
@@ -318,7 +318,7 @@ internal sealed class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithC
 
         // Act 1 - ancestor check returns false, so GetByKeyAsync should return null.
         var firstResult = await controlledCache.GetByIdAsync(Textpage.Key, false);
-        Assert.IsNull(firstResult, "First call should return null when ancestor check fails");
+        Assert.That(firstResult, Is.Null, "First call should return null when ancestor check fails");
 
         // Act 2 - now the ancestor check returns true.
         ancestorCheckReturnsTrue = true;
@@ -326,16 +326,16 @@ internal sealed class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithC
 
         // Assert - the null from step 1 should NOT have been cached, so step 2 should
         // hit the database again and return the content.
-        Assert.IsNotNull(secondResult, "Second call should return content because null should not have been cached when ancestor check failed");
+        Assert.That(secondResult, Is.Not.Null, "Second call should return content because null should not have been cached when ancestor check failed");
     }
 
     private void AssertTextPage(IPublishedContent textPage)
     {
         Assert.Multiple(() =>
         {
-            Assert.IsNotNull(textPage);
-            Assert.AreEqual(Textpage.Name, textPage.Name);
-            Assert.AreEqual(Textpage.Published, textPage.IsPublished());
+            Assert.That(textPage, Is.Not.Null);
+            Assert.That(textPage.Name, Is.EqualTo(Textpage.Name));
+            Assert.That(textPage.IsPublished(), Is.EqualTo(Textpage.Published));
         });
         AssertProperties(Textpage.Properties, textPage.Properties);
     }
@@ -352,8 +352,8 @@ internal sealed class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithC
     {
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(property.Alias, publishedProperty.Alias);
-            Assert.AreEqual(property.PropertyType.Alias, publishedProperty.PropertyType.Alias);
+            Assert.That(publishedProperty.Alias, Is.EqualTo(property.Alias));
+            Assert.That(publishedProperty.PropertyType.Alias, Is.EqualTo(property.PropertyType.Alias));
         });
     }
 }

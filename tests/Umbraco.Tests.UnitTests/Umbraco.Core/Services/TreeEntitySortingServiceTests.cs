@@ -38,8 +38,8 @@ public class TreeEntitySortingServiceTests
 
     private void AssertContainsAllEntities(ITreeEntity[] result)
     {
-        Assert.AreEqual(_treeEntities.Count, result.Length);
-        Assert.IsTrue(_treeEntities.All(e => result.SingleOrDefault(r => r.Key == e.Key) is not null));
+        Assert.That(result.Length, Is.EqualTo(_treeEntities.Count));
+        Assert.That(_treeEntities.All(e => result.SingleOrDefault(r => r.Key == e.Key) is not null), Is.True);
     }
 
     [Test]
@@ -53,9 +53,9 @@ public class TreeEntitySortingServiceTests
 
         AssertContainsAllEntities(result);
 
-        Assert.AreEqual(EntityKey(20), result.First().Key);
-        Assert.AreEqual(EntityKey(1), result[1].Key);
-        Assert.AreEqual(EntityKey(19), result.Last().Key);
+        Assert.That(result.First().Key, Is.EqualTo(EntityKey(20)));
+        Assert.That(result[1].Key, Is.EqualTo(EntityKey(1)));
+        Assert.That(result.Last().Key, Is.EqualTo(EntityKey(19)));
     }
 
     [Test]
@@ -69,9 +69,9 @@ public class TreeEntitySortingServiceTests
 
         AssertContainsAllEntities(result);
 
-        Assert.AreEqual(EntityKey(2), result.First().Key);
-        Assert.AreEqual(EntityKey(3), result[1].Key);
-        Assert.AreEqual(EntityKey(1), result.Last().Key);
+        Assert.That(result.First().Key, Is.EqualTo(EntityKey(2)));
+        Assert.That(result[1].Key, Is.EqualTo(EntityKey(3)));
+        Assert.That(result.Last().Key, Is.EqualTo(EntityKey(1)));
     }
 
     [Test]
@@ -90,10 +90,10 @@ public class TreeEntitySortingServiceTests
 
         AssertContainsAllEntities(result);
 
-        Assert.AreEqual(EntityKey(1), result.First().Key);
-        Assert.AreEqual(EntityKey(7), result[19].Key);
-        Assert.AreEqual(EntityKey(2), result[18].Key);
-        Assert.AreEqual(EntityKey(12), result[17].Key);
+        Assert.That(result.First().Key, Is.EqualTo(EntityKey(1)));
+        Assert.That(result[19].Key, Is.EqualTo(EntityKey(7)));
+        Assert.That(result[18].Key, Is.EqualTo(EntityKey(2)));
+        Assert.That(result[17].Key, Is.EqualTo(EntityKey(12)));
     }
 
     [Test]
@@ -112,10 +112,10 @@ public class TreeEntitySortingServiceTests
 
         AssertContainsAllEntities(result);
 
-        Assert.AreEqual(EntityKey(7), result.First().Key);
-        Assert.AreEqual(EntityKey(17), result[1].Key);
-        Assert.AreEqual(EntityKey(12), result[2].Key);
-        Assert.AreEqual(EntityKey(20), result.Last().Key);
+        Assert.That(result.First().Key, Is.EqualTo(EntityKey(7)));
+        Assert.That(result[1].Key, Is.EqualTo(EntityKey(17)));
+        Assert.That(result[2].Key, Is.EqualTo(EntityKey(12)));
+        Assert.That(result.Last().Key, Is.EqualTo(EntityKey(20)));
     }
 
     [Test]
@@ -135,7 +135,7 @@ public class TreeEntitySortingServiceTests
 
         AssertContainsAllEntities(result);
 
-        Assert.IsTrue(result.SequenceEqual(_treeEntities));
+        Assert.That(result.SequenceEqual(_treeEntities), Is.True);
     }
 
     [Test]
@@ -153,8 +153,8 @@ public class TreeEntitySortingServiceTests
 
         AssertContainsAllEntities(result);
 
-        Assert.AreEqual(EntityKey(10), result[4].Key);
-        Assert.AreEqual(EntityKey(20), result[9].Key);
+        Assert.That(result[4].Key, Is.EqualTo(EntityKey(10)));
+        Assert.That(result[9].Key, Is.EqualTo(EntityKey(20)));
     }
 
     [Test]
@@ -172,8 +172,8 @@ public class TreeEntitySortingServiceTests
 
         AssertContainsAllEntities(result);
 
-        Assert.AreEqual(EntityKey(5), result[14].Key);
-        Assert.AreEqual(EntityKey(10), result[19].Key);
+        Assert.That(result[14].Key, Is.EqualTo(EntityKey(5)));
+        Assert.That(result[19].Key, Is.EqualTo(EntityKey(10)));
     }
 
     [TestCase(true)]
@@ -191,8 +191,8 @@ public class TreeEntitySortingServiceTests
         AssertContainsAllEntities(result);
 
         // the result must not depend on the order in which the instructions are carried out
-        Assert.AreEqual(EntityKey(5), result[14].Key);
-        Assert.AreEqual(EntityKey(10), result[19].Key);
+        Assert.That(result[14].Key, Is.EqualTo(EntityKey(5)));
+        Assert.That(result[19].Key, Is.EqualTo(EntityKey(10)));
     }
 
     [TestCase(false)]
@@ -210,8 +210,8 @@ public class TreeEntitySortingServiceTests
         AssertContainsAllEntities(result);
 
         // the result must not depend on the order in which the instructions are carried out
-        Assert.AreEqual(EntityKey(5), result[8].Key);
-        Assert.AreEqual(EntityKey(12), result[17].Key);
+        Assert.That(result[8].Key, Is.EqualTo(EntityKey(5)));
+        Assert.That(result[17].Key, Is.EqualTo(EntityKey(12)));
     }
 
     [Test]
@@ -247,26 +247,26 @@ public class TreeEntitySortingServiceTests
 
         AssertContainsAllEntities(result);
 
-        Assert.AreEqual(EntityKey(20), result[0].Key);
-        Assert.AreEqual(EntityKey(19), result[1].Key);
-        Assert.AreEqual(EntityKey(18), result[2].Key);
-        Assert.AreEqual(EntityKey(17), result[3].Key);
-        Assert.AreEqual(EntityKey(16), result[4].Key);
-        Assert.AreEqual(EntityKey(15), result[5].Key);
-        Assert.AreEqual(EntityKey(14), result[6].Key);
-        Assert.AreEqual(EntityKey(13), result[7].Key);
-        Assert.AreEqual(EntityKey(12), result[8].Key);
-        Assert.AreEqual(EntityKey(11), result[9].Key);
-        Assert.AreEqual(EntityKey(10), result[10].Key);
-        Assert.AreEqual(EntityKey(9), result[11].Key);
-        Assert.AreEqual(EntityKey(8), result[12].Key);
-        Assert.AreEqual(EntityKey(7), result[13].Key);
-        Assert.AreEqual(EntityKey(6), result[14].Key);
-        Assert.AreEqual(EntityKey(5), result[15].Key);
-        Assert.AreEqual(EntityKey(4), result[16].Key);
-        Assert.AreEqual(EntityKey(3), result[17].Key);
-        Assert.AreEqual(EntityKey(2), result[18].Key);
-        Assert.AreEqual(EntityKey(1), result[19].Key);
+        Assert.That(result[0].Key, Is.EqualTo(EntityKey(20)));
+        Assert.That(result[1].Key, Is.EqualTo(EntityKey(19)));
+        Assert.That(result[2].Key, Is.EqualTo(EntityKey(18)));
+        Assert.That(result[3].Key, Is.EqualTo(EntityKey(17)));
+        Assert.That(result[4].Key, Is.EqualTo(EntityKey(16)));
+        Assert.That(result[5].Key, Is.EqualTo(EntityKey(15)));
+        Assert.That(result[6].Key, Is.EqualTo(EntityKey(14)));
+        Assert.That(result[7].Key, Is.EqualTo(EntityKey(13)));
+        Assert.That(result[8].Key, Is.EqualTo(EntityKey(12)));
+        Assert.That(result[9].Key, Is.EqualTo(EntityKey(11)));
+        Assert.That(result[10].Key, Is.EqualTo(EntityKey(10)));
+        Assert.That(result[11].Key, Is.EqualTo(EntityKey(9)));
+        Assert.That(result[12].Key, Is.EqualTo(EntityKey(8)));
+        Assert.That(result[13].Key, Is.EqualTo(EntityKey(7)));
+        Assert.That(result[14].Key, Is.EqualTo(EntityKey(6)));
+        Assert.That(result[15].Key, Is.EqualTo(EntityKey(5)));
+        Assert.That(result[16].Key, Is.EqualTo(EntityKey(4)));
+        Assert.That(result[17].Key, Is.EqualTo(EntityKey(3)));
+        Assert.That(result[18].Key, Is.EqualTo(EntityKey(2)));
+        Assert.That(result[19].Key, Is.EqualTo(EntityKey(1)));
     }
 
     [TestCase(-1)]

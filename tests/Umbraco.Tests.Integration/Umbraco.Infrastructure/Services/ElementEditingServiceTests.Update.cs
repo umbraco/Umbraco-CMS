@@ -27,8 +27,8 @@ public partial class ElementEditingServiceTests
         };
 
         var result = await ElementEditingService.UpdateAsync(element.Key, updateModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.Success));
         VerifyUpdate(result.Result.Content);
 
         // re-get and re-test
@@ -36,10 +36,10 @@ public partial class ElementEditingServiceTests
 
         void VerifyUpdate(IElement? updatedElement)
         {
-            Assert.IsNotNull(updatedElement);
-            Assert.AreEqual("Updated Name", updatedElement.Name);
-            Assert.AreEqual("The updated title", updatedElement.GetValue<string>("title"));
-            Assert.AreEqual("The updated text", updatedElement.GetValue<string>("text"));
+            Assert.That(updatedElement, Is.Not.Null);
+            Assert.That(updatedElement.Name, Is.EqualTo("Updated Name"));
+            Assert.That(updatedElement.GetValue<string>("title"), Is.EqualTo("The updated title"));
+            Assert.That(updatedElement.GetValue<string>("text"), Is.EqualTo("The updated text"));
         }
     }
 
@@ -64,8 +64,8 @@ public partial class ElementEditingServiceTests
         };
 
         var result = await ElementEditingService.UpdateAsync(element.Key, updateModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.Success));
         VerifyUpdate(result.Result.Content);
 
         // re-get and re-test
@@ -73,12 +73,12 @@ public partial class ElementEditingServiceTests
 
         void VerifyUpdate(IElement? updatedElement)
         {
-            Assert.IsNotNull(updatedElement);
-            Assert.AreEqual("Updated English Name", updatedElement.GetCultureName("en-US"));
-            Assert.AreEqual("Updated Danish Name", updatedElement.GetCultureName("da-DK"));
-            Assert.AreEqual("The updated invariant title", updatedElement.GetValue<string>("invariantTitle"));
-            Assert.AreEqual("The updated English title", updatedElement.GetValue<string>("variantTitle", "en-US"));
-            Assert.AreEqual("The updated Danish title", updatedElement.GetValue<string>("variantTitle", "da-DK"));
+            Assert.That(updatedElement, Is.Not.Null);
+            Assert.That(updatedElement.GetCultureName("en-US"), Is.EqualTo("Updated English Name"));
+            Assert.That(updatedElement.GetCultureName("da-DK"), Is.EqualTo("Updated Danish Name"));
+            Assert.That(updatedElement.GetValue<string>("invariantTitle"), Is.EqualTo("The updated invariant title"));
+            Assert.That(updatedElement.GetValue<string>("variantTitle", "en-US"), Is.EqualTo("The updated English title"));
+            Assert.That(updatedElement.GetValue<string>("variantTitle", "da-DK"), Is.EqualTo("The updated Danish title"));
         }
     }
 
@@ -105,8 +105,8 @@ public partial class ElementEditingServiceTests
         };
 
         var result = await ElementEditingService.UpdateAsync(element.Key, updateModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.Success));
         VerifyUpdate(result.Result.Content);
 
         // re-get and re-test
@@ -114,14 +114,14 @@ public partial class ElementEditingServiceTests
 
         void VerifyUpdate(IElement? updatedElement)
         {
-            Assert.IsNotNull(updatedElement);
+            Assert.That(updatedElement, Is.Not.Null);
             Assert.Multiple(() =>
             {
-                Assert.AreEqual("The Updated Name", updatedElement.Name);
-                Assert.AreEqual("The updated invariant title", updatedElement.GetValue<string>("invariantTitle"));
-                Assert.AreEqual("The updated default title", updatedElement.GetValue<string>("variantTitle", segment: null));
-                Assert.AreEqual("The updated seg-1 title", updatedElement.GetValue<string>("variantTitle", segment: "seg-1"));
-                Assert.AreEqual("The updated seg-2 title", updatedElement.GetValue<string>("variantTitle", segment: "seg-2"));
+                Assert.That(updatedElement.Name, Is.EqualTo("The Updated Name"));
+                Assert.That(updatedElement.GetValue<string>("invariantTitle"), Is.EqualTo("The updated invariant title"));
+                Assert.That(updatedElement.GetValue<string>("variantTitle", segment: null), Is.EqualTo("The updated default title"));
+                Assert.That(updatedElement.GetValue<string>("variantTitle", segment: "seg-1"), Is.EqualTo("The updated seg-1 title"));
+                Assert.That(updatedElement.GetValue<string>("variantTitle", segment: "seg-2"), Is.EqualTo("The updated seg-2 title"));
             });
         }
     }
@@ -150,16 +150,16 @@ public partial class ElementEditingServiceTests
         };
 
         var result = await ElementEditingService.UpdateAsync(element.Key, updateModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.Success));
 
         var updatedElement = result.Result.Content;
-        Assert.IsNotNull(updatedElement);
+        Assert.That(updatedElement, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual("Updated Name", updatedElement.Name);
-            Assert.AreEqual("The updated title", updatedElement.GetValue<string>("title"));
-            Assert.AreEqual("The updated text", updatedElement.GetValue<string>("text"));
+            Assert.That(updatedElement.Name, Is.EqualTo("Updated Name"));
+            Assert.That(updatedElement.GetValue<string>("title"), Is.EqualTo("The updated title"));
+            Assert.That(updatedElement.GetValue<string>("text"), Is.EqualTo("The updated text"));
         });
     }
 
@@ -192,8 +192,8 @@ public partial class ElementEditingServiceTests
         };
 
         var result = await ElementEditingService.UpdateAsync(element.Key, updateModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.Success));
         VerifyUpdate(result.Result.Content);
 
         // re-get and re-test
@@ -201,19 +201,19 @@ public partial class ElementEditingServiceTests
 
         void VerifyUpdate(IElement? updatedElement)
         {
-            Assert.IsNotNull(updatedElement);
+            Assert.That(updatedElement, Is.Not.Null);
             Assert.Multiple(() =>
             {
-                Assert.AreEqual("The Updated English Name", updatedElement.GetCultureName("en-US"));
-                Assert.AreEqual("The Updated Danish Name", updatedElement.GetCultureName("da-DK"));
+                Assert.That(updatedElement.GetCultureName("en-US"), Is.EqualTo("The Updated English Name"));
+                Assert.That(updatedElement.GetCultureName("da-DK"), Is.EqualTo("The Updated Danish Name"));
 
-                Assert.AreEqual("The updated invariant title", updatedElement.GetValue<string>("invariantTitle"));
-                Assert.AreEqual("The updated default title in English", updatedElement.GetValue<string>("variantTitle", culture: "en-US", segment: null));
-                Assert.AreEqual("The updated seg-1 title in English", updatedElement.GetValue<string>("variantTitle", culture: "en-US", segment: "seg-1"));
-                Assert.AreEqual("The updated seg-2 title in English", updatedElement.GetValue<string>("variantTitle", culture: "en-US", segment: "seg-2"));
-                Assert.AreEqual("The updated default title in Danish", updatedElement.GetValue<string>("variantTitle", culture: "da-DK", segment: null));
-                Assert.AreEqual("The updated seg-1 title in Danish", updatedElement.GetValue<string>("variantTitle", culture: "da-DK", segment: "seg-1"));
-                Assert.AreEqual("The updated seg-2 title in Danish", updatedElement.GetValue<string>("variantTitle", culture: "da-DK", segment: "seg-2"));
+                Assert.That(updatedElement.GetValue<string>("invariantTitle"), Is.EqualTo("The updated invariant title"));
+                Assert.That(updatedElement.GetValue<string>("variantTitle", culture: "en-US", segment: null), Is.EqualTo("The updated default title in English"));
+                Assert.That(updatedElement.GetValue<string>("variantTitle", culture: "en-US", segment: "seg-1"), Is.EqualTo("The updated seg-1 title in English"));
+                Assert.That(updatedElement.GetValue<string>("variantTitle", culture: "en-US", segment: "seg-2"), Is.EqualTo("The updated seg-2 title in English"));
+                Assert.That(updatedElement.GetValue<string>("variantTitle", culture: "da-DK", segment: null), Is.EqualTo("The updated default title in Danish"));
+                Assert.That(updatedElement.GetValue<string>("variantTitle", culture: "da-DK", segment: "seg-1"), Is.EqualTo("The updated seg-1 title in Danish"));
+                Assert.That(updatedElement.GetValue<string>("variantTitle", culture: "da-DK", segment: "seg-2"), Is.EqualTo("The updated seg-2 title in Danish"));
             });
         }
     }

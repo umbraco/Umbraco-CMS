@@ -42,14 +42,14 @@ public class LazyCollectionBuilderTests
 
         var values = factory.GetRequiredService<TestCollection>();
 
-        Assert.AreEqual(3, values.Count());
-        Assert.IsTrue(values.Select(x => x.GetType())
-            .ContainsAll(new[] { typeof(TransientObject1), typeof(TransientObject2), typeof(TransientObject3) }));
+        Assert.That(values.Count(), Is.EqualTo(3));
+        Assert.That(values.Select(x => x.GetType())
+            .ContainsAll(new[] { typeof(TransientObject1), typeof(TransientObject2), typeof(TransientObject3) }), Is.True);
 
         var other = factory.GetRequiredService<TestCollection>();
-        Assert.AreNotSame(values, other); // transient
+        Assert.That(other, Is.Not.SameAs(values)); // transient
         var o1 = other.FirstOrDefault(x => x is TransientObject1);
-        Assert.IsFalse(values.Contains(o1)); // transient
+        Assert.That(values, Does.Not.Contain(o1)); // transient
     }
 
     [Test]
@@ -67,14 +67,14 @@ public class LazyCollectionBuilderTests
 
         var values = factory.GetRequiredService<TestCollection>();
 
-        Assert.AreEqual(3, values.Count());
-        Assert.IsTrue(values.Select(x => x.GetType())
-            .ContainsAll(new[] { typeof(TransientObject1), typeof(TransientObject2), typeof(TransientObject3) }));
+        Assert.That(values.Count(), Is.EqualTo(3));
+        Assert.That(values.Select(x => x.GetType())
+            .ContainsAll(new[] { typeof(TransientObject1), typeof(TransientObject2), typeof(TransientObject3) }), Is.True);
 
         var other = factory.GetRequiredService<TestCollection>();
-        Assert.AreNotSame(values, other); // transient
+        Assert.That(other, Is.Not.SameAs(values)); // transient
         var o1 = other.FirstOrDefault(x => x is TransientObject1);
-        Assert.IsFalse(values.Contains(o1)); // transient
+        Assert.That(values, Does.Not.Contain(o1)); // transient
     }
 
     [Test]
@@ -93,14 +93,14 @@ public class LazyCollectionBuilderTests
 
         var values = factory.GetRequiredService<TestCollection>();
 
-        Assert.AreEqual(3, values.Count());
-        Assert.IsTrue(values.Select(x => x.GetType())
-            .ContainsAll(new[] { typeof(TransientObject1), typeof(TransientObject2), typeof(TransientObject3) }));
+        Assert.That(values.Count(), Is.EqualTo(3));
+        Assert.That(values.Select(x => x.GetType())
+            .ContainsAll(new[] { typeof(TransientObject1), typeof(TransientObject2), typeof(TransientObject3) }), Is.True);
 
         var other = factory.GetRequiredService<TestCollection>();
-        Assert.AreNotSame(values, other); // transient
+        Assert.That(other, Is.Not.SameAs(values)); // transient
         var o1 = other.FirstOrDefault(x => x is TransientObject1);
-        Assert.IsFalse(values.Contains(o1)); // transient
+        Assert.That(values, Does.Not.Contain(o1)); // transient
     }
 
     [Test]
@@ -140,16 +140,16 @@ public class LazyCollectionBuilderTests
 
         var values = factory.GetRequiredService<TestCollection>();
 
-        Assert.AreEqual(2, values.Count());
-        Assert.IsFalse(values.Select(x => x.GetType())
-            .Contains(typeof(TransientObject3)));
-        Assert.IsTrue(values.Select(x => x.GetType())
-            .ContainsAll(new[] { typeof(TransientObject1), typeof(TransientObject2) }));
+        Assert.That(values.Count(), Is.EqualTo(2));
+        Assert.That(values.Select(x => x.GetType())
+, Does.Not.Contain(typeof(TransientObject3)));
+        Assert.That(values.Select(x => x.GetType())
+            .ContainsAll(new[] { typeof(TransientObject1), typeof(TransientObject2) }), Is.True);
 
         var other = factory.GetRequiredService<TestCollection>();
-        Assert.AreNotSame(values, other); // transient
+        Assert.That(other, Is.Not.SameAs(values)); // transient
         var o1 = other.FirstOrDefault(x => x is TransientObject1);
-        Assert.IsFalse(values.Contains(o1)); // transient
+        Assert.That(values, Does.Not.Contain(o1)); // transient
     }
 
     private interface ITestInterface

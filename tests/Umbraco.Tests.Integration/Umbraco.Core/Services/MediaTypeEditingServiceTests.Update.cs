@@ -19,19 +19,19 @@ internal sealed partial class MediaTypeEditingServiceTests
         updateModel.AllowedAsRoot = false;
 
         var result = await MediaTypeEditingService.UpdateAsync(mediaType, updateModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
 
         // Ensure it's actually persisted
         mediaType = await MediaTypeService.GetAsync(result.Result!.Key);
-        Assert.IsNotNull(mediaType);
+        Assert.That(mediaType, Is.Not.Null);
 
-        Assert.AreEqual("testUpdated", mediaType.Alias);
-        Assert.AreEqual("Test updated", mediaType.Name);
-        Assert.AreEqual(result.Result.Id, mediaType.Id);
-        Assert.AreEqual(result.Result.Key, mediaType.Key);
-        Assert.AreEqual("This is the Test description updated", mediaType.Description);
-        Assert.AreEqual("icon icon-something-updated", mediaType.Icon);
-        Assert.IsFalse(mediaType.AllowedAsRoot);
+        Assert.That(mediaType.Alias, Is.EqualTo("testUpdated"));
+        Assert.That(mediaType.Name, Is.EqualTo("Test updated"));
+        Assert.That(mediaType.Id, Is.EqualTo(result.Result.Id));
+        Assert.That(mediaType.Key, Is.EqualTo(result.Result.Key));
+        Assert.That(mediaType.Description, Is.EqualTo("This is the Test description updated"));
+        Assert.That(mediaType.Icon, Is.EqualTo("icon icon-something-updated"));
+        Assert.That(mediaType.AllowedAsRoot, Is.False);
     }
 
     [Test]
@@ -57,17 +57,17 @@ internal sealed partial class MediaTypeEditingServiceTests
         };
 
         var result = await MediaTypeEditingService.UpdateAsync(mediaType, updateModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.IsNotNull(result.Result);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.Not.Null);
 
         mediaType = await MediaTypeService.GetAsync(result.Result.Key);
-        Assert.IsNotNull(mediaType);
+        Assert.That(mediaType, Is.Not.Null);
 
         var allowedContentTypes = mediaType.AllowedContentTypes?.ToArray();
-        Assert.IsNotNull(allowedContentTypes);
-        Assert.AreEqual(2, allowedContentTypes.Length);
-        Assert.IsTrue(allowedContentTypes.Any(c => c.Key == allowedTwo.Key && c.SortOrder == 0 && c.Alias == allowedTwo.Alias));
-        Assert.IsTrue(allowedContentTypes.Any(c => c.Key == allowedThree.Key && c.SortOrder == 1 && c.Alias == allowedThree.Alias));
+        Assert.That(allowedContentTypes, Is.Not.Null);
+        Assert.That(allowedContentTypes, Has.Length.EqualTo(2));
+        Assert.That(allowedContentTypes.Any(c => c.Key == allowedTwo.Key && c.SortOrder == 0 && c.Alias == allowedTwo.Alias), Is.True);
+        Assert.That(allowedContentTypes.Any(c => c.Key == allowedThree.Key && c.SortOrder == 1 && c.Alias == allowedThree.Alias), Is.True);
     }
 
     [Test]
@@ -91,28 +91,28 @@ internal sealed partial class MediaTypeEditingServiceTests
         updateModel.Properties = new[] { propertyType, propertyType2 };
 
         var result = await MediaTypeEditingService.UpdateAsync(mediaType, updateModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.IsNotNull(result.Result);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.Not.Null);
 
         // Ensure it's actually persisted
         mediaType = await MediaTypeService.GetAsync(result.Result!.Key);
 
-        Assert.IsNotNull(mediaType);
-        Assert.AreEqual(2, mediaType.PropertyTypes.Count());
+        Assert.That(mediaType, Is.Not.Null);
+        Assert.That(mediaType.PropertyTypes.Count(), Is.EqualTo(2));
 
         var property1 = mediaType.PropertyTypes.First();
-        Assert.AreEqual("Test Property 2", property1.Name);
-        Assert.AreEqual("testProperty2", property1.Alias);
-        Assert.AreEqual("The description 2", property1.Description);
-        Assert.AreEqual(5, property1.SortOrder);
+        Assert.That(property1.Name, Is.EqualTo("Test Property 2"));
+        Assert.That(property1.Alias, Is.EqualTo("testProperty2"));
+        Assert.That(property1.Description, Is.EqualTo("The description 2"));
+        Assert.That(property1.SortOrder, Is.EqualTo(5));
         var property2 = mediaType.PropertyTypes.Last();
-        Assert.AreEqual("Test Property Updated", property2.Name);
-        Assert.AreEqual("testProperty", property2.Alias);
-        Assert.AreEqual("The updated description", property2.Description);
-        Assert.AreEqual(originalPropertyTypeKey, property2.Key);
-        Assert.AreEqual(10, property2.SortOrder);
+        Assert.That(property2.Name, Is.EqualTo("Test Property Updated"));
+        Assert.That(property2.Alias, Is.EqualTo("testProperty"));
+        Assert.That(property2.Description, Is.EqualTo("The updated description"));
+        Assert.That(property2.Key, Is.EqualTo(originalPropertyTypeKey));
+        Assert.That(property2.SortOrder, Is.EqualTo(10));
 
-        Assert.AreEqual(2, mediaType.NoGroupPropertyTypes.Count());
+        Assert.That(mediaType.NoGroupPropertyTypes.Count(), Is.EqualTo(2));
     }
 
     [TestCase(Constants.Conventions.MediaTypes.File)]
@@ -121,15 +121,15 @@ internal sealed partial class MediaTypeEditingServiceTests
     public async Task Cannot_Change_Alias_Of_System_Media_Type(string mediaTypeAlias)
     {
         var mediaType = MediaTypeService.Get(mediaTypeAlias);
-        Assert.IsNotNull(mediaType);
+        Assert.That(mediaType, Is.Not.Null);
 
         var updateModel = MediaTypeUpdateModel(mediaTypeAlias, $"{mediaTypeAlias}_updated");
         var result = await MediaTypeEditingService.UpdateAsync(mediaType, updateModel, Constants.Security.SuperUserKey);
 
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(result.Success);
-            Assert.AreEqual(ContentTypeOperationStatus.SystemAliasChangeNotAllowed, result.Status);
+            Assert.That(result.Success, Is.False);
+            Assert.That(result.Status, Is.EqualTo(ContentTypeOperationStatus.SystemAliasChangeNotAllowed));
         });
     }
 }

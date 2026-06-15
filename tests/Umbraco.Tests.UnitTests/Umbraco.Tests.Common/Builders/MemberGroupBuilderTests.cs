@@ -34,11 +34,11 @@ public class MemberGroupBuilderTests
             .Build();
 
         // Assert
-        Assert.AreEqual(testId, group.Id);
-        Assert.AreEqual(testKey, group.Key);
-        Assert.AreEqual(testName, group.Name);
-        Assert.AreEqual(testCreateDate, group.CreateDate);
-        Assert.AreEqual(testUpdateDate, group.UpdateDate);
-        Assert.AreEqual(testCreatorId, group.CreatorId);
+        Assert.That(group.Id, Is.EqualTo(testId));
+        Assert.That(group.Key, Is.EqualTo(testKey));
+        Assert.That(group.Name, Is.EqualTo(testName));
+        Assert.That(group.CreateDate, Is.EqualTo(testCreateDate));
+        Assert.That(group.UpdateDate, Is.EqualTo(testUpdateDate));
+        Assert.That(group.CreatorId, Is.EqualTo(testCreatorId));
     }
 }

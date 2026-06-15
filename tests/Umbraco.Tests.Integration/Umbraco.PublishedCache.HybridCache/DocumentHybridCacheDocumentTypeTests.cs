@@ -31,14 +31,14 @@ internal sealed class DocumentHybridCacheDocumentTypeTests : UmbracoIntegrationT
     {
         // Act
         var oldTextPage = await PublishedContentHybridCache.GetByIdAsync(TextpageId, true);
-        Assert.IsNotNull(oldTextPage.Value("title"));
+        Assert.That(oldTextPage.Value("title"), Is.Not.Null);
 
         ContentType.RemovePropertyType("title");
         await ContentTypeService.UpdateAsync(ContentType, Constants.Security.SuperUserKey);
 
         // Assert
         var newTextPage = await PublishedContentHybridCache.GetByIdAsync(TextpageId, true);
-        Assert.IsNull(newTextPage.Value("title"));
+        Assert.That(newTextPage.Value("title"), Is.Null);
     }
 
     [Test]
@@ -52,7 +52,7 @@ internal sealed class DocumentHybridCacheDocumentTypeTests : UmbracoIntegrationT
 
         //Assert
         var newTextPage = await PublishedContentHybridCache.GetByIdAsync(Textpage.Key.Value, true);
-        Assert.IsNull(newTextPage.Value("title"));
+        Assert.That(newTextPage.Value("title"), Is.Null);
     }
 
     [Test]
@@ -60,9 +60,9 @@ internal sealed class DocumentHybridCacheDocumentTypeTests : UmbracoIntegrationT
     {
         // Arrange - load content into cache and verify the title property has a value.
         var oldTextPage = await PublishedContentHybridCache.GetByIdAsync(TextpageId, true);
-        Assert.IsNotNull(oldTextPage);
+        Assert.That(oldTextPage, Is.Not.Null);
         var originalTitle = oldTextPage.Value("title");
-        Assert.IsNotNull(originalTitle);
+        Assert.That(originalTitle, Is.Not.Null);
 
         // Act - perform a non-structural change (rename the content type).
         ContentType.Name = "Renamed Textpage";
@@ -70,8 +70,8 @@ internal sealed class DocumentHybridCacheDocumentTypeTests : UmbracoIntegrationT
 
         // Assert - property values should still be available from cache.
         var newTextPage = await PublishedContentHybridCache.GetByIdAsync(TextpageId, true);
-        Assert.IsNotNull(newTextPage);
-        Assert.AreEqual(originalTitle, newTextPage.Value("title"));
+        Assert.That(newTextPage, Is.Not.Null);
+        Assert.That(newTextPage.Value("title"), Is.EqualTo(originalTitle));
     }
 
     [Test]
@@ -79,9 +79,9 @@ internal sealed class DocumentHybridCacheDocumentTypeTests : UmbracoIntegrationT
     {
         // Arrange - load content into cache by key and verify the title property has a value.
         var oldTextPage = await PublishedContentHybridCache.GetByIdAsync(Textpage.Key.Value, true);
-        Assert.IsNotNull(oldTextPage);
+        Assert.That(oldTextPage, Is.Not.Null);
         var originalTitle = oldTextPage.Value("title");
-        Assert.IsNotNull(originalTitle);
+        Assert.That(originalTitle, Is.Not.Null);
 
         // Act - perform a non-structural change (update the description).
         ContentType.Description = "Updated description";
@@ -89,8 +89,8 @@ internal sealed class DocumentHybridCacheDocumentTypeTests : UmbracoIntegrationT
 
         // Assert - property values should still be available from cache.
         var newTextPage = await PublishedContentHybridCache.GetByIdAsync(Textpage.Key.Value, true);
-        Assert.IsNotNull(newTextPage);
-        Assert.AreEqual(originalTitle, newTextPage.Value("title"));
+        Assert.That(newTextPage, Is.Not.Null);
+        Assert.That(newTextPage.Value("title"), Is.EqualTo(originalTitle));
     }
 
     [Test]
@@ -98,11 +98,11 @@ internal sealed class DocumentHybridCacheDocumentTypeTests : UmbracoIntegrationT
     {
         // Load into cache
         var textPage = await PublishedContentHybridCache.GetByIdAsync(Textpage.Key.Value, preview: true);
-        Assert.IsNotNull(textPage);
+        Assert.That(textPage, Is.Not.Null);
 
         await ContentTypeService.DeleteAsync(textPage.ContentType.Key, Constants.Security.SuperUserKey);
 
         var textPageAgain = await PublishedContentHybridCache.GetByIdAsync(Textpage.Key.Value, preview: true);
-        Assert.IsNull(textPageAgain);
+        Assert.That(textPageAgain, Is.Null);
     }
 }

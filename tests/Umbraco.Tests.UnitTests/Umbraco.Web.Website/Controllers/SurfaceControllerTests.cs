@@ -50,7 +50,7 @@ public class SurfaceControllerTests
 
         var result = ctrl.Index();
 
-        Assert.IsNotNull(result);
+        Assert.That(result, Is.Not.Null);
     }
 
     [Test]
@@ -67,7 +67,7 @@ public class SurfaceControllerTests
 
         var ctrl = new TestSurfaceController(umbracoContextAccessor, Mock.Of<IPublishedContentQuery>(), Mock.Of<IPublishedUrlProvider>());
 
-        Assert.IsNotNull(ctrl.UmbracoContext);
+        Assert.That(ctrl.UmbracoContext, Is.Not.Null);
     }
 
     [Test]
@@ -90,9 +90,9 @@ public class SurfaceControllerTests
         var ctrl = new TestSurfaceController(umbracoContextAccessor, publishedContentQuery, Mock.Of<IPublishedUrlProvider>());
         var result = ctrl.GetContent(2) as PublishedContentResult;
 
-        Assert.IsNotNull(result);
-        Assert.IsNotNull(result.Content);
-        Assert.AreEqual(2, result.Content.Id);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Content, Is.Not.Null);
+        Assert.That(result.Content.Id, Is.EqualTo(2));
     }
 
     [Test]
@@ -125,7 +125,7 @@ public class SurfaceControllerTests
 
         var result = ctrl.GetContentFromCurrentPage() as PublishedContentResult;
 
-        Assert.AreEqual(12345, result.Content.Id);
+        Assert.That(result.Content.Id, Is.EqualTo(12345));
     }
 
     public class TestSurfaceController : SurfaceController

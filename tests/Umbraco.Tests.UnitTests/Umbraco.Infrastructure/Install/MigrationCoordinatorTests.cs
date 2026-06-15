@@ -46,7 +46,7 @@ public class MigrationCoordinatorTests
         var sut = CreateSut();
         var result = await sut.TryBecomeLeaderAsync(CancellationToken.None);
 
-        Assert.IsTrue(result);
+        Assert.That(result, Is.True);
         _keyValueServiceMock.Verify(
             x => x.SetValue(
                 Constants.Conventions.Migrations.UpgradeLockKey,
@@ -65,7 +65,7 @@ public class MigrationCoordinatorTests
         var sut = CreateSut(claimTimeout: TimeSpan.FromHours(2));
         var result = await sut.TryBecomeLeaderAsync(CancellationToken.None);
 
-        Assert.IsTrue(result);
+        Assert.That(result, Is.True);
         _keyValueServiceMock.Verify(
             x => x.SetValue(
                 Constants.Conventions.Migrations.UpgradeLockKey,
@@ -84,7 +84,7 @@ public class MigrationCoordinatorTests
         var sut = CreateSut();
         var result = await sut.TryBecomeLeaderAsync(CancellationToken.None);
 
-        Assert.IsTrue(result);
+        Assert.That(result, Is.True);
         _keyValueServiceMock.Verify(
             x => x.SetValue(
                 Constants.Conventions.Migrations.UpgradeLockKey,
@@ -117,7 +117,7 @@ public class MigrationCoordinatorTests
         var sut = CreateSut();
         var result = await sut.TryBecomeLeaderAsync(CancellationToken.None);
 
-        Assert.IsFalse(result);
+        Assert.That(result, Is.False);
         // The claim was written then cleared by ReleaseLeadership.
         _keyValueServiceMock.Verify(
             x => x.SetValue(Constants.Conventions.Migrations.UpgradeLockKey, string.Empty),
@@ -140,7 +140,7 @@ public class MigrationCoordinatorTests
         var sut = CreateSut();
         var result = await sut.TryBecomeLeaderAsync(CancellationToken.None);
 
-        Assert.IsFalse(result);
+        Assert.That(result, Is.False);
     }
 
     [Test]
@@ -159,7 +159,7 @@ public class MigrationCoordinatorTests
         var sut = CreateSut();
         var result = await sut.TryBecomeLeaderAsync(CancellationToken.None);
 
-        Assert.IsFalse(result);
+        Assert.That(result, Is.False);
     }
 
     [Test]
@@ -179,7 +179,7 @@ public class MigrationCoordinatorTests
         var sut = CreateSut();
         var result = await sut.TryBecomeLeaderAsync(CancellationToken.None);
 
-        Assert.IsFalse(result);
+        Assert.That(result, Is.False);
     }
 
     [Test]
@@ -191,7 +191,7 @@ public class MigrationCoordinatorTests
         var sut = CreateSut();
         var result = await sut.TryBecomeLeaderAsync(cts.Token);
 
-        Assert.IsFalse(result);
+        Assert.That(result, Is.False);
         _scopeProviderMock.Verify(
             x => x.CreateCoreScope(
                 It.IsAny<IsolationLevel>(),

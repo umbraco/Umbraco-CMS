@@ -28,13 +28,13 @@ public class EmailMessageExtensionsTests
 
         var result = emailMessage.ToMimeMessage(ConfiguredSender);
 
-        Assert.AreEqual(1, result.From.Count());
-        Assert.AreEqual(from, result.From.First().ToString());
-        Assert.AreEqual(1, result.To.Count());
-        Assert.AreEqual(to, result.To.First().ToString());
-        Assert.AreEqual(subject, result.Subject);
-        Assert.IsNull(result.TextBody);
-        Assert.AreEqual(body, result.HtmlBody);
+        Assert.That(result.From.Count(), Is.EqualTo(1));
+        Assert.That(result.From.First().ToString(), Is.EqualTo(from));
+        Assert.That(result.To.Count(), Is.EqualTo(1));
+        Assert.That(result.To.First().ToString(), Is.EqualTo(to));
+        Assert.That(result.Subject, Is.EqualTo(subject));
+        Assert.That(result.TextBody, Is.Null);
+        Assert.That(result.HtmlBody, Is.EqualTo(body));
     }
 
     [Test]
@@ -55,24 +55,24 @@ public class EmailMessageExtensionsTests
 
         var result = emailMessage.ToMimeMessage(ConfiguredSender);
 
-        Assert.AreEqual(1, result.From.Count());
-        Assert.AreEqual(from, result.From.First().ToString());
-        Assert.AreEqual(2, result.To.Count());
-        Assert.AreEqual(to[0], result.To.First().ToString());
-        Assert.AreEqual(to[1], result.To.Skip(1).First().ToString());
-        Assert.AreEqual(2, result.Cc.Count());
-        Assert.AreEqual(cc[0], result.Cc.First().ToString());
-        Assert.AreEqual(cc[1], result.Cc.Skip(1).First().ToString());
-        Assert.AreEqual(3, result.Bcc.Count());
-        Assert.AreEqual(bcc[0], result.Bcc.First().ToString());
-        Assert.AreEqual(bcc[1], result.Bcc.Skip(1).First().ToString());
-        Assert.AreEqual(bcc[2], result.Bcc.Skip(2).First().ToString());
-        Assert.AreEqual(1, result.ReplyTo.Count());
-        Assert.AreEqual(replyTo[0], result.ReplyTo.First().ToString());
-        Assert.AreEqual(subject, result.Subject);
-        Assert.IsNull(result.HtmlBody);
-        Assert.AreEqual(body, result.TextBody);
-        Assert.AreEqual(1, result.Attachments.Count());
+        Assert.That(result.From.Count(), Is.EqualTo(1));
+        Assert.That(result.From.First().ToString(), Is.EqualTo(from));
+        Assert.That(result.To.Count(), Is.EqualTo(2));
+        Assert.That(result.To.First().ToString(), Is.EqualTo(to[0]));
+        Assert.That(result.To.Skip(1).First().ToString(), Is.EqualTo(to[1]));
+        Assert.That(result.Cc.Count(), Is.EqualTo(2));
+        Assert.That(result.Cc.First().ToString(), Is.EqualTo(cc[0]));
+        Assert.That(result.Cc.Skip(1).First().ToString(), Is.EqualTo(cc[1]));
+        Assert.That(result.Bcc.Count(), Is.EqualTo(3));
+        Assert.That(result.Bcc.First().ToString(), Is.EqualTo(bcc[0]));
+        Assert.That(result.Bcc.Skip(1).First().ToString(), Is.EqualTo(bcc[1]));
+        Assert.That(result.Bcc.Skip(2).First().ToString(), Is.EqualTo(bcc[2]));
+        Assert.That(result.ReplyTo.Count(), Is.EqualTo(1));
+        Assert.That(result.ReplyTo.First().ToString(), Is.EqualTo(replyTo[0]));
+        Assert.That(result.Subject, Is.EqualTo(subject));
+        Assert.That(result.HtmlBody, Is.Null);
+        Assert.That(result.TextBody, Is.EqualTo(body));
+        Assert.That(result.Attachments.Count(), Is.EqualTo(1));
     }
 
     [Test]
@@ -86,13 +86,13 @@ public class EmailMessageExtensionsTests
 
         var result = emailMessage.ToMimeMessage(ConfiguredSender);
 
-        Assert.AreEqual(1, result.From.Count());
-        Assert.AreEqual(ConfiguredSender, result.From.First().ToString());
-        Assert.AreEqual(1, result.To.Count());
-        Assert.AreEqual(to, result.To.First().ToString());
-        Assert.AreEqual(subject, result.Subject);
-        Assert.IsNull(result.TextBody);
-        Assert.AreEqual(body, result.HtmlBody);
+        Assert.That(result.From.Count(), Is.EqualTo(1));
+        Assert.That(result.From.First().ToString(), Is.EqualTo(ConfiguredSender));
+        Assert.That(result.To.Count(), Is.EqualTo(1));
+        Assert.That(result.To.First().ToString(), Is.EqualTo(to));
+        Assert.That(result.Subject, Is.EqualTo(subject));
+        Assert.That(result.TextBody, Is.Null);
+        Assert.That(result.HtmlBody, Is.EqualTo(body));
     }
 
     [Test]
@@ -107,15 +107,15 @@ public class EmailMessageExtensionsTests
 
         var result = emailMessage.ToNotificationEmail(ConfiguredSender);
 
-        Assert.AreEqual(from, result.From.Address);
-        Assert.AreEqual(string.Empty, result.From.DisplayName);
-        Assert.AreEqual(1, result.To.Count());
-        Assert.AreEqual(to, result.To.First().Address);
-        Assert.AreEqual(string.Empty, result.To.First().DisplayName);
-        Assert.AreEqual(subject, result.Subject);
-        Assert.AreEqual(body, result.Body);
-        Assert.IsTrue(result.IsBodyHtml);
-        Assert.IsFalse(result.HasAttachments);
+        Assert.That(result.From.Address, Is.EqualTo(from));
+        Assert.That(result.From.DisplayName, Is.EqualTo(string.Empty));
+        Assert.That(result.To.Count(), Is.EqualTo(1));
+        Assert.That(result.To.First().Address, Is.EqualTo(to));
+        Assert.That(result.To.First().DisplayName, Is.EqualTo(string.Empty));
+        Assert.That(result.Subject, Is.EqualTo(subject));
+        Assert.That(result.Body, Is.EqualTo(body));
+        Assert.That(result.IsBodyHtml, Is.True);
+        Assert.That(result.HasAttachments, Is.False);
     }
 
     [Test]
@@ -129,15 +129,15 @@ public class EmailMessageExtensionsTests
 
         var result = emailMessage.ToNotificationEmail(ConfiguredSender);
 
-        Assert.AreEqual(ConfiguredSender, result.From.Address);
-        Assert.AreEqual(string.Empty, result.From.DisplayName);
-        Assert.AreEqual(1, result.To.Count());
-        Assert.AreEqual(to, result.To.First().Address);
-        Assert.AreEqual(string.Empty, result.To.First().DisplayName);
-        Assert.AreEqual(subject, result.Subject);
-        Assert.AreEqual(body, result.Body);
-        Assert.IsTrue(result.IsBodyHtml);
-        Assert.IsFalse(result.HasAttachments);
+        Assert.That(result.From.Address, Is.EqualTo(ConfiguredSender));
+        Assert.That(result.From.DisplayName, Is.EqualTo(string.Empty));
+        Assert.That(result.To.Count(), Is.EqualTo(1));
+        Assert.That(result.To.First().Address, Is.EqualTo(to));
+        Assert.That(result.To.First().DisplayName, Is.EqualTo(string.Empty));
+        Assert.That(result.Subject, Is.EqualTo(subject));
+        Assert.That(result.Body, Is.EqualTo(body));
+        Assert.That(result.IsBodyHtml, Is.True);
+        Assert.That(result.HasAttachments, Is.False);
     }
 
     [Test]
@@ -152,15 +152,15 @@ public class EmailMessageExtensionsTests
 
         var result = emailMessage.ToNotificationEmail(ConfiguredSender);
 
-        Assert.AreEqual("from@from.com", result.From.Address);
-        Assert.AreEqual("From Email", result.From.DisplayName);
-        Assert.AreEqual(1, result.To.Count());
-        Assert.AreEqual("to@to.com", result.To.First().Address);
-        Assert.AreEqual("To Email", result.To.First().DisplayName);
-        Assert.AreEqual(subject, result.Subject);
-        Assert.AreEqual(body, result.Body);
-        Assert.IsTrue(result.IsBodyHtml);
-        Assert.IsFalse(result.HasAttachments);
+        Assert.That(result.From.Address, Is.EqualTo("from@from.com"));
+        Assert.That(result.From.DisplayName, Is.EqualTo("From Email"));
+        Assert.That(result.To.Count(), Is.EqualTo(1));
+        Assert.That(result.To.First().Address, Is.EqualTo("to@to.com"));
+        Assert.That(result.To.First().DisplayName, Is.EqualTo("To Email"));
+        Assert.That(result.Subject, Is.EqualTo(subject));
+        Assert.That(result.Body, Is.EqualTo(body));
+        Assert.That(result.IsBodyHtml, Is.True);
+        Assert.That(result.HasAttachments, Is.False);
     }
 
     [Test]
@@ -181,35 +181,35 @@ public class EmailMessageExtensionsTests
 
         var result = emailMessage.ToNotificationEmail(ConfiguredSender);
 
-        Assert.AreEqual("from@from.com", result.From.Address);
-        Assert.AreEqual("From Email", result.From.DisplayName);
+        Assert.That(result.From.Address, Is.EqualTo("from@from.com"));
+        Assert.That(result.From.DisplayName, Is.EqualTo("From Email"));
 
-        Assert.AreEqual(2, result.To.Count());
-        Assert.AreEqual("to@email.com", result.To.First().Address);
-        Assert.AreEqual(string.Empty, result.To.First().DisplayName);
-        Assert.AreEqual("to2@email.com", result.To.Skip(1).First().Address);
-        Assert.AreEqual("Second Email", result.To.Skip(1).First().DisplayName);
+        Assert.That(result.To.Count(), Is.EqualTo(2));
+        Assert.That(result.To.First().Address, Is.EqualTo("to@email.com"));
+        Assert.That(result.To.First().DisplayName, Is.EqualTo(string.Empty));
+        Assert.That(result.To.Skip(1).First().Address, Is.EqualTo("to2@email.com"));
+        Assert.That(result.To.Skip(1).First().DisplayName, Is.EqualTo("Second Email"));
 
-        Assert.AreEqual(2, result.Cc.Count());
-        Assert.AreEqual("cc@email.com", result.Cc.First().Address);
-        Assert.AreEqual("First CC", result.Cc.First().DisplayName);
-        Assert.AreEqual("cc2@email.com", result.Cc.Skip(1).First().Address);
-        Assert.AreEqual(string.Empty, result.Cc.Skip(1).First().DisplayName);
+        Assert.That(result.Cc.Count(), Is.EqualTo(2));
+        Assert.That(result.Cc.First().Address, Is.EqualTo("cc@email.com"));
+        Assert.That(result.Cc.First().DisplayName, Is.EqualTo("First CC"));
+        Assert.That(result.Cc.Skip(1).First().Address, Is.EqualTo("cc2@email.com"));
+        Assert.That(result.Cc.Skip(1).First().DisplayName, Is.EqualTo(string.Empty));
 
-        Assert.AreEqual(3, result.Bcc.Count());
-        Assert.AreEqual("bcc@email.com", result.Bcc.First().Address);
-        Assert.AreEqual(string.Empty, result.Bcc.First().DisplayName);
-        Assert.AreEqual("bcc2@email.com", result.Bcc.Skip(1).First().Address);
-        Assert.AreEqual(string.Empty, result.Bcc.Skip(1).First().DisplayName);
-        Assert.AreEqual("bcc3@email.com", result.Bcc.Skip(2).First().Address);
-        Assert.AreEqual("Third BCC", result.Bcc.Skip(2).First().DisplayName);
+        Assert.That(result.Bcc.Count(), Is.EqualTo(3));
+        Assert.That(result.Bcc.First().Address, Is.EqualTo("bcc@email.com"));
+        Assert.That(result.Bcc.First().DisplayName, Is.EqualTo(string.Empty));
+        Assert.That(result.Bcc.Skip(1).First().Address, Is.EqualTo("bcc2@email.com"));
+        Assert.That(result.Bcc.Skip(1).First().DisplayName, Is.EqualTo(string.Empty));
+        Assert.That(result.Bcc.Skip(2).First().Address, Is.EqualTo("bcc3@email.com"));
+        Assert.That(result.Bcc.Skip(2).First().DisplayName, Is.EqualTo("Third BCC"));
 
-        Assert.AreEqual(1, result.ReplyTo.Count());
-        Assert.AreEqual("replyto@email.com", result.ReplyTo.First().Address);
-        Assert.AreEqual(string.Empty, result.ReplyTo.First().DisplayName);
+        Assert.That(result.ReplyTo.Count(), Is.EqualTo(1));
+        Assert.That(result.ReplyTo.First().Address, Is.EqualTo("replyto@email.com"));
+        Assert.That(result.ReplyTo.First().DisplayName, Is.EqualTo(string.Empty));
 
-        Assert.AreEqual(subject, result.Subject);
-        Assert.AreEqual(body, result.Body);
-        Assert.AreEqual(1, result.Attachments.Count());
+        Assert.That(result.Subject, Is.EqualTo(subject));
+        Assert.That(result.Body, Is.EqualTo(body));
+        Assert.That(result.Attachments.Count(), Is.EqualTo(1));
     }
 }

@@ -21,7 +21,7 @@ internal class UserStartNodeTreeFilterServiceTests
     {
         var sut = CreateService([Constants.System.Root], []);
 
-        Assert.IsTrue(sut.ShouldBypassStartNodeFiltering());
+        Assert.That(sut.ShouldBypassStartNodeFiltering(), Is.True);
     }
 
     [Test]
@@ -29,7 +29,7 @@ internal class UserStartNodeTreeFilterServiceTests
     {
         var sut = CreateService([1234], []);
 
-        Assert.IsFalse(sut.ShouldBypassStartNodeFiltering());
+        Assert.That(sut.ShouldBypassStartNodeFiltering(), Is.False);
     }
 
     [Test]
@@ -40,7 +40,7 @@ internal class UserStartNodeTreeFilterServiceTests
 
         var sut = CreateService([1234], []);
 
-        Assert.IsTrue(sut.ShouldBypassStartNodeFiltering(dataTypeKey));
+        Assert.That(sut.ShouldBypassStartNodeFiltering(dataTypeKey), Is.True);
     }
 
     [Test]
@@ -51,7 +51,7 @@ internal class UserStartNodeTreeFilterServiceTests
 
         var sut = CreateService([1234], []);
 
-        Assert.IsFalse(sut.ShouldBypassStartNodeFiltering(dataTypeKey));
+        Assert.That(sut.ShouldBypassStartNodeFiltering(dataTypeKey), Is.False);
     }
 
     [Test]
@@ -76,9 +76,9 @@ internal class UserStartNodeTreeFilterServiceTests
             e => $"access:{e.Key}",
             e => $"no-access:{e.Key}");
 
-        Assert.AreEqual(2, result.Length);
-        Assert.AreEqual($"access:{entityWithAccess.Key}", result[0]);
-        Assert.AreEqual($"no-access:{entityWithoutAccess.Key}", result[1]);
+        Assert.That(result.Length, Is.EqualTo(2));
+        Assert.That(result[0], Is.EqualTo($"access:{entityWithAccess.Key}"));
+        Assert.That(result[1], Is.EqualTo($"no-access:{entityWithoutAccess.Key}"));
     }
 
     [Test]
@@ -95,7 +95,7 @@ internal class UserStartNodeTreeFilterServiceTests
             e => $"access:{e.Key}",
             e => $"no-access:{e.Key}");
 
-        Assert.IsEmpty(result);
+        Assert.That(result, Is.Empty);
     }
 
     [Test]
@@ -116,10 +116,10 @@ internal class UserStartNodeTreeFilterServiceTests
 
         var result = sut.GetFilteredRootEntities(out var totalItems);
 
-        Assert.AreEqual(2, result.Length);
-        Assert.AreEqual(2, totalItems);
-        Assert.IsTrue(result[0].HasAccess);
-        Assert.IsFalse(result[1].HasAccess);
+        Assert.That(result.Length, Is.EqualTo(2));
+        Assert.That(totalItems, Is.EqualTo(2));
+        Assert.That(result[0].HasAccess, Is.True);
+        Assert.That(result[1].HasAccess, Is.False);
     }
 
     [Test]
@@ -150,9 +150,9 @@ internal class UserStartNodeTreeFilterServiceTests
 
         var result = sut.GetFilteredChildEntities(parentKey, 0, 50, ordering, out var total);
 
-        Assert.AreEqual(2, result.Length);
-        Assert.IsTrue(result[0].HasAccess);
-        Assert.IsFalse(result[1].HasAccess);
+        Assert.That(result.Length, Is.EqualTo(2));
+        Assert.That(result[0].HasAccess, Is.True);
+        Assert.That(result[1].HasAccess, Is.False);
     }
 
     [Test]
@@ -186,10 +186,10 @@ internal class UserStartNodeTreeFilterServiceTests
 
         var result = sut.GetFilteredSiblingEntities(target, 5, 10, ordering, out _, out _);
 
-        Assert.AreEqual(3, result.Length);
-        Assert.IsFalse(result[0].HasAccess);
-        Assert.IsTrue(result[1].HasAccess);
-        Assert.IsFalse(result[2].HasAccess);
+        Assert.That(result.Length, Is.EqualTo(3));
+        Assert.That(result[0].HasAccess, Is.False);
+        Assert.That(result[1].HasAccess, Is.True);
+        Assert.That(result[2].HasAccess, Is.False);
     }
 
     [Test]
@@ -211,7 +211,7 @@ internal class UserStartNodeTreeFilterServiceTests
 
         sut.GetFilteredRootEntities(out _);
 
-        Assert.AreEqual(treeObjectTypes, capturedObjectTypes);
+        Assert.That(capturedObjectTypes, Is.EqualTo(treeObjectTypes));
     }
 
     private void SetupDataTypeIgnoringStartNodes(Guid dataTypeKey, bool ignores)

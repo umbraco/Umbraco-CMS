@@ -65,7 +65,7 @@ internal sealed class RedirectUrlServiceTests : UmbracoIntegrationTestWithConten
     public void Can_Get_Most_Recent_RedirectUrl()
     {
         var redirect = RedirectUrlService.GetMostRecentRedirectUrl(Url);
-        Assert.AreEqual(redirect.ContentId, _secondSubPage.Id);
+        Assert.That(_secondSubPage.Id, Is.EqualTo(redirect.ContentId));
     }
 
     [Test]
@@ -73,7 +73,7 @@ internal sealed class RedirectUrlServiceTests : UmbracoIntegrationTestWithConten
     public void Can_Get_Most_Recent_RedirectUrl_With_Culture()
     {
         var redirect = RedirectUrlService.GetMostRecentRedirectUrl(Url, CultureEnglish);
-        Assert.AreEqual(redirect.ContentId, _firstSubPage.Id);
+        Assert.That(_firstSubPage.Id, Is.EqualTo(redirect.ContentId));
     }
 
     [Test]
@@ -81,7 +81,7 @@ internal sealed class RedirectUrlServiceTests : UmbracoIntegrationTestWithConten
     public void Can_Get_Most_Recent_RedirectUrl_With_Culture_When_No_CultureVariant_Exists()
     {
         var redirect = RedirectUrlService.GetMostRecentRedirectUrl(UrlAlt, UnusedCulture);
-        Assert.AreEqual(redirect.ContentId, _thirdSubPage.Id);
+        Assert.That(_thirdSubPage.Id, Is.EqualTo(redirect.ContentId));
     }
 
     [Test]
@@ -93,6 +93,6 @@ internal sealed class RedirectUrlServiceTests : UmbracoIntegrationTestWithConten
 
         var redirect = RedirectUrlService.GetMostRecentRedirectUrl(TestUrl, CultureEnglish);
 
-        Assert.AreEqual(redirect.ContentId, _firstSubPage.Id);
+        Assert.That(_firstSubPage.Id, Is.EqualTo(redirect.ContentId));
     }
 }

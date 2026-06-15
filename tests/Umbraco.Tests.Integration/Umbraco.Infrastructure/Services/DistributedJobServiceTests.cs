@@ -47,12 +47,12 @@ internal sealed class DistributedJobServiceTests : UmbracoIntegrationTest
         var job = await DistributedJobService.TryTakeRunnableAsync();
 
         // Assert
-        Assert.IsNotNull(job);
-        Assert.AreEqual(TestJobName, job!.Name);
+        Assert.That(job, Is.Not.Null);
+        Assert.That(job!.Name, Is.EqualTo(TestJobName));
 
         // Verify the job is now marked as running
         var jobState = GetJobState(TestJobName);
-        Assert.IsTrue(jobState.IsRunning);
+        Assert.That(jobState.IsRunning, Is.True);
     }
 
     [Test]
@@ -68,7 +68,7 @@ internal sealed class DistributedJobServiceTests : UmbracoIntegrationTest
         var job = await DistributedJobService.TryTakeRunnableAsync();
 
         // Assert
-        Assert.IsNull(job);
+        Assert.That(job, Is.Null);
     }
 
     [Test]
@@ -88,7 +88,7 @@ internal sealed class DistributedJobServiceTests : UmbracoIntegrationTest
         var job = await DistributedJobService.TryTakeRunnableAsync();
 
         // Assert - Should NOT pick up the job because it's running and hasn't timed out
-        Assert.IsNull(job);
+        Assert.That(job, Is.Null);
     }
 
     [Test]
@@ -109,8 +109,8 @@ internal sealed class DistributedJobServiceTests : UmbracoIntegrationTest
         var job = await DistributedJobService.TryTakeRunnableAsync();
 
         // Assert - Should pick up the job because it has timed out (stale recovery)
-        Assert.IsNotNull(job);
-        Assert.AreEqual(TestJobName, job!.Name);
+        Assert.That(job, Is.Not.Null);
+        Assert.That(job!.Name, Is.EqualTo(TestJobName));
     }
 
     [Test]
@@ -121,7 +121,7 @@ internal sealed class DistributedJobServiceTests : UmbracoIntegrationTest
         SetJobState(TestJobName, lastRun: DateTime.UtcNow - TestJobPeriod - TimeSpan.FromMinutes(1), isRunning: false);
 
         var job = await DistributedJobService.TryTakeRunnableAsync();
-        Assert.IsNotNull(job);
+        Assert.That(job, Is.Not.Null);
 
         var beforeFinish = DateTime.UtcNow;
 
@@ -130,9 +130,9 @@ internal sealed class DistributedJobServiceTests : UmbracoIntegrationTest
 
         // Assert
         var jobState = GetJobState(TestJobName);
-        Assert.IsFalse(jobState.IsRunning);
-        Assert.GreaterOrEqual(jobState.LastRun, beforeFinish);
-        Assert.GreaterOrEqual(jobState.LastAttemptedRun, beforeFinish);
+        Assert.That(jobState.IsRunning, Is.False);
+        Assert.That(jobState.LastRun, Is.GreaterThanOrEqualTo(beforeFinish));
+        Assert.That(jobState.LastAttemptedRun, Is.GreaterThanOrEqualTo(beforeFinish));
     }
 
     [Test]
@@ -143,8 +143,8 @@ internal sealed class DistributedJobServiceTests : UmbracoIntegrationTest
 
         // Assert
         var jobState = GetJobState(TestJobName);
-        Assert.IsNotNull(jobState);
-        Assert.AreEqual(TestJobPeriod.Ticks, jobState.Period);
+        Assert.That(jobState, Is.Not.Null);
+        Assert.That(jobState.Period, Is.EqualTo(TestJobPeriod.Ticks));
     }
 
     [Test]
@@ -158,13 +158,13 @@ internal sealed class DistributedJobServiceTests : UmbracoIntegrationTest
 
         // Act - Take the first job
         var job1 = await DistributedJobService.TryTakeRunnableAsync();
-        Assert.IsNotNull(job1);
+        Assert.That(job1, Is.Not.Null);
 
         // Act - Try to take another job (same job is now running, so should return null if no other jobs are due)
         var job2 = await DistributedJobService.TryTakeRunnableAsync();
 
         // Assert - Should be null because the only test job is now running
-        Assert.IsNull(job2);
+        Assert.That(job2, Is.Null);
     }
 
     [Test]
@@ -186,7 +186,7 @@ internal sealed class DistributedJobServiceTests : UmbracoIntegrationTest
         var job = await DistributedJobService.TryTakeRunnableAsync();
 
         // Assert - Should NOT pick up because it hasn't quite timed out yet
-        Assert.IsNull(job);
+        Assert.That(job, Is.Null);
     }
 
     [Test]
@@ -200,15 +200,15 @@ internal sealed class DistributedJobServiceTests : UmbracoIntegrationTest
         InsertJob(orphanedJobName, TimeSpan.FromHours(1));
 
         // Verify both jobs exist
-        Assert.IsNotNull(GetJobStateOrDefault(TestJobName));
-        Assert.IsNotNull(GetJobStateOrDefault(orphanedJobName));
+        Assert.That(GetJobStateOrDefault(TestJobName), Is.Not.Null);
+        Assert.That(GetJobStateOrDefault(orphanedJobName), Is.Not.Null);
 
         // Act - EnsureJobsAsync should remove the orphaned job
         await DistributedJobService.EnsureJobsAsync();
 
         // Assert
-        Assert.IsNotNull(GetJobStateOrDefault(TestJobName)); // Registered job still exists
-        Assert.IsNull(GetJobStateOrDefault(orphanedJobName)); // Orphaned job was removed
+        Assert.That(GetJobStateOrDefault(TestJobName), Is.Not.Null); // Registered job still exists
+        Assert.That(GetJobStateOrDefault(orphanedJobName), Is.Null); // Orphaned job was removed
     }
 
     [Test]
@@ -224,14 +224,14 @@ internal sealed class DistributedJobServiceTests : UmbracoIntegrationTest
 
         // Verify the period was changed
         var beforeUpdate = GetJobState(TestJobName);
-        Assert.AreEqual(differentPeriod.Ticks, beforeUpdate.Period);
+        Assert.That(beforeUpdate.Period, Is.EqualTo(differentPeriod.Ticks));
 
         // Act - EnsureJobsAsync should update the period back to the registered value
         await DistributedJobService.EnsureJobsAsync();
 
         // Assert - Period should be restored to the registered value
         var afterUpdate = GetJobState(TestJobName);
-        Assert.AreEqual(originalPeriod.Ticks, afterUpdate.Period);
+        Assert.That(afterUpdate.Period, Is.EqualTo(originalPeriod.Ticks));
     }
 
     [Test]
@@ -248,9 +248,9 @@ internal sealed class DistributedJobServiceTests : UmbracoIntegrationTest
         var afterThird = GetJobState(TestJobName);
 
         // Assert - Job should still exist with same properties
-        Assert.AreEqual(afterFirst.Id, afterSecond.Id);
-        Assert.AreEqual(afterSecond.Id, afterThird.Id);
-        Assert.AreEqual(TestJobPeriod.Ticks, afterThird.Period);
+        Assert.That(afterSecond.Id, Is.EqualTo(afterFirst.Id));
+        Assert.That(afterThird.Id, Is.EqualTo(afterSecond.Id));
+        Assert.That(afterThird.Period, Is.EqualTo(TestJobPeriod.Ticks));
     }
 
     private void SetJobState(string jobName, DateTime lastRun, bool isRunning, DateTime? lastAttemptedRun = null)

@@ -16,7 +16,7 @@ public class RequestHeaderHandlerTests
 
         var sut = new TestRequestHeaderHandler(httpContextAccessor);
 
-        Assert.IsNull(sut.TestGetHeaderValue(HeaderName));
+        Assert.That(sut.TestGetHeaderValue(HeaderName), Is.Null);
     }
 
     [Test]
@@ -33,7 +33,7 @@ public class RequestHeaderHandlerTests
 
         var sut = new TestRequestHeaderHandler(httpContextAccessor);
 
-        Assert.AreEqual(headerValue, sut.TestGetHeaderValue(HeaderName));
+        Assert.That(sut.TestGetHeaderValue(HeaderName), Is.EqualTo(headerValue));
     }
 }
 

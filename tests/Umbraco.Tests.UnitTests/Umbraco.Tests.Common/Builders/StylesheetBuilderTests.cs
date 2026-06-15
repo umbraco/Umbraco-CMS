@@ -27,7 +27,7 @@ public class StylesheetBuilderTests
             .Build();
 
         // Assert
-        Assert.AreEqual(Path.DirectorySeparatorChar + Path.Combine("css", "styles.css"), stylesheet.Path);
-        Assert.AreEqual(testContent, stylesheet.Content);
+        Assert.That(stylesheet.Path, Is.EqualTo(Path.DirectorySeparatorChar + Path.Combine("css", "styles.css")));
+        Assert.That(stylesheet.Content, Is.EqualTo(testContent));
     }
 }

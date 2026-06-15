@@ -84,7 +84,7 @@ internal sealed partial class DocumentNavigationServiceTests : DocumentNavigatio
         var nodeExists = DocumentNavigationQueryService.TryGetParentKey(notCreatedRootKey, out _);
 
         // Assert
-        Assert.IsFalse(nodeExists);
+        Assert.That(nodeExists, Is.False);
     }
 
     [Test]
@@ -121,9 +121,9 @@ internal sealed partial class DocumentNavigationServiceTests : DocumentNavigatio
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(1, initialRootOfTypeList.Count); // Verify that loaded doc types can be used to filter
-            Assert.AreEqual(2, filteredRootList.Count); // Verify that new doc type can be used to filter
-            Assert.AreEqual(3, allRootList.Count);
+            Assert.That(initialRootOfTypeList, Has.Count.EqualTo(1)); // Verify that loaded doc types can be used to filter
+            Assert.That(filteredRootList, Has.Count.EqualTo(2)); // Verify that new doc type can be used to filter
+            Assert.That(allRootList, Has.Count.EqualTo(3));
         });
     }
 
@@ -159,9 +159,9 @@ internal sealed partial class DocumentNavigationServiceTests : DocumentNavigatio
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(3, initialChildrenOfTypeList.Count); // Verify that loaded doc types can be used to filter
-            Assert.AreEqual(1, filteredChildrenList.Count); // Verify that new doc type can be used to filter
-            Assert.AreEqual(4, allChildrenList.Count);
+            Assert.That(initialChildrenOfTypeList, Has.Count.EqualTo(3)); // Verify that loaded doc types can be used to filter
+            Assert.That(filteredChildrenList, Has.Count.EqualTo(1)); // Verify that new doc type can be used to filter
+            Assert.That(allChildrenList, Has.Count.EqualTo(4));
         });
     }
 
@@ -197,9 +197,9 @@ internal sealed partial class DocumentNavigationServiceTests : DocumentNavigatio
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(2, initialDescendantsOfTypeList.Count); // Verify that loaded doc types can be used to filter
-            Assert.AreEqual(1, filteredDescendantsList.Count); // Verify that new doc type can be used to filter
-            Assert.AreEqual(3, allDescendantsList.Count);
+            Assert.That(initialDescendantsOfTypeList, Has.Count.EqualTo(2)); // Verify that loaded doc types can be used to filter
+            Assert.That(filteredDescendantsList, Has.Count.EqualTo(1)); // Verify that new doc type can be used to filter
+            Assert.That(allDescendantsList, Has.Count.EqualTo(3));
         });
     }
 
@@ -238,9 +238,9 @@ internal sealed partial class DocumentNavigationServiceTests : DocumentNavigatio
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(3, ancestorsKeysOfOriginalTypeList.Count); // Verify that loaded doc types can be used to filter
-            Assert.AreEqual(1, ancestorsKeysOfNewTypeList.Count); // Verify that new doc type can be used to filter
-            Assert.AreEqual(4, allAncestorsList.Count);
+            Assert.That(ancestorsKeysOfOriginalTypeList, Has.Count.EqualTo(3)); // Verify that loaded doc types can be used to filter
+            Assert.That(ancestorsKeysOfNewTypeList, Has.Count.EqualTo(1)); // Verify that new doc type can be used to filter
+            Assert.That(allAncestorsList, Has.Count.EqualTo(4));
         });
     }
 
@@ -276,9 +276,9 @@ internal sealed partial class DocumentNavigationServiceTests : DocumentNavigatio
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(2, initialSiblingsOfTypeList.Count); // Verify that loaded doc types can be used to filter
-            Assert.AreEqual(1, filteredSiblingsList.Count); // Verify that new doc type can be used to filter
-            Assert.AreEqual(3, allSiblingsList.Count);
+            Assert.That(initialSiblingsOfTypeList, Has.Count.EqualTo(2)); // Verify that loaded doc types can be used to filter
+            Assert.That(filteredSiblingsList, Has.Count.EqualTo(1)); // Verify that new doc type can be used to filter
+            Assert.That(allSiblingsList, Has.Count.EqualTo(3));
         });
     }
 
@@ -287,22 +287,22 @@ internal sealed partial class DocumentNavigationServiceTests : DocumentNavigatio
     public void Descendants_Are_In_Top_Down_Order_Of_Structure()
     {
         var result = DocumentNavigationQueryService.TryGetDescendantsKeysOrSelfKeys(Root.Key, out IEnumerable<Guid> descendantsKeys);
-        Assert.IsTrue(result);
+        Assert.That(result, Is.True);
 
         var descendantsKeysAsArray = descendantsKeys.ToArray();
-        Assert.AreEqual(9, descendantsKeysAsArray.Length);
+        Assert.That(descendantsKeysAsArray, Has.Length.EqualTo(9));
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(Root.Key, descendantsKeysAsArray[0]);
-            Assert.AreEqual(Child1.Key, descendantsKeysAsArray[1]);
-            Assert.AreEqual(Grandchild1.Key, descendantsKeysAsArray[2]);
-            Assert.AreEqual(Grandchild2.Key, descendantsKeysAsArray[3]);
-            Assert.AreEqual(Child2.Key, descendantsKeysAsArray[4]);
-            Assert.AreEqual(Grandchild3.Key, descendantsKeysAsArray[5]);
-            Assert.AreEqual(GreatGrandchild1.Key, descendantsKeysAsArray[6]);
-            Assert.AreEqual(Child3.Key, descendantsKeysAsArray[7]);
-            Assert.AreEqual(Grandchild4.Key, descendantsKeysAsArray[8]);
+            Assert.That(descendantsKeysAsArray[0], Is.EqualTo(Root.Key));
+            Assert.That(descendantsKeysAsArray[1], Is.EqualTo(Child1.Key));
+            Assert.That(descendantsKeysAsArray[2], Is.EqualTo(Grandchild1.Key));
+            Assert.That(descendantsKeysAsArray[3], Is.EqualTo(Grandchild2.Key));
+            Assert.That(descendantsKeysAsArray[4], Is.EqualTo(Child2.Key));
+            Assert.That(descendantsKeysAsArray[5], Is.EqualTo(Grandchild3.Key));
+            Assert.That(descendantsKeysAsArray[6], Is.EqualTo(GreatGrandchild1.Key));
+            Assert.That(descendantsKeysAsArray[7], Is.EqualTo(Child3.Key));
+            Assert.That(descendantsKeysAsArray[8], Is.EqualTo(Grandchild4.Key));
         });
     }
 
@@ -311,17 +311,17 @@ internal sealed partial class DocumentNavigationServiceTests : DocumentNavigatio
     public void Ancestors_Are_In_Down_Top_Order()
     {
         var result = DocumentNavigationQueryService.TryGetAncestorsOrSelfKeys(GreatGrandchild1.Key, out IEnumerable<Guid> ancestorsKeys);
-        Assert.IsTrue(result);
+        Assert.That(result, Is.True);
 
         var ancestorKeysAsArray = ancestorsKeys.ToArray();
-        Assert.AreEqual(4, ancestorKeysAsArray.Length);
+        Assert.That(ancestorKeysAsArray, Has.Length.EqualTo(4));
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(GreatGrandchild1.Key, ancestorKeysAsArray[0]);
-            Assert.AreEqual(Grandchild3.Key, ancestorKeysAsArray[1]);
-            Assert.AreEqual(Child2.Key, ancestorKeysAsArray[2]);
-            Assert.AreEqual(Root.Key, ancestorKeysAsArray[3]);
+            Assert.That(ancestorKeysAsArray[0], Is.EqualTo(GreatGrandchild1.Key));
+            Assert.That(ancestorKeysAsArray[1], Is.EqualTo(Grandchild3.Key));
+            Assert.That(ancestorKeysAsArray[2], Is.EqualTo(Child2.Key));
+            Assert.That(ancestorKeysAsArray[3], Is.EqualTo(Root.Key));
         });
     }
 }

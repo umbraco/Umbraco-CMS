@@ -64,7 +64,7 @@ public partial class ContentEditingServiceTests : ContentEditingServiceTestsBase
         createModel.Variants = [new() { Name = childName }];
 
         var child = (await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result.Content!;
-        Assert.AreEqual(root.Id, child.ParentId);
+        Assert.That(child.ParentId, Is.EqualTo(root.Id));
 
         return (root, child);
     }

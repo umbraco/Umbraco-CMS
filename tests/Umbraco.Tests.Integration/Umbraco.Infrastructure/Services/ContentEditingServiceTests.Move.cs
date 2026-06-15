@@ -22,8 +22,8 @@ public partial class ContentEditingServiceTests
 
         if (allowedAtRoot)
         {
-            Assert.IsTrue(result.Success);
-            Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+            Assert.That(result.Success, Is.True);
+            Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.Success));
             VerifyMove(result.Result);
 
             // re-get and re-test
@@ -31,14 +31,14 @@ public partial class ContentEditingServiceTests
 
             void VerifyMove(IContent? movedContent)
             {
-                Assert.IsNotNull(movedContent);
-                Assert.AreEqual(Constants.System.Root, movedContent.ParentId);
+                Assert.That(movedContent, Is.Not.Null);
+                Assert.That(movedContent.ParentId, Is.EqualTo(Constants.System.Root));
             }
         }
         else
         {
-            Assert.IsFalse(result.Success);
-            Assert.AreEqual(ContentEditingOperationStatus.NotAllowed, result.Status);
+            Assert.That(result.Success, Is.False);
+            Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.NotAllowed));
         }
     }
 
@@ -61,8 +61,8 @@ public partial class ContentEditingServiceTests
 
         if (allowedAtParent)
         {
-            Assert.IsTrue(result.Success);
-            Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+            Assert.That(result.Success, Is.True);
+            Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.Success));
             VerifyMove(result.Result);
 
             // re-get and re-test
@@ -70,14 +70,14 @@ public partial class ContentEditingServiceTests
 
             void VerifyMove(IContent? movedContent)
             {
-                Assert.IsNotNull(movedContent);
-                Assert.AreEqual(root2.Id, movedContent.ParentId);
+                Assert.That(movedContent, Is.Not.Null);
+                Assert.That(movedContent.ParentId, Is.EqualTo(root2.Id));
             }
         }
         else
         {
-            Assert.IsFalse(result.Success);
-            Assert.AreEqual(ContentEditingOperationStatus.NotAllowed, result.Status);
+            Assert.That(result.Success, Is.False);
+            Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.NotAllowed));
         }
     }
 
@@ -89,8 +89,8 @@ public partial class ContentEditingServiceTests
         (IContent root2, IContent child2) = await CreateRootAndChildAsync(contentType, "Root 2", "Child 2");
 
         var result = await ContentEditingService.MoveAsync(root1.Key, root2.Key, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.Success));
 
         VerifyMove(result.Result);
 
@@ -98,16 +98,16 @@ public partial class ContentEditingServiceTests
         VerifyMove(await ContentEditingService.GetAsync(result.Result!.Key));
 
         child1 = await ContentEditingService.GetAsync(child1.Key);
-        Assert.IsNotNull(child1);
+        Assert.That(child1, Is.Not.Null);
         var ancestorIds = child1.GetAncestorIds()!.ToArray();
-        Assert.AreEqual(2, ancestorIds.Length);
-        Assert.AreEqual(root2.Id, ancestorIds.First());
-        Assert.AreEqual(root1.Id, ancestorIds.Last());
+        Assert.That(ancestorIds, Has.Length.EqualTo(2));
+        Assert.That(ancestorIds.First(), Is.EqualTo(root2.Id));
+        Assert.That(ancestorIds.Last(), Is.EqualTo(root1.Id));
 
         void VerifyMove(IContent? movedContent)
         {
-            Assert.IsNotNull(movedContent);
-            Assert.AreEqual(root2.Id, movedContent.ParentId);
+            Assert.That(movedContent, Is.Not.Null);
+            Assert.That(movedContent.ParentId, Is.EqualTo(root2.Id));
         }
     }
 
@@ -118,8 +118,8 @@ public partial class ContentEditingServiceTests
         (IContent root, IContent child) = await CreateRootAndChildAsync(contentType);
 
         var result = await ContentEditingService.MoveAsync(child.Key, root.Key, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.Success));
 
         VerifyMove(result.Result);
 
@@ -128,8 +128,8 @@ public partial class ContentEditingServiceTests
 
         void VerifyMove(IContent? movedContent)
         {
-            Assert.IsNotNull(movedContent);
-            Assert.AreEqual(root.Id, movedContent.ParentId);
+            Assert.That(movedContent, Is.Not.Null);
+            Assert.That(movedContent.ParentId, Is.EqualTo(root.Id));
         }
     }
 
@@ -140,8 +140,8 @@ public partial class ContentEditingServiceTests
         (IContent root, IContent child) = await CreateRootAndChildAsync(contentType);
 
         var result = await ContentEditingService.MoveAsync(root.Key, Constants.System.RootKey, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.Success));
 
         VerifyMove(result.Result);
 
@@ -150,8 +150,8 @@ public partial class ContentEditingServiceTests
 
         void VerifyMove(IContent? movedContent)
         {
-            Assert.IsNotNull(movedContent);
-            Assert.AreEqual(Constants.System.Root, movedContent.ParentId);
+            Assert.That(movedContent, Is.Not.Null);
+            Assert.That(movedContent.ParentId, Is.EqualTo(Constants.System.Root));
         }
     }
 
@@ -159,8 +159,8 @@ public partial class ContentEditingServiceTests
     public async Task Cannot_Move_Non_Existing_Content()
     {
         var result = await ContentEditingService.MoveAsync(Guid.NewGuid(), Constants.System.RootKey, Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.NotFound, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.NotFound));
     }
 
     [Test]
@@ -170,8 +170,8 @@ public partial class ContentEditingServiceTests
         (IContent root, IContent child) = await CreateRootAndChildAsync(contentType);
 
         var result = await ContentEditingService.MoveAsync(child.Key, Guid.NewGuid(), Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.ParentNotFound, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.ParentNotFound));
     }
 
     [Test]
@@ -183,8 +183,8 @@ public partial class ContentEditingServiceTests
         await ContentEditingService.MoveToRecycleBinAsync(root1.Key, Constants.Security.SuperUserKey);
 
         var result = await ContentEditingService.MoveAsync(root2.Key, root1.Key, Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.InTrash, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.InTrash));
     }
 
     [Test]
@@ -194,8 +194,8 @@ public partial class ContentEditingServiceTests
         (IContent root, IContent child) = await CreateRootAndChildAsync(contentType);
 
         var result = await ContentEditingService.MoveAsync(root.Key, child.Key, Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.ParentInvalid, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.ParentInvalid));
     }
 
     /// <summary>
@@ -211,7 +211,7 @@ public partial class ContentEditingServiceTests
         (IContent root, IContent child) = await CreateRootAndChildAsync(contentType);
 
         var moveToRecycleBinResult = await ContentEditingService.MoveToRecycleBinAsync(child.Key, Constants.Security.SuperUserKey);
-        Assert.IsTrue(moveToRecycleBinResult.Success);
+        Assert.That(moveToRecycleBinResult.Success, Is.True);
 
         var savedCulture = CultureInfo.CurrentCulture;
         try
@@ -228,8 +228,8 @@ public partial class ContentEditingServiceTests
 
             var result = await ContentEditingService.RestoreAsync(child.Key, root.Key, Constants.Security.SuperUserKey);
 
-            Assert.IsTrue(result.Success);
-            Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+            Assert.That(result.Success, Is.True);
+            Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.Success));
         }
         finally
         {

@@ -15,7 +15,7 @@ public class FileUploadValueRequiredValidatorTests
 
         var value = JsonNode.Parse("{ \"src\": \"\", \"settingsData\": [] }");
         var result = validator.ValidateRequired(value, ValueTypes.Json);
-        Assert.AreEqual(1, result.Count());
+        Assert.That(result.Count(), Is.EqualTo(1));
     }
 
     [Test]
@@ -25,6 +25,6 @@ public class FileUploadValueRequiredValidatorTests
 
         var value = JsonNode.Parse("{ \"src\": \"fakePath\", \"settingsData\": [] }");
         var result = validator.ValidateRequired(value, ValueTypes.Json);
-        Assert.IsEmpty(result);
+        Assert.That(result, Is.Empty);
     }
 }

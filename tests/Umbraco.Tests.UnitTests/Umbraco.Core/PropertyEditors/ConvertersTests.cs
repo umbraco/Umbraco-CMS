@@ -122,37 +122,35 @@ public class ConvertersTests
         // can get the actual property Clr type
         // ie ModelType gets properly mapped by IPublishedContentModelFactory
         // must test ModelClrType with special equals 'cos they are not ref-equals
-        Assert.IsTrue(ModelType.Equals(
+        Assert.That(ModelType.Equals(
             typeof(IEnumerable<>).MakeGenericType(ModelType.For("content1")),
-            contentType2.GetPropertyType("prop2").ModelClrType));
-        Assert.AreEqual(
-            typeof(IEnumerable<PublishedSnapshotTestObjects.TestContentModel1>),
-            contentType2.GetPropertyType("prop2").ClrType);
+            contentType2.GetPropertyType("prop2").ModelClrType), Is.True);
+        Assert.That(
+            contentType2.GetPropertyType("prop2").ClrType, Is.EqualTo(typeof(IEnumerable<PublishedSnapshotTestObjects.TestContentModel1>)));
 
         // can create a model for an element
         var model1 = factory.CreateModel(element1);
-        Assert.IsInstanceOf<PublishedSnapshotTestObjects.TestElementModel1>(model1);
-        Assert.AreEqual("val1", ((PublishedSnapshotTestObjects.TestElementModel1)model1).Prop1);
+        Assert.That(model1, Is.InstanceOf<PublishedSnapshotTestObjects.TestElementModel1>());
+        Assert.That(((PublishedSnapshotTestObjects.TestElementModel1)model1).Prop1, Is.EqualTo("val1"));
 
         // can create a model for a published content
         var model2 = factory.CreateModel(element2);
-        Assert.IsInstanceOf<PublishedSnapshotTestObjects.TestElementModel2>(model2);
+        Assert.That(model2, Is.InstanceOf<PublishedSnapshotTestObjects.TestElementModel2>());
         var mmodel2 = (PublishedSnapshotTestObjects.TestElementModel2)model2;
 
         // and get direct property
-        Assert.IsInstanceOf<PublishedSnapshotTestObjects.TestContentModel1[]>(
-            model2.Value(Mock.Of<IPublishedValueFallback>(), "prop2"));
-        Assert.AreEqual(
-            1,
-            ((PublishedSnapshotTestObjects.TestContentModel1[])model2.Value(Mock.Of<IPublishedValueFallback>(), "prop2")).Length);
+        Assert.That(
+            model2.Value(Mock.Of<IPublishedValueFallback>(), "prop2"), Is.InstanceOf<PublishedSnapshotTestObjects.TestContentModel1[]>());
+        Assert.That(
+            ((PublishedSnapshotTestObjects.TestContentModel1[])model2.Value(Mock.Of<IPublishedValueFallback>(), "prop2")).Length, Is.EqualTo(1));
 
         // and get model property
-        Assert.IsInstanceOf<IEnumerable<PublishedSnapshotTestObjects.TestContentModel1>>(mmodel2.Prop2);
-        Assert.IsInstanceOf<PublishedSnapshotTestObjects.TestContentModel1[]>(mmodel2.Prop2);
+        Assert.That(mmodel2.Prop2, Is.InstanceOf<IEnumerable<PublishedSnapshotTestObjects.TestContentModel1>>());
+        Assert.That(mmodel2.Prop2, Is.InstanceOf<PublishedSnapshotTestObjects.TestContentModel1[]>());
         var mmodel1 = mmodel2.Prop2.First();
 
         // and we get what we want
-        Assert.AreSame(cacheContent[mmodel1.Id], mmodel1);
+        Assert.That(mmodel1, Is.SameAs(cacheContent[mmodel1.Id]));
     }
 
     private ContentNode CreateContentNode(string name, int id, IPublishedContentType contentType, Dictionary<string, object> properties)

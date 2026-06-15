@@ -192,7 +192,7 @@ internal class MediaPicker3ValueEditorValidationTests
     {
         if (succeed)
         {
-            Assert.IsEmpty(result);
+            Assert.That(result, Is.Empty);
         }
         else
         {

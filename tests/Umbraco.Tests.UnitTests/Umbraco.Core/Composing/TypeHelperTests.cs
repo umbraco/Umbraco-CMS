@@ -47,8 +47,8 @@ public class TypeHelperTests
     [Test]
     public void Is_Static_Class()
     {
-        Assert.IsTrue(TypeHelper.IsStaticClass(typeof(TypeHelper)));
-        Assert.IsFalse(TypeHelper.IsStaticClass(typeof(TypeHelperTests)));
+        Assert.That(TypeHelper.IsStaticClass(typeof(TypeHelper)), Is.True);
+        Assert.That(TypeHelper.IsStaticClass(typeof(TypeHelperTests)), Is.False);
     }
 
     [Test]
@@ -58,15 +58,15 @@ public class TypeHelperTests
             typeof(OleDbCommand),
             typeof(OdbcCommand),
             typeof(SqlCommand));
-        Assert.IsFalse(t1.Success);
+        Assert.That(t1.Success, Is.False);
 
         var t2 = TypeHelper.GetLowestBaseType(
             typeof(OleDbCommand),
             typeof(OdbcCommand),
             typeof(SqlCommand),
             typeof(Component));
-        Assert.IsTrue(t2.Success);
-        Assert.AreEqual(typeof(Component), t2.Result);
+        Assert.That(t2.Success, Is.True);
+        Assert.That(t2.Result, Is.EqualTo(typeof(Component)));
 
         var t3 = TypeHelper.GetLowestBaseType(
             typeof(OleDbCommand),
@@ -74,8 +74,8 @@ public class TypeHelperTests
             typeof(SqlCommand),
             typeof(Component),
             typeof(Component).BaseType);
-        Assert.IsTrue(t3.Success);
-        Assert.AreEqual(typeof(MarshalByRefObject), t3.Result);
+        Assert.That(t3.Success, Is.True);
+        Assert.That(t3.Result, Is.EqualTo(typeof(MarshalByRefObject)));
 
         var t4 = TypeHelper.GetLowestBaseType(
             typeof(OleDbCommand),
@@ -84,27 +84,27 @@ public class TypeHelperTests
             typeof(Component),
             typeof(Component).BaseType,
             typeof(int));
-        Assert.IsFalse(t4.Success);
+        Assert.That(t4.Success, Is.False);
 
         var t5 = TypeHelper.GetLowestBaseType(typeof(PropertyAliasDto));
-        Assert.IsTrue(t5.Success);
-        Assert.AreEqual(typeof(PropertyAliasDto), t5.Result);
+        Assert.That(t5.Success, Is.True);
+        Assert.That(t5.Result, Is.EqualTo(typeof(PropertyAliasDto)));
     }
 
     [Test]
     public void MatchTypesTest()
     {
         var bindings = new Dictionary<string, Type>();
-        Assert.IsTrue(TypeHelper.MatchType(typeof(int), typeof(int), bindings));
-        Assert.AreEqual(0, bindings.Count);
+        Assert.That(TypeHelper.MatchType(typeof(int), typeof(int), bindings), Is.True);
+        Assert.That(bindings.Count, Is.EqualTo(0));
 
         bindings = new Dictionary<string, Type>();
-        Assert.IsFalse(TypeHelper.MatchType(typeof(int), typeof(string), bindings));
-        Assert.AreEqual(0, bindings.Count);
+        Assert.That(TypeHelper.MatchType(typeof(int), typeof(string), bindings), Is.False);
+        Assert.That(bindings.Count, Is.EqualTo(0));
 
         bindings = new Dictionary<string, Type>();
-        Assert.IsTrue(TypeHelper.MatchType(typeof(List<int>), typeof(IEnumerable), bindings));
-        Assert.AreEqual(0, bindings.Count);
+        Assert.That(TypeHelper.MatchType(typeof(List<int>), typeof(IEnumerable), bindings), Is.True);
+        Assert.That(bindings.Count, Is.EqualTo(0));
 
         var t1 = typeof(IList<>); // IList<>
         var a1 = t1.GetGenericArguments()[0]; // <T>
@@ -112,73 +112,73 @@ public class TypeHelperTests
         var t2 = a1;
 
         bindings = new Dictionary<string, Type>();
-        Assert.IsTrue(TypeHelper.MatchType(typeof(int), t2, bindings));
-        Assert.AreEqual(1, bindings.Count);
-        Assert.AreEqual(typeof(int), bindings["T"]);
+        Assert.That(TypeHelper.MatchType(typeof(int), t2, bindings), Is.True);
+        Assert.That(bindings, Has.Count.EqualTo(1));
+        Assert.That(bindings["T"], Is.EqualTo(typeof(int)));
 
         bindings = new Dictionary<string, Type>();
-        Assert.IsTrue(TypeHelper.MatchType(typeof(IList<int>), t1, bindings));
-        Assert.AreEqual(1, bindings.Count);
-        Assert.AreEqual(typeof(int), bindings["T"]);
+        Assert.That(TypeHelper.MatchType(typeof(IList<int>), t1, bindings), Is.True);
+        Assert.That(bindings, Has.Count.EqualTo(1));
+        Assert.That(bindings["T"], Is.EqualTo(typeof(int)));
 
         bindings = new Dictionary<string, Type>();
-        Assert.IsTrue(TypeHelper.MatchType(typeof(List<int>), typeof(IList<int>), bindings));
-        Assert.AreEqual(0, bindings.Count);
+        Assert.That(TypeHelper.MatchType(typeof(List<int>), typeof(IList<int>), bindings), Is.True);
+        Assert.That(bindings.Count, Is.EqualTo(0));
 
         bindings = new Dictionary<string, Type>();
-        Assert.IsTrue(TypeHelper.MatchType(typeof(List<int>), t1, bindings));
-        Assert.AreEqual(1, bindings.Count);
-        Assert.AreEqual(typeof(int), bindings["T"]);
+        Assert.That(TypeHelper.MatchType(typeof(List<int>), t1, bindings), Is.True);
+        Assert.That(bindings, Has.Count.EqualTo(1));
+        Assert.That(bindings["T"], Is.EqualTo(typeof(int)));
 
         bindings = new Dictionary<string, Type>();
-        Assert.IsTrue(TypeHelper.MatchType(typeof(Dictionary<int, string>), typeof(IDictionary<,>), bindings));
-        Assert.AreEqual(2, bindings.Count);
-        Assert.AreEqual(typeof(int), bindings["TKey"]);
-        Assert.AreEqual(typeof(string), bindings["TValue"]);
+        Assert.That(TypeHelper.MatchType(typeof(Dictionary<int, string>), typeof(IDictionary<,>), bindings), Is.True);
+        Assert.That(bindings, Has.Count.EqualTo(2));
+        Assert.That(bindings["TKey"], Is.EqualTo(typeof(int)));
+        Assert.That(bindings["TValue"], Is.EqualTo(typeof(string)));
 
         t1 = typeof(IDictionary<,>); // IDictionary<,>
         a1 = t1.GetGenericArguments()[0]; // <TKey>
         t1 = t1.MakeGenericType(a1, a1); // IDictionary<TKey,TKey>
 
         bindings = new Dictionary<string, Type>();
-        Assert.IsFalse(TypeHelper.MatchType(typeof(Dictionary<int, string>), t1, bindings));
+        Assert.That(TypeHelper.MatchType(typeof(Dictionary<int, string>), t1, bindings), Is.False);
 
         bindings = new Dictionary<string, Type>();
-        Assert.IsTrue(TypeHelper.MatchType(typeof(Dictionary<int, int>), t1, bindings));
-        Assert.AreEqual(1, bindings.Count);
-        Assert.AreEqual(typeof(int), bindings["TKey"]);
+        Assert.That(TypeHelper.MatchType(typeof(Dictionary<int, int>), t1, bindings), Is.True);
+        Assert.That(bindings, Has.Count.EqualTo(1));
+        Assert.That(bindings["TKey"], Is.EqualTo(typeof(int)));
     }
 
     [Test]
     public void MatchType()
     {
         // both are OK
-        Assert.IsTrue(TypeHelper.MatchType(typeof(List<int>), typeof(IEnumerable<>)));
+        Assert.That(TypeHelper.MatchType(typeof(List<int>), typeof(IEnumerable<>)), Is.True);
 
         var t1 = typeof(IDictionary<,>); // IDictionary<,>
         var a1 = t1.GetGenericArguments()[0];
         t1 = t1.MakeGenericType(a1, a1); // IDictionary<T,T>
 
         // both are OK
-        Assert.IsTrue(TypeHelper.MatchType(typeof(Dictionary<int, int>), t1));
+        Assert.That(TypeHelper.MatchType(typeof(Dictionary<int, int>), t1), Is.True);
 
-        Assert.IsFalse(TypeHelper.MatchType(typeof(Dictionary<int, string>), t1));
+        Assert.That(TypeHelper.MatchType(typeof(Dictionary<int, string>), t1), Is.False);
 
         // these are all of there from Is_Assignable_To_Generic_Type
-        Assert.IsTrue(TypeHelper.MatchType(typeof(Derived<int>), typeof(Base<>)));
-        Assert.IsTrue(TypeHelper.MatchType(typeof(List<int>), typeof(IEnumerable<>)));
-        Assert.IsTrue(TypeHelper.MatchType(typeof(Derived<int>), typeof(Derived<>)));
-        Assert.IsTrue(TypeHelper.MatchType(typeof(Derived2<int>), typeof(Base<>)));
-        Assert.IsTrue(TypeHelper.MatchType(typeof(DerivedI<int>), typeof(IBase<>)));
-        Assert.IsTrue(TypeHelper.MatchType(typeof(Derived2<int>), typeof(IBase<>)));
-        Assert.IsTrue(TypeHelper.MatchType(typeof(int?), typeof(Nullable<>)));
+        Assert.That(TypeHelper.MatchType(typeof(Derived<int>), typeof(Base<>)), Is.True);
+        Assert.That(TypeHelper.MatchType(typeof(List<int>), typeof(IEnumerable<>)), Is.True);
+        Assert.That(TypeHelper.MatchType(typeof(Derived<int>), typeof(Derived<>)), Is.True);
+        Assert.That(TypeHelper.MatchType(typeof(Derived2<int>), typeof(Base<>)), Is.True);
+        Assert.That(TypeHelper.MatchType(typeof(DerivedI<int>), typeof(IBase<>)), Is.True);
+        Assert.That(TypeHelper.MatchType(typeof(Derived2<int>), typeof(IBase<>)), Is.True);
+        Assert.That(TypeHelper.MatchType(typeof(int?), typeof(Nullable<>)), Is.True);
 
-        Assert.IsTrue(TypeHelper.MatchType(typeof(Derived<int>), typeof(object)));
-        Assert.IsFalse(TypeHelper.MatchType(typeof(Derived<int>), typeof(List<>)));
-        Assert.IsFalse(TypeHelper.MatchType(typeof(Derived<int>), typeof(IEnumerable<>)));
-        Assert.IsTrue(TypeHelper.MatchType(typeof(Derived<int>), typeof(Base<int>)));
-        Assert.IsTrue(TypeHelper.MatchType(typeof(List<int>), typeof(IEnumerable<int>)));
-        Assert.IsFalse(TypeHelper.MatchType(typeof(int), typeof(Nullable<>)));
+        Assert.That(TypeHelper.MatchType(typeof(Derived<int>), typeof(object)), Is.True);
+        Assert.That(TypeHelper.MatchType(typeof(Derived<int>), typeof(List<>)), Is.False);
+        Assert.That(TypeHelper.MatchType(typeof(Derived<int>), typeof(IEnumerable<>)), Is.False);
+        Assert.That(TypeHelper.MatchType(typeof(Derived<int>), typeof(Base<int>)), Is.True);
+        Assert.That(TypeHelper.MatchType(typeof(List<int>), typeof(IEnumerable<int>)), Is.True);
+        Assert.That(TypeHelper.MatchType(typeof(int), typeof(Nullable<>)), Is.False);
 
         // This get's the "Type" from the Count extension method on IEnumerable<T>, however the type IEnumerable<T> isn't
         // IEnumerable<> and it is not a generic definition, this attempts to explain that:
@@ -190,7 +190,7 @@ public class TypeHelperTests
             .Single()
             .ParameterType;
 
-        Assert.IsTrue(TypeHelper.MatchType(typeof(List<int>), genericEnumerableNonGenericDefinition));
+        Assert.That(TypeHelper.MatchType(typeof(List<int>), genericEnumerableNonGenericDefinition), Is.True);
     }
 
     [Test]
@@ -205,53 +205,53 @@ public class TypeHelperTests
         // type, or byref type based on a type parameter, or a generic type that is not a generic type definition
         // but contains unresolved type parameters."
         var t = Type.GetType("System.Collections.Generic.IList`1");
-        Assert.IsNotNull(t);
-        Assert.IsTrue(t.IsGenericTypeDefinition);
-        Assert.AreEqual("IList`1", t.Name);
-        Assert.AreEqual("System.Collections.Generic.IList`1", t.FullName);
-        Assert.AreEqual("System.Collections.Generic.IList`1[T]", t.ToString());
+        Assert.That(t, Is.Not.Null);
+        Assert.That(t.IsGenericTypeDefinition, Is.True);
+        Assert.That(t.Name, Is.EqualTo("IList`1"));
+        Assert.That(t.FullName, Is.EqualTo("System.Collections.Generic.IList`1"));
+        Assert.That(t.ToString(), Is.EqualTo("System.Collections.Generic.IList`1[T]"));
 
         t = typeof(IList<>);
-        Assert.IsTrue(t.IsGenericTypeDefinition);
-        Assert.AreEqual("IList`1", t.Name);
-        Assert.AreEqual("System.Collections.Generic.IList`1", t.FullName);
-        Assert.AreEqual("System.Collections.Generic.IList`1[T]", t.ToString());
+        Assert.That(t.IsGenericTypeDefinition, Is.True);
+        Assert.That(t.Name, Is.EqualTo("IList`1"));
+        Assert.That(t.FullName, Is.EqualTo("System.Collections.Generic.IList`1"));
+        Assert.That(t.ToString(), Is.EqualTo("System.Collections.Generic.IList`1[T]"));
 
         t = typeof(IDictionary<,>);
-        Assert.IsTrue(t.IsGenericTypeDefinition);
-        Assert.AreEqual("IDictionary`2", t.Name);
-        Assert.AreEqual("System.Collections.Generic.IDictionary`2", t.FullName);
-        Assert.AreEqual("System.Collections.Generic.IDictionary`2[TKey,TValue]", t.ToString());
+        Assert.That(t.IsGenericTypeDefinition, Is.True);
+        Assert.That(t.Name, Is.EqualTo("IDictionary`2"));
+        Assert.That(t.FullName, Is.EqualTo("System.Collections.Generic.IDictionary`2"));
+        Assert.That(t.ToString(), Is.EqualTo("System.Collections.Generic.IDictionary`2[TKey,TValue]"));
 
         t = typeof(IDictionary<,>);
         t = t.MakeGenericType(t.GetGenericArguments()[0], t.GetGenericArguments()[1]);
-        Assert.AreEqual("IDictionary`2", t.Name);
-        Assert.AreEqual("System.Collections.Generic.IDictionary`2", t.FullName);
-        Assert.AreEqual("System.Collections.Generic.IDictionary`2[TKey,TValue]", t.ToString());
+        Assert.That(t.Name, Is.EqualTo("IDictionary`2"));
+        Assert.That(t.FullName, Is.EqualTo("System.Collections.Generic.IDictionary`2"));
+        Assert.That(t.ToString(), Is.EqualTo("System.Collections.Generic.IDictionary`2[TKey,TValue]"));
 
         t = typeof(IDictionary<,>);
         t = t.MakeGenericType(t.GetGenericArguments()[0], t.GetGenericArguments()[0]);
-        Assert.IsFalse(t.IsGenericTypeDefinition); // not anymore
-        Assert.AreEqual("IDictionary`2", t.Name);
-        Assert.IsNull(t.FullName); // see note above
-        Assert.AreEqual("System.Collections.Generic.IDictionary`2[TKey,TKey]", t.ToString());
+        Assert.That(t.IsGenericTypeDefinition, Is.False); // not anymore
+        Assert.That(t.Name, Is.EqualTo("IDictionary`2"));
+        Assert.That(t.FullName, Is.Null); // see note above
+        Assert.That(t.ToString(), Is.EqualTo("System.Collections.Generic.IDictionary`2[TKey,TKey]"));
 
         t = typeof(IList<>);
-        Assert.IsTrue(t.IsGenericTypeDefinition);
+        Assert.That(t.IsGenericTypeDefinition, Is.True);
         t = t.MakeGenericType(t.GetGenericArguments()[0]);
-        Assert.AreEqual("IList`1", t.Name);
-        Assert.AreEqual("System.Collections.Generic.IList`1", t.FullName);
-        Assert.AreEqual("System.Collections.Generic.IList`1[T]", t.ToString());
+        Assert.That(t.Name, Is.EqualTo("IList`1"));
+        Assert.That(t.FullName, Is.EqualTo("System.Collections.Generic.IList`1"));
+        Assert.That(t.ToString(), Is.EqualTo("System.Collections.Generic.IList`1[T]"));
 
         t = typeof(IList<int>);
-        Assert.AreEqual("System.Collections.Generic.IList`1[System.Int32]", t.ToString());
+        Assert.That(t.ToString(), Is.EqualTo("System.Collections.Generic.IList`1[System.Int32]"));
 
         t = typeof(IDictionary<,>);
         t = t.MakeGenericType(typeof(int), t.GetGenericArguments()[1]);
-        Assert.IsFalse(t.IsGenericTypeDefinition); // not anymore
-        Assert.AreEqual("IDictionary`2", t.Name);
-        Assert.IsNull(t.FullName); // see note above
-        Assert.AreEqual("System.Collections.Generic.IDictionary`2[System.Int32,TValue]", t.ToString());
+        Assert.That(t.IsGenericTypeDefinition, Is.False); // not anymore
+        Assert.That(t.Name, Is.EqualTo("IDictionary`2"));
+        Assert.That(t.FullName, Is.Null); // see note above
+        Assert.That(t.ToString(), Is.EqualTo("System.Collections.Generic.IDictionary`2[System.Int32,TValue]"));
     }
 
     /// <summary>

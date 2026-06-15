@@ -74,9 +74,8 @@ internal sealed class OpenAPIContractTest : UmbracoTestServerTestBase
         var mergedContract = JsonNode.Parse(generatedContractJson)!.AsObject();
         mergedContract.MergeLeft(expectedContract);
 
-        Assert.AreEqual(
-            generatedContract.ToJsonString(),
-            mergedContract.ToJsonString(),
+        Assert.That(
+            mergedContract.ToJsonString(), Is.EqualTo(generatedContract.ToJsonString()),
             "Generated API does not respect the contract.");
     }
 

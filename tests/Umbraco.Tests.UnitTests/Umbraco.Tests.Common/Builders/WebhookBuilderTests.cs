@@ -36,15 +36,15 @@ public class WebhookBuilderTests
             .Build();
 
         // Assert
-        Assert.AreEqual(id, webhook.Id);
-        Assert.AreEqual(key, webhook.Key);
-        Assert.AreEqual(url, webhook.Url);
-        Assert.AreEqual(enabled, webhook.Enabled);
-        Assert.AreEqual(entityKeys.Length, webhook.ContentTypeKeys.Length);
-        Assert.AreEqual(entityKeys[0], webhook.ContentTypeKeys[0]);
-        Assert.AreEqual(events.Length, webhook.Events.Length);
-        Assert.AreEqual(events[0], webhook.Events[0]);
-        Assert.AreEqual(events.Length, webhook.Events.Length);
-        Assert.AreEqual("application/json", webhook.Headers["Content-Type"]);
+        Assert.That(webhook.Id, Is.EqualTo(id));
+        Assert.That(webhook.Key, Is.EqualTo(key));
+        Assert.That(webhook.Url, Is.EqualTo(url));
+        Assert.That(webhook.Enabled, Is.EqualTo(enabled));
+        Assert.That(webhook.ContentTypeKeys.Length, Is.EqualTo(entityKeys.Length));
+        Assert.That(webhook.ContentTypeKeys[0], Is.EqualTo(entityKeys[0]));
+        Assert.That(webhook.Events.Length, Is.EqualTo(events.Length));
+        Assert.That(webhook.Events[0], Is.EqualTo(events[0]));
+        Assert.That(webhook.Events.Length, Is.EqualTo(events.Length));
+        Assert.That(webhook.Headers["Content-Type"], Is.EqualTo("application/json"));
     }
 }

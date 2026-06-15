@@ -32,7 +32,7 @@ public class DefaultUrlSegmentProviderTests
 
         var result = _provider.GetUrlSegment(content, published: false, culture: null);
 
-        Assert.AreEqual("URL-SEGMENT-CULTURE::New Name", result);
+        Assert.That(result, Is.EqualTo("URL-SEGMENT-CULTURE::New Name"));
     }
 
     /// <summary>
@@ -50,7 +50,7 @@ public class DefaultUrlSegmentProviderTests
 
         var result = _provider.GetUrlSegment(content, published: true, culture: null);
 
-        Assert.AreEqual("URL-SEGMENT-CULTURE::Old Name", result);
+        Assert.That(result, Is.EqualTo("URL-SEGMENT-CULTURE::Old Name"));
     }
 
     /// <summary>
@@ -69,7 +69,7 @@ public class DefaultUrlSegmentProviderTests
 
         var result = _provider.GetUrlSegment(content, published, culture: null);
 
-        Assert.AreEqual("URL-SEGMENT-CULTURE::Draft Only Page", result);
+        Assert.That(result, Is.EqualTo("URL-SEGMENT-CULTURE::Draft Only Page"));
     }
 
     /// <summary>
@@ -87,7 +87,7 @@ public class DefaultUrlSegmentProviderTests
 
         var result = _provider.GetUrlSegment(content, published, culture: null);
 
-        Assert.AreEqual("URL-SEGMENT-CULTURE::Same Name", result);
+        Assert.That(result, Is.EqualTo("URL-SEGMENT-CULTURE::Same Name"));
     }
 
     /// <summary>
@@ -106,7 +106,7 @@ public class DefaultUrlSegmentProviderTests
 
         var result = _provider.GetUrlSegment(content, published: false, culture: null);
 
-        Assert.AreEqual("URL-SEGMENT-CULTURE::custom-draft-slug", result);
+        Assert.That(result, Is.EqualTo("URL-SEGMENT-CULTURE::custom-draft-slug"));
     }
 
     /// <summary>
@@ -125,7 +125,7 @@ public class DefaultUrlSegmentProviderTests
 
         var result = _provider.GetUrlSegment(content, published: true, culture: null);
 
-        Assert.AreEqual("URL-SEGMENT-CULTURE::custom-published-slug", result);
+        Assert.That(result, Is.EqualTo("URL-SEGMENT-CULTURE::custom-published-slug"));
     }
 
     private static IContent CreateInvariantContent(

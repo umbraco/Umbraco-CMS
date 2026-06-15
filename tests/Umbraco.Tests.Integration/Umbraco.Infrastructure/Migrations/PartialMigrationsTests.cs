@@ -57,19 +57,19 @@ internal sealed class PartialMigrationsTests : UmbracoIntegrationTest
 
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(result.Successful);
-            Assert.AreEqual(string.Empty, result.InitialState);
-            Assert.AreEqual("a", result.FinalState);
-            Assert.AreEqual(1, result.CompletedTransitions.Count);
-            Assert.IsNotNull(result.Exception);
+            Assert.That(result.Successful, Is.False);
+            Assert.That(result.InitialState, Is.EqualTo(string.Empty));
+            Assert.That(result.FinalState, Is.EqualTo("a"));
+            Assert.That(result.CompletedTransitions, Has.Count.EqualTo(1));
+            Assert.That(result.Exception, Is.Not.Null);
 
             // Ensure that the partial success is saved in the keyvalue service so next plan execution starts correctly.
             using var scope = ScopeProvider.CreateScope(autoComplete: true);
-            Assert.AreEqual("a", KeyValueService.GetValue(upgrader.StateValueKey));
+            Assert.That(KeyValueService.GetValue(upgrader.StateValueKey), Is.EqualTo("a"));
             // Ensure that the changes from the first migration is persisted
-            Assert.IsTrue(scope.Database.HasTable(TableName));
+            Assert.That(scope.Database.HasTable(TableName), Is.True);
             // But that the final migration wasn't run
-            Assert.IsFalse(ColumnExists(TableName, ColumnName, scope));
+            Assert.That(ColumnExists(TableName, ColumnName, scope), Is.False);
         });
 
         // Now let's simulate that someone came along and fixed the broken migration and we'll now try and rerun
@@ -79,17 +79,17 @@ internal sealed class PartialMigrationsTests : UmbracoIntegrationTest
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual("a", result.InitialState);
-            Assert.IsTrue(result.Successful);
-            Assert.IsNull(result.Exception);
-            Assert.AreEqual(2, result.CompletedTransitions.Count);
-            Assert.AreEqual("c", result.FinalState);
+            Assert.That(result.InitialState, Is.EqualTo("a"));
+            Assert.That(result.Successful, Is.True);
+            Assert.That(result.Exception, Is.Null);
+            Assert.That(result.CompletedTransitions, Has.Count.EqualTo(2));
+            Assert.That(result.FinalState, Is.EqualTo("c"));
 
             // Ensure that everything got updated in the database.
             using var scope = ScopeProvider.CreateScope(autoComplete: true);
-            Assert.AreEqual("c", KeyValueService.GetValue(upgrader.StateValueKey));
-            Assert.IsTrue(scope.Database.HasTable(TableName));
-            Assert.IsTrue(ColumnExists(TableName, ColumnName, scope));
+            Assert.That(KeyValueService.GetValue(upgrader.StateValueKey), Is.EqualTo("c"));
+            Assert.That(scope.Database.HasTable(TableName), Is.True);
+            Assert.That(ColumnExists(TableName, ColumnName, scope), Is.True);
         });
     }
 
@@ -103,13 +103,13 @@ internal sealed class PartialMigrationsTests : UmbracoIntegrationTest
 
         Assert.Multiple(() =>
         {
-            Assert.True(result.Successful);
-            Assert.AreEqual("SimpleMigrationPlan_InitialState", result.InitialState);
-            Assert.AreEqual("SimpleMigrationStep", result.FinalState);
-            Assert.AreEqual(1, result.CompletedTransitions.Count);
-            Assert.IsNull(result.Exception);
-            Assert.True(result2.Successful);
-            Assert.IsNull(result2.Exception);
+            Assert.That(result.Successful, Is.True);
+            Assert.That(result.InitialState, Is.EqualTo("SimpleMigrationPlan_InitialState"));
+            Assert.That(result.FinalState, Is.EqualTo("SimpleMigrationStep"));
+            Assert.That(result.CompletedTransitions, Has.Count.EqualTo(1));
+            Assert.That(result.Exception, Is.Null);
+            Assert.That(result2.Successful, Is.True);
+            Assert.That(result2.Exception, Is.Null);
         });
     }
 
@@ -126,15 +126,15 @@ internal sealed class PartialMigrationsTests : UmbracoIntegrationTest
 
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(result.Successful);
-            Assert.IsNotNull(result.Exception);
-            Assert.IsInstanceOf<PanicException>(result.Exception);
-            Assert.IsEmpty(result.CompletedTransitions);
-            Assert.AreEqual(string.Empty, result.InitialState);
-            Assert.AreEqual(string.Empty, result.FinalState);
+            Assert.That(result.Successful, Is.False);
+            Assert.That(result.Exception, Is.Not.Null);
+            Assert.That(result.Exception, Is.InstanceOf<PanicException>());
+            Assert.That(result.CompletedTransitions, Is.Empty);
+            Assert.That(result.InitialState, Is.EqualTo(string.Empty));
+            Assert.That(result.FinalState, Is.EqualTo(string.Empty));
 
             using var scope = ScopeProvider.CreateCoreScope();
-            Assert.IsNull(KeyValueService.GetValue(upgrader.StateValueKey));
+            Assert.That(KeyValueService.GetValue(upgrader.StateValueKey), Is.Null);
         });
     }
 
@@ -150,9 +150,9 @@ internal sealed class PartialMigrationsTests : UmbracoIntegrationTest
         var upgrader = new Upgrader(plan);
         var result = await upgrader.ExecuteAsync(MigrationPlanExecutor, ScopeProvider, KeyValueService).ConfigureAwait(false);
 
-        Assert.IsTrue(result.Successful);
-        Assert.AreEqual(2, result.CompletedTransitions.Count);
-        Assert.AreEqual("b", result.FinalState);
+        Assert.That(result.Successful, Is.True);
+        Assert.That(result.CompletedTransitions, Has.Count.EqualTo(2));
+        Assert.That(result.FinalState, Is.EqualTo("b"));
     }
 
     [Test]
@@ -165,10 +165,10 @@ internal sealed class PartialMigrationsTests : UmbracoIntegrationTest
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(result1.Successful);
-            Assert.AreEqual(string.Empty, result1.InitialState);
-            Assert.AreEqual("b", result1.FinalState);
-            Assert.AreEqual(2, result1.CompletedTransitions.Count);
+            Assert.That(result1.Successful, Is.True);
+            Assert.That(result1.InitialState, Is.EqualTo(string.Empty));
+            Assert.That(result1.FinalState, Is.EqualTo("b"));
+            Assert.That(result1.CompletedTransitions, Has.Count.EqualTo(2));
         });
 
         // Run an extended plan with 3 steps under the same plan name.
@@ -179,10 +179,10 @@ internal sealed class PartialMigrationsTests : UmbracoIntegrationTest
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(result2.Successful);
-            Assert.AreEqual("b", result2.InitialState);
-            Assert.AreEqual("c", result2.FinalState);
-            Assert.AreEqual(1, result2.CompletedTransitions.Count);
+            Assert.That(result2.Successful, Is.True);
+            Assert.That(result2.InitialState, Is.EqualTo("b"));
+            Assert.That(result2.FinalState, Is.EqualTo("c"));
+            Assert.That(result2.CompletedTransitions, Has.Count.EqualTo(1));
         });
     }
 
@@ -203,18 +203,18 @@ internal sealed class PartialMigrationsTests : UmbracoIntegrationTest
 
                 if (shouldSucceed)
                 {
-                    Assert.IsTrue(executedPlan.Successful);
-                    Assert.IsNull(executedPlan.Exception);
-                    Assert.AreEqual("c", executedPlan.FinalState);
-                    Assert.AreEqual(3, executedPlan.CompletedTransitions.Count);
+                    Assert.That(executedPlan.Successful, Is.True);
+                    Assert.That(executedPlan.Exception, Is.Null);
+                    Assert.That(executedPlan.FinalState, Is.EqualTo("c"));
+                    Assert.That(executedPlan.CompletedTransitions, Has.Count.EqualTo(3));
                 }
                 else
                 {
-                    Assert.IsFalse(executedPlan.Successful);
-                    Assert.IsNotNull(executedPlan.Exception);
-                    Assert.IsInstanceOf<PanicException>(executedPlan.Exception);
-                    Assert.AreEqual("a", executedPlan.FinalState);
-                    Assert.AreEqual(1, executedPlan.CompletedTransitions.Count);
+                    Assert.That(executedPlan.Successful, Is.False);
+                    Assert.That(executedPlan.Exception, Is.Not.Null);
+                    Assert.That(executedPlan.Exception, Is.InstanceOf<PanicException>());
+                    Assert.That(executedPlan.FinalState, Is.EqualTo("a"));
+                    Assert.That(executedPlan.CompletedTransitions, Has.Count.EqualTo(1));
                 }
             });
         };
@@ -224,7 +224,7 @@ internal sealed class PartialMigrationsTests : UmbracoIntegrationTest
         var plan = new TestUmbracoPlan(null!);
         await databaseBuilder.UpgradeSchemaAndDataAsync(plan).ConfigureAwait(false);
 
-        Assert.IsTrue(notificationPublished);
+        Assert.That(notificationPublished, Is.True);
     }
 
     private class TwoStepTestPackageMigrationPlan : PackageMigrationPlan
@@ -340,10 +340,10 @@ internal class AssertScopeUnscopedTestMigration : UnscopedAsyncMigrationBase
     protected override Task MigrateAsync()
     {
         // Since this is a scopeless migration both ambient scope and the parent scope should be null
-        Assert.IsNull(_scopeAccessor.AmbientScope);
+        Assert.That(_scopeAccessor.AmbientScope, Is.Null);
 
         using var scope = _scopeProvider.CreateScope();
-        Assert.IsNull(((Scope)scope).ParentScope);
+        Assert.That(((Scope)scope).ParentScope, Is.Null);
 
         Context.Complete();
 
@@ -367,11 +367,11 @@ internal class AsserScopeScopedTestMigration : AsyncMigrationBase
 
     protected override Task MigrateAsync()
     {
-        Assert.IsNotNull(_scopeAccessor.AmbientScope);
+        Assert.That(_scopeAccessor.AmbientScope, Is.Not.Null);
 
         using var scope = _scopeProvider.CreateScope();
 
-        Assert.IsNotNull(((Scope)scope).ParentScope);
+        Assert.That(((Scope)scope).ParentScope, Is.Not.Null);
 
         return Task.CompletedTask;
     }

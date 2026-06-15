@@ -93,7 +93,7 @@ public class PublicAccessCheckerTests
         MockGetUserAsync(memberManager, new MemberIdentityUser());
 
         var result = await sut.HasMemberAccessToContentAsync(123);
-        Assert.AreEqual(PublicAccessStatus.NotLoggedIn, result);
+        Assert.That(result, Is.EqualTo(PublicAccessStatus.NotLoggedIn));
     }
 
     [AutoMoqData]
@@ -108,7 +108,7 @@ public class PublicAccessCheckerTests
         MockGetUserAsync(memberManager, null);
 
         var result = await sut.HasMemberAccessToContentAsync(123);
-        Assert.AreEqual(PublicAccessStatus.NotLoggedIn, result);
+        Assert.That(result, Is.EqualTo(PublicAccessStatus.NotLoggedIn));
     }
 
     [AutoMoqData]
@@ -142,7 +142,7 @@ public class PublicAccessCheckerTests
         MockGetRolesAsync(memberManager, Enumerable.Empty<string>());
 
         var result = await sut.HasMemberAccessToContentAsync(123);
-        Assert.AreEqual(PublicAccessStatus.AccessDenied, result);
+        Assert.That(result, Is.EqualTo(PublicAccessStatus.AccessDenied));
     }
 
     [AutoMoqData]
@@ -161,7 +161,7 @@ public class PublicAccessCheckerTests
         MockGetRolesAsync(memberManager);
 
         var result = await sut.HasMemberAccessToContentAsync(123);
-        Assert.AreEqual(PublicAccessStatus.LockedOut, result);
+        Assert.That(result, Is.EqualTo(PublicAccessStatus.LockedOut));
     }
 
     [AutoMoqData]
@@ -178,7 +178,7 @@ public class PublicAccessCheckerTests
         MockGetRolesAsync(memberManager);
 
         var result = await sut.HasMemberAccessToContentAsync(123);
-        Assert.AreEqual(PublicAccessStatus.NotApproved, result);
+        Assert.That(result, Is.EqualTo(PublicAccessStatus.NotApproved));
     }
 
     [AutoMoqData]
@@ -195,7 +195,7 @@ public class PublicAccessCheckerTests
         Mock.Get(contentService).Setup(x => x.GetById(123)).Returns((IContent)null);
 
         var result = await sut.HasMemberAccessToContentAsync(123);
-        Assert.AreEqual(PublicAccessStatus.AccessAccepted, result);
+        Assert.That(result, Is.EqualTo(PublicAccessStatus.AccessAccepted));
     }
 
     [AutoMoqData]
@@ -214,7 +214,7 @@ public class PublicAccessCheckerTests
         Mock.Get(publicAccessService).Setup(x => x.GetEntryForContent(content)).Returns((PublicAccessEntry)null);
 
         var result = await sut.HasMemberAccessToContentAsync(123);
-        Assert.AreEqual(PublicAccessStatus.AccessAccepted, result);
+        Assert.That(result, Is.EqualTo(PublicAccessStatus.AccessAccepted));
     }
 
     [AutoMoqData]
@@ -234,7 +234,7 @@ public class PublicAccessCheckerTests
             .Returns(GetPublicAccessEntry(string.Empty, string.Empty));
 
         var result = await sut.HasMemberAccessToContentAsync(123);
-        Assert.AreEqual(PublicAccessStatus.AccessDenied, result);
+        Assert.That(result, Is.EqualTo(PublicAccessStatus.AccessDenied));
     }
 
     [AutoMoqData]
@@ -254,7 +254,7 @@ public class PublicAccessCheckerTests
             .Returns(GetPublicAccessEntry("MyUsername", string.Empty));
 
         var result = await sut.HasMemberAccessToContentAsync(123);
-        Assert.AreEqual(PublicAccessStatus.AccessAccepted, result);
+        Assert.That(result, Is.EqualTo(PublicAccessStatus.AccessAccepted));
     }
 
     [AutoMoqData]
@@ -274,6 +274,6 @@ public class PublicAccessCheckerTests
             .Returns(GetPublicAccessEntry(string.Empty, "role1"));
 
         var result = await sut.HasMemberAccessToContentAsync(123);
-        Assert.AreEqual(PublicAccessStatus.AccessAccepted, result);
+        Assert.That(result, Is.EqualTo(PublicAccessStatus.AccessAccepted));
     }
 }

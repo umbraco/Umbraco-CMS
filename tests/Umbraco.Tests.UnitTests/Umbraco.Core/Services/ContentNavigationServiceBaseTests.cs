@@ -65,8 +65,8 @@ public class ContentNavigationServiceBaseTests
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(result);
-            Assert.IsNull(parentKey);
+            Assert.That(result, Is.False);
+            Assert.That(parentKey, Is.Null);
         });
     }
 
@@ -88,16 +88,16 @@ public class ContentNavigationServiceBaseTests
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(result);
+            Assert.That(result, Is.True);
 
             if (expectedParentKey is null)
             {
-                Assert.IsNull(parentKey);
+                Assert.That(parentKey, Is.Null);
             }
             else
             {
-                Assert.IsNotNull(parentKey);
-                Assert.AreEqual(expectedParentKey, parentKey);
+                Assert.That(parentKey, Is.Not.Null);
+                Assert.That(parentKey, Is.EqualTo(expectedParentKey));
             }
         });
     }
@@ -116,7 +116,7 @@ public class ContentNavigationServiceBaseTests
         List<Guid> rootsList = rootKeys.ToList();
 
         // Assert
-        Assert.IsEmpty(rootsList);
+        Assert.That(rootsList, Is.Empty);
     }
 
     [Test]
@@ -129,10 +129,10 @@ public class ContentNavigationServiceBaseTests
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(result);
-            Assert.IsNotEmpty(rootsList);
-            Assert.AreEqual(1, rootsList.Count);
-            Assert.IsTrue(rootsList.Contains(Root));
+            Assert.That(result, Is.True);
+            Assert.That(rootsList, Is.Not.Empty);
+            Assert.That(rootsList, Has.Count.EqualTo(1));
+            Assert.That(rootsList, Does.Contain(Root));
         });
     }
 
@@ -150,9 +150,9 @@ public class ContentNavigationServiceBaseTests
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(result);
-            Assert.AreEqual(2, rootsList.Count);
-            CollectionAssert.AreEqual(new[] { Root, anotherRoot }, rootsList); // Root and Another root in order
+            Assert.That(result, Is.True);
+            Assert.That(rootsList, Has.Count.EqualTo(2));
+            Assert.That(rootsList, Is.EqualTo(new[] { Root, anotherRoot }).AsCollection); // Root and Another root in order
         });
     }
 
@@ -168,8 +168,8 @@ public class ContentNavigationServiceBaseTests
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(result);
-            Assert.IsEmpty(rootKeys);
+            Assert.That(result, Is.False);
+            Assert.That(rootKeys, Is.Empty);
         });
     }
 
@@ -203,8 +203,8 @@ public class ContentNavigationServiceBaseTests
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(result);
-            Assert.AreEqual(2, rootKeys.Count());
+            Assert.That(result, Is.True);
+            Assert.That(rootKeys.Count(), Is.EqualTo(2));
         });
     }
 
@@ -250,9 +250,9 @@ public class ContentNavigationServiceBaseTests
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(allRootsCount > rootsOfTypeCount);
-            Assert.AreEqual(3, allRootsCount);
-            Assert.AreEqual(2, rootsOfTypeCount);
+            Assert.That(allRootsCount, Is.GreaterThan(rootsOfTypeCount));
+            Assert.That(allRootsCount, Is.EqualTo(3));
+            Assert.That(rootsOfTypeCount, Is.EqualTo(2));
         });
     }
 
@@ -296,7 +296,7 @@ public class ContentNavigationServiceBaseTests
 
         // Assert
         // Check that the order matches what is expected
-        Assert.IsTrue(expectedRootsOrder.SequenceEqual(rootKeysOfType));
+        Assert.That(expectedRootsOrder.SequenceEqual(rootKeysOfType), Is.True);
     }
 
     [Test]
@@ -326,7 +326,7 @@ public class ContentNavigationServiceBaseTests
         _navigationService.TryGetRootKeysOfType(contentTypeAlias, out IEnumerable<Guid> rootKeys);
 
         // Assert
-        Assert.AreEqual(1, rootKeys.Count());
+        Assert.That(rootKeys.Count(), Is.EqualTo(1));
     }
 
     [Test]
@@ -341,8 +341,8 @@ public class ContentNavigationServiceBaseTests
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(result);
-            Assert.IsEmpty(childrenKeys);
+            Assert.That(result, Is.False);
+            Assert.That(childrenKeys, Is.Empty);
         });
     }
 
@@ -364,8 +364,8 @@ public class ContentNavigationServiceBaseTests
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(result);
-            Assert.AreEqual(childrenCount, childrenKeys.Count());
+            Assert.That(result, Is.True);
+            Assert.That(childrenKeys.Count(), Is.EqualTo(childrenCount));
         });
     }
 
@@ -389,7 +389,7 @@ public class ContentNavigationServiceBaseTests
         // Assert
         for (var i = 0; i < expectedChildren.Length; i++)
         {
-            Assert.AreEqual(expectedChildren[i], childrenList.ElementAt(i));
+            Assert.That(childrenList.ElementAt(i), Is.EqualTo(expectedChildren[i]));
         }
     }
 
@@ -406,8 +406,8 @@ public class ContentNavigationServiceBaseTests
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(result);
-            Assert.IsEmpty(childrenKeys);
+            Assert.That(result, Is.False);
+            Assert.That(childrenKeys, Is.Empty);
         });
     }
 
@@ -436,8 +436,8 @@ public class ContentNavigationServiceBaseTests
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(result);
-            Assert.IsEmpty(childrenKeys);
+            Assert.That(result, Is.False);
+            Assert.That(childrenKeys, Is.Empty);
         });
     }
 
@@ -477,8 +477,8 @@ public class ContentNavigationServiceBaseTests
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(result);
-            Assert.AreEqual(childrenCount, childrenKeys.Count());
+            Assert.That(result, Is.True);
+            Assert.That(childrenKeys.Count(), Is.EqualTo(childrenCount));
         });
     }
 
@@ -525,9 +525,9 @@ public class ContentNavigationServiceBaseTests
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(allChildrenCount > childrenOfTypeCount);
-            Assert.AreEqual(5, allChildrenCount);
-            Assert.AreEqual(2, childrenOfTypeCount);
+            Assert.That(allChildrenCount, Is.GreaterThan(childrenOfTypeCount));
+            Assert.That(allChildrenCount, Is.EqualTo(5));
+            Assert.That(childrenOfTypeCount, Is.EqualTo(2));
         });
     }
 
@@ -572,7 +572,7 @@ public class ContentNavigationServiceBaseTests
 
         // Assert
         // Check that the order matches what is expected
-        Assert.IsTrue(expectedChildrenOrder.SequenceEqual(childrenKeysOfType));
+        Assert.That(expectedChildrenOrder.SequenceEqual(childrenKeysOfType), Is.True);
     }
 
     [Test]
@@ -603,7 +603,7 @@ public class ContentNavigationServiceBaseTests
         _navigationService.TryGetChildrenKeysOfType(parentKey, contentTypeAlias, out IEnumerable<Guid> childrenKeys);
 
         // Assert
-        Assert.AreEqual(2, childrenKeys.Count());
+        Assert.That(childrenKeys.Count(), Is.EqualTo(2));
     }
 
     [Test]
@@ -618,8 +618,8 @@ public class ContentNavigationServiceBaseTests
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(result);
-            Assert.IsEmpty(descendantsKeys);
+            Assert.That(result, Is.False);
+            Assert.That(descendantsKeys, Is.Empty);
         });
     }
 
@@ -641,8 +641,8 @@ public class ContentNavigationServiceBaseTests
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(result);
-            Assert.AreEqual(descendantsCount, descendantsKeys.Count());
+            Assert.That(result, Is.True);
+            Assert.That(descendantsKeys.Count(), Is.EqualTo(descendantsCount));
         });
     }
 
@@ -666,7 +666,7 @@ public class ContentNavigationServiceBaseTests
         // Assert
         for (var i = 0; i < expectedDescendants.Length; i++)
         {
-            Assert.AreEqual(expectedDescendants[i], descendantsList.ElementAt(i));
+            Assert.That(descendantsList.ElementAt(i), Is.EqualTo(expectedDescendants[i]));
         }
     }
 
@@ -683,8 +683,8 @@ public class ContentNavigationServiceBaseTests
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(result);
-            Assert.IsEmpty(descendantsKeys);
+            Assert.That(result, Is.False);
+            Assert.That(descendantsKeys, Is.Empty);
         });
     }
 
@@ -713,8 +713,8 @@ public class ContentNavigationServiceBaseTests
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(result);
-            Assert.IsEmpty(descendantsKeys);
+            Assert.That(result, Is.False);
+            Assert.That(descendantsKeys, Is.Empty);
         });
     }
 
@@ -756,8 +756,8 @@ public class ContentNavigationServiceBaseTests
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(result);
-            Assert.AreEqual(descendantsCount, descendantsKeys.Count());
+            Assert.That(result, Is.True);
+            Assert.That(descendantsKeys.Count(), Is.EqualTo(descendantsCount));
         });
     }
 
@@ -804,9 +804,9 @@ public class ContentNavigationServiceBaseTests
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(allDescendantsCount > descendantsOfTypeCount);
-            Assert.AreEqual(4, allDescendantsCount);
-            Assert.AreEqual(2, descendantsOfTypeCount);
+            Assert.That(allDescendantsCount, Is.GreaterThan(descendantsOfTypeCount));
+            Assert.That(allDescendantsCount, Is.EqualTo(4));
+            Assert.That(descendantsOfTypeCount, Is.EqualTo(2));
         });
     }
 
@@ -851,7 +851,7 @@ public class ContentNavigationServiceBaseTests
 
         // Assert
         // Check that the order matches what is expected
-        Assert.IsTrue(expectedDescendantsOrder.SequenceEqual(descendantsOfType));
+        Assert.That(expectedDescendantsOrder.SequenceEqual(descendantsOfType), Is.True);
     }
 
     [Test]
@@ -866,8 +866,8 @@ public class ContentNavigationServiceBaseTests
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(result);
-            Assert.IsEmpty(ancestorsKeys);
+            Assert.That(result, Is.False);
+            Assert.That(ancestorsKeys, Is.Empty);
         });
     }
 
@@ -889,8 +889,8 @@ public class ContentNavigationServiceBaseTests
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(result);
-            Assert.AreEqual(ancestorsCount, ancestorsKeys.Count());
+            Assert.That(result, Is.True);
+            Assert.That(ancestorsKeys.Count(), Is.EqualTo(ancestorsCount));
         });
     }
 
@@ -911,7 +911,7 @@ public class ContentNavigationServiceBaseTests
         // Assert
         for (var i = 0; i < expectedAncestors.Length; i++)
         {
-            Assert.AreEqual(expectedAncestors[i], ancestorsList.ElementAt(i));
+            Assert.That(ancestorsList.ElementAt(i), Is.EqualTo(expectedAncestors[i]));
         }
     }
 
@@ -928,8 +928,8 @@ public class ContentNavigationServiceBaseTests
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(result);
-            Assert.IsEmpty(ancestorsKeys);
+            Assert.That(result, Is.False);
+            Assert.That(ancestorsKeys, Is.Empty);
         });
     }
 
@@ -958,8 +958,8 @@ public class ContentNavigationServiceBaseTests
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(result);
-            Assert.IsEmpty(ancestorsKeys);
+            Assert.That(result, Is.False);
+            Assert.That(ancestorsKeys, Is.Empty);
         });
     }
 
@@ -999,8 +999,8 @@ public class ContentNavigationServiceBaseTests
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(result);
-            Assert.AreEqual(ancestorsCount, ancestorsKeys.Count());
+            Assert.That(result, Is.True);
+            Assert.That(ancestorsKeys.Count(), Is.EqualTo(ancestorsCount));
         });
     }
 
@@ -1048,9 +1048,9 @@ public class ContentNavigationServiceBaseTests
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(allAncestorsCount > ancestorsOfTypeCount);
-            Assert.AreEqual(4, allAncestorsCount);
-            Assert.AreEqual(1, ancestorsOfTypeCount);
+            Assert.That(allAncestorsCount, Is.GreaterThan(ancestorsOfTypeCount));
+            Assert.That(allAncestorsCount, Is.EqualTo(4));
+            Assert.That(ancestorsOfTypeCount, Is.EqualTo(1));
         });
     }
 
@@ -1066,8 +1066,8 @@ public class ContentNavigationServiceBaseTests
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(result);
-            Assert.IsEmpty(siblingsKeys);
+            Assert.That(result, Is.False);
+            Assert.That(siblingsKeys, Is.Empty);
         });
     }
 
@@ -1084,9 +1084,9 @@ public class ContentNavigationServiceBaseTests
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(result);
-            Assert.IsNotEmpty(siblingsList);
-            Assert.IsFalse(siblingsList.Contains(nodeKey));
+            Assert.That(result, Is.True);
+            Assert.That(siblingsList, Is.Not.Empty);
+            Assert.That(siblingsList, Does.Not.Contain(nodeKey));
         });
     }
 
@@ -1104,9 +1104,9 @@ public class ContentNavigationServiceBaseTests
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.IsNotEmpty(siblingsList);
-            Assert.AreEqual(1, siblingsList.Count);
-            Assert.AreEqual(Root, siblingsList.First());
+            Assert.That(siblingsList, Is.Not.Empty);
+            Assert.That(siblingsList, Has.Count.EqualTo(1));
+            Assert.That(siblingsList.First(), Is.EqualTo(Root));
         });
     }
 
@@ -1128,8 +1128,8 @@ public class ContentNavigationServiceBaseTests
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(result);
-            Assert.AreEqual(siblingsCount, siblingsKeys.Count());
+            Assert.That(result, Is.True);
+            Assert.That(siblingsKeys.Count(), Is.EqualTo(siblingsCount));
         });
     }
 
@@ -1149,7 +1149,7 @@ public class ContentNavigationServiceBaseTests
         // Assert
         for (var i = 0; i < expectedSiblings.Length; i++)
         {
-            Assert.AreEqual(expectedSiblings[i], siblingsList.ElementAt(i));
+            Assert.That(siblingsList.ElementAt(i), Is.EqualTo(expectedSiblings[i]));
         }
     }
 
@@ -1166,8 +1166,8 @@ public class ContentNavigationServiceBaseTests
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(result);
-            Assert.IsEmpty(siblingsKeys);
+            Assert.That(result, Is.False);
+            Assert.That(siblingsKeys, Is.Empty);
         });
     }
 
@@ -1196,8 +1196,8 @@ public class ContentNavigationServiceBaseTests
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(result);
-            Assert.IsEmpty(siblingsKeys);
+            Assert.That(result, Is.False);
+            Assert.That(siblingsKeys, Is.Empty);
         });
     }
 
@@ -1237,8 +1237,8 @@ public class ContentNavigationServiceBaseTests
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(result);
-            Assert.AreEqual(siblingsCount, siblingsKeys.Count());
+            Assert.That(result, Is.True);
+            Assert.That(siblingsKeys.Count(), Is.EqualTo(siblingsCount));
         });
     }
 
@@ -1285,9 +1285,9 @@ public class ContentNavigationServiceBaseTests
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(allSiblingsCount > siblingsOfTypeCount);
-            Assert.AreEqual(4, allSiblingsCount);
-            Assert.AreEqual(2, siblingsOfTypeCount);
+            Assert.That(allSiblingsCount, Is.GreaterThan(siblingsOfTypeCount));
+            Assert.That(allSiblingsCount, Is.EqualTo(4));
+            Assert.That(siblingsOfTypeCount, Is.EqualTo(2));
         });
     }
 
@@ -1332,7 +1332,7 @@ public class ContentNavigationServiceBaseTests
 
         // Assert
         // Check that the order matches what is expected
-        Assert.IsTrue(expectedSiblingsOrder.SequenceEqual(siblingsKeysOfType));
+        Assert.That(expectedSiblingsOrder.SequenceEqual(siblingsKeysOfType), Is.True);
     }
 
     [Test]
@@ -1347,8 +1347,8 @@ public class ContentNavigationServiceBaseTests
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(result);
-            Assert.IsNull(level);
+            Assert.That(result, Is.False);
+            Assert.That(level, Is.Null);
         });
     }
 
@@ -1370,9 +1370,9 @@ public class ContentNavigationServiceBaseTests
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(result);
-            Assert.IsNotNull(level);
-            Assert.AreEqual(expectedLevel, level);
+            Assert.That(result, Is.True);
+            Assert.That(level, Is.Not.Null);
+            Assert.That(level, Is.EqualTo(expectedLevel));
         });
     }
 
@@ -1386,7 +1386,7 @@ public class ContentNavigationServiceBaseTests
         var result = _navigationService.MoveToBin(nonExistingKey);
 
         // Assert
-        Assert.IsFalse(result);
+        Assert.That(result, Is.False);
     }
 
     [Test]
@@ -1405,14 +1405,14 @@ public class ContentNavigationServiceBaseTests
         var result = _navigationService.MoveToBin(keyOfNodeToRemove);
 
         // Assert
-        Assert.IsTrue(result);
+        Assert.That(result, Is.True);
 
         var nodeExists = _navigationService.TryGetParentKey(keyOfNodeToRemove, out Guid? parentKey);
 
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(nodeExists);
-            Assert.IsNull(parentKey);
+            Assert.That(nodeExists, Is.False);
+            Assert.That(parentKey, Is.Null);
         });
     }
 
@@ -1429,18 +1429,18 @@ public class ContentNavigationServiceBaseTests
         var result = _navigationService.MoveToBin(keyOfNodeToRemove);
 
         // Assert
-        Assert.IsTrue(result);
+        Assert.That(result, Is.True);
 
         _navigationService.TryGetDescendantsKeys(keyOfNodeToRemove, out IEnumerable<Guid> descendantsKeys);
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(0, descendantsKeys.Count());
+            Assert.That(descendantsKeys.Count(), Is.EqualTo(0));
 
             foreach (Guid descendant in initialDescendantsKeys)
             {
                 var descendantExists = _navigationService.TryGetParentKey(descendant, out _);
-                Assert.IsFalse(descendantExists);
+                Assert.That(descendantExists, Is.False);
             }
         });
     }
@@ -1465,8 +1465,8 @@ public class ContentNavigationServiceBaseTests
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(nodeExistsInBin);
-            Assert.IsNull(parentKeyInBin);
+            Assert.That(nodeExistsInBin, Is.True);
+            Assert.That(parentKeyInBin, Is.Null);
         });
     }
 
@@ -1491,7 +1491,7 @@ public class ContentNavigationServiceBaseTests
         // Assert
         _navigationService.TryGetSiblingsKeysInBin(nodeInRecycleBin1, out IEnumerable<Guid> siblingsInBin);
 
-        Assert.AreEqual(siblingsInBin.Last(), keyOfNodeToRemove);
+        Assert.That(keyOfNodeToRemove, Is.EqualTo(siblingsInBin.Last()));
     }
 
     [Test]
@@ -1513,13 +1513,13 @@ public class ContentNavigationServiceBaseTests
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(nodeExistsInBin);
-            CollectionAssert.AreEqual(initialDescendantsList, descendantsKeysInBin);
+            Assert.That(nodeExistsInBin, Is.True);
+            Assert.That(descendantsKeysInBin, Is.EqualTo(initialDescendantsList).AsCollection);
 
             foreach (Guid descendant in initialDescendantsList)
             {
                 _navigationService.TryGetParentKeyInBin(descendant, out Guid? parentKeyInBin);
-                Assert.IsNotNull(parentKeyInBin); // The descendant kept its initial parent
+                Assert.That(parentKeyInBin, Is.Not.Null); // The descendant kept its initial parent
             }
         });
     }
@@ -1535,7 +1535,7 @@ public class ContentNavigationServiceBaseTests
         var result = _navigationService.Add(newNodeKey, ContentType, nonExistentParentKey);
 
         // Assert
-        Assert.IsFalse(result);
+        Assert.That(result, Is.False);
     }
 
     [Test]
@@ -1545,7 +1545,7 @@ public class ContentNavigationServiceBaseTests
         var result = _navigationService.Add(Child1, ContentType);
 
         // Assert
-        Assert.IsFalse(result);
+        Assert.That(result, Is.False);
     }
 
     [Test]
@@ -1558,14 +1558,14 @@ public class ContentNavigationServiceBaseTests
         var result = _navigationService.Add(newNodeKey, ContentType); // parentKey is null
 
         // Assert
-        Assert.IsTrue(result);
+        Assert.That(result, Is.True);
 
         var nodeExists = _navigationService.TryGetParentKey(newNodeKey, out Guid? parentKey);
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(nodeExists);
-            Assert.IsNull(parentKey);
+            Assert.That(nodeExists, Is.True);
+            Assert.That(parentKey, Is.Null);
         });
     }
 
@@ -1584,15 +1584,15 @@ public class ContentNavigationServiceBaseTests
         var result = _navigationService.Add(newNodeKey, ContentType, parentKey);
 
         // Assert
-        Assert.IsTrue(result);
+        Assert.That(result, Is.True);
 
         _navigationService.TryGetChildrenKeys(parentKey, out IEnumerable<Guid> newChildrenKeys);
         var newChildrenList = newChildrenKeys.ToList();
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(currentChildrenCount + 1, newChildrenList.Count);
-            Assert.IsTrue(newChildrenList.Any(childKey => childKey == newNodeKey));
+            Assert.That(newChildrenList, Has.Count.EqualTo(currentChildrenCount + 1));
+            Assert.That(newChildrenList.Any(childKey => childKey == newNodeKey), Is.True);
         });
     }
 
@@ -1617,7 +1617,7 @@ public class ContentNavigationServiceBaseTests
         // Assert
         _navigationService.TryGetChildrenKeys(parentKey, out IEnumerable<Guid> childrenKeys);
 
-        Assert.AreEqual(newNodeKey, childrenKeys.Last());
+        Assert.That(childrenKeys.Last(), Is.EqualTo(newNodeKey));
     }
 
     [Test]
@@ -1631,7 +1631,7 @@ public class ContentNavigationServiceBaseTests
         var result = _navigationService.Move(nodeToMove, nonExistentTargetParentKey);
 
         // Assert
-        Assert.IsFalse(result);
+        Assert.That(result, Is.False);
     }
 
     [Test]
@@ -1645,7 +1645,7 @@ public class ContentNavigationServiceBaseTests
         var result = _navigationService.Move(nonExistentNodeKey, targetParentKey);
 
         // Assert
-        Assert.IsFalse(result);
+        Assert.That(result, Is.False);
     }
 
     [Test]
@@ -1658,7 +1658,7 @@ public class ContentNavigationServiceBaseTests
         var result = _navigationService.Move(nodeToMove, nodeToMove);
 
         // Assert
-        Assert.IsFalse(result);
+        Assert.That(result, Is.False);
     }
 
     [Test]
@@ -1671,12 +1671,12 @@ public class ContentNavigationServiceBaseTests
         var result = _navigationService.Move(nodeToMove); // parentKey is null
 
         // Assert
-        Assert.IsTrue(result);
+        Assert.That(result, Is.True);
 
         // Verify the node's new parent is null (moved to content root)
         _navigationService.TryGetParentKey(nodeToMove, out Guid? newParentKey);
 
-        Assert.IsNull(newParentKey);
+        Assert.That(newParentKey, Is.Null);
     }
 
     [Test]
@@ -1690,15 +1690,15 @@ public class ContentNavigationServiceBaseTests
         var result = _navigationService.Move(nodeToMove, targetParentKey);
 
         // Assert
-        Assert.IsTrue(result);
+        Assert.That(result, Is.True);
 
         // Verify the node's new parent is updated
         _navigationService.TryGetParentKey(nodeToMove, out Guid? newParentKey);
 
         Assert.Multiple(() =>
         {
-            Assert.IsNotNull(newParentKey);
-            Assert.AreEqual(targetParentKey, newParentKey);
+            Assert.That(newParentKey, Is.Not.Null);
+            Assert.That(newParentKey, Is.EqualTo(targetParentKey));
         });
     }
 
@@ -1714,18 +1714,18 @@ public class ContentNavigationServiceBaseTests
         var result = _navigationService.Move(nodeToMove, targetParentKey);
 
         // Assert
-        Assert.IsTrue(result);
+        Assert.That(result, Is.True);
 
         // Verify the node's new parent is updated
         _navigationService.TryGetParentKey(nodeToMove, out Guid? newParentKey);
 
         Assert.Multiple(() =>
         {
-            Assert.IsNotNull(newParentKey);
-            Assert.AreEqual(targetParentKey, newParentKey);
+            Assert.That(newParentKey, Is.Not.Null);
+            Assert.That(newParentKey, Is.EqualTo(targetParentKey));
 
             // Verify that the new parent is different from the old one
-            Assert.AreNotEqual(oldParentKey, targetParentKey);
+            Assert.That(targetParentKey, Is.Not.EqualTo(oldParentKey));
         });
     }
 
@@ -1743,7 +1743,7 @@ public class ContentNavigationServiceBaseTests
         var result = _navigationService.Move(nodeToMove, targetParentKey);
 
         // Assert
-        Assert.IsTrue(result);
+        Assert.That(result, Is.True);
 
         // Verify the node is removed from its old parent's children list
         _navigationService.TryGetChildrenKeys(oldParentKey.Value, out IEnumerable<Guid> childrenKeys);
@@ -1751,8 +1751,8 @@ public class ContentNavigationServiceBaseTests
 
         Assert.Multiple(() =>
         {
-            CollectionAssert.DoesNotContain(childrenList, nodeToMove);
-            Assert.AreEqual(oldParentChildrenCount - 1, childrenList.Count);
+            Assert.That(childrenList, Has.No.Member(nodeToMove));
+            Assert.That(childrenList, Has.Count.EqualTo(oldParentChildrenCount - 1));
         });
     }
 
@@ -1769,7 +1769,7 @@ public class ContentNavigationServiceBaseTests
         var result = _navigationService.Move(nodeToMove, targetParentKey);
 
         // Assert
-        Assert.IsTrue(result);
+        Assert.That(result, Is.True);
 
         // Verify the node is added to its new parent's children list
         _navigationService.TryGetChildrenKeys(targetParentKey, out IEnumerable<Guid> childrenKeys);
@@ -1777,8 +1777,8 @@ public class ContentNavigationServiceBaseTests
 
         Assert.Multiple(() =>
         {
-            CollectionAssert.Contains(childrenList, nodeToMove);
-            Assert.AreEqual(targetParentChildrenCount + 1, childrenList.Count);
+            Assert.That(childrenList, Has.Member(nodeToMove));
+            Assert.That(childrenList, Has.Count.EqualTo(targetParentChildrenCount + 1));
         });
     }
 
@@ -1801,7 +1801,7 @@ public class ContentNavigationServiceBaseTests
         // Assert
         _navigationService.TryGetChildrenKeys(targetParentKey, out IEnumerable<Guid> childrenKeys);
 
-        Assert.AreEqual(nodeToMove, childrenKeys.Last());
+        Assert.That(childrenKeys.Last(), Is.EqualTo(nodeToMove));
     }
 
     [Test]
@@ -1814,13 +1814,13 @@ public class ContentNavigationServiceBaseTests
         var result = _navigationService.Move(nodeToMove, targetParentKey);
 
         // Assert
-        Assert.IsTrue(result);
+        Assert.That(result, Is.True);
 
         // Verify that the number of descendants remain the same after moving the node
         _navigationService.TryGetDescendantsKeys(nodeToMove, out IEnumerable<Guid> descendantsKeys);
         var descendantsCountAfterMove = descendantsKeys.Count();
 
-        Assert.AreEqual(initialDescendantsCount, descendantsCountAfterMove);
+        Assert.That(descendantsCountAfterMove, Is.EqualTo(initialDescendantsCount));
     }
 
     [Test]
@@ -1838,13 +1838,13 @@ public class ContentNavigationServiceBaseTests
         var result = _navigationService.Move(nodeToMove, targetParentKey);
 
         // Assert
-        Assert.IsTrue(result);
+        Assert.That(result, Is.True);
 
         _navigationService.TryGetDescendantsKeys(targetParentKey, out IEnumerable<Guid> updatedTargetParentDescendantsKeys);
         var updatedDescendantsCountOfTargetParent = updatedTargetParentDescendantsKeys.Count();
 
         // Verify the number of descendants of the target parent has increased by the number of descendants of the moved node plus the node itself
-        Assert.AreEqual(initialDescendantsCountOfTargetParent + descendantsCountOfNodeToMove + 1, updatedDescendantsCountOfTargetParent);
+        Assert.That(updatedDescendantsCountOfTargetParent, Is.EqualTo(initialDescendantsCountOfTargetParent + descendantsCountOfNodeToMove + 1));
     }
 
     [Test]
@@ -1859,7 +1859,7 @@ public class ContentNavigationServiceBaseTests
         var result = _navigationService.RestoreFromBin(nodeToRestore, nonExistentTargetParentKey);
 
         // Assert
-        Assert.IsFalse(result);
+        Assert.That(result, Is.False);
     }
 
     [Test]
@@ -1873,7 +1873,7 @@ public class ContentNavigationServiceBaseTests
         var result = _navigationService.RestoreFromBin(notDeletedNodeKey, targetParentKey);
 
         // Assert
-        Assert.IsFalse(result);
+        Assert.That(result, Is.False);
     }
 
     [Test]
@@ -1895,7 +1895,7 @@ public class ContentNavigationServiceBaseTests
         var result = _navigationService.RestoreFromBin(nodeToRestore, targetParentKey);
 
         // Assert
-        Assert.IsTrue(result);
+        Assert.That(result, Is.True);
 
         // Verify the node's new parent is updated
         _navigationService.TryGetParentKey(nodeToRestore, out Guid? parentKeyAfterRestore);
@@ -1904,14 +1904,14 @@ public class ContentNavigationServiceBaseTests
         {
             if (targetParentKey is null)
             {
-                Assert.IsNull(parentKeyAfterRestore);
+                Assert.That(parentKeyAfterRestore, Is.Null);
             }
             else
             {
-                Assert.IsNotNull(parentKeyAfterRestore);
+                Assert.That(parentKeyAfterRestore, Is.Not.Null);
             }
 
-            Assert.AreEqual(targetParentKey, parentKeyAfterRestore);
+            Assert.That(parentKeyAfterRestore, Is.EqualTo(targetParentKey));
         });
     }
 
@@ -1930,7 +1930,7 @@ public class ContentNavigationServiceBaseTests
         var result = _navigationService.RestoreFromBin(nodeToRestore, targetParentKey);
 
         // Assert
-        Assert.IsTrue(result);
+        Assert.That(result, Is.True);
 
         // Verify the node is added to its target parent's children list
         _navigationService.TryGetChildrenKeys(targetParentKey, out IEnumerable<Guid> childrenKeys);
@@ -1938,8 +1938,8 @@ public class ContentNavigationServiceBaseTests
 
         Assert.Multiple(() =>
         {
-            CollectionAssert.Contains(childrenList, nodeToRestore);
-            Assert.AreEqual(targetParentChildrenCount + 1, childrenList.Count);
+            Assert.That(childrenList, Has.Member(nodeToRestore));
+            Assert.That(childrenList, Has.Count.EqualTo(targetParentChildrenCount + 1));
         });
     }
 
@@ -1962,13 +1962,13 @@ public class ContentNavigationServiceBaseTests
 
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(nodeExistsInBin);
-            Assert.IsNull(parentKeyInBinAfterRestore);
+            Assert.That(nodeExistsInBin, Is.False);
+            Assert.That(parentKeyInBinAfterRestore, Is.Null);
 
             foreach (Guid descendant in descendantsKeysInBin)
             {
                 var descendantExistsInBin = _navigationService.TryGetParentKeyInBin(descendant, out _);
-                Assert.IsFalse(descendantExistsInBin);
+                Assert.That(descendantExistsInBin, Is.False);
             }
         });
     }
@@ -1990,7 +1990,7 @@ public class ContentNavigationServiceBaseTests
         _navigationService.TryGetDescendantsKeys(nodeToRestore, out IEnumerable<Guid> restoredDescendantsKeys);
         var descendantsCountAfterRestore = restoredDescendantsKeys.Count();
 
-        Assert.AreEqual(initialDescendantsCount, descendantsCountAfterRestore);
+        Assert.That(descendantsCountAfterRestore, Is.EqualTo(initialDescendantsCount));
     }
 
     private void CreateTestData()

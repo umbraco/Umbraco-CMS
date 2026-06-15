@@ -12,17 +12,17 @@ public partial class ElementEditingServiceTests
     public async Task Can_Move_Element_From_Root_To_Recycle_Bin()
     {
         var element = await CreateInvariantElement();
-        Assert.AreEqual(1, EntityService.GetRootEntities(UmbracoObjectTypes.Element).Count());
+        Assert.That(EntityService.GetRootEntities(UmbracoObjectTypes.Element).Count(), Is.EqualTo(1));
 
         var moveResult = await ElementEditingService.MoveToRecycleBinAsync(element.Key, Constants.Security.SuperUserKey);
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(moveResult.Success);
-            Assert.AreEqual(ContentEditingOperationStatus.Success, moveResult.Result);
+            Assert.That(moveResult.Success, Is.True);
+            Assert.That(moveResult.Result, Is.EqualTo(ContentEditingOperationStatus.Success));
         });
 
         await AssertElementIsInRecycleBin(element.Key);
-        Assert.AreEqual(0, EntityService.GetRootEntities(UmbracoObjectTypes.Element).Count());
+        Assert.That(EntityService.GetRootEntities(UmbracoObjectTypes.Element).Count(), Is.EqualTo(0));
     }
 
     [Test]
@@ -32,18 +32,18 @@ public partial class ElementEditingServiceTests
         var container = (await ElementContainerService.CreateAsync(containerKey, "Root Container", null, Constants.Security.SuperUserKey)).Result;
 
         var element = await CreateInvariantElement(containerKey);
-        Assert.AreEqual(container.Id, element.ParentId);
-        Assert.AreEqual(1, GetFolderChildren(containerKey).Length);
+        Assert.That(element.ParentId, Is.EqualTo(container.Id));
+        Assert.That(GetFolderChildren(containerKey), Has.Length.EqualTo(1));
 
         var moveResult = await ElementEditingService.MoveToRecycleBinAsync(element.Key, Constants.Security.SuperUserKey);
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(moveResult.Success);
-            Assert.AreEqual(ContentEditingOperationStatus.Success, moveResult.Result);
+            Assert.That(moveResult.Success, Is.True);
+            Assert.That(moveResult.Result, Is.EqualTo(ContentEditingOperationStatus.Success));
         });
 
         await AssertElementIsInRecycleBin(element.Key);
-        Assert.AreEqual(0, EntityService.GetRootEntities(UmbracoObjectTypes.Element).Count());
+        Assert.That(EntityService.GetRootEntities(UmbracoObjectTypes.Element).Count(), Is.EqualTo(0));
     }
 
     [Test]
@@ -66,8 +66,8 @@ public partial class ElementEditingServiceTests
                 out var total)
             .ToArray();
 
-        Assert.AreEqual(2, total);
-        Assert.IsEmpty(entities);
+        Assert.That(total, Is.EqualTo(2));
+        Assert.That(entities, Is.Empty);
     }
 
     [Test]
@@ -91,8 +91,8 @@ public partial class ElementEditingServiceTests
                 out var total)
             .ToArray();
 
-        Assert.AreEqual(3, total);
-        Assert.IsEmpty(entities);
+        Assert.That(total, Is.EqualTo(3));
+        Assert.That(entities, Is.Empty);
     }
 
     [Test]
@@ -114,14 +114,14 @@ public partial class ElementEditingServiceTests
             Constants.Security.SuperUserKey);
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(moveResult.Success);
-            Assert.AreEqual(ContentEditingOperationStatus.CannotMoveToRecycleBinWhenReferenced, moveResult.Result);
+            Assert.That(moveResult.Success, Is.False);
+            Assert.That(moveResult.Result, Is.EqualTo(ContentEditingOperationStatus.CannotMoveToRecycleBinWhenReferenced));
         });
 
         // Verify element was not moved
         var element = await ElementEditingService.GetAsync(referencedElement.Key);
-        Assert.IsNotNull(element);
-        Assert.IsFalse(element!.Trashed);
+        Assert.That(element, Is.Not.Null);
+        Assert.That(element!.Trashed, Is.False);
     }
 
     [Test]
@@ -144,8 +144,8 @@ public partial class ElementEditingServiceTests
             Constants.Security.SuperUserKey);
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(moveResult.Success);
-            Assert.AreEqual(ContentEditingOperationStatus.Success, moveResult.Result);
+            Assert.That(moveResult.Success, Is.True);
+            Assert.That(moveResult.Result, Is.EqualTo(ContentEditingOperationStatus.Success));
         });
 
         await AssertElementIsInRecycleBin(referencingElement.Key);
@@ -154,12 +154,12 @@ public partial class ElementEditingServiceTests
     private async Task AssertElementIsInRecycleBin(Guid elementKey)
     {
         var element = await ElementEditingService.GetAsync(elementKey);
-        Assert.NotNull(element);
+        Assert.That(element, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(Constants.System.RecycleBinElement, element.ParentId);
-            Assert.AreEqual($"{Constants.System.RecycleBinElementPathPrefix}{element.Id}", element.Path);
-            Assert.IsTrue(element.Trashed);
+            Assert.That(element.ParentId, Is.EqualTo(Constants.System.RecycleBinElement));
+            Assert.That(element.Path, Is.EqualTo($"{Constants.System.RecycleBinElementPathPrefix}{element.Id}"));
+            Assert.That(element.Trashed, Is.True);
         });
 
         var recycleBinItems = EntityService
@@ -167,10 +167,10 @@ public partial class ElementEditingServiceTests
             .ToArray();
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(1, total);
-            Assert.AreEqual(1, recycleBinItems.Length);
+            Assert.That(total, Is.EqualTo(1));
+            Assert.That(recycleBinItems, Has.Length.EqualTo(1));
         });
 
-        Assert.AreEqual(element.Key, recycleBinItems[0].Key);
+        Assert.That(recycleBinItems[0].Key, Is.EqualTo(element.Key));
     }
 }

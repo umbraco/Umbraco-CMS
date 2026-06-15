@@ -22,7 +22,7 @@ internal class UmbracoFieldDefinitionCollectionTests
         var collectionCount = collection.Count;
 
         collection = new UmbracoFieldDefinitionCollection();
-        Assert.AreEqual(collectionCount - 1, collection.Count);
+        Assert.That(collection, Has.Count.EqualTo(collectionCount - 1));
         AssertDefaultField(collection);
         AssertCustomField(collection, expectExists: false);
     }
@@ -35,7 +35,7 @@ internal class UmbracoFieldDefinitionCollectionTests
         var collectionCount = collection.Count;
 
         collection = new UmbracoFieldDefinitionCollection(collection);
-        Assert.AreEqual(collectionCount, collection.Count);
+        Assert.That(collection, Has.Count.EqualTo(collectionCount));
         AssertDefaultField(collection);
         AssertCustomField(collection, expectExists: true);
     }
@@ -53,9 +53,9 @@ internal class UmbracoFieldDefinitionCollectionTests
     private static void AssertDefaultField(UmbracoFieldDefinitionCollection collection, string expectedType = "int")
     {
         var field = collection.SingleOrDefault(x => x.Name == "parentID");
-        Assert.IsNotNull(field);
-        Assert.AreEqual("parentID", field.Name);
-        Assert.AreEqual(expectedType, field.Type);
+        Assert.That(field, Is.Not.Null);
+        Assert.That(field.Name, Is.EqualTo("parentID"));
+        Assert.That(field.Type, Is.EqualTo(expectedType));
     }
 
     private static void AssertCustomField(UmbracoFieldDefinitionCollection collection, bool expectExists)
@@ -63,13 +63,13 @@ internal class UmbracoFieldDefinitionCollectionTests
         var field = collection.SingleOrDefault(x => x.Name == "customField");
         if (expectExists is false)
         {
-            Assert.IsNull(field.Name);
-            Assert.IsNull(field.Type);
+            Assert.That(field.Name, Is.Null);
+            Assert.That(field.Type, Is.Null);
             return;
         }
 
-        Assert.IsNotNull(field);
-        Assert.AreEqual("customField", field.Name);
-        Assert.AreEqual("string", field.Type);
+        Assert.That(field, Is.Not.Null);
+        Assert.That(field.Name, Is.EqualTo("customField"));
+        Assert.That(field.Type, Is.EqualTo("string"));
     }
 }

@@ -83,7 +83,7 @@ internal sealed class DocumentHybridCacheTests : UmbracoIntegrationTestWithConte
 
         // Assert
         AssertPublishedTextPage(textPage);
-        Assert.IsFalse(textPage.IsPublished());
+        Assert.That(textPage.IsPublished(), Is.False);
     }
 
     [TestCase(true)]
@@ -92,7 +92,7 @@ internal sealed class DocumentHybridCacheTests : UmbracoIntegrationTestWithConte
     {
         // Arrange
         var unpublishAttempt = await ContentPublishingService.UnpublishAsync(PublishedTextPage.Key.Value, null, Constants.Security.SuperUserKey);
-        Assert.IsTrue(unpublishAttempt.Success);
+        Assert.That(unpublishAttempt.Success, Is.True);
 
         // Act
         var textPage = await PublishedContentHybridCache.GetByIdAsync(PublishedTextPage.Key.Value, preview);
@@ -100,12 +100,12 @@ internal sealed class DocumentHybridCacheTests : UmbracoIntegrationTestWithConte
         // Assert
         if (preview)
         {
-            Assert.IsNotNull(textPage);
-            Assert.IsFalse(textPage.IsPublished());
+            Assert.That(textPage, Is.Not.Null);
+            Assert.That(textPage.IsPublished(), Is.False);
         }
         else
         {
-            Assert.IsNull(textPage);
+            Assert.That(textPage, Is.Null);
         }
     }
 
@@ -115,7 +115,7 @@ internal sealed class DocumentHybridCacheTests : UmbracoIntegrationTestWithConte
     {
         // Arrange
         var unpublishAttempt = await ContentPublishingService.UnpublishAsync(PublishedTextPage.Key.Value, null, Constants.Security.SuperUserKey);
-        Assert.IsTrue(unpublishAttempt.Success);
+        Assert.That(unpublishAttempt.Success, Is.True);
 
         // Act
         var textPage = await PublishedContentHybridCache.GetByIdAsync(PublishedTextPageId, preview);
@@ -123,12 +123,12 @@ internal sealed class DocumentHybridCacheTests : UmbracoIntegrationTestWithConte
         // Assert
         if (preview)
         {
-            Assert.IsNotNull(textPage);
-            Assert.IsFalse(textPage.IsPublished());
+            Assert.That(textPage, Is.Not.Null);
+            Assert.That(textPage.IsPublished(), Is.False);
         }
         else
         {
-            Assert.IsNull(textPage);
+            Assert.That(textPage, Is.Null);
         }
     }
 
@@ -140,7 +140,7 @@ internal sealed class DocumentHybridCacheTests : UmbracoIntegrationTestWithConte
 
         // Assert
         AssertPublishedTextPage(textPage);
-        Assert.IsFalse(textPage.IsPublished());
+        Assert.That(textPage.IsPublished(), Is.False);
     }
 
     [Test]
@@ -156,8 +156,8 @@ internal sealed class DocumentHybridCacheTests : UmbracoIntegrationTestWithConte
         var publishedPage = await PublishedContentHybridCache.GetByIdAsync(PublishedTextPageId, true);
         var unpublishedPage = await PublishedContentHybridCache.GetByIdAsync(TextpageId, true);
 
-        Assert.IsNotNull(publishedPage);
-        Assert.IsNotNull(unpublishedPage);
+        Assert.That(publishedPage, Is.Not.Null);
+        Assert.That(unpublishedPage, Is.Not.Null);
 
         var allPages = new[] { publishedPage!, unpublishedPage! };
 
@@ -165,8 +165,8 @@ internal sealed class DocumentHybridCacheTests : UmbracoIntegrationTestWithConte
         var filteredPages = allPages.Where(x => x.IsPublished()).ToList();
 
         // Assert - only the published page should pass the filter
-        Assert.AreEqual(1, filteredPages.Count);
-        Assert.AreEqual(PublishedTextPage.Key!.Value, filteredPages[0].Key);
+        Assert.That(filteredPages, Has.Count.EqualTo(1));
+        Assert.That(filteredPages[0].Key, Is.EqualTo(PublishedTextPage.Key!.Value));
     }
 
     [Test]
@@ -186,7 +186,7 @@ internal sealed class DocumentHybridCacheTests : UmbracoIntegrationTestWithConte
         var updatedPage = await PublishedContentHybridCache.GetByIdAsync(TextpageId, true);
 
         // Assert
-        Assert.AreEqual(NewName, updatedPage.Name);
+        Assert.That(updatedPage.Name, Is.EqualTo(NewName));
     }
 
     [Test]
@@ -206,7 +206,7 @@ internal sealed class DocumentHybridCacheTests : UmbracoIntegrationTestWithConte
         var updatedPage = await PublishedContentHybridCache.GetByIdAsync(Textpage.Key.Value, true);
 
         // Assert
-        Assert.AreEqual(NewName, updatedPage.Name);
+        Assert.That(updatedPage.Name, Is.EqualTo(NewName));
     }
 
     [Test]
@@ -229,7 +229,7 @@ internal sealed class DocumentHybridCacheTests : UmbracoIntegrationTestWithConte
         var textPage = await PublishedContentHybridCache.GetByIdAsync(PublishedTextPageId, preview);
 
         // Assert
-        Assert.AreEqual(result, NewName.Equals(textPage.Name));
+        Assert.That(NewName.Equals(textPage.Name), Is.EqualTo(result));
     }
 
     [Test]
@@ -252,7 +252,7 @@ internal sealed class DocumentHybridCacheTests : UmbracoIntegrationTestWithConte
         var textPage = await PublishedContentHybridCache.GetByIdAsync(PublishedTextPage.Key.Value, preview);
 
         // Assert
-        Assert.AreEqual(result, NewName.Equals(textPage.Name));
+        Assert.That(NewName.Equals(textPage.Name), Is.EqualTo(result));
     }
 
     [Test]
@@ -265,7 +265,7 @@ internal sealed class DocumentHybridCacheTests : UmbracoIntegrationTestWithConte
         var textPage = await PublishedContentHybridCache.GetByIdAsync(TextpageId, true);
 
         // Assert
-        Assert.AreEqual(titleValue, textPage.Value("title"));
+        Assert.That(textPage.Value("title"), Is.EqualTo(titleValue));
     }
 
     [Test]
@@ -278,7 +278,7 @@ internal sealed class DocumentHybridCacheTests : UmbracoIntegrationTestWithConte
         var textPage = await PublishedContentHybridCache.GetByIdAsync(Textpage.Key.Value, true);
 
         // Assert
-        Assert.AreEqual(titleValue, textPage.Value("title"));
+        Assert.That(textPage.Value("title"), Is.EqualTo(titleValue));
     }
 
     [Test]
@@ -291,7 +291,7 @@ internal sealed class DocumentHybridCacheTests : UmbracoIntegrationTestWithConte
         var textPage = await PublishedContentHybridCache.GetByIdAsync(PublishedTextPageId, true);
 
         // Assert
-        Assert.AreEqual(titleValue, textPage.Value("title"));
+        Assert.That(textPage.Value("title"), Is.EqualTo(titleValue));
     }
 
     [Test]
@@ -304,7 +304,7 @@ internal sealed class DocumentHybridCacheTests : UmbracoIntegrationTestWithConte
         var textPage = await PublishedContentHybridCache.GetByIdAsync(PublishedTextPage.Key.Value, true);
 
         // Assert
-        Assert.AreEqual(titleValue, textPage.Value("title"));
+        Assert.That(textPage.Value("title"), Is.EqualTo(titleValue));
     }
 
     [Test]
@@ -317,7 +317,7 @@ internal sealed class DocumentHybridCacheTests : UmbracoIntegrationTestWithConte
         var textPage = await PublishedContentHybridCache.GetByIdAsync(PublishedTextPageId, true);
 
         // Assert
-        Assert.AreEqual(titleValue, textPage.Value("title"));
+        Assert.That(textPage.Value("title"), Is.EqualTo(titleValue));
     }
 
     [Test]
@@ -330,7 +330,7 @@ internal sealed class DocumentHybridCacheTests : UmbracoIntegrationTestWithConte
         var textPage = await PublishedContentHybridCache.GetByIdAsync(PublishedTextPage.Key.Value, true);
 
         // Assert
-        Assert.AreEqual(titleValue, textPage.Value("title"));
+        Assert.That(textPage.Value("title"), Is.EqualTo(titleValue));
     }
 
     [Test]
@@ -350,7 +350,7 @@ internal sealed class DocumentHybridCacheTests : UmbracoIntegrationTestWithConte
         var textPage = await PublishedContentHybridCache.GetByIdAsync(TextpageId, true);
 
         // Assert
-        Assert.AreEqual(NewTitle, textPage.Value("title"));
+        Assert.That(textPage.Value("title"), Is.EqualTo(NewTitle));
     }
 
     [Test]
@@ -370,7 +370,7 @@ internal sealed class DocumentHybridCacheTests : UmbracoIntegrationTestWithConte
         var textPage = await PublishedContentHybridCache.GetByIdAsync(Textpage.Key.Value, true);
 
         // Assert
-        Assert.AreEqual(NewTitle, textPage.Value("title"));
+        Assert.That(textPage.Value("title"), Is.EqualTo(NewTitle));
     }
 
     [Test]
@@ -394,7 +394,7 @@ internal sealed class DocumentHybridCacheTests : UmbracoIntegrationTestWithConte
         var textPage = await PublishedContentHybridCache.GetByIdAsync(PublishedTextPage.Key.Value, true);
 
         // Assert
-        Assert.AreEqual(NewTitle, textPage.Value("title"));
+        Assert.That(textPage.Value("title"), Is.EqualTo(NewTitle));
     }
 
     [Test]
@@ -418,7 +418,7 @@ internal sealed class DocumentHybridCacheTests : UmbracoIntegrationTestWithConte
         var textPage = await PublishedContentHybridCache.GetByIdAsync(PublishedTextPage.Key.Value);
 
         // Assert
-        Assert.AreEqual(NewTitle, textPage.Value("title"));
+        Assert.That(textPage.Value("title"), Is.EqualTo(NewTitle));
     }
 
     [Test]
@@ -440,7 +440,7 @@ internal sealed class DocumentHybridCacheTests : UmbracoIntegrationTestWithConte
         var textPage = await PublishedContentHybridCache.GetByIdAsync(PublishedTextPageId, preview);
 
         // Assert
-        Assert.AreEqual(titleName, textPage.Value("title"));
+        Assert.That(textPage.Value("title"), Is.EqualTo(titleName));
     }
 
     [Test]
@@ -462,7 +462,7 @@ internal sealed class DocumentHybridCacheTests : UmbracoIntegrationTestWithConte
         var textPage = await PublishedContentHybridCache.GetByIdAsync(PublishedTextPage.Key.Value, true);
 
         // Assert
-        Assert.AreEqual(titleName, textPage.Value("title"));
+        Assert.That(textPage.Value("title"), Is.EqualTo(titleName));
     }
 
     [Test]
@@ -470,7 +470,7 @@ internal sealed class DocumentHybridCacheTests : UmbracoIntegrationTestWithConte
     {
         // Arrange
         var content = await PublishedContentHybridCache.GetByIdAsync(Subpage1Id, true);
-        Assert.IsNotNull(content);
+        Assert.That(content, Is.Not.Null);
         await ContentEditingService.DeleteAsync(Subpage1.Key.Value, Constants.Security.SuperUserKey);
 
         // Act
@@ -479,7 +479,7 @@ internal sealed class DocumentHybridCacheTests : UmbracoIntegrationTestWithConte
         var textPage = await PublishedContentHybridCache.GetByIdAsync(Subpage1Id, true);
 
         // Assert
-        Assert.IsNull(textPage);
+        Assert.That(textPage, Is.Null);
     }
 
     [Test]
@@ -488,14 +488,14 @@ internal sealed class DocumentHybridCacheTests : UmbracoIntegrationTestWithConte
         // Arrange
         await PublishedContentHybridCache.GetByIdAsync(Subpage1.Key.Value, true);
         var hasContent = await PublishedContentHybridCache.GetByIdAsync(Subpage1Id, true);
-        Assert.IsNotNull(hasContent);
+        Assert.That(hasContent, Is.Not.Null);
         await ContentEditingService.DeleteAsync(Subpage1.Key.Value, Constants.Security.SuperUserKey);
 
         // Act
         var textPage = await PublishedContentHybridCache.GetByIdAsync(Subpage1.Key.Value, true);
 
         // Assert
-        Assert.IsNull(textPage);
+        Assert.That(textPage, Is.Null);
     }
 
     [Test]
@@ -510,7 +510,7 @@ internal sealed class DocumentHybridCacheTests : UmbracoIntegrationTestWithConte
         var textPage = await PublishedContentHybridCache.GetByIdAsync(PublishedTextPageId, preview);
 
         // Assert
-        Assert.IsNull(textPage);
+        Assert.That(textPage, Is.Null);
     }
 
     [Test]
@@ -525,7 +525,7 @@ internal sealed class DocumentHybridCacheTests : UmbracoIntegrationTestWithConte
         var textPage = await PublishedContentHybridCache.GetByIdAsync(PublishedTextPage.Key.Value, preview);
 
         // Assert
-        Assert.IsNull(textPage);
+        Assert.That(textPage, Is.Null);
     }
 
     [Test]
@@ -537,21 +537,21 @@ internal sealed class DocumentHybridCacheTests : UmbracoIntegrationTestWithConte
         // Act & Assert
         // - assert we cannot get the content that doesn't yet exist from the cache
         var testPage = await PublishedContentHybridCache.GetByIdAsync(testPageKey);
-        Assert.IsNull(testPage);
+        Assert.That(testPage, Is.Null);
 
         testPage = await PublishedContentHybridCache.GetByIdAsync(testPageKey);
-        Assert.IsNull(testPage);
+        Assert.That(testPage, Is.Null);
 
         // - create and publish the content
         var testPageContent = ContentEditingBuilder.CreateBasicContent(ContentType.Key, testPageKey);
         var createResult = await ContentEditingService.CreateAsync(testPageContent, Constants.Security.SuperUserKey);
-        Assert.IsTrue(createResult.Success);
+        Assert.That(createResult.Success, Is.True);
         var publishResult = await ContentPublishingService.PublishAsync(testPageKey, CultureAndSchedule, Constants.Security.SuperUserKey);
-        Assert.IsTrue(publishResult.Success);
+        Assert.That(publishResult.Success, Is.True);
 
         // - assert we can now get the content from the cache
         testPage = await PublishedContentHybridCache.GetByIdAsync(testPageKey);
-        Assert.IsNotNull(testPage);
+        Assert.That(testPage, Is.Not.Null);
     }
 
     [Test]
@@ -559,7 +559,7 @@ internal sealed class DocumentHybridCacheTests : UmbracoIntegrationTestWithConte
     {
         // Act
         var hasContentForTextPageCached = await DocumentCacheService.HasContentByIdAsync(PublishedTextPageId);
-        Assert.IsTrue(hasContentForTextPageCached);
+        Assert.That(hasContentForTextPageCached, Is.True);
         var textPage = await PublishedContentHybridCache.GetByIdAsync(PublishedTextPageId);
 
         // Assert
@@ -572,15 +572,15 @@ internal sealed class DocumentHybridCacheTests : UmbracoIntegrationTestWithConte
         var testPageKey = Guid.NewGuid();
         var testPageContent = ContentEditingBuilder.CreateBasicContent(ContentType.Key, testPageKey);
         var createResult = await ContentEditingService.CreateAsync(testPageContent, Constants.Security.SuperUserKey);
-        Assert.IsTrue(createResult.Success);
+        Assert.That(createResult.Success, Is.True);
         var publishResult = await ContentPublishingService.PublishAsync(testPageKey, CultureAndSchedule, Constants.Security.SuperUserKey);
-        Assert.IsTrue(publishResult.Success);
+        Assert.That(publishResult.Success, Is.True);
 
         var testPage = await PublishedContentHybridCache.GetByIdAsync(testPageKey);
-        Assert.IsNotNull(testPage);
+        Assert.That(testPage, Is.Not.Null);
 
         var hasContentForTextPageCached = await DocumentCacheService.HasContentByIdAsync(testPage.Id);
-        Assert.IsTrue(hasContentForTextPageCached);
+        Assert.That(hasContentForTextPageCached, Is.True);
     }
 
     [TestCase(true)]
@@ -589,15 +589,15 @@ internal sealed class DocumentHybridCacheTests : UmbracoIntegrationTestWithConte
     {
         // Arrange - Verify published content is in cache
         var textPage = await PublishedContentHybridCache.GetByIdAsync(PublishedTextPage.Key.Value, preview);
-        Assert.IsNotNull(textPage, "Content should be in cache before trashing");
+        Assert.That(textPage, Is.Not.Null, "Content should be in cache before trashing");
 
         // Act - Trash the document (move to recycle bin)
         var trashResult = await ContentEditingService.MoveToRecycleBinAsync(PublishedTextPage.Key.Value, Constants.Security.SuperUserKey);
-        Assert.IsTrue(trashResult.Success);
+        Assert.That(trashResult.Success, Is.True);
 
         // Assert - Content should no longer be in the cache
         var trashedPage = await PublishedContentHybridCache.GetByIdAsync(PublishedTextPage.Key.Value, preview);
-        Assert.IsNull(trashedPage, "Trashed content should not be in cache");
+        Assert.That(trashedPage, Is.Null, "Trashed content should not be in cache");
     }
 
     [TestCase(true)]
@@ -606,15 +606,15 @@ internal sealed class DocumentHybridCacheTests : UmbracoIntegrationTestWithConte
     {
         // Arrange - Verify published content is in cache
         var textPage = await PublishedContentHybridCache.GetByIdAsync(PublishedTextPageId, preview);
-        Assert.IsNotNull(textPage, "Content should be in cache before trashing");
+        Assert.That(textPage, Is.Not.Null, "Content should be in cache before trashing");
 
         // Act - Trash the document (move to recycle bin)
         var trashResult = await ContentEditingService.MoveToRecycleBinAsync(PublishedTextPage.Key.Value, Constants.Security.SuperUserKey);
-        Assert.IsTrue(trashResult.Success);
+        Assert.That(trashResult.Success, Is.True);
 
         // Assert - Content should no longer be in the cache
         var trashedPage = await PublishedContentHybridCache.GetByIdAsync(PublishedTextPageId, preview);
-        Assert.IsNull(trashedPage, "Trashed content should not be in cache");
+        Assert.That(trashedPage, Is.Null, "Trashed content should not be in cache");
     }
 
     [Test]
@@ -622,34 +622,34 @@ internal sealed class DocumentHybridCacheTests : UmbracoIntegrationTestWithConte
     {
         // Arrange - Verify published content is in cache, then trash it
         var textPage = await PublishedContentHybridCache.GetByIdAsync(PublishedTextPage.Key.Value, true);
-        Assert.IsNotNull(textPage, "Content should be in cache before trashing");
+        Assert.That(textPage, Is.Not.Null, "Content should be in cache before trashing");
 
         var trashResult = await ContentEditingService.MoveToRecycleBinAsync(PublishedTextPage.Key.Value, Constants.Security.SuperUserKey);
-        Assert.IsTrue(trashResult.Success);
+        Assert.That(trashResult.Success, Is.True);
 
         var trashedPage = await PublishedContentHybridCache.GetByIdAsync(PublishedTextPage.Key.Value, true);
-        Assert.IsNull(trashedPage, "Trashed content should not be in cache");
+        Assert.That(trashedPage, Is.Null, "Trashed content should not be in cache");
 
         // Act - Restore to root (original location)
         var restoreResult = await ContentEditingService.RestoreAsync(PublishedTextPage.Key.Value, null, Constants.Security.SuperUserKey);
-        Assert.IsTrue(restoreResult.Success);
+        Assert.That(restoreResult.Success, Is.True);
 
         // Assert - Restored content should be back in the draft cache, but not republished automatically
         var restoredDraft = await PublishedContentHybridCache.GetByIdAsync(PublishedTextPage.Key.Value, true);
-        Assert.IsNotNull(restoredDraft, "Restored content should be in the draft cache");
+        Assert.That(restoredDraft, Is.Not.Null, "Restored content should be in the draft cache");
 
         var restoredPublished = await PublishedContentHybridCache.GetByIdAsync(PublishedTextPage.Key.Value, false);
-        Assert.IsNull(restoredPublished, "Restored content should not be in the published cache until it is republished");
+        Assert.That(restoredPublished, Is.Null, "Restored content should not be in the published cache until it is republished");
     }
 
     private void AssertTextPage(IPublishedContent textPage)
     {
         Assert.Multiple(() =>
         {
-            Assert.IsNotNull(textPage);
-            Assert.AreEqual(Textpage.Key, textPage.Key);
-            Assert.AreEqual(Textpage.ContentTypeKey, textPage.ContentType.Key);
-            Assert.AreEqual(Textpage.Variants.Single().Name, textPage.Name);
+            Assert.That(textPage, Is.Not.Null);
+            Assert.That(textPage.Key, Is.EqualTo(Textpage.Key));
+            Assert.That(textPage.ContentType.Key, Is.EqualTo(Textpage.ContentTypeKey));
+            Assert.That(textPage.Name, Is.EqualTo(Textpage.Variants.Single().Name));
         });
 
         AssertProperties(Textpage.Properties, textPage.Properties);
@@ -659,10 +659,10 @@ internal sealed class DocumentHybridCacheTests : UmbracoIntegrationTestWithConte
     {
         Assert.Multiple(() =>
         {
-            Assert.IsNotNull(textPage);
-            Assert.AreEqual(PublishedTextPage.Key, textPage.Key);
-            Assert.AreEqual(PublishedTextPage.ContentTypeKey, textPage.ContentType.Key);
-            Assert.AreEqual(PublishedTextPage.Variants.Single().Name, textPage.Name);
+            Assert.That(textPage, Is.Not.Null);
+            Assert.That(textPage.Key, Is.EqualTo(PublishedTextPage.Key));
+            Assert.That(textPage.ContentType.Key, Is.EqualTo(PublishedTextPage.ContentTypeKey));
+            Assert.That(textPage.Name, Is.EqualTo(PublishedTextPage.Variants.Single().Name));
         });
 
         AssertProperties(PublishedTextPage.Properties, textPage.Properties);
@@ -680,8 +680,8 @@ internal sealed class DocumentHybridCacheTests : UmbracoIntegrationTestWithConte
     {
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(property.Alias, publishedProperty.Alias);
-            Assert.AreEqual(property.Value, publishedProperty.GetSourceValue());
+            Assert.That(publishedProperty.Alias, Is.EqualTo(property.Alias));
+            Assert.That(publishedProperty.GetSourceValue(), Is.EqualTo(property.Value));
         });
     }
 }

@@ -33,27 +33,27 @@ internal sealed class MemberEditingServiceTests : UmbracoIntegrationTest
     public async Task Can_Create_Member()
     {
         var member = await CreateMemberAsync();
-        Assert.IsTrue(member.HasIdentity);
-        Assert.Greater(member.Id, 0);
+        Assert.That(member.HasIdentity, Is.True);
+        Assert.That(member.Id, Is.GreaterThan(0));
 
         member = await MemberEditingService.GetAsync(member.Key);
-        Assert.IsNotNull(member);
-        Assert.AreEqual("test@test.com", member.Email);
-        Assert.AreEqual("test", member.Username);
-        Assert.AreEqual("T. Est", member.Name);
-        Assert.IsTrue(member.IsApproved);
+        Assert.That(member, Is.Not.Null);
+        Assert.That(member.Email, Is.EqualTo("test@test.com"));
+        Assert.That(member.Username, Is.EqualTo("test"));
+        Assert.That(member.Name, Is.EqualTo("T. Est"));
+        Assert.That(member.IsApproved, Is.True);
 
-        Assert.AreEqual("The title value", member.GetValue<string>("title"));
-        Assert.AreEqual("The author value", member.GetValue<string>("author"));
+        Assert.That(member.GetValue<string>("title"), Is.EqualTo("The title value"));
+        Assert.That(member.GetValue<string>("author"), Is.EqualTo("The author value"));
 
         var memberManager = GetRequiredService<IMemberManager>();
         var memberIdentityUser = await memberManager.FindByEmailAsync(member.Email);
-        Assert.IsNotNull(memberIdentityUser);
-        Assert.IsTrue(await memberManager.CheckPasswordAsync(memberIdentityUser, "SuperSecret123"));
+        Assert.That(memberIdentityUser, Is.Not.Null);
+        Assert.That(await memberManager.CheckPasswordAsync(memberIdentityUser, "SuperSecret123"), Is.True);
 
         var roles = MemberService.GetAllRoles(member.Id).ToArray();
-        Assert.AreEqual(1, roles.Length);
-        Assert.AreEqual("RoleOne", roles[0]);
+        Assert.That(roles, Has.Length.EqualTo(1));
+        Assert.That(roles[0], Is.EqualTo("RoleOne"));
     }
 
     [Test]
@@ -61,12 +61,12 @@ internal sealed class MemberEditingServiceTests : UmbracoIntegrationTest
     {
         var key = Guid.NewGuid();
         var member = await CreateMemberAsync(key);
-        Assert.IsTrue(member.HasIdentity);
-        Assert.Greater(member.Id, 0);
-        Assert.AreEqual(key, member.Key);
+        Assert.That(member.HasIdentity, Is.True);
+        Assert.That(member.Id, Is.GreaterThan(0));
+        Assert.That(member.Key, Is.EqualTo(key));
 
         member = await MemberEditingService.GetAsync(member.Key);
-        Assert.IsNotNull(member);
+        Assert.That(member, Is.Not.Null);
     }
 
     [Test]
@@ -88,19 +88,19 @@ internal sealed class MemberEditingServiceTests : UmbracoIntegrationTest
         };
 
         var result = await MemberEditingService.UpdateAsync(member.Key, updateModel, SuperUser());
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status.ContentEditingOperationStatus);
-        Assert.AreEqual(MemberEditingOperationStatus.Success, result.Status.MemberEditingOperationStatus);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status.ContentEditingOperationStatus, Is.EqualTo(ContentEditingOperationStatus.Success));
+        Assert.That(result.Status.MemberEditingOperationStatus, Is.EqualTo(MemberEditingOperationStatus.Success));
 
         member = result.Result.Content;
-        Assert.IsNotNull(member);
-        Assert.AreEqual("test-updated@test.com", member.Email);
-        Assert.AreEqual("test-updated", member.Username);
-        Assert.AreEqual("T. Est Updated", member.Name);
-        Assert.IsFalse(member.IsApproved);
+        Assert.That(member, Is.Not.Null);
+        Assert.That(member.Email, Is.EqualTo("test-updated@test.com"));
+        Assert.That(member.Username, Is.EqualTo("test-updated"));
+        Assert.That(member.Name, Is.EqualTo("T. Est Updated"));
+        Assert.That(member.IsApproved, Is.False);
 
-        Assert.AreEqual("The updated title value", member.GetValue<string>("title"));
-        Assert.AreEqual("The updated author value", member.GetValue<string>("author"));
+        Assert.That(member.GetValue<string>("title"), Is.EqualTo("The updated title value"));
+        Assert.That(member.GetValue<string>("author"), Is.EqualTo("The updated author value"));
     }
 
     [Test]
@@ -119,13 +119,13 @@ internal sealed class MemberEditingServiceTests : UmbracoIntegrationTest
         };
 
         var result = await MemberEditingService.UpdateAsync(member.Key, updateModel, SuperUser());
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status.ContentEditingOperationStatus);
-        Assert.AreEqual(MemberEditingOperationStatus.Success, result.Status.MemberEditingOperationStatus);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status.ContentEditingOperationStatus, Is.EqualTo(ContentEditingOperationStatus.Success));
+        Assert.That(result.Status.MemberEditingOperationStatus, Is.EqualTo(MemberEditingOperationStatus.Success));
 
         var memberIdentityUser = await memberManager.FindByEmailAsync(member.Email);
-        Assert.IsNotNull(memberIdentityUser);
-        Assert.IsTrue(await memberManager.CheckPasswordAsync(memberIdentityUser, "NewSuperSecret123"));
+        Assert.That(memberIdentityUser, Is.Not.Null);
+        Assert.That(await memberManager.CheckPasswordAsync(memberIdentityUser, "NewSuperSecret123"), Is.True);
     }
 
     [Test]
@@ -147,33 +147,33 @@ internal sealed class MemberEditingServiceTests : UmbracoIntegrationTest
         };
 
         var result = await MemberEditingService.UpdateAsync(member.Key, updateModel, SuperUser());
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status.ContentEditingOperationStatus);
-        Assert.AreEqual(MemberEditingOperationStatus.Success, result.Status.MemberEditingOperationStatus);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status.ContentEditingOperationStatus, Is.EqualTo(ContentEditingOperationStatus.Success));
+        Assert.That(result.Status.MemberEditingOperationStatus, Is.EqualTo(MemberEditingOperationStatus.Success));
 
         var roles = MemberService.GetAllRoles(member.Id).ToArray();
-        Assert.AreEqual(2, roles.Length);
-        Assert.IsTrue(roles.Contains("RoleTwo"));
-        Assert.IsTrue(roles.Contains("RoleThree"));
+        Assert.That(roles, Has.Length.EqualTo(2));
+        Assert.That(roles.Contains("RoleTwo"), Is.True);
+        Assert.That(roles.Contains("RoleThree"), Is.True);
     }
 
     [Test]
     public async Task Can_Delete_Member()
     {
         var member = await CreateMemberAsync();
-        Assert.IsTrue(member.HasIdentity);
-        Assert.Greater(member.Id, 0);
+        Assert.That(member.HasIdentity, Is.True);
+        Assert.That(member.Id, Is.GreaterThan(0));
 
         member = await MemberEditingService.GetAsync(member.Key);
-        Assert.IsNotNull(member);
+        Assert.That(member, Is.Not.Null);
 
         var result = await MemberEditingService.DeleteAsync(member.Key, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status.ContentEditingOperationStatus);
-        Assert.AreEqual(MemberEditingOperationStatus.Success, result.Status.MemberEditingOperationStatus);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status.ContentEditingOperationStatus, Is.EqualTo(ContentEditingOperationStatus.Success));
+        Assert.That(result.Status.MemberEditingOperationStatus, Is.EqualTo(MemberEditingOperationStatus.Success));
 
         member = await MemberEditingService.GetAsync(member.Key);
-        Assert.IsNull(member);
+        Assert.That(member, Is.Null);
     }
 
     [TestCase(true)]
@@ -206,22 +206,22 @@ internal sealed class MemberEditingServiceTests : UmbracoIntegrationTest
         var result = await MemberEditingService.CreateAsync(createModel, SuperUser());
 
         // success is expected regardless of property level validation - the validation error status is communicated in the attempt status (see below)
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(MemberEditingOperationStatus.Success, result.Status.MemberEditingOperationStatus);
-        Assert.AreEqual(addValidProperties ? ContentEditingOperationStatus.Success : ContentEditingOperationStatus.PropertyValidationError, result.Status.ContentEditingOperationStatus);
-        Assert.IsNotNull(result.Result);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status.MemberEditingOperationStatus, Is.EqualTo(MemberEditingOperationStatus.Success));
+        Assert.That(result.Status.ContentEditingOperationStatus, Is.EqualTo(addValidProperties ? ContentEditingOperationStatus.Success : ContentEditingOperationStatus.PropertyValidationError));
+        Assert.That(result.Result, Is.Not.Null);
 
         if (addValidProperties is false)
         {
-            Assert.AreEqual(2, result.Result.ValidationResult.ValidationErrors.Count());
-            Assert.IsNotNull(result.Result.ValidationResult.ValidationErrors.FirstOrDefault(v => v.Alias == "title" && v.ErrorMessages.Length == 1));
-            Assert.IsNotNull(result.Result.ValidationResult.ValidationErrors.FirstOrDefault(v => v.Alias == "author" && v.ErrorMessages.Length == 1));
+            Assert.That(result.Result.ValidationResult.ValidationErrors.Count(), Is.EqualTo(2));
+            Assert.That(result.Result.ValidationResult.ValidationErrors.FirstOrDefault(v => v.Alias == "title" && v.ErrorMessages.Length == 1), Is.Not.Null);
+            Assert.That(result.Result.ValidationResult.ValidationErrors.FirstOrDefault(v => v.Alias == "author" && v.ErrorMessages.Length == 1), Is.Not.Null);
         }
 
         // NOTE: member creation must be successful, even if the mandatory property is missing
-        Assert.IsTrue(result.Result.Content!.HasIdentity);
-        Assert.AreEqual(titleValue, result.Result.Content!.GetValue<string>("title"));
-        Assert.AreEqual(authorValue, result.Result.Content!.GetValue<string>("author"));
+        Assert.That(result.Result.Content!.HasIdentity, Is.True);
+        Assert.That(result.Result.Content!.GetValue<string>("title"), Is.EqualTo(titleValue));
+        Assert.That(result.Result.Content!.GetValue<string>("author"), Is.EqualTo(authorValue));
     }
 
     [TestCase(true)]
@@ -253,21 +253,21 @@ internal sealed class MemberEditingServiceTests : UmbracoIntegrationTest
         var result = await MemberEditingService.UpdateAsync(member.Key, updateModel, SuperUser());
 
         // success is expected regardless of property level validation - the validation error status is communicated in the attempt status (see below)
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(MemberEditingOperationStatus.Success, result.Status.MemberEditingOperationStatus);
-        Assert.AreEqual(addValidProperties ? ContentEditingOperationStatus.Success : ContentEditingOperationStatus.PropertyValidationError, result.Status.ContentEditingOperationStatus);
-        Assert.IsNotNull(result.Result);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status.MemberEditingOperationStatus, Is.EqualTo(MemberEditingOperationStatus.Success));
+        Assert.That(result.Status.ContentEditingOperationStatus, Is.EqualTo(addValidProperties ? ContentEditingOperationStatus.Success : ContentEditingOperationStatus.PropertyValidationError));
+        Assert.That(result.Result, Is.Not.Null);
 
         if (addValidProperties is false)
         {
-            Assert.AreEqual(2, result.Result.ValidationResult.ValidationErrors.Count());
-            Assert.IsNotNull(result.Result.ValidationResult.ValidationErrors.FirstOrDefault(v => v.Alias == "title" && v.ErrorMessages.Length == 1));
-            Assert.IsNotNull(result.Result.ValidationResult.ValidationErrors.FirstOrDefault(v => v.Alias == "author" && v.ErrorMessages.Length == 1));
+            Assert.That(result.Result.ValidationResult.ValidationErrors.Count(), Is.EqualTo(2));
+            Assert.That(result.Result.ValidationResult.ValidationErrors.FirstOrDefault(v => v.Alias == "title" && v.ErrorMessages.Length == 1), Is.Not.Null);
+            Assert.That(result.Result.ValidationResult.ValidationErrors.FirstOrDefault(v => v.Alias == "author" && v.ErrorMessages.Length == 1), Is.Not.Null);
         }
 
         // NOTE: member update must be successful, even if the mandatory property is missing
-        Assert.AreEqual(titleValue, result.Result.Content!.GetValue<string>("title"));
-        Assert.AreEqual(authorValue, result.Result.Content!.GetValue<string>("author"));
+        Assert.That(result.Result.Content!.GetValue<string>("title"), Is.EqualTo(titleValue));
+        Assert.That(result.Result.Content!.GetValue<string>("author"), Is.EqualTo(authorValue));
     }
 
     [TestCase(true)]
@@ -296,37 +296,37 @@ internal sealed class MemberEditingServiceTests : UmbracoIntegrationTest
         var result = await MemberEditingService.UpdateAsync(member.Key, updateModel, useSuperUser ? SuperUser() : user);
         if (useSuperUser)
         {
-            Assert.IsTrue(result.Success);
-            Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status.ContentEditingOperationStatus);
-            Assert.AreEqual(MemberEditingOperationStatus.Success, result.Status.MemberEditingOperationStatus);
+            Assert.That(result.Success, Is.True);
+            Assert.That(result.Status.ContentEditingOperationStatus, Is.EqualTo(ContentEditingOperationStatus.Success));
+            Assert.That(result.Status.MemberEditingOperationStatus, Is.EqualTo(MemberEditingOperationStatus.Success));
         }
         else
         {
-            Assert.IsFalse(result.Success);
-            Assert.AreEqual(ContentEditingOperationStatus.NotAllowed, result.Status.ContentEditingOperationStatus);
-            Assert.AreEqual(MemberEditingOperationStatus.Success, result.Status.MemberEditingOperationStatus);
+            Assert.That(result.Success, Is.False);
+            Assert.That(result.Status.ContentEditingOperationStatus, Is.EqualTo(ContentEditingOperationStatus.NotAllowed));
+            Assert.That(result.Status.MemberEditingOperationStatus, Is.EqualTo(MemberEditingOperationStatus.Success));
         }
 
         member = await MemberEditingService.GetAsync(member.Key);
-        Assert.IsNotNull(member);
+        Assert.That(member, Is.Not.Null);
 
         if (useSuperUser)
         {
-            Assert.AreEqual("The updated title value", member.GetValue<string>("title"));
-            Assert.AreEqual("The updated author value", member.GetValue<string>("author"));
+            Assert.That(member.GetValue<string>("title"), Is.EqualTo("The updated title value"));
+            Assert.That(member.GetValue<string>("author"), Is.EqualTo("The updated author value"));
 
-            Assert.AreEqual("test-updated@test.com", member.Email);
-            Assert.AreEqual("test-updated", member.Username);
-            Assert.AreEqual("T. Est Updated", member.Name);
+            Assert.That(member.Email, Is.EqualTo("test-updated@test.com"));
+            Assert.That(member.Username, Is.EqualTo("test-updated"));
+            Assert.That(member.Name, Is.EqualTo("T. Est Updated"));
         }
         else
         {
-            Assert.AreEqual("The title value", member.GetValue<string>("title"));
-            Assert.AreEqual("The author value", member.GetValue<string>("author"));
+            Assert.That(member.GetValue<string>("title"), Is.EqualTo("The title value"));
+            Assert.That(member.GetValue<string>("author"), Is.EqualTo("The author value"));
 
-            Assert.AreEqual("test@test.com", member.Email);
-            Assert.AreEqual("test", member.Username);
-            Assert.AreEqual("T. Est", member.Name);
+            Assert.That(member.Email, Is.EqualTo("test@test.com"));
+            Assert.That(member.Username, Is.EqualTo("test"));
+            Assert.That(member.Name, Is.EqualTo("T. Est"));
         }
     }
 
@@ -351,23 +351,23 @@ internal sealed class MemberEditingServiceTests : UmbracoIntegrationTest
         };
 
         var result = await MemberEditingService.UpdateAsync(member.Key, updateModel, user);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status.ContentEditingOperationStatus);
-        Assert.AreEqual(MemberEditingOperationStatus.Success, result.Status.MemberEditingOperationStatus);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status.ContentEditingOperationStatus, Is.EqualTo(ContentEditingOperationStatus.Success));
+        Assert.That(result.Status.MemberEditingOperationStatus, Is.EqualTo(MemberEditingOperationStatus.Success));
 
         member = await MemberEditingService.GetAsync(member.Key);
-        Assert.IsNotNull(member);
+        Assert.That(member, Is.Not.Null);
 
-        Assert.AreEqual("The title value", member.GetValue<string>("title"));
-        Assert.AreEqual("The updated author value", member.GetValue<string>("author"));
+        Assert.That(member.GetValue<string>("title"), Is.EqualTo("The title value"));
+        Assert.That(member.GetValue<string>("author"), Is.EqualTo("The updated author value"));
 
-        Assert.AreEqual("test-updated@test.com", member.Email);
-        Assert.AreEqual("test-updated", member.Username);
-        Assert.AreEqual("T. Est Updated", member.Name);
+        Assert.That(member.Email, Is.EqualTo("test-updated@test.com"));
+        Assert.That(member.Username, Is.EqualTo("test-updated"));
+        Assert.That(member.Name, Is.EqualTo("T. Est Updated"));
 
         // IsApproved and IsLockedOut are always sensitive properties.
-        Assert.IsTrue(member.IsApproved);
-        Assert.IsFalse(member.IsLockedOut);
+        Assert.That(member.IsApproved, Is.True);
+        Assert.That(member.IsLockedOut, Is.False);
     }
 
     [Test]
@@ -384,7 +384,7 @@ internal sealed class MemberEditingServiceTests : UmbracoIntegrationTest
         var result = await MemberEditingService.IsExternalMemberAsync(externalMember.Key);
 
         // Assert
-        Assert.IsTrue(result);
+        Assert.That(result, Is.True);
     }
 
     [Test]
@@ -397,7 +397,7 @@ internal sealed class MemberEditingServiceTests : UmbracoIntegrationTest
         var result = await MemberEditingService.IsExternalMemberAsync(member.Key);
 
         // Assert
-        Assert.IsFalse(result);
+        Assert.That(result, Is.False);
     }
 
     [Test]
@@ -407,7 +407,7 @@ internal sealed class MemberEditingServiceTests : UmbracoIntegrationTest
         var result = await MemberEditingService.IsExternalMemberAsync(Guid.NewGuid());
 
         // Assert
-        Assert.IsFalse(result);
+        Assert.That(result, Is.False);
     }
 
     [Test]
@@ -425,10 +425,10 @@ internal sealed class MemberEditingServiceTests : UmbracoIntegrationTest
         var result = await MemberEditingService.GetExternalMemberAsync(externalMember.Key);
 
         // Assert
-        Assert.IsNotNull(result);
-        Assert.AreEqual(externalMember.Key, result!.Key);
-        Assert.AreEqual("get-external@test.com", result.Email);
-        Assert.AreEqual("Get External Test", result.Name);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result!.Key, Is.EqualTo(externalMember.Key));
+        Assert.That(result.Email, Is.EqualTo("get-external@test.com"));
+        Assert.That(result.Name, Is.EqualTo("Get External Test"));
     }
 
     [Test]
@@ -441,7 +441,7 @@ internal sealed class MemberEditingServiceTests : UmbracoIntegrationTest
         var result = await MemberEditingService.GetExternalMemberAsync(member.Key);
 
         // Assert
-        Assert.IsNull(result);
+        Assert.That(result, Is.Null);
     }
 
     [Test]
@@ -451,7 +451,7 @@ internal sealed class MemberEditingServiceTests : UmbracoIntegrationTest
         var result = await MemberEditingService.GetExternalMemberAsync(Guid.NewGuid());
 
         // Assert
-        Assert.IsNull(result);
+        Assert.That(result, Is.Null);
     }
 
     [Test]
@@ -465,14 +465,14 @@ internal sealed class MemberEditingServiceTests : UmbracoIntegrationTest
         await ExternalMemberService.CreateAsync(externalMember);
 
         // Verify it exists.
-        Assert.IsTrue(await MemberEditingService.IsExternalMemberAsync(externalMember.Key));
+        Assert.That(await MemberEditingService.IsExternalMemberAsync(externalMember.Key), Is.True);
 
         // Act
         var result = await MemberEditingService.DeleteAsync(externalMember.Key, Constants.Security.SuperUserKey);
 
         // Assert
-        Assert.IsTrue(result.Success);
-        Assert.IsFalse(await MemberEditingService.IsExternalMemberAsync(externalMember.Key));
+        Assert.That(result.Success, Is.True);
+        Assert.That(await MemberEditingService.IsExternalMemberAsync(externalMember.Key), Is.False);
     }
 
     [Test]
@@ -491,7 +491,7 @@ internal sealed class MemberEditingServiceTests : UmbracoIntegrationTest
 
         // Assert — content member still exists.
         var retrievedContent = await MemberEditingService.GetAsync(contentMember.Key);
-        Assert.IsNotNull(retrievedContent);
+        Assert.That(retrievedContent, Is.Not.Null);
     }
 
     private IUser SuperUser() => GetRequiredService<IUserService>().GetAsync(Constants.Security.SuperUserKey).GetAwaiter().GetResult();
@@ -522,14 +522,14 @@ internal sealed class MemberEditingServiceTests : UmbracoIntegrationTest
         };
 
         var result = await MemberEditingService.CreateAsync(createModel, SuperUser());
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status.ContentEditingOperationStatus);
-        Assert.AreEqual(MemberEditingOperationStatus.Success, result.Status.MemberEditingOperationStatus);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status.ContentEditingOperationStatus, Is.EqualTo(ContentEditingOperationStatus.Success));
+        Assert.That(result.Status.MemberEditingOperationStatus, Is.EqualTo(MemberEditingOperationStatus.Success));
 
         var member = result.Result.Content;
-        Assert.IsNotNull(member);
-        Assert.IsTrue(member.HasIdentity);
-        Assert.Greater(member.Id, 0);
+        Assert.That(member, Is.Not.Null);
+        Assert.That(member.HasIdentity, Is.True);
+        Assert.That(member.Id, Is.GreaterThan(0));
 
         return await MemberEditingService.GetAsync(member.Key) ?? throw new ApplicationException("Created member could not be retrieved");
     }

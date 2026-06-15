@@ -24,8 +24,8 @@ public partial class ContentBlueprintEditingServiceTests
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(result.Success);
-            Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+            Assert.That(result.Success, Is.True);
+            Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.Success));
         });
         VerifyCreate(result.Result.Content);
 
@@ -34,18 +34,18 @@ public partial class ContentBlueprintEditingServiceTests
 
         void VerifyCreate(IContent? createdBlueprint)
         {
-            Assert.IsNotNull(createdBlueprint);
+            Assert.That(createdBlueprint, Is.Not.Null);
             Assert.Multiple(() =>
             {
-                Assert.AreNotEqual(Guid.Empty, createdBlueprint.Key);
-                Assert.IsTrue(createdBlueprint.HasIdentity);
-                Assert.AreEqual("Test Create Blueprint", createdBlueprint.Name);
+                Assert.That(createdBlueprint.Key, Is.Not.EqualTo(Guid.Empty));
+                Assert.That(createdBlueprint.HasIdentity, Is.True);
+                Assert.That(createdBlueprint.Name, Is.EqualTo("Test Create Blueprint"));
             });
         }
 
         // ensures it's not found by normal content
         var contentFound = await ContentEditingService.GetAsync(result.Result.Content!.Key);
-        Assert.IsNull(contentFound);
+        Assert.That(contentFound, Is.Null);
     }
 
     [Test]
@@ -68,8 +68,8 @@ public partial class ContentBlueprintEditingServiceTests
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(result.Success);
-            Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+            Assert.That(result.Success, Is.True);
+            Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.Success));
         });
         VerifyCreate(result.Result.Content);
 
@@ -78,19 +78,19 @@ public partial class ContentBlueprintEditingServiceTests
 
         void VerifyCreate(IContent? createdBlueprint)
         {
-            Assert.IsNotNull(createdBlueprint);
+            Assert.That(createdBlueprint, Is.Not.Null);
             Assert.Multiple(() =>
             {
-                Assert.AreNotEqual(Guid.Empty, createdBlueprint.Key);
-                Assert.IsTrue(createdBlueprint.HasIdentity);
-                Assert.AreEqual("Test Create Blueprint", createdBlueprint.Name);
-                Assert.AreEqual("The title value", createdBlueprint.GetValue<string>("title"));
+                Assert.That(createdBlueprint.Key, Is.Not.EqualTo(Guid.Empty));
+                Assert.That(createdBlueprint.HasIdentity, Is.True);
+                Assert.That(createdBlueprint.Name, Is.EqualTo("Test Create Blueprint"));
+                Assert.That(createdBlueprint.GetValue<string>("title"), Is.EqualTo("The title value"));
             });
         }
 
         // ensures it's not found by normal content
         var contentFound = await ContentEditingService.GetAsync(result.Result.Content!.Key);
-        Assert.IsNull(contentFound);
+        Assert.That(contentFound, Is.Null);
     }
 
     [Test]
@@ -115,21 +115,21 @@ public partial class ContentBlueprintEditingServiceTests
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(result.Success);
-            Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
-            Assert.IsNotNull(result.Result.Content);
+            Assert.That(result.Success, Is.True);
+            Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.Success));
+            Assert.That(result.Result.Content, Is.Not.Null);
         });
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(result.Result.Content.HasIdentity);
-            Assert.AreEqual(key, result.Result.Content.Key);
-            Assert.AreEqual("The title value", result.Result.Content.GetValue<string>("title"));
+            Assert.That(result.Result.Content.HasIdentity, Is.True);
+            Assert.That(result.Result.Content.Key, Is.EqualTo(key));
+            Assert.That(result.Result.Content.GetValue<string>("title"), Is.EqualTo("The title value"));
         });
 
         // re-get and verify creation
         var blueprint = await ContentBlueprintEditingService.GetAsync(key);
-        Assert.IsNotNull(blueprint);
-        Assert.AreEqual(result.Result.Content.Id, blueprint.Id);
+        Assert.That(blueprint, Is.Not.Null);
+        Assert.That(blueprint.Id, Is.EqualTo(result.Result.Content.Id));
     }
 
     [Test]
@@ -152,9 +152,9 @@ public partial class ContentBlueprintEditingServiceTests
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(result1.Success);
-            Assert.AreEqual(ContentEditingOperationStatus.Success, result1.Status);
-            Assert.IsNotNull(result1.Result);
+            Assert.That(result1.Success, Is.True);
+            Assert.That(result1.Status, Is.EqualTo(ContentEditingOperationStatus.Success));
+            Assert.That(result1.Result, Is.Not.Null);
         });
 
         // create another blueprint with the same name
@@ -162,11 +162,11 @@ public partial class ContentBlueprintEditingServiceTests
 
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(result2.Success);
-            Assert.AreEqual(ContentEditingOperationStatus.DuplicateName, result2.Status);
-            Assert.IsNotNull(result2.Result);
+            Assert.That(result2.Success, Is.False);
+            Assert.That(result2.Status, Is.EqualTo(ContentEditingOperationStatus.DuplicateName));
+            Assert.That(result2.Result, Is.Not.Null);
         });
-        Assert.IsNull(result2.Result.Content);
+        Assert.That(result2.Result.Content, Is.Null);
     }
 
     [Test]
@@ -188,9 +188,9 @@ public partial class ContentBlueprintEditingServiceTests
         var result1 = await ContentBlueprintEditingService.CreateAsync(createModel1, Constants.Security.SuperUserKey);
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(result1.Success);
-            Assert.AreEqual(ContentEditingOperationStatus.Success, result1.Status);
-            Assert.IsNotNull(result1.Result);
+            Assert.That(result1.Success, Is.True);
+            Assert.That(result1.Status, Is.EqualTo(ContentEditingOperationStatus.Success));
+            Assert.That(result1.Result, Is.Not.Null);
         });
 
         var createModel2 = new ContentBlueprintCreateModel
@@ -208,9 +208,9 @@ public partial class ContentBlueprintEditingServiceTests
         var result2 = await ContentBlueprintEditingService.CreateAsync(createModel2, Constants.Security.SuperUserKey);
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(result2.Success);
-            Assert.AreEqual(ContentEditingOperationStatus.Success, result2.Status);
-            Assert.IsNotNull(result2.Result);
+            Assert.That(result2.Success, Is.True);
+            Assert.That(result2.Status, Is.EqualTo(ContentEditingOperationStatus.Success));
+            Assert.That(result2.Result, Is.Not.Null);
         });
     }
 
@@ -236,9 +236,9 @@ public partial class ContentBlueprintEditingServiceTests
         var result1 = await ContentBlueprintEditingService.CreateAsync(createModel1, Constants.Security.SuperUserKey);
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(result1.Success);
-            Assert.AreEqual(ContentEditingOperationStatus.Success, result1.Status);
-            Assert.IsNotNull(result1.Result);
+            Assert.That(result1.Success, Is.True);
+            Assert.That(result1.Status, Is.EqualTo(ContentEditingOperationStatus.Success));
+            Assert.That(result1.Result, Is.Not.Null);
         });
 
         var contentType2 = await CreateInvariantContentType();
@@ -258,9 +258,9 @@ public partial class ContentBlueprintEditingServiceTests
         var result2 = await ContentBlueprintEditingService.CreateAsync(createModel2, Constants.Security.SuperUserKey);
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(result2.Success);
-            Assert.AreEqual(ContentEditingOperationStatus.Success, result2.Status);
-            Assert.IsNotNull(result2.Result);
+            Assert.That(result2.Success, Is.True);
+            Assert.That(result2.Status, Is.EqualTo(ContentEditingOperationStatus.Success));
+            Assert.That(result2.Result, Is.Not.Null);
         });
     }
 
@@ -278,11 +278,11 @@ public partial class ContentBlueprintEditingServiceTests
 
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(result.Success);
-            Assert.AreEqual(ContentEditingOperationStatus.ContentTypeNotFound, result.Status);
-            Assert.IsNotNull(result.Result);
+            Assert.That(result.Success, Is.False);
+            Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.ContentTypeNotFound));
+            Assert.That(result.Result, Is.Not.Null);
         });
-        Assert.IsNull(result.Result.Content);
+        Assert.That(result.Result.Content, Is.Null);
     }
 
     [Test]
@@ -295,18 +295,18 @@ public partial class ContentBlueprintEditingServiceTests
         await ContentBlueprintEditingService.CreateAsync(SimpleContentBlueprintCreateModel(blueprintKey, containerKey), Constants.Security.SuperUserKey);
 
         var blueprint = await ContentBlueprintEditingService.GetAsync(blueprintKey);
-        Assert.NotNull(blueprint);
+        Assert.That(blueprint, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(container.Id, blueprint.ParentId);
-            Assert.AreEqual($"{container.Path},{blueprint.Id}", blueprint.Path);
+            Assert.That(blueprint.ParentId, Is.EqualTo(container.Id));
+            Assert.That(blueprint.Path, Is.EqualTo($"{container.Path},{blueprint.Id}"));
         });
 
         var result = GetBlueprintChildren(containerKey);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(1, result.Length);
-            Assert.AreEqual(blueprintKey, result.First().Key);
+            Assert.That(result, Has.Length.EqualTo(1));
+            Assert.That(result.First().Key, Is.EqualTo(blueprintKey));
         });
     }
 
@@ -336,8 +336,8 @@ public partial class ContentBlueprintEditingServiceTests
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(result.Success);
-            Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+            Assert.That(result.Success, Is.True);
+            Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.Success));
         });
         VerifyCreate(result.Result.Content);
 
@@ -346,22 +346,22 @@ public partial class ContentBlueprintEditingServiceTests
 
         void VerifyCreate(IContent? createdBlueprint)
         {
-            Assert.IsNotNull(createdBlueprint);
+            Assert.That(createdBlueprint, Is.Not.Null);
             Assert.Multiple(() =>
             {
-                Assert.AreNotEqual(Guid.Empty, createdBlueprint.Key);
-                Assert.IsTrue(createdBlueprint.HasIdentity);
-                Assert.AreEqual("English Blueprint", createdBlueprint.GetCultureName("en-US"));
-                Assert.AreEqual("Danish Blueprint", createdBlueprint.GetCultureName("da-DK"));
-                Assert.AreEqual("The invariant title value", createdBlueprint.GetValue<string>("invariantTitle"));
-                Assert.AreEqual("The English title value", createdBlueprint.GetValue<string>("variantTitle", culture: "en-US"));
-                Assert.AreEqual("The Danish title value", createdBlueprint.GetValue<string>("variantTitle", culture: "da-DK"));
+                Assert.That(createdBlueprint.Key, Is.Not.EqualTo(Guid.Empty));
+                Assert.That(createdBlueprint.HasIdentity, Is.True);
+                Assert.That(createdBlueprint.GetCultureName("en-US"), Is.EqualTo("English Blueprint"));
+                Assert.That(createdBlueprint.GetCultureName("da-DK"), Is.EqualTo("Danish Blueprint"));
+                Assert.That(createdBlueprint.GetValue<string>("invariantTitle"), Is.EqualTo("The invariant title value"));
+                Assert.That(createdBlueprint.GetValue<string>("variantTitle", culture: "en-US"), Is.EqualTo("The English title value"));
+                Assert.That(createdBlueprint.GetValue<string>("variantTitle", culture: "da-DK"), Is.EqualTo("The Danish title value"));
             });
         }
 
         // ensures it's not found by normal content
         var contentFound = await ContentEditingService.GetAsync(result.Result.Content!.Key);
-        Assert.IsNull(contentFound);
+        Assert.That(contentFound, Is.Null);
     }
 
     [TestCase("English Blueprint", "Unique Danish Name")]
@@ -383,7 +383,7 @@ public partial class ContentBlueprintEditingServiceTests
             Properties = []
         };
 
-        Assert.IsTrue((await ContentBlueprintEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Success);
+        Assert.That((await ContentBlueprintEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Success, Is.True);
 
         createModel = new ContentBlueprintCreateModel
         {
@@ -400,8 +400,8 @@ public partial class ContentBlueprintEditingServiceTests
 
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(result.Success);
-            Assert.AreEqual(ContentEditingOperationStatus.DuplicateName, result.Status);
+            Assert.That(result.Success, Is.False);
+            Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.DuplicateName));
         });
     }
 }

@@ -156,7 +156,7 @@ public class ContentFinderByRedirectUrlTests
 
     private static void AssertRedirectResult(PublishedRequestBuilder publishedRequestBuilder, bool result)
     {
-        Assert.AreEqual(true, result);
-        Assert.AreEqual(HttpStatusCode.Moved, (HttpStatusCode)publishedRequestBuilder.ResponseStatusCode);
+        Assert.That(result, Is.EqualTo(true));
+        Assert.That((HttpStatusCode)publishedRequestBuilder.ResponseStatusCode, Is.EqualTo(HttpStatusCode.Moved));
     }
 }

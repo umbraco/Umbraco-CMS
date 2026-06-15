@@ -39,7 +39,7 @@ public class PendingPackageMigrationsTests
         var pendingPackageMigrations = GetPendingPackageMigrations();
         var registeredMigrations = new Dictionary<string, string>();
         var pending = pendingPackageMigrations.GetPendingPackageMigrations(registeredMigrations);
-        Assert.AreEqual(1, pending.Count);
+        Assert.That(pending, Has.Count.EqualTo(1));
     }
 
     [Test]
@@ -51,7 +51,7 @@ public class PendingPackageMigrationsTests
             [Constants.Conventions.Migrations.KeyValuePrefix + TestPackageName] = s_step2.ToString(),
         };
         var pending = pendingPackageMigrations.GetPendingPackageMigrations(registeredMigrations);
-        Assert.AreEqual(0, pending.Count);
+        Assert.That(pending.Count, Is.EqualTo(0));
     }
 
     [Test]
@@ -63,7 +63,7 @@ public class PendingPackageMigrationsTests
             [Constants.Conventions.Migrations.KeyValuePrefix + TestPackageName] = s_step1.ToString(),
         };
         var pending = pendingPackageMigrations.GetPendingPackageMigrations(registeredMigrations);
-        Assert.AreEqual(1, pending.Count);
+        Assert.That(pending, Has.Count.EqualTo(1));
     }
 
     [Test]
@@ -75,6 +75,6 @@ public class PendingPackageMigrationsTests
             [Constants.Conventions.Migrations.KeyValuePrefix + TestPackageName] = s_step1.ToString().ToUpper(),
         };
         var pending = pendingPackageMigrations.GetPendingPackageMigrations(registeredMigrations);
-        Assert.AreEqual(1, pending.Count);
+        Assert.That(pending, Has.Count.EqualTo(1));
     }
 }

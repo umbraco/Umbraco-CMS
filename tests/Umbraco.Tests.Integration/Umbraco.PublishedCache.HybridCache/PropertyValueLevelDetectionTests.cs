@@ -83,13 +83,13 @@ internal sealed class PropertyValueLevelDetectionTests : UmbracoIntegrationTestW
                 null),
         };
         var result = PublishedContentFactory.ToIPublishedContent(contentCacheNode, false);
-        Assert.IsNotNull(result);
-        Assert.AreEqual(expectHasValue, result.HasValue("title"));
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.HasValue("title"), Is.EqualTo(expectHasValue));
 
         // NOTE: the .Value() extensions always end up returning the source value, no matter if the property value
         //       converter returns false from .HasValue()... this is the case both at property and at content level
         var value = result.Value<string>(PublishedValueFallback, "title");
-        Assert.AreEqual(titleValue, value);
+        Assert.That(value, Is.EqualTo(titleValue));
     }
 
     [TestCase("validSourceLevel", true)]
@@ -116,13 +116,13 @@ internal sealed class PropertyValueLevelDetectionTests : UmbracoIntegrationTestW
             false);
 
 
-        Assert.IsNotNull(element);
-        Assert.AreEqual(expectHasValue, element.HasValue("title"));
+        Assert.That(element, Is.Not.Null);
+        Assert.That(element.HasValue("title"), Is.EqualTo(expectHasValue));
 
         // NOTE: the .Value() extensions always end up returning the source value, no matter if the property value
         //       converter returns false from .HasValue()... this is the case both at property and at content level
         var value = element.Value<string>(PublishedValueFallback, "title");
-        Assert.AreEqual(titleValue, value);
+        Assert.That(value, Is.EqualTo(titleValue));
     }
 
     [HideFromTypeFinder]

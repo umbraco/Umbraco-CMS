@@ -55,10 +55,10 @@ public class RedirectTrackerTests : UmbracoIntegrationTestWithContent
 
         redirectTracker.StoreOldRoute(_testPage, dict, isMove: true);
 
-        Assert.AreEqual(1, dict.Count);
+        Assert.That(dict, Has.Count.EqualTo(1));
         var key = dict.Keys.First();
-        Assert.AreEqual(_testPage.Key, dict[key].ContentKey);
-        Assert.AreEqual("/new-route", dict[key].OldRoute);
+        Assert.That(dict[key].ContentKey, Is.EqualTo(_testPage.Key));
+        Assert.That(dict[key].OldRoute, Is.EqualTo("/new-route"));
     }
 
     /// <summary>
@@ -78,10 +78,10 @@ public class RedirectTrackerTests : UmbracoIntegrationTestWithContent
 
         redirectTracker.StoreOldRoute(_testPage, dict, isMove: true);
 
-        Assert.AreEqual(1, dict.Count);
+        Assert.That(dict, Has.Count.EqualTo(1));
         var key = dict.Keys.First();
-        Assert.AreEqual(_testPage.Key, dict[key].ContentKey);
-        Assert.AreEqual($"{_rootPage.Id}/new-route", dict[key].OldRoute);
+        Assert.That(dict[key].ContentKey, Is.EqualTo(_testPage.Key));
+        Assert.That(dict[key].OldRoute, Is.EqualTo($"{_rootPage.Id}/new-route"));
     }
 
     /// <summary>
@@ -101,9 +101,9 @@ public class RedirectTrackerTests : UmbracoIntegrationTestWithContent
         redirectTracker.CreateRedirects(dict);
 
         var redirects = RedirectUrlService.GetContentRedirectUrls(_testPage.Key);
-        Assert.AreEqual(1, redirects.Count());
+        Assert.That(redirects.Count(), Is.EqualTo(1));
         var redirect = redirects.First();
-        Assert.AreEqual("/old-route", redirect.Url);
+        Assert.That(redirect.Url, Is.EqualTo("/old-route"));
     }
 
     /// <summary>
@@ -116,7 +116,7 @@ public class RedirectTrackerTests : UmbracoIntegrationTestWithContent
         CreateExistingRedirect();
 
         var redirects = RedirectUrlService.GetContentRedirectUrls(_testPage.Key);
-        Assert.IsTrue(redirects.Any(x => x.Url == "/new-route")); // Ensure self referencing redirect exists.
+        Assert.That(redirects.Any(x => x.Url == "/new-route"), Is.True); // Ensure self referencing redirect exists.
 
         IDictionary<(int ContentId, string Culture), (Guid ContentKey, string OldRoute)> dict =
             new Dictionary<(int ContentId, string Culture), (Guid ContentKey, string OldRoute)>
@@ -128,9 +128,9 @@ public class RedirectTrackerTests : UmbracoIntegrationTestWithContent
         redirectTracker.CreateRedirects(dict);
 
         redirects = RedirectUrlService.GetContentRedirectUrls(_testPage.Key);
-        Assert.AreEqual(1, redirects.Count());
+        Assert.That(redirects.Count(), Is.EqualTo(1));
         var redirect = redirects.First();
-        Assert.AreEqual("/old-route", redirect.Url);
+        Assert.That(redirect.Url, Is.EqualTo("/old-route"));
     }
 
     /// <summary>
@@ -156,7 +156,7 @@ public class RedirectTrackerTests : UmbracoIntegrationTestWithContent
 
         redirectTracker.CreateRedirects(dict);
 
-        Assert.IsEmpty(RedirectUrlService.GetContentRedirectUrls(_testPage.Key));
+        Assert.That(RedirectUrlService.GetContentRedirectUrls(_testPage.Key), Is.Empty);
     }
 
     /// <summary>
@@ -195,7 +195,7 @@ public class RedirectTrackerTests : UmbracoIntegrationTestWithContent
 
         redirectTracker.StoreOldRoute(_testPage, dict, isMove: false);
 
-        Assert.AreEqual(0, dict.Count, "Old route should not be stored for content that has no published URL.");
+        Assert.That(dict, Is.Empty, "Old route should not be stored for content that has no published URL.");
     }
 
     /// <summary>
@@ -218,12 +218,12 @@ public class RedirectTrackerTests : UmbracoIntegrationTestWithContent
 
         redirectTracker.StoreOldRoute(_testPage, dict, isMove: true);
 
-        Assert.AreEqual(1, dict.Count);
+        Assert.That(dict, Has.Count.EqualTo(1));
         var key = dict.Keys.First();
-        Assert.AreEqual(_testPage.Key, dict[key].ContentKey);
+        Assert.That(dict[key].ContentKey, Is.EqualTo(_testPage.Key));
 
         // The stored route should strip the domain path "/en" so the result is "{rootId}/new-route", NOT "{rootId}/en/new-route".
-        Assert.AreEqual($"{_rootPage.Id}/new-route", dict[key].OldRoute);
+        Assert.That(dict[key].OldRoute, Is.EqualTo($"{_rootPage.Id}/new-route"));
     }
 
     /// <summary>
@@ -251,7 +251,7 @@ public class RedirectTrackerTests : UmbracoIntegrationTestWithContent
         redirectTracker.CreateRedirects(dict);
 
         var redirects = RedirectUrlService.GetContentRedirectUrls(_testPage.Key);
-        Assert.AreEqual(0, redirects.Count());
+        Assert.That(redirects.Count(), Is.EqualTo(0));
     }
 
     /// <summary>
@@ -273,7 +273,7 @@ public class RedirectTrackerTests : UmbracoIntegrationTestWithContent
 
         redirectTracker.StoreOldRoute(_testPage, dict, isMove: false);
 
-        Assert.AreEqual(0, dict.Count);
+        Assert.That(dict, Is.Empty);
     }
 
     /// <summary>
@@ -295,7 +295,7 @@ public class RedirectTrackerTests : UmbracoIntegrationTestWithContent
 
         redirectTracker.StoreOldRoute(_testPage, dict, isMove: false);
 
-        Assert.IsTrue(dict.Count > 0);
+        Assert.That(dict, Is.Not.Empty);
     }
 
     /// <summary>
@@ -317,7 +317,7 @@ public class RedirectTrackerTests : UmbracoIntegrationTestWithContent
 
         redirectTracker.StoreOldRoute(_testPage, dict, isMove: true);
 
-        Assert.IsTrue(dict.Count > 0);
+        Assert.That(dict, Is.Not.Empty);
     }
 
     /// <summary>
@@ -353,9 +353,9 @@ public class RedirectTrackerTests : UmbracoIntegrationTestWithContent
 
         // GetUrl for the child should only be called once (during parent's traversal).
         // The second StoreOldRoute skips because the child is already in oldRoutes.
-        Assert.AreEqual(1, getUrlForChildCallCount);
-        Assert.IsTrue(dict.ContainsKey((_testPage.Id, "en")));
-        Assert.IsTrue(dict.ContainsKey((childId, "en")));
+        Assert.That(getUrlForChildCallCount, Is.EqualTo(1));
+        Assert.That(dict.ContainsKey((_testPage.Id, "en")), Is.True);
+        Assert.That(dict.ContainsKey((childId, "en")), Is.True);
     }
 
     /// <summary>
@@ -377,7 +377,7 @@ public class RedirectTrackerTests : UmbracoIntegrationTestWithContent
 
         redirectTracker.StoreOldRoute(_testPage, dict, isMove: false);
 
-        Assert.IsTrue(dict.Count > 0);
+        Assert.That(dict, Is.Not.Empty);
     }
 
     /// <summary>
@@ -401,7 +401,7 @@ public class RedirectTrackerTests : UmbracoIntegrationTestWithContent
 
         redirectTracker.StoreOldRoute(_testPage, dict, isMove: false);
 
-        Assert.IsTrue(dict.Count > 0);
+        Assert.That(dict, Is.Not.Empty);
     }
 
     /// <summary>
@@ -426,7 +426,7 @@ public class RedirectTrackerTests : UmbracoIntegrationTestWithContent
 
         redirectTracker.StoreOldRoute(_testPage, dict, isMove: false);
 
-        Assert.IsTrue(dict.Count > 0);
+        Assert.That(dict, Is.Not.Empty);
     }
 
     private RedirectUrlRepository CreateRedirectUrlRepository() =>

@@ -45,10 +45,10 @@ public class StylesheetTests
         stylesheet.AddProperty(new StylesheetProperty("Test", "p", "font-weight:bold; font-family:Arial;"));
 
         // Assert
-        Assert.AreEqual(1, stylesheet.Properties.Count());
-        Assert.AreEqual("Test", stylesheet.Properties.Single().Name);
-        Assert.AreEqual("p", stylesheet.Properties.Single().Alias);
-        Assert.AreEqual("font-weight:bold;" + Environment.NewLine + "font-family:Arial;", stylesheet.Properties.Single().Value);
+        Assert.That(stylesheet.Properties.Count(), Is.EqualTo(1));
+        Assert.That(stylesheet.Properties.Single().Name, Is.EqualTo("Test"));
+        Assert.That(stylesheet.Properties.Single().Alias, Is.EqualTo("p"));
+        Assert.That(stylesheet.Properties.Single().Value, Is.EqualTo("font-weight:bold;" + Environment.NewLine + "font-family:Arial;"));
     }
 
     [Test]
@@ -59,14 +59,14 @@ public class StylesheetTests
             .WithPath("/css/styles.css")
             .WithContent(@"body { color:#000; } /**umb_name:Hello*/p{font-size:2em;} .bold {font-weight:bold;}")
             .Build();
-        Assert.AreEqual(1, stylesheet.Properties.Count());
+        Assert.That(stylesheet.Properties.Count(), Is.EqualTo(1));
 
         // Act
         stylesheet.RemoveProperty("Hello");
 
         // Assert
-        Assert.AreEqual(0, stylesheet.Properties.Count());
-        Assert.AreEqual(@"body { color:#000; }  .bold {font-weight:bold;}", stylesheet.Content);
+        Assert.That(stylesheet.Properties.Count(), Is.EqualTo(0));
+        Assert.That(stylesheet.Content, Is.EqualTo(@"body { color:#000; }  .bold {font-weight:bold;}"));
     }
 
     [Test]
@@ -87,12 +87,11 @@ public class StylesheetTests
         prop = stylesheet.Properties.Single();
 
         // Assert
-        Assert.AreEqual("li", prop.Alias);
-        Assert.AreEqual("font-size:5em;", prop.Value);
-        Assert.AreEqual(
-            "body { color:#000; } /**umb_name:Hello*/" + Environment.NewLine + "li {" + Environment.NewLine +
-            "\tfont-size:5em;" + Environment.NewLine + "} .bold {font-weight:bold;}",
-            stylesheet.Content);
+        Assert.That(prop.Alias, Is.EqualTo("li"));
+        Assert.That(prop.Value, Is.EqualTo("font-size:5em;"));
+        Assert.That(
+            stylesheet.Content, Is.EqualTo("body { color:#000; } /**umb_name:Hello*/" + Environment.NewLine + "li {" + Environment.NewLine +
+            "\tfont-size:5em;" + Environment.NewLine + "} .bold {font-weight:bold;}"));
     }
 
     [Test]
@@ -109,13 +108,13 @@ public class StylesheetTests
         var properties = stylesheet.Properties;
 
         // Assert
-        Assert.AreEqual(2, properties.Count());
-        Assert.AreEqual("Hello", properties.First().Name);
-        Assert.AreEqual("font-size: 1em;", properties.First().Value);
-        Assert.AreEqual("p", properties.First().Alias);
-        Assert.AreEqual("testing123", properties.Last().Name);
-        Assert.AreEqual("padding:0px;", properties.Last().Value);
-        Assert.AreEqual("li:first-child", properties.Last().Alias);
+        Assert.That(properties.Count(), Is.EqualTo(2));
+        Assert.That(properties.First().Name, Is.EqualTo("Hello"));
+        Assert.That(properties.First().Value, Is.EqualTo("font-size: 1em;"));
+        Assert.That(properties.First().Alias, Is.EqualTo("p"));
+        Assert.That(properties.Last().Name, Is.EqualTo("testing123"));
+        Assert.That(properties.Last().Value, Is.EqualTo("padding:0px;"));
+        Assert.That(properties.Last().Alias, Is.EqualTo("li:first-child"));
     }
 
     [Test]

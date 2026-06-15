@@ -19,9 +19,9 @@ public class DeepCloneHelperTests
 
         var clone = (Test1)test1.DeepClone();
 
-        Assert.AreNotSame(test1, clone);
-        Assert.AreNotSame(test1.MyTest1, clone.MyTest1);
-        Assert.AreSame(test1.MyTest2, clone.MyTest2);
+        Assert.That(clone, Is.Not.SameAs(test1));
+        Assert.That(clone.MyTest1, Is.Not.SameAs(test1.MyTest1));
+        Assert.That(clone.MyTest2, Is.SameAs(test1.MyTest2));
     }
 
     [Test]
@@ -31,12 +31,12 @@ public class DeepCloneHelperTests
 
         var clone = (Test3)test1.DeepClone();
 
-        Assert.AreNotSame(test1, clone);
-        Assert.AreEqual(test1.MyTest1.Length, clone.MyTest1.Length);
+        Assert.That(clone, Is.Not.SameAs(test1));
+        Assert.That(clone.MyTest1.Length, Is.EqualTo(test1.MyTest1.Length));
         for (var i = 0; i < test1.MyTest1.Length; i++)
         {
-            Assert.IsNotNull(clone.MyTest1.ElementAt(i));
-            Assert.AreNotSame(clone.MyTest1.ElementAt(i), test1.MyTest1.ElementAt(i));
+            Assert.That(clone.MyTest1.ElementAt(i), Is.Not.Null);
+            Assert.That(test1.MyTest1.ElementAt(i), Is.Not.SameAs(clone.MyTest1.ElementAt(i)));
         }
     }
 
@@ -47,12 +47,12 @@ public class DeepCloneHelperTests
 
         var clone = (Test4)test1.DeepClone();
 
-        Assert.AreNotSame(test1, clone);
-        Assert.AreEqual(test1.MyTest1.Length, clone.MyTest1.Length);
+        Assert.That(clone, Is.Not.SameAs(test1));
+        Assert.That(clone.MyTest1.Length, Is.EqualTo(test1.MyTest1.Length));
         for (var i = 0; i < test1.MyTest1.Length; i++)
         {
-            Assert.IsNotNull(clone.MyTest1.ElementAt(i));
-            Assert.AreNotSame(clone.MyTest1.ElementAt(i), test1.MyTest1.ElementAt(i));
+            Assert.That(clone.MyTest1.ElementAt(i), Is.Not.Null);
+            Assert.That(test1.MyTest1.ElementAt(i), Is.Not.SameAs(clone.MyTest1.ElementAt(i)));
         }
     }
 
@@ -63,13 +63,13 @@ public class DeepCloneHelperTests
 
         var clone = (Test5)test1.DeepClone();
 
-        Assert.AreNotSame(test1, clone);
+        Assert.That(clone, Is.Not.SameAs(test1));
 
-        Assert.AreEqual(test1.MyTest1.Cast<object>().Count(), clone.MyTest1.Cast<object>().Count());
+        Assert.That(clone.MyTest1.Cast<object>().Count(), Is.EqualTo(test1.MyTest1.Cast<object>().Count()));
         for (var i = 0; i < test1.MyTest1.Cast<object>().Count(); i++)
         {
-            Assert.IsNotNull(clone.MyTest1.Cast<object>().ElementAt(i));
-            Assert.AreNotSame(clone.MyTest1.Cast<object>().ElementAt(i), test1.MyTest1.Cast<object>().ElementAt(i));
+            Assert.That(clone.MyTest1.Cast<object>().ElementAt(i), Is.Not.Null);
+            Assert.That(test1.MyTest1.Cast<object>().ElementAt(i), Is.Not.SameAs(clone.MyTest1.Cast<object>().ElementAt(i)));
         }
     }
 
@@ -80,12 +80,12 @@ public class DeepCloneHelperTests
 
         var clone = (Test6)test1.DeepClone();
 
-        Assert.AreNotSame(test1, clone);
-        Assert.AreEqual(test1.MyTest1.Count(), clone.MyTest1.Count());
+        Assert.That(clone, Is.Not.SameAs(test1));
+        Assert.That(clone.MyTest1.Count(), Is.EqualTo(test1.MyTest1.Count()));
         for (var i = 0; i < test1.MyTest1.Count(); i++)
         {
-            Assert.IsNotNull(clone.MyTest1.ElementAt(i));
-            Assert.AreNotSame(clone.MyTest1.ElementAt(i), test1.MyTest1.ElementAt(i));
+            Assert.That(clone.MyTest1.ElementAt(i), Is.Not.Null);
+            Assert.That(test1.MyTest1.ElementAt(i), Is.Not.SameAs(clone.MyTest1.ElementAt(i)));
         }
     }
 
@@ -96,12 +96,12 @@ public class DeepCloneHelperTests
 
         var clone = (Test7)test1.DeepClone();
 
-        Assert.AreNotSame(test1, clone);
-        Assert.AreEqual(test1.MyTest1.Count(), clone.MyTest1.Count());
+        Assert.That(clone, Is.Not.SameAs(test1));
+        Assert.That(clone.MyTest1.Count(), Is.EqualTo(test1.MyTest1.Count()));
         for (var i = 0; i < test1.MyTest1.Count(); i++)
         {
-            Assert.IsNotNull(clone.MyTest1.ElementAt(i));
-            Assert.AreNotSame(clone.MyTest1.ElementAt(i), test1.MyTest1.ElementAt(i));
+            Assert.That(clone.MyTest1.ElementAt(i), Is.Not.Null);
+            Assert.That(test1.MyTest1.ElementAt(i), Is.Not.SameAs(clone.MyTest1.ElementAt(i)));
         }
     }
 
@@ -112,12 +112,12 @@ public class DeepCloneHelperTests
 
         var clone = (Test8)test1.DeepClone();
 
-        Assert.AreNotSame(test1, clone);
-        Assert.AreEqual(test1.MyTest1.Count(), clone.MyTest1.Count());
+        Assert.That(clone, Is.Not.SameAs(test1));
+        Assert.That(clone.MyTest1.Count(), Is.EqualTo(test1.MyTest1.Count()));
         for (var i = 0; i < test1.MyTest1.Count(); i++)
         {
-            Assert.IsNotNull(clone.MyTest1.ElementAt(i));
-            Assert.AreNotSame(clone.MyTest1.ElementAt(i), test1.MyTest1.ElementAt(i));
+            Assert.That(clone.MyTest1.ElementAt(i), Is.Not.Null);
+            Assert.That(test1.MyTest1.ElementAt(i), Is.Not.SameAs(clone.MyTest1.ElementAt(i)));
         }
     }
 
@@ -138,7 +138,7 @@ public class DeepCloneHelperTests
         var clone = (Test3)test1.DeepClone();
 
         // It skipped this property so these will now be the same.
-        Assert.AreSame(clone.MyTest1, test1.MyTest1);
+        Assert.That(test1.MyTest1, Is.SameAs(clone.MyTest1));
     }
 
     public class Test1 : BaseCloneable

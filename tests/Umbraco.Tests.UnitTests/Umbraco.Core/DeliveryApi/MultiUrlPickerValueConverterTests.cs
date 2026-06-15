@@ -25,7 +25,7 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
         publishedPropertyType.SetupGet(p => p.DataType).Returns(publishedDataType);
 
         var valueConverter = MultiUrlPickerValueConverter();
-        Assert.AreEqual(typeof(IEnumerable<ApiLink>), valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType.Object));
+        Assert.That(valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType.Object), Is.EqualTo(typeof(IEnumerable<ApiLink>)));
 
         var inter = Serializer().Serialize(new[]
         {
@@ -35,18 +35,18 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
             }
         });
         var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<ApiLink>;
-        Assert.NotNull(result);
-        Assert.AreEqual(1, result.Count());
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Count(), Is.EqualTo(1));
         var link = result.First();
-        Assert.AreEqual(PublishedContent.Name, link.Title);
-        Assert.AreEqual(LinkType.Content, link.LinkType);
-        Assert.AreEqual(PublishedContent.Key, link.DestinationId);
-        Assert.AreEqual("TheContentType", link.DestinationType);
-        Assert.Null(link.Url);
-        Assert.Null(link.Target);
+        Assert.That(link.Title, Is.EqualTo(PublishedContent.Name));
+        Assert.That(link.LinkType, Is.EqualTo(LinkType.Content));
+        Assert.That(link.DestinationId, Is.EqualTo(PublishedContent.Key));
+        Assert.That(link.DestinationType, Is.EqualTo("TheContentType"));
+        Assert.That(link.Url, Is.Null);
+        Assert.That(link.Target, Is.Null);
         var route = link.Route;
-        Assert.NotNull(route);
-        Assert.AreEqual("/the-page-url/", route.Path);
+        Assert.That(route, Is.Not.Null);
+        Assert.That(route.Path, Is.EqualTo("/the-page-url/"));
     }
 
     [Test]
@@ -57,7 +57,7 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
         publishedPropertyType.SetupGet(p => p.DataType).Returns(publishedDataType);
 
         var valueConverter = MultiUrlPickerValueConverter();
-        Assert.AreEqual(typeof(IEnumerable<ApiLink>), valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType.Object));
+        Assert.That(valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType.Object), Is.EqualTo(typeof(IEnumerable<ApiLink>)));
 
         var inter = Serializer().Serialize(new[]
         {
@@ -67,16 +67,16 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
             }
         });
         var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<ApiLink>;
-        Assert.NotNull(result);
-        Assert.AreEqual(1, result.Count());
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Count(), Is.EqualTo(1));
         var link = result.First();
-        Assert.AreEqual(PublishedMedia.Name, link.Title);
-        Assert.AreEqual(PublishedMedia.Key, link.DestinationId);
-        Assert.AreEqual("TheMediaType", link.DestinationType);
-        Assert.AreEqual("the-media-url", link.Url);
-        Assert.AreEqual(LinkType.Media, link.LinkType);
-        Assert.AreEqual(null, link.Target);
-        Assert.AreEqual(null, link.Route);
+        Assert.That(link.Title, Is.EqualTo(PublishedMedia.Name));
+        Assert.That(link.DestinationId, Is.EqualTo(PublishedMedia.Key));
+        Assert.That(link.DestinationType, Is.EqualTo("TheMediaType"));
+        Assert.That(link.Url, Is.EqualTo("the-media-url"));
+        Assert.That(link.LinkType, Is.EqualTo(LinkType.Media));
+        Assert.That(link.Target, Is.EqualTo(null));
+        Assert.That(link.Route, Is.EqualTo(null));
     }
 
     [Test]
@@ -87,7 +87,7 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
         publishedPropertyType.SetupGet(p => p.DataType).Returns(publishedDataType);
 
         var valueConverter = MultiUrlPickerValueConverter();
-        Assert.AreEqual(typeof(IEnumerable<ApiLink>), valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType.Object));
+        Assert.That(valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType.Object), Is.EqualTo(typeof(IEnumerable<ApiLink>)));
 
         var inter = Serializer().Serialize(new[]
         {
@@ -108,28 +108,28 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
             }
         });
         var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<ApiLink>;
-        Assert.NotNull(result);
-        Assert.AreEqual(3, result.Count());
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Count(), Is.EqualTo(3));
 
         var first = result.First();
         var second = result.Skip(1).First();
         var last = result.Last();
 
-        Assert.AreEqual(PublishedContent.Name, first.Title);
-        Assert.AreEqual(LinkType.Content, first.LinkType);
-        Assert.AreEqual(PublishedContent.Key, first.DestinationId);
-        Assert.NotNull(first.Route);
+        Assert.That(first.Title, Is.EqualTo(PublishedContent.Name));
+        Assert.That(first.LinkType, Is.EqualTo(LinkType.Content));
+        Assert.That(first.DestinationId, Is.EqualTo(PublishedContent.Key));
+        Assert.That(first.Route, Is.Not.Null);
 
-        Assert.AreEqual(PublishedMedia.Name, second.Title);
-        Assert.AreEqual(PublishedMedia.Key, second.DestinationId);
-        Assert.AreEqual("TheMediaType", second.DestinationType);
-        Assert.Null(second.Route);
+        Assert.That(second.Title, Is.EqualTo(PublishedMedia.Name));
+        Assert.That(second.DestinationId, Is.EqualTo(PublishedMedia.Key));
+        Assert.That(second.DestinationType, Is.EqualTo("TheMediaType"));
+        Assert.That(second.Route, Is.Null);
 
-        Assert.AreEqual("The link", last.Title);
-        Assert.AreEqual("https://umbraco.com/?something=true", last.Url);
-        Assert.AreEqual(LinkType.External, last.LinkType);
-        Assert.AreEqual("_blank", last.Target);
-        Assert.Null(last.Route);
+        Assert.That(last.Title, Is.EqualTo("The link"));
+        Assert.That(last.Url, Is.EqualTo("https://umbraco.com/?something=true"));
+        Assert.That(last.LinkType, Is.EqualTo(LinkType.External));
+        Assert.That(last.Target, Is.EqualTo("_blank"));
+        Assert.That(last.Route, Is.Null);
     }
 
     [Test]
@@ -152,15 +152,15 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
             }
         });
         var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<ApiLink>;
-        Assert.NotNull(result);
-        Assert.AreEqual(1, result.Count());
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Count(), Is.EqualTo(1));
         var link = result.First();
-        Assert.AreEqual("The link", link.Title);
-        Assert.AreEqual("https://umbraco.com/?something=true", link.Url);
-        Assert.AreEqual("?something=true", link.QueryString);
-        Assert.AreEqual(LinkType.External, link.LinkType);
-        Assert.AreEqual("_blank", link.Target);
-        Assert.Null(link.Route);
+        Assert.That(link.Title, Is.EqualTo("The link"));
+        Assert.That(link.Url, Is.EqualTo("https://umbraco.com/?something=true"));
+        Assert.That(link.QueryString, Is.EqualTo("?something=true"));
+        Assert.That(link.LinkType, Is.EqualTo(LinkType.External));
+        Assert.That(link.Target, Is.EqualTo("_blank"));
+        Assert.That(link.Route, Is.Null);
     }
 
     [Test]
@@ -183,17 +183,17 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
             }
         });
         var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<ApiLink>;
-        Assert.NotNull(result);
-        Assert.AreEqual(1, result.Count());
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Count(), Is.EqualTo(1));
         var link = result.First();
-        Assert.AreEqual("Custom link name", link.Title);
-        Assert.AreEqual(PublishedMedia.Key, link.DestinationId);
-        Assert.AreEqual("TheMediaType", link.DestinationType);
-        Assert.AreEqual("the-media-url?something=true", link.Url);
-        Assert.AreEqual(LinkType.Media, link.LinkType);
-        Assert.AreEqual("_blank", link.Target);
-        Assert.AreEqual("?something=true", link.QueryString);
-        Assert.AreEqual(null, link.Route);
+        Assert.That(link.Title, Is.EqualTo("Custom link name"));
+        Assert.That(link.DestinationId, Is.EqualTo(PublishedMedia.Key));
+        Assert.That(link.DestinationType, Is.EqualTo("TheMediaType"));
+        Assert.That(link.Url, Is.EqualTo("the-media-url?something=true"));
+        Assert.That(link.LinkType, Is.EqualTo(LinkType.Media));
+        Assert.That(link.Target, Is.EqualTo("_blank"));
+        Assert.That(link.QueryString, Is.EqualTo("?something=true"));
+        Assert.That(link.Route, Is.EqualTo(null));
     }
 
     [Test]
@@ -216,16 +216,16 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
             }
         });
         var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<ApiLink>;
-        Assert.NotNull(result);
-        Assert.AreEqual(1, result.Count());
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Count(), Is.EqualTo(1));
         var link = result.First();
-        Assert.AreEqual("Custom link name", link.Title);
-        Assert.AreEqual(PublishedContent.Key, link.DestinationId);
-        Assert.AreEqual("/the-page-url/",  link.Route!.Path);
-        Assert.AreEqual(LinkType.Content, link.LinkType);
-        Assert.AreEqual("_blank", link.Target);
-        Assert.AreEqual("?something=true", link.QueryString);
-        Assert.Null(link.Url);
+        Assert.That(link.Title, Is.EqualTo("Custom link name"));
+        Assert.That(link.DestinationId, Is.EqualTo(PublishedContent.Key));
+        Assert.That(link.Route!.Path, Is.EqualTo("/the-page-url/"));
+        Assert.That(link.LinkType, Is.EqualTo(LinkType.Content));
+        Assert.That(link.Target, Is.EqualTo("_blank"));
+        Assert.That(link.QueryString, Is.EqualTo("?something=true"));
+        Assert.That(link.Url, Is.Null);
     }
 
     [Test]
@@ -247,15 +247,15 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
             }
         });
         var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<ApiLink>;
-        Assert.NotNull(result);
-        Assert.AreEqual(1, result.Count());
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Count(), Is.EqualTo(1));
         var link = result.First();
-        Assert.AreEqual(PublishedContent.Name, link.Title);
-        Assert.AreEqual(PublishedContent.Key, link.DestinationId);
-        Assert.AreEqual("/the-page-url/", link.Route!.Path);
-        Assert.AreEqual(LinkType.Content, link.LinkType);
-        Assert.Null(link.Target);
-        Assert.Null(link.Url);
+        Assert.That(link.Title, Is.EqualTo(PublishedContent.Name));
+        Assert.That(link.DestinationId, Is.EqualTo(PublishedContent.Key));
+        Assert.That(link.Route!.Path, Is.EqualTo("/the-page-url/"));
+        Assert.That(link.LinkType, Is.EqualTo(LinkType.Content));
+        Assert.That(link.Target, Is.Null);
+        Assert.That(link.Url, Is.Null);
     }
 
     [TestCase(123)]
@@ -270,8 +270,8 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
         var valueConverter = MultiUrlPickerValueConverter();
 
         var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<ApiLink>;
-        Assert.NotNull(result);
-        Assert.IsEmpty(result);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result, Is.Empty);
     }
 
     [TestCase(123)]
@@ -286,8 +286,8 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
         var valueConverter = MultiUrlPickerValueConverter();
 
         var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<ApiLink>;
-        Assert.NotNull(result);
-        Assert.IsEmpty(result);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result, Is.Empty);
     }
 
     private IApiMediaUrlProvider ApiMediaUrlProvider() => new ApiMediaUrlProvider(PublishedUrlProvider);
@@ -348,19 +348,19 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
             false) as IEnumerable<ApiLink>;
 
         // Assert
-        Assert.NotNull(result);
-        Assert.AreEqual(1, result.Count());
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Count(), Is.EqualTo(1));
         var link = result.First();
-        Assert.AreEqual(PublishedContent.Name, link.Title);
-        Assert.AreEqual(LinkType.Content, link.LinkType);
-        Assert.AreEqual(PublishedContent.Key, link.DestinationId);
-        Assert.AreEqual("TheContentType", link.DestinationType);
-        Assert.Null(link.Url);
-        Assert.Null(link.Target);
-        Assert.AreEqual("fr-FR", link.Culture);
+        Assert.That(link.Title, Is.EqualTo(PublishedContent.Name));
+        Assert.That(link.LinkType, Is.EqualTo(LinkType.Content));
+        Assert.That(link.DestinationId, Is.EqualTo(PublishedContent.Key));
+        Assert.That(link.DestinationType, Is.EqualTo("TheContentType"));
+        Assert.That(link.Url, Is.Null);
+        Assert.That(link.Target, Is.Null);
+        Assert.That(link.Culture, Is.EqualTo("fr-FR"));
         var route = link.Route;
-        Assert.NotNull(route);
-        Assert.AreEqual("/fr/the-page-url/", route.Path);
+        Assert.That(route, Is.Not.Null);
+        Assert.That(route.Path, Is.EqualTo("/fr/the-page-url/"));
     }
 
     [Test]
@@ -398,8 +398,8 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
             false);
 
         // Assert
-        Assert.NotNull(result);
+        Assert.That(result, Is.Not.Null);
         var link = result as Link;
-        Assert.AreEqual("/fr/the-page-url", link.Url);
+        Assert.That(link.Url, Is.EqualTo("/fr/the-page-url"));
     }
 }

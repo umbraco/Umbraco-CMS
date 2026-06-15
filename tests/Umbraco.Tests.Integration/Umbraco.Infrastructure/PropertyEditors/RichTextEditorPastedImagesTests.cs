@@ -104,7 +104,7 @@ internal sealed class RichTextEditorPastedImagesTests : UmbracoIntegrationTest
         var subject = Services.GetRequiredService<RichTextEditorPastedImages>();
 
         var result = await subject.FindAndPersistPastedTempImagesAsync(html, Guid.Empty, Constants.Security.SuperUserKey);
-        Assert.AreEqual(html, result);
+        Assert.That(result, Is.EqualTo(html));
     }
 
     [Test]
@@ -118,17 +118,17 @@ internal sealed class RichTextEditorPastedImagesTests : UmbracoIntegrationTest
         var htmlDoc = new HtmlDocument();
         htmlDoc.LoadHtml(result);
         var imageNodes = htmlDoc.DocumentNode.SelectNodes("//img");
-        Assert.AreEqual(2, imageNodes.Count);
+        Assert.That(imageNodes, Has.Count.EqualTo(2));
 
         var udis = imageNodes.Select(imageNode => UdiParser.Parse(imageNode.Attributes["data-udi"].Value)).OfType<GuidUdi>().ToArray();
-        Assert.AreEqual(2, udis.Length);
-        Assert.AreNotEqual(udis.First().Guid, udis.Last().Guid);
+        Assert.That(udis, Has.Length.EqualTo(2));
+        Assert.That(udis.Last().Guid, Is.Not.EqualTo(udis.First().Guid));
 
         var mediaService = Services.GetRequiredService<IMediaService>();
         Assert.Multiple(() =>
         {
-            Assert.IsNotNull(mediaService.GetById(udis.First().Guid));
-            Assert.IsNotNull(mediaService.GetById(udis.Last().Guid));
+            Assert.That(mediaService.GetById(udis.First().Guid), Is.Not.Null);
+            Assert.That(mediaService.GetById(udis.Last().Guid), Is.Not.Null);
         });
     }
 
@@ -143,34 +143,34 @@ internal sealed class RichTextEditorPastedImagesTests : UmbracoIntegrationTest
         var htmlDoc = new HtmlDocument();
         htmlDoc.LoadHtml(result);
         var imageNodes = htmlDoc.DocumentNode.SelectNodes("//img");
-        Assert.AreEqual(2, imageNodes.Count);
+        Assert.That(imageNodes, Has.Count.EqualTo(2));
 
         var udis = imageNodes.Select(imageNode => UdiParser.Parse(imageNode.Attributes["data-udi"].Value)).OfType<GuidUdi>().ToArray();
-        Assert.AreEqual(2, udis.Length);
-        Assert.AreEqual(udis.First().Guid, udis.Last().Guid);
+        Assert.That(udis, Has.Length.EqualTo(2));
+        Assert.That(udis.Last().Guid, Is.EqualTo(udis.First().Guid));
 
         var mediaService = Services.GetRequiredService<IMediaService>();
-        Assert.IsNotNull(mediaService.GetById(udis.First().Guid));
+        Assert.That(mediaService.GetById(udis.First().Guid), Is.Not.Null);
     }
 
     private void AssertContainsMedia(string result, string expectedMediaTypeAlias)
     {
-        Assert.IsFalse(result.Contains("data-tmpimg"));
+        Assert.That(result, Does.Not.Contain("data-tmpimg"));
 
         var htmlDoc = new HtmlDocument();
         htmlDoc.LoadHtml(result);
         var imageNode = htmlDoc.DocumentNode.SelectNodes("//img").FirstOrDefault();
-        Assert.IsNotNull(imageNode);
+        Assert.That(imageNode, Is.Not.Null);
 
-        Assert.IsTrue(imageNode.Attributes.Contains("src"));
-        Assert.AreEqual("the-media-url", imageNode.Attributes["src"].Value);
+        Assert.That(imageNode.Attributes.Contains("src"), Is.True);
+        Assert.That(imageNode.Attributes["src"].Value, Is.EqualTo("the-media-url"));
 
-        Assert.IsTrue(imageNode.Attributes.Contains("data-udi"));
-        Assert.IsTrue(UdiParser.TryParse(imageNode.Attributes["data-udi"].Value, out GuidUdi udi));
-        Assert.AreEqual(Constants.UdiEntityType.Media, udi.EntityType);
+        Assert.That(imageNode.Attributes.Contains("data-udi"), Is.True);
+        Assert.That(UdiParser.TryParse(imageNode.Attributes["data-udi"].Value, out GuidUdi udi), Is.True);
+        Assert.That(udi.EntityType, Is.EqualTo(Constants.UdiEntityType.Media));
 
         var media = Services.GetRequiredService<IMediaService>().GetById(udi.Guid);
-        Assert.IsNotNull(media);
-        Assert.AreEqual(expectedMediaTypeAlias, media.ContentType.Alias);
+        Assert.That(media, Is.Not.Null);
+        Assert.That(media.ContentType.Alias, Is.EqualTo(expectedMediaTypeAlias));
     }
 }

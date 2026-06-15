@@ -202,7 +202,7 @@ internal sealed class ServerRegistrationRepositoryTest : UmbracoIntegrationTest
 
             // Act
             var server = repository.Get(3);
-            Assert.IsNotNull(server);
+            Assert.That(server, Is.Not.Null);
             repository.Delete(server);
 
             var exists = repository.Exists(3);
@@ -239,15 +239,15 @@ internal sealed class ServerRegistrationRepositoryTest : UmbracoIntegrationTest
         {
             var repository = CreateRepository(provider);
             var all = repository.GetMany().ToArray();
-            Assert.IsTrue(all.Length > 0);
+            Assert.That(all, Is.Not.Empty);
 
             var first = repository.Get(all[0].Id);
             var second = repository.Get(all[0].Id);
 
-            Assert.IsNotNull(first);
-            Assert.IsNotNull(second);
-            Assert.AreEqual(first!.Id, second!.Id);
-            Assert.AreNotSame(first, second);
+            Assert.That(first, Is.Not.Null);
+            Assert.That(second, Is.Not.Null);
+            Assert.That(second!.Id, Is.EqualTo(first!.Id));
+            Assert.That(second, Is.Not.SameAs(first));
         }
     }
 
@@ -259,10 +259,10 @@ internal sealed class ServerRegistrationRepositoryTest : UmbracoIntegrationTest
         {
             var repository = CreateRepository(provider);
             var all = repository.GetMany().ToArray();
-            Assert.IsTrue(all.Length > 0);
+            Assert.That(all, Is.Not.Empty);
 
-            Assert.IsTrue(repository.Exists(all[0].Id));
-            Assert.IsFalse(repository.Exists(99999));
+            Assert.That(repository.Exists(all[0].Id), Is.True);
+            Assert.That(repository.Exists(99999), Is.False);
         }
     }
 

@@ -35,8 +35,8 @@ public class ChildrenSelectorTests
             Mock.Of<IVariationContextAccessor>());
 
         var result = subject.BuildSelectorOption("children:/some/where");
-        Assert.AreEqual(1, result.Values.Length);
-        Assert.AreEqual(documentKey.ToString("D"), result.Values[0]);
+        Assert.That(result.Values.Length, Is.EqualTo(1));
+        Assert.That(result.Values[0], Is.EqualTo(documentKey.ToString("D")));
     }
 
     [Test]
@@ -51,7 +51,7 @@ public class ChildrenSelectorTests
             Mock.Of<IVariationContextAccessor>());
 
         var result = subject.BuildSelectorOption($"children:{documentKey:D}");
-        Assert.AreEqual(1, result.Values.Length);
-        Assert.AreEqual(documentKey.ToString("D"), result.Values[0]);
+        Assert.That(result.Values.Length, Is.EqualTo(1));
+        Assert.That(result.Values[0], Is.EqualTo(documentKey.ToString("D")));
     }
 }

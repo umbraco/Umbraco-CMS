@@ -115,12 +115,11 @@ internal abstract class OpenApiTestBase : UmbracoTestServerTestBase
         var generatedOpenApiJson = JsonNode.Parse(generatedSpec);
         var expectedOpenApiJson = JsonNode.Parse(expectedContract);
 
-        Assert.NotNull(generatedOpenApiJson);
-        Assert.NotNull(expectedOpenApiJson);
+        Assert.That(generatedOpenApiJson, Is.Not.Null);
+        Assert.That(expectedOpenApiJson, Is.Not.Null);
 
-        Assert.AreEqual(
-            expectedOpenApiJson!.ToJsonString(),
-            generatedOpenApiJson!.ToJsonString(),
+        Assert.That(
+            generatedOpenApiJson!.ToJsonString(), Is.EqualTo(expectedOpenApiJson!.ToJsonString()),
             "Generated API does not respect the contract.");
     }
 

@@ -35,7 +35,7 @@ internal sealed class CacheInstructionServiceTests : UmbracoIntegrationTest
 
         var result = sut.IsColdBootRequired(0);
 
-        Assert.IsTrue(result);
+        Assert.That(result, Is.True);
     }
 
     [Test]
@@ -48,7 +48,7 @@ internal sealed class CacheInstructionServiceTests : UmbracoIntegrationTest
 
         var result = sut.IsColdBootRequired(2);
 
-        Assert.IsTrue(result);
+        Assert.That(result, Is.True);
     }
 
     [Test]
@@ -61,7 +61,7 @@ internal sealed class CacheInstructionServiceTests : UmbracoIntegrationTest
 
         var result = sut.IsColdBootRequired(1);
 
-        Assert.IsFalse(result);
+        Assert.That(result, Is.False);
     }
 
     [TestCase(1, 10, false, 4)]
@@ -74,8 +74,8 @@ internal sealed class CacheInstructionServiceTests : UmbracoIntegrationTest
 
         var result = sut.IsInstructionCountOverLimit(lastId, limit, out var count);
 
-        Assert.AreEqual(expectedResult, result);
-        Assert.AreEqual(expectedCount, count);
+        Assert.That(result, Is.EqualTo(expectedResult));
+        Assert.That(count, Is.EqualTo(expectedCount));
     }
 
     [Test]
@@ -87,7 +87,7 @@ internal sealed class CacheInstructionServiceTests : UmbracoIntegrationTest
 
         var result = sut.GetMaxInstructionId();
 
-        Assert.AreEqual(3, result);
+        Assert.That(result, Is.EqualTo(3));
     }
 
     [Test]
@@ -135,11 +135,11 @@ internal sealed class CacheInstructionServiceTests : UmbracoIntegrationTest
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(1, cacheInstructions.Count);
+            Assert.That(cacheInstructions, Has.Count.EqualTo(1));
 
             var firstInstruction = cacheInstructions.First();
-            Assert.AreEqual(2, firstInstruction.InstructionCount);
-            Assert.AreEqual(LocalIdentity, firstInstruction.OriginIdentity);
+            Assert.That(firstInstruction.InstructionCount, Is.EqualTo(2));
+            Assert.That(firstInstruction.OriginIdentity, Is.EqualTo(LocalIdentity));
         });
     }
 
@@ -155,8 +155,8 @@ internal sealed class CacheInstructionServiceTests : UmbracoIntegrationTest
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(3, result.LastId); // 3 records found.
-            Assert.AreEqual(2, result.NumberOfInstructionsProcessed); // 2 records processed (as one is for the same identity).
+            Assert.That(result.LastId, Is.EqualTo(3)); // 3 records found.
+            Assert.That(result.NumberOfInstructionsProcessed, Is.EqualTo(2)); // 2 records processed (as one is for the same identity).
         });
     }
 
@@ -174,8 +174,8 @@ internal sealed class CacheInstructionServiceTests : UmbracoIntegrationTest
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(0, result.LastId);
-            Assert.AreEqual(0, result.NumberOfInstructionsProcessed);
+            Assert.That(result.LastId, Is.EqualTo(0));
+            Assert.That(result.NumberOfInstructionsProcessed, Is.EqualTo(0));
         });
     }
 
@@ -194,8 +194,8 @@ internal sealed class CacheInstructionServiceTests : UmbracoIntegrationTest
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(3, result.LastId); // 3 records found.
-            Assert.AreEqual(2, result.NumberOfInstructionsProcessed); // 2 records processed (as one is for the same identity).
+            Assert.That(result.LastId, Is.EqualTo(3)); // 3 records found.
+            Assert.That(result.NumberOfInstructionsProcessed, Is.EqualTo(2)); // 2 records processed (as one is for the same identity).
         });
 
         // ProcessAllInstructions persists the last synced ID via ILastSyncedManager,
@@ -206,11 +206,10 @@ internal sealed class CacheInstructionServiceTests : UmbracoIntegrationTest
         var secondResult = sut.ProcessAllInstructions(CacheRefreshers, CancellationToken, LocalIdentity);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(
-                0,
+            Assert.That(
                 secondResult
-                    .LastId); // No instructions was processed so LastId is 0, this is consistent with behavior from V8
-            Assert.AreEqual(0, secondResult.NumberOfInstructionsProcessed); // Nothing was processed.
+                    .LastId, Is.EqualTo(0)); // No instructions was processed so LastId is 0, this is consistent with behavior from V8
+            Assert.That(secondResult.NumberOfInstructionsProcessed, Is.EqualTo(0)); // Nothing was processed.
         });
     }
 
@@ -222,7 +221,7 @@ internal sealed class CacheInstructionServiceTests : UmbracoIntegrationTest
 
         var result = sut.ProcessAllInstructions(CacheRefreshers, CancellationToken, LocalIdentity);
 
-        Assert.AreEqual(3, result.LastId); // Make sure LastId is 3, the rest is tested in other test.
+        Assert.That(result.LastId, Is.EqualTo(3)); // Make sure LastId is 3, the rest is tested in other test.
 
         // Add new instruction
         var instructions = CreateInstructions();
@@ -232,8 +231,8 @@ internal sealed class CacheInstructionServiceTests : UmbracoIntegrationTest
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(4, secondResult.LastId);
-            Assert.AreEqual(1, secondResult.NumberOfInstructionsProcessed);
+            Assert.That(secondResult.LastId, Is.EqualTo(4));
+            Assert.That(secondResult.NumberOfInstructionsProcessed, Is.EqualTo(1));
         });
     }
 
@@ -245,7 +244,7 @@ internal sealed class CacheInstructionServiceTests : UmbracoIntegrationTest
 
         var result = sut.ProcessAllInstructions(CacheRefreshers, CancellationToken, LocalIdentity);
 
-        Assert.AreEqual(3, result.LastId); // Make sure LastId is 3, the rest is tested in other test.
+        Assert.That(result.LastId, Is.EqualTo(3)); // Make sure LastId is 3, the rest is tested in other test.
 
         // Add new instruction
         var instructions = CreateInstructions();
@@ -255,8 +254,8 @@ internal sealed class CacheInstructionServiceTests : UmbracoIntegrationTest
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(4, secondResult.LastId);
-            Assert.AreEqual(0, secondResult.NumberOfInstructionsProcessed);
+            Assert.That(secondResult.LastId, Is.EqualTo(4));
+            Assert.That(secondResult.NumberOfInstructionsProcessed, Is.EqualTo(0));
         });
     }
 
@@ -271,21 +270,21 @@ internal sealed class CacheInstructionServiceTests : UmbracoIntegrationTest
         sut.DeliverInstructions(instructions, LocalIdentity);
 
         var lastSynced = await lastSyncedManager.GetLastSyncedExternalAsync();
-        Assert.IsNull(lastSynced);
+        Assert.That(lastSynced, Is.Null);
 
         var result = sut.ProcessAllInstructions(CacheRefreshers, CancellationToken, LocalIdentity);
 
         Assert.Multiple(() =>
         {
             // 2 records found.
-            Assert.AreEqual(2, result.LastId);
+            Assert.That(result.LastId, Is.EqualTo(2));
 
             // local instructions do not count against number of processed instructions.
-            Assert.AreEqual(0, result.NumberOfInstructionsProcessed);
+            Assert.That(result.NumberOfInstructionsProcessed, Is.EqualTo(0));
         });
 
         lastSynced = await lastSyncedManager.GetLastSyncedExternalAsync();
-        Assert.AreEqual(2, lastSynced);
+        Assert.That(lastSynced, Is.EqualTo(2));
         var debug = true;
     }
 

@@ -70,9 +70,9 @@ public class FullDataSetCachePolicyFindTests
 
         var found = policy.FindCached(x => x.Id == 3, _ => entities);
 
-        Assert.IsNotNull(found);
-        Assert.AreEqual(3, found!.Id);
-        Assert.AreEqual("entity-3", found.Name);
+        Assert.That(found, Is.Not.Null);
+        Assert.That(found!.Id, Is.EqualTo(3));
+        Assert.That(found.Name, Is.EqualTo("entity-3"));
     }
 
     [Test]
@@ -86,12 +86,12 @@ public class FullDataSetCachePolicyFindTests
 
         var found = policy.FindCached(x => x.Id == 2, _ => entities);
 
-        Assert.IsNotNull(found);
-        Assert.AreEqual(2, found!.Id);
+        Assert.That(found, Is.Not.Null);
+        Assert.That(found!.Id, Is.EqualTo(2));
 
         // Must be a different reference than the cached original.
         var cachedOriginal = entities.First(x => x.Id == 2);
-        Assert.AreNotSame(cachedOriginal, found);
+        Assert.That(found, Is.Not.SameAs(cachedOriginal));
     }
 
     [Test]
@@ -105,7 +105,7 @@ public class FullDataSetCachePolicyFindTests
 
         var found = policy.FindCached(x => x.Id == 999, _ => entities);
 
-        Assert.IsNull(found);
+        Assert.That(found, Is.Null);
     }
 
     [Test]
@@ -123,9 +123,9 @@ public class FullDataSetCachePolicyFindTests
             return entities;
         });
 
-        Assert.IsNotNull(found);
-        Assert.AreEqual(2, found!.Id);
-        Assert.AreEqual(1, performGetAllCallCount, "performGetAll should be called once to populate cache");
+        Assert.That(found, Is.Not.Null);
+        Assert.That(found!.Id, Is.EqualTo(2));
+        Assert.That(performGetAllCallCount, Is.EqualTo(1), "performGetAll should be called once to populate cache");
 
         // Second call should NOT trigger performGetAll again.
         var found2 = policy.FindCached(x => x.Id == 1, _ =>
@@ -134,8 +134,8 @@ public class FullDataSetCachePolicyFindTests
             return entities;
         });
 
-        Assert.IsNotNull(found2);
-        Assert.AreEqual(1, performGetAllCallCount, "performGetAll should not be called again — cache is warm");
+        Assert.That(found2, Is.Not.Null);
+        Assert.That(performGetAllCallCount, Is.EqualTo(1), "performGetAll should not be called again — cache is warm");
     }
 
     [Test]
@@ -149,7 +149,7 @@ public class FullDataSetCachePolicyFindTests
 
         var exists = policy.ExistsCached(x => x.Id == 3, _ => entities);
 
-        Assert.IsTrue(exists);
+        Assert.That(exists, Is.True);
     }
 
     [Test]
@@ -163,7 +163,7 @@ public class FullDataSetCachePolicyFindTests
 
         var exists = policy.ExistsCached(x => x.Id == 999, _ => entities);
 
-        Assert.IsFalse(exists);
+        Assert.That(exists, Is.False);
     }
 
     [Test]
@@ -181,9 +181,9 @@ public class FullDataSetCachePolicyFindTests
         // FindCached should clone only the 1 matched entity.
         var found = policy.FindCached(x => x.Id == 25, _ => entities);
 
-        Assert.IsNotNull(found);
-        Assert.AreEqual(25, found!.Id);
-        Assert.AreEqual(1, CloneCountingEntity.CloneCount, "FindCached should trigger exactly 1 DeepClone call");
+        Assert.That(found, Is.Not.Null);
+        Assert.That(found!.Id, Is.EqualTo(25));
+        Assert.That(CloneCountingEntity.CloneCount, Is.EqualTo(1), "FindCached should trigger exactly 1 DeepClone call");
     }
 
     [Test]
@@ -202,8 +202,8 @@ public class FullDataSetCachePolicyFindTests
         // GetAll clones every entity.
         var all = policy.GetAll(null, _ => entities);
 
-        Assert.AreEqual(entityCount, all.Length);
-        Assert.AreEqual(entityCount, CloneCountingEntity.CloneCount, "GetAll should trigger N DeepClone calls");
+        Assert.That(all.Length, Is.EqualTo(entityCount));
+        Assert.That(CloneCountingEntity.CloneCount, Is.EqualTo(entityCount), "GetAll should trigger N DeepClone calls");
     }
 
     [Test]
@@ -220,8 +220,8 @@ public class FullDataSetCachePolicyFindTests
 
         var exists = policy.ExistsCached(x => x.Id == 25, _ => entities);
 
-        Assert.IsTrue(exists);
-        Assert.AreEqual(0, CloneCountingEntity.CloneCount, "ExistsCached should trigger zero DeepClone calls");
+        Assert.That(exists, Is.True);
+        Assert.That(CloneCountingEntity.CloneCount, Is.EqualTo(0), "ExistsCached should trigger zero DeepClone calls");
     }
 
     [Test]
@@ -248,8 +248,8 @@ public class FullDataSetCachePolicyFindTests
                 try
                 {
                     var result = policy.FindCached(x => x.Id == targetId, _ => entities);
-                    Assert.IsNotNull(result);
-                    Assert.AreEqual(targetId, result!.Id);
+                    Assert.That(result, Is.Not.Null);
+                    Assert.That(result!.Id, Is.EqualTo(targetId));
                 }
                 catch (Exception e)
                 {
@@ -272,8 +272,8 @@ public class FullDataSetCachePolicyFindTests
             t.Join();
         }
 
-        Assert.IsEmpty(
-            exceptions,
+        Assert.That(
+            exceptions, Is.Empty,
             $"Thread safety violation: {string.Join(Environment.NewLine, exceptions.Select(e => e.Message))}");
     }
 
@@ -293,8 +293,8 @@ public class FullDataSetCachePolicyFindTests
         var targetIds = new HashSet<int> { 5, 10, 15, 20, 25 };
         var found = policy.FindAllCached(x => targetIds.Contains(x.Id), _ => entities);
 
-        Assert.AreEqual(5, found.Length);
-        Assert.AreEqual(5, CloneCountingEntity.CloneCount, "FindAllCached should clone only the 5 matched entities, not all 50");
+        Assert.That(found.Length, Is.EqualTo(5));
+        Assert.That(CloneCountingEntity.CloneCount, Is.EqualTo(5), "FindAllCached should clone only the 5 matched entities, not all 50");
     }
 
     [Test]
@@ -308,7 +308,7 @@ public class FullDataSetCachePolicyFindTests
 
         var found = policy.FindAllCached(x => x.Id > 999, _ => entities);
 
-        Assert.IsEmpty(found);
+        Assert.That(found, Is.Empty);
     }
 
     /// <summary>

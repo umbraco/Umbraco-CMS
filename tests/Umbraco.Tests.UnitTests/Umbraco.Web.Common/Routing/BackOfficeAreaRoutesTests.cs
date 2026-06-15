@@ -27,7 +27,7 @@ public class BackOfficeAreaRoutesTests
         var endpoints = new TestRouteBuilder();
         routes.CreateRoutes(endpoints);
 
-        Assert.AreEqual(0, endpoints.DataSources.Count);
+        Assert.That(endpoints.DataSources.Count, Is.EqualTo(0));
     }
 
     [Test]
@@ -40,9 +40,9 @@ public class BackOfficeAreaRoutesTests
         var endpoints = new TestRouteBuilder();
         routes.CreateRoutes(endpoints);
 
-        Assert.AreEqual(2, endpoints.DataSources.Count);
+        Assert.That(endpoints.DataSources, Has.Count.EqualTo(2));
         var route = endpoints.DataSources.First();
-        Assert.AreEqual(2, route.Endpoints.Count);
+        Assert.That(route.Endpoints, Has.Count.EqualTo(2));
 
         AssertMinimalBackOfficeRoutes(route);
     }
@@ -50,9 +50,9 @@ public class BackOfficeAreaRoutesTests
     private void AssertMinimalBackOfficeRoutes(EndpointDataSource route)
     {
         var endpoint1 = (RouteEndpoint)route.Endpoints[0];
-        Assert.AreEqual("umbraco/{action}/{id?}", endpoint1.RoutePattern.RawText);
-        Assert.AreEqual("Index", endpoint1.RoutePattern.Defaults[ActionToken]);
-        Assert.AreEqual(ControllerExtensions.GetControllerName<BackOfficeDefaultController>(), endpoint1.RoutePattern.Defaults[ControllerToken]);
+        Assert.That(endpoint1.RoutePattern.RawText, Is.EqualTo("umbraco/{action}/{id?}"));
+        Assert.That(endpoint1.RoutePattern.Defaults[ActionToken], Is.EqualTo("Index"));
+        Assert.That(endpoint1.RoutePattern.Defaults[ControllerToken], Is.EqualTo(ControllerExtensions.GetControllerName<BackOfficeDefaultController>()));
     }
 
     private BackOfficeAreaRoutes GetBackOfficeAreaRoutes(RuntimeLevel level)

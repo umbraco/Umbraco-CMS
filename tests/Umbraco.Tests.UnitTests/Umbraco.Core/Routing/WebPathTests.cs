@@ -26,7 +26,7 @@ public class WebPathTests
 
     [Test]
     public void Combine_must_handle_empty_array() =>
-        Assert.AreEqual(string.Empty, WebPath.Combine(Array.Empty<string>()));
+        Assert.That(WebPath.Combine(Array.Empty<string>()), Is.EqualTo(string.Empty));
 
     [Test]
     public void Combine_must_handle_null() => Assert.Throws<ArgumentNullException>(() => WebPath.Combine(null));

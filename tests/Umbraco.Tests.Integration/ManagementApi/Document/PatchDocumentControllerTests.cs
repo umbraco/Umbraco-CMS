@@ -184,13 +184,13 @@ public class PatchDocumentControllerTests : ManagementApiUserGroupTestBase<Patch
         var response = await Client.PatchAsync($"/umbraco/management/api/v1/document/{documentKey}/patch", httpContent);
 
         // Assert
-        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
 
         // Verify only en-US was updated
         var content = await ContentEditingService.GetAsync(documentKey);
-        Assert.IsNotNull(content);
-        Assert.AreEqual("Updated English Name", content.GetCultureName("en-US"));
-        Assert.AreEqual("Danish Name", content.GetCultureName("da-DK")); // Unchanged
+        Assert.That(content, Is.Not.Null);
+        Assert.That(content.GetCultureName("en-US"), Is.EqualTo("Updated English Name"));
+        Assert.That(content.GetCultureName("da-DK"), Is.EqualTo("Danish Name")); // Unchanged
     }
 
     [Test]
@@ -267,14 +267,14 @@ public class PatchDocumentControllerTests : ManagementApiUserGroupTestBase<Patch
         var response = await Client.PatchAsync($"/umbraco/management/api/v1/document/{documentKey}/patch", httpContent);
 
         // Assert
-        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
 
         // Verify both cultures updated
         var content = await ContentEditingService.GetAsync(documentKey);
-        Assert.IsNotNull(content);
-        Assert.AreEqual("Updated English", content.GetCultureName("en-US"));
-        Assert.AreEqual("Updated Danish", content.GetCultureName("da-DK"));
-        Assert.AreEqual("German Name", content.GetCultureName("de-DE")); // Unchanged
+        Assert.That(content, Is.Not.Null);
+        Assert.That(content.GetCultureName("en-US"), Is.EqualTo("Updated English"));
+        Assert.That(content.GetCultureName("da-DK"), Is.EqualTo("Updated Danish"));
+        Assert.That(content.GetCultureName("de-DE"), Is.EqualTo("German Name")); // Unchanged
     }
 
     [Test]
@@ -333,7 +333,7 @@ public class PatchDocumentControllerTests : ManagementApiUserGroupTestBase<Patch
         var response = await Client.PatchAsync($"/umbraco/management/api/v1/document/{documentKey}/patch", httpContent);
 
         // Assert
-        Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
     }
 
     [Test]
@@ -397,12 +397,12 @@ public class PatchDocumentControllerTests : ManagementApiUserGroupTestBase<Patch
         var response = await Client.PatchAsync($"/umbraco/management/api/v1/document/{documentKey}/patch", httpContent);
 
         // Assert
-        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
 
         // Verify property was updated
         var updatedContent = await ContentEditingService.GetAsync(documentKey);
-        Assert.IsNotNull(updatedContent);
-        Assert.AreEqual("Updated Title", updatedContent.GetValue<string>("title", "en-US"));
+        Assert.That(updatedContent, Is.Not.Null);
+        Assert.That(updatedContent.GetValue<string>("title", "en-US"), Is.EqualTo("Updated Title"));
     }
 
     [Test]
@@ -481,13 +481,13 @@ public class PatchDocumentControllerTests : ManagementApiUserGroupTestBase<Patch
         var response = await Client.PatchAsync($"/umbraco/management/api/v1/document/{documentKey}/patch", httpContent);
 
         // Assert
-        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
 
         // Verify both properties were updated
         var updatedContent = await ContentEditingService.GetAsync(documentKey);
-        Assert.IsNotNull(updatedContent);
-        Assert.AreEqual("Updated Title", updatedContent.GetValue<string>("title", "en-US"));
-        Assert.AreEqual("Updated Description", updatedContent.GetValue<string>("description", "en-US"));
+        Assert.That(updatedContent, Is.Not.Null);
+        Assert.That(updatedContent.GetValue<string>("title", "en-US"), Is.EqualTo("Updated Title"));
+        Assert.That(updatedContent.GetValue<string>("description", "en-US"), Is.EqualTo("Updated Description"));
     }
 
     [Test]
@@ -557,13 +557,13 @@ public class PatchDocumentControllerTests : ManagementApiUserGroupTestBase<Patch
         var response = await Client.PatchAsync($"/umbraco/management/api/v1/document/{documentKey}/patch", httpContent);
 
         // Assert
-        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
 
         // Verify both name and property were updated
         var updatedContent = await ContentEditingService.GetAsync(documentKey);
-        Assert.IsNotNull(updatedContent);
-        Assert.AreEqual("Updated Name", updatedContent.GetCultureName("en-US"));
-        Assert.AreEqual("Updated Title", updatedContent.GetValue<string>("title", "en-US"));
+        Assert.That(updatedContent, Is.Not.Null);
+        Assert.That(updatedContent.GetCultureName("en-US"), Is.EqualTo("Updated Name"));
+        Assert.That(updatedContent.GetValue<string>("title", "en-US"), Is.EqualTo("Updated Title"));
     }
 
     [Test]
@@ -623,7 +623,7 @@ public class PatchDocumentControllerTests : ManagementApiUserGroupTestBase<Patch
         var response = await Client.PatchAsync($"/umbraco/management/api/v1/document/{documentKey}/patch", httpContent);
 
         // Assert - Returns BadRequest (400) because path filter matches no elements
-        Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
     }
 
     [Test]
@@ -694,13 +694,13 @@ public class PatchDocumentControllerTests : ManagementApiUserGroupTestBase<Patch
             var errorContent = await response.Content.ReadAsStringAsync();
             Console.WriteLine($"Error Response: {errorContent}");
         }
-        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
 
         // Verify only premium segment was updated
         var updatedContent = await ContentEditingService.GetAsync(documentKey);
-        Assert.IsNotNull(updatedContent);
-        Assert.AreEqual("200", updatedContent.GetValue<string>("price", "en-US", "premium"));
-        Assert.AreEqual("100", updatedContent.GetValue<string>("price", "en-US", "standard")); // Unchanged
+        Assert.That(updatedContent, Is.Not.Null);
+        Assert.That(updatedContent.GetValue<string>("price", "en-US", "premium"), Is.EqualTo("200"));
+        Assert.That(updatedContent.GetValue<string>("price", "en-US", "standard"), Is.EqualTo("100")); // Unchanged
     }
 
     [Test]
@@ -747,7 +747,7 @@ public class PatchDocumentControllerTests : ManagementApiUserGroupTestBase<Patch
         var response = await Client.PatchAsync($"/umbraco/management/api/v1/document/{documentKey}/patch", httpContent);
 
         // Assert - Umbraco allows patching documents in recycle bin (they can be edited before permanent deletion)
-        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
     }
 
     [Test]
@@ -778,7 +778,7 @@ public class PatchDocumentControllerTests : ManagementApiUserGroupTestBase<Patch
         var response = await Client.PatchAsync($"/umbraco/management/api/v1/document/{nonExistentKey}/patch", httpContent);
 
         // Assert
-        Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode);
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
     }
 
     [Test]
@@ -952,42 +952,42 @@ public class PatchDocumentControllerTests : ManagementApiUserGroupTestBase<Patch
             Console.WriteLine($"Error response: {response.StatusCode}");
             Console.WriteLine($"Error body: {errorContent}");
         }
-        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
 
         // Verify only block 2's headline was updated
         var updatedContent = ContentService.GetById(documentKey);
-        Assert.IsNotNull(updatedContent);
+        Assert.That(updatedContent, Is.Not.Null);
 
         var updatedBlockListJson = updatedContent.GetValue<string>("contentBlocks");
-        Assert.IsNotNull(updatedBlockListJson);
+        Assert.That(updatedBlockListJson, Is.Not.Null);
 
         var updatedBlockListValue = jsonSerializer.Deserialize<BlockListValue>(updatedBlockListJson);
-        Assert.IsNotNull(updatedBlockListValue);
+        Assert.That(updatedBlockListValue, Is.Not.Null);
 
         // Find block 2 in the content data
         var block2Data = updatedBlockListValue.ContentData.FirstOrDefault(b => b.Key == block2Key);
-        Assert.IsNotNull(block2Data);
+        Assert.That(block2Data, Is.Not.Null);
 
         // Verify block 2 headline was updated
         var headlineValue = block2Data.Values.FirstOrDefault(v => v.Alias == "headline");
-        Assert.IsNotNull(headlineValue);
-        Assert.AreEqual("Updated Block 2 Headline", headlineValue.Value?.ToString());
+        Assert.That(headlineValue, Is.Not.Null);
+        Assert.That(headlineValue.Value?.ToString(), Is.EqualTo("Updated Block 2 Headline"));
 
         // Verify block 2 description was NOT updated
         var descriptionValue = block2Data.Values.FirstOrDefault(v => v.Alias == "description");
-        Assert.IsNotNull(descriptionValue);
-        Assert.AreEqual("Block 2 Description", descriptionValue.Value?.ToString());
+        Assert.That(descriptionValue, Is.Not.Null);
+        Assert.That(descriptionValue.Value?.ToString(), Is.EqualTo("Block 2 Description"));
 
         // Verify block 1 and block 3 were NOT updated
         var block1Data = updatedBlockListValue.ContentData.FirstOrDefault(b => b.Key == block1Key);
-        Assert.IsNotNull(block1Data);
-        Assert.AreEqual("Block 1 Headline", block1Data.Values.FirstOrDefault(v => v.Alias == "headline")?.Value?.ToString());
-        Assert.AreEqual("Block 1 Description", block1Data.Values.FirstOrDefault(v => v.Alias == "description")?.Value?.ToString());
+        Assert.That(block1Data, Is.Not.Null);
+        Assert.That(block1Data.Values.FirstOrDefault(v => v.Alias == "headline")?.Value?.ToString(), Is.EqualTo("Block 1 Headline"));
+        Assert.That(block1Data.Values.FirstOrDefault(v => v.Alias == "description")?.Value?.ToString(), Is.EqualTo("Block 1 Description"));
 
         var block3Data = updatedBlockListValue.ContentData.FirstOrDefault(b => b.Key == block3Key);
-        Assert.IsNotNull(block3Data);
-        Assert.AreEqual("Block 3 Headline", block3Data.Values.FirstOrDefault(v => v.Alias == "headline")?.Value?.ToString());
-        Assert.AreEqual("Block 3 Description", block3Data.Values.FirstOrDefault(v => v.Alias == "description")?.Value?.ToString());
+        Assert.That(block3Data, Is.Not.Null);
+        Assert.That(block3Data.Values.FirstOrDefault(v => v.Alias == "headline")?.Value?.ToString(), Is.EqualTo("Block 3 Headline"));
+        Assert.That(block3Data.Values.FirstOrDefault(v => v.Alias == "description")?.Value?.ToString(), Is.EqualTo("Block 3 Description"));
     }
 
     [Test]
@@ -1160,41 +1160,41 @@ public class PatchDocumentControllerTests : ManagementApiUserGroupTestBase<Patch
             Console.WriteLine($"Error response: {response.StatusCode}");
             Console.WriteLine($"Error body: {errorContent}");
         }
-        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
 
         // Verify the block list now has 3 blocks
         var updatedContent = ContentService.GetById(documentKey);
-        Assert.IsNotNull(updatedContent);
+        Assert.That(updatedContent, Is.Not.Null);
 
         var updatedBlockListJson = updatedContent.GetValue<string>("contentBlocks");
-        Assert.IsNotNull(updatedBlockListJson);
+        Assert.That(updatedBlockListJson, Is.Not.Null);
 
         var updatedBlockListValue = jsonSerializer.Deserialize<BlockListValue>(updatedBlockListJson);
-        Assert.IsNotNull(updatedBlockListValue);
+        Assert.That(updatedBlockListValue, Is.Not.Null);
 
         // Verify contentData has 3 blocks
-        Assert.AreEqual(3, updatedBlockListValue.ContentData.Count);
+        Assert.That(updatedBlockListValue.ContentData, Has.Count.EqualTo(3));
 
         // Verify the new block was added with correct values
         var newBlockData = updatedBlockListValue.ContentData.FirstOrDefault(b => b.Key == newBlockKey);
-        Assert.IsNotNull(newBlockData);
-        Assert.AreEqual("New Block Headline", newBlockData.Values.FirstOrDefault(v => v.Alias == "headline")?.Value?.ToString());
-        Assert.AreEqual("New Block Description", newBlockData.Values.FirstOrDefault(v => v.Alias == "description")?.Value?.ToString());
+        Assert.That(newBlockData, Is.Not.Null);
+        Assert.That(newBlockData.Values.FirstOrDefault(v => v.Alias == "headline")?.Value?.ToString(), Is.EqualTo("New Block Headline"));
+        Assert.That(newBlockData.Values.FirstOrDefault(v => v.Alias == "description")?.Value?.ToString(), Is.EqualTo("New Block Description"));
 
         // Verify original blocks were NOT changed
         var block1Data = updatedBlockListValue.ContentData.FirstOrDefault(b => b.Key == block1Key);
-        Assert.IsNotNull(block1Data);
-        Assert.AreEqual("Block 1 Headline", block1Data.Values.FirstOrDefault(v => v.Alias == "headline")?.Value?.ToString());
-        Assert.AreEqual("Block 1 Description", block1Data.Values.FirstOrDefault(v => v.Alias == "description")?.Value?.ToString());
+        Assert.That(block1Data, Is.Not.Null);
+        Assert.That(block1Data.Values.FirstOrDefault(v => v.Alias == "headline")?.Value?.ToString(), Is.EqualTo("Block 1 Headline"));
+        Assert.That(block1Data.Values.FirstOrDefault(v => v.Alias == "description")?.Value?.ToString(), Is.EqualTo("Block 1 Description"));
 
         var block2Data = updatedBlockListValue.ContentData.FirstOrDefault(b => b.Key == block2Key);
-        Assert.IsNotNull(block2Data);
-        Assert.AreEqual("Block 2 Headline", block2Data.Values.FirstOrDefault(v => v.Alias == "headline")?.Value?.ToString());
-        Assert.AreEqual("Block 2 Description", block2Data.Values.FirstOrDefault(v => v.Alias == "description")?.Value?.ToString());
+        Assert.That(block2Data, Is.Not.Null);
+        Assert.That(block2Data.Values.FirstOrDefault(v => v.Alias == "headline")?.Value?.ToString(), Is.EqualTo("Block 2 Headline"));
+        Assert.That(block2Data.Values.FirstOrDefault(v => v.Alias == "description")?.Value?.ToString(), Is.EqualTo("Block 2 Description"));
 
         // Verify layout was also updated with the new block
         var layoutItems = updatedBlockListValue.Layout[Constants.PropertyEditors.Aliases.BlockList].ToList();
-        Assert.AreEqual(3, layoutItems.Count);
+        Assert.That(layoutItems, Has.Count.EqualTo(3));
     }
 
     // ── Deeply nested block editor tests ──────────────────────────────────────
@@ -1534,7 +1534,7 @@ public class PatchDocumentControllerTests : ManagementApiUserGroupTestBase<Patch
             }
         };
         var createResult = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(createResult.Success);
+        Assert.That(createResult.Success, Is.True);
 
         return new DeepNestedSetup
         {
@@ -1604,52 +1604,49 @@ public class PatchDocumentControllerTests : ManagementApiUserGroupTestBase<Patch
             Console.WriteLine($"Error body: {errorContent}");
         }
 
-        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
 
         // Verify the deeply nested value was updated for en-US
         var updatedContent = await ContentEditingService.GetAsync(setup.DocumentKey);
-        Assert.IsNotNull(updatedContent);
+        Assert.That(updatedContent, Is.Not.Null);
 
         var rteValue = updatedContent.GetValue<string>("rte", "en-US");
-        Assert.IsNotNull(rteValue);
+        Assert.That(rteValue, Is.Not.Null);
 
         // Parse through the nested structure to verify the patched value
         RichTextPropertyEditorHelper.TryParseRichTextEditorValue(rteValue, setup.JsonSerializer, Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance, out var parsedRte);
-        Assert.IsNotNull(parsedRte?.Blocks);
+        Assert.That(parsedRte?.Blocks, Is.Not.Null);
 
         var gridContainerData = parsedRte!.Blocks!.ContentData.FirstOrDefault(b => b.Key == setup.GridContainerKey);
-        Assert.IsNotNull(gridContainerData);
+        Assert.That(gridContainerData, Is.Not.Null);
 
         var blockGridRaw = gridContainerData!.Values.FirstOrDefault(v => v.Alias == "blockGrid")?.Value?.ToString();
-        Assert.IsNotNull(blockGridRaw);
+        Assert.That(blockGridRaw, Is.Not.Null);
 
         var blockGridVal = setup.JsonSerializer.Deserialize<BlockGridValue>(blockGridRaw!);
-        Assert.IsNotNull(blockGridVal);
+        Assert.That(blockGridVal, Is.Not.Null);
 
         var listContainerData = blockGridVal!.ContentData.FirstOrDefault(b => b.Key == setup.ListContainerKey);
-        Assert.IsNotNull(listContainerData);
+        Assert.That(listContainerData, Is.Not.Null);
 
         var blockListRaw = listContainerData!.Values.FirstOrDefault(v => v.Alias == "blockList")?.Value?.ToString();
-        Assert.IsNotNull(blockListRaw);
+        Assert.That(blockListRaw, Is.Not.Null);
 
         var blockListVal = setup.JsonSerializer.Deserialize<BlockListValue>(blockListRaw!);
-        Assert.IsNotNull(blockListVal);
+        Assert.That(blockListVal, Is.Not.Null);
 
         // Verify the patched text block
         var textBlock1 = blockListVal!.ContentData.FirstOrDefault(b => b.Key == setup.TextBlock1Key);
-        Assert.IsNotNull(textBlock1);
-        Assert.AreEqual("updated deep value",
-            textBlock1!.Values.FirstOrDefault(v => v.Alias == "text" && v.Culture == "en-US")?.Value?.ToString());
+        Assert.That(textBlock1, Is.Not.Null);
+        Assert.That(textBlock1!.Values.FirstOrDefault(v => v.Alias == "text" && v.Culture == "en-US")?.Value?.ToString(), Is.EqualTo("updated deep value"));
 
         // Verify da-DK text was NOT changed
-        Assert.AreEqual("original da",
-            textBlock1.Values.FirstOrDefault(v => v.Alias == "text" && v.Culture == "da-DK")?.Value?.ToString());
+        Assert.That(textBlock1.Values.FirstOrDefault(v => v.Alias == "text" && v.Culture == "da-DK")?.Value?.ToString(), Is.EqualTo("original da"));
 
         // Verify the second text block was NOT changed
         var textBlock2 = blockListVal.ContentData.FirstOrDefault(b => b.Key == setup.TextBlock2Key);
-        Assert.IsNotNull(textBlock2);
-        Assert.AreEqual("second block en",
-            textBlock2!.Values.FirstOrDefault(v => v.Alias == "text" && v.Culture == "en-US")?.Value?.ToString());
+        Assert.That(textBlock2, Is.Not.Null);
+        Assert.That(textBlock2!.Values.FirstOrDefault(v => v.Alias == "text" && v.Culture == "en-US")?.Value?.ToString(), Is.EqualTo("second block en"));
     }
 
     [Test]
@@ -1709,11 +1706,11 @@ public class PatchDocumentControllerTests : ManagementApiUserGroupTestBase<Patch
             Console.WriteLine($"Error body: {errorContent}");
         }
 
-        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
 
         // Parse through the nested structure to the block list
         var updatedContent = await ContentEditingService.GetAsync(setup.DocumentKey);
-        Assert.IsNotNull(updatedContent);
+        Assert.That(updatedContent, Is.Not.Null);
         var rteValue = updatedContent.GetValue<string>("rte", "en-US");
         RichTextPropertyEditorHelper.TryParseRichTextEditorValue(rteValue, setup.JsonSerializer, Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance, out var parsedRte);
         var gridContainerData = parsedRte!.Blocks!.ContentData.First(b => b.Key == setup.GridContainerKey);
@@ -1722,20 +1719,20 @@ public class PatchDocumentControllerTests : ManagementApiUserGroupTestBase<Patch
         var blockListVal = setup.JsonSerializer.Deserialize<BlockListValue>(listContainerData.Values.First(v => v.Alias == "blockList").Value!.ToString()!);
 
         // Verify 3 blocks in contentData
-        Assert.AreEqual(3, blockListVal!.ContentData.Count);
+        Assert.That(blockListVal!.ContentData, Has.Count.EqualTo(3));
 
         // Verify new block was appended
         var newBlock = blockListVal.ContentData.FirstOrDefault(b => b.Key == newBlockKey);
-        Assert.IsNotNull(newBlock);
-        Assert.AreEqual("new block en", newBlock!.Values.FirstOrDefault(v => v.Alias == "text" && v.Culture == "en-US")?.Value?.ToString());
+        Assert.That(newBlock, Is.Not.Null);
+        Assert.That(newBlock!.Values.FirstOrDefault(v => v.Alias == "text" && v.Culture == "en-US")?.Value?.ToString(), Is.EqualTo("new block en"));
 
         // Verify originals unchanged
-        Assert.AreEqual("original en", blockListVal.ContentData.First(b => b.Key == setup.TextBlock1Key).Values.First(v => v.Alias == "text" && v.Culture == "en-US").Value?.ToString());
-        Assert.AreEqual("second block en", blockListVal.ContentData.First(b => b.Key == setup.TextBlock2Key).Values.First(v => v.Alias == "text" && v.Culture == "en-US").Value?.ToString());
+        Assert.That(blockListVal.ContentData.First(b => b.Key == setup.TextBlock1Key).Values.First(v => v.Alias == "text" && v.Culture == "en-US").Value?.ToString(), Is.EqualTo("original en"));
+        Assert.That(blockListVal.ContentData.First(b => b.Key == setup.TextBlock2Key).Values.First(v => v.Alias == "text" && v.Culture == "en-US").Value?.ToString(), Is.EqualTo("second block en"));
 
         // Verify layout has 3 entries
         var layoutItems = blockListVal.Layout[Constants.PropertyEditors.Aliases.BlockList].ToList();
-        Assert.AreEqual(3, layoutItems.Count);
+        Assert.That(layoutItems, Has.Count.EqualTo(3));
     }
 
     [Test]
@@ -1796,7 +1793,7 @@ public class PatchDocumentControllerTests : ManagementApiUserGroupTestBase<Patch
             Console.WriteLine($"Error body: {errorContent}");
         }
 
-        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
 
         // Parse through the nested structure to the block list
         var updatedContent = await ContentEditingService.GetAsync(setup.DocumentKey);
@@ -1808,18 +1805,18 @@ public class PatchDocumentControllerTests : ManagementApiUserGroupTestBase<Patch
         var blockListVal = setup.JsonSerializer.Deserialize<BlockListValue>(listContainerData.Values.First(v => v.Alias == "blockList").Value!.ToString()!);
 
         // Verify 3 blocks in contentData
-        Assert.AreEqual(3, blockListVal!.ContentData.Count);
+        Assert.That(blockListVal!.ContentData, Has.Count.EqualTo(3));
 
         // Verify insertion order: original1, inserted, original2
-        Assert.AreEqual(setup.TextBlock1Key, blockListVal.ContentData[0].Key);
-        Assert.AreEqual(newBlockKey, blockListVal.ContentData[1].Key);
-        Assert.AreEqual(setup.TextBlock2Key, blockListVal.ContentData[2].Key);
+        Assert.That(blockListVal.ContentData[0].Key, Is.EqualTo(setup.TextBlock1Key));
+        Assert.That(blockListVal.ContentData[1].Key, Is.EqualTo(newBlockKey));
+        Assert.That(blockListVal.ContentData[2].Key, Is.EqualTo(setup.TextBlock2Key));
 
         // Verify inserted block values
-        Assert.AreEqual("inserted block en", blockListVal.ContentData[1].Values.First(v => v.Alias == "text" && v.Culture == "en-US").Value?.ToString());
+        Assert.That(blockListVal.ContentData[1].Values.First(v => v.Alias == "text" && v.Culture == "en-US").Value?.ToString(), Is.EqualTo("inserted block en"));
 
         // Verify layout order matches
         var layoutItems = blockListVal.Layout[Constants.PropertyEditors.Aliases.BlockList].ToList();
-        Assert.AreEqual(3, layoutItems.Count);
+        Assert.That(layoutItems, Has.Count.EqualTo(3));
     }
 }

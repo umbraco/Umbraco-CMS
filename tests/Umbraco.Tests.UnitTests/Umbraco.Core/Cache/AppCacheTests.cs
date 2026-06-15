@@ -44,8 +44,8 @@ public abstract class AppCacheTests
 
             return "value";
         });
-        Assert.IsNotNull(exception);
-        Assert.IsAssignableFrom<InvalidOperationException>(exception);
+        Assert.That(exception, Is.Not.Null);
+        Assert.That(exception, Is.AssignableFrom<InvalidOperationException>());
     }
 
     [Test]
@@ -78,7 +78,7 @@ public abstract class AppCacheTests
         {
         }
 
-        Assert.Greater(counter, 1);
+        Assert.That(counter, Is.GreaterThan(1));
     }
 
     [Test]
@@ -94,10 +94,10 @@ public abstract class AppCacheTests
 
         object? Get() => AppCache.Get("Blah", Factory);
 
-        Assert.IsNull(Get());
-        Assert.IsNull(Get());
-        Assert.AreEqual("Not a null value", Get());
-        Assert.AreEqual(3, counter);
+        Assert.That(Get(), Is.Null);
+        Assert.That(Get(), Is.Null);
+        Assert.That(Get(), Is.EqualTo("Not a null value"));
+        Assert.That(counter, Is.EqualTo(3));
     }
 
     [Test]
@@ -119,7 +119,7 @@ public abstract class AppCacheTests
             return string.Empty;
         });
 
-        Assert.AreEqual(1, counter);
+        Assert.That(counter, Is.EqualTo(1));
     }
 
     [Test]
@@ -134,11 +134,11 @@ public abstract class AppCacheTests
         AppCache.Get("Tes3", () => cacheContent3);
         AppCache.Get("different4", () => cacheContent4);
 
-        Assert.AreEqual(4, GetTotalItemCount);
+        Assert.That(GetTotalItemCount, Is.EqualTo(4));
 
         var result = AppCache.SearchByKey("Tes");
 
-        Assert.AreEqual(3, result.Count());
+        Assert.That(result.Count(), Is.EqualTo(3));
     }
 
     [Test]
@@ -153,11 +153,11 @@ public abstract class AppCacheTests
         AppCache.Get("Tes3", () => cacheContent3);
         AppCache.Get("different4", () => cacheContent4);
 
-        Assert.AreEqual(4, GetTotalItemCount);
+        Assert.That(GetTotalItemCount, Is.EqualTo(4));
 
         AppCache.ClearByRegex("^\\w+es\\d.*");
 
-        Assert.AreEqual(2, GetTotalItemCount);
+        Assert.That(GetTotalItemCount, Is.EqualTo(2));
     }
 
     [Test]
@@ -172,11 +172,11 @@ public abstract class AppCacheTests
         AppCache.Get("Tes3", () => cacheContent3);
         AppCache.Get("different4", () => cacheContent4);
 
-        Assert.AreEqual(4, GetTotalItemCount);
+        Assert.That(GetTotalItemCount, Is.EqualTo(4));
 
         AppCache.ClearByKey("Test");
 
-        Assert.AreEqual(2, GetTotalItemCount);
+        Assert.That(GetTotalItemCount, Is.EqualTo(2));
     }
 
     [Test]
@@ -191,12 +191,12 @@ public abstract class AppCacheTests
         AppCache.Get("Test3", () => cacheContent3);
         AppCache.Get("Test4", () => cacheContent4);
 
-        Assert.AreEqual(4, GetTotalItemCount);
+        Assert.That(GetTotalItemCount, Is.EqualTo(4));
 
         AppCache.Clear("Test1");
         AppCache.Clear("Test2");
 
-        Assert.AreEqual(2, GetTotalItemCount);
+        Assert.That(GetTotalItemCount, Is.EqualTo(2));
     }
 
     [Test]
@@ -211,11 +211,11 @@ public abstract class AppCacheTests
         AppCache.Get("Test3", () => cacheContent3);
         AppCache.Get("Test4", () => cacheContent4);
 
-        Assert.AreEqual(4, GetTotalItemCount);
+        Assert.That(GetTotalItemCount, Is.EqualTo(4));
 
         AppCache.Clear();
 
-        Assert.AreEqual(0, GetTotalItemCount);
+        Assert.That(GetTotalItemCount, Is.EqualTo(0));
     }
 
     [Test]
@@ -223,7 +223,7 @@ public abstract class AppCacheTests
     {
         var cacheContent1 = new CacheContent();
         AppCache.Get("Test1", () => cacheContent1);
-        Assert.AreEqual(1, GetTotalItemCount);
+        Assert.That(GetTotalItemCount, Is.EqualTo(1));
     }
 
     [Test]
@@ -232,8 +232,8 @@ public abstract class AppCacheTests
         var cacheContent1 = new CacheContent();
         var result = AppCache.Get("Test1", () => cacheContent1);
         var result2 = AppCache.Get("Test1", () => cacheContent1);
-        Assert.AreEqual(1, GetTotalItemCount);
-        Assert.AreEqual(result, result2);
+        Assert.That(GetTotalItemCount, Is.EqualTo(1));
+        Assert.That(result2, Is.EqualTo(result));
     }
 
     [Test]
@@ -248,11 +248,11 @@ public abstract class AppCacheTests
         AppCache.Get("Test3", () => cacheContent3);
         AppCache.Get("Test4", () => cacheContent4);
 
-        Assert.AreEqual(4, GetTotalItemCount);
+        Assert.That(GetTotalItemCount, Is.EqualTo(4));
 
         AppCache.ClearOfType<CacheContent>();
 
-        Assert.AreEqual(1, GetTotalItemCount);
+        Assert.That(GetTotalItemCount, Is.EqualTo(1));
     }
 
     [Test]
@@ -267,11 +267,11 @@ public abstract class AppCacheTests
         AppCache.Get("Test3", () => cacheContent3);
         AppCache.Get("Test4", () => cacheContent4);
 
-        Assert.AreEqual(4, GetTotalItemCount);
+        Assert.That(GetTotalItemCount, Is.EqualTo(4));
 
         AppCache.ClearOfType<CacheContent>();
 
-        Assert.AreEqual(1, GetTotalItemCount);
+        Assert.That(GetTotalItemCount, Is.EqualTo(1));
     }
 
     // Just used for these tests

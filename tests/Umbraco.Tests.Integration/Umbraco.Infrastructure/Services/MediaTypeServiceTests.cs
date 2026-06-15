@@ -33,7 +33,7 @@ internal sealed class MediaTypeServiceTests : UmbracoIntegrationTest
         var result = MediaTypeService.Get(Guid.NewGuid());
 
         // Assert
-        Assert.IsNull(result);
+        Assert.That(result, Is.Null);
     }
 
     [Test]
@@ -47,8 +47,8 @@ internal sealed class MediaTypeServiceTests : UmbracoIntegrationTest
         mediaType2.Description = string.Empty;
         await MediaTypeService.CreateAsync(mediaType2, Constants.Security.SuperUserKey);
 
-        Assert.IsNull(mediaType.Description);
-        Assert.IsNull(mediaType2.Description);
+        Assert.That(mediaType.Description, Is.Null);
+        Assert.That(mediaType2.Description, Is.Null);
     }
 
     [Test]
@@ -84,10 +84,10 @@ internal sealed class MediaTypeServiceTests : UmbracoIntegrationTest
 
         var found = MediaService.GetByIds(ids);
 
-        Assert.AreEqual(4, found.Count());
+        Assert.That(found.Count(), Is.EqualTo(4));
         foreach (var content in found)
         {
-            Assert.IsTrue(content.Trashed);
+            Assert.That(content.Trashed, Is.True);
         }
     }
 
@@ -158,24 +158,22 @@ internal sealed class MediaTypeServiceTests : UmbracoIntegrationTest
 
         // Act
         var sut = mediaType.DeepCloneWithResetIdentities("Image2_2");
-        Assert.IsNotNull(sut);
+        Assert.That(sut, Is.Not.Null);
         await MediaTypeService.CreateAsync(sut, Constants.Security.SuperUserKey);
 
         // Assert
         Assert.That(sut.HasIdentity, Is.True);
-        Assert.AreEqual(mediaType.ParentId, sut.ParentId);
-        Assert.AreEqual(mediaType.Level, sut.Level);
-        Assert.AreEqual(mediaType.PropertyTypes.Count(), sut.PropertyTypes.Count());
-        Assert.AreNotEqual(mediaType.Id, sut.Id);
-        Assert.AreNotEqual(mediaType.Key, sut.Key);
-        Assert.AreNotEqual(mediaType.Path, sut.Path);
-        Assert.AreNotEqual(mediaType.SortOrder, sut.SortOrder);
-        Assert.AreNotEqual(
-            mediaType.PropertyTypes.First(x => x.Alias.Equals("umbracoFile")).Id,
-            sut.PropertyTypes.First(x => x.Alias.Equals("umbracoFile")).Id);
-        Assert.AreNotEqual(
-            mediaType.PropertyGroups.First(x => x.Name.Equals("Media")).Id,
-            sut.PropertyGroups.First(x => x.Name.Equals("Media")).Id);
+        Assert.That(sut.ParentId, Is.EqualTo(mediaType.ParentId));
+        Assert.That(sut.Level, Is.EqualTo(mediaType.Level));
+        Assert.That(sut.PropertyTypes.Count(), Is.EqualTo(mediaType.PropertyTypes.Count()));
+        Assert.That(sut.Id, Is.Not.EqualTo(mediaType.Id));
+        Assert.That(sut.Key, Is.Not.EqualTo(mediaType.Key));
+        Assert.That(sut.Path, Is.Not.EqualTo(mediaType.Path));
+        Assert.That(sut.SortOrder, Is.Not.EqualTo(mediaType.SortOrder));
+        Assert.That(
+            sut.PropertyTypes.First(x => x.Alias.Equals("umbracoFile")).Id, Is.Not.EqualTo(mediaType.PropertyTypes.First(x => x.Alias.Equals("umbracoFile")).Id));
+        Assert.That(
+            sut.PropertyGroups.First(x => x.Name.Equals("Media")).Id, Is.Not.EqualTo(mediaType.PropertyGroups.First(x => x.Name.Equals("Media")).Id));
     }
 
     [Test]
@@ -191,7 +189,7 @@ internal sealed class MediaTypeServiceTests : UmbracoIntegrationTest
 
         // Act
         var clone = mediaType.DeepCloneWithResetIdentities("newcategory");
-        Assert.IsNotNull(clone);
+        Assert.That(clone, Is.Not.Null);
         clone.RemoveContentType("parent1");
         clone.AddContentType(parentMediaType2);
         clone.ParentId = parentMediaType2.Id;
@@ -206,22 +204,20 @@ internal sealed class MediaTypeServiceTests : UmbracoIntegrationTest
         Assert.That(clonedMediaType.CompositionAliases().Any(x => x.Equals("parent2")), Is.True);
         Assert.That(clonedMediaType.CompositionAliases().Any(x => x.Equals("parent1")), Is.False);
 
-        Assert.AreEqual(clonedMediaType.Path, "-1," + parentMediaType2.Id + "," + clonedMediaType.Id);
-        Assert.AreEqual(clonedMediaType.PropertyTypes.Count(), originalMediaType.PropertyTypes.Count());
+        Assert.That("-1," + parentMediaType2.Id + "," + clonedMediaType.Id, Is.EqualTo(clonedMediaType.Path));
+        Assert.That(originalMediaType.PropertyTypes.Count(), Is.EqualTo(clonedMediaType.PropertyTypes.Count()));
 
-        Assert.AreNotEqual(clonedMediaType.ParentId, originalMediaType.ParentId);
-        Assert.AreEqual(clonedMediaType.ParentId, parentMediaType2.Id);
+        Assert.That(originalMediaType.ParentId, Is.Not.EqualTo(clonedMediaType.ParentId));
+        Assert.That(parentMediaType2.Id, Is.EqualTo(clonedMediaType.ParentId));
 
-        Assert.AreNotEqual(clonedMediaType.Id, originalMediaType.Id);
-        Assert.AreNotEqual(clonedMediaType.Key, originalMediaType.Key);
-        Assert.AreNotEqual(clonedMediaType.Path, originalMediaType.Path);
+        Assert.That(originalMediaType.Id, Is.Not.EqualTo(clonedMediaType.Id));
+        Assert.That(originalMediaType.Key, Is.Not.EqualTo(clonedMediaType.Key));
+        Assert.That(originalMediaType.Path, Is.Not.EqualTo(clonedMediaType.Path));
 
-        Assert.AreNotEqual(
-            clonedMediaType.PropertyTypes.First(x => x.Alias.StartsWith("umbracoFile")).Id,
-            originalMediaType.PropertyTypes.First(x => x.Alias.StartsWith("umbracoFile")).Id);
-        Assert.AreNotEqual(
-            clonedMediaType.PropertyGroups.First(x => x.Name.StartsWith("Media")).Id,
-            originalMediaType.PropertyGroups.First(x => x.Name.StartsWith("Media")).Id);
+        Assert.That(
+            originalMediaType.PropertyTypes.First(x => x.Alias.StartsWith("umbracoFile")).Id, Is.Not.EqualTo(clonedMediaType.PropertyTypes.First(x => x.Alias.StartsWith("umbracoFile")).Id));
+        Assert.That(
+            originalMediaType.PropertyGroups.First(x => x.Name.StartsWith("Media")).Id, Is.Not.EqualTo(clonedMediaType.PropertyGroups.First(x => x.Name.StartsWith("Media")).Id));
     }
 
     [TestCase(Constants.Conventions.MediaTypes.File)]
@@ -232,7 +228,7 @@ internal sealed class MediaTypeServiceTests : UmbracoIntegrationTest
         // Arrange
         // Act
         var mediaType = MediaTypeService.Get(mediaTypeAlias);
-        Assert.IsNotNull(mediaType);
+        Assert.That(mediaType, Is.Not.Null);
 
         // Assert
         Assert.Throws<InvalidOperationException>(() => MediaTypeService.Delete(mediaType));
@@ -246,7 +242,7 @@ internal sealed class MediaTypeServiceTests : UmbracoIntegrationTest
         // Arrange
         // Act
         var mediaType = MediaTypeService.Get(mediaTypeAlias);
-        Assert.IsNotNull(mediaType);
+        Assert.That(mediaType, Is.Not.Null);
 
         // Assert
         Assert.Throws<InvalidOperationException>(() => mediaType.Alias += "_updated");
@@ -259,21 +255,21 @@ internal sealed class MediaTypeServiceTests : UmbracoIntegrationTest
     {
         // Arrange
         var mediaType = MediaTypeService.Get(mediaTypeAlias);
-        Assert.IsNotNull(mediaType);
+        Assert.That(mediaType, Is.Not.Null);
 
         // Act
         var result = await MediaTypeService.CopyAsync(mediaType.Key, null);
 
         // Assert
-        Assert.IsTrue(result.Success);
-        Assert.IsNotNull(result.Result);
-        Assert.AreNotEqual(mediaType.Alias, result.Result!.Alias);
-        Assert.AreNotEqual(mediaType.Id, result.Result.Id);
-        Assert.AreNotEqual(mediaType.Key, result.Result.Key);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.Not.Null);
+        Assert.That(result.Result!.Alias, Is.Not.EqualTo(mediaType.Alias));
+        Assert.That(result.Result.Id, Is.Not.EqualTo(mediaType.Id));
+        Assert.That(result.Result.Key, Is.Not.EqualTo(mediaType.Key));
 
         // Verify the copy's alias can be changed (it is not system-protected)
         result.Result.Alias = "myCustomAlias";
-        Assert.AreEqual("myCustomAlias", result.Result.Alias);
+        Assert.That(result.Result.Alias, Is.EqualTo("myCustomAlias"));
     }
 
     [Test]
@@ -329,7 +325,7 @@ internal sealed class MediaTypeServiceTests : UmbracoIntegrationTest
         Assert.That(result.Success, Is.True);
         Assert.That(result.Result, Is.Not.Null);
         var parentKeys = result.Result!.ToList();
-        Assert.That(parentKeys.Count, Is.EqualTo(2));
+        Assert.That(parentKeys, Has.Count.EqualTo(2));
         Assert.That(parentKeys, Does.Contain(parentMediaType1.Key));
         Assert.That(parentKeys, Does.Contain(parentMediaType2.Key));
         Assert.That(parentKeys, Does.Not.Contain(unrelatedParentMediaType.Key));
@@ -377,9 +373,9 @@ internal sealed class MediaTypeServiceTests : UmbracoIntegrationTest
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(baseline.Total + 1, result.Total);
-            Assert.IsTrue(result.Items.Any(x => x.Key == allowedAtRoot.Key));
-            Assert.IsFalse(result.Items.Any(x => x.Key == notAllowedAtRoot.Key));
+            Assert.That(result.Total, Is.EqualTo(baseline.Total + 1));
+            Assert.That(result.Items.Any(x => x.Key == allowedAtRoot.Key), Is.True);
+            Assert.That(result.Items.Any(x => x.Key == notAllowedAtRoot.Key), Is.False);
         });
     }
 }

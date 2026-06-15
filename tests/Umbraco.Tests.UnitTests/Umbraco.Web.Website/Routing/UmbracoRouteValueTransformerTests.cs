@@ -109,7 +109,7 @@ public class UmbracoRouteValueTransformerTests
             Mock.Of<IRuntimeState>());
 
         var result = await transformer.TransformAsync(new DefaultHttpContext(), new RouteValueDictionary());
-        Assert.IsNull(result);
+        Assert.That(result, Is.Null);
     }
 
     [Test]
@@ -119,7 +119,7 @@ public class UmbracoRouteValueTransformerTests
             Mock.Of<IUmbracoContextAccessor>());
 
         var result = await transformer.TransformAsync(new DefaultHttpContext(), new RouteValueDictionary());
-        Assert.IsNull(result);
+        Assert.That(result, Is.Null);
     }
 
     [Test]
@@ -131,7 +131,7 @@ public class UmbracoRouteValueTransformerTests
             Mock.Of<IRoutableDocumentFilter>(x => x.IsDocumentRequest(It.IsAny<string>()) == false));
 
         var result = await transformer.TransformAsync(new DefaultHttpContext(), new RouteValueDictionary());
-        Assert.IsNull(result);
+        Assert.That(result, Is.Null);
     }
 
     [Test]
@@ -147,9 +147,9 @@ public class UmbracoRouteValueTransformerTests
             Mock.Of<IDocumentUrlService>(x => x.HasAny() == false));
 
         var result = await transformer.TransformAsync(new DefaultHttpContext(), new RouteValueDictionary());
-        Assert.AreEqual(2, result.Count);
-        Assert.AreEqual(ControllerExtensions.GetControllerName<RenderNoContentController>(), result[ControllerToken]);
-        Assert.AreEqual(nameof(RenderNoContentController.Index), result[ActionToken]);
+        Assert.That(result, Has.Count.EqualTo(2));
+        Assert.That(result[ControllerToken], Is.EqualTo(ControllerExtensions.GetControllerName<RenderNoContentController>()));
+        Assert.That(result[ActionToken], Is.EqualTo(nameof(RenderNoContentController.Index)));
     }
 
     [Test]
@@ -164,7 +164,7 @@ public class UmbracoRouteValueTransformerTests
             routeValuesFactory: GetRouteValuesFactory(request));
 
         await transformer.TransformAsync(new DefaultHttpContext(), new RouteValueDictionary());
-        Assert.AreEqual(request, umbracoContext.PublishedRequest);
+        Assert.That(umbracoContext.PublishedRequest, Is.EqualTo(request));
     }
 
     [Test]
@@ -180,10 +180,10 @@ public class UmbracoRouteValueTransformerTests
 
         var httpContext = new DefaultHttpContext();
         var result = await transformer.TransformAsync(httpContext, new RouteValueDictionary());
-        Assert.IsNull(result);
+        Assert.That(result, Is.Null);
 
         var routeVals = httpContext.Features.Get<UmbracoRouteValues>();
-        Assert.AreEqual(routeVals.PublishedRequest.GetRouteResult(), UmbracoRouteResult.NotFound);
+        Assert.That(routeVals.PublishedRequest.GetRouteResult(), Is.EqualTo(UmbracoRouteResult.NotFound));
     }
 
     [Test]
@@ -201,8 +201,8 @@ public class UmbracoRouteValueTransformerTests
         await transformer.TransformAsync(httpContext, new RouteValueDictionary());
 
         var routeVals = httpContext.Features.Get<UmbracoRouteValues>();
-        Assert.IsNotNull(routeVals);
-        Assert.AreEqual(routeVals.PublishedRequest, umbracoContext.PublishedRequest);
+        Assert.That(routeVals, Is.Not.Null);
+        Assert.That(umbracoContext.PublishedRequest, Is.EqualTo(routeVals.PublishedRequest));
     }
 
     [Test]
@@ -219,8 +219,8 @@ public class UmbracoRouteValueTransformerTests
 
         var result = await transformer.TransformAsync(new DefaultHttpContext(), new RouteValueDictionary());
 
-        Assert.AreEqual(routeValues.ControllerName, result[ControllerToken]);
-        Assert.AreEqual(routeValues.ActionName, result[ActionToken]);
+        Assert.That(result[ControllerToken], Is.EqualTo(routeValues.ControllerName));
+        Assert.That(result[ActionToken], Is.EqualTo(routeValues.ActionName));
     }
 
     [Test]
@@ -237,7 +237,7 @@ public class UmbracoRouteValueTransformerTests
 
         var result = await transformer.TransformAsync(new DefaultHttpContext(), new RouteValueDictionary());
 
-        Assert.IsNull(result);
+        Assert.That(result, Is.Null);
     }
 
     private class TestController : RenderController

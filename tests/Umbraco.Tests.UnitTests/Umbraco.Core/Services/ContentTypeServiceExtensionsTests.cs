@@ -62,8 +62,8 @@ public class ContentTypeServiceExtensionsTests
                 new[] { "blah" })
             .Results.Where(x => x.Allowed).Select(x => x.Composition).ToArray();
 
-        Assert.AreEqual(1, availableTypes.Count());
-        Assert.AreEqual(ct4.Id, availableTypes.ElementAt(0).Id);
+        Assert.That(availableTypes.Count(), Is.EqualTo(1));
+        Assert.That(availableTypes.ElementAt(0).Id, Is.EqualTo(ct4.Id));
     }
 
     [Test]
@@ -107,8 +107,8 @@ public class ContentTypeServiceExtensionsTests
                 new[] { "title" })
             .Results.Where(x => x.Allowed).Select(x => x.Composition).ToArray();
 
-        Assert.AreEqual(1, availableTypes.Count());
-        Assert.AreEqual(ct4.Id, availableTypes.ElementAt(0).Id);
+        Assert.That(availableTypes.Count(), Is.EqualTo(1));
+        Assert.That(availableTypes.ElementAt(0).Id, Is.EqualTo(ct4.Id));
     }
 
     [Test]
@@ -151,8 +151,8 @@ public class ContentTypeServiceExtensionsTests
                 new[] { ct2.Alias })
             .Results.Where(x => x.Allowed).Select(x => x.Composition).ToArray();
 
-        Assert.AreEqual(1, availableTypes.Count());
-        Assert.AreEqual(ct4.Id, availableTypes.ElementAt(0).Id);
+        Assert.That(availableTypes.Count(), Is.EqualTo(1));
+        Assert.That(availableTypes.ElementAt(0).Id, Is.EqualTo(ct4.Id));
     }
 
     [Test]
@@ -172,9 +172,9 @@ public class ContentTypeServiceExtensionsTests
                 new[] { ct1, ct2, ct3 })
             .Results.Where(x => x.Allowed).Select(x => x.Composition).ToArray();
 
-        Assert.AreEqual(2, availableTypes.Count());
-        Assert.AreEqual(ct2.Id, availableTypes.ElementAt(0).Id);
-        Assert.AreEqual(ct3.Id, availableTypes.ElementAt(1).Id);
+        Assert.That(availableTypes.Count(), Is.EqualTo(2));
+        Assert.That(availableTypes.ElementAt(0).Id, Is.EqualTo(ct2.Id));
+        Assert.That(availableTypes.ElementAt(1).Id, Is.EqualTo(ct3.Id));
     }
 
     // This shows that a nested comp is not allowed
@@ -194,7 +194,7 @@ public class ContentTypeServiceExtensionsTests
             ct1,
             new[] { ct1, ct2, ct3 }).Results;
 
-        Assert.AreEqual(0, availableTypes.Count());
+        Assert.That(availableTypes.Count(), Is.EqualTo(0));
     }
 
     // This shows that a nested comp is not allowed
@@ -216,7 +216,7 @@ public class ContentTypeServiceExtensionsTests
             ct1,
             new[] { ct1, ct2, ct3 }).Results;
 
-        Assert.AreEqual(0, availableTypes.Count());
+        Assert.That(availableTypes.Count(), Is.EqualTo(0));
     }
 
     [Test]
@@ -238,8 +238,8 @@ public class ContentTypeServiceExtensionsTests
                 new[] { ct1, ct2, ct3 })
             .Results.Where(x => x.Allowed).Select(x => x.Composition).ToArray();
 
-        Assert.AreEqual(1, availableTypes.Count());
-        Assert.AreEqual(ct3.Id, availableTypes.Single().Id);
+        Assert.That(availableTypes.Count(), Is.EqualTo(1));
+        Assert.That(availableTypes.Single().Id, Is.EqualTo(ct3.Id));
     }
 
     [Test]
@@ -261,9 +261,9 @@ public class ContentTypeServiceExtensionsTests
                 new[] { ct1, ct2, ct3 })
             .Results.Where(x => x.Allowed).Select(x => x.Composition).ToArray();
 
-        Assert.AreEqual(2, availableTypes.Count());
-        Assert.AreEqual(ct2.Id, availableTypes.ElementAt(0).Id);
-        Assert.AreEqual(ct3.Id, availableTypes.ElementAt(1).Id);
+        Assert.That(availableTypes.Count(), Is.EqualTo(2));
+        Assert.That(availableTypes.ElementAt(0).Id, Is.EqualTo(ct2.Id));
+        Assert.That(availableTypes.ElementAt(1).Id, Is.EqualTo(ct3.Id));
     }
 
     [Test]
@@ -288,9 +288,9 @@ public class ContentTypeServiceExtensionsTests
                 new[] { ct1, ct2, ct3 })
             .Results.Where(x => x.Allowed).Select(x => x.Composition).ToArray();
 
-        Assert.AreEqual(3, availableTypes.Count());
-        Assert.AreEqual(ct2.Id, availableTypes.ElementAt(0).Id);
-        Assert.AreEqual(ct3.Id, availableTypes.ElementAt(1).Id);
-        Assert.AreEqual(ct4.Id, availableTypes.ElementAt(2).Id);
+        Assert.That(availableTypes.Count(), Is.EqualTo(3));
+        Assert.That(availableTypes.ElementAt(0).Id, Is.EqualTo(ct2.Id));
+        Assert.That(availableTypes.ElementAt(1).Id, Is.EqualTo(ct3.Id));
+        Assert.That(availableTypes.ElementAt(2).Id, Is.EqualTo(ct4.Id));
     }
 }

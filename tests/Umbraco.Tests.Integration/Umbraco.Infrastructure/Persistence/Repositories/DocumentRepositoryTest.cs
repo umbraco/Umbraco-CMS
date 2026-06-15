@@ -188,16 +188,16 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
 
         // Initial and subsequent requests should use the cache, since the cache by Id and Key was populated on save.
         repository.Get(content.Id);
-        Assert.AreEqual(0, database.SqlCount);
+        Assert.That(database.SqlCount, Is.EqualTo(0));
 
         repository.Get(content.Id);
-        Assert.AreEqual(0, database.SqlCount);
+        Assert.That(database.SqlCount, Is.EqualTo(0));
 
         repository.Get(content.Key);
-        Assert.AreEqual(0, database.SqlCount);
+        Assert.That(database.SqlCount, Is.EqualTo(0));
 
         repository.Get(content.Key);
-        Assert.AreEqual(0, database.SqlCount);
+        Assert.That(database.SqlCount, Is.EqualTo(0));
     }
 
     [Test]
@@ -227,7 +227,7 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
 
         // Initial request by ID should hit the database.
         repository.Get(content.Id);
-        Assert.Greater(database.SqlCount, 0);
+        Assert.That(database.SqlCount, Is.GreaterThan(0));
 
         // Reset counter.
         database.EnableSqlCount = false;
@@ -235,10 +235,10 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
 
         // Subsequent requests should use the cache, since the cache by Id and Key was populated on retrieval.
         repository.Get(content.Id);
-        Assert.AreEqual(0, database.SqlCount);
+        Assert.That(database.SqlCount, Is.EqualTo(0));
 
         repository.Get(content.Key);
-        Assert.AreEqual(0, database.SqlCount);
+        Assert.That(database.SqlCount, Is.EqualTo(0));
     }
 
     [Test]
@@ -268,7 +268,7 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
 
         // Initial request by key should hit the database.
         repository.Get(content.Key);
-        Assert.Greater(database.SqlCount, 0);
+        Assert.That(database.SqlCount, Is.GreaterThan(0));
 
         // Reset counter.
         database.EnableSqlCount = false;
@@ -276,10 +276,10 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
 
         // Subsequent requests should use the cache, since the cache by Id and Key was populated on retrieval.
         repository.Get(content.Key);
-        Assert.AreEqual(0, database.SqlCount);
+        Assert.That(database.SqlCount, Is.EqualTo(0));
 
         repository.Get(content.Id);
-        Assert.AreEqual(0, database.SqlCount);
+        Assert.That(database.SqlCount, Is.EqualTo(0));
     }
 
     private async Task<Content> CreateContent(DocumentRepository repository, ContentTypeRepository contentTypeRepository)
@@ -326,15 +326,15 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
             versions.Add(content1.VersionId); // NEW VERSION
 
             // new edit version has been created
-            Assert.AreNotEqual(versions[^2], versions[^1]);
-            Assert.IsTrue(content1.Published);
-            Assert.AreEqual(PublishedState.Published, ((Content)content1).PublishedState);
-            Assert.AreEqual(versions[^1], repository.Get(content1.Id).VersionId);
+            Assert.That(versions[^1], Is.Not.EqualTo(versions[^2]));
+            Assert.That(content1.Published, Is.True);
+            Assert.That(((Content)content1).PublishedState, Is.EqualTo(PublishedState.Published));
+            Assert.That(repository.Get(content1.Id).VersionId, Is.EqualTo(versions[^1]));
 
             // misc checks
-            Assert.AreEqual(true, ScopeAccessor.AmbientScope.Database.ExecuteScalar<bool>(
+            Assert.That(ScopeAccessor.AmbientScope.Database.ExecuteScalar<bool>(
                     $"SELECT published FROM {Constants.DatabaseSchema.Tables.Document} WHERE nodeId=@id",
-                    new { id = content1.Id }));
+                    new { id = content1.Id }), Is.EqualTo(true));
 
             // change something
             // save = update the current (draft) version
@@ -345,16 +345,15 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
             versions.Add(content1.VersionId); // the same version
 
             // no new version has been created
-            Assert.AreEqual(versions[^2], versions[^1]);
-            Assert.IsTrue(content1.Published);
-            Assert.AreEqual(versions[^1], repository.Get(content1.Id).VersionId);
+            Assert.That(versions[^1], Is.EqualTo(versions[^2]));
+            Assert.That(content1.Published, Is.True);
+            Assert.That(repository.Get(content1.Id).VersionId, Is.EqualTo(versions[^1]));
 
             // misc checks
-            Assert.AreEqual(
-                true,
+            Assert.That(
                 ScopeAccessor.AmbientScope.Database.ExecuteScalar<bool>(
                     $"SELECT published FROM {Constants.DatabaseSchema.Tables.Document} WHERE nodeId=@id",
-                    new { id = content1.Id }));
+                    new { id = content1.Id }), Is.EqualTo(true));
 
             // unpublish = no impact on versions
             ((Content)content1).PublishedState = PublishedState.Unpublishing;
@@ -363,17 +362,16 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
             versions.Add(content1.VersionId); // the same version
 
             // no new version has been created
-            Assert.AreEqual(versions[^2], versions[^1]);
-            Assert.IsFalse(content1.Published);
-            Assert.AreEqual(PublishedState.Unpublished, ((Content)content1).PublishedState);
-            Assert.AreEqual(versions[^1], repository.Get(content1.Id).VersionId);
+            Assert.That(versions[^1], Is.EqualTo(versions[^2]));
+            Assert.That(content1.Published, Is.False);
+            Assert.That(((Content)content1).PublishedState, Is.EqualTo(PublishedState.Unpublished));
+            Assert.That(repository.Get(content1.Id).VersionId, Is.EqualTo(versions[^1]));
 
             // misc checks
-            Assert.AreEqual(
-                false,
+            Assert.That(
                 ScopeAccessor.AmbientScope.Database.ExecuteScalar<bool>(
                     $"SELECT published FROM {Constants.DatabaseSchema.Tables.Document} WHERE nodeId=@id",
-                    new { id = content1.Id }));
+                    new { id = content1.Id }), Is.EqualTo(false));
 
             // change something
             // save = update the current (draft) version
@@ -384,15 +382,14 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
             versions.Add(content1.VersionId); // the same version
 
             // no new version has been created
-            Assert.AreEqual(versions[^2], versions[^1]);
-            Assert.AreEqual(versions[^1], repository.Get(content1.Id).VersionId);
+            Assert.That(versions[^1], Is.EqualTo(versions[^2]));
+            Assert.That(repository.Get(content1.Id).VersionId, Is.EqualTo(versions[^1]));
 
             // misc checks
-            Assert.AreEqual(
-                false,
+            Assert.That(
                 ScopeAccessor.AmbientScope.Database.ExecuteScalar<bool>(
                     $"SELECT published FROM {Constants.DatabaseSchema.Tables.Document} WHERE nodeId=@id",
-                    new { id = content1.Id }));
+                    new { id = content1.Id }), Is.EqualTo(false));
 
             // publish = version
             content1.PublishCulture(CultureImpact.Invariant, DateTime.UtcNow, PropertyEditorCollection);
@@ -402,17 +399,16 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
             versions.Add(content1.VersionId); // NEW VERSION
 
             // new version has been created
-            Assert.AreNotEqual(versions[^2], versions[^1]);
-            Assert.IsTrue(content1.Published);
-            Assert.AreEqual(PublishedState.Published, ((Content)content1).PublishedState);
-            Assert.AreEqual(versions[^1], repository.Get(content1.Id).VersionId);
+            Assert.That(versions[^1], Is.Not.EqualTo(versions[^2]));
+            Assert.That(content1.Published, Is.True);
+            Assert.That(((Content)content1).PublishedState, Is.EqualTo(PublishedState.Published));
+            Assert.That(repository.Get(content1.Id).VersionId, Is.EqualTo(versions[^1]));
 
             // misc checks
-            Assert.AreEqual(
-                true,
+            Assert.That(
                 ScopeAccessor.AmbientScope.Database.ExecuteScalar<bool>(
                     $"SELECT published FROM {Constants.DatabaseSchema.Tables.Document} WHERE nodeId=@id",
-                    new { id = content1.Id }));
+                    new { id = content1.Id }), Is.EqualTo(true));
 
             // change something
             // save = update the current (draft) version
@@ -426,15 +422,14 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
             versions.Add(content1.VersionId); // the same version
 
             // no new version has been created
-            Assert.AreEqual(versions[^2], versions[^1]);
-            Assert.AreEqual(versions[^1], repository.Get(content1.Id).VersionId);
+            Assert.That(versions[^1], Is.EqualTo(versions[^2]));
+            Assert.That(repository.Get(content1.Id).VersionId, Is.EqualTo(versions[^1]));
 
             // misc checks
-            Assert.AreEqual(
-                true,
+            Assert.That(
                 ScopeAccessor.AmbientScope.Database.ExecuteScalar<bool>(
                     $"SELECT published FROM {Constants.DatabaseSchema.Tables.Document} WHERE nodeId=@id",
-                    new { id = content1.Id }));
+                    new { id = content1.Id }), Is.EqualTo(true));
 
             // publish = new version
             content1.Name = "name-4";
@@ -446,17 +441,16 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
             versions.Add(content1.VersionId); // NEW VERSION
 
             // a new version has been created
-            Assert.AreNotEqual(versions[^2], versions[^1]);
-            Assert.IsTrue(content1.Published);
-            Assert.AreEqual(PublishedState.Published, ((Content)content1).PublishedState);
-            Assert.AreEqual(versions[^1], repository.Get(content1.Id).VersionId);
+            Assert.That(versions[^1], Is.Not.EqualTo(versions[^2]));
+            Assert.That(content1.Published, Is.True);
+            Assert.That(((Content)content1).PublishedState, Is.EqualTo(PublishedState.Published));
+            Assert.That(repository.Get(content1.Id).VersionId, Is.EqualTo(versions[^1]));
 
             // misc checks
-            Assert.AreEqual(
-                true,
+            Assert.That(
                 ScopeAccessor.AmbientScope.Database.ExecuteScalar<bool>(
                     $"SELECT published FROM {Constants.DatabaseSchema.Tables.Document} WHERE nodeId=@id",
-                    new { id = content1.Id }));
+                    new { id = content1.Id }), Is.EqualTo(true));
 
             // all versions
             var allVersions = repository.GetAllVersions(content1.Id).ToArray();
@@ -476,20 +470,20 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
 
             // get older version
             var content = repository.GetVersion(versions[^4]);
-            Assert.AreNotEqual(0, content.VersionId);
-            Assert.AreEqual(versions[^4], content.VersionId);
-            Assert.AreEqual("name-4", content1.Name);
-            Assert.AreEqual("title-4", content1.GetValue("title"));
-            Assert.AreEqual("name-2", content.Name);
-            Assert.AreEqual("title-2", content.GetValue("title"));
+            Assert.That(content.VersionId, Is.Not.EqualTo(0));
+            Assert.That(content.VersionId, Is.EqualTo(versions[^4]));
+            Assert.That(content1.Name, Is.EqualTo("name-4"));
+            Assert.That(content1.GetValue("title"), Is.EqualTo("title-4"));
+            Assert.That(content.Name, Is.EqualTo("name-2"));
+            Assert.That(content.GetValue("title"), Is.EqualTo("title-2"));
 
             // get all versions - most recent first
             allVersions = repository.GetAllVersions(content1.Id).ToArray();
             var expVersions = versions.Distinct().Reverse().ToArray();
-            Assert.AreEqual(expVersions.Length, allVersions.Length);
+            Assert.That(allVersions, Has.Length.EqualTo(expVersions.Length));
             for (var i = 0; i < expVersions.Length; i++)
             {
-                Assert.AreEqual(expVersions[i], allVersions[i].VersionId);
+                Assert.That(allVersions[i].VersionId, Is.EqualTo(expVersions[i]));
             }
         }
     }
@@ -534,9 +528,9 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
             var n2 = result[1];
             var n3 = result[2];
 
-            Assert.AreEqual(content1.Id, n1.Id);
-            Assert.AreEqual(content2.Id, n2.Id);
-            Assert.AreEqual(content3.Id, n3.Id);
+            Assert.That(n1.Id, Is.EqualTo(content1.Id));
+            Assert.That(n2.Id, Is.EqualTo(content2.Id));
+            Assert.That(n3.Id, Is.EqualTo(content3.Id));
 
             // compare everything including properties and their values
             // this ensures that they have been properly retrieved
@@ -647,9 +641,9 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
 
             var fetched = repository.Get(textpage.Id);
 
-            Assert.True(textpage.TemplateId.HasValue);
-            Assert.NotZero(textpage.TemplateId.Value);
-            Assert.AreEqual(textpage.TemplateId, contentType.DefaultTemplate.Id);
+            Assert.That(textpage.TemplateId.HasValue, Is.True);
+            Assert.That(textpage.TemplateId.Value, Is.Not.Zero);
+            Assert.That(contentType.DefaultTemplate.Id, Is.EqualTo(textpage.TemplateId));
 
             scope.Complete();
 
@@ -747,18 +741,18 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
 
             var updatedContent = repository.Get(_subpage.Id);
 
-            Assert.AreEqual(content.Id, updatedContent.Id);
-            Assert.AreEqual(content.Name, updatedContent.Name);
-            Assert.AreEqual(content.VersionId, updatedContent.VersionId);
+            Assert.That(updatedContent.Id, Is.EqualTo(content.Id));
+            Assert.That(updatedContent.Name, Is.EqualTo(content.Name));
+            Assert.That(updatedContent.VersionId, Is.EqualTo(content.VersionId));
 
-            Assert.AreEqual(content.GetValue("title"), "Welcome to our Home page");
+            Assert.That(content.GetValue("title"), Is.EqualTo("Welcome to our Home page"));
             content.SetValue("title", "toot");
             repository.Save(content);
 
             updatedContent = repository.Get(_subpage.Id);
 
-            Assert.AreEqual("toot", updatedContent.GetValue("title"));
-            Assert.AreEqual(content.VersionId, updatedContent.VersionId);
+            Assert.That(updatedContent.GetValue("title"), Is.EqualTo("toot"));
+            Assert.That(updatedContent.VersionId, Is.EqualTo(content.VersionId));
         }
     }
 
@@ -776,7 +770,7 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
 
             var updatedContent = repository.Get(_subpage.Id);
 
-            Assert.False(updatedContent.TemplateId.HasValue);
+            Assert.That(updatedContent.TemplateId.HasValue, Is.False);
         }
     }
 
@@ -797,7 +791,7 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
             repository.Delete(content);
 
             var content1 = repository.Get(id);
-            Assert.IsNull(content1);
+            Assert.That(content1, Is.Null);
         }
     }
 
@@ -810,13 +804,13 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
             var repository = CreateRepository((IScopeAccessor)provider, out _);
             var content = repository.Get(_subpage2.Id);
 
-            Assert.AreEqual(_subpage2.Id, content.Id);
+            Assert.That(content.Id, Is.EqualTo(_subpage2.Id));
             Assert.That(content.CreateDate, Is.GreaterThan(DateTime.MinValue));
             Assert.That(content.UpdateDate, Is.GreaterThan(DateTime.MinValue));
-            Assert.AreNotEqual(0, content.ParentId);
-            Assert.AreEqual("Text Page 2", content.Name);
-            Assert.AreNotEqual(0, content.VersionId);
-            Assert.AreEqual(_contentType.Id, content.ContentTypeId);
+            Assert.That(content.ParentId, Is.Not.EqualTo(0));
+            Assert.That(content.Name, Is.EqualTo("Text Page 2"));
+            Assert.That(content.VersionId, Is.Not.EqualTo(0));
+            Assert.That(content.ContentTypeId, Is.EqualTo(_contentType.Id));
             Assert.That(content.Path, Is.Not.Empty);
             Assert.That(content.Properties.Any(), Is.True);
         }
@@ -833,7 +827,7 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
             var query = ScopeProvider.CreateQuery<IContent>().Where(x => x.Level == 2);
             var result = repository.Get(query);
 
-            Assert.GreaterOrEqual(2, result.Count());
+            Assert.That(2, Is.GreaterThanOrEqualTo(result.Count()));
         }
     }
 
@@ -872,7 +866,7 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
             var repository = CreateRepository((IScopeAccessor)provider, out _);
             var result2 = repository.GetMany().ToArray();
 
-            Assert.AreEqual(result.Length, result2.Length);
+            Assert.That(result2, Has.Length.EqualTo(result.Length));
         }
     }
 
@@ -880,14 +874,14 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
     public void AliasRegexTest()
     {
         var regex = new SqlServerSyntaxProvider(Options.Create(new GlobalSettings())).AliasRegex;
-        Assert.AreEqual(@"(\[\w+]\.\[\w+])\s+AS\s+(\[\w+])", regex.ToString());
+        Assert.That(regex.ToString(), Is.EqualTo(@"(\[\w+]\.\[\w+])\s+AS\s+(\[\w+])"));
         const string sql = "SELECT [table].[column1] AS [alias1], [table].[column2] AS [alias2] FROM [table];";
         var matches = regex.Matches(sql);
-        Assert.AreEqual(2, matches.Count);
-        Assert.AreEqual("[table].[column1]", matches[0].Groups[1].Value);
-        Assert.AreEqual("[alias1]", matches[0].Groups[2].Value);
-        Assert.AreEqual("[table].[column2]", matches[1].Groups[1].Value);
-        Assert.AreEqual("[alias2]", matches[1].Groups[2].Value);
+        Assert.That(matches, Has.Count.EqualTo(2));
+        Assert.That(matches[0].Groups[1].Value, Is.EqualTo("[table].[column1]"));
+        Assert.That(matches[0].Groups[2].Value, Is.EqualTo("[alias1]"));
+        Assert.That(matches[1].Groups[1].Value, Is.EqualTo("[table].[column2]"));
+        Assert.That(matches[1].Groups[2].Value, Is.EqualTo("[alias2]"));
     }
 
     [Test]
@@ -954,9 +948,9 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
         }
 
         var child1 = children[1];
-        Assert.IsTrue(child1.ContentType.VariesByCulture());
-        Assert.IsTrue(child1.Name.StartsWith("VAR"));
-        Assert.IsTrue(child1.GetCultureName("en-US").StartsWith("VAR"));
+        Assert.That(child1.ContentType.VariesByCulture(), Is.True);
+        Assert.That(child1.Name, Does.StartWith("VAR"));
+        Assert.That(child1.GetCultureName("en-US"), Does.StartWith("VAR"));
 
         var provider = ScopeProvider;
         using (var scope = provider.CreateScope())
@@ -964,9 +958,9 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
             var repository = CreateRepository((IScopeAccessor)provider, out _);
 
             var child = repository.Get(children[1].Id); // 1 is variant
-            Assert.IsTrue(child.ContentType.VariesByCulture());
-            Assert.IsTrue(child.Name.StartsWith("VAR"));
-            Assert.IsTrue(child.GetCultureName("en-US").StartsWith("VAR"));
+            Assert.That(child.ContentType.VariesByCulture(), Is.True);
+            Assert.That(child.Name, Does.StartWith("VAR"));
+            Assert.That(child.GetCultureName("en-US"), Does.StartWith("VAR"));
 
             try
             {
@@ -976,7 +970,7 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
                 var query = ScopeProvider.CreateQuery<IContent>().Where(x => x.ParentId == root.Id);
                 var result = repository.GetPage(query, 0, 20, out var totalRecords, propertyAliases: null, filter: null, Ordering.By("UpdateDate"));
 
-                Assert.AreEqual(25, totalRecords);
+                Assert.That(totalRecords, Is.EqualTo(25));
                 foreach (var r in result)
                 {
                     var isInvariant = r.ContentType.Alias == "umbInvariantTextpage";
@@ -984,13 +978,13 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
                     var namePrefix = isInvariant ? "INV" : "VAR";
 
                     // ensure the correct name (invariant vs variant) is in the result
-                    Assert.IsTrue(name.StartsWith(namePrefix));
+                    Assert.That(name, Does.StartWith(namePrefix));
 
                     foreach (var p in r.Properties)
                     {
                         // ensure there is a value for the correct variant/invariant property
                         var value = p.GetValue(p.PropertyType.Variations.VariesByNothing() ? null : "en-US");
-                        Assert.IsNotNull(value);
+                        Assert.That(value, Is.Not.Null);
                     }
                 }
             }
@@ -1019,12 +1013,12 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
 
                 var result = repository.GetPage(query, 0, 2, out var totalRecords, propertyAliases: null, filter: null, Ordering.By("title", isCustomField: true));
 
-                Assert.AreEqual(3, totalRecords);
-                Assert.AreEqual(2, result.Count());
+                Assert.That(totalRecords, Is.EqualTo(3));
+                Assert.That(result.Count(), Is.EqualTo(2));
 
                 result = repository.GetPage(query, 1, 2, out totalRecords, propertyAliases: null, filter: null, Ordering.By("title", isCustomField: true));
 
-                Assert.AreEqual(1, result.Count());
+                Assert.That(result.Count(), Is.EqualTo(1));
             }
             finally
             {
@@ -1235,8 +1229,8 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
                 .Where(x => x.Key == new Guid("B58B3AD4-62C2-4E27-B1BE-837BD7C533E0"));
             var content = repository.Get(query).SingleOrDefault();
 
-            Assert.IsNotNull(content);
-            Assert.AreEqual(_textpage.Id, content.Id);
+            Assert.That(content, Is.Not.Null);
+            Assert.That(content.Id, Is.EqualTo(_textpage.Id));
         }
     }
 
@@ -1266,7 +1260,7 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
         var guidRepo = (IReadRepository<Guid, IContent>)repository;
 
         var result = guidRepo.GetMany().ToArray();
-        Assert.IsNotEmpty(result);
+        Assert.That(result, Is.Not.Empty);
         Assert.That(result.Any(c => c.Key == content.Key));
     }
 }

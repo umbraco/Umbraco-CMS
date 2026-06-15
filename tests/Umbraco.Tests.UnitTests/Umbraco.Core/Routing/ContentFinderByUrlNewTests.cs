@@ -38,14 +38,14 @@ public class ContentFinderByUrlNewTests
 
         var result = await sut.TryFindContent(publishedRequestBuilder);
 
-        Assert.AreEqual(expectSuccess, result);
+        Assert.That(result, Is.EqualTo(expectSuccess));
         if (expectSuccess)
         {
-            Assert.IsNotNull(publishedRequestBuilder.PublishedContent);
+            Assert.That(publishedRequestBuilder.PublishedContent, Is.Not.Null);
         }
         else
         {
-            Assert.IsNull(publishedRequestBuilder.PublishedContent);
+            Assert.That(publishedRequestBuilder.PublishedContent, Is.Null);
         }
     }
 
@@ -76,14 +76,14 @@ public class ContentFinderByUrlNewTests
 
         var result = await sut.TryFindContent(publishedRequestBuilder);
 
-        Assert.AreEqual(expectSuccess, result);
+        Assert.That(result, Is.EqualTo(expectSuccess));
         if (expectSuccess)
         {
-            Assert.IsNotNull(publishedRequestBuilder.PublishedContent);
+            Assert.That(publishedRequestBuilder.PublishedContent, Is.Not.Null);
         }
         else
         {
-            Assert.IsNull(publishedRequestBuilder.PublishedContent);
+            Assert.That(publishedRequestBuilder.PublishedContent, Is.Null);
         }
     }
 

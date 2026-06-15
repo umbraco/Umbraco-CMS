@@ -27,7 +27,7 @@ public class AspNetCoreHostingEnvironmentTests
         else
         {
             var result = sut.ToAbsolute(input);
-            Assert.AreEqual(expected, result);
+            Assert.That(result, Is.EqualTo(expected));
         }
     }
 
@@ -35,9 +35,9 @@ public class AspNetCoreHostingEnvironmentTests
     public void EnsurePathIsApplicationRootPrefixed()
     {
         // Assert
-        Assert.AreEqual("~/Views/Template.cshtml", PathUtility.EnsurePathIsApplicationRootPrefixed("Views/Template.cshtml"));
-        Assert.AreEqual("~/Views/Template.cshtml", PathUtility.EnsurePathIsApplicationRootPrefixed("/Views/Template.cshtml"));
-        Assert.AreEqual("~/Views/Template.cshtml", PathUtility.EnsurePathIsApplicationRootPrefixed("~/Views/Template.cshtml"));
+        Assert.That(PathUtility.EnsurePathIsApplicationRootPrefixed("Views/Template.cshtml"), Is.EqualTo("~/Views/Template.cshtml"));
+        Assert.That(PathUtility.EnsurePathIsApplicationRootPrefixed("/Views/Template.cshtml"), Is.EqualTo("~/Views/Template.cshtml"));
+        Assert.That(PathUtility.EnsurePathIsApplicationRootPrefixed("~/Views/Template.cshtml"), Is.EqualTo("~/Views/Template.cshtml"));
     }
 
     [Test]
@@ -46,7 +46,7 @@ public class AspNetCoreHostingEnvironmentTests
         var sut = CreateWithDefaultConfig(ApplicationUrlDetection.FirstRequest);
         var url = new Uri("http://localhost:5000");
         sut.EnsureApplicationMainUrl(url);
-        Assert.AreEqual(sut.ApplicationMainUrl, url);
+        Assert.That(url, Is.EqualTo(sut.ApplicationMainUrl));
     }
 
     /// <summary>
@@ -88,15 +88,15 @@ public class AspNetCoreHostingEnvironmentTests
 
         // Step 1: Normal traffic sets the URL
         sut.EnsureApplicationMainUrl(legitimateUrl);
-        Assert.AreEqual(legitimateUrl, sut.ApplicationMainUrl, "Initial legitimate URL should be set");
+        Assert.That(sut.ApplicationMainUrl, Is.EqualTo(legitimateUrl), "Initial legitimate URL should be set");
 
         // Step 2: Attacker sends request with forged Host header — must be ignored
         sut.EnsureApplicationMainUrl(attackerUrl);
-        Assert.AreEqual(legitimateUrl, sut.ApplicationMainUrl, "Attacker URL must not overwrite the legitimate URL");
+        Assert.That(sut.ApplicationMainUrl, Is.EqualTo(legitimateUrl), "Attacker URL must not overwrite the legitimate URL");
 
         // Step 3: Legitimate traffic continues — URL remains stable
         sut.EnsureApplicationMainUrl(legitimateUrl);
-        Assert.AreEqual(legitimateUrl, sut.ApplicationMainUrl, "Legitimate URL is retained");
+        Assert.That(sut.ApplicationMainUrl, Is.EqualTo(legitimateUrl), "Legitimate URL is retained");
     }
 
     [Test]
@@ -110,7 +110,7 @@ public class AspNetCoreHostingEnvironmentTests
         sut.EnsureApplicationMainUrl(new Uri("https://evil1.com"));
         sut.EnsureApplicationMainUrl(new Uri("https://evil2.com"));
 
-        Assert.AreEqual(legitimateUrl, sut.ApplicationMainUrl, "First URL is locked, all subsequent URLs are ignored");
+        Assert.That(sut.ApplicationMainUrl, Is.EqualTo(legitimateUrl), "First URL is locked, all subsequent URLs are ignored");
     }
 
     [Test]
@@ -122,7 +122,7 @@ public class AspNetCoreHostingEnvironmentTests
 
         var url = new Uri("https://legit-site.com");
         sut.EnsureApplicationMainUrl(url);
-        Assert.AreEqual(url, sut.ApplicationMainUrl);
+        Assert.That(sut.ApplicationMainUrl, Is.EqualTo(url));
     }
 
     [Test]
@@ -132,7 +132,7 @@ public class AspNetCoreHostingEnvironmentTests
 
         sut.EnsureApplicationMainUrl(new Uri("https://legit-site.com"));
 
-        Assert.IsNull(sut.ApplicationMainUrl);
+        Assert.That(sut.ApplicationMainUrl, Is.Null);
     }
 
     [Test]
@@ -160,7 +160,7 @@ public class AspNetCoreHostingEnvironmentTests
             webHostEnvironment.Object);
 
         // Explicit config is set in the constructor, not via auto-detection
-        Assert.AreEqual(new Uri("https://configured-site.com"), sut.ApplicationMainUrl);
+        Assert.That(sut.ApplicationMainUrl, Is.EqualTo(new Uri("https://configured-site.com")));
     }
 
     [Test]
@@ -172,10 +172,10 @@ public class AspNetCoreHostingEnvironmentTests
         var url2 = new Uri("https://site-b.com");
 
         sut.EnsureApplicationMainUrl(url1);
-        Assert.AreEqual(url1, sut.ApplicationMainUrl);
+        Assert.That(sut.ApplicationMainUrl, Is.EqualTo(url1));
 
         sut.EnsureApplicationMainUrl(url2);
-        Assert.AreEqual(url2, sut.ApplicationMainUrl, "New URL should overwrite in EveryRequest mode");
+        Assert.That(sut.ApplicationMainUrl, Is.EqualTo(url2), "New URL should overwrite in EveryRequest mode");
     }
 
     [Test]
@@ -187,7 +187,7 @@ public class AspNetCoreHostingEnvironmentTests
         sut.EnsureApplicationMainUrl(url);
         sut.EnsureApplicationMainUrl(url);
 
-        Assert.AreEqual(url, sut.ApplicationMainUrl, "Repeated same URL is a no-op");
+        Assert.That(sut.ApplicationMainUrl, Is.EqualTo(url), "Repeated same URL is a no-op");
     }
 
     [Test]
@@ -214,14 +214,13 @@ public class AspNetCoreHostingEnvironmentTests
             webRoutingSettingsMonitor,
             webHostEnvironment.Object);
 
-        Assert.AreEqual(new Uri("https://configured-site.com"), sut.ApplicationMainUrl);
+        Assert.That(sut.ApplicationMainUrl, Is.EqualTo(new Uri("https://configured-site.com")));
 
         // Attempt to overwrite via auto-detection
         sut.EnsureApplicationMainUrl(new Uri("https://non-configured-site.com"));
 
-        Assert.AreEqual(
-            new Uri("https://configured-site.com"),
-            sut.ApplicationMainUrl,
+        Assert.That(
+            sut.ApplicationMainUrl, Is.EqualTo(new Uri("https://configured-site.com")),
             "Explicit config prevents auto-detection overwrite");
     }
 
@@ -249,15 +248,14 @@ public class AspNetCoreHostingEnvironmentTests
             webRoutingSettingsMonitor,
             webHostEnvironment.Object);
 
-        Assert.AreEqual(new Uri("https://configured-site.com"), sut.ApplicationMainUrl);
+        Assert.That(sut.ApplicationMainUrl, Is.EqualTo(new Uri("https://configured-site.com")));
 
         // Attempt override.
         sut.EnsureApplicationMainUrl(new Uri("https://non-configured-site.com"));
 
         // Should remain configured value.
-        Assert.AreEqual(
-            new Uri("https://configured-site.com"),
-            sut.ApplicationMainUrl,
+        Assert.That(
+            sut.ApplicationMainUrl, Is.EqualTo(new Uri("https://configured-site.com")),
             "Explicit config prevents host header poisoning");
     }
 }

@@ -31,11 +31,11 @@ internal sealed class KeyValueServiceTests : UmbracoIntegrationTest
 
         // Assert
 
-        Assert.AreEqual(4, value.Count);
-        Assert.AreEqual("hello1", value["test1"]);
-        Assert.AreEqual("hello2", value["test2"]);
-        Assert.AreEqual("hello3", value["test3"]);
-        Assert.AreEqual("hello4", value["test4"]);
+        Assert.That(value, Has.Count.EqualTo(4));
+        Assert.That(value["test1"], Is.EqualTo("hello1"));
+        Assert.That(value["test2"], Is.EqualTo("hello2"));
+        Assert.That(value["test3"], Is.EqualTo("hello3"));
+        Assert.That(value["test4"], Is.EqualTo("hello4"));
     }
 
     [Test]
@@ -45,7 +45,7 @@ internal sealed class KeyValueServiceTests : UmbracoIntegrationTest
         var value = KeyValueService.GetValue("foo");
 
         // Assert
-        Assert.IsNull(value);
+        Assert.That(value, Is.Null);
     }
 
     [Test]
@@ -57,7 +57,7 @@ internal sealed class KeyValueServiceTests : UmbracoIntegrationTest
         var value = KeyValueService.GetValue("foo");
 
         // Assert
-        Assert.AreEqual("bar", value);
+        Assert.That(value, Is.EqualTo("bar"));
     }
 
     [Test]
@@ -70,7 +70,7 @@ internal sealed class KeyValueServiceTests : UmbracoIntegrationTest
         var value = KeyValueService.GetValue("foo");
 
         // Assert
-        Assert.AreEqual("buzz", value);
+        Assert.That(value, Is.EqualTo("buzz"));
     }
 
     [Test]
@@ -83,8 +83,8 @@ internal sealed class KeyValueServiceTests : UmbracoIntegrationTest
         var value = KeyValueService.GetValue("foo");
 
         // Assert
-        Assert.IsTrue(result);
-        Assert.AreEqual("buzz", value);
+        Assert.That(result, Is.True);
+        Assert.That(value, Is.EqualTo("buzz"));
     }
 
     [Test]
@@ -97,7 +97,7 @@ internal sealed class KeyValueServiceTests : UmbracoIntegrationTest
         var value = KeyValueService.GetValue("foo");
 
         // Assert
-        Assert.IsFalse(result);
-        Assert.AreEqual("bar", value);
+        Assert.That(result, Is.False);
+        Assert.That(value, Is.EqualTo("bar"));
     }
 }

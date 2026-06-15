@@ -240,8 +240,8 @@ internal sealed class DocumentUrlServiceContentTreeChangeTests : UmbracoIntegrat
         var rowsAfter = GetDbSegments(page.Key);
 
         Assert.That(
-            rowsAfter.Count,
-            Is.EqualTo(rowsBefore.Count),
+            rowsAfter,
+Has.Count.EqualTo(rowsBefore.Count),
             "UpdateUrlSegmentCacheAsync must not write additional rows to the database.");
 
         var isoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
@@ -285,8 +285,8 @@ internal sealed class DocumentUrlServiceContentTreeChangeTests : UmbracoIntegrat
 
         var aliasesAfter = GetDbAliases(page.Key);
         Assert.That(
-            aliasesAfter.Count,
-            Is.EqualTo(aliasesBefore.Count),
+            aliasesAfter,
+Has.Count.EqualTo(aliasesBefore.Count),
             "UpdateAliasCacheAsync must not write additional alias rows to the database.");
 
         var result = await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("cache-test-alias", isoCode);
@@ -330,12 +330,12 @@ internal sealed class DocumentUrlServiceContentTreeChangeTests : UmbracoIntegrat
         Assert.Multiple(() =>
         {
             Assert.That(
-                parentRowsAfter.Count,
-                Is.EqualTo(parentRowsBefore.Count),
+                parentRowsAfter,
+Has.Count.EqualTo(parentRowsBefore.Count),
                 "UpdateUrlSegmentCacheWithDescendantsAsync must not write additional rows for the parent.");
             Assert.That(
-                childRowsAfter.Count,
-                Is.EqualTo(childRowsBefore.Count),
+                childRowsAfter,
+Has.Count.EqualTo(childRowsBefore.Count),
                 "UpdateUrlSegmentCacheWithDescendantsAsync must not write additional rows for the child.");
         });
 
@@ -394,12 +394,12 @@ internal sealed class DocumentUrlServiceContentTreeChangeTests : UmbracoIntegrat
         Assert.Multiple(() =>
         {
             Assert.That(
-                parentAliasesAfter.Count,
-                Is.EqualTo(parentAliasesBefore.Count),
+                parentAliasesAfter,
+Has.Count.EqualTo(parentAliasesBefore.Count),
                 "UpdateAliasCacheWithDescendantsAsync must not write additional rows for the parent.");
             Assert.That(
-                childAliasesAfter.Count,
-                Is.EqualTo(childAliasesBefore.Count),
+                childAliasesAfter,
+Has.Count.EqualTo(childAliasesBefore.Count),
                 "UpdateAliasCacheWithDescendantsAsync must not write additional rows for the child.");
         });
 

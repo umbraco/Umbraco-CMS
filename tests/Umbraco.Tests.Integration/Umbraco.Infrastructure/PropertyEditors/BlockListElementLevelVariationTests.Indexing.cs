@@ -45,7 +45,7 @@ internal partial class BlockListElementLevelVariationTests
                 { elementType.Key, elementType }, { contentType.Key, contentType }
             });
 
-        Assert.AreEqual(2, indexValues.Count());
+        Assert.That(indexValues.Count(), Is.EqualTo(2));
 
         AssertIndexValues("en-US");
         AssertIndexValues("da-DK");
@@ -53,14 +53,14 @@ internal partial class BlockListElementLevelVariationTests
         void AssertIndexValues(string culture)
         {
             var indexValue = indexValues.FirstOrDefault(v => v.Culture == culture);
-            Assert.IsNotNull(indexValue);
-            Assert.AreEqual(1, indexValue.Values.Count());
+            Assert.That(indexValue, Is.Not.Null);
+            Assert.That(indexValue.Values.Count(), Is.EqualTo(1));
             var indexedValue = indexValue.Values.First() as string;
-            Assert.IsNotNull(indexedValue);
+            Assert.That(indexedValue, Is.Not.Null);
             var values = indexedValue.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
-            Assert.AreEqual(2, values.Length);
-            Assert.Contains($"The content value ({culture})", values);
-            Assert.Contains("The invariant content value", values);
+            Assert.That(values, Has.Length.EqualTo(2));
+            Assert.That(values, Does.Contain($"The content value ({culture})"));
+            Assert.That(values, Does.Contain("The invariant content value"));
         }
     }
 
@@ -122,14 +122,14 @@ internal partial class BlockListElementLevelVariationTests
                     { elementType.Key, elementType }, { contentType.Key, contentType }
                 });
 
-            Assert.AreEqual(1, indexValues.Count());
+            Assert.That(indexValues.Count(), Is.EqualTo(1));
 
             var indexValue = indexValues.FirstOrDefault(v => v.Culture == culture);
-            Assert.IsNotNull(indexValue);
-            Assert.AreEqual(1, indexValue.Values.Count());
+            Assert.That(indexValue, Is.Not.Null);
+            Assert.That(indexValue.Values.Count(), Is.EqualTo(1));
             var indexedValue = indexValue.Values.First() as string;
-            Assert.IsNotNull(indexedValue);
-            Assert.AreEqual($"{culture} invariantText content value {culture} variantText content value", TrimAndStripNewlines(indexedValue));
+            Assert.That(indexedValue, Is.Not.Null);
+            Assert.That(TrimAndStripNewlines(indexedValue), Is.EqualTo($"{culture} invariantText content value {culture} variantText content value"));
         }
     }
 
@@ -197,33 +197,33 @@ internal partial class BlockListElementLevelVariationTests
                 { elementType.Key, elementType }, { contentType.Key, contentType }
             });
 
-        Assert.AreEqual(2, indexValues.Count());
+        Assert.That(indexValues.Count(), Is.EqualTo(2));
         var indexValue = indexValues.FirstOrDefault(v => v.Culture == "da-DK");
-        Assert.IsNotNull(indexValue);
-        Assert.AreEqual(1, indexValue.Values.Count());
+        Assert.That(indexValue, Is.Not.Null);
+        Assert.That(indexValue.Values.Count(), Is.EqualTo(1));
         var indexedValue = indexValue.Values.First() as string;
-        Assert.IsNotNull(indexedValue);
+        Assert.That(indexedValue, Is.Not.Null);
         if (published)
         {
-            Assert.AreEqual("#2: The invariant content value #2: The content value in Danish", TrimAndStripNewlines(indexedValue));
+            Assert.That(TrimAndStripNewlines(indexedValue), Is.EqualTo("#2: The invariant content value #2: The content value in Danish"));
         }
         else
         {
-            Assert.AreEqual("#1: The invariant content value #1: The content value in Danish #2: The invariant content value #2: The content value in Danish", TrimAndStripNewlines(indexedValue));
+            Assert.That(TrimAndStripNewlines(indexedValue), Is.EqualTo("#1: The invariant content value #1: The content value in Danish #2: The invariant content value #2: The content value in Danish"));
         }
 
         indexValue = indexValues.FirstOrDefault(v => v.Culture == "en-US");
-        Assert.IsNotNull(indexValue);
-        Assert.AreEqual(1, indexValue.Values.Count());
+        Assert.That(indexValue, Is.Not.Null);
+        Assert.That(indexValue.Values.Count(), Is.EqualTo(1));
         indexedValue = indexValue.Values.First() as string;
-        Assert.IsNotNull(indexedValue);
+        Assert.That(indexedValue, Is.Not.Null);
         if (published)
         {
-            Assert.AreEqual("#1: The invariant content value #1: The content value in English", TrimAndStripNewlines(indexedValue));
+            Assert.That(TrimAndStripNewlines(indexedValue), Is.EqualTo("#1: The invariant content value #1: The content value in English"));
         }
         else
         {
-            Assert.AreEqual("#1: The invariant content value #1: The content value in English #2: The invariant content value #2: The content value in English", TrimAndStripNewlines(indexedValue));
+            Assert.That(TrimAndStripNewlines(indexedValue), Is.EqualTo("#1: The invariant content value #1: The content value in English #2: The invariant content value #2: The content value in English"));
         }
     }
 
@@ -262,16 +262,16 @@ internal partial class BlockListElementLevelVariationTests
                 { elementType.Key, elementType }, { contentType.Key, contentType }
             });
 
-        Assert.AreEqual(1, indexValues.Count());
+        Assert.That(indexValues.Count(), Is.EqualTo(1));
         var indexValue = indexValues.FirstOrDefault(v => v.Culture is null);
-        Assert.IsNotNull(indexValue);
-        Assert.AreEqual(1, indexValue.Values.Count());
+        Assert.That(indexValue, Is.Not.Null);
+        Assert.That(indexValue.Values.Count(), Is.EqualTo(1));
         var indexedValue = indexValue.Values.First() as string;
-        Assert.IsNotNull(indexedValue);
+        Assert.That(indexedValue, Is.Not.Null);
         var values = indexedValue.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
-        Assert.AreEqual(2, values.Length);
-        Assert.Contains("The invariant content value", values);
-        Assert.Contains("Another invariant content value", values);
+        Assert.That(values, Has.Length.EqualTo(2));
+        Assert.That(values, Does.Contain("The invariant content value"));
+        Assert.That(values, Does.Contain("Another invariant content value"));
     }
 
     [Test]
@@ -362,7 +362,7 @@ internal partial class BlockListElementLevelVariationTests
             {
                 { nestedElementType.Key, nestedElementType }, { rootElementType.Key, rootElementType }, { contentType.Key, contentType }
             });
-        Assert.AreEqual(2, indexValues.Count());
+        Assert.That(indexValues.Count(), Is.EqualTo(2));
 
         AssertIndexedValues(
             "en-US",
@@ -381,13 +381,13 @@ internal partial class BlockListElementLevelVariationTests
         void AssertIndexedValues(string culture, params string[] expectedIndexedValues)
         {
             var indexValue = indexValues.FirstOrDefault(v => v.Culture == culture);
-            Assert.IsNotNull(indexValue);
-            Assert.AreEqual(1, indexValue.Values.Count());
+            Assert.That(indexValue, Is.Not.Null);
+            Assert.That(indexValue.Values.Count(), Is.EqualTo(1));
             var indexedValue = indexValue.Values.First() as string;
-            Assert.IsNotNull(indexedValue);
+            Assert.That(indexedValue, Is.Not.Null);
             var values = indexedValue.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
-            Assert.AreEqual(expectedIndexedValues.Length, values.Length);
-            Assert.IsTrue(values.ContainsAll(expectedIndexedValues));
+            Assert.That(values, Has.Length.EqualTo(expectedIndexedValues.Length));
+            Assert.That(values.ContainsAll(expectedIndexedValues), Is.True);
         }
     }
 
@@ -433,31 +433,31 @@ internal partial class BlockListElementLevelVariationTests
             })
             .ToArray();
 
-        Assert.AreEqual(1, indexValues.Length);
+        Assert.That(indexValues, Has.Length.EqualTo(1));
 
         // no changes have been made to the property value, so the indexer will index based on the previously stored value
         var expectedIndexCulture = initialVaryByCulture ? "en-US" : null;
         var indexValue = indexValues.FirstOrDefault(v => v.Culture == expectedIndexCulture);
-        Assert.IsNotNull(indexValue);
-        Assert.AreEqual(1, indexValue.Values.Count());
+        Assert.That(indexValue, Is.Not.Null);
+        Assert.That(indexValue.Values.Count(), Is.EqualTo(1));
 
         var indexedValue = indexValue.Values.First() as string;
-        Assert.IsNotNull(indexedValue);
+        Assert.That(indexedValue, Is.Not.Null);
 
         var values = indexedValue.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
 
         if (initialVaryByCulture)
         {
             // variant to invariant => the indexer skips the previous variant values
-            Assert.AreEqual(1, values.Length);
-            Assert.Contains("The invariant content value", values);
+            Assert.That(values, Has.Length.EqualTo(1));
+            Assert.That(values, Does.Contain("The invariant content value"));
         }
         else
         {
             // invariant to variant => the indexer applies the previous invariant values to the available cultures
-            Assert.AreEqual(2, values.Length);
-            Assert.Contains("The variant content value", values);
-            Assert.Contains("The invariant content value", values);
+            Assert.That(values, Has.Length.EqualTo(2));
+            Assert.That(values, Does.Contain("The variant content value"));
+            Assert.That(values, Does.Contain("The invariant content value"));
         }
     }
 

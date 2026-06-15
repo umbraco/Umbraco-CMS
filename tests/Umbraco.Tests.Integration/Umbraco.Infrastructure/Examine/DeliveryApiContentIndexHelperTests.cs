@@ -67,7 +67,7 @@ public class DeliveryApiContentIndexHelperTests : UmbracoIntegrationTestWithCont
             actionToPerform,
             pageSize);
 
-        Assert.AreEqual(expectedNumberOfContentItems, contentEnumerated);
+        Assert.That(contentEnumerated, Is.EqualTo(expectedNumberOfContentItems));
     }
 
     [Test]
@@ -89,7 +89,7 @@ public class DeliveryApiContentIndexHelperTests : UmbracoIntegrationTestWithCont
             actionToPerform,
             pageSize);
 
-        Assert.AreEqual(expectedNumberOfContentItems - 1, contentEnumerated);
+        Assert.That(contentEnumerated, Is.EqualTo(expectedNumberOfContentItems - 1));
     }
 
     private DeliveryApiContentIndexHelper CreateDeliveryApiContentIndexHelper(HashSet<string>? disallowedContentTypeAliases = null)
@@ -115,7 +115,7 @@ public class DeliveryApiContentIndexHelperTests : UmbracoIntegrationTestWithCont
     private int GetExpectedNumberOfContentItems()
     {
         var result = ContentService.GetAllPublished().Count();
-        Assert.AreEqual(10, result);
+        Assert.That(result, Is.EqualTo(10));
         return result;
     }
 }

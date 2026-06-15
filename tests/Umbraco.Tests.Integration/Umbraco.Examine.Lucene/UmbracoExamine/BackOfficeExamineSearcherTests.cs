@@ -175,7 +175,7 @@ internal sealed class BackOfficeExamineSearcherTests : ExamineBaseTest
         IEnumerable<ISearchResult> actual = BackOfficeExamineSearch(query);
 
         // Assert
-        Assert.AreEqual(0, actual.Count());
+        Assert.That(actual.Count(), Is.EqualTo(0));
     }
 
     [Test]
@@ -195,8 +195,8 @@ internal sealed class BackOfficeExamineSearcherTests : ExamineBaseTest
 
         // Assert
         IEnumerable<ISearchResult> searchResults = actual.ToArray();
-        Assert.AreEqual(1, searchResults.Count());
-        Assert.AreEqual(searchResults.First().Values["nodeName"], contentName);
+        Assert.That(searchResults.Count(), Is.EqualTo(1));
+        Assert.That(searchResults.First().Values["nodeName"], Is.EqualTo(contentName));
     }
 
     [Test]
@@ -214,7 +214,7 @@ internal sealed class BackOfficeExamineSearcherTests : ExamineBaseTest
         IEnumerable<ISearchResult> actual = BackOfficeExamineSearch(query);
 
         // Assert
-        Assert.AreEqual(0, actual.Count());
+        Assert.That(actual.Count(), Is.EqualTo(0));
     }
 
     [Test]
@@ -236,9 +236,9 @@ internal sealed class BackOfficeExamineSearcherTests : ExamineBaseTest
 
         // Assert
         IEnumerable<ISearchResult> searchResults = actual.ToArray();
-        Assert.AreEqual(1, searchResults.Count());
-        Assert.AreEqual(searchResults.First().Values["nodeName"], contentName);
-        Assert.AreEqual(searchResults.First().Id, contentId);
+        Assert.That(searchResults.Count(), Is.EqualTo(1));
+        Assert.That(searchResults.First().Values["nodeName"], Is.EqualTo(contentName));
+        Assert.That(contentId, Is.EqualTo(searchResults.First().Id));
     }
 
     [Test]
@@ -295,11 +295,11 @@ internal sealed class BackOfficeExamineSearcherTests : ExamineBaseTest
 
         // Assert
         IEnumerable<ISearchResult> searchResults = actual.ToArray();
-        Assert.AreEqual(2, searchResults.Count());
+        Assert.That(searchResults.Count(), Is.EqualTo(2));
         // Checks if the first content in the search is the original content
-        Assert.AreEqual(searchResults.First().Id, firstContent.Id.ToString());
+        Assert.That(firstContent.Id.ToString(), Is.EqualTo(searchResults.First().Id));
         // Checks if the score for the original name is higher than the score for the copy
-        Assert.Greater(searchResults.First().Score, searchResults.Last().Score);
+        Assert.That(searchResults.First().Score, Is.GreaterThan(searchResults.Last().Score));
     }
 
     [Test]
@@ -359,10 +359,10 @@ internal sealed class BackOfficeExamineSearcherTests : ExamineBaseTest
         // Assert
         IEnumerable<ISearchResult> contentActual = parentContentActual.ToArray();
         IEnumerable<ISearchResult> searchResults = childContentActual.ToArray();
-        Assert.AreEqual(1, contentActual.Count());
-        Assert.AreEqual(1, searchResults.Count());
-        Assert.AreEqual(contentActual.First().Values["nodeName"], contentName);
-        Assert.AreEqual(searchResults.First().Values["nodeName"], childContentName);
+        Assert.That(contentActual.Count(), Is.EqualTo(1));
+        Assert.That(searchResults.Count(), Is.EqualTo(1));
+        Assert.That(contentActual.First().Values["nodeName"], Is.EqualTo(contentName));
+        Assert.That(searchResults.First().Values["nodeName"], Is.EqualTo(childContentName));
     }
 
     [Test]
@@ -442,12 +442,12 @@ internal sealed class BackOfficeExamineSearcherTests : ExamineBaseTest
         IEnumerable<ISearchResult> childChildSearchResults = childChildContentActual.ToArray();
 
         // Assert
-        Assert.AreEqual(1, parentSearchResults.Count());
-        Assert.AreEqual(1, childSearchResults.Count());
-        Assert.AreEqual(1, childChildSearchResults.Count());
-        Assert.AreEqual(parentSearchResults.First().Values["nodeName"], contentName);
-        Assert.AreEqual(childSearchResults.First().Values["nodeName"], childContentName);
-        Assert.AreEqual(childChildSearchResults.First().Values["nodeName"], childChildContentName);
+        Assert.That(parentSearchResults.Count(), Is.EqualTo(1));
+        Assert.That(childSearchResults.Count(), Is.EqualTo(1));
+        Assert.That(childChildSearchResults.Count(), Is.EqualTo(1));
+        Assert.That(parentSearchResults.First().Values["nodeName"], Is.EqualTo(contentName));
+        Assert.That(childSearchResults.First().Values["nodeName"], Is.EqualTo(childContentName));
+        Assert.That(childChildSearchResults.First().Values["nodeName"], Is.EqualTo(childChildContentName));
     }
 
     [Test]
@@ -465,7 +465,7 @@ internal sealed class BackOfficeExamineSearcherTests : ExamineBaseTest
         IEnumerable<ISearchResult> actual = BackOfficeExamineSearch(query);
 
         // Assert
-        Assert.AreEqual(0, actual.Count());
+        Assert.That(actual.Count(), Is.EqualTo(0));
     }
 
     // Multiple Languages
@@ -516,11 +516,11 @@ internal sealed class BackOfficeExamineSearcherTests : ExamineBaseTest
 
         // Assert
         IEnumerable<ISearchResult> searchResults = actual.ToArray();
-        Assert.AreEqual(1, searchResults.Count());
+        Assert.That(searchResults.Count(), Is.EqualTo(1));
         var nodeNameEn = searchResults.First().Values["nodeName_en-us"];
         var nodeNameDa = searchResults.First().Values["nodeName_da"];
-        Assert.AreEqual(englishNodeName, nodeNameEn);
-        Assert.AreEqual(danishNodeName, nodeNameDa);
+        Assert.That(nodeNameEn, Is.EqualTo(englishNodeName));
+        Assert.That(nodeNameDa, Is.EqualTo(danishNodeName));
     }
 
     [Test]
@@ -542,11 +542,11 @@ internal sealed class BackOfficeExamineSearcherTests : ExamineBaseTest
 
         // Assert
         IEnumerable<ISearchResult> searchResults = actual.ToArray();
-        Assert.AreEqual(1, searchResults.Count());
+        Assert.That(searchResults.Count(), Is.EqualTo(1));
         var nodeNameEn = searchResults.First().Values["nodeName_en-us"];
         var nodeNameDa = searchResults.First().Values["nodeName_da"];
-        Assert.AreEqual(englishNodeName, nodeNameEn);
-        Assert.AreEqual(danishNodeName, nodeNameDa);
+        Assert.That(nodeNameEn, Is.EqualTo(englishNodeName));
+        Assert.That(nodeNameDa, Is.EqualTo(danishNodeName));
     }
 
     [Test]
@@ -568,11 +568,11 @@ internal sealed class BackOfficeExamineSearcherTests : ExamineBaseTest
 
         // Assert
         IEnumerable<ISearchResult> searchResults = actual.ToArray();
-        Assert.AreEqual(1, searchResults.Count());
+        Assert.That(searchResults.Count(), Is.EqualTo(1));
         var nodeNameDa = searchResults.First().Values["nodeName_da"];
         var nodeNameEn = searchResults.First().Values["nodeName_en-us"];
-        Assert.AreEqual(englishNodeName, nodeNameEn);
-        Assert.AreEqual(danishNodeName, nodeNameDa);
+        Assert.That(nodeNameEn, Is.EqualTo(englishNodeName));
+        Assert.That(nodeNameDa, Is.EqualTo(danishNodeName));
     }
 
     [Test]
@@ -594,11 +594,11 @@ internal sealed class BackOfficeExamineSearcherTests : ExamineBaseTest
 
         // Assert
         IEnumerable<ISearchResult> searchResults = actual.ToArray();
-        Assert.AreEqual(1, searchResults.Count());
+        Assert.That(searchResults.Count(), Is.EqualTo(1));
         var nodeNameDa = searchResults.First().Values["nodeName_da"];
         var nodeNameEn = searchResults.First().Values["nodeName_en-us"];
-        Assert.AreEqual(englishNodeName, nodeNameEn);
-        Assert.AreEqual(danishNodeName, nodeNameDa);
+        Assert.That(nodeNameEn, Is.EqualTo(englishNodeName));
+        Assert.That(nodeNameDa, Is.EqualTo(danishNodeName));
     }
 
     // Check All Indexed Values
@@ -639,7 +639,7 @@ internal sealed class BackOfficeExamineSearcherTests : ExamineBaseTest
 
         // Assert
         IEnumerable<ISearchResult> searchResults = actual.ToArray();
-        Assert.AreEqual(1, searchResults.Count());
+        Assert.That(searchResults.Count(), Is.EqualTo(1));
 
         string contentNodePublish = string.Empty;
         if (contentNode.Published)
@@ -656,16 +656,16 @@ internal sealed class BackOfficeExamineSearcherTests : ExamineBaseTest
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(searchResults.First().Values["__NodeId"], contentNode.Id.ToString());
-            Assert.AreEqual(searchResults.First().Values["__IndexType"], "content");
-            Assert.AreEqual(searchResults.First().Values["__NodeTypeAlias"], contentNode.ContentType.Alias);
-            Assert.AreEqual(searchResults.First().Values["__Published"], contentNodePublish);
-            Assert.AreEqual(searchResults.First().Values["id"], contentNode.Id.ToString());
-            Assert.AreEqual(searchResults.First().Values["__Key"], contentNode.Key.ToString());
-            Assert.AreEqual(searchResults.First().Values["parentID"], contentNode.ParentId.ToString());
-            Assert.AreEqual(searchResults.First().Values["nodeName"], contentNode.Name);
-            Assert.AreEqual(searchResults.First().Values["__VariesByCulture"], contentTypeCultureVariations);
-            Assert.AreEqual(searchResults.First().Values["__Icon"], contentNode.ContentType.Icon);
+            Assert.That(contentNode.Id.ToString(), Is.EqualTo(searchResults.First().Values["__NodeId"]));
+            Assert.That(searchResults.First().Values["__IndexType"], Is.EqualTo("content"));
+            Assert.That(contentNode.ContentType.Alias, Is.EqualTo(searchResults.First().Values["__NodeTypeAlias"]));
+            Assert.That(contentNodePublish, Is.EqualTo(searchResults.First().Values["__Published"]));
+            Assert.That(contentNode.Id.ToString(), Is.EqualTo(searchResults.First().Values["id"]));
+            Assert.That(contentNode.Key.ToString(), Is.EqualTo(searchResults.First().Values["__Key"]));
+            Assert.That(contentNode.ParentId.ToString(), Is.EqualTo(searchResults.First().Values["parentID"]));
+            Assert.That(contentNode.Name, Is.EqualTo(searchResults.First().Values["nodeName"]));
+            Assert.That(contentTypeCultureVariations, Is.EqualTo(searchResults.First().Values["__VariesByCulture"]));
+            Assert.That(contentNode.ContentType.Icon, Is.EqualTo(searchResults.First().Values["__Icon"]));
         });
     }
 
@@ -713,7 +713,7 @@ internal sealed class BackOfficeExamineSearcherTests : ExamineBaseTest
 
         // Assert
         IEnumerable<ISearchResult> searchResults = actual.ToArray();
-        Assert.AreEqual(1, searchResults.Count());
+        Assert.That(searchResults.Count(), Is.EqualTo(1));
 
         string contentNodePublish = string.Empty;
         string contentTypeCultureVariations = string.Empty;
@@ -730,16 +730,16 @@ internal sealed class BackOfficeExamineSearcherTests : ExamineBaseTest
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(searchResults.First().Values["__NodeId"], contentNode.Id.ToString());
-            Assert.AreEqual(searchResults.First().Values["__IndexType"], "content");
-            Assert.AreEqual(searchResults.First().Values["__NodeTypeAlias"], contentNode.ContentType.Alias);
-            Assert.AreEqual(searchResults.First().Values["__Published"], contentNodePublish);
-            Assert.AreEqual(searchResults.First().Values["id"], contentNode.Id.ToString());
-            Assert.AreEqual(searchResults.First().Values["__Key"], contentNode.Key.ToString());
-            Assert.AreEqual(searchResults.First().Values["parentID"], contentNode.ParentId.ToString());
-            Assert.AreEqual(searchResults.First().Values["nodeName"], contentNode.Name);
-            Assert.AreEqual(searchResults.First().Values["__VariesByCulture"], contentTypeCultureVariations);
-            Assert.AreEqual(searchResults.First().Values["__Icon"], contentNode.ContentType.Icon);
+            Assert.That(contentNode.Id.ToString(), Is.EqualTo(searchResults.First().Values["__NodeId"]));
+            Assert.That(searchResults.First().Values["__IndexType"], Is.EqualTo("content"));
+            Assert.That(contentNode.ContentType.Alias, Is.EqualTo(searchResults.First().Values["__NodeTypeAlias"]));
+            Assert.That(contentNodePublish, Is.EqualTo(searchResults.First().Values["__Published"]));
+            Assert.That(contentNode.Id.ToString(), Is.EqualTo(searchResults.First().Values["id"]));
+            Assert.That(contentNode.Key.ToString(), Is.EqualTo(searchResults.First().Values["__Key"]));
+            Assert.That(contentNode.ParentId.ToString(), Is.EqualTo(searchResults.First().Values["parentID"]));
+            Assert.That(contentNode.Name, Is.EqualTo(searchResults.First().Values["nodeName"]));
+            Assert.That(contentTypeCultureVariations, Is.EqualTo(searchResults.First().Values["__VariesByCulture"]));
+            Assert.That(contentNode.ContentType.Icon, Is.EqualTo(searchResults.First().Values["__Icon"]));
         });
     }
 }

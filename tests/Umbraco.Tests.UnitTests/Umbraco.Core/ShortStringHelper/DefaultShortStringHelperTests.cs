@@ -126,7 +126,7 @@ public class DefaultShortStringHelperTests
     public void CleanStringForSafeAlias(string input, string expected)
     {
         var output = ShortStringHelper.CleanStringForSafeAlias(input);
-        Assert.AreEqual(expected, output);
+        Assert.That(output, Is.EqualTo(expected));
     }
 
     [TestCase("Home Page", "home-page")]
@@ -141,7 +141,7 @@ public class DefaultShortStringHelperTests
     public void CleanStringForUrlSegment(string input, string expected)
     {
         var output = ShortStringHelper.CleanStringForUrlSegment(input);
-        Assert.AreEqual(expected, output);
+        Assert.That(output, Is.EqualTo(expected));
     }
 
     [TestCase("ThisIsTheEndMyFriend", "This Is The End My Friend")]
@@ -156,11 +156,11 @@ public class DefaultShortStringHelperTests
     public void SplitPascalCasing(string input, string expected)
     {
         var output = ShortStringHelper.SplitPascalCasing(input, ' ');
-        Assert.AreEqual(expected, output);
+        Assert.That(output, Is.EqualTo(expected));
 
         output = ShortStringHelper.SplitPascalCasing(input, '*');
         expected = expected.Replace(' ', '*');
-        Assert.AreEqual(expected, output);
+        Assert.That(output, Is.EqualTo(expected));
     }
 
     [TestCase(
@@ -177,7 +177,7 @@ public class DefaultShortStringHelperTests
         // picks the proper config per culture
         // and overrides some stringType params (ascii...)
         var output = ShortStringHelper.CleanString(input, stringType, culture);
-        Assert.AreEqual(expected, output);
+        Assert.That(output, Is.EqualTo(expected));
     }
 
     [TestCase("foo.txt", "foo.txt")]
@@ -196,6 +196,6 @@ public class DefaultShortStringHelperTests
     public void CleanStringForSafeFileName(string input, string expected)
     {
         var output = ShortStringHelper.CleanStringForSafeFileName(input);
-        Assert.AreEqual(expected, output);
+        Assert.That(output, Is.EqualTo(expected));
     }
 }

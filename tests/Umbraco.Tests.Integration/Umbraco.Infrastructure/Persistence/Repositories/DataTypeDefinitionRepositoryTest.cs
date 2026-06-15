@@ -73,17 +73,17 @@ internal sealed class DataTypeDefinitionRepositoryTest : UmbracoIntegrationTest
             var usages = DataTypeRepository.FindUsages(dataType1.Id);
 
             var key = usages.First().Key;
-            Assert.AreEqual(ct.Key, ((GuidUdi)key).Guid);
-            Assert.AreEqual(2, usages[key].Count());
-            Assert.AreEqual("pt1", usages[key].ElementAt(0));
-            Assert.AreEqual("pt2", usages[key].ElementAt(1));
+            Assert.That(((GuidUdi)key).Guid, Is.EqualTo(ct.Key));
+            Assert.That(usages[key].Count(), Is.EqualTo(2));
+            Assert.That(usages[key].ElementAt(0), Is.EqualTo("pt1"));
+            Assert.That(usages[key].ElementAt(1), Is.EqualTo("pt2"));
 
             usages = DataTypeRepository.FindUsages(dataType2.Id);
 
             key = usages.First().Key;
-            Assert.AreEqual(ct.Key, ((GuidUdi)key).Guid);
-            Assert.AreEqual(1, usages[key].Count());
-            Assert.AreEqual("pt3", usages[key].ElementAt(0));
+            Assert.That(((GuidUdi)key).Guid, Is.EqualTo(ct.Key));
+            Assert.That(usages[key].Count(), Is.EqualTo(1));
+            Assert.That(usages[key].ElementAt(0), Is.EqualTo("pt3"));
         }
     }
 
@@ -113,15 +113,15 @@ internal sealed class DataTypeDefinitionRepositoryTest : UmbracoIntegrationTest
 
             var result = DataTypeRepository.Move(dataType, container1).ToArray();
 
-            Assert.AreEqual(2, result.Length);
+            Assert.That(result, Has.Length.EqualTo(2));
 
             // re-get
             dataType = DataTypeRepository.Get(dataType.Id);
             dataType2 = DataTypeRepository.Get(dataType2.Id);
 
-            Assert.AreEqual(container1.Id, dataType.ParentId);
-            Assert.AreNotEqual(result.Single(x => x.Entity.Id == dataType.Id).OriginalPath, dataType.Path);
-            Assert.AreNotEqual(result.Single(x => x.Entity.Id == dataType2.Id).OriginalPath, dataType2.Path);
+            Assert.That(dataType.ParentId, Is.EqualTo(container1.Id));
+            Assert.That(dataType.Path, Is.Not.EqualTo(result.Single(x => x.Entity.Id == dataType.Id).OriginalPath));
+            Assert.That(dataType2.Path, Is.Not.EqualTo(result.Single(x => x.Entity.Id == dataType2.Id).OriginalPath));
         }
     }
 
@@ -136,7 +136,7 @@ internal sealed class DataTypeDefinitionRepositoryTest : UmbracoIntegrationTest
             Assert.That(container.Id, Is.GreaterThan(0));
 
             var found = DataTypeContainerRepository.Get(container.Id);
-            Assert.IsNotNull(found);
+            Assert.That(found, Is.Not.Null);
         }
     }
 
@@ -152,7 +152,7 @@ internal sealed class DataTypeDefinitionRepositoryTest : UmbracoIntegrationTest
             DataTypeContainerRepository.Delete(container);
 
             var found = DataTypeContainerRepository.Get(container.Id);
-            Assert.IsNull(found);
+            Assert.That(found, Is.Null);
         }
     }
 
@@ -169,7 +169,7 @@ internal sealed class DataTypeDefinitionRepositoryTest : UmbracoIntegrationTest
                 { Name = "test" };
             DataTypeRepository.Save(dataTypeDefinition);
 
-            Assert.AreEqual(container.Id, dataTypeDefinition.ParentId);
+            Assert.That(dataTypeDefinition.ParentId, Is.EqualTo(container.Id));
         }
     }
 
@@ -190,11 +190,11 @@ internal sealed class DataTypeDefinitionRepositoryTest : UmbracoIntegrationTest
             DataTypeContainerRepository.Delete(container);
 
             var found = DataTypeContainerRepository.Get(container.Id);
-            Assert.IsNull(found);
+            Assert.That(found, Is.Null);
 
             dataType = DataTypeRepository.Get(dataType.Id);
-            Assert.IsNotNull(dataType);
-            Assert.AreEqual(-1, dataType.ParentId);
+            Assert.That(dataType, Is.Not.Null);
+            Assert.That(dataType.ParentId, Is.EqualTo(-1));
         }
     }
 
@@ -248,7 +248,7 @@ internal sealed class DataTypeDefinitionRepositoryTest : UmbracoIntegrationTest
             Assert.That(dataTypeDefinitions, Is.Not.Null);
             Assert.That(dataTypeDefinitions.Any(), Is.True);
             Assert.That(dataTypeDefinitions.Any(x => x == null), Is.False);
-            Assert.That(dataTypeDefinitions.Length, Is.EqualTo(37));
+            Assert.That(dataTypeDefinitions, Has.Length.EqualTo(37));
         }
     }
 
@@ -264,7 +264,7 @@ internal sealed class DataTypeDefinitionRepositoryTest : UmbracoIntegrationTest
             Assert.That(dataTypeDefinitions, Is.Not.Null);
             Assert.That(dataTypeDefinitions.Any(), Is.True);
             Assert.That(dataTypeDefinitions.Any(x => x == null), Is.False);
-            Assert.That(dataTypeDefinitions.Length, Is.EqualTo(3));
+            Assert.That(dataTypeDefinitions, Has.Length.EqualTo(3));
         }
     }
 
@@ -331,13 +331,12 @@ internal sealed class DataTypeDefinitionRepositoryTest : UmbracoIntegrationTest
             TestHelper.AssertPropertyValuesAreEqual(dataTypeDefinition, fetched, ignoreProperties: new[] { nameof(DataType.ConfigurationObject) });
 
             // still, can compare explicitely
-            Assert.IsNotNull(dataTypeDefinition.ConfigurationObject);
-            Assert.IsInstanceOf<LabelConfiguration>(dataTypeDefinition.ConfigurationObject);
-            Assert.IsNotNull(fetched.ConfigurationObject);
-            Assert.IsInstanceOf<LabelConfiguration>(fetched.ConfigurationObject);
-            Assert.AreEqual(
-                ConfigurationEditor.ConfigurationAs<LabelConfiguration>(dataTypeDefinition.ConfigurationObject).ValueType,
-                ConfigurationEditor.ConfigurationAs<LabelConfiguration>(fetched.ConfigurationObject).ValueType);
+            Assert.That(dataTypeDefinition.ConfigurationObject, Is.Not.Null);
+            Assert.That(dataTypeDefinition.ConfigurationObject, Is.InstanceOf<LabelConfiguration>());
+            Assert.That(fetched.ConfigurationObject, Is.Not.Null);
+            Assert.That(fetched.ConfigurationObject, Is.InstanceOf<LabelConfiguration>());
+            Assert.That(
+                ConfigurationEditor.ConfigurationAs<LabelConfiguration>(fetched.ConfigurationObject).ValueType, Is.EqualTo(ConfigurationEditor.ConfigurationAs<LabelConfiguration>(dataTypeDefinition.ConfigurationObject).ValueType));
         }
     }
 

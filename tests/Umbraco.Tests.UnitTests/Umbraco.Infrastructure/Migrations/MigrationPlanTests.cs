@@ -114,9 +114,9 @@ public class MigrationPlanTests
             s.Complete();
         }
 
-        Assert.AreEqual("VERSION.33", state);
-        Assert.AreEqual(1, database.Operations.Count);
-        Assert.AreEqual("DROP TABLE [umbracoRedirectUrl]", database.Operations[0].Sql);
+        Assert.That(state, Is.EqualTo("VERSION.33"));
+        Assert.That(database.Operations, Has.Count.EqualTo(1));
+        Assert.That(database.Operations[0].Sql, Is.EqualTo("DROP TABLE [umbracoRedirectUrl]"));
     }
 
     [Test]
@@ -176,7 +176,7 @@ public class MigrationPlanTests
         var plan = new UmbracoPlan(TestHelper.GetUmbracoVersion());
         plan.Validate();
         Console.WriteLine(plan.FinalState);
-        Assert.IsFalse(plan.FinalState.IsNullOrWhiteSpace());
+        Assert.That(plan.FinalState.IsNullOrWhiteSpace(), Is.False);
     }
 
     [Test]
@@ -199,8 +199,8 @@ public class MigrationPlanTests
         WritePlanToConsole(plan);
 
         plan.Validate();
-        Assert.AreEqual("eee", plan.FollowPath("xxx").Last());
-        Assert.AreEqual("yyy", plan.FollowPath("xxx", "yyy").Last());
+        Assert.That(plan.FollowPath("xxx").Last(), Is.EqualTo("eee"));
+        Assert.That(plan.FollowPath("xxx", "yyy").Last(), Is.EqualTo("yyy"));
     }
 
     [Test]
@@ -229,12 +229,12 @@ public class MigrationPlanTests
 
     private void AssertList(IReadOnlyList<string> states, params string[] expected)
     {
-        Assert.AreEqual(expected.Length, states.Count, string.Join(", ", states));
+        Assert.That(states, Has.Count.EqualTo(expected.Length), string.Join(", ", states));
         for (var i = 0; i < expected.Length; i++)
         {
             if (expected[i] != "*")
             {
-                Assert.AreEqual(expected[i], states[i], "at:" + i);
+                Assert.That(states[i], Is.EqualTo(expected[i]), "at:" + i);
             }
         }
     }

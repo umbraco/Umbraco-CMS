@@ -16,7 +16,7 @@ public class NoopLookupNormalizerTests
 
         var normalizedName = sut.NormalizeName(name);
 
-        Assert.AreEqual(name, normalizedName);
+        Assert.That(normalizedName, Is.EqualTo(name));
     }
 
     [Test]
@@ -27,7 +27,7 @@ public class NoopLookupNormalizerTests
 
         var normalizedEmail = sut.NormalizeEmail(email);
 
-        Assert.AreEqual(email, normalizedEmail);
+        Assert.That(normalizedEmail, Is.EqualTo(email));
     }
 
     [Test]
@@ -40,7 +40,7 @@ public class NoopLookupNormalizerTests
 
         var normalizedName = sut.NormalizeName(name);
 
-        Assert.AreEqual(name, normalizedName);
+        Assert.That(normalizedName, Is.EqualTo(name));
     }
 
     [Test]
@@ -53,6 +53,6 @@ public class NoopLookupNormalizerTests
 
         var normalizedEmail = sut.NormalizeEmail(email);
 
-        Assert.AreEqual(email, normalizedEmail);
+        Assert.That(normalizedEmail, Is.EqualTo(email));
     }
 }

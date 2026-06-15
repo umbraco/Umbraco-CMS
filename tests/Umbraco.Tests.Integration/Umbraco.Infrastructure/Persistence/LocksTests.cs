@@ -16,7 +16,7 @@ using Umbraco.Cms.Tests.Integration.Testing;
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence;
 
 [TestFixture]
-[Timeout(60000)]
+[CancelAfter(60000)]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Logger = UmbracoTestOptions.Logger.Console)]
 internal sealed class LocksTests : UmbracoIntegrationTest
 {
@@ -113,12 +113,12 @@ internal sealed class LocksTests : UmbracoIntegrationTest
             thread.Join();
         }
 
-        Assert.AreEqual(threadCount, maxAcquired);
-        Assert.AreEqual(0, acquired);
+        Assert.That(maxAcquired, Is.EqualTo(threadCount));
+        Assert.That(acquired, Is.EqualTo(0));
 
         for (var i = 0; i < threadCount; i++)
         {
-            Assert.IsNull(exceptions[i]);
+            Assert.That(exceptions[i], Is.Null);
         }
     }
 
@@ -149,7 +149,7 @@ internal sealed class LocksTests : UmbracoIntegrationTest
             }
         }
 
-        Assert.AreEqual(0, sqlCount);
+        Assert.That(sqlCount, Is.EqualTo(0));
     }
 
     [NUnit.Framework.Ignore("We currently do not have a way to force lazy locks")]
@@ -181,7 +181,7 @@ internal sealed class LocksTests : UmbracoIntegrationTest
             }
         }
 
-        Assert.AreEqual(2,sqlCount);
+        Assert.That(sqlCount, Is.EqualTo(2));
     }
 
     [Test]
@@ -265,7 +265,7 @@ internal sealed class LocksTests : UmbracoIntegrationTest
         // TODO: This timing is flaky
         Thread.Sleep(500);
         // only 1 thread has locked
-        Assert.AreEqual(1, acquired);
+        Assert.That(acquired, Is.EqualTo(1));
         for (var i = 0; i < threadCount; i++)
         {
             ms[i].Set(); // let all go
@@ -276,11 +276,11 @@ internal sealed class LocksTests : UmbracoIntegrationTest
             thread.Join();
         }
 
-        Assert.AreEqual(0, acquired);
+        Assert.That(acquired, Is.EqualTo(0));
 
         for (var i = 0; i < threadCount; i++)
         {
-            Assert.IsNull(exceptions[i]);
+            Assert.That(exceptions[i], Is.Null);
         }
     }
 
@@ -337,7 +337,7 @@ internal sealed class LocksTests : UmbracoIntegrationTest
     private void AssertIsDistributedLockingTimeoutException(Exception e)
     {
         var sqlException = e as DistributedLockingTimeoutException;
-        Assert.IsNotNull(sqlException);
+        Assert.That(sqlException, Is.Not.Null);
     }
 
     private void DeadLockTestThread(int id1, int id2, EventWaitHandle myEv, WaitHandle otherEv, ref Exception exception)
@@ -410,8 +410,8 @@ internal sealed class LocksTests : UmbracoIntegrationTest
         thread1.Join();
         thread2.Join();
 
-        Assert.IsNull(e1);
-        Assert.IsNull(e2);
+        Assert.That(e1, Is.Null);
+        Assert.That(e2, Is.Null);
     }
 
     [Test]
@@ -587,7 +587,7 @@ internal sealed class LocksTests : UmbracoIntegrationTest
                     Assert.DoesNotThrow(() =>
                         scope.EagerReadLock(TimeSpan.FromMilliseconds(6000), Constants.Locks.ContentTree));
 
-                    Assert.GreaterOrEqual(locksCompleted, 1);
+                    Assert.That(locksCompleted, Is.GreaterThanOrEqualTo(1));
 
                     scope.Complete();
                     Interlocked.Increment(ref locksCompleted);
@@ -606,7 +606,7 @@ internal sealed class LocksTests : UmbracoIntegrationTest
                     Assert.DoesNotThrow(() =>
                         scope.EagerReadLock(TimeSpan.FromMilliseconds(6000), Constants.Locks.ContentTree));
 
-                    Assert.GreaterOrEqual(locksCompleted, 1);
+                    Assert.That(locksCompleted, Is.GreaterThanOrEqualTo(1));
 
                     scope.Complete();
                     Interlocked.Increment(ref locksCompleted);
@@ -617,7 +617,7 @@ internal sealed class LocksTests : UmbracoIntegrationTest
             Task.WaitAll(t1, t2, t3);
         }
 
-        Assert.AreEqual(3, locksCompleted);
+        Assert.That(locksCompleted, Is.EqualTo(3));
     }
 
     [Test]

@@ -65,8 +65,8 @@ public class DocumentPermissionFilterServiceTests
         var (filteredEntities, totalItems) = await _setup.Sut.FilterAsync(entities, 100);
 
         // Assert
-        Assert.AreEqual(3, filteredEntities.Length);
-        Assert.AreEqual(100, totalItems);
+        Assert.That(filteredEntities.Length, Is.EqualTo(3));
+        Assert.That(totalItems, Is.EqualTo(100));
     }
 
     [Test]
@@ -86,11 +86,11 @@ public class DocumentPermissionFilterServiceTests
         var (filteredEntities, totalItems) = await _setup.Sut.FilterAsync(entities, 100);
 
         // Assert
-        Assert.AreEqual(2, filteredEntities.Length);
-        Assert.AreEqual(99, totalItems);
-        Assert.IsTrue(filteredEntities.Any(e => e.Key == entities[0].Key));
-        Assert.IsFalse(filteredEntities.Any(e => e.Key == entities[1].Key));
-        Assert.IsTrue(filteredEntities.Any(e => e.Key == entities[2].Key));
+        Assert.That(filteredEntities.Length, Is.EqualTo(2));
+        Assert.That(totalItems, Is.EqualTo(99));
+        Assert.That(filteredEntities.Any(e => e.Key == entities[0].Key), Is.True);
+        Assert.That(filteredEntities.Any(e => e.Key == entities[1].Key), Is.False);
+        Assert.That(filteredEntities.Any(e => e.Key == entities[2].Key), Is.True);
     }
 
     [Test]
@@ -110,11 +110,11 @@ public class DocumentPermissionFilterServiceTests
         var (filteredEntities, totalItems) = await _setup.Sut.FilterAsync(entities, 100);
 
         // Assert
-        Assert.AreEqual(2, filteredEntities.Length);
-        Assert.AreEqual(99, totalItems);
-        Assert.IsTrue(filteredEntities.Any(e => e.Key == entities[0].Key));
-        Assert.IsFalse(filteredEntities.Any(e => e.Key == entities[1].Key));
-        Assert.IsTrue(filteredEntities.Any(e => e.Key == entities[2].Key));
+        Assert.That(filteredEntities.Length, Is.EqualTo(2));
+        Assert.That(totalItems, Is.EqualTo(99));
+        Assert.That(filteredEntities.Any(e => e.Key == entities[0].Key), Is.True);
+        Assert.That(filteredEntities.Any(e => e.Key == entities[1].Key), Is.False);
+        Assert.That(filteredEntities.Any(e => e.Key == entities[2].Key), Is.True);
     }
 
     [Test]
@@ -130,8 +130,8 @@ public class DocumentPermissionFilterServiceTests
         var (filteredEntities, totalItems) = await _setup.Sut.FilterAsync(entities, 100);
 
         // Assert
-        Assert.AreEqual(0, filteredEntities.Length);
-        Assert.AreEqual(97, totalItems);
+        Assert.That(filteredEntities.Length, Is.EqualTo(0));
+        Assert.That(totalItems, Is.EqualTo(97));
     }
 
     [Test]
@@ -148,9 +148,9 @@ public class DocumentPermissionFilterServiceTests
         var (filteredEntities, totalBefore, totalAfter) = await _setup.Sut.FilterAsync(targetKey, entities, 10, 20);
 
         // Assert
-        Assert.AreEqual(5, filteredEntities.Length);
-        Assert.AreEqual(10, totalBefore);
-        Assert.AreEqual(20, totalAfter);
+        Assert.That(filteredEntities.Length, Is.EqualTo(5));
+        Assert.That(totalBefore, Is.EqualTo(10));
+        Assert.That(totalAfter, Is.EqualTo(20));
     }
 
     [Test]
@@ -173,9 +173,9 @@ public class DocumentPermissionFilterServiceTests
         var (filteredEntities, totalBefore, totalAfter) = await _setup.Sut.FilterAsync(targetKey, entities, 10, 20);
 
         // Assert
-        Assert.AreEqual(4, filteredEntities.Length);
-        Assert.AreEqual(9, totalBefore); // Decremented by 1
-        Assert.AreEqual(20, totalAfter); // Unchanged
+        Assert.That(filteredEntities.Length, Is.EqualTo(4));
+        Assert.That(totalBefore, Is.EqualTo(9)); // Decremented by 1
+        Assert.That(totalAfter, Is.EqualTo(20)); // Unchanged
     }
 
     [Test]
@@ -198,9 +198,9 @@ public class DocumentPermissionFilterServiceTests
         var (filteredEntities, totalBefore, totalAfter) = await _setup.Sut.FilterAsync(targetKey, entities, 10, 20);
 
         // Assert
-        Assert.AreEqual(4, filteredEntities.Length);
-        Assert.AreEqual(10, totalBefore); // Unchanged
-        Assert.AreEqual(19, totalAfter); // Decremented by 1
+        Assert.That(filteredEntities.Length, Is.EqualTo(4));
+        Assert.That(totalBefore, Is.EqualTo(10)); // Unchanged
+        Assert.That(totalAfter, Is.EqualTo(19)); // Decremented by 1
     }
 
     [Test]
@@ -223,9 +223,9 @@ public class DocumentPermissionFilterServiceTests
         var (filteredEntities, totalBefore, totalAfter) = await _setup.Sut.FilterAsync(targetKey, entities, 10, 20);
 
         // Assert
-        Assert.AreEqual(1, filteredEntities.Length); // Only target remains
-        Assert.AreEqual(8, totalBefore); // Decremented by 2
-        Assert.AreEqual(18, totalAfter); // Decremented by 2
+        Assert.That(filteredEntities.Length, Is.EqualTo(1)); // Only target remains
+        Assert.That(totalBefore, Is.EqualTo(8)); // Decremented by 2
+        Assert.That(totalAfter, Is.EqualTo(18)); // Decremented by 2
     }
 
     [Test]
@@ -248,9 +248,9 @@ public class DocumentPermissionFilterServiceTests
         var (filteredEntities, totalBefore, totalAfter) = await _setup.Sut.FilterAsync(targetKey, entities, 10, 20);
 
         // Assert
-        Assert.AreEqual(4, filteredEntities.Length);
-        Assert.AreEqual(10, totalBefore); // Unchanged - target is not before or after
-        Assert.AreEqual(20, totalAfter); // Unchanged - target is not before or after
+        Assert.That(filteredEntities.Length, Is.EqualTo(4));
+        Assert.That(totalBefore, Is.EqualTo(10)); // Unchanged - target is not before or after
+        Assert.That(totalAfter, Is.EqualTo(20)); // Unchanged - target is not before or after
     }
 
     private static IEntitySlim[] CreateEntities(int count)

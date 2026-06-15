@@ -43,8 +43,8 @@ public class MemberReferenceServiceTests
             await _sut.GetPagedReferencesAsync(id, 0, 20);
 
         // Assert
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(1, result.Result.Total);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result.Total, Is.EqualTo(1));
         _mockMemberEditingService.Verify(x => x.IsExternalMemberAsync(It.IsAny<Guid>()), Times.Never);
     }
 
@@ -72,9 +72,9 @@ public class MemberReferenceServiceTests
             await _sut.GetPagedReferencesAsync(id, 0, 10);
 
         // Assert
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(GetReferencesOperationStatus.Success, result.Status);
-        Assert.AreEqual(2, result.Result.Total);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(GetReferencesOperationStatus.Success));
+        Assert.That(result.Result.Total, Is.EqualTo(2));
     }
 
     [Test]
@@ -94,8 +94,8 @@ public class MemberReferenceServiceTests
             await _sut.GetPagedReferencesAsync(id, 0, 20);
 
         // Assert
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(GetReferencesOperationStatus.ContentNotFound, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(GetReferencesOperationStatus.ContentNotFound));
     }
 
     [Test]
@@ -119,7 +119,7 @@ public class MemberReferenceServiceTests
             await _sut.GetPagedReferencesAsync(id, 5, 10);
 
         // Assert
-        Assert.IsFalse(result.Success);
+        Assert.That(result.Success, Is.False);
         _mockMemberEditingService.Verify(x => x.IsExternalMemberAsync(id), Times.Once);
     }
 

@@ -83,9 +83,9 @@ public class PublishedContentCacheTests : DeliveryApiTests
     {
         var publishedContentCache = CreateApiPublishedContentCache(CreateDeliveryApiSettings());
         var content = publishedContentCache.GetById(_contentOneId);
-        Assert.IsNotNull(content);
-        Assert.AreEqual(_contentOneId, content.Key);
-        Assert.AreEqual("theContentType", content.ContentType.Alias);
+        Assert.That(content, Is.Not.Null);
+        Assert.That(content.Key, Is.EqualTo(_contentOneId));
+        Assert.That(content.ContentType.Alias, Is.EqualTo("theContentType"));
     }
 
     [Test]
@@ -93,9 +93,9 @@ public class PublishedContentCacheTests : DeliveryApiTests
     {
         var publishedContentCache = CreateApiPublishedContentCache(CreateDeliveryApiSettings());
         var content = publishedContentCache.GetByRoute("/content-two");
-        Assert.IsNotNull(content);
-        Assert.AreEqual(_contentTwoId, content.Key);
-        Assert.AreEqual("theOtherContentType", content.ContentType.Alias);
+        Assert.That(content, Is.Not.Null);
+        Assert.That(content.Key, Is.EqualTo(_contentTwoId));
+        Assert.That(content.ContentType.Alias, Is.EqualTo("theOtherContentType"));
     }
 
     [Test]
@@ -103,9 +103,9 @@ public class PublishedContentCacheTests : DeliveryApiTests
     {
         var publishedContentCache = CreateApiPublishedContentCache(CreateDeliveryApiSettings());
         var content = publishedContentCache.GetByRoute("1234/content-three");
-        Assert.IsNotNull(content);
-        Assert.AreEqual(_contentThreeId, content.Key);
-        Assert.AreEqual("theThirdContentType", content.ContentType.Alias);
+        Assert.That(content, Is.Not.Null);
+        Assert.That(content.Key, Is.EqualTo(_contentThreeId));
+        Assert.That(content.ContentType.Alias, Is.EqualTo("theThirdContentType"));
     }
 
     [Test]
@@ -113,9 +113,9 @@ public class PublishedContentCacheTests : DeliveryApiTests
     {
         var publishedContentCache = CreateApiPublishedContentCache(CreateDeliveryApiSettings());
         var content = publishedContentCache.GetByIds(new[] { _contentOneId, _contentTwoId }).ToArray();
-        Assert.AreEqual(2, content.Length);
-        Assert.AreEqual(_contentOneId, content.First().Key);
-        Assert.AreEqual(_contentTwoId, content.Last().Key);
+        Assert.That(content.Length, Is.EqualTo(2));
+        Assert.That(content.First().Key, Is.EqualTo(_contentOneId));
+        Assert.That(content.Last().Key, Is.EqualTo(_contentTwoId));
     }
 
     [TestCase(true)]
@@ -128,11 +128,11 @@ public class PublishedContentCacheTests : DeliveryApiTests
 
         if (denied)
         {
-            Assert.IsNull(content);
+            Assert.That(content, Is.Null);
         }
         else
         {
-            Assert.IsNotNull(content);
+            Assert.That(content, Is.Not.Null);
         }
     }
 
@@ -146,11 +146,11 @@ public class PublishedContentCacheTests : DeliveryApiTests
 
         if (denied)
         {
-            Assert.IsNull(content);
+            Assert.That(content, Is.Null);
         }
         else
         {
-            Assert.IsNotNull(content);
+            Assert.That(content, Is.Not.Null);
         }
     }
 
@@ -162,14 +162,14 @@ public class PublishedContentCacheTests : DeliveryApiTests
         var publishedContentCache = CreateApiPublishedContentCache(CreateDeliveryApiSettings(denyList));
         var content = publishedContentCache.GetByIds(new[] { _contentOneId, _contentTwoId }).ToArray();
 
-        Assert.AreEqual(1, content.Length);
+        Assert.That(content.Length, Is.EqualTo(1));
         if (deniedContentType == "theContentType")
         {
-            Assert.AreEqual(_contentTwoId, content.First().Key);
+            Assert.That(content.First().Key, Is.EqualTo(_contentTwoId));
         }
         else
         {
-            Assert.AreEqual(_contentOneId, content.First().Key);
+            Assert.That(content.First().Key, Is.EqualTo(_contentOneId));
         }
     }
 
@@ -179,9 +179,9 @@ public class PublishedContentCacheTests : DeliveryApiTests
         var denyList = new[] { "theContentType" };
         var publishedContentCache = CreateApiPublishedContentCache(CreateDeliveryApiSettings(denyList));
         var content = publishedContentCache.GetById(_contentTwoId);
-        Assert.IsNotNull(content);
-        Assert.AreEqual(_contentTwoId, content.Key);
-        Assert.AreEqual("theOtherContentType", content.ContentType.Alias);
+        Assert.That(content, Is.Not.Null);
+        Assert.That(content.Key, Is.EqualTo(_contentTwoId));
+        Assert.That(content.ContentType.Alias, Is.EqualTo("theOtherContentType"));
     }
 
     [Test]
@@ -190,9 +190,9 @@ public class PublishedContentCacheTests : DeliveryApiTests
         var denyList = new[] { "theOtherContentType" };
         var publishedContentCache = CreateApiPublishedContentCache(CreateDeliveryApiSettings(denyList));
         var content = publishedContentCache.GetByRoute("/content-one");
-        Assert.IsNotNull(content);
-        Assert.AreEqual(_contentOneId, content.Key);
-        Assert.AreEqual("theContentType", content.ContentType.Alias);
+        Assert.That(content, Is.Not.Null);
+        Assert.That(content.Key, Is.EqualTo(_contentOneId));
+        Assert.That(content.ContentType.Alias, Is.EqualTo("theContentType"));
     }
 
     [TestCase("en-US")]
@@ -201,9 +201,9 @@ public class PublishedContentCacheTests : DeliveryApiTests
     {
         var publishedContentCache = CreateApiPublishedContentCache(CreateDeliveryApiSettings(), culture);
         var content = publishedContentCache.GetByRoute("/content-four");
-        Assert.IsNotNull(content);
-        Assert.AreEqual(_contentFourId, content.Key);
-        Assert.AreEqual("theFourthContentType", content.ContentType.Alias);
+        Assert.That(content, Is.Not.Null);
+        Assert.That(content.Key, Is.EqualTo(_contentFourId));
+        Assert.That(content.ContentType.Alias, Is.EqualTo("theFourthContentType"));
     }
 
     [TestCase("de-DE")]
@@ -212,7 +212,7 @@ public class PublishedContentCacheTests : DeliveryApiTests
     {
         var publishedContentCache = CreateApiPublishedContentCache(CreateDeliveryApiSettings(), culture);
         var content = publishedContentCache.GetByRoute("/content-four");
-        Assert.IsNull(content);
+        Assert.That(content, Is.Null);
     }
 
     [Test]
@@ -221,7 +221,7 @@ public class PublishedContentCacheTests : DeliveryApiTests
         var denyList = new[] { "theContentType", "theOtherContentType" };
         var publishedContentCache = CreateApiPublishedContentCache(CreateDeliveryApiSettings(denyList));
         var content = publishedContentCache.GetByIds(new[] { _contentOneId, _contentTwoId }).ToArray();
-        Assert.IsEmpty(content);
+        Assert.That(content, Is.Empty);
     }
 
     [Test]
@@ -230,7 +230,7 @@ public class PublishedContentCacheTests : DeliveryApiTests
         var denyList = new[] { "THEcontentTYPE" };
         var publishedContentCache = CreateApiPublishedContentCache(CreateDeliveryApiSettings(denyList));
         var content = publishedContentCache.GetByRoute("/content-one");
-        Assert.IsNull(content);
+        Assert.That(content, Is.Null);
     }
 
     [TestCase(true)]
@@ -243,11 +243,11 @@ public class PublishedContentCacheTests : DeliveryApiTests
 
         if (allowed)
         {
-            Assert.IsNotNull(content);
+            Assert.That(content, Is.Not.Null);
         }
         else
         {
-            Assert.IsNull(content);
+            Assert.That(content, Is.Null);
         }
     }
 
@@ -261,11 +261,11 @@ public class PublishedContentCacheTests : DeliveryApiTests
 
         if (allowed)
         {
-            Assert.IsNotNull(content);
+            Assert.That(content, Is.Not.Null);
         }
         else
         {
-            Assert.IsNull(content);
+            Assert.That(content, Is.Null);
         }
     }
 
@@ -277,14 +277,14 @@ public class PublishedContentCacheTests : DeliveryApiTests
         var publishedContentCache = CreateApiPublishedContentCache(CreateDeliveryApiSettings(allowedContentTypeAliases: allowList));
         var content = publishedContentCache.GetByIds(new[] { _contentOneId, _contentTwoId }).ToArray();
 
-        Assert.AreEqual(1, content.Length);
+        Assert.That(content.Length, Is.EqualTo(1));
         if (allowedContentType == "theContentType")
         {
-            Assert.AreEqual(_contentOneId, content.First().Key);
+            Assert.That(content.First().Key, Is.EqualTo(_contentOneId));
         }
         else
         {
-            Assert.AreEqual(_contentTwoId, content.First().Key);
+            Assert.That(content.First().Key, Is.EqualTo(_contentTwoId));
         }
     }
 
@@ -294,7 +294,7 @@ public class PublishedContentCacheTests : DeliveryApiTests
         var allowList = new[] { "theContentType", "theOtherContentType" };
         var publishedContentCache = CreateApiPublishedContentCache(CreateDeliveryApiSettings(allowedContentTypeAliases: allowList));
         var content = publishedContentCache.GetByIds(new[] { _contentOneId, _contentTwoId }).ToArray();
-        Assert.AreEqual(2, content.Length);
+        Assert.That(content.Length, Is.EqualTo(2));
     }
 
     [Test]
@@ -303,7 +303,7 @@ public class PublishedContentCacheTests : DeliveryApiTests
         var allowList = new[] { "THEcontentTYPE" };
         var publishedContentCache = CreateApiPublishedContentCache(CreateDeliveryApiSettings(allowedContentTypeAliases: allowList));
         var content = publishedContentCache.GetByRoute("/content-one");
-        Assert.IsNotNull(content);
+        Assert.That(content, Is.Not.Null);
     }
 
     [Test]
@@ -313,7 +313,7 @@ public class PublishedContentCacheTests : DeliveryApiTests
         var allowList = new[] { "theContentType" };
         var publishedContentCache = CreateApiPublishedContentCache(CreateDeliveryApiSettings(denyList, allowList));
         var content = publishedContentCache.GetByRoute("/content-one");
-        Assert.IsNotNull(content);
+        Assert.That(content, Is.Not.Null);
     }
 
     [Test]
@@ -324,10 +324,10 @@ public class PublishedContentCacheTests : DeliveryApiTests
         var publishedContentCache = CreateApiPublishedContentCache(CreateDeliveryApiSettings(denyList, allowList));
 
         var contentOne = publishedContentCache.GetByRoute("/content-one");
-        Assert.IsNotNull(contentOne);
+        Assert.That(contentOne, Is.Not.Null);
 
         var contentTwo = publishedContentCache.GetById(_contentTwoId);
-        Assert.IsNull(contentTwo);
+        Assert.That(contentTwo, Is.Null);
     }
 
     [Test]
@@ -338,10 +338,10 @@ public class PublishedContentCacheTests : DeliveryApiTests
         var publishedContentCache = CreateApiPublishedContentCache(CreateDeliveryApiSettings(denyList, allowList));
 
         var contentOne = publishedContentCache.GetByRoute("/content-one");
-        Assert.IsNull(contentOne);
+        Assert.That(contentOne, Is.Null);
 
         var contentTwo = publishedContentCache.GetById(_contentTwoId);
-        Assert.IsNotNull(contentTwo);
+        Assert.That(contentTwo, Is.Not.Null);
     }
 
     private IVariationContextAccessor CreateVariationContextAccessor(string? culture = null)

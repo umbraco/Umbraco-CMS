@@ -48,8 +48,8 @@ internal sealed class DataTypeServiceTests : UmbracoIntegrationTest
                 DatabaseType = ValueStorageType.Ntext
             };
         var result = await DataTypeService.CreateAsync(dataType, Constants.Security.SuperUserKey);
-        Assert.True(result.Success);
-        Assert.AreEqual(DataTypeOperationStatus.Success, result.Status);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(DataTypeOperationStatus.Success));
 
         // Assert
         Assert.That(dataType, Is.Not.Null);
@@ -64,18 +64,18 @@ internal sealed class DataTypeServiceTests : UmbracoIntegrationTest
     {
         // Arrange
         IDataType? dataType = (await DataTypeService.GetByEditorAliasAsync(Constants.PropertyEditors.Aliases.TextBox)).FirstOrDefault();
-        Assert.NotNull(dataType);
+        Assert.That(dataType, Is.Not.Null);
 
         // Act
         dataType.Name += " UPDATED";
         var result = await DataTypeService.UpdateAsync(dataType, Constants.Security.SuperUserKey);
-        Assert.True(result.Success);
-        Assert.AreEqual(DataTypeOperationStatus.Success, result.Status);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(DataTypeOperationStatus.Success));
 
         // Assert
         dataType = await DataTypeService.GetAsync(dataType.Key);
-        Assert.NotNull(dataType);
-        Assert.True(dataType.Name.EndsWith(" UPDATED"));
+        Assert.That(dataType, Is.Not.Null);
+        Assert.That(dataType.Name, Does.EndWith(" UPDATED"));
     }
 
     [Test]
@@ -91,7 +91,7 @@ internal sealed class DataTypeServiceTests : UmbracoIntegrationTest
                     DatabaseType = ValueStorageType.Nvarchar
                 };
             var result = await DataTypeService.CreateAsync(dataType, Constants.Security.SuperUserKey);
-            Assert.True(result.Success);
+            Assert.That(result.Success, Is.True);
             return result.Result;
         }
 
@@ -103,11 +103,11 @@ internal sealed class DataTypeServiceTests : UmbracoIntegrationTest
         IEnumerable<IDataType> dataTypes = await DataTypeService.GetByEditorAliasAsync(Constants.PropertyEditors.Aliases.TextBox);
 
         // Assert
-        Assert.True(dataTypes.Count() >= 3);
-        Assert.True(dataTypes.All(dataType => dataType.EditorAlias == Constants.PropertyEditors.Aliases.TextBox));
-        Assert.NotNull(dataTypes.FirstOrDefault(dataType => dataType.Key == dataType1.Key));
-        Assert.NotNull(dataTypes.FirstOrDefault(dataType => dataType.Key == dataType2.Key));
-        Assert.NotNull(dataTypes.FirstOrDefault(dataType => dataType.Key == dataType3.Key));
+        Assert.That(dataTypes.Count(), Is.GreaterThanOrEqualTo(3));
+        Assert.That(dataTypes.All(dataType => dataType.EditorAlias == Constants.PropertyEditors.Aliases.TextBox), Is.True);
+        Assert.That(dataTypes.FirstOrDefault(dataType => dataType.Key == dataType1.Key), Is.Not.Null);
+        Assert.That(dataTypes.FirstOrDefault(dataType => dataType.Key == dataType2.Key), Is.Not.Null);
+        Assert.That(dataTypes.FirstOrDefault(dataType => dataType.Key == dataType3.Key), Is.Not.Null);
     }
 
     [Test]
@@ -115,14 +115,14 @@ internal sealed class DataTypeServiceTests : UmbracoIntegrationTest
     {
         // Arrange
         IDataType? dataType = (await DataTypeService.GetByEditorAliasAsync(Constants.PropertyEditors.Aliases.TextBox)).FirstOrDefault();
-        Assert.NotNull(dataType);
+        Assert.That(dataType, Is.Not.Null);
 
         // Act
         IDataType? actual = await DataTypeService.GetAsync(dataType.Key);
 
         // Assert
-        Assert.NotNull(actual);
-        Assert.AreEqual(dataType.Key, actual.Key);
+        Assert.That(actual, Is.Not.Null);
+        Assert.That(actual.Key, Is.EqualTo(dataType.Key));
     }
 
     [Test]
@@ -130,14 +130,14 @@ internal sealed class DataTypeServiceTests : UmbracoIntegrationTest
     {
         // Arrange
         IDataType? dataType = (await DataTypeService.GetByEditorAliasAsync(Constants.PropertyEditors.Aliases.TextBox)).FirstOrDefault();
-        Assert.NotNull(dataType);
+        Assert.That(dataType, Is.Not.Null);
 
         // Act
         IDataType? actual = await DataTypeService.GetAsync(dataType.Name);
 
         // Assert
-        Assert.NotNull(actual);
-        Assert.AreEqual(dataType.Key, actual.Key);
+        Assert.That(actual, Is.Not.Null);
+        Assert.That(actual.Key, Is.EqualTo(dataType.Key));
     }
 
     [Test]
@@ -154,17 +154,17 @@ internal sealed class DataTypeServiceTests : UmbracoIntegrationTest
 
         // validate the assumptions used for assertions later in this test
         var contentType = ContentTypeService.Get(doctype.Id);
-        Assert.AreEqual(3, contentType.PropertyTypes.Count());
-        Assert.IsNotNull(contentType.PropertyTypes.SingleOrDefault(pt => pt.PropertyEditorAlias is Constants.PropertyEditors.Aliases.RichText));
+        Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(3));
+        Assert.That(contentType.PropertyTypes.SingleOrDefault(pt => pt.PropertyEditorAlias is Constants.PropertyEditors.Aliases.RichText), Is.Not.Null);
 
         // Act
         var definition = dataTypeDefinitions.First();
         var definitionKey = definition.Key;
         var result = await DataTypeService.DeleteAsync(definitionKey, Constants.Security.SuperUserKey);
-        Assert.True(result.Success);
-        Assert.AreEqual(DataTypeOperationStatus.Success, result.Status);
-        Assert.NotNull(result.Result);
-        Assert.AreEqual(definitionKey, result.Result.Key);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(DataTypeOperationStatus.Success));
+        Assert.That(result.Result, Is.Not.Null);
+        Assert.That(result.Result.Key, Is.EqualTo(definitionKey));
 
         var deletedDefinition = await DataTypeService.GetAsync(definitionKey);
 
@@ -191,13 +191,13 @@ internal sealed class DataTypeServiceTests : UmbracoIntegrationTest
             },
             Constants.Security.SuperUserKey);
 
-        Assert.True(result.Success);
-        Assert.IsNotNull(result.Result);
-        Assert.AreEqual(DataTypeOperationStatus.Success, result.Status);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.Not.Null);
+        Assert.That(result.Status, Is.EqualTo(DataTypeOperationStatus.Success));
 
         var dataType = await DataTypeService.GetAsync(result.Result.Key);
-        Assert.IsNotNull(dataType);
-        Assert.AreEqual(container.Id, dataType.ParentId);
+        Assert.That(dataType, Is.Not.Null);
+        Assert.That(dataType.ParentId, Is.EqualTo(container.Id));
     }
 
     [Test]
@@ -214,16 +214,16 @@ internal sealed class DataTypeServiceTests : UmbracoIntegrationTest
         var container = (await DataTypeContainerService.CreateAsync(null, "Root Container", null, Constants.Security.SuperUserKey)).Result;
 
         dataType = await DataTypeService.GetAsync(dataType.Key);
-        Assert.IsNotNull(dataType);
-        Assert.AreEqual(Constants.System.Root, dataType.ParentId);
+        Assert.That(dataType, Is.Not.Null);
+        Assert.That(dataType.ParentId, Is.EqualTo(Constants.System.Root));
 
         var result = await DataTypeService.MoveAsync(dataType, container.Key, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(DataTypeOperationStatus.Success, result.Status);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(DataTypeOperationStatus.Success));
 
         dataType = await DataTypeService.GetAsync(dataType.Key);
-        Assert.IsNotNull(dataType);
-        Assert.AreEqual(container.Id, dataType.ParentId);
+        Assert.That(dataType, Is.Not.Null);
+        Assert.That(dataType.ParentId, Is.EqualTo(container.Id));
     }
 
     [Test]
@@ -240,16 +240,16 @@ internal sealed class DataTypeServiceTests : UmbracoIntegrationTest
             Constants.Security.SuperUserKey)).Result;
 
         dataType = await DataTypeService.GetAsync(dataType.Key);
-        Assert.IsNotNull(dataType);
-        Assert.AreEqual(container.Id, dataType.ParentId);
+        Assert.That(dataType, Is.Not.Null);
+        Assert.That(dataType.ParentId, Is.EqualTo(container.Id));
 
         var result = await DataTypeService.MoveAsync(dataType, null, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(DataTypeOperationStatus.Success, result.Status);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(DataTypeOperationStatus.Success));
 
         dataType = await DataTypeService.GetAsync(dataType.Key);
-        Assert.IsNotNull(dataType);
-        Assert.AreEqual(Constants.System.Root, dataType.ParentId);
+        Assert.That(dataType, Is.Not.Null);
+        Assert.That(dataType.ParentId, Is.EqualTo(Constants.System.Root));
     }
 
     [Test]
@@ -264,15 +264,15 @@ internal sealed class DataTypeServiceTests : UmbracoIntegrationTest
             Constants.Security.SuperUserKey)).Result;
 
         var result = await DataTypeService.CopyAsync(dataType, null, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(DataTypeOperationStatus.Success, result.Status);
-        Assert.IsNotNull(result.Result);
-        Assert.AreNotEqual(dataType.Key, result.Result.Key);
-        Assert.AreNotEqual(dataType.Name, result.Result.Name);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(DataTypeOperationStatus.Success));
+        Assert.That(result.Result, Is.Not.Null);
+        Assert.That(result.Result.Key, Is.Not.EqualTo(dataType.Key));
+        Assert.That(result.Result.Name, Is.Not.EqualTo(dataType.Name));
 
         IDataType copy = await DataTypeService.GetAsync(result.Result.Key);
-        Assert.IsNotNull(copy);
-        Assert.AreEqual(Constants.System.Root, copy.ParentId);
+        Assert.That(copy, Is.Not.Null);
+        Assert.That(copy.ParentId, Is.EqualTo(Constants.System.Root));
     }
 
     [Test]
@@ -288,15 +288,15 @@ internal sealed class DataTypeServiceTests : UmbracoIntegrationTest
             Constants.Security.SuperUserKey)).Result;
 
         var result = await DataTypeService.CopyAsync(dataType, container.Key, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(DataTypeOperationStatus.Success, result.Status);
-        Assert.IsNotNull(result.Result);
-        Assert.AreNotEqual(dataType.Key, result.Result.Key);
-        Assert.AreNotEqual(dataType.Name, result.Result.Name);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(DataTypeOperationStatus.Success));
+        Assert.That(result.Result, Is.Not.Null);
+        Assert.That(result.Result.Key, Is.Not.EqualTo(dataType.Key));
+        Assert.That(result.Result.Name, Is.Not.EqualTo(dataType.Name));
 
         IDataType copy = await DataTypeService.GetAsync(result.Result.Key);
-        Assert.IsNotNull(copy);
-        Assert.AreEqual(container.Id, copy.ParentId);
+        Assert.That(copy, Is.Not.Null);
+        Assert.That(copy.ParentId, Is.EqualTo(container.Id));
     }
 
     [Test]
@@ -314,19 +314,19 @@ internal sealed class DataTypeServiceTests : UmbracoIntegrationTest
             Constants.Security.SuperUserKey)).Result;
 
         var result = await DataTypeService.CopyAsync(dataType, container2.Key, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(DataTypeOperationStatus.Success, result.Status);
-        Assert.IsNotNull(result.Result);
-        Assert.AreNotEqual(dataType.Key, result.Result.Key);
-        Assert.AreNotEqual(dataType.Name, result.Result.Name);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(DataTypeOperationStatus.Success));
+        Assert.That(result.Result, Is.Not.Null);
+        Assert.That(result.Result.Key, Is.Not.EqualTo(dataType.Key));
+        Assert.That(result.Result.Name, Is.Not.EqualTo(dataType.Name));
 
         IDataType original = await DataTypeService.GetAsync(dataType.Key);
-        Assert.IsNotNull(original);
-        Assert.AreEqual(container1.Id, original.ParentId);
+        Assert.That(original, Is.Not.Null);
+        Assert.That(original.ParentId, Is.EqualTo(container1.Id));
 
         IDataType copy = await DataTypeService.GetAsync(result.Result.Key);
-        Assert.IsNotNull(copy);
-        Assert.AreEqual(container2.Id, copy.ParentId);
+        Assert.That(copy, Is.Not.Null);
+        Assert.That(copy.ParentId, Is.EqualTo(container2.Id));
     }
 
     [Test]
@@ -343,19 +343,19 @@ internal sealed class DataTypeServiceTests : UmbracoIntegrationTest
             Constants.Security.SuperUserKey)).Result;
 
         var result = await DataTypeService.CopyAsync(dataType, null, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(DataTypeOperationStatus.Success, result.Status);
-        Assert.IsNotNull(result.Result);
-        Assert.AreNotEqual(dataType.Key, result.Result.Key);
-        Assert.AreNotEqual(dataType.Name, result.Result.Name);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(DataTypeOperationStatus.Success));
+        Assert.That(result.Result, Is.Not.Null);
+        Assert.That(result.Result.Key, Is.Not.EqualTo(dataType.Key));
+        Assert.That(result.Result.Name, Is.Not.EqualTo(dataType.Name));
 
         IDataType original = await DataTypeService.GetAsync(dataType.Key);
-        Assert.IsNotNull(original);
-        Assert.AreEqual(container1.Id, original.ParentId);
+        Assert.That(original, Is.Not.Null);
+        Assert.That(original.ParentId, Is.EqualTo(container1.Id));
 
         IDataType copy = await DataTypeService.GetAsync(result.Result.Key);
-        Assert.IsNotNull(copy);
-        Assert.AreEqual(Constants.System.Root, copy.ParentId);
+        Assert.That(copy, Is.Not.Null);
+        Assert.That(copy.ParentId, Is.EqualTo(Constants.System.Root));
     }
 
     [Test]
@@ -373,8 +373,8 @@ internal sealed class DataTypeServiceTests : UmbracoIntegrationTest
         var result = await DataTypeService.CreateAsync(dataTypeDefinition, Constants.Security.SuperUserKey);
 
         // Assert
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(DataTypeOperationStatus.InvalidName, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(DataTypeOperationStatus.InvalidName));
     }
 
     [Test]
@@ -392,8 +392,8 @@ internal sealed class DataTypeServiceTests : UmbracoIntegrationTest
         var result = await DataTypeService.CreateAsync(dataTypeDefinition, Constants.Security.SuperUserKey);
 
         // Assert
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(DataTypeOperationStatus.InvalidName, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(DataTypeOperationStatus.InvalidName));
     }
 
     [Test]
@@ -409,8 +409,8 @@ internal sealed class DataTypeServiceTests : UmbracoIntegrationTest
 
         // Act & Assert
         var result = await DataTypeService.CreateAsync(dataTypeDefinition, Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(DataTypeOperationStatus.InvalidName, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(DataTypeOperationStatus.InvalidName));
     }
 
     [Test]
@@ -425,16 +425,16 @@ internal sealed class DataTypeServiceTests : UmbracoIntegrationTest
             Constants.Security.SuperUserKey)).Result;
 
         dataType = await DataTypeService.GetAsync(dataType.Key);
-        Assert.IsNotNull(dataType);
-        Assert.AreEqual(Constants.System.Root, dataType.ParentId);
+        Assert.That(dataType, Is.Not.Null);
+        Assert.That(dataType.ParentId, Is.EqualTo(Constants.System.Root));
 
         var result = await DataTypeService.MoveAsync(dataType, Guid.NewGuid(), Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(DataTypeOperationStatus.ParentNotFound, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(DataTypeOperationStatus.ParentNotFound));
 
         dataType = await DataTypeService.GetAsync(dataType.Key);
-        Assert.IsNotNull(dataType);
-        Assert.AreEqual(Constants.System.Root, dataType.ParentId);
+        Assert.That(dataType, Is.Not.Null);
+        Assert.That(dataType.ParentId, Is.EqualTo(Constants.System.Root));
     }
 
     [TestCase(Constants.DataTypes.Guids.LabelDateTime)]
@@ -445,11 +445,11 @@ internal sealed class DataTypeServiceTests : UmbracoIntegrationTest
     public async Task Cannot_Delete_NonDeletable_DataType(string dataTypeKey)
     {
         var dataType = await DataTypeService.GetAsync(Guid.Parse(dataTypeKey));
-        Assert.IsNotNull(dataType);
+        Assert.That(dataType, Is.Not.Null);
 
         var result = await DataTypeService.DeleteAsync(dataType.Key, Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(DataTypeOperationStatus.NonDeletable, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(DataTypeOperationStatus.NonDeletable));
     }
 
     [Test]
@@ -464,31 +464,31 @@ internal sealed class DataTypeServiceTests : UmbracoIntegrationTest
         await MediaTypeService.CreateAsync(mediaType, Constants.Security.SuperUserKey);
 
         documentType = ContentTypeService.Get(documentType.Id);
-        Assert.IsNotNull(documentType.PropertyTypes.SingleOrDefault(pt => pt.PropertyEditorAlias is Constants.PropertyEditors.Aliases.RichText));
+        Assert.That(documentType.PropertyTypes.SingleOrDefault(pt => pt.PropertyEditorAlias is Constants.PropertyEditors.Aliases.RichText), Is.Not.Null);
 
         mediaType = MediaTypeService.Get(mediaType.Id);
-        Assert.IsNotNull(mediaType.PropertyTypes.SingleOrDefault(pt => pt.PropertyEditorAlias is Constants.PropertyEditors.Aliases.RichText));
+        Assert.That(mediaType.PropertyTypes.SingleOrDefault(pt => pt.PropertyEditorAlias is Constants.PropertyEditors.Aliases.RichText), Is.Not.Null);
 
         var definition = dataTypeDefinitions.First();
         var definitionKey = definition.Key;
         PagedModel<RelationItemModel> result = await DataTypeService.GetPagedRelationsAsync(definitionKey, 0, 10);
-        Assert.AreEqual(2, result.Total);
+        Assert.That(result.Total, Is.EqualTo(2));
 
         RelationItemModel firstResult = result.Items.First();
-        Assert.AreEqual("umbTextpage", firstResult.ContentTypeAlias);
-        Assert.AreEqual("Text Page", firstResult.ContentTypeName);
-        Assert.AreEqual("icon-document", firstResult.ContentTypeIcon);
-        Assert.AreEqual(documentType.Key, firstResult.ContentTypeKey);
-        Assert.AreEqual("bodyText", firstResult.NodeAlias);
-        Assert.AreEqual("Body text", firstResult.NodeName);
+        Assert.That(firstResult.ContentTypeAlias, Is.EqualTo("umbTextpage"));
+        Assert.That(firstResult.ContentTypeName, Is.EqualTo("Text Page"));
+        Assert.That(firstResult.ContentTypeIcon, Is.EqualTo("icon-document"));
+        Assert.That(firstResult.ContentTypeKey, Is.EqualTo(documentType.Key));
+        Assert.That(firstResult.NodeAlias, Is.EqualTo("bodyText"));
+        Assert.That(firstResult.NodeName, Is.EqualTo("Body text"));
 
         RelationItemModel secondResult = result.Items.Skip(1).First();
-        Assert.AreEqual("umbMediaItem", secondResult.ContentTypeAlias);
-        Assert.AreEqual("Media Item", secondResult.ContentTypeName);
-        Assert.AreEqual("icon-picture", secondResult.ContentTypeIcon);
-        Assert.AreEqual(mediaType.Key, secondResult.ContentTypeKey);
-        Assert.AreEqual("bodyText", secondResult.NodeAlias);
-        Assert.AreEqual("Body text", secondResult.NodeName);
+        Assert.That(secondResult.ContentTypeAlias, Is.EqualTo("umbMediaItem"));
+        Assert.That(secondResult.ContentTypeName, Is.EqualTo("Media Item"));
+        Assert.That(secondResult.ContentTypeIcon, Is.EqualTo("icon-picture"));
+        Assert.That(secondResult.ContentTypeKey, Is.EqualTo(mediaType.Key));
+        Assert.That(secondResult.NodeAlias, Is.EqualTo("bodyText"));
+        Assert.That(secondResult.NodeName, Is.EqualTo("Body text"));
     }
 
     [Test]
@@ -505,7 +505,7 @@ internal sealed class DataTypeServiceTests : UmbracoIntegrationTest
             DatabaseType = ValueStorageType.Nvarchar
         };
         var createResult = await DataTypeService.CreateAsync(customListView, Constants.Security.SuperUserKey);
-        Assert.IsTrue(createResult.Success);
+        Assert.That(createResult.Success, Is.True);
 
         // Create a document type that uses this list view as its collection
         IContentType documentTypeWithListView = new ContentTypeBuilder()
@@ -519,13 +519,13 @@ internal sealed class DataTypeServiceTests : UmbracoIntegrationTest
         PagedModel<RelationItemModel> result = await DataTypeService.GetPagedRelationsAsync(customListViewKey, 0, 10);
 
         // Assert - The document type should be listed as a reference
-        Assert.AreEqual(1, result.Total);
+        Assert.That(result.Total, Is.EqualTo(1));
 
         RelationItemModel listViewReference = result.Items.First();
-        Assert.AreEqual("listViewContainer", listViewReference.ContentTypeAlias);
-        Assert.AreEqual("List View Container", listViewReference.ContentTypeName);
-        Assert.AreEqual(documentTypeWithListView.Key, listViewReference.ContentTypeKey);
-        Assert.AreEqual("Custom List View For Test", listViewReference.NodeName);
+        Assert.That(listViewReference.ContentTypeAlias, Is.EqualTo("listViewContainer"));
+        Assert.That(listViewReference.ContentTypeName, Is.EqualTo("List View Container"));
+        Assert.That(listViewReference.ContentTypeKey, Is.EqualTo(documentTypeWithListView.Key));
+        Assert.That(listViewReference.NodeName, Is.EqualTo("Custom List View For Test"));
     }
 
     [Test]
@@ -540,17 +540,17 @@ internal sealed class DataTypeServiceTests : UmbracoIntegrationTest
             },
             Constants.Security.SuperUserKey)).Result;
 
-        Assert.IsNotNull(dataType);
+        Assert.That(dataType, Is.Not.Null);
 
         // Act
         IDataType? actual = await DataTypeService.GetAsync(dataType.Key);
 
         // Assert
-        Assert.NotNull(actual);
-        Assert.AreEqual(dataType.Key, actual.Key);
-        Assert.IsAssignableFrom(typeof(MissingPropertyEditor), actual.Editor);
-        Assert.AreEqual("Test Editor", actual.EditorAlias, "The alias should be the same as the original editor");
-        Assert.AreEqual("Umb.PropertyEditorUi.Missing", actual.EditorUiAlias, "The editor UI alias should be the Missing Editor UI");
+        Assert.That(actual, Is.Not.Null);
+        Assert.That(actual.Key, Is.EqualTo(dataType.Key));
+        Assert.That(actual.Editor, Is.AssignableFrom(typeof(MissingPropertyEditor)));
+        Assert.That(actual.EditorAlias, Is.EqualTo("Test Editor"), "The alias should be the same as the original editor");
+        Assert.That(actual.EditorUiAlias, Is.EqualTo("Umb.PropertyEditorUi.Missing"), "The editor UI alias should be the Missing Editor UI");
     }
 
     private class TestEditor : DataEditor

@@ -27,7 +27,7 @@ public class IdentityExtensionsTests
 
         var errorMessage = errors.ToErrorMessage();
 
-        Assert.AreEqual(expectedError, errorMessage);
+        Assert.That(errorMessage, Is.EqualTo(expectedError));
     }
 
     [Test]
@@ -43,6 +43,6 @@ public class IdentityExtensionsTests
 
         var errorMessage = errors.ToErrorMessage();
 
-        Assert.AreEqual($"{error1}, {error2}", errorMessage);
+        Assert.That(errorMessage, Is.EqualTo($"{error1}, {error2}"));
     }
 }

@@ -31,73 +31,73 @@ internal sealed class DictionaryItemServiceTests : UmbracoIntegrationTest
     {
         var rootItems = await DictionaryItemService.GetAtRootAsync();
 
-        Assert.NotNull(rootItems);
-        Assert.IsTrue(rootItems.Any());
+        Assert.That(rootItems, Is.Not.Null);
+        Assert.That(rootItems.Any(), Is.True);
     }
 
     [Test]
     public async Task Can_Determine_If_DictionaryItem_Exists()
     {
         var exists = await DictionaryItemService.ExistsAsync("Parent");
-        Assert.IsTrue(exists);
+        Assert.That(exists, Is.True);
     }
 
     [Test]
     public async Task Can_Get_Dictionary_Item_By_Id()
     {
         var parentItem = await DictionaryItemService.GetAsync(_parentItemId);
-        Assert.NotNull(parentItem);
+        Assert.That(parentItem, Is.Not.Null);
 
         var childItem = await DictionaryItemService.GetAsync(_childItemId);
-        Assert.NotNull(childItem);
+        Assert.That(childItem, Is.Not.Null);
     }
 
     [Test]
     public async Task Can_Get_Dictionary_Items_By_Ids()
     {
         var items = await DictionaryItemService.GetManyAsync(_parentItemId, _childItemId);
-        Assert.AreEqual(2, items.Count());
-        Assert.NotNull(items.FirstOrDefault(i => i.Key == _parentItemId));
-        Assert.NotNull(items.FirstOrDefault(i => i.Key == _childItemId));
+        Assert.That(items.Count(), Is.EqualTo(2));
+        Assert.That(items.FirstOrDefault(i => i.Key == _parentItemId), Is.Not.Null);
+        Assert.That(items.FirstOrDefault(i => i.Key == _childItemId), Is.Not.Null);
     }
 
     [Test]
     public async Task Can_Get_Dictionary_Item_By_Key()
     {
         var parentItem = await DictionaryItemService.GetAsync("Parent");
-        Assert.NotNull(parentItem);
+        Assert.That(parentItem, Is.Not.Null);
 
         var childItem = await DictionaryItemService.GetAsync("Child");
-        Assert.NotNull(childItem);
+        Assert.That(childItem, Is.Not.Null);
     }
 
     [Test]
     public async Task Can_Get_Dictionary_Items_By_Keys()
     {
         var items = await DictionaryItemService.GetManyAsync("Parent", "Child");
-        Assert.AreEqual(2, items.Count());
-        Assert.NotNull(items.FirstOrDefault(i => i.ItemKey == "Parent"));
-        Assert.NotNull(items.FirstOrDefault(i => i.ItemKey == "Child"));
+        Assert.That(items.Count(), Is.EqualTo(2));
+        Assert.That(items.FirstOrDefault(i => i.ItemKey == "Parent"), Is.Not.Null);
+        Assert.That(items.FirstOrDefault(i => i.ItemKey == "Child"), Is.Not.Null);
     }
 
     [Test]
     public async Task Does_Not_Fail_When_DictionaryItem_Doesnt_Exist()
     {
         var item = await DictionaryItemService.GetAsync("RandomKey");
-        Assert.Null(item);
+        Assert.That(item, Is.Null);
     }
 
     [Test]
     public async Task Can_Get_Dictionary_Item_Children()
     {
         var item = await DictionaryItemService.GetChildrenAsync(_parentItemId);
-        Assert.NotNull(item);
+        Assert.That(item, Is.Not.Null);
         Assert.That(item.Count(), Is.EqualTo(1));
 
         foreach (var dictionaryItem in item)
         {
-            Assert.AreEqual(_parentItemId, dictionaryItem.ParentId);
-            Assert.IsFalse(string.IsNullOrEmpty(dictionaryItem.ItemKey));
+            Assert.That(dictionaryItem.ParentId, Is.EqualTo(_parentItemId));
+            Assert.That(string.IsNullOrEmpty(dictionaryItem.ItemKey), Is.False);
         }
     }
 
@@ -124,7 +124,7 @@ internal sealed class DictionaryItemServiceTests : UmbracoIntegrationTest
                     },
                     Constants.Security.SuperUserKey);
 
-                Assert.IsTrue(result.Success);
+                Assert.That(result.Success, Is.True);
 
                 await DictionaryItemService.CreateAsync(
                     new DictionaryItem(currParentId, "D2" + i)
@@ -147,10 +147,10 @@ internal sealed class DictionaryItemServiceTests : UmbracoIntegrationTest
 
             Debug.WriteLine("SQL CALLS: " + ScopeAccessor.AmbientScope.Database.AsUmbracoDatabase().SqlCount);
 
-            Assert.AreEqual(51, items.Length);
+            Assert.That(items, Has.Length.EqualTo(51));
 
             // There's a call or two to get languages, so apart from that there should only be one call per level.
-            Assert.Less(ScopeAccessor.AmbientScope.Database.AsUmbracoDatabase().SqlCount, 30);
+            Assert.That(ScopeAccessor.AmbientScope.Database.AsUmbracoDatabase().SqlCount, Is.LessThan(30));
         }
     }
 
@@ -165,17 +165,17 @@ internal sealed class DictionaryItemServiceTests : UmbracoIntegrationTest
                 Translations = new List<IDictionaryTranslation> { new DictionaryTranslation(english, "Hello world") }
             },
             Constants.Security.SuperUserKey);
-        Assert.True(result.Success);
+        Assert.That(result.Success, Is.True);
 
         // re-get
         var item = await DictionaryItemService.GetAsync(result.Result!.Key);
-        Assert.NotNull(item);
+        Assert.That(item, Is.Not.Null);
 
-        Assert.Greater(item.Id, 0);
-        Assert.IsTrue(item.HasIdentity);
-        Assert.IsFalse(item.ParentId.HasValue);
-        Assert.AreEqual("Testing123", item.ItemKey);
-        Assert.AreEqual(1, item.Translations.Count());
+        Assert.That(item.Id, Is.GreaterThan(0));
+        Assert.That(item.HasIdentity, Is.True);
+        Assert.That(item.ParentId.HasValue, Is.False);
+        Assert.That(item.ItemKey, Is.EqualTo("Testing123"));
+        Assert.That(item.Translations.Count(), Is.EqualTo(1));
     }
 
     [Test]
@@ -189,7 +189,7 @@ internal sealed class DictionaryItemServiceTests : UmbracoIntegrationTest
                 Translations = new List<IDictionaryTranslation> { new DictionaryTranslation(english, "Hello parent") }
             },
             Constants.Security.SuperUserKey);
-        Assert.True(result.Success);
+        Assert.That(result.Success, Is.True);
         var parentKey = result.Result.Key;
 
         result = await DictionaryItemService.CreateAsync(
@@ -199,48 +199,47 @@ internal sealed class DictionaryItemServiceTests : UmbracoIntegrationTest
                 ParentId = parentKey
             },
             Constants.Security.SuperUserKey);
-        Assert.True(result.Success);
+        Assert.That(result.Success, Is.True);
 
         // re-get
         var item = await DictionaryItemService.GetAsync(result.Result!.Key);
-        Assert.NotNull(item);
+        Assert.That(item, Is.Not.Null);
 
-        Assert.Greater(item.Id, 0);
-        Assert.IsTrue(item.HasIdentity);
-        Assert.IsTrue(item.ParentId.HasValue);
-        Assert.AreEqual("Testing456", item.ItemKey);
-        Assert.AreEqual(1, item.Translations.Count());
-        Assert.AreEqual(parentKey, item.ParentId);
+        Assert.That(item.Id, Is.GreaterThan(0));
+        Assert.That(item.HasIdentity, Is.True);
+        Assert.That(item.ParentId.HasValue, Is.True);
+        Assert.That(item.ItemKey, Is.EqualTo("Testing456"));
+        Assert.That(item.Translations.Count(), Is.EqualTo(1));
+        Assert.That(item.ParentId, Is.EqualTo(parentKey));
     }
 
     [Test]
     public async Task Can_Create_DictionaryItem_At_Root_With_All_Languages()
     {
         var allLangs = (await LanguageService.GetAllAsync()).ToArray();
-        Assert.Greater(allLangs.Length, 0);
+        Assert.That(allLangs, Is.Not.Empty);
 
         var translations = allLangs.Select(language => new DictionaryTranslation(language, $"Translation for: {language.IsoCode}")).ToArray();
         var result = await DictionaryItemService.CreateAsync(
             new DictionaryItem("Testing12345") { Translations = translations },
             Constants.Security.SuperUserKey);
 
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(DictionaryItemOperationStatus.Success, result.Status);
-        Assert.NotNull(result.Result);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(DictionaryItemOperationStatus.Success));
+        Assert.That(result.Result, Is.Not.Null);
 
         // re-get
         var item = await DictionaryItemService.GetAsync(result.Result!.Key);
 
-        Assert.IsNotNull(item);
-        Assert.Greater(item.Id, 0);
-        Assert.IsTrue(item.HasIdentity);
-        Assert.IsFalse(item.ParentId.HasValue);
-        Assert.AreEqual("Testing12345", item.ItemKey);
+        Assert.That(item, Is.Not.Null);
+        Assert.That(item.Id, Is.GreaterThan(0));
+        Assert.That(item.HasIdentity, Is.True);
+        Assert.That(item.ParentId.HasValue, Is.False);
+        Assert.That(item.ItemKey, Is.EqualTo("Testing12345"));
         foreach (var language in allLangs)
         {
-            Assert.AreEqual(
-                $"Translation for: {language.IsoCode}",
-                item.Translations.Single(x => x.LanguageIsoCode == language.IsoCode).Value);
+            Assert.That(
+                item.Translations.Single(x => x.LanguageIsoCode == language.IsoCode).Value, Is.EqualTo($"Translation for: {language.IsoCode}"));
         }
     }
 
@@ -248,27 +247,27 @@ internal sealed class DictionaryItemServiceTests : UmbracoIntegrationTest
     public async Task Can_Create_DictionaryItem_At_Root_With_Some_Languages()
     {
         var allLangs = (await LanguageService.GetAllAsync()).ToArray();
-        Assert.Greater(allLangs.Length, 1);
+        Assert.That(allLangs, Has.Length.GreaterThan(1));
 
         var firstLanguage = allLangs.First();
         var translations = new[] { new DictionaryTranslation(firstLanguage, $"Translation for: {firstLanguage.IsoCode}") };
         var result = await DictionaryItemService.CreateAsync(
             new DictionaryItem("Testing12345") { Translations = translations }, Constants.Security.SuperUserKey);
 
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(DictionaryItemOperationStatus.Success, result.Status);
-        Assert.NotNull(result.Result);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(DictionaryItemOperationStatus.Success));
+        Assert.That(result.Result, Is.Not.Null);
 
         // re-get
         var item = await DictionaryItemService.GetAsync(result.Result!.Key);
 
-        Assert.IsNotNull(item);
-        Assert.Greater(item.Id, 0);
-        Assert.IsTrue(item.HasIdentity);
-        Assert.IsFalse(item.ParentId.HasValue);
-        Assert.AreEqual("Testing12345", item.ItemKey);
-        Assert.AreEqual(1, item.Translations.Count());
-        Assert.AreEqual(firstLanguage.IsoCode, item.Translations.First().LanguageIsoCode);
+        Assert.That(item, Is.Not.Null);
+        Assert.That(item.Id, Is.GreaterThan(0));
+        Assert.That(item.HasIdentity, Is.True);
+        Assert.That(item.ParentId.HasValue, Is.False);
+        Assert.That(item.ItemKey, Is.EqualTo("Testing12345"));
+        Assert.That(item.Translations.Count(), Is.EqualTo(1));
+        Assert.That(item.Translations.First().LanguageIsoCode, Is.EqualTo(firstLanguage.IsoCode));
     }
 
     [Test]
@@ -285,13 +284,13 @@ internal sealed class DictionaryItemServiceTests : UmbracoIntegrationTest
                 Translations = new List<IDictionaryTranslation> { new DictionaryTranslation(english, "Hello world") }
             },
             Constants.Security.SuperUserKey);
-        Assert.True(result.Success);
-        Assert.AreEqual(key, result.Result.Key);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result.Key, Is.EqualTo(key));
 
         // re-get
         var item = await DictionaryItemService.GetAsync(result.Result!.Key);
-        Assert.NotNull(item);
-        Assert.AreEqual(key, item.Key);
+        Assert.That(item, Is.Not.Null);
+        Assert.That(item.Key, Is.EqualTo(key));
     }
 
     [Test]
@@ -300,21 +299,21 @@ internal sealed class DictionaryItemServiceTests : UmbracoIntegrationTest
         var english = await LanguageService.GetAsync("en-US");
 
         var result = await DictionaryItemService.CreateAsync(new DictionaryItem("Testing12345"), Constants.Security.SuperUserKey);
-        Assert.True(result.Success);
+        Assert.That(result.Success, Is.True);
 
         // re-get
         var item = await DictionaryItemService.GetAsync(result.Result!.Key);
-        Assert.NotNull(item);
+        Assert.That(item, Is.Not.Null);
 
         item.Translations = new List<IDictionaryTranslation> { new DictionaryTranslation(english, "Hello world") };
 
         result = await DictionaryItemService.UpdateAsync(item, Constants.Security.SuperUserKey);
-        Assert.True(result.Success);
+        Assert.That(result.Success, Is.True);
 
-        Assert.AreEqual(1, item.Translations.Count());
+        Assert.That(item.Translations.Count(), Is.EqualTo(1));
         foreach (var translation in item.Translations)
         {
-            Assert.AreEqual("Hello world", translation.Value);
+            Assert.That(translation.Value, Is.EqualTo("Hello world"));
         }
 
         item.Translations = new List<IDictionaryTranslation>(item.Translations)
@@ -325,29 +324,29 @@ internal sealed class DictionaryItemServiceTests : UmbracoIntegrationTest
         };
 
         result = await DictionaryItemService.UpdateAsync(item, Constants.Security.SuperUserKey);
-        Assert.True(result.Success);
+        Assert.That(result.Success, Is.True);
 
         // re-get
         item = await DictionaryItemService.GetAsync(item.Key);
-        Assert.NotNull(item);
+        Assert.That(item, Is.Not.Null);
 
-        Assert.AreEqual(2, item.Translations.Count());
-        Assert.AreEqual("Hello world", item.Translations.First().Value);
-        Assert.AreEqual("My new value", item.Translations.Last().Value);
+        Assert.That(item.Translations.Count(), Is.EqualTo(2));
+        Assert.That(item.Translations.First().Value, Is.EqualTo("Hello world"));
+        Assert.That(item.Translations.Last().Value, Is.EqualTo("My new value"));
     }
 
     [Test]
     public async Task Can_Delete_DictionaryItem()
     {
         var item = await DictionaryItemService.GetAsync("Child");
-        Assert.NotNull(item);
+        Assert.That(item, Is.Not.Null);
 
         var result = await DictionaryItemService.DeleteAsync(item.Key, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(DictionaryItemOperationStatus.Success, result.Status);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(DictionaryItemOperationStatus.Success));
 
         var deletedItem = await DictionaryItemService.GetAsync("Child");
-        Assert.Null(deletedItem);
+        Assert.That(deletedItem, Is.Null);
     }
 
     [Test]
@@ -360,19 +359,19 @@ internal sealed class DictionaryItemServiceTests : UmbracoIntegrationTest
         }
 
         var result = await DictionaryItemService.UpdateAsync(item, Constants.Security.SuperUserKey);
-        Assert.True(result.Success);
+        Assert.That(result.Success, Is.True);
 
         // Verify that the create and update dates can be used to distinguish between creates
         // and updates (as these fields are used in ServerEventSender to emit a "Created" or "Updated"
         // event.
-        Assert.Greater(result.Result.UpdateDate, result.Result.CreateDate);
+        Assert.That(result.Result.UpdateDate, Is.GreaterThan(result.Result.CreateDate));
 
         var updatedItem = await DictionaryItemService.GetAsync("Child");
-        Assert.NotNull(updatedItem);
+        Assert.That(updatedItem, Is.Not.Null);
 
         foreach (var translation in updatedItem.Translations)
         {
-            Assert.That(translation.Value.EndsWith("UPDATED"), Is.True);
+            Assert.That(translation.Value, Does.EndWith("UPDATED"));
         }
     }
 
@@ -383,20 +382,20 @@ internal sealed class DictionaryItemServiceTests : UmbracoIntegrationTest
         var childKey = (await DictionaryItemService.CreateAsync(new DictionaryItem("ChildOne") { ParentId = rootOneKey }, Constants.Security.SuperUserKey)).Result.Key;
 
         var child = await DictionaryItemService.GetAsync(childKey);
-        Assert.AreEqual(rootOneKey, child.ParentId);
+        Assert.That(child.ParentId, Is.EqualTo(rootOneKey));
 
         var result = await DictionaryItemService.MoveAsync(child, null, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(DictionaryItemOperationStatus.Success, result.Status);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(DictionaryItemOperationStatus.Success));
 
         child = await DictionaryItemService.GetAsync(childKey);
-        Assert.AreEqual(null, child.ParentId);
+        Assert.That(child.ParentId, Is.EqualTo(null));
 
         var rootItemKeys = (await DictionaryItemService.GetAtRootAsync()).Select(item => item.Key);
-        Assert.True(rootItemKeys.Contains(childKey));
+        Assert.That(rootItemKeys, Does.Contain(childKey));
 
         var rootOneChildren = await DictionaryItemService.GetChildrenAsync(rootOneKey);
-        Assert.AreEqual(0, rootOneChildren.Count());
+        Assert.That(rootOneChildren.Count(), Is.EqualTo(0));
     }
 
     [Test]
@@ -407,14 +406,14 @@ internal sealed class DictionaryItemServiceTests : UmbracoIntegrationTest
         var childKey = (await DictionaryItemService.CreateAsync(new DictionaryItem("ChildOne") { ParentId = rootOneKey }, Constants.Security.SuperUserKey)).Result.Key;
 
         var child = await DictionaryItemService.GetAsync(childKey);
-        Assert.AreEqual(rootOneKey, child.ParentId);
+        Assert.That(child.ParentId, Is.EqualTo(rootOneKey));
 
         var result = await DictionaryItemService.MoveAsync(child, rootTwoKey, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(DictionaryItemOperationStatus.Success, result.Status);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(DictionaryItemOperationStatus.Success));
 
         child = await DictionaryItemService.GetAsync(childKey);
-        Assert.AreEqual(rootTwoKey, child.ParentId);
+        Assert.That(child.ParentId, Is.EqualTo(rootTwoKey));
     }
 
     [Test]
@@ -425,34 +424,34 @@ internal sealed class DictionaryItemServiceTests : UmbracoIntegrationTest
         var childKey = (await DictionaryItemService.CreateAsync(new DictionaryItem("ChildOne") { ParentId = rootOneKey }, Constants.Security.SuperUserKey)).Result.Key;
 
         var rootTwo = await DictionaryItemService.GetAsync(rootTwoKey);
-        Assert.IsNull(rootTwo.ParentId);
+        Assert.That(rootTwo.ParentId, Is.Null);
 
         var result = await DictionaryItemService.MoveAsync(rootTwo, childKey, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(DictionaryItemOperationStatus.Success, result.Status);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(DictionaryItemOperationStatus.Success));
 
         rootTwo = await DictionaryItemService.GetAsync(rootTwoKey);
-        Assert.AreEqual(childKey, rootTwo.ParentId);
+        Assert.That(rootTwo.ParentId, Is.EqualTo(childKey));
 
         var rootItemKeys = (await DictionaryItemService.GetAtRootAsync()).Select(item => item.Key);
-        Assert.IsFalse(rootItemKeys.Contains(rootTwoKey));
+        Assert.That(rootItemKeys, Does.Not.Contain(rootTwoKey));
     }
 
     [Test]
     public async Task Cannot_Add_Duplicate_DictionaryItem_ItemKey()
     {
         var item = await DictionaryItemService.GetAsync("Child");
-        Assert.IsNotNull(item);
+        Assert.That(item, Is.Not.Null);
 
         item.ItemKey = "Parent";
 
         var result = await DictionaryItemService.UpdateAsync(item, Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(DictionaryItemOperationStatus.DuplicateItemKey, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(DictionaryItemOperationStatus.DuplicateItemKey));
 
         var item2 = await DictionaryItemService.GetAsync("Child");
-        Assert.IsNotNull(item2);
-        Assert.AreEqual(item.Key, item2.Key);
+        Assert.That(item2, Is.Not.Null);
+        Assert.That(item2.Key, Is.EqualTo(item.Key));
     }
 
     [Test]
@@ -461,11 +460,11 @@ internal sealed class DictionaryItemServiceTests : UmbracoIntegrationTest
         var itemKey = Guid.NewGuid().ToString("N");
 
         var result = await DictionaryItemService.CreateAsync(new DictionaryItem(Guid.NewGuid(), itemKey), Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(DictionaryItemOperationStatus.ParentNotFound, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(DictionaryItemOperationStatus.ParentNotFound));
 
         var item = await DictionaryItemService.GetAsync(itemKey);
-        Assert.IsNull(item);
+        Assert.That(item, Is.Null);
     }
 
     [Test]
@@ -474,40 +473,40 @@ internal sealed class DictionaryItemServiceTests : UmbracoIntegrationTest
         var itemKey = Guid.NewGuid().ToString("N");
         var result = await DictionaryItemService.CreateAsync(new DictionaryItem(itemKey), Constants.Security.SuperUserKey);
 
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
 
         result = await DictionaryItemService.CreateAsync(new DictionaryItem(itemKey), Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(DictionaryItemOperationStatus.DuplicateItemKey, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(DictionaryItemOperationStatus.DuplicateItemKey));
     }
 
     [Test]
     public async Task Cannot_Update_Non_Existant_DictionaryItem()
     {
         var result = await DictionaryItemService.UpdateAsync(new DictionaryItem("NoSuchItemKey"), Constants.Security.SuperUserKey);
-        Assert.False(result.Success);
-        Assert.AreEqual(DictionaryItemOperationStatus.ItemNotFound, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(DictionaryItemOperationStatus.ItemNotFound));
     }
 
     [Test]
     public async Task Cannot_Update_DictionaryItem_With_Empty_Id()
     {
         var item = await DictionaryItemService.GetAsync("Child");
-        Assert.IsNotNull(item);
+        Assert.That(item, Is.Not.Null);
 
         item = new DictionaryItem(item.ParentId, item.ItemKey) { Key = item.Key, Translations = item.Translations };
 
         var result = await DictionaryItemService.UpdateAsync(item, Constants.Security.SuperUserKey);
-        Assert.False(result.Success);
-        Assert.AreEqual(DictionaryItemOperationStatus.ItemNotFound, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(DictionaryItemOperationStatus.ItemNotFound));
     }
 
     [Test]
     public async Task Cannot_Delete_Non_Existant_DictionaryItem()
     {
         var result = await DictionaryItemService.DeleteAsync(Guid.NewGuid(), Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(DictionaryItemOperationStatus.ItemNotFound, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(DictionaryItemOperationStatus.ItemNotFound));
     }
 
     [Test]
@@ -523,7 +522,7 @@ internal sealed class DictionaryItemServiceTests : UmbracoIntegrationTest
                 Translations = new List<IDictionaryTranslation> { new DictionaryTranslation(english, "Hello world") }
             },
             Constants.Security.SuperUserKey);
-        Assert.True(result.Success);
+        Assert.That(result.Success, Is.True);
 
         result = await DictionaryItemService.CreateAsync(
             new DictionaryItem("Testing456")
@@ -532,31 +531,31 @@ internal sealed class DictionaryItemServiceTests : UmbracoIntegrationTest
                 Translations = new List<IDictionaryTranslation> { new DictionaryTranslation(english, "Hello world") }
             },
             Constants.Security.SuperUserKey);
-        Assert.False(result.Success);
-        Assert.AreEqual(DictionaryItemOperationStatus.DuplicateKey, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(DictionaryItemOperationStatus.DuplicateKey));
 
         // re-get
         var item = await DictionaryItemService.GetAsync("Testing123");
-        Assert.NotNull(item);
-        Assert.AreEqual(key, item.Key);
+        Assert.That(item, Is.Not.Null);
+        Assert.That(item.Key, Is.EqualTo(key));
 
         item = await DictionaryItemService.GetAsync("Testing456");
-        Assert.Null(item);
+        Assert.That(item, Is.Null);
     }
 
     [Test]
     public async Task Cannot_Create_DictionaryItem_With_Reused_DictionaryItem_Model()
     {
         var childItem = await DictionaryItemService.GetAsync("Child");
-        Assert.NotNull(childItem);
+        Assert.That(childItem, Is.Not.Null);
 
         childItem.ItemKey = "Something";
         childItem.Translations.First().Value = "Something Edited";
         childItem.Translations.Last().Value = "Something Also Edited";
 
         var result = await DictionaryItemService.CreateAsync(childItem, Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(DictionaryItemOperationStatus.InvalidId, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(DictionaryItemOperationStatus.InvalidId));
     }
 
     [Test]
@@ -565,11 +564,11 @@ internal sealed class DictionaryItemServiceTests : UmbracoIntegrationTest
         var root = (await DictionaryItemService.CreateAsync(new DictionaryItem("RootOne"), Constants.Security.SuperUserKey)).Result;
 
         var result = await DictionaryItemService.MoveAsync(root, root.Key, Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(DictionaryItemOperationStatus.InvalidParent, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(DictionaryItemOperationStatus.InvalidParent));
 
         root = await DictionaryItemService.GetAsync(root.Key);
-        Assert.IsNull(root.ParentId);
+        Assert.That(root.ParentId, Is.Null);
     }
 
     [Test]
@@ -579,11 +578,11 @@ internal sealed class DictionaryItemServiceTests : UmbracoIntegrationTest
         var child = (await DictionaryItemService.CreateAsync(new DictionaryItem("ChildOne") { ParentId = root.Key }, Constants.Security.SuperUserKey)).Result;
 
         var result = await DictionaryItemService.MoveAsync(root, child.Key, Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(DictionaryItemOperationStatus.InvalidParent, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(DictionaryItemOperationStatus.InvalidParent));
 
         root = await DictionaryItemService.GetAsync(root.Key);
-        Assert.IsNull(root.ParentId);
+        Assert.That(root.ParentId, Is.Null);
     }
 
     [Test]
@@ -594,11 +593,11 @@ internal sealed class DictionaryItemServiceTests : UmbracoIntegrationTest
         var grandChild = (await DictionaryItemService.CreateAsync(new DictionaryItem("GrandChildOne") { ParentId = child.Key }, Constants.Security.SuperUserKey)).Result;
 
         var result = await DictionaryItemService.MoveAsync(root, grandChild.Key, Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(DictionaryItemOperationStatus.InvalidParent, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(DictionaryItemOperationStatus.InvalidParent));
 
         root = await DictionaryItemService.GetAsync(root.Key);
-        Assert.IsNull(root.ParentId);
+        Assert.That(root.ParentId, Is.Null);
     }
 
     private async Task CreateTestData()
@@ -611,9 +610,9 @@ internal sealed class DictionaryItemServiceTests : UmbracoIntegrationTest
             .Build();
 
         var languageResult = await LanguageService.CreateAsync(languageDaDk, Constants.Security.SuperUserKey);
-        Assert.IsTrue(languageResult.Success);
+        Assert.That(languageResult.Success, Is.True);
         languageResult = await LanguageService.CreateAsync(languageEnGb, Constants.Security.SuperUserKey);
-        Assert.IsTrue(languageResult.Success);
+        Assert.That(languageResult.Success, Is.True);
 
         var dictionaryResult = await DictionaryItemService.CreateAsync(
             new DictionaryItem("Parent")
@@ -625,7 +624,7 @@ internal sealed class DictionaryItemServiceTests : UmbracoIntegrationTest
                 }
             },
             Constants.Security.SuperUserKey);
-        Assert.True(dictionaryResult.Success);
+        Assert.That(dictionaryResult.Success, Is.True);
         IDictionaryItem parentItem = dictionaryResult.Result!;
 
         _parentItemId = parentItem.Key;
@@ -642,7 +641,7 @@ internal sealed class DictionaryItemServiceTests : UmbracoIntegrationTest
                 }
             },
             Constants.Security.SuperUserKey);
-        Assert.True(dictionaryResult.Success);
+        Assert.That(dictionaryResult.Success, Is.True);
         IDictionaryItem childItem = dictionaryResult.Result!;
 
         _childItemId = childItem.Key;

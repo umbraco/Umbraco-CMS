@@ -35,28 +35,28 @@ public class OutputExpansionStrategyTests : OutputExpansionStrategyTestBase
 
         var result = apiContentBuilder.Build(content.Object);
 
-        Assert.AreEqual(3, result.Properties.Count);
-        Assert.AreEqual(444, result.Properties["number"]);
+        Assert.That(result.Properties, Has.Count.EqualTo(3));
+        Assert.That(result.Properties["number"], Is.EqualTo(444));
 
         var elementOutput = result.Properties["element"] as IApiElement;
-        Assert.IsNotNull(elementOutput);
-        Assert.AreEqual(2, elementOutput.Properties.Count);
-        Assert.AreEqual(333, elementOutput.Properties["number"]);
+        Assert.That(elementOutput, Is.Not.Null);
+        Assert.That(elementOutput.Properties, Has.Count.EqualTo(2));
+        Assert.That(elementOutput.Properties["number"], Is.EqualTo(333));
         var contentPickerOutput = elementOutput.Properties["contentPicker"] as IApiContent;
-        Assert.IsNotNull(contentPickerOutput);
-        Assert.AreEqual(contentPickerValue.Key, contentPickerOutput.Id);
-        Assert.AreEqual(2, contentPickerOutput.Properties.Count);
-        Assert.AreEqual(111, contentPickerOutput.Properties["numberOne"]);
-        Assert.AreEqual(222, contentPickerOutput.Properties["numberTwo"]);
+        Assert.That(contentPickerOutput, Is.Not.Null);
+        Assert.That(contentPickerOutput.Id, Is.EqualTo(contentPickerValue.Key));
+        Assert.That(contentPickerOutput.Properties, Has.Count.EqualTo(2));
+        Assert.That(contentPickerOutput.Properties["numberOne"], Is.EqualTo(111));
+        Assert.That(contentPickerOutput.Properties["numberTwo"], Is.EqualTo(222));
 
         elementOutput = result.Properties["element2"] as IApiElement;
-        Assert.IsNotNull(elementOutput);
-        Assert.AreEqual(2, elementOutput.Properties.Count);
-        Assert.AreEqual(555, elementOutput.Properties["number"]);
+        Assert.That(elementOutput, Is.Not.Null);
+        Assert.That(elementOutput.Properties, Has.Count.EqualTo(2));
+        Assert.That(elementOutput.Properties["number"], Is.EqualTo(555));
         contentPickerOutput = elementOutput.Properties["contentPicker"] as IApiContent;
-        Assert.IsNotNull(contentPickerOutput);
-        Assert.AreEqual(contentPicker2Value.Key, contentPickerOutput.Id);
-        Assert.AreEqual(0, contentPickerOutput.Properties.Count);
+        Assert.That(contentPickerOutput, Is.Not.Null);
+        Assert.That(contentPickerOutput.Id, Is.EqualTo(contentPicker2Value.Key));
+        Assert.That(contentPickerOutput.Properties.Count, Is.EqualTo(0));
     }
 
     [Test]
@@ -78,8 +78,8 @@ public class OutputExpansionStrategyTests : OutputExpansionStrategyTestBase
 
         var result = apiContentBuilder.Build(content.Object);
 
-        Assert.AreEqual(3, result.Properties.Count);
-        Assert.AreEqual(444, result.Properties["number"]);
+        Assert.That(result.Properties, Has.Count.EqualTo(3));
+        Assert.That(result.Properties["number"], Is.EqualTo(444));
 
         var expectedElementOutputs = new[]
         {
@@ -104,15 +104,15 @@ public class OutputExpansionStrategyTests : OutputExpansionStrategyTestBase
         foreach (var expectedElementOutput in expectedElementOutputs)
         {
             var elementOutput = result.Properties[expectedElementOutput.PropertyAlias] as IApiElement;
-            Assert.IsNotNull(elementOutput);
-            Assert.AreEqual(2, elementOutput.Properties.Count);
-            Assert.AreEqual(expectedElementOutput.ElementNumber, elementOutput.Properties["number"]);
+            Assert.That(elementOutput, Is.Not.Null);
+            Assert.That(elementOutput.Properties, Has.Count.EqualTo(2));
+            Assert.That(elementOutput.Properties["number"], Is.EqualTo(expectedElementOutput.ElementNumber));
             var contentPickerOutput = elementOutput.Properties["contentPicker"] as IApiContent;
-            Assert.IsNotNull(contentPickerOutput);
-            Assert.AreEqual(expectedElementOutput.ElementContentPicker, contentPickerOutput.Id);
-            Assert.AreEqual(2, contentPickerOutput.Properties.Count);
-            Assert.AreEqual(expectedElementOutput.ContentNumberOne, contentPickerOutput.Properties["numberOne"]);
-            Assert.AreEqual(expectedElementOutput.ContentNumberTwo, contentPickerOutput.Properties["numberTwo"]);
+            Assert.That(contentPickerOutput, Is.Not.Null);
+            Assert.That(contentPickerOutput.Id, Is.EqualTo(expectedElementOutput.ElementContentPicker));
+            Assert.That(contentPickerOutput.Properties, Has.Count.EqualTo(2));
+            Assert.That(contentPickerOutput.Properties["numberOne"], Is.EqualTo(expectedElementOutput.ContentNumberOne));
+            Assert.That(contentPickerOutput.Properties["numberTwo"], Is.EqualTo(expectedElementOutput.ContentNumberTwo));
         }
     }
 
@@ -131,21 +131,21 @@ public class OutputExpansionStrategyTests : OutputExpansionStrategyTestBase
 
         var result = apiContentBuilder.Build(content.Object);
 
-        Assert.AreEqual(1, result.Properties.Count);
+        Assert.That(result.Properties, Has.Count.EqualTo(1));
 
         var elementOutput = result.Properties["element"] as IApiElement;
-        Assert.IsNotNull(elementOutput);
-        Assert.AreEqual(2, elementOutput.Properties.Count);
-        Assert.AreEqual(333, elementOutput.Properties["number"]);
+        Assert.That(elementOutput, Is.Not.Null);
+        Assert.That(elementOutput.Properties, Has.Count.EqualTo(2));
+        Assert.That(elementOutput.Properties["number"], Is.EqualTo(333));
         var contentPickerOutput = elementOutput.Properties["contentPicker"] as IApiContent;
-        Assert.IsNotNull(contentPickerOutput);
-        Assert.AreEqual(contentPickerValue.Key, contentPickerOutput.Id);
-        Assert.AreEqual(2, contentPickerOutput.Properties.Count);
-        Assert.AreEqual(987, contentPickerOutput.Properties["number"]);
+        Assert.That(contentPickerOutput, Is.Not.Null);
+        Assert.That(contentPickerOutput.Id, Is.EqualTo(contentPickerValue.Key));
+        Assert.That(contentPickerOutput.Properties, Has.Count.EqualTo(2));
+        Assert.That(contentPickerOutput.Properties["number"], Is.EqualTo(987));
         var nestedContentPickerOutput = contentPickerOutput.Properties["contentPicker"] as IApiContent;
-        Assert.IsNotNull(nestedContentPickerOutput);
-        Assert.AreEqual(nestedContentPickerValue.Key, nestedContentPickerOutput.Id);
-        Assert.AreEqual(0, nestedContentPickerOutput.Properties.Count);
+        Assert.That(nestedContentPickerOutput, Is.Not.Null);
+        Assert.That(nestedContentPickerOutput.Id, Is.EqualTo(nestedContentPickerValue.Key));
+        Assert.That(nestedContentPickerOutput.Properties.Count, Is.EqualTo(0));
     }
 
     protected override IOutputExpansionStrategyAccessor CreateOutputExpansionStrategyAccessor(string? expand = null, string? fields = null)

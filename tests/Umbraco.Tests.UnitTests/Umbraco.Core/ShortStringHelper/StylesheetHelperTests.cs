@@ -29,10 +29,9 @@ public class StylesheetHelperTests
                 Styles = "font-size:1em; color:blue;",
             });
 
-        Assert.AreEqual(
-            @"body {font-family:Arial;}/**umb_name:My new rule*/
-p{font-size:1em; color:blue;} /** umb_name:  Test2 */ li {padding:0px;} table {margin:0;}".StripWhitespace(),
-            result.StripWhitespace());
+        Assert.That(
+            result.StripWhitespace(), Is.EqualTo(@"body {font-family:Arial;}/**umb_name:My new rule*/
+p{font-size:1em; color:blue;} /** umb_name:  Test2 */ li {padding:0px;} table {margin:0;}".StripWhitespace()));
     }
 
     [Test]
@@ -45,12 +44,11 @@ p{font-size:1em; color:blue;} /** umb_name:  Test2 */ li {padding:0px;} table {m
             css,
             new StylesheetRule { Name = "My new rule", Selector = "p", Styles = "font-size:1em; color:blue;" });
 
-        Assert.AreEqual(
-            @"body {font-family:Arial;}/** Umb_Name: Test1 */ p { font-size: 1em; } /** umb_name:  Test2 */ li {padding:0px;} table {margin:0;}
+        Assert.That(
+            result.StripWhitespace(), Is.EqualTo(@"body {font-family:Arial;}/** Umb_Name: Test1 */ p { font-size: 1em; } /** umb_name:  Test2 */ li {padding:0px;} table {margin:0;}
 
 /**umb_name:My new rule*/
-p{font-size:1em; color:blue;}".StripWhitespace(),
-            result.StripWhitespace());
+p{font-size:1em; color:blue;}".StripWhitespace()));
     }
 
     [Test]
@@ -58,7 +56,7 @@ p{font-size:1em; color:blue;}".StripWhitespace(),
     {
         var css = @"/** Umb_Name: Test */ p { font-size: 1em; } /** umb_name:  Test */ li {padding:0px;}";
         var results = StylesheetHelper.ParseRules(css);
-        Assert.AreEqual(1, results.Count());
+        Assert.That(results.Count(), Is.EqualTo(1));
     }
 
     // Standard rule stle
@@ -108,12 +106,12 @@ font-size: 1em;
         var results = StylesheetHelper.ParseRules(css).ToArray();
 
         // Assert
-        Assert.AreEqual(1, results.Length);
+        Assert.That(results.Length, Is.EqualTo(1));
 
         // Assert.IsTrue(results.First().RuleId.Value.Value.ToString() == file.Id.Value.Value + "/" + name);
-        Assert.AreEqual(name, results.First().Name);
-        Assert.AreEqual(selector, results.First().Selector);
-        Assert.AreEqual(styles.StripWhitespace(), results.First().Styles.StripWhitespace());
+        Assert.That(results.First().Name, Is.EqualTo(name));
+        Assert.That(results.First().Selector, Is.EqualTo(selector));
+        Assert.That(results.First().Styles.StripWhitespace(), Is.EqualTo(styles.StripWhitespace()));
     }
 
     // No Name: keyword
@@ -147,7 +145,7 @@ world */p{font-size: 1em;}")]
         var results = StylesheetHelper.ParseRules(css);
 
         // Assert
-        Assert.IsTrue(results.Any() == false);
+        Assert.That(results.Any(), Is.EqualTo(false));
     }
 
     [Test]
@@ -168,8 +166,8 @@ world */p{font-size: 1em;}")]
             new StylesheetRule { Name = "Test2", Selector = ".test2", Styles = "font-color: green;" });
 
         // verify the CSS formatting including the indents
-        Assert.AreEqual(
-            Tabbed(
+        Assert.That(
+            result.NormalizeNewLines(), Is.EqualTo(Tabbed(
                 @"body {
 #font-family:Arial;
 }
@@ -183,8 +181,7 @@ world */p{font-size: 1em;}")]
 /**umb_name:Test2*/
 .test2 {
 #font-color: green;
-}").NormalizeNewLines(),
-            result.NormalizeNewLines());
+}").NormalizeNewLines()));
     }
 
     [Test]
@@ -207,18 +204,17 @@ world */p{font-size: 1em;}")]
 #font-color: green;
 }");
         var rules = StylesheetHelper.ParseRules(css).ToArray();
-        Assert.AreEqual(2, rules.Count());
+        Assert.That(rules.Count(), Is.EqualTo(2));
 
-        Assert.AreEqual("Test", rules.First().Name);
-        Assert.AreEqual(".test", rules.First().Selector);
-        Assert.AreEqual(
-            @"font-color: red;
-margin: 1rem;".NormalizeNewLines(),
-            rules.First().Styles.NormalizeNewLines());
+        Assert.That(rules.First().Name, Is.EqualTo("Test"));
+        Assert.That(rules.First().Selector, Is.EqualTo(".test"));
+        Assert.That(
+            rules.First().Styles.NormalizeNewLines(), Is.EqualTo(@"font-color: red;
+margin: 1rem;".NormalizeNewLines()));
 
-        Assert.AreEqual("Test2", rules.Last().Name);
-        Assert.AreEqual(".test2", rules.Last().Selector);
-        Assert.AreEqual("font-color: green;", rules.Last().Styles);
+        Assert.That(rules.Last().Name, Is.EqualTo("Test2"));
+        Assert.That(rules.Last().Selector, Is.EqualTo(".test2"));
+        Assert.That(rules.Last().Styles, Is.EqualTo("font-color: green;"));
     }
 
     // can't put tabs in verbatim strings, so this will replace # with \t to test the CSS indents

@@ -21,9 +21,9 @@ internal sealed partial class ContentTypeServiceTests
 
         var result = await ContentTypeService.GetAllAllowedInLibraryAsync(0, 100);
 
-        Assert.AreEqual(1, result.Total);
-        Assert.AreEqual(1, result.Items.Count());
-        Assert.AreEqual("allowedElement", result.Items.First().Alias);
+        Assert.That(result.Total, Is.EqualTo(1));
+        Assert.That(result.Items.Count(), Is.EqualTo(1));
+        Assert.That(result.Items.First().Alias, Is.EqualTo("allowedElement"));
     }
 
     [Test]
@@ -35,8 +35,8 @@ internal sealed partial class ContentTypeServiceTests
 
         var result = await ContentTypeService.GetAllAllowedInLibraryAsync(0, 100);
 
-        Assert.AreEqual(0, result.Total);
-        Assert.AreEqual(0, result.Items.Count());
+        Assert.That(result.Total, Is.EqualTo(0));
+        Assert.That(result.Items.Count(), Is.EqualTo(0));
     }
 
     [Test]
@@ -48,8 +48,8 @@ internal sealed partial class ContentTypeServiceTests
 
         var result = await ContentTypeService.GetAllAllowedInLibraryAsync(0, 100);
 
-        Assert.AreEqual(0, result.Total);
-        Assert.AreEqual(0, result.Items.Count());
+        Assert.That(result.Total, Is.EqualTo(0));
+        Assert.That(result.Items.Count(), Is.EqualTo(0));
     }
 
     [Test]
@@ -66,8 +66,8 @@ internal sealed partial class ContentTypeServiceTests
 
         var result = await ContentTypeService.GetAllAllowedInLibraryAsync(0, 100);
 
-        Assert.AreEqual(0, result.Total);
-        Assert.AreEqual(0, result.Items.Count());
+        Assert.That(result.Total, Is.EqualTo(0));
+        Assert.That(result.Items.Count(), Is.EqualTo(0));
     }
 
     [Test]
@@ -81,12 +81,12 @@ internal sealed partial class ContentTypeServiceTests
         }
 
         var firstPage = await ContentTypeService.GetAllAllowedInLibraryAsync(0, 2);
-        Assert.AreEqual(3, firstPage.Total);
-        Assert.AreEqual(2, firstPage.Items.Count());
+        Assert.That(firstPage.Total, Is.EqualTo(3));
+        Assert.That(firstPage.Items.Count(), Is.EqualTo(2));
 
         var secondPage = await ContentTypeService.GetAllAllowedInLibraryAsync(2, 2);
-        Assert.AreEqual(3, secondPage.Total);
-        Assert.AreEqual(1, secondPage.Items.Count());
+        Assert.That(secondPage.Total, Is.EqualTo(3));
+        Assert.That(secondPage.Items.Count(), Is.EqualTo(1));
     }
 
     [Test]
@@ -103,8 +103,8 @@ internal sealed partial class ContentTypeServiceTests
 
         var result = await ContentTypeService.GetAllAllowedInLibraryAsync(0, 100);
 
-        Assert.AreEqual(1, result.Total);
-        Assert.AreEqual("allowedElement", result.Items.First().Alias);
+        Assert.That(result.Total, Is.EqualTo(1));
+        Assert.That(result.Items.First().Alias, Is.EqualTo("allowedElement"));
     }
 
     [Test]
@@ -121,8 +121,8 @@ internal sealed partial class ContentTypeServiceTests
 
         var result = await ContentTypeService.GetAllAllowedInLibraryAsync(0, 100);
 
-        Assert.AreEqual(1, result.Total);
-        Assert.AreEqual("otherElement", result.Items.First().Alias);
+        Assert.That(result.Total, Is.EqualTo(1));
+        Assert.That(result.Items.First().Alias, Is.EqualTo("otherElement"));
     }
 
     public static void ConfigureContentTypeFilterToAllowInLibrary(IUmbracoBuilder builder)

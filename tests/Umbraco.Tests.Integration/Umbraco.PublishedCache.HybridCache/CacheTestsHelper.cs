@@ -10,7 +10,7 @@ internal static class CacheTestsHelper
     {
         Assert.Multiple(() =>
         {
-            Assert.IsNotNull(comparisonContent);
+            Assert.That(comparisonContent, Is.Not.Null);
             if (baseContent.ContentType.VariesByCulture())
             {
                 foreach (var culture in baseContent.CultureInfos ?? Enumerable.Empty<ContentCultureInfos>())
@@ -47,8 +47,8 @@ internal static class CacheTestsHelper
     {
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(property.Alias, publishedProperty.Alias);
-            Assert.AreEqual(property.PropertyType.Alias, publishedProperty.PropertyType.Alias);
+            Assert.That(publishedProperty.Alias, Is.EqualTo(property.Alias));
+            Assert.That(publishedProperty.PropertyType.Alias, Is.EqualTo(property.PropertyType.Alias));
         });
     }
 }

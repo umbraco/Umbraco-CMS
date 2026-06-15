@@ -18,7 +18,7 @@ internal sealed partial class DocumentNavigationServiceTests
         await ContentEditingService.MoveToRecycleBinAsync(nodeToDelete, Constants.Security.SuperUserKey);
         DocumentNavigationQueryService.TryGetSiblingsKeysInBin(nodeInRecycleBin, out IEnumerable<Guid> initialSiblingsKeys);
         var initialSiblingsCount = initialSiblingsKeys.Count();
-        Assert.AreEqual(initialSiblingsCount, 1);
+        Assert.That(initialSiblingsCount, Is.EqualTo(1));
 
         // Act
         await ContentEditingService.DeleteFromRecycleBinAsync(nodeToDelete, Constants.Security.SuperUserKey);
@@ -29,13 +29,13 @@ internal sealed partial class DocumentNavigationServiceTests
         Assert.Multiple(() =>
         {
             // Verify siblings count has decreased by one
-            Assert.AreEqual(initialSiblingsCount - 1, updatedSiblingsKeys.Count());
+            Assert.That(updatedSiblingsKeys.Count(), Is.EqualTo(initialSiblingsCount - 1));
             foreach (Guid descendant in initialDescendantsKeys)
             {
                 var descendantExists = DocumentNavigationQueryService.TryGetParentKey(descendant, out _);
-                Assert.IsFalse(descendantExists);
+                Assert.That(descendantExists, Is.False);
                 var descendantExistsInRecycleBin = DocumentNavigationQueryService.TryGetParentKeyInBin(descendant, out _);
-                Assert.IsFalse(descendantExistsInRecycleBin);
+                Assert.That(descendantExistsInRecycleBin, Is.False);
             }
         });
     }

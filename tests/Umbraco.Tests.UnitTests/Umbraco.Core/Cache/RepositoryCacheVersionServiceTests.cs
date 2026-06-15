@@ -72,7 +72,7 @@ public class RepositoryCacheVersionServiceTests
         var isSynced = await _sut.IsCacheSyncedAsync<IContent>();
 
         // Assert: local V1 ≠ accessor V0 → not synced.
-        Assert.IsFalse(isSynced, "Cache should be out of sync when the accessor returns a stale version.");
+        Assert.That(isSynced, Is.False, "Cache should be out of sync when the accessor returns a stale version.");
     }
 
     [Test]
@@ -93,7 +93,7 @@ public class RepositoryCacheVersionServiceTests
 
         var isSynced = await _sut.IsCacheSyncedAsync<IContent>();
 
-        Assert.IsTrue(isSynced);
+        Assert.That(isSynced, Is.True);
     }
 
     [Test]

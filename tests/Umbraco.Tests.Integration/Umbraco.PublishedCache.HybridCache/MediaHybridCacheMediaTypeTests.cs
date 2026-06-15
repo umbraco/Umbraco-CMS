@@ -32,7 +32,7 @@ internal sealed class MediaHybridCacheMediaTypeTests : UmbracoIntegrationTestWit
     {
         // Arrange
         var oldMedia = await PublishedMediaHybridCache.GetByIdAsync(SubTestMediaId);
-        Assert.IsNotNull(oldMedia.Value("testProperty"));
+        Assert.That(oldMedia.Value("testProperty"), Is.Not.Null);
         MediaTypeUpdateHelper mediaTypeUpdateHelper = new MediaTypeUpdateHelper();
 
         // Act
@@ -43,7 +43,7 @@ internal sealed class MediaHybridCacheMediaTypeTests : UmbracoIntegrationTestWit
 
         // Assert
         var newMedia = await PublishedMediaHybridCache.GetByIdAsync(SubTestMediaId);
-        Assert.IsNull(newMedia.Value("testProperty"));
+        Assert.That(newMedia.Value("testProperty"), Is.Null);
     }
 
     [Test]
@@ -51,7 +51,7 @@ internal sealed class MediaHybridCacheMediaTypeTests : UmbracoIntegrationTestWit
     {
         // Arrange
         var oldMedia = await PublishedMediaHybridCache.GetByIdAsync(SubTestMedia.Key.Value);
-        Assert.IsNotNull(oldMedia.Value("testProperty"));
+        Assert.That(oldMedia.Value("testProperty"), Is.Not.Null);
         MediaTypeUpdateHelper mediaTypeUpdateHelper = new MediaTypeUpdateHelper();
 
         // Act
@@ -62,7 +62,7 @@ internal sealed class MediaHybridCacheMediaTypeTests : UmbracoIntegrationTestWit
 
         // Assert
         var newMedia = await PublishedMediaHybridCache.GetByIdAsync(SubTestMedia.Key.Value);
-        Assert.IsNull(newMedia.Value("testProperty"));
+        Assert.That(newMedia.Value("testProperty"), Is.Null);
     }
 
     [Test]
@@ -70,9 +70,9 @@ internal sealed class MediaHybridCacheMediaTypeTests : UmbracoIntegrationTestWit
     {
         // Arrange - load media into cache and verify the property has a value.
         var oldMedia = await PublishedMediaHybridCache.GetByIdAsync(SubTestMediaId);
-        Assert.IsNotNull(oldMedia);
+        Assert.That(oldMedia, Is.Not.Null);
         var originalValue = oldMedia.Value("testProperty");
-        Assert.IsNotNull(originalValue);
+        Assert.That(originalValue, Is.Not.Null);
         MediaTypeUpdateHelper mediaTypeUpdateHelper = new MediaTypeUpdateHelper();
 
         // Act - perform a non-structural change (rename the media type).
@@ -82,8 +82,8 @@ internal sealed class MediaHybridCacheMediaTypeTests : UmbracoIntegrationTestWit
 
         // Assert - property values should still be available from cache
         var newMedia = await PublishedMediaHybridCache.GetByIdAsync(SubTestMediaId);
-        Assert.IsNotNull(newMedia);
-        Assert.AreEqual(originalValue, newMedia.Value("testProperty"));
+        Assert.That(newMedia, Is.Not.Null);
+        Assert.That(newMedia.Value("testProperty"), Is.EqualTo(originalValue));
     }
 
     [Test]
@@ -91,13 +91,13 @@ internal sealed class MediaHybridCacheMediaTypeTests : UmbracoIntegrationTestWit
     {
         // Arrange
         var media = await PublishedMediaHybridCache.GetByIdAsync(SubTestMedia.Key.Value);
-        Assert.IsNotNull(media);
+        Assert.That(media, Is.Not.Null);
 
         // Act
         await MediaTypeService.DeleteAsync(CustomMediaType.Key, Constants.Security.SuperUserKey);
 
         // Assert
         var newMedia = await PublishedMediaHybridCache.GetByIdAsync(SubTestMedia.Key.Value);
-        Assert.IsNull(newMedia);
+        Assert.That(newMedia, Is.Null);
     }
 }

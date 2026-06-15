@@ -111,22 +111,22 @@ internal partial class BlockListElementLevelVariationTests
             var publishedContent = GetPublishedContent(content.Key);
 
             var value = publishedContent.Value<BlockListModel>("blocks");
-            Assert.IsNotNull(value);
-            Assert.AreEqual(1, value.Count);
+            Assert.That(value, Is.Not.Null);
+            Assert.That(value, Has.Count.EqualTo(1));
 
             var blockListItem = value.First();
-            Assert.AreEqual(2, blockListItem.Content.Properties.Count());
+            Assert.That(blockListItem.Content.Properties.Count(), Is.EqualTo(2));
             Assert.Multiple(() =>
             {
-                Assert.AreEqual(expectedInvariantContentValue, blockListItem.Content.Value<string>("invariantText"));
-                Assert.AreEqual(expectedVariantContentValue, blockListItem.Content.Value<string>("variantText"));
+                Assert.That(blockListItem.Content.Value<string>("invariantText"), Is.EqualTo(expectedInvariantContentValue));
+                Assert.That(blockListItem.Content.Value<string>("variantText"), Is.EqualTo(expectedVariantContentValue));
             });
 
-            Assert.AreEqual(2, blockListItem.Settings.Properties.Count());
+            Assert.That(blockListItem.Settings.Properties.Count(), Is.EqualTo(2));
             Assert.Multiple(() =>
             {
-                Assert.AreEqual(expectedInvariantSettingsValue, blockListItem.Settings.Value<string>("invariantText"));
-                Assert.AreEqual(expectedVariantSettingsValue, blockListItem.Settings.Value<string>("variantText"));
+                Assert.That(blockListItem.Settings.Value<string>("invariantText"), Is.EqualTo(expectedInvariantSettingsValue));
+                Assert.That(blockListItem.Settings.Value<string>("variantText"), Is.EqualTo(expectedVariantSettingsValue));
             });
         }
     }
@@ -237,22 +237,22 @@ internal partial class BlockListElementLevelVariationTests
             var publishedContent = GetPublishedContent(content.Key);
 
             var value = publishedContent.Value<BlockListModel>("blocks");
-            Assert.IsNotNull(value);
-            Assert.AreEqual(1, value.Count);
+            Assert.That(value, Is.Not.Null);
+            Assert.That(value, Has.Count.EqualTo(1));
 
             var blockListItem = value.First();
-            Assert.AreEqual(2, blockListItem.Content.Properties.Count());
+            Assert.That(blockListItem.Content.Properties.Count(), Is.EqualTo(2));
             Assert.Multiple(() =>
             {
-                Assert.AreEqual(expectedInvariantContentValue, blockListItem.Content.Value<string>("invariantText"));
-                Assert.AreEqual(expectedVariantContentValue, blockListItem.Content.Value<string>("variantText"));
+                Assert.That(blockListItem.Content.Value<string>("invariantText"), Is.EqualTo(expectedInvariantContentValue));
+                Assert.That(blockListItem.Content.Value<string>("variantText"), Is.EqualTo(expectedVariantContentValue));
             });
 
-            Assert.AreEqual(2, blockListItem.Settings.Properties.Count());
+            Assert.That(blockListItem.Settings.Properties.Count(), Is.EqualTo(2));
             Assert.Multiple(() =>
             {
-                Assert.AreEqual(expectedInvariantSettingsValue, blockListItem.Settings.Value<string>("invariantText"));
-                Assert.AreEqual(expectedVariantSettingsValue, blockListItem.Settings.Value<string>("variantText"));
+                Assert.That(blockListItem.Settings.Value<string>("invariantText"), Is.EqualTo(expectedInvariantSettingsValue));
+                Assert.That(blockListItem.Settings.Value<string>("variantText"), Is.EqualTo(expectedVariantSettingsValue));
             });
         }
     }
@@ -338,28 +338,28 @@ internal partial class BlockListElementLevelVariationTests
             "en-US",
             (rootBlockContent, nestedBlockContent, nestedBlockSetting) =>
             {
-                Assert.AreEqual("The first root invariant content value", rootBlockContent.Value<string>("invariantText"));
-                Assert.AreEqual("The first root content value in English", rootBlockContent.Value<string>("variantText"));
+                Assert.That(rootBlockContent.Value<string>("invariantText"), Is.EqualTo("The first root invariant content value"));
+                Assert.That(rootBlockContent.Value<string>("variantText"), Is.EqualTo("The first root content value in English"));
 
-                Assert.AreEqual("The first nested invariant content value", nestedBlockContent.Value<string>("invariantText"));
-                Assert.AreEqual("The first nested content value in English", nestedBlockContent.Value<string>("variantText"));
+                Assert.That(nestedBlockContent.Value<string>("invariantText"), Is.EqualTo("The first nested invariant content value"));
+                Assert.That(nestedBlockContent.Value<string>("variantText"), Is.EqualTo("The first nested content value in English"));
 
-                Assert.AreEqual("The first nested invariant settings value", nestedBlockSetting.Value<string>("invariantText"));
-                Assert.AreEqual("The first nested settings value in English", nestedBlockSetting.Value<string>("variantText"));
+                Assert.That(nestedBlockSetting.Value<string>("invariantText"), Is.EqualTo("The first nested invariant settings value"));
+                Assert.That(nestedBlockSetting.Value<string>("variantText"), Is.EqualTo("The first nested settings value in English"));
             });
 
         AssertPropertyValues(
             "da-DK",
             (rootBlockContent, nestedBlockContent, nestedBlockSetting) =>
             {
-                Assert.AreEqual("The first root invariant content value", rootBlockContent.Value<string>("invariantText"));
-                Assert.AreEqual("The first root content value in Danish", rootBlockContent.Value<string>("variantText"));
+                Assert.That(rootBlockContent.Value<string>("invariantText"), Is.EqualTo("The first root invariant content value"));
+                Assert.That(rootBlockContent.Value<string>("variantText"), Is.EqualTo("The first root content value in Danish"));
 
-                Assert.AreEqual("The first nested invariant content value", nestedBlockContent.Value<string>("invariantText"));
-                Assert.AreEqual("The first nested content value in Danish", nestedBlockContent.Value<string>("variantText"));
+                Assert.That(nestedBlockContent.Value<string>("invariantText"), Is.EqualTo("The first nested invariant content value"));
+                Assert.That(nestedBlockContent.Value<string>("variantText"), Is.EqualTo("The first nested content value in Danish"));
 
-                Assert.AreEqual("The first nested invariant settings value", nestedBlockSetting.Value<string>("invariantText"));
-                Assert.AreEqual("The first nested settings value in Danish", nestedBlockSetting.Value<string>("variantText"));
+                Assert.That(nestedBlockSetting.Value<string>("invariantText"), Is.EqualTo("The first nested invariant settings value"));
+                Assert.That(nestedBlockSetting.Value<string>("variantText"), Is.EqualTo("The first nested settings value in Danish"));
             });
 
         var blockListValue = JsonSerializer.Deserialize<BlockListValue>((string)content.Properties["blocks"]!.GetValue()!);
@@ -394,28 +394,28 @@ internal partial class BlockListElementLevelVariationTests
             "en-US",
             (rootBlockContent, nestedBlockContent, nestedBlockSetting) =>
             {
-                Assert.AreEqual("The second root invariant content value", rootBlockContent.Value<string>("invariantText"));
-                Assert.AreEqual("The second root content value in English", rootBlockContent.Value<string>("variantText"));
+                Assert.That(rootBlockContent.Value<string>("invariantText"), Is.EqualTo("The second root invariant content value"));
+                Assert.That(rootBlockContent.Value<string>("variantText"), Is.EqualTo("The second root content value in English"));
 
-                Assert.AreEqual("The second nested invariant content value", nestedBlockContent.Value<string>("invariantText"));
-                Assert.AreEqual("The second nested content value in English", nestedBlockContent.Value<string>("variantText"));
+                Assert.That(nestedBlockContent.Value<string>("invariantText"), Is.EqualTo("The second nested invariant content value"));
+                Assert.That(nestedBlockContent.Value<string>("variantText"), Is.EqualTo("The second nested content value in English"));
 
-                Assert.AreEqual("The second nested invariant settings value", nestedBlockSetting.Value<string>("invariantText"));
-                Assert.AreEqual("The second nested settings value in English", nestedBlockSetting.Value<string>("variantText"));
+                Assert.That(nestedBlockSetting.Value<string>("invariantText"), Is.EqualTo("The second nested invariant settings value"));
+                Assert.That(nestedBlockSetting.Value<string>("variantText"), Is.EqualTo("The second nested settings value in English"));
             });
 
         AssertPropertyValues(
             "da-DK",
             (rootBlockContent, nestedBlockContent, nestedBlockSetting) =>
             {
-                Assert.AreEqual("The second root invariant content value", rootBlockContent.Value<string>("invariantText"));
-                Assert.AreEqual("The first root content value in Danish", rootBlockContent.Value<string>("variantText"));
+                Assert.That(rootBlockContent.Value<string>("invariantText"), Is.EqualTo("The second root invariant content value"));
+                Assert.That(rootBlockContent.Value<string>("variantText"), Is.EqualTo("The first root content value in Danish"));
 
-                Assert.AreEqual("The second nested invariant content value", nestedBlockContent.Value<string>("invariantText"));
-                Assert.AreEqual("The first nested content value in Danish", nestedBlockContent.Value<string>("variantText"));
+                Assert.That(nestedBlockContent.Value<string>("invariantText"), Is.EqualTo("The second nested invariant content value"));
+                Assert.That(nestedBlockContent.Value<string>("variantText"), Is.EqualTo("The first nested content value in Danish"));
 
-                Assert.AreEqual("The second nested invariant settings value", nestedBlockSetting.Value<string>("invariantText"));
-                Assert.AreEqual("The first nested settings value in Danish", nestedBlockSetting.Value<string>("variantText"));
+                Assert.That(nestedBlockSetting.Value<string>("invariantText"), Is.EqualTo("The second nested invariant settings value"));
+                Assert.That(nestedBlockSetting.Value<string>("variantText"), Is.EqualTo("The first nested settings value in Danish"));
             });
 
         PublishContent(content, contentType, ["da-DK"]);
@@ -424,14 +424,14 @@ internal partial class BlockListElementLevelVariationTests
             "da-DK",
             (rootBlockContent, nestedBlockContent, nestedBlockSetting) =>
             {
-                Assert.AreEqual("The second root invariant content value", rootBlockContent.Value<string>("invariantText"));
-                Assert.AreEqual("The second root content value in Danish", rootBlockContent.Value<string>("variantText"));
+                Assert.That(rootBlockContent.Value<string>("invariantText"), Is.EqualTo("The second root invariant content value"));
+                Assert.That(rootBlockContent.Value<string>("variantText"), Is.EqualTo("The second root content value in Danish"));
 
-                Assert.AreEqual("The second nested invariant content value", nestedBlockContent.Value<string>("invariantText"));
-                Assert.AreEqual("The second nested content value in Danish", nestedBlockContent.Value<string>("variantText"));
+                Assert.That(nestedBlockContent.Value<string>("invariantText"), Is.EqualTo("The second nested invariant content value"));
+                Assert.That(nestedBlockContent.Value<string>("variantText"), Is.EqualTo("The second nested content value in Danish"));
 
-                Assert.AreEqual("The second nested invariant settings value", nestedBlockSetting.Value<string>("invariantText"));
-                Assert.AreEqual("The second nested settings value in Danish", nestedBlockSetting.Value<string>("variantText"));
+                Assert.That(nestedBlockSetting.Value<string>("invariantText"), Is.EqualTo("The second nested invariant settings value"));
+                Assert.That(nestedBlockSetting.Value<string>("variantText"), Is.EqualTo("The second nested settings value in Danish"));
             });
 
         void AssertPropertyValues(string culture, Action<IPublishedElement, IPublishedElement, IPublishedElement> validateBlockValues)
@@ -440,15 +440,15 @@ internal partial class BlockListElementLevelVariationTests
             var publishedContent = GetPublishedContent(content.Key);
 
             var rootBlock = publishedContent.Value<BlockListModel>("blocks");
-            Assert.IsNotNull(rootBlock);
-            Assert.AreEqual(1, rootBlock.Count);
+            Assert.That(rootBlock, Is.Not.Null);
+            Assert.That(rootBlock, Has.Count.EqualTo(1));
             Assert.Multiple(() =>
             {
                 var rootBlockContent = rootBlock.First().Content;
 
                 var nestedBlock = rootBlockContent.Value<BlockListModel>("nestedBlocks");
-                Assert.IsNotNull(nestedBlock);
-                Assert.AreEqual(1, nestedBlock.Count);
+                Assert.That(nestedBlock, Is.Not.Null);
+                Assert.That(nestedBlock, Has.Count.EqualTo(1));
 
                 var nestedBlockContent = nestedBlock.First().Content;
                 var nestedBlockSettings = nestedBlock.First().Settings;
@@ -562,28 +562,28 @@ internal partial class BlockListElementLevelVariationTests
             "en-US",
             (rootBlockContent, nestedBlockContent, nestedBlockSetting) =>
             {
-                Assert.AreEqual("The first root invariant content value", rootBlockContent.Value<string>("invariantText"));
-                Assert.AreEqual("The first root content value in English", rootBlockContent.Value<string>("variantText"));
+                Assert.That(rootBlockContent.Value<string>("invariantText"), Is.EqualTo("The first root invariant content value"));
+                Assert.That(rootBlockContent.Value<string>("variantText"), Is.EqualTo("The first root content value in English"));
 
-                Assert.AreEqual("The first nested invariant content value", nestedBlockContent.Value<string>("invariantText"));
-                Assert.AreEqual("The first nested content value in English", nestedBlockContent.Value<string>("variantText"));
+                Assert.That(nestedBlockContent.Value<string>("invariantText"), Is.EqualTo("The first nested invariant content value"));
+                Assert.That(nestedBlockContent.Value<string>("variantText"), Is.EqualTo("The first nested content value in English"));
 
-                Assert.AreEqual("The first nested invariant settings value", nestedBlockSetting.Value<string>("invariantText"));
-                Assert.AreEqual("The first nested settings value in English", nestedBlockSetting.Value<string>("variantText"));
+                Assert.That(nestedBlockSetting.Value<string>("invariantText"), Is.EqualTo("The first nested invariant settings value"));
+                Assert.That(nestedBlockSetting.Value<string>("variantText"), Is.EqualTo("The first nested settings value in English"));
             });
 
         AssertPropertyValues(
             "da-DK",
             (rootBlockContent, nestedBlockContent, nestedBlockSetting) =>
             {
-                Assert.AreEqual("The first root invariant content value", rootBlockContent.Value<string>("invariantText"));
-                Assert.AreEqual("The first root content value in Danish", rootBlockContent.Value<string>("variantText"));
+                Assert.That(rootBlockContent.Value<string>("invariantText"), Is.EqualTo("The first root invariant content value"));
+                Assert.That(rootBlockContent.Value<string>("variantText"), Is.EqualTo("The first root content value in Danish"));
 
-                Assert.AreEqual("The first nested invariant content value", nestedBlockContent.Value<string>("invariantText"));
-                Assert.AreEqual("The first nested content value in Danish", nestedBlockContent.Value<string>("variantText"));
+                Assert.That(nestedBlockContent.Value<string>("invariantText"), Is.EqualTo("The first nested invariant content value"));
+                Assert.That(nestedBlockContent.Value<string>("variantText"), Is.EqualTo("The first nested content value in Danish"));
 
-                Assert.AreEqual("The first nested invariant settings value", nestedBlockSetting.Value<string>("invariantText"));
-                Assert.AreEqual("The first nested settings value in Danish", nestedBlockSetting.Value<string>("variantText"));
+                Assert.That(nestedBlockSetting.Value<string>("invariantText"), Is.EqualTo("The first nested invariant settings value"));
+                Assert.That(nestedBlockSetting.Value<string>("variantText"), Is.EqualTo("The first nested settings value in Danish"));
             });
 
         var blockListValue = JsonSerializer.Deserialize<BlockListValue>((string)content.Properties["blocks"]!.GetValue()!);
@@ -633,28 +633,28 @@ internal partial class BlockListElementLevelVariationTests
             "en-US",
             (rootBlockContent, nestedBlockContent, nestedBlockSetting) =>
             {
-                Assert.AreEqual("The second root invariant content value", rootBlockContent.Value<string>("invariantText"));
-                Assert.AreEqual("The second root content value in English", rootBlockContent.Value<string>("variantText"));
+                Assert.That(rootBlockContent.Value<string>("invariantText"), Is.EqualTo("The second root invariant content value"));
+                Assert.That(rootBlockContent.Value<string>("variantText"), Is.EqualTo("The second root content value in English"));
 
-                Assert.AreEqual("The second nested invariant content value", nestedBlockContent.Value<string>("invariantText"));
-                Assert.AreEqual("The second nested content value in English", nestedBlockContent.Value<string>("variantText"));
+                Assert.That(nestedBlockContent.Value<string>("invariantText"), Is.EqualTo("The second nested invariant content value"));
+                Assert.That(nestedBlockContent.Value<string>("variantText"), Is.EqualTo("The second nested content value in English"));
 
-                Assert.AreEqual("The second nested invariant settings value", nestedBlockSetting.Value<string>("invariantText"));
-                Assert.AreEqual("The second nested settings value in English", nestedBlockSetting.Value<string>("variantText"));
+                Assert.That(nestedBlockSetting.Value<string>("invariantText"), Is.EqualTo("The second nested invariant settings value"));
+                Assert.That(nestedBlockSetting.Value<string>("variantText"), Is.EqualTo("The second nested settings value in English"));
             });
 
         AssertPropertyValues(
             "da-DK",
             (rootBlockContent, nestedBlockContent, nestedBlockSetting) =>
             {
-                Assert.AreEqual("The second root invariant content value", rootBlockContent.Value<string>("invariantText"));
-                Assert.AreEqual("The first root content value in Danish", rootBlockContent.Value<string>("variantText"));
+                Assert.That(rootBlockContent.Value<string>("invariantText"), Is.EqualTo("The second root invariant content value"));
+                Assert.That(rootBlockContent.Value<string>("variantText"), Is.EqualTo("The first root content value in Danish"));
 
-                Assert.AreEqual("The first nested invariant content value", nestedBlockContent.Value<string>("invariantText"));
-                Assert.AreEqual("The first nested content value in Danish", nestedBlockContent.Value<string>("variantText"));
+                Assert.That(nestedBlockContent.Value<string>("invariantText"), Is.EqualTo("The first nested invariant content value"));
+                Assert.That(nestedBlockContent.Value<string>("variantText"), Is.EqualTo("The first nested content value in Danish"));
 
-                Assert.AreEqual("The first nested invariant settings value", nestedBlockSetting.Value<string>("invariantText"));
-                Assert.AreEqual("The first nested settings value in Danish", nestedBlockSetting.Value<string>("variantText"));
+                Assert.That(nestedBlockSetting.Value<string>("invariantText"), Is.EqualTo("The first nested invariant settings value"));
+                Assert.That(nestedBlockSetting.Value<string>("variantText"), Is.EqualTo("The first nested settings value in Danish"));
             });
 
         PublishContent(content, contentType, ["da-DK"]);
@@ -663,14 +663,14 @@ internal partial class BlockListElementLevelVariationTests
             "da-DK",
             (rootBlockContent, nestedBlockContent, nestedBlockSetting) =>
             {
-                Assert.AreEqual("The second root invariant content value", rootBlockContent.Value<string>("invariantText"));
-                Assert.AreEqual("The second root content value in Danish", rootBlockContent.Value<string>("variantText"));
+                Assert.That(rootBlockContent.Value<string>("invariantText"), Is.EqualTo("The second root invariant content value"));
+                Assert.That(rootBlockContent.Value<string>("variantText"), Is.EqualTo("The second root content value in Danish"));
 
-                Assert.AreEqual("The second nested invariant content value", nestedBlockContent.Value<string>("invariantText"));
-                Assert.AreEqual("The second nested content value in Danish", nestedBlockContent.Value<string>("variantText"));
+                Assert.That(nestedBlockContent.Value<string>("invariantText"), Is.EqualTo("The second nested invariant content value"));
+                Assert.That(nestedBlockContent.Value<string>("variantText"), Is.EqualTo("The second nested content value in Danish"));
 
-                Assert.AreEqual("The second nested invariant settings value", nestedBlockSetting.Value<string>("invariantText"));
-                Assert.AreEqual("The second nested settings value in Danish", nestedBlockSetting.Value<string>("variantText"));
+                Assert.That(nestedBlockSetting.Value<string>("invariantText"), Is.EqualTo("The second nested invariant settings value"));
+                Assert.That(nestedBlockSetting.Value<string>("variantText"), Is.EqualTo("The second nested settings value in Danish"));
             });
 
         void AssertPropertyValues(string culture, Action<IPublishedElement, IPublishedElement, IPublishedElement> validateBlockValues)
@@ -679,15 +679,15 @@ internal partial class BlockListElementLevelVariationTests
             var publishedContent = GetPublishedContent(content.Key);
 
             var rootBlock = publishedContent.Value<BlockListModel>("blocks");
-            Assert.IsNotNull(rootBlock);
-            Assert.AreEqual(1, rootBlock.Count);
+            Assert.That(rootBlock, Is.Not.Null);
+            Assert.That(rootBlock, Has.Count.EqualTo(1));
             Assert.Multiple(() =>
             {
                 var rootBlockContent = rootBlock.First().Content;
 
                 var nestedBlock = rootBlockContent.Value<BlockListModel>("nestedBlocks");
-                Assert.IsNotNull(nestedBlock);
-                Assert.AreEqual(1, nestedBlock.Count);
+                Assert.That(nestedBlock, Is.Not.Null);
+                Assert.That(nestedBlock, Has.Count.EqualTo(1));
 
                 var nestedBlockContent = nestedBlock.First().Content;
                 var nestedBlockSettings = nestedBlock.First().Settings;
@@ -835,15 +835,15 @@ internal partial class BlockListElementLevelVariationTests
             var publishedContent = GetPublishedContent(content.Key);
 
             var value = publishedContent.Value<BlockListModel>("blocks");
-            Assert.IsNotNull(value);
-            Assert.AreEqual(1, value.Count);
+            Assert.That(value, Is.Not.Null);
+            Assert.That(value, Has.Count.EqualTo(1));
 
             var blockListItem = value.First();
-            Assert.AreEqual(2, blockListItem.Content.Properties.Count());
+            Assert.That(blockListItem.Content.Properties.Count(), Is.EqualTo(2));
             Assert.Multiple(() =>
             {
-                Assert.AreEqual(expectedInvariantContentValue, blockListItem.Content.Value<string>("invariantText"));
-                Assert.AreEqual(expectedVariantContentValue, blockListItem.Content.Value<string>("variantText"));
+                Assert.That(blockListItem.Content.Value<string>("invariantText"), Is.EqualTo(expectedInvariantContentValue));
+                Assert.That(blockListItem.Content.Value<string>("variantText"), Is.EqualTo(expectedVariantContentValue));
             });
         }
     }
@@ -896,15 +896,15 @@ internal partial class BlockListElementLevelVariationTests
             var publishedContent = GetPublishedContent(content.Key);
 
             var value = publishedContent.Value<BlockListModel>("blocks");
-            Assert.IsNotNull(value);
-            Assert.AreEqual(1, value.Count);
+            Assert.That(value, Is.Not.Null);
+            Assert.That(value, Has.Count.EqualTo(1));
 
             var blockListItem = value.First();
-            Assert.AreEqual(2, blockListItem.Content.Properties.Count());
+            Assert.That(blockListItem.Content.Properties.Count(), Is.EqualTo(2));
             Assert.Multiple(() =>
             {
-                Assert.AreEqual(expectedInvariantContentValue, blockListItem.Content.Value<string>("invariantText"));
-                Assert.AreEqual(expectedVariantContentValue, blockListItem.Content.Value<string>("variantText"));
+                Assert.That(blockListItem.Content.Value<string>("invariantText"), Is.EqualTo(expectedInvariantContentValue));
+                Assert.That(blockListItem.Content.Value<string>("variantText"), Is.EqualTo(expectedVariantContentValue));
             });
         }
     }
@@ -970,26 +970,26 @@ internal partial class BlockListElementLevelVariationTests
 
         AssertPropertyValues("en-US", 3, blocks =>
         {
-            Assert.AreEqual("#1: The first invariant content value", blocks[0].Content.Value<string>("invariantText"));
-            Assert.AreEqual("#1: The first content value in English", blocks[0].Content.Value<string>("variantText"));
+            Assert.That(blocks[0].Content.Value<string>("invariantText"), Is.EqualTo("#1: The first invariant content value"));
+            Assert.That(blocks[0].Content.Value<string>("variantText"), Is.EqualTo("#1: The first content value in English"));
 
-            Assert.AreEqual("#2: The first invariant content value", blocks[1].Content.Value<string>("invariantText"));
-            Assert.AreEqual("#2: The first content value in English", blocks[1].Content.Value<string>("variantText"));
+            Assert.That(blocks[1].Content.Value<string>("invariantText"), Is.EqualTo("#2: The first invariant content value"));
+            Assert.That(blocks[1].Content.Value<string>("variantText"), Is.EqualTo("#2: The first content value in English"));
 
-            Assert.AreEqual("#3: The first invariant content value", blocks[2].Content.Value<string>("invariantText"));
-            Assert.AreEqual("#3: The first content value in English", blocks[2].Content.Value<string>("variantText"));
+            Assert.That(blocks[2].Content.Value<string>("invariantText"), Is.EqualTo("#3: The first invariant content value"));
+            Assert.That(blocks[2].Content.Value<string>("variantText"), Is.EqualTo("#3: The first content value in English"));
         });
 
         AssertPropertyValues("da-DK", 3, blocks =>
         {
-            Assert.AreEqual("#1: The first invariant content value", blocks[0].Content.Value<string>("invariantText"));
-            Assert.AreEqual("#1: The first content value in Danish", blocks[0].Content.Value<string>("variantText"));
+            Assert.That(blocks[0].Content.Value<string>("invariantText"), Is.EqualTo("#1: The first invariant content value"));
+            Assert.That(blocks[0].Content.Value<string>("variantText"), Is.EqualTo("#1: The first content value in Danish"));
 
-            Assert.AreEqual("#2: The first invariant content value", blocks[1].Content.Value<string>("invariantText"));
-            Assert.AreEqual("#2: The first content value in Danish", blocks[1].Content.Value<string>("variantText"));
+            Assert.That(blocks[1].Content.Value<string>("invariantText"), Is.EqualTo("#2: The first invariant content value"));
+            Assert.That(blocks[1].Content.Value<string>("variantText"), Is.EqualTo("#2: The first content value in Danish"));
 
-            Assert.AreEqual("#3: The first invariant content value", blocks[2].Content.Value<string>("invariantText"));
-            Assert.AreEqual("#3: The first content value in Danish", blocks[2].Content.Value<string>("variantText"));
+            Assert.That(blocks[2].Content.Value<string>("invariantText"), Is.EqualTo("#3: The first invariant content value"));
+            Assert.That(blocks[2].Content.Value<string>("variantText"), Is.EqualTo("#3: The first content value in Danish"));
         });
 
         // remove block #2
@@ -1015,31 +1015,31 @@ internal partial class BlockListElementLevelVariationTests
 
         AssertPropertyValues("en-US", 2, blocks =>
         {
-            Assert.AreEqual("#1: The second invariant content value", blocks[0].Content.Value<string>("invariantText"));
-            Assert.AreEqual("#1: The second content value in English", blocks[0].Content.Value<string>("variantText"));
+            Assert.That(blocks[0].Content.Value<string>("invariantText"), Is.EqualTo("#1: The second invariant content value"));
+            Assert.That(blocks[0].Content.Value<string>("variantText"), Is.EqualTo("#1: The second content value in English"));
 
-            Assert.AreEqual("#3: The second invariant content value", blocks[1].Content.Value<string>("invariantText"));
-            Assert.AreEqual("#3: The second content value in English", blocks[1].Content.Value<string>("variantText"));
+            Assert.That(blocks[1].Content.Value<string>("invariantText"), Is.EqualTo("#3: The second invariant content value"));
+            Assert.That(blocks[1].Content.Value<string>("variantText"), Is.EqualTo("#3: The second content value in English"));
         });
 
         AssertPropertyValues("da-DK", 2, blocks =>
         {
-            Assert.AreEqual("#1: The second invariant content value", blocks[0].Content.Value<string>("invariantText"));
-            Assert.AreEqual("#1: The first content value in Danish", blocks[0].Content.Value<string>("variantText"));
+            Assert.That(blocks[0].Content.Value<string>("invariantText"), Is.EqualTo("#1: The second invariant content value"));
+            Assert.That(blocks[0].Content.Value<string>("variantText"), Is.EqualTo("#1: The first content value in Danish"));
 
-            Assert.AreEqual("#3: The second invariant content value", blocks[1].Content.Value<string>("invariantText"));
-            Assert.AreEqual("#3: The first content value in Danish", blocks[1].Content.Value<string>("variantText"));
+            Assert.That(blocks[1].Content.Value<string>("invariantText"), Is.EqualTo("#3: The second invariant content value"));
+            Assert.That(blocks[1].Content.Value<string>("variantText"), Is.EqualTo("#3: The first content value in Danish"));
         });
 
         PublishContent(content, contentType, ["da-DK"]);
 
         AssertPropertyValues("da-DK", 2, blocks =>
         {
-            Assert.AreEqual("#1: The second invariant content value", blocks[0].Content.Value<string>("invariantText"));
-            Assert.AreEqual("#1: The second content value in Danish", blocks[0].Content.Value<string>("variantText"));
+            Assert.That(blocks[0].Content.Value<string>("invariantText"), Is.EqualTo("#1: The second invariant content value"));
+            Assert.That(blocks[0].Content.Value<string>("variantText"), Is.EqualTo("#1: The second content value in Danish"));
 
-            Assert.AreEqual("#3: The second invariant content value", blocks[1].Content.Value<string>("invariantText"));
-            Assert.AreEqual("#3: The second content value in Danish", blocks[1].Content.Value<string>("variantText"));
+            Assert.That(blocks[1].Content.Value<string>("invariantText"), Is.EqualTo("#3: The second invariant content value"));
+            Assert.That(blocks[1].Content.Value<string>("variantText"), Is.EqualTo("#3: The second content value in Danish"));
         });
 
         void AssertPropertyValues(string culture, int numberOfExpectedBlocks, Action<BlockListModel> validateBlocks)
@@ -1048,8 +1048,8 @@ internal partial class BlockListElementLevelVariationTests
             var publishedContent = GetPublishedContent(content.Key);
 
             var value = publishedContent.Value<BlockListModel>("blocks");
-            Assert.IsNotNull(value);
-            Assert.AreEqual(numberOfExpectedBlocks, value.Count);
+            Assert.That(value, Is.Not.Null);
+            Assert.That(value, Has.Count.EqualTo(numberOfExpectedBlocks));
 
             validateBlocks(value);
         }
@@ -1090,14 +1090,14 @@ internal partial class BlockListElementLevelVariationTests
 
         AssertPropertyValues("en-US", 1, blocks =>
         {
-            Assert.AreEqual("#1: The first invariant content value", blocks[0].Content.Value<string>("invariantText"));
-            Assert.AreEqual("#1: The first content value in English", blocks[0].Content.Value<string>("variantText"));
+            Assert.That(blocks[0].Content.Value<string>("invariantText"), Is.EqualTo("#1: The first invariant content value"));
+            Assert.That(blocks[0].Content.Value<string>("variantText"), Is.EqualTo("#1: The first content value in English"));
         });
 
         AssertPropertyValues("da-DK", 1, blocks =>
         {
-            Assert.AreEqual("#1: The first invariant content value", blocks[0].Content.Value<string>("invariantText"));
-            Assert.AreEqual("#1: The first content value in Danish", blocks[0].Content.Value<string>("variantText"));
+            Assert.That(blocks[0].Content.Value<string>("invariantText"), Is.EqualTo("#1: The first invariant content value"));
+            Assert.That(blocks[0].Content.Value<string>("variantText"), Is.EqualTo("#1: The first content value in Danish"));
         });
 
         // Add one more block
@@ -1140,25 +1140,25 @@ internal partial class BlockListElementLevelVariationTests
 
         AssertPropertyValues("en-US", 2, blocks =>
         {
-            Assert.AreEqual("#1: The second invariant content value", blocks[0].Content.Value<string>("invariantText"));
-            Assert.AreEqual("#1: The second content value in English", blocks[0].Content.Value<string>("variantText"));
+            Assert.That(blocks[0].Content.Value<string>("invariantText"), Is.EqualTo("#1: The second invariant content value"));
+            Assert.That(blocks[0].Content.Value<string>("variantText"), Is.EqualTo("#1: The second content value in English"));
 
-            Assert.AreEqual("#2: The second invariant content value", blocks[1].Content.Value<string>("invariantText"));
-            Assert.AreEqual("#2: The second content value in English", blocks[1].Content.Value<string>("variantText"));
+            Assert.That(blocks[1].Content.Value<string>("invariantText"), Is.EqualTo("#2: The second invariant content value"));
+            Assert.That(blocks[1].Content.Value<string>("variantText"), Is.EqualTo("#2: The second content value in English"));
         });
 
         AssertPropertyValues("da-DK", 1, blocks =>
         {
-            Assert.AreEqual("#1: The second invariant content value", blocks[0].Content.Value<string>("invariantText"));
-            Assert.AreEqual("#1: The first content value in Danish", blocks[0].Content.Value<string>("variantText"));
+            Assert.That(blocks[0].Content.Value<string>("invariantText"), Is.EqualTo("#1: The second invariant content value"));
+            Assert.That(blocks[0].Content.Value<string>("variantText"), Is.EqualTo("#1: The first content value in Danish"));
         });
 
         PublishContent(content, contentType, ["da-DK"]);
 
         AssertPropertyValues("da-DK", 1, blocks =>
         {
-            Assert.AreEqual("#1: The second invariant content value", blocks[0].Content.Value<string>("invariantText"));
-            Assert.AreEqual("#1: The second content value in Danish", blocks[0].Content.Value<string>("variantText"));
+            Assert.That(blocks[0].Content.Value<string>("invariantText"), Is.EqualTo("#1: The second invariant content value"));
+            Assert.That(blocks[0].Content.Value<string>("variantText"), Is.EqualTo("#1: The second content value in Danish"));
         });
 
         void AssertPropertyValues(string culture, int numberOfExpectedBlocks, Action<BlockListModel> validateBlocks)
@@ -1167,8 +1167,8 @@ internal partial class BlockListElementLevelVariationTests
             var publishedContent = GetPublishedContent(content.Key);
 
             var value = publishedContent.Value<BlockListModel>("blocks");
-            Assert.IsNotNull(value);
-            Assert.AreEqual(numberOfExpectedBlocks, value.Count);
+            Assert.That(value, Is.Not.Null);
+            Assert.That(value, Has.Count.EqualTo(numberOfExpectedBlocks));
 
             validateBlocks(value);
         }
@@ -1228,17 +1228,17 @@ internal partial class BlockListElementLevelVariationTests
 
         AssertPropertyValues("en-US", 2, blocks =>
         {
-            Assert.AreEqual("#1: The invariant content value", blocks[0].Content.Value<string>("invariantText"));
-            Assert.AreEqual("#1: The content value in English", blocks[0].Content.Value<string>("variantText"));
+            Assert.That(blocks[0].Content.Value<string>("invariantText"), Is.EqualTo("#1: The invariant content value"));
+            Assert.That(blocks[0].Content.Value<string>("variantText"), Is.EqualTo("#1: The content value in English"));
 
-            Assert.AreEqual("#2: The invariant content value", blocks[1].Content.Value<string>("invariantText"));
-            Assert.AreEqual("#2: The content value in English", blocks[1].Content.Value<string>("variantText"));
+            Assert.That(blocks[1].Content.Value<string>("invariantText"), Is.EqualTo("#2: The invariant content value"));
+            Assert.That(blocks[1].Content.Value<string>("variantText"), Is.EqualTo("#2: The content value in English"));
         });
 
         AssertPropertyValues("da-DK", 1, blocks =>
         {
-            Assert.AreEqual("#2: The invariant content value", blocks[0].Content.Value<string>("invariantText"));
-            Assert.AreEqual("#2: The content value in Danish", blocks[0].Content.Value<string>("variantText"));
+            Assert.That(blocks[0].Content.Value<string>("invariantText"), Is.EqualTo("#2: The invariant content value"));
+            Assert.That(blocks[0].Content.Value<string>("variantText"), Is.EqualTo("#2: The content value in Danish"));
         });
 
         blockListValue.Expose =
@@ -1255,11 +1255,11 @@ internal partial class BlockListElementLevelVariationTests
 
         AssertPropertyValues("da-DK", 2, blocks =>
         {
-            Assert.AreEqual("#1: The invariant content value", blocks[0].Content.Value<string>("invariantText"));
-            Assert.AreEqual("#1: The content value in Danish", blocks[0].Content.Value<string>("variantText"));
+            Assert.That(blocks[0].Content.Value<string>("invariantText"), Is.EqualTo("#1: The invariant content value"));
+            Assert.That(blocks[0].Content.Value<string>("variantText"), Is.EqualTo("#1: The content value in Danish"));
 
-            Assert.AreEqual("#2: The invariant content value", blocks[1].Content.Value<string>("invariantText"));
-            Assert.AreEqual("#2: The content value in Danish", blocks[1].Content.Value<string>("variantText"));
+            Assert.That(blocks[1].Content.Value<string>("invariantText"), Is.EqualTo("#2: The invariant content value"));
+            Assert.That(blocks[1].Content.Value<string>("variantText"), Is.EqualTo("#2: The content value in Danish"));
         });
 
         void AssertPropertyValues(string culture, int numberOfExpectedBlocks, Action<BlockListModel> validateBlocks)
@@ -1268,8 +1268,8 @@ internal partial class BlockListElementLevelVariationTests
             var publishedContent = GetPublishedContent(content.Key);
 
             var value = publishedContent.Value<BlockListModel>("blocks");
-            Assert.IsNotNull(value);
-            Assert.AreEqual(numberOfExpectedBlocks, value.Count);
+            Assert.That(value, Is.Not.Null);
+            Assert.That(value, Has.Count.EqualTo(numberOfExpectedBlocks));
 
             validateBlocks(value);
         }
@@ -1328,11 +1328,11 @@ internal partial class BlockListElementLevelVariationTests
         {
             AssertPropertyValues(culture, 2, blocks =>
             {
-                Assert.AreEqual("#1: The invariant content value", blocks[0].Content.Value<string>("invariantText"));
-                Assert.AreEqual("#1: The other invariant content value", blocks[0].Content.Value<string>("variantText"));
+                Assert.That(blocks[0].Content.Value<string>("invariantText"), Is.EqualTo("#1: The invariant content value"));
+                Assert.That(blocks[0].Content.Value<string>("variantText"), Is.EqualTo("#1: The other invariant content value"));
 
-                Assert.AreEqual("#2: The invariant content value", blocks[1].Content.Value<string>("invariantText"));
-                Assert.AreEqual("#2: The other invariant content value", blocks[1].Content.Value<string>("variantText"));
+                Assert.That(blocks[1].Content.Value<string>("invariantText"), Is.EqualTo("#2: The invariant content value"));
+                Assert.That(blocks[1].Content.Value<string>("variantText"), Is.EqualTo("#2: The other invariant content value"));
             });
         }
 
@@ -1351,8 +1351,8 @@ internal partial class BlockListElementLevelVariationTests
         {
             AssertPropertyValues(culture, 1, blocks =>
             {
-                Assert.AreEqual("#2: The invariant content value", blocks[0].Content.Value<string>("invariantText"));
-                Assert.AreEqual("#2: The other invariant content value", blocks[0].Content.Value<string>("variantText"));
+                Assert.That(blocks[0].Content.Value<string>("invariantText"), Is.EqualTo("#2: The invariant content value"));
+                Assert.That(blocks[0].Content.Value<string>("variantText"), Is.EqualTo("#2: The other invariant content value"));
             });
         }
 
@@ -1362,8 +1362,8 @@ internal partial class BlockListElementLevelVariationTests
             var publishedContent = GetPublishedContent(content.Key);
 
             var value = publishedContent.Value<BlockListModel>("blocks");
-            Assert.IsNotNull(value);
-            Assert.AreEqual(numberOfExpectedBlocks, value.Count);
+            Assert.That(value, Is.Not.Null);
+            Assert.That(value, Has.Count.EqualTo(numberOfExpectedBlocks));
 
             validateBlocks(value);
         }
@@ -1428,17 +1428,17 @@ internal partial class BlockListElementLevelVariationTests
 
         AssertPropertyValues("en-US", 2, blocks =>
         {
-            Assert.AreEqual("#1: The invariant content value", blocks[0].Content.Value<string>("invariantText"));
-            Assert.AreEqual("#1: The other invariant content value", blocks[0].Content.Value<string>("variantText"));
+            Assert.That(blocks[0].Content.Value<string>("invariantText"), Is.EqualTo("#1: The invariant content value"));
+            Assert.That(blocks[0].Content.Value<string>("variantText"), Is.EqualTo("#1: The other invariant content value"));
 
-            Assert.AreEqual("#2: The invariant content value", blocks[1].Content.Value<string>("invariantText"));
-            Assert.AreEqual("#2: The variant content value in English", blocks[1].Content.Value<string>("variantText"));
+            Assert.That(blocks[1].Content.Value<string>("invariantText"), Is.EqualTo("#2: The invariant content value"));
+            Assert.That(blocks[1].Content.Value<string>("variantText"), Is.EqualTo("#2: The variant content value in English"));
         });
 
         AssertPropertyValues("da-DK", 1, blocks =>
         {
-            Assert.AreEqual("#1: The invariant content value", blocks[0].Content.Value<string>("invariantText"));
-            Assert.AreEqual("#1: The other invariant content value", blocks[0].Content.Value<string>("variantText"));
+            Assert.That(blocks[0].Content.Value<string>("invariantText"), Is.EqualTo("#1: The invariant content value"));
+            Assert.That(blocks[0].Content.Value<string>("variantText"), Is.EqualTo("#1: The other invariant content value"));
         });
 
         blockListValue.Expose =
@@ -1455,11 +1455,11 @@ internal partial class BlockListElementLevelVariationTests
 
         AssertPropertyValues("da-DK", 2, blocks =>
         {
-            Assert.AreEqual("#1: The invariant content value", blocks[0].Content.Value<string>("invariantText"));
-            Assert.AreEqual("#1: The other invariant content value", blocks[0].Content.Value<string>("variantText"));
+            Assert.That(blocks[0].Content.Value<string>("invariantText"), Is.EqualTo("#1: The invariant content value"));
+            Assert.That(blocks[0].Content.Value<string>("variantText"), Is.EqualTo("#1: The other invariant content value"));
 
-            Assert.AreEqual("#2: The invariant content value", blocks[1].Content.Value<string>("invariantText"));
-            Assert.AreEqual("#2: The variant content value in Danish", blocks[1].Content.Value<string>("variantText"));
+            Assert.That(blocks[1].Content.Value<string>("invariantText"), Is.EqualTo("#2: The invariant content value"));
+            Assert.That(blocks[1].Content.Value<string>("variantText"), Is.EqualTo("#2: The variant content value in Danish"));
         });
 
         void AssertPropertyValues(string culture, int numberOfExpectedBlocks, Action<BlockListModel> validateBlocks)
@@ -1468,8 +1468,8 @@ internal partial class BlockListElementLevelVariationTests
             var publishedContent = GetPublishedContent(content.Key);
 
             var value = publishedContent.Value<BlockListModel>("blocks");
-            Assert.IsNotNull(value);
-            Assert.AreEqual(numberOfExpectedBlocks, value.Count);
+            Assert.That(value, Is.Not.Null);
+            Assert.That(value, Has.Count.EqualTo(numberOfExpectedBlocks));
 
             validateBlocks(value);
         }
@@ -1522,11 +1522,11 @@ internal partial class BlockListElementLevelVariationTests
 
         AssertPropertyValues("da-DK", 1, blocks =>
         {
-            Assert.AreEqual("The first invariant content value", blocks[0].Content.Value<string>("invariantText"));
-            Assert.AreEqual("The first content value in Danish", blocks[0].Content.Value<string>("variantText"));
-            Assert.IsNotNull(blocks[0].Settings);
-            Assert.AreEqual("The first invariant settings value", blocks[0].Settings.Value<string>("invariantText"));
-            Assert.AreEqual("The first settings value in Danish", blocks[0].Settings.Value<string>("variantText"));
+            Assert.That(blocks[0].Content.Value<string>("invariantText"), Is.EqualTo("The first invariant content value"));
+            Assert.That(blocks[0].Content.Value<string>("variantText"), Is.EqualTo("The first content value in Danish"));
+            Assert.That(blocks[0].Settings, Is.Not.Null);
+            Assert.That(blocks[0].Settings.Value<string>("invariantText"), Is.EqualTo("The first invariant settings value"));
+            Assert.That(blocks[0].Settings.Value<string>("variantText"), Is.EqualTo("The first settings value in Danish"));
         });
 
         blockListValue.ContentData[0].Values[0].Value = "The second invariant content value";
@@ -1544,11 +1544,11 @@ internal partial class BlockListElementLevelVariationTests
 
         AssertPropertyValues("da-DK", 1, blocks =>
         {
-            Assert.AreEqual("The second invariant content value", blocks[0].Content.Value<string>("invariantText"));
-            Assert.AreEqual("The second content value in Danish", blocks[0].Content.Value<string>("variantText"));
-            Assert.IsNotNull(blocks[0].Settings);
-            Assert.AreEqual("The second invariant settings value", blocks[0].Settings.Value<string>("invariantText"));
-            Assert.AreEqual("The second settings value in Danish", blocks[0].Settings.Value<string>("variantText"));
+            Assert.That(blocks[0].Content.Value<string>("invariantText"), Is.EqualTo("The second invariant content value"));
+            Assert.That(blocks[0].Content.Value<string>("variantText"), Is.EqualTo("The second content value in Danish"));
+            Assert.That(blocks[0].Settings, Is.Not.Null);
+            Assert.That(blocks[0].Settings.Value<string>("invariantText"), Is.EqualTo("The second invariant settings value"));
+            Assert.That(blocks[0].Settings.Value<string>("variantText"), Is.EqualTo("The second settings value in Danish"));
         });
 
         void AssertPropertyValues(string culture, int numberOfExpectedBlocks, Action<BlockListModel>? validateBlocks = null)
@@ -1557,8 +1557,8 @@ internal partial class BlockListElementLevelVariationTests
             var publishedContent = GetPublishedContent(content.Key);
 
             var value = publishedContent.Value<BlockListModel>("blocks");
-            Assert.IsNotNull(value);
-            Assert.AreEqual(numberOfExpectedBlocks, value.Count);
+            Assert.That(value, Is.Not.Null);
+            Assert.That(value, Has.Count.EqualTo(numberOfExpectedBlocks));
 
             validateBlocks?.Invoke(value);
         }
@@ -1610,11 +1610,11 @@ internal partial class BlockListElementLevelVariationTests
 
         AssertPropertyValues("da-DK", 1, blocks =>
         {
-            Assert.AreEqual(string.Empty, blocks[0].Content.Value<string>("invariantText"));
-            Assert.AreEqual("The first content value in Danish", blocks[0].Content.Value<string>("variantText"));
-            Assert.IsNotNull(blocks[0].Settings);
-            Assert.AreEqual(string.Empty, blocks[0].Settings.Value<string>("invariantText"));
-            Assert.AreEqual("The first settings value in Danish", blocks[0].Settings.Value<string>("variantText"));
+            Assert.That(blocks[0].Content.Value<string>("invariantText"), Is.EqualTo(string.Empty));
+            Assert.That(blocks[0].Content.Value<string>("variantText"), Is.EqualTo("The first content value in Danish"));
+            Assert.That(blocks[0].Settings, Is.Not.Null);
+            Assert.That(blocks[0].Settings.Value<string>("invariantText"), Is.EqualTo(string.Empty));
+            Assert.That(blocks[0].Settings.Value<string>("variantText"), Is.EqualTo("The first settings value in Danish"));
         });
 
         void AssertPropertyValues(string culture, int numberOfExpectedBlocks, Action<BlockListModel>? validateBlocks = null)
@@ -1623,8 +1623,8 @@ internal partial class BlockListElementLevelVariationTests
             var publishedContent = GetPublishedContent(content.Key);
 
             var value = publishedContent.Value<BlockListModel>("blocks");
-            Assert.IsNotNull(value);
-            Assert.AreEqual(numberOfExpectedBlocks, value.Count);
+            Assert.That(value, Is.Not.Null);
+            Assert.That(value, Has.Count.EqualTo(numberOfExpectedBlocks));
 
             validateBlocks?.Invoke(value);
         }
@@ -1665,9 +1665,9 @@ internal partial class BlockListElementLevelVariationTests
         ContentService.Save(content);
 
         var publishResult = ContentService.Publish(content, ["en-US", "da-DK"]);
-        Assert.IsTrue(publishResult.Success);
-        Assert.IsTrue(publishResult.Content.PublishedCultures.Contains("en-US"));
-        Assert.IsTrue(publishResult.Content.PublishedCultures.Contains("da-DK"));
+        Assert.That(publishResult.Success, Is.True);
+        Assert.That(publishResult.Content.PublishedCultures, Does.Contain("en-US"));
+        Assert.That(publishResult.Content.PublishedCultures, Does.Contain("da-DK"));
     }
 
     [Test]
@@ -1705,9 +1705,9 @@ internal partial class BlockListElementLevelVariationTests
         ContentService.Save(content);
 
         var publishResult = ContentService.Publish(content, ["en-US"]);
-        Assert.IsTrue(publishResult.Success);
-        Assert.IsTrue(publishResult.Content.PublishedCultures.Contains("en-US"));
-        Assert.IsFalse(publishResult.Content.PublishedCultures.Contains("da-DK"));
+        Assert.That(publishResult.Success, Is.True);
+        Assert.That(publishResult.Content.PublishedCultures, Does.Contain("en-US"));
+        Assert.That(publishResult.Content.PublishedCultures, Does.Not.Contain("da-DK"));
     }
 
     [Test]
@@ -1745,9 +1745,9 @@ internal partial class BlockListElementLevelVariationTests
         ContentService.Save(content);
 
         var publishResult = ContentService.Publish(content, ["*"]);
-        Assert.IsTrue(publishResult.Success);
-        Assert.IsTrue(publishResult.Content.PublishedCultures.Contains("en-US"));
-        Assert.IsTrue(publishResult.Content.PublishedCultures.Contains("da-DK"));
+        Assert.That(publishResult.Success, Is.True);
+        Assert.That(publishResult.Content.PublishedCultures, Does.Contain("en-US"));
+        Assert.That(publishResult.Content.PublishedCultures, Does.Contain("da-DK"));
     }
 
     [TestCase(true)]
@@ -1788,10 +1788,10 @@ internal partial class BlockListElementLevelVariationTests
         var publishResult = ContentService.Publish(content, ["en-US", "da-DK"]);
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(publishResult.Success);
-            Assert.IsNotNull(publishResult.InvalidProperties);
-            Assert.AreEqual(1, publishResult.InvalidProperties.Count());
-            Assert.AreEqual("blocks", publishResult.InvalidProperties.First().Alias);
+            Assert.That(publishResult.Success, Is.False);
+            Assert.That(publishResult.InvalidProperties, Is.Not.Null);
+            Assert.That(publishResult.InvalidProperties.Count(), Is.EqualTo(1));
+            Assert.That(publishResult.InvalidProperties.First().Alias, Is.EqualTo("blocks"));
         });
     }
 
@@ -1830,10 +1830,10 @@ internal partial class BlockListElementLevelVariationTests
         var publishResult = ContentService.Publish(content, ["en-US", "da-DK"]);
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(publishResult.Success);
-            Assert.IsNotNull(publishResult.InvalidProperties);
-            Assert.AreEqual(1, publishResult.InvalidProperties.Count());
-            Assert.AreEqual("blocks", publishResult.InvalidProperties.First().Alias);
+            Assert.That(publishResult.Success, Is.False);
+            Assert.That(publishResult.InvalidProperties, Is.Not.Null);
+            Assert.That(publishResult.InvalidProperties.Count(), Is.EqualTo(1));
+            Assert.That(publishResult.InvalidProperties.First().Alias, Is.EqualTo("blocks"));
         });
     }
 
@@ -1873,15 +1873,15 @@ internal partial class BlockListElementLevelVariationTests
         ContentService.Save(content);
 
         var publishResult = ContentService.Publish(content, ["en-US"]);
-        Assert.IsTrue(publishResult.Success);
+        Assert.That(publishResult.Success, Is.True);
 
         publishResult = ContentService.Publish(content, ["da-DK"]);
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(publishResult.Success);
-            Assert.IsNotNull(publishResult.InvalidProperties);
-            Assert.AreEqual(1, publishResult.InvalidProperties.Count());
-            Assert.AreEqual("blocks", publishResult.InvalidProperties.First().Alias);
+            Assert.That(publishResult.Success, Is.False);
+            Assert.That(publishResult.InvalidProperties, Is.Not.Null);
+            Assert.That(publishResult.InvalidProperties.Count(), Is.EqualTo(1));
+            Assert.That(publishResult.InvalidProperties.First().Alias, Is.EqualTo("blocks"));
         });
     }
 
@@ -1925,15 +1925,15 @@ internal partial class BlockListElementLevelVariationTests
         ContentService.Save(content);
 
         var publishResult = ContentService.Publish(content, ["en-US"]);
-        Assert.IsTrue(publishResult.Success);
+        Assert.That(publishResult.Success, Is.True);
 
         publishResult = ContentService.Publish(content, ["da-DK"]);
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(publishResult.Success);
-            Assert.IsNotNull(publishResult.InvalidProperties);
-            Assert.AreEqual(1, publishResult.InvalidProperties.Count());
-            Assert.AreEqual("blocks", publishResult.InvalidProperties.First().Alias);
+            Assert.That(publishResult.Success, Is.False);
+            Assert.That(publishResult.InvalidProperties, Is.Not.Null);
+            Assert.That(publishResult.InvalidProperties.Count(), Is.EqualTo(1));
+            Assert.That(publishResult.InvalidProperties.First().Alias, Is.EqualTo("blocks"));
         });
     }
 
@@ -1987,16 +1987,16 @@ internal partial class BlockListElementLevelVariationTests
             var publishedContent = GetPublishedContent(content.Key);
 
             var value = publishedContent.Value<BlockListModel>("blocks");
-            Assert.IsNotNull(value);
-            Assert.AreEqual(1, value.Count);
+            Assert.That(value, Is.Not.Null);
+            Assert.That(value, Has.Count.EqualTo(1));
 
             var blockListItem = value.First();
-            Assert.AreEqual(1, blockListItem.Content.Properties.Count());
+            Assert.That(blockListItem.Content.Properties.Count(), Is.EqualTo(1));
             // need to ensure the property type cache level, otherwise this test has little value
-            Assert.AreEqual(PropertyCacheLevel.Elements, blockListItem.Content.Properties.First().PropertyType.CacheLevel);
+            Assert.That(blockListItem.Content.Properties.First().PropertyType.CacheLevel, Is.EqualTo(PropertyCacheLevel.Elements));
             var actualPickedPublishedContent = blockListItem.Content.Value<IPublishedContent>("contentPicker");
-            Assert.IsNotNull(actualPickedPublishedContent);
-            Assert.AreEqual(expectedPickedContent.Key, actualPickedPublishedContent.Key);
+            Assert.That(actualPickedPublishedContent, Is.Not.Null);
+            Assert.That(actualPickedPublishedContent.Key, Is.EqualTo(expectedPickedContent.Key));
         }
     }
 
@@ -2007,13 +2007,13 @@ internal partial class BlockListElementLevelVariationTests
     public async Task Can_Perform_Language_Fallback(ContentVariation elementTypeVariation, bool performFallbackToDefaultLanguage)
     {
         var daDkLanguage = await LanguageService.GetAsync("da-DK");
-        Assert.IsNotNull(daDkLanguage);
+        Assert.That(daDkLanguage, Is.Not.Null);
         daDkLanguage.FallbackIsoCode = "en-US";
         var saveLanguageResult = await LanguageService.UpdateAsync(daDkLanguage, Constants.Security.SuperUserKey);
-        Assert.IsTrue(saveLanguageResult.Success);
+        Assert.That(saveLanguageResult.Success, Is.True);
 
         daDkLanguage = await LanguageService.GetAsync("da-DK");
-        Assert.AreEqual("en-US", daDkLanguage?.FallbackIsoCode);
+        Assert.That(daDkLanguage?.FallbackIsoCode, Is.EqualTo("en-US"));
 
         var elementType = await CreateElementType(elementTypeVariation);
         var blockListDataType = await CreateBlockListDataType(elementType);
@@ -2070,22 +2070,22 @@ internal partial class BlockListElementLevelVariationTests
 
             var publishedValueFallback = GetRequiredService<IPublishedValueFallback>();
             var value = publishedContent.Value<BlockListModel>(publishedValueFallback, "blocks", fallback: fallback);
-            Assert.IsNotNull(value);
-            Assert.AreEqual(1, value.Count);
+            Assert.That(value, Is.Not.Null);
+            Assert.That(value, Has.Count.EqualTo(1));
 
             var blockListItem = value.First();
-            Assert.AreEqual(2, blockListItem.Content.Properties.Count());
+            Assert.That(blockListItem.Content.Properties.Count(), Is.EqualTo(2));
             Assert.Multiple(() =>
             {
-                Assert.AreEqual(expectedInvariantContentValue, blockListItem.Content.Value<string>("invariantText"));
-                Assert.AreEqual(expectedVariantContentValue, blockListItem.Content.Value<string>("variantText", culture: "en-US"));
+                Assert.That(blockListItem.Content.Value<string>("invariantText"), Is.EqualTo(expectedInvariantContentValue));
+                Assert.That(blockListItem.Content.Value<string>("variantText", culture: "en-US"), Is.EqualTo(expectedVariantContentValue));
             });
 
-            Assert.AreEqual(2, blockListItem.Settings.Properties.Count());
+            Assert.That(blockListItem.Settings.Properties.Count(), Is.EqualTo(2));
             Assert.Multiple(() =>
             {
-                Assert.AreEqual(expectedInvariantSettingsValue, blockListItem.Settings.Value<string>("invariantText"));
-                Assert.AreEqual(expectedVariantSettingsValue, blockListItem.Settings.Value<string>("variantText", culture: "en-US"));
+                Assert.That(blockListItem.Settings.Value<string>("invariantText"), Is.EqualTo(expectedInvariantSettingsValue));
+                Assert.That(blockListItem.Settings.Value<string>("variantText", culture: "en-US"), Is.EqualTo(expectedVariantSettingsValue));
             });
         }
 
@@ -2095,8 +2095,8 @@ internal partial class BlockListElementLevelVariationTests
             var publishedContent = GetPublishedContent(content.Key);
 
             var value = publishedContent.Value<BlockListModel>("blocks");
-            Assert.NotNull(value);
-            Assert.IsEmpty(value);
+            Assert.That(value, Is.Not.Null);
+            Assert.That(value, Is.Empty);
         }
     }
 
@@ -2154,10 +2154,10 @@ internal partial class BlockListElementLevelVariationTests
 
         // Verify element type properties are now invariant
         var refreshedElementType = ContentTypeService.Get(elementType.Key);
-        Assert.IsNotNull(refreshedElementType, "Element type should exist after save");
+        Assert.That(refreshedElementType, Is.Not.Null, "Element type should exist after save");
         var variantTextProperty = refreshedElementType!.PropertyTypes.FirstOrDefault(p => p.Alias == "variantText");
-        Assert.IsNotNull(variantTextProperty, "variantText property should exist");
-        Assert.IsFalse(variantTextProperty!.VariesByCulture(), $"variantText should NOT vary by culture after element type change. Variations={variantTextProperty.Variations}");
+        Assert.That(variantTextProperty, Is.Not.Null, "variantText property should exist");
+        Assert.That(variantTextProperty!.VariesByCulture(), Is.False, $"variantText should NOT vary by culture after element type change. Variations={variantTextProperty.Variations}");
 
         // 4. Update the content values - simulating real-world scenario where:
         //    - Old variant values remain in the published JSON value (leftover from before element type change)
@@ -2204,14 +2204,14 @@ internal partial class BlockListElementLevelVariationTests
         // 6. Verify: Get the published value and check for duplicates in the raw data
         content = ContentService.GetById(content.Key)!;
         var publishedValue = (string?)content.Properties["blocks"]!.GetValue(null, null, published: true);
-        Assert.IsNotNull(publishedValue, "Published value should not be null");
+        Assert.That(publishedValue, Is.Not.Null, "Published value should not be null");
 
         var publishedBlockListValue = JsonSerializer.Deserialize<BlockListValue>(publishedValue);
-        Assert.IsNotNull(publishedBlockListValue);
+        Assert.That(publishedBlockListValue, Is.Not.Null);
 
         // Verify ContentData entries are not duplicated
-        Assert.AreEqual(1, publishedBlockListValue.ContentData.Count, "Should have exactly 1 content data entry");
-        Assert.AreEqual(1, publishedBlockListValue.SettingsData.Count, "Should have exactly 1 settings data entry");
+        Assert.That(publishedBlockListValue.ContentData, Has.Count.EqualTo(1), "Should have exactly 1 content data entry");
+        Assert.That(publishedBlockListValue.SettingsData, Has.Count.EqualTo(1), "Should have exactly 1 settings data entry");
 
         // Verify Values within each ContentData are not duplicated
         // The bug causes the same property alias to appear multiple times with different cultures
@@ -2220,23 +2220,21 @@ internal partial class BlockListElementLevelVariationTests
         var aliasGroups = publishedBlockListValue.ContentData[0].Values.GroupBy(v => v.Alias);
         foreach (var group in aliasGroups)
         {
-            Assert.AreEqual(
-                1,
-                group.Count(),
+            Assert.That(
+                group.Count(), Is.EqualTo(1),
                 $"Property '{group.Key}' has multiple values with different cultures. Values: {string.Join(", ", group.Select(v => $"Culture={v.Culture ?? "null"}:Value={v.Value}"))}");
         }
 
         aliasGroups = publishedBlockListValue.SettingsData[0].Values.GroupBy(v => v.Alias);
         foreach (var group in aliasGroups)
         {
-            Assert.AreEqual(
-                1,
-                group.Count(),
+            Assert.That(
+                group.Count(), Is.EqualTo(1),
                 $"Property '{group.Key}' has multiple values with different cultures. Values: {string.Join(", ", group.Select(v => $"Culture={v.Culture ?? "null"}:Value={v.Value}"))}");
         }
 
         // Verify Expose entries are not duplicated
-        Assert.AreEqual(1, publishedBlockListValue.Expose.Count);
+        Assert.That(publishedBlockListValue.Expose, Has.Count.EqualTo(1));
 
         void AssertPropertyValues(
             string culture,
@@ -2249,20 +2247,20 @@ internal partial class BlockListElementLevelVariationTests
             var publishedContent = GetPublishedContent(content.Key);
 
             var value = publishedContent.Value<BlockListModel>("blocks");
-            Assert.IsNotNull(value);
-            Assert.AreEqual(1, value.Count);
+            Assert.That(value, Is.Not.Null);
+            Assert.That(value, Has.Count.EqualTo(1));
 
             var blockListItem = value.First();
             Assert.Multiple(() =>
             {
-                Assert.AreEqual(expectedInvariantContentValue, blockListItem.Content.Value<string>("invariantText"));
-                Assert.AreEqual(expectedVariantContentValue, blockListItem.Content.Value<string>("variantText"));
+                Assert.That(blockListItem.Content.Value<string>("invariantText"), Is.EqualTo(expectedInvariantContentValue));
+                Assert.That(blockListItem.Content.Value<string>("variantText"), Is.EqualTo(expectedVariantContentValue));
             });
 
             Assert.Multiple(() =>
             {
-                Assert.AreEqual(expectedInvariantSettingsValue, blockListItem.Settings.Value<string>("invariantText"));
-                Assert.AreEqual(expectedVariantSettingsValue, blockListItem.Settings.Value<string>("variantText"));
+                Assert.That(blockListItem.Settings.Value<string>("invariantText"), Is.EqualTo(expectedInvariantSettingsValue));
+                Assert.That(blockListItem.Settings.Value<string>("variantText"), Is.EqualTo(expectedVariantSettingsValue));
             });
         }
     }
@@ -2335,10 +2333,10 @@ internal partial class BlockListElementLevelVariationTests
 
         // Verify element type properties are now variant
         var refreshedElementType = ContentTypeService.Get(elementType.Key);
-        Assert.IsNotNull(refreshedElementType, "Element type should exist after save");
+        Assert.That(refreshedElementType, Is.Not.Null, "Element type should exist after save");
         var variantTextProperty = refreshedElementType!.PropertyTypes.FirstOrDefault(p => p.Alias == "variantText");
-        Assert.IsNotNull(variantTextProperty, "variantText property should exist");
-        Assert.IsTrue(variantTextProperty!.VariesByCulture(), $"variantText should vary by culture after element type change. Variations={variantTextProperty.Variations}");
+        Assert.That(variantTextProperty, Is.Not.Null, "variantText property should exist");
+        Assert.That(variantTextProperty!.VariesByCulture(), Is.True, $"variantText should vary by culture after element type change. Variations={variantTextProperty.Variations}");
 
         // 4. Update the content values - simulating real-world scenario where:
         //    - Old invariant value remains in the JSON (leftover from before element type change)
@@ -2399,29 +2397,29 @@ internal partial class BlockListElementLevelVariationTests
         // 6. Verify published JSON doesn't contain old invariant values for variantText
         content = ContentService.GetById(content.Key)!;
         var publishedValue = (string?)content.Properties["blocks"]!.GetValue(null, null, published: true);
-        Assert.IsNotNull(publishedValue, "Published value should not be null");
+        Assert.That(publishedValue, Is.Not.Null, "Published value should not be null");
 
         var publishedBlockListValue = JsonSerializer.Deserialize<BlockListValue>(publishedValue);
-        Assert.IsNotNull(publishedBlockListValue);
+        Assert.That(publishedBlockListValue, Is.Not.Null);
 
         // Verify ContentData entries are not duplicated
-        Assert.AreEqual(1, publishedBlockListValue!.ContentData.Count, "Should have exactly 1 content data entry");
-        Assert.AreEqual(1, publishedBlockListValue.SettingsData.Count, "Should have exactly 1 settings data entry");
+        Assert.That(publishedBlockListValue!.ContentData, Has.Count.EqualTo(1), "Should have exactly 1 content data entry");
+        Assert.That(publishedBlockListValue.SettingsData, Has.Count.EqualTo(1), "Should have exactly 1 settings data entry");
 
         var variantTextValues = publishedBlockListValue.ContentData[0].Values.Where(v => v.Alias == "variantText").ToList();
-        Assert.IsFalse(
-            variantTextValues.Any(v => v.Culture is null),
+        Assert.That(
+            variantTextValues.Any(v => v.Culture is null), Is.False,
             $"variantText property should not have invariant values after changing to variant. Values: {string.Join(", ", variantTextValues.Select(v => $"Culture={v.Culture ?? "null"}:Value={v.Value}"))}");
 
         variantTextValues = publishedBlockListValue.SettingsData[0].Values.Where(v => v.Alias == "variantText").ToList();
-        Assert.IsFalse(
-            variantTextValues.Any(v => v.Culture is null),
+        Assert.That(
+            variantTextValues.Any(v => v.Culture is null), Is.False,
             $"variantText property should not have invariant values after changing to variant. Values: {string.Join(", ", variantTextValues.Select(v => $"Culture={v.Culture ?? "null"}:Value={v.Value}"))}");
 
         // Verify Expose entries are not duplicated
         var exposeGroups = publishedBlockListValue.Expose.GroupBy(e => (e.ContentKey, e.Culture, e.Segment));
-        Assert.IsTrue(
-            exposeGroups.All(g => g.Count() == 1),
+        Assert.That(
+            exposeGroups.All(g => g.Count() == 1), Is.True,
             $"Duplicate Expose entries found. Expose: {string.Join(", ", publishedBlockListValue.Expose.Select(e => $"{e.ContentKey}:{e.Culture}:{e.Segment}"))}");
 
         void AssertPropertyValues(
@@ -2435,20 +2433,20 @@ internal partial class BlockListElementLevelVariationTests
             var publishedContent = GetPublishedContent(content.Key);
 
             var value = publishedContent.Value<BlockListModel>("blocks");
-            Assert.IsNotNull(value);
-            Assert.AreEqual(1, value!.Count);
+            Assert.That(value, Is.Not.Null);
+            Assert.That(value!, Has.Count.EqualTo(1));
 
             var blockListItem = value.First();
             Assert.Multiple(() =>
             {
-                Assert.AreEqual(expectedInvariantContentValue, blockListItem.Content.Value<string>("invariantText"));
-                Assert.AreEqual(expectedVariantContentValue, blockListItem.Content.Value<string>("variantText"));
+                Assert.That(blockListItem.Content.Value<string>("invariantText"), Is.EqualTo(expectedInvariantContentValue));
+                Assert.That(blockListItem.Content.Value<string>("variantText"), Is.EqualTo(expectedVariantContentValue));
             });
 
             Assert.Multiple(() =>
             {
-                Assert.AreEqual(expectedInvariantSettingsValue, blockListItem.Settings.Value<string>("invariantText"));
-                Assert.AreEqual(expectedVariantSettingsValue, blockListItem.Settings.Value<string>("variantText"));
+                Assert.That(blockListItem.Settings.Value<string>("invariantText"), Is.EqualTo(expectedInvariantSettingsValue));
+                Assert.That(blockListItem.Settings.Value<string>("variantText"), Is.EqualTo(expectedVariantSettingsValue));
             });
         }
     }
@@ -2503,7 +2501,7 @@ internal partial class BlockListElementLevelVariationTests
         };
 
         var updateResult = await ContentEditingService.UpdateAsync(content.Key, updateModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(updateResult.Success, "Content update should succeed");
+        Assert.That(updateResult.Success, Is.True, "Content update should succeed");
 
         // Reload content to get fresh state.
         content = ContentService.GetById(content.Key)!;
@@ -2519,9 +2517,9 @@ internal partial class BlockListElementLevelVariationTests
         // pending changes due to JSON serialization order differences between EditedValue and PublishedValue.
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(content.Edited, "Content should not be marked as edited after publishing all cultures");
-            Assert.IsFalse(content.IsCultureEdited("en-US"), "en-US culture should not be marked as edited");
-            Assert.IsFalse(content.IsCultureEdited("da-DK"), "da-DK culture should not be marked as edited");
+            Assert.That(content.Edited, Is.False, "Content should not be marked as edited after publishing all cultures");
+            Assert.That(content.IsCultureEdited("en-US"), Is.False, "en-US culture should not be marked as edited");
+            Assert.That(content.IsCultureEdited("da-DK"), Is.False, "da-DK culture should not be marked as edited");
         });
     }
 
@@ -2529,7 +2527,7 @@ internal partial class BlockListElementLevelVariationTests
     public async Task Can_Perform_Language_Fallback_At_Block_Property_Level()
     {
         var defaultCulture = await GetRequiredService<ILanguageService>().GetDefaultIsoCodeAsync();
-        Assert.AreEqual("en-US", defaultCulture);
+        Assert.That(defaultCulture, Is.EqualTo("en-US"));
 
         var elementType = await CreateElementType(ContentVariation.Culture);
         var blockListDataType = await CreateBlockListDataType(elementType);
@@ -2583,8 +2581,8 @@ internal partial class BlockListElementLevelVariationTests
 
         var publishedContent = GetPublishedContent(content.Key);
         var value = publishedContent.Value<BlockListModel>("blocks");
-        Assert.IsNotNull(value);
-        Assert.AreEqual(2, value.Count);
+        Assert.That(value, Is.Not.Null);
+        Assert.That(value, Has.Count.EqualTo(2));
 
         // assert property values in the English variation context.
         Assert.Multiple(() =>
@@ -2592,41 +2590,41 @@ internal partial class BlockListElementLevelVariationTests
             // start block #1
 
             // "invariantText" has a value, so it won't perform fallback.
-            Assert.AreEqual("#1: The invariant content value", value[0].Content.Value<string>("invariantText"));
-            Assert.AreEqual("#1: The invariant content value", value[0].Content.Value<string>("invariantText", fallback: Fallback.ToDefaultValue, defaultValue: "The default value"));
+            Assert.That(value[0].Content.Value<string>("invariantText"), Is.EqualTo("#1: The invariant content value"));
+            Assert.That(value[0].Content.Value<string>("invariantText", fallback: Fallback.ToDefaultValue, defaultValue: "The default value"), Is.EqualTo("#1: The invariant content value"));
 
             // "variantText" has a value in English (both implicit and explicit), so it won't perform fallback.
-            Assert.AreEqual("#1: The content value in English", value[0].Content.Value<string>("variantText"));
-            Assert.AreEqual("#1: The content value in English", value[0].Content.Value<string>("variantText", culture: "en-US"));
-            Assert.AreEqual("#1: The content value in English", value[0].Content.Value<string>("variantText", culture: "en-US", fallback: Fallback.ToDefaultValue, defaultValue: "The default value"));
+            Assert.That(value[0].Content.Value<string>("variantText"), Is.EqualTo("#1: The content value in English"));
+            Assert.That(value[0].Content.Value<string>("variantText", culture: "en-US"), Is.EqualTo("#1: The content value in English"));
+            Assert.That(value[0].Content.Value<string>("variantText", culture: "en-US", fallback: Fallback.ToDefaultValue, defaultValue: "The default value"), Is.EqualTo("#1: The content value in English"));
 
             // "variantText" has no value in Danish, so it will perform fallback - both to the default language (en-US) and to a default value.
-            Assert.AreEqual(string.Empty, value[0].Content.Value<string>("variantText", culture: "da-DK"));
-            Assert.AreEqual("#1: The content value in English", value[0].Content.Value<string>("variantText", culture: "da-DK", fallback: Fallback.ToDefaultLanguage));
-            Assert.AreEqual("The default value", value[0].Content.Value<string>("variantText", culture: "da-DK", fallback: Fallback.ToDefaultValue, defaultValue: "The default value"));
+            Assert.That(value[0].Content.Value<string>("variantText", culture: "da-DK"), Is.EqualTo(string.Empty));
+            Assert.That(value[0].Content.Value<string>("variantText", culture: "da-DK", fallback: Fallback.ToDefaultLanguage), Is.EqualTo("#1: The content value in English"));
+            Assert.That(value[0].Content.Value<string>("variantText", culture: "da-DK", fallback: Fallback.ToDefaultValue, defaultValue: "The default value"), Is.EqualTo("The default value"));
 
             // start block #2
 
             // "invariantText" has no value, so it will perform fallback.
-            Assert.AreEqual(string.Empty, value[1].Content.Value<string>("invariantText"));
-            Assert.AreEqual("The default value", value[1].Content.Value<string>("invariantText", fallback: Fallback.ToDefaultValue, defaultValue: "The default value"));
+            Assert.That(value[1].Content.Value<string>("invariantText"), Is.EqualTo(string.Empty));
+            Assert.That(value[1].Content.Value<string>("invariantText", fallback: Fallback.ToDefaultValue, defaultValue: "The default value"), Is.EqualTo("The default value"));
 
             // "variantText" has no value in English (neither implicit nor explicit), so it will perform fallback.
-            Assert.AreEqual(string.Empty, value[1].Content.Value<string>("variantText"));
-            Assert.AreEqual(string.Empty, value[1].Content.Value<string>("variantText", culture: "en-US"));
-            Assert.AreEqual("The default value", value[1].Content.Value<string>("variantText", culture: "en-US", fallback: Fallback.ToDefaultValue, defaultValue: "The default value"));
+            Assert.That(value[1].Content.Value<string>("variantText"), Is.EqualTo(string.Empty));
+            Assert.That(value[1].Content.Value<string>("variantText", culture: "en-US"), Is.EqualTo(string.Empty));
+            Assert.That(value[1].Content.Value<string>("variantText", culture: "en-US", fallback: Fallback.ToDefaultValue, defaultValue: "The default value"), Is.EqualTo("The default value"));
 
             // "variantText" has a value in Danish, so it won't perform fallback.
-            Assert.AreEqual("#2: The content value in Danish", value[1].Content.Value<string>("variantText", culture: "da-DK"));
-            Assert.AreEqual("#2: The content value in Danish", value[1].Content.Value<string>("variantText", culture: "da-DK", fallback: Fallback.ToDefaultLanguage));
+            Assert.That(value[1].Content.Value<string>("variantText", culture: "da-DK"), Is.EqualTo("#2: The content value in Danish"));
+            Assert.That(value[1].Content.Value<string>("variantText", culture: "da-DK", fallback: Fallback.ToDefaultLanguage), Is.EqualTo("#2: The content value in Danish"));
         });
 
         SetVariationContext("da-DK", null);
 
         publishedContent = GetPublishedContent(content.Key);
         value = publishedContent.Value<BlockListModel>("blocks");
-        Assert.IsNotNull(value);
-        Assert.AreEqual(2, value.Count);
+        Assert.That(value, Is.Not.Null);
+        Assert.That(value, Has.Count.EqualTo(2));
 
         // assert property values in the Danish variation context.
         Assert.Multiple(() =>
@@ -2634,36 +2632,36 @@ internal partial class BlockListElementLevelVariationTests
             // start block #1
 
             // "invariantText" has a value, so it won't perform fallback.
-            Assert.AreEqual("#1: The invariant content value", value[0].Content.Value<string>("invariantText"));
-            Assert.AreEqual("#1: The invariant content value", value[0].Content.Value<string>("invariantText", fallback: Fallback.ToDefaultValue, defaultValue: "The default value"));
+            Assert.That(value[0].Content.Value<string>("invariantText"), Is.EqualTo("#1: The invariant content value"));
+            Assert.That(value[0].Content.Value<string>("invariantText", fallback: Fallback.ToDefaultValue, defaultValue: "The default value"), Is.EqualTo("#1: The invariant content value"));
 
             // "variantText" has no value in Danish (neither implicit nor explicit), so it will perform fallback - both to the default language (en-US) and to a default value.
-            Assert.AreEqual(string.Empty, value[0].Content.Value<string>("variantText"));
-            Assert.AreEqual(string.Empty, value[0].Content.Value<string>("variantText", culture: "da-DK"));
-            Assert.AreEqual("#1: The content value in English", value[0].Content.Value<string>("variantText", fallback: Fallback.ToDefaultLanguage));
-            Assert.AreEqual("#1: The content value in English", value[0].Content.Value<string>("variantText", culture: "da-DK", fallback: Fallback.ToDefaultLanguage));
-            Assert.AreEqual("The default value", value[0].Content.Value<string>("variantText", fallback: Fallback.ToDefaultValue, defaultValue: "The default value"));
-            Assert.AreEqual("The default value", value[0].Content.Value<string>("variantText", culture: "da-DK", fallback: Fallback.ToDefaultValue, defaultValue: "The default value"));
+            Assert.That(value[0].Content.Value<string>("variantText"), Is.EqualTo(string.Empty));
+            Assert.That(value[0].Content.Value<string>("variantText", culture: "da-DK"), Is.EqualTo(string.Empty));
+            Assert.That(value[0].Content.Value<string>("variantText", fallback: Fallback.ToDefaultLanguage), Is.EqualTo("#1: The content value in English"));
+            Assert.That(value[0].Content.Value<string>("variantText", culture: "da-DK", fallback: Fallback.ToDefaultLanguage), Is.EqualTo("#1: The content value in English"));
+            Assert.That(value[0].Content.Value<string>("variantText", fallback: Fallback.ToDefaultValue, defaultValue: "The default value"), Is.EqualTo("The default value"));
+            Assert.That(value[0].Content.Value<string>("variantText", culture: "da-DK", fallback: Fallback.ToDefaultValue, defaultValue: "The default value"), Is.EqualTo("The default value"));
 
             // "variantText" has a value in English, so it won't perform fallback.
-            Assert.AreEqual("#1: The content value in English", value[0].Content.Value<string>("variantText", culture: "en-US"));
-            Assert.AreEqual("#1: The content value in English", value[0].Content.Value<string>("variantText", culture: "en-US", fallback: Fallback.ToDefaultValue, defaultValue: "The default value"));
+            Assert.That(value[0].Content.Value<string>("variantText", culture: "en-US"), Is.EqualTo("#1: The content value in English"));
+            Assert.That(value[0].Content.Value<string>("variantText", culture: "en-US", fallback: Fallback.ToDefaultValue, defaultValue: "The default value"), Is.EqualTo("#1: The content value in English"));
 
             // start block #2
 
             // "invariantText" has no value, so it will perform fallback.
-            Assert.AreEqual(string.Empty, value[1].Content.Value<string>("invariantText"));
-            Assert.AreEqual("The default value", value[1].Content.Value<string>("invariantText", fallback: Fallback.ToDefaultValue, defaultValue: "The default value"));
+            Assert.That(value[1].Content.Value<string>("invariantText"), Is.EqualTo(string.Empty));
+            Assert.That(value[1].Content.Value<string>("invariantText", fallback: Fallback.ToDefaultValue, defaultValue: "The default value"), Is.EqualTo("The default value"));
 
             // "variantText" has a value in Danish, so it won't perform fallback.
-            Assert.AreEqual("#2: The content value in Danish", value[1].Content.Value<string>("variantText"));
-            Assert.AreEqual("#2: The content value in Danish", value[1].Content.Value<string>("variantText", culture: "da-DK"));
-            Assert.AreEqual("#2: The content value in Danish", value[1].Content.Value<string>("variantText", culture: "da-DK", fallback: Fallback.ToDefaultLanguage));
-            Assert.AreEqual("#2: The content value in Danish", value[1].Content.Value<string>("variantText", fallback: Fallback.ToDefaultValue, defaultValue: "The default value"));
+            Assert.That(value[1].Content.Value<string>("variantText"), Is.EqualTo("#2: The content value in Danish"));
+            Assert.That(value[1].Content.Value<string>("variantText", culture: "da-DK"), Is.EqualTo("#2: The content value in Danish"));
+            Assert.That(value[1].Content.Value<string>("variantText", culture: "da-DK", fallback: Fallback.ToDefaultLanguage), Is.EqualTo("#2: The content value in Danish"));
+            Assert.That(value[1].Content.Value<string>("variantText", fallback: Fallback.ToDefaultValue, defaultValue: "The default value"), Is.EqualTo("#2: The content value in Danish"));
 
             // "variantText" has no value in English, so it will perform fallback.
-            Assert.AreEqual(string.Empty, value[1].Content.Value<string>("variantText", culture: "en-US"));
-            Assert.AreEqual("The default value", value[1].Content.Value<string>("variantText", culture: "en-US", fallback: Fallback.ToDefaultValue, defaultValue: "The default value"));
+            Assert.That(value[1].Content.Value<string>("variantText", culture: "en-US"), Is.EqualTo(string.Empty));
+            Assert.That(value[1].Content.Value<string>("variantText", culture: "en-US", fallback: Fallback.ToDefaultValue, defaultValue: "The default value"), Is.EqualTo("The default value"));
         });
     }
 }

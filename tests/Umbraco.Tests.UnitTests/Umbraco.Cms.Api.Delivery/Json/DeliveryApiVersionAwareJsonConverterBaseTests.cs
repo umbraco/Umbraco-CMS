@@ -101,7 +101,7 @@ public class DeliveryApiVersionAwareJsonConverterBaseTests
         foreach (var propertyName in expectedPropertyNames)
         {
             var expectedValue = GetPropertyValue(propertyName);
-            Assert.AreEqual(expectedValue, root.GetProperty(propertyName).GetString());
+            Assert.That(root.GetProperty(propertyName).GetString(), Is.EqualTo(expectedValue));
         }
     }
 
@@ -146,8 +146,8 @@ public class DeliveryApiVersionAwareJsonConverterBaseTests
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(expectedFirstPropertyName, firstProperty.Name);
-            Assert.AreEqual(expectedLastPropertyName, lastProperty.Name);
+            Assert.That(firstProperty.Name, Is.EqualTo(expectedFirstPropertyName));
+            Assert.That(lastProperty.Name, Is.EqualTo(expectedLastPropertyName));
         });
     }
 

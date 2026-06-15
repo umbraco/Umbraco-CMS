@@ -37,9 +37,9 @@ public class HtmlLocalLinkParserTests
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(2, result.Count);
-            Assert.Contains(UdiParser.Parse("umb://document/eed5fc6b-96fd-45a5-a0f1-b1adfb483c2f"), result);
-            Assert.Contains(UdiParser.Parse("umb://media/7e21a725-b905-4c5f-86dc-8c41ec116e39"), result);
+            Assert.That(result, Has.Count.EqualTo(2));
+            Assert.That(result, Does.Contain(UdiParser.Parse("umb://document/eed5fc6b-96fd-45a5-a0f1-b1adfb483c2f")));
+            Assert.That(result, Does.Contain(UdiParser.Parse("umb://media/7e21a725-b905-4c5f-86dc-8c41ec116e39")));
         });
     }
 
@@ -62,9 +62,9 @@ public class HtmlLocalLinkParserTests
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(2, result.Count);
-            Assert.Contains(UdiParser.Parse("umb://document/C093961595094900AAF9170DDE6AD442"), result);
-            Assert.Contains(UdiParser.Parse("umb://document-type/2D692FCB070B4CDA92FB6883FDBFD6E2"), result);
+            Assert.That(result, Has.Count.EqualTo(2));
+            Assert.That(result, Does.Contain(UdiParser.Parse("umb://document/C093961595094900AAF9170DDE6AD442")));
+            Assert.That(result, Does.Contain(UdiParser.Parse("umb://document-type/2D692FCB070B4CDA92FB6883FDBFD6E2")));
         });
     }
 
@@ -95,11 +95,11 @@ public class HtmlLocalLinkParserTests
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(4, result.Count);
-            Assert.Contains(UdiParser.Parse("umb://document/eed5fc6b-96fd-45a5-a0f1-b1adfb483c2f"), result);
-            Assert.Contains(UdiParser.Parse("umb://media/7e21a725-b905-4c5f-86dc-8c41ec116e39"), result);
-            Assert.Contains(UdiParser.Parse("umb://document/C093961595094900AAF9170DDE6AD442"), result);
-            Assert.Contains(UdiParser.Parse("umb://document-type/2D692FCB070B4CDA92FB6883FDBFD6E2"), result);
+            Assert.That(result, Has.Count.EqualTo(4));
+            Assert.That(result, Does.Contain(UdiParser.Parse("umb://document/eed5fc6b-96fd-45a5-a0f1-b1adfb483c2f")));
+            Assert.That(result, Does.Contain(UdiParser.Parse("umb://media/7e21a725-b905-4c5f-86dc-8c41ec116e39")));
+            Assert.That(result, Does.Contain(UdiParser.Parse("umb://document/C093961595094900AAF9170DDE6AD442")));
+            Assert.That(result, Does.Contain(UdiParser.Parse("umb://document-type/2D692FCB070B4CDA92FB6883FDBFD6E2")));
         });
     }
 
@@ -246,7 +246,7 @@ public class HtmlLocalLinkParserTests
 
             var output = linkParser.EnsureInternalLinks(input);
 
-            Assert.AreEqual(result, output);
+            Assert.That(output, Is.EqualTo(result));
         }
     }
 
@@ -308,8 +308,8 @@ public class HtmlLocalLinkParserTests
             var absoluteOutput = linkParser.EnsureInternalLinks(input, UrlMode.Absolute);
 
             // Assert
-            Assert.AreEqual("hello href=\"/relative-url\" world", relativeOutput);
-            Assert.AreEqual("hello href=\"http://example.com/absolute-url\" world", absoluteOutput);
+            Assert.That(relativeOutput, Is.EqualTo("hello href=\"/relative-url\" world"));
+            Assert.That(absoluteOutput, Is.EqualTo("hello href=\"http://example.com/absolute-url\" world"));
         }
     }
 
@@ -437,7 +437,7 @@ public class HtmlLocalLinkParserTests
 
             var output = linkParser.EnsureInternalLinks(input, urlMode);
 
-            Assert.AreEqual(expectedResult, output);
+            Assert.That(output, Is.EqualTo(expectedResult));
         }
     }
 
@@ -544,7 +544,7 @@ public class HtmlLocalLinkParserTests
             var output = linkParser.EnsureInternalLinks(input);
 
             // Assert
-            Assert.AreEqual(expected, output);
+            Assert.That(output, Is.EqualTo(expected));
         }
     }
 
@@ -608,7 +608,7 @@ public class HtmlLocalLinkParserTests
             var output = linkParser.EnsureInternalLinks(input);
 
             // Assert
-            Assert.AreEqual(expected, output);
+            Assert.That(output, Is.EqualTo(expected));
         }
     }
 
@@ -662,7 +662,7 @@ public class HtmlLocalLinkParserTests
             var output = linkParser.EnsureInternalLinks(input);
 
             // Assert
-            Assert.AreEqual(expected, output);
+            Assert.That(output, Is.EqualTo(expected));
         }
     }
 }

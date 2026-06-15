@@ -28,47 +28,47 @@ public class MemberTests
         var clone = (Member)member.DeepClone();
 
         // Assert
-        Assert.AreNotSame(clone, member);
-        Assert.AreEqual(clone, member);
-        Assert.AreEqual(clone.Id, member.Id);
-        Assert.AreEqual(clone.VersionId, member.VersionId);
-        Assert.AreEqual(clone.ContentType, member.ContentType);
-        Assert.AreEqual(clone.ContentTypeId, member.ContentTypeId);
-        Assert.AreEqual(clone.CreateDate, member.CreateDate);
-        Assert.AreEqual(clone.CreatorId, member.CreatorId);
-        Assert.AreEqual(clone.Comments, member.Comments);
-        Assert.AreEqual(clone.Key, member.Key);
-        Assert.AreEqual(clone.FailedPasswordAttempts, member.FailedPasswordAttempts);
-        Assert.AreEqual(clone.Level, member.Level);
-        Assert.AreEqual(clone.Path, member.Path);
-        Assert.AreEqual(clone.Groups, member.Groups);
-        Assert.AreEqual(clone.Groups.Count(), member.Groups.Count());
-        Assert.AreEqual(clone.IsApproved, member.IsApproved);
-        Assert.AreEqual(clone.IsLockedOut, member.IsLockedOut);
-        Assert.AreEqual(clone.SortOrder, member.SortOrder);
-        Assert.AreEqual(clone.LastLockoutDate, member.LastLockoutDate);
-        Assert.AreNotSame(clone.LastLoginDate, member.LastLoginDate);
-        Assert.AreEqual(clone.LastPasswordChangeDate, member.LastPasswordChangeDate);
-        Assert.AreEqual(clone.Trashed, member.Trashed);
-        Assert.AreEqual(clone.UpdateDate, member.UpdateDate);
-        Assert.AreEqual(clone.VersionId, member.VersionId);
-        Assert.AreEqual(clone.RawPasswordValue, member.RawPasswordValue);
-        Assert.AreNotSame(clone.Properties, member.Properties);
-        Assert.AreEqual(clone.Properties.Count(), member.Properties.Count());
+        Assert.That(member, Is.Not.SameAs(clone));
+        Assert.That(member, Is.EqualTo(clone));
+        Assert.That(member.Id, Is.EqualTo(clone.Id));
+        Assert.That(member.VersionId, Is.EqualTo(clone.VersionId));
+        Assert.That(member.ContentType, Is.EqualTo(clone.ContentType));
+        Assert.That(member.ContentTypeId, Is.EqualTo(clone.ContentTypeId));
+        Assert.That(member.CreateDate, Is.EqualTo(clone.CreateDate));
+        Assert.That(member.CreatorId, Is.EqualTo(clone.CreatorId));
+        Assert.That(member.Comments, Is.EqualTo(clone.Comments));
+        Assert.That(member.Key, Is.EqualTo(clone.Key));
+        Assert.That(member.FailedPasswordAttempts, Is.EqualTo(clone.FailedPasswordAttempts));
+        Assert.That(member.Level, Is.EqualTo(clone.Level));
+        Assert.That(member.Path, Is.EqualTo(clone.Path));
+        Assert.That(member.Groups, Is.EqualTo(clone.Groups));
+        Assert.That(member.Groups.Count(), Is.EqualTo(clone.Groups.Count()));
+        Assert.That(member.IsApproved, Is.EqualTo(clone.IsApproved));
+        Assert.That(member.IsLockedOut, Is.EqualTo(clone.IsLockedOut));
+        Assert.That(member.SortOrder, Is.EqualTo(clone.SortOrder));
+        Assert.That(member.LastLockoutDate, Is.EqualTo(clone.LastLockoutDate));
+        Assert.That(member.LastLoginDate, Is.Not.EqualTo(clone.LastLoginDate));
+        Assert.That(member.LastPasswordChangeDate, Is.EqualTo(clone.LastPasswordChangeDate));
+        Assert.That(member.Trashed, Is.EqualTo(clone.Trashed));
+        Assert.That(member.UpdateDate, Is.EqualTo(clone.UpdateDate));
+        Assert.That(member.VersionId, Is.EqualTo(clone.VersionId));
+        Assert.That(member.RawPasswordValue, Is.EqualTo(clone.RawPasswordValue));
+        Assert.That(member.Properties, Is.Not.SameAs(clone.Properties));
+        Assert.That(member.Properties.Count(), Is.EqualTo(clone.Properties.Count()));
         for (var index = 0; index < member.Properties.Count; index++)
         {
-            Assert.AreNotSame(clone.Properties[index], member.Properties[index]);
-            Assert.AreEqual(clone.Properties[index], member.Properties[index]);
+            Assert.That(member.Properties[index], Is.Not.SameAs(clone.Properties[index]));
+            Assert.That(member.Properties[index], Is.EqualTo(clone.Properties[index]));
         }
 
         // this can be the same, it is immutable
-        Assert.AreSame(clone.ContentType, member.ContentType);
+        Assert.That(member.ContentType, Is.SameAs(clone.ContentType));
 
         // This double verifies by reflection
         var allProps = clone.GetType().GetProperties();
         foreach (var propertyInfo in allProps)
         {
-            Assert.AreEqual(propertyInfo.GetValue(clone, null), propertyInfo.GetValue(member, null));
+            Assert.That(propertyInfo.GetValue(member, null), Is.EqualTo(propertyInfo.GetValue(clone, null)));
         }
     }
 

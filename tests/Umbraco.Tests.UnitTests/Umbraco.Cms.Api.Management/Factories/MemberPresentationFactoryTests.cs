@@ -64,8 +64,8 @@ public class MemberPresentationFactoryTests
         MemberResponseModel result = await _sut.CreateResponseModelAsync(member.Object, user.Object);
 
         // Assert
-        Assert.AreEqual(memberKey, result.Id);
-        Assert.AreEqual("content@test.com", result.Email);
+        Assert.That(result.Id, Is.EqualTo(memberKey));
+        Assert.That(result.Email, Is.EqualTo("content@test.com"));
         _mockMapper.Verify(x => x.Map<MemberResponseModel>(member.Object), Times.Once);
     }
 
@@ -85,7 +85,7 @@ public class MemberPresentationFactoryTests
         MemberResponseModel result = await _sut.CreateResponseModelAsync(member.Object, user.Object);
 
         // Assert
-        Assert.IsTrue(result.IsTwoFactorEnabled);
+        Assert.That(result.IsTwoFactorEnabled, Is.True);
     }
 
     [Test]
@@ -103,7 +103,7 @@ public class MemberPresentationFactoryTests
         MemberResponseModel result = await _sut.CreateResponseModelAsync(member.Object, user.Object);
 
         // Assert
-        Assert.AreEqual(MemberKind.Default, result.Kind);
+        Assert.That(result.Kind, Is.EqualTo(MemberKind.Default));
     }
 
     [Test]
@@ -158,9 +158,9 @@ public class MemberPresentationFactoryTests
         MemberResponseModel result = await _sut.CreateResponseModelAsync(member.Object, user.Object);
 
         // Assert — sensitive fields are reset.
-        Assert.IsFalse(result.IsApproved);
-        Assert.IsFalse(result.IsLockedOut);
-        Assert.IsNull(result.LastLoginDate);
+        Assert.That(result.IsApproved, Is.False);
+        Assert.That(result.IsLockedOut, Is.False);
+        Assert.That(result.LastLoginDate, Is.Null);
     }
 
     [Test]
@@ -187,7 +187,7 @@ public class MemberPresentationFactoryTests
             members.Select(m => m.Object), user.Object);
 
         // Assert
-        Assert.AreEqual(2, results.Count());
+        Assert.That(results.Count(), Is.EqualTo(2));
     }
 
     [Test]
@@ -203,8 +203,8 @@ public class MemberPresentationFactoryTests
         MemberItemResponseModel result = _sut.CreateItemResponseModel(member.Object);
 
         // Assert
-        Assert.AreEqual(memberKey, result.Id);
-        Assert.AreEqual(MemberKind.Default, result.Kind);
+        Assert.That(result.Id, Is.EqualTo(memberKey));
+        Assert.That(result.Kind, Is.EqualTo(MemberKind.Default));
     }
 
     [Test]
@@ -220,9 +220,9 @@ public class MemberPresentationFactoryTests
         MemberItemResponseModel result = _sut.CreateItemResponseModel(member.Object);
 
         // Assert
-        Assert.AreEqual(1, result.Variants.Count());
-        Assert.AreEqual("Test Name", result.Variants.First().Name);
-        Assert.IsNull(result.Variants.First().Culture);
+        Assert.That(result.Variants.Count(), Is.EqualTo(1));
+        Assert.That(result.Variants.First().Name, Is.EqualTo("Test Name"));
+        Assert.That(result.Variants.First().Culture, Is.Null);
     }
 
     [Test]
@@ -236,7 +236,7 @@ public class MemberPresentationFactoryTests
         MemberResponseModel result = await _sut.CreateExternalMemberResponseModelAsync(member);
 
         // Assert
-        Assert.AreEqual(MemberKind.ExternalOnly, result.Kind);
+        Assert.That(result.Kind, Is.EqualTo(MemberKind.ExternalOnly));
     }
 
     [Test]
@@ -250,11 +250,11 @@ public class MemberPresentationFactoryTests
         MemberResponseModel result = await _sut.CreateExternalMemberResponseModelAsync(member);
 
         // Assert
-        Assert.AreEqual(member.Key, result.Id);
-        Assert.AreEqual("external@test.com", result.Email);
-        Assert.AreEqual("external@test.com", result.Username);
-        Assert.IsTrue(result.IsApproved);
-        Assert.IsFalse(result.IsLockedOut);
+        Assert.That(result.Id, Is.EqualTo(member.Key));
+        Assert.That(result.Email, Is.EqualTo("external@test.com"));
+        Assert.That(result.Username, Is.EqualTo("external@test.com"));
+        Assert.That(result.IsApproved, Is.True);
+        Assert.That(result.IsLockedOut, Is.False);
     }
 
     [Test]
@@ -268,9 +268,9 @@ public class MemberPresentationFactoryTests
         MemberResponseModel result = await _sut.CreateExternalMemberResponseModelAsync(member);
 
         // Assert — one variant with the member name, but no content values.
-        Assert.AreEqual(1, result.Variants.Count());
-        Assert.AreEqual(member.Name, result.Variants.First().Name);
-        Assert.IsFalse(result.Values.Any());
+        Assert.That(result.Variants.Count(), Is.EqualTo(1));
+        Assert.That(result.Variants.First().Name, Is.EqualTo(member.Name));
+        Assert.That(result.Values.Any(), Is.False);
     }
 
     [Test]
@@ -303,7 +303,7 @@ public class MemberPresentationFactoryTests
         MemberResponseModel result = await _sut.CreateExternalMemberResponseModelAsync(member);
 
         // Assert
-        Assert.IsFalse(result.IsTwoFactorEnabled);
+        Assert.That(result.IsTwoFactorEnabled, Is.False);
     }
 
     [Test]
@@ -329,9 +329,9 @@ public class MemberPresentationFactoryTests
         MemberResponseModel result = await _sut.CreateExternalMemberResponseModelAsync(member);
 
         // Assert
-        Assert.AreEqual(loginDate, result.LastLoginDate!.Value.UtcDateTime);
-        Assert.AreEqual(lockoutDate, result.LastLockoutDate!.Value.UtcDateTime);
-        Assert.IsNull(result.LastPasswordChangeDate);
+        Assert.That(result.LastLoginDate!.Value.UtcDateTime, Is.EqualTo(loginDate));
+        Assert.That(result.LastLockoutDate!.Value.UtcDateTime, Is.EqualTo(lockoutDate));
+        Assert.That(result.LastPasswordChangeDate, Is.Null);
     }
 
     private static Mock<IMember> CreateMockMember(Guid key, string email, string username)
@@ -388,12 +388,12 @@ public class MemberPresentationFactoryTests
         MemberResponseModel result = _sut.CreateFilterItemResponseModel(item);
 
         // Assert
-        Assert.AreEqual(item.Key, result.Id);
-        Assert.AreEqual("filter-content@test.com", result.Email);
-        Assert.AreEqual(MemberKind.Default, result.Kind);
-        Assert.AreEqual(memberTypeKey, result.MemberType.Id);
-        Assert.AreEqual("icon-user", result.MemberType.Icon);
-        Assert.AreEqual("Filter Content", result.Variants.First().Name);
+        Assert.That(result.Id, Is.EqualTo(item.Key));
+        Assert.That(result.Email, Is.EqualTo("filter-content@test.com"));
+        Assert.That(result.Kind, Is.EqualTo(MemberKind.Default));
+        Assert.That(result.MemberType.Id, Is.EqualTo(memberTypeKey));
+        Assert.That(result.MemberType.Icon, Is.EqualTo("icon-user"));
+        Assert.That(result.Variants.First().Name, Is.EqualTo("Filter Content"));
     }
 
     [Test]
@@ -417,10 +417,10 @@ public class MemberPresentationFactoryTests
         MemberResponseModel result = _sut.CreateFilterItemResponseModel(item);
 
         // Assert
-        Assert.AreEqual(item.Key, result.Id);
-        Assert.AreEqual(MemberKind.ExternalOnly, result.Kind);
-        Assert.AreEqual(Guid.Empty, result.MemberType.Id);
-        Assert.AreEqual(string.Empty, result.MemberType.Icon);
+        Assert.That(result.Id, Is.EqualTo(item.Key));
+        Assert.That(result.Kind, Is.EqualTo(MemberKind.ExternalOnly));
+        Assert.That(result.MemberType.Id, Is.EqualTo(Guid.Empty));
+        Assert.That(result.MemberType.Icon, Is.EqualTo(string.Empty));
     }
 
     private static ExternalMemberIdentity CreateExternalMember() => new()

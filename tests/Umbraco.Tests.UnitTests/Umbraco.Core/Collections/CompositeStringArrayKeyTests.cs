@@ -15,9 +15,9 @@ public class CompositeStringArrayKeyTests
         var key1 = new CompositeStringArrayKey("a", "b", "c");
         var key2 = new CompositeStringArrayKey("a", "b", "c");
 
-        Assert.IsTrue(key1.Equals(key2));
-        Assert.IsTrue(key1 == key2);
-        Assert.AreEqual(key1.GetHashCode(), key2.GetHashCode());
+        Assert.That(key1, Is.EqualTo(key2));
+        Assert.That(key1, Is.EqualTo(key2));
+        Assert.That(key2.GetHashCode(), Is.EqualTo(key1.GetHashCode()));
     }
 
     [Test]
@@ -26,8 +26,8 @@ public class CompositeStringArrayKeyTests
         var key1 = new CompositeStringArrayKey("a", "b", "c");
         var key2 = new CompositeStringArrayKey("a", "b", "d");
 
-        Assert.IsFalse(key1.Equals(key2));
-        Assert.IsTrue(key1 != key2);
+        Assert.That(key1, Is.Not.EqualTo(key2));
+        Assert.That(key1, Is.Not.EqualTo(key2));
     }
 
     [Test]
@@ -36,8 +36,8 @@ public class CompositeStringArrayKeyTests
         var key1 = new CompositeStringArrayKey("Hello", "World");
         var key2 = new CompositeStringArrayKey("hello", "world");
 
-        Assert.IsTrue(key1.Equals(key2));
-        Assert.AreEqual(key1.GetHashCode(), key2.GetHashCode());
+        Assert.That(key1, Is.EqualTo(key2));
+        Assert.That(key2.GetHashCode(), Is.EqualTo(key1.GetHashCode()));
     }
 
     [Test]
@@ -46,7 +46,7 @@ public class CompositeStringArrayKeyTests
         var key1 = new CompositeStringArrayKey("a", "b");
         var key2 = new CompositeStringArrayKey("a", "b", "c");
 
-        Assert.IsFalse(key1.Equals(key2));
+        Assert.That(key1, Is.Not.EqualTo(key2));
     }
 
     [Test]
@@ -64,7 +64,7 @@ public class CompositeStringArrayKeyTests
         dict[key] = "value";
 
         var lookup = new CompositeStringArrayKey("CULTURE", "SEGMENT", "FALLBACK");
-        Assert.IsTrue(dict.ContainsKey(lookup));
-        Assert.AreEqual("value", dict[lookup]);
+        Assert.That(dict.ContainsKey(lookup), Is.True);
+        Assert.That(dict[lookup], Is.EqualTo("value"));
     }
 }

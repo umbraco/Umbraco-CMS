@@ -30,7 +30,7 @@ public class ImageCropperValueConverterTests : PropertyValueConverterTests
         publishedPropertyType.SetupGet(p => p.DataType).Returns(publishedDataType);
 
         var valueConverter = new ImageCropperValueConverter(Mock.Of<ILogger<ImageCropperValueConverter>>(), new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory()));
-        Assert.AreEqual(typeof(ApiImageCropperValue), valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType.Object));
+        Assert.That(valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType.Object), Is.EqualTo(typeof(ApiImageCropperValue)));
 
         var serializer = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
         var source = serializer.Serialize(new ImageCropperValue
@@ -48,20 +48,20 @@ public class ImageCropperValueConverterTests : PropertyValueConverterTests
             });
         var inter = valueConverter.ConvertSourceToIntermediate(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, source, false);
         var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false, false) as ApiImageCropperValue;
-        Assert.NotNull(result);
-        Assert.AreEqual("/some/file.jpg", result.Url);
-        Assert.NotNull(result.FocalPoint);
-        Assert.AreEqual(.2m, result.FocalPoint.Left);
-        Assert.AreEqual(.4m, result.FocalPoint.Top);
-        Assert.NotNull(result.Crops);
-        Assert.AreEqual(1, result.Crops.Count());
-        Assert.AreEqual("one", result.Crops.First().Alias);
-        Assert.AreEqual(100, result.Crops.First().Height);
-        Assert.AreEqual(200, result.Crops.First().Width);
-        Assert.NotNull(result.Crops.First().Coordinates);
-        Assert.AreEqual(1m, result.Crops.First().Coordinates.X1);
-        Assert.AreEqual(2m, result.Crops.First().Coordinates.X2);
-        Assert.AreEqual(10m, result.Crops.First().Coordinates.Y1);
-        Assert.AreEqual(20m, result.Crops.First().Coordinates.Y2);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Url, Is.EqualTo("/some/file.jpg"));
+        Assert.That(result.FocalPoint, Is.Not.Null);
+        Assert.That(result.FocalPoint.Left, Is.EqualTo(.2m));
+        Assert.That(result.FocalPoint.Top, Is.EqualTo(.4m));
+        Assert.That(result.Crops, Is.Not.Null);
+        Assert.That(result.Crops.Count(), Is.EqualTo(1));
+        Assert.That(result.Crops.First().Alias, Is.EqualTo("one"));
+        Assert.That(result.Crops.First().Height, Is.EqualTo(100));
+        Assert.That(result.Crops.First().Width, Is.EqualTo(200));
+        Assert.That(result.Crops.First().Coordinates, Is.Not.Null);
+        Assert.That(result.Crops.First().Coordinates.X1, Is.EqualTo(1m));
+        Assert.That(result.Crops.First().Coordinates.X2, Is.EqualTo(2m));
+        Assert.That(result.Crops.First().Coordinates.Y1, Is.EqualTo(10m));
+        Assert.That(result.Crops.First().Coordinates.Y2, Is.EqualTo(20m));
     }
 }

@@ -40,7 +40,7 @@ public class HtmlHelperExtensionMethodsTests
     {
         var result = _htmlHelper.Truncate(SampleWithAnchorElement, 25).ToString();
 
-        Assert.AreEqual("Hello world, this is some&hellip;", result);
+        Assert.That(result, Is.EqualTo("Hello world, this is some&hellip;"));
     }
 
     [Test]
@@ -48,7 +48,7 @@ public class HtmlHelperExtensionMethodsTests
     {
         var result = _htmlHelper.Truncate(SampleWithAnchorElement, 26).ToString();
 
-        Assert.AreEqual("Hello world, this is some&hellip;", result);
+        Assert.That(result, Is.EqualTo("Hello world, this is some&hellip;"));
     }
 
     [Test]
@@ -56,7 +56,7 @@ public class HtmlHelperExtensionMethodsTests
     {
         var result = _htmlHelper.Truncate(SampleWithAnchorElement, 24).ToString();
 
-        Assert.AreEqual("Hello world, this is som&hellip;", result);
+        Assert.That(result, Is.EqualTo("Hello world, this is som&hellip;"));
     }
 
     [Test]
@@ -64,7 +64,7 @@ public class HtmlHelperExtensionMethodsTests
     {
         var result = _htmlHelper.Truncate(SampleWithAnchorElement, 35).ToString();
 
-        Assert.AreEqual("Hello world, this is some text <a href='blah'>with&hellip;</a>", result);
+        Assert.That(result, Is.EqualTo("Hello world, this is some text <a href='blah'>with&hellip;</a>"));
     }
 
     [Test]
@@ -72,7 +72,7 @@ public class HtmlHelperExtensionMethodsTests
     {
         var result = _htmlHelper.TruncateByWords(SampleWithAnchorElement, 4).ToString();
 
-        Assert.AreEqual("Hello world, this is&hellip;", result);
+        Assert.That(result, Is.EqualTo("Hello world, this is&hellip;"));
     }
 
     [Test]
@@ -80,7 +80,7 @@ public class HtmlHelperExtensionMethodsTests
     {
         var result = _htmlHelper.TruncateByWords(SampleWithBoldAndAnchorElements, 4).ToString();
 
-        Assert.AreEqual("Hello world, <b>this</b> is&hellip;", result);
+        Assert.That(result, Is.EqualTo("Hello world, <b>this</b> is&hellip;"));
     }
 
     [Test]
@@ -88,7 +88,7 @@ public class HtmlHelperExtensionMethodsTests
     {
         var result = _htmlHelper.TruncateByWords(SampleWithAnchorElement, 7).ToString();
 
-        Assert.AreEqual("Hello world, this is some text <a href='blah'>with&hellip;</a>", result);
+        Assert.That(result, Is.EqualTo("Hello world, this is some text <a href='blah'>with&hellip;</a>"));
     }
 
     [Test]
@@ -96,7 +96,7 @@ public class HtmlHelperExtensionMethodsTests
     {
         var result = _htmlHelper.StripHtml(SampleWithBoldAndAnchorElements, null).ToString();
 
-        Assert.AreEqual("Hello world, this is some text with a link", result);
+        Assert.That(result, Is.EqualTo("Hello world, this is some text with a link"));
     }
 
     [Test]
@@ -106,7 +106,7 @@ public class HtmlHelperExtensionMethodsTests
 
         var result = _htmlHelper.StripHtml(SampleWithBoldAndAnchorElements, tags).ToString();
 
-        Assert.AreEqual(SampleWithAnchorElement, result);
+        Assert.That(result, Is.EqualTo(SampleWithAnchorElement));
     }
 
     [Test]
@@ -116,6 +116,6 @@ public class HtmlHelperExtensionMethodsTests
 
         var result = _htmlHelper.StripHtml(text).ToString();
 
-        Assert.AreEqual("Hello world, is some text with a link", result);
+        Assert.That(result, Is.EqualTo("Hello world, is some text with a link"));
     }
 }

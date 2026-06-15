@@ -33,10 +33,10 @@ public class TimeOnlyPropertyIndexValueFactoryTests
             new Dictionary<Guid, IContentType>())
             .ToList();
 
-        Assert.AreEqual(1, result.Count);
+        Assert.That(result, Has.Count.EqualTo(1));
         var indexValue = result.First();
-        Assert.AreEqual(indexValue.FieldName, "testAlias");
-        Assert.IsEmpty(indexValue.Values);
+        Assert.That(indexValue.FieldName, Is.EqualTo("testAlias"));
+        Assert.That(indexValue.Values, Is.Empty);
     }
 
     [Test]
@@ -59,11 +59,11 @@ public class TimeOnlyPropertyIndexValueFactoryTests
             new Dictionary<Guid, IContentType>())
             .ToList();
 
-        Assert.AreEqual(1, result.Count);
+        Assert.That(result, Has.Count.EqualTo(1));
         var indexValue = result.First();
-        Assert.AreEqual(indexValue.FieldName, "testAlias");
-        Assert.AreEqual(1, indexValue.Values.Count());
+        Assert.That(indexValue.FieldName, Is.EqualTo("testAlias"));
+        Assert.That(indexValue.Values.Count(), Is.EqualTo(1));
         var value = indexValue.Values.First();
-        Assert.AreEqual("11:00:00", value);
+        Assert.That(value, Is.EqualTo("11:00:00"));
     }
 }

@@ -21,15 +21,15 @@ internal sealed partial class MediaTypeEditingServiceTests
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(result.Success);
-            Assert.IsNotNull(mediaType);
-            Assert.AreEqual("testMediaType", mediaType.Alias);
-            Assert.AreEqual("Test Media Type", mediaType.Name);
-            Assert.AreEqual(result.Result.Id, mediaType.Id);
-            Assert.AreEqual(result.Result.Key, mediaType.Key);
-            Assert.AreEqual("This is the Test description", mediaType.Description);
-            Assert.AreEqual("icon icon-something", mediaType.Icon);
-            Assert.IsTrue(mediaType.AllowedAsRoot);
+            Assert.That(result.Success, Is.True);
+            Assert.That(mediaType, Is.Not.Null);
+            Assert.That(mediaType.Alias, Is.EqualTo("testMediaType"));
+            Assert.That(mediaType.Name, Is.EqualTo("Test Media Type"));
+            Assert.That(mediaType.Id, Is.EqualTo(result.Result.Id));
+            Assert.That(mediaType.Key, Is.EqualTo(result.Result.Key));
+            Assert.That(mediaType.Description, Is.EqualTo("This is the Test description"));
+            Assert.That(mediaType.Icon, Is.EqualTo("icon icon-something"));
+            Assert.That(mediaType.AllowedAsRoot, Is.True);
         });
     }
 
@@ -37,18 +37,18 @@ internal sealed partial class MediaTypeEditingServiceTests
     public async Task Can_Create_In_A_Folder()
     {
         var containerResult = MediaTypeService.CreateContainer(Constants.System.Root, Guid.NewGuid(), "Test folder");
-        Assert.IsTrue(containerResult.Success);
+        Assert.That(containerResult.Success, Is.True);
         var container = containerResult.Result?.Entity;
-        Assert.IsNotNull(container);
+        Assert.That(container, Is.Not.Null);
 
         var createModel = MediaTypeCreateModel("Test", "test", containerKey: container.Key);
         var result = await MediaTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
 
         // Ensure it's actually persisted in the folder
         var mediaType = await MediaTypeService.GetAsync(result.Result!.Key);
-        Assert.IsNotNull(mediaType);
-        Assert.AreEqual(container.Id, mediaType.ParentId);
+        Assert.That(mediaType, Is.Not.Null);
+        Assert.That(mediaType.ParentId, Is.EqualTo(container.Id));
     }
 
     [Test]
@@ -62,18 +62,18 @@ internal sealed partial class MediaTypeEditingServiceTests
         createModel.Properties = new[] { propertyType };
 
         var result = await MediaTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
 
         // Ensure it's actually persisted
         var mediaType = await MediaTypeService.GetAsync(result.Result!.Key);
 
-        Assert.IsNotNull(mediaType);
-        Assert.AreEqual(1, mediaType.PropertyGroups.Count);
-        Assert.AreEqual(1, mediaType.PropertyTypes.Count());
-        Assert.AreEqual(1, mediaType.PropertyGroups.First().PropertyTypes!.Count);
-        Assert.AreEqual("testProperty", mediaType.PropertyTypes.First().Alias);
-        Assert.AreEqual("testProperty", mediaType.PropertyGroups.First().PropertyTypes!.First().Alias);
-        Assert.IsEmpty(mediaType.NoGroupPropertyTypes);
+        Assert.That(mediaType, Is.Not.Null);
+        Assert.That(mediaType.PropertyGroups, Has.Count.EqualTo(1));
+        Assert.That(mediaType.PropertyTypes.Count(), Is.EqualTo(1));
+        Assert.That(mediaType.PropertyGroups.First().PropertyTypes!, Has.Count.EqualTo(1));
+        Assert.That(mediaType.PropertyTypes.First().Alias, Is.EqualTo("testProperty"));
+        Assert.That(mediaType.PropertyGroups.First().PropertyTypes!.First().Alias, Is.EqualTo("testProperty"));
+        Assert.That(mediaType.NoGroupPropertyTypes, Is.Empty);
     }
 
     [Test]
@@ -85,7 +85,7 @@ internal sealed partial class MediaTypeEditingServiceTests
             propertyTypes: new[] { parentProperty });
 
         var parentResult = await MediaTypeEditingService.CreateAsync(parentModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(parentResult.Success);
+        Assert.That(parentResult.Success, Is.True);
 
         var childProperty = MediaTypePropertyTypeModel("Child Property", "childProperty");
         var parentKey = parentResult.Result!.Key;
@@ -104,16 +104,16 @@ internal sealed partial class MediaTypeEditingServiceTests
 
         var result = await MediaTypeEditingService.CreateAsync(childModel, Constants.Security.SuperUserKey);
 
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
 
         var mediaType = result.Result!;
 
-        Assert.AreEqual(parentResult.Result.Id, mediaType.ParentId);
-        Assert.AreEqual(1, mediaType.ContentTypeComposition.Count());
-        Assert.AreEqual(parentResult.Result.Key, mediaType.ContentTypeComposition.FirstOrDefault()?.Key);
-        Assert.AreEqual(2, mediaType.CompositionPropertyTypes.Count());
-        Assert.IsTrue(mediaType.CompositionPropertyTypes.Any(x => x.Alias == parentProperty.Alias));
-        Assert.IsTrue(mediaType.CompositionPropertyTypes.Any(x => x.Alias == childProperty.Alias));
+        Assert.That(mediaType.ParentId, Is.EqualTo(parentResult.Result.Id));
+        Assert.That(mediaType.ContentTypeComposition.Count(), Is.EqualTo(1));
+        Assert.That(mediaType.ContentTypeComposition.FirstOrDefault()?.Key, Is.EqualTo(parentResult.Result.Key));
+        Assert.That(mediaType.CompositionPropertyTypes.Count(), Is.EqualTo(2));
+        Assert.That(mediaType.CompositionPropertyTypes.Any(x => x.Alias == parentProperty.Alias), Is.True);
+        Assert.That(mediaType.CompositionPropertyTypes.Any(x => x.Alias == childProperty.Alias), Is.True);
     }
 
     [Test]
@@ -129,7 +129,7 @@ internal sealed partial class MediaTypeEditingServiceTests
         compositionBase.Properties = new[] { compositionProperty };
 
         var compositionResult = await MediaTypeEditingService.CreateAsync(compositionBase, Constants.Security.SuperUserKey);
-        Assert.IsTrue(compositionResult.Success);
+        Assert.That(compositionResult.Success, Is.True);
         var compositionType = compositionResult.Result;
 
         // Create media type using the composition
@@ -140,17 +140,17 @@ internal sealed partial class MediaTypeEditingServiceTests
             });
 
         var result = await MediaTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
         var mediaType = await MediaTypeService.GetAsync(result.Result!.Key);
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(1, mediaType.ContentTypeComposition.Count());
-            Assert.AreEqual(compositionType.Key, mediaType.ContentTypeComposition.First().Key);
-            Assert.AreEqual(1, compositionType.CompositionPropertyGroups.Count());
-            Assert.AreEqual(container.Key, compositionType.CompositionPropertyGroups.First().Key);
-            Assert.AreEqual(1, compositionType.CompositionPropertyTypes.Count());
-            Assert.AreEqual(compositionProperty.Key, compositionType.CompositionPropertyTypes.First().Key);
+            Assert.That(mediaType.ContentTypeComposition.Count(), Is.EqualTo(1));
+            Assert.That(mediaType.ContentTypeComposition.First().Key, Is.EqualTo(compositionType.Key));
+            Assert.That(compositionType.CompositionPropertyGroups.Count(), Is.EqualTo(1));
+            Assert.That(compositionType.CompositionPropertyGroups.First().Key, Is.EqualTo(container.Key));
+            Assert.That(compositionType.CompositionPropertyTypes.Count(), Is.EqualTo(1));
+            Assert.That(compositionType.CompositionPropertyTypes.First().Key, Is.EqualTo(compositionProperty.Key));
         });
     }
 
@@ -167,7 +167,7 @@ internal sealed partial class MediaTypeEditingServiceTests
         compositionBase.Properties = new[] { compositionProperty };
 
         var compositionResult = await ContentTypeEditingService.CreateAsync(compositionBase, Constants.Security.SuperUserKey);
-        Assert.IsTrue(compositionResult.Success);
+        Assert.That(compositionResult.Success, Is.True);
         var compositionType = compositionResult.Result;
 
         // Create media type using the composition
@@ -178,7 +178,7 @@ internal sealed partial class MediaTypeEditingServiceTests
             });
 
         var result = await MediaTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentTypeOperationStatus.InvalidComposition, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentTypeOperationStatus.InvalidComposition));
     }
 }

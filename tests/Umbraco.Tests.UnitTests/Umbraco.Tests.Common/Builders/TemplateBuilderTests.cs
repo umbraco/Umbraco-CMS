@@ -42,16 +42,16 @@ public class TemplateBuilderTests
             .Build();
 
         // Assert
-        Assert.AreEqual(testId, template.Id);
-        Assert.AreEqual(testAlias, template.Alias);
-        Assert.AreEqual(testName, template.Name);
-        Assert.AreEqual(testCreateDate, template.CreateDate);
-        Assert.AreEqual(testUpdateDate, template.UpdateDate);
-        Assert.AreEqual(testKey, template.Key);
-        Assert.AreEqual(testPath, template.Path);
-        Assert.AreEqual(testContent, template.Content);
-        Assert.IsTrue(template.IsLayoutTemplate);
-        Assert.AreEqual(testLayoutTemplateAlias, template.LayoutTemplateAlias);
-        Assert.AreEqual(testLayoutTemplateId, ((Template)template).LayoutTemplateId.Value);
+        Assert.That(template.Id, Is.EqualTo(testId));
+        Assert.That(template.Alias, Is.EqualTo(testAlias));
+        Assert.That(template.Name, Is.EqualTo(testName));
+        Assert.That(template.CreateDate, Is.EqualTo(testCreateDate));
+        Assert.That(template.UpdateDate, Is.EqualTo(testUpdateDate));
+        Assert.That(template.Key, Is.EqualTo(testKey));
+        Assert.That(template.Path, Is.EqualTo(testPath));
+        Assert.That(template.Content, Is.EqualTo(testContent));
+        Assert.That(template.IsLayoutTemplate, Is.True);
+        Assert.That(template.LayoutTemplateAlias, Is.EqualTo(testLayoutTemplateAlias));
+        Assert.That(((Template)template).LayoutTemplateId.Value, Is.EqualTo(testLayoutTemplateId));
     }
 }

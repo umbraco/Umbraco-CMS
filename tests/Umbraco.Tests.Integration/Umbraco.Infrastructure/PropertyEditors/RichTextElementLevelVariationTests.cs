@@ -34,42 +34,42 @@ internal sealed class RichTextElementLevelVariationTests : BlockEditorElementVar
             "en-US",
             (element1, element2, element3) =>
             {
-                Assert.AreEqual("#1: The first invariant content value", element1.Properties["invariantText"]);
-                Assert.AreEqual("#1: The first content value in English", element1.Properties["variantText"]);
-                Assert.AreEqual("#2: The first invariant content value", element2.Properties["invariantText"]);
-                Assert.AreEqual("#2: The first content value in English", element2.Properties["variantText"]);
-                Assert.AreEqual("#3: The first invariant content value", element3.Properties["invariantText"]);
-                Assert.AreEqual("#3: The first content value in English", element3.Properties["variantText"]);
+                Assert.That(element1.Properties["invariantText"], Is.EqualTo("#1: The first invariant content value"));
+                Assert.That(element1.Properties["variantText"], Is.EqualTo("#1: The first content value in English"));
+                Assert.That(element2.Properties["invariantText"], Is.EqualTo("#2: The first invariant content value"));
+                Assert.That(element2.Properties["variantText"], Is.EqualTo("#2: The first content value in English"));
+                Assert.That(element3.Properties["invariantText"], Is.EqualTo("#3: The first invariant content value"));
+                Assert.That(element3.Properties["variantText"], Is.EqualTo("#3: The first content value in English"));
             },
             (element1, element2, element3) =>
             {
-                Assert.AreEqual("#1: The first invariant settings value", element1.Properties["invariantText"]);
-                Assert.AreEqual("#1: The first settings value in English", element1.Properties["variantText"]);
-                Assert.AreEqual("#2: The first invariant settings value", element2.Properties["invariantText"]);
-                Assert.AreEqual("#2: The first settings value in English", element2.Properties["variantText"]);
-                Assert.AreEqual("#3: The first invariant settings value", element3.Properties["invariantText"]);
-                Assert.AreEqual("#3: The first settings value in English", element3.Properties["variantText"]);
+                Assert.That(element1.Properties["invariantText"], Is.EqualTo("#1: The first invariant settings value"));
+                Assert.That(element1.Properties["variantText"], Is.EqualTo("#1: The first settings value in English"));
+                Assert.That(element2.Properties["invariantText"], Is.EqualTo("#2: The first invariant settings value"));
+                Assert.That(element2.Properties["variantText"], Is.EqualTo("#2: The first settings value in English"));
+                Assert.That(element3.Properties["invariantText"], Is.EqualTo("#3: The first invariant settings value"));
+                Assert.That(element3.Properties["variantText"], Is.EqualTo("#3: The first settings value in English"));
             });
 
         AssertPropertyValues(
             "da-DK",
             (element1, element2, element3) =>
             {
-                Assert.AreEqual("#1: The first invariant content value", element1.Properties["invariantText"]);
-                Assert.AreEqual("#1: The first content value in Danish", element1.Properties["variantText"]);
-                Assert.AreEqual("#2: The first invariant content value", element2.Properties["invariantText"]);
-                Assert.AreEqual("#2: The first content value in Danish", element2.Properties["variantText"]);
-                Assert.AreEqual("#3: The first invariant content value", element3.Properties["invariantText"]);
-                Assert.AreEqual("#3: The first content value in Danish", element3.Properties["variantText"]);
+                Assert.That(element1.Properties["invariantText"], Is.EqualTo("#1: The first invariant content value"));
+                Assert.That(element1.Properties["variantText"], Is.EqualTo("#1: The first content value in Danish"));
+                Assert.That(element2.Properties["invariantText"], Is.EqualTo("#2: The first invariant content value"));
+                Assert.That(element2.Properties["variantText"], Is.EqualTo("#2: The first content value in Danish"));
+                Assert.That(element3.Properties["invariantText"], Is.EqualTo("#3: The first invariant content value"));
+                Assert.That(element3.Properties["variantText"], Is.EqualTo("#3: The first content value in Danish"));
             },
             (element1, element2, element3) =>
             {
-                Assert.AreEqual("#1: The first invariant settings value", element1.Properties["invariantText"]);
-                Assert.AreEqual("#1: The first settings value in Danish", element1.Properties["variantText"]);
-                Assert.AreEqual("#2: The first invariant settings value", element2.Properties["invariantText"]);
-                Assert.AreEqual("#2: The first settings value in Danish", element2.Properties["variantText"]);
-                Assert.AreEqual("#3: The first invariant settings value", element3.Properties["invariantText"]);
-                Assert.AreEqual("#3: The first settings value in Danish", element3.Properties["variantText"]);
+                Assert.That(element1.Properties["invariantText"], Is.EqualTo("#1: The first invariant settings value"));
+                Assert.That(element1.Properties["variantText"], Is.EqualTo("#1: The first settings value in Danish"));
+                Assert.That(element2.Properties["invariantText"], Is.EqualTo("#2: The first invariant settings value"));
+                Assert.That(element2.Properties["variantText"], Is.EqualTo("#2: The first settings value in Danish"));
+                Assert.That(element3.Properties["invariantText"], Is.EqualTo("#3: The first invariant settings value"));
+                Assert.That(element3.Properties["variantText"], Is.EqualTo("#3: The first settings value in Danish"));
             });
 
         richTextValue = JsonSerializer.Deserialize<RichTextEditorValue>((string)content.Properties["blocks"]!.GetValue()!);
@@ -91,42 +91,42 @@ internal sealed class RichTextElementLevelVariationTests : BlockEditorElementVar
             "en-US",
             (element1, element2, element3) =>
             {
-                Assert.AreEqual("#1: The second invariant content value", element1.Properties["invariantText"]);
-                Assert.AreEqual("#1: The second content value in English", element1.Properties["variantText"]);
-                Assert.AreEqual("#2: The second invariant content value", element2.Properties["invariantText"]);
-                Assert.AreEqual("#2: The second content value in English", element2.Properties["variantText"]);
-                Assert.AreEqual("#3: The second invariant content value", element3.Properties["invariantText"]);
-                Assert.AreEqual("#3: The second content value in English", element3.Properties["variantText"]);
+                Assert.That(element1.Properties["invariantText"], Is.EqualTo("#1: The second invariant content value"));
+                Assert.That(element1.Properties["variantText"], Is.EqualTo("#1: The second content value in English"));
+                Assert.That(element2.Properties["invariantText"], Is.EqualTo("#2: The second invariant content value"));
+                Assert.That(element2.Properties["variantText"], Is.EqualTo("#2: The second content value in English"));
+                Assert.That(element3.Properties["invariantText"], Is.EqualTo("#3: The second invariant content value"));
+                Assert.That(element3.Properties["variantText"], Is.EqualTo("#3: The second content value in English"));
             },
             (element1, element2, element3) =>
             {
-                Assert.AreEqual("#1: The second invariant settings value", element1.Properties["invariantText"]);
-                Assert.AreEqual("#1: The second settings value in English", element1.Properties["variantText"]);
-                Assert.AreEqual("#2: The second invariant settings value", element2.Properties["invariantText"]);
-                Assert.AreEqual("#2: The second settings value in English", element2.Properties["variantText"]);
-                Assert.AreEqual("#3: The second invariant settings value", element3.Properties["invariantText"]);
-                Assert.AreEqual("#3: The second settings value in English", element3.Properties["variantText"]);
+                Assert.That(element1.Properties["invariantText"], Is.EqualTo("#1: The second invariant settings value"));
+                Assert.That(element1.Properties["variantText"], Is.EqualTo("#1: The second settings value in English"));
+                Assert.That(element2.Properties["invariantText"], Is.EqualTo("#2: The second invariant settings value"));
+                Assert.That(element2.Properties["variantText"], Is.EqualTo("#2: The second settings value in English"));
+                Assert.That(element3.Properties["invariantText"], Is.EqualTo("#3: The second invariant settings value"));
+                Assert.That(element3.Properties["variantText"], Is.EqualTo("#3: The second settings value in English"));
             });
 
         AssertPropertyValues(
             "da-DK",
             (element1, element2, element3) =>
             {
-                Assert.AreEqual("#1: The second invariant content value", element1.Properties["invariantText"]);
-                Assert.AreEqual("#1: The first content value in Danish", element1.Properties["variantText"]);
-                Assert.AreEqual("#2: The second invariant content value", element2.Properties["invariantText"]);
-                Assert.AreEqual("#2: The first content value in Danish", element2.Properties["variantText"]);
-                Assert.AreEqual("#3: The second invariant content value", element3.Properties["invariantText"]);
-                Assert.AreEqual("#3: The first content value in Danish", element3.Properties["variantText"]);
+                Assert.That(element1.Properties["invariantText"], Is.EqualTo("#1: The second invariant content value"));
+                Assert.That(element1.Properties["variantText"], Is.EqualTo("#1: The first content value in Danish"));
+                Assert.That(element2.Properties["invariantText"], Is.EqualTo("#2: The second invariant content value"));
+                Assert.That(element2.Properties["variantText"], Is.EqualTo("#2: The first content value in Danish"));
+                Assert.That(element3.Properties["invariantText"], Is.EqualTo("#3: The second invariant content value"));
+                Assert.That(element3.Properties["variantText"], Is.EqualTo("#3: The first content value in Danish"));
             },
             (element1, element2, element3) =>
             {
-                Assert.AreEqual("#1: The second invariant settings value", element1.Properties["invariantText"]);
-                Assert.AreEqual("#1: The first settings value in Danish", element1.Properties["variantText"]);
-                Assert.AreEqual("#2: The second invariant settings value", element2.Properties["invariantText"]);
-                Assert.AreEqual("#2: The first settings value in Danish", element2.Properties["variantText"]);
-                Assert.AreEqual("#3: The second invariant settings value", element3.Properties["invariantText"]);
-                Assert.AreEqual("#3: The first settings value in Danish", element3.Properties["variantText"]);
+                Assert.That(element1.Properties["invariantText"], Is.EqualTo("#1: The second invariant settings value"));
+                Assert.That(element1.Properties["variantText"], Is.EqualTo("#1: The first settings value in Danish"));
+                Assert.That(element2.Properties["invariantText"], Is.EqualTo("#2: The second invariant settings value"));
+                Assert.That(element2.Properties["variantText"], Is.EqualTo("#2: The first settings value in Danish"));
+                Assert.That(element3.Properties["invariantText"], Is.EqualTo("#3: The second invariant settings value"));
+                Assert.That(element3.Properties["variantText"], Is.EqualTo("#3: The first settings value in Danish"));
             });
 
         PublishContent(content, ["da-DK"]);
@@ -135,21 +135,21 @@ internal sealed class RichTextElementLevelVariationTests : BlockEditorElementVar
             "da-DK",
             (element1, element2, element3) =>
             {
-                Assert.AreEqual("#1: The second invariant content value", element1.Properties["invariantText"]);
-                Assert.AreEqual("#1: The second content value in Danish", element1.Properties["variantText"]);
-                Assert.AreEqual("#2: The second invariant content value", element2.Properties["invariantText"]);
-                Assert.AreEqual("#2: The second content value in Danish", element2.Properties["variantText"]);
-                Assert.AreEqual("#3: The second invariant content value", element3.Properties["invariantText"]);
-                Assert.AreEqual("#3: The second content value in Danish", element3.Properties["variantText"]);
+                Assert.That(element1.Properties["invariantText"], Is.EqualTo("#1: The second invariant content value"));
+                Assert.That(element1.Properties["variantText"], Is.EqualTo("#1: The second content value in Danish"));
+                Assert.That(element2.Properties["invariantText"], Is.EqualTo("#2: The second invariant content value"));
+                Assert.That(element2.Properties["variantText"], Is.EqualTo("#2: The second content value in Danish"));
+                Assert.That(element3.Properties["invariantText"], Is.EqualTo("#3: The second invariant content value"));
+                Assert.That(element3.Properties["variantText"], Is.EqualTo("#3: The second content value in Danish"));
             },
             (element1, element2, element3) =>
             {
-                Assert.AreEqual("#1: The second invariant settings value", element1.Properties["invariantText"]);
-                Assert.AreEqual("#1: The second settings value in Danish", element1.Properties["variantText"]);
-                Assert.AreEqual("#2: The second invariant settings value", element2.Properties["invariantText"]);
-                Assert.AreEqual("#2: The second settings value in Danish", element2.Properties["variantText"]);
-                Assert.AreEqual("#3: The second invariant settings value", element3.Properties["invariantText"]);
-                Assert.AreEqual("#3: The second settings value in Danish", element3.Properties["variantText"]);
+                Assert.That(element1.Properties["invariantText"], Is.EqualTo("#1: The second invariant settings value"));
+                Assert.That(element1.Properties["variantText"], Is.EqualTo("#1: The second settings value in Danish"));
+                Assert.That(element2.Properties["invariantText"], Is.EqualTo("#2: The second invariant settings value"));
+                Assert.That(element2.Properties["variantText"], Is.EqualTo("#2: The second settings value in Danish"));
+                Assert.That(element3.Properties["invariantText"], Is.EqualTo("#3: The second invariant settings value"));
+                Assert.That(element3.Properties["variantText"], Is.EqualTo("#3: The second settings value in Danish"));
             });
 
         void AssertPropertyValues(
@@ -160,13 +160,13 @@ internal sealed class RichTextElementLevelVariationTests : BlockEditorElementVar
             SetVariationContext(culture, null);
             var publishedContent = GetPublishedContent(content.Key);
             var property = publishedContent.GetProperty("blocks");
-            Assert.IsNotNull(property);
+            Assert.That(property, Is.Not.Null);
 
             var propertyValue = property.GetDeliveryApiValue(false, culture) as RichTextModel;
-            Assert.IsNotNull(propertyValue);
+            Assert.That(propertyValue, Is.Not.Null);
 
             var blocks = propertyValue.Blocks.ToArray();
-            Assert.AreEqual(3, blocks.Length);
+            Assert.That(blocks, Has.Length.EqualTo(3));
 
             Assert.Multiple(() =>
             {
@@ -204,7 +204,7 @@ internal sealed class RichTextElementLevelVariationTests : BlockEditorElementVar
         richTextValue.Blocks.ContentData.RemoveAt(1);
         richTextValue.Blocks.SettingsData.RemoveAt(1);
         richTextValue.Blocks.Expose.RemoveAll(v => v.ContentKey == contentKey);
-        Assert.AreEqual(4, richTextValue.Blocks.Expose.Count);
+        Assert.That(richTextValue.Blocks.Expose, Has.Count.EqualTo(4));
 
         richTextValue.Blocks.ContentData[0].Values[0].Value = "#1: The second invariant content value";
         richTextValue.Blocks.ContentData[0].Values[1].Value = "#1: The second content value in English";
@@ -225,43 +225,43 @@ internal sealed class RichTextElementLevelVariationTests : BlockEditorElementVar
 
         AssertPropertyValues("en-US", 2, blocks =>
         {
-            Assert.AreEqual("#1: The second invariant content value", blocks[0].Content.Properties["invariantText"]);
-            Assert.AreEqual("#1: The second content value in English", blocks[0].Content.Properties["variantText"]);
-            Assert.AreEqual("#3: The second invariant content value", blocks[1].Content.Properties["invariantText"]);
-            Assert.AreEqual("#3: The second content value in English", blocks[1].Content.Properties["variantText"]);
+            Assert.That(blocks[0].Content.Properties["invariantText"], Is.EqualTo("#1: The second invariant content value"));
+            Assert.That(blocks[0].Content.Properties["variantText"], Is.EqualTo("#1: The second content value in English"));
+            Assert.That(blocks[1].Content.Properties["invariantText"], Is.EqualTo("#3: The second invariant content value"));
+            Assert.That(blocks[1].Content.Properties["variantText"], Is.EqualTo("#3: The second content value in English"));
 
-            Assert.AreEqual("#1: The second invariant settings value", blocks[0].Settings!.Properties["invariantText"]);
-            Assert.AreEqual("#1: The second settings value in English", blocks[0].Settings.Properties["variantText"]);
-            Assert.AreEqual("#3: The second invariant settings value", blocks[1].Settings!.Properties["invariantText"]);
-            Assert.AreEqual("#3: The second settings value in English", blocks[1].Settings.Properties["variantText"]);
+            Assert.That(blocks[0].Settings!.Properties["invariantText"], Is.EqualTo("#1: The second invariant settings value"));
+            Assert.That(blocks[0].Settings.Properties["variantText"], Is.EqualTo("#1: The second settings value in English"));
+            Assert.That(blocks[1].Settings!.Properties["invariantText"], Is.EqualTo("#3: The second invariant settings value"));
+            Assert.That(blocks[1].Settings.Properties["variantText"], Is.EqualTo("#3: The second settings value in English"));
         });
 
         AssertPropertyValues("da-DK", 2, blocks =>
         {
-            Assert.AreEqual("#1: The second invariant content value", blocks[0].Content.Properties["invariantText"]);
-            Assert.AreEqual("#1: The first content value in Danish", blocks[0].Content.Properties["variantText"]);
-            Assert.AreEqual("#3: The second invariant content value", blocks[1].Content.Properties["invariantText"]);
-            Assert.AreEqual("#3: The first content value in Danish", blocks[1].Content.Properties["variantText"]);
+            Assert.That(blocks[0].Content.Properties["invariantText"], Is.EqualTo("#1: The second invariant content value"));
+            Assert.That(blocks[0].Content.Properties["variantText"], Is.EqualTo("#1: The first content value in Danish"));
+            Assert.That(blocks[1].Content.Properties["invariantText"], Is.EqualTo("#3: The second invariant content value"));
+            Assert.That(blocks[1].Content.Properties["variantText"], Is.EqualTo("#3: The first content value in Danish"));
 
-            Assert.AreEqual("#1: The second invariant settings value", blocks[0].Settings!.Properties["invariantText"]);
-            Assert.AreEqual("#1: The first settings value in Danish", blocks[0].Settings.Properties["variantText"]);
-            Assert.AreEqual("#3: The second invariant settings value", blocks[1].Settings!.Properties["invariantText"]);
-            Assert.AreEqual("#3: The first settings value in Danish", blocks[1].Settings.Properties["variantText"]);
+            Assert.That(blocks[0].Settings!.Properties["invariantText"], Is.EqualTo("#1: The second invariant settings value"));
+            Assert.That(blocks[0].Settings.Properties["variantText"], Is.EqualTo("#1: The first settings value in Danish"));
+            Assert.That(blocks[1].Settings!.Properties["invariantText"], Is.EqualTo("#3: The second invariant settings value"));
+            Assert.That(blocks[1].Settings.Properties["variantText"], Is.EqualTo("#3: The first settings value in Danish"));
         });
 
         PublishContent(content, ["da-DK"]);
 
         AssertPropertyValues("da-DK", 2, blocks =>
         {
-            Assert.AreEqual("#1: The second invariant content value", blocks[0].Content.Properties["invariantText"]);
-            Assert.AreEqual("#1: The second content value in Danish", blocks[0].Content.Properties["variantText"]);
-            Assert.AreEqual("#3: The second invariant content value", blocks[1].Content.Properties["invariantText"]);
-            Assert.AreEqual("#3: The second content value in Danish", blocks[1].Content.Properties["variantText"]);
+            Assert.That(blocks[0].Content.Properties["invariantText"], Is.EqualTo("#1: The second invariant content value"));
+            Assert.That(blocks[0].Content.Properties["variantText"], Is.EqualTo("#1: The second content value in Danish"));
+            Assert.That(blocks[1].Content.Properties["invariantText"], Is.EqualTo("#3: The second invariant content value"));
+            Assert.That(blocks[1].Content.Properties["variantText"], Is.EqualTo("#3: The second content value in Danish"));
 
-            Assert.AreEqual("#1: The second invariant settings value", blocks[0].Settings!.Properties["invariantText"]);
-            Assert.AreEqual("#1: The second settings value in Danish", blocks[0].Settings.Properties["variantText"]);
-            Assert.AreEqual("#3: The second invariant settings value", blocks[1].Settings!.Properties["invariantText"]);
-            Assert.AreEqual("#3: The second settings value in Danish", blocks[1].Settings.Properties["variantText"]);
+            Assert.That(blocks[0].Settings!.Properties["invariantText"], Is.EqualTo("#1: The second invariant settings value"));
+            Assert.That(blocks[0].Settings.Properties["variantText"], Is.EqualTo("#1: The second settings value in Danish"));
+            Assert.That(blocks[1].Settings!.Properties["invariantText"], Is.EqualTo("#3: The second invariant settings value"));
+            Assert.That(blocks[1].Settings.Properties["variantText"], Is.EqualTo("#3: The second settings value in Danish"));
         });
 
         void AssertPropertyValues(string culture, int numberOfExpectedBlocks, Action<ApiBlockItem[]> validateBlocks)
@@ -269,13 +269,13 @@ internal sealed class RichTextElementLevelVariationTests : BlockEditorElementVar
             SetVariationContext(culture, null);
             var publishedContent = GetPublishedContent(content.Key);
             var property = publishedContent.GetProperty("blocks");
-            Assert.IsNotNull(property);
+            Assert.That(property, Is.Not.Null);
 
             var propertyValue = property.GetDeliveryApiValue(false, culture) as RichTextModel;
-            Assert.IsNotNull(propertyValue);
+            Assert.That(propertyValue, Is.Not.Null);
 
             var blocks = propertyValue.Blocks.ToArray();
-            Assert.AreEqual(numberOfExpectedBlocks, blocks.Length);
+            Assert.That(blocks, Has.Length.EqualTo(numberOfExpectedBlocks));
 
             validateBlocks(blocks);
         }
@@ -297,10 +297,10 @@ internal sealed class RichTextElementLevelVariationTests : BlockEditorElementVar
         {
             Assert.Multiple(() =>
             {
-                Assert.IsTrue(markup.Contains("<p>Some text.</p>"));
-                Assert.IsTrue(markup.Contains("<p>More text.</p>"));
-                Assert.IsTrue(markup.Contains("<p>Even more text.</p>"));
-                Assert.IsTrue(markup.Contains("<p>The end.</p>"));
+                Assert.That(markup, Does.Contain("<p>Some text.</p>"));
+                Assert.That(markup, Does.Contain("<p>More text.</p>"));
+                Assert.That(markup, Does.Contain("<p>Even more text.</p>"));
+                Assert.That(markup, Does.Contain("<p>The end.</p>"));
             });
         });
 
@@ -319,14 +319,14 @@ internal sealed class RichTextElementLevelVariationTests : BlockEditorElementVar
         {
             Assert.Multiple(() =>
             {
-                Assert.IsFalse(markup.Contains("<p>Some text.</p>"));
-                Assert.IsFalse(markup.Contains("<p>More text.</p>"));
-                Assert.IsFalse(markup.Contains("<p>Even more text.</p>"));
-                Assert.IsFalse(markup.Contains("<p>The end.</p>"));
-                Assert.IsTrue(markup.Contains("<p>Some text updated.</p>"));
-                Assert.IsTrue(markup.Contains("<p>More text updated.</p>"));
-                Assert.IsTrue(markup.Contains("<p>Even more text updated.</p>"));
-                Assert.IsTrue(markup.Contains("<p>The end updated.</p>"));
+                Assert.That(markup, Does.Not.Contain("<p>Some text.</p>"));
+                Assert.That(markup, Does.Not.Contain("<p>More text.</p>"));
+                Assert.That(markup, Does.Not.Contain("<p>Even more text.</p>"));
+                Assert.That(markup, Does.Not.Contain("<p>The end.</p>"));
+                Assert.That(markup, Does.Contain("<p>Some text updated.</p>"));
+                Assert.That(markup, Does.Contain("<p>More text updated.</p>"));
+                Assert.That(markup, Does.Contain("<p>Even more text updated.</p>"));
+                Assert.That(markup, Does.Contain("<p>The end updated.</p>"));
             });
         });
 
@@ -336,14 +336,14 @@ internal sealed class RichTextElementLevelVariationTests : BlockEditorElementVar
         {
             Assert.Multiple(() =>
             {
-                Assert.IsFalse(markup.Contains("<p>Some text.</p>"));
-                Assert.IsFalse(markup.Contains("<p>More text.</p>"));
-                Assert.IsFalse(markup.Contains("<p>Even more text.</p>"));
-                Assert.IsFalse(markup.Contains("<p>The end.</p>"));
-                Assert.IsTrue(markup.Contains("<p>Some text updated.</p>"));
-                Assert.IsTrue(markup.Contains("<p>More text updated.</p>"));
-                Assert.IsTrue(markup.Contains("<p>Even more text updated.</p>"));
-                Assert.IsTrue(markup.Contains("<p>The end updated.</p>"));
+                Assert.That(markup, Does.Not.Contain("<p>Some text.</p>"));
+                Assert.That(markup, Does.Not.Contain("<p>More text.</p>"));
+                Assert.That(markup, Does.Not.Contain("<p>Even more text.</p>"));
+                Assert.That(markup, Does.Not.Contain("<p>The end.</p>"));
+                Assert.That(markup, Does.Contain("<p>Some text updated.</p>"));
+                Assert.That(markup, Does.Contain("<p>More text updated.</p>"));
+                Assert.That(markup, Does.Contain("<p>Even more text updated.</p>"));
+                Assert.That(markup, Does.Contain("<p>The end updated.</p>"));
             });
         });
 
@@ -354,12 +354,12 @@ internal sealed class RichTextElementLevelVariationTests : BlockEditorElementVar
                 SetVariationContext(culture, null);
                 var publishedContent = GetPublishedContent(content.Key);
                 var property = publishedContent.GetProperty("blocks");
-                Assert.IsNotNull(property);
+                Assert.That(property, Is.Not.Null);
 
                 var propertyValue = property.GetDeliveryApiValue(false, culture) as RichTextModel;
-                Assert.IsNotNull(propertyValue);
+                Assert.That(propertyValue, Is.Not.Null);
 
-                Assert.IsNotEmpty(propertyValue.Markup);
+                Assert.That(propertyValue.Markup, Is.Not.Empty);
                 validateMarkup(propertyValue.Markup);
             }
         }
@@ -385,12 +385,12 @@ internal sealed class RichTextElementLevelVariationTests : BlockEditorElementVar
             SetVariationContext(culture, null);
             var publishedContent = GetPublishedContent(content.Key);
             var property = publishedContent.GetProperty("blocks");
-            Assert.IsNotNull(property);
+            Assert.That(property, Is.Not.Null);
 
             var propertyValue = property.GetDeliveryApiValue(false, culture) as RichTextModel;
-            Assert.IsNotNull(propertyValue);
-            Assert.AreEqual("<p>Markup here</p>", propertyValue.Markup);
-            Assert.IsEmpty(propertyValue.Blocks);
+            Assert.That(propertyValue, Is.Not.Null);
+            Assert.That(propertyValue.Markup, Is.EqualTo("<p>Markup here</p>"));
+            Assert.That(propertyValue.Blocks, Is.Empty);
         }
     }
 
@@ -414,12 +414,12 @@ internal sealed class RichTextElementLevelVariationTests : BlockEditorElementVar
             SetVariationContext(culture, null);
             var publishedContent = GetPublishedContent(content.Key);
             var property = publishedContent.GetProperty("blocks");
-            Assert.IsNotNull(property);
+            Assert.That(property, Is.Not.Null);
 
             var propertyValue = property.GetDeliveryApiValue(false, culture) as RichTextModel;
-            Assert.IsNotNull(propertyValue);
-            Assert.AreEqual("<p>Markup here</p>", propertyValue.Markup);
-            Assert.IsEmpty(propertyValue.Blocks);
+            Assert.That(propertyValue, Is.Not.Null);
+            Assert.That(propertyValue.Markup, Is.EqualTo("<p>Markup here</p>"));
+            Assert.That(propertyValue.Blocks, Is.Empty);
         }
     }
 
@@ -446,8 +446,8 @@ internal sealed class RichTextElementLevelVariationTests : BlockEditorElementVar
                 { elementType.Key, elementType }, { contentType.Key, contentType }
             });
 
-        Assert.AreEqual(3, indexValues.Count());
-        Assert.NotNull(indexValues.FirstOrDefault(value => value.FieldName.StartsWith(UmbracoExamineFieldNames.RawFieldPrefix)));
+        Assert.That(indexValues.Count(), Is.EqualTo(3));
+        Assert.That(indexValues.FirstOrDefault(value => value.FieldName.StartsWith(UmbracoExamineFieldNames.RawFieldPrefix)), Is.Not.Null);
 
         AssertIndexedValues(
             "en-US",
@@ -478,13 +478,13 @@ internal sealed class RichTextElementLevelVariationTests : BlockEditorElementVar
         void AssertIndexedValues(string culture, params string[] expectedIndexedValues)
         {
             var indexValue = indexValues.FirstOrDefault(v => v.Culture.InvariantEquals(culture));
-            Assert.IsNotNull(indexValue);
-            Assert.AreEqual(1, indexValue.Values.Count());
+            Assert.That(indexValue, Is.Not.Null);
+            Assert.That(indexValue.Values.Count(), Is.EqualTo(1));
             var indexedValue = indexValue.Values.First() as string;
-            Assert.IsNotNull(indexedValue);
+            Assert.That(indexedValue, Is.Not.Null);
             var values = indexedValue.Split(Environment.NewLine).Select(s => s.Trim()).Where(s => s.IsNullOrWhiteSpace() is false).ToArray();
-            Assert.AreEqual(expectedIndexedValues.Length, values.Length);
-            Assert.IsTrue(values.ContainsAll(expectedIndexedValues));
+            Assert.That(values, Has.Length.EqualTo(expectedIndexedValues.Length));
+            Assert.That(values.ContainsAll(expectedIndexedValues), Is.True);
         }
     }
 
@@ -514,8 +514,8 @@ internal sealed class RichTextElementLevelVariationTests : BlockEditorElementVar
                 { elementType.Key, elementType }, { contentType.Key, contentType }
             });
 
-        Assert.AreEqual(3, indexValues.Count());
-        Assert.NotNull(indexValues.FirstOrDefault(value => value.FieldName.StartsWith(UmbracoExamineFieldNames.RawFieldPrefix)));
+        Assert.That(indexValues.Count(), Is.EqualTo(3));
+        Assert.That(indexValues.FirstOrDefault(value => value.FieldName.StartsWith(UmbracoExamineFieldNames.RawFieldPrefix)), Is.Not.Null);
 
         if (published)
         {
@@ -558,13 +558,13 @@ internal sealed class RichTextElementLevelVariationTests : BlockEditorElementVar
         void AssertIndexedValues(string culture, params string[] expectedIndexedValues)
         {
             var indexValue = indexValues.FirstOrDefault(v => v.Culture.InvariantEquals(culture));
-            Assert.IsNotNull(indexValue);
-            Assert.AreEqual(1, indexValue.Values.Count());
+            Assert.That(indexValue, Is.Not.Null);
+            Assert.That(indexValue.Values.Count(), Is.EqualTo(1));
             var indexedValue = indexValue.Values.First() as string;
-            Assert.IsNotNull(indexedValue);
+            Assert.That(indexedValue, Is.Not.Null);
             var values = indexedValue.Split(Environment.NewLine).Select(s => s.Trim()).Where(s => s.IsNullOrWhiteSpace() is false).ToArray();
-            Assert.AreEqual(expectedIndexedValues.Length, values.Length);
-            Assert.IsTrue(values.ContainsAll(expectedIndexedValues));
+            Assert.That(values, Has.Length.EqualTo(expectedIndexedValues.Length));
+            Assert.That(values.ContainsAll(expectedIndexedValues), Is.True);
         }
     }
 
@@ -616,17 +616,17 @@ internal sealed class RichTextElementLevelVariationTests : BlockEditorElementVar
                     { elementType.Key, elementType }, { contentType.Key, contentType }
                 });
 
-            Assert.AreEqual(2, indexValues.Count());
-            Assert.NotNull(indexValues.FirstOrDefault(value => value.FieldName.StartsWith(UmbracoExamineFieldNames.RawFieldPrefix)));
+            Assert.That(indexValues.Count(), Is.EqualTo(2));
+            Assert.That(indexValues.FirstOrDefault(value => value.FieldName.StartsWith(UmbracoExamineFieldNames.RawFieldPrefix)), Is.Not.Null);
 
             var indexValue = indexValues.FirstOrDefault(v => v.Culture.InvariantEquals(culture) && v.FieldName == "blocks");
-            Assert.IsNotNull(indexValue);
-            Assert.AreEqual(1, indexValue.Values.Count());
+            Assert.That(indexValue, Is.Not.Null);
+            Assert.That(indexValue.Values.Count(), Is.EqualTo(1));
             var indexedValue = indexValue.Values.First() as string;
-            Assert.IsNotNull(indexedValue);
+            Assert.That(indexedValue, Is.Not.Null);
             var values = indexedValue.Split(Environment.NewLine).Select(s => s.Trim()).Where(s => s.IsNullOrWhiteSpace() is false).ToArray();
-            Assert.AreEqual(expectedIndexedValues.Length, values.Length);
-            Assert.IsTrue(values.ContainsAll(expectedIndexedValues));
+            Assert.That(values, Has.Length.EqualTo(expectedIndexedValues.Length));
+            Assert.That(values.ContainsAll(expectedIndexedValues), Is.True);
         }
 
         RichTextEditorValue CreateInvariantRichTextValue(string culture)
@@ -913,35 +913,33 @@ internal sealed class RichTextElementLevelVariationTests : BlockEditorElementVar
         // 6. Verify published JSON doesn't contain old culture-specific values
         content = ContentService.GetById(content.Key)!;
         var publishedValue = (string?)content.Properties["blocks"]!.GetValue(null, null, published: true);
-        Assert.IsNotNull(publishedValue, "Published value should not be null");
+        Assert.That(publishedValue, Is.Not.Null, "Published value should not be null");
 
         var publishedRichTextValue = JsonSerializer.Deserialize<RichTextEditorValue>(publishedValue);
-        Assert.IsNotNull(publishedRichTextValue?.Blocks);
+        Assert.That(publishedRichTextValue?.Blocks, Is.Not.Null);
 
         // Verify ContentData entries are not duplicated
-        Assert.AreEqual(1, publishedRichTextValue.Blocks.ContentData.Count, "Should have exactly 1 content data entry");
-        Assert.AreEqual(1, publishedRichTextValue.Blocks.SettingsData.Count, "Should have exactly 1 settings data entry");
+        Assert.That(publishedRichTextValue.Blocks.ContentData, Has.Count.EqualTo(1), "Should have exactly 1 content data entry");
+        Assert.That(publishedRichTextValue.Blocks.SettingsData, Has.Count.EqualTo(1), "Should have exactly 1 settings data entry");
 
         var aliasGroups = publishedRichTextValue.Blocks.ContentData[0].Values.GroupBy(v => v.Alias);
         foreach (var group in aliasGroups)
         {
-            Assert.AreEqual(
-                1,
-                group.Count(),
+            Assert.That(
+                group.Count(), Is.EqualTo(1),
                 $"Property '{group.Key}' has multiple values. Values: {string.Join(", ", group.Select(v => $"Culture={v.Culture ?? "null"}:Value={v.Value}"))}");
         }
 
         aliasGroups = publishedRichTextValue.Blocks.SettingsData[0].Values.GroupBy(v => v.Alias);
         foreach (var group in aliasGroups)
         {
-            Assert.AreEqual(
-                1,
-                group.Count(),
+            Assert.That(
+                group.Count(), Is.EqualTo(1),
                 $"Property '{group.Key}' has multiple values. Values: {string.Join(", ", group.Select(v => $"Culture={v.Culture ?? "null"}:Value={v.Value}"))}");
         }
 
         // Verify Expose entries are not duplicated
-        Assert.AreEqual(1, publishedRichTextValue.Blocks.Expose.Count);
+        Assert.That(publishedRichTextValue.Blocks.Expose, Has.Count.EqualTo(1));
     }
 
     [TestCase(true, true)]
@@ -1079,29 +1077,29 @@ internal sealed class RichTextElementLevelVariationTests : BlockEditorElementVar
         // 6. Verify published JSON doesn't contain old invariant values for variantText
         content = ContentService.GetById(content.Key)!;
         var publishedValue = (string?)content.Properties["blocks"]!.GetValue(null, null, published: true);
-        Assert.IsNotNull(publishedValue, "Published value should not be null");
+        Assert.That(publishedValue, Is.Not.Null, "Published value should not be null");
 
         var publishedRichTextValue = JsonSerializer.Deserialize<RichTextEditorValue>(publishedValue);
-        Assert.IsNotNull(publishedRichTextValue?.Blocks);
+        Assert.That(publishedRichTextValue?.Blocks, Is.Not.Null);
 
         // Verify ContentData entries are not duplicated
-        Assert.AreEqual(1, publishedRichTextValue.Blocks.ContentData.Count, "Should have exactly 1 content data entry");
-        Assert.AreEqual(1, publishedRichTextValue.Blocks.SettingsData.Count, "Should have exactly 1 settings data entry");
+        Assert.That(publishedRichTextValue.Blocks.ContentData, Has.Count.EqualTo(1), "Should have exactly 1 content data entry");
+        Assert.That(publishedRichTextValue.Blocks.SettingsData, Has.Count.EqualTo(1), "Should have exactly 1 settings data entry");
 
         var variantTextValues = publishedRichTextValue.Blocks.ContentData[0].Values.Where(v => v.Alias == "variantText").ToList();
-        Assert.IsFalse(
-            variantTextValues.Any(v => v.Culture is null),
+        Assert.That(
+            variantTextValues.Any(v => v.Culture is null), Is.False,
             $"variantText property should not have invariant values after changing to variant. Values: {string.Join(", ", variantTextValues.Select(v => $"Culture={v.Culture ?? "null"}:Value={v.Value}"))}");
 
         variantTextValues = publishedRichTextValue.Blocks.SettingsData[0].Values.Where(v => v.Alias == "variantText").ToList();
-        Assert.IsFalse(
-            variantTextValues.Any(v => v.Culture is null),
+        Assert.That(
+            variantTextValues.Any(v => v.Culture is null), Is.False,
             $"variantText property should not have invariant values after changing to variant. Values: {string.Join(", ", variantTextValues.Select(v => $"Culture={v.Culture ?? "null"}:Value={v.Value}"))}");
 
         // Verify Expose entries are not duplicated
         var exposeGroups = publishedRichTextValue.Blocks.Expose.GroupBy(e => (e.ContentKey, e.Culture, e.Segment));
-        Assert.IsTrue(
-            exposeGroups.All(g => g.Count() == 1),
+        Assert.That(
+            exposeGroups.All(g => g.Count() == 1), Is.True,
             $"Duplicate Expose entries found. Expose: {string.Join(", ", publishedRichTextValue.Blocks.Expose.Select(e => $"{e.ContentKey}:{e.Culture}:{e.Segment}"))}");
 
         void AssertPropertyValues(
@@ -1114,25 +1112,25 @@ internal sealed class RichTextElementLevelVariationTests : BlockEditorElementVar
             SetVariationContext(culture, null);
             var publishedContent = GetPublishedContent(content.Key);
             var property = publishedContent.GetProperty("blocks");
-            Assert.IsNotNull(property);
+            Assert.That(property, Is.Not.Null);
 
             var propertyValue = property.GetDeliveryApiValue(false, culture) as RichTextModel;
-            Assert.IsNotNull(propertyValue);
+            Assert.That(propertyValue, Is.Not.Null);
 
             var blocks = propertyValue.Blocks.ToArray();
-            Assert.AreEqual(1, blocks.Length);
+            Assert.That(blocks, Has.Length.EqualTo(1));
 
             var apiBlockItem = blocks.First();
             Assert.Multiple(() =>
             {
-                Assert.AreEqual(expectedInvariantContentValue, apiBlockItem.Content.Properties["invariantText"]);
-                Assert.AreEqual(expectedVariantContentValue, apiBlockItem.Content.Properties["variantText"]);
+                Assert.That(apiBlockItem.Content.Properties["invariantText"], Is.EqualTo(expectedInvariantContentValue));
+                Assert.That(apiBlockItem.Content.Properties["variantText"], Is.EqualTo(expectedVariantContentValue));
             });
 
             Assert.Multiple(() =>
             {
-                Assert.AreEqual(expectedInvariantSettingsValue, apiBlockItem.Settings!.Properties["invariantText"]);
-                Assert.AreEqual(expectedVariantSettingsValue, apiBlockItem.Settings.Properties["variantText"]);
+                Assert.That(apiBlockItem.Settings!.Properties["invariantText"], Is.EqualTo(expectedInvariantSettingsValue));
+                Assert.That(apiBlockItem.Settings.Properties["variantText"], Is.EqualTo(expectedVariantSettingsValue));
             });
         }
     }

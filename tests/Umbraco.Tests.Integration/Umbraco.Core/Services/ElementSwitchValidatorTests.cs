@@ -101,7 +101,7 @@ internal sealed class ElementSwitchValidatorTests : UmbracoIntegrationTest
         var result = await ElementSwitchValidator.AncestorsAreAlignedAsync(itemToTest);
 
         // Assert
-        Assert.AreEqual(result, validationShouldPass);
+        Assert.That(validationShouldPass, Is.EqualTo(result));
     }
 
     [TestCase(new[] { true }, 0, true, true, TestName = "E=>E No Ancestor or children")]
@@ -177,7 +177,7 @@ internal sealed class ElementSwitchValidatorTests : UmbracoIntegrationTest
         var result = await ElementSwitchValidator.DescendantsAreAlignedAsync(itemToTest);
 
         // Assert
-        Assert.AreEqual(result, validationShouldPass);
+        Assert.That(validationShouldPass, Is.EqualTo(result));
     }
 
     [TestCase(0, true, TestName = "No Content")]
@@ -200,7 +200,7 @@ internal sealed class ElementSwitchValidatorTests : UmbracoIntegrationTest
         var result = await ElementSwitchValidator.DocumentToElementHasNoContentAsync(contentType);
 
         // Assert
-        Assert.AreEqual(result, validationShouldPass);
+        Assert.That(validationShouldPass, Is.EqualTo(result));
     }
 
     // Since the full permutation table would result in 64 tests and more block editors might be added later,
@@ -270,7 +270,7 @@ internal sealed class ElementSwitchValidatorTests : UmbracoIntegrationTest
         var result = await ElementSwitchValidator.ElementToDocumentNotUsedInBlockStructuresAsync(elementType);
 
         // Assert
-        Assert.AreEqual(result, validationShouldPass);
+        Assert.That(validationShouldPass, Is.EqualTo(result));
     }
 
     [TestCase(0, true, TestName = "No Elements")]
@@ -292,7 +292,7 @@ internal sealed class ElementSwitchValidatorTests : UmbracoIntegrationTest
         var result = await ElementSwitchValidator.ElementToDocumentHasNoContentAsync(contentType);
 
         // Assert
-        Assert.AreEqual(result, validationShouldPass);
+        Assert.That(validationShouldPass, Is.EqualTo(result));
     }
 
     private async Task<IContentType> SetupContentType(bool isElement)

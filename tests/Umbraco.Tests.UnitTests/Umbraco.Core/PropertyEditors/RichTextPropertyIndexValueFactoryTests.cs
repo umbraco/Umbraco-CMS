@@ -74,11 +74,11 @@ public class RichTextPropertyIndexValueFactoryTests
         var indexValue = factory
             .GetIndexValues(property, null, null, true, [], new Dictionary<Guid, IContentType>())
             .FirstOrDefault(kvp => kvp.FieldName == alias);
-        Assert.IsNotNull(indexValue);
+        Assert.That(indexValue, Is.Not.Null);
 
         // assert that index the value is created correctly (it might contain a trailing whitespace, but that's OK)
         var expectedIndexValue = indexValue.Values.SingleOrDefault() as string;
-        Assert.IsNotNull(expectedIndexValue);
-        Assert.AreEqual(expected, expectedIndexValue);
+        Assert.That(expectedIndexValue, Is.Not.Null);
+        Assert.That(expectedIndexValue, Is.EqualTo(expected));
     }
 }

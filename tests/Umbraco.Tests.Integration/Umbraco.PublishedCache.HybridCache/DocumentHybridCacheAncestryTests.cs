@@ -51,7 +51,7 @@ internal sealed class DocumentHybridCacheAncestryTests : UmbracoIntegrationTestW
         await ContentPublishingService.UnpublishAsync(Subpage.Key, null, Constants.Security.SuperUserKey);
 
         var published = await PublishedContentCache.GetByIdAsync(_subSubPage.Key);
-        Assert.IsNull(published);
+        Assert.That(published, Is.Null);
     }
 
     [Test]
@@ -79,8 +79,8 @@ internal sealed class DocumentHybridCacheAncestryTests : UmbracoIntegrationTestW
 
         var unpublishedSubSubPage = await PublishedContentCache.GetByIdAsync(_subSubPage.Key);
         var unpublishedSubPage = await PublishedContentCache.GetByIdAsync(Subpage.Key);
-        Assert.IsNull(unpublishedSubSubPage);
-        Assert.IsNull(unpublishedSubPage);
+        Assert.That(unpublishedSubSubPage, Is.Null);
+        Assert.That(unpublishedSubPage, Is.Null);
 
         // We should however be able to get the still published root Text Page
         var publishedTextPage = await PublishedContentCache.GetByIdAsync(Textpage.Key);

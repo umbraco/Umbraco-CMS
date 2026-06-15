@@ -29,7 +29,7 @@ public class SqlAzureDatabaseProviderMetadataTests
 
         var sut = new SqlAzureDatabaseProviderMetadata();
         var connectionString = sut.GenerateConnectionString(settings);
-        Assert.AreEqual(connectionString, "Server=tcp:MyServer.database.windows.net,1433;Database=MyDatabase;User ID=MyUser@MyServer;Password=MyPassword");
+        Assert.That(connectionString, Is.EqualTo("Server=tcp:MyServer.database.windows.net,1433;Database=MyDatabase;User ID=MyUser@MyServer;Password=MyPassword"));
     }
 
     [TestCase("tcp:kzeej5z8ty.ssmsawacluster4.windowsazure.mscds.com,1433", "MyDatabase", "MyUser", "MyPassword")]
@@ -48,6 +48,6 @@ public class SqlAzureDatabaseProviderMetadataTests
 
         var sut = new SqlAzureDatabaseProviderMetadata();
         var connectionString = sut.GenerateConnectionString(settings);
-        Assert.AreEqual(connectionString, "Server=tcp:kzeej5z8ty.ssmsawacluster4.windowsazure.mscds.com,1433;Database=MyDatabase;User ID=MyUser@kzeej5z8ty;Password=MyPassword");
+        Assert.That(connectionString, Is.EqualTo("Server=tcp:kzeej5z8ty.ssmsawacluster4.windowsazure.mscds.com,1433;Database=MyDatabase;User ID=MyUser@kzeej5z8ty;Password=MyPassword"));
     }
 }

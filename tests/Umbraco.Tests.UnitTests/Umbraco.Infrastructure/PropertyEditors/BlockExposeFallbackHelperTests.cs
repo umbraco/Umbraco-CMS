@@ -24,8 +24,8 @@ public class BlockExposeFallbackHelperTests
 
         var result = BlockExposeFallbackHelper.IsBlockExposed(expose, _elementKey, "nl-BE", null, default, languages, "en-US", out var resolvedCulture);
 
-        Assert.IsTrue(result);
-        Assert.AreEqual("nl-BE", resolvedCulture);
+        Assert.That(result, Is.True);
+        Assert.That(resolvedCulture, Is.EqualTo("nl-BE"));
     }
 
     [Test]
@@ -38,8 +38,8 @@ public class BlockExposeFallbackHelperTests
 
         var result = BlockExposeFallbackHelper.IsBlockExposed(expose, _elementKey, "nl-BE", null, Fallback.ToLanguage, languages, "en-US", out var resolvedCulture);
 
-        Assert.IsTrue(result);
-        Assert.AreEqual("en-US", resolvedCulture);
+        Assert.That(result, Is.True);
+        Assert.That(resolvedCulture, Is.EqualTo("en-US"));
     }
 
     [Test]
@@ -54,8 +54,8 @@ public class BlockExposeFallbackHelperTests
 
         var result = BlockExposeFallbackHelper.IsBlockExposed(expose, _elementKey, "nl-BE", null, Fallback.ToLanguage, languages, "en-US", out var resolvedCulture);
 
-        Assert.IsTrue(result);
-        Assert.AreEqual("en-US", resolvedCulture);
+        Assert.That(result, Is.True);
+        Assert.That(resolvedCulture, Is.EqualTo("en-US"));
     }
 
     [Test]
@@ -71,8 +71,8 @@ public class BlockExposeFallbackHelperTests
 
         var result = BlockExposeFallbackHelper.IsBlockExposed(expose, _elementKey, "nl-BE", null, Fallback.ToLanguage, languages, "en-US", out var resolvedCulture);
 
-        Assert.IsTrue(result);
-        Assert.AreEqual("fr-FR", resolvedCulture);
+        Assert.That(result, Is.True);
+        Assert.That(resolvedCulture, Is.EqualTo("fr-FR"));
     }
 
     [Test]
@@ -86,8 +86,8 @@ public class BlockExposeFallbackHelperTests
         // Default Fallback (None) — should NOT walk fallback chain.
         var result = BlockExposeFallbackHelper.IsBlockExposed(expose, _elementKey, "nl-BE", null, default, languages, "en-US", out var resolvedCulture);
 
-        Assert.IsFalse(result);
-        Assert.IsNull(resolvedCulture);
+        Assert.That(result, Is.False);
+        Assert.That(resolvedCulture, Is.Null);
     }
 
     [Test]
@@ -100,8 +100,8 @@ public class BlockExposeFallbackHelperTests
 
         var result = BlockExposeFallbackHelper.IsBlockExposed(expose, _elementKey, "nl-BE", null, Fallback.ToDefaultLanguage, languages, "en-US", out var resolvedCulture);
 
-        Assert.IsTrue(result);
-        Assert.AreEqual("en-US", resolvedCulture);
+        Assert.That(result, Is.True);
+        Assert.That(resolvedCulture, Is.EqualTo("en-US"));
     }
 
     [Test]
@@ -117,8 +117,8 @@ public class BlockExposeFallbackHelperTests
 
         var result = BlockExposeFallbackHelper.IsBlockExposed(expose, _elementKey, "en-US", null, Fallback.ToLanguage, languages, "de-DE", out var resolvedCulture);
 
-        Assert.IsFalse(result);
-        Assert.IsNull(resolvedCulture);
+        Assert.That(result, Is.False);
+        Assert.That(resolvedCulture, Is.Null);
     }
 
     [Test]
@@ -130,8 +130,8 @@ public class BlockExposeFallbackHelperTests
         // expectedCulture is null for invariant blocks — direct match should succeed.
         var result = BlockExposeFallbackHelper.IsBlockExposed(expose, _elementKey, null, null, default, languages, "en-US", out var resolvedCulture);
 
-        Assert.IsTrue(result);
-        Assert.IsNull(resolvedCulture);
+        Assert.That(result, Is.True);
+        Assert.That(resolvedCulture, Is.Null);
     }
 
     [Test]
@@ -144,8 +144,8 @@ public class BlockExposeFallbackHelperTests
 
         var result = BlockExposeFallbackHelper.IsBlockExposed(expose, _elementKey, "nl-BE", "my-segment", Fallback.ToLanguage, languages, "en-US", out var resolvedCulture);
 
-        Assert.IsTrue(result);
-        Assert.AreEqual("en-US", resolvedCulture);
+        Assert.That(result, Is.True);
+        Assert.That(resolvedCulture, Is.EqualTo("en-US"));
     }
 
     [Test]
@@ -158,8 +158,8 @@ public class BlockExposeFallbackHelperTests
 
         var result = BlockExposeFallbackHelper.IsBlockExposed(expose, _elementKey, "nl-BE", "segment-b", Fallback.ToLanguage, languages, "en-US", out var resolvedCulture);
 
-        Assert.IsFalse(result);
-        Assert.IsNull(resolvedCulture);
+        Assert.That(result, Is.False);
+        Assert.That(resolvedCulture, Is.Null);
     }
 
     [Test]
@@ -174,8 +174,8 @@ public class BlockExposeFallbackHelperTests
 
         var result = BlockExposeFallbackHelper.IsBlockExposed(expose, _elementKey, "nl-BE", null, Fallback.ToLanguage, languages, "en-US", out var resolvedCulture);
 
-        Assert.IsFalse(result);
-        Assert.IsNull(resolvedCulture);
+        Assert.That(result, Is.False);
+        Assert.That(resolvedCulture, Is.Null);
     }
 
     private static List<BlockItemVariation> CreateExpose(params (string? Culture, string? Segment)[] entries)

@@ -29,7 +29,7 @@ public class ArtifactBaseTests
         string serialized = JsonSerializer.Serialize(artifact, _jsonSerializerOptions);
 
         var expected = "{\"Udi\":\"umb://document/3382d5433b5749d08919bc9961422a1f\",\"Dependencies\":[],\"Checksum\":\"test checksum value\",\"Name\":\"Test Name\",\"Alias\":\"testAlias\"}";
-        Assert.AreEqual(expected, serialized);
+        Assert.That(serialized, Is.EqualTo(expected));
     }
 
     [Test]
@@ -38,9 +38,9 @@ public class ArtifactBaseTests
         var serialized = "{\"Udi\":\"umb://document/3382d5433b5749d08919bc9961422a1f\",\"Dependencies\":[],\"Checksum\":\"test checksum value\",\"Name\":\"Test Name\",\"Alias\":\"testAlias\"}";
 
         TestArtifact? deserialized = JsonSerializer.Deserialize<TestArtifact>(serialized, _jsonSerializerOptions);
-        Assert.IsNotNull(deserialized);
-        Assert.AreEqual("Test Name", deserialized.Name);
-        Assert.AreEqual("testAlias", deserialized.Alias);
+        Assert.That(deserialized, Is.Not.Null);
+        Assert.That(deserialized.Name, Is.EqualTo("Test Name"));
+        Assert.That(deserialized.Alias, Is.EqualTo("testAlias"));
     }
 
     [Test]
@@ -61,9 +61,8 @@ public class ArtifactBaseTests
 
         artifact.Dependencies = dependencies;
 
-        Assert.AreEqual(
-            "umb://template-file/TestPage.cshtml,umb://template/d4651496fad24c1290a53ea4d55d945b",
-            string.Join(",", artifact.Dependencies.Select(x => x.Udi.ToString())));
+        Assert.That(
+            string.Join(",", artifact.Dependencies.Select(x => x.Udi.ToString())), Is.EqualTo("umb://template-file/TestPage.cshtml,umb://template/d4651496fad24c1290a53ea4d55d945b"));
     }
 
     [Test]
@@ -78,12 +77,12 @@ public class ArtifactBaseTests
             new ArtifactDependency(udi, false, ArtifactDependencyMode.Exist),
         };
 
-        Assert.AreEqual(1, dependencies.Count);
+        Assert.That(dependencies, Has.Count.EqualTo(1));
         var dependency = dependencies.First();
-        Assert.AreEqual(udi, dependency.Udi);
-        Assert.AreEqual(false, dependency.Ordering);
-        Assert.AreEqual(ArtifactDependencyMode.Match, dependency.Mode);
-        Assert.AreEqual(null, dependency.Checksum);
+        Assert.That(dependency.Udi, Is.EqualTo(udi));
+        Assert.That(dependency.Ordering, Is.EqualTo(false));
+        Assert.That(dependency.Mode, Is.EqualTo(ArtifactDependencyMode.Match));
+        Assert.That(dependency.Checksum, Is.EqualTo(null));
     }
 
     [Test]
@@ -102,12 +101,12 @@ public class ArtifactBaseTests
             new ArtifactDependency(udi, false, ArtifactDependencyMode.Exist),
         };
 
-        Assert.AreEqual(1, dependencies.Count);
+        Assert.That(dependencies, Has.Count.EqualTo(1));
         var dependency = dependencies.First();
-        Assert.AreEqual(udi, dependency.Udi);
-        Assert.AreEqual(true, dependency.Ordering);
-        Assert.AreEqual(ArtifactDependencyMode.Match, dependency.Mode);
-        Assert.AreEqual(null, dependency.Checksum);
+        Assert.That(dependency.Udi, Is.EqualTo(udi));
+        Assert.That(dependency.Ordering, Is.EqualTo(true));
+        Assert.That(dependency.Mode, Is.EqualTo(ArtifactDependencyMode.Match));
+        Assert.That(dependency.Checksum, Is.EqualTo(null));
     }
 
     [Test]
@@ -123,12 +122,12 @@ public class ArtifactBaseTests
             new ArtifactDependency(udi, true, ArtifactDependencyMode.Match),
         };
 
-        Assert.AreEqual(1, dependencies.Count);
+        Assert.That(dependencies, Has.Count.EqualTo(1));
         var dependency = dependencies.First();
-        Assert.AreEqual(udi, dependency.Udi);
-        Assert.AreEqual(true, dependency.Ordering);
-        Assert.AreEqual(ArtifactDependencyMode.Match, dependency.Mode);
-        Assert.AreEqual("123", dependency.Checksum);
+        Assert.That(dependency.Udi, Is.EqualTo(udi));
+        Assert.That(dependency.Ordering, Is.EqualTo(true));
+        Assert.That(dependency.Mode, Is.EqualTo(ArtifactDependencyMode.Match));
+        Assert.That(dependency.Checksum, Is.EqualTo("123"));
     }
 
     private class TestArtifact : ArtifactBase<GuidUdi>

@@ -32,11 +32,11 @@ public class ResponseHeaderTransformerTests
 
         // Assert
         var response = (OpenApiResponse)operation.Responses["201"];
-        Assert.IsNotNull(response.Headers);
-        Assert.IsTrue(response.Headers.ContainsKey(Constants.Headers.GeneratedResource));
+        Assert.That(response.Headers, Is.Not.Null);
+        Assert.That(response.Headers.ContainsKey(Constants.Headers.GeneratedResource), Is.True);
 
         var header = (OpenApiHeader)response.Headers[Constants.Headers.GeneratedResource];
-        Assert.AreEqual(JsonSchemaType.String, header.Schema?.Type);
+        Assert.That(header.Schema?.Type, Is.EqualTo(JsonSchemaType.String));
     }
 
     [Test]
@@ -56,12 +56,12 @@ public class ResponseHeaderTransformerTests
 
         // Assert
         var response = (OpenApiResponse)operation.Responses["201"];
-        Assert.IsNotNull(response.Headers);
-        Assert.IsTrue(response.Headers.ContainsKey(Constants.Headers.Location));
+        Assert.That(response.Headers, Is.Not.Null);
+        Assert.That(response.Headers.ContainsKey(Constants.Headers.Location), Is.True);
 
         var header = (OpenApiHeader)response.Headers[Constants.Headers.Location];
-        Assert.AreEqual(JsonSchemaType.String, header.Schema?.Type);
-        Assert.AreEqual("uri", header.Schema?.Format);
+        Assert.That(header.Schema?.Type, Is.EqualTo(JsonSchemaType.String));
+        Assert.That(header.Schema?.Format, Is.EqualTo("uri"));
     }
 
     [Test]
@@ -86,7 +86,7 @@ public class ResponseHeaderTransformerTests
         foreach (var (_, value) in operation.Responses)
         {
             var response = (OpenApiResponse)value;
-            Assert.IsNull(response.Headers);
+            Assert.That(response.Headers, Is.Null);
         }
     }
 
@@ -134,11 +134,11 @@ public class ResponseHeaderTransformerTests
         await _transformer.TransformAsync(operation, null!, CancellationToken.None);
 
         var createdResponse = (OpenApiResponse)operation.Responses["201"];
-        Assert.IsNotNull(createdResponse.Headers);
-        Assert.IsTrue(createdResponse.Headers.ContainsKey(Constants.Headers.GeneratedResource));
+        Assert.That(createdResponse.Headers, Is.Not.Null);
+        Assert.That(createdResponse.Headers.ContainsKey(Constants.Headers.GeneratedResource), Is.True);
 
         var defaultResponse = (OpenApiResponse)operation.Responses["default"];
-        Assert.IsNull(defaultResponse.Headers);
+        Assert.That(defaultResponse.Headers, Is.Null);
     }
 
     [Test]
@@ -164,9 +164,9 @@ public class ResponseHeaderTransformerTests
 
         // Assert
         var response = (OpenApiResponse)operation.Responses["201"];
-        Assert.AreEqual(3, response.Headers?.Count); // Custom + GeneratedResource + Location
-        Assert.IsTrue(response.Headers?.ContainsKey("X-Custom-Header"));
-        Assert.IsTrue(response.Headers?.ContainsKey(Constants.Headers.GeneratedResource));
-        Assert.IsTrue(response.Headers?.ContainsKey(Constants.Headers.Location));
+        Assert.That(response.Headers?.Count, Is.EqualTo(3)); // Custom + GeneratedResource + Location
+        Assert.That(response.Headers?.ContainsKey("X-Custom-Header"), Is.True);
+        Assert.That(response.Headers?.ContainsKey(Constants.Headers.GeneratedResource), Is.True);
+        Assert.That(response.Headers?.ContainsKey(Constants.Headers.Location), Is.True);
     }
 }

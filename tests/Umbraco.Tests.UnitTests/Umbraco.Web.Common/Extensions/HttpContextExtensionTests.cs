@@ -18,7 +18,7 @@ public class HttpContextExtensionTests
 
         var result = httpContext.TryGetBasicAuthCredentials(out var _, out var _);
 
-        Assert.IsFalse(result);
+        Assert.That(result, Is.False);
     }
 
     [Test]
@@ -33,8 +33,8 @@ public class HttpContextExtensionTests
 
         var result = httpContext.TryGetBasicAuthCredentials(out var username, out var password);
 
-        Assert.IsTrue(result);
-        Assert.AreEqual(testUsername, username);
-        Assert.AreEqual(testPassword, password);
+        Assert.That(result, Is.True);
+        Assert.That(username, Is.EqualTo(testUsername));
+        Assert.That(password, Is.EqualTo(testPassword));
     }
 }

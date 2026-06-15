@@ -41,14 +41,14 @@ internal sealed class ContentServiceVariantTests : UmbracoIntegrationTest
         ContentService.Save(content);
 
         var publishResult = ContentService.Publish(content, [publishCultureCode]);
-        Assert.IsTrue(publishResult.Success);
+        Assert.That(publishResult.Success, Is.True);
 
         content = ContentService.GetById(content.Key)!;
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(content.Published);
-            Assert.AreEqual(1, content.PublishedCultures.Count());
-            Assert.AreEqual("en-US", content.PublishedCultures.FirstOrDefault());
+            Assert.That(content.Published, Is.True);
+            Assert.That(content.PublishedCultures.Count(), Is.EqualTo(1));
+            Assert.That(content.PublishedCultures.FirstOrDefault(), Is.EqualTo("en-US"));
         });
     }
 
@@ -69,13 +69,13 @@ internal sealed class ContentServiceVariantTests : UmbracoIntegrationTest
         ContentService.Publish(content, ["en-US"]);
 
         var unpublishResult = ContentService.Unpublish(content, unpublishCultureCode);
-        Assert.IsTrue(unpublishResult.Success);
+        Assert.That(unpublishResult.Success, Is.True);
 
         content = ContentService.GetById(content.Key)!;
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(content.Published);
-            Assert.AreEqual(0, content.PublishedCultures.Count());
+            Assert.That(content.Published, Is.False);
+            Assert.That(content.PublishedCultures.Count(), Is.EqualTo(0));
         });
     }
 
@@ -99,24 +99,24 @@ internal sealed class ContentServiceVariantTests : UmbracoIntegrationTest
         ContentService.Save(child);
 
         var publishResult = ContentService.PublishBranch(root, PublishBranchFilter.All, [publishCultureCode]);
-        Assert.AreEqual(2, publishResult.Count());
-        Assert.IsTrue(publishResult.First().Success);
-        Assert.IsTrue(publishResult.Last().Success);
+        Assert.That(publishResult.Count(), Is.EqualTo(2));
+        Assert.That(publishResult.First().Success, Is.True);
+        Assert.That(publishResult.Last().Success, Is.True);
 
         root = ContentService.GetById(root.Key)!;
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(root.Published);
-            Assert.AreEqual(1, root.PublishedCultures.Count());
-            Assert.AreEqual("en-US", root.PublishedCultures.FirstOrDefault());
+            Assert.That(root.Published, Is.True);
+            Assert.That(root.PublishedCultures.Count(), Is.EqualTo(1));
+            Assert.That(root.PublishedCultures.FirstOrDefault(), Is.EqualTo("en-US"));
         });
 
         child = ContentService.GetById(child.Key)!;
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(child.Published);
-            Assert.AreEqual(1, child.PublishedCultures.Count());
-            Assert.AreEqual("en-US", child.PublishedCultures.FirstOrDefault());
+            Assert.That(child.Published, Is.True);
+            Assert.That(child.PublishedCultures.Count(), Is.EqualTo(1));
+            Assert.That(child.PublishedCultures.FirstOrDefault(), Is.EqualTo("en-US"));
         });
     }
 

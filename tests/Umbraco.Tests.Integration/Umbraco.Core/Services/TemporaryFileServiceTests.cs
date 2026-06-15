@@ -44,24 +44,24 @@ public class TemporaryFileServiceTests : UmbracoIntegrationTest
             }
         };
         var createAttempt = await TemporaryFileService.CreateAsync(model);
-        Assert.IsTrue(createAttempt.Success);
+        Assert.That(createAttempt.Success, Is.True);
 
         TemporaryFileModel? fileModel = await TemporaryFileService.GetAsync(key);
-        Assert.IsNotNull(fileModel);
-        Assert.AreEqual(key, fileModel.Key);
-        Assert.AreEqual(FileName, fileModel.FileName);
+        Assert.That(fileModel, Is.Not.Null);
+        Assert.That(fileModel.Key, Is.EqualTo(key));
+        Assert.That(fileModel.FileName, Is.EqualTo(FileName));
 
         using (var reader = new StreamReader(fileModel.OpenReadStream()))
         {
             string fileContents = reader.ReadToEnd();
-            Assert.AreEqual(FileContents, fileContents);
+            Assert.That(fileContents, Is.EqualTo(FileContents));
         }
 
         var deleteAttempt = await TemporaryFileService.DeleteAsync(key);
-        Assert.IsTrue(createAttempt.Success);
+        Assert.That(createAttempt.Success, Is.True);
 
         fileModel = await TemporaryFileService.GetAsync(key);
-        Assert.IsNull(fileModel);
+        Assert.That(fileModel, Is.Null);
     }
 
     [Test]
@@ -85,7 +85,7 @@ public class TemporaryFileServiceTests : UmbracoIntegrationTest
             }
         };
         var createAttempt = await TemporaryFileService.CreateAsync(model);
-        Assert.IsFalse(createAttempt.Success);
-        Assert.AreEqual(TemporaryFileOperationStatus.InvalidFileName, createAttempt.Status);
+        Assert.That(createAttempt.Success, Is.False);
+        Assert.That(createAttempt.Status, Is.EqualTo(TemporaryFileOperationStatus.InvalidFileName));
     }
 }

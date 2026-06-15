@@ -42,17 +42,17 @@ internal sealed class WebhookLogServiceTests : UmbracoIntegrationTest
 
             static void AssertGetResult(WebhookLog createdWebhookLog, PagedModel<WebhookLog> allWebhookLogsPaged)
             {
-                Assert.IsNotNull(allWebhookLogsPaged);
-                Assert.IsNotEmpty(allWebhookLogsPaged.Items);
-                Assert.AreEqual(1, allWebhookLogsPaged.Items.Count());
+                Assert.That(allWebhookLogsPaged, Is.Not.Null);
+                Assert.That(allWebhookLogsPaged.Items, Is.Not.Empty);
+                Assert.That(allWebhookLogsPaged.Items.Count(), Is.EqualTo(1));
                 var webhookLog = allWebhookLogsPaged.Items.First();
-                Assert.AreEqual(createdWebhookLog.Date.ToString(CultureInfo.InvariantCulture), webhookLog.Date.ToString(CultureInfo.InvariantCulture));
-                Assert.AreEqual(createdWebhookLog.EventAlias, webhookLog.EventAlias);
-                Assert.AreEqual(createdWebhookLog.RequestBody, webhookLog.RequestBody);
-                Assert.AreEqual(createdWebhookLog.ResponseBody, webhookLog.ResponseBody);
-                Assert.AreEqual(createdWebhookLog.StatusCode, webhookLog.StatusCode);
-                Assert.AreEqual(createdWebhookLog.RetryCount, webhookLog.RetryCount);
-                Assert.AreEqual(createdWebhookLog.Key, webhookLog.Key);
+                Assert.That(webhookLog.Date.ToString(CultureInfo.InvariantCulture), Is.EqualTo(createdWebhookLog.Date.ToString(CultureInfo.InvariantCulture)));
+                Assert.That(webhookLog.EventAlias, Is.EqualTo(createdWebhookLog.EventAlias));
+                Assert.That(webhookLog.RequestBody, Is.EqualTo(createdWebhookLog.RequestBody));
+                Assert.That(webhookLog.ResponseBody, Is.EqualTo(createdWebhookLog.ResponseBody));
+                Assert.That(webhookLog.StatusCode, Is.EqualTo(createdWebhookLog.StatusCode));
+                Assert.That(webhookLog.RetryCount, Is.EqualTo(createdWebhookLog.RetryCount));
+                Assert.That(webhookLog.Key, Is.EqualTo(createdWebhookLog.Key));
             }
         });
     }

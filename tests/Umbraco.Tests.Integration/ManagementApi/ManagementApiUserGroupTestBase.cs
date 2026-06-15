@@ -50,7 +50,7 @@ public abstract class ManagementApiUserGroupTestBase<T> : ManagementApiTest<T>
     public virtual async Task As_Admin_I_Have_Specified_Access()
     {
         var response = await AuthorizedRequest(Constants.Security.AdminGroupKey, "Admin");
-        Assert.AreEqual(AdminUserGroupAssertionModel.ExpectedStatusCode, response.StatusCode, await response.Content.ReadAsStringAsync());
+        Assert.That(response.StatusCode, Is.EqualTo(AdminUserGroupAssertionModel.ExpectedStatusCode), await response.Content.ReadAsStringAsync());
     }
 
     // Editor
@@ -58,9 +58,8 @@ public abstract class ManagementApiUserGroupTestBase<T> : ManagementApiTest<T>
     public virtual async Task As_Editor_I_Have_Specified_Access()
     {
         var response = await AuthorizedRequest(Constants.Security.EditorGroupKey, "Editor");
-        Assert.AreEqual(
-            EditorUserGroupAssertionModel.ExpectedStatusCode,
-            response.StatusCode,
+        Assert.That(
+            response.StatusCode, Is.EqualTo(EditorUserGroupAssertionModel.ExpectedStatusCode),
             await response.Content.ReadAsStringAsync());
     }
 
@@ -69,9 +68,8 @@ public abstract class ManagementApiUserGroupTestBase<T> : ManagementApiTest<T>
     public virtual async Task As_Sensitive_Data_I_Have_Specified_Access()
     {
         var response = await AuthorizedRequest(Constants.Security.SensitiveDataGroupKey, "SensitiveData");
-        Assert.AreEqual(
-            SensitiveDataUserGroupAssertionModel.ExpectedStatusCode,
-            response.StatusCode,
+        Assert.That(
+            response.StatusCode, Is.EqualTo(SensitiveDataUserGroupAssertionModel.ExpectedStatusCode),
             await response.Content.ReadAsStringAsync());
     }
 
@@ -80,9 +78,8 @@ public abstract class ManagementApiUserGroupTestBase<T> : ManagementApiTest<T>
     public virtual async Task As_Translator_I_Have_Specified_Access()
     {
         var response = await AuthorizedRequest(Constants.Security.TranslatorGroupKey, "Translator");
-        Assert.AreEqual(
-            TranslatorUserGroupAssertionModel.ExpectedStatusCode,
-            response.StatusCode,
+        Assert.That(
+            response.StatusCode, Is.EqualTo(TranslatorUserGroupAssertionModel.ExpectedStatusCode),
             await response.Content.ReadAsStringAsync());
     }
 
@@ -91,9 +88,8 @@ public abstract class ManagementApiUserGroupTestBase<T> : ManagementApiTest<T>
     public virtual async Task As_Writer_I_Have_Specified_Access()
     {
         var response = await AuthorizedRequest(Constants.Security.WriterGroupKey, "Writer");
-        Assert.AreEqual(
-            WriterUserGroupAssertionModel.ExpectedStatusCode,
-            response.StatusCode,
+        Assert.That(
+            response.StatusCode, Is.EqualTo(WriterUserGroupAssertionModel.ExpectedStatusCode),
             await response.Content.ReadAsStringAsync());
     }
 
@@ -102,9 +98,8 @@ public abstract class ManagementApiUserGroupTestBase<T> : ManagementApiTest<T>
     public virtual async Task As_Unauthorized_I_Have_Specified_Access()
     {
         var response = await ClientRequest();
-        Assert.AreEqual(
-            UnauthorizedUserGroupAssertionModel.ExpectedStatusCode,
-            response.StatusCode,
+        Assert.That(
+            response.StatusCode, Is.EqualTo(UnauthorizedUserGroupAssertionModel.ExpectedStatusCode),
             await response.Content.ReadAsStringAsync());
     }
 

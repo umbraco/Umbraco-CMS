@@ -35,10 +35,10 @@ public class DataTypeDefinitionRepositorySqlClausesTest : BaseUsingSqlSyntax
 
         Assert.That(sql.SQL, Is.EqualTo(expected.SQL));
 
-        Assert.AreEqual(expected.Arguments.Length, sql.Arguments.Length);
+        Assert.That(sql.Arguments.Length, Is.EqualTo(expected.Arguments.Length));
         for (var i = 0; i < expected.Arguments.Length; i++)
         {
-            Assert.AreEqual(expected.Arguments[i], sql.Arguments[i]);
+            Assert.That(sql.Arguments[i], Is.EqualTo(expected.Arguments[i]));
         }
 
         Debug.Print(sql.SQL);
