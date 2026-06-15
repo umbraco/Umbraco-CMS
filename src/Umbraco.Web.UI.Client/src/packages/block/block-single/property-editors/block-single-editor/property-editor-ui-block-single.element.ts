@@ -459,6 +459,12 @@ export class UmbPropertyEditorUIBlockSingleElement
 		UmbTextStyles,
 
 		css`
+			:host {
+				display: flex;
+				flex-direction: column;
+				gap: var(--uui-size-1);
+			}
+
 			uui-button-group {
 				margin-top: 1px;
 				display: grid;
