@@ -139,6 +139,10 @@ internal abstract class BlockPropertyValueCreatorBase<TBlockModel, TBlockItemMod
 
         // Convert the content data
         var contentPublishedElements = new Dictionary<Guid, IPublishedElement>();
+
+        // Get all layouts.
+        // NOTE: While the Grid areas are modeled to contain areas within areas, in reality it cannot be configured as
+        //       such, so this "top-level aggregation" of layouts works in effect.
         IBlockLayoutItem[] allLayouts = converted
             .Layout
             .SelectMany(layout => new[] { layout }.Union(layout.GetContainedLayouts()))

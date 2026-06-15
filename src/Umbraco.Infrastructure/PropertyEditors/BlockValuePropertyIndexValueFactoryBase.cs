@@ -147,6 +147,10 @@ internal abstract class BlockValuePropertyIndexValueFactoryBase<TSerialized> : J
         }
 
         IBlockLayoutItem[] layoutsAsArray = layouts as IBlockLayoutItem[] ?? layouts.ToArray();
+
+        // Get the shared element keys from all layouts.
+        // NOTE: While the Grid areas are modeled to contain areas within areas, in reality it cannot be configured as
+        //       such, so this "top-level aggregation" of shared content keys works in effect.
         Guid[] sharedElementKeys = layoutsAsArray
             .Union(layoutsAsArray.SelectMany(l => l.GetContainedLayouts()))
             .Where(l => l.IsSharedContent)
