@@ -100,76 +100,7 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 		// We do not have index for RTE Blocks at the moment.
 		this.#context.setIndex(0);
 
-		this.observe(
-			this.#context.showContentEdit,
-			(showContentEdit) => {
-				this._showContentEdit = showContentEdit;
-				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config!, showContentEdit } });
-			},
-			null,
-		);
-		this.observe(
-			this.#context.settingsElementTypeKey,
-			(key) => {
-				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config!, showSettingsEdit: !!key } });
-			},
-			null,
-		);
-		this.observe(
-			this.#context.contentElementTypeAlias,
-			(alias) => {
-				this._contentTypeAlias = alias;
-			},
-			null,
-		);
-		this.observe(
-			this.#context.contentElementTypeName,
-			(contentElementTypeName) => {
-				this._contentTypeName = contentElementTypeName;
-			},
-			null,
-		);
-		this.observe(
-			this.#context.blockType,
-			(blockType) => {
-				this.#updateBlockViewProps({ blockType });
-			},
-			null,
-		);
-		this.observe(this.#context.index, (index) => this.#updateBlockViewProps({ index }), null);
-		this.observe(
-			this.#context.label,
-			(label) => {
-				this.#updateBlockViewProps({ label });
-				this._label = label;
-			},
-			null,
-		);
-		this.observe(
-			this.#context.contentElementTypeIcon,
-			(icon) => {
-				this.#updateBlockViewProps({ icon });
-				this._icon = icon;
-			},
-			null,
-		);
-		this.observe(
-			this.#context.hasExpose,
-			(exposed) => {
-				this.#updateBlockViewProps({ unpublished: !exposed });
-				this._exposed = exposed;
-			},
-			null,
-		);
-		this.observe(
-			this.#context.unsupported,
-			(unsupported) => {
-				if (unsupported === undefined) return;
-				this.#updateBlockViewProps({ unsupported });
-				this.unsupported = unsupported;
-			},
-			null,
-		);
+		this.#observeBlockViewProps();
 
 		this.observe(this.#context.actionsVisibility, (showActions) => (this._showActions = showActions), null);
 
@@ -225,6 +156,67 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 				this.#updateBlockViewProps({ readonly: isReadOnly });
 			},
 			'umbReadOnlyObserver',
+		);
+	}
+
+	#observeBlockViewProps() {
+		this.observe(
+			this.#context.showContentEdit,
+			(showContentEdit) => {
+				this._showContentEdit = showContentEdit;
+				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config!, showContentEdit } });
+			},
+			null,
+		);
+		this.observe(
+			this.#context.settingsElementTypeKey,
+			(key) => {
+				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config!, showSettingsEdit: !!key } });
+			},
+			null,
+		);
+		this.observe(this.#context.contentElementTypeAlias, (alias) => (this._contentTypeAlias = alias), null);
+		this.observe(this.#context.contentElementTypeName, (name) => (this._contentTypeName = name), null);
+		this.observe(
+			this.#context.blockType,
+			(blockType) => {
+				this.#updateBlockViewProps({ blockType });
+			},
+			null,
+		);
+		this.observe(this.#context.index, (index) => this.#updateBlockViewProps({ index }), null);
+		this.observe(
+			this.#context.label,
+			(label) => {
+				this.#updateBlockViewProps({ label });
+				this._label = label;
+			},
+			null,
+		);
+		this.observe(
+			this.#context.contentElementTypeIcon,
+			(icon) => {
+				this.#updateBlockViewProps({ icon });
+				this._icon = icon;
+			},
+			null,
+		);
+		this.observe(
+			this.#context.hasExpose,
+			(exposed) => {
+				this.#updateBlockViewProps({ unpublished: !exposed });
+				this._exposed = exposed;
+			},
+			null,
+		);
+		this.observe(
+			this.#context.unsupported,
+			(unsupported) => {
+				if (unsupported === undefined) return;
+				this.#updateBlockViewProps({ unsupported });
+				this.unsupported = unsupported;
+			},
+			null,
 		);
 	}
 
