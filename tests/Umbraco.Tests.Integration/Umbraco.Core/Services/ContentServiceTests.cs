@@ -84,8 +84,9 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
         .AddNotificationHandler<ContentCopiedNotification, ContentNotificationHandler>()
         .AddNotificationHandler<ContentSavingNotification, ContentNotificationHandler>();
 
-    [Test]
-    public void Sort_Preserves_Template_And_Property_Data_When_Items_Loaded_Without_Them()
+    [TestCase(true)]
+    [TestCase(false)]
+    public void Sort_Preserves_Template_And_Property_Data_When_Items_Loaded_Without_Them(bool useSortChildren)
     {
         // The fixture's children share the content type's default template; assign it so we can verify it survives.
         var templateId = ContentType.DefaultTemplateId;
@@ -113,15 +114,30 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
 
         // Rotate the order so every item's sort order changes (and is therefore re-saved).
         Dictionary<Guid, IContent> byKey = partialChildren.ToDictionary(x => x.Key, x => x);
-        IContent[] rotated =
-        [
-            byKey[new Guid(SubPage2Key)],
-            byKey[new Guid(SubPage3Key)],
-            byKey[new Guid(SubPageKey)],
-        ];
+        if (useSortChildren)
+        {
+            int[] rotated =
+            [
+                byKey[new Guid(SubPage2Key)].Id,
+                byKey[new Guid(SubPage3Key)].Id,
+                byKey[new Guid(SubPageKey)].Id,
+            ];
 
-        OperationResult result = ContentService.Sort(rotated);
-        Assert.That(result.Success, Is.True);
+            var result = ContentService.SortChildren(Textpage.Id, rotated);
+            Assert.That(result.Success, Is.True);
+        }
+        else
+        {
+            IContent[] rotated =
+            [
+                byKey[new Guid(SubPage2Key)],
+                byKey[new Guid(SubPage3Key)],
+                byKey[new Guid(SubPageKey)],
+            ];
+
+            OperationResult result = ContentService.Sort(rotated);
+            Assert.That(result.Success, Is.True);
+        }
 
         // Every sorted child must retain its template and property data.
         foreach (var key in childKeys)

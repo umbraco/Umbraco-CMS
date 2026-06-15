@@ -23,8 +23,9 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
 
     private IMediaTypeService MediaTypeService => GetRequiredService<IMediaTypeService>();
 
-    [Test]
-    public async Task Sort_Preserves_Property_Data_When_Items_Loaded_Without_It()
+    [TestCase(true)]
+    [TestCase(false)]
+    public async Task Sort_Preserves_Property_Data_When_Items_Loaded_Without_It(bool useSortChildren)
     {
         var mediaType = await CreateMediaType();
 
@@ -48,9 +49,18 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
             .ToList();
 
         // Rotate so every item's sort order changes (and is therefore re-saved).
-        IMedia[] rotated = [partial[1], partial[2], partial[0]];
+        if (useSortChildren)
+        {
+            int[] rotated = [partial[1].Id, partial[2].Id, partial[0].Id];
 
-        Assert.That(MediaService.Sort(rotated), Is.True);
+            var result = MediaService.SortChildren(Constants.System.Root, rotated);
+            Assert.That(result.Success, Is.True);
+        }
+        else
+        {
+            IMedia[] rotated = [partial[1], partial[2], partial[0]];
+            Assert.That(MediaService.Sort(rotated), Is.True);
+        }
 
         // Every sorted item must retain its property data, and the requested order must be applied.
         Assert.Multiple(() =>
