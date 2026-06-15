@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
+namespace Umbraco.Cms.Persistence.EFCore.Sqlite.Migrations
 {
     /// <inheritdoc />
     public partial class AddRedirectUrlDto : Migration

@@ -86,7 +86,7 @@ public class RedirectTrackerTests : UmbracoIntegrationTestWithContent
     }
 
     /// <summary>
-    /// Verifies that <see cref="IRedirectTracker.CreateRedirects"/> registers a redirect URL
+    /// Verifies that <see cref="IRedirectTracker.CreateRedirectsAsync"/> registers a redirect URL
     /// when the old route differs from the new route.
     /// </summary>
     [Test]
@@ -145,7 +145,7 @@ public class RedirectTrackerTests : UmbracoIntegrationTestWithContent
     /// </summary>
     [TestCase(Constants.Routing.Unroutable)]
     [TestCase(Constants.Routing.UrlProviderException)]
-    public void Does_Not_Create_Redirect_For_Unroutable_Old_Route(string oldRoute)
+    public async Task Does_Not_Create_Redirect_For_Unroutable_Old_Route(string oldRoute)
     {
         IDictionary<(int ContentId, string Culture), (Guid ContentKey, string OldRoute)> dict =
             new Dictionary<(int ContentId, string Culture), (Guid ContentKey, string OldRoute)>
@@ -155,9 +155,9 @@ public class RedirectTrackerTests : UmbracoIntegrationTestWithContent
 
         var redirectTracker = CreateRedirectTracker();
 
-        redirectTracker.CreateRedirects(dict);
+        await redirectTracker.CreateRedirectsAsync(dict);
 
-        Assert.IsEmpty(RedirectUrlService.GetContentRedirectUrls(_testPage.Key));
+        Assert.IsEmpty(await RedirectUrlService.GetContentRedirectUrlsAsync(_testPage.Key));
     }
 
     /// <summary>

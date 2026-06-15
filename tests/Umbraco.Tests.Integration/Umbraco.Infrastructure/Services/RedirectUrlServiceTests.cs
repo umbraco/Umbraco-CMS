@@ -10,8 +10,9 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
-using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
@@ -46,7 +47,7 @@ internal sealed class RedirectUrlServiceTests : UmbracoIntegrationTestWithConten
         using (var scope = ScopeProvider.CreateScope())
         {
             var repository = new RedirectUrlRepository(
-                (IScopeAccessor)ScopeProvider,
+                GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>(),
                 AppCaches.Disabled,
                 Mock.Of<ILogger<RedirectUrlRepository>>(),
                 Mock.Of<IRepositoryCacheVersionService>(),
@@ -58,12 +59,12 @@ internal sealed class RedirectUrlServiceTests : UmbracoIntegrationTestWithConten
             _thirdSubPage = subPages[2];
 
 
-            repository.Save(new RedirectUrl { ContentKey = _firstSubPage.Key, Url = Url, Culture = CultureEnglish });
+            await repository.SaveAsync(new RedirectUrl { ContentKey = _firstSubPage.Key, Url = Url, Culture = CultureEnglish }, CancellationToken.None);
             Thread.Sleep(
                 1000); //Added delay to ensure timestamp difference as sometimes they seem to have the same timestamp
-            repository.Save(new RedirectUrl { ContentKey = _secondSubPage.Key, Url = Url, Culture = CultureGerman });
+            await repository.SaveAsync(new RedirectUrl { ContentKey = _secondSubPage.Key, Url = Url, Culture = CultureGerman }, CancellationToken.None);
             Thread.Sleep(1000);
-            repository.Save(new RedirectUrl { ContentKey = _thirdSubPage.Key, Url = UrlAlt, Culture = string.Empty });
+            await repository.SaveAsync(new RedirectUrl { ContentKey = _thirdSubPage.Key, Url = UrlAlt, Culture = string.Empty }, CancellationToken.None);
 
             scope.Complete();
         }
@@ -80,43 +81,43 @@ internal sealed class RedirectUrlServiceTests : UmbracoIntegrationTestWithConten
 
     [Test]
     [LongRunning]
-    public void Can_Get_Most_Recent_RedirectUrl()
+    public async Task Can_Get_Most_Recent_RedirectUrl()
     {
-        var redirect = RedirectUrlService.GetMostRecentRedirectUrl(Url);
+        var redirect = await RedirectUrlService.GetMostRecentRedirectUrlAsync(Url);
         Assert.AreEqual(redirect.ContentId, _secondSubPage.Id);
     }
 
     [Test]
     [LongRunning]
-    public void Can_Get_Most_Recent_RedirectUrl_With_Culture()
+    public async Task Can_Get_Most_Recent_RedirectUrl_With_Culture()
     {
-        var redirect = RedirectUrlService.GetMostRecentRedirectUrl(Url, CultureEnglish);
+        var redirect = await RedirectUrlService.GetMostRecentRedirectUrlAsync(Url, CultureEnglish);
         Assert.AreEqual(redirect.ContentId, _firstSubPage.Id);
     }
 
     [Test]
     [LongRunning]
-    public void Can_Get_Most_Recent_RedirectUrl_With_Culture_When_No_CultureVariant_Exists()
+    public async Task Can_Get_Most_Recent_RedirectUrl_With_Culture_When_No_CultureVariant_Exists()
     {
-        var redirect = RedirectUrlService.GetMostRecentRedirectUrl(UrlAlt, UnusedCulture);
+        var redirect = await RedirectUrlService.GetMostRecentRedirectUrlAsync(UrlAlt, UnusedCulture);
         Assert.AreEqual(redirect.ContentId, _thirdSubPage.Id);
     }
 
     [Test]
-    public void Can_RegisterWithStatus_Redirect()
+    public async Task Can_RegisterWithStatus_Redirect()
     {
         const string TestUrl = "testUrl";
 
-        var status = RedirectUrlService.RegisterWithStatus(TestUrl, _firstSubPage.Key);
+        var status = await RedirectUrlService.RegisterWithStatusAsync(TestUrl, _firstSubPage.Key);
 
-        var redirect = RedirectUrlService.GetMostRecentRedirectUrl(TestUrl, CultureEnglish);
+        var redirect = await RedirectUrlService.GetMostRecentRedirectUrlAsync(TestUrl, CultureEnglish);
 
         Assert.AreEqual(redirect.ContentId, _firstSubPage.Id);
         Assert.AreEqual(status.Status, RedirectUrlOperationStatus.Success);
     }
 
     [Test]
-    public void RegisterWithStatus_Publishes_Saving_And_Saved_Notifications()
+    public async Task RegisterWithStatus_Publishes_Saving_And_Saved_Notifications()
     {
         const string OldUrl = "/old/url";
 
@@ -125,7 +126,7 @@ internal sealed class RedirectUrlServiceTests : UmbracoIntegrationTestWithConten
         RedirectUrlNotificationHandler.Saving = n => savingCaptured = n;
         RedirectUrlNotificationHandler.Saved = n => savedCaptured = n;
 
-        var result = RedirectUrlService.RegisterWithStatus(OldUrl, _firstSubPage.Key, CultureEnglish);
+        var result = await RedirectUrlService.RegisterWithStatusAsync(OldUrl, _firstSubPage.Key, CultureEnglish);
 
         Assert.Multiple(() =>
         {
@@ -145,7 +146,7 @@ internal sealed class RedirectUrlServiceTests : UmbracoIntegrationTestWithConten
     }
 
     [Test]
-    public void RegisterWithStatus_Returns_CancelledByNotification_When_Handler_Cancels_Saving()
+    public async Task RegisterWithStatus_Returns_CancelledByNotification_When_Handler_Cancels_Saving()
     {
         const string OldUrl = "/cancelled/old";
 
@@ -153,7 +154,7 @@ internal sealed class RedirectUrlServiceTests : UmbracoIntegrationTestWithConten
         RedirectUrlNotificationHandler.Saving = n => n.Cancel = true;
         RedirectUrlNotificationHandler.Saved = _ => savedWasCalled = true;
 
-        var result = RedirectUrlService.RegisterWithStatus(OldUrl, _firstSubPage.Key, CultureEnglish);
+        var result = await RedirectUrlService.RegisterWithStatusAsync(OldUrl, _firstSubPage.Key, CultureEnglish);
 
         Assert.Multiple(() =>
         {
@@ -163,20 +164,20 @@ internal sealed class RedirectUrlServiceTests : UmbracoIntegrationTestWithConten
         });
 
         // Verify nothing was persisted.
-        var persisted = RedirectUrlService.GetMostRecentRedirectUrl(OldUrl, CultureEnglish);
+        var persisted = await RedirectUrlService.GetMostRecentRedirectUrlAsync(OldUrl, CultureEnglish);
         Assert.IsNull(persisted);
     }
 
     [Test]
-    public void DeleteWithStatus_By_Entity_Returns_CancelledByNotification_When_Handler_Cancels()
+    public async Task DeleteWithStatus_By_Entity_Returns_CancelledByNotification_When_Handler_Cancels()
     {
-        IRedirectUrl existing = RedirectUrlService.GetContentRedirectUrls(_firstSubPage.Key).First();
+        IRedirectUrl existing = (await RedirectUrlService.GetContentRedirectUrlsAsync(_firstSubPage.Key)).First();
 
         var deletedWasCalled = false;
         RedirectUrlNotificationHandler.Deleting = n => n.Cancel = true;
         RedirectUrlNotificationHandler.Deleted = _ => deletedWasCalled = true;
 
-        var status = RedirectUrlService.DeleteWithStatus(existing);
+        var status = await RedirectUrlService.DeleteWithStatusAsync(existing);
 
         Assert.Multiple(() =>
         {
@@ -185,26 +186,26 @@ internal sealed class RedirectUrlServiceTests : UmbracoIntegrationTestWithConten
         });
 
         // Verify the redirect still exists.
-        Assert.IsNotNull(RedirectUrlService.GetContentRedirectUrls(_firstSubPage.Key).FirstOrDefault(r => r.Key == existing.Key));
+        Assert.IsNotNull((await RedirectUrlService.GetContentRedirectUrlsAsync(_firstSubPage.Key)).FirstOrDefault(r => r.Key == existing.Key));
     }
 
     [Test]
-    public void DeleteWithStatus_By_Id_Returns_NotFound_When_Missing()
+    public async Task DeleteWithStatus_By_Id_Returns_NotFound_When_Missing()
     {
-        var status = RedirectUrlService.DeleteWithStatus(Guid.NewGuid());
+        var status = await RedirectUrlService.DeleteWithStatusAsync(Guid.NewGuid());
 
         Assert.AreEqual(RedirectUrlOperationStatus.NotFound, status);
     }
 
     [Test]
-    public void DeleteContentRedirectUrlsWithStatus_Cancels_All_When_Handler_Cancels()
+    public async Task DeleteContentRedirectUrlsWithStatus_Cancels_All_When_Handler_Cancels()
     {
         RedirectUrlNotificationHandler.Deleting = n => n.Cancel = true;
 
-        var status = RedirectUrlService.DeleteContentRedirectUrlsWithStatus(_firstSubPage.Key);
+        var status = await RedirectUrlService.DeleteContentRedirectUrlsWithStatusAsync(_firstSubPage.Key);
 
         Assert.AreEqual(RedirectUrlOperationStatus.CancelledByNotification, status);
-        Assert.IsNotEmpty(RedirectUrlService.GetContentRedirectUrls(_firstSubPage.Key));
+        Assert.IsNotEmpty(await RedirectUrlService.GetContentRedirectUrlsAsync(_firstSubPage.Key));
     }
 
     internal sealed class RedirectUrlNotificationHandler :

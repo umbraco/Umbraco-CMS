@@ -58,34 +58,34 @@ public interface IRedirectUrlRepository : IAsyncReadWriteRepository<Guid, IRedir
     ///     Gets paginated redirect URLs for a content item.
     /// </summary>
     /// <param name="contentKey">The content unique key.</param>
-    /// <param name="pageIndex">The zero-based page index.</param>
-    /// <param name="pageSize">The page size.</param>
-    /// <returns>All redirect URLs for the content item.</returns>
-    Task<PagedModel<IRedirectUrl>> GetContentUrlsAsync(Guid contentKey, long pageIndex, int pageSize);
+    /// <param name="skip">The number of redirect URLs to skip.</param>
+    /// <param name="take">The number of redirect URLs to take.</param>
+    /// <returns>A paged model containing the redirect URLs for the content item and the total count.</returns>
+    Task<PagedModel<IRedirectUrl>> GetContentUrlsAsync(Guid contentKey, int skip, int take);
 
     /// <summary>
     ///     Gets all redirect URLs.
     /// </summary>
-    /// <param name="pageIndex">The zero-based page index.</param>
-    /// <param name="pageSize">The page size.</param>
+    /// <param name="skip">The number of redirect URLs to skip.</param>
+    /// <param name="take">The number of redirect URLs to take.</param>
     /// <returns>A paged model containing the redirect URLs and the total count.</returns>
-    Task<PagedModel<IRedirectUrl>> GetAllUrlsAsync(long pageIndex, int pageSize);
+    Task<PagedModel<IRedirectUrl>> GetAllUrlsAsync(int skip, int take);
 
     /// <summary>
     ///     Gets all redirect URLs below a given content item.
     /// </summary>
     /// <param name="rootContentId">The content unique identifier.</param>
-    /// <param name="pageIndex">The zero-based page index.</param>
-    /// <param name="pageSize">The page size.</param>
+    /// <param name="skip">The number of redirect URLs to skip.</param>
+    /// <param name="take">The number of redirect URLs to take.</param>
     /// <returns>A paged model containing the redirect URLs and the total count.</returns>
-    Task<PagedModel<IRedirectUrl>> GetAllUrlsAsync(int rootContentId, long pageIndex, int pageSize);
+    Task<PagedModel<IRedirectUrl>> GetAllUrlsAsync(int rootContentId, int skip, int take);
 
     /// <summary>
     ///     Searches for all redirect URLs that contain a given search term in their URL property.
     /// </summary>
     /// <param name="searchTerm">The term to search for.</param>
-    /// <param name="pageIndex">The zero-based page index.</param>
-    /// <param name="pageSize">The page size.</param>
+    /// <param name="skip">The number of redirect URLs to skip.</param>
+    /// <param name="take">The number of redirect URLs to take.</param>
     /// <returns>A paged model containing the matching redirect URLs and the total count.</returns>
-    Task<PagedModel<IRedirectUrl>> SearchUrlsAsync(string searchTerm, long pageIndex, int pageSize);
+    Task<PagedModel<IRedirectUrl>> SearchUrlsAsync(string searchTerm, int skip, int take);
 }

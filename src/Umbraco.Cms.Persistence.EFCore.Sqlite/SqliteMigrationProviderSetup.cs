@@ -20,11 +20,7 @@ public class SqliteMigrationProviderSetup : IMigrationProviderSetup
         {
             x.MigrationsAssembly(GetType().Assembly.FullName);
 
-            // Retry transient SQLite errors (BUSY / LOCKED). See SqliteRetryingExecutionStrategy
-            // for the rationale — long-running migrations or schema-modifying operations can
-            // briefly lock the database in a way that surfaces as a hard error to concurrent
-            // EF Core readers (notably OpenIddict token validation). See issue #22939.
-            x.ExecutionStrategy(deps => new SqliteRetryingExecutionStrategy(deps));
+
         });
     }
 }

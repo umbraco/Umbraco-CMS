@@ -309,7 +309,7 @@ internal sealed class RedirectTracker : IRedirectTracker
                 // to the original. We resolve this by removing any existing redirect that points to the new route.
                 await RemoveSelfReferencingRedirectAsync(contentKey, newRoute);
 
-                _redirectUrlService.RegisterWithStatus(oldRoute, contentKey, culture);
+                await _redirectUrlService.RegisterWithStatusAsync(oldRoute, contentKey, culture);
             }
             catch (Exception ex)
             {
@@ -341,7 +341,7 @@ internal sealed class RedirectTracker : IRedirectTracker
         {
             if (redirectUrl.Url == route)
             {
-                _redirectUrlService.DeleteWithStatus(redirectUrl.Key);
+                await _redirectUrlService.DeleteWithStatusAsync(redirectUrl.Key);
             }
         }
     }

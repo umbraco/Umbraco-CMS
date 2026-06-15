@@ -185,7 +185,7 @@ internal sealed class RedirectUrlRepository : AsyncEntityRepositoryBase<Guid, IR
         });
 
     /// <inheritdoc/>
-    public async Task<PagedModel<IRedirectUrl>> GetContentUrlsAsync(Guid contentKey, long pageIndex, int pageSize) =>
+    public async Task<PagedModel<IRedirectUrl>> GetContentUrlsAsync(Guid contentKey, int skip, int take) =>
         await AmbientScope.ExecuteWithContextAsync(async db =>
         {
             var contentId = await db.Nodes
@@ -193,27 +193,31 @@ internal sealed class RedirectUrlRepository : AsyncEntityRepositoryBase<Guid, IR
                 .Select(n => n.NodeId)
                 .FirstOrDefaultAsync();
 
-            List<RedirectUrlDto> dtos = await db.RedirectUrls
-                .Where(x => x.ContentKey == contentKey)
-                .Skip((int)(pageIndex * pageSize))
-                .Take(pageSize)
+            IQueryable<RedirectUrlDto> query = db.RedirectUrls
+                .Where(x => x.ContentKey == contentKey);
+
+            var total = await query.LongCountAsync();
+
+            List<RedirectUrlDto> dtos = await query
                 .OrderByDescending(x => x.CreateDateUtc)
+                .Skip(skip)
+                .Take(take)
                 .ToListAsync();
 
             IRedirectUrl[] items = dtos.Select(dto => Map(dto, contentId)).ToArray();
-            return new PagedModel<IRedirectUrl>(items.Length, items);
+            return new PagedModel<IRedirectUrl>(total, items);
         });
 
     /// <inheritdoc/>
-    public async Task<PagedModel<IRedirectUrl>> GetAllUrlsAsync(long pageIndex, int pageSize) =>
+    public async Task<PagedModel<IRedirectUrl>> GetAllUrlsAsync(int skip, int take) =>
         await AmbientScope.ExecuteWithContextAsync(async db =>
         {
             var total = await db.RedirectUrls.LongCountAsync();
 
             var results = await db.RedirectUrls
                 .OrderByDescending(x => x.CreateDateUtc)
-                .Skip((int)(pageIndex * pageSize))
-                .Take(pageSize)
+                .Skip(skip)
+                .Take(take)
                 .Join(
                     db.Nodes,
                     redirect => redirect.ContentKey,
@@ -226,7 +230,7 @@ internal sealed class RedirectUrlRepository : AsyncEntityRepositoryBase<Guid, IR
         });
 
     /// <inheritdoc/>
-    public async Task<PagedModel<IRedirectUrl>> GetAllUrlsAsync(int rootContentId, long pageIndex, int pageSize) =>
+    public async Task<PagedModel<IRedirectUrl>> GetAllUrlsAsync(int rootContentId, int skip, int take) =>
         await AmbientScope.ExecuteWithContextAsync(async db =>
         {
             var pathPattern = "," + rootContentId + ",";
@@ -243,8 +247,8 @@ internal sealed class RedirectUrlRepository : AsyncEntityRepositoryBase<Guid, IR
 
             var results = await query
                 .OrderByDescending(x => x.Redirect.CreateDateUtc)
-                .Skip((int)(pageIndex * pageSize))
-                .Take(pageSize)
+                .Skip(skip)
+                .Take(take)
                 .ToListAsync();
 
             IEnumerable<IRedirectUrl> items = results.Select(r => Map(r.Redirect, r.ContentId));
@@ -252,7 +256,7 @@ internal sealed class RedirectUrlRepository : AsyncEntityRepositoryBase<Guid, IR
         });
 
     /// <inheritdoc/>
-    public async Task<PagedModel<IRedirectUrl>> SearchUrlsAsync(string searchTerm, long pageIndex, int pageSize) =>
+    public async Task<PagedModel<IRedirectUrl>> SearchUrlsAsync(string searchTerm, int skip, int take) =>
         await AmbientScope.ExecuteWithContextAsync(async db =>
         {
             var term = searchTerm.Trim().ToLowerInvariant();
@@ -263,8 +267,8 @@ internal sealed class RedirectUrlRepository : AsyncEntityRepositoryBase<Guid, IR
 
             var results = await query
                 .OrderByDescending(x => x.CreateDateUtc)
-                .Skip((int)(pageIndex * pageSize))
-                .Take(pageSize)
+                .Skip(skip)
+                .Take(take)
                 .Join(
                     db.Nodes,
                     redirect => redirect.ContentKey,
