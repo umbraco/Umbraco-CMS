@@ -244,10 +244,10 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 				if (!contentKey || !variantId) return;
 
 				this.observe(
-					manager.isSharedContentOf(contentKey),
-					(isSharedContent) => {
-						if (isSharedContent) {
-							// A library element references pre-existing shared content. It is never exposed
+					manager.isExternalContentOf(contentKey),
+					(isExternalContent) => {
+						if (isExternalContent) {
+							// A library element references pre-existing external content. It is never exposed
 							// per-variant the way local content is, so the expose lookup would always report
 							// false. The block already exists, so it is established — submit reads as "Update".
 							this.#exposed.setValue(true);
@@ -304,8 +304,8 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 					return;
 				}
 				this.observe(
-					manager.isSharedContentOf(contentKey),
-					(isSharedContent) => this.#hasContent.setValue(!isSharedContent),
+					manager.isExternalContentOf(contentKey),
+					(isExternalContent) => this.#hasContent.setValue(!isExternalContent),
 					'observeHasContent',
 				);
 			},

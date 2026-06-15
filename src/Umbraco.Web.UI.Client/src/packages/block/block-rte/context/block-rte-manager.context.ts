@@ -83,10 +83,10 @@ export class UmbBlockRteManagerContext<
 		return true;
 	}
 
-	override async insertSharedContent(elementKey: string, originData?: UmbBlockRteWorkspaceOriginData) {
-		await super.insertSharedContent(elementKey, originData);
+	override async insertExternalContent(elementKey: string, originData?: UmbBlockRteWorkspaceOriginData) {
+		await super.insertExternalContent(elementKey, originData);
 		if (originData) {
-			const layout = { key: UmbId.new(), contentKey: elementKey, isSharedContent: true } as BlockLayoutType;
+			const layout = { key: UmbId.new(), contentKey: elementKey, isExternalContent: true } as BlockLayoutType;
 			this.notifyBlockInserted(layout, originData);
 		}
 	}

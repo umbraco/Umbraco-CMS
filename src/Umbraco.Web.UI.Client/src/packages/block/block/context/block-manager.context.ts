@@ -83,8 +83,8 @@ export abstract class UmbBlockManagerContext<
 	readonly #contents = new UmbArrayState(<Array<UmbBlockDataModel>>[], (x) => x.key);
 	public readonly contents = this.#contents.asObservable();
 
-	readonly #resolvedSharedContent = new UmbArrayState(<Array<UmbBlockDataModel>>[], (x) => x.key);
-	readonly #resolvedSharedContentVariants = new UmbArrayState(
+	readonly #resolvedExternalContent = new UmbArrayState(<Array<UmbBlockDataModel>>[], (x) => x.key);
+	readonly #resolvedExternalContentVariants = new UmbArrayState(
 		<
 			Array<{ key: string; variants: Array<{ culture: string | null; segment: string | null; state: string | null }> }>
 		>[],
@@ -206,8 +206,8 @@ export abstract class UmbBlockManagerContext<
 			this._layouts.asObservable(),
 			(layouts) => {
 				layouts.forEach((layout) => {
-					if (layout.isSharedContent && layout.contentKey) {
-						this.#fetchSharedContent(layout.contentKey);
+					if (layout.isExternalContent && layout.contentKey) {
+						this.#fetchExternalContent(layout.contentKey);
 					}
 				});
 			},
@@ -328,32 +328,32 @@ export abstract class UmbBlockManagerContext<
 		return mergeObservables(
 			[
 				this.#contents.asObservablePart((source) => source.find((x) => x.key === key)),
-				this.#resolvedSharedContent.asObservablePart((source) => source.find((x) => x.key === key)),
+				this.#resolvedExternalContent.asObservablePart((source) => source.find((x) => x.key === key)),
 			],
-			([localContent, sharedContent]) => localContent ?? sharedContent ?? undefined,
+			([localContent, externalContent]) => localContent ?? externalContent ?? undefined,
 		);
 	}
 
 	// TODO: [LK] Review the naming of this property, align with with team.
 	/**
 	 * Returns an observable that emits true when the layout for the given contentKey
-	 * has `isSharedContent` set (i.e., the block references shared content).
+	 * has `isExternalContent` set (i.e., the block references external content).
 	 */
-	isSharedContentOf(key: string) {
+	isExternalContentOf(key: string) {
 		return this._layouts.asObservablePart(
-			(source) => source.find((x) => x.contentKey === key)?.isSharedContent === true,
+			(source) => source.find((x) => x.contentKey === key)?.isExternalContent === true,
 		);
 	}
 
 	/**
-	 * Returns an observable of the variant state for shared content,
+	 * Returns an observable of the variant state for external content,
 	 * resolved against the manager's active variantId (culture/segment).
 	 * Emits the state string (e.g., 'Published', 'Draft') or null if not resolved yet.
 	 */
 	elementStateOf(key: string) {
 		return mergeObservables(
 			[
-				this.#resolvedSharedContentVariants.asObservablePart((source) => source.find((x) => x.key === key)),
+				this.#resolvedExternalContentVariants.asObservablePart((source) => source.find((x) => x.key === key)),
 				this.variantId,
 			],
 			([entry, variantId]) => {
@@ -368,9 +368,9 @@ export abstract class UmbBlockManagerContext<
 	// TODO: [@madsrasmussen] Replace per-key fetches here with a batching manager that bundles multiple
 	// element requests into a single round-trip. Today this issues one request per shared block, which
 	// can become N+1 on pages with many references. The batching manager should also cache and dedupe.
-	async #fetchSharedContent(key: string) {
+	async #fetchExternalContent(key: string) {
 		if (this.#pendingElementFetches.has(key)) return;
-		if (this.#resolvedSharedContent.getValue().some((x) => x.key === key)) return;
+		if (this.#resolvedExternalContent.getValue().some((x) => x.key === key)) return;
 		this.#pendingElementFetches.add(key);
 		try {
 			const { data } = await this.#elementRepository.requestByUnique(key);
@@ -388,8 +388,8 @@ export abstract class UmbBlockManagerContext<
 						}),
 					),
 				};
-				this.#resolvedSharedContent.appendOne(blockData);
-				this.#resolvedSharedContentVariants.appendOne({
+				this.#resolvedExternalContent.appendOne(blockData);
+				this.#resolvedExternalContentVariants.appendOne({
 					key: data.unique,
 					variants: data.variants.map((v) => ({
 						culture: v.culture ?? null,
@@ -465,7 +465,7 @@ export abstract class UmbBlockManagerContext<
 	getContentOf(contentKey: string) {
 		return (
 			this.#contents.value.find((x) => x.key === contentKey) ??
-			this.#resolvedSharedContent.value.find((x) => x.key === contentKey)
+			this.#resolvedExternalContent.value.find((x) => x.key === contentKey)
 		);
 	}
 	getSettingsOf(settingsKey: string) {
@@ -511,12 +511,12 @@ export abstract class UmbBlockManagerContext<
 	}
 
 	/**
-	 * Insert a block whose content is a shared content reference.
+	 * Insert a block whose content is an external content reference.
 	 * Only creates a layout entry — no contentData entry is added.
 	 * The layout observer handles fetching the element data.
 	 */
-	insertSharedContent(elementKey: string, _originData?: BlockOriginDataType) {
-		const layout = { key: UmbId.new(), contentKey: elementKey, isSharedContent: true } as BlockLayoutType;
+	insertExternalContent(elementKey: string, _originData?: BlockOriginDataType) {
+		const layout = { key: UmbId.new(), contentKey: elementKey, isExternalContent: true } as BlockLayoutType;
 		this._layouts.appendOne(layout);
 	}
 
@@ -566,7 +566,7 @@ export abstract class UmbBlockManagerContext<
 		this.removeExposesOf(contentKey);
 		this._layouts.updateOne(key, {
 			contentKey: created.unique,
-			isSharedContent: true,
+			isExternalContent: true,
 		} as Partial<BlockLayoutType>);
 	}
 
@@ -612,11 +612,11 @@ export abstract class UmbBlockManagerContext<
 		this.#contents.appendOne(newContent);
 		this._layouts.updateOne(key, {
 			contentKey: newContent.key,
-			isSharedContent: undefined,
+			isExternalContent: undefined,
 		} as Partial<BlockLayoutType>);
-		this.#resolvedSharedContent.removeOne(elementKey);
-		this.#resolvedSharedContentVariants.removeOne(elementKey);
-		// Only set expose if the content type structure is loaded (it may not be for shared content
+		this.#resolvedExternalContent.removeOne(elementKey);
+		this.#resolvedExternalContentVariants.removeOne(elementKey);
+		// Only set expose if the content type structure is loaded (it may not be for external content
 		// whose type was not in the block type list)
 		if (this.getStructure(contentTypeKey)) {
 			this.#setInitialBlockExpose(newContent);

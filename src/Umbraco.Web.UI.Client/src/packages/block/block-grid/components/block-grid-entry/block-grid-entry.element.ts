@@ -184,10 +184,10 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	}; // Set to undefined cause it will be set before we render.
 
 	@property({ type: Boolean, attribute: 'is-reference', reflect: true })
-	private _isSharedContent = false;
+	private _isExternalContent = false;
 
 	@state()
-	private _sharedContentVariantState: string | null | undefined;
+	private _externalContentVariantState: string | null | undefined;
 
 	@state()
 	private _isReadOnly = false;
@@ -262,17 +262,17 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		this.observe(this.#context.inlineEditingMode, (mode) => (this._inlineEditingMode = mode), null);
 		this.observe(this.#context.isSortMode, (isSortMode) => (this._isSortMode = isSortMode), null);
 		this.observe(
-			this.#context.isSharedContent,
-			(isSharedContent) => {
-				this._isSharedContent = isSharedContent;
+			this.#context.isExternalContent,
+			(isExternalContent) => {
+				this._isExternalContent = isExternalContent;
 				this.#updateExposedState();
 			},
 			null,
 		);
 		this.observe(
-			this.#context.sharedContentVariantState,
+			this.#context.externalContentVariantState,
 			(state) => {
-				this._sharedContentVariantState = state;
+				this._externalContentVariantState = state;
 				this.#updateExposedState();
 			},
 			null,
@@ -446,10 +446,10 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	};
 
 	#updateExposedState() {
-		// Shared content blocks use the element's variant state; local blocks use the expose entry
-		const isExposed = this._isSharedContent
-			? this._sharedContentVariantState === UmbElementVariantState.PUBLISHED ||
-				this._sharedContentVariantState === UmbElementVariantState.PUBLISHED_PENDING_CHANGES
+		// External content blocks use the element's variant state; local blocks use the expose entry
+		const isExposed = this._isExternalContent
+			? this._externalContentVariantState === UmbElementVariantState.PUBLISHED ||
+				this._externalContentVariantState === UmbElementVariantState.PUBLISHED_PENDING_CHANGES
 			: this._hasExpose;
 		this.#updateBlockViewProps({ unpublished: !isExposed });
 		this._exposed = isExposed;
@@ -540,7 +540,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 						() => this.#renderRefBlock(),
 						() => html`
 							<umb-entity-frame>
-								${when(this._isSharedContent, () => html`<uui-icon name="link"></uui-icon>`)} ${this._label}
+								${when(this._isExternalContent, () => html`<uui-icon name="link"></uui-icon>`)} ${this._label}
 							</umb-entity-frame>
 							<umb-extension-slot
 								single

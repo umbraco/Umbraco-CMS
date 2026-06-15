@@ -63,13 +63,13 @@ export abstract class UmbBlockEntryContext<
 
 	protected readonly localize = new UmbLocalizationController(this);
 
-	#isSharedContent = new UmbBooleanState(false);
+	#isExternalContent = new UmbBooleanState(false);
 	/** Observable that emits true when this block's content is shared (referenced from the Element Library) rather than local. */
-	readonly isSharedContent = this.#isSharedContent.asObservable();
+	readonly isExternalContent = this.#isExternalContent.asObservable();
 
-	#sharedContentVariantState = new UmbStringState(undefined);
+	#externalContentVariantState = new UmbStringState(undefined);
 	/** Observable of the shared element's variant state (e.g. 'Published', 'Draft'), resolved for the active culture/segment. */
-	readonly sharedContentVariantState = this.#sharedContentVariantState.asObservable();
+	readonly externalContentVariantState = this.#externalContentVariantState.asObservable();
 
 	#pathAddendum = new UmbRoutePathAddendumContext(this);
 	#variantId = new UmbClassState<UmbVariantId | undefined>(undefined);
@@ -180,14 +180,14 @@ export abstract class UmbBlockEntryContext<
 	#workspacePath = new UmbStringState(undefined);
 	public readonly workspacePath = this.#workspacePath.asObservable();
 
-	#sharedContentWorkspacePath = new UmbStringState(undefined);
+	#externalContentWorkspacePath = new UmbStringState(undefined);
 
 	public readonly workspaceEditContentPath = mergeObservables(
-		[this.contentKey, this.workspacePath, this.isSharedContent, this.#sharedContentWorkspacePath.asObservable()],
-		([contentKey, path, isSharedContent, sharedContentPath]) => {
+		[this.contentKey, this.workspacePath, this.isExternalContent, this.#externalContentWorkspacePath.asObservable()],
+		([contentKey, path, isExternalContent, externalContentPath]) => {
 			if (!contentKey) return '';
-			if (isSharedContent && sharedContentPath) {
-				return sharedContentPath + UMB_EDIT_ELEMENT_WORKSPACE_PATH_PATTERN.generateLocal({ unique: contentKey });
+			if (isExternalContent && externalContentPath) {
+				return externalContentPath + UMB_EDIT_ELEMENT_WORKSPACE_PATH_PATTERN.generateLocal({ unique: contentKey });
 			}
 			return this.#generateWorkspaceEditContentPath(path, contentKey);
 		},
@@ -597,7 +597,7 @@ export abstract class UmbBlockEntryContext<
 				};
 			})
 			.observeRouteBuilder((routeBuilder) => {
-				this.#sharedContentWorkspacePath.setValue(routeBuilder({ entityType: UMB_ELEMENT_ENTITY_TYPE }));
+				this.#externalContentWorkspacePath.setValue(routeBuilder({ entityType: UMB_ELEMENT_ENTITY_TYPE }));
 			});
 	}
 
@@ -607,31 +607,31 @@ export abstract class UmbBlockEntryContext<
 		const contentKey = this.#contentKey ?? this._layout.value?.contentKey;
 		if (!this._manager || !contentKey) return;
 
-		// Observe content and shared-content state together to avoid race conditions.
+		// Observe content and external-content state together to avoid race conditions.
 		// Both are evaluated in the same tick, preventing the unsupported flag
-		// from flashing true while shared content is being fetched.
+		// from flashing true while external content is being fetched.
 		this.observe(
 			mergeObservables(
-				[this._manager.contentOf(contentKey), this._manager.isSharedContentOf(contentKey)],
-				([content, isSharedContent]) => ({ content, isSharedContent: isSharedContent ?? false }),
+				[this._manager.contentOf(contentKey), this._manager.isExternalContentOf(contentKey)],
+				([content, isExternalContent]) => ({ content, isExternalContent: isExternalContent ?? false }),
 			),
-			({ content, isSharedContent }) => {
-				this.#isSharedContent.setValue(isSharedContent);
+			({ content, isExternalContent }) => {
+				this.#isExternalContent.setValue(isExternalContent);
 				if (!this.#structurallyUnsupported) {
-					this.#unsupported.setValue(!content && !isSharedContent);
+					this.#unsupported.setValue(!content && !isExternalContent);
 				}
 				this.#content.setValue(content);
 			},
 			'observeContent',
 		);
 
-		// Observe the variant state of shared content (published, draft, etc.)
+		// Observe the variant state of external content (published, draft, etc.)
 		this.observe(
 			this._manager.elementStateOf(contentKey),
 			(state) => {
-				this.#sharedContentVariantState.setValue(state ?? undefined);
+				this.#externalContentVariantState.setValue(state ?? undefined);
 			},
-			'observeSharedContentVariantState',
+			'observeExternalContentVariantState',
 		);
 	}
 	#observeSettingsData() {

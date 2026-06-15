@@ -158,9 +158,9 @@ export abstract class UmbBlockEntriesContext<
 		value: UmbBlockValueType,
 		originData: BlockOriginData,
 	) {
-		// Shared-content references have no inline contentData — insert as a reference instead.
-		if (layoutEntry.isSharedContent) {
-			await this._manager?.insertSharedContent(layoutEntry.contentKey, originData);
+		// External-content references have no inline contentData — insert as a reference instead.
+		if (layoutEntry.isExternalContent) {
+			await this._manager?.insertExternalContent(layoutEntry.contentKey, originData);
 			return;
 		}
 

@@ -1075,7 +1075,7 @@ export const data: Array<UmbMockDocumentModel> = [
 								key: '45110b54-764e-4198-858d-6bf8f51589b6',
 								contentKey: 'simple-element-id',
 								settingsKey: null,
-								isSharedContent: true,
+								isExternalContent: true,
 							},
 						],
 					},

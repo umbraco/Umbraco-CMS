@@ -1,12 +1,12 @@
 import {
 	UMB_BLOCK_ENTRY_HAS_SETTINGS_CONDITION_ALIAS,
-	UMB_BLOCK_ENTRY_HAS_SHARED_CONTENT_CONDITION_ALIAS,
+	UMB_BLOCK_ENTRY_HAS_EXTERNAL_CONTENT_CONDITION_ALIAS,
 	UMB_BLOCK_ENTRY_IS_EXPOSED_CONDITION_ALIAS,
 	UMB_BLOCK_ENTRY_IS_READ_ONLY_CONDITION_ALIAS,
 	UMB_BLOCK_WORKSPACE_HAS_CONTENT_CONDITION_ALIAS,
 } from './constants.js';
 import UmbBlockEntryHasSettingsCondition from './block-entry-has-settings.condition.js';
-import UmbBlockEntryHasSharedContentCondition from './block-entry-has-shared-content.condition.js';
+import UmbBlockEntryHasExternalContentCondition from './block-entry-has-external-content.condition.js';
 import UmbBlockEntryIsExposedCondition from './block-entry-is-exposed.condition.js';
 import UmbBlockEntryIsReadOnlyCondition from './block-entry-is-read-only.condition.js';
 import UmbBlockEntryShowContentEditCondition from './block-entry-show-content-edit.condition.js';
@@ -61,9 +61,9 @@ export const manifests: Array<ManifestCondition> = [
 	},
 	{
 		type: 'condition',
-		name: 'Block Entry Has Shared Content Condition',
-		alias: UMB_BLOCK_ENTRY_HAS_SHARED_CONTENT_CONDITION_ALIAS,
-		api: UmbBlockEntryHasSharedContentCondition,
+		name: 'Block Entry Has External Content Condition',
+		alias: UMB_BLOCK_ENTRY_HAS_EXTERNAL_CONTENT_CONDITION_ALIAS,
+		api: UmbBlockEntryHasExternalContentCondition,
 	},
 	{
 		type: 'condition',
