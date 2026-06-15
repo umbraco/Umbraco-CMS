@@ -101,7 +101,7 @@ test('cannot fetch a child in a culture where the root is unpublished', async ({
   expect(contentItem.status()).toBe(404);
 });
 
-test('cannot fetch a deeply nested content when a mid-level ancestor is unpublished in the requested culture', async ({umbracoApi}) => {
+test('cannot fetch a deeply nested content node when a mid-level ancestor is unpublished in the requested culture', async ({umbracoApi}) => {
   // Arrange
   const documentIds = await umbracoApi.document.createPublishedVariantChain(documentTypeId, [rootNames, childNames, grandchildNames, greatGrandchildNames]);
   const grandchildId = documentIds[2];
@@ -115,7 +115,7 @@ test('cannot fetch a deeply nested content when a mid-level ancestor is unpublis
   expect(contentItem.status()).toBe(404);
 });
 
-test('can fetch a deeply nested content when the whole chain is published', async ({umbracoApi}) => {
+test('can fetch a deeply nested content node when the whole chain is published', async ({umbracoApi}) => {
   // Arrange
   const documentIds = await umbracoApi.document.createPublishedVariantChain(documentTypeId, [rootNames, childNames, grandchildNames, greatGrandchildNames]);
   const greatGrandchildId = documentIds[3];
