@@ -75,7 +75,14 @@ export class UmbClassicTreeViewElement extends UmbTreeViewElementBase {
 	}
 
 	override render() {
-		return html`${this.#renderTreeRoot()} ${this.#renderRootItems()}`;
+		if (this._isMenu) {
+			return html`${this.#renderTreeRoot()} ${this.#renderRootItems()}`;
+		}
+		return html`
+			<uui-box>
+				${this.#renderTreeRoot()} ${this.#renderRootItems()}
+			</uui-box>
+		`;
 	}
 
 	#renderTreeRoot() {
