@@ -118,6 +118,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 			this.#blockEntries = context;
 			if (context) {
 				this.observe(
+					// TODO: Turn this into a observablePart that is retrievable from the block entries context, so we do not have to observe multiple values here. [NL]
 					observeMultiple([context.layoutEntries, this.contentKey]).pipe(
 						map(([layouts, contentKey]) => {
 							const found = contentKey ? layouts.findIndex((x) => x.contentKey === contentKey) : -1;
@@ -290,6 +291,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		contentValues: Array<UmbBlockDataValueModel> | undefined,
 		settingsValues: Array<UmbBlockDataValueModel> | undefined,
 	) {
+		// TODO: content or $settings does not handle variant properties, it just uses the first value it can find for the alias. [NL]
 		const valueObject: UmbBlockLabelUfmValueType = {};
 		if (contentValues) {
 			for (const property of contentValues) {

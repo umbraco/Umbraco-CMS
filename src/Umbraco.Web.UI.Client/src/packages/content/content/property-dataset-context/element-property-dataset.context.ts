@@ -19,13 +19,13 @@ import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 type UmbPropertyVariantIdMapType = Array<{ alias: string; variantId: UmbVariantId }>;
 
 export abstract class UmbElementPropertyDatasetContext<
-		ContentModel extends UmbElementDetailModel = UmbElementDetailModel,
-		ContentTypeModel extends UmbContentTypeModel = UmbContentTypeModel,
-		DataOwnerType extends UmbElementPropertyDataOwner<ContentModel, ContentTypeModel> = UmbElementPropertyDataOwner<
-			ContentModel,
-			ContentTypeModel
-		>,
-	>
+	ContentModel extends UmbElementDetailModel = UmbElementDetailModel,
+	ContentTypeModel extends UmbContentTypeModel = UmbContentTypeModel,
+	DataOwnerType extends UmbElementPropertyDataOwner<ContentModel, ContentTypeModel> = UmbElementPropertyDataOwner<
+		ContentModel,
+		ContentTypeModel
+	>,
+>
 	extends UmbContextBase
 	implements UmbPropertyDatasetContext
 {
@@ -69,7 +69,8 @@ export abstract class UmbElementPropertyDatasetContext<
 		this.#variantContext.setVariantId(this.#variantId);
 
 		this.#propertyVariantIdPromise = new Promise((resolve) => {
-			this.#propertyVariantIdPromiseResolver = resolve as any;
+			this.#propertyVariantIdPromiseResolver = resolve as unknown as () => void;
+			// TODO: implement a rejector as well, and handle that in the places awaiting this promise. [NL]
 		});
 
 		this.observe(
