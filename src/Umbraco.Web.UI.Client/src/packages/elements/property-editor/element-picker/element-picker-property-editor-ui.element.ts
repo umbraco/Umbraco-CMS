@@ -40,6 +40,9 @@ export class UmbElementPickerPropertyEditorUIElement
 		this._startNode = startNodeId.length
 			? { unique: startNodeId[0], entityType: UMB_ELEMENT_FOLDER_ENTITY_TYPE }
 			: undefined;
+
+		const allowedContentTypes = config.getValueByAlias<string>('allowedContentTypes');
+		this._allowedContentTypes = allowedContentTypes ? allowedContentTypes.split(',').filter(Boolean) : undefined;
 	}
 
 	@state()
@@ -59,6 +62,9 @@ export class UmbElementPickerPropertyEditorUIElement
 
 	@state()
 	private _startNode?: UmbTreeStartNode;
+
+	@state()
+	private _allowedContentTypes?: string[];
 
 	override focus() {
 		return this.shadowRoot?.querySelector('umb-input-element')?.focus();
@@ -91,6 +97,7 @@ export class UmbElementPickerPropertyEditorUIElement
 				.minMessage=${this._minMessage}
 				.max=${this._max}
 				.maxMessage=${this._maxMessage}
+				.allowedContentTypeIds=${this._allowedContentTypes}
 				?folderOnly=${this._folderOnly}
 				?readonly=${this.readonly}
 				@change=${this.#onChange}>

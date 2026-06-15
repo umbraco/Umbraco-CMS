@@ -21,6 +21,10 @@ export class UmbDocumentDuplicateToModalElement extends UmbModalBaseElement<
 	@state()
 	private _destinationUnique?: string | null;
 
+	private get _treeExpansion() {
+		return this.data?.treeExpansion ?? [];
+	}
+
 	#onTreeSelectionChange(event: UmbSelectionChangeEvent) {
 		const target = event.target as UmbTreeElement;
 		const selection = target.getSelection();
@@ -58,11 +62,14 @@ export class UmbDocumentDuplicateToModalElement extends UmbModalBaseElement<
 							expandTreeRoot: true,
 							hideTreeItemActions: true,
 							selectableFilter: this.#selectableFilter,
+							expansion: this._treeExpansion,
 						}}
 						@selection-change=${this.#onTreeSelectionChange}></umb-tree>
 				</uui-box>
 				<uui-box headline=${this.localize.term('general_options')}>
-					<umb-property-layout label=${this.localize.term('defaultdialogs_relateToOriginalLabel')} orientation="vertical"
+					<umb-property-layout
+						label=${this.localize.term('defaultdialogs_relateToOriginalLabel')}
+						orientation="vertical"
 						><div slot="editor">
 							<uui-toggle
 								@change=${this.#onRelateToOriginalChange}
@@ -85,7 +92,10 @@ export class UmbDocumentDuplicateToModalElement extends UmbModalBaseElement<
 
 	#renderActions() {
 		return html`
-			<uui-button slot="actions" label=${this.localize.term('general_cancel')} @click="${this._rejectModal}"></uui-button>
+			<uui-button
+				slot="actions"
+				label=${this.localize.term('general_cancel')}
+				@click="${this._rejectModal}"></uui-button>
 			<uui-button
 				slot="actions"
 				color="positive"
