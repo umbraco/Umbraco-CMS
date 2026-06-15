@@ -12,6 +12,7 @@ import { manifests as folderManifests } from './folder/manifests.js';
 import { manifests as treeItemChildrenManifests } from './tree-item-children/manifests.js';
 import { manifests as viewManifests } from './views/manifests.js';
 import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
+import { UMB_TREE_ALIAS_CONDITION } from '@umbraco-cms/backoffice/tree';
 
 export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
 	{
@@ -66,6 +67,36 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 			{
 				alias: UMB_WORKSPACE_CONDITION_ALIAS,
 				oneOf: [UMB_DOCUMENT_TYPE_ROOT_WORKSPACE_ALIAS, UMB_DOCUMENT_TYPE_FOLDER_WORKSPACE_ALIAS],
+			},
+		],
+	},
+	{
+		type: 'workspaceView',
+		kind: 'tree',
+		alias: 'Umb.WorkspaceView.DocumentType.Tree',
+		name: 'Document Type Tree Item Children Workspace View',
+		meta: {
+			label: 'Children',
+			pathname: 'children',
+			icon: 'icon-bulleted-list',
+			treeAlias: UMB_DOCUMENT_TYPE_TREE_ALIAS,
+		},
+		conditions: [
+			{
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
+				oneOf: [UMB_DOCUMENT_TYPE_ROOT_WORKSPACE_ALIAS, UMB_DOCUMENT_TYPE_FOLDER_WORKSPACE_ALIAS],
+			},
+		],
+	},
+	{
+		type: 'treeAction',
+		kind: 'create',
+		name: 'Document Type Tree Create Action',
+		alias: 'Umb.TreeAction.DocumentType.Create',
+		conditions: [
+			{
+				alias: UMB_TREE_ALIAS_CONDITION,
+				match: UMB_DOCUMENT_TYPE_TREE_ALIAS,
 			},
 		],
 	},

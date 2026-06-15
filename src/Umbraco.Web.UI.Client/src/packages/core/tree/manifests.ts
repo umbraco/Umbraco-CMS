@@ -1,3 +1,5 @@
+import { manifests as actionManifests } from './action/manifests.js';
+import { manifests as conditionManifests } from './conditions/manifests.js';
 import { manifests as defaultTreeItemManifests } from './tree-item/tree-item-default/manifests.js';
 import { manifests as defaultTreeManifests } from './default/manifests.js';
 import { manifests as entityActionManifests } from './entity-actions/manifests.js';
@@ -10,6 +12,8 @@ import { manifests as workspaceViewManifests } from './workspace-view/manifests.
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
 export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
+	...actionManifests,
+	...conditionManifests,
 	...defaultTreeItemManifests,
 	...defaultTreeManifests,
 	...entityActionManifests,

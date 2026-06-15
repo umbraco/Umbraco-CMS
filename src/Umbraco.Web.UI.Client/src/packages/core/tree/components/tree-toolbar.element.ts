@@ -1,6 +1,8 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+
+import './tree-action-bundle.element.js';
 import './tree-view-bundle.element.js';
 
 @customElement('umb-tree-toolbar')
@@ -8,6 +10,7 @@ export class UmbTreeToolbarElement extends UmbLitElement {
 	override render() {
 		return html`
 			<div id="toolbar">
+				<umb-tree-action-bundle></umb-tree-action-bundle>
 				<umb-tree-view-bundle></umb-tree-view-bundle>
 			</div>
 		`;
@@ -22,7 +25,7 @@ export class UmbTreeToolbarElement extends UmbLitElement {
 
 			#toolbar {
 				display: flex;
-				justify-content: flex-end;
+				justify-content: space-between;
 				align-items: center;
 				width: 100%;
 				padding: var(--uui-size-space-3) var(--uui-size-space-4);
