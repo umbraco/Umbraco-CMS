@@ -198,7 +198,6 @@
 		"generate:server-api": "npm run generate:server-api -w @umbraco-backoffice/core",
 		"generate:icons": "node ./devops/icons/index.js",
 		"generate:overrides": "node ./devops/tsc/index.js",
-		"generate:jsonschema:imports": "node ./devops/json-schema-generator/index.js",
 		"generate:jsonschema:base": "npm run generate:jsonschema -- --include \"./src/json-schema/umbraco-package-schema.ts\" --out ./umbraco-package-schema.json tsconfig.json UmbracoPackage",
 		"generate:jsonschema:extensions": "npm run generate:jsonschema -- --include \"./src/json-schema/umbraco-package-schema.Umbraco.Cms.ts\" --out ./umbraco-package-schema.Umbraco.Cms.json tsconfig.json UmbracoPackageExtensions",
 		"generate:jsonschema:dist": "npm run generate:jsonschema:base && npm run generate:jsonschema:extensions",
