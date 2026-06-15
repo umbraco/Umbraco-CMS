@@ -54,8 +54,12 @@ public abstract class ManifestControllerBase : ManagementApiControllerBase
 
         var json = JsonSerializer.Serialize(model.Extensions);
 
-        // Nothing to do when auto-stamping is off and there is no explicit token to resolve.
-        if (stamp is false && json.Contains(Constants.Web.CacheBusterToken, StringComparison.Ordinal) is false)
+        // Avoid the parse/walk entirely when there is nothing to do: no explicit %CACHE_BUSTER% token to resolve and
+        // (when auto-stamping) no /App_Plugins path to stamp. The /App_Plugins probe is deliberately broad and
+        // case-insensitive — it only needs to avoid false negatives; the per-URL logic makes the precise decision.
+        var hasToken = json.Contains(Constants.Web.CacheBusterToken, StringComparison.Ordinal);
+        var hasAppPluginsPath = stamp && json.Contains(Constants.SystemDirectories.AppPlugins, StringComparison.OrdinalIgnoreCase);
+        if (hasToken is false && hasAppPluginsPath is false)
         {
             return;
         }
@@ -70,7 +74,9 @@ public abstract class ManifestControllerBase : ManagementApiControllerBase
             CacheBustAssetUrls(extension, hash, stamp);
         }
 
-        model.Extensions = extensions.Deserialize<object[]>() ?? model.Extensions;
+        // Assign the mutated nodes straight onto the model; System.Text.Json serialises a JsonNode the same as the
+        // original JsonElement, so there is no need to re-parse the tree back into object[] via Deserialize.
+        model.Extensions = extensions.Cast<object>().ToArray();
     }
 
     // Walks every string value in the extension tree (at any depth) and applies cache-busting per URL.
