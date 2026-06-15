@@ -84,7 +84,7 @@ public partial class ContentEditingServiceTests
     {
         var contentType = await CreateVariantContentType(variantTitleAsMandatory: false);
         contentType.AllowedContentTypes = [new ContentTypeSort(contentType.Key, 0, contentType.Alias)];
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var root = (await ContentEditingService.CreateAsync(
             new ContentCreateModel
@@ -111,6 +111,78 @@ public partial class ContentEditingServiceTests
                 Constants.Security.SuperUserKey)).Result.Content!;
             childKeys[i] = child.Key;
         }
+
+        var result = await ContentEditingService.SortByFieldAsync(root.Key, ContentSortField.Name, Direction.Ascending, culture, Constants.Security.SuperUserKey);
+        Assert.AreEqual(ContentEditingOperationStatus.Success, result);
+
+        var actualChildKeys = ContentService
+            .GetPagedChildren(root.Id, 0, 100, out _, propertyAliases: null, filter: null, ordering: null)
+            .OrderBy(c => c.SortOrder)
+            .Select(c => c.Key)
+            .ToArray();
+        var expectedChildKeys = expectedChildIndexes.Select(i => childKeys[i]).ToArray();
+
+        Assert.AreEqual(expectedChildKeys, actualChildKeys);
+    }
+
+    // Proves the invariant-name fallback documented in ContentEditingServiceWithSortingBase.BuildOrdering():
+    // for a mix of variant and invariant children, the culture only selects the variant children's name -
+    // invariant children always sort by their single node name and ignore the culture entirely.
+    [TestCase("en-US", new[] { 0, 2, 1 })] // en names asc: banana(V0), mango(I2), yankee(V1)
+    [TestCase("da-DK", new[] { 1, 2, 0 })] // da names asc: banana(V1), mango(I2), yankee(V0)
+    public async Task Sort_Children_By_Name_With_Culture_Uses_Invariant_Name_For_Invariant_Children(string culture, int[] expectedChildIndexes)
+    {
+        var variantContentType = await CreateVariantContentType(variantTitleAsMandatory: false);
+
+        var invariantContentType = ContentTypeBuilder.CreateBasicContentType(alias: "invariantChild", name: "Invariant Child");
+        await ContentTypeService.CreateAsync(invariantContentType, Constants.Security.SuperUserKey);
+
+        // The (variant) parent allows both variant and invariant children.
+        variantContentType.AllowedContentTypes =
+        [
+            new ContentTypeSort(variantContentType.Key, 0, variantContentType.Alias),
+            new ContentTypeSort(invariantContentType.Key, 1, invariantContentType.Alias),
+        ];
+        await ContentTypeService.UpdateAsync(variantContentType, Constants.Security.SuperUserKey);
+
+        var root = (await ContentEditingService.CreateAsync(
+            new ContentCreateModel
+            {
+                ContentTypeKey = variantContentType.Key,
+                ParentKey = Constants.System.RootKey,
+                Variants = [new() { Culture = "en-US", Name = "Root EN" }, new() { Culture = "da-DK", Name = "Root DA" }],
+            },
+            Constants.Security.SuperUserKey)).Result.Content!;
+
+        var childKeys = new Guid[3];
+
+        // index 0, 1: variant children whose en-US and da-DK names sort into opposite orders.
+        (string English, string Danish)[] variantChildNames = [("banana", "yankee"), ("yankee", "banana")];
+        for (var i = 0; i < variantChildNames.Length; i++)
+        {
+            (string english, string danish) = variantChildNames[i];
+            var child = (await ContentEditingService.CreateAsync(
+                new ContentCreateModel
+                {
+                    ContentTypeKey = variantContentType.Key,
+                    ParentKey = root.Key,
+                    Variants = [new() { Culture = "en-US", Name = english }, new() { Culture = "da-DK", Name = danish }],
+                },
+                Constants.Security.SuperUserKey)).Result.Content!;
+            childKeys[i] = child.Key;
+        }
+
+        // index 2: invariant child with a single name that sorts between the variant names in both cultures.
+        // It has no name for either culture, so a broken fallback would mis-sort it (e.g. to the start).
+        var invariantChild = (await ContentEditingService.CreateAsync(
+            new ContentCreateModel
+            {
+                ContentTypeKey = invariantContentType.Key,
+                ParentKey = root.Key,
+                Variants = [new() { Name = "mango" }],
+            },
+            Constants.Security.SuperUserKey)).Result.Content!;
+        childKeys[2] = invariantChild.Key;
 
         var result = await ContentEditingService.SortByFieldAsync(root.Key, ContentSortField.Name, Direction.Ascending, culture, Constants.Security.SuperUserKey);
         Assert.AreEqual(ContentEditingOperationStatus.Success, result);
