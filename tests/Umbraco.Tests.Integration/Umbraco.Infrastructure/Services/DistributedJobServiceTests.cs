@@ -283,8 +283,9 @@ internal sealed class DistributedJobServiceTests : UmbracoIntegrationTest
         // Arrange
         await DistributedJobService.EnsureJobsAsync();
 
-        // Last run is "now", so the most recent hourly boundary is at or before it: no new boundary has passed.
-        SetJobState(AlignedTestJobName, lastRun: DateTime.UtcNow, isRunning: false);
+        // Last run is set slightly in the future so the most recent clock boundary is guaranteed to be before it,
+        // even if the wall clock crosses a top-of-hour between here and the poll (avoids a boundary race).
+        SetJobState(AlignedTestJobName, lastRun: DateTime.UtcNow.AddMinutes(1), isRunning: false);
 
         // Act
         var job = await DistributedJobService.TryTakeRunnableAsync();

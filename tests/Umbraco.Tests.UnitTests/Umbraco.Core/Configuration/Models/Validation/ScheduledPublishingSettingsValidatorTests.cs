@@ -11,21 +11,21 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Configuration.Models.Validati
 public class ScheduledPublishingSettingsValidatorTests
 {
     [Test]
-    public void Returns_Success_For_Default_Configuration()
+    public void Can_Validate_Default_Configuration()
     {
         var result = Validate(new ScheduledPublishingSettings());
         Assert.True(result.Succeeded);
     }
 
     [Test]
-    public void Returns_Fail_For_Zero_Or_Negative_Period()
+    public void Cannot_Validate_Zero_Or_Negative_Period()
     {
         var result = Validate(new ScheduledPublishingSettings { Period = TimeSpan.Zero });
         Assert.False(result.Succeeded);
     }
 
     [Test]
-    public void Returns_Success_When_Not_Aligned_For_Any_Positive_Period()
+    public void Can_Validate_Any_Positive_Period_When_Not_Aligned()
     {
         // 7 seconds does not divide evenly into an hour, but that's only enforced when aligned.
         var result = Validate(new ScheduledPublishingSettings
@@ -44,7 +44,7 @@ public class ScheduledPublishingSettingsValidatorTests
     [TestCase(30)]
     [TestCase(60)]
     [TestCase(3600)]
-    public void Returns_Success_When_Aligned_With_Clean_Divisor_Of_An_Hour(int seconds)
+    public void Can_Validate_Clean_Divisor_Of_An_Hour_When_Aligned(int seconds)
     {
         var result = Validate(new ScheduledPublishingSettings
         {
@@ -58,7 +58,7 @@ public class ScheduledPublishingSettingsValidatorTests
     [TestCase(11)]
     [TestCase(70)]
     [TestCase(7200)]
-    public void Returns_Fail_When_Aligned_With_Non_Divisor_Of_An_Hour(int seconds)
+    public void Cannot_Validate_Non_Divisor_Of_An_Hour_When_Aligned(int seconds)
     {
         var result = Validate(new ScheduledPublishingSettings
         {
@@ -69,7 +69,7 @@ public class ScheduledPublishingSettingsValidatorTests
     }
 
     [Test]
-    public void Returns_Fail_When_Aligned_With_Sub_Second_Period()
+    public void Cannot_Validate_Sub_Second_Period_When_Aligned()
     {
         var result = Validate(new ScheduledPublishingSettings
         {

@@ -20,9 +20,9 @@ public class DistributedJobService : IDistributedJobService
     private readonly ILogger<DistributedJobService> _logger;
     private readonly DistributedJobSettings _settings;
 
-    // Captured once: which jobs align to the clock is a startup configuration concern (changing it requires a restart),
-    // so there's no need to re-evaluate it on every poll.
-    private readonly Lazy<HashSet<string>> _clockAlignedJobNames;
+    // Which jobs align to the clock is a startup configuration concern (changing it requires a restart), so it is
+    // captured once in the constructor rather than re-evaluated on every poll.
+    private readonly HashSet<string> _clockAlignedJobNames;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DistributedJobService"/> class.
@@ -62,8 +62,10 @@ public class DistributedJobService : IDistributedJobService
         _distributedBackgroundJobs = distributedBackgroundJobs;
         _logger = logger;
         _settings = settings.Value;
-        _clockAlignedJobNames = new Lazy<HashSet<string>>(() =>
-            _distributedBackgroundJobs.Where(x => x.AlignToClock).Select(x => x.Name).ToHashSet());
+        _clockAlignedJobNames = _distributedBackgroundJobs
+            .Where(x => x.AlignToClock)
+            .Select(x => x.Name)
+            .ToHashSet();
     }
 
     /// <inheritdoc />
@@ -74,11 +76,10 @@ public class DistributedJobService : IDistributedJobService
         scope.EagerWriteLock(Constants.Locks.DistributedJobs);
 
         DateTime utcNow = DateTime.UtcNow;
-        HashSet<string> clockAlignedJobNames = _clockAlignedJobNames.Value;
 
         IEnumerable<DistributedBackgroundJobModel> jobs = _distributedJobRepository.GetAll();
         DistributedBackgroundJobModel? job = jobs.FirstOrDefault(x =>
-            IsDue(x, utcNow, clockAlignedJobNames.Contains(x.Name))
+            IsDue(x, utcNow, _clockAlignedJobNames.Contains(x.Name))
             && (x.IsRunning is false || x.LastAttemptedRun < utcNow - x.Period - _settings.MaximumExecutionTime));
 
         if (job is null)
