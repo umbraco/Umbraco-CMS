@@ -1414,6 +1414,15 @@ namespace Umbraco.Cms.Core.Services
             {
                 scope.WriteLock(Constants.Locks.MediaTree);
 
+                // Reload within the lock so sorting operates on fully-loaded entities. Callers may pass
+                // partially-loaded media (e.g. without property data), and saving those directly would
+                // wipe the property data (#23120). Preserve the caller's ordering, which drives the sort.
+                var reloadedById = GetByIds(itemsA.Select(x => x.Id)).ToDictionary(x => x.Id);
+                itemsA = itemsA
+                    .Select(x => reloadedById.TryGetValue(x.Id, out IMedia? media) ? media : null)
+                    .WhereNotNull()
+                    .ToArray();
+
                 var savingNotification = new MediaSavingNotification(itemsA, messages);
                 if (scope.Notifications.PublishCancelable(savingNotification))
                 {

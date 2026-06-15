@@ -3137,7 +3137,13 @@ public class ContentService : RepositoryService, IContentService
         {
             scope.WriteLock(Constants.Locks.ContentTree);
 
-            OperationResult ret = Sort(scope, itemsA, userId, evtMsgs);
+            // Reload within the lock so sorting operates on fully-loaded entities. Callers may pass
+            // partially-loaded content (e.g. loaded with loadTemplates: false or without property data),
+            // and saving those directly would wipe the template and property data (#23120).
+            // GetByIds returns items in the requested order, preserving the caller's ordering that drives the sort.
+            IContent[] reloaded = GetByIds(itemsA.Select(x => x.Id).ToArray()).ToArray();
+
+            OperationResult ret = Sort(scope, reloaded, userId, evtMsgs);
             scope.Complete();
             return ret;
         }
