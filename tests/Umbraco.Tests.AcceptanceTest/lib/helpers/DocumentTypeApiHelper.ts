@@ -434,6 +434,29 @@ export class DocumentTypeApiHelper {
   }
 
 
+  async createVariantDocumentTypeWithTemplateAndAllowedChildNode(documentTypeName: string, templateId: string, isAllowedAsRoot: boolean = false, allowedChildNodeId?: string) {
+    await this.ensureNameNotExists(documentTypeName);
+
+    const documentTypeBuilder = new DocumentTypeBuilder()
+      .withName(documentTypeName)
+      .withAlias(AliasHelper.toAlias(documentTypeName))
+      .withAllowedAsRoot(isAllowedAsRoot)
+      .withVariesByCulture(true)
+      .addAllowedTemplateId()
+        .withId(templateId)
+        .done()
+      .withDefaultTemplateId(templateId);
+
+    if (allowedChildNodeId !== undefined) {
+      documentTypeBuilder
+        .addAllowedDocumentType()
+          .withId(allowedChildNodeId)
+          .done();
+    }
+
+    return await this.create(documentTypeBuilder.build());
+  }
+
   async createDocumentTypeWithAllowedTemplate(documentTypeName: string, allowedTemplateId: string, isAllowedAsRoot:boolean = false) {
     await this.ensureNameNotExists(documentTypeName);
 

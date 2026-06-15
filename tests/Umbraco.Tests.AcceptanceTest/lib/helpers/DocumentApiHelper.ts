@@ -161,11 +161,32 @@ export class DocumentApiHelper {
     return response.status();
   }
 
+  async publishWithCultures(id: string, cultures: string[]) {
+    const publishSchedulesData = {publishSchedules: cultures.map(culture => ({culture}))};
+    return await this.publish(id, publishSchedulesData);
+  }
+
+  async unpublish(id: string, cultures: string[] | null = null) {
+    if (id == null) {
+      return;
+    }
+    const response = await this.api.put(this.api.baseUrl + '/umbraco/management/api/v1/document/' + id + '/unpublish', {cultures});
+    return response.status();
+  }
+
   async getDocumentUrl(id: string) {
     const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/document/urls?id=' + id);
     const urls = await response.json();
 
     return urls[0].urlInfos[0].url;
+  }
+
+  async getDocumentUrlByCulture(id: string, culture: string) {
+    const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/document/urls?id=' + id);
+    const urls = await response.json();
+    const urlInfo = urls[0].urlInfos.find(info => info.culture === culture);
+
+    return urlInfo ? urlInfo.url : null;
   }
 
   async moveToRecycleBin(id: string) {
@@ -1507,6 +1528,22 @@ export class DocumentApiHelper {
     };
 
     return await this.publish(id, publishScheduleData);
+  }
+
+  async createVariantDocumentWithParent(documentTypeId: string, templateId: string, name: string, cultures: string[], parentId?: string) {
+    const documentBuilder = new DocumentBuilder()
+      .withDocumentTypeId(documentTypeId)
+      .withTemplateId(templateId);
+
+    if (parentId) {
+      documentBuilder.withParentId(parentId);
+    }
+
+    for (const culture of cultures) {
+      documentBuilder.addVariant().withName(name).withCulture(culture).done();
+    }
+
+    return await this.create(documentBuilder.build());
   }
 
   async createDocumentWithTextContentAndParent(documentName: string, documentTypeId: string, textContent: string, dataTypeName: string, parentId: string) {
