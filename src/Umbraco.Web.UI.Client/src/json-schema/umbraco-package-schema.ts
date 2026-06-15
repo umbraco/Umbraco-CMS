@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import '@umbraco-cms/backoffice/extension-registry';
 
 /**
  * Umbraco package manifest JSON
@@ -45,7 +44,7 @@ export interface UmbracoPackage {
 	 * @title An array of Umbraco package manifest types that will be installed
 	 * @required
 	 */
-	extensions: UmbExtensionManifest[];
+	extensions: Array<unknown>;
 
 	/**
 	 * @title The importmap for the package

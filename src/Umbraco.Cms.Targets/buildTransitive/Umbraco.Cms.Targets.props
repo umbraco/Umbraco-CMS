@@ -12,6 +12,7 @@
   <ItemGroup>
     <UmbracoJsonSchemaReferences Include="https://json.schemastore.org/appsettings.json" Weight="-100" />
     <UmbracoJsonSchemaFiles Include="$(MSBuildThisFileDirectory)..\appsettings-schema.Umbraco.Cms.json" Weight="-90" />
+    <UmbracoPackageSchemaFiles Include="$(MSBuildThisFileDirectory)..\umbraco-package-schema.json" Weight="-100" Reference="false" />
     <UmbracoPackageSchemaFiles Include="$(MSBuildThisFileDirectory)..\umbraco-package-schema.Umbraco.Cms.json" Weight="-90" />
   </ItemGroup>
 
