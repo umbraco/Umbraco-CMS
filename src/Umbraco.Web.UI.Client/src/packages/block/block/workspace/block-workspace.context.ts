@@ -1,4 +1,9 @@
-import type { UmbBlockDataModel, UmbBlockDataValueModel, UmbBlockLayoutBaseModel } from '../types.js';
+import type {
+	UmbBlockDataModel,
+	UmbBlockDataValueModel,
+	UmbBlockLabelUfmValueType,
+	UmbBlockLayoutBaseModel,
+} from '../types.js';
 import { UMB_BLOCK_ENTRIES_CONTEXT, UMB_BLOCK_MANAGER_CONTEXT } from '../context/index.js';
 import { UmbBlockWorkspaceEditorElement } from './block-workspace-editor.element.js';
 import { UmbBlockElementManager } from './block-element-manager.js';
@@ -285,7 +290,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		contentValues: Array<UmbBlockDataValueModel> | undefined,
 		settingsValues: Array<UmbBlockDataValueModel> | undefined,
 	) {
-		const valueObject = {} as Record<string, unknown> & { $settings?: Record<string, unknown>; $index?: number };
+		const valueObject: UmbBlockLabelUfmValueType = {};
 		if (contentValues) {
 			for (const property of contentValues) {
 				valueObject[property.alias] = property.value;
