@@ -42,6 +42,19 @@ public class SortChildrenDocumentControllerTests : ManagementApiUserGroupTestBas
         };
         var response = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         _parentKey = response.Result.Content.Key;
+
+        // Children are needed to exercise the per-child authorization the endpoint performs.
+        for (var i = 0; i < 2; i++)
+        {
+            var childModel = new ContentCreateModel
+            {
+                ContentTypeKey = contentType.Key,
+                TemplateKey = template.Key,
+                ParentKey = _parentKey,
+                Variants = new List<VariantModel> { new() { Name = Guid.NewGuid().ToString() } },
+            };
+            await ContentEditingService.CreateAsync(childModel, Constants.Security.SuperUserKey);
+        }
     }
 
     protected override Expression<Func<SortChildrenDocumentController, object>> MethodSelector =>

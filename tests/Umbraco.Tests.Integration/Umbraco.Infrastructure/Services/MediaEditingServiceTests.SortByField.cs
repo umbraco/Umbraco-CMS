@@ -53,12 +53,12 @@ internal sealed partial class MediaEditingServiceTests
     }
 
     [Test]
-    public async Task Sort_Children_By_Field_Returns_SortingInvalid_For_Unknown_Field()
+    public async Task Sort_Children_By_Field_Throws_For_Unrecognised_Field()
     {
         (IMedia root, _) = await CreateRootWithChildrenForFieldSorting();
 
-        var result = await MediaEditingService.SortByFieldAsync(root.Key, (ContentSortField)999, Direction.Ascending, Constants.Security.SuperUserKey);
-        Assert.AreEqual(ContentEditingOperationStatus.SortingInvalid, result);
+        Assert.ThrowsAsync<ArgumentOutOfRangeException>(() =>
+            MediaEditingService.SortByFieldAsync(root.Key, (ContentSortField)999, Direction.Ascending, Constants.Security.SuperUserKey));
     }
 
     [TestCase(ContentSortField.Name, Direction.Ascending, new[] { 3, 1, 4, 0, 2 })]

@@ -70,12 +70,12 @@ public partial class ContentEditingServiceTests
     }
 
     [Test]
-    public async Task Sort_Children_By_Field_Returns_SortingInvalid_For_Unknown_Field()
+    public async Task Sort_Children_By_Field_Throws_For_Unrecognised_Field()
     {
         (IContent root, _) = await CreateRootWithChildrenForFieldSorting();
 
-        var result = await ContentEditingService.SortByFieldAsync(root.Key, (ContentSortField)999, Direction.Ascending, culture: null, Constants.Security.SuperUserKey);
-        Assert.AreEqual(ContentEditingOperationStatus.SortingInvalid, result);
+        Assert.ThrowsAsync<ArgumentOutOfRangeException>(() =>
+            ContentEditingService.SortByFieldAsync(root.Key, (ContentSortField)999, Direction.Ascending, culture: null, Constants.Security.SuperUserKey));
     }
 
     [TestCase("en-US", new[] { 1, 2, 0 })] // English names ascending: A(1), B(2), C(0)

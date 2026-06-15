@@ -2,8 +2,10 @@ using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Api.Management.Security.Authorization;
 using Umbraco.Cms.Api.Management.ViewModels.Sorting;
 using Umbraco.Cms.Core.Actions;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Security.Authorization;
 using Umbraco.Cms.Core.Services;
@@ -21,6 +23,7 @@ public class SortChildrenAtRootDocumentController : DocumentControllerBase
 {
     private readonly IAuthorizationService _authorizationService;
     private readonly IContentEditingService _contentEditingService;
+    private readonly IEntityService _entityService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
     /// <summary>
@@ -28,14 +31,17 @@ public class SortChildrenAtRootDocumentController : DocumentControllerBase
     /// </summary>
     /// <param name="authorizationService">Service used to authorize user actions.</param>
     /// <param name="contentEditingService">Service for editing and managing content.</param>
+    /// <param name="entityService">Service used to resolve the children to authorize.</param>
     /// <param name="backOfficeSecurityAccessor">Accessor for back office security context.</param>
     public SortChildrenAtRootDocumentController(
         IAuthorizationService authorizationService,
         IContentEditingService contentEditingService,
+        IEntityService entityService,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
     {
         _authorizationService = authorizationService;
         _contentEditingService = contentEditingService;
+        _entityService = entityService;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
@@ -62,6 +68,20 @@ public class SortChildrenAtRootDocumentController : DocumentControllerBase
             AuthorizationPolicies.ContentPermissionByResource);
 
         if (!authorizationResult.Succeeded)
+        {
+            return Forbidden();
+        }
+
+        var childrenAuthorized = await SortChildrenAuthorizer.IsAuthorizedForChildrenAsync(
+            _authorizationService,
+            _entityService,
+            User,
+            parentKey: null,
+            UmbracoObjectTypes.Document,
+            childKeys => ContentPermissionResource.WithKeys(ActionSort.ActionLetter, childKeys),
+            AuthorizationPolicies.ContentPermissionByResource);
+
+        if (!childrenAuthorized)
         {
             return Forbidden();
         }

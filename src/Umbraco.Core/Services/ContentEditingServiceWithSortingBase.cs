@@ -156,11 +156,7 @@ internal abstract class ContentEditingServiceWithSortingBase<TContent, TContentT
             return ContentEditingOperationStatus.NotFound;
         }
 
-        Ordering? ordering = BuildOrdering(field, direction, culture);
-        if (ordering is null)
-        {
-            return ContentEditingOperationStatus.SortingInvalid;
-        }
+        Ordering ordering = BuildOrdering(field, direction, culture);
 
         // The database does the ordering (matching the list view and the order shown in the sort UI).
         if (ContentSettings.SortChildrenByFieldFiresNotifications)
@@ -222,7 +218,7 @@ internal abstract class ContentEditingServiceWithSortingBase<TContent, TContentT
         return results;
     }
 
-    private static Ordering? BuildOrdering(ContentSortField field, Direction direction, string? culture)
+    private static Ordering BuildOrdering(ContentSortField field, Direction direction, string? culture)
         => field switch
         {
             // Name is variant - the culture selects the variant name to order by (invariant content and media
@@ -230,6 +226,6 @@ internal abstract class ContentEditingServiceWithSortingBase<TContent, TContentT
             ContentSortField.Name => Ordering.By("name", direction, culture),
             ContentSortField.CreateDate => Ordering.By("createDate", direction),
             ContentSortField.UpdateDate => Ordering.By("updateDate", direction),
-            _ => null,
+            _ => throw new ArgumentOutOfRangeException(nameof(field), field, "Unsupported sort field."),
         };
 }

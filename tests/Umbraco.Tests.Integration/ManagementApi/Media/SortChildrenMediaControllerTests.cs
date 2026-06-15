@@ -33,6 +33,18 @@ public class SortChildrenMediaControllerTests : ManagementApiUserGroupTestBase<S
         };
         var responseParent = await MediaEditingService.CreateAsync(parentCreateModel, Constants.Security.SuperUserKey);
         _parentFolderKey = responseParent.Result.Content.Key;
+
+        // Children are needed to exercise the per-child authorization the endpoint performs.
+        for (var i = 0; i < 2; i++)
+        {
+            MediaCreateModel childCreateModel = new()
+            {
+                Variants = new List<VariantModel> { new() { Name = $"MediaChildFolder{i}" } },
+                ContentTypeKey = folderMediaType.Key,
+                ParentKey = _parentFolderKey,
+            };
+            await MediaEditingService.CreateAsync(childCreateModel, Constants.Security.SuperUserKey);
+        }
     }
 
     protected override Expression<Func<SortChildrenMediaController, object>> MethodSelector =>

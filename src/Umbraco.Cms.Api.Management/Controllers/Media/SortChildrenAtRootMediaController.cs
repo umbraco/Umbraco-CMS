@@ -2,7 +2,9 @@ using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Api.Management.Security.Authorization;
 using Umbraco.Cms.Api.Management.ViewModels.Sorting;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Security.Authorization;
 using Umbraco.Cms.Core.Services;
@@ -20,6 +22,7 @@ public class SortChildrenAtRootMediaController : MediaControllerBase
 {
     private readonly IAuthorizationService _authorizationService;
     private readonly IMediaEditingService _mediaEditingService;
+    private readonly IEntityService _entityService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
     /// <summary>
@@ -27,14 +30,17 @@ public class SortChildrenAtRootMediaController : MediaControllerBase
     /// </summary>
     /// <param name="authorizationService">Service used to authorize user actions.</param>
     /// <param name="mediaEditingService">Service responsible for editing and sorting media items.</param>
+    /// <param name="entityService">Service used to resolve the children to authorize.</param>
     /// <param name="backOfficeSecurityAccessor">Accessor for backoffice security context.</param>
     public SortChildrenAtRootMediaController(
         IAuthorizationService authorizationService,
         IMediaEditingService mediaEditingService,
+        IEntityService entityService,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
     {
         _authorizationService = authorizationService;
         _mediaEditingService = mediaEditingService;
+        _entityService = entityService;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
@@ -61,6 +67,20 @@ public class SortChildrenAtRootMediaController : MediaControllerBase
             AuthorizationPolicies.MediaPermissionByResource);
 
         if (!authorizationResult.Succeeded)
+        {
+            return Forbidden();
+        }
+
+        var childrenAuthorized = await SortChildrenAuthorizer.IsAuthorizedForChildrenAsync(
+            _authorizationService,
+            _entityService,
+            User,
+            parentKey: null,
+            UmbracoObjectTypes.Media,
+            childKeys => MediaPermissionResource.WithKeys(childKeys),
+            AuthorizationPolicies.MediaPermissionByResource);
+
+        if (!childrenAuthorized)
         {
             return Forbidden();
         }
