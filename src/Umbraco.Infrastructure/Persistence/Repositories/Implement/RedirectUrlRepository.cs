@@ -376,6 +376,15 @@ internal sealed class RedirectUrlRepository : AsyncEntityRepositoryBase<Guid, IR
             entity.ResetDirtyProperties();
         });
 
+    /// <inheritdoc/>
+    protected override async Task PersistDeletedItemAsync(IRedirectUrl entity) =>
+        await AmbientScope.ExecuteWithContextAsync<RedirectUrlDto>(async db =>
+        {
+            await db.RedirectUrls
+                .Where(x => x.Id == entity.Key)
+                .ExecuteDeleteAsync();
+        });
+
     private static RedirectUrlDto? Map(IRedirectUrl redirectUrl)
     {
         if (redirectUrl == null)
