@@ -285,7 +285,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		contentValues: Array<UmbBlockDataValueModel> | undefined,
 		settingsValues: Array<UmbBlockDataValueModel> | undefined,
 	) {
-		const valueObject = {} as Record<string, unknown>;
+		const valueObject = {} as Record<string, unknown> & { $settings?: Record<string, unknown>; $index?: number };
 		if (contentValues) {
 			for (const property of contentValues) {
 				valueObject[property.alias] = property.value;
@@ -293,7 +293,11 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		}
 
 		if (settingsValues) {
-			valueObject['$settings'] = settingsValues;
+			const settingsObject: Record<string, unknown> = {};
+			for (const property of settingsValues) {
+				settingsObject[property.alias] = property.value;
+			}
+			valueObject['$settings'] = settingsObject;
 		}
 
 		const index = resolveBlockWorkspaceLabelIndex(
