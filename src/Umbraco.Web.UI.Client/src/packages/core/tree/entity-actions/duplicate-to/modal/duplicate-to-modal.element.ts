@@ -11,6 +11,10 @@ export class UmbDuplicateToModalElement extends UmbModalBaseElement<UmbDuplicate
 	@state()
 	private _destinationUnique?: string | null;
 
+	private get _treeExpansion() {
+		return this.data?.treeExpansion ?? [];
+	}
+
 	#onTreeSelectionChange(event: UmbSelectionChangeEvent) {
 		const target = event.target as UmbTreeElement;
 		const selection = target.getSelection();
@@ -32,6 +36,7 @@ export class UmbDuplicateToModalElement extends UmbModalBaseElement<UmbDuplicate
 						.props=${{
 							foldersOnly: this.data?.foldersOnly,
 							expandTreeRoot: true,
+							expansion: this._treeExpansion,
 						}}
 						@selection-change=${this.#onTreeSelectionChange}></umb-tree>
 				</uui-box>
@@ -43,7 +48,10 @@ export class UmbDuplicateToModalElement extends UmbModalBaseElement<UmbDuplicate
 
 	#renderActions() {
 		return html`
-			<uui-button slot="actions" label=${this.localize.term('general_cancel')} @click="${this._rejectModal}"></uui-button>
+			<uui-button
+				slot="actions"
+				label=${this.localize.term('general_cancel')}
+				@click="${this._rejectModal}"></uui-button>
 			<uui-button
 				slot="actions"
 				color="positive"
