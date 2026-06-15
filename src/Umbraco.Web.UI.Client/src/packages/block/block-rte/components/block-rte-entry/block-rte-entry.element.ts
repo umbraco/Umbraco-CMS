@@ -1,12 +1,11 @@
 import type { UmbBlockRteLayoutModel } from '../../types.js';
-import { UMB_BLOCK_RTE } from '../../constants.js';
 import { UmbBlockRteEntryContext } from '../../context/block-rte-entry.context.js';
-import { css, customElement, html, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { UMB_BLOCK_RTE } from '../../constants.js';
+import { css, customElement, html, nothing, property, when, state } from '@umbraco-cms/backoffice/external/lit';
 import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbDataPathBlockElementDataQuery } from '@umbraco-cms/backoffice/block';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbObserveValidationStateController } from '@umbraco-cms/backoffice/validation';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type {
 	ManifestBlockEditorCustomView,
 	UmbBlockEditorCustomViewProperties,
@@ -254,6 +253,7 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 		if (this._unsupported) {
 			return false;
 		}
+
 		const elementTypeAlias = this._contentTypeAlias ?? '';
 		const isForBlockEditor =
 			!manifest.forBlockEditor || stringOrStringArrayContains(manifest.forBlockEditor, UMB_BLOCK_RTE);
@@ -271,34 +271,38 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 		if (this._exposed || this._isReadOnly) {
 			return ext.component;
 		} else {
-			return html`<div>
-				${ext.component}
-				<umb-block-overlay-expose-button
-					.contentTypeName=${this._contentTypeName}
-					@click=${this.#expose}></umb-block-overlay-expose-button>
-			</div>`;
+			return html`
+				<div>
+					${ext.component}
+					<umb-block-overlay-expose-button
+						.contentTypeName=${this._contentTypeName}
+						@click=${this.#expose}></umb-block-overlay-expose-button>
+				</div>
+			`;
 		}
 	};
 
 	#renderBlock() {
-		return this.contentKey && (this._contentTypeAlias || this._unsupported)
-			? html`
-					<div class="uui-text uui-font">
-						<umb-extension-slot
-							type="blockEditorCustomView"
-							default-element="umb-ref-rte-block"
-							.renderMethod=${this.#extensionSlotRenderMethod}
-							.fallbackRenderMethod=${this.#renderBuiltinBlockView}
-							.props=${this._blockViewProps}
-							.filter=${this.#filterBlockCustomViews}
-							single></umb-extension-slot>
-						${this.#renderActionBar()}
-						${!this._showContentEdit && this._contentInvalid
-							? html`<uui-badge attention color="invalid" label="Invalid content">!</uui-badge>`
-							: nothing}
-					</div>
-				`
-			: nothing;
+		return when(
+			this.contentKey && (this._contentTypeAlias || this._unsupported),
+			() => html`
+				<div>
+					<umb-extension-slot
+						type="blockEditorCustomView"
+						default-element="umb-ref-rte-block"
+						.renderMethod=${this.#extensionSlotRenderMethod}
+						.fallbackRenderMethod=${this.#renderBuiltinBlockView}
+						.props=${this._blockViewProps}
+						.filter=${this.#filterBlockCustomViews}
+						single></umb-extension-slot>
+					${this.#renderActionBar()}
+					${when(
+						!this._showContentEdit && this._contentInvalid,
+						() => html`<uui-badge attention color="invalid" label="Invalid content">!</uui-badge>`,
+					)}
+				</div>
+			`,
+		);
 	}
 
 	#renderActionBar() {
@@ -318,14 +322,16 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 	};
 
 	#renderRefBlock() {
-		return html`<umb-ref-rte-block
-			.label=${this._label}
-			.icon=${this._icon}
-			.index=${this._blockViewProps.index}
-			.unpublished=${!this._exposed}
-			.content=${this._blockViewProps.content}
-			.settings=${this._blockViewProps.settings}
-			.config=${this._blockViewProps.config}></umb-ref-rte-block>`;
+		return html`
+			<umb-ref-rte-block
+				.label=${this._label}
+				.icon=${this._icon}
+				.index=${this._blockViewProps.index}
+				.unpublished=${!this._exposed}
+				.content=${this._blockViewProps.content}
+				.settings=${this._blockViewProps.settings}
+				.config=${this._blockViewProps.config}></umb-ref-rte-block>
+		`;
 	}
 
 	override render() {
@@ -333,7 +339,6 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 	}
 
 	static override readonly styles = [
-		UmbTextStyles,
 		css`
 			:host {
 				position: relative;
