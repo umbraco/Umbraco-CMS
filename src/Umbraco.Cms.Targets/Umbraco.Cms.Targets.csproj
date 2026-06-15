@@ -28,7 +28,7 @@
   <!-- Add JSON schema references (and include MSBuild task) -->
   <PropertyGroup>
     <_UmbracoCmsJsonSchemaReference>appsettings-schema.Umbraco.Cms.json</_UmbracoCmsJsonSchemaReference>
-    <_UmbracoCmsPackageSchemaReference>umbraco-package-schema.json</_UmbracoCmsPackageSchemaReference>
+    <_UmbracoCmsPackageSchemaReference>umbraco-package-schema.Umbraco.Cms.json</_UmbracoCmsPackageSchemaReference>
     <NoWarn>$(NoWarn),NU5100,NU5128</NoWarn>
   </PropertyGroup>
   <ItemGroup>

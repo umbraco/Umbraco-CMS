@@ -1,5 +1,5 @@
 {
-	"$schema": "../../umbraco-package-schema.json",
+	"$schema": "../../umbraco-package-schema.Umbraco.Cms.json",
 	"name": "My Package",
 	"version": "1.0.0",
 	"extensions": [

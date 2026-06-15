@@ -149,7 +149,7 @@
 	"files": [
 		"dist-cms",
 		"examples",
-		"umbraco-package-schema.json",
+		"umbraco-package-schema.Umbraco.Cms.json",
 		"custom-elements.json",
 		"vscode-html-custom-data.json",
 		"README.md"
@@ -198,7 +198,7 @@
 		"generate:icons": "node ./devops/icons/index.js",
 		"generate:overrides": "node ./devops/tsc/index.js",
 		"generate:jsonschema:imports": "node ./devops/json-schema-generator/index.js",
-		"generate:jsonschema:dist": "npm run generate:jsonschema -- --out ./umbraco-package-schema.json tsconfig.json UmbracoPackage",
+		"generate:jsonschema:dist": "npm run generate:jsonschema -- --out ./umbraco-package-schema.Umbraco.Cms.json tsconfig.json UmbracoPackage",
 		"generate:jsonschema": "typescript-json-schema --skipLibCheck --ignoreErrors --excludePrivate --required --include \"./src/json-schema/umbraco-package-schema.ts\"",
 		"generate:check-const-test": "node ./devops/generate-check-const-test/index.js",
 		"lint:errors": "npm run lint -- --quiet",
