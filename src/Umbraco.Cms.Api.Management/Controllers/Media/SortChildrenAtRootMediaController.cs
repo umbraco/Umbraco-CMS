@@ -71,7 +71,7 @@ public class SortChildrenAtRootMediaController : MediaControllerBase
             return Forbidden();
         }
 
-        var childrenAuthorized = await SortChildrenAuthorizer.IsAuthorizedForChildrenAsync(
+        var childrenAuthorized = await AllChildrenAuthorizer.IsAuthorizedForChildrenAsync(
             _authorizationService,
             _entityService,
             User,

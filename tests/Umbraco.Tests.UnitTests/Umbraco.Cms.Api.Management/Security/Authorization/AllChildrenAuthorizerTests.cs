@@ -12,7 +12,7 @@ using Umbraco.Cms.Core.Services;
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Management.Security.Authorization;
 
 [TestFixture]
-public class SortChildrenAuthorizerTests
+public class AllChildrenAuthorizerTests
 {
     private const string Policy = "TestPolicy";
 
@@ -83,7 +83,7 @@ public class SortChildrenAuthorizerTests
     }
 
     private Task<bool> Authorize() =>
-        SortChildrenAuthorizer.IsAuthorizedForChildrenAsync(
+        AllChildrenAuthorizer.IsAuthorizedForChildrenAsync(
             _authorizationService.Object,
             _entityService.Object,
             _user,

@@ -72,7 +72,7 @@ public class SortChildrenAtRootDocumentController : DocumentControllerBase
             return Forbidden();
         }
 
-        var childrenAuthorized = await SortChildrenAuthorizer.IsAuthorizedForChildrenAsync(
+        var childrenAuthorized = await AllChildrenAuthorizer.IsAuthorizedForChildrenAsync(
             _authorizationService,
             _entityService,
             User,
