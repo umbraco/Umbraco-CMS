@@ -35,7 +35,7 @@ export class UmbDocumentLinkPickerContext extends UmbPickerContext {
 	}
 
 	async #loadLanguages() {
-		const { data } = await this.#languageCollectionRepository.requestCollection({ skip: 0, take: 1000 });
+		const { data } = await this.#languageCollectionRepository.requestAllItems();
 		const languages = data?.items || [];
 
 		this.#languages.setValue(languages);
