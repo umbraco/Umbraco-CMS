@@ -367,7 +367,9 @@ public class ElementPermissionServiceTests
         var user = CreateUser();
 
         _entityServiceMock
-            .Setup(x => x.GetAllPaths(It.Is<IEnumerable<UmbracoObjectTypes>>(t => t.Contains(UmbracoObjectTypes.Element)), new[] { elementKey }))
+            .Setup(x => x.GetAllPaths(
+                It.Is<IEnumerable<UmbracoObjectTypes>>(t => t.Contains(UmbracoObjectTypes.Element)),
+                It.Is<Guid[]>(keys => keys.Length == 1 && keys[0] == elementKey)))
             .Returns([CreateTreeEntityPath(elementKey, ElementNodeId, ElementNodePath)]);
 
         SetupBatchPermissions(user, [ElementNodeId, UserStartNodeId, Constants.System.Root], ["A", "B"]);
@@ -403,7 +405,9 @@ public class ElementPermissionServiceTests
         var user = CreateUser();
 
         _entityServiceMock
-            .Setup(x => x.GetAllPaths(It.Is<IEnumerable<UmbracoObjectTypes>>(t => t.Contains(UmbracoObjectTypes.Element)), new[] { elementKey }))
+            .Setup(x => x.GetAllPaths(
+                It.Is<IEnumerable<UmbracoObjectTypes>>(t => t.Contains(UmbracoObjectTypes.Element)),
+                It.Is<Guid[]>(keys => keys.Length == 1 && keys[0] == elementKey)))
             .Returns([]);
 
         // Act
