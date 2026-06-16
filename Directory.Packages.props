@@ -38,7 +38,7 @@
   </ItemGroup>
   <!-- Umbraco packages -->
   <ItemGroup>
-    <PackageVersion Include="Umbraco.JsonSchema.Extensions" Version="0.4.2" />
+    <PackageVersion Include="Umbraco.JsonSchema.Extensions" Version="0.4.3" />
   </ItemGroup>
   <!-- Third-party packages -->
   <ItemGroup>

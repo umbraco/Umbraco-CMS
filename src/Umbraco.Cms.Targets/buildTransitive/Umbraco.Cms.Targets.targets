@@ -40,7 +40,7 @@
       <UmbracoPackageSchemaReferences Include="@(UmbracoPackageSchemaFiles->'%(Filename)%(Extension)#')" Exclude="@(UmbracoPackageSchemaReferences)" Condition="'%(UmbracoPackageSchemaFiles.Reference)' != 'false'" />
     </ItemGroup>
     <Message Text="Adding schema references to umbraco-package-schema.json: @(UmbracoPackageSchemaReferences)" Importance="high" />
-    <JsonSchemaAddReferences JsonSchemaFile="$(MSBuildProjectDirectory)\umbraco-package-schema.json" References="@(UmbracoPackageSchemaReferences)" TargetPath="$.properties.extensions.items" />
+    <JsonSchemaAddReferences JsonSchemaFile="$(MSBuildProjectDirectory)\umbraco-package-schema.json" References="@(UmbracoPackageSchemaReferences)" TargetPath="$.properties.extensions.items" Combinator="anyOf" />
   </Target>
 
   <!-- Include App_Plugins content in output/publish directories -->

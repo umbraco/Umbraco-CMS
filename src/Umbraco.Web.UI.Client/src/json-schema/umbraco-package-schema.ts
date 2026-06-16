@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/naming-convention */
+import type { ManifestBase, ManifestCondition } from '@umbraco-cms/backoffice/extension-api';
 
 /**
  * Umbraco package manifest JSON
@@ -44,7 +45,7 @@ export interface UmbracoPackage {
 	 * @title An array of Umbraco package manifest types that will be installed
 	 * @required
 	 */
-	extensions: Array<unknown>;
+	extensions: Array<ManifestBase | ManifestCondition>;
 
 	/**
 	 * @title The importmap for the package
