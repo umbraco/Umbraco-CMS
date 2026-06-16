@@ -24,7 +24,7 @@ public class ElementPermissionMapperTests
             new Lazy<IElementPermissionService>(() => _elementPermissionService.Object));
 
     [Test]
-    public void AggregatePresentationModels_Resolves_Permissions_Through_ElementPermissionService()
+    public void Can_Aggregate_Permissions_Through_Element_Permission_Service()
     {
         // Arrange
         var user = Mock.Of<IUser>();

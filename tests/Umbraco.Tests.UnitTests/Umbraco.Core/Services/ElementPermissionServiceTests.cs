@@ -385,7 +385,7 @@ public class ElementPermissionServiceTests
     }
 
     [Test]
-    public async Task Get_Permissions_Returns_Empty_For_Empty_Keys()
+    public async Task Can_Return_Empty_Permissions_For_Empty_Keys()
     {
         // Arrange
         var user = CreateUser();
@@ -398,7 +398,7 @@ public class ElementPermissionServiceTests
     }
 
     [Test]
-    public async Task Get_Permissions_Returns_Empty_When_Element_Not_Found()
+    public async Task Can_Return_Empty_When_Element_Not_Found()
     {
         // Arrange
         var elementKey = Guid.NewGuid();
@@ -418,7 +418,7 @@ public class ElementPermissionServiceTests
     }
 
     [Test]
-    public async Task FilterFallbackPermissions_Returns_Permissions_Unchanged()
+    public async Task Can_Pass_Through_Fallback_Permissions_Unchanged()
     {
         // Arrange
         var user = CreateUser();

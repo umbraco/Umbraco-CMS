@@ -13,6 +13,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.User.Current;
 
+/// <summary>
+/// Provides endpoints to retrieve element permissions for the current user.
+/// </summary>
 [ApiVersion("1.0")]
 public class GetElementPermissionsCurrentUserController : CurrentUserControllerBase
 {
@@ -21,6 +24,13 @@ public class GetElementPermissionsCurrentUserController : CurrentUserControllerB
     private readonly IElementPermissionService _elementPermissionService;
 
     // TODO (V20): Remove the IUserService parameter from the constructor as it is not used in the current implementation.
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="GetElementPermissionsCurrentUserController"/> class, which handles requests related to retrieving element permissions for the current user.
+    /// </summary>
+    /// <param name="backOfficeSecurityAccessor">Provides access to back office security information for the current user.</param>
+    /// <param name="mapper">The Umbraco object mapper used for mapping between models.</param>
+    /// <param name="elementPermissionService">Service for managing element permissions.</param>
     [ActivatorUtilitiesConstructor]
     public GetElementPermissionsCurrentUserController(
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
@@ -33,6 +43,12 @@ public class GetElementPermissionsCurrentUserController : CurrentUserControllerB
         _elementPermissionService = elementPermissionService;
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="GetElementPermissionsCurrentUserController"/> class.
+    /// </summary>
+    /// <param name="backOfficeSecurityAccessor">Provides access to back office security information for the current user.</param>
+    /// <param name="userService">Service for managing and retrieving user information.</param>
+    /// <param name="mapper">The Umbraco object mapper used for mapping between models.</param>
     [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 20.")]
     public GetElementPermissionsCurrentUserController(
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
@@ -46,6 +62,12 @@ public class GetElementPermissionsCurrentUserController : CurrentUserControllerB
     {
     }
 
+    /// <summary>
+    /// Retrieves the element permissions for the currently authenticated user for the specified element IDs.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="ids">A set of element IDs for which to retrieve permissions.</param>
+    /// <returns>An <see cref="IActionResult"/> containing a <see cref="UserPermissionsResponseModel"/> with the permissions for each requested element.</returns>
     [MapToApiVersion("1.0")]
     [HttpGet("permissions/element")]
     [ProducesResponseType(typeof(UserPermissionsResponseModel), StatusCodes.Status200OK)]
