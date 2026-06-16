@@ -1,10 +1,10 @@
 using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.HybridCache.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache.NotificationHandlers;
 
@@ -23,11 +23,12 @@ internal sealed class DomainCacheSeedingNotificationHandler : INotificationHandl
 
     public void Handle(UmbracoApplicationStartingNotification notification)
     {
-        if (_runtimeState.Level <= RuntimeLevel.Install || (_runtimeState.Level == RuntimeLevel.Upgrade && _globalSettings.ShowMaintenancePageWhenInUpgradeState))
+        if (_runtimeState.ShouldSkipStartupSeeding(_globalSettings))
         {
             return;
         }
 
+        // Force eager population of the lazily-loaded domain cache.
         _domainCacheService.GetAll(includeWildcards: true);
     }
 }
