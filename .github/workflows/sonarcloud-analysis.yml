@@ -93,7 +93,7 @@ jobs:
 
       - name: Warn on test failure
         if: steps.tests.outcome == 'failure'
-        run: echo "::warning::Unit tests failed - SonarCloud analysis will proceed without coverage data"
+        run: echo "::warning::Unit tests failed - SonarCloud analysis will proceed but coverage data may be incomplete"
 
       - name: End analysis
         if: steps.build.outcome == 'success'
