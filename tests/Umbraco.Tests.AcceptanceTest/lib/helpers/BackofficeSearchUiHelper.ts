@@ -1,4 +1,4 @@
-import {Page, Locator} from "@playwright/test";
+import {Page, Locator, expect} from "@playwright/test";
 import {UiBaseLocators} from "./UiBaseLocators";
 import {ConstantHelper} from "./ConstantHelper";
 
@@ -32,9 +32,6 @@ export class BackofficeSearchUiHelper extends UiBaseLocators {
   }
 
   async clickOutsideToCloseModal() {
-    // The modal closes when a click is dispatched anywhere outside of
-    // <umb-search-modal>. Coord (0, 0) of the viewport sits in the top-left,
-    // outside the centered modal, so the document click handler fires.
     await this.page.mouse.click(0, 0);
   }
 
@@ -84,6 +81,10 @@ export class BackofficeSearchUiHelper extends UiBaseLocators {
 
   async isSearchProviderActive(providerName: string) {
     await this.hasText(this.activeProvider, providerName);
+  }
+  
+  async doesSearchResultHaveCount(count: number) {
+    expect(await this.results.count()).toBe(count);
   }
 
   async isSearchProviderVisible(providerName: string, isVisible: boolean = true) {

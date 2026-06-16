@@ -172,8 +172,7 @@ export class UmbPickerSearchResultElement extends UmbLitElement {
 			}
 
 			uui-pagination {
-				display: block;
-				margin-top: var(--uui-size-layout-1);
+				margin-top: var(--uui-size-space-3);
 			}
 		`,
 	];

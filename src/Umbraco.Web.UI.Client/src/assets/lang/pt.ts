@@ -1404,6 +1404,7 @@ export default {
 	},
 	sections: {
 		content: 'Conteúdo',
+		library: 'Biblioteca',
 		media: 'Multimédia',
 		member: 'Membros',
 		packages: 'Pacotes',

@@ -21,6 +21,7 @@ export class UmbPropertyEditorUIDocumentTypePickerElement extends UmbLitElement 
 		this._max = minMax?.max ?? Infinity;
 
 		this._elementTypesOnly = config.getValueByAlias('onlyPickElementTypes') ?? false;
+		this._documentTypesOnly = config.getValueByAlias('onlyPickDocumentTypes') ?? false;
 	}
 
 	@property({ type: Boolean, attribute: 'readonly' })
@@ -35,6 +36,9 @@ export class UmbPropertyEditorUIDocumentTypePickerElement extends UmbLitElement 
 	@state()
 	private _elementTypesOnly?: boolean;
 
+	@state()
+	private _documentTypesOnly?: boolean;
+
 	#onChange(event: CustomEvent & { target: UmbInputDocumentTypeElement }) {
 		this.value = event.target.value;
 		this.dispatchEvent(new UmbChangeEvent());
@@ -48,6 +52,7 @@ export class UmbPropertyEditorUIDocumentTypePickerElement extends UmbLitElement 
 				.value=${this.value}
 				.readonly=${this.readonly}
 				.elementTypesOnly=${this._elementTypesOnly ?? false}
+				.documentTypesOnly=${this._documentTypesOnly ?? false}
 				@change=${this.#onChange}>
 			</umb-input-document-type>
 		`;

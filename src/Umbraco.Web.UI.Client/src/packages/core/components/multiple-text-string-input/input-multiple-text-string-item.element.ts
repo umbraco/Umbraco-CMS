@@ -107,7 +107,6 @@ export class UmbInputMultipleTextStringItemElement extends UUIFormControlWithBas
 					<uui-button
 						compact
 						label="${this.localize.term('general_remove')} ${this.value}"
-						look="outline"
 						?disabled=${this.disabled}
 						@click=${this.#onDelete}>
 						<uui-icon name="icon-trash"></uui-icon>
@@ -128,6 +127,7 @@ export class UmbInputMultipleTextStringItemElement extends UUIFormControlWithBas
 
 			#validation-message {
 				flex: 1;
+				margin-bottom: calc(var(--uui-size-1) * -1);
 			}
 
 			#input {
@@ -136,10 +136,27 @@ export class UmbInputMultipleTextStringItemElement extends UUIFormControlWithBas
 
 			.handle {
 				cursor: grab;
+				opacity: 0.6;
+				transition: opacity 120ms;
 			}
 
 			.handle:active {
 				cursor: grabbing;
+			}
+
+			uui-button {
+				opacity: 0;
+				transition: opacity 120ms;
+			}
+
+			:host(:hover),
+			:host(:focus-within) {
+				uui-button {
+					opacity: 1;
+				}
+				.handle {
+					opacity: 1;
+				}
 			}
 		`,
 	];

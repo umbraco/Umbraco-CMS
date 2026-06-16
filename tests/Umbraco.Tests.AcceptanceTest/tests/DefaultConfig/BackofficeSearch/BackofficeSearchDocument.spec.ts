@@ -87,7 +87,7 @@ test('clears search results when the input is emptied', async ({umbracoApi, umbr
 
   // Assert
   await umbracoUi.backofficeSearch.isNavigationTipsVisible();
-  expect(await umbracoUi.backofficeSearch.getSearchResultsCount()).toBe(0);
+  await umbracoUi.backofficeSearch.doesSearchResultHaveCount(0);
 });
 
 test('can find a child document by name', async ({umbracoApi, umbracoUi}) => {
