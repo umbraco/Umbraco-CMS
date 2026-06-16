@@ -1,5 +1,6 @@
 import type { UmbElementDetailModel } from '../types.js';
 import type { UmbElementPropertyDataOwner } from './element-property-data-owner.interface.js';
+import { umbExtractVariantValues } from './merge-variant-values.function.js';
 import type { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -119,16 +120,7 @@ export abstract class UmbElementPropertyDatasetContext<
 	}
 
 	#mergeVariantIdsAndValues([props, values]: [UmbPropertyVariantIdMapType, ContentModel['values'] | undefined]) {
-		const r: ContentModel['values'] = [];
-		if (values) {
-			for (const prop of props) {
-				const f = values.find((v) => prop.alias === v.alias && prop.variantId.compare(v));
-				if (f) {
-					r.push(f);
-				}
-			}
-		}
-		return r as ContentModel['values'];
+		return umbExtractVariantValues(props, values) as ContentModel['values'];
 	}
 
 	async getProperties(): Promise<ContentModel['values']> {

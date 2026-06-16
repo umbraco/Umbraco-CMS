@@ -128,7 +128,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 					),
 					(index) => {
 						this.#index = index;
-						this.#renderLabel(this.content.getValues(), this.settings.getValues());
+						this.#renderLabel(this.content.getVariantValues(), this.settings.getVariantValues());
 					},
 					'observeLayoutIndex',
 				);
@@ -172,7 +172,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		);
 
 		this.observe(
-			observeMultiple([this.content.values, this.settings.values]),
+			observeMultiple([this.content.variantValues, this.settings.variantValues]),
 			async ([contentValues, settingsValues]) => {
 				this.#renderLabel(contentValues, settingsValues);
 			},
@@ -283,7 +283,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	#gotLabel(label: string | undefined) {
 		if (label) {
 			this.#labelRender.markdown = label;
-			this.#renderLabel(this.content.getValues(), this.settings.getValues());
+			this.#renderLabel(this.content.getVariantValues(), this.settings.getVariantValues());
 		}
 	}
 
@@ -291,7 +291,6 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		contentValues: Array<UmbBlockDataValueModel> | undefined,
 		settingsValues: Array<UmbBlockDataValueModel> | undefined,
 	) {
-		// TODO: content or $settings does not handle variant properties, it just uses the first value it can find for the alias. [NL]
 		const valueObject: UmbBlockLabelUfmValueType = {};
 		if (contentValues) {
 			for (const property of contentValues) {
