@@ -17,6 +17,7 @@ import { UmbDeprecation, UmbSelectionManager, debounce } from '@umbraco-cms/back
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry, type ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbEntityContext } from '@umbraco-cms/backoffice/entity';
 
 export class UmbDefaultTreeContext<
 	TreeItemType extends UmbTreeItemModel,
@@ -28,6 +29,8 @@ export class UmbDefaultTreeContext<
 {
 	#treeRoot = new UmbObjectState<TreeRootType | undefined>(undefined);
 	public readonly treeRoot = this.#treeRoot.asObservable();
+
+	#entityContext = new UmbEntityContext(this);
 
 	public selectableFilter?: (item: TreeItemType) => boolean = () => true;
 	public filter?: (item: TreeItemType) => boolean = () => true;
@@ -212,6 +215,10 @@ export class UmbDefaultTreeContext<
 			this.#treeRoot.setValue(data);
 			this.#treeItemChildrenManager.setTreeItem(data);
 			this.#treeItemExpansionManager.setTreeItem(data);
+			if (!this.getStartNode()) {
+				this.#entityContext.setEntityType(data.entityType);
+				this.#entityContext.setUnique(data.unique);
+			}
 			this.pagination.setTotalItems(1);
 
 			if (!reload) {
@@ -276,6 +283,10 @@ export class UmbDefaultTreeContext<
 	 */
 	setStartNode(startNode: UmbTreeStartNode | undefined) {
 		this.#treeItemChildrenManager.setStartNode(startNode);
+		if (startNode) {
+			this.#entityContext.setEntityType(startNode.entityType);
+			this.#entityContext.setUnique(startNode.unique);
+		}
 		// we need to reset the tree if this config changes
 		this.#clearTree();
 		this.loadTree();
