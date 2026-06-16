@@ -108,7 +108,6 @@ class UmbStoryBookElement extends UmbLitElement {
 		...publishCacheManifests,
 		...relationsManifests,
 		...rteManifests,
-		...searchManifests,
 		...segmentManifests,
 		...settingsManifests,
 		...staticFileManifests,
@@ -190,25 +189,25 @@ export const parameters = {
 		},
 	},
 	backgrounds: {
-        options: {
-            greyish: {
+		options: {
+			greyish: {
 				name: 'Greyish',
 				value: '#F3F3F5',
 			},
 
-            white: {
+			white: {
 				name: 'White',
 				value: '#ffffff',
 			}
-        }
-    },
+		}
+	},
 };
 
 setCustomElements(customElementManifests);
 export const tags = ['autodocs'];
 
 export const initialGlobals = {
-    backgrounds: {
-        value: 'greyish'
-    }
+	backgrounds: {
+		value: 'greyish'
+	}
 };
