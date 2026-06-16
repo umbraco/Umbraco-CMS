@@ -390,6 +390,10 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 	}
 
 	static override styles = css`
+		#breadcrumb {
+			margin-bottom: var(--uui-size-space-4);
+		}
+
 		uui-breadcrumbs {
 			overflow: hidden;
 			min-width: 0;
