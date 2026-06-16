@@ -19,8 +19,6 @@ public class SqliteMigrationProviderSetup : IMigrationProviderSetup
         builder.UseSqlite(connectionString, x =>
         {
             x.MigrationsAssembly(GetType().Assembly.FullName);
-
-
         });
     }
 }

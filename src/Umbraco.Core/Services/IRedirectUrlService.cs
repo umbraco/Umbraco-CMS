@@ -29,7 +29,14 @@ public interface IRedirectUrlService : IService
     ///     <see cref="RedirectUrlOperationStatus.CancelledByNotification" /> if a notification handler
     ///     canceled the operation.
     /// </returns>
-    Task<Attempt<IRedirectUrl?, RedirectUrlOperationStatus>> RegisterWithStatusAsync(string oldUrl, Guid contentKey, string? culture = null);
+    // TODO (V20): Remove the default implementation, and rename this back to "Register" when the obsolete Register overload is removed.
+    async Task<Attempt<IRedirectUrl?, RedirectUrlOperationStatus>> RegisterWithStatusAsync(string oldUrl, Guid contentKey, string? culture = null)
+    {
+#pragma warning disable CS0618 // Type or member is obsolete
+        Register(oldUrl, contentKey, culture);
+#pragma warning restore CS0618 // Type or member is obsolete
+        return Attempt.SucceedWithStatus<IRedirectUrl?, RedirectUrlOperationStatus>(RedirectUrlOperationStatus.Success, null);
+    }
 
     /// <summary>
     ///     Deletes all redirect URLs for a given content.
@@ -47,7 +54,14 @@ public interface IRedirectUrlService : IService
     ///     <see cref="RedirectUrlOperationStatus.CancelledByNotification" /> if a notification handler
     ///     canceled the operation.
     /// </returns>
-    Task<RedirectUrlOperationStatus> DeleteContentRedirectUrlsWithStatusAsync(Guid contentKey);
+    // TODO (V20): Remove the default implementation when the obsolete DeleteContentRedirectUrls overload is removed.
+    async Task<RedirectUrlOperationStatus> DeleteContentRedirectUrlsWithStatusAsync(Guid contentKey)
+    {
+#pragma warning disable CS0618 // Type or member is obsolete
+        DeleteContentRedirectUrls(contentKey);
+#pragma warning restore CS0618 // Type or member is obsolete
+        return RedirectUrlOperationStatus.Success;
+    }
 
     /// <summary>
     ///     Deletes a redirect URL.
@@ -65,7 +79,14 @@ public interface IRedirectUrlService : IService
     ///     <see cref="RedirectUrlOperationStatus.CancelledByNotification" /> if a notification handler
     ///     canceled the operation.
     /// </returns>
-    Task<RedirectUrlOperationStatus> DeleteWithStatusAsync(IRedirectUrl redirectUrl);
+    // TODO (V20): Remove the default implementation when the obsolete Delete(IRedirectUrl) overload is removed.
+    async Task<RedirectUrlOperationStatus> DeleteWithStatusAsync(IRedirectUrl redirectUrl)
+    {
+#pragma warning disable CS0618 // Type or member is obsolete
+        Delete(redirectUrl);
+#pragma warning restore CS0618 // Type or member is obsolete
+        return RedirectUrlOperationStatus.Success;
+    }
 
     /// <summary>
     ///     Deletes a redirect URL.
@@ -84,7 +105,14 @@ public interface IRedirectUrlService : IService
     ///     <see cref="RedirectUrlOperationStatus.CancelledByNotification" /> if a notification handler
     ///     canceled the operation.
     /// </returns>
-    Task<RedirectUrlOperationStatus> DeleteWithStatusAsync(Guid id);
+    // TODO (V20): Remove the default implementation when the obsolete Delete(Guid) overload is removed.
+    async Task<RedirectUrlOperationStatus> DeleteWithStatusAsync(Guid id)
+    {
+#pragma warning disable CS0618 // Type or member is obsolete
+        Delete(id);
+#pragma warning restore CS0618 // Type or member is obsolete
+        return RedirectUrlOperationStatus.Success;
+    }
 
     /// <summary>
     ///     Deletes all redirect URLs.
