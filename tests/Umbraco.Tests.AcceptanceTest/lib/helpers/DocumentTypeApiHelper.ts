@@ -601,13 +601,14 @@ export class DocumentTypeApiHelper {
     return await this.create(documentType);
   }
 
-  async createElementTypeWithAComposition(elementTypeName: string, compositionId: string) {
+  async createElementTypeWithAComposition(elementTypeName: string, compositionId: string, isAllowedInLibrary: boolean = false) {
     await this.ensureNameNotExists(elementTypeName);
 
     const documentType = new DocumentTypeBuilder()
       .withName(elementTypeName)
       .withAlias(AliasHelper.toAlias(elementTypeName))
       .withIsElement(true)
+      .withAllowedInLibrary(isAllowedInLibrary)
       .withIcon("icon-plugin")
       .addComposition()
         .withDocumentTypeId(compositionId)
@@ -1009,6 +1010,37 @@ export class DocumentTypeApiHelper {
         .withAlias(AliasHelper.toAlias(propertyName))
         .withName(propertyName)
         .withDataTypeId(dataTypeId)
+        .done()
+      .addAllowedTemplateId()
+        .withId(templateId)
+        .done()
+      .withDefaultTemplateId(templateId)
+      .build();
+
+    return await this.create(documentType);
+  }
+
+  async createVariantDocumentTypeWithInvariantPropertyEditorAndAllowedTemplate(documentTypeName: string, propertyName: string, dataTypeId: string, templateId: string) {
+    const crypto = require('crypto');
+    const containerId = crypto.randomUUID();
+    await this.ensureNameNotExists(documentTypeName);
+
+    const documentType = new DocumentTypeBuilder()
+      .withName(documentTypeName)
+      .withAlias(AliasHelper.toAlias(documentTypeName))
+      .withAllowedAsRoot(true)
+      .withVariesByCulture(true)
+      .addContainer()
+        .withName('TestGroup')
+        .withId(containerId)
+        .withType('Group')
+        .done()
+      .addProperty()
+        .withContainerId(containerId)
+        .withAlias(AliasHelper.toAlias(propertyName))
+        .withName(propertyName)
+        .withDataTypeId(dataTypeId)
+        .withVariesByCulture(false)
         .done()
       .addAllowedTemplateId()
         .withId(templateId)
