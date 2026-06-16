@@ -73,17 +73,10 @@ jobs:
         run: dotnet restore umbraco.sln
 
       - name: Build solution
-        id: build
-        continue-on-error: true
         run: GITHUB_ENV=/dev/null dotnet build umbraco.sln --no-restore -clp:ErrorsOnly # prevent sonar MSBuild integration from writing malformed values to $GITHUB_ENV
-
-      - name: Warn on build failure
-        if: steps.build.outcome == 'failure'
-        run: echo "::warning::Solution build failed - SonarCloud analysis was skipped"
 
       - name: Run unit tests with coverage
         id: tests
-        if: steps.build.outcome == 'success'
         continue-on-error: true
         run: |
           dotnet-coverage collect \
@@ -96,7 +89,6 @@ jobs:
         run: echo "::warning::Unit tests failed - SonarCloud analysis will proceed but coverage data may be incomplete"
 
       - name: End analysis
-        if: steps.build.outcome == 'success'
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: dotnet-sonarscanner end /d:sonar.token="$SONAR_TOKEN"
