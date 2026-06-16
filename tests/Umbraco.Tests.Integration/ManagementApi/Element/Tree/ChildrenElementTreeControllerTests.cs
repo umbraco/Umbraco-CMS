@@ -96,7 +96,7 @@ public class ChildrenElementTreeControllerTests : ManagementApiUserGroupTestBase
             .WithAlias(Guid.NewGuid().ToString("N"))
             .WithName("Test Group With Element Start Node")
             .WithAllowedSections(["library"])
-            .WithPermissions(new HashSet<string> { ActionElementBrowse.ActionLetter })
+            .WithPermissions(new HashSet<string> { ActionElementBrowse.ActionLetter, ActionElementContainerBrowse.ActionLetter })
             .WithStartElementId(startNodeFolder.Id)
             .Build();
 

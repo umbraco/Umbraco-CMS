@@ -197,7 +197,8 @@ test('can delete a trashed folder from the recycle bin when delete folder permis
   await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
   await umbracoUi.library.goToSection(ConstantHelper.sections.library, false);
-  await umbracoUi.library.isItemVisibleInRecycleBin(folderName);
+  await umbracoUi.library.clickCaretButtonForName('Recycle Bin');
+  await umbracoUi.library.isItemVisibleInRecycleBin(folderName, true, false);
 
   // Act
   await umbracoUi.library.clickDeleteButtonForTrashedElememtWithName(folderName);
@@ -348,5 +349,5 @@ test('cannot rename a folder when only element update permission is enabled', as
   await umbracoUi.library.goToSection(ConstantHelper.sections.library, false);
 
   // Assert
-  await umbracoUi.library.isActionsMenuForNameVisible(folderName, false);
+  await umbracoUi.library.isElementInTreeVisible(folderName, false);
 });
