@@ -76,7 +76,7 @@ test('can render published element extension methods on an invariant element', a
   await umbracoUi.contentRender.doesContentRenderValueContainText('IsDocumentType: True');
   await umbracoUi.contentRender.doesContentRenderValueContainText('NotDocumentType: False');
   await umbracoUi.contentRender.doesContentRenderValueContainText('CultureDate: ' + currentYear);
-  await umbracoUi.contentRender.doesContentRenderValueContainText('CreatorName: ' + currentUser.name);
+  await umbracoUi.contentRender.doesContentRenderValueContainText('CreatorName: ' + currentUser.name, true);
   await umbracoUi.contentRender.doesContentRenderValueContainText('WriterName: ' + currentUser.name);
   await umbracoUi.contentRender.doesContentRenderValueContainText('PageName: ' + contentName);
   await umbracoUi.contentRender.doesContentRenderValueContainText('PageIsDocumentType: True');
