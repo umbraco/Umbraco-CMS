@@ -30,6 +30,7 @@ export class UmbTreeWorkspaceViewElement extends UmbLitElement {
 			alias=${this.manifest.meta.treeAlias}
 			.props=${{
 				hideToolbar: false,
+				hideTreeActions: false,
 				hideTreeRoot: true,
 				startNode: this._parent,
 				selectionConfiguration: {

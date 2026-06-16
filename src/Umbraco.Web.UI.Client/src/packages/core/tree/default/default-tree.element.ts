@@ -80,6 +80,13 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 	@property({ type: Boolean, attribute: 'hide-toolbar' })
 	hideToolbar: boolean = true;
 
+	/**
+	 * When true the tree actions are hidden.
+	 * Defaults to true — tree actions are not shown unless explicitly opted in with hide-tree-actions="false".
+	 */
+	@property({ type: Boolean, attribute: 'hide-tree-actions' })
+	hideTreeActions: boolean = true;
+
 	@state()
 	private _viewElement?: HTMLElement | null;
 
@@ -144,7 +151,8 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 
 	override render() {
 		return html`
-			${!this.hideToolbar ? html`<umb-tree-toolbar></umb-tree-toolbar>` : nothing} ${this._viewElement ?? nothing}
+			${!this.hideToolbar ? html`<umb-tree-toolbar .hideTreeActions=${this.hideTreeActions}></umb-tree-toolbar>` : nothing}
+			${this._viewElement ?? nothing}
 		`;
 	}
 
