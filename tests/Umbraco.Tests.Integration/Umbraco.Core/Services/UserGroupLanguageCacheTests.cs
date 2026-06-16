@@ -48,10 +48,11 @@ internal sealed class UserGroupLanguageCacheTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Deleting_Language_Evicts_It_From_Cached_User_Group()
+    public async Task Can_Evict_Deleted_Language_From_Cached_User_Group()
     {
         var language = new LanguageBuilder().WithCultureInfo("nb-NO").Build();
-        await LanguageService.CreateAsync(language, Constants.Security.SuperUserKey);
+        var languageCreated = await LanguageService.CreateAsync(language, Constants.Security.SuperUserKey);
+        Assert.IsTrue(languageCreated.Success);
 
         var userGroup = new UserGroup(ShortStringHelper)
         {
