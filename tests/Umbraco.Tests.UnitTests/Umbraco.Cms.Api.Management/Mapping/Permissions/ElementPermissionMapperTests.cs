@@ -19,8 +19,6 @@ public class ElementPermissionMapperTests
 
     private ElementPermissionMapper CreateMapper()
         => new(
-            new Lazy<IEntityService>(() => Mock.Of<IEntityService>()),
-            new Lazy<IUserService>(() => Mock.Of<IUserService>()),
             new Lazy<IElementPermissionService>(() => _elementPermissionService.Object));
 
     [Test]
