@@ -19936,7 +19936,7 @@ export type GetUserCurrentPermissionsElementResponses = {
     /**
      * OK
      */
-    200: Array<UserPermissionsResponseModel>;
+    200: UserPermissionsResponseModel;
 };
 
 export type GetUserCurrentPermissionsElementResponse = GetUserCurrentPermissionsElementResponses[keyof GetUserCurrentPermissionsElementResponses];

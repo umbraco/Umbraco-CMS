@@ -36798,10 +36798,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/UserPermissionsResponseModel"
-                  }
+                  "$ref": "#/components/schemas/UserPermissionsResponseModel"
                 }
               }
             }

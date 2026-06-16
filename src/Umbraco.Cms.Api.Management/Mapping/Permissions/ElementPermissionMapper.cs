@@ -1,5 +1,7 @@
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.UserGroup.Permissions;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Models.Membership.Permissions;
@@ -17,18 +19,32 @@ namespace Umbraco.Cms.Api.Management.Mapping.Permissions;
 /// </remarks>
 public class ElementPermissionMapper : IPermissionPresentationMapper, IPermissionMapper
 {
-    private readonly Lazy<IEntityService> _entityService;
-    private readonly Lazy<IUserService> _userService;
+    private readonly Lazy<IElementPermissionService> _elementPermissionService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ElementPermissionMapper"/> class.
     /// </summary>
-    /// <param name="entityService">Lazy-loaded service for interacting with entities.</param>
-    /// <param name="userService">Lazy-loaded service for interacting with users and their permissions.</param>
+    /// <param name="entityService">The entity service.</param>
+    /// <param name="userService">The user service.</param>
+    /// <param name="elementPermissionService">The element permission service.</param>
+    // TODO (V20): Remove the entityService and userService parameters as they are not used in the current implementation.
+    public ElementPermissionMapper(
+#pragma warning disable IDE0060 // Remove unused parameter
+        Lazy<IEntityService> entityService,
+        Lazy<IUserService> userService,
+#pragma warning restore IDE0060 // Remove unused parameter
+        Lazy<IElementPermissionService> elementPermissionService) => _elementPermissionService = elementPermissionService;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ElementPermissionMapper"/> class.
+    /// </summary>
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 20.")]
     public ElementPermissionMapper(Lazy<IEntityService> entityService, Lazy<IUserService> userService)
+        : this(
+            entityService,
+            userService,
+            new Lazy<IElementPermissionService>(StaticServiceProvider.Instance.GetRequiredService<IElementPermissionService>))
     {
-        _entityService = entityService;
-        _userService = userService;
     }
 
     /// <inheritdoc cref="IPermissionMapper" />
@@ -108,25 +124,18 @@ public class ElementPermissionMapper : IPermissionPresentationMapper, IPermissio
             .Distinct()
             .ToArray();
 
-        // Batch retrieve all elements by their keys.
-        var elements = _entityService.Value.GetAll<IElement>(elementKeysWithGranularPermissions)
-            .ToDictionary(elem => elem.Key, elem => elem.Path);
+        // Resolve permissions through IElementPermissionService so custom implementations are respected.
+        IEnumerable<NodePermissions> permissions = _elementPermissionService.Value
+            .GetPermissionsAsync(user, elementKeysWithGranularPermissions)
+            .GetAwaiter()
+            .GetResult();
 
-        // Iterate through each element key that has granular permissions.
-        foreach (Guid elementKey in elementKeysWithGranularPermissions)
+        foreach (NodePermissions nodePermission in permissions)
         {
-            // Retrieve the path from the pre-fetched elements.
-            if (!elements.TryGetValue(elementKey, out var path) || string.IsNullOrEmpty(path))
-            {
-                continue;
-            }
-
-            // With the path we can call the same logic as used server-side for authorizing access to resources.
-            EntityPermissionSet permissionsForPath = _userService.Value.GetPermissionsForPath(user, path);
             yield return new ElementPermissionPresentationModel
             {
-                Element = new ReferenceByIdModel(elementKey),
-                Verbs = permissionsForPath.GetAllPermissions(),
+                Element = new ReferenceByIdModel(nodePermission.NodeKey),
+                Verbs = nodePermission.Permissions,
             };
         }
     }
