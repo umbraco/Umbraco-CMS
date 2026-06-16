@@ -18,6 +18,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.BackgroundJobs.Jobs
 public class TouchServerJobTests
 {
     private Mock<IServerRegistrationService> _mockServerRegistrationService;
+    private Mock<ILogger<TouchServerJob>> _mockLogger;
 
     private const string ApplicationUrl = "https://mysite.com/";
     private readonly TimeSpan _staleServerTimeout = TimeSpan.FromMinutes(2);
@@ -77,11 +78,116 @@ public class TouchServerJobTests
         Assert.AreEqual(waitTimeBetweenCalls, sut.Period);
     }
 
+    [Test]
+    public async Task Returns_And_Logs_When_Touch_Hangs()
+    {
+        using var gate = new ManualResetEventSlim(false);
+        var sut = CreateTouchServerTask(touchTimeout: TimeSpan.FromMilliseconds(50), onTouch: () => gate.Wait());
+
+        try
+        {
+            // A hung TouchServer() must not block the recurring loop: RunJobAsync should return after the timeout
+            // rather than awaiting the (synchronous, un-cancellable) call forever.
+            Task runTask = sut.RunJobAsync(CancellationToken.None);
+            Task winner = await Task.WhenAny(runTask, Task.Delay(TimeSpan.FromSeconds(10)));
+
+            Assert.AreSame(runTask, winner, "RunJobAsync did not return after the touch timed out.");
+            await runTask; // Must complete without throwing so the loop continues.
+
+            VerifyErrorLogged();
+        }
+        finally
+        {
+            // Release the abandoned touch so it does not leave a blocked thread-pool thread behind.
+            gate.Set();
+        }
+    }
+
+    [Test]
+    public async Task Skips_Touch_While_Previous_Is_Still_Running()
+    {
+        using var gate = new ManualResetEventSlim(false);
+        var sut = CreateTouchServerTask(touchTimeout: TimeSpan.FromMilliseconds(50), onTouch: () => gate.Wait());
+
+        try
+        {
+            // First run starts a touch that hangs and times out, leaving it in-flight.
+            await sut.RunJobAsync(CancellationToken.None);
+
+            // Second run must skip rather than start (and block on) another touch while the first is still running.
+            await sut.RunJobAsync(CancellationToken.None);
+
+            VerifyServerTouchedTimes(Times.Once());
+        }
+        finally
+        {
+            gate.Set();
+        }
+    }
+
+    [Test]
+    public async Task Resumes_Touch_After_In_Flight_Call_Completes()
+    {
+        using var gate = new ManualResetEventSlim(false);
+        var touchCount = 0;
+        var sut = CreateTouchServerTask(
+            touchTimeout: TimeSpan.FromMilliseconds(50),
+            onTouch: () =>
+            {
+                // Only the first call blocks; later calls return immediately.
+                if (Interlocked.Increment(ref touchCount) == 1)
+                {
+                    gate.Wait();
+                }
+            });
+
+        // First run hangs and times out, leaving the touch in-flight.
+        await sut.RunJobAsync(CancellationToken.None);
+        Assert.AreEqual(1, Volatile.Read(ref touchCount));
+
+        // Release the stalled call; once its task completes the next run must start a fresh touch — i.e. the job
+        // self-heals without a recycle. Retry briefly to avoid racing the in-flight task's completion.
+        gate.Set();
+
+        var resumed = false;
+        for (var attempt = 0; attempt < 500 && resumed is false; attempt++)
+        {
+            await sut.RunJobAsync(CancellationToken.None);
+            if (Volatile.Read(ref touchCount) >= 2)
+            {
+                resumed = true;
+            }
+            else
+            {
+                await Task.Delay(10);
+            }
+        }
+
+        Assert.IsTrue(resumed, "Touching did not resume after the stalled call completed.");
+        VerifyServerTouchedTimes(Times.Exactly(2));
+    }
+
+    [Test]
+    public async Task Falls_Back_And_Warns_When_TouchTimeout_Invalid()
+    {
+        // A non-positive timeout is misconfiguration; the job should warn and fall back to a sane default
+        // rather than treating every touch as immediately timed out.
+        var sut = CreateTouchServerTask(touchTimeout: TimeSpan.Zero);
+
+        VerifyWarningLogged();
+
+        // The fallback timeout is generous, so a normal (fast) touch still completes successfully.
+        await sut.RunJobAsync(CancellationToken.None);
+        VerifyServerTouched();
+    }
+
     private TouchServerJob CreateTouchServerTask(
         RuntimeLevel runtimeLevel = RuntimeLevel.Run,
         string applicationUrl = ApplicationUrl,
         bool useElection = true,
-        TimeSpan? waitTimeBetweenCalls = null)
+        TimeSpan? waitTimeBetweenCalls = null,
+        TimeSpan? touchTimeout = null,
+        Action? onTouch = null)
     {
         var mockRequestAccessor = new Mock<IHostingEnvironment>();
         mockRequestAccessor.SetupGet(x => x.ApplicationMainUrl)
@@ -90,17 +196,29 @@ public class TouchServerJobTests
         var mockRunTimeState = new Mock<IRuntimeState>();
         mockRunTimeState.SetupGet(x => x.Level).Returns(runtimeLevel);
 
-        var mockLogger = new Mock<ILogger<TouchServerJob>>();
+        _mockLogger = new Mock<ILogger<TouchServerJob>>();
 
         _mockServerRegistrationService = new Mock<IServerRegistrationService>();
+        if (onTouch is not null)
+        {
+            _mockServerRegistrationService
+                .Setup(x => x.TouchServer(It.IsAny<string>(), It.IsAny<TimeSpan>()))
+                .Callback(onTouch);
+        }
+
+        var registrarSettings = new DatabaseServerRegistrarSettings
+        {
+            StaleServerTimeout = _staleServerTimeout,
+            WaitTimeBetweenCalls = waitTimeBetweenCalls ?? TimeSpan.FromMinutes(1),
+        };
+        if (touchTimeout.HasValue)
+        {
+            registrarSettings.TouchTimeout = touchTimeout.Value;
+        }
 
         var settings = new GlobalSettings
         {
-            DatabaseServerRegistrar = new DatabaseServerRegistrarSettings
-            {
-                StaleServerTimeout = _staleServerTimeout,
-                WaitTimeBetweenCalls = waitTimeBetweenCalls ?? TimeSpan.FromMinutes(1),
-            },
+            DatabaseServerRegistrar = registrarSettings,
         };
 
         IServerRoleAccessor roleAccessor = useElection
@@ -110,7 +228,7 @@ public class TouchServerJobTests
         return new TouchServerJob(
             _mockServerRegistrationService.Object,
             mockRequestAccessor.Object,
-            mockLogger.Object,
+            _mockLogger.Object,
             new TestOptionsMonitor<GlobalSettings>(settings),
             roleAccessor);
     }
@@ -132,4 +250,17 @@ public class TouchServerJobTests
                 It.Is<string>(y => y == Environment.MachineName),
                 It.Is<TimeSpan>(y => y == _staleServerTimeout)),
             Times.Once());
+
+    private void VerifyErrorLogged() => VerifyLogged(LogLevel.Error);
+
+    private void VerifyWarningLogged() => VerifyLogged(LogLevel.Warning);
+
+    private void VerifyLogged(LogLevel level) => _mockLogger.Verify(
+        l => l.Log(
+            It.Is<LogLevel>(y => y == level),
+            It.IsAny<EventId>(),
+            It.IsAny<It.IsAnyType>(),
+            It.IsAny<Exception>(),
+            It.IsAny<Func<It.IsAnyType, Exception, string>>()),
+        Times.Once);
 }
