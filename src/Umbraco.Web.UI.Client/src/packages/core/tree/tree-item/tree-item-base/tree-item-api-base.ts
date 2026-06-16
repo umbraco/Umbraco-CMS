@@ -280,8 +280,12 @@ export abstract class UmbTreeItemApiBase<
 		/* Check if the current location includes the path of this tree item.
 		We ensure that the paths ends with a slash to avoid collisions with paths like /path-1 and /path-1-2 where /path-1 is in both.
 		Instead we compare /path-1/ with /path-1-2/ which wont collide.*/
+		const path = this.#path.getValue();
+		// If the path hasn't been resolved yet (e.g. no section context in a modal), skip the check.
+		// ensureSlash('') produces '/' which matches every URL and would mark all items as active.
+		if (!path) return;
 		const location = ensureSlash(window.location.pathname);
-		const comparePath = ensureSlash(this.#path.getValue());
+		const comparePath = ensureSlash(path);
 		const isActive = location.includes(comparePath);
 
 		if (this._isActive.getValue() === isActive) return;
