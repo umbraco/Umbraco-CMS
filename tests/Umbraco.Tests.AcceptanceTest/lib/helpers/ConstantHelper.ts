@@ -413,9 +413,10 @@
     disabled: 'Disabled',
     disableInstruction: 'Redirect URL tracking is configured through application settings. To disable tracking, set the following configuration key to true:',
     enableInstruction: 'Redirect URL tracking is configured through application settings. To enable tracking, set the following configuration key to false:',
-    configurationKey: 'Umbraco:CMS:WebRouting:DisableRedirectUrlTracking'
+    configurationKey: 'Umbraco:CMS:WebRouting:DisableRedirectUrlTracking',
+    noRedirectsHaveBeenMade: 'No redirects have been made'
   }
-  
+
   public static readonly documentUrlInfoMessages = {
     cannotBeRouted: 'This document is published but its URL cannot be routed'
   }
