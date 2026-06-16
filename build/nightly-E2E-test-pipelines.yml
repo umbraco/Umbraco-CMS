@@ -618,9 +618,34 @@ stages:
               CONNECTIONSTRINGS__UMBRACODBDSN: Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);Encrypt=True;TrustServerCertificate=True
               CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.SqlClient
               additionalEnvironmentVariables: false
+            # ImagingSettingConfig
+            WindowsImagingSettingsConfig:
+              vmImage: "windows-latest"
+              testFolder: "ImagingSettingConfig"
+              port: ''
+              testCommand: "npx playwright test --project=imagingSettingConfig"
+              CONNECTIONSTRINGS__UMBRACODBDSN: Data Source=(localdb)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Umbraco.mdf;Integrated Security=True
+              CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.SqlClient
+              additionalEnvironmentVariables: false
+            LinuxImagingSettingsConfig:
+              vmImage: "ubuntu-latest"
+              testFolder: "ImagingSettingConfig"
+              port: ''
+              testCommand: "npx playwright test --project=imagingSettingConfig"
+              CONNECTIONSTRINGS__UMBRACODBDSN: Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);Encrypt=True;TrustServerCertificate=True
+              CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.SqlClient
+              additionalEnvironmentVariables: false
             # WebRoutingConfig
             WindowsWebRoutingConfig:
               vmImage: "windows-latest"
+              testFolder: "WebRoutingConfig"
+              port: ''
+              testCommand: "npx playwright test --project=webRoutingConfig"
+              CONNECTIONSTRINGS__UMBRACODBDSN: Data Source=(localdb)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Umbraco.mdf;Integrated Security=True
+              CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.SqlClient
+              additionalEnvironmentVariables: false
+            LinuxWebRoutingConfig:
+              vmImage: "ubuntu-latest"
               testFolder: "WebRoutingConfig"
               port: ''
               testCommand: "npx playwright test --project=webRoutingConfig"
