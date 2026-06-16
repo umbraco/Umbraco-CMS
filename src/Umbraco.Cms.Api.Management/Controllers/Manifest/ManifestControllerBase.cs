@@ -88,38 +88,36 @@ public abstract class ManifestControllerBase : ManagementApiControllerBase
         switch (node)
         {
             case JsonObject obj:
-            {
                 foreach (var key in obj.Select(property => property.Key).ToList())
                 {
-                    if (obj[key] is JsonValue value && value.TryGetValue(out string? url))
-                    {
-                        obj[key] = PackageManifestCacheBuster.ApplyCacheBust(url, hash, stamp);
-                    }
-                    else
-                    {
-                        CacheBustAssetUrls(obj[key], hash, stamp);
-                    }
+                    CacheBustChild(obj[key], hash, stamp, replacement => obj[key] = replacement);
                 }
 
                 break;
-            }
 
             case JsonArray array:
-            {
                 for (var i = 0; i < array.Count; i++)
                 {
-                    if (array[i] is JsonValue value && value.TryGetValue(out string? url))
-                    {
-                        array[i] = PackageManifestCacheBuster.ApplyCacheBust(url, hash, stamp);
-                    }
-                    else
-                    {
-                        CacheBustAssetUrls(array[i], hash, stamp);
-                    }
+                    var index = i;
+                    CacheBustChild(array[index], hash, stamp, replacement => array[index] = replacement);
                 }
 
                 break;
-            }
+        }
+    }
+
+    // A leaf string is cache-busted in place via <paramref name="replace"/>; any container is walked recursively.
+    // Only leaf strings are reassigned — a JsonNode that already has a parent cannot be reassigned to its slot, so
+    // containers are mutated in place rather than replaced.
+    private static void CacheBustChild(JsonNode? child, string hash, bool stamp, Action<JsonNode?> replace)
+    {
+        if (child is JsonValue value && value.TryGetValue(out string? url))
+        {
+            replace(PackageManifestCacheBuster.ApplyCacheBust(url, hash, stamp));
+        }
+        else
+        {
+            CacheBustAssetUrls(child, hash, stamp);
         }
     }
 }
