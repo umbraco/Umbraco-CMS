@@ -252,7 +252,7 @@ export abstract class UmbTreeItemElementBase<
 				@selected=${this._handleSelectedItem}
 				@deselected=${this._handleDeselectedItem}
 				?active=${this._isActive}
-				?disabled=${this._noAccess}
+				?disabled=${this._noAccess || (this._isSelectableContext && !this._isSelectable)}
 				?selectable=${this._isSelectable}
 				?selected=${this._isSelected}
 				.loading=${this._isLoading}
