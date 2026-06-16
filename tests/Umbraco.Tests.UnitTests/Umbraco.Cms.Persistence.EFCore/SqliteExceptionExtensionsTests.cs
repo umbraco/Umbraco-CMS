@@ -8,7 +8,6 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Persistence.EFCore;
 [TestFixture]
 public class SqliteExceptionExtensionsTests
 {
-    [TestCase(raw.SQLITE_BUSY, ExpectedResult = false)] // intentional failure to verify SonarCloud workflow resilience
     [TestCase(raw.SQLITE_BUSY, ExpectedResult = true)]
     [TestCase(raw.SQLITE_LOCKED, ExpectedResult = true)]
     [TestCase(raw.SQLITE_LOCKED_SHAREDCACHE, ExpectedResult = true)]
