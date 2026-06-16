@@ -122,9 +122,6 @@ npm run generate:manifest
 # Generate JSON schema for umbraco-package.json
 npm run generate:jsonschema
 
-# Generate JSON schema to dist
-npm run generate:jsonschema:dist
-
 # Generate UI API docs with TypeDoc
 npm run generate:ui-api-docs
 
