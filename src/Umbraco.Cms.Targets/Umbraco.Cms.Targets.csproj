@@ -73,9 +73,11 @@
   <!-- Generate JSON package base and extensions schema on build (and before copying to project) -->
   <Target Name="GenerateUmbracoPackageSchema" BeforeTargets="Build;CopyUmbracoJsonSchemaFiles" Condition="!Exists('$(_PackageSchemaReference)') or !Exists('$(_UmbracoCmsPackageSchemaReference)')">
     <Message Text="Generating $(_PackageSchemaReference) because it doesn't exist" Importance="high" Condition="!Exists('$(_PackageSchemaReference)')" />
-    <Exec WorkingDirectory="$(MsBuildThisFileDirectory)..\Umbraco.Web.UI.Client" Command="npm run generate:jsonschema -- --include &quot;./src/json-schema/umbraco-package-schema.ts&quot; --out &quot;$(MSBuildThisFileDirectory)$(_PackageSchemaReference)&quot; tsconfig.json UmbracoPackage" Condition="!Exists('$(_PackageSchemaReference)')" />
+    <Exec WorkingDirectory="$(MsBuildThisFileDirectory)..\Umbraco.Web.UI.Client" Command="npm run generate:jsonschema:base" Condition="!Exists('$(_PackageSchemaReference)')" />
+    <Copy SourceFiles="$(MsBuildThisFileDirectory)..\Umbraco.Web.UI.Client\$(_PackageSchemaReference)" DestinationFolder="$(MSBuildThisFileDirectory)" SkipUnchangedFiles="true" Condition="!Exists('$(_PackageSchemaReference)')" />
     <Message Text="Generating $(_UmbracoCmsPackageSchemaReference) because it doesn't exist" Importance="high" Condition="!Exists('$(_UmbracoCmsPackageSchemaReference)')" />
-    <Exec WorkingDirectory="$(MsBuildThisFileDirectory)..\Umbraco.Web.UI.Client" Command="npm run generate:jsonschema -- --include &quot;./src/json-schema/umbraco-package-schema.Umbraco.Cms.ts&quot; --out &quot;$(MSBuildThisFileDirectory)$(_UmbracoCmsPackageSchemaReference)&quot; tsconfig.json UmbracoPackageExtensions" Condition="!Exists('$(_UmbracoCmsPackageSchemaReference)')" />
+    <Exec WorkingDirectory="$(MsBuildThisFileDirectory)..\Umbraco.Web.UI.Client" Command="npm run generate:jsonschema:extensions" Condition="!Exists('$(_UmbracoCmsPackageSchemaReference)')" />
+    <Copy SourceFiles="$(MsBuildThisFileDirectory)..\Umbraco.Web.UI.Client\$(_UmbracoCmsPackageSchemaReference)" DestinationFolder="$(MSBuildThisFileDirectory)" SkipUnchangedFiles="true" Condition="!Exists('$(_UmbracoCmsPackageSchemaReference)')" />
   </Target>
 
   <!-- Remove generated JSON package schema on clean -->
