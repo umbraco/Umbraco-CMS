@@ -126,6 +126,48 @@ public class TouchServerJobTests
     }
 
     [Test]
+    public async Task Resumes_Touch_After_In_Flight_Call_Completes()
+    {
+        using var gate = new ManualResetEventSlim(false);
+        var touchCount = 0;
+        var sut = CreateTouchServerTask(
+            touchTimeout: TimeSpan.FromMilliseconds(50),
+            onTouch: () =>
+            {
+                // Only the first call blocks; later calls return immediately.
+                if (Interlocked.Increment(ref touchCount) == 1)
+                {
+                    gate.Wait();
+                }
+            });
+
+        // First run hangs and times out, leaving the touch in-flight.
+        await sut.RunJobAsync(CancellationToken.None);
+        Assert.AreEqual(1, Volatile.Read(ref touchCount));
+
+        // Release the stalled call; once its task completes the next run must start a fresh touch — i.e. the job
+        // self-heals without a recycle. Retry briefly to avoid racing the in-flight task's completion.
+        gate.Set();
+
+        var resumed = false;
+        for (var attempt = 0; attempt < 500 && resumed is false; attempt++)
+        {
+            await sut.RunJobAsync(CancellationToken.None);
+            if (Volatile.Read(ref touchCount) >= 2)
+            {
+                resumed = true;
+            }
+            else
+            {
+                await Task.Delay(10);
+            }
+        }
+
+        Assert.IsTrue(resumed, "Touching did not resume after the stalled call completed.");
+        VerifyServerTouchedTimes(Times.Exactly(2));
+    }
+
+    [Test]
     public async Task Falls_Back_And_Warns_When_TouchTimeout_Invalid()
     {
         // A non-positive timeout is misconfiguration; the job should warn and fall back to a sane default

@@ -76,6 +76,48 @@ public class InstructionProcessJobTests
     }
 
     [Test]
+    public async Task Resumes_Sync_After_In_Flight_Call_Completes()
+    {
+        using var gate = new ManualResetEventSlim(false);
+        var syncCount = 0;
+        var sut = CreateInstructionProcessJob(
+            TimeSpan.FromMilliseconds(50),
+            () =>
+            {
+                // Only the first call blocks; later calls return immediately.
+                if (Interlocked.Increment(ref syncCount) == 1)
+                {
+                    gate.Wait();
+                }
+            });
+
+        // First run hangs and times out, leaving the sync in-flight.
+        await sut.RunJobAsync(CancellationToken.None);
+        Assert.AreEqual(1, Volatile.Read(ref syncCount));
+
+        // Release the stalled call; once its task completes the next run must start a fresh sync — i.e. the job
+        // self-heals without a recycle. Retry briefly to avoid racing the in-flight task's completion.
+        gate.Set();
+
+        var resumed = false;
+        for (var attempt = 0; attempt < 500 && resumed is false; attempt++)
+        {
+            await sut.RunJobAsync(CancellationToken.None);
+            if (Volatile.Read(ref syncCount) >= 2)
+            {
+                resumed = true;
+            }
+            else
+            {
+                await Task.Delay(10);
+            }
+        }
+
+        Assert.IsTrue(resumed, "Polling did not resume after the stalled sync completed.");
+        VerifyMessengerSyncedTimes(Times.Exactly(2));
+    }
+
+    [Test]
     public async Task Falls_Back_And_Warns_When_SyncTimeout_Invalid()
     {
         // A non-positive timeout is misconfiguration; the job should warn and fall back to a sane default
