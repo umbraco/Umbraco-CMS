@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.Mapping.Permissions;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -19,8 +19,8 @@ internal static class UserGroupsBuilderExtensions
         builder.Services.AddSingleton<IPermissionMapper, DocumentPropertyValuePermissionMapper>();
         builder.Services.AddSingleton<IPermissionPresentationMapper, DocumentPropertyValuePermissionMapper>();
 
-        builder.Services.AddSingleton<IPermissionMapper, ElementPermissionMapper>();
-        builder.Services.AddSingleton<IPermissionPresentationMapper, ElementPermissionMapper>();
+        builder.Services.AddSingleton<IPermissionMapper>(sp => ActivatorUtilities.CreateInstance<ElementPermissionMapper>(sp));
+        builder.Services.AddSingleton<IPermissionPresentationMapper>(sp => ActivatorUtilities.CreateInstance<ElementPermissionMapper>(sp));
 
         return builder;
     }

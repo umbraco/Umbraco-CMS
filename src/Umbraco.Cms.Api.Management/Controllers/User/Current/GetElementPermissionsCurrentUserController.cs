@@ -29,12 +29,15 @@ public class GetElementPermissionsCurrentUserController : CurrentUserControllerB
     /// Initializes a new instance of the <see cref="GetElementPermissionsCurrentUserController"/> class, which handles requests related to retrieving element permissions for the current user.
     /// </summary>
     /// <param name="backOfficeSecurityAccessor">Provides access to back office security information for the current user.</param>
+    /// <param name="userService">Service for managing and retrieving user information.</param>
     /// <param name="mapper">The Umbraco object mapper used for mapping between models.</param>
     /// <param name="elementPermissionService">Service for managing element permissions.</param>
     [ActivatorUtilitiesConstructor]
     public GetElementPermissionsCurrentUserController(
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+#pragma warning disable IDE0060 // Remove unused parameter
         IUserService userService,
+#pragma warning restore IDE0060 // Remove unused parameter
         IUmbracoMapper mapper,
         IElementPermissionService elementPermissionService)
     {

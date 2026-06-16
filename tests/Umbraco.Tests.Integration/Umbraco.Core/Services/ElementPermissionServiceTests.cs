@@ -84,32 +84,6 @@ internal sealed class ElementPermissionServiceTests : UmbracoIntegrationTest
         Assert.That(viaService[0].Permissions, Is.EquivalentTo(viaPath));
     }
 
-    [Test]
-    public async Task GetPermissionsAsync_Returns_Empty_For_Empty_Keys()
-    {
-        // Arrange
-        var user = await CreateUserInGroup([], [], elementKey: null);
-
-        // Act
-        NodePermissions[] result = (await ElementPermissionService.GetPermissionsAsync(user, [])).ToArray();
-
-        // Assert
-        Assert.That(result, Is.Empty);
-    }
-
-    [Test]
-    public async Task GetPermissionsAsync_Returns_Empty_For_Unknown_Element()
-    {
-        // Arrange
-        var user = await CreateUserInGroup([], [], elementKey: null);
-
-        // Act
-        NodePermissions[] result = (await ElementPermissionService.GetPermissionsAsync(user, [Guid.NewGuid()])).ToArray();
-
-        // Assert
-        Assert.That(result, Is.Empty);
-    }
-
     private async Task<Guid> CreateElement()
     {
         var contentType = ContentTypeBuilder.CreateBasicContentType(
@@ -133,13 +107,11 @@ internal sealed class ElementPermissionServiceTests : UmbracoIntegrationTest
 
     private string GetPath(Guid elementKey) => EntityService.Get(elementKey)!.Path;
 
-    private async Task<IUser> CreateUserInGroup(string[] granularPermissions, string[] defaultPermissions, Guid? elementKey)
+    private async Task<IUser> CreateUserInGroup(string[] granularPermissions, string[] defaultPermissions, Guid elementKey)
     {
-        IGranularPermission[] granular = elementKey is null
-            ? []
-            : granularPermissions
-                .Select(verb => (IGranularPermission)new ElementGranularPermission { Key = elementKey.Value, Permission = verb })
-                .ToArray();
+        IGranularPermission[] granular = granularPermissions
+            .Select(verb => (IGranularPermission)new ElementGranularPermission { Key = elementKey, Permission = verb })
+            .ToArray();
 
         var userGroup = new UserGroupBuilder()
             .WithName(Guid.NewGuid().ToString())

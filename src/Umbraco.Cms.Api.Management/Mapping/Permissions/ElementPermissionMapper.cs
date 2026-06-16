@@ -21,28 +21,27 @@ public class ElementPermissionMapper : IPermissionPresentationMapper, IPermissio
 {
     private readonly Lazy<IElementPermissionService> _elementPermissionService;
 
+    // TODO (V20): When the obsolete constructor is removed, update the registration in UserGroupsBuilderExtensions to use:
+    //      builder.Services.AddSingleton<IPermissionMapper, ElementPermissionMapper>();
+    //      builder.Services.AddSingleton<IPermissionPresentationMapper, ElementPermissionMapper>();
+    // rather than:
+    //      builder.Services.AddSingleton<IPermissionMapper>(sp => ActivatorUtilities.CreateInstance<ElementPermissionMapper>(sp));
+    //      builder.Services.AddSingleton<IPermissionPresentationMapper>(sp => ActivatorUtilities.CreateInstance<ElementPermissionMapper>(sp));
+
     /// <summary>
     /// Initializes a new instance of the <see cref="ElementPermissionMapper"/> class.
     /// </summary>
-    /// <param name="entityService">The entity service.</param>
-    /// <param name="userService">The user service.</param>
     /// <param name="elementPermissionService">The element permission service.</param>
-    // TODO (V20): Remove the entityService and userService parameters as they are not used in the current implementation.
+    [ActivatorUtilitiesConstructor]
     public ElementPermissionMapper(
-#pragma warning disable IDE0060 // Remove unused parameter
-        Lazy<IEntityService> entityService,
-        Lazy<IUserService> userService,
-#pragma warning restore IDE0060 // Remove unused parameter
         Lazy<IElementPermissionService> elementPermissionService) => _elementPermissionService = elementPermissionService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ElementPermissionMapper"/> class.
     /// </summary>
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 20.")]
+    [Obsolete("Please use the constructor taking only the Lazy<IElementPermissionService> instance. Scheduled for removal in Umbraco 20.")]
     public ElementPermissionMapper(Lazy<IEntityService> entityService, Lazy<IUserService> userService)
         : this(
-            entityService,
-            userService,
             new Lazy<IElementPermissionService>(StaticServiceProvider.Instance.GetRequiredService<IElementPermissionService>))
     {
     }
