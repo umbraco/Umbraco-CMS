@@ -3181,6 +3181,43 @@ public class ContentService : RepositoryService, IContentService
         }
     }
 
+    /// <inheritdoc />
+    public OperationResult SortChildren(int parentId, IReadOnlyList<int> orderedChildIds, int userId = Constants.Security.SuperUserId)
+    {
+        EventMessages evtMsgs = EventMessagesFactory.Get();
+        if (orderedChildIds.Count == 0)
+        {
+            return new OperationResult(OperationResultType.NoOperation, evtMsgs);
+        }
+
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.WriteLock(Constants.Locks.ContentTree);
+
+        _documentRepository.UpdateSortOrder(orderedChildIds);
+
+        // Sort order lives in umbracoNode; neither the published cache nor the content repository cache keeps
+        // a separate serialized copy of it, so refreshing the affected branch (which invalidates both and has
+        // them reload from umbracoNode) is enough to pick up the new order without re-saving each child.
+        if (parentId == Constants.System.Root)
+        {
+            IContent[] roots = GetByIds(orderedChildIds).ToArray();
+            scope.Notifications.Publish(new ContentTreeChangeNotification(roots, TreeChangeTypes.RefreshNode, evtMsgs));
+        }
+        else
+        {
+            IContent? parent = GetById(parentId);
+            if (parent is not null)
+            {
+                scope.Notifications.Publish(new ContentTreeChangeNotification(parent, TreeChangeTypes.RefreshBranch, evtMsgs));
+            }
+        }
+
+        Audit(AuditType.Sort, userId, parentId);
+
+        scope.Complete();
+        return OperationResult.Succeed(evtMsgs);
+    }
+
     private OperationResult Sort(ICoreScope scope, IContent[] itemsA, int userId, EventMessages eventMessages)
     {
         var sortingNotification = new ContentSortingNotification(itemsA, eventMessages);

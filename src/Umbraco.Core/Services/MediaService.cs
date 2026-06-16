@@ -1461,6 +1461,43 @@ namespace Umbraco.Cms.Core.Services
 
         }
 
+        /// <inheritdoc />
+        public OperationResult SortChildren(int parentId, IReadOnlyList<int> orderedChildIds, int userId = Constants.Security.SuperUserId)
+        {
+            EventMessages evtMsgs = EventMessagesFactory.Get();
+            if (orderedChildIds.Count == 0)
+            {
+                return new OperationResult(OperationResultType.NoOperation, evtMsgs);
+            }
+
+            using ICoreScope scope = ScopeProvider.CreateCoreScope();
+            scope.WriteLock(Constants.Locks.MediaTree);
+
+            _mediaRepository.UpdateSortOrder(orderedChildIds);
+
+            // Sort order lives in umbracoNode; neither the published cache nor the media repository cache keeps
+            // a separate serialized copy of it, so refreshing the affected branch (which invalidates both and has
+            // them reload from umbracoNode) is enough to pick up the new order without re-saving each child.
+            if (parentId == Constants.System.Root)
+            {
+                IMedia[] roots = GetByIds(orderedChildIds).ToArray();
+                scope.Notifications.Publish(new MediaTreeChangeNotification(roots, TreeChangeTypes.RefreshNode, evtMsgs));
+            }
+            else
+            {
+                IMedia? parent = GetById(parentId);
+                if (parent is not null)
+                {
+                    scope.Notifications.Publish(new MediaTreeChangeNotification(parent, TreeChangeTypes.RefreshBranch, evtMsgs));
+                }
+            }
+
+            Audit(AuditType.Sort, userId, parentId);
+
+            scope.Complete();
+            return OperationResult.Succeed(evtMsgs);
+        }
+
         /// <summary>
         ///     Checks the data integrity of the media tree and optionally fixes detected issues.
         /// </summary>

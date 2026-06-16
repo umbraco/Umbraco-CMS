@@ -458,6 +458,10 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         {
             // these are the only result states currently expected from the invoked IContentService operations
             OperationResultType.Success => ContentEditingOperationStatus.Success,
+
+            // a no-op (e.g. sorting children when nothing needs reordering) is a successful outcome, not an error
+            OperationResultType.NoOperation => ContentEditingOperationStatus.Success,
+
             OperationResultType.FailedCancelledByEvent => ContentEditingOperationStatus.CancelledByNotification,
             OperationResultType.FailedCannot => ContentEditingOperationStatus.CannotDeleteWhenReferenced,
 
