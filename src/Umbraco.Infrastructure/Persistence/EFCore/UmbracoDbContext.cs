@@ -84,6 +84,8 @@ public class UmbracoDbContext : DbContext
 
     public required DbSet<DictionaryDto> DictionaryEntries { get; set; }
 
+    public required DbSet<RedirectUrlDto> RedirectUrls { get; set; }
+
     private static DbContextOptions<UmbracoDbContext> ConfigureOptions(DbContextOptions<UmbracoDbContext> options)
     {
         var coreExtensions = options.FindExtension<Microsoft.EntityFrameworkCore.Infrastructure.CoreOptionsExtension>();

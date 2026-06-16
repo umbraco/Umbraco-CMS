@@ -11,9 +11,10 @@ using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 using Umbraco.Cms.Infrastructure.Routing;
-using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 
@@ -85,11 +86,11 @@ public class RedirectTrackerTests : UmbracoIntegrationTestWithContent
     }
 
     /// <summary>
-    /// Verifies that <see cref="IRedirectTracker.CreateRedirects"/> registers a redirect URL
+    /// Verifies that <see cref="IRedirectTracker.CreateRedirectsAsync"/> registers a redirect URL
     /// when the old route differs from the new route.
     /// </summary>
     [Test]
-    public void Can_Create_Redirects()
+    public async Task Can_Create_Redirects()
     {
         IDictionary<(int ContentId, string Culture), (Guid ContentKey, string OldRoute)> dict =
             new Dictionary<(int ContentId, string Culture), (Guid ContentKey, string OldRoute)>
@@ -98,9 +99,9 @@ public class RedirectTrackerTests : UmbracoIntegrationTestWithContent
             };
         var redirectTracker = CreateRedirectTracker();
 
-        redirectTracker.CreateRedirects(dict);
+        await redirectTracker.CreateRedirectsAsync(dict);
 
-        var redirects = RedirectUrlService.GetContentRedirectUrls(_testPage.Key);
+        var redirects = await RedirectUrlService.GetContentRedirectUrlsAsync(_testPage.Key);
         Assert.AreEqual(1, redirects.Count());
         var redirect = redirects.First();
         Assert.AreEqual("/old-route", redirect.Url);
@@ -111,11 +112,11 @@ public class RedirectTrackerTests : UmbracoIntegrationTestWithContent
     /// content's current route, preventing self-referencing redirects.
     /// </summary>
     [Test]
-    public void Will_Remove_Self_Referencing_Redirects()
+    public async Task Will_Remove_Self_Referencing_Redirects()
     {
-        CreateExistingRedirect();
+        await CreateExistingRedirect();
 
-        var redirects = RedirectUrlService.GetContentRedirectUrls(_testPage.Key);
+        var redirects = await RedirectUrlService.GetContentRedirectUrlsAsync(_testPage.Key);
         Assert.IsTrue(redirects.Any(x => x.Url == "/new-route")); // Ensure self referencing redirect exists.
 
         IDictionary<(int ContentId, string Culture), (Guid ContentKey, string OldRoute)> dict =
@@ -125,9 +126,9 @@ public class RedirectTrackerTests : UmbracoIntegrationTestWithContent
             };
 
         var redirectTracker = CreateRedirectTracker();
-        redirectTracker.CreateRedirects(dict);
+        await redirectTracker.CreateRedirectsAsync(dict);
 
-        redirects = RedirectUrlService.GetContentRedirectUrls(_testPage.Key);
+        redirects = await RedirectUrlService.GetContentRedirectUrlsAsync(_testPage.Key);
         Assert.AreEqual(1, redirects.Count());
         var redirect = redirects.First();
         Assert.AreEqual("/old-route", redirect.Url);
@@ -144,7 +145,7 @@ public class RedirectTrackerTests : UmbracoIntegrationTestWithContent
     /// </summary>
     [TestCase(Constants.Routing.Unroutable)]
     [TestCase(Constants.Routing.UrlProviderException)]
-    public void Does_Not_Create_Redirect_For_Unroutable_Old_Route(string oldRoute)
+    public async Task Does_Not_Create_Redirect_For_Unroutable_Old_Route(string oldRoute)
     {
         IDictionary<(int ContentId, string Culture), (Guid ContentKey, string OldRoute)> dict =
             new Dictionary<(int ContentId, string Culture), (Guid ContentKey, string OldRoute)>
@@ -154,9 +155,9 @@ public class RedirectTrackerTests : UmbracoIntegrationTestWithContent
 
         var redirectTracker = CreateRedirectTracker();
 
-        redirectTracker.CreateRedirects(dict);
+        await redirectTracker.CreateRedirectsAsync(dict);
 
-        Assert.IsEmpty(RedirectUrlService.GetContentRedirectUrls(_testPage.Key));
+        Assert.IsEmpty(await RedirectUrlService.GetContentRedirectUrlsAsync(_testPage.Key));
     }
 
     /// <summary>
@@ -231,7 +232,7 @@ public class RedirectTrackerTests : UmbracoIntegrationTestWithContent
     /// correctly stripping the domain path prefix.
     /// </summary>
     [Test]
-    public void Create_Redirects_With_Domain_Path_Skips_When_Route_Unchanged()
+    public async Task Create_Redirects_With_Domain_Path_Skips_When_Route_Unchanged()
     {
         // oldRoute matches the correctly computed newRoute (domain path stripped).
         // Without the fix, newRoute would be "{rootId}/en/new-route" (duplicated), causing a
@@ -248,9 +249,9 @@ public class RedirectTrackerTests : UmbracoIntegrationTestWithContent
             AssignDomain = true, DomainName = "example.com/en/", RelativeUrl = "/en/new-route",
         });
 
-        redirectTracker.CreateRedirects(dict);
+        await redirectTracker.CreateRedirectsAsync(dict);
 
-        var redirects = RedirectUrlService.GetContentRedirectUrls(_testPage.Key);
+        var redirects = await RedirectUrlService.GetContentRedirectUrlsAsync(_testPage.Key);
         Assert.AreEqual(0, redirects.Count());
     }
 
@@ -431,9 +432,9 @@ public class RedirectTrackerTests : UmbracoIntegrationTestWithContent
 
     private RedirectUrlRepository CreateRedirectUrlRepository() =>
         new(
-            (IScopeAccessor)ScopeProvider,
+            GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>(),
             AppCaches.Disabled,
-            new NullLogger<RedirectUrlRepository>(),
+            LoggerFactory.CreateLogger<RedirectUrlRepository>(),
             Mock.Of<IRepositoryCacheVersionService>(),
             Mock.Of<ICacheSyncService>());
 
@@ -641,11 +642,12 @@ public class RedirectTrackerTests : UmbracoIntegrationTestWithContent
             documentUrlService.Object);
     }
 
-    private void CreateExistingRedirect()
+    private async Task CreateExistingRedirect()
     {
-        using var scope = ScopeProvider.CreateScope();
+        var provider = NewScopeProvider;
+        using var scope = provider.CreateScope();
         var repository = CreateRedirectUrlRepository();
-        repository.Save(new RedirectUrl { ContentKey = _testPage.Key, Url = "/new-route", Culture = "en" });
+        await repository.SaveAsync(new RedirectUrl { ContentKey = _testPage.Key, Url = "/new-route", Culture = "en" }, CancellationToken.None);
         scope.Complete();
     }
 
