@@ -7,6 +7,11 @@ import { TEST_MANIFESTS, UmbTestDocumentWorkspaceHostElement } from './document-
 
 const INVARIANT_DOCUMENT_ID = 'variant-documents-invariant-document-id';
 const VARIANT_DOCUMENT_ID = 'variant-documents-variant-document-id';
+const SEGMENT_VARIANT_DOCUMENT_ID = 'variant-documents-segment-variant-document-id';
+const INVARIANT_WITH_CULTURE_VARIANT_COMPOSITION_DOCUMENT_ID =
+	'variant-documents-invariant-with-variant-composition-document-id';
+const INVARIANT_WITH_SEGMENT_VARIANT_COMPOSITION_DOCUMENT_ID =
+	'variant-documents-invariant-with-segment-variant-composition-document-id';
 
 describe('UmbDocumentWorkspaceContext', () => {
 	let hostElement: UmbTestDocumentWorkspaceHostElement;
@@ -47,7 +52,7 @@ describe('UmbDocumentWorkspaceContext', () => {
 			});
 		});
 
-		describe('variant document', () => {
+		describe('culture variant document', () => {
 			beforeEach(async () => {
 				await context.load(VARIANT_DOCUMENT_ID);
 			});
@@ -68,6 +73,29 @@ describe('UmbDocumentWorkspaceContext', () => {
 
 			it('returns undefined for a culture-variant property when called without a variantId', () => {
 				expect(context.getPropertyValue('variantText')).to.be.undefined;
+			});
+
+			it('returns undefined for an unknown alias', () => {
+				expect(context.getPropertyValue('nonExistent')).to.be.undefined;
+			});
+		});
+
+		describe('segment variant document', () => {
+			beforeEach(async () => {
+				await context.load(SEGMENT_VARIANT_DOCUMENT_ID);
+			});
+
+			it('returns the invariant property value without a variantId', () => {
+				expect(context.getPropertyValue('text')).to.equal('This invariant text is shared across all segments.');
+			});
+
+			it('returns the default-segment property value without a variantId', () => {
+				expect(context.getPropertyValue('segmentText')).to.equal('This is the default segment text.');
+			});
+
+			it('returns the s1 segment property value', () => {
+				const s1 = UmbVariantId.Create({ culture: null, segment: 's1' });
+				expect(context.getPropertyValue('segmentText', s1)).to.equal('This is the segment 1 text.');
 			});
 
 			it('returns undefined for an unknown alias', () => {
@@ -111,7 +139,7 @@ describe('UmbDocumentWorkspaceContext', () => {
 			});
 		});
 
-		describe('variant document', () => {
+		describe('culture variant document', () => {
 			beforeEach(async () => {
 				await context.load(VARIANT_DOCUMENT_ID);
 			});
@@ -142,6 +170,79 @@ describe('UmbDocumentWorkspaceContext', () => {
 				}
 				const values = context.getValues();
 				expect(values).to.be.an('array').with.lengthOf(3);
+			});
+		});
+
+		describe('segment variant document', () => {
+			beforeEach(async () => {
+				await context.load(SEGMENT_VARIANT_DOCUMENT_ID);
+			});
+
+			it('updates the default-segment property value', async () => {
+				await context.setPropertyValue('segmentText', 'Updated default segment text');
+				expect(context.getPropertyValue('segmentText')).to.equal('Updated default segment text');
+			});
+
+			it('updates the s1 segment property value', async () => {
+				const s1 = UmbVariantId.Create({ culture: null, segment: 's1' });
+				await context.setPropertyValue('segmentText', 'Updated segment 1 text', s1);
+				expect(context.getPropertyValue('segmentText', s1)).to.equal('Updated segment 1 text');
+			});
+
+			it('does not affect other segments when updating one', async () => {
+				const s1 = UmbVariantId.Create({ culture: null, segment: 's1' });
+				await context.setPropertyValue('segmentText', 'Updated segment 1 text', s1);
+				expect(context.getPropertyValue('segmentText')).to.equal('This is the default segment text.');
+			});
+
+			it('updates the invariant property value without a variantId', async () => {
+				await context.setPropertyValue('text', 'Updated shared text');
+				expect(context.getPropertyValue('text')).to.equal('Updated shared text');
+			});
+		});
+
+		describe('invariant document with a culture-variant composition property', () => {
+			beforeEach(async () => {
+				await context.load(INVARIANT_WITH_CULTURE_VARIANT_COMPOSITION_DOCUMENT_ID);
+			});
+
+			it('updates the culture-variant composition property as invariant when the document is invariant', async () => {
+				await context.setPropertyValue('compositionCultureVariantText', 'Updated composition value');
+				expect(context.getPropertyValue('compositionCultureVariantText')).to.equal('Updated composition value');
+			});
+
+			it('stores the value with a culture- and segment-invariant variantId', async () => {
+				await context.setPropertyValue('compositionCultureVariantText', 'Updated composition value');
+				const entry = context.getValues()?.find((v) => v.alias === 'compositionCultureVariantText');
+				expect(entry?.culture).to.be.null;
+				expect(entry?.segment).to.be.null;
+			});
+		});
+
+		describe('invariant document with a segment-variant composition property', () => {
+			beforeEach(async () => {
+				await context.load(INVARIANT_WITH_SEGMENT_VARIANT_COMPOSITION_DOCUMENT_ID);
+			});
+
+			it('updates the segment-variant composition property using the default segment', async () => {
+				await context.setPropertyValue('compositionSegmentText', 'Updated default segment value');
+				expect(context.getPropertyValue('compositionSegmentText')).to.equal('Updated default segment value');
+			});
+
+			it('stores the default-segment value with null culture and null segment', async () => {
+				await context.setPropertyValue('compositionSegmentText', 'Updated default segment value');
+				const entry = context.getValues()?.find((v) => v.alias === 'compositionSegmentText' && v.segment === null);
+				expect(entry?.culture).to.be.null;
+				expect(entry?.segment).to.be.null;
+			});
+
+			it('updates a named-segment value without affecting the default segment', async () => {
+				const s1 = UmbVariantId.Create({ culture: null, segment: 's1' });
+				await context.setPropertyValue('compositionSegmentText', 'Updated segment 1 value', s1);
+				expect(context.getPropertyValue('compositionSegmentText', s1)).to.equal('Updated segment 1 value');
+				expect(context.getPropertyValue('compositionSegmentText')).to.equal(
+					'Initial composition segment text (default segment).',
+				);
 			});
 		});
 	});
@@ -238,7 +339,7 @@ describe('UmbDocumentWorkspaceContext', () => {
 			});
 		});
 
-		describe('variant document', () => {
+		describe('culture variant document', () => {
 			beforeEach(async () => {
 				await context.load(VARIANT_DOCUMENT_ID);
 			});
@@ -266,6 +367,29 @@ describe('UmbDocumentWorkspaceContext', () => {
 				let emitted: string | undefined = 'sentinel';
 				const sub = obs!.subscribe((v) => (emitted = v));
 				expect(emitted).to.be.undefined;
+				sub.unsubscribe();
+			});
+		});
+
+		describe('segment variant document', () => {
+			beforeEach(async () => {
+				await context.load(SEGMENT_VARIANT_DOCUMENT_ID);
+			});
+
+			it('returns an observable filtered by the default segment', async () => {
+				const obs = await context.propertyValueByAlias<string>('segmentText');
+				let emitted: string | undefined;
+				const sub = obs!.subscribe((v) => (emitted = v));
+				expect(emitted).to.equal('This is the default segment text.');
+				sub.unsubscribe();
+			});
+
+			it('returns an observable filtered by the s1 segment', async () => {
+				const s1 = UmbVariantId.Create({ culture: null, segment: 's1' });
+				const obs = await context.propertyValueByAlias<string>('segmentText', s1);
+				let emitted: string | undefined;
+				const sub = obs!.subscribe((v) => (emitted = v));
+				expect(emitted).to.equal('This is the segment 1 text.');
 				sub.unsubscribe();
 			});
 		});

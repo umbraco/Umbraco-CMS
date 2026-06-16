@@ -102,6 +102,24 @@ public class TagService : RepositoryService, ITagService
     }
 
     /// <inheritdoc />
+    public IEnumerable<TaggedEntity> GetTaggedElementsByTagGroup(string group, string? culture = null)
+    {
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            return _tagRepository.GetTaggedEntitiesByTagGroup(TaggableObjectTypes.Element, group, culture);
+        }
+    }
+
+    /// <inheritdoc />
+    public IEnumerable<TaggedEntity> GetTaggedElementsByTag(string tag, string? group = null, string? culture = null)
+    {
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            return _tagRepository.GetTaggedEntitiesByTag(TaggableObjectTypes.Element, tag, group, culture);
+        }
+    }
+
+    /// <inheritdoc />
     public IEnumerable<ITag> GetAllTags(string? group = null, string? culture = null)
     {
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -159,6 +177,15 @@ public class TagService : RepositoryService, ITagService
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _tagRepository.GetTagsForEntityType(TaggableObjectTypes.Member, group, culture);
+        }
+    }
+
+    /// <inheritdoc />
+    public IEnumerable<ITag> GetAllElementTags(string? group = null, string? culture = null)
+    {
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            return _tagRepository.GetTagsForEntityType(TaggableObjectTypes.Element, group, culture);
         }
     }
 

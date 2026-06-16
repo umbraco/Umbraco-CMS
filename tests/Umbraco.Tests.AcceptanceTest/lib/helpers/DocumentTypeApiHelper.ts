@@ -84,6 +84,14 @@ export class DocumentTypeApiHelper {
     return response.headers().location.split("/").pop();
   }
 
+  async update(id: string, documentType) {
+    if (documentType == null) {
+      return;
+    }
+    const response = await this.api.put(this.api.baseUrl + '/umbraco/management/api/v1/document-type/' + id, documentType);
+    return response.status();
+  }
+
   async get(id: string) {
     const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/document-type/' + id);
     const json = await response.json();
@@ -609,14 +617,14 @@ export class DocumentTypeApiHelper {
     return await this.create(documentType);
   }
 
-  async createEmptyElementType(elementTypeName: string) {
+  async createEmptyElementType(elementTypeName: string, isAllowedInLibrary: boolean = false) {
     await this.ensureNameNotExists(elementTypeName);
 
     const documentType = new DocumentTypeBuilder()
       .withName(elementTypeName)
       .withAlias(AliasHelper.toAlias(elementTypeName))
       .withIsElement(true)
-      .withAllowedInLibrary(true)
+      .withAllowedInLibrary(isAllowedInLibrary)
       .withIcon("icon-plugin")
       .build();
 
@@ -940,6 +948,46 @@ export class DocumentTypeApiHelper {
       .withVariesByCulture(true)
       .build();
     return await this.create(documentType);
+  }
+
+  async createDocumentTypeWithTextstringAndAllowAsRootAndAllowSelfAsChild(documentTypeName: string, variesByCulture: boolean = false) {
+    await this.ensureNameNotExists(documentTypeName);
+    const crypto = require('crypto');
+    const documentTypeId = crypto.randomUUID();
+    const containerId = crypto.randomUUID();
+    const dataType = await this.api.dataType.getByName('Textstring');
+
+    const buildDocumentType = (allowSelfAsChild: boolean) => {
+      const builder = new DocumentTypeBuilder()
+        .withId(documentTypeId)
+        .withName(documentTypeName)
+        .withAlias(AliasHelper.toAlias(documentTypeName))
+        .withAllowedAsRoot(true)
+        .withVariesByCulture(variesByCulture)
+        .addContainer()
+          .withName('Content')
+          .withId(containerId)
+          .withType('Group')
+          .done()
+        .addProperty()
+          .withContainerId(containerId)
+          .withAlias('title')
+          .withName('Title')
+          .withDataTypeId(dataType.id)
+          .done();
+      if (allowSelfAsChild) {
+        builder.addAllowedDocumentType()
+          .withId(documentTypeId)
+          .done();
+      }
+      return builder.build();
+    };
+
+    // A document type cannot reference itself as an allowed child during creation (it does not exist yet),
+    // so create it first and then update it to allow itself as a child.
+    await this.create(buildDocumentType(false));
+    await this.update(documentTypeId, buildDocumentType(true));
+    return documentTypeId;
   }
 
   async createDocumentTypeWithPropertyEditorAndAllowedTemplate(documentTypeName: string, dataTypeId: string, propertyName: string, templateId: string) {

@@ -479,7 +479,7 @@ export default {
 		enterFolderName: 'Enter a folder name',
 		updateData: 'Choose a type and a title',
 		noDocumentTypes:
-			'There are no allowed Document Types available for creating content here. You must enable these in <strong>Document Types</strong> within the <strong>Settings</strong> section, by editing the <strong>Allowed child node types</strong> under <strong>Permissions</strong>.',
+			'There are no allowed Document Types available for creating content here. You must enable these in <strong>Document Types</strong> within the <strong>Settings</strong> section, by editing the <strong>Allowed child node types</strong> under <strong>Structure</strong>.',
 		noDocumentTypesAtRoot:
 			'There are no Document Types available for creating content here. You must create these in <strong>Document Types</strong> within the <strong>Settings</strong> section.',
 		noDocumentTypesWithNoSettingsAccess:
@@ -487,9 +487,9 @@ export default {
 		noDocumentTypesEditPermissions: 'Edit permissions for this Document Type',
 		noDocumentTypesCreateNew: 'Create a new Document Type',
 		noDocumentTypesAllowedAtRoot:
-			'There are no allowed Document Types available for creating content here. You must enable these in <strong>Document Types</strong> within the <strong>Settings</strong> section, by changing the <strong>Allow as root</strong> option under <strong>Permissions</strong>.',
+			'There are no allowed Document Types available for creating content here. You must enable these in <strong>Document Types</strong> within the <strong>Settings</strong> section, by changing the <strong>Allow as root</strong> option under <strong>Structure</strong>.',
 		noMediaTypes:
-			'There are no allowed Media Types available for creating media here. You must enable these in <strong>Media Types</strong> within the <strong>Settings</strong> section, by editing the <strong>Allowed child node types</strong> under <strong>Permissions</strong>.',
+			'There are no allowed Media Types available for creating media here. You must enable these in <strong>Media Types</strong> within the <strong>Settings</strong> section, by editing the <strong>Allowed child node types</strong> under <strong>Structure</strong>.',
 		noMediaTypesWithNoSettingsAccess:
 			"The selected media in the tree doesn't allow for any other media to be created below it.",
 		noMediaTypesEditPermissions: 'Edit permissions for this Media Type',
@@ -887,6 +887,7 @@ export default {
 		content: 'Content',
 		continue: 'Continue',
 		copy: 'Copy',
+		copied: 'Copied!',
 		create: 'Create',
 		database: 'Database',
 		date: 'Date',
@@ -1110,6 +1111,7 @@ export default {
 		text: 'Text',
 	},
 	globalSearch: {
+		documents: 'Documents',
 		navigateSearchProviders: 'Navigate search providers',
 		navigateSearchResults: 'Navigate search results',
 	},
@@ -1270,6 +1272,7 @@ export default {
 		requiredPasswordValidationMessage: 'Please fill in a password',
 		showPassword: 'Show password',
 		hidePassword: 'Hide password',
+		invalidPasswordMessage: 'The password is not strong enough.',
 	},
 	main: {
 		dashboard: 'Dashboard',
@@ -2483,7 +2486,13 @@ export default {
 	},
 	redirectUrls: {
 		disableUrlTracker: 'Disable URL tracker',
+		disableUrlTrackerInstruction:
+			'Redirect URL tracking is configured through application settings. To disable tracking, set the following configuration key to true:',
 		enableUrlTracker: 'Enable URL tracker',
+		enableUrlTrackerInstruction:
+			'Redirect URL tracking is configured through application settings. To enable tracking, set the following configuration key to false:',
+		urlTrackerEnabled: 'Enabled',
+		urlTrackerDisabled: 'Disabled',
 		originalUrl: 'Original URL',
 		redirectedTo: 'Redirected To',
 		redirectUrlManagement: 'Redirect URL Management',

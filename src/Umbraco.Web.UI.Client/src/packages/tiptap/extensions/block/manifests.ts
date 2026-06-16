@@ -6,7 +6,7 @@ export const manifests: Array<ManifestTiptapExtension | ManifestTiptapToolbarExt
 		type: 'tiptapExtension',
 		alias: 'Umb.Tiptap.Block',
 		name: 'Block Tiptap Extension',
-		api: () => import('./block.tiptap-api.js'),
+		api: () => import('../extension-apis.bundle.js').then((m) => ({ default: m.UmbTiptapBlockElementApi })),
 		meta: {
 			icon: 'icon-plugin',
 			label: 'Block',
@@ -18,7 +18,7 @@ export const manifests: Array<ManifestTiptapExtension | ManifestTiptapToolbarExt
 		kind: 'button',
 		alias: 'Umb.Tiptap.Toolbar.BlockPicker',
 		name: 'Block Picker Tiptap Extension Button',
-		api: () => import('./block.tiptap-toolbar-api.js'),
+		api: () => import('../extension-apis.bundle.js').then((m) => ({ default: m.UmbTiptapBlockPickerToolbarExtension })),
 		forExtensions: ['Umb.Tiptap.Block'],
 		meta: {
 			alias: 'umbblockpicker',

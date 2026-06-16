@@ -343,7 +343,7 @@ export default {
 		noDocumentTypesEditPermissions: 'Oprávnění k úpravám pro tento typ dokumentu',
 		noDocumentTypesCreateNew: 'Vytvořit nový typ dokumentu',
 		noDocumentTypesAllowedAtRoot:
-			'Nejsou zde k dispozici žádné povolené typy dokumentů pro vytváření obsahu. Musíte je povolit v sekci <strong>Typy dokumentů</strong> v části <strong>Nastavení</strong> změnou možnosti <strong>Povolit jako root</strong> v části <strong>Oprávnění</strong>.',
+			'Nejsou zde k dispozici žádné povolené typy dokumentů pro vytváření obsahu. Musíte je povolit v sekci <strong>Typy dokumentů</strong> v části <strong>Nastavení</strong> změnou možnosti <strong>Povolit jako root</strong> v části <strong>Struktura</strong>.',
 		noMediaTypes:
 			'Nejsou dostupné žádné povolené typy medií. Tyto musíte povolit v sekci nastavení pod <strong>"typy medií"</strong>.',
 		noMediaTypesWithNoSettingsAccess: 'Vybraná média ve stromu neumožňuje vytváření pod nimi žádná další média.',
@@ -639,6 +639,7 @@ export default {
 		content: 'Obsah',
 		continue: 'Pokračovat',
 		copy: 'Kopírovat',
+		copied: 'Zkopírováno!',
 		create: 'Vytvořit',
 		database: 'Databáze',
 		date: 'Datum',
@@ -1091,20 +1092,13 @@ export default {
 	},
 	sections: {
 		content: 'Obsah',
-		forms: 'Formuláře',
+		library: 'Knihovna',
 		media: 'Média',
 		member: 'Členové',
 		packages: 'Balíčky',
 		settings: 'Nastavení',
 		translation: 'Překlad',
 		users: 'Uživatelé',
-		concierge: 'Domovník',
-		courier: 'Kurýr',
-		developer: 'Vývojář',
-		installer: 'Průvodce nastavením Umbraca',
-		newsletters: 'Zpravodaje',
-		statistics: 'Statistiky',
-		help: 'Nápověda',
 	},
 	settings: {
 		defaulttemplate: 'Výchozí šablona',
@@ -1730,6 +1724,8 @@ export default {
 	redirectUrls: {
 		disableUrlTracker: 'Zakázat sledování URL',
 		enableUrlTracker: 'Povolit sledování URL',
+		urlTrackerEnabled: 'Povoleno',
+		urlTrackerDisabled: 'Zakázáno',
 		culture: 'Jazyk',
 		originalUrl: 'Originální URL',
 		redirectedTo: 'Přesměrováno na',

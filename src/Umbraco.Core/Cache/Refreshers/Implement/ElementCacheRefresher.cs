@@ -131,8 +131,8 @@ public sealed class ElementCacheRefresher : PayloadCacheRefresherBase<ElementCac
             // By INT Id
             isolatedCache.Clear(RepositoryCacheKeys.GetKey<IElement, int>(payload.Id));
 
-            // By GUID Key
-            isolatedCache.Clear(RepositoryCacheKeys.GetKey<IElement, Guid?>(payload.Key));
+            // By GUID Key (GUID-keyed read repository uses a separate "uRepoGuid_" prefix)
+            isolatedCache.Clear(RepositoryCacheKeys.GetGuidKey<IElement>(payload.Key));
 
             HandleMemoryCache(payload);
             HandlePublishStatusAsync(payload, CancellationToken.None).GetAwaiter().GetResult();

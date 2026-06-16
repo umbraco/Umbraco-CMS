@@ -18,6 +18,7 @@ export default {
 		changeDataType: 'Datatype aanpassen',
 		copy: 'Kopiëren',
 		create: 'Nieuw',
+		createFor: (name: string) => (name ? `Item aanmaken voor ${name}` : 'Aanmaken'),
 		export: 'Export',
 		createPackage: 'Nieuwe package',
 		createGroup: 'Groep maken',
@@ -56,6 +57,7 @@ export default {
 		setGroup: 'Groep instellen',
 		sort: 'Sorteren',
 		translate: 'Vertalen',
+		trash: 'Verwijderen',
 		update: 'Bijwerken',
 		setPermissions: 'Rechten instellen',
 		unlock: 'Deblokkeer',
@@ -364,7 +366,7 @@ export default {
 		noDocumentTypesEditPermissions: 'Rechten aanpassen voor dit documenttype',
 		noDocumentTypesCreateNew: 'Nieuw documenttype aanmaken',
 		noDocumentTypesAllowedAtRoot:
-			'Er zijn geen toegestane ​​documenttypes beschikbaar om hier aan te maken. Je moet deze inschakelen bij <strong>Documenttypes</strong> in de sectie <strong>Instellingen</strong>, de optie <strong>Toestaan op root-niveau</strong> onder <strong>Rechten</strong>.',
+			'Er zijn geen toegestane ​​documenttypes beschikbaar om hier aan te maken. Je moet deze inschakelen bij <strong>Documenttypes</strong> in de sectie <strong>Instellingen</strong>, de optie <strong>Toestaan op root-niveau</strong> onder <strong>Structuur</strong>.',
 		noMediaTypes:
 			'Er zijn geen toegestande mediatypes beschikbaar. Schakel deze in in de sectie Instellingen onder <strong>"Mediatypes"</strong>.',
 		noMediaTypesWithNoSettingsAccess:
@@ -679,6 +681,7 @@ export default {
 		content: 'Inhoud',
 		continue: 'Doorgaan',
 		copy: 'Kopiëren',
+		copied: 'Gekopieerd!',
 		create: 'Aanmaken',
 		cropSection: 'Sectie bijsnijden',
 		database: 'Database',
@@ -1187,7 +1190,7 @@ export default {
 	},
 	sections: {
 		content: 'Inhoud',
-		forms: 'Formulieren',
+		library: 'Bibliotheek',
 		media: 'Media',
 		member: 'Leden',
 		packages: 'Packages',
@@ -1876,6 +1879,8 @@ export default {
 	redirectUrls: {
 		disableUrlTracker: 'URL tracker uitschakelen',
 		enableUrlTracker: 'URL tracker inschakelen',
+		urlTrackerEnabled: 'Ingeschakeld',
+		urlTrackerDisabled: 'Uitgeschakeld',
 		culture: 'Cultuur',
 		originalUrl: 'Originele URL',
 		redirectedTo: 'Doorgestuurd naar',

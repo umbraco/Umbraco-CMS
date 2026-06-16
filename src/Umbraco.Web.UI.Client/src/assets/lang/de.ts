@@ -763,6 +763,7 @@ export default {
 		content: 'Inhalt',
 		continue: 'Weiter',
 		copy: 'Kopieren',
+		copied: 'Kopiert!',
 		create: 'Neu',
 		cropSection: 'Ausschnitte Bereich',
 		database: 'Datenbank',
@@ -1309,7 +1310,7 @@ export default {
 	},
 	sections: {
 		content: 'Inhalte',
-		forms: 'Formulare',
+		library: 'Bibliothek',
 		media: 'Medien',
 		member: 'Mitglieder',
 		packages: 'Pakete',
@@ -1942,6 +1943,8 @@ export default {
 	redirectUrls: {
 		disableUrlTracker: 'URL-Änderungsaufzeichnung abschalten',
 		enableUrlTracker: 'URL-Änderungsaufzeichnung einschalten',
+		urlTrackerEnabled: 'Aktiviert',
+		urlTrackerDisabled: 'Deaktiviert',
 		culture: 'Kultur',
 		originalUrl: 'Original URL',
 		redirectedTo: 'Weiterleiten zu',
