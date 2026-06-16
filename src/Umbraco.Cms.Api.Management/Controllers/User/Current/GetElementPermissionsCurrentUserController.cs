@@ -72,6 +72,8 @@ public class GetElementPermissionsCurrentUserController : CurrentUserControllerB
     [HttpGet("permissions/element")]
     [ProducesResponseType(typeof(UserPermissionsResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Gets element permissions for the current user.")]
+    [EndpointDescription("Gets the element permissions for the currently authenticated user.")]
     public async Task<IActionResult> GetPermissions(
         CancellationToken cancellationToken,
         [FromQuery(Name = "id")] HashSet<Guid> ids)

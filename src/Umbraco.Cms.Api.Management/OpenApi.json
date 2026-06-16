@@ -36778,6 +36778,8 @@
         "tags": [
           "User"
         ],
+        "summary": "Gets element permissions for the current user.",
+        "description": "Gets the element permissions for the currently authenticated user.",
         "operationId": "GetUserCurrentPermissionsElement",
         "parameters": [
           {
