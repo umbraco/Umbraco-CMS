@@ -94,7 +94,8 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         Mock.Of<IEventAggregator>(),
         Mock.Of<IRepositoryCacheVersionService>(),
         Mock.Of<ICacheSyncService>(),
-        GetRequiredService<IContentTypeRepository>());
+        GetRequiredService<IContentTypeRepository>(),
+        GetRequiredService<ITemplateRepository>());
 
     // --- PerformGetAsync ---
 
@@ -866,6 +867,49 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
             "empty propertyAliases should load no property data");
     }
 
+    [Test]
+    public async Task GetChildrenWithoutTemplatesAsync_ReturnsItemsWithNullTemplateIds()
+    {
+        var content = ContentBuilder.CreateSimpleContent(_contentType, "Templated Child", _textpage.Id);
+        content.TemplateId = _template.Id;
+        ContentService.Save(content, -1);
+        ContentService.Publish(content, ["*"]);
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        PagedModel<IContent> result = await repository.GetChildrenWithoutTemplatesAsync(
+            _textpage.Key, skip: 0, take: 100, propertyAliases: null, ordering: null, CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(result.Items.Any(c => c.Key == content.Key), Is.True);
+        Assert.That(result.Items.All(c => c.TemplateId == null), Is.True,
+            "GetChildrenWithoutTemplatesAsync must not populate TemplateId");
+        Assert.That(result.Items.All(c => c.PublishTemplateId == null), Is.True,
+            "GetChildrenWithoutTemplatesAsync must not populate PublishTemplateId");
+    }
+
+    [Test]
+    public async Task GetChildrenAsync_WithTemplate_PopulatesTemplateId()
+    {
+        var content = ContentBuilder.CreateSimpleContent(_contentType, "Templated Child For Verify", _textpage.Id);
+        content.TemplateId = _template.Id;
+        ContentService.Save(content, -1);
+        ContentService.Publish(content, ["*"]);
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        PagedModel<IContent> result = await repository.GetChildrenAsync(
+            _textpage.Key, skip: 0, take: 100, propertyAliases: null, ordering: null, CancellationToken.None);
+        scope.Complete();
+
+        IContent? templated = result.Items.FirstOrDefault(c => c.Key == content.Key);
+        Assert.That(templated, Is.Not.Null);
+        Assert.That(templated!.TemplateId, Is.EqualTo(_template.Id),
+            "GetChildrenAsync must populate TemplateId for content with a template assigned");
+    }
+
     // --- Group 12: GetDescendantsAsync ---
 
     [Test]
@@ -927,6 +971,49 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
             Assert.That(descendant.Properties, Is.Not.Empty,
                 $"Descendant {descendant.Key} should have properties populated");
         }
+    }
+
+    [Test]
+    public async Task GetDescendantsWithoutTemplatesAsync_ReturnsItemsWithNullTemplateIds()
+    {
+        var content = ContentBuilder.CreateSimpleContent(_contentType, "Templated Descendant", _textpage.Id);
+        content.TemplateId = _template.Id;
+        ContentService.Save(content, -1);
+        ContentService.Publish(content, ["*"]);
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        PagedModel<IContent> result = await repository.GetDescendantsWithoutTemplatesAsync(
+            _textpage.Key, skip: 0, take: 100, ordering: null, CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(result.Items.Any(c => c.Key == content.Key), Is.True);
+        Assert.That(result.Items.All(c => c.TemplateId == null), Is.True,
+            "GetDescendantsWithoutTemplatesAsync must not populate TemplateId");
+        Assert.That(result.Items.All(c => c.PublishTemplateId == null), Is.True,
+            "GetDescendantsWithoutTemplatesAsync must not populate PublishTemplateId");
+    }
+
+    [Test]
+    public async Task GetDescendantsAsync_WithTemplate_PopulatesTemplateId()
+    {
+        var content = ContentBuilder.CreateSimpleContent(_contentType, "Templated Descendant For Verify", _textpage.Id);
+        content.TemplateId = _template.Id;
+        ContentService.Save(content, -1);
+        ContentService.Publish(content, ["*"]);
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        PagedModel<IContent> result = await repository.GetDescendantsAsync(
+            _textpage.Key, skip: 0, take: 100, ordering: null, CancellationToken.None);
+        scope.Complete();
+
+        IContent? templated = result.Items.FirstOrDefault(c => c.Key == content.Key);
+        Assert.That(templated, Is.Not.Null);
+        Assert.That(templated!.TemplateId, Is.EqualTo(_template.Id),
+            "GetDescendantsAsync must populate TemplateId for content with a template assigned");
     }
 
     // --- Variant published/draft property split ---

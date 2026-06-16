@@ -30,6 +30,8 @@ internal sealed class AsyncDocumentRepository
         DocumentCultureVariationDto>,
       IAsyncDocumentRepository
 {
+    private readonly ITemplateRepository _templateRepository;
+
     /// <summary>
     ///     Initializes a new instance of the <see cref="AsyncDocumentRepository" /> class.
     /// </summary>
@@ -46,6 +48,7 @@ internal sealed class AsyncDocumentRepository
     /// <param name="repositoryCacheVersionService">The repository cache version service.</param>
     /// <param name="cacheSyncService">The cache synchronization service.</param>
     /// <param name="contentTypeRepository">The content type repository.</param>
+    /// <param name="templateRepository">The template repository, used to validate template IDs on load.</param>
     internal AsyncDocumentRepository(
         IEFCoreScopeAccessor<UmbracoDbContext> scopeAccessor,
         AppCaches appCaches,
@@ -59,7 +62,8 @@ internal sealed class AsyncDocumentRepository
         IEventAggregator eventAggregator,
         IRepositoryCacheVersionService repositoryCacheVersionService,
         ICacheSyncService cacheSyncService,
-        IContentTypeRepository contentTypeRepository)
+        IContentTypeRepository contentTypeRepository,
+        ITemplateRepository templateRepository)
         : base(
             scopeAccessor,
             appCaches,
@@ -75,6 +79,7 @@ internal sealed class AsyncDocumentRepository
             cacheSyncService,
             contentTypeRepository)
     {
+        _templateRepository = templateRepository;
     }
 
     /// <inheritdoc />
@@ -244,7 +249,16 @@ internal sealed class AsyncDocumentRepository
 
     /// <inheritdoc />
     public override Task<PagedModel<IContent>> GetChildrenAsync(
-        Guid parentKey, int skip, int take, string[]? propertyAliases, Ordering? ordering, CancellationToken cancellationToken) =>
+        Guid parentKey, int skip, int take, string[]? propertyAliases, Ordering? ordering, CancellationToken cancellationToken)
+        => GetChildrenCoreAsync(parentKey, skip, take, propertyAliases, ordering, loadTemplates: true, cancellationToken);
+
+    /// <inheritdoc />
+    public Task<PagedModel<IContent>> GetChildrenWithoutTemplatesAsync(
+        Guid parentKey, int skip, int take, string[]? propertyAliases, Ordering? ordering, CancellationToken cancellationToken)
+        => GetChildrenCoreAsync(parentKey, skip, take, propertyAliases, ordering, loadTemplates: false, cancellationToken);
+
+    private Task<PagedModel<IContent>> GetChildrenCoreAsync(
+        Guid parentKey, int skip, int take, string[]? propertyAliases, Ordering? ordering, bool loadTemplates, CancellationToken cancellationToken) =>
         AmbientScope.ExecuteWithContextAsync(async db =>
         {
             int parentNodeId = await ResolveNodeIdAsync(db, parentKey, cancellationToken);
@@ -332,13 +346,23 @@ internal sealed class AsyncDocumentRepository
                 return new PagedModel<IContent> { Total = total, Items = Enumerable.Empty<IContent>() };
             }
 
-            List<IContent> items = await AssembleEntitiesAsync(rows, db, propertyAliases);
+            List<IContent> items = await AssembleEntitiesAsync(rows, db, propertyAliases, loadTemplates);
             return new PagedModel<IContent> { Total = total, Items = items };
         });
 
     /// <inheritdoc />
+    /// <inheritdoc />
     public override Task<PagedModel<IContent>> GetDescendantsAsync(
-        Guid ancestorKey, int skip, int take, Ordering? ordering, CancellationToken cancellationToken) =>
+        Guid ancestorKey, int skip, int take, Ordering? ordering, CancellationToken cancellationToken)
+        => GetDescendantsCoreAsync(ancestorKey, skip, take, ordering, loadTemplates: true, cancellationToken);
+
+    /// <inheritdoc />
+    public Task<PagedModel<IContent>> GetDescendantsWithoutTemplatesAsync(
+        Guid ancestorKey, int skip, int take, Ordering? ordering, CancellationToken cancellationToken)
+        => GetDescendantsCoreAsync(ancestorKey, skip, take, ordering, loadTemplates: false, cancellationToken);
+
+    private Task<PagedModel<IContent>> GetDescendantsCoreAsync(
+        Guid ancestorKey, int skip, int take, Ordering? ordering, bool loadTemplates, CancellationToken cancellationToken) =>
         AmbientScope.ExecuteWithContextAsync(async db =>
         {
             int parentNodeId = await ResolveNodeIdAsync(db, ancestorKey, cancellationToken);
@@ -427,7 +451,7 @@ internal sealed class AsyncDocumentRepository
                 return new PagedModel<IContent> { Total = total, Items = Enumerable.Empty<IContent>() };
             }
 
-            List<IContent> items = await AssembleEntitiesAsync(rows, db);
+            List<IContent> items = await AssembleEntitiesAsync(rows, db, loadTemplates: loadTemplates);
             return new PagedModel<IContent> { Total = total, Items = items };
         });
 
@@ -452,26 +476,6 @@ internal sealed class AsyncDocumentRepository
     /// <inheritdoc />
     protected override DocumentDto BuildEntityDto(IContent entity) =>
         throw new NotImplementedException();
-
-    // --- IAsyncDocumentRepository: paged overloads with loadTemplates ---
-
-    /// <inheritdoc />
-    public Task<PagedModel<IContent>> GetChildrenAsync(
-        Guid parentKey, int skip, int take, string[]? propertyAliases, Ordering? ordering, bool loadTemplates, CancellationToken cancellationToken)
-    {
-        // TODO: skip the published version LEFT JOIN when loadTemplates == false for a performance win;
-        // for now templates are always loaded from the published DocumentVersionDto join.
-        return GetChildrenAsync(parentKey, skip, take, propertyAliases, ordering, cancellationToken);
-    }
-
-    /// <inheritdoc />
-    public Task<PagedModel<IContent>> GetDescendantsAsync(
-        Guid ancestorKey, int skip, int take, Ordering? ordering, bool loadTemplates, CancellationToken cancellationToken)
-    {
-        // TODO: skip the published version LEFT JOIN when loadTemplates == false for a performance win;
-        // for now templates are always loaded from the published DocumentVersionDto join.
-        return GetDescendantsAsync(ancestorKey, skip, take, ordering, cancellationToken);
-    }
 
     // --- IAsyncDocumentRepository: permissions ---
 
@@ -629,8 +633,26 @@ internal sealed class AsyncDocumentRepository
             return await AssembleEntitiesAsync(rows, db);
         });
 
-    private async Task<List<IContent>> AssembleEntitiesAsync(IReadOnlyList<DocumentRow> rows, UmbracoDbContext db, string[]? propertyAliases = null)
+    private HashSet<int> ResolveValidTemplateIds(IReadOnlyList<DocumentRow> rows)
     {
+        int[] templateIds = rows
+            .SelectMany(row => new[] { row.DocumentVersion.TemplateId, row.PublishedDocumentVersion?.TemplateId })
+            .Where(id => id.HasValue)
+            .Select(id => id!.Value)
+            .Distinct()
+            .ToArray();
+
+        return templateIds.Length > 0
+            ? [.._templateRepository.GetMany(templateIds).Select(template => template.Id)]
+            : [];
+    }
+
+    private async Task<List<IContent>> AssembleEntitiesAsync(IReadOnlyList<DocumentRow> rows, UmbracoDbContext db, string[]? propertyAliases = null, bool loadTemplates = true)
+    {
+        // Resolve valid template IDs once for the whole batch (mirrors NPoco AddAdditionalTempContentMapping).
+        // null means "skip template assignment entirely".
+        HashSet<int>? validTemplateIds = loadTemplates ? ResolveValidTemplateIds(rows) : null;
+
         int[] nodeIds = rows.Select(row => row.Node.NodeId).ToArray();
 
         // All relevant version IDs (current + published, deduplicated).
@@ -677,6 +699,21 @@ internal sealed class AsyncDocumentRepository
             row.Document.PublishedVersion = row.PublishedDocumentVersion;
 
             IContent entity = BuildEntity(row.Document, contentType);
+
+            if (validTemplateIds is not null)
+            {
+                int? draftTemplateId = row.DocumentVersion.TemplateId;
+                if (draftTemplateId.HasValue && validTemplateIds.Contains(draftTemplateId.Value))
+                {
+                    entity.TemplateId = draftTemplateId;
+                }
+
+                int? publishedTemplateId = row.PublishedDocumentVersion?.TemplateId;
+                if (publishedTemplateId.HasValue && validTemplateIds.Contains(publishedTemplateId.Value))
+                {
+                    entity.PublishTemplateId = publishedTemplateId;
+                }
+            }
 
             var versionPropertyDtos = new List<PropertyDataDto>();
             if (propertyDtosByVersionId.TryGetValue(row.ContentVersion.Id, out List<PropertyDataDto>? currentProps))

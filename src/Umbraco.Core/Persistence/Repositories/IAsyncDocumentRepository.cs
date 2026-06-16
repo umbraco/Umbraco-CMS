@@ -10,8 +10,12 @@ namespace Umbraco.Cms.Core.Persistence.Repositories;
 public interface IAsyncDocumentRepository : IAsyncPublishableContentRepository<IContent>
 {
     /// <summary>
-    ///     Gets a paged list of direct children of a document node, with template loading control.
+    ///     Gets a paged list of direct children of a document node, without loading template information.
     /// </summary>
+    /// <remarks>
+    ///     Use this overload when template IDs are not required (e.g. collection/list views) to avoid the
+    ///     template-existence validation round-trip against the template repository.
+    /// </remarks>
     /// <param name="parentKey">The Guid key of the parent node.</param>
     /// <param name="skip">The number of items to skip.</param>
     /// <param name="take">The maximum number of items to return.</param>
@@ -20,25 +24,24 @@ public interface IAsyncDocumentRepository : IAsyncPublishableContentRepository<I
     ///     If empty, no custom properties are loaded (only system properties).
     /// </param>
     /// <param name="ordering">The ordering specification, or <c>null</c> for default ordering.</param>
-    /// <param name="loadTemplates">
-    ///     Whether to load templates. Set to <c>false</c> for performance optimization when templates are not
-    ///     needed (e.g., collection views).
-    /// </param>
     /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>A paged result containing the matching children and the total record count.</returns>
-    new Task<PagedModel<IContent>> GetChildrenAsync(Guid parentKey, int skip, int take, string[]? propertyAliases, Ordering? ordering, bool loadTemplates, CancellationToken cancellationToken);
+    /// <returns>A paged result containing the matching children with <c>null</c> template IDs.</returns>
+    Task<PagedModel<IContent>> GetChildrenWithoutTemplatesAsync(Guid parentKey, int skip, int take, string[]? propertyAliases, Ordering? ordering, CancellationToken cancellationToken);
 
     /// <summary>
-    ///     Gets a paged list of all descendants of a document node, with template loading control.
+    ///     Gets a paged list of all descendants of a document node, without loading template information.
     /// </summary>
+    /// <remarks>
+    ///     Use this overload when template IDs are not required (e.g. collection/list views) to avoid the
+    ///     template-existence validation round-trip against the template repository.
+    /// </remarks>
     /// <param name="ancestorKey">The Guid key of the ancestor node.</param>
     /// <param name="skip">The number of items to skip.</param>
     /// <param name="take">The maximum number of items to return.</param>
     /// <param name="ordering">The ordering specification, or <c>null</c> for default ordering.</param>
-    /// <param name="loadTemplates">Whether to load templates.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>A paged result containing the matching descendants and the total record count.</returns>
-    new Task<PagedModel<IContent>> GetDescendantsAsync(Guid ancestorKey, int skip, int take, Ordering? ordering, bool loadTemplates, CancellationToken cancellationToken);
+    /// <returns>A paged result containing the matching descendants with <c>null</c> template IDs.</returns>
+    Task<PagedModel<IContent>> GetDescendantsWithoutTemplatesAsync(Guid ancestorKey, int skip, int take, Ordering? ordering, CancellationToken cancellationToken);
 
     /// <summary>
     ///     Bulk-replaces all permissions for a content item with the provided permission set.

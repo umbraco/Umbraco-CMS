@@ -28,6 +28,11 @@ internal sealed class ContentBaseFactory
     ///     Creates a <see cref="Content"/> entity from an EF Core <see cref="EFCoreDtos.DocumentDto"/> with its
     ///     nav properties populated by the repository (mirrors the NPoco <see cref="BuildEntity(DocumentDto, IContentType?)"/> overload).
     /// </summary>
+    /// <remarks>
+    ///     Template IDs are NOT set by this method — the repository is responsible for assigning
+    ///     <see cref="ITemplatedContent.TemplateId"/> and <see cref="ITemplatedContent.PublishTemplateId"/>
+    ///     after calling this method, mirroring the NPoco <c>AddAdditionalTempContentMapping</c> pattern.
+    /// </remarks>
     /// <param name="dto">
     ///     The EF Core <see cref="EFCoreDtos.DocumentDto"/> with <c>ContentDto</c>, <c>CurrentVersion</c>,
     ///     and (optionally) <c>PublishedVersion</c> populated.
@@ -43,11 +48,6 @@ internal sealed class ContentBaseFactory
         {
             entity.DisableChangeTracking();
             PopulatePublishableEntity(entity, dto);
-
-            // Document-specific: templates set here rather than in a separate repository pass
-            entity.TemplateId = dto.CurrentVersion.TemplateId;
-            entity.PublishTemplateId = dto.PublishedVersion?.TemplateId;
-
             entity.ResetDirtyProperties(false);
             return entity;
         }
