@@ -9,6 +9,7 @@ import {
 	property,
 	unsafeHTML,
 } from '@umbraco-cms/backoffice/external/lit';
+import { sanitizeHTML } from '@umbraco-cms/backoffice/utils';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import {
 	UMB_ERROR_VIEWER_MODAL,
@@ -78,7 +79,7 @@ export class UmbPeekErrorNotificationElement extends UmbLitElement {
 	protected override render() {
 		if (!this.data) return nothing;
 		return html`<uui-toast-notification-layout headline=${ifDefined(this.data.headline)}>
-			${typeof this.#message === 'string' ? unsafeHTML(this.#message) : this.#message} ${this.#actions}
+			${typeof this.#message === 'string' ? unsafeHTML(sanitizeHTML(this.#message)) : this.#message} ${this.#actions}
 		</uui-toast-notification-layout>`;
 	}
 

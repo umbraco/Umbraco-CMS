@@ -10,6 +10,7 @@ import {
 	css,
 	unsafeHTML,
 } from '@umbraco-cms/backoffice/external/lit';
+import { sanitizeHTML } from '@umbraco-cms/backoffice/utils';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 export type { UmbNotificationDefaultData };
@@ -25,7 +26,7 @@ export class UmbNotificationLayoutDefaultElement extends LitElement {
 	override render() {
 		return html`
 			<uui-toast-notification-layout id="layout" headline="${ifDefined(this.data.headline)}" class="uui-text">
-				<div id="message">${unsafeHTML(this.data.message)}</div>
+				<div id="message">${unsafeHTML(sanitizeHTML(this.data.message))}</div>
 				${this.#renderStructuredList(this.data.structuredList)}
 			</uui-toast-notification-layout>
 		`;
