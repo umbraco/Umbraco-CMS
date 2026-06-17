@@ -14,10 +14,12 @@ const DA = UmbVariantId.Create({ culture: 'da', segment: null });
 
 /**
  * Reproduces the create-and-publish orchestration the publishing workspace context performs: build the
- * save data, call the combined create-and-publish endpoint via the publishing data source, then ask the
- * document workspace context to apply the create lifecycle (finalizeCreate). The reload+transfer that
- * #performSaveAndPublish runs afterwards is intentionally omitted here — these tests assert the state in
- * the window before that reload, which is exactly the window the new->edit redirect navigates in.
+ * save data, then drive performCreateOrUpdate with a persist strategy that calls the combined
+ * create-and-publish endpoint via the publishing data source. The endpoint does not return the saved
+ * document (the strategy returns undefined), so the workspace reconciles to the sent data and applies the
+ * create lifecycle. The reload+transfer that #performSaveAndPublish runs afterwards is intentionally
+ * omitted here — these tests assert the state in the window before that reload, which is exactly the
+ * window the new->edit redirect navigates in.
  */
 async function createAndPublish(
 	context: UmbDocumentWorkspaceContext,
@@ -25,9 +27,16 @@ async function createAndPublish(
 	variantIds: Array<UmbVariantId>,
 ) {
 	const saveData = await context.constructSaveData(variantIds);
-	const parent = context._internal_getCreateUnderParent();
-	await publishingDataSource.createAndPublish(saveData, variantIds, parent?.unique ?? null);
-	await context.finalizeCreate(saveData);
+	await context.performCreateOrUpdate(variantIds, saveData, {
+		create: async (data, ids, parent) => {
+			await publishingDataSource.createAndPublish(data, ids, parent.unique);
+			return undefined;
+		},
+		update: async (data, ids) => {
+			await publishingDataSource.updateAndPublish(data, ids);
+			return undefined;
+		},
+	});
 }
 
 describe('UmbDocumentWorkspaceContext (create-and-publish redirect dirty state)', () => {
@@ -75,11 +84,12 @@ describe('UmbDocumentWorkspaceContext (create-and-publish redirect dirty state)'
 		).to.be.false;
 	});
 
-	// Guards the #68071 promise on the create path: finalizeCreate clears the dirty state for the redirect
-	// by resetting current to the saved (published) data, so the edited-but-unpublished variant is briefly
-	// absent. The full flow must restore it — the reload + transferPublishedVariantsToCurrent that
-	// #performSaveAndPublish runs re-applies the unpublished variant's edit so it survives and is dirty
-	// again. This asserts that end state (no data loss), not the intermediate redirect window.
+	// Guards the #68071 promise on the create path: the create-and-publish reconcile clears the dirty
+	// state for the redirect by resetting current to the saved (published) data, so the
+	// edited-but-unpublished variant is briefly absent. The full flow must restore it — the reload +
+	// transferPublishedVariantsToCurrent that #performSaveAndPublish runs re-applies the unpublished
+	// variant's edit so it survives and is dirty again. This asserts that end state (no data loss), not
+	// the intermediate redirect window.
 	it('restores an edited-but-unpublished variant after the full create-and-publish flow (no data loss)', async () => {
 		await context.create(PARENT_ENTITY, VARIANT_DOCUMENT_TYPE_ID);
 		context.setName('English name', EN_US);
@@ -89,10 +99,7 @@ describe('UmbDocumentWorkspaceContext (create-and-publish redirect dirty state)'
 
 		// Mirror UmbDocumentPublishingWorkspaceContext #performSaveAndPublish for the create path:
 		const dirtyData = context.getData(); // full draft, incl. the unpublished Danish edit
-		const saveData = await context.constructSaveData([EN_US]);
-		const parent = context._internal_getCreateUnderParent();
-		await publishingDataSource.createAndPublish(saveData, [EN_US], parent?.unique ?? null);
-		await context.finalizeCreate(saveData);
+		await createAndPublish(context, publishingDataSource, [EN_US]);
 		await context.reload();
 		await context.transferPublishedVariantsToCurrent(dirtyData, [EN_US]);
 

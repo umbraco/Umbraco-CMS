@@ -43,11 +43,6 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/document-type';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
-import {
-	UmbEntityUpdatedEvent,
-	UmbRequestReloadChildrenOfEntityEvent,
-	UmbRequestReloadStructureForEntityEvent,
-} from '@umbraco-cms/backoffice/entity-action';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import { UmbPreviewRepository } from '@umbraco-cms/backoffice/preview';
 
@@ -393,61 +388,6 @@ export class UmbDocumentWorkspaceContext
 			});
 			throw new Error(previewUrlData.message);
 		}
-	}
-
-	/**
-	 * Applies the workspace side-effects of a document having been created externally: reconciles the
-	 * persisted and current data states to the saved data, marks the workspace as no longer new, and
-	 * requests a reload of the parent's structure and children.
-	 * @param {UmbDocumentDetailModel} savedData - The data that was sent to the server (constructSaveData)
-	 * @returns {Promise<void>}
-	 * @memberof UmbDocumentWorkspaceContext
-	 */
-	public async finalizeCreate(savedData: UmbDocumentDetailModel): Promise<void> {
-		const parent = this._internal_getCreateUnderParent();
-		if (!parent) throw new Error('Parent is not set');
-
-		// Reconcile persisted AND current before flipping isNew: the flip triggers the new->edit redirect,
-		// whose navigation guard compares the two states with an order-sensitive jsonStringComparison.
-		// `savedData` is a merge-processed projection of the draft (its values array can be ordered
-		// differently), so reconciling only persisted can still leave a spurious mismatch -> dialog.
-		this._data.setPersisted(savedData);
-		this._data.setCurrent(savedData);
-		this.setIsNew(false);
-
-		const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
-		if (!eventContext) throw new Error('Event context is missing');
-
-		eventContext.dispatchEvent(
-			new UmbRequestReloadStructureForEntityEvent({ entityType: parent.entityType, unique: parent.unique }),
-		);
-		eventContext.dispatchEvent(
-			new UmbRequestReloadChildrenOfEntityEvent({ entityType: parent.entityType, unique: parent.unique }),
-		);
-	}
-
-	/**
-	 * Applies the workspace side-effects of a document having been updated externally: reconciles the
-	 * persisted and current data states to the saved data, requests a reload of the entity's structure,
-	 * and emits the workspace's own UmbEntityUpdatedEvent (stamped so the workspace ignores its own update).
-	 * @param {UmbDocumentDetailModel} savedData - The data that was sent to the server (constructSaveData)
-	 * @returns {Promise<void>}
-	 * @memberof UmbDocumentWorkspaceContext
-	 */
-	public async finalizeUpdate(savedData: UmbDocumentDetailModel): Promise<void> {
-		const unique = this.getUnique()!;
-		const entityType = this.getEntityType();
-
-		this._data.setPersisted(savedData);
-		this._data.setCurrent(savedData);
-
-		const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
-		if (!eventContext) throw new Error('Event context is missing');
-
-		eventContext.dispatchEvent(new UmbRequestReloadStructureForEntityEvent({ unique, entityType }));
-		eventContext.dispatchEvent(
-			new UmbEntityUpdatedEvent({ unique, entityType, eventUnique: this._workspaceEventUnique }),
-		);
 	}
 
 	/**
