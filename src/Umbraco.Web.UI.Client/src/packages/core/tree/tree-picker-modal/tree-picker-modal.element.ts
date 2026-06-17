@@ -12,8 +12,11 @@ import { UmbPickerModalBaseElement } from '@umbraco-cms/backoffice/picker';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbEntityExpansionModel, UmbExpansionChangeEvent } from '@umbraco-cms/backoffice/utils';
+import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry, type ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
+
+const TREE_INTERACTION_MEMORIES_UNIQUE = 'UmbTreeItemPickerTreeMemories';
 
 interface UmbTreeBreadcrumbItem {
 	unique: string | null;
@@ -50,6 +53,9 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 	private _treeExpansion: UmbEntityExpansionModel = [];
 
 	@state()
+	private _treeInteractionMemories: Array<UmbInteractionMemoryModel> = [];
+
+	@state()
 	private _currentLocation?: UmbTreeStartNode;
 
 	@state()
@@ -70,6 +76,7 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 		this.#observePickerSelection();
 		this.#observeSearch();
 		this.#observeExpansion();
+		this.#observeTreeInteractionMemories();
 	}
 
 	override connectedCallback(): void {
@@ -246,6 +253,16 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 		);
 	}
 
+	#observeTreeInteractionMemories() {
+		this.observe(
+			this._pickerContext.interactionMemory.memory(TREE_INTERACTION_MEMORIES_UNIQUE),
+			(memory) => {
+				this._treeInteractionMemories = memory?.memories ?? [];
+			},
+			'umbTreePickerInteractionMemoriesObserver',
+		);
+	}
+
 	// Tree Selection
 	#onTreeItemSelected(event: UmbSelectedEvent) {
 		event.stopPropagation();
@@ -300,6 +317,17 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 		this._pickerContext.expansion.setExpansion(expansion);
 	}
 
+	#onTreeInteractionMemoriesChange(event: Event) {
+		event.stopPropagation();
+		const tree = event.currentTarget as UmbTreeElement;
+		const memories = tree.interactionMemories;
+		if (memories.length > 0) {
+			this._pickerContext.interactionMemory.setMemory({ unique: TREE_INTERACTION_MEMORIES_UNIQUE, memories });
+		} else {
+			this._pickerContext.interactionMemory.deleteMemory(TREE_INTERACTION_MEMORIES_UNIQUE);
+		}
+	}
+
 	#searchSelectableFilter = () => true;
 
 	override render() {
@@ -340,10 +368,12 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 					startNode: this._currentLocation,
 					foldersOnly: this.data?.foldersOnly,
 					expansion: this._treeExpansion,
+					interactionMemories: this._treeInteractionMemories,
 				}}
 				@selected=${this.#onTreeItemSelected}
 				@deselected=${this.#onTreeItemDeselected}
-				@expansion-change=${this.#onTreeItemExpansionChange}></umb-tree>
+				@expansion-change=${this.#onTreeItemExpansionChange}
+				@interaction-memories-change=${this.#onTreeInteractionMemoriesChange}></umb-tree>
 		`;
 	}
 
