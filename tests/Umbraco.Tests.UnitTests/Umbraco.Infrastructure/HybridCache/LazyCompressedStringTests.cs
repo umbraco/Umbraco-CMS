@@ -25,13 +25,14 @@ public class LazyCompressedStringTests
     }
 
     [Test]
-    public void Can_Report_String_Length_After_Decompression()
+    public void Can_Report_Utf16_Byte_Size_After_Decompression()
     {
         const string value = "hello world";
         var sut = new LazyCompressedString(LZ4Pickler.Pickle(Encoding.UTF8.GetBytes(value)));
 
         sut.DecompressString();
 
-        Assert.That(sut.GetApproximateByteCount(), Is.EqualTo(value.Length));
+        // UTF-16 byte size (chars × 2), consistent with how plain strings are sized in the size estimator.
+        Assert.That(sut.GetApproximateByteCount(), Is.EqualTo(value.Length * 2));
     }
 }

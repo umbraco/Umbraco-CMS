@@ -61,8 +61,10 @@ internal struct LazyCompressedString
 
     /// <summary>
     ///     Returns an approximate byte count for this value without decompressing it: the compressed byte
-    ///     length while still compressed, otherwise the (already decompressed) string length. Never triggers
-    ///     decompression and never throws — intended for cheap size diagnostics.
+    ///     length while still compressed, otherwise the approximate UTF-16 byte size (character count × 2) of
+    ///     the already-decompressed string. Never triggers decompression and never throws — intended for cheap
+    ///     size diagnostics. Returning UTF-16 bytes here keeps the decompressed estimate consistent with how
+    ///     plain strings are sized elsewhere.
     /// </summary>
     public int GetApproximateByteCount()
     {
@@ -73,7 +75,7 @@ internal struct LazyCompressedString
                 return _bytes.Length;
             }
 
-            return _str?.Length ?? 0;
+            return _str is null ? 0 : _str.Length * 2;
         }
     }
 
