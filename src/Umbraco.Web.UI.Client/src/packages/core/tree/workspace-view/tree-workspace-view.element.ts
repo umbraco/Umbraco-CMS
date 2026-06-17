@@ -1,8 +1,12 @@
-import { UMB_ENTITY_CONTEXT, type UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+import { UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
 import type { ManifestWorkspaceViewTreekind } from './types.js';
 import { html, customElement, property, state, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbTreeStartNode } from '../types.js';
+import { UMB_INTERACTION_MEMORY_CONTEXT } from '@umbraco-cms/backoffice/interaction-memory';
+import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
+import type { UmbTreeElement } from '../tree.element.js';
+import type { PropertyValues } from '@umbraco-cms/backoffice/external/lit';
 
 @customElement('umb-tree-workspace-view')
 export class UmbTreeWorkspaceViewElement extends UmbLitElement {
@@ -12,6 +16,11 @@ export class UmbTreeWorkspaceViewElement extends UmbLitElement {
 	@state()
 	private _parent?: UmbTreeStartNode;
 
+	@state()
+	private _interactionMemories?: Array<UmbInteractionMemoryModel>;
+
+	#interactionMemoryContext?: typeof UMB_INTERACTION_MEMORY_CONTEXT.TYPE;
+
 	constructor() {
 		super();
 
@@ -20,6 +29,38 @@ export class UmbTreeWorkspaceViewElement extends UmbLitElement {
 			const unique = context?.getUnique();
 			this._parent = entityType && unique ? { entityType, unique } : undefined;
 		});
+
+		this.consumeContext(UMB_INTERACTION_MEMORY_CONTEXT, (context) => {
+			this.#interactionMemoryContext = context;
+			this.#readInteractionMemory();
+		});
+	}
+
+	protected override updated(changedProperties: PropertyValues) {
+		super.updated(changedProperties);
+		if (changedProperties.has('manifest')) {
+			this.#readInteractionMemory();
+		}
+	}
+
+	#readInteractionMemory() {
+		const alias = this.manifest?.alias;
+		if (!alias || !this.#interactionMemoryContext) return;
+		const stored = this.#interactionMemoryContext.memory.getMemory(alias);
+		this._interactionMemories = stored?.memories ?? [];
+	}
+
+	#onInteractionMemoriesChange(event: Event) {
+		event.stopPropagation();
+		const alias = this.manifest?.alias;
+		if (!alias || !this.#interactionMemoryContext) return;
+		const tree = event.currentTarget as UmbTreeElement;
+		const memories = tree.interactionMemories;
+		if (memories.length > 0) {
+			this.#interactionMemoryContext.memory.setMemory({ unique: alias, memories });
+		} else {
+			this.#interactionMemoryContext.memory.deleteMemory(alias);
+		}
 	}
 
 	override render() {
@@ -33,10 +74,12 @@ export class UmbTreeWorkspaceViewElement extends UmbLitElement {
 				hideTreeActions: false,
 				hideTreeRoot: true,
 				startNode: this._parent,
+				interactionMemories: this._interactionMemories,
 				selectionConfiguration: {
 					selectable: false,
 				},
-			}}></umb-tree>`;
+			}}
+			@interaction-memories-change=${this.#onInteractionMemoriesChange}></umb-tree>`;
 	}
 
 	static override styles = css`

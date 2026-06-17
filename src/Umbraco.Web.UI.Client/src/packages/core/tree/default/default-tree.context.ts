@@ -14,6 +14,7 @@ import type { UmbTreeRootItemsRequestArgs } from '../data/types.js';
 import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbDeprecation, UmbSelectionManager, debounce } from '@umbraco-cms/backoffice/utils';
+import { UmbInteractionMemoryManager } from '@umbraco-cms/backoffice/interaction-memory';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry, type ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -36,7 +37,8 @@ export class UmbDefaultTreeContext<
 	public filter?: (item: TreeItemType) => boolean = () => true;
 	public readonly selection = new UmbSelectionManager(this);
 	public readonly expansion = new UmbTreeExpansionManager(this);
-	public readonly view = new UmbTreeViewManager(this);
+	public readonly interactionMemory = new UmbInteractionMemoryManager(this);
+	public readonly view = new UmbTreeViewManager(this, { interactionMemoryManager: this.interactionMemory });
 
 	#hideTreeRoot = new UmbBooleanState(false);
 	public readonly hideTreeRoot = this.#hideTreeRoot.asObservable();

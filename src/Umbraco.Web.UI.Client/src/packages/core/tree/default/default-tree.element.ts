@@ -12,6 +12,9 @@ import { css, customElement, html, nothing, property, state } from '@umbraco-cms
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
+import { UmbInteractionMemoriesChangeEvent } from '@umbraco-cms/backoffice/interaction-memory';
+import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
+import { jsonStringComparison } from '@umbraco-cms/backoffice/observable-api';
 
 import '../components/tree-toolbar.element.js';
 
@@ -38,6 +41,21 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 				}
 				this._viewElement = element;
 			});
+		}
+		if (value?.interactionMemory) {
+			// Snapshot before forwarding so the first observer emission is not treated as a change.
+			this.#lastDispatchedMemories = this.interactionMemories ?? [];
+			this.interactionMemories?.forEach((m) => value.interactionMemory!.setMemory(m));
+			this.observe(
+				value.interactionMemory.memories,
+				(memories) => {
+					if (!jsonStringComparison(memories, this.#lastDispatchedMemories)) {
+						this.#lastDispatchedMemories = memories;
+						this.dispatchEvent(new UmbInteractionMemoriesChangeEvent());
+					}
+				},
+				'umbTreeInteractionMemoryObserver',
+			);
 		}
 	}
 
@@ -86,6 +104,11 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 	 */
 	@property({ type: Boolean, attribute: 'hide-tree-actions' })
 	hideTreeActions: boolean = true;
+
+	@property({ attribute: false })
+	interactionMemories?: Array<UmbInteractionMemoryModel>;
+
+	#lastDispatchedMemories: Array<UmbInteractionMemoryModel> = [];
 
 	@state()
 	private _viewElement?: HTMLElement | null;
@@ -139,6 +162,11 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 		if (_changedProperties.has('isMenu')) {
 			this._api!.setIsMenu?.(this.isMenu ?? false);
 		}
+
+		if (_changedProperties.has('interactionMemories') && this._api?.interactionMemory) {
+			this.#lastDispatchedMemories = this.interactionMemories ?? [];
+			this.interactionMemories?.forEach((m) => this._api!.interactionMemory!.setMemory(m));
+		}
 	}
 
 	getSelection() {
@@ -151,7 +179,9 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 
 	override render() {
 		return html`
-			${!this.hideToolbar ? html`<umb-tree-toolbar .hideTreeActions=${this.hideTreeActions}></umb-tree-toolbar>` : nothing}
+			${!this.hideToolbar
+				? html`<umb-tree-toolbar .hideTreeActions=${this.hideTreeActions}></umb-tree-toolbar>`
+				: nothing}
 			${this._viewElement ?? nothing}
 		`;
 	}

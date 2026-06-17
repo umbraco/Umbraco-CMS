@@ -6,6 +6,7 @@ import type { UmbTreeRepository } from './data/tree-repository.interface.js';
 import type { UmbTreeRootItemsRequestArgs } from './data/types.js';
 import type { UmbTreeViewManager } from './view/tree-view.manager.js';
 import type { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
+import type { UmbInteractionMemoryManager } from '@umbraco-cms/backoffice/interaction-memory';
 import type { Observable } from '@umbraco-cms/backoffice/observable-api';
 import type {
 	UmbPaginationManager,
@@ -21,6 +22,7 @@ export interface UmbTreeContext<
 	manifest: ManifestTree | undefined;
 
 	readonly activeManager: UmbTreeItemActiveManager;
+	readonly interactionMemory?: UmbInteractionMemoryManager;
 	readonly view?: UmbTreeViewManager;
 
 	readonly treeRoot: Observable<TreeRootType | undefined>;
