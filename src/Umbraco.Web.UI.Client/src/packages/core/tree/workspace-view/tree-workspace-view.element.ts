@@ -1,8 +1,7 @@
-import { UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
+import { UMB_ENTITY_CONTEXT, type UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import type { ManifestWorkspaceViewTreekind } from './types.js';
-import { html, customElement, property, state, css } from '@umbraco-cms/backoffice/external/lit';
+import { html, nothing, customElement, property, state, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbTreeStartNode } from '../types.js';
 import { UMB_INTERACTION_MEMORY_CONTEXT } from '@umbraco-cms/backoffice/interaction-memory';
 import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
 import type { UmbTreeElement } from '../tree.element.js';
@@ -14,7 +13,7 @@ export class UmbTreeWorkspaceViewElement extends UmbLitElement {
 	public manifest?: ManifestWorkspaceViewTreekind;
 
 	@state()
-	private _parent?: UmbTreeStartNode;
+	private _parent?: UmbEntityModel;
 
 	@state()
 	private _interactionMemories?: Array<UmbInteractionMemoryModel>;
@@ -27,7 +26,7 @@ export class UmbTreeWorkspaceViewElement extends UmbLitElement {
 		this.consumeContext(UMB_ENTITY_CONTEXT, (context) => {
 			const entityType = context?.getEntityType();
 			const unique = context?.getUnique();
-			this._parent = entityType && unique ? { entityType, unique } : undefined;
+			this._parent = entityType && unique !== undefined ? { entityType, unique } : undefined;
 		});
 
 		this.consumeContext(UMB_INTERACTION_MEMORY_CONTEXT, (context) => {
@@ -66,6 +65,7 @@ export class UmbTreeWorkspaceViewElement extends UmbLitElement {
 	override render() {
 		if (!this.manifest) return html` <div>No Manifest</div>`;
 		if (!this.manifest.meta.treeAlias) return html` <div>No Collection Alias in Manifest</div>`;
+		if (this._parent === undefined) return nothing;
 		return html`<umb-tree
 			data-mark="tree:${this.manifest.meta.treeAlias}"
 			alias=${this.manifest.meta.treeAlias}
