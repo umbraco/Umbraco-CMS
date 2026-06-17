@@ -23,7 +23,7 @@ env:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  cancel-in-progress: true
 
 jobs:
   analyze:
@@ -37,6 +37,12 @@ jobs:
 
       - name: Setup .NET from global.json
         uses: actions/setup-dotnet@v5
+
+      - name: Setup Java 21
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "21"
 
       - name: Cache SonarQube packages
         uses: actions/cache@v5
@@ -60,7 +66,8 @@ jobs:
           dotnet-sonarscanner begin \
             /k:"$SONAR_PROJECT_KEY" \
             /o:"$SONAR_ORGANIZATION" \
-            /d:sonar.token="$SONAR_TOKEN"
+            /d:sonar.token="$SONAR_TOKEN" \
+            /d:sonar.scanner.skipJreProvisioning=true
 
       - name: Restore
         run: dotnet restore umbraco.sln
@@ -69,11 +76,22 @@ jobs:
         run: GITHUB_ENV=/dev/null dotnet build umbraco.sln --no-restore -clp:ErrorsOnly # prevent sonar MSBuild integration from writing malformed values to $GITHUB_ENV
 
       - name: Run unit tests with coverage
+        id: tests
+        continue-on-error: true
         run: |
           dotnet-coverage collect \
             "dotnet test tests/Umbraco.Tests.UnitTests/Umbraco.Tests.UnitTests.csproj --no-build" \
             --output TestResults/coverage.xml \
             --output-format xml
+
+      - name: Warn on test failure
+        if: steps.tests.outcome == 'failure'
+        run: |
+          if [ -f TestResults/coverage.xml ]; then
+            echo "::warning::Unit tests failed - SonarCloud analysis will proceed with the collected coverage data"
+          else
+            echo "::warning::Unit tests failed and no coverage data was collected"
+          fi
 
       - name: End analysis
         env:
