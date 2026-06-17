@@ -16,7 +16,8 @@ import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interact
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry, type ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
 
-const TREE_INTERACTION_MEMORIES_UNIQUE = 'UmbTreeItemPickerTreeMemories';
+const TREE_MEMORY_UNIQUE = 'UmbTreeItemPickerTree';
+const LOCATION_MEMORY_UNIQUE = 'UmbTreeItemPickerLocation';
 
 interface UmbTreeBreadcrumbItem {
 	unique: string | null;
@@ -148,6 +149,7 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 				if (this._repository && !this._breadcrumbLoaded) {
 					this._breadcrumbLoaded = true;
 					await this.#loadInitialBreadcrumb();
+					await this.#restoreLocationFromMemory();
 				}
 			},
 		);
@@ -178,15 +180,16 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 
 	#onTreeItemOpen = async (event: UmbTreeItemOpenEvent) => {
 		event.stopPropagation();
-
 		const { unique, entityType } = event;
-		this._currentLocation = { unique, entityType };
+		await this.#navigateToLocation({ unique, entityType });
+		this.#setLocationInInteractionMemory();
+	};
 
+	async #navigateToLocation(entity: UmbTreeStartNode) {
+		this._currentLocation = entity;
 		if (!this._repository) return;
 
-		const { data } = await this._repository.requestTreeItemAncestors({
-			treeItem: { unique, entityType },
-		});
+		const { data } = await this._repository.requestTreeItemAncestors({ treeItem: entity });
 		const items = data ?? [];
 
 		if (this._initialStartNode) {
@@ -208,7 +211,42 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 				})),
 			];
 		}
-	};
+	}
+
+	#setLocationInInteractionMemory() {
+		if (!this._currentLocation) {
+			this._pickerContext.interactionMemory.deleteMemory(LOCATION_MEMORY_UNIQUE);
+			return;
+		}
+		const memory: UmbInteractionMemoryModel = {
+			unique: LOCATION_MEMORY_UNIQUE,
+			value: {
+				entity: {
+					unique: this._currentLocation.unique,
+					entityType: this._currentLocation.entityType,
+				},
+			},
+		};
+		this._pickerContext.interactionMemory.setMemory(memory);
+	}
+
+	#getLocationFromInteractionMemory(): UmbTreeStartNode | undefined {
+		const memory = this._pickerContext.interactionMemory.getMemory(LOCATION_MEMORY_UNIQUE);
+		return memory?.value?.entity;
+	}
+
+	async #restoreLocationFromMemory() {
+		const entity = this.#getLocationFromInteractionMemory();
+		if (!entity || !this._repository) return;
+
+		if (this._initialStartNode) {
+			const { data } = await this._repository.requestTreeItemAncestors({ treeItem: entity });
+			const isWithinStartNode = (data ?? []).some((a) => a.unique === this._initialStartNode!.unique);
+			if (!isWithinStartNode) return;
+		}
+
+		await this.#navigateToLocation(entity);
+	}
 
 	#onBreadcrumbItemClick(index: number) {
 		if (index === this._breadcrumb.length - 1) return;
@@ -220,6 +258,7 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 			this._currentLocation = { unique: item.unique!, entityType: item.entityType };
 		}
 		this._breadcrumb = this._breadcrumb.slice(0, index + 1);
+		this.#setLocationInInteractionMemory();
 	}
 
 	#observePickerSelection() {
@@ -255,7 +294,7 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 
 	#observeTreeInteractionMemories() {
 		this.observe(
-			this._pickerContext.interactionMemory.memory(TREE_INTERACTION_MEMORIES_UNIQUE),
+			this._pickerContext.interactionMemory.memory(TREE_MEMORY_UNIQUE),
 			(memory) => {
 				this._treeInteractionMemories = memory?.memories ?? [];
 			},
@@ -322,9 +361,9 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 		const tree = event.currentTarget as UmbTreeElement;
 		const memories = tree.interactionMemories;
 		if (memories.length > 0) {
-			this._pickerContext.interactionMemory.setMemory({ unique: TREE_INTERACTION_MEMORIES_UNIQUE, memories });
+			this._pickerContext.interactionMemory.setMemory({ unique: TREE_MEMORY_UNIQUE, memories });
 		} else {
-			this._pickerContext.interactionMemory.deleteMemory(TREE_INTERACTION_MEMORIES_UNIQUE);
+			this._pickerContext.interactionMemory.deleteMemory(TREE_MEMORY_UNIQUE);
 		}
 	}
 
