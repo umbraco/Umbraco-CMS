@@ -99,15 +99,15 @@ public class ConvertedPublishedContentCacheTests
     [Test]
     public void Can_Retain_Frequently_Accessed_Items_Under_Scan_Pressure()
     {
-        // Integer keys are used deliberately: the W-TinyLFU admission policy estimates access frequency with a
-        // count-min sketch keyed off the entry's hash code, and .NET randomizes string.GetHashCode() per
-        // process. With string keys an unlucky per-process seed can collide a cold item's sketch buckets with a
-        // hot item's, inflating its estimate enough to evict the hot entry that is still cycling through
-        // probation — a green-locally / red-on-CI flake. Integer hash codes are stable across processes, so the
-        // sketch (and therefore this assertion) is deterministic. The high access count gives the hot set a wide
-        // frequency margin so the outcome is unambiguous; the behaviour under test — frequently requested content
-        // surviving a one-off scan of more-recently-touched items, which a plain LRU would NOT do — does not
-        // depend on the exact numbers, so this still guards the behaviour if the backing cache is swapped later.
+        // Guards the scan-resistance property: frequently requested content survives a one-off scan of
+        // more-recently-touched items, which a plain LRU would NOT do (it keeps the most recent N, so a scan
+        // larger than the cache evicts the whole hot set).
+        //
+        // The hot set is driven into W-TinyLFU's protected region, whose entries are not eviction candidates
+        // until that region itself overflows — which three items in a ten-entry cache never cause — so survival
+        // is guaranteed by structure rather than by the marginal frequency comparison for window/probation
+        // residents (which depends on count-min sketch hashing and buffer behaviour). Int keys keep that hashing
+        // stable across processes, as .NET randomizes string.GetHashCode().
         var cache = new ConvertedPublishedContentCache<int>(maximumItems: 10);
 
         int[] hot = [0, 1, 2];
@@ -117,9 +117,17 @@ public class ConvertedPublishedContentCacheTests
             cache.Set(key, Content(), 10);
         }
 
-        // Establish a high access frequency for the hot set. Maintenance runs between rounds (as it would on
-        // a live site) so the accesses are recorded as frequency rather than dropped from the read buffer.
-        for (var round = 0; round < 30; round++)
+        // Push the hot items out of the single-slot admission window into the main region. Total held is
+        // 3 hot + 4 decoys = 7 < 10, so nothing is evicted yet.
+        for (var decoy = -4; decoy < 0; decoy++)
+        {
+            cache.Set(decoy, Content(), 10);
+        }
+
+        cache.RunPendingMaintenance();
+
+        // Read the hot items so each is promoted from probation into the protected region.
+        for (var round = 0; round < 5; round++)
         {
             foreach (int key in hot)
             {
