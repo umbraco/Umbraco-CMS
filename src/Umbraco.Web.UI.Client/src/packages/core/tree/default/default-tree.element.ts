@@ -119,6 +119,10 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 		super.updated(_changedProperties);
 		if (this._api === undefined) return;
 
+		if (_changedProperties.has('api')) {
+			this._api.loadTree();
+		}
+
 		if (_changedProperties.has('selectionConfiguration')) {
 			this._selectionConfiguration = this.selectionConfiguration;
 			this._api!.selection.setMultiple(this._selectionConfiguration.multiple ?? false);
