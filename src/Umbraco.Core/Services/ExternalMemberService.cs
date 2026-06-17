@@ -371,6 +371,154 @@ internal sealed class ExternalMemberService : RepositoryService, IExternalMember
         return Attempt.SucceedWithStatus(ExternalMemberOperationStatus.Success, result);
     }
 
+    /// <inheritdoc />
+    public async Task<ExternalMemberOperationStatus> ValidateConvertToExternalMemberAsync(Guid memberKey, bool requireExternalLogin = true)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        (ExternalMemberOperationStatus status, _) = await ValidateConvertToExternalMemberInternalAsync(memberKey, requireExternalLogin);
+        return status;
+    }
+
+    /// <inheritdoc />
+    public async Task<Attempt<ExternalMemberIdentity?, ExternalMemberOperationStatus>> ConvertToExternalMemberAsync(
+        Guid memberKey,
+        Action<ExternalMemberIdentity, IMember>? mapProfileData = null,
+        bool requireExternalLogin = true)
+    {
+        ExternalMemberIdentity identity;
+        IReadOnlyCollection<IExternalLogin> capturedLogins;
+        IReadOnlyCollection<IExternalLoginToken> capturedTokens;
+
+        // Scope A — validate, capture state, delete the content member and persist the external identity.
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        {
+            (ExternalMemberOperationStatus status, IMember? member) = await ValidateConvertToExternalMemberInternalAsync(memberKey, requireExternalLogin);
+            if (status != ExternalMemberOperationStatus.Success)
+            {
+                scope.Complete();
+                return Attempt.FailWithStatus<ExternalMemberIdentity?, ExternalMemberOperationStatus>(status, null);
+            }
+
+            // Capture group memberships and external login links before the member is deleted.
+            var roleNames = _memberService.GetAllRoles(member!.Username).ToArray();
+            capturedLogins = _externalLoginRepository
+                .Get(Query<IIdentityUserLogin>().Where(x => x.Key == memberKey))
+                .Select(x => (IExternalLogin)new ExternalLogin(x.LoginProvider, x.ProviderKey, x.UserData))
+                .ToArray();
+            capturedTokens = _externalLoginRepository
+                .Get(Query<IIdentityUserToken>().Where(x => x.Key == memberKey))
+                .Select(x => (IExternalLoginToken)new ExternalLoginToken(x.LoginProvider, x.Name, x.Value))
+                .ToArray();
+
+            DateTime now = DateTime.UtcNow;
+            identity = new ExternalMemberIdentity
+            {
+                // Preserve the Guid key so external login links continue to resolve.
+                Key = member.Key,
+                Email = member.Email,
+                UserName = member.Username,
+                Name = member.Name,
+                IsApproved = member.IsApproved,
+                IsLockedOut = member.IsLockedOut,
+                CreateDate = member.CreateDate,
+                UpdateDate = now,
+
+                // Invalidate active sessions by setting a new security stamp.
+                SecurityStamp = Guid.NewGuid().ToString(),
+            };
+
+            // Allow the caller to map content properties into the identity (e.g. profile data) before save.
+            mapProfileData?.Invoke(identity, member);
+
+            EventMessages evtMsgs = EventMessagesFactory.Get();
+            var savingNotification = new ExternalMemberSavingNotification(identity, evtMsgs);
+            if (scope.Notifications.PublishCancelable(savingNotification))
+            {
+                // Roll back: leave the content member untouched.
+                return Attempt.FailWithStatus<ExternalMemberIdentity?, ExternalMemberOperationStatus>(ExternalMemberOperationStatus.CancelledByNotification, null);
+            }
+
+            // Delete the content member. This queues a deferred MemberDeletedNotification which, at the end
+            // of the outermost scope, deletes the external login links by key — hence the re-link in scope B.
+            Attempt<OperationResult?> deleteResult = _memberService.Delete(member);
+            if (deleteResult.Success is false)
+            {
+                // Delete was cancelled by a notification handler; roll back without persisting the identity.
+                return Attempt.FailWithStatus<ExternalMemberIdentity?, ExternalMemberOperationStatus>(ExternalMemberOperationStatus.CancelledByNotification, null);
+            }
+
+            // Persist the external identity. The content row is deleted within this transaction, so the
+            // external store's unique indexes (key/username/email) no longer collide.
+            var id = await _repository.CreateAsync(identity);
+            identity.Id = id;
+
+            if (roleNames.Length > 0)
+            {
+                var groupIds = ResolveGroupIds(roleNames);
+                await _repository.AssignRolesAsync(id, groupIds);
+            }
+
+            scope.Notifications.Publish(
+                new ExternalMemberSavedNotification(identity, evtMsgs).WithStateFrom(savingNotification));
+
+            scope.Complete();
+        }
+
+        // Scope B — re-link external logins and tokens. The deferred delete handler from scope A has now
+        // removed them, so they must be re-saved against the preserved member key.
+        if (capturedLogins.Count > 0 || capturedTokens.Count > 0)
+        {
+            using ICoreScope scope = ScopeProvider.CreateCoreScope();
+            if (capturedLogins.Count > 0)
+            {
+                _externalLoginRepository.Save(memberKey, capturedLogins);
+            }
+
+            if (capturedTokens.Count > 0)
+            {
+                _externalLoginRepository.Save(memberKey, capturedTokens);
+            }
+
+            scope.Complete();
+        }
+
+        return Attempt.SucceedWithStatus<ExternalMemberIdentity?, ExternalMemberOperationStatus>(ExternalMemberOperationStatus.Success, identity);
+    }
+
+    private async Task<(ExternalMemberOperationStatus Status, IMember? Member)> ValidateConvertToExternalMemberInternalAsync(Guid memberKey, bool requireExternalLogin)
+    {
+        IMember? member = _memberService.GetById(memberKey);
+        if (member is null)
+        {
+            return (ExternalMemberOperationStatus.NotFound, null);
+        }
+
+        if (requireExternalLogin
+            && _externalLoginRepository.Get(Query<IIdentityUserLogin>().Where(x => x.Key == memberKey)).Any() is false)
+        {
+            return (ExternalMemberOperationStatus.NoExternalLogin, member);
+        }
+
+        // The content member legitimately owns its username/email, so exclude it from the uniqueness
+        // checks (which span both stores) — only a *different* record clashing is a real conflict.
+        ExternalMemberOperationStatus? uniquenessResult = await ValidateUsernameUniqueAsync(member.Username, memberKey);
+        if (uniquenessResult is not null)
+        {
+            return (uniquenessResult.Value, member);
+        }
+
+        if (_securitySettings.CurrentValue.MemberRequireUniqueEmail)
+        {
+            uniquenessResult = await ValidateEmailUniqueAsync(member.Email, memberKey);
+            if (uniquenessResult is not null)
+            {
+                return (uniquenessResult.Value, member);
+            }
+        }
+
+        return (ExternalMemberOperationStatus.Success, member);
+    }
+
     private async Task<ExternalMemberOperationStatus?> ValidateUsernameUniqueAsync(string username, Guid? excludeKey)
     {
         // Check external store.

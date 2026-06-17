@@ -4,6 +4,7 @@
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Tests.Common.Builders;
@@ -24,6 +25,8 @@ internal sealed class ExternalMemberServiceTests : UmbracoIntegrationTest
     private IMemberTypeService MemberTypeService => GetRequiredService<IMemberTypeService>();
 
     private IMemberService MemberService => GetRequiredService<IMemberService>();
+
+    private IExternalLoginWithKeyService ExternalLoginService => GetRequiredService<IExternalLoginWithKeyService>();
 
     [Test]
     public async Task Can_Create_And_Get_External_Member()
@@ -363,4 +366,151 @@ internal sealed class ExternalMemberServiceTests : UmbracoIntegrationTest
         Assert.AreEqual(ExternalMemberOperationStatus.NotFound, result.Status);
     }
 
+    [Test]
+    public async Task Can_Convert_Content_To_External_Member()
+    {
+        // Arrange — content member with a group, a property value and an external login link.
+        IMember member = await CreateContentMemberAsync("convert-to-external@test.com", "convert-to-external", title: "Engineer");
+
+        MemberService.AddRole("ToExternalGroup");
+        MemberService.AssignRoles([member.Id], ["ToExternalGroup"]);
+
+        ExternalLoginService.Save(member.Key, new[] { new ExternalLogin("TestProvider", "provider-key-123") });
+
+        var originalKey = member.Key;
+
+        // Act — map the content "title" property into the external member's profile data.
+        string? capturedTitle = null;
+        var result = await ExternalMemberService.ConvertToExternalMemberAsync(
+            originalKey,
+            (identity, source) =>
+            {
+                capturedTitle = source.GetValue<string>("title");
+                identity.ProfileData = $$"""{"title":"{{capturedTitle}}"}""";
+            });
+
+        // Assert — external member created with the same key and identity fields.
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(ExternalMemberOperationStatus.Success, result.Status);
+        Assert.IsNotNull(result.Result);
+        Assert.AreEqual(originalKey, result.Result!.Key);
+        Assert.AreEqual("convert-to-external@test.com", result.Result.Email);
+        Assert.AreEqual("convert-to-external", result.Result.UserName);
+
+        // Assert — callback ran against the source member and profile data was persisted.
+        Assert.AreEqual("Engineer", capturedTitle);
+        var externalMember = await ExternalMemberService.GetByKeyAsync(originalKey);
+        Assert.IsNotNull(externalMember);
+        Assert.AreEqual("""{"title":"Engineer"}""", externalMember!.ProfileData);
+
+        // Assert — the content member is gone.
+        Assert.IsNull(MemberService.GetById(originalKey));
+
+        // Assert — group memberships migrated to the external store.
+        IEnumerable<string> externalRoles = await ExternalMemberService.GetRolesAsync(originalKey);
+        CollectionAssert.Contains(externalRoles.ToList(), "ToExternalGroup");
+    }
+
+    [Test]
+    public async Task Convert_Content_To_External_Preserves_External_Login()
+    {
+        // Arrange — content member with an external login link and a token.
+        IMember member = await CreateContentMemberAsync("preserve-login@test.com", "preserve-login");
+        var originalKey = member.Key;
+
+        ExternalLoginService.Save(originalKey, new[] { new ExternalLogin("TestProvider", "provider-key-abc", "user-data") });
+        ExternalLoginService.Save(originalKey, new[] { new ExternalLoginToken("TestProvider", "access_token", "token-value") });
+
+        // Act
+        var result = await ExternalMemberService.ConvertToExternalMemberAsync(originalKey);
+
+        // Assert — the login link and token survive the conversion (deleting the content member queues a
+        // deferred handler that wipes the links; the second scope must re-link them).
+        Assert.IsTrue(result.Success);
+
+        var logins = ExternalLoginService.GetExternalLogins(originalKey).ToList();
+        Assert.AreEqual(1, logins.Count);
+        Assert.AreEqual("TestProvider", logins[0].LoginProvider);
+        Assert.AreEqual("provider-key-abc", logins[0].ProviderKey);
+        Assert.AreEqual("user-data", logins[0].UserData);
+
+        var tokens = ExternalLoginService.GetExternalLoginTokens(originalKey).ToList();
+        Assert.AreEqual(1, tokens.Count);
+        Assert.AreEqual("access_token", tokens[0].Name);
+        Assert.AreEqual("token-value", tokens[0].Value);
+    }
+
+    [Test]
+    public async Task Convert_Content_To_External_Returns_NoExternalLogin_When_No_Link()
+    {
+        // Arrange — a password-only content member with no external login link.
+        IMember member = await CreateContentMemberAsync("no-link@test.com", "no-link");
+        var originalKey = member.Key;
+
+        // Act + Assert — by default the conversion is rejected and the member is left untouched.
+        var guardedResult = await ExternalMemberService.ConvertToExternalMemberAsync(originalKey);
+        Assert.IsFalse(guardedResult.Success);
+        Assert.AreEqual(ExternalMemberOperationStatus.NoExternalLogin, guardedResult.Status);
+        Assert.IsNotNull(MemberService.GetById(originalKey), "The failed guard must not mutate the member.");
+
+        // Act + Assert — forcing the conversion succeeds (auto-link recreates a link on next sign-in).
+        var forcedResult = await ExternalMemberService.ConvertToExternalMemberAsync(originalKey, requireExternalLogin: false);
+        Assert.IsTrue(forcedResult.Success);
+        Assert.AreEqual(ExternalMemberOperationStatus.Success, forcedResult.Status);
+        Assert.IsNull(MemberService.GetById(originalKey));
+        Assert.IsNotNull(await ExternalMemberService.GetByKeyAsync(originalKey));
+    }
+
+    [Test]
+    public async Task Convert_Content_To_External_Returns_NotFound_For_NonExistent()
+    {
+        // Act
+        var result = await ExternalMemberService.ConvertToExternalMemberAsync(Guid.NewGuid());
+
+        // Assert
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ExternalMemberOperationStatus.NotFound, result.Status);
+    }
+
+    [Test]
+    public async Task ValidateConvertToExternalMember_Reports_Status_Without_Mutating()
+    {
+        // Arrange — member with a link (valid) and a member without one (invalid under the guard).
+        IMember linkedMember = await CreateContentMemberAsync("validate-linked@test.com", "validate-linked");
+        ExternalLoginService.Save(linkedMember.Key, new[] { new ExternalLogin("TestProvider", "provider-key-xyz") });
+
+        IMember unlinkedMember = await CreateContentMemberAsync("validate-unlinked@test.com", "validate-unlinked");
+
+        // Act
+        var linkedStatus = await ExternalMemberService.ValidateConvertToExternalMemberAsync(linkedMember.Key);
+        var unlinkedStatus = await ExternalMemberService.ValidateConvertToExternalMemberAsync(unlinkedMember.Key);
+        var missingStatus = await ExternalMemberService.ValidateConvertToExternalMemberAsync(Guid.NewGuid());
+
+        // Assert — correct statuses reported.
+        Assert.AreEqual(ExternalMemberOperationStatus.Success, linkedStatus);
+        Assert.AreEqual(ExternalMemberOperationStatus.NoExternalLogin, unlinkedStatus);
+        Assert.AreEqual(ExternalMemberOperationStatus.NotFound, missingStatus);
+
+        // Assert — validation mutated nothing: both members still exist as content members.
+        Assert.IsNotNull(MemberService.GetById(linkedMember.Key));
+        Assert.IsNotNull(MemberService.GetById(unlinkedMember.Key));
+        Assert.IsNull(await ExternalMemberService.GetByKeyAsync(linkedMember.Key));
+    }
+
+    private async Task<IMember> CreateContentMemberAsync(string email, string username, string? title = null)
+    {
+        // A distinct member type alias per call, since several members may be created within one test.
+        var alias = "memberType" + username.Replace("-", string.Empty);
+        IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType(alias, alias);
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
+
+        IMember member = MemberBuilder.CreateSimpleMember(memberType, username, email, "password", username);
+        if (title is not null)
+        {
+            member.SetValue("title", title);
+        }
+
+        MemberService.Save(member);
+        return member;
+    }
 }
