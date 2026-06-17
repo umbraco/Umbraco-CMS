@@ -16,7 +16,7 @@ export const manifest: ManifestPropertyEditorSchema = {
 				},
 				{
 					alias: 'storageType',
-					label: 'Storage Type',
+					label: 'Storage type',
 					description:
 						'Select whether to store the tags in cache as JSON (default) or CSV format. Notice that CSV does not support commas in the tag value.',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Select',
@@ -26,6 +26,12 @@ export const manifest: ManifestPropertyEditorSchema = {
 							value: ['Csv', 'Json'],
 						},
 					],
+				},
+				{
+					alias: 'preserveCommas',
+					label: 'Preserve commas in tags',
+					description: 'Only applicable when tags are stored in the cache in JSON format.',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
 				},
 			],
 			defaultData: [

@@ -3,22 +3,26 @@ import type { UmbTagsInputElement } from '../../components/tags-input/tags-input
 import { expect, fixture, html } from '@open-wc/testing';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { type UmbTestRunnerWindow, defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
+import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
 describe('UmbPropertyEditorUITagsElement', () => {
 	let element: UmbPropertyEditorUITagsElement;
+	let inputElement: UmbTagsInputElement;
 
 	beforeEach(async () => {
 		element = await fixture(html` <umb-property-editor-ui-tags></umb-property-editor-ui-tags> `);
+		inputElement = element.shadowRoot?.querySelector('umb-tags-input') as UmbTagsInputElement;
 	});
 
 	it('is defined with its own instance', () => {
 		expect(element).to.be.instanceOf(UmbPropertyEditorUITagsElement);
 	});
 
-	it('preserves tags containing commas', async () => {
-		const tagsInput = element.shadowRoot!.querySelector('umb-tags-input') as UmbTagsInputElement;
-		tagsInput.items = ['hello', 'world, with comma', 'foo'];
-		tagsInput.dispatchEvent(new UmbChangeEvent());
+	it('should preserve tags containing commas', async () => {
+		element.config = new UmbPropertyEditorConfigCollection([{ alias: 'preserveCommas', value: true }]);
+		await element.updateComplete;
+		inputElement.items = ['hello', 'world, with comma', 'foo'];
+		inputElement.dispatchEvent(new UmbChangeEvent());
 		await element.updateComplete;
 		expect(element.value).to.deep.equal(['hello', 'world, with comma', 'foo']);
 	});

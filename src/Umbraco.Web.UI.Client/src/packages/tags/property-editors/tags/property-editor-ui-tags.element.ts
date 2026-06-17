@@ -47,12 +47,16 @@ export class UmbPropertyEditorUITagsElement
 	private _storageType?: string;
 
 	@state()
+	private _preserveCommas?: boolean;
+
+	@state()
 	private _culture?: string | null;
 	//TODO: Use type from VariantID
 
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		this._group = config?.getValueByAlias('group');
 		this._storageType = config?.getValueByAlias('storageType');
+		this._preserveCommas = config?.getValueByAlias('preserveCommas');
 	}
 
 	constructor() {
@@ -74,7 +78,10 @@ export class UmbPropertyEditorUITagsElement
 	#onChange(event: UmbChangeEvent) {
 		event.stopPropagation();
 		const tagsInput = event.currentTarget as UmbTagsInputElement;
-		this.value = this._storageType?.toLowerCase() === 'csv' ? (tagsInput.value as string).split(',') : tagsInput.items;
+		this.value =
+			this._storageType?.toLowerCase() === 'csv' || !this._preserveCommas
+				? (tagsInput.value as string).split(',')
+				: tagsInput.items;
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
