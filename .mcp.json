@@ -9,6 +9,10 @@
       "args": [
         "@playwright/mcp@latest"
       ]
+    },
+    "wcag": {
+      "command": "npx",
+      "args": ["-y", "wcag-guidelines-mcp"]
     }
   }
 }
