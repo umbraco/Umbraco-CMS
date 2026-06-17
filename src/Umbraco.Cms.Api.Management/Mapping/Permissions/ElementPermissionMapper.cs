@@ -21,25 +21,34 @@ public class ElementPermissionMapper : IPermissionPresentationMapper, IPermissio
 {
     private readonly Lazy<IElementPermissionService> _elementPermissionService;
 
-    // TODO (V20): When the obsolete constructor is removed, update the registration in UserGroupsBuilderExtensions to use:
-    //      builder.Services.AddSingleton<IPermissionMapper, ElementPermissionMapper>();
-    //      builder.Services.AddSingleton<IPermissionPresentationMapper, ElementPermissionMapper>();
-    // rather than:
-    //      builder.Services.AddSingleton<IPermissionMapper>(sp => ActivatorUtilities.CreateInstance<ElementPermissionMapper>(sp));
-    //      builder.Services.AddSingleton<IPermissionPresentationMapper>(sp => ActivatorUtilities.CreateInstance<ElementPermissionMapper>(sp));
-
     /// <summary>
     /// Initializes a new instance of the <see cref="ElementPermissionMapper"/> class.
     /// </summary>
     /// <param name="elementPermissionService">The element permission service.</param>
-    [ActivatorUtilitiesConstructor]
-    public ElementPermissionMapper(
-        Lazy<IElementPermissionService> elementPermissionService) => _elementPermissionService = elementPermissionService;
+    public ElementPermissionMapper(Lazy<IElementPermissionService> elementPermissionService)
+        => _elementPermissionService = elementPermissionService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ElementPermissionMapper"/> class.
     /// </summary>
-    [Obsolete("Please use the constructor taking only the Lazy<IElementPermissionService> instance. Scheduled for removal in Umbraco 20.")]
+    /// <remarks>
+    /// This constructor exists only to give the dependency injection container an unambiguous (greediest) constructor
+    /// to select while the obsolete constructors remain. Use the constructor taking only the
+    /// <see cref="Lazy{T}"/> of <see cref="IElementPermissionService"/>.
+    /// </remarks>
+    [Obsolete("This constructor exists only to satisfy dependency injection. Please use the constructor taking only Lazy<IElementPermissionService>. Scheduled for removal in Umbraco 20.")]
+    public ElementPermissionMapper(
+        Lazy<IEntityService> entityService,
+        Lazy<IUserService> userService,
+        Lazy<IElementPermissionService> elementPermissionService)
+        : this(elementPermissionService)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ElementPermissionMapper"/> class.
+    /// </summary>
+    [Obsolete("Please use the constructor taking only Lazy<IElementPermissionService>. Scheduled for removal in Umbraco 20.")]
     public ElementPermissionMapper(Lazy<IEntityService> entityService, Lazy<IUserService> userService)
         : this(
             new Lazy<IElementPermissionService>(StaticServiceProvider.Instance.GetRequiredService<IElementPermissionService>))
