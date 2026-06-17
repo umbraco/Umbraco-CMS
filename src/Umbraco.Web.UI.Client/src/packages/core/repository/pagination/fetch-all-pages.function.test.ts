@@ -1,6 +1,7 @@
 import { expect } from '@open-wc/testing';
 import { fetchAllPages } from './fetch-all-pages.function.js';
-import type { UmbDataSourceResponse, UmbPagedModel } from '@umbraco-cms/backoffice/repository';
+import type { UmbDataSourceResponse } from '../data-source-response.interface.js';
+import type { UmbPagedModel } from '../types.js';
 
 interface TestItem {
 	id: number;

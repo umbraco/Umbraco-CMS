@@ -1,4 +1,5 @@
-import type { UmbDataSourceResponse, UmbPagedModel } from '@umbraco-cms/backoffice/repository';
+import type { UmbDataSourceResponse } from '../data-source-response.interface.js';
+import type { UmbPagedModel } from '../types.js';
 
 /**
  * A function that returns a single page of an offset-paginated collection.
