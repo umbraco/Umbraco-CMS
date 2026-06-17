@@ -1056,7 +1056,7 @@ export default {
 		greeting5: 'Willkommen',
 		greeting6: 'Willkommen',
 		instruction: 'Hier anmelden:',
-		signInWith: 'Anmelden mit',
+		signInWith: 'Anmelden mit {0}',
 		timeout: 'Sitzung abgelaufen',
 		forgottenPassword: 'Kennwort vergessen?',
 		forgottenPasswordInstruction:

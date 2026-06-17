@@ -943,7 +943,7 @@ export default {
 		greeting5: 'Welkom',
 		greeting6: 'Welkom',
 		instruction: 'log hieronder in',
-		signInWith: 'Inloggen met',
+		signInWith: 'Inloggen met {0}',
 		timeout: 'Sessie is verlopen',
 		forgottenPassword: 'Wachtwoord vergeten?',
 		forgottenPasswordInstruction:
