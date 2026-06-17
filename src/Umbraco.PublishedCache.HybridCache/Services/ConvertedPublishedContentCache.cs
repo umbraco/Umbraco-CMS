@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using BitFaster.Caching.Lfu;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models.PublishedContent;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache.Services;
@@ -75,24 +76,7 @@ internal sealed class ConvertedPublishedContentCache<TKey>
             // Bounded: estimate by sizing a bounded sample and scaling by the entry count, so this stays
             // cheap regardless of the configured capacity. Enumerating is a snapshot read and does not
             // register an access, so it does not distort the eviction policy's frequency tracking.
-            long count = _bounded!.Count;
-            if (count == 0)
-            {
-                return 0;
-            }
-
-            long sampled = 0;
-            long sampledBytes = 0;
-            foreach (KeyValuePair<TKey, CacheEntry> entry in _bounded)
-            {
-                sampledBytes += entry.Value.Size;
-                if (++sampled >= ByteEstimateSampleSize)
-                {
-                    break;
-                }
-            }
-
-            return sampled == 0 ? 0 : count * (sampledBytes / sampled);
+            return SampledSizeEstimator.Estimate(_bounded!.Count, _bounded, entry => entry.Value.Size, ByteEstimateSampleSize);
         }
     }
 

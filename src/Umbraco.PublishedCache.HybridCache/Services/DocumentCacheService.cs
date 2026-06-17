@@ -163,7 +163,12 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
         }
 
         IPublishedContent? result = _publishedContentFactory.ToIPublishedContent(contentCacheNode, preview).CreateModel(_publishedModelFactory);
-        if (result is not null)
+
+        // Only published content is stored in L0: the read fast path above is guarded by preview is false, so a
+        // draft entry would never be served back, and draft keys have no per-key invalidation (RemoveFromMemoryCacheAsync
+        // only removes the published key) so they would linger until a full clear. In bounded mode they would also
+        // waste eviction slots and dilute the W-TinyLFU frequency signal.
+        if (result is not null && preview is false)
         {
             // The size estimate runs unconditionally (not only when reporting is enabled): it is cheap
             // (O(properties), no IO/decompression) and only on the cache-miss path, and keeping the running
