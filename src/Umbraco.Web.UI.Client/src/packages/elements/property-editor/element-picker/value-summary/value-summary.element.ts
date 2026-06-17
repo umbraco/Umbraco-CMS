@@ -30,6 +30,7 @@ export class UmbElementPickerPropertyEditorValueSummaryElement extends UmbValueS
 				this.#resolvers.get(unique)?.destroy();
 				this.#resolvers.delete(unique);
 				this.#resolvedNames.delete(unique);
+				this.removeUmbControllerByAlias(`element-${unique}`);
 			}
 		}
 
@@ -46,6 +47,8 @@ export class UmbElementPickerPropertyEditorValueSummaryElement extends UmbValueS
 					},
 					`element-${item.unique}`,
 				);
+			} else {
+				this.#resolvers.get(item.unique)!.setData(item);
 			}
 		}
 
