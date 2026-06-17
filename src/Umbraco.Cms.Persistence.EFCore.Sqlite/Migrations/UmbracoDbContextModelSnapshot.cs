@@ -537,7 +537,7 @@ namespace Umbraco.Cms.Persistence.EFCore.Sqlite.Migrations
                         .HasColumnName("thumbnail")
                         .UseCollation("NOCASE");
 
-                    b.Property<byte>("Variations")
+                    b.Property<int>("Variations")
                         .HasColumnType("INTEGER")
                         .HasColumnName("variations");
 
@@ -885,7 +885,7 @@ namespace Umbraco.Cms.Persistence.EFCore.Sqlite.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnName("createDate");
 
-                    b.Property<short>("Level")
+                    b.Property<int>("Level")
                         .HasColumnType("INTEGER")
                         .HasColumnName("level");
 
@@ -1028,7 +1028,7 @@ namespace Umbraco.Cms.Persistence.EFCore.Sqlite.Migrations
                         .HasColumnName("validationRegExpMessage")
                         .UseCollation("NOCASE");
 
-                    b.Property<byte>("Variations")
+                    b.Property<int>("Variations")
                         .HasColumnType("INTEGER")
                         .HasColumnName("variations");
 
@@ -1074,10 +1074,10 @@ namespace Umbraco.Cms.Persistence.EFCore.Sqlite.Migrations
                         .HasColumnName("text")
                         .UseCollation("NOCASE");
 
-                    b.Property<short>("Type")
+                    b.Property<int>("Type")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER")
-                        .HasDefaultValue((short)0)
+                        .HasDefaultValue(0)
                         .HasColumnName("type");
 
                     b.Property<Guid>("UniqueId")
@@ -1239,10 +1239,10 @@ namespace Umbraco.Cms.Persistence.EFCore.Sqlite.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnName("key");
 
-                    b.Property<short>("Kind")
+                    b.Property<int>("Kind")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER")
-                        .HasDefaultValue((short)0)
+                        .HasDefaultValue(0)
                         .HasColumnName("kind");
 
                     b.Property<DateTime?>("LastLockoutDate")

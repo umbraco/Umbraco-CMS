@@ -164,6 +164,18 @@ public class UmbracoDbContext : DbContext
         optionsBuilder.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
     }
 
+    protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+    {
+        base.ConfigureConventions(configurationBuilder);
+
+        // Umbraco's schema maps every byte/short CLR property to an int column (SqlSyntaxProviderBase resolves
+        // both to IntColumnDefinition). NPoco narrows on read, but EF Core's strict materializer throws an
+        // InvalidCastException reading an int column into a byte/short property on SQL Server. Convert globally so
+        // the EF model matches the actual column type.
+        configurationBuilder.Properties<byte>().HaveConversion<int>();
+        configurationBuilder.Properties<short>().HaveConversion<int>();
+    }
+
     /// <summary>
     /// A Update or Insert helper. If there's nothing to update, this method inserts.
     /// </summary>

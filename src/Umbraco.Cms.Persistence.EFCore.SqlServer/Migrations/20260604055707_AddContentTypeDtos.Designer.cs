@@ -499,8 +499,8 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("thumbnail");
 
-                    b.Property<byte>("Variations")
-                        .HasColumnType("tinyint")
+                    b.Property<int>("Variations")
+                        .HasColumnType("int")
                         .HasColumnName("variations");
 
                     b.HasKey("PrimaryKey");
@@ -839,8 +839,8 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("createDate");
 
-                    b.Property<short>("Level")
-                        .HasColumnType("smallint")
+                    b.Property<int>("Level")
+                        .HasColumnType("int")
                         .HasColumnName("level");
 
                     b.Property<Guid?>("NodeObjectType")
@@ -976,8 +976,8 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                         .HasColumnType("nvarchar(500)")
                         .HasColumnName("validationRegExpMessage");
 
-                    b.Property<byte>("Variations")
-                        .HasColumnType("tinyint")
+                    b.Property<int>("Variations")
+                        .HasColumnType("int")
                         .HasColumnName("variations");
 
                     b.HasKey("Id");
@@ -1022,10 +1022,10 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("text");
 
-                    b.Property<short>("Type")
+                    b.Property<int>("Type")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("smallint")
-                        .HasDefaultValue((short)0)
+                        .HasColumnType("int")
+                        .HasDefaultValue(0)
                         .HasColumnName("type");
 
                     b.Property<Guid>("UniqueId")
@@ -1188,10 +1188,10 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("key");
 
-                    b.Property<short>("Kind")
+                    b.Property<int>("Kind")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("smallint")
-                        .HasDefaultValue((short)0)
+                        .HasColumnType("int")
+                        .HasDefaultValue(0)
                         .HasColumnName("kind");
 
                     b.Property<DateTime?>("LastLockoutDate")

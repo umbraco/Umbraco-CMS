@@ -22,6 +22,12 @@ using Umbraco.Cms.Infrastructure.Persistence.Factories;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.EFCore;
 using Umbraco.Extensions;
 
+// EF1002: the raw SQL below interpolates only compile-time identifier constants (table/column names) and
+// server-generated integer ids — never user-controlled strings. All caller-supplied values (Guids, object-type
+// ids, IQuery clause arguments) are bound through the positional parameter array. Identifiers cannot be passed as
+// parameters, so ExecuteSqlInterpolated is not an option; the queries are not vulnerable to SQL injection.
+#pragma warning disable EF1002 // Risk of vulnerability to SQL injection.
+
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
 /// <summary>
@@ -1615,7 +1621,7 @@ internal sealed class ContentTypeRepository : AsyncEntityRepositoryBase<Guid, IC
              SELECT pd.versionId AS VersionId, pd.propertyTypeId AS PropertyTypeId,
              pd.languageId AS LanguageId, pd.segment AS Segment, pd.intValue AS IntValue, pd.decimalValue AS DecimalValue,
              pd.dateValue AS DateValue, pd.varcharValue AS VarcharValue, pd.textValue AS TextValue,
-             cv.nodeId AS NodeId, cv."current" AS "Current", COALESCE(dv.published, 0) AS Published, pt.variations AS Variations
+             cv.nodeId AS NodeId, cv."current" AS "Current", CAST(COALESCE(dv.published, 0) AS BIT) AS Published, pt.variations AS Variations
              FROM {Constants.DatabaseSchema.Tables.PropertyData} pd
              INNER JOIN {Constants.DatabaseSchema.Tables.ContentVersion} cv ON cv.id = pd.versionId
              INNER JOIN {PropertyTypeDto.TableName} pt ON pt.{PropertyTypeDto.PrimaryKeyColumnName} = pd.propertyTypeId
@@ -1924,7 +1930,9 @@ internal sealed class ContentTypeRepository : AsyncEntityRepositoryBase<Guid, IC
 
         public bool Published { get; set; }
 
-        public byte Variations { get; set; }
+        // The cmsPropertyType.variations column is an int on SQL Server (Umbraco maps byte/short to int columns);
+        // read it as int and cast to ContentVariation at the use site.
+        public int Variations { get; set; }
     }
 
     private sealed class DocumentCultureVariationRow
