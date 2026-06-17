@@ -273,9 +273,41 @@ HybridCache API is experimental (suppressed with `#pragma warning disable EXTEXP
 
 Before returning cached content, verifies ancestor path is published via `_publishStatusQueryService.HasPublishedAncestorPath()`. Returns null if parent unpublished.
 
-### In-Memory Content Cache (DocumentCacheService.cs line 39)
+### In-Memory Content Cache (the L0 converted-content cache)
 
-Secondary `ConcurrentDictionary<string, IPublishedContent>` caches converted objects, since `ContentCacheNode` to `IPublishedContent` conversion is expensive.
+The converted `IPublishedContent` objects are cached in `ConvertedPublishedContentCache<TKey>`
+(`Services/ConvertedPublishedContentCache.cs`), used by `DocumentCacheService` (`<string>`) and
+`MediaCacheService` (`<Guid>`), since `ContentCacheNode` → `IPublishedContent` conversion is expensive.
+This is the single insert/remove/clear path for the L0 cache (the seam a later bounded/eviction-aware
+implementation slots into), and it tracks both the entry count and an approximate retained byte total.
+The cache is currently **unbounded** — only evicted on content change / explicit clear, so walking the
+whole published tree (Delivery API crawl, sitemap, warm-up) retains the whole tree's converted form.
+Bounding it with a scan-resistant policy is tracked separately; the observability below quantifies it.
+
+### Memory observability
+
+The in-memory structures whose footprint scales with the size of the content tree implement
+`IMemoryCacheSizeReporter` (`Umbraco.Cms.Core.Cache`), exposing an approximate retained **entry count** and
+(where cheaply derivable) an approximate **byte** estimate:
+
+| Reporter (`CacheName`) | Structure | Byte estimate |
+|------------------------|-----------|---------------|
+| `Published content (converted, L0)` | `DocumentCacheService` L0 cache | running total of per-entry node-size estimates |
+| `Published media (converted, L0)` | `MediaCacheService` L0 cache | running total of per-entry node-size estimates |
+| `Document URL segments` | `DocumentUrlService._documentUrlCache` (≈ documents × cultures × draft/published) | sampled structural estimate |
+| `Document navigation` / `Media navigation` | the in-memory navigation trees (active + recycle bin) | sampled structural estimate |
+
+`MemoryCacheSizeReportingJob` (a recurring job, all server roles, 1-minute period) logs each count and byte
+estimate plus `GC.GetTotalMemory` and `Environment.WorkingSet` **at `Debug` level** — enable `Debug` for
+`Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs.MemoryCacheSizeReportingJob` to capture, e.g. during a
+reindex or crawl. Counts/bytes are a **trend/attribution** signal (a value that climbs and never falls
+indicates unbounded retention). The byte figures are coarse approximations, **not** a heap measurement: the
+L0 estimate is an *underlying-content lower bound* (`ContentCacheNodeSizeEstimator` sums the source node's
+stored content without decompressing or walking the converted graph, so it omits the property-editor-driven
+conversion blow-up); true per-object bytes come from a GC dump. Note the tiers: **L0** is the
+converted-`IPublishedContent` cache reported above; **L1** is Microsoft HybridCache's in-process tier of
+`ContentCacheNode` entries (behind L0); **L2** is the optional distributed tier. The HybridCache **L1** has
+no exposed count/size — measure it from the GC dump until a sized backing cache is wired up (PR 3).
 
 ### Known Technical Debt
 

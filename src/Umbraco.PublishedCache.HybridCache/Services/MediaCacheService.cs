@@ -1,11 +1,11 @@
 #if DEBUG
     using System.Diagnostics;
 #endif
-using System.Collections.Concurrent;
 using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
@@ -19,7 +19,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache.Services;
 
-internal sealed class MediaCacheService : IMediaCacheService
+internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeReporter
 {
     private readonly IDatabaseCacheRepository _databaseCacheRepository;
     private readonly IIdKeyMap _idKeyMap;
@@ -32,7 +32,7 @@ internal sealed class MediaCacheService : IMediaCacheService
     private readonly ILogger<MediaCacheService> _logger;
     private readonly CacheSettings _cacheSettings;
 
-    private readonly ConcurrentDictionary<Guid, IPublishedContent> _publishedContentCache = [];
+    private readonly ConvertedPublishedContentCache<Guid> _publishedContentCache = new();
 
     private HashSet<Guid>? _seedKeys;
     private HashSet<Guid> SeedKeys
@@ -79,6 +79,15 @@ internal sealed class MediaCacheService : IMediaCacheService
         _logger = logger;
     }
 
+    /// <inheritdoc />
+    public string CacheName => "Published media (converted, L0)";
+
+    /// <inheritdoc />
+    public long GetApproximateCount() => _publishedContentCache.Count;
+
+    /// <inheritdoc />
+    public long? GetApproximateBytes() => _publishedContentCache.ApproximateSizeInBytes;
+
     public async Task<IPublishedContent?> GetByKeyAsync(Guid key)
     {
         Attempt<int> idAttempt = _idKeyMap.GetIdForKey(key, UmbracoObjectTypes.Media);
@@ -106,7 +115,7 @@ internal sealed class MediaCacheService : IMediaCacheService
     public bool TryGetCached(Guid key, out IPublishedContent? content)
     {
         // Mirror the L0 (published content cache) fast path in GetNodeAsync.
-        if (_publishedContentCache.TryGetValue(key, out content))
+        if (_publishedContentCache.TryGet(key, out content))
         {
             return true;
         }
@@ -117,7 +126,7 @@ internal sealed class MediaCacheService : IMediaCacheService
 
     private async Task<IPublishedContent?> GetNodeAsync(Guid key)
     {
-        if (_publishedContentCache.TryGetValue(key, out IPublishedContent? cached))
+        if (_publishedContentCache.TryGet(key, out IPublishedContent? cached))
         {
             return cached;
         }
@@ -146,7 +155,10 @@ internal sealed class MediaCacheService : IMediaCacheService
         IPublishedContent? result = _publishedContentFactory.ToIPublishedMedia(contentCacheNode).CreateModel(_publishedModelFactory);
         if (result is not null)
         {
-            _publishedContentCache[key] = result;
+            // The size estimate runs unconditionally (not only when reporting is enabled): it is cheap
+            // (O(properties), no IO/decompression) and only on the cache-miss path, and keeping the running
+            // total always-current means it is accurate the moment debug reporting is switched on.
+            _publishedContentCache.Set(key, result, ContentCacheNodeSizeEstimator.EstimateBytes(contentCacheNode));
         }
 
         return result;
@@ -185,7 +197,7 @@ internal sealed class MediaCacheService : IMediaCacheService
 
         var cacheNode = _cacheNodeFactory.ToContentCacheNode(media);
         await _databaseCacheRepository.RefreshMediaAsync(cacheNode);
-        _publishedContentCache.Remove(media.Key, out _);
+        _publishedContentCache.Remove(media.Key);
         scope.Complete();
     }
 
@@ -262,7 +274,7 @@ internal sealed class MediaCacheService : IMediaCacheService
         if (publishedNode is not null)
         {
             await _hybridCache.SetAsync(GetCacheKey(publishedNode.Key), publishedNode, GetEntryOptions(publishedNode.Key));
-            _publishedContentCache.Remove(key, out _);
+            _publishedContentCache.Remove(key);
         }
         else
         {
@@ -300,7 +312,7 @@ internal sealed class MediaCacheService : IMediaCacheService
     public void ClearConvertedContentCache(IReadOnlyCollection<int> mediaTypeIds)
     {
         var ids = mediaTypeIds as int[] ?? mediaTypeIds.ToArray();
-        _publishedContentCache.RemoveAll(content => ids.Contains(content.Value.ContentType.Id));
+        _publishedContentCache.RemoveWhere(content => ids.Contains(content.ContentType.Id));
     }
 
     public void Rebuild(IReadOnlyCollection<int> contentTypeIds)
@@ -356,7 +368,7 @@ internal sealed class MediaCacheService : IMediaCacheService
     private async Task ClearPublishedCacheAsync(Guid key)
     {
         await _hybridCache.RemoveAsync(GetCacheKey(key));
-        _publishedContentCache.Remove(key, out _);
+        _publishedContentCache.Remove(key);
     }
 
     private static string MediaTypeIdTag(int mediaTypeId)
