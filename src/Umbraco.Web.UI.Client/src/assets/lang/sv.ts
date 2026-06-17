@@ -697,7 +697,7 @@ export default {
 		greeting5: 'Välkommen',
 		greeting6: 'Välkommen',
 		instruction: 'Logga in nedan',
-		signInWith: 'Logga in med',
+		signInWith: 'Logga in med {0}',
 		timeout: 'Sessionen har nått sin maxgräns',
 	},
 	main: {

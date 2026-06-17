@@ -924,7 +924,7 @@ export default {
 		greeting5: 'Bienvenue',
 		greeting6: 'Bienvenue',
 		instruction: 'Connectez-vous ci-dessous',
-		signInWith: 'Identifiez-vous avec',
+		signInWith: 'Identifiez-vous avec {0}',
 		timeout: 'La session a expiré',
 		bottomText:
 			'<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">Umbraco.com</a></p> ',
