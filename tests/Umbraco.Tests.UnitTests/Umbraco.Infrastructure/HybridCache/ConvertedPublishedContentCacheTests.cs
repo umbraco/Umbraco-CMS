@@ -99,25 +99,29 @@ public class ConvertedPublishedContentCacheTests
     [Test]
     public void Can_Retain_Frequently_Accessed_Items_Under_Scan_Pressure()
     {
-        // Capacity gives the hot set clear headroom so the hot items settle in the protected region (not the
-        // small admission window), keeping the assertion deterministic. The behaviour under test — frequently
-        // requested content surviving a one-off scan of more-recently-touched items, which a plain LRU would
-        // NOT do — does not depend on the exact numbers; this guards the behaviour even if the backing cache
-        // is swapped or reimplemented later.
-        var cache = new ConvertedPublishedContentCache<string>(maximumItems: 10);
+        // Integer keys are used deliberately: the W-TinyLFU admission policy estimates access frequency with a
+        // count-min sketch keyed off the entry's hash code, and .NET randomizes string.GetHashCode() per
+        // process. With string keys an unlucky per-process seed can collide a cold item's sketch buckets with a
+        // hot item's, inflating its estimate enough to evict the hot entry that is still cycling through
+        // probation — a green-locally / red-on-CI flake. Integer hash codes are stable across processes, so the
+        // sketch (and therefore this assertion) is deterministic. The high access count gives the hot set a wide
+        // frequency margin so the outcome is unambiguous; the behaviour under test — frequently requested content
+        // surviving a one-off scan of more-recently-touched items, which a plain LRU would NOT do — does not
+        // depend on the exact numbers, so this still guards the behaviour if the backing cache is swapped later.
+        var cache = new ConvertedPublishedContentCache<int>(maximumItems: 10);
 
-        string[] hot = ["hot-0", "hot-1", "hot-2"];
+        int[] hot = [0, 1, 2];
 
-        foreach (string key in hot)
+        foreach (int key in hot)
         {
             cache.Set(key, Content(), 10);
         }
 
         // Establish a high access frequency for the hot set. Maintenance runs between rounds (as it would on
         // a live site) so the accesses are recorded as frequency rather than dropped from the read buffer.
-        for (var round = 0; round < 10; round++)
+        for (var round = 0; round < 30; round++)
         {
-            foreach (string key in hot)
+            foreach (int key in hot)
             {
                 cache.TryGet(key, out _);
             }
@@ -127,16 +131,16 @@ public class ConvertedPublishedContentCacheTests
 
         // A one-off "scan" of other items, each requested once — these are touched more recently than the
         // hot set, so under a plain LRU they would evict it.
-        for (var i = 0; i < 20; i++)
+        for (var i = 100; i < 130; i++)
         {
-            cache.Set($"cold-{i}", Content(), 10);
+            cache.Set(i, Content(), 10);
         }
 
         cache.RunPendingMaintenance();
 
         Assert.Multiple(() =>
         {
-            foreach (string key in hot)
+            foreach (int key in hot)
             {
                 Assert.That(cache.TryGet(key, out _), Is.True, $"frequently accessed '{key}' should survive the scan");
             }
