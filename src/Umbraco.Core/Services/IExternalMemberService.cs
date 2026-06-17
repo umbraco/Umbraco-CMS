@@ -117,6 +117,23 @@ public interface IExternalMemberService
     Task<Attempt<IMember?, ExternalMemberOperationStatus>> ConvertToContentMemberAsync(Guid memberKey, string memberTypeAlias, Action<IMember, string?>? mapProfileData = null);
 
     /// <summary>
+    ///     Validates whether <see cref="ConvertToContentMemberAsync"/> would succeed for the given member,
+    ///     without mutating any data.
+    /// </summary>
+    /// <param name="memberKey">The unique key of the external member to validate for conversion.</param>
+    /// <param name="memberTypeAlias">The alias of the member type the content member would use.</param>
+    /// <returns>
+    ///     <see cref="ExternalMemberOperationStatus.Success"/> if the conversion would succeed; otherwise
+    ///     the status that would cause it to fail (<see cref="ExternalMemberOperationStatus.NotFound"/>,
+    ///     <see cref="ExternalMemberOperationStatus.InvalidMemberType"/>,
+    ///     <see cref="ExternalMemberOperationStatus.DuplicateUsername"/> or
+    ///     <see cref="ExternalMemberOperationStatus.DuplicateEmail"/>).
+    /// </returns>
+    // TODO (V20): make abstract / remove the default implementation when the obsolete period allows.
+    Task<ExternalMemberOperationStatus> ValidateConvertToContentMemberAsync(Guid memberKey, string memberTypeAlias)
+        => Task.FromResult(ExternalMemberOperationStatus.NotImplemented);
+
+    /// <summary>
     ///     Converts a full content-based member into an external-only (lightweight) member,
     ///     preserving its key, identity fields, group memberships and external login links.
     /// </summary>

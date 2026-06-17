@@ -40,6 +40,11 @@ public enum ExternalMemberOperationStatus
     NoExternalLogin,
 
     /// <summary>
+    ///     The operation failed because the specified member type alias does not exist.
+    /// </summary>
+    InvalidMemberType,
+
+    /// <summary>
     ///     The operation is not yet implemented.
     /// </summary>
     NotImplemented,

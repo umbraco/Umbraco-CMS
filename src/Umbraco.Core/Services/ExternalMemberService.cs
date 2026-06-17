@@ -23,6 +23,7 @@ internal sealed class ExternalMemberService : RepositoryService, IExternalMember
     private readonly IExternalMemberRepository _repository;
     private readonly IMemberService _memberService;
     private readonly IMemberGroupService _memberGroupService;
+    private readonly IMemberTypeService _memberTypeService;
     private readonly IExternalLoginWithKeyRepository _externalLoginRepository;
     private readonly IOptionsMonitor<SecuritySettings> _securitySettings;
     private readonly ILogger<ExternalMemberService> _logger;
@@ -37,6 +38,7 @@ internal sealed class ExternalMemberService : RepositoryService, IExternalMember
         IExternalMemberRepository repository,
         IMemberService memberService,
         IMemberGroupService memberGroupService,
+        IMemberTypeService memberTypeService,
         IExternalLoginWithKeyRepository externalLoginRepository,
         IOptionsMonitor<SecuritySettings> securitySettings)
         : base(provider, loggerFactory, eventMessagesFactory)
@@ -44,6 +46,7 @@ internal sealed class ExternalMemberService : RepositoryService, IExternalMember
         _repository = repository;
         _memberService = memberService;
         _memberGroupService = memberGroupService;
+        _memberTypeService = memberTypeService;
         _externalLoginRepository = externalLoginRepository;
         _securitySettings = securitySettings;
         _logger = loggerFactory.CreateLogger<ExternalMemberService>();
@@ -320,21 +323,28 @@ internal sealed class ExternalMemberService : RepositoryService, IExternalMember
     }
 
     /// <inheritdoc />
+    public async Task<ExternalMemberOperationStatus> ValidateConvertToContentMemberAsync(Guid memberKey, string memberTypeAlias)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        (ExternalMemberOperationStatus status, _) = await ValidateConvertToContentMemberInternalAsync(memberKey, memberTypeAlias);
+        return status;
+    }
+
+    /// <inheritdoc />
     public async Task<Attempt<IMember?, ExternalMemberOperationStatus>> ConvertToContentMemberAsync(Guid memberKey, string memberTypeAlias, Action<IMember, string?>? mapProfileData = null)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
-        // Load the external member.
-        ExternalMemberIdentity? externalMember = await _repository.GetByKeyAsync(memberKey);
-        if (externalMember is null)
+        (ExternalMemberOperationStatus status, ExternalMemberIdentity? externalMember) = await ValidateConvertToContentMemberInternalAsync(memberKey, memberTypeAlias);
+        if (status != ExternalMemberOperationStatus.Success)
         {
             scope.Complete();
-            return Attempt.FailWithStatus<IMember?, ExternalMemberOperationStatus>(ExternalMemberOperationStatus.NotFound, null);
+            return Attempt.FailWithStatus<IMember?, ExternalMemberOperationStatus>(status, null);
         }
 
-        // Create the content member entity.
+        // Create the content member entity (externalMember is guaranteed non-null when status is Success).
         IMember contentMember = _memberService.CreateMember(
-            externalMember.UserName,
+            externalMember!.UserName,
             externalMember.Email,
             externalMember.Name ?? externalMember.UserName,
             memberTypeAlias);
@@ -483,6 +493,40 @@ internal sealed class ExternalMemberService : RepositoryService, IExternalMember
         }
 
         return Attempt.SucceedWithStatus<ExternalMemberIdentity?, ExternalMemberOperationStatus>(ExternalMemberOperationStatus.Success, identity);
+    }
+
+    private async Task<(ExternalMemberOperationStatus Status, ExternalMemberIdentity? Member)> ValidateConvertToContentMemberInternalAsync(Guid memberKey, string memberTypeAlias)
+    {
+        ExternalMemberIdentity? externalMember = await _repository.GetByKeyAsync(memberKey);
+        if (externalMember is null)
+        {
+            return (ExternalMemberOperationStatus.NotFound, null);
+        }
+
+        if (_memberTypeService.Get(memberTypeAlias) is null)
+        {
+            return (ExternalMemberOperationStatus.InvalidMemberType, externalMember);
+        }
+
+        // The external member legitimately owns its username/email, so exclude it from the uniqueness
+        // checks (which span both stores) — only a *different* record clashing is a real conflict. For
+        // this direction the meaningful clash is a content member that already owns the username/email.
+        ExternalMemberOperationStatus? uniquenessResult = await ValidateUsernameUniqueAsync(externalMember.UserName, externalMember.Key);
+        if (uniquenessResult is not null)
+        {
+            return (uniquenessResult.Value, externalMember);
+        }
+
+        if (_securitySettings.CurrentValue.MemberRequireUniqueEmail)
+        {
+            uniquenessResult = await ValidateEmailUniqueAsync(externalMember.Email, externalMember.Key);
+            if (uniquenessResult is not null)
+            {
+                return (uniquenessResult.Value, externalMember);
+            }
+        }
+
+        return (ExternalMemberOperationStatus.Success, externalMember);
     }
 
     private async Task<(ExternalMemberOperationStatus Status, IMember? Member)> ValidateConvertToExternalMemberInternalAsync(Guid memberKey, bool requireExternalLogin)

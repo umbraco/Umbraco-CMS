@@ -367,6 +367,80 @@ internal sealed class ExternalMemberServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
+    public async Task Convert_External_To_Content_Returns_InvalidMemberType_For_Unknown_Alias()
+    {
+        // Arrange
+        var identity = ExternalMemberIdentityBuilder.CreateSimple("invalid-type@test.com", "Invalid Type Test");
+        var createResult = await ExternalMemberService.CreateAsync(identity);
+        Assert.IsTrue(createResult.Success);
+
+        // Act — a member type alias that does not exist must yield a status, not throw.
+        var result = await ExternalMemberService.ConvertToContentMemberAsync(createResult.Result.Key, "thisAliasDoesNotExist");
+
+        // Assert
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ExternalMemberOperationStatus.InvalidMemberType, result.Status);
+
+        // Assert — the external member is untouched.
+        Assert.IsNotNull(await ExternalMemberService.GetByKeyAsync(createResult.Result.Key));
+    }
+
+    [Test]
+    public async Task Convert_External_To_Content_Returns_DuplicateUsername_When_Content_Member_Exists()
+    {
+        // Arrange — create the external member first (so cross-store uniqueness lets it through), then a
+        // *different* content member that already owns the same username.
+        var identity = new ExternalMemberIdentityBuilder()
+            .WithEmail("fwd-dup-external@test.com")
+            .WithUserName("fwd-dup")
+            .WithName("Forward Duplicate Test")
+            .Build();
+        var createResult = await ExternalMemberService.CreateAsync(identity);
+        Assert.IsTrue(createResult.Success);
+
+        IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
+        IMember contentMember = MemberBuilder.CreateSimpleMember(memberType, "Forward Dup Content", "fwd-dup-content@test.com", "password", "fwd-dup");
+        MemberService.Save(contentMember);
+
+        // Act
+        var result = await ExternalMemberService.ConvertToContentMemberAsync(createResult.Result.Key, memberType.Alias);
+
+        // Assert
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ExternalMemberOperationStatus.DuplicateUsername, result.Status);
+
+        // Assert — the external member is untouched.
+        Assert.IsNotNull(await ExternalMemberService.GetByKeyAsync(createResult.Result.Key));
+    }
+
+    [Test]
+    public async Task ValidateConvertToContentMember_Reports_Status_Without_Mutating()
+    {
+        // Arrange
+        var identity = ExternalMemberIdentityBuilder.CreateSimple("validate-to-content@test.com", "Validate To Content");
+        var createResult = await ExternalMemberService.CreateAsync(identity);
+        Assert.IsTrue(createResult.Success);
+
+        IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
+
+        // Act
+        var validStatus = await ExternalMemberService.ValidateConvertToContentMemberAsync(createResult.Result.Key, memberType.Alias);
+        var invalidTypeStatus = await ExternalMemberService.ValidateConvertToContentMemberAsync(createResult.Result.Key, "thisAliasDoesNotExist");
+        var missingStatus = await ExternalMemberService.ValidateConvertToContentMemberAsync(Guid.NewGuid(), memberType.Alias);
+
+        // Assert — correct statuses reported.
+        Assert.AreEqual(ExternalMemberOperationStatus.Success, validStatus);
+        Assert.AreEqual(ExternalMemberOperationStatus.InvalidMemberType, invalidTypeStatus);
+        Assert.AreEqual(ExternalMemberOperationStatus.NotFound, missingStatus);
+
+        // Assert — validation mutated nothing: the external member still exists and was not converted.
+        Assert.IsNotNull(await ExternalMemberService.GetByKeyAsync(createResult.Result.Key));
+        Assert.IsNull(MemberService.GetById(createResult.Result.Key));
+    }
+
+    [Test]
     public async Task Can_Convert_Content_To_External_Member()
     {
         // Arrange — content member with a group, a property value and an external login link.
