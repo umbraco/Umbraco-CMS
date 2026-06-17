@@ -712,7 +712,7 @@ export default {
 		greeting5: 'Velkommen',
 		greeting6: 'Velkommen',
 		instruction: 'Logg på nedenfor',
-		signInWith: 'Logg på med',
+		signInWith: 'Logg på med {0}',
 		timeout: 'Din sesjon er utløpt',
 		bottomText:
 			'<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">umbraco.com</a></p> ',

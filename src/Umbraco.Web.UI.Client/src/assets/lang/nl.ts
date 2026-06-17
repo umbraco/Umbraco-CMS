@@ -943,7 +943,7 @@ export default {
 		greeting5: 'Welkom',
 		greeting6: 'Welkom',
 		instruction: 'log hieronder in',
-		signInWith: 'Inloggen met',
+		signInWith: 'Inloggen met {0}',
 		timeout: 'Sessie is verlopen',
 		bottomText:
 			'<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">umbraco.com</a></p>',

@@ -1056,7 +1056,7 @@ export default {
 		greeting5: 'Willkommen',
 		greeting6: 'Willkommen',
 		instruction: 'Hier anmelden:',
-		signInWith: 'Anmelden mit',
+		signInWith: 'Anmelden mit {0}',
 		timeout: 'Sitzung abgelaufen',
 		bottomText:
 			'<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">umbraco.org</a></p> ',
