@@ -1,4 +1,4 @@
-import type { UmbTreeItemModel, UmbTreeRootModel } from '../../types.js';
+import type { UmbTreeItemModel, UmbTreeRootModel, UmbTreeStartNode } from '../../types.js';
 import { UmbTreeViewElementBase } from '../tree-view-element-base.js';
 import { css, customElement, html, nothing, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 
@@ -27,6 +27,9 @@ export class UmbClassicTreeViewElement extends UmbTreeViewElementBase {
 
 	@state()
 	private _isMenu = false;
+
+	@state()
+	private _startNode?: UmbTreeStartNode;
 
 	protected override _observeContext() {
 		super._observeContext();
@@ -62,6 +65,11 @@ export class UmbClassicTreeViewElement extends UmbTreeViewElementBase {
 			'_observeHideTreeItemActions',
 		);
 		this.observe(this._treeContext?.isMenu, (value) => (this._isMenu = value ?? false), '_observeIsMenu');
+		this.observe(
+			this._treeContext?.startNode,
+			(value) => (this._startNode = value),
+			'_observeStartNode',
+		);
 	}
 
 	#onLoadPrev(event: Event) {
@@ -86,7 +94,8 @@ export class UmbClassicTreeViewElement extends UmbTreeViewElementBase {
 	}
 
 	#renderTreeRoot() {
-		if (this._hideTreeRoot || this._treeRoot === undefined) return nothing;
+		// When drilled into a start node, the root node is replaced by the drilled children via #renderRootItems.
+		if (this._hideTreeRoot || this._startNode || this._treeRoot === undefined) return nothing;
 		return html`
 			<umb-tree-item
 				.entityType=${(this._treeRoot as UmbTreeRootModel).entityType}
@@ -99,7 +108,8 @@ export class UmbClassicTreeViewElement extends UmbTreeViewElementBase {
 	}
 
 	#renderRootItems() {
-		if (this._hideTreeRoot !== true) return nothing;
+		// Render when hideTreeRoot is true, OR when drilled into a start node (startNode replaces the root node).
+		if (!this._hideTreeRoot && !this._startNode) return nothing;
 		return html`
 			${this.#renderLoadPrevButton()}
 			${repeat(

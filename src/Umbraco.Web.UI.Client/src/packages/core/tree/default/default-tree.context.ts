@@ -197,14 +197,19 @@ export class UmbDefaultTreeContext<
 
 		const hasStartNode = this.getStartNode();
 		const hideTreeRoot = this.getHideTreeRoot();
-		if (hasStartNode || hideTreeRoot) {
+
+		if (!hasStartNode && !hideTreeRoot) {
+			this.#loadTreeRoot(reload);
+		}
+
+		// Load children when drilled into a node, when the root is hidden, or when
+		// the root is pre-expanded — all cases where children must be immediately visible.
+		if (hasStartNode || hideTreeRoot || this.getExpandTreeRoot()) {
 			if (reload) {
 				this.#treeItemChildrenManager.reloadChildren();
 			} else {
 				this.#treeItemChildrenManager.loadChildren();
 			}
-		} else {
-			this.#loadTreeRoot(reload);
 		}
 	}
 

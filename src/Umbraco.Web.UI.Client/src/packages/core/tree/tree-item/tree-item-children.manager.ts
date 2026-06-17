@@ -503,6 +503,7 @@ export class UmbTreeItemChildrenManager<
 	 */
 	public clear(): void {
 		this.#children.setValue([]);
+		this.#currentPageChildren.setValue([]);
 		this.offsetPagination.clear();
 		this.targetPagination.clear();
 	}
