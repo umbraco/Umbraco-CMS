@@ -675,7 +675,7 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
     /// When content types are removed from a composition (U4-1690), clears the orphaned property data
     /// on content of <paramref name="entity"/> for property types that belonged to the removed types.
     /// </summary>
-    protected void ClearPropertyDataForRemovedContentTypes(IContentTypeComposition entity)
+    private void ClearPropertyDataForRemovedContentTypes(IContentTypeComposition entity)
     {
         // 1. Find content based on the current ContentType: entity.Id
         // 2. Find all PropertyTypes on the ContentType that was removed - tracked id (key)
@@ -762,7 +762,7 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
     ///     variation set on the entity itself.
     /// </summary>
     /// <param name="entity">Entity to correct properties for</param>
-    protected void CorrectPropertyTypeVariations(IContentTypeComposition entity)
+    private void CorrectPropertyTypeVariations(IContentTypeComposition entity)
     {
         // Update property variations based on the content type variation
         foreach (IPropertyType propertyType in entity.PropertyTypes)
@@ -779,7 +779,7 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
     ///     Ensures that no property types are flagged for a variance that is not supported by the content type itself
     /// </summary>
     /// <param name="entity">The entity for which the property types will be validated</param>
-    protected void ValidateVariations(IContentTypeComposition entity)
+    private void ValidateVariations(IContentTypeComposition entity)
     {
         foreach (IPropertyType prop in entity.PropertyTypes)
         {
@@ -795,7 +795,7 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
         }
     }
 
-    protected IEnumerable<IContentTypeComposition> GetImpactedContentTypes(
+    private IEnumerable<IContentTypeComposition> GetImpactedContentTypes(
         IContentTypeComposition contentType,
         IEnumerable<IContentTypeComposition>? all)
     {
@@ -846,7 +846,7 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
 
     // gets property types that have actually changed, and the corresponding changes
     // returns null if no property type has actually changed
-    protected Dictionary<int, (ContentVariation FromVariation, ContentVariation ToVariation)>?
+    private Dictionary<int, (ContentVariation FromVariation, ContentVariation ToVariation)>?
         GetPropertyVariationChanges(IEnumerable<IPropertyType> propertyTypes)
     {
         var propertyTypesL = propertyTypes.ToList();
@@ -890,7 +890,7 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
     /// <summary>
     ///     Clear any redirects associated with content for a content type
     /// </summary>
-    protected void Clear301Redirects(IContentTypeComposition contentType)
+    private void Clear301Redirects(IContentTypeComposition contentType)
     {
         // first clear out any existing property data that might already exists under the default lang
         Sql<ISqlContext> sqlSelect = Sql().Select<NodeDto>(x => x.UniqueId)
@@ -909,7 +909,7 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
     /// <summary>
     ///     Clear any scheduled publishing associated with content for a content type
     /// </summary>
-    protected void ClearScheduledPublishing(IContentTypeComposition contentType)
+    private void ClearScheduledPublishing(IContentTypeComposition contentType)
     {
         // TODO: Fill this in when scheduled publishing is enabled for variants
     }
@@ -930,7 +930,7 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
     /// <summary>
     ///     Moves variant data for property type variation changes.
     /// </summary>
-    protected void MovePropertyTypeVariantData(
+    private void MovePropertyTypeVariantData(
         IDictionary<int, (ContentVariation FromVariation, ContentVariation ToVariation)> propertyTypeChanges,
         IEnumerable<IContentTypeComposition> impacted)
     {
@@ -968,7 +968,7 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
     /// <summary>
     ///     Moves variant data for a content type variation change.
     /// </summary>
-    protected void MoveContentTypeVariantData(
+    private void MoveContentTypeVariantData(
         IContentTypeComposition contentType,
         ContentVariation fromVariation,
         ContentVariation toVariation)
@@ -1527,7 +1527,7 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
         }
     }
 
-    protected void DeletePropertyType(IContentTypeComposition contentType, int propertyTypeId)
+    private void DeletePropertyType(IContentTypeComposition contentType, int propertyTypeId)
     {
         // first clear dependencies
         Sql<ISqlContext> sqlTagRelationship = Sql()
@@ -1799,7 +1799,7 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
         return list;
     }
 
-    protected (TEntity Entity, int SortOrder)[] GetAllowedContentTypes(IContentTypeBase contentTypeBase)
+    private (TEntity Entity, int SortOrder)[] GetAllowedContentTypes(IContentTypeBase contentTypeBase)
     {
         if (contentTypeBase.AllowedContentTypes?.Any() is not true)
         {
