@@ -108,6 +108,27 @@ export const TextIndent = Extension.create<UmbTiptapTextIndentOptions>({
 			textOutdent: commanderFactory(-1),
 		};
 	},
+
+	addKeyboardShortcuts() {
+		return {
+			Tab: () => {
+				if (this.editor.isActive('listItem')) {
+					// Attempt to sink; if not possible, just prevent focus loss
+					this.editor.commands.sinkListItem('listItem');
+					return true;
+				}
+				return this.editor.commands.textIndent();
+			},
+			'Shift-Tab': () => {
+				if (this.editor.isActive('listItem')) {
+					// Attempt to lift; if not possible, just prevent focus loss
+					this.editor.commands.liftListItem('listItem');
+					return true;
+				}
+				return this.editor.commands.textOutdent();
+			},
+		};
+	},
 });
 
 declare module '@tiptap/core' {
