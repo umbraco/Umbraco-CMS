@@ -32,7 +32,7 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
     private readonly ILogger<MediaCacheService> _logger;
     private readonly CacheSettings _cacheSettings;
 
-    private readonly ConvertedPublishedContentCache<Guid> _publishedContentCache = new();
+    private readonly ConvertedPublishedContentCache<Guid> _publishedContentCache;
 
     private HashSet<Guid>? _seedKeys;
     private HashSet<Guid> SeedKeys
@@ -77,6 +77,7 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
         _publishedModelFactory = publishedModelFactory;
         _cacheSettings = cacheSettings.Value;
         _logger = logger;
+        _publishedContentCache = new ConvertedPublishedContentCache<Guid>(_cacheSettings.Entry.Media.MaximumLocalCacheItems);
     }
 
     /// <inheritdoc />

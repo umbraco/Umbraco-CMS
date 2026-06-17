@@ -278,11 +278,16 @@ Before returning cached content, verifies ancestor path is published via `_publi
 The converted `IPublishedContent` objects are cached in `ConvertedPublishedContentCache<TKey>`
 (`Services/ConvertedPublishedContentCache.cs`), used by `DocumentCacheService` (`<string>`) and
 `MediaCacheService` (`<Guid>`), since `ContentCacheNode` → `IPublishedContent` conversion is expensive.
-This is the single insert/remove/clear path for the L0 cache (the seam a later bounded/eviction-aware
-implementation slots into), and it tracks both the entry count and an approximate retained byte total.
-The cache is currently **unbounded** — only evicted on content change / explicit clear, so walking the
-whole published tree (Delivery API crawl, sitemap, warm-up) retains the whole tree's converted form.
-Bounding it with a scan-resistant policy is tracked separately; the observability below quantifies it.
+This is the single insert/remove/clear path for the L0 cache, and it tracks both the entry count and an
+approximate retained byte total.
+
+The cache is **unbounded by default** — only evicted on content change / explicit clear, so walking the
+whole published tree (Delivery API crawl, sitemap, warm-up) retains the whole tree's converted form. Set
+`CacheSettings.Entry.Document.MaximumLocalCacheItems` / `...Media.MaximumLocalCacheItems` to make it a
+**bounded, scan-resistant** cache instead: it then uses BitFaster's W-TinyLFU (`ConcurrentLfu`), so
+frequently requested content is retained while rarely accessed content is evicted and a one-off full-tree
+walk cannot grow it without bound. Default `null` preserves the unbounded behaviour; the observability
+below quantifies it either way.
 
 ### Memory observability
 

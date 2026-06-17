@@ -36,7 +36,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
     private readonly ILogger<DocumentCacheService> _logger;
     private HashSet<Guid>? _seedKeys;
 
-    private readonly ConvertedPublishedContentCache<string> _publishedContentCache = new();
+    private readonly ConvertedPublishedContentCache<string> _publishedContentCache;
 
     private HashSet<Guid> SeedKeys
     {
@@ -84,6 +84,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
         _publishStatusQueryService = publishStatusQueryService;
         _cacheSettings = cacheSettings.Value;
         _logger = logger;
+        _publishedContentCache = new ConvertedPublishedContentCache<string>(_cacheSettings.Entry.Document.MaximumLocalCacheItems);
     }
 
     /// <inheritdoc />
