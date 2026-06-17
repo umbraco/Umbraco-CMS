@@ -1,6 +1,14 @@
 import type { UmbNotificationHandler } from '../../notification-handler.js';
 import type { UmbPeekErrorArgs } from '../../types.js';
-import { css, customElement, html, ifDefined, nothing, property } from '@umbraco-cms/backoffice/external/lit';
+import {
+	css,
+	customElement,
+	html,
+	ifDefined,
+	nothing,
+	property,
+	unsafeHTML,
+} from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import {
 	UMB_ERROR_VIEWER_MODAL,
@@ -70,7 +78,7 @@ export class UmbPeekErrorNotificationElement extends UmbLitElement {
 	protected override render() {
 		if (!this.data) return nothing;
 		return html`<uui-toast-notification-layout headline=${ifDefined(this.data.headline)}>
-			${this.#message} ${this.#actions}
+			${typeof this.#message === 'string' ? unsafeHTML(this.#message) : this.#message} ${this.#actions}
 		</uui-toast-notification-layout>`;
 	}
 
