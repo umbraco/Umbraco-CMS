@@ -544,6 +544,9 @@ internal partial class BlockListElementLevelVariationTests
         SetVariationContext(culture, segment);
         AssertBlockValues();
 
+        // Retry to re-visit the cache within the same test, but for another culture, so we don't get false positives
+        // because of caching. No matter the requested culture, the variant-for-invariant handling should always
+        // resolve the default language for rendering.
         culture = culture == "en-US" ? "da-DK" : "en-US";
         SetVariationContext(culture, segment);
         AssertBlockValues();
