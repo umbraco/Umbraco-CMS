@@ -15,20 +15,23 @@ const DA_ORIGINAL = 'Dette er den danske varianttekst.';
 
 /**
  * Reproduces the save-and-publish orchestration that the publishing workspace context performs
- * (#performSaveAndPublish): capture the draft, perform the combined update-and-publish call via the
- * publishing data source, reload, then transfer only the published variants back to the current data
- * state. These scenarios use an existing (non-new) document, so the update-and-publish path is used.
+ * (#performSaveAndPublish): build the save data, then drive performCreateOrUpdate with a persist strategy
+ * that performs the combined update-and-publish call. Published variants take the server values, while
+ * only the selected variants will be updated in draft data, leaving the not selected draft variants unchanged. These scenarios use an existing (non-new) document, so the
+ * update path is used.
  */
 async function saveAndPublish(
 	context: UmbDocumentWorkspaceContext,
 	publishingDataSource: UmbDocumentPublishingServerDataSource,
 	variantIds: Array<UmbVariantId>,
 ) {
-	const dirtyData = context.getData();
 	const saveData = await context.constructSaveData(variantIds);
-	await publishingDataSource.updateAndPublish(saveData, variantIds);
-	await context.reload();
-	await context.transferPublishedVariantsToCurrent(dirtyData, variantIds);
+	await context.performCreateOrUpdate(variantIds, saveData, {
+		update: async (data, ids) => {
+			await publishingDataSource.updateAndPublish(data, ids);
+			return context.loadWithoutPersist();
+		},
+	});
 }
 
 describe('UmbDocumentWorkspaceContext (save & publish data state)', () => {

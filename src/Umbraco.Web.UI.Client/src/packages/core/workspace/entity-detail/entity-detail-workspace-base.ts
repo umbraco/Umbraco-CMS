@@ -28,11 +28,11 @@ const LOADING_STATE_UNIQUE = 'umbLoadingEntityDetail';
 const FORBIDDEN_STATE_UNIQUE = 'umbForbiddenEntityDetail';
 
 export abstract class UmbEntityDetailWorkspaceContextBase<
-		DetailModelType extends UmbEntityModel = UmbEntityModel,
-		DetailRepositoryType extends UmbDetailRepository<DetailModelType> = UmbDetailRepository<DetailModelType>,
-		CreateArgsType extends
-			UmbEntityDetailWorkspaceContextCreateArgs<DetailModelType> = UmbEntityDetailWorkspaceContextCreateArgs<DetailModelType>,
-	>
+	DetailModelType extends UmbEntityModel = UmbEntityModel,
+	DetailRepositoryType extends UmbDetailRepository<DetailModelType> = UmbDetailRepository<DetailModelType>,
+	CreateArgsType extends UmbEntityDetailWorkspaceContextCreateArgs<DetailModelType> =
+		UmbEntityDetailWorkspaceContextCreateArgs<DetailModelType>,
+>
 	extends UmbSubmittableWorkspaceContextBase<DetailModelType>
 	implements UmbSubmittableTreeEntityWorkspaceContext
 {
@@ -292,6 +292,20 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	}
 
 	/**
+	 * Requests the latest persisted version of the entity from the server WITHOUT applying it to the
+	 * workspace state, and returns the processed data. The caller is responsible for reconciling it into
+	 * the workspace (e.g. as the return value of a persist method passed to performCreateOrUpdate).
+	 * @returns { Promise<DetailModelType> } The latest persisted data.
+	 */
+	public async loadWithoutPersist(): Promise<DetailModelType> {
+		const unique = this.getUnique();
+		if (!unique) throw new Error('Unique is not set');
+		const { data, error } = await this._detailRepository!.requestByUnique(unique);
+		if (error || !data) throw new Error('Error loading document', { cause: error });
+		return await this._processIncomingData(data);
+	}
+
+	/**
 	 * Method to check if the workspace data is loaded.
 	 * @returns { Promise<any> | undefined } true if the workspace data is loaded.
 	 * @memberof UmbEntityWorkspaceContextBase
@@ -402,7 +416,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 
 		const { error, data } = await this._detailRepository.create(currentData, parent.unique);
 		if (error || !data) {
-			throw error?.message ?? 'Repository did not return data after create.';
+			throw new Error('Repository did not return data after create.', { cause: error });
 		}
 
 		this.#entityContext.setUnique(data.unique);
@@ -431,7 +445,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	protected async _update(currentData: DetailModelType) {
 		const { error, data } = await this._detailRepository!.save(currentData);
 		if (error || !data) {
-			throw error?.message ?? 'Repository did not return data after create.';
+			throw new Error('Entity Detail Repository failed saving', { cause: error });
 		}
 
 		this._data.setPersisted(data);
