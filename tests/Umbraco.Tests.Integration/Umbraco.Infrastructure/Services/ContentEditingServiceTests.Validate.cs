@@ -239,8 +239,41 @@ public partial class ContentEditingServiceTests
     }
 
     [Test]
+    public async Task Cannot_Validate_Create_As_Child_When_Not_Allowed_By_Parent()
+    {
+        var createModel = await BuildTextPageChildCreateModel(parentAllowsChild: false);
+
+        var result = await ContentEditingService.ValidateCreateAsync(createModel, Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.NotAllowed, result.Status);
+    }
+
+    [Test]
+    public async Task Can_Validate_Create_As_Child_When_Allowed_By_Parent()
+    {
+        var createModel = await BuildTextPageChildCreateModel(parentAllowsChild: true);
+
+        var result = await ContentEditingService.ValidateCreateAsync(createModel, Constants.Security.SuperUserKey);
+
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+    }
+
+    [Test]
     [ConfigureBuilder(ActionName = nameof(ConfigureContentTypeFilterToDisallowTextPageAsChild))]
     public async Task Cannot_Validate_Create_As_Child_With_Content_Type_Filter()
+    {
+        // The parent allows the child type, so the only reason creation is disallowed is the content type filter.
+        var createModel = await BuildTextPageChildCreateModel(parentAllowsChild: true);
+
+        var result = await ContentEditingService.ValidateCreateAsync(createModel, Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.NotAllowed, result.Status);
+    }
+
+    private async Task<ContentCreateModel> BuildTextPageChildCreateModel(bool parentAllowsChild)
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
         await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
@@ -251,10 +284,14 @@ public partial class ContentEditingServiceTests
 
         var rootContentType = ContentTypeBuilder.CreateBasicContentType();
         rootContentType.AllowedAsRoot = true;
-        rootContentType.AllowedContentTypes = new[]
+        if (parentAllowsChild)
         {
-            new ContentTypeSort(childContentType.Key, 1, childContentType.Alias)
-        };
+            rootContentType.AllowedContentTypes = new[]
+            {
+                new ContentTypeSort(childContentType.Key, 1, childContentType.Alias)
+            };
+        }
+
         ContentTypeService.Save(rootContentType);
 
         var rootKey = (await ContentEditingService.CreateAsync(
@@ -269,7 +306,7 @@ public partial class ContentEditingServiceTests
             },
             Constants.Security.SuperUserKey)).Result.Content!.Key;
 
-        var createModel = new ContentCreateModel
+        return new ContentCreateModel
         {
             ContentTypeKey = childContentType.Key,
             TemplateKey = template.Key,
@@ -284,11 +321,6 @@ public partial class ContentEditingServiceTests
                 new PropertyValueModel { Alias = "bodyText", Value = "The child body text" }
             ]
         };
-
-        var result = await ContentEditingService.ValidateCreateAsync(createModel, Constants.Security.SuperUserKey);
-
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.NotAllowed, result.Status);
     }
 
     private async Task<ContentCreateModel> BuildTextPageRootCreateModel(bool allowedAsRoot)

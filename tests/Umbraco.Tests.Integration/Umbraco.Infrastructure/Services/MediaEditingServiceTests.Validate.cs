@@ -47,6 +47,41 @@ internal sealed partial class MediaEditingServiceTests
         Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
     }
 
+    [Test]
+    public async Task Cannot_Validate_Create_As_Child_When_Not_Allowed_By_Parent()
+    {
+        var createModel = await BuildTestMediaChildCreateModel(parentAllowsChild: false);
+
+        var result = await MediaEditingService.ValidateCreateAsync(createModel);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.NotAllowed, result.Status);
+    }
+
+    [Test]
+    public async Task Can_Validate_Create_As_Child_When_Allowed_By_Parent()
+    {
+        var createModel = await BuildTestMediaChildCreateModel(parentAllowsChild: true);
+
+        var result = await MediaEditingService.ValidateCreateAsync(createModel);
+
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+    }
+
+    [Test]
+    [ConfigureBuilder(ActionName = nameof(ConfigureContentTypeFilterToDisallowChildMediaAsChild))]
+    public async Task Cannot_Validate_Create_As_Child_With_Content_Type_Filter()
+    {
+        // The parent allows the child type, so the only reason creation is disallowed is the content type filter.
+        var createModel = await BuildTestMediaChildCreateModel(parentAllowsChild: true);
+
+        var result = await MediaEditingService.ValidateCreateAsync(createModel);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.NotAllowed, result.Status);
+    }
+
     private MediaCreateModel BuildTestMediaRootCreateModel(bool allowedAsRoot)
     {
         var mediaType = MediaTypeBuilder.CreateSimpleMediaType("testMedia", "Test Media");
@@ -61,20 +96,80 @@ internal sealed partial class MediaEditingServiceTests
         };
     }
 
+    private async Task<MediaCreateModel> BuildTestMediaChildCreateModel(bool parentAllowsChild)
+    {
+        var childMediaType = MediaTypeBuilder.CreateSimpleMediaType("childMedia", "Child Media");
+        childMediaType.AllowedAsRoot = false;
+        MediaTypeService.Save(childMediaType);
+
+        var parentMediaType = MediaTypeBuilder.CreateSimpleMediaType("parentMedia", "Parent Media");
+        parentMediaType.AllowedAsRoot = true;
+        if (parentAllowsChild)
+        {
+            parentMediaType.AllowedContentTypes = new[]
+            {
+                new ContentTypeSort(childMediaType.Key, 1, childMediaType.Alias)
+            };
+        }
+
+        MediaTypeService.Save(parentMediaType);
+
+        var parentKey = (await MediaEditingService.CreateAsync(
+            new MediaCreateModel
+            {
+                ContentTypeKey = parentMediaType.Key,
+                ParentKey = Constants.System.RootKey,
+                Variants = [new VariantModel { Name = "Parent" }],
+            },
+            Constants.Security.SuperUserKey)).Result.Content!.Key;
+
+        return new MediaCreateModel
+        {
+            ContentTypeKey = childMediaType.Key,
+            ParentKey = parentKey,
+            Variants = [new VariantModel { Name = "Test Create Child" }],
+        };
+    }
+
     public static void ConfigureContentTypeFilterToAllowTestMediaAtRoot(IUmbracoBuilder builder)
         => builder.ContentTypeFilters().Append<ContentTypeFilterForAllowedTestMediaAtRoot>();
 
     public static void ConfigureContentTypeFilterToDisallowTestMediaAtRoot(IUmbracoBuilder builder)
         => builder.ContentTypeFilters().Append<ContentTypeFilterForDisallowedTestMediaAtRoot>();
 
-    private sealed class ContentTypeFilterForAllowedTestMediaAtRoot() : ContentTypeFilterForTestMediaAtRoot(true);
+    public static void ConfigureContentTypeFilterToDisallowChildMediaAsChild(IUmbracoBuilder builder)
+        => builder.ContentTypeFilters().Append<ContentTypeFilterForDisallowedChildMediaAsChild>();
 
-    private sealed class ContentTypeFilterForDisallowedTestMediaAtRoot() : ContentTypeFilterForTestMediaAtRoot(false);
-
-    private abstract class ContentTypeFilterForTestMediaAtRoot(bool allowed) : IContentTypeFilter
+    private sealed class ContentTypeFilterForDisallowedChildMediaAsChild : IContentTypeFilter
     {
+        public Task<IEnumerable<ContentTypeSort>> FilterAllowedChildrenAsync(IEnumerable<ContentTypeSort> contentTypes, Guid parentContentTypeKey, Guid? parentContentKey)
+            => Task.FromResult(contentTypes.Where(x => x.Alias != "childMedia"));
+    }
+
+    private sealed class ContentTypeFilterForAllowedTestMediaAtRoot : ContentTypeFilterForTestMediaAtRoot
+    {
+        public ContentTypeFilterForAllowedTestMediaAtRoot()
+            : base(true)
+        {
+        }
+    }
+
+    private sealed class ContentTypeFilterForDisallowedTestMediaAtRoot : ContentTypeFilterForTestMediaAtRoot
+    {
+        public ContentTypeFilterForDisallowedTestMediaAtRoot()
+            : base(false)
+        {
+        }
+    }
+
+    private abstract class ContentTypeFilterForTestMediaAtRoot : IContentTypeFilter
+    {
+        private readonly bool _allowed;
+
+        protected ContentTypeFilterForTestMediaAtRoot(bool allowed) => _allowed = allowed;
+
         public Task<IEnumerable<TItem>> FilterAllowedAtRootAsync<TItem>(IEnumerable<TItem> contentTypes)
             where TItem : IContentTypeComposition
-            => Task.FromResult(contentTypes.Where(x => (allowed && x.Alias == "testMedia") || (!allowed && x.Alias != "testMedia")));
+            => Task.FromResult(contentTypes.Where(x => (_allowed && x.Alias == "testMedia") || (!_allowed && x.Alias != "testMedia")));
     }
 }
