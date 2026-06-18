@@ -2,10 +2,9 @@ import type { UmbLanguageCollectionFilterModel } from '../types.js';
 import type { UmbLanguageDetailModel } from '../../types.js';
 import { UmbLanguageCollectionServerDataSource } from './language-collection.server.data-source.js';
 import type { UmbLanguageCollectionDataSource } from './types.js';
-import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
+import { UmbRepositoryBase, fetchAllPages } from '@umbraco-cms/backoffice/repository';
 import type { UmbCollectionRepository } from '@umbraco-cms/backoffice/collection';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { fetchAllPages } from '@umbraco-cms/backoffice/utils';
 
 // Mirrors the server's default page size for `GET /language` — chosen so the underlying request matches
 // the unconfigured server contract.
