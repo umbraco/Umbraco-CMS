@@ -79,8 +79,8 @@ public class ContentFinderByUrlAliasTests
 
         public void SetupDomainRoot(int domainRootId, Guid domainRootKey) =>
             IdKeyMap
-                .Setup(x => x.GetKeyForId(domainRootId, UmbracoObjectTypes.Document))
-                .Returns(Attempt<Guid>.Succeed(domainRootKey));
+                .Setup(x => x.GetKeyForIdAsync(domainRootId, UmbracoObjectTypes.Document))
+                .ReturnsAsync(Attempt<Guid>.Succeed(domainRootKey));
 
         public void SetupDocumentAncestors(Guid documentKey, params Guid[] ancestorKeys)
         {

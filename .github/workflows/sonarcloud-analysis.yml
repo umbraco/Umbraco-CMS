@@ -1,0 +1,81 @@
+name: "SonarQube Cloud - Analysis"
+
+# This workflow runs the full SonarCloud analysis with the SONAR_TOKEN secret.
+# It is skipped for fork PRs since secrets are not available in that context.
+
+on:
+  push:
+    branches:
+      - main
+      - "v*/dev"
+      - "v*/main"
+      - "release/*"
+  pull_request:
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  SONAR_PROJECT_KEY: umbraco_Umbraco-CMS
+  SONAR_ORGANIZATION: umbraco
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  analyze:
+    name: Build and analyze
+    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork != true
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET from global.json
+        uses: actions/setup-dotnet@v5
+
+      - name: Cache SonarQube packages
+        uses: actions/cache@v5
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+
+      - name: Install tools
+        run: |
+          dotnet tool install --global dotnet-sonarscanner
+          dotnet tool install --global dotnet-coverage
+
+      - name: Load sonar params
+        run: echo "SONARQUBE_SCANNER_PARAMS=$(jq -c . .github/workflows/sonarcloud/sonar-params.json)" >> $GITHUB_ENV
+
+      - name: Begin analysis
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          dotnet-sonarscanner begin \
+            /k:"$SONAR_PROJECT_KEY" \
+            /o:"$SONAR_ORGANIZATION" \
+            /d:sonar.token="$SONAR_TOKEN"
+
+      - name: Restore
+        run: dotnet restore umbraco.sln
+
+      - name: Build solution
+        run: GITHUB_ENV=/dev/null dotnet build umbraco.sln --no-restore -clp:ErrorsOnly # prevent sonar MSBuild integration from writing malformed values to $GITHUB_ENV
+
+      - name: Run unit tests with coverage
+        run: |
+          dotnet-coverage collect \
+            "dotnet test tests/Umbraco.Tests.UnitTests/Umbraco.Tests.UnitTests.csproj --no-build" \
+            --output TestResults/coverage.xml \
+            --output-format xml
+
+      - name: End analysis
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: dotnet-sonarscanner end /d:sonar.token="$SONAR_TOKEN"

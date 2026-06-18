@@ -804,14 +804,14 @@ public class EntityService : RepositoryService, IEntityService
     }
 
     /// <inheritdoc />
-    public Attempt<int> GetId(Guid key, UmbracoObjectTypes objectType) => _idKeyMap.GetIdForKey(key, objectType);
+    public Attempt<int> GetId(Guid key, UmbracoObjectTypes objectType) => _idKeyMap.GetIdForKeyAsync(key, objectType).GetAwaiter().GetResult();
 
     /// <inheritdoc />
-    public Attempt<int> GetId(Udi udi) => _idKeyMap.GetIdForUdi(udi);
+    public Attempt<int> GetId(Udi udi) => _idKeyMap.GetIdForUdiAsync(udi).GetAwaiter().GetResult();
 
     /// <inheritdoc />
     public Attempt<Guid> GetKey(int id, UmbracoObjectTypes umbracoObjectType) =>
-        _idKeyMap.GetKeyForId(id, umbracoObjectType);
+        _idKeyMap.GetKeyForIdAsync(id, umbracoObjectType).GetAwaiter().GetResult();
 
     /// <inheritdoc />
     public virtual IEnumerable<TreeEntityPath> GetAllPaths(UmbracoObjectTypes objectType, params int[]? ids)
@@ -967,7 +967,7 @@ public class EntityService : RepositoryService, IEntityService
             .Where(x => x != -1);
 
         Guid[] keys = ids
-            .Select(x => _idKeyMap.GetKeyForId(x, UmbracoObjectTypes.Document))
+            .Select(x => _idKeyMap.GetKeyForIdAsync(x, UmbracoObjectTypes.Document).GetAwaiter().GetResult())
             .Where(x => x.Success)
             .Select(x => x.Result)
             .ToArray();

@@ -11,6 +11,7 @@ using Umbraco.Cms.Core.DistributedLocking.Exceptions;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore.Extensions;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
+using Umbraco.Cms.Persistence.EFCore;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.EFCore.Locking;
@@ -186,17 +187,11 @@ public sealed class SqliteEFCoreDistributedLockingMechanism<T> : IDistributedLoc
                         throw new ArgumentException($"LockObject with id={LockId} does not exist.");
                     }
                 }
-                catch (SqliteException ex) when (IsBusyOrLocked(ex))
+                catch (SqliteException ex) when (ex.IsBusyOrLocked())
                 {
                     throw new DistributedWriteLockTimeoutException(LockId);
                 }
             });
         }
-
-        private static bool IsBusyOrLocked(SqliteException ex) =>
-            ex.SqliteErrorCode
-                is raw.SQLITE_BUSY
-                or raw.SQLITE_LOCKED
-                or raw.SQLITE_LOCKED_SHAREDCACHE;
     }
 }

@@ -22,7 +22,8 @@ public class NodeDtoConfiguration : IEntityTypeConfiguration<NodeDto>
             .HasColumnName(NodeDto.ParentIdColumnName);
 
         builder.Property(x => x.Level)
-            .HasColumnName(NodeDto.LevelColumnName);
+            .HasColumnName(NodeDto.LevelColumnName)
+            .HasConversion<int>();
 
         builder.Property(x => x.Path)
             .HasColumnName(NodeDto.PathColumnName)

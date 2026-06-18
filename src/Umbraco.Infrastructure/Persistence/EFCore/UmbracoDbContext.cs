@@ -78,6 +78,12 @@ public class UmbracoDbContext : DbContext
 
     public required DbSet<AccessRuleDto> AccessRules { get; set; }
 
+    public required DbSet<DistributedJobDto> DistributedJob { get; set; }
+
+    public required DbSet<ConsentDto> Consents { get; set; }
+
+    public required DbSet<DictionaryDto> DictionaryEntries { get; set; }
+
     public required DbSet<ContentTypeDto> ContentTypes { get; set; }
 
     public required DbSet<ContentType2ContentTypeDto> ContentTypeComposition { get; set; }

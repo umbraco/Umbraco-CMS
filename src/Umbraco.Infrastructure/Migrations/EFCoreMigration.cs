@@ -20,5 +20,8 @@ public enum EFCoreMigration
     AddRelationDtos = 12,
     AddContentVersionCleanupPolicyDto = 13,
     AddPublicAccessDto = 14,
-    AddContentTypeDtos = 15,
+    AddDistributedJobDto = 15,
+    AddConsentDto = 16,
+    AddDictionaryDto = 17,
+    AddContentTypeDtos = 18,
 }

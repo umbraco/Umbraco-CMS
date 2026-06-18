@@ -445,6 +445,53 @@ namespace Umbraco.Cms.Persistence.EFCore.Sqlite.Migrations
                     b.ToTable("umbracoCacheInstruction", (string)null);
                 });
 
+            modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.ConsentDto", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Action")
+                        .HasMaxLength(512)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("action")
+                        .UseCollation("NOCASE");
+
+                    b.Property<string>("Comment")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("comment")
+                        .UseCollation("NOCASE");
+
+                    b.Property<string>("Context")
+                        .HasMaxLength(128)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("context")
+                        .UseCollation("NOCASE");
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("createDate");
+
+                    b.Property<bool>("Current")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("current");
+
+                    b.Property<string>("Source")
+                        .HasMaxLength(512)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("source")
+                        .UseCollation("NOCASE");
+
+                    b.Property<int>("State")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("state");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("umbracoConsent", (string)null);
+                });
+
             modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.ContentType2ContentTypeDto", b =>
                 {
                     b.Property<int>("ParentId")
@@ -603,6 +650,78 @@ namespace Umbraco.Cms.Persistence.EFCore.Sqlite.Migrations
                     b.ToTable("umbracoContentVersionCleanupPolicy", (string)null);
                 });
 
+            modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.DictionaryDto", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("pk");
+
+                    b.Property<string>("Key")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("key")
+                        .UseCollation("NOCASE");
+
+                    b.Property<Guid?>("Parent")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("parent");
+
+                    b.Property<Guid>("UniqueId")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Key")
+                        .IsUnique()
+                        .HasDatabaseName("IX_cmsDictionary_key");
+
+                    b.HasIndex("Parent")
+                        .HasDatabaseName("IX_cmsDictionary_Parent");
+
+                    b.HasIndex("UniqueId")
+                        .IsUnique()
+                        .HasDatabaseName("IX_cmsDictionary_id");
+
+                    b.ToTable("cmsDictionary", (string)null);
+                });
+
+            modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.DistributedJobDto", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("id");
+
+                    b.Property<bool>("IsRunning")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("IsRunning");
+
+                    b.Property<DateTime>("LastAttemptedRun")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("lastAttemptedRun");
+
+                    b.Property<DateTime>("LastRun")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("lastRun");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT")
+                        .HasColumnName("Name")
+                        .UseCollation("NOCASE");
+
+                    b.Property<long>("Period")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("period");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("umbracoDistributedJob", (string)null);
+                });
+
             modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.DataTypeDto", b =>
                 {
                     b.Property<int>("NodeId")
@@ -746,6 +865,39 @@ namespace Umbraco.Cms.Persistence.EFCore.Sqlite.Migrations
                         .IsUnique();
 
                     b.ToTable("umbracoLanguage", (string)null);
+                });
+
+            modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.LanguageTextDto", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("pk");
+
+                    b.Property<int>("LanguageId")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("languageId");
+
+                    b.Property<Guid>("UniqueId")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("UniqueId");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("value")
+                        .UseCollation("NOCASE");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UniqueId");
+
+                    b.HasIndex("LanguageId", "UniqueId")
+                        .IsUnique()
+                        .HasDatabaseName("IX_cmsLanguageText_languageId");
+
+                    b.ToTable("cmsLanguageText", (string)null);
                 });
 
             modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.LastSyncedDto", b =>
@@ -1466,6 +1618,17 @@ namespace Umbraco.Cms.Persistence.EFCore.Sqlite.Migrations
                     b.Navigation("Access");
                 });
 
+            modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.DictionaryDto", b =>
+                {
+                    b.HasOne("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.DictionaryDto", "ParentEntry")
+                        .WithMany()
+                        .HasForeignKey("Parent")
+                        .HasPrincipalKey("UniqueId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("ParentEntry");
+                });
+
             modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.ContentTypeDto", b =>
                 {
                     b.HasOne("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.NodeDto", "NodeDto")
@@ -1498,6 +1661,26 @@ namespace Umbraco.Cms.Persistence.EFCore.Sqlite.Migrations
                         .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("FallbackLanguage");
+                });
+
+            modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.LanguageTextDto", b =>
+                {
+                    b.HasOne("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.LanguageDto", "Language")
+                        .WithMany()
+                        .HasForeignKey("LanguageId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.DictionaryDto", "DictionaryEntry")
+                        .WithMany("LanguageText")
+                        .HasForeignKey("UniqueId")
+                        .HasPrincipalKey("UniqueId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("DictionaryEntry");
+
+                    b.Navigation("Language");
                 });
 
             modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.LogDto", b =>
@@ -1616,6 +1799,11 @@ namespace Umbraco.Cms.Persistence.EFCore.Sqlite.Migrations
             modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.AccessDto", b =>
                 {
                     b.Navigation("Rules");
+                });
+
+            modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.DictionaryDto", b =>
+                {
+                    b.Navigation("LanguageText");
                 });
 
             modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.PropertyTypeGroupDto", b =>

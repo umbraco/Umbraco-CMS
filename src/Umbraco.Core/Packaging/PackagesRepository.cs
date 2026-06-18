@@ -367,7 +367,7 @@ public class PackagesRepository : ICreatedPackagesRepository
                 continue;
             }
 
-            Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForId(outInt, UmbracoObjectTypes.DataType);
+            Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForIdAsync(outInt, UmbracoObjectTypes.DataType).GetAwaiter().GetResult();
             if (keyAttempt.Success is false)
             {
                 continue;

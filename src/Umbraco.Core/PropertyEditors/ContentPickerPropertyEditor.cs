@@ -121,7 +121,7 @@ public class ContentPickerPropertyEditor : DataEditor, IValueSchemaProvider
             {
                 // todo: This is a temporary code path that should be removed ASAP
                 Attempt<Guid> conversionAttempt = StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>()
-                    .GetKeyForId(oldInt, UmbracoObjectTypes.Document);
+                    .GetKeyForIdAsync(oldInt, UmbracoObjectTypes.Document).GetAwaiter().GetResult();
                 return conversionAttempt.Success ? conversionAttempt.Result : null;
             }
 
