@@ -114,6 +114,16 @@ public interface IExternalMemberService
     ///     (e.g. <c>member.SetValue("department", ...)</c>).
     /// </param>
     /// <returns>An <see cref="Attempt{TResult,TStatus}"/> with the newly created <see cref="IMember"/> on success.</returns>
+    /// <remarks>
+    ///     On success this publishes <see cref="Notifications.ExternalMemberDeletedNotification"/> for the
+    ///     removed external member, so it is evicted from caches and the search index. Handlers of that
+    ///     notification therefore also run during a conversion. Note that the member's Guid key is
+    ///     <em>preserved</em> on the new content member, so a handler that performs key-based cleanup
+    ///     (e.g. deleting related data by member key) would act on a key that now belongs to the live
+    ///     content member — such handlers should account for conversions. The external login links are
+    ///     intentionally left intact (they belong to the content member under the same key) and are not
+    ///     deleted as part of this notification.
+    /// </remarks>
     Task<Attempt<IMember?, ExternalMemberOperationStatus>> ConvertToContentMemberAsync(Guid memberKey, string memberTypeAlias, Action<IMember, string?>? mapProfileData = null);
 
     /// <summary>

@@ -356,10 +356,10 @@ internal sealed class ExternalMemberService : RepositoryService, IExternalMember
             _memberService.AssignRoles([contentMember.Id], roleNames);
         }
 
-        // Delete the external member record and its group memberships, then publish the deleted
-        // notification so it is removed from the search index and distributed caches. The external login
-        // links are deliberately left intact — keyed by the preserved Guid, they now belong to the
-        // content member (so this does not call the full DeleteAsync, which would delete them).
+        // Delete the external record (and its group memberships) and publish the deleted notification so it
+        // is evicted from caches and the search index. The login links are intentionally preserved — keyed
+        // by the same Guid, they now belong to the content member — so the full DeleteAsync, which would
+        // delete them, is not used.
         await _repository.DeleteAsync(source.Key);
         scope.Notifications.Publish(new ExternalMemberDeletedNotification(source, EventMessagesFactory.Get()));
 
@@ -434,7 +434,7 @@ internal sealed class ExternalMemberService : RepositoryService, IExternalMember
             var savingNotification = new ExternalMemberSavingNotification(identity, evtMsgs);
             if (scope.Notifications.PublishCancelable(savingNotification))
             {
-                // Roll back: leave the content member untouched.
+                scope.Complete();
                 return Fail(ExternalMemberOperationStatus.CancelledByNotification);
             }
 
@@ -442,7 +442,7 @@ internal sealed class ExternalMemberService : RepositoryService, IExternalMember
             // of the outermost scope, deletes the external login links by key — hence the re-link in scope B.
             if (_memberService.Delete(member).Success is false)
             {
-                // Delete was cancelled by a notification handler; roll back without persisting the identity.
+                scope.Complete();
                 return Fail(ExternalMemberOperationStatus.CancelledByNotification);
             }
 
@@ -454,9 +454,22 @@ internal sealed class ExternalMemberService : RepositoryService, IExternalMember
             scope.Complete();
         }
 
-        // Scope B — re-link external logins and tokens. The deferred delete handler from scope A has now
-        // removed them, so they must be re-saved against the preserved member key.
-        RelinkExternalLogins(memberKey, capturedLogins, capturedTokens);
+        // Scope B — re-link the external logins/tokens that scope A's deferred delete handler removed,
+        // against the preserved member key. Scope A has already committed, so a failure here is a recoverable
+        // partial state, not a failed conversion (auto-link recreates the link on next sign-in) — log it
+        // rather than throwing over an otherwise-successful conversion.
+        try
+        {
+            RelinkExternalLogins(memberKey, capturedLogins, capturedTokens);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(
+                ex,
+                "Converted member {MemberKey} to an external member, but failed to re-link its external logins/tokens. "
+                + "The member has no login link until auto-link recreates one on next external sign-in.",
+                memberKey);
+        }
 
         return Attempt.SucceedWithStatus<ExternalMemberIdentity?, ExternalMemberOperationStatus>(ExternalMemberOperationStatus.Success, identity);
     }

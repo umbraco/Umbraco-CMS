@@ -1,6 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Events;
@@ -30,10 +31,12 @@ internal sealed class ExternalMemberServiceTests : UmbracoIntegrationTest
 
     private IExternalLoginWithKeyService ExternalLoginService => GetRequiredService<IExternalLoginWithKeyService>();
 
-    private static readonly List<Guid> _externalMemberDeletedKeys = [];
-
     protected override void CustomTestSetup(IUmbracoBuilder builder)
-        => builder.AddNotificationHandler<ExternalMemberDeletedNotification, ExternalMemberDeletedSpy>();
+    {
+        // A fresh host (and singleton recorder) is built per test, so captured keys never bleed across tests.
+        builder.Services.AddSingleton<ExternalMemberDeletedRecorder>();
+        builder.AddNotificationHandler<ExternalMemberDeletedNotification, ExternalMemberDeletedSpy>();
+    }
 
     [Test]
     public async Task Can_Create_And_Get_External_Member()
@@ -425,7 +428,7 @@ internal sealed class ExternalMemberServiceTests : UmbracoIntegrationTest
     public async Task Can_Convert_External_To_Content_Member_Publishing_Deleted_Notification()
     {
         // Arrange
-        _externalMemberDeletedKeys.Clear();
+        ExternalMemberDeletedRecorder recorder = GetRequiredService<ExternalMemberDeletedRecorder>();
         var identity = ExternalMemberIdentityBuilder.CreateSimple("deindex@test.com", "Deindex Test");
         var createResult = await ExternalMemberService.CreateAsync(identity);
         Assert.IsTrue(createResult.Success);
@@ -437,10 +440,10 @@ internal sealed class ExternalMemberServiceTests : UmbracoIntegrationTest
         // Act
         var result = await ExternalMemberService.ConvertToContentMemberAsync(key, memberType.Alias);
 
-        // Assert — the deleted notification fired for the converted member, so it is removed from the
-        // search index and distributed caches (which a bare repository delete would have skipped).
+        // Assert — the deleted notification fired for the converted member, so it is evicted from the
+        // search index and distributed caches.
         Assert.IsTrue(result.Success);
-        CollectionAssert.Contains(_externalMemberDeletedKeys, key);
+        CollectionAssert.Contains(recorder.DeletedKeys, key);
     }
 
     [Test]
@@ -565,6 +568,58 @@ internal sealed class ExternalMemberServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
+    public async Task Cannot_Convert_Content_To_External_Member_When_Username_Taken_By_External_Member()
+    {
+        // Arrange — an existing external member owns the username; then a *different* content member with
+        // the same username (the content store doesn't check the external store, so this can exist).
+        var existingExternal = new ExternalMemberIdentityBuilder()
+            .WithEmail("rev-dup-username-external@test.com")
+            .WithUserName("rev-dup-username")
+            .WithName("Existing External")
+            .Build();
+        var createResult = await ExternalMemberService.CreateAsync(existingExternal);
+        Assert.IsTrue(createResult.Success);
+
+        IMember contentMember = await CreateContentMemberAsync("rev-dup-username-content@test.com", "rev-dup-username");
+
+        // Act — requireExternalLogin: false isolates the uniqueness guard from the no-login guard.
+        var result = await ExternalMemberService.ConvertToExternalMemberAsync(contentMember.Key, requireExternalLogin: false);
+
+        // Assert — a different external record owns the username, so conversion is rejected.
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ExternalMemberOperationStatus.DuplicateUsername, result.Status);
+
+        // Assert — the content member is untouched.
+        Assert.IsNotNull(MemberService.GetById(contentMember.Key));
+    }
+
+    [Test]
+    public async Task Cannot_Convert_Content_To_External_Member_When_Email_Taken_By_External_Member()
+    {
+        // Arrange — an existing external member owns the email; a *different* content member shares it.
+        // Usernames differ so the username check passes and the email check is what rejects the conversion.
+        var existingExternal = new ExternalMemberIdentityBuilder()
+            .WithEmail("rev-dup-email@test.com")
+            .WithUserName("rev-dup-email-external")
+            .WithName("Existing External")
+            .Build();
+        var createResult = await ExternalMemberService.CreateAsync(existingExternal);
+        Assert.IsTrue(createResult.Success);
+
+        IMember contentMember = await CreateContentMemberAsync("rev-dup-email@test.com", "rev-dup-email-content");
+
+        // Act
+        var result = await ExternalMemberService.ConvertToExternalMemberAsync(contentMember.Key, requireExternalLogin: false);
+
+        // Assert — a different external record owns the email (MemberRequireUniqueEmail defaults to true).
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ExternalMemberOperationStatus.DuplicateEmail, result.Status);
+
+        // Assert — the content member is untouched.
+        Assert.IsNotNull(MemberService.GetById(contentMember.Key));
+    }
+
+    [Test]
     public async Task Cannot_Convert_NonExistent_Content_Member_To_External()
     {
         // Act
@@ -617,9 +672,18 @@ internal sealed class ExternalMemberServiceTests : UmbracoIntegrationTest
         return member;
     }
 
+    private sealed class ExternalMemberDeletedRecorder
+    {
+        public List<Guid> DeletedKeys { get; } = [];
+    }
+
     private sealed class ExternalMemberDeletedSpy : INotificationHandler<ExternalMemberDeletedNotification>
     {
+        private readonly ExternalMemberDeletedRecorder _recorder;
+
+        public ExternalMemberDeletedSpy(ExternalMemberDeletedRecorder recorder) => _recorder = recorder;
+
         public void Handle(ExternalMemberDeletedNotification notification)
-            => _externalMemberDeletedKeys.AddRange(notification.DeletedEntities.Select(x => x.Key));
+            => _recorder.DeletedKeys.AddRange(notification.DeletedEntities.Select(x => x.Key));
     }
 }
