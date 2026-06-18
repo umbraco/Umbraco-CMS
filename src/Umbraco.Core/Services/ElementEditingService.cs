@@ -113,6 +113,13 @@ internal sealed class ElementEditingService
             return Attempt.FailWithStatus(ContentEditingOperationStatus.NotAllowed, new ContentValidationResult());
         }
 
+        // A content type filter could prevent the element from being created under the requested parent,
+        // consistent with the validation applied when actually creating the element.
+        if (await IsAllowedInLibraryByContentTypeFilters(contentType, createModel.ParentKey) is false)
+        {
+            return Attempt.FailWithStatus(ContentEditingOperationStatus.NotAllowed, new ContentValidationResult());
+        }
+
         return await ValidateCulturesAndPropertiesAsync(
             createModel,
             createModel.ContentTypeKey,
@@ -327,6 +334,20 @@ internal sealed class ElementEditingService
             }
 
             parentId = container.Id;
+        }
+
+        IContentType? contentType = ContentTypeService.Get(element.ContentType.Key);
+        if (contentType is null)
+        {
+            return Attempt.Fail(ContentEditingOperationStatus.ContentTypeNotFound);
+        }
+
+        // A content type filter could prevent the element from being moved to (or restored at) this destination,
+        // consistent with the validation applied when creating an element.
+        Guid? targetParentKey = containerKey.HasValue && containerKey.Value != Guid.Empty ? containerKey.Value : null;
+        if (await IsAllowedInLibraryByContentTypeFilters(contentType, targetParentKey) is false)
+        {
+            return Attempt.Fail(ContentEditingOperationStatus.NotAllowed);
         }
 
         var originalPath = element.Path;
