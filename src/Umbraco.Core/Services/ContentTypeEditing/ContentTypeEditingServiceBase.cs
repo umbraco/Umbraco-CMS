@@ -278,12 +278,6 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
             return operationStatus;
         }
 
-        // element types cannot vary by segment
-        if (model.IsElement && model.VariesBySegment)
-        {
-            return ContentTypeOperationStatus.InvalidSegmentVariationForElementType;
-        }
-
         return ContentTypeOperationStatus.Success;
     }
 
