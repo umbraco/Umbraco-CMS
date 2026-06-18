@@ -88,8 +88,8 @@ interface UmbContentPersistMethods<DetailModelType extends UmbContentDetailModel
 		saveData: DetailModelType,
 		variantIds: Array<UmbVariantId>,
 		parent: UmbEntityModel,
-	) => Promise<DetailModelType | undefined>;
-	update?: (saveData: DetailModelType, variantIds: Array<UmbVariantId>) => Promise<DetailModelType | undefined>;
+	) => Promise<DetailModelType>;
+	update?: (saveData: DetailModelType, variantIds: Array<UmbVariantId>) => Promise<DetailModelType>;
 }
 
 /**
@@ -1080,27 +1080,27 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		persistenceMethod?: UmbContentPersistMethods<DetailModelType>,
 	) {
 		if (this.getIsNew()) {
-			await this.#create(variantIds, saveData, persistenceMethod);
+			await this.#create(variantIds, saveData, persistenceMethod?.create);
 		} else {
-			await this.#update(variantIds, saveData, persistenceMethod);
+			await this.#update(variantIds, saveData, persistenceMethod?.update);
 		}
 	}
 
 	async #create(
 		variantIds: Array<UmbVariantId>,
 		saveData: DetailModelType,
-		persistenceMethod?: UmbContentPersistMethods<DetailModelType>,
+		overwriteCreate?: UmbContentPersistMethods<DetailModelType>['create'],
 	) {
 		const parent = this._internal_getCreateUnderParent();
 		if (!parent) throw new Error('Parent is not set');
 
-		const persisted = persistenceMethod?.create
-			? await persistenceMethod.create(saveData, variantIds, parent)
+		const persisted = overwriteCreate
+			? await overwriteCreate(saveData, variantIds, parent)
 			: await this.#defaultCreate(saveData, parent.unique);
 
 		// Set persisted AND current before flipping isNew: the flip triggers the new->edit redirect,
 		// whose navigation guard compares the two states with an order-sensitive comparison.
-		await this.#updateData(persisted, saveData, variantIds, this._data.getCurrent());
+		await this.#applyPersistedData(persisted, saveData, variantIds);
 		this.setIsNew(false);
 
 		await this.#dispatchActionEvents(
@@ -1112,15 +1112,13 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	async #update(
 		variantIds: Array<UmbVariantId>,
 		saveData: DetailModelType,
-		persistenceMethod?: UmbContentPersistMethods<DetailModelType>,
+		overwriteUpdate?: UmbContentPersistMethods<DetailModelType>['update'],
 	) {
-		const persisted = persistenceMethod?.update
-			? await persistenceMethod.update(saveData, variantIds)
+		const persisted = overwriteUpdate
+			? await overwriteUpdate(saveData, variantIds)
 			: await this.#defaultUpdate(saveData);
 
-		// Use getPersisted() as the merge base so non-saved variants retain the actual server state,
-		// not unsaved local edits from current data.
-		await this.#updateData(persisted, saveData, variantIds, this._data.getPersisted());
+		await this.#applyPersistedData(persisted, saveData, variantIds);
 
 		const unique = this.getUnique();
 		if (!unique) {
@@ -1148,22 +1146,15 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	}
 
 	/**
-	 * Reconciles the persisted and current data states after a save.
-	 *
-	 * When `persisted` is the saved document, the chosen variants are merged into both states so unsaved
-	 * variants retain their state. When it is `undefined` — the persistence endpoint did not return the
-	 * document — both states are set directly to the sent `saveData`; the caller is expected to follow up
-	 * with a reload for the authoritative state.
+	 * Partial update the current data with the persisted data, only for the variants that were saved.
 	 * @param {DetailModelType | undefined} persisted - The saved document, or undefined if not returned
 	 * @param {DetailModelType} saveData - The data that was sent to the server
 	 * @param {Array<UmbVariantId>} variantIds - The variants that were saved
-	 * @param {DetailModelType | undefined} persistedMergeBase - The base to merge the persisted state onto
 	 */
-	async #updateData(
+	async #applyPersistedData(
 		persisted: DetailModelType | undefined,
 		saveData: DetailModelType,
 		variantIds: Array<UmbVariantId>,
-		persistedMergeBase: DetailModelType | undefined,
 	) {
 		if (!persisted) {
 			this._data.setPersisted(saveData);
@@ -1174,7 +1165,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		const variantIdsIncludingInvariant = [...variantIds, UmbVariantId.CreateInvariant()];
 
 		const newPersistedData = await new UmbMergeContentVariantDataController(this).process(
-			persistedMergeBase,
+			this._data.getPersisted(),
 			persisted,
 			variantIds,
 			variantIdsIncludingInvariant,

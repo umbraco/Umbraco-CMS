@@ -16,10 +16,9 @@ const DA = UmbVariantId.Create({ culture: 'da', segment: null });
  * Reproduces the create-and-publish orchestration the publishing workspace context performs: build the
  * save data, then drive performCreateOrUpdate with a persist strategy that calls the combined
  * create-and-publish endpoint via the publishing data source. The endpoint does not return the saved
- * document (the strategy returns undefined), so the workspace reconciles to the sent data and applies the
- * create lifecycle. The reload+transfer that #performSaveAndPublish runs afterwards is intentionally
- * omitted here — these tests assert the state in the window before that reload, which is exactly the
- * window the new->edit redirect navigates in.
+ * document, so the strategy re-reads the authoritative server state (loadWithoutPersist) and returns it
+ * for the workspace to merge — published variants take the server values, edited-but-unpublished variants
+ * stay dirty.
  */
 async function createAndPublish(
 	context: UmbDocumentWorkspaceContext,
@@ -30,11 +29,11 @@ async function createAndPublish(
 	await context.performCreateOrUpdate(variantIds, saveData, {
 		create: async (data, ids, parent) => {
 			await publishingDataSource.createAndPublish(data, ids, parent.unique);
-			return undefined;
+			return context.loadWithoutPersist();
 		},
 		update: async (data, ids) => {
 			await publishingDataSource.updateAndPublish(data, ids);
-			return undefined;
+			return context.loadWithoutPersist();
 		},
 	});
 }
@@ -84,12 +83,10 @@ describe('UmbDocumentWorkspaceContext (create-and-publish redirect dirty state)'
 		).to.be.false;
 	});
 
-	// Guards the #68071 promise on the create path: the create-and-publish reconcile clears the dirty
-	// state for the redirect by resetting current to the saved (published) data, so the
-	// edited-but-unpublished variant is briefly absent. The full flow must restore it — the reload +
-	// transferPublishedVariantsToCurrent that #performSaveAndPublish runs re-applies the unpublished
-	// variant's edit so it survives and is dirty again. This asserts that end state (no data loss), not
-	// the intermediate redirect window.
+	// Guards the #68071 promise on the create path: the reconcile keeps the edited-but-unpublished variant
+	// dirty. The persist method re-reads the server document; the workspace merges it so the published
+	// variant takes the (clean) server values while the unpublished Danish edit stays in the current data
+	// state and remains dirty. This asserts that end state (no data loss).
 	it('restores an edited-but-unpublished variant after the full create-and-publish flow (no data loss)', async () => {
 		await context.create(PARENT_ENTITY, VARIANT_DOCUMENT_TYPE_ID);
 		context.setName('English name', EN_US);
@@ -97,11 +94,7 @@ describe('UmbDocumentWorkspaceContext (create-and-publish redirect dirty state)'
 		await context.setPropertyValue('variantText', 'English value', EN_US);
 		await context.setPropertyValue('variantText', 'Dansk vaerdi', DA);
 
-		// Mirror UmbDocumentPublishingWorkspaceContext #performSaveAndPublish for the create path:
-		const dirtyData = context.getData(); // full draft, incl. the unpublished Danish edit
 		await createAndPublish(context, publishingDataSource, [EN_US]);
-		await context.reload();
-		await context.transferPublishedVariantsToCurrent(dirtyData, [EN_US]);
 
 		const changed = context.getChangedVariants();
 		expect(

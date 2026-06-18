@@ -399,24 +399,22 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 		const entityType = this.#documentWorkspaceContext.getEntityType();
 		if (!entityType) throw new Error('Entity type is missing');
 
-		// Capture the current (draft) data before the operation, so variants that are not being published
-		// but still hold unsaved edits can be kept dirty after the reload below.
-		const dirtyData = this.#documentWorkspaceContext.getData();
+		// Clear stale published data and pending changes state before the persisted state changes, so the
+		// persistedData observer does not compare against outdated published data and briefly show a
+		// false-positive "pending changes" state.
+		// TODO: I don't think we need this one...
+		//this.#clear();
 
-		// Save and publish in a single server transaction (replaces the separate save + publish calls).
-		// The HTTP lives in the publishing domain; the document workspace context applies the create/update
-		// lifecycle (isNew, tree events, persisted reconcile). The endpoints don't return the document, so
-		// the workspace reconciles to the sent data and the reload below brings in the authoritative state.
 		await this.#documentWorkspaceContext.performCreateOrUpdate(variantIds, saveData, {
-			create: async (data, variantIds, parent) => {
-				const { error } = await this.#publishingRepository.createAndPublish(data, variantIds, parent.unique);
+			create: async (data, ids, parent) => {
+				const { error } = await this.#publishingRepository.createAndPublish(data, ids, parent.unique);
 				if (error) throw new Error('Error creating and publishing document');
-				return undefined;
+				return this.#documentWorkspaceContext!.loadWithoutPersist();
 			},
-			update: async (data, variantIds) => {
-				const { error } = await this.#publishingRepository.updateAndPublish(data, variantIds);
+			update: async (data, ids) => {
+				const { error } = await this.#publishingRepository.updateAndPublish(data, ids);
 				if (error) throw new Error('Error updating and publishing document');
-				return undefined;
+				return this.#documentWorkspaceContext!.loadWithoutPersist();
 			},
 		});
 
@@ -425,19 +423,6 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 				message: this.#localize.term('speechBubbles_editContentPublishedHeader'),
 			},
 		});
-
-		// Clear stale published data and pending changes state so the
-		// persistedData observer does not run a comparison against outdated
-		// data during reload, which would briefly show a false-positive
-		// "pending changes" state.
-		this.#clear();
-
-		// reload the document so all states are updated after the publish operation
-		await this.#documentWorkspaceContext.reload();
-
-		// The reload resets the current data state to the full server document. Re-apply the edits of the
-		// variants that were not published, so they remain dirty (and the Discard-Changes guard fires).
-		await this.#documentWorkspaceContext.transferPublishedVariantsToCurrent(dirtyData, variantIds);
 
 		await this.#loadAndProcessLastPublished();
 
