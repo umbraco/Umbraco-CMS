@@ -405,7 +405,11 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	 * @memberof UmbEntityWorkspaceContextBase
 	 */
 	protected _checkWillNavigateAway(newUrl: string | URL): boolean {
-		const href = newUrl instanceof URL ? newUrl.href : newUrl;
+		const basePath = this.routes.getAbsolutePath();
+		// Before the workspace has been routed we cannot position the match, so we never block.
+		if (basePath === undefined) return false;
+
+		const newPath = (newUrl instanceof URL ? newUrl : new URL(newUrl, window.location.origin)).pathname;
 
 		// The navigation stays within this workspace as long as the target still matches one of our
 		// local routes for the current entity. Besides the currently active route, we pair every local
@@ -422,7 +426,14 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 			}
 		}
 
-		return !sameEntityPaths.some((localPath) => href.includes(localPath));
+		// Anchor each candidate to this workspace's own absolute base path, so an identical segment
+		// elsewhere in the URL (nested workspaces, split views) cannot mask a real change to the
+		// segment this workspace owns.
+		return !sameEntityPaths.some((localPath) => {
+			if (localPath === '') return false;
+			const absolutePath = `${basePath}/${localPath}`;
+			return newPath === absolutePath || newPath.startsWith(`${absolutePath}/`);
+		});
 	}
 
 	protected async _create(currentData: DetailModelType, parent: UmbEntityModel) {
