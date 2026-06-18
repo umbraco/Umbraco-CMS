@@ -259,7 +259,7 @@ public class BlockEditorComponentTests
                 ""key"": """ + layoutKey + @""",
                 ""contentKey"": ""cc361d62-af55-4470-b228-190c44fabffb"",
                 ""settingsKey"": """ + settingsKey + @""",
-                ""isSharedContent"": true
+                ""isExternalContent"": true
             }
         ]
     },
@@ -311,12 +311,12 @@ public class BlockEditorComponentTests
         ""Umbraco.BlockGrid"": [{
                 ""key"": """ + rootLayoutKey + @""",
                 ""contentKey"": ""4852d9ef-ac8d-4d44-87c9-82d282aa0e7f"",
-                ""isSharedContent"": true,
+                ""isExternalContent"": true,
                 ""areas"": [{
                         ""items"": [{
                                 ""key"": """ + area1LayoutKey + @""",
                                 ""contentKey"": ""96a15ca9-3970-4e0a-9c66-18433bc23274"",
-                                ""isSharedContent"": true,
+                                ""isExternalContent"": true,
                                 ""areas"": [],
                                 ""columnSpan"": 3,
                                 ""rowSpan"": 1
@@ -326,7 +326,7 @@ public class BlockEditorComponentTests
                         ""items"": [{
                                 ""key"": """ + area2LayoutKey + @""",
                                 ""contentKey"": ""3093f7f1-c931-4325-ba71-638eb2746c8d"",
-                                ""isSharedContent"": true,
+                                ""isExternalContent"": true,
                                 ""areas"": [],
                                 ""columnSpan"": 3,
                                 ""rowSpan"": 1,

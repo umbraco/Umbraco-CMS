@@ -157,7 +157,7 @@ public abstract class BlockEditorPropertyNotificationHandlerBase<TBlockLayoutIte
         var keys = layoutItems.SelectMany(layoutItem => new[]
             {
                 layoutItem["key"]?.GetValue<string>(),
-                layoutItem["isSharedContent"]?.GetValue<bool>() is not true
+                layoutItem["isExternalContent"]?.GetValue<bool>() is not true
                     ? layoutItem["contentKey"]?.GetValue<string>()
                     : null,
                 layoutItem["settingsKey"]?.GetValue<string>(),
