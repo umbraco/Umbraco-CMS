@@ -187,6 +187,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 				this.#notificationContext?.peek('positive', notification);
 
 				// reload the document so all states are updated after the publish operation
+				// TODO: It seems wrong to make a full reload, In this case I think we can just update the variants status? [NL]
 				await this.#documentWorkspaceContext.reload();
 				this.#loadAndProcessLastPublished();
 
@@ -290,6 +291,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 			});
 
 			// reload the document so all states are updated after the publish operation
+			// TODO: It seems wrong to make a full reload, I think we should only load the selected variants. [NL]
 			await this.#documentWorkspaceContext.reload();
 			await this.#loadAndProcessLastPublished();
 
@@ -322,6 +324,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 		await new UmbUnpublishDocumentEntityAction(this, { unique, entityType, meta: {} as never }).execute();
 
 		// Reload workspace data to reflect the unpublished state
+		// TODO: It seems wrong to make a full reload, In this case I think we can just update the variants status? [NL]
 		await this.#documentWorkspaceContext.reload();
 		await this.#loadAndProcessLastPublished();
 	}
@@ -398,12 +401,6 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 
 		const entityType = this.#documentWorkspaceContext.getEntityType();
 		if (!entityType) throw new Error('Entity type is missing');
-
-		// Clear stale published data and pending changes state before the persisted state changes, so the
-		// persistedData observer does not compare against outdated published data and briefly show a
-		// false-positive "pending changes" state.
-		// TODO: I don't think we need this one...
-		//this.#clear();
 
 		await this.#documentWorkspaceContext.performCreateOrUpdate(variantIds, saveData, {
 			create: async (data, ids, parent) => {
