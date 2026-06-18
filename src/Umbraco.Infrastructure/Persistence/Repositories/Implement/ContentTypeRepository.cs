@@ -155,7 +155,7 @@ internal sealed class ContentTypeRepository : AsyncContentTypeRepositoryBase<ICo
 
         entity.AddingEntity();
 
-        PersistNewBaseContentTypeEFCore(entity);
+        PersistNewBaseContentType(entity);
         PersistTemplates(entity);
         PersistHistoryCleanup(entity);
 
@@ -187,7 +187,7 @@ internal sealed class ContentTypeRepository : AsyncContentTypeRepositoryBase<ICo
             entity.SortOrder = maxSortOrder + 1;
         }
 
-        PersistUpdatedBaseContentTypeEFCore(entity);
+        PersistUpdatedBaseContentType(entity);
         PersistTemplates(entity);
         PersistHistoryCleanup(entity);
 

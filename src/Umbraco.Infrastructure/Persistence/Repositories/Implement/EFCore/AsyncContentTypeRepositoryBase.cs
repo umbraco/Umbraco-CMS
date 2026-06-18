@@ -163,13 +163,13 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
 
     /// <summary>
     /// Persists a new content type, including any entity-specific tables. Derived repositories typically call
-    /// <see cref="PersistNewBaseContentTypeEFCore"/> for the shared definition tables.
+    /// <see cref="PersistNewBaseContentType"/> for the shared definition tables.
     /// </summary>
     protected abstract void PersistNewItem(TEntity entity);
 
     /// <summary>
     /// Persists an updated content type, including any entity-specific tables. Derived repositories typically call
-    /// <see cref="PersistUpdatedBaseContentTypeEFCore"/> for the shared definition tables.
+    /// <see cref="PersistUpdatedBaseContentType"/> for the shared definition tables.
     /// </summary>
     protected abstract void PersistUpdatedItem(TEntity entity);
 
@@ -374,7 +374,7 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
         });
 
         // Definition tables modelled in EF Core.
-        PersistDeletedBaseContentTypeEFCore(entity);
+        PersistDeletedBaseContentType(entity);
 
         entity.DeleteDate = DateTime.UtcNow;
         CommonRepository.ClearCache(); // always
@@ -387,7 +387,7 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
     /// cmsContentType + umbracoNode rows in FK-safe order. <c>ExecuteDelete</c> is set-based and bypasses the
     /// change tracker.
     /// </summary>
-    private void PersistDeletedBaseContentTypeEFCore(TEntity entity)
+    private void PersistDeletedBaseContentType(TEntity entity)
     {
         var id = entity.Id;
         ExecuteEfScope(db =>
@@ -412,7 +412,7 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
     /// cmsContentType + composition + allowed-type + property group/type rows through the EF Core
     /// <see cref="UmbracoDbContext"/>.
     /// </summary>
-    protected void PersistNewBaseContentTypeEFCore(IContentTypeComposition entity)
+    protected void PersistNewBaseContentType(IContentTypeComposition entity)
     {
         ValidateVariations(entity);
 
@@ -551,7 +551,7 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
     /// EF Core implementation of the content-type-definition update path. The variation cascade and
     /// content-instance cleanup run as EF raw SQL (variant engine), sharing the same bridged scope.
     /// </summary>
-    protected void PersistUpdatedBaseContentTypeEFCore(IContentTypeComposition entity)
+    protected void PersistUpdatedBaseContentType(IContentTypeComposition entity)
     {
         CorrectPropertyTypeVariations(entity);
         ValidateVariations(entity);
