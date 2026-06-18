@@ -38,9 +38,6 @@ public enum ExternalMemberOperationStatus
     /// </summary>
     NotImplemented,
 
-    // New members must be appended below to keep the existing numeric values stable — this is a public
-    // enum and consumers may persist or deserialize the underlying integer value.
-
     /// <summary>
     ///     The operation failed because the member has no external login link, so it could not
     ///     authenticate as an external-only member after conversion.
