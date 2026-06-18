@@ -35,7 +35,7 @@ export abstract class UmbTreeItemElementBase<
 	protected _item?: TreeItemModelType;
 
 	@property({ type: Boolean, reflect: true, attribute: 'no-access' })
-	protected _noAccess = undefined;
+	protected _noAccess: boolean = false;
 
 	/**
 	 * @param item - The item from which to extract flags.
