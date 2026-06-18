@@ -34,28 +34,8 @@ export abstract class UmbTreeItemElementBase<
 	}
 	protected _item?: TreeItemModelType;
 
-	/**
-	 * @internal
-	 * Indicates whether the user has no access to this tree item.
-	 * This property is reflected as an attribute for styling purposes.
-	 *
-	 * **Usage Pattern (opt-in):**
-	 * Child classes that support access restrictions should observe their context's `noAccess` observable
-	 * and update this property. The base class provides the property, styling, and interaction prevention,
-	 * but does not subscribe to the observable to avoid forcing all tree item types to implement it.
-	 *
-	 * **Example (in child class api setter):**
-	 * ```typescript
-	 * this.observe(this.#api.noAccess, (noAccess) => (this._noAccess = noAccess));
-	 * ```
-	 *
-	 * **Why not in the base interface?**
-	 * Adding `noAccess` to `UmbTreeItemContext` would be a breaking change, forcing all tree item
-	 * implementations (users, members, data types, etc.) to provide this property even when access
-	 * restrictions don't apply to them.
-	 */
 	@property({ type: Boolean, reflect: true, attribute: 'no-access' })
-	protected _noAccess = false;
+	protected _noAccess = undefined;
 
 	/**
 	 * @param item - The item from which to extract flags.
@@ -97,6 +77,7 @@ export abstract class UmbTreeItemElementBase<
 			this.observe(this.#api.isSelectable, (value) => (this._isSelectable = value), '_observeIsSelectable');
 			this.observe(this.#api.selectOnly, (value) => (this._selectOnly = value), '_observeSelectOnly');
 			this.observe(this.#api.isSelected, (value) => (this._isSelected = value), '_observeIsSelected');
+			this.observe(this.#api.noAccess, (value) => (this._noAccess = value), '_observeNoAccess');
 			this.observe(this.#api.path, (value) => (this._href = value), '_observePath');
 			this.observe(this.#api.pagination.currentPage, (value) => (this._currentPage = value), '_observeCurrentPage');
 			this.observe(this.#api.pagination.totalPages, (value) => (this._totalPages = value), '_observeTotalPages');

@@ -103,8 +103,7 @@ export abstract class UmbTreeItemApiBase<
 	#treeItemEntityActionManager = new UmbTreeItemEntityActionManager(this);
 	#hideTreeItemActions = new UmbBooleanState(false);
 
-	protected readonly _noAccess = new UmbBooleanState(false);
-	readonly noAccess = this._noAccess.asObservable();
+	readonly noAccess = this._treeItem.asObservablePart((item) => item?.noAccess ?? false);
 
 	readonly hasActions = combineLatest([
 		this.#treeItemEntityActionManager.hasActions,

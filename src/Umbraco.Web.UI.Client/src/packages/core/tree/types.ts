@@ -15,6 +15,7 @@ export interface UmbTreeItemModelBase extends UmbEntityWithOptionalFlags {
 	hasChildren: boolean;
 	isFolder: boolean;
 	icon?: string | null;
+	noAccess?: boolean;
 }
 
 export interface UmbTreeItemModel extends UmbTreeItemModelBase {
