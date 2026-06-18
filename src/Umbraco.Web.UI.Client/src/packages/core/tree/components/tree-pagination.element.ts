@@ -32,7 +32,7 @@ export class UmbTreePaginationElement extends UmbLitElement {
 	}
 
 	#onChange(event: UUIPaginationEvent) {
-		this.#treeContext?.loadPage(event.target.current);
+		this.#treeContext?.loadPage?.(event.target.current);
 	}
 
 	override render() {

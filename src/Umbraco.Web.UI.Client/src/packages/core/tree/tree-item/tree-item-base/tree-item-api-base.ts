@@ -317,7 +317,7 @@ export abstract class UmbTreeItemApiBase<
 	open(): void {
 		const item = this.getTreeItem();
 		if (!item) return;
-		this._treeContext?.open(item);
+		this._treeContext?.open?.(item);
 	}
 
 	select(): void {

@@ -30,7 +30,7 @@ export interface UmbTreeContext<
 	readonly expandTreeRoot: Observable<boolean | undefined>;
 	readonly hideTreeItemActions?: Observable<boolean>;
 	readonly isMenu?: Observable<boolean>;
-	readonly selectOnly: Observable<boolean | undefined>;
+	readonly selectOnly?: Observable<boolean | undefined>;
 
 	selectableFilter?(item: TreeItemType): boolean;
 	filter?(item: TreeItemType): boolean;
@@ -39,7 +39,7 @@ export interface UmbTreeContext<
 	readonly expansion: UmbTreeExpansionManager;
 
 	readonly rootItems: Observable<TreeItemType[]>;
-	readonly currentPageItems: Observable<TreeItemType[]>;
+	readonly currentPageItems?: Observable<TreeItemType[]>;
 	readonly hasChildren: Observable<boolean>;
 	readonly pagination: UmbPaginationManager;
 	readonly targetPagination: UmbTargetPaginationManager;
@@ -51,11 +51,11 @@ export interface UmbTreeContext<
 
 	getRepository(): UmbTreeRepository | undefined;
 
-	open(item: TreeItemType): void;
+	open?(item: TreeItemType): void;
 
 	loadTree(): void;
 	reloadTree(): void;
-	loadPage(pageNumber: number): void;
+	loadPage?(pageNumber: number): void;
 	loadMore(): void;
 	loadPrevItems(): void;
 	loadNextItems(): void;
@@ -66,8 +66,8 @@ export interface UmbTreeContext<
 	setHideTreeItemActions?(value: boolean): void;
 	getHideTreeItemActions?(): boolean;
 
-	setSelectOnly(value: boolean | undefined): void;
-	getSelectOnly(): boolean;
+	setSelectOnly?(value: boolean | undefined): void;
+	getSelectOnly?(): boolean;
 
 	setIsMenu?(value: boolean): void;
 	getIsMenu?(): boolean;

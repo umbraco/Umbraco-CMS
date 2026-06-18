@@ -275,7 +275,7 @@ export class UmbTableTreeViewElement extends UmbTreeViewElementBase<UmbTreeItemM
 					value: {
 						name,
 						href,
-						onOpen: item.hasChildren ? () => this._treeContext?.open(item as UmbTreeItemModel) : undefined,
+						onOpen: item.hasChildren ? () => this._treeContext?.open?.(item as UmbTreeItemModel) : undefined,
 					},
 				},
 				...manifestColumnData,
