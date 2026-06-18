@@ -37,6 +37,7 @@ internal sealed class DeferredSearchReindexService : IDeferredSearchReindexServi
     private readonly ConcurrentDictionary<int, byte> _pendingContentTypeIds = new();
     private readonly ConcurrentDictionary<int, byte> _pendingMediaTypeIds = new();
     private readonly ConcurrentDictionary<int, byte> _pendingMemberTypeIds = new();
+    private readonly ConcurrentDictionary<int, byte> _pendingElementIds = new();
     private int _processing; // 0 = idle, 1 = active
 
     /// <summary>
@@ -106,6 +107,17 @@ internal sealed class DeferredSearchReindexService : IDeferredSearchReindexServi
         ScheduleProcessing();
     }
 
+    /// <inheritdoc />
+    public void QueueElementReindex(IReadOnlyCollection<int> elementIds)
+    {
+        foreach (var id in elementIds)
+        {
+            _pendingElementIds.TryAdd(id, 0);
+        }
+
+        ScheduleProcessing();
+    }
+
     private void ScheduleProcessing()
     {
         if (_shutdownCts.IsCancellationRequested)
@@ -140,6 +152,7 @@ internal sealed class DeferredSearchReindexService : IDeferredSearchReindexServi
                 var contentTypeIds = DrainIds(_pendingContentTypeIds);
                 var mediaTypeIds = DrainIds(_pendingMediaTypeIds);
                 var memberTypeIds = DrainIds(_pendingMemberTypeIds);
+                var elementIds = DrainIds(_pendingElementIds);
 
                 try
                 {
@@ -164,6 +177,13 @@ internal sealed class DeferredSearchReindexService : IDeferredSearchReindexServi
                         _logger.LogInformation("Deferred reindex completed for member type IDs: {MemberTypeIds}", memberTypeIds);
                     }
 
+                    if (elementIds.Length > 0)
+                    {
+                        _logger.LogInformation("Deferred reindex starting for documents referencing element IDs: {ElementIds}", elementIds);
+                        ReindexDocumentsReferencingElements(elementIds);
+                        _logger.LogInformation("Deferred reindex completed for documents referencing element IDs: {ElementIds}", elementIds);
+                    }
+
                     consecutiveFailures = 0;
                 }
                 catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
@@ -171,6 +191,7 @@ internal sealed class DeferredSearchReindexService : IDeferredSearchReindexServi
                     RequeueIds(_pendingContentTypeIds, contentTypeIds);
                     RequeueIds(_pendingMediaTypeIds, mediaTypeIds);
                     RequeueIds(_pendingMemberTypeIds, memberTypeIds);
+                    RequeueIds(_pendingElementIds, elementIds);
                     throw;
                 }
                 catch (Exception ex)
@@ -180,6 +201,7 @@ internal sealed class DeferredSearchReindexService : IDeferredSearchReindexServi
                     RequeueIds(_pendingContentTypeIds, contentTypeIds);
                     RequeueIds(_pendingMediaTypeIds, mediaTypeIds);
                     RequeueIds(_pendingMemberTypeIds, memberTypeIds);
+                    RequeueIds(_pendingElementIds, elementIds);
 
                     if (consecutiveFailures >= MaxConsecutiveFailures)
                     {
@@ -263,6 +285,10 @@ internal sealed class DeferredSearchReindexService : IDeferredSearchReindexServi
             c => _umbracoIndexingHandler.ReIndexForMember(c));
     }
 
+    private void ReindexDocumentsReferencingElements(int[] elementIds)
+    {
+    }
+
     /// <summary>
     ///     Pages through a repository without acquiring distributed locks and invokes an action for each item.
     /// </summary>
@@ -328,7 +354,8 @@ internal sealed class DeferredSearchReindexService : IDeferredSearchReindexServi
     private bool HasPendingIds() =>
         _pendingContentTypeIds.IsEmpty is false ||
         _pendingMediaTypeIds.IsEmpty is false ||
-        _pendingMemberTypeIds.IsEmpty is false;
+        _pendingMemberTypeIds.IsEmpty is false ||
+        _pendingElementIds.IsEmpty is false;
 
     private static int[] DrainIds(ConcurrentDictionary<int, byte> dictionary)
     {
