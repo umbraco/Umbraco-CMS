@@ -19,7 +19,7 @@ import type {
 	UmbRepositoryResponse,
 	UmbRepositoryResponseWithAsObservable,
 } from '@umbraco-cms/backoffice/repository';
-import { UmbStateManager } from '@umbraco-cms/backoffice/utils';
+import { UmbStateManager, umbUrlPatternToString } from '@umbraco-cms/backoffice/utils';
 import { UmbValidationContext } from '@umbraco-cms/backoffice/validation';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbApiError } from '@umbraco-cms/backoffice/resources';
@@ -405,10 +405,24 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	 * @memberof UmbEntityWorkspaceContextBase
 	 */
 	protected _checkWillNavigateAway(newUrl: string | URL): boolean {
-		if (newUrl instanceof URL) {
-			newUrl = newUrl.href;
+		const href = newUrl instanceof URL ? newUrl.href : newUrl;
+
+		// The navigation stays within this workspace as long as the target still matches one of our
+		// local routes for the current entity. Besides the currently active route, we pair every local
+		// route with the current unique so that, for example, the post-create redirect from a "create"
+		// route to "edit/:unique" (still the same entity) is not treated as navigating away.
+		const sameEntityPaths = [this.routes.getActiveLocalPath()];
+
+		const unique = this.getUnique();
+		if (unique) {
+			for (const route of this.routes.getRoutes()) {
+				// Routes that don't carry the unique keep their unresolved `:param` tokens, so they
+				// can never match a concrete URL and are effectively skipped.
+				sameEntityPaths.push(umbUrlPatternToString(route.path, { unique }));
+			}
 		}
-		return !newUrl.includes(this.routes.getActiveLocalPath());
+
+		return !sameEntityPaths.some((localPath) => href.includes(localPath));
 	}
 
 	protected async _create(currentData: DetailModelType, parent: UmbEntityModel) {
