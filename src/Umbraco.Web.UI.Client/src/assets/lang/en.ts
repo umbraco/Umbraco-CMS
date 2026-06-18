@@ -2142,6 +2142,7 @@ export default {
 		classicViewLabel: 'Tree',
 		cardViewLabel: 'Cards',
 		tableViewLabel: 'Table',
+		children: 'Children',
 	},
 	update: {
 		updateAvailable: 'New update ready',

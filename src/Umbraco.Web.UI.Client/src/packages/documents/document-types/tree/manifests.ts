@@ -57,7 +57,7 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 		alias: 'Umb.WorkspaceView.DocumentType.Tree',
 		name: 'Document Type Tree Item Children Workspace View',
 		meta: {
-			label: 'Children',
+			label: '#tree_children',
 			pathname: 'children',
 			icon: 'icon-bulleted-list',
 			treeAlias: UMB_DOCUMENT_TYPE_TREE_ALIAS,
