@@ -43,7 +43,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.EFCore;
 /// </remarks>
 /// <typeparam name="TEntity">The type of content-type composition managed by the repository.</typeparam>
 internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRepositoryBase<Guid, TEntity>,
-    IContentTypeRepositoryBase<TEntity>
+    IContentTypeRepositoryBase<TEntity>,
+    IAsyncContentTypeRepositoryBase<TEntity>
     where TEntity : class, IContentTypeComposition
 {
     private readonly IIdKeyMap _idKeyMap;
@@ -203,6 +204,25 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
     public TEntity? Get(string alias)
         => GetAllCached().FirstOrDefault(x => x.Alias.InvariantEquals(alias));
 
+    /// <inheritdoc cref="IAsyncReadRepository{TKey,TEntity}.GetAsync" />
+    public async Task<TEntity?> GetAsync(int id, CancellationToken cancellationToken)
+        => (await GetAllAsync(cancellationToken)).FirstOrDefault(x => x.Id == id);
+
+    /// <inheritdoc cref="IAsyncReadRepository{TKey,TEntity}.GetManyAsync" />
+    public async Task<IEnumerable<TEntity>> GetManyAsync(int[] ids, CancellationToken cancellationToken)
+    {
+        IEnumerable<TEntity> all = await GetAllAsync(cancellationToken);
+        return ids is { Length: > 0 } ? all.Where(x => ids.Contains(x.Id)) : all;
+    }
+
+    /// <inheritdoc cref="IAsyncReadRepository{TKey,TEntity}.ExistsAsync" />
+    public async Task<bool> ExistsAsync(int id, CancellationToken cancellationToken)
+        => (await GetAllAsync(cancellationToken)).Any(x => x.Id == id);
+
+    /// <inheritdoc />
+    public async Task<TEntity?> GetAsync(string alias, CancellationToken cancellationToken)
+        => (await GetAllAsync(cancellationToken)).FirstOrDefault(x => x.Alias.InvariantEquals(alias));
+
     /// <inheritdoc />
     public void Save(TEntity entity)
     {
@@ -221,15 +241,23 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
     public IEnumerable<TEntity> Get(IQuery<TEntity> query)
     {
         EnsureAmbientScopeOnCallerContext();
-        return PerformGetByQueryAsync(query).GetAwaiter().GetResult().WhereNotNull();
+        return GetAsync(query, CancellationToken.None).GetAwaiter().GetResult();
     }
+
+    /// <inheritdoc />
+    public async Task<IEnumerable<TEntity>> GetAsync(IQuery<TEntity> query, CancellationToken cancellationToken)
+        => (await PerformGetByQueryAsync(query)).WhereNotNull();
 
     /// <inheritdoc />
     public int Count(IQuery<TEntity>? query)
     {
         EnsureAmbientScopeOnCallerContext();
-        return PerformCountAsync(query).GetAwaiter().GetResult();
+        return CountAsync(query, CancellationToken.None).GetAwaiter().GetResult();
     }
+
+    /// <inheritdoc />
+    public Task<int> CountAsync(IQuery<TEntity>? query, CancellationToken cancellationToken)
+        => PerformCountAsync(query);
 
     // ----------------------------------------------------------------------------------------------------
     // IQuery read path — the where clauses captured by the IQuery (SQL text + args) are appended to a
@@ -883,6 +911,13 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
     /// </summary>
     public IEnumerable<MoveEventInfo<TEntity>> Move(TEntity moving, EntityContainer? container)
     {
+        EnsureAmbientScopeOnCallerContext();
+        return MoveAsync(moving, container, CancellationToken.None).GetAwaiter().GetResult();
+    }
+
+    /// <inheritdoc />
+    public async Task<IEnumerable<MoveEventInfo<TEntity>>> MoveAsync(TEntity moving, EntityContainer? container, CancellationToken cancellationToken)
+    {
         var parentId = Constants.System.Root;
         Guid? parentKey = Constants.System.RootKey;
         if (container != null)
@@ -913,10 +948,10 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
         var movingPath = moving.Path + ","; // save before changing
         moving.Path = (container == null ? Constants.System.RootString : container.Path) + "," + moving.Id;
         moving.Level = container == null ? 1 : container.Level + 1;
-        Save(moving);
+        await SaveAsync(moving, cancellationToken);
 
         // update all descendants (from the cached full set), update in order of level
-        TEntity[] descendants = GetAllCached()
+        TEntity[] descendants = (await GetAllAsync(cancellationToken))
             .Where(type => type.Path.StartsWith(movingPath, StringComparison.Ordinal))
             .ToArray();
         var paths = new Dictionary<int, string>
@@ -931,7 +966,7 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
             descendant.Path = paths[descendant.Id] = paths[descendant.ParentId] + "," + descendant.Id;
             descendant.Level += levelDelta;
 
-            Save(descendant);
+            await SaveAsync(descendant, cancellationToken);
         }
 
         return moveInfo;
@@ -1628,12 +1663,17 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
     public string GetUniqueAlias(string alias)
     {
         EnsureAmbientScopeOnCallerContext();
+        return GetUniqueAliasAsync(alias, CancellationToken.None).GetAwaiter().GetResult();
+    }
 
+    /// <inheritdoc />
+    public async Task<string> GetUniqueAliasAsync(string alias, CancellationToken cancellationToken)
+    {
         // alias is unique across ALL content types!
-        List<string> aliases = ExecuteEfScopeAsync(db => db.ContentTypes
+        List<string> aliases = await ExecuteEfScopeAsync(db => db.ContentTypes
             .Where(x => x.Alias != null && x.Alias.StartsWith(alias))
             .Select(x => x.Alias!)
-            .ToListAsync()).GetAwaiter().GetResult();
+            .ToListAsync());
 
         var i = 1;
         string test;
@@ -1654,6 +1694,14 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
     }
 
     /// <inheritdoc />
+    public Task<bool> HasContainerInPathAsync(string contentPath, CancellationToken cancellationToken)
+    {
+        var ids = contentPath.Split(Constants.CharArrays.Comma)
+            .Select(s => int.Parse(s, CultureInfo.InvariantCulture)).ToArray();
+        return HasContainerInPathAsync(ids, cancellationToken);
+    }
+
+    /// <inheritdoc />
     public bool HasContainerInPath(params int[] ids)
     {
         if (ids.Length == 0)
@@ -1662,6 +1710,16 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
         }
 
         EnsureAmbientScopeOnCallerContext();
+        return HasContainerInPathAsync(ids, CancellationToken.None).GetAwaiter().GetResult();
+    }
+
+    /// <inheritdoc />
+    public Task<bool> HasContainerInPathAsync(int[] ids, CancellationToken cancellationToken)
+    {
+        if (ids.Length == 0)
+        {
+            return Task.FromResult(false);
+        }
 
         var sql =
             $"""
@@ -1670,25 +1728,34 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
              INNER JOIN {Constants.DatabaseSchema.Tables.Content} c ON ct.{ContentTypeDto.NodeIdColumnName} = c.contentTypeId
              WHERE c.nodeId IN ({string.Join(",", ids)}) AND ct.listView IS NULL
              """;
-        return ExecuteEfScopeAsync(db => db.Database.SqlQueryRaw<int>(sql).SingleAsync()).GetAwaiter().GetResult() > 0;
+        return ExecuteEfScopeAsync(async db => await db.Database.SqlQueryRaw<int>(sql).SingleAsync() > 0);
     }
 
     /// <inheritdoc />
     public bool HasContentNodes(int id)
     {
         EnsureAmbientScopeOnCallerContext();
+        return HasContentNodesAsync(id, CancellationToken.None).GetAwaiter().GetResult();
+    }
 
+    /// <inheritdoc />
+    public Task<bool> HasContentNodesAsync(int id, CancellationToken cancellationToken)
+    {
         var sql =
             $"SELECT CASE WHEN EXISTS (SELECT * FROM {Constants.DatabaseSchema.Tables.Content} WHERE contentTypeId = {{0}}) THEN 1 ELSE 0 END AS Value";
-        return ExecuteEfScopeAsync(db => db.Database.SqlQueryRaw<int>(sql, id).SingleAsync()).GetAwaiter().GetResult() == 1;
+        return ExecuteEfScopeAsync(async db => await db.Database.SqlQueryRaw<int>(sql, id).SingleAsync() == 1);
     }
 
     /// <inheritdoc />
     public IEnumerable<Guid> GetAllowedParentKeys(Guid key)
     {
         EnsureAmbientScopeOnCallerContext();
+        return GetAllowedParentKeysAsync(key, CancellationToken.None).GetAwaiter().GetResult();
+    }
 
-        return ExecuteEfScopeAsync(db =>
+    /// <inheritdoc />
+    public async Task<IEnumerable<Guid>> GetAllowedParentKeysAsync(Guid key, CancellationToken cancellationToken)
+        => await ExecuteEfScopeAsync(db =>
         {
             IQueryable<int> childNodeIds = db.Nodes
                 .Where(x => x.UniqueId == key)
@@ -1698,8 +1765,7 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
                     join node in db.Nodes on allowed.Id equals node.NodeId
                     where childNodeIds.Contains(allowed.AllowedId)
                     select node.UniqueId).ToListAsync();
-        }).GetAwaiter().GetResult();
-    }
+        });
 
     /// <summary>
     /// Resolves the entity's allowed content types to their node ids directly against the database (not the

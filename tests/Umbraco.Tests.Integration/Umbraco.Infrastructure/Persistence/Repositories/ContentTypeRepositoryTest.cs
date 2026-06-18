@@ -236,7 +236,6 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
             LoggerFactory.CreateLogger<ContentTypeRepository>(),
             commonRepository,
             LanguageRepository,
-            ShortStringHelper,
             Mock.Of<IRepositoryCacheVersionService>(),
             IdKeyMap,
             Mock.Of<ICacheSyncService>(),
