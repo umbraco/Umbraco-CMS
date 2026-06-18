@@ -18,7 +18,7 @@ export abstract class UmbTreeItemContextBase<
 {
 	protected readonly _treeItemChildrenManager = new UmbTreeItemChildrenManager<TreeItemType, TreeRootType>(this);
 	public readonly childItems = this._treeItemChildrenManager.children;
-	public readonly hasChildren = this._treeItemChildrenManager.hasChildren;
+	public override readonly hasChildren = this._treeItemChildrenManager.hasChildren;
 	public readonly foldersOnly = this._treeItemChildrenManager.foldersOnly;
 	public readonly pagination = this._treeItemChildrenManager.offsetPagination;
 	public readonly targetPagination = this._treeItemChildrenManager.targetPagination;
