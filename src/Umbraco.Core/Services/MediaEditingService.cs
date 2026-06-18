@@ -83,7 +83,15 @@ internal sealed class MediaEditingService
 
     /// <inheritdoc />
     public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateCreateAsync(MediaCreateModel createModel)
-        => await ValidatePropertiesAsync(createModel, createModel.ContentTypeKey);
+    {
+        ContentEditingOperationStatus creationAllowedStatus = await ValidateCreationAllowedAsync(createModel);
+        if (creationAllowedStatus != ContentEditingOperationStatus.Success)
+        {
+            return Attempt.FailWithStatus(creationAllowedStatus, new ContentValidationResult());
+        }
+
+        return await ValidatePropertiesAsync(createModel, createModel.ContentTypeKey);
+    }
 
     /// <inheritdoc />
     public async Task<Attempt<MediaCreateResult, ContentEditingOperationStatus>> CreateAsync(MediaCreateModel createModel, Guid userKey)
