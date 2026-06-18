@@ -1,4 +1,5 @@
 import { UmbSubmittableWorkspaceContextBase } from '../submittable/index.js';
+import { umbWorkspaceWillNavigateAway } from '../utils/check-will-navigate-away.function.js';
 import { UmbEntityWorkspaceDataManager } from '../entity/entity-workspace-data-manager.js';
 import type { UmbSubmittableTreeEntityWorkspaceContext } from '../contexts/tokens/index.js';
 import type { UmbEntityDetailWorkspaceContextArgs, UmbEntityDetailWorkspaceContextCreateArgs } from './types.js';
@@ -19,7 +20,7 @@ import type {
 	UmbRepositoryResponse,
 	UmbRepositoryResponseWithAsObservable,
 } from '@umbraco-cms/backoffice/repository';
-import { UmbStateManager, umbUrlPatternToString } from '@umbraco-cms/backoffice/utils';
+import { UmbStateManager } from '@umbraco-cms/backoffice/utils';
 import { UmbValidationContext } from '@umbraco-cms/backoffice/validation';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbApiError } from '@umbraco-cms/backoffice/resources';
@@ -405,35 +406,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	 * @memberof UmbEntityWorkspaceContextBase
 	 */
 	protected _checkWillNavigateAway(newUrl: string | URL): boolean {
-		const basePath = this.routes.getAbsolutePath();
-		// Before the workspace has been routed we cannot position the match, so we never block.
-		if (basePath === undefined) return false;
-
-		const newPath = (newUrl instanceof URL ? newUrl : new URL(newUrl, window.location.origin)).pathname;
-
-		// The navigation stays within this workspace as long as the target still matches one of our
-		// local routes for the current entity. Besides the currently active route, we pair every local
-		// route with the current unique so that, for example, the post-create redirect from a "create"
-		// route to "edit/:unique" (still the same entity) is not treated as navigating away.
-		const sameEntityPaths = [this.routes.getActiveLocalPath()];
-
-		const unique = this.getUnique();
-		if (unique) {
-			for (const route of this.routes.getRoutes()) {
-				// Routes that don't carry the unique keep their unresolved `:param` tokens, so they
-				// can never match a concrete URL and are effectively skipped.
-				sameEntityPaths.push(umbUrlPatternToString(route.path, { unique }));
-			}
-		}
-
-		// Anchor each candidate to this workspace's own absolute base path, so an identical segment
-		// elsewhere in the URL (nested workspaces, split views) cannot mask a real change to the
-		// segment this workspace owns.
-		return !sameEntityPaths.some((localPath) => {
-			if (localPath === '') return false;
-			const absolutePath = `${basePath}/${localPath}`;
-			return newPath === absolutePath || newPath.startsWith(`${absolutePath}/`);
-		});
+		return umbWorkspaceWillNavigateAway(this.routes, this.getUnique(), newUrl);
 	}
 
 	protected async _create(currentData: DetailModelType, parent: UmbEntityModel) {
