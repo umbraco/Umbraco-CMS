@@ -2,6 +2,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Examine;
@@ -160,6 +161,9 @@ internal sealed class RichTextPropertyIndexValueFactory : BlockValuePropertyInde
 
     protected override IEnumerable<RawDataItem> GetDataItems(RichTextEditorValue input, bool published)
         => GetDataItems(input.Blocks?.GetLayouts() ?? [], input.Blocks?.ContentData ?? [], input.Blocks?.Expose ?? [], published);
+
+    protected override IEnumerable<IBlockLayoutItem> GetLayouts(RichTextEditorValue input)
+        => input.Blocks?.GetLayouts()?.Cast<IBlockLayoutItem>() ?? [];
 
     /// <summary>
     /// Strips HTML tags from content, replacing them with spaces to preserve word boundaries for indexing.

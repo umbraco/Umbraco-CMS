@@ -23,4 +23,7 @@ internal sealed class BlockListPropertyIndexValueFactory
 
     protected override IEnumerable<RawDataItem> GetDataItems(BlockListValue input, bool published)
         => GetDataItems(input.GetLayouts() ?? [], input.ContentData, input.Expose, published);
+
+    protected override IEnumerable<IBlockLayoutItem> GetLayouts(BlockListValue input)
+        => input.GetLayouts() ?? [];
 }

@@ -23,4 +23,7 @@ internal sealed class SingleBlockPropertyIndexValueFactory
 
     protected override IEnumerable<RawDataItem> GetDataItems(SingleBlockValue input, bool published)
         => GetDataItems(input.GetLayouts() ?? [], input.ContentData, input.Expose, published);
+
+    protected override IEnumerable<IBlockLayoutItem> GetLayouts(SingleBlockValue input)
+        => input.GetLayouts() ?? [];
 }

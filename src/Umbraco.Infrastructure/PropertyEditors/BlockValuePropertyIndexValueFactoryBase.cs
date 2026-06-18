@@ -14,6 +14,7 @@ internal abstract class BlockValuePropertyIndexValueFactoryBase<TSerialized> : J
 {
     private readonly PropertyEditorCollection _propertyEditorCollection;
     private readonly IElementService _elementService;
+    private readonly IJsonSerializer _jsonSerializer;
 
     protected BlockValuePropertyIndexValueFactoryBase(
         PropertyEditorCollection propertyEditorCollection,
@@ -24,6 +25,7 @@ internal abstract class BlockValuePropertyIndexValueFactoryBase<TSerialized> : J
     {
         _propertyEditorCollection = propertyEditorCollection;
         _elementService = elementService;
+        _jsonSerializer = jsonSerializer;
     }
 
     protected override IEnumerable<IndexValue> Handle(
@@ -106,6 +108,85 @@ internal abstract class BlockValuePropertyIndexValueFactoryBase<TSerialized> : J
     /// Get the data items of a parent item. E.g. block list have contentData.
     /// </summary>
     protected abstract IEnumerable<RawDataItem> GetDataItems(TSerialized input, bool published);
+
+    /// <summary>
+    /// Gets the layout items of a block value.
+    /// </summary>
+    protected abstract IEnumerable<IBlockLayoutItem> GetLayouts(TSerialized input);
+
+    /// <inheritdoc />
+    public override IEnumerable<IndexValue> GetIndexValues(
+        IProperty property,
+        string? culture,
+        string? segment,
+        bool published,
+        IEnumerable<string> availableCultures,
+        IDictionary<Guid, IContentType> contentTypeDictionary)
+    {
+        var result = base
+            .GetIndexValues(property, culture, segment, published, availableCultures, contentTypeDictionary)
+            .ToList();
+
+        result.AddRange(GetSharedElementReferenceIndexValues(property, culture, segment, published));
+
+        return result;
+    }
+
+    private IEnumerable<IndexValue> GetSharedElementReferenceIndexValues(
+        IProperty property,
+        string? culture,
+        string? segment,
+        bool published)
+    {
+        if (property.GetValue(culture, segment, published) is not string rawValue || rawValue.DetectIsJson() is false)
+        {
+            return [];
+        }
+
+        TSerialized? deserialized;
+        try
+        {
+            deserialized = _jsonSerializer.Deserialize<TSerialized>(rawValue);
+        }
+        catch (InvalidCastException)
+        {
+            return [];
+        }
+        catch (ArgumentException)
+        {
+            return [];
+        }
+
+        if (deserialized is null)
+        {
+            return [];
+        }
+
+        IBlockLayoutItem[] layouts = GetLayouts(deserialized).ToArray();
+        IBlockLayoutItem[] allLayouts = layouts
+            .Union(layouts.SelectMany(l => l.GetContainedLayouts()))
+            .ToArray();
+
+        var result = new List<IndexValue>();
+        for (var index = 0; index < allLayouts.Length; index++)
+        {
+            IBlockLayoutItem layout = allLayouts[index];
+            if (layout.IsExternalContent is false)
+            {
+                continue;
+            }
+
+            result.Add(
+                new IndexValue
+                {
+                    Culture = culture,
+                    FieldName = $"{property.Alias}.items[{index}].{UmbracoExamineFieldNames.ElementKeyFieldName}",
+                    Values = [layout.ContentKey.ToString()],
+                });
+        }
+
+        return result;
+    }
 
     /// <summary>
     /// Unwraps block item data as data items.

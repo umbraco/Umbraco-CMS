@@ -5,6 +5,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Integration.Attributes;
@@ -16,6 +17,10 @@ internal class BlockListWithReusableContentTest : BlockEditorWithReusableContent
     public static void ConfigureAllowEditInvariantFromNonDefaultTrue(IUmbracoBuilder builder)
         => builder.Services.Configure<ContentSettings>(config =>
             config.AllowEditInvariantFromNonDefault = true);
+
+    public static void ConfigureIndexSharedElementsTrue(IUmbracoBuilder builder)
+        => builder.Services.Configure<IndexingSettings>(config =>
+            config.IndexSharedElements = true);
 
     [Test]
     public async Task Can_Handle_Reusable_Element()
@@ -788,6 +793,7 @@ internal class BlockListWithReusableContentTest : BlockEditorWithReusableContent
 
     [TestCase(true)]
     [TestCase(false)]
+    [ConfigureBuilder(ActionName = nameof(ConfigureIndexSharedElementsTrue))]
     public async Task Can_Include_Invariant_Reusable_Elements_In_Search_Indexing(bool published)
     {
         var elementType = await CreateElementType(ContentVariation.Nothing);
@@ -832,18 +838,16 @@ internal class BlockListWithReusableContentTest : BlockEditorWithReusableContent
             contentTypeDictionary: new Dictionary<Guid, IContentType>
             {
                 { elementType.Key, elementType }, { contentType.Key, contentType },
-            });
+            }).ToList();
 
-        Assert.AreEqual(1, indexValues.Count());
-
-        var indexValue = indexValues.FirstOrDefault(v => v.Culture is null);
+        var indexValue = indexValues.FirstOrDefault(v => v.Culture is null && v.FieldName == "blocks");
         Assert.IsNotNull(indexValue);
-        Assert.AreEqual(1, indexValue.Values.Count());
+        Assert.AreEqual(1, indexValue!.Values.Count());
 
         var indexedValue = indexValue.Values.First() as string;
         Assert.IsNotNull(indexedValue);
 
-        var values = indexedValue.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
+        var values = indexedValue!.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
         Assert.AreEqual(2, values.Length);
         Assert.Contains("The reusable invariant text", values);
         Assert.Contains("The reusable variant text", values);
@@ -851,6 +855,7 @@ internal class BlockListWithReusableContentTest : BlockEditorWithReusableContent
 
     [TestCase(true)]
     [TestCase(false)]
+    [ConfigureBuilder(ActionName = nameof(ConfigureIndexSharedElementsTrue))]
     public async Task Can_Include_Variant_Reusable_Elements_In_Search_Indexing(bool published)
     {
         var elementType = await CreateElementType(ContentVariation.Culture);
@@ -895,25 +900,70 @@ internal class BlockListWithReusableContentTest : BlockEditorWithReusableContent
             contentTypeDictionary: new Dictionary<Guid, IContentType>
             {
                 { elementType.Key, elementType }, { contentType.Key, contentType },
-            });
-
-        Assert.AreEqual(2, indexValues.Count());
+            }).ToList();
 
         AssertIndexValues("en-US", "The reusable English text");
         AssertIndexValues("da-DK", "The reusable Danish text");
 
         void AssertIndexValues(string culture, string variantText)
         {
-            var indexValue = indexValues.FirstOrDefault(v => v.Culture == culture);
+            var indexValue = indexValues.FirstOrDefault(v => v.Culture == culture && v.FieldName == "blocks");
             Assert.IsNotNull(indexValue);
-            Assert.AreEqual(1, indexValue.Values.Count());
+            Assert.AreEqual(1, indexValue!.Values.Count());
             var indexedValue = indexValue.Values.First() as string;
             Assert.IsNotNull(indexedValue);
-            var values = indexedValue.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
+            var values = indexedValue!.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
             Assert.AreEqual(2, values.Length);
             Assert.Contains(variantText, values);
             Assert.Contains("The reusable invariant text", values);
         }
+    }
+
+    [Test]
+    public async Task Always_Indexes_Shared_Element_Reference()
+    {
+        var elementType = await CreateElementType(ContentVariation.Nothing);
+        var blockListDataType = await CreateBlockListDataType(elementType);
+        var contentType = await CreateContentType(ContentVariation.Nothing, blockListDataType);
+
+        var reusableElementKey = await CreateAndPublishInvariantReusableElement(elementType.Key);
+
+        var blockListValue = new BlockListValue
+        {
+            Layout = new Dictionary<string, IEnumerable<IBlockLayoutItem>>
+            {
+                {
+                    Constants.PropertyEditors.Aliases.BlockList,
+                    [
+                        new BlockListLayoutItem { ContentKey = reusableElementKey, IsExternalContent = true }
+                    ]
+                },
+            },
+            ContentData = [],
+            SettingsData = [],
+            Expose = [],
+        };
+
+        var content = new ContentBuilder().WithContentType(contentType).WithName("Page").Build();
+        content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
+        ContentService.Save(content);
+        PublishContent(content, ["*"]);
+
+        var editor = blockListDataType.Editor!;
+        var indexValues = editor.PropertyIndexValueFactory.GetIndexValues(
+            content.Properties["blocks"]!,
+            culture: null,
+            segment: null,
+            published: true,
+            availableCultures: ["en-US"],
+            contentTypeDictionary: new Dictionary<Guid, IContentType>
+            {
+                { elementType.Key, elementType }, { contentType.Key, contentType },
+            }).ToList();
+
+        var referenceField = indexValues.SingleOrDefault(v => v.FieldName == $"blocks.items[0].{UmbracoExamineFieldNames.ElementKeyFieldName}");
+        Assert.IsNotNull(referenceField, "Expected a positional __elementKey reference field for the shared element.");
+        Assert.AreEqual(reusableElementKey.ToString(), referenceField!.Values.Single());
     }
 
     private async Task<IDataType> CreateBlockListDataType(IContentType elementType)
