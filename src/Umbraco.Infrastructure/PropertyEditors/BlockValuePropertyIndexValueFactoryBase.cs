@@ -15,6 +15,7 @@ internal abstract class BlockValuePropertyIndexValueFactoryBase<TSerialized> : J
     private readonly PropertyEditorCollection _propertyEditorCollection;
     private readonly IElementService _elementService;
     private readonly IJsonSerializer _jsonSerializer;
+    private readonly IOptionsMonitor<IndexingSettings> _indexingSettings;
 
     protected BlockValuePropertyIndexValueFactoryBase(
         PropertyEditorCollection propertyEditorCollection,
@@ -26,6 +27,7 @@ internal abstract class BlockValuePropertyIndexValueFactoryBase<TSerialized> : J
         _propertyEditorCollection = propertyEditorCollection;
         _elementService = elementService;
         _jsonSerializer = jsonSerializer;
+        _indexingSettings = indexingSettings;
     }
 
     protected override IEnumerable<IndexValue> Handle(
@@ -238,7 +240,7 @@ internal abstract class BlockValuePropertyIndexValueFactoryBase<TSerialized> : J
             .Select(l => l.ContentKey)
             .ToArray();
 
-        if (sharedElementKeys.Length > 0)
+        if (sharedElementKeys.Length > 0 && _indexingSettings.CurrentValue.IndexSharedElements)
         {
             IEnumerable<IElement> elements = _elementService.GetByIds(sharedElementKeys);
             indexData.AddRange(

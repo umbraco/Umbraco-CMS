@@ -966,6 +966,59 @@ internal class BlockListWithReusableContentTest : BlockEditorWithReusableContent
         Assert.AreEqual(reusableElementKey.ToString(), referenceField!.Values.Single());
     }
 
+    [Test]
+    public async Task Does_Not_Index_Shared_Element_Content_When_Opt_In_Disabled()
+    {
+        var elementType = await CreateElementType(ContentVariation.Nothing);
+        var blockListDataType = await CreateBlockListDataType(elementType);
+        var contentType = await CreateContentType(ContentVariation.Nothing, blockListDataType);
+
+        var reusableElementKey = await CreateAndPublishInvariantReusableElement(elementType.Key);
+
+        var blockListValue = new BlockListValue
+        {
+            Layout = new Dictionary<string, IEnumerable<IBlockLayoutItem>>
+            {
+                {
+                    Constants.PropertyEditors.Aliases.BlockList,
+                    [
+                        new BlockListLayoutItem { ContentKey = reusableElementKey, IsExternalContent = true }
+                    ]
+                },
+            },
+            ContentData = [],
+            SettingsData = [],
+            Expose = [],
+        };
+
+        var content = new ContentBuilder().WithContentType(contentType).WithName("Page").Build();
+        content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
+        ContentService.Save(content);
+        PublishContent(content, ["*"]);
+
+        var editor = blockListDataType.Editor!;
+        var indexValues = editor.PropertyIndexValueFactory.GetIndexValues(
+            content.Properties["blocks"]!,
+            culture: null,
+            segment: null,
+            published: true,
+            availableCultures: ["en-US"],
+            contentTypeDictionary: new Dictionary<Guid, IContentType>
+            {
+                { elementType.Key, elementType }, { contentType.Key, contentType },
+            }).ToList();
+
+        // Reference is always present.
+        Assert.IsTrue(indexValues.Any(v => v.FieldName == $"blocks.items[0].{UmbracoExamineFieldNames.ElementKeyFieldName}"));
+
+        // Element content must NOT be indexed when opt-in is disabled.
+        var allText = string.Join(
+            Environment.NewLine,
+            indexValues.SelectMany(v => v.Values).OfType<string>());
+        Assert.IsFalse(allText.Contains("The reusable invariant text"), "Shared-element content must not be indexed when the opt-in is disabled.");
+        Assert.IsFalse(allText.Contains("The reusable variant text"), "Shared-element content must not be indexed when the opt-in is disabled.");
+    }
+
     private async Task<IDataType> CreateBlockListDataType(IContentType elementType)
         => await CreateBlockEditorDataType(
             Constants.PropertyEditors.Aliases.BlockList,
