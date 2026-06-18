@@ -33,21 +33,20 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.EFCore;
 ///     Provides the shared functionality for the content-type composition repositories (document, media and member
 ///     types), running entirely on the EF Core <see cref="UmbracoDbContext"/> (async base) while still exposing the
 ///     synchronous <see cref="IContentTypeRepositoryBase{TEntity}"/> contract that the content-type service layer
-///     calls; the sync members bridge to the async base.
+///     calls; the sync members bridge to the async work via <c>GetAwaiter().GetResult()</c>.
 /// </summary>
 /// <remarks>
 ///     Derived repositories supply the entity-specific <see cref="NodeObjectTypeId"/> and <see cref="SupportsPublishing"/>,
-///     implement the <see cref="PersistNewItem"/> / <see cref="PersistUpdatedItem"/> orchestration (adding any entity
+///     implement the <c>PersistNewItemAsync</c> / <c>PersistUpdatedItemAsync</c> orchestration (adding any entity
 ///     specific tables such as templates), and may delete entity-specific definition tables via
-///     <see cref="DeleteContentTypeSpecificDefinitionTables"/>. Tables not modelled in EF Core (content-instance tables
-///     owned by other repositories) are accessed with EF raw SQL on the same context.
+///     <see cref="DeleteContentTypeSpecificDefinitionTablesAsync"/>. Tables not modelled in EF Core (content-instance
+///     tables owned by other repositories) are accessed with EF raw SQL on the same context.
 /// </remarks>
 /// <typeparam name="TEntity">The type of content-type composition managed by the repository.</typeparam>
 internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRepositoryBase<Guid, TEntity>,
     IContentTypeRepositoryBase<TEntity>
     where TEntity : class, IContentTypeComposition
 {
-    private readonly IShortStringHelper _shortStringHelper;
     private readonly IIdKeyMap _idKeyMap;
 
     /// <summary>
@@ -58,7 +57,6 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
         ILogger<AsyncContentTypeRepositoryBase<TEntity>> logger,
         IContentTypeCommonRepository commonRepository,
         ILanguageRepository languageRepository,
-        IShortStringHelper shortStringHelper,
         IRepositoryCacheVersionService repositoryCacheVersionService,
         IIdKeyMap idKeyMap,
         ICacheSyncService cacheSyncService,
@@ -72,7 +70,6 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
     {
         CommonRepository = commonRepository;
         LanguageRepository = languageRepository;
-        _shortStringHelper = shortStringHelper;
         _idKeyMap = idKeyMap;
     }
 
@@ -97,8 +94,9 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
     protected abstract bool SupportsPublishing { get; }
 
     // ----------------------------------------------------------------------------------------------------
-    // Async EF Core base overrides + cache policy. Bodies are synchronous-in-substance (the EF work runs
-    // synchronously and is returned via completed tasks), so the sync bridge below never blocks on real I/O.
+    // Async EF Core base overrides + cache policy. Reads are served from the FullDataSet cache (its backing
+    // set comes from the synchronous NPoco common repository), so they return completed tasks. The write and
+    // delete paths below are genuinely async (SaveChangesAsync/ExecuteDeleteAsync/ExecuteSqlRawAsync/...).
     // ----------------------------------------------------------------------------------------------------
 
     /// <inheritdoc />
@@ -136,42 +134,12 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
     protected override Task<bool> PerformExistsAsync(Guid key)
         => Task.FromResult(GetAllCached().Any(x => x.Key == key));
 
-    /// <inheritdoc />
-    protected override Task PersistNewItemAsync(TEntity item)
-    {
-        PersistNewItem(item);
-        return Task.CompletedTask;
-    }
-
-    /// <inheritdoc />
-    protected override Task PersistUpdatedItemAsync(TEntity item)
-    {
-        PersistUpdatedItem(item);
-        return Task.CompletedTask;
-    }
-
-    /// <inheritdoc />
-    protected override Task PersistDeletedItemAsync(TEntity entity)
-    {
-        PersistDeletedItem(entity);
-        return Task.CompletedTask;
-    }
-
     // ----------------------------------------------------------------------------------------------------
-    // Entity-specific persistence hooks implemented by derived repositories.
+    // Entity-specific persistence hooks implemented by derived repositories. PersistNewItemAsync /
+    // PersistUpdatedItemAsync are inherited as abstract from AsyncEntityRepositoryBase — derived repositories
+    // implement them, typically calling PersistNewBaseContentTypeAsync / PersistUpdatedBaseContentTypeAsync
+    // for the shared definition tables and adding any entity-specific tables (templates, history cleanup).
     // ----------------------------------------------------------------------------------------------------
-
-    /// <summary>
-    /// Persists a new content type, including any entity-specific tables. Derived repositories typically call
-    /// <see cref="PersistNewBaseContentType"/> for the shared definition tables.
-    /// </summary>
-    protected abstract void PersistNewItem(TEntity entity);
-
-    /// <summary>
-    /// Persists an updated content type, including any entity-specific tables. Derived repositories typically call
-    /// <see cref="PersistUpdatedBaseContentType"/> for the shared definition tables.
-    /// </summary>
-    protected abstract void PersistUpdatedItem(TEntity entity);
 
     /// <summary>
     /// Deletes entity-specific definition tables (e.g. templates, version cleanup policies) for the given content
@@ -179,13 +147,12 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
     /// </summary>
     /// <param name="db">The ambient EF Core context.</param>
     /// <param name="id">The content type node id.</param>
-    protected virtual void DeleteContentTypeSpecificDefinitionTables(UmbracoDbContext db, int id)
-    {
-    }
+    protected virtual Task DeleteContentTypeSpecificDefinitionTablesAsync(UmbracoDbContext db, int id)
+        => Task.CompletedTask;
 
     // ----------------------------------------------------------------------------------------------------
     // Synchronous IContentTypeRepositoryBase contract (consumed by the shared sync content-type service base).
-    // Reads are served from the FullDataSet cache; writes/deletes bridge to the async base.
+    // Reads are served from the FullDataSet cache; writes/deletes/queries bridge to the async work.
     // ----------------------------------------------------------------------------------------------------
 
     private IEnumerable<TEntity> GetAllCached()
@@ -253,17 +220,24 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
 
     /// <inheritdoc />
     public IEnumerable<TEntity> Get(IQuery<TEntity> query)
-        => PerformGetByQuery(query).WhereNotNull();
+    {
+        EnsureAmbientScopeOnCallerContext();
+        return PerformGetByQueryAsync(query).GetAwaiter().GetResult().WhereNotNull();
+    }
 
     /// <inheritdoc />
-    public int Count(IQuery<TEntity>? query) => PerformCount(query);
+    public int Count(IQuery<TEntity>? query)
+    {
+        EnsureAmbientScopeOnCallerContext();
+        return PerformCountAsync(query).GetAwaiter().GetResult();
+    }
 
     // ----------------------------------------------------------------------------------------------------
     // IQuery read path — the where clauses captured by the IQuery (SQL text + args) are appended to a
     // hand-written id-select and executed by EF Core as raw SQL; matching entities are then hydrated from
     // the cached full set.
     // ----------------------------------------------------------------------------------------------------
-    private IEnumerable<TEntity> PerformGetByQuery(IQuery<TEntity> query)
+    private async Task<IEnumerable<TEntity>> PerformGetByQueryAsync(IQuery<TEntity> query)
     {
         // note: Guid values must be bound as parameters (not string literals) — providers store/bind them
         // in provider-specific formats (e.g. uppercase TEXT on SQLite, uniqueidentifier on SQL Server).
@@ -281,7 +255,7 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
         args[0] = NodeObjectTypeId;
         clauseArgs.CopyTo(args, 1);
 
-        List<int> ids = ExecuteEfScope(db => db.Database.SqlQueryRaw<int>(sql, args).ToList());
+        List<int> ids = await ExecuteEfScopeAsync(db => db.Database.SqlQueryRaw<int>(sql, args).ToListAsync());
 
         return ids.Count > 0
             ? GetMany(ids.ToArray()).OrderBy(x => x.Name)
@@ -314,7 +288,7 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
         return (sb.ToString(), args.ToArray());
     }
 
-    private int PerformCount(IQuery<TEntity>? query)
+    private Task<int> PerformCountAsync(IQuery<TEntity>? query)
     {
         (var whereSql, var clauseArgs) = query is null
             ? (string.Empty, Array.Empty<object>())
@@ -332,49 +306,49 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
         args[0] = NodeObjectTypeId;
         clauseArgs.CopyTo(args, 1);
 
-        return ExecuteEfScope(db => db.Database.SqlQueryRaw<int>(sql, args).Single());
+        return ExecuteEfScopeAsync(db => db.Database.SqlQueryRaw<int>(sql, args).SingleAsync());
     }
 
     // ----------------------------------------------------------------------------------------------------
-    // Delete (sync) — invoked by the async PersistDeletedItemAsync wrapper above.
+    // Delete — invoked by the async base via PersistDeletedItemAsync.
     // ----------------------------------------------------------------------------------------------------
 
     /// <summary>
     ///     Deletes a content type. First checks for children and removes those first.
     /// </summary>
-    protected virtual void PersistDeletedItem(TEntity entity)
+    protected override async Task PersistDeletedItemAsync(TEntity entity)
     {
         TEntity[] children = GetAllCached().Where(x => x.ParentId == entity.Id).ToArray();
         foreach (TEntity child in children)
         {
-            PersistDeletedItem(child);
+            await PersistDeletedItemAsync(child);
         }
 
         // The cascade tables below (property data, notifications, tags, granular permissions) belong to other
         // repositories and are not modelled in EF Core — raw SQL on the shared context.
-        ExecuteEfScope(db =>
+        await ExecuteEfScopeAsync(async db =>
         {
             // Before deleting the definition tables, clear any leftover property data linked to this content
             // type. A document-type switch can leave property data pointing at the previous type (FK on cmsPropertyType).
-            db.Database.ExecuteSqlRaw(
+            await db.Database.ExecuteSqlRawAsync(
                 $"""
                  DELETE FROM {Constants.DatabaseSchema.Tables.PropertyData} WHERE propertyTypeId IN (
                  SELECT {PropertyTypeDto.PrimaryKeyColumnName} FROM {PropertyTypeDto.TableName} WHERE {PropertyTypeDto.ContentTypeIdColumnName} = {entity.Id})
                  """);
 
-            db.Database.ExecuteSqlRaw(
+            await db.Database.ExecuteSqlRawAsync(
                 $"DELETE FROM {Constants.DatabaseSchema.Tables.User2NodeNotify} WHERE nodeId = {entity.Id}");
-            db.Database.ExecuteSqlRaw(
+            await db.Database.ExecuteSqlRawAsync(
                 $"DELETE FROM {Constants.DatabaseSchema.Tables.TagRelationship} WHERE nodeId = {entity.Id}");
 
             // delete all granular permissions for this content type
-            db.Database.ExecuteSqlRaw(
+            await db.Database.ExecuteSqlRawAsync(
                 $"DELETE FROM {Constants.DatabaseSchema.Tables.UserGroup2GranularPermission} WHERE uniqueId = {{0}}",
                 entity.Key);
         });
 
         // Definition tables modelled in EF Core.
-        PersistDeletedBaseContentType(entity);
+        await PersistDeletedBaseContentTypeAsync(entity);
 
         entity.DeleteDate = DateTime.UtcNow;
         CommonRepository.ClearCache(); // always
@@ -383,28 +357,28 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
     /// <summary>
     /// EF Core implementation of the content-type-definition delete path. Removes the cmsPropertyType +
     /// cmsPropertyTypeGroup + cmsContentTypeAllowedContentType + cmsContentType2ContentType rows, then any
-    /// entity-specific definition tables (via <see cref="DeleteContentTypeSpecificDefinitionTables"/>), then the
-    /// cmsContentType + umbracoNode rows in FK-safe order. <c>ExecuteDelete</c> is set-based and bypasses the
+    /// entity-specific definition tables (via <see cref="DeleteContentTypeSpecificDefinitionTablesAsync"/>), then the
+    /// cmsContentType + umbracoNode rows in FK-safe order. <c>ExecuteDeleteAsync</c> is set-based and bypasses the
     /// change tracker.
     /// </summary>
-    private void PersistDeletedBaseContentType(TEntity entity)
+    private Task PersistDeletedBaseContentTypeAsync(TEntity entity)
     {
         var id = entity.Id;
-        ExecuteEfScope(db =>
+        return ExecuteEfScopeAsync(async db =>
         {
-            db.PropertyTypes.Where(x => x.ContentTypeId == id).ExecuteDelete();
-            db.PropertyTypeGroups.Where(x => x.ContentTypeNodeId == id).ExecuteDelete();
-            db.ContentTypeAllowedContentTypes.Where(x => x.Id == id || x.AllowedId == id).ExecuteDelete();
-            db.ContentTypeComposition.Where(x => x.ParentId == id || x.ChildId == id).ExecuteDelete();
-            DeleteContentTypeSpecificDefinitionTables(db, id);
-            db.ContentTypes.Where(x => x.NodeId == id).ExecuteDelete();
-            db.Nodes.Where(x => x.NodeId == id).ExecuteDelete();
+            await db.PropertyTypes.Where(x => x.ContentTypeId == id).ExecuteDeleteAsync();
+            await db.PropertyTypeGroups.Where(x => x.ContentTypeNodeId == id).ExecuteDeleteAsync();
+            await db.ContentTypeAllowedContentTypes.Where(x => x.Id == id || x.AllowedId == id).ExecuteDeleteAsync();
+            await db.ContentTypeComposition.Where(x => x.ParentId == id || x.ChildId == id).ExecuteDeleteAsync();
+            await DeleteContentTypeSpecificDefinitionTablesAsync(db, id);
+            await db.ContentTypes.Where(x => x.NodeId == id).ExecuteDeleteAsync();
+            await db.Nodes.Where(x => x.NodeId == id).ExecuteDeleteAsync();
         });
     }
 
     // ----------------------------------------------------------------------------------------------------
     // Shared persistence of the content-type definition tables (umbracoNode + cmsContentType + composition +
-    // allowed types + property groups/types), called by the derived PersistNewItem / PersistUpdatedItem.
+    // allowed types + property groups/types), called by the derived PersistNewItemAsync / PersistUpdatedItemAsync.
     // ----------------------------------------------------------------------------------------------------
 
     /// <summary>
@@ -412,26 +386,26 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
     /// cmsContentType + composition + allowed-type + property group/type rows through the EF Core
     /// <see cref="UmbracoDbContext"/>.
     /// </summary>
-    protected void PersistNewBaseContentType(IContentTypeComposition entity)
+    protected async Task PersistNewBaseContentTypeAsync(IContentTypeComposition entity)
     {
         ValidateVariations(entity);
 
         ContentTypeDto contentTypeDto = ContentTypeFactory.BuildEFCoreContentTypeDto(entity);
 
-        ExecuteEfScope(db =>
+        await ExecuteEfScopeAsync(async db =>
         {
             // Cannot add a duplicate content type
-            var exists = db.ContentTypes
-                .Count(ct => ct.Alias == entity.Alias && ct.NodeDto.NodeObjectType == NodeObjectTypeId);
+            var exists = await db.ContentTypes
+                .CountAsync(ct => ct.Alias == entity.Alias && ct.NodeDto.NodeObjectType == NodeObjectTypeId);
             if (exists > 0)
             {
                 throw new DuplicateNameException("An item with the alias " + entity.Alias + " already exists");
             }
 
             // Logic for setting Path, Level and SortOrder
-            NodeDto? parent = db.Nodes.FirstOrDefault(x => x.NodeId == entity.ParentId);
+            NodeDto? parent = await db.Nodes.FirstOrDefaultAsync(x => x.NodeId == entity.ParentId);
             var level = (parent?.Level ?? 0) + 1;
-            var sortOrder = db.Nodes.Count(x => x.ParentId == entity.ParentId && x.NodeObjectType == NodeObjectTypeId);
+            var sortOrder = await db.Nodes.CountAsync(x => x.ParentId == entity.ParentId && x.NodeObjectType == NodeObjectTypeId);
 
             // Create the (base) node data - umbracoNode
             NodeDto nodeDto = contentTypeDto.NodeDto;
@@ -439,11 +413,11 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
             nodeDto.Level = short.Parse(level.ToString(CultureInfo.InvariantCulture));
             nodeDto.SortOrder = sortOrder;
             db.Nodes.Add(nodeDto);
-            db.SaveChanges();
+            await db.SaveChangesAsync();
 
             // Update with new correct path
             nodeDto.Path = string.Concat(nodeDto.Path, ",", nodeDto.NodeId);
-            db.SaveChanges();
+            await db.SaveChangesAsync();
 
             // Update entity with correct values
             entity.Id = nodeDto.NodeId;
@@ -454,7 +428,7 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
             // Insert new ContentType entry
             contentTypeDto.NodeId = nodeDto.NodeId;
             db.ContentTypes.Add(contentTypeDto);
-            db.SaveChanges();
+            await db.SaveChangesAsync();
 
             // Insert ContentType composition
             foreach (IContentTypeComposition composition in entity.ContentTypeComposition)
@@ -471,10 +445,10 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
                 else
                 {
                     // Fallback for ContentTypes with no identity
-                    var parentId = db.ContentTypes
+                    var parentId = await db.ContentTypes
                         .Where(x => x.Alias == composition.Alias)
                         .Select(x => (int?)x.NodeId)
-                        .FirstOrDefault();
+                        .FirstOrDefaultAsync();
                     if (parentId.HasValue)
                     {
                         db.ContentTypeComposition.Add(new ContentType2ContentTypeDto { ParentId = parentId.Value, ChildId = entity.Id });
@@ -482,12 +456,12 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
                 }
             }
 
-            db.SaveChanges();
+            await db.SaveChangesAsync();
 
             // Insert collection of allowed content types. Resolved against the database AFTER the content
             // type row insert, so a type allowing itself (created with a self-reference, before it has an
             // identity) resolves within the same transaction.
-            foreach ((var allowedId, var allowedSortOrder) in GetAllowedContentTypeIds(db, entity))
+            foreach ((var allowedId, var allowedSortOrder) in await GetAllowedContentTypeIdsAsync(db, entity))
             {
                 db.ContentTypeAllowedContentTypes.Add(new ContentTypeAllowedContentTypeDto
                 {
@@ -497,14 +471,14 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
                 });
             }
 
-            db.SaveChanges();
+            await db.SaveChangesAsync();
 
             // Insert Tabs
             foreach (PropertyGroup propertyGroup in entity.PropertyGroups)
             {
                 PropertyTypeGroupDto tabDto = PropertyGroupFactory.BuildEFCoreGroupDto(propertyGroup, nodeDto.NodeId);
                 db.PropertyTypeGroups.Add(tabDto);
-                db.SaveChanges();
+                await db.SaveChangesAsync();
                 propertyGroup.Id = tabDto.Id; // Set Id on PropertyGroup
 
                 if (propertyGroup.PropertyTypes is not null)
@@ -527,15 +501,15 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
 
                 if (propertyType.DataTypeId == 0 || propertyType.DataTypeId == default)
                 {
-                    AssignDataTypeIdFromProvidedKeyOrPropertyEditor(db, propertyType);
+                    await AssignDataTypeIdFromProvidedKeyOrPropertyEditorAsync(db, propertyType);
                 }
 
                 PropertyTypeDto propertyTypeDto = PropertyGroupFactory.BuildEFCorePropertyTypeDto(tabId, propertyType, nodeDto.NodeId);
                 db.PropertyTypes.Add(propertyTypeDto);
-                db.SaveChanges();
+                await db.SaveChangesAsync();
                 propertyType.Id = propertyTypeDto.Id; // Set Id on new PropertyType
 
-                DataTypeDto? dataTypeDto = db.DataTypes.FirstOrDefault(x => x.NodeId == propertyType.DataTypeId);
+                DataTypeDto? dataTypeDto = await db.DataTypes.FirstOrDefaultAsync(x => x.NodeId == propertyType.DataTypeId);
                 if (dataTypeDto is not null)
                 {
                     propertyType.PropertyEditorAlias = dataTypeDto.EditorAlias;
@@ -551,7 +525,7 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
     /// EF Core implementation of the content-type-definition update path. The variation cascade and
     /// content-instance cleanup run as EF raw SQL (variant engine), sharing the same bridged scope.
     /// </summary>
-    protected void PersistUpdatedBaseContentType(IContentTypeComposition entity)
+    protected async Task PersistUpdatedBaseContentTypeAsync(IContentTypeComposition entity)
     {
         CorrectPropertyTypeVariations(entity);
         ValidateVariations(entity);
@@ -560,7 +534,7 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
 
         ContentVariation oldContentTypeVariation = default;
 
-        ExecuteEfScope(db =>
+        await ExecuteEfScopeAsync(async db =>
         {
             // The bridged context is shared across repository operations within the ambient scope and accumulates
             // tracked entities from prior inserts/saves. Clear it so the junction-table re-inserts below don't
@@ -568,7 +542,7 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
             db.ChangeTracker.Clear();
 
             // ensure the alias is not used already
-            var exists = db.ContentTypes.Count(ct =>
+            var exists = await db.ContentTypes.CountAsync(ct =>
                 ct.Alias == dto.Alias
                 && ct.NodeDto.NodeObjectType == NodeObjectTypeId
                 && ct.NodeDto.NodeId != dto.NodeId);
@@ -578,14 +552,14 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
             }
 
             // capture the current (old) variation
-            oldContentTypeVariation = (ContentVariation)db.ContentTypes
+            oldContentTypeVariation = (ContentVariation)await db.ContentTypes
                 .Where(x => x.NodeId == dto.NodeId)
                 .Select(x => x.Variations)
-                .First();
+                .FirstAsync();
 
             // handle (update) the node (ExecuteUpdate is set-based and tracking-free)
             NodeDto nodeDto = dto.NodeDto;
-            db.Nodes.Where(x => x.NodeId == nodeDto.NodeId).ExecuteUpdate(s => s
+            await db.Nodes.Where(x => x.NodeId == nodeDto.NodeId).ExecuteUpdateAsync(s => s
                 .SetProperty(x => x.UniqueId, nodeDto.UniqueId)
                 .SetProperty(x => x.ParentId, nodeDto.ParentId)
                 .SetProperty(x => x.Level, nodeDto.Level)
@@ -598,7 +572,7 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
                 .SetProperty(x => x.CreateDate, nodeDto.CreateDate));
 
             // handle (update) the ContentType
-            db.ContentTypes.Where(x => x.NodeId == dto.NodeId).ExecuteUpdate(s => s
+            await db.ContentTypes.Where(x => x.NodeId == dto.NodeId).ExecuteUpdateAsync(s => s
                 .SetProperty(x => x.Alias, dto.Alias)
                 .SetProperty(x => x.Icon, dto.Icon)
                 .SetProperty(x => x.Thumbnail, dto.Thumbnail)
@@ -610,25 +584,25 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
                 .SetProperty(x => x.Variations, dto.Variations));
 
             // handle (delete then recreate) compositions
-            db.ContentTypeComposition.Where(x => x.ChildId == entity.Id).ExecuteDelete();
+            await db.ContentTypeComposition.Where(x => x.ChildId == entity.Id).ExecuteDeleteAsync();
             foreach (IContentTypeComposition composition in entity.ContentTypeComposition)
             {
                 db.ContentTypeComposition.Add(new ContentType2ContentTypeDto { ParentId = composition.Id, ChildId = entity.Id });
             }
 
-            db.SaveChanges();
+            await db.SaveChangesAsync();
         });
 
         // removing a ContentType from a composition (U4-1690): content-instance cleanup (EF raw SQL)
-        ClearPropertyDataForRemovedContentTypes(entity);
+        await ClearPropertyDataForRemovedContentTypesAsync(entity);
 
         // delete the allowed content type entries before re-inserting the collection of allowed content types
         // (resolved against the database, so types created earlier in the same scope resolve too)
-        ExecuteEfScope(db =>
+        await ExecuteEfScopeAsync(async db =>
         {
-            db.ContentTypeAllowedContentTypes.Where(x => x.Id == entity.Id).ExecuteDelete();
+            await db.ContentTypeAllowedContentTypes.Where(x => x.Id == entity.Id).ExecuteDeleteAsync();
 
-            foreach ((var allowedId, var sortOrder) in GetAllowedContentTypeIds(db, entity))
+            foreach ((var allowedId, var sortOrder) in await GetAllowedContentTypeIdsAsync(db, entity))
             {
                 db.ContentTypeAllowedContentTypes.Add(new ContentTypeAllowedContentTypeDto
                 {
@@ -638,22 +612,22 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
                 });
             }
 
-            db.SaveChanges();
+            await db.SaveChangesAsync();
         });
 
         // Delete property types that have been removed from the entity's collections.
         if (entity.IsPropertyDirty("NoGroupPropertyTypes") ||
             entity.PropertyGroups.Any(x => x.IsPropertyDirty("PropertyTypes")))
         {
-            List<int> dbPropertyTypeIds = ExecuteEfScope(db => db.PropertyTypes
+            List<int> dbPropertyTypeIds = await ExecuteEfScopeAsync(db => db.PropertyTypes
                 .Where(x => x.ContentTypeId == entity.Id)
                 .Select(x => x.Id)
-                .ToList());
+                .ToListAsync());
             IEnumerable<int> entityPropertyTypes = entity.PropertyTypes.Where(x => x.HasIdentity).Select(x => x.Id);
             IEnumerable<int> propertyTypeToDeleteIds = dbPropertyTypeIds.Except(entityPropertyTypes);
             foreach (var propertyTypeId in propertyTypeToDeleteIds)
             {
-                DeletePropertyType(entity, propertyTypeId); // also clears tag/property-data/permission dependencies
+                await DeletePropertyTypeAsync(entity, propertyTypeId); // also clears tag/property-data/permission dependencies
             }
         }
 
@@ -661,32 +635,32 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
         List<int>? orphanPropertyTypeIds = null;
         if (entity.IsPropertyDirty("PropertyGroups"))
         {
-            ExecuteEfScope(db =>
+            await ExecuteEfScopeAsync(async db =>
             {
-                List<int> existingPropertyGroups = db.PropertyTypeGroups
+                List<int> existingPropertyGroups = await db.PropertyTypeGroups
                     .Where(x => x.ContentTypeNodeId == entity.Id)
                     .Select(x => x.Id)
-                    .ToList();
+                    .ToListAsync();
 
                 var newPropertyGroups = entity.PropertyGroups.Select(x => x.Id).ToList();
                 var groupsToDelete = existingPropertyGroups.Except(newPropertyGroups).ToArray();
 
                 if (groupsToDelete.Length > 0)
                 {
-                    orphanPropertyTypeIds = db.PropertyTypes
+                    orphanPropertyTypeIds = await db.PropertyTypes
                         .Where(x => x.PropertyTypeGroupId != null && groupsToDelete.Contains(x.PropertyTypeGroupId.Value))
                         .Select(x => x.Id)
-                        .ToList();
-                    db.PropertyTypes
+                        .ToListAsync();
+                    await db.PropertyTypes
                         .Where(x => x.PropertyTypeGroupId != null && groupsToDelete.Contains(x.PropertyTypeGroupId.Value))
-                        .ExecuteUpdate(s => s.SetProperty(x => x.PropertyTypeGroupId, (int?)null));
-                    db.PropertyTypeGroups.Where(x => groupsToDelete.Contains(x.Id)).ExecuteDelete();
+                        .ExecuteUpdateAsync(s => s.SetProperty(x => x.PropertyTypeGroupId, (int?)null));
+                    await db.PropertyTypeGroups.Where(x => groupsToDelete.Contains(x.Id)).ExecuteDeleteAsync();
                 }
             });
         }
 
         // insert or update groups, assign properties
-        ExecuteEfScope(db =>
+        await ExecuteEfScopeAsync(async db =>
         {
             foreach (PropertyGroup propertyGroup in entity.PropertyGroups)
             {
@@ -694,7 +668,7 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
                 int groupId;
                 if (propertyGroup.HasIdentity)
                 {
-                    db.PropertyTypeGroups.Where(x => x.Id == propertyGroup.Id).ExecuteUpdate(s => s
+                    await db.PropertyTypeGroups.Where(x => x.Id == propertyGroup.Id).ExecuteUpdateAsync(s => s
                         .SetProperty(x => x.UniqueId, groupDto.UniqueId)
                         .SetProperty(x => x.ContentTypeNodeId, groupDto.ContentTypeNodeId)
                         .SetProperty(x => x.Type, groupDto.Type)
@@ -706,7 +680,7 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
                 else
                 {
                     db.PropertyTypeGroups.Add(groupDto);
-                    db.SaveChanges();
+                    await db.SaveChangesAsync();
                     groupId = groupDto.Id;
                     propertyGroup.Id = groupId;
                 }
@@ -728,9 +702,9 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
             contentTypeVariationDirty && oldContentTypeVariation != newContentTypeVariation;
         if (contentTypeVariationChanging)
         {
-            MoveContentTypeVariantData(entity, oldContentTypeVariation, newContentTypeVariation);
-            Clear301Redirects(entity);
-            ClearScheduledPublishing(entity);
+            await MoveContentTypeVariantDataAsync(entity, oldContentTypeVariation, newContentTypeVariation);
+            await Clear301RedirectsAsync(entity);
+            await ClearScheduledPublishingAsync(entity);
         }
 
         // collect property types that have a dirty variation
@@ -746,7 +720,7 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
 
         Dictionary<int, (ContentVariation FromVariation, ContentVariation ToVariation)>? propertyTypeVariationChanges =
             propertyTypeVariationDirty != null
-                ? GetPropertyVariationChanges(propertyTypeVariationDirty)
+                ? await GetPropertyVariationChangesAsync(propertyTypeVariationDirty)
                 : null;
 
         if (contentTypeVariationChanging)
@@ -768,13 +742,13 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
         }
 
         // insert or update properties (all of them, no-group and in-groups)
-        ExecuteEfScope(db =>
+        await ExecuteEfScopeAsync(async db =>
         {
             foreach (IPropertyType propertyType in entity.PropertyTypes)
             {
                 if (propertyType.DataTypeId == 0 || propertyType.DataTypeId == default)
                 {
-                    AssignDataTypeIdFromProvidedKeyOrPropertyEditor(db, propertyType);
+                    await AssignDataTypeIdFromProvidedKeyOrPropertyEditorAsync(db, propertyType);
                 }
 
                 ValidateAlias(propertyType);
@@ -784,7 +758,7 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
                 int typeId;
                 if (propertyType.HasIdentity)
                 {
-                    db.PropertyTypes.Where(x => x.Id == propertyType.Id).ExecuteUpdate(s => s
+                    await db.PropertyTypes.Where(x => x.Id == propertyType.Id).ExecuteUpdateAsync(s => s
                         .SetProperty(x => x.DataTypeId, propertyTypeDto.DataTypeId)
                         .SetProperty(x => x.ContentTypeId, propertyTypeDto.ContentTypeId)
                         .SetProperty(x => x.PropertyTypeGroupId, propertyTypeDto.PropertyTypeGroupId)
@@ -804,7 +778,7 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
                 else
                 {
                     db.PropertyTypes.Add(propertyTypeDto);
-                    db.SaveChanges();
+                    await db.SaveChangesAsync();
                     typeId = propertyTypeDto.Id;
                     propertyType.Id = typeId;
                 }
@@ -820,7 +794,7 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
 
         if (propertyTypeVariationChanges?.Count > 0)
         {
-            MovePropertyTypeVariantData(propertyTypeVariationChanges, impacted);
+            await MovePropertyTypeVariantDataAsync(propertyTypeVariationChanges, impacted);
         }
 
         // deal with orphan properties: those that were in a deleted tab and have not been re-mapped
@@ -828,7 +802,7 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
         {
             foreach (var id in orphanPropertyTypeIds)
             {
-                DeletePropertyType(entity, id);
+                await DeletePropertyTypeAsync(entity, id);
             }
         }
 
@@ -839,12 +813,12 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
     /// EF Core variant of the data-type resolution: tries the key via <see cref="IIdKeyMap"/>, then falls back to
     /// looking up a data type by its property editor alias.
     /// </summary>
-    private void AssignDataTypeIdFromProvidedKeyOrPropertyEditor(UmbracoDbContext db, IPropertyType propertyType)
+    private async Task AssignDataTypeIdFromProvidedKeyOrPropertyEditorAsync(UmbracoDbContext db, IPropertyType propertyType)
     {
         // If a key is provided, use that.
         if (propertyType.DataTypeKey != Guid.Empty)
         {
-            Attempt<int> dataTypeIdAttempt = _idKeyMap.GetIdForKey(propertyType.DataTypeKey, UmbracoObjectTypes.DataType);
+            Attempt<int> dataTypeIdAttempt = await _idKeyMap.GetIdForKeyAsync(propertyType.DataTypeKey, UmbracoObjectTypes.DataType);
             if (dataTypeIdAttempt.Success)
             {
                 propertyType.DataTypeId = dataTypeIdAttempt.Result;
@@ -862,11 +836,11 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
             return;
         }
 
-        var dataType = db.DataTypes
+        var dataType = await db.DataTypes
             .Where(x => x.EditorAlias == propertyType.PropertyEditorAlias)
             .OrderBy(x => x.NodeId)
             .Select(x => new { x.NodeId, x.NodeDto.UniqueId })
-            .FirstOrDefault();
+            .FirstOrDefaultAsync();
 
         if (dataType is not null)
         {
@@ -883,19 +857,17 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
     }
 
     /// <summary>
-    /// Executes the given action against the ambient EF Core <see cref="UmbracoDbContext"/>, bridging the
-    /// synchronous repository contract onto the async-only scope API. The action runs synchronously so there is
-    /// no real await and no deadlock risk.
+    /// Executes the given asynchronous action against the ambient EF Core <see cref="UmbracoDbContext"/>.
     /// </summary>
-    protected void ExecuteEfScope(Action<UmbracoDbContext> action)
-        => ExecuteEfScope(db =>
-        {
-            action(db);
-            return true;
-        });
+    protected Task ExecuteEfScopeAsync(Func<UmbracoDbContext, Task> action)
+        => AmbientScope.ExecuteWithContextAsync<object>(action);
 
-    protected T ExecuteEfScope<T>(Func<UmbracoDbContext, T> func)
-        => AmbientScope.ExecuteWithContextAsync(db => Task.FromResult(func(db))).GetAwaiter().GetResult();
+    /// <summary>
+    /// Executes the given asynchronous function against the ambient EF Core <see cref="UmbracoDbContext"/> and
+    /// returns its result.
+    /// </summary>
+    protected Task<T> ExecuteEfScopeAsync<T>(Func<UmbracoDbContext, Task<T>> func)
+        => AmbientScope.ExecuteWithContextAsync(func);
 
     // ----------------------------------------------------------------------------------------------------
     // Shared content-type operations (move, variation cascade, variant-data moves and helpers).
@@ -970,14 +942,14 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
     /// When content types are removed from a composition (U4-1690), clears the orphaned property data
     /// on content of <paramref name="entity"/> for property types that belonged to the removed types.
     /// </summary>
-    private void ClearPropertyDataForRemovedContentTypes(IContentTypeComposition entity)
+    private Task ClearPropertyDataForRemovedContentTypesAsync(IContentTypeComposition entity)
     {
         if (!entity.RemovedContentTypes.Any())
         {
-            return;
+            return Task.CompletedTask;
         }
 
-        ExecuteEfScope(db =>
+        return ExecuteEfScopeAsync(async db =>
         {
             // note: Guid values must be bound as parameters (not string literals) — providers store/bind them
             // in provider-specific formats (e.g. uppercase TEXT on SQLite, uniqueidentifier on SQL Server).
@@ -986,7 +958,7 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
             {
                 // delete property data on content of this content type, for property types belonging to
                 // the removed composition type
-                db.Database.ExecuteSqlRaw(
+                await db.Database.ExecuteSqlRawAsync(
                     $"""
                      DELETE FROM {Constants.DatabaseSchema.Tables.PropertyData} WHERE id IN (
                      SELECT pd.id
@@ -1122,17 +1094,17 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
 
     // gets property types that have actually changed, and the corresponding changes
     // returns null if no property type has actually changed
-    private Dictionary<int, (ContentVariation FromVariation, ContentVariation ToVariation)>?
-        GetPropertyVariationChanges(IEnumerable<IPropertyType> propertyTypes)
+    private async Task<Dictionary<int, (ContentVariation FromVariation, ContentVariation ToVariation)>?>
+        GetPropertyVariationChangesAsync(IEnumerable<IPropertyType> propertyTypes)
     {
         var propertyTypesL = propertyTypes.ToList();
         var propertyTypeIds = propertyTypesL.Select(x => x.Id).ToList();
 
         // select the current variations (before the change) from database
-        Dictionary<int, byte> oldVariations = ExecuteEfScope(db => db.PropertyTypes
+        Dictionary<int, byte> oldVariations = await ExecuteEfScopeAsync(db => db.PropertyTypes
             .Where(x => propertyTypeIds.Contains(x.Id))
             .Select(x => new { x.Id, x.Variations })
-            .ToDictionary(x => x.Id, x => x.Variations));
+            .ToDictionaryAsync(x => x.Id, x => x.Variations));
 
         Dictionary<int, (ContentVariation, ContentVariation)>? changes = null;
 
@@ -1161,8 +1133,8 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
     /// <summary>
     ///     Clear any redirects associated with content for a content type.
     /// </summary>
-    private void Clear301Redirects(IContentTypeComposition contentType)
-        => ExecuteEfScope(db => db.Database.ExecuteSqlRaw(
+    private Task Clear301RedirectsAsync(IContentTypeComposition contentType)
+        => ExecuteEfScopeAsync(db => db.Database.ExecuteSqlRawAsync(
             $"""
              DELETE FROM {Constants.DatabaseSchema.Tables.RedirectUrl} WHERE contentKey IN (
              SELECT n.{NodeDto.KeyColumnName}
@@ -1174,22 +1146,21 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
     /// <summary>
     ///     Clear any scheduled publishing associated with content for a content type.
     /// </summary>
-    private void ClearScheduledPublishing(IContentTypeComposition contentType)
-    {
+    private Task ClearScheduledPublishingAsync(IContentTypeComposition contentType)
         // TODO: Fill this in when scheduled publishing is enabled for variants
-    }
+        => Task.CompletedTask;
 
-    private int GetDefaultLanguageId()
-        => ExecuteEfScope(db => db.Language.Where(x => x.IsDefault).Select(x => x.Id).First());
+    private Task<int> GetDefaultLanguageIdAsync()
+        => ExecuteEfScopeAsync(db => db.Language.Where(x => x.IsDefault).Select(x => x.Id).FirstAsync());
 
     /// <summary>
     ///     Moves variant data for property type variation changes.
     /// </summary>
-    private void MovePropertyTypeVariantData(
+    private async Task MovePropertyTypeVariantDataAsync(
         IDictionary<int, (ContentVariation FromVariation, ContentVariation ToVariation)> propertyTypeChanges,
         IEnumerable<IContentTypeComposition> impacted)
     {
-        var defaultLanguageId = GetDefaultLanguageId();
+        var defaultLanguageId = await GetDefaultLanguageIdAsync();
         var impactedL = impacted.Select(x => x.Id).ToList();
 
         foreach (IGrouping<(ContentVariation FromVariation, ContentVariation ToVariation),
@@ -1205,16 +1176,16 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
             if (!fromCultureEnabled && toCultureEnabled)
             {
                 // Culture has been enabled
-                CopyPropertyData(null, defaultLanguageId, propertyTypeIds, impactedL);
-                CopyTagData(null, defaultLanguageId, propertyTypeIds, impactedL);
-                RenormalizeDocumentEditedFlags(propertyTypeIds, impactedL);
+                await CopyPropertyDataAsync(null, defaultLanguageId, propertyTypeIds, impactedL);
+                await CopyTagDataAsync(null, defaultLanguageId, propertyTypeIds, impactedL);
+                await RenormalizeDocumentEditedFlagsAsync(propertyTypeIds, impactedL);
             }
             else if (fromCultureEnabled && !toCultureEnabled)
             {
                 // Culture has been disabled
-                CopyPropertyData(defaultLanguageId, null, propertyTypeIds, impactedL);
-                CopyTagData(defaultLanguageId, null, propertyTypeIds, impactedL);
-                RenormalizeDocumentEditedFlags(propertyTypeIds, impactedL);
+                await CopyPropertyDataAsync(defaultLanguageId, null, propertyTypeIds, impactedL);
+                await CopyTagDataAsync(defaultLanguageId, null, propertyTypeIds, impactedL);
+                await RenormalizeDocumentEditedFlagsAsync(propertyTypeIds, impactedL);
             }
         }
     }
@@ -1222,12 +1193,12 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
     /// <summary>
     ///     Moves variant data for a content type variation change.
     /// </summary>
-    private void MoveContentTypeVariantData(
+    private async Task MoveContentTypeVariantDataAsync(
         IContentTypeComposition contentType,
         ContentVariation fromVariation,
         ContentVariation toVariation)
     {
-        var defaultLanguageId = GetDefaultLanguageId();
+        var defaultLanguageId = await GetDefaultLanguageIdAsync();
 
         var cultureIsNotEnabled = !fromVariation.HasFlag(ContentVariation.Culture);
         var cultureWillBeEnabled = toVariation.HasFlag(ContentVariation.Culture);
@@ -1239,10 +1210,10 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
 
         // move the names: first clear out any existing names that might already exist under the default lang,
         // then insert names into the two culture-variation tables based on the invariant data
-        ExecuteEfScope(db =>
+        await ExecuteEfScopeAsync(async db =>
         {
             // clear out the versionCultureVariation table
-            db.Database.ExecuteSqlRaw(
+            await db.Database.ExecuteSqlRawAsync(
                 $"""
                  DELETE FROM {Constants.DatabaseSchema.Tables.ContentVersionCultureVariation} WHERE id IN (
                  SELECT ccv.id
@@ -1253,7 +1224,7 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
                  """);
 
             // clear out the documentCultureVariation table
-            db.Database.ExecuteSqlRaw(
+            await db.Database.ExecuteSqlRawAsync(
                 $"""
                  DELETE FROM {Constants.DatabaseSchema.Tables.DocumentCultureVariation} WHERE id IN (
                  SELECT dcv.id
@@ -1263,7 +1234,7 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
                  """);
 
             // insert rows into the versionCultureVariation table based on contentVersion data for the default lang
-            db.Database.ExecuteSqlRaw(
+            await db.Database.ExecuteSqlRawAsync(
                 $"""
                  INSERT INTO {Constants.DatabaseSchema.Tables.ContentVersionCultureVariation} (versionId, "name", availableUserId, "date", languageId)
                  SELECT cv.id, cv."text", cv.userId, cv.versionDate, {defaultLanguageId}
@@ -1273,7 +1244,7 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
                  """);
 
             // insert rows into the documentCultureVariation table (make Available + default language ID)
-            db.Database.ExecuteSqlRaw(
+            await db.Database.ExecuteSqlRawAsync(
                 $"""
                  INSERT INTO {Constants.DatabaseSchema.Tables.DocumentCultureVariation} (nodeId, edited, published, "name", available, languageId)
                  SELECT d.nodeId, d.edited, d.published, n."text", 1, {defaultLanguageId}
@@ -1285,7 +1256,7 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
         });
     }
 
-    private void CopyTagData(
+    private Task CopyTagDataAsync(
         int? sourceLanguageId,
         int? targetLanguageId,
         IReadOnlyCollection<int> propertyTypeIds,
@@ -1293,7 +1264,7 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
     {
         if (propertyTypeIds.Count == 0)
         {
-            return;
+            return Task.CompletedTask;
         }
 
         var pts = string.Join(",", propertyTypeIds);
@@ -1306,10 +1277,10 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
         var targetCmp = targetLanguageId?.ToString(CultureInfo.InvariantCulture) ?? "-1";
         var targetLiteral = targetLanguageId?.ToString(CultureInfo.InvariantCulture) ?? "NULL";
 
-        ExecuteEfScope(db =>
+        return ExecuteEfScopeAsync(async db =>
         {
             // delete existing relations (for target language); do *not* delete existing tags
-            db.Database.ExecuteSqlRaw(
+            await db.Database.ExecuteSqlRawAsync(
                 $"""
                  DELETE FROM {Constants.DatabaseSchema.Tables.TagRelationship} WHERE tagId IN (
                  SELECT t.id
@@ -1323,7 +1294,7 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
 
             // copy tags from source language to target language; target tags may exist already, so check
             // for existence via the "xtags" left join
-            db.Database.ExecuteSqlRaw(
+            await db.Database.ExecuteSqlRawAsync(
                 $"""
                  INSERT INTO {Constants.DatabaseSchema.Tables.Tag} (tag, "group", languageId)
                  SELECT DISTINCT t.tag, t."group", {targetLiteral}
@@ -1338,7 +1309,7 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
                  """);
 
             // create relations to the new tags (existing target relations were deleted above)
-            db.Database.ExecuteSqlRaw(
+            await db.Database.ExecuteSqlRawAsync(
                 $"""
                  INSERT INTO {Constants.DatabaseSchema.Tables.TagRelationship} (nodeId, propertyTypeId, tagId)
                  SELECT DISTINCT r.nodeId, r.propertyTypeId, otag.id
@@ -1352,7 +1323,7 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
                  """);
 
             // delete original relations - *not* the tags - all of them
-            db.Database.ExecuteSqlRaw(
+            await db.Database.ExecuteSqlRawAsync(
                 $"""
                  DELETE FROM {Constants.DatabaseSchema.Tables.TagRelationship} WHERE tagId IN (
                  SELECT t.id
@@ -1373,7 +1344,7 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
     /// <param name="targetLanguageId">The target language (can be null ie invariant)</param>
     /// <param name="propertyTypeIds">The property type identifiers.</param>
     /// <param name="contentTypeIds">The content type identifiers.</param>
-    private void CopyPropertyData(
+    private Task CopyPropertyDataAsync(
         int? sourceLanguageId,
         int? targetLanguageId,
         IReadOnlyCollection<int> propertyTypeIds,
@@ -1381,7 +1352,7 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
     {
         if (propertyTypeIds.Count == 0)
         {
-            return;
+            return Task.CompletedTask;
         }
 
         var pts = string.Join(",", propertyTypeIds);
@@ -1400,10 +1371,10 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
         var targetCmp = targetLanguageId?.ToString(CultureInfo.InvariantCulture) ?? "-1";
         var targetLiteral = targetLanguageId?.ToString(CultureInfo.InvariantCulture) ?? "NULL";
 
-        ExecuteEfScope(db =>
+        return ExecuteEfScopeAsync(async db =>
         {
             // first clear out any existing property data that might already exist under the target language
-            db.Database.ExecuteSqlRaw(
+            await db.Database.ExecuteSqlRawAsync(
                 $"""
                  DELETE FROM {Constants.DatabaseSchema.Tables.PropertyData} WHERE
                  {versionScope}
@@ -1419,7 +1390,7 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
                    INNER JOIN {Constants.DatabaseSchema.Tables.Content} c ON cv.nodeId = c.nodeId
                    """;
             var sourceWhere = cts is null ? string.Empty : $"AND c.contentTypeId IN ({cts})";
-            db.Database.ExecuteSqlRaw(
+            await db.Database.ExecuteSqlRawAsync(
                 $"""
                  INSERT INTO {Constants.DatabaseSchema.Tables.PropertyData} (versionId, propertyTypeId, segment, intValue, decimalValue, dateValue, varcharValue, textValue, languageId)
                  SELECT pd.versionId, pd.propertyTypeId, pd.segment, pd.intValue, pd.decimalValue, pd.dateValue, pd.varcharValue, pd.textValue, {targetLiteral}
@@ -1434,7 +1405,7 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
             // when copying from Nothing, kill the original values, we don't want them around
             if (sourceLanguageId == null)
             {
-                db.Database.ExecuteSqlRaw(
+                await db.Database.ExecuteSqlRawAsync(
                     $"""
                      DELETE FROM {Constants.DatabaseSchema.Tables.PropertyData} WHERE
                      {versionScope}
@@ -1449,7 +1420,7 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
     ///     Re-normalizes the edited value in the umbracoDocumentCultureVariation and umbracoDocument table when
     ///     variations are changed.
     /// </summary>
-    private void RenormalizeDocumentEditedFlags(
+    private async Task RenormalizeDocumentEditedFlagsAsync(
         IReadOnlyCollection<int> propertyTypeIds,
         IReadOnlyCollection<int>? contentTypeIds = null)
     {
@@ -1458,8 +1429,7 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
             return;
         }
 
-        // TODO: Await this properly when the repository goes fully async.
-        var defaultLang = LanguageRepository.GetDefaultIdAsync().GetAwaiter().GetResult();
+        var defaultLang = await LanguageRepository.GetDefaultIdAsync();
 
         var pts = string.Join(",", propertyTypeIds);
         var cts = contentTypeIds is { Count: > 0 } ? string.Join(",", contentTypeIds) : null;
@@ -1485,8 +1455,8 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
              {contentWhere}
              """;
 
-        List<PropertyValueVersionDto> rows = ExecuteEfScope(db =>
-            db.Database.SqlQueryRaw<PropertyValueVersionDto>(propertySql).ToList());
+        List<PropertyValueVersionDto> rows = await ExecuteEfScopeAsync(db =>
+            db.Database.SqlQueryRaw<PropertyValueVersionDto>(propertySql).ToListAsync());
 
         // Published data must come before Current data, per (nodeId, propertyTypeId, languageId, versionId).
         rows = rows
@@ -1565,23 +1535,25 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
             .Distinct()
             .ToArray();
         IEnumerable<int> nodeIds = editedLanguageVersions.Keys.Select(x => x.nodeId).Distinct();
-        Dictionary<(int NodeId, int? LanguageId), DocumentCultureVariationRow> docCultureVariationsToUpdate =
-            languageIds.Length == 0
-                ? new Dictionary<(int, int?), DocumentCultureVariationRow>()
-                : nodeIds.InGroupsOf(Constants.Sql.MaxParameterCount - languageIds.Length)
-                    .SelectMany(group =>
-                    {
-                        var sql =
-                            $"""
-                             SELECT id AS Id, nodeId AS NodeId, languageId AS LanguageId, edited AS Edited
-                             FROM {Constants.DatabaseSchema.Tables.DocumentCultureVariation}
-                             WHERE languageId IN ({string.Join(",", languageIds)}) AND nodeId IN ({string.Join(",", group)})
-                             """;
-                        return ExecuteEfScope(db => db.Database.SqlQueryRaw<DocumentCultureVariationRow>(sql).ToList());
-                    })
-                    .ToDictionary(
-                        x => (x.NodeId, (int?)x.LanguageId),
-                        x => x);
+        var docCultureVariationsToUpdate = new Dictionary<(int NodeId, int? LanguageId), DocumentCultureVariationRow>();
+        if (languageIds.Length > 0)
+        {
+            foreach (IEnumerable<int> group in nodeIds.InGroupsOf(Constants.Sql.MaxParameterCount - languageIds.Length))
+            {
+                var sql =
+                    $"""
+                     SELECT id AS Id, nodeId AS NodeId, languageId AS LanguageId, edited AS Edited
+                     FROM {Constants.DatabaseSchema.Tables.DocumentCultureVariation}
+                     WHERE languageId IN ({string.Join(",", languageIds)}) AND nodeId IN ({string.Join(",", group)})
+                     """;
+                List<DocumentCultureVariationRow> batchRows = await ExecuteEfScopeAsync(db =>
+                    db.Database.SqlQueryRaw<DocumentCultureVariationRow>(sql).ToListAsync());
+                foreach (DocumentCultureVariationRow batchRow in batchRows)
+                {
+                    docCultureVariationsToUpdate[(batchRow.NodeId, batchRow.LanguageId)] = batchRow;
+                }
+            }
+        }
 
         var toUpdate = new List<DocumentCultureVariationRow>();
         foreach (KeyValuePair<(int nodeId, int? langId), bool> ev in editedLanguageVersions)
@@ -1603,14 +1575,14 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
             }
         }
 
-        ExecuteEfScope(db =>
+        await ExecuteEfScopeAsync(async db =>
         {
             // bulk update umbracoDocumentCultureVariation, once for edited = true, another for edited = false
             foreach (IGrouping<bool, DocumentCultureVariationRow> editValue in toUpdate.GroupBy(x => x.Edited))
             {
                 foreach (IEnumerable<DocumentCultureVariationRow> batch in editValue.InGroupsOf(Constants.Sql.MaxParameterCount))
                 {
-                    db.Database.ExecuteSqlRaw(
+                    await db.Database.ExecuteSqlRawAsync(
                         $"UPDATE {Constants.DatabaseSchema.Tables.DocumentCultureVariation} SET edited = {(editValue.Key ? 1 : 0)} WHERE id IN ({string.Join(",", batch.Select(x => x.Id))})");
                 }
             }
@@ -1620,47 +1592,49 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
             {
                 foreach (IEnumerable<KeyValuePair<int, bool>> batch in groupByValue.InGroupsOf(Constants.Sql.MaxParameterCount))
                 {
-                    db.Database.ExecuteSqlRaw(
+                    await db.Database.ExecuteSqlRawAsync(
                         $"UPDATE {Constants.DatabaseSchema.Tables.Document} SET edited = {(groupByValue.Key ? 1 : 0)} WHERE nodeId IN ({string.Join(",", batch.Select(x => x.Key))})");
                 }
             }
         });
     }
 
-    private void DeletePropertyType(IContentTypeComposition contentType, int propertyTypeId)
-        => ExecuteEfScope(db =>
+    private Task DeletePropertyTypeAsync(IContentTypeComposition contentType, int propertyTypeId)
+        => ExecuteEfScopeAsync(async db =>
         {
             // first clear dependencies
-            db.Database.ExecuteSqlRaw(
+            await db.Database.ExecuteSqlRawAsync(
                 $"DELETE FROM {Constants.DatabaseSchema.Tables.TagRelationship} WHERE propertyTypeId = {propertyTypeId}");
-            db.Database.ExecuteSqlRaw(
+            await db.Database.ExecuteSqlRawAsync(
                 $"DELETE FROM {Constants.DatabaseSchema.Tables.PropertyData} WHERE propertyTypeId = {propertyTypeId}");
 
             // delete granular permissions scoped to this property type (permission format: "<propertyTypeKey>|...")
-            Guid? propertyTypeKey = db.PropertyTypes
+            Guid? propertyTypeKey = await db.PropertyTypes
                 .Where(x => x.Id == propertyTypeId)
                 .Select(x => (Guid?)x.UniqueId)
-                .FirstOrDefault();
+                .FirstOrDefaultAsync();
             if (propertyTypeKey.HasValue)
             {
-                db.Database.ExecuteSqlRaw(
+                await db.Database.ExecuteSqlRawAsync(
                     $"DELETE FROM {Constants.DatabaseSchema.Tables.UserGroup2GranularPermission} WHERE uniqueId = {{0}} AND permission LIKE {{1}}",
                     contentType.Key,
                     $"{propertyTypeKey.Value}|%");
             }
 
             // Finally delete the property type.
-            db.PropertyTypes.Where(x => x.ContentTypeId == contentType.Id && x.Id == propertyTypeId).ExecuteDelete();
+            await db.PropertyTypes.Where(x => x.ContentTypeId == contentType.Id && x.Id == propertyTypeId).ExecuteDeleteAsync();
         });
 
     /// <inheritdoc />
     public string GetUniqueAlias(string alias)
     {
+        EnsureAmbientScopeOnCallerContext();
+
         // alias is unique across ALL content types!
-        List<string> aliases = ExecuteEfScope(db => db.ContentTypes
+        List<string> aliases = ExecuteEfScopeAsync(db => db.ContentTypes
             .Where(x => x.Alias != null && x.Alias.StartsWith(alias))
             .Select(x => x.Alias!)
-            .ToList());
+            .ToListAsync()).GetAwaiter().GetResult();
 
         var i = 1;
         string test;
@@ -1688,6 +1662,8 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
             return false;
         }
 
+        EnsureAmbientScopeOnCallerContext();
+
         var sql =
             $"""
              SELECT COUNT(*) AS Value
@@ -1695,20 +1671,25 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
              INNER JOIN {Constants.DatabaseSchema.Tables.Content} c ON ct.{ContentTypeDto.NodeIdColumnName} = c.contentTypeId
              WHERE c.nodeId IN ({string.Join(",", ids)}) AND ct.listView IS NULL
              """;
-        return ExecuteEfScope(db => db.Database.SqlQueryRaw<int>(sql).Single()) > 0;
+        return ExecuteEfScopeAsync(db => db.Database.SqlQueryRaw<int>(sql).SingleAsync()).GetAwaiter().GetResult() > 0;
     }
 
     /// <inheritdoc />
     public bool HasContentNodes(int id)
     {
+        EnsureAmbientScopeOnCallerContext();
+
         var sql =
             $"SELECT CASE WHEN EXISTS (SELECT * FROM {Constants.DatabaseSchema.Tables.Content} WHERE contentTypeId = {{0}}) THEN 1 ELSE 0 END AS Value";
-        return ExecuteEfScope(db => db.Database.SqlQueryRaw<int>(sql, id).Single()) == 1;
+        return ExecuteEfScopeAsync(db => db.Database.SqlQueryRaw<int>(sql, id).SingleAsync()).GetAwaiter().GetResult() == 1;
     }
 
     /// <inheritdoc />
     public IEnumerable<Guid> GetAllowedParentKeys(Guid key)
-        => ExecuteEfScope(db =>
+    {
+        EnsureAmbientScopeOnCallerContext();
+
+        return ExecuteEfScopeAsync(db =>
         {
             IQueryable<int> childNodeIds = db.Nodes
                 .Where(x => x.UniqueId == key)
@@ -1717,15 +1698,16 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
             return (from allowed in db.ContentTypeAllowedContentTypes
                     join node in db.Nodes on allowed.Id equals node.NodeId
                     where childNodeIds.Contains(allowed.AllowedId)
-                    select node.UniqueId).ToList();
-        });
+                    select node.UniqueId).ToListAsync();
+        }).GetAwaiter().GetResult();
+    }
 
     /// <summary>
     /// Resolves the entity's allowed content types to their node ids directly against the database (not the
     /// cached full set), so that a content type referencing itself — or another type created earlier in the
     /// same scope — resolves correctly even though it is not yet present in the cache.
     /// </summary>
-    private (int Id, int SortOrder)[] GetAllowedContentTypeIds(UmbracoDbContext db, IContentTypeBase contentTypeBase)
+    private async Task<(int Id, int SortOrder)[]> GetAllowedContentTypeIdsAsync(UmbracoDbContext db, IContentTypeBase contentTypeBase)
     {
         if (contentTypeBase.AllowedContentTypes?.Any() is not true)
         {
@@ -1738,10 +1720,10 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
             .Select(c => c.Key)
             .ToArray();
 
-        Dictionary<Guid, int> idsByKey = db.Nodes
+        Dictionary<Guid, int> idsByKey = await db.Nodes
             .Where(n => allowedContentTypeKeys.Contains(n.UniqueId) && n.NodeObjectType == NodeObjectTypeId)
             .Select(n => new { n.UniqueId, n.NodeId })
-            .ToDictionary(n => n.UniqueId, n => n.NodeId);
+            .ToDictionaryAsync(n => n.UniqueId, n => n.NodeId);
 
         // NOTE: we're efficiently discarding the input sort order here in favor of a "0 to n" sorting.
         return allowedContentTypeKeys

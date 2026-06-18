@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Services;
@@ -38,7 +39,6 @@ internal sealed class ContentTypeRepository : AsyncContentTypeRepositoryBase<ICo
         ILogger<ContentTypeRepository> logger,
         IContentTypeCommonRepository commonRepository,
         ILanguageRepository languageRepository,
-        IShortStringHelper shortStringHelper,
         IRepositoryCacheVersionService repositoryCacheVersionService,
         IIdKeyMap idKeyMap,
         ICacheSyncService cacheSyncService,
@@ -48,7 +48,6 @@ internal sealed class ContentTypeRepository : AsyncContentTypeRepositoryBase<ICo
             logger,
             commonRepository,
             languageRepository,
-            shortStringHelper,
             repositoryCacheVersionService,
             idKeyMap,
             cacheSyncService,
@@ -62,18 +61,14 @@ internal sealed class ContentTypeRepository : AsyncContentTypeRepositoryBase<ICo
     /// <inheritdoc />
     protected override bool SupportsPublishing => ContentType.SupportsPublishingConst;
 
-    // ----------------------------------------------------------------------------------------------------
-    // Document-type-specific query methods (IContentTypeRepository).
-    // ----------------------------------------------------------------------------------------------------
-
     /// <inheritdoc />
     public IEnumerable<IContentType> GetByQuery(IQuery<PropertyType> query)
     {
-        var ints = PerformGetByQuery(query).ToArray();
+        var ints = PerformGetByQueryAsync(query).GetAwaiter().GetResult();
         return ints.Length > 0 ? GetMany(ints) : Enumerable.Empty<IContentType>();
     }
 
-    private IEnumerable<int> PerformGetByQuery(IQuery<PropertyType> query)
+    private Task<int[]> PerformGetByQueryAsync(IQuery<PropertyType> query)
     {
         // used by DataTypeService to remove properties from content types if they have a deleted data type.
         // Matches the legacy behaviour of resolving the content type through the property GROUP — ungrouped
@@ -88,26 +83,28 @@ internal sealed class ContentTypeRepository : AsyncContentTypeRepositoryBase<ICo
              WHERE 1 = 1{whereSql}
              """;
 
-        return ExecuteEfScope(db => db.Database.SqlQueryRaw<int>(sql, args).ToList())
-            .Where(id => id > 0)
-            .Distinct();
+        return ExecuteEfScopeAsync(async db =>
+            (await db.Database.SqlQueryRaw<int>(sql, args).ToListAsync())
+                .Where(id => id > 0)
+                .Distinct()
+                .ToArray());
     }
 
     /// <summary>
     ///     Gets all property type aliases.
     /// </summary>
     public IEnumerable<string> GetAllPropertyTypeAliases()
-        => ExecuteEfScope(db => db.PropertyTypes
+        => ExecuteEfScopeAsync(db => db.PropertyTypes
             .Select(x => x.Alias!)
             .Distinct()
             .OrderBy(x => x)
-            .ToList());
+            .ToListAsync()).GetAwaiter().GetResult();
 
     /// <summary>
     ///     Gets all content type aliases.
     /// </summary>
     public IEnumerable<string> GetAllContentTypeAliases(params Guid[] objectTypes)
-        => ExecuteEfScope(db =>
+        => ExecuteEfScopeAsync(db =>
         {
             IQueryable<ContentTypeDto> query = db.ContentTypes;
 
@@ -117,8 +114,8 @@ internal sealed class ContentTypeRepository : AsyncContentTypeRepositoryBase<ICo
                     x.NodeDto.NodeObjectType.HasValue && objectTypes.Contains(x.NodeDto.NodeObjectType.Value));
             }
 
-            return query.Select(x => x.Alias!).ToList();
-        });
+            return query.Select(x => x.Alias!).ToListAsync();
+        }).GetAwaiter().GetResult();
 
     /// <summary>
     ///     Retrieves the IDs of all content types that match the specified aliases.
@@ -130,10 +127,10 @@ internal sealed class ContentTypeRepository : AsyncContentTypeRepositoryBase<ICo
             return Enumerable.Empty<int>();
         }
 
-        return ExecuteEfScope(db => db.ContentTypes
+        return ExecuteEfScopeAsync(db => db.ContentTypes
             .Where(x => aliases.Contains(x.Alias))
             .Select(x => x.NodeId)
-            .ToList());
+            .ToListAsync()).GetAwaiter().GetResult();
     }
 
     // ----------------------------------------------------------------------------------------------------
@@ -141,7 +138,7 @@ internal sealed class ContentTypeRepository : AsyncContentTypeRepositoryBase<ICo
     // ----------------------------------------------------------------------------------------------------
 
     /// <inheritdoc />
-    protected override void PersistNewItem(IContentType entity)
+    protected override async Task PersistNewItemAsync(IContentType entity)
     {
         if (string.IsNullOrWhiteSpace(entity.Alias))
         {
@@ -155,15 +152,15 @@ internal sealed class ContentTypeRepository : AsyncContentTypeRepositoryBase<ICo
 
         entity.AddingEntity();
 
-        PersistNewBaseContentType(entity);
-        PersistTemplates(entity);
-        PersistHistoryCleanup(entity);
+        await PersistNewBaseContentTypeAsync(entity);
+        await PersistTemplatesAsync(entity);
+        await PersistHistoryCleanupAsync(entity);
 
         entity.ResetDirtyProperties();
     }
 
     /// <inheritdoc />
-    protected override void PersistUpdatedItem(IContentType entity)
+    protected override async Task PersistUpdatedItemAsync(IContentType entity)
     {
         ValidateAlias(entity);
 
@@ -173,44 +170,44 @@ internal sealed class ContentTypeRepository : AsyncContentTypeRepositoryBase<ICo
         // Look up parent to get and set the correct Path if ParentId has changed
         if (entity.IsPropertyDirty("ParentId"))
         {
-            var parent = ExecuteEfScope(db => db.Nodes
+            var parent = await ExecuteEfScopeAsync(db => db.Nodes
                 .Where(x => x.NodeId == entity.ParentId)
                 .Select(x => new { x.Path, x.Level })
-                .First());
+                .FirstAsync());
             entity.Path = string.Concat(parent.Path, ",", entity.Id);
             entity.Level = parent.Level + 1;
 
-            var maxSortOrder = ExecuteEfScope(db => db.Nodes
+            var maxSortOrder = await ExecuteEfScopeAsync(db => db.Nodes
                 .Where(x => x.ParentId == entity.ParentId && x.NodeObjectType == NodeObjectTypeId)
                 .Select(x => (int?)x.SortOrder)
-                .Max()) ?? 0;
+                .MaxAsync()) ?? 0;
             entity.SortOrder = maxSortOrder + 1;
         }
 
-        PersistUpdatedBaseContentType(entity);
-        PersistTemplates(entity);
-        PersistHistoryCleanup(entity);
+        await PersistUpdatedBaseContentTypeAsync(entity);
+        await PersistTemplatesAsync(entity);
+        await PersistHistoryCleanupAsync(entity);
 
         entity.ResetDirtyProperties();
     }
 
     /// <inheritdoc />
-    protected override void DeleteContentTypeSpecificDefinitionTables(UmbracoDbContext db, int id)
+    protected override async Task DeleteContentTypeSpecificDefinitionTablesAsync(UmbracoDbContext db, int id)
     {
-        db.ContentTypeTemplates.Where(x => x.ContentTypeNodeId == id).ExecuteDelete();
-        db.ContentVersionCleanupPolicies.Where(x => x.ContentTypeId == id).ExecuteDelete();
+        await db.ContentTypeTemplates.Where(x => x.ContentTypeNodeId == id).ExecuteDeleteAsync();
+        await db.ContentVersionCleanupPolicies.Where(x => x.ContentTypeId == id).ExecuteDeleteAsync();
     }
 
-    private void PersistTemplates(IContentType entity)
+    private Task PersistTemplatesAsync(IContentType entity)
     {
         var defaultTemplateId = entity.DefaultTemplateId;
         ITemplate[] allowedTemplates = entity.AllowedTemplates?.Where(x => x.Id != defaultTemplateId).ToArray()
                                        ?? Array.Empty<ITemplate>();
 
-        ExecuteEfScope(db =>
+        return ExecuteEfScopeAsync(async db =>
         {
-            // remove and re-insert. ExecuteDelete is set-based and bypasses the change tracker.
-            db.ContentTypeTemplates.Where(x => x.ContentTypeNodeId == entity.Id).ExecuteDelete();
+            // remove and re-insert. ExecuteDeleteAsync is set-based and bypasses the change tracker.
+            await db.ContentTypeTemplates.Where(x => x.ContentTypeNodeId == entity.Id).ExecuteDeleteAsync();
 
             if (defaultTemplateId > 0)
             {
@@ -232,11 +229,11 @@ internal sealed class ContentTypeRepository : AsyncContentTypeRepositoryBase<ICo
                 });
             }
 
-            db.SaveChanges();
+            await db.SaveChangesAsync();
         });
     }
 
-    private void PersistHistoryCleanup(IContentType entity)
+    private Task PersistHistoryCleanupAsync(IContentType entity)
     {
         // historyCleanup property is not mandatory for api endpoint, handle the case where it's not present.
         if (entity is IContentType entityWithHistoryCleanup)
@@ -246,12 +243,12 @@ internal sealed class ContentTypeRepository : AsyncContentTypeRepositoryBase<ICo
             var keepAllVersionsNewerThanDays = entityWithHistoryCleanup.HistoryCleanup?.KeepAllVersionsNewerThanDays;
             var keepLatestVersionPerDayForDays = entityWithHistoryCleanup.HistoryCleanup?.KeepLatestVersionPerDayForDays;
 
-            ExecuteEfScope(db =>
+            return ExecuteEfScopeAsync(async db =>
             {
-                // Upsert: ExecuteUpdate is set-based (no change-tracker conflict); insert only if absent.
-                var affected = db.ContentVersionCleanupPolicies
+                // Upsert: ExecuteUpdateAsync is set-based (no change-tracker conflict); insert only if absent.
+                var affected = await db.ContentVersionCleanupPolicies
                     .Where(x => x.ContentTypeId == entity.Id)
-                    .ExecuteUpdate(s => s
+                    .ExecuteUpdateAsync(s => s
                         .SetProperty(x => x.Updated, updated)
                         .SetProperty(x => x.PreventCleanup, preventCleanup)
                         .SetProperty(x => x.KeepAllVersionsNewerThanDays, keepAllVersionsNewerThanDays)
@@ -267,9 +264,11 @@ internal sealed class ContentTypeRepository : AsyncContentTypeRepositoryBase<ICo
                         KeepAllVersionsNewerThanDays = keepAllVersionsNewerThanDays,
                         KeepLatestVersionPerDayForDays = keepLatestVersionPerDayForDays,
                     });
-                    db.SaveChanges();
+                    await db.SaveChangesAsync();
                 }
             });
         }
+
+        return Task.CompletedTask;
     }
 }
