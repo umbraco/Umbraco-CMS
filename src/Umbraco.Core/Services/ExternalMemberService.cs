@@ -356,8 +356,12 @@ internal sealed class ExternalMemberService : RepositoryService, IExternalMember
             _memberService.AssignRoles([contentMember.Id], roleNames);
         }
 
-        // Delete the external member record and its group memberships.
+        // Delete the external member record and its group memberships, then publish the deleted
+        // notification so it is removed from the search index and distributed caches. The external login
+        // links are deliberately left intact — keyed by the preserved Guid, they now belong to the
+        // content member (so this does not call the full DeleteAsync, which would delete them).
         await _repository.DeleteAsync(source.Key);
+        scope.Notifications.Publish(new ExternalMemberDeletedNotification(source, EventMessagesFactory.Get()));
 
         scope.Complete();
 

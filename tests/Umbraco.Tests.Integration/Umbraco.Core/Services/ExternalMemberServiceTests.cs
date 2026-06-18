@@ -3,7 +3,9 @@
 
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -27,6 +29,11 @@ internal sealed class ExternalMemberServiceTests : UmbracoIntegrationTest
     private IMemberService MemberService => GetRequiredService<IMemberService>();
 
     private IExternalLoginWithKeyService ExternalLoginService => GetRequiredService<IExternalLoginWithKeyService>();
+
+    private static readonly List<Guid> _externalMemberDeletedKeys = [];
+
+    protected override void CustomTestSetup(IUmbracoBuilder builder)
+        => builder.AddNotificationHandler<ExternalMemberDeletedNotification, ExternalMemberDeletedSpy>();
 
     [Test]
     public async Task Can_Create_And_Get_External_Member()
@@ -144,7 +151,7 @@ internal sealed class ExternalMemberServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Delete_Returns_NotFound_For_NonExistent()
+    public async Task Cannot_Delete_NonExistent_External_Member()
     {
         // Act
         var result = await ExternalMemberService.DeleteAsync(Guid.NewGuid());
@@ -222,7 +229,7 @@ internal sealed class ExternalMemberServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task GetByKey_Returns_Null_For_NonExistent()
+    public async Task Cannot_Get_NonExistent_External_Member_By_Key()
     {
         // Act
         var retrieved = await ExternalMemberService.GetByKeyAsync(Guid.NewGuid());
@@ -232,7 +239,7 @@ internal sealed class ExternalMemberServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Cross_Store_Uniqueness_Rejects_Duplicate_Username()
+    public async Task Cannot_Create_External_Member_With_Duplicate_Username()
     {
         // Arrange - create a content-based member first.
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
@@ -255,7 +262,7 @@ internal sealed class ExternalMemberServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Cross_Store_Uniqueness_Rejects_Duplicate_Email_When_Required()
+    public async Task Cannot_Create_External_Member_With_Duplicate_Email_When_Unique_Email_Required()
     {
         // Arrange - create a content-based member first (note: MemberRequireUniqueEmail defaults to true).
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
@@ -356,7 +363,7 @@ internal sealed class ExternalMemberServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Convert_External_To_Content_Returns_NotFound_For_NonExistent()
+    public async Task Cannot_Convert_NonExistent_External_Member_To_Content()
     {
         // Act
         var result = await ExternalMemberService.ConvertToContentMemberAsync(Guid.NewGuid(), "Member");
@@ -367,7 +374,7 @@ internal sealed class ExternalMemberServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Convert_External_To_Content_Returns_InvalidMemberType_For_Unknown_Alias()
+    public async Task Cannot_Convert_External_To_Content_Member_With_Unknown_Member_Type()
     {
         // Arrange
         var identity = ExternalMemberIdentityBuilder.CreateSimple("invalid-type@test.com", "Invalid Type Test");
@@ -386,7 +393,7 @@ internal sealed class ExternalMemberServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Convert_External_To_Content_Returns_DuplicateUsername_When_Content_Member_Exists()
+    public async Task Cannot_Convert_External_To_Content_Member_When_Username_Taken_By_Content_Member()
     {
         // Arrange — create the external member first (so cross-store uniqueness lets it through), then a
         // *different* content member that already owns the same username.
@@ -415,7 +422,29 @@ internal sealed class ExternalMemberServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task ValidateConvertToContentMember_Reports_Status_Without_Mutating()
+    public async Task Can_Convert_External_To_Content_Member_Publishing_Deleted_Notification()
+    {
+        // Arrange
+        _externalMemberDeletedKeys.Clear();
+        var identity = ExternalMemberIdentityBuilder.CreateSimple("deindex@test.com", "Deindex Test");
+        var createResult = await ExternalMemberService.CreateAsync(identity);
+        Assert.IsTrue(createResult.Success);
+        var key = createResult.Result.Key;
+
+        IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
+
+        // Act
+        var result = await ExternalMemberService.ConvertToContentMemberAsync(key, memberType.Alias);
+
+        // Assert — the deleted notification fired for the converted member, so it is removed from the
+        // search index and distributed caches (which a bare repository delete would have skipped).
+        Assert.IsTrue(result.Success);
+        CollectionAssert.Contains(_externalMemberDeletedKeys, key);
+    }
+
+    [Test]
+    public async Task Can_Validate_Convert_To_Content_Member_Without_Mutating()
     {
         // Arrange
         var identity = ExternalMemberIdentityBuilder.CreateSimple("validate-to-content@test.com", "Validate To Content");
@@ -486,7 +515,7 @@ internal sealed class ExternalMemberServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Convert_Content_To_External_Preserves_External_Login()
+    public async Task Can_Convert_Content_To_External_Member_Preserving_External_Login()
     {
         // Arrange — content member with an external login link and a token.
         IMember member = await CreateContentMemberAsync("preserve-login@test.com", "preserve-login");
@@ -515,7 +544,7 @@ internal sealed class ExternalMemberServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Convert_Content_To_External_Returns_NoExternalLogin_When_No_Link()
+    public async Task Cannot_Convert_Content_To_External_Member_Without_External_Login_Unless_Forced()
     {
         // Arrange — a password-only content member with no external login link.
         IMember member = await CreateContentMemberAsync("no-link@test.com", "no-link");
@@ -536,7 +565,7 @@ internal sealed class ExternalMemberServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Convert_Content_To_External_Returns_NotFound_For_NonExistent()
+    public async Task Cannot_Convert_NonExistent_Content_Member_To_External()
     {
         // Act
         var result = await ExternalMemberService.ConvertToExternalMemberAsync(Guid.NewGuid());
@@ -547,7 +576,7 @@ internal sealed class ExternalMemberServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task ValidateConvertToExternalMember_Reports_Status_Without_Mutating()
+    public async Task Can_Validate_Convert_To_External_Member_Without_Mutating()
     {
         // Arrange — member with a link (valid) and a member without one (invalid under the guard).
         IMember linkedMember = await CreateContentMemberAsync("validate-linked@test.com", "validate-linked");
@@ -586,5 +615,11 @@ internal sealed class ExternalMemberServiceTests : UmbracoIntegrationTest
 
         MemberService.Save(member);
         return member;
+    }
+
+    private sealed class ExternalMemberDeletedSpy : INotificationHandler<ExternalMemberDeletedNotification>
+    {
+        public void Handle(ExternalMemberDeletedNotification notification)
+            => _externalMemberDeletedKeys.AddRange(notification.DeletedEntities.Select(x => x.Key));
     }
 }

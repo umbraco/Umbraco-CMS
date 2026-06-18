@@ -129,7 +129,7 @@ public interface IExternalMemberService
     ///     <see cref="ExternalMemberOperationStatus.DuplicateUsername"/> or
     ///     <see cref="ExternalMemberOperationStatus.DuplicateEmail"/>).
     /// </returns>
-    // TODO (V20): make abstract / remove the default implementation when the obsolete period allows.
+    // TODO (V19): remove the default implementation.
     Task<ExternalMemberOperationStatus> ValidateConvertToContentMemberAsync(Guid memberKey, string memberTypeAlias)
         => Task.FromResult(ExternalMemberOperationStatus.NotImplemented);
 
@@ -161,7 +161,7 @@ public interface IExternalMemberService
     ///     external sign-in. Do not call this method within an ambient scope, as that would defer the
     ///     login-link deletion past the re-save and leave the member with no link.
     /// </remarks>
-    // TODO (V20): make abstract / remove the default implementation when the obsolete period allows.
+    // TODO (V19): remove the default implementation.
     Task<Attempt<ExternalMemberIdentity?, ExternalMemberOperationStatus>> ConvertToExternalMemberAsync(
         Guid memberKey,
         Action<ExternalMemberIdentity, IMember>? mapProfileData = null,
@@ -185,7 +185,7 @@ public interface IExternalMemberService
     ///     <see cref="ExternalMemberOperationStatus.DuplicateUsername"/> or
     ///     <see cref="ExternalMemberOperationStatus.DuplicateEmail"/>).
     /// </returns>
-    // TODO (V20): make abstract / remove the default implementation when the obsolete period allows.
+    // TODO (V19): remove the default implementation.
     Task<ExternalMemberOperationStatus> ValidateConvertToExternalMemberAsync(Guid memberKey, bool requireExternalLogin = true)
         => Task.FromResult(ExternalMemberOperationStatus.NotImplemented);
 }
