@@ -39,7 +39,7 @@ internal sealed class PackageManifestService : IPackageManifestService
         _cache = appCaches.RuntimeCache;
         _runtimeSettings = runtimeSettingsOptionsMonitor.CurrentValue;
         runtimeSettingsOptionsMonitor.OnChange(runtimeSettings => _runtimeSettings = runtimeSettings);
-        _globalCacheBustHash = CacheBustHashGenerator.Generate(hostingEnvironment, umbracoVersion);
+        _globalCacheBustHash = CacheBustHashGenerator.Generate(hostingEnvironment, umbracoVersion, _runtimeSettings.CacheBuster);
     }
 
     /// <summary>

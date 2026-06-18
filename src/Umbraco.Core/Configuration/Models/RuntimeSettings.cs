@@ -28,4 +28,12 @@ public class RuntimeSettings
     /// </summary>
     [DefaultValue(StaticTemporaryFileLifeTime)]
     public TimeSpan TemporaryFileLifeTime { get; set; } = TimeSpan.Parse(StaticTemporaryFileLifeTime);
+
+    /// <summary>
+    /// Gets or sets an optional value that is mixed into the cache-bust hash of every package's <c>/App_Plugins</c>
+    /// assets. Change it — for example to a build number or deployment id on each release — to force all package
+    /// assets to be re-fetched, regardless of whether each package bumped its own <c>version</c>. Empty by default,
+    /// in which case it has no effect and per-package versioning behaves as normal.
+    /// </summary>
+    public string CacheBuster { get; set; } = string.Empty;
 }

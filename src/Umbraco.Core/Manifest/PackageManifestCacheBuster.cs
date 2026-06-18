@@ -22,21 +22,23 @@ public static partial class PackageManifestCacheBuster
     private static partial Regex JavaScriptExtensionRegex();
 
     /// <summary>
-    ///     Returns the cache-bust hash for a package: a hash of its <paramref name="packageVersion"/> when present,
-    ///     otherwise the supplied global fallback hash.
+    ///     Returns the cache-bust hash for a package: when a <paramref name="packageVersion"/> is present it is salted
+    ///     with <paramref name="globalHash"/> and hashed, so the result moves whenever either the package version or the
+    ///     global hash changes; when absent it falls back to <paramref name="globalHash"/>. Because the global hash
+    ///     carries Umbraco's version and the host's optional cache-bust seed, those flow into every package's hash.
     /// </summary>
-    public static string ResolvePackageCacheBustHash(string? packageVersion, string fallbackHash)
+    public static string ResolvePackageCacheBustHash(string? packageVersion, string globalHash)
         => string.IsNullOrWhiteSpace(packageVersion)
-            ? fallbackHash
-            : packageVersion.GenerateHash();
+            ? globalHash
+            : $"{packageVersion}|{globalHash}".GenerateHash();
 
     /// <summary>
     ///     Resolves the cache-bust hash and auto-stamp flag for a package in one place, so every manifest-processing
-    ///     path (importmap and extensions) derives them identically. The hash is always the package's
-    ///     <see cref="PackageManifest.Version"/> hash (falling back to <paramref name="globalHash"/> only when the
-    ///     package has no version) — an explicit <c>%CACHE_BUSTER%</c> token is the author's opt-in and always resolves
-    ///     to it. <see cref="PackageManifest.AllowCacheBusting"/> governs only whether clean URLs are
-    ///     <em>automatically</em> stamped; it does not change the hash.
+    ///     path (importmap and extensions) derives them identically. The hash combines the package's
+    ///     <see cref="PackageManifest.Version"/> with <paramref name="globalHash"/> (falling back to
+    ///     <paramref name="globalHash"/> alone when the package has no version) — an explicit <c>%CACHE_BUSTER%</c> token
+    ///     is the author's opt-in and always resolves to it. <see cref="PackageManifest.AllowCacheBusting"/> governs only
+    ///     whether clean URLs are <em>automatically</em> stamped; it does not change the hash.
     /// </summary>
     public static (string Hash, bool AutoStamp) ResolvePackageCacheBust(PackageManifest manifest, string globalHash)
         => (ResolvePackageCacheBustHash(manifest.Version, globalHash), manifest.AllowCacheBusting);

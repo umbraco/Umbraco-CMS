@@ -290,7 +290,7 @@ public class ManifestControllerBaseTests
         Assert.Multiple(() =>
         {
             // The package's own version drives the hash, not the global Umbraco hash.
-            Assert.That(json, Does.Contain($"/App_Plugins/Foo/bundle.js?v={"1.2.3".GenerateHash()}"));
+            Assert.That(json, Does.Contain($"/App_Plugins/Foo/bundle.js?v={PackageHash("1.2.3")}"));
             Assert.That(json, Does.Not.Contain(CacheBustHash));
             Assert.That(json, Does.Not.Contain(Constants.Web.CacheBusterToken));
         });
@@ -314,7 +314,7 @@ public class ManifestControllerBaseTests
         Assert.Multiple(() =>
         {
             // Disabling busting turns off auto-stamping only; an explicit token still resolves to the package version hash.
-            Assert.That(json, Does.Contain($"/App_Plugins/Foo/bundle.js?v={"1.2.3".GenerateHash()}"));
+            Assert.That(json, Does.Contain($"/App_Plugins/Foo/bundle.js?v={PackageHash("1.2.3")}"));
             Assert.That(json, Does.Not.Contain(CacheBustHash));
             Assert.That(json, Does.Not.Contain(Constants.Web.CacheBusterToken));
         });
@@ -337,7 +337,7 @@ public class ManifestControllerBaseTests
         Assert.Multiple(() =>
         {
             // The clean URL is auto-stamped with the package's own version hash, not the global Umbraco hash.
-            Assert.That(json, Does.Contain($"/App_Plugins/Foo/bundle.js?umb__rnd={"1.2.3".GenerateHash()}"));
+            Assert.That(json, Does.Contain($"/App_Plugins/Foo/bundle.js?umb__rnd={PackageHash("1.2.3")}"));
             Assert.That(json, Does.Not.Contain(CacheBustHash));
         });
     }
@@ -363,6 +363,9 @@ public class ManifestControllerBaseTests
             Assert.That(json, Does.Not.Contain("umb__rnd"));
         });
     }
+
+    // The per-package hash: the package version salted with the global hash passed in (here, CacheBustHash).
+    private static string PackageHash(string version) => $"{version}|{CacheBustHash}".GenerateHash();
 
     private static ManifestResponseModel CreateModel(object[] extensions, string name = "TestPackage")
         => new() { Name = name, Extensions = extensions };

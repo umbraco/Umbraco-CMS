@@ -1,5 +1,10 @@
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Web;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Common.Hosting;
@@ -10,10 +15,32 @@ public class UmbracoBackOfficePathGenerator : IBackOfficePathGenerator
     private string? _backofficeAssetsPath;
     private string? _backOfficeVirtualDirectory;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UmbracoBackOfficePathGenerator"/> class.
+    /// </summary>
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
     public UmbracoBackOfficePathGenerator(IHostingEnvironment hostingEnvironment, IUmbracoVersion umbracoVersion)
+        : this(
+            hostingEnvironment,
+            umbracoVersion,
+            StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<RuntimeSettings>>())
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UmbracoBackOfficePathGenerator"/> class.
+    /// </summary>
+    /// <param name="hostingEnvironment">The hosting environment.</param>
+    /// <param name="umbracoVersion">The Umbraco version.</param>
+    /// <param name="runtimeSettings">Runtime settings, used to fold the optional cache-bust seed into the back office cache-bust hash.</param>
+    [ActivatorUtilitiesConstructor]
+    public UmbracoBackOfficePathGenerator(
+        IHostingEnvironment hostingEnvironment,
+        IUmbracoVersion umbracoVersion,
+        IOptionsMonitor<RuntimeSettings> runtimeSettings)
     {
         BackOfficePath = hostingEnvironment.GetBackOfficePath();
-        BackOfficeCacheBustHash = UrlHelperExtensions.GetCacheBustHash(hostingEnvironment, umbracoVersion);
+        BackOfficeCacheBustHash = CacheBustHashGenerator.Generate(hostingEnvironment, umbracoVersion, runtimeSettings.CurrentValue.CacheBuster);
     }
 
     /// <inheritdoc />

@@ -10,10 +10,16 @@ public class PackageManifestCacheBusterTests
     private const string GlobalHash = "globalhash";
 
     [Test]
-    public void ResolvePackageCacheBustHash_UsesVersionHash_WhenVersionPresent()
+    public void ResolvePackageCacheBustHash_CombinesVersionWithGlobalHash_WhenVersionPresent()
     {
         var result = PackageManifestCacheBuster.ResolvePackageCacheBustHash("1.2.3", GlobalHash);
-        Assert.That(result, Is.EqualTo("1.2.3".GenerateHash()));
+
+        Assert.Multiple(() =>
+        {
+            // The version is salted with the global hash (which carries Umbraco's version + the host seed).
+            Assert.That(result, Is.EqualTo($"1.2.3|{GlobalHash}".GenerateHash()));
+            Assert.That(result, Is.Not.EqualTo("1.2.3".GenerateHash()));
+        });
     }
 
     [TestCase(null)]
@@ -26,7 +32,7 @@ public class PackageManifestCacheBusterTests
     }
 
     [Test]
-    public void ResolvePackageCacheBust_UsesVersionHashAndEnablesStamping_WhenBustingAllowed()
+    public void ResolvePackageCacheBust_CombinesVersionWithGlobalHashAndEnablesStamping_WhenBustingAllowed()
     {
         var manifest = new PackageManifest { Name = "Pkg", Version = "1.2.3", Extensions = [] };
 
@@ -34,13 +40,13 @@ public class PackageManifestCacheBusterTests
 
         Assert.Multiple(() =>
         {
-            Assert.That(hash, Is.EqualTo("1.2.3".GenerateHash()));
+            Assert.That(hash, Is.EqualTo($"1.2.3|{GlobalHash}".GenerateHash()));
             Assert.That(autoStamp, Is.True);
         });
     }
 
     [Test]
-    public void ResolvePackageCacheBust_UsesVersionHashButDisablesStamping_WhenBustingDisallowed()
+    public void ResolvePackageCacheBust_CombinesVersionWithGlobalHashButDisablesStamping_WhenBustingDisallowed()
     {
         var manifest = new PackageManifest { Name = "Pkg", Version = "1.2.3", AllowCacheBusting = false, Extensions = [] };
 
@@ -48,8 +54,8 @@ public class PackageManifestCacheBusterTests
 
         Assert.Multiple(() =>
         {
-            // AllowCacheBusting only governs auto-stamping; the hash (used to resolve an explicit token) is still the version hash.
-            Assert.That(hash, Is.EqualTo("1.2.3".GenerateHash()));
+            // AllowCacheBusting only governs auto-stamping; the hash (used to resolve an explicit token) is unchanged by it.
+            Assert.That(hash, Is.EqualTo($"1.2.3|{GlobalHash}".GenerateHash()));
             Assert.That(autoStamp, Is.False);
         });
     }
