@@ -37,7 +37,7 @@ public class AllowedInLibraryDocumentTypeController : DocumentTypeControllerBase
     /// <param name="take">The maximum number of items to return.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains an <see cref="IActionResult"/> with a <see cref="PagedViewModel{AllowedDocumentType}"/> of document types allowed in the library.</returns>
     [NonAction]
-    [Obsolete("Use the non obsoleted method instead. Scheduled for removal in Umbraco 20.")]
+    [Obsolete("Please use the overload that accepts a parentKey parameter. Scheduled for removal in Umbraco 20.")]
     public async Task<IActionResult> AllowedInLibrary(CancellationToken cancellationToken, int skip = 0, int take = 100)
         => await AllowedInLibrary(cancellationToken, null, skip, take);
 

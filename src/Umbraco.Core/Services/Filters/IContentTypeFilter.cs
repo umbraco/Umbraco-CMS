@@ -35,6 +35,7 @@ public interface IContentTypeFilter
     /// <param name="contentTypes">Retrieved collection of content types.</param>
     /// <param name="parentKey">The parent container key (provided to allow for custom filtering of the returned list based on the library context), or <c>null</c> at the library root.</param>
     /// <returns>Filtered collection of content types.</returns>
+    // TODO (V20): Remove the default implementation when the obsolete FilterAllowedInLibraryAsync overload is removed.
     Task<IEnumerable<TItem>> FilterAllowedInLibraryAsync<TItem>(IEnumerable<TItem> contentTypes, Guid? parentKey)
         where TItem : IContentTypeComposition
 #pragma warning disable CS0618 // Type or member is obsolete

@@ -114,8 +114,10 @@ internal sealed class ElementEditingService
         }
 
         // A content type filter could prevent the element from being created under the requested parent,
-        // consistent with the validation applied when actually creating the element.
-        if (await IsAllowedInLibraryByContentTypeFilters(contentType, createModel.ParentKey) is false)
+        // consistent with the validation applied when actually creating the element. Treat an empty key as the
+        // library root, consistent with the create/move paths.
+        Guid? parentKey = createModel.ParentKey == Guid.Empty ? null : createModel.ParentKey;
+        if (await IsAllowedInLibraryByContentTypeFilters(contentType, parentKey) is false)
         {
             return Attempt.FailWithStatus(ContentEditingOperationStatus.NotAllowed, new ContentValidationResult());
         }
@@ -217,6 +219,12 @@ internal sealed class ElementEditingService
 
     protected override async Task<(int? ParentId, ContentEditingOperationStatus OperationStatus)> TryGetAndValidateParentIdAsync(Guid? parentKey, IContentType contentType)
     {
+        // Treat an empty key as the library root, consistent with the move/restore and container operations.
+        if (parentKey == Guid.Empty)
+        {
+            parentKey = null;
+        }
+
         if (parentKey.HasValue is false)
         {
             // We could have a content type filter registered that prevents the element from being created at the library root.

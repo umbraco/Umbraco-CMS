@@ -545,6 +545,20 @@ public partial class ElementEditingServiceTests
         Assert.AreEqual(ContentEditingOperationStatus.NotAllowed, result.Status);
     }
 
+    [Test]
+    public async Task Can_Create_With_Empty_Parent_Key_Treated_As_Root()
+    {
+        var elementType = await CreateInvariantElementType();
+
+        var createModel = CreateElementModel(elementType.Key, Guid.Empty);
+
+        var result = await ElementEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+        Assert.AreEqual(Constants.System.Root, result.Result.Content!.ParentId);
+    }
+
     private static ElementCreateModel CreateElementModel(Guid contentTypeKey, Guid? parentKey)
         => new()
         {
