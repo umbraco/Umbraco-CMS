@@ -713,7 +713,7 @@ export default {
 		greeting5: 'Velkommen',
 		greeting6: 'Velkommen',
 		instruction: 'Logg på nedenfor',
-		signInWith: 'Logg på med',
+		signInWith: 'Logg på med {0}',
 		timeout: 'Din sesjon er utløpt',
 		continue: 'Fortsett',
 		validate: 'Valider',
