@@ -64,7 +64,7 @@ export class UmbTreeCreateActionApi extends UmbTreeActionBase {
 							this.#options.setValue(options);
 							this.#multipleOptions.setValue(options.length > 1);
 						},
-					);
+					) as unknown as UmbExtensionsApiInitializer<ManifestType>;
 				},
 				'umbEntityContextObserver',
 			);
