@@ -23,7 +23,10 @@ export class UmbUfmElementNameElement extends UmbUfmElementBase {
 							? (value as Record<string, unknown>)[this.alias]
 							: (value as unknown);
 
-					if (!temp) return;
+					if (!temp) {
+						this.value = '';
+						return;
+					}
 
 					const uniques = this.#getUniques(temp);
 					this.value = await this.#getNames(uniques);
@@ -49,7 +52,9 @@ export class UmbUfmElementNameElement extends UmbUfmElementBase {
 				const namePromises = data.map(async (item) => {
 					const resolver = new UmbElementItemDataResolver(this);
 					resolver.setData(item);
-					return await resolver.getName();
+					const name = await resolver.getName();
+					resolver.destroy();
+					return name;
 				});
 				const names = await Promise.all(namePromises);
 				return names.join(', ');
