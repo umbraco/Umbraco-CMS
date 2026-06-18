@@ -240,7 +240,7 @@ internal abstract class BlockValuePropertyIndexValueFactoryBase<TSerialized> : J
             .Select(l => l.ContentKey)
             .ToArray();
 
-        if (sharedElementKeys.Length > 0 && _indexingSettings.CurrentValue.IndexSharedElements)
+        if (sharedElementKeys.Length > 0 && _indexingSettings.CurrentValue.IndexExternalElements)
         {
             IEnumerable<IElement> elements = _elementService.GetByIds(sharedElementKeys);
             indexData.AddRange(
