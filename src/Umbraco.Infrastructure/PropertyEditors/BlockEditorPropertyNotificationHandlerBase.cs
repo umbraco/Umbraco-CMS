@@ -126,7 +126,7 @@ public abstract class BlockEditorPropertyNotificationHandlerBase<TBlockLayoutIte
     private void ParseKeys(JsonArray contentData, JsonArray settingsData, JsonObject layoutData)
     {
         // recurse a JSON object to find all contained block editor layouts
-        List<JsonObject> GetLayoutItemsRecursively(JsonObject jsonObject)
+        static List<JsonObject> GetLayoutItemsRecursively(JsonObject jsonObject)
         {
             var layoutItems = new List<JsonObject>();
             if (jsonObject.ContainsKey("key") && jsonObject.ContainsKey("contentKey"))

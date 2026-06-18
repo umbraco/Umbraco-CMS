@@ -24,7 +24,6 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
     private readonly IJsonSerializer _jsonSerializer;
     private readonly DataValueReferenceFactoryCollection _dataValueReferenceFactoryCollection;
     private readonly BlockEditorVarianceHandler _blockEditorVarianceHandler;
-    private BlockEditorValues<TValue, TLayout>? _blockEditorValues;
     private readonly ILanguageService _languageService;
 
     protected BlockValuePropertyValueEditorBase(
@@ -47,15 +46,15 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
         _languageService = languageService;
     }
 
-              /// <summary>
-              /// Caches referenced entities for all property values with supporting property editors within the specified block editor data
-              /// optimising subsequent retrieval of entities when parsing and converting property values.
-              /// </summary>
-              /// <remarks>
-              /// This method iterates through all property values associated with data editors in the provided
-              /// block editor data and invokes caching for referenced entities where supported by the property editor.
-              /// </remarks>
-              /// <param name="blockEditorData">The block editor data containing content and settings property values to analyze for referenced entities.</param>
+    /// <summary>
+    /// Caches referenced entities for all property values with supporting property editors within the specified block editor data
+    /// optimising subsequent retrieval of entities when parsing and converting property values.
+    /// </summary>
+    /// <remarks>
+    /// This method iterates through all property values associated with data editors in the provided
+    /// block editor data and invokes caching for referenced entities where supported by the property editor.
+    /// </remarks>
+    /// <param name="blockEditorData">The block editor data containing content and settings property values to analyze for referenced entities.</param>
     [Obsolete("This method is available for support of request caching retrieved entities in derived property value editors. " +
               "The intention is to supersede this with lazy loaded read locks, which will make this unnecessary. " +
               "Scheduled for removal in Umbraco 19.")]
@@ -93,8 +92,8 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
 
     protected BlockEditorValues<TValue, TLayout> BlockEditorValues
     {
-        get => _blockEditorValues ?? throw new NullReferenceException($"The property {nameof(BlockEditorValues)} must be initialized at value editor construction");
-        set => _blockEditorValues = value;
+        get => field ?? throw new NullReferenceException($"The property {nameof(BlockEditorValues)} must be initialized at value editor construction");
+        set;
     }
 
     protected IEnumerable<UmbracoEntityReference> GetBlockValueReferences(TValue blockValue)
@@ -237,10 +236,7 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
                 var newValue = valueEditor.FromEditor(propertyData, currentValue?.Value);
 
                 // Update the raw value since this is what will get serialized out.
-                if (editedValue != null)
-                {
-                    editedValue.Value = newValue;
-                }
+                editedValue?.Value = newValue;
             }
         }
     }
@@ -345,11 +341,7 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
             item.Values = _blockEditorVarianceHandler.AlignPropertyVarianceAsync(item.Values, culture).GetAwaiter().GetResult();
             foreach (BlockPropertyValue blockPropertyValue in item.Values)
             {
-                IPropertyType? propertyType = blockPropertyValue.PropertyType;
-                if (propertyType is null)
-                {
-                    throw new ArgumentException("One or more block properties did not have a resolved property type. Block editor values must be resolved before attempting to map them to editor.", nameof(items));
-                }
+                IPropertyType? propertyType = blockPropertyValue.PropertyType ?? throw new ArgumentException("One or more block properties did not have a resolved property type. Block editor values must be resolved before attempting to map them to editor.", nameof(items));
 
                 IDataEditor? propertyEditor = _propertyEditors[propertyType.PropertyEditorAlias];
                 if (propertyEditor is null)
@@ -434,7 +426,7 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
         bool canUpdateInvariantData,
         HashSet<string> allowedCultures)
     {
-        var mergedInvariant = UpdateSourceInvariantData(source, target, canUpdateInvariantData);
+        BlockEditorData<TValue, TLayout>? mergedInvariant = UpdateSourceInvariantData(source, target, canUpdateInvariantData);
 
         // if the structure (invariant) is not defined after merger, the target content does not matter
         if (mergedInvariant?.Layout is null)
@@ -444,10 +436,7 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
 
         // since we merged the invariant data (layout) before we get to this point
         // we just need an empty valid object to run comparisons at this point
-        if (source is null)
-        {
-            source = new BlockEditorData<TValue, TLayout>([], new TValue());
-        }
+        source ??= new BlockEditorData<TValue, TLayout>([], new TValue());
 
         // update the target with the merged invariant
         target!.BlockValue.Layout = mergedInvariant.BlockValue.Layout;
