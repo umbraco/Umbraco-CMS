@@ -79,7 +79,6 @@ export abstract class UmbTreeItemElementBase<
 			this.observe(this.#api.isSelected, (value) => (this._isSelected = value), '_observeIsSelected');
 			this.observe(this.#api.noAccess, (value) => (this._noAccess = value), '_observeNoAccess');
 			this.observe(this.#api.path, (value) => (this._href = value), '_observePath');
-			this.observe(this.#api.pagination.currentPage, (value) => (this._currentPage = value), '_observeCurrentPage');
 			this.observe(this.#api.pagination.totalPages, (value) => (this._totalPages = value), '_observeTotalPages');
 			this.observe(
 				this.#api.isLoadingPrevChildren,
@@ -154,9 +153,6 @@ export abstract class UmbTreeItemElementBase<
 	private _totalPages = 1;
 
 	@state()
-	private _currentPage = 1;
-
-	@state()
 	private _hasPreviousItems = false;
 
 	@state()
@@ -216,8 +212,7 @@ export abstract class UmbTreeItemElementBase<
 
 	#onLoadNext(event: any) {
 		event.stopPropagation();
-		const next = (this._currentPage = this._currentPage + 1);
-		this.#api?.pagination.setCurrentPageNumber(next);
+		this.#api?.loadNextItems?.();
 	}
 
 	// Note: Currently we want to prevent opening when the item is in a selectable context, but this might change in the future.
