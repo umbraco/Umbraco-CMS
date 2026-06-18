@@ -5,11 +5,13 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Navigation;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Search;
 
@@ -34,6 +36,7 @@ internal sealed class DeferredSearchReindexService : IDeferredSearchReindexServi
     private readonly ICoreScopeProvider _scopeProvider;
     private readonly ILogger<DeferredSearchReindexService> _logger;
     private readonly CancellationTokenSource _shutdownCts;
+    private readonly IRelationService _relationService;
     private readonly ConcurrentDictionary<int, byte> _pendingContentTypeIds = new();
     private readonly ConcurrentDictionary<int, byte> _pendingMediaTypeIds = new();
     private readonly ConcurrentDictionary<int, byte> _pendingMemberTypeIds = new();
@@ -52,6 +55,7 @@ internal sealed class DeferredSearchReindexService : IDeferredSearchReindexServi
     /// <param name="scopeProvider">The scope provider, used to create scopes for repository access.</param>
     /// <param name="logger">The logger.</param>
     /// <param name="hostApplicationLifetime">The application lifetime, used to cancel in-flight reindexing on shutdown.</param>
+    /// <param name="relationService">The relation service, used to traverse element-to-document relations.</param>
     public DeferredSearchReindexService(
         IDocumentRepository documentRepository,
         IMediaRepository mediaRepository,
@@ -61,7 +65,8 @@ internal sealed class DeferredSearchReindexService : IDeferredSearchReindexServi
         IOptionsMonitor<IndexingSettings> indexingSettings,
         ICoreScopeProvider scopeProvider,
         ILogger<DeferredSearchReindexService> logger,
-        IHostApplicationLifetime hostApplicationLifetime)
+        IHostApplicationLifetime hostApplicationLifetime,
+        IRelationService relationService)
     {
         _documentRepository = documentRepository;
         _mediaRepository = mediaRepository;
@@ -72,6 +77,7 @@ internal sealed class DeferredSearchReindexService : IDeferredSearchReindexServi
         _scopeProvider = scopeProvider;
         _logger = logger;
         _shutdownCts = CancellationTokenSource.CreateLinkedTokenSource(hostApplicationLifetime.ApplicationStopping);
+        _relationService = relationService;
     }
 
     /// <inheritdoc />
@@ -287,6 +293,82 @@ internal sealed class DeferredSearchReindexService : IDeferredSearchReindexServi
 
     private void ReindexDocumentsReferencingElements(int[] elementIds)
     {
+        IReadOnlyCollection<int> documentIds = FindDocumentIdsReferencingElements(elementIds);
+        if (documentIds.Count == 0)
+        {
+            return;
+        }
+
+        var publishChecked = new Dictionary<int, bool>();
+        foreach (IEnumerable<int> batch in documentIds.InGroupsOf(Constants.Sql.MaxParameterCount))
+        {
+            var batchIds = batch.ToArray();
+            IContent[] documents;
+            using (ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true))
+            {
+                documents = _documentRepository.GetMany(batchIds).ToArray();
+            }
+
+            foreach (IContent document in documents)
+            {
+                var isPublished = false;
+                if (document.Published && publishChecked.TryGetValue(document.Id, out isPublished) is false)
+                {
+                    isPublished = _publishStatusQueryService.HasPublishedAncestorPath(document.Key);
+                    publishChecked[document.Id] = isPublished;
+                }
+
+                _umbracoIndexingHandler.ReIndexForContent(document, isPublished);
+            }
+        }
+    }
+
+    internal IReadOnlyCollection<int> FindDocumentIdsReferencingElements(IEnumerable<int> elementIds)
+    {
+        var visitedElementIds = new HashSet<int>();
+        var documentIds = new HashSet<int>();
+        var queue = new Queue<int>(elementIds);
+
+        while (queue.Count > 0)
+        {
+            var elementId = queue.Dequeue();
+            if (visitedElementIds.Add(elementId) is false)
+            {
+                continue;
+            }
+
+            foreach (IUmbracoEntity documentParent in GetParentEntities(elementId, UmbracoObjectTypes.Document))
+            {
+                documentIds.Add(documentParent.Id);
+            }
+
+            foreach (IUmbracoEntity elementParent in GetParentEntities(elementId, UmbracoObjectTypes.Element))
+            {
+                if (visitedElementIds.Contains(elementParent.Id) is false)
+                {
+                    queue.Enqueue(elementParent.Id);
+                }
+            }
+        }
+
+        return documentIds;
+    }
+
+    private IEnumerable<IUmbracoEntity> GetParentEntities(int childId, UmbracoObjectTypes objectType)
+    {
+        var results = new List<IUmbracoEntity>();
+        var pageSize = _indexingSettings.CurrentValue.BatchSize;
+        long page = 0;
+        var total = long.MaxValue;
+        while (page * pageSize < total)
+        {
+            IUmbracoEntity[] items = _relationService
+                .GetPagedParentEntitiesByChildId(childId, page++, pageSize, out total, objectType)
+                .ToArray();
+            results.AddRange(items);
+        }
+
+        return results;
     }
 
     /// <summary>

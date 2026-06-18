@@ -10,6 +10,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
@@ -30,6 +31,7 @@ public class DeferredSearchReindexServiceTests
     private Mock<IUmbracoIndexingHandler> _umbracoIndexingHandler = null!;
     private Mock<IPublishStatusQueryService> _publishStatusQueryService = null!;
     private Mock<ICoreScopeProvider> _scopeProvider = null!;
+    private Mock<IRelationService> _relationService = null!;
     private DeferredSearchReindexService _service = null!;
 
     [SetUp]
@@ -41,6 +43,7 @@ public class DeferredSearchReindexServiceTests
         _umbracoIndexingHandler = new Mock<IUmbracoIndexingHandler>();
         _publishStatusQueryService = new Mock<IPublishStatusQueryService>();
         _scopeProvider = new Mock<ICoreScopeProvider>();
+        _relationService = new Mock<IRelationService>();
         _scopeProvider
             .Setup(x => x.CreateCoreScope(
                 It.IsAny<System.Data.IsolationLevel>(),
@@ -83,7 +86,8 @@ public class DeferredSearchReindexServiceTests
             indexingSettings.Object,
             _scopeProvider.Object,
             Mock.Of<ILogger<DeferredSearchReindexService>>(),
-            lifetime.Object);
+            lifetime.Object,
+            _relationService.Object);
     }
 
     /// <summary>
@@ -433,6 +437,68 @@ public class DeferredSearchReindexServiceTests
                 It.IsAny<Ordering?>()),
             Times.Once);
     }
+
+    /// <summary>
+    ///     Verifies that a document transitively embedding an element (via an intermediate element) is included in the
+    ///     reindex set.
+    /// </summary>
+    [Test]
+    public void Finds_Document_Transitively_Referencing_Element()
+    {
+        // Document 100 embeds element 1; element 1 embeds element 2 (the one that changes).
+        SetupRelationGraph(new Dictionary<(int childId, UmbracoObjectTypes type), int[]>
+        {
+            { (2, UmbracoObjectTypes.Document), [] },
+            { (2, UmbracoObjectTypes.Element), [1] },
+            { (1, UmbracoObjectTypes.Document), [100] },
+            { (1, UmbracoObjectTypes.Element), [] },
+        });
+
+        var documentIds = _service.FindDocumentIdsReferencingElements([2]);
+
+        CollectionAssert.AreEquivalent(new[] { 100 }, documentIds);
+    }
+
+    /// <summary>
+    ///     Verifies that the BFS terminates and does not loop when element references are cyclic.
+    /// </summary>
+    [Test]
+    public void Terminates_On_Cyclic_Element_References()
+    {
+        // Element 1 <-> element 2 (cycle); document 100 embeds element 1. Element 2 changes.
+        SetupRelationGraph(new Dictionary<(int childId, UmbracoObjectTypes type), int[]>
+        {
+            { (2, UmbracoObjectTypes.Document), [] },
+            { (2, UmbracoObjectTypes.Element), [1] },
+            { (1, UmbracoObjectTypes.Document), [100] },
+            { (1, UmbracoObjectTypes.Element), [2] },
+        });
+
+        var documentIds = _service.FindDocumentIdsReferencingElements([2]);
+
+        CollectionAssert.AreEquivalent(new[] { 100 }, documentIds);
+    }
+
+    private void SetupRelationGraph(Dictionary<(int childId, UmbracoObjectTypes type), int[]> graph)
+    {
+        _relationService
+            .Setup(r => r.GetPagedParentEntitiesByChildId(
+                It.IsAny<int>(),
+                It.IsAny<long>(),
+                It.IsAny<int>(),
+                out It.Ref<long>.IsAny,
+                It.IsAny<UmbracoObjectTypes[]>()))
+            .Returns((int id, long pageIndex, int pageSize, out long total, UmbracoObjectTypes[] types) =>
+            {
+                UmbracoObjectTypes type = types.Length > 0 ? types[0] : UmbracoObjectTypes.Unknown;
+                int[] parents = graph.TryGetValue((id, type), out int[]? ids) ? ids : [];
+                total = parents.Length;
+                return pageIndex == 0 ? parents.Select(CreateEntity).ToArray() : [];
+            });
+    }
+
+    private static IUmbracoEntity CreateEntity(int id)
+        => Mock.Of<IUmbracoEntity>(e => e.Id == id);
 
     private static IContent CreateContent(int id, bool published)
     {
