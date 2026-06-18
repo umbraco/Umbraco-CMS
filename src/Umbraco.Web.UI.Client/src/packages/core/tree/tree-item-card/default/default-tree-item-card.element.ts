@@ -28,7 +28,7 @@ export class UmbDefaultTreeItemCardElement extends UmbLitElement {
 	}
 
 	@property({ type: Object, attribute: false })
-	item?: UmbTreeItemModel;
+	item: UmbTreeItemModel | undefined;
 
 	@state()
 	private _isSelectable = false;
