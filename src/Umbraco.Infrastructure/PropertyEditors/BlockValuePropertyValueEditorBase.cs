@@ -1,3 +1,4 @@
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
@@ -128,6 +129,17 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
             foreach (UmbracoEntityReference value in references)
             {
                 result.Add(value);
+            }
+        }
+
+        IBlockLayoutItem[] allLayoutItems = blockValue.Layout.Values
+            .SelectMany(layouts => layouts)
+            .ToArray();
+        foreach (IBlockLayoutItem layout in allLayoutItems.Union(allLayoutItems.SelectMany(l => l.GetContainedLayouts())))
+        {
+            if (layout.IsExternalContent)
+            {
+                result.Add(new UmbracoEntityReference(new GuidUdi(Constants.UdiEntityType.Element, layout.ContentKey)));
             }
         }
 
