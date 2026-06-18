@@ -24,7 +24,10 @@ export class UmbUfmMemberNameElement extends UmbUfmElementBase {
 							? (value as Record<string, unknown>)[this.alias]
 							: (value as unknown);
 
-					if (!temp) return;
+					if (!temp) {
+						this.value = '';
+						return;
+					}
 
 					const uniques = this.#getUniques(temp);
 
@@ -58,7 +61,8 @@ export class UmbUfmMemberNameElement extends UmbUfmElementBase {
 	#extractGuid(token: string): string | undefined {
 		if (token.startsWith('umb://')) {
 			try {
-				return getGuidFromUdi(token);
+				const guid = getGuidFromUdi(token);
+				return UmbId.validate(guid) ? guid : undefined;
 			} catch {
 				return undefined;
 			}
