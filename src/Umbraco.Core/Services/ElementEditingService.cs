@@ -23,6 +23,7 @@ internal sealed class ElementEditingService
     private readonly ILogger<ElementEditingService> _logger;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
     private readonly IElementContainerService _containerService;
+    private readonly ContentTypeFilterCollection _contentTypeFilters;
     private readonly IEventMessagesFactory _eventMessagesFactory;
     private readonly IIdKeyMap _idKeyMap;
     private readonly IAuditService _auditService;
@@ -65,6 +66,7 @@ internal sealed class ElementEditingService
         _logger = logger;
         _userIdKeyResolver = userIdKeyResolver;
         _containerService = containerService;
+        _contentTypeFilters = contentTypeFilters;
         _eventMessagesFactory = eventMessagesFactory;
         _idKeyMap = idKeyMap;
         _auditService = auditService;
@@ -210,13 +212,33 @@ internal sealed class ElementEditingService
     {
         if (parentKey.HasValue is false)
         {
-            return (Constants.System.Root, ContentEditingOperationStatus.Success);
+            // We could have a content type filter registered that prevents the element from being created at the library root.
+            return await IsAllowedInLibraryByContentTypeFilters(contentType, null)
+                ? (Constants.System.Root, ContentEditingOperationStatus.Success)
+                : (null, ContentEditingOperationStatus.NotAllowed);
         }
 
         EntityContainer? container = await _containerService.GetAsync(parentKey.Value);
-        return container is not null
+        if (container is null)
+        {
+            return (null, ContentEditingOperationStatus.ParentNotFound);
+        }
+
+        // We could have a content type filter registered that prevents the element from being created under this container.
+        return await IsAllowedInLibraryByContentTypeFilters(contentType, parentKey.Value)
             ? (container.Id, ContentEditingOperationStatus.Success)
-            : (null, ContentEditingOperationStatus.ParentNotFound);
+            : (null, ContentEditingOperationStatus.NotAllowed);
+    }
+
+    private async Task<bool> IsAllowedInLibraryByContentTypeFilters(IContentType contentType, Guid? parentKey)
+    {
+        IEnumerable<IContentType> filteredContentTypes = [contentType];
+        foreach (IContentTypeFilter filter in _contentTypeFilters)
+        {
+            filteredContentTypes = await filter.FilterAllowedInLibraryAsync(filteredContentTypes, parentKey);
+        }
+
+        return filteredContentTypes.Any();
     }
 
     /// <inheritdoc/>
