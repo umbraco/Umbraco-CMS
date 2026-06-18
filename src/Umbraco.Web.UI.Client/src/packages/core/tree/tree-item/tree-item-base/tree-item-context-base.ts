@@ -9,10 +9,10 @@ import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export abstract class UmbTreeItemContextBase<
-		TreeItemType extends UmbTreeItemModel,
-		TreeRootType extends UmbTreeRootModel,
-		ManifestType extends ManifestTreeItem = ManifestTreeItem,
-	>
+	TreeItemType extends UmbTreeItemModel,
+	TreeRootType extends UmbTreeRootModel,
+	ManifestType extends ManifestTreeItem = ManifestTreeItem,
+>
 	extends UmbTreeItemApiBase<TreeItemType, ManifestType>
 	implements UmbTreeItemContext<TreeItemType>
 {
