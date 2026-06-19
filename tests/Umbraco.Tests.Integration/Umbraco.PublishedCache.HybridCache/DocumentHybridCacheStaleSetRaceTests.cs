@@ -1,17 +1,15 @@
-﻿using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Infrastructure.HybridCache;
 using Umbraco.Cms.Infrastructure.HybridCache.Factories;
 using Umbraco.Cms.Infrastructure.HybridCache.Persistence;
-using Umbraco.Cms.Infrastructure.HybridCache.SeedKeyProviders.Document;
 using Umbraco.Cms.Infrastructure.HybridCache.Services;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
@@ -162,6 +160,11 @@ internal sealed class DocumentHybridCacheStaleSetRaceTests : UmbracoIntegrationT
             $"{Textpage.Key}",
             _ => new ValueTask<ContentCacheNode?>((ContentCacheNode?)null));
 
-        Assert.AreEqual(newNode, cachedNode);
+        Assert.IsNotNull(cachedNode);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(newNode.Key, cachedNode!.Key, "Cached node should be the refreshed node.");
+            Assert.AreEqual(NewName, cachedNode!.Data?.Name, "Cached node should hold the refreshed name.");
+        });
     }
 }
