@@ -498,9 +498,7 @@ export class UmbPropertyEditorUIBlockListElement
 	static override readonly styles = [
 		css`
 			:host {
-				display: flex;
-				flex-direction: column;
-				gap: var(--uui-size-1);
+				display: block;
 			}
 
 			uui-button-group {
