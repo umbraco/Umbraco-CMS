@@ -103,6 +103,9 @@ public partial class UmbracoPlan : MigrationPlan
         To<V_18_0_0.AddElementContainerPermissions>("{D00BB11A-DDF8-47C4-B58E-150C123BB3BB}");
         To<V_18_0_0.MigrateSingleBlockList>("{74332C49-B279-4945-8943-F8F00B1F5949}");
         To<V_18_0_0.AddElementSectionForAdmins>("{6FE4656E-8B8D-452F-AE2A-438A615B61BC}");
+
+        // To 19.0.0
+        To<V_19_0_0.AddExternalBlockElementRelationType>("{2D8F1B6E-4C3A-4E7D-9A1B-5F0C7E2D8A93}");
     }
 
     /// <summary>
