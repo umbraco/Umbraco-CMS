@@ -83,25 +83,6 @@ describe('UmbDocumentWorkspaceContext (save & publish data state)', () => {
 		).to.be.false;
 	});
 
-	it('transferPublishedVariantsToCurrent restores the dirty variant that reload() clobbers', async () => {
-		await context.setPropertyValue('variantText', 'Edited English', EN_US);
-		await context.setPropertyValue('variantText', 'Redigeret dansk', DA);
-
-		const dirtyData = context.getData();
-		const saveData = await context.constructSaveData([EN_US]);
-		await publishingDataSource.updateAndPublish(saveData, [EN_US]);
-		await context.reload();
-
-		// After reload, current state is the full server document, so the unsaved Danish edit is gone.
-		expect(context.getPropertyValue('variantText', DA), 'reload clobbers the Danish edit').to.equal(DA_ORIGINAL);
-
-		// The transfer step is what restores it (this is the fix).
-		await context.transferPublishedVariantsToCurrent(dirtyData, [EN_US]);
-		expect(context.getPropertyValue('variantText', DA), 'transfer restores the Danish edit').to.equal(
-			'Redigeret dansk',
-		);
-	});
-
 	it('persists only the published variant on the server', async () => {
 		await context.setPropertyValue('variantText', 'Edited English', EN_US);
 		await context.setPropertyValue('variantText', 'Redigeret dansk', DA);

@@ -390,50 +390,6 @@ export class UmbDocumentWorkspaceContext
 		}
 	}
 
-	/**
-	 * Sets the current data state to the given data, with the published variants (and the invariant
-	 * culture) replaced by their values from the persisted data state. Unpublished variants keep their
-	 * values from the given data and thereby remain dirty.
-	 * @param {UmbDocumentDetailModel | undefined} currentData - The data to set as current
-	 * @param {Array<UmbVariantId>} variantIds - The variants that were published
-	 * @returns {Promise<void>}
-	 * @memberof UmbDocumentWorkspaceContext
-	 */
-	public async transferPublishedVariantsToCurrent(
-		currentData: UmbDocumentDetailModel | undefined,
-		variantIds: Array<UmbVariantId>,
-	): Promise<void> {
-		const serverData = this._data.getPersisted();
-		if (!serverData || !currentData) return;
-
-		const invariantVariantId = UmbVariantId.CreateInvariant();
-		let selectedVariants = [...variantIds];
-		let variantsToStore = [...variantIds, invariantVariantId];
-
-		// When varying by segment we need to transfer all segments of the published cultures (and the
-		// invariant culture), mirroring how the save data is constructed.
-		if (this.getVariesBySegment()) {
-			const segments = [...new Set(serverData.values.map((x) => x.segment).filter((x) => x))] as Array<string>;
-			variantsToStore = [
-				...variantsToStore,
-				...segments.flatMap((segment) => variantsToStore.map((variant) => variant.toSegment(segment))),
-			];
-			selectedVariants = [
-				...selectedVariants,
-				...segments.flatMap((segment) => selectedVariants.map((variant) => variant.toSegment(segment))),
-			];
-		}
-
-		const merged = await new UmbMergeContentVariantDataController(this).process(
-			currentData,
-			serverData,
-			selectedVariants,
-			variantsToStore,
-		);
-
-		this._data.setCurrent(merged);
-	}
-
 	public createPropertyDatasetContext(
 		host: UmbControllerHost,
 		variantId: UmbVariantId,
