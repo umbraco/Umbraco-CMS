@@ -103,4 +103,32 @@ describe('UmbExtensionInitializerBase — loaded signal', () => {
 			'`loaded` resolved before the late, slow extension finished instantiating',
 		).to.be.true;
 	});
+
+	// Permission-timing guard (re: the #22522 "user permissions resolved too late" concern).
+	//
+	// The backoffice route is gated by `#loadedGuard`, which awaits `bundleInitializer.loaded`
+	// via `.asPromise()`; the private extensions and user-permission data that load behind that
+	// gate must not be raced. So the gate must NOT open until the extensions registered before it
+	// was awaited have actually finished instantiating. This guards against a naive "resolve
+	// unconditionally" that sets `loaded` before instantiation completes.
+	//
+	// Note: user-permission *condition* resolution itself lives in UmbBaseExtensionInitializer
+	// (see base-extension-initializer.race.test.ts) — a different class this change does not touch.
+	it('does not open the `loaded` gate until the initially-registered extensions have instantiated', async () => {
+		const extensionRegistry = new UmbExtensionRegistry<ManifestBase>();
+		extensionRegistry.register({
+			type: 'test',
+			name: 'slow-boot',
+			alias: 'Umb.Test.SlowBoot',
+			js: () => new Promise((r) => setTimeout(() => r({}), 100)),
+		} as never);
+
+		const {initializer, instantiated} = createTestInitializer(hostElement, extensionRegistry);
+
+		const instantiatedWhenGateOpened = await new UmbObserver(initializer.loaded)
+			.asPromise()
+			.then(() => instantiated.includes('Umb.Test.SlowBoot'));
+
+		expect(instantiatedWhenGateOpened, '`loaded` opened the gate before the extension instantiated').to.be.true;
+	});
 });
