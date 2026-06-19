@@ -1103,7 +1103,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 		// Set persisted AND current before flipping isNew: the flip triggers the new->edit redirect,
 		// whose navigation guard compares the two states with an order-sensitive comparison.
-		await this.#applyPersistedData(persisted, saveData, variantIds);
+		await this.#applyPersistedData(persisted, variantIds);
 		this.setIsNew(false);
 
 		await this.#dispatchActionEvents(
@@ -1121,7 +1121,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			? await overwriteUpdate(saveData, variantIds)
 			: await this.#defaultUpdatePersistence(saveData);
 
-		await this.#applyPersistedData(persisted, saveData, variantIds);
+		await this.#applyPersistedData(persisted, variantIds);
 
 		const unique = this.getUnique();
 		if (!unique) {
@@ -1151,18 +1151,11 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	/**
 	 * Partial update the current data with the persisted data, only for the variants that were saved.
 	 * @param {DetailModelType | undefined} persisted - The saved document, or undefined if not returned
-	 * @param {DetailModelType} saveData - The data that was sent to the server
 	 * @param {Array<UmbVariantId>} variantIds - The variants that were saved
 	 */
-	async #applyPersistedData(
-		persisted: DetailModelType | undefined,
-		saveData: DetailModelType,
-		variantIds: Array<UmbVariantId>,
-	) {
+	async #applyPersistedData(persisted: DetailModelType | undefined, variantIds: Array<UmbVariantId>) {
 		if (!persisted) {
-			this._data.setPersisted(saveData);
-			this._data.setCurrent(saveData);
-			return;
+			throw new Error('Persisted data is missing, persistence methods should return latest draft from the server.');
 		}
 
 		const variantIdsIncludingInvariant = [...variantIds, UmbVariantId.CreateInvariant()];
