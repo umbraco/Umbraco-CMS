@@ -1,4 +1,5 @@
 using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Umbraco.Cms.Persistence.EFCore.Sqlite;
@@ -52,6 +53,45 @@ public class SqliteRetryingExecutionStrategy : ExecutionStrategy
         TimeSpan maxRetryDelay)
         : base(dependencies, maxRetryCount, maxRetryDelay)
     {
+    }
+
+    /// <inheritdoc />
+    /// <remarks>
+    /// When an explicit transaction is already open (Umbraco's <c>EFCoreScope</c> opens one for
+    /// every unit of work) the operation is executed directly without retries. A retrying strategy
+    /// cannot retry an operation that participates in a caller-managed transaction, and EF Core
+    /// throws rather than allow it. Consumers without an ambient transaction — notably OpenIddict's
+    /// token store — still get the retry behaviour from <see cref="ExecutionStrategy"/>.
+    /// </remarks>
+    public override TResult Execute<TState, TResult>(
+        TState state,
+        Func<DbContext, TState, TResult> operation,
+        Func<DbContext, TState, ExecutionResult<TResult>>? verifySucceeded)
+    {
+        if (Dependencies.CurrentContext.Context.Database.CurrentTransaction is not null)
+        {
+            return operation(Dependencies.CurrentContext.Context, state);
+        }
+
+        return base.Execute(state, operation, verifySucceeded);
+    }
+
+    /// <inheritdoc />
+    /// <remarks>
+    /// See <see cref="Execute{TState,TResult}"/> for why an open transaction bypasses the retry.
+    /// </remarks>
+    public override Task<TResult> ExecuteAsync<TState, TResult>(
+        TState state,
+        Func<DbContext, TState, CancellationToken, Task<TResult>> operation,
+        Func<DbContext, TState, CancellationToken, Task<ExecutionResult<TResult>>>? verifySucceeded,
+        CancellationToken cancellationToken = default)
+    {
+        if (Dependencies.CurrentContext.Context.Database.CurrentTransaction is not null)
+        {
+            return operation(Dependencies.CurrentContext.Context, state, cancellationToken);
+        }
+
+        return base.ExecuteAsync(state, operation, verifySucceeded, cancellationToken);
     }
 
     /// <inheritdoc />
