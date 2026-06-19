@@ -83,7 +83,10 @@ export interface UmbContentDetailWorkspaceContextArgs<
 	saveModalToken?: UmbModalToken<UmbContentVariantPickerData<VariantOptionModelType>, UmbContentVariantPickerValue>;
 }
 
-interface UmbContentPersistMethods<DetailModelType extends UmbContentDetailModel> {
+/**
+ * Interface for the third argument of performCreateOrUpdate, relevant if the persistence method should be different from default.
+ */
+export interface UmbContentWorkspaceCreateOrUpdatePersistMethods<DetailModelType extends UmbContentDetailModel> {
 	create?: (
 		saveData: DetailModelType,
 		variantIds: Array<UmbVariantId>,
@@ -1071,13 +1074,13 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	 * Perform the create or update of the content
 	 * @param {Array<UmbVariantId>} variantIds - The variant ids to save
 	 * @param {DetailModelType} saveData - The data to save
-	 * @param {UmbContentPersistMethods<DetailModelType>} [persistenceMethod] - Optional custom persistence logic.
+	 * @param {UmbContentWorkspaceCreateOrUpdatePersistMethods<DetailModelType>} [persistenceMethod] - Optional custom persistence logic.
 	 * @memberof UmbContentDetailWorkspaceContextBase
 	 */
 	public async performCreateOrUpdate(
 		variantIds: Array<UmbVariantId>,
 		saveData: DetailModelType,
-		persistenceMethod?: UmbContentPersistMethods<DetailModelType>,
+		persistenceMethod?: UmbContentWorkspaceCreateOrUpdatePersistMethods<DetailModelType>,
 	) {
 		if (this.getIsNew()) {
 			await this.#create(variantIds, saveData, persistenceMethod?.create);
@@ -1089,7 +1092,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	async #create(
 		variantIds: Array<UmbVariantId>,
 		saveData: DetailModelType,
-		overwriteCreate?: UmbContentPersistMethods<DetailModelType>['create'],
+		overwriteCreate?: UmbContentWorkspaceCreateOrUpdatePersistMethods<DetailModelType>['create'],
 	) {
 		const parent = this._internal_getCreateUnderParent();
 		if (!parent) throw new Error('Parent is not set');
@@ -1112,7 +1115,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	async #update(
 		variantIds: Array<UmbVariantId>,
 		saveData: DetailModelType,
-		overwriteUpdate?: UmbContentPersistMethods<DetailModelType>['update'],
+		overwriteUpdate?: UmbContentWorkspaceCreateOrUpdatePersistMethods<DetailModelType>['update'],
 	) {
 		const persisted = overwriteUpdate
 			? await overwriteUpdate(saveData, variantIds)
