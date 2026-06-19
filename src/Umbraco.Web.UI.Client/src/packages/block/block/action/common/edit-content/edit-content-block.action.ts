@@ -8,7 +8,6 @@ import { UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 
 /** Block action that navigates to the block's content editor workspace. */
 export class UmbEditContentBlockAction extends UmbBlockActionBase<MetaBlockActionDefaultKind> {
-	#context?: typeof UMB_BLOCK_ENTRY_CONTEXT.TYPE;
 	#contextReady: Promise<void>;
 	#resolveContext!: () => void;
 
@@ -26,23 +25,16 @@ export class UmbEditContentBlockAction extends UmbBlockActionBase<MetaBlockActio
 		});
 
 		this.consumeContext(UMB_BLOCK_ENTRY_CONTEXT, (context) => {
-			this.#context = context;
 			if (!context) return;
 			this.#resolveContext();
 
-			this.observe(
-				context.workspaceEditContentPath,
-				(path) => this.#href.setValue(path || undefined),
-				'observeHref',
-			);
+			this.observe(context.workspaceEditContentPath, (path) => this.#href.setValue(path || undefined), 'observeHref');
 
 			this.observe(
 				context.contentKey,
 				(contentKey) => {
 					this.#validationDataPath.setValue(
-						contentKey
-							? `$.contentData[${UmbDataPathBlockElementDataQuery({ key: contentKey })}]`
-							: undefined,
+						contentKey ? `$.contentData[${UmbDataPathBlockElementDataQuery({ key: contentKey })}]` : undefined,
 					);
 				},
 				'observeValidationDataPath',
@@ -52,7 +44,7 @@ export class UmbEditContentBlockAction extends UmbBlockActionBase<MetaBlockActio
 
 	override async getHref() {
 		await this.#contextReady;
-		return await this.observe(this.href)?.asPromise() || undefined;
+		return (await this.observe(this.href)?.asPromise()) || undefined;
 	}
 
 	override async getValidationDataPath() {

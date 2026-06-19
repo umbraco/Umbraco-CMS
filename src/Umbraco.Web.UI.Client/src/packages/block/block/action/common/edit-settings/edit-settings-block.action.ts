@@ -8,7 +8,6 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /** Block action that navigates to the block's settings editor workspace. */
 export class UmbEditSettingsBlockAction extends UmbBlockActionBase<MetaBlockActionDefaultKind> {
-	#context?: typeof UMB_BLOCK_ENTRY_CONTEXT.TYPE;
 	#contextReady: Promise<void>;
 	#resolveContext!: () => void;
 
@@ -26,7 +25,6 @@ export class UmbEditSettingsBlockAction extends UmbBlockActionBase<MetaBlockActi
 		});
 
 		this.consumeContext(UMB_BLOCK_ENTRY_CONTEXT, (context) => {
-			this.#context = context;
 			if (!context) return;
 			this.#resolveContext();
 
@@ -46,7 +44,7 @@ export class UmbEditSettingsBlockAction extends UmbBlockActionBase<MetaBlockActi
 
 	override async getHref() {
 		await this.#contextReady;
-		return await this.observe(this.href)?.asPromise() || undefined;
+		return (await this.observe(this.href)?.asPromise()) || undefined;
 	}
 
 	override async getValidationDataPath() {
