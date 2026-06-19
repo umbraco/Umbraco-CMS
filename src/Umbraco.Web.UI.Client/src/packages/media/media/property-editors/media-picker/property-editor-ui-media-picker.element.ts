@@ -6,6 +6,7 @@ import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPropertyEditorUiInteractionMemoryManager } from '@umbraco-cms/backoffice/property-editor';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
+import { UMB_VARIANT_CONTEXT } from '@umbraco-cms/backoffice/variant';
 import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
 import type {
@@ -33,6 +34,9 @@ export class UmbPropertyEditorUIMediaPickerElement
 		this._focalPointEnabled = Boolean(config.getValueByAlias('enableLocalFocalPoint'));
 		this._multiple = Boolean(config.getValueByAlias('multiple'));
 		this._preselectedCrops = config?.getValueByAlias<Array<UmbCropModel>>('crops') ?? [];
+		this._altTextMode = config.getValueByAlias<'off' | 'altText' | 'decorative'>('altTextMode') ?? 'off';
+		this._hideZoomCrop = Boolean(config.getValueByAlias('hideZoomCrop'));
+		this._enableAltTextPerCrop = Boolean(config.getValueByAlias('enableAltTextPerCrop'));
 
 		const startNodeId = config.getValueByAlias<string>('startNodeId') ?? '';
 		this._startNode = startNodeId ? { unique: startNodeId, entityType: UMB_MEDIA_ENTITY_TYPE } : undefined;
@@ -83,10 +87,22 @@ export class UmbPropertyEditorUIMediaPickerElement
 	private _max: number = Infinity;
 
 	@state()
+	private _altTextMode: 'off' | 'altText' | 'decorative' = 'off';
+
+	@state()
+	private _hideZoomCrop: boolean = false;
+
+	@state()
+	private _enableAltTextPerCrop: boolean = false;
+
+	@state()
 	private _alias?: string;
 
 	@state()
 	private _variantId?: string;
+
+	@state()
+	private _activeWorkspaceCulture?: string;
 
 	@state()
 	private _interactionMemories: Array<UmbInteractionMemoryModel> = [];
@@ -101,6 +117,15 @@ export class UmbPropertyEditorUIMediaPickerElement
 		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
 			this.observe(context?.alias, (alias) => (this._alias = alias));
 			this.observe(context?.variantId, (variantId) => (this._variantId = variantId?.toString() || 'invariant'));
+		});
+
+		this.consumeContext(UMB_VARIANT_CONTEXT, (context) => {
+			if (!context) return;
+			this.observe(
+				context.variantId,
+				(variantId) => (this._activeWorkspaceCulture = variantId?.culture ?? undefined),
+				'_observeWorkspaceCulture',
+			);
 		});
 
 		this.observe(this.#interactionMemoryManager.memoriesForPropertyEditor, (interactionMemories) => {
@@ -150,8 +175,12 @@ export class UmbPropertyEditorUIMediaPickerElement
 				?multiple=${this._multiple}
 				@change=${this.#onChange}
 				?readonly=${this.readonly}
+				.activeCulture=${this.readonly ? this._activeWorkspaceCulture : undefined}
 				.interactionMemories=${this._interactionMemories}
-				@interaction-memories-change=${this.#onInputInteractionMemoriesChange}>
+				@interaction-memories-change=${this.#onInputInteractionMemoriesChange}
+				.altTextMode=${this._altTextMode}
+				?hideZoomCrop=${this._hideZoomCrop}
+				?enableAltTextPerCrop=${this._enableAltTextPerCrop}>
 			</umb-input-rich-media>
 		`;
 	}

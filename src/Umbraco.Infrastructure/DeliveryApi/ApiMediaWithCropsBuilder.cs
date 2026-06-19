@@ -20,6 +20,7 @@ internal sealed class ApiMediaWithCropsBuilder : ApiMediaWithCropsBuilderBase<IA
         IPublishedContent media,
         IApiMedia inner,
         ImageFocalPoint? focalPoint,
-        IEnumerable<ImageCrop>? crops)
-        => new ApiMediaWithCrops(inner, focalPoint, crops);
+        IEnumerable<ImageCrop>? crops,
+        string? altText)
+        => new ApiMediaWithCrops(inner, focalPoint, crops, altText);
 }

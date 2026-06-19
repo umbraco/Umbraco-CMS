@@ -61,6 +61,10 @@ export class UmbImageCropperFocusSetterElement extends UmbLitElement {
 
 	#DOT_RADIUS = 8 as const;
 
+	override focus(options?: FocusOptions) {
+		this.focalPointElement?.focus(options);
+	}
+
 	protected override update(changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 		super.update(changedProperties);
 
@@ -250,16 +254,27 @@ export class UmbImageCropperFocusSetterElement extends UmbLitElement {
 					id="focal-point"
 					class=${classMap({ 'focal-point--dragging': this._isDraggingGridHandle, hidden: this.hideFocalPoint })}
 					tabindex=${ifDefined(this.disabled ? undefined : '0')}
+					role="application"
 					aria-label=${this.localize.term('general_focalPoint')}
+					aria-describedby="focal-point-hint"
 					@keydown=${this.#handleGridKeyDown}>
 				</span>
 			</div>
+			${this.hideFocalPoint || this.disabled
+				? nothing
+				: html`<p id="focal-point-hint">
+						<umb-localize key="imagecropper_focalPointHint"
+							>Click or drag to set the focal point. Use arrow keys to move with keyboard (hold Shift for finer
+							control).</umb-localize
+						>
+					</p>`}
 		`;
 	}
 
 	static override styles = css`
 		:host {
 			display: flex;
+			flex-direction: column;
 			width: 100%;
 			height: 100%;
 			position: relative;
@@ -271,6 +286,8 @@ export class UmbImageCropperFocusSetterElement extends UmbLitElement {
 		#wrapper {
 			position: relative;
 			display: flex;
+			flex: 1;
+			min-height: 0;
 			margin: auto;
 			max-width: 100%;
 			max-height: 100%;
@@ -306,8 +323,19 @@ export class UmbImageCropperFocusSetterElement extends UmbLitElement {
 			cursor: none;
 			transform: scale(1.5);
 		}
+		#focal-point:focus-visible {
+			outline: 3px solid var(--uui-color-focus);
+			outline-offset: 2px;
+		}
+
 		#focal-point.hidden {
 			display: none;
+		}
+		#focal-point-hint {
+			margin: var(--uui-size-space-2) 0 0;
+			font-size: var(--uui-type-small-size);
+			color: var(--uui-color-text-alt);
+			text-align: center;
 		}
 	`;
 }

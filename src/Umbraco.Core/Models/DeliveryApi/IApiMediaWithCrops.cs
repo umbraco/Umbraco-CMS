@@ -14,4 +14,10 @@ public interface IApiMediaWithCrops : IApiMedia
     ///     Gets the defined image crops.
     /// </summary>
     public IEnumerable<ImageCrop>? Crops { get; }
+
+    /// <summary>
+    ///     Gets the alternative text for this media item.
+    /// </summary>
+    // TODO (V20): Remove the default implementation once all external implementations have been updated.
+    public string? AltText => null;
 }

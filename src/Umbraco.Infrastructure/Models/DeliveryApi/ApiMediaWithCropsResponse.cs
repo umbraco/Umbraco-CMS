@@ -11,14 +11,16 @@ internal sealed class ApiMediaWithCropsResponse : ApiMediaWithCrops, IApiMediaWi
     /// <param name="path">The URL or path to the media item.</param>
     /// <param name="createDate">The date and time when the media item was created.</param>
     /// <param name="updateDate">The date and time when the media item was last updated.</param>
+    /// <param name="altText">The alternative text for the media item, or <c>null</c> if not specified.</param>
     public ApiMediaWithCropsResponse(
         IApiMedia inner,
         ImageFocalPoint? focalPoint,
         IEnumerable<ImageCrop>? crops,
         string path,
         DateTime createDate,
-        DateTime updateDate)
-        : base(inner, focalPoint, crops)
+        DateTime updateDate,
+        string? altText = null)
+        : base(inner, focalPoint, crops, altText)
     {
         Path = path;
         CreateDate = createDate;

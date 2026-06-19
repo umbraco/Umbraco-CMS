@@ -24,7 +24,8 @@ internal abstract class ApiMediaWithCropsBuilderBase<T>
         IPublishedContent media,
         IApiMedia inner,
         ImageFocalPoint? focalPoint,
-        IEnumerable<ImageCrop>? crops);
+        IEnumerable<ImageCrop>? crops,
+        string? altText);
 
     /// <summary>
     /// Builds an instance of <typeparamref name="T" /> from the specified <see cref="MediaWithCrops" />.
@@ -44,7 +45,7 @@ internal abstract class ApiMediaWithCropsBuilderBase<T>
             localCrops = localCrops.Merge(mediaCrops);
         }
 
-        return Create(media.Content, inner, localCrops.GetImageFocalPoint(), localCrops.GetImageCrops());
+        return Create(media.Content, inner, localCrops.GetImageFocalPoint(), localCrops.GetImageCrops(), localCrops.AltText);
     }
 
     /// <summary>

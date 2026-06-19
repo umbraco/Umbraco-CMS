@@ -33,10 +33,11 @@ internal sealed class ApiMediaWithCropsResponseBuilder : ApiMediaWithCropsBuilde
         IPublishedContent media,
         IApiMedia inner,
         ImageFocalPoint? focalPoint,
-        IEnumerable<ImageCrop>? crops)
+        IEnumerable<ImageCrop>? crops,
+        string? altText)
     {
         var path = $"/{string.Join("/", PathSegments(media).Reverse())}/";
-        return new ApiMediaWithCropsResponse(inner, focalPoint, crops, path, media.CreateDate, media.UpdateDate);
+        return new ApiMediaWithCropsResponse(inner, focalPoint, crops, path, media.CreateDate, media.UpdateDate, altText);
     }
 
     private IEnumerable<string> PathSegments(IPublishedContent media)

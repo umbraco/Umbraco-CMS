@@ -15,6 +15,7 @@ import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
 import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbRepositoryItemsManager } from '@umbraco-cms/backoffice/repository';
 import { UMB_MEDIA_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/media-type';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 import '@umbraco-cms/backoffice/imaging';
 import {
@@ -136,6 +137,29 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 	}
 	#focalPointEnabled: boolean = false;
 
+	@property({ type: String, attribute: 'alt-text-mode', reflect: true })
+	public altTextMode: 'off' | 'altText' | 'decorative' = 'off';
+
+	@property({ type: String })
+	public variantId: string = 'invariant';
+
+	/** The active workspace culture tab, provided by the property editor when the property is readonly (shared across cultures). */
+	@property({ type: String })
+	public activeCulture?: string;
+
+	get #activeCulture(): string | null {
+		// Only write per-culture alt text when readonly — shared property on a non-default culture tab.
+		// For variant properties (readonly=false, each culture owns its full value), altText is the per-culture value.
+		if (!this.readonly) return null;
+		return this.activeCulture ?? null;
+	}
+
+	@property({ type: Boolean })
+	public hideZoomCrop: boolean = false;
+
+	@property({ type: Boolean })
+	public enableAltTextPerCrop: boolean = false;
+
 	/**
 	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
 	 * @type {boolean}
@@ -172,6 +196,9 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 	private _cards: Array<UmbRichMediaCardModel> = [];
 
 	@state()
+	private _announcement = '';
+
+	@state()
 	private _routeBuilder?: UmbModalRouteBuilder;
 
 	readonly #itemManager = new UmbRepositoryItemsManager<UmbMediaItemModel>(this, UMB_MEDIA_ITEM_REPOSITORY_ALIAS);
@@ -194,26 +221,64 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 				const item = this.value?.find((item) => item.key === key);
 				if (!item) return false;
 
+				const culture = this.#activeCulture;
+				const resolvedAltText = (culture && item.altTextByCulture?.[culture]) ?? item.altText ?? '';
+
+				// When editing a specific culture, resolve each crop's alt text from altTextByCulture[culture]
+				// so the editor sees the culture-specific value rather than the default.
+				const crops = culture
+					? (item.crops ?? []).map((crop) => ({
+							...crop,
+							altText: crop.altTextByCulture?.[culture] ?? crop.altText ?? '',
+						}))
+					: (item.crops ?? []);
+
 				return {
 					data: {
 						cropOptions: this.preselectedCrops,
 						hideFocalPoint: !this.focalPointEnabled,
+						hideZoomCrop: this.hideZoomCrop,
+						enableAltTextPerCrop: this.enableAltTextPerCrop,
+						altTextMode: this.altTextMode,
 						key,
 						unique: item.mediaKey,
 						pickableFilter: this.#pickableFilter,
+						culture: culture ?? undefined,
+						readonlyMedia: this.readonly,
 					},
 					value: {
-						crops: item.crops ?? [],
+						crops,
 						focalPoint: item.focalPoint ?? null,
 						src: '',
 						key,
 						unique: item.mediaKey,
+						altText: resolvedAltText,
 					},
 				};
 			})
 			.onSubmit((value) => {
 				this.value = this.value?.map((item) => {
 					if (item.key !== value.key) return item;
+
+					const culture = this.#activeCulture;
+
+					if (culture) {
+						const altTextByCulture = { ...(item.altTextByCulture ?? {}), [culture]: value.altText ?? '' };
+
+						// Write each crop's submitted altText into altTextByCulture[culture] on the stored crop,
+						// preserving the invariant altText and all other cultures' entries.
+						const crops = (item.crops ?? []).map((storedCrop) => {
+							const submittedCrop = value.crops?.find((c) => c.alias === storedCrop.alias);
+							if (!submittedCrop) return storedCrop;
+							const cropAltByCulture = {
+								...(storedCrop.altTextByCulture ?? {}),
+								[culture]: submittedCrop.altText ?? '',
+							};
+							return { ...storedCrop, altTextByCulture: cropAltByCulture };
+						});
+
+						return { ...item, crops, altTextByCulture };
+					}
 
 					const focalPoint = this.focalPointEnabled ? value.focalPoint : null;
 					const crops = value.crops;
@@ -222,7 +287,7 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 					// Note: If the mediaKey changes we will change the key which causes cards to update
 					const key = mediaKey === item.mediaKey ? item.key : UmbId.new();
 
-					return { ...item, crops, mediaKey, focalPoint, key };
+					return { ...item, crops, mediaKey, focalPoint, key, altText: value.altText };
 				});
 
 				this.dispatchEvent(new UmbChangeEvent());
@@ -310,6 +375,8 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 
 		if (!uniques.length) return;
 
+		const wasEmpty = !this.value?.length;
+
 		const additions: Array<UmbMediaPickerPropertyValueEntry> = uniques.map((unique) => ({
 			key: UmbId.new(),
 			mediaKey: unique,
@@ -320,6 +387,17 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 
 		this.value = [...(this.value ?? []), ...additions];
 		this.dispatchEvent(new UmbChangeEvent());
+
+		if (wasEmpty && uniques.length === 1 && (this.altTextMode === 'altText' || this.enableAltTextPerCrop)) {
+			this.#autoOpenCropEditor(additions[0].key);
+		}
+	}
+
+	async #autoOpenCropEditor(key: string) {
+		await this.updateComplete;
+		const href = this._routeBuilder?.({ key });
+		if (!href) return;
+		window.history.pushState({}, '', href);
 	}
 
 	#openPicker() {
@@ -344,6 +422,7 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 			await this.#pickerInputContext.requestRemoveItem(item.media);
 			this.value = this.value?.filter((x) => x.key !== item.unique);
 			this.dispatchEvent(new UmbChangeEvent());
+			this._announcement = this.localize.term('mediaPicker_itemRemoved', [item.name]);
 		} catch {
 			// User cancelled the action
 		}
@@ -361,6 +440,7 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 
 	override render() {
 		return html`
+			<div class="sr-only" role="status" aria-live="polite" aria-atomic="true">${this._announcement}</div>
 			${this.#renderDropzone()}
 			<div class="container">${this.#renderItems()} ${this.#renderAddButton()}</div>
 		`;
@@ -409,30 +489,80 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 
 	#renderItem(item: UmbRichMediaCardModel) {
 		if (!item.unique) return nothing;
-		const href = this.readonly ? undefined : this._routeBuilder?.({ key: item.unique });
+		const canOpenModal = !this.readonly || this.altTextMode !== 'off' || this.enableAltTextPerCrop;
+		const href = canOpenModal ? this._routeBuilder?.({ key: item.unique }) : undefined;
+		const valueEntry = this.value?.find((v) => v.key === item.unique);
 
 		return html`
-			<uui-card-media id=${item.unique} title=${item.name} name=${item.name} .href=${href} ?readonly=${this.readonly}>
-				<umb-imaging-thumbnail
-					.unique=${item.media}
-					.alt=${item.name}
-					.icon=${item.icon ?? 'icon-picture'}
-					.externalLoading=${item.isLoading ?? false}></umb-imaging-thumbnail>
+			<div class="media-item-wrapper">
+				<uui-card-media id=${item.unique} title=${item.name} name=${item.name} .href=${href} ?readonly=${this.readonly}>
+					<umb-imaging-thumbnail
+						.unique=${item.media}
+						.alt=${item.name}
+						.icon=${item.icon ?? 'icon-picture'}
+						.externalLoading=${item.isLoading ?? false}></umb-imaging-thumbnail>
 
-				${this.#renderIsTrashed(item)} ${this.#renderActions(item)}
-			</uui-card-media>
+					${this.#renderIsTrashed(item)} ${this.#renderActions(item)}
+				</uui-card-media>
+				${this.altTextMode === 'decorative' ? this.#renderDecorativeMessage() : nothing}
+			</div>
+		`;
+	}
+
+	#renderDecorativeMessage() {
+		return html`
+			<p class="decorative-message">
+				<umb-localize key="mediaPicker_decorativeImageMessage">This image is decorative.</umb-localize>
+			</p>
 		`;
 	}
 
 	#renderActions(item: UmbRichMediaCardModel) {
 		if (this.readonly) return nothing;
+		const index = this._cards.findIndex((c) => c.unique === item.unique);
+		const isFirst = index === 0;
+		const isLast = index === this._cards.length - 1;
+		const showMoveButtons = this._cards.length > 1;
 		return html`
 			<uui-action-bar slot="actions">
+				${showMoveButtons
+					? html`
+							<uui-button
+								label=${this.localize.term('general_reorderMoveUp')}
+								look="secondary"
+								?disabled=${isFirst}
+								@click=${() => this.#moveItem(index, -1)}>
+								<uui-icon name="icon-arrow-up"></uui-icon>
+							</uui-button>
+							<uui-button
+								label=${this.localize.term('general_reorderMoveDown')}
+								look="secondary"
+								?disabled=${isLast}
+								@click=${() => this.#moveItem(index, 1)}>
+								<uui-icon name="icon-arrow-down"></uui-icon>
+							</uui-button>
+						`
+					: nothing}
 				<uui-button label=${this.localize.term('general_remove')} look="secondary" @click=${() => this.#onRemove(item)}>
 					<uui-icon name="icon-trash"></uui-icon>
 				</uui-button>
 			</uui-action-bar>
 		`;
+	}
+
+	#moveItem(fromIndex: number, direction: -1 | 1) {
+		if (!this.value) return;
+		const toIndex = fromIndex + direction;
+		if (toIndex < 0 || toIndex >= this.value.length) return;
+		const updated = [...this.value];
+		[updated[fromIndex], updated[toIndex]] = [updated[toIndex], updated[fromIndex]];
+		this.value = updated;
+		this.#sorter.setModel(updated);
+		this.dispatchEvent(new UmbChangeEvent());
+		this._announcement = this.localize.term(
+			direction === -1 ? 'mediaPicker_movedUp' : 'mediaPicker_movedDown',
+			[this._cards[fromIndex].name],
+		);
 	}
 
 	#renderIsTrashed(item: UmbRichMediaCardModel) {
@@ -445,6 +575,7 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 	}
 
 	static override readonly styles = [
+		UmbTextStyles,
 		css`
 			:host {
 				position: relative;
@@ -457,6 +588,26 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 				gap: var(--uui-size-space-5);
 				grid-template-columns: repeat(auto-fill, minmax(var(--umb-card-medium-min-width), 1fr));
 				grid-auto-rows: var(--umb-card-medium-min-width);
+			}
+
+			:host([alt-text-mode='decorative']) .container {
+				grid-auto-rows: auto;
+			}
+
+			.media-item-wrapper {
+				display: flex;
+				flex-direction: column;
+				gap: var(--uui-size-space-3);
+			}
+
+			.media-item-wrapper uui-card-media {
+				min-height: var(--umb-card-medium-min-width);
+			}
+
+			.decorative-message {
+				font-size: var(--uui-type-small-size);
+				color: var(--uui-color-text-alt);
+				margin: 0;
 			}
 
 			#dropzone {

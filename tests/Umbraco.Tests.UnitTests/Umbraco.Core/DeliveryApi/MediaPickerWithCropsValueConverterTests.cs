@@ -8,13 +8,14 @@ using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Infrastructure.DeliveryApi;
 using Umbraco.Cms.Infrastructure.Serialization;
+using VariationContext = Umbraco.Cms.Core.Models.PublishedContent.VariationContext;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.DeliveryApi;
 
 [TestFixture]
 public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTests
 {
-    private MediaPickerWithCropsValueConverter MediaPickerWithCropsValueConverter()
+    private MediaPickerWithCropsValueConverter MediaPickerWithCropsValueConverter(string? culture = null)
     {
         var serializer = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
         var publishedValueFallback = Mock.Of<IPublishedValueFallback>();
@@ -26,12 +27,15 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
                 publishedValueFallback,
                 CreateOutputExpansionStrategyAccessor()),
             publishedValueFallback);
+        var variationContextAccessor = new Mock<IVariationContextAccessor>();
+        variationContextAccessor.SetupGet(a => a.VariationContext).Returns(new VariationContext(culture));
         return new MediaPickerWithCropsValueConverter(
             CacheManager.Media,
             PublishedUrlProvider,
             publishedValueFallback,
             serializer,
-            apiMediaWithCropsBuilder);
+            apiMediaWithCropsBuilder,
+            variationContextAccessor.Object);
     }
 
     [Test]
@@ -294,6 +298,213 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
         var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<IApiMediaWithCrops>;
         Assert.NotNull(result);
         Assert.IsEmpty(result);
+    }
+
+    [Test]
+    public void MediaPickerWithCropsValueConverter_AltText_IsPopulated_WhenDtoContainsAltText()
+    {
+        var publishedPropertyType = SetupMediaPropertyType(false);
+        var mediaKey = SetupMedia("Test media", ".jpg", 100, 200, "irrelevant", 500);
+
+        var serializer = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
+
+        var inter = serializer.Serialize(new[]
+        {
+            new MediaPicker3PropertyEditor.MediaPicker3PropertyValueEditor.MediaWithCropsDto
+            {
+                Key = Guid.NewGuid(),
+                MediaKey = mediaKey,
+                Crops = Array.Empty<ImageCropperValue.ImageCropperCrop>(),
+                AltText = "A descriptive alt text",
+            }
+        });
+
+        var result = MediaPickerWithCropsValueConverter()
+            .ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false, false)
+            as IEnumerable<IApiMediaWithCrops>;
+
+        Assert.NotNull(result);
+        var item = result.Single();
+        Assert.AreEqual("A descriptive alt text", item.AltText);
+    }
+
+    [Test]
+    public void MediaPickerWithCropsValueConverter_AltText_IsNull_WhenDtoHasNoAltText()
+    {
+        var publishedPropertyType = SetupMediaPropertyType(false);
+        var mediaKey = SetupMedia("Test media", ".jpg", 100, 200, "irrelevant", 500);
+
+        var serializer = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
+
+        var inter = serializer.Serialize(new[]
+        {
+            new MediaPicker3PropertyEditor.MediaPicker3PropertyValueEditor.MediaWithCropsDto
+            {
+                Key = Guid.NewGuid(),
+                MediaKey = mediaKey,
+                Crops = Array.Empty<ImageCropperValue.ImageCropperCrop>(),
+                // AltText intentionally omitted
+            }
+        });
+
+        var result = MediaPickerWithCropsValueConverter()
+            .ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false, false)
+            as IEnumerable<IApiMediaWithCrops>;
+
+        Assert.NotNull(result);
+        Assert.IsNull(result.Single().AltText);
+    }
+
+    [Test]
+    public void GetDeliveryApiPropertyCacheLevel_Returns_None()
+    {
+        var converter = MediaPickerWithCropsValueConverter();
+        var dataType = new PublishedDataType(1, Constants.PropertyEditors.Aliases.MediaPicker3, "test",
+            new Lazy<object?>(() => new MediaPicker3Configuration()));
+        var propertyType = Mock.Of<IPublishedPropertyType>(pt => pt.DataType == dataType);
+
+        Assert.AreEqual(PropertyCacheLevel.None, converter.GetDeliveryApiPropertyCacheLevel(propertyType));
+    }
+
+    [Test]
+    public void GetDeliveryApiPropertyCacheLevelForExpansion_Returns_None()
+    {
+        var converter = MediaPickerWithCropsValueConverter();
+        var dataType = new PublishedDataType(1, Constants.PropertyEditors.Aliases.MediaPicker3, "test",
+            new Lazy<object?>(() => new MediaPicker3Configuration()));
+        var propertyType = Mock.Of<IPublishedPropertyType>(pt => pt.DataType == dataType);
+
+        Assert.AreEqual(PropertyCacheLevel.None, converter.GetDeliveryApiPropertyCacheLevelForExpansion(propertyType));
+    }
+
+    [Test]
+    public void DeliveryApi_ReturnsCultureSpecificAltText_WhenCultureContextIsSet()
+    {
+        var publishedPropertyType = SetupMediaPropertyType(false);
+        var mediaKey = SetupMedia("Test media", ".jpg", 100, 200, "irrelevant", 500);
+
+        var serializer = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
+        var inter = serializer.Serialize(new[]
+        {
+            new MediaPicker3PropertyEditor.MediaPicker3PropertyValueEditor.MediaWithCropsDto
+            {
+                Key = Guid.NewGuid(),
+                MediaKey = mediaKey,
+                Crops = Array.Empty<ImageCropperValue.ImageCropperCrop>(),
+                AltText = "Default alt text",
+                AltTextByCulture = new Dictionary<string, string> { ["da-DK"] = "Dansk alt tekst" },
+            }
+        });
+
+        var result = MediaPickerWithCropsValueConverter(culture: "da-DK")
+            .ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false, false)
+            as IEnumerable<IApiMediaWithCrops>;
+
+        Assert.NotNull(result);
+        Assert.AreEqual("Dansk alt tekst", result.Single().AltText);
+    }
+
+    [Test]
+    public void DeliveryApi_FallsBackToInvariantAltText_WhenCultureNotInDict()
+    {
+        var publishedPropertyType = SetupMediaPropertyType(false);
+        var mediaKey = SetupMedia("Test media", ".jpg", 100, 200, "irrelevant", 500);
+
+        var serializer = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
+        var inter = serializer.Serialize(new[]
+        {
+            new MediaPicker3PropertyEditor.MediaPicker3PropertyValueEditor.MediaWithCropsDto
+            {
+                Key = Guid.NewGuid(),
+                MediaKey = mediaKey,
+                Crops = Array.Empty<ImageCropperValue.ImageCropperCrop>(),
+                AltText = "Default alt text",
+                AltTextByCulture = new Dictionary<string, string> { ["da-DK"] = "Dansk alt tekst" },
+            }
+        });
+
+        var result = MediaPickerWithCropsValueConverter(culture: "fr-FR")
+            .ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false, false)
+            as IEnumerable<IApiMediaWithCrops>;
+
+        Assert.NotNull(result);
+        Assert.AreEqual("Default alt text", result.Single().AltText);
+    }
+
+    [Test]
+    public void DeliveryApi_ReturnsCultureSpecificCropAltText_WhenCultureContextIsSet()
+    {
+        var publishedPropertyType = SetupMediaPropertyType(false);
+        var mediaKey = SetupMedia("Test media", ".jpg", 100, 200, "irrelevant", 500);
+
+        var serializer = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
+        var inter = serializer.Serialize(new[]
+        {
+            new MediaPicker3PropertyEditor.MediaPicker3PropertyValueEditor.MediaWithCropsDto
+            {
+                Key = Guid.NewGuid(),
+                MediaKey = mediaKey,
+                Crops =
+                [
+                    new ImageCropperValue.ImageCropperCrop
+                    {
+                        Alias = "one",
+                        Width = 200,
+                        Height = 100,
+                        Coordinates = new ImageCropperValue.ImageCropperCropCoordinates { X1 = 1m, X2 = 2m, Y1 = 10m, Y2 = 20m },
+                        AltText = "Default crop alt",
+                        AltTextByCulture = new Dictionary<string, string> { ["da-DK"] = "Dansk crop alt tekst" },
+                    }
+                ],
+            }
+        });
+
+        var result = MediaPickerWithCropsValueConverter(culture: "da-DK")
+            .ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false, false)
+            as IEnumerable<IApiMediaWithCrops>;
+
+        Assert.NotNull(result);
+        var crop = result.Single().Crops?.Single();
+        Assert.NotNull(crop);
+        Assert.AreEqual("Dansk crop alt tekst", crop!.AltText);
+    }
+
+    [Test]
+    public void DeliveryApi_FallsBackToInvariantCropAltText_WhenCultureNotInDict()
+    {
+        var publishedPropertyType = SetupMediaPropertyType(false);
+        var mediaKey = SetupMedia("Test media", ".jpg", 100, 200, "irrelevant", 500);
+
+        var serializer = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
+        var inter = serializer.Serialize(new[]
+        {
+            new MediaPicker3PropertyEditor.MediaPicker3PropertyValueEditor.MediaWithCropsDto
+            {
+                Key = Guid.NewGuid(),
+                MediaKey = mediaKey,
+                Crops =
+                [
+                    new ImageCropperValue.ImageCropperCrop
+                    {
+                        Alias = "one",
+                        Width = 200,
+                        Height = 100,
+                        Coordinates = new ImageCropperValue.ImageCropperCropCoordinates { X1 = 1m, X2 = 2m, Y1 = 10m, Y2 = 20m },
+                        AltText = "Default crop alt",
+                        AltTextByCulture = new Dictionary<string, string> { ["da-DK"] = "Dansk crop alt tekst" },
+                    }
+                ],
+            }
+        });
+
+        var result = MediaPickerWithCropsValueConverter(culture: "fr-FR")
+            .ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false, false)
+            as IEnumerable<IApiMediaWithCrops>;
+
+        Assert.NotNull(result);
+        var crop = result.Single().Crops?.Single();
+        Assert.NotNull(crop);
+        Assert.AreEqual("Default crop alt", crop!.AltText);
     }
 
     private IPublishedPropertyType SetupMediaPropertyType(bool multiSelect)

@@ -2,7 +2,7 @@ import type { UmbImageCropperCrop, UmbImageCropperFocalPoint } from './types.js'
 import { UmbImageCropChangeEvent } from './crop-change.event.js';
 import { calculateExtrapolatedValue, clamp, inverseLerp, lerp } from '@umbraco-cms/backoffice/utils';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
-import { customElement, property, query, css, html } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, nothing, property, query, css, html } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-image-cropper')
@@ -14,6 +14,9 @@ export class UmbImageCropperElement extends UmbLitElement {
 	@property({ type: Object, attribute: false }) value?: UmbImageCropperCrop;
 	@property({ type: String }) src: string = '';
 	@property({ attribute: false }) focalPoint: UmbImageCropperFocalPoint = null;
+	@property({ type: Boolean }) hideZoom = false;
+	/** When true, hides all editing controls and makes the viewport non-interactive — for display-only crop previews. */
+	@property({ type: Boolean, reflect: true, attribute: 'display-only' }) displayOnly = false;
 	@property({ type: Number })
 	get zoom() {
 		return this.#zoom;
@@ -51,15 +54,48 @@ export class UmbImageCropperElement extends UmbLitElement {
 		this.#removeEventListeners();
 	}
 
+	override focus(options?: FocusOptions) {
+		this.viewportElement?.focus(options);
+	}
+
 	async #addEventListeners() {
 		await this.updateComplete;
 		this.imageElement.addEventListener('mousedown', this.#onStartDrag);
-		this.addEventListener('wheel', this.#onWheel, { passive: false }); //
+		this.addEventListener('wheel', this.#onWheel, { passive: false });
+		this.viewportElement.addEventListener('keydown', this.#onViewportKeydown);
 	}
 
 	#removeEventListeners() {
 		this.imageElement.removeEventListener('mousedown', this.#onStartDrag);
 		this.removeEventListener('wheel', this.#onWheel);
+		this.viewportElement.removeEventListener('keydown', this.#onViewportKeydown);
+	}
+
+	#onViewportKeydown = (event: KeyboardEvent) => {
+		const step = event.shiftKey ? 20 : 5;
+		switch (event.key) {
+			case 'ArrowLeft':
+				this.#panImage(-step, 0);
+				break;
+			case 'ArrowRight':
+				this.#panImage(step, 0);
+				break;
+			case 'ArrowUp':
+				this.#panImage(0, -step);
+				break;
+			case 'ArrowDown':
+				this.#panImage(0, step);
+				break;
+			default:
+				return;
+		}
+		event.preventDefault();
+	};
+
+	#panImage(dx: number, dy: number) {
+		const currentLeft = parseFloat(this.imageElement.style.left) || 0;
+		const currentTop = parseFloat(this.imageElement.style.top) || 0;
+		this.#updateImagePosition(currentTop + dy, currentLeft + dx);
 	}
 
 	protected override updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
@@ -281,6 +317,7 @@ export class UmbImageCropperElement extends UmbLitElement {
 	}
 
 	#onStartDrag = (event: MouseEvent) => {
+		if (this.displayOnly) return;
 		event.preventDefault();
 
 		this.#isDragging = true;
@@ -310,28 +347,70 @@ export class UmbImageCropperElement extends UmbLitElement {
 	};
 
 	#onWheel = (event: WheelEvent) => {
+		if (this.hideZoom || this.displayOnly) return;
 		event.preventDefault();
 		this.#updateImageScale(event.deltaY * -this.#SCROLL_ZOOM_SPEED, event.clientX, event.clientY);
 	};
 
 	override render() {
 		return html`
-			<div id="viewport">
+			<div
+				id="viewport"
+				tabindex=${this.displayOnly ? '-1' : '0'}
+				role="application"
+				aria-label="${this.localize.term('imagecropper_viewportLabel')}"
+				aria-describedby="crop-viewport-hint">
 				<img id="image" src=${this.src} alt="" />
 				<div id="mask"></div>
+				<div id="pan-controls">
+					<button
+						class="pan-btn pan-up"
+						aria-label=${this.localize.term('imagecropper_panUp')}
+						@click=${() => this.#panImage(0, -20)}>
+						<uui-icon name="icon-arrow-up" aria-hidden="true"></uui-icon>
+					</button>
+					<button
+						class="pan-btn pan-left"
+						aria-label=${this.localize.term('imagecropper_panLeft')}
+						@click=${() => this.#panImage(-20, 0)}>
+						<uui-icon name="icon-arrow-left" aria-hidden="true"></uui-icon>
+					</button>
+					<button
+						class="pan-btn pan-right"
+						aria-label=${this.localize.term('imagecropper_panRight')}
+						@click=${() => this.#panImage(20, 0)}>
+						<uui-icon name="icon-arrow-right" aria-hidden="true"></uui-icon>
+					</button>
+					<button
+						class="pan-btn pan-down"
+						aria-label=${this.localize.term('imagecropper_panDown')}
+						@click=${() => this.#panImage(0, 20)}>
+						<uui-icon name="icon-arrow-down" aria-hidden="true"></uui-icon>
+					</button>
+				</div>
 			</div>
-			<uui-slider
-				@input=${this.#onSliderUpdate}
-				.value=${this.zoom.toString()}
-				hide-step-values
-				id="slider"
-				type="range"
-				min="0"
-				max="1"
-				value="0"
-				step="0.001">
-			</uui-slider>
+			<p id="crop-viewport-hint">
+				<umb-localize key="imagecropper_cropHint"
+					>Drag the image or use arrow keys to pan. Use the zoom slider or scroll to zoom. Hold Shift for larger
+					steps.</umb-localize
+				>
+			</p>
+			${this.hideZoom
+				? nothing
+				: html`<uui-slider
+						label="${this.localize.term('imagecropper_zoom')}"
+						@input=${this.#onSliderUpdate}
+						.value=${this.zoom.toString()}
+						hide-step-values
+						id="slider"
+						type="range"
+						min="0"
+						max="1"
+						value="0"
+						step="0.001">
+					</uui-slider>`}
 			<div id="actions">
+				<slot name="actions-prefix"></slot>
 				<uui-button @click=${this.#onReset} label="${this.localize.term('imagecropper_reset')}"></uui-button>
 				<uui-button
 					look="secondary"
@@ -349,7 +428,7 @@ export class UmbImageCropperElement extends UmbLitElement {
 	static override styles = css`
 		:host {
 			display: grid;
-			grid-template-rows: 1fr auto auto;
+			grid-template-rows: 1fr auto auto auto;
 			gap: var(--uui-size-space-3);
 			height: 100%;
 			width: 100%;
@@ -367,11 +446,62 @@ export class UmbImageCropperElement extends UmbLitElement {
 			outline: 1px solid var(--uui-color-border);
 			border-radius: var(--uui-border-radius);
 		}
+
+		#viewport:focus-visible {
+			outline: 3px solid var(--uui-color-focus);
+			outline-offset: 2px;
+		}
+
+		#pan-controls {
+			position: absolute;
+			bottom: var(--uui-size-space-3);
+			right: var(--uui-size-space-3);
+			display: grid;
+			grid-template-columns: repeat(3, 28px);
+			grid-template-rows: repeat(3, 28px);
+			gap: 2px;
+			pointer-events: none;
+		}
+
+		.pan-btn {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			width: 28px;
+			height: 28px;
+			padding: 0;
+			background: rgba(255, 255, 255, 0.85);
+			border: 1px solid rgba(0, 0, 0, 0.2);
+			border-radius: var(--uui-border-radius);
+			cursor: pointer;
+			pointer-events: all;
+			color: var(--uui-color-text);
+			font-size: 12px;
+		}
+
+		.pan-btn:hover {
+			background: rgba(255, 255, 255, 1);
+		}
+
+		.pan-btn:focus-visible {
+			outline: 2px solid var(--uui-color-focus);
+			outline-offset: 2px;
+		}
+
+		.pan-up    { grid-column: 2; grid-row: 1; }
+		.pan-left  { grid-column: 1; grid-row: 2; }
+		.pan-right { grid-column: 3; grid-row: 2; }
+		.pan-down  { grid-column: 2; grid-row: 3; }
 		#actions {
 			display: flex;
+			align-items: flex-end;
 			justify-content: flex-end;
-			gap: var(--uui-size-space-1);
-			margin-top: 0.5rem;
+			gap: var(--uui-size-space-2);
+		}
+
+		::slotted(*) {
+			flex: 1;
+			min-width: 0;
 		}
 
 		#mask {
@@ -395,6 +525,24 @@ export class UmbImageCropperElement extends UmbLitElement {
 			width: 100%;
 			height: 0px; /* TODO: FIX - This is needed to prevent the slider from taking up more space than needed */
 			min-height: 22px; /* TODO: FIX - This is needed to prevent the slider from taking up more space than needed */
+		}
+
+		#crop-viewport-hint {
+			margin: 0;
+			font-size: var(--uui-type-small-size);
+			color: var(--uui-color-text-alt);
+			text-align: center;
+		}
+
+		:host([display-only]) #pan-controls,
+		:host([display-only]) #actions,
+		:host([display-only]) #crop-viewport-hint {
+			display: none;
+		}
+
+		:host([display-only]) #viewport {
+			pointer-events: none;
+			cursor: default;
 		}
 	`;
 }

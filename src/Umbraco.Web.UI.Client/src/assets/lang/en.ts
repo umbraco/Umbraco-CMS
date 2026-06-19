@@ -980,6 +980,8 @@ export default {
 		reload: 'Reload',
 		remaining: 'Remaining',
 		remove: 'Remove',
+		reorderMoveUp: 'Move up',
+		reorderMoveDown: 'Move down',
 		rename: 'Rename',
 		renew: 'Renew',
 		required: 'Required',
@@ -1490,6 +1492,28 @@ export default {
 		tabClipboard: 'Clipboard',
 		notAllowed: 'Not allowed',
 		openMediaPicker: 'Open media picker',
+		altTextLabel: 'Alternative text',
+		altTextPlaceholder: 'Describe what this image communicates...',
+		altTextHelpLabel: 'How to write alt text',
+		altTextHelpContextual:
+			'Describe what the image communicates in context — its purpose or the information it conveys, not just its appearance. Avoid starting with "Image of" or "Photo of". If nearby text already says the same thing, keep it short or leave it empty.',
+		altTextHelpPerCropNote:
+			'Alternative text per crop is enabled. Each crop may represent a different visual context — write alt text appropriate to how that crop will be used on the page.',
+		decorativeImageMessage:
+			'This image is decorative. It will be hidden from screen readers and other assistive technology.',
+		itemRemoved: '%0% removed',
+		movedUp: '%0% moved up',
+		movedDown: '%0% moved down',
+		cropSaved: 'Crop saved',
+		cropSelected: '%0% crop selected',
+		focalPointViewSelected: 'Focal point view selected',
+		skipToAltText: 'Skip to alternative text',
+		editCropLabel: 'Edit %0% crop',
+		editFocalPointLabel: 'Edit focal point',
+		altTextCultureLabel: 'Alternative text (%0%)',
+		altTextDefaultLabel: 'Default alternative text',
+		sharedPropertyCultureNotice:
+			'Editing alternative text for the %0% language. Image selection and crop editing are only available on the default language tab.',
 	},
 	propertyEditorPicker: {
 		title: 'Select a property editor',
@@ -1520,6 +1544,15 @@ export default {
 		updateEditCrop: 'Done',
 		undoEditCrop: 'Undo edits',
 		customCrop: 'User defined',
+		zoom: 'Zoom level',
+		viewportLabel: 'Drag or use arrow keys to pan the image',
+		focalPointHint:
+			'Click or drag to set the focal point. Use arrow keys to move with keyboard (hold Shift for finer control).',
+		cropHint: 'Drag the image or use arrow keys to pan. Use the zoom slider or scroll to zoom. Hold Shift for larger steps.',
+		panUp: 'Pan image up',
+		panDown: 'Pan image down',
+		panLeft: 'Pan image left',
+		panRight: 'Pan image right',
 	},
 	rollback: {
 		changes: 'Changes',

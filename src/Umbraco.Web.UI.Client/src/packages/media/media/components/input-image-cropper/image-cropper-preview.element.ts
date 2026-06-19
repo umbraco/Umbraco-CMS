@@ -1,7 +1,8 @@
 import type { UmbImageCropperCrop, UmbImageCropperFocalPoint } from './index.js';
 import { calculateExtrapolatedValue, clamp } from '@umbraco-cms/backoffice/utils';
-import { css, html, nothing, customElement, property, query } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, nothing, customElement, property, query, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 @customElement('umb-image-cropper-preview')
 export class UmbImageCropperPreviewElement extends UmbLitElement {
@@ -17,6 +18,12 @@ export class UmbImageCropperPreviewElement extends UmbLitElement {
 	@property({ type: String })
 	label?: string;
 
+	@property({ type: String })
+	actionLabel?: string;
+
+	@property({ type: Boolean, reflect: true })
+	active = false;
+
 	@property({ attribute: false })
 	set focalPoint(value) {
 		this.#focalPoint = value;
@@ -27,6 +34,10 @@ export class UmbImageCropperPreviewElement extends UmbLitElement {
 	}
 
 	#focalPoint: UmbImageCropperFocalPoint = null;
+
+	override focus(options?: FocusOptions) {
+		this.shadowRoot?.querySelector<HTMLElement>('.inner')?.focus(options);
+	}
 
 	override connectedCallback() {
 		super.connectedCallback();
@@ -145,33 +156,64 @@ export class UmbImageCropperPreviewElement extends UmbLitElement {
 
 	override render() {
 		if (!this.crop) {
-			return html`<span id="label">${this.label}</span>`;
+			return html`
+				<button class="inner" type="button" aria-pressed=${this.active}>
+					${this.actionLabel ? html`<span class="sr-only">${this.actionLabel}: </span>` : nothing}
+					<span id="label">${this.label}</span>
+				</button>`;
 		}
 
 		return html`
-			<div id="container">
-				<img id="image" src=${this.src} alt="" />
-			</div>
-			<span id="alias">
-				${this.crop.label !== undefined ? this.localize.string(this.crop.label) : (this.label ?? this.crop.alias)}
-			</span>
-			<span id="dimensions">${this.crop.width} x ${this.crop.height}</span>
-			${this.crop.coordinates
-				? html`<span id="user-defined"><umb-localize key="imagecropper_customCrop">User defined</umb-localize></span>`
-				: nothing}
+			<button class="inner" type="button" aria-pressed=${this.active}>
+				${this.actionLabel ? html`<span class="sr-only">${this.actionLabel}: </span>` : nothing}
+				<div id="container">
+					<img id="image" src=${ifDefined(this.src || undefined)} alt="" />
+				</div>
+				<span id="alias">
+					${this.crop.label !== undefined ? this.localize.string(this.crop.label) : (this.label ?? this.crop.alias)}
+				</span>
+				<span id="dimensions">${this.crop.width} x ${this.crop.height}</span>
+				${this.crop.coordinates
+					? html`<span id="user-defined"><umb-localize key="imagecropper_customCrop">User defined</umb-localize></span>`
+					: nothing}
+			</button>
 		`;
 	}
-	static override styles = css`
+	static override styles = [
+		UmbTextStyles,
+		css`
 		:host {
 			display: flex;
 			flex-direction: column;
-			padding: var(--uui-size-space-4);
 			border-radius: var(--uui-border-radius);
 			background-color: var(--uui-color-surface);
 			cursor: pointer;
 		}
 		:host(:hover) {
 			background-color: var(--uui-color-surface-alt);
+		}
+		:host([active]) {
+			/* Left-border accent: non-colour indicator combined with the background change */
+			box-shadow: inset 3px 0 0 var(--uui-color-current);
+		}
+		.inner {
+			display: flex;
+			flex-direction: column;
+			width: 100%;
+			padding: var(--uui-size-space-4);
+			background: none;
+			border: none;
+			margin: 0;
+			cursor: inherit;
+			font: inherit;
+			color: inherit;
+			text-align: left;
+			border-radius: inherit;
+		}
+		.inner:focus-visible {
+			outline: 2px solid var(--uui-color-focus);
+			outline-offset: 1px;
+			border-radius: var(--uui-border-radius);
 		}
 		#container {
 			display: flex;
@@ -200,7 +242,8 @@ export class UmbImageCropperPreviewElement extends UmbLitElement {
 			position: absolute;
 			pointer-events: none;
 		}
-	`;
+	`,
+];
 }
 
 declare global {

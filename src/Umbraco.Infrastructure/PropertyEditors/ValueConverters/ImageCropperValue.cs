@@ -14,6 +14,11 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 public class ImageCropperValue :TemporaryFileUploadValueBase, IHtmlEncodedString, IEquatable<ImageCropperValue>
 {
     /// <summary>
+    ///     Gets or sets the alternative text for the image.
+    /// </summary>
+    public string? AltText { get; set; }
+
+    /// <summary>
     ///     Gets or sets the value focal point.
     /// </summary>
     public ImageCropperFocalPoint? FocalPoint { get; set; }
@@ -204,7 +209,8 @@ public class ImageCropperValue :TemporaryFileUploadValueBase, IHtmlEncodedString
         {
             Src = !string.IsNullOrWhiteSpace(Src) ? Src : imageCropperValue.Src,
             Crops = crops,
-            FocalPoint = FocalPoint ?? imageCropperValue.FocalPoint
+            FocalPoint = FocalPoint ?? imageCropperValue.FocalPoint,
+            AltText = AltText ?? imageCropperValue.AltText,
         };
     }
 
@@ -298,6 +304,16 @@ public class ImageCropperValue :TemporaryFileUploadValueBase, IHtmlEncodedString
 
         /// <summary>Gets or sets the coordinates for the image crop.</summary>
         public ImageCropperCropCoordinates? Coordinates { get; set; }
+
+        /// <summary>Gets or sets the alternative text for this crop.</summary>
+        public string? AltText { get; set; }
+
+        /// <summary>
+        /// Gets or sets per-culture alternative text overrides for this crop.
+        /// Keys are ISO culture codes (e.g. "en-US", "da-DK"). When a matching culture entry exists,
+        /// it takes precedence over <see cref="AltText"/> during value conversion.
+        /// </summary>
+        public Dictionary<string, string>? AltTextByCulture { get; set; }
 
         #region IEquatable
 

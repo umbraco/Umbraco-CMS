@@ -389,7 +389,7 @@ public abstract class OutputExpansionStrategyTestBase : PropertyValueConverterTe
         var publishedValueFallback = Mock.Of<IPublishedValueFallback>();
         var apiMediaWithCropsBuilder = new ApiMediaWithCropsBuilder(mediaBuilder, publishedValueFallback);
 
-        MediaPickerWithCropsValueConverter mediaPickerValueConverter = new MediaPickerWithCropsValueConverter(CacheManager.Media, PublishedUrlProvider, publishedValueFallback, new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory()), apiMediaWithCropsBuilder);
+        MediaPickerWithCropsValueConverter mediaPickerValueConverter = new MediaPickerWithCropsValueConverter(CacheManager.Media, PublishedUrlProvider, publishedValueFallback, new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory()), apiMediaWithCropsBuilder, Mock.Of<IVariationContextAccessor>());
         var mediaPickerPropertyType = SetupPublishedPropertyType(mediaPickerValueConverter, propertyTypeAlias, Constants.PropertyEditors.Aliases.MediaPicker3, new MediaPicker3Configuration());
 
         var propertyData = new PropertyData { Value = new GuidUdi(Constants.UdiEntityType.Media, pickedMediaKey).ToString(), Culture = string.Empty, Segment = string.Empty };
@@ -411,7 +411,7 @@ public abstract class OutputExpansionStrategyTestBase : PropertyValueConverterTe
         var publishedValueFallback = Mock.Of<IPublishedValueFallback>();
         var apiMediaWithCropsBuilder = new ApiMediaWithCropsBuilder(mediaBuilder, publishedValueFallback);
 
-        MediaPickerWithCropsValueConverter mediaPickerValueConverter = new MediaPickerWithCropsValueConverter(CacheManager.Media, PublishedUrlProvider, publishedValueFallback, new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory()), apiMediaWithCropsBuilder);
+        MediaPickerWithCropsValueConverter mediaPickerValueConverter = new MediaPickerWithCropsValueConverter(CacheManager.Media, PublishedUrlProvider, publishedValueFallback, new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory()), apiMediaWithCropsBuilder, Mock.Of<IVariationContextAccessor>());
         var mediaPickerPropertyType = SetupPublishedPropertyType(mediaPickerValueConverter, propertyTypeAlias, Constants.PropertyEditors.Aliases.MediaPicker3, new MediaPicker3Configuration());
 
         var propertyData = new PropertyData { Value = value, Culture = string.Empty, Segment = string.Empty };

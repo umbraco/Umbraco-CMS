@@ -6,8 +6,15 @@ export interface UmbImageCropperEditorModalData<ItemType> {
 	key: string;
 	unique: string;
 	hideFocalPoint: boolean;
+	hideZoomCrop?: boolean;
+	enableAltTextPerCrop?: boolean;
+	altTextMode?: 'off' | 'altText' | 'decorative';
 	cropOptions: Array<UmbCropModel>;
 	pickableFilter?: (item: ItemType) => boolean;
+	/** ISO culture code being edited (e.g. 'en', 'da'). Absent for invariant properties. */
+	culture?: string;
+	/** When true, media selection and crop/focal-point editing are disabled while alt text remains editable. */
+	readonlyMedia?: boolean;
 }
 
 export interface UmbImageCropperEditorModalValue {
@@ -15,6 +22,7 @@ export interface UmbImageCropperEditorModalValue {
 	unique: string;
 	crops: Array<UmbImageCropperCrop>;
 	focalPoint: { left: number; top: number } | null;
+	altText?: string;
 }
 
 export const UMB_IMAGE_CROPPER_EDITOR_MODAL = new UmbModalToken<

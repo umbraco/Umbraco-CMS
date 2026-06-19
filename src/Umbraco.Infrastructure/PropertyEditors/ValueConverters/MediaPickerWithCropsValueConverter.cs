@@ -1,3 +1,5 @@
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -22,6 +24,7 @@ public class MediaPickerWithCropsValueConverter : PropertyValueConverterBase, ID
     private readonly IPublishedUrlProvider _publishedUrlProvider;
     private readonly IPublishedValueFallback _publishedValueFallback;
     private readonly IApiMediaWithCropsBuilder _apiMediaWithCropsBuilder;
+    private readonly IVariationContextAccessor _variationContextAccessor;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="MediaPickerWithCropsValueConverter"/> class.
@@ -31,18 +34,47 @@ public class MediaPickerWithCropsValueConverter : PropertyValueConverterBase, ID
     /// <param name="publishedValueFallback">Handles fallback logic for published property values.</param>
     /// <param name="jsonSerializer">Serializes and deserializes JSON data for property values.</param>
     /// <param name="apiMediaWithCropsBuilder">Builds API representations of media items with crop data.</param>
+    /// <param name="variationContextAccessor">Provides the current culture context for resolving per-culture alt text.</param>
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 20.")]
     public MediaPickerWithCropsValueConverter(
         IPublishedMediaCache publishedMediaCache,
         IPublishedUrlProvider publishedUrlProvider,
         IPublishedValueFallback publishedValueFallback,
         IJsonSerializer jsonSerializer,
         IApiMediaWithCropsBuilder apiMediaWithCropsBuilder)
+        : this(
+            publishedMediaCache,
+            publishedUrlProvider,
+            publishedValueFallback,
+            jsonSerializer,
+            apiMediaWithCropsBuilder,
+            StaticServiceProvider.Instance.GetRequiredService<IVariationContextAccessor>())
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MediaPickerWithCropsValueConverter"/> class.
+    /// </summary>
+    /// <param name="publishedMediaCache">Provides access to the cache of published media items.</param>
+    /// <param name="publishedUrlProvider">Resolves URLs for published content and media.</param>
+    /// <param name="publishedValueFallback">Handles fallback logic for published property values.</param>
+    /// <param name="jsonSerializer">Serializes and deserializes JSON data for property values.</param>
+    /// <param name="apiMediaWithCropsBuilder">Builds API representations of media items with crop data.</param>
+    /// <param name="variationContextAccessor">Provides the current culture context for resolving per-culture alt text.</param>
+    public MediaPickerWithCropsValueConverter(
+        IPublishedMediaCache publishedMediaCache,
+        IPublishedUrlProvider publishedUrlProvider,
+        IPublishedValueFallback publishedValueFallback,
+        IJsonSerializer jsonSerializer,
+        IApiMediaWithCropsBuilder apiMediaWithCropsBuilder,
+        IVariationContextAccessor variationContextAccessor)
     {
         _publishedMediaCache = publishedMediaCache;
         _publishedUrlProvider = publishedUrlProvider;
         _publishedValueFallback = publishedValueFallback;
         _jsonSerializer = jsonSerializer;
         _apiMediaWithCropsBuilder = apiMediaWithCropsBuilder;
+        _variationContextAccessor = variationContextAccessor;
     }
 
     /// <summary>
@@ -91,10 +123,12 @@ public class MediaPickerWithCropsValueConverter : PropertyValueConverterBase, ID
     /// </summary>
     /// <param name="propertyType">The published property type for which to determine the cache level.</param>
     /// <returns>
-    /// Always returns <see cref="PropertyCacheLevel.Snapshot"/>, indicating the value is cached at the snapshot level.
+    /// Always returns <see cref="PropertyCacheLevel.None"/> because the converted value includes
+    /// culture-specific alt text resolved from <see cref="IVariationContextAccessor"/> at runtime,
+    /// which varies per request and cannot be safely cached across requests.
     /// </returns>
     public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType) =>
-        PropertyCacheLevel.Snapshot;
+        PropertyCacheLevel.None;
 
     /// <summary>
     /// Converts the intermediate value produced by the media picker with crops property editor into its final strongly-typed object representation.
@@ -120,16 +154,43 @@ public class MediaPickerWithCropsValueConverter : PropertyValueConverterBase, ID
         IEnumerable<MediaPicker3PropertyEditor.MediaPicker3PropertyValueEditor.MediaWithCropsDto> dtos =
             MediaPicker3PropertyEditor.MediaPicker3PropertyValueEditor.Deserialize(_jsonSerializer, inter);
         MediaPicker3Configuration? configuration = propertyType.DataType.ConfigurationAs<MediaPicker3Configuration>();
+        var culture = _variationContextAccessor.VariationContext?.Culture;
+
         foreach (MediaPicker3PropertyEditor.MediaPicker3PropertyValueEditor.MediaWithCropsDto dto in dtos)
         {
             IPublishedContent? mediaItem = _publishedMediaCache.GetById(preview, dto.MediaKey);
             if (mediaItem != null)
             {
+                var altText = (!string.IsNullOrEmpty(culture) && dto.AltTextByCulture?.TryGetValue(culture, out var cultureAltText) == true)
+                    ? cultureAltText
+                    : dto.AltText;
+
+                // Resolve per-crop alt text from AltTextByCulture when a culture context is active.
+                var crops = string.IsNullOrEmpty(culture)
+                    ? dto.Crops
+                    : dto.Crops?.Select(crop =>
+                    {
+                        var cropAltText = crop.AltTextByCulture?.TryGetValue(culture, out var cultureCropAlt) == true
+                            ? cultureCropAlt
+                            : crop.AltText;
+                        return cropAltText == crop.AltText
+                            ? crop
+                            : new ImageCropperValue.ImageCropperCrop
+                            {
+                                Alias = crop.Alias,
+                                Width = crop.Width,
+                                Height = crop.Height,
+                                Coordinates = crop.Coordinates,
+                                AltText = cropAltText,
+                            };
+                    });
+
                 var localCrops = new ImageCropperValue
                 {
-                    Crops = dto.Crops,
+                    Crops = crops,
                     FocalPoint = dto.FocalPoint,
                     Src = mediaItem.Url(_publishedUrlProvider),
+                    AltText = altText,
                 };
 
                 localCrops.ApplyConfiguration(configuration);
@@ -155,15 +216,23 @@ public class MediaPickerWithCropsValueConverter : PropertyValueConverterBase, ID
     /// Determines the cache level to use for the delivery API when accessing a media picker property with crops.
     /// </summary>
     /// <param name="propertyType">The published property type for which to determine the cache level.</param>
-    /// <returns>The <see cref="PropertyCacheLevel"/> to be used for the delivery API.</returns>
-    public PropertyCacheLevel GetDeliveryApiPropertyCacheLevel(IPublishedPropertyType propertyType) => PropertyCacheLevel.Elements;
+    /// <returns>
+    /// Always returns <see cref="PropertyCacheLevel.None"/> because the converted value includes
+    /// culture-specific alt text resolved from <see cref="IVariationContextAccessor"/> at runtime,
+    /// which varies per request and cannot be safely cached across requests.
+    /// </returns>
+    public PropertyCacheLevel GetDeliveryApiPropertyCacheLevel(IPublishedPropertyType propertyType) => PropertyCacheLevel.None;
 
     /// <summary>
     /// Determines the <see cref="PropertyCacheLevel"/> to use when expanding a media picker property for the Delivery API.
     /// </summary>
     /// <param name="propertyType">The <see cref="IPublishedPropertyType"/> representing the property being expanded.</param>
-    /// <returns>The appropriate <see cref="PropertyCacheLevel"/> for Delivery API expansion.</returns>
-    public PropertyCacheLevel GetDeliveryApiPropertyCacheLevelForExpansion(IPublishedPropertyType propertyType) => PropertyCacheLevel.Snapshot;
+    /// <returns>
+    /// Always returns <see cref="PropertyCacheLevel.None"/> because the expanded value includes
+    /// culture-specific alt text resolved from <see cref="IVariationContextAccessor"/> at runtime,
+    /// which varies per request and cannot be safely cached across requests.
+    /// </returns>
+    public PropertyCacheLevel GetDeliveryApiPropertyCacheLevelForExpansion(IPublishedPropertyType propertyType) => PropertyCacheLevel.None;
 
     /// <summary>
     /// Gets the type used for delivery API property values for the specified published property type.
