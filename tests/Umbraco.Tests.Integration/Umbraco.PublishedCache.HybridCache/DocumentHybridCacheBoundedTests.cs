@@ -40,7 +40,7 @@ internal sealed class DocumentHybridCacheBoundedTests : UmbracoIntegrationTestWi
     private IDocumentCacheService DocumentCacheService => GetRequiredService<IDocumentCacheService>();
 
     [Test]
-    public async Task Bounded_L0_Cache_Evicts_Yet_Still_Serves_All_Content()
+    public async Task Can_Evict_And_Still_Serve_Content_When_L0_Is_Bounded()
     {
         const int pageCount = 30;
         var keys = await CreatePublishedPagesAsync(pageCount);

@@ -34,7 +34,7 @@ internal sealed class MediaHybridCacheBoundedTests : UmbracoIntegrationTestWithM
     private IMediaCacheService MediaCacheService => GetRequiredService<IMediaCacheService>();
 
     [Test]
-    public async Task Bounded_L0_Cache_Evicts_Yet_Still_Serves_All_Media()
+    public async Task Can_Evict_And_Still_Serve_Media_When_L0_Is_Bounded()
     {
         const int mediaCount = 30;
         var keys = await CreateMediaAsync(mediaCount);
