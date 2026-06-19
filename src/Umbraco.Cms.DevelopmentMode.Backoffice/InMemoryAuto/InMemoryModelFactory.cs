@@ -368,10 +368,10 @@ namespace Umbraco.Cms.DevelopmentMode.Backoffice.InMemoryAuto
 
                 return _infos;
             }
-            catch (ObjectDisposedException)
+            catch (ObjectDisposedException ex)
             {
-                // The factory was disposed concurrently (application shutdown) while acquiring the lock.
-                // Treat it the same as the early-out above and return the current models.
+                // Expected when the factory is disposed during shutdown mid-request; log so an unexpected disposal stays traceable.
+                _logger.LogDebug(ex, "EnsureModels interrupted by object disposal (assumed application shutdown); returning current models.");
                 return _infos;
             }
             finally
