@@ -27,7 +27,6 @@ interface UmbPreviewUrlArgs {
 
 export class UmbPreviewContext extends UmbContextBase {
 	#connection?: HubConnection;
-	#intentionalClose = false;
 	#currentArgs: UmbPreviewIframeArgs = {};
 	#notificationContext?: typeof UMB_NOTIFICATION_CONTEXT.TYPE;
 	#resizeController?: AbortController;
@@ -97,7 +96,6 @@ export class UmbPreviewContext extends UmbContextBase {
 
 		// Clean up SignalR connection
 		if (this.#connection) {
-			this.#intentionalClose = true;
 			this.#connection.stop();
 			this.#connection = undefined;
 		}
@@ -106,12 +104,13 @@ export class UmbPreviewContext extends UmbContextBase {
 	async #initHubConnection(serverUrl: string, serverContext?: typeof UMB_SERVER_CONTEXT.TYPE) {
 		const previewHubUrl = `${serverUrl}/umbraco/PreviewHub`;
 
-		// Make sure that no previous connection exists.
+		// Make sure that no previous connection exists, otherwise an orphaned connection would keep
+		// reconnecting in the background. Clear the reference before stopping so the old connection's
+		// onclose handler sees it is no longer the active one and stays silent.
 		if (this.#connection) {
-			this.#intentionalClose = true;
-			await this.#connection.stop();
+			const previousConnection = this.#connection;
 			this.#connection = undefined;
-			this.#intentionalClose = false;
+			await previousConnection.stop();
 		}
 
 		const skipNegotiation = serverContext?.getServerConnection()?.getSignalRSkipNegotiation() ?? false;
@@ -127,6 +126,10 @@ export class UmbPreviewContext extends UmbContextBase {
 			.withUrl(previewHubUrl, hubOptions)
 			.withAutomaticReconnect(new UmbSignalRReconnectPolicy())
 			.build();
+
+		// Capture this specific connection so its onclose handler can tell whether it is still the active
+		// one; if it has since been replaced or cleared, the close was deliberate and should stay silent.
+		const connection = this.#connection;
 
 		this.#connection.on('refreshed', (payload) => {
 			if (payload === this.#unique.getValue()) {
@@ -155,9 +158,10 @@ export class UmbPreviewContext extends UmbContextBase {
 		});
 
 		this.#connection.onclose(() => {
-			// With automatic reconnect, onclose only fires for an intentional stop (teardown/exit) or a
-			// close that cannot be recovered. Don't warn when we closed the connection ourselves.
-			if (this.#intentionalClose) {
+			// With automatic reconnect, onclose only fires when we stop the connection ourselves (teardown,
+			// exit, or replacing it) or for a close that cannot be recovered. Only warn when this is still
+			// the active connection — i.e. an unexpected drop we did not initiate.
+			if (this.#connection !== connection) {
 				return;
 			}
 
@@ -244,7 +248,6 @@ export class UmbPreviewContext extends UmbContextBase {
 
 		// Stop SignalR connection without waiting - window will close anyway
 		if (this.#connection) {
-			this.#intentionalClose = true;
 			this.#connection.stop();
 			this.#connection = undefined;
 		}

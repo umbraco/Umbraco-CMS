@@ -81,11 +81,12 @@ export class UmbManagementApiServerEventContext extends UmbContextBase {
 		});
 	}
 
-	#initHubConnection(token: string) {
+	async #initHubConnection(token: string) {
 		// Make sure that no previous connection exists, otherwise an orphaned connection would keep
-		// reconnecting in the background and emitting events.
+		// reconnecting in the background and emitting events. Await the stop so it can't race with
+		// building the new connection.
 		if (this.#connection) {
-			this.#connection.stop();
+			await this.#connection.stop();
 			this.#connection = undefined;
 		}
 

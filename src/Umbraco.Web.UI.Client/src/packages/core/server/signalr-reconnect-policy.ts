@@ -10,6 +10,12 @@ const MAX_RECONNECT_DELAY_MS = 30000;
  * SignalR has fallen back to Server-Sent Events and a keepalive is delayed by response buffering.
  */
 export class UmbSignalRReconnectPolicy implements IRetryPolicy {
+	/**
+	 * Gets the delay before the next reconnect attempt, following the capped backoff schedule.
+	 * @param {RetryContext} retryContext - The context for the current retry, including the previous retry count.
+	 * @returns {number} The delay in milliseconds before the next reconnect attempt (never null, so retries continue indefinitely).
+	 * @memberof UmbSignalRReconnectPolicy
+	 */
 	nextRetryDelayInMilliseconds(retryContext: RetryContext): number {
 		return RECONNECT_DELAYS_MS[retryContext.previousRetryCount] ?? MAX_RECONNECT_DELAY_MS;
 	}
