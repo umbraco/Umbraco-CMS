@@ -1096,7 +1096,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 		const persisted = overwriteCreate
 			? await overwriteCreate(saveData, variantIds, parent)
-			: await this.#performDefaultCreate(saveData, parent.unique);
+			: await this.#defaultCreatePersistence(saveData, parent.unique);
 
 		// Set persisted AND current before flipping isNew: the flip triggers the new->edit redirect,
 		// whose navigation guard compares the two states with an order-sensitive comparison.
@@ -1116,7 +1116,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	) {
 		const persisted = overwriteUpdate
 			? await overwriteUpdate(saveData, variantIds)
-			: await this.#performDefaultUpdate(saveData);
+			: await this.#defaultUpdatePersistence(saveData);
 
 		await this.#applyPersistedData(persisted, saveData, variantIds);
 
@@ -1131,14 +1131,14 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		);
 	}
 
-	async #performDefaultCreate(saveData: DetailModelType, parentUnique: string | null): Promise<DetailModelType> {
+	async #defaultCreatePersistence(saveData: DetailModelType, parentUnique: string | null): Promise<DetailModelType> {
 		if (!this._detailRepository) throw new Error('Detail repository is not set');
 		const { data, error } = await this._detailRepository.create(saveData, parentUnique);
 		if (!data || error) throw new Error('Error creating content');
 		return data;
 	}
 
-	async #performDefaultUpdate(saveData: DetailModelType): Promise<DetailModelType> {
+	async #defaultUpdatePersistence(saveData: DetailModelType): Promise<DetailModelType> {
 		if (!this._detailRepository) throw new Error('Detail repository is not set');
 		const { data, error } = await this._detailRepository.save(saveData);
 		if (!data || error) throw new Error('Error saving content');
