@@ -118,7 +118,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	@state()
 	private _exposed?: boolean;
 
-	private _hasExpose?: boolean;
+	private _localExpose?: boolean;
 
 	@state()
 	private _unsupported?: boolean;
@@ -203,7 +203,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 		this.observe(
 			this.#context.hasExpose,
 			(exposed) => {
-				this._hasExpose = exposed;
+				this._localExpose = exposed;
 				this.#updateExposedState();
 			},
 			null,
@@ -353,7 +353,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 		const isExposed = this._isExternalContent
 			? this._externalContentVariantState === UmbElementVariantState.PUBLISHED ||
 				this._externalContentVariantState === UmbElementVariantState.PUBLISHED_PENDING_CHANGES
-			: this._hasExpose;
+			: this._localExpose;
 		this.#updateBlockViewProps({ unpublished: !isExposed });
 		this._exposed = isExposed;
 	}

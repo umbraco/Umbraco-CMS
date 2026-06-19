@@ -6,23 +6,17 @@ import { UMB_BLOCK_ENTRY_CONTEXT } from '../../../context/block-entry.context-to
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 
-/**
- * Block action that navigates to the block's content editor workspace.
- * Exposes the workspace edit path via `getHref()` / `hrefObservable` and the content validation
- * data path via `getValidationDataPath()` / `validationDataPathObservable`.
- * The observable variants update reactively (e.g. after disconnect from Element Library),
- * whereas the promise variants resolve once for consumers that call them imperatively.
- */
+/** Block action that navigates to the block's content editor workspace. */
 export class UmbEditContentBlockAction extends UmbBlockActionBase<MetaBlockActionDefaultKind> {
 	#context?: typeof UMB_BLOCK_ENTRY_CONTEXT.TYPE;
 	#contextReady: Promise<void>;
 	#resolveContext!: () => void;
 
 	readonly #href = new UmbStringState(undefined);
-	readonly hrefObservable = this.#href.asObservable();
+	readonly href = this.#href.asObservable();
 
 	readonly #validationDataPath = new UmbStringState(undefined);
-	readonly validationDataPathObservable = this.#validationDataPath.asObservable();
+	readonly validationDataPath = this.#validationDataPath.asObservable();
 
 	constructor(host: UmbControllerHost, args: UmbBlockActionArgs<MetaBlockActionDefaultKind>) {
 		super(host, args);
@@ -58,15 +52,12 @@ export class UmbEditContentBlockAction extends UmbBlockActionBase<MetaBlockActio
 
 	override async getHref() {
 		await this.#contextReady;
-		const path = await this.observe(this.#context?.workspaceEditContentPath)?.asPromise();
-		return path || undefined;
+		return await this.observe(this.href)?.asPromise() || undefined;
 	}
 
 	override async getValidationDataPath() {
 		await this.#contextReady;
-		const contentKey = await this.observe(this.#context?.contentKey)?.asPromise();
-		if (!contentKey) return undefined;
-		return `$.contentData[${UmbDataPathBlockElementDataQuery({ key: contentKey })}]`;
+		return await this.observe(this.validationDataPath)?.asPromise();
 	}
 }
 

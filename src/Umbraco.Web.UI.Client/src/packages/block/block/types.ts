@@ -7,7 +7,7 @@ export interface UmbBlockLayoutBaseModel {
 	key: string;
 	contentKey: string;
 	settingsKey?: string | null;
-	isExternalContent?: boolean; // TODO: [LK] Review the naming of this property, align with with team.
+	isExternalContent?: boolean;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type

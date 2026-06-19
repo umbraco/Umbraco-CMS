@@ -29,8 +29,8 @@ export class UmbBlockActionDefaultElement<
 		this.#api = api;
 		this._href = undefined;
 
-		if (api?.hrefObservable) {
-			this.observe(api.hrefObservable, (href) => (this._href = href), 'observeHref');
+		if (api?.href) {
+			this.observe(api.href, (href) => (this._href = href), 'observeHref');
 		} else {
 			this.removeUmbControllerByAlias('observeHref');
 			api?.getHref?.().then((href) => {
@@ -38,9 +38,9 @@ export class UmbBlockActionDefaultElement<
 			});
 		}
 
-		if (api?.validationDataPathObservable) {
+		if (api?.validationDataPath) {
 			this.observe(
-				api.validationDataPathObservable,
+				api.validationDataPath,
 				(path) => {
 					this.removeUmbControllerByAlias('observeValidation');
 					if (path) {

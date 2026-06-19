@@ -135,7 +135,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	@state()
 	private _exposed?: boolean;
 
-	private _hasExpose?: boolean;
+	private _localExpose?: boolean;
 
 	// Unsupported is triggered if the Block Type is not recognized, it can also be triggered by the Content Element Type not existing any longer. [NL]
 	@state()
@@ -243,7 +243,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		this.observe(
 			this.#context.hasExpose,
 			(exposed) => {
-				this._hasExpose = exposed;
+				this._localExpose = exposed;
 				this.#updateExposedState();
 			},
 			null,
@@ -450,7 +450,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		const isExposed = this._isExternalContent
 			? this._externalContentVariantState === UmbElementVariantState.PUBLISHED ||
 				this._externalContentVariantState === UmbElementVariantState.PUBLISHED_PENDING_CHANGES
-			: this._hasExpose;
+			: this._localExpose;
 		this.#updateBlockViewProps({ unpublished: !isExposed });
 		this._exposed = isExposed;
 	}

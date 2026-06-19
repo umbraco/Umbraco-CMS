@@ -15,7 +15,7 @@ export interface UmbBlockAction<ArgsMetaType> extends UmbAction<UmbBlockActionAr
 	 * When provided, the default kind element subscribes to it and updates the link reactively,
 	 * rather than resolving `getHref()` once at initialisation time.
 	 */
-	hrefObservable?: Observable<string | undefined>;
+	href?: Observable<string | undefined>;
 
 	/**
 	 * The `execute` method, the action will act as a button.
@@ -37,5 +37,5 @@ export interface UmbBlockAction<ArgsMetaType> extends UmbAction<UmbBlockActionAr
 	 * state controller reactively, rather than resolving `getValidationDataPath()` once at
 	 * initialisation time.
 	 */
-	validationDataPathObservable?: Observable<string | undefined>;
+	validationDataPath?: Observable<string | undefined>;
 }

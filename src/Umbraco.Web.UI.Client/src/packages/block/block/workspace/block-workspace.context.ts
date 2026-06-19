@@ -247,9 +247,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 					manager.isExternalContentOf(contentKey),
 					(isExternalContent) => {
 						if (isExternalContent) {
-							// A library element references pre-existing external content. It is never exposed
-							// per-variant the way local content is, so the expose lookup would always report
-							// false. The block already exists, so it is established — submit reads as "Update".
+							// External content does not keep an exposed state, so we default to true.
 							this.#exposed.setValue(true);
 							return;
 						}

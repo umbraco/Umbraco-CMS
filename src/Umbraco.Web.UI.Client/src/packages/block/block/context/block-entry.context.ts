@@ -58,17 +58,14 @@ export abstract class UmbBlockEntryContext<
 	#contentKey?: string;
 	#unsupported = new UmbBooleanState(undefined);
 	readonly unsupported = this.#unsupported.asObservable();
-	/** True when unsupported was set by a structural fault (missing block type or element type structure). Prevents the content observer from resetting the flag. */
 	#structurallyUnsupported = false;
 
 	protected readonly localize = new UmbLocalizationController(this);
 
 	#isExternalContent = new UmbBooleanState(false);
-	/** Observable that emits true when this block's content is shared (referenced from the Element Library) rather than local. */
 	readonly isExternalContent = this.#isExternalContent.asObservable();
 
 	#externalContentVariantState = new UmbStringState(undefined);
-	/** Observable of the shared element's variant state (e.g. 'Published', 'Draft'), resolved for the active culture/segment. */
 	readonly externalContentVariantState = this.#externalContentVariantState.asObservable();
 
 	#pathAddendum = new UmbRoutePathAddendumContext(this);
@@ -382,10 +379,6 @@ export abstract class UmbBlockEntryContext<
 			null,
 		);
 
-		// Re-observe content and expose when the layout's contentKey changes (e.g., after Transfer to
-		// Element Library assigns a new element UUID, or Disconnect assigns a fresh local content key).
-		// NOTE: this.#contentKey is updated by #observeLayout() AFTER _layout.setValue() emits, so we
-		// must sync it here before calling the observe methods which read it.
 		this.observe(
 			this.contentKey,
 			(contentKey) => {
@@ -588,7 +581,7 @@ export abstract class UmbBlockEntryContext<
 		);
 
 		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
-			.addAdditionalPath('library')
+			.addAdditionalPath('element')
 			.addUniquePaths(['unique'])
 			.onSetup(() => {
 				return {
@@ -627,7 +620,7 @@ export abstract class UmbBlockEntryContext<
 
 		// Observe the variant state of external content (published, draft, etc.)
 		this.observe(
-			this._manager.elementStateOf(contentKey),
+			this._manager.externalContentStateOf(contentKey),
 			(state) => {
 				this.#externalContentVariantState.setValue(state ?? undefined);
 			},
@@ -841,15 +834,15 @@ export abstract class UmbBlockEntryContext<
 		this.delete();
 	}
 
-	async requestTransferToElementLibrary() {
+	async requestTransferToExternalContent() {
 		if (!this.#key) return;
 		const name = this.getName();
-		await this._manager?.requestTransferToElementLibrary(this.#key, name);
+		await this._manager?.requestTransferToExternalContent(this.#key, name);
 	}
 
-	async requestDisconnectFromElementLibrary() {
+	async requestDisconnectFromExternalContent() {
 		if (!this.#key) return;
-		await this._manager?.requestDisconnectFromElementLibrary(this.#key);
+		await this._manager?.requestDisconnectFromExternalContent(this.#key);
 	}
 
 	public delete() {
