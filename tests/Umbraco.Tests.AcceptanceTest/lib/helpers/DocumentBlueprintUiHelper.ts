@@ -41,7 +41,7 @@ export class DocumentBlueprintUiHelper extends UiBaseLocators{
   async goToDocumentBlueprint(blueprintName: string) {
     await this.goToSection(ConstantHelper.sections.settings);
     await this.reloadDocumentBlueprintsTree();
-    await this.click(this.page.getByLabel(blueprintName, {exact: true}));
+    await this.clickTreeItemWithName(blueprintName);
   }
 
   async isDocumentBlueprintRootTreeItemVisible(blueprintName: string, isVisible: boolean = true, toReload: boolean = true){
