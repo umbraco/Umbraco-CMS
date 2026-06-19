@@ -358,6 +358,16 @@ public static partial class Constants
             public const string RelatedElementAlias = "umbElement";
 
             /// <summary>
+            ///     Name for default relation type "External Block Element".
+            /// </summary>
+            public const string RelatedExternalBlockElementName = "External Block Element";
+
+            /// <summary>
+            ///     Alias for default relation type "External Block Element".
+            /// </summary>
+            public const string RelatedExternalBlockElementAlias = "umbExternalBlockElement";
+
+            /// <summary>
             ///     Name for default relation type "Relate Document On Copy".
             /// </summary>
             public const string RelateDocumentOnCopyName = "Relate Document On Copy";
@@ -414,7 +424,7 @@ public static partial class Constants
             ///     Developers should not manually use these relation types since they will all be cleared whenever an entity
             ///     (content, media, member or element) is saved since they are auto-populated based on property values.
             /// </remarks>
-            public static string[] AutomaticRelationTypes { get; } = { RelatedMediaAlias, RelatedMemberAlias, RelatedDocumentAlias, RelatedElementAlias };
+            public static string[] AutomaticRelationTypes { get; } = { RelatedMediaAlias, RelatedMemberAlias, RelatedDocumentAlias, RelatedElementAlias, RelatedExternalBlockElementAlias };
 
             // TODO: return a list of built in types so we can use that to prevent deletion in the UI
         }
