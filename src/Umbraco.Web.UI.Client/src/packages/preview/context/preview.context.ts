@@ -5,7 +5,7 @@ import { UmbBooleanState, UmbStringState } from '@umbraco-cms/backoffice/observa
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
-import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
+import { UMB_SERVER_CONTEXT, UmbSignalRReconnectPolicy } from '@umbraco-cms/backoffice/server';
 import type { HubConnection, IHttpConnectionOptions } from '@umbraco-cms/backoffice/external/signalr';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
@@ -27,6 +27,7 @@ interface UmbPreviewUrlArgs {
 
 export class UmbPreviewContext extends UmbContextBase {
 	#connection?: HubConnection;
+	#intentionalClose = false;
 	#currentArgs: UmbPreviewIframeArgs = {};
 	#notificationContext?: typeof UMB_NOTIFICATION_CONTEXT.TYPE;
 	#resizeController?: AbortController;
@@ -96,6 +97,7 @@ export class UmbPreviewContext extends UmbContextBase {
 
 		// Clean up SignalR connection
 		if (this.#connection) {
+			this.#intentionalClose = true;
 			this.#connection.stop();
 			this.#connection = undefined;
 		}
@@ -106,8 +108,10 @@ export class UmbPreviewContext extends UmbContextBase {
 
 		// Make sure that no previous connection exists.
 		if (this.#connection) {
+			this.#intentionalClose = true;
 			await this.#connection.stop();
 			this.#connection = undefined;
+			this.#intentionalClose = false;
 		}
 
 		const skipNegotiation = serverContext?.getServerConnection()?.getSignalRSkipNegotiation() ?? false;
@@ -119,7 +123,10 @@ export class UmbPreviewContext extends UmbContextBase {
 			hubOptions.transport = HttpTransportType.WebSockets;
 		}
 
-		this.#connection = new HubConnectionBuilder().withUrl(previewHubUrl, hubOptions).build();
+		this.#connection = new HubConnectionBuilder()
+			.withUrl(previewHubUrl, hubOptions)
+			.withAutomaticReconnect(new UmbSignalRReconnectPolicy())
+			.build();
 
 		this.#connection.on('refreshed', (payload) => {
 			if (payload === this.#unique.getValue()) {
@@ -127,7 +134,33 @@ export class UmbPreviewContext extends UmbContextBase {
 			}
 		});
 
+		this.#connection.onreconnecting(() => {
+			this.#notificationContext?.peek('warning', {
+				data: {
+					headline: this.#localize.term('general_preview'),
+					message: this.#localize.term('preview_connectionReconnecting'),
+				},
+			});
+		});
+
+		this.#connection.onreconnected(() => {
+			// A 'refreshed' event may have been missed while disconnected, so reload the iframe to catch up.
+			this.#setPreviewUrl({ rnd: Math.random() });
+			this.#notificationContext?.peek('positive', {
+				data: {
+					headline: this.#localize.term('general_preview'),
+					message: this.#localize.term('preview_connectionRestored'),
+				},
+			});
+		});
+
 		this.#connection.onclose(() => {
+			// With automatic reconnect, onclose only fires for an intentional stop (teardown/exit) or a
+			// close that cannot be recovered. Don't warn when we closed the connection ourselves.
+			if (this.#intentionalClose) {
+				return;
+			}
+
 			this.#notificationContext?.peek('warning', {
 				data: {
 					headline: this.#localize.term('general_preview'),
@@ -211,6 +244,7 @@ export class UmbPreviewContext extends UmbContextBase {
 
 		// Stop SignalR connection without waiting - window will close anyway
 		if (this.#connection) {
+			this.#intentionalClose = true;
 			this.#connection.stop();
 			this.#connection = undefined;
 		}

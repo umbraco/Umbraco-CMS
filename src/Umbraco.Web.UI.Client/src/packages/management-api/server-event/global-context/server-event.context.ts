@@ -9,7 +9,7 @@ import {
 	type HubConnection,
 	type IHttpConnectionOptions,
 } from '@umbraco-cms/backoffice/external/signalr';
-import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
+import { UMB_SERVER_CONTEXT, UmbSignalRReconnectPolicy } from '@umbraco-cms/backoffice/server';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { filter, Subject } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
@@ -82,6 +82,13 @@ export class UmbManagementApiServerEventContext extends UmbContextBase {
 	}
 
 	#initHubConnection(token: string) {
+		// Make sure that no previous connection exists, otherwise an orphaned connection would keep
+		// reconnecting in the background and emitting events.
+		if (this.#connection) {
+			this.#connection.stop();
+			this.#connection = undefined;
+		}
+
 		const serverURL = this.#serverContext?.getServerUrl();
 
 		if (!serverURL) {
@@ -102,7 +109,10 @@ export class UmbManagementApiServerEventContext extends UmbContextBase {
 			hubOptions.transport = HttpTransportType.WebSockets;
 		}
 
-		this.#connection = new HubConnectionBuilder().withUrl(serverEventHubUrl, hubOptions).build();
+		this.#connection = new HubConnectionBuilder()
+			.withUrl(serverEventHubUrl, hubOptions)
+			.withAutomaticReconnect(new UmbSignalRReconnectPolicy())
+			.build();
 
 		this.#connection.on('notify', (payload) => {
 			const event: UmbManagementApiServerEventModel = {
@@ -112,6 +122,11 @@ export class UmbManagementApiServerEventContext extends UmbContextBase {
 
 			this.#events.next(event);
 		});
+
+		// While reconnecting we treat the connection as down so cache invalidation consumers refetch
+		// rather than trust a cache that may have missed events during the gap.
+		this.#connection.onreconnecting(() => this.#isConnected.setValue(false));
+		this.#connection.onreconnected(() => this.#isConnected.setValue(true));
 
 		this.#connection
 			.start()
