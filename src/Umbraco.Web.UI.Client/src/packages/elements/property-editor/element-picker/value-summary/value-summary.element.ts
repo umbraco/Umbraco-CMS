@@ -27,32 +27,41 @@ export class UmbElementPickerPropertyEditorValueSummaryElement extends UmbValueS
 
 		for (const unique of this.#resolvers.keys()) {
 			if (!value.some((item) => item.unique === unique)) {
-				this.#resolvers.get(unique)?.destroy();
-				this.#resolvers.delete(unique);
-				this.#resolvedNames.delete(unique);
-				this.removeUmbControllerByAlias(`element-${unique}`);
+				this.#removeResolver(unique);
 			}
 		}
 
 		for (const item of value) {
-			if (this.#resolvers.has(item.unique)) {
-				this.#resolvers.get(item.unique)!.setData(item);
-			} else {
-				const resolver = new UmbElementItemDataResolver<UmbElementItemModel>(this);
-				resolver.setData(item);
-				this.#resolvers.set(item.unique, resolver);
-				this.observe(
-					resolver.name,
-					(name) => {
-						this.#resolvedNames.set(item.unique, name ?? '');
-						this.#buildNames();
-					},
-					`element-${item.unique}`,
-				);
-			}
+			this.#addOrUpdateResolver(item);
 		}
 
 		this.#buildNames();
+	}
+
+	#removeResolver(unique: string) {
+		this.#resolvers.get(unique)?.destroy();
+		this.#resolvers.delete(unique);
+		this.#resolvedNames.delete(unique);
+		this.removeUmbControllerByAlias(`element-${unique}`);
+	}
+
+	#addOrUpdateResolver(item: UmbElementItemModel) {
+		if (this.#resolvers.has(item.unique)) {
+			this.#resolvers.get(item.unique)!.setData(item);
+			return;
+		}
+
+		const resolver = new UmbElementItemDataResolver<UmbElementItemModel>(this);
+		resolver.setData(item);
+		this.#resolvers.set(item.unique, resolver);
+		this.observe(
+			resolver.name,
+			(name) => {
+				this.#resolvedNames.set(item.unique, name ?? '');
+				this.#buildNames();
+			},
+			`element-${item.unique}`,
+		);
 	}
 
 	#buildNames() {
