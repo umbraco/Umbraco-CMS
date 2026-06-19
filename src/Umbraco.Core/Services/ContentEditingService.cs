@@ -103,11 +103,19 @@ internal sealed class ContentEditingService
     public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateCreateAsync(
         ContentCreateModel createModel,
         Guid userKey)
-        => await ValidateCulturesAndPropertiesAsync(
+    {
+        ContentEditingOperationStatus creationAllowedStatus = await ValidateCreationAllowedAsync(createModel);
+        if (creationAllowedStatus != ContentEditingOperationStatus.Success)
+        {
+            return Attempt.FailWithStatus(creationAllowedStatus, new ContentValidationResult());
+        }
+
+        return await ValidateCulturesAndPropertiesAsync(
             createModel,
             createModel.ContentTypeKey,
             createModel.Variants.Select(variant => variant.Culture),
             userKey);
+    }
 
     /// <inheritdoc />
     public async Task<Attempt<ContentCreateResult, ContentEditingOperationStatus>> CreateAsync(ContentCreateModel createModel, Guid userKey)

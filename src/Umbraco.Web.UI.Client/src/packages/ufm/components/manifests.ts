@@ -31,4 +31,11 @@ export const manifests: Array<ManifestUfmComponent> = [
 		api: () => import('./link/link.component.js'),
 		meta: { alias: 'umbLink' },
 	},
+	{
+		type: 'ufmComponent',
+		alias: 'Umb.Markdown.MemberName',
+		name: 'Member Name UFM Component',
+		api: () => import('./member-name/member-name.component.js'),
+		meta: { alias: 'umbMemberName' },
+	},
 ];
