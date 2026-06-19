@@ -295,13 +295,15 @@ internal sealed class MediaCacheService : IMediaCacheService
         {
             await _hybridCache.SetAsync(GetCacheKey(publishedNode.Key), publishedNode, GetEntryOptions(publishedNode.Key));
             _publishedContentCache.Remove(key, out _);
+            InvalidateMemoryCacheGeneration();
         }
         else
         {
+            // RemoveFromMemoryCacheAsync → ClearPublishedCacheAsync bumps the generation itself,
+            // so this path is already covered.
             await RemoveFromMemoryCacheAsync(key);
         }
 
-        InvalidateMemoryCacheGeneration();
         scope.Complete();
     }
 

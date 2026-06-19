@@ -262,15 +262,16 @@ internal sealed class DocumentCacheService : IDocumentCacheService
             var cacheKey = GetCacheKey(publishedNode.Key, false);
             await _hybridCache.SetAsync(cacheKey, publishedNode, GetEntryOptions(publishedNode.Key, false), GenerateTags(publishedNode));
             _publishedContentCache.Remove(cacheKey, out _);
+            InvalidateMemoryCacheGeneration();
         }
         else
         {
             // Either no published node in the database cache, or the ancestor path is no longer published —
-            // remove any stale published entry from the local memory cache.
+            // remove any stale published entry from the local memory cache. ClearPublishedCacheAsync
+            // bumps the generation itself, so this path is already covered.
             await ClearPublishedCacheAsync(key);
         }
 
-        InvalidateMemoryCacheGeneration();
         scope.Complete();
     }
 
