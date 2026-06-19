@@ -57,7 +57,7 @@ export class UmbUfmElementNameElement extends UmbUfmElementBase {
 					return name;
 				});
 				const names = await Promise.all(namePromises);
-				return names.join(', ');
+				return names.filter(Boolean).join(', ');
 			}
 		}
 		return '';
