@@ -302,7 +302,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		const unique = this.getUnique();
 		if (!unique) throw new Error('Unique is not set');
 		const { data, error } = await this._detailRepository!.requestByUnique(unique);
-		if (error || !data) throw new Error('Error loading document', { cause: error });
+		if (error || !data) throw new Error('Error loading entity', { cause: error });
 		return await this._processIncomingData(data);
 	}
 

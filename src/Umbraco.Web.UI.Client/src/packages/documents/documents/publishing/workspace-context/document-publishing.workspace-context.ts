@@ -420,16 +420,28 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 		const entityType = this.#documentWorkspaceContext.getEntityType();
 		if (!entityType) throw new Error('Entity type is missing');
 
+		// The publish already succeeded server-side once we reach the read-back; a failed read-back must not be
+		// reported as a publish failure, so we fall back to the submitted data and flag the editor as stale.
+		let reloadAfterPublishFailed = false;
+		const loadAfterPublish = async (): Promise<UmbDocumentDetailModel> => {
+			try {
+				return await this.#documentWorkspaceContext!.loadWithoutPersist();
+			} catch {
+				reloadAfterPublishFailed = true;
+				return saveData;
+			}
+		};
+
 		await this.#documentWorkspaceContext.performCreateOrUpdate(variantIds, saveData, {
 			create: async (data, ids, parent) => {
 				const { error } = await this.#publishingRepository.createAndPublish(data, ids, parent.unique);
 				if (error) throw new Error('Error creating and publishing document', { cause: error });
-				return this.#documentWorkspaceContext!.loadWithoutPersist();
+				return loadAfterPublish();
 			},
 			update: async (data, ids) => {
 				const { error } = await this.#publishingRepository.updateAndPublish(data, ids);
 				if (error) throw new Error('Error updating and publishing document', { cause: error });
-				return this.#documentWorkspaceContext!.loadWithoutPersist();
+				return loadAfterPublish();
 			},
 		});
 
@@ -438,6 +450,14 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 				message: this.#localize.term('speechBubbles_editContentPublishedHeader'),
 			},
 		});
+
+		if (reloadAfterPublishFailed) {
+			this.#notificationContext?.peek('warning', {
+				data: {
+					message: this.#localize.term('speechBubbles_editContentPublishedReloadFailed'),
+				},
+			});
+		}
 
 		await this.#loadAndProcessLastPublished();
 
