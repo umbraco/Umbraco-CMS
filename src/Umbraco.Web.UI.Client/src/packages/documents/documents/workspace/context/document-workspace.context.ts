@@ -19,10 +19,7 @@ import { UMB_DOCUMENT_CONFIGURATION_CONTEXT } from '../../index.js';
 import { UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD, UMB_DOCUMENT_WORKSPACE_ALIAS } from '../constants.js';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { umbPeekError } from '@umbraco-cms/backoffice/notification';
-import {
-	UmbContentDetailWorkspaceContextBase,
-	UmbMergeContentVariantDataController,
-} from '@umbraco-cms/backoffice/content';
+import { UmbContentDetailWorkspaceContextBase } from '@umbraco-cms/backoffice/content';
 import { UmbDeprecation, type UmbVariantGuardRule } from '@umbraco-cms/backoffice/utils';
 import { UmbDocumentBlueprintDetailRepository } from '@umbraco-cms/backoffice/document-blueprint';
 import { UmbEntityContentTypeEntityContext } from '@umbraco-cms/backoffice/content-type';
