@@ -142,23 +142,29 @@ internal sealed class DocumentCacheService : IDocumentCacheService
             return cached;
         }
 
-        // Capture the cache generation before reading the backing store. If a concurrent publish or
-        // invalidation bumps the generation while we read and build below, the snapshot we hold is
-        // stale and must not be written back over the refreshed entries (the clobber that leaves
-        // memory permanently stale until a full clear).
-        long generation = Interlocked.Read(ref _cacheGeneration);
-
         (bool exists, ContentCacheNode? contentCacheNode) = await _hybridCache.TryGetValueAsync<ContentCacheNode?>(cacheKey, CancellationToken.None);
+
+        // A value found in the backing store is already current, so it can always populate the caches
+        // below; only a value built from the read-through DB fetch needs the generation guard.
+        bool snapshotIsCurrent = true;
         if (exists is false)
         {
+            // Capture the cache generation before reading the backing store. If a concurrent publish or
+            // invalidation bumps the generation while we read and build below, the snapshot we hold is
+            // stale and must not be written back over the refreshed entries (the clobber that leaves
+            // memory permanently stale until a full clear).
+            long generation = Interlocked.Read(ref _cacheGeneration);
+
             bool ancestorCheckFailed;
             (contentCacheNode, ancestorCheckFailed) = await GetContentCacheNodeFromRepo();
+
+            snapshotIsCurrent = IsCacheGenerationCurrent(generation);
 
             // Only cache the result if the ancestor check didn't fail.
             // When content exists in DB but the ancestor check fails, this could be a transient
             // race condition during cache rebuild. Caching null would poison the distributed cache.
             // Skip the write when the generation moved — a refresh has superseded this snapshot.
-            if (ancestorCheckFailed is false && IsCacheGenerationCurrent(generation))
+            if (ancestorCheckFailed is false && snapshotIsCurrent)
             {
                 await _hybridCache.SetAsync(
                     cacheKey,
@@ -177,7 +183,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService
 
         // Only populate the L0 cache when our snapshot is still current; otherwise a concurrent
         // refresh has already written fresher content and we must not overwrite it with this one.
-        if (result is not null && IsCacheGenerationCurrent(generation))
+        if (result is not null && snapshotIsCurrent)
         {
             _publishedContentCache[cacheKey] = result;
         }

@@ -136,20 +136,26 @@ internal sealed class MediaCacheService : IMediaCacheService
             return cached;
         }
 
-        // Capture the cache generation before reading the backing store. If a concurrent refresh or
-        // invalidation bumps the generation while we read and build below, the snapshot we hold is
-        // stale and must not be written back over the refreshed entries (the clobber that leaves
-        // memory permanently stale until a full clear).
-        long generation = Interlocked.Read(ref _cacheGeneration);
-
         string cacheKey = GetCacheKey(key);
         (bool exists, ContentCacheNode? contentCacheNode) = await _hybridCache.TryGetValueAsync<ContentCacheNode?>(cacheKey, CancellationToken.None);
+
+        // A value found in the backing store is already current, so it can always populate the caches
+        // below; only a value built from the read-through DB fetch needs the generation guard.
+        bool snapshotIsCurrent = true;
         if (exists is false)
         {
+            // Capture the cache generation before reading the backing store. If a concurrent refresh or
+            // invalidation bumps the generation while we read and build below, the snapshot we hold is
+            // stale and must not be written back over the refreshed entries (the clobber that leaves
+            // memory permanently stale until a full clear).
+            long generation = Interlocked.Read(ref _cacheGeneration);
+
             contentCacheNode = await GetContentCacheNodeFromRepo();
+            snapshotIsCurrent = IsCacheGenerationCurrent(generation);
+
             // We don't want to cache removed items, this may cause issues if the L2 serializer changes.
             // Skip the write when the generation moved — a refresh has superseded this snapshot.
-            if (contentCacheNode is not null && IsCacheGenerationCurrent(generation))
+            if (contentCacheNode is not null && snapshotIsCurrent)
             {
                 await _hybridCache.SetAsync(
                     cacheKey,
@@ -168,7 +174,7 @@ internal sealed class MediaCacheService : IMediaCacheService
 
         // Only populate the L0 cache when our snapshot is still current; otherwise a concurrent
         // refresh has already written fresher content and we must not overwrite it with this one.
-        if (result is not null && IsCacheGenerationCurrent(generation))
+        if (result is not null && snapshotIsCurrent)
         {
             _publishedContentCache[key] = result;
         }
