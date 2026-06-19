@@ -11,9 +11,12 @@ import {
 	ifDefined,
 } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray, type UmbConfigCollectionModel } from '@umbraco-cms/backoffice/utils';
+import { jsonStringComparison } from '@umbraco-cms/backoffice/observable-api';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import { UmbInteractionMemoriesChangeEvent } from '@umbraco-cms/backoffice/interaction-memory';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
+import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
 import type { UmbRepositoryItemsStatus } from '@umbraco-cms/backoffice/repository';
 import type { UmbItemModel } from '@umbraco-cms/backoffice/entity-item';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
@@ -145,6 +148,17 @@ export class UmbInputEntityDataElement extends UmbFormControlMixin<string | unde
 	}
 	#readonly = false;
 
+	@property({ type: Array, attribute: false })
+	public get interactionMemories(): Array<UmbInteractionMemoryModel> | undefined {
+		return this.#pickerInputContext.interactionMemory.getAllMemories();
+	}
+	public set interactionMemories(value: Array<UmbInteractionMemoryModel> | undefined) {
+		this.#interactionMemories = value;
+		value?.forEach((memory) => this.#pickerInputContext.interactionMemory.setMemory(memory));
+	}
+
+	#interactionMemories?: Array<UmbInteractionMemoryModel> = [];
+
 	@state()
 	private _items: Array<UmbItemModel> = [];
 
@@ -188,6 +202,20 @@ export class UmbInputEntityDataElement extends UmbFormControlMixin<string | unde
 		this.observe(this.#pickerInputContext.modalRoute, (modalRoute) => {
 			this._modalRoute = modalRoute;
 		});
+
+		this.observe(
+			this.#pickerInputContext.interactionMemory.memories,
+			(memories) => {
+				// only dispatch the event if the interaction memories have actually changed
+				const isIdentical = jsonStringComparison(memories, this.#interactionMemories);
+
+				if (!isIdentical) {
+					this.#interactionMemories = memories;
+					this.dispatchEvent(new UmbInteractionMemoriesChangeEvent());
+				}
+			},
+			'_observeMemories',
+		);
 	}
 
 	protected override getFormElement() {
