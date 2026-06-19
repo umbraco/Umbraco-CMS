@@ -196,9 +196,11 @@ export class UmbDefaultTreeContext<
 		const hasStartNode = this.getStartNode();
 		const hideTreeRoot = this.getHideTreeRoot();
 
-		if (!hasStartNode && !hideTreeRoot) {
-			this.#loadTreeRoot(reload);
-		}
+		// Always load the tree root entity, even when the root node is hidden or we are drilled
+		// into a start node. The root entity is required to wire up the target/expansion handling
+		// at root level: the tree's expansion manager only starts observing once it has been given
+		// the root tree item, which is what lets a deep-link / breadcrumb target paginate the root.
+		this.#loadTreeRoot(reload);
 
 		// Load children when drilled into a node, when the root is hidden, or when
 		// the root is pre-expanded — all cases where children must be immediately visible.
