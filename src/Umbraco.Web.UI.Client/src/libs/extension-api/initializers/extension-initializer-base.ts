@@ -25,6 +25,11 @@ export abstract class UmbExtensionInitializerBase<
 		this.host = host;
 		this.extensionRegistry = extensionRegistry;
 		this.observe(extensionRegistry.byType<Key, T>(manifestType), async (extensions) => {
+			// Re-arm while this pass is in flight so a consumer awaiting `loaded` waits for it to
+			// finish instead of resolving on a stale `true` from a previous pass. `undefined`
+			// rather than `false` because `asPromise()` resolves on the first non-undefined value.
+			this.#loaded.setValue(undefined);
+
 			this.#extensionMap.forEach((existingExt) => {
 				if (!extensions.find((b) => b.alias === existingExt.alias)) {
 					this.unloadExtension(existingExt);
@@ -40,9 +45,10 @@ export abstract class UmbExtensionInitializerBase<
 				}),
 			);
 
-			if (extensions.length > 0) {
-				this.#loaded.setValue(true);
-			}
+			// Resolve unconditionally — including for zero extensions — so a consumer awaiting
+			// `loaded` (the app-entry-point boot gate, the bundle guard) never hangs on a default
+			// install that registers none of this type.
+			this.#loaded.setValue(true);
 		});
 	}
 
