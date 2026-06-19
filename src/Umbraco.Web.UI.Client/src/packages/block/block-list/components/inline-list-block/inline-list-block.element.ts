@@ -12,7 +12,11 @@ import { UmbLanguageItemRepository } from '@umbraco-cms/backoffice/language';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbApiConstructorArgumentsMethodType } from '@umbraco-cms/backoffice/extension-api';
-import type { UmbBlockDataType, UMB_BLOCK_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/block';
+import type {
+	UmbBlockDataType,
+	UMB_BLOCK_WORKSPACE_CONTEXT,
+	UmbBlockLabelUfmValueType,
+} from '@umbraco-cms/backoffice/block';
 
 import '../../../block/workspace/views/edit/block-workspace-view-edit-content-no-router.element.js';
 import { UmbContextBoundary } from '@umbraco-cms/backoffice/context-api';
@@ -186,7 +190,7 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 	}
 
 	#renderBlockInfo() {
-		const blockValue = { ...this.content, $settings: this.settings, $index: this.index };
+		const blockValue: UmbBlockLabelUfmValueType = { ...this.content, $settings: this.settings, $index: this.index };
 		return html`
 			<span id="content">
 				<span id="icon">
