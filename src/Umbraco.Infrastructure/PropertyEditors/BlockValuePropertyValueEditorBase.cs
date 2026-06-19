@@ -138,7 +138,9 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
 
         foreach (IBlockLayoutItem layout in allExternalLayoutItems)
         {
-            result.Add(new UmbracoEntityReference(new GuidUdi(Constants.UdiEntityType.Element, layout.ContentKey)));
+            result.Add(new UmbracoEntityReference(
+                new GuidUdi(Constants.UdiEntityType.Element, layout.ContentKey),
+                Constants.Conventions.RelationTypes.RelatedExternalBlockElementAlias));
         }
 
         return result;
