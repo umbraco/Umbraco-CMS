@@ -2834,6 +2834,14 @@ internal sealed class DatabaseDataCreator
             Constants.ObjectTypes.ElementContainer,
             false,
             false);
+        CreateRelationTypeData(
+            10,
+            Constants.Conventions.RelationTypes.RelatedExternalBlockElementAlias,
+            Constants.Conventions.RelationTypes.RelatedExternalBlockElementName,
+            null,
+            null,
+            false,
+            true);
     }
 
     private void CreateRelationTypeData(
