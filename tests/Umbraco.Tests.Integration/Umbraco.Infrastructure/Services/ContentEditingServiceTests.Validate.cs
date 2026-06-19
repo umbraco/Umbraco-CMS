@@ -280,7 +280,7 @@ public partial class ContentEditingServiceTests
 
         var childContentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id);
         childContentType.AllowedAsRoot = false;
-        ContentTypeService.Save(childContentType);
+        await ContentTypeService.CreateAsync(childContentType, Constants.Security.SuperUserKey);
 
         var rootContentType = ContentTypeBuilder.CreateBasicContentType();
         rootContentType.AllowedAsRoot = true;
@@ -292,7 +292,7 @@ public partial class ContentEditingServiceTests
             };
         }
 
-        ContentTypeService.Save(rootContentType);
+        await ContentTypeService.CreateAsync(rootContentType, Constants.Security.SuperUserKey);
 
         var rootKey = (await ContentEditingService.CreateAsync(
             new ContentCreateModel
@@ -330,7 +330,7 @@ public partial class ContentEditingServiceTests
 
         var contentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id);
         contentType.AllowedAsRoot = allowedAsRoot;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         return new ContentCreateModel
         {
