@@ -43,40 +43,42 @@ internal abstract class BlockValuePropertyIndexValueFactoryBase<TSerialized> : J
         var index = 0;
         foreach (RawDataItem rawData in GetDataItems(deserializedPropertyValue, published))
         {
-            if (contentTypeDictionary.TryGetValue(rawData.ContentTypeKey, out IContentType? contentType))
+            if (contentTypeDictionary.TryGetValue(rawData.ContentTypeKey, out IContentType? contentType) is false)
             {
-                var propertyTypeDictionary =
-                    contentType
-                        .CompositionPropertyTypes
-                        .Select(propertyType =>
-                        {
-                            // We want to ensure that the nested properties are set vary by culture if the parent is
-                            // This is because it's perfectly valid to have a nested property type that's set to invariant even if the parent varies.
-                            // For instance in a block list, the list it self can vary, but the elements can be invariant, at the same time.
-                            if (culture is not null)
-                            {
-                                propertyType.Variations |= ContentVariation.Culture;
-                            }
-
-                            if (segment is not null)
-                            {
-                                propertyType.Variations |= ContentVariation.Segment;
-                            }
-
-                            return propertyType;
-                        })
-                        .ToDictionary(x => x.Alias);
-
-                result.AddRange(GetNestedResults(
-                    $"{property.Alias}.items[{index}]",
-                    culture,
-                    segment,
-                    published,
-                    propertyTypeDictionary,
-                    rawData,
-                    availableCultures,
-                    contentTypeDictionary));
+                continue;
             }
+
+            var propertyTypeDictionary =
+                contentType
+                    .CompositionPropertyTypes
+                    .Select(propertyType =>
+                    {
+                        // We want to ensure that the nested properties are set vary by culture if the parent is
+                        // This is because it's perfectly valid to have a nested property type that's set to invariant even if the parent varies.
+                        // For instance in a block list, the list it self can vary, but the elements can be invariant, at the same time.
+                        if (culture is not null)
+                        {
+                            propertyType.Variations |= ContentVariation.Culture;
+                        }
+
+                        if (segment is not null)
+                        {
+                            propertyType.Variations |= ContentVariation.Segment;
+                        }
+
+                        return propertyType;
+                    })
+                    .ToDictionary(x => x.Alias);
+
+            result.AddRange(GetNestedResults(
+                $"{property.Alias}.items[{index}]",
+                culture,
+                segment,
+                published,
+                propertyTypeDictionary,
+                rawData,
+                availableCultures,
+                contentTypeDictionary));
 
             index++;
         }
