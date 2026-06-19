@@ -4,13 +4,13 @@ import { loadManifestPlainJs } from '../functions/load-manifest-plain-js.functio
 import { UmbExtensionInitializerBase } from './extension-initializer-base.js';
 import { UmbObserver } from '../../observable-api/observer.js';
 import { expect, fixture } from '@open-wc/testing';
-import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
+import type { UmbElement } from '@umbraco-cms/backoffice/element-api';
 import { customElement, html } from '@umbraco-cms/backoffice/external/lit';
 
 @customElement('umb-test-initializer-base-host')
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-class UmbTestInitializerBaseHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
+class UmbTestInitializerBaseHostElement extends UmbElementMixin(HTMLElement) {}
 
 async function wait(ms: number) {
 	await new Promise((r) => setTimeout(r, ms));
@@ -20,7 +20,7 @@ async function wait(ms: number) {
 // `observe` callback fires synchronously during `super()` — before any subclass field would
 // initialise — so the record of instantiated aliases is a closed-over array created up front
 // rather than instance state.
-function createTestInitializer(host: UmbControllerHostElement, registry: UmbExtensionRegistry<ManifestBase>) {
+function createTestInitializer(host: UmbElement, registry: UmbExtensionRegistry<ManifestBase>) {
 	const instantiated: string[] = [];
 	class UmbTestInitializer extends UmbExtensionInitializerBase<'test'> {
 		constructor() {
@@ -41,7 +41,7 @@ function createTestInitializer(host: UmbControllerHostElement, registry: UmbExte
 }
 
 describe('UmbExtensionInitializerBase — loaded signal', () => {
-	let hostElement: UmbControllerHostElement;
+	let hostElement: UmbElement;
 
 	beforeEach(async () => {
 		hostElement = await fixture(html`<umb-test-initializer-base-host></umb-test-initializer-base-host>`);
