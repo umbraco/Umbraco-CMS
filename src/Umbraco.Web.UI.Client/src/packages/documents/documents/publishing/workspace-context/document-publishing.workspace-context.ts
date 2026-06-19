@@ -167,46 +167,59 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 		await this.#documentWorkspaceContext.runMandatoryValidationForSaveData(saveData);
 		await this.#documentWorkspaceContext.askServerToValidate(saveData, variantIds);
 
-		return this.#documentWorkspaceContext.validateVariantsAndSubmit(
-			variantIds,
-			async () => {
-				if (!this.#documentWorkspaceContext) {
-					throw new Error('Document workspace context is missing');
-				}
+		return this.#documentWorkspaceContext
+			.validateVariantsAndSubmit(
+				variantIds,
+				async () => {
+					if (!this.#documentWorkspaceContext) {
+						throw new Error('Document workspace context is missing');
+					}
 
-				// Save the document before scheduling
-				await this.#documentWorkspaceContext.performCreateOrUpdate(variantIds, saveData);
+					// Save the document before scheduling
+					await this.#documentWorkspaceContext.performCreateOrUpdate(variantIds, saveData);
 
-				// Schedule the document
-				const { error } = await this.#publishingRepository.publish(unique, variants);
-				if (error) {
-					return Promise.reject(error);
-				}
+					// Schedule the document
+					const { error } = await this.#publishingRepository.publish(unique, variants);
+					if (error) {
+						return Promise.reject(error);
+					}
 
-				const notification = { data: { message: this.#localize.term('speechBubbles_editContentScheduledSavedText') } };
-				this.#notificationContext?.peek('positive', notification);
+					const notification = {
+						data: { message: this.#localize.term('speechBubbles_editContentScheduledSavedText') },
+					};
+					this.#notificationContext?.peek('positive', notification);
 
-				// reload the document so all states are updated after the publish operation
-				// TODO: It seems wrong to make a full reload, In this case I think we can just update the variants status? [NL]
-				await this.#documentWorkspaceContext.reload();
-				this.#loadAndProcessLastPublished();
+					// reload the document so all states are updated after the publish operation
+					// TODO: It seems wrong to make a full reload, In this case I think we can just update the variants status? [NL]
+					await this.#documentWorkspaceContext.reload();
+					this.#loadAndProcessLastPublished();
 
-				// request reload of this entity
-				const structureEvent = new UmbRequestReloadStructureForEntityEvent({ entityType, unique });
-				this.#eventContext?.dispatchEvent(structureEvent);
-			},
-			async (reason?: any) => {
-				const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
+					// request reload of this entity
+					const structureEvent = new UmbRequestReloadStructureForEntityEvent({ entityType, unique });
+					this.#eventContext?.dispatchEvent(structureEvent);
+				},
+				async (reason?: any) => {
+					const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
+					if (!notificationContext) {
+						throw new Error('Notification context is missing');
+					}
+					notificationContext.peek('danger', {
+						data: { message: this.#localize.term('speechBubbles_editContentScheduledNotSavedText') },
+					});
+
+					return Promise.reject(reason);
+				},
+			)
+			.catch((error) => {
+				const notificationContext = this.#notificationContext;
 				if (!notificationContext) {
 					throw new Error('Notification context is missing');
 				}
 				notificationContext.peek('danger', {
 					data: { message: this.#localize.term('speechBubbles_editContentScheduledNotSavedText') },
 				});
-
-				return Promise.reject(reason);
-			},
-		);
+				return Promise.reject(error);
+			});
 	}
 
 	/**
