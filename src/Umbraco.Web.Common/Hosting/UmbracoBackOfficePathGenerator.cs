@@ -23,7 +23,7 @@ public class UmbracoBackOfficePathGenerator : IBackOfficePathGenerator
         : this(
             hostingEnvironment,
             umbracoVersion,
-            StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<RuntimeSettings>>())
+            StaticServiceProvider.Instance.GetRequiredService<IOptions<RuntimeSettings>>())
     {
     }
 
@@ -37,10 +37,10 @@ public class UmbracoBackOfficePathGenerator : IBackOfficePathGenerator
     public UmbracoBackOfficePathGenerator(
         IHostingEnvironment hostingEnvironment,
         IUmbracoVersion umbracoVersion,
-        IOptionsMonitor<RuntimeSettings> runtimeSettings)
+        IOptions<RuntimeSettings> runtimeSettings)
     {
         BackOfficePath = hostingEnvironment.GetBackOfficePath();
-        BackOfficeCacheBustHash = CacheBustHashGenerator.Generate(hostingEnvironment, umbracoVersion, runtimeSettings.CurrentValue.CacheBuster);
+        BackOfficeCacheBustHash = CacheBustHashGenerator.Generate(hostingEnvironment, umbracoVersion, runtimeSettings.Value.CacheBuster);
     }
 
     /// <inheritdoc />

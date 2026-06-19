@@ -35,5 +35,6 @@ public class RuntimeSettings
     /// assets to be re-fetched, regardless of whether each package bumped its own <c>version</c>. Empty by default,
     /// in which case it has no effect and per-package versioning behaves as normal.
     /// </summary>
+    [DefaultValue("")]
     public string CacheBuster { get; set; } = string.Empty;
 }
