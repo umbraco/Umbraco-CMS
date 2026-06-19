@@ -17,7 +17,11 @@ import {
 	mergeObservables,
 	observeMultiple,
 } from '@umbraco-cms/backoffice/observable-api';
-import { encodeFilePath, UmbReadOnlyVariantGuardManager } from '@umbraco-cms/backoffice/utils';
+import {
+	encodeFilePath,
+	transformServerPathToClientPath,
+	UmbReadOnlyVariantGuardManager,
+} from '@umbraco-cms/backoffice/utils';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import { UmbRoutePathAddendumContext } from '@umbraco-cms/backoffice/router';
@@ -32,6 +36,7 @@ import type {
 	UmbPropertyTypeModel,
 } from '@umbraco-cms/backoffice/content-type';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 
 export abstract class UmbBlockEntryContext<
 	BlockManagerContextTokenType extends UmbContextToken<BlockManagerContextType>,
@@ -51,6 +56,8 @@ export abstract class UmbBlockEntryContext<
 	//
 	protected _manager?: BlockManagerContextType;
 	protected _entries?: BlockEntriesContextType;
+
+	#serverUrl = '';
 
 	#contentKey?: string;
 	#unsupported = new UmbBooleanState(undefined);
@@ -135,6 +142,26 @@ export abstract class UmbBlockEntryContext<
 	public readonly settingsElementTypeKey = this._blockType.asObservablePart((x) =>
 		x ? (x.settingsElementTypeKey ?? undefined) : null,
 	);
+	public readonly thumbnail = this._blockType.asObservablePart((x) => x?.thumbnail);
+
+	/**
+	 * Returns the thumbnail path as stored in the block type configuration.
+	 * Use {@link getThumbnailUrl} to get the resolved, client-usable URL.
+	 * @returns {string | undefined}
+	 */
+	public getThumbnail(): string | undefined {
+		return this._blockType.getValue()?.thumbnail;
+	}
+
+	/**
+	 * Returns the thumbnail as a resolved, client-usable URL.
+	 * Use {@link getThumbnail} to get the raw path instead.
+	 * @returns {{ src: string } | undefined}
+	 */
+	public getThumbnailUrl(): { src: string } | undefined {
+		const rawPath = this.getThumbnail();
+		return rawPath ? { src: new URL(transformServerPathToClientPath(rawPath), this.#serverUrl).href } : undefined;
+	}
 
 	protected _layout = new UmbObjectState<BlockLayoutType | undefined>(undefined);
 	public readonly layout = this._layout.asObservable();
@@ -347,6 +374,10 @@ export abstract class UmbBlockEntryContext<
 			this._entries = entries;
 			this._gotEntries();
 			this.#gotEntries();
+		});
+
+		this.consumeContext(UMB_SERVER_CONTEXT, (instance) => {
+			this.#serverUrl = instance?.getServerUrl() ?? '';
 		});
 
 		// Observe key:
