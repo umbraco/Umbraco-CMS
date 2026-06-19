@@ -74,7 +74,7 @@ export class UmbTreeViewManager extends UmbControllerBase {
 				if (!views.length) {
 					// No treeView manifests registered for this tree — use the built-in classic fallback.
 					new UmbDeprecation({
-						removeInVersion: '19.0.0',
+						removeInVersion: '20.0.0',
 						deprecated: 'Implicit classic tree view fallback',
 						solution:
 							"Register a treeView manifest with `kind: 'classic'` on your tree. The automatic fallback will be removed in Umbraco 19.",
