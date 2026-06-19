@@ -9,7 +9,7 @@ export class UmbElementPickerValueSummaryResolver
 	extends UmbControllerBase
 	implements UmbValueSummaryResolver<Array<string> | undefined, Array<UmbElementItemModel>>
 {
-	#repo = new UmbElementItemRepository(this);
+	readonly #repo = new UmbElementItemRepository(this);
 
 	async resolveValues(
 		values: ReadonlyArray<Array<string> | undefined>,
@@ -18,13 +18,13 @@ export class UmbElementPickerValueSummaryResolver
 		if (!allKeys.length) return { data: values.map(() => []) };
 
 		const { data, asObservable } = await this.#repo.requestItems(allKeys);
-		const items = Array.isArray(data) ? (data as Array<UmbElementItemModel>) : [];
+		const items = Array.isArray(data) ? data : [];
 
 		return {
 			data: this.#map(values, items),
 			asObservable: asObservable
 				? () =>
-						createObservablePart(asObservable()!, (latest) => this.#map(values, latest as Array<UmbElementItemModel>))
+						createObservablePart(asObservable()!, (latest) => this.#map(values, latest))
 				: undefined,
 		};
 	}

@@ -12,8 +12,8 @@ export class UmbElementPickerPropertyEditorValueSummaryElement extends UmbValueS
 	@state()
 	private _names: Array<string> = [];
 
-	#resolvers = new Map<string, UmbElementItemDataResolver<UmbElementItemModel>>();
-	#resolvedNames = new Map<string, string>();
+	readonly #resolvers = new Map<string, UmbElementItemDataResolver<UmbElementItemModel>>();
+	readonly #resolvedNames = new Map<string, string>();
 
 	protected override willUpdate(changedProperties: PropertyValueMap<this>): void {
 		super.willUpdate(changedProperties);
@@ -26,7 +26,7 @@ export class UmbElementPickerPropertyEditorValueSummaryElement extends UmbValueS
 		const value = this._value ?? [];
 
 		for (const unique of this.#resolvers.keys()) {
-			if (!value.find((item) => item.unique === unique)) {
+			if (!value.some((item) => item.unique === unique)) {
 				this.#resolvers.get(unique)?.destroy();
 				this.#resolvers.delete(unique);
 				this.#resolvedNames.delete(unique);
@@ -35,7 +35,9 @@ export class UmbElementPickerPropertyEditorValueSummaryElement extends UmbValueS
 		}
 
 		for (const item of value) {
-			if (!this.#resolvers.has(item.unique)) {
+			if (this.#resolvers.has(item.unique)) {
+				this.#resolvers.get(item.unique)!.setData(item);
+			} else {
 				const resolver = new UmbElementItemDataResolver<UmbElementItemModel>(this);
 				resolver.setData(item);
 				this.#resolvers.set(item.unique, resolver);
@@ -47,8 +49,6 @@ export class UmbElementPickerPropertyEditorValueSummaryElement extends UmbValueS
 					},
 					`element-${item.unique}`,
 				);
-			} else {
-				this.#resolvers.get(item.unique)!.setData(item);
 			}
 		}
 
