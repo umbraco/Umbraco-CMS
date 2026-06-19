@@ -1,5 +1,5 @@
 import type { UmbEntityFlag } from '@umbraco-cms/backoffice/entity-flag';
-import type { UmbPropertyValueDataWithVariant } from '@umbraco-cms/backoffice/property';
+import type { UmbPropertyValueData, UmbPropertyValueDataWithVariant } from '@umbraco-cms/backoffice/property';
 import type { UmbEntityVariantModel } from '@umbraco-cms/backoffice/variant';
 
 export type * from './collection/types.js';
@@ -21,8 +21,10 @@ export interface UmbElementValueModel<ValueType = unknown> extends UmbPropertyVa
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface UmbContentValueModel<ValueType = unknown> extends UmbElementValueModel<ValueType> {}
 
-export interface UmbPotentialContentValueModel<ValueType = unknown> extends UmbPropertyValueDataWithVariant<ValueType> {
+export interface UmbPotentialContentValueModel<ValueType = unknown> extends UmbPropertyValueData<ValueType> {
 	editorAlias?: string;
+	culture?: string | null;
+	segment?: string | null;
 }
 
 export interface UmbContentDetailModel<

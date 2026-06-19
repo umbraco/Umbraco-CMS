@@ -1,9 +1,4 @@
-import type {
-	UmbBlockDataModel,
-	UmbBlockDataValueModel,
-	UmbBlockLabelUfmValueType,
-	UmbBlockLayoutBaseModel,
-} from '../types.js';
+import type { UmbBlockDataModel, UmbBlockDataValueModel, UmbBlockLayoutBaseModel } from '../types.js';
 import { UMB_BLOCK_ENTRIES_CONTEXT, UMB_BLOCK_MANAGER_CONTEXT } from '../context/index.js';
 import { UmbBlockWorkspaceEditorElement } from './block-workspace-editor.element.js';
 import { UmbBlockElementManager } from './block-element-manager.js';
@@ -11,6 +6,7 @@ import type { UmbBlockWorkspaceOriginData } from './block-workspace.modal-token.
 import { UMB_BLOCK_WORKSPACE_VIEW_CONTENT, UMB_BLOCK_WORKSPACE_VIEW_SETTINGS } from './constants.js';
 import { UmbBlockLanguageAccessWorkspaceController } from './block-workspace-language-access.controller.js';
 import { resolveBlockWorkspaceLabelIndex } from './block-workspace-label-index.function.js';
+import { buildBlockLabelValueObject } from './block-workspace-label-value.function.js';
 import {
 	UmbSubmittableWorkspaceContextBase,
 	type UmbRoutableWorkspaceContext,
@@ -291,32 +287,13 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		contentValues: Array<UmbBlockDataValueModel> | undefined,
 		settingsValues: Array<UmbBlockDataValueModel> | undefined,
 	) {
-		const valueObject: UmbBlockLabelUfmValueType = {};
-		if (contentValues) {
-			for (const property of contentValues) {
-				valueObject[property.alias] = property.value;
-			}
-		}
-
-		if (settingsValues) {
-			const settingsObject: Record<string, unknown> = {};
-			for (const property of settingsValues) {
-				settingsObject[property.alias] = property.value;
-			}
-			valueObject['$settings'] = settingsObject;
-		}
-
 		const index = resolveBlockWorkspaceLabelIndex(
 			this.#index,
 			this.#originData,
 			this.#blockEntries?.getLayouts().length,
 		);
 
-		if (index !== undefined) {
-			valueObject['$index'] = index;
-		}
-
-		this.#labelRender.value = valueObject;
+		this.#labelRender.value = buildBlockLabelValueObject(contentValues, settingsValues, index);
 
 		// Await one animation frame:
 		await new Promise((resolve) => requestAnimationFrame(() => resolve(true)));
