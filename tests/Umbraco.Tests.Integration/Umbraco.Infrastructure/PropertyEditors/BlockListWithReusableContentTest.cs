@@ -5,7 +5,6 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.PropertyEditors;
-using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Integration.Attributes;
@@ -920,53 +919,6 @@ internal class BlockListWithReusableContentTest : BlockEditorWithReusableContent
     }
 
     [Test]
-    public async Task Always_Indexes_Shared_Element_Reference()
-    {
-        var elementType = await CreateElementType(ContentVariation.Nothing);
-        var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = await CreateContentType(ContentVariation.Nothing, blockListDataType);
-
-        var reusableElementKey = await CreateAndPublishInvariantReusableElement(elementType.Key);
-
-        var blockListValue = new BlockListValue
-        {
-            Layout = new Dictionary<string, IEnumerable<IBlockLayoutItem>>
-            {
-                {
-                    Constants.PropertyEditors.Aliases.BlockList,
-                    [
-                        new BlockListLayoutItem { ContentKey = reusableElementKey, IsExternalContent = true }
-                    ]
-                },
-            },
-            ContentData = [],
-            SettingsData = [],
-            Expose = [],
-        };
-
-        var content = new ContentBuilder().WithContentType(contentType).WithName("Page").Build();
-        content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
-        ContentService.Save(content);
-        PublishContent(content, ["*"]);
-
-        var editor = blockListDataType.Editor!;
-        var indexValues = editor.PropertyIndexValueFactory.GetIndexValues(
-            content.Properties["blocks"]!,
-            culture: null,
-            segment: null,
-            published: true,
-            availableCultures: ["en-US"],
-            contentTypeDictionary: new Dictionary<Guid, IContentType>
-            {
-                { elementType.Key, elementType }, { contentType.Key, contentType },
-            }).ToList();
-
-        var referenceField = indexValues.SingleOrDefault(v => v.FieldName == $"blocks.items[0].{UmbracoExamineFieldNames.ElementKeyFieldName}");
-        Assert.IsNotNull(referenceField, "Expected a positional __elementKey reference field for the shared element.");
-        Assert.AreEqual(reusableElementKey.ToString(), referenceField!.Values.Single());
-    }
-
-    [Test]
     public async Task Does_Not_Index_Shared_Element_Content_When_Opt_In_Disabled()
     {
         var elementType = await CreateElementType(ContentVariation.Nothing);
@@ -1007,9 +959,6 @@ internal class BlockListWithReusableContentTest : BlockEditorWithReusableContent
             {
                 { elementType.Key, elementType }, { contentType.Key, contentType },
             }).ToList();
-
-        // Reference is always present.
-        Assert.IsTrue(indexValues.Any(v => v.FieldName == $"blocks.items[0].{UmbracoExamineFieldNames.ElementKeyFieldName}"));
 
         // Element content must NOT be indexed when opt-in is disabled.
         var allText = string.Join(

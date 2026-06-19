@@ -162,9 +162,6 @@ internal sealed class RichTextPropertyIndexValueFactory : BlockValuePropertyInde
     protected override IEnumerable<RawDataItem> GetDataItems(RichTextEditorValue input, bool published)
         => GetDataItems(input.Blocks?.GetLayouts() ?? [], input.Blocks?.ContentData ?? [], input.Blocks?.Expose ?? [], published);
 
-    protected override IEnumerable<IBlockLayoutItem> GetLayouts(RichTextEditorValue input)
-        => input.Blocks?.GetLayouts()?.Cast<IBlockLayoutItem>() ?? [];
-
     /// <summary>
     /// Strips HTML tags from content, replacing them with spaces to preserve word boundaries for indexing.
     /// </summary>

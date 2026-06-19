@@ -14,7 +14,6 @@ internal abstract class BlockValuePropertyIndexValueFactoryBase<TSerialized> : J
 {
     private readonly PropertyEditorCollection _propertyEditorCollection;
     private readonly IElementService _elementService;
-    private readonly IJsonSerializer _jsonSerializer;
     private readonly IOptionsMonitor<IndexingSettings> _indexingSettings;
 
     protected BlockValuePropertyIndexValueFactoryBase(
@@ -26,10 +25,10 @@ internal abstract class BlockValuePropertyIndexValueFactoryBase<TSerialized> : J
     {
         _propertyEditorCollection = propertyEditorCollection;
         _elementService = elementService;
-        _jsonSerializer = jsonSerializer;
         _indexingSettings = indexingSettings;
     }
 
+    /// <inheritdoc/>
     protected override IEnumerable<IndexValue> Handle(
         TSerialized deserializedPropertyValue,
         IProperty property,
@@ -44,42 +43,40 @@ internal abstract class BlockValuePropertyIndexValueFactoryBase<TSerialized> : J
         var index = 0;
         foreach (RawDataItem rawData in GetDataItems(deserializedPropertyValue, published))
         {
-            if (contentTypeDictionary.TryGetValue(rawData.ContentTypeKey, out IContentType? contentType) is false)
+            if (contentTypeDictionary.TryGetValue(rawData.ContentTypeKey, out IContentType? contentType))
             {
-                continue;
+                var propertyTypeDictionary =
+                    contentType
+                        .CompositionPropertyTypes
+                        .Select(propertyType =>
+                        {
+                            // We want to ensure that the nested properties are set vary by culture if the parent is
+                            // This is because it's perfectly valid to have a nested property type that's set to invariant even if the parent varies.
+                            // For instance in a block list, the list it self can vary, but the elements can be invariant, at the same time.
+                            if (culture is not null)
+                            {
+                                propertyType.Variations |= ContentVariation.Culture;
+                            }
+
+                            if (segment is not null)
+                            {
+                                propertyType.Variations |= ContentVariation.Segment;
+                            }
+
+                            return propertyType;
+                        })
+                        .ToDictionary(x => x.Alias);
+
+                result.AddRange(GetNestedResults(
+                    $"{property.Alias}.items[{index}]",
+                    culture,
+                    segment,
+                    published,
+                    propertyTypeDictionary,
+                    rawData,
+                    availableCultures,
+                    contentTypeDictionary));
             }
-
-            var propertyTypeDictionary =
-                contentType
-                    .CompositionPropertyTypes
-                    .Select(propertyType =>
-                    {
-                        // We want to ensure that the nested properties are set vary by culture if the parent is
-                        // This is because it's perfectly valid to have a nested property type that's set to invariant even if the parent varies.
-                        // For instance in a block list, the list it self can vary, but the elements can be invariant, at the same time.
-                        if (culture is not null)
-                        {
-                            propertyType.Variations |= ContentVariation.Culture;
-                        }
-
-                        if (segment is not null)
-                        {
-                            propertyType.Variations |= ContentVariation.Segment;
-                        }
-
-                        return propertyType;
-                    })
-                    .ToDictionary(x => x.Alias);
-
-            result.AddRange(GetNestedResults(
-                $"{property.Alias}.items[{index}]",
-                culture,
-                segment,
-                published,
-                propertyTypeDictionary,
-                rawData,
-                availableCultures,
-                contentTypeDictionary));
 
             index++;
         }
@@ -112,139 +109,74 @@ internal abstract class BlockValuePropertyIndexValueFactoryBase<TSerialized> : J
     protected abstract IEnumerable<RawDataItem> GetDataItems(TSerialized input, bool published);
 
     /// <summary>
-    /// Gets the layout items of a block value.
+    /// Unwraps block item data as data items, in layout order.
     /// </summary>
-    protected abstract IEnumerable<IBlockLayoutItem> GetLayouts(TSerialized input);
-
-    /// <inheritdoc />
-    public override IEnumerable<IndexValue> GetIndexValues(
-        IProperty property,
-        string? culture,
-        string? segment,
-        bool published,
-        IEnumerable<string> availableCultures,
-        IDictionary<Guid, IContentType> contentTypeDictionary)
+    protected IEnumerable<RawDataItem> GetDataItems(IEnumerable<IBlockLayoutItem> layouts, IList<BlockItemData> contentData, IList<BlockItemVariation> expose, bool published)
     {
-        var result = base
-            .GetIndexValues(property, culture, segment, published, availableCultures, contentTypeDictionary)
-            .ToList();
+        IBlockLayoutItem[] layoutsAsArray = layouts as IBlockLayoutItem[] ?? layouts.ToArray();
 
-        result.AddRange(GetSharedElementReferenceIndexValues(property, culture, segment, published));
-
-        return result;
-    }
-
-    private IEnumerable<IndexValue> GetSharedElementReferenceIndexValues(
-        IProperty property,
-        string? culture,
-        string? segment,
-        bool published)
-    {
-        if (property.GetValue(culture, segment, published) is not string rawValue || rawValue.DetectIsJson() is false)
-        {
-            return [];
-        }
-
-        TSerialized? deserialized;
-        try
-        {
-            deserialized = _jsonSerializer.Deserialize<TSerialized>(rawValue);
-        }
-        catch (InvalidCastException)
-        {
-            return [];
-        }
-        catch (ArgumentException)
-        {
-            return [];
-        }
-
-        if (deserialized is null)
-        {
-            return [];
-        }
-
-        IBlockLayoutItem[] layouts = GetLayouts(deserialized).ToArray();
-        IBlockLayoutItem[] allLayouts = layouts
-            .Union(layouts.SelectMany(l => l.GetContainedLayouts()))
+        // NOTE: While the Grid areas are modeled to contain areas within areas, in reality it cannot be configured as
+        //       such, so this "top-level aggregation" of layout items works in effect.
+        IBlockLayoutItem[] allLayouts = layoutsAsArray
+            .Union(layoutsAsArray.SelectMany(l => l.GetContainedLayouts()))
             .ToArray();
 
-        var result = new List<IndexValue>();
-        for (var index = 0; index < allLayouts.Length; index++)
+        var contentDataByKey = contentData.ToDictionary(d => d.Key);
+
+        Dictionary<Guid, RawDataItem>? externalDataByKey = _indexingSettings.CurrentValue.IndexExternalElements ? GetExternalElementDataItems(allLayouts, published) : null;
+        foreach (IBlockLayoutItem layout in allLayouts)
         {
-            IBlockLayoutItem layout = allLayouts[index];
-            if (layout.IsExternalContent is false)
+            if (layout.IsExternalContent)
+            {
+                if (externalDataByKey?.TryGetValue(layout.ContentKey, out RawDataItem? elementData) == true)
+                {
+                    yield return elementData;
+                }
+
+                continue;
+            }
+
+            if (!contentDataByKey.TryGetValue(layout.ContentKey, out BlockItemData? blockItemData))
             {
                 continue;
             }
 
-            result.Add(
-                new IndexValue
-                {
-                    Culture = culture,
-                    FieldName = $"{property.Alias}.items[{index}].{UmbracoExamineFieldNames.ElementKeyFieldName}",
-                    Values = [layout.ContentKey.ToString()],
-                });
-        }
+            if (published is false)
+            {
+                yield return ToRawData(blockItemData);
+                continue;
+            }
 
-        return result;
+            var exposedCultures = expose
+                .Where(e => e.ContentKey == blockItemData.Key)
+                .Select(e => e.Culture)
+                .ToArray();
+
+            if (exposedCultures.Any() is false)
+            {
+                continue;
+            }
+
+            if (exposedCultures.Contains(null)
+                || exposedCultures.ContainsAll(blockItemData.Values.Select(v => v.Culture)))
+            {
+                yield return ToRawData(blockItemData);
+                continue;
+            }
+
+            yield return ToRawData(
+                blockItemData.ContentTypeKey,
+                blockItemData.Values.Where(value => value.Culture is null || exposedCultures.Contains(value.Culture)));
+        }
     }
 
-    /// <summary>
-    /// Unwraps block item data as data items.
-    /// </summary>
-    protected IEnumerable<RawDataItem> GetDataItems(IEnumerable<IBlockLayoutItem> layouts, IList<BlockItemData> contentData, IList<BlockItemVariation> expose, bool published)
+    private Dictionary<Guid, RawDataItem> GetExternalElementDataItems(IBlockLayoutItem[] allLayouts, bool published)
     {
-        List<RawDataItem> indexData;
-        if (published is false)
-        {
-            indexData = contentData.Select(ToRawData).ToList();
-        }
-        else
-        {
-            indexData = new();
-            foreach (BlockItemData blockItemData in contentData)
-            {
-                var exposedCultures = expose
-                    .Where(e => e.ContentKey == blockItemData.Key)
-                    .Select(e => e.Culture)
-                    .ToArray();
-
-                if (exposedCultures.Any() is false)
-                {
-                    continue;
-                }
-
-                if (exposedCultures.Contains(null)
-                    || exposedCultures.ContainsAll(blockItemData.Values.Select(v => v.Culture)))
-                {
-                    indexData.Add(ToRawData(blockItemData));
-                    continue;
-                }
-
-                indexData.Add(
-                    ToRawData(
-                        blockItemData.ContentTypeKey,
-                        blockItemData.Values.Where(value => value.Culture is null || exposedCultures.Contains(value.Culture))));
-            }
-        }
-
-        IBlockLayoutItem[] layoutsAsArray = layouts as IBlockLayoutItem[] ?? layouts.ToArray();
-
-        // Get the shared element keys from all layouts.
-        // NOTE: While the Grid areas are modeled to contain areas within areas, in reality it cannot be configured as
-        //       such, so this "top-level aggregation" of shared content keys works in effect.
-        Guid[] sharedElementKeys = layoutsAsArray
-            .Union(layoutsAsArray.SelectMany(l => l.GetContainedLayouts()))
-            .Where(l => l.IsExternalContent)
-            .Select(l => l.ContentKey)
-            .ToArray();
-
-        if (sharedElementKeys.Length > 0 && _indexingSettings.CurrentValue.IndexExternalElements)
-        {
-            IEnumerable<IElement> elements = _elementService.GetByIds(sharedElementKeys);
-            indexData.AddRange(
-                elements.Select(element => new RawDataItem
+        Guid[] externalKeys = allLayouts.Where(l => l.IsExternalContent).Select(l => l.ContentKey).ToArray();
+        return _elementService.GetByIds(externalKeys)
+            .ToDictionary(
+                element => element.Key,
+                element => new RawDataItem
                 {
                     ContentTypeKey = element.ContentType.Key,
                     Properties = element
@@ -260,10 +192,7 @@ internal abstract class BlockValuePropertyIndexValueFactoryBase<TSerialized> : J
                                     : value.EditedValue,
                             }))
                         .ToArray(),
-                }));
-        }
-
-        return indexData;
+                });
     }
 
     /// <summary>

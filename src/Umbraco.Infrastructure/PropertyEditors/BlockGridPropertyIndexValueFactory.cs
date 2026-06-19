@@ -20,7 +20,4 @@ internal sealed class BlockGridPropertyIndexValueFactory
 
     protected override IEnumerable<RawDataItem> GetDataItems(BlockGridValue input, bool published)
         => GetDataItems(input.GetLayouts() ?? [], input.ContentData, input.Expose, published);
-
-    protected override IEnumerable<IBlockLayoutItem> GetLayouts(BlockGridValue input)
-        => input.GetLayouts() ?? [];
 }

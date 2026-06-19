@@ -24,11 +24,6 @@ public static class UmbracoExamineFieldNames
 
     public const string VariesByCultureFieldName = ExamineFieldNames.SpecialFieldPrefix + "VariesByCulture";
 
-    /// <summary>
-    ///     The sub-field, emitted per shared-element block layout slot, holding the referenced element key (GUID).
-    /// </summary>
-    public const string ElementKeyFieldName = ExamineFieldNames.SpecialFieldPrefix + "elementKey";
-
     public const string NodeNameFieldName = "nodeName";
     public const string ItemIdFieldName = "__NodeId";
     public const string CategoryFieldName = "__IndexType";
