@@ -98,7 +98,7 @@ export default defineConfig({
     // Unauthenticated: this exercises the login screen itself (a late-registered auth provider).
     {
       name: 'authProviderLateRegistration',
-      testMatch: 'AuthProviderLateRegistration/**',
+      testMatch: 'AuthProviderLateRegistration/**/*.spec.ts',
       use: {
         ...devices['Desktop Chrome'],
         ignoreHTTPSErrors: true,
