@@ -125,7 +125,9 @@ internal abstract class BlockValuePropertyIndexValueFactoryBase<TSerialized> : J
 
         var contentDataByKey = contentData.ToDictionary(d => d.Key);
 
-        Dictionary<Guid, RawDataItem>? externalDataByKey = _indexingSettings.CurrentValue.IndexExternalElements ? GetExternalElementDataItems(allLayouts, published) : null;
+        Dictionary<Guid, RawDataItem>? externalDataByKey = _indexingSettings.CurrentValue.IndexExternalElements
+            ? GetExternalElementDataItems(allLayouts, published)
+            : null;
         foreach (IBlockLayoutItem layout in allLayouts)
         {
             if (layout.IsExternalContent)

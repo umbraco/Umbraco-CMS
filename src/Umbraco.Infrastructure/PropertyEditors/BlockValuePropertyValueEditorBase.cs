@@ -131,15 +131,14 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
             }
         }
 
-        IBlockLayoutItem[] allLayoutItems = blockValue.Layout.Values
+        IEnumerable<IBlockLayoutItem> allExternalLayoutItems = blockValue.Layout.Values
             .SelectMany(layouts => layouts)
-            .ToArray();
-        foreach (IBlockLayoutItem layout in allLayoutItems.Union(allLayoutItems.SelectMany(l => l.GetContainedLayouts())))
+            .Union(blockValue.Layout.Values.SelectMany(layouts => layouts.SelectMany(l => l.GetContainedLayouts())))
+            .Where(l => l.IsExternalContent);
+
+        foreach (IBlockLayoutItem layout in allExternalLayoutItems)
         {
-            if (layout.IsExternalContent)
-            {
-                result.Add(new UmbracoEntityReference(new GuidUdi(Constants.UdiEntityType.Element, layout.ContentKey)));
-            }
+            result.Add(new UmbracoEntityReference(new GuidUdi(Constants.UdiEntityType.Element, layout.ContentKey)));
         }
 
         return result;
