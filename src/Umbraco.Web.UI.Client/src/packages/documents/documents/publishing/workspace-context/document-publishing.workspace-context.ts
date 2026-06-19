@@ -369,27 +369,38 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 		await this.#documentWorkspaceContext.runMandatoryValidationForSaveData(saveData, variantIds);
 		await this.#documentWorkspaceContext.askServerToValidate(saveData, variantIds);
 
-		return this.#documentWorkspaceContext.validateVariantsAndSubmit(
-			variantIds,
-			async () => {
-				return this.#performSaveAndPublish(variantIds, saveData);
-			},
-			async (reason?: any) => {
-				// If data of the selection is not valid Then just save:
-				await this.#documentWorkspaceContext!.performCreateOrUpdate(variantIds, saveData);
-				// Notifying that the save was successful, but we did not publish, which is what we want to symbolize here. [NL]
-				const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
+		return this.#documentWorkspaceContext
+			.validateVariantsAndSubmit(
+				variantIds,
+				() => {
+					return this.#performSaveAndPublish(variantIds, saveData);
+				},
+				async (reason?: any) => {
+					// If data of the selection is not valid Then just save:
+					await this.#documentWorkspaceContext!.performCreateOrUpdate(variantIds, saveData);
+					// Notifying that the save was successful, but we did not publish, which is what we want to symbolize here. [NL]
+					const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
+					if (!notificationContext) {
+						throw new Error('Notification context is missing');
+					}
+					// TODO: Get rid of the save notification.
+					notificationContext.peek('danger', {
+						data: { message: this.#localize.term('speechBubbles_editContentPublishedFailedByValidation') },
+					});
+					// Reject even thought the save was successful, but we did not publish, which is what we want to symbolize here. [NL]
+					return await Promise.reject(reason);
+				},
+			)
+			.catch((error) => {
+				const notificationContext = this.#notificationContext;
 				if (!notificationContext) {
 					throw new Error('Notification context is missing');
 				}
-				// TODO: Get rid of the save notification.
 				notificationContext.peek('danger', {
-					data: { message: this.#localize.term('speechBubbles_editContentPublishedFailedByValidation') },
+					data: { message: this.#localize.term('speechBubbles_editContentPublishedFailed') },
 				});
-				// Reject even thought the save was successful, but we did not publish, which is what we want to symbolize here. [NL]
-				return await Promise.reject(reason);
-			},
-		);
+				return Promise.reject(error);
+			});
 	}
 
 	async #performSaveAndPublish(variantIds: Array<UmbVariantId>, saveData: UmbDocumentDetailModel): Promise<void> {
@@ -405,12 +416,12 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 		await this.#documentWorkspaceContext.performCreateOrUpdate(variantIds, saveData, {
 			create: async (data, ids, parent) => {
 				const { error } = await this.#publishingRepository.createAndPublish(data, ids, parent.unique);
-				if (error) throw new Error('Error creating and publishing document');
+				if (error) throw new Error('Error creating and publishing document', { cause: error });
 				return this.#documentWorkspaceContext!.loadWithoutPersist();
 			},
 			update: async (data, ids) => {
 				const { error } = await this.#publishingRepository.updateAndPublish(data, ids);
-				if (error) throw new Error('Error updating and publishing document');
+				if (error) throw new Error('Error updating and publishing document', { cause: error });
 				return this.#documentWorkspaceContext!.loadWithoutPersist();
 			},
 		});
