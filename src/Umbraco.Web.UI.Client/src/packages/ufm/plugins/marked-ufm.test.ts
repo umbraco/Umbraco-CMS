@@ -2,6 +2,7 @@ import { expect } from '@open-wc/testing';
 import { ufm } from './marked-ufm.plugin.js';
 import { UmbMarked } from '../contexts/ufm.context.js';
 import { UmbUfmContentNameComponent } from '../components/content-name/content-name.component.js';
+import { UmbUfmElementNameComponent } from '../components/element-name/element-name.component.js';
 import { UmbUfmLabelValueComponent } from '../components/label-value/label-value.component.js';
 import { UmbUfmLocalizeComponent } from '../components/localize/localize.component.js';
 
@@ -26,12 +27,18 @@ describe('UmbMarkedUfm', () => {
 				ufm: '{umbContentName: contentPicker}',
 				expected: '<ufm-content-name alias="contentPicker"></ufm-content-name>',
 			},
+			{ ufm: '{umbElementName:elementPicker}', expected: '<ufm-element-name alias="elementPicker"></ufm-element-name>' },
+			{
+				ufm: '{ umbElementName: elementPicker }',
+				expected: '<ufm-element-name alias="elementPicker"></ufm-element-name>',
+			},
 		];
 
 		// Manually configuring the UFM components for testing.
 		UmbMarked.use(
 			ufm([
 				{ alias: 'umbContentName', marker: '~', render: new UmbUfmContentNameComponent().render },
+				{ alias: 'umbElementName', render: new UmbUfmElementNameComponent().render },
 				{ alias: 'umbValue', marker: '=', render: new UmbUfmLabelValueComponent().render },
 				{ alias: 'umbLocalize', marker: '#', render: new UmbUfmLocalizeComponent().render },
 			]),
