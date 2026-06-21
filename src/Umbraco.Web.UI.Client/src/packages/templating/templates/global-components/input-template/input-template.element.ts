@@ -24,7 +24,7 @@ export class UmbInputTemplateElement extends UUIFormControlWithBasicsMixin(UmbLi
 
 	/**
 	 * Min validation message.
-	 * @type {boolean}
+	 * @type {string}
 	 * @attr
 	 * @default
 	 */
@@ -42,7 +42,7 @@ export class UmbInputTemplateElement extends UUIFormControlWithBasicsMixin(UmbLi
 
 	/**
 	 * Max validation message.
-	 * @type {boolean}
+	 * @type {string}
 	 * @attr
 	 * @default
 	 */
