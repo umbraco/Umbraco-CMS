@@ -95,7 +95,7 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 
 	/**
 	 * Max validation message.
-	 * @type {boolean}
+	 * @type {string}
 	 * @attr
 	 * @default
 	 */
