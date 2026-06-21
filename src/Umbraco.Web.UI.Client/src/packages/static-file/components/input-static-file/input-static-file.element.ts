@@ -31,7 +31,7 @@ export class UmbInputStaticFileElement extends UmbFormControlMixin<string | unde
 
 	/**
 	 * Min validation message.
-	 * @type {boolean}
+	 * @type {string}
 	 * @attr
 	 * @default
 	 */
@@ -54,7 +54,7 @@ export class UmbInputStaticFileElement extends UmbFormControlMixin<string | unde
 
 	/**
 	 * Max validation message.
-	 * @type {boolean}
+	 * @type {string}
 	 * @attr
 	 * @default
 	 */
