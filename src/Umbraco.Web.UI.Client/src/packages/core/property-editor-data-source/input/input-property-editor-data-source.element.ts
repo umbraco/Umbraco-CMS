@@ -66,7 +66,7 @@ export class UmbInputPropertyEditorDataSourceElement extends UUIFormControlWithB
 
 	/**
 	 * Max validation message.
-	 * @type {boolean}
+	 * @type {string}
 	 * @attr
 	 * @default
 	 */
