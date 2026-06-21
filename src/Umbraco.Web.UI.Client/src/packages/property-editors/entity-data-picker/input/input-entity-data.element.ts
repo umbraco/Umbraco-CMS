@@ -99,7 +99,7 @@ export class UmbInputEntityDataElement extends UmbFormControlMixin<string | unde
 
 	/**
 	 * Max validation message.
-	 * @type {boolean}
+	 * @type {string}
 	 * @attr
 	 * @default
 	 */
