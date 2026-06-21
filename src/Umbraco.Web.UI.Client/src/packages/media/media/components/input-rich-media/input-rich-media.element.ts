@@ -77,7 +77,7 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 
 	/**
 	 * Min validation message.
-	 * @type {boolean}
+	 * @type {string}
 	 * @attr
 	 * @default
 	 */
@@ -95,7 +95,7 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 
 	/**
 	 * Max validation message.
-	 * @type {boolean}
+	 * @type {string}
 	 * @attr
 	 * @default
 	 */
