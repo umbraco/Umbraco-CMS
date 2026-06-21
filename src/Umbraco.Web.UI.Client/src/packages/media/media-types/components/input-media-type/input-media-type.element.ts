@@ -49,7 +49,7 @@ export class UmbInputMediaTypeElement extends UmbFormControlMixin<string | undef
 
 	/**
 	 * Min validation message.
-	 * @type {boolean}
+	 * @type {string}
 	 * @attr
 	 * @default
 	 */
@@ -72,7 +72,7 @@ export class UmbInputMediaTypeElement extends UmbFormControlMixin<string | undef
 
 	/**
 	 * Max validation message.
-	 * @type {boolean}
+	 * @type {string}
 	 * @attr
 	 * @default
 	 */
