@@ -71,7 +71,7 @@ export class UmbInputMemberGroupElement extends UmbFormControlMixin<string, type
 
 	/**
 	 * Max validation message.
-	 * @type {boolean}
+	 * @type {string}
 	 * @attr
 	 * @default
 	 */
