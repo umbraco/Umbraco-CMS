@@ -25,7 +25,7 @@ export class UmbInputSectionElement extends UmbFormControlMixin<string | undefin
 
 	/**
 	 * Min validation message.
-	 * @type {boolean}
+	 * @type {string}
 	 * @attr
 	 * @default
 	 */
@@ -48,7 +48,7 @@ export class UmbInputSectionElement extends UmbFormControlMixin<string | undefin
 
 	/**
 	 * Max validation message.
-	 * @type {boolean}
+	 * @type {string}
 	 * @attr
 	 * @default
 	 */
