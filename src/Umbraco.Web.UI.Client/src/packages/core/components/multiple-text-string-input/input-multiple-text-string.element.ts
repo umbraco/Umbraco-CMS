@@ -43,7 +43,7 @@ export class UmbInputMultipleTextStringElement extends UmbFormControlMixin<undef
 
 	/**
 	 * Min validation message.
-	 * @type {boolean}
+	 * @type {string}
 	 * @attr
 	 * @default
 	 */
@@ -61,7 +61,7 @@ export class UmbInputMultipleTextStringElement extends UmbFormControlMixin<undef
 
 	/**
 	 * Max validation message.
-	 * @type {boolean}
+	 * @type {string}
 	 * @attr
 	 * @default
 	 */
