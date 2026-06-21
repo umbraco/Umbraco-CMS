@@ -42,7 +42,7 @@ export class UmbMultipleColorPickerInputElement extends UUIFormControlWithBasics
 
 	/**
 	 * Min validation message.
-	 * @type {boolean}
+	 * @type {string}
 	 * @attr
 	 * @default
 	 */
@@ -60,7 +60,7 @@ export class UmbMultipleColorPickerInputElement extends UUIFormControlWithBasics
 
 	/**
 	 * Max validation message.
-	 * @type {boolean}
+	 * @type {string}
 	 * @attr
 	 * @default
 	 */
