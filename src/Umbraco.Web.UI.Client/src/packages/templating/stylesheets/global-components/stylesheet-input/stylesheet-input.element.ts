@@ -46,7 +46,7 @@ export class UmbStylesheetInputElement extends UUIFormControlWithBasicsMixin(Umb
 
 	/**
 	 * Max validation message.
-	 * @type {boolean}
+	 * @type {string}
 	 * @attr
 	 * @default
 	 */
