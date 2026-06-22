@@ -223,7 +223,7 @@ internal sealed class RedirectTracker : IRedirectTracker
     }
 
     private int GetNodeIdWithAssignedDomain(IPublishedContent entityContent) =>
-        entityContent.Path.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).Reverse()
+        entityContent.Path.GetIdsFromPathReversed()
             .FirstOrDefault(x => _domainCache.HasAssigned(x, includeWildcards: true));
 
     private string GetUrl(Guid contentKey, string languageIsoCode) =>
@@ -309,7 +309,7 @@ internal sealed class RedirectTracker : IRedirectTracker
                 // to the original. We resolve this by removing any existing redirect that points to the new route.
                 RemoveSelfReferencingRedirect(contentKey, newRoute);
 
-                _redirectUrlService.Register(oldRoute, contentKey, culture);
+                _redirectUrlService.RegisterWithStatus(oldRoute, contentKey, culture);
             }
             catch (Exception ex)
             {
@@ -341,7 +341,7 @@ internal sealed class RedirectTracker : IRedirectTracker
         {
             if (redirectUrl.Url == route)
             {
-                _redirectUrlService.Delete(redirectUrl.Key);
+                _redirectUrlService.DeleteWithStatus(redirectUrl.Key);
             }
         }
     }

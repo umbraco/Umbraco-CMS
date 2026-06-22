@@ -1,15 +1,15 @@
 import type { UmbContentPickerDynamicRoot, UmbContentPickerSourceType } from '../../types.js';
 import type { UmbInputContentPickerDocumentRootElement } from '../../dynamic-root/components/input-content-picker-document-root.element.js';
 import { html, customElement, property, css, state, nothing } from '@umbraco-cms/backoffice/external/lit';
-import type { UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
-import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import type { UUISelectEvent, UUISelectOption } from '@umbraco-cms/backoffice/external/uui';
+import { UUIFormControlWithBasicsMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 import '../../dynamic-root/components/input-content-picker-document-root.element.js';
 
 @customElement('umb-input-content-picker-source')
-export class UmbInputContentPickerSourceElement extends UUIFormControlMixin(UmbLitElement, '') {
+export class UmbInputContentPickerSourceElement extends UUIFormControlWithBasicsMixin(UmbLitElement, '') {
 	protected override getFormElement() {
 		return undefined;
 	}
@@ -43,7 +43,7 @@ export class UmbInputContentPickerSourceElement extends UUIFormControlMixin(UmbL
 	dynamicRoot?: UmbContentPickerDynamicRoot;
 
 	@state()
-	private _options: Array<Option> = [
+	private _options: Array<UUISelectOption> = [
 		{ value: 'content', name: 'Content' },
 		{ value: 'media', name: 'Media' },
 		{ value: 'member', name: 'Members' },

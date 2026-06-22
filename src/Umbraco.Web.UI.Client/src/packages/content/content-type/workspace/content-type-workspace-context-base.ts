@@ -92,7 +92,7 @@ export abstract class UmbContentTypeWorkspaceContextBase<
 		let { data } = await request;
 
 		if (data) {
-			data = await this._scaffoldProcessData(data);
+			data = await this._processIncomingData(data);
 
 			if (this.modalContext) {
 				// Notice if the preset comes with values, they will overwrite the scaffolded values... [NL]

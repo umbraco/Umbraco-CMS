@@ -1,0 +1,240 @@
+using System.ComponentModel.DataAnnotations;
+using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Editors;
+using Umbraco.Cms.Core.Models.Validation;
+using Umbraco.Cms.Core.PropertyEditors.Validation;
+using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Strings;
+using Umbraco.Extensions;
+
+namespace Umbraco.Cms.Core.PropertyEditors;
+
+/// <summary>
+///     Element picker property editor that stores element keys.
+/// </summary>
+[DataEditor(
+    Constants.PropertyEditors.Aliases.ElementPicker,
+    ValueType = ValueTypes.Json,
+    ValueEditorIsReusable = true)]
+public class ElementPickerPropertyEditor : DataEditor
+{
+    private readonly IIOHelper _ioHelper;
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="ElementPickerPropertyEditor" /> class.
+    /// </summary>
+    /// <param name="dataValueEditorFactory">The data value editor factory.</param>
+    /// <param name="ioHelper">The IO helper.</param>
+    public ElementPickerPropertyEditor(IDataValueEditorFactory dataValueEditorFactory, IIOHelper ioHelper)
+        : base(dataValueEditorFactory)
+    {
+        _ioHelper = ioHelper;
+        SupportsReadOnly = true;
+    }
+
+    /// <inheritdoc />
+    protected override IConfigurationEditor CreateConfigurationEditor() =>
+        new ElementPickerConfigurationEditor(_ioHelper);
+
+    /// <inheritdoc/>
+    protected override IDataValueEditor CreateValueEditor() =>
+        DataValueEditorFactory.Create<ElementPickerPropertyValueEditor>(Attribute!);
+
+    /// <summary>
+    ///     Provides the value editor for the element picker property editor.
+    /// </summary>
+    internal sealed class ElementPickerPropertyValueEditor : DataValueEditor, IDataValueReference
+    {
+        private readonly IJsonSerializer _jsonSerializer;
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="ElementPickerPropertyValueEditor" /> class.
+        /// </summary>
+        /// <param name="shortStringHelper">The short string helper.</param>
+        /// <param name="jsonSerializer">The JSON serializer.</param>
+        /// <param name="ioHelper">The IO helper.</param>
+        /// <param name="attribute">The data editor attribute.</param>
+        /// <param name="localizedTextService">The localized text service.</param>
+        /// <param name="elementService">The element service.</param>
+        /// <param name="coreScopeProvider">The core scope provider.</param>
+        public ElementPickerPropertyValueEditor(
+            IShortStringHelper shortStringHelper,
+            IJsonSerializer jsonSerializer,
+            IIOHelper ioHelper,
+            DataEditorAttribute attribute,
+            ILocalizedTextService localizedTextService,
+            IElementService elementService,
+            ICoreScopeProvider coreScopeProvider)
+            : base(shortStringHelper, jsonSerializer, ioHelper, attribute)
+        {
+            _jsonSerializer = jsonSerializer;
+            Validators.Add(new TypedValidatorRunner<List<string>, ElementPickerConfiguration>(
+                new MinMaxValidator(localizedTextService),
+                new AllowedTypeValidator(localizedTextService, elementService, coreScopeProvider)));
+        }
+
+        /// <inheritdoc/>
+        public IEnumerable<UmbracoEntityReference> GetReferences(object? value)
+        {
+            var asString = value as string ?? value?.ToString();
+            if (string.IsNullOrEmpty(asString))
+            {
+                yield break;
+            }
+
+            IEnumerable<Guid>? elementIds = _jsonSerializer.Deserialize<IEnumerable<Guid>>(asString);
+            if (elementIds is null)
+            {
+                yield break;
+            }
+
+            foreach (Guid elementId in elementIds)
+            {
+                yield return new UmbracoEntityReference(Udi.Create(Constants.UdiEntityType.Element, elementId));
+            }
+        }
+    }
+
+    /// <summary>
+    /// Validator to ensure that the number of selected elements is within the configured min/max limits, if any.
+    /// </summary>
+    internal sealed class MinMaxValidator : ITypedValidator<List<string>, ElementPickerConfiguration>
+    {
+        private readonly ILocalizedTextService _localizedTextService;
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="MinMaxValidator" /> class.
+        /// </summary>
+        /// <param name="localizedTextService">The localized text service.</param>
+        public MinMaxValidator(ILocalizedTextService localizedTextService)
+            => _localizedTextService = localizedTextService;
+
+        /// <inheritdoc/>
+        public IEnumerable<ValidationResult> Validate(
+            List<string>? value,
+            ElementPickerConfiguration? configuration,
+            string? valueType,
+            PropertyValidationContext validationContext)
+        {
+            var validationResults = new List<ValidationResult>();
+
+            if (configuration is null || configuration.ValidationLimit is null)
+            {
+                return validationResults;
+            }
+
+            if (configuration.ValidationLimit.Min is int min and > 0 && (value is null || value.Count < min))
+            {
+                validationResults.Add(new ValidationResult(
+                    _localizedTextService.Localize(
+                        "validation",
+                        "entriesShort",
+                        [min.ToString(), (min - (value?.Count ?? 0)).ToString()]),
+                    ["value"]));
+            }
+
+            if (value is null)
+            {
+                return validationResults;
+            }
+
+            if (configuration.ValidationLimit.Max is int max and > 0 && value.Count > max)
+            {
+                validationResults.Add(new ValidationResult(
+                    _localizedTextService.Localize(
+                        "validation",
+                        "entriesExceed",
+                        [max.ToString(), (value.Count - max).ToString()]),
+                    ["value"]));
+            }
+
+            return validationResults;
+        }
+    }
+
+    /// <summary>
+    /// Validator to ensure that all selected elements are of an allowed content type, if any are configured.
+    /// </summary>
+    internal sealed class AllowedTypeValidator : ITypedValidator<List<string>, ElementPickerConfiguration>
+    {
+        private readonly ILocalizedTextService _localizedTextService;
+        private readonly IElementService _elementService;
+        private readonly ICoreScopeProvider _coreScopeProvider;
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="AllowedTypeValidator" /> class.
+        /// </summary>
+        /// <param name="localizedTextService">The localized text service.</param>
+        /// <param name="elementService">The element service.</param>
+        /// <param name="coreScopeProvider">The core scope provider.</param>
+        public AllowedTypeValidator(
+            ILocalizedTextService localizedTextService,
+            IElementService elementService,
+            ICoreScopeProvider coreScopeProvider)
+        {
+            _localizedTextService = localizedTextService;
+            _elementService = elementService;
+            _coreScopeProvider = coreScopeProvider;
+        }
+
+        /// <inheritdoc/>
+        public IEnumerable<ValidationResult> Validate(
+            List<string>? value,
+            ElementPickerConfiguration? configuration,
+            string? valueType,
+            PropertyValidationContext validationContext)
+        {
+            if (value is null || value.Count == 0 || configuration is null)
+            {
+                return [];
+            }
+
+            HashSet<Guid> allowedContentTypeKeys = AllowedContentTypeKeysParser.Parse(configuration.AllowedContentTypeIds);
+
+            // No filter configured — all element types are allowed.
+            if (allowedContentTypeKeys.Count == 0)
+            {
+                return [];
+            }
+
+            Guid[] elementIds = value
+                .Where(v => Guid.TryParse(v, out _))
+                .Select(Guid.Parse)
+                .Distinct()
+                .ToArray();
+
+            using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+            IElement[] elements = _elementService.GetByIds(elementIds).ToArray();
+            scope.Complete();
+
+            // Compare against the distinct requested keys (not the raw value count, which may include
+            // duplicates or non-GUID entries) so existing elements aren't incorrectly reported as missing.
+            if (elements.Length != elementIds.Length)
+            {
+                return [
+                    new ValidationResult(
+                        _localizedTextService.Localize("validation", "missingContent"),
+                        ["value"])
+                ];
+            }
+
+            foreach (IElement element in elements)
+            {
+                if (allowedContentTypeKeys.Contains(element.ContentType.Key) is false)
+                {
+                    return
+                    [
+                        new ValidationResult(
+                            _localizedTextService.Localize("validation", "invalidObjectType"),
+                            ["value"])
+                    ];
+                }
+            }
+
+            return [];
+        }
+    }
+}

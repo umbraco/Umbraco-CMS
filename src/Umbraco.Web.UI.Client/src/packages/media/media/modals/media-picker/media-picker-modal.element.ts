@@ -206,8 +206,7 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 				entityType: this._currentMediaEntity.entityType,
 			},
 			dataType: this.#dataType,
-			skip,
-			take,
+			paging: { skip, take },
 		});
 
 		this._currentChildren = data?.items ?? [];
@@ -739,7 +738,6 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 			}
 
 			uui-pagination {
-				display: block;
 				margin-top: var(--uui-size-layout-1);
 			}
 

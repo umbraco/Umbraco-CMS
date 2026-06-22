@@ -6,7 +6,9 @@ import type {
 	UnpublishDocumentRequestModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { DocumentVariantResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+
+type UmbDocumentVariantState = DocumentVariantResponseModel['state'];
 
 export class UmbMockDocumentPublishingManager {
 	#documentDb: UmbDocumentMockDB;
@@ -43,7 +45,7 @@ export class UmbMockDocumentPublishingManager {
 
 			const variant = document.variants.find((x) => x.culture === culture.culture);
 			if (variant) {
-				variant.state = DocumentVariantStateModel.PUBLISHED;
+				variant.state = 'Published' as UmbDocumentVariantState;
 				variant.scheduledPublishDate = publishTime;
 				variant.scheduledUnpublishDate = unpublishTime;
 				variant.updateDate = new Date().toISOString();
@@ -64,9 +66,9 @@ export class UmbMockDocumentPublishingManager {
 					const variant = document.variants.find((x) => x.culture === culture);
 					if (
 						variant &&
-						(data.includeUnpublishedDescendants || variant.state !== DocumentVariantStateModel.PUBLISHED)
+						(data.includeUnpublishedDescendants || variant.state !== 'Published')
 					) {
-						variant.state = DocumentVariantStateModel.PUBLISHED;
+						variant.state = 'Published' as UmbDocumentVariantState;
 						variant.updateDate = new Date().toISOString();
 					}
 					this.#documentDb.detail.update(d.id, d);
@@ -123,7 +125,7 @@ export class UmbMockDocumentPublishingManager {
 				const variant = document.variants.find((x) => x.culture === culture);
 
 				if (variant) {
-					variant.state = DocumentVariantStateModel.DRAFT;
+					variant.state = 'Draft' as UmbDocumentVariantState;
 					variant.scheduledPublishDate = null;
 					variant.scheduledUnpublishDate = null;
 					variant.updateDate = new Date().toISOString();
@@ -131,7 +133,7 @@ export class UmbMockDocumentPublishingManager {
 			});
 		} else {
 			document.variants.forEach((variant) => {
-				variant.state = DocumentVariantStateModel.DRAFT;
+				variant.state = 'Draft' as UmbDocumentVariantState;
 				variant.scheduledPublishDate = null;
 				variant.scheduledUnpublishDate = null;
 				variant.updateDate = new Date().toISOString();

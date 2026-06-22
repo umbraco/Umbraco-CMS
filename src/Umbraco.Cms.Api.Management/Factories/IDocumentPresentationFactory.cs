@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Api.Management.ViewModels.Content;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Item;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentBlueprint.Item;
@@ -31,11 +32,13 @@ public interface IDocumentPresentationFactory
     /// <param name="schedule">The schedule collection associated with the content.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the document response model.</returns>
     Task<DocumentResponseModel> CreateResponseModelAsync(IContent content, ContentScheduleCollection schedule);
+
     /// <summary>
     /// Creates a response model for a document item based on the provided entity.
     /// </summary>
     /// <param name="entity">The document entity to create the response model from.</param>
     /// <returns>A <see cref="DocumentItemResponseModel"/> representing the document item.</returns>
+    [Obsolete("Use CreateItemResponseModelAsync instead. Scheduled for removal in Umbraco 19.")]
     DocumentItemResponseModel CreateItemResponseModel(IDocumentEntitySlim entity);
 
     /// <summary>
@@ -50,6 +53,7 @@ public interface IDocumentPresentationFactory
     /// </summary>
     /// <param name="entity">The document entity to create variant response models for.</param>
     /// <returns>An enumerable of <see cref="DocumentVariantItemResponseModel"/> representing the document variants.</returns>
+    [Obsolete("Use CreateVariantsItemResponseModelsAsync instead. Scheduled for removal in Umbraco 19.")]
     IEnumerable<DocumentVariantItemResponseModel> CreateVariantsItemResponseModels(IDocumentEntitySlim entity);
 
     /// <summary>
@@ -75,11 +79,11 @@ public interface IDocumentPresentationFactory
         {
             if (cultureAndScheduleRequestModel.Schedule is null)
             {
-                model.Add(new CulturePublishScheduleModel
-                {
-                    Culture = cultureAndScheduleRequestModel.Culture
-                              ?? Constants.System.InvariantCulture
-                });
+                model.Add(
+                    new CulturePublishScheduleModel
+                    {
+                        Culture = cultureAndScheduleRequestModel.Culture ?? Constants.System.InvariantCulture,
+                    });
                 continue;
             }
 
@@ -100,17 +104,40 @@ public interface IDocumentPresentationFactory
                 return Attempt.FailWithStatus(ContentPublishingOperationStatus.UnpublishTimeNeedsToBeAfterPublishTime, model);
             }
 
-            model.Add(new CulturePublishScheduleModel
-            {
-                Culture = cultureAndScheduleRequestModel.Culture,
-                Schedule = new ContentScheduleModel
+            model.Add(
+                new CulturePublishScheduleModel
                 {
-                    PublishDate = cultureAndScheduleRequestModel.Schedule.PublishTime,
-                    UnpublishDate = cultureAndScheduleRequestModel.Schedule.UnpublishTime,
-                },
-            });
+                    Culture = cultureAndScheduleRequestModel.Culture,
+                    Schedule = new ContentScheduleModel
+                    {
+                        PublishDate = cultureAndScheduleRequestModel.Schedule.PublishTime,
+                        UnpublishDate = cultureAndScheduleRequestModel.Schedule.UnpublishTime,
+                    },
+                });
         }
 
         return Attempt.SucceedWithStatus(ContentPublishingOperationStatus.Success, model);
     }
+
+    /// <summary>
+    /// Asynchronously creates a response model for a document item based on the provided entity.
+    /// </summary>
+    /// <param name="entity">The document entity to create the response model from.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains a <see cref="DocumentItemResponseModel"/> representing the document item.</returns>
+    // TODO (V19): Remove the default implementation when CreateItemResponseModel is removed.
+    Task<DocumentItemResponseModel> CreateItemResponseModelAsync(IDocumentEntitySlim entity)
+#pragma warning disable CS0618 // Type or member is obsolete
+        => Task.FromResult(CreateItemResponseModel(entity));
+#pragma warning restore CS0618 // Type or member is obsolete
+
+    /// <summary>
+    /// Asynchronously creates a collection of <see cref="DocumentVariantItemResponseModel"/> instances representing the variants of the specified document entity.
+    /// </summary>
+    /// <param name="entity">The document entity to create variant response models for.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains an enumerable of <see cref="DocumentVariantItemResponseModel"/> representing the document variants.</returns>
+    // TODO (V19): Remove the default implementation when CreateVariantsItemResponseModels is removed.
+    Task<IEnumerable<DocumentVariantItemResponseModel>> CreateVariantsItemResponseModelsAsync(IDocumentEntitySlim entity)
+#pragma warning disable CS0618 // Type or member is obsolete
+        => Task.FromResult(CreateVariantsItemResponseModels(entity));
+#pragma warning restore CS0618 // Type or member is obsolete
 }

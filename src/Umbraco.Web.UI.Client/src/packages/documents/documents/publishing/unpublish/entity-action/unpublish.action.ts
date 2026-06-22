@@ -28,7 +28,7 @@ export class UmbUnpublishDocumentEntityAction extends UmbEntityActionBase<never>
 		const localize = new UmbLocalizationController(this);
 
 		const languageRepository = new UmbLanguageCollectionRepository(this._host);
-		const { data: languageData } = await languageRepository.requestCollection({});
+		const { data: languageData } = await languageRepository.requestAllItems();
 
 		const documentRepository = new UmbDocumentDetailRepository(this._host);
 		const { data: documentData } = await documentRepository.requestByUnique(this.args.unique);

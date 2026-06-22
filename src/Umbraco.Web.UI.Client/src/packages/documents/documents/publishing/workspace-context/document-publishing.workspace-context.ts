@@ -1,4 +1,4 @@
-import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../workspace/document-workspace.context-token.js';
+import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../workspace/context/document-workspace.context-token.js';
 import type {
 	UmbDocumentDetailModel,
 	UmbDocumentVariantOptionModel,
@@ -6,6 +6,7 @@ import type {
 } from '../../types.js';
 import { UmbDocumentPublishingRepository } from '../repository/index.js';
 import { UmbDocumentPublishedPendingChangesManager } from '../pending-changes/index.js';
+import { UmbDocumentVariantState } from '../../variant-state.js';
 import { UMB_DOCUMENT_SCHEDULE_MODAL } from '../schedule-publish/constants.js';
 import { UMB_DOCUMENT_PUBLISH_WITH_DESCENDANTS_MODAL } from '../publish-with-descendants/constants.js';
 import { UMB_DOCUMENT_PUBLISH_MODAL } from '../publish/constants.js';
@@ -16,7 +17,6 @@ import { UMB_DOCUMENT_PUBLISHING_SHORTCUT_UNIQUE } from './constants.js';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
-import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import {
@@ -28,7 +28,11 @@ import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
-import type { UmbPublishableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
+import { notifyWorkspaceActionStarting } from '@umbraco-cms/backoffice/workspace';
+import type {
+	UmbPublishableWorkspaceContext,
+	UmbWorkspaceActionExecutionOptions,
+} from '@umbraco-cms/backoffice/workspace';
 
 export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implements UmbPublishableWorkspaceContext {
 	/**
@@ -99,16 +103,17 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 
 	/**
 	 * Save and publish the document
+	 * @param {UmbWorkspaceActionExecutionOptions} [options] - Optional execution options (e.g. `onActionStarting` invoked after the variant-picker modal closes).
 	 * @returns {Promise<void>}
 	 * @memberof UmbDocumentPublishingWorkspaceContext
 	 */
-	public async saveAndPublish(): Promise<void> {
+	public async saveAndPublish(options?: UmbWorkspaceActionExecutionOptions): Promise<void> {
 		const elementStyle = (this.getHostElement() as HTMLElement).style;
 		elementStyle.removeProperty('--uui-color-invalid');
 		elementStyle.removeProperty('--uui-color-invalid-emphasis');
 		elementStyle.removeProperty('--uui-color-invalid-standalone');
 		elementStyle.removeProperty('--uui-color-invalid-contrast');
-		return this.#handleSaveAndPublish();
+		return this.#handleSaveAndPublish(options);
 	}
 
 	/**
@@ -321,7 +326,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 		await this.#loadAndProcessLastPublished();
 	}
 
-	async #handleSaveAndPublish() {
+	async #handleSaveAndPublish(executionOptions?: UmbWorkspaceActionExecutionOptions) {
 		await this.#init;
 		if (!this.#documentWorkspaceContext) throw new Error('Document workspace context is missing');
 
@@ -353,6 +358,9 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 
 			variantIds = result?.selection.map((x) => UmbVariantId.FromString(x)) ?? [];
 		}
+
+		// User has committed to publishing (modal closed with a selection, or no modal needed).
+		notifyWorkspaceActionStarting(executionOptions);
 
 		const saveData = await this.#documentWorkspaceContext.constructSaveData(variantIds);
 		await this.#documentWorkspaceContext.runMandatoryValidationForSaveData(saveData, variantIds);
@@ -522,13 +530,13 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 	#hasPublishedVariant() {
 		// Use persisted data (falls back to current) because this may be called
 		// from the persistedData observer before setCurrent has run.
-		const variants = this.#documentWorkspaceContext?.getPersistedData()?.variants
-			?? this.#documentWorkspaceContext?.getVariants();
+		const variants =
+			this.#documentWorkspaceContext?.getPersistedData()?.variants ?? this.#documentWorkspaceContext?.getVariants();
 		return (
 			variants?.some(
 				(variant) =>
-					variant.state === DocumentVariantStateModel.PUBLISHED ||
-					variant.state === DocumentVariantStateModel.PUBLISHED_PENDING_CHANGES,
+					variant.state === UmbDocumentVariantState.PUBLISHED ||
+					variant.state === UmbDocumentVariantState.PUBLISHED_PENDING_CHANGES,
 			) ?? false
 		);
 	}

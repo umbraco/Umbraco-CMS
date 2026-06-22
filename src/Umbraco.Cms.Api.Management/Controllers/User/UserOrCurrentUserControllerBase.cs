@@ -63,6 +63,10 @@ public abstract class UserOrCurrentUserControllerBase : ManagementApiControllerB
                 .WithTitle("Cannot delete user")
                 .WithDetail("The user cannot be deleted.")
                 .Build()),
+            UserOperationStatus.CannotDeleteUserWithLoginHistory => BadRequest(problemDetailsBuilder
+                .WithTitle("Cannot delete user")
+                .WithDetail("This user has logged in and may be referenced by audit logs or content history. Disable the user instead of deleting them.")
+                .Build()),
             UserOperationStatus.CannotDisableSelf => BadRequest(problemDetailsBuilder
                 .WithTitle("Cannot disable")
                 .WithDetail("A user cannot disable itself.")
@@ -94,6 +98,10 @@ public abstract class UserOrCurrentUserControllerBase : ManagementApiControllerB
             UserOperationStatus.MediaStartNodeNotFound => BadRequest(problemDetailsBuilder
                 .WithTitle("Media Start Node not found")
                 .WithDetail("Some of the provided media start nodes was not found.")
+                .Build()),
+            UserOperationStatus.ElementStartNodeNotFound => BadRequest(problemDetailsBuilder
+                .WithTitle("Element Start Node not found")
+                .WithDetail("Some of the provided element start nodes was not found.")
                 .Build()),
             UserOperationStatus.UserNotFound => NotFound(problemDetailsBuilder
                 .WithTitle("The user was not found")

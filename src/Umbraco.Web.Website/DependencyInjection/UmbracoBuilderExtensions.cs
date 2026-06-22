@@ -124,10 +124,17 @@ public static partial class UmbracoBuilderExtensions
                 new WebsiteOutputCachePolicy(settings.ContentDuration));
         });
 
+        // Signal that Umbraco has enabled output caching so the application builder registers
+        // the output cache middleware. Gated via a marker rather than IOutputCacheStore so that
+        // applications calling services.AddOutputCache(...) for their own purposes are not
+        // affected by Umbraco's automatic middleware registration.
+        builder.Services.TryAddSingleton<IUmbracoManagedOutputCacheMarker, UmbracoManagedOutputCacheMarker>();
+
         // Register eviction handlers and providers.
         builder.AddNotificationAsyncHandler<ContentCacheRefresherNotification, WebsiteDocumentOutputCacheEvictionHandler>();
         builder.AddNotificationAsyncHandler<MediaCacheRefresherNotification, WebsiteMediaOutputCacheEvictionHandler>();
         builder.AddNotificationAsyncHandler<MemberCacheRefresherNotification, WebsiteMemberOutputCacheEvictionHandler>();
+        builder.AddNotificationAsyncHandler<ElementCacheRefresherNotification, WebsiteElementOutputCacheEvictionHandler>();
         builder.Services.AddSingleton<IWebsiteOutputCacheTagProvider, WebsiteContentTypeOutputCacheTagProvider>();
         builder.Services.AddUnique<IWebsiteOutputCacheDurationProvider, DefaultWebsiteOutputCacheDurationProvider>();
         builder.Services.AddUnique<IWebsiteOutputCacheRequestFilter, DefaultWebsiteOutputCacheRequestFilter>();

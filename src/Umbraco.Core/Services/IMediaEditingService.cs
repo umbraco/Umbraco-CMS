@@ -119,6 +119,18 @@ public interface IMediaEditingService
     Task<ContentEditingOperationStatus> SortAsync(Guid? parentKey, IEnumerable<SortingModel> sortingModels, Guid userKey);
 
     /// <summary>
+    ///     Sorts the children of a parent by a system field.
+    /// </summary>
+    /// <param name="parentKey">The unique identifier of the parent, or <c>null</c> for root-level sorting.</param>
+    /// <param name="field">The system field to sort the children by.</param>
+    /// <param name="direction">The direction to sort in.</param>
+    /// <param name="userKey">The unique identifier of the user performing the operation.</param>
+    /// <returns>The operation status indicating the operation outcome.</returns>
+    /// <remarks>Media items never vary by culture, so children are always ordered by the invariant name.</remarks>
+    Task<ContentEditingOperationStatus> SortByFieldAsync(Guid? parentKey, ContentSortField field, Direction direction, Guid userKey)
+        => throw new NotImplementedException(); // TODO (V19): Remove default implementation.
+
+    /// <summary>
     ///     Permanently deletes a media item from the recycle bin.
     /// </summary>
     /// <param name="key">The unique identifier of the media item to delete from the recycle bin.</param>

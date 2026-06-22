@@ -65,21 +65,6 @@ public class PublishedContentQuery : IPublishedContentQuery
     {
     }
 
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
-    public PublishedContentQuery(
-        IVariationContextAccessor variationContextAccessor,
-        IExamineManager examineManager,
-        IPublishedContentCache publishedContent,
-        IPublishedMediaCache publishedMediaCache)
-        : this(
-            variationContextAccessor,
-            examineManager,
-            publishedContent,
-            publishedMediaCache,
-            StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>())
-    {
-    }
-
     #region Convert Helpers
 
     private static bool ConvertIdObjectToInt(object id, out int intId)
