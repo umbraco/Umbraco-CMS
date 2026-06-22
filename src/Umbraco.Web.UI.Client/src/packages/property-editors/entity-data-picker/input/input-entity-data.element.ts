@@ -12,8 +12,10 @@ import {
 } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray, type UmbConfigCollectionModel } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import { UmbEntityInputInteractionMemoryManager } from '@umbraco-cms/backoffice/entity';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
+import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
 import type { UmbRepositoryItemsStatus } from '@umbraco-cms/backoffice/repository';
 import type { UmbItemModel } from '@umbraco-cms/backoffice/entity-item';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
@@ -145,6 +147,14 @@ export class UmbInputEntityDataElement extends UmbFormControlMixin<string | unde
 	}
 	#readonly = false;
 
+	@property({ type: Array, attribute: false })
+	public get interactionMemories(): Array<UmbInteractionMemoryModel> | undefined {
+		return this.#interactionMemoryManager.getMemories();
+	}
+	public set interactionMemories(value: Array<UmbInteractionMemoryModel> | undefined) {
+		this.#interactionMemoryManager.setMemories(value);
+	}
+
 	@state()
 	private _items: Array<UmbItemModel> = [];
 
@@ -155,6 +165,10 @@ export class UmbInputEntityDataElement extends UmbFormControlMixin<string | unde
 	private _modalRoute?: string;
 
 	#pickerInputContext = new UmbEntityDataPickerInputContext(this);
+	#interactionMemoryManager = new UmbEntityInputInteractionMemoryManager(
+		this,
+		this.#pickerInputContext.interactionMemory,
+	);
 
 	constructor() {
 		super();

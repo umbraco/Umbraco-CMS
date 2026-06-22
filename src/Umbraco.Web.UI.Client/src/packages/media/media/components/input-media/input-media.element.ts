@@ -10,11 +10,10 @@ import {
 	repeat,
 	state,
 } from '@umbraco-cms/backoffice/external/lit';
-import { jsonStringComparison } from '@umbraco-cms/backoffice/observable-api';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
-import { UmbInteractionMemoriesChangeEvent } from '@umbraco-cms/backoffice/interaction-memory';
+import { UmbEntityInputInteractionMemoryManager } from '@umbraco-cms/backoffice/entity';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbSorterController, UmbSorterResolvePlacementAsGrid } from '@umbraco-cms/backoffice/sorter';
@@ -154,14 +153,11 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 
 	@property({ type: Array, attribute: false })
 	public get interactionMemories(): Array<UmbInteractionMemoryModel> | undefined {
-		return this.#pickerInputContext.interactionMemory.getAllMemories();
+		return this.#interactionMemoryManager.getMemories();
 	}
 	public set interactionMemories(value: Array<UmbInteractionMemoryModel> | undefined) {
-		this.#interactionMemories = value;
-		value?.forEach((memory) => this.#pickerInputContext.interactionMemory.setMemory(memory));
+		this.#interactionMemoryManager.setMemories(value);
 	}
-
-	#interactionMemories?: Array<UmbInteractionMemoryModel> = [];
 
 	@state()
 	private _editMediaPath = '';
@@ -170,6 +166,10 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 	private _cards: Array<UmbMediaCardItemModel> = [];
 
 	#pickerInputContext = new UmbMediaPickerInputContext(this);
+	#interactionMemoryManager = new UmbEntityInputInteractionMemoryManager(
+		this,
+		this.#pickerInputContext.interactionMemory,
+	);
 
 	constructor() {
 		super();
@@ -191,20 +191,6 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 
 			this._cards = selectedItems ?? [];
 		});
-
-		this.observe(
-			this.#pickerInputContext.interactionMemory.memories,
-			(memories) => {
-				// only dispatch the event if the interaction memories have actually changed
-				const isIdentical = jsonStringComparison(memories, this.#interactionMemories);
-
-				if (!isIdentical) {
-					this.#interactionMemories = memories;
-					this.dispatchEvent(new UmbInteractionMemoriesChangeEvent());
-				}
-			},
-			'_observeMemories',
-		);
 
 		this.addValidator(
 			'rangeUnderflow',
