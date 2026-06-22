@@ -1,7 +1,7 @@
 import type { UmbTreeItemModel } from '../../types.js';
 import { UmbTreeViewElementBase } from '../tree-view-element-base.js';
 import type { ManifestTreeViewTableKind, MetaTreeViewTableKindColumn } from './types.js';
-import { UmbDefaultTreeItemTableApi } from './default-tree-item-table.api.js';
+import { UmbTreeItemApiBase } from '../../tree-item/tree-item-base/tree-item-api-base.js';
 import {
 	css,
 	customElement,
@@ -27,10 +27,12 @@ import type {
 import './tree-name-table-column-layout.element.js';
 import '@umbraco-cms/backoffice/entity-action';
 
+class UmbTableTreeViewItemApi extends UmbTreeItemApiBase<UmbTreeItemModel> {}
+
 type UmbTableTreeViewRowContext = {
 	host: UmbElementControllerHost;
 	entityContext: UmbEntityContext;
-	api: UmbDefaultTreeItemTableApi;
+	api: UmbTableTreeViewItemApi;
 	noAccessObserver: UmbObserverController<boolean>;
 	pathObserver: UmbObserverController<string>;
 	isActiveObserver: UmbObserverController<boolean>;
@@ -98,7 +100,7 @@ export class UmbTableTreeViewElement extends UmbTreeViewElementBase<UmbTreeItemM
 		entityContext.setEntityType(item.entityType);
 		entityContext.setUnique(item.id);
 
-		const api = new UmbDefaultTreeItemTableApi(host);
+		const api = new UmbTableTreeViewItemApi(host);
 		const treeItem = this.#itemMap.get(item.id);
 		if (treeItem) api.setTreeItem(treeItem);
 
