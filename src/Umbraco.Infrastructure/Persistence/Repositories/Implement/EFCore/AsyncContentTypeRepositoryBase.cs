@@ -275,11 +275,11 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
         var p0 = "{0}";
         var sql =
             $"""
-             SELECT DISTINCT {ContentTypeDto.TableName}.{ContentTypeDto.NodeIdColumnName} AS Value
-             FROM {ContentTypeDto.TableName}
-             INNER JOIN {NodeDto.TableName} ON {ContentTypeDto.TableName}.{ContentTypeDto.NodeIdColumnName} = {NodeDto.TableName}.{NodeDto.PrimaryKeyColumnName}
-             LEFT JOIN {ContentTypeTemplateDto.TableName} ON {ContentTypeTemplateDto.TableName}.{ContentTypeTemplateDto.ContentTypeNodeIdColumnName} = {ContentTypeDto.TableName}.{ContentTypeDto.NodeIdColumnName}
-             WHERE {NodeDto.TableName}.{NodeDto.NodeObjectTypeColumnName} = {p0}{whereSql}
+             SELECT DISTINCT "{ContentTypeDto.TableName}"."{ContentTypeDto.NodeIdColumnName}" AS Value
+             FROM "{ContentTypeDto.TableName}"
+             INNER JOIN "{NodeDto.TableName}" ON "{ContentTypeDto.TableName}"."{ContentTypeDto.NodeIdColumnName}" = "{NodeDto.TableName}"."{NodeDto.PrimaryKeyColumnName}"
+             LEFT JOIN "{ContentTypeTemplateDto.TableName}" ON "{ContentTypeTemplateDto.TableName}"."{ContentTypeTemplateDto.ContentTypeNodeIdColumnName}" = "{ContentTypeDto.TableName}"."{ContentTypeDto.NodeIdColumnName}"
+             WHERE "{NodeDto.TableName}"."{NodeDto.NodeObjectTypeColumnName}" = {p0}{whereSql}
              """;
         var args = new object[clauseArgs.Length + 1];
         args[0] = NodeObjectTypeId;
@@ -329,10 +329,10 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
         var sql =
             $"""
              SELECT COUNT(*) AS Value
-             FROM {ContentTypeDto.TableName}
-             INNER JOIN {NodeDto.TableName} ON {ContentTypeDto.TableName}.{ContentTypeDto.NodeIdColumnName} = {NodeDto.TableName}.{NodeDto.PrimaryKeyColumnName}
-             LEFT JOIN {ContentTypeTemplateDto.TableName} ON {ContentTypeTemplateDto.TableName}.{ContentTypeTemplateDto.ContentTypeNodeIdColumnName} = {ContentTypeDto.TableName}.{ContentTypeDto.NodeIdColumnName}
-             WHERE {NodeDto.TableName}.{NodeDto.NodeObjectTypeColumnName} = {p0}{whereSql}
+             FROM "{ContentTypeDto.TableName}"
+             INNER JOIN "{NodeDto.TableName}" ON "{ContentTypeDto.TableName}"."{ContentTypeDto.NodeIdColumnName}" = "{NodeDto.TableName}"."{NodeDto.PrimaryKeyColumnName}"
+             LEFT JOIN "{ContentTypeTemplateDto.TableName}" ON "{ContentTypeTemplateDto.TableName}"."{ContentTypeTemplateDto.ContentTypeNodeIdColumnName}" = "{ContentTypeDto.TableName}"."{ContentTypeDto.NodeIdColumnName}"
+             WHERE "{NodeDto.TableName}"."{NodeDto.NodeObjectTypeColumnName}" = {p0}{whereSql}
              """;
         var args = new object[clauseArgs.Length + 1];
         args[0] = NodeObjectTypeId;
@@ -367,18 +367,18 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
             // type. A document-type switch can leave property data pointing at the previous type (FK on cmsPropertyType).
             await db.Database.ExecuteSqlRawAsync(
                 $"""
-                 DELETE FROM {Constants.DatabaseSchema.Tables.PropertyData} WHERE propertyTypeId IN (
-                 SELECT {PropertyTypeDto.PrimaryKeyColumnName} FROM {PropertyTypeDto.TableName} WHERE {PropertyTypeDto.ContentTypeIdColumnName} = {entity.Id})
+                 DELETE FROM "{Constants.DatabaseSchema.Tables.PropertyData}" WHERE "propertyTypeId" IN (
+                 SELECT "{PropertyTypeDto.PrimaryKeyColumnName}" FROM "{PropertyTypeDto.TableName}" WHERE "{PropertyTypeDto.ContentTypeIdColumnName}" = {entity.Id})
                  """);
 
             await db.Database.ExecuteSqlRawAsync(
-                $"DELETE FROM {Constants.DatabaseSchema.Tables.User2NodeNotify} WHERE nodeId = {entity.Id}");
+                $"DELETE FROM \"{Constants.DatabaseSchema.Tables.User2NodeNotify}\" WHERE \"nodeId\" = {entity.Id}");
             await db.Database.ExecuteSqlRawAsync(
-                $"DELETE FROM {Constants.DatabaseSchema.Tables.TagRelationship} WHERE nodeId = {entity.Id}");
+                $"DELETE FROM \"{Constants.DatabaseSchema.Tables.TagRelationship}\" WHERE \"nodeId\" = {entity.Id}");
 
             // delete all granular permissions for this content type
             await db.Database.ExecuteSqlRawAsync(
-                $"DELETE FROM {Constants.DatabaseSchema.Tables.UserGroup2GranularPermission} WHERE uniqueId = {{0}}",
+                $"DELETE FROM \"{Constants.DatabaseSchema.Tables.UserGroup2GranularPermission}\" WHERE \"uniqueId\" = {{0}}",
                 entity.Key);
         });
 #pragma warning restore EF1002
@@ -1033,14 +1033,14 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
                 // the removed composition type
                 await db.Database.ExecuteSqlRawAsync(
                     $"""
-                     DELETE FROM {Constants.DatabaseSchema.Tables.PropertyData} WHERE id IN (
-                     SELECT pd.id
-                     FROM {Constants.DatabaseSchema.Tables.PropertyData} pd
-                     INNER JOIN {Constants.DatabaseSchema.Tables.ContentVersion} cv ON pd.versionId = cv.id
-                     INNER JOIN {Constants.DatabaseSchema.Tables.Content} c ON cv.nodeId = c.nodeId
-                     INNER JOIN {NodeDto.TableName} n ON c.nodeId = n.{NodeDto.PrimaryKeyColumnName}
-                     INNER JOIN {PropertyTypeDto.TableName} pt ON pd.propertyTypeId = pt.{PropertyTypeDto.PrimaryKeyColumnName}
-                     WHERE n.{NodeDto.NodeObjectTypeColumnName} = {p0} AND c.contentTypeId = {entity.Id} AND pt.{PropertyTypeDto.ContentTypeIdColumnName} = {key})
+                     DELETE FROM "{Constants.DatabaseSchema.Tables.PropertyData}" WHERE "id" IN (
+                     SELECT pd."id"
+                     FROM "{Constants.DatabaseSchema.Tables.PropertyData}" pd
+                     INNER JOIN "{Constants.DatabaseSchema.Tables.ContentVersion}" cv ON pd."versionId" = cv."id"
+                     INNER JOIN "{Constants.DatabaseSchema.Tables.Content}" c ON cv."nodeId" = c."nodeId"
+                     INNER JOIN "{NodeDto.TableName}" n ON c."nodeId" = n."{NodeDto.PrimaryKeyColumnName}"
+                     INNER JOIN "{PropertyTypeDto.TableName}" pt ON pd."propertyTypeId" = pt."{PropertyTypeDto.PrimaryKeyColumnName}"
+                     WHERE n."{NodeDto.NodeObjectTypeColumnName}" = {p0} AND c."contentTypeId" = {entity.Id} AND pt."{PropertyTypeDto.ContentTypeIdColumnName}" = {key})
                      """,
                     Constants.ObjectTypes.Document);
             }
@@ -1211,11 +1211,11 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
     private Task Clear301RedirectsAsync(IContentTypeComposition contentType)
         => ExecuteEfScopeAsync(db => db.Database.ExecuteSqlRawAsync(
             $"""
-             DELETE FROM {Constants.DatabaseSchema.Tables.RedirectUrl} WHERE contentKey IN (
-             SELECT n.{NodeDto.KeyColumnName}
-             FROM {NodeDto.TableName} n
-             INNER JOIN {Constants.DatabaseSchema.Tables.Content} c ON c.nodeId = n.{NodeDto.PrimaryKeyColumnName}
-             WHERE c.contentTypeId = {contentType.Id})
+             DELETE FROM "{Constants.DatabaseSchema.Tables.RedirectUrl}" WHERE "contentKey" IN (
+             SELECT n."{NodeDto.KeyColumnName}"
+             FROM "{NodeDto.TableName}" n
+             INNER JOIN "{Constants.DatabaseSchema.Tables.Content}" c ON c."nodeId" = n."{NodeDto.PrimaryKeyColumnName}"
+             WHERE c."contentTypeId" = {contentType.Id})
              """));
 #pragma warning restore EF1002
 
@@ -1292,43 +1292,43 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
             // clear out the versionCultureVariation table
             await db.Database.ExecuteSqlRawAsync(
                 $"""
-                 DELETE FROM {Constants.DatabaseSchema.Tables.ContentVersionCultureVariation} WHERE id IN (
-                 SELECT ccv.id
-                 FROM {Constants.DatabaseSchema.Tables.ContentVersionCultureVariation} ccv
-                 INNER JOIN {Constants.DatabaseSchema.Tables.ContentVersion} cv ON cv.id = ccv.versionId
-                 INNER JOIN {Constants.DatabaseSchema.Tables.Content} c ON c.nodeId = cv.nodeId
-                 WHERE c.contentTypeId = {contentType.Id} AND ccv.languageId = {defaultLanguageId})
+                 DELETE FROM "{Constants.DatabaseSchema.Tables.ContentVersionCultureVariation}" WHERE "id" IN (
+                 SELECT ccv."id"
+                 FROM "{Constants.DatabaseSchema.Tables.ContentVersionCultureVariation}" ccv
+                 INNER JOIN "{Constants.DatabaseSchema.Tables.ContentVersion}" cv ON cv."id" = ccv."versionId"
+                 INNER JOIN "{Constants.DatabaseSchema.Tables.Content}" c ON c."nodeId" = cv."nodeId"
+                 WHERE c."contentTypeId" = {contentType.Id} AND ccv."languageId" = {defaultLanguageId})
                  """);
 
             // clear out the documentCultureVariation table
             await db.Database.ExecuteSqlRawAsync(
                 $"""
-                 DELETE FROM {Constants.DatabaseSchema.Tables.DocumentCultureVariation} WHERE id IN (
-                 SELECT dcv.id
-                 FROM {Constants.DatabaseSchema.Tables.DocumentCultureVariation} dcv
-                 INNER JOIN {Constants.DatabaseSchema.Tables.Content} c ON c.nodeId = dcv.nodeId
-                 WHERE c.contentTypeId = {contentType.Id} AND dcv.languageId = {defaultLanguageId})
+                 DELETE FROM "{Constants.DatabaseSchema.Tables.DocumentCultureVariation}" WHERE "id" IN (
+                 SELECT dcv."id"
+                 FROM "{Constants.DatabaseSchema.Tables.DocumentCultureVariation}" dcv
+                 INNER JOIN "{Constants.DatabaseSchema.Tables.Content}" c ON c."nodeId" = dcv."nodeId"
+                 WHERE c."contentTypeId" = {contentType.Id} AND dcv."languageId" = {defaultLanguageId})
                  """);
 
             // insert rows into the versionCultureVariation table based on contentVersion data for the default lang
             await db.Database.ExecuteSqlRawAsync(
                 $"""
-                 INSERT INTO {Constants.DatabaseSchema.Tables.ContentVersionCultureVariation} (versionId, "name", availableUserId, "date", languageId)
-                 SELECT cv.id, cv."text", cv.userId, cv.versionDate, {defaultLanguageId}
-                 FROM {Constants.DatabaseSchema.Tables.ContentVersion} cv
-                 INNER JOIN {Constants.DatabaseSchema.Tables.Content} c ON c.nodeId = cv.nodeId
-                 WHERE c.contentTypeId = {contentType.Id}
+                 INSERT INTO "{Constants.DatabaseSchema.Tables.ContentVersionCultureVariation}" ("versionId", "name", "availableUserId", "date", "languageId")
+                 SELECT cv."id", cv."text", cv."userId", cv."versionDate", {defaultLanguageId}
+                 FROM "{Constants.DatabaseSchema.Tables.ContentVersion}" cv
+                 INNER JOIN "{Constants.DatabaseSchema.Tables.Content}" c ON c."nodeId" = cv."nodeId"
+                 WHERE c."contentTypeId" = {contentType.Id}
                  """);
 
             // insert rows into the documentCultureVariation table (make Available + default language ID)
             await db.Database.ExecuteSqlRawAsync(
                 $"""
-                 INSERT INTO {Constants.DatabaseSchema.Tables.DocumentCultureVariation} (nodeId, edited, published, "name", available, languageId)
-                 SELECT d.nodeId, d.edited, d.published, n."text", 1, {defaultLanguageId}
-                 FROM {Constants.DatabaseSchema.Tables.Document} d
-                 INNER JOIN {NodeDto.TableName} n ON n.{NodeDto.PrimaryKeyColumnName} = d.nodeId
-                 INNER JOIN {Constants.DatabaseSchema.Tables.Content} c ON c.nodeId = n.{NodeDto.PrimaryKeyColumnName}
-                 WHERE c.contentTypeId = {contentType.Id}
+                 INSERT INTO "{Constants.DatabaseSchema.Tables.DocumentCultureVariation}" ("nodeId", "edited", "published", "name", "available", "languageId")
+                 SELECT d."nodeId", d."edited", d."published", n."text", 1, {defaultLanguageId}
+                 FROM "{Constants.DatabaseSchema.Tables.Document}" d
+                 INNER JOIN "{NodeDto.TableName}" n ON n."{NodeDto.PrimaryKeyColumnName}" = d."nodeId"
+                 INNER JOIN "{Constants.DatabaseSchema.Tables.Content}" c ON c."nodeId" = n."{NodeDto.PrimaryKeyColumnName}"
+                 WHERE c."contentTypeId" = {contentType.Id}
                  """);
         });
 #pragma warning restore EF1002
@@ -1347,8 +1347,8 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
 
         var pts = string.Join(",", propertyTypeIds);
         var cts = contentTypeIds is { Count: > 0 } ? string.Join(",", contentTypeIds) : null;
-        var contentJoin = cts is null ? string.Empty : $"INNER JOIN {Constants.DatabaseSchema.Tables.Content} c ON r.nodeId = c.nodeId";
-        var contentWhere = cts is null ? string.Empty : $"AND c.contentTypeId IN ({cts})";
+        var contentJoin = cts is null ? string.Empty : $"INNER JOIN \"{Constants.DatabaseSchema.Tables.Content}\" c ON r.\"nodeId\" = c.\"nodeId\"";
+        var contentWhere = cts is null ? string.Empty : $"AND c.\"contentTypeId\" IN ({cts})";
 
         // note: nullable language ids are compared via COALESCE(x, -1), mirroring NPoco's SqlNullableEquals
         var srcCmp = sourceLanguageId?.ToString(CultureInfo.InvariantCulture) ?? "-1";
@@ -1361,57 +1361,57 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
             // delete existing relations (for target language); do *not* delete existing tags
             await db.Database.ExecuteSqlRawAsync(
                 $"""
-                 DELETE FROM {Constants.DatabaseSchema.Tables.TagRelationship} WHERE tagId IN (
-                 SELECT t.id
-                 FROM {Constants.DatabaseSchema.Tables.Tag} t
-                 INNER JOIN {Constants.DatabaseSchema.Tables.TagRelationship} r ON t.id = r.tagId
+                 DELETE FROM "{Constants.DatabaseSchema.Tables.TagRelationship}" WHERE "tagId" IN (
+                 SELECT t."id"
+                 FROM "{Constants.DatabaseSchema.Tables.Tag}" t
+                 INNER JOIN "{Constants.DatabaseSchema.Tables.TagRelationship}" r ON t."id" = r."tagId"
                  {contentJoin}
-                 WHERE r.propertyTypeId IN ({pts})
+                 WHERE r."propertyTypeId" IN ({pts})
                  {contentWhere}
-                 AND COALESCE(t.languageId, -1) = {targetCmp})
+                 AND COALESCE(t."languageId", -1) = {targetCmp})
                  """);
 
             // copy tags from source language to target language; target tags may exist already, so check
             // for existence via the "xtags" left join
             await db.Database.ExecuteSqlRawAsync(
                 $"""
-                 INSERT INTO {Constants.DatabaseSchema.Tables.Tag} (tag, "group", languageId)
-                 SELECT DISTINCT t.tag, t."group", {targetLiteral}
-                 FROM {Constants.DatabaseSchema.Tables.Tag} t
-                 INNER JOIN {Constants.DatabaseSchema.Tables.TagRelationship} r ON t.id = r.tagId
-                 LEFT JOIN {Constants.DatabaseSchema.Tables.Tag} xtags ON t.tag = xtags.tag AND t."group" = xtags."group" AND COALESCE(xtags.languageId, -1) = {targetCmp}
+                 INSERT INTO "{Constants.DatabaseSchema.Tables.Tag}" ("tag", "group", "languageId")
+                 SELECT DISTINCT t."tag", t."group", {targetLiteral}
+                 FROM "{Constants.DatabaseSchema.Tables.Tag}" t
+                 INNER JOIN "{Constants.DatabaseSchema.Tables.TagRelationship}" r ON t."id" = r."tagId"
+                 LEFT JOIN "{Constants.DatabaseSchema.Tables.Tag}" xtags ON t."tag" = xtags."tag" AND t."group" = xtags."group" AND COALESCE(xtags."languageId", -1) = {targetCmp}
                  {contentJoin}
-                 WHERE r.propertyTypeId IN ({pts})
+                 WHERE r."propertyTypeId" IN ({pts})
                  {contentWhere}
-                 AND xtags.id IS NULL
-                 AND COALESCE(t.languageId, -1) = {srcCmp}
+                 AND xtags."id" IS NULL
+                 AND COALESCE(t."languageId", -1) = {srcCmp}
                  """);
 
             // create relations to the new tags (existing target relations were deleted above)
             await db.Database.ExecuteSqlRawAsync(
                 $"""
-                 INSERT INTO {Constants.DatabaseSchema.Tables.TagRelationship} (nodeId, propertyTypeId, tagId)
-                 SELECT DISTINCT r.nodeId, r.propertyTypeId, otag.id
-                 FROM {Constants.DatabaseSchema.Tables.TagRelationship} r
-                 INNER JOIN {Constants.DatabaseSchema.Tables.Tag} t ON r.tagId = t.id
-                 INNER JOIN {Constants.DatabaseSchema.Tables.Tag} otag ON t.tag = otag.tag AND t."group" = otag."group" AND COALESCE(otag.languageId, -1) = {targetCmp}
+                 INSERT INTO "{Constants.DatabaseSchema.Tables.TagRelationship}" ("nodeId", "propertyTypeId", "tagId")
+                 SELECT DISTINCT r."nodeId", r."propertyTypeId", otag."id"
+                 FROM "{Constants.DatabaseSchema.Tables.TagRelationship}" r
+                 INNER JOIN "{Constants.DatabaseSchema.Tables.Tag}" t ON r."tagId" = t."id"
+                 INNER JOIN "{Constants.DatabaseSchema.Tables.Tag}" otag ON t."tag" = otag."tag" AND t."group" = otag."group" AND COALESCE(otag."languageId", -1) = {targetCmp}
                  {contentJoin}
-                 WHERE COALESCE(t.languageId, -1) = {srcCmp}
-                 AND r.propertyTypeId IN ({pts})
+                 WHERE COALESCE(t."languageId", -1) = {srcCmp}
+                 AND r."propertyTypeId" IN ({pts})
                  {contentWhere}
                  """);
 
             // delete original relations - *not* the tags - all of them
             await db.Database.ExecuteSqlRawAsync(
                 $"""
-                 DELETE FROM {Constants.DatabaseSchema.Tables.TagRelationship} WHERE tagId IN (
-                 SELECT t.id
-                 FROM {Constants.DatabaseSchema.Tables.Tag} t
-                 INNER JOIN {Constants.DatabaseSchema.Tables.TagRelationship} r ON t.id = r.tagId
+                 DELETE FROM "{Constants.DatabaseSchema.Tables.TagRelationship}" WHERE "tagId" IN (
+                 SELECT t."id"
+                 FROM "{Constants.DatabaseSchema.Tables.Tag}" t
+                 INNER JOIN "{Constants.DatabaseSchema.Tables.TagRelationship}" r ON t."id" = r."tagId"
                  {contentJoin}
-                 WHERE r.propertyTypeId IN ({pts})
+                 WHERE r."propertyTypeId" IN ({pts})
                  {contentWhere}
-                 AND COALESCE(t.languageId, -1) <> {targetCmp})
+                 AND COALESCE(t."languageId", -1) <> {targetCmp})
                  """);
         });
 #pragma warning restore EF1002
@@ -1440,11 +1440,11 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
         var versionScope = cts is null
             ? string.Empty
             : $"""
-               versionId IN (
-               SELECT cv.id
-               FROM {Constants.DatabaseSchema.Tables.ContentVersion} cv
-               INNER JOIN {Constants.DatabaseSchema.Tables.Content} c ON cv.nodeId = c.nodeId
-               WHERE c.contentTypeId IN ({cts})) AND
+               "versionId" IN (
+               SELECT cv."id"
+               FROM "{Constants.DatabaseSchema.Tables.ContentVersion}" cv
+               INNER JOIN "{Constants.DatabaseSchema.Tables.Content}" c ON cv."nodeId" = c."nodeId"
+               WHERE c."contentTypeId" IN ({cts})) AND
                """;
 
         var srcCmp = sourceLanguageId?.ToString(CultureInfo.InvariantCulture) ?? "-1";
@@ -1457,28 +1457,28 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
             // first clear out any existing property data that might already exist under the target language
             await db.Database.ExecuteSqlRawAsync(
                 $"""
-                 DELETE FROM {Constants.DatabaseSchema.Tables.PropertyData} WHERE
+                 DELETE FROM "{Constants.DatabaseSchema.Tables.PropertyData}" WHERE
                  {versionScope}
-                 COALESCE(languageId, -1) = {targetCmp}
-                 AND propertyTypeId IN ({pts})
+                 COALESCE("languageId", -1) = {targetCmp}
+                 AND "propertyTypeId" IN ({pts})
                  """);
 
             // now insert all property data into the target language that exists under the source language
             var sourceJoin = cts is null
                 ? string.Empty
                 : $"""
-                   INNER JOIN {Constants.DatabaseSchema.Tables.ContentVersion} cv ON pd.versionId = cv.id
-                   INNER JOIN {Constants.DatabaseSchema.Tables.Content} c ON cv.nodeId = c.nodeId
+                   INNER JOIN "{Constants.DatabaseSchema.Tables.ContentVersion}" cv ON pd."versionId" = cv."id"
+                   INNER JOIN "{Constants.DatabaseSchema.Tables.Content}" c ON cv."nodeId" = c."nodeId"
                    """;
-            var sourceWhere = cts is null ? string.Empty : $"AND c.contentTypeId IN ({cts})";
+            var sourceWhere = cts is null ? string.Empty : $"AND c.\"contentTypeId\" IN ({cts})";
             await db.Database.ExecuteSqlRawAsync(
                 $"""
-                 INSERT INTO {Constants.DatabaseSchema.Tables.PropertyData} (versionId, propertyTypeId, segment, intValue, decimalValue, dateValue, varcharValue, textValue, languageId)
-                 SELECT pd.versionId, pd.propertyTypeId, pd.segment, pd.intValue, pd.decimalValue, pd.dateValue, pd.varcharValue, pd.textValue, {targetLiteral}
-                 FROM {Constants.DatabaseSchema.Tables.PropertyData} pd
+                 INSERT INTO "{Constants.DatabaseSchema.Tables.PropertyData}" ("versionId", "propertyTypeId", "segment", "intValue", "decimalValue", "dateValue", "varcharValue", "textValue", "languageId")
+                 SELECT pd."versionId", pd."propertyTypeId", pd."segment", pd."intValue", pd."decimalValue", pd."dateValue", pd."varcharValue", pd."textValue", {targetLiteral}
+                 FROM "{Constants.DatabaseSchema.Tables.PropertyData}" pd
                  {sourceJoin}
-                 WHERE COALESCE(pd.languageId, -1) = {srcCmp}
-                 AND pd.propertyTypeId IN ({pts})
+                 WHERE COALESCE(pd."languageId", -1) = {srcCmp}
+                 AND pd."propertyTypeId" IN ({pts})
                  {sourceWhere}
                  """);
 
@@ -1488,10 +1488,10 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
             {
                 await db.Database.ExecuteSqlRawAsync(
                     $"""
-                     DELETE FROM {Constants.DatabaseSchema.Tables.PropertyData} WHERE
+                     DELETE FROM "{Constants.DatabaseSchema.Tables.PropertyData}" WHERE
                      {versionScope}
-                     languageId IS NULL
-                     AND propertyTypeId IN ({pts})
+                     "languageId" IS NULL
+                     AND "propertyTypeId" IN ({pts})
                      """);
             }
         });
@@ -1515,25 +1515,25 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
 
         var pts = string.Join(",", propertyTypeIds);
         var cts = contentTypeIds is { Count: > 0 } ? string.Join(",", contentTypeIds) : null;
-        var contentJoin = cts is null ? string.Empty : $"INNER JOIN {Constants.DatabaseSchema.Tables.Content} c ON c.nodeId = cv.nodeId";
-        var contentWhere = cts is null ? string.Empty : $"AND c.contentTypeId IN ({cts})";
+        var contentJoin = cts is null ? string.Empty : $"INNER JOIN \"{Constants.DatabaseSchema.Tables.Content}\" c ON c.\"nodeId\" = cv.\"nodeId\"";
+        var contentWhere = cts is null ? string.Empty : $"AND c.\"contentTypeId\" IN ({cts})";
 
         // Build a query for the property values of both the current and the published version so we can check,
         // based on the current variance of each item, whether its 'edited' value should be true/false.
         // Note: no ORDER BY in the raw SQL (EF composes raw queries into subqueries); rows are sorted in memory.
         var propertySql =
             $"""
-             SELECT pd.versionId AS VersionId, pd.propertyTypeId AS PropertyTypeId,
-             pd.languageId AS LanguageId, pd.segment AS Segment, pd.intValue AS IntValue, pd.decimalValue AS DecimalValue,
-             pd.dateValue AS DateValue, pd.varcharValue AS VarcharValue, pd.textValue AS TextValue,
-             cv.nodeId AS NodeId, cv."current" AS "Current", CAST(COALESCE(dv.published, 0) AS BIT) AS Published, pt.variations AS Variations
-             FROM {Constants.DatabaseSchema.Tables.PropertyData} pd
-             INNER JOIN {Constants.DatabaseSchema.Tables.ContentVersion} cv ON cv.id = pd.versionId
-             INNER JOIN {PropertyTypeDto.TableName} pt ON pt.{PropertyTypeDto.PrimaryKeyColumnName} = pd.propertyTypeId
+             SELECT pd."versionId" AS VersionId, pd."propertyTypeId" AS PropertyTypeId,
+             pd."languageId" AS LanguageId, pd."segment" AS Segment, pd."intValue" AS IntValue, pd."decimalValue" AS DecimalValue,
+             pd."dateValue" AS DateValue, pd."varcharValue" AS VarcharValue, pd."textValue" AS TextValue,
+             cv."nodeId" AS NodeId, cv."current" AS "Current", CAST(COALESCE(dv."published", 0) AS BIT) AS Published, pt."variations" AS Variations
+             FROM "{Constants.DatabaseSchema.Tables.PropertyData}" pd
+             INNER JOIN "{Constants.DatabaseSchema.Tables.ContentVersion}" cv ON cv."id" = pd."versionId"
+             INNER JOIN "{PropertyTypeDto.TableName}" pt ON pt."{PropertyTypeDto.PrimaryKeyColumnName}" = pd."propertyTypeId"
              {contentJoin}
-             LEFT JOIN {Constants.DatabaseSchema.Tables.DocumentVersion} dv ON cv.id = dv.id
-             WHERE (cv."current" = 1 OR dv.published = 1)
-             AND pd.propertyTypeId IN ({pts})
+             LEFT JOIN "{Constants.DatabaseSchema.Tables.DocumentVersion}" dv ON cv."id" = dv."id"
+             WHERE (cv."current" = 1 OR dv."published" = 1)
+             AND pd."propertyTypeId" IN ({pts})
              {contentWhere}
              """;
 
@@ -1626,9 +1626,9 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
             {
                 var sql =
                     $"""
-                     SELECT id AS Id, nodeId AS NodeId, languageId AS LanguageId, edited AS Edited
-                     FROM {Constants.DatabaseSchema.Tables.DocumentCultureVariation}
-                     WHERE languageId IN ({string.Join(",", languageIds)}) AND nodeId IN ({string.Join(",", group)})
+                     SELECT "id" AS Id, "nodeId" AS NodeId, "languageId" AS LanguageId, "edited" AS Edited
+                     FROM "{Constants.DatabaseSchema.Tables.DocumentCultureVariation}"
+                     WHERE "languageId" IN ({string.Join(",", languageIds)}) AND "nodeId" IN ({string.Join(",", group)})
                      """;
 #pragma warning disable EF1002 // Risk of vulnerability to SQL injection.
                 List<DocumentCultureVariationRow> batchRows = await ExecuteEfScopeAsync(db =>
@@ -1670,7 +1670,7 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
                 foreach (IEnumerable<DocumentCultureVariationRow> batch in editValue.InGroupsOf(Constants.Sql.MaxParameterCount))
                 {
                     await db.Database.ExecuteSqlRawAsync(
-                        $"UPDATE {Constants.DatabaseSchema.Tables.DocumentCultureVariation} SET edited = {(editValue.Key ? 1 : 0)} WHERE id IN ({string.Join(",", batch.Select(x => x.Id))})");
+                        $"UPDATE \"{Constants.DatabaseSchema.Tables.DocumentCultureVariation}\" SET \"edited\" = {(editValue.Key ? 1 : 0)} WHERE \"id\" IN ({string.Join(",", batch.Select(x => x.Id))})");
                 }
             }
 
@@ -1680,7 +1680,7 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
                 foreach (IEnumerable<KeyValuePair<int, bool>> batch in groupByValue.InGroupsOf(Constants.Sql.MaxParameterCount))
                 {
                     await db.Database.ExecuteSqlRawAsync(
-                        $"UPDATE {Constants.DatabaseSchema.Tables.Document} SET edited = {(groupByValue.Key ? 1 : 0)} WHERE nodeId IN ({string.Join(",", batch.Select(x => x.Key))})");
+                        $"UPDATE \"{Constants.DatabaseSchema.Tables.Document}\" SET \"edited\" = {(groupByValue.Key ? 1 : 0)} WHERE \"nodeId\" IN ({string.Join(",", batch.Select(x => x.Key))})");
                 }
             }
         });
@@ -1693,9 +1693,9 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
         {
             // first clear dependencies
             await db.Database.ExecuteSqlRawAsync(
-                $"DELETE FROM {Constants.DatabaseSchema.Tables.TagRelationship} WHERE propertyTypeId = {propertyTypeId}");
+                $"DELETE FROM \"{Constants.DatabaseSchema.Tables.TagRelationship}\" WHERE \"propertyTypeId\" = {propertyTypeId}");
             await db.Database.ExecuteSqlRawAsync(
-                $"DELETE FROM {Constants.DatabaseSchema.Tables.PropertyData} WHERE propertyTypeId = {propertyTypeId}");
+                $"DELETE FROM \"{Constants.DatabaseSchema.Tables.PropertyData}\" WHERE \"propertyTypeId\" = {propertyTypeId}");
 
             // delete granular permissions scoped to this property type (permission format: "<propertyTypeKey>|...")
             Guid? propertyTypeKey = await db.PropertyTypes
@@ -1705,7 +1705,7 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
             if (propertyTypeKey.HasValue)
             {
                 await db.Database.ExecuteSqlRawAsync(
-                    $"DELETE FROM {Constants.DatabaseSchema.Tables.UserGroup2GranularPermission} WHERE uniqueId = {{0}} AND permission LIKE {{1}}",
+                    $"DELETE FROM \"{Constants.DatabaseSchema.Tables.UserGroup2GranularPermission}\" WHERE \"uniqueId\" = {{0}} AND \"permission\" LIKE {{1}}",
                     contentType.Key,
                     $"{propertyTypeKey.Value}|%");
             }
@@ -1780,9 +1780,9 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
         var sql =
             $"""
              SELECT COUNT(*) AS Value
-             FROM {ContentTypeDto.TableName} ct
-             INNER JOIN {Constants.DatabaseSchema.Tables.Content} c ON ct.{ContentTypeDto.NodeIdColumnName} = c.contentTypeId
-             WHERE c.nodeId IN ({string.Join(",", ids)}) AND ct.listView IS NULL
+             FROM "{ContentTypeDto.TableName}" ct
+             INNER JOIN "{Constants.DatabaseSchema.Tables.Content}" c ON ct."{ContentTypeDto.NodeIdColumnName}" = c."contentTypeId"
+             WHERE c."nodeId" IN ({string.Join(",", ids)}) AND ct."listView" IS NULL
              """;
 #pragma warning disable EF1002 // Risk of vulnerability to SQL injection.
         return ExecuteEfScopeAsync(async db => await db.Database.SqlQueryRaw<int>(sql).SingleAsync() > 0);
@@ -1800,7 +1800,7 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
     public Task<bool> HasContentNodesAsync(int id, CancellationToken cancellationToken)
     {
         var sql =
-            $"SELECT CASE WHEN EXISTS (SELECT * FROM {Constants.DatabaseSchema.Tables.Content} WHERE contentTypeId = {{0}}) THEN 1 ELSE 0 END AS Value";
+            $"SELECT CASE WHEN EXISTS (SELECT * FROM \"{Constants.DatabaseSchema.Tables.Content}\" WHERE \"contentTypeId\" = {{0}}) THEN 1 ELSE 0 END AS Value";
 #pragma warning disable EF1002 // Risk of vulnerability to SQL injection.
         return ExecuteEfScopeAsync(async db => await db.Database.SqlQueryRaw<int>(sql, id).SingleAsync() == 1);
 #pragma warning restore EF1002
