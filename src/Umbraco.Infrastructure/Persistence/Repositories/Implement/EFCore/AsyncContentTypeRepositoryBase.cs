@@ -1793,10 +1793,15 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
                 .Where(x => x.UniqueId == key)
                 .Select(x => x.NodeId);
 
-            return (from allowed in db.ContentTypeAllowedContentTypes
-                    join node in db.Nodes on allowed.Id equals node.NodeId
-                    where childNodeIds.Contains(allowed.AllowedId)
-                    select node.UniqueId).ToListAsync();
+            return db.ContentTypeAllowedContentTypes
+                .Join(
+                    db.Nodes,
+                    allowed => allowed.Id,
+                    node => node.NodeId,
+                    (allowed, node) => new { allowed, node })
+                .Where(x => childNodeIds.Contains(x.allowed.AllowedId))
+                .Select(x => x.node.UniqueId)
+                .ToListAsync();
         });
 
     /// <summary>
