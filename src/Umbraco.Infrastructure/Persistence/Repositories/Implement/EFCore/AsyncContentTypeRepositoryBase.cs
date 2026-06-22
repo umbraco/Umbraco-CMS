@@ -264,6 +264,7 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
     // hand-written id-select and executed by EF Core as raw SQL; matching entities are then hydrated from
     // the cached full set.
     // ----------------------------------------------------------------------------------------------------
+    
     private async Task<IEnumerable<TEntity>> PerformGetByQueryAsync(IQuery<TEntity> query)
     {
         // note: Guid values must be bound as parameters (not string literals) — providers store/bind them
