@@ -86,7 +86,8 @@ public class PropertyTypeDtoConfiguration : IEntityTypeConfiguration<PropertyTyp
             .OnDelete(DeleteBehavior.NoAction)
             .HasConstraintName($"FK_{PropertyTypeDto.TableName}_{PropertyTypeGroupDto.TableName}");
 
-        // FK to cmsContentType.nodeId is created by NPoco's schema; it references the content-type
-        // alternate key (nodeId) rather than its primary key, so no EF Core navigation is declared.
+        // No EF Core navigation is declared for the content-type FK: it references the alternate key
+        // (nodeId) rather than its primary key.
+        // TODO (EF Core): the FK to cmsContentType.nodeId is currently created by NPoco's schema; revisit this comment once NPoco is removed.
     }
 }

@@ -22,8 +22,8 @@ public class ContentTypeAllowedContentTypeDtoConfiguration : IEntityTypeConfigur
             .HasColumnName(ContentTypeAllowedContentTypeDto.SortOrderColumnName)
             .HasDefaultValue(0);
 
-        // FKs to cmsContentType.nodeId are created by NPoco's schema; no EF Core navigations are
-        // declared because they reference the content-type alternate key (nodeId) rather than its
-        // primary key, and the repository matches allowed types in memory rather than via navigation.
+        // No EF Core navigations are declared: the FKs reference the content-type alternate key (nodeId)
+        // rather than its primary key, and the repository matches allowed types in memory rather than via navigation.
+        // TODO (EF Core): the FKs to cmsContentType.nodeId are currently created by NPoco's schema; revisit this comment once NPoco is removed.
     }
 }

@@ -98,6 +98,7 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
     // Async EF Core base overrides + cache policy. Reads are served from the FullDataSet cache (its backing
     // set comes from the synchronous NPoco common repository), so they return completed tasks. The write and
     // delete paths below are genuinely async (SaveChangesAsync/ExecuteDeleteAsync/ExecuteSqlRawAsync/...).
+    // TODO (EF Core): reads still source their backing set from the NPoco common repository; revisit this comment once NPoco is removed.
     // ----------------------------------------------------------------------------------------------------
 
     /// <inheritdoc />
@@ -265,6 +266,7 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
     // hand-written id-select and executed by EF Core as raw SQL; matching entities are then hydrated from
     // the cached full set.
     // ----------------------------------------------------------------------------------------------------
+
     private async Task<IEnumerable<TEntity>> PerformGetByQueryAsync(IQuery<TEntity> query)
     {
         // note: Guid values must be bound as parameters (not string literals) — providers store/bind them
