@@ -500,12 +500,19 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
 
             await db.SaveChangesAsync();
 
-            // Insert Tabs
+            // Insert Tabs (batched: add all groups, then save once so EF populates the generated identities)
+            var groupDtos = new List<(PropertyGroup Group, PropertyTypeGroupDto Dto)>();
             foreach (PropertyGroup propertyGroup in entity.PropertyGroups)
             {
                 PropertyTypeGroupDto tabDto = PropertyGroupFactory.BuildEFCoreGroupDto(propertyGroup, nodeDto.NodeId);
                 db.PropertyTypeGroups.Add(tabDto);
-                await db.SaveChangesAsync();
+                groupDtos.Add((propertyGroup, tabDto));
+            }
+
+            await db.SaveChangesAsync();
+
+            foreach ((PropertyGroup propertyGroup, PropertyTypeGroupDto tabDto) in groupDtos)
+            {
                 propertyGroup.Id = tabDto.Id; // Set Id on PropertyGroup
 
                 if (propertyGroup.PropertyTypes is not null)
@@ -522,22 +529,44 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
             }
 
             // Insert PropertyTypes
+            // Resolve any property types that don't yet have a data type id.
             foreach (IPropertyType propertyType in entity.PropertyTypes)
             {
-                var tabId = propertyType.PropertyGroupId != null ? propertyType.PropertyGroupId.Value : default;
-
                 if (propertyType.DataTypeId == 0 || propertyType.DataTypeId == default)
                 {
                     await AssignDataTypeIdFromProvidedKeyOrPropertyEditorAsync(db, propertyType);
                 }
+            }
 
+            // Prefetch every referenced data type in a single query (bounded by the property types on one content type).
+            var dataTypeIds = entity.PropertyTypes
+                .Select(pt => pt.DataTypeId)
+                .Where(id => id != 0)
+                .Distinct()
+                .ToList();
+            Dictionary<int, DataTypeDto> dataTypesById = dataTypeIds.Count == 0
+                ? new Dictionary<int, DataTypeDto>()
+                : await db.DataTypes
+                    .Where(x => dataTypeIds.Contains(x.NodeId))
+                    .ToDictionaryAsync(x => x.NodeId);
+
+            // Batched: add all property types, then save once so EF populates the generated identities.
+            var propertyTypeDtos = new List<(IPropertyType PropertyType, PropertyTypeDto Dto)>();
+            foreach (IPropertyType propertyType in entity.PropertyTypes)
+            {
+                var tabId = propertyType.PropertyGroupId != null ? propertyType.PropertyGroupId.Value : default;
                 PropertyTypeDto propertyTypeDto = PropertyGroupFactory.BuildEFCorePropertyTypeDto(tabId, propertyType, nodeDto.NodeId);
                 db.PropertyTypes.Add(propertyTypeDto);
-                await db.SaveChangesAsync();
+                propertyTypeDtos.Add((propertyType, propertyTypeDto));
+            }
+
+            await db.SaveChangesAsync();
+
+            foreach ((IPropertyType propertyType, PropertyTypeDto propertyTypeDto) in propertyTypeDtos)
+            {
                 propertyType.Id = propertyTypeDto.Id; // Set Id on new PropertyType
 
-                DataTypeDto? dataTypeDto = await db.DataTypes.FirstOrDefaultAsync(x => x.NodeId == propertyType.DataTypeId);
-                if (dataTypeDto is not null)
+                if (dataTypesById.TryGetValue(propertyType.DataTypeId, out DataTypeDto? dataTypeDto))
                 {
                     propertyType.PropertyEditorAlias = dataTypeDto.EditorAlias;
                     propertyType.ValueStorageType = dataTypeDto.DbType.EnumParse<ValueStorageType>(true);
