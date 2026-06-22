@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
@@ -593,9 +594,12 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
         await ExecuteEfScopeAsync(async db =>
         {
             // The bridged context is shared across repository operations within the ambient scope and accumulates
-            // tracked entities from prior inserts/saves. Clear it so the junction-table re-inserts below don't
-            // collide with already-tracked instances carrying the same composite key.
-            db.ChangeTracker.Clear();
+            // tracked entities from prior inserts/saves. Detach any tracked composition rows so the junction-table
+            // re-inserts below don't collide with already-tracked instances carrying the same composite key.
+            foreach (EntityEntry<ContentType2ContentTypeDto> entry in db.ChangeTracker.Entries<ContentType2ContentTypeDto>().ToList())
+            {
+                entry.State = EntityState.Detached;
+            }
 
             // ensure the alias is not used already
             var exists = await db.ContentTypes.CountAsync(ct =>
