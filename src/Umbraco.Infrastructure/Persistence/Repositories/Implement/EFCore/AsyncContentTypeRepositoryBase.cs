@@ -21,13 +21,13 @@ using Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence.Factories;
 using Umbraco.Extensions;
 
-// EF1002: the raw SQL below interpolates only compile-time identifier constants (table/column names) and
-// server-generated integer ids — never user-controlled strings. All caller-supplied values (Guids, object-type
-// ids, IQuery clause arguments) are bound through the positional parameter array. Identifiers cannot be passed as
-// parameters, so ExecuteSqlInterpolated is not an option; the queries are not vulnerable to SQL injection.
-#pragma warning disable EF1002 // Risk of vulnerability to SQL injection.
-
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.EFCore;
+
+// EF1002 rationale (suppressed in tight scopes around each raw-SQL block below): the raw SQL interpolates only
+// compile-time identifier constants (table/column names) and server-generated integer ids — never user-controlled
+// strings. All caller-supplied values (Guids, object-type ids, IQuery clause arguments) are bound through the
+// positional parameter array. Identifiers cannot be passed as parameters, so ExecuteSqlInterpolated is not an option.
+// The suppressions are scoped per block (not file-wide) so any new raw SQL elsewhere in the file is still flagged.
 
 /// <summary>
 ///     Provides the shared functionality for the content-type composition repositories (document, media and member
@@ -285,7 +285,9 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
         args[0] = NodeObjectTypeId;
         clauseArgs.CopyTo(args, 1);
 
+#pragma warning disable EF1002 // Risk of vulnerability to SQL injection.
         List<int> ids = await ExecuteEfScopeAsync(db => db.Database.SqlQueryRaw<int>(sql, args).ToListAsync());
+#pragma warning restore EF1002
 
         return ids.Count > 0
             ? GetMany(ids.ToArray()).OrderBy(x => x.Name)
@@ -336,7 +338,9 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
         args[0] = NodeObjectTypeId;
         clauseArgs.CopyTo(args, 1);
 
+#pragma warning disable EF1002 // Risk of vulnerability to SQL injection.
         return ExecuteEfScopeAsync(db => db.Database.SqlQueryRaw<int>(sql, args).SingleAsync());
+#pragma warning restore EF1002
     }
 
     // ----------------------------------------------------------------------------------------------------
@@ -356,6 +360,7 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
 
         // The cascade tables below (property data, notifications, tags, granular permissions) belong to other
         // repositories and are not modelled in EF Core — raw SQL on the shared context.
+#pragma warning disable EF1002 // Risk of vulnerability to SQL injection.
         await ExecuteEfScopeAsync(async db =>
         {
             // Before deleting the definition tables, clear any leftover property data linked to this content
@@ -376,6 +381,7 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
                 $"DELETE FROM {Constants.DatabaseSchema.Tables.UserGroup2GranularPermission} WHERE uniqueId = {{0}}",
                 entity.Key);
         });
+#pragma warning restore EF1002
 
         // Definition tables modelled in EF Core.
         await PersistDeletedBaseContentTypeAsync(entity);
@@ -1015,6 +1021,7 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
             return Task.CompletedTask;
         }
 
+#pragma warning disable EF1002 // Risk of vulnerability to SQL injection.
         return ExecuteEfScopeAsync(async db =>
         {
             // note: Guid values must be bound as parameters (not string literals) — providers store/bind them
@@ -1038,6 +1045,7 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
                     Constants.ObjectTypes.Document);
             }
         });
+#pragma warning restore EF1002
     }
 
     private void ValidateAlias(IPropertyType pt)
@@ -1199,6 +1207,7 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
     /// <summary>
     ///     Clear any redirects associated with content for a content type.
     /// </summary>
+#pragma warning disable EF1002 // Risk of vulnerability to SQL injection.
     private Task Clear301RedirectsAsync(IContentTypeComposition contentType)
         => ExecuteEfScopeAsync(db => db.Database.ExecuteSqlRawAsync(
             $"""
@@ -1208,6 +1217,7 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
              INNER JOIN {Constants.DatabaseSchema.Tables.Content} c ON c.nodeId = n.{NodeDto.PrimaryKeyColumnName}
              WHERE c.contentTypeId = {contentType.Id})
              """));
+#pragma warning restore EF1002
 
     /// <summary>
     ///     Clear any scheduled publishing associated with content for a content type.
@@ -1276,6 +1286,7 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
 
         // move the names: first clear out any existing names that might already exist under the default lang,
         // then insert names into the two culture-variation tables based on the invariant data
+#pragma warning disable EF1002 // Risk of vulnerability to SQL injection.
         await ExecuteEfScopeAsync(async db =>
         {
             // clear out the versionCultureVariation table
@@ -1320,6 +1331,7 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
                  WHERE c.contentTypeId = {contentType.Id}
                  """);
         });
+#pragma warning restore EF1002
     }
 
     private Task CopyTagDataAsync(
@@ -1343,6 +1355,7 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
         var targetCmp = targetLanguageId?.ToString(CultureInfo.InvariantCulture) ?? "-1";
         var targetLiteral = targetLanguageId?.ToString(CultureInfo.InvariantCulture) ?? "NULL";
 
+#pragma warning disable EF1002 // Risk of vulnerability to SQL injection.
         return ExecuteEfScopeAsync(async db =>
         {
             // delete existing relations (for target language); do *not* delete existing tags
@@ -1401,6 +1414,7 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
                  AND COALESCE(t.languageId, -1) <> {targetCmp})
                  """);
         });
+#pragma warning restore EF1002
     }
 
     /// <summary>
@@ -1437,6 +1451,7 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
         var targetCmp = targetLanguageId?.ToString(CultureInfo.InvariantCulture) ?? "-1";
         var targetLiteral = targetLanguageId?.ToString(CultureInfo.InvariantCulture) ?? "NULL";
 
+#pragma warning disable EF1002 // Risk of vulnerability to SQL injection.
         return ExecuteEfScopeAsync(async db =>
         {
             // first clear out any existing property data that might already exist under the target language
@@ -1480,6 +1495,7 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
                      """);
             }
         });
+#pragma warning restore EF1002
     }
 
     /// <summary>
@@ -1521,8 +1537,10 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
              {contentWhere}
              """;
 
+#pragma warning disable EF1002 // Risk of vulnerability to SQL injection.
         List<PropertyValueVersionDto> rows = await ExecuteEfScopeAsync(db =>
             db.Database.SqlQueryRaw<PropertyValueVersionDto>(propertySql).ToListAsync());
+#pragma warning restore EF1002
 
         // Published data must come before Current data, per (nodeId, propertyTypeId, languageId, versionId).
         rows = rows
@@ -1612,8 +1630,10 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
                      FROM {Constants.DatabaseSchema.Tables.DocumentCultureVariation}
                      WHERE languageId IN ({string.Join(",", languageIds)}) AND nodeId IN ({string.Join(",", group)})
                      """;
+#pragma warning disable EF1002 // Risk of vulnerability to SQL injection.
                 List<DocumentCultureVariationRow> batchRows = await ExecuteEfScopeAsync(db =>
                     db.Database.SqlQueryRaw<DocumentCultureVariationRow>(sql).ToListAsync());
+#pragma warning restore EF1002
                 foreach (DocumentCultureVariationRow batchRow in batchRows)
                 {
                     docCultureVariationsToUpdate[(batchRow.NodeId, batchRow.LanguageId)] = batchRow;
@@ -1641,6 +1661,7 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
             }
         }
 
+#pragma warning disable EF1002 // Risk of vulnerability to SQL injection.
         await ExecuteEfScopeAsync(async db =>
         {
             // bulk update umbracoDocumentCultureVariation, once for edited = true, another for edited = false
@@ -1663,8 +1684,10 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
                 }
             }
         });
+#pragma warning restore EF1002
     }
 
+#pragma warning disable EF1002 // Risk of vulnerability to SQL injection.
     private Task DeletePropertyTypeAsync(IContentTypeComposition contentType, int propertyTypeId)
         => ExecuteEfScopeAsync(async db =>
         {
@@ -1690,6 +1713,7 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
             // Finally delete the property type.
             await db.PropertyTypes.Where(x => x.ContentTypeId == contentType.Id && x.Id == propertyTypeId).ExecuteDeleteAsync();
         });
+#pragma warning restore EF1002
 
     /// <inheritdoc />
     public string GetUniqueAlias(string alias)
@@ -1760,7 +1784,9 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
              INNER JOIN {Constants.DatabaseSchema.Tables.Content} c ON ct.{ContentTypeDto.NodeIdColumnName} = c.contentTypeId
              WHERE c.nodeId IN ({string.Join(",", ids)}) AND ct.listView IS NULL
              """;
+#pragma warning disable EF1002 // Risk of vulnerability to SQL injection.
         return ExecuteEfScopeAsync(async db => await db.Database.SqlQueryRaw<int>(sql).SingleAsync() > 0);
+#pragma warning restore EF1002
     }
 
     /// <inheritdoc />
@@ -1775,7 +1801,9 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
     {
         var sql =
             $"SELECT CASE WHEN EXISTS (SELECT * FROM {Constants.DatabaseSchema.Tables.Content} WHERE contentTypeId = {{0}}) THEN 1 ELSE 0 END AS Value";
+#pragma warning disable EF1002 // Risk of vulnerability to SQL injection.
         return ExecuteEfScopeAsync(async db => await db.Database.SqlQueryRaw<int>(sql, id).SingleAsync() == 1);
+#pragma warning restore EF1002
     }
 
     /// <inheritdoc />
