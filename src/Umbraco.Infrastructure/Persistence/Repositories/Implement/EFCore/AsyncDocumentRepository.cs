@@ -316,30 +316,13 @@ internal sealed class AsyncDocumentRepository
                     joined => joined.pubGroup.DefaultIfEmpty(),
                     (joined, pub) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, joined.contentType, pub });
 
-            var orderedQuery = ApplyDocumentOrdering(
-                baseQuery,
-                ordering,
-                sortOrderSelector: joined => joined.node.SortOrder,
-                textSelector: joined => joined.node.Text,
-                createDateSelector: joined => joined.node.CreateDate,
-                versionDateSelector: joined => joined.contentVersion.VersionDate,
-                idSelector: joined => joined.node.NodeId,
-                ownerSelector: joined => joined.node.UserId,
-                publishedSelector: joined => joined.documentVersion.Published,
-                contentTypeAliasSelector: joined => joined.contentType.Alias);
+            bool isCultureNameOrdering =
+                ordering?.OrderBy?.Equals("name", StringComparison.OrdinalIgnoreCase) == true
+                && ordering?.IsInvariant == false;
 
-            List<DocumentRow> rows = await orderedQuery
-                .Skip(skip)
-                .Take(take)
-                .Select(joined => new DocumentRow(
-                    joined.node,
-                    joined.document,
-                    joined.content,
-                    joined.contentVersion,
-                    joined.documentVersion,
-                    joined.pub!.contentVersion,
-                    joined.pub!.documentVersion))
-                .ToListAsync(cancellationToken);
+            IReadOnlyList<DocumentRow> rows = isCultureNameOrdering
+                ? await FetchCultureNameOrdered()
+                : await FetchDefaultOrdered();
 
             if (rows.Count == 0)
             {
@@ -347,6 +330,89 @@ internal sealed class AsyncDocumentRepository
             }
 
             List<IContent> items = await AssembleEntitiesAsync(rows, db, propertyAliases, loadTemplates);
+
+            async Task<IReadOnlyList<DocumentRow>> FetchCultureNameOrdered()
+            {
+                // Pre-fetch the language ID — the Language table is tiny (bounded by configured languages).
+                // An unknown culture yields languageId = 0, which matches no CCV rows, so
+                // variantName falls back to node.Text for every row (graceful degradation).
+                int languageId = await db.Language
+                    .Where(lang => lang.IsoCode == ordering!.Culture)
+                    .Select(lang => lang.Id)
+                    .FirstOrDefaultAsync(cancellationToken);
+
+                // LEFT JOIN ContentVersionCultureVariations filtered to the resolved language.
+                // Join key is the current (draft) version ID, mirroring the NPoco CCV join condition.
+                // variantName = COALESCE(ccv.Name, node.Text) — mirrors NPoco's VariantNameSqlExpression.
+                var withVariantName = baseQuery
+                    .GroupJoin(
+                        db.ContentVersionCultureVariations.Where(ccv => ccv.LanguageId == languageId),
+                        joined => joined.contentVersion.Id,
+                        ccv => ccv.VersionId,
+                        (joined, ccvGroup) => new
+                        {
+                            joined.node, joined.document, joined.content,
+                            joined.contentVersion, joined.documentVersion,
+                            joined.contentType, joined.pub, ccvGroup
+                        })
+                    .SelectMany(
+                        joined => joined.ccvGroup.DefaultIfEmpty(),
+                        (joined, ccv) => new
+                        {
+                            joined.node, joined.document, joined.content,
+                            joined.contentVersion, joined.documentVersion,
+                            joined.contentType, joined.pub,
+                            variantName = ccv != null ? ccv.Name ?? joined.node.Text : joined.node.Text,
+                        });
+
+                bool descending = ordering!.Direction == Direction.Descending;
+                var ordered = descending
+                    ? withVariantName.OrderByDescending(joined => joined.variantName)
+                    : withVariantName.OrderBy(joined => joined.variantName);
+
+                return await ordered
+                    .Skip(skip)
+                    .Take(take)
+                    .Select(joined => new DocumentRow(
+                        joined.node,
+                        joined.document,
+                        joined.content,
+                        joined.contentVersion,
+                        joined.documentVersion,
+                        joined.pub!.contentVersion,
+                        joined.pub!.documentVersion))
+                    .ToListAsync(cancellationToken);
+            }
+
+            async Task<IReadOnlyList<DocumentRow>> FetchDefaultOrdered()
+            {
+                // Invariant name ordering falls through here: textSelector = node.Text,
+                // equivalent to COALESCE(NULL, node.Text) in NPoco's invariant path.
+                var orderedQuery = ApplyDocumentOrdering(
+                    baseQuery,
+                    ordering,
+                    sortOrderSelector: joined => joined.node.SortOrder,
+                    textSelector: joined => joined.node.Text,
+                    createDateSelector: joined => joined.node.CreateDate,
+                    versionDateSelector: joined => joined.contentVersion.VersionDate,
+                    idSelector: joined => joined.node.NodeId,
+                    ownerSelector: joined => joined.node.UserId,
+                    publishedSelector: joined => joined.documentVersion.Published,
+                    contentTypeAliasSelector: joined => joined.contentType.Alias);
+
+                return await orderedQuery
+                    .Skip(skip)
+                    .Take(take)
+                    .Select(joined => new DocumentRow(
+                        joined.node,
+                        joined.document,
+                        joined.content,
+                        joined.contentVersion,
+                        joined.documentVersion,
+                        joined.pub!.contentVersion,
+                        joined.pub!.documentVersion))
+                    .ToListAsync(cancellationToken);
+            }
             return new PagedModel<IContent> { Total = total, Items = items };
         });
 
@@ -421,30 +487,13 @@ internal sealed class AsyncDocumentRepository
                     joined => joined.pubGroup.DefaultIfEmpty(),
                     (joined, pub) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, joined.contentType, pub });
 
-            var orderedQuery = ApplyDocumentOrdering(
-                baseQuery,
-                ordering,
-                sortOrderSelector: joined => joined.node.SortOrder,
-                textSelector: joined => joined.node.Text,
-                createDateSelector: joined => joined.node.CreateDate,
-                versionDateSelector: joined => joined.contentVersion.VersionDate,
-                idSelector: joined => joined.node.NodeId,
-                ownerSelector: joined => joined.node.UserId,
-                publishedSelector: joined => joined.documentVersion.Published,
-                contentTypeAliasSelector: joined => joined.contentType.Alias);
+            bool isCultureNameOrdering =
+                ordering?.OrderBy?.Equals("name", StringComparison.OrdinalIgnoreCase) == true
+                && ordering?.IsInvariant == false;
 
-            List<DocumentRow> rows = await orderedQuery
-                .Skip(skip)
-                .Take(take)
-                .Select(joined => new DocumentRow(
-                    joined.node,
-                    joined.document,
-                    joined.content,
-                    joined.contentVersion,
-                    joined.documentVersion,
-                    joined.pub!.contentVersion,
-                    joined.pub!.documentVersion))
-                .ToListAsync(cancellationToken);
+            IReadOnlyList<DocumentRow> rows = isCultureNameOrdering
+                ? await FetchCultureNameOrdered()
+                : await FetchDefaultOrdered();
 
             if (rows.Count == 0)
             {
@@ -452,6 +501,89 @@ internal sealed class AsyncDocumentRepository
             }
 
             List<IContent> items = await AssembleEntitiesAsync(rows, db, loadTemplates: loadTemplates);
+
+            async Task<IReadOnlyList<DocumentRow>> FetchCultureNameOrdered()
+            {
+                // Pre-fetch the language ID — the Language table is tiny (bounded by configured languages).
+                // An unknown culture yields languageId = 0, which matches no CCV rows, so
+                // variantName falls back to node.Text for every row (graceful degradation).
+                int languageId = await db.Language
+                    .Where(lang => lang.IsoCode == ordering!.Culture)
+                    .Select(lang => lang.Id)
+                    .FirstOrDefaultAsync(cancellationToken);
+
+                // LEFT JOIN ContentVersionCultureVariations filtered to the resolved language.
+                // Join key is the current (draft) version ID, mirroring the NPoco CCV join condition.
+                // variantName = COALESCE(ccv.Name, node.Text) — mirrors NPoco's VariantNameSqlExpression.
+                var withVariantName = baseQuery
+                    .GroupJoin(
+                        db.ContentVersionCultureVariations.Where(ccv => ccv.LanguageId == languageId),
+                        joined => joined.contentVersion.Id,
+                        ccv => ccv.VersionId,
+                        (joined, ccvGroup) => new
+                        {
+                            joined.node, joined.document, joined.content,
+                            joined.contentVersion, joined.documentVersion,
+                            joined.contentType, joined.pub, ccvGroup
+                        })
+                    .SelectMany(
+                        joined => joined.ccvGroup.DefaultIfEmpty(),
+                        (joined, ccv) => new
+                        {
+                            joined.node, joined.document, joined.content,
+                            joined.contentVersion, joined.documentVersion,
+                            joined.contentType, joined.pub,
+                            variantName = ccv != null ? ccv.Name ?? joined.node.Text : joined.node.Text,
+                        });
+
+                bool descending = ordering!.Direction == Direction.Descending;
+                var ordered = descending
+                    ? withVariantName.OrderByDescending(joined => joined.variantName)
+                    : withVariantName.OrderBy(joined => joined.variantName);
+
+                return await ordered
+                    .Skip(skip)
+                    .Take(take)
+                    .Select(joined => new DocumentRow(
+                        joined.node,
+                        joined.document,
+                        joined.content,
+                        joined.contentVersion,
+                        joined.documentVersion,
+                        joined.pub!.contentVersion,
+                        joined.pub!.documentVersion))
+                    .ToListAsync(cancellationToken);
+            }
+
+            async Task<IReadOnlyList<DocumentRow>> FetchDefaultOrdered()
+            {
+                // Invariant name ordering falls through here: textSelector = node.Text,
+                // equivalent to COALESCE(NULL, node.Text) in NPoco's invariant path.
+                var orderedQuery = ApplyDocumentOrdering(
+                    baseQuery,
+                    ordering,
+                    sortOrderSelector: joined => joined.node.SortOrder,
+                    textSelector: joined => joined.node.Text,
+                    createDateSelector: joined => joined.node.CreateDate,
+                    versionDateSelector: joined => joined.contentVersion.VersionDate,
+                    idSelector: joined => joined.node.NodeId,
+                    ownerSelector: joined => joined.node.UserId,
+                    publishedSelector: joined => joined.documentVersion.Published,
+                    contentTypeAliasSelector: joined => joined.contentType.Alias);
+
+                return await orderedQuery
+                    .Skip(skip)
+                    .Take(take)
+                    .Select(joined => new DocumentRow(
+                        joined.node,
+                        joined.document,
+                        joined.content,
+                        joined.contentVersion,
+                        joined.documentVersion,
+                        joined.pub!.contentVersion,
+                        joined.pub!.documentVersion))
+                    .ToListAsync(cancellationToken);
+            }
             return new PagedModel<IContent> { Total = total, Items = items };
         });
 
@@ -536,7 +668,8 @@ internal sealed class AsyncDocumentRepository
         bool descending = ordering?.Direction == Direction.Descending;
         return ordering?.OrderBy?.ToLowerInvariant() switch
         {
-            // TODO: implement culture-specific name ordering (requires ContentVersionCultureVariation JOIN)
+            // Invariant name ordering (node.Text). Culture-specific name ordering is handled
+            // by the callers via a ContentVersionCultureVariation JOIN before reaching this method.
             "name" => descending
                 ? source.OrderByDescending(textSelector)
                 : source.OrderBy(textSelector),

@@ -12,6 +12,7 @@ using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
@@ -1045,5 +1046,81 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
             "draft property value should reflect the unsaved edit");
         Assert.That(result.GetValue("variantTitle", "en-US", published: true), Is.EqualTo("published value"),
             "published property value should remain unchanged");
+    }
+
+    // --- Culture-specific name ordering ---
+
+    [Test]
+    public async Task GetChildrenAsync_OrderedByName_WithCulture_UsesCultureVariantName()
+    {
+        IContentType contentType = await CreateVariantContentTypeAsync();
+
+        // Invariant names sort in opposite order from culture names — this proves the CCV join is used.
+        // Invariant order: "A-Second" < "Z-First" → docB first.
+        // Culture (en-US) order: "Alpha" < "Zeta" → docA first.
+        var docA = new ContentBuilder()
+            .WithContentType(contentType)
+            .WithName("Z-First")
+            .WithParentId(_textpage.Id)
+            .Build();
+        docA.SetCultureName("Alpha", "en-US");
+        ContentService.Save(docA, -1);
+
+        var docB = new ContentBuilder()
+            .WithContentType(contentType)
+            .WithName("A-Second")
+            .WithParentId(_textpage.Id)
+            .Build();
+        docB.SetCultureName("Zeta", "en-US");
+        ContentService.Save(docB, -1);
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        PagedModel<IContent> result = await repository.GetChildrenAsync(
+            _textpage.Key, skip: 0, take: 10, propertyAliases: null,
+            ordering: Ordering.By("name", culture: "en-US"),
+            CancellationToken.None);
+        scope.Complete();
+
+        IContent first = result.Items.First(item => item.Key == docA.Key || item.Key == docB.Key);
+        Assert.That(first.GetCultureName("en-US"), Is.EqualTo("Alpha"),
+            "Culture name ordering must put 'Alpha' before 'Zeta', not fall back to invariant name order ('A-Second' before 'Z-First')");
+    }
+
+    [Test]
+    public async Task GetDescendantsAsync_OrderedByName_WithCulture_UsesCultureVariantName()
+    {
+        IContentType contentType = await CreateVariantContentTypeAsync();
+
+        // Same inverted-name setup as the GetChildrenAsync variant.
+        var docA = new ContentBuilder()
+            .WithContentType(contentType)
+            .WithName("Z-First")
+            .WithParentId(_textpage.Id)
+            .Build();
+        docA.SetCultureName("Alpha", "en-US");
+        ContentService.Save(docA, -1);
+
+        var docB = new ContentBuilder()
+            .WithContentType(contentType)
+            .WithName("A-Second")
+            .WithParentId(_textpage.Id)
+            .Build();
+        docB.SetCultureName("Zeta", "en-US");
+        ContentService.Save(docB, -1);
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        PagedModel<IContent> result = await repository.GetDescendantsAsync(
+            _textpage.Key, skip: 0, take: 10,
+            ordering: Ordering.By("name", culture: "en-US"),
+            CancellationToken.None);
+        scope.Complete();
+
+        IContent first = result.Items.First(item => item.Key == docA.Key || item.Key == docB.Key);
+        Assert.That(first.GetCultureName("en-US"), Is.EqualTo("Alpha"),
+            "Culture name ordering must put 'Alpha' before 'Zeta', not fall back to invariant name order ('A-Second' before 'Z-First')");
     }
 }
