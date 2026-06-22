@@ -15,6 +15,10 @@ describe('UmbImagingThumbnailElement', () => {
 		(element as unknown as { _thumbnailUrl: string })._thumbnailUrl = TRANSPARENT_PNG;
 		element.requestUpdate();
 		await element.updateComplete;
+
+		// Guard: if the private field is ever renamed, the injection above silently no-ops.
+		// Fail loudly here rather than letting later assertions pass vacuously.
+		expect(element.shadowRoot!.querySelector('#figure'), 'sample image should render').to.not.equal(null);
 	});
 
 	it('is defined with its own instance', () => {

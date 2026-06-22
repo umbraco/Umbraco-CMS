@@ -9,8 +9,8 @@ import { UmbEntityUpdatedEvent } from '@umbraco-cms/backoffice/entity-action';
 /**
  * Displays a thumbnail for a media item, with optional server-side cropping.
  *
- * Prefer the `umb-thumbnail` alias, which is the recommended name for this component.
- * This `umb-imaging-thumbnail` tag remains registered for backwards compatibility.
+ * Registered under both `umb-thumbnail` (the recommended tag) and `umb-imaging-thumbnail`
+ * (an equivalent alias kept for backwards compatibility).
  * @element umb-imaging-thumbnail
  * @cssprop [--umb-thumbnail-background] - Background shown behind the image. Defaults to a checkerboard
  * pattern that reveals transparency; set to `none` for a transparent background.
