@@ -294,8 +294,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 
 	/**
 	 * Requests the latest persisted version of the entity from the server WITHOUT applying it to the
-	 * workspace state, and returns the processed data. The caller is responsible for reconciling it into
-	 * the workspace (e.g. as the return value of a persist method passed to performCreateOrUpdate).
+	 * workspace state, and returns the processed data.
 	 * @returns { Promise<DetailModelType> } The latest persisted data.
 	 */
 	public async loadWithoutPersist(): Promise<DetailModelType> {
