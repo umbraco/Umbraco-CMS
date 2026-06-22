@@ -617,19 +617,16 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
                 .Select(x => x.Variations)
                 .FirstAsync();
 
-            // handle (update) the node (ExecuteUpdate is set-based and tracking-free)
+            // handle (update) the node (ExecuteUpdate is set-based and tracking-free).
             NodeDto nodeDto = dto.NodeDto;
             await db.Nodes.Where(x => x.NodeId == nodeDto.NodeId).ExecuteUpdateAsync(s => s
-                .SetProperty(x => x.UniqueId, nodeDto.UniqueId)
                 .SetProperty(x => x.ParentId, nodeDto.ParentId)
                 .SetProperty(x => x.Level, nodeDto.Level)
                 .SetProperty(x => x.Path, nodeDto.Path)
                 .SetProperty(x => x.SortOrder, nodeDto.SortOrder)
                 .SetProperty(x => x.Trashed, nodeDto.Trashed)
                 .SetProperty(x => x.UserId, nodeDto.UserId)
-                .SetProperty(x => x.Text, nodeDto.Text)
-                .SetProperty(x => x.NodeObjectType, nodeDto.NodeObjectType)
-                .SetProperty(x => x.CreateDate, nodeDto.CreateDate));
+                .SetProperty(x => x.Text, nodeDto.Text));
 
             // handle (update) the ContentType
             await db.ContentTypes.Where(x => x.NodeId == dto.NodeId).ExecuteUpdateAsync(s => s
