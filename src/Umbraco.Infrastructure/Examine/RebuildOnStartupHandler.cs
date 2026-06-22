@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Infrastructure.Examine;
 ///     On the first HTTP request this will rebuild the Examine indexes if they are empty.
 ///     If it is a cold boot, they are all rebuilt.
 /// </remarks>
-[Obsolete("Superseded by RebuildOnStartedHandler. Scheduled for removal in V19.")]
+[Obsolete("Superseded by RebuildOnStartedHandler. Scheduled for removal in Umbraco 19.")]
 public sealed class RebuildOnStartupHandler : INotificationHandler<UmbracoRequestBeginNotification>
 {
     // These must be static because notification handlers are transient.

@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Infrastructure.Examine;
 ///     Once the application has fully started this rebuilds the Examine indexes if they are empty.
 ///     If it is a cold boot, they are all rebuilt.
 /// </remarks>
-public class RebuildOnStartedHandler : INotificationAsyncHandler<UmbracoApplicationStartedNotification>
+public sealed class RebuildOnStartedHandler : INotificationAsyncHandler<UmbracoApplicationStartedNotification>
 {
     // The notification is published again on restart, but the indexes only need to be
     // considered for rebuilding once per application lifetime.
