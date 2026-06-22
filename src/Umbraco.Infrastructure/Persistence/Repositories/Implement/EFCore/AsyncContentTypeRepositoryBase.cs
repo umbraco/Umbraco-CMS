@@ -18,7 +18,7 @@ using Umbraco.Cms.Infrastructure.Cache;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
-using Umbraco.Cms.Infrastructure.Persistence.Factories;
+using Umbraco.Cms.Infrastructure.Persistence.Factories.EFCore;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.EFCore;
@@ -426,7 +426,7 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
     {
         ValidateVariations(entity);
 
-        ContentTypeDto contentTypeDto = ContentTypeFactory.BuildEFCoreContentTypeDto(entity);
+        ContentTypeDto contentTypeDto = ContentTypeFactory.BuildContentTypeDto(entity);
 
         await ExecuteEfScopeAsync(async db =>
         {
@@ -513,7 +513,7 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
             var groupDtos = new List<(PropertyGroup Group, PropertyTypeGroupDto Dto)>();
             foreach (PropertyGroup propertyGroup in entity.PropertyGroups)
             {
-                PropertyTypeGroupDto tabDto = PropertyGroupFactory.BuildEFCoreGroupDto(propertyGroup, nodeDto.NodeId);
+                PropertyTypeGroupDto tabDto = PropertyGroupFactory.BuildGroupDto(propertyGroup, nodeDto.NodeId);
                 db.PropertyTypeGroups.Add(tabDto);
                 groupDtos.Add((propertyGroup, tabDto));
             }
@@ -564,7 +564,7 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
             foreach (IPropertyType propertyType in entity.PropertyTypes)
             {
                 var tabId = propertyType.PropertyGroupId != null ? propertyType.PropertyGroupId.Value : default;
-                PropertyTypeDto propertyTypeDto = PropertyGroupFactory.BuildEFCorePropertyTypeDto(tabId, propertyType, nodeDto.NodeId);
+                PropertyTypeDto propertyTypeDto = PropertyGroupFactory.BuildPropertyTypeDto(tabId, propertyType, nodeDto.NodeId);
                 db.PropertyTypes.Add(propertyTypeDto);
                 propertyTypeDtos.Add((propertyType, propertyTypeDto));
             }
@@ -595,7 +595,7 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
         CorrectPropertyTypeVariations(entity);
         ValidateVariations(entity);
 
-        ContentTypeDto dto = ContentTypeFactory.BuildEFCoreContentTypeDto(entity);
+        ContentTypeDto dto = ContentTypeFactory.BuildContentTypeDto(entity);
 
         ContentVariation oldContentTypeVariation = default;
 
@@ -729,7 +729,7 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
         {
             foreach (PropertyGroup propertyGroup in entity.PropertyGroups)
             {
-                PropertyTypeGroupDto groupDto = PropertyGroupFactory.BuildEFCoreGroupDto(propertyGroup, entity.Id);
+                PropertyTypeGroupDto groupDto = PropertyGroupFactory.BuildGroupDto(propertyGroup, entity.Id);
                 int groupId;
                 if (propertyGroup.HasIdentity)
                 {
@@ -819,7 +819,7 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
                 ValidateAlias(propertyType);
 
                 var groupId = propertyType.PropertyGroupId?.Value ?? default;
-                PropertyTypeDto propertyTypeDto = PropertyGroupFactory.BuildEFCorePropertyTypeDto(groupId, propertyType, entity.Id);
+                PropertyTypeDto propertyTypeDto = PropertyGroupFactory.BuildPropertyTypeDto(groupId, propertyType, entity.Id);
                 int typeId;
                 if (propertyType.HasIdentity)
                 {
