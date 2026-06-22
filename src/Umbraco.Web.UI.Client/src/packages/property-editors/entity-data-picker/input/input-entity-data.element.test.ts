@@ -1,15 +1,16 @@
-import { UmbInputDocumentElement } from './input-document.element.js';
+import { UmbInputEntityDataElement } from './input-entity-data.element.js';
 import { expect, fixture, html } from '@open-wc/testing';
 import { type UmbTestRunnerWindow, defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
-describe('UmbInputDocumentElement', () => {
-	let element: UmbInputDocumentElement;
+
+describe('UmbInputEntityDataElement', () => {
+	let element: UmbInputEntityDataElement;
 
 	beforeEach(async () => {
-		element = await fixture(html` <umb-input-document></umb-input-document> `);
+		element = await fixture(html` <umb-input-entity-data></umb-input-entity-data> `);
 	});
 
 	it('is defined with its own instance', () => {
-		expect(element).to.be.instanceOf(UmbInputDocumentElement);
+		expect(element).to.be.instanceOf(UmbInputEntityDataElement);
 	});
 
 	describe('interactionMemories', () => {
