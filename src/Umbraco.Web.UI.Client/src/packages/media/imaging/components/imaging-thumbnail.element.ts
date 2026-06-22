@@ -6,6 +6,16 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbEntityUpdatedEvent } from '@umbraco-cms/backoffice/entity-action';
 
+/**
+ * Displays a thumbnail for a media item, with optional server-side cropping.
+ *
+ * Prefer the `umb-thumbnail` alias, which is the recommended name for this component.
+ * This `umb-imaging-thumbnail` tag remains registered for backwards compatibility.
+ * @element umb-imaging-thumbnail
+ * @cssprop [--umb-thumbnail-background] - Background shown behind the image. Defaults to a checkerboard
+ * pattern that reveals transparency; set to `none` for a transparent background.
+ * @csspart img - The underlying `<img>` element.
+ */
 @customElement('umb-imaging-thumbnail')
 export class UmbImagingThumbnailElement extends UmbLitElement {
 	/**
@@ -80,6 +90,8 @@ export class UmbImagingThumbnailElement extends UmbLitElement {
 
 	#intersectionObserver?: IntersectionObserver;
 
+	#actionEventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
+
 	override render() {
 		return when(
 			this.externalLoading || this._isLoading,
@@ -109,6 +121,7 @@ export class UmbImagingThumbnailElement extends UmbLitElement {
 	override disconnectedCallback() {
 		super.disconnectedCallback();
 		this.#intersectionObserver?.disconnect();
+		this.#removeActionEventListener();
 	}
 
 	/**
@@ -118,13 +131,21 @@ export class UmbImagingThumbnailElement extends UmbLitElement {
 	 */
 	#observeActionEvent() {
 		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (actionEventContext) => {
-			actionEventContext?.addEventListener(UmbEntityUpdatedEvent.TYPE, (event) => {
-				if (event instanceof UmbEntityUpdatedEvent && event.getUnique() === this.unique) {
-					this.#generateThumbnailUrl();
-				}
-			});
+			this.#removeActionEventListener();
+			this.#actionEventContext = actionEventContext;
+			this.#actionEventContext?.addEventListener(UmbEntityUpdatedEvent.TYPE, this.#onEntityUpdated as EventListener);
 		});
 	}
+
+	#removeActionEventListener() {
+		this.#actionEventContext?.removeEventListener(UmbEntityUpdatedEvent.TYPE, this.#onEntityUpdated as EventListener);
+	}
+
+	#onEntityUpdated = (event: UmbEntityUpdatedEvent) => {
+		if (event.getUnique() === this.unique) {
+			this.#generateThumbnailUrl();
+		}
+	};
 
 	#renderLoading() {
 		return html`<uui-loader-circle id="loader"></uui-loader-circle>`;
@@ -133,7 +154,15 @@ export class UmbImagingThumbnailElement extends UmbLitElement {
 	#renderThumbnail() {
 		return when(
 			this._thumbnailUrl,
-			(url) => html`<img id="figure" src=${url} alt=${this.alt} loading=${this.loading} decoding="async" draggable="false" />`,
+			(url) =>
+				html`<img
+					id="figure"
+					part="img"
+					src=${url}
+					alt=${this.alt}
+					loading=${this.loading}
+					decoding="async"
+					draggable="false" />`,
 			() => html`<umb-icon id="icon" name=${this.icon}></umb-icon>`,
 		);
 	}
@@ -179,7 +208,10 @@ export class UmbImagingThumbnailElement extends UmbLitElement {
 				object-fit: contain;
 				object-position: center;
 
-				background-image: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" fill-opacity=".1"><path d="M50 0h50v50H50zM0 50h50v50H0z"/></svg>');
+				background-image: var(
+					--umb-thumbnail-background,
+					url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" fill-opacity=".1"><path d="M50 0h50v50H50zM0 50h50v50H0z"/></svg>')
+				);
 				background-size: 10px 10px;
 				background-repeat: repeat;
 			}
