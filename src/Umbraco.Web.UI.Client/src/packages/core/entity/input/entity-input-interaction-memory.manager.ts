@@ -10,9 +10,6 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 /**
  * Bridges a picker input's interaction-memory manager to its host element's `interactionMemories`
  * property and `interaction-memories-change` event, keeping the two in sync.
- *
- * Used by entity input elements (e.g. `umb-input-document`, `umb-input-media`, `umb-input-entity-data`)
- * to avoid duplicating the snapshot-sync and change-event logic.
  * @exports
  * @class UmbEntityInputInteractionMemoryManager
  * @augments {UmbControllerBase}
