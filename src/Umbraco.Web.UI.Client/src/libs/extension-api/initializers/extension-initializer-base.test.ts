@@ -98,10 +98,8 @@ describe('UmbExtensionInitializerBase — loaded signal', () => {
 			.asPromise()
 			.then(() => instantiated.includes('Umb.Test.B.Late'));
 
-		expect(
-			lateExtInstantiatedWhenLoaded,
-			'`loaded` resolved before the late, slow extension finished instantiating',
-		).to.be.true;
+		expect(lateExtInstantiatedWhenLoaded, '`loaded` resolved before the late, slow extension finished instantiating').to
+			.be.true;
 	});
 
 	// Permission-timing guard (re: the #22522 "user permissions resolved too late" concern).
@@ -123,7 +121,7 @@ describe('UmbExtensionInitializerBase — loaded signal', () => {
 			js: () => new Promise((r) => setTimeout(() => r({}), 100)),
 		} as never);
 
-		const {initializer, instantiated} = createTestInitializer(hostElement, extensionRegistry);
+		const { initializer, instantiated } = createTestInitializer(hostElement, extensionRegistry);
 
 		const instantiatedWhenGateOpened = await new UmbObserver(initializer.loaded)
 			.asPromise()
