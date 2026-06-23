@@ -19,6 +19,7 @@ import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-ap
 import { umbExtensionsRegistry, type ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbEntityContext } from '@umbraco-cms/backoffice/entity';
+import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 
 export class UmbDefaultTreeContext<
 	TreeItemType extends UmbTreeItemModel,
@@ -147,7 +148,10 @@ export class UmbDefaultTreeContext<
 	}
 
 	public open(item: TreeItemType): void {
-		this.getHostElement().dispatchEvent(new UmbTreeItemOpenEvent({ unique: item.unique, entityType: item.entityType }));
+		// The tree root has a null unique and is not a navigable target, so opening it is a no-op.
+		const unique = item.unique as UmbEntityUnique;
+		if (unique === null || unique === undefined) return;
+		this.getHostElement().dispatchEvent(new UmbTreeItemOpenEvent({ unique, entityType: item.entityType }));
 	}
 
 	/**
