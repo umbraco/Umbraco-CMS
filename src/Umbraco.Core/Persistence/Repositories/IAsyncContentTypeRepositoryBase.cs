@@ -15,6 +15,7 @@ namespace Umbraco.Cms.Core.Persistence.Repositories;
 ///     migrated to EF Core (out of scope for the document-type migration).
 /// </remarks>
 /// <typeparam name="TItem">The type of content type composition.</typeparam>
+// TODO (EFCore): Rename back to IContentTypeRepositoryBase after all ContentType repositories have been migrated
 public interface IAsyncContentTypeRepositoryBase<TItem>
     : IAsyncReadWriteRepository<Guid, TItem>, IAsyncReadRepository<int, TItem>
     where TItem : IContentTypeComposition
