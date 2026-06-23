@@ -610,11 +610,12 @@ export class UmbTreeItemChildrenManager<
 	}
 
 	#onReloadChildrenRequest = (event: UmbEntityActionEvent) => {
-		const entityType = this.getTreeItem()?.entityType;
-		const unique = this.getTreeItem()?.unique;
+		// Match against the parent we actually load children for. When drilled into a start node
+		// the children belong to the start node, not the tree root held by getTreeItem().
+		const parent = this.getStartNode() || this.getTreeItem();
 
-		if (event.getEntityType() !== entityType) return;
-		if (event.getUnique() !== unique) return;
+		if (event.getEntityType() !== parent?.entityType) return;
+		if (event.getUnique() !== parent?.unique) return;
 
 		this.reloadChildren();
 	};
