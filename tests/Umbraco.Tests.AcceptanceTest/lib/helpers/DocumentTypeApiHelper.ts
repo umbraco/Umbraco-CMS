@@ -776,6 +776,7 @@ export class DocumentTypeApiHelper {
       .withName(elementName)
       .withAlias(AliasHelper.toAlias(elementName))
       .withIsElement(true)
+      .withAllowedInLibrary(true)
       .withVariesByCulture(elementVariesByCulture)
       .withIcon("icon-plugin")
       .addContainer()
@@ -1311,6 +1312,14 @@ export class DocumentTypeApiHelper {
       text: boolean,
     }
   ) {
+    // A property can only vary by culture when its containing element type also varies.
+    if (variance.text && !variance.innerElement) {
+      throw new Error('Invalid variance combination: "text" can only vary by culture when "innerElement" varies.');
+    }
+    if (variance.innerBlockList && !variance.outerElement) {
+      throw new Error('Invalid variance combination: "innerBlockList" can only vary by culture when "outerElement" varies.');
+    }
+
     const crypto = require('crypto');
     await this.ensureNameNotExists(documentTypeName);
     await this.api.dataType.ensureNameNotExists(outerBlockListDataTypeName);
