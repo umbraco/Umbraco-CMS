@@ -1,4 +1,5 @@
 import { UmbImagingThumbnailElement } from './imaging-thumbnail.element.js';
+import { UmbThumbnailElement } from './thumbnail.element.js';
 import { expect, fixture, html } from '@open-wc/testing';
 
 // 1x1 transparent PNG.
@@ -21,8 +22,9 @@ describe('UmbImagingThumbnailElement', () => {
 		expect(element.shadowRoot!.querySelector('#figure'), 'sample image should render').to.not.equal(null);
 	});
 
-	it('is defined with its own instance', () => {
+	it('is a deprecated alias that extends UmbThumbnailElement', () => {
 		expect(element).to.be.instanceOf(UmbImagingThumbnailElement);
+		expect(element).to.be.instanceOf(UmbThumbnailElement);
 	});
 
 	it('renders the image with a stylable "img" part', () => {
