@@ -1,5 +1,6 @@
 import type { UmbTreeItemModel } from '../types.js';
 import type { ManifestTreeItemCard } from './tree-item-card.extension.js';
+import type { UmbTreeItemCardElement } from './types.js';
 import { css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbExtensionsElementAndApiInitializer } from '@umbraco-cms/backoffice/extension-api';
@@ -7,11 +8,11 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registr
 
 @customElement('umb-tree-item-card-extension')
 export class UmbTreeItemCardExtensionElement extends UmbLitElement {
-	#extensionsController?: any;
+	#extensionsController?: UmbExtensionsElementAndApiInitializer<ManifestTreeItemCard>;
 	#item?: UmbTreeItemModel;
 
 	@state()
-	protected _component?: any;
+	protected _component?: UmbTreeItemCardElement;
 
 	@property({ type: Object, attribute: false })
 	public set item(value: UmbTreeItemModel | undefined) {
