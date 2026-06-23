@@ -12,7 +12,7 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 			kind: 'tree',
 			element: UmbTreeWorkspaceViewElement,
 			meta: {
-				label: 'Children',
+				label: '#tree_children',
 				pathname: 'children',
 				icon: 'icon-bulleted-list',
 			},
