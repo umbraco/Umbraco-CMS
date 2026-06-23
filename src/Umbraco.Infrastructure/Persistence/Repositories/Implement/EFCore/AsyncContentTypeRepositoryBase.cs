@@ -359,6 +359,7 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
 
         // The cascade tables below (property data, notifications, tags, granular permissions) belong to other
         // repositories and are not modelled in EF Core — raw SQL on the shared context.
+        // TODO (EF Core): replace with the EF Core query builder once these tables are migrated to EF Core DTOs.
 #pragma warning disable EF1002 // Risk of vulnerability to SQL injection.
         await ExecuteEfScopeAsync(async db =>
         {
@@ -1020,6 +1021,8 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
             return Task.CompletedTask;
         }
 
+        // TODO (EF Core): replace with the EF Core query builder once the content tables referenced here
+        // (umbracoPropertyData, umbracoContentVersion, umbracoContent) are migrated to EF Core DTOs.
 #pragma warning disable EF1002 // Risk of vulnerability to SQL injection.
         return ExecuteEfScopeAsync(async db =>
         {
