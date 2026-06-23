@@ -6,6 +6,7 @@ import type { UmbBlockWorkspaceOriginData } from './block-workspace.modal-token.
 import { UMB_BLOCK_WORKSPACE_VIEW_CONTENT, UMB_BLOCK_WORKSPACE_VIEW_SETTINGS } from './constants.js';
 import { UmbBlockLanguageAccessWorkspaceController } from './block-workspace-language-access.controller.js';
 import { resolveBlockWorkspaceLabelIndex } from './block-workspace-label-index.function.js';
+import { buildBlockLabelValueObject } from './block-workspace-label-value.function.js';
 import {
 	UmbSubmittableWorkspaceContextBase,
 	type UmbRoutableWorkspaceContext,
@@ -113,6 +114,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 			this.#blockEntries = context;
 			if (context) {
 				this.observe(
+					// TODO: Turn this into a observablePart that is retrievable from the block entries context, so we do not have to observe multiple values here. [NL]
 					observeMultiple([context.layoutEntries, this.contentKey]).pipe(
 						map(([layouts, contentKey]) => {
 							const found = contentKey ? layouts.findIndex((x) => x.contentKey === contentKey) : -1;
@@ -122,7 +124,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 					),
 					(index) => {
 						this.#index = index;
-						this.#renderLabel(this.content.getValues(), this.settings.getValues());
+						this.#renderLabel(this.content.getVariantValues(), this.settings.getVariantValues());
 					},
 					'observeLayoutIndex',
 				);
@@ -166,7 +168,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		);
 
 		this.observe(
-			observeMultiple([this.content.values, this.settings.values]),
+			observeMultiple([this.content.variantValues, this.settings.variantValues]),
 			async ([contentValues, settingsValues]) => {
 				this.#renderLabel(contentValues, settingsValues);
 			},
@@ -277,7 +279,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	#gotLabel(label: string | undefined) {
 		if (label) {
 			this.#labelRender.markdown = label;
-			this.#renderLabel(this.content.getValues(), this.settings.getValues());
+			this.#renderLabel(this.content.getVariantValues(), this.settings.getVariantValues());
 		}
 	}
 
@@ -285,28 +287,13 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		contentValues: Array<UmbBlockDataValueModel> | undefined,
 		settingsValues: Array<UmbBlockDataValueModel> | undefined,
 	) {
-		const valueObject = {} as Record<string, unknown>;
-		if (contentValues) {
-			for (const property of contentValues) {
-				valueObject[property.alias] = property.value;
-			}
-		}
-
-		if (settingsValues) {
-			valueObject['$settings'] = settingsValues;
-		}
-
 		const index = resolveBlockWorkspaceLabelIndex(
 			this.#index,
 			this.#originData,
 			this.#blockEntries?.getLayouts().length,
 		);
 
-		if (index !== undefined) {
-			valueObject['$index'] = index;
-		}
-
-		this.#labelRender.value = valueObject;
+		this.#labelRender.value = buildBlockLabelValueObject(contentValues, settingsValues, index);
 
 		// Await one animation frame:
 		await new Promise((resolve) => requestAnimationFrame(() => resolve(true)));
