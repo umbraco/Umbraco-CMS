@@ -1,15 +1,16 @@
-import { UmbInputDocumentElement } from './input-document.element.js';
+import { UmbInputRichMediaElement } from './input-rich-media.element.js';
 import { expect, fixture, html } from '@open-wc/testing';
 import { type UmbTestRunnerWindow, defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
-describe('UmbInputDocumentElement', () => {
-	let element: UmbInputDocumentElement;
+
+describe('UmbInputRichMediaElement', () => {
+	let element: UmbInputRichMediaElement;
 
 	beforeEach(async () => {
-		element = await fixture(html` <umb-input-document></umb-input-document> `);
+		element = await fixture(html` <umb-input-rich-media></umb-input-rich-media> `);
 	});
 
 	it('is defined with its own instance', () => {
-		expect(element).to.be.instanceOf(UmbInputDocumentElement);
+		expect(element).to.be.instanceOf(UmbInputRichMediaElement);
 	});
 
 	describe('interactionMemories', () => {
