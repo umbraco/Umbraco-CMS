@@ -103,7 +103,7 @@ internal sealed class DocumentHybridCacheStaleSetRaceTests : UmbracoIntegrationT
         var readReachedDatabase = new TaskCompletionSource();
         var releaseRead = new TaskCompletionSource();
         _databaseCacheRepository
-            .Setup(x => x.GetContentSourceAsync(Textpage.Key, false))
+            .Setup(x => x.GetDocumentSourceAsync(Textpage.Key, false))
             .Returns(async () =>
             {
                 readReachedDatabase.TrySetResult();
@@ -113,7 +113,7 @@ internal sealed class DocumentHybridCacheStaleSetRaceTests : UmbracoIntegrationT
 
         // The publish-time memory refresh reads the new snapshot from the database cache.
         _databaseCacheRepository
-            .Setup(x => x.GetContentSourceForPublishStatesAsync(Textpage.Key))
+            .Setup(x => x.GetDocumentSourceForPublishStatesAsync(Textpage.Key))
             .ReturnsAsync((null, newNode));
 
         // Ensure the published entry is absent so the request below is a genuine read-through.
