@@ -225,8 +225,9 @@ export class UmbTableElement extends UmbLitElement {
 
 		// The `keyed` directive in `render()` rebuilds the `<uui-table>` element when the column
 		// signature changes. The sorter caches its container element on first initialization, so
-		// when the table is replaced we need to reattach it to the fresh node.
-		if (changedProperties.has('columns') && this._sortable) {
+		// when the table is replaced we need to reattach it to the fresh node. Gate on the key
+		// because the key also depends on `#hasChildrenColumn`, which can toggle from an items update alone.
+		if (this._sortable) {
 			const columnKey = this.#getColumnKey();
 			if (columnKey !== this.#lastColumnKey) {
 				this.#lastColumnKey = columnKey;
