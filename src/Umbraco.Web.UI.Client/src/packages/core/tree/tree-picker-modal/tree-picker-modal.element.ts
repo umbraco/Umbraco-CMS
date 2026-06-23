@@ -65,6 +65,7 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 	private _initialStartNode?: UmbTreeStartNode;
 	private _repository?: UmbTreeRepository;
 	private _breadcrumbLoaded = false;
+	private _breadcrumbLoadPromise?: Promise<void>;
 
 	protected _pickerContext = new UmbTreeItemPickerContext(this);
 
@@ -116,6 +117,7 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 				this._currentLocation = this.data.startNode;
 				this._breadcrumb = [];
 				this._breadcrumbLoaded = false;
+				this._breadcrumbLoadPromise = undefined;
 				this.#initRepository(this.data.treeAlias);
 			}
 
@@ -148,7 +150,8 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 				this._repository = permitted ? ctrl.api : undefined;
 				if (this._repository && !this._breadcrumbLoaded) {
 					this._breadcrumbLoaded = true;
-					await this.#loadInitialBreadcrumb();
+					this._breadcrumbLoadPromise = this.#loadInitialBreadcrumb();
+					await this._breadcrumbLoadPromise;
 					await this.#restoreLocationFromMemory();
 				}
 			},
@@ -189,6 +192,8 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 		this._currentLocation = entity;
 		if (!this._repository) return;
 
+		await this._breadcrumbLoadPromise;
+
 		const { data } = await this._repository.requestTreeItemAncestors({ treeItem: entity });
 		const items = data ?? [];
 
@@ -203,7 +208,7 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 		} else {
 			const root = this._breadcrumb[0];
 			this._breadcrumb = [
-				root,
+				...(root ? [root] : []),
 				...items.map((item) => ({
 					unique: item.unique,
 					entityType: item.entityType,
