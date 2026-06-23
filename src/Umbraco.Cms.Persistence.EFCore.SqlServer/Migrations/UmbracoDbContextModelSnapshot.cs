@@ -464,6 +464,8 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                     b.HasKey("ParentId", "ChildId")
                         .HasName("PK_cmsContentType2ContentType");
 
+                    b.HasIndex("ChildId");
+
                     b.ToTable("cmsContentType2ContentType", (string)null);
                 });
 
@@ -1565,6 +1567,28 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
 
                     b.Navigation("ParentEntry");
                 });
+
+            modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.ContentType2ContentTypeDto", b =>
+                {
+                    b.HasOne("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.NodeDto", "ChildNode")
+                        .WithMany()
+                        .HasForeignKey("ChildId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired()
+                        .HasConstraintName("FK_cmsContentType2ContentType_umbracoNode_child");
+
+                    b.HasOne("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.NodeDto", "ParentNode")
+                        .WithMany()
+                        .HasForeignKey("ParentId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired()
+                        .HasConstraintName("FK_cmsContentType2ContentType_umbracoNode_parent");
+
+                    b.Navigation("ChildNode");
+
+                    b.Navigation("ParentNode");
+                });
+
 
             modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.ContentTypeDto", b =>
                 {

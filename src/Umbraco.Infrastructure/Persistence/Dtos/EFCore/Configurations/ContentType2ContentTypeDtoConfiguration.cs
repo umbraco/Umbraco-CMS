@@ -18,8 +18,16 @@ public class ContentType2ContentTypeDtoConfiguration : IEntityTypeConfiguration<
         builder.Property(x => x.ChildId)
             .HasColumnName(ContentType2ContentTypeDto.ChildIdColumnName);
 
-        // No EF Core navigations are declared for the parent/child FKs: they reference umbracoNode
-        // rather than the content-type primary key, and the repository does not traverse them.
-        // TODO (EF Core): the DB constraints are currently created by NPoco's schema; revisit this comment once NPoco is removed.
+        builder.HasOne(x => x.ParentNode)
+            .WithMany()
+            .HasForeignKey(x => x.ParentId)
+            .OnDelete(DeleteBehavior.NoAction)
+            .HasConstraintName("FK_cmsContentType2ContentType_umbracoNode_parent");
+
+        builder.HasOne(x => x.ChildNode)
+            .WithMany()
+            .HasForeignKey(x => x.ChildId)
+            .OnDelete(DeleteBehavior.NoAction)
+            .HasConstraintName("FK_cmsContentType2ContentType_umbracoNode_child");
     }
 }

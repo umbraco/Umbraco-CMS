@@ -20,4 +20,18 @@ public sealed class ContentType2ContentTypeDto
     /// Gets or sets the child content type identifier.
     /// </summary>
     public int ChildId { get; set; }
+
+    /// <summary>
+    /// Gets or sets the <see cref="NodeDto"/> of the parent content type.
+    /// </summary>
+    /// <remarks>
+    /// The parent/child columns are foreign keys to <c>umbracoNode</c>, so the navigations target
+    /// <see cref="NodeDto"/> (matching the physical constraints) rather than <see cref="ContentTypeDto"/>.
+    /// </remarks>
+    public NodeDto ParentNode { get; set; } = null!;
+
+    /// <summary>
+    /// Gets or sets the <see cref="NodeDto"/> of the child content type.
+    /// </summary>
+    public NodeDto ChildNode { get; set; } = null!;
 }
