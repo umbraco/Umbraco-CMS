@@ -1,5 +1,5 @@
 import { UMB_ENTITY_CONTEXT, type UmbEntityModel } from '@umbraco-cms/backoffice/entity';
-import type { ManifestWorkspaceViewTreekind } from './types.js';
+import type { ManifestWorkspaceViewTreeKind } from './types.js';
 import { html, nothing, customElement, property, state, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_INTERACTION_MEMORY_CONTEXT } from '@umbraco-cms/backoffice/interaction-memory';
@@ -10,7 +10,7 @@ import type { PropertyValues } from '@umbraco-cms/backoffice/external/lit';
 @customElement('umb-tree-workspace-view')
 export class UmbTreeWorkspaceViewElement extends UmbLitElement {
 	@property({ type: Object, attribute: false })
-	public manifest?: ManifestWorkspaceViewTreekind;
+	public manifest?: ManifestWorkspaceViewTreeKind;
 
 	@state()
 	private _parent?: UmbEntityModel;

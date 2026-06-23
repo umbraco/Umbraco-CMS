@@ -1,6 +1,6 @@
 import type { ManifestWorkspaceView, MetaWorkspaceView } from '@umbraco-cms/backoffice/workspace';
 
-export interface ManifestWorkspaceViewTreekind extends ManifestWorkspaceView {
+export interface ManifestWorkspaceViewTreeKind extends ManifestWorkspaceView {
 	type: 'workspaceView';
 	kind: 'tree';
 	meta: MetaWorkspaceViewTreeKind;
@@ -12,6 +12,6 @@ export interface MetaWorkspaceViewTreeKind extends MetaWorkspaceView {
 
 declare global {
 	interface UmbExtensionManifestMap {
-		umbManifestWorkspaceViewTreeKind: ManifestWorkspaceViewTreekind;
+		umbManifestWorkspaceViewTreeKind: ManifestWorkspaceViewTreeKind;
 	}
 }
