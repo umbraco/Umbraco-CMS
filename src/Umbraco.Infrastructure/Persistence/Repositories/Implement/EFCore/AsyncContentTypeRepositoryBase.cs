@@ -242,23 +242,44 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
     public IEnumerable<TEntity> Get(IQuery<TEntity> query)
     {
         EnsureAmbientScopeOnCallerContext();
-        return GetAsync(query, CancellationToken.None).GetAwaiter().GetResult();
+        return PerformGetByQueryAsync(query).GetAwaiter().GetResult().WhereNotNull();
     }
-
-    /// <inheritdoc />
-    public async Task<IEnumerable<TEntity>> GetAsync(IQuery<TEntity> query, CancellationToken cancellationToken)
-        => (await PerformGetByQueryAsync(query)).WhereNotNull();
 
     /// <inheritdoc />
     public int Count(IQuery<TEntity>? query)
     {
         EnsureAmbientScopeOnCallerContext();
-        return CountAsync(query, CancellationToken.None).GetAwaiter().GetResult();
+        return PerformCountAsync(query).GetAwaiter().GetResult();
     }
 
     /// <inheritdoc />
-    public Task<int> CountAsync(IQuery<TEntity>? query, CancellationToken cancellationToken)
-        => PerformCountAsync(query);
+    public async Task<IEnumerable<TEntity>> GetByParentIdAsync(int parentId, CancellationToken cancellationToken)
+        => (await GetAllAsync(cancellationToken))
+            .Where(x => x.ParentId == parentId)
+            .OrderBy(x => x.Name)
+            .ToArray();
+
+    /// <inheritdoc />
+    public async Task<bool> HasChildrenAsync(int parentId, CancellationToken cancellationToken)
+        => (await GetAllAsync(cancellationToken)).Any(x => x.ParentId == parentId);
+
+    /// <inheritdoc />
+    public async Task<int> CountAsync(CancellationToken cancellationToken)
+        => (await GetAllAsync(cancellationToken)).Count();
+
+    /// <inheritdoc />
+    public async Task<IEnumerable<TEntity>> GetAllowedAsRootAsync(CancellationToken cancellationToken)
+        => (await GetAllAsync(cancellationToken))
+            .Where(x => x.AllowedAsRoot)
+            .OrderBy(x => x.Name)
+            .ToArray();
+
+    /// <inheritdoc />
+    public async Task<IEnumerable<TEntity>> GetAllowedInLibraryAsync(CancellationToken cancellationToken)
+        => (await GetAllAsync(cancellationToken))
+            .Where(x => x.IsElement && x.AllowedInLibrary)
+            .OrderBy(x => x.Name)
+            .ToArray();
 
     // ----------------------------------------------------------------------------------------------------
     // IQuery read path — the where clauses captured by the IQuery (SQL text + args) are appended to a

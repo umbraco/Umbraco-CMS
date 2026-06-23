@@ -3,7 +3,6 @@
 
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Persistence.Querying;
 
 namespace Umbraco.Cms.Core.Persistence.Repositories;
 
@@ -29,20 +28,40 @@ public interface IAsyncContentTypeRepositoryBase<TItem>
     Task<TItem?> GetAsync(string alias, CancellationToken cancellationToken);
 
     /// <summary>
-    ///     Gets the content types matching the specified query.
+    ///     Gets the content types that are direct children of the specified parent.
     /// </summary>
-    /// <param name="query">The query.</param>
+    /// <param name="parentId">The parent content type id.</param>
     /// <param name="cancellationToken">A cancellation token.</param>
-    /// <returns>The matching content types.</returns>
-    Task<IEnumerable<TItem>> GetAsync(IQuery<TItem> query, CancellationToken cancellationToken);
+    /// <returns>The child content types, ordered by name.</returns>
+    Task<IEnumerable<TItem>> GetByParentIdAsync(int parentId, CancellationToken cancellationToken);
 
     /// <summary>
-    ///     Counts the content types matching the specified query.
+    ///     Gets a value indicating whether the specified content type has any children.
     /// </summary>
-    /// <param name="query">The query, or <c>null</c> to count all.</param>
+    /// <param name="parentId">The parent content type id.</param>
     /// <param name="cancellationToken">A cancellation token.</param>
-    /// <returns>The number of matching content types.</returns>
-    Task<int> CountAsync(IQuery<TItem>? query, CancellationToken cancellationToken);
+    Task<bool> HasChildrenAsync(int parentId, CancellationToken cancellationToken);
+
+    /// <summary>
+    ///     Counts all content types.
+    /// </summary>
+    /// <param name="cancellationToken">A cancellation token.</param>
+    /// <returns>The total number of content types.</returns>
+    Task<int> CountAsync(CancellationToken cancellationToken);
+
+    /// <summary>
+    ///     Gets the content types that are allowed at the root.
+    /// </summary>
+    /// <param name="cancellationToken">A cancellation token.</param>
+    /// <returns>The content types allowed at the root, ordered by name.</returns>
+    Task<IEnumerable<TItem>> GetAllowedAsRootAsync(CancellationToken cancellationToken);
+
+    /// <summary>
+    ///     Gets the element content types that are allowed in the library.
+    /// </summary>
+    /// <param name="cancellationToken">A cancellation token.</param>
+    /// <returns>The element content types allowed in the library, ordered by name.</returns>
+    Task<IEnumerable<TItem>> GetAllowedInLibraryAsync(CancellationToken cancellationToken);
 
     /// <summary>
     ///     Moves a content type to a container.
