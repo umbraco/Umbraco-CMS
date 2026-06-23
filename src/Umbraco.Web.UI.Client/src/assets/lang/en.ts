@@ -2143,6 +2143,7 @@ export default {
 		cardViewLabel: 'Cards',
 		tableViewLabel: 'Table',
 		children: 'Children',
+		noItems: 'No items',
 	},
 	update: {
 		updateAvailable: 'New update ready',

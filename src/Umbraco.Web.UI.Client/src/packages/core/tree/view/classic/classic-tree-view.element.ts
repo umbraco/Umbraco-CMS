@@ -86,6 +86,11 @@ export class UmbClassicTreeViewElement extends UmbTreeViewElementBase {
 		if (this._isMenu) {
 			return html`${this.#renderTreeRoot()} ${this.#renderRootItems()}`;
 		}
+		// When the tree root is hidden or we are drilled into a start node only the children are shown.
+		// With no children there is nothing to frame, so render nothing and let the tree host present the empty state.
+		if ((this._hideTreeRoot || this._startNode) && this._rootItems.length === 0) {
+			return nothing;
+		}
 		return html`
 			<uui-box>
 				${this.#renderTreeRoot()} ${this.#renderRootItems()}

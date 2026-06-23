@@ -10,6 +10,7 @@ import type { UmbDefaultTreeContext } from './default-tree.context.js';
 
 import { css, customElement, html, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { UmbInteractionMemoriesChangeEvent } from '@umbraco-cms/backoffice/interaction-memory';
@@ -33,6 +34,29 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 	}
 	public set api(value: UmbDefaultTreeContext<UmbTreeItemModel, UmbTreeRootModel> | undefined) {
 		this._api = value;
+		if (value) {
+			// Derive emptiness from the loaded children, not `hasChildren`: the latter is also written by the
+			// concurrent tree-root load (with the root's own child count), which can clobber the start node's value
+			// and intermittently hide the empty state.
+			this.observe(
+				value.rootItems,
+				(items) => (this._hasItems = (items?.length ?? 0) > 0),
+				'umbTreeRootItemsObserver',
+			);
+			// Track loading so the empty state isn't shown before the children have loaded, or while reloading.
+			this.observe(
+				value.isLoadingChildren,
+				(isLoadingChildren) => {
+					this._isLoadingChildren = isLoadingChildren ?? false;
+					if (isLoadingChildren) {
+						this.#hasBeenLoading = true;
+					} else if (this.#hasBeenLoading) {
+						this._initialLoadDone = true;
+					}
+				},
+				'umbTreeIsLoadingChildrenObserver',
+			);
+		}
 		if (value?.view) {
 			this.observe(value.view.currentView, async (manifest) => {
 				const element = manifest ? await createExtensionElement(manifest) : null;
@@ -113,6 +137,17 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 	@state()
 	private _viewElement?: HTMLElement | null;
 
+	@state()
+	private _hasItems = false;
+
+	@state()
+	private _isLoadingChildren = false;
+
+	@state()
+	private _initialLoadDone = false;
+
+	#hasBeenLoading = false;
+
 	protected override async updated(
 		_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>,
 	): Promise<void> {
@@ -186,15 +221,40 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 			${!this.hideToolbar
 				? html`<umb-tree-toolbar .hideTreeActions=${this.hideTreeActions}></umb-tree-toolbar>`
 				: nothing}
-			${this._viewElement ?? nothing}
+			${this._viewElement ?? nothing} ${this.#renderEmptyState()}
 		`;
 	}
 
-	static override styles = css`
-		:host {
-			display: contents;
-		}
-	`;
+	#renderEmptyState() {
+		// The empty state belongs to the children list, not a single view, so it is presented once here — mirroring
+		// the collection pattern. It is only relevant when the children are shown on their own (root hidden or drilled
+		// into a start node) and never in the sidebar menu.
+		if (this.isMenu || !(this.hideTreeRoot || this.startNode)) return nothing;
+		if (!this._initialLoadDone || this._isLoadingChildren || this._hasItems) return nothing;
+		return html`<div id="empty-state" class="uui-text"><h4>${this.localize.term('tree_noItems')}</h4></div>`;
+	}
+
+	static override styles = [
+		UmbTextStyles,
+		css`
+			:host {
+				display: contents;
+			}
+
+			#empty-state {
+				text-align: center;
+				padding: var(--uui-size-layout-1);
+				opacity: 0;
+				animation: fadeIn 100ms 100ms forwards;
+			}
+
+			@keyframes fadeIn {
+				100% {
+					opacity: 1;
+				}
+			}
+		`,
+	];
 }
 
 export default UmbDefaultTreeElement;
