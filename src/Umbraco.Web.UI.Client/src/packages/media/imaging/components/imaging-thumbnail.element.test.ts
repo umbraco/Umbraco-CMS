@@ -2,45 +2,18 @@ import { UmbImagingThumbnailElement } from './imaging-thumbnail.element.js';
 import { UmbThumbnailElement } from './thumbnail.element.js';
 import { expect, fixture, html } from '@open-wc/testing';
 
-// 1x1 transparent PNG.
-const TRANSPARENT_PNG =
-	'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+M8AAAMBAQDJ/IjVAAAAAElFTkSuQmCC';
-
-describe('UmbImagingThumbnailElement', () => {
+// Behaviour (the "img" part, checkerboard default, --umb-thumbnail-background) is covered by
+// thumbnail.element.test.ts and inherited from UmbThumbnailElement. This suite only guards that the
+// deprecated `umb-imaging-thumbnail` alias stays registered and on the inheritance chain.
+describe('UmbImagingThumbnailElement (deprecated alias)', () => {
 	let element: UmbImagingThumbnailElement;
 
 	beforeEach(async () => {
-		// No `unique` is set, so #generateThumbnailUrl returns early and never
-		// overwrites the thumbnail URL we inject below.
 		element = await fixture<UmbImagingThumbnailElement>(html`<umb-imaging-thumbnail></umb-imaging-thumbnail>`);
-		(element as unknown as { _thumbnailUrl: string })._thumbnailUrl = TRANSPARENT_PNG;
-		element.requestUpdate();
-		await element.updateComplete;
-
-		// Guard: if the private field is ever renamed, the injection above silently no-ops.
-		// Fail loudly here rather than letting later assertions pass vacuously.
-		expect(element.shadowRoot!.querySelector('#figure'), 'sample image should render').to.not.equal(null);
 	});
 
-	it('is a deprecated alias that extends UmbThumbnailElement', () => {
+	it('is still registered and extends UmbThumbnailElement', () => {
 		expect(element).to.be.instanceOf(UmbImagingThumbnailElement);
 		expect(element).to.be.instanceOf(UmbThumbnailElement);
-	});
-
-	it('renders the image with a stylable "img" part', () => {
-		const img = element.shadowRoot!.querySelector<HTMLImageElement>('#figure');
-		expect(img).to.not.equal(null);
-		expect(img!.getAttribute('part')).to.equal('img');
-	});
-
-	it('shows the checkerboard background by default', () => {
-		const img = element.shadowRoot!.querySelector<HTMLImageElement>('#figure')!;
-		expect(getComputedStyle(img).backgroundImage).to.contain('svg');
-	});
-
-	it('removes the checkerboard when --umb-thumbnail-background is overridden', () => {
-		const img = element.shadowRoot!.querySelector<HTMLImageElement>('#figure')!;
-		element.style.setProperty('--umb-thumbnail-background', 'none');
-		expect(getComputedStyle(img).backgroundImage).to.equal('none');
 	});
 });
