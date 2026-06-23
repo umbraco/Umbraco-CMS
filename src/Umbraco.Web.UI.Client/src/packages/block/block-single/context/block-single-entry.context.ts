@@ -17,7 +17,10 @@ export class UmbBlockSingleEntryContext extends UmbBlockEntryContext<
 	typeof UMB_BLOCK_SINGLE_ENTRIES_CONTEXT.TYPE
 > {
 	#inlineEditingMode = new UmbBooleanState(undefined);
-	readonly inlineEditingMode = this.#inlineEditingMode.asObservable();
+	readonly inlineEditingMode = mergeObservables(
+		[this.#inlineEditingMode.asObservable(), this.isExternalContent],
+		([inlineEditingMode, isExternalContent]) => inlineEditingMode === true && !isExternalContent,
+	);
 	readonly forceHideContentEditorInOverlay = this._blockType.asObservablePart((x) =>
 		x ? (x.forceHideContentEditorInOverlay ?? false) : undefined,
 	);
