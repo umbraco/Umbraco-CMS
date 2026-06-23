@@ -2,6 +2,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -356,25 +357,48 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
     }
 
     [Test]
-    public void GetDeliveryApiPropertyCacheLevel_Returns_None()
+    public void GetDeliveryApiPropertyCacheLevel_Returns_Elements_When_AltText_Disabled()
     {
         var converter = MediaPickerWithCropsValueConverter();
-        var dataType = new PublishedDataType(1, Constants.PropertyEditors.Aliases.MediaPicker3, "test",
-            new Lazy<object?>(() => new MediaPicker3Configuration()));
-        var propertyType = Mock.Of<IPublishedPropertyType>(pt => pt.DataType == dataType);
+        var propertyType = CreatePropertyType(new MediaPicker3Configuration());
+
+        Assert.AreEqual(PropertyCacheLevel.Elements, converter.GetDeliveryApiPropertyCacheLevel(propertyType));
+    }
+
+    [Test]
+    public void GetDeliveryApiPropertyCacheLevel_Returns_None_When_AltText_Enabled_On_Invariant_Property()
+    {
+        var converter = MediaPickerWithCropsValueConverter();
+        var propertyType = CreatePropertyType(new MediaPicker3Configuration { AltTextMode = "altText" });
 
         Assert.AreEqual(PropertyCacheLevel.None, converter.GetDeliveryApiPropertyCacheLevel(propertyType));
     }
 
     [Test]
-    public void GetDeliveryApiPropertyCacheLevelForExpansion_Returns_None()
+    public void GetDeliveryApiPropertyCacheLevelForExpansion_Returns_Elements_When_AltText_Disabled()
     {
         var converter = MediaPickerWithCropsValueConverter();
-        var dataType = new PublishedDataType(1, Constants.PropertyEditors.Aliases.MediaPicker3, "test",
-            new Lazy<object?>(() => new MediaPicker3Configuration()));
-        var propertyType = Mock.Of<IPublishedPropertyType>(pt => pt.DataType == dataType);
+        var propertyType = CreatePropertyType(new MediaPicker3Configuration());
+
+        Assert.AreEqual(PropertyCacheLevel.Elements, converter.GetDeliveryApiPropertyCacheLevelForExpansion(propertyType));
+    }
+
+    [Test]
+    public void GetDeliveryApiPropertyCacheLevelForExpansion_Returns_None_When_AltText_Enabled_On_Invariant_Property()
+    {
+        var converter = MediaPickerWithCropsValueConverter();
+        var propertyType = CreatePropertyType(new MediaPicker3Configuration { AltTextMode = "altText" });
 
         Assert.AreEqual(PropertyCacheLevel.None, converter.GetDeliveryApiPropertyCacheLevelForExpansion(propertyType));
+    }
+
+    private static IPublishedPropertyType CreatePropertyType(
+        MediaPicker3Configuration configuration,
+        ContentVariation variations = ContentVariation.Nothing)
+    {
+        var dataType = new PublishedDataType(1, Constants.PropertyEditors.Aliases.MediaPicker3, "test",
+            new Lazy<object?>(() => configuration));
+        return Mock.Of<IPublishedPropertyType>(pt => pt.DataType == dataType && pt.Variations == variations);
     }
 
     [Test]
@@ -393,6 +417,33 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
                 Crops = Array.Empty<ImageCropperValue.ImageCropperCrop>(),
                 AltText = "Default alt text",
                 AltTextByCulture = new Dictionary<string, string> { ["da-DK"] = "Dansk alt tekst" },
+            }
+        });
+
+        var result = MediaPickerWithCropsValueConverter(culture: "da-DK")
+            .ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false, false)
+            as IEnumerable<IApiMediaWithCrops>;
+
+        Assert.NotNull(result);
+        Assert.AreEqual("Dansk alt tekst", result.Single().AltText);
+    }
+
+    [Test]
+    public void DeliveryApi_ReturnsCultureSpecificAltText_WhenCultureCasingDiffers()
+    {
+        var publishedPropertyType = SetupMediaPropertyType(false);
+        var mediaKey = SetupMedia("Test media", ".jpg", 100, 200, "irrelevant", 500);
+
+        var serializer = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
+        var inter = serializer.Serialize(new[]
+        {
+            new MediaPicker3PropertyEditor.MediaPicker3PropertyValueEditor.MediaWithCropsDto
+            {
+                Key = Guid.NewGuid(),
+                MediaKey = mediaKey,
+                Crops = Array.Empty<ImageCropperValue.ImageCropperCrop>(),
+                AltText = "Default alt text",
+                AltTextByCulture = new Dictionary<string, string> { ["da-dk"] = "Dansk alt tekst" },
             }
         });
 

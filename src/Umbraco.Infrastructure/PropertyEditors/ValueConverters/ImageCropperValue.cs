@@ -197,10 +197,12 @@ public class ImageCropperValue :TemporaryFileUploadValueBase, IHtmlEncodedString
                     // Add incoming crop
                     crops.Add(incomingCrop);
                 }
-                else if (crop.Coordinates is null)
+                else
                 {
-                    // Use incoming crop coordinates
-                    crop.Coordinates = incomingCrop.Coordinates;
+                    // Keep this instance's values, but backfill anything it is missing from the incoming crop
+                    crop.Coordinates ??= incomingCrop.Coordinates;
+                    crop.AltText ??= incomingCrop.AltText;
+                    crop.AltTextByCulture ??= incomingCrop.AltTextByCulture;
                 }
             }
         }
@@ -310,8 +312,8 @@ public class ImageCropperValue :TemporaryFileUploadValueBase, IHtmlEncodedString
 
         /// <summary>
         /// Gets or sets per-culture alternative text overrides for this crop.
-        /// Keys are ISO culture codes (e.g. "en-US", "da-DK"). When a matching culture entry exists,
-        /// it takes precedence over <see cref="AltText"/> during value conversion.
+        /// Keys are ISO culture codes (e.g. "en-US", "da-DK"), matched case-insensitively. When a matching
+        /// culture entry exists, it takes precedence over <see cref="AltText"/> during value conversion.
         /// </summary>
         public Dictionary<string, string>? AltTextByCulture { get; set; }
 
@@ -331,6 +333,7 @@ public class ImageCropperValue :TemporaryFileUploadValueBase, IHtmlEncodedString
                                                 && string.Equals(left.Alias, right.Alias)
                                                 && left.Width == right.Width
                                                 && left.Height == right.Height
+                                                && string.Equals(left.AltText, right.AltText)
                                                 && Equals(left.Coordinates, right.Coordinates));
 
         public static bool operator ==(ImageCropperCrop? left, ImageCropperCrop? right)
@@ -352,6 +355,7 @@ public class ImageCropperValue :TemporaryFileUploadValueBase, IHtmlEncodedString
                 var hashCode = Alias?.GetHashCode() ?? 0;
                 hashCode = (hashCode * 397) ^ Width;
                 hashCode = (hashCode * 397) ^ Height;
+                hashCode = (hashCode * 397) ^ (AltText?.GetHashCode() ?? 0);
                 hashCode = (hashCode * 397) ^ (Coordinates?.GetHashCode() ?? 0);
                 return hashCode;
                 // ReSharper restore NonReadonlyMemberInGetHashCode
@@ -446,6 +450,7 @@ public class ImageCropperValue :TemporaryFileUploadValueBase, IHtmlEncodedString
         => ReferenceEquals(left, right) // deals with both being null, too
            || (!ReferenceEquals(left, null) && !ReferenceEquals(right, null)
                                             && string.Equals(left.Src, right.Src)
+                                            && string.Equals(left.AltText, right.AltText)
                                             && Equals(left.FocalPoint, right.FocalPoint)
                                             && left.ComparableCrops.SequenceEqual(right.ComparableCrops));
 
@@ -469,6 +474,7 @@ public class ImageCropperValue :TemporaryFileUploadValueBase, IHtmlEncodedString
             // properties are, practically, readonly
             // ReSharper disable NonReadonlyMemberInGetHashCode
             var hashCode = Src?.GetHashCode() ?? 0;
+            hashCode = (hashCode * 397) ^ (AltText?.GetHashCode() ?? 0);
             hashCode = (hashCode * 397) ^ (FocalPoint?.GetHashCode() ?? 0);
             hashCode = (hashCode * 397) ^ (Crops?.GetHashCode() ?? 0);
             return hashCode;

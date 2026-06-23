@@ -244,16 +244,41 @@ public class MediaPickerWithCropsValueConverterTests
     }
 
     [Test]
-    public void GetPropertyCacheLevel_Returns_None()
+    public void GetPropertyCacheLevel_Returns_Elements_When_AltText_Disabled()
     {
         var converter = CreateConverter(MockAccessor(new VariationContext("en")));
+        var propertyType = CreatePropertyType(new MediaPicker3Configuration());
+
+        Assert.AreEqual(PropertyCacheLevel.Elements, converter.GetPropertyCacheLevel(propertyType));
+    }
+
+    [Test]
+    public void GetPropertyCacheLevel_Returns_None_When_AltText_Enabled_On_Invariant_Property()
+    {
+        var converter = CreateConverter(MockAccessor(new VariationContext("en")));
+        var propertyType = CreatePropertyType(new MediaPicker3Configuration { AltTextMode = "altText" });
+
+        Assert.AreEqual(PropertyCacheLevel.None, converter.GetPropertyCacheLevel(propertyType));
+    }
+
+    [Test]
+    public void GetPropertyCacheLevel_Returns_Elements_When_AltText_Enabled_But_Property_Varies_By_Culture()
+    {
+        var converter = CreateConverter(MockAccessor(new VariationContext("en")));
+        var propertyType = CreatePropertyType(
+            new MediaPicker3Configuration { AltTextMode = "altText" },
+            ContentVariation.Culture);
+
+        Assert.AreEqual(PropertyCacheLevel.Elements, converter.GetPropertyCacheLevel(propertyType));
+    }
+
+    private static IPublishedPropertyType CreatePropertyType(
+        MediaPicker3Configuration configuration,
+        ContentVariation variations = ContentVariation.Nothing)
+    {
         var dataType = new PublishedDataType(1, Constants.PropertyEditors.Aliases.MediaPicker3, "test",
-            new Lazy<object?>(() => new MediaPicker3Configuration()));
-        var propertyType = Mock.Of<IPublishedPropertyType>(pt => pt.DataType == dataType);
-
-        var cacheLevel = converter.GetPropertyCacheLevel(propertyType);
-
-        Assert.AreEqual(PropertyCacheLevel.None, cacheLevel);
+            new Lazy<object?>(() => configuration));
+        return Mock.Of<IPublishedPropertyType>(pt => pt.DataType == dataType && pt.Variations == variations);
     }
 
     [Test]

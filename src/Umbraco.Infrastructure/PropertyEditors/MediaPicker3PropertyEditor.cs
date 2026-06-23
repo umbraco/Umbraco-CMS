@@ -464,8 +464,8 @@ public class MediaPicker3PropertyEditor : DataEditor, IValueSchemaProvider
 
             /// <summary>
             /// Gets or sets per-culture alternative text overrides.
-            /// Keys are ISO culture codes (e.g. "en", "da"). When a matching culture entry exists,
-            /// it takes precedence over <see cref="AltText"/> during value conversion.
+            /// Keys are ISO culture codes (e.g. "en-US", "da-DK"), matched case-insensitively. When a
+            /// matching culture entry exists, it takes precedence over <see cref="AltText"/> during value conversion.
             /// </summary>
             public Dictionary<string, string>? AltTextByCulture { get; set; }
 

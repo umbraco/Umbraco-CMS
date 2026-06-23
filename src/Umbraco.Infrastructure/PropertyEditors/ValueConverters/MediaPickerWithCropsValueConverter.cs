@@ -123,12 +123,12 @@ public class MediaPickerWithCropsValueConverter : PropertyValueConverterBase, ID
     /// </summary>
     /// <param name="propertyType">The published property type for which to determine the cache level.</param>
     /// <returns>
-    /// Always returns <see cref="PropertyCacheLevel.None"/> because the converted value includes
-    /// culture-specific alt text resolved from <see cref="IVariationContextAccessor"/> at runtime,
-    /// which varies per request and cannot be safely cached across requests.
+    /// <see cref="PropertyCacheLevel.None"/> when per-culture alt text has to be resolved per request
+    /// (see <see cref="RequiresPerRequestCultureResolution"/>); otherwise <see cref="PropertyCacheLevel.Elements"/>
+    /// so the converted value can be cached as it was before alt text support was added.
     /// </returns>
     public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType) =>
-        PropertyCacheLevel.None;
+        RequiresPerRequestCultureResolution(propertyType) ? PropertyCacheLevel.None : PropertyCacheLevel.Elements;
 
     /// <summary>
     /// Converts the intermediate value produced by the media picker with crops property editor into its final strongly-typed object representation.
@@ -161,18 +161,14 @@ public class MediaPickerWithCropsValueConverter : PropertyValueConverterBase, ID
             IPublishedContent? mediaItem = _publishedMediaCache.GetById(preview, dto.MediaKey);
             if (mediaItem != null)
             {
-                var altText = (!string.IsNullOrEmpty(culture) && dto.AltTextByCulture?.TryGetValue(culture, out var cultureAltText) == true)
-                    ? cultureAltText
-                    : dto.AltText;
+                var altText = ResolveCultureAltText(dto.AltText, dto.AltTextByCulture, culture);
 
                 // Resolve per-crop alt text from AltTextByCulture when a culture context is active.
                 var crops = string.IsNullOrEmpty(culture)
                     ? dto.Crops
                     : dto.Crops?.Select(crop =>
                     {
-                        var cropAltText = crop.AltTextByCulture?.TryGetValue(culture, out var cultureCropAlt) == true
-                            ? cultureCropAlt
-                            : crop.AltText;
+                        var cropAltText = ResolveCultureAltText(crop.AltText, crop.AltTextByCulture, culture);
                         return cropAltText == crop.AltText
                             ? crop
                             : new ImageCropperValue.ImageCropperCrop
@@ -182,6 +178,7 @@ public class MediaPickerWithCropsValueConverter : PropertyValueConverterBase, ID
                                 Height = crop.Height,
                                 Coordinates = crop.Coordinates,
                                 AltText = cropAltText,
+                                AltTextByCulture = crop.AltTextByCulture,
                             };
                     });
 
@@ -217,22 +214,22 @@ public class MediaPickerWithCropsValueConverter : PropertyValueConverterBase, ID
     /// </summary>
     /// <param name="propertyType">The published property type for which to determine the cache level.</param>
     /// <returns>
-    /// Always returns <see cref="PropertyCacheLevel.None"/> because the converted value includes
-    /// culture-specific alt text resolved from <see cref="IVariationContextAccessor"/> at runtime,
-    /// which varies per request and cannot be safely cached across requests.
+    /// <see cref="PropertyCacheLevel.None"/> when per-culture alt text has to be resolved per request
+    /// (see <see cref="RequiresPerRequestCultureResolution"/>); otherwise <see cref="PropertyCacheLevel.Elements"/>.
     /// </returns>
-    public PropertyCacheLevel GetDeliveryApiPropertyCacheLevel(IPublishedPropertyType propertyType) => PropertyCacheLevel.None;
+    public PropertyCacheLevel GetDeliveryApiPropertyCacheLevel(IPublishedPropertyType propertyType) =>
+        RequiresPerRequestCultureResolution(propertyType) ? PropertyCacheLevel.None : PropertyCacheLevel.Elements;
 
     /// <summary>
     /// Determines the <see cref="PropertyCacheLevel"/> to use when expanding a media picker property for the Delivery API.
     /// </summary>
     /// <param name="propertyType">The <see cref="IPublishedPropertyType"/> representing the property being expanded.</param>
     /// <returns>
-    /// Always returns <see cref="PropertyCacheLevel.None"/> because the expanded value includes
-    /// culture-specific alt text resolved from <see cref="IVariationContextAccessor"/> at runtime,
-    /// which varies per request and cannot be safely cached across requests.
+    /// <see cref="PropertyCacheLevel.None"/> when per-culture alt text has to be resolved per request
+    /// (see <see cref="RequiresPerRequestCultureResolution"/>); otherwise <see cref="PropertyCacheLevel.Elements"/>.
     /// </returns>
-    public PropertyCacheLevel GetDeliveryApiPropertyCacheLevelForExpansion(IPublishedPropertyType propertyType) => PropertyCacheLevel.None;
+    public PropertyCacheLevel GetDeliveryApiPropertyCacheLevelForExpansion(IPublishedPropertyType propertyType) =>
+        RequiresPerRequestCultureResolution(propertyType) ? PropertyCacheLevel.None : PropertyCacheLevel.Elements;
 
     /// <summary>
     /// Gets the type used for delivery API property values for the specified published property type.
@@ -261,8 +258,8 @@ public class MediaPickerWithCropsValueConverter : PropertyValueConverterBase, ID
 
         IApiMediaWithCrops ToApiMedia(MediaWithCrops media) => _apiMediaWithCropsBuilder.Build(media);
 
-        // NOTE: eventually we might implement this explicitly instead of piggybacking on the default object conversion. however, this only happens once per cache rebuild,
-        // and the performance gain from an explicit implementation is negligible, so... at least for the time being this will do just fine.
+        // NOTE: eventually we might implement this explicitly instead of piggybacking on the default object conversion.
+        // The performance gain from an explicit implementation is negligible, so... at least for the time being this will do just fine.
         var converted = ConvertIntermediateToObject(owner, propertyType, referenceCacheLevel, inter, preview);
         if (isMultiple && converted is IEnumerable<MediaWithCrops> mediasWithCrops)
         {
@@ -278,4 +275,41 @@ public class MediaPickerWithCropsValueConverter : PropertyValueConverterBase, ID
 
     private bool IsMultipleDataType(PublishedDataType dataType) =>
         dataType.ConfigurationAs<MediaPicker3Configuration>()?.Multiple ?? false;
+
+    // Per-culture alt text overrides are only stored on invariant (shared) properties — for those, an
+    // invariant value is shared across cultures, so caching it would serve one culture's alt text to all.
+    // Culture-varying properties already cache per culture, and properties with no alt text feature enabled
+    // never produce a culture-dependent value, so both can keep the normal (cacheable) cache level.
+    private static bool RequiresPerRequestCultureResolution(IPublishedPropertyType propertyType)
+    {
+        if (propertyType.Variations.VariesByCulture())
+        {
+            return false;
+        }
+
+        MediaPicker3Configuration? configuration = propertyType.DataType.ConfigurationAs<MediaPicker3Configuration>();
+        return configuration is not null
+               && (configuration.AltTextMode != "off" || configuration.EnableAltTextPerCrop);
+    }
+
+    // Culture codes can differ in casing between where alt text is written (the backoffice variant context)
+    // and where it is read (the published variation context), so match case-insensitively rather than relying
+    // on the dictionary's default ordinal comparer, which would silently fall back to the invariant value.
+    private static string? ResolveCultureAltText(string? defaultAltText, IReadOnlyDictionary<string, string>? altTextByCulture, string? culture)
+    {
+        if (string.IsNullOrEmpty(culture) || altTextByCulture is null)
+        {
+            return defaultAltText;
+        }
+
+        foreach (KeyValuePair<string, string> entry in altTextByCulture)
+        {
+            if (string.Equals(entry.Key, culture, StringComparison.OrdinalIgnoreCase))
+            {
+                return entry.Value;
+            }
+        }
+
+        return defaultAltText;
+    }
 }
