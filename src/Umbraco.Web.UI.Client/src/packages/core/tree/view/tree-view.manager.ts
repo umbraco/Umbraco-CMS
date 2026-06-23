@@ -30,10 +30,19 @@ const CLASSIC_FALLBACK: ManifestTreeView = {
 
 const MEMORY_UNIQUE = 'UmbTreeCurrentView';
 
+/**
+ * Construction arguments for {@link UmbTreeViewManager}.
+ */
 export interface UmbTreeViewManagerArgs {
+	/**
+	 * When provided, the selected tree view is remembered and restored across sessions.
+	 */
 	interactionMemoryManager?: UmbInteractionMemoryManager;
 }
 
+/**
+ * Manages the available views for a tree and tracks which one is currently active.
+ */
 export class UmbTreeViewManager extends UmbControllerBase {
 	#views = new UmbArrayState<ManifestTreeView>([], (x) => x.alias);
 	public readonly views = this.#views.asObservable();
@@ -47,6 +56,10 @@ export class UmbTreeViewManager extends UmbControllerBase {
 	#interactionMemoryManager?: UmbInteractionMemoryManager;
 	#muteMemoryObservation = false;
 
+	/**
+	 * @param {UmbControllerHost} host - The controller host this manager is bound to.
+	 * @param {UmbTreeViewManagerArgs} [args] - Optional construction arguments.
+	 */
 	constructor(host: UmbControllerHost, args?: UmbTreeViewManagerArgs) {
 		super(host);
 		this.#interactionMemoryManager = args?.interactionMemoryManager;

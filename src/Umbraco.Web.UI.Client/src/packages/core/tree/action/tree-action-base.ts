@@ -1,6 +1,9 @@
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
+/**
+ * A tree-level action, rendered in the tree's header to operate on the tree as a whole.
+ */
 export interface UmbTreeAction extends UmbApi {
 	/**
 	 * The href location, the action will act as a link.
@@ -21,6 +24,9 @@ export interface UmbTreeAction extends UmbApi {
 	execute(): Promise<void>;
 }
 
+/**
+ * Base class for {@link UmbTreeAction} implementations.
+ */
 export abstract class UmbTreeActionBase extends UmbControllerBase implements UmbTreeAction {
 	abstract execute(): Promise<void>;
 }

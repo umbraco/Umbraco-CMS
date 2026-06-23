@@ -4,6 +4,11 @@ import { UMB_TREE_CONTEXT } from '../tree.context.token.js';
 import { state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
+/**
+ * Base class for tree view elements, providing the tree's root and selection state to subclasses.
+ * @template TreeItemType - The tree item model rendered by this view.
+ * @template TreeRootType - The tree root model for this view.
+ */
 export abstract class UmbTreeViewElementBase<
 	TreeItemType extends UmbTreeItemModel = UmbTreeItemModel,
 	TreeRootType extends UmbTreeRootModel = UmbTreeRootModel,
