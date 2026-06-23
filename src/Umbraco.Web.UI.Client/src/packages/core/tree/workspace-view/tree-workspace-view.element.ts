@@ -64,7 +64,7 @@ export class UmbTreeWorkspaceViewElement extends UmbLitElement {
 
 	override render() {
 		if (!this.manifest) return html` <div>No Manifest</div>`;
-		if (!this.manifest.meta.treeAlias) return html` <div>No Collection Alias in Manifest</div>`;
+		if (!this.manifest.meta.treeAlias) return html` <div>No Tree Alias in Manifest</div>`;
 		if (this._parent === undefined) return nothing;
 		return html`<umb-tree
 			data-mark="tree:${this.manifest.meta.treeAlias}"
