@@ -866,6 +866,12 @@ export class UiBaseLocators extends BasePage {
     await this.enterText(this.folderNameTxt, folderName, { verify: true });
   }
 
+  async enterRenameFolderName(folderName: string) {
+    await expect(this.folderNameTxt).toBeVisible();
+    await expect(this.folderNameTxt).not.toHaveValue("");
+    await this.enterText(this.folderNameTxt, folderName, { verify: true });
+  }
+
   async createFolder(folderName: string) {
     await this.clickCreateActionMenuOption();
     await this.clickNewFolderThreeDotsButton();
@@ -2125,6 +2131,11 @@ export class UiBaseLocators extends BasePage {
   }
 
   async selectUserLanguage(language: string) {
-    await this.languageBtn.selectOption(language, {force: true});
+    // The culture select initialises asynchronously and can ignore (or clobber) an early selection, leaving the
+    // workspace pristine so Save sends no request. Re-select until the chosen value sticks.
+    await expect(async () => {
+      await this.languageBtn.selectOption(language, {force: true});
+      await expect(this.languageBtn).toHaveValue(language, {timeout: ConstantHelper.timeout.short});
+    }).toPass({timeout: ConstantHelper.timeout.medium});
   }
 }

@@ -173,16 +173,11 @@ test('can add a media image to a media picker in variant content, remove it and 
   // Removes media item from the media picker
   await umbracoUi.content.removeMediaPickerByName(mediaFileName);
   await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeUpdated();
-  // The picker can keep rendering the removed card after publish; switch tabs to force it to
-  // re-render from the (now empty) model before adding again.
-  await umbracoUi.content.clickInfoTab();
-  await umbracoUi.content.clickContentTab();
   // Adds media item to a media picker again
   await umbracoUi.content.clickChooseButtonAndSelectMediaWithKey(mediaFileId);
   await umbracoUi.content.clickChooseModalButton();
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  // Wait for the media file to be visible
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
-  await umbracoUi.content.isMediaNameVisible(mediaFileName);
+  expect(await umbracoApi.document.doesImageMediaPickerContainImage(contentName, AliasHelper.toAlias(dataTypeName), mediaFileId)).toBeTruthy();
 });

@@ -56,6 +56,7 @@ export class LibraryUiHelper extends UiBaseLocators {
   private readonly elementWorkspace: Locator;
   private readonly selectAVariantBtn: Locator;
   private readonly variantAddModeBtn: Locator;
+  private readonly cultureVariant: Locator;
   private readonly saveAndCloseBtn: Locator;
   private readonly enterNameInContainerTxt: Locator;
   private readonly elementCollectionView: Locator;
@@ -230,6 +231,7 @@ export class LibraryUiHelper extends UiBaseLocators {
     this.elementWorkspace = page.locator('umb-element-workspace-editor');
     this.selectAVariantBtn = page.getByRole('button', {name: 'Open version selector'});
     this.variantAddModeBtn = page.locator('.switch-button.add-mode').locator('.variant-name');
+    this.cultureVariant = page.locator('.variant.culture-variant');
     this.saveAndCloseBtn = page.getByLabel('Save and close');
     this.elementTreeItem = page.locator('umb-tree-item');
     this.elementLanguageSelect = page.locator('umb-app-language-select');
@@ -913,11 +915,17 @@ export class LibraryUiHelper extends UiBaseLocators {
   }
 
   async clickSelectVariantButton() {
-    await this.click(this.selectAVariantBtn);
+    const variantRow = this.cultureVariant.first();
+    await expect(async () => {
+      if (!(await variantRow.isVisible())) {
+        await this.click(this.selectAVariantBtn);
+      }
+      await expect(variantRow).toBeVisible({timeout: ConstantHelper.timeout.short});
+    }).toPass({timeout: ConstantHelper.timeout.medium});
   }
 
   async clickExpendSegmentButton(elementName: string) {
-    await this.page.locator('.variant.culture-variant').filter({hasText: elementName}).locator(this.expandSegmentBtn).click();
+    await this.cultureVariant.filter({hasText: elementName}).locator(this.expandSegmentBtn).click();
   }
 
   async clickVariantAddModeButtonForLanguageName(language: string) {
