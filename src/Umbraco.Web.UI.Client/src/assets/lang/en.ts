@@ -2420,6 +2420,10 @@ export default {
 	textbox: {
 		characters_left: '<strong>%0%</strong> characters left.',
 		characters_exceed: 'Maximum %0% characters, <strong>%1%</strong> too many.',
+		maxCharsLabel: 'Maximum allowed characters',
+		autocompleteSelection: 'Autocomplete behavior',
+		autocomplete: 'Autocomplete group',
+		placeholder: 'Placeholder',
 	},
 	recycleBin: {
 		contentTrashed: 'Trashed content with Id: {0} related to original parent content with Id: {1}',
