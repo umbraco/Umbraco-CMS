@@ -24,7 +24,7 @@ internal abstract class AsyncContentEditingServiceWithSortingBase<TContent, TCon
     private readonly ITreeEntitySortingService _treeEntitySortingService;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="ContentEditingServiceWithSortingBase{TContent, TContentType, TContentService, TContentTypeService}"/> class.
+    /// Initializes a new instance of the <see cref="AsyncContentEditingServiceWithSortingBase{TContent, TContentType, TContentService, TContentTypeService}"/> class.
     /// </summary>
     /// <param name="contentService">The content service.</param>
     /// <param name="contentTypeService">The content type service.</param>

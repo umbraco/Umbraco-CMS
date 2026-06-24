@@ -1,4 +1,4 @@
-using Umbraco.Cms.Core.Models;
+﻿using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentTypeEditing;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Core.Strings;
@@ -6,20 +6,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services.ContentTypeEditing;
 
-/// <summary>
-///     Abstract base class providing common functionality for content type editing services.
-/// </summary>
-/// <typeparam name="TContentType">The type of content type being edited (e.g., <see cref="IContentType"/>, <see cref="IMediaType"/>, <see cref="IMemberType"/>).</typeparam>
-/// <typeparam name="TContentTypeService">The service type for managing the content type.</typeparam>
-/// <typeparam name="TPropertyTypeModel">The model type for property type definitions.</typeparam>
-/// <typeparam name="TPropertyTypeContainer">The model type for property type containers (groups/tabs).</typeparam>
-/// <remarks>
-///     This base class provides shared validation, mapping, and update logic for all content type
-///     editing services including document types, media types, and member types.
-/// </remarks>
-internal abstract class ContentTypeEditingServiceBase<TContentType, TContentTypeService, TPropertyTypeModel, TPropertyTypeContainer>
+internal abstract class AsyncContentTypeEditingServiceBase<TContentType, TContentTypeService, TPropertyTypeModel, TPropertyTypeContainer>
     where TContentType : class, IContentTypeComposition
-    where TContentTypeService : IContentTypeBaseService<TContentType>
+    where TContentTypeService : IAsyncContentTypeBaseService<TContentType>
     where TPropertyTypeModel : PropertyTypeModelBase
     where TPropertyTypeContainer : PropertyTypeContainerModelBase
 {
@@ -30,14 +19,14 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
     private readonly IShortStringHelper _shortStringHelper;
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="ContentTypeEditingServiceBase{TContentType, TContentTypeService, TPropertyTypeModel, TPropertyTypeContainer}"/> class.
+    ///     Initializes a new instance of the <see cref="AsyncContentTypeEditingServiceBase{TContentType, TContentTypeService, TPropertyTypeModel, TPropertyTypeContainer}"/> class.
     /// </summary>
     /// <param name="contentTypeService">The content type service for cross-type operations.</param>
     /// <param name="concreteContentTypeService">The specific content type service for the type being edited.</param>
     /// <param name="dataTypeService">The data type service for validating property data types.</param>
     /// <param name="entityService">The entity service for resolving entity relationships.</param>
     /// <param name="shortStringHelper">The helper for generating safe aliases.</param>
-    protected ContentTypeEditingServiceBase(
+    protected AsyncContentTypeEditingServiceBase(
         IContentTypeService contentTypeService,
         TContentTypeService concreteContentTypeService,
         IDataTypeService dataTypeService,
@@ -90,7 +79,7 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         bool isElement = false)
     {
         TContentType? contentType = key.HasValue ? await _concreteContentTypeService.GetAsync(key.Value) : null;
-        IContentTypeComposition[] allContentTypes = _concreteContentTypeService.GetAll().ToArray();
+        IContentTypeComposition[] allContentTypes = (await _concreteContentTypeService.GetAllAsync()).ToArray();
 
         var currentCompositionAliases = currentCompositeKeys.Any()
             ? allContentTypes.Where(ct => currentCompositeKeys.Contains(ct.Key)).Select(ct => ct.Alias).ToArray()
@@ -127,7 +116,7 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         }
 
         // get all existing content type compositions
-        IContentTypeComposition[] allContentTypeCompositions = GetAllContentTypeCompositions();
+        IContentTypeComposition[] allContentTypeCompositions = await GetAllContentTypeCompositionsAsync();
 
         // validate inheritance or parent container - a content type can be created either under another content type (inheritance) or inside a container (folder)
         ContentTypeOperationStatus operationStatus = ValidateInheritanceAndParent(model, containerKey);
@@ -178,13 +167,13 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
     {
         SanitizeModelAliases(model);
 
-        if (ContentTypeAliasCanBeUsedFor(model.Alias, contentType.Key) is false)
+        if (await ContentTypeAliasCanBeUsedForAsync(model.Alias, contentType.Key) is false)
         {
             return Attempt.FailWithStatus<TContentType?, ContentTypeOperationStatus>(ContentTypeOperationStatus.InvalidAlias, null);
         }
 
         // get all existing content type compositions
-        IContentTypeComposition[] allContentTypeCompositions = GetAllContentTypeCompositions();
+        IContentTypeComposition[] allContentTypeCompositions = await GetAllContentTypeCompositionsAsync();
 
         // validate that inheritance or parent relationship hasn't changed
         ContentTypeOperationStatus operationStatus = ValidateInheritanceAndParent(contentType, model);
@@ -542,9 +531,9 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
     /// <param name="alias">The alias to check.</param>
     /// <param name="key">The key of the content type that wants to use the alias.</param>
     /// <returns><c>true</c> if the alias can be used; otherwise, <c>false</c>.</returns>
-    private bool ContentTypeAliasCanBeUsedFor(string alias, Guid key)
+    private async Task<bool> ContentTypeAliasCanBeUsedForAsync(string alias, Guid key)
     {
-        IContentType? existingContentType = _contentTypeService.GetAsync(alias).GetAwaiter().GetResult();
+        IContentType? existingContentType = await _contentTypeService.GetAsync(alias);
         if (existingContentType is null || existingContentType.Key == key)
         {
             return true;
@@ -959,9 +948,10 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
     ///     Gets all content type compositions from the service.
     /// </summary>
     /// <returns>An array of all content type compositions.</returns>
-    private IContentTypeComposition[] GetAllContentTypeCompositions()
+    private async Task<IContentTypeComposition[]> GetAllContentTypeCompositionsAsync()
         // NOTE: using Cast here is OK, because we implicitly enforce the constraint TContentType : IContentTypeComposition
-        => _concreteContentTypeService.GetAll().Cast<IContentTypeComposition>().ToArray();
+        => (await _concreteContentTypeService.GetAllAsync()).Cast<IContentTypeComposition>().ToArray();
 
     #endregion
 }
+
