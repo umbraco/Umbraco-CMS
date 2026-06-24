@@ -100,6 +100,10 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 		config: { showContentEdit: false, showSettingsEdit: false },
 	}; // Set to undefined cause it will be set before we render.
 
+	// 'is-reference' attribute is used for styling purpose.
+	@property({ type: Boolean, attribute: 'is-reference', reflect: true })
+	private _isExternalContent = false;
+
 	// 'content-invalid' attribute is used for styling purpose.
 	@property({ type: Boolean, attribute: 'content-invalid', reflect: true })
 	// eslint-disable-next-line @typescript-eslint/naming-convention
@@ -179,6 +183,14 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 			(exposed) => {
 				this.#updateBlockViewProps({ unpublished: !exposed });
 				this._exposed = exposed;
+			},
+			null,
+		);
+
+		this.observe(
+			this.#context.isExternalContent,
+			(isExternalContent) => {
+				this._isExternalContent = isExternalContent ?? false;
 			},
 			null,
 		);
@@ -350,6 +362,7 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 			:host {
 				position: relative;
 				display: block;
+				margin-top: 10px;
 				user-select: all;
 				user-drag: auto;
 				white-space: nowrap;
