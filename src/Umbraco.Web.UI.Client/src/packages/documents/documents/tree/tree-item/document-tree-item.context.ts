@@ -88,20 +88,29 @@ export class UmbDocumentTreeItemContext extends UmbDefaultTreeItemContext<
 	}
 
 	public override showChildren() {
-		if (this.getIsMenu() && this.#item.getHasCollection()) {
-			// Collections cannot be expanded via a menu, instead we open the Collection for the user.
-			this.#openCollection();
+		if (this.#item.getHasCollection()) {
+			this.#activateCollection();
 			return;
 		}
 		super.showChildren();
 	}
 
 	public override hideChildren() {
-		if (this.getIsMenu() && this.#item.getHasCollection()) {
-			// Collections in a menu will collapse when already showing children, and instead we open the Collection for the user.
-			this.#openCollection();
+		if (this.#item.getHasCollection()) {
+			this.#activateCollection();
+			return;
 		}
 		super.hideChildren();
+	}
+
+	// Collections cannot be expanded/collapsed. In a menu we navigate to the Collection view via the path;
+	// elsewhere (e.g. a picker) we emit the open event so the host can enter the Collection.
+	#activateCollection() {
+		if (this.getIsMenu()) {
+			this.#openCollection();
+		} else {
+			this.open();
+		}
 	}
 
 	#openCollection() {

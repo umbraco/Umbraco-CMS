@@ -55,13 +55,11 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 
 	// eslint-disable-next-line @typescript-eslint/naming-convention
 	override _renderExpandSymbol = () => {
-		// If this in the menu and it is a collection, then we will enforce the user to the Collection view instead of expanding.
+		// When it is a collection, we show a list icon instead of the expand arrow. Activating the caret then
+		// enters the Collection instead of expanding its children (see `UmbDocumentTreeItemContext`).
 		// `this._forceShowExpand` is equivalent to hasCollection for this element.
-		if (this._isMenu && this._forceShowExpand) {
-			return html`<umb-icon data-mark="open-collection" name="icon-list" style="font-size: 8px;"></umb-icon>`;
-		} else {
-			return undefined;
-		}
+		if (!this._forceShowExpand) return undefined;
+		return html`<umb-icon data-mark="open-collection" name="icon-list" style="font-size: 8px;"></umb-icon>`;
 	};
 
 	#handleDblClick(event: MouseEvent) {
