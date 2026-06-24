@@ -949,6 +949,7 @@ export default {
 		password: 'Password',
 		path: 'Path',
 		pixels: 'pixels',
+		placeholder: 'Placeholder',
 		pleasewait: 'One moment please...',
 		previous: 'Previous',
 		properties: 'Properties',
