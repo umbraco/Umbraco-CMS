@@ -188,11 +188,13 @@ internal sealed class ElementEditingService
     protected override async Task<Attempt<IContentType?, ContentEditingOperationStatus>> TryGetAndValidateContentTypeAsync(Guid contentTypeKey, ContentEditingModelBase contentEditingModelBase)
     {
         Attempt<IContentType?, ContentEditingOperationStatus> validateContentTypeAttempt = await base.TryGetAndValidateContentTypeAsync(contentTypeKey, contentEditingModelBase);
-        IContentType? contentType = validateContentTypeAttempt.Result;
-        if (validateContentTypeAttempt.Success is false || contentType is null)
+        if (validateContentTypeAttempt.Success is false || validateContentTypeAttempt.Result is null)
         {
-            return Attempt.FailWithStatus<IContentType?, ContentEditingOperationStatus>(ContentEditingOperationStatus.ContentTypeNotFound, null);
+            // preserve the failing status from the base validation (e.g. PropertyTypeNotFound)
+            return validateContentTypeAttempt;
         }
+
+        IContentType contentType = validateContentTypeAttempt.Result;
 
         // Only enforce IsElement + AllowedInLibrary on create; updates only need the content type to exist
         if (contentEditingModelBase is ContentCreationModelBase && IsAllowedLibraryElement(contentType) is false)
@@ -200,7 +202,7 @@ internal sealed class ElementEditingService
             return Attempt.FailWithStatus<IContentType?, ContentEditingOperationStatus>(ContentEditingOperationStatus.NotAllowed, null);
         }
 
-        return Attempt.SucceedWithStatus<IContentType?, ContentEditingOperationStatus>(ContentEditingOperationStatus.NotAllowed, contentType);
+        return Attempt.SucceedWithStatus<IContentType?, ContentEditingOperationStatus>(ContentEditingOperationStatus.Success, contentType);
     }
 
     protected override async Task<(int? ParentId, ContentEditingOperationStatus OperationStatus)> TryGetAndValidateParentIdAsync(Guid? parentKey, IContentType contentType)

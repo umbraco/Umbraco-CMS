@@ -543,7 +543,7 @@ internal abstract class AsyncContentEditingServiceBase<TContent, TContentType, T
         if (contentType.VariesBySegment() && contentEditingModelBase.Variants.Any(v => v.Segment is null) is false)
         {
             // varies by segment with no default segment variants = invalid
-            return Attempt.FailWithStatus<TContentType?, ContentEditingOperationStatus>(ContentEditingOperationStatus.ContentTypeCultureVarianceMismatch, null);
+            return Attempt.FailWithStatus<TContentType?, ContentEditingOperationStatus>(ContentEditingOperationStatus.ContentTypeSegmentVarianceMismatch, null);
         }
 
         var propertyTypesByAlias = contentType.CompositionPropertyTypes.ToDictionary(pt => pt.Alias);
