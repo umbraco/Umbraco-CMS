@@ -26,7 +26,7 @@ public class BlockGridPropertyEditor : BlockGridPropertyEditorBase
     public BlockGridPropertyEditor(
         IDataValueEditorFactory dataValueEditorFactory,
         IIOHelper ioHelper,
-        IBlockValuePropertyIndexValueFactory blockValuePropertyIndexValueFactory)
+        IBlockGridPropertyIndexValueFactory blockValuePropertyIndexValueFactory)
         : base(dataValueEditorFactory, blockValuePropertyIndexValueFactory)
         => _ioHelper = ioHelper;
 

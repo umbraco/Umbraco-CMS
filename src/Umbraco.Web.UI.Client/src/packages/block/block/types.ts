@@ -4,8 +4,10 @@ export type * from './conditions/types.js';
 export type * from './clipboard/types.js';
 
 export interface UmbBlockLayoutBaseModel {
+	key: string;
 	contentKey: string;
 	settingsKey?: string | null;
+	isExternalContent?: boolean;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
@@ -35,7 +37,8 @@ export interface UmbBlockValueDataPropertiesBaseType {
 	expose: Array<UmbBlockExposeModel>;
 }
 
-export interface UmbBlockValueType<BlockLayoutType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel>
-	extends UmbBlockValueDataPropertiesBaseType {
+export interface UmbBlockValueType<
+	BlockLayoutType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel,
+> extends UmbBlockValueDataPropertiesBaseType {
 	layout: { [key: string]: Array<BlockLayoutType> | undefined };
 }

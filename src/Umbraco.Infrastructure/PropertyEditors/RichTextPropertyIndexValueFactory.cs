@@ -3,6 +3,7 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Extensions;
 
@@ -19,14 +20,16 @@ internal sealed class RichTextPropertyIndexValueFactory : BlockValuePropertyInde
     /// </summary>
     /// <param name="propertyEditorCollection">A collection containing all available property editors.</param>
     /// <param name="jsonSerializer">The serializer used for handling JSON data.</param>
+    /// <param name="elementService">Service for accessing elements.</param>
     /// <param name="indexingSettings">The monitor providing current indexing settings.</param>
     /// <param name="logger">The logger used for logging diagnostic information.</param>
     public RichTextPropertyIndexValueFactory(
         PropertyEditorCollection propertyEditorCollection,
+        IElementService elementService,
         IJsonSerializer jsonSerializer,
         IOptionsMonitor<IndexingSettings> indexingSettings,
         ILogger<RichTextPropertyIndexValueFactory> logger)
-        : base(propertyEditorCollection, jsonSerializer, indexingSettings)
+        : base(propertyEditorCollection, elementService, jsonSerializer, indexingSettings)
     {
         _jsonSerializer = jsonSerializer;
         _logger = logger;
@@ -156,7 +159,7 @@ internal sealed class RichTextPropertyIndexValueFactory : BlockValuePropertyInde
     }
 
     protected override IEnumerable<RawDataItem> GetDataItems(RichTextEditorValue input, bool published)
-        => GetDataItems(input.Blocks?.ContentData ?? [], input.Blocks?.Expose ?? [], published);
+        => GetDataItems(input.Blocks?.GetLayouts() ?? [], input.Blocks?.ContentData ?? [], input.Blocks?.Expose ?? [], published);
 
     /// <summary>
     /// Strips HTML tags from content, replacing them with spaces to preserve word boundaries for indexing.

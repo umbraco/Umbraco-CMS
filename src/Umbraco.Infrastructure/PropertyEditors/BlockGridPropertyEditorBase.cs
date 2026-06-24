@@ -25,9 +25,9 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// </summary>
 public abstract class BlockGridPropertyEditorBase : DataEditor, IValueSchemaProvider
 {
-    private readonly IBlockValuePropertyIndexValueFactory _blockValuePropertyIndexValueFactory;
+    private readonly IBlockGridPropertyIndexValueFactory _blockValuePropertyIndexValueFactory;
 
-    protected BlockGridPropertyEditorBase(IDataValueEditorFactory dataValueEditorFactory, IBlockValuePropertyIndexValueFactory blockValuePropertyIndexValueFactory)
+    protected BlockGridPropertyEditorBase(IDataValueEditorFactory dataValueEditorFactory, IBlockGridPropertyIndexValueFactory blockValuePropertyIndexValueFactory)
         : base(dataValueEditorFactory)
     {
         _blockValuePropertyIndexValueFactory = blockValuePropertyIndexValueFactory;
