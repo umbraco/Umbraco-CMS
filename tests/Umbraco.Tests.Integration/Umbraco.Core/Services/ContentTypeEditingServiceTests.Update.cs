@@ -1293,8 +1293,7 @@ internal sealed partial class ContentTypeEditingServiceTests
     [Test]
     public async Task Cannot_Add_Inheritance_When_Created_In_A_Folder()
     {
-        EntityContainer container = ((IContentTypeBaseService<IContentType>)ContentTypeService).CreateContainer(Constants.System.Root, Guid.NewGuid(), "Test folder").Result!.Entity;
-
+        EntityContainer container = (await ContentTypeContainerService.CreateAsync(null, "Test folder", Constants.System.RootKey, Constants.Security.SuperUserKey)).Result;
         var parentContentType = (await ContentTypeEditingService.CreateAsync(ContentTypeCreateModel("Parent"), Constants.Security.SuperUserKey)).Result!;
         var contentType = (await ContentTypeEditingService.CreateAsync(ContentTypeCreateModel("Child", containerKey: container.Key), Constants.Security.SuperUserKey)).Result!;
 

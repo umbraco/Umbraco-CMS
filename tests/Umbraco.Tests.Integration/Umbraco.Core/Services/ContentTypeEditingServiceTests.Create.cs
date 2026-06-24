@@ -79,9 +79,9 @@ internal sealed partial class ContentTypeEditingServiceTests
         ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
             => refreshedPayloads = payloads;
 
-        var containerResult = ((IContentTypeBaseService<IContentType>)ContentTypeService).CreateContainer(Constants.System.Root, Guid.NewGuid(), "Test folder");
+        var containerResult = await ContentTypeContainerService.CreateAsync(null, "Test folder", Constants.System.RootKey, Constants.Security.SuperUserKey);
         Assert.IsTrue(containerResult.Success);
-        var container = containerResult.Result?.Entity;
+        var container = containerResult.Result;
         Assert.IsNotNull(container);
 
         var createModel = ContentTypeCreateModel("Test", "test", isElement: isElement, containerKey: container.Key);
@@ -872,9 +872,9 @@ internal sealed partial class ContentTypeEditingServiceTests
         AssertContentTypeRefreshPayload(refreshedPayloads, parent.Id, ContentTypeChangeTypes.Create);
         refreshedPayloads = null;
 
-        var containerResult = ((IContentTypeBaseService<IContentType>)ContentTypeService).CreateContainer(Constants.System.Root, Guid.NewGuid(), "Test folder");
+        var containerResult = await ContentTypeContainerService.CreateAsync(null, "Test folder", Constants.System.RootKey, Constants.Security.SuperUserKey);
         Assert.IsTrue(containerResult.Success);
-        var container = containerResult.Result?.Entity;
+        var container = containerResult.Result;
         Assert.IsNotNull(container);
 
         Composition[] composition =
