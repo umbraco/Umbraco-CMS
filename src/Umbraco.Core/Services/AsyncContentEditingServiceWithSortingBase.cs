@@ -1,3 +1,6 @@
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -10,22 +13,14 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
 
-/// <summary>
-/// Base class for content editing services that support sorting operations.
-/// </summary>
-/// <typeparam name="TContent">The type of content (e.g., IContent, IMedia).</typeparam>
-/// <typeparam name="TContentType">The type of content type.</typeparam>
-/// <typeparam name="TContentService">The type of content service.</typeparam>
-/// <typeparam name="TContentTypeService">The type of content type service.</typeparam>
-// TODO EFCore: Remove this once media and member type have been migrated
-internal abstract class ContentEditingServiceWithSortingBase<TContent, TContentType, TContentService, TContentTypeService>
-    : ContentEditingServiceBase<TContent, TContentType, TContentService, TContentTypeService>
+internal abstract class AsyncContentEditingServiceWithSortingBase<TContent, TContentType, TContentService, TContentTypeService>
+    : AsyncContentEditingServiceBase<TContent, TContentType, TContentService, TContentTypeService>
     where TContent : class, IContentBase
     where TContentType : class, IContentTypeComposition
     where TContentService : IContentServiceBase<TContent>
-    where TContentTypeService : IContentTypeBaseService<TContentType>
+    where TContentTypeService : IAsyncContentTypeBaseService<TContentType>
 {
-    private readonly ILogger<ContentEditingServiceBase<TContent, TContentType, TContentService, TContentTypeService>> _logger;
+    private readonly ILogger<AsyncContentEditingServiceBase<TContent, TContentType, TContentService, TContentTypeService>> _logger;
     private readonly ITreeEntitySortingService _treeEntitySortingService;
 
     /// <summary>
@@ -43,12 +38,12 @@ internal abstract class ContentEditingServiceWithSortingBase<TContent, TContentT
     /// <param name="optionsMonitor">The content settings options monitor.</param>
     /// <param name="relationService">The relation service.</param>
     /// <param name="contentTypeFilters">The content type filter collection.</param>
-    protected ContentEditingServiceWithSortingBase(
+    protected AsyncContentEditingServiceWithSortingBase(
         TContentService contentService,
         TContentTypeService contentTypeService,
         PropertyEditorCollection propertyEditorCollection,
         IDataTypeService dataTypeService,
-        ILogger<ContentEditingServiceBase<TContent, TContentType, TContentService, TContentTypeService>> logger,
+        ILogger<AsyncContentEditingServiceBase<TContent, TContentType, TContentService, TContentTypeService>> logger,
         ICoreScopeProvider scopeProvider,
         IUserIdKeyResolver userIdKeyResolver,
         IContentValidationServiceBase<TContentType> validationService,
@@ -93,7 +88,7 @@ internal abstract class ContentEditingServiceWithSortingBase<TContent, TContentT
     /// <param name="pageSize">The page size.</param>
     /// <param name="total">The total number of children.</param>
     /// <returns>The paged children.</returns>
-    protected abstract IEnumerable<TContent> GetPagedChildren(int parentId, int pageIndex, int pageSize, out long total);
+    protected abstract Task<IEnumerable<TContent>> GetPagedChildrenAsync(int parentId, int pageIndex, int pageSize, out long total);
 
     /// <summary>
     /// Handles the sorting operation asynchronously.
@@ -118,12 +113,12 @@ internal abstract class ContentEditingServiceWithSortingBase<TContent, TContentT
 
         const int pageSize = 500;
         var pageNumber = 0;
-        IEnumerable<TContent> page = GetPagedChildren(contentId.Value, pageNumber++, pageSize, out var total);
+        IEnumerable<TContent> page = await GetPagedChildrenAsync(contentId.Value, pageNumber++, pageSize, out var total);
         var children = new List<TContent>((int)total);
         children.AddRange(page);
         while (pageNumber * pageSize < total)
         {
-            page = GetPagedChildren(contentId.Value, pageNumber++, pageSize, out _);
+            page = await GetPagedChildrenAsync(contentId.Value, pageNumber++, pageSize, out _);
             children.AddRange(page);
         }
 
@@ -144,3 +139,4 @@ internal abstract class ContentEditingServiceWithSortingBase<TContent, TContentT
         }
     }
 }
+
