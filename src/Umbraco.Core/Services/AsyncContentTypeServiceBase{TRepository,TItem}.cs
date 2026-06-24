@@ -26,7 +26,7 @@ namespace Umbraco.Cms.Core.Services;
 /// </remarks>
 /// <typeparam name="TRepository">The type of the (asynchronous) content type repository.</typeparam>
 /// <typeparam name="TItem">The type of content type.</typeparam>
-public abstract class AsyncContentTypeServiceBase<TRepository, TItem> : ContentTypeServiceBase, IAsyncContentTypeBaseService<TItem>, IContentTypeBaseService<TItem>
+public abstract class AsyncContentTypeServiceBase<TRepository, TItem> : ContentTypeServiceBase, IAsyncContentTypeBaseService<TItem>
     where TRepository : IAsyncContentTypeRepositoryBase<TItem>
     where TItem : class, IContentTypeComposition
 {
@@ -1449,80 +1449,6 @@ public abstract class AsyncContentTypeServiceBase<TRepository, TItem> : ContentT
             }
         }
     }
-
-    #endregion
-
-    #region Synchronous bridge (transitional)
-
-    // These synchronous members satisfy the existing IContentTypeBaseService<TItem> contract while consumers are
-    // migrated to the asynchronous API. They bridge to the async members above via GetAwaiter().GetResult().
-    // TODO: remove this region (and the IContentTypeBaseService<TItem> interface) once all callers use the async API.
-
-    /// <inheritdoc />
-    IContentTypeComposition? IContentTypeBaseService.Get(int id) => Get(id);
-
-    /// <inheritdoc />
-    public TItem? Get(int id) => GetAsync(id).GetAwaiter().GetResult();
-
-    /// <inheritdoc />
-    public TItem? Get(Guid key) => GetAsync(key).GetAwaiter().GetResult();
-
-    /// <inheritdoc />
-    public TItem? Get(string alias) => GetAsync(alias).GetAwaiter().GetResult();
-
-    /// <inheritdoc />
-    public int Count() => CountAsync().GetAwaiter().GetResult();
-
-    /// <inheritdoc />
-    public bool HasContentNodes(int id) => HasContentNodesAsync(id).GetAwaiter().GetResult();
-
-    /// <inheritdoc />
-    public IEnumerable<TItem> GetAll() => GetAllAsync().GetAwaiter().GetResult();
-
-    /// <inheritdoc />
-    public IEnumerable<TItem> GetMany(params int[] ids) => GetManyAsync(ids).GetAwaiter().GetResult();
-
-    /// <inheritdoc />
-    public IEnumerable<TItem> GetMany(IEnumerable<Guid>? ids) => GetManyAsync(ids).GetAwaiter().GetResult();
-
-    /// <inheritdoc />
-    public IEnumerable<TItem> GetDescendants(int id, bool andSelf) => GetDescendantsAsync(id, andSelf).GetAwaiter().GetResult();
-
-    /// <inheritdoc />
-    public IEnumerable<TItem> GetComposedOf(int id) => GetComposedOfAsync(id).GetAwaiter().GetResult();
-
-    /// <inheritdoc />
-    public IEnumerable<TItem> GetComposedOf(int id, IEnumerable<TItem> all) =>
-        all.Where(x => x.ContentTypeComposition.Any(y => y.Id == id));
-
-    /// <inheritdoc />
-    public IEnumerable<TItem> GetChildren(int id) => GetChildrenAsync(id).GetAwaiter().GetResult();
-
-    /// <inheritdoc />
-    public IEnumerable<TItem> GetChildren(Guid id) => GetChildrenAsync(id).GetAwaiter().GetResult();
-
-    /// <inheritdoc />
-    public bool HasChildren(int id) => HasChildrenAsync(id).GetAwaiter().GetResult();
-
-    /// <inheritdoc />
-    public bool HasChildren(Guid id) => HasChildrenAsync(id).GetAwaiter().GetResult();
-
-    /// <inheritdoc />
-    public bool HasContainerInPath(string contentPath) => HasContainerInPathAsync(contentPath).GetAwaiter().GetResult();
-
-    /// <inheritdoc />
-    public bool HasContainerInPath(params int[] ids) => HasContainerInPathAsync(ids).GetAwaiter().GetResult();
-
-    /// <inheritdoc />
-    public Attempt<string[]?> ValidateComposition(TItem? compo) => ValidateCompositionAsync(compo).GetAwaiter().GetResult();
-
-    /// <inheritdoc />
-    public void Delete(TItem item, int userId = Constants.Security.SuperUserId)
-        => DeleteAsync(item, _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult()).GetAwaiter().GetResult();
-
-    /// <inheritdoc />
-    public void Delete(IEnumerable<TItem> item, int userId = Constants.Security.SuperUserId)
-        => DeleteAsync(item, _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult()).GetAwaiter().GetResult();
 
     #endregion
 
