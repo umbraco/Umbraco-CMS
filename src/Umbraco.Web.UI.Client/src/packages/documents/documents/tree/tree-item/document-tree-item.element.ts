@@ -64,8 +64,18 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 		}
 	};
 
+	#handleDblClick(event: MouseEvent) {
+		if (!this._item?.hasChildren) return;
+		event.stopPropagation();
+		this.api?.open();
+	}
+
 	override renderLabel() {
-		return html`<span id="label" slot="label" class=${classMap({ draft: this._isDraft, noAccess: this._noAccess })}>
+		return html`<span
+			id="label"
+			slot="label"
+			class=${classMap({ draft: this._isDraft, noAccess: this._noAccess })}
+			@dblclick=${this.#handleDblClick}>
 			${this._name}
 		</span> `;
 	}
