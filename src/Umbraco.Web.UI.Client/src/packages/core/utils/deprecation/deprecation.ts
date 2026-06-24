@@ -20,7 +20,9 @@ export class UmbDeprecation {
 	}
 
 	/**
-	 * Logs a warning message to the console.
+	 * Logs a deprecation warning to the console, annotated with the likely caller origin (Umbraco core,
+	 * an `/App_Plugins` package, or other custom code). Core-origin warnings are suppressed in production
+	 * builds, where a consumer cannot act on them.
 	 * @memberof UmbDeprecation
 	 * @param {object} [options] - Options for the warning message.
 	 * @param {boolean} [options.logAlways] - If true, the warning is always logged regardless of origin (defaults to false).
@@ -34,20 +36,13 @@ export class UmbDeprecation {
 	 * deprecation.warn();
 	 */
 	warn(options: { logAlways?: boolean } = {}): void {
-		const origin = umbParseDeprecationOrigin(this.#stack(), import.meta.url);
+		// `new Error().stack` is populated on construction (no throw needed); we read it only to classify
+		// the caller. The browser already attaches the full, clickable stack to console.warn for the
+		// developer to expand, so we annotate with the resolved origin rather than printing it ourselves.
+		const origin = umbParseDeprecationOrigin(new Error().stack, import.meta.url);
 		if (!options.logAlways && !umbShouldLogDeprecation(origin, umbIsProductionBuild())) return;
-		const message = `${this.#messagePrefix} ${this.#deprecated} The feature will be removed in version ${this.#removeInVersion}. ${this.#solution}`;
-		console.warn(origin.type === 'unknown' ? message : `[${origin.label}] ${message}`);
-	}
 
-	#stack(): string {
-		try {
-			throw new Error();
-		} catch (e) {
-			if (e instanceof Error) {
-				return e.stack ?? '';
-			}
-			return '';
-		}
+		const message = `${this.#messagePrefix} ${this.#deprecated} The feature will be removed in version ${this.#removeInVersion}. ${this.#solution}`;
+		console.warn(origin.type === 'unknown' ? message : `${message}\nOrigin: ${origin.label}`);
 	}
 }
