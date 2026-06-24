@@ -14,7 +14,7 @@ export interface UmbDeprecationOrigin {
 	label: string;
 }
 
-// In a production build the backoffice is served from this path, so any stack frame under it is core code.
+// In a production build, core is served from this path; any frame under it is core code.
 const UMB_CORE_PATH_MARKER = '/umbraco/backoffice/';
 
 /**
@@ -31,7 +31,7 @@ const UMB_CORE_PATH_MARKER = '/umbraco/backoffice/';
 export function umbParseDeprecationOrigin(stack: string | undefined, selfUrl: string): UmbDeprecationOrigin {
 	if (!stack) return { type: 'unknown', label: 'unknown' };
 
-	// Extract URLs from frames — Chrome "at fn (URL:1:2)", Firefox/Safari "fn@URL:1:2" — dropping :line:col.
+	// Frame URLs, tolerant of Chrome "at fn (URL:1:2)" and Firefox/Safari "fn@URL:1:2".
 	const urls = Array.from(stack.matchAll(/(?:https?|blob|file):\/\/[^\s)'"]+/g)).map((match) =>
 		match[0].replace(/:\d+:\d+\)?$/, ''),
 	);
@@ -39,7 +39,6 @@ export function umbParseDeprecationOrigin(stack: string | undefined, selfUrl: st
 	const selfBase = selfUrl.split('?')[0];
 	const frames = urls.filter((url) => url.split('?')[0] !== selfBase);
 
-	// Only meaningful when core is recognisable (production backoffice path).
 	const coreKnown = selfUrl.includes(UMB_CORE_PATH_MARKER) || frames.some((url) => url.includes(UMB_CORE_PATH_MARKER));
 	if (!coreKnown) return { type: 'unknown', label: 'unknown' };
 

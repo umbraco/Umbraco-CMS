@@ -36,9 +36,6 @@ export class UmbDeprecation {
 	 * deprecation.warn();
 	 */
 	warn(options: { logAlways?: boolean } = {}): void {
-		// `new Error().stack` is populated on construction (no throw needed); we read it only to classify
-		// the caller. The browser already attaches the full, clickable stack to console.warn for the
-		// developer to expand, so we annotate with the resolved origin rather than printing it ourselves.
 		const origin = umbParseDeprecationOrigin(new Error().stack, import.meta.url);
 		if (!options.logAlways && !umbShouldLogDeprecation(origin, umbIsProductionBuild())) return;
 
