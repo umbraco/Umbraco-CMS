@@ -18,11 +18,8 @@ import { UMB_MEDIA_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/media-type';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 import '@umbraco-cms/backoffice/imaging';
-import {
-	UmbInteractionMemoriesChangeEvent,
-	type UmbInteractionMemoryModel,
-} from '@umbraco-cms/backoffice/interaction-memory';
-import { jsonStringComparison } from '@umbraco-cms/backoffice/observable-api';
+import { UmbEntityInputInteractionMemoryManager } from '@umbraco-cms/backoffice/entity';
+import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
 
 type UmbRichMediaCardModel = {
 	unique: string;
@@ -183,14 +180,11 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 
 	@property({ type: Array, attribute: false })
 	public get interactionMemories(): Array<UmbInteractionMemoryModel> | undefined {
-		return this.#pickerInputContext.interactionMemory.getAllMemories();
+		return this.#interactionMemoryManager.getMemories();
 	}
 	public set interactionMemories(value: Array<UmbInteractionMemoryModel> | undefined) {
-		this.#interactionMemories = value;
-		value?.forEach((memory) => this.#pickerInputContext.interactionMemory.setMemory(memory));
+		this.#interactionMemoryManager.setMemories(value);
 	}
-
-	#interactionMemories?: Array<UmbInteractionMemoryModel> = [];
 
 	@state()
 	private _cards: Array<UmbRichMediaCardModel> = [];
@@ -204,6 +198,10 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 	readonly #itemManager = new UmbRepositoryItemsManager<UmbMediaItemModel>(this, UMB_MEDIA_ITEM_REPOSITORY_ALIAS);
 
 	readonly #pickerInputContext = new UmbMediaPickerInputContext(this);
+	readonly #interactionMemoryManager = new UmbEntityInputInteractionMemoryManager(
+		this,
+		this.#pickerInputContext.interactionMemory,
+	);
 
 	constructor() {
 		super();
@@ -299,20 +297,6 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 		this.observe(this.#pickerInputContext.selection, (selection) => {
 			this.#addItems(selection);
 		});
-
-		this.observe(
-			this.#pickerInputContext.interactionMemory.memories,
-			(memories) => {
-				// only dispatch the event if the interaction memories have actually changed
-				const isIdentical = jsonStringComparison(memories, this.#interactionMemories);
-
-				if (!isIdentical) {
-					this.#interactionMemories = memories;
-					this.dispatchEvent(new UmbInteractionMemoriesChangeEvent());
-				}
-			},
-			'_observeMemories',
-		);
 
 		this.addValidator(
 			'valueMissing',
@@ -496,11 +480,11 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 		return html`
 			<div class="media-item-wrapper">
 				<uui-card-media id=${item.unique} title=${item.name} name=${item.name} .href=${href} ?readonly=${this.readonly}>
-					<umb-imaging-thumbnail
+					<umb-media-thumbnail
 						.unique=${item.media}
 						.alt=${item.name}
 						.icon=${item.icon ?? 'icon-picture'}
-						.externalLoading=${item.isLoading ?? false}></umb-imaging-thumbnail>
+						.externalLoading=${item.isLoading ?? false}></umb-media-thumbnail>
 
 					${this.#renderIsTrashed(item)} ${this.#renderActions(item)}
 				</uui-card-media>
