@@ -621,16 +621,26 @@ export class UmbTreeItemChildrenManager<
 	};
 
 	#onReloadStructureForEntityRequest = async (event: UmbRequestReloadStructureForEntityEvent) => {
-		const entityType = this.getTreeItem()?.entityType;
-		const unique = this.getTreeItem()?.unique;
+		const entity = { entityType: event.getEntityType(), unique: event.getUnique() };
 
-		if (event.getEntityType() !== entityType) return;
-		if (event.getUnique() !== unique) return;
+		// A child we are currently displaying changed its structure (e.g. was deleted, moved or
+		// renamed). Reload our own children so the change is reflected. This is the manager that
+		// owns the displayed list, so it also covers flat card/table views where the children have
+		// no individual tree-item context to react on their own behalf.
+		if (this.isChildLoaded(entity)) {
+			this.reloadChildren();
+			return;
+		}
 
-		if (this.#parentTreeItemContext) {
-			this.#parentTreeItemContext.reloadChildren();
-		} else if (this.#treeContext) {
-			this.#treeContext.reloadTree();
+		// Our own item changed and no parent manager displays us as a child (we are the
+		// root/context-level manager). Reload the whole tree so the change is picked up.
+		const treeItem = this.getTreeItem();
+		if (
+			!this.#parentTreeItemContext &&
+			event.getEntityType() === treeItem?.entityType &&
+			event.getUnique() === treeItem?.unique
+		) {
+			this.#treeContext?.reloadTree();
 		}
 	};
 
