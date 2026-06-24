@@ -18,6 +18,11 @@ export const manifest: ManifestPropertyEditorSchema = {
 					label: 'Add options',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.MultipleTextString',
 				},
+				{
+					alias: 'placeholder',
+					label: '#general_placeholder',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.TextBox',
+				},
 			],
 		},
 	},
