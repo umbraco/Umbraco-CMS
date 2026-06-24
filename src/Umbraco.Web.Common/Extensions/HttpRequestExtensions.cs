@@ -143,7 +143,7 @@ public static class HttpRequestExtensions
     /// <returns>The extracted `ufprt` token.</returns>
     public static string? GetUfprt(this HttpRequest request)
     {
-        if (request.HasFormContentType && request.Form.TryGetValue("ufprt", out StringValues formVal) &&
+        if (request.GetFormOrNull() is { } form && form.TryGetValue("ufprt", out StringValues formVal) &&
             formVal != StringValues.Empty)
         {
             return formVal.ToString();
@@ -155,6 +155,40 @@ public static class HttpRequestExtensions
         }
 
         return null;
+    }
+
+    /// <summary>
+    ///     Gets the value of the specified form field, or <c>null</c> when the request has no form content
+    ///     or the form body cannot be read.
+    /// </summary>
+    internal static string? GetFormValueOrNull(this HttpRequest request, string name)
+        => request.GetFormOrNull() is { } form ? (string?)form[name] : null;
+
+    /// <summary>
+    ///     Returns the parsed form for the request, or <c>null</c> when the request has no form content type
+    ///     or the body cannot be parsed.
+    /// </summary>
+    /// <remarks>
+    ///     The synchronous <see cref="HttpRequest.Form" /> getter parses the body on first access and throws when it
+    ///     is malformed (e.g. a truncated multipart body) or exceeds the configured form limits. Routing-pipeline
+    ///     callers only probe for specific keys, so a parse failure must fall through to normal routing rather than
+    ///     surface as an unhandled exception (HTTP 500).
+    /// </remarks>
+    internal static IFormCollection? GetFormOrNull(this HttpRequest request)
+    {
+        if (request.HasFormContentType is not true)
+        {
+            return null;
+        }
+
+        try
+        {
+            return request.Form;
+        }
+        catch (Exception exception) when (exception is IOException or InvalidDataException)
+        {
+            return null;
+        }
     }
 
     private static bool IsSet(this IPAddress address)
