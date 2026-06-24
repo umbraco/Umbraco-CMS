@@ -45,7 +45,7 @@ public class BatchDocumentTypesController : DocumentTypeControllerBase
             return Ok(new BatchResponseModel<DocumentTypeResponseModel>());
         }
 
-        IEnumerable<IContentType> contentTypes = _contentTypeService.GetMany(requestedIds);
+        IEnumerable<IContentType> contentTypes = await _contentTypeService.GetManyAsync(requestedIds);
 
         List<IContentType> ordered = OrderByRequestedIds(contentTypes, requestedIds);
 

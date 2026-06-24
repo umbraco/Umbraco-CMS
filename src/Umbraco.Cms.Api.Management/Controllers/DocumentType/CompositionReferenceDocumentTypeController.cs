@@ -57,7 +57,7 @@ public class CompositionReferenceDocumentTypeController : DocumentTypeController
             return OperationStatusResult(ContentTypeOperationStatus.NotFound);
         }
 
-        IEnumerable<IContentType> composedOf = _contentTypeService.GetComposedOf(contentType.Id);
+        IEnumerable<IContentType> composedOf = await _contentTypeService.GetComposedOfAsync(contentType.Id);
         List<DocumentTypeCompositionResponseModel> responseModels = _umbracoMapper.MapEnumerable<IContentType, DocumentTypeCompositionResponseModel>(composedOf);
 
         return Ok(responseModels);

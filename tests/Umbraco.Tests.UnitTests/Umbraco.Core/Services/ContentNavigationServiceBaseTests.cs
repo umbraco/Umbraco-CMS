@@ -184,7 +184,7 @@ public class ContentNavigationServiceBaseTests
         contentTypeMock.SetupGet(x => x.Key).Returns(ContentType);
 
         var contentTypeServiceMock = new Mock<IContentTypeService>();
-        contentTypeServiceMock.Setup(x => x.GetAll()).Returns(new[] { contentTypeMock.Object });
+        contentTypeServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(new[] { contentTypeMock.Object });
 
         _navigationService = new TestContentNavigationService(
             Mock.Of<ICoreScopeProvider>(),
@@ -225,7 +225,7 @@ public class ContentNavigationServiceBaseTests
         anotherContentTypeMock.SetupGet(x => x.Key).Returns(anotherContentTypeKey);
 
         var contentTypeServiceMock = new Mock<IContentTypeService>();
-        contentTypeServiceMock.Setup(x => x.GetAll()).Returns(new[] { contentTypeMock.Object, anotherContentTypeMock.Object });
+        contentTypeServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(new[] { contentTypeMock.Object, anotherContentTypeMock.Object });
 
         _navigationService = new TestContentNavigationService(
             Mock.Of<ICoreScopeProvider>(),
@@ -273,7 +273,7 @@ public class ContentNavigationServiceBaseTests
         anotherContentTypeMock.SetupGet(x => x.Key).Returns(anotherContentTypeKey);
 
         var contentTypeServiceMock = new Mock<IContentTypeService>();
-        contentTypeServiceMock.Setup(x => x.GetAll()).Returns(new[] { contentTypeMock.Object, anotherContentTypeMock.Object });
+        contentTypeServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(new[] { contentTypeMock.Object, anotherContentTypeMock.Object });
 
         _navigationService = new TestContentNavigationService(
             Mock.Of<ICoreScopeProvider>(),
@@ -311,8 +311,8 @@ public class ContentNavigationServiceBaseTests
 
         var contentTypeServiceMock = new Mock<IContentTypeService>();
         contentTypeServiceMock.Setup(x => x
-            .Get(It.Is<string>(alias => alias == contentTypeAlias)))
-            .Returns(contentTypeMock.Object);
+            .GetAsync(It.Is<string>(alias => alias == contentTypeAlias)))
+            .ReturnsAsync(contentTypeMock.Object);
 
         _navigationService = new TestContentNavigationService(
             Mock.Of<ICoreScopeProvider>(),
@@ -423,7 +423,7 @@ public class ContentNavigationServiceBaseTests
         contentTypeMock.SetupGet(x => x.Key).Returns(ContentType);
 
         var contentTypeServiceMock = new Mock<IContentTypeService>();
-        contentTypeServiceMock.Setup(x => x.GetAll()).Returns(new[] { contentTypeMock.Object });
+        contentTypeServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(new[] { contentTypeMock.Object });
 
         _navigationService = new TestContentNavigationService(
             Mock.Of<ICoreScopeProvider>(),
@@ -461,7 +461,7 @@ public class ContentNavigationServiceBaseTests
         contentTypeMock.SetupGet(x => x.Key).Returns(ContentType);
 
         var contentTypeServiceMock = new Mock<IContentTypeService>();
-        contentTypeServiceMock.Setup(x => x.GetAll()).Returns(new[] { contentTypeMock.Object });
+        contentTypeServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(new[] { contentTypeMock.Object });
 
         _navigationService = new TestContentNavigationService(
             Mock.Of<ICoreScopeProvider>(),
@@ -500,7 +500,7 @@ public class ContentNavigationServiceBaseTests
         anotherContentTypeMock.SetupGet(x => x.Key).Returns(anotherContentTypeKey);
 
         var contentTypeServiceMock = new Mock<IContentTypeService>();
-        contentTypeServiceMock.Setup(x => x.GetAll()).Returns(new[] { contentTypeMock.Object, anotherContentTypeMock.Object });
+        contentTypeServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(new[] { contentTypeMock.Object, anotherContentTypeMock.Object });
 
         _navigationService = new TestContentNavigationService(
             Mock.Of<ICoreScopeProvider>(),
@@ -549,7 +549,7 @@ public class ContentNavigationServiceBaseTests
         anotherContentTypeMock.SetupGet(x => x.Key).Returns(anotherContentTypeKey);
 
         var contentTypeServiceMock = new Mock<IContentTypeService>();
-        contentTypeServiceMock.Setup(x => x.GetAll()).Returns(new[] { contentTypeMock.Object, anotherContentTypeMock.Object });
+        contentTypeServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(new[] { contentTypeMock.Object, anotherContentTypeMock.Object });
 
         _navigationService = new TestContentNavigationService(
             Mock.Of<ICoreScopeProvider>(),
@@ -588,8 +588,8 @@ public class ContentNavigationServiceBaseTests
 
         var contentTypeServiceMock = new Mock<IContentTypeService>();
         contentTypeServiceMock.Setup(x => x
-            .Get(It.Is<string>(alias => alias == contentTypeAlias)))
-            .Returns(contentTypeMock.Object);
+            .GetAsync(It.Is<string>(alias => alias == contentTypeAlias)))
+            .ReturnsAsync(contentTypeMock.Object);
 
         _navigationService = new TestContentNavigationService(
             Mock.Of<ICoreScopeProvider>(),
@@ -700,7 +700,7 @@ public class ContentNavigationServiceBaseTests
         contentTypeMock.SetupGet(x => x.Key).Returns(ContentType);
 
         var contentTypeServiceMock = new Mock<IContentTypeService>();
-        contentTypeServiceMock.Setup(x => x.GetAll()).Returns(new[] { contentTypeMock.Object });
+        contentTypeServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(new[] { contentTypeMock.Object });
 
         _navigationService = new TestContentNavigationService(
             Mock.Of<ICoreScopeProvider>(),
@@ -740,7 +740,7 @@ public class ContentNavigationServiceBaseTests
         contentTypeMock.SetupGet(x => x.Key).Returns(ContentType);
 
         var contentTypeServiceMock = new Mock<IContentTypeService>();
-        contentTypeServiceMock.Setup(x => x.GetAll()).Returns(new[] { contentTypeMock.Object });
+        contentTypeServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(new[] { contentTypeMock.Object });
 
         _navigationService = new TestContentNavigationService(
             Mock.Of<ICoreScopeProvider>(),
@@ -779,7 +779,7 @@ public class ContentNavigationServiceBaseTests
         anotherContentTypeMock.SetupGet(x => x.Key).Returns(anotherContentTypeKey);
 
         var contentTypeServiceMock = new Mock<IContentTypeService>();
-        contentTypeServiceMock.Setup(x => x.GetAll()).Returns(new[] { contentTypeMock.Object, anotherContentTypeMock.Object });
+        contentTypeServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(new[] { contentTypeMock.Object, anotherContentTypeMock.Object });
 
         _navigationService = new TestContentNavigationService(
             Mock.Of<ICoreScopeProvider>(),
@@ -828,7 +828,7 @@ public class ContentNavigationServiceBaseTests
         anotherContentTypeMock.SetupGet(x => x.Key).Returns(anotherContentTypeKey);
 
         var contentTypeServiceMock = new Mock<IContentTypeService>();
-        contentTypeServiceMock.Setup(x => x.GetAll()).Returns(new[] { contentTypeMock.Object, anotherContentTypeMock.Object });
+        contentTypeServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(new[] { contentTypeMock.Object, anotherContentTypeMock.Object });
 
         _navigationService = new TestContentNavigationService(
             Mock.Of<ICoreScopeProvider>(),
@@ -945,7 +945,7 @@ public class ContentNavigationServiceBaseTests
         contentTypeMock.SetupGet(x => x.Key).Returns(ContentType);
 
         var contentTypeServiceMock = new Mock<IContentTypeService>();
-        contentTypeServiceMock.Setup(x => x.GetAll()).Returns(new[] { contentTypeMock.Object });
+        contentTypeServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(new[] { contentTypeMock.Object });
 
         _navigationService = new TestContentNavigationService(
             Mock.Of<ICoreScopeProvider>(),
@@ -983,7 +983,7 @@ public class ContentNavigationServiceBaseTests
         contentTypeMock.SetupGet(x => x.Key).Returns(ContentType);
 
         var contentTypeServiceMock = new Mock<IContentTypeService>();
-        contentTypeServiceMock.Setup(x => x.GetAll()).Returns(new[] { contentTypeMock.Object });
+        contentTypeServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(new[] { contentTypeMock.Object });
 
         _navigationService = new TestContentNavigationService(
             Mock.Of<ICoreScopeProvider>(),
@@ -1022,7 +1022,7 @@ public class ContentNavigationServiceBaseTests
         anotherContentTypeMock.SetupGet(x => x.Key).Returns(anotherContentTypeKey);
 
         var contentTypeServiceMock = new Mock<IContentTypeService>();
-        contentTypeServiceMock.Setup(x => x.GetAll()).Returns(new[] { contentTypeMock.Object, anotherContentTypeMock.Object });
+        contentTypeServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(new[] { contentTypeMock.Object, anotherContentTypeMock.Object });
 
         _navigationService = new TestContentNavigationService(
             Mock.Of<ICoreScopeProvider>(),
@@ -1183,7 +1183,7 @@ public class ContentNavigationServiceBaseTests
         contentTypeMock.SetupGet(x => x.Key).Returns(ContentType);
 
         var contentTypeServiceMock = new Mock<IContentTypeService>();
-        contentTypeServiceMock.Setup(x => x.GetAll()).Returns(new[] { contentTypeMock.Object });
+        contentTypeServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(new[] { contentTypeMock.Object });
 
         _navigationService = new TestContentNavigationService(
             Mock.Of<ICoreScopeProvider>(),
@@ -1221,7 +1221,7 @@ public class ContentNavigationServiceBaseTests
         contentTypeMock.SetupGet(x => x.Key).Returns(ContentType);
 
         var contentTypeServiceMock = new Mock<IContentTypeService>();
-        contentTypeServiceMock.Setup(x => x.GetAll()).Returns(new[] { contentTypeMock.Object });
+        contentTypeServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(new[] { contentTypeMock.Object });
 
         _navigationService = new TestContentNavigationService(
             Mock.Of<ICoreScopeProvider>(),
@@ -1260,7 +1260,7 @@ public class ContentNavigationServiceBaseTests
         anotherContentTypeMock.SetupGet(x => x.Key).Returns(anotherContentTypeKey);
 
         var contentTypeServiceMock = new Mock<IContentTypeService>();
-        contentTypeServiceMock.Setup(x => x.GetAll()).Returns(new[] { contentTypeMock.Object, anotherContentTypeMock.Object });
+        contentTypeServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(new[] { contentTypeMock.Object, anotherContentTypeMock.Object });
 
         _navigationService = new TestContentNavigationService(
             Mock.Of<ICoreScopeProvider>(),
@@ -1309,7 +1309,7 @@ public class ContentNavigationServiceBaseTests
         anotherContentTypeMock.SetupGet(x => x.Key).Returns(anotherContentTypeKey);
 
         var contentTypeServiceMock = new Mock<IContentTypeService>();
-        contentTypeServiceMock.Setup(x => x.GetAll()).Returns(new[] { contentTypeMock.Object, anotherContentTypeMock.Object });
+        contentTypeServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(new[] { contentTypeMock.Object, anotherContentTypeMock.Object });
 
         _navigationService = new TestContentNavigationService(
             Mock.Of<ICoreScopeProvider>(),
@@ -2026,7 +2026,7 @@ public class ContentNavigationServiceBaseTests
     }
 }
 
-internal class TestContentNavigationService : ContentNavigationServiceBase<IContentType, IContentTypeService>
+internal class TestContentNavigationService : AsyncContentNavigationServiceBase<IContentType, IContentTypeService>
 {
     public TestContentNavigationService(
         ICoreScopeProvider coreScopeProvider,

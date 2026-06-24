@@ -175,13 +175,13 @@ public class LoadTestController : Controller
                 return null;
             }
 
-            var contentType = _contentTypeService.Get(ContentAlias);
+            var contentType = _contentTypeService.GetAsync(ContentAlias).GetAwaiter().GetResult();
             if (contentType == null)
             {
                 return ContentHtml("Not installed, first you must <a href=\"/LoadTest/Install\">install</a>.");
             }
 
-            var containerType = _contentTypeService.Get(ContainerAlias);
+            var containerType = _contentTypeService.GetAsync(ContainerAlias).GetAwaiter().GetResult();
             if (containerType == null)
             {
                 return ContentHtml("Panic! Container type is missing.");
@@ -344,7 +344,7 @@ public class LoadTestController : Controller
             return res;
         }
 
-        var contentType = _contentTypeService.Get(ContentAlias);
+        var contentType = _contentTypeService.GetAsync(ContentAlias).GetAwaiter().GetResult();
         _contentService.DeleteOfType(contentType.Id);
 
         return ContentHtml("Cleared.");

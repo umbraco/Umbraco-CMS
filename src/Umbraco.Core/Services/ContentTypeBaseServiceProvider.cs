@@ -35,7 +35,10 @@ public class ContentTypeBaseServiceProvider : IContentTypeBaseServiceProvider
         switch (contentBase)
         {
             case IContent _:
-                return _contentTypeService;
+                // TODO (V19): IContentTypeService no longer derives from IContentTypeBaseService, but the
+                // concrete ContentTypeService still implements it via its transitional synchronous bridge.
+                // Remove this cast once IContentTypeBaseServiceProvider is migrated to the async API.
+                return (IContentTypeBaseService)_contentTypeService;
             case IMedia _:
                 return _mediaTypeService;
             case IMember _:

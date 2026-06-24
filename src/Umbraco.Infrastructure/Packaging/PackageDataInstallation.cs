@@ -53,6 +53,14 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         private readonly IContentService _contentService;
         private readonly IMemberTypeService _memberTypeService;
 
+        // TODO (V19): IContentTypeService no longer derives from IContentTypeBaseService<IContentType>, but the concrete
+        // ContentTypeService still implements it (sync Get + the obsolete container operations) via its transitional
+        // bridge. The package importer's shared generic methods (ImportContentBase/ImportDocumentTypes) take
+        // IContentTypeBaseService<T> for parity with the still-synchronous media/member type services, so the document
+        // type service has to be adapted here. Remove this once the importer and container operations are fully async
+        // (see IContentTypeContainerService).
+        private IContentTypeBaseService<IContentType> ContentTypeBaseService => (IContentTypeBaseService<IContentType>)_contentTypeService;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="PackageDataInstallation"/> class.
         /// </summary>
@@ -164,7 +172,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                     compiledPackage.Documents,
                     importedDocTypes,
                     userId,
-                    _contentTypeService,
+                    ContentTypeBaseService,
                     _contentService);
                 installationSummary.MediaInstalled = ImportContentBase(
                     compiledPackage.Media,
@@ -584,7 +592,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         /// <param name="userId">Optional id of the User performing the operation. Default is zero (admin).</param>
         /// <returns>An enumerable list of generated ContentTypes</returns>
         public IReadOnlyList<IContentType> ImportDocumentTypes(IEnumerable<XElement> docTypeElements, int userId)
-            => ImportDocumentTypes(docTypeElements.ToList(), true, userId, _contentTypeService, out _);
+            => ImportDocumentTypes(docTypeElements.ToList(), true, userId, ContentTypeBaseService, out _);
 
         /// <summary>
         /// Imports and saves package xml as <see cref="IContentType"/>
@@ -601,7 +609,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 docTypeElements.ToList(),
                 true,
                 userId,
-                _contentTypeService,
+                ContentTypeBaseService,
                 out entityContainersInstalled);
 
         /// <summary>
@@ -798,17 +806,17 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                     if (folderKeys.Length == folders.Length && folderKeys.Length > 0)
                     {
                         rootFolderKey = folderKeys[0];
-                        current = _contentTypeService.GetContainer(rootFolderKey.Value);
+                        current = ContentTypeBaseService.GetContainer(rootFolderKey.Value);
                     }
 
                     // The folder might already exist, but with a different key, so check if it exists, even if there is a key.
                     // Level 1 = root level folders, there can only be one with the same name
-                    current ??= _contentTypeService.GetContainers(rootFolder, 1).FirstOrDefault();
+                    current ??= ContentTypeBaseService.GetContainers(rootFolder, 1).FirstOrDefault();
 
                     if (current == null)
                     {
                         Attempt<OperationResult<OperationResultType, EntityContainer>?> tryCreateFolder =
-                            _contentTypeService.CreateContainer(-1, rootFolderKey ?? Guid.NewGuid(), rootFolder);
+                            ContentTypeBaseService.CreateContainer(-1, rootFolderKey ?? Guid.NewGuid(), rootFolder);
 
                         if (tryCreateFolder == false)
                         {
@@ -822,7 +830,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                         var rootFolderId = tryCreateFolder.Result?.Entity?.Id;
                         if (rootFolderId is not null)
                         {
-                            current = _contentTypeService.GetContainer(rootFolderId.Value);
+                            current = ContentTypeBaseService.GetContainer(rootFolderId.Value);
                             trackEntityContainersInstalled.Add(current!);
                         }
                     }
@@ -853,17 +861,17 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                                          ?? children.FirstOrDefault(x => x.Name.InvariantEquals(folderName));
             if (matchingChild is not null)
             {
-                return _contentTypeService.GetContainer(matchingChild.Id);
+                return ContentTypeBaseService.GetContainer(matchingChild.Id);
             }
 
-            Attempt<OperationResult<OperationResultType, EntityContainer>?> tryCreateFolder = _contentTypeService.CreateContainer(current.Id, folderKey, folderName);
+            Attempt<OperationResult<OperationResultType, EntityContainer>?> tryCreateFolder = ContentTypeBaseService.CreateContainer(current.Id, folderKey, folderName);
             if (tryCreateFolder == false)
             {
                 _logger.LogError(tryCreateFolder.Exception, "Could not create folder: {FolderName}", folderName);
                 throw tryCreateFolder.Exception!;
             }
 
-            return _contentTypeService.GetContainer(tryCreateFolder.Result!.Entity!.Id);
+            return ContentTypeBaseService.GetContainer(tryCreateFolder.Result!.Entity!.Id);
         }
 
         /// <summary>

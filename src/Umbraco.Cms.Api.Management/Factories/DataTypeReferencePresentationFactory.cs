@@ -40,7 +40,7 @@ public class DataTypeReferencePresentationFactory : IDataTypeReferencePresentati
     {
         var getContentTypesByObjectType = new Dictionary<string, Func<IEnumerable<Guid>, IEnumerable<IContentTypeBase>>>
         {
-            { UmbracoObjectTypes.DocumentType.GetUdiType(), keys => _contentTypeService.GetMany(keys) },
+            { UmbracoObjectTypes.DocumentType.GetUdiType(), keys => _contentTypeService.GetManyAsync(keys).GetAwaiter().GetResult() },
             { UmbracoObjectTypes.MediaType.GetUdiType(), keys => _mediaTypeService.GetMany(keys) },
             { UmbracoObjectTypes.MemberType.GetUdiType(), keys => _memberTypeService.GetMany(keys) }
         };

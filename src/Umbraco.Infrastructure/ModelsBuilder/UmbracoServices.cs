@@ -72,7 +72,7 @@ public sealed class UmbracoServices
         // in more than one place.
         types.AddRange(GetTypes(
             PublishedItemType.Content,
-            _contentTypeService.GetAll().Cast<IContentTypeComposition>().ToArray()));
+            _contentTypeService.GetAllAsync().GetAwaiter().GetResult().Cast<IContentTypeComposition>().ToArray()));
         types.AddRange(GetTypes(
             PublishedItemType.Media,
             _mediaTypeService.GetAll().Cast<IContentTypeComposition>().ToArray()));
@@ -91,7 +91,7 @@ public sealed class UmbracoServices
     /// </returns>
     public IList<TypeModel> GetContentTypes()
     {
-        IContentTypeComposition[] contentTypes = _contentTypeService.GetAll().Cast<IContentTypeComposition>().ToArray();
+        IContentTypeComposition[] contentTypes = _contentTypeService.GetAllAsync().GetAwaiter().GetResult().Cast<IContentTypeComposition>().ToArray();
         return GetTypes(PublishedItemType.Content, contentTypes); // aliases have to be unique here
     }
 

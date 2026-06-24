@@ -523,7 +523,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     {
         var user = new UserBuilder().Build();
         UserService.Save(user);
-        var content = new Content("Test", Constants.System.Root, ContentTypeService.Get("umbTextpage"));
+        var content = new Content("Test", Constants.System.Root, ContentTypeService.GetAsync("umbTextpage").GetAwaiter().GetResult());
 
         // Act
         ContentService.Save(content, user.Id);
@@ -541,7 +541,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     public void Cannot_Save_Content_With_Empty_Name()
     {
         // Arrange
-        var content = new Content(string.Empty, Constants.System.Root, ContentTypeService.Get("umbTextpage"));
+        var content = new Content(string.Empty, Constants.System.Root, ContentTypeService.GetAsync("umbTextpage").GetAwaiter().GetResult());
 
         // Act & Assert
         Assert.Throws<InvalidOperationException>(() => ContentService.Save(content));
@@ -1837,7 +1837,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     public void Can_Bulk_Save_Content()
     {
         // Arrange
-        var contentType = ContentTypeService.Get("umbTextpage");
+        var contentType = ContentTypeService.GetAsync("umbTextpage").GetAwaiter().GetResult();
         var subpage = ContentBuilder.CreateSimpleContent(contentType, "Text Subpage 1", Textpage.Id);
         var subpage2 = ContentBuilder.CreateSimpleContent(contentType, "Text Subpage 2", Textpage.Id);
         var list = new List<IContent> { subpage, subpage2 };
@@ -1869,7 +1869,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     public void Can_Delete_Content_Of_Specific_ContentType()
     {
         // Arrange
-        var contentType = ContentTypeService.Get("umbTextpage");
+        var contentType = ContentTypeService.GetAsync("umbTextpage").GetAwaiter().GetResult();
 
         // Act
         ContentService.DeleteOfType(contentType.Id);
@@ -1913,7 +1913,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     [LongRunning]
     public void Can_Move_Content_Structure_To_RecycleBin_And_Empty_RecycleBin()
     {
-        var contentType = ContentTypeService.Get("umbTextpage");
+        var contentType = ContentTypeService.GetAsync("umbTextpage").GetAwaiter().GetResult();
 
         var subsubpage = ContentBuilder.CreateSimpleContent(contentType, "Text Page 3", Subpage.Id);
         ContentService.Save(subsubpage);
@@ -2812,7 +2812,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     [Test]
     public void Can_Save_Lazy_Content()
     {
-        var contentType = ContentTypeService.Get("umbTextpage");
+        var contentType = ContentTypeService.GetAsync("umbTextpage").GetAwaiter().GetResult();
         var root = ContentService.GetById(Textpage.Id);
 
         var c = new Lazy<IContent>(() =>
@@ -3292,7 +3292,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         var contentTypeService = ContentTypeService;
 
-        var contentType = ContentTypeService.Get("umbTextpage");
+        var contentType = ContentTypeService.GetAsync("umbTextpage").GetAwaiter().GetResult();
         contentType.Variations = ContentVariation.Culture;
         contentType.AddPropertyType(new PropertyType(
             ShortStringHelper,
@@ -3336,7 +3336,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         var contentTypeService = ContentTypeService;
 
-        var contentType = ContentTypeService.Get("umbTextpage");
+        var contentType = ContentTypeService.GetAsync("umbTextpage").GetAwaiter().GetResult();
         contentType.Variations = ContentVariation.Culture;
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
@@ -3365,7 +3365,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     {
         // Siblings whose names differ only in punctuation produce the same URL segment
         // (e.g. "Title" and "Title." both produce "title"), so the second should get a suffix.
-        var contentType = ContentTypeService.Get("umbTextpage")!;
+        var contentType = ContentTypeService.GetAsync("umbTextpage").GetAwaiter().GetResult()!;
 
         var parent = new Content("root", Constants.System.Root, contentType);
         ContentService.Save(parent);
@@ -3399,7 +3399,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         await languageService.CreateAsync(langFr, Constants.Security.SuperUserKey);
         await languageService.CreateAsync(langUk, Constants.Security.SuperUserKey);
 
-        var contentType = ContentTypeService.Get("umbTextpage")!;
+        var contentType = ContentTypeService.GetAsync("umbTextpage").GetAwaiter().GetResult()!;
         contentType.Variations = ContentVariation.Culture;
         await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
 
@@ -3446,7 +3446,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         var contentTypeService = ContentTypeService;
 
-        var contentType = ContentTypeService.Get("umbTextpage");
+        var contentType = ContentTypeService.GetAsync("umbTextpage").GetAwaiter().GetResult();
         contentType.Variations = ContentVariation.Culture;
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
@@ -3590,7 +3590,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         var contentTypeService = ContentTypeService;
 
-        var contentType = ContentTypeService.Get("umbTextpage");
+        var contentType = ContentTypeService.GetAsync("umbTextpage").GetAwaiter().GetResult();
         contentType.Variations = ContentVariation.Culture;
         contentType.AddPropertyType(new PropertyType(
             ShortStringHelper,
@@ -4108,7 +4108,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
     private IEnumerable<IContent> CreateContentHierarchy()
     {
-        var contentType = ContentTypeService.Get("umbTextpage");
+        var contentType = ContentTypeService.GetAsync("umbTextpage").GetAwaiter().GetResult();
         var root = ContentService.GetById(Textpage.Id);
 
         var list = new List<IContent>();

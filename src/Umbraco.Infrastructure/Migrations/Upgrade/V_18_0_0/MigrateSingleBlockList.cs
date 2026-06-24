@@ -107,7 +107,7 @@ public class MigrateSingleBlockList : AsyncMigrationBase
         var languagesById = (await _languageService.GetAllAsync())
             .ToDictionary(language => language.Id);
 
-        IEnumerable<IContentType> allContentTypes = _contentTypeService.GetAll();
+        IEnumerable<IContentType> allContentTypes = await _contentTypeService.GetAllAsync();
         IEnumerable<IPropertyType> contentPropertyTypes = allContentTypes
             .SelectMany(ct => ct.PropertyTypes);
 

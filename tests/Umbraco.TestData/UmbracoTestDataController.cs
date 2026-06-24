@@ -286,7 +286,7 @@ public class UmbracoTestDataController : SurfaceController
     /// </remarks>
     private async Task<IContentType> GetOrCreateContentTypeAsync()
     {
-        var docType = Services.ContentTypeService.Get(TestDataContentTypeAlias);
+        var docType = Services.ContentTypeService.GetAsync(TestDataContentTypeAlias).GetAwaiter().GetResult();
         if (docType != null)
         {
             return docType;

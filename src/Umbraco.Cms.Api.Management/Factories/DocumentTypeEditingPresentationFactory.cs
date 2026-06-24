@@ -12,7 +12,10 @@ internal sealed class DocumentTypeEditingPresentationFactory : ContentTypeEditin
     /// </summary>
     /// <param name="contentTypeService">The service used to manage and retrieve content types.</param>
     public DocumentTypeEditingPresentationFactory(IContentTypeService contentTypeService)
-        : base(contentTypeService)
+        // TODO (V19): IContentTypeService no longer derives from IContentTypeBaseService<IContentType>, but the concrete
+        // ContentTypeService still implements it. The base factory is shared with the still-synchronous media type
+        // factory, so the document type service is adapted here until that base is migrated to the async API.
+        : base((IContentTypeBaseService<IContentType>)contentTypeService)
     {
     }
 

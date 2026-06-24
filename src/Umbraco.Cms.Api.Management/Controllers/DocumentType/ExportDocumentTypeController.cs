@@ -46,11 +46,11 @@ public class ExportDocumentTypeController : DocumentTypeControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [EndpointSummary("Exports a document type.")]
     [EndpointDescription("Exports the document type identified by the provided Id to a downloadable format.")]
-    public IActionResult Export(
+    public async Task<IActionResult> Export(
         CancellationToken cancellationToken,
         Guid id)
     {
-        IContentType? contentType = _contentTypeService.Get(id);
+        IContentType? contentType = await _contentTypeService.GetAsync(id);
         if (contentType is null)
         {
             return OperationStatusResult(ContentTypeOperationStatus.NotFound);

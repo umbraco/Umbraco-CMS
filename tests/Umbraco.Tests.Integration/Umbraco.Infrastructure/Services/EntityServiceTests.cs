@@ -64,7 +64,7 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
     [Test]
     public void EntityService_Can_Get_Paged_Descendants_Ordering_Path()
     {
-        var contentType = ContentTypeService.Get("umbTextpage");
+        var contentType = ContentTypeService.GetAsync("umbTextpage").GetAwaiter().GetResult();
 
         var root = ContentBuilder.CreateSimpleContent(contentType);
         ContentService.Save(root);
@@ -129,7 +129,7 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
     [Test]
     public void EntityService_Can_Get_Paged_Content_Children()
     {
-        var contentType = ContentTypeService.Get("umbTextpage");
+        var contentType = ContentTypeService.GetAsync("umbTextpage").GetAwaiter().GetResult();
 
         var root = ContentBuilder.CreateSimpleContent(contentType);
         ContentService.Save(root);
@@ -179,7 +179,7 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
     [Test]
     public void EntityService_Can_Get_Paged_Content_Descendants()
     {
-        var contentType = ContentTypeService.Get("umbTextpage");
+        var contentType = ContentTypeService.GetAsync("umbTextpage").GetAwaiter().GetResult();
 
         var root = ContentBuilder.CreateSimpleContent(contentType);
         ContentService.Save(root);
@@ -211,7 +211,7 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
     [LongRunning]
     public void EntityService_Can_Get_Paged_Content_Descendants_Including_Recycled()
     {
-        var contentType = ContentTypeService.Get("umbTextpage");
+        var contentType = ContentTypeService.GetAsync("umbTextpage").GetAwaiter().GetResult();
 
         var root = ContentBuilder.CreateSimpleContent(contentType);
         ContentService.Save(root);
@@ -253,7 +253,7 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
     [LongRunning]
     public void EntityService_Can_Get_Paged_Content_Descendants_Without_Recycled()
     {
-        var contentType = ContentTypeService.Get("umbTextpage");
+        var contentType = ContentTypeService.GetAsync("umbTextpage").GetAwaiter().GetResult();
 
         var root = ContentBuilder.CreateSimpleContent(contentType);
         ContentService.Save(root);
@@ -296,7 +296,7 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
     [LongRunning]
     public void EntityService_Can_Get_Paged_Trashed_Content_Children()
     {
-        var contentType = ContentTypeService.Get("umbTextpage");
+        var contentType = ContentTypeService.GetAsync("umbTextpage").GetAwaiter().GetResult();
 
         var root = ContentBuilder.CreateSimpleContent(contentType);
         ContentService.Save(root);
@@ -339,7 +339,7 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
     [Test]
     public void EntityService_Can_Get_Paged_Content_Descendants_With_Search()
     {
-        var contentType = ContentTypeService.Get("umbTextpage");
+        var contentType = ContentTypeService.GetAsync("umbTextpage").GetAwaiter().GetResult();
 
         var root = ContentBuilder.CreateSimpleContent(contentType);
         ContentService.Save(root);
@@ -933,7 +933,7 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
     [Test]
     public void EntityService_GetPathKeys_ReturnsExpectedKeys()
     {
-        var contentType = ContentTypeService.Get("umbTextpage");
+        var contentType = ContentTypeService.GetAsync("umbTextpage").GetAwaiter().GetResult();
 
         var root = ContentBuilder.CreateSimpleContent(contentType);
         ContentService.Save(root);
@@ -1162,7 +1162,7 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
 
     private List<Content> CreateDocumentSiblingsTestData(int count = 10)
     {
-        var contentType = ContentTypeService.Get("umbTextpage");
+        var contentType = ContentTypeService.GetAsync("umbTextpage").GetAwaiter().GetResult();
 
         var root = ContentBuilder.CreateSimpleContent(contentType);
         ContentService.Save(root);

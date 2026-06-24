@@ -27,14 +27,14 @@ internal sealed class ContentTypeSearchService : IContentTypeSearchService
     /// <returns>
     /// A task representing the asynchronous operation. The result contains a <see cref="PagedModel{IContentType}"/> with the matching content types and the total count.
     /// </returns>
-    public Task<PagedModel<IContentType>> SearchAsync(string query, bool? isElement, CancellationToken cancellationToken, int skip = 0, int take = 100)
+    public async Task<PagedModel<IContentType>> SearchAsync(string query, bool? isElement, CancellationToken cancellationToken, int skip = 0, int take = 100)
     {
         // if the query is a GUID, search for that explicitly
         Guid.TryParse(query, out Guid guidQuery);
 
         // The content-type repository is backed by a full-dataset cache, so filtering the materialized set
         // in-memory is cheap and avoids an IQuery round-trip (not supported by the async EF Core repository).
-        IContentType[] contentTypes = _contentTypeService.GetAll()
+        IContentType[] contentTypes = (await _contentTypeService.GetAllAsync())
             .Where(x => ((x.Name?.InvariantContains(query) ?? false) || x.Key == guidQuery)
                         && (isElement is null || x.IsElement == isElement))
             .ToArray();
@@ -45,6 +45,6 @@ internal sealed class ContentTypeSearchService : IContentTypeSearchService
             Total = contentTypes.Length,
         };
 
-        return Task.FromResult(pagedModel);
+        return pagedModel;
     }
 }

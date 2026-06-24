@@ -190,7 +190,7 @@ internal sealed class ContentTypeContainerServiceTests : UmbracoIntegrationTest
         var currentContainer = await ContentTypeContainerService.GetAsync(container.Key);
         Assert.IsNotNull(currentContainer);
 
-        var currentContentType = ContentTypeService.Get(contentType.Key);
+        var currentContentType = ContentTypeService.GetAsync(contentType.Key).GetAwaiter().GetResult();
         Assert.IsNotNull(currentContentType);
     }
 

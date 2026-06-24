@@ -30,7 +30,7 @@ internal sealed class ContentTypeSchemaServiceTests : UmbracoIntegrationTestWith
         var result = ContentTypeSchemaService.GetDocumentTypes();
 
         // Assert - count should match the content type service
-        Assert.That(result, Has.Count.EqualTo(ContentTypeService.Count()));
+        Assert.That(result, Has.Count.EqualTo(ContentTypeService.CountAsync().GetAwaiter().GetResult()));
 
         var contentTypeSchema = result.FirstOrDefault(ct => ct.Alias == ContentType.Alias);
         Assert.That(contentTypeSchema, Is.Not.Null);

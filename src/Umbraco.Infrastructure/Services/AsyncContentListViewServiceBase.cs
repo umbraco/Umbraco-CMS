@@ -8,19 +8,22 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Services;
 
-// TODO: Remove this synchronous base once the media and member type services are migrated to the async
-// IAsyncContentTypeBaseService contract. At that point their list view services can move to
-// AsyncContentListViewServiceBase and this class (a near-duplicate) can be deleted.
-internal abstract class ContentListViewServiceBase<TContent, TContentType, TContentTypeService>
+/// <summary>
+/// Asynchronous counterpart of <see cref="ContentListViewServiceBase{TContent, TContentType, TContentTypeService}" />,
+/// used while the content type repositories are migrated to EF Core. It runs against the asynchronous
+/// <see cref="IAsyncContentTypeBaseService{TContentType}" /> contract; the media list view service continues to use the
+/// synchronous base until its repository is migrated.
+/// </summary>
+internal abstract class AsyncContentListViewServiceBase<TContent, TContentType, TContentTypeService>
     where TContent : class, IContentBase
     where TContentType : class, IContentTypeComposition
-    where TContentTypeService : IContentTypeBaseService<TContentType>
+    where TContentTypeService : IAsyncContentTypeBaseService<TContentType>
 {
     private readonly TContentTypeService _contentTypeService;
     private readonly IDataTypeService _dataTypeService;
     private readonly IContentSearchService<TContent> _contentSearchService;
 
-    protected ContentListViewServiceBase(TContentTypeService contentTypeService, IDataTypeService dataTypeService, IContentSearchService<TContent> contentSearchService)
+    protected AsyncContentListViewServiceBase(TContentTypeService contentTypeService, IDataTypeService dataTypeService, IContentSearchService<TContent> contentSearchService)
     {
         _contentTypeService = contentTypeService;
         _dataTypeService = dataTypeService;

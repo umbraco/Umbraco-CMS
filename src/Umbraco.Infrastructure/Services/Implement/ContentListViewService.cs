@@ -8,7 +8,7 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Infrastructure.Services.Implement;
 
-internal sealed class ContentListViewService : ContentListViewServiceBase<IContent, IContentType, IContentTypeService>, IContentListViewService
+internal sealed class ContentListViewService : AsyncContentListViewServiceBase<IContent, IContentType, IContentTypeService>, IContentListViewService
 {
     private readonly IContentService _contentService;
     private readonly IContentPermissionAuthorizer _contentPermissionAuthorizer;

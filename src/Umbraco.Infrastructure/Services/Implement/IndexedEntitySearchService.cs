@@ -95,7 +95,7 @@ internal sealed class IndexedEntitySearchService : IIndexedEntitySearchService
         var contentTypeAliases = contentTypeIdsAsArray?.Length > 0
             ? (entityType switch
             {
-                UmbracoEntityTypes.Document => _contentTypeService.GetMany(contentTypeIdsAsArray).Select(x => x.Alias),
+                UmbracoEntityTypes.Document => _contentTypeService.GetManyAsync(contentTypeIdsAsArray).GetAwaiter().GetResult().Select(x => x.Alias),
                 UmbracoEntityTypes.Media => _mediaTypeService.GetMany(contentTypeIdsAsArray).Select(x => x.Alias),
                 UmbracoEntityTypes.Member => _memberTypeService.GetMany(contentTypeIdsAsArray).Select(x => x.Alias),
                 _ => throw new NotSupportedException("This service only supports searching for documents, media and members")

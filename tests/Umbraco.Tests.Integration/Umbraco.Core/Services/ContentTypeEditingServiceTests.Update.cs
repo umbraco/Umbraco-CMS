@@ -3,6 +3,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentTypeEditing;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Tests.Common.Builders;
@@ -1292,7 +1293,7 @@ internal sealed partial class ContentTypeEditingServiceTests
     [Test]
     public async Task Cannot_Add_Inheritance_When_Created_In_A_Folder()
     {
-        EntityContainer container = ContentTypeService.CreateContainer(Constants.System.Root, Guid.NewGuid(), "Test folder").Result!.Entity;
+        EntityContainer container = ((IContentTypeBaseService<IContentType>)ContentTypeService).CreateContainer(Constants.System.Root, Guid.NewGuid(), "Test folder").Result!.Entity;
 
         var parentContentType = (await ContentTypeEditingService.CreateAsync(ContentTypeCreateModel("Parent"), Constants.Security.SuperUserKey)).Result!;
         var contentType = (await ContentTypeEditingService.CreateAsync(ContentTypeCreateModel("Child", containerKey: container.Key), Constants.Security.SuperUserKey)).Result!;

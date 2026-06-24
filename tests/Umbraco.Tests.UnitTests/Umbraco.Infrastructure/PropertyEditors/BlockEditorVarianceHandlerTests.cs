@@ -361,7 +361,7 @@ public class BlockEditorVarianceHandlerTests
         var elementType = new Mock<IContentType>();
         elementType.SetupGet(e => e.Key).Returns(element.ContentType.Key);
         elementType.SetupGet(e => e.Variations).Returns(element.ContentType.Variations);
-        contentTypeServiceMock.Setup(c => c.Get(It.IsAny<Guid>())).Returns((Guid key) =>
+        contentTypeServiceMock.Setup(c => c.GetAsync(It.IsAny<Guid>())).ReturnsAsync((Guid key) =>
         {
             if (key == element.ContentType.Key)
             {

@@ -35,7 +35,7 @@ public class ContentTypeSchemaServiceTests
         var cachedType = Mock.Of<IContentType>(x => x.Alias == "cachedType" && x.PropertyTypes == Array.Empty<IPropertyType>());
         var uncachedType = Mock.Of<IContentType>(x => x.Alias == "uncachedType");
 
-        _contentTypeServiceMock.Setup(x => x.GetAll()).Returns([cachedType, uncachedType]);
+        _contentTypeServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync([cachedType, uncachedType]);
         _publishedContentTypeCacheMock.Setup(x => x.Get(PublishedItemType.Content, "cachedType"))
             .Returns(Mock.Of<IPublishedContentType>(x =>
                 x.Alias == "cachedType" &&
@@ -72,7 +72,7 @@ public class ContentTypeSchemaServiceTests
                 Mock.Of<IPublishedPropertyType>(p => p.Alias == "inheritedProperty" && p.EditorAlias == "test" && p.DeliveryApiModelClrType == typeof(string)),
             });
 
-        _contentTypeServiceMock.Setup(x => x.GetAll()).Returns([contentType]);
+        _contentTypeServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync([contentType]);
         _publishedContentTypeCacheMock.Setup(x => x.Get(PublishedItemType.Content, "composedType")).Returns(publishedContentType);
 
         // Act
@@ -95,7 +95,7 @@ public class ContentTypeSchemaServiceTests
             x.CompositionAliases == new HashSet<string> { "basePage", "seoComposition" } &&
             x.PropertyTypes == Array.Empty<IPublishedPropertyType>());
 
-        _contentTypeServiceMock.Setup(x => x.GetAll()).Returns([contentType]);
+        _contentTypeServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync([contentType]);
         _publishedContentTypeCacheMock.Setup(x => x.Get(PublishedItemType.Content, "articlePage")).Returns(publishedContentType);
 
         // Act
@@ -111,7 +111,7 @@ public class ContentTypeSchemaServiceTests
     public void GetDocumentTypes_ReturnsEmptyCollectionWhenNoContentTypes()
     {
         // Arrange
-        _contentTypeServiceMock.Setup(x => x.GetAll()).Returns(Array.Empty<IContentType>());
+        _contentTypeServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(Array.Empty<IContentType>());
 
         // Act
         var result = _sut.GetDocumentTypes();
@@ -127,7 +127,7 @@ public class ContentTypeSchemaServiceTests
         var documentType = Mock.Of<IContentType>(x => x.Alias == "documentType" && x.PropertyTypes == Array.Empty<IPropertyType>());
         var elementType = Mock.Of<IContentType>(x => x.Alias == "elementType" && x.PropertyTypes == Array.Empty<IPropertyType>());
 
-        _contentTypeServiceMock.Setup(x => x.GetAll()).Returns([documentType, elementType]);
+        _contentTypeServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync([documentType, elementType]);
         _publishedContentTypeCacheMock.Setup(x => x.Get(PublishedItemType.Content, "documentType"))
             .Returns(Mock.Of<IPublishedContentType>(x =>
                 x.Alias == "documentType" &&

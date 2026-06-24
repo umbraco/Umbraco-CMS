@@ -22,6 +22,7 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
     private readonly IConfigurationEditorJsonSerializer _configurationEditorJsonSerializer;
     private readonly IContentService _contentService;
     private readonly IContentTypeService _contentTypeService;
+    private readonly IContentTypeContainerService _contentTypeContainerService;
     private readonly IDataTypeService _dataTypeService;
     private readonly IDataTypeContainerService _dataTypeContainerService;
     private readonly IIdKeyMap _idKeyMap;
@@ -47,6 +48,7 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
     /// <param name="configurationEditorJsonSerializer">The serializer for configuration data.</param>
     /// <param name="dataTypeContainerService">The data type container service for resolving ancestor folders.</param>
     /// <param name="idKeyMap">The cached id-to-key map used to resolve int data type IDs to GUID keys.</param>
+    /// <param name="contentTypeContainerService">The content type container service for resolving ancestor folders.</param>
     public EntityXmlSerializer(
         IContentService contentService,
         IMediaService mediaService,
@@ -59,9 +61,11 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
         PropertyEditorCollection propertyEditors,
         IConfigurationEditorJsonSerializer configurationEditorJsonSerializer,
         IDataTypeContainerService dataTypeContainerService,
-        IIdKeyMap idKeyMap)
+        IIdKeyMap idKeyMap,
+        IContentTypeContainerService contentTypeContainerService)
     {
         _contentTypeService = contentTypeService;
+        _contentTypeContainerService = contentTypeContainerService;
         _mediaService = mediaService;
         _contentService = contentService;
         _dataTypeService = dataTypeService;
@@ -510,7 +514,14 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
         if (contentType.Level != 1 && masterContentType == null)
         {
             // get URL encoded folder names
-            IOrderedEnumerable<EntityContainer> folders = _contentTypeService.GetContainers(contentType)
+            var ancestorIds = contentType.Path
+                .Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries)
+                .Select(x => int.TryParse(x, NumberStyles.Integer, CultureInfo.InvariantCulture, out var asInt) ? asInt : int.MinValue)
+                .Where(x => x != int.MinValue && x != contentType.Id)
+                .ToArray();
+
+            IOrderedEnumerable<EntityContainer> folders = _contentTypeContainerService.GetAllAsync().GetAwaiter().GetResult()
+                .Where(x => ancestorIds.Contains(x.Id))
                 .OrderBy(x => x.Level);
 
             folderNames = string.Join("/", folders.Select(x => WebUtility.UrlEncode(x.Name)).ToArray());

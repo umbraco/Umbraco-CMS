@@ -1,5 +1,4 @@
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
@@ -7,7 +6,7 @@ namespace Umbraco.Cms.Core.Services;
 /// <summary>
 ///     Manages <see cref="IContentType" /> objects.
 /// </summary>
-public interface IContentTypeService : IContentTypeBaseService<IContentType>
+public interface IContentTypeService : IAsyncContentTypeBaseService<IContentType>
 {
     /// <summary>
     ///     Gets all property type aliases.
@@ -31,14 +30,6 @@ public interface IContentTypeService : IContentTypeBaseService<IContentType>
     /// <param name="aliases">The content type aliases to look up.</param>
     /// <returns>An enumerable collection of content type identifiers.</returns>
     IEnumerable<int> GetAllContentTypeIds(string[] aliases);
-
-    /// <summary>
-    ///     Gets content types matching the specified query.
-    /// </summary>
-    /// <param name="query">The query to filter content types.</param>
-    /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
-    /// <returns>A task that represents the asynchronous operation. The task result contains the matching content types.</returns>
-    Task<IEnumerable<IContentType>> GetByQueryAsync(IQuery<IContentType> query, CancellationToken cancellationToken) => Task.FromResult(Enumerable.Empty<IContentType>());
 
     /// <summary>
     /// Creates a template for the given content type.
