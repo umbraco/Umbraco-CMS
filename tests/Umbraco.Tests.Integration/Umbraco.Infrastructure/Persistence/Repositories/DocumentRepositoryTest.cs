@@ -292,7 +292,7 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
         var contentType =
             ContentTypeBuilder.CreateSimpleContentType("umbTextpage1", "Textpage", defaultTemplateId: template.Id);
 
-        contentTypeRepository.Save(contentType);
+        await contentTypeRepository.SaveAsync(contentType, CancellationToken.None);
         var content = ContentBuilder.CreateSimpleContent(contentType);
         repository.Save(content);
         return content;
@@ -311,7 +311,7 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
             var hasPropertiesContentType =
                 ContentTypeBuilder.CreateSimpleContentType("umbTextpage1", "Textpage", defaultTemplateId: template.Id);
 
-            contentTypeRepository.Save(hasPropertiesContentType);
+            await contentTypeRepository.SaveAsync(hasPropertiesContentType, CancellationToken.None);
 
             IContent content1 = ContentBuilder.CreateSimpleContent(hasPropertiesContentType);
 
@@ -519,8 +519,8 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
             var emptyContentType = ContentTypeBuilder.CreateBasicContentType();
             var hasPropertiesContentType =
                 ContentTypeBuilder.CreateSimpleContentType("umbTextpage1", "Textpage", defaultTemplateId: template.Id);
-            contentTypeRepository.Save(emptyContentType);
-            contentTypeRepository.Save(hasPropertiesContentType);
+            await contentTypeRepository.SaveAsync(emptyContentType, CancellationToken.None);
+            await contentTypeRepository.SaveAsync(hasPropertiesContentType, CancellationToken.None);
 
             var content1 = ContentBuilder.CreateSimpleContent(hasPropertiesContentType);
             var content2 = ContentBuilder.CreateBasicContent(emptyContentType);
@@ -616,7 +616,7 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
             var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository);
             var contentType =
                 ContentTypeBuilder.CreateSimpleContentType("umbTextpage2", "Textpage", defaultTemplateId: template.Id);
-            contentTypeRepository.Save(contentType);
+            await contentTypeRepository.SaveAsync(contentType, CancellationToken.None);
 
             IContent textpage = ContentBuilder.CreateSimpleContent(contentType);
 
@@ -629,7 +629,7 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void SaveContentWithDefaultTemplate()
+    public async Task SaveContentWithDefaultTemplate()
     {
         var provider = ScopeProvider;
         using (var scope = provider.CreateScope())
@@ -643,7 +643,7 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
             contentType.AllowedTemplates =
                 Enumerable.Empty<ITemplate>(); // because CreateSimpleContentType assigns one already
             contentType.SetDefaultTemplate(template);
-            contentTypeRepository.Save(contentType);
+            await contentTypeRepository.SaveAsync(contentType, CancellationToken.None);
 
             var textpage = ContentBuilder.CreateSimpleContent(contentType);
             repository.Save(textpage);
@@ -673,7 +673,7 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
             var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository);
             var contentType =
                 ContentTypeBuilder.CreateSimpleContentType("umbTextpage1", "Textpage", defaultTemplateId: template.Id);
-            contentTypeRepository.Save(contentType);
+            await contentTypeRepository.SaveAsync(contentType, CancellationToken.None);
 
             var textpage = ContentBuilder.CreateSimpleContent(contentType, "test@umbraco.org");
             var anotherTextpage = ContentBuilder.CreateSimpleContent(contentType, "@lightgiants");
@@ -705,7 +705,7 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
             var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository);
             var contentType =
                 ContentTypeBuilder.CreateSimpleContentType("umbTextpage1", "Textpage", defaultTemplateId: template.Id);
-            contentTypeRepository.Save(contentType);
+            await contentTypeRepository.SaveAsync(contentType, CancellationToken.None);
 
             var textpage = ContentBuilder.CreateSimpleContent(contentType);
 
@@ -784,13 +784,13 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void DeleteContent()
+    public async Task DeleteContent()
     {
         var provider = ScopeProvider;
         using (var scope = provider.CreateScope())
         {
             var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository);
-            var contentType = contentTypeRepository.Get(_contentType.Id);
+            var contentType = await contentTypeRepository.GetAsync(_contentType.Id, CancellationToken.None);
             var content = new Content("Textpage 2 Child Node", _trashed.Id, contentType) { CreatorId = 0, WriterId = 0 };
 
             repository.Save(content);

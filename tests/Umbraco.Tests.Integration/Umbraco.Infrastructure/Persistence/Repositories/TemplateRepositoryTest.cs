@@ -553,7 +553,7 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
 
             var contentType =
                 ContentTypeBuilder.CreateSimpleContentType("umbTextpage2", "Textpage", defaultTemplateId: template.Id);
-            contentTypeRepository.Save(contentType);
+            await contentTypeRepository.SaveAsync(contentType, CancellationToken.None);
 
             var textpage = ContentBuilder.CreateSimpleContent(contentType);
             contentRepo.Save(textpage);

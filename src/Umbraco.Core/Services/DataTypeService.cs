@@ -304,7 +304,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 // what IS weird is that a content type is losing a property and we do NOT raise any
                 // content type event... so ppl better listen on the data type events too.
 
-                _contentTypeRepository.Save(contentType);
+                await _contentTypeRepository.SaveAsync(contentType, CancellationToken.None);
             }
 
             _dataTypeRepository.Delete(dataType);
@@ -398,10 +398,12 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// <returns>A list of content type compositions.</returns>
         private List<IContentTypeComposition> GetReferencedContentTypes(List<(string PropertyAlias, Udi Udi)> pagedUsages)
         {
-            IEnumerable<IContentTypeComposition> documentTypes = GetContentTypes(
-                pagedUsages,
-                Constants.UdiEntityType.DocumentType,
-                _contentTypeRepository);
+            // The document-type repository is async-only; bridge to it here. Media/member repositories are still
+            // synchronous (NPoco) and use the generic helper below.
+            Guid[] documentTypeKeys = GetContentTypeKeys(pagedUsages, Constants.UdiEntityType.DocumentType);
+            IEnumerable<IContentTypeComposition> documentTypes = documentTypeKeys.Length > 0
+                ? _contentTypeRepository.GetManyAsync(documentTypeKeys, CancellationToken.None).GetAwaiter().GetResult()
+                : [];
             IEnumerable<IContentTypeComposition> mediaTypes = GetContentTypes(
                 pagedUsages,
                 Constants.UdiEntityType.MediaType,
@@ -427,15 +429,20 @@ namespace Umbraco.Cms.Core.Services.Implement
             IContentTypeRepositoryBase<T> repository)
             where T : IContentTypeComposition
         {
-            Guid[] contentTypeKeys = dataTypeUsages
-                .Where(x => x.Udi is GuidUdi && x.Udi.EntityType == entityType)
-                .Select(x => ((GuidUdi)x.Udi).Guid)
-                .Distinct()
-                .ToArray();
+            Guid[] contentTypeKeys = GetContentTypeKeys(dataTypeUsages, entityType);
             return contentTypeKeys.Length > 0
                 ? repository.GetMany(contentTypeKeys)
                 : [];
         }
+
+        private static Guid[] GetContentTypeKeys(
+            IEnumerable<(string PropertyAlias, Udi Udi)> dataTypeUsages,
+            string entityType)
+            => dataTypeUsages
+                .Where(x => x.Udi is GuidUdi && x.Udi.EntityType == entityType)
+                .Select(x => ((GuidUdi)x.Udi).Guid)
+                .Distinct()
+                .ToArray();
 
         /// <inheritdoc />
         public IEnumerable<ValidationResult> ValidateConfigurationData(IDataType dataType)

@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Core.Services;
 /// <summary>
 ///     Represents the ContentType Service, which is an easy access to operations involving <see cref="IContentType" />
 /// </summary>
-public class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository, IContentType>, IContentTypeService
+public class ContentTypeService : AsyncContentTypeServiceBase<IContentTypeRepository, IContentType>, IContentTypeService
 {
     private readonly ITemplateService _templateService;
     private readonly IContentService _contentService;
@@ -370,22 +370,6 @@ public class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository,
         }
     }
 
-    /// <summary>
-    ///     Gets content types by query.
-    /// </summary>
-    /// <param name="query">The query to filter content types.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>A collection of content types matching the query.</returns>
-    public async Task<IEnumerable<IContentType>> GetByQueryAsync(IQuery<IContentType> query, CancellationToken cancellationToken)
-    {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
-        // that one is special because it works across content, media and member types
-        scope.ReadLock(Constants.Locks.ContentTypes);
-        IEnumerable<IContentType> contentTypes = Repository.Get(query);
-        scope.Complete();
-        return contentTypes;
-    }
-
     /// <inheritdoc />
     public async Task<Attempt<Guid?, ContentTypeOperationStatus>> CreateTemplateAsync(
         Guid contentTypeKey,
@@ -429,7 +413,7 @@ public class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository,
     }
 
     /// <inheritdoc />
-    protected override void DeleteItemsOfTypes(IEnumerable<int> typeIds)
+    protected override Task DeleteItemsOfTypesAsync(IEnumerable<int> typeIds)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
@@ -439,6 +423,8 @@ public class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository,
             _elementService.DeleteOfTypes(typeIdsA);
             scope.Complete();
         }
+
+        return Task.CompletedTask;
     }
 
     #region Notifications

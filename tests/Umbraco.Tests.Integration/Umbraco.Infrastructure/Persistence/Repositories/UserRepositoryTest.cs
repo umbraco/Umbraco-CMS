@@ -550,7 +550,7 @@ internal sealed class UserRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Perform_Update_On_UserRepository()
+    public async Task Can_Perform_Update_On_UserRepository()
     {
         var ct = ContentTypeBuilder.CreateBasicContentType("test");
         var mt = MediaTypeBuilder.CreateSimpleMediaType("testmedia", "TestMedia");
@@ -562,7 +562,7 @@ internal sealed class UserRepositoryTest : UmbracoIntegrationTest
             var userRepository = CreateRepository(provider);
             var userGroupRepository = CreateUserGroupRepository(provider);
 
-            ContentTypeRepository.Save(ct);
+            await ContentTypeRepository.SaveAsync(ct, CancellationToken.None);
             MediaTypeRepository.Save(mt);
 
             var content = ContentBuilder.CreateBasicContent(ct);

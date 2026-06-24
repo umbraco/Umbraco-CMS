@@ -1,3 +1,4 @@
+using System.Globalization;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Exceptions;
@@ -25,12 +26,13 @@ namespace Umbraco.Cms.Core.Services;
 /// </remarks>
 /// <typeparam name="TRepository">The type of the (asynchronous) content type repository.</typeparam>
 /// <typeparam name="TItem">The type of content type.</typeparam>
-public abstract class AsyncContentTypeServiceBase<TRepository, TItem> : ContentTypeServiceBase, IAsyncContentTypeBaseService<TItem>
+public abstract class AsyncContentTypeServiceBase<TRepository, TItem> : ContentTypeServiceBase, IAsyncContentTypeBaseService<TItem>, IContentTypeBaseService<TItem>
     where TRepository : IAsyncContentTypeRepositoryBase<TItem>
     where TItem : class, IContentTypeComposition
 {
     private readonly IAuditService _auditService;
     private readonly IEntityContainerRepository _containerRepository;
+    private readonly IEntityRepository _entityRepository;
     private readonly IEventAggregator _eventAggregator;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
     private readonly ContentTypeFilterCollection _contentTypeFilters;
@@ -44,6 +46,7 @@ public abstract class AsyncContentTypeServiceBase<TRepository, TItem> : ContentT
     /// <param name="repository">The content type repository.</param>
     /// <param name="auditService">The audit service.</param>
     /// <param name="containerRepository">The entity container repository.</param>
+    /// <param name="entityRepository">The entity repository.</param>
     /// <param name="eventAggregator">The event aggregator.</param>
     /// <param name="userIdKeyResolver">The user ID key resolver.</param>
     /// <param name="contentTypeFilters">The content type filter collection.</param>
@@ -54,6 +57,7 @@ public abstract class AsyncContentTypeServiceBase<TRepository, TItem> : ContentT
         TRepository repository,
         IAuditService auditService,
         IEntityContainerRepository containerRepository,
+        IEntityRepository entityRepository,
         IEventAggregator eventAggregator,
         IUserIdKeyResolver userIdKeyResolver,
         ContentTypeFilterCollection contentTypeFilters)
@@ -62,6 +66,7 @@ public abstract class AsyncContentTypeServiceBase<TRepository, TItem> : ContentT
         Repository = repository;
         _auditService = auditService;
         _containerRepository = containerRepository;
+        _entityRepository = entityRepository;
         _eventAggregator = eventAggregator;
         _userIdKeyResolver = userIdKeyResolver;
         _contentTypeFilters = contentTypeFilters;
@@ -1204,6 +1209,320 @@ public abstract class AsyncContentTypeServiceBase<TRepository, TItem> : ContentT
     /// Gets the container object type GUID.
     /// </summary>
     protected Guid ContainerObjectType => EntityContainer.GetContainerObjectType(ContainedObjectType);
+
+    /// <summary>
+    /// Creates a new entity container for organizing content types.
+    /// </summary>
+    [Obsolete($"Please use {nameof(IContentTypeContainerService)} or {nameof(IMediaTypeContainerService)} for all content or media type container operations. Scheduled for removal in Umbraco 18.")]
+    public Attempt<OperationResult<OperationResultType, EntityContainer>?> CreateContainer(int parentId, Guid key, string name, int userId = Constants.Security.SuperUserId)
+    {
+        EventMessages eventMessages = EventMessagesFactory.Get();
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.WriteLock(WriteLockIds); // also for containers
+
+        try
+        {
+            var container = new EntityContainer(ContainedObjectType)
+            {
+                Name = name,
+                ParentId = parentId,
+                CreatorId = userId,
+                Key = key
+            };
+
+            var savingNotification = new EntityContainerSavingNotification(container, eventMessages);
+            if (scope.Notifications.PublishCancelable(savingNotification))
+            {
+                scope.Complete();
+                return OperationResult.Attempt.Cancel(eventMessages, container);
+            }
+
+            _containerRepository?.Save(container);
+            scope.Complete();
+
+            var savedNotification = new EntityContainerSavedNotification(container, eventMessages);
+            savedNotification.WithStateFrom(savingNotification);
+            scope.Notifications.Publish(savedNotification);
+            // TODO: Audit trail ?
+
+            return OperationResult.Attempt.Succeed(eventMessages, container);
+        }
+        catch (Exception ex)
+        {
+            scope.Complete();
+            return OperationResult.Attempt.Fail<OperationResultType, EntityContainer>(OperationResultType.FailedCancelledByEvent, eventMessages, ex);
+        }
+    }
+
+    /// <summary>
+    /// Saves an entity container.
+    /// </summary>
+    [Obsolete($"Please use {nameof(IContentTypeContainerService)} or {nameof(IMediaTypeContainerService)} for all content or media type container operations. Scheduled for removal in Umbraco 18.")]
+    public Attempt<OperationResult?> SaveContainer(EntityContainer container, int userId = Constants.Security.SuperUserId)
+    {
+        EventMessages eventMessages = EventMessagesFactory.Get();
+
+        Guid containerObjectType = ContainerObjectType;
+        if (container.ContainerObjectType != containerObjectType)
+        {
+            var ex = new InvalidOperationException("Not a container of the proper type.");
+            return OperationResult.Attempt.Fail(eventMessages, ex);
+        }
+
+        if (container.HasIdentity && container.IsPropertyDirty("ParentId"))
+        {
+            var ex = new InvalidOperationException("Cannot save a container with a modified parent, move the container instead.");
+            return OperationResult.Attempt.Fail(eventMessages, ex);
+        }
+
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        {
+            var savingNotification = new EntityContainerSavingNotification(container, eventMessages);
+            if (scope.Notifications.PublishCancelable(savingNotification))
+            {
+                scope.Complete();
+                return OperationResult.Attempt.Cancel(eventMessages);
+            }
+
+            scope.WriteLock(WriteLockIds); // also for containers
+
+            _containerRepository?.Save(container);
+            scope.Complete();
+
+            var savedNotification = new EntityContainerSavedNotification(container, eventMessages);
+            savedNotification.WithStateFrom(savingNotification);
+            scope.Notifications.Publish(savedNotification);
+        }
+
+        // TODO: Audit trail ?
+
+        return OperationResult.Attempt.Succeed(eventMessages);
+    }
+
+    /// <summary>
+    /// Gets an entity container by its integer identifier.
+    /// </summary>
+    [Obsolete($"Please use {nameof(IContentTypeContainerService)} or {nameof(IMediaTypeContainerService)} for all content or media type container operations. Scheduled for removal in Umbraco 18.")]
+    public EntityContainer? GetContainer(int containerId)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        scope.ReadLock(ReadLockIds); // also for containers
+
+        return _containerRepository.Get(containerId);
+    }
+
+    /// <summary>
+    /// Gets an entity container by its GUID identifier.
+    /// </summary>
+    [Obsolete($"Please use {nameof(IContentTypeContainerService)} or {nameof(IMediaTypeContainerService)} for all content or media type container operations. Scheduled for removal in Umbraco 18.")]
+    public EntityContainer? GetContainer(Guid containerId)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        scope.ReadLock(ReadLockIds); // also for containers
+
+        return _containerRepository.Get(containerId);
+    }
+
+    /// <summary>
+    /// Gets entity containers by their integer identifiers.
+    /// </summary>
+    [Obsolete($"Please use {nameof(IContentTypeContainerService)} or {nameof(IMediaTypeContainerService)} for all content or media type container operations. Scheduled for removal in Umbraco 18.")]
+    public IEnumerable<EntityContainer> GetContainers(int[] containerIds)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        scope.ReadLock(ReadLockIds); // also for containers
+
+        return _containerRepository.GetMany(containerIds);
+    }
+
+    /// <summary>
+    /// Gets the ancestor containers of the specified content type item.
+    /// </summary>
+    [Obsolete($"Please use {nameof(IContentTypeContainerService)} or {nameof(IMediaTypeContainerService)} for all content or media type container operations. Scheduled for removal in Umbraco 18.")]
+    public IEnumerable<EntityContainer> GetContainers(TItem item)
+    {
+        var ancestorIds = item.Path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries)
+            .Select(x => int.TryParse(x, NumberStyles.Integer, CultureInfo.InvariantCulture, out var asInt) ? asInt : int.MinValue)
+            .Where(x => x != int.MinValue && x != item.Id)
+            .ToArray();
+
+        return GetContainers(ancestorIds);
+    }
+
+    /// <summary>
+    /// Gets entity containers by name and level.
+    /// </summary>
+    [Obsolete($"Please use {nameof(IContentTypeContainerService)} or {nameof(IMediaTypeContainerService)} for all content or media type container operations. Scheduled for removal in Umbraco 18.")]
+    public IEnumerable<EntityContainer> GetContainers(string name, int level)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        scope.ReadLock(ReadLockIds); // also for containers
+
+        return _containerRepository.Get(name, level);
+    }
+
+    /// <summary>
+    /// Deletes an entity container.
+    /// </summary>
+    [Obsolete($"Please use {nameof(IContentTypeContainerService)} or {nameof(IMediaTypeContainerService)} for all content or media type container operations. Scheduled for removal in Umbraco 18.")]
+    public Attempt<OperationResult?> DeleteContainer(int containerId, int userId = Constants.Security.SuperUserId)
+    {
+        EventMessages eventMessages = EventMessagesFactory.Get();
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.WriteLock(WriteLockIds); // also for containers
+
+        EntityContainer? container = _containerRepository?.Get(containerId);
+        if (container == null)
+        {
+            return OperationResult.Attempt.NoOperation(eventMessages);
+        }
+
+        // 'container' here does not know about its children, so we need
+        // to get it again from the entity repository, as a light entity
+        IEntitySlim? entity = _entityRepository.Get(container.Id);
+        if (entity?.HasChildren ?? false)
+        {
+            scope.Complete();
+            return Attempt.Fail(new OperationResult(OperationResultType.FailedCannot, eventMessages));
+        }
+
+        var deletingNotification = new EntityContainerDeletingNotification(container, eventMessages);
+        if (scope.Notifications.PublishCancelable(deletingNotification))
+        {
+            scope.Complete();
+            return Attempt.Fail(new OperationResult(OperationResultType.FailedCancelledByEvent, eventMessages));
+        }
+
+        _containerRepository?.Delete(container);
+        scope.Complete();
+
+        var deletedNotification = new EntityContainerDeletedNotification(container, eventMessages);
+        deletedNotification.WithStateFrom(deletingNotification);
+        scope.Notifications.Publish(deletedNotification);
+
+        return OperationResult.Attempt.Succeed(eventMessages);
+        // TODO: Audit trail ?
+    }
+
+    /// <summary>
+    /// Renames an entity container.
+    /// </summary>
+    [Obsolete($"Please use {nameof(IContentTypeContainerService)} or {nameof(IMediaTypeContainerService)} for all content or media type container operations. Scheduled for removal in Umbraco 18.")]
+    public Attempt<OperationResult<OperationResultType, EntityContainer>?> RenameContainer(int id, string name, int userId = Constants.Security.SuperUserId)
+    {
+        EventMessages eventMessages = EventMessagesFactory.Get();
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        {
+            scope.WriteLock(WriteLockIds); // also for containers
+
+            try
+            {
+                EntityContainer? container = _containerRepository?.Get(id);
+
+                //throw if null, this will be caught by the catch and a failed returned
+                if (container == null)
+                {
+                    throw new InvalidOperationException("No container found with id " + id);
+                }
+
+                container.Name = name;
+
+                var renamingNotification = new EntityContainerRenamingNotification(container, eventMessages);
+                if (scope.Notifications.PublishCancelable(renamingNotification))
+                {
+                    scope.Complete();
+                    return OperationResult.Attempt.Cancel<EntityContainer>(eventMessages);
+                }
+
+                _containerRepository?.Save(container);
+                scope.Complete();
+
+                var renamedNotification = new EntityContainerRenamedNotification(container, eventMessages);
+                renamedNotification.WithStateFrom(renamingNotification);
+                scope.Notifications.Publish(renamedNotification);
+
+                return OperationResult.Attempt.Succeed(OperationResultType.Success, eventMessages, container);
+            }
+            catch (Exception ex)
+            {
+                return OperationResult.Attempt.Fail<EntityContainer>(eventMessages, ex);
+            }
+        }
+    }
+
+    #endregion
+
+    #region Synchronous bridge (transitional)
+
+    // These synchronous members satisfy the existing IContentTypeBaseService<TItem> contract while consumers are
+    // migrated to the asynchronous API. They bridge to the async members above via GetAwaiter().GetResult().
+    // TODO: remove this region (and the IContentTypeBaseService<TItem> interface) once all callers use the async API.
+
+    /// <inheritdoc />
+    IContentTypeComposition? IContentTypeBaseService.Get(int id) => Get(id);
+
+    /// <inheritdoc />
+    public TItem? Get(int id) => GetAsync(id).GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    public TItem? Get(Guid key) => GetAsync(key).GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    public TItem? Get(string alias) => GetAsync(alias).GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    public int Count() => CountAsync().GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    public bool HasContentNodes(int id) => HasContentNodesAsync(id).GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    public IEnumerable<TItem> GetAll() => GetAllAsync().GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    public IEnumerable<TItem> GetMany(params int[] ids) => GetManyAsync(ids).GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    public IEnumerable<TItem> GetMany(IEnumerable<Guid>? ids) => GetManyAsync(ids).GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    public IEnumerable<TItem> GetDescendants(int id, bool andSelf) => GetDescendantsAsync(id, andSelf).GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    public IEnumerable<TItem> GetComposedOf(int id) => GetComposedOfAsync(id).GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    public IEnumerable<TItem> GetComposedOf(int id, IEnumerable<TItem> all) =>
+        all.Where(x => x.ContentTypeComposition.Any(y => y.Id == id));
+
+    /// <inheritdoc />
+    public IEnumerable<TItem> GetChildren(int id) => GetChildrenAsync(id).GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    public IEnumerable<TItem> GetChildren(Guid id) => GetChildrenAsync(id).GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    public bool HasChildren(int id) => HasChildrenAsync(id).GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    public bool HasChildren(Guid id) => HasChildrenAsync(id).GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    public bool HasContainerInPath(string contentPath) => HasContainerInPathAsync(contentPath).GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    public bool HasContainerInPath(params int[] ids) => HasContainerInPathAsync(ids).GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    public Attempt<string[]?> ValidateComposition(TItem? compo) => ValidateCompositionAsync(compo).GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    public void Delete(TItem item, int userId = Constants.Security.SuperUserId)
+        => DeleteAsync(item, _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult()).GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    public void Delete(IEnumerable<TItem> item, int userId = Constants.Security.SuperUserId)
+        => DeleteAsync(item, _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult()).GetAwaiter().GetResult();
 
     #endregion
 
