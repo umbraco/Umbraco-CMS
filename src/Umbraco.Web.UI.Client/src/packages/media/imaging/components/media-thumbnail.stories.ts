@@ -1,6 +1,6 @@
-import './thumbnail.element.js';
+import './media-thumbnail.element.js';
 import { UmbImagingCropMode } from '../types.js';
-import type { UmbThumbnailElement } from './thumbnail.element.js';
+import type { UmbMediaThumbnailElement } from './media-thumbnail.element.js';
 import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import { html, ref } from '@umbraco-cms/backoffice/external/lit';
 
@@ -12,16 +12,16 @@ const SAMPLE_IMAGE =
 // imaging backend, so this story-only helper sets the resolved URL directly to demonstrate rendering.
 // The stable callback identity ensures the ref only runs on mount, not on every update.
 const withSampleImage = (el?: Element) => {
-	const thumbnail = el as (UmbThumbnailElement & { _thumbnailUrl: string }) | undefined;
+	const thumbnail = el as (UmbMediaThumbnailElement & { _thumbnailUrl: string }) | undefined;
 	if (thumbnail && thumbnail._thumbnailUrl !== SAMPLE_IMAGE) {
 		thumbnail._thumbnailUrl = SAMPLE_IMAGE;
 		thumbnail.requestUpdate();
 	}
 };
 
-const meta: Meta<UmbThumbnailElement> = {
-	title: 'Entity/Media/Components/Thumbnail',
-	component: 'umb-thumbnail',
+const meta: Meta<UmbMediaThumbnailElement> = {
+	title: 'Entity/Media/Components/Media Thumbnail',
+	component: 'umb-media-thumbnail',
 	args: {
 		width: 300,
 		height: 300,
@@ -32,20 +32,20 @@ const meta: Meta<UmbThumbnailElement> = {
 	},
 	render: (args) => html`
 		<div style="width: 200px; height: 200px;">
-			<umb-thumbnail
+			<umb-media-thumbnail
 				${ref(withSampleImage)}
 				.width=${args.width}
 				.height=${args.height}
 				.mode=${args.mode}
 				.alt=${args.alt}
 				.icon=${args.icon}
-				.loading=${args.loading}></umb-thumbnail>
+				.loading=${args.loading}></umb-media-thumbnail>
 		</div>
 	`,
 };
 
 export default meta;
-type Story = StoryObj<UmbThumbnailElement>;
+type Story = StoryObj<UmbMediaThumbnailElement>;
 
 /**
  * The default behaviour: transparent areas of the image are shown over a checkerboard pattern, which
@@ -54,21 +54,21 @@ type Story = StoryObj<UmbThumbnailElement>;
 export const Default: Story = {};
 
 /**
- * Setting `--umb-thumbnail-background: none` removes the checkerboard so the image sits on a transparent
- * background — use this when the thumbnail represents final content, e.g. in a block grid. Here it is
- * shown over a solid colour to make the transparency visible.
+ * Setting `--umb-media-thumbnail-background: none` removes the checkerboard so the image sits on a
+ * transparent background — use this when the thumbnail represents final content, e.g. in a block grid.
+ * Here it is shown over a solid colour to make the transparency visible.
  */
 export const TransparentBackground: Story = {
 	render: (args) => html`
-		<div style="width: 200px; height: 200px; background: #2152a3; --umb-thumbnail-background: none;">
-			<umb-thumbnail
+		<div style="width: 200px; height: 200px; background: #2152a3; --umb-media-thumbnail-background: none;">
+			<umb-media-thumbnail
 				${ref(withSampleImage)}
 				.width=${args.width}
 				.height=${args.height}
 				.mode=${args.mode}
 				.alt=${args.alt}
 				.icon=${args.icon}
-				.loading=${args.loading}></umb-thumbnail>
+				.loading=${args.loading}></umb-media-thumbnail>
 		</div>
 	`,
 };
@@ -79,7 +79,7 @@ export const TransparentBackground: Story = {
 export const FallbackIcon: Story = {
 	render: (args) => html`
 		<div style="width: 200px; height: 200px;">
-			<umb-thumbnail .icon=${args.icon} .alt=${args.alt}></umb-thumbnail>
+			<umb-media-thumbnail .icon=${args.icon} .alt=${args.alt}></umb-media-thumbnail>
 		</div>
 	`,
 };

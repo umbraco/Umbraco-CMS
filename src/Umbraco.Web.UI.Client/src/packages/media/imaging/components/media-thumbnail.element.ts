@@ -9,13 +9,13 @@ import { UmbEntityUpdatedEvent } from '@umbraco-cms/backoffice/entity-action';
 /**
  * Displays a thumbnail for a media item, with optional server-side cropping and transparency support.
  * This is the recommended component for rendering media images in the backoffice.
- * @element umb-thumbnail
- * @cssprop [--umb-thumbnail-background] - Background shown behind the image. Defaults to a checkerboard
+ * @element umb-media-thumbnail
+ * @cssprop [--umb-media-thumbnail-background] - Background shown behind the image. Defaults to a checkerboard
  * pattern that reveals transparency; set to `none` for a transparent background.
  * @csspart img - The underlying `<img>` element.
  */
-@customElement('umb-thumbnail')
-export class UmbThumbnailElement extends UmbLitElement {
+@customElement('umb-media-thumbnail')
+export class UmbMediaThumbnailElement extends UmbLitElement {
 	/**
 	 * The unique identifier for the media item.
 	 * @description This is also known as the media key and is used to fetch the resource.
@@ -207,7 +207,7 @@ export class UmbThumbnailElement extends UmbLitElement {
 				object-position: center;
 
 				background-image: var(
-					--umb-thumbnail-background,
+					--umb-media-thumbnail-background,
 					url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" fill-opacity=".1"><path d="M50 0h50v50H50zM0 50h50v50H0z"/></svg>')
 				);
 				background-size: 10px 10px;
@@ -225,6 +225,6 @@ export class UmbThumbnailElement extends UmbLitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-thumbnail': UmbThumbnailElement;
+		'umb-media-thumbnail': UmbMediaThumbnailElement;
 	}
 }

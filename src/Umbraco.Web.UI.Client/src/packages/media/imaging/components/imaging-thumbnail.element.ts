@@ -1,27 +1,13 @@
-import { UmbThumbnailElement } from './thumbnail.element.js';
+import { UmbMediaThumbnailElement } from './media-thumbnail.element.js';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
-import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
-
-let hasWarned = false;
 
 /**
- * @deprecated Use `umb-thumbnail` (`UmbThumbnailElement`) instead. Scheduled for removal in Umbraco 19.
+ * Alias of `umb-media-thumbnail`, kept for backwards compatibility.
+ * @deprecated Use `umb-media-thumbnail` (`UmbMediaThumbnailElement`) instead.
  * @element umb-imaging-thumbnail
  */
 @customElement('umb-imaging-thumbnail')
-export class UmbImagingThumbnailElement extends UmbThumbnailElement {
-	constructor() {
-		super();
-		if (!hasWarned) {
-			hasWarned = true;
-			new UmbDeprecation({
-				deprecated: 'The umb-imaging-thumbnail element',
-				removeInVersion: '19.0.0',
-				solution: 'Use the umb-thumbnail element instead.',
-			}).warn();
-		}
-	}
-}
+export class UmbImagingThumbnailElement extends UmbMediaThumbnailElement {}
 
 declare global {
 	interface HTMLElementTagNameMap {

@@ -1,5 +1,5 @@
 import { Meta, Story, Source } from '@storybook/addon-docs/blocks';
-import * as ThumbnailStories from '../components/thumbnail.stories';
+import * as MediaThumbnailStories from '../components/media-thumbnail.stories';
 
 <Meta title="Guides/Working with Media Images" />
 
@@ -13,11 +13,8 @@ handle authentication, HMAC-signed URLs, lazy loading and caching for you.
 
 | Component | Cropping / resizing | Transparency | Use when… |
 | --- | --- | --- | --- |
-| `<umb-thumbnail>` | ✅ server-side resize & crop | ✅ configurable | You want a sized thumbnail — cards, pickers, collections, block grid items. **Recommended default.** |
+| `<umb-media-thumbnail>` | ✅ server-side resize & crop | ✅ configurable | You want a sized thumbnail — cards, pickers, collections, block grid items. **Recommended default.** |
 | `<umb-media-image>` | ❌ original file | ✅ | You need the original, full-size image without resizing. |
-
-> `<umb-imaging-thumbnail>` is a deprecated alias of `<umb-thumbnail>`, kept for backwards compatibility
-> and scheduled for removal in Umbraco 19. Use `<umb-thumbnail>` in new code.
 
 ## Displaying a thumbnail
 
@@ -26,16 +23,16 @@ HMAC-signed URL and renders it, falling back to an icon when the item has no ima
 
 <Source
 	dark
-	code={`<umb-thumbnail
+	code={`<umb-media-thumbnail
 	.unique=\${mediaUnique}
 	.width=\${300}
 	.height=\${300}
 	.mode=\${UmbImagingCropMode.MIN}
 	alt="My image"
-	loading="lazy"></umb-thumbnail>`}
+	loading="lazy"></umb-media-thumbnail>`}
 />
 
-<Story of={ThumbnailStories.Default} />
+<Story of={MediaThumbnailStories.Default} />
 
 ## Transparency: the checkerboard background
 
@@ -43,17 +40,17 @@ By default, transparent areas of an image are shown over a checkerboard pattern.
 media-management contexts — it signals to an editor that the image has transparency.
 
 When the thumbnail represents **final content** (for example a block grid item that should look like the
-rendered site), remove the checkerboard with the `--umb-thumbnail-background` custom property:
+rendered site), remove the checkerboard with the `--umb-media-thumbnail-background` custom property:
 
-<Source dark code={`umb-thumbnail { --umb-thumbnail-background: none; }`} />
+<Source dark code={`umb-media-thumbnail { --umb-media-thumbnail-background: none; }`} />
 
 Because it is a CSS custom property, it inherits — set it on any ancestor and every thumbnail underneath
 picks it up. For full control over the underlying `<img>` (e.g. `object-fit`, `border-radius`), use the
 `img` part:
 
-<Source dark code={`umb-thumbnail::part(img) { object-fit: cover; border-radius: 4px; }`} />
+<Source dark code={`umb-media-thumbnail::part(img) { object-fit: cover; border-radius: 4px; }`} />
 
-<Story of={ThumbnailStories.TransparentBackground} />
+<Story of={MediaThumbnailStories.TransparentBackground} />
 
 ## Going lower level
 
@@ -71,5 +68,5 @@ const { data } = await repository.requestResizedItems([mediaUnique], {
 const url = data[0]?.url;`}
 />
 
-You generally shouldn't need this — `<umb-thumbnail>` wraps exactly this flow, including loading state,
-the fallback icon and reloading when the media item changes.
+You generally shouldn't need this — `<umb-media-thumbnail>` wraps exactly this flow, including loading
+state, the fallback icon and reloading when the media item changes.

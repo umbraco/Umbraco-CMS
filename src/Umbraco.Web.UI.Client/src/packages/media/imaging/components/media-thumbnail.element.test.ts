@@ -1,17 +1,17 @@
-import { UmbThumbnailElement } from './thumbnail.element.js';
+import { UmbMediaThumbnailElement } from './media-thumbnail.element.js';
 import { expect, fixture, html } from '@open-wc/testing';
 
 // 1x1 transparent PNG.
 const TRANSPARENT_PNG =
 	'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+M8AAAMBAQDJ/IjVAAAAAElFTkSuQmCC';
 
-describe('UmbThumbnailElement', () => {
-	let element: UmbThumbnailElement;
+describe('UmbMediaThumbnailElement', () => {
+	let element: UmbMediaThumbnailElement;
 
 	beforeEach(async () => {
 		// No `unique` is set, so #generateThumbnailUrl returns early and never
 		// overwrites the thumbnail URL we inject below.
-		element = await fixture<UmbThumbnailElement>(html`<umb-thumbnail></umb-thumbnail>`);
+		element = await fixture<UmbMediaThumbnailElement>(html`<umb-media-thumbnail></umb-media-thumbnail>`);
 		(element as unknown as { _thumbnailUrl: string })._thumbnailUrl = TRANSPARENT_PNG;
 		element.requestUpdate();
 		await element.updateComplete;
@@ -22,7 +22,7 @@ describe('UmbThumbnailElement', () => {
 	});
 
 	it('is defined with its own instance', () => {
-		expect(element).to.be.instanceOf(UmbThumbnailElement);
+		expect(element).to.be.instanceOf(UmbMediaThumbnailElement);
 	});
 
 	it('renders the image with a stylable "img" part', () => {
@@ -36,9 +36,9 @@ describe('UmbThumbnailElement', () => {
 		expect(getComputedStyle(img).backgroundImage).to.contain('svg');
 	});
 
-	it('removes the checkerboard when --umb-thumbnail-background is overridden', () => {
+	it('removes the checkerboard when --umb-media-thumbnail-background is overridden', () => {
 		const img = element.shadowRoot!.querySelector<HTMLImageElement>('#figure')!;
-		element.style.setProperty('--umb-thumbnail-background', 'none');
+		element.style.setProperty('--umb-media-thumbnail-background', 'none');
 		expect(getComputedStyle(img).backgroundImage).to.equal('none');
 	});
 });
