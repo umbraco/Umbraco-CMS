@@ -534,10 +534,15 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 		`;
 	}
 
-	#moveItem(fromIndex: number, direction: -1 | 1) {
+	async #moveItem(fromIndex: number, direction: -1 | 1) {
 		if (!this.value) return;
 		const toIndex = fromIndex + direction;
 		if (toIndex < 0 || toIndex >= this.value.length) return;
+
+		// Capture before mutation — value setter rebuilds _cards synchronously,
+		// so reading _cards[fromIndex] after the swap gives the wrong item.
+		const movedCard = this._cards[fromIndex];
+
 		const updated = [...this.value];
 		[updated[fromIndex], updated[toIndex]] = [updated[toIndex], updated[fromIndex]];
 		this.value = updated;
@@ -545,8 +550,30 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 		this.dispatchEvent(new UmbChangeEvent());
 		this._announcement = this.localize.term(
 			direction === -1 ? 'mediaPicker_movedUp' : 'mediaPicker_movedDown',
-			[this._cards[fromIndex].name],
+			[movedCard.name],
 		);
+
+		await this.updateComplete;
+		this.#restoreFocusAfterMove(movedCard.unique, toIndex, direction);
+	}
+
+	#restoreFocusAfterMove(movedItemKey: string, newIndex: number, direction: -1 | 1) {
+		const card = this.shadowRoot?.querySelector(`[id="${movedItemKey}"]`);
+		if (!card) return;
+
+		// Buttons order within uui-action-bar: [0] move-up, [1] move-down, [2] remove
+		const buttons = card.querySelectorAll<HTMLElement>('uui-action-bar uui-button');
+		if (buttons.length < 2) return;
+
+		const isNowFirst = newIndex === 0;
+		const isNowLast = newIndex === (this.value?.length ?? 0) - 1;
+
+		// Keep focus on the same direction button unless it is now disabled (edge position),
+		// in which case move focus to the opposing direction button.
+		const targetButton =
+			direction === -1 ? (isNowFirst ? buttons[1] : buttons[0]) : isNowLast ? buttons[0] : buttons[1];
+
+		targetButton?.focus();
 	}
 
 	#renderIsTrashed(item: UmbRichMediaCardModel) {
