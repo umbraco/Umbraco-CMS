@@ -1,12 +1,11 @@
 import type { UmbDocumentTreeItemModel } from '../types.js';
 import { UmbDocumentItemDataResolver } from '../../item/index.js';
 import { UmbDocumentVariantState } from '../../variant-state.js';
+import { getDocumentVariantStateTagConfig } from '../../utils.js';
 import { getItemFallbackIcon } from '@umbraco-cms/backoffice/entity-item';
 import { customElement, html, ifDefined, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { fromCamelCase } from '@umbraco-cms/backoffice/utils';
 import type { UmbTreeItemApi } from '@umbraco-cms/backoffice/tree';
-import type { UUIInterfaceColor } from '@umbraco-cms/backoffice/external/uui';
 
 const elementName = 'umb-document-tree-item-card';
 
@@ -132,26 +131,10 @@ export class UmbDocumentTreeItemCardElement extends UmbLitElement {
 		return html`<umb-icon name=${icon}></umb-icon>`;
 	}
 
-	#getStateTagConfig(): { color: UUIInterfaceColor; label: string } | undefined {
-		if (!this._state) return undefined;
-		switch (this._state) {
-			case UmbDocumentVariantState.PUBLISHED:
-				return { color: 'positive', label: this.localize.term('content_published') };
-			case UmbDocumentVariantState.PUBLISHED_PENDING_CHANGES:
-				return { color: 'warning', label: this.localize.term('content_publishedPendingChanges') };
-			case UmbDocumentVariantState.DRAFT:
-				return { color: 'default', label: this.localize.term('content_unpublished') };
-			case UmbDocumentVariantState.NOT_CREATED:
-				return { color: 'danger', label: this.localize.term('content_notCreated') };
-			default:
-				return { color: 'danger', label: fromCamelCase(this._state) };
-		}
-	}
-
 	#renderState() {
-		const tagConfig = this.#getStateTagConfig();
-		if (!tagConfig) return nothing;
-		return html`<uui-tag slot="tag" color=${tagConfig.color} look="secondary">${tagConfig.label}</uui-tag>`;
+		if (!this._state) return nothing;
+		const { color, label } = getDocumentVariantStateTagConfig(this._state, this.localize);
+		return html`<uui-tag slot="tag" color=${color} look="secondary">${label}</uui-tag>`;
 	}
 
 	#renderActions() {

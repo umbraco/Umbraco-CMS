@@ -21,9 +21,9 @@ import type {
 	UmbEntityCollectionItemElement,
 } from '@umbraco-cms/backoffice/collection';
 import { UmbDocumentVariantState } from '../../variant-state.js';
+import { getDocumentVariantStateTagConfig } from '../../utils.js';
 import { UmbEntityContentTypeEntityContext } from '@umbraco-cms/backoffice/content-type';
 import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/document-type';
-import type { UUIInterfaceColor } from '@umbraco-cms/backoffice/external/uui';
 import { fromCamelCase } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-document-collection-item-card')
@@ -147,22 +147,6 @@ export class UmbDocumentCollectionItemCardElement extends UmbLitElement implemen
 		}
 	}
 
-	#getStateTagConfig(): { color: UUIInterfaceColor; label: string } | undefined {
-		if (!this._state) return;
-		switch (this._state) {
-			case UmbDocumentVariantState.PUBLISHED:
-				return { color: 'positive', label: this.localize.term('content_published') };
-			case UmbDocumentVariantState.PUBLISHED_PENDING_CHANGES:
-				return { color: 'warning', label: this.localize.term('content_publishedPendingChanges') };
-			case UmbDocumentVariantState.DRAFT:
-				return { color: 'default', label: this.localize.term('content_unpublished') };
-			case UmbDocumentVariantState.NOT_CREATED:
-				return { color: 'danger', label: this.localize.term('content_notCreated') };
-			default:
-				return { color: 'danger', label: fromCamelCase(this._state) };
-		}
-	}
-
 	override render() {
 		if (!this.item) return nothing;
 		return html`
@@ -188,9 +172,9 @@ export class UmbDocumentCollectionItemCardElement extends UmbLitElement implemen
 	}
 
 	#renderState() {
-		const tagConfig = this.#getStateTagConfig();
-		if (!tagConfig) return nothing;
-		return html`<uui-tag slot="tag" id="state" color=${tagConfig.color} look="secondary">${tagConfig.label}</uui-tag>`;
+		if (!this._state) return nothing;
+		const { color, label } = getDocumentVariantStateTagConfig(this._state, this.localize);
+		return html`<uui-tag slot="tag" id="state" color=${color} look="secondary">${label}</uui-tag>`;
 	}
 
 	#renderProperties() {
