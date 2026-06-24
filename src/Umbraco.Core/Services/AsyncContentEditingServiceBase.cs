@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Extensions;
@@ -6,32 +6,24 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.Models.Membership;
-using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Filters;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
+using IDataEditor = Umbraco.Cms.Core.PropertyEditors.IDataEditor;
+using PropertyEditorCollection = Umbraco.Cms.Core.PropertyEditors.PropertyEditorCollection;
 
 namespace Umbraco.Cms.Core.Services;
 
-/// <summary>
-/// Base class for content editing services that provides common functionality for creating, updating,
-/// and managing content entities (documents, media, members).
-/// </summary>
-/// <typeparam name="TContent">The type of content entity.</typeparam>
-/// <typeparam name="TContentType">The type of content type.</typeparam>
-/// <typeparam name="TContentService">The type of content service.</typeparam>
-/// <typeparam name="TContentTypeService">The type of content type service.</typeparam>
-// TODO EFCore: Remove when Media and Member content types are migrated
-internal abstract class ContentEditingServiceBase<TContent, TContentType, TContentService, TContentTypeService>
+internal abstract class AsyncContentEditingServiceBase<TContent, TContentType, TContentService, TContentTypeService>
     where TContent : class, IContentBase
     where TContentType : class, IContentTypeComposition
     where TContentService : IContentServiceBase<TContent>
-    where TContentTypeService : IContentTypeBaseService<TContentType>
+    where TContentTypeService : IAsyncContentTypeBaseService<TContentType>
 {
     private readonly PropertyEditorCollection _propertyEditorCollection;
     private readonly IDataTypeService _dataTypeService;
-    private readonly ILogger<ContentEditingServiceBase<TContent, TContentType, TContentService, TContentTypeService>> _logger;
+    private readonly ILogger<AsyncContentEditingServiceBase<TContent, TContentType, TContentService, TContentTypeService>> _logger;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
     private readonly IContentValidationServiceBase<TContentType> _validationService;
     private readonly IRelationService _relationService;
@@ -40,7 +32,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     private readonly IUserService _userService;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="ContentEditingServiceBase{TContent, TContentType, TContentService, TContentTypeService}"/> class.
+    /// Initializes a new instance of the <see cref="AsyncContentEditingServiceBase{TContent, TContentType, TContentService, TContentTypeService}"/> class.
     /// </summary>
     /// <param name="contentService">The content service.</param>
     /// <param name="contentTypeService">The content type service.</param>
@@ -53,12 +45,14 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     /// <param name="optionsMonitor">The content settings options monitor.</param>
     /// <param name="relationService">The relation service.</param>
     /// <param name="contentTypeFilters">The content type filter collection.</param>
-    protected ContentEditingServiceBase(
+    /// <param name="languageService"></param>
+    /// <param name="userService"></param>
+    protected AsyncContentEditingServiceBase(
         TContentService contentService,
         TContentTypeService contentTypeService,
         PropertyEditorCollection propertyEditorCollection,
         IDataTypeService dataTypeService,
-        ILogger<ContentEditingServiceBase<TContent, TContentType, TContentService, TContentTypeService>> logger,
+        ILogger<AsyncContentEditingServiceBase<TContent, TContentType, TContentService, TContentTypeService>> logger,
         ICoreScopeProvider scopeProvider,
         IUserIdKeyResolver userIdKeyResolver,
         IContentValidationServiceBase<TContentType> validationService,
@@ -169,10 +163,11 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     protected async Task<Attempt<TContentCreateResult, ContentEditingOperationStatus>> MapCreate<TContentCreateResult>(ContentCreationModelBase contentCreationModelBase)
         where TContentCreateResult : ContentCreateResultBase<TContent>, new()
     {
-        TContentType? contentType = TryGetAndValidateContentType(contentCreationModelBase.ContentTypeKey, contentCreationModelBase, out ContentEditingOperationStatus validationOperationStatus);
-        if (contentType == null)
+        Attempt<TContentType?, ContentEditingOperationStatus> validateContentTypeAttempt = await TryGetAndValidateContentTypeAsync(contentCreationModelBase.ContentTypeKey, contentCreationModelBase);
+        TContentType? contentType = validateContentTypeAttempt.Result;
+        if (validateContentTypeAttempt.Success is false || contentType is null)
         {
-            return Attempt.FailWithStatus(validationOperationStatus, new TContentCreateResult());
+            return Attempt.FailWithStatus(validateContentTypeAttempt.Status, new TContentCreateResult());
         }
 
         (int? ParentId, ContentEditingOperationStatus OperationStatus) parent = await TryGetAndValidateParentIdAsync(contentCreationModelBase.ParentKey, contentType);
@@ -207,10 +202,11 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     protected async Task<Attempt<TContentUpdateResult, ContentEditingOperationStatus>> MapUpdate<TContentUpdateResult>(TContent content, ContentEditingModelBase contentEditingModelBase)
         where TContentUpdateResult : ContentUpdateResultBase<TContent>, new()
     {
-        TContentType? contentType = TryGetAndValidateContentType(content.ContentType.Key, contentEditingModelBase, out ContentEditingOperationStatus operationStatus);
-        if (contentType == null)
+        Attempt<TContentType?, ContentEditingOperationStatus> validateContentTypeAttempt = await TryGetAndValidateContentTypeAsync(content.ContentType.Key, contentEditingModelBase);
+        TContentType? contentType = validateContentTypeAttempt.Result;
+        if (validateContentTypeAttempt.Success is false || contentType is null)
         {
-            return Attempt.FailWithStatus(operationStatus, new TContentUpdateResult { Content = content });
+            return Attempt.FailWithStatus(validateContentTypeAttempt.Status, new TContentUpdateResult { Content = content });
         }
 
         // NOTE: property level validation errors must NOT fail the update - it must be possible to save invalid properties.
@@ -413,7 +409,12 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
             return Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(ContentEditingOperationStatus.NotInTrash, content);
         }
 
-        TContentType contentType = ContentTypeService.Get(content.ContentType.Key)!;
+        TContentType? contentType = await ContentTypeService.GetAsync(content.ContentType.Key);
+
+        if (contentType is null)
+        {
+            return Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(ContentEditingOperationStatus.ContentTypeNotFound, content);
+        }
 
         (int? ParentId, ContentEditingOperationStatus OperationStatus) parent = await TryGetAndValidateParentIdAsync(parentKey, contentType);
         if (parent.OperationStatus != ContentEditingOperationStatus.Success)
@@ -465,7 +466,11 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
             return Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, content);
         }
 
-        TContentType contentType = ContentTypeService.Get(content.ContentType.Key)!;
+        TContentType? contentType = await ContentTypeService.GetAsync(content.ContentType.Key);
+        if (contentType is null)
+        {
+            return Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(ContentEditingOperationStatus.ContentTypeNotFound, content);
+        }
 
         (int? ParentId, ContentEditingOperationStatus OperationStatus) parent = await TryGetAndValidateParentIdAsync(parentKey, contentType);
         if (parent.OperationStatus != ContentEditingOperationStatus.Success)
@@ -515,34 +520,30 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     /// <returns>The user ID.</returns>
     protected async Task<int> GetUserIdAsync(Guid userKey) => await _userIdKeyResolver.GetAsync(userKey);
 
-    protected virtual TContentType? TryGetAndValidateContentType(Guid contentTypeKey, ContentEditingModelBase contentEditingModelBase, out ContentEditingOperationStatus operationStatus)
+    protected virtual async Task<Attempt<TContentType?, ContentEditingOperationStatus>> TryGetAndValidateContentTypeAsync(Guid contentTypeKey, ContentEditingModelBase contentEditingModelBase)
     {
-        TContentType? contentType = ContentTypeService.Get(contentTypeKey);
+        TContentType? contentType = await ContentTypeService.GetAsync(contentTypeKey);
         if (contentType == null)
         {
-            operationStatus = ContentEditingOperationStatus.ContentTypeNotFound;
-            return null;
+            return Attempt.FailWithStatus<TContentType?, ContentEditingOperationStatus>(ContentEditingOperationStatus.ContentTypeNotFound, null);
         }
 
         if (contentType.VariesByNothing() && contentEditingModelBase.Variants.Any(v => v.Culture is null && v.Segment is null) is false)
         {
             // does not vary by anything and is missing the invariant name = invalid
-            operationStatus = ContentEditingOperationStatus.ContentTypeCultureVarianceMismatch;
-            return null;
+            return Attempt.FailWithStatus<TContentType?, ContentEditingOperationStatus>(ContentEditingOperationStatus.ContentTypeCultureVarianceMismatch, null);
         }
 
         if (contentType.VariesByCulture() && contentEditingModelBase.Variants.Any(v => v.Culture is null))
         {
             // varies by culture with one or more variants not bound to a culture = invalid
-            operationStatus = ContentEditingOperationStatus.ContentTypeCultureVarianceMismatch;
-            return null;
+            return Attempt.FailWithStatus<TContentType?, ContentEditingOperationStatus>(ContentEditingOperationStatus.ContentTypeCultureVarianceMismatch, null);
         }
 
         if (contentType.VariesBySegment() && contentEditingModelBase.Variants.Any(v => v.Segment is null) is false)
         {
             // varies by segment with no default segment variants = invalid
-            operationStatus = ContentEditingOperationStatus.ContentTypeSegmentVarianceMismatch;
-            return null;
+            return Attempt.FailWithStatus<TContentType?, ContentEditingOperationStatus>(ContentEditingOperationStatus.ContentTypeCultureVarianceMismatch, null);
         }
 
         var propertyTypesByAlias = contentType.CompositionPropertyTypes.ToDictionary(pt => pt.Alias);
@@ -559,8 +560,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         // verify that all property values are defined as property types
         if (propertyValuesAndVariance.Any(pv => propertyTypesByAlias.ContainsKey(pv.PropertyValue.Alias) == false))
         {
-            operationStatus = ContentEditingOperationStatus.PropertyTypeNotFound;
-            return null;
+            return Attempt.FailWithStatus<TContentType?, ContentEditingOperationStatus>(ContentEditingOperationStatus.PropertyTypeNotFound, null);
         }
 
         // verify that all properties match their respective property type culture variance
@@ -570,8 +570,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
                 return propertyType.VariesByCulture() != pv.VariesByCulture;
             }))
         {
-            operationStatus = ContentEditingOperationStatus.PropertyTypeCultureVarianceMismatch;
-            return null;
+            return Attempt.FailWithStatus<TContentType?, ContentEditingOperationStatus>(ContentEditingOperationStatus.PropertyTypeCultureVarianceMismatch, null);
         }
 
         // verify that all properties match their respective property type segment variance
@@ -581,12 +580,10 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
                 return propertyType.VariesBySegment() is false && pv.VariesBySegment;
             }))
         {
-            operationStatus = ContentEditingOperationStatus.PropertyTypeSegmentVarianceMismatch;
-            return null;
+            return Attempt.FailWithStatus<TContentType?, ContentEditingOperationStatus>(ContentEditingOperationStatus.PropertyTypeSegmentVarianceMismatch, null);
         }
 
-        operationStatus = ContentEditingOperationStatus.Success;
-        return contentType;
+        return Attempt.SucceedWithStatus<TContentType?, ContentEditingOperationStatus>(ContentEditingOperationStatus.Success, contentType);
     }
 
     /// <summary>
@@ -623,7 +620,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
                 return (null, ContentEditingOperationStatus.InTrash);
             }
 
-            TContentType? parentContentType = ContentTypeService.Get(parent.ContentType.Key);
+            TContentType? parentContentType = await ContentTypeService.GetAsync(parent.ContentType.Key);
             Guid[] allowedContentTypeKeys = parentContentType?.AllowedContentTypes?.Select(c => c.Key).ToArray()
                                             ?? Array.Empty<Guid>();
 
@@ -881,3 +878,4 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         MustNotBeTrashed
     }
 }
+
