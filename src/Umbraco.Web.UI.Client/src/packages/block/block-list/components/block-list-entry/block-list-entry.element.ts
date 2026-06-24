@@ -3,8 +3,9 @@ import type { UmbBlockListLayoutModel } from '../../types.js';
 import { UMB_BLOCK_LIST } from '../../constants.js';
 import { css, customElement, html, nothing, property, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement, umbDestroyOnDisconnect } from '@umbraco-cms/backoffice/lit-element';
-import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
+import { stringOrStringArrayContains, UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { UmbDataPathBlockElementDataQuery } from '@umbraco-cms/backoffice/block';
+import { UmbElementVariantState } from '@umbraco-cms/backoffice/element';
 import { UmbObserveValidationStateController } from '@umbraco-cms/backoffice/validation';
 import { UUIBlinkAnimationValue, UUIBlinkKeyframes } from '@umbraco-cms/backoffice/external/uui';
 import type {
@@ -32,10 +33,54 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 		return this.#context.getIndex();
 	}
 
+	/**
+	 * Set the layout entry for this block.
+	 */
+	public set layout(value: UmbBlockListLayoutModel | undefined) {
+		if (!value) return;
+		const key = value.key;
+		const contentKey = value.contentKey;
+
+		if (key && key !== this._key) {
+			this._key = key;
+			this.#context.setKey(key);
+		}
+
+		if (contentKey && contentKey !== this._contentKey) {
+			this._contentKey = contentKey;
+
+			new UmbObserveValidationStateController(
+				this,
+				`$.contentData[${UmbDataPathBlockElementDataQuery({ key: contentKey })}]`,
+				(hasMessages) => {
+					this._contentInvalid = hasMessages;
+					this._blockViewProps.contentInvalid = hasMessages;
+				},
+				'observeMessagesForContent',
+			);
+		}
+	}
+
+	public get key(): string | undefined {
+		return this._key;
+	}
+	private _key?: string | undefined;
+
+	/**
+	 * @deprecated Use the `layout` property instead. Will be removed in Umbraco 20.
+	 */
 	@property({ attribute: false })
 	public set contentKey(value: string | undefined) {
 		if (!value) return;
+		new UmbDeprecation({
+			deprecated: 'umb-block-list-entry.contentKey property',
+			solution: 'Use the `layout` property instead.',
+			removeInVersion: '20.0.0',
+		}).warn();
 		this._contentKey = value;
+		if (!this._key) {
+			this.#context.setKey(value);
+		}
 		this.#context.setContentKey(value);
 
 		new UmbObserveValidationStateController(
@@ -73,6 +118,8 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	@state()
 	private _exposed?: boolean;
 
+	private _localExpose?: boolean;
+
 	@state()
 	private _unsupported?: boolean;
 
@@ -99,10 +146,11 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 		config: { showContentEdit: false, showSettingsEdit: false },
 	}; // Set to undefined cause it will be set before we render.
 
-	#updateBlockViewProps(incoming: Partial<UmbBlockEditorCustomViewProperties<UmbBlockListLayoutModel>>) {
-		this._blockViewProps = { ...this._blockViewProps, ...incoming };
-		this.requestUpdate('_blockViewProps');
-	}
+	@property({ type: Boolean, attribute: 'is-reference', reflect: true })
+	private _isExternalContent = false;
+
+	@state()
+	private _externalContentVariantState: string | null | undefined;
 
 	@state()
 	private _isReadOnly = false;
@@ -155,8 +203,8 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 		this.observe(
 			this.#context.hasExpose,
 			(exposed) => {
-				this.#updateBlockViewProps({ unpublished: !exposed });
-				this._exposed = exposed;
+				this._localExpose = exposed;
+				this.#updateExposedState();
 			},
 			null,
 		);
@@ -173,6 +221,22 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 		this.observe(this.#context.actionsVisibility, (showActions) => (this._showActions = showActions), null);
 		this.observe(this.#context.inlineEditingMode, (mode) => (this._inlineEditingMode = mode), null);
 		this.observe(this.#context.isSortMode, (isSortMode) => (this._isSortMode = isSortMode), null);
+		this.observe(
+			this.#context.isExternalContent,
+			(isExternalContent) => {
+				this._isExternalContent = isExternalContent;
+				this.#updateExposedState();
+			},
+			null,
+		);
+		this.observe(
+			this.#context.externalContentVariantState,
+			(state) => {
+				this._externalContentVariantState = state;
+				this.#updateExposedState();
+			},
+			null,
+		);
 
 		// Data props:
 		this.observe(
@@ -244,6 +308,11 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 		);
 	}
 
+	#updateBlockViewProps(incoming: Partial<UmbBlockEditorCustomViewProperties<UmbBlockListLayoutModel>>) {
+		this._blockViewProps = { ...this._blockViewProps, ...incoming };
+		this.requestUpdate('_blockViewProps');
+	}
+
 	override connectedCallback(): void {
 		super.connectedCallback();
 		// element styling:
@@ -279,6 +348,16 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 		this.#context.expose();
 	};
 
+	#updateExposedState() {
+		// External content blocks use the element's variant state; local blocks use the expose entry
+		const isExposed = this._isExternalContent
+			? this._externalContentVariantState === UmbElementVariantState.PUBLISHED ||
+				this._externalContentVariantState === UmbElementVariantState.PUBLISHED_PENDING_CHANGES
+			: this._localExpose;
+		this.#updateBlockViewProps({ unpublished: !isExposed });
+		this._exposed = isExposed;
+	}
+
 	#extensionSlotFilterMethod = (manifest: ManifestBlockEditorCustomView) => {
 		if (this._unsupported) {
 			// If the block is unsupported, we should not allow any custom views to render.
@@ -302,12 +381,14 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 		if (this._exposed || this._isReadOnly) {
 			return ext.component;
 		} else {
-			return html`<div style="min-height: var(--uui-size-16);">
-				${ext.component}
-				<umb-block-overlay-expose-button
-					.contentTypeName=${this._contentTypeName}
-					@click=${this.#expose}></umb-block-overlay-expose-button>
-			</div>`;
+			return html`
+				<div style="min-height: var(--uui-size-16);">
+					${ext.component}
+					<umb-block-overlay-expose-button
+						.contentTypeName=${this._contentTypeName}
+						@click=${this.#expose}></umb-block-overlay-expose-button>
+				</div>
+			`;
 		}
 	};
 
@@ -328,23 +409,29 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	}
 
 	#renderInlineBlock() {
-		return html`<umb-inline-list-block
-			.label=${this._label}
-			.icon=${this._icon}
-			.index=${this._blockViewProps.index}
-			.unpublished=${!this._exposed}
-			.config=${this._blockViewProps.config}
-			.content=${this._blockViewProps.content}
-			.settings=${this._blockViewProps.settings}
-			${umbDestroyOnDisconnect()}></umb-inline-list-block>`;
+		return html`
+			<umb-inline-list-block
+				.label=${this._label}
+				.icon=${this._icon}
+				.index=${this._blockViewProps.index}
+				.unpublished=${!this._exposed}
+				.config=${this._blockViewProps.config}
+				.content=${this._blockViewProps.content}
+				.settings=${this._blockViewProps.settings}
+				${umbDestroyOnDisconnect()}>
+			</umb-inline-list-block>
+		`;
 	}
 
 	#renderUnsupportedBlock() {
-		return html`<umb-unsupported-list-block
-			.config=${this._blockViewProps.config}
-			.content=${this._blockViewProps.content}
-			.settings=${this._blockViewProps.settings}
-			${umbDestroyOnDisconnect()}></umb-unsupported-list-block>`;
+		return html`
+			<umb-unsupported-list-block
+				.config=${this._blockViewProps.config}
+				.content=${this._blockViewProps.content}
+				.settings=${this._blockViewProps.settings}
+				${umbDestroyOnDisconnect()}>
+			</umb-unsupported-list-block>
+		`;
 	}
 
 	#renderBuiltinBlockView = () => {
@@ -366,6 +453,9 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 						this._isSortMode,
 						() => this.#renderRefBlock(),
 						() => html`
+							<umb-entity-frame>
+								${when(this._isExternalContent, () => html`<uui-icon name="link"></uui-icon>`)} ${this._label}
+							</umb-entity-frame>
 							<umb-extension-slot
 								single
 								type="blockEditorCustomView"
@@ -388,7 +478,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	#renderActionBar() {
 		if (this._isSortMode) return nothing;
 		if (!this._showActions) return nothing;
-		return html`<umb-block-action-list id="actions" block-editor=${UMB_BLOCK_LIST}></umb-block-action-list>`;
+		return html`<umb-block-action-list id="actions" .blockEditor=${UMB_BLOCK_LIST}></umb-block-action-list>`;
 	}
 
 	override render() {
@@ -483,6 +573,21 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			:host([drag-placeholder]) .umb-block-list__block {
 				transition: opacity 50ms 16ms;
 				opacity: 0;
+			}
+
+			:host([is-reference]) .umb-block-list__block {
+				--umb-entity-frame-color: var(--umb-color-reference, #7532c8);
+				--umb-entity-frame-contrast-color: var(--umb-color-reference-contrast, #ffffff);
+			}
+
+			.umb-block-list__block {
+				--umb-entity-frame-opacity: 0;
+				--umb-entity-frame-color: var(--uui-color-interactive-emphasis);
+
+				&:hover,
+				&:focus-within {
+					--umb-entity-frame-opacity: 1;
+				}
 			}
 		`,
 	];

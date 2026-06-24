@@ -1,0 +1,1 @@
+export const UMB_BLOCK_ACTION_DISCONNECT_FROM_ELEMENT_LIBRARY_ALIAS = 'Umb.BlockAction.DisconnectFromElementLibrary';

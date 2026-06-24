@@ -2,7 +2,7 @@ import type { UmbBlockRteLayoutModel } from '../../types.js';
 import { UMB_BLOCK_RTE } from '../../constants.js';
 import { UmbBlockRteEntryContext } from '../../context/block-rte-entry.context.js';
 import { css, customElement, html, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
+import { stringOrStringArrayContains, UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbDataPathBlockElementDataQuery } from '@umbraco-cms/backoffice/block';
 import { UmbObserveValidationStateController } from '@umbraco-cms/backoffice/validation';
@@ -22,10 +22,35 @@ import '../../../block/action/block-action-list.element.js';
  */
 @customElement('umb-rte-block')
 export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropertyEditorUiElement {
+	/**
+	 * The unique key of this block layout entry.
+	 */
+	@property({ type: String, attribute: 'data-key', reflect: true })
+	public set key(value: string | undefined) {
+		if (!value) return;
+		this._key = value;
+		this.#context.setKey(value);
+	}
+	public get key(): string | undefined {
+		return this._key;
+	}
+	private _key?: string | undefined;
+
+	/**
+	 * @deprecated Use `key` instead. Will be removed in Umbraco 20.
+	 */
 	@property({ type: String, attribute: 'data-content-key', reflect: true })
 	public set contentKey(value: string | undefined) {
 		if (!value) return;
+		new UmbDeprecation({
+			deprecated: 'umb-rte-block.contentKey property',
+			solution: 'Use the `key` property instead.',
+			removeInVersion: '20.0.0',
+		}).warn();
 		this._contentKey = value;
+		if (!this._key) {
+			this.#context.setKey(value);
+		}
 		this.#context.setContentKey(value);
 
 		new UmbObserveValidationStateController(
@@ -255,19 +280,22 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 		if (this._exposed || this._isReadOnly) {
 			return ext.component;
 		} else {
-			return html`<div>
-				${ext.component}
-				<umb-block-overlay-expose-button
-					.contentTypeName=${this._contentTypeName}
-					@click=${this.#expose}></umb-block-overlay-expose-button>
-			</div>`;
+			return html`
+				<div>
+					${ext.component}
+					<umb-block-overlay-expose-button
+						.contentTypeName=${this._contentTypeName}
+						@click=${this.#expose}></umb-block-overlay-expose-button>
+				</div>
+			`;
 		}
 	};
 
 	#renderBlock() {
 		return this.contentKey && this._contentTypeAlias
 			? html`
-					<div class="uui-text uui-font">
+					<div class="umb-block-rte__block uui-text uui-font">
+						<umb-entity-frame .label=${this._label}></umb-entity-frame>
 						<umb-extension-slot
 							type="blockEditorCustomView"
 							default-element="umb-ref-rte-block"
@@ -287,7 +315,7 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 
 	#renderActionBar() {
 		if (!this._showActions) return nothing;
-		return html`<umb-block-action-list id="actions" block-editor=${UMB_BLOCK_RTE}></umb-block-action-list>`;
+		return html`<umb-block-action-list id="actions" .blockEditor=${UMB_BLOCK_RTE}></umb-block-action-list>`;
 	}
 
 	#renderBuiltinBlockView = () => {
@@ -299,14 +327,17 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 	};
 
 	#renderRefBlock() {
-		return html`<umb-ref-rte-block
-			.label=${this._label}
-			.icon=${this._icon}
-			.index=${this._blockViewProps.index}
-			.unpublished=${!this._exposed}
-			.content=${this._blockViewProps.content}
-			.settings=${this._blockViewProps.settings}
-			.config=${this._blockViewProps.config}></umb-ref-rte-block>`;
+		return html`
+			<umb-ref-rte-block
+				.label=${this._label}
+				.icon=${this._icon}
+				.index=${this._blockViewProps.index}
+				.unpublished=${!this._exposed}
+				.content=${this._blockViewProps.content}
+				.settings=${this._blockViewProps.settings}
+				.config=${this._blockViewProps.config}>
+			</umb-ref-rte-block>
+		`;
 	}
 
 	override render() {
@@ -354,6 +385,21 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 
 			:host([drag-placeholder]) {
 				opacity: 0.2;
+			}
+
+			:host([is-reference]) .umb-block-rte__block {
+				--umb-entity-frame-color: var(--umb-color-reference, #7532c8);
+				--umb-entity-frame-contrast-color: var(--umb-color-reference-contrast, #ffffff);
+			}
+
+			.umb-block-rte__block {
+				--umb-entity-frame-opacity: 0;
+				--umb-entity-frame-color: var(--uui-color-interactive-emphasis);
+
+				&:hover,
+				&:focus-within {
+					--umb-entity-frame-opacity: 1;
+				}
 			}
 		`,
 	];

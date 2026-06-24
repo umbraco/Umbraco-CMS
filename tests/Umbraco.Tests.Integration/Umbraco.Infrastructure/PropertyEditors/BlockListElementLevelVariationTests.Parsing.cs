@@ -542,37 +542,48 @@ internal partial class BlockListElementLevelVariationTests
             true);
 
         SetVariationContext(culture, segment);
+        AssertBlockValues();
 
-        var publishedContent = GetPublishedContent(content.Key);
+        // Retry to re-visit the cache within the same test, but for another culture, so we don't get false positives
+        // because of caching. No matter the requested culture, the variant-for-invariant handling should always
+        // resolve the default language for rendering.
+        culture = culture == "en-US" ? "da-DK" : "en-US";
+        SetVariationContext(culture, segment);
+        AssertBlockValues();
 
-        var value = publishedContent.GetProperty("blocks")!.GetValue() as BlockListModel;
-        Assert.IsNotNull(value);
-        Assert.AreEqual(1, value.Count);
-
-        var blockListItem = value.First();
-        Assert.AreEqual(2, blockListItem.Content.Properties.Count());
-        Assert.Multiple(() =>
+        void AssertBlockValues()
         {
-            var invariantProperty = blockListItem.Content.Properties.First();
-            Assert.AreEqual("invariantText", invariantProperty.Alias);
-            Assert.AreEqual("This is invariant content text", invariantProperty.GetValue());
+            var publishedContent = GetPublishedContent(content.Key);
 
-            var variantProperty = blockListItem.Content.Properties.Last();
-            Assert.AreEqual("variantText", variantProperty.Alias);
-            Assert.AreEqual("This is variant content text", variantProperty.GetValue());
-        });
+            var value = publishedContent.GetProperty("blocks")!.GetValue() as BlockListModel;
+            Assert.IsNotNull(value);
+            Assert.AreEqual(1, value.Count);
 
-        Assert.AreEqual(2, blockListItem.Settings.Properties.Count());
-        Assert.Multiple(() =>
-        {
-            var invariantProperty = blockListItem.Settings.Properties.First();
-            Assert.AreEqual("invariantText", invariantProperty.Alias);
-            Assert.AreEqual("This is invariant settings text", invariantProperty.GetValue());
+            var blockListItem = value.First();
+            Assert.AreEqual(2, blockListItem.Content.Properties.Count());
+            Assert.Multiple(() =>
+            {
+                var invariantProperty = blockListItem.Content.Properties.First();
+                Assert.AreEqual("invariantText", invariantProperty.Alias);
+                Assert.AreEqual("This is invariant content text", invariantProperty.GetValue());
 
-            var variantProperty = blockListItem.Settings.Properties.Last();
-            Assert.AreEqual("variantText", variantProperty.Alias);
-            Assert.AreEqual("This is variant settings text", variantProperty.GetValue());
-        });
+                var variantProperty = blockListItem.Content.Properties.Last();
+                Assert.AreEqual("variantText", variantProperty.Alias);
+                Assert.AreEqual("This is variant content text", variantProperty.GetValue());
+            });
+
+            Assert.AreEqual(2, blockListItem.Settings.Properties.Count());
+            Assert.Multiple(() =>
+            {
+                var invariantProperty = blockListItem.Settings.Properties.First();
+                Assert.AreEqual("invariantText", invariantProperty.Alias);
+                Assert.AreEqual("This is invariant settings text", invariantProperty.GetValue());
+
+                var variantProperty = blockListItem.Settings.Properties.Last();
+                Assert.AreEqual("variantText", variantProperty.Alias);
+                Assert.AreEqual("This is variant settings text", variantProperty.GetValue());
+            });
+        }
     }
 
     [TestCase("en-US", null)]
