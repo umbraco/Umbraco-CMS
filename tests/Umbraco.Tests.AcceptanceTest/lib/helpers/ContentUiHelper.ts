@@ -101,6 +101,7 @@ export class ContentUiHelper extends UiBaseLocators {
   private readonly selectLoginPageDocument: Locator;
   private readonly selectErrorPageDocument: Locator;
   private readonly rollbackItem: Locator;
+  private readonly activeRollbackItem: Locator;
   private readonly actionsMenu: Locator;
   private readonly linkToDocumentBtn: Locator;
   private readonly linkToMediaBtn: Locator;
@@ -411,6 +412,7 @@ export class ContentUiHelper extends UiBaseLocators {
       .locator("umb-input-document")
       .locator("#button");
     this.rollbackItem = page.locator(".rollback-item");
+    this.activeRollbackItem = page.locator(".rollback-item.active");
     this.actionsMenu = page.locator("uui-scroll-container");
     this.linkToDocumentBtn = this.linkPickerModal
       .getByTestId("action:document")
@@ -1543,7 +1545,11 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   async clickLatestRollBackItem() {
-    await this.click(this.rollbackItem.last());
+    // Wait for the modal's async pre-selection of the current version, otherwise it clobbers our pick.
+    await expect(this.activeRollbackItem).toBeVisible();
+    const previousVersion = this.rollbackItem.filter({hasNotText: "Current published version"}).last();
+    await previousVersion.click();
+    await expect(previousVersion).toHaveClass(/active/);
   }
 
   async waitForRollbackItems() {
