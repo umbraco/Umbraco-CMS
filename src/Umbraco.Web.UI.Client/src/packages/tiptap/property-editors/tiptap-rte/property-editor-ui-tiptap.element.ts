@@ -21,16 +21,18 @@ export class UmbPropertyEditorUiTiptapElement extends UmbPropertyEditorUiRteElem
 		const markup = tipTapElement.value;
 
 		// Remove unused Blocks of Blocks Layout. Leaving only the Blocks that are present in Markup.
-		const usedContentKeys: string[] = [];
+		// Extract the layout key (data-key) from each block element to uniquely identify layout entries.
+		// For legacy markup without data-key, fall back to data-content-key — safe because
+		// setLayouts() coerces layout.key ??= layout.contentKey for persisted data without a key.
+		const usedLayoutKeys: string[] = [];
 
-		// Regex matching all block elements in the markup, and extracting the content key. It's the same as the one used on the backend.
-		const regex = new RegExp(
-			/<umb-rte-block(?:-inline)?(?: class="(?:.[^"]*)")? data-content-key="(?<key>.[^"]*)">(?:<!--Umbraco-Block-->)?<\/umb-rte-block(?:-inline)?>/gi,
-		);
+		const blockRegex = /<umb-rte-block(?:-inline)?(?:[^>]*)>/gi;
 		let blockElement: RegExpExecArray | null;
-		while ((blockElement = regex.exec(markup)) !== null) {
-			if (blockElement.groups?.key) {
-				usedContentKeys.push(blockElement.groups.key);
+		while ((blockElement = blockRegex.exec(markup)) !== null) {
+			const tag = blockElement[0];
+			const layoutKey = tag.match(/ data-key="([^"]+)"/)?.[1] ?? tag.match(/ data-content-key="([^"]+)"/)?.[1];
+			if (layoutKey) {
+				usedLayoutKeys.push(layoutKey);
 			}
 		}
 
@@ -52,7 +54,7 @@ export class UmbPropertyEditorUiTiptapElement extends UmbPropertyEditorUiRteElem
 		}
 
 		// lets run this one after we set the value, to make sure we don't reset the value.
-		this._filterUnusedBlocks(usedContentKeys);
+		this._filterUnusedBlocks(usedLayoutKeys);
 
 		this._fireChangeEvent();
 	}

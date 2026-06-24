@@ -310,54 +310,30 @@ export abstract class UmbPropertyEditorUiRteElementBase
 	#setUnusedBlockLookups(unusedLayouts: Array<UmbBlockRteLayoutModel>) {
 		if (unusedLayouts.length) {
 			unusedLayouts.forEach((layout) => {
-				if (layout.contentKey) {
-					this.#unusedLayoutLookup.set(layout.contentKey, layout);
+				if (layout.key) {
+					this.#unusedLayoutLookup.set(layout.key, layout);
 
-					const contentBlock = this.#managerContext.getContentOf(layout.contentKey);
-					if (contentBlock) {
-						this.#unusedContentLookup.set(layout.contentKey, contentBlock);
-					} else {
-						console.warn(
-							`Expected content block for '${layout.contentKey}' was not found. This may indicate a data consistency issue.`,
-						);
-					}
-
-					if (layout.settingsKey) {
-						const settingsBlock = this.#managerContext.getSettingsOf(layout.settingsKey);
-						if (settingsBlock) {
-							this.#unusedSettingsLookup.set(layout.settingsKey, settingsBlock);
+					// External (library element) content lives in the manager's externalContentValues state and
+					// is never cleaned up on layout removal, so it remains available if the layout is restored
+					// (e.g. via RTE undo). No need to stash it here.
+					if (!layout.isExternalContent) {
+						const contentBlock = this.#managerContext.getContentOf(layout.contentKey);
+						if (contentBlock) {
+							this.#unusedContentLookup.set(layout.key, contentBlock);
 						} else {
 							console.warn(
-								`Expected settings block for '${layout.settingsKey}' was not found. This may indicate a data consistency issue.`,
+								`Expected content block for '${layout.contentKey}' was not found. This may indicate a data consistency issue.`,
 							);
 						}
-					}
-				}
-			});
-		}
-	}
 
-	#restoreUnusedBlocks(usedContentKeys: Array<string | null>) {
-		if (usedContentKeys.length) {
-			usedContentKeys.forEach((contentKey) => {
-				if (contentKey && this.#unusedLayoutLookup.has(contentKey)) {
-					const layout = this.#unusedLayoutLookup.get(contentKey);
-					if (layout) {
-						this.#managerContext.setOneLayout(layout);
-						this.#unusedLayoutLookup.delete(contentKey);
-
-						const contentBlock = this.#unusedContentLookup.get(contentKey);
-						if (contentBlock) {
-							this.#managerContext.setOneContent(contentBlock);
-							this.#managerContext.setOneExpose(contentKey, UmbVariantId.CreateInvariant());
-							this.#unusedContentLookup.delete(contentKey);
-						}
-
-						if (layout.settingsKey && this.#unusedSettingsLookup.has(layout.settingsKey)) {
-							const settingsBlock = this.#unusedSettingsLookup.get(layout.settingsKey);
+						if (layout.settingsKey) {
+							const settingsBlock = this.#managerContext.getSettingsOf(layout.settingsKey);
 							if (settingsBlock) {
-								this.#managerContext.setOneSettings(settingsBlock);
-								this.#unusedSettingsLookup.delete(layout.settingsKey);
+								this.#unusedSettingsLookup.set(layout.settingsKey, settingsBlock);
+							} else {
+								console.warn(
+									`Expected settings block for '${layout.settingsKey}' was not found. This may indicate a data consistency issue.`,
+								);
 							}
 						}
 					}
@@ -366,11 +342,45 @@ export abstract class UmbPropertyEditorUiRteElementBase
 		}
 	}
 
-	protected _filterUnusedBlocks(usedContentKeys: (string | null)[]) {
-		const unusedLayouts = this.#managerContext.getLayouts().filter((x) => usedContentKeys.indexOf(x.contentKey) === -1);
+	#restoreUnusedBlocks(usedLayoutKeys: Array<string | null>) {
+		if (usedLayoutKeys.length) {
+			usedLayoutKeys.forEach((layoutKey) => {
+				if (layoutKey && this.#unusedLayoutLookup.has(layoutKey)) {
+					const layout = this.#unusedLayoutLookup.get(layoutKey);
+					if (layout) {
+						this.#managerContext.setOneLayout(layout);
+						this.#unusedLayoutLookup.delete(layoutKey);
+
+						// External blocks have no local content to restore — their content remains in
+						// the manager's externalContentValues state and will be re-synced into the editor
+						// DOM automatically when #updateBlocks re-fires after the layout is restored.
+						if (!layout.isExternalContent) {
+							const contentBlock = this.#unusedContentLookup.get(layoutKey);
+							if (contentBlock) {
+								this.#managerContext.setOneContent(contentBlock);
+								this.#managerContext.setOneExpose(layout.contentKey, UmbVariantId.CreateInvariant());
+								this.#unusedContentLookup.delete(layoutKey);
+							}
+
+							if (layout.settingsKey && this.#unusedSettingsLookup.has(layout.settingsKey)) {
+								const settingsBlock = this.#unusedSettingsLookup.get(layout.settingsKey);
+								if (settingsBlock) {
+									this.#managerContext.setOneSettings(settingsBlock);
+									this.#unusedSettingsLookup.delete(layout.settingsKey);
+								}
+							}
+						}
+					}
+				}
+			});
+		}
+	}
+
+	protected _filterUnusedBlocks(usedLayoutKeys: (string | null)[]) {
+		const unusedLayouts = this.#managerContext.getLayouts().filter((x) => usedLayoutKeys.indexOf(x.key) === -1);
 
 		// Temporarily set the unused layouts to the lookup, as they could be restored later, e.g. via an RTE undo action. [LK]
-		this.#restoreUnusedBlocks(usedContentKeys);
+		this.#restoreUnusedBlocks(usedLayoutKeys);
 		this.#setUnusedBlockLookups(unusedLayouts);
 
 		const unusedContentKeys = unusedLayouts.map((x) => x.contentKey);
@@ -381,7 +391,7 @@ export abstract class UmbPropertyEditorUiRteElementBase
 
 		this.#managerContext.removeManyContent(unusedContentKeys);
 		this.#managerContext.removeManySettings(unusedSettingsKeys);
-		this.#managerContext.removeManyLayouts(unusedContentKeys);
+		this.#managerContext.removeManyLayouts(unusedLayouts.map((x) => x.key));
 	}
 
 	protected _fireChangeEvent() {

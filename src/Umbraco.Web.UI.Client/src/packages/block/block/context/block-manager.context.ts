@@ -84,6 +84,15 @@ export abstract class UmbBlockManagerContext<
 	public readonly contents = this.#contents.asObservable();
 
 	readonly #externalContentValues = new UmbArrayState(<Array<UmbBlockDataModel>>[], (x) => x.key);
+
+	/**
+	 * Combined observable of local block content and resolved external (library element) content.
+	 * Use this instead of `contents` when you need to react to library elements becoming available.
+	 */
+	public readonly allContents = mergeObservables(
+		[this.#contents.asObservable(), this.#externalContentValues.asObservable()],
+		([local, external]) => [...(local ?? []), ...(external ?? [])],
+	);
 	readonly #externalContentVariants = new UmbArrayState(
 		<
 			Array<{ key: string; variants: Array<{ culture: string | null; segment: string | null; state: string | null }> }>
