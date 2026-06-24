@@ -37,6 +37,13 @@ export class UmbPropertyEditorUITextBoxElement
 	mandatoryMessage = UMB_VALIDATION_EMPTY_LOCALIZATION_KEY;
 
 	/**
+	 * The alias of this field.
+	 * @type {string}
+	 */
+	@property({ type: String })
+	alias?: string;
+
+	/**
 	 * The name of this field.
 	 * @type {string}
 	 */
@@ -60,7 +67,7 @@ export class UmbPropertyEditorUITextBoxElement
 	private _placeholder?: string;
 
 	@state()
-	private _autocomplete?: string;
+	private _autocomplete?: boolean;
 
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
@@ -69,9 +76,7 @@ export class UmbPropertyEditorUITextBoxElement
 		this._inputMode = config.getValueByAlias<UUIInputMode>('inputMode') || this.#defaultInputMode;
 		this._maxChars = this.#parseNumber(config.getValueByAlias('maxChars'));
 		this._placeholder = this.localize.string(config.getValueByAlias<string>('placeholder') ?? '');
-		const autocompleteValue = config.getValueByAlias<string>('autocomplete');
-		const autocompleteSelection = config.getValueByAlias<string>('autocompleteSelection');
-		this._autocomplete = autocompleteValue ? autocompleteValue : autocompleteSelection;
+		this._autocomplete = config.getValueByAlias<boolean>('autocomplete');
 	}
 
 	protected override firstUpdated(): void {
@@ -120,6 +125,7 @@ export class UmbPropertyEditorUITextBoxElement
 	override render() {
 		return html`
 			<uui-input
+				.name=${this.alias ?? ''}
 				.inputMode=${this._inputMode}
 				.label=${this.localize.term('general_fieldFor', [this.name])}
 				.maxlength=${this._maxChars}
@@ -128,7 +134,7 @@ export class UmbPropertyEditorUITextBoxElement
 				.requiredMessage=${this.mandatoryMessage}
 				.type=${this._type}
 				.value=${this.value ?? ''}
-				autocomplete=${ifDefined(this._autocomplete)}
+				.autocomplete=${this._autocomplete === false ? 'off' : 'on'}
 				?readonly=${this.readonly}
 				?required=${this.mandatory}
 				@input=${this.#onInput}>

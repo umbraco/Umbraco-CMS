@@ -19,8 +19,8 @@ export const manifest: ManifestPropertyEditorSchema = {
 					],
 				},
 				{
-					alias: 'autocompleteSelection',
-					label: '#textbox_autocompleteSelection',
+					alias: 'autocomplete',
+					label: '#textbox_autocompleteLabel',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Dropdown',
 					config: [
 						{
@@ -30,16 +30,15 @@ export const manifest: ManifestPropertyEditorSchema = {
 								{ name: 'Off', value: 'off' },
 							],
 						},
+						{
+							alias: 'placeholder',
+							value: '#general_placeholder',
+						},
 					],
 				},
 				{
-					alias: 'autocomplete',
-					label: '#textbox_autocomplete',
-					propertyEditorUiAlias: 'Umb.PropertyEditorUi.TextBox',
-				},
-				{
 					alias: 'placeholder',
-					label: '#textbox_placeholder',
+					label: '#general_placeholder',
 					description: 'Placeholder text shown inside the input when empty',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.TextBox',
 				},
@@ -50,7 +49,7 @@ export const manifest: ManifestPropertyEditorSchema = {
 					value: 512,
 				},
 				{
-					alias: 'autocompleteSelection',
+					alias: 'autocomplete',
 					value: 'off',
 				},
 			],
