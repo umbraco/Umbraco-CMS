@@ -31,13 +31,13 @@ const UMB_CORE_PATH_MARKER = '/umbraco/backoffice/';
 export function umbParseDeprecationOrigin(stack: string | undefined, selfUrl: string): UmbDeprecationOrigin {
 	if (!stack) return { type: 'unknown', label: 'unknown' };
 
-	// Frame URLs, tolerant of Chrome "at fn (URL:1:2)" and Firefox/Safari "fn@URL:1:2".
+	// Frame URLs, tolerant of Chrome "at fn (URL:1:2)" and Firefox/Safari "fn@URL:1:2"; strip line:col and any query/fragment.
 	const urls = Array.from(stack.matchAll(/(?:https?|blob|file):\/\/[^\s)'"]+/g)).map((match) =>
-		match[0].replace(/:\d+:\d+\)?$/, ''),
+		match[0].replace(/:\d+:\d+\)?$/, '').replace(/[?#].*$/, ''),
 	);
 
-	const selfBase = selfUrl.split('?')[0];
-	const frames = urls.filter((url) => url.split('?')[0] !== selfBase);
+	const selfBase = selfUrl.replace(/[?#].*$/, '');
+	const frames = urls.filter((url) => url !== selfBase);
 
 	const coreKnown = selfUrl.includes(UMB_CORE_PATH_MARKER) || frames.some((url) => url.includes(UMB_CORE_PATH_MARKER));
 	if (!coreKnown) return { type: 'unknown', label: 'unknown' };
