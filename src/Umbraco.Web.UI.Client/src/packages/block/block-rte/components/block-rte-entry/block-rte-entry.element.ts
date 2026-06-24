@@ -388,6 +388,7 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 			:host {
 				position: relative;
 				display: block;
+				margin-top: var(--uui-size-3);
 				user-select: all;
 				user-drag: auto;
 				white-space: nowrap;
