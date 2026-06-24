@@ -87,7 +87,7 @@ export abstract class UmbBlockManagerContext<
 
 	/**
 	 * Combined observable of local block content and resolved external (library element) content.
-	 * Use this instead of `contents` when you need to react to library elements becoming available.
+	 * Use this alongside `contents` when you also need to react to library elements becoming available.
 	 */
 	public readonly allContents = mergeObservables(
 		[this.#contents.asObservable(), this.#externalContentValues.asObservable()],

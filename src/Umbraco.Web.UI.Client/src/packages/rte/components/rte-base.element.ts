@@ -308,74 +308,76 @@ export abstract class UmbPropertyEditorUiRteElementBase
 	}
 
 	#setUnusedBlockLookups(unusedLayouts: Array<UmbBlockRteLayoutModel>) {
-		if (unusedLayouts.length) {
-			unusedLayouts.forEach((layout) => {
-				if (layout.key) {
-					this.#unusedLayoutLookup.set(layout.key, layout);
+		for (const layout of unusedLayouts) {
+			if (!layout.key) continue;
 
-					// External (library element) content lives in the manager's externalContentValues state and
-					// is never cleaned up on layout removal, so it remains available if the layout is restored
-					// (e.g. via RTE undo). No need to stash it here.
-					if (!layout.isExternalContent) {
-						const contentBlock = this.#managerContext.getContentOf(layout.contentKey);
-						if (contentBlock) {
-							this.#unusedContentLookup.set(layout.key, contentBlock);
-						} else {
-							console.warn(
-								`Expected content block for '${layout.contentKey}' was not found. This may indicate a data consistency issue.`,
-							);
-						}
+			this.#unusedLayoutLookup.set(layout.key, layout);
 
-						if (layout.settingsKey) {
-							const settingsBlock = this.#managerContext.getSettingsOf(layout.settingsKey);
-							if (settingsBlock) {
-								this.#unusedSettingsLookup.set(layout.settingsKey, settingsBlock);
-							} else {
-								console.warn(
-									`Expected settings block for '${layout.settingsKey}' was not found. This may indicate a data consistency issue.`,
-								);
-							}
-						}
-					}
+			// External (library element) content lives in the manager's externalContentValues state and
+			// is never cleaned up on layout removal, so it remains available if the layout is restored
+			// (e.g. via RTE undo). No need to stash it here.
+			if (!layout.isExternalContent) {
+				const contentBlock = this.#managerContext.getContentOf(layout.contentKey);
+				if (contentBlock) {
+					this.#unusedContentLookup.set(layout.key, contentBlock);
+				} else {
+					console.warn(
+						`Expected content block for '${layout.contentKey}' was not found. This may indicate a data consistency issue.`,
+					);
 				}
-			});
+			}
+
+			// Settings can exist for both local and external blocks; always stash them.
+			if (layout.settingsKey) {
+				const settingsBlock = this.#managerContext.getSettingsOf(layout.settingsKey);
+				if (settingsBlock) {
+					this.#unusedSettingsLookup.set(layout.settingsKey, settingsBlock);
+				} else {
+					console.warn(
+						`Expected settings block for '${layout.settingsKey}' was not found. This may indicate a data consistency issue.`,
+					);
+				}
+			}
 		}
 	}
 
 	#restoreUnusedBlocks(usedLayoutKeys: Array<string | null>) {
-		if (usedLayoutKeys.length) {
-			usedLayoutKeys.forEach((layoutKey) => {
-				if (layoutKey && this.#unusedLayoutLookup.has(layoutKey)) {
-					const layout = this.#unusedLayoutLookup.get(layoutKey);
-					if (layout) {
-						this.#managerContext.setOneLayout(layout);
-						this.#unusedLayoutLookup.delete(layoutKey);
+		for (const layoutKey of usedLayoutKeys) {
+			if (!layoutKey || !this.#unusedLayoutLookup.has(layoutKey)) continue;
 
-						// External blocks have no local content to restore — their content remains in
-						// the manager's externalContentValues state and will be re-synced into the editor
-						// DOM automatically when #updateBlocks re-fires after the layout is restored.
-						if (!layout.isExternalContent) {
-							const contentBlock = this.#unusedContentLookup.get(layoutKey);
-							if (contentBlock) {
-								this.#managerContext.setOneContent(contentBlock);
-								this.#managerContext.setOneExpose(layout.contentKey, UmbVariantId.CreateInvariant());
-								this.#unusedContentLookup.delete(layoutKey);
-							}
+			const layout = this.#unusedLayoutLookup.get(layoutKey);
+			if (!layout) continue;
 
-							if (layout.settingsKey && this.#unusedSettingsLookup.has(layout.settingsKey)) {
-								const settingsBlock = this.#unusedSettingsLookup.get(layout.settingsKey);
-								if (settingsBlock) {
-									this.#managerContext.setOneSettings(settingsBlock);
-									this.#unusedSettingsLookup.delete(layout.settingsKey);
-								}
-							}
-						}
-					}
+			this.#managerContext.setOneLayout(layout);
+			this.#unusedLayoutLookup.delete(layoutKey);
+
+			// External blocks have no local content to restore — their content remains in
+			// the manager's externalContentValues state and will be re-synced into the editor
+			// DOM automatically when #updateBlocks re-fires after the layout is restored.
+			if (!layout.isExternalContent) {
+				const contentBlock = this.#unusedContentLookup.get(layoutKey);
+				if (contentBlock) {
+					this.#managerContext.setOneContent(contentBlock);
+					this.#managerContext.setOneExpose(layout.contentKey, UmbVariantId.CreateInvariant());
+					this.#unusedContentLookup.delete(layoutKey);
 				}
-			});
+			}
+
+			// Settings can exist for both local and external blocks; always restore them.
+			if (layout.settingsKey && this.#unusedSettingsLookup.has(layout.settingsKey)) {
+				const settingsBlock = this.#unusedSettingsLookup.get(layout.settingsKey);
+				if (settingsBlock) {
+					this.#managerContext.setOneSettings(settingsBlock);
+					this.#unusedSettingsLookup.delete(layout.settingsKey);
+				}
+			}
 		}
 	}
 
+	/**
+	 * @param {(string | null)[]} usedLayoutKeys - Layout keys (not content keys) currently present in the editor markup.
+	 * @since 19.0.0 — parameter semantics changed from content keys to layout keys.
+	 */
 	protected _filterUnusedBlocks(usedLayoutKeys: (string | null)[]) {
 		const unusedLayouts = this.#managerContext.getLayouts().filter((x) => usedLayoutKeys.indexOf(x.key) === -1);
 

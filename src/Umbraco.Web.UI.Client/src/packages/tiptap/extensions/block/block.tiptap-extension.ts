@@ -12,6 +12,22 @@ declare module '@tiptap/core' {
 	}
 }
 
+function getBlockAttrs(node: Element) {
+	const el = node as HTMLElement;
+	const contentKey = el.getAttribute(UMB_BLOCK_RTE_DATA_CONTENT_KEY);
+	// Migrate legacy markup that has no data-key: use content key as layout key.
+	// Safe because setLayouts() coerces layout.key ??= layout.contentKey for persisted data.
+	const layoutKey = el.getAttribute(UMB_BLOCK_RTE_DATA_LAYOUT_KEY) ?? contentKey;
+	return { [UMB_BLOCK_RTE_DATA_LAYOUT_KEY]: layoutKey, [UMB_BLOCK_RTE_DATA_CONTENT_KEY]: contentKey };
+}
+
+function buildInsertAttrs(options: { layoutKey: string; contentKey: string }) {
+	return {
+		[UMB_BLOCK_RTE_DATA_LAYOUT_KEY]: options.layoutKey,
+		[UMB_BLOCK_RTE_DATA_CONTENT_KEY]: options.contentKey,
+	};
+}
+
 export const umbRteBlock = Node.create({
 	name: 'umbRteBlock',
 	group: 'block',
@@ -33,19 +49,7 @@ export const umbRteBlock = Node.create({
 	},
 
 	parseHTML() {
-		return [
-			{
-				tag: `umb-rte-block[${UMB_BLOCK_RTE_DATA_CONTENT_KEY}]`,
-				getAttrs: (node) => {
-					const el = node as HTMLElement;
-					const contentKey = el.getAttribute(UMB_BLOCK_RTE_DATA_CONTENT_KEY);
-					// Migrate legacy markup that has no data-key: use content key as layout key.
-					// Safe because setLayouts() coerces layout.key ??= layout.contentKey for persisted data.
-					const layoutKey = el.getAttribute(UMB_BLOCK_RTE_DATA_LAYOUT_KEY) ?? contentKey;
-					return { [UMB_BLOCK_RTE_DATA_LAYOUT_KEY]: layoutKey, [UMB_BLOCK_RTE_DATA_CONTENT_KEY]: contentKey };
-				},
-			},
-		];
+		return [{ tag: `umb-rte-block[${UMB_BLOCK_RTE_DATA_CONTENT_KEY}]`, getAttrs: getBlockAttrs }];
 	},
 
 	renderHTML({ HTMLAttributes }) {
@@ -56,16 +60,8 @@ export const umbRteBlock = Node.create({
 		return {
 			setBlock:
 				(options) =>
-				({ commands }) => {
-					const attrs = {
-						[UMB_BLOCK_RTE_DATA_LAYOUT_KEY]: options.layoutKey,
-						[UMB_BLOCK_RTE_DATA_CONTENT_KEY]: options.contentKey,
-					};
-					return commands.insertContent({
-						type: this.name,
-						attrs,
-					});
-				},
+				({ commands }) =>
+					commands.insertContent({ type: this.name, attrs: buildInsertAttrs(options) }),
 		};
 	},
 });
@@ -76,17 +72,7 @@ export const umbRteBlockInline = umbRteBlock.extend({
 	inline: true,
 
 	parseHTML() {
-		return [
-			{
-				tag: `umb-rte-block-inline[${UMB_BLOCK_RTE_DATA_CONTENT_KEY}]`,
-				getAttrs: (node) => {
-					const el = node as HTMLElement;
-					const contentKey = el.getAttribute(UMB_BLOCK_RTE_DATA_CONTENT_KEY);
-					const layoutKey = el.getAttribute(UMB_BLOCK_RTE_DATA_LAYOUT_KEY) ?? contentKey;
-					return { [UMB_BLOCK_RTE_DATA_LAYOUT_KEY]: layoutKey, [UMB_BLOCK_RTE_DATA_CONTENT_KEY]: contentKey };
-				},
-			},
-		];
+		return [{ tag: `umb-rte-block-inline[${UMB_BLOCK_RTE_DATA_CONTENT_KEY}]`, getAttrs: getBlockAttrs }];
 	},
 
 	renderHTML({ HTMLAttributes }) {
@@ -97,16 +83,8 @@ export const umbRteBlockInline = umbRteBlock.extend({
 		return {
 			setBlockInline:
 				(options) =>
-				({ commands }) => {
-					const attrs = {
-						[UMB_BLOCK_RTE_DATA_LAYOUT_KEY]: options.layoutKey,
-						[UMB_BLOCK_RTE_DATA_CONTENT_KEY]: options.contentKey,
-					};
-					return commands.insertContent({
-						type: this.name,
-						attrs,
-					});
-				},
+				({ commands }) =>
+					commands.insertContent({ type: this.name, attrs: buildInsertAttrs(options) }),
 		};
 	},
 });
