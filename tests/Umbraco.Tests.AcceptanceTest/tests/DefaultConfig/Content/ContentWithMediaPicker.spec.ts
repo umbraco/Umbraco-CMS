@@ -173,6 +173,8 @@ test('can add a media image to a media picker in variant content, remove it and 
   // Removes media item from the media picker
   await umbracoUi.content.removeMediaPickerByName(mediaFileName);
   await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeUpdated();
+  // Reload so the picker re-renders from the persisted (empty) model before adding again (#10431).
+  await umbracoUi.reloadPage();
   // Adds media item to a media picker again
   await umbracoUi.content.clickChooseButtonAndSelectMediaWithKey(mediaFileId);
   await umbracoUi.content.clickChooseModalButton();
