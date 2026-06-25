@@ -2131,11 +2131,11 @@ export class UiBaseLocators extends BasePage {
   }
 
   async selectUserLanguage(language: string) {
-    // The culture select initialises asynchronously and can ignore (or clobber) an early selection, leaving the
-    // workspace pristine so Save sends no request. Re-select until the chosen value sticks.
+    // Re-select until the change round-trips to the model; an early selection is clobbered by the async load.
+    const cultureInput = this.page.locator('umb-ui-culture-input');
     await expect(async () => {
       await this.languageBtn.selectOption(language, {force: true});
-      await expect(this.languageBtn).toHaveValue(language, {timeout: ConstantHelper.timeout.short});
+      await expect(cultureInput).toHaveAttribute('value', language.toLowerCase(), {timeout: ConstantHelper.timeout.short});
     }).toPass({timeout: ConstantHelper.timeout.medium});
   }
 }
