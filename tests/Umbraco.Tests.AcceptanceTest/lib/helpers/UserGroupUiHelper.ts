@@ -278,14 +278,14 @@ export class UserGroupUiHelper extends UiBaseLocators {
   }
 
   async clickRemoveButtonForUserWithName(userName: string) {
-    await this.click(this.workspaceUsersSection.locator('umb-entity-item-ref', {hasText: userName}).getByLabel('Remove'));
+    await this.click(this.workspaceUserItemRefs.filter({hasText: userName}).getByLabel('Remove'));
   }
 
   async isUserVisibleInUserGroup(userName: string, isVisible = true) {
-    await this.isVisible(this.workspaceUsersSection.locator('umb-entity-item-ref', {hasText: userName}), isVisible);
+    await this.isVisible(this.workspaceUserItemRefs.filter({hasText: userName}), isVisible);
   }
 
-  async getUsersInGroupCount(): Promise<number> {
+  async getUsersInGroupCount() {
     await this.waitForVisible(this.workspaceUsersSection);
     return await this.workspaceUserItemRefs.count();
   }
@@ -302,9 +302,10 @@ export class UserGroupUiHelper extends UiBaseLocators {
     return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.userGroup, this.clickConfirmRemoveButton(), ConstantHelper.statusCodes.ok);
   }
 
-  async waitForPendingGroupUsersUpdate() {
-    await this.page.waitForResponse(
-      (resp) => resp.url().includes(ConstantHelper.apiEndpoints.userGroup) && resp.status() === ConstantHelper.statusCodes.ok,
-    );
+  async clickSaveButtonAndWaitForUserGroupWithUsersToBeCreated() {
+    return await Promise.all([
+      this.page.waitForResponse((resp) => resp.url().includes(ConstantHelper.apiEndpoints.userGroup) && resp.status() === ConstantHelper.statusCodes.ok),
+      this.clickSaveButtonAndWaitForUserGroupToBeCreated(),
+    ]);
   }
 }

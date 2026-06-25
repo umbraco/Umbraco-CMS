@@ -23,7 +23,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.user.ensureNameNotExists(userC.name);
 });
 
-test('can view existing users in a user group', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+test('can view users in a user group', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const userGroupId = await umbracoApi.userGroup.createEmptyUserGroup(userGroupName);
   await umbracoApi.user.createDefaultUser(userA.name, userA.email, [userGroupId]);
@@ -51,11 +51,11 @@ test('cannot see any users in an empty user group', async ({umbracoApi, umbracoU
   expect(await umbracoUi.userGroup.getUsersInGroupCount()).toBe(0);
 });
 
-test('can add a user to an existing user group from the workspace', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+test('can add a user to a user group from the workspace', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const userGroupId = await umbracoApi.userGroup.createEmptyUserGroup(userGroupName);
-  const seedUserGroup = await umbracoApi.userGroup.getByName(writersUserGroupName);
-  await umbracoApi.user.createDefaultUser(userA.name, userA.email, [seedUserGroup.id]);
+  const writersUserGroup = await umbracoApi.userGroup.getByName(writersUserGroupName);
+  await umbracoApi.user.createDefaultUser(userA.name, userA.email, [writersUserGroup.id]);
   await umbracoUi.userGroup.clickUserGroupsButton();
   await umbracoUi.userGroup.clickUserGroupWithName(userGroupName);
 
@@ -66,16 +66,16 @@ test('can add a user to an existing user group from the workspace', {tag: '@smok
 
   // Assert
   await umbracoUi.userGroup.isUserVisibleInUserGroup(userA.name);
-  expect(await umbracoApi.user.doesUserContainUserGroupIds(userA.name, [seedUserGroup.id, userGroupId])).toBeTruthy();
+  expect(await umbracoApi.user.doesUserContainUserGroupIds(userA.name, [writersUserGroup.id, userGroupId])).toBeTruthy();
 });
 
-test('can add multiple users to an existing user group at once', async ({umbracoApi, umbracoUi}) => {
+test('can add multiple users to a user group at once', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const userGroupId = await umbracoApi.userGroup.createEmptyUserGroup(userGroupName);
-  const seedUserGroup = await umbracoApi.userGroup.getByName(writersUserGroupName);
-  await umbracoApi.user.createDefaultUser(userA.name, userA.email, [seedUserGroup.id]);
-  await umbracoApi.user.createDefaultUser(userB.name, userB.email, [seedUserGroup.id]);
-  await umbracoApi.user.createDefaultUser(userC.name, userC.email, [seedUserGroup.id]);
+  const writersUserGroup = await umbracoApi.userGroup.getByName(writersUserGroupName);
+  await umbracoApi.user.createDefaultUser(userA.name, userA.email, [writersUserGroup.id]);
+  await umbracoApi.user.createDefaultUser(userB.name, userB.email, [writersUserGroup.id]);
+  await umbracoApi.user.createDefaultUser(userC.name, userC.email, [writersUserGroup.id]);
   await umbracoUi.userGroup.clickUserGroupsButton();
   await umbracoUi.userGroup.clickUserGroupWithName(userGroupName);
 
@@ -90,18 +90,18 @@ test('can add multiple users to an existing user group at once', async ({umbraco
   await umbracoUi.userGroup.isUserVisibleInUserGroup(userA.name);
   await umbracoUi.userGroup.isUserVisibleInUserGroup(userB.name);
   await umbracoUi.userGroup.isUserVisibleInUserGroup(userC.name);
-  expect(await umbracoApi.user.doesUserContainUserGroupIds(userA.name, [seedUserGroup.id, userGroupId])).toBeTruthy();
-  expect(await umbracoApi.user.doesUserContainUserGroupIds(userB.name, [seedUserGroup.id, userGroupId])).toBeTruthy();
-  expect(await umbracoApi.user.doesUserContainUserGroupIds(userC.name, [seedUserGroup.id, userGroupId])).toBeTruthy();
+  expect(await umbracoApi.user.doesUserContainUserGroupIds(userA.name, [writersUserGroup.id, userGroupId])).toBeTruthy();
+  expect(await umbracoApi.user.doesUserContainUserGroupIds(userB.name, [writersUserGroup.id, userGroupId])).toBeTruthy();
+  expect(await umbracoApi.user.doesUserContainUserGroupIds(userC.name, [writersUserGroup.id, userGroupId])).toBeTruthy();
 });
 
 test('can add a new user via the picker without removing existing users', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const userGroupId = await umbracoApi.userGroup.createEmptyUserGroup(userGroupName);
-  const seedUserGroup = await umbracoApi.userGroup.getByName(writersUserGroupName);
+  const writersUserGroup = await umbracoApi.userGroup.getByName(writersUserGroupName);
   await umbracoApi.user.createDefaultUser(userA.name, userA.email, [userGroupId]);
   await umbracoApi.user.createDefaultUser(userB.name, userB.email, [userGroupId]);
-  await umbracoApi.user.createDefaultUser(userC.name, userC.email, [seedUserGroup.id]);
+  await umbracoApi.user.createDefaultUser(userC.name, userC.email, [writersUserGroup.id]);
   await umbracoUi.userGroup.clickUserGroupsButton();
   await umbracoUi.userGroup.clickUserGroupWithName(userGroupName);
 
@@ -116,7 +116,7 @@ test('can add a new user via the picker without removing existing users', async 
   await umbracoUi.userGroup.isUserVisibleInUserGroup(userC.name);
   expect(await umbracoApi.user.doesUserContainUserGroupIds(userA.name, [userGroupId])).toBeTruthy();
   expect(await umbracoApi.user.doesUserContainUserGroupIds(userB.name, [userGroupId])).toBeTruthy();
-  expect(await umbracoApi.user.doesUserContainUserGroupIds(userC.name, [seedUserGroup.id, userGroupId])).toBeTruthy();
+  expect(await umbracoApi.user.doesUserContainUserGroupIds(userC.name, [writersUserGroup.id, userGroupId])).toBeTruthy();
 });
 
 test('can remove a user from a user group', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
@@ -161,8 +161,8 @@ test('can remove all users from a user group', async ({umbracoApi, umbracoUi}) =
 test('can add and then remove the same user in the same session', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const userGroupId = await umbracoApi.userGroup.createEmptyUserGroup(userGroupName);
-  const seedUserGroup = await umbracoApi.userGroup.getByName(writersUserGroupName);
-  await umbracoApi.user.createDefaultUser(userA.name, userA.email, [seedUserGroup.id]);
+  const writersUserGroup = await umbracoApi.userGroup.getByName(writersUserGroupName);
+  await umbracoApi.user.createDefaultUser(userA.name, userA.email, [writersUserGroup.id]);
   await umbracoUi.userGroup.clickUserGroupsButton();
   await umbracoUi.userGroup.clickUserGroupWithName(userGroupName);
 
@@ -170,6 +170,8 @@ test('can add and then remove the same user in the same session', async ({umbrac
   await umbracoUi.userGroup.clickChooseUserButton();
   await umbracoUi.userGroup.clickUserCardWithName(userA.name);
   await umbracoUi.userGroup.clickChooseModalButtonAndWaitForGroupUsersUpdate();
+  await umbracoUi.userGroup.isUserVisibleInUserGroup(userA.name);
+  expect(await umbracoApi.user.doesUserContainUserGroupIds(userA.name, [writersUserGroup.id, userGroupId])).toBeTruthy();
   await umbracoUi.userGroup.clickRemoveButtonForUserWithName(userA.name);
   await umbracoUi.userGroup.clickConfirmRemoveButtonAndWaitForGroupUsersUpdate();
 
@@ -181,8 +183,8 @@ test('can add and then remove the same user in the same session', async ({umbrac
 test('can see user updates are persisted after navigating away from and returning to the user group', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const userGroupId = await umbracoApi.userGroup.createEmptyUserGroup(userGroupName);
-  const seedUserGroup = await umbracoApi.userGroup.getByName(writersUserGroupName);
-  await umbracoApi.user.createDefaultUser(userA.name, userA.email, [seedUserGroup.id]);
+  const writersUserGroup = await umbracoApi.userGroup.getByName(writersUserGroupName);
+  await umbracoApi.user.createDefaultUser(userA.name, userA.email, [writersUserGroup.id]);
   await umbracoUi.userGroup.clickUserGroupsButton();
   await umbracoUi.userGroup.clickUserGroupWithName(userGroupName);
   await umbracoUi.userGroup.clickChooseUserButton();
@@ -195,14 +197,14 @@ test('can see user updates are persisted after navigating away from and returnin
 
   // Assert
   await umbracoUi.userGroup.isUserVisibleInUserGroup(userA.name);
-  expect(await umbracoApi.user.doesUserContainUserGroupIds(userA.name, [seedUserGroup.id, userGroupId])).toBeTruthy();
+  expect(await umbracoApi.user.doesUserContainUserGroupIds(userA.name, [writersUserGroup.id, userGroupId])).toBeTruthy();
 });
 
 test('can add users while creating a new user group', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const seedUserGroup = await umbracoApi.userGroup.getByName(writersUserGroupName);
-  await umbracoApi.user.createDefaultUser(userA.name, userA.email, [seedUserGroup.id]);
-  await umbracoApi.user.createDefaultUser(userB.name, userB.email, [seedUserGroup.id]);
+  const writersUserGroup = await umbracoApi.userGroup.getByName(writersUserGroupName);
+  await umbracoApi.user.createDefaultUser(userA.name, userA.email, [writersUserGroup.id]);
+  await umbracoApi.user.createDefaultUser(userB.name, userB.email, [writersUserGroup.id]);
 
   // Act
   await umbracoUi.userGroup.clickUserGroupsButton();
@@ -212,12 +214,10 @@ test('can add users while creating a new user group', {tag: '@release'}, async (
   await umbracoUi.userGroup.clickUserCardWithName(userA.name);
   await umbracoUi.userGroup.clickUserCardWithName(userB.name);
   await umbracoUi.userGroup.clickChooseModalButton();
-  const userGroupId = await umbracoUi.userGroup.clickSaveButtonAndWaitForUserGroupToBeCreated();
-  // Wait for the deferred user persistence to fire after the group transitions from new to persisted.
-  await umbracoUi.userGroup.waitForPendingGroupUsersUpdate();
+  const [, userGroupId] = await umbracoUi.userGroup.clickSaveButtonAndWaitForUserGroupWithUsersToBeCreated();
 
   // Assert
   expect(await umbracoApi.userGroup.doesExist(userGroupId)).toBe(true);
-  expect(await umbracoApi.user.doesUserContainUserGroupIds(userA.name, [seedUserGroup.id, userGroupId])).toBeTruthy();
-  expect(await umbracoApi.user.doesUserContainUserGroupIds(userB.name, [seedUserGroup.id, userGroupId])).toBeTruthy();
+  expect(await umbracoApi.user.doesUserContainUserGroupIds(userA.name, [writersUserGroup.id, userGroupId])).toBeTruthy();
+  expect(await umbracoApi.user.doesUserContainUserGroupIds(userB.name, [writersUserGroup.id, userGroupId])).toBeTruthy();
 });
