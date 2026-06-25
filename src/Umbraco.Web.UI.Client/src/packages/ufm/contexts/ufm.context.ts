@@ -46,6 +46,11 @@ export type UmbUfmFilterType = {
 
 export class UmbUfmContext extends UmbContextBase {
 	#filters = new UmbArrayState<UmbUfmFilterType>([], (x) => x.alias);
+	/**
+	 * Observable of all registered UFM filters. Aliases reflect the canonical form registered by each filter's
+	 * manifest (camelCase for built-in filters since v18 — e.g. `stripHtml`, not `strip-html`).
+	 * Use {@link getFilterByAlias} for alias-based lookup; it maps deprecated kebab-case aliases automatically.
+	 */
 	public readonly filters = this.#filters.asObservable();
 
 	constructor(host: UmbControllerHost) {
@@ -68,6 +73,9 @@ export class UmbUfmContext extends UmbContextBase {
 
 	/**
 	 * Get the filters registered in the UFM context.
+	 * Aliases reflect the canonical form registered by each filter's manifest (camelCase for built-in
+	 * filters since v18 — e.g. `stripHtml`, not `strip-html`).
+	 * Use {@link getFilterByAlias} for alias-based lookup; it maps deprecated kebab-case aliases automatically.
 	 * @returns {Array<UmbUfmFilterType>} An array of filters with their aliases and filter functions.
 	 */
 	public getFilters(): Array<UmbUfmFilterType> {
