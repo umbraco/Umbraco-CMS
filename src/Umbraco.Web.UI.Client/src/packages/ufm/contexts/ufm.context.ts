@@ -1,4 +1,5 @@
 import type { ManifestUfmFilter } from '../extensions/ufm-filter.extension.js';
+import { umbResolveUfmFilterAlias } from './ufm-filter-alias.function.js';
 import { DOMPurify } from '@umbraco-cms/backoffice/external/dompurify';
 import { Marked } from '@umbraco-cms/backoffice/external/marked';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
@@ -79,7 +80,7 @@ export class UmbUfmContext extends UmbContextBase {
 	 * @returns {UmbUfmFilterFunction} The filter function associated with the alias, or undefined if not found.
 	 */
 	public getFilterByAlias(alias: string): UmbUfmFilterFunction {
-		return this.#filters.getValue().find((x) => x.alias === alias)?.filter;
+		return this.#filters.getValue().find((x) => x.alias === umbResolveUfmFilterAlias(alias))?.filter;
 	}
 
 	/**

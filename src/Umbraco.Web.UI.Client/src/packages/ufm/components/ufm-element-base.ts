@@ -1,5 +1,4 @@
 import { UMB_UFM_CONTEXT } from '../contexts/ufm.context.js';
-import { umbResolveUfmFilterAlias } from './ufm-filter-alias.function.js';
 import { property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
@@ -17,7 +16,7 @@ export abstract class UmbUfmElementBase extends UmbLitElement {
 			.filter((item) => item)
 			.map((item) => {
 				const [alias, ...args] = item.split(':').map((x) => x.trim());
-				return { alias: umbResolveUfmFilterAlias(alias), args };
+				return { alias, args };
 			});
 	}
 	public get filters(): string | undefined {
