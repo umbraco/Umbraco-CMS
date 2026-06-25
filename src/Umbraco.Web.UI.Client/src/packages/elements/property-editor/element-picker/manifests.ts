@@ -1,4 +1,5 @@
 ﻿import { manifest as schemaManifest } from './Umbraco.ElementPicker.js';
+import { manifests as valueSummaryManifests } from './value-summary/manifests.js';
 import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/property-editor';
 
 const propertyEditorUi: ManifestPropertyEditorUi = {
@@ -46,4 +47,4 @@ const propertyEditorUi: ManifestPropertyEditorUi = {
 	},
 };
 
-export const manifests: Array<UmbExtensionManifest> = [propertyEditorUi, schemaManifest];
+export const manifests: Array<UmbExtensionManifest> = [propertyEditorUi, schemaManifest, ...valueSummaryManifests];

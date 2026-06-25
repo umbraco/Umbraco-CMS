@@ -95,6 +95,15 @@ export default defineConfig({
         ignoreHTTPSErrors: true,
       }
     },
+    // Unauthenticated: this exercises the login screen itself (a late-registered auth provider).
+    {
+      name: 'authProviderLateRegistration',
+      testMatch: 'AuthProviderLateRegistration/**/*.spec.ts',
+      use: {
+        ...devices['Desktop Chrome'],
+        ignoreHTTPSErrors: true,
+      }
+    },
     // This project is used to test the install steps, for that we do not need to authenticate.
     {
       name: 'unattendedInstallConfig',
