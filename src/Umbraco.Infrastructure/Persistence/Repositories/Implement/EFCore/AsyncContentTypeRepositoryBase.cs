@@ -42,6 +42,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.EFCore;
 /// </remarks>
 /// <typeparam name="TEntity">The type of content-type composition managed by the repository.</typeparam>
 internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRepositoryBase<Guid, TEntity>,
+    IContentTypeRepositoryBase<TEntity>,
     IAsyncContentTypeRepositoryBase<TEntity>
     where TEntity : class, IContentTypeComposition
 {
@@ -169,6 +170,40 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
     /// </summary>
     private void EnsureAmbientScopeOnCallerContext() => _ = AmbientScope;
 
+    /// <inheritdoc />
+    public TEntity? Get(int id)
+        => GetAllCached().FirstOrDefault(x => x.Id == id);
+
+    /// <inheritdoc />
+    public IEnumerable<TEntity> GetMany(params int[]? ids)
+    {
+        IEnumerable<TEntity> all = GetAllCached();
+        return ids is { Length: > 0 } ? all.Where(x => ids.Contains(x.Id)) : all;
+    }
+
+    /// <inheritdoc />
+    public bool Exists(int id) => GetAllCached().Any(x => x.Id == id);
+
+    /// <inheritdoc />
+    public TEntity? Get(Guid id)
+        => GetAllCached().FirstOrDefault(x => x.Key == id);
+
+    /// <remarks>
+    ///     Explicit implementation to disambiguate from the <see cref="int"/>-keyed <see cref="GetMany(int[])"/>.
+    /// </remarks>
+    IEnumerable<TEntity> IReadRepository<Guid, TEntity>.GetMany(params Guid[]? ids)
+    {
+        IEnumerable<TEntity> all = GetAllCached();
+        return ids is { Length: > 0 } ? all.Where(x => ids.Contains(x.Key)) : all;
+    }
+
+    /// <inheritdoc />
+    public bool Exists(Guid id) => GetAllCached().Any(x => x.Key == id);
+
+    /// <inheritdoc />
+    public TEntity? Get(string alias)
+        => GetAllCached().FirstOrDefault(x => x.Alias.InvariantEquals(alias));
+
     /// <inheritdoc cref="IAsyncReadRepository{TKey,TEntity}.GetAsync" />
     public async Task<TEntity?> GetAsync(int id, CancellationToken cancellationToken)
         => (await GetAllAsync(cancellationToken)).FirstOrDefault(x => x.Id == id);
@@ -187,6 +222,34 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
     /// <inheritdoc />
     public async Task<TEntity?> GetAsync(string alias, CancellationToken cancellationToken)
         => (await GetAllAsync(cancellationToken)).FirstOrDefault(x => x.Alias.InvariantEquals(alias));
+
+    /// <inheritdoc />
+    public void Save(TEntity entity)
+    {
+        EnsureAmbientScopeOnCallerContext();
+        SaveAsync(entity, CancellationToken.None).GetAwaiter().GetResult();
+    }
+
+    /// <inheritdoc />
+    public void Delete(TEntity entity)
+    {
+        EnsureAmbientScopeOnCallerContext();
+        DeleteAsync(entity, CancellationToken.None).GetAwaiter().GetResult();
+    }
+
+    /// <inheritdoc />
+    public IEnumerable<TEntity> Get(IQuery<TEntity> query)
+    {
+        EnsureAmbientScopeOnCallerContext();
+        return PerformGetByQueryAsync(query).GetAwaiter().GetResult().WhereNotNull();
+    }
+
+    /// <inheritdoc />
+    public int Count(IQuery<TEntity>? query)
+    {
+        EnsureAmbientScopeOnCallerContext();
+        return PerformCountAsync(query).GetAwaiter().GetResult();
+    }
 
     /// <inheritdoc />
     public async Task<IEnumerable<TEntity>> GetByParentIdAsync(int parentId, CancellationToken cancellationToken)
@@ -222,6 +285,33 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
     // append an IQuery's captured where clauses (SQL text + args) to a hand-written id-select run as raw SQL.
     // ----------------------------------------------------------------------------------------------------
 
+    private async Task<IEnumerable<TEntity>> PerformGetByQueryAsync(IQuery<TEntity> query)
+    {
+        // note: Guid values must be bound as parameters (not string literals) — providers store/bind them
+        // in provider-specific formats (e.g. uppercase TEXT on SQLite, uniqueidentifier on SQL Server).
+        (var whereSql, var clauseArgs) = TranslateWhereClauses(query.GetWhereClauses(), parameterOffset: 1);
+        var p0 = "{0}";
+        var sql =
+            $"""
+             SELECT DISTINCT "{ContentTypeDto.TableName}"."{ContentTypeDto.NodeIdColumnName}" AS Value
+             FROM "{ContentTypeDto.TableName}"
+             INNER JOIN "{NodeDto.TableName}" ON "{ContentTypeDto.TableName}"."{ContentTypeDto.NodeIdColumnName}" = "{NodeDto.TableName}"."{NodeDto.PrimaryKeyColumnName}"
+             LEFT JOIN "{ContentTypeTemplateDto.TableName}" ON "{ContentTypeTemplateDto.TableName}"."{ContentTypeTemplateDto.ContentTypeNodeIdColumnName}" = "{ContentTypeDto.TableName}"."{ContentTypeDto.NodeIdColumnName}"
+             WHERE "{NodeDto.TableName}"."{NodeDto.NodeObjectTypeColumnName}" = {p0}{whereSql}
+             """;
+        var args = new object[clauseArgs.Length + 1];
+        args[0] = NodeObjectTypeId;
+        clauseArgs.CopyTo(args, 1);
+
+#pragma warning disable EF1002 // Risk of vulnerability to SQL injection.
+        List<int> ids = await ExecuteEfScopeAsync(db => db.Database.SqlQueryRaw<int>(sql, args).ToListAsync());
+#pragma warning restore EF1002
+
+        return ids.Count > 0
+            ? GetMany(ids.ToArray()).OrderBy(x => x.Name)
+            : Enumerable.Empty<TEntity>();
+    }
+
     /// <summary>
     /// Translates the SQL where clauses captured by an <see cref="IQuery{T}"/> into a fragment that EF Core
     /// can execute as raw SQL: each clause's local <c>@N</c> parameter placeholders are renumbered into EF's
@@ -246,6 +336,29 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
         }
 
         return (sb.ToString(), args.ToArray());
+    }
+
+    private Task<int> PerformCountAsync(IQuery<TEntity>? query)
+    {
+        (var whereSql, var clauseArgs) = query is null
+            ? (string.Empty, Array.Empty<object>())
+            : TranslateWhereClauses(query.GetWhereClauses(), parameterOffset: 1);
+        var p0 = "{0}";
+        var sql =
+            $"""
+             SELECT COUNT(*) AS Value
+             FROM "{ContentTypeDto.TableName}"
+             INNER JOIN "{NodeDto.TableName}" ON "{ContentTypeDto.TableName}"."{ContentTypeDto.NodeIdColumnName}" = "{NodeDto.TableName}"."{NodeDto.PrimaryKeyColumnName}"
+             LEFT JOIN "{ContentTypeTemplateDto.TableName}" ON "{ContentTypeTemplateDto.TableName}"."{ContentTypeTemplateDto.ContentTypeNodeIdColumnName}" = "{ContentTypeDto.TableName}"."{ContentTypeDto.NodeIdColumnName}"
+             WHERE "{NodeDto.TableName}"."{NodeDto.NodeObjectTypeColumnName}" = {p0}{whereSql}
+             """;
+        var args = new object[clauseArgs.Length + 1];
+        args[0] = NodeObjectTypeId;
+        clauseArgs.CopyTo(args, 1);
+
+#pragma warning disable EF1002 // Risk of vulnerability to SQL injection.
+        return ExecuteEfScopeAsync(db => db.Database.SqlQueryRaw<int>(sql, args).SingleAsync());
+#pragma warning restore EF1002
     }
 
     // ----------------------------------------------------------------------------------------------------
@@ -853,6 +966,13 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
     /// Moves the specified content type entity to a new container or to the root if the container is <c>null</c>.
     /// Updates the entity's parent, path, and level, and also updates all descendant entities accordingly.
     /// </summary>
+    public IEnumerable<MoveEventInfo<TEntity>> Move(TEntity moving, EntityContainer? container)
+    {
+        EnsureAmbientScopeOnCallerContext();
+        return MoveAsync(moving, container, CancellationToken.None).GetAwaiter().GetResult();
+    }
+
+    /// <inheritdoc />
     public async Task<IEnumerable<MoveEventInfo<TEntity>>> MoveAsync(TEntity moving, EntityContainer? container, CancellationToken cancellationToken)
     {
         var parentId = Constants.System.Root;
@@ -1617,6 +1737,13 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
 #pragma warning restore EF1002
 
     /// <inheritdoc />
+    public string GetUniqueAlias(string alias)
+    {
+        EnsureAmbientScopeOnCallerContext();
+        return GetUniqueAliasAsync(alias, CancellationToken.None).GetAwaiter().GetResult();
+    }
+
+    /// <inheritdoc />
     public async Task<string> GetUniqueAliasAsync(string alias, CancellationToken cancellationToken)
     {
         // alias is unique across ALL content types!
@@ -1636,11 +1763,31 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
     }
 
     /// <inheritdoc />
+    public bool HasContainerInPath(string contentPath)
+    {
+        var ids = contentPath.Split(Constants.CharArrays.Comma)
+            .Select(s => int.Parse(s, CultureInfo.InvariantCulture)).ToArray();
+        return HasContainerInPath(ids);
+    }
+
+    /// <inheritdoc />
     public Task<bool> HasContainerInPathAsync(string contentPath, CancellationToken cancellationToken)
     {
         var ids = contentPath.Split(Constants.CharArrays.Comma)
             .Select(s => int.Parse(s, CultureInfo.InvariantCulture)).ToArray();
         return HasContainerInPathAsync(ids, cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public bool HasContainerInPath(params int[] ids)
+    {
+        if (ids.Length == 0)
+        {
+            return false;
+        }
+
+        EnsureAmbientScopeOnCallerContext();
+        return HasContainerInPathAsync(ids, CancellationToken.None).GetAwaiter().GetResult();
     }
 
     /// <inheritdoc />
@@ -1664,6 +1811,13 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
     }
 
     /// <inheritdoc />
+    public bool HasContentNodes(int id)
+    {
+        EnsureAmbientScopeOnCallerContext();
+        return HasContentNodesAsync(id, CancellationToken.None).GetAwaiter().GetResult();
+    }
+
+    /// <inheritdoc />
     public Task<bool> HasContentNodesAsync(int id, CancellationToken cancellationToken)
     {
         var sql =
@@ -1671,6 +1825,13 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
 #pragma warning disable EF1002 // Risk of vulnerability to SQL injection.
         return ExecuteEfScopeAsync(async db => await db.Database.SqlQueryRaw<int>(sql, id).SingleAsync() == 1);
 #pragma warning restore EF1002
+    }
+
+    /// <inheritdoc />
+    public IEnumerable<Guid> GetAllowedParentKeys(Guid key)
+    {
+        EnsureAmbientScopeOnCallerContext();
+        return GetAllowedParentKeysAsync(key, CancellationToken.None).GetAwaiter().GetResult();
     }
 
     /// <inheritdoc />

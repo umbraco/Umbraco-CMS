@@ -90,6 +90,28 @@ internal sealed class ContentTypeRepository : AsyncContentTypeRepositoryBase<ICo
                 .ToArray());
     }
 
+    private Task<int[]> PerformGetByQueryAsync(IQuery<PropertyType> query)
+    {
+        // used by DataTypeService to remove properties from content types if they have a deleted data type.
+        // Matches the legacy behaviour of resolving the content type through the property GROUP — ungrouped
+        // property types resolve to 0 and are filtered out.
+        (var whereSql, var args) = TranslateWhereClauses(query.GetWhereClauses());
+        var sql =
+            $"""
+             SELECT DISTINCT COALESCE({PropertyTypeGroupDto.TableName}.{PropertyTypeGroupDto.ContentTypeNodeIdColumnName}, 0) AS Value
+             FROM {PropertyTypeDto.TableName}
+             LEFT JOIN {PropertyTypeGroupDto.TableName} ON {PropertyTypeGroupDto.TableName}.{PropertyTypeGroupDto.PrimaryKeyColumnName} = {PropertyTypeDto.TableName}.{PropertyTypeDto.PropertyTypeGroupIdColumnName}
+             INNER JOIN {DataTypeDto.TableName} ON {PropertyTypeDto.TableName}.{PropertyTypeDto.DataTypeIdColumnName} = {DataTypeDto.TableName}.nodeId
+             WHERE 1 = 1{whereSql}
+             """;
+
+        return ExecuteEfScopeAsync(async db =>
+            (await db.Database.SqlQueryRaw<int>(sql, args).ToListAsync())
+                .Where(id => id > 0)
+                .Distinct()
+                .ToArray());
+    }
+
     /// <summary>
     ///     Gets all property type aliases.
     /// </summary>
