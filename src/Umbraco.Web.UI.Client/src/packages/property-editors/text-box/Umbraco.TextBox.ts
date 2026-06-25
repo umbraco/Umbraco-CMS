@@ -30,10 +30,6 @@ export const manifest: ManifestPropertyEditorSchema = {
 								{ name: 'Off', value: 'off' },
 							],
 						},
-						{
-							alias: 'placeholder',
-							value: '#general_placeholder',
-						},
 					],
 				},
 				{
