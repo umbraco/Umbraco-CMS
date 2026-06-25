@@ -67,7 +67,7 @@ export class UmbPropertyEditorUITextBoxElement
 	private _placeholder?: string;
 
 	@state()
-	private _autocomplete?: boolean;
+	private _autocomplete?: string;
 
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
@@ -76,7 +76,7 @@ export class UmbPropertyEditorUITextBoxElement
 		this._inputMode = config.getValueByAlias<UUIInputMode>('inputMode') || this.#defaultInputMode;
 		this._maxChars = this.#parseNumber(config.getValueByAlias('maxChars'));
 		this._placeholder = this.localize.string(config.getValueByAlias<string>('placeholder') ?? '');
-		this._autocomplete = config.getValueByAlias<boolean>('autocomplete');
+		this._autocomplete = config.getValueByAlias<string>('autocomplete');
 	}
 
 	protected override firstUpdated(): void {
@@ -134,7 +134,7 @@ export class UmbPropertyEditorUITextBoxElement
 				.requiredMessage=${this.mandatoryMessage}
 				.type=${this._type}
 				.value=${this.value ?? ''}
-				.autocomplete=${this._autocomplete === false ? 'off' : 'on'}
+				.autocomplete=${this._autocomplete ?? 'on'}
 				?readonly=${this.readonly}
 				?required=${this.mandatory}
 				@input=${this.#onInput}>
