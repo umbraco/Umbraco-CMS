@@ -24,7 +24,7 @@ export function umbResolveUfmFilterAlias(alias: string): string {
 			deprecated: `The UFM filter alias "${alias}" is deprecated.`,
 			removeInVersion: '20.0.0',
 			solution: `Use the camelCase alias "${mapped}" instead.`,
-		}).warn();
+		}).warn({ logAlways: true });
 	}
 
 	return mapped;
