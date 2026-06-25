@@ -1,17 +1,7 @@
 import { UMB_UFM_CONTEXT } from '../contexts/ufm.context.js';
+import { umbResolveUfmFilterAlias } from './ufm-filter-alias.function.js';
 import { property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-
-/**
- * @deprecated To be removed in Umbraco 20. [LK]
- * This is here as a friendly backward-compatibility fix.
- * The documentation says to use the camelCase aliases (for UFMJS compatibility).
- */
-const UMB_UFM_FILTER_KEBABCASE_MAP: Record<string, string> = {
-	'strip-html': 'stripHtml',
-	'title-case': 'titleCase',
-	'word-limit': 'wordLimit',
-};
 
 export abstract class UmbUfmElementBase extends UmbLitElement {
 	#filterFuncArgs?: Array<{ alias: string; args: Array<string> }>;
@@ -27,7 +17,7 @@ export abstract class UmbUfmElementBase extends UmbLitElement {
 			.filter((item) => item)
 			.map((item) => {
 				const [alias, ...args] = item.split(':').map((x) => x.trim());
-				return { alias: UMB_UFM_FILTER_KEBABCASE_MAP[alias] ?? alias, args };
+				return { alias: umbResolveUfmFilterAlias(alias), args };
 			});
 	}
 	public get filters(): string | undefined {
