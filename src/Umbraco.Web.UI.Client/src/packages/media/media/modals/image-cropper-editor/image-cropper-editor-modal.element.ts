@@ -225,7 +225,7 @@ export class UmbImageCropperEditorModalElement extends UmbModalBaseElement<
 	override render() {
 		return html`
 			<div class="sr-only" role="status" aria-live="polite" aria-atomic="true">${this._statusAnnouncement}</div>
-			<umb-body-layout headline=${this.localize.term('defaultdialogs_selectMedia')} main-no-tabstop>
+			<umb-body-layout headline=${this.localize.term('defaultdialogs_selectMedia')}>
 				<div id="content">
 					<div id="layout">
 						${when(

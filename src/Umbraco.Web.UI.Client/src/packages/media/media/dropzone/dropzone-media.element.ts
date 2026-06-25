@@ -120,6 +120,7 @@ export class UmbDropzoneMediaElement extends UmbInputDropzoneElement {
 		css`
 			:host(:not([disabled])[dragging]) #dropzone {
 				opacity: 1;
+				visibility: visible;
 				pointer-events: all;
 			}
 
@@ -129,6 +130,7 @@ export class UmbDropzoneMediaElement extends UmbInputDropzoneElement {
 
 			#dropzone {
 				opacity: 0;
+				visibility: hidden;
 				pointer-events: none;
 				display: flex;
 				align-items: center;

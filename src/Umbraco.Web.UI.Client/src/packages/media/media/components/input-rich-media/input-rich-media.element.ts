@@ -359,8 +359,6 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 
 		if (!uniques.length) return;
 
-		const wasEmpty = !this.value?.length;
-
 		const additions: Array<UmbMediaPickerPropertyValueEntry> = uniques.map((unique) => ({
 			key: UmbId.new(),
 			mediaKey: unique,
@@ -372,7 +370,7 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 		this.value = [...(this.value ?? []), ...additions];
 		this.dispatchEvent(new UmbChangeEvent());
 
-		if (wasEmpty && uniques.length === 1 && (this.altTextMode === 'altText' || this.enableAltTextPerCrop)) {
+		if (uniques.length === 1 && (this.altTextMode === 'altText' || this.enableAltTextPerCrop)) {
 			this.#autoOpenCropEditor(additions[0].key);
 		}
 	}
@@ -512,14 +510,14 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 				${showMoveButtons
 					? html`
 							<uui-button
-								label=${this.localize.term('general_reorderMoveUp')}
+								label=${this.localize.term('general_reorderMoveUpPosition', String(index + 1), String(this._cards.length))}
 								look="secondary"
 								?disabled=${isFirst}
 								@click=${() => this.#moveItem(index, -1)}>
 								<uui-icon name="icon-arrow-up"></uui-icon>
 							</uui-button>
 							<uui-button
-								label=${this.localize.term('general_reorderMoveDown')}
+								label=${this.localize.term('general_reorderMoveDownPosition', String(index + 1), String(this._cards.length))}
 								look="secondary"
 								?disabled=${isLast}
 								@click=${() => this.#moveItem(index, 1)}>
@@ -550,7 +548,9 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 		this.dispatchEvent(new UmbChangeEvent());
 		this._announcement = this.localize.term(
 			direction === -1 ? 'mediaPicker_movedUp' : 'mediaPicker_movedDown',
-			[movedCard.name],
+			movedCard.name,
+			String(toIndex + 1),
+			String(this.value?.length ?? 0),
 		);
 
 		await this.updateComplete;

@@ -8,7 +8,6 @@ import {
 	property,
 	state,
 	query,
-	ifDefined,
 } from '@umbraco-cms/backoffice/external/lit';
 
 //TODO: Add the following attributes to JSDocs: header-transparent, main-no-padding, header-no-padding, header-fit-height
@@ -40,14 +39,6 @@ export class UmbBodyLayoutElement extends LitElement {
 
 	@property({ type: Boolean })
 	loading = false;
-
-	/**
-	 * When set, the main scroll container is removed as a keyboard tab stop.
-	 * Use this in constrained-height layouts (e.g. modal dialogs) where the scrollable
-	 * region would otherwise create a confusing extra focus stop.
-	 */
-	@property({ type: Boolean, attribute: 'main-no-tabstop' })
-	mainNoTabstop = false;
 
 	@state()
 	private _headerSlotHasChildren = false;
@@ -128,7 +119,7 @@ export class UmbBodyLayoutElement extends LitElement {
 					}}></slot>
 			</div>
 
-			<uui-scroll-container id="main" tabindex=${ifDefined(this.mainNoTabstop ? '-1' : undefined)}>
+			<uui-scroll-container id="main">
 				${this.loading ? html`<uui-loader-bar></uui-loader-bar>` : nothing}
 				<slot></slot>
 			</uui-scroll-container>
