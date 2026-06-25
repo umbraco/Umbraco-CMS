@@ -924,7 +924,7 @@ export default {
 		greeting5: 'Bienvenue',
 		greeting6: 'Bienvenue',
 		instruction: 'Connectez-vous ci-dessous',
-		signInWith: 'Identifiez-vous avec',
+		signInWith: 'Identifiez-vous avec {0}',
 		timeout: 'La session a expiré',
 		forgottenPassword: 'Mot de passe oublié?',
 		forgottenPasswordInstruction:
@@ -1118,7 +1118,7 @@ export default {
 	},
 	sections: {
 		content: 'Contenu',
-		forms: 'Formulaires',
+		library: 'Bibliothèque',
 		media: 'Medias',
 		member: 'Membres',
 		packages: 'Packages',

@@ -73,7 +73,7 @@ test('can publish content with an element picker selected', {tag: '@smoke'}, asy
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, elementPickerDataTypeName, elementPickerDataTypeId);
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   // Create element type and element
-  const elementTypeId = await umbracoApi.documentType.createEmptyElementType(elementTypeName);
+  const elementTypeId = await umbracoApi.documentType.createEmptyElementType(elementTypeName, true);
   const elementId = await umbracoApi.element.createDefaultElement(elementName, elementTypeId);
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
@@ -96,7 +96,7 @@ test('can select multiple elements in the element picker', async ({umbracoApi, u
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, elementPickerDataTypeName, elementPickerDataTypeId);
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   // Create element type and element
-  const elementTypeId = await umbracoApi.documentType.createEmptyElementType(elementTypeName);
+  const elementTypeId = await umbracoApi.documentType.createEmptyElementType(elementTypeName, true);
   const firstElementId = await umbracoApi.element.createDefaultElement(elementName, elementTypeId);
   const secondElementId = await umbracoApi.element.createDefaultElement(secondElementName, elementTypeId);
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
@@ -124,7 +124,7 @@ test('can not publish a mandatory element picker with an empty value', async ({u
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, elementPickerDataTypeName, elementPickerDataTypeId, 'Test Group', false, false, true);
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   // Create element type and element
-  const elementTypeId = await umbracoApi.documentType.createEmptyElementType(elementTypeName);
+  const elementTypeId = await umbracoApi.documentType.createEmptyElementType(elementTypeName, true);
   const elementId = await umbracoApi.element.createDefaultElement(elementName, elementTypeId);
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
@@ -153,7 +153,7 @@ test.fixme('can validate minimum amount in element picker', async ({umbracoApi, 
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, elementPickerDataTypeName, elementPickerDataTypeId);
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   // Create element type and elements
-  const elementTypeId = await umbracoApi.documentType.createEmptyElementType(elementTypeName);
+  const elementTypeId = await umbracoApi.documentType.createEmptyElementType(elementTypeName, true);
   await umbracoApi.element.createDefaultElement(elementName, elementTypeId);
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
@@ -176,7 +176,7 @@ test('can validate maximum amount in element picker', async ({umbracoApi, umbrac
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, elementPickerDataTypeName, elementPickerDataTypeId);
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   // Create element type and elements
-  const elementTypeId = await umbracoApi.documentType.createEmptyElementType(elementTypeName);
+  const elementTypeId = await umbracoApi.documentType.createEmptyElementType(elementTypeName, true);
   await umbracoApi.element.createDefaultElement(elementName, elementTypeId);
   await umbracoApi.element.createDefaultElement(secondElementName, elementTypeId);
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
@@ -198,7 +198,7 @@ test('can remove an element from the element picker in the content', async ({umb
   const elementPickerDataTypeId = await umbracoApi.dataType.createDefaultElementPickerDataType(elementPickerDataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, elementPickerDataTypeName, elementPickerDataTypeId);
   // Create element type and element
-  const elementTypeId = await umbracoApi.documentType.createEmptyElementType(elementTypeName);
+  const elementTypeId = await umbracoApi.documentType.createEmptyElementType(elementTypeName, true);
   const elementId = await umbracoApi.element.createDefaultElement(elementName, elementTypeId);
   await umbracoApi.document.createDocumentWithElementPickers(contentName, documentTypeId, elementPickerDataTypeName, [elementId]);
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
@@ -219,7 +219,7 @@ test('can remove a not-found element from the element picker in the content', as
   const elementPickerDataTypeId = await umbracoApi.dataType.createDefaultElementPickerDataType(elementPickerDataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, elementPickerDataTypeName, elementPickerDataTypeId);
   // Create element type and element
-  const elementTypeId = await umbracoApi.documentType.createEmptyElementType(elementTypeName);
+  const elementTypeId = await umbracoApi.documentType.createEmptyElementType(elementTypeName, true);
   const elementId = await umbracoApi.element.createDefaultElement(elementName, elementTypeId);
   await umbracoApi.document.createDocumentWithElementPickers(contentName, documentTypeId, elementPickerDataTypeName, [elementId]);
   await umbracoApi.element.ensureNameNotExists(elementName); // Delete the element to make it not-found

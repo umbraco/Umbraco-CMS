@@ -18,6 +18,7 @@ export default {
 		changeDataType: 'Datatype aanpassen',
 		copy: 'Kopiëren',
 		create: 'Nieuw',
+		createFor: (name: string) => (name ? `Item aanmaken voor ${name}` : 'Aanmaken'),
 		export: 'Export',
 		createPackage: 'Nieuwe package',
 		createGroup: 'Groep maken',
@@ -56,6 +57,7 @@ export default {
 		setGroup: 'Groep instellen',
 		sort: 'Sorteren',
 		translate: 'Vertalen',
+		trash: 'Verwijderen',
 		update: 'Bijwerken',
 		setPermissions: 'Rechten instellen',
 		unlock: 'Deblokkeer',
@@ -944,7 +946,7 @@ export default {
 		greeting5: 'Welkom',
 		greeting6: 'Welkom',
 		instruction: 'log hieronder in',
-		signInWith: 'Inloggen met',
+		signInWith: 'Inloggen met {0}',
 		timeout: 'Sessie is verlopen',
 		forgottenPassword: 'Wachtwoord vergeten?',
 		forgottenPasswordInstruction:
@@ -1188,7 +1190,7 @@ export default {
 	},
 	sections: {
 		content: 'Inhoud',
-		forms: 'Formulieren',
+		library: 'Bibliotheek',
 		media: 'Media',
 		member: 'Leden',
 		packages: 'Packages',

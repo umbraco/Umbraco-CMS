@@ -2,8 +2,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Extensions;
 
@@ -49,6 +47,7 @@ public abstract class SystemTextJsonSerializerBase : IJsonSerializer
         value = jsonString.IsNullOrWhiteSpace()
             ? null
             : Deserialize<T>(jsonString);
+
         return value != null;
     }
 }

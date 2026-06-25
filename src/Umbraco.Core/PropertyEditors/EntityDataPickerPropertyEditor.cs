@@ -67,7 +67,7 @@ internal sealed class EntityDataPickerPropertyEditor : DataEditor
         /// <summary>
         /// Validates the min/max configuration for the entity data picker property editor.
         /// </summary>
-        internal sealed class MinMaxValidator : ITypedJsonValidator<EntityDataPickerDto, EntityDataPickerConfiguration>
+        internal sealed class MinMaxValidator : ITypedValidator<EntityDataPickerDto, EntityDataPickerConfiguration>
         {
             private readonly ILocalizedTextService _localizedTextService;
 

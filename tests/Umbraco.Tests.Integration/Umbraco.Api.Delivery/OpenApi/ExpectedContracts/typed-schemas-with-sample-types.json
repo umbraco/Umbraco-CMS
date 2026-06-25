@@ -1278,7 +1278,8 @@
                 "type": "null"
               }
             ]
-          }
+          },
+          "plainJson": { }
         }
       },
       "ArticlePageContentResponseModel": {

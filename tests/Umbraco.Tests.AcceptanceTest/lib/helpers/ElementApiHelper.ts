@@ -210,11 +210,26 @@ export class ElementApiHelper {
     return response.headers().location.split("/").pop();
   }
 
+  async createFolderResponse(name: string, parentId?: string) {
+    const folder = {
+      name: name,
+      parent: parentId ? {id: parentId} : null
+    }
+    return await this.api.post(`${this.api.baseUrl}${ConstantHelper.apiEndpoints.elementFolder}`, folder);
+  }
+
   async renameFolder(folderId: string, folderName: string) {
     const folder = {
       name: folderName
     }
     return await this.api.put(`${this.api.baseUrl}${ConstantHelper.apiEndpoints.elementFolder}/${folderId}`, folder);
+  }
+
+  async moveFolder(folderId: string, targetParentId: string | null = null) {
+    const payload = {
+      target: targetParentId ? {id: targetParentId} : null
+    }
+    return await this.api.put(`${this.api.baseUrl}${ConstantHelper.apiEndpoints.elementFolder}/${folderId}/move`, payload);
   }
 
   // Create Elements

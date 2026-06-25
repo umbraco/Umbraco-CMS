@@ -1233,7 +1233,7 @@ export default {
 	},
 	sections: {
 		content: 'Contenuto',
-		forms: 'Forms',
+		library: 'Biblioteca',
 		media: 'Media',
 		member: 'Membri',
 		packages: 'Pacchetti',
