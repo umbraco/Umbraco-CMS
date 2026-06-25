@@ -84,6 +84,8 @@ export class UmbUfmContext extends UmbContextBase {
 
 	/**
 	 * Get a filter by its alias.
+	 * Deprecated kebab-case aliases (e.g. `strip-html`, `title-case`, `word-limit`) are transparently
+	 * resolved to their camelCase equivalents, with a one-time deprecation warning logged per alias.
 	 * @param alias The alias of the filter to retrieve.
 	 * @returns {UmbUfmFilterFunction} The filter function associated with the alias, or undefined if not found.
 	 */
