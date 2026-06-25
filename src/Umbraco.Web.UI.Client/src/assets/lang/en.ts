@@ -1882,8 +1882,16 @@ export default {
 		chooseChildNode: 'Choose child node',
 		compositionsDescription:
 			'Inherit tabs and properties from an existing Document Type. New tabs will be added to the current Document Type or merged if a tab with an identical name exists.',
-		compositionInUse: 'This Content Type is used in a composition, and therefore cannot be composed itself.',
-		noAvailableCompositions: 'There are no Content Types available to use as a composition.',
+		compositionsDescriptionMediaType:
+			'Inherit tabs and properties from an existing Media Type. New tabs will be added to the current Media Type or merged if a tab with an identical name exists.',
+		compositionsDescriptionMemberType:
+			'Inherit tabs and properties from an existing Member Type. New tabs will be added to the current Member Type or merged if a tab with an identical name exists.',
+		compositionInUse: 'This Document Type is used in a composition, and therefore cannot be composed itself.',
+		compositionInUseMediaType: 'This Media Type is used in a composition, and therefore cannot be composed itself.',
+		compositionInUseMemberType: 'This Member Type is used in a composition, and therefore cannot be composed itself.',
+		noAvailableCompositions: 'There are no Document Types available to use as a composition.',
+		noAvailableCompositionsMediaType: 'There are no Media Types available to use as a composition.',
+		noAvailableCompositionsMemberType: 'There are no Member Types available to use as a composition.',
 		compositionRemoveWarning:
 			"Removing a composition will delete all the associated property data. Once you save the Document Type there's no way back.",
 		availableEditors: 'Create new',
@@ -1921,7 +1929,11 @@ export default {
 		tabHasNoSortOrder: 'tab has no sort order',
 		compositionUsageHeading: 'Where is this composition used?',
 		compositionUsageSpecification:
-			'This composition is currently used in the composition of the following Content Types:',
+			'This composition is currently used in the composition of the following Document Types:',
+		compositionUsageSpecificationMediaType:
+			'This composition is currently used in the composition of the following Media Types:',
+		compositionUsageSpecificationMemberType:
+			'This composition is currently used in the composition of the following Member Types:',
 		variantsHeading: 'Variation',
 		cultureVariantHeading: 'Allow vary by culture',
 		segmentVariantHeading: 'Allow segmentation',

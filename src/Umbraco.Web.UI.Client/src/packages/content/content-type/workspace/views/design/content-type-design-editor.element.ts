@@ -450,6 +450,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 			isElement: ownerContentType.isElement,
 			currentPropertyAliases,
 			isNew: this.#workspaceContext.getIsNew()!,
+			entityType: this.#workspaceContext.getEntityType(),
 		};
 
 		const value = await umbOpenModal(this, UMB_COMPOSITION_PICKER_MODAL, {
