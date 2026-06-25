@@ -669,6 +669,81 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
+    public async Task Removing_Composition_Clears_Orphaned_PropertyData_On_Content()
+    {
+        // U4-1690: removing a composition from a content type must delete the orphaned property data for the
+        // composition's property types on that content type's existing content, without touching the content
+        // type's own property data.
+        var composition = new ContentType(ShortStringHelper, Constants.System.Root)
+        {
+            Alias = "compositionType",
+            Name = "Composition Type",
+        };
+        composition.PropertyGroups.Add(new PropertyGroup(new PropertyTypeCollection(true)
+        {
+            new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext)
+            {
+                Alias = "compProp", Name = "Comp Prop", DataTypeId = Constants.DataTypes.Textbox,
+            },
+        })
+        {
+            Alias = "compGroup", Name = "Comp Group", SortOrder = 1,
+        });
+        await ContentTypeService.CreateAsync(composition, Constants.Security.SuperUserKey);
+
+        var page = new ContentType(ShortStringHelper, Constants.System.Root)
+        {
+            Alias = "pageType",
+            Name = "Page Type",
+        };
+        page.PropertyGroups.Add(new PropertyGroup(new PropertyTypeCollection(true)
+        {
+            new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext)
+            {
+                Alias = "pageProp", Name = "Page Prop", DataTypeId = Constants.DataTypes.Textbox,
+            },
+        })
+        {
+            Alias = "pageGroup", Name = "Page Group", SortOrder = 1,
+        });
+        Assert.That(page.AddContentType(composition), Is.True);
+        await ContentTypeService.CreateAsync(page, Constants.Security.SuperUserKey);
+
+        var compPropertyTypeId = composition.PropertyTypes.Single(x => x.Alias == "compProp").Id;
+        var pagePropertyTypeId = page.PropertyTypes.Single(x => x.Alias == "pageProp").Id;
+
+        var content = new Content("Page 1", Constants.System.Root, page);
+        content.SetValue("compProp", "composition value");
+        content.SetValue("pageProp", "page value");
+        ContentService.Save(content);
+
+        // sanity: both property values are persisted before the composition is removed
+        Assert.Multiple(() =>
+        {
+            Assert.That(CountPropertyData(compPropertyTypeId), Is.GreaterThan(0));
+            Assert.That(CountPropertyData(pagePropertyTypeId), Is.GreaterThan(0));
+        });
+
+        // remove the composition
+        Assert.That(page.RemoveContentType(composition.Alias), Is.True);
+        await ContentTypeService.UpdateAsync(page, Constants.Security.SuperUserKey);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(CountPropertyData(compPropertyTypeId), Is.EqualTo(0), "orphaned composition property data should be cleared");
+            Assert.That(CountPropertyData(pagePropertyTypeId), Is.GreaterThan(0), "the content type's own property data should be preserved");
+        });
+    }
+
+    private int CountPropertyData(int propertyTypeId)
+    {
+        using var scope = ScopeProvider.CreateScope(autoComplete: true);
+        return scope.Database.ExecuteScalar<int>(
+            $"SELECT COUNT(*) FROM {Constants.DatabaseSchema.Tables.PropertyData} WHERE propertyTypeId = @0",
+            propertyTypeId);
+    }
+
+    [Test]
     public async Task Can_Copy_ContentType_By_Performing_Clone()
     {
         // Arrange

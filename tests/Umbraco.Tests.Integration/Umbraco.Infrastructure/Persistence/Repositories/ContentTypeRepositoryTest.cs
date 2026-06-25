@@ -16,6 +16,8 @@ using Umbraco.Cms.Core.Models.Membership.Permissions;
 using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Tests.Common.Attributes;
@@ -230,15 +232,14 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
             new ContentTypeCommonRepository(scopeAccessor, TemplateRepository, appCaches, ShortStringHelper);
 
         return new ContentTypeRepository(
-            scopeAccessor,
             appCaches,
             LoggerFactory.CreateLogger<ContentTypeRepository>(),
             commonRepository,
             LanguageRepository,
-            ShortStringHelper,
             Mock.Of<IRepositoryCacheVersionService>(),
             IdKeyMap,
-            Mock.Of<ICacheSyncService>());
+            Mock.Of<ICacheSyncService>(),
+            GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>());
     }
 
     [Test]

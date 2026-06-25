@@ -84,6 +84,20 @@ public class UmbracoDbContext : DbContext
 
     public required DbSet<DictionaryDto> DictionaryEntries { get; set; }
 
+    public required DbSet<ContentTypeDto> ContentTypes { get; set; }
+
+    public required DbSet<ContentType2ContentTypeDto> ContentTypeComposition { get; set; }
+
+    public required DbSet<ContentTypeAllowedContentTypeDto> ContentTypeAllowedContentTypes { get; set; }
+
+    public required DbSet<ContentTypeTemplateDto> ContentTypeTemplates { get; set; }
+
+    public required DbSet<PropertyTypeGroupDto> PropertyTypeGroups { get; set; }
+
+    public required DbSet<PropertyTypeDto> PropertyTypes { get; set; }
+
+    public required DbSet<DataTypeDto> DataTypes { get; set; }
+
     private static DbContextOptions<UmbracoDbContext> ConfigureOptions(DbContextOptions<UmbracoDbContext> options)
     {
         var coreExtensions = options.FindExtension<Microsoft.EntityFrameworkCore.Infrastructure.CoreOptionsExtension>();
@@ -154,6 +168,18 @@ public class UmbracoDbContext : DbContext
         base.OnConfiguring(optionsBuilder);
 
         optionsBuilder.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+    }
+
+    protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+    {
+        base.ConfigureConventions(configurationBuilder);
+
+        // Umbraco's schema maps every byte/short CLR property to an int column (SqlSyntaxProviderBase resolves
+        // both to IntColumnDefinition). NPoco narrows on read, but EF Core's strict materializer throws an
+        // InvalidCastException reading an int column into a byte/short property on SQL Server. Convert globally so
+        // the EF model matches the actual column type.
+        configurationBuilder.Properties<byte>().HaveConversion<int>();
+        configurationBuilder.Properties<short>().HaveConversion<int>();
     }
 
     /// <summary>

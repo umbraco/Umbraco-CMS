@@ -1,119 +1,123 @@
-using System.Xml.Linq;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Strings;
-using Umbraco.Cms.Infrastructure.Persistence.Dtos;
-using Umbraco.Cms.Infrastructure.Persistence.Querying;
-using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
-using Umbraco.Cms.Infrastructure.Scoping;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
+using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.EFCore;
 using Umbraco.Extensions;
+
+// EF1002: the raw SQL below interpolates only compile-time identifier constants (table/column names). All
+// caller-supplied values (IQuery clause arguments) are bound through the positional parameter array. Identifiers
+// cannot be passed as parameters, so ExecuteSqlInterpolated is not an option; the query is not vulnerable to SQL injection.
+#pragma warning disable EF1002 // Risk of vulnerability to SQL injection.
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
 /// <summary>
-///     Represents a repository for doing CRUD operations for <see cref="IContentType" />
+///     Represents a repository for doing CRUD operations for <see cref="IContentType" /> (document types).
 /// </summary>
-internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContentType>, IContentTypeRepository
+/// <remarks>
+///     The shared content-type-composition logic lives in <see cref="AsyncContentTypeRepositoryBase{TEntity}"/>;
+///     this class only supplies the document-type specifics: the node object type, template and history-cleanup
+///     persistence, and the document-type-only query methods on <see cref="IContentTypeRepository"/>.
+/// </remarks>
+internal sealed class ContentTypeRepository : AsyncContentTypeRepositoryBase<IContentType>, IContentTypeRepository
 {
-    private readonly IRepositoryCacheVersionService _repositoryCacheVersionService;
-    private readonly ICacheSyncService _cacheSyncService;
-
     /// <summary>
     /// Initializes a new instance of the <see cref="ContentTypeRepository"/> class.
     /// </summary>
-    /// <param name="scopeAccessor">Provides access to the current database scope.</param>
-    /// <param name="cache">The application-level cache manager.</param>
-    /// <param name="logger">The logger used for logging repository operations.</param>
-    /// <param name="commonRepository">Repository for common content type operations.</param>
-    /// <param name="languageRepository">Repository for managing languages.</param>
-    /// <param name="shortStringHelper">Helper for generating and manipulating short strings.</param>
-    /// <param name="repositoryCacheVersionService">Service for managing repository cache versions.</param>
-    /// <param name="idKeyMap">Service for mapping between IDs and keys.</param>
-    /// <param name="cacheSyncService">Service for synchronizing cache across distributed environments.</param>
     public ContentTypeRepository(
-        IScopeAccessor scopeAccessor,
         AppCaches cache,
         ILogger<ContentTypeRepository> logger,
         IContentTypeCommonRepository commonRepository,
         ILanguageRepository languageRepository,
-        IShortStringHelper shortStringHelper,
         IRepositoryCacheVersionService repositoryCacheVersionService,
         IIdKeyMap idKeyMap,
-        ICacheSyncService cacheSyncService)
+        ICacheSyncService cacheSyncService,
+        IEFCoreScopeAccessor<UmbracoDbContext> efCoreScopeAccessor)
         : base(
-            scopeAccessor,
             cache,
             logger,
             commonRepository,
             languageRepository,
-            shortStringHelper,
             repositoryCacheVersionService,
             idKeyMap,
-            cacheSyncService)
+            cacheSyncService,
+            efCoreScopeAccessor)
     {
-        _repositoryCacheVersionService = repositoryCacheVersionService;
-        _cacheSyncService = cacheSyncService;
     }
 
-    protected override bool SupportsPublishing => ContentType.SupportsPublishingConst;
-
+    /// <inheritdoc />
     protected override Guid NodeObjectTypeId => Constants.ObjectTypes.DocumentType;
+
+    /// <inheritdoc />
+    protected override bool SupportsPublishing => ContentType.SupportsPublishingConst;
 
     /// <inheritdoc />
     public IEnumerable<IContentType> GetByQuery(IQuery<PropertyType> query)
     {
-        var ints = PerformGetByQuery(query).ToArray();
+        var ints = PerformGetByQueryAsync(query).GetAwaiter().GetResult();
         return ints.Length > 0 ? GetMany(ints) : Enumerable.Empty<IContentType>();
+    }
+
+    private Task<int[]> PerformGetByQueryAsync(IQuery<PropertyType> query)
+    {
+        // used by DataTypeService to remove properties from content types if they have a deleted data type.
+        // Matches the legacy behaviour of resolving the content type through the property GROUP — ungrouped
+        // property types resolve to 0 and are filtered out.
+        (var whereSql, var args) = TranslateWhereClauses(query.GetWhereClauses());
+        var sql =
+            $"""
+             SELECT DISTINCT COALESCE({PropertyTypeGroupDto.TableName}.{PropertyTypeGroupDto.ContentTypeNodeIdColumnName}, 0) AS Value
+             FROM {PropertyTypeDto.TableName}
+             LEFT JOIN {PropertyTypeGroupDto.TableName} ON {PropertyTypeGroupDto.TableName}.{PropertyTypeGroupDto.PrimaryKeyColumnName} = {PropertyTypeDto.TableName}.{PropertyTypeDto.PropertyTypeGroupIdColumnName}
+             INNER JOIN {DataTypeDto.TableName} ON {PropertyTypeDto.TableName}.{PropertyTypeDto.DataTypeIdColumnName} = {DataTypeDto.TableName}.nodeId
+             WHERE 1 = 1{whereSql}
+             """;
+
+        return ExecuteEfScopeAsync(async db =>
+            (await db.Database.SqlQueryRaw<int>(sql, args).ToListAsync())
+                .Where(id => id > 0)
+                .Distinct()
+                .ToArray());
     }
 
     /// <summary>
     ///     Gets all property type aliases.
     /// </summary>
-    /// <returns></returns>
     public IEnumerable<string> GetAllPropertyTypeAliases()
-    {
-        Sql<ISqlContext> sql = Sql()
-            .SelectDistinct<PropertyTypeDto>(c => c.Alias)
-            .From<PropertyTypeDto>()
-            .OrderBy<PropertyTypeDto>(c => c.Alias);
-        return Database.Fetch<string>(sql);
-    }
+        => ExecuteEfScopeAsync(db => db.PropertyTypes
+            .Select(x => x.Alias!)
+            .Distinct()
+            .OrderBy(x => x)
+            .ToListAsync()).GetAwaiter().GetResult();
 
     /// <summary>
-    ///     Gets all content type aliases
+    ///     Gets all content type aliases.
     /// </summary>
-    /// <param name="objectTypes">
-    ///     If this list is empty, it will return all content type aliases for media, members and content, otherwise
-    ///     it will only return content type aliases for the object types specified
-    /// </param>
-    /// <returns></returns>
     public IEnumerable<string> GetAllContentTypeAliases(params Guid[] objectTypes)
-    {
-        Sql<ISqlContext> sql = Sql()
-            .Select<ContentTypeDto>(c => c.Alias)
-            .From<ContentTypeDto>()
-            .InnerJoin<NodeDto>()
-            .On<ContentTypeDto, NodeDto>(dto => dto.NodeId, dto => dto.NodeId);
-
-        if (objectTypes.Any())
+        => ExecuteEfScopeAsync(db =>
         {
-            sql = sql.WhereIn<NodeDto>(dto => dto.NodeObjectType, objectTypes);
-        }
+            IQueryable<ContentTypeDto> query = db.ContentTypes;
 
-        return Database.Fetch<string>(sql);
-    }
+            if (objectTypes.Any())
+            {
+                query = query.Where(x =>
+                    x.NodeDto.NodeObjectType.HasValue && objectTypes.Contains(x.NodeDto.NodeObjectType.Value));
+            }
+
+            return query.Select(x => x.Alias!).ToListAsync();
+        }).GetAwaiter().GetResult();
 
     /// <summary>
-    /// Retrieves the IDs of all content types that match the specified aliases.
+    ///     Retrieves the IDs of all content types that match the specified aliases.
     /// </summary>
-    /// <param name="aliases">An array of content type aliases for which to retrieve the corresponding IDs.</param>
-    /// <returns>An <see cref="IEnumerable{Int32}"/> containing the IDs of content types that match the provided aliases. If no aliases are specified, returns an empty collection.</returns>
     public IEnumerable<int> GetAllContentTypeIds(string[] aliases)
     {
         if (aliases.Length == 0)
@@ -121,133 +125,18 @@ internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContent
             return Enumerable.Empty<int>();
         }
 
-        Sql<ISqlContext> sql = Sql()
-            .Select<ContentTypeDto>(x => x.NodeId)
-            .From<ContentTypeDto>()
-            .InnerJoin<NodeDto>()
-            .On<ContentTypeDto, NodeDto>(dto => dto.NodeId, dto => dto.NodeId)
-            .WhereIn<ContentTypeDto>(x => x.Alias, aliases);
-
-        return Database.Fetch<int>(sql);
+        return ExecuteEfScopeAsync(db => db.ContentTypes
+            .Where(x => aliases.Contains(x.Alias))
+            .Select(x => x.NodeId)
+            .ToListAsync()).GetAwaiter().GetResult();
     }
 
-    protected override IRepositoryCachePolicy<IContentType, int> CreateCachePolicy() =>
-        new FullDataSetRepositoryCachePolicy<IContentType, int>(GlobalIsolatedCache, ScopeAccessor, _repositoryCacheVersionService, _cacheSyncService, GetEntityId, /*expires:*/ true);
+    // ----------------------------------------------------------------------------------------------------
+    // Document-type-specific persistence (templates, history cleanup) layered on top of the shared base.
+    // ----------------------------------------------------------------------------------------------------
 
-    // Note: PerformGet(int) is passed as a callback to the cache policy's Get(TId) method,
-    // but FullDataSetRepositoryCachePolicy.Get() never invokes it — it uses GetAllCached()
-    // internally and clones only the matched entity. This override exists only as a required
-    // implementation of the abstract base and as a fallback for non-FullDataSet policies.
-    protected override IContentType? PerformGet(int id)
-        => GetMany().FirstOrDefault(x => x.Id == id);
-
-    protected override IEnumerable<IContentType>? GetAllWithFullCachePolicy() =>
-        CommonRepository.GetAllTypes()?.OfType<IContentType>();
-
-    protected override IEnumerable<IContentType> PerformGetByQuery(IQuery<IContentType> query)
-    {
-        Sql<ISqlContext> baseQuery = GetBaseQuery(false);
-        var translator = new SqlTranslator<IContentType>(baseQuery, query);
-        Sql<ISqlContext> sql = translator.Translate();
-        var ids = Database.Fetch<int>(sql).Distinct().ToArray();
-
-        return ids.Length > 0
-            ? GetMany(ids).OrderBy(x => x.Name)
-            : Enumerable.Empty<IContentType>();
-    }
-
-    private IEnumerable<int> PerformGetByQuery(IQuery<PropertyType> query)
-    {
-        // used by DataTypeService to remove properties
-        // from content types if they have a deleted data type - see
-        // notes in DataTypeService.Delete as it's a bit weird
-        Sql<ISqlContext> sqlClause = Sql()
-            .SelectAll()
-            .From<PropertyTypeDto>()
-            .LeftJoin<PropertyTypeGroupDto>()
-            .On<PropertyTypeGroupDto, PropertyTypeDto>(left => left.Id, right => right.PropertyTypeGroupId)
-            .InnerJoin<DataTypeDto>()
-            .On<PropertyTypeDto, DataTypeDto>(left => left.DataTypeId, right => right.NodeId);
-
-        var translator = new SqlTranslator<PropertyType>(sqlClause, query);
-        Sql<ISqlContext> sql = translator.Translate()
-            .OrderBy<PropertyTypeDto>(x => x.PropertyTypeGroupId);
-
-        return Database
-            .FetchOneToMany<PropertyTypeGroupDto>(x => x.PropertyTypeDtos, sql)
-            .Select(x => x.ContentTypeNodeId).Distinct();
-    }
-
-    protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
-    {
-        Sql<ISqlContext> sql = Sql();
-
-        sql = isCount
-            ? sql.SelectCount()
-            : sql.Select<ContentTypeDto>(x => x.NodeId);
-
-        sql
-            .From<ContentTypeDto>()
-            .InnerJoin<NodeDto>().On<ContentTypeDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-            .LeftJoin<ContentTypeTemplateDto>()
-            .On<ContentTypeTemplateDto, ContentTypeDto>(left => left.ContentTypeNodeId, right => right.NodeId)
-            .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
-
-        return sql;
-    }
-
-    protected override string GetBaseWhereClause() => $"{QuoteTableName(NodeDto.TableName)}.id = @id";
-
-    protected override IEnumerable<string> GetDeleteClauses()
-    {
-        var l = (List<string>)base.GetDeleteClauses(); // we know it's a list
-        l.Add($"DELETE FROM {QuoteTableName(ContentVersionCleanupPolicyDto.TableName)} WHERE {QuoteColumnName(ContentVersionCleanupPolicyDto.PrimaryKeyColumnName)} = @id");
-        l.Add($"DELETE FROM {QuoteTableName(ContentTypeTemplateDto.TableName)} WHERE {QuoteColumnName(ContentTypeTemplateDto.ContentTypeNodeIdColumnName)} = @id");
-        l.Add($"DELETE FROM {QuoteTableName(ContentTypeDto.TableName)} WHERE {QuoteColumnName(ContentTypeDto.NodeIdColumnName)} = @id");
-        l.Add($"DELETE FROM {QuoteTableName(NodeDto.TableName)} WHERE {QuoteColumnName(NodeDto.PrimaryKeyColumnName)} = @id");
-        return l;
-    }
-
-    /// <summary>
-    ///     Deletes a content type
-    /// </summary>
-    /// <param name="entity"></param>
-    /// <remarks>
-    ///     First checks for children and removes those first
-    /// </remarks>
-    protected override void PersistDeletedItem(IContentType entity)
-    {
-        IQuery<IContentType> query = Query<IContentType>().Where(x => x.ParentId == entity.Id);
-        IEnumerable<IContentType> children = Get(query);
-        foreach (IContentType child in children)
-        {
-            PersistDeletedItem(child);
-        }
-
-        // Before we call the base class methods to run all delete clauses, we need to first
-        // delete all of the property data associated with this document type. Normally this will
-        // be done in the ContentTypeService by deleting all associated content first, but in some cases
-        // like when we switch a document type, there is property data left over that is linked
-        // to the previous document type. So we need to ensure it's removed.
-        Sql<ISqlContext> sql = Sql()
-            .SelectDistinct<PropertyDataDto>(c => c.PropertyTypeId)
-            .From<PropertyDataDto>()
-            .InnerJoin<PropertyTypeDto>()
-            .On<PropertyDataDto, PropertyTypeDto>(dto => dto.PropertyTypeId, dto => dto.Id)
-            .InnerJoin<ContentTypeDto>()
-            .On<ContentTypeDto, PropertyTypeDto>(dto => dto.NodeId, dto => dto.ContentTypeId)
-            .Where<ContentTypeDto>(dto => dto.NodeId == entity.Id);
-
-        // Delete all PropertyData where propertytypeid EXISTS in the subquery above
-        Database.Execute(SqlSyntax.GetDeleteSubquery(PropertyDataDto.TableName, "propertyTypeId", sql));
-
-        // delete all granular permissions for this content type
-        Database.Delete<UserGroup2GranularPermissionDto>(Sql().Where<UserGroup2GranularPermissionDto>(dto => dto.UniqueId == entity.Key));
-
-        base.PersistDeletedItem(entity);
-    }
-
-    protected override void PersistNewItem(IContentType entity)
+    /// <inheritdoc />
+    protected override async Task PersistNewItemAsync(IContentType entity)
     {
         if (string.IsNullOrWhiteSpace(entity.Alias))
         {
@@ -261,46 +150,15 @@ internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContent
 
         entity.AddingEntity();
 
-        PersistNewBaseContentType(entity);
-        PersistTemplates(entity, false);
-        PersistHistoryCleanup(entity);
+        await PersistNewBaseContentTypeAsync(entity);
+        await PersistTemplatesAsync(entity);
+        await PersistHistoryCleanupAsync(entity);
 
         entity.ResetDirtyProperties();
     }
 
-    private void PersistTemplates(IContentType entity, bool clearAll)
-    {
-        // remove and insert, if required
-        Sql<ISqlContext> sql = Sql()
-            .Delete<ContentTypeTemplateDto>()
-            .Where<ContentTypeTemplateDto>(x => x.ContentTypeNodeId == entity.Id);
-        Database.Execute(sql);
-
-        // we could do it all in foreach if we assume that the default template is an allowed template??
-        var defaultTemplateId = entity.DefaultTemplateId;
-        if (defaultTemplateId > 0)
-        {
-            Database.Insert(new ContentTypeTemplateDto
-            {
-                ContentTypeNodeId = entity.Id,
-                TemplateNodeId = defaultTemplateId,
-                IsDefault = true,
-            });
-        }
-
-        foreach (ITemplate template in entity.AllowedTemplates?.Where(x => x.Id != defaultTemplateId) ??
-                                       Array.Empty<ITemplate>())
-        {
-            Database.Insert(new ContentTypeTemplateDto
-            {
-                ContentTypeNodeId = entity.Id,
-                TemplateNodeId = template.Id,
-                IsDefault = false,
-            });
-        }
-    }
-
-    protected override void PersistUpdatedItem(IContentType entity)
+    /// <inheritdoc />
+    protected override async Task PersistUpdatedItemAsync(IContentType entity)
     {
         ValidateAlias(entity);
 
@@ -310,45 +168,105 @@ internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContent
         // Look up parent to get and set the correct Path if ParentId has changed
         if (entity.IsPropertyDirty("ParentId"))
         {
-            Sql<ISqlContext> sql = Sql()
-                .SelectAll()
-                .From<NodeDto>()
-                .Where<NodeDto>(x => x.NodeId == entity.ParentId);
-            NodeDto parent = Database.First<NodeDto>(sql);
+            var parent = await ExecuteEfScopeAsync(db => db.Nodes
+                .Where(x => x.NodeId == entity.ParentId)
+                .Select(x => new { x.Path, x.Level })
+                .FirstAsync());
             entity.Path = string.Concat(parent.Path, ",", entity.Id);
             entity.Level = parent.Level + 1;
-            sql = Sql()
-                .SelectMax<NodeDto>(c => c.SortOrder, 0)
-                .From<NodeDto>()
-                .Where<NodeDto>(x => x.ParentId == entity.ParentId && x.NodeObjectType == NodeObjectTypeId);
-            var maxSortOrder = Database.ExecuteScalar<int>(sql);
+
+            var maxSortOrder = await ExecuteEfScopeAsync(db => db.Nodes
+                .Where(x => x.ParentId == entity.ParentId && x.NodeObjectType == NodeObjectTypeId)
+                .Select(x => (int?)x.SortOrder)
+                .MaxAsync()) ?? 0;
             entity.SortOrder = maxSortOrder + 1;
         }
 
-        PersistUpdatedBaseContentType(entity);
-        PersistTemplates(entity, true);
-        PersistHistoryCleanup(entity);
+        await PersistUpdatedBaseContentTypeAsync(entity);
+        await PersistTemplatesAsync(entity);
+        await PersistHistoryCleanupAsync(entity);
 
         entity.ResetDirtyProperties();
     }
 
-    private void PersistHistoryCleanup(IContentType entity)
+    /// <inheritdoc />
+    protected override async Task DeleteContentTypeSpecificDefinitionTablesAsync(UmbracoDbContext db, int id)
+    {
+        await db.ContentTypeTemplates.Where(x => x.ContentTypeNodeId == id).ExecuteDeleteAsync();
+        await db.ContentVersionCleanupPolicies.Where(x => x.ContentTypeId == id).ExecuteDeleteAsync();
+    }
+
+    private Task PersistTemplatesAsync(IContentType entity)
+    {
+        var defaultTemplateId = entity.DefaultTemplateId;
+        ITemplate[] allowedTemplates = entity.AllowedTemplates?.Where(x => x.Id != defaultTemplateId).ToArray()
+                                       ?? Array.Empty<ITemplate>();
+
+        return ExecuteEfScopeAsync(async db =>
+        {
+            // remove and re-insert. ExecuteDeleteAsync is set-based and bypasses the change tracker.
+            await db.ContentTypeTemplates.Where(x => x.ContentTypeNodeId == entity.Id).ExecuteDeleteAsync();
+
+            if (defaultTemplateId > 0)
+            {
+                db.ContentTypeTemplates.Add(new ContentTypeTemplateDto
+                {
+                    ContentTypeNodeId = entity.Id,
+                    TemplateNodeId = defaultTemplateId,
+                    IsDefault = true,
+                });
+            }
+
+            foreach (ITemplate template in allowedTemplates)
+            {
+                db.ContentTypeTemplates.Add(new ContentTypeTemplateDto
+                {
+                    ContentTypeNodeId = entity.Id,
+                    TemplateNodeId = template.Id,
+                    IsDefault = false,
+                });
+            }
+
+            await db.SaveChangesAsync();
+        });
+    }
+
+    private Task PersistHistoryCleanupAsync(IContentType entity)
     {
         // historyCleanup property is not mandatory for api endpoint, handle the case where it's not present.
-        // DocumentTypeSave doesn't handle this for us like ContentType constructors do.
         if (entity is IContentType entityWithHistoryCleanup)
         {
-            var dto = new ContentVersionCleanupPolicyDto
+            var updated = DateTime.UtcNow;
+            var preventCleanup = entityWithHistoryCleanup.HistoryCleanup?.PreventCleanup ?? false;
+            var keepAllVersionsNewerThanDays = entityWithHistoryCleanup.HistoryCleanup?.KeepAllVersionsNewerThanDays;
+            var keepLatestVersionPerDayForDays = entityWithHistoryCleanup.HistoryCleanup?.KeepLatestVersionPerDayForDays;
+
+            return ExecuteEfScopeAsync(async db =>
             {
-                ContentTypeId = entity.Id,
-                Updated = DateTime.UtcNow,
-                PreventCleanup = entityWithHistoryCleanup.HistoryCleanup?.PreventCleanup ?? false,
-                KeepAllVersionsNewerThanDays =
-                    entityWithHistoryCleanup.HistoryCleanup?.KeepAllVersionsNewerThanDays,
-                KeepLatestVersionPerDayForDays =
-                    entityWithHistoryCleanup.HistoryCleanup?.KeepLatestVersionPerDayForDays,
-            };
-            Database.InsertOrUpdate(dto);
+                // Upsert: ExecuteUpdateAsync is set-based (no change-tracker conflict); insert only if absent.
+                var affected = await db.ContentVersionCleanupPolicies
+                    .Where(x => x.ContentTypeId == entity.Id)
+                    .ExecuteUpdateAsync(s => s
+                        .SetProperty(x => x.Updated, updated)
+                        .SetProperty(x => x.PreventCleanup, preventCleanup)
+                        .SetProperty(x => x.KeepAllVersionsNewerThanDays, keepAllVersionsNewerThanDays)
+                        .SetProperty(x => x.KeepLatestVersionPerDayForDays, keepLatestVersionPerDayForDays));
+
+                if (affected == 0)
+                {
+                    db.ContentVersionCleanupPolicies.Add(new ContentVersionCleanupPolicyDto
+                    {
+                        ContentTypeId = entity.Id,
+                        Updated = updated,
+                        PreventCleanup = preventCleanup,
+                        KeepAllVersionsNewerThanDays = keepAllVersionsNewerThanDays,
+                        KeepLatestVersionPerDayForDays = keepLatestVersionPerDayForDays,
+                    });
+                    await db.SaveChangesAsync();
+                }
+            });
         }
+
+        return Task.CompletedTask;
     }
 }

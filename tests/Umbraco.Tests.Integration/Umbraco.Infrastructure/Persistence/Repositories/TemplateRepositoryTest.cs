@@ -521,7 +521,7 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
             var commonRepository =
                 new ContentTypeCommonRepository(scopeAccessor, templateRepository, AppCaches, ShortStringHelper);
             var languageRepository = new LanguageRepository(newScopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<LanguageRepository>(), Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
-            var contentTypeRepository = new ContentTypeRepository(scopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<ContentTypeRepository>(), commonRepository, languageRepository, ShortStringHelper, Mock.Of<IRepositoryCacheVersionService>(), IdKeyMap, Mock.Of<ICacheSyncService>());
+            var contentTypeRepository = new ContentTypeRepository(AppCaches.Disabled, LoggerFactory.CreateLogger<ContentTypeRepository>(), commonRepository, languageRepository, Mock.Of<IRepositoryCacheVersionService>(), IdKeyMap, Mock.Of<ICacheSyncService>(), newScopeAccessor);
             var relationTypeRepository = new RelationTypeRepository(newScopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<RelationTypeRepository>(), Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
             var entityRepository = new EntityRepository(scopeAccessor, AppCaches.Disabled);
             var relationRepository = new RelationRepository(newScopeAccessor, LoggerFactory.CreateLogger<RelationRepository>(), relationTypeRepository, Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());

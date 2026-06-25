@@ -264,6 +264,20 @@ internal sealed class EFCoreScopeProvider<TDbContext> : IEFCoreScopeProvider<TDb
             return existing;
         }
 
+        // The bridge is enlisted in the ambient scope context, which is owned by the ROOT scope and outlives
+        // any child scope. Bind the bridge to the root scope: child scopes share the root's database and
+        // transaction, and binding to a child would leave the bridge holding a disposed inner scope once the
+        // child completes — while still being reused from the enlistment for the rest of the context.
+        if (existingNPocoScope is Scope concreteScope)
+        {
+            while (concreteScope.ParentScope is not null)
+            {
+                concreteScope = concreteScope.ParentScope;
+            }
+
+            existingNPocoScope = concreteScope;
+        }
+
         var bridgeScope = new EFCoreScope<TDbContext>(
             existingNPocoScope,
             _distributedLockingMechanismFactory,
