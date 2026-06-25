@@ -352,7 +352,7 @@ internal sealed class PackageDataInstallationTests : UmbracoIntegrationTestWithC
             PackageDataInstallation.ImportDataTypes(dataTypeElement.Elements("DataType").ToList(), -1);
         var contentTypes = PackageDataInstallation.ImportDocumentTypes(docTypesElement.Elements("DocumentType"), -1);
         var importedContentTypes = contentTypes.ToDictionary(x => x.Alias, x => x);
-        var contents = PackageDataInstallation.ImportContentBase(packageDocument.Yield(), importedContentTypes, -1, (IContentTypeBaseService<IContentType>)ContentTypeService, ContentService);
+        var contents = PackageDataInstallation.ImportContentBase(packageDocument.Yield(), importedContentTypes, -1, ContentTypeService, ContentService);
         var numberOfDocs = (from doc in element.Descendants()
                             where (string)doc.Attribute("isDoc") == string.Empty
                             select doc).Count();
@@ -409,7 +409,7 @@ internal sealed class PackageDataInstallationTests : UmbracoIntegrationTestWithC
             PackageDataInstallation.ImportDataTypes(dataTypeElement.Elements("DataType").ToList(), -1);
         var contentTypes = PackageDataInstallation.ImportDocumentTypes(docTypesElement.Elements("DocumentType"), -1);
         var importedContentTypes = contentTypes.ToDictionary(x => x.Alias, x => x);
-        var contents = PackageDataInstallation.ImportContentBase(packageDocument.Yield(), importedContentTypes, -1, (IContentTypeBaseService<IContentType>)ContentTypeService, ContentService);
+        var contents = PackageDataInstallation.ImportContentBase(packageDocument.Yield(), importedContentTypes, -1, ContentTypeService, ContentService);
         var numberOfDocs = (from doc in element.Descendants()
                             where (string)doc.Attribute("isDoc") == string.Empty
                             select doc).Count();
