@@ -52,7 +52,7 @@ export class UmbTreeItemChildrenManager<
 	#startNode = new UmbObjectState<UmbTreeStartNode | undefined>(undefined);
 	public readonly startNode = this.#startNode.asObservable();
 
-	#isLoading = new UmbBooleanState(false);
+	#isLoading = new UmbBooleanState(undefined);
 	public readonly isLoading = this.#isLoading.asObservable();
 
 	#isLoadingPrevChildren = new UmbBooleanState(false);

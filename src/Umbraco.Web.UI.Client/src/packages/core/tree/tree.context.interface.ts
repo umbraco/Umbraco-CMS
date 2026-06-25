@@ -38,6 +38,7 @@ export interface UmbTreeContext<
 	readonly startNode: Observable<UmbTreeStartNode | undefined>;
 	readonly foldersOnly: Observable<boolean>;
 	readonly additionalRequestArgs: Observable<Partial<RequestArgsType> | object>;
+	readonly isLoading: Observable<boolean | undefined>;
 	readonly isLoadingPrevChildren: Observable<boolean>;
 	readonly isLoadingNextChildren: Observable<boolean>;
 

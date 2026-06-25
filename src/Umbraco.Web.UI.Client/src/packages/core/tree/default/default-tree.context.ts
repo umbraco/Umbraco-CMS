@@ -17,10 +17,10 @@ import { umbExtensionsRegistry, type ManifestRepository } from '@umbraco-cms/bac
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbDefaultTreeContext<
-		TreeItemType extends UmbTreeItemModel,
-		TreeRootType extends UmbTreeRootModel,
-		RequestArgsType extends UmbTreeRootItemsRequestArgs = UmbTreeRootItemsRequestArgs,
-	>
+	TreeItemType extends UmbTreeItemModel,
+	TreeRootType extends UmbTreeRootModel,
+	RequestArgsType extends UmbTreeRootItemsRequestArgs = UmbTreeRootItemsRequestArgs,
+>
 	extends UmbContextBase
 	implements UmbTreeContext<TreeItemType, TreeRootType, RequestArgsType>
 {
@@ -46,6 +46,7 @@ export class UmbDefaultTreeContext<
 	public readonly startNode = this.#treeItemChildrenManager.startNode;
 	public readonly foldersOnly = this.#treeItemChildrenManager.foldersOnly;
 	public readonly additionalRequestArgs = this.#treeItemChildrenManager.additionalRequestArgs;
+	public readonly isLoading = this.#treeItemChildrenManager.isLoading;
 	public readonly isLoadingPrevChildren = this.#treeItemChildrenManager.isLoadingPrevChildren;
 	public readonly isLoadingNextChildren = this.#treeItemChildrenManager.isLoadingNextChildren;
 

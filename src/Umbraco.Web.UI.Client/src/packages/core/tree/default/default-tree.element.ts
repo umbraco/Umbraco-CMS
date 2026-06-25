@@ -75,6 +75,9 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 	private _hasNextItems = false;
 
 	@state()
+	private _initialLoadDone = false;
+
+	@state()
 	private _isLoadingPrevChildren = false;
 
 	@state()
@@ -84,8 +87,25 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 		this.observe(this._api?.treeRoot, (treeRoot) => (this._treeRoot = treeRoot), '_observeTreeRoot');
 		this.observe(this._api?.rootItems, (rootItems) => (this._rootItems = rootItems ?? []), '_observeRootItems');
 		this.observe(this._api?.pagination.currentPage, (value) => (this._currentPage = value ?? 1), '_observeCurrentPage');
-		this.observe(this._api?.isLoadingPrevChildren, (value) => (this._isLoadingPrevChildren = value ?? false), '_observeIsLoadingPrevChildren');
-		this.observe(this._api?.isLoadingNextChildren, (value) => (this._isLoadingNextChildren = value ?? false), '_observeIsLoadingNextChildren');
+		this.observe(
+			this._api?.isLoading,
+			(l) => {
+				if (l === false) {
+					this._initialLoadDone = true;
+				}
+			},
+			'_observeIsLoading',
+		);
+		this.observe(
+			this._api?.isLoadingPrevChildren,
+			(value) => (this._isLoadingPrevChildren = value ?? false),
+			'_observeIsLoadingPrevChildren',
+		);
+		this.observe(
+			this._api?.isLoadingNextChildren,
+			(value) => (this._isLoadingNextChildren = value ?? false),
+			'_observeIsLoadingNextChildren',
+		);
 
 		this.observe(
 			this._api?.targetPagination?.totalPrevItems,
@@ -180,23 +200,38 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 
 	#renderRootItems() {
 		// only show the root items directly if the tree root is hidden
-		if (this.hideTreeRoot === true) {
-			return html`
-				${this.#renderLoadPrevButton()}
-				${repeat(
-					this._rootItems,
-					(item, index) => item.name + '___' + index,
-					(item) => html`
-						<umb-tree-item
-							.entityType=${item.entityType}
-							.props=${{ hideActions: this.hideTreeItemActions, item, isMenu: this.isMenu }}></umb-tree-item>
-					`,
-				)}
-				${this.#renderLoadNextButton()}
-			`;
-		} else {
+		if (this.hideTreeRoot !== true) {
 			return nothing;
 		}
+
+		if (!this.isMenu && this._initialLoadDone) {
+			return html`<umb-view-loader></umb-view-loader>`;
+		}
+
+		// Not in a menu (sidebar) && done loading && has no items.
+		if (!this.isMenu && this._initialLoadDone && this._rootItems.length === 0) {
+			return this.#renderEmptyState();
+		}
+
+		return html`
+			${this.#renderLoadPrevButton()}
+			${repeat(
+				this._rootItems,
+				(item, index) => item.name + '___' + index,
+				(item) => html`
+					<umb-tree-item
+						.entityType=${item.entityType}
+						.props=${{ hideActions: this.hideTreeItemActions, item, isMenu: this.isMenu }}></umb-tree-item>
+				`,
+			)}
+			${this.#renderLoadNextButton()}
+		`;
+	}
+
+	#renderEmptyState() {
+		return html`<div id="empty-state">
+			<umb-localize key="content_listViewNoItems">There are no items to show in the list.</umb-localize>
+		</div>`;
 	}
 
 	#renderLoadPrevButton() {
@@ -216,6 +251,12 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 	static override styles = css`
 		#load-more {
 			width: 100%;
+		}
+
+		#empty-state {
+			display: block;
+			padding: var(--uui-size-space-4);
+			color: var(--uui-color-text-alt);
 		}
 	`;
 }
