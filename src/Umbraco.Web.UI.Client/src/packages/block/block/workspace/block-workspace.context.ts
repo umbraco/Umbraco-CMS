@@ -297,6 +297,8 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 
 		// Await one animation frame:
 		await new Promise((resolve) => requestAnimationFrame(() => resolve(true)));
+		// Check have we been destroyed while waiting for the animation frame? then back out:
+		if (!this.#blockManager) return;
 		const prefix = this.getIsNew() === true ? '#general_add' : '#general_edit';
 		const label = this.#labelRender.toString();
 		const title = `${prefix} ${label}`;
