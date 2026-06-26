@@ -1,3 +1,4 @@
+import '@umbraco-ui/uui';
 export * from '@umbraco-ui/uui';
 
 // UUI 2.0 removed the global ambient `Option` interface (its replacement is the exported
