@@ -42,7 +42,7 @@ export interface UmbracoPackage {
 	allowPublicAccess?: boolean;
 
 	/**
-	 * @title Decides if Umbraco automatically appends a per-package cache-busting token to this package's clean /App_Plugins JavaScript assets (.js/.mjs, in importmap and extensions)
+	 * @title Whether Umbraco automatically appends a cache-buster to this package's clean /App_Plugins assets (importmap and extensions)
 	 * @default true
 	 */
 	allowCacheBusting?: boolean;
