@@ -5,12 +5,15 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Manifest;
 using Umbraco.Cms.Infrastructure.Manifest;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Manifest;
 
 [TestFixture]
 public class PackageManifestServiceTests
 {
+    private static string ShortHash(string value) => value.GenerateHash()[..7];
+
     private static PackageManifestService CreateService(params PackageManifest[] manifests)
         => CreateService(string.Empty, manifests);
 
@@ -44,7 +47,7 @@ public class PackageManifestServiceTests
 
     private static IEnumerable<TestCaseData> SingleImportCases()
     {
-        yield return new TestCaseData("2.0.0", true, "/App_Plugins/Pkg/index.js", "/App_Plugins/Pkg/index.js?v=2.0.0")
+        yield return new TestCaseData("2.0.0", true, "/App_Plugins/Pkg/index.js", "/App_Plugins/Pkg/index.js?umb__rnd=2.0.0")
             .SetName("Stamps the version on a clean /App_Plugins import");
         yield return new TestCaseData("2.0.0", false, "/App_Plugins/Pkg/index.js", "/App_Plugins/Pkg/index.js")
             .SetName("Does not stamp when busting is disabled");
@@ -105,7 +108,7 @@ public class PackageManifestServiceTests
 
         var result = await service.GetPackageManifestImportmapAsync();
 
-        Assert.That(result.Scopes!["/App_Plugins/Pkg/"]["pkg"], Is.EqualTo("/App_Plugins/Pkg/scoped.js?v=2.0.0"));
+        Assert.That(result.Scopes!["/App_Plugins/Pkg/"]["pkg"], Is.EqualTo("/App_Plugins/Pkg/scoped.js?umb__rnd=2.0.0"));
     }
 
     [Test]
@@ -140,7 +143,7 @@ public class PackageManifestServiceTests
 
         var result = await service.GetPackageManifestImportmapAsync();
 
-        Assert.That(result.Imports["pkg"], Is.EqualTo("/App_Plugins/Pkg/index.js?v=2.0.0&umb__rnd=deploy-1"));
+        Assert.That(result.Imports["pkg"], Is.EqualTo($"/App_Plugins/Pkg/index.js?umb__rnd=2.0.0-{ShortHash("deploy-1")}"));
     }
 
     [Test]
@@ -152,6 +155,6 @@ public class PackageManifestServiceTests
 
         var result = await service.GetPackageManifestImportmapAsync();
 
-        Assert.That(result.Imports["pkg"], Is.EqualTo("/App_Plugins/Pkg/index.js?umb__rnd=deploy-1"));
+        Assert.That(result.Imports["pkg"], Is.EqualTo($"/App_Plugins/Pkg/index.js?umb__rnd={ShortHash("deploy-1")}"));
     }
 }

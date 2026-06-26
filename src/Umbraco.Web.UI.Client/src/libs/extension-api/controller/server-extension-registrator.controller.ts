@@ -67,13 +67,11 @@ export class UmbServerExtensionRegistrator extends UmbControllerBase {
 		}
 
 		const apiBaseUrl = serverContext?.getServerUrl();
-		const cacheBuster = serverContext?.getCacheBuster();
 
 		packages?.forEach((p) => {
-			// Cache-bust on the package's own /App_Plugins path, then prepend the server base url for relative paths.
-			const autoStamp = p.allowCacheBusting !== false;
+			// Append the server-computed cache-buster on the package's own /App_Plugins path, then prepend the base url.
 			const resolveAssetUrl = (url: string): string => {
-				const busted = appendCacheBust(url, p.version, cacheBuster, autoStamp);
+				const busted = appendCacheBust(url, p.cacheBuster);
 				return busted.startsWith('http') ? busted : `${apiBaseUrl}${busted}`;
 			};
 

@@ -25,10 +25,10 @@ public class ManifestResponseModel
     public string? Version { get; set; }
 
     /// <summary>
-    /// Gets or sets a value indicating whether the backoffice automatically appends a cache-buster to this package's
-    /// clean <c>/App_Plugins</c> JavaScript assets. Treated as <c>true</c> when not specified.
+    /// Gets or sets the cache-bust value the backoffice appends (as <c>umb__rnd</c>) to this package's clean
+    /// <c>/App_Plugins</c> assets. <c>null</c> when the package opts out or there is nothing to bust.
     /// </summary>
-    public bool? AllowCacheBusting { get; set; }
+    public string? CacheBuster { get; set; }
 
     /// <summary>
     /// Gets or sets the extensions associated with this manifest response.

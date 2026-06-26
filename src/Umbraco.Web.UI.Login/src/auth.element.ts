@@ -193,14 +193,6 @@ export default class UmbAuthElement extends UmbLitElement {
 	@property({ type: Boolean, attribute: 'allow-user-invite' })
 	allowUserInvite = false;
 
-	/**
-	 * An optional host-controlled cache-buster appended (as `umb__rnd`) to package `/App_Plugins` assets.
-	 *
-	 * @attr cachebuster
-	 */
-	@property({ attribute: 'cachebuster' })
-	cacheBuster?: string;
-
 	@property({ attribute: 'return-url' })
 	set returnPath(value: string) {
 		this.#authContext.returnPath = value;
@@ -252,7 +244,7 @@ export default class UmbAuthElement extends UmbLitElement {
 
 	async firstUpdated() {
 		// Bind the (slim) Backoffice controller to this element so that we can use utilities from the Backoffice app.
-		await new UmbSlimBackofficeController(this).register(this, this.cacheBuster);
+		await new UmbSlimBackofficeController(this).register(this);
 
 		// Register the main package for Umbraco.Auth
 		umbExtensionsRegistry.registerMany(extensions);

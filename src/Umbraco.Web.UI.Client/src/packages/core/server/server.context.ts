@@ -12,7 +12,6 @@ export class UmbServerContext extends UmbContextBase {
 	#serverUrl: string;
 	#backofficePath: string;
 	#serverConnection;
-	#cacheBuster?: string;
 
 	#serverInformation = new UmbObjectState<ServerInformationResponseModel | undefined>(undefined);
 	#serverInformationFetched = false;
@@ -43,7 +42,6 @@ export class UmbServerContext extends UmbContextBase {
 		this.#serverUrl = config.serverUrl;
 		this.#backofficePath = config.backofficePath;
 		this.#serverConnection = config.serverConnection;
-		this.#cacheBuster = config.cacheBuster;
 	}
 
 	async #fetchServerInformation() {
@@ -65,13 +63,5 @@ export class UmbServerContext extends UmbContextBase {
 
 	getServerConnection() {
 		return this.#serverConnection;
-	}
-
-	/**
-	 * Gets the optional host-controlled cache-buster applied to package `/App_Plugins` assets.
-	 * @returns The cache-buster value, or `undefined` when none is configured.
-	 */
-	getCacheBuster() {
-		return this.#cacheBuster;
 	}
 }

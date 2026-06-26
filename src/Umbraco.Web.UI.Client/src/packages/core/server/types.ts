@@ -13,8 +13,4 @@ export interface UmbServerContextConfig {
 	 * The server connection to use for the context.
 	 */
 	serverConnection: UmbServerConnection;
-	/**
-	 * An optional host-controlled cache-buster appended (as `umb__rnd`) to package `/App_Plugins` assets.
-	 */
-	cacheBuster?: string;
 }

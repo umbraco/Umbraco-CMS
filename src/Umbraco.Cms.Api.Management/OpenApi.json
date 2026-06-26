@@ -45659,8 +45659,8 @@
             "type": "string",
             "nullable": true
           },
-          "allowCacheBusting": {
-            "type": "boolean",
+          "cacheBuster": {
+            "type": "string",
             "nullable": true
           },
           "extensions": {

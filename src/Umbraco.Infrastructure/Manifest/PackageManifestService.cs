@@ -83,7 +83,7 @@ internal sealed class PackageManifestService : IPackageManifestService
     public async Task<PackageManifestImportmap> GetPackageManifestImportmapAsync()
     {
         IEnumerable<PackageManifest> packageManifests = await GetAllPackageManifestsAsync();
-        var cacheBuster = _pluginSettings.Cachebuster;
+        var hostCacheBuster = _pluginSettings.Cachebuster;
 
         // Last-wins on duplicate import/scope keys across packages (the old ToDictionary threw, letting one package break the whole importmap).
         var importDict = new Dictionary<string, string>();
@@ -91,7 +91,7 @@ internal sealed class PackageManifestService : IPackageManifestService
 
         foreach (PackageManifest manifest in packageManifests)
         {
-            AppendStampedImportmap(manifest, cacheBuster, importDict, scopesDict);
+            AppendStampedImportmap(manifest, hostCacheBuster, importDict, scopesDict);
         }
 
         return new PackageManifestImportmap
@@ -103,7 +103,7 @@ internal sealed class PackageManifestService : IPackageManifestService
 
     private static void AppendStampedImportmap(
         PackageManifest manifest,
-        string cacheBuster,
+        string hostCacheBuster,
         Dictionary<string, string> importDict,
         Dictionary<string, Dictionary<string, string>> scopesDict)
     {
@@ -113,12 +113,13 @@ internal sealed class PackageManifestService : IPackageManifestService
             return;
         }
 
-        var version = manifest.Version;
-        var autoStamp = manifest.AllowCacheBusting;
+        var cacheBuster = manifest.AllowCacheBusting
+            ? PackageManifestCacheBuster.ComputeCacheBuster(manifest.Version, hostCacheBuster)
+            : null;
 
         foreach ((var key, var value) in importmap.Imports)
         {
-            importDict[key] = PackageManifestCacheBuster.ApplyCacheBust(value, version, cacheBuster, autoStamp);
+            importDict[key] = PackageManifestCacheBuster.ApplyCacheBust(value, cacheBuster);
         }
 
         if (importmap.Scopes is null)
@@ -128,16 +129,16 @@ internal sealed class PackageManifestService : IPackageManifestService
 
         foreach ((var scopeKey, Dictionary<string, string> scopeImports) in importmap.Scopes)
         {
-            scopesDict[scopeKey] = StampScope(scopeImports, version, cacheBuster, autoStamp);
+            scopesDict[scopeKey] = StampScope(scopeImports, cacheBuster);
         }
     }
 
-    private static Dictionary<string, string> StampScope(Dictionary<string, string> scopeImports, string? version, string cacheBuster, bool autoStamp)
+    private static Dictionary<string, string> StampScope(Dictionary<string, string> scopeImports, string? cacheBuster)
     {
         var stampedScope = new Dictionary<string, string>();
         foreach ((var key, var value) in scopeImports)
         {
-            stampedScope[key] = PackageManifestCacheBuster.ApplyCacheBust(value, version, cacheBuster, autoStamp);
+            stampedScope[key] = PackageManifestCacheBuster.ApplyCacheBust(value, cacheBuster);
         }
 
         return stampedScope;

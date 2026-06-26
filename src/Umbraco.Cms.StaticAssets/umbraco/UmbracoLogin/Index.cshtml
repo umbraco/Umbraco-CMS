@@ -12,7 +12,6 @@
 @using Umbraco.Extensions
 @inject IOptions<GlobalSettings> GlobalSettings
 @inject IOptions<SecuritySettings> SecuritySettings
-@inject IOptions<UmbracoPluginSettings> PluginSettings
 @inject IEmailSender EmailSender
 @inject IHostingEnvironment HostingEnvironment
 @inject IProfilerHtml ProfilerHtml
@@ -85,7 +84,6 @@
 
 <umb-auth
     lang="@GlobalSettings.Value.DefaultUILanguage"
-    cachebuster="@PluginSettings.Value.Cachebuster"
     return-url="@backOfficePath"
     logo-image="@loginLogoImage"
     logo-image-alternative="@loginLogoImageAlternative"

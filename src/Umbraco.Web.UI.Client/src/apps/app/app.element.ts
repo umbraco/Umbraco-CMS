@@ -102,14 +102,6 @@ export class UmbAppElement extends UmbLitElement {
 	@property({ type: Boolean, attribute: 'keep-user-logged-in' })
 	keepUserLoggedIn = false;
 
-	/**
-	 * An optional host-controlled cache-buster appended (as `umb__rnd`) to package `/App_Plugins` assets, forcing
-	 * them to be re-fetched on demand regardless of each package's own version.
-	 * @attr
-	 */
-	@property({ type: String, attribute: 'cachebuster' })
-	cacheBuster?: string;
-
 	private _routes: UmbRoute[] = [
 		{
 			path: 'error',
@@ -261,7 +253,6 @@ export class UmbAppElement extends UmbLitElement {
 			backofficePath: this.backofficePath,
 			serverUrl: this.serverUrl,
 			serverConnection: this.#serverConnection,
-			cacheBuster: this.cacheBuster,
 		});
 
 		// Register Core extensions (this is specifically done here because we need these extensions to be registered before the application is initialized)

@@ -13,7 +13,6 @@
 @inject IProfilerHtml ProfilerHtml
 @inject IOptions<GlobalSettings> GlobalSettings
 @inject IOptions<SecuritySettings> SecuritySettings
-@inject IOptions<UmbracoPluginSettings> PluginSettings
 @inject Umbraco.Cms.Core.Security.ICspNonceService CspNonceService
 @addTagHelper Umbraco.Cms.Web.Common.TagHelpers.CspNonceTagHelper, Umbraco.Cms.Web.Common
 @{
@@ -62,7 +61,7 @@
         <p>Here are the <a href="https://www.enable-javascript.com/" target="_blank" rel="noopener" style="text-decoration: underline;">instructions how to enable JavaScript in your web browser</a>.</p>
     </div>
 </noscript>
-<umb-app lang="@GlobalSettings.Value.DefaultUILanguage" cachebuster="@PluginSettings.Value.Cachebuster" @(SecuritySettings.Value.KeepUserLoggedIn ? "keep-user-logged-in" : "")></umb-app>
+<umb-app lang="@GlobalSettings.Value.DefaultUILanguage" @(SecuritySettings.Value.KeepUserLoggedIn ? "keep-user-logged-in" : "")></umb-app>
 
 @if (isDebug)
 {

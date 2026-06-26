@@ -31,27 +31,23 @@ export class UmbSlimBackofficeController extends UmbControllerBase {
 		host.classList.add('uui-font');
 	}
 
-	async register(host: UmbElement, cacheBuster?: string) {
+	async register(host: UmbElement) {
 		// Get the server URL and backoffice path from the host.
 		const serverUrl = window.location.origin;
 		const serverConnection = new UmbServerConnection(host, serverUrl);
 
-		// Server context the registrator reads from; carries the host cache-buster. Built as a local so the
-		// published config type tolerates the extra `cacheBuster` field (consumed by the runtime backoffice).
-		const serverContextConfig = {
+		// Create the server context for the slim backoffice.
+		// This is needed by the UmbServerExtensionRegistrator to register the extensions.
+		new UmbServerContext(this, {
 			backofficePath: '/umbraco',
 			serverUrl,
-			serverConnection,
-			cacheBuster,
-		};
-		new UmbServerContext(this, serverContextConfig);
+			serverConnection: serverConnection,
+		});
 
 		// Register the public extensions for the slim backoffice.
-		await new UmbServerExtensionRegistrator(this, umbExtensionsRegistry)
-			.registerPublicExtensions()
-			.catch((error) => {
-				console.error(`Failed to register public extensions for the slim backoffice.`, error);
-			});
+		await new UmbServerExtensionRegistrator(this, umbExtensionsRegistry).registerPublicExtensions().catch((error) => {
+			console.error(`Failed to register public extensions for the slim backoffice.`, error);
+		});
 
 		new UmbAppEntryPointExtensionInitializer(host, umbExtensionsRegistry);
 	}
