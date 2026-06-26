@@ -196,7 +196,7 @@ test('can see notification when content is rollbacked', async ({umbracoApi, umbr
   await umbracoUi.content.clickInfoTab();
   await umbracoUi.content.clickRollbackButton();
   await umbracoUi.waitForTimeout(ConstantHelper.wait.medium); // Wait for the rollback items to load
-  await umbracoUi.content.clickLatestRollBackItem();
+  await umbracoUi.content.clickPreviousRollBackItem();
   await umbracoUi.content.clickRollbackContainerButton();
 
   // Assert

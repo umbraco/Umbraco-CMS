@@ -1544,7 +1544,7 @@ export class ContentUiHelper extends UiBaseLocators {
     await this.click(this.rollbackContainerBtn);
   }
 
-  async clickLatestRollBackItem() {
+  async clickPreviousRollBackItem() {
     // Wait for the modal's async pre-selection of the current version, otherwise it clobbers our pick.
     await expect(this.activeRollbackItem).toBeVisible();
     const previousVersion = this.rollbackItem.filter({hasNotText: "Current published version"}).last();
