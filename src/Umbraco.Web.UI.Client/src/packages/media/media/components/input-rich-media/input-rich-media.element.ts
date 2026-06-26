@@ -1,7 +1,9 @@
 import { UMB_IMAGE_CROPPER_EDITOR_MODAL } from '../../modals/index.js';
 import type { UmbMediaItemModel, UmbCropModel, UmbMediaPickerPropertyValueEntry } from '../../types.js';
 import { UMB_MEDIA_ITEM_REPOSITORY_ALIAS } from '../../repository/constants.js';
+import { UmbMediaUrlRepository } from '../../url/index.js';
 import { UmbMediaPickerInputContext } from '../input-media/input-media.context.js';
+import { UmbTemporaryFileConfigRepository } from '@umbraco-cms/backoffice/temporary-file';
 import { UmbFileDropzoneItemStatus } from '@umbraco-cms/backoffice/dropzone';
 import type { UmbDropzoneChangeEvent } from '@umbraco-cms/backoffice/dropzone';
 import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
@@ -197,6 +199,10 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 
 	readonly #itemManager = new UmbRepositoryItemsManager<UmbMediaItemModel>(this, UMB_MEDIA_ITEM_REPOSITORY_ALIAS);
 
+	readonly #urlRepository = new UmbMediaUrlRepository(this);
+	readonly #temporaryFileConfig = new UmbTemporaryFileConfigRepository(this);
+	#imageFileTypes?: Array<string>;
+
 	readonly #pickerInputContext = new UmbMediaPickerInputContext(this);
 	readonly #interactionMemoryManager = new UmbEntityInputInteractionMemoryManager(
 		this,
@@ -209,6 +215,8 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 		this.observe(this.#itemManager.items, () => {
 			this.#populateCards();
 		});
+
+		this.#observeImageFileTypes();
 
 		new UmbModalRouteRegistrationController(this, UMB_IMAGE_CROPPER_EDITOR_MODAL)
 			.addAdditionalPath(':key')
@@ -371,11 +379,32 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 		this.dispatchEvent(new UmbChangeEvent());
 
 		if (uniques.length === 1 && (this.altTextMode === 'altText' || this.enableAltTextPerCrop)) {
-			this.#autoOpenCropEditor(additions[0].key);
+			this.#autoOpenCropEditor(additions[0].key, additions[0].mediaKey);
 		}
 	}
 
-	async #autoOpenCropEditor(key: string) {
+	async #observeImageFileTypes() {
+		await this.#temporaryFileConfig.initialized;
+		this.observe(
+			this.#temporaryFileConfig.part('imageFileTypes'),
+			(imageFileTypes) => (this.#imageFileTypes = imageFileTypes),
+			'_observeImageFileTypes',
+		);
+	}
+
+	// The crop and alt text controls only apply to images, so non-image media (e.g. PDFs) must not auto-open the editor.
+	async #isImage(mediaKey: string): Promise<boolean> {
+		const { data } = await this.#urlRepository.requestItems([mediaKey]);
+		const item = data?.[0];
+		if (!item?.url || !item.extension) return false;
+
+		await this.#temporaryFileConfig.initialized;
+		return this.#imageFileTypes?.includes(item.extension) ?? false;
+	}
+
+	async #autoOpenCropEditor(key: string, mediaKey: string) {
+		if (!(await this.#isImage(mediaKey))) return;
+
 		await this.updateComplete;
 		const href = this._routeBuilder?.({ key });
 		if (!href) return;
