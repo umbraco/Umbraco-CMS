@@ -46,6 +46,30 @@ internal sealed class DeferredSearchReindexServiceElementTests : BlockEditorWith
         Assert.Contains(content.Id, documentIds.ToArray());
     }
 
+    [Test]
+    public async Task Does_Not_Find_Document_Referencing_Element_Via_Generic_Element_Relation()
+    {
+        var elementType = await CreateElementType(ContentVariation.Nothing);
+        var blockListDataType = await CreateBlockListDataType(elementType);
+        var contentType = await CreateContentType(ContentVariation.Nothing, blockListDataType);
+
+        // A published element, and a plain document with NO external block content.
+        var elementKey = await CreateAndPublishInvariantReusableElement(elementType.Key);
+        var document = new ContentBuilder().WithContentType(contentType).WithName("Picker page").Build();
+        ContentService.Save(document);
+        PublishContent(document, ["*"]);
+
+        var elementId = ElementId(elementKey);
+
+        // Simulate an element-picker reference: a generic umbElement relation document(parent) -> element(child).
+        var relationService = GetRequiredService<IRelationService>();
+        relationService.Relate(document.Id, elementId, Constants.Conventions.RelationTypes.RelatedElementAlias);
+
+        var documentIds = Service.FindDocumentIdsReferencingElements([elementId]);
+
+        Assert.IsFalse(documentIds.Contains(document.Id), "Documents referencing an element only via the generic umbElement relation (element picker) must not be reindexed.");
+    }
+
     private IContent CreateDocumentEmbeddingElement(IContentType contentType, Guid sharedElementKey)
     {
         var blockListValue = new BlockListValue

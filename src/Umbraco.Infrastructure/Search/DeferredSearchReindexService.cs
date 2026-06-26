@@ -337,16 +337,15 @@ internal sealed class DeferredSearchReindexService : IDeferredSearchReindexServi
                 continue;
             }
 
-            foreach (IUmbracoEntity documentParent in GetParentEntities(elementId, UmbracoObjectTypes.Document))
+            foreach (IEntitySlim parent in GetParentEntities(elementId).Cast<IEntitySlim>())
             {
-                documentIds.Add(documentParent.Id);
-            }
-
-            foreach (IUmbracoEntity elementParent in GetParentEntities(elementId, UmbracoObjectTypes.Element))
-            {
-                if (visitedElementIds.Contains(elementParent.Id) is false)
+                if (parent.NodeObjectType == Constants.ObjectTypes.Document)
                 {
-                    queue.Enqueue(elementParent.Id);
+                    documentIds.Add(parent.Id);
+                }
+                else if (parent.NodeObjectType == Constants.ObjectTypes.Element && visitedElementIds.Contains(parent.Id) is false)
+                {
+                    queue.Enqueue(parent.Id);
                 }
             }
         }
@@ -354,7 +353,7 @@ internal sealed class DeferredSearchReindexService : IDeferredSearchReindexServi
         return documentIds;
     }
 
-    private IEnumerable<IUmbracoEntity> GetParentEntities(int childId, UmbracoObjectTypes objectType)
+    private IEnumerable<IUmbracoEntity> GetParentEntities(int childId)
     {
         var results = new List<IUmbracoEntity>();
         var pageSize = _indexingSettings.CurrentValue.BatchSize;
@@ -363,7 +362,14 @@ internal sealed class DeferredSearchReindexService : IDeferredSearchReindexServi
         while (page * pageSize < total)
         {
             IUmbracoEntity[] items = _relationService
-                .GetPagedParentEntitiesByChildId(childId, page++, pageSize, out total, objectType)
+                .GetPagedParentEntitiesByChildId(
+                    childId,
+                    page++,
+                    pageSize,
+                    out total,
+                    [Constants.Conventions.RelationTypes.RelatedExternalBlockElementAlias],
+                    UmbracoObjectTypes.Document,
+                    UmbracoObjectTypes.Element)
                 .ToArray();
             results.AddRange(items);
         }
