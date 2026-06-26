@@ -41,9 +41,9 @@ for (const [subpath, target] of Object.entries(clientPkg.exports ?? {})) {
 
 const tsConfig = {
 	compilerOptions: {
-		target: 'ES2024',
+		target: 'ES2022',
 		module: 'ESNext',
-		lib: ['ES2024', 'DOM', 'DOM.Iterable'],
+		lib: ['ES2022', 'DOM', 'DOM.Iterable'],
 		experimentalDecorators: true,
 		useDefineForClassFields: false,
 		moduleResolution: 'bundler',
