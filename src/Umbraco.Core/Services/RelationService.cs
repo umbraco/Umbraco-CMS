@@ -433,6 +433,23 @@ public class RelationService : RepositoryService, IRelationService
     }
 
     /// <inheritdoc />
+    public IEnumerable<IUmbracoEntity> GetPagedParentEntitiesByChildId(int id, long pageIndex, int pageSize, out long totalChildren, IEnumerable<string> relationTypeAliases, params UmbracoObjectTypes[] entityTypes)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+
+        ICollection<string> aliases = relationTypeAliases as ICollection<string> ?? relationTypeAliases.ToArray();
+        int[] relationTypeIds = aliases.Count == 0
+            ? []
+            : _relationTypeRepository.GetMany(Array.Empty<int>())
+                .Where(relationType => aliases.Contains(relationType.Alias))
+                .Select(relationType => relationType.Id)
+                .ToArray();
+
+        return _relationRepository.GetPagedParentEntitiesByChildId(
+            id, pageIndex, pageSize, out totalChildren, relationTypeIds, entityTypes.Select(x => x.GetGuid()).ToArray());
+    }
+
+    /// <inheritdoc />
     public IEnumerable<IUmbracoEntity> GetPagedChildEntitiesByParentId(int id, long pageIndex, int pageSize, out long totalChildren, params UmbracoObjectTypes[] entityTypes)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);

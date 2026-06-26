@@ -243,6 +243,18 @@ public interface IRelationService : IService
     IEnumerable<IUmbracoEntity> GetPagedParentEntitiesByChildId(int id, long pageIndex, int pageSize, out long totalChildren, params UmbracoObjectTypes[] entityTypes);
 
     /// <summary>
+    ///     Returns paged parent entities for a related child id, filtered by relation type alias.
+    /// </summary>
+    /// <param name="id">The child entity id.</param>
+    /// <param name="pageIndex">The page index.</param>
+    /// <param name="pageSize">The page size.</param>
+    /// <param name="totalChildren">Returns the total number of records.</param>
+    /// <param name="relationTypeAliases">Relation type aliases to filter by. Pass an empty sequence to include all relation types.</param>
+    /// <param name="entityTypes">The entity types to filter by.</param>
+    /// <returns>An enumerable list of <see cref="IUmbracoEntity" />.</returns>
+    IEnumerable<IUmbracoEntity> GetPagedParentEntitiesByChildId(int id, long pageIndex, int pageSize, out long totalChildren, IEnumerable<string> relationTypeAliases, params UmbracoObjectTypes[] entityTypes);
+
+    /// <summary>
     ///     Returns paged child entities for a related parent id
     /// </summary>
     /// <param name="id"></param>
