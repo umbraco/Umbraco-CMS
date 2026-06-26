@@ -6,6 +6,20 @@
 	--umb-card-large-min-width: 250px;
 }
 
+/*
+ * UUI 2.0 increased the default corner rounding: --uui-border-radius went from
+ * 3px (--uui-size-1) to 9px (--uui-size-3). Reset it to the previous value so the
+ * v17 backoffice keeps its established, subtler look. Every UUI component derives
+ * its rounding from this single token, so this one override covers them all.
+ *
+ * The doubled :root selector raises specificity above the plain :root rule in the
+ * UUI theme files (light/dark/high-contrast.css), which are linked after this
+ * stylesheet and, for dark/high-contrast, injected dynamically by the theme system.
+ */
+:root:root {
+	--uui-border-radius: var(--uui-size-1);
+}
+
 @font-face {
 	font-display: block;
 	font-family: codicon;
