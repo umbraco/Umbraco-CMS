@@ -1,11 +1,8 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Linq;
-using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Extensions;
 
@@ -17,11 +14,7 @@ public class ContentExtensionsTests
     [Test]
     public void DirtyProperty_Reset_Clears_SavedPublishedState()
     {
-        var contentTypeService = Mock.Of<IContentTypeService>();
         var contentType = ContentTypeBuilder.CreateTextPageContentType();
-        Mock.Get(contentTypeService).As<IContentTypeBaseService>().Setup(x => x.Get(It.IsAny<int>()))
-            .Returns(contentType);
-
         var content = ContentBuilder.CreateTextpageContent(contentType, "Textpage", -1);
 
         content.PublishedState = PublishedState.Publishing;
@@ -34,11 +27,7 @@ public class ContentExtensionsTests
     [Test]
     public void DirtyProperty_OnlyIfActuallyChanged_Content()
     {
-        var contentTypeService = Mock.Of<IContentTypeService>();
         var contentType = ContentTypeBuilder.CreateTextPageContentType();
-        Mock.Get(contentTypeService).As<IContentTypeBaseService>().Setup(x => x.Get(It.IsAny<int>()))
-            .Returns(contentType);
-
         var content = ContentBuilder.CreateTextpageContent(contentType, "Textpage", -1);
 
         // if you assign a content property with its value it is not dirty
@@ -59,11 +48,7 @@ public class ContentExtensionsTests
     [Test]
     public void DirtyProperty_OnlyIfActuallyChanged_User()
     {
-        var contentTypeService = Mock.Of<IContentTypeService>();
         var contentType = ContentTypeBuilder.CreateTextPageContentType();
-        Mock.Get(contentTypeService).As<IContentTypeBaseService>().Setup(x => x.Get(It.IsAny<int>()))
-            .Returns(contentType);
-
         var content = ContentBuilder.CreateTextpageContent(contentType, "Textpage", -1);
         var prop = content.Properties.First();
 
@@ -86,11 +71,7 @@ public class ContentExtensionsTests
     [Test]
     public void DirtyProperty_UpdateDate()
     {
-        var contentTypeService = Mock.Of<IContentTypeService>();
         var contentType = ContentTypeBuilder.CreateTextPageContentType();
-        Mock.Get(contentTypeService).As<IContentTypeBaseService>().Setup(x => x.Get(It.IsAny<int>()))
-            .Returns(contentType);
-
         var content = ContentBuilder.CreateTextpageContent(contentType, "Textpage", -1);
         var prop = content.Properties.First();
 
@@ -113,11 +94,7 @@ public class ContentExtensionsTests
     [Test]
     public void DirtyProperty_WasDirty_ContentProperty()
     {
-        var contentTypeService = Mock.Of<IContentTypeService>();
         var contentType = ContentTypeBuilder.CreateTextPageContentType();
-        Mock.Get(contentTypeService).As<IContentTypeBaseService>().Setup(x => x.Get(It.IsAny<int>()))
-            .Returns(contentType);
-
         var content = ContentBuilder.CreateTextpageContent(contentType, "Textpage", -1);
         content.ResetDirtyProperties(false);
         Assert.IsFalse(content.IsDirty());
@@ -144,11 +121,7 @@ public class ContentExtensionsTests
     [Test]
     public void DirtyProperty_WasDirty_ContentSortOrder()
     {
-        var contentTypeService = Mock.Of<IContentTypeService>();
         var contentType = ContentTypeBuilder.CreateTextPageContentType();
-        Mock.Get(contentTypeService).As<IContentTypeBaseService>().Setup(x => x.Get(It.IsAny<int>()))
-            .Returns(contentType);
-
         var content = ContentBuilder.CreateTextpageContent(contentType, "Textpage", -1);
         content.ResetDirtyProperties(false);
         Assert.IsFalse(content.IsDirty());
@@ -175,11 +148,7 @@ public class ContentExtensionsTests
     [Test]
     public void DirtyProperty_WasDirty_UserProperty()
     {
-        var contentTypeService = Mock.Of<IContentTypeService>();
         var contentType = ContentTypeBuilder.CreateTextPageContentType();
-        Mock.Get(contentTypeService).As<IContentTypeBaseService>().Setup(x => x.Get(It.IsAny<int>()))
-            .Returns(contentType);
-
         var content = ContentBuilder.CreateTextpageContent(contentType, "Textpage", -1);
         var prop = content.Properties.First();
         content.ResetDirtyProperties(false);
