@@ -90,30 +90,10 @@ public class PackageManifestCacheBusterTests
     }
 
     [Test]
-    public void ApplyCacheBust_ResolvesCacheBusterToken_ToVersion()
+    public void ApplyCacheBust_LeavesCacheBusterTokenUntouched()
     {
+        // The %CACHE_BUSTER% token is resolved server-side (it sits in an existing query, so it is never auto-stamped).
         const string url = "/App_Plugins/MyPkg/index.js?cb=%CACHE_BUSTER%";
-        Assert.That(
-            PackageManifestCacheBuster.ApplyCacheBust(url, "1.2.3", "seed", autoStamp: true),
-            Is.EqualTo("/App_Plugins/MyPkg/index.js?cb=1.2.3"));
-    }
-
-    [Test]
-    public void ApplyCacheBust_ResolvesCacheBusterToken_ToCacheBuster_WhenNoVersion()
-    {
-        const string url = "/App_Plugins/MyPkg/index.js?cb=%CACHE_BUSTER%";
-        Assert.That(
-            PackageManifestCacheBuster.ApplyCacheBust(url, null, "seed", autoStamp: true),
-            Is.EqualTo("/App_Plugins/MyPkg/index.js?cb=seed"));
-    }
-
-    [Test]
-    public void ApplyCacheBust_ResolvesCacheBusterToken_OnAnyHost_RegardlessOfAutoStamp()
-    {
-        // The token is an explicit opt-in, so it resolves even on a non-/App_Plugins URL and when auto-stamping is off.
-        const string url = "https://cdn.example.com/pkg/index.js?cb=%CACHE_BUSTER%";
-        Assert.That(
-            PackageManifestCacheBuster.ApplyCacheBust(url, "1.2.3", "seed", autoStamp: false),
-            Is.EqualTo("https://cdn.example.com/pkg/index.js?cb=1.2.3"));
+        Assert.That(PackageManifestCacheBuster.ApplyCacheBust(url, "1.2.3", "seed", autoStamp: true), Is.EqualTo(url));
     }
 }

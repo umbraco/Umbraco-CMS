@@ -1,15 +1,9 @@
 const APP_PLUGINS_PREFIX = '/app_plugins/';
-const CACHE_BUSTER_TOKEN = '%CACHE_BUSTER%';
 
 /**
- * Applies cache-busting to a single package asset URL.
- *
- * - An explicit `%CACHE_BUSTER%` token is always resolved (wherever it appears) to the package `version`, falling
- *   back to the host `cacheBuster` — that is the author's deliberate opt-in.
- * - Otherwise, when `autoStamp` is `true`, a clean `/App_Plugins`-rooted URL gets
- *   `?v=<version>&umb__rnd=<cacheBuster>` appended (only the values that are present).
- * - Everything else — the backoffice core, CDNs, protocol-relative URLs, bare module specifiers, and URLs that
- *   already carry a query string — is returned unchanged.
+ * When `autoStamp` is on, appends `?v=<version>&umb__rnd=<cacheBuster>` (only the values present) to a clean
+ * `/App_Plugins` URL. Existing-query, CDN, bare-specifier and backoffice-core URLs are untouched. (The
+ * `%CACHE_BUSTER%` token is resolved server-side, so it never reaches here.)
  */
 export function appendCacheBust(
 	url: string,
@@ -17,27 +11,12 @@ export function appendCacheBust(
 	cacheBuster: string | null | undefined,
 	autoStamp: boolean,
 ): string {
-	if (!url) {
+	if (!url || !autoStamp) {
 		return url;
 	}
 
-	// The explicit %CACHE_BUSTER% opt-in: resolve it wherever the author placed it, regardless of autoStamp.
-	if (url.includes(CACHE_BUSTER_TOKEN)) {
-		return url.replaceAll(CACHE_BUSTER_TOKEN, version || cacheBuster || '');
-	}
-
-	if (!autoStamp) {
-		return url;
-	}
-
-	// Automatic stamping only ever touches the package's own /App_Plugins assets (case-insensitive). This also
-	// excludes the backoffice core, CDNs, protocol-relative URLs, bare specifiers and relative paths.
-	if (!url.toLowerCase().startsWith(APP_PLUGINS_PREFIX)) {
-		return url;
-	}
-
-	// The author already manages this URL's query — leave it alone.
-	if (url.includes('?')) {
+	// Only auto-stamp the package's own /App_Plugins assets, and never a URL that already manages its own query.
+	if (!url.toLowerCase().startsWith(APP_PLUGINS_PREFIX) || url.includes('?')) {
 		return url;
 	}
 

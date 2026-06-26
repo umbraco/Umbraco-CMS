@@ -11,12 +11,10 @@ import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 // TODO: consider if this can be replaced by the new extension controllers
 export class UmbServerExtensionRegistrator extends UmbControllerBase {
 	#extensionRegistry: UmbBackofficeExtensionRegistry;
-	#cacheBuster?: string;
 
-	constructor(host: UmbControllerHost, extensionRegistry: UmbBackofficeExtensionRegistry, cacheBuster?: string) {
+	constructor(host: UmbControllerHost, extensionRegistry: UmbBackofficeExtensionRegistry) {
 		super(host, UmbServerExtensionRegistrator.name);
 		this.#extensionRegistry = extensionRegistry;
-		this.#cacheBuster = cacheBuster;
 	}
 
 	/**
@@ -69,15 +67,13 @@ export class UmbServerExtensionRegistrator extends UmbControllerBase {
 		}
 
 		const apiBaseUrl = serverContext?.getServerUrl();
+		const cacheBuster = serverContext?.getCacheBuster();
 
 		packages?.forEach((p) => {
-			// Apply per-package cache-busting before prepending the server base url, so the rules match on the
-			// package's own clean /App_Plugins path. allowCacheBusting (default true) only governs the automatic
-			// stamping; an explicit %CACHE_BUSTER% token always resolves.
+			// Cache-bust on the package's own /App_Plugins path, then prepend the server base url for relative paths.
 			const autoStamp = p.allowCacheBusting !== false;
-			// Cache-bust the package's own /App_Plugins asset, then prepend the server base url for relative paths.
 			const resolveAssetUrl = (url: string): string => {
-				const busted = appendCacheBust(url, p.version, this.#cacheBuster, autoStamp);
+				const busted = appendCacheBust(url, p.version, cacheBuster, autoStamp);
 				return busted.startsWith('http') ? busted : `${apiBaseUrl}${busted}`;
 			};
 

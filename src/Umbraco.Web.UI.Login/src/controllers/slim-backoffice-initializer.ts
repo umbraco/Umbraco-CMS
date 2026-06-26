@@ -4,7 +4,6 @@ import {
 	umbExtensionsRegistry,
 } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbElement } from '@umbraco-cms/backoffice/element-api';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UUIIconRegistryEssential } from '@umbraco-cms/backoffice/external/uui';
 import { UmbServerConnection, UmbServerContext } from '@umbraco-cms/backoffice/server';
@@ -13,17 +12,6 @@ import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 // We import what we need from the Backoffice app.
 // In the future the login screen app will be a part of the Backoffice app, and we will not need to import these.
 import '@umbraco-cms/backoffice/localization';
-
-// The third `cacheBuster` argument ships with the runtime backoffice (resolved via the importmap). This app
-// type-checks against the published @umbraco-cms/backoffice, whose types may lag, so reference the constructor
-// through a signature that includes the parameter.
-// TODO: drop this cast and the alias once the login app consumes the backoffice by source — the local
-// UmbServerExtensionRegistrator then declares the cacheBuster parameter directly.
-type UmbServerExtensionRegistratorCtor = new (
-	host: UmbControllerHost,
-	extensionRegistry: typeof umbExtensionsRegistry,
-	cacheBuster?: string,
-) => UmbServerExtensionRegistrator;
 
 /**
  * This is the initializer for the slim backoffice.
@@ -48,16 +36,18 @@ export class UmbSlimBackofficeController extends UmbControllerBase {
 		const serverUrl = window.location.origin;
 		const serverConnection = new UmbServerConnection(host, serverUrl);
 
-		// Create the server context for the slim backoffice.
-		// This is needed by the UmbServerExtensionRegistrator to register the extensions.
-		new UmbServerContext(this, {
+		// Server context the registrator reads from; carries the host cache-buster. Built as a local so the
+		// published config type tolerates the extra `cacheBuster` field (consumed by the runtime backoffice).
+		const serverContextConfig = {
 			backofficePath: '/umbraco',
 			serverUrl,
-			serverConnection: serverConnection,
-		});
+			serverConnection,
+			cacheBuster,
+		};
+		new UmbServerContext(this, serverContextConfig);
 
 		// Register the public extensions for the slim backoffice.
-		await new (UmbServerExtensionRegistrator as UmbServerExtensionRegistratorCtor)(this, umbExtensionsRegistry, cacheBuster)
+		await new UmbServerExtensionRegistrator(this, umbExtensionsRegistry)
 			.registerPublicExtensions()
 			.catch((error) => {
 				console.error(`Failed to register public extensions for the slim backoffice.`, error);

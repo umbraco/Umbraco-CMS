@@ -50,8 +50,8 @@ public class PackageManifestServiceTests
             .SetName("Does not stamp when busting is disabled");
         yield return new TestCaseData((string?)null, true, "/App_Plugins/Pkg/index.js", "/App_Plugins/Pkg/index.js")
             .SetName("Leaves a clean import untouched when there is no version and no cache-buster");
-        yield return new TestCaseData("2.0.0", true, "/App_Plugins/Pkg/index.js?v=%CACHE_BUSTER%", "/App_Plugins/Pkg/index.js?v=2.0.0")
-            .SetName("Resolves an explicit %CACHE_BUSTER% token to the version");
+        yield return new TestCaseData("2.0.0", true, "/App_Plugins/Pkg/index.js?v=%CACHE_BUSTER%", "/App_Plugins/Pkg/index.js?v=%CACHE_BUSTER%")
+            .SetName("Leaves a %CACHE_BUSTER% token untouched (resolved server-side, and the URL already has a query)");
     }
 
     [TestCaseSource(nameof(SingleImportCases))]
@@ -109,7 +109,7 @@ public class PackageManifestServiceTests
     }
 
     [Test]
-    public async Task GetPackageManifestImportmapAsync_WhenBustingDisabled_ResolvesTokenToVersionButDoesNotStamp()
+    public async Task GetPackageManifestImportmapAsync_WhenBustingDisabled_LeavesImportsUntouched()
     {
         var service = CreateService(Manifest(
             "Pkg",
@@ -125,9 +125,8 @@ public class PackageManifestServiceTests
 
         Assert.Multiple(() =>
         {
-            // Disabling busting turns off auto-stamping only; an explicit token still resolves to the package version.
-            Assert.That(result.Imports["tokenised"], Is.EqualTo("/App_Plugins/Pkg/index.js?v=2.0.0"));
-            // The clean path is left untouched because automatic stamping is off for this package.
+            // The %CACHE_BUSTER% token is resolved server-side, not here; the clean path is not auto-stamped (busting off).
+            Assert.That(result.Imports["tokenised"], Is.EqualTo("/App_Plugins/Pkg/index.js?v=%CACHE_BUSTER%"));
             Assert.That(result.Imports["clean"], Is.EqualTo("/App_Plugins/Pkg/clean.js"));
         });
     }

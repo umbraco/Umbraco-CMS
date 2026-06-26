@@ -261,13 +261,14 @@ export class UmbAppElement extends UmbLitElement {
 			backofficePath: this.backofficePath,
 			serverUrl: this.serverUrl,
 			serverConnection: this.#serverConnection,
+			cacheBuster: this.cacheBuster,
 		});
 
 		// Register Core extensions (this is specifically done here because we need these extensions to be registered before the application is initialized)
 		onInit(this, umbExtensionsRegistry);
 
 		// Register public extensions (login extensions)
-		await new UmbServerExtensionRegistrator(this, umbExtensionsRegistry, this.cacheBuster).registerPublicExtensions();
+		await new UmbServerExtensionRegistrator(this, umbExtensionsRegistry).registerPublicExtensions();
 		const entryPointInitializer = new UmbAppEntryPointExtensionInitializer(this, umbExtensionsRegistry);
 
 		// Try to initialise the auth flow and get the runtime status
@@ -419,7 +420,7 @@ export class UmbAppElement extends UmbLitElement {
 			const results = await Promise.allSettled([
 				this.observe(this.#bundleInitializer?.loaded).asPromise(),
 				this.#registerExtensions(),
-				new UmbServerExtensionRegistrator(this, umbExtensionsRegistry, this.cacheBuster).registerPrivateExtensions(),
+				new UmbServerExtensionRegistrator(this, umbExtensionsRegistry).registerPrivateExtensions(),
 			]);
 
 			const result = results.reduce((acc, curr) => acc && curr.status === 'fulfilled', true);

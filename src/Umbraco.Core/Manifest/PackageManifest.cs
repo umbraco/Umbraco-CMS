@@ -26,12 +26,9 @@ public class PackageManifest
     public bool AllowPublicAccess { get; set; }
 
     /// <summary>
-    ///     Gets or sets a value indicating whether Umbraco <em>automatically</em> appends a cache-buster
-    ///     (<c>?v=&lt;version&gt;&amp;umb__rnd=&lt;host cache-buster&gt;</c>) to this package's clean
-    ///     <c>/App_Plugins</c> JavaScript URLs, in both its importmap (server-side) and its registered extensions
-    ///     (client-side). <c>true</c> by default; set to <c>false</c> to opt out of the automatic stamping. URLs that
-    ///     already carry a query string are always left untouched. This setting controls only the automatic stamping —
-    ///     an explicit <c>%CACHE_BUSTER%</c> token authored into a URL always resolves regardless of this value.
+    ///     Gets or sets a value indicating whether Umbraco automatically appends a cache-buster to this package's clean
+    ///     <c>/App_Plugins</c> URLs (importmap and extensions). <c>true</c> by default; set <c>false</c> to opt out of the
+    ///     automatic stamping only — an explicit <c>%CACHE_BUSTER%</c> token still resolves regardless.
     /// </summary>
     public bool AllowCacheBusting { get; set; } = true;
 

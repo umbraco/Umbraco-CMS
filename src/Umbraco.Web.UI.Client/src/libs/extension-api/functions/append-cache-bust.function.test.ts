@@ -66,21 +66,8 @@ describe('appendCacheBust', () => {
 		expect(appendCacheBust(url, '1.2.3', 'seed', false)).to.equal(url);
 	});
 
-	it('resolves an explicit %CACHE_BUSTER% token to the version', () => {
-		expect(appendCacheBust('/App_Plugins/MyPkg/index.js?cb=%CACHE_BUSTER%', '1.2.3', 'seed', true)).to.equal(
-			'/App_Plugins/MyPkg/index.js?cb=1.2.3',
-		);
-	});
-
-	it('resolves an explicit %CACHE_BUSTER% token to the cache-buster when there is no version', () => {
-		expect(appendCacheBust('/App_Plugins/MyPkg/index.js?cb=%CACHE_BUSTER%', undefined, 'seed', true)).to.equal(
-			'/App_Plugins/MyPkg/index.js?cb=seed',
-		);
-	});
-
-	it('resolves an explicit %CACHE_BUSTER% token on any host, regardless of autoStamp', () => {
-		expect(appendCacheBust('https://cdn.example.com/pkg/index.js?cb=%CACHE_BUSTER%', '1.2.3', 'seed', false)).to.equal(
-			'https://cdn.example.com/pkg/index.js?cb=1.2.3',
-		);
+	it('leaves a %CACHE_BUSTER% token untouched (resolved server-side, and the URL already has a query)', () => {
+		const url = '/App_Plugins/MyPkg/index.js?cb=%CACHE_BUSTER%';
+		expect(appendCacheBust(url, '1.2.3', 'seed', true)).to.equal(url);
 	});
 });

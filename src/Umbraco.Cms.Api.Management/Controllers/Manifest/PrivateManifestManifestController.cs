@@ -21,6 +21,7 @@ public class PrivateManifestManifestController : ManifestControllerBase
 {
     private readonly IPackageManifestService _packageManifestService;
     private readonly IUmbracoMapper _umbracoMapper;
+    private readonly IBackOfficePathGenerator _backOfficePathGenerator;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PrivateManifestManifestController"/> class.
@@ -50,6 +51,7 @@ public class PrivateManifestManifestController : ManifestControllerBase
     {
         _packageManifestService = packageManifestService;
         _umbracoMapper = umbracoMapper;
+        _backOfficePathGenerator = backOfficePathGenerator;
     }
 
     // NOTE: this endpoint is deliberately created as non-paginated to ensure the fastest possible client initialization
@@ -69,6 +71,7 @@ public class PrivateManifestManifestController : ManifestControllerBase
     {
         IEnumerable<PackageManifest> packageManifests = await _packageManifestService.GetPrivatePackageManifestsAsync();
         IEnumerable<ManifestResponseModel> models = _umbracoMapper.MapEnumerable<PackageManifest, ManifestResponseModel>(packageManifests);
+        ReplaceCacheBusterTokens(models, _backOfficePathGenerator.BackOfficeCacheBustHash);
         return Ok(models);
     }
 }
