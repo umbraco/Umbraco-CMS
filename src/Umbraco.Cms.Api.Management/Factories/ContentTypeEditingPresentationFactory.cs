@@ -1,4 +1,6 @@
+using System.Globalization;
 using Umbraco.Cms.Api.Management.ViewModels;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
@@ -24,10 +26,10 @@ internal abstract class ContentTypeEditingPresentationFactory<TContentType>
     private IEnumerable<EntityContainer> GetContainersForType(TContentType contentType)
     {
         IEnumerable<EntityContainer> allContainers = _containerService.GetAllAsync().GetAwaiter().GetResult();
-        Dictionary<int, EntityContainer> containerById = allContainers.ToDictionary(c => c.Id);
+        var containerById = allContainers.ToDictionary(c => c.Id);
         return contentType.Path
-            .Split(',', StringSplitOptions.RemoveEmptyEntries)
-            .Select(s => int.TryParse(s, out int id) ? id : 0)
+            .Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries)
+            .Select(s => int.TryParse(s, NumberStyles.Integer, CultureInfo.InvariantCulture, out int id) ? id : int.MinValue)
             .Where(id => id > 0 && containerById.ContainsKey(id))
             .Select(id => containerById[id]);
     }
