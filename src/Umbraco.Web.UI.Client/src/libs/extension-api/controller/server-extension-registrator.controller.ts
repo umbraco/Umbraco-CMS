@@ -20,7 +20,7 @@ export class UmbServerExtensionRegistrator extends UmbControllerBase {
 	/**
 	 * Registers all extensions from the server.
 	 * This is used to register all extensions that are available to the user (including private extensions).
-	 * @remark Users must have the BACKOFFICE_ACCESS permission to access this method.
+	 * @remarks Users must have the BACKOFFICE_ACCESS permission to access this method.
 	 */
 	public async registerAllExtensions() {
 		const { data: packages } = await tryExecute(this, ManifestService.getManifestManifest());
@@ -32,7 +32,7 @@ export class UmbServerExtensionRegistrator extends UmbControllerBase {
 	/**
 	 * Registers all private extensions from the server.
 	 * This is used to register all private extensions that are available to the user.
-	 * @remark Users must have the BACKOFFICE_ACCESS permission to access this method.
+	 * @remarks Users must have the BACKOFFICE_ACCESS permission to access this method.
 	 */
 	public async registerPrivateExtensions() {
 		const { data: packages } = await tryExecute(this, ManifestService.getManifestManifestPrivate(), {
@@ -46,7 +46,7 @@ export class UmbServerExtensionRegistrator extends UmbControllerBase {
 	/**
 	 * Registers all public extensions from the server.
 	 * This is used to register all extensions that are available to the user (excluding private extensions) such as login extensions.
-	 * @remark Any user can access this method without any permissions.
+	 * @remarks Any user can access this method without any permissions.
 	 */
 	public async registerPublicExtensions() {
 		const { data: packages } = await tryExecute(this, ManifestService.getManifestManifestPublic(), {

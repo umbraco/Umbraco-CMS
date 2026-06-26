@@ -3,6 +3,9 @@ const APP_PLUGINS_PREFIX = '/app_plugins/';
 /**
  * Appends the server-computed `?umb__rnd=<cacheBuster>` to a clean `/App_Plugins` URL. URLs outside `/App_Plugins`,
  * URLs that already carry a query string, and an empty `cacheBuster` are returned unchanged.
+ * @param {string} url The package asset URL (its own clean `/App_Plugins` path).
+ * @param {string | null | undefined} cacheBuster The server-computed cache-bust value, or empty to skip stamping.
+ * @returns {string} The stamped URL, or the original URL when no stamping applies.
  */
 export function appendCacheBust(url: string, cacheBuster: string | null | undefined): string {
 	if (!url || !cacheBuster) {
