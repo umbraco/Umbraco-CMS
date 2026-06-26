@@ -114,25 +114,30 @@ internal sealed class PackageManifestService : IPackageManifestService
         }
 
         var version = manifest.Version;
-        var stamp = manifest.AllowCacheBusting;
+        var autoStamp = manifest.AllowCacheBusting;
 
         foreach ((var key, var value) in importmap.Imports)
         {
-            importDict[key] = PackageManifestCacheBuster.ApplyCacheBust(value, version, cacheBuster, stamp);
+            importDict[key] = PackageManifestCacheBuster.ApplyCacheBust(value, version, cacheBuster, autoStamp);
         }
 
-        foreach ((var scopeKey, Dictionary<string, string> scopeImports) in importmap.Scopes ?? new Dictionary<string, Dictionary<string, string>>())
+        if (importmap.Scopes is null)
         {
-            scopesDict[scopeKey] = StampScope(scopeImports, version, cacheBuster, stamp);
+            return;
+        }
+
+        foreach ((var scopeKey, Dictionary<string, string> scopeImports) in importmap.Scopes)
+        {
+            scopesDict[scopeKey] = StampScope(scopeImports, version, cacheBuster, autoStamp);
         }
     }
 
-    private static Dictionary<string, string> StampScope(Dictionary<string, string> scopeImports, string? version, string cacheBuster, bool stamp)
+    private static Dictionary<string, string> StampScope(Dictionary<string, string> scopeImports, string? version, string cacheBuster, bool autoStamp)
     {
         var stampedScope = new Dictionary<string, string>();
         foreach ((var key, var value) in scopeImports)
         {
-            stampedScope[key] = PackageManifestCacheBuster.ApplyCacheBust(value, version, cacheBuster, stamp);
+            stampedScope[key] = PackageManifestCacheBuster.ApplyCacheBust(value, version, cacheBuster, autoStamp);
         }
 
         return stampedScope;

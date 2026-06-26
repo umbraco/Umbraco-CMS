@@ -75,7 +75,11 @@ export class UmbServerExtensionRegistrator extends UmbControllerBase {
 			// package's own clean /App_Plugins path. allowCacheBusting (default true) only governs the automatic
 			// stamping; an explicit %CACHE_BUSTER% token always resolves.
 			const autoStamp = p.allowCacheBusting !== false;
-			const cacheBust = (url: string): string => appendCacheBust(url, p.version, this.#cacheBuster, autoStamp);
+			// Cache-bust the package's own /App_Plugins asset, then prepend the server base url for relative paths.
+			const resolveAssetUrl = (url: string): string => {
+				const busted = appendCacheBust(url, p.version, this.#cacheBuster, autoStamp);
+				return busted.startsWith('http') ? busted : `${apiBaseUrl}${busted}`;
+			};
 
 			p.extensions?.forEach((e) => {
 				// Crudely validate that the extension at least follows a basic manifest structure
@@ -87,22 +91,16 @@ export class UmbServerExtensionRegistrator extends UmbControllerBase {
 					 */
 
 					// TODO: add helper to check for relative paths
-					// Cache-bust, then add the base url if the js path is relative
 					if ('js' in e && typeof e.js === 'string') {
-						const js = cacheBust(e.js);
-						e.js = js.startsWith('http') ? js : `${apiBaseUrl}${js}`;
+						e.js = resolveAssetUrl(e.js);
 					}
 
-					// Cache-bust, then add the base url if the element path is relative
 					if ('element' in e && typeof e.element === 'string') {
-						const element = cacheBust(e.element);
-						e.element = element.startsWith('http') ? element : `${apiBaseUrl}${element}`;
+						e.element = resolveAssetUrl(e.element);
 					}
 
-					// Cache-bust, then add the base url if the api path is relative
 					if ('api' in e && typeof e.api === 'string') {
-						const api = cacheBust(e.api);
-						e.api = api.startsWith('http') ? api : `${apiBaseUrl}${api}`;
+						e.api = resolveAssetUrl(e.api);
 					}
 
 					extensions.push(e);

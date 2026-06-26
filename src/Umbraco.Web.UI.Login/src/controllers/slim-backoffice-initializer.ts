@@ -4,6 +4,7 @@ import {
 	umbExtensionsRegistry,
 } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbElement } from '@umbraco-cms/backoffice/element-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UUIIconRegistryEssential } from '@umbraco-cms/backoffice/external/uui';
 import { UmbServerConnection, UmbServerContext } from '@umbraco-cms/backoffice/server';
@@ -12,6 +13,15 @@ import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 // We import what we need from the Backoffice app.
 // In the future the login screen app will be a part of the Backoffice app, and we will not need to import these.
 import '@umbraco-cms/backoffice/localization';
+
+// The third `cacheBuster` argument ships with the runtime backoffice (resolved via the importmap). This app
+// type-checks against the published @umbraco-cms/backoffice, whose types may lag, so reference the constructor
+// through a signature that includes the parameter. Safe to drop once the pinned backoffice version declares it.
+type UmbServerExtensionRegistratorCtor = new (
+	host: UmbControllerHost,
+	extensionRegistry: typeof umbExtensionsRegistry,
+	cacheBuster?: string,
+) => UmbServerExtensionRegistrator;
 
 /**
  * This is the initializer for the slim backoffice.
@@ -31,7 +41,7 @@ export class UmbSlimBackofficeController extends UmbControllerBase {
 		host.classList.add('uui-font');
 	}
 
-	async register(host: UmbElement) {
+	async register(host: UmbElement, cacheBuster?: string) {
 		// Get the server URL and backoffice path from the host.
 		const serverUrl = window.location.origin;
 		const serverConnection = new UmbServerConnection(host, serverUrl);
@@ -45,9 +55,11 @@ export class UmbSlimBackofficeController extends UmbControllerBase {
 		});
 
 		// Register the public extensions for the slim backoffice.
-		await new UmbServerExtensionRegistrator(this, umbExtensionsRegistry).registerPublicExtensions().catch((error) => {
-			console.error(`Failed to register public extensions for the slim backoffice.`, error);
-		});
+		await new (UmbServerExtensionRegistrator as UmbServerExtensionRegistratorCtor)(this, umbExtensionsRegistry, cacheBuster)
+			.registerPublicExtensions()
+			.catch((error) => {
+				console.error(`Failed to register public extensions for the slim backoffice.`, error);
+			});
 
 		new UmbAppEntryPointExtensionInitializer(host, umbExtensionsRegistry);
 	}

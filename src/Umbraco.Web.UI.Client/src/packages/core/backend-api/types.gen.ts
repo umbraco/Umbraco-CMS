@@ -1315,7 +1315,7 @@ export type ManifestResponseModel = {
     name: string;
     id?: string | null;
     version?: string | null;
-    allowCacheBusting: boolean;
+    allowCacheBusting?: boolean | null;
     extensions: Array<unknown>;
 };
 
