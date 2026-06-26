@@ -21,7 +21,7 @@ import type {
 	UmbEntityCollectionItemElement,
 } from '@umbraco-cms/backoffice/collection';
 import { UmbDocumentVariantState } from '../../variant-state.js';
-import { getDocumentVariantStateTagConfig } from '../../utils.js';
+import { getDocumentVariantStateTagConfig } from '../../variant-state/utils.js';
 import { UmbEntityContentTypeEntityContext } from '@umbraco-cms/backoffice/content-type';
 import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/document-type';
 import { fromCamelCase } from '@umbraco-cms/backoffice/utils';

@@ -1,5 +1,5 @@
 import { UMB_DOCUMENT_TREE_ALIAS } from '../constants.js';
-import { UMB_DATE_TIME_VALUE_TYPE } from '@umbraco-cms/backoffice/value-type';
+import { UMB_DOCUMENT_VARIANT_STATE_VALUE_TYPE } from '../../variant-state/value-type/constants.js';
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
 export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
@@ -26,9 +26,9 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 		meta: {
 			columns: [
 				{
-					field: 'createDate',
-					label: '#content_createDate',
-					valueType: UMB_DATE_TIME_VALUE_TYPE,
+					field: 'variants',
+					label: '#general_status',
+					valueType: UMB_DOCUMENT_VARIANT_STATE_VALUE_TYPE,
 				},
 			],
 		},
