@@ -25,6 +25,12 @@ public class ManifestResponseModel
     public string? Version { get; set; }
 
     /// <summary>
+    /// Gets or sets a value indicating whether the backoffice automatically appends a cache-buster to this package's
+    /// clean <c>/App_Plugins</c> JavaScript assets. <c>true</c> by default.
+    /// </summary>
+    public bool AllowCacheBusting { get; set; } = true;
+
+    /// <summary>
     /// Gets or sets the extensions associated with this manifest response.
     /// </summary>
     public object[] Extensions { get; set; } = Array.Empty<object>();

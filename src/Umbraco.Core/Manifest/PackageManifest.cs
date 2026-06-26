@@ -26,13 +26,12 @@ public class PackageManifest
     public bool AllowPublicAccess { get; set; }
 
     /// <summary>
-    ///     Gets or sets a value indicating whether Umbraco <em>automatically</em> appends a per-package
-    ///     <c>?umb__rnd</c> cache-buster (derived from <see cref="Version"/>) to this package's clean
-    ///     <c>/App_Plugins</c> JavaScript URLs (<c>.js</c>/<c>.mjs</c>), in both its importmap and its extension
-    ///     definitions. <c>true</c> by default; set to <c>false</c> to opt out of the automatic stamping. URLs that
+    ///     Gets or sets a value indicating whether Umbraco <em>automatically</em> appends a cache-buster
+    ///     (<c>?v=&lt;version&gt;&amp;umb__rnd=&lt;host cache-buster&gt;</c>) to this package's clean
+    ///     <c>/App_Plugins</c> JavaScript URLs, in both its importmap (server-side) and its registered extensions
+    ///     (client-side). <c>true</c> by default; set to <c>false</c> to opt out of the automatic stamping. URLs that
     ///     already carry a query string are always left untouched. This setting controls only the automatic stamping —
-    ///     an explicit <c>%CACHE_BUSTER%</c> token authored into a URL always resolves to the package version hash
-    ///     regardless of this value.
+    ///     an explicit <c>%CACHE_BUSTER%</c> token authored into a URL always resolves regardless of this value.
     /// </summary>
     public bool AllowCacheBusting { get; set; } = true;
 

@@ -1,119 +1,59 @@
 using NUnit.Framework;
 using Umbraco.Cms.Core.Manifest;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Manifest;
 
 [TestFixture]
 public class PackageManifestCacheBusterTests
 {
-    private const string GlobalHash = "globalhash";
-
     [Test]
-    public void ResolvePackageCacheBustHash_CombinesVersionWithGlobalHash_WhenVersionPresent()
+    public void ApplyCacheBust_AppendsVersionAndCacheBuster()
     {
-        var result = PackageManifestCacheBuster.ResolvePackageCacheBustHash("1.2.3", GlobalHash);
-
-        Assert.Multiple(() =>
-        {
-            // The version is salted with the global hash (which carries Umbraco's version + the host seed).
-            Assert.That(result, Is.EqualTo($"1.2.3|{GlobalHash}".GenerateHash()));
-            Assert.That(result, Is.Not.EqualTo("1.2.3".GenerateHash()));
-        });
-    }
-
-    [TestCase(null)]
-    [TestCase("")]
-    [TestCase("   ")]
-    public void ResolvePackageCacheBustHash_FallsBackToGlobal_WhenVersionMissing(string? version)
-    {
-        var result = PackageManifestCacheBuster.ResolvePackageCacheBustHash(version, GlobalHash);
-        Assert.That(result, Is.EqualTo(GlobalHash));
+        var result = PackageManifestCacheBuster.ApplyCacheBust("/App_Plugins/MyPkg/index.js", "1.2.3", "seed", autoStamp: true);
+        Assert.That(result, Is.EqualTo("/App_Plugins/MyPkg/index.js?v=1.2.3&umb__rnd=seed"));
     }
 
     [Test]
-    public void ResolvePackageCacheBust_CombinesVersionWithGlobalHashAndEnablesStamping_WhenBustingAllowed()
+    public void ApplyCacheBust_AppendsVersionOnly_WhenNoCacheBuster()
     {
-        var manifest = new PackageManifest { Name = "Pkg", Version = "1.2.3", Extensions = [] };
-
-        var (hash, autoStamp) = PackageManifestCacheBuster.ResolvePackageCacheBust(manifest, GlobalHash);
-
-        Assert.Multiple(() =>
-        {
-            Assert.That(hash, Is.EqualTo($"1.2.3|{GlobalHash}".GenerateHash()));
-            Assert.That(autoStamp, Is.True);
-        });
+        var result = PackageManifestCacheBuster.ApplyCacheBust("/App_Plugins/MyPkg/index.js", "1.2.3", string.Empty, autoStamp: true);
+        Assert.That(result, Is.EqualTo("/App_Plugins/MyPkg/index.js?v=1.2.3"));
     }
 
     [Test]
-    public void ResolvePackageCacheBust_CombinesVersionWithGlobalHashButDisablesStamping_WhenBustingDisallowed()
+    public void ApplyCacheBust_AppendsCacheBusterOnly_WhenNoVersion()
     {
-        var manifest = new PackageManifest { Name = "Pkg", Version = "1.2.3", AllowCacheBusting = false, Extensions = [] };
-
-        var (hash, autoStamp) = PackageManifestCacheBuster.ResolvePackageCacheBust(manifest, GlobalHash);
-
-        Assert.Multiple(() =>
-        {
-            // AllowCacheBusting only governs auto-stamping; the hash (used to resolve an explicit token) is unchanged by it.
-            Assert.That(hash, Is.EqualTo($"1.2.3|{GlobalHash}".GenerateHash()));
-            Assert.That(autoStamp, Is.False);
-        });
+        // The host cache-buster works even when a package has no version (version is optional).
+        var result = PackageManifestCacheBuster.ApplyCacheBust("/App_Plugins/MyPkg/index.js", null, "seed", autoStamp: true);
+        Assert.That(result, Is.EqualTo("/App_Plugins/MyPkg/index.js?umb__rnd=seed"));
     }
 
     [Test]
-    public void ResolvePackageCacheBust_FallsBackToGlobalHash_WhenPackageHasNoVersion()
+    public void ApplyCacheBust_LeavesUnchanged_WhenNeitherVersionNorCacheBuster()
     {
-        var manifest = new PackageManifest { Name = "Pkg", Version = null, Extensions = [] };
-
-        var (hash, autoStamp) = PackageManifestCacheBuster.ResolvePackageCacheBust(manifest, GlobalHash);
-
-        Assert.Multiple(() =>
-        {
-            Assert.That(hash, Is.EqualTo(GlobalHash));
-            Assert.That(autoStamp, Is.True);
-        });
+        const string url = "/App_Plugins/MyPkg/index.js";
+        Assert.That(PackageManifestCacheBuster.ApplyCacheBust(url, null, string.Empty, autoStamp: true), Is.EqualTo(url));
     }
 
     [Test]
-    public void ApplyCacheBust_StampsAppPluginsPath()
+    public void ApplyCacheBust_EscapesValues()
     {
-        var result = PackageManifestCacheBuster.ApplyCacheBust("/App_Plugins/MyPkg/index.js", "abc", autoStamp: true);
-        Assert.That(result, Is.EqualTo("/App_Plugins/MyPkg/index.js?umb__rnd=abc"));
+        var result = PackageManifestCacheBuster.ApplyCacheBust("/App_Plugins/MyPkg/index.js", "1.0 beta", "a/b", autoStamp: true);
+        Assert.That(result, Is.EqualTo("/App_Plugins/MyPkg/index.js?v=1.0%20beta&umb__rnd=a%2Fb"));
     }
 
     [Test]
     public void ApplyCacheBust_IsCaseInsensitiveOnAppPluginsRoot()
     {
-        var result = PackageManifestCacheBuster.ApplyCacheBust("/app_plugins/MyPkg/index.js", "abc", autoStamp: true);
-        Assert.That(result, Is.EqualTo("/app_plugins/MyPkg/index.js?umb__rnd=abc"));
+        var result = PackageManifestCacheBuster.ApplyCacheBust("/app_plugins/MyPkg/index.js", "1.2.3", null, autoStamp: true);
+        Assert.That(result, Is.EqualTo("/app_plugins/MyPkg/index.js?v=1.2.3"));
     }
 
     [Test]
     public void ApplyCacheBust_InsertsBeforeFragment()
     {
-        var result = PackageManifestCacheBuster.ApplyCacheBust("/App_Plugins/MyPkg/index.js#frag", "abc", autoStamp: true);
-        Assert.That(result, Is.EqualTo("/App_Plugins/MyPkg/index.js?umb__rnd=abc#frag"));
-    }
-
-    [TestCase("/App_Plugins/MyPkg/index.js", "/App_Plugins/MyPkg/index.js?umb__rnd=abc")]
-    [TestCase("/App_Plugins/MyPkg/index.JS", "/App_Plugins/MyPkg/index.JS?umb__rnd=abc")]
-    [TestCase("/App_Plugins/MyPkg/module.mjs", "/App_Plugins/MyPkg/module.mjs?umb__rnd=abc")]
-    [TestCase("/App_Plugins/MyPkg/module.MJS", "/App_Plugins/MyPkg/module.MJS?umb__rnd=abc")]
-    [TestCase("/App_Plugins/MyPkg/index.mjs.js", "/App_Plugins/MyPkg/index.mjs.js?umb__rnd=abc")]
-    public void ApplyCacheBust_StampsJavaScriptModuleExtensions(string url, string expected)
-    {
-        Assert.That(PackageManifestCacheBuster.ApplyCacheBust(url, "abc", autoStamp: true), Is.EqualTo(expected));
-    }
-
-    [TestCase("/App_Plugins/MyPkg/styles.css")]
-    [TestCase("/App_Plugins/MyPkg/data.json")]
-    [TestCase("/App_Plugins/MyPkg/icon.svg")]
-    [TestCase("/App_Plugins/MyPkg/route")]
-    [TestCase("/App_Plugins/MyPkg/")]
-    public void ApplyCacheBust_DoesNotStampNonJavaScriptAppPluginsPath(string url)
-    {
-        // Only .js entrypoints are auto-stamped; anything else that merely looks like an /App_Plugins path is left alone.
-        Assert.That(PackageManifestCacheBuster.ApplyCacheBust(url, "abc", autoStamp: true), Is.EqualTo(url));
+        var result = PackageManifestCacheBuster.ApplyCacheBust("/App_Plugins/MyPkg/index.js#frag", "1.2.3", null, autoStamp: true);
+        Assert.That(result, Is.EqualTo("/App_Plugins/MyPkg/index.js?v=1.2.3#frag"));
     }
 
     [TestCase("/umbraco/backoffice/apps/app/index.js")]
@@ -125,46 +65,55 @@ public class PackageManifestCacheBusterTests
     [TestCase("/App_Plugins")]
     public void ApplyCacheBust_LeavesNonAppPluginsPathsUnchanged(string url)
     {
-        Assert.That(PackageManifestCacheBuster.ApplyCacheBust(url, "abc", autoStamp: true), Is.EqualTo(url));
+        Assert.That(PackageManifestCacheBuster.ApplyCacheBust(url, "1.2.3", "seed", autoStamp: true), Is.EqualTo(url));
     }
 
     [Test]
     public void ApplyCacheBust_SkipsWhenQueryAlreadyPresent()
     {
-        const string url = "/App_Plugins/MyPkg/index.js?v=1";
-        Assert.That(PackageManifestCacheBuster.ApplyCacheBust(url, "abc", autoStamp: true), Is.EqualTo(url));
+        const string url = "/App_Plugins/MyPkg/index.js?foo=1";
+        Assert.That(PackageManifestCacheBuster.ApplyCacheBust(url, "1.2.3", "seed", autoStamp: true), Is.EqualTo(url));
     }
 
     [Test]
     public void ApplyCacheBust_SkipsWhenQuestionMarkInFragment()
     {
         const string url = "/App_Plugins/MyPkg/index.js#a?b";
-        Assert.That(PackageManifestCacheBuster.ApplyCacheBust(url, "abc", autoStamp: true), Is.EqualTo(url));
-    }
-
-    [Test]
-    public void ApplyCacheBust_ResolvesCacheBusterToken()
-    {
-        const string url = "/App_Plugins/MyPkg/index.js?v=%CACHE_BUSTER%";
-        Assert.That(
-            PackageManifestCacheBuster.ApplyCacheBust(url, "abc", autoStamp: true),
-            Is.EqualTo("/App_Plugins/MyPkg/index.js?v=abc"));
-    }
-
-    [Test]
-    public void ApplyCacheBust_ResolvesCacheBusterToken_OnAnyHost_RegardlessOfAutoStamp()
-    {
-        // The token is an explicit opt-in, so it resolves even on a non-/App_Plugins URL and when auto-stamping is off.
-        const string url = "https://cdn.example.com/pkg/index.js?v=%CACHE_BUSTER%";
-        Assert.That(
-            PackageManifestCacheBuster.ApplyCacheBust(url, "abc", autoStamp: false),
-            Is.EqualTo("https://cdn.example.com/pkg/index.js?v=abc"));
+        Assert.That(PackageManifestCacheBuster.ApplyCacheBust(url, "1.2.3", "seed", autoStamp: true), Is.EqualTo(url));
     }
 
     [Test]
     public void ApplyCacheBust_DoesNotStampCleanPath_WhenAutoStampDisabled()
     {
         const string url = "/App_Plugins/MyPkg/index.js";
-        Assert.That(PackageManifestCacheBuster.ApplyCacheBust(url, "abc", autoStamp: false), Is.EqualTo(url));
+        Assert.That(PackageManifestCacheBuster.ApplyCacheBust(url, "1.2.3", "seed", autoStamp: false), Is.EqualTo(url));
+    }
+
+    [Test]
+    public void ApplyCacheBust_ResolvesCacheBusterToken_ToVersion()
+    {
+        const string url = "/App_Plugins/MyPkg/index.js?cb=%CACHE_BUSTER%";
+        Assert.That(
+            PackageManifestCacheBuster.ApplyCacheBust(url, "1.2.3", "seed", autoStamp: true),
+            Is.EqualTo("/App_Plugins/MyPkg/index.js?cb=1.2.3"));
+    }
+
+    [Test]
+    public void ApplyCacheBust_ResolvesCacheBusterToken_ToCacheBuster_WhenNoVersion()
+    {
+        const string url = "/App_Plugins/MyPkg/index.js?cb=%CACHE_BUSTER%";
+        Assert.That(
+            PackageManifestCacheBuster.ApplyCacheBust(url, null, "seed", autoStamp: true),
+            Is.EqualTo("/App_Plugins/MyPkg/index.js?cb=seed"));
+    }
+
+    [Test]
+    public void ApplyCacheBust_ResolvesCacheBusterToken_OnAnyHost_RegardlessOfAutoStamp()
+    {
+        // The token is an explicit opt-in, so it resolves even on a non-/App_Plugins URL and when auto-stamping is off.
+        const string url = "https://cdn.example.com/pkg/index.js?cb=%CACHE_BUSTER%";
+        Assert.That(
+            PackageManifestCacheBuster.ApplyCacheBust(url, "1.2.3", "seed", autoStamp: false),
+            Is.EqualTo("https://cdn.example.com/pkg/index.js?cb=1.2.3"));
     }
 }

@@ -45642,6 +45642,7 @@
       },
       "ManifestResponseModel": {
         "required": [
+          "allowCacheBusting",
           "extensions",
           "name"
         ],
@@ -45658,6 +45659,9 @@
           "version": {
             "type": "string",
             "nullable": true
+          },
+          "allowCacheBusting": {
+            "type": "boolean"
           },
           "extensions": {
             "type": "array",

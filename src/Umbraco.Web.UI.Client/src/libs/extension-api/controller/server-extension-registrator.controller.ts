@@ -1,5 +1,6 @@
 import type { ManifestBase } from '../types/index.js';
 import { isManifestBaseType } from '../type-guards/index.js';
+import { appendCacheBust } from '../functions/append-cache-bust.function.js';
 import { ManifestService, type ManifestResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -10,10 +11,12 @@ import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 // TODO: consider if this can be replaced by the new extension controllers
 export class UmbServerExtensionRegistrator extends UmbControllerBase {
 	#extensionRegistry: UmbBackofficeExtensionRegistry;
+	#cacheBuster?: string;
 
-	constructor(host: UmbControllerHost, extensionRegistry: UmbBackofficeExtensionRegistry) {
+	constructor(host: UmbControllerHost, extensionRegistry: UmbBackofficeExtensionRegistry, cacheBuster?: string) {
 		super(host, UmbServerExtensionRegistrator.name);
 		this.#extensionRegistry = extensionRegistry;
+		this.#cacheBuster = cacheBuster;
 	}
 
 	/**
@@ -68,6 +71,12 @@ export class UmbServerExtensionRegistrator extends UmbControllerBase {
 		const apiBaseUrl = serverContext?.getServerUrl();
 
 		packages?.forEach((p) => {
+			// Apply per-package cache-busting before prepending the server base url, so the rules match on the
+			// package's own clean /App_Plugins path. allowCacheBusting (default true) only governs the automatic
+			// stamping; an explicit %CACHE_BUSTER% token always resolves.
+			const autoStamp = p.allowCacheBusting !== false;
+			const cacheBust = (url: string): string => appendCacheBust(url, p.version, this.#cacheBuster, autoStamp);
+
 			p.extensions?.forEach((e) => {
 				// Crudely validate that the extension at least follows a basic manifest structure
 				// Idea: Use `Zod` to validate the manifest
@@ -78,19 +87,22 @@ export class UmbServerExtensionRegistrator extends UmbControllerBase {
 					 */
 
 					// TODO: add helper to check for relative paths
-					// Add base url if the js path is relative
-					if ('js' in e && typeof e.js === 'string' && !e.js.startsWith('http')) {
-						e.js = `${apiBaseUrl}${e.js}`;
+					// Cache-bust, then add the base url if the js path is relative
+					if ('js' in e && typeof e.js === 'string') {
+						const js = cacheBust(e.js);
+						e.js = js.startsWith('http') ? js : `${apiBaseUrl}${js}`;
 					}
 
-					// Add base url if the element path is relative
-					if ('element' in e && typeof e.element === 'string' && !e.element.startsWith('http')) {
-						e.element = `${apiBaseUrl}${e.element}`;
+					// Cache-bust, then add the base url if the element path is relative
+					if ('element' in e && typeof e.element === 'string') {
+						const element = cacheBust(e.element);
+						e.element = element.startsWith('http') ? element : `${apiBaseUrl}${element}`;
 					}
 
-					// Add base url if the element path api relative
-					if ('api' in e && typeof e.api === 'string' && !e.api.startsWith('http')) {
-						e.api = `${apiBaseUrl}${e.api}`;
+					// Cache-bust, then add the base url if the api path is relative
+					if ('api' in e && typeof e.api === 'string') {
+						const api = cacheBust(e.api);
+						e.api = api.startsWith('http') ? api : `${apiBaseUrl}${api}`;
 					}
 
 					extensions.push(e);

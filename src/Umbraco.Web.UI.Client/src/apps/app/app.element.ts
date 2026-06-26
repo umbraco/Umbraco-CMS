@@ -102,6 +102,14 @@ export class UmbAppElement extends UmbLitElement {
 	@property({ type: Boolean, attribute: 'keep-user-logged-in' })
 	keepUserLoggedIn = false;
 
+	/**
+	 * An optional host-controlled cache-buster appended (as `umb__rnd`) to package `/App_Plugins` assets, forcing
+	 * them to be re-fetched on demand regardless of each package's own version.
+	 * @attr
+	 */
+	@property({ type: String, attribute: 'cachebuster' })
+	cacheBuster?: string;
+
 	private _routes: UmbRoute[] = [
 		{
 			path: 'error',
@@ -262,6 +270,7 @@ export class UmbAppElement extends UmbLitElement {
 		const registerPublicExtensions = new UmbServerExtensionRegistrator(
 			this,
 			umbExtensionsRegistry,
+			this.cacheBuster,
 		).registerPublicExtensions();
 		new UmbAppEntryPointExtensionInitializer(this, umbExtensionsRegistry);
 
@@ -411,7 +420,7 @@ export class UmbAppElement extends UmbLitElement {
 			const results = await Promise.allSettled([
 				this.observe(this.#bundleInitializer?.loaded).asPromise(),
 				this.#registerExtensions(),
-				new UmbServerExtensionRegistrator(this, umbExtensionsRegistry).registerPrivateExtensions(),
+				new UmbServerExtensionRegistrator(this, umbExtensionsRegistry, this.cacheBuster).registerPrivateExtensions(),
 			]);
 
 			const result = results.reduce((acc, curr) => acc && curr.status === 'fulfilled', true);

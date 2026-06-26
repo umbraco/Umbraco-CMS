@@ -22,6 +22,7 @@ public class ManifestViewModelMapDefinition : IMapDefinition
         target.Name = source.Name;
         target.Id = source.Id;
         target.Version = source.Version;
+        target.AllowCacheBusting = source.AllowCacheBusting;
         target.Extensions = source.Extensions;
     }
 }

@@ -2,13 +2,9 @@ using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Manifest;
-using Umbraco.Cms.Core.Semver;
 using Umbraco.Cms.Infrastructure.Manifest;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Manifest;
 
@@ -24,20 +20,16 @@ public class PackageManifestServiceTests
         reader.Setup(x => x.ReadPackageManifestsAsync()).ReturnsAsync(manifests);
 
         var runtimeSettings = new Mock<IOptionsMonitor<RuntimeSettings>>();
-        runtimeSettings.Setup(x => x.CurrentValue).Returns(new RuntimeSettings { Mode = RuntimeMode.Production, CacheBuster = cacheBuster });
+        runtimeSettings.Setup(x => x.CurrentValue).Returns(new RuntimeSettings { Mode = RuntimeMode.Production });
 
-        var hostingEnvironment = new Mock<IHostingEnvironment>();
-        hostingEnvironment.Setup(x => x.IsDebugMode).Returns(false);
-
-        var umbracoVersion = new Mock<IUmbracoVersion>();
-        umbracoVersion.Setup(x => x.SemanticVersion).Returns(new SemVersion(17, 0, 0));
+        var pluginSettings = new Mock<IOptionsMonitor<UmbracoPluginSettings>>();
+        pluginSettings.Setup(x => x.CurrentValue).Returns(new UmbracoPluginSettings { Cachebuster = cacheBuster });
 
         return new PackageManifestService(
             new[] { reader.Object },
             AppCaches.Disabled,
             runtimeSettings.Object,
-            hostingEnvironment.Object,
-            umbracoVersion.Object);
+            pluginSettings.Object);
     }
 
     private static PackageManifest Manifest(string name, string? version, bool allowCacheBusting, Dictionary<string, string> imports)
@@ -50,21 +42,16 @@ public class PackageManifestServiceTests
             Importmap = new PackageManifestImportmap { Imports = imports },
         };
 
-    private static readonly string _globalHash = new SemVersion(17, 0, 0).ToSemanticString().GenerateHash();
-
-    // The per-package hash for version "2.0.0": the version salted with the global hash (Umbraco version + seed).
-    private static readonly string _packageHash = $"2.0.0|{_globalHash}".GenerateHash();
-
     private static IEnumerable<TestCaseData> SingleImportCases()
     {
-        yield return new TestCaseData("2.0.0", true, "/App_Plugins/Pkg/index.js", $"/App_Plugins/Pkg/index.js?umb__rnd={_packageHash}")
-            .SetName("Stamps the version hash on a clean /App_Plugins import");
+        yield return new TestCaseData("2.0.0", true, "/App_Plugins/Pkg/index.js", "/App_Plugins/Pkg/index.js?v=2.0.0")
+            .SetName("Stamps the version on a clean /App_Plugins import");
         yield return new TestCaseData("2.0.0", false, "/App_Plugins/Pkg/index.js", "/App_Plugins/Pkg/index.js")
             .SetName("Does not stamp when busting is disabled");
-        yield return new TestCaseData((string?)null, true, "/App_Plugins/Pkg/index.js", $"/App_Plugins/Pkg/index.js?umb__rnd={_globalHash}")
-            .SetName("Falls back to the global hash when the package has no version");
-        yield return new TestCaseData("2.0.0", true, "/App_Plugins/Pkg/index.js?v=%CACHE_BUSTER%", $"/App_Plugins/Pkg/index.js?v={_packageHash}")
-            .SetName("Resolves an explicit %CACHE_BUSTER% token to the version hash");
+        yield return new TestCaseData((string?)null, true, "/App_Plugins/Pkg/index.js", "/App_Plugins/Pkg/index.js")
+            .SetName("Leaves a clean import untouched when there is no version and no cache-buster");
+        yield return new TestCaseData("2.0.0", true, "/App_Plugins/Pkg/index.js?v=%CACHE_BUSTER%", "/App_Plugins/Pkg/index.js?v=2.0.0")
+            .SetName("Resolves an explicit %CACHE_BUSTER% token to the version");
     }
 
     [TestCaseSource(nameof(SingleImportCases))]
@@ -118,11 +105,11 @@ public class PackageManifestServiceTests
 
         var result = await service.GetPackageManifestImportmapAsync();
 
-        Assert.That(result.Scopes!["/App_Plugins/Pkg/"]["pkg"], Is.EqualTo($"/App_Plugins/Pkg/scoped.js?umb__rnd={_packageHash}"));
+        Assert.That(result.Scopes!["/App_Plugins/Pkg/"]["pkg"], Is.EqualTo("/App_Plugins/Pkg/scoped.js?v=2.0.0"));
     }
 
     [Test]
-    public async Task GetPackageManifestImportmapAsync_WhenBustingDisabled_ResolvesTokenToVersionHashButDoesNotStamp()
+    public async Task GetPackageManifestImportmapAsync_WhenBustingDisabled_ResolvesTokenToVersionButDoesNotStamp()
     {
         var service = CreateService(Manifest(
             "Pkg",
@@ -138,15 +125,15 @@ public class PackageManifestServiceTests
 
         Assert.Multiple(() =>
         {
-            // Disabling busting turns off auto-stamping only; an explicit token still resolves to the package version hash.
-            Assert.That(result.Imports["tokenised"], Is.EqualTo($"/App_Plugins/Pkg/index.js?v={_packageHash}"));
+            // Disabling busting turns off auto-stamping only; an explicit token still resolves to the package version.
+            Assert.That(result.Imports["tokenised"], Is.EqualTo("/App_Plugins/Pkg/index.js?v=2.0.0"));
             // The clean path is left untouched because automatic stamping is off for this package.
             Assert.That(result.Imports["clean"], Is.EqualTo("/App_Plugins/Pkg/clean.js"));
         });
     }
 
     [Test]
-    public async Task GetPackageManifestImportmapAsync_SeedFlowsThroughGlobalHashIntoPackageHash()
+    public async Task GetPackageManifestImportmapAsync_AppendsHostCacheBuster()
     {
         var service = CreateService(
             "deploy-1",
@@ -154,13 +141,18 @@ public class PackageManifestServiceTests
 
         var result = await service.GetPackageManifestImportmapAsync();
 
-        var seededGlobalHash = $"{_globalHash}|deploy-1".GenerateHash();
-        var expected = $"2.0.0|{seededGlobalHash}".GenerateHash();
-        Assert.Multiple(() =>
-        {
-            // The host seed is folded into the global hash, which is salted into the package hash — so the stamp moves.
-            Assert.That(result.Imports["pkg"], Is.EqualTo($"/App_Plugins/Pkg/index.js?umb__rnd={expected}"));
-            Assert.That(result.Imports["pkg"], Does.Not.Contain($"umb__rnd={_packageHash}"));
-        });
+        Assert.That(result.Imports["pkg"], Is.EqualTo("/App_Plugins/Pkg/index.js?v=2.0.0&umb__rnd=deploy-1"));
+    }
+
+    [Test]
+    public async Task GetPackageManifestImportmapAsync_AppendsHostCacheBuster_WhenPackageHasNoVersion()
+    {
+        var service = CreateService(
+            "deploy-1",
+            Manifest("Pkg", null, allowCacheBusting: true, new Dictionary<string, string> { ["pkg"] = "/App_Plugins/Pkg/index.js" }));
+
+        var result = await service.GetPackageManifestImportmapAsync();
+
+        Assert.That(result.Imports["pkg"], Is.EqualTo("/App_Plugins/Pkg/index.js?umb__rnd=deploy-1"));
     }
 }

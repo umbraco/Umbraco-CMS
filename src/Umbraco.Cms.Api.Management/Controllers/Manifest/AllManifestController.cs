@@ -21,7 +21,6 @@ public class AllManifestController : ManifestControllerBase
 {
     private readonly IPackageManifestService _packageManifestService;
     private readonly IUmbracoMapper _umbracoMapper;
-    private readonly IBackOfficePathGenerator _backOfficePathGenerator;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Controllers.Manifest.AllManifestController"/> class, which manages operations related to all package manifests.
@@ -51,7 +50,6 @@ public class AllManifestController : ManifestControllerBase
     {
         _packageManifestService = packageManifestService;
         _umbracoMapper = umbracoMapper;
-        _backOfficePathGenerator = backOfficePathGenerator;
     }
 
     // NOTE: this endpoint is deliberately created as non-paginated to ensure the fastest possible client initialization
@@ -73,7 +71,6 @@ public class AllManifestController : ManifestControllerBase
     {
         IEnumerable<PackageManifest> packageManifests = await _packageManifestService.GetAllPackageManifestsAsync();
         IEnumerable<ManifestResponseModel> models = _umbracoMapper.MapEnumerable<PackageManifest, ManifestResponseModel>(packageManifests);
-        ReplaceCacheBusterTokens(models, packageManifests, _backOfficePathGenerator.BackOfficeCacheBustHash);
         return Ok(models);
     }
 }

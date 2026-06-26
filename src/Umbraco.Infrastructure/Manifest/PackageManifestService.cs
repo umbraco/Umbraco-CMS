@@ -1,10 +1,7 @@
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Manifest;
-using Umbraco.Cms.Core.Web;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Manifest;
@@ -14,11 +11,7 @@ internal sealed class PackageManifestService : IPackageManifestService
     private readonly IEnumerable<IPackageManifestReader> _packageManifestReaders;
     private readonly IAppPolicyCache _cache;
     private RuntimeSettings _runtimeSettings;
-
-    // The global cache-bust hash only depends on the debug mode and Umbraco version, both fixed for the application's
-    // lifetime, so it is computed once here rather than on every importmap request (this service is a singleton).
-    private readonly string _globalCacheBustHash;
-
+    private UmbracoPluginSettings _pluginSettings;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PackageManifestService"/> class.
@@ -26,20 +19,19 @@ internal sealed class PackageManifestService : IPackageManifestService
     /// <param name="packageManifestReaders">A collection of <see cref="IPackageManifestReader"/> instances used to read package manifests.</param>
     /// <param name="appCaches">The <see cref="AppCaches"/> instance used for caching manifest data.</param>
     /// <param name="runtimeSettingsOptionsMonitor">An <see cref="IOptionsMonitor{RuntimeSettings}"/> used to monitor runtime configuration settings.</param>
-    /// <param name="hostingEnvironment">The <see cref="IHostingEnvironment"/> used to determine the current hosting environment (e.g. debug mode).</param>
-    /// <param name="umbracoVersion">The <see cref="IUmbracoVersion"/> used as a fallback cache-bust hash source when a package has no version.</param>
+    /// <param name="pluginSettingsOptionsMonitor">An <see cref="IOptionsMonitor{UmbracoPluginSettings}"/> used to read the optional host cache-buster applied to package importmap assets.</param>
     public PackageManifestService(
         IEnumerable<IPackageManifestReader> packageManifestReaders,
         AppCaches appCaches,
         IOptionsMonitor<RuntimeSettings> runtimeSettingsOptionsMonitor,
-        IHostingEnvironment hostingEnvironment,
-        IUmbracoVersion umbracoVersion)
+        IOptionsMonitor<UmbracoPluginSettings> pluginSettingsOptionsMonitor)
     {
         _packageManifestReaders = packageManifestReaders;
         _cache = appCaches.RuntimeCache;
         _runtimeSettings = runtimeSettingsOptionsMonitor.CurrentValue;
         runtimeSettingsOptionsMonitor.OnChange(runtimeSettings => _runtimeSettings = runtimeSettings);
-        _globalCacheBustHash = CacheBustHashGenerator.Generate(hostingEnvironment, umbracoVersion, _runtimeSettings.CacheBuster);
+        _pluginSettings = pluginSettingsOptionsMonitor.CurrentValue;
+        pluginSettingsOptionsMonitor.OnChange(pluginSettings => _pluginSettings = pluginSettings);
     }
 
     /// <summary>
@@ -91,6 +83,7 @@ internal sealed class PackageManifestService : IPackageManifestService
     public async Task<PackageManifestImportmap> GetPackageManifestImportmapAsync()
     {
         IEnumerable<PackageManifest> packageManifests = await GetAllPackageManifestsAsync();
+        var cacheBuster = _pluginSettings.Cachebuster;
 
         // Last-wins on duplicate import/scope keys across packages (the old ToDictionary threw, letting one package break the whole importmap).
         var importDict = new Dictionary<string, string>();
@@ -98,7 +91,7 @@ internal sealed class PackageManifestService : IPackageManifestService
 
         foreach (PackageManifest manifest in packageManifests)
         {
-            AppendStampedImportmap(manifest, _globalCacheBustHash, importDict, scopesDict);
+            AppendStampedImportmap(manifest, cacheBuster, importDict, scopesDict);
         }
 
         return new PackageManifestImportmap
@@ -110,7 +103,7 @@ internal sealed class PackageManifestService : IPackageManifestService
 
     private static void AppendStampedImportmap(
         PackageManifest manifest,
-        string globalHash,
+        string cacheBuster,
         Dictionary<string, string> importDict,
         Dictionary<string, Dictionary<string, string>> scopesDict)
     {
@@ -120,25 +113,26 @@ internal sealed class PackageManifestService : IPackageManifestService
             return;
         }
 
-        (var hash, var stamp) = PackageManifestCacheBuster.ResolvePackageCacheBust(manifest, globalHash);
+        var version = manifest.Version;
+        var stamp = manifest.AllowCacheBusting;
 
         foreach ((var key, var value) in importmap.Imports)
         {
-            importDict[key] = PackageManifestCacheBuster.ApplyCacheBust(value, hash, stamp);
+            importDict[key] = PackageManifestCacheBuster.ApplyCacheBust(value, version, cacheBuster, stamp);
         }
 
         foreach ((var scopeKey, Dictionary<string, string> scopeImports) in importmap.Scopes ?? new Dictionary<string, Dictionary<string, string>>())
         {
-            scopesDict[scopeKey] = StampScope(scopeImports, hash, stamp);
+            scopesDict[scopeKey] = StampScope(scopeImports, version, cacheBuster, stamp);
         }
     }
 
-    private static Dictionary<string, string> StampScope(Dictionary<string, string> scopeImports, string hash, bool stamp)
+    private static Dictionary<string, string> StampScope(Dictionary<string, string> scopeImports, string? version, string cacheBuster, bool stamp)
     {
         var stampedScope = new Dictionary<string, string>();
         foreach ((var key, var value) in scopeImports)
         {
-            stampedScope[key] = PackageManifestCacheBuster.ApplyCacheBust(value, hash, stamp);
+            stampedScope[key] = PackageManifestCacheBuster.ApplyCacheBust(value, version, cacheBuster, stamp);
         }
 
         return stampedScope;

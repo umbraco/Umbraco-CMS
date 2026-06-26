@@ -1,60 +1,33 @@
-using System.Text.RegularExpressions;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Manifest;
 
 /// <summary>
-///     Computes and applies per-package cache-busting tokens for package manifest assets.
+///     Applies cache-busting query parameters to package manifest asset URLs.
 /// </summary>
-public static partial class PackageManifestCacheBuster
+/// <remarks>
+///     This is used server-side for the type-safe importmap only. Registered extension asset URLs are cache-busted
+///     client-side (the backoffice reads each package's <c>version</c> off the manifest and applies the same rules),
+///     so the server never has to unwrap the untyped extension JSON.
+/// </remarks>
+public static class PackageManifestCacheBuster
 {
-    private const string QueryParameterName = "umb__rnd";
-
     // The /App_Plugins root with a trailing slash, so the StartsWith check honours a path-segment boundary
     // (and never matches e.g. "/App_PluginsFoo/...").
     private static readonly string _appPluginsPrefix = Constants.SystemDirectories.AppPlugins.EnsureEndsWith('/');
 
-    // Auto-stamping only targets JavaScript entrypoints (.js / .mjs) — the non-bundler-hashed files that actually
-    // need a version-driven bust. Matching by extension keeps the algorithm type-agnostic (it never needs to know
-    // which manifest keys hold URLs) while avoiding rewriting a string that merely looks like an /App_Plugins path
-    // but isn't a fetchable script (a route, an icon path, an alias, etc.).
-    [GeneratedRegex(@"\.m?js$", RegexOptions.IgnoreCase)]
-    private static partial Regex JavaScriptExtensionRegex();
-
     /// <summary>
-    ///     Returns the cache-bust hash for a package: when a <paramref name="packageVersion"/> is present it is salted
-    ///     with <paramref name="globalHash"/> and hashed, so the result moves whenever either the package version or the
-    ///     global hash changes; when absent it falls back to <paramref name="globalHash"/>. Because the global hash
-    ///     carries Umbraco's version and the host's optional cache-bust seed, those flow into every package's hash.
-    /// </summary>
-    public static string ResolvePackageCacheBustHash(string? packageVersion, string globalHash)
-        => string.IsNullOrWhiteSpace(packageVersion)
-            ? globalHash
-            : $"{packageVersion}|{globalHash}".GenerateHash();
-
-    /// <summary>
-    ///     Resolves the cache-bust hash and auto-stamp flag for a package in one place, so every manifest-processing
-    ///     path (importmap and extensions) derives them identically. The hash combines the package's
-    ///     <see cref="PackageManifest.Version"/> with <paramref name="globalHash"/> (falling back to
-    ///     <paramref name="globalHash"/> alone when the package has no version) — an explicit <c>%CACHE_BUSTER%</c> token
-    ///     is the author's opt-in and always resolves to it. <see cref="PackageManifest.AllowCacheBusting"/> governs only
-    ///     whether clean URLs are <em>automatically</em> stamped; it does not change the hash.
-    /// </summary>
-    public static (string Hash, bool AutoStamp) ResolvePackageCacheBust(PackageManifest manifest, string globalHash)
-        => (ResolvePackageCacheBustHash(manifest.Version, globalHash), manifest.AllowCacheBusting);
-
-    /// <summary>
-    ///     Applies cache-busting to a single manifest URL using <paramref name="hash"/>.
+    ///     Applies cache-busting to a single manifest URL.
     ///     <para>
-    ///     An explicit <c>%CACHE_BUSTER%</c> token is always resolved to <paramref name="hash"/> wherever it appears
-    ///     (path or query, any host) — that is the author's deliberate opt-in. When <paramref name="autoStamp"/> is
-    ///     <c>true</c>, a clean <c>/App_Plugins</c>-rooted JavaScript path (<c>.js</c>/<c>.mjs</c>) additionally gets
-    ///     <c>?umb__rnd=&lt;hash&gt;</c> appended. Everything else — the backoffice core (<c>/umbraco/backoffice/...</c>),
-    ///     CDNs, protocol-relative URLs, bare module specifiers, relative paths, non-JavaScript assets, and URLs that
-    ///     already carry a query string — is returned unchanged.
+    ///     An explicit <c>%CACHE_BUSTER%</c> token is always resolved (wherever it appears) to the package
+    ///     <paramref name="version"/>, falling back to the host <paramref name="cacheBuster"/> — that is the author's
+    ///     deliberate opt-in. Otherwise, when <paramref name="autoStamp"/> is <c>true</c>, a clean
+    ///     <c>/App_Plugins</c>-rooted URL gets <c>?v=&lt;version&gt;&amp;umb__rnd=&lt;cacheBuster&gt;</c> appended (only
+    ///     the values that are present). Everything else — the backoffice core, CDNs, protocol-relative URLs, bare
+    ///     module specifiers, relative paths, and URLs that already carry a query string — is returned unchanged.
     ///     </para>
     /// </summary>
-    public static string ApplyCacheBust(string url, string hash, bool autoStamp)
+    public static string ApplyCacheBust(string url, string? version, string? cacheBuster, bool autoStamp)
     {
         if (string.IsNullOrEmpty(url))
         {
@@ -65,7 +38,7 @@ public static partial class PackageManifestCacheBuster
         // A URL the author already tokenised is never also auto-stamped.
         if (url.Contains(Constants.Web.CacheBusterToken, StringComparison.Ordinal))
         {
-            return url.Replace(Constants.Web.CacheBusterToken, hash, StringComparison.Ordinal);
+            return url.Replace(Constants.Web.CacheBusterToken, version ?? cacheBuster ?? string.Empty, StringComparison.Ordinal);
         }
 
         if (autoStamp is false)
@@ -86,17 +59,31 @@ public static partial class PackageManifestCacheBuster
             return url;
         }
 
-        var fragmentIndex = url.IndexOf('#');
-        var path = fragmentIndex < 0 ? url : url[..fragmentIndex];
-
-        // Only JavaScript entrypoints are auto-stamped; other asset shapes are left untouched.
-        if (JavaScriptExtensionRegex().IsMatch(path) is false)
+        var query = BuildQuery(version, cacheBuster);
+        if (query.Length == 0)
         {
             return url;
         }
 
+        var fragmentIndex = url.IndexOf('#');
         return fragmentIndex < 0
-            ? $"{url}?{QueryParameterName}={hash}"
-            : $"{path}?{QueryParameterName}={hash}{url[fragmentIndex..]}";
+            ? $"{url}?{query}"
+            : $"{url[..fragmentIndex]}?{query}{url[fragmentIndex..]}";
+    }
+
+    private static string BuildQuery(string? version, string? cacheBuster)
+    {
+        var parameters = new List<string>(2);
+        if (string.IsNullOrWhiteSpace(version) is false)
+        {
+            parameters.Add($"v={Uri.EscapeDataString(version)}");
+        }
+
+        if (string.IsNullOrWhiteSpace(cacheBuster) is false)
+        {
+            parameters.Add($"umb__rnd={Uri.EscapeDataString(cacheBuster)}");
+        }
+
+        return string.Join('&', parameters);
     }
 }

@@ -1,11 +1,8 @@
-using Moq;
+﻿using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Manifest;
-using Umbraco.Cms.Core.Semver;
 using Umbraco.Cms.Infrastructure.Manifest;
 using Umbraco.Cms.Tests.Common;
 
@@ -35,18 +32,11 @@ public class PackageManifestServiceTests
                 NoAppCache.Instance,
                 new IsolatedCaches(type => NoAppCache.Instance));
 
-        var hostingEnvironment = new Mock<IHostingEnvironment>();
-        hostingEnvironment.Setup(x => x.IsDebugMode).Returns(false);
-
-        var umbracoVersion = new Mock<IUmbracoVersion>();
-        umbracoVersion.Setup(x => x.SemanticVersion).Returns(new SemVersion(17, 0, 0));
-
         _service = new PackageManifestService(
             new[] { _readerMock.Object },
             appCaches,
             new TestOptionsMonitor<RuntimeSettings>(new RuntimeSettings { Mode = RuntimeMode.Production }),
-            hostingEnvironment.Object,
-            umbracoVersion.Object);
+            new TestOptionsMonitor<UmbracoPluginSettings>(new UmbracoPluginSettings()));
     }
 
     [Test]
