@@ -9,31 +9,12 @@ import {
 } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbEntityFlag } from '@umbraco-cms/backoffice/entity-flag';
-import { UMB_VARIANT_CONTEXT } from '@umbraco-cms/backoffice/variant';
+import { UmbVariantResolver } from '@umbraco-cms/backoffice/variant';
 import type { Observable } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbItemDataResolver } from '@umbraco-cms/backoffice/entity-item';
-import type { UmbVariantContext } from '@umbraco-cms/backoffice/variant';
 
 type UmbDocumentItemDataResolverModel = Omit<UmbDocumentItemModel, 'parent' | 'hasChildren'>;
-
-/**
- *
- * @param {Array<UmbDocumentItemVariantModel>} variants - An array of variants to check
- * @returns {boolean} Returns true if the variants are invariant, false otherwise
- */
-function isVariantsInvariant(variants: Array<UmbDocumentItemVariantModel>): boolean {
-	return variants?.[0]?.culture === null;
-}
-/**
- *
- * @param {Array<UmbDocumentItemVariantModel>} variants - An array of variants to search
- * @param {string} culture - The culture to find
- * @returns {T | undefined} Returns the variant with the matching culture, or undefined if not found
- */
-function findVariant<T extends UmbDocumentItemVariantModel>(variants: Array<T>, culture: string): T | undefined {
-	return variants.find((x) => x.culture === culture);
-}
 
 /**
  * A controller for resolving data for a document item
@@ -72,38 +53,27 @@ export class UmbDocumentItemDataResolver<DocumentItemModel extends UmbDocumentIt
 	#flags = new UmbArrayState<UmbEntityFlag>([], (data) => data.alias);
 	public readonly flags = this.#flags.asObservable();
 
-	#variantContext?: UmbVariantContext;
-	#fallbackCulture?: string | null;
-	#displayCulture?: string | null;
+	#variantResolver: UmbVariantResolver<UmbDocumentItemVariantModel>;
 
 	constructor(host: UmbControllerHost) {
 		super(host);
 
-		this.consumeContext(UMB_VARIANT_CONTEXT, (context) => {
-			this.#variantContext = context;
-			this.#observeVariantContext();
-		});
-	}
+		this.#variantResolver = new UmbVariantResolver<UmbDocumentItemVariantModel>(this);
 
-	#observeVariantContext() {
+		// Recompute when either the ambient culture or the resolved variant changes. Observing the cultures
+		// triggers a recompute when a culture arrives even if the matched variant is unchanged (clearing the
+		// guard below); observing the variants ensures the recompute reads the freshly resolved variant.
+		this.observe(this.#variantResolver.displayCulture, () => this.#setVariantAwareValues(), 'umbObserveDisplayCulture');
 		this.observe(
-			this.#variantContext?.displayCulture,
-			(displayCulture) => {
-				if (displayCulture === undefined) return;
-				this.#displayCulture = displayCulture;
-				this.#setVariantAwareValues();
-			},
-			'umbObserveVariantId',
-		);
-
-		this.observe(
-			this.#variantContext?.fallbackCulture,
-			(fallbackCulture) => {
-				if (fallbackCulture === undefined) return;
-				this.#fallbackCulture = fallbackCulture;
-				this.#setVariantAwareValues();
-			},
+			this.#variantResolver.fallbackCulture,
+			() => this.#setVariantAwareValues(),
 			'umbObserveFallbackCulture',
+		);
+		this.observe(this.#variantResolver.variant, () => this.#setVariantAwareValues(), 'umbObserveVariant');
+		this.observe(
+			this.#variantResolver.fallbackVariant,
+			() => this.#setVariantAwareValues(),
+			'umbObserveFallbackVariant',
 		);
 	}
 
@@ -113,7 +83,7 @@ export class UmbDocumentItemDataResolver<DocumentItemModel extends UmbDocumentIt
 	 * @memberof UmbDocumentItemDataResolver
 	 */
 	getCulture(): string | null | undefined {
-		return this.#displayCulture || this.#fallbackCulture;
+		return this.#variantResolver.getDisplayCulture() || this.#variantResolver.getFallbackCulture();
 	}
 
 	/**
@@ -132,6 +102,7 @@ export class UmbDocumentItemDataResolver<DocumentItemModel extends UmbDocumentIt
 	 */
 	setData(data: DocumentItemModel | undefined) {
 		this.#data.setValue(data);
+		this.#variantResolver.setVariants(data?.variants);
 		this.#setVariantAwareValues();
 	}
 
@@ -226,10 +197,9 @@ export class UmbDocumentItemDataResolver<DocumentItemModel extends UmbDocumentIt
 	}
 
 	#setVariantAwareValues() {
-		if (!this.#variantContext) return;
-		if (!this.#displayCulture) return;
-		if (!this.#fallbackCulture) return;
-		if (!this.#data) return;
+		if (!this.#variantResolver.getDisplayCulture()) return;
+		if (!this.#variantResolver.getFallbackCulture()) return;
+		if (!this.getData()) return;
 		this.#setName();
 		this.#setIsDraft();
 		this.#setState();
@@ -239,68 +209,44 @@ export class UmbDocumentItemDataResolver<DocumentItemModel extends UmbDocumentIt
 	}
 
 	#setName() {
-		const variant = this.#getCurrentVariant();
+		const variant = this.#variantResolver.getVariant();
 		if (variant?.name) {
 			this.#name.setValue(variant.name);
 			return;
 		}
 
-		const variants = this.getData()?.variants;
-		if (variants) {
-			// Try fallback culture first, then first variant with any name
-			const fallbackName = findVariant(variants, this.#fallbackCulture!)?.name ?? variants.find((x) => x.name)?.name;
+		// Try fallback culture first, then first variant with any name
+		const fallbackName =
+			this.#variantResolver.getFallbackVariant()?.name ?? this.#variantResolver.getVariants().find((x) => x.name)?.name;
 
-			if (fallbackName) {
-				this.#name.setValue(`(${fallbackName})`);
-				return;
-			}
+		if (fallbackName) {
+			this.#name.setValue(`(${fallbackName})`);
+			return;
 		}
 
 		this.#name.setValue('(Untitled)');
 	}
 
 	#setIsDraft() {
-		const variant = this.#getCurrentVariant();
+		const variant = this.#variantResolver.getVariant();
 		const isDraft = variant?.state === UmbDocumentVariantState.DRAFT || false;
 		this.#isDraft.setValue(isDraft);
 	}
 
 	#setState() {
-		const variant = this.#getCurrentVariant();
+		const variant = this.#variantResolver.getVariant();
 		const state = variant?.state || UmbDocumentVariantState.NOT_CREATED;
 		this.#state.setValue(state);
 	}
 
-	async #setCreateDate() {
-		const variant = await this.#getCurrentVariant();
-		if (variant) {
-			this.#createDate.setValue(variant.createDate);
-			return;
-		}
-
-		const variants = this.getData()?.variants;
-		if (variants) {
-			const fallbackCreateDate = findVariant(variants, this.#fallbackCulture!)?.createDate;
-			this.#createDate.setValue(fallbackCreateDate);
-		} else {
-			this.#createDate.setValue(undefined);
-		}
+	#setCreateDate() {
+		const variant = this.#variantResolver.getVariant();
+		this.#createDate.setValue((variant ?? this.#variantResolver.getFallbackVariant())?.createDate);
 	}
 
-	async #setUpdateDate() {
-		const variant = await this.#getCurrentVariant();
-		if (variant) {
-			this.#updateDate.setValue(variant.updateDate);
-			return;
-		}
-
-		const variants = this.getData()?.variants;
-		if (variants) {
-			const fallbackUpdateDate = findVariant(variants, this.#fallbackCulture!)?.updateDate;
-			this.#updateDate.setValue(fallbackUpdateDate);
-		} else {
-			this.#updateDate.setValue(undefined);
-		}
+	#setUpdateDate() {
+		const variant = this.#variantResolver.getVariant();
+		this.#updateDate.setValue((variant ?? this.#variantResolver.getFallbackVariant())?.updateDate);
 	}
 
 	#setFlags() {
@@ -311,18 +257,7 @@ export class UmbDocumentItemDataResolver<DocumentItemModel extends UmbDocumentIt
 		}
 
 		const flags = data.flags ?? [];
-		const variantFlags = this.#getCurrentVariant()?.flags ?? [];
+		const variantFlags = this.#variantResolver.getVariant()?.flags ?? [];
 		this.#flags.setValue([...flags, ...variantFlags]);
-	}
-
-	#getCurrentVariant() {
-		const variants = this.getData()?.variants;
-		if (!variants) return undefined;
-
-		if (isVariantsInvariant(variants)) {
-			return variants[0];
-		}
-
-		return findVariant(variants, this.#displayCulture!);
 	}
 }
