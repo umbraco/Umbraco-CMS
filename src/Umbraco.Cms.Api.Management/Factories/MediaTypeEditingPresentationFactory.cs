@@ -7,13 +7,8 @@ namespace Umbraco.Cms.Api.Management.Factories;
 
 internal sealed class MediaTypeEditingPresentationFactory : ContentTypeEditingPresentationFactory<IMediaType>, IMediaTypeEditingPresentationFactory
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Factories.MediaTypeEditingPresentationFactory"/> class,
-    /// providing the required media type service dependency.
-    /// </summary>
-    /// <param name="mediaTypeService">The service used to manage media types.</param>
-    public MediaTypeEditingPresentationFactory(IMediaTypeService mediaTypeService)
-        : base(mediaTypeService)
+    public MediaTypeEditingPresentationFactory(IMediaTypeService mediaTypeService, IMediaTypeContainerService containerService)
+        : base(containerService, () => mediaTypeService.GetAll())
     {
     }
 

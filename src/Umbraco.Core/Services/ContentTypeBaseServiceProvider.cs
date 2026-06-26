@@ -24,41 +24,46 @@ public class ContentTypeBaseServiceProvider : IContentTypeBaseServiceProvider
         _memberTypeService = memberTypeService;
     }
 
-    /// <inheritdoc />
-    public IContentTypeBaseService For(IContentBase contentBase)
-    {
-        if (contentBase == null)
-        {
-            throw new ArgumentNullException(nameof(contentBase));
-        }
-
-        switch (contentBase)
-        {
-            case IContent _:
-                // TODO (V19): IContentTypeService no longer derives from IContentTypeBaseService, but the
-                // concrete ContentTypeService still implements it via its transitional synchronous bridge.
-                // Remove this cast once IContentTypeBaseServiceProvider is migrated to the async API.
-                return (IContentTypeBaseService)_contentTypeService;
-            case IMedia _:
-                return _mediaTypeService;
-            case IMember _:
-                return _memberTypeService;
-            default:
-                throw new ArgumentException(
-                    $"Invalid contentBase type: {contentBase.GetType().FullName}",
-                    nameof(contentBase));
-        }
-    }
+    // TODO EFCore: uncomment this when interface has the method again.
+    // /// <inheritdoc />
+    // public IContentTypeBaseService For(IContentBase contentBase)
+    // {
+    //     if (contentBase == null)
+    //     {
+    //         throw new ArgumentNullException(nameof(contentBase));
+    //     }
+    //
+    //     switch (contentBase)
+    //     {
+    //         case IContent _:
+    //             return _contentTypeService;
+    //         case IMedia _:
+    //             return _mediaTypeService;
+    //         case IMember _:
+    //             return _memberTypeService;
+    //         default:
+    //             throw new ArgumentException(
+    //                 $"Invalid contentBase type: {contentBase.GetType().FullName}",
+    //                 nameof(contentBase));
+    //     }
+    // }
 
     /// <inheritdoc />
     // note: this should be a default interface method with C# 8
     public IContentTypeComposition? GetContentTypeOf(IContentBase contentBase)
     {
-        if (contentBase == null)
+        switch (contentBase)
         {
-            throw new ArgumentNullException(nameof(contentBase));
+            case IContent _:
+                return _contentTypeService.GetAsync(contentBase.Key).GetAwaiter().GetResult();
+            case IMedia _:
+                return _mediaTypeService.Get(contentBase.Key);
+            case IMember _:
+                return _memberTypeService.Get(contentBase.Key);
+            default:
+                throw new ArgumentException(
+                    $"Invalid contentBase type: {contentBase.GetType().FullName}",
+                    nameof(contentBase));
         }
-
-        return For(contentBase).Get(contentBase.ContentTypeId);
     }
 }

@@ -7,13 +7,8 @@ namespace Umbraco.Cms.Api.Management.Factories;
 
 internal sealed class MemberTypeEditingPresentationFactory : ContentTypeEditingPresentationFactory<IMemberType>, IMemberTypeEditingPresentationFactory
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Factories.MemberTypeEditingPresentationFactory"/> class,
-    /// providing functionality for creating member type editing presentations.
-    /// </summary>
-    /// <param name="memberTypeService">The service used to manage and retrieve member types.</param>
-    public MemberTypeEditingPresentationFactory(IMemberTypeService memberTypeService)
-        : base(memberTypeService)
+    public MemberTypeEditingPresentationFactory(IMemberTypeService memberTypeService, IMemberTypeContainerService containerService)
+        : base(containerService, () => memberTypeService.GetAll())
     {
     }
 

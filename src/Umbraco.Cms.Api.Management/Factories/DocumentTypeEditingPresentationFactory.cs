@@ -7,15 +7,8 @@ namespace Umbraco.Cms.Api.Management.Factories;
 
 internal sealed class DocumentTypeEditingPresentationFactory : ContentTypeEditingPresentationFactory<IContentType>, IDocumentTypeEditingPresentationFactory
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="DocumentTypeEditingPresentationFactory"/> class, using the specified content type service.
-    /// </summary>
-    /// <param name="contentTypeService">The service used to manage and retrieve content types.</param>
-    public DocumentTypeEditingPresentationFactory(IContentTypeService contentTypeService)
-        // TODO (V19): IContentTypeService no longer derives from IContentTypeBaseService<IContentType>, but the concrete
-        // ContentTypeService still implements it. The base factory is shared with the still-synchronous media type
-        // factory, so the document type service is adapted here until that base is migrated to the async API.
-        : base((IContentTypeBaseService<IContentType>)contentTypeService)
+    public DocumentTypeEditingPresentationFactory(IContentTypeService contentTypeService, IContentTypeContainerService containerService)
+        : base(containerService, () => contentTypeService.GetAllAsync().GetAwaiter().GetResult())
     {
     }
 
