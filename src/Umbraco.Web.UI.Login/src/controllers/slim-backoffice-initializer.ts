@@ -16,7 +16,9 @@ import '@umbraco-cms/backoffice/localization';
 
 // The third `cacheBuster` argument ships with the runtime backoffice (resolved via the importmap). This app
 // type-checks against the published @umbraco-cms/backoffice, whose types may lag, so reference the constructor
-// through a signature that includes the parameter. Safe to drop once the pinned backoffice version declares it.
+// through a signature that includes the parameter.
+// TODO: drop this cast and the alias once the login app consumes the backoffice by source — the local
+// UmbServerExtensionRegistrator then declares the cacheBuster parameter directly.
 type UmbServerExtensionRegistratorCtor = new (
 	host: UmbControllerHost,
 	extensionRegistry: typeof umbExtensionsRegistry,
