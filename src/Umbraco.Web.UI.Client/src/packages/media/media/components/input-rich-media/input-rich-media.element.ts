@@ -397,11 +397,11 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 
 		return html`
 			<uui-card-media id=${item.unique} title=${item.name} name=${item.name} .href=${href} ?readonly=${this.readonly}>
-				<umb-imaging-thumbnail
+				<umb-media-thumbnail
 					.unique=${item.media}
 					.alt=${item.name}
 					.icon=${item.icon ?? 'icon-picture'}
-					.externalLoading=${item.isLoading ?? false}></umb-imaging-thumbnail>
+					.externalLoading=${item.isLoading ?? false}></umb-media-thumbnail>
 
 				${this.#renderIsTrashed(item)} ${this.#renderActions(item)}
 			</uui-card-media>
