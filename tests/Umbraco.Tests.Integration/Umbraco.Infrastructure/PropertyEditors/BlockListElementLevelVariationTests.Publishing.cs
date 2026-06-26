@@ -2183,6 +2183,96 @@ internal partial class BlockListElementLevelVariationTests
         }
     }
 
+    [TestCase(true)]
+    [TestCase(false)]
+    public async Task Property_Value_Order_Is_Irrelevant_For_Segment_Values(bool defaultFirst)
+    {
+        var elementType = await CreateElementType(ContentVariation.Segment);
+        var blockListDataType = await CreateBlockListDataType(elementType);
+        var contentType = await CreateContentType(ContentVariation.Segment, blockListDataType);
+
+        var contentValues = new List<BlockPropertyValue>
+        {
+            new() { Alias = "invariantText", Value = "English invariantText content value" },
+        };
+        var settingsValues = new List<BlockPropertyValue>
+        {
+                new() { Alias = "invariantText", Value = "English invariantText settings value" },
+        };
+        if (defaultFirst)
+        {
+            contentValues.AddRange(
+                new() { Alias = "variantText", Value = "English variantText content value, default", Segment = null },
+                new() { Alias = "variantText", Value = "English variantText content value, s1", Segment = "s1" });
+            settingsValues.AddRange(
+                new() { Alias = "variantText", Value = "English variantText settings value, default", Segment = null },
+                new() { Alias = "variantText", Value = "English variantText settings value, s1", Segment = "s1" });
+        }
+        else
+        {
+            contentValues.AddRange(
+                new() { Alias = "variantText", Value = "English variantText content value, s1", Segment = "s1" },
+                new() { Alias = "variantText", Value = "English variantText content value, default", Segment = null });
+            settingsValues.AddRange(
+                new() { Alias = "variantText", Value = "English variantText settings value, s1", Segment = "s1" },
+                new() { Alias = "variantText", Value = "English variantText settings value, default", Segment = null });
+        }
+
+        var content = CreateContent(
+            contentType,
+            elementType,
+            [
+                new BlockProperty(contentValues, settingsValues, null, null)
+            ],
+            true);
+
+        AssertPropertyValues(
+            null,
+            "English invariantText content value",
+            "English variantText content value, default",
+            "English invariantText settings value",
+            "English variantText settings value, default");
+
+        AssertPropertyValues(
+            "s1",
+            "English invariantText content value",
+            "English variantText content value, s1",
+            "English invariantText settings value",
+            "English variantText settings value, s1");
+
+
+        void AssertPropertyValues(
+            string? segment,
+            string expectedInvariantContentValue,
+            string expectedVariantContentValue,
+            string expectedInvariantSettingsValue,
+            string expectedVariantSettingsValue)
+        {
+            SetVariationContext(null, segment);
+            var publishedContent = GetPublishedContent(content.Key);
+
+            var publishedValueFallback = GetRequiredService<IPublishedValueFallback>();
+            var value = publishedContent.Value<BlockListModel>(publishedValueFallback, "blocks");
+            Assert.IsNotNull(value);
+            Assert.AreEqual(1, value.Count);
+
+            var blockListItem = value.First();
+            Assert.AreEqual(2, blockListItem.Content.Properties.Count());
+            Assert.Multiple(() =>
+            {
+                Assert.AreEqual(expectedInvariantContentValue, blockListItem.Content.Value<string>("invariantText"));
+                Assert.AreEqual(expectedVariantContentValue, blockListItem.Content.Value<string>("variantText"));
+            });
+
+            Assert.AreEqual(2, blockListItem.Settings.Properties.Count());
+            Assert.Multiple(() =>
+            {
+                Assert.AreEqual(expectedInvariantSettingsValue, blockListItem.Settings.Value<string>("invariantText"));
+                Assert.AreEqual(expectedVariantSettingsValue, blockListItem.Settings.Value<string>("variantText"));
+            });
+        }
+    }
+
     [TestCase(true, true)]
     [TestCase(true, false)]
     [TestCase(false, true)]

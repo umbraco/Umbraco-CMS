@@ -99,11 +99,9 @@ public sealed class BlockEditorVarianceHandler
             : propertyType.Variations.VariesByCulture()
                 ? blockPropertyValue.Culture.IfNullOrWhiteSpace(variationContext.Culture.IfNullOrWhiteSpace(defaultCulture))
                 : null;
-        var alignedSegment = owner.ContentType.VariesBySegment() is false && VariesBySegment(blockPropertyValue)
+        var alignedSegment = owner.ContentType.VariesBySegment() is false && propertyType.Variations.VariesBySegment()
             ? variationContext.Segment
-            : propertyType.Variations.VariesBySegment()
-                ? blockPropertyValue.Segment.IfNullOrWhiteSpace(variationContext.Segment)
-                : null;
+            : blockPropertyValue.Segment;
 
         return new BlockPropertyValue
         {
