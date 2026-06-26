@@ -65,6 +65,7 @@ public interface IPackageDataInstallation
     /// <param name="typeService">The document type service.</param>
     /// <param name="service">The service for managing content.</param>
     /// <returns>A read-only list of imported content base items.</returns>
+    /// TODO EFCore : Remove this once media and member types have been migrated, and we can use IContentTypeBaseService again.
     IReadOnlyList<TContentBase> ImportContentBase<TContentBase>(
         IEnumerable<CompiledPackageContentBase> docs,
         IDictionary<string, IContentType> importedDocumentTypes,
