@@ -204,7 +204,7 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 			return nothing;
 		}
 
-		if (!this.isMenu && this._initialLoadDone) {
+		if (!this.isMenu && !this._initialLoadDone) {
 			return html`<umb-view-loader></umb-view-loader>`;
 		}
 
