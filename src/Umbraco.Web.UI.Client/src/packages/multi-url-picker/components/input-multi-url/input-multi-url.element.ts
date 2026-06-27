@@ -315,13 +315,15 @@ export class UmbInputMultiUrlElement extends UmbFormControlMixin<string, typeof 
 		return data?.[0]?.name ?? '';
 	}
 
-	async #requestRemoveItem(index: number, name?: string) {
+	async #requestRemoveItem(index: number) {
 		const item = this.#urls[index];
 		if (!item) throw new Error('Could not find item at index: ' + index);
 
+		const name = this.#getResolvedItemName(item);
+
 		await umbConfirmModal(this, {
 			color: 'danger',
-			headline: `Remove ${name || item.name || 'item'}?`,
+			headline: `Remove ${name || 'item'}?`,
 			content: 'Are you sure you want to remove this item?',
 			confirmLabel: '#general_remove',
 		});
@@ -422,7 +424,7 @@ export class UmbInputMultiUrlElement extends UmbFormControlMixin<string, typeof 
 						<uui-action-bar slot="actions">
 							<uui-button
 								label=${this.localize.term('general_remove')}
-								@click=${() => this.#requestRemoveItem(index, name)}></uui-button>
+								@click=${() => this.#requestRemoveItem(index)}></uui-button>
 						</uui-action-bar>
 					`,
 				)}
