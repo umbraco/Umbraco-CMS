@@ -5,8 +5,7 @@ import { UmbExtensionsApiInitializer } from '@umbraco-cms/backoffice/extension-a
 import type { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { ManifestEntityCreateOptionAction } from '@umbraco-cms/backoffice/entity-create-option-action';
-import { UmbArrayState, UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
-import { combineLatest } from '@umbraco-cms/backoffice/external/rxjs';
+import { UmbArrayState, UmbBooleanState, observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbTreeCreateOption } from './types.js';
 
 type ManifestType = ManifestEntityCreateOptionAction;
@@ -28,7 +27,7 @@ export class UmbTreeCreateActionApi extends UmbTreeActionBase {
 			if (!context) return;
 
 			this.observe(
-				combineLatest([context.entityType, context.unique]),
+				observeMultiple([context.entityType, context.unique]),
 				([entityType, unique]) => {
 					if (!entityType || unique === undefined) {
 						this.#options.setValue([]);
