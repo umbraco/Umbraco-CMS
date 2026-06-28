@@ -188,7 +188,8 @@ export class UmbTableElement extends UmbLitElement {
 	@state()
 	private _columnConfigurationHash = '';
 
-	#hasChildrenColumn = false;
+	@state()
+	private _hasChildrenColumn = false;
 
 	#cellElementCache = new WeakMap<UmbTableItem, Map<string, UmbTableColumnLayoutElement>>();
 
@@ -218,11 +219,11 @@ export class UmbTableElement extends UmbLitElement {
 			for (const id of this.#rowRenderedCallbacks.keys()) {
 				if (!currentIds.has(id)) this.#rowRenderedCallbacks.delete(id);
 			}
-			this.#hasChildrenColumn = this._items.some((i) => i.hasChildren);
+			this._hasChildrenColumn = this._items.some((i) => i.hasChildren);
 		}
 		if (changedProperties.has('_items') || changedProperties.has('columns')) {
 			this._columnConfigurationHash = JSON.stringify([
-				this.#hasChildrenColumn,
+				this._hasChildrenColumn,
 				...this.columns.map((column) => column.alias),
 			]);
 		}
@@ -343,10 +344,10 @@ export class UmbTableElement extends UmbLitElement {
 			this._columnConfigurationHash,
 			html`
 				<uui-table class="uui-text">
-					${this.#hasChildrenColumn ? html`<uui-table-column style="width: 24px;"></uui-table-column>` : nothing}
+					${this._hasChildrenColumn ? html`<uui-table-column style="width: 24px;"></uui-table-column>` : nothing}
 					<uui-table-column style=${ifDefined(style)}></uui-table-column>
 					<uui-table-head>
-						${this.#hasChildrenColumn
+						${this._hasChildrenColumn
 							? html`<uui-table-head-cell class="children-indicator-cell"></uui-table-head-cell>`
 							: nothing}
 						${this._renderHeaderCheckboxCell()}
@@ -414,7 +415,7 @@ export class UmbTableElement extends UmbLitElement {
 				?active=${item.active ?? false}
 				@selected=${() => this._selectRow(item)}
 				@deselected=${() => this._deselectRow(item)}>
-				${this.#hasChildrenColumn
+				${this._hasChildrenColumn
 					? html`<uui-table-cell class="children-indicator-cell">
 							${item.hasChildren ? html`<uui-symbol-expand></uui-symbol-expand>` : nothing}
 						</uui-table-cell>`
