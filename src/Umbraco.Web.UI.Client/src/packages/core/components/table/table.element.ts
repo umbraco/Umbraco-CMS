@@ -185,7 +185,9 @@ export class UmbTableElement extends UmbLitElement {
 	@state()
 	private _selectionMode = false;
 
-	#lastColumnKey = '';
+	@state()
+	private _columnConfigurationHash = '';
+
 	#hasChildrenColumn = false;
 
 	#cellElementCache = new WeakMap<UmbTableItem, Map<string, UmbTableColumnLayoutElement>>();
@@ -218,27 +220,24 @@ export class UmbTableElement extends UmbLitElement {
 			}
 			this.#hasChildrenColumn = this._items.some((i) => i.hasChildren);
 		}
+		if (changedProperties.has('_items') || changedProperties.has('columns')) {
+			this._columnConfigurationHash = JSON.stringify([
+				this.#hasChildrenColumn,
+				...this.columns.map((column) => column.alias),
+			]);
+		}
 	}
 
 	override updated(changedProperties: Map<string | number | symbol, unknown>) {
 		super.updated(changedProperties);
 
 		// The `keyed` directive in `render()` rebuilds the `<uui-table>` element when the column
-		// signature changes. The sorter caches its container element on first initialization, so
-		// when the table is replaced we need to reattach it to the fresh node. Gate on the key
-		// because the key also depends on `#hasChildrenColumn`, which can toggle from an items update alone.
-		if (this._sortable) {
-			const columnKey = this.#getColumnKey();
-			if (columnKey !== this.#lastColumnKey) {
-				this.#lastColumnKey = columnKey;
-				this.#sorter.disable();
-				this.#sorter.enable();
-			}
+		// configuration changes. The sorter caches its container element on first initialization, so
+		// when the table is replaced we need to reattach it to the fresh node.
+		if (this._sortable && changedProperties.has('_columnConfigurationHash')) {
+			this.#sorter.disable();
+			this.#sorter.enable();
 		}
-	}
-
-	#getColumnKey() {
-		return JSON.stringify([this.#hasChildrenColumn, ...this.columns.map((column) => column.alias)]);
 	}
 
 	#sorter = new UmbSorterController<UmbTableItem>(this, {
@@ -339,9 +338,9 @@ export class UmbTableElement extends UmbLitElement {
 		const style = !(this.config.allowSelection === false && this.config.hideIcon === true) ? 'width: 60px' : undefined;
 		// Firefox's `display: table-*` engine does not reliably relayout when cells are
 		// inserted or removed from existing rows. Key the whole table on the column
-		// signature so the table is rebuilt whenever the column set changes.
+		// configuration so the table is rebuilt whenever the column set changes.
 		return keyed(
-			this.#getColumnKey(),
+			this._columnConfigurationHash,
 			html`
 				<uui-table class="uui-text">
 					${this.#hasChildrenColumn ? html`<uui-table-column style="width: 24px;"></uui-table-column>` : nothing}
