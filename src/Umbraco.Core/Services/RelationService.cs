@@ -438,12 +438,25 @@ public class RelationService : RepositoryService, IRelationService
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
 
         ICollection<string> aliases = relationTypeAliases as ICollection<string> ?? relationTypeAliases.ToArray();
-        int[] relationTypeIds = aliases.Count == 0
-            ? []
-            : _relationTypeRepository.GetMany(Array.Empty<int>())
-                .Where(relationType => aliases.Contains(relationType.Alias))
-                .Select(relationType => relationType.Id)
-                .ToArray();
+        if (aliases.Count == 0)
+        {
+            // No alias filter requested: return parents across all relation types.
+            return _relationRepository.GetPagedParentEntitiesByChildId(
+                id, pageIndex, pageSize, out totalChildren, [], entityTypes.Select(x => x.GetGuid()).ToArray());
+        }
+
+        int[] relationTypeIds = _relationTypeRepository.GetMany(Array.Empty<int>())
+            .Where(relationType => aliases.Contains(relationType.Alias))
+            .Select(relationType => relationType.Id)
+            .ToArray();
+
+        // Aliases were requested but none exist: filter to those types only, so there are no matches.
+        // Delegating with an empty id array would instead be treated as "no filter" (all relation types).
+        if (relationTypeIds.Length == 0)
+        {
+            totalChildren = 0;
+            return [];
+        }
 
         return _relationRepository.GetPagedParentEntitiesByChildId(
             id, pageIndex, pageSize, out totalChildren, relationTypeIds, entityTypes.Select(x => x.GetGuid()).ToArray());
