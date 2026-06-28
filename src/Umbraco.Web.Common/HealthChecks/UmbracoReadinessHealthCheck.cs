@@ -6,7 +6,9 @@ namespace Umbraco.Cms.Web.Common.HealthChecks;
 
 /// <summary>
 /// ASP.NET Core health check that reports readiness based on the Umbraco runtime level.
-/// Reports <see cref="HealthCheckResult.Healthy"/> only when the runtime level is <see cref="RuntimeLevel.Run"/>.
+/// Reports <see cref="HealthCheckResult.Healthy"/> when the runtime level is <see cref="RuntimeLevel.Run"/>,
+/// otherwise <see cref="HealthCheckResult.Unhealthy"/> (mapped to HTTP 503 by the default status-code mapping)
+/// so the endpoint signals "not ready" during startup and unattended upgrades.
 /// </summary>
 internal sealed class UmbracoReadinessHealthCheck : IHealthCheck
 {
@@ -21,5 +23,5 @@ internal sealed class UmbracoReadinessHealthCheck : IHealthCheck
         => Task.FromResult(
             _runtimeState.Level == RuntimeLevel.Run
                 ? HealthCheckResult.Healthy("Umbraco is ready.")
-                : HealthCheckResult.Degraded($"Umbraco is not yet ready. Level: {_runtimeState.Level}"));
+                : HealthCheckResult.Unhealthy($"Umbraco is not yet ready. Level: {_runtimeState.Level}"));
 }
