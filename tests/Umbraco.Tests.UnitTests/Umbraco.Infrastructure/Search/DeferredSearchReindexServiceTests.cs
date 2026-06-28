@@ -446,12 +446,10 @@ public class DeferredSearchReindexServiceTests
     public void Finds_Document_Transitively_Referencing_Element()
     {
         // Document 100 embeds element 1; element 1 embeds element 2 (the one that changes).
-        SetupRelationGraph(new Dictionary<(int childId, UmbracoObjectTypes type), int[]>
+        SetupRelationGraph(new Dictionary<int, (int id, Guid objectType)[]>
         {
-            { (2, UmbracoObjectTypes.Document), [] },
-            { (2, UmbracoObjectTypes.Element), [1] },
-            { (1, UmbracoObjectTypes.Document), [100] },
-            { (1, UmbracoObjectTypes.Element), [] },
+            { 2, [(1, Constants.ObjectTypes.Element)] },
+            { 1, [(100, Constants.ObjectTypes.Document)] },
         });
 
         var documentIds = _service.FindDocumentIdsReferencingElements([2]);
@@ -466,12 +464,10 @@ public class DeferredSearchReindexServiceTests
     public void Terminates_On_Cyclic_Element_References()
     {
         // Element 1 <-> element 2 (cycle); document 100 embeds element 1. Element 2 changes.
-        SetupRelationGraph(new Dictionary<(int childId, UmbracoObjectTypes type), int[]>
+        SetupRelationGraph(new Dictionary<int, (int id, Guid objectType)[]>
         {
-            { (2, UmbracoObjectTypes.Document), [] },
-            { (2, UmbracoObjectTypes.Element), [1] },
-            { (1, UmbracoObjectTypes.Document), [100] },
-            { (1, UmbracoObjectTypes.Element), [2] },
+            { 2, [(1, Constants.ObjectTypes.Element)] },
+            { 1, [(100, Constants.ObjectTypes.Document), (2, Constants.ObjectTypes.Element)] },
         });
 
         var documentIds = _service.FindDocumentIdsReferencingElements([2]);
@@ -479,7 +475,7 @@ public class DeferredSearchReindexServiceTests
         CollectionAssert.AreEquivalent(new[] { 100 }, documentIds);
     }
 
-    private void SetupRelationGraph(Dictionary<(int childId, UmbracoObjectTypes type), int[]> graph)
+    private void SetupRelationGraph(Dictionary<int, (int id, Guid objectType)[]> graph)
     {
         _relationService
             .Setup(r => r.GetPagedParentEntitiesByChildId(
@@ -487,18 +483,18 @@ public class DeferredSearchReindexServiceTests
                 It.IsAny<long>(),
                 It.IsAny<int>(),
                 out It.Ref<long>.IsAny,
+                It.IsAny<IEnumerable<string>>(),
                 It.IsAny<UmbracoObjectTypes[]>()))
-            .Returns((int id, long pageIndex, int pageSize, out long total, UmbracoObjectTypes[] types) =>
+            .Returns((int id, long pageIndex, int pageSize, out long total, IEnumerable<string> aliases, UmbracoObjectTypes[] types) =>
             {
-                UmbracoObjectTypes type = types.Length > 0 ? types[0] : UmbracoObjectTypes.Unknown;
-                int[] parents = graph.TryGetValue((id, type), out int[]? ids) ? ids : [];
+                (int id, Guid objectType)[] parents = graph.TryGetValue(id, out (int id, Guid objectType)[]? p) ? p : [];
                 total = parents.Length;
-                return pageIndex == 0 ? parents.Select(CreateEntity).ToArray() : [];
+                return pageIndex == 0 ? parents.Select(parent => CreateEntity(parent.id, parent.objectType)).ToArray() : [];
             });
     }
 
-    private static IUmbracoEntity CreateEntity(int id)
-        => Mock.Of<IUmbracoEntity>(e => e.Id == id);
+    private static IEntitySlim CreateEntity(int id, Guid nodeObjectType)
+        => Mock.Of<IEntitySlim>(e => e.Id == id && e.NodeObjectType == nodeObjectType);
 
     private static IContent CreateContent(int id, bool published)
     {
