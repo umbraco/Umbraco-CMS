@@ -99,6 +99,9 @@ public partial class UmbracoPlan : MigrationPlan
         To<V_17_4_0.AddExternalMemberTables>("{D7E8F9A0-B1C2-4D3E-A5F6-7890ABCDEF12}");
         To<V_17_4_0.FixLabelDataTypeDbTypeFromConfiguration>("{3F9B6A1C-7D84-4E2B-9C15-6A2E8F3D5B47}");
 
+        // To 17.5.0
+        To<V_17_5_0.ConvertRichTextBlockUdisToKeys>("{C1A9F4E2-6B73-4D85-9E1A-2F0B8C3D5A41}");
+
         // To 18.0.0
         To<V_18_0_0.AddElementContainerPermissions>("{D00BB11A-DDF8-47C4-B58E-150C123BB3BB}");
         To<V_18_0_0.MigrateSingleBlockList>("{74332C49-B279-4945-8943-F8F00B1F5949}");
