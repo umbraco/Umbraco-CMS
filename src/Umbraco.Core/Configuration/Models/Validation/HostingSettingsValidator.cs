@@ -15,6 +15,8 @@ public class HostingSettingsValidator
     /// <inheritdoc />
     public ValidateOptionsResult Validate(string? name, HostingSettings options)
     {
+        // WEBSITE_INSTANCE_ID is an environment variable, not a config value, so it cannot be validated here.
+        // MachineInfoFactory.GetMachineIdentifier() carries its own runtime length guard for that path.
         var baseName = string.IsNullOrWhiteSpace(options.MachineIdentifier)
             ? Environment.MachineName
             : options.MachineIdentifier;

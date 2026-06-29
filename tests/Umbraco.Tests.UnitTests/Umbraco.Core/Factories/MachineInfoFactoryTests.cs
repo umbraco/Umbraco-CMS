@@ -13,6 +13,19 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Factories;
 [TestFixture]
 public class MachineInfoFactoryTests
 {
+    private string? _savedWebsiteInstanceId;
+
+    [SetUp]
+    public void SetUp()
+    {
+        _savedWebsiteInstanceId = Environment.GetEnvironmentVariable(MachineInfoFactory.AzureWebsiteInstanceIdEnvironmentVariable);
+        Environment.SetEnvironmentVariable(MachineInfoFactory.AzureWebsiteInstanceIdEnvironmentVariable, null);
+    }
+
+    [TearDown]
+    public void TearDown() =>
+        Environment.SetEnvironmentVariable(MachineInfoFactory.AzureWebsiteInstanceIdEnvironmentVariable, _savedWebsiteInstanceId);
+
     [Test]
     public void BuildMachineIdentifier_WithNoSiteName_ReturnsMachineNameOnly()
     {
@@ -107,49 +120,25 @@ public class MachineInfoFactoryTests
     [Test]
     public void GetMachineIdentifier_WithWebsiteInstanceId_UsesInstanceId()
     {
-        string? original = Environment.GetEnvironmentVariable(MachineInfoFactory.AzureWebsiteInstanceIdEnvironmentVariable);
-        try
-        {
-            Environment.SetEnvironmentVariable(MachineInfoFactory.AzureWebsiteInstanceIdEnvironmentVariable, "abc123instanceid");
-            var factory = CreateFactory(siteName: null);
-            Assert.AreEqual("abc123instanceid", factory.GetMachineIdentifier());
-        }
-        finally
-        {
-            Environment.SetEnvironmentVariable(MachineInfoFactory.AzureWebsiteInstanceIdEnvironmentVariable, original);
-        }
+        Environment.SetEnvironmentVariable(MachineInfoFactory.AzureWebsiteInstanceIdEnvironmentVariable, "abc123instanceid");
+        var factory = CreateFactory(siteName: null);
+        Assert.AreEqual("abc123instanceid", factory.GetMachineIdentifier());
     }
 
     [Test]
     public void GetMachineIdentifier_WithWebsiteInstanceIdAndSiteName_UsesInstanceIdSlashSiteName()
     {
-        string? original = Environment.GetEnvironmentVariable(MachineInfoFactory.AzureWebsiteInstanceIdEnvironmentVariable);
-        try
-        {
-            Environment.SetEnvironmentVariable(MachineInfoFactory.AzureWebsiteInstanceIdEnvironmentVariable, "abc123instanceid");
-            var factory = CreateFactory(siteName: "mysite");
-            Assert.AreEqual("abc123instanceid/mysite", factory.GetMachineIdentifier());
-        }
-        finally
-        {
-            Environment.SetEnvironmentVariable(MachineInfoFactory.AzureWebsiteInstanceIdEnvironmentVariable, original);
-        }
+        Environment.SetEnvironmentVariable(MachineInfoFactory.AzureWebsiteInstanceIdEnvironmentVariable, "abc123instanceid");
+        var factory = CreateFactory(siteName: "mysite");
+        Assert.AreEqual("abc123instanceid/mysite", factory.GetMachineIdentifier());
     }
 
     [Test]
     public void GetMachineIdentifier_WithMachineIdentifierAndWebsiteInstanceId_PrefersMachineIdentifier()
     {
-        string? original = Environment.GetEnvironmentVariable(MachineInfoFactory.AzureWebsiteInstanceIdEnvironmentVariable);
-        try
-        {
-            Environment.SetEnvironmentVariable(MachineInfoFactory.AzureWebsiteInstanceIdEnvironmentVariable, "abc123instanceid");
-            var factory = CreateFactory(siteName: null, machineIdentifier: "explicit-override");
-            Assert.AreEqual("explicit-override", factory.GetMachineIdentifier());
-        }
-        finally
-        {
-            Environment.SetEnvironmentVariable(MachineInfoFactory.AzureWebsiteInstanceIdEnvironmentVariable, original);
-        }
+        Environment.SetEnvironmentVariable(MachineInfoFactory.AzureWebsiteInstanceIdEnvironmentVariable, "abc123instanceid");
+        var factory = CreateFactory(siteName: null, machineIdentifier: "explicit-override");
+        Assert.AreEqual("explicit-override", factory.GetMachineIdentifier());
     }
 
     private static MachineInfoFactory CreateFactory(string? siteName, string? machineIdentifier = null)
