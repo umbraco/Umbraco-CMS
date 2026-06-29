@@ -41,7 +41,7 @@ export class UmbMemberServerDataSource extends UmbControllerBase implements UmbD
 				unique: memberTypeUnique,
 				icon: memberTypeIcon,
 			},
-			isApproved: false,
+			isApproved: true,
 			isLockedOut: false,
 			isTwoFactorEnabled: false,
 			kind: UmbMemberKind.DEFAULT,

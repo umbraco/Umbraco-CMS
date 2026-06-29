@@ -2,6 +2,7 @@ import { html, customElement, property, ifDefined } from '@umbraco-cms/backoffic
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { InputType, UUIFormLayoutItemElement } from '@umbraco-cms/backoffice/external/uui';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { umbLocalizationRegistry } from '@umbraco-cms/backoffice/localization';
 
 import { UMB_AUTH_CONTEXT, UmbAuthContext } from './contexts/index.js';
 import { UmbSlimBackofficeController } from './controllers/index.js';
@@ -121,7 +122,7 @@ const createFormLayoutPasswordItem = (
 	label: HTMLLabelElement,
 	input: HTMLInputElement,
 	showPasswordToggle: HTMLSpanElement,
-	requiredMessageKey: string
+	requiredMessageKey: string,
 ) => {
 	const formLayoutItem = document.createElement('uui-form-layout-item') as UUIFormLayoutItemElement;
 	const errorId = input.getAttribute('aria-errormessage') || input.id + '-error';
@@ -228,6 +229,19 @@ export default class UmbAuthElement extends UmbLitElement {
 		});
 	}
 
+	override connectedCallback() {
+		super.connectedCallback();
+
+		// The host's `lang` attribute is set by Razor from GlobalSettings.DefaultUILanguage.
+		// Use it as the initial active language; current-user.context overrides it after login.
+		if (this.lang) {
+			umbLocalizationRegistry.loadLanguage(this.lang);
+		}
+		this.observe(umbLocalizationRegistry.currentLanguage, (lang) => {
+			if (lang) this.lang = lang;
+		});
+	}
+
 	async firstUpdated() {
 		// Bind the (slim) Backoffice controller to this element so that we can use utilities from the Backoffice app.
 		await new UmbSlimBackofficeController(this).register(this);
@@ -311,13 +325,13 @@ export default class UmbAuthElement extends UmbLitElement {
 		const usernameLayoutItem = createFormLayoutItem(
 			usernameLabel,
 			usernameInput,
-			this.usernameIsEmail ? 'auth_requiredEmailValidationMessage' : 'auth_requiredUsernameValidationMessage'
+			this.usernameIsEmail ? 'auth_requiredEmailValidationMessage' : 'auth_requiredUsernameValidationMessage',
 		);
 		const passwordLayoutItem = createFormLayoutPasswordItem(
 			passwordLabel,
 			passwordInput,
 			passwordShowPasswordToggleItem,
-			'auth_requiredPasswordValidationMessage'
+			'auth_requiredPasswordValidationMessage',
 		);
 		const style = document.createElement('style');
 		style.innerHTML = authStyles;
