@@ -54,7 +54,7 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 	private _treeExpansion: UmbEntityExpansionModel = [];
 
 	@state()
-	private _treeInteractionMemories: Array<UmbInteractionMemoryModel> = [];
+	private _treeInteractionMemories?: Array<UmbInteractionMemoryModel>;
 
 	@state()
 	private _currentLocation?: UmbTreeStartNode;
@@ -301,7 +301,7 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 		this.observe(
 			this._pickerContext.interactionMemory.memory(TREE_MEMORY_UNIQUE),
 			(memory) => {
-				this._treeInteractionMemories = memory?.memories ?? [];
+				this._treeInteractionMemories = memory?.memories;
 			},
 			'umbTreePickerInteractionMemoriesObserver',
 		);
