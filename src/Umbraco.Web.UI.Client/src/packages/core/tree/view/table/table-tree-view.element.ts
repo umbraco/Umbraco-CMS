@@ -1,7 +1,7 @@
 import type { UmbTreeItemModel } from '../../types.js';
 import { UmbTreeViewElementBase } from '../tree-view-element-base.js';
 import type { ManifestTreeViewTableKind, MetaTreeViewTableKindColumn } from './types.js';
-import { UmbTreeItemApiBase } from '../../tree-item/tree-item-base/tree-item-api-base.js';
+import { UmbTableTreeViewRowController } from './table-tree-view-row.controller.js';
 import {
 	css,
 	customElement,
@@ -12,10 +12,7 @@ import {
 	type PropertyValues,
 } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbElementControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbEntityContext } from '@umbraco-cms/backoffice/entity';
 import { getItemFallbackIcon } from '@umbraco-cms/backoffice/entity-item';
-import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import type {
 	UmbTableColumn,
 	UmbTableConfig,
@@ -26,20 +23,6 @@ import type {
 
 import './tree-name-table-column-layout.element.js';
 import '@umbraco-cms/backoffice/entity-action';
-
-class UmbTableTreeViewItemApi extends UmbTreeItemApiBase<UmbTreeItemModel> {}
-
-type UmbTableTreeViewRowContext = {
-	host: UmbElementControllerHost;
-	entityContext: UmbEntityContext;
-	api: UmbTableTreeViewItemApi;
-	noAccessObserver: UmbObserverController<boolean>;
-	pathObserver: UmbObserverController<string>;
-	isActiveObserver: UmbObserverController<boolean>;
-	currentNoAccess: boolean;
-	currentPath: string;
-	currentIsActive: boolean;
-};
 
 @customElement('umb-table-tree-view')
 export class UmbTableTreeViewElement extends UmbTreeViewElementBase<UmbTreeItemModel> {
@@ -69,92 +52,43 @@ export class UmbTableTreeViewElement extends UmbTreeViewElementBase<UmbTreeItemM
 	}
 
 	#itemMap = new Map<string, UmbTreeItemModel>();
-	#rowContexts = new Map<string, UmbTableTreeViewRowContext>();
+	#rows = new Map<string, UmbTableTreeViewRowController>();
 
 	#onRowRendered = (element: HTMLElement | undefined, item: UmbTableItem) => {
 		if (!element) {
-			const existing = this.#rowContexts.get(item.id);
-			if (existing) {
-				existing.noAccessObserver.destroy();
-				existing.pathObserver.destroy();
-				existing.isActiveObserver.destroy();
-				existing.host.destroy();
-				this.#rowContexts.delete(item.id);
-			}
+			this.#rows.get(item.id)?.destroy();
+			this.#rows.delete(item.id);
 			return;
 		}
 
-		const existing = this.#rowContexts.get(item.id);
+		const existing = this.#rows.get(item.id);
 		if (existing) {
-			existing.entityContext.setEntityType(item.entityType);
-			existing.entityContext.setUnique(item.id);
-			const treeItem = this.#itemMap.get(item.id);
-			if (treeItem) existing.api.setTreeItem(treeItem);
+			existing.setItem(item.entityType, item.id, this.#itemMap.get(item.id));
 			return;
 		}
 
-		const host = new UmbElementControllerHost(element);
-		host.hostConnected();
+		const row = new UmbTableTreeViewRowController(element, item.entityType, item.id, this.#itemMap.get(item.id));
 
-		const entityContext = new UmbEntityContext(host);
-		entityContext.setEntityType(item.entityType);
-		entityContext.setUnique(item.id);
+		// Register before observers so synchronous emissions see the row.
+		this.#rows.set(item.id, row);
 
-		const api = new UmbTableTreeViewItemApi(host);
-		const treeItem = this.#itemMap.get(item.id);
-		if (treeItem) api.setTreeItem(treeItem);
-
-		const ctx: UmbTableTreeViewRowContext = {
-			host,
-			entityContext,
-			api,
-			currentNoAccess: false,
-			currentPath: '',
-			currentIsActive: false,
-			noAccessObserver: undefined!,
-			pathObserver: undefined!,
-			isActiveObserver: undefined!,
-		};
-
-		// Register before observers so synchronous emissions see the context.
-		this.#rowContexts.set(item.id, ctx);
-
-		ctx.noAccessObserver = this.observe(
-			api.noAccess,
-			(noAccess) => {
-				ctx.currentNoAccess = noAccess ?? false;
-				this.#updateRowSelectable(item.id);
-			},
-			null,
-		);
-
-		ctx.pathObserver = this.observe(
-			api.path,
-			(path) => {
-				ctx.currentPath = path ?? '';
+		row.observeApi({
+			onNoAccessChange: () => this.#updateRowSelectable(item.id),
+			onPathChange: () => {
 				const updated = this.#updateRowHref(item.id);
 				if (updated) this._tableRows = updated;
 			},
-			null,
-		);
-
-		ctx.isActiveObserver = this.observe(
-			api.isActive,
-			(isActive) => {
-				ctx.currentIsActive = isActive ?? false;
-				this.#updateRowActive(item.id);
-			},
-			null,
-		);
+			onActiveChange: () => this.#updateRowActive(item.id),
+		});
 	};
 
 	#updateRowSelectable(id: string) {
 		const idx = this._tableRows.findIndex((r) => r.id === id);
 		if (idx === -1) return;
 
-		const ctx = this.#rowContexts.get(id);
+		const row = this.#rows.get(id);
 		const treeItem = this.#itemMap.get(id);
-		const selectable = !(ctx?.currentNoAccess ?? false) && (treeItem ? this._isSelectableItem(treeItem) : false);
+		const selectable = !(row?.currentNoAccess ?? false) && (treeItem ? this._isSelectableItem(treeItem) : false);
 
 		if (this._tableRows[idx].selectable === selectable) return;
 
@@ -169,11 +103,11 @@ export class UmbTableTreeViewElement extends UmbTreeViewElementBase<UmbTreeItemM
 		const idx = rows.findIndex((r) => r.id === id);
 		if (idx === -1) return null;
 
-		const ctx = this.#rowContexts.get(id);
+		const row = this.#rows.get(id);
 		const treeItem = this.#itemMap.get(id);
 		if (!treeItem) return null;
 
-		const href = this._selectable ? undefined : ctx?.currentPath || undefined;
+		const href = this._selectable ? undefined : row?.currentPath || undefined;
 		const nameData = rows[idx].data.find((d) => d.columnAlias === 'name');
 		if (nameData?.value?.href === href) return null;
 
@@ -191,7 +125,7 @@ export class UmbTableTreeViewElement extends UmbTreeViewElementBase<UmbTreeItemM
 		const idx = this._tableRows.findIndex((r) => r.id === id);
 		if (idx === -1) return;
 
-		const isActive = this.#rowContexts.get(id)?.currentIsActive ?? false;
+		const isActive = this.#rows.get(id)?.currentIsActive ?? false;
 		if (this._tableRows[idx].active === isActive) return;
 
 		this._tableRows = [
@@ -245,10 +179,10 @@ export class UmbTableTreeViewElement extends UmbTreeViewElementBase<UmbTreeItemM
 	#toTableRow(item: UmbTreeItemModel): UmbTableItem {
 		const id = item.unique;
 		const icon = item.isFolder ? 'icon-folder' : (item.icon ?? getItemFallbackIcon());
-		const ctx = this.#rowContexts.get(id);
-		const noAccess = ctx?.currentNoAccess ?? false;
-		const href = this._selectable ? undefined : ctx?.currentPath || undefined;
-		const isActive = ctx?.currentIsActive ?? false;
+		const row = this.#rows.get(id);
+		const noAccess = row?.currentNoAccess ?? false;
+		const href = this._selectable ? undefined : row?.currentPath || undefined;
+		const isActive = row?.currentIsActive ?? false;
 		const name = item.name;
 
 		const manifestColumnData = this.#manifestColumns.map((col) => {
@@ -297,13 +231,10 @@ export class UmbTableTreeViewElement extends UmbTreeViewElementBase<UmbTreeItemM
 		this._tableRows = items.map((item) => this.#toTableRow(item));
 
 		const currentIds = new Set(this._tableRows.map((row) => row.id));
-		for (const [id, ctx] of this.#rowContexts) {
+		for (const [id, row] of this.#rows) {
 			if (!currentIds.has(id)) {
-				ctx.noAccessObserver.destroy();
-				ctx.pathObserver.destroy();
-				ctx.isActiveObserver.destroy();
-				ctx.host.destroy();
-				this.#rowContexts.delete(id);
+				row.destroy();
+				this.#rows.delete(id);
 			}
 		}
 	}
@@ -316,6 +247,9 @@ export class UmbTableTreeViewElement extends UmbTreeViewElementBase<UmbTreeItemM
 				allowSelectAll: false,
 				selectOnly: this._selectOnly,
 			};
+		}
+
+		if (changedProperties.has('_selectable')) {
 			let rows = this._tableRows;
 			for (const id of this.#itemMap.keys()) {
 				rows = this.#updateRowHref(id, rows) ?? rows;
@@ -342,13 +276,10 @@ export class UmbTableTreeViewElement extends UmbTreeViewElementBase<UmbTreeItemM
 
 	override disconnectedCallback() {
 		super.disconnectedCallback();
-		for (const [, ctx] of this.#rowContexts) {
-			ctx.noAccessObserver.destroy();
-			ctx.pathObserver.destroy();
-			ctx.isActiveObserver.destroy();
-			ctx.host.destroy();
+		for (const row of this.#rows.values()) {
+			row.destroy();
 		}
-		this.#rowContexts.clear();
+		this.#rows.clear();
 		this.#itemMap.clear();
 	}
 
