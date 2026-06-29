@@ -32,6 +32,20 @@ internal sealed class ElementCacheService : IElementCacheService, IMemoryCacheSi
 
     private readonly ConvertedPublishedContentCache<string, IPublishedElement> _publishedElementCache = new();
 
+    // Monotonic counter bumped whenever the in-memory cache (L0/L1) is invalidated or refreshed.
+    // GetNodeAsync captures it before reading the backing store and re-checks it before writing
+    // back, so a snapshot read before a concurrent refresh is never written over the refreshed
+    // entry — preventing the stale-set clobber that otherwise persists until a full clear.
+    //
+    // Deliberately a single global counter, not per-key: any invalidation invalidates every in-flight
+    // read-through. The only cost is an occasional skipped cache population when a read-through for one
+    // key overlaps an unrelated refresh — a re-miss on the next request, never stale data. A per-key
+    // scheme would avoid that but needs a global epoch for bulk clears plus an exact per-key bump on
+    // every mutated cache key, which is easy to get wrong and would silently reintroduce the clobber.
+    // Global is correctness-robust; only revisit if read-through churn under heavy concurrent
+    // refreshing ever shows up in profiling.
+    private long _cacheGeneration;
+
     private HashSet<Guid> SeedKeys
     {
         get
@@ -113,14 +127,31 @@ internal sealed class ElementCacheService : IElementCacheService, IMemoryCacheSi
         }
 
         (bool exists, ContentCacheNode? contentCacheNode) = await _hybridCache.TryGetValueAsync<ContentCacheNode?>(cacheKey, CancellationToken.None);
+
+        // A value found in the backing store is already current, so it can always populate the caches
+        // below; only a value built from the read-through DB fetch needs the generation guard.
+        bool snapshotIsCurrent = true;
         if (exists is false)
         {
+            // Capture the cache generation before reading the backing store. If a concurrent refresh or
+            // invalidation bumps the generation while we read and build below, the snapshot we hold is
+            // stale and must not be written back over the refreshed entries (the clobber that leaves
+            // memory permanently stale until a full clear).
+            long generation = Interlocked.Read(ref _cacheGeneration);
+
             contentCacheNode = await GetContentCacheNodeFromRepo();
-            await _hybridCache.SetAsync(
-                cacheKey,
-                contentCacheNode,
-                GetEntryOptions(key, preview),
-                GenerateTags(contentCacheNode));
+            snapshotIsCurrent = IsCacheGenerationCurrent(generation);
+
+            // Skip the write when the generation moved — a refresh has superseded this snapshot. A null
+            // node is still written when current (negative caching, tagged so it can be cleared).
+            if (snapshotIsCurrent)
+            {
+                await _hybridCache.SetAsync(
+                    cacheKey,
+                    contentCacheNode,
+                    GetEntryOptions(key, preview),
+                    GenerateTags(contentCacheNode));
+            }
         }
 
         if (contentCacheNode is null)
@@ -129,7 +160,10 @@ internal sealed class ElementCacheService : IElementCacheService, IMemoryCacheSi
         }
 
         IPublishedElement? result = _publishedContentFactory.ToIPublishedElement(contentCacheNode, preview)?.CreateModel(_publishedModelFactory);
-        if (result is not null)
+
+        // Only populate the L0 cache when our snapshot is still current; otherwise a concurrent
+        // refresh has already written fresher content and we must not overwrite it with this one.
+        if (result is not null && snapshotIsCurrent)
         {
             // The size estimate is cheap (O(properties), no IO/decompression) and only runs on the
             // cache-miss path, so keeping the running total always-current means it is accurate the
@@ -146,6 +180,13 @@ internal sealed class ElementCacheService : IElementCacheService, IMemoryCacheSi
         }
     }
 
+    // Bumped after every in-memory cache invalidation/refresh so in-flight read-through snapshots
+    // (see GetNodeAsync) can detect they have been superseded and skip writing back stale content.
+    private void InvalidateMemoryCacheGeneration() => Interlocked.Increment(ref _cacheGeneration);
+
+    private bool IsCacheGenerationCurrent(long capturedGeneration)
+        => Interlocked.Read(ref _cacheGeneration) == capturedGeneration;
+
     public IEnumerable<IPublishedElement> GetByContentType(IPublishedContentType contentType)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
@@ -159,6 +200,10 @@ internal sealed class ElementCacheService : IElementCacheService, IMemoryCacheSi
 
     public async Task ClearMemoryCacheAsync(CancellationToken cancellationToken)
     {
+        // Bump first so any read-through that read the backing store before this clear is rejected
+        // when it tries to write back, even while the reseed below is still running.
+        InvalidateMemoryCacheGeneration();
+
         _publishedElementCache.Clear();
         await _hybridCache.RemoveByTagAsync(Constants.Cache.Tags.Element, cancellationToken);
 
@@ -253,10 +298,12 @@ internal sealed class ElementCacheService : IElementCacheService, IMemoryCacheSi
             var cacheKey = GetCacheKey(publishedNode.Key, false);
             await _hybridCache.SetAsync(cacheKey, publishedNode, GetEntryOptions(publishedNode.Key, false), GenerateTags(publishedNode));
             _publishedElementCache.Remove(cacheKey);
+            InvalidateMemoryCacheGeneration();
         }
         else
         {
-            // No published node in the database cache — remove any stale published entry from the local memory cache.
+            // No published node in the database cache — remove any stale published entry from the local
+            // memory cache. ClearPublishedCacheAsync bumps the generation itself, so this path is covered.
             await ClearPublishedCacheAsync(key);
         }
 
@@ -332,12 +379,17 @@ internal sealed class ElementCacheService : IElementCacheService, IMemoryCacheSi
         ClearConvertedContentCache(elementTypeIdsAsArray);
     }
 
-    public void ClearConvertedContentCache() => _publishedElementCache.Clear();
+    public void ClearConvertedContentCache()
+    {
+        _publishedElementCache.Clear();
+        InvalidateMemoryCacheGeneration();
+    }
 
     public void ClearConvertedContentCache(IReadOnlyCollection<int> elementTypeIds)
     {
         var ids = elementTypeIds as int[] ?? elementTypeIds.ToArray();
         _publishedElementCache.RemoveWhere(element => ids.Contains(element.ContentType.Id));
+        InvalidateMemoryCacheGeneration();
     }
 
     private static string GetCacheKey(Guid key, bool preview) => preview ? $"{key}+draft" : $"{key}";
@@ -386,6 +438,7 @@ internal sealed class ElementCacheService : IElementCacheService, IMemoryCacheSi
         var cacheKey = GetCacheKey(key, false);
         await _hybridCache.RemoveAsync(cacheKey);
         _publishedElementCache.Remove(cacheKey);
+        InvalidateMemoryCacheGeneration();
     }
 
     private static string ElementTypeIdTag(int elementTypeId)
