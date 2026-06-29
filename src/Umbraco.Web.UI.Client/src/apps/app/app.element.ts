@@ -27,6 +27,7 @@ import {
 import { redirectToStoredPath } from '@umbraco-cms/backoffice/utils';
 import { umbHttpClient } from '@umbraco-cms/backoffice/http-client';
 import { UmbViewContext } from '@umbraco-cms/backoffice/view';
+import { umbLocalizationRegistry } from '@umbraco-cms/backoffice/localization';
 
 import './app-logo.element.js';
 import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
@@ -209,6 +210,16 @@ export class UmbAppElement extends UmbLitElement {
 
 	override connectedCallback(): void {
 		super.connectedCallback();
+
+		// The host's `lang` attribute is set by Razor from GlobalSettings.DefaultUILanguage.
+		// Use it as the initial active language; current-user.context overrides it after login.
+		if (this.lang) {
+			umbLocalizationRegistry.loadLanguage(this.lang);
+		}
+		this.observe(umbLocalizationRegistry.currentLanguage, (lang) => {
+			if (lang) this.lang = lang;
+		});
+
 		this.#setup();
 	}
 
@@ -249,7 +260,7 @@ export class UmbAppElement extends UmbLitElement {
 
 		// Register public extensions (login extensions)
 		await new UmbServerExtensionRegistrator(this, umbExtensionsRegistry).registerPublicExtensions();
-		new UmbAppEntryPointExtensionInitializer(this, umbExtensionsRegistry);
+		const entryPointInitializer = new UmbAppEntryPointExtensionInitializer(this, umbExtensionsRegistry);
 
 		// Try to initialise the auth flow and get the runtime status
 		try {
@@ -264,6 +275,12 @@ export class UmbAppElement extends UmbLitElement {
 			} else {
 				await this.#setAuthStatus();
 			}
+
+			// The login screen decides which auth provider to use from the registered
+			// `authProvider` extensions. App-entry-points may register or unregister those during
+			// their async onInit, so wait for them to settle before routing — otherwise on a slow
+			// connection the decision races and falls back to the local login.
+			await this.observe(entryPointInitializer.loaded).asPromise();
 
 			// Initialise the router
 			this.#redirect();

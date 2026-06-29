@@ -1,4 +1,4 @@
-import type { UmbDataSourceResponse } from '../repository/index.js';
+import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 import { TemporaryFileService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecute, tryXhrRequest } from '@umbraco-cms/backoffice/resources';

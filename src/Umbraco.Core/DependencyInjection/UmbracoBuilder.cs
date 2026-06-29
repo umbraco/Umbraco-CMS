@@ -458,6 +458,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IDocumentUrlAliasService, DocumentUrlAliasService>();
             Services.AddNotificationAsyncHandler<UmbracoApplicationStartingNotification, DocumentUrlAliasServiceInitializerNotificationHandler>();
             Services.AddNotificationAsyncHandler<ContentTypeChangedNotification, DocumentUrlServiceContentTypeChangedNotificationHandler>();
+            Services.AddNotificationAsyncHandler<ContentTreeChangeNotification, DocumentUrlServiceContentTreeChangeNotificationHandler>();
         }
     }
 }

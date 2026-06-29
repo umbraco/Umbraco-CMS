@@ -861,8 +861,16 @@ export default {
 		chooseChildNode: '選擇子節點',
 		compositionsDescription:
 			'從已存在的文檔類別中繼承選項卡以及屬性。新選項卡將被新增至目前文檔種類或合併至已存在同名的選項卡中。',
+		compositionsDescriptionMediaType:
+			'從已存在的媒體類別中繼承選項卡以及屬性。新選項卡將被新增至目前媒體種類或合併至已存在同名的選項卡中。',
+		compositionsDescriptionMemberType:
+			'從已存在的會員類別中繼承選項卡以及屬性。新選項卡將被新增至目前會員種類或合併至已存在同名的選項卡中。',
 		compositionInUse: '此內容種類已經用於集合中，因此不能重複添加本身。',
+		compositionInUseMediaType: '此媒體種類已經用於集合中，因此不能重複添加本身。',
+		compositionInUseMemberType: '此會員種類已經用於集合中，因此不能重複添加本身。',
 		noAvailableCompositions: '沒有可用於集合的內容種類。',
+		noAvailableCompositionsMediaType: '沒有可用於集合的媒體種類。',
+		noAvailableCompositionsMemberType: '沒有可用於集合的會員種類。',
 		availableEditors: '可用的編輯器',
 		reuse: '重複使用',
 		editorSettings: '編輯器設定',
@@ -1043,6 +1051,8 @@ export default {
 	redirectUrls: {
 		disableUrlTracker: '停止網址追蹤器',
 		enableUrlTracker: '啟動網址追蹤器',
+		urlTrackerEnabled: '已啟用',
+		urlTrackerDisabled: '已停用',
 		originalUrl: '原本網址',
 		redirectedTo: '轉址成',
 		noRedirects: '沒有任何轉址',

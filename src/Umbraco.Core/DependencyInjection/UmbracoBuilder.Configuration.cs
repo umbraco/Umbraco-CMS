@@ -57,6 +57,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IValidateOptions<RequestHandlerSettings>, RequestHandlerSettingsValidator>();
         builder.Services.AddSingleton<IValidateOptions<UnattendedSettings>, UnattendedSettingsValidator>();
         builder.Services.AddSingleton<IValidateOptions<SecuritySettings>, SecuritySettingsValidator>();
+        builder.Services.AddSingleton<IValidateOptions<ScheduledPublishingSettings>, ScheduledPublishingSettingsValidator>();
 
         // Register configuration sections.
         // TODO (V18): Remove the registrations of UserPasswordConfigurationSettings and MemberPasswordConfigurationSettings.
@@ -102,6 +103,7 @@ public static partial class UmbracoBuilderExtensions
             .AddUmbracoOptions<CacheSettings>()
             .AddUmbracoOptions<SystemDateMigrationSettings>()
             .AddUmbracoOptions<DistributedJobSettings>()
+            .AddUmbracoOptions<ScheduledPublishingSettings>(options => options.ValidateOnStart())
             .AddUmbracoOptions<BackOfficeTokenCookieSettings>()
             .AddUmbracoOptions<WebsiteSettings>()
             .AddUmbracoOptions<SignalRSettings>();

@@ -24,10 +24,15 @@ internal sealed class PublishedMediaStatusFilteringService : IPublishedMediaStat
         => _publishedMediaCache = publishedMediaCache;
 
     /// <inheritdoc />
+    /// <remarks>
+    /// Returned lazily so consumers like .FirstOrDefault() / .Take(n) can short-circuit without
+    /// materialising the full result. Callers that need to enumerate the result more than once
+    /// should buffer it themselves (.ToList() / .ToArray()).
+    /// </remarks>
     public IEnumerable<IPublishedContent> FilterAvailable(IEnumerable<Guid> candidateKeys, string? culture)
-        => candidateKeys.Select(_publishedMediaCache.GetById).WhereNotNull().ToArray();
+        => candidateKeys.Select(_publishedMediaCache.GetById).WhereNotNull();
 
     /// <inheritdoc />
     public IEnumerable<IPublishedContent> Unfiltered(IEnumerable<Guid> candidateKeys)
-        => candidateKeys.Select(_publishedMediaCache.GetById).WhereNotNull().ToArray();
+        => candidateKeys.Select(_publishedMediaCache.GetById).WhereNotNull();
 }
