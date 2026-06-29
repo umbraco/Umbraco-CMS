@@ -136,8 +136,8 @@ export class UmbTableTreeViewElement extends UmbTreeViewElementBase<UmbTreeItemM
 		];
 	}
 
-	protected override _observeContext() {
-		super._observeContext();
+	protected override _gotTreeContext() {
+		super._gotTreeContext();
 
 		this.observe(
 			this._treeContext?.currentPageItems,

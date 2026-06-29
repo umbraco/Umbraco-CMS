@@ -31,11 +31,11 @@ export abstract class UmbTreeViewElementBase<
 		super();
 		this.consumeContext(UMB_TREE_CONTEXT, (context) => {
 			this._treeContext = context as UmbTreeContext<TreeItemType, TreeRootType>;
-			this._observeContext();
+			this._gotTreeContext();
 		});
 	}
 
-	protected _observeContext() {
+	protected _gotTreeContext() {
 		this.observe(
 			this._treeContext?.treeRoot,
 			(treeRoot) => (this._treeRoot = treeRoot as TreeRootType | undefined),
