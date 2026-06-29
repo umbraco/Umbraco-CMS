@@ -52,7 +52,7 @@ export class UmbDefaultTreeContext<
 
 	#selectOnlyConfig?: boolean;
 
-	#isMenu = new UmbBooleanState(false);
+	#isMenu = new UmbBooleanState(undefined);
 	public readonly isMenu = this.#isMenu.asObservable();
 
 	#expandTreeRoot = new UmbBooleanState(undefined);
@@ -264,7 +264,7 @@ export class UmbDefaultTreeContext<
 	}
 
 	getIsMenu(): boolean {
-		return this.#isMenu.getValue();
+		return this.#isMenu.getValue() ?? false;
 	}
 
 	/**
