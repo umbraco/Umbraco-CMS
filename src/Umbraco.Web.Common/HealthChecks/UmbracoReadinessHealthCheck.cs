@@ -9,6 +9,8 @@ namespace Umbraco.Cms.Web.Common.HealthChecks;
 /// Reports <see cref="HealthCheckResult.Healthy"/> when the runtime level is <see cref="RuntimeLevel.Run"/>,
 /// otherwise <see cref="HealthCheckResult.Unhealthy"/> (mapped to HTTP 503 by the default status-code mapping)
 /// so the endpoint signals "not ready" during startup and unattended upgrades.
+/// A <see cref="RuntimeLevel.BootFailed"/> runtime never reaches this check: BootFailedMiddleware is
+/// registered ahead of the health checks and short-circuits the request with HTTP 500.
 /// </summary>
 internal sealed class UmbracoReadinessHealthCheck : IHealthCheck
 {
