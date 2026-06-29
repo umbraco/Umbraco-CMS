@@ -2205,7 +2205,7 @@ export default {
 		updateDate: 'User last updated',
 		userCreated: 'has been created',
 		userCreatedSuccessHelp: 'The new user has successfully been created. To log in to Umbraco use the password below.',
-		userCreatedApiSuccessHelp: 'Set client credentials for the account via the user\'s profile.',
+		userCreatedApiSuccessHelp: "Set client credentials for the account via the user's profile.",
 		userHasPassword: 'The user already has a password set',
 		userHasGroup: "The user is already in group '%0%'",
 		userLockoutNotEnabled: 'Lockout is not enabled for this user',
@@ -2423,7 +2423,6 @@ export default {
 		characters_exceed: 'Maximum %0% characters, <strong>%1%</strong> too many.',
 		maxCharsLabel: 'Maximum allowed characters',
 		autocompleteLabel: 'Autocomplete',
-		autocompletePlaceholder: '',
 	},
 	recycleBin: {
 		contentTrashed: 'Trashed content with Id: {0} related to original parent content with Id: {1}',
