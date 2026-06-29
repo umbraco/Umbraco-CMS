@@ -336,7 +336,10 @@ export class UmbTableElement extends UmbLitElement {
 	}
 
 	override render() {
-		const style = !(this.config.allowSelection === false && this.config.hideIcon === true) ? 'width: 60px' : undefined;
+		const iconColumnWidth = this._hasChildrenColumn ? '45px' : '60px';
+		const style = !(this.config.allowSelection === false && this.config.hideIcon === true)
+			? `width: ${iconColumnWidth}`
+			: undefined;
 		// Firefox's `display: table-*` engine does not reliably relayout when cells are
 		// inserted or removed from existing rows. Key the whole table on the column
 		// configuration so the table is rebuilt whenever the column set changes.
