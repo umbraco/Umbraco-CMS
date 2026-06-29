@@ -15,7 +15,11 @@ import type { UmbBlockEditorCustomViewConfiguration } from '@umbraco-cms/backoff
 import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
 import type { UmbDataTypeDetailModel } from '@umbraco-cms/backoffice/data-type';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
-import type { UMB_BLOCK_WORKSPACE_CONTEXT, UmbBlockDataType } from '@umbraco-cms/backoffice/block';
+import type {
+	UMB_BLOCK_WORKSPACE_CONTEXT,
+	UmbBlockDataType,
+	UmbBlockLabelUfmValueType,
+} from '@umbraco-cms/backoffice/block';
 
 const apiArgsCreator: UmbApiConstructorArgumentsMethodType<unknown> = (manifest: unknown) => {
 	return [{ manifest }];
@@ -209,7 +213,7 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 	}
 
 	#renderBlockInfo() {
-		const blockValue = { ...this.content, $settings: this.settings, $index: this.index };
+		const blockValue: UmbBlockLabelUfmValueType = { ...this.content, $settings: this.settings, $index: this.index };
 		return html`
 			<span id="content">
 				<span id="icon">

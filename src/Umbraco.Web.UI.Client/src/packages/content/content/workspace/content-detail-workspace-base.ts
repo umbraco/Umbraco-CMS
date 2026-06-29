@@ -21,7 +21,12 @@ import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
 import { UmbDataTypeItemRepositoryManager } from '@umbraco-cms/backoffice/data-type';
 import { UmbReadOnlyVariantGuardManager } from '@umbraco-cms/backoffice/utils';
-import { UmbEntityDetailWorkspaceContextBase, UmbWorkspaceSplitViewManager } from '@umbraco-cms/backoffice/workspace';
+import {
+	notifyWorkspaceActionStarting,
+	UmbEntityDetailWorkspaceContextBase,
+	UmbWorkspaceSplitViewManager,
+} from '@umbraco-cms/backoffice/workspace';
+import type { UmbWorkspaceActionExecutionOptions } from '@umbraco-cms/backoffice/workspace';
 import {
 	UmbEntityUpdatedEvent,
 	UmbRequestReloadChildrenOfEntityEvent,
@@ -394,7 +399,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 	public async loadLanguages() {
 		// TODO: If we don't end up having a Global Context for languages, then we should at least change this into using a asObservable which should be returned from the repository. [Nl]
-		const { data } = await this.#languageRepository.requestCollection({});
+		const { data } = await this.#languageRepository.requestAllItems();
 		this.#languages.setValue(data?.items ?? []);
 	}
 
@@ -686,11 +691,11 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 				throw new Error(`Property alias "${alias}" not found.`);
 			}
 
-			if (
-				(property.variesByCulture && variantId.isCultureInvariant()) ||
-				(property.variesBySegment && variantId.isSegmentInvariant())
-			) {
-				throw new Error(`Property alias "${alias}" requires a variantId.`);
+			// Effective variance is the intersection: a variant property on an invariant content type is treated as invariant.
+			// A null segment is the default segment, so segment-variance is not guarded here.
+			const contentTypeVariesByCulture = this.getVariesByCulture() ?? false;
+			if (property.variesByCulture && contentTypeVariesByCulture && variantId.isCultureInvariant()) {
+				throw new Error(`Property alias "${alias}" requires a culture variantId.`);
 			}
 
 			// the getItemByUnique is a async method that first resolves once the item is loaded.
@@ -911,10 +916,11 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 	/**
 	 * Request a save of the workspace, in the case of Document Workspaces the validation does not need to be valid for this to be saved.
+	 * @param {UmbWorkspaceActionExecutionOptions} [options] - Optional execution options (e.g. `onActionStarting` invoked after any save-variant modal closes).
 	 * @returns {Promise<void>} A promise which resolves once it has been completed.
 	 */
-	public requestSave() {
-		return this._handleSave();
+	public requestSave(options?: UmbWorkspaceActionExecutionOptions) {
+		return this._handleSave(options);
 	}
 
 	/**
@@ -931,7 +937,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		await this._handleSave();
 		this._closeModal();
 	}
-	protected async _handleSave(): Promise<void> {
+	protected async _handleSave(executionOptions?: UmbWorkspaceActionExecutionOptions): Promise<void> {
 		const data = this.getData();
 		if (!data) {
 			throw new Error('Data is missing');
@@ -968,6 +974,9 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			These are based on the variants that have been edited */
 			variantIds = selected.map((x) => UmbVariantId.FromString(x));
 		}
+
+		// User has committed to saving (modal closed with a selection, or no modal needed).
+		notifyWorkspaceActionStarting(executionOptions);
 
 		const saveData = await this.constructSaveData(variantIds);
 

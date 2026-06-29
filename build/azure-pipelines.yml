@@ -825,74 +825,31 @@ stages:
                 publishFeedCredentials: "MyGet - Umbraco Nightly"
               ${{ else }}:
                 publishFeedCredentials: "MyGet - Pre-releases"
+      # Pre-release/nightly feeds: keep the `latest` dist-tag default (no `next` split).
       - job:
         displayName: Push to pre-release feed (npm)
         steps:
-          - checkout: none
-          - download: current
-            artifact: npm
-          - bash: |
-              # Check if we are on a nightly build
-              if [ $isNightly = "False" ]; then
-                  echo "##[debug]Prerelease build detected"
-                  registry="https://www.myget.org/F/umbracoprereleases/npm/"
-              else
-                  echo "##[debug]Nightly build detected"
-                  registry="https://www.myget.org/F/umbraconightly/npm/"
-              fi
-              echo "@umbraco-cms:registry=$registry" >> .npmrc
-            env:
-              isNightly: ${{parameters.isNightly}}
-            workingDirectory: $(Pipeline.Workspace)/npm
-            displayName: Add scoped registry to .npmrc
-          - task: npmAuthenticate@0
-            displayName: Authenticate with npm (MyGet)
-            inputs:
-              workingFile: "$(Pipeline.Workspace)/npm/.npmrc"
+          - template: templates/npm-publish.yml
+            parameters:
+              artifactName: npm
               customEndpoint: "MyGet (npm) - Umbracoprereleases, MyGet (npm) - Umbraconightly"
-          - bash: |
-              # Setup temp npm project to load in defaults from the local .npmrc
-              npm init -y
-
-              # Find the first .tgz file in the current directory and publish it
-              files=( ./*.tgz )
-              npm publish "${files[0]}"
-            displayName: Push to npm (MyGet)
-            workingDirectory: $(Pipeline.Workspace)/npm
+              displayName: Push to npm (MyGet)
+              ${{ if eq(parameters.isNightly, true) }}:
+                registry: https://www.myget.org/F/umbraconightly/npm/
+              ${{ else }}:
+                registry: https://www.myget.org/F/umbracoprereleases/npm/
       - job: PublishTestHelpersNpm
         displayName: Push TestHelpers to pre-release feed (npm)
         steps:
-          - checkout: none
-          - download: current
-            artifact: npm-testhelpers
-          - bash: |
-              # Check if we are on a nightly build
-              if [ $isNightly = "False" ]; then
-                  echo "##[debug]Prerelease build detected"
-                  registry="https://www.myget.org/F/umbracoprereleases/npm/"
-              else
-                  echo "##[debug]Nightly build detected"
-                  registry="https://www.myget.org/F/umbraconightly/npm/"
-              fi
-              echo "@umbraco-cms:registry=$registry" >> .npmrc
-            env:
-              isNightly: ${{parameters.isNightly}}
-            workingDirectory: $(Pipeline.Workspace)/npm-testhelpers
-            displayName: Add scoped registry to .npmrc
-          - task: npmAuthenticate@0
-            displayName: Authenticate with npm (MyGet)
-            inputs:
-              workingFile: "$(Pipeline.Workspace)/npm-testhelpers/.npmrc"
+          - template: templates/npm-publish.yml
+            parameters:
+              artifactName: npm-testhelpers
               customEndpoint: "MyGet (npm) - Umbracoprereleases, MyGet (npm) - Umbraconightly"
-          - bash: |
-              # Setup temp npm project to load in defaults from the local .npmrc
-              npm init -y
-
-              # Find the first .tgz file in the current directory and publish it
-              files=( ./*.tgz )
-              npm publish "${files[0]}"
-            displayName: Push test helpers to npm (MyGet)
-            workingDirectory: $(Pipeline.Workspace)/npm-testhelpers
+              displayName: Push test helpers to npm (MyGet)
+              ${{ if eq(parameters.isNightly, true) }}:
+                registry: https://www.myget.org/F/umbraconightly/npm/
+              ${{ else }}:
+                registry: https://www.myget.org/F/umbracoprereleases/npm/
 
   - stage: Deploy_NuGet
     displayName: NuGet release
@@ -941,53 +898,30 @@ stages:
     condition: and(in(dependencies.Deploy_NuGet.result, 'Succeeded', 'SucceededWithIssues'), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.npmDeploy}}))
     dependsOn:
       - Deploy_NuGet
+    variables:
+      # `latest` for stable releases, `next` for prereleases.
+      npmDistTag: $[ iif(eq(stageDependencies.Build.A.outputs['build.NBGV_PrereleaseVersionNoLeadingHyphen'], ''), 'latest', 'next') ]
     jobs:
       - job: Publish
         displayName: Push to NPM
         steps:
-          - checkout: none
-          - download: current
-            artifact: npm
-          - bash: echo "@umbraco-cms:registry=https://registry.npmjs.org" >> .npmrc
-            workingDirectory: $(Pipeline.Workspace)/npm
-            displayName: Add scoped registry to .npmrc
-          - task: npmAuthenticate@0
-            displayName: Authenticate with npm
-            inputs:
-              workingFile: $(Pipeline.Workspace)/npm/.npmrc
+          - template: templates/npm-publish.yml
+            parameters:
+              artifactName: npm
+              registry: https://registry.npmjs.org/
               customEndpoint: "NPM - Umbraco Backoffice"
-          - script: |
-              # Setup temp npm project to load in defaults from the local .npmrc
-              npm init -y
-
-              # Find the first .tgz file in the current directory and publish it
-              files=( ./*.tgz )
-              npm publish "${files[0]}"
-            displayName: Push to npm
-            workingDirectory: $(Pipeline.Workspace)/npm
+              displayName: Push to npm
+              npmTag: $(npmDistTag)
       - job: PublishTestHelpers
         displayName: Push Test Helpers to NPM
         steps:
-          - checkout: none
-          - download: current
-            artifact: npm-testhelpers
-          - bash: echo "@umbraco-cms:registry=https://registry.npmjs.org" >> .npmrc
-            workingDirectory: $(Pipeline.Workspace)/npm-testhelpers
-            displayName: Add scoped registry to .npmrc
-          - task: npmAuthenticate@0
-            displayName: Authenticate with npm
-            inputs:
-              workingFile: $(Pipeline.Workspace)/npm-testhelpers/.npmrc
+          - template: templates/npm-publish.yml
+            parameters:
+              artifactName: npm-testhelpers
+              registry: https://registry.npmjs.org/
               customEndpoint: "NPM - Umbraco Backoffice"
-          - script: |
-              # Setup temp npm project to load in defaults from the local .npmrc
-              npm init -y
-
-              # Find the first .tgz file in the current directory and publish it
-              files=( ./*.tgz )
-              npm publish "${files[0]}"
-            displayName: Push test helpers to npm
-            workingDirectory: $(Pipeline.Workspace)/npm-testhelpers
+              displayName: Push test helpers to npm
+              npmTag: $(npmDistTag)
 
   - stage: Upload_API_Docs
     pool:

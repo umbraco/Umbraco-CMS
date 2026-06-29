@@ -9,7 +9,7 @@ export class UmbDateTableColumnViewElement extends UmbLitElement {
 	override render() {
 		if (!this.value) return nothing;
 		const date = new Date(this.value);
-		return html`${date.toLocaleString()}`;
+		return html`${date.toLocaleString(this.localize.lang())}`;
 	}
 }
 

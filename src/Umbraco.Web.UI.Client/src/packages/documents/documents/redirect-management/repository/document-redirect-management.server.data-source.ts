@@ -48,6 +48,9 @@ export class UmbDocumentRedirectManagementServerDataSource {
 	 * @param {boolean} enabled - Whether the tracker should be enabled.
 	 * @returns {*}
 	 * @memberof UmbDocumentRedirectManagementServerDataSource
+	 * @deprecated Deprecated since v17. The backend endpoint is now a no-op; set the
+	 *   `Umbraco:CMS:WebRouting:DisableRedirectUrlTracking` configuration key instead.
+	 *   Scheduled for removal in Umbraco 19.
 	 */
 	async setStatus(enabled: boolean) {
 		const status = enabled ? RedirectStatusModel.ENABLED : RedirectStatusModel.DISABLED;

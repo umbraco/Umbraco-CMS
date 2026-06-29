@@ -1,7 +1,7 @@
 import { UMB_BLOCK_GRID_ENTRY_CONTEXT } from '../block-grid-entry/constants.js';
 import { css, customElement, html, property, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbBlockDataType } from '@umbraco-cms/backoffice/block';
+import type { UmbBlockDataType, UmbBlockLabelUfmValueType } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockEditorCustomViewConfiguration } from '@umbraco-cms/backoffice/block-custom-view';
 import type { UmbUfmResolvedEvent } from '@umbraco-cms/backoffice/ufm';
 
@@ -44,7 +44,7 @@ export class UmbBlockGridBlockElement extends UmbLitElement {
 	settings?: UmbBlockDataType;
 
 	override render() {
-		const blockValue = { ...this.content, $settings: this.settings, $index: this.index };
+		const blockValue: UmbBlockLabelUfmValueType = { ...this.content, $settings: this.settings, $index: this.index };
 		return html`
 			<umb-ref-grid-block
 				standalone

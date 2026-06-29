@@ -1,7 +1,7 @@
 import { css, customElement, html, property, state, when } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
-import type { UmbBlockDataType } from '@umbraco-cms/backoffice/block';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { UmbBlockDataType, UmbBlockLabelUfmValueType } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockEditorCustomViewConfiguration } from '@umbraco-cms/backoffice/block-custom-view';
 
 let hasWarnedLabelDeprecation = false;
@@ -63,7 +63,7 @@ export class UmbRefListBlockElement extends UmbLitElement {
 	};
 
 	override render() {
-		const blockValue = { ...this.content, $settings: this.settings, $index: this.index };
+		const blockValue: UmbBlockLabelUfmValueType = { ...this.content, $settings: this.settings, $index: this.index };
 		return html`
 			<uui-ref-node
 				standalone

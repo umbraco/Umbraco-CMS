@@ -1,7 +1,7 @@
 import { UMB_BLOCK_SINGLE_ENTRY_CONTEXT } from '../../context/index.js';
 import { css, customElement, html, property, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbBlockDataType } from '@umbraco-cms/backoffice/block';
+import type { UmbBlockDataType, UmbBlockLabelUfmValueType } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockEditorCustomViewConfiguration } from '@umbraco-cms/backoffice/block-custom-view';
 import type { UmbUfmResolvedEvent } from '@umbraco-cms/backoffice/ufm';
 
@@ -40,7 +40,7 @@ export class UmbRefSingleBlockElement extends UmbLitElement {
 	config?: UmbBlockEditorCustomViewConfiguration;
 
 	override render() {
-		const blockValue = { ...this.content, $settings: this.settings };
+		const blockValue: UmbBlockLabelUfmValueType = { ...this.content, $settings: this.settings };
 		return html`
 			<uui-ref-node
 				standalone

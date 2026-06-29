@@ -24,7 +24,7 @@ export class RelationTypeUiHelper extends UiBaseLocators{
     this.isDependencyToggle = page.locator("umb-property-layout[label='Is dependency'] #toggle");
     this.parentDropDownBox = page.locator("umb-property-layout[label='Parent'] #native");
     this.childDropDownBox = page.locator("umb-property-layout[label='Child'] #native");
-    this.relationTypeCollection = page.locator('umb-relation-type-table-collection-view')
+    this.relationTypeCollection = page.locator('[data-mark="collection-view:Umb.CollectionView.RelationType.Table"]')
     this.relationTypeWorkspace = page.locator('umb-relation-type-detail-workspace-view');
     this.relationTypeParentType = this.relationTypeWorkspace.locator('[label="Parent Type"]').locator('[slot="editor"]');
     this.relationTypeChildType = this.relationTypeWorkspace.locator('[label="Child Type"]').locator('[slot="editor"]');

@@ -1,4 +1,5 @@
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbEmptyRecycleBinCollectionAction } from './empty-recycle-bin.collection-action.js';
 
 export const manifest: UmbExtensionManifestKind = {
 	type: 'kind',
@@ -8,7 +9,7 @@ export const manifest: UmbExtensionManifestKind = {
 	manifest: {
 		type: 'collectionAction',
 		kind: 'emptyRecycleBin',
-		api: () => import('./empty-recycle-bin.collection-action.js'),
+		api: UmbEmptyRecycleBinCollectionAction,
 		elementName: 'umb-collection-action-button',
 		weight: 100,
 		meta: {
