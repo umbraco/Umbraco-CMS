@@ -83,10 +83,79 @@ public class MachineInfoFactoryTests
         Assert.Throws<InvalidOperationException>(() => factory.GetMachineIdentifier());
     }
 
-    private static MachineInfoFactory CreateFactory(string? siteName)
+    [Test]
+    public void GetMachineIdentifier_WithMachineIdentifier_ReturnsMachineIdentifierDirectly()
+    {
+        var factory = CreateFactory(siteName: null, machineIdentifier: "my-stable-id");
+        Assert.AreEqual("my-stable-id", factory.GetMachineIdentifier());
+    }
+
+    [Test]
+    public void GetMachineIdentifier_WithMachineIdentifier_AppendsSiteName()
+    {
+        var factory = CreateFactory(siteName: "site1", machineIdentifier: "my-stable-id");
+        Assert.AreEqual("my-stable-id/site1", factory.GetMachineIdentifier());
+    }
+
+    [Test]
+    public void GetMachineIdentifier_WithMachineIdentifierThatExceedsMaxLength_ThrowsInvalidOperationException()
+    {
+        var factory = CreateFactory(siteName: null, machineIdentifier: new string('x', MachineInfoFactory.MaxMachineIdentifierLength + 1));
+        Assert.Throws<InvalidOperationException>(() => factory.GetMachineIdentifier());
+    }
+
+    [Test]
+    public void GetMachineIdentifier_WithWebsiteInstanceId_UsesInstanceId()
+    {
+        string? original = Environment.GetEnvironmentVariable(MachineInfoFactory.AzureWebsiteInstanceIdEnvironmentVariable);
+        try
+        {
+            Environment.SetEnvironmentVariable(MachineInfoFactory.AzureWebsiteInstanceIdEnvironmentVariable, "abc123instanceid");
+            var factory = CreateFactory(siteName: null);
+            Assert.AreEqual("abc123instanceid", factory.GetMachineIdentifier());
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable(MachineInfoFactory.AzureWebsiteInstanceIdEnvironmentVariable, original);
+        }
+    }
+
+    [Test]
+    public void GetMachineIdentifier_WithWebsiteInstanceIdAndSiteName_UsesInstanceIdSlashSiteName()
+    {
+        string? original = Environment.GetEnvironmentVariable(MachineInfoFactory.AzureWebsiteInstanceIdEnvironmentVariable);
+        try
+        {
+            Environment.SetEnvironmentVariable(MachineInfoFactory.AzureWebsiteInstanceIdEnvironmentVariable, "abc123instanceid");
+            var factory = CreateFactory(siteName: "mysite");
+            Assert.AreEqual("abc123instanceid/mysite", factory.GetMachineIdentifier());
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable(MachineInfoFactory.AzureWebsiteInstanceIdEnvironmentVariable, original);
+        }
+    }
+
+    [Test]
+    public void GetMachineIdentifier_WithMachineIdentifierAndWebsiteInstanceId_PrefersMachineIdentifier()
+    {
+        string? original = Environment.GetEnvironmentVariable(MachineInfoFactory.AzureWebsiteInstanceIdEnvironmentVariable);
+        try
+        {
+            Environment.SetEnvironmentVariable(MachineInfoFactory.AzureWebsiteInstanceIdEnvironmentVariable, "abc123instanceid");
+            var factory = CreateFactory(siteName: null, machineIdentifier: "explicit-override");
+            Assert.AreEqual("explicit-override", factory.GetMachineIdentifier());
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable(MachineInfoFactory.AzureWebsiteInstanceIdEnvironmentVariable, original);
+        }
+    }
+
+    private static MachineInfoFactory CreateFactory(string? siteName, string? machineIdentifier = null)
     {
         var hostingEnvironment = Mock.Of<IHostingEnvironment>();
-        var hostingSettings = Options.Create(new HostingSettings { SiteName = siteName });
+        var hostingSettings = Options.Create(new HostingSettings { SiteName = siteName, MachineIdentifier = machineIdentifier });
         return new MachineInfoFactory(hostingEnvironment, hostingSettings);
     }
 }

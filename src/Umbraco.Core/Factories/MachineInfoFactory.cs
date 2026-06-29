@@ -13,6 +13,8 @@ internal sealed class MachineInfoFactory : IMachineInfoFactory
     // machineId is stored as NVARCHAR(255) in umbracoLastSynced
     internal const int MaxMachineIdentifierLength = 255;
 
+    internal const string AzureWebsiteInstanceIdEnvironmentVariable = "WEBSITE_INSTANCE_ID";
+
     private readonly IHostingEnvironment _hostingEnvironment;
     private readonly IOptions<HostingSettings> _hostingSettings;
 
@@ -40,13 +42,31 @@ internal sealed class MachineInfoFactory : IMachineInfoFactory
     /// <inheritdoc />
     public string GetMachineIdentifier()
     {
-        var identifier = BuildMachineIdentifier(Environment.MachineName, _hostingSettings.Value.SiteName);
+        var explicitMachineIdentifier = _hostingSettings.Value.MachineIdentifier;
+
+        // Resolve the base name: explicit config → Azure instance ID (stable across container recycles) → OS hostname.
+        string baseName;
+        if (string.IsNullOrWhiteSpace(explicitMachineIdentifier) is false)
+        {
+            baseName = explicitMachineIdentifier;
+        }
+        else
+        {
+            var instanceId = Environment.GetEnvironmentVariable(AzureWebsiteInstanceIdEnvironmentVariable);
+            baseName = string.IsNullOrWhiteSpace(instanceId) ? Environment.MachineName : instanceId;
+        }
+
+        var identifier = BuildMachineIdentifier(baseName, _hostingSettings.Value.SiteName);
 
         if (identifier.Length > MaxMachineIdentifierLength)
         {
+            var settingHint = string.IsNullOrWhiteSpace(explicitMachineIdentifier)
+                ? $"'{Constants.Configuration.ConfigHostingPrefix}{nameof(HostingSettings.SiteName)}'"
+                : $"'{Constants.Configuration.ConfigHostingPrefix}{nameof(HostingSettings.MachineIdentifier)}' or '{Constants.Configuration.ConfigHostingPrefix}{nameof(HostingSettings.SiteName)}'";
+
             throw new InvalidOperationException(
                 $"The combined machine identifier '{identifier}' ({identifier.Length} characters) exceeds the maximum allowed length of {MaxMachineIdentifierLength} characters. " +
-                $"Please shorten the value of '{Constants.Configuration.ConfigHostingPrefix}SiteName'.");
+                $"Please shorten the value of {settingHint}.");
         }
 
         return identifier;

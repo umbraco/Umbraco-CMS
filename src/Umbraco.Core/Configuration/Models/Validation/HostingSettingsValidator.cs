@@ -15,13 +15,21 @@ public class HostingSettingsValidator
     /// <inheritdoc />
     public ValidateOptionsResult Validate(string? name, HostingSettings options)
     {
-        var identifier = MachineInfoFactory.BuildMachineIdentifier(Environment.MachineName, options.SiteName);
+        var baseName = string.IsNullOrWhiteSpace(options.MachineIdentifier)
+            ? Environment.MachineName
+            : options.MachineIdentifier;
+
+        var identifier = MachineInfoFactory.BuildMachineIdentifier(baseName, options.SiteName);
 
         if (identifier.Length > MachineInfoFactory.MaxMachineIdentifierLength)
         {
+            var settingHint = string.IsNullOrWhiteSpace(options.MachineIdentifier)
+                ? $"'{Constants.Configuration.ConfigHostingPrefix}{nameof(HostingSettings.SiteName)}'"
+                : $"'{Constants.Configuration.ConfigHostingPrefix}{nameof(HostingSettings.MachineIdentifier)}' or '{Constants.Configuration.ConfigHostingPrefix}{nameof(HostingSettings.SiteName)}'";
+
             return ValidateOptionsResult.Fail(
                 $"The combined machine identifier '{identifier}' ({identifier.Length} characters) exceeds the maximum allowed length of {MachineInfoFactory.MaxMachineIdentifierLength} characters. " +
-                $"Please shorten the value of '{Constants.Configuration.ConfigHostingPrefix}{nameof(HostingSettings.SiteName)}'.");
+                $"Please shorten the value of {settingHint}.");
         }
 
         return ValidateOptionsResult.Success;
