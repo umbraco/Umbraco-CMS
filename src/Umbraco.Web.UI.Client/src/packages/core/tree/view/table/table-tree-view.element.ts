@@ -115,6 +115,7 @@ export class UmbTableTreeViewElement extends UmbTreeViewElementBase<UmbTreeItemM
 			...rows.slice(0, idx),
 			{
 				...rows[idx],
+				href,
 				data: rows[idx].data.map((d) => (d.columnAlias === 'name' ? { ...d, value: { ...d.value, href } } : d)),
 			},
 			...rows.slice(idx + 1),
@@ -198,6 +199,8 @@ export class UmbTableTreeViewElement extends UmbTreeViewElementBase<UmbTreeItemM
 			return { columnAlias: col.field, value: rawValue };
 		});
 
+		const onOpen = item.hasChildren ? () => this._treeContext?.open?.(item as UmbTreeItemModel) : undefined;
+
 		return {
 			id,
 			icon,
@@ -205,13 +208,15 @@ export class UmbTableTreeViewElement extends UmbTreeViewElementBase<UmbTreeItemM
 			hasChildren: item.hasChildren,
 			selectable: !noAccess && this._isSelectableItem(item as UmbTreeItemModel),
 			active: isActive,
+			href,
+			onOpen,
 			data: [
 				{
 					columnAlias: 'name',
 					value: {
 						name,
 						href,
-						onOpen: item.hasChildren ? () => this._treeContext?.open?.(item as UmbTreeItemModel) : undefined,
+						onOpen,
 					},
 				},
 				...manifestColumnData,

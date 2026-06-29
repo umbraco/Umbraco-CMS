@@ -24,6 +24,10 @@ export interface UmbTableItem {
 	selectable?: boolean;
 	active?: boolean;
 	hasChildren?: boolean;
+	/** When set, the children-expand indicator becomes an anchor linking to this href. */
+	href?: string;
+	/** When set (and no `href` is provided), the children-expand indicator becomes a button invoking this callback. */
+	onOpen?: () => void;
 }
 
 export interface UmbTableItemData {
@@ -420,7 +424,7 @@ export class UmbTableElement extends UmbLitElement {
 				@deselected=${() => this._deselectRow(item)}>
 				${this._hasChildrenColumn
 					? html`<uui-table-cell class="children-indicator-cell">
-							${item.hasChildren ? html`<uui-symbol-expand></uui-symbol-expand>` : nothing}
+							${this.#renderChildrenIndicator(item)}
 						</uui-table-cell>`
 					: nothing}
 				${this._renderRowCheckboxCell(item)}
@@ -432,6 +436,34 @@ export class UmbTableElement extends UmbLitElement {
 			</uui-table-row>
 		`;
 	};
+
+	#renderChildrenIndicator(item: UmbTableItem) {
+		if (!item.hasChildren) return nothing;
+
+		const symbol = html`<uui-symbol-expand></uui-symbol-expand>`;
+
+		if (item.href) {
+			return html`
+				<uui-button compact label=${this.localize.term('general_open')} href=${item.href}>${symbol}</uui-button>
+			`;
+		}
+
+		if (item.onOpen) {
+			return html`
+				<uui-button
+					compact
+					label=${this.localize.term('general_open')}
+					@click=${(e: Event) => {
+						e.stopPropagation();
+						item.onOpen?.();
+					}}>
+					${symbol}
+				</uui-button>
+			`;
+		}
+
+		return symbol;
+	}
 
 	private _renderRowCheckboxCell(item: UmbTableItem) {
 		if (this.sortable === true) {
@@ -547,6 +579,11 @@ export class UmbTableElement extends UmbLitElement {
 				padding-right: 0;
 				display: flex;
 				align-items: center;
+			}
+
+			.children-indicator-cell uui-button {
+				--uui-button-padding-left-factor: 0;
+				--uui-button-padding-right-factor: 0;
 			}
 
 			uui-table-head-cell:focus,
