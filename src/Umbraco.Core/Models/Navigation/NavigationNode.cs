@@ -13,6 +13,8 @@ public sealed class NavigationNode
 
     private readonly ConcurrentHashSet<Guid> _children;
 
+
+#pragma warning disable CS0419 // Ambiguous reference in cref attribute
     /// <summary>
     /// Cached snapshot of <see cref="Children"/> ordered by each child's <c>SortOrder</c>.
     /// </summary>
@@ -25,6 +27,7 @@ public sealed class NavigationNode
     /// cannot finish after a concurrent invalidation has cleared it.
     /// </remarks>
     private Guid[]? _orderedChildren;
+#pragma warning restore CS0419 // Ambiguous reference in cref attribute
 
     private readonly Lock _orderedChildrenLock = new();
 
@@ -172,6 +175,8 @@ public sealed class NavigationNode
         return BuildOrderedChildren(navigationStructure);
     }
 
+
+#pragma warning disable CS0419 // Ambiguous reference in cref attribute
     /// <summary>
     ///     Invalidates the cached ordered-children snapshot.
     /// </summary>
@@ -181,6 +186,7 @@ public sealed class NavigationNode
     ///     child <c>SortOrder</c> and so is stale after such an update).
     /// </remarks>
     internal void InvalidateOrderedChildren()
+#pragma warning restore CS0419 // Ambiguous reference in cref attribute
     {
         lock (_orderedChildrenLock)
         {
@@ -231,6 +237,14 @@ public sealed class NavigationNode
     /// <summary>
     ///     Defines the canonical sibling ordering: by <c>SortOrder</c>, then by key as a tie-break.
     /// </summary>
+    /// <param name="sortOrderA">The sort order of the first node.</param>
+    /// <param name="keyA">The key of the first node, used as the tie-break when sort orders are equal.</param>
+    /// <param name="sortOrderB">The sort order of the second node.</param>
+    /// <param name="keyB">The key of the second node, used as the tie-break when sort orders are equal.</param>
+    /// <returns>
+    ///     A negative value if the first node sorts before the second, a positive value if it sorts
+    ///     after, and zero only when both the sort order and key are equal.
+    /// </returns>
     /// <remarks>
     ///     The key tie-break keeps ordering deterministic across rebuilds when sibling sort orders
     ///     collide — which well-formed Umbraco data avoids, but corrupt/legacy data can produce.
