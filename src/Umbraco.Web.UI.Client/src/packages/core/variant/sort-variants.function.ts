@@ -19,13 +19,21 @@ const getVariantStateOrderValue = (variant?: UmbEntityVariantOptionModel['varian
 	return variantStatesOrder[variant.state] || fallbackOrder;
 };
 
-// eslint-disable-next-line jsdoc/require-jsdoc
+/**
+ * @param {UmbEntityVariantOptionModel} a - First variant to compare
+ * @param {UmbEntityVariantOptionModel} b - Second variant to compare
+ * @returns {number} - Sorting value
+ */
 function compareDefault(a: UmbEntityVariantOptionModel, b: UmbEntityVariantOptionModel) {
 	return (a.language?.isDefault ? -1 : 1) - (b.language?.isDefault ? -1 : 1);
 }
 
-// Make sure mandatory variants go on top, unless they are published, cause then they already go to the top and then we want to mix them with other published variants.
-// eslint-disable-next-line jsdoc/require-jsdoc
+/**
+ * Mandatory variants sort to the top, unless they are published — published variants already sort first and should mix with other published variants.
+ * @param {UmbEntityVariantOptionModel} a - First variant to compare
+ * @param {UmbEntityVariantOptionModel} b - Second variant to compare
+ * @returns {number} - Sorting value
+ */
 function compareMandatory(a: UmbEntityVariantOptionModel, b: UmbEntityVariantOptionModel) {
 	return a.variant?.state === DocumentVariantStateModel.PUBLISHED_PENDING_CHANGES ||
 		a.variant?.state === DocumentVariantStateModel.PUBLISHED
@@ -33,12 +41,20 @@ function compareMandatory(a: UmbEntityVariantOptionModel, b: UmbEntityVariantOpt
 		: (a.language?.isMandatory ? -1 : 1) - (b.language?.isMandatory ? -1 : 1);
 }
 
-// eslint-disable-next-line jsdoc/require-jsdoc
+/**
+ * @param {UmbEntityVariantOptionModel} a - First variant to compare
+ * @param {UmbEntityVariantOptionModel} b - Second variant to compare
+ * @returns {number} - Sorting value
+ */
 function compareState(a: UmbEntityVariantOptionModel, b: UmbEntityVariantOptionModel) {
 	return getVariantStateOrderValue(a.variant) - getVariantStateOrderValue(b.variant);
 }
 
-// eslint-disable-next-line jsdoc/require-jsdoc
+/**
+ * @param {UmbEntityVariantOptionModel} a - First variant to compare
+ * @param {UmbEntityVariantOptionModel} b - Second variant to compare
+ * @returns {number} - Sorting value
+ */
 function compareName(a: UmbEntityVariantOptionModel, b: UmbEntityVariantOptionModel) {
 	const nameA = a.language?.name;
 	const nameB = b.language?.name;
