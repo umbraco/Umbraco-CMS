@@ -67,7 +67,7 @@ export class UmbDefaultTreeContext<
 	public readonly startNode = this.#treeItemChildrenManager.startNode;
 	public readonly foldersOnly = this.#treeItemChildrenManager.foldersOnly;
 	public readonly additionalRequestArgs = this.#treeItemChildrenManager.additionalRequestArgs;
-	public readonly isLoadingChildren = this.#treeItemChildrenManager.isLoading;
+	public readonly isLoading = this.#treeItemChildrenManager.isLoading;
 	public readonly isLoadingPrevChildren = this.#treeItemChildrenManager.isLoadingPrevChildren;
 	public readonly isLoadingNextChildren = this.#treeItemChildrenManager.isLoadingNextChildren;
 

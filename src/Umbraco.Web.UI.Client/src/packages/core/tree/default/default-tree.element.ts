@@ -45,16 +45,16 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 			);
 			// Track loading so the empty state isn't shown before the children have loaded, or while reloading.
 			this.observe(
-				value.isLoadingChildren,
-				(isLoadingChildren) => {
-					this._isLoadingChildren = isLoadingChildren ?? false;
-					if (isLoadingChildren) {
+				value.isLoading,
+				(isLoading) => {
+					this._isLoading = isLoading ?? false;
+					if (isLoading) {
 						this.#hasBeenLoading = true;
 					} else if (this.#hasBeenLoading) {
 						this._initialLoadDone = true;
 					}
 				},
-				'umbTreeIsLoadingChildrenObserver',
+				'umbTreeIsLoadingObserver',
 			);
 		}
 		if (value?.view) {
@@ -145,7 +145,7 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 	private _hasItems = false;
 
 	@state()
-	private _isLoadingChildren = false;
+	private _isLoading = false;
 
 	@state()
 	private _initialLoadDone = false;
@@ -234,7 +234,7 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 		// the collection pattern. It is only relevant when the children are shown on their own (root hidden or drilled
 		// into a start node) and never in the sidebar menu.
 		if (this.isMenu || !(this.hideTreeRoot || this.startNode)) return nothing;
-		if (!this._initialLoadDone || this._isLoadingChildren || this._hasItems) return nothing;
+		if (!this._initialLoadDone || this._isLoading || this._hasItems) return nothing;
 		return html`<div id="empty-state" class="uui-text"><h4>${this.localize.term('tree_noItems')}</h4></div>`;
 	}
 
