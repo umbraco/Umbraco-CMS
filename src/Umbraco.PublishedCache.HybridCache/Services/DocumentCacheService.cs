@@ -195,7 +195,11 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
         // draft entry would never be served back, and draft keys have no per-key invalidation (RemoveFromMemoryCacheAsync
         // only removes the published key) so they would linger until a full clear. In bounded mode they would also
         // waste eviction slots and dilute the W-TinyLFU frequency signal.
-        if (result is not null && preview is false)
+        //
+        // Only populate when our snapshot is still current; otherwise a concurrent refresh has already written
+        // fresher content and we must not overwrite it with this stale one (the clobber that leaves L0 stale
+        // until a full clear).
+        if (result is not null && preview is false && snapshotIsCurrent)
         {
             // The size estimate runs unconditionally (not only when reporting is enabled): it is cheap
             // (O(properties), no IO/decompression) and only on the cache-miss path, and keeping the running
