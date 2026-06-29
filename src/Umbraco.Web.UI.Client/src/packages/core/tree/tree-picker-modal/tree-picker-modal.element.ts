@@ -62,6 +62,7 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 	@state()
 	private _breadcrumb: Array<UmbTreeBreadcrumbItem> = [];
 
+	#treeAlias?: string;
 	private _initialStartNode?: UmbTreeStartNode;
 	private _repository?: UmbTreeRepository;
 	private _breadcrumbLoaded = false;
@@ -112,7 +113,8 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 				multiple,
 			};
 
-			if (this.data?.treeAlias) {
+			if (this.data?.treeAlias && this.data.treeAlias !== this.#treeAlias) {
+				this.#treeAlias = this.data.treeAlias;
 				this._initialStartNode = this.data.startNode;
 				this._currentLocation = this.data.startNode;
 				this._breadcrumb = [];
