@@ -13,10 +13,11 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.Website.Routing;
 [TestFixture]
 internal sealed class MalformedFormRoutingTests : UmbracoTestServerTestBase
 {
-    // Reproduces the reported repro at the routing layer: a request that declares a multipart form content type
-    // but carries a truncated body (no closing boundary). The first content finder, ContentFinderByPageIdQuery,
-    // reads the form looking for "umbPageID"; before the fix the synchronous HttpRequest.Form getter threw an
-    // IOException that propagated out of RouteRequestAsync as an unhandled 500. It must now route gracefully.
+    // Content finders probe the request form for keys during routing (e.g. ContentFinderByPageIdQuery reads
+    // "umbPageID"). When a request declares a form content type but carries a body the synchronous
+    // HttpRequest.Form getter cannot parse (here a truncated multipart body with no closing boundary), that probe
+    // must treat the form as absent and let routing continue, rather than let the parse failure escape as an
+    // unhandled exception (which surfaces to the client as an HTTP 500).
     [Test]
     public void RouteRequestAsync_DoesNotThrow_WhenRequestHasMalformedMultipartBody()
     {

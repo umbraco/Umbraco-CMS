@@ -51,8 +51,9 @@ public class HttpRequestExtensionsTests
         Assert.AreEqual("from-form", context.Request.GetUfprt());
     }
 
-    // Exercises the real ASP.NET Core form parser (not a fake) against a truncated multipart body, mirroring
-    // the reported repro: a missing closing boundary makes the synchronous Form getter throw a real IOException.
+    // The other DoesNotThrow tests inject a fake form feature that throws a chosen exception; this one drives
+    // the real ASP.NET Core form parser with a genuinely truncated multipart body (no closing boundary), so it
+    // confirms the parser's actual failure mode is one the guard catches, rather than relying on an assumed type.
     [Test]
     public void GetUfprt_DoesNotThrow_WhenRealMultipartBodyIsTruncated()
     {

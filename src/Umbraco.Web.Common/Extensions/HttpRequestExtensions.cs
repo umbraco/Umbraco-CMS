@@ -170,9 +170,10 @@ public static class HttpRequestExtensions
     /// </summary>
     /// <remarks>
     ///     The synchronous <see cref="HttpRequest.Form" /> getter parses the body on first access and throws when it
-    ///     is malformed (e.g. a truncated multipart body) or exceeds the configured form limits. Routing-pipeline
-    ///     callers only probe for specific keys, so a parse failure must fall through to normal routing rather than
-    ///     surface as an unhandled exception (HTTP 500).
+    ///     is malformed (e.g. a truncated multipart body) or exceeds the configured form limits. Returning
+    ///     <c>null</c> in that case lets a caller that only probes the form for specific keys treat an unparseable
+    ///     body as "no form present" and continue, rather than let the parse failure surface as an unhandled
+    ///     exception (HTTP 500).
     /// </remarks>
     internal static IFormCollection? GetFormOrNull(this HttpRequest request)
     {
