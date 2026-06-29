@@ -1,7 +1,7 @@
-import type { UmbDocumentVariantOptionModel } from '../types.js';
-import { sortVariants } from '../utils.js';
 import { UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT } from '../publishing/index.js';
+import type { UmbDocumentVariantOptionModel } from '../types.js';
 import { customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
+import { sortVariants } from '@umbraco-cms/backoffice/variant';
 import { UmbDocumentVariantState } from '../variant-state.js';
 import { UmbWorkspaceSplitViewVariantSelectorElement } from '@umbraco-cms/backoffice/workspace';
 

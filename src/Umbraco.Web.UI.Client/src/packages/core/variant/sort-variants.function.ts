@@ -1,12 +1,12 @@
 import type { UmbEntityVariantOptionModel } from './types.js';
-import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { DocumentVariantStateModel as UmbPublishableVariantState } from '@umbraco-cms/backoffice/external/backend-api';
 
 const variantStatesOrder: Record<string, number> = {
-	[DocumentVariantStateModel.PUBLISHED_PENDING_CHANGES]: 1,
-	[DocumentVariantStateModel.PUBLISHED]: 1,
-	[DocumentVariantStateModel.DRAFT]: 2,
-	[DocumentVariantStateModel.NOT_CREATED]: 3,
-	[DocumentVariantStateModel.TRASHED]: 4,
+	[UmbPublishableVariantState.PUBLISHED_PENDING_CHANGES]: 1,
+	[UmbPublishableVariantState.PUBLISHED]: 1,
+	[UmbPublishableVariantState.DRAFT]: 2,
+	[UmbPublishableVariantState.NOT_CREATED]: 3,
+	[UmbPublishableVariantState.TRASHED]: 4,
 };
 
 const getVariantStateOrderValue = (variant?: UmbEntityVariantOptionModel['variant']) => {
@@ -35,8 +35,8 @@ function compareDefault(a: UmbEntityVariantOptionModel, b: UmbEntityVariantOptio
  * @returns {number} - Sorting value
  */
 function compareMandatory(a: UmbEntityVariantOptionModel, b: UmbEntityVariantOptionModel) {
-	return a.variant?.state === DocumentVariantStateModel.PUBLISHED_PENDING_CHANGES ||
-		a.variant?.state === DocumentVariantStateModel.PUBLISHED
+	return a.variant?.state === UmbPublishableVariantState.PUBLISHED_PENDING_CHANGES ||
+		a.variant?.state === UmbPublishableVariantState.PUBLISHED
 		? 0
 		: (a.language?.isMandatory ? -1 : 1) - (b.language?.isMandatory ? -1 : 1);
 }
