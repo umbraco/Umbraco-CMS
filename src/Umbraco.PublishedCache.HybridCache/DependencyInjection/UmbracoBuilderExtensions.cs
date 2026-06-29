@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Notifications;
@@ -44,8 +45,12 @@ public static class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IDomainCache, DomainCache>();
         builder.Services.AddSingleton<IElementsCache, ElementsDictionaryAppCache>();
         builder.Services.AddSingleton<IPublishedContentTypeCache, PublishedContentTypeCache>();
-        builder.Services.AddSingleton<IDocumentCacheService, DocumentCacheService>();
-        builder.Services.AddSingleton<IMediaCacheService, MediaCacheService>();
+        builder.Services.AddSingleton<DocumentCacheService>();
+        builder.Services.AddSingleton<IDocumentCacheService>(s => s.GetRequiredService<DocumentCacheService>());
+        builder.Services.AddSingleton<MediaCacheService>();
+        builder.Services.AddSingleton<IMediaCacheService>(s => s.GetRequiredService<MediaCacheService>());
+        builder.Services.AddSingleton<IMemoryCacheSizeReporter>(s => s.GetRequiredService<DocumentCacheService>());
+        builder.Services.AddSingleton<IMemoryCacheSizeReporter>(s => s.GetRequiredService<MediaCacheService>());
         builder.Services.AddSingleton<IMemberCacheService, MemberCacheService>();
         builder.Services.AddSingleton<IElementCacheService, ElementCacheService>();
         builder.Services.AddSingleton<IBlockElementService, BlockElementService>();
