@@ -1023,12 +1023,10 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
             childrenWithSortOrder.Add((childNodeKey, childNode.SortOrder));
         }
 
-        // Tie-break by key so tied sibling SortOrders sort deterministically across rebuilds.
+        // Shares NavigationNode's canonical sibling ordering (SortOrder, then key tie-break) so the
+        // content-type-filtered path stays in sync with the unfiltered, cached path.
         childrenWithSortOrder.Sort((a, b) =>
-        {
-            var bySortOrder = a.SortOrder.CompareTo(b.SortOrder);
-            return bySortOrder != 0 ? bySortOrder : a.ChildNodeKey.CompareTo(b.ChildNodeKey);
-        });
+            NavigationNode.CompareBySortOrderThenKey(a.SortOrder, a.ChildNodeKey, b.SortOrder, b.ChildNodeKey));
         return childrenWithSortOrder.ConvertAll(childWithSortOrder => childWithSortOrder.ChildNodeKey);
     }
 

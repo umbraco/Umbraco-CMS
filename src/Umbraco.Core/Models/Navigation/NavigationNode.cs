@@ -8,17 +8,8 @@ namespace Umbraco.Cms.Core.Models.Navigation;
 /// </summary>
 public sealed class NavigationNode
 {
-    // Sort by SortOrder, then by Key as a tie-break. The Key tie-break keeps ordering
-    // deterministic across rebuilds when sibling SortOrders collide (which well-formed Umbraco
-    // data avoids, but corrupt/legacy data can produce): the underlying List.Sort is not a stable
-    // sort, so without a total order the relative position of tied siblings would be arbitrary and
-    // could differ from one rebuild to the next.
     private static readonly Comparison<(Guid Key, int SortOrder)> _sortBySortOrder =
-        static (a, b) =>
-        {
-            var bySortOrder = a.SortOrder.CompareTo(b.SortOrder);
-            return bySortOrder != 0 ? bySortOrder : a.Key.CompareTo(b.Key);
-        };
+        static (a, b) => CompareBySortOrderThenKey(a.SortOrder, a.Key, b.SortOrder, b.Key);
 
     private readonly ConcurrentHashSet<Guid> _children;
 
@@ -235,5 +226,21 @@ public sealed class NavigationNode
             _orderedChildren = result;
             return result;
         }
+    }
+
+    /// <summary>
+    ///     Defines the canonical sibling ordering: by <c>SortOrder</c>, then by key as a tie-break.
+    /// </summary>
+    /// <remarks>
+    ///     The key tie-break keeps ordering deterministic across rebuilds when sibling sort orders
+    ///     collide — which well-formed Umbraco data avoids, but corrupt/legacy data can produce.
+    ///     The <see cref="List{T}"/> sort used to order children is not a stable sort, so without a
+    ///     total order the relative position of tied siblings would be arbitrary and could differ
+    ///     from one rebuild to the next. Shared so every sibling-ordering call site stays in sync.
+    /// </remarks>
+    internal static int CompareBySortOrderThenKey(int sortOrderA, Guid keyA, int sortOrderB, Guid keyB)
+    {
+        var bySortOrder = sortOrderA.CompareTo(sortOrderB);
+        return bySortOrder != 0 ? bySortOrder : keyA.CompareTo(keyB);
     }
 }
