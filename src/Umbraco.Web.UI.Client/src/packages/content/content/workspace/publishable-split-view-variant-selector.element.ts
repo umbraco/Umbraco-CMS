@@ -20,12 +20,11 @@ export interface UmbPublishingWorkspaceContextWithPendingChanges extends UmbCont
  * A variant selector base class that adds publishing-state awareness
  * (pending changes, publish state labels) to the split-view variant selector.
  * Both Document and Element variant selectors extend this.
- *
  * @abstract
- * @class UmbPublishingAwareSplitViewVariantSelectorElement
+ * @class UmbPublishableSplitViewVariantSelectorElement
  * @augments {UmbWorkspaceSplitViewVariantSelectorElement}
  */
-export abstract class UmbPublishingAwareSplitViewVariantSelectorElement<
+export abstract class UmbPublishableSplitViewVariantSelectorElement<
 	VariantOptionModelType extends UmbEntityVariantOptionModel<UmbEntityVariantModel>,
 > extends UmbWorkspaceSplitViewVariantSelectorElement<VariantOptionModelType> {
 	/**
