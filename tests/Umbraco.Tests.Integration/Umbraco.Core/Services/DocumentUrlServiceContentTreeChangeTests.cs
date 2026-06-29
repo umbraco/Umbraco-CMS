@@ -1,6 +1,7 @@
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Repositories;
@@ -37,6 +38,8 @@ internal sealed class DocumentUrlServiceContentTreeChangeTests : UmbracoIntegrat
     private ICoreScopeProvider CoreScopeProvider => GetRequiredService<ICoreScopeProvider>();
 
     private IContentService ContentService => GetRequiredService<IContentService>();
+
+    private IEventAggregator EventAggregator => GetRequiredService<IEventAggregator>();
 
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
@@ -137,6 +140,38 @@ internal sealed class DocumentUrlServiceContentTreeChangeTests : UmbracoIntegrat
                 .Where(r => r.DocumentKey == documentKey)
                 .ToList();
         }
+    }
+
+    /// <summary>
+    /// When operations run under a scoped notification publisher restricted to
+    /// <see cref="IDistributedCacheNotificationHandler"/>, the handler must still persist URL segments and
+    /// aliases to the database; otherwise the data only reaches the in-memory cache and routing is lost on restart.
+    /// </summary>
+    [Test]
+    public void Publish_UnderDistributedCacheOnlyPublisher_StillWritesUrlSegmentsAndAliasesToDatabase()
+    {
+        var page = ContentBuilder.CreateSimpleContent(ContentType, "Distributed Cache Page", RootPage.Id);
+        page.SetValue(Constants.Conventions.Content.UrlAlias, "distributed-cache-alias");
+
+        var publisher = new ScopedNotificationPublisher<IDistributedCacheNotificationHandler>(EventAggregator);
+        using (ICoreScope scope = CoreScopeProvider.CreateCoreScope(scopedNotificationPublisher: publisher))
+        {
+            ContentService.Save(page, -1);
+            ContentService.Publish(page, []);
+            scope.Complete();
+        }
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(
+                GetDbSegments(page.Key),
+                Is.Not.Empty,
+                "URL segments must be persisted to the database even when publishing under a distributed-cache-only notification publisher.");
+            Assert.That(
+                GetDbAliases(page.Key).Any(a => a.Alias == "distributed-cache-alias"),
+                Is.True,
+                "URL aliases must be persisted to the database even when publishing under a distributed-cache-only notification publisher.");
+        });
     }
 
     /// <summary>
