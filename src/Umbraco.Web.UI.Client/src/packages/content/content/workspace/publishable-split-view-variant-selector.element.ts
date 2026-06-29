@@ -69,6 +69,13 @@ export abstract class UmbPublishableSplitViewVariantSelectorElement<
 		);
 	}
 
+	#isPublished(variantOption: VariantOptionModelType) {
+		return (
+			variantOption.variant?.state === UmbPublishableVariantState.PUBLISHED ||
+			variantOption.variant?.state === UmbPublishableVariantState.PUBLISHED_PENDING_CHANGES
+		);
+	}
+
 	#hasPendingChanges(variant: VariantOptionModelType) {
 		return this._variantsWithPendingChanges.some((x) => x.variantId.compare(variant));
 	}
@@ -77,11 +84,7 @@ export abstract class UmbPublishableSplitViewVariantSelectorElement<
 		let term =
 			this.#publishStateLocalizationMap[variantOption.variant?.state || UmbPublishableVariantState.NOT_CREATED];
 
-		if (
-			(variantOption.variant?.state === UmbPublishableVariantState.PUBLISHED ||
-				variantOption.variant?.state === UmbPublishableVariantState.PUBLISHED_PENDING_CHANGES) &&
-			this.#hasPendingChanges(variantOption)
-		) {
+		if (this.#isPublished(variantOption) && this.#hasPendingChanges(variantOption)) {
 			term = 'content_publishedPendingChanges';
 		}
 
