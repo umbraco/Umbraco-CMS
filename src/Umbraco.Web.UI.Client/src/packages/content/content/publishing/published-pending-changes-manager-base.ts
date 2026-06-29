@@ -19,7 +19,7 @@ export interface UmbPublishedPendingChangesManagerProcessArgs<TDetailModel exten
  * @augments {UmbControllerBase}
  */
 export abstract class UmbPublishedPendingChangesManagerBase<
-	TDetailModel extends UmbContentDetailModel,
+	TDetailModel extends UmbContentDetailModel<TVariantModel>,
 	TVariantModel extends UmbEntityVariantModel = UmbEntityVariantModel,
 > extends UmbControllerBase {
 	#variantsWithChanges = new UmbArrayState<UmbPublishedVariantWithPendingChanges>([], (x) => x.variantId.toString());
@@ -38,36 +38,33 @@ export abstract class UmbPublishedPendingChangesManagerBase<
 			throw new Error('Persisted and published data does not have the same unique');
 
 		const variantIds = args.persistedData.variants?.map((x) => UmbVariantId.Create(x)) ?? [];
-
-		const pendingChangesPromises = variantIds.map(async (variantId) => {
-			const mergedData = await new UmbMergeContentVariantDataController(this).process(
-				args.publishedData,
-				args.persistedData,
-				[variantId],
-				[variantId],
-			);
-
-			const mergedDataClone = structuredClone(mergedData);
-			const publishedDataClone = structuredClone(args.publishedData);
-
-			// remove dates from the comparison
-			mergedDataClone.variants.forEach((variant) => this.#cleanVariantForComparison(variant as TVariantModel));
-			publishedDataClone.variants.forEach((variant) => this.#cleanVariantForComparison(variant as TVariantModel));
-
-			this.cleanDataBeforeComparison(mergedDataClone as TDetailModel, publishedDataClone as TDetailModel);
-
-			const hasChanges = jsonStringComparison(mergedDataClone, publishedDataClone) === false;
-
-			if (hasChanges) {
-				return { variantId };
-			} else {
-				return null;
-			}
-		});
-
+		const pendingChangesPromises = variantIds.map((variantId) => this.#processVariant(args, variantId));
 		const variantsWithPendingChanges = (await Promise.all(pendingChangesPromises)).filter((x) => x !== null);
-
 		this.#variantsWithChanges.setValue(variantsWithPendingChanges);
+	}
+
+	async #processVariant(
+		args: UmbPublishedPendingChangesManagerProcessArgs<TDetailModel>,
+		variantId: UmbVariantId,
+	): Promise<UmbPublishedVariantWithPendingChanges | null> {
+		const mergedData = await new UmbMergeContentVariantDataController(this).process(
+			args.publishedData,
+			args.persistedData,
+			[variantId],
+			[variantId],
+		);
+
+		const mergedDataClone = structuredClone(mergedData);
+		const publishedDataClone = structuredClone(args.publishedData);
+
+		// remove dates from the comparison
+		mergedDataClone.variants.forEach((variant) => this.#cleanVariantForComparison(variant));
+		publishedDataClone.variants.forEach((variant) => this.#cleanVariantForComparison(variant));
+
+		this.cleanDataBeforeComparison(mergedDataClone, publishedDataClone);
+
+		const hasChanges = jsonStringComparison(mergedDataClone, publishedDataClone) === false;
+		return hasChanges ? { variantId } : null;
 	}
 
 	/**
