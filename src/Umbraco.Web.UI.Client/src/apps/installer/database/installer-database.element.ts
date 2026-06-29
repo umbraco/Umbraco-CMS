@@ -246,6 +246,7 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 				@input=${this._handleChange}
 				.value=${this.databaseFormData.server ?? ''}
 				.placeholder=${this._selectedDatabase?.serverPlaceholder ?? ''}
+				autocomplete="off"
 				required
 				required-message="Server is required"></uui-input>
 		</uui-form-layout-item>
@@ -263,6 +264,7 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 				label="Database name"
 				@input=${this._handleChange}
 				placeholder="umbraco"
+				autocomplete="off"
 				required
 				required-message="Database name is required"></uui-input>
 		</uui-form-layout-item>`;
@@ -284,6 +286,7 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 									name="username"
 									label="Username"
 									@input=${this._handleChange}
+									autocomplete="off"
 									required
 									required-message="Username is required"></uui-input>
 							</uui-form-layout-item>
@@ -297,7 +300,7 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 									name="password"
 									label="Password"
 									@input=${this._handleChange}
-									autocomplete="new-password"
+									autocomplete="off"
 									required
 									required-message="Password is required"></uui-input>
 							</uui-form-layout-item>`
