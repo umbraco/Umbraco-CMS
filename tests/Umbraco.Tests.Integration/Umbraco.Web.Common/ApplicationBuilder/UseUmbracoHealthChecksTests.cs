@@ -50,6 +50,8 @@ public class UseUmbracoHealthChecksTests
     }
 
     [TestCase(RuntimeLevel.Run)]
+    [TestCase(RuntimeLevel.Boot)]
+    [TestCase(RuntimeLevel.Install)]
     [TestCase(RuntimeLevel.Upgrading)]
     public async Task Live_RegardlessOfLevel_Returns200(RuntimeLevel level)
     {
