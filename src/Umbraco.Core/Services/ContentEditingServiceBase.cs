@@ -458,6 +458,10 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         {
             // these are the only result states currently expected from the invoked IContentService operations
             OperationResultType.Success => ContentEditingOperationStatus.Success,
+
+            // a no-op (e.g. sorting children when nothing needs reordering) is a successful outcome, not an error
+            OperationResultType.NoOperation => ContentEditingOperationStatus.Success,
+
             OperationResultType.FailedCancelledByEvent => ContentEditingOperationStatus.CancelledByNotification,
             OperationResultType.FailedCannot => ContentEditingOperationStatus.CannotDeleteWhenReferenced,
 
@@ -617,6 +621,25 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         }
 
         return filteredContentTypes.Any();
+    }
+
+    /// <summary>
+    /// Validates that content of the requested type is allowed to be created under the requested parent, applying the
+    /// same "allowed at root", "allowed as child" and content type filter rules that are enforced when the content is
+    /// actually created. This allows the validation endpoints to be consistent with creation.
+    /// </summary>
+    /// <param name="createModel">The content creation model.</param>
+    /// <returns>The operation status; <see cref="ContentEditingOperationStatus.Success"/> when creation is allowed.</returns>
+    protected async Task<ContentEditingOperationStatus> ValidateCreationAllowedAsync(ContentCreationModelBase createModel)
+    {
+        TContentType? contentType = ContentTypeService.Get(createModel.ContentTypeKey);
+        if (contentType is null)
+        {
+            return ContentEditingOperationStatus.ContentTypeNotFound;
+        }
+
+        (int? _, ContentEditingOperationStatus operationStatus) = await TryGetAndValidateParentIdAsync(createModel.ParentKey, contentType);
+        return operationStatus;
     }
 
     private void UpdateNames(ContentEditingModelBase contentEditingModelBase, TContent content, TContentType contentType)
