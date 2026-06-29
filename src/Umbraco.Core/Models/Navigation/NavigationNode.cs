@@ -13,7 +13,6 @@ public sealed class NavigationNode
 
     private readonly ConcurrentHashSet<Guid> _children;
 
-
 #pragma warning disable CS0419 // Ambiguous reference in cref attribute
     /// <summary>
     /// Cached snapshot of <see cref="Children"/> ordered by each child's <c>SortOrder</c>.
