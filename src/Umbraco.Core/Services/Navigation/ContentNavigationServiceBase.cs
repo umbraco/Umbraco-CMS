@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Navigation;
 using Umbraco.Cms.Core.Persistence.Repositories;
@@ -75,6 +76,27 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
 
     private NavigationSnapshot _navigation = new(new(), []);
     private NavigationSnapshot _recycleBinNavigation = new(new(), []);
+
+    /// <summary>
+    ///     Gets the approximate number of nodes currently held in memory across the active navigation
+    ///     structure and the recycle bin structure, for diagnostics. Each snapshot reference is read once,
+    ///     so the count is consistent per structure even if a rebuild swaps a snapshot concurrently.
+    /// </summary>
+    private protected long GetNavigationNodeCount()
+        => _navigation.Structure.Count + _recycleBinNavigation.Structure.Count;
+
+    /// <summary>
+    ///     Gets an approximate retained size, in bytes, of the navigation structures (active tree plus
+    ///     recycle bin), for diagnostics. Sampled and structural — a coarse estimate, not a heap measurement.
+    /// </summary>
+    private protected long GetNavigationApproximateBytes()
+        => EstimateStructureBytes(_navigation.Structure) + EstimateStructureBytes(_recycleBinNavigation.Structure);
+
+    // The dictionary is enumerated directly (not via .Values, which snapshot-copies the whole collection).
+    // Per-node estimate: fixed fields (key, content-type key, parent, sort order, lock) + dictionary bucket,
+    // plus an allowance per child key (held in the child set and the cached ordered array).
+    private static long EstimateStructureBytes(ConcurrentDictionary<Guid, NavigationNode> structure)
+        => SampledSizeEstimator.Estimate(structure.Count, structure, static kvp => 120 + (40L * kvp.Value.Children.Count));
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="ContentNavigationServiceBase{TContentType, TContentTypeService}"/> class.
