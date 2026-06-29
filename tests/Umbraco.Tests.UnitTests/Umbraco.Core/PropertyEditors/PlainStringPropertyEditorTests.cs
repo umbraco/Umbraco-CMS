@@ -12,26 +12,33 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 [TestFixture]
 public class PlainStringPropertyEditorTests
 {
+    [Test]
+    public void Can_Create_Text_Only_Value_Editor()
+    {
+        IDataValueEditor valueEditor = CreatePropertyEditor().GetValueEditor();
+
+        Assert.IsInstanceOf<TextOnlyValueEditor>(valueEditor);
+    }
+
     [TestCase("{\"test\":\"test\"}")]
     [TestCase("{}")]
     [TestCase("[1,2,3]")]
     [TestCase("{\"nested\":{\"key\":\"value\"}}")]
     [TestCase("hello world")]
     [TestCase("123")]
-    public void ToEditor_Returns_Raw_String_For_Json_Looking_Values(string storedValue)
+    public void Can_Parse_Json_Looking_Value_To_Editor_As_Raw_String(string storedValue)
     {
         var result = ToEditor(storedValue);
 
-        Assert.IsNotNull(result);
-        Assert.IsInstanceOf<string>(result);
-        Assert.AreEqual(storedValue, result);
+        Assert.That(result, Is.EqualTo(storedValue));
     }
 
     [Test]
-    public void ToEditor_Returns_Null_Or_Empty_For_Null_Value()
+    public void Null_To_Editor_Yields_Empty_String()
     {
         var result = ToEditor(null);
-        Assert.That(result is null or (string and ""), Is.True);
+
+        Assert.That(result, Is.Empty);
     }
 
     private static object? ToEditor(object? value)
@@ -41,17 +48,22 @@ public class PlainStringPropertyEditorTests
             .Setup(x => x.GetValue(It.IsAny<string?>(), It.IsAny<string?>(), It.IsAny<bool>()))
             .Returns(value);
 
-        return CreateValueEditor().ToEditor(property.Object);
+        return CreatePropertyEditor().GetValueEditor().ToEditor(property.Object);
     }
 
-    private static IDataValueEditor CreateValueEditor()
+    private static PlainStringPropertyEditor CreatePropertyEditor()
     {
-        var attribute = new DataEditorAttribute("Umbraco.Plain.String");
-        return new TextOnlyValueEditor(
-            attribute,
-            Mock.Of<ILocalizedTextService>(),
-            Mock.Of<IShortStringHelper>(),
-            Mock.Of<IJsonSerializer>(),
-            Mock.Of<IIOHelper>());
+        var factory = new Mock<IDataValueEditorFactory>();
+
+        factory
+            .Setup(x => x.Create<TextOnlyValueEditor>(It.IsAny<DataEditorAttribute>()))
+            .Returns((object[] args) => new TextOnlyValueEditor(
+                (DataEditorAttribute)args[0],
+                Mock.Of<ILocalizedTextService>(),
+                Mock.Of<IShortStringHelper>(),
+                Mock.Of<IJsonSerializer>(),
+                Mock.Of<IIOHelper>()));
+
+        return new PlainStringPropertyEditor(factory.Object);
     }
 }
