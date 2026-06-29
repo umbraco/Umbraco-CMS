@@ -125,7 +125,7 @@ export class UmbTableTreeViewElement extends UmbTreeViewElementBase<UmbTreeItemM
 				ctx.currentNoAccess = noAccess ?? false;
 				this.#updateRowSelectable(item.id);
 			},
-			`_observeNoAccess_${item.id}`,
+			null,
 		);
 
 		ctx.pathObserver = this.observe(
@@ -135,7 +135,7 @@ export class UmbTableTreeViewElement extends UmbTreeViewElementBase<UmbTreeItemM
 				const updated = this.#updateRowHref(item.id);
 				if (updated) this._tableRows = updated;
 			},
-			`_observePath_${item.id}`,
+			null,
 		);
 
 		ctx.isActiveObserver = this.observe(
@@ -144,7 +144,7 @@ export class UmbTableTreeViewElement extends UmbTreeViewElementBase<UmbTreeItemM
 				ctx.currentIsActive = isActive ?? false;
 				this.#updateRowActive(item.id);
 			},
-			`_observeIsActive_${item.id}`,
+			null,
 		);
 	};
 
