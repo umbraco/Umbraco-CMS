@@ -17,7 +17,7 @@ export const manifest: ManifestPropertyEditorSchema = {
 				},
 				{
 					alias: 'placeholder',
-					label: '#textbox_placeholder',
+					label: '#general_placeholder',
 					description: 'Placeholder text shown inside the textarea when empty',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.TextBox',
 				},
