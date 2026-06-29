@@ -8,8 +8,17 @@ namespace Umbraco.Cms.Core.Models.Navigation;
 /// </summary>
 public sealed class NavigationNode
 {
+    // Sort by SortOrder, then by Key as a tie-break. The Key tie-break keeps ordering
+    // deterministic across rebuilds when sibling SortOrders collide (which well-formed Umbraco
+    // data avoids, but corrupt/legacy data can produce): the underlying List.Sort is not a stable
+    // sort, so without a total order the relative position of tied siblings would be arbitrary and
+    // could differ from one rebuild to the next.
     private static readonly Comparison<(Guid Key, int SortOrder)> _sortBySortOrder =
-        static (a, b) => a.SortOrder.CompareTo(b.SortOrder);
+        static (a, b) =>
+        {
+            var bySortOrder = a.SortOrder.CompareTo(b.SortOrder);
+            return bySortOrder != 0 ? bySortOrder : a.Key.CompareTo(b.Key);
+        };
 
     private readonly ConcurrentHashSet<Guid> _children;
 
@@ -91,6 +100,22 @@ public sealed class NavigationNode
     /// <param name="childKey">The key of the child node to add.</param>
     /// <exception cref="KeyNotFoundException">Thrown when the child key is not found in the navigation structure.</exception>
     public void AddChild(ConcurrentDictionary<Guid, NavigationNode> navigationStructure, Guid childKey)
+        => AddChild(navigationStructure, childKey, appendAsLastItem: true);
+
+    /// <summary>
+    ///     Adds a child node to this node, optionally preserving the child's existing <see cref="SortOrder"/>.
+    /// </summary>
+    /// <param name="navigationStructure">The navigation structure dictionary containing all nodes.</param>
+    /// <param name="childKey">The key of the child node to add.</param>
+    /// <param name="appendAsLastItem">
+    ///     When <c>true</c>, the child's <see cref="SortOrder"/> is set so it sorts after its existing
+    ///     siblings (the behaviour required when a node is newly created or moved). When <c>false</c>,
+    ///     the child's <see cref="SortOrder"/> is left untouched — used when rebuilding the structure
+    ///     from persisted data, where each node already carries the sort order loaded from the database
+    ///     and the load order (parent-first, by path) must not be allowed to redefine it.
+    /// </param>
+    /// <exception cref="KeyNotFoundException">Thrown when the child key is not found in the navigation structure.</exception>
+    internal void AddChild(ConcurrentDictionary<Guid, NavigationNode> navigationStructure, Guid childKey, bool appendAsLastItem)
     {
         if (navigationStructure.TryGetValue(childKey, out NavigationNode? child) is false)
         {
@@ -99,8 +124,10 @@ public sealed class NavigationNode
 
         child.Parent = Key;
 
-        // Add it as the last item
-        child.SortOrder = _children.Count;
+        if (appendAsLastItem)
+        {
+            child.SortOrder = _children.Count;
+        }
 
         _children.Add(childKey);
 

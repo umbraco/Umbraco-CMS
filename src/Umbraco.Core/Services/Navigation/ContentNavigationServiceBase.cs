@@ -1023,7 +1023,12 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
             childrenWithSortOrder.Add((childNodeKey, childNode.SortOrder));
         }
 
-        childrenWithSortOrder.Sort((a, b) => a.SortOrder.CompareTo(b.SortOrder));
+        // Tie-break by key so tied sibling SortOrders sort deterministically across rebuilds.
+        childrenWithSortOrder.Sort((a, b) =>
+        {
+            var bySortOrder = a.SortOrder.CompareTo(b.SortOrder);
+            return bySortOrder != 0 ? bySortOrder : a.ChildNodeKey.CompareTo(b.ChildNodeKey);
+        });
         return childrenWithSortOrder.ConvertAll(childWithSortOrder => childWithSortOrder.ChildNodeKey);
     }
 
@@ -1072,10 +1077,12 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
                 continue;
             }
 
-            // If the parent node exists in the nodesStructure, add the node to the parent's children (parent is set as well)
+            // If the parent node exists in the nodesStructure, add the node to the parent's children (parent is set as well).
+            // The node already carries its persisted SortOrder (set on construction above), so the child is linked without
+            // reassigning it — the load order here is by path (parent-first), not sort order, and must not redefine it.
             if (nodesStructure.TryGetValue(parentKey, out NavigationNode? parentNode))
             {
-                parentNode.AddChild(nodesStructure, entity.Key);
+                parentNode.AddChild(nodesStructure, entity.Key, appendAsLastItem: false);
             }
         }
     }
