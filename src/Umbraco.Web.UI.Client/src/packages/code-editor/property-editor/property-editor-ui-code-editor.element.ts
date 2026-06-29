@@ -69,15 +69,11 @@ export class UmbPropertyEditorUICodeEditorElement
 	}
 
 	override render() {
-		// Ensure the value is always a string — the API may deserialize JSON values into objects
-		const code =
-			typeof this.value === 'string' ? this.value : this.value != null ? JSON.stringify(this.value, null, 2) : '';
-
 		return html`
 			<umb-code-editor
 				style=${styleMap({ height: `${this._height}px` })}
 				.language=${this._language ?? this.#defaultLanguage}
-				.code=${code}
+				.code=${this.value ?? ''}
 				?disable-line-numbers=${!this._lineNumbers}
 				?disable-minimap=${!this._minimap}
 				?word-wrap=${this._wordWrap}
