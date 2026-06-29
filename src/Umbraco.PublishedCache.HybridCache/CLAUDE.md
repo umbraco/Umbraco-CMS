@@ -275,9 +275,10 @@ Before returning cached content, verifies ancestor path is published via `_publi
 
 ### In-Memory Content Cache (the L0 converted-content cache)
 
-The converted `IPublishedContent` objects are cached in `ConvertedPublishedContentCache<TKey>`
-(`Services/ConvertedPublishedContentCache.cs`), used by `DocumentCacheService` (`<string>`) and
-`MediaCacheService` (`<Guid>`), since `ContentCacheNode` → `IPublishedContent` conversion is expensive.
+The converted `IPublishedElement` objects are cached in `ConvertedPublishedContentCache<TKey, TValue>`
+(`Services/ConvertedPublishedContentCache.cs`), used by `DocumentCacheService` (`<string, IPublishedContent>`),
+`MediaCacheService` (`<Guid, IPublishedContent>`) and `ElementCacheService` (`<string, IPublishedElement>`),
+since `ContentCacheNode` → `IPublishedElement`/`IPublishedContent` conversion is expensive.
 This is the single insert/remove/clear path for the L0 cache (the seam a later bounded/eviction-aware
 implementation slots into), and it tracks both the entry count and an approximate retained byte total.
 The cache is currently **unbounded** — only evicted on content change / explicit clear, so walking the
@@ -294,8 +295,9 @@ The in-memory structures whose footprint scales with the size of the content tre
 |------------------------|-----------|---------------|
 | `Published content (converted, L0)` | `DocumentCacheService` L0 cache | running total of per-entry node-size estimates |
 | `Published media (converted, L0)` | `MediaCacheService` L0 cache | running total of per-entry node-size estimates |
+| `Published elements (converted, L0)` | `ElementCacheService` L0 cache | running total of per-entry node-size estimates |
 | `Document URL segments` | `DocumentUrlService._documentUrlCache` (≈ documents × cultures × draft/published) | sampled structural estimate |
-| `Document navigation` / `Media navigation` | the in-memory navigation trees (active + recycle bin) | sampled structural estimate |
+| `Document navigation` / `Media navigation` / `Element navigation` | the in-memory navigation trees (active + recycle bin) | sampled structural estimate |
 
 `MemoryCacheSizeReportingJob` (a recurring job, all server roles, 1-minute period) logs each count and byte
 estimate plus `GC.GetTotalMemory` and `Environment.WorkingSet` **at `Debug` level** — enable `Debug` for

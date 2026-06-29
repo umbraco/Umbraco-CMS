@@ -1,8 +1,8 @@
-using System.Collections.Concurrent;
 using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
@@ -16,7 +16,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache.Services;
 
-internal sealed class ElementCacheService : IElementCacheService
+internal sealed class ElementCacheService : IElementCacheService, IMemoryCacheSizeReporter
 {
     private readonly IDatabaseCacheRepository _databaseCacheRepository;
     private readonly ICoreScopeProvider _scopeProvider;
@@ -30,7 +30,7 @@ internal sealed class ElementCacheService : IElementCacheService
     private readonly ILogger<ElementCacheService> _logger;
     private HashSet<Guid>? _seedKeys;
 
-    private readonly ConcurrentDictionary<string, IPublishedElement> _publishedElementCache = [];
+    private readonly ConvertedPublishedContentCache<string, IPublishedElement> _publishedElementCache = new();
 
     private HashSet<Guid> SeedKeys
     {
@@ -76,6 +76,15 @@ internal sealed class ElementCacheService : IElementCacheService
         _logger = logger;
     }
 
+    /// <inheritdoc />
+    public string CacheName => "Published elements (converted, L0)";
+
+    /// <inheritdoc />
+    public long GetApproximateCount() => _publishedElementCache.Count;
+
+    /// <inheritdoc />
+    public long? GetApproximateBytes() => _publishedElementCache.ApproximateSizeInBytes;
+
     public async Task<IPublishedElement?> GetByKeyAsync(Guid key, bool? preview = null)
     {
         bool calculatedPreview = preview ?? _previewService.IsInPreview();
@@ -85,7 +94,7 @@ internal sealed class ElementCacheService : IElementCacheService
     public bool TryGetCached(Guid key, bool preview, out IPublishedElement? element)
     {
         // Mirror the L0 (published element cache) fast path in GetNodeAsync.
-        if (preview is false && _publishedElementCache.TryGetValue(GetCacheKey(key, preview), out element))
+        if (preview is false && _publishedElementCache.TryGet(GetCacheKey(key, preview), out element))
         {
             return true;
         }
@@ -98,7 +107,7 @@ internal sealed class ElementCacheService : IElementCacheService
     {
         var cacheKey = GetCacheKey(key, preview);
 
-        if (preview is false && _publishedElementCache.TryGetValue(cacheKey, out IPublishedElement? cached))
+        if (preview is false && _publishedElementCache.TryGet(cacheKey, out IPublishedElement? cached))
         {
             return cached;
         }
@@ -122,7 +131,10 @@ internal sealed class ElementCacheService : IElementCacheService
         IPublishedElement? result = _publishedContentFactory.ToIPublishedElement(contentCacheNode, preview)?.CreateModel(_publishedModelFactory);
         if (result is not null)
         {
-            _publishedElementCache[cacheKey] = result;
+            // The size estimate is cheap (O(properties), no IO/decompression) and only runs on the
+            // cache-miss path, so keeping the running total always-current means it is accurate the
+            // moment debug reporting is switched on.
+            _publishedElementCache.Set(cacheKey, result, ContentCacheNodeSizeEstimator.EstimateBytes(contentCacheNode));
         }
 
         return result;
@@ -240,7 +252,7 @@ internal sealed class ElementCacheService : IElementCacheService
         {
             var cacheKey = GetCacheKey(publishedNode.Key, false);
             await _hybridCache.SetAsync(cacheKey, publishedNode, GetEntryOptions(publishedNode.Key, false), GenerateTags(publishedNode));
-            _publishedElementCache.Remove(cacheKey, out _);
+            _publishedElementCache.Remove(cacheKey);
         }
         else
         {
@@ -325,7 +337,7 @@ internal sealed class ElementCacheService : IElementCacheService
     public void ClearConvertedContentCache(IReadOnlyCollection<int> elementTypeIds)
     {
         var ids = elementTypeIds as int[] ?? elementTypeIds.ToArray();
-        _publishedElementCache.RemoveAll(element => ids.Contains(element.Value.ContentType.Id));
+        _publishedElementCache.RemoveWhere(element => ids.Contains(element.ContentType.Id));
     }
 
     private static string GetCacheKey(Guid key, bool preview) => preview ? $"{key}+draft" : $"{key}";
@@ -373,7 +385,7 @@ internal sealed class ElementCacheService : IElementCacheService
     {
         var cacheKey = GetCacheKey(key, false);
         await _hybridCache.RemoveAsync(cacheKey);
-        _publishedElementCache.Remove(cacheKey, out _);
+        _publishedElementCache.Remove(cacheKey);
     }
 
     private static string ElementTypeIdTag(int elementTypeId)
