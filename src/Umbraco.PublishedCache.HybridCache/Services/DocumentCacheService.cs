@@ -36,7 +36,21 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
     private readonly ILogger<DocumentCacheService> _logger;
     private HashSet<Guid>? _seedKeys;
 
-    private readonly ConvertedPublishedContentCache<string> _publishedContentCache;
+    private readonly ConcurrentDictionary<string, IPublishedContent> _publishedContentCache = [];
+
+    // Monotonic counter bumped whenever the in-memory cache (L0/L1) is invalidated or refreshed.
+    // GetNodeAsync captures it before reading the backing store and re-checks it before writing
+    // back, so a snapshot read before a concurrent publish/refresh is never written over the
+    // refreshed entry — preventing the stale-set clobber that otherwise persists until a full clear.
+    //
+    // Deliberately a single global counter, not per-key: any invalidation invalidates every in-flight
+    // read-through. The only cost is an occasional skipped cache population when a read-through for one
+    // key overlaps an unrelated publish — a re-miss on the next request, never stale data. A per-key
+    // scheme would avoid that but needs a global epoch for bulk clears plus an exact per-key bump on
+    // every mutated cache key, which is easy to get wrong and would silently reintroduce the clobber.
+    // Global is correctness-robust; only revisit if read-through churn under heavy concurrent
+    // publishing ever shows up in profiling.
+    private long _cacheGeneration;
 
     private HashSet<Guid> SeedKeys
     {
@@ -139,15 +153,28 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
         }
 
         (bool exists, ContentCacheNode? contentCacheNode) = await _hybridCache.TryGetValueAsync<ContentCacheNode?>(cacheKey, CancellationToken.None);
+
+        // A value found in the backing store is already current, so it can always populate the caches
+        // below; only a value built from the read-through DB fetch needs the generation guard.
+        bool snapshotIsCurrent = true;
         if (exists is false)
         {
+            // Capture the cache generation before reading the backing store. If a concurrent publish or
+            // invalidation bumps the generation while we read and build below, the snapshot we hold is
+            // stale and must not be written back over the refreshed entries (the clobber that leaves
+            // memory permanently stale until a full clear).
+            long generation = Interlocked.Read(ref _cacheGeneration);
+
             bool ancestorCheckFailed;
             (contentCacheNode, ancestorCheckFailed) = await GetContentCacheNodeFromRepo();
+
+            snapshotIsCurrent = IsCacheGenerationCurrent(generation);
 
             // Only cache the result if the ancestor check didn't fail.
             // When content exists in DB but the ancestor check fails, this could be a transient
             // race condition during cache rebuild. Caching null would poison the distributed cache.
-            if (ancestorCheckFailed is false)
+            // Skip the write when the generation moved — a refresh has superseded this snapshot.
+            if (ancestorCheckFailed is false && snapshotIsCurrent)
             {
                 await _hybridCache.SetAsync(
                     cacheKey,
@@ -203,6 +230,13 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
 
     private bool GetPreview() => _previewService.IsInPreview();
 
+    // Bumped after every in-memory cache invalidation/refresh so in-flight read-through snapshots
+    // (see GetNodeAsync) can detect they have been superseded and skip writing back stale content.
+    private void InvalidateMemoryCacheGeneration() => Interlocked.Increment(ref _cacheGeneration);
+
+    private bool IsCacheGenerationCurrent(long capturedGeneration)
+        => Interlocked.Read(ref _cacheGeneration) == capturedGeneration;
+
     public IEnumerable<IPublishedContent> GetByContentType(IPublishedContentType contentType)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
@@ -216,6 +250,10 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
 
     public async Task ClearMemoryCacheAsync(CancellationToken cancellationToken)
     {
+        // Bump first so any read-through that read the backing store before this clear is rejected
+        // when it tries to write back, even while the reseed below is still running.
+        InvalidateMemoryCacheGeneration();
+
         _publishedContentCache.Clear();
         await _hybridCache.RemoveByTagAsync(Constants.Cache.Tags.Content, cancellationToken);
 
@@ -245,11 +283,13 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
             var cacheKey = GetCacheKey(publishedNode.Key, false);
             await _hybridCache.SetAsync(cacheKey, publishedNode, GetEntryOptions(publishedNode.Key, false), GenerateTags(publishedNode));
             _publishedContentCache.Remove(cacheKey);
+            InvalidateMemoryCacheGeneration();
         }
         else
         {
             // Either no published node in the database cache, or the ancestor path is no longer published —
-            // remove any stale published entry from the local memory cache.
+            // remove any stale published entry from the local memory cache. ClearPublishedCacheAsync
+            // bumps the generation itself, so this path is already covered.
             await ClearPublishedCacheAsync(key);
         }
 
@@ -441,12 +481,17 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
         ClearConvertedContentCache(contentTypeIdsAsArray);
     }
 
-    public void ClearConvertedContentCache() => _publishedContentCache.Clear();
+    public void ClearConvertedContentCache()
+    {
+        _publishedContentCache.Clear();
+        InvalidateMemoryCacheGeneration();
+    }
 
     public void ClearConvertedContentCache(IReadOnlyCollection<int> contentTypeIds)
     {
         var ids = contentTypeIds as int[] ?? contentTypeIds.ToArray();
         _publishedContentCache.RemoveWhere(content => ids.Contains(content.ContentType.Id));
+        InvalidateMemoryCacheGeneration();
     }
 
     private async Task ClearPublishedCacheAsync(Guid key)
@@ -454,6 +499,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
         var cacheKey = GetCacheKey(key, false);
         await _hybridCache.RemoveAsync(cacheKey);
         _publishedContentCache.Remove(cacheKey);
+        InvalidateMemoryCacheGeneration();
     }
 
     private static string ContentTypeIdTag(int contentTypeId)

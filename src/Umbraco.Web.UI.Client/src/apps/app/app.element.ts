@@ -258,12 +258,9 @@ export class UmbAppElement extends UmbLitElement {
 		// Register Core extensions (this is specifically done here because we need these extensions to be registered before the application is initialized)
 		onInit(this, umbExtensionsRegistry);
 
-		// Register public extensions (login extensions) in parallel with the auth flow below.
-		const registerPublicExtensions = new UmbServerExtensionRegistrator(
-			this,
-			umbExtensionsRegistry,
-		).registerPublicExtensions();
-		new UmbAppEntryPointExtensionInitializer(this, umbExtensionsRegistry);
+		// Register public extensions (login extensions)
+		await new UmbServerExtensionRegistrator(this, umbExtensionsRegistry).registerPublicExtensions();
+		const entryPointInitializer = new UmbAppEntryPointExtensionInitializer(this, umbExtensionsRegistry);
 
 		// Try to initialise the auth flow and get the runtime status
 		try {
@@ -279,8 +276,11 @@ export class UmbAppElement extends UmbLitElement {
 				await this.#setAuthStatus();
 			}
 
-			// The login screen needs the public extensions before routing.
-			await registerPublicExtensions;
+			// The login screen decides which auth provider to use from the registered
+			// `authProvider` extensions. App-entry-points may register or unregister those during
+			// their async onInit, so wait for them to settle before routing — otherwise on a slow
+			// connection the decision races and falls back to the local login.
+			await this.observe(entryPointInitializer.loaded).asPromise();
 
 			// Initialise the router
 			this.#redirect();
