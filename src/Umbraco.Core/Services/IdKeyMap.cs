@@ -151,6 +151,11 @@ public class IdKeyMap : IIdKeyMap, IDisposable
             return Attempt.Succeed(Constants.System.RecycleBinMedia);
         }
 
+        if (key == Constants.System.RecycleBinElementKey && umbracoObjectType is UmbracoObjectTypes.Element or UmbracoObjectTypes.ElementContainer)
+        {
+            return Attempt.Succeed(Constants.System.RecycleBinElement);
+        }
+
         bool empty;
 
         try
@@ -286,6 +291,11 @@ public class IdKeyMap : IIdKeyMap, IDisposable
             return Attempt.Succeed(Constants.System.RecycleBinMediaKey);
         }
 
+        if (id == Constants.System.RecycleBinElement && umbracoObjectType is UmbracoObjectTypes.Element or UmbracoObjectTypes.ElementContainer)
+        {
+            return Attempt.Succeed(Constants.System.RecycleBinElementKey);
+        }
+
         bool empty;
 
         try
@@ -386,12 +396,11 @@ public class IdKeyMap : IIdKeyMap, IDisposable
         try
         {
             _locker.EnterWriteLock();
-            if (_id2Key.TryGetValue(id, out TypedId<Guid> key) == false)
+            if (_id2Key.Remove(id, out TypedId<Guid> key) == false)
             {
                 return;
             }
 
-            _id2Key.Remove(id);
             _key2Id.Remove(key.Id);
         }
         finally
@@ -409,13 +418,12 @@ public class IdKeyMap : IIdKeyMap, IDisposable
         try
         {
             _locker.EnterWriteLock();
-            if (_key2Id.TryGetValue(key, out TypedId<int> id) == false)
+            if (_key2Id.Remove(key, out TypedId<int> id) == false)
             {
                 return;
             }
 
             _id2Key.Remove(id.Id);
-            _key2Id.Remove(key);
         }
         finally
         {

@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services.Navigation;
@@ -14,8 +14,10 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection;
 public static partial class UmbracoBuilderExtensions
 {
     /// <summary>
-    /// Add Umbraco background jobs
+    /// Registers the default set of Umbraco background jobs and related hosted services with the specified builder.
     /// </summary>
+    /// <param name="builder">The <see cref="IUmbracoBuilder"/> to which background jobs will be added.</param>
+    /// <returns>The same <see cref="IUmbracoBuilder"/> instance so that additional calls can be chained.</returns>
     public static IUmbracoBuilder AddBackgroundJobs(this IUmbracoBuilder builder)
     {
         // Add background jobs
@@ -36,7 +38,9 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddHostedService<DistributedBackgroundJobHostedService>();
 
         builder.Services.AddSingleton(RecurringBackgroundJobHostedService.CreateHostedServiceFactory);
-        builder.Services.AddHostedService<RecurringBackgroundJobHostedServiceRunner>();
+        builder.Services.AddSingleton<RecurringBackgroundJobHostedServiceRunner>();
+        builder.Services.AddHostedService(sp => sp.GetRequiredService<RecurringBackgroundJobHostedServiceRunner>());
+        builder.Services.AddSingleton(typeof(IRecurringBackgroundJobTrigger<>), typeof(RecurringBackgroundJobTrigger<>));
         builder.Services.AddHostedService<QueuedHostedService>();
         builder.AddNotificationAsyncHandler<PostRuntimePremigrationsUpgradeNotification, NavigationInitializationNotificationHandler>();
         builder.AddNotificationAsyncHandler<PostRuntimePremigrationsUpgradeNotification, PublishStatusInitializationNotificationHandler>();

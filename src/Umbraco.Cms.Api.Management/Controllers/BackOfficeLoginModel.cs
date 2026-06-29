@@ -2,6 +2,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Umbraco.Cms.Api.Management;
 
+/// <summary>
+/// Represents a model containing the credentials required for logging into the Umbraco back office.
+/// </summary>
 [BindProperties]
 public class BackOfficeLoginModel
 {
@@ -16,5 +19,8 @@ public class BackOfficeLoginModel
     /// </summary>
     public string? UmbracoUrl { get; set; }
 
+    /// <summary>
+    /// Indicates whether the user is already logged in to the back office.
+    /// </summary>
     public bool UserIsAlreadyLoggedIn { get; set; }
 }

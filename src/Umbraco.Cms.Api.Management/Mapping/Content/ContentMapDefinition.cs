@@ -1,5 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.ViewModels.Content;
+using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
@@ -8,6 +9,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Mapping.Content;
 
+/// <summary>
+/// Provides mapping configuration between content types, value view models, and variant view models in the Umbraco CMS management API.
+/// </summary>
 public abstract class ContentMapDefinition<TContent, TValueViewModel, TVariantViewModel>
     where TContent : IContentBase
     where TValueViewModel : ValueResponseModelBase, new()
@@ -22,14 +26,6 @@ public abstract class ContentMapDefinition<TContent, TValueViewModel, TVariantVi
     {
         _propertyEditorCollection = propertyEditorCollection;
         _dataValueEditorFactory = dataValueEditorFactory;
-    }
-
-    [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in Umbraco 18.")]
-    protected ContentMapDefinition(PropertyEditorCollection propertyEditorCollection)
-        : this(
-            propertyEditorCollection,
-            StaticServiceProvider.Instance.GetRequiredService<IDataValueEditorFactory>())
-    {
     }
 
     protected delegate void ValueViewModelMapping(IDataEditor propertyEditor, TValueViewModel variantViewModel);
@@ -108,4 +104,33 @@ public abstract class ContentMapDefinition<TContent, TValueViewModel, TVariantVi
             }))
             .ToArray();
     }
+
+    protected void MapContentScheduleCollection<TContentResponseModel, TPublishableVariantResponseModelBase>(ContentScheduleCollection source, TContentResponseModel target, MapperContext context)
+        where TContentResponseModel : ContentResponseModelBase<TValueViewModel, TPublishableVariantResponseModelBase>
+        where TPublishableVariantResponseModelBase : PublishableVariantResponseModelBase, TVariantViewModel
+    {
+        foreach (ContentSchedule schedule in source.FullSchedule)
+        {
+            TPublishableVariantResponseModelBase? variant = target.Variants
+                .FirstOrDefault(v =>
+                    v.Culture == schedule.Culture ||
+                    (IsInvariant(v.Culture) && IsInvariant(schedule.Culture)));
+            if (variant is null)
+            {
+                continue;
+            }
+
+            switch (schedule.Action)
+            {
+                case ContentScheduleAction.Release:
+                    variant.ScheduledPublishDate = new DateTimeOffset(schedule.Date, TimeSpan.Zero);
+                    break;
+                case ContentScheduleAction.Expire:
+                    variant.ScheduledUnpublishDate = new DateTimeOffset(schedule.Date, TimeSpan.Zero);
+                    break;
+            }
+        }
+    }
+
+    private static bool IsInvariant(string? culture) => culture.IsNullOrWhiteSpace() || culture == Core.Constants.System.InvariantCulture;
 }

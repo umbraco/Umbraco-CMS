@@ -10,12 +10,20 @@ using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Package.Created;
 
+/// <summary>
+/// API controller responsible for managing and retrieving information about all packages created in the system.
+/// </summary>
 [ApiVersion("1.0")]
 public class AllCreatedPackageController : CreatedPackageControllerBase
 {
     private readonly IPackagingService _packagingService;
     private readonly IUmbracoMapper _umbracoMapper;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AllCreatedPackageController"/> class.
+    /// </summary>
+    /// <param name="packagingService">Service used for package-related operations.</param>
+    /// <param name="umbracoMapper">The mapper used to map Umbraco objects.</param>
     public AllCreatedPackageController(IPackagingService packagingService, IUmbracoMapper umbracoMapper)
     {
         _packagingService = packagingService;

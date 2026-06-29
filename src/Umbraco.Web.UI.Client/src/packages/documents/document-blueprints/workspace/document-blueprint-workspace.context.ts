@@ -17,7 +17,6 @@ import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContentDetailWorkspaceContextBase, type UmbContentWorkspaceContext } from '@umbraco-cms/backoffice/content';
 import {
-	UMB_DOCUMENT_COLLECTION_ALIAS,
 	UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD,
 	UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN,
 } from '@umbraco-cms/backoffice/document';
@@ -99,20 +98,6 @@ export class UmbDocumentBlueprintWorkspaceContext
 		});
 	}
 
-	getCollectionAlias() {
-		return UMB_DOCUMENT_COLLECTION_ALIAS;
-	}
-
-	/**
-	 * Gets the unique identifier of the content type.
-	 * @deprecated Use `getContentTypeUnique` instead.
-	 * @returns { string | undefined} The unique identifier of the content type.
-	 * @memberof UmbDocumentWorkspaceContext
-	 */
-	getContentTypeId(): string | undefined {
-		return this.getContentTypeUnique();
-	}
-
 	/**
 	 * Gets the unique identifier of the content type.
 	 * @returns { string | undefined} The unique identifier of the content type.
@@ -120,6 +105,19 @@ export class UmbDocumentBlueprintWorkspaceContext
 	 */
 	getContentTypeUnique(): string | undefined {
 		return this.getData()?.documentType.unique;
+	}
+
+	/**
+	 * Override mandatory validation to filter out variants without a name before validating.
+	 * Blueprints allow partial variant data and users may only provide a name for some cultures.
+	 */
+	public override async runMandatoryValidationForSaveData(
+		saveData: ContentModel,
+		variantIds: Array<UmbVariantId> = [],
+	): Promise<void> {
+		const namedVariants = saveData.variants.filter((v) => v.name);
+		const filteredVariantIds = variantIds.filter((variantId) => namedVariants.some((v) => variantId.compare(v)));
+		return super.runMandatoryValidationForSaveData({ ...saveData, variants: namedVariants }, filteredVariantIds);
 	}
 
 	public createPropertyDatasetContext(

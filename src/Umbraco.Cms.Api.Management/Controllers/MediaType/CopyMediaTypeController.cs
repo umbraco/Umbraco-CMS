@@ -11,15 +11,31 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.MediaType;
 
+/// <summary>
+/// API controller responsible for handling operations related to copying media types in the system.
+/// </summary>
 [ApiVersion("1.0")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessMediaTypes)]
 public class CopyMediaTypeController : MediaTypeControllerBase
 {
     private readonly IMediaTypeService _mediaTypeService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="CopyMediaTypeController"/> class with the specified media type service.
+    /// </summary>
+    /// <param name="mediaTypeService">The service used to manage media types.</param>
     public CopyMediaTypeController(IMediaTypeService mediaTypeService)
         => _mediaTypeService = mediaTypeService;
 
+    /// <summary>
+    /// Creates a duplicate of an existing media type identified by the provided <paramref name="id"/>.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="id">The unique identifier (GUID) of the media type to copy.</param>
+    /// <param name="copyMediaTypeRequestModel">The request model containing details for the copy operation, such as the target location.</param>
+    /// <returns>
+    /// An <see cref="IActionResult"/> that represents the result of the copy operation. Returns <c>201 Created</c> with the new media type if successful, or a <see cref="ProblemDetails"/> response with <c>400 Bad Request</c> or <c>404 Not Found</c> if the operation fails.
+    /// </returns>
     [HttpPost("{id:guid}/copy")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status201Created)]

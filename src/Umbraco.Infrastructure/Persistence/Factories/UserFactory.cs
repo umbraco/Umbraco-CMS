@@ -10,6 +10,13 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories;
 
 internal static class UserFactory
 {
+    /// <summary>
+    /// Constructs an <see cref="IUser"/> entity using the provided global settings, user data transfer object, and a set of permission mappers.
+    /// </summary>
+    /// <param name="globalSettings">The <see cref="GlobalSettings"/> instance containing configuration values used during user creation.</param>
+    /// <param name="dto">The <see cref="UserDto"/> containing user information from the data store.</param>
+    /// <param name="permissionMappers">A dictionary mapping permission keys to <see cref="IPermissionMapper"/> implementations, used to assign permissions to the user.</param>
+    /// <returns>An <see cref="IUser"/> entity populated with data from the provided <paramref name="dto"/> and configured according to <paramref name="globalSettings"/> and <paramref name="permissionMappers"/>.</returns>
     public static IUser BuildEntity(
         GlobalSettings globalSettings,
         UserDto dto,
@@ -34,6 +41,8 @@ internal static class UserFactory
             dto.UserStartNodeDtos.Where(x => x.StartNodeType == (int)UserStartNodeDto.StartNodeTypeValue.Content)
                 .Select(x => x.StartNode).ToArray(),
             dto.UserStartNodeDtos.Where(x => x.StartNodeType == (int)UserStartNodeDto.StartNodeTypeValue.Media)
+                .Select(x => x.StartNode).ToArray(),
+            dto.UserStartNodeDtos.Where(x => x.StartNodeType == (int)UserStartNodeDto.StartNodeTypeValue.Element)
                 .Select(x => x.StartNode).ToArray());
 
         try
@@ -68,6 +77,12 @@ internal static class UserFactory
         }
     }
 
+    /// <summary>
+    /// Creates a <see cref="UserDto"/> instance from the specified <see cref="IUser"/> entity.
+    /// Copies relevant properties from the user entity to the data transfer object, including start nodes and metadata.
+    /// </summary>
+    /// <param name="entity">The <see cref="IUser"/> entity to convert.</param>
+    /// <returns>A <see cref="UserDto"/> populated with data from the provided user entity.</returns>
     public static UserDto BuildDto(IUser entity)
     {
         var dto = new UserDto
@@ -91,7 +106,7 @@ internal static class UserFactory
             Avatar = entity.Avatar,
             EmailConfirmedDate = entity.EmailConfirmedDate,
             InvitedDate = entity.InvitedDate,
-            Kind = (short)entity.Kind
+            Kind = (short)entity.Kind,
         };
 
         if (entity.StartContentIds is not null)
@@ -120,6 +135,19 @@ internal static class UserFactory
             }
         }
 
+        if (entity.StartElementIds is not null)
+        {
+            foreach (var startNodeId in entity.StartElementIds)
+            {
+                dto.UserStartNodeDtos.Add(new UserStartNodeDto
+                {
+                    StartNode = startNodeId,
+                    StartNodeType = (int)UserStartNodeDto.StartNodeTypeValue.Element,
+                    UserId = entity.Id,
+                });
+            }
+        }
+
         if (entity.HasIdentity)
         {
             dto.Id = entity.Id;
@@ -128,15 +156,16 @@ internal static class UserFactory
         return dto;
     }
 
-    private static IReadOnlyUserGroup ToReadOnlyGroup(UserGroupDto group, IDictionary<string, IPermissionMapper> permissionMappers)
-    {
-        return new ReadOnlyUserGroup(
+    private static IReadOnlyUserGroup ToReadOnlyGroup(UserGroupDto group, IDictionary<string, IPermissionMapper> permissionMappers) =>
+        new ReadOnlyUserGroup(
             group.Id,
             group.Key,
             group.Name,
+            group.Description,
             group.Icon,
             group.StartContentId,
             group.StartMediaId,
+            group.StartElementId,
             group.Alias,
             group.UserGroup2LanguageDtos.Select(x => x.LanguageId),
             group.UserGroup2AppDtos.Select(x => x.AppAlias).WhereNotNull().ToArray(),
@@ -148,12 +177,11 @@ internal static class UserFactory
                     return mapper.MapFromDto(granularPermission);
                 }
 
-                return new UnknownTypeGranularPermission()
+                return new UnknownTypeGranularPermission
                 {
                     Permission = granularPermission.Permission,
-                    Context = granularPermission.Context
+                    Context = granularPermission.Context,
                 };
             })),
             group.HasAccessToAllLanguages);
-    }
 }

@@ -10,6 +10,13 @@ internal sealed class MediaSearchService : ContentSearchServiceBase<IMedia>, IMe
 {
     private readonly IMediaService _mediaService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MediaSearchService"/> class.
+    /// </summary>
+    /// <param name="sqlContext">The <see cref="ISqlContext"/> used for database operations.</param>
+    /// <param name="idKeyMap">The <see cref="IIdKeyMap"/> used for mapping entity IDs.</param>
+    /// <param name="logger">The <see cref="ILogger{MediaSearchService}"/> instance used for logging.</param>
+    /// <param name="mediaService">The <see cref="IMediaService"/> used for managing media entities.</param>
     public MediaSearchService(ISqlContext sqlContext, IIdKeyMap idKeyMap, ILogger<MediaSearchService> logger, IMediaService mediaService)
         : base(sqlContext, idKeyMap, logger)
         => _mediaService = mediaService;

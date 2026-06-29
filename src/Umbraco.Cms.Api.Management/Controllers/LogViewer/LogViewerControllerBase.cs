@@ -7,6 +7,9 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.LogViewer;
 
+/// <summary>
+/// Serves as the base controller for log viewer features in the Umbraco CMS Management API.
+/// </summary>
 [VersionedApiBackOfficeRoute("log-viewer")]
 [ApiExplorerSettings(GroupName = "Log Viewer")]
 [Authorize(Policy = AuthorizationPolicies.SectionAccessSettings)]

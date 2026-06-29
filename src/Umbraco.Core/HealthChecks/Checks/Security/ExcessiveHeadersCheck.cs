@@ -46,6 +46,16 @@ public class ExcessiveHeadersCheck : HealthCheck
         var success = false;
         var url = _hostingEnvironment.ApplicationMainUrl?.GetLeftPart(UriPartial.Authority);
 
+        if (url is null)
+        {
+            return new HealthCheckStatus(
+                _textService.Localize("healthcheck", "httpsCheckNoApplicationUrl"))
+            {
+                ResultType = StatusResultType.Info,
+                ReadMoreLink = Constants.HealthChecks.DocumentationLinks.Security.ExcessiveHeadersCheck,
+            };
+        }
+
         // Access the site home page and check for the headers
         using var request = new HttpRequestMessage(HttpMethod.Head, url);
         try

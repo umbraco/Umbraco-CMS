@@ -1,5 +1,8 @@
 namespace Umbraco.Cms.Api.Management.ViewModels.Package;
 
+/// <summary>
+/// Represents a response model containing the status of a package migration operation.
+/// </summary>
 public class PackageMigrationStatusResponseModel
 {
     /// <summary>

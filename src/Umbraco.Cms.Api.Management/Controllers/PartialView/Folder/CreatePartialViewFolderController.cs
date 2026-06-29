@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Extensions;
@@ -11,12 +11,20 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.PartialView.Folder;
 
+/// <summary>
+/// API controller responsible for handling requests to create new partial view folders in the system.
+/// </summary>
 [ApiVersion("1.0")]
 public class CreatePartialViewFolderController : PartialViewFolderControllerBase
 {
     private readonly IPartialViewFolderService _partialViewFolderService;
     private readonly IUmbracoMapper _mapper;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="CreatePartialViewFolderController"/> class.
+    /// </summary>
+    /// <param name="partialViewFolderService">Service used to manage partial view folders.</param>
+    /// <param name="mapper">The <see cref="IUmbracoMapper"/> instance used for object mapping.</param>
     public CreatePartialViewFolderController(IPartialViewFolderService partialViewFolderService, IUmbracoMapper mapper)
     {
         _partialViewFolderService = partialViewFolderService;

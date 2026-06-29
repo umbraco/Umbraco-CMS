@@ -62,6 +62,14 @@ public class UmbracoDatabaseFactory : DisposableObjectSlim, IUmbracoDatabaseFact
     ///     Initializes a new instance of the <see cref="UmbracoDatabaseFactory" />.
     /// </summary>
     /// <remarks>Used by the other ctor and in tests.</remarks>
+    /// <param name="logger">The logger instance for logging within the <see cref="UmbracoDatabaseFactory"/>.</param>
+    /// <param name="loggerFactory">The factory used to create logger instances.</param>
+    /// <param name="globalSettings">The options accessor for global Umbraco settings.</param>
+    /// <param name="connectionStrings">The monitor for database connection string options.</param>
+    /// <param name="mappers">The collection of registered mappers for database mapping.</param>
+    /// <param name="dbProviderFactoryCreator">The factory responsible for creating database provider factories.</param>
+    /// <param name="databaseSchemaCreatorFactory">The factory for creating database schema creators.</param>
+    /// <param name="npocoMappers">The collection of NPoco mappers for ORM mapping.</param>
     public UmbracoDatabaseFactory(
         ILogger<UmbracoDatabaseFactory> logger,
         ILoggerFactory loggerFactory,

@@ -14,6 +14,12 @@ internal sealed class WebhookPresentationFactory : IWebhookPresentationFactory
     private readonly IHostingEnvironment _hostingEnvironment;
     private readonly ILocalizedTextService _localizedTextService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="WebhookPresentationFactory"/> class with the specified dependencies.
+    /// </summary>
+    /// <param name="webhookEventCollection">The <see cref="WebhookEventCollection"/> containing the webhook events.</param>
+    /// <param name="hostingEnvironment">The <see cref="IHostingEnvironment"/> representing the hosting environment.</param>
+    /// <param name="localizedTextService">The <see cref="ILocalizedTextService"/> used for localized text.</param>
     public WebhookPresentationFactory(
         WebhookEventCollection webhookEventCollection,
         IHostingEnvironment hostingEnvironment,
@@ -41,6 +47,11 @@ internal sealed class WebhookPresentationFactory : IWebhookPresentationFactory
         return target;
     }
 
+    /// <summary>
+    /// Creates a new <see cref="IWebhook"/> instance from the specified <see cref="CreateWebhookRequestModel"/>.
+    /// </summary>
+    /// <param name="webhookRequestModel">The model containing the webhook creation details.</param>
+    /// <returns>A new <see cref="IWebhook"/> instance initialized with the provided data.</returns>
     public IWebhook CreateWebhook(CreateWebhookRequestModel webhookRequestModel)
     {
         var target = new Webhook(webhookRequestModel.Url, webhookRequestModel.Enabled, webhookRequestModel.ContentTypeKeys, webhookRequestModel.Events, webhookRequestModel.Headers)
@@ -63,6 +74,11 @@ internal sealed class WebhookPresentationFactory : IWebhookPresentationFactory
         return target;
     }
 
+    /// <summary>
+    /// Creates a new instance of <see cref="WebhookResponseModel"/> based on the specified <see cref="IWebhook"/>.
+    /// </summary>
+    /// <param name="webhook">The <see cref="IWebhook"/> instance from which to create the response model.</param>
+    /// <returns>A <see cref="WebhookResponseModel"/> populated with data from the provided webhook.</returns>
     public WebhookLogResponseModel CreateResponseModel(WebhookLog webhookLog)
     {
         var webhookLogResponseModel = new WebhookLogResponseModel

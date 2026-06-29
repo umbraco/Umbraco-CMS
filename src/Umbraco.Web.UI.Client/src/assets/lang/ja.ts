@@ -382,6 +382,7 @@ export default {
 		constrainProportions: '縦横比',
 		continue: '続行',
 		copy: 'コピー',
+		copied: 'コピーしました！',
 		create: '新規作成',
 		database: 'データベース',
 		date: '日付',
@@ -475,6 +476,7 @@ export default {
 		current: '現在',
 		embed: '埋め込み',
 		restore: '復元',
+		unnamed: '名称未設定',
 	},
 	colors: {
 		blue: 'ブルー',
@@ -600,8 +602,6 @@ export default {
 		greeting6: 'ようこそ',
 		instruction: 'ウェブサイトにログインします。',
 		timeout: 'セッションタイムアウトしました。',
-		bottomText:
-			'<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">umbraco.org</a></p> ',
 	},
 	main: {
 		dashboard: 'ダッシュボード',
@@ -720,20 +720,13 @@ export default {
 		editscript: 'スクリプトファイルの編集',
 	},
 	sections: {
-		concierge: '管理人',
 		content: 'コンテンツ',
-		courier: 'Courier',
-		developer: '開発',
-		installer: 'Umbraco 設定ウィザード',
+		library: 'ライブラリ',
 		media: 'メディア',
 		member: 'メンバー',
-		newsletters: 'ニュースレター',
 		settings: '設定',
-		statistics: '統計',
 		translation: '翻訳',
 		users: 'ユーザー',
-		help: 'ヘルプ',
-		forms: 'フォーム',
 	},
 	settings: {
 		defaulttemplate: '既定のテンプレート',
@@ -870,8 +863,9 @@ export default {
 	contentTypeEditor: {
 		compositions: '構成',
 		noGroups: 'タブが追加されていません',
+		addGroup: 'タブを追加',
 		inheritedFrom: '次から継承:',
-		addProperty: 'プロパティの追加',
+		addProperty: 'プロパティを追加',
 		requiredLabel: '必要なラベル',
 		enableListViewHeading: 'リスト ビューの有効化',
 		enableListViewDescription:
@@ -885,8 +879,16 @@ export default {
 		chooseChildNode: '子ノードの選択',
 		compositionsDescription:
 			'既存ドキュメント タイプのタブとプロパティを継承。新しいタブを現在のドキュメント タイプに追加、または同じ名前のタブがある場合はマージされます。',
+		compositionsDescriptionMediaType:
+			'既存メディア タイプのタブとプロパティを継承。新しいタブを現在のメディア タイプに追加、または同じ名前のタブがある場合はマージされます。',
+		compositionsDescriptionMemberType:
+			'既存メンバー タイプのタブとプロパティを継承。新しいタブを現在のメンバー タイプに追加、または同じ名前のタブがある場合はマージされます。',
 		compositionInUse: 'このコンテンツ タイプが構成で使用されるため、自身を構成することはできません。',
+		compositionInUseMediaType: 'このメディア タイプが構成で使用されるため、自身を構成することはできません。',
+		compositionInUseMemberType: 'このメンバー タイプが構成で使用されるため、自身を構成することはできません。',
 		noAvailableCompositions: '構成に使用できるコンテンツ タイプはありません。',
+		noAvailableCompositionsMediaType: '構成に使用できるメディア タイプはありません。',
+		noAvailableCompositionsMemberType: '構成に使用できるメンバー タイプはありません。',
 		availableEditors: '使用可能なエディター',
 		reuse: '再利用',
 		editorSettings: 'エディター設定',
@@ -904,6 +906,8 @@ export default {
 		andAllDocuments: 'およびこのタイプを使用したすべてのドキュメント',
 		andAllMediaItems: 'およびこのタイプを使用したこのメディア アイテム',
 		andAllMembers: 'およびこのタイプを使用したすべてのメンバー',
+		addTab: 'タブを追加',
+		deleteTab: 'タブを削除',
 	},
 	templateEditor: {
 		alternativeField: '代替フィールド',

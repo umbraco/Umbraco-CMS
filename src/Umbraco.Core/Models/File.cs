@@ -21,6 +21,11 @@ public abstract class File : EntityBase, IFile
     private string _path;
 
     /// <summary>
+    ///     File-based entities derive their Key from the file path, so Key must be allowed to change when the path changes.
+    /// </summary>
+    protected override bool CanChangeKey => true;
+
+    /// <summary>
     ///     Initializes a new instance of the <see cref="File" /> class with the specified path.
     /// </summary>
     /// <param name="path">The path to the file.</param>

@@ -4,8 +4,15 @@ using Umbraco.Cms.Api.Management.ViewModels.Language;
 
 namespace Umbraco.Cms.Api.Management.Mapping.Language;
 
+/// <summary>
+/// Defines the mapping configuration between language domain models and their corresponding view models.
+/// </summary>
 public class LanguageViewModelsMapDefinition : IMapDefinition
 {
+    /// <summary>
+    /// Configures object-object mappings related to language view models, including mappings between request models, the <see cref="ILanguage"/> domain model, and response models.
+    /// </summary>
+    /// <param name="mapper">The <see cref="IUmbracoMapper"/> instance used to define the mappings.</param>
     public void DefineMaps(IUmbracoMapper mapper)
     {
         mapper.Define<CreateLanguageRequestModel, ILanguage>((_, _) => new Core.Models.Language(string.Empty, string.Empty), Map);

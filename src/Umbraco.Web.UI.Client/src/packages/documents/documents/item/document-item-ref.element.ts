@@ -1,8 +1,9 @@
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
 import { UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN } from '../paths.js';
 import type { UmbDocumentItemModel } from './types.js';
+import type { UmbDocumentSearchItemModel } from '../search/types.js';
 import { UmbDocumentItemDataResolver } from './document-item-data-resolver.js';
-import { customElement, html, ifDefined, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, ifDefined, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
@@ -16,6 +17,14 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 	@property({ type: Object })
 	public set item(value: UmbDocumentItemModel | undefined) {
 		this.#item.setData(value);
+		const ancestors = (value as UmbDocumentSearchItemModel | undefined)?.ancestors;
+		this._ancestorPath =
+			ancestors?.length
+				? ancestors
+						.map((a) => a.variants[0]?.name ?? '(Untitled)')
+						.filter(Boolean)
+						.join(' / ')
+				: '';
 	}
 	public get item(): UmbDocumentItemModel | undefined {
 		return this.#item.getData();
@@ -57,6 +66,9 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 	@state()
 	private _editPath = '';
 
+	@state()
+	private _ancestorPath = '';
+
 	constructor() {
 		super();
 
@@ -77,10 +89,13 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 	}
 
 	#getHref() {
-		if (!this._unique) return;
+		// No `_editPath` means the modal route registration couldn't reach a parent route context
+		// (e.g. this ref is rendered inside a non-routable modal). Skip rendering an href so we don't
+		// produce a broken `/edit/<guid>` link. Consumers that know they will be in such a context
+		// (like the link-picker modal) should also pass `readonly` so the ref isn't styled as clickable.
+		if (!this._unique || !this._editPath) return;
 		const path = UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN.generateLocal({ unique: this._unique });
-		const culture = this.#item.getCulture();
-		return culture ? `${this._editPath}/${path}/${culture}` : `${this._editPath}/${path}`;
+		return `${this._editPath}/${path}`;
 	}
 
 	#onSelected(event: UUISelectableEvent) {
@@ -110,6 +125,7 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 				@deselected=${this.#onDeselected}>
 				<slot name="actions" slot="actions"></slot>
 				${this.#renderIcon()}${this.#renderIsDraft()} ${this.#renderIsTrashed()}
+				${this._ancestorPath ? html`<span slot="detail" class="ancestor-path">${this._ancestorPath}</span>` : nothing}
 			</uui-ref-node>
 		`;
 	}
@@ -128,6 +144,19 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 		if (!this._isDraft) return nothing;
 		return html`<uui-tag size="s" slot="tag" look="secondary" color="default">Draft</uui-tag>`;
 	}
+
+	static override styles = [
+		css`
+			.ancestor-path {
+				display: block;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+				direction: rtl;
+				text-align: left;
+			}
+		`,
+	];
 }
 
 export { UmbDocumentItemRefElement as element };

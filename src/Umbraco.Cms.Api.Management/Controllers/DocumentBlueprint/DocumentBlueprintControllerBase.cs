@@ -6,10 +6,16 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DocumentBlueprint;
 
+/// <summary>
+/// Serves as the base controller for API endpoints that manage document blueprints in the Umbraco CMS.
+/// Provides common functionality for derived controllers handling document blueprint operations.
+/// </summary>
 [VersionedApiBackOfficeRoute(Constants.UdiEntityType.DocumentBlueprint)]
 [ApiExplorerSettings(GroupName = "Document Blueprint")]
 public abstract class DocumentBlueprintControllerBase : ContentControllerBase
 {
+    protected override string EntityName => "document blueprint";
+
     protected IActionResult DocumentBlueprintNotFound()
         => OperationStatusResult(ContentEditingOperationStatus.NotFound, problemDetailsBuilder
             => NotFound(problemDetailsBuilder

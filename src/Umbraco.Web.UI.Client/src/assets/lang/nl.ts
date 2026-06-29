@@ -18,6 +18,7 @@ export default {
 		changeDataType: 'Datatype aanpassen',
 		copy: 'Kopiëren',
 		create: 'Nieuw',
+		createFor: (name: string) => (name ? `Item aanmaken voor ${name}` : 'Aanmaken'),
 		export: 'Export',
 		createPackage: 'Nieuwe package',
 		createGroup: 'Groep maken',
@@ -56,6 +57,7 @@ export default {
 		setGroup: 'Groep instellen',
 		sort: 'Sorteren',
 		translate: 'Vertalen',
+		trash: 'Verwijderen',
 		update: 'Bijwerken',
 		setPermissions: 'Rechten instellen',
 		unlock: 'Deblokkeer',
@@ -364,7 +366,7 @@ export default {
 		noDocumentTypesEditPermissions: 'Rechten aanpassen voor dit documenttype',
 		noDocumentTypesCreateNew: 'Nieuw documenttype aanmaken',
 		noDocumentTypesAllowedAtRoot:
-			'Er zijn geen toegestane ​​documenttypes beschikbaar om hier aan te maken. Je moet deze inschakelen bij <strong>Documenttypes</strong> in de sectie <strong>Instellingen</strong>, de optie <strong>Toestaan op root-niveau</strong> onder <strong>Rechten</strong>.',
+			'Er zijn geen toegestane ​​documenttypes beschikbaar om hier aan te maken. Je moet deze inschakelen bij <strong>Documenttypes</strong> in de sectie <strong>Instellingen</strong>, de optie <strong>Toestaan op root-niveau</strong> onder <strong>Structuur</strong>.',
 		noMediaTypes:
 			'Er zijn geen toegestande mediatypes beschikbaar. Schakel deze in in de sectie Instellingen onder <strong>"Mediatypes"</strong>.',
 		noMediaTypesWithNoSettingsAccess:
@@ -679,6 +681,7 @@ export default {
 		content: 'Inhoud',
 		continue: 'Doorgaan',
 		copy: 'Kopiëren',
+		copied: 'Gekopieerd!',
 		create: 'Aanmaken',
 		cropSection: 'Sectie bijsnijden',
 		database: 'Database',
@@ -943,10 +946,8 @@ export default {
 		greeting5: 'Welkom',
 		greeting6: 'Welkom',
 		instruction: 'log hieronder in',
-		signInWith: 'Inloggen met',
+		signInWith: 'Inloggen met {0}',
 		timeout: 'Sessie is verlopen',
-		bottomText:
-			'<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">umbraco.com</a></p>',
 		forgottenPassword: 'Wachtwoord vergeten?',
 		forgottenPasswordInstruction:
 			'Er zal een e-mail worden gestuurd naar het e-mailadres van jouw account.\n      Hierin staat een link om je wachtwoord te resetten\n    ',
@@ -958,17 +959,39 @@ export default {
 		setPasswordInstruction: 'Geef alsjeblieft een nieuw wachtwoord op',
 		setPasswordConfirmation: 'Je wachtwoord is aangepast',
 		resetCodeExpired: 'De link die je hebt aangeklikt is niet (meer) geldig.',
-		resetPasswordEmailCopySubject: 'Umbraco: Wachtwoord Reset',
-		resetPasswordEmailCopyFormat:
-			'<p>De gebruikersnaam om in te loggen bij jouw Umbraco omgeving is: <strong>%0%</strong></p><p>Klik <a href="%1%"><strong>hier</strong></a> om je wachtwoord te resetten of knip/plak deze URL in je browser:</p><p><em>%1%</em></p>',
-		mfaSecurityCodeSubject: 'Umbraco: Beveiligingscode',
-		mfaSecurityCodeMessage: 'Jouw beveiligingscode is: %0%',
-		'2faTitle': 'Laatste stap',
-		'2faText': 'Je hebt tweestapsverificatie ingeschakeld en moet je identiteit verifiëren.',
-		'2faMultipleText': 'Kies een tweestapsverificatie aanbieder',
-		'2faCodeInput': 'Verificatiecode',
-		'2faCodeInputHelp': 'Vul de verificatiecode in',
-		'2faInvalidCode': 'Ongeldige code ingevoerd',
+		continue: 'Doorgaan',
+		validate: 'Valideren',
+		login: 'Inloggen',
+		email: 'Voer jouw e-mailadres in',
+		username: 'Gebruikersnaam',
+		password: 'Wachtwoord',
+		submit: 'Verstuur',
+		required: 'Verplicht',
+		success: 'Succes',
+		rememberMe: 'Onthoud mij',
+		error: 'Fout',
+		defaultError: 'Er is een onbekende fout opgetreden.',
+		errorInPasswordFormat: 'Het wachtwoord moet minstens %0% tekens lang zijn en moet minstens %1% cijfers bevatten',
+		passwordMismatch: 'Beide wachtwoorden zijn niet hetzelfde!',
+		passwordMinLength: 'Je wachtwoord moet minstens {0} tekens lang zijn.',
+		passwordIsBlank: 'Je nieuwe wachtwoord mag niet leeg zijn!',
+		userFailedLogin: 'Oeps! We konden je niet inloggen. Controleer je inloggegevens en probeer het opnieuw.',
+		userLockedOut: 'Je account is geblokkeerd. Probeer het later opnieuw.',
+		receivedErrorFromServer: 'Een error ontvangen van de server',
+		userInviteWelcomeMessage:
+			'Hallo en welkom in Umbraco! Binnen ongeveer één minuut kan je aan de slag. Je moet enkel je wachtwoord instellen.',
+		userInviteExpiredMessage:
+			'Welkom bij Umbraco! Helaas is je uitnodiging vervallen. Vraag aan je administrator om de uitnodiging opnieuw te versturen.',
+		newPassword: 'Wijzig je wachtwoord',
+		confirmNewPassword: 'Bevestig nieuw wachtwoord',
+		mfaTitle: 'Laatste stap!',
+		mfaCodeInputHelp: 'Vul de verificatiecode in',
+		mfaText: 'Je hebt tweestapsverificatie ingeschakeld en moet je identiteit verifiëren.',
+		mfaMultipleText: 'Kies een tweestapsverificatie aanbieder',
+		mfaCodeInput: 'Verificatiecode',
+		mfaInvalidCode: 'Ongeldige code ingevoerd',
+		localLoginDisabled: 'Helaas is direct inloggen niet mogelijk. Het is uitgeschakeld door een aanbieder.',
+		friendlyGreeting: 'Hallo!',
 	},
 	main: {
 		dashboard: 'Dashboard',
@@ -1167,7 +1190,7 @@ export default {
 	},
 	sections: {
 		content: 'Inhoud',
-		forms: 'Formulieren',
+		library: 'Bibliotheek',
 		media: 'Media',
 		member: 'Leden',
 		packages: 'Packages',
@@ -1454,9 +1477,19 @@ export default {
 		chooseChildNode: 'Kies onderliggende node',
 		compositionsDescription:
 			'Overgeërfde tabs en properties van een bestaand documenttype. Nieuwe tabs\n      worden toegevoegd aan het huidige documenttype of samengevoegd als een tab met dezelfde naam al bestaat.\n    ',
+		compositionsDescriptionMediaType:
+			'Overgeërfde tabs en properties van een bestaand mediatype. Nieuwe tabs\n      worden toegevoegd aan het huidige mediatype of samengevoegd als een tab met dezelfde naam al bestaat.\n    ',
+		compositionsDescriptionMemberType:
+			'Overgeërfde tabs en properties van een bestaand lidtype. Nieuwe tabs\n      worden toegevoegd aan het huidige lidtype of samengevoegd als een tab met dezelfde naam al bestaat.\n    ',
 		compositionInUse:
 			'Dit contenttype wordt gebruikt in een compositie en kan daarom niet zelf een\n      compositie worden.\n    ',
+		compositionInUseMediaType:
+			'Dit mediatype wordt gebruikt in een compositie en kan daarom niet zelf een\n      compositie worden.\n    ',
+		compositionInUseMemberType:
+			'Dit lidtype wordt gebruikt in een compositie en kan daarom niet zelf een\n      compositie worden.\n    ',
 		noAvailableCompositions: 'Er zijn geen contenttypen beschikbaar om als compositie te gebruiken.',
+		noAvailableCompositionsMediaType: 'Er zijn geen mediatypen beschikbaar om als compositie te gebruiken.',
+		noAvailableCompositionsMemberType: 'Er zijn geen lidtypen beschikbaar om als compositie te gebruiken.',
 		compositionRemoveWarning:
 			'Een compositie verwijderen zal alle bijbehorende eigenschapsdata ook\n      verwijderen. Zodra je het documenttype hebt opgeslagen is er geen weg meer terug.\n    ',
 		availableEditors: 'Beschikbare editors',
@@ -1494,6 +1527,10 @@ export default {
 		compositionUsageHeading: 'Waar wordt deze compositie gebruikt?',
 		compositionUsageSpecification:
 			'Deze samenstelling wordt momenteel gebruikt bij de samenstelling van de\n      volgende inhoudstypen:\n    ',
+		compositionUsageSpecificationMediaType:
+			'Deze samenstelling wordt momenteel gebruikt bij de samenstelling van de\n      volgende mediatypen:\n    ',
+		compositionUsageSpecificationMemberType:
+			'Deze samenstelling wordt momenteel gebruikt bij de samenstelling van de\n      volgende lidtypen:\n    ',
 		variantsHeading: 'Variaties toestaan',
 		cultureVariantHeading: 'Variëren per cultuur toestaan',
 		segmentVariantHeading: 'Segmentatie toestaan',
@@ -1856,6 +1893,8 @@ export default {
 	redirectUrls: {
 		disableUrlTracker: 'URL tracker uitschakelen',
 		enableUrlTracker: 'URL tracker inschakelen',
+		urlTrackerEnabled: 'Ingeschakeld',
+		urlTrackerDisabled: 'Uitgeschakeld',
 		culture: 'Cultuur',
 		originalUrl: 'Originele URL',
 		redirectedTo: 'Doorgestuurd naar',
@@ -1935,7 +1974,8 @@ export default {
 		openBackofficeSearch: 'Backoffice zoeken openen',
 		openCloseBackofficeHelp: 'Backoffice help openen/sluiten',
 		openCloseBackofficeProfileOptions: 'Jouw profiel opties openen/sluiten',
-		profileOptions: 'Profiel opties',
+		profileOptions: 'Gebruikersprofiel voor %0% (%1%)',
+		profileOptionsDefault: 'Gebruikersprofiel',
 		assignDomainDescription: 'Cultuur en Hostnamen instellen voor %0%',
 		createDescription: 'Nieuwe node aanmaken onder %0%',
 		protectDescription: 'Openbare toegang instellen op %0%',

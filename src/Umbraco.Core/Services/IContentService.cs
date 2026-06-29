@@ -1,6 +1,4 @@
 using System.Collections.Immutable;
-using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Querying;
@@ -10,24 +8,8 @@ namespace Umbraco.Cms.Core.Services;
 /// <summary>
 ///     Defines the ContentService, which is an easy access to operations involving <see cref="IContent" />
 /// </summary>
-public interface IContentService : IContentServiceBase<IContent>
+public interface IContentService : IPublishableContentService<IContent>
 {
-    #region Rollback
-
-    /// <summary>
-    ///     Rolls back the content to a specific version.
-    /// </summary>
-    /// <param name="id">The id of the content node.</param>
-    /// <param name="versionId">The version id to roll back to.</param>
-    /// <param name="culture">An optional culture to roll back.</param>
-    /// <param name="userId">The identifier of the user who is performing the roll back.</param>
-    /// <remarks>
-    ///     <para>When no culture is specified, all cultures are rolled back.</para>
-    /// </remarks>
-    OperationResult Rollback(int id, int versionId, string culture = "*", int userId = Constants.Security.SuperUserId);
-
-    #endregion
-
     #region Blueprints
 
     /// <summary>
@@ -55,20 +37,17 @@ public interface IContentService : IContentServiceBase<IContent>
     ///     Saves a blueprint.
     /// </summary>
     /// <param name="content">The blueprint to save.</param>
-    /// <param name="userId">The identifier of the user performing the action.</param>
-    [Obsolete("Please use the method taking all parameters. Scheduled for removal in Umbraco 18.")]
-    void SaveBlueprint(IContent content, int userId = Constants.Security.SuperUserId);
-
-    /// <summary>
-    ///     Saves a blueprint.
-    /// </summary>
-    /// <param name="content">The blueprint to save.</param>
     /// <param name="createdFromContent">The content from which the blueprint was created.</param>
     /// <param name="userId">The identifier of the user performing the action.</param>
-    void SaveBlueprint(IContent content, IContent? createdFromContent, int userId = Constants.Security.SuperUserId)
-#pragma warning disable CS0618 // Type or member is obsolete
-        => SaveBlueprint(content, userId);
-#pragma warning restore CS0618 // Type or member is obsolete
+    void SaveBlueprint(IContent content, IContent? createdFromContent, int userId = Constants.Security.SuperUserId);
+
+    /// <summary>
+    ///     Moves a blueprint.
+    /// </summary>
+    /// <param name="content">The blueprint to move.</param>
+    /// <param name="userId">The identifier of the user performing the action.</param>
+    // TODO (V19): Remove the default implementation from this
+    void MoveBlueprint(IContent content, int userId = Constants.Security.SuperUserId) => throw new NotImplementedException();
 
     /// <summary>
     ///     Deletes a blueprint.
@@ -87,18 +66,6 @@ public interface IContentService : IContentServiceBase<IContent>
     // TODO: Remove the default implementation when CreateContentFromBlueprint is removed.
     IContent CreateBlueprintFromContent(IContent blueprint, string name, int userId = Constants.Security.SuperUserId)
         => throw new NotImplementedException();
-
-    /// <summary>
-    ///     (Deprecated) Creates a new content item from a blueprint.
-    /// </summary>
-    /// <param name="blueprint">The blueprint to create content from.</param>
-    /// <param name="name">The name for the new content.</param>
-    /// <param name="userId">The identifier of the user performing the action.</param>
-    /// <returns>The created content.</returns>
-    /// <remarks>If creating content from a blueprint, use <see cref="IContentBlueprintEditingService.GetScaffoldedAsync"/>
-    /// instead. If creating a blueprint from content use <see cref="CreateBlueprintFromContent"/> instead.</remarks>
-    [Obsolete("Use IContentBlueprintEditingService.GetScaffoldedAsync() instead. Scheduled for removal in Umbraco 18.")]
-    IContent CreateContentFromBlueprint(IContent blueprint, string name, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
     ///     Deletes blueprints for a content type.
@@ -126,42 +93,11 @@ public interface IContentService : IContentServiceBase<IContent>
     IContent? GetById(int id);
 
     /// <summary>
-    ///     Gets a document.
-    /// </summary>
-    /// <param name="key">The unique identifier of the document.</param>
-    /// <returns>The document, or null if not found.</returns>
-    // TODO (V18): This is already declared on the base type, so for the next major, when we can allow a binary breaking change, we should remove it from here.
-#pragma warning disable CS0108 // Member hides inherited member; missing new keyword
-    IContent? GetById(Guid key);
-#pragma warning restore CS0108 // Member hides inherited member; missing new keyword
-
-    /// <summary>
-    ///     Gets publish/unpublish schedule for a content node.
-    /// </summary>
-    /// <param name="contentId">The identifier of the content to load schedule for.</param>
-    /// <returns>The <see cref="ContentScheduleCollection" />.</returns>
-    ContentScheduleCollection GetContentScheduleByContentId(int contentId);
-
-    /// <summary>
-    ///     Persists publish/unpublish schedule for a content node.
-    /// </summary>
-    /// <param name="content">The content to persist the schedule for.</param>
-    /// <param name="contentSchedule">The content schedule collection.</param>
-    void PersistContentSchedule(IContent content, ContentScheduleCollection contentSchedule);
-
-    /// <summary>
     ///     Gets documents.
     /// </summary>
     /// <param name="ids">The identifiers of the documents.</param>
     /// <returns>The documents.</returns>
     IEnumerable<IContent> GetByIds(IEnumerable<int> ids);
-
-    /// <summary>
-    ///     Gets documents.
-    /// </summary>
-    /// <param name="ids">The unique identifiers of the documents.</param>
-    /// <returns>The documents.</returns>
-    IEnumerable<IContent> GetByIds(IEnumerable<Guid> ids);
 
     /// <summary>
     ///     Gets documents at a given level.
@@ -197,40 +133,6 @@ public interface IContentService : IContentServiceBase<IContent>
     /// <param name="content">The document.</param>
     /// <returns>The ancestor documents.</returns>
     IEnumerable<IContent> GetAncestors(IContent content);
-
-    /// <summary>
-    ///     Gets all versions of a document.
-    /// </summary>
-    /// <param name="id">The identifier of the document.</param>
-    /// <returns>The document versions.</returns>
-    /// <remarks>Versions are ordered with current first, then most recent first.</remarks>
-    IEnumerable<IContent> GetVersions(int id);
-
-    /// <summary>
-    ///     Gets all versions of a document.
-    /// </summary>
-    /// <param name="id">The identifier of the document.</param>
-    /// <param name="skip">The number of versions to skip.</param>
-    /// <param name="take">The number of versions to take.</param>
-    /// <returns>The document versions.</returns>
-    /// <remarks>Versions are ordered with current first, then most recent first.</remarks>
-    IEnumerable<IContent> GetVersionsSlim(int id, int skip, int take);
-
-    /// <summary>
-    ///     Gets top versions of a document.
-    /// </summary>
-    /// <param name="id">The identifier of the document.</param>
-    /// <param name="topRows">The number of top versions to get.</param>
-    /// <returns>The version identifiers.</returns>
-    /// <remarks>Versions are ordered with current first, then most recent first.</remarks>
-    IEnumerable<int> GetVersionIds(int id, int topRows);
-
-    /// <summary>
-    ///     Gets a version of a document.
-    /// </summary>
-    /// <param name="versionId">The version identifier.</param>
-    /// <returns>The document version, or null if not found.</returns>
-    IContent? GetVersion(int versionId);
 
     /// <summary>
     ///     Gets root-level documents.
@@ -377,13 +279,6 @@ public interface IContentService : IContentServiceBase<IContent>
     [Obsolete("Use GetContentSchedulesByKeys instead. Scheduled for removal in Umbraco 19.")]
     IDictionary<int, IEnumerable<ContentSchedule>> GetContentSchedulesByIds(Guid[] keys) => ImmutableDictionary<int, IEnumerable<ContentSchedule>>.Empty;
 
-    /// <summary>
-    ///     Gets a dictionary of content keys and their matching content schedules.
-    /// </summary>
-    /// <param name="keys">The content keys.</param>
-    /// <returns>A dictionary with a content key and an IEnumerable of matching ContentSchedules.</returns>
-    IDictionary<Guid, IEnumerable<ContentSchedule>> GetContentSchedulesByKeys(Guid[] keys) => ImmutableDictionary<Guid, IEnumerable<ContentSchedule>>.Empty;
-
     #endregion
 
     #region Save, Delete Document
@@ -428,17 +323,6 @@ public interface IContentService : IContentServiceBase<IContent>
     ///     <para>This operation is potentially dangerous and expensive.</para>
     /// </remarks>
     void DeleteOfType(int documentTypeId, int userId = Constants.Security.SuperUserId);
-
-    /// <summary>
-    ///     Deletes all documents of given document types.
-    /// </summary>
-    /// <param name="contentTypeIds">The content type identifiers.</param>
-    /// <param name="userId">The identifier of the user performing the action.</param>
-    /// <remarks>
-    ///     <para>All non-deleted descendants of the deleted documents are moved to the recycle bin.</para>
-    ///     <para>This operation is potentially dangerous and expensive.</para>
-    /// </remarks>
-    void DeleteOfTypes(IEnumerable<int> contentTypeIds, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
     ///     Deletes versions of a document prior to a given date.
@@ -534,6 +418,22 @@ public interface IContentService : IContentServiceBase<IContent>
     /// <returns>The operation result.</returns>
     OperationResult Sort(IEnumerable<int>? ids, int userId = Constants.Security.SuperUserId);
 
+    /// <summary>
+    ///     Sorts the children of a parent by persisting the supplied (already ordered) child identifiers
+    ///     as the new sort order, in a single set-based update.
+    /// </summary>
+    /// <param name="parentId">The identifier of the parent, or <see cref="Constants.System.Root"/> for the root.</param>
+    /// <param name="orderedChildIds">The child document identifiers, in the desired order.</param>
+    /// <param name="userId">The identifier of the user performing the action.</param>
+    /// <returns>The operation result.</returns>
+    /// <remarks>
+    ///     Unlike <see cref="Sort(IEnumerable{int}?, int)" />, this does not load the children or fire per-item
+    ///     save/sort notifications; it persists the order directly and refreshes the affected cache branch.
+    /// </remarks>
+    // TODO (V19): Remove the default implementation.
+    OperationResult SortChildren(int parentId, IReadOnlyList<int> orderedChildIds, int userId = Constants.Security.SuperUserId)
+        => throw new NotImplementedException();
+
     #endregion
 
     #region Publish Document
@@ -566,22 +466,6 @@ public interface IContentService : IContentServiceBase<IContent>
     IEnumerable<PublishResult> PublishBranch(IContent content, PublishBranchFilter publishBranchFilter, string[] cultures, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
-    ///     Unpublishes a document.
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         By default, unpublishes the document as a whole, but it is possible to specify a culture to be
-    ///         unpublished. Depending on whether that culture is mandatory, and other cultures remain published,
-    ///         the document as a whole may or may not remain published.
-    ///     </para>
-    ///     <para>
-    ///         If the content type is variant, then culture can be either '*' or an actual culture, but neither null nor
-    ///         empty. If the content type is invariant, then culture can be either '*' or null or empty.
-    ///     </para>
-    /// </remarks>
-    PublishResult Unpublish(IContent content, string? culture = "*", int userId = Constants.Security.SuperUserId);
-
-    /// <summary>
     ///     Gets a value indicating whether a document is path-publishable.
     /// </summary>
     /// <param name="content">The document.</param>
@@ -604,13 +488,6 @@ public interface IContentService : IContentServiceBase<IContent>
     /// <param name="userId">The identifier of the user performing the action.</param>
     /// <returns><c>true</c> if the document was sent to publication; otherwise, <c>false</c>.</returns>
     bool SendToPublication(IContent? content, int userId = Constants.Security.SuperUserId);
-
-    /// <summary>
-    ///     Publishes and unpublishes scheduled documents.
-    /// </summary>
-    /// <param name="date">The date to use for determining scheduled actions.</param>
-    /// <returns>The publish results.</returns>
-    IEnumerable<PublishResult> PerformScheduledPublish(DateTime date);
 
     #endregion
 
@@ -711,12 +588,4 @@ public interface IContentService : IContentServiceBase<IContent>
     /// <param name="userId">The unique identifier of the user emptying the Recycle Bin.</param>
     /// <returns>A task representing the asynchronous operation with the operation result.</returns>
     Task<OperationResult> EmptyRecycleBinAsync(Guid userId);
-
-    /// <summary>
-    ///     Gets publish/unpublish schedule for a content node.
-    /// </summary>
-    /// <param name="contentId">The unique identifier of the content to load schedule for.</param>
-    /// <returns>The <see cref="ContentScheduleCollection" />.</returns>
-    ContentScheduleCollection GetContentScheduleByContentId(Guid contentId) => StaticServiceProvider.Instance
-        .GetRequiredService<ContentService>().GetContentScheduleByContentId(contentId);
 }

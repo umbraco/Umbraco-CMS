@@ -35,6 +35,7 @@ public class DatabaseSchemaCreator
         typeof(ContentVersionDto),
         typeof(MediaVersionDto),
         typeof(DocumentDto),
+        typeof(ElementDto),
         typeof(ContentTypeTemplateDto),
         typeof(DataTypeDto),
         typeof(DictionaryDto),
@@ -45,6 +46,8 @@ public class DatabaseSchemaCreator
         typeof(MemberPropertyTypeDto),
         typeof(MemberDto),
         typeof(Member2MemberGroupDto),
+        typeof(ExternalMemberDto),
+        typeof(ExternalMember2MemberGroupDto),
         typeof(PropertyTypeGroupDto),
         typeof(PropertyTypeDto),
         typeof(PropertyDataDto),
@@ -73,6 +76,7 @@ public class DatabaseSchemaCreator
         typeof(UserStartNodeDto),
         typeof(ContentNuDto),
         typeof(DocumentVersionDto),
+        typeof(ElementVersionDto),
         typeof(DocumentUrlDto),
         typeof(DocumentUrlAliasDto),
         typeof(KeyValueDto),
@@ -81,6 +85,7 @@ public class DatabaseSchemaCreator
         typeof(AuditEntryDto),
         typeof(ContentVersionCultureVariationDto),
         typeof(DocumentCultureVariationDto),
+        typeof(ElementCultureVariationDto),
         typeof(ContentScheduleDto),
         typeof(LogViewerQueryDto),
         typeof(ContentVersionCleanupPolicyDto),
@@ -109,20 +114,26 @@ public class DatabaseSchemaCreator
     /// <summary>
     /// Initializes a new instance of the <see cref="DatabaseSchemaCreator"/> class.
     /// </summary>
+    /// <param name="database">The Umbraco database instance to use for schema creation, or <c>null</c> if not provided.</param>
+    /// <param name="logger">The logger used for logging schema creation operations.</param>
+    /// <param name="loggerFactory">The factory used to create logger instances.</param>
+    /// <param name="umbracoVersion">Provides information about the current Umbraco version.</param>
+    /// <param name="eventAggregator">The event aggregator for publishing and subscribing to events during schema creation.</param>
+    /// <param name="defaultDataCreationSettings">The settings that control default data creation during installation.</param>
     public DatabaseSchemaCreator(
         IUmbracoDatabase? database,
         ILogger<DatabaseSchemaCreator> logger,
         ILoggerFactory loggerFactory,
         IUmbracoVersion umbracoVersion,
         IEventAggregator eventAggregator,
-        IOptionsMonitor<InstallDefaultDataSettings> defaultDataCreationSettings)
+        IOptionsMonitor<InstallDefaultDataSettings> installDefaultDataSettings)
     {
         _database = database ?? throw new ArgumentNullException(nameof(database));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
         _umbracoVersion = umbracoVersion ?? throw new ArgumentNullException(nameof(umbracoVersion));
         _eventAggregator = eventAggregator;
-        _installDefaultDataSettings = defaultDataCreationSettings;  // TODO (V18): Rename this parameter to installDefaultDataSettings.
+        _installDefaultDataSettings = installDefaultDataSettings;
 
         if (_database.SqlContext?.SqlSyntax == null)
         {
@@ -606,8 +617,9 @@ public class DatabaseSchemaCreator
     }
 
     /// <summary>
-    ///     Drops the table for the specified <paramref name="tableName"/>
+    /// Drops the specified table from the database.
     /// </summary>
+    /// <param name="tableName">The name of the table to drop.</param>
     public void DropTable(string? tableName)
     {
         var sql = new Sql(string.Format(SqlSyntax.DropTable, SqlSyntax.GetQuotedTableName(tableName)));

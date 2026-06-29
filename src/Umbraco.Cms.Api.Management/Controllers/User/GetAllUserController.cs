@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
@@ -14,6 +14,9 @@ using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Api.Management.Controllers.User;
 
+/// <summary>
+/// API controller responsible for retrieving information about all users in the system.
+/// </summary>
 [ApiVersion("1.0")]
 public class GetAllUserController : UserControllerBase
 {
@@ -21,6 +24,12 @@ public class GetAllUserController : UserControllerBase
     private readonly IUserPresentationFactory _userPresentationFactory;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Controllers.User.GetAllUserController"/> class, which handles requests to retrieve all users.
+    /// </summary>
+    /// <param name="userService">Service used for user management operations.</param>
+    /// <param name="userPresentationFactory">Factory for creating user presentation models.</param>
+    /// <param name="backOfficeSecurityAccessor">Accessor for back office security context.</param>
     public GetAllUserController(
         IUserService userService,
         IUserPresentationFactory userPresentationFactory,
@@ -31,6 +40,16 @@ public class GetAllUserController : UserControllerBase
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
+    /// <summary>
+    /// Retrieves a paginated collection of all users.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="skip">The number of users to skip before starting to collect the result set. Used for pagination.</param>
+    /// <param name="take">The maximum number of users to return. Used for pagination.</param>
+    /// <returns>
+    /// A task representing the asynchronous operation. The task result contains an <see cref="IActionResult"/> with a <see cref="PagedViewModel{UserResponseModel}"/> representing the paginated collection of users.
+    /// Returns 200 OK with the collection, or 404 Not Found if users cannot be retrieved.
+    /// </returns>
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<UserResponseModel>), StatusCodes.Status200OK)]

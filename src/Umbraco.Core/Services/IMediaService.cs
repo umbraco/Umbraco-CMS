@@ -86,7 +86,7 @@ public interface IMediaService : IContentServiceBase<IMedia>
     /// <returns>
     ///     <see cref="IMedia" />
     /// </returns>
-    IMedia CreateMedia(string? name, int parentId, string mediaTypeAlias, int userId = Constants.Security.SuperUserId);
+    IMedia CreateMedia(string name, int parentId, string mediaTypeAlias, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
     ///     Creates an <see cref="IMedia" /> object using the alias of the <see cref="IMediaType" />
@@ -246,27 +246,6 @@ public interface IMediaService : IContentServiceBase<IMedia>
     /// <param name="userId">Id of the User saving the Media</param>
     Attempt<OperationResult?> Save(IMedia media, int userId = Constants.Security.SuperUserId);
 
-    /// <summary>
-    ///     Saves a collection of <see cref="IMedia" /> objects
-    /// </summary>
-    /// <param name="medias">Collection of <see cref="IMedia" /> to save</param>
-    /// <param name="userId">Id of the User saving the Media</param>
-    // TODO (V18): This is already declared on the base type, so for the next major, when we can allow a binary breaking change, we should remove it from here.
-#pragma warning disable CS0108 // Member hides inherited member; missing new keyword
-    Attempt<OperationResult?> Save(IEnumerable<IMedia> medias, int userId = Constants.Security.SuperUserId);
-#pragma warning restore CS0108 // Member hides inherited member; missing new keyword
-
-    /// <summary>
-    ///     Gets an <see cref="IMedia" /> object by its 'UniqueId'
-    /// </summary>
-    /// <param name="key">Guid key of the Media to retrieve</param>
-    /// <returns>
-    ///     <see cref="IMedia" />
-    /// </returns>
-    // TODO (V18): This is already declared on the base type, so for the next major, when we can allow a binary breaking change, we should remove it from here.
-#pragma warning disable CS0108 // Member hides inherited member; missing new keyword
-    IMedia? GetById(Guid key);
-#pragma warning restore CS0108 // Member hides inherited member; missing new keyword
 
     /// <summary>
     ///     Gets a collection of <see cref="IMedia" /> objects by Level
@@ -358,6 +337,22 @@ public interface IMediaService : IContentServiceBase<IMedia>
     /// <param name="userId"></param>
     /// <returns>True if sorting succeeded, otherwise False</returns>
     bool Sort(IEnumerable<IMedia> items, int userId = Constants.Security.SuperUserId);
+
+    /// <summary>
+    ///     Sorts the children of a parent by persisting the supplied (already ordered) child identifiers
+    ///     as the new sort order, in a single set-based update.
+    /// </summary>
+    /// <param name="parentId">The identifier of the parent, or <see cref="Constants.System.Root"/> for the root.</param>
+    /// <param name="orderedChildIds">The child media identifiers, in the desired order.</param>
+    /// <param name="userId">The identifier of the user performing the action.</param>
+    /// <returns>The operation result.</returns>
+    /// <remarks>
+    ///     Unlike <see cref="Sort(IEnumerable{IMedia}, int)" />, this does not load the children or fire per-item
+    ///     save/sort notifications; it persists the order directly and refreshes the affected cache branch.
+    /// </remarks>
+    // TODO (V19): Remove the default implementation.
+    OperationResult SortChildren(int parentId, IReadOnlyList<int> orderedChildIds, int userId = Constants.Security.SuperUserId)
+        => throw new NotImplementedException();
 
     /// <summary>
     ///     Creates an <see cref="IMedia" /> object using the alias of the <see cref="IMediaType" />

@@ -7,11 +7,18 @@ using Umbraco.Cms.Infrastructure.Install;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Package;
 
+/// <summary>
+/// API controller responsible for executing migration packages within the Umbraco CMS management context.
+/// </summary>
 [ApiVersion("1.0")]
 public class RunMigrationPackageController : PackageControllerBase
 {
     private readonly PackageMigrationRunner _packageMigrationRunner;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="RunMigrationPackageController"/> class.
+    /// </summary>
+    /// <param name="packageMigrationRunner">An instance of <see cref="PackageMigrationRunner"/> used to execute package migrations.</param>
     public RunMigrationPackageController(PackageMigrationRunner packageMigrationRunner)
         => _packageMigrationRunner = packageMigrationRunner;
 

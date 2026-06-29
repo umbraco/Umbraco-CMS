@@ -1,10 +1,7 @@
-using System.Diagnostics;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Factories;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Runtime;
@@ -44,67 +41,6 @@ public abstract class DatabaseServerMessenger : ServerMessengerBase, IDisposable
     /// <summary>
     ///     Initializes a new instance of the <see cref="DatabaseServerMessenger" /> class.
     /// </summary>
-    [Obsolete("Use the non-obsolete constructor. Scheduled for removal in Umbraco 18.")]
-    protected DatabaseServerMessenger(
-        IMainDom mainDom,
-        CacheRefresherCollection cacheRefreshers,
-        ILogger<DatabaseServerMessenger> logger,
-        bool distributedEnabled,
-        ISyncBootStateAccessor syncBootStateAccessor,
-        IHostingEnvironment hostingEnvironment,
-        ICacheInstructionService cacheInstructionService,
-        IJsonSerializer jsonSerializer,
-        LastSyncedFileManager lastSyncedFileManager,
-        IOptionsMonitor<GlobalSettings> globalSettings)
-        : this(
-            mainDom,
-            cacheRefreshers,
-            logger,
-            distributedEnabled,
-            syncBootStateAccessor,
-            hostingEnvironment,
-            cacheInstructionService,
-            jsonSerializer,
-            globalSettings,
-            StaticServiceProvider.Instance.GetRequiredService<ILastSyncedManager>(),
-            StaticServiceProvider.Instance.GetRequiredService<IMachineInfoFactory>()
-            )
-    {
-    }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="DatabaseServerMessenger" /> class.
-    /// </summary>
-    [Obsolete("Use the non-obsolete constructor. Scheduled for removal in Umbraco 18.")]
-    protected DatabaseServerMessenger(
-        IMainDom mainDom,
-        CacheRefresherCollection cacheRefreshers,
-        IServerRoleAccessor serverRoleAccessor,
-        ILogger<DatabaseServerMessenger> logger,
-        bool distributedEnabled,
-        ISyncBootStateAccessor syncBootStateAccessor,
-        IHostingEnvironment hostingEnvironment,
-        ICacheInstructionService cacheInstructionService,
-        IJsonSerializer jsonSerializer,
-        LastSyncedFileManager lastSyncedFileManager,
-        IOptionsMonitor<GlobalSettings> globalSettings)
-        : this(
-            mainDom,
-            cacheRefreshers,
-            logger,
-            distributedEnabled,
-            syncBootStateAccessor,
-            hostingEnvironment,
-            cacheInstructionService,
-            jsonSerializer,
-            lastSyncedFileManager,
-            globalSettings)
-    {
-    }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="DatabaseServerMessenger" /> class.
-    /// </summary>
     protected DatabaseServerMessenger(
         IMainDom mainDom,
         CacheRefresherCollection cacheRefreshers,
@@ -138,6 +74,9 @@ public abstract class DatabaseServerMessenger : ServerMessengerBase, IDisposable
         _initialized = new Lazy<SyncBootState?>(InitializeWithMainDom);
     }
 
+    /// <summary>
+    /// Gets the global Umbraco CMS configuration settings used by the DatabaseServerMessenger.
+    /// </summary>
     public GlobalSettings GlobalSettings { get; private set; }
 
     protected ILogger<DatabaseServerMessenger> Logger { get; }

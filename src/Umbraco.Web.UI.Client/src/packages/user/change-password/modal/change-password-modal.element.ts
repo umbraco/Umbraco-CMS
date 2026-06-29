@@ -2,9 +2,10 @@ import type { UmbChangePasswordModalData, UmbChangePasswordModalValue } from './
 import { css, customElement, html, query, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbUserItemRepository } from '@umbraco-cms/backoffice/user';
+import { UmbUserItemRepository, UmbUserConfigRepository } from '@umbraco-cms/backoffice/user';
 import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
 import type { UUIInputPasswordElement } from '@umbraco-cms/backoffice/external/uui';
+import type { PasswordConfigurationResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 @customElement('umb-change-password-modal')
 export class UmbChangePasswordModalElement extends UmbModalBaseElement<
@@ -23,7 +24,27 @@ export class UmbChangePasswordModalElement extends UmbModalBaseElement<
 	@state()
 	private _isCurrentUser: boolean = false;
 
+	@state()
+	private _passwordConfiguration?: PasswordConfigurationResponseModel;
+
+	get #newPasswordValue(): string {
+		return (this._newPasswordInput?.value as string) ?? '';
+	}
+
+	// Extracted from repeated validator pattern to reduce duplication across password policy rules.
+	#addNewPasswordValidator(messageKey: string, configKey: keyof PasswordConfigurationResponseModel, pattern: RegExp) {
+		this._newPasswordInput?.addValidator(
+			'customError',
+			() => this.localize.term(messageKey),
+			() => {
+				if (!this._passwordConfiguration?.[configKey]) return false;
+				return this.#newPasswordValue.length > 0 && !pattern.test(this.#newPasswordValue);
+			},
+		);
+	}
+
 	#userItemRepository = new UmbUserItemRepository(this);
+	#userConfigRepository = new UmbUserConfigRepository(this);
 	#currentUserContext?: typeof UMB_CURRENT_USER_CONTEXT.TYPE;
 
 	#onClose() {
@@ -55,6 +76,16 @@ export class UmbChangePasswordModalElement extends UmbModalBaseElement<
 			this.#currentUserContext = instance;
 			this.#setIsCurrentUser();
 		});
+
+		this.#loadPasswordConfiguration();
+	}
+
+	async #loadPasswordConfiguration() {
+		await this.#userConfigRepository.initialized;
+		if (!this.isConnected) return;
+		this.observe(this.#userConfigRepository.part('passwordConfiguration'), (passwordConfig) => {
+			this._passwordConfiguration = passwordConfig;
+		});
 	}
 
 	async #setIsCurrentUser() {
@@ -72,6 +103,25 @@ export class UmbChangePasswordModalElement extends UmbModalBaseElement<
 			() => this.localize.term('user_passwordMismatch'),
 			() => this._confirmPasswordInput?.value !== this._newPasswordInput?.value,
 		);
+
+		this._newPasswordInput?.addValidator(
+			'customError',
+			() =>
+				this.localize.term('user_newPasswordFormatLengthTip', [
+					this._passwordConfiguration?.minimumPasswordLength ?? 0,
+				]),
+			() => {
+				const config = this._passwordConfiguration;
+				if (!config || config.minimumPasswordLength <= 0) return false;
+				const password = this.#newPasswordValue;
+				return password.length > 0 && password.length < config.minimumPasswordLength;
+			},
+		);
+
+		this.#addNewPasswordValidator('user_passwordRequiresDigit', 'requireDigit', /\d/);
+		this.#addNewPasswordValidator('user_passwordRequiresLower', 'requireLowercase', /[a-z]/);
+		this.#addNewPasswordValidator('user_passwordRequiresUpper', 'requireUppercase', /[A-Z]/);
+		this.#addNewPasswordValidator('user_passwordRequiresNonAlphanumeric', 'requireNonLetterOrDigit', /[^a-zA-Z0-9]/);
 
 		if (!this.data?.user.unique) return;
 		const { data } = await this.#userItemRepository.requestItems([this.data.user.unique]);

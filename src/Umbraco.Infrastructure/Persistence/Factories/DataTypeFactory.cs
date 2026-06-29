@@ -11,6 +11,18 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories;
 
 internal static class DataTypeFactory
 {
+    /// <summary>
+    /// Constructs an <see cref="Umbraco.Cms.Core.Models.IDataType"/> entity from the specified <see cref="Umbraco.Cms.Infrastructure.Persistence.Dtos.DataTypeDto"/>.
+    /// If the property editor specified by the DTO cannot be found, a <see cref="MissingPropertyEditor"/> is used and a warning is logged.
+    /// </summary>
+    /// <param name="dto">The data transfer object containing the persisted data type information.</param>
+    /// <param name="editors">A collection of property editors used to resolve the editor by alias.</param>
+    /// <param name="logger">The logger used to record warnings if the editor is missing.</param>
+    /// <param name="serializer">The serializer for configuration data.</param>
+    /// <param name="dataValueEditorFactory">The factory used to create data value editors, including for missing editors.</param>
+    /// <returns>
+    /// An <see cref="Umbraco.Cms.Core.Models.IDataType"/> instance populated from the DTO and associated configuration.
+    /// </returns>
     public static IDataType BuildEntity(
         DataTypeDto dto,
         PropertyEditorCollection editors,
@@ -62,6 +74,12 @@ internal static class DataTypeFactory
         }
     }
 
+    /// <summary>
+    /// Creates a <see cref="Umbraco.Cms.Infrastructure.Persistence.Dtos.DataTypeDto"/> from the specified <see cref="Umbraco.Cms.Core.Models.IDataType"/> entity, serializing its configuration using the provided JSON serializer.
+    /// </summary>
+    /// <param name="entity">The <see cref="Umbraco.Cms.Core.Models.IDataType"/> to convert.</param>
+    /// <param name="serializer">The <see cref="Umbraco.Cms.Core.PropertyEditors.IConfigurationEditorJsonSerializer"/> used to serialize the configuration data.</param>
+    /// <returns>A <see cref="Umbraco.Cms.Infrastructure.Persistence.Dtos.DataTypeDto"/> representing the converted data type entity.</returns>
     public static DataTypeDto BuildDto(IDataType entity, IConfigurationEditorJsonSerializer serializer)
     {
         var dataTypeDto = new DataTypeDto

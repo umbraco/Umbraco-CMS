@@ -24,12 +24,24 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
     private readonly IShortStringHelper _shortStringHelper;
     private readonly UrlSegmentProviderCollection _urlSegmentProviders;
     private readonly IUserService _userService;
-    private readonly ILocalizationService _localizationService;
     private readonly IContentTypeService _contentTypeService;
     private readonly ILogger<ContentValueSetBuilder> _logger;
     private readonly IDocumentUrlService _documentUrlService;
     private readonly ILanguageService _languageService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.Examine.ContentValueSetBuilder"/> class.
+    /// </summary>
+    /// <param name="propertyEditors">A collection of property editors used for value extraction.</param>
+    /// <param name="urlSegmentProviders">A collection of URL segment providers for generating URL segments.</param>
+    /// <param name="userService">The service used to manage users.</param>
+    /// <param name="shortStringHelper">The helper used for generating and manipulating short strings.</param>
+    /// <param name="scopeProvider">The provider for managing database scopes.</param>
+    /// <param name="publishedValuesOnly">If set to <c>true</c>, only published values will be used.</param>
+    /// <param name="contentTypeService">The service used to manage content types.</param>
+    /// <param name="logger">The logger used for logging information and errors.</param>
+    /// <param name="documentUrlService">The service used to generate document URLs.</param>
+    /// <param name="languageService">The service used to manage languages.</param>
     public ContentValueSetBuilder(
         PropertyEditorCollection propertyEditors,
         UrlSegmentProviderCollection urlSegmentProviders,
@@ -37,7 +49,6 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
         IShortStringHelper shortStringHelper,
         ICoreScopeProvider scopeProvider,
         bool publishedValuesOnly,
-        ILocalizationService localizationService,
         IContentTypeService contentTypeService,
         ILogger<ContentValueSetBuilder> logger,
         IDocumentUrlService documentUrlService,
@@ -48,7 +59,6 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
         _userService = userService;
         _shortStringHelper = shortStringHelper;
         _scopeProvider = scopeProvider;
-        _localizationService = localizationService;
         _contentTypeService = contentTypeService;
         _logger = logger;
         _documentUrlService = documentUrlService;
@@ -88,7 +98,9 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
         {
             var isVariant = c.ContentType.VariesByCulture();
 
-            var urlValue = _documentUrlService.GetUrlSegment(c.Key, defaultCulture, false); // Always add invariant urlName
+            var urlValue = _documentUrlService.IsInitialized
+                ? _documentUrlService.GetUrlSegment(c.Key, defaultCulture, false)
+                : c.GetUrlSegment(_shortStringHelper, _urlSegmentProviders, defaultCulture); // Fallback when DocumentUrlService is not yet initialized (e.g. during upgrade)
             var values = new Dictionary<string, IEnumerable<object?>>
             {
                 { "icon", c.ContentType.Icon?.Yield() ?? Enumerable.Empty<string>() },
@@ -132,7 +144,9 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
 
                 foreach (var culture in c.AvailableCultures)
                 {
-                    var variantUrl = c.GetUrlSegment(_shortStringHelper, _urlSegmentProviders, culture);
+                    var variantUrl = _documentUrlService.IsInitialized
+                        ? _documentUrlService.GetUrlSegment(c.Key, culture, false)
+                        : c.GetUrlSegment(_shortStringHelper, _urlSegmentProviders, culture);
                     var lowerCulture = culture.ToLowerInvariant();
                     values[$"urlName_{lowerCulture}"] = variantUrl?.Yield() ?? Enumerable.Empty<string>();
                     values[$"nodeName_{lowerCulture}"] = (PublishedValuesOnly
@@ -149,7 +163,7 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
             var availableCultures = new List<string>(c.AvailableCultures);
             if (availableCultures.Any() is false)
             {
-                availableCultures.Add(_localizationService.GetDefaultLanguageIsoCode());
+                availableCultures.Add(defaultCulture);
             }
 
             foreach (IProperty property in c.Properties)

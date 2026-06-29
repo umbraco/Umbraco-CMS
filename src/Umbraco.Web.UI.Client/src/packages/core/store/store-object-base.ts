@@ -3,6 +3,7 @@ import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { type Observable, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 /**
  * The base class for a store that holds an object.
@@ -10,7 +11,7 @@ import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 export class UmbStoreObjectBase<T> extends UmbContextBase implements UmbApi {
 	protected _data;
 
-	constructor(host: UmbControllerHost, storeAlias: string, initialData?: T) {
+	constructor(host: UmbControllerHost, storeAlias: UmbContextToken<any> | string, initialData?: T) {
 		super(host, storeAlias);
 		this._data = new UmbObjectState<T | null>(initialData ?? null);
 	}

@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -12,6 +12,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Document;
 
+/// <summary>
+/// Controller responsible for handling update operations on documents in the management API.
+/// </summary>
 [ApiVersion("1.0")]
 public class UpdateDocumentController : UpdateDocumentControllerBase
 {
@@ -19,6 +22,13 @@ public class UpdateDocumentController : UpdateDocumentControllerBase
     private readonly IDocumentEditingPresentationFactory _documentEditingPresentationFactory;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UpdateDocumentController"/> class.
+    /// </summary>
+    /// <param name="authorizationService">Service for verifying user permissions.</param>
+    /// <param name="contentEditingService">Service for managing content updates.</param>
+    /// <param name="documentEditingPresentationFactory">Factory for creating document editing presentation models.</param>
+    /// <param name="backOfficeSecurityAccessor">Accessor for the back office user security context.</param>
     public UpdateDocumentController(
         IAuthorizationService authorizationService,
         IContentEditingService contentEditingService,
@@ -31,6 +41,11 @@ public class UpdateDocumentController : UpdateDocumentControllerBase
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
+    /// <summary>Updates the specified document with new details provided in the request model.</summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="id">The unique identifier of the document to update.</param>
+    /// <param name="requestModel">The model containing the updated document details.</param>
+    /// <returns>An <see cref="IActionResult"/> representing the outcome of the update operation.</returns>
     [HttpPut("{id:guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]

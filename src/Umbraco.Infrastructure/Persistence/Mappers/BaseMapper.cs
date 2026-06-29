@@ -6,6 +6,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Mappers;
 
+/// <summary>
+/// Provides a base class for mapping entities to database tables within the persistence layer.
+/// </summary>
 public abstract class BaseMapper
 {
     private readonly Lock _definedLock = new();

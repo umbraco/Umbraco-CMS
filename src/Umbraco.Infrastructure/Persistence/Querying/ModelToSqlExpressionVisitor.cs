@@ -15,6 +15,11 @@ internal sealed class ModelToSqlExpressionVisitor<T> : ExpressionVisitorBase
     private readonly BaseMapper? _mapper;
     private readonly IMapperCollection? _mappers;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.Persistence.Querying.ModelToSqlExpressionVisitor{T}"/> class.
+    /// </summary>
+    /// <param name="sqlSyntax">The SQL syntax provider used to generate SQL queries.</param>
+    /// <param name="mappers">An optional collection of mappers used to map model properties to SQL expressions. Can be <c>null</c>.</param>
     public ModelToSqlExpressionVisitor(ISqlSyntaxProvider sqlSyntax, IMapperCollection? mappers)
         : base(sqlSyntax)
     {

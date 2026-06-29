@@ -6,11 +6,18 @@ using Umbraco.Cms.Api.Management.ViewModels.ModelsBuilderDashboard;
 
 namespace Umbraco.Cms.Api.Management.Controllers.ModelsBuilder;
 
+/// <summary>
+/// Controller for retrieving the configuration and status of the Models Builder.
+/// </summary>
 [ApiVersion("1.0")]
 public class GetModelsBuilderController : ModelsBuilderControllerBase
 {
     private readonly IModelsBuilderPresentationFactory _modelsBuilderPresentationFactory;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="GetModelsBuilderController"/> class.
+    /// </summary>
+    /// <param name="modelsBuilderPresentationFactory">Factory used to create presentation models for the Models Builder API endpoints.</param>
     public GetModelsBuilderController(IModelsBuilderPresentationFactory modelsBuilderPresentationFactory) => _modelsBuilderPresentationFactory = modelsBuilderPresentationFactory;
 
     [HttpGet("dashboard")]

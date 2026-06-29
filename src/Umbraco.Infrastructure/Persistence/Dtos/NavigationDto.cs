@@ -18,6 +18,9 @@ internal sealed class NavigationDto : INavigationModel
     [Column(NodeDto.KeyColumnName)]
     public Guid Key { get; set; }
 
+    /// <summary>
+    /// Gets or sets the unique key identifying the content type.
+    /// </summary>
     [Column(ContentTypeKeyColumnName)]
     public Guid ContentTypeKey { get; set; }
 

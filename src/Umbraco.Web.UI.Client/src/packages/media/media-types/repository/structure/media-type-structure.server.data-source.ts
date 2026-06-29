@@ -87,5 +87,8 @@ const getAllowedMediaTypesOfExtension = async ({
 }) => {
 	// eslint-disable-next-line local-rules/no-direct-api-import
 	const { data } = await MediaTypeService.getItemMediaTypeAllowed({ query: { fileExtension, skip, take } });
-	return data.items.map((item) => mapper(item));
+	return data.items.map((item) => ({
+		...mapper(item),
+		matchedFileExtension: item.matchedFileExtension,
+	}));
 };

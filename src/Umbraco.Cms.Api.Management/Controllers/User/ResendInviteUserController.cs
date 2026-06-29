@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Factories;
@@ -12,6 +12,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.User;
 
+/// <summary>
+/// API controller responsible for handling requests to resend invitation emails to users.
+/// </summary>
 [ApiVersion("1.0")]
 public class ResendInviteUserController : UserControllerBase
 {
@@ -19,6 +22,13 @@ public class ResendInviteUserController : UserControllerBase
     private readonly IUserPresentationFactory _userPresentationFactory;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Controllers.User.ResendInviteUserController"/> class,
+    /// which handles operations related to resending user invitations in the management API.
+    /// </summary>
+    /// <param name="userService">Service used for user management operations.</param>
+    /// <param name="userPresentationFactory">Factory for creating user presentation models.</param>
+    /// <param name="backOfficeSecurityAccessor">Accessor for back office security context.</param>
     public ResendInviteUserController(IUserService userService, IUserPresentationFactory userPresentationFactory, IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
     {
         _userService = userService;

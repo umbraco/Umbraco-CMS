@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Routing;
@@ -7,6 +7,10 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Relation;
 
+/// <summary>
+/// Serves as the base controller for handling relation-related operations in the Umbraco CMS Management API.
+/// Provides common functionality for derived relation controllers.
+/// </summary>
 [VersionedApiBackOfficeRoute("relation")]
 [ApiExplorerSettings(GroupName = "Relation")]
 [Authorize(Policy = AuthorizationPolicies.SectionAccessContent)]

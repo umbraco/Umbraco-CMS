@@ -14,6 +14,13 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 internal sealed class ServerRegistrationRepository : EntityRepositoryBase<int, IServerRegistration>,
     IServerRegistrationRepository
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ServerRegistrationRepository"/> class, responsible for managing server registration data in the database.
+    /// </summary>
+    /// <param name="scopeAccessor">Provides access to the current database scope for repository operations.</param>
+    /// <param name="logger">The logger used for logging repository-related events and errors.</param>
+    /// <param name="repositoryCacheVersionService">Service for managing cache versioning of repository data.</param>
+    /// <param name="cacheSyncService">Service for synchronizing cache across distributed servers.</param>
     public ServerRegistrationRepository(
         IScopeAccessor scopeAccessor,
         ILogger<ServerRegistrationRepository> logger,
@@ -28,8 +35,15 @@ internal sealed class ServerRegistrationRepository : EntityRepositoryBase<int, I
     {
     }
 
+    /// <summary>
+    /// Clears the cache used by the server registration repository.
+    /// </summary>
     public void ClearCache() => CachePolicy.ClearAll();
 
+    /// <summary>
+    /// Deactivates all server registrations that have not accessed the system within the specified timeout period.
+    /// </summary>
+    /// <param name="staleTimeout">The duration after which a server is considered stale and will be deactivated.</param>
     public void DeactiveStaleServers(TimeSpan staleTimeout)
     {
         DateTime timeoutDate = DateTime.UtcNow.Subtract(staleTimeout);
@@ -58,14 +72,14 @@ internal sealed class ServerRegistrationRepository : EntityRepositoryBase<int, I
     protected override int PerformCount(IQuery<IServerRegistration>? query) =>
         throw new NotSupportedException("This repository does not support this method.");
 
+    // Note: PerformExists(int) and PerformGet(int) are passed as callbacks to the cache
+    // policy, but FullDataSetRepositoryCachePolicy never invokes them — it uses GetAllCached()
+    // internally. These overrides exist only as required implementations of the abstract base
+    // and as fallbacks for non-FullDataSet policies.
     protected override bool PerformExists(int id) =>
-
-        // use the underlying GetAll which force-caches all registrations
         GetMany().Any(x => x.Id == id);
 
     protected override IServerRegistration? PerformGet(int id) =>
-
-        // use the underlying GetAll which force-caches all registrations
         GetMany().FirstOrDefault(x => x.Id == id);
 
     protected override IEnumerable<IServerRegistration> PerformGetAll(params int[]? ids) =>

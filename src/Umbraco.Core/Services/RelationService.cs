@@ -532,15 +532,6 @@ public class RelationService : RepositoryService, IRelationService
     [Obsolete("No longer used in Umbraco, please the overload taking all parameters. Scheduled for removal in Umbraco 19.")]
     public bool IsRelated(int id) => IsRelated(id, RelationDirectionFilter.Any, null, null);
 
-    /// <summary>
-    /// Checks whether an entity has relations in the specified direction.
-    /// </summary>
-    /// <param name="id">The identifier of the entity.</param>
-    /// <param name="directionFilter">The direction filter to apply when checking relations.</param>
-    /// <returns><c>true</c> if the entity has relations matching the filter; otherwise, <c>false</c>.</returns>
-    [Obsolete("Please the overload taking all parameters. Scheduled for removal in Umbraco 18.")]
-    public bool IsRelated(int id, RelationDirectionFilter directionFilter) => IsRelated(id, directionFilter, null, null);
-
     /// <inheritdoc />
     public bool IsRelated(int id, RelationDirectionFilter directionFilter, int[]? includeRelationTypeIds = null, int[]? excludeRelationTypeIds = null)
     {
@@ -679,19 +670,10 @@ public class RelationService : RepositoryService, IRelationService
 
     private async Task<Attempt<IRelationType, RelationTypeOperationStatus>> SaveAsync(IRelationType relationType, Func<RelationTypeOperationStatus> operationValidation, AuditType auditType, string auditMessage, Guid userKey)
     {
-        // Validate that parent & child object types are allowed
-        UmbracoObjectTypes[] allowedObjectTypes = GetAllowedObjectTypes().ToArray();
-        var childObjectTypeAllowed = allowedObjectTypes.Any(x => x.GetGuid() == relationType.ChildObjectType);
-        if (childObjectTypeAllowed is false)
+        RelationTypeOperationStatus? objectTypeValidationError = ValidateObjectTypes(relationType);
+        if (objectTypeValidationError is not null)
         {
-            return Attempt.FailWithStatus(RelationTypeOperationStatus.InvalidChildObjectType, relationType);
-        }
-
-        var parentObjectTypeAllowed = allowedObjectTypes.Any(x => x.GetGuid() == relationType.ParentObjectType);
-
-        if (parentObjectTypeAllowed is false)
-        {
-            return Attempt.FailWithStatus(RelationTypeOperationStatus.InvalidParentObjectType, relationType);
+            return Attempt.FailWithStatus(objectTypeValidationError.Value, relationType);
         }
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
@@ -826,6 +808,26 @@ public class RelationService : RepositoryService, IRelationService
         ];
 
     #region Private Methods
+
+    private RelationTypeOperationStatus? ValidateObjectTypes(IRelationType relationType)
+    {
+        UmbracoObjectTypes[] allowedObjectTypes = GetAllowedObjectTypes().ToArray();
+
+        bool IsAllowed(Guid? objectType) =>
+            objectType is null || allowedObjectTypes.Any(x => x.GetGuid() == objectType);
+
+        if (IsAllowed(relationType.ChildObjectType) is false)
+        {
+            return RelationTypeOperationStatus.InvalidChildObjectType;
+        }
+
+        if (IsAllowed(relationType.ParentObjectType) is false)
+        {
+            return RelationTypeOperationStatus.InvalidParentObjectType;
+        }
+
+        return null;
+    }
 
     private IRelationType? GetRelationType(string relationTypeAlias)
     {

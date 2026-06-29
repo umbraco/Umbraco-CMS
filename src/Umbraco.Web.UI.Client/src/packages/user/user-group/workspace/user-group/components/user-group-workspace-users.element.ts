@@ -1,0 +1,172 @@
+import { UMB_USER_GROUP_WORKSPACE_CONTEXT } from '../user-group-workspace.context-token.js';
+import { UmbUserGroupUsersRepository } from '../../../repository/users/user-group-users.repository.js';
+import type { UmbUserInputElement } from '../../../../user/components/user-input/user-input.element.js';
+import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import { css, html, customElement, state, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
+
+import '../../../../user/components/user-input/user-input.element.js';
+
+@customElement('umb-user-group-workspace-users')
+export class UmbUserGroupWorkspaceUsersElement extends UmbLitElement {
+	@state()
+	private _userUniques: string[] = [];
+
+	@state()
+	private _usersRemainingCount = 0;
+
+	#unique?: string;
+	#isNew = false;
+	#persistedUserUniques: string[] = [];
+	#usersRepository = new UmbUserGroupUsersRepository(this);
+	#workspaceContext?: typeof UMB_USER_GROUP_WORKSPACE_CONTEXT.TYPE;
+
+	constructor() {
+		super();
+		this.consumeContext(UMB_USER_GROUP_WORKSPACE_CONTEXT, (instance) => {
+			this.#workspaceContext = instance;
+			this.#observe();
+		});
+	}
+
+	#observe() {
+		this.observe(
+			this.#workspaceContext?.unique,
+			(unique) => {
+				this.#unique = unique ?? undefined;
+				if (unique && !this.#isNew) {
+					this.#loadUsers(unique);
+				}
+			},
+			'_observeUnique',
+		);
+
+		this.observe(
+			this.#workspaceContext?.isNew,
+			(isNew) => {
+				const wasNew = this.#isNew;
+				this.#isNew = isNew ?? false;
+
+				// When the group transitions from newly created to persisted, save any pending user changes.
+				if (wasNew === true && isNew === false) {
+					this.#savePendingUserChanges();
+				}
+			},
+			'_observeIsNew',
+		);
+	}
+
+	async #loadUsers(unique: string) {
+		const { data } = await this.#usersRepository.requestUsersInGroup(unique);
+		this.#persistedUserUniques = [...(data?.uniques ?? [])];
+		this._userUniques = [...(data?.uniques ?? [])];
+		const total = data?.total ?? 0;
+		this._usersRemainingCount = Math.max(0, total - this._userUniques.length);
+	}
+
+	async #savePendingUserChanges() {
+		const unique = this.#unique;
+		if (!unique || this._userUniques.length === 0) return;
+		await this.#persistUserChanges(unique, this._userUniques);
+	}
+
+	async #persistUserChanges(unique: string, newSelection: string[]): Promise<boolean> {
+		const toAdd = newSelection.filter((u) => !this.#persistedUserUniques.includes(u));
+		const toRemove = this.#persistedUserUniques.filter((u) => !newSelection.includes(u));
+
+		const [{ error: addError }, { error: removeError }] = await Promise.all([
+			this.#usersRepository.addUsersToGroup(unique, toAdd),
+			this.#usersRepository.removeUsersFromGroup(unique, toRemove),
+		]);
+
+		const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
+
+		if (addError) {
+			notificationContext?.peek('danger', {
+				data: {
+					headline: this.localize.term('speechBubbles_operationFailedHeader'),
+					message: this.localize.term('user_addUsersToGroupError'),
+				},
+			});
+		}
+
+		if (removeError) {
+			notificationContext?.peek('danger', {
+				data: {
+					headline: this.localize.term('speechBubbles_operationFailedHeader'),
+					message: this.localize.term('user_removeUsersFromGroupError'),
+				},
+			});
+		}
+
+		if (!addError && !removeError) {
+			this.#persistedUserUniques = [...newSelection];
+			return true;
+		}
+
+		return false;
+	}
+
+	async #onUsersChange(event: UmbChangeEvent) {
+		event.stopPropagation();
+		const target = event.target as UmbUserInputElement;
+		const newSelection = target.selection;
+
+		// For new (unsaved) groups, track locally — users will be persisted when the group is saved.
+		if (this.#isNew) {
+			this._userUniques = newSelection;
+			return;
+		}
+
+		const unique = this.#unique;
+		if (!unique) return;
+
+		const previousSelection = [...this._userUniques];
+		this._userUniques = newSelection; // optimistic update
+
+		const success = await this.#persistUserChanges(unique, newSelection);
+		if (!success) {
+			this._userUniques = previousSelection; // revert on error
+		}
+	}
+
+	override render() {
+		return html`
+			<uui-box>
+				<div slot="headline"><umb-localize key="general_users"></umb-localize></div>
+				<umb-user-input .selection=${this._userUniques} @change=${this.#onUsersChange}></umb-user-input>
+				${this.#renderRemainingCount()}
+			</uui-box>
+		`;
+	}
+
+	#renderRemainingCount() {
+		if (!this._usersRemainingCount) return nothing;
+		return html`<div class="remaining-count">
+			${this.localize.term('user_andMore', this._usersRemainingCount)} -
+			<i>${this.localize.term('user_usersNotManagedFromGroup')}</i>
+		</div>`;
+	}
+
+	static override styles = [
+		UmbTextStyles,
+		css`
+			:host {
+				display: block;
+			}
+			.remaining-count {
+				padding: 8px 0px 8px 0px;
+			}
+		`,
+	];
+}
+
+export { UmbUserGroupWorkspaceUsersElement as element };
+
+declare global {
+	interface HTMLElementTagNameMap {
+		'umb-user-group-workspace-users': UmbUserGroupWorkspaceUsersElement;
+	}
+}

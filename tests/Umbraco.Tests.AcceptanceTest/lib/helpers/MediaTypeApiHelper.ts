@@ -327,6 +327,20 @@ export class MediaTypeApiHelper {
     return await this.create(mediaType);
   }
 
+  async createMediaTypeWithAComposition(mediaTypeName: string, compositionId: string) {
+    await this.ensureNameNotExists(mediaTypeName);
+
+    const mediaType = new MediaTypeBuilder()
+      .withName(mediaTypeName)
+      .withAlias(AliasHelper.toAlias(mediaTypeName))
+      .addComposition()
+        .withMediaTypeId(compositionId)
+        .done()
+      .build();
+
+    return await this.create(mediaType);
+  }
+
   async createMediaTypeWithAllowedChildNode(mediaTypeName: string, allowedChildNodeId: string) {
     await this.ensureNameNotExists(mediaTypeName);
     const mediaType = new MediaTypeBuilder()
