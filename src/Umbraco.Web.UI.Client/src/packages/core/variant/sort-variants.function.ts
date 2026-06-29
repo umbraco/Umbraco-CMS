@@ -24,7 +24,7 @@ const getVariantStateOrderValue = (variant?: UmbEntityVariantOptionModel['varian
  * @param {UmbEntityVariantOptionModel} b - Second variant to compare
  * @returns {number} - Sorting value
  */
-function compareDefault(a: UmbEntityVariantOptionModel, b: UmbEntityVariantOptionModel) {
+function compareDefault(a: UmbEntityVariantOptionModel, b: UmbEntityVariantOptionModel): number {
 	return (a.language?.isDefault ? -1 : 1) - (b.language?.isDefault ? -1 : 1);
 }
 
@@ -34,7 +34,7 @@ function compareDefault(a: UmbEntityVariantOptionModel, b: UmbEntityVariantOptio
  * @param {UmbEntityVariantOptionModel} b - Second variant to compare
  * @returns {number} - Sorting value
  */
-function compareMandatory(a: UmbEntityVariantOptionModel, b: UmbEntityVariantOptionModel) {
+function compareMandatory(a: UmbEntityVariantOptionModel, b: UmbEntityVariantOptionModel): number {
 	return a.variant?.state === UmbPublishableVariantState.PUBLISHED_PENDING_CHANGES ||
 		a.variant?.state === UmbPublishableVariantState.PUBLISHED
 		? 0
@@ -46,7 +46,7 @@ function compareMandatory(a: UmbEntityVariantOptionModel, b: UmbEntityVariantOpt
  * @param {UmbEntityVariantOptionModel} b - Second variant to compare
  * @returns {number} - Sorting value
  */
-function compareState(a: UmbEntityVariantOptionModel, b: UmbEntityVariantOptionModel) {
+function compareState(a: UmbEntityVariantOptionModel, b: UmbEntityVariantOptionModel): number {
 	return getVariantStateOrderValue(a.variant) - getVariantStateOrderValue(b.variant);
 }
 
@@ -55,7 +55,7 @@ function compareState(a: UmbEntityVariantOptionModel, b: UmbEntityVariantOptionM
  * @param {UmbEntityVariantOptionModel} b - Second variant to compare
  * @returns {number} - Sorting value
  */
-function compareName(a: UmbEntityVariantOptionModel, b: UmbEntityVariantOptionModel) {
+function compareName(a: UmbEntityVariantOptionModel, b: UmbEntityVariantOptionModel): number {
 	const nameA = a.language?.name;
 	const nameB = b.language?.name;
 
@@ -73,6 +73,6 @@ function compareName(a: UmbEntityVariantOptionModel, b: UmbEntityVariantOptionMo
  * @param {UmbEntityVariantOptionModel} b - Second variant to compare
  * @returns {number} - Sorting value
  */
-export function sortVariants(a: UmbEntityVariantOptionModel, b: UmbEntityVariantOptionModel) {
+export function sortVariants(a: UmbEntityVariantOptionModel, b: UmbEntityVariantOptionModel): number {
 	return compareDefault(a, b) || compareMandatory(a, b) || compareState(a, b) || compareName(a, b);
 }
