@@ -58,13 +58,17 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 			);
 		}
 		if (value?.view) {
-			this.observe(value.view.currentView, async (manifest) => {
-				const element = manifest ? await createExtensionElement(manifest) : null;
-				if (element && 'manifest' in element) {
-					(element as HTMLElement & { manifest: unknown }).manifest = manifest;
-				}
-				this._viewElement = element;
-			});
+			this.observe(
+				value.view.currentView,
+				async (manifest) => {
+					const element = manifest ? await createExtensionElement(manifest) : null;
+					if (element && 'manifest' in element) {
+						(element as HTMLElement & { manifest: unknown }).manifest = manifest;
+					}
+					this._viewElement = element;
+				},
+				'umbTreeCurrentViewObserver',
+			);
 		}
 		if (value?.interactionMemory) {
 			// Snapshot before forwarding so the first observer emission is not treated as a change.
