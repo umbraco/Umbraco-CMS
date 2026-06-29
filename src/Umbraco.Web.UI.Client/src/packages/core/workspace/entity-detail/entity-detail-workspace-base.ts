@@ -489,6 +489,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	#onBeforeUnload = (e: BeforeUnloadEvent) => {
 		if (this.getHasUnpersistedChanges()) {
 			e.preventDefault();
+			e.returnValue = '';
 		}
 	};
 
