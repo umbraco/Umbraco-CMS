@@ -1,6 +1,7 @@
 using System.Net;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.RegularExpressions;
 using HtmlAgilityPack;
 using Microsoft.AspNetCore.Html;
 
@@ -9,7 +10,7 @@ namespace Umbraco.Cms.Web.Common.Mvc;
 /// <summary>
 ///     Provides utility methods for UmbracoHelper for working with strings and HTML in views.
 /// </summary>
-public sealed class HtmlStringUtilities
+public sealed partial class HtmlStringUtilities
 {
     /// <summary>
     ///     HTML encodes the text and replaces text line breaks with HTML line breaks.
@@ -28,6 +29,9 @@ public sealed class HtmlStringUtilities
         return new HtmlString(value);
     }
 
+    [GeneratedRegex("\\s{2,}", RegexOptions.Compiled)]
+    private static partial Regex MultiSpaceRegex();
+
     public HtmlString StripHtmlTags(string html, params string[]? tags)
     {
         var doc = new HtmlDocument();
@@ -38,6 +42,7 @@ public sealed class HtmlStringUtilities
 
         if (nodes is not null)
         {
+            bool filterAllTags = tags == null || !tags.Any();
             foreach (HtmlNode node in nodes)
             {
                 // is element
@@ -46,7 +51,6 @@ public sealed class HtmlStringUtilities
                     continue;
                 }
 
-                bool filterAllTags = tags == null || !tags.Any();
                 if (filterAllTags ||
                     (tags?.Any(tag => string.Equals(tag, node.Name, StringComparison.CurrentCultureIgnoreCase)) ??
                      false))
@@ -59,7 +63,7 @@ public sealed class HtmlStringUtilities
             targets.Reverse();
             foreach (HtmlNode target in CollectionsMarshal.AsSpan(targets))
             {
-                HtmlNode content = doc.CreateTextNode(target.InnerHtml);
+                HtmlNode content = doc.CreateTextNode(target.InnerHtml + " ");
                 target.ParentNode.ReplaceChild(content, target);
             }
         }
@@ -68,7 +72,7 @@ public sealed class HtmlStringUtilities
             return new HtmlString(html);
         }
 
-        return new HtmlString(doc.DocumentNode.InnerHtml.Replace("  ", " "));
+        return new HtmlString(MultiSpaceRegex().Replace(doc.DocumentNode.InnerHtml, " ").Trim());
     }
 
     public string Join(string separator, params object[] args)
