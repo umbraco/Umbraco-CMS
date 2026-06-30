@@ -303,7 +303,10 @@ public class MediaPickerWithCropsValueConverterTests
     {
         var culture = accessor.VariationContext?.Culture;
         if (!string.IsNullOrEmpty(culture) && dto.AltTextByCulture?.TryGetValue(culture, out var cultureAltText) == true)
+        {
             return cultureAltText;
+        }
+
         return dto.AltText;
     }
 

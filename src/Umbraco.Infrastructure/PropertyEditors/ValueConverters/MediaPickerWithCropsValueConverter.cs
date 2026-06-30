@@ -164,7 +164,7 @@ public class MediaPickerWithCropsValueConverter : PropertyValueConverterBase, ID
                 var altText = ResolveCultureAltText(dto.AltText, dto.AltTextByCulture, culture);
 
                 // Resolve per-crop alt text from AltTextByCulture when a culture context is active.
-                var crops = string.IsNullOrEmpty(culture)
+                IEnumerable<ImageCropperValue.ImageCropperCrop>? crops = string.IsNullOrEmpty(culture)
                     ? dto.Crops
                     : dto.Crops?.Select(crop =>
                     {
@@ -267,7 +267,7 @@ public class MediaPickerWithCropsValueConverter : PropertyValueConverterBase, ID
         }
         if (isMultiple == false && converted is MediaWithCrops mediaWithCrops)
         {
-            return new [] { ToApiMedia(mediaWithCrops) };
+            return new[] { ToApiMedia(mediaWithCrops) };
         }
 
         return Array.Empty<IApiMediaWithCrops>();

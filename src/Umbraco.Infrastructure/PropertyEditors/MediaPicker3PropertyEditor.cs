@@ -127,7 +127,7 @@ public class MediaPicker3PropertyEditor : DataEditor, IValueSchemaProvider
         if (config?.Crops is { Length: > 0 })
         {
             var cropAliases = new JsonArray();
-            foreach (var crop in config.Crops)
+            foreach (MediaPicker3Configuration.CropConfiguration crop in config.Crops)
             {
                 if (!string.IsNullOrEmpty(crop.Alias))
                 {
@@ -137,7 +137,7 @@ public class MediaPicker3PropertyEditor : DataEditor, IValueSchemaProvider
 
             if (cropAliases.Count > 0)
             {
-                var aliasProperty = cropItemSchema["properties"]!["alias"]!.AsObject();
+                JsonObject aliasProperty = cropItemSchema["properties"]!["alias"]!.AsObject();
                 aliasProperty["enum"] = cropAliases;
             }
         }
@@ -349,7 +349,7 @@ public class MediaPicker3PropertyEditor : DataEditor, IValueSchemaProvider
                             Key = Guid.NewGuid(),
                             MediaKey = guidUdi.Guid,
                             Crops = Enumerable.Empty<ImageCropperValue.ImageCropperCrop>(),
-                            FocalPoint = new ImageCropperValue.ImageCropperFocalPoint {Left = 0.5m, Top = 0.5m},
+                            FocalPoint = new ImageCropperValue.ImageCropperFocalPoint { Left = 0.5m, Top = 0.5m },
                         };
                     }
                 }

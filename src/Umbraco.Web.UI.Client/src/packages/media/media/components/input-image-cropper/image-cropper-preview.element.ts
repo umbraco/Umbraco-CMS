@@ -156,11 +156,10 @@ export class UmbImageCropperPreviewElement extends UmbLitElement {
 
 	override render() {
 		if (!this.crop) {
-			return html`
-				<button class="inner" type="button" aria-pressed=${this.active}>
-					${this.actionLabel ? html`<span class="sr-only">${this.actionLabel}: </span>` : nothing}
-					<span id="label">${this.label}</span>
-				</button>`;
+			return html` <button class="inner" type="button" aria-pressed=${this.active}>
+				${this.actionLabel ? html`<span class="sr-only">${this.actionLabel}: </span>` : nothing}
+				<span id="label">${this.label}</span>
+			</button>`;
 		}
 
 		return html`
@@ -182,68 +181,68 @@ export class UmbImageCropperPreviewElement extends UmbLitElement {
 	static override styles = [
 		UmbTextStyles,
 		css`
-		:host {
-			display: flex;
-			flex-direction: column;
-			border-radius: var(--uui-border-radius);
-			background-color: var(--uui-color-surface);
-			cursor: pointer;
-		}
-		:host(:hover) {
-			background-color: var(--uui-color-surface-alt);
-		}
-		:host([active]) {
-			/* Left-border accent: non-colour indicator combined with the background change */
-			box-shadow: inset 3px 0 0 var(--uui-color-current);
-		}
-		.inner {
-			display: flex;
-			flex-direction: column;
-			width: 100%;
-			padding: var(--uui-size-space-4);
-			background: none;
-			border: none;
-			margin: 0;
-			cursor: inherit;
-			font: inherit;
-			color: inherit;
-			text-align: left;
-			border-radius: inherit;
-		}
-		.inner:focus-visible {
-			outline: 2px solid var(--uui-color-focus);
-			outline-offset: 1px;
-			border-radius: var(--uui-border-radius);
-		}
-		#container {
-			display: flex;
-			width: 100%;
-			aspect-ratio: 1;
-			overflow: hidden;
-			position: relative;
-			overflow: hidden;
-			margin: auto;
-			max-width: 100%;
-			max-height: 200px;
-			user-select: none;
-		}
-		#label {
-			font-weight: bold;
-		}
-		#alias {
-			font-weight: bold;
-			margin-top: var(--uui-size-space-3);
-		}
-		#dimensions,
-		#user-defined {
-			font-size: 0.8em;
-		}
-		#image {
-			position: absolute;
-			pointer-events: none;
-		}
-	`,
-];
+			:host {
+				display: flex;
+				flex-direction: column;
+				border-radius: var(--uui-border-radius);
+				background-color: var(--uui-color-surface);
+				cursor: pointer;
+			}
+			:host(:hover) {
+				background-color: var(--uui-color-surface-alt);
+			}
+			:host([active]) {
+				/* Left-border accent: non-colour indicator combined with the background change */
+				box-shadow: inset 3px 0 0 var(--uui-color-current);
+			}
+			.inner {
+				display: flex;
+				flex-direction: column;
+				width: 100%;
+				padding: var(--uui-size-space-4);
+				background: none;
+				border: none;
+				margin: 0;
+				cursor: inherit;
+				font: inherit;
+				color: inherit;
+				text-align: left;
+				border-radius: inherit;
+			}
+			.inner:focus-visible {
+				outline: 2px solid var(--uui-color-focus);
+				outline-offset: 1px;
+				border-radius: var(--uui-border-radius);
+			}
+			#container {
+				display: flex;
+				width: 100%;
+				aspect-ratio: 1;
+				overflow: hidden;
+				position: relative;
+				overflow: hidden;
+				margin: auto;
+				max-width: 100%;
+				max-height: 200px;
+				user-select: none;
+			}
+			#label {
+				font-weight: bold;
+			}
+			#alias {
+				font-weight: bold;
+				margin-top: var(--uui-size-space-3);
+			}
+			#dimensions,
+			#user-defined {
+				font-size: 0.8em;
+			}
+			#image {
+				position: absolute;
+				pointer-events: none;
+			}
+		`,
+	];
 }
 
 declare global {

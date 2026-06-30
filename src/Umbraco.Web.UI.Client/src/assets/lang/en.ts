@@ -1505,7 +1505,8 @@ export default {
 			'This image is decorative. It will be hidden from screen readers and other assistive technology.',
 		itemRemoved: '%0% removed',
 		movedUp: (name: string, position: string, total: string) => `${name} moved up to position ${position} of ${total}`,
-		movedDown: (name: string, position: string, total: string) => `${name} moved down to position ${position} of ${total}`,
+		movedDown: (name: string, position: string, total: string) =>
+			`${name} moved down to position ${position} of ${total}`,
 		cropSaved: 'Crop saved',
 		cropSelected: '%0% crop selected',
 		focalPointViewSelected: 'Focal point view selected',
@@ -1550,7 +1551,8 @@ export default {
 		viewportLabel: 'Drag or use arrow keys to pan the image',
 		focalPointHint:
 			'Click or drag to set the focal point. Use arrow keys to move with keyboard (hold Shift for finer control).',
-		cropHint: 'Drag the image or use arrow keys to pan. Use the zoom slider or scroll to zoom. Hold Shift for larger steps.',
+		cropHint:
+			'Drag the image or use arrow keys to pan. Use the zoom slider or scroll to zoom. Hold Shift for larger steps.',
 		panUp: 'Pan image up',
 		panDown: 'Pan image down',
 		panLeft: 'Pan image left',

@@ -272,8 +272,8 @@ export class UmbImageCropperEditorFieldElement extends UmbInputImageCropperField
 						>Alternative text (${this.culture})</umb-localize
 					>
 					&mdash; <em>${cropLabel}</em>`
-			: html`<umb-localize key="mediaPicker_altTextLabel">Alternative text</umb-localize>
-					&mdash; <em>${cropLabel}</em>`;
+			: html`<umb-localize key="mediaPicker_altTextLabel">Alternative text</umb-localize> &mdash;
+					<em>${cropLabel}</em>`;
 		return html`
 			<div id="crop-alt-text" class="alt-text-section" tabindex="-1">
 				<label for=${inputId} class="alt-text-label">${labelContent}</label>

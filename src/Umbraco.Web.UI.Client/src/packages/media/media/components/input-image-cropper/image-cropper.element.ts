@@ -488,10 +488,22 @@ export class UmbImageCropperElement extends UmbLitElement {
 			outline-offset: 2px;
 		}
 
-		.pan-up    { grid-column: 2; grid-row: 1; }
-		.pan-left  { grid-column: 1; grid-row: 2; }
-		.pan-right { grid-column: 3; grid-row: 2; }
-		.pan-down  { grid-column: 2; grid-row: 3; }
+		.pan-up {
+			grid-column: 2;
+			grid-row: 1;
+		}
+		.pan-left {
+			grid-column: 1;
+			grid-row: 2;
+		}
+		.pan-right {
+			grid-column: 3;
+			grid-row: 2;
+		}
+		.pan-down {
+			grid-column: 2;
+			grid-row: 3;
+		}
 		#actions {
 			display: flex;
 			align-items: flex-end;

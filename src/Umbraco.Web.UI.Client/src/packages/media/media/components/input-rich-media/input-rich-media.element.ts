@@ -502,7 +502,6 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 		if (!item.unique) return nothing;
 		const canOpenModal = !this.readonly || this.altTextMode !== 'off' || this.enableAltTextPerCrop;
 		const href = canOpenModal ? this._routeBuilder?.({ key: item.unique }) : undefined;
-		const valueEntry = this.value?.find((v) => v.key === item.unique);
 
 		return html`
 			<div class="media-item-wrapper">
@@ -539,14 +538,22 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 				${showMoveButtons
 					? html`
 							<uui-button
-								label=${this.localize.term('general_reorderMoveUpPosition', String(index + 1), String(this._cards.length))}
+								label=${this.localize.term(
+									'general_reorderMoveUpPosition',
+									String(index + 1),
+									String(this._cards.length),
+								)}
 								look="secondary"
 								?disabled=${isFirst}
 								@click=${() => this.#moveItem(index, -1)}>
 								<uui-icon name="icon-arrow-up"></uui-icon>
 							</uui-button>
 							<uui-button
-								label=${this.localize.term('general_reorderMoveDownPosition', String(index + 1), String(this._cards.length))}
+								label=${this.localize.term(
+									'general_reorderMoveDownPosition',
+									String(index + 1),
+									String(this._cards.length),
+								)}
 								look="secondary"
 								?disabled=${isLast}
 								@click=${() => this.#moveItem(index, 1)}>

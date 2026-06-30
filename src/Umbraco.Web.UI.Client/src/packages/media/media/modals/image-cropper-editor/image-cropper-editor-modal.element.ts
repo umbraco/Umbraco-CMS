@@ -383,7 +383,6 @@ export class UmbImageCropperEditorModalElement extends UmbModalBaseElement<
 				align-items: center;
 				height: 100%;
 			}
-
 		`,
 	];
 }

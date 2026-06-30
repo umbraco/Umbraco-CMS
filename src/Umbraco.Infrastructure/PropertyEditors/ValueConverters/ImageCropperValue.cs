@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 /// <summary>
 ///     Represents a value of the image cropper value editor.
 /// </summary>
-public class ImageCropperValue :TemporaryFileUploadValueBase, IHtmlEncodedString, IEquatable<ImageCropperValue>
+public class ImageCropperValue : TemporaryFileUploadValueBase, IHtmlEncodedString, IEquatable<ImageCropperValue>
 {
     /// <summary>
     ///     Gets or sets the alternative text for the image.
@@ -255,7 +255,7 @@ public class ImageCropperValue :TemporaryFileUploadValueBase, IHtmlEncodedString
 
         private static bool Equals(ImageCropperFocalPoint left, ImageCropperFocalPoint? right)
             => ReferenceEquals(left, right) // deals with both being null, too
-               || (!ReferenceEquals(left, null) && !ReferenceEquals(right, null)
+               || (left is not null && right is not null
                                                 && left.Left == right.Left
                                                 && left.Top == right.Top);
 
@@ -329,7 +329,7 @@ public class ImageCropperValue :TemporaryFileUploadValueBase, IHtmlEncodedString
 
         private static bool Equals(ImageCropperCrop? left, ImageCropperCrop? right)
             => ReferenceEquals(left, right) // deals with both being null, too
-               || (!ReferenceEquals(left, null) && !ReferenceEquals(right, null)
+               || (left is not null && right is not null
                                                 && string.Equals(left.Alias, right.Alias)
                                                 && left.Width == right.Width
                                                 && left.Height == right.Height
@@ -402,7 +402,7 @@ public class ImageCropperValue :TemporaryFileUploadValueBase, IHtmlEncodedString
 
         private static bool Equals(ImageCropperCropCoordinates? left, ImageCropperCropCoordinates? right)
             => ReferenceEquals(left, right) // deals with both being null, too
-               || (!ReferenceEquals(left, null) && !ReferenceEquals(right, null)
+               || (left is not null && right is not null
                                                 && left.X1 == right.X1
                                                 && left.X2 == right.X2
                                                 && left.Y1 == right.Y1
@@ -448,7 +448,7 @@ public class ImageCropperValue :TemporaryFileUploadValueBase, IHtmlEncodedString
 
     private static bool Equals(ImageCropperValue? left, ImageCropperValue? right)
         => ReferenceEquals(left, right) // deals with both being null, too
-           || (!ReferenceEquals(left, null) && !ReferenceEquals(right, null)
+           || (left is not null && right is not null
                                             && string.Equals(left.Src, right.Src)
                                             && string.Equals(left.AltText, right.AltText)
                                             && Equals(left.FocalPoint, right.FocalPoint)
