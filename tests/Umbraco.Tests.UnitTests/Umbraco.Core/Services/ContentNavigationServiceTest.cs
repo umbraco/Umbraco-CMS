@@ -159,6 +159,32 @@ public class ContentNavigationServiceTest
             Is.EqualTo(new[] { childAKey, grandA2Key, grandA1Key, childBKey, grandB2Key, grandB1Key }));
     }
 
+    [Test]
+    public void Can_Add_Children_With_Explicit_Sort_Order()
+    {
+        // The cache refreshers pass the real content.SortOrder to Add(). When children are added in an
+        // order that differs from their sort order — as a RefreshBranch walking descendants in path
+        // order can do — the supplied sort order must be honoured rather than overwritten with the
+        // insertion position. Children are added C, A, B here but with sort orders that yield A, B, C.
+        var contentType = Guid.NewGuid();
+        var parentKey = Guid.NewGuid();
+        var childCKey = Guid.NewGuid();
+        var childAKey = Guid.NewGuid();
+        var childBKey = Guid.NewGuid();
+
+        var contentNavigationService = new DocumentNavigationService(GetScopeProvider(), Mock.Of<INavigationRepository>(), Mock.Of<IContentTypeService>());
+
+        contentNavigationService.Add(parentKey, contentType);
+        contentNavigationService.Add(childCKey, contentType, parentKey, sortOrder: 2);
+        contentNavigationService.Add(childAKey, contentType, parentKey, sortOrder: 0);
+        contentNavigationService.Add(childBKey, contentType, parentKey, sortOrder: 1);
+
+        var success = contentNavigationService.TryGetChildrenKeys(parentKey, out IEnumerable<Guid> childrenKeys);
+
+        Assert.IsTrue(success);
+        Assert.That(childrenKeys, Is.EqualTo(new[] { childAKey, childBKey, childCKey }));
+    }
+
     public ICoreScopeProvider GetScopeProvider()
     {
         var mockScope = new Mock<IScope>();
