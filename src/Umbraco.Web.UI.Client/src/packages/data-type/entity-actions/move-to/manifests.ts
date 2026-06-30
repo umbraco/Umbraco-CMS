@@ -2,7 +2,6 @@ import { UMB_DATA_TYPE_ENTITY_TYPE } from '../../entity.js';
 import { UMB_DATA_TYPE_TREE_REPOSITORY_ALIAS, UMB_DATA_TYPE_TREE_ALIAS } from '../../constants.js';
 import { UMB_MOVE_DATA_TYPE_REPOSITORY_ALIAS } from './repository/index.js';
 import { manifests as repositoryManifests } from './repository/manifests.js';
-import { UMB_DATA_TYPE_SEARCH_PROVIDER_ALIAS } from '../../search/constants.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -15,7 +14,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 			treeRepositoryAlias: UMB_DATA_TYPE_TREE_REPOSITORY_ALIAS,
 			moveRepositoryAlias: UMB_MOVE_DATA_TYPE_REPOSITORY_ALIAS,
 			treeAlias: UMB_DATA_TYPE_TREE_ALIAS,
-			searchProviderAlias: UMB_DATA_TYPE_SEARCH_PROVIDER_ALIAS,
 			foldersOnly: true,
 		},
 	},

@@ -8,11 +8,6 @@ import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { linkEntityExpansionEntries } from '@umbraco-cms/backoffice/utils';
 
 export class UmbDuplicateToEntityAction extends UmbEntityActionBase<MetaEntityActionDuplicateToKind> {
-	#searchConfig() {
-		const alias = this.args.meta.searchProviderAlias;
-		return alias ? { providerAlias: alias } : undefined;
-	}
-
 	override async execute() {
 		if (!this.args.unique) throw new Error('Unique is not available');
 		if (!this.args.entityType) throw new Error('Entity Type is not available');
@@ -27,7 +22,6 @@ export class UmbDuplicateToEntityAction extends UmbEntityActionBase<MetaEntityAc
 				foldersOnly: this.args.meta.foldersOnly,
 				expandTreeRoot: true,
 				treeExpansion: ancestors.length ? linkEntityExpansionEntries(ancestors) : undefined,
-				search: this.#searchConfig(),
 			},
 		});
 
