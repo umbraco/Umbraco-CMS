@@ -32,6 +32,8 @@ export class UmbMoveToEntityAction extends UmbEntityActionBase<MetaEntityActionM
 
 		const value = await umbOpenModal(this, UMB_TREE_PICKER_MODAL, {
 			data: {
+				headline: '#actions_move',
+				confirmLabel: '#general_move',
 				treeAlias: this.args.meta.treeAlias,
 				foldersOnly: this.args.meta.foldersOnly,
 				expandTreeRoot: true,

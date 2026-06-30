@@ -22,6 +22,8 @@ export class UmbMediaDuplicateEntityBulkAction extends UmbEntityBulkActionBase<M
 
 		const value = await umbOpenModal(this, UMB_TREE_PICKER_MODAL, {
 			data: {
+				headline: '#actions_copyTo',
+				confirmLabel: '#general_copy',
 				foldersOnly: this.args.meta.foldersOnly,
 				hideTreeRoot: this.args.meta.hideTreeRoot,
 				treeAlias: this.args.meta.treeAlias,

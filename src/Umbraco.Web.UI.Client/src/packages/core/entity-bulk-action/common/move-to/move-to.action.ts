@@ -22,6 +22,8 @@ export class UmbMediaMoveEntityBulkAction extends UmbEntityBulkActionBase<MetaEn
 
 		const value = await umbOpenModal(this, UMB_TREE_PICKER_MODAL, {
 			data: {
+				headline: '#actions_move',
+				confirmLabel: '#general_move',
 				foldersOnly: this.args.meta.foldersOnly,
 				hideTreeRoot: this.args.meta.hideTreeRoot,
 				treeAlias: this.args.meta.treeAlias,
