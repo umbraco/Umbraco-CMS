@@ -81,6 +81,15 @@ export class UmbDropdownElement extends UmbLitElement {
 		}
 	}
 
+	// Capture phase so this runs before a menu item's action opens its modal: WebKit otherwise
+	// leaves the popovertarget toggle state "open" after the modal light-dismisses the popover,
+	// and the trigger then stops responding until the page is reloaded.
+	#onPopoverClickCapture = () => {
+		if (this.#open) {
+			this.closeDropdown();
+		}
+	};
+
 	override render() {
 		return html`
 			<uui-button
@@ -98,7 +107,11 @@ export class UmbDropdownElement extends UmbLitElement {
 					() => html`<uui-symbol-expand id="symbol-expand" .open=${this.#open}></uui-symbol-expand>`,
 				)}
 			</uui-button>
-			<uui-popover-container id="dropdown-popover" .placement=${this.placement} @toggle=${this.#onToggle}>
+			<uui-popover-container
+				id="dropdown-popover"
+				.placement=${this.placement}
+				@toggle=${this.#onToggle}
+				@click=${{ handleEvent: this.#onPopoverClickCapture, capture: true }}>
 				<umb-popover-layout>
 					<slot></slot>
 				</umb-popover-layout>
