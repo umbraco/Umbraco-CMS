@@ -228,8 +228,9 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
     {
         appCaches ??= AppCaches;
 
+        var efCoreScopeAccessor = GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>();
         var commonRepository =
-            new ContentTypeCommonRepository(scopeAccessor, TemplateRepository, appCaches, ShortStringHelper);
+            new ContentTypeCommonRepository(efCoreScopeAccessor, TemplateRepository, appCaches, ShortStringHelper);
 
         return new ContentTypeRepository(
             appCaches,
@@ -239,7 +240,7 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
             Mock.Of<IRepositoryCacheVersionService>(),
             IdKeyMap,
             Mock.Of<ICacheSyncService>(),
-            GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>());
+            efCoreScopeAccessor);
     }
 
     [Test]

@@ -1,7 +1,9 @@
 using System.Globalization;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Factories.EFCore;
@@ -9,6 +11,92 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories.EFCore;
 // EF Core factory for IContentType (document types), IMediaType (media types) and IMemberType (member types).
 internal static class ContentTypeFactory
 {
+    /// <summary>
+    /// Creates and initializes an <see cref="IContentType"/> entity from the specified <see cref="ContentTypeDto"/>.
+    /// </summary>
+    public static IContentType BuildContentTypeEntity(IShortStringHelper shortStringHelper, ContentTypeDto dto)
+    {
+        var contentType = new ContentType(shortStringHelper, dto.NodeDto.ParentId);
+        try
+        {
+            contentType.DisableChangeTracking();
+            BuildCommonEntity(contentType, dto);
+            contentType.ResetDirtyProperties(false);
+            return contentType;
+        }
+        finally
+        {
+            contentType.EnableChangeTracking();
+        }
+    }
+
+    /// <summary>
+    /// Creates and initializes an <see cref="IMediaType"/> entity from the specified <see cref="ContentTypeDto"/>.
+    /// </summary>
+    public static IMediaType BuildMediaTypeEntity(IShortStringHelper shortStringHelper, ContentTypeDto dto)
+    {
+        var contentType = new MediaType(shortStringHelper, dto.NodeDto.ParentId);
+        try
+        {
+            contentType.DisableChangeTracking();
+            BuildCommonEntity(contentType, dto);
+            contentType.ResetDirtyProperties(false);
+        }
+        finally
+        {
+            contentType.EnableChangeTracking();
+        }
+
+        return contentType;
+    }
+
+    /// <summary>
+    /// Creates and initializes an <see cref="IMemberType"/> entity from the specified <see cref="ContentTypeDto"/>.
+    /// </summary>
+    public static IMemberType BuildMemberTypeEntity(IShortStringHelper shortStringHelper, ContentTypeDto dto)
+    {
+        var contentType = new MemberType(shortStringHelper, dto.NodeDto.ParentId);
+        try
+        {
+            contentType.DisableChangeTracking();
+            BuildCommonEntity(contentType, dto, setVariations: false);
+            contentType.ResetDirtyProperties(false);
+        }
+        finally
+        {
+            contentType.EnableChangeTracking();
+        }
+
+        return contentType;
+    }
+
+    private static void BuildCommonEntity(ContentTypeBase entity, ContentTypeDto dto, bool setVariations = true)
+    {
+        entity.Id = dto.NodeDto.NodeId;
+        entity.Key = dto.NodeDto.UniqueId;
+        entity.Alias = dto.Alias ?? string.Empty;
+        entity.Name = dto.NodeDto.Text;
+        entity.Icon = dto.Icon;
+        entity.Thumbnail = dto.Thumbnail;
+        entity.SortOrder = dto.NodeDto.SortOrder;
+        entity.Description = dto.Description;
+        entity.CreateDate = dto.NodeDto.CreateDate.EnsureUtc();
+        entity.UpdateDate = dto.NodeDto.CreateDate.EnsureUtc();
+        entity.Path = dto.NodeDto.Path;
+        entity.Level = dto.NodeDto.Level;
+        entity.CreatorId = dto.NodeDto.UserId ?? Constants.Security.UnknownUserId;
+        entity.AllowedAsRoot = dto.AllowAtRoot;
+        entity.ListView = dto.ListView;
+        entity.IsElement = dto.IsElement;
+        entity.AllowedInLibrary = dto.AllowedInLibrary;
+        entity.Trashed = dto.NodeDto.Trashed;
+
+        if (setVariations)
+        {
+            entity.Variations = (ContentVariation)dto.Variations;
+        }
+    }
+
     /// <summary>
     /// Creates a <see cref="ContentTypeDto"/> (including its nested <see cref="NodeDto"/>) from the specified
     /// <see cref="IContentTypeBase"/> entity. Determines the appropriate node object type based on the entity's

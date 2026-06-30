@@ -1,4 +1,4 @@
-using NPoco;
+using Microsoft.EntityFrameworkCore;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Exceptions;
@@ -6,9 +6,10 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Strings;
-using Umbraco.Cms.Infrastructure.Persistence.Dtos;
-using Umbraco.Cms.Infrastructure.Persistence.Factories;
-using Umbraco.Cms.Infrastructure.Scoping;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
+using Umbraco.Cms.Infrastructure.Persistence.Factories.EFCore;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
@@ -22,7 +23,7 @@ internal sealed class ContentTypeCommonRepository : IContentTypeCommonRepository
         "Umbraco.Core.Persistence.Repositories.Implement.ContentTypeCommonRepository::AllTypes";
 
     private readonly AppCaches _appCaches;
-    private readonly IScopeAccessor _scopeAccessor;
+    private readonly IEFCoreScopeAccessor<UmbracoDbContext> _scopeAccessor;
     private readonly IShortStringHelper _shortStringHelper;
     private readonly ITemplateRepository _templateRepository;
 
@@ -30,7 +31,7 @@ internal sealed class ContentTypeCommonRepository : IContentTypeCommonRepository
     ///     Initializes a new instance of the <see cref="IContentTypeCommonRepository" /> class.
     /// </summary>
     public ContentTypeCommonRepository(
-        IScopeAccessor scopeAccessor,
+        IEFCoreScopeAccessor<UmbracoDbContext> scopeAccessor,
         ITemplateRepository templateRepository,
         AppCaches appCaches,
         IShortStringHelper shortStringHelper)
@@ -41,19 +42,12 @@ internal sealed class ContentTypeCommonRepository : IContentTypeCommonRepository
         _shortStringHelper = shortStringHelper;
     }
 
-    private IScope? AmbientScope => _scopeAccessor.AmbientScope;
-
-    private IUmbracoDatabase? Database => AmbientScope?.Database;
-
-    private ISqlContext? SqlContext => AmbientScope?.SqlContext;
-
-    // private Sql<ISqlContext> Sql(string sql, params object[] args) => SqlContext.Sql(sql, args);
-    // private ISqlSyntaxProvider SqlSyntax => SqlContext.SqlSyntax;
-    // private IQuery<T> Query<T>() => SqlContext.Query<T>();
+    private IEFCoreScope<UmbracoDbContext> AmbientScope
+        => _scopeAccessor.AmbientScope
+           ?? throw new InvalidOperationException("Cannot run a repository without an ambient scope.");
 
     /// <inheritdoc />
     public IEnumerable<IContentTypeComposition>? GetAllTypes() =>
-
         // use a sliding cache - same as FullDataSet cache policy
         _appCaches.RuntimeCache.GetCacheItem(CacheKey, GetAllTypesInternal, RepositoryCacheConstants.DefaultCacheDuration, true);
 
@@ -62,132 +56,141 @@ internal sealed class ContentTypeCommonRepository : IContentTypeCommonRepository
 
     private IEnumerable<IContentTypeComposition> GetAllTypesInternal()
     {
-        var contentTypes = new Dictionary<int, IContentTypeComposition>();
-
-        if (SqlContext is null)
-        {
-            return contentTypes.Values;
-        }
-
-        // get content types
-        Sql<ISqlContext> sql1 = SqlContext.Sql()
-            .Select<ContentTypeDto>(r => r.Select(x => x.NodeDto))
-            .From<ContentTypeDto>()
-            .InnerJoin<NodeDto>().On<ContentTypeDto, NodeDto>((ct, n) => ct.NodeId == n.NodeId)
-            .OrderBy<ContentTypeDto>(x => x.NodeId);
-
-        List<ContentTypeDto>? contentTypeDtos = Database?.Fetch<ContentTypeDto>(sql1);
-
-        // get allowed content types
-        Sql<ISqlContext> sql2 = SqlContext.Sql()
-            .Select<ContentTypeAllowedContentTypeDto>()
-            .From<ContentTypeAllowedContentTypeDto>()
-            .OrderBy<ContentTypeAllowedContentTypeDto>(x => x.Id);
-
-        List<ContentTypeAllowedContentTypeDto>? allowedDtos = Database?.Fetch<ContentTypeAllowedContentTypeDto>(sql2);
-
-        if (contentTypeDtos is null)
-        {
-            return contentTypes.Values;
-        }
-
-        // prepare
-        // note: same alias could be used for media, content... but always different ids = ok
-        var aliases = contentTypeDtos.ToDictionary(x => x.NodeId, x => x.Alias);
-        var keys = contentTypeDtos.ToDictionary(x => x.NodeId, x => x.NodeDto.UniqueId);
-
-        // create
-        var allowedDtoIx = 0;
-        foreach (ContentTypeDto contentTypeDto in contentTypeDtos)
-        {
-            // create content type
-            IContentTypeComposition contentType;
-            if (contentTypeDto.NodeDto.NodeObjectType == Constants.ObjectTypes.MediaType)
-            {
-                contentType = ContentTypeFactory.BuildMediaTypeEntity(_shortStringHelper, contentTypeDto);
-            }
-            else if (contentTypeDto.NodeDto.NodeObjectType == Constants.ObjectTypes.DocumentType)
-            {
-                contentType = ContentTypeFactory.BuildContentTypeEntity(_shortStringHelper, contentTypeDto);
-            }
-            else if (contentTypeDto.NodeDto.NodeObjectType == Constants.ObjectTypes.MemberType)
-            {
-                contentType = ContentTypeFactory.BuildMemberTypeEntity(_shortStringHelper, contentTypeDto);
-            }
-            else
-            {
-                throw new PanicException(
-                    $"The node object type {contentTypeDto.NodeDto.NodeObjectType} is not supported");
-            }
-
-            contentTypes.Add(contentType.Id, contentType);
-
-            // map allowed content types
-            var allowedContentTypes = new List<ContentTypeSort>();
-            while (allowedDtoIx < allowedDtos?.Count && allowedDtos[allowedDtoIx].Id == contentTypeDto.NodeId)
-            {
-                ContentTypeAllowedContentTypeDto allowedDto = allowedDtos[allowedDtoIx];
-                if (!aliases.TryGetValue(allowedDto.AllowedId, out var alias)
-                    || !keys.TryGetValue(allowedDto.AllowedId, out Guid key))
-                {
-                    continue;
-                }
-
-                allowedContentTypes.Add(new ContentTypeSort(
-                    key,
-                    allowedDto.SortOrder,
-                    alias!));
-                allowedDtoIx++;
-            }
-
-            contentType.AllowedContentTypes = allowedContentTypes;
-        }
-
-        MapTemplates(contentTypes);
-        MapComposition(contentTypes);
-        MapGroupsAndProperties(contentTypes);
-        MapHistoryCleanup(contentTypes);
-
-        // finalize
-        foreach (IContentTypeComposition contentType in contentTypes.Values)
-        {
-            contentType.ResetDirtyProperties(false);
-        }
-
-        return contentTypes.Values;
+        // Touch the scope on the synchronous caller context before entering the async flow, ensuring that
+        // async-local scope state (including bridge-scope enlistment) is captured on this execution context.
+        EnsureAmbientScopeOnCallerContext();
+        return GetAllTypesAsync().GetAwaiter().GetResult();
     }
 
-    private void MapHistoryCleanup(Dictionary<int, IContentTypeComposition> contentTypes)
+    private void EnsureAmbientScopeOnCallerContext() => _ = AmbientScope;
+
+    private async Task<IEnumerable<IContentTypeComposition>> GetAllTypesAsync()
     {
-        if (SqlContext is null)
+        return await AmbientScope.ExecuteWithContextAsync<IEnumerable<IContentTypeComposition>>(async db =>
         {
-            return;
-        }
+            // Query 1: content types with their nodes, ordered so pointer-walking below works
+            List<ContentTypeDto> contentTypeDtos = await db.ContentTypes
+                .Include(ct => ct.NodeDto)
+                .OrderBy(ct => ct.NodeId)
+                .ToListAsync();
 
-        // get templates
-        Sql<ISqlContext> sql1 = SqlContext.Sql()
-            .Select<ContentVersionCleanupPolicyDto>()
-            .From<ContentVersionCleanupPolicyDto>()
-            .OrderBy<ContentVersionCleanupPolicyDto>(x => x.ContentTypeId);
+            if (contentTypeDtos.Count == 0)
+            {
+                return [];
+            }
 
-        List<ContentVersionCleanupPolicyDto>? contentVersionCleanupPolicyDtos =
-            Database?.Fetch<ContentVersionCleanupPolicyDto>(sql1);
+            // Query 2: allowed content types (parent content type id is ordered to align with Query 1)
+            List<ContentTypeAllowedContentTypeDto> allowedDtos = await db.ContentTypeAllowedContentTypes
+                .OrderBy(a => a.Id)
+                .ToListAsync();
 
-        var contentVersionCleanupPolicyDictionary =
-            contentVersionCleanupPolicyDtos?.ToDictionary(x => x.ContentTypeId);
+            // Query 3: property type groups, ordered for the group pointer-walk in MapGroupsAndProperties
+            List<PropertyTypeGroupDto> groupDtos = await db.PropertyTypeGroups
+                .OrderBy(g => g.ContentTypeNodeId)
+                .ThenBy(g => g.SortOrder)
+                .ThenBy(g => g.Id)
+                .ToListAsync();
+
+            // Query 4: all property types with data type info and optional member-specific metadata
+            List<PropertyTypeDto> propertyDtos = await db.PropertyTypes
+                .Include(pt => pt.DataTypeDto).ThenInclude(dt => dt.NodeDto)
+                .Include(pt => pt.MemberPropertyTypeDto)
+                .OrderBy(pt => pt.ContentTypeId)
+                .ThenBy(pt => pt.SortOrder)
+                .ThenBy(pt => pt.Id)
+                .ToListAsync();
+
+            // Query 5: composition (parent-child content type hierarchy)
+            List<ContentType2ContentTypeDto> compositionDtos = await db.ContentTypeComposition
+                .OrderBy(c => c.ChildId)
+                .ToListAsync();
+
+            // Query 6: template associations (document types only)
+            List<ContentTypeTemplateDto> templateDtos = await db.ContentTypeTemplates
+                .OrderBy(t => t.ContentTypeNodeId)
+                .ToListAsync();
+
+            // Query 7: per-content-type version cleanup policies (document types only)
+            List<ContentVersionCleanupPolicyDto> cleanupDtos = await db.ContentVersionCleanupPolicies
+                .OrderBy(p => p.ContentTypeId)
+                .ToListAsync();
+
+            // Build alias and key lookups for resolving AllowedContentTypes
+            var aliases = contentTypeDtos.ToDictionary(x => x.NodeId, x => x.Alias);
+            var keys = contentTypeDtos.ToDictionary(x => x.NodeId, x => x.NodeDto.UniqueId);
+
+            // Instantiate content type entities and wire up allowed child types
+            var contentTypes = new Dictionary<int, IContentTypeComposition>(contentTypeDtos.Count);
+            var allowedIx = 0;
+            foreach (ContentTypeDto dto in contentTypeDtos)
+            {
+                IContentTypeComposition contentType;
+                if (dto.NodeDto.NodeObjectType == Constants.ObjectTypes.MediaType)
+                {
+                    contentType = ContentTypeFactory.BuildMediaTypeEntity(_shortStringHelper, dto);
+                }
+                else if (dto.NodeDto.NodeObjectType == Constants.ObjectTypes.DocumentType)
+                {
+                    contentType = ContentTypeFactory.BuildContentTypeEntity(_shortStringHelper, dto);
+                }
+                else if (dto.NodeDto.NodeObjectType == Constants.ObjectTypes.MemberType)
+                {
+                    contentType = ContentTypeFactory.BuildMemberTypeEntity(_shortStringHelper, dto);
+                }
+                else
+                {
+                    throw new PanicException($"The node object type {dto.NodeDto.NodeObjectType} is not supported");
+                }
+
+                contentTypes.Add(contentType.Id, contentType);
+
+                var allowedContentTypes = new List<ContentTypeSort>();
+                while (allowedIx < allowedDtos.Count && allowedDtos[allowedIx].Id == dto.NodeId)
+                {
+                    ContentTypeAllowedContentTypeDto allowedDto = allowedDtos[allowedIx];
+                    if (aliases.TryGetValue(allowedDto.AllowedId, out var alias)
+                        && keys.TryGetValue(allowedDto.AllowedId, out Guid key))
+                    {
+                        allowedContentTypes.Add(new ContentTypeSort(key, allowedDto.SortOrder, alias!));
+                    }
+
+                    allowedIx++;
+                }
+
+                contentType.AllowedContentTypes = allowedContentTypes;
+            }
+
+            MapTemplates(contentTypes, templateDtos);
+            MapComposition(contentTypes, compositionDtos);
+            MapGroupsAndProperties(contentTypes, groupDtos, propertyDtos);
+            MapHistoryCleanup(contentTypes, cleanupDtos);
+
+            foreach (IContentTypeComposition contentType in contentTypes.Values)
+            {
+                contentType.ResetDirtyProperties(false);
+            }
+
+            return contentTypes.Values;
+        });
+    }
+
+    private static void MapHistoryCleanup(
+        Dictionary<int, IContentTypeComposition> contentTypes,
+        List<ContentVersionCleanupPolicyDto> cleanupDtos)
+    {
+        Dictionary<int, ContentVersionCleanupPolicyDto> cleanupByContentTypeId =
+            cleanupDtos.ToDictionary(x => x.ContentTypeId);
+
         foreach (IContentTypeComposition c in contentTypes.Values)
         {
-            if (!(c is ContentType contentType))
+            if (c is not ContentType contentType)
             {
                 continue;
             }
 
             var historyCleanup = new HistoryCleanup();
 
-            if (contentVersionCleanupPolicyDictionary is not null &&
-                contentVersionCleanupPolicyDictionary.TryGetValue(
-                    contentType.Id,
-                    out ContentVersionCleanupPolicyDto? versionCleanup))
+            if (cleanupByContentTypeId.TryGetValue(contentType.Id, out ContentVersionCleanupPolicyDto? versionCleanup))
             {
                 historyCleanup.PreventCleanup = versionCleanup.PreventCleanup;
                 historyCleanup.KeepAllVersionsNewerThanDays = versionCleanup.KeepAllVersionsNewerThanDays;
@@ -198,26 +201,16 @@ internal sealed class ContentTypeCommonRepository : IContentTypeCommonRepository
         }
     }
 
-    private void MapTemplates(Dictionary<int, IContentTypeComposition> contentTypes)
+    private void MapTemplates(
+        Dictionary<int, IContentTypeComposition> contentTypes,
+        List<ContentTypeTemplateDto> templateDtos)
     {
-        if (SqlContext is null)
-        {
-            return;
-        }
-
-        // get templates
-        Sql<ISqlContext> sql1 = SqlContext.Sql()
-            .Select<ContentTypeTemplateDto>()
-            .From<ContentTypeTemplateDto>()
-            .OrderBy<ContentTypeTemplateDto>(x => x.ContentTypeNodeId);
-
-        List<ContentTypeTemplateDto>? templateDtos = Database?.Fetch<ContentTypeTemplateDto>(sql1);
-
-        // var templates = templateRepository.GetMany(templateDtos.Select(x => x.TemplateNodeId).ToArray()).ToDictionary(x => x.Id, x => x);
         IEnumerable<ITemplate>? allTemplates = _templateRepository.GetMany((int[]?)null);
+        Dictionary<int, ITemplate> templates = allTemplates.ToDictionary(x => x.Id, x => x);
 
-        var templates = allTemplates.ToDictionary(x => x.Id, x => x);
-        var templateDtoIx = 0;
+        Dictionary<int, List<ContentTypeTemplateDto>> templatesByContentTypeId = templateDtos
+            .GroupBy(t => t.ContentTypeNodeId)
+            .ToDictionary(g => g.Key, g => g.ToList());
 
         foreach (IContentTypeComposition c in contentTypes.Values)
         {
@@ -226,24 +219,24 @@ internal sealed class ContentTypeCommonRepository : IContentTypeCommonRepository
                 continue;
             }
 
-            // map allowed templates
             var allowedTemplates = new List<ITemplate>();
             var defaultTemplateId = 0;
-            while (templateDtoIx < templateDtos?.Count &&
-                   templateDtos[templateDtoIx].ContentTypeNodeId == contentType.Id)
+
+            if (templatesByContentTypeId.TryGetValue(contentType.Id, out List<ContentTypeTemplateDto>? contentTypeTemplateDtos))
             {
-                ContentTypeTemplateDto allowedDto = templateDtos[templateDtoIx];
-                templateDtoIx++;
-                if (!templates.TryGetValue(allowedDto.TemplateNodeId, out ITemplate? template))
+                foreach (ContentTypeTemplateDto templateDto in contentTypeTemplateDtos)
                 {
-                    continue;
-                }
+                    if (!templates.TryGetValue(templateDto.TemplateNodeId, out ITemplate? template))
+                    {
+                        continue;
+                    }
 
-                allowedTemplates.Add(template);
+                    allowedTemplates.Add(template);
 
-                if (allowedDto.IsDefault)
-                {
-                    defaultTemplateId = template.Id;
+                    if (templateDto.IsDefault)
+                    {
+                        defaultTemplateId = template.Id;
+                    }
                 }
             }
 
@@ -252,130 +245,95 @@ internal sealed class ContentTypeCommonRepository : IContentTypeCommonRepository
         }
     }
 
-    private void MapComposition(IDictionary<int, IContentTypeComposition> contentTypes)
+    private static void MapComposition(
+        IDictionary<int, IContentTypeComposition> contentTypes,
+        List<ContentType2ContentTypeDto> compositionDtos)
     {
-        if (SqlContext is null)
-        {
-            return;
-        }
+        Dictionary<int, List<ContentType2ContentTypeDto>> compositionByChildId = compositionDtos
+            .GroupBy(c => c.ChildId)
+            .ToDictionary(g => g.Key, g => g.ToList());
 
-        // get parent/child
-        Sql<ISqlContext> sql1 = SqlContext.Sql()
-            .Select<ContentType2ContentTypeDto>()
-            .From<ContentType2ContentTypeDto>()
-            .OrderBy<ContentType2ContentTypeDto>(x => x.ChildId);
-
-        List<ContentType2ContentTypeDto>? compositionDtos = Database?.Fetch<ContentType2ContentTypeDto>(sql1);
-
-        // map
-        var compositionIx = 0;
         foreach (IContentTypeComposition contentType in contentTypes.Values)
         {
-            while (compositionIx < compositionDtos?.Count &&
-                   compositionDtos[compositionIx].ChildId == contentType.Id)
+            if (!compositionByChildId.TryGetValue(contentType.Id, out List<ContentType2ContentTypeDto>? parents))
             {
-                ContentType2ContentTypeDto parentDto = compositionDtos[compositionIx];
-                compositionIx++;
+                continue;
+            }
 
-                if (!contentTypes.TryGetValue(parentDto.ParentId, out IContentTypeComposition? parentContentType))
+            foreach (ContentType2ContentTypeDto parentDto in parents)
+            {
+                if (contentTypes.TryGetValue(parentDto.ParentId, out IContentTypeComposition? parentContentType))
                 {
-                    continue;
+                    contentType.AddContentType(parentContentType);
                 }
-
-                contentType.AddContentType(parentContentType);
             }
         }
     }
 
-    private void MapGroupsAndProperties(IDictionary<int, IContentTypeComposition> contentTypes)
+    private void MapGroupsAndProperties(
+        IDictionary<int, IContentTypeComposition> contentTypes,
+        List<PropertyTypeGroupDto> groupDtos,
+        List<PropertyTypeDto> propertyDtos)
     {
-        if (SqlContext is null)
-        {
-            return;
-        }
-
-        Sql<ISqlContext> sql1 = SqlContext.Sql()
-            .Select<PropertyTypeGroupDto>()
-            .From<PropertyTypeGroupDto>()
-            .InnerJoin<ContentTypeDto>()
-            .On<PropertyTypeGroupDto, ContentTypeDto>((ptg, ct) => ptg.ContentTypeNodeId == ct.NodeId)
-            .OrderBy<ContentTypeDto>(x => x.NodeId)
-            .AndBy<PropertyTypeGroupDto>(x => x.SortOrder, x => x.Id);
-
-        List<PropertyTypeGroupDto>? groupDtos = Database?.Fetch<PropertyTypeGroupDto>(sql1);
-
-        Sql<ISqlContext> sql2 = SqlContext.Sql()
-            .Select<PropertyTypeDto>(r => r.Select(x => x.DataTypeDto, r1 => r1.Select(x => x.NodeDto)))
-            .AndSelect<MemberPropertyTypeDto>()
-            .From<PropertyTypeDto>()
-            .InnerJoin<DataTypeDto>().On<PropertyTypeDto, DataTypeDto>((pt, dt) => pt.DataTypeId == dt.NodeId)
-            .InnerJoin<NodeDto>().On<DataTypeDto, NodeDto>((dt, n) => dt.NodeId == n.NodeId)
-            .InnerJoin<ContentTypeDto>()
-            .On<PropertyTypeDto, ContentTypeDto>((pt, ct) => pt.ContentTypeId == ct.NodeId)
-            .LeftJoin<PropertyTypeGroupDto>()
-            .On<PropertyTypeDto, PropertyTypeGroupDto>((pt, ptg) => pt.PropertyTypeGroupId == ptg.Id)
-            .LeftJoin<MemberPropertyTypeDto>()
-            .On<PropertyTypeDto, MemberPropertyTypeDto>((pt, mpt) => pt.Id == mpt.PropertyTypeId)
-            .OrderBy<ContentTypeDto>(x => x.NodeId)
-            .AndBy<
-                PropertyTypeGroupDto>(
-                    x => x.SortOrder,
-                    x => x.Id) // NULLs will come first or last, never mind, we deal with it below
-            .AndBy<PropertyTypeDto>(x => x.SortOrder, x => x.Id);
-
-        List<PropertyTypeCommonDto>? propertyDtos = Database?.Fetch<PropertyTypeCommonDto>(sql2);
         Dictionary<string, PropertyType> builtinProperties =
             ConventionsHelper.GetStandardPropertyTypeStubs(_shortStringHelper);
 
-        var groupIx = 0;
-        var propertyIx = 0;
+        // Index grouped properties by group id, sorted by position within each group
+        Dictionary<int, List<PropertyTypeDto>> propertiesByGroupId = propertyDtos
+            .Where(pt => pt.PropertyTypeGroupId.HasValue)
+            .GroupBy(pt => pt.PropertyTypeGroupId!.Value)
+            .ToDictionary(g => g.Key, g => g.OrderBy(pt => pt.SortOrder).ThenBy(pt => pt.Id).ToList());
+
+        // Index group-less properties by content type id, sorted by position
+        Dictionary<int, List<PropertyTypeDto>> noGroupPropertiesByContentTypeId = propertyDtos
+            .Where(pt => !pt.PropertyTypeGroupId.HasValue)
+            .GroupBy(pt => pt.ContentTypeId)
+            .ToDictionary(g => g.Key, g => g.OrderBy(pt => pt.SortOrder).ThenBy(pt => pt.Id).ToList());
+
+        // Index groups by content type id (already ordered: ContentTypeNodeId → SortOrder → Id)
+        Dictionary<int, List<PropertyTypeGroupDto>> groupsByContentTypeId = groupDtos
+            .GroupBy(g => g.ContentTypeNodeId)
+            .ToDictionary(g => g.Key, g => g.ToList());
+
         foreach (IContentTypeComposition contentType in contentTypes.Values)
         {
-            // only IContentType is publishing
             var isPublishing = contentType is IContentType;
 
-            // get group-less properties (in case NULL is ordered first)
+            // Group-less properties
             var noGroupPropertyTypes = new PropertyTypeCollection(isPublishing);
-            while (propertyIx < propertyDtos?.Count && propertyDtos[propertyIx].ContentTypeId == contentType.Id &&
-                   propertyDtos[propertyIx].PropertyTypeGroupId == null)
+            if (noGroupPropertiesByContentTypeId.TryGetValue(contentType.Id, out List<PropertyTypeDto>? ungroupedProps))
             {
-                noGroupPropertyTypes.Add(MapPropertyType(contentType, propertyDtos[propertyIx], builtinProperties));
-                propertyIx++;
+                foreach (PropertyTypeDto pt in ungroupedProps)
+                {
+                    noGroupPropertyTypes.Add(MapPropertyType(contentType, pt, builtinProperties));
+                }
             }
 
-            // get groups and their properties
+            // Property groups and their properties
             var groupCollection = new PropertyGroupCollection();
-            while (groupIx < groupDtos?.Count && groupDtos[groupIx].ContentTypeNodeId == contentType.Id)
+            if (groupsByContentTypeId.TryGetValue(contentType.Id, out List<PropertyTypeGroupDto>? groups))
             {
-                PropertyGroup group = MapPropertyGroup(groupDtos[groupIx], isPublishing);
-                groupCollection.Add(group);
-                groupIx++;
-
-                while (propertyIx < propertyDtos?.Count &&
-                       propertyDtos[propertyIx].ContentTypeId == contentType.Id &&
-                       propertyDtos[propertyIx].PropertyTypeGroupId == group.Id)
+                foreach (PropertyTypeGroupDto groupDto in groups)
                 {
-                    group.PropertyTypes?.Add(MapPropertyType(contentType, propertyDtos[propertyIx], builtinProperties));
-                    propertyIx++;
+                    PropertyGroup group = MapPropertyGroup(groupDto, isPublishing);
+                    groupCollection.Add(group);
+
+                    if (propertiesByGroupId.TryGetValue(groupDto.Id, out List<PropertyTypeDto>? groupProps))
+                    {
+                        foreach (PropertyTypeDto pt in groupProps)
+                        {
+                            group.PropertyTypes?.Add(MapPropertyType(contentType, pt, builtinProperties));
+                        }
+                    }
                 }
             }
 
             contentType.PropertyGroups = groupCollection;
-
-            // get group-less properties (in case NULL is ordered last)
-            while (propertyIx < propertyDtos?.Count && propertyDtos[propertyIx].ContentTypeId == contentType.Id &&
-                   propertyDtos[propertyIx].PropertyTypeGroupId == null)
-            {
-                noGroupPropertyTypes.Add(MapPropertyType(contentType, propertyDtos[propertyIx], builtinProperties));
-                propertyIx++;
-            }
-
             contentType.NoGroupPropertyTypes = noGroupPropertyTypes;
 
-            // ensure builtin properties
+            // Ensure standard built-in property types exist on member types
             if (contentType is IMemberType memberType)
             {
-                // ensure that property types exist (ok if they already exist)
                 foreach ((var alias, PropertyType propertyType) in builtinProperties)
                 {
                     var added = memberType.AddPropertyType(
@@ -407,7 +365,7 @@ internal sealed class ContentTypeCommonRepository : IContentTypeCommonRepository
 
     private PropertyType MapPropertyType(
         IContentTypeComposition contentType,
-        PropertyTypeCommonDto dto,
+        PropertyTypeDto dto,
         IDictionary<string, PropertyType> builtinProperties)
     {
         var groupId = dto.PropertyTypeGroupId;
@@ -419,9 +377,9 @@ internal sealed class ContentTypeCommonRepository : IContentTypeCommonRepository
 
         if (contentType is IMemberType memberType && dto.Alias is not null)
         {
-            memberType.SetIsSensitiveProperty(dto.Alias, dto.IsSensitive);
-            memberType.SetMemberCanEditProperty(dto.Alias, dto.CanEdit);
-            memberType.SetMemberCanViewProperty(dto.Alias, dto.ViewOnProfile);
+            memberType.SetIsSensitiveProperty(dto.Alias, dto.MemberPropertyTypeDto?.IsSensitive ?? false);
+            memberType.SetMemberCanEditProperty(dto.Alias, dto.MemberPropertyTypeDto?.CanEdit ?? false);
+            memberType.SetMemberCanViewProperty(dto.Alias, dto.MemberPropertyTypeDto?.ViewOnProfile ?? false);
         }
 
         return new PropertyType(_shortStringHelper, dto.DataTypeDto.EditorAlias, storageType, readonlyStorageType, dto.Alias)
