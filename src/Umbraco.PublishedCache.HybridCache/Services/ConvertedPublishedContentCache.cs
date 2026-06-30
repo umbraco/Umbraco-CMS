@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 namespace Umbraco.Cms.Infrastructure.HybridCache.Services;
 
 /// <summary>
-///     Encapsulates the in-process (L0) cache of converted <see cref="IPublishedContent" /> behind a single
+///     Encapsulates the in-process (L0) cache of converted <see cref="IPublishedElement" /> behind a single
 ///     insert/remove/clear path, tracking both the entry count and an approximate retained byte total.
 /// </summary>
 /// <remarks>
@@ -14,9 +14,11 @@ namespace Umbraco.Cms.Infrastructure.HybridCache.Services;
 ///     without locking the whole structure), suitable for diagnostics, not exact accounting.
 ///     This is also the seam the later bounded/eviction-aware implementation slots into.
 /// </remarks>
-/// <typeparam name="TKey">The cache key type (string for documents, Guid for media).</typeparam>
-internal sealed class ConvertedPublishedContentCache<TKey>
+/// <typeparam name="TKey">The cache key type.</typeparam>
+/// <typeparam name="TValue">The cached converted type.</typeparam>
+internal sealed class ConvertedPublishedContentCache<TKey, TValue>
     where TKey : notnull
+    where TValue : class, IPublishedElement
 {
     private readonly ConcurrentDictionary<TKey, CacheEntry> _cache = new();
     private long _approximateSizeInBytes;
@@ -34,7 +36,7 @@ internal sealed class ConvertedPublishedContentCache<TKey>
     /// <summary>
     ///     Attempts to get a cached converted content item.
     /// </summary>
-    public bool TryGet(TKey key, out IPublishedContent? content)
+    public bool TryGet(TKey key, out TValue? content)
     {
         if (_cache.TryGetValue(key, out CacheEntry entry))
         {
@@ -50,7 +52,7 @@ internal sealed class ConvertedPublishedContentCache<TKey>
     ///     Adds or replaces a cached converted content item, adjusting the running byte total by the supplied
     ///     per-entry size estimate.
     /// </summary>
-    public void Set(TKey key, IPublishedContent content, long approximateSizeInBytes)
+    public void Set(TKey key, TValue content, long approximateSizeInBytes)
     {
         var entry = new CacheEntry(content, approximateSizeInBytes);
 
@@ -84,7 +86,7 @@ internal sealed class ConvertedPublishedContentCache<TKey>
     /// <summary>
     ///     Removes every entry whose content matches the predicate, subtracting their sizes from the total.
     /// </summary>
-    public void RemoveWhere(Func<IPublishedContent, bool> predicate)
+    public void RemoveWhere(Func<TValue, bool> predicate)
     {
         foreach (KeyValuePair<TKey, CacheEntry> kvp in _cache)
         {
@@ -104,5 +106,5 @@ internal sealed class ConvertedPublishedContentCache<TKey>
         Interlocked.Exchange(ref _approximateSizeInBytes, 0);
     }
 
-    private readonly record struct CacheEntry(IPublishedContent Content, long Size);
+    private readonly record struct CacheEntry(TValue Content, long Size);
 }
