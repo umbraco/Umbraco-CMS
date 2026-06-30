@@ -29,8 +29,12 @@ public sealed partial class HtmlStringUtilities
         return new HtmlString(value);
     }
 
-    [GeneratedRegex("\\s{2,}", RegexOptions.Compiled)]
+    [GeneratedRegex("\\s{2,}")]
     private static partial Regex MultiSpaceRegex();
+
+    [GeneratedRegex("\\s(\\p{P})")]
+    private static partial Regex PunctuationRegex();
+
 
     public HtmlString StripHtmlTags(string html, params string[]? tags)
     {
@@ -71,8 +75,9 @@ public sealed partial class HtmlStringUtilities
         {
             return new HtmlString(html);
         }
-
-        return new HtmlString(MultiSpaceRegex().Replace(doc.DocumentNode.InnerHtml, " ").Trim());
+        var text = MultiSpaceRegex().Replace(doc.DocumentNode.InnerHtml, " ").Trim();
+        text = PunctuationRegex().Replace(text, "$1");
+        return new HtmlString(text);
     }
 
     public string Join(string separator, params object[] args)
