@@ -19,6 +19,11 @@ public class PackageDefinitionXmlParser
     private static readonly IList<GuidUdi> EmptyGuidUdiList = new List<GuidUdi>();
 
     /// <summary>
+    ///     An empty Guid list used as a default value for package definition element collections.
+    /// </summary>
+    private static readonly IList<Guid> EmptyGuidList = new List<Guid>();
+
+    /// <summary>
     ///     Converts an XML element to a <see cref="PackageDefinition"/>.
     /// </summary>
     /// <param name="xml">The XML element containing the package definition.</param>
@@ -42,6 +47,9 @@ public class PackageDefinitionXmlParser
                 xml.Element("media")?.Elements("nodeUdi").Select(x => (GuidUdi)UdiParser.Parse(x.Value)).ToList() ??
                 EmptyGuidUdiList,
             MediaLoadChildNodes = xml.Element("media")?.AttributeValue<bool>("loadChildNodes") ?? false,
+            Elements =
+                xml.Element("elements")?.Elements("key").Select(x => Guid.Parse(x.Value)).ToList() ??
+                EmptyGuidList,
             Templates =
                 xml.Element("templates")?.Value
                     .Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries).ToList() ??
@@ -110,7 +118,10 @@ public class PackageDefinitionXmlParser
             new XElement(
                 "media",
                 def.MediaUdis.Select(x => (object)new XElement("nodeUdi", x))
-                    .Union(new[] { new XAttribute("loadChildNodes", def.MediaLoadChildNodes) })));
+                    .Union(new[] { new XAttribute("loadChildNodes", def.MediaLoadChildNodes) })),
+            new XElement(
+                "elements",
+                def.Elements.Select(x => new XElement("key", x))));
         return packageXml;
     }
 }
