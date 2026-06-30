@@ -8,16 +8,16 @@ import './tree-view-bundle.element.js';
 @customElement('umb-tree-toolbar')
 export class UmbTreeToolbarElement extends UmbLitElement {
 	/**
-	 * When true the tree actions are hidden.
-	 * Defaults to true — tree actions are not shown unless explicitly opted in with hide-tree-actions="false".
+	 * When true the tree actions are shown.
+	 * Defaults to false — tree actions are not shown unless explicitly opted in with show-tree-actions.
 	 */
-	@property({ type: Boolean, attribute: 'hide-tree-actions' })
-	hideTreeActions: boolean = true;
+	@property({ type: Boolean, attribute: 'show-tree-actions' })
+	showTreeActions: boolean = false;
 
 	override render() {
 		return html`
 			<div id="toolbar">
-				${!this.hideTreeActions ? html`<umb-tree-action-bundle></umb-tree-action-bundle>` : nothing}
+				${this.showTreeActions ? html`<umb-tree-action-bundle></umb-tree-action-bundle>` : nothing}
 				<umb-tree-view-bundle></umb-tree-view-bundle>
 			</div>
 		`;

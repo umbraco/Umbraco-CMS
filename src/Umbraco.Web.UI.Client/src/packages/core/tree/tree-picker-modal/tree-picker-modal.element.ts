@@ -404,7 +404,7 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 			<umb-tree
 				alias=${ifDefined(this.data?.treeAlias)}
 				.props=${{
-					hideToolbar: false,
+					showToolbar: true,
 					hideTreeItemActions: true,
 					hideTreeRoot: this.data?.hideTreeRoot,
 					expandTreeRoot: this.data?.expandTreeRoot,

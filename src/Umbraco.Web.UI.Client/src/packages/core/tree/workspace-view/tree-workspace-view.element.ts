@@ -71,8 +71,8 @@ export class UmbTreeWorkspaceViewElement extends UmbLitElement {
 			data-mark="tree:${this.manifest.meta.treeAlias}"
 			alias=${this.manifest.meta.treeAlias}
 			.props=${{
-				hideToolbar: false,
-				hideTreeActions: false,
+				showToolbar: true,
+				showTreeActions: true,
 				hideTreeRoot: true,
 				startNode: this._parent,
 				interactionMemories: this._interactionMemories,

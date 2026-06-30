@@ -38,11 +38,7 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 			// Derive emptiness from the loaded children, not `hasChildren`: the latter is also written by the
 			// concurrent tree-root load (with the root's own child count), which can clobber the start node's value
 			// and intermittently hide the empty state.
-			this.observe(
-				value.rootItems,
-				(items) => (this._hasItems = (items?.length ?? 0) > 0),
-				'umbTreeRootItemsObserver',
-			);
+			this.observe(value.rootItems, (items) => (this._hasItems = (items?.length ?? 0) > 0), 'umbTreeRootItemsObserver');
 			// Track loading so the empty state isn't shown before the children have loaded, or while reloading.
 			this.observe(
 				value.isLoading,
@@ -117,21 +113,11 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 	@property({ attribute: false })
 	expansion: UmbTreeExpansionModel = [];
 
-	/**
-	 * When true the view-switcher toolbar is hidden.
-	 * Defaults to true for backwards compatibility — existing trees stay toolbar-less
-	 * until a consumer explicitly opts in with hide-toolbar="false".
-	 * Note: hideTreeRoot and hideTreeItemActions default to false; this is the intentional exception.
-	 */
-	@property({ type: Boolean, attribute: 'hide-toolbar' })
-	hideToolbar: boolean = true;
+	@property({ type: Boolean, attribute: 'show-toolbar' })
+	showToolbar: boolean = false;
 
-	/**
-	 * When true the tree actions are hidden.
-	 * Defaults to true — tree actions are not shown unless explicitly opted in with hide-tree-actions="false".
-	 */
-	@property({ type: Boolean, attribute: 'hide-tree-actions' })
-	hideTreeActions: boolean = true;
+	@property({ type: Boolean, attribute: 'show-tree-actions' })
+	showTreeActions: boolean = false;
 
 	@property({ attribute: false })
 	interactionMemories?: Array<UmbInteractionMemoryModel>;
@@ -222,8 +208,8 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 
 	override render() {
 		return html`
-			${!this.hideToolbar
-				? html`<umb-tree-toolbar .hideTreeActions=${this.hideTreeActions}></umb-tree-toolbar>`
+			${this.showToolbar
+				? html`<umb-tree-toolbar .showTreeActions=${this.showTreeActions}></umb-tree-toolbar>`
 				: nothing}
 			${this._viewElement ?? nothing} ${this.#renderEmptyState()}
 		`;
