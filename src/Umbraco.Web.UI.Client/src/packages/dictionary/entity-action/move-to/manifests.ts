@@ -2,7 +2,6 @@ import { UMB_DICTIONARY_ENTITY_TYPE } from '../../entity.js';
 import { UMB_DICTIONARY_TREE_ALIAS, UMB_DICTIONARY_TREE_REPOSITORY_ALIAS } from '../../tree/index.js';
 import { UMB_MOVE_DICTIONARY_REPOSITORY_ALIAS } from './constants.js';
 import { manifests as repositoryManifests } from './repository/manifests.js';
-import { UMB_DICTIONARY_SEARCH_PROVIDER_ALIAS } from '../../search/constants.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -15,7 +14,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 			treeRepositoryAlias: UMB_DICTIONARY_TREE_REPOSITORY_ALIAS,
 			moveRepositoryAlias: UMB_MOVE_DICTIONARY_REPOSITORY_ALIAS,
 			treeAlias: UMB_DICTIONARY_TREE_ALIAS,
-			searchProviderAlias: UMB_DICTIONARY_SEARCH_PROVIDER_ALIAS,
 		},
 	},
 	...repositoryManifests,
