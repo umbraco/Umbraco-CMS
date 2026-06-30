@@ -29,8 +29,11 @@ export class UmbOutlineStyleController extends UmbControllerBase {
 	};
 
 	override hostDisconnected(): void {
-		this.removeEventListener('focusout', this.#onFocusOut);
-		this.removeEventListener('mousedown', this.#onMouseDown);
-		this.removeEventListener('mouseup', this.#onMouseUp);
+		super.hostDisconnected();
+
+		const host = this.getHostElement();
+		host.removeEventListener('focusout', this.#onFocusOut);
+		host.removeEventListener('mousedown', this.#onMouseDown);
+		host.removeEventListener('mouseup', this.#onMouseUp);
 	}
 }
