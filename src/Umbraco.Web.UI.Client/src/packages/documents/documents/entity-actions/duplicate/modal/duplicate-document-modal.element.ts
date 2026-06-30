@@ -1,7 +1,7 @@
 import { UMB_DOCUMENT_TREE_ALIAS } from '../../../tree/manifests.js';
 import { UMB_DOCUMENT_SEARCH_PROVIDER_ALIAS } from '../../../search/constants.js';
 import type { UmbDuplicateDocumentModalData, UmbDuplicateDocumentModalValue } from './duplicate-document-modal.token.js';
-import { html, customElement, nothing, css, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, nothing, css, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbPickerContext } from '@umbraco-cms/backoffice/picker';
@@ -40,17 +40,25 @@ export class UmbDocumentDuplicateToModalElement extends UmbModalBaseElement<
 		this.#pickerContext.selection.setMultiple(false);
 		this.#pickerContext.search.updateConfig({ providerAlias: UMB_DOCUMENT_SEARCH_PROVIDER_ALIAS });
 
-		this.observe(this.#pickerContext.selection.selection, (selection) => {
-			this._destinationUnique = selection.length ? selection[0] : undefined;
-			this._selectionConfiguration = { ...this._selectionConfiguration, selection: [...selection] };
-			if (this._destinationUnique || this._destinationUnique === null) {
-				this.updateValue({ destination: { unique: this._destinationUnique } });
-			}
-		});
+		this.observe(
+			this.#pickerContext.selection.selection,
+			(selection) => {
+				this._destinationUnique = selection.length ? selection[0] : undefined;
+				this._selectionConfiguration = { ...this._selectionConfiguration, selection: [...selection] };
+				if (this._destinationUnique || this._destinationUnique === null) {
+					this.updateValue({ destination: { unique: this._destinationUnique } });
+				}
+			},
+			'umbPickerSelectionObserver',
+		);
 
-		this.observe(this.#pickerContext.search.query, (query) => {
-			this._searchQuery = query?.query;
-		});
+		this.observe(
+			this.#pickerContext.search.query,
+			(query) => {
+				this._searchQuery = query?.query;
+			},
+			'umbPickerSearchQueryObserver',
+		);
 	}
 
 	#selectableFilter = (item: UmbDocumentTreeItemModel): boolean => {
@@ -117,7 +125,7 @@ export class UmbDocumentDuplicateToModalElement extends UmbModalBaseElement<
 
 		return html`
 			<umb-tree
-				alias=${ifDefined(UMB_DOCUMENT_TREE_ALIAS)}
+				alias=${UMB_DOCUMENT_TREE_ALIAS}
 				.props=${{
 					hideTreeItemActions: true,
 					expandTreeRoot: true,
