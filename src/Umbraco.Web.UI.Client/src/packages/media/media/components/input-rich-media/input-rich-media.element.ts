@@ -1,4 +1,5 @@
 import { UMB_IMAGE_CROPPER_EDITOR_MODAL } from '../../modals/index.js';
+import type { UmbImageCropperEditorModalValue } from '../../modals/index.js';
 import type { UmbMediaItemModel, UmbCropModel, UmbMediaPickerPropertyValueEntry } from '../../types.js';
 import { UMB_MEDIA_ITEM_REPOSITORY_ALIAS } from '../../repository/constants.js';
 import { UmbMediaUrlRepository } from '../../url/index.js';
@@ -217,95 +218,106 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 		});
 
 		this.#observeImageFileTypes();
-
-		new UmbModalRouteRegistrationController(this, UMB_IMAGE_CROPPER_EDITOR_MODAL)
-			.addAdditionalPath(':key')
-			.onSetup((params) => {
-				const key = params.key;
-				if (!key) return false;
-
-				const item = this.value?.find((item) => item.key === key);
-				if (!item) return false;
-
-				const culture = this.#activeCulture;
-				const resolvedAltText = (culture && item.altTextByCulture?.[culture]) ?? item.altText ?? '';
-
-				// When editing a specific culture, resolve each crop's alt text from altTextByCulture[culture]
-				// so the editor sees the culture-specific value rather than the default.
-				const crops = culture
-					? (item.crops ?? []).map((crop) => ({
-							...crop,
-							altText: crop.altTextByCulture?.[culture] ?? crop.altText ?? '',
-						}))
-					: (item.crops ?? []);
-
-				return {
-					data: {
-						cropOptions: this.preselectedCrops,
-						hideFocalPoint: !this.focalPointEnabled,
-						hideZoomCrop: this.hideZoomCrop,
-						enableAltTextPerCrop: this.enableAltTextPerCrop,
-						altTextMode: this.altTextMode,
-						key,
-						unique: item.mediaKey,
-						pickableFilter: this.#pickableFilter,
-						culture: culture ?? undefined,
-						readonlyMedia: this.readonly,
-					},
-					value: {
-						crops,
-						focalPoint: item.focalPoint ?? null,
-						src: '',
-						key,
-						unique: item.mediaKey,
-						altText: resolvedAltText,
-					},
-				};
-			})
-			.onSubmit((value) => {
-				this.value = this.value?.map((item) => {
-					if (item.key !== value.key) return item;
-
-					const culture = this.#activeCulture;
-
-					if (culture) {
-						const altTextByCulture = { ...(item.altTextByCulture ?? {}), [culture]: value.altText ?? '' };
-
-						// Write each crop's submitted altText into altTextByCulture[culture] on the stored crop,
-						// preserving the invariant altText and all other cultures' entries.
-						const crops = (item.crops ?? []).map((storedCrop) => {
-							const submittedCrop = value.crops?.find((c) => c.alias === storedCrop.alias);
-							if (!submittedCrop) return storedCrop;
-							const cropAltByCulture = {
-								...(storedCrop.altTextByCulture ?? {}),
-								[culture]: submittedCrop.altText ?? '',
-							};
-							return { ...storedCrop, altTextByCulture: cropAltByCulture };
-						});
-
-						return { ...item, crops, altTextByCulture };
-					}
-
-					const focalPoint = this.focalPointEnabled ? value.focalPoint : null;
-					const crops = value.crops;
-					const mediaKey = value.unique;
-
-					// Note: If the mediaKey changes we will change the key which causes cards to update
-					const key = mediaKey === item.mediaKey ? item.key : UmbId.new();
-
-					return { ...item, crops, mediaKey, focalPoint, key, altText: value.altText };
-				});
-
-				this.dispatchEvent(new UmbChangeEvent());
-			})
-			.observeRouteBuilder((routeBuilder) => {
-				this._routeBuilder = routeBuilder;
-			});
+		this.#registerImageCropperModalRoute();
 
 		this.observe(this.#pickerInputContext.selection, (selection) => {
 			this.#addItems(selection);
 		});
 
+		this.#addPickerValidators();
+	}
+
+	#registerImageCropperModalRoute() {
+		new UmbModalRouteRegistrationController(this, UMB_IMAGE_CROPPER_EDITOR_MODAL)
+			.addAdditionalPath(':key')
+			.onSetup((params) => this.#setupImageCropperModal(params))
+			.onSubmit((value) => this.#submitImageCropperModal(value))
+			.observeRouteBuilder((routeBuilder) => {
+				this._routeBuilder = routeBuilder;
+			});
+	}
+
+	#setupImageCropperModal(params: { key?: string }) {
+		const key = params.key;
+		if (!key) return false;
+
+		const item = this.value?.find((item) => item.key === key);
+		if (!item) return false;
+
+		const culture = this.#activeCulture;
+		const resolvedAltText = (culture && item.altTextByCulture?.[culture]) ?? item.altText ?? '';
+
+		// When editing a specific culture, resolve each crop's alt text from altTextByCulture[culture]
+		// so the editor sees the culture-specific value rather than the default.
+		const crops = culture
+			? (item.crops ?? []).map((crop) => ({
+					...crop,
+					altText: crop.altTextByCulture?.[culture] ?? crop.altText ?? '',
+				}))
+			: (item.crops ?? []);
+
+		return {
+			data: {
+				cropOptions: this.preselectedCrops,
+				hideFocalPoint: !this.focalPointEnabled,
+				hideZoomCrop: this.hideZoomCrop,
+				enableAltTextPerCrop: this.enableAltTextPerCrop,
+				altTextMode: this.altTextMode,
+				key,
+				unique: item.mediaKey,
+				pickableFilter: this.#pickableFilter,
+				culture: culture ?? undefined,
+				readonlyMedia: this.readonly,
+			},
+			value: {
+				crops,
+				focalPoint: item.focalPoint ?? null,
+				src: '',
+				key,
+				unique: item.mediaKey,
+				altText: resolvedAltText,
+			},
+		};
+	}
+
+	#submitImageCropperModal(value: UmbImageCropperEditorModalValue) {
+		this.value = this.value?.map((item) => {
+			if (item.key !== value.key) return item;
+
+			const culture = this.#activeCulture;
+
+			if (culture) {
+				const altTextByCulture = { ...(item.altTextByCulture ?? {}), [culture]: value.altText ?? '' };
+
+				// Write each crop's submitted altText into altTextByCulture[culture] on the stored crop,
+				// preserving the invariant altText and all other cultures' entries.
+				const crops = (item.crops ?? []).map((storedCrop) => {
+					const submittedCrop = value.crops?.find((c) => c.alias === storedCrop.alias);
+					if (!submittedCrop) return storedCrop;
+					const cropAltByCulture = {
+						...(storedCrop.altTextByCulture ?? {}),
+						[culture]: submittedCrop.altText ?? '',
+					};
+					return { ...storedCrop, altTextByCulture: cropAltByCulture };
+				});
+
+				return { ...item, crops, altTextByCulture };
+			}
+
+			const focalPoint = this.focalPointEnabled ? value.focalPoint : null;
+			const crops = value.crops;
+			const mediaKey = value.unique;
+
+			// Note: If the mediaKey changes we will change the key which causes cards to update
+			const key = mediaKey === item.mediaKey ? item.key : UmbId.new();
+
+			return { ...item, crops, mediaKey, focalPoint, key, altText: value.altText };
+		});
+
+		this.dispatchEvent(new UmbChangeEvent());
+	}
+
+	#addPickerValidators() {
 		this.addValidator(
 			'valueMissing',
 			() => this.requiredMessage ?? UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
@@ -378,7 +390,8 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 		this.value = [...(this.value ?? []), ...additions];
 		this.dispatchEvent(new UmbChangeEvent());
 
-		if (uniques.length === 1 && (this.altTextMode === 'altText' || this.enableAltTextPerCrop)) {
+		const cropEditorEnabled = this.altTextMode === 'altText' || this.enableAltTextPerCrop;
+		if (uniques.length === 1 && cropEditorEnabled) {
 			this.#autoOpenCropEditor(additions[0].key, additions[0].mediaKey);
 		}
 	}

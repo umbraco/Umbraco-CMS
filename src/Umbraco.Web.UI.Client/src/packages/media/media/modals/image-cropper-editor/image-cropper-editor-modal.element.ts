@@ -95,21 +95,28 @@ export class UmbImageCropperEditorModalElement extends UmbModalBaseElement<
 	override connectedCallback(): void {
 		super.connectedCallback();
 
-		this._key = this.data?.key ?? '';
-		this._unique = this.data?.unique ?? '';
-
-		this._hideFocalPoint = this.data?.hideFocalPoint ?? false;
-		this._hideZoomCrop = this.data?.hideZoomCrop ?? false;
-		this._enableAltTextPerCrop = this.data?.enableAltTextPerCrop ?? false;
-		this._altTextMode = this.data?.altTextMode ?? 'off';
-		this._altText = this.value?.altText ?? '';
-		this._culture = this.data?.culture;
-		this._readonlyMedia = this.data?.readonlyMedia ?? false;
-		this._crops = this.data?.cropOptions ?? [];
-		this._pickableFilter = this.data?.pickableFilter;
+		this.#applyModalData();
 
 		this.#observeAcceptedFileTypes();
 		this.#getSrc();
+	}
+
+	#applyModalData(): void {
+		this._altText = this.value?.altText ?? '';
+
+		const data = this.data;
+		if (!data) return;
+
+		this._key = data.key ?? '';
+		this._unique = data.unique ?? '';
+		this._hideFocalPoint = data.hideFocalPoint ?? false;
+		this._hideZoomCrop = data.hideZoomCrop ?? false;
+		this._enableAltTextPerCrop = data.enableAltTextPerCrop ?? false;
+		this._altTextMode = data.altTextMode ?? 'off';
+		this._culture = data.culture;
+		this._readonlyMedia = data.readonlyMedia ?? false;
+		this._crops = data.cropOptions ?? [];
+		this._pickableFilter = data.pickableFilter;
 	}
 
 	async #observeAcceptedFileTypes() {

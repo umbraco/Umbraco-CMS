@@ -58,22 +58,21 @@ export class UmbImageCropperEditorFieldElement extends UmbInputImageCropperField
 	}
 
 	override focus(options?: FocusOptions) {
-		const skipLink = this.shadowRoot?.querySelector<HTMLElement>('.skip-link');
-		if (skipLink) {
-			skipLink.focus(options);
-			return;
+		// Ordered fallback: focus the first available target. The focus setter is skipped when the
+		// focal point is hidden, falling through to the preview.
+		const candidates = [
+			'.skip-link',
+			'umb-image-cropper',
+			...(this.hideFocalPoint ? [] : ['umb-image-cropper-focus-setter']),
+			'umb-image-cropper-preview',
+		];
+		for (const selector of candidates) {
+			const target = this.shadowRoot?.querySelector<HTMLElement>(selector);
+			if (target) {
+				target.focus(options);
+				return;
+			}
 		}
-		const cropper = this.shadowRoot?.querySelector<HTMLElement>('umb-image-cropper');
-		if (cropper) {
-			cropper.focus(options);
-			return;
-		}
-		const focusSetter = this.shadowRoot?.querySelector<HTMLElement>('umb-image-cropper-focus-setter');
-		if (focusSetter && !this.hideFocalPoint) {
-			focusSetter.focus(options);
-			return;
-		}
-		this.shadowRoot?.querySelector<HTMLElement>('umb-image-cropper-preview')?.focus(options);
 	}
 
 	/**
@@ -87,21 +86,23 @@ export class UmbImageCropperEditorFieldElement extends UmbInputImageCropperField
 			super.onCropClick(crop);
 			const cropLabel = crop.label ?? crop.alias;
 			this._announcement = this.localize.term('mediaPicker_cropSelected', [cropLabel]);
-			this.updateComplete.then(async () => {
-				const skipLink = this.shadowRoot?.querySelector<HTMLElement>('.skip-link');
-				if (skipLink) {
-					skipLink.focus();
-					return;
-				}
-				const cropper = this.shadowRoot?.querySelector<UmbImageCropperElement>('umb-image-cropper');
-				if (cropper) {
-					await cropper.updateComplete;
-					cropper.focus();
-				}
-			});
+			this.updateComplete.then(() => this.#focusAfterCropSelect());
 		} else if (this.enableAltTextPerCrop) {
 			// Readonly media + per-crop alt text: focus the alt text field directly
 			this.updateComplete.then(() => this.#skipToAltText());
+		}
+	}
+
+	async #focusAfterCropSelect() {
+		const skipLink = this.shadowRoot?.querySelector<HTMLElement>('.skip-link');
+		if (skipLink) {
+			skipLink.focus();
+			return;
+		}
+		const cropper = this.shadowRoot?.querySelector<UmbImageCropperElement>('umb-image-cropper');
+		if (cropper) {
+			await cropper.updateComplete;
+			cropper.focus();
 		}
 	}
 

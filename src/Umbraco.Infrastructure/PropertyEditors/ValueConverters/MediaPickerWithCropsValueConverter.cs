@@ -161,33 +161,12 @@ public class MediaPickerWithCropsValueConverter : PropertyValueConverterBase, ID
             IPublishedContent? mediaItem = _publishedMediaCache.GetById(preview, dto.MediaKey);
             if (mediaItem != null)
             {
-                var altText = ResolveCultureAltText(dto.AltText, dto.AltTextByCulture, culture);
-
-                // Resolve per-crop alt text from AltTextByCulture when a culture context is active.
-                IEnumerable<ImageCropperValue.ImageCropperCrop>? crops = string.IsNullOrEmpty(culture)
-                    ? dto.Crops
-                    : dto.Crops?.Select(crop =>
-                    {
-                        var cropAltText = ResolveCultureAltText(crop.AltText, crop.AltTextByCulture, culture);
-                        return cropAltText == crop.AltText
-                            ? crop
-                            : new ImageCropperValue.ImageCropperCrop
-                            {
-                                Alias = crop.Alias,
-                                Width = crop.Width,
-                                Height = crop.Height,
-                                Coordinates = crop.Coordinates,
-                                AltText = cropAltText,
-                                AltTextByCulture = crop.AltTextByCulture,
-                            };
-                    });
-
                 var localCrops = new ImageCropperValue
                 {
-                    Crops = crops,
+                    Crops = ResolveCropsForCulture(dto.Crops, culture),
                     FocalPoint = dto.FocalPoint,
                     Src = mediaItem.Url(_publishedUrlProvider),
-                    AltText = altText,
+                    AltText = ResolveCultureAltText(dto.AltText, dto.AltTextByCulture, culture),
                 };
 
                 localCrops.ApplyConfiguration(configuration);
@@ -290,6 +269,31 @@ public class MediaPickerWithCropsValueConverter : PropertyValueConverterBase, ID
         MediaPicker3Configuration? configuration = propertyType.DataType.ConfigurationAs<MediaPicker3Configuration>();
         return configuration is not null
                && (configuration.AltTextMode != "off" || configuration.EnableAltTextPerCrop);
+    }
+
+    // Resolve per-crop alt text from AltTextByCulture when a culture context is active; otherwise the stored crops are used as-is.
+    private static IEnumerable<ImageCropperValue.ImageCropperCrop>? ResolveCropsForCulture(IEnumerable<ImageCropperValue.ImageCropperCrop>? crops, string? culture)
+    {
+        if (string.IsNullOrEmpty(culture))
+        {
+            return crops;
+        }
+
+        return crops?.Select(crop =>
+        {
+            var cropAltText = ResolveCultureAltText(crop.AltText, crop.AltTextByCulture, culture);
+            return cropAltText == crop.AltText
+                ? crop
+                : new ImageCropperValue.ImageCropperCrop
+                {
+                    Alias = crop.Alias,
+                    Width = crop.Width,
+                    Height = crop.Height,
+                    Coordinates = crop.Coordinates,
+                    AltText = cropAltText,
+                    AltTextByCulture = crop.AltTextByCulture,
+                };
+        });
     }
 
     // Culture codes can differ in casing between where alt text is written (the backoffice variant context)

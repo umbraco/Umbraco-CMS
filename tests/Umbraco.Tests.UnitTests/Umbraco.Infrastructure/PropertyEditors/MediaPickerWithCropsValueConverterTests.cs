@@ -18,101 +18,49 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PropertyEditors;
 [TestFixture]
 public class MediaPickerWithCropsValueConverterTests
 {
-    [Test]
-    public void AltText_Returns_Invariant_When_No_Culture_Dict()
+    [TestCase("en", null, null, "English alt text", "English alt text", TestName = "AltText returns invariant when no culture dictionary")]
+    [TestCase("da", "da", "Dansk alt tekst", "English alt text", "Dansk alt tekst", TestName = "AltText returns culture-specific value when culture matches")]
+    [TestCase("fr", "da", "Dansk alt tekst", "Fallback alt text", "Fallback alt text", TestName = "AltText falls back to invariant when culture not in dictionary")]
+    [TestCase(null, "da", "Dansk alt tekst", "Invariant alt text", "Invariant alt text", TestName = "AltText returns invariant when no active culture")]
+    public void AltText_Resolves_Expected_Value(
+        string? culture,
+        string? cultureKey,
+        string? cultureValue,
+        string invariantAltText,
+        string expected)
     {
-        var variationContext = new VariationContext("en");
-        var accessor = MockAccessor(variationContext);
+        var accessor = MockAccessor(new VariationContext(culture));
+
+        Dictionary<string, string>? altTextByCulture =
+            cultureKey is null ? null : new Dictionary<string, string> { [cultureKey] = cultureValue! };
 
         var dto = new MediaPicker3PropertyEditor.MediaPicker3PropertyValueEditor.MediaWithCropsDto
         {
-            AltText = "English alt text",
-            AltTextByCulture = null,
+            AltText = invariantAltText,
+            AltTextByCulture = altTextByCulture,
         };
 
-        Assert.AreEqual("English alt text", ResolveAltText(accessor, dto));
+        Assert.AreEqual(expected, ResolveAltText(accessor, dto));
     }
 
-    [Test]
-    public void AltText_Returns_Culture_Specific_When_Match()
-    {
-        var variationContext = new VariationContext("da");
-        var accessor = MockAccessor(variationContext);
-
-        var dto = new MediaPicker3PropertyEditor.MediaPicker3PropertyValueEditor.MediaWithCropsDto
-        {
-            AltText = "English alt text",
-            AltTextByCulture = new Dictionary<string, string> { ["da"] = "Dansk alt tekst" },
-        };
-
-        Assert.AreEqual("Dansk alt tekst", ResolveAltText(accessor, dto));
-    }
-
-    [Test]
-    public void AltText_Falls_Back_To_Invariant_When_Culture_Not_In_Dict()
-    {
-        var variationContext = new VariationContext("fr");
-        var accessor = MockAccessor(variationContext);
-
-        var dto = new MediaPicker3PropertyEditor.MediaPicker3PropertyValueEditor.MediaWithCropsDto
-        {
-            AltText = "Fallback alt text",
-            AltTextByCulture = new Dictionary<string, string> { ["da"] = "Dansk alt tekst" },
-        };
-
-        Assert.AreEqual("Fallback alt text", ResolveAltText(accessor, dto));
-    }
-
-    [Test]
-    public void AltText_Returns_Invariant_When_No_Active_Culture()
-    {
-        // VariationContext with null/empty culture = invariant
-        var variationContext = new VariationContext(null);
-        var accessor = MockAccessor(variationContext);
-
-        var dto = new MediaPicker3PropertyEditor.MediaPicker3PropertyValueEditor.MediaWithCropsDto
-        {
-            AltText = "Invariant alt text",
-            AltTextByCulture = new Dictionary<string, string> { ["da"] = "Dansk alt tekst" },
-        };
-
-        Assert.AreEqual("Invariant alt text", ResolveAltText(accessor, dto));
-    }
-
-    [Test]
-    public void ImageCrop_AltText_Is_Exposed_In_Delivery_Api()
+    [TestCase("A person standing by a window", "A person standing by a window", TestName = "ImageCrop alt text is exposed in the Delivery API")]
+    [TestCase(null, null, TestName = "ImageCrop alt text is null when not set")]
+    public void ImageCrop_AltText_Is_Exposed_In_Delivery_Api(string? altText, string? expected)
     {
         var sourceCrop = new ImageCropperValue.ImageCropperCrop
         {
             Alias = "portrait",
             Width = 800,
             Height = 600,
-            AltText = "A person standing by a window",
+            AltText = altText,
         };
 
         var imageCropperValue = new ImageCropperValue { Crops = [sourceCrop] };
         var apiCrops = imageCropperValue.GetImageCrops()?.ToList();
 
         Assert.IsNotNull(apiCrops);
-        Assert.AreEqual(1, apiCrops.Count);
-        Assert.AreEqual("A person standing by a window", apiCrops[0].AltText);
-    }
-
-    [Test]
-    public void ImageCrop_AltText_Is_Null_When_Not_Set()
-    {
-        var sourceCrop = new ImageCropperValue.ImageCropperCrop
-        {
-            Alias = "square",
-            Width = 400,
-            Height = 400,
-        };
-
-        var imageCropperValue = new ImageCropperValue { Crops = [sourceCrop] };
-        var apiCrops = imageCropperValue.GetImageCrops()?.ToList();
-
-        Assert.IsNotNull(apiCrops);
-        Assert.IsNull(apiCrops![0].AltText);
+        Assert.AreEqual(1, apiCrops!.Count);
+        Assert.AreEqual(expected, apiCrops[0].AltText);
     }
 
     [Test]

@@ -352,6 +352,37 @@ export class UmbImageCropperElement extends UmbLitElement {
 		this.#updateImageScale(event.deltaY * -this.#SCROLL_ZOOM_SPEED, event.clientX, event.clientY);
 	};
 
+	#renderPanControls() {
+		return html`
+			<div id="pan-controls">
+				<button
+					class="pan-btn pan-up"
+					aria-label=${this.localize.term('imagecropper_panUp')}
+					@click=${() => this.#panImage(0, -20)}>
+					<uui-icon name="icon-arrow-up" aria-hidden="true"></uui-icon>
+				</button>
+				<button
+					class="pan-btn pan-left"
+					aria-label=${this.localize.term('imagecropper_panLeft')}
+					@click=${() => this.#panImage(-20, 0)}>
+					<uui-icon name="icon-arrow-left" aria-hidden="true"></uui-icon>
+				</button>
+				<button
+					class="pan-btn pan-right"
+					aria-label=${this.localize.term('imagecropper_panRight')}
+					@click=${() => this.#panImage(20, 0)}>
+					<uui-icon name="icon-arrow-right" aria-hidden="true"></uui-icon>
+				</button>
+				<button
+					class="pan-btn pan-down"
+					aria-label=${this.localize.term('imagecropper_panDown')}
+					@click=${() => this.#panImage(0, 20)}>
+					<uui-icon name="icon-arrow-down" aria-hidden="true"></uui-icon>
+				</button>
+			</div>
+		`;
+	}
+
 	override render() {
 		return html`
 			<div
@@ -362,32 +393,7 @@ export class UmbImageCropperElement extends UmbLitElement {
 				aria-describedby="crop-viewport-hint">
 				<img id="image" src=${this.src} alt="" />
 				<div id="mask"></div>
-				<div id="pan-controls">
-					<button
-						class="pan-btn pan-up"
-						aria-label=${this.localize.term('imagecropper_panUp')}
-						@click=${() => this.#panImage(0, -20)}>
-						<uui-icon name="icon-arrow-up" aria-hidden="true"></uui-icon>
-					</button>
-					<button
-						class="pan-btn pan-left"
-						aria-label=${this.localize.term('imagecropper_panLeft')}
-						@click=${() => this.#panImage(-20, 0)}>
-						<uui-icon name="icon-arrow-left" aria-hidden="true"></uui-icon>
-					</button>
-					<button
-						class="pan-btn pan-right"
-						aria-label=${this.localize.term('imagecropper_panRight')}
-						@click=${() => this.#panImage(20, 0)}>
-						<uui-icon name="icon-arrow-right" aria-hidden="true"></uui-icon>
-					</button>
-					<button
-						class="pan-btn pan-down"
-						aria-label=${this.localize.term('imagecropper_panDown')}
-						@click=${() => this.#panImage(0, 20)}>
-						<uui-icon name="icon-arrow-down" aria-hidden="true"></uui-icon>
-					</button>
-				</div>
+				${this.#renderPanControls()}
 			</div>
 			<p id="crop-viewport-hint">
 				<umb-localize key="imagecropper_cropHint"
