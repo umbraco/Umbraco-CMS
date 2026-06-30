@@ -1,5 +1,5 @@
 import { UMB_BACKOFFICE_CONTEXT } from '../backoffice.context.js';
-import { css, html, customElement, state, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, nothing, query } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
@@ -19,6 +19,9 @@ import { UMB_SYSINFO_MODAL } from '@umbraco-cms/backoffice/sysinfo';
 export class UmbBackofficeHeaderLogoElement extends UmbLitElement {
 	@state()
 	private _version?: string;
+
+	@query('#logo-popover')
+	private _popover?: HTMLElement;
 
 	constructor() {
 		super();
@@ -62,11 +65,10 @@ export class UmbBackofficeHeaderLogoElement extends UmbLitElement {
 	}
 
 	async #openSystemInformation() {
-		// WebKit/Safari Fix: Programmatically close the popover before opening the modal.
-		// This prevents Safari's light-dismiss logic from permanently locking the UI state.
-		const popover = this.shadowRoot?.querySelector('#logo-popover') as HTMLElement;
-		if (popover && typeof popover.hidePopover === 'function') {
-			popover.hidePopover();
+		// WebKit keeps the popovertarget toggle state "open" after the modal light-dismisses
+		// the popover, leaving the logo button unresponsive until reload — close it explicitly first.
+		if (this._popover?.matches(':popover-open')) {
+			this._popover.hidePopover();
 		}
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 		if (!modalManager) {
