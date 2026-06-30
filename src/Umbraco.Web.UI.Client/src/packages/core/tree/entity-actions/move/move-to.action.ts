@@ -14,6 +14,11 @@ export class UmbMoveToEntityAction extends UmbEntityActionBase<MetaEntityActionM
 		return (treeItem) => treeItem.unique !== unique;
 	}
 
+	#searchConfig() {
+		const alias = this.args.meta.searchProviderAlias;
+		return alias ? { providerAlias: alias } : undefined;
+	}
+
 	override async execute() {
 		if (!this.args.unique) throw new Error('Unique is not available');
 		if (!this.args.entityType) throw new Error('Entity Type is not available');
@@ -24,9 +29,6 @@ export class UmbMoveToEntityAction extends UmbEntityActionBase<MetaEntityActionM
 		]);
 
 		const treeExpansion = ancestors.length ? linkEntityExpansionEntries(ancestors) : undefined;
-		const search = this.args.meta.searchProviderAlias
-			? { providerAlias: this.args.meta.searchProviderAlias }
-			: undefined;
 
 		const value = await umbOpenModal(this, UMB_TREE_PICKER_MODAL, {
 			data: {
@@ -35,7 +37,7 @@ export class UmbMoveToEntityAction extends UmbEntityActionBase<MetaEntityActionM
 				expandTreeRoot: true,
 				treeExpansion,
 				pickableFilter,
-				search,
+				search: this.#searchConfig(),
 			},
 		});
 
