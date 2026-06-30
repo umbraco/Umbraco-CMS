@@ -1530,7 +1530,7 @@ namespace Umbraco.Extensions
         /// Appends an UPDATE statement to the specified SQL query.
         /// </summary>
         /// <param name="sql">The SQL query to which the UPDATE statement will be appended.</param>
-        /// <returns>The SQL query with the appended UPDATE statement.</returns
+        /// <returns>The SQL query with the appended UPDATE statement.</returns>
         public static Sql<ISqlContext> Update<TDto>(this Sql<ISqlContext> sql, Func<SqlUpd<TDto>, SqlUpd<TDto>> updates)
         {
             Type type = typeof(TDto);

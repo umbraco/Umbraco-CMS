@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
@@ -122,6 +123,43 @@ internal sealed class DocumentUrlServiceContentTreeChangeTests : UmbracoIntegrat
         return (ContentType)contentType;
     }
 
+    private ContentType CreateCultureVariantContentTypeWithUrlAlias(int templateId)
+    {
+        var contentType = new ContentTypeBuilder()
+            .WithAlias("variantTestPageWithAlias")
+            .WithName("Variant Test Page With Alias")
+            .WithContentVariation(ContentVariation.Culture)
+            .AddPropertyGroup()
+                .WithAlias("content")
+                .WithName("Content")
+                .WithSortOrder(1)
+                .WithSupportsPublishing(true)
+                .AddPropertyType()
+                    .WithAlias("title")
+                    .WithName("Title")
+                    .WithSortOrder(1)
+                    .Done()
+                .AddPropertyType()
+                    .WithAlias(Constants.Conventions.Content.UrlAlias)
+                    .WithName("URL Alias")
+                    .WithSortOrder(2)
+                    .WithDataTypeId(Constants.DataTypes.Textbox)
+                    .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.TextBox)
+                    .WithValueStorageType(ValueStorageType.Nvarchar)
+                    .WithVariations(ContentVariation.Culture)
+                    .Done()
+                .Done()
+            .AddAllowedTemplate()
+                .WithId(templateId)
+                .WithAlias("variantTemplate")
+                .WithName("Variant Template")
+                .Done()
+            .WithDefaultTemplateId(templateId)
+            .Build();
+
+        return (ContentType)contentType;
+    }
+
     private List<PublishedDocumentUrlSegment> GetDbSegments(Guid documentKey)
     {
         using (CoreScopeProvider.CreateCoreScope(autoComplete: true))
@@ -129,6 +167,22 @@ internal sealed class DocumentUrlServiceContentTreeChangeTests : UmbracoIntegrat
             return DocumentUrlRepository.GetAll()
                 .Where(r => r.DocumentKey == documentKey)
                 .ToList();
+        }
+    }
+
+    private void DeleteDbSegments(Guid documentKey)
+    {
+        using (CoreScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            DocumentUrlRepository.DeleteByDocumentKey(new[] { documentKey });
+        }
+    }
+
+    private void DeleteDbAliases(Guid documentKey)
+    {
+        using (CoreScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            DocumentUrlAliasRepository.DeleteByDocumentKey(new[] { documentKey });
         }
     }
 
@@ -171,6 +225,77 @@ internal sealed class DocumentUrlServiceContentTreeChangeTests : UmbracoIntegrat
                 GetDbAliases(page.Key).Any(a => a.Alias == "distributed-cache-alias"),
                 Is.True,
                 "URL aliases must be persisted to the database even when publishing under a distributed-cache-only notification publisher.");
+        });
+    }
+
+    /// <summary>
+    /// When a content type variation change is dispatched under a scoped notification publisher restricted to
+    /// <see cref="IDistributedCacheNotificationHandler"/> (as Umbraco Deploy does on its restore/import scopes),
+    /// <see cref="DocumentUrlServiceContentTypeChangedNotificationHandler"/> must still rebuild and persist URL
+    /// segments and aliases to the database; otherwise routing data is lost on the next restart.
+    /// </summary>
+    [Test]
+    public async Task ContentTypeVariationChange_UnderDistributedCacheOnlyPublisher_StillWritesUrlSegmentsAndAliasesToDatabase()
+    {
+        // Arrange — a culture-variant content type with a published variant page, so the content-tree-change
+        // handler persists URL segments and aliases to the database on publish.
+        var template = TemplateBuilder.CreateTextPageTemplate("variantTemplate");
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+
+        var variantContentType = CreateCultureVariantContentTypeWithUrlAlias(template.Id);
+        await ContentTypeService.CreateAsync(variantContentType, Constants.Security.SuperUserKey);
+
+        var isoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
+
+        var page = new ContentBuilder()
+            .WithContentType(variantContentType)
+            .WithCultureName(isoCode, "Variant Page")
+            .Build();
+        page.SetValue(Constants.Conventions.Content.UrlAlias, "variation-change-alias", isoCode);
+        page.ParentId = RootPage.Id;
+        ContentService.Save(page, -1);
+        ContentService.Publish(page, [isoCode]);
+
+        // Pre-condition: publish persisted segments and the alias.
+        Assert.That(
+            GetDbSegments(page.Key),
+            Is.Not.Empty,
+            "Pre-condition: publish must have written URL segments.");
+        Assert.That(
+            GetDbAliases(page.Key).Any(a => a.Alias == "variation-change-alias"),
+            Is.True,
+            "Pre-condition: publish must have written the URL alias.");
+
+        // Clear the persisted rows so the handler's rebuild is observable (without this, the assertions
+        // below would pass regardless of whether the handler ran).
+        DeleteDbSegments(page.Key);
+        DeleteDbAliases(page.Key);
+        Assert.That(GetDbSegments(page.Key), Is.Empty, "Pre-condition: segments cleared before dispatch.");
+        Assert.That(GetDbAliases(page.Key), Is.Empty, "Pre-condition: aliases cleared before dispatch.");
+
+        // Act — dispatch a content type variation change under a distributed-cache-only notification publisher.
+        var notification = new ContentTypeChangedNotification(
+            new ContentTypeChange<IContentType>(variantContentType, ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.VariationChanged),
+            new EventMessages());
+
+        var publisher = new ScopedNotificationPublisher<IDistributedCacheNotificationHandler>(EventAggregator);
+        using (ICoreScope scope = CoreScopeProvider.CreateCoreScope(scopedNotificationPublisher: publisher))
+        {
+            scope.Notifications.Publish(notification);
+            scope.Complete();
+        }
+
+        // Assert — the handler ran under the distributed-cache-only publisher and re-persisted to the database.
+        Assert.Multiple(() =>
+        {
+            Assert.That(
+                GetDbSegments(page.Key),
+                Is.Not.Empty,
+                "URL segments must be persisted to the database when a content type variation change is dispatched under a distributed-cache-only notification publisher.");
+            Assert.That(
+                GetDbAliases(page.Key).Any(a => a.Alias == "variation-change-alias"),
+                Is.True,
+                "URL aliases must be persisted to the database when a content type variation change is dispatched under a distributed-cache-only notification publisher.");
         });
     }
 
