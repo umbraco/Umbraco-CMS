@@ -122,7 +122,7 @@ public class HtmlHelperExtensionMethodsTests
     [Test]
     public void Strip_Html_Ensure_Spacing()
     {
-        const string text = "<h1>Test header</h1><p>Some <strong>text</strong>content</p>";
+        const string text = "<h1>Test header</h1><p>Some <strong>text</strong> content</p>";
 
         var result = _htmlHelper.StripHtml(text).ToString();
 
