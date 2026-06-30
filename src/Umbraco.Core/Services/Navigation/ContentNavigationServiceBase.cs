@@ -493,7 +493,8 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
             return false; // Node with this key already exists
         }
 
-        parentNode?.AddChild(_navigation.Structure, key);
+        // If sortOrder supplied → caller is asserting the position, preserve it; otherwise append last.
+        parentNode?.AddChild(_navigation.Structure, key, appendAsLastItem: sortOrder is null);
 
         _navigation.Invalidate();
         return true;
@@ -1027,7 +1028,10 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
             childrenWithSortOrder.Add((childNodeKey, childNode.SortOrder));
         }
 
-        childrenWithSortOrder.Sort((a, b) => a.SortOrder.CompareTo(b.SortOrder));
+        // Shares NavigationNode's canonical sibling ordering (SortOrder, then key tie-break) so the
+        // content-type-filtered path stays in sync with the unfiltered, cached path.
+        childrenWithSortOrder.Sort((a, b) =>
+            NavigationNode.CompareBySortOrderThenKey(a.SortOrder, a.ChildNodeKey, b.SortOrder, b.ChildNodeKey));
         return childrenWithSortOrder.ConvertAll(childWithSortOrder => childWithSortOrder.ChildNodeKey);
     }
 
@@ -1076,10 +1080,12 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
                 continue;
             }
 
-            // If the parent node exists in the nodesStructure, add the node to the parent's children (parent is set as well)
+            // If the parent node exists in the nodesStructure, add the node to the parent's children (parent is set as well).
+            // The node already carries its persisted SortOrder (set on construction above), so the child is linked without
+            // reassigning it — the load order here is by path (parent-first), not sort order, and must not redefine it.
             if (nodesStructure.TryGetValue(parentKey, out NavigationNode? parentNode))
             {
-                parentNode.AddChild(nodesStructure, entity.Key);
+                parentNode.AddChild(nodesStructure, entity.Key, appendAsLastItem: false);
             }
         }
     }
