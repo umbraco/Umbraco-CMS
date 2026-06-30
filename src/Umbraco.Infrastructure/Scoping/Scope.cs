@@ -274,7 +274,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
         /// <summary>
         /// Gets the <see cref="IScopeContext"/> associated with this scope, which is used for attaching and detaching resources or state during the scope's lifetime.
         /// </summary>
-        /// <remarks>the context (for attaching & detaching only)</remarks>
+        /// <remarks>the context (for attaching &amp; detaching only)</remarks>
         public IScopeContext? Context { get; }
 
         /// <summary>

@@ -173,7 +173,7 @@ public class MigrationPlan
     /// </summary>
     /// <typeparam name="TMigration">The type of migration to apply for this transition.</typeparam>
     /// <param name="targetState">The unique identifier of the target state.</param>
-    /// <returns>The updated <see cref="MigrationPlan"/> instance.</returns
+    /// <returns>The updated <see cref="MigrationPlan"/> instance.</returns>
     public MigrationPlan To<TMigration>(Guid targetState)
         where TMigration : AsyncMigrationBase
         => To(targetState, typeof(TMigration));
