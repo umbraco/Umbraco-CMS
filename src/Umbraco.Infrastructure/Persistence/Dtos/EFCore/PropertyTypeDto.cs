@@ -110,4 +110,10 @@ public class PropertyTypeDto
     /// Gets or sets the <see cref="EFCore.PropertyTypeGroupDto"/> this property type belongs to, if any.
     /// </summary>
     public PropertyTypeGroupDto? PropertyTypeGroupDto { get; set; }
+
+    /// <summary>
+    /// Gets or sets the <see cref="EFCore.MemberPropertyTypeDto"/> extending this property type with member-specific
+    /// metadata, if any (only present for property types on member types).
+    /// </summary>
+    public MemberPropertyTypeDto? MemberPropertyTypeDto { get; set; }
 }
