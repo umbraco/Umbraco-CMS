@@ -5,6 +5,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { customElement, state, css, html } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbRoute, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
+import { createObservablePart } from '@umbraco-cms/backoffice/observable-api';
 
 @customElement('umb-media-workspace-editor')
 export class UmbMediaWorkspaceEditorElement extends UmbLitElement {
@@ -13,8 +14,7 @@ export class UmbMediaWorkspaceEditorElement extends UmbLitElement {
 	private _splitViewElement = new UmbMediaWorkspaceSplitViewElement();
 
 	#workspaceContext?: typeof UMB_MEDIA_WORKSPACE_CONTEXT.TYPE;
-	#variants?: Array<UmbMediaVariantOptionModel>;
-	#isForbidden = false;
+	#variants?: Array<Pick<UmbMediaVariantOptionModel, 'culture' | 'segment' | 'unique'>>;
 
 	@state()
 	private _routes?: Array<UmbRoute>;
@@ -28,30 +28,26 @@ export class UmbMediaWorkspaceEditorElement extends UmbLitElement {
 		this.consumeContext(UMB_MEDIA_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
 			this.#observeVariants();
-			this.#observeForbidden();
 			this.#observeLoading();
 		});
 	}
 
 	#observeVariants() {
 		this.observe(
-			this.#workspaceContext?.variantOptions,
+			this.#workspaceContext
+				? createObservablePart(this.#workspaceContext.variantOptions, (variants) =>
+						variants.map((v) => ({
+							culture: v.culture,
+							segment: v.segment,
+							unique: v.unique,
+						})),
+					)
+				: undefined,
 			(options) => {
 				this.#variants = options;
 				this._generateRoutes();
 			},
 			'_observeVariants',
-		);
-	}
-
-	#observeForbidden() {
-		this.observe(
-			this.#workspaceContext?.forbidden.isOn,
-			(forbidden) => {
-				this.#isForbidden = forbidden ?? false;
-				this._generateRoutes();
-			},
-			'_observeForbidden',
 		);
 	}
 
@@ -67,8 +63,7 @@ export class UmbMediaWorkspaceEditorElement extends UmbLitElement {
 
 	private async _generateRoutes() {
 		if (!this.#variants || this.#variants.length === 0) {
-			this._routes = [];
-			this.#ensureForbiddenRoute(this._routes);
+			this._routes = [this.#createNotFoundRoute()];
 			return;
 		}
 
@@ -113,25 +108,21 @@ export class UmbMediaWorkspaceEditorElement extends UmbLitElement {
 			});
 		}
 
-		this.#ensureForbiddenRoute(routes);
+		routes.push(this.#createNotFoundRoute());
 
 		this._routes = routes;
 	}
 
-	/**
-	 * Ensure that there is a route to handle forbidden access.
-	 * This route will display a forbidden message when the user does not have permission to access certain resources.
-	 * Also handles not found routes.
-	 * @param {Array<UmbRoute>} routes - The array of routes to append the forbidden route to
-	 */
-	#ensureForbiddenRoute(routes: Array<UmbRoute> = []) {
-		routes.push({
+	#createNotFoundRoute(): UmbRoute {
+		return {
 			path: '**',
 			component: async () => {
 				const router = await import('@umbraco-cms/backoffice/router');
-				return this.#isForbidden ? router.UmbRouteForbiddenElement : router.UmbRouteNotFoundElement;
+				return this.#workspaceContext?.forbidden.getIsOn()
+					? router.UmbRouteForbiddenElement
+					: router.UmbRouteNotFoundElement;
 			},
-		});
+		};
 	}
 
 	private _gotWorkspaceRoute = (e: UmbRouterSlotInitEvent) => {
