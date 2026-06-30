@@ -521,7 +521,7 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
     /// </summary>
     /// <param name="objectType">The unique identifier of the object type.</param>
     /// <param name="keys">Optional array of entity keys to filter the paths. If not provided, paths for all entities of the specified type are returned.</param>
-    /// <returns>An enumerable of <see cref="Umbraco.Cms.Core.Models.TreeEntityPath"/> representing the entity paths.</returns>
+    /// <returns>An enumerable of <see cref="TreeEntityPath"/> representing the entity paths.</returns>
     public IEnumerable<TreeEntityPath> GetAllPaths(Guid objectType, params Guid[] keys) =>
         keys.Any()
             ? keys.Distinct().SelectByGroups(
