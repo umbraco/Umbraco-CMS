@@ -28,7 +28,7 @@ function compareDefault(a: UmbEntityVariantOptionModel, b: UmbEntityVariantOptio
 	return (a.language?.isDefault ? -1 : 1) - (b.language?.isDefault ? -1 : 1);
 }
 
-const _isPublishedState = (state: string | undefined): boolean =>
+const _isPublishedState = (state: string | null | undefined): boolean =>
 	state === UmbPublishableVariantState.PUBLISHED_PENDING_CHANGES || state === UmbPublishableVariantState.PUBLISHED;
 
 /**
