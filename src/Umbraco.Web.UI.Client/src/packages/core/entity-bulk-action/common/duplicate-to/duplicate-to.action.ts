@@ -20,6 +20,9 @@ export class UmbMediaDuplicateEntityBulkAction extends UmbEntityBulkActionBase<M
 				foldersOnly: this.args.meta.foldersOnly,
 				hideTreeRoot: this.args.meta.hideTreeRoot,
 				treeAlias: this.args.meta.treeAlias,
+				search: this.args.meta.searchProviderAlias
+					? { providerAlias: this.args.meta.searchProviderAlias }
+					: undefined,
 			},
 		});
 

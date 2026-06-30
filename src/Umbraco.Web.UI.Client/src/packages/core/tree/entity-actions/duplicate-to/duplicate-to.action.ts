@@ -1,4 +1,4 @@
-import { UMB_DUPLICATE_TO_MODAL } from './modal/duplicate-to-modal.token.js';
+import { UMB_TREE_PICKER_MODAL } from '../../tree-picker-modal/index.js';
 import type { MetaEntityActionDuplicateToKind, UmbDuplicateToRepository } from './types.js';
 import type { UmbTreeRepository } from '../../data/tree-repository.interface.js';
 import { UmbEntityActionBase, UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
@@ -14,17 +14,18 @@ export class UmbDuplicateToEntityAction extends UmbEntityActionBase<MetaEntityAc
 
 		const ancestors = await this.#requestAncestors();
 
-		const value = await umbOpenModal(this, UMB_DUPLICATE_TO_MODAL, {
+		const value = await umbOpenModal(this, UMB_TREE_PICKER_MODAL, {
 			data: {
-				unique: this.args.unique,
-				entityType: this.args.entityType,
+				headline: '#actions_copyTo',
+				confirmLabel: '#general_copy',
 				treeAlias: this.args.meta.treeAlias,
 				foldersOnly: this.args.meta.foldersOnly,
+				expandTreeRoot: true,
 				treeExpansion: ancestors.length ? linkEntityExpansionEntries(ancestors) : undefined,
 			},
 		});
 
-		const destinationUnique = value.destination.unique;
+		const destinationUnique = value.selection[0];
 		if (destinationUnique === undefined) throw new Error('Destination Unique is not available');
 
 		const duplicateRepository = await createExtensionApiByAlias<UmbDuplicateToRepository>(

@@ -3,13 +3,27 @@ import type { UmbDuplicateToModalData, UmbDuplicateToModalValue } from './duplic
 import { html, customElement, nothing, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
+import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import type { UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
 
 const elementName = 'umb-duplicate-to-modal';
+
+/**
+ * @deprecated Deprecated since v17. The "Duplicate to" entity action now uses the shared `UMB_TREE_PICKER_MODAL`. Scheduled for removal in Umbraco 19.
+ */
 @customElement(elementName)
 export class UmbDuplicateToModalElement extends UmbModalBaseElement<UmbDuplicateToModalData, UmbDuplicateToModalValue> {
 	@state()
 	private _destinationUnique?: string | null;
+
+	constructor() {
+		super();
+		new UmbDeprecation({
+			deprecated: 'UmbDuplicateToModalElement (umb-duplicate-to-modal / Umb.Modal.DuplicateTo)',
+			removeInVersion: '19.0.0',
+			solution: 'Use the shared UMB_TREE_PICKER_MODAL instead, passing `headline` and `confirmLabel`.',
+		}).warn();
+	}
 
 	private get _treeExpansion() {
 		return this.data?.treeExpansion ?? [];

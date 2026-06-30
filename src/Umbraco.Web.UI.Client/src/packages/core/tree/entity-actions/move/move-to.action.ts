@@ -30,6 +30,9 @@ export class UmbMoveToEntityAction extends UmbEntityActionBase<MetaEntityActionM
 				expandTreeRoot: true,
 				treeExpansion: ancestors.length ? linkEntityExpansionEntries(ancestors) : undefined,
 				pickableFilter,
+				search: this.args.meta.searchProviderAlias
+					? { providerAlias: this.args.meta.searchProviderAlias }
+					: undefined,
 			},
 		});
 
