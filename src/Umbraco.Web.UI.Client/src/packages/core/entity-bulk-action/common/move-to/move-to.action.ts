@@ -15,14 +15,16 @@ export class UmbMediaMoveEntityBulkAction extends UmbEntityBulkActionBase<MetaEn
 	async execute() {
 		if (this.selection?.length === 0) return;
 
+		const search = this.args.meta.searchProviderAlias
+			? { providerAlias: this.args.meta.searchProviderAlias }
+			: undefined;
+
 		const value = await umbOpenModal(this, UMB_TREE_PICKER_MODAL, {
 			data: {
 				foldersOnly: this.args.meta.foldersOnly,
 				hideTreeRoot: this.args.meta.hideTreeRoot,
 				treeAlias: this.args.meta.treeAlias,
-				search: this.args.meta.searchProviderAlias
-					? { providerAlias: this.args.meta.searchProviderAlias }
-					: undefined,
+				search,
 			},
 		});
 

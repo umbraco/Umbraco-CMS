@@ -23,16 +23,19 @@ export class UmbMoveToEntityAction extends UmbEntityActionBase<MetaEntityActionM
 			this._getPickableFilter(this.args.unique),
 		]);
 
+		const treeExpansion = ancestors.length ? linkEntityExpansionEntries(ancestors) : undefined;
+		const search = this.args.meta.searchProviderAlias
+			? { providerAlias: this.args.meta.searchProviderAlias }
+			: undefined;
+
 		const value = await umbOpenModal(this, UMB_TREE_PICKER_MODAL, {
 			data: {
 				treeAlias: this.args.meta.treeAlias,
 				foldersOnly: this.args.meta.foldersOnly,
 				expandTreeRoot: true,
-				treeExpansion: ancestors.length ? linkEntityExpansionEntries(ancestors) : undefined,
+				treeExpansion,
 				pickableFilter,
-				search: this.args.meta.searchProviderAlias
-					? { providerAlias: this.args.meta.searchProviderAlias }
-					: undefined,
+				search,
 			},
 		});
 
