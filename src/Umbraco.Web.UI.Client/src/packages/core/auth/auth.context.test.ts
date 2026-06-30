@@ -1,5 +1,5 @@
 import { UmbAuthContext } from './auth.context.js';
-import { expect } from '@open-wc/testing';
+import { aTimeout, expect } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 
@@ -166,6 +166,78 @@ describe('UmbAuthContext', () => {
 		it('generates correct post-logout redirect URL', () => {
 			const url = context.getPostLogoutRedirectUrl();
 			expect(url).to.contain('/umbraco/logout');
+		});
+	});
+	describe('Refresh failure handling', () => {
+		let fetchCalls: Array<string>;
+		let fetchResponder: () => Response;
+		let channel: BroadcastChannel;
+		const realFetch = window.fetch;
+
+		const invalidGrantResponse = () =>
+			new Response(JSON.stringify({ error: 'invalid_grant', error_description: 'The token is no longer valid.' }), {
+				status: 400,
+				headers: { 'Content-Type': 'application/json' },
+			});
+
+		beforeEach(() => {
+			fetchCalls = [];
+			window.fetch = ((input: RequestInfo | URL) => {
+				fetchCalls.push(input.toString());
+				return Promise.resolve(fetchResponder());
+			}) as typeof window.fetch;
+			channel = new BroadcastChannel('umb:auth');
+		});
+
+		afterEach(() => {
+			window.fetch = realFetch;
+			channel.close();
+		});
+
+		it('does not call /token again after a definitive invalid_grant failure', async () => {
+			fetchResponder = invalidGrantResponse;
+
+			expect(await context.validateToken()).to.be.false;
+			expect(await context.validateToken()).to.be.false;
+
+			expect(fetchCalls).to.have.lengthOf(1);
+		});
+
+		it('times the user out on a definitive invalid_grant failure', async () => {
+			fetchResponder = invalidGrantResponse;
+			let timeOutCalls = 0;
+			context.timeOut = () => {
+				timeOutCalls++;
+			};
+
+			await context.validateToken();
+
+			expect(timeOutCalls).to.equal(1);
+		});
+
+		it('retries /token after a transient network failure', async () => {
+			fetchResponder = () => {
+				throw new TypeError('Failed to fetch');
+			};
+
+			expect(await context.validateToken()).to.be.false;
+			expect(await context.validateToken()).to.be.false;
+
+			expect(fetchCalls).to.have.lengthOf(2);
+		});
+
+		it('attempts /token again once a new session is established', async () => {
+			fetchResponder = invalidGrantResponse;
+			await context.validateToken();
+			expect(fetchCalls).to.have.lengthOf(1);
+
+			// A peer tab (or completed re-authentication) establishes a new session
+			const now = Math.floor(Date.now() / 1000);
+			channel.postMessage({ type: 'sessionUpdate', accessTokenExpiresAt: now + 60, expiresAt: now + 240 });
+			await aTimeout(50);
+
+			await context.validateToken();
+			expect(fetchCalls).to.have.lengthOf(2);
 		});
 	});
 });

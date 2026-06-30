@@ -306,5 +306,6 @@ public class SecuritySettings
     ///         TODO (V18): Remove the standalone <see cref="MemberPasswordConfigurationSettings"/>
     ///         registration and consolidate all consumers to use this property.
     ///     </para>
+    /// </remarks>
     public MemberPasswordConfigurationSettings MemberPassword { get; set; } = new();
 }

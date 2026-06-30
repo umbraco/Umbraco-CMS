@@ -301,7 +301,7 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
     /// Returns the specified name quoted with double quotes for use in SQL statements.
     /// </summary>
     /// <param name="name">The name to quote. Can be <c>null</c>.</param>
-    /// <returns>The quoted name as a string, or <c>"null"</c> if <paramref name="name"/> is <c>null</c>.</returns
+    /// <returns>The quoted name as a string, or <c>"null"</c> if <paramref name="name"/> is <c>null</c>.</returns>
     public virtual string GetQuotedName(string? name) => $"\"{name}\"";
 
     /// <summary>

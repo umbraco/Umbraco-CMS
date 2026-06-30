@@ -1,13 +1,13 @@
 import type { UmbDocumentDetailModel, UmbDocumentVariantModel } from '../../types.js';
-import { UmbPublishedPendingChangesManagerBase } from '@umbraco-cms/backoffice/content';
+import { UmbContentPublishedPendingChangesManagerBase } from '@umbraco-cms/backoffice/content';
 
 /**
  * Manages the pending changes for a published document.
  * @exports
  * @class UmbDocumentPublishedPendingChangesManager
- * @augments {UmbPublishedPendingChangesManagerBase}
+ * @augments {UmbContentPublishedPendingChangesManagerBase}
  */
-export class UmbDocumentPublishedPendingChangesManager extends UmbPublishedPendingChangesManagerBase<
+export class UmbDocumentPublishedPendingChangesManager extends UmbContentPublishedPendingChangesManagerBase<
 	UmbDocumentDetailModel,
 	UmbDocumentVariantModel
 > {

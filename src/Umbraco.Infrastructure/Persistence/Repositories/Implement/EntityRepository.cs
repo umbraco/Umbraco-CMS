@@ -450,7 +450,7 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
     /// </summary>
     /// <param name="objectType">The unique identifier of the object type to retrieve entities for.</param>
     /// <param name="ids">An optional array of integer IDs to filter the entities. If not provided, all entities of the specified type are returned.</param>
-    /// <returns>An enumerable collection of entities matching the specified criteria.</returns
+    /// <returns>An enumerable collection of entities matching the specified criteria.</returns>
     public IEnumerable<IEntitySlim> GetAll(Guid objectType, params Guid[] keys) =>
         keys.Length > 0
             ? PerformGetAll(objectType, sql => sql.WhereIn<NodeDto>(x => x.UniqueId, keys.Distinct()))
