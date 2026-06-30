@@ -6,7 +6,7 @@ import { UmbMergeContentVariantDataController } from '../controller/merge-conten
 import { jsonStringComparison, UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbEntityVariantModel } from '@umbraco-cms/backoffice/variant';
 
-export interface UmbPublishedPendingChangesManagerProcessArgs<TDetailModel extends UmbContentDetailModel> {
+export interface UmbContentPublishedPendingChangesManagerProcessArgs<TDetailModel extends UmbContentDetailModel> {
 	persistedData: TDetailModel;
 	publishedData: TDetailModel;
 }
@@ -15,10 +15,10 @@ export interface UmbPublishedPendingChangesManagerProcessArgs<TDetailModel exten
  * Base class for managing pending changes between persisted and published content.
  * @exports
  * @abstract
- * @class UmbPublishedPendingChangesManagerBase
+ * @class UmbContentPublishedPendingChangesManagerBase
  * @augments {UmbControllerBase}
  */
-export abstract class UmbPublishedPendingChangesManagerBase<
+export abstract class UmbContentPublishedPendingChangesManagerBase<
 	TDetailModel extends UmbContentDetailModel<TVariantModel>,
 	TVariantModel extends UmbEntityVariantModel = UmbEntityVariantModel,
 > extends UmbControllerBase {
@@ -28,10 +28,10 @@ export abstract class UmbPublishedPendingChangesManagerBase<
 
 	/**
 	 * Checks each variant if there are any pending changes to publish.
-	 * @param {UmbPublishedPendingChangesManagerProcessArgs<TDetailModel>} args - The arguments for the process.
+	 * @param {UmbContentPublishedPendingChangesManagerProcessArgs<TDetailModel>} args - The arguments for the process.
 	 * @returns {Promise<void>}
 	 */
-	async process(args: UmbPublishedPendingChangesManagerProcessArgs<TDetailModel>): Promise<void> {
+	async process(args: UmbContentPublishedPendingChangesManagerProcessArgs<TDetailModel>): Promise<void> {
 		if (!args.persistedData) throw new Error('Persisted data is missing');
 		if (!args.publishedData) throw new Error('Published data is missing');
 		if (args.persistedData.unique !== args.publishedData.unique)
@@ -44,7 +44,7 @@ export abstract class UmbPublishedPendingChangesManagerBase<
 	}
 
 	async #processVariant(
-		args: UmbPublishedPendingChangesManagerProcessArgs<TDetailModel>,
+		args: UmbContentPublishedPendingChangesManagerProcessArgs<TDetailModel>,
 		variantId: UmbVariantId,
 	): Promise<UmbPublishedVariantWithPendingChanges | null> {
 		const mergedData = await new UmbMergeContentVariantDataController(this).process(
