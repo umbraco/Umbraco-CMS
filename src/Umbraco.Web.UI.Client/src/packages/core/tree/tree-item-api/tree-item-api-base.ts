@@ -1,7 +1,8 @@
-import type { UmbTreeItemModel } from '../../types.js';
-import { UMB_TREE_CONTEXT } from '../../tree.context.token.js';
-import { UMB_TREE_ITEM_API_CONTEXT } from '../tree-item.context.token.js';
-import { UmbTreeItemEntityActionManager } from '../tree-item-entity-action.manager.js';
+import type { UmbTreeItemModel } from '../types.js';
+import { UMB_TREE_CONTEXT } from '../tree.context.token.js';
+import { UMB_TREE_ITEM_BASE_CONTEXT } from '../tree-item/tree-item.context.token.js';
+import { UmbTreeItemEntityActionManager } from '../tree-item/tree-item-entity-action.manager.js';
+import type { UmbTreeItemApi } from './tree-item-api.interface.js';
 import { combineLatest, map } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbBooleanState, UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
@@ -12,46 +13,13 @@ import { UmbEntityContext, UmbParentEntityContext } from '@umbraco-cms/backoffic
 import { UMB_SECTION_CONTEXT } from '@umbraco-cms/backoffice/section';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbEntityModel, UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
-import type { Observable } from '@umbraco-cms/backoffice/observable-api';
-import type { UmbContextMinimal } from '@umbraco-cms/backoffice/context-api';
-import type { ManifestBase, UmbApi } from '@umbraco-cms/backoffice/extension-api';
-
-/**
- * Shared contract for tree item contexts and card apis covering item data,
- * selection, active state, path, and entity actions. Children, expansion, and
- * pagination are not included here and remain exclusively on `UmbTreeItemContextBase`.
- */
-export interface UmbTreeItemApi<
-	TreeItemType extends UmbTreeItemModel = UmbTreeItemModel,
-	ManifestType extends ManifestBase = ManifestBase,
->
-	extends UmbApi, UmbContextMinimal {
-	unique?: UmbEntityUnique;
-	entityType?: string;
-	manifest: ManifestType | undefined;
-	readonly treeItem: Observable<TreeItemType | undefined>;
-	readonly isSelectable: Observable<boolean>;
-	readonly isSelectableContext: Observable<boolean>;
-	readonly selectOnly: Observable<boolean>;
-	readonly isSelected: Observable<boolean>;
-	readonly isActive: Observable<boolean>;
-	readonly hasChildren: Observable<boolean>;
-	readonly hasActions: Observable<boolean>;
-	readonly noAccess: Observable<boolean>;
-	readonly path: Observable<string>;
-	setTreeItem(item: TreeItemType | undefined): void;
-	getTreeItem(): TreeItemType | undefined;
-	open(): void;
-	select(): void;
-	deselect(): void;
-	constructPath(pathname: string, entityType: string, unique: string | null): string;
-}
+import type { ManifestBase } from '@umbraco-cms/backoffice/extension-api';
 
 /**
  * Abstract base for tree item apis. Handles item data, selection, active state,
  * path, and entity actions — without children, expansion, or pagination.
  *
- * Provides itself as `UMB_TREE_ITEM_API_CONTEXT` so entity action conditions
+ * Provides itself as `UMB_TREE_ITEM_BASE_CONTEXT` so entity action conditions
  * can discover a tree item regardless of which tree view is active.
  */
 export abstract class UmbTreeItemApiBase<
@@ -126,7 +94,7 @@ export abstract class UmbTreeItemApiBase<
 	}
 
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_TREE_ITEM_API_CONTEXT);
+		super(host, UMB_TREE_ITEM_BASE_CONTEXT);
 
 		this._treeContextConsumer = this.consumeContext(UMB_TREE_CONTEXT, (context) => {
 			this._treeContext = context;

@@ -1,5 +1,5 @@
 import type { UmbTreeItemModel } from '../../types.js';
-import { UmbTreeItemApiBase } from '../../tree-item/tree-item-base/tree-item-api-base.js';
+import { UmbTreeItemApiBase } from '../../tree-item-api/tree-item-api-base.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbElementControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbEntityContext } from '@umbraco-cms/backoffice/entity';
