@@ -28,6 +28,9 @@ function compareDefault(a: UmbEntityVariantOptionModel, b: UmbEntityVariantOptio
 	return (a.language?.isDefault ? -1 : 1) - (b.language?.isDefault ? -1 : 1);
 }
 
+const _isPublishedState = (state: string | undefined): boolean =>
+	state === UmbPublishableVariantState.PUBLISHED_PENDING_CHANGES || state === UmbPublishableVariantState.PUBLISHED;
+
 /**
  * Mandatory variants sort to the top, unless they are published — published variants already sort first and should mix with other published variants.
  * @param {UmbEntityVariantOptionModel} a - First variant to compare
@@ -35,10 +38,8 @@ function compareDefault(a: UmbEntityVariantOptionModel, b: UmbEntityVariantOptio
  * @returns {number} - Sorting value
  */
 function compareMandatory(a: UmbEntityVariantOptionModel, b: UmbEntityVariantOptionModel): number {
-	return a.variant?.state === UmbPublishableVariantState.PUBLISHED_PENDING_CHANGES ||
-		a.variant?.state === UmbPublishableVariantState.PUBLISHED
-		? 0
-		: (a.language?.isMandatory ? -1 : 1) - (b.language?.isMandatory ? -1 : 1);
+	if (_isPublishedState(a.variant?.state)) return 0;
+	return (a.language?.isMandatory ? -1 : 1) - (b.language?.isMandatory ? -1 : 1);
 }
 
 /**
@@ -68,10 +69,14 @@ function compareName(a: UmbEntityVariantOptionModel, b: UmbEntityVariantOptionMo
 	return nameA.localeCompare(nameB);
 }
 /**
- * Sorts entity variants based on multiple criteria:
+ * Sorts entity variants in priority order:
+ * 1. Default language first
+ * 2. Mandatory (non-published) variants
+ * 3. By publish state (published → draft → not-created → trashed)
+ * 4. Alphabetically by language name
  * @param {UmbEntityVariantOptionModel} a - First variant to compare
  * @param {UmbEntityVariantOptionModel} b - Second variant to compare
- * @returns {number} - Sorting value
+ * @returns {number} - Negative if a sorts first, positive if b sorts first, 0 if equal
  */
 export function sortVariants(a: UmbEntityVariantOptionModel, b: UmbEntityVariantOptionModel): number {
 	return compareDefault(a, b) || compareMandatory(a, b) || compareState(a, b) || compareName(a, b);

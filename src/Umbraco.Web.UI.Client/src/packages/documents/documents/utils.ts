@@ -4,6 +4,12 @@ import type { UmbDocumentVariantOptionModel } from './types.js';
 
 type VariantType = UmbDocumentVariantOptionModel;
 
+const _deprecation = new UmbDeprecation({
+	deprecated: 'sortVariants from @umbraco-cms/backoffice/documents',
+	removeInVersion: '19.0.0',
+	solution: 'Import `sortVariants` from `@umbraco-cms/backoffice/variant` instead.',
+});
+
 /**
  * Sorts document variants based on multiple criteria:
  * @param {VariantType} a - First variant to compare
@@ -12,11 +18,6 @@ type VariantType = UmbDocumentVariantOptionModel;
  * @deprecated Deprecated since v17.6. Import `sortVariants` from `@umbraco-cms/backoffice/variant` instead. Scheduled for removal in Umbraco 19. [LK]
  */
 export function sortVariants(a: VariantType, b: VariantType): number {
-	new UmbDeprecation({
-		deprecated: 'sortVariants from @umbraco-cms/backoffice/documents',
-		removeInVersion: '19.0.0',
-		solution: 'Import `sortVariants` from `@umbraco-cms/backoffice/variant` instead.',
-	}).warn();
-
+	_deprecation.warn();
 	return _sortVariants(a, b);
 }
