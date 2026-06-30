@@ -435,6 +435,14 @@ When a PR changes Management API controllers or models, the `OpenApi.json` file 
 
 The backoffice is published to npm as `@umbraco-cms/backoffice`. Runtime dependencies are provided via importmap; npm peerDependencies provide types only. For full details on dependency hoisting, version range logic, and plugin development, see `/src/Umbraco.Web.UI.Client/CLAUDE.md` → "npm Package Publishing".
 
+### SQL Server 2100-parameter limit
+
+Any `WHERE IN (@0, @1, ...)` built from a runtime-sized collection risks hitting SQL Server's 2100-parameter ceiling and throwing `SqlException` 8003 in production.
+
+Batch with `IEnumerable<T>.InGroupsOf(Constants.Sql.MaxParameterCount)` or `Database.FetchByGroups(...)` whenever the collection size is driven by user data — not just when it currently fits. Watch for products of two scaling dimensions (documents × languages, properties × versions) and config-tunable batch sizes whose defaults are safe but ceilings aren't.
+
+Full guidance, safe patterns and decision rule: see `/src/Umbraco.Infrastructure/CLAUDE.md` → "Avoiding the SQL Server 2100-parameter limit".
+
 ### Known Limitations
 
 1. **Circular Dependencies**: Avoided via `Lazy<T>` or event notifications
@@ -502,6 +510,42 @@ Labels are only added, never removed. Claude applies only labels it is confident
 - **`id-token: write` permission** — required for OIDC token exchange with the Claude GitHub App.
 - **Trigger phrase stripping** — the action strips `@claude` from comments before passing to Claude. Prompts must reference commands without the prefix (e.g., `review` not `@claude review`).
 - **PR number injection** — the interactive workflow injects the PR/issue number into the prompt via `${{ github.event.issue.number }}` since Claude can't discover it from `gh pr view` when checked out on `main`.
+
+---
+
+## 8. Code Comment Policy
+
+**Default to no comment.** Applies to all code in this repository — C#, TypeScript, Razor, build scripts. Well-named identifiers and small functions are the primary form of self-documentation; comments are a fallback for the rare cases where the code itself cannot carry the meaning.
+
+### When NOT to comment
+
+- **Don't restate what the code does.** A line calling `resetState()` does not need `// Reset state`. A method named `validateInput` does not need `// Validate input`.
+- **Don't narrate a sequence of calls.** If three lines run in order, the order is in the code — don't paraphrase it above.
+- **Don't reference the current task, fix, callers, or PR.** No `// Fix for X`, `// Used by Y`, `// Added for the Z flow`, `// See PR #1234`. That belongs in commit messages and PR descriptions; in source it rots as the codebase evolves.
+
+### When a comment IS justified
+
+Write a comment only when **removing it would leave a future reader confused**. Concretely:
+
+- **A non-obvious WHY.** A hidden constraint, business rule, or ordering requirement that is not visible from the code.
+- **A workaround for a specific bug or platform quirk.** Link the issue (`(#21996)`, `https://...`) so the comment can be deleted once the upstream fix lands.
+- **A subtle invariant** that the type system or method names do not enforce.
+- **An edge case the code intentionally handles** that would surprise a reader (e.g. "must run before X because Y").
+- **API documentation** — XML doc comments on C# members, JSDoc on exported TypeScript symbols. Required for the public contract; still keep them concise.
+
+### TODOs
+
+Allowed, but cheap to write and cheaper to leave behind. Keep them short and trackable: `// TODO (V19): remove once obsolete overload is gone` or `// TODO: pagination [NL]`. A TODO should have an author or a version trigger.
+
+---
+
+## 9. Testing Practices
+
+### Tests for a bug fix must fail before the fix
+
+Verify any test you add for a bug fix actually catches the bug: either write the failing test first (TDD), or temporarily revert the production change and confirm the test fails before re-applying. A test that passes both ways proves nothing. Watch for coincidental passes — default seed/sort orders can make a buggy path produce the right answer for the test's specific inputs; construct inputs so the broken and fixed behaviours give visibly different results.
+
+For integration tests that exercise caching or cache refreshers, see `tests/Umbraco.Tests.Integration/CLAUDE.md` — the harness disables caching by default, which can produce false greens.
 
 ---
 

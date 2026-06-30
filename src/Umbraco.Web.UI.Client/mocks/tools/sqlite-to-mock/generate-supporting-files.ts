@@ -116,7 +116,7 @@ export {
 };
 
 // Type assertion to ensure this module satisfies UmbMockDataSet
-const _typeCheck: UmbMockDataSet = {
+({
 	dataType,
 	dictionary,
 	document,
@@ -154,8 +154,7 @@ const _typeCheck: UmbMockDataSet = {
 	examineSearchResults,
 	trackedReferenceItems,
 	news,
-};
-void _typeCheck;
+} satisfies UmbMockDataSet);
 `;
 
 	const outputDir = getOutputDir();
@@ -424,8 +423,8 @@ export const savedSearches: Array<SavedLogSearchResponseModel> = [
 		query: 'Has(Duration) and Duration > 1000',
 	},
 	{
-		name: "Find all logs that are from the namespace 'Umbraco.Core'",
-		query: "StartsWith(SourceContext, 'Umbraco.Core')",
+		name: "Find all logs that are within the namespace 'Umbraco.Cms'",
+		query: "StartsWith(SourceContext, 'Umbraco.Cms')",
 	},
 ];
 

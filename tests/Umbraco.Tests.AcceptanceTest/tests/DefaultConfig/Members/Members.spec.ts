@@ -175,6 +175,25 @@ test('can view member info', async ({umbracoApi, umbracoUi}) => {
   }));
 });
 
+test('approved is enabled by default when creating a member', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoUi.member.goToMembers();
+
+  // Act
+  await umbracoUi.member.clickCreateMembersButton();
+  await umbracoUi.member.enterMemberName(memberName);
+  await umbracoUi.member.clickInfoTab();
+  await umbracoUi.member.enterUsername(username);
+  await umbracoUi.member.enterEmail(email);
+  await umbracoUi.member.enterPassword(password);
+  await umbracoUi.member.enterConfirmPassword(password);
+  await umbracoUi.member.clickSaveButtonAndWaitForMemberToBeCreated();
+
+  // Assert
+  const memberData = await umbracoApi.member.getByName(memberName);
+  expect(memberData.isApproved).toBe(true);
+});
+
 test('can enable approved', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   memberTypeId = await umbracoApi.memberType.createDefaultMemberType(memberTypeName);

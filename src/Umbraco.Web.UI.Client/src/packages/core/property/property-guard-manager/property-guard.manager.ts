@@ -1,4 +1,4 @@
-import type { Observable } from '@umbraco-cms/backoffice/observable-api';
+import { mergeObservables, type Observable } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 import { UmbGuardManagerBase, type UmbGuardRule } from '@umbraco-cms/backoffice/utils';
 
@@ -29,7 +29,9 @@ export class UmbPropertyGuardManager extends UmbGuardManagerBase<UmbPropertyGuar
 	 * @memberof UmbPropertyGuardManager
 	 */
 	isPermittedForProperty(propertyType: UmbReferenceByUnique): Observable<boolean> {
-		return this._rules.asObservablePart((rules) => this.#resolvePermission(rules, propertyType));
+		return mergeObservables([this.rules, this._fallback], ([states, fallback]) => {
+			return this.#resolvePermission(states, propertyType) ?? fallback;
+		});
 	}
 
 	/**
@@ -39,16 +41,16 @@ export class UmbPropertyGuardManager extends UmbGuardManagerBase<UmbPropertyGuar
 	 * @memberof UmbPropertyGuardManager
 	 */
 	getIsPermittedForProperty(propertyType: UmbReferenceByUnique): boolean {
-		return this.#resolvePermission(this.getRules(), propertyType);
+		return this.#resolvePermission(this.getRules(), propertyType) ?? this._getFallback();
 	}
 
-	#resolvePermission(rules: UmbPropertyGuardRule[], propertyType: UmbReferenceByUnique) {
+	#resolvePermission(rules: UmbPropertyGuardRule[], propertyType: UmbReferenceByUnique): boolean | undefined {
 		if (rules.filter((x) => x.permitted === false).some((rule) => findRule(rule, propertyType))) {
 			return false;
 		}
 		if (rules.filter((x) => x.permitted === true).some((rule) => findRule(rule, propertyType))) {
 			return true;
 		}
-		return this._fallback;
+		return undefined;
 	}
 }

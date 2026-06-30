@@ -1297,6 +1297,36 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         /// </summary>
         public abstract int RecycleBinId { get; }
 
+        /// <inheritdoc />
+        public void UpdateSortOrder(IReadOnlyList<int> orderedNodeIds)
+        {
+            if (orderedNodeIds.Count == 0)
+            {
+                return;
+            }
+
+            var nodeTable = SqlSyntax.GetQuotedTableName(NodeDto.TableName);
+            var idColumn = SqlSyntax.GetQuotedColumnName(NodeDto.IdColumnName);
+            var sortOrderColumn = SqlSyntax.GetQuotedColumnName(NodeDto.SortOrderColumnName);
+
+            // Each node's new sort order is its position in the ordered collection.
+            var ordered = orderedNodeIds
+                .Select((id, sortOrder) => new KeyValuePair<int, int>(id, sortOrder))
+                .ToList();
+
+            // Two parameters per node (id + sort order), so batch to stay within the SQL Server parameter limit.
+            foreach (IEnumerable<KeyValuePair<int, int>> group in ordered.InGroupsOf(Constants.Sql.MaxParameterCount / 2))
+            {
+                List<KeyValuePair<int, int>> groupList = group.ToList();
+                var args = groupList.SelectMany(pair => new object[] { pair.Key, pair.Value }).ToArray();
+                var whenClauses = string.Join(" ", groupList.Select((_, i) => $"WHEN @{i * 2} THEN @{(i * 2) + 1}"));
+                var inClause = string.Join(", ", groupList.Select((_, i) => $"@{i * 2}"));
+
+                var sql = $"UPDATE {nodeTable} SET {sortOrderColumn} = CASE {idColumn} {whenClauses} END WHERE {idColumn} IN ({inClause})";
+                Database.Execute(sql, args);
+            }
+        }
+
         /// <summary>
         /// Gets all entities that are currently in the recycle bin.
         /// </summary>

@@ -1,25 +1,7 @@
 import type { UmbMockDocumentModel } from '../../mock-data-set.types.js';
-import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { DocumentVariantResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 
-// Map string state to enum
-/**
- *
- * @param state
- */
-function mapState(state: string): DocumentVariantStateModel {
-	switch (state) {
-		case 'Published':
-			return DocumentVariantStateModel.PUBLISHED;
-		case 'Draft':
-			return DocumentVariantStateModel.DRAFT;
-		case 'NotCreated':
-			return DocumentVariantStateModel.NOT_CREATED;
-		case 'PublishedPendingChanges':
-			return DocumentVariantStateModel.PUBLISHED_PENDING_CHANGES;
-		default:
-			return DocumentVariantStateModel.DRAFT;
-	}
-}
+type UmbDocumentVariantState = DocumentVariantResponseModel['state'];
 
 const rawData = [
 	{
@@ -2566,10 +2548,51 @@ const rawData = [
 	},
 ];
 
-export const data: Array<UmbMockDocumentModel> = rawData.map((doc) => ({
-	...doc,
-	variants: doc.variants.map((v) => ({
-		...v,
-		state: mapState(v.state),
+const HOME_DOCUMENT_ID = 'db79156b-3d5b-43d6-ab32-902dc423bec3';
+const ALL_DATA_TYPES_DOCUMENT_TYPE_ID = '8b1d6f2a-7c4e-4a9b-bf13-2e5d9a0c4f76';
+const ALL_DATA_TYPES_DOCUMENT_ID = '3f7c2e9d-5a14-4b8e-9c0a-6d2f8b1e4a37';
+
+// A single document showcasing every data type, reusing the values from the individual showcase documents.
+const allDataTypesValues = rawData
+	.filter((document) => document.parent?.id === HOME_DOCUMENT_ID)
+	.flatMap((document) => document.values as UmbMockDocumentModel['values']);
+
+export const data: Array<UmbMockDocumentModel> = [
+	...rawData.map((doc) => ({
+		...doc,
+		variants: doc.variants.map((v) => ({
+			...v,
+			state: v.state as UmbDocumentVariantState,
+		})),
 	})),
-}));
+	{
+		ancestors: [{ id: HOME_DOCUMENT_ID }],
+		template: null,
+		id: ALL_DATA_TYPES_DOCUMENT_ID,
+		createDate: '2023-02-20 16:30:00',
+		parent: { id: HOME_DOCUMENT_ID },
+		documentType: {
+			id: ALL_DATA_TYPES_DOCUMENT_TYPE_ID,
+			icon: 'icon-documents color-green',
+		},
+		hasChildren: false,
+		noAccess: false,
+		isProtected: false,
+		isTrashed: false,
+		variants: [
+			{
+				state: 'Published' as UmbDocumentVariantState,
+				publishDate: '2026-04-16 11:10:37.0000000',
+				culture: null,
+				segment: null,
+				name: 'All Data Types',
+				createDate: '2023-02-20 16:30:00',
+				updateDate: '2026-04-16 11:10:37.0000000',
+				id: ALL_DATA_TYPES_DOCUMENT_ID,
+				flags: [],
+			},
+		],
+		values: allDataTypesValues,
+		flags: [],
+	},
+];
