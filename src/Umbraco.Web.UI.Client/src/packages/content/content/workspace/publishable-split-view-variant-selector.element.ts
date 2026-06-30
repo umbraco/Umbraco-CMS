@@ -3,21 +3,23 @@ import { html, state } from '@umbraco-cms/backoffice/external/lit';
 import { DocumentVariantStateModel as UmbPublishableVariantState } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbWorkspaceSplitViewVariantSelectorElement } from '@umbraco-cms/backoffice/workspace';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
+import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbEntityVariantModel, UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';
-import type { UmbContextMinimal, UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import type { UmbPublishableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 
 /**
- * Minimal interface that publishing workspace contexts must satisfy
+ * Minimal interface that publishable workspace contexts must satisfy
  * for the variant selector to observe pending changes.
  */
-export interface UmbPublishingWorkspaceContextWithPendingChanges extends UmbContextMinimal {
+export interface UmbPublishableWorkspaceContextWithPendingChanges extends UmbPublishableWorkspaceContext {
+	/** Observable state for detecting pending (unpublished) changes per variant. */
 	publishedPendingChanges: {
 		variantsWithChanges: Observable<Array<UmbPublishedVariantWithPendingChanges>>;
 	};
 }
 
 /**
- * A variant selector base class that adds publishing-state awareness
+ * A variant selector base class that adds publishable-state awareness
  * (pending changes, publish state labels) to the split-view variant selector.
  * Both Document and Element variant selectors extend this.
  * @abstract
@@ -26,19 +28,19 @@ export interface UmbPublishingWorkspaceContextWithPendingChanges extends UmbCont
  */
 export abstract class UmbPublishableSplitViewVariantSelectorElement<
 	VariantOptionModelType extends UmbEntityVariantOptionModel<UmbEntityVariantModel>,
+	TContext extends UmbPublishableWorkspaceContextWithPendingChanges = UmbPublishableWorkspaceContextWithPendingChanges,
 > extends UmbWorkspaceSplitViewVariantSelectorElement<VariantOptionModelType> {
 	/**
-	 * Returns the context token used to consume the publishing workspace context.
+	 * Returns the context token used to consume the publishable workspace context.
 	 * Subclasses must implement this to provide their entity-specific context token.
-	 * @returns {UmbContextToken<any>} The context token for the publishing workspace context.
+	 * @returns {UmbContextToken<TContext>} The context token for the publishable workspace context.
 	 */
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	protected abstract getPublishingContextToken(): UmbContextToken<any>;
+	protected abstract getPublishingContextToken(): UmbContextToken<TContext>;
 
 	@state()
 	private _variantsWithPendingChanges: Array<UmbPublishedVariantWithPendingChanges> = [];
 
-	#publishingContext?: UmbPublishingWorkspaceContextWithPendingChanges;
+	#publishingContext?: TContext;
 
 	#publishStateLocalizationMap: Record<string, string> = {
 		[UmbPublishableVariantState.DRAFT]: 'content_unpublished',
@@ -54,7 +56,7 @@ export abstract class UmbPublishableSplitViewVariantSelectorElement<
 	constructor() {
 		super();
 		this.consumeContext(this.getPublishingContextToken(), (instance) => {
-			this.#publishingContext = instance as UmbPublishingWorkspaceContextWithPendingChanges;
+			this.#publishingContext = instance;
 			this.#observePendingChanges();
 		});
 	}
