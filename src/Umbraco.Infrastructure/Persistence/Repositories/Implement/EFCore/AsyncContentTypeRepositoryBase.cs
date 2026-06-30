@@ -114,8 +114,8 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
         => Task.FromResult(GetAllCached().FirstOrDefault(x => x.Key == key));
 
     /// <inheritdoc />
-    protected override Task<IEnumerable<TEntity>?> PerformGetAllAsync()
-        => Task.FromResult(CommonRepository.GetAllTypes()?.OfType<TEntity>());
+    protected override async Task<IEnumerable<TEntity>?> PerformGetAllAsync()
+        => (await CommonRepository.GetAllTypesAsync())?.OfType<TEntity>();
 
     /// <inheritdoc />
     protected override Task<IEnumerable<TEntity>?> PerformGetManyAsync(Guid[]? keys)

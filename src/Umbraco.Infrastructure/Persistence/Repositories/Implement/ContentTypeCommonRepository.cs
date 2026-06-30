@@ -47,26 +47,18 @@ internal sealed class ContentTypeCommonRepository : IContentTypeCommonRepository
            ?? throw new InvalidOperationException("Cannot run a repository without an ambient scope.");
 
     /// <inheritdoc />
-    public IEnumerable<IContentTypeComposition>? GetAllTypes() =>
-        // use a sliding cache - same as FullDataSet cache policy
-        _appCaches.RuntimeCache.GetCacheItem(CacheKey, GetAllTypesInternal, RepositoryCacheConstants.DefaultCacheDuration, true);
+    public Task<IEnumerable<IContentTypeComposition>?> GetAllTypesAsync()
+        => _appCaches.RuntimeCache.GetCacheItemAsync<IEnumerable<IContentTypeComposition>>(
+            CacheKey,
+            async () => await FetchAllTypesFromDatabaseAsync(),
+            RepositoryCacheConstants.DefaultCacheDuration,
+            isSliding: true);
 
     /// <inheritdoc />
     public void ClearCache() => _appCaches.RuntimeCache.Clear(CacheKey);
 
-    private IEnumerable<IContentTypeComposition> GetAllTypesInternal()
-    {
-        // Touch the scope on the synchronous caller context before entering the async flow, ensuring that
-        // async-local scope state (including bridge-scope enlistment) is captured on this execution context.
-        EnsureAmbientScopeOnCallerContext();
-        return GetAllTypesAsync().GetAwaiter().GetResult();
-    }
-
-    private void EnsureAmbientScopeOnCallerContext() => _ = AmbientScope;
-
-    private async Task<IEnumerable<IContentTypeComposition>> GetAllTypesAsync()
-    {
-        return await AmbientScope.ExecuteWithContextAsync<IEnumerable<IContentTypeComposition>>(async db =>
+    private async Task<IEnumerable<IContentTypeComposition>> FetchAllTypesFromDatabaseAsync() =>
+        await AmbientScope.ExecuteWithContextAsync<IEnumerable<IContentTypeComposition>>(async db =>
         {
             // Query 1: content types with their nodes, ordered so pointer-walking below works
             List<ContentTypeDto> contentTypeDtos = await db.ContentTypes
@@ -172,7 +164,6 @@ internal sealed class ContentTypeCommonRepository : IContentTypeCommonRepository
 
             return contentTypes.Values;
         });
-    }
 
     private static void MapHistoryCleanup(
         Dictionary<int, IContentTypeComposition> contentTypes,
