@@ -24,4 +24,5 @@ public enum EFCoreMigration
     AddConsentDto = 16,
     AddDictionaryDto = 17,
     AddContentTypeDtos = 18,
+    MemberPropertyTypeToEFCore = 19,
 }
