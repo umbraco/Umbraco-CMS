@@ -70,6 +70,11 @@ public class CacheEntrySettings
     ///     full-tree walk (crawl, sitemap) cannot grow it without bound. Leave unset on small sites; set it
     ///     on very large sites that see memory pressure from full-tree scans.
     ///     <para>
+    ///         Bounding requires the opt-in <c>Umbraco.Cms.PublishedCache.HybridCache.Bounded</c> package to be
+    ///         installed. If a maximum is configured without it, the cache stays unbounded and a warning is
+    ///         logged at start-up.
+    ///     </para>
+    ///     <para>
     ///         The value is read once when the cache is constructed at start-up, so changing it requires an
     ///         application restart. Values below 3 are raised to 3 (the minimum the bounded cache supports).
     ///     </para>

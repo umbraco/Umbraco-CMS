@@ -4,6 +4,7 @@
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Infrastructure.HybridCache.Bounded;
 using Umbraco.Cms.Infrastructure.HybridCache.Services;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HybridCache;
@@ -14,7 +15,7 @@ public class ConvertedPublishedContentCacheTests
     [Test]
     public void Can_Track_Count_And_Bytes_On_Set_And_Remove()
     {
-        var cache = new ConvertedPublishedContentCache<string>();
+        var cache = new UnboundedConvertedPublishedContentCache<string>();
 
         cache.Set("a", Content(), 100);
         cache.Set("b", Content(), 50);
@@ -37,7 +38,7 @@ public class ConvertedPublishedContentCacheTests
     [Test]
     public void Can_Adjust_Bytes_When_Overwriting_Existing_Key()
     {
-        var cache = new ConvertedPublishedContentCache<string>();
+        var cache = new UnboundedConvertedPublishedContentCache<string>();
 
         cache.Set("a", Content(), 100);
         cache.Set("a", Content(), 30);
@@ -52,7 +53,7 @@ public class ConvertedPublishedContentCacheTests
     [Test]
     public void Can_Reset_Bytes_On_Clear()
     {
-        var cache = new ConvertedPublishedContentCache<string>();
+        var cache = new UnboundedConvertedPublishedContentCache<string>();
 
         cache.Set("a", Content(), 100);
         cache.Clear();
@@ -67,7 +68,7 @@ public class ConvertedPublishedContentCacheTests
     [Test]
     public void Can_Remove_Matching_Entries_With_RemoveWhere()
     {
-        var cache = new ConvertedPublishedContentCache<string>();
+        var cache = new UnboundedConvertedPublishedContentCache<string>();
 
         cache.Set("a", ContentOfType(1), 100);
         cache.Set("b", ContentOfType(2), 40);
@@ -84,7 +85,7 @@ public class ConvertedPublishedContentCacheTests
     [Test]
     public void Can_Bound_Entry_Count_When_Maximum_Configured()
     {
-        var cache = new ConvertedPublishedContentCache<string>(maximumItems: 5);
+        var cache = new BoundedConvertedPublishedContentCache<string>(5);
 
         for (var i = 0; i < 100; i++)
         {
@@ -108,7 +109,7 @@ public class ConvertedPublishedContentCacheTests
         // is guaranteed by structure rather than by the marginal frequency comparison for window/probation
         // residents (which depends on count-min sketch hashing and buffer behaviour). Int keys keep that hashing
         // stable across processes, as .NET randomizes string.GetHashCode().
-        var cache = new ConvertedPublishedContentCache<int>(maximumItems: 10);
+        var cache = new BoundedConvertedPublishedContentCache<int>(10);
 
         int[] hot = [0, 1, 2];
 
@@ -160,7 +161,7 @@ public class ConvertedPublishedContentCacheTests
     [Test]
     public void Can_Remove_And_Clear_When_Bounded()
     {
-        var cache = new ConvertedPublishedContentCache<string>(maximumItems: 10);
+        var cache = new BoundedConvertedPublishedContentCache<string>(10);
 
         cache.Set("a", ContentOfType(1), 10);
         cache.Set("b", ContentOfType(2), 10);

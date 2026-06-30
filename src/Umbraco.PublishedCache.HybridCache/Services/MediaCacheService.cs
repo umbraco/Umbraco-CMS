@@ -32,7 +32,7 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
     private readonly ILogger<MediaCacheService> _logger;
     private readonly CacheSettings _cacheSettings;
 
-    private readonly ConvertedPublishedContentCache<Guid> _publishedContentCache;
+    private readonly IConvertedPublishedContentCache<Guid> _publishedContentCache;
 
     // Monotonic counter bumped whenever the in-memory cache (L0/L1) is invalidated or refreshed.
     // GetNodeAsync captures it before reading the backing store and re-checks it before writing
@@ -79,7 +79,8 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
         IEnumerable<IMediaSeedKeyProvider> seedKeyProviders,
         IPublishedModelFactory publishedModelFactory,
         IOptions<CacheSettings> cacheSettings,
-        ILogger<MediaCacheService> logger)
+        ILogger<MediaCacheService> logger,
+        IConvertedPublishedContentCacheFactory cacheFactory)
     {
         _databaseCacheRepository = databaseCacheRepository;
         _idKeyMap = idKeyMap;
@@ -91,7 +92,7 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
         _publishedModelFactory = publishedModelFactory;
         _cacheSettings = cacheSettings.Value;
         _logger = logger;
-        _publishedContentCache = new ConvertedPublishedContentCache<Guid>(_cacheSettings.Entry.Media.MaximumLocalCacheItems);
+        _publishedContentCache = cacheFactory.Create<Guid>(_cacheSettings.Entry.Media.MaximumLocalCacheItems, CacheName);
     }
 
     /// <inheritdoc />

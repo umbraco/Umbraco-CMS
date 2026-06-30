@@ -36,7 +36,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
     private readonly ILogger<DocumentCacheService> _logger;
     private HashSet<Guid>? _seedKeys;
 
-    private readonly ConvertedPublishedContentCache<string> _publishedContentCache;
+    private readonly IConvertedPublishedContentCache<string> _publishedContentCache;
 
     // Monotonic counter bumped whenever the in-memory cache (L0/L1) is invalidated or refreshed.
     // GetNodeAsync captures it before reading the backing store and re-checks it before writing
@@ -84,7 +84,8 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
         IPublishedModelFactory publishedModelFactory,
         IPreviewService previewService,
         IPublishStatusQueryService publishStatusQueryService,
-        ILogger<DocumentCacheService> logger)
+        ILogger<DocumentCacheService> logger,
+        IConvertedPublishedContentCacheFactory cacheFactory)
     {
         _databaseCacheRepository = databaseCacheRepository;
         _idKeyMap = idKeyMap;
@@ -98,7 +99,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
         _publishStatusQueryService = publishStatusQueryService;
         _cacheSettings = cacheSettings.Value;
         _logger = logger;
-        _publishedContentCache = new ConvertedPublishedContentCache<string>(_cacheSettings.Entry.Document.MaximumLocalCacheItems);
+        _publishedContentCache = cacheFactory.Create<string>(_cacheSettings.Entry.Document.MaximumLocalCacheItems, CacheName);
     }
 
     /// <inheritdoc />

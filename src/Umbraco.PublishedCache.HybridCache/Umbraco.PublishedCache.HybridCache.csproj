@@ -12,13 +12,15 @@
   </PropertyGroup>
   
   <ItemGroup>
-    <PackageReference Include="BitFaster.Caching" />
     <PackageReference Include="Microsoft.Extensions.Caching.Hybrid" />
     <PackageReference Include="MessagePack" />
     <PackageReference Include="K4os.Compression.LZ4" />
   </ItemGroup>
 
   <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>Umbraco.PublishedCache.HybridCache.Bounded</_Parameter1>
+    </AssemblyAttribute>
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
       <_Parameter1>Umbraco.Tests</_Parameter1>
     </AssemblyAttribute>

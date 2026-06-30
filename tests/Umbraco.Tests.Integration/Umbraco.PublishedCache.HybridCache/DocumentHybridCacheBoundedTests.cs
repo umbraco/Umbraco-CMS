@@ -15,6 +15,7 @@ using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.PublishedCache.HybridCache;
 
@@ -31,6 +32,7 @@ internal sealed class DocumentHybridCacheBoundedTests : UmbracoIntegrationTestWi
         builder.AddNotificationHandler<ContentTreeChangeNotification, ContentTreeChangeDistributedCacheNotificationHandler>();
         builder.Services.AddUnique<IServerMessenger, ContentEventsTests.LocalServerMessenger>();
         builder.Services.Configure<CacheSettings>(options => options.Entry.Document.MaximumLocalCacheItems = MaximumItems);
+        builder.AddBoundedHybridCache();
     }
 
     private IPublishedContentCache PublishedContentHybridCache => GetRequiredService<IPublishedContentCache>();
