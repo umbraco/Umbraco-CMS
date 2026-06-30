@@ -1,4 +1,5 @@
 import type { ManifestUfmFilter } from '../extensions/ufm-filter.extension.js';
+import { umbResolveUfmFilterAlias } from './ufm-filter-alias.function.js';
 import { DOMPurify } from '@umbraco-cms/backoffice/external/dompurify';
 import { Marked } from '@umbraco-cms/backoffice/external/marked';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
@@ -45,6 +46,11 @@ export type UmbUfmFilterType = {
 
 export class UmbUfmContext extends UmbContextBase {
 	#filters = new UmbArrayState<UmbUfmFilterType>([], (x) => x.alias);
+	/**
+	 * Observable of all registered UFM filters. Aliases reflect the canonical form registered by each filter's
+	 * manifest (camelCase for built-in filters since v18 — e.g. `stripHtml`, not `strip-html`).
+	 * Use {@link getFilterByAlias} for alias-based lookup; it maps deprecated kebab-case aliases automatically.
+	 */
 	public readonly filters = this.#filters.asObservable();
 
 	constructor(host: UmbControllerHost) {
@@ -67,6 +73,9 @@ export class UmbUfmContext extends UmbContextBase {
 
 	/**
 	 * Get the filters registered in the UFM context.
+	 * Aliases reflect the canonical form registered by each filter's manifest (camelCase for built-in
+	 * filters since v18 — e.g. `stripHtml`, not `strip-html`).
+	 * Use {@link getFilterByAlias} for alias-based lookup; it maps deprecated kebab-case aliases automatically.
 	 * @returns {Array<UmbUfmFilterType>} An array of filters with their aliases and filter functions.
 	 */
 	public getFilters(): Array<UmbUfmFilterType> {
@@ -75,11 +84,13 @@ export class UmbUfmContext extends UmbContextBase {
 
 	/**
 	 * Get a filter by its alias.
+	 * Deprecated kebab-case aliases (e.g. `strip-html`, `title-case`, `word-limit`) are transparently
+	 * resolved to their camelCase equivalents, with a one-time deprecation warning logged per alias.
 	 * @param alias The alias of the filter to retrieve.
 	 * @returns {UmbUfmFilterFunction} The filter function associated with the alias, or undefined if not found.
 	 */
 	public getFilterByAlias(alias: string): UmbUfmFilterFunction {
-		return this.#filters.getValue().find((x) => x.alias === alias)?.filter;
+		return this.#filters.getValue().find((x) => x.alias === umbResolveUfmFilterAlias(alias))?.filter;
 	}
 
 	/**
