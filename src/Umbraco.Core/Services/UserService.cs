@@ -695,6 +695,11 @@ internal partial class UserService : RepositoryService, IUserService
 
         if (identityCreationResult.Succeded is false)
         {
+            if (identityCreationResult.WasCancelledByNotification)
+            {
+                return Attempt.FailWithStatus(UserOperationStatus.CancelledByNotification, new UserCreationResult());
+            }
+
             // If we fail from something in Identity we can't know exactly why, so we have to resolve to returning an unknown failure.
             // But there should be more information in the message.
             return Attempt.FailWithStatus(

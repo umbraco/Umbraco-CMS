@@ -152,7 +152,16 @@ public class BackOfficeUserStore :
 
         UpdateMemberProperties(userEntity, user);
 
-        SaveAsync(userEntity).GetAwaiter().GetResult();
+        UserOperationStatus saveStatus = SaveAsync(userEntity).GetAwaiter().GetResult();
+
+        if (saveStatus == UserOperationStatus.CancelledByNotification)
+        {
+            return Task.FromResult(IdentityResult.Failed(new IdentityError
+            {
+                Code = nameof(UserOperationStatus.CancelledByNotification),
+                Description = "User creation was cancelled by a notification handler."
+            }));
+        }
 
         if (!userEntity.HasIdentity)
         {
