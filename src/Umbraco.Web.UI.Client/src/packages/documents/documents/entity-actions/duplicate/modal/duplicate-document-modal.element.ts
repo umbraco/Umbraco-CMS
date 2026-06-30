@@ -5,7 +5,7 @@ import { html, customElement, nothing, css, state, ifDefined } from '@umbraco-cm
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbPickerContext } from '@umbraco-cms/backoffice/picker';
-import { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
+import type { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbTreeSelectionConfiguration } from '@umbraco-cms/backoffice/tree';
 import type { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbDocumentTreeItemModel } from '../../../types.js';
