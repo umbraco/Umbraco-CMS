@@ -23,7 +23,10 @@ export class UmbDuplicateToEntityAction extends UmbEntityActionBase<MetaEntityAc
 				expandTreeRoot: true,
 				treeExpansion: ancestors.length ? linkEntityExpansionEntries(ancestors) : undefined,
 			},
-		});
+		}).catch(() => undefined);
+
+		// The modal was cancelled.
+		if (!value) return;
 
 		const destinationUnique = value.selection[0];
 		if (destinationUnique === undefined) throw new Error('Destination Unique is not available');

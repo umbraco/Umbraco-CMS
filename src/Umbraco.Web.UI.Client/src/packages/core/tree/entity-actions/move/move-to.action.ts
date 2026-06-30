@@ -41,7 +41,10 @@ export class UmbMoveToEntityAction extends UmbEntityActionBase<MetaEntityActionM
 				pickableFilter,
 				search: this.#searchConfig(),
 			},
-		});
+		}).catch(() => undefined);
+
+		// The modal was cancelled.
+		if (!value) return;
 
 		const destinationUnique = value.selection[0];
 		if (destinationUnique === undefined) throw new Error('Destination Unique is not available');

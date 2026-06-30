@@ -29,7 +29,7 @@ export class UmbMediaMoveEntityBulkAction extends UmbEntityBulkActionBase<MetaEn
 				treeAlias: this.args.meta.treeAlias,
 				search: this.#searchConfig(),
 			},
-		});
+		}).catch(() => undefined);
 
 		if (!value?.selection?.length) return;
 

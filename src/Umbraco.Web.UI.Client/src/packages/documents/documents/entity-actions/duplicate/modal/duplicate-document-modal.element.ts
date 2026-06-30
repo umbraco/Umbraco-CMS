@@ -101,6 +101,7 @@ export class UmbDocumentDuplicateToModalElement extends UmbModalBaseElement<
 						orientation="vertical">
 						<div slot="editor">
 							<uui-toggle
+								label=${this.localize.term('defaultdialogs_relateToOriginalLabel')}
 								@change=${this.#onRelateToOriginalChange}
 								.checked=${this.value?.relateToOriginal ?? false}></uui-toggle>
 						</div>
@@ -109,6 +110,7 @@ export class UmbDocumentDuplicateToModalElement extends UmbModalBaseElement<
 					<umb-property-layout label=${this.localize.term('defaultdialogs_includeDescendants')} orientation="vertical">
 						<div slot="editor">
 							<uui-toggle
+								label=${this.localize.term('defaultdialogs_includeDescendants')}
 								@change=${this.#onIncludeDescendantsChange}
 								.checked=${this.value?.includeDescendants ?? false}></uui-toggle>
 						</div>
