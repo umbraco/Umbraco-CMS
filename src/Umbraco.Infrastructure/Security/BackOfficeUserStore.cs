@@ -218,7 +218,12 @@ public class BackOfficeUserStore :
 
         UpdateMemberProperties(userEntity, user);
 
-        SaveAsync(userEntity).GetAwaiter().GetResult();
+        UserOperationStatus saveStatus = SaveAsync(userEntity).GetAwaiter().GetResult();
+
+        if (TryCreateCancelledResult(saveStatus, out Task<IdentityResult>? cancelledResult))
+        {
+            return cancelledResult!;
+        }
 
         if (!userEntity.HasIdentity)
         {
@@ -229,10 +234,21 @@ public class BackOfficeUserStore :
         user.Id = UserIdToString(userEntity.Id);
         user.Key = userEntity.Key;
 
+        SaveDirtyExternalLoginsAndTokens(userEntity.Key, user, isLoginsPropertyDirty, isTokensPropertyDirty);
+
+        return Task.FromResult(IdentityResult.Success);
+    }
+
+    private void SaveDirtyExternalLoginsAndTokens(
+        Guid userKey,
+        BackOfficeIdentityUser user,
+        bool isLoginsPropertyDirty,
+        bool isTokensPropertyDirty)
+    {
         if (isLoginsPropertyDirty)
         {
             _externalLoginService.Save(
-                userEntity.Key,
+                userKey,
                 user.Logins.Select(x => new ExternalLogin(
                     x.LoginProvider,
                     x.ProviderKey,
@@ -242,14 +258,28 @@ public class BackOfficeUserStore :
         if (isTokensPropertyDirty)
         {
             _externalLoginService.Save(
-                userEntity.Key,
+                userKey,
                 user.LoginTokens.Select(x => new ExternalLoginToken(
                     x.LoginProvider,
                     x.Name,
                     x.Value)));
         }
+    }
 
-        return Task.FromResult(IdentityResult.Success);
+    private static bool TryCreateCancelledResult(UserOperationStatus saveStatus, out Task<IdentityResult>? result)
+    {
+        if (saveStatus != UserOperationStatus.CancelledByNotification)
+        {
+            result = null;
+            return false;
+        }
+
+        result = Task.FromResult(IdentityResult.Failed(new IdentityError
+        {
+            Code = nameof(UserOperationStatus.CancelledByNotification),
+            Description = "User creation was cancelled by a notification handler."
+        }));
+        return true;
     }
 
     /// <inheritdoc />

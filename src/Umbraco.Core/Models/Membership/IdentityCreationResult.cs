@@ -14,9 +14,21 @@ public class IdentityCreationResult
         new IdentityCreationResult { ErrorMessage = errorMessage, Succeded = false };
 
     /// <summary>
+    ///     Creates a failed identity creation result indicating the operation was cancelled by a notification handler.
+    /// </summary>
+    /// <returns>A failed <see cref="IdentityCreationResult" /> instance with <see cref="WasCancelledByNotification" /> set.</returns>
+    public static IdentityCreationResult CancelledByNotification() =>
+        new IdentityCreationResult { Succeded = false, WasCancelledByNotification = true };
+
+    /// <summary>
     ///     Gets or initializes a value indicating whether the identity creation succeeded.
     /// </summary>
     public bool Succeded { get; init; }
+
+    /// <summary>
+    ///     Gets or initializes a value indicating whether the operation was cancelled by a notification handler.
+    /// </summary>
+    public bool WasCancelledByNotification { get; init; }
 
     /// <summary>
     ///     Gets or initializes the error message if the operation failed.
