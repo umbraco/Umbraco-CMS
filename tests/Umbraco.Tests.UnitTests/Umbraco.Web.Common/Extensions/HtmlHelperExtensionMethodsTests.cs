@@ -118,4 +118,15 @@ public class HtmlHelperExtensionMethodsTests
 
         Assert.AreEqual("Hello world, is some text with a link", result);
     }
+
+    [Test]
+    public void Strip_Html_Ensure_Spacing()
+    {
+        const string text = "<h1>Test header</h1><p>Some <strong>text</strong>content</p>";
+
+        var result = _htmlHelper.StripHtml(text).ToString();
+
+        Assert.AreEqual("Test header Some text content", result);
+    }
+
 }
