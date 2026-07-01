@@ -28,6 +28,7 @@ public static class HtmlHelperBackOfficeExtensions
     /// <param name="jsonSerializer">The JSON serializer used to serialize the package imports.</param>
     /// <param name="backOfficePathGenerator">The path generator for BackOffice assets and cache busting.</param>
     /// <param name="packageManifestService">The service to retrieve package manifest import maps.</param>
+    /// <param name="cspNonceService">The service to retrieve the CSP nonce for the script tag.</param>
     /// <returns>A <see cref="Task"/> containing the html content for the BackOffice import map.</returns>
     public static async Task<IHtmlContent> BackOfficeImportMapScriptAsync(
         this IHtmlHelper html,
