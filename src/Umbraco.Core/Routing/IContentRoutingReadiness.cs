@@ -23,5 +23,11 @@ public interface IContentRoutingReadiness
     /// Marks per-server content-routing initialization as complete. Called once the
     /// <c>UmbracoApplicationStartingNotification</c> and its seeding handlers have finished.
     /// </summary>
+    /// <remarks>
+    /// This is a one-way, irreversible transition: there is no way to return to the not-ready state.
+    /// Consequently a <c>CoreRuntime.RestartAsync()</c> does not re-open the initialization window — once
+    /// ready, the server stays ready for its lifetime. This is intentional; the window only needs gating
+    /// during the initial boot / background-upgrade sequence, not on subsequent in-process restarts.
+    /// </remarks>
     void MarkReady();
 }

@@ -73,11 +73,14 @@ public sealed class MaintenanceModeActionFilterAttribute : TypeFilterAttribute
 
             if (isApiController)
             {
+                // Distinguish the two blocking states so clients can tell "still starting up" from an actual upgrade.
                 var problem = new ProblemDetails
                 {
                     Status = StatusCodes.Status503ServiceUnavailable,
                     Title = "Service Unavailable",
-                    Detail = "The application is currently being upgraded. Please try again later.",
+                    Detail = inInitializationWindow
+                        ? "The application is starting up and is not yet ready to handle requests. Please try again shortly."
+                        : "The application is currently being upgraded. Please try again later.",
                 };
                 context.Result = new ObjectResult(problem) { StatusCode = StatusCodes.Status503ServiceUnavailable };
                 return;
