@@ -589,14 +589,13 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             switch (contentType)
             {
                 case IContentType c when typeof(IElement).IsAssignableFrom(typeof(TContentBase)):
-                    // Elements never have child elements; they are placed directly under their container (parentId).
-                    return new Element(name, parentId, c)
+                    var element = new Element(name, parentId, c)
                     {
                         Key = key,
                         Level = level,
                         SortOrder = sortOrder,
-                    }
-                    as TContentBase;
+                    };
+                    return element as TContentBase;
 
                 case IContentType c:
                     if (parent is null)
@@ -653,21 +652,24 @@ namespace Umbraco.Cms.Infrastructure.Packaging
 
         #region Elements
 
-        private async Task<(IReadOnlyList<IElement> Elements, IEnumerable<EntityContainer> ContainersInstalled)> ImportElementsAsync(
-            IEnumerable<CompiledPackageContentBase> elementSets,
-            IDictionary<string, IContentType> importedDocumentTypes,
-            int userId)
+        private async Task<(IReadOnlyList<IElement> Elements, IEnumerable<EntityContainer> ContainersInstalled)>
+            ImportElementsAsync(
+                IEnumerable<CompiledPackageContentBase> elementSets,
+                IDictionary<string, IContentType> importedDocumentTypes,
+                int userId)
         {
             // Each ElementSet wraps a single element root (flagged with isDoc=""); elements never nest.
             var roots = elementSets
-                .SelectMany(x => x.XmlData.Elements().Where(e => (string?)e.Attribute("isDoc") == string.Empty))
+                .SelectMany(x => x.XmlData.Elements()
+                    .Where(e => (string?)e.Attribute("isDoc") == string.Empty))
                 .ToList();
 
-            (Dictionary<Guid, int> elementContainerIds, IEnumerable<EntityContainer> containersInstalled) =
+            (Dictionary<Guid, int> elementParentIds, IEnumerable<EntityContainer> containersInstalled) =
                 await CreateElementFolderStructureAsync(roots);
 
             var installed = new List<IElement>();
-            foreach (IGrouping<int, XElement> group in roots.GroupBy(root => GetElementParentId(root, elementContainerIds)))
+            foreach (IGrouping<int, XElement> group in roots
+                         .GroupBy(root => GetElementParentId(root, elementParentIds)))
             {
                 installed.AddRange(
                     ImportContentBase(
@@ -682,109 +684,104 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             return (installed, containersInstalled);
         }
 
-        private static int GetElementParentId(XElement element, IReadOnlyDictionary<Guid, int> elementContainerIds)
+        private async Task<(Dictionary<Guid, int> ElementParentIds, IEnumerable<EntityContainer> ContainersInstalled)>
+            CreateElementFolderStructureAsync(IEnumerable<XElement> elements)
         {
-            if (Guid.TryParse(element.Attribute("key")?.Value, out Guid key)
-                && elementContainerIds.TryGetValue(key, out var containerId))
-            {
-                return containerId;
-            }
-
-            return Constants.System.Root;
-        }
-
-        private async Task<(Dictionary<Guid, int> ElementContainerIds, IEnumerable<EntityContainer> ContainersInstalled)> CreateElementFolderStructureAsync(
-            IEnumerable<XElement> elements)
-        {
-            var elementContainerIds = new Dictionary<Guid, int>();
+            var elementParentIds = new Dictionary<Guid, int>();
             var trackEntityContainersInstalled = new List<EntityContainer>();
 
             foreach (XElement element in elements)
             {
-                XAttribute? foldersAttribute = element.Attribute("Folders");
-                if (foldersAttribute == null)
-                {
-                    continue;
-                }
-
-                if (Guid.TryParse(element.Attribute("key")?.Value, out Guid elementKey) is false)
-                {
-                    continue;
-                }
-
-                var folders = foldersAttribute.Value.Split(Constants.CharArrays.ForwardSlash);
-
-                Guid[] folderKeys = Array.Empty<Guid>();
-                XAttribute? folderKeysAttribute = element.Attribute("FolderKeys");
-                if (folderKeysAttribute != null)
-                {
-                    folderKeys = folderKeysAttribute.Value.Split(Constants.CharArrays.ForwardSlash)
-                        .Select(x => Guid.Parse(x)).ToArray();
-                }
-
-                var rootFolder = WebUtility.UrlDecode(folders[0]);
-                Guid rootFolderKey = folderKeys.Length > 0 ? folderKeys[0] : Guid.NewGuid();
-
-                // Match by key first, then by name at root level.
-                EntityContainer? current = await _elementContainerService.GetAsync(rootFolderKey)
-                    ?? (await _elementContainerService.GetAsync(rootFolder, 1)).FirstOrDefault();
-
-                if (current == null)
-                {
-                    Attempt<EntityContainer?, EntityContainerOperationStatus> tryCreateFolder =
-                        await _elementContainerService.CreateAsync(rootFolderKey, rootFolder, parentKey: null, Constants.Security.SuperUserKey);
-                    if (tryCreateFolder.Success is false)
-                    {
-                        _logger.LogError(
-                            "Could not create element folder: {FolderName}. Status: {Status}",
-                            rootFolder,
-                            tryCreateFolder.Status);
-                        throw new InvalidOperationException($"Could not create element folder '{rootFolder}'. Status: {tryCreateFolder.Status}");
-                    }
-
-                    current = tryCreateFolder.Result;
-                    trackEntityContainersInstalled.Add(current!);
-                }
-
-                for (var i = 1; i < folders.Length; i++)
-                {
-                    var folderName = WebUtility.UrlDecode(folders[i]);
-                    Guid folderKey = folderKeys.Length == folders.Length ? folderKeys[i] : Guid.NewGuid();
-                    current = await CreateElementChildFolderAsync(folderName, folderKey, current!, trackEntityContainersInstalled);
-                }
-
-                elementContainerIds[elementKey] = current!.Id;
+                await ProcessElementFolderAsync(element, elementParentIds, trackEntityContainersInstalled);
             }
 
-            return (elementContainerIds, trackEntityContainersInstalled);
+            return (elementParentIds, trackEntityContainersInstalled);
         }
 
-        private async Task<EntityContainer?> CreateElementChildFolderAsync(
-            string folderName,
-            Guid folderKey,
-            IUmbracoEntity current,
+        private async Task ProcessElementFolderAsync(
+            XElement element,
+            Dictionary<Guid, int> elementParentIds,
             List<EntityContainer> trackEntityContainersInstalled)
         {
-            IEntitySlim[] children = _entityService.GetChildren(current.Id).ToArray();
-
-            // Match by key first (more reliable when folders have been renamed in the destination), then fall back to name.
-            IEntitySlim? matchingChild = children.FirstOrDefault(x => x.Key == folderKey)
-                                         ?? children.FirstOrDefault(x => x.Name.InvariantEquals(folderName));
-            if (matchingChild is not null)
+            if (Guid.TryParse(element.Attribute("key")?.Value, out Guid elementKey) is false)
             {
-                return await _elementContainerService.GetAsync(matchingChild.Key);
+                return;
+            }
+
+            var folderNames = element.Attribute("Folders")?.Value
+                .Split(Constants.CharArrays.ForwardSlash) ?? [];
+            if (folderNames.Length == 0)
+            {
+                return;
+            }
+
+            Guid[] folderKeys = element.Attribute("FolderKeys")?.Value
+                .Split(Constants.CharArrays.ForwardSlash)
+                .Select(Guid.Parse)
+                .ToArray() ?? [];
+
+            EntityContainer? current = null;
+            for (var i = 0; i < folderNames.Length; i++)
+            {
+                var folderName = WebUtility.UrlDecode(folderNames[i]);
+                Guid folderKey = folderKeys.Length > i ? folderKeys[i] : Guid.NewGuid();
+                current = await CreateOrGetElementFolderAsync(folderName, folderKey, current, trackEntityContainersInstalled);
+            }
+
+            elementParentIds[elementKey] = current!.Id;
+        }
+
+        private async Task<EntityContainer?> CreateOrGetElementFolderAsync(
+            string folderName,
+            Guid folderKey,
+            EntityContainer? parent,
+            List<EntityContainer> trackEntityContainersInstalled)
+        {
+            EntityContainer? existing;
+            if (parent is null)
+            {
+                existing = (await _elementContainerService.GetAsync(folderName, 1)).FirstOrDefault();
+            }
+            else
+            {
+                // Match among children by key first (more reliable when folders have been renamed), then by name.
+                IEntitySlim[] children = _entityService.GetChildren(parent.Id).ToArray();
+                IEntitySlim? matchingChild = children.FirstOrDefault(x => x.Key == folderKey)
+                                             ?? children.FirstOrDefault(x => x.Name.InvariantEquals(folderName));
+                existing = matchingChild is not null
+                    ? await _elementContainerService.GetAsync(matchingChild.Key)
+                    : null;
+            }
+
+            if (existing is not null)
+            {
+                return existing;
             }
 
             Attempt<EntityContainer?, EntityContainerOperationStatus> tryCreateFolder =
-                await _elementContainerService.CreateAsync(folderKey, folderName, current.Key, Constants.Security.SuperUserKey);
+                await _elementContainerService.CreateAsync(folderKey, folderName, parent?.Key, Constants.Security.SuperUserKey);
             if (tryCreateFolder.Success is false)
             {
-                _logger.LogError("Could not create element folder: {FolderName}. Status: {Status}", folderName, tryCreateFolder.Status);
+                _logger.LogError(
+                    "Could not create element folder: {FolderName}. Status: {Status}",
+                    folderName,
+                    tryCreateFolder.Status);
                 throw new InvalidOperationException($"Could not create element folder '{folderName}'. Status: {tryCreateFolder.Status}");
             }
 
             trackEntityContainersInstalled.Add(tryCreateFolder.Result!);
             return tryCreateFolder.Result;
+        }
+
+        private static int GetElementParentId(XElement element, Dictionary<Guid, int> elementParentIds)
+        {
+            if (Guid.TryParse(element.Attribute("key")?.Value, out Guid key)
+                && elementParentIds.TryGetValue(key, out var containerId))
+            {
+                return containerId;
+            }
+
+            return Constants.System.Root;
         }
 
         #endregion

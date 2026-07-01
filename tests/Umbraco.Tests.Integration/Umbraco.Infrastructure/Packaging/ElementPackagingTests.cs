@@ -51,7 +51,7 @@ internal sealed class ElementPackagingTests : UmbracoIntegrationTest
         var elementType = ContentTypeBuilder.CreateSimpleElementType("element2", "Element 2");
         await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
 
-        IElement element = new Element("My Element", elementType);
+        Element element = new Element("My Element", elementType);
         element.SetValue("title", "The Element Title");
         ElementService.Save(element);
 
@@ -76,7 +76,7 @@ internal sealed class ElementPackagingTests : UmbracoIntegrationTest
         var elementType = ContentTypeBuilder.CreateSimpleElementType("element3", "Element 3");
         await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
 
-        IElement element = new Element("My Element", elementType);
+        Element element = new Element("My Element", elementType);
         element.SetValue("title", "The Element Title");
         ElementService.Save(element);
 
@@ -102,7 +102,9 @@ internal sealed class ElementPackagingTests : UmbracoIntegrationTest
 
         // Act
         CompiledPackage compiledPackage = CompiledPackageXmlParser.ToCompiledPackage(packageXml);
+#pragma warning disable CS0618
         InstallationSummary summary = PackageDataInstallation.InstallPackageData(compiledPackage, Constants.Security.SuperUserId);
+#pragma warning restore CS0618
 
         // Assert
         Assert.Multiple(() =>
@@ -170,7 +172,9 @@ internal sealed class ElementPackagingTests : UmbracoIntegrationTest
 
         // Act
         CompiledPackage compiledPackage = CompiledPackageXmlParser.ToCompiledPackage(packageXml);
+#pragma warning disable CS0618
         InstallationSummary summary = PackageDataInstallation.InstallPackageData(compiledPackage, Constants.Security.SuperUserId);
+#pragma warning restore CS0618
 
         // Assert: both containers recreated and the element is placed back under the leaf container.
         IElement reloaded = ElementService.GetById(elementKey)!;
