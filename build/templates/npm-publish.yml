@@ -1,0 +1,28 @@
+parameters:
+  - name: artifactName # "npm" or "npm-testhelpers"
+    type: string
+  - name: registry # scoped-registry URL to publish to
+    type: string
+  - name: customEndpoint # npmAuthenticate service connection(s)
+    type: string
+  - name: displayName # label for the publish step
+    type: string
+  - name: npmTag # dist-tag to publish under
+    type: string
+    default: latest
+
+steps:
+  - checkout: none
+  - download: current
+    artifact: ${{ parameters.artifactName }}
+  - script: npm config set @umbraco-cms:registry ${{ parameters.registry }} --location=project
+    displayName: Add scoped registry to .npmrc
+    workingDirectory: $(Pipeline.Workspace)/${{ parameters.artifactName }}
+  - task: npmAuthenticate@0
+    displayName: Authenticate with npm
+    inputs:
+      workingFile: $(Pipeline.Workspace)/${{ parameters.artifactName }}/.npmrc
+      customEndpoint: ${{ parameters.customEndpoint }}
+  - script: npm publish *.tgz --tag ${{ parameters.npmTag }}
+    displayName: ${{ parameters.displayName }}
+    workingDirectory: $(Pipeline.Workspace)/${{ parameters.artifactName }}

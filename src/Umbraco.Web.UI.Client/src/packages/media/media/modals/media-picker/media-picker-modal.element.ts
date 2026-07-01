@@ -581,10 +581,7 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 				?selected=${this.value?.selection?.find((value) => value === item.unique)}
 				?selectable=${selectable}
 				?select-only=${this._isSelectionMode || canNavigate === false}>
-				<umb-imaging-thumbnail
-					unique=${item.unique}
-					alt=${item.name}
-					icon=${item.mediaType.icon}></umb-imaging-thumbnail>
+				<umb-media-thumbnail unique=${item.unique} alt=${item.name} icon=${item.mediaType.icon}></umb-media-thumbnail>
 			</uui-card-media>
 		`;
 	}
@@ -738,7 +735,6 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 			}
 
 			uui-pagination {
-				display: block;
 				margin-top: var(--uui-size-layout-1);
 			}
 

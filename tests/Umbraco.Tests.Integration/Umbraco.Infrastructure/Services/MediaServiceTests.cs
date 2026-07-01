@@ -23,6 +23,57 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
 
     private IMediaTypeService MediaTypeService => GetRequiredService<IMediaTypeService>();
 
+    [TestCase(true)]
+    [TestCase(false)]
+    public async Task Sort_Preserves_Property_Data_When_Items_Loaded_Without_It(bool useSortChildren)
+    {
+        var mediaType = await CreateMediaType();
+
+        var keys = new List<Guid>();
+        for (var i = 0; i < 3; i++)
+        {
+            IMedia media = MediaBuilder.CreateSimpleMedia(mediaType, "Media " + i, -1);
+            media.SetValue("title", "Title " + i);
+            MediaService.Save(media);
+            keys.Add(media.Key);
+        }
+
+        // Mimic a partial load (e.g. a collection view): instances without property data (#23120).
+        List<IMedia> partial = keys
+            .Select(key =>
+            {
+                IMedia media = MediaService.GetById(key);
+                media.Properties = new PropertyCollection();
+                return media;
+            })
+            .ToList();
+
+        // Rotate so every item's sort order changes (and is therefore re-saved).
+        if (useSortChildren)
+        {
+            int[] rotated = [partial[1].Id, partial[2].Id, partial[0].Id];
+
+            var result = MediaService.SortChildren(Constants.System.Root, rotated);
+            Assert.That(result.Success, Is.True);
+        }
+        else
+        {
+            IMedia[] rotated = [partial[1], partial[2], partial[0]];
+            Assert.That(MediaService.Sort(rotated), Is.True);
+        }
+
+        // Every sorted item must retain its property data, and the requested order must be applied.
+        Assert.Multiple(() =>
+        {
+            Assert.That(MediaService.GetById(keys[0]).GetValue<string>("title"), Is.EqualTo("Title 0"));
+            Assert.That(MediaService.GetById(keys[1]).GetValue<string>("title"), Is.EqualTo("Title 1"));
+            Assert.That(MediaService.GetById(keys[2]).GetValue<string>("title"), Is.EqualTo("Title 2"));
+            Assert.That(MediaService.GetById(keys[1]).SortOrder, Is.EqualTo(0));
+            Assert.That(MediaService.GetById(keys[2]).SortOrder, Is.EqualTo(1));
+            Assert.That(MediaService.GetById(keys[0]).SortOrder, Is.EqualTo(2));
+        });
+    }
+
     [Test]
     public async Task Can_Create_Media()
     {
@@ -526,4 +577,38 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
     }
 
     #endregion
+
+    [Test]
+    public void SortChildren_Persists_The_Supplied_Order()
+    {
+        var folderMediaType = MediaTypeService.Get(Constants.Conventions.MediaTypes.Folder)!;
+
+        var root = MediaBuilder.CreateMediaFolder(folderMediaType, Constants.System.Root);
+        root.Name = "Root";
+        MediaService.Save(root);
+
+        var childIds = new List<int>();
+        for (var i = 0; i < 5; i++)
+        {
+            var child = MediaBuilder.CreateMediaFolder(folderMediaType, root.Id);
+            child.Name = $"Folder {i}";
+            MediaService.Save(child);
+            childIds.Add(child.Id);
+        }
+
+        int[] ChildIdsInSortOrder() => MediaService
+            .GetPagedChildren(root.Id, 0, 100, out _)
+            .OrderBy(child => child.SortOrder)
+            .Select(child => child.Id)
+            .ToArray();
+
+        // Children were created in ascending sort order.
+        Assert.AreEqual(childIds.ToArray(), ChildIdsInSortOrder());
+
+        var reversed = Enumerable.Reverse(childIds).ToArray();
+        var result = MediaService.SortChildren(root.Id, reversed, Constants.Security.SuperUserId);
+
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(reversed, ChildIdsInSortOrder());
+    }
 }

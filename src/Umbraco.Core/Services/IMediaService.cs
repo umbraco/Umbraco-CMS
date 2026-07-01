@@ -339,6 +339,22 @@ public interface IMediaService : IContentServiceBase<IMedia>
     bool Sort(IEnumerable<IMedia> items, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
+    ///     Sorts the children of a parent by persisting the supplied (already ordered) child identifiers
+    ///     as the new sort order, in a single set-based update.
+    /// </summary>
+    /// <param name="parentId">The identifier of the parent, or <see cref="Constants.System.Root"/> for the root.</param>
+    /// <param name="orderedChildIds">The child media identifiers, in the desired order.</param>
+    /// <param name="userId">The identifier of the user performing the action.</param>
+    /// <returns>The operation result.</returns>
+    /// <remarks>
+    ///     Unlike <see cref="Sort(IEnumerable{IMedia}, int)" />, this does not load the children or fire per-item
+    ///     save/sort notifications; it persists the order directly and refreshes the affected cache branch.
+    /// </remarks>
+    // TODO (V19): Remove the default implementation.
+    OperationResult SortChildren(int parentId, IReadOnlyList<int> orderedChildIds, int userId = Constants.Security.SuperUserId)
+        => throw new NotImplementedException();
+
+    /// <summary>
     ///     Creates an <see cref="IMedia" /> object using the alias of the <see cref="IMediaType" />
     ///     that this Media should based on.
     /// </summary>

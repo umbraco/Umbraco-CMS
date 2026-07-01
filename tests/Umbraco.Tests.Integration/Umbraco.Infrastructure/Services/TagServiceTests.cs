@@ -44,6 +44,8 @@ internal sealed class TagServiceTests : UmbracoIntegrationTest
 
     private IContentService ContentService => GetRequiredService<IContentService>();
 
+    private IElementService ElementService => GetRequiredService<IElementService>();
+
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
     private ITagService TagService => GetRequiredService<ITagService>();
@@ -104,6 +106,103 @@ internal sealed class TagServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
+    public async Task GetTaggedElementsByTag_Returns_Tagged_Elements()
+    {
+        IContentType elementType = await CreateElementTypeWithTags();
+
+        IElement element1 = new Element("Tagged element 1", elementType);
+        element1.AssignTags(PropertyEditorCollection, DataTypeService, IdKeyMap, Serializer, "tags", new[] { "cow", "pig", "goat" });
+        ElementService.Save(element1);
+        ElementService.Publish(element1, Array.Empty<string>());
+
+        IElement element2 = new Element("Tagged element 2", elementType);
+        element2.AssignTags(PropertyEditorCollection, DataTypeService, IdKeyMap, Serializer, "tags", new[] { "pig" });
+        ElementService.Save(element2);
+        ElementService.Publish(element2, Array.Empty<string>());
+
+        var taggedWithCow = TagService.GetTaggedElementsByTag("cow").ToArray();
+        Assert.AreEqual(1, taggedWithCow.Length);
+        Assert.AreEqual(element1.Id, taggedWithCow[0].EntityId);
+        Assert.IsTrue(taggedWithCow[0].TaggedProperties.SelectMany(x => x.Tags).Any(x => x.Text == "cow"));
+
+        var taggedWithPig = TagService.GetTaggedElementsByTag("pig").Select(x => x.EntityId).ToArray();
+        Assert.AreEqual(2, taggedWithPig.Length);
+        CollectionAssert.AreEquivalent(new[] { element1.Id, element2.Id }, taggedWithPig);
+    }
+
+    [Test]
+    public async Task GetTaggedElementsByTagGroup_Returns_Tagged_Elements()
+    {
+        IContentType elementType = await CreateElementTypeWithTags();
+
+        IElement element1 = new Element("Tagged element 1", elementType);
+        element1.AssignTags(PropertyEditorCollection, DataTypeService, IdKeyMap, Serializer, "tags", new[] { "cow", "pig" });
+        ElementService.Save(element1);
+        ElementService.Publish(element1, Array.Empty<string>());
+
+        var tagged = TagService.GetTaggedElementsByTagGroup("default").ToArray();
+        Assert.AreEqual(1, tagged.Length);
+        Assert.AreEqual(element1.Id, tagged[0].EntityId);
+    }
+
+    [Test]
+    public async Task GetAllElementTags_Returns_Element_Tags_With_NodeCount()
+    {
+        IContentType elementType = await CreateElementTypeWithTags();
+
+        IElement element1 = new Element("Tagged element 1", elementType);
+        element1.AssignTags(PropertyEditorCollection, DataTypeService, IdKeyMap, Serializer, "tags", new[] { "cow", "pig", "goat" });
+        ElementService.Save(element1);
+        ElementService.Publish(element1, Array.Empty<string>());
+
+        IElement element2 = new Element("Tagged element 2", elementType);
+        element2.AssignTags(PropertyEditorCollection, DataTypeService, IdKeyMap, Serializer, "tags", new[] { "cow", "pig" });
+        ElementService.Save(element2);
+        ElementService.Publish(element2, Array.Empty<string>());
+
+        IElement element3 = new Element("Tagged element 3", elementType);
+        element3.AssignTags(PropertyEditorCollection, DataTypeService, IdKeyMap, Serializer, "tags", new[] { "cow" });
+        ElementService.Save(element3);
+        ElementService.Publish(element3, Array.Empty<string>());
+
+        var tags = TagService.GetAllElementTags()
+            .OrderByDescending(x => x.NodeCount)
+            .ToList();
+
+        Assert.AreEqual(3, tags.Count);
+        Assert.AreEqual("cow", tags[0].Text);
+        Assert.AreEqual(3, tags[0].NodeCount);
+        Assert.AreEqual("pig", tags[1].Text);
+        Assert.AreEqual(2, tags[1].NodeCount);
+        Assert.AreEqual("goat", tags[2].Text);
+        Assert.AreEqual(1, tags[2].NodeCount);
+    }
+
+    [Test]
+    public async Task Element_And_Content_Tags_Are_Isolated_By_ObjectType()
+    {
+        IContentType elementType = await CreateElementTypeWithTags();
+
+        IContent content = ContentBuilder.CreateSimpleContent(_contentType, "Tagged content");
+        content.AssignTags(PropertyEditorCollection, DataTypeService, IdKeyMap, Serializer, "tags", new[] { "shared" });
+        ContentService.Save(content);
+        ContentService.Publish(content, Array.Empty<string>());
+
+        IElement element = new Element("Tagged element", elementType);
+        element.AssignTags(PropertyEditorCollection, DataTypeService, IdKeyMap, Serializer, "tags", new[] { "shared" });
+        ElementService.Save(element);
+        ElementService.Publish(element, Array.Empty<string>());
+
+        var taggedContent = TagService.GetTaggedContentByTag("shared").ToArray();
+        Assert.AreEqual(1, taggedContent.Length);
+        Assert.AreEqual(content.Id, taggedContent[0].EntityId);
+
+        var taggedElements = TagService.GetTaggedElementsByTag("shared").ToArray();
+        Assert.AreEqual(1, taggedElements.Length);
+        Assert.AreEqual(element.Id, taggedElements[0].EntityId);
+    }
+
+    [Test]
     public void TagList_Contains_NodeCount()
     {
         var content1 = ContentBuilder.CreateSimpleContent(_contentType, "Tagged content 1");
@@ -140,5 +239,17 @@ internal sealed class TagServiceTests : UmbracoIntegrationTest
         Assert.AreEqual(2, tags[1].NodeCount);
         Assert.AreEqual("goat", tags[2].Text);
         Assert.AreEqual(1, tags[2].NodeCount);
+    }
+
+    private async Task<IContentType> CreateElementTypeWithTags()
+    {
+        IContentType elementType = ContentTypeBuilder.CreateSimpleElementType("umbElement", "Mandatory Element Type");
+        elementType.PropertyGroups.First().PropertyTypes.Add(
+            new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "tags")
+            {
+                DataTypeId = Constants.DataTypes.Tags
+            });
+        await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
+        return elementType;
     }
 }

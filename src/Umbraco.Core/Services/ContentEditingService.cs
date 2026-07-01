@@ -103,11 +103,19 @@ internal sealed class ContentEditingService
     public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateCreateAsync(
         ContentCreateModel createModel,
         Guid userKey)
-        => await ValidateCulturesAndPropertiesAsync(
+    {
+        ContentEditingOperationStatus creationAllowedStatus = await ValidateCreationAllowedAsync(createModel);
+        if (creationAllowedStatus != ContentEditingOperationStatus.Success)
+        {
+            return Attempt.FailWithStatus(creationAllowedStatus, new ContentValidationResult());
+        }
+
+        return await ValidateCulturesAndPropertiesAsync(
             createModel,
             createModel.ContentTypeKey,
             createModel.Variants.Select(variant => variant.Culture),
             userKey);
+    }
 
     /// <inheritdoc />
     public async Task<Attempt<ContentCreateResult, ContentEditingOperationStatus>> CreateAsync(ContentCreateModel createModel, Guid userKey)
@@ -211,6 +219,15 @@ internal sealed class ContentEditingService
         Guid userKey)
         => await HandleSortAsync(parentKey, sortingModels, userKey);
 
+    /// <inheritdoc />
+    public async Task<ContentEditingOperationStatus> SortByFieldAsync(
+        Guid? parentKey,
+        ContentSortField field,
+        Direction direction,
+        string? culture,
+        Guid userKey)
+        => await HandleSortByFieldAsync(parentKey, field, direction, culture, userKey);
+
     private async Task<ContentEditingOperationStatus> UpdateTemplateAsync(IContent content, Guid? templateKey)
     {
         if (templateKey == null)
@@ -258,13 +275,20 @@ internal sealed class ContentEditingService
     protected override OperationResult? Delete(IContent content, int userId) => ContentService.Delete(content, userId);
 
     /// <inheritdoc />
-    protected override IEnumerable<IContent> GetPagedChildren(int parentId, int pageIndex, int pageSize, out long total)
-        => ContentService.GetPagedChildren(parentId, pageIndex, pageSize, out total, propertyAliases: null, filter: null, ordering: null);
+    protected override IEnumerable<IContent> GetPagedChildren(int parentId, int pageIndex, int pageSize, Ordering? ordering, out long total)
+        => ContentService.GetPagedChildren(parentId, pageIndex, pageSize, out total, propertyAliases: null, filter: null, ordering: ordering);
 
     /// <inheritdoc />
     protected override ContentEditingOperationStatus Sort(IEnumerable<IContent> items, int userId)
     {
         OperationResult result = ContentService.Sort(items, userId);
+        return OperationResultToOperationStatus(result);
+    }
+
+    /// <inheritdoc />
+    protected override ContentEditingOperationStatus SortChildrenInBulk(int parentId, IReadOnlyList<int> orderedChildIds, int userId)
+    {
+        OperationResult result = ContentService.SortChildren(parentId, orderedChildIds, userId);
         return OperationResultToOperationStatus(result);
     }
 

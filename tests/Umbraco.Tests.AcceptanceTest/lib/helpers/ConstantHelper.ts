@@ -66,8 +66,9 @@
   }
 
   public static readonly contentPickerSettings = {
-    0: ['Ignore user start nodes', 'Selecting this option allows a user to choose nodes that they normally dont have access to.'],
-    1: ['Start node', '']
+    0: ['Accepted types', 'Limit to specific types'],
+    1: ['Start node', ''],
+    2: ['Ignore user start nodes', 'Selecting this option allows a user to choose nodes that they normally dont have access to.']
   }
 
   public static readonly datePickerSettings = {
@@ -405,6 +406,10 @@
     rollback: 'Rollback',
     copy: 'Copy',
     unpublish: 'Unpublish'
+  }
+
+  public static readonly documentUrlInfoMessages = {
+    cannotBeRouted: 'This document is published but its URL cannot be routed'
   }
 
   public static readonly elementTypeChangeMessages = {

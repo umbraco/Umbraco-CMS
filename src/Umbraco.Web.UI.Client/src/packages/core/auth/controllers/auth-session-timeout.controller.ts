@@ -2,6 +2,15 @@ import type { UmbAuthContext } from '../auth.context.js';
 import { UMB_MODAL_AUTH_TIMEOUT } from '../modals/umb-auth-timeout-modal.token.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
+/**
+ * Safety margin (in seconds) subtracted from the client-computed session expiry.
+ * The client stamps the session timing when the token response is received, which is
+ * slightly later than when the server issued it — so the client's expiry estimate is
+ * always a little optimistic. Treating the session as expired this much earlier ensures
+ * a "Stay logged in" click near the end of the countdown still reaches the server in time.
+ */
+const EXPIRY_SAFETY_MARGIN_IN_SECONDS = 5;
+
 export class UmbAuthSessionTimeoutController extends UmbControllerBase {
 	#host: UmbAuthContext;
 	#timeoutId?: ReturnType<typeof setTimeout>;
@@ -58,6 +67,7 @@ export class UmbAuthSessionTimeoutController extends UmbControllerBase {
 	/**
 	 * Schedules a check for when the session enters the warning zone (buffer before expiry).
 	 * Uses adaptive buffer: 25% of session lifetime, clamped between 5s and 60s.
+	 * @param {number} expiresAt The unix timestamp (in seconds) when the session expires.
 	 */
 	#scheduleCheck(expiresAt: number) {
 		this.#scheduledExpiresAt = expiresAt;
@@ -67,7 +77,7 @@ export class UmbAuthSessionTimeoutController extends UmbControllerBase {
 
 		if (secondsUntilExpiry <= 0) {
 			// Already expired
-			this.#onSessionExpiring(0, expiresAt);
+			this.#onSessionExpiring(expiresAt);
 			return;
 		}
 
@@ -77,17 +87,18 @@ export class UmbAuthSessionTimeoutController extends UmbControllerBase {
 
 		if (secondsUntilWarning <= 0) {
 			// Already in the buffer zone
-			this.#onSessionExpiring(secondsUntilExpiry, expiresAt);
+			this.#onSessionExpiring(expiresAt);
 		} else {
-			this.#timeoutId = setTimeout(() => this.#onSessionExpiring(buffer, expiresAt), secondsUntilWarning * 1000);
+			this.#timeoutId = setTimeout(() => this.#onSessionExpiring(expiresAt), secondsUntilWarning * 1000);
 		}
 	}
 
 	/**
 	 * Called when the session is expiring or has expired.
 	 * Decides whether to auto-refresh, show the timeout modal, or time out.
+	 * @param {number} originalExpiresAt The session expiry (unix timestamp in seconds) this check was scheduled for.
 	 */
-	async #onSessionExpiring(secondsRemaining: number, originalExpiresAt: number) {
+	async #onSessionExpiring(originalExpiresAt: number) {
 		// Guard: if the session was refreshed since we scheduled this check, skip.
 		// We compare expiresAt rather than using isSessionValid() because this fires
 		// during the buffer zone (before full expiry), when the session is still "valid".
@@ -95,12 +106,14 @@ export class UmbAuthSessionTimeoutController extends UmbControllerBase {
 
 		if (this.#host.keepUserLoggedIn) {
 			console.log('[Auth] Session expiring, auto-refreshing (keepUserLoggedIn=true)');
-			const success = await this.#tryValidateToken();
-			if (!success) {
-				this.#host.timeOut();
-			}
+			await this.#tryValidateToken();
 			return;
 		}
+
+		// Recompute the remaining time from the wall clock — the scheduled timer may have
+		// fired late (system sleep, background-tab timer throttling), in which case the
+		// session can already be expired even though it was valid when the timer was set.
+		const secondsRemaining = originalExpiresAt - Math.floor(Date.now() / 1000) - EXPIRY_SAFETY_MARGIN_IN_SECONDS;
 
 		if (secondsRemaining <= 0) {
 			console.log('[Auth] Session fully expired');
@@ -120,9 +133,9 @@ export class UmbAuthSessionTimeoutController extends UmbControllerBase {
 
 	async #openTimeoutModal(remainingTimeInSeconds: number): Promise<void> {
 		const contextToken = (await import('@umbraco-cms/backoffice/modal')).UMB_MODAL_MANAGER_CONTEXT;
-		const modalManager = await this.getContext(contextToken);
 
 		try {
+			const modalManager = await this.getContext(contextToken);
 			const modal = modalManager?.open(this, UMB_MODAL_AUTH_TIMEOUT, {
 				modal: {
 					key: 'auth-timeout',
@@ -147,9 +160,20 @@ export class UmbAuthSessionTimeoutController extends UmbControllerBase {
 		}
 	}
 
+	/**
+	 * Forces a token refresh against the server.
+	 * Times the user out when the refresh fails (e.g. the refresh token has expired),
+	 * so the re-authentication flow starts instead of leaving the user in a session
+	 * that will be rejected on the next API call.
+	 * @returns {Promise<boolean>} True if the refresh succeeded, otherwise false.
+	 */
 	async #tryValidateToken(): Promise<boolean> {
 		try {
-			return await this.#host.validateToken();
+			const success = await this.#host.validateToken();
+			if (!success) {
+				this.#host.timeOut();
+			}
+			return success;
 		} catch (error) {
 			console.error('[Auth] Error validating token:', error);
 			this.#host.timeOut();

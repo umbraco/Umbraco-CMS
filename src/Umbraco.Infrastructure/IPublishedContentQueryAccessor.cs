@@ -1,10 +1,10 @@
-/// <summary>
-/// Provides access to the current <see cref="Umbraco.Cms.Core.PublishedCache.IPublishedContentQuery" /> instance for the active request context.
-/// </summary>
 using System.Diagnostics.CodeAnalysis;
 
 namespace Umbraco.Cms.Core;
 
+/// <summary>
+/// Provides access to the current <see cref="Umbraco.Cms.Core.PublishedCache.IPublishedContentQuery" /> instance for the active request context.
+/// </summary>
 /// <remarks>
 ///     Not intended for use in background threads where you should make use of
 ///     <see cref="Umbraco.Cms.Core.Web.IUmbracoContextFactory.EnsureUmbracoContext" />
