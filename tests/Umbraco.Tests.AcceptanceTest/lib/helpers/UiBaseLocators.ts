@@ -1495,6 +1495,8 @@ export class UiBaseLocators extends BasePage {
     await this.clickSubmitButton();
     await this.click(this.page.getByLabel(dictionaryName));
     await this.click(this.chooseBtn);
+    // Wait for the snippet to land in the editor before returning, so a following save can't race the insert.
+    await this.containsText(this.monacoEditor, dictionaryName);
   }
 
   async insertSystemFieldValue(fieldValue: string) {
