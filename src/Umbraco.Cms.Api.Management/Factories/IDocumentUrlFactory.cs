@@ -16,11 +16,29 @@ public interface IDocumentUrlFactory
     Task<IEnumerable<DocumentUrlInfo>> CreateUrlsAsync(IContent content);
 
     /// <summary>
+    /// Creates URLs asynchronously for the given content, optionally restricted to a single culture.
+    /// </summary>
+    /// <param name="content">The content to create URLs for.</param>
+    /// <param name="culture">The culture to restrict variant content urls to, or <c>null</c> for all cultures.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains a collection of DocumentUrlInfo.</returns>
+    Task<IEnumerable<DocumentUrlInfo>> CreateUrlsAsync(IContent content, string? culture)
+        => CreateUrlsAsync(content);
+
+    /// <summary>
     /// Asynchronously creates URL sets for the specified content items.
     /// </summary>
     /// <param name="contentItems">The content items for which to generate URL sets.</param>
     /// <returns>A task representing the asynchronous operation, with a result containing an enumerable of <see cref="DocumentUrlInfoResponseModel"/> representing the URL sets.</returns>
     Task<IEnumerable<DocumentUrlInfoResponseModel>> CreateUrlSetsAsync(IEnumerable<IContent> contentItems);
+
+    /// <summary>
+    /// Asynchronously creates URL sets for the specified content items, optionally restricted to a single culture.
+    /// </summary>
+    /// <param name="contentItems">The content items for which to generate URL sets.</param>
+    /// <param name="culture">The culture to restrict variant content urls to, or <c>null</c> for all cultures.</param>
+    /// <returns>A task representing the asynchronous operation, with a result containing an enumerable of <see cref="DocumentUrlInfoResponseModel"/> representing the URL sets.</returns>
+    Task<IEnumerable<DocumentUrlInfoResponseModel>> CreateUrlSetsAsync(IEnumerable<IContent> contentItems, string? culture)
+        => CreateUrlSetsAsync(contentItems);
 
     /// <summary>
     /// Asynchronously retrieves preview URL information for the specified content item.

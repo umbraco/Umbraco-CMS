@@ -7455,6 +7455,7 @@ export type GetDocumentUrlsData = {
     path?: never;
     query?: {
         id?: Array<string>;
+        culture?: string;
     };
     url: '/umbraco/management/api/v1/document/urls';
 };

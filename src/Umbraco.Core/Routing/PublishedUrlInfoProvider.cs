@@ -56,16 +56,26 @@ public class PublishedUrlInfoProvider : IPublishedUrlInfoProvider
     }
 
     /// <inheritdoc />
-    public async Task<ISet<UrlInfo>> GetAllAsync(IContent content)
+    public Task<ISet<UrlInfo>> GetAllAsync(IContent content)
+        => GetAllAsync(content, culture: null);
+
+    /// <inheritdoc />
+    public async Task<ISet<UrlInfo>> GetAllAsync(IContent content, string? culture)
     {
         HashSet<UrlInfo> urlInfos = [];
         var isInvariant = !content.ContentType.VariesByCulture();
 
-        IEnumerable<string> cultures = await GetCulturesForUrlLookupAsync(content);
+        // For variant content, restrict to the requested culture when it is a valid installed culture.
+        // For invariant content, no culture, or an unknown culture, this is null and all cultures are resolved.
+        string? scopedCulture = await ResolveScopedCultureAsync(content, culture);
 
-        foreach (var culture in cultures)
+        IEnumerable<string> cultures = scopedCulture is not null
+            ? [scopedCulture]
+            : await GetCulturesForUrlLookupAsync(content);
+
+        foreach (var contentCulture in cultures)
         {
-            var url = _publishedUrlProvider.GetUrl(content.Key, culture: culture);
+            var url = _publishedUrlProvider.GetUrl(content.Key, culture: contentCulture);
 
             // Handle "could not get URL"
             if (url is Constants.Routing.Unroutable or Constants.Routing.UrlProviderException)
@@ -77,12 +87,12 @@ public class PublishedUrlInfoProvider : IPublishedUrlInfoProvider
                     continue;
                 }
 
-                urlInfos.Add(UrlInfo.AsMessage(_localizedTextService.Localize("content", "getUrlException"), UrlProviderAlias, culture));
+                urlInfos.Add(UrlInfo.AsMessage(_localizedTextService.Localize("content", "getUrlException"), UrlProviderAlias, contentCulture));
                 continue;
             }
 
             // Check for collision
-            Attempt<UrlInfo?> hasCollision = await VerifyCollisionAsync(content, url, culture);
+            Attempt<UrlInfo?> hasCollision = await VerifyCollisionAsync(content, url, contentCulture);
 
             if (hasCollision is { Success: true, Result: not null })
             {
@@ -90,7 +100,7 @@ public class PublishedUrlInfoProvider : IPublishedUrlInfoProvider
                 continue;
             }
 
-            urlInfos.Add(UrlInfo.AsUrl(url, UrlProviderAlias, culture));
+            urlInfos.Add(UrlInfo.AsUrl(url, UrlProviderAlias, contentCulture));
         }
 
         // If the content is trashed, we can't get the other URLs, as we have no parent structure to navigate through.
@@ -101,12 +111,32 @@ public class PublishedUrlInfoProvider : IPublishedUrlInfoProvider
 
         // Then get "other" urls - I.E. Not what you'd get with GetUrl(), this includes all the urls registered using domains.
         // for these 'other' URLs, we don't check whether they are routable, collide, anything - we just report them.
-        foreach (UrlInfo otherUrl in _publishedUrlProvider.GetOtherUrls(content.Id).OrderBy(x => x.Message).ThenBy(x => x.Culture))
+        // When scoped to a single culture, only report the other urls for that culture.
+        foreach (UrlInfo otherUrl in _publishedUrlProvider.GetOtherUrls(content.Id)
+                     .Where(x => scopedCulture is null || string.Equals(x.Culture, scopedCulture, StringComparison.OrdinalIgnoreCase))
+                     .OrderBy(x => x.Message).ThenBy(x => x.Culture))
         {
             urlInfos.Add(otherUrl);
         }
 
         return urlInfos;
+    }
+
+    /// <summary>
+    /// Resolves the single culture to scope the URL lookup to, or <c>null</c> to resolve all cultures.
+    /// Returns null for invariant content, when no culture is requested, or when the requested culture
+    /// is not a valid installed culture (in which case all cultures are resolved). Otherwise returns the
+    /// installed culture matching the request (using the installed culture's casing).
+    /// </summary>
+    private async Task<string?> ResolveScopedCultureAsync(IContent content, string? culture)
+    {
+        if (culture is null || content.ContentType.VariesByCulture() is false)
+        {
+            return null;
+        }
+
+        IEnumerable<string> isoCodes = await _languageService.GetAllIsoCodesAsync();
+        return isoCodes.FirstOrDefault(x => x.InvariantEquals(culture));
     }
 
     /// <summary>

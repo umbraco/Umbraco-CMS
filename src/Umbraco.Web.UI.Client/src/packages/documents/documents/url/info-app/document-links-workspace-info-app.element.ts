@@ -84,7 +84,7 @@ export class UmbDocumentLinksWorkspaceInfoAppElement extends UmbLitElement {
 
 						if (unique !== this._unique) {
 							this._unique = unique;
-							this.#requestUrls();
+							this.#debounceRequestUrls();
 						}
 					},
 					'observeWorkspaceState',
@@ -98,6 +98,16 @@ export class UmbDocumentLinksWorkspaceInfoAppElement extends UmbLitElement {
 				this.#setLinks();
 			});
 		});
+
+		// Re-request when the displayed culture changes, so switching language fetches that culture.
+		this.observe(
+			this.#documentUrlsDataResolver?.requestCulture,
+			() => {
+				if (!this._unique || this._isNew) return;
+				this.#debounceRequestUrls();
+			},
+			'observeRequestCulture',
+		);
 
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (context) => {
 			this.#propertyDataSetVariantId = context?.getVariantId();
@@ -143,7 +153,10 @@ export class UmbDocumentLinksWorkspaceInfoAppElement extends UmbLitElement {
 		this._loading = true;
 		this.#documentUrlsDataResolver?.setData([]);
 
-		const { data } = await this.#documentUrlRepository.requestItems([this._unique]);
+		// Only request the culture currently being displayed for variant documents. Invariant documents
+		// return all of their domain urls, so no culture is passed (getRequestCulture resolves undefined).
+		const culture = await this.#documentUrlsDataResolver?.getRequestCulture();
+		const { data } = await this.#documentUrlRepository.requestUrls([this._unique], culture);
 
 		if (data?.length) {
 			this.#documentUrlsDataResolver?.setData(data[0].urls);

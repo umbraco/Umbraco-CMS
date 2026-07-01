@@ -11686,6 +11686,13 @@
                 "format": "uuid"
               }
             }
+          },
+          {
+            "name": "culture",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
