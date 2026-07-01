@@ -24,7 +24,7 @@ public abstract class ContentBase : TreeEntityBase, IContentBase
     /// <summary>
     ///     Initializes a new instance of the <see cref="ContentBase" /> class.
     /// </summary>
-    protected ContentBase(string? name, int parentId, IContentTypeComposition? contentType, IPropertyCollection properties, string? culture = null)
+    protected ContentBase(string name, int parentId, IContentTypeComposition? contentType, IPropertyCollection properties, string? culture = null)
         : this(name, contentType, properties, culture)
     {
         if (parentId == 0)
@@ -38,7 +38,7 @@ public abstract class ContentBase : TreeEntityBase, IContentBase
     /// <summary>
     ///     Initializes a new instance of the <see cref="ContentBase" /> class.
     /// </summary>
-    protected ContentBase(string? name, IContentBase? parent, IContentTypeComposition contentType, IPropertyCollection properties, string? culture = null)
+    protected ContentBase(string name, IContentBase? parent, IContentTypeComposition contentType, IPropertyCollection properties, string? culture = null)
         : this(name, contentType, properties, culture)
     {
         if (parent == null)
@@ -49,8 +49,9 @@ public abstract class ContentBase : TreeEntityBase, IContentBase
         SetParent(parent);
     }
 
-    private ContentBase(string? name, IContentTypeComposition? contentType, IPropertyCollection properties, string? culture = null)
+    private ContentBase(string name, IContentTypeComposition? contentType, IPropertyCollection properties, string? culture = null)
     {
+        ArgumentNullException.ThrowIfNull(name);
         ContentType = contentType?.ToSimple() ?? throw new ArgumentNullException(nameof(contentType));
 
         // initially, all new instances have

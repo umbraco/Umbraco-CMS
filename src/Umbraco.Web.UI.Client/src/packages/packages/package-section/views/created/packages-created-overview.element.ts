@@ -53,7 +53,7 @@ export class UmbPackagesCreatedOverviewElement extends UmbLitElement {
 			color: 'danger',
 			headline: `Remove ${pkg.name}?`,
 			content: 'Are you sure you want to delete this package',
-			confirmLabel: this.localize.term('general_delete'),
+			confirmLabel: '#general_delete',
 		});
 
 		const success = await this.#packageRepository.deleteCreatedPackage(pkg.unique);
@@ -146,9 +146,6 @@ export class UmbPackagesCreatedOverviewElement extends UmbLitElement {
 			.no-packages {
 				display: flex;
 				justify-content: space-around;
-			}
-			uui-pagination {
-				display: inline-block;
 			}
 
 			.container {

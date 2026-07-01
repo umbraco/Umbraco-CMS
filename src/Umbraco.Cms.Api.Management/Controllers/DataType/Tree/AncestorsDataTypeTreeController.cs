@@ -8,16 +8,12 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DataType.Tree;
 
+/// <summary>
+/// Controller responsible for handling operations related to the ancestors tree structure of data types.
+/// </summary>
 [ApiVersion("1.0")]
 public class AncestorsDataTypeTreeController : DataTypeTreeControllerBase
 {
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
-    public AncestorsDataTypeTreeController(IEntityService entityService, IDataTypeService dataTypeService)
-        : base(entityService, dataTypeService)
-    {
-    }
-
-    [ActivatorUtilitiesConstructor]
     public AncestorsDataTypeTreeController(IEntityService entityService, FlagProviderCollection flagProviders, IDataTypeService dataTypeService)
     : base(entityService, flagProviders, dataTypeService)
     {

@@ -373,16 +373,16 @@ export default {
 		enterFolderName: 'أدخل اسم المجلد',
 		updateData: 'اختر نوعًا وعنوانًا',
 		noDocumentTypes:
-			'لا توجد أنواع وثائق مسموح بها متاحة لإنشاء المحتوى هنا. يجب تمكينها في <strong>أنواع الوثائق</strong> ضمن قسم <strong>الإعدادات</strong>، عن طريق تعديل <strong>أنواع العقد الفرعية المسموح بها</strong> ضمن <strong>الأذونات</strong>.',
+			'لا توجد أنواع وثائق مسموح بها متاحة لإنشاء المحتوى هنا. يجب تمكينها في <strong>أنواع الوثائق</strong> ضمن قسم <strong>الإعدادات</strong>، عن طريق تعديل <strong>أنواع العقد الفرعية المسموح بها</strong> ضمن <strong>الهيكل</strong>.',
 		noDocumentTypesAtRoot:
 			'لا توجد أنواع وثائق متاحة لإنشاء المحتوى هنا. يجب عليك إنشاء هذه الأنواع في <strong>أنواع الوثائق</strong> ضمن قسم <strong>الإعدادات</strong>.',
 		noDocumentTypesWithNoSettingsAccess: 'الصفحة المحددة في شجرة المحتوى لا تسمح بإنشاء أي صفحات أسفلها.',
 		noDocumentTypesEditPermissions: 'تعديل الأذونات لهذا النوع من الوثائق',
 		noDocumentTypesCreateNew: 'إنشاء نوع وثيقة جديد',
 		noDocumentTypesAllowedAtRoot:
-			'لا توجد أنواع وثائق مسموح بها لإنشاء المحتوى هنا. يجب تمكينها في <strong>أنواع الوثائق</strong> ضمن قسم <strong>الإعدادات</strong>، عن طريق تغيير خيار <strong>السماح كجذر</strong> ضمن <strong>الأذونات</strong>.',
+			'لا توجد أنواع وثائق مسموح بها لإنشاء المحتوى هنا. يجب تمكينها في <strong>أنواع الوثائق</strong> ضمن قسم <strong>الإعدادات</strong>، عن طريق تغيير خيار <strong>السماح كجذر</strong> ضمن <strong>الهيكل</strong>.',
 		noMediaTypes:
-			'لا توجد أنواع وسائط مسموح بها لإنشاء الوسائط هنا. يجب تمكينها في <strong>أنواع الوسائط</strong> ضمن قسم <strong>الإعدادات</strong>، عن طريق تعديل <strong>أنواع العقد الفرعية المسموح بها</strong> ضمن <strong>الأذونات</strong>.',
+			'لا توجد أنواع وسائط مسموح بها لإنشاء الوسائط هنا. يجب تمكينها في <strong>أنواع الوسائط</strong> ضمن قسم <strong>الإعدادات</strong>، عن طريق تعديل <strong>أنواع العقد الفرعية المسموح بها</strong> ضمن <strong>الهيكل</strong>.',
 		noMediaTypesWithNoSettingsAccess: 'الوسائط المحددة في الشجرة لا تسمح بإنشاء أي وسائط أخرى أسفلها.',
 		noMediaTypesEditPermissions: 'تعديل الأذونات لهذا النوع من الوسائط',
 		documentTypeWithoutTemplate: 'نوع الوثيقة بدون قالب',
@@ -736,6 +736,7 @@ export default {
 		content: 'محتوى',
 		continue: 'متابعة',
 		copy: 'نسخ',
+		copied: 'تم النسخ!',
 		create: 'إنشاء',
 		cropSection: 'قسم الاقتصاص',
 		database: 'قاعدة بيانات',
@@ -1258,6 +1259,7 @@ export default {
 	},
 	sections: {
 		content: 'المحتوى',
+		library: 'المكتبة',
 		media: 'الوسائط',
 		member: 'الأعضاء',
 		packages: 'الحزم',
@@ -1555,8 +1557,16 @@ export default {
 		chooseChildNode: 'اختر العقدة الفرعية',
 		compositionsDescription:
 			'ارث التبويبات والخصائص من نوع مستند موجود. سيتم إضافة التبويبات الجديدة إلى نوع الوثيقة الحالي أو دمجها إذا كان هناك تبويب بنفس الاسم.',
+		compositionsDescriptionMediaType:
+			'ارث التبويبات والخصائص من نوع وسائط موجود. سيتم إضافة التبويبات الجديدة إلى نوع الوسائط الحالي أو دمجها إذا كان هناك تبويب بنفس الاسم.',
+		compositionsDescriptionMemberType:
+			'ارث التبويبات والخصائص من نوع عضو موجود. سيتم إضافة التبويبات الجديدة إلى نوع العضو الحالي أو دمجها إذا كان هناك تبويب بنفس الاسم.',
 		compositionInUse: 'هذا النوع من المحتوى قيد الاستخدام في تركيب، وبالتالي لا يمكن تركيبه بنفسه.\n    ',
+		compositionInUseMediaType: 'هذا النوع من الوسائط قيد الاستخدام في تركيب، وبالتالي لا يمكن تركيبه بنفسه.\n    ',
+		compositionInUseMemberType: 'هذا النوع من الأعضاء قيد الاستخدام في تركيب، وبالتالي لا يمكن تركيبه بنفسه.\n    ',
 		noAvailableCompositions: 'لا توجد أنواع محتوى متاحة لاستخدامها كتركيب.',
+		noAvailableCompositionsMediaType: 'لا توجد أنواع وسائط متاحة لاستخدامها كتركيب.',
+		noAvailableCompositionsMemberType: 'لا توجد أنواع أعضاء متاحة لاستخدامها كتركيب.',
 		compositionRemoveWarning:
 			'إزالة التركيب ستؤدي إلى حذف جميع بيانات الخصائص المرتبطة. بمجرد حفظ نوع الوثيقة لا يوجد طريق للعودة.',
 		availableEditors: 'إنشاء جديد',
@@ -1590,6 +1600,8 @@ export default {
 		tabHasNoSortOrder: 'التبويب ليس له ترتيب فرز',
 		compositionUsageHeading: 'أين يتم استخدام هذا التركيب؟',
 		compositionUsageSpecification: 'يتم استخدام هذا التركيب حاليًا في تركيب أنواع المحتوى التالية:\n    ',
+		compositionUsageSpecificationMediaType: 'يتم استخدام هذا التركيب حاليًا في تركيب أنواع الوسائط التالية:\n    ',
+		compositionUsageSpecificationMemberType: 'يتم استخدام هذا التركيب حاليًا في تركيب أنواع الأعضاء التالية:\n    ',
 		variantsHeading: 'السماح بالاختلافات',
 		cultureVariantHeading: 'السماح بالاختلاف حسب الثقافة',
 		segmentVariantHeading: 'السماح بالتجزئة',
@@ -1776,7 +1788,7 @@ export default {
 		createDate: 'تاريخ إنشاء المستخدم',
 		changePassword: 'تغيير كلمة المرور',
 		changePhoto: 'تغيير الصورة',
-		configureMfa: 'تكوين MFA',
+		configureMfa: 'تكوين 2FA',
 		emailRequired: 'مطلوب - أدخل عنوان بريد إلكتروني لهذا المستخدم',
 		emailDescription: (usernameIsEmail) => {
 			return usernameIsEmail
@@ -2025,6 +2037,8 @@ export default {
 	redirectUrls: {
 		disableUrlTracker: 'تعطيل تتبع URL',
 		enableUrlTracker: 'تمكين تتبع URL',
+		urlTrackerEnabled: 'ممكّن',
+		urlTrackerDisabled: 'معطّل',
 		culture: 'الثقافة',
 		originalUrl: 'URL الأصلي',
 		redirectedTo: 'تم إعادة التوجيه إلى',
@@ -2102,7 +2116,8 @@ export default {
 		openBackofficeSearch: 'فتح بحث المكتب الخلفي',
 		openCloseBackofficeHelp: 'فتح/إغلاق مساعدة المكتب الخلفي',
 		openCloseBackofficeProfileOptions: 'فتح/إغلاق خيارات ملفك الشخصي',
-		profileOptions: 'خيارات الملف الشخصي',
+		profileOptions: 'ملف المستخدم الشخصي لـ %0% (%1%)',
+		profileOptionsDefault: 'ملف المستخدم الشخصي',
 		assignDomainDescription: 'إعداد الثقافة وأسماء النطاقات لـ %0%',
 		createDescription: 'إنشاء عقدة جديدة تحت %0%',
 		protectDescription: 'إعداد قيود الوصول على %0%',

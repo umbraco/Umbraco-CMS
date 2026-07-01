@@ -22,6 +22,9 @@ public class DateTimeUnspecifiedPropertyEditor : DateTimePropertyEditorBase
     /// <summary>
     /// Initializes a new instance of the <see cref="DateTimeUnspecifiedPropertyEditor"/> class.
     /// </summary>
+    /// <param name="dataValueEditorFactory">Factory for creating data value editors for property values.</param>
+    /// <param name="ioHelper">Helper for IO operations, such as path and file handling.</param>
+    /// <param name="propertyIndexValueFactory">Factory for creating index values for date/time properties with unspecified kind.</param>
     public DateTimeUnspecifiedPropertyEditor(
         IDataValueEditorFactory dataValueEditorFactory,
         IIOHelper ioHelper,

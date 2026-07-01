@@ -11,6 +11,10 @@ export class UmbDuplicateToModalElement extends UmbModalBaseElement<UmbDuplicate
 	@state()
 	private _destinationUnique?: string | null;
 
+	private get _treeExpansion() {
+		return this.data?.treeExpansion ?? [];
+	}
+
 	#onTreeSelectionChange(event: UmbSelectionChangeEvent) {
 		const target = event.target as UmbTreeElement;
 		const selection = target.getSelection();
@@ -25,13 +29,14 @@ export class UmbDuplicateToModalElement extends UmbModalBaseElement<UmbDuplicate
 		if (!this.data) return nothing;
 
 		return html`
-			<umb-body-layout headline="Duplicate">
+			<umb-body-layout headline=${this.localize.term('actions_copyTo')}>
 				<uui-box>
 					<umb-tree
 						alias=${this.data.treeAlias}
 						.props=${{
 							foldersOnly: this.data?.foldersOnly,
 							expandTreeRoot: true,
+							expansion: this._treeExpansion,
 						}}
 						@selection-change=${this.#onTreeSelectionChange}></umb-tree>
 				</uui-box>
@@ -43,12 +48,15 @@ export class UmbDuplicateToModalElement extends UmbModalBaseElement<UmbDuplicate
 
 	#renderActions() {
 		return html`
-			<uui-button slot="actions" label="Cancel" @click="${this._rejectModal}"></uui-button>
+			<uui-button
+				slot="actions"
+				label=${this.localize.term('general_cancel')}
+				@click="${this._rejectModal}"></uui-button>
 			<uui-button
 				slot="actions"
 				color="positive"
 				look="primary"
-				label="Duplicate"
+				label=${this.localize.term('general_copy')}
 				@click=${this._submitModal}
 				?disabled=${this._destinationUnique === undefined}></uui-button>
 		`;

@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -13,6 +13,9 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Language;
 
+/// <summary>
+/// Controller responsible for handling requests to update language resources in the system.
+/// </summary>
 [ApiVersion("1.0")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessLanguages)]
 public class UpdateLanguageController : LanguageControllerBase
@@ -21,6 +24,12 @@ public class UpdateLanguageController : LanguageControllerBase
     private readonly IUmbracoMapper _umbracoMapper;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UpdateLanguageController"/> class, responsible for handling language update operations in the Umbraco management API.
+    /// </summary>
+    /// <param name="languageService">Service used to manage and update language entities.</param>
+    /// <param name="umbracoMapper">Mapper used to convert between domain models and API models.</param>
+    /// <param name="backOfficeSecurityAccessor">Accessor for back office security context, used for authorization and user information.</param>
     public UpdateLanguageController(
         ILanguageService languageService,
         IUmbracoMapper umbracoMapper,

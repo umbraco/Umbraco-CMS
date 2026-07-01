@@ -26,6 +26,9 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 	private _specific?: boolean;
 
 	@state()
+	private _initalSpecific?: boolean;
+
+	@state()
 	private _startPage = true;
 
 	@state()
@@ -89,8 +92,7 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 		if (!this.#unique) return;
 
 		try {
-			const { data, error } = await this.#publicAccessRepository.read(this.#unique);
-
+			const { data, error } = await this.#publicAccessRepository.read(this.#unique, true);
 			if (error) {
 				// A 404 means no direct public access entry exists on this node.
 				// This is expected for descendants of a protected document — they inherit
@@ -107,11 +109,19 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 				return;
 			}
 
-			this.#isNew = false;
-			this._startPage = false;
+			// When protection is inherited from an ancestor, treat this as a "new" entry so the dialog
+			// shows the inherit selection as a default for modification and uses create (not update)
+			// on save (because the child document doesn't have its own public access entry yet).
+			this.#isNew = data.isProtectedByAncestor;
+
+			// Show the start page if protection is inherited, otherwise show the edit page.
+			this._startPage = data.isProtectedByAncestor;
 
 			// Specific or Groups
 			this._specific = data.members.length > 0;
+
+			// preserve initial specific value allowing for clearing the selection when changed.
+			this._initalSpecific = this._specific;
 
 			//selection
 			if (data.members.length > 0) {
@@ -131,6 +141,10 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 	// Modal events
 
 	#handleNext() {
+		if (this._specific != this._initalSpecific) {
+			// Clear selection if changing between specific and groups as the selection is not compatible.
+			this._selection = [];
+		}
 		this._startPage = false;
 	}
 
@@ -215,7 +229,10 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 
 	override render() {
 		return html`
-			<umb-body-layout headline=${this.localize.term('actions_protect')}>
+			<umb-body-layout
+				headline=${this.#isNew
+					? this.localize.term('publicAccess_psHeadlineSetup')
+					: this.localize.term('publicAccess_psHeadlineEdit')}>
 				<uui-box>${this.#renderContent()}</uui-box> ${this.renderActions()}
 			</umb-body-layout>
 		`;
@@ -246,11 +263,11 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 			<uui-radio-group
 				@change=${(e: UUIRadioEvent) =>
 					e.target.value === 'members' ? (this._specific = true) : (this._specific = false)}>
-				<uui-radio label=${this.localize.term('publicAccess_paMembers')} value="members">
+				<uui-radio ?checked=${this._specific === true} label=${this.localize.term('publicAccess_paMembers')} value="members">
 					<strong>${this.localize.term('publicAccess_paMembers')}</strong><br />
 					${this.localize.term('publicAccess_paMembersHelp')}
 				</uui-radio>
-				<uui-radio label=${this.localize.term('publicAccess_paGroups')} value="groups">
+				<uui-radio ?checked=${this._specific === false} label=${this.localize.term('publicAccess_paGroups')} value="groups">
 					<strong>${this.localize.term('publicAccess_paGroups')}</strong><br />
 					${this.localize.term('publicAccess_paGroupsHelp')}
 				</uui-radio>
@@ -313,7 +330,9 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 					id="save"
 					look="primary"
 					color="positive"
-					label=${this.localize.term('buttons_save')}
+					label=${this.#isNew
+						? this.localize.term('publicAccess_psActionSetup')
+						: this.localize.term('publicAccess_psActionEdit')}
 					?disabled=${!this._loginDocumentId || !this._errorDocumentId || this._selection.length === 0}
 					@click="${this.#handleSave}"></uui-button>`
 			: html`<uui-button
@@ -376,6 +395,12 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 
 			#error p {
 				margin: var(--uui-size-2) 0;
+			}
+
+			#warning {
+				margin-bottom: var(--uui-size-space-4);
+				--uui-color-surface: var(--uui-color-warning);
+				padding: var(--uui-size-space-1);
 			}
 		`,
 	];

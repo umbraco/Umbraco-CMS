@@ -15,7 +15,6 @@ public class MediaType : ContentTypeCompositionBase, IMediaType
     ///     Constant indicating that media types do not support publishing.
     /// </summary>
     public const bool SupportsPublishingConst = false;
-    private bool _isCloning;
 
     /// <summary>
     ///     Constuctor for creating a MediaType with the parent's id.
@@ -56,7 +55,7 @@ public class MediaType : ContentTypeCompositionBase, IMediaType
         get => base.Alias;
         set
         {
-            if (this.IsSystemMediaType() && value != Alias && _isCloning is false)
+            if (HasIdentity && this.IsSystemMediaType() && value != Alias)
             {
                 throw new InvalidOperationException("Cannot change the alias of a system media type");
             }
@@ -66,12 +65,7 @@ public class MediaType : ContentTypeCompositionBase, IMediaType
     }
 
     /// <inheritdoc />
-    public new IMediaType DeepCloneWithResetIdentities(string newAlias)
-    {
-        _isCloning = true;
-        var clone = (IMediaType)base.DeepCloneWithResetIdentities(newAlias);
-        _isCloning = false;
-        return clone;
-    }
+    public new IMediaType DeepCloneWithResetIdentities(string newAlias) =>
+        (IMediaType)base.DeepCloneWithResetIdentities(newAlias);
 
 }

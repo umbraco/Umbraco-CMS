@@ -11,6 +11,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Package.Created;
 
+/// <summary>
+/// Controller responsible for handling update operations on packages that have already been created.
+/// </summary>
 [ApiVersion("1.0")]
 public class UpdateCreatedPackageController : CreatedPackageControllerBase
 {
@@ -18,6 +21,12 @@ public class UpdateCreatedPackageController : CreatedPackageControllerBase
     private readonly IUmbracoMapper _umbracoMapper;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UpdateCreatedPackageController"/> class.
+    /// </summary>
+    /// <param name="packagingService">Service used for handling package creation and updates.</param>
+    /// <param name="umbracoMapper">The mapper used to map between Umbraco models and API models.</param>
+    /// <param name="backOfficeSecurityAccessor">Accessor for back office security context and authentication.</param>
     public UpdateCreatedPackageController(
         IPackagingService packagingService,
         IUmbracoMapper umbracoMapper,

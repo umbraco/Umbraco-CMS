@@ -15,6 +15,14 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
 internal sealed class PublicAccessRepository : EntityRepositoryBase<Guid, PublicAccessEntry>, IPublicAccessRepository
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PublicAccessRepository"/> class.
+    /// </summary>
+    /// <param name="scopeAccessor">Provides access to the current database scope for repository operations.</param>
+    /// <param name="cache">The application-level caches used for optimizing data retrieval.</param>
+    /// <param name="logger">The logger used for logging repository events and errors.</param>
+    /// <param name="repositoryCacheVersionService">Service for managing cache versioning within the repository.</param>
+    /// <param name="cacheSyncService">Service responsible for synchronizing cache across distributed environments.</param>
     public PublicAccessRepository(
         IScopeAccessor scopeAccessor,
         AppCaches cache,
@@ -33,9 +41,11 @@ internal sealed class PublicAccessRepository : EntityRepositoryBase<Guid, Public
     protected override IRepositoryCachePolicy<PublicAccessEntry, Guid> CreateCachePolicy() =>
         new FullDataSetRepositoryCachePolicy<PublicAccessEntry, Guid>(GlobalIsolatedCache, ScopeAccessor,  RepositoryCacheVersionService, CacheSyncService, GetEntityId, /*expires:*/ false);
 
+    // Note: PerformGet(Guid) is passed as a callback to the cache policy's Get(TId) method,
+    // but FullDataSetRepositoryCachePolicy.Get() never invokes it — it uses GetAllCached()
+    // internally and clones only the matched entity. This override exists only as a required
+    // implementation of the abstract base and as a fallback for non-FullDataSet policies.
     protected override PublicAccessEntry? PerformGet(Guid id) =>
-
-        // return from GetAll - this will be cached as a collection
         GetMany().FirstOrDefault(x => x.Key == id);
 
     protected override IEnumerable<PublicAccessEntry> PerformGetAll(params Guid[]? ids)

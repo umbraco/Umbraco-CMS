@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -13,22 +14,71 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Media.Tree;
 
+/// <summary>
+/// Controller responsible for handling operations related to the child nodes of media items in the media tree.
+/// </summary>
 [ApiVersion("1.0")]
 public class ChildrenMediaTreeController : MediaTreeControllerBase
 {
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ChildrenMediaTreeController"/> class.
+    /// </summary>
+    /// <param name="entityService">Service for managing and retrieving entities within the system.</param>
+    /// <param name="flagProviders">A collection of providers that supply flags for entities.</param>
+    /// <param name="treeFilterService">Service for filtering media tree entities based on user start nodes.</param>
+    /// <param name="mediaPresentationFactory">Factory for creating media presentation models.</param>
+    [ActivatorUtilitiesConstructor]
     public ChildrenMediaTreeController(
         IEntityService entityService,
-        IUserStartNodeEntitiesService userStartNodeEntitiesService,
-        IDataTypeService dataTypeService,
-        AppCaches appCaches,
-        IBackOfficeSecurityAccessor backofficeSecurityAccessor,
+        FlagProviderCollection flagProviders,
+        IMediaStartNodeTreeFilterService treeFilterService,
         IMediaPresentationFactory mediaPresentationFactory)
-        : base(entityService, userStartNodeEntitiesService, dataTypeService, appCaches, backofficeSecurityAccessor, mediaPresentationFactory)
+        : base(entityService, flagProviders, treeFilterService, mediaPresentationFactory)
     {
     }
 
-    [ActivatorUtilitiesConstructor]
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ChildrenMediaTreeController"/> class.
+    /// </summary>
+    /// <remarks>
+    /// This constructor exists solely to disambiguate DI container constructor resolution between the new
+    /// and the existing obsolete constructors; all parameters except those forwarded to the non-obsolete
+    /// constructor are ignored.
+    /// </remarks>
+    /// <param name="entityService">Service for accessing and managing entities within the system.</param>
+    /// <param name="flagProviders">A collection of providers that supply flags for entities.</param>
+    /// <param name="userStartNodeEntitiesService">Service for resolving user start nodes for entities.</param>
+    /// <param name="dataTypeService">Service for accessing and managing data types.</param>
+    /// <param name="treeFilterService">Service for filtering media tree entities based on user start nodes.</param>
+    /// <param name="appCaches">Provides access to application-level caches.</param>
+    /// <param name="backofficeSecurityAccessor">Accessor for backoffice security context and operations.</param>
+    /// <param name="mediaPresentationFactory">Factory for creating media presentation models.</param>
+    [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in Umbraco 19.")]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public ChildrenMediaTreeController(
+        IEntityService entityService,
+        FlagProviderCollection flagProviders,
+        IUserStartNodeEntitiesService userStartNodeEntitiesService,
+        IDataTypeService dataTypeService,
+        IMediaStartNodeTreeFilterService treeFilterService,
+        AppCaches appCaches,
+        IBackOfficeSecurityAccessor backofficeSecurityAccessor,
+        IMediaPresentationFactory mediaPresentationFactory)
+        : this(entityService, flagProviders, treeFilterService, mediaPresentationFactory)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ChildrenMediaTreeController"/> class, responsible for handling API requests related to retrieving child media items in the media tree.
+    /// </summary>
+    /// <param name="entityService">Service for managing and retrieving entities within the Umbraco system.</param>
+    /// <param name="flagProviders">A collection of providers that supply flags for entities, used for additional metadata or state.</param>
+    /// <param name="userStartNodeEntitiesService">Service for resolving the start nodes for users, determining their access within the media tree.</param>
+    /// <param name="dataTypeService">Service for accessing and managing data types in Umbraco.</param>
+    /// <param name="appCaches">Provides access to application-level caches for performance optimization.</param>
+    /// <param name="backofficeSecurityAccessor">Accessor for backoffice security context, used for authorization and user information.</param>
+    /// <param name="mediaPresentationFactory">Factory for creating presentation models for media entities.</param>
+    [Obsolete("Please use the constructor accepting IMediaStartNodeTreeFilterService. Scheduled for removal in Umbraco 19.")]
     public ChildrenMediaTreeController(
         IEntityService entityService,
         FlagProviderCollection flagProviders,
@@ -41,6 +91,15 @@ public class ChildrenMediaTreeController : MediaTreeControllerBase
     {
     }
 
+    /// <summary>
+    /// Retrieves a paginated list of media tree items that are direct children of the specified parent media item.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="parentId">The unique identifier of the parent media item whose children are to be retrieved.</param>
+    /// <param name="skip">The number of items to skip before starting to collect the result set (for pagination).</param>
+    /// <param name="take">The maximum number of items to return (for pagination).</param>
+    /// <param name="dataTypeId">An optional data type identifier to filter the media items.</param>
+    /// <returns>A task representing the asynchronous operation. The result contains an <see cref="ActionResult{T}"/> with a paged view model of <see cref="MediaTreeItemResponseModel"/> items.</returns>
     [HttpGet("children")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<MediaTreeItemResponseModel>), StatusCodes.Status200OK)]

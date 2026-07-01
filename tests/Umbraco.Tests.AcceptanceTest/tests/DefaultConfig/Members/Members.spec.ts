@@ -111,8 +111,7 @@ test('can edit password', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
 test('can add member group', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const memberGroupName = 'TestMemberGroup';
-  await umbracoApi.memberGroup.ensureNameNotExists(memberGroupName);
-  const memberGroupId = await umbracoApi.memberGroup.create(memberGroupName);
+  const memberGroupId = await umbracoApi.memberGroup.createDefaultMemberGroup(memberGroupName);
   memberTypeId = await umbracoApi.memberType.createDefaultMemberType(memberTypeName);
   memberId = await umbracoApi.member.createDefaultMember(memberName, memberTypeId, email, username, password);
   await umbracoUi.member.goToMembers();
@@ -133,8 +132,7 @@ test('can add member group', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) =>
 test('can remove member group', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const memberGroupName = 'TestMemberGroup';
-  await umbracoApi.memberGroup.ensureNameNotExists(memberGroupName);
-  const memberGroupId = await umbracoApi.memberGroup.create(memberGroupName);
+  const memberGroupId = await umbracoApi.memberGroup.createDefaultMemberGroup(memberGroupName);
   memberTypeId = await umbracoApi.memberType.createDefaultMemberType(memberTypeName);
   memberId = await umbracoApi.member.createMemberWithMemberGroup(memberName, memberTypeId, email, username, password, memberGroupId);
   await umbracoUi.member.goToMembers();
@@ -175,6 +173,25 @@ test('can view member info', async ({umbracoApi, umbracoUi}) => {
     minute: "numeric",
     hour12: true,
   }));
+});
+
+test('approved is enabled by default when creating a member', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoUi.member.goToMembers();
+
+  // Act
+  await umbracoUi.member.clickCreateMembersButton();
+  await umbracoUi.member.enterMemberName(memberName);
+  await umbracoUi.member.clickInfoTab();
+  await umbracoUi.member.enterUsername(username);
+  await umbracoUi.member.enterEmail(email);
+  await umbracoUi.member.enterPassword(password);
+  await umbracoUi.member.enterConfirmPassword(password);
+  await umbracoUi.member.clickSaveButtonAndWaitForMemberToBeCreated();
+
+  // Assert
+  const memberData = await umbracoApi.member.getByName(memberName);
+  expect(memberData.isApproved).toBe(true);
 });
 
 test('can enable approved', async ({umbracoApi, umbracoUi}) => {

@@ -1,11 +1,13 @@
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
+import type { UmbEntityExpansionModel } from '@umbraco-cms/backoffice/utils';
 
 export const UMB_DUPLICATE_TO_MODAL_ALIAS = 'Umb.Modal.DuplicateTo';
 
 export interface UmbDuplicateToModalData extends UmbEntityModel {
 	treeAlias: string;
 	foldersOnly?: boolean;
+	treeExpansion?: UmbEntityExpansionModel;
 }
 
 export interface UmbDuplicateToModalValue {

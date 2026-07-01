@@ -3,6 +3,9 @@ using Umbraco.Cms.Core.Packaging;
 
 namespace Umbraco.Extensions;
 
+/// <summary>
+/// Contains extension methods to assist with loading and managing infrastructure-related types in Umbraco.
+/// </summary>
 public static class InfrastuctureTypeLoaderExtensions
 {
     /// <summary>

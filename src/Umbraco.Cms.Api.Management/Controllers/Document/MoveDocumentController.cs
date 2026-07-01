@@ -16,6 +16,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Document;
 
+/// <summary>
+/// Controller responsible for handling document move operations within the Umbraco CMS API.
+/// </summary>
 [ApiVersion("1.0")]
 public class MoveDocumentController : DocumentControllerBase
 {
@@ -23,6 +26,13 @@ public class MoveDocumentController : DocumentControllerBase
     private readonly IContentEditingService _contentEditingService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Controllers.Document.MoveDocumentController"/> class,
+    /// providing services required for document move operations.
+    /// </summary>
+    /// <param name="authorizationService">Service used to authorize user actions related to document movement.</param>
+    /// <param name="contentEditingService">Service responsible for editing and managing content documents.</param>
+    /// <param name="backOfficeSecurityAccessor">Accessor for back office security context and user information.</param>
     public MoveDocumentController(
         IAuthorizationService authorizationService,
         IContentEditingService contentEditingService,
@@ -33,6 +43,16 @@ public class MoveDocumentController : DocumentControllerBase
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
+    /// <summary>
+    /// Moves the specified document to a new location within the content tree.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="id">The unique identifier (GUID) of the document to move.</param>
+    /// <param name="moveDocumentRequestModel">The request model containing information about the target location.</param>
+    /// <returns>
+    /// An <see cref="IActionResult"/> indicating the result of the move operation:
+    /// returns <c>200 OK</c> if the move is successful, or <c>404 Not Found</c> if the document or target location does not exist.
+    /// </returns>
     [HttpPut("{id:guid}/move")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]

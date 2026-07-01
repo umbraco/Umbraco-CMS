@@ -3,7 +3,6 @@
 
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.IO;
-using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
@@ -15,15 +14,13 @@ namespace Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
 ///     Will run on all servers - even though file upload should only be handled on the scheduling publisher, this will
 ///     ensure that in the case it happens on subscribers that they are cleaned up too.
 /// </remarks>
-public class TempFileCleanupJob : IRecurringBackgroundJob
+public class TempFileCleanupJob : RecurringBackgroundJobBase
 {
-    public TimeSpan Period { get => TimeSpan.FromMinutes(60); }
-
-    // Runs on all servers
-    public ServerRole[] ServerRoles { get => Enum.GetValues<ServerRole>(); }
-
-    // No-op event as the period never changes on this job
-    public event EventHandler PeriodChanged { add { } remove { } }
+    /// <summary>
+    /// Gets the server roles on which this job runs. This job is configured to run on all server roles.
+    /// </summary>
+    /// <remarks>Runs on all servers</remarks>
+    public override ServerRole[] ServerRoles => Enum.GetValues<ServerRole>();
 
     private readonly TimeSpan _age = TimeSpan.FromDays(1);
     private readonly IIOHelper _ioHelper;
@@ -36,24 +33,33 @@ public class TempFileCleanupJob : IRecurringBackgroundJob
     /// <param name="ioHelper">Helper service for IO operations.</param>
     /// <param name="logger">The typed logger.</param>
     public TempFileCleanupJob(IIOHelper ioHelper, ILogger<TempFileCleanupJob> logger)
+        : base(TimeSpan.FromMinutes(60))
     {
         _ioHelper = ioHelper;
         _logger = logger;
-
         _tempFolders = _ioHelper.GetTempFolders();
     }
 
-    public Task RunJobAsync()
+    /// <summary>
+    /// Asynchronously executes the cleanup of temporary files in the configured temporary folders.
+    /// </summary>
+    /// <param name="cancellationToken">A cancellation token that is signaled when the host is shutting down.</param>
+    /// <returns>
+    /// A task that represents the asynchronous cleanup operation.
+    /// </returns>
+    public override Task RunJobAsync(CancellationToken cancellationToken)
     {
         foreach (DirectoryInfo folder in _tempFolders)
         {
-            CleanupFolder(folder);
+            cancellationToken.ThrowIfCancellationRequested();
+
+            CleanupFolder(folder, cancellationToken);
         }
 
         return Task.CompletedTask;
     }
 
-    private void CleanupFolder(DirectoryInfo folder)
+    private void CleanupFolder(DirectoryInfo folder, CancellationToken cancellationToken)
     {
         CleanFolderResult result = _ioHelper.CleanFolder(folder, _age);
         switch (result.Status)
@@ -83,6 +89,8 @@ public class TempFileCleanupJob : IRecurringBackgroundJob
         FileInfo[] files = folder.GetFiles("*.*", SearchOption.AllDirectories);
         foreach (FileInfo file in files)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             if (DateTime.UtcNow - file.LastWriteTimeUtc > _age)
             {
                 try
@@ -97,5 +105,4 @@ public class TempFileCleanupJob : IRecurringBackgroundJob
             }
         }
     }
-
 }

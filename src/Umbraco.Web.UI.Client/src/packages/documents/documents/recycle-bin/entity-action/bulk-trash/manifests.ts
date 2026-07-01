@@ -14,6 +14,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		kind: UMB_ENTITY_BULK_ACTION_TRASH_WITH_RELATION_KIND,
 		alias: 'Umb.EntityBulkAction.Document.Trash',
 		name: 'Trash Document Entity Bulk Action',
+		api: () => import('./document-bulk-trash-with-relation.action.js'),
 		weight: 10,
 		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {

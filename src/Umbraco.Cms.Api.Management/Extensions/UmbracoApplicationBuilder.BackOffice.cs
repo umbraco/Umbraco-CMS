@@ -14,14 +14,20 @@ public static partial class UmbracoApplicationBuilderExtensions
     /// <summary>
     ///     Adds all required middleware to run the back office
     /// </summary>
-    /// <param name="builder"></param>
-    /// <returns></returns>
+    /// <param name="builder">The Umbraco application builder context.</param>
+    /// <returns>The builder for chaining.</returns>
     public static IUmbracoApplicationBuilderContext UseBackOffice(this IUmbracoApplicationBuilderContext builder)
     {
         builder.AppBuilder.UseMiddleware<BackOfficeExternalLoginProviderErrorMiddleware>();
         return builder;
     }
 
+    /// <summary>
+    /// Configures the endpoint routes required for the Umbraco back office, including administrative and preview endpoints.
+    /// Should be called after routing, authentication, and authorization middleware have been configured.
+    /// </summary>
+    /// <param name="app">The <see cref="IUmbracoEndpointBuilderContext"/> to configure with back office endpoints.</param>
+    /// <returns>The same <see cref="IUmbracoEndpointBuilderContext"/> instance, for chaining.</returns>
     public static IUmbracoEndpointBuilderContext UseBackOfficeEndpoints(this IUmbracoEndpointBuilderContext app)
     {
         // NOTE: This method will have been called after UseRouting, UseAuthentication, UseAuthorization

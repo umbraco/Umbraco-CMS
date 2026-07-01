@@ -183,11 +183,16 @@ export class UmbBlockGridEntriesContext
 				const valueResolver = new UmbClipboardPastePropertyValueTranslatorValueResolver(this);
 
 				const blockTypes = this.#allowedBlockTypes.getValue();
+
+				const configuredSize = this._manager
+					.getEditorConfiguration()
+					?.getValueByAlias<'small' | 'medium' | 'large' | 'full'>('createModalSize');
 				/*
 				modal size logic:
 				If more than 8 block types, medium modal, more than 12 large modal:
 				*/
-				const modalSize = blockTypes.length > 12 ? 'large' : blockTypes.length > 8 ? 'medium' : 'small';
+				const modalSize =
+					configuredSize ?? (blockTypes.length > 12 ? 'large' : blockTypes.length > 8 ? 'medium' : 'small');
 
 				return {
 					modal: { size: modalSize },
@@ -443,19 +448,6 @@ export class UmbBlockGridEntriesContext
 	getPathForCreateBlock(index: number) {
 		const pathBuilder = this._catalogueRouteBuilderState.getValue();
 		if (!pathBuilder) return undefined;
-
-		const blockTypes = this.#allowedBlockTypes.getValue();
-		if (blockTypes?.length === 1) {
-			const elementKey = blockTypes[0].contentElementTypeKey;
-
-			if (!this._manager) return undefined;
-			// does the Block have any Content properties?
-			const contentTypeKey = this._manager.getContentTypeKeyOfContentKey(elementKey);
-			if (contentTypeKey && this._manager.getContentTypeHasProperties(contentTypeKey) === false) {
-				return undefined;
-			}
-			return pathBuilder({ view: 'create', index: index }) + 'modal/umb-modal-workspace/create/' + elementKey;
-		}
 
 		return pathBuilder({ view: 'create', index: index });
 	}
@@ -713,10 +705,14 @@ export class UmbBlockGridEntriesContext
 		const allowedBlocks = this.#allowedBlockTypes.getValue();
 		if (allowedBlocks.length === 0) return false;
 
+		// Manager may have been torn down (e.g. when navigating away) while the form-control
+		// mixin still runs validators from updated(). Treat as valid in that case.
+		if (!this._manager) return true;
+
 		const allowedKeys = allowedBlocks.map((x) => x.contentElementTypeKey);
 		// get content for each layout entry:
 		const invalidEntries = layoutEntries.filter((entry) => {
-			const contentTypeKey = this._manager!.getContentTypeKeyOfContentKey(entry.contentKey);
+			const contentTypeKey = this._manager?.getContentTypeKeyOfContentKey(entry.contentKey);
 			if (!contentTypeKey) {
 				// We could not find the content type key, so we cant determin if this is valid or not when the content is missing.
 				// This should be captured elsewhere as the Block then becomes invalid. So the unsupported Block should capture this.

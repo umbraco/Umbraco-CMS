@@ -9,14 +9,18 @@ public class BackOfficeExternalLoginsBuilder
 {
     private readonly IServiceCollection _services;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="BackOfficeExternalLoginsBuilder"/> class for configuring external login providers in the backoffice.
+    /// </summary>
+    /// <param name="services">The <see cref="IServiceCollection"/> to which external login services will be added.</param>
     public BackOfficeExternalLoginsBuilder(IServiceCollection services) => _services = services;
 
     /// <summary>
     ///     Add a back office login provider with options
     /// </summary>
-    /// <param name="loginProviderOptions"></param>
-    /// <param name="build"></param>
-    /// <returns></returns>
+    /// <param name="loginProviderOptions">Optional configuration for the login provider.</param>
+    /// <param name="build">The builder action to configure the authentication scheme.</param>
+    /// <returns>The builder for chaining.</returns>
     public BackOfficeExternalLoginsBuilder AddBackOfficeLogin(
         Action<BackOfficeAuthenticationBuilder> build,
         Action<BackOfficeExternalLoginProviderOptions>? loginProviderOptions = null)

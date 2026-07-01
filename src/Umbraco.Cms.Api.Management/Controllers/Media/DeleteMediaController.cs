@@ -14,6 +14,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Media;
 
+/// <summary>
+/// Provides API endpoints for deleting media items in the Umbraco CMS.
+/// </summary>
 [ApiVersion("1.0")]
 public class DeleteMediaController : MediaControllerBase
 {
@@ -21,6 +24,12 @@ public class DeleteMediaController : MediaControllerBase
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly IMediaEditingService _mediaEditingService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DeleteMediaController"/> class.
+    /// </summary>
+    /// <param name="authorizationService">Service used to authorize user actions for media deletion.</param>
+    /// <param name="backOfficeSecurityAccessor">Accessor for back office security context and user information.</param>
+    /// <param name="mediaEditingService">Service responsible for editing and deleting media items.</param>
     public DeleteMediaController(
         IAuthorizationService authorizationService,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
@@ -31,6 +40,12 @@ public class DeleteMediaController : MediaControllerBase
         _mediaEditingService = mediaEditingService;
     }
 
+    /// <summary>
+    /// Deletes a media item identified by the provided Id.
+    /// </summary>
+    /// <param name="cancellationToken">The cancellation token to cancel the operation.</param>
+    /// <param name="id">The unique identifier of the media item to delete.</param>
+    /// <returns>An <see cref="IActionResult"/> indicating the result of the delete operation.</returns>
     [HttpDelete("{id:guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]

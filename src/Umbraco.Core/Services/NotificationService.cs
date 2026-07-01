@@ -32,7 +32,7 @@ public class NotificationService : INotificationService
     private readonly IEmailSender _emailSender;
     private readonly GlobalSettings _globalSettings;
     private readonly IIOHelper _ioHelper;
-    private readonly ILocalizationService _localizationService;
+    private readonly ILanguageService _languageService;
     private readonly ILogger<NotificationService> _logger;
     private readonly INotificationsRepository _notificationsRepository;
     private readonly ICoreScopeProvider _uowProvider;
@@ -44,7 +44,7 @@ public class NotificationService : INotificationService
     /// <param name="provider">The scope provider for unit of work operations.</param>
     /// <param name="userService">The user service for retrieving user information.</param>
     /// <param name="contentService">The content service for accessing content versions.</param>
-    /// <param name="localizationService">The localization service for language operations.</param>
+    /// <param name="languageService">The language service for language operations.</param>
     /// <param name="logger">The logger for diagnostic output.</param>
     /// <param name="ioHelper">The IO helper for resolving paths.</param>
     /// <param name="notificationsRepository">The repository for notification data access.</param>
@@ -55,7 +55,7 @@ public class NotificationService : INotificationService
         ICoreScopeProvider provider,
         IUserService userService,
         IContentService contentService,
-        ILocalizationService localizationService,
+        ILanguageService languageService,
         ILogger<NotificationService> logger,
         IIOHelper ioHelper,
         INotificationsRepository notificationsRepository,
@@ -70,7 +70,7 @@ public class NotificationService : INotificationService
         _uowProvider = provider ?? throw new ArgumentNullException(nameof(provider));
         _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         _contentService = contentService ?? throw new ArgumentNullException(nameof(contentService));
-        _localizationService = localizationService;
+        _languageService = languageService;
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _ioHelper = ioHelper;
     }
@@ -394,7 +394,7 @@ public class NotificationService : INotificationService
                 // Create the HTML based summary (ul of culture names)
                 IEnumerable<string>? culturesChanged = content.CultureInfos?.Values.Where(x => x.WasDirty())
                     .Select(x => x.Culture)
-                    .Select(_localizationService.GetLanguageByIsoCode)
+                    .Select(isoCode => _languageService.GetAsync(isoCode).GetAwaiter().GetResult())
                     .WhereNotNull()
                     .Select(x => x.CultureName);
                 summary.Append("<ul>");
@@ -415,7 +415,7 @@ public class NotificationService : INotificationService
                 // Create the text based summary (csv of culture names)
                 var culturesChanged = string.Join(", ", content.CultureInfos!.Values.Where(x => x.WasDirty())
                     .Select(x => x.Culture)
-                    .Select(_localizationService.GetLanguageByIsoCode)
+                    .Select(isoCode => _languageService.GetAsync(isoCode).GetAwaiter().GetResult())
                     .WhereNotNull()
                     .Select(x => x.CultureName));
 
@@ -465,7 +465,7 @@ public class NotificationService : INotificationService
             }
         }
 
-        var protocol = _globalSettings.UseHttps ? "https" : "http";
+        var protocol = siteUri.Scheme;
 
         var subjectVars = new NotificationEmailSubjectParams(
             string.Concat(siteUri.Authority, _ioHelper.ResolveUrl(Constants.System.DefaultUmbracoPath)),
@@ -476,15 +476,13 @@ public class NotificationService : INotificationService
             mailingUser.Name,
             actionName,
             content.Name,
-            content.Id.ToString(CultureInfo.InvariantCulture),
+            content.Key.ToString(),
             string.Format(
-                "{2}://{0}/{1}",
-                string.Concat(siteUri.Authority),
-
-                // TODO: RE-enable this so we can have a nice URL
-                /*umbraco.library.NiceUrl(documentObject.Id))*/
-                string.Concat(content.Id, ".aspx"),
-                protocol),
+                "{0}://{1}{2}/section/content/workspace/document/edit/{3}",
+                protocol,
+                siteUri.Authority,
+                _ioHelper.ResolveUrl(Constants.System.DefaultUmbracoPath),
+                content.Key),
             performingUser.Name,
             string.Concat(siteUri.Authority, _ioHelper.ResolveUrl(Constants.System.DefaultUmbracoPath)),
             summary.ToString());
@@ -511,9 +509,9 @@ public class NotificationService : INotificationService
                     createBody((user: mailingUser, body: bodyVars, true)));
         }
 
-        // nh, issue 30724. Due to hardcoded http strings in resource files, we need to check for https replacements here
+        // Due to hardcoded http strings in resource files, we need to check for https replacements here
         // adding the server name to make sure we don't replace external links
-        if (_globalSettings.UseHttps && string.IsNullOrEmpty(body) == false)
+        if (string.Equals(siteUri.Scheme, "https", StringComparison.OrdinalIgnoreCase) && string.IsNullOrEmpty(body) == false)
         {
             var serverName = siteUri.Host;
             body = body.Replace(

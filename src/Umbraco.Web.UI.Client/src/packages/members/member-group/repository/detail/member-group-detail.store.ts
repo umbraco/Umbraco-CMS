@@ -15,7 +15,7 @@ export class UmbMemberGroupDetailStore extends UmbDetailStoreBase<UmbMemberGroup
 	 * @memberof UmbMemberGroupDetailStore
 	 */
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_MEMBER_GROUP_DETAIL_STORE_CONTEXT.toString());
+		super(host, UMB_MEMBER_GROUP_DETAIL_STORE_CONTEXT);
 	}
 }
 

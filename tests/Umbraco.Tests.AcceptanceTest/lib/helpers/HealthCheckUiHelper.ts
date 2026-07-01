@@ -11,6 +11,8 @@ export class HealthCheckUiHelper extends UiBaseLocators {
   private readonly healthCheckResultTag: Locator;
   private readonly headline: Locator;
   private readonly healthCheckGroup: Locator;
+  private readonly performChecksBtn: Locator;
+  private readonly healthCheckBox: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -23,6 +25,8 @@ export class HealthCheckUiHelper extends UiBaseLocators {
     this.healthCheckResultTag = page.locator(`${this.positiveTag}, ${this.warningTag}, ${this.dangerTag}`);
     this.headline = page.locator('#headline');
     this.healthCheckGroup = page.locator('umb-dashboard-health-check-group');
+    this.performChecksBtn = page.getByLabel('Perform checks');
+    this.healthCheckBox = page.locator('umb-dashboard-health-check-group uui-box');
   }
 
   async clickHealthCheckTab() {
@@ -63,11 +67,25 @@ export class HealthCheckUiHelper extends UiBaseLocators {
     return expect(this.healthCheckGroupBox.filter({has: this.page.getByText(healthCheckGroupName)}).locator(this.dangerTag)).toHaveText(count.toString());
   }
 
-  async isCheckNameVisible(name: string) {
+  async isHealthCheckNameVisible(name: string) {
     return await this.isVisible(this.headline.filter({hasText: name}));
   }
 
-  async isCheckDescriptionVisible(description: string) {
+  async isHealthCheckDescriptionVisible(description: string) {
     return await this.isVisible(this.healthCheckGroup.getByText(description));
+  }
+
+  async clickPerformChecksButton() {
+    await this.click(this.performChecksBtn);
+  }
+
+  async doesHealthCheckHaveResultMessage(checkName: string, message: string) {
+    const resultDescriptionLocator = this.healthCheckBox.filter({has: this.page.locator('#headline', {hasText: checkName})}).locator('.check-result-description');
+    await expect(resultDescriptionLocator).toContainText(message);
+  }
+
+  async isHealthCheckReadMoreLinkVisible(checkName: string, isVisible = true) {
+    const readMoreLocator = this.healthCheckBox.filter({has: this.page.locator('#headline', {hasText: checkName})}).getByLabel('Read more');
+    await expect(readMoreLocator).toBeVisible({visible: isVisible});
   }
 }

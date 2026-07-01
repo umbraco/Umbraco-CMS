@@ -241,12 +241,15 @@ public static partial class UmbracoBuilderExtensions
     private static IUmbracoBuilder AddHttpClients(this IUmbracoBuilder builder)
     {
         builder.Services.AddHttpClient();
+        // TODO (V19): Remove this registration along with Constants.HttpClients.IgnoreCertificateErrors.
+        #pragma warning disable CS0618 // Type or member is obsolete
         builder.Services.AddHttpClient(Constants.HttpClients.IgnoreCertificateErrors)
             .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
             {
                 ServerCertificateCustomValidationCallback =
                     HttpClientHandler.DangerousAcceptAnyServerCertificateValidator,
             });
+        #pragma warning restore CS0618 // Type or member is obsolete
         builder.Services.AddHttpClient(Constants.HttpClients.WebhookFiring, (services, client) =>
         {
             var productVersion = services.GetRequiredService<IUmbracoVersion>().SemanticVersion.ToSemanticStringWithoutBuild();
@@ -275,6 +278,14 @@ public static partial class UmbracoBuilderExtensions
     /// </summary>
     public static IUmbracoBuilder AddWebComponents(this IUmbracoBuilder builder)
     {
+        // Idempotency check - safe to call multiple times.
+        if (builder.Services.Any(s => s.ServiceType == typeof(AddWebComponentsMarker)))
+        {
+            return builder;
+        }
+
+        builder.Services.AddSingleton<AddWebComponentsMarker>();
+
         // Add service session
         // This can be overwritten by the user by adding their own call to AddSession
         // since the last call of AddSession take precedence
@@ -296,6 +307,7 @@ public static partial class UmbracoBuilderExtensions
         // AspNetCore specific services
         builder.Services.AddUnique<IRequestAccessor, AspNetCoreRequestAccessor>();
         builder.AddNotificationHandler<UmbracoRequestBeginNotification, ApplicationUrlRequestBeginNotificationHandler>();
+        builder.AddNotificationHandler<UmbracoApplicationStartedNotification, ApplicationUrlConfigurationNotificationHandler>();
 
         // Password hasher
         builder.Services.AddUnique<IPasswordHasher, AspNetCorePasswordHasher>();
@@ -316,10 +328,6 @@ public static partial class UmbracoBuilderExtensions
         // register the umbraco context factory
         builder.Services.AddUnique<IUmbracoContextFactory, UmbracoContextFactory>();
         builder.Services.AddUnique<IBackOfficeSecurityAccessor, BackOfficeSecurityAccessor>();
-
-        var umbracoApiControllerTypes = builder.TypeLoader.GetUmbracoApiControllers().ToList();
-        builder.WithCollectionBuilder<UmbracoApiControllerTypeCollectionBuilder>()
-            .Add(umbracoApiControllerTypes);
 
         builder.Services.AddSingleton<UmbracoRequestLoggingMiddleware>();
         builder.Services.AddSingleton<PreviewAuthenticationMiddleware>();
@@ -398,6 +406,13 @@ public static partial class UmbracoBuilderExtensions
     /// Marker class to ensure AddCore is only executed once.
     /// </summary>
     private sealed class AddCoreMarker
+    {
+    }
+
+    /// <summary>
+    /// Marker class to ensure AddWebComponents is only executed once.
+    /// </summary>
+    private sealed class AddWebComponentsMarker
     {
     }
 }

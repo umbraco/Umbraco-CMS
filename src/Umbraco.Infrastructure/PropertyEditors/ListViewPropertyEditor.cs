@@ -15,6 +15,11 @@ public class ListViewPropertyEditor : DataEditor
 {
     private readonly IIOHelper _iioHelper;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ListViewPropertyEditor"/> class.
+    /// </summary>
+    /// <param name="dataValueEditorFactory">A factory for creating data value editors.</param>
+    /// <param name="iioHelper">An <see cref="IIOHelper"/> instance used for file and directory operations.</param>
     public ListViewPropertyEditor(IDataValueEditorFactory dataValueEditorFactory, IIOHelper iioHelper)
         : base(dataValueEditorFactory)
     {

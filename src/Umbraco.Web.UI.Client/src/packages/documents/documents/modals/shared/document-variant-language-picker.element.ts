@@ -1,4 +1,5 @@
-import { UmbDocumentVariantState, type UmbDocumentVariantOptionModel } from '../../types.js';
+import { UmbDocumentVariantState } from '../../variant-state.js';
+import type { UmbDocumentVariantOptionModel } from '../../types.js';
 import { sortVariants } from '../../utils.js';
 import type { UUIBooleanInputElement } from '@umbraco-cms/backoffice/external/uui';
 import {
@@ -190,6 +191,10 @@ export class UmbDocumentVariantLanguagePickerElement extends UmbLitElement {
 			uui-menu-item {
 				--uui-menu-item-flat-structure: 1;
 				--uui-menu-item-border-radius: var(--uui-border-radius);
+			}
+
+			uui-menu-item:not(:last-of-type) {
+				margin-bottom: 1px;
 			}
 
 			uui-checkbox {

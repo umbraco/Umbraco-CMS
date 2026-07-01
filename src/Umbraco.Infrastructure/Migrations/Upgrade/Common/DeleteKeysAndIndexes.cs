@@ -1,13 +1,21 @@
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.Common;
 
-public class DeleteKeysAndIndexes : MigrationBase
+/// <summary>
+/// Represents a migration step that removes specified database keys and indexes during an upgrade process.
+/// </summary>
+public class DeleteKeysAndIndexes : AsyncMigrationBase
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="T:Umbraco.Cms.Infrastructure.Migrations.Upgrade.Common.DeleteKeysAndIndexes"/> class.
+    /// </summary>
+    /// <param name="context">The <see cref="T:Umbraco.Cms.Infrastructure.Migrations.IMigrationContext"/> to use for the migration.</param>
     public DeleteKeysAndIndexes(IMigrationContext context)
         : base(context)
     {
     }
 
-    protected override void Migrate()
+    /// <inheritdoc />
+    protected override Task MigrateAsync()
     {
         // all v7.14 tables
         var tables = new[]
@@ -58,7 +66,6 @@ public class DeleteKeysAndIndexes : MigrationBase
             "umbracoUser2UserGroup",
             "umbracoUserGroup",
             "umbracoUserGroup2App",
-            "umbracoUserGroup2NodePermission",
             "umbracoUserLogin",
             "umbracoUserStartNode",
         };
@@ -74,5 +81,7 @@ public class DeleteKeysAndIndexes : MigrationBase
         {
             Delete.KeysAndIndexes(table, true, false).Do();
         }
+
+        return Task.CompletedTask;
     }
 }

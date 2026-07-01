@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -15,6 +15,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.User;
 
+/// <summary>
+/// API controller responsible for handling requests to unlock user accounts in the system.
+/// </summary>
 [ApiVersion("1.0")]
 public class UnlockUserController : UserControllerBase
 {
@@ -22,6 +25,12 @@ public class UnlockUserController : UserControllerBase
     private readonly IUserService _userService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Controllers.User.UnlockUserController"/> class.
+    /// </summary>
+    /// <param name="authorizationService">Service used to authorize user actions within the controller.</param>
+    /// <param name="userService">Service for managing and retrieving user information.</param>
+    /// <param name="backOfficeSecurityAccessor">Accessor for back office security context and operations.</param>
     public UnlockUserController(
         IAuthorizationService authorizationService,
         IUserService userService,

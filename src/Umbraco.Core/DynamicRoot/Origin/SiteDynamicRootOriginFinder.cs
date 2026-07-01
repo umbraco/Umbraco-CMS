@@ -12,7 +12,6 @@ namespace Umbraco.Cms.Core.DynamicRoot.Origin;
 /// </summary>
 public class SiteDynamicRootOriginFinder : RootDynamicRootOriginFinder
 {
-    private readonly IEntityService _entityService;
     private readonly IDomainService _domainService;
 
     /// <summary>
@@ -20,11 +19,8 @@ public class SiteDynamicRootOriginFinder : RootDynamicRootOriginFinder
     /// </summary>
     /// <param name="entityService">The entity service used to retrieve entities and traverse the content tree.</param>
     /// <param name="domainService">The domain service used to check for assigned domains on content items.</param>
-    public SiteDynamicRootOriginFinder(IEntityService entityService, IDomainService domainService) : base(entityService)
-    {
-        _entityService = entityService;
-        _domainService = domainService;
-    }
+    public SiteDynamicRootOriginFinder(IEntityService entityService, IDomainService domainService)
+        : base(entityService) => _domainService = domainService;
 
     /// <inheritdoc/>
     protected override string SupportedOriginType { get; set; } = "Site";
@@ -37,25 +33,29 @@ public class SiteDynamicRootOriginFinder : RootDynamicRootOriginFinder
             return null;
         }
 
-        // when creating new content, CurrentKey will be null - fallback to using ParentKey
+        // When creating new content, CurrentKey will be null - fallback to using ParentKey.
         Guid entityKey = query.Context.CurrentKey ?? query.Context.ParentKey;
-        IEntitySlim? entity = _entityService.Get(entityKey);
+        IEntitySlim? entity = EntityService.Get(entityKey);
         if (entity is null || entity.NodeObjectType != Constants.ObjectTypes.Document)
         {
             return null;
         }
 
+        var contentIdsWithDomains = _domainService.GetAllAsync(true).GetAwaiter().GetResult()
+            .Where(d => d.RootContentId.HasValue)
+            .Select(d => d.RootContentId!.Value)
+            .ToHashSet();
+
         string[] contentIdStrings = entity.Path.Split(',');
         for (int i = contentIdStrings.Length - 1; i >= 0; i--)
         {
             var contentId = int.Parse(contentIdStrings[i], NumberStyles.Integer, CultureInfo.InvariantCulture);
-            IEnumerable<IDomain> domains = _domainService.GetAssignedDomains(contentId, true);
-            if (!domains.Any())
+            if (!contentIdsWithDomains.Contains(contentId))
             {
                 continue;
             }
 
-            IEntitySlim? entityWithDomain = _entityService.Get(contentId);
+            IEntitySlim? entityWithDomain = EntityService.Get(contentId);
             if (entityWithDomain is not null)
             {
                 return entityWithDomain.Key;

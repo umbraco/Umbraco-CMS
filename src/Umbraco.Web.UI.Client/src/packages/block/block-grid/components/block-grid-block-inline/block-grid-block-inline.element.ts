@@ -12,8 +12,13 @@ import { UMB_BLOCK_WORKSPACE_ALIAS } from '@umbraco-cms/backoffice/block';
 import type { UmbApiConstructorArgumentsMethodType } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbBlockEditorCustomViewConfiguration } from '@umbraco-cms/backoffice/block-custom-view';
 import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
+import type { UmbDataTypeDetailModel } from '@umbraco-cms/backoffice/data-type';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
-import type { UMB_BLOCK_WORKSPACE_CONTEXT, UmbBlockDataType } from '@umbraco-cms/backoffice/block';
+import type {
+	UMB_BLOCK_WORKSPACE_CONTEXT,
+	UmbBlockDataType,
+	UmbBlockLabelUfmValueType,
+} from '@umbraco-cms/backoffice/block';
 
 const apiArgsCreator: UmbApiConstructorArgumentsMethodType<unknown> = (manifest: unknown) => {
 	return [{ manifest }];
@@ -52,6 +57,9 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 
 	@state()
 	private _inlineProperty?: UmbPropertyTypeModel;
+
+	@state()
+	private _inlinePropertyDataTypeDetail?: UmbDataTypeDetailModel;
 
 	@state()
 	private _inlinePropertyDataPath?: string;
@@ -119,6 +127,17 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 						(contentTypeProperties) => {
 							this._inlineProperty = contentTypeProperties[0];
 							this.#generatePropertyDataPath();
+
+							const dataTypeUnique = this._inlineProperty?.dataType.unique;
+							if (dataTypeUnique) {
+								this.observe(
+									this.#workspaceContext!.content.structure.contentTypeDataTypeDetailOf(dataTypeUnique),
+									(detail) => {
+										this._inlinePropertyDataTypeDetail = detail;
+									},
+									'observeInlinePropertyDataTypeDetail',
+								);
+							}
 						},
 						'observeProperties',
 					);
@@ -189,7 +208,7 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 	}
 
 	#renderBlockInfo() {
-		const blockValue = { ...this.content, $settings: this.settings, $index: this.index };
+		const blockValue: UmbBlockLabelUfmValueType = { ...this.content, $settings: this.settings, $index: this.index };
 		return html`
 			<span id="content">
 				<span id="icon">
@@ -225,6 +244,7 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 				<div id="inside" draggable="false">
 					<umb-property-type-based-property
 						.property=${this._inlineProperty}
+						.dataTypeDetail=${this._inlinePropertyDataTypeDetail}
 						.dataPath=${this._inlinePropertyDataPath ?? ''}
 						slot="areas"></umb-property-type-based-property>
 					<umb-block-grid-areas-container slot="areas" draggable="false"></umb-block-grid-areas-container>

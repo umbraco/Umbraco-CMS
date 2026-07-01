@@ -5,6 +5,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Member.Filter;
 
+/// <summary>
+/// Serves as the base controller for implementing member filtering operations in the API.
+/// </summary>
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Filter}/{Constants.UdiEntityType.Member}")]
 public abstract class MemberFilterControllerBase : MemberControllerBase
 {

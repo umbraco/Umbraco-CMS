@@ -29,7 +29,18 @@ import { UmbFileDropzoneItemStatus, type UmbDropzoneChangeEvent } from '@umbraco
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
 import type { UmbPickerContext } from '@umbraco-cms/backoffice/picker';
-import type { UUIInputEvent, UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
+import type {
+	UUIInputEvent,
+	UUIPaginationEvent,
+	UUIPopoverContainerElement,
+} from '@umbraco-cms/backoffice/external/uui';
+import type {
+	UmbTableColumn,
+	UmbTableConfig,
+	UmbTableDeselectedEvent,
+	UmbTableItem,
+	UmbTableSelectedEvent,
+} from '@umbraco-cms/backoffice/components';
 import {
 	UMB_CLIPBOARD_CONTEXT,
 	UMB_CLIPBOARD_ENTRY_PICKER_MODAL,
@@ -41,6 +52,8 @@ import './components/index.js';
 import '@umbraco-cms/backoffice/imaging';
 
 const root: UmbMediaPathModel = { name: 'Media', unique: null, entityType: UMB_MEDIA_ROOT_ENTITY_TYPE };
+
+type UmbMediaPickerView = 'cards' | 'table';
 
 // TODO: investigate how we can reuse the picker-search-field element, picker context etc.
 @customElement('umb-media-picker-modal')
@@ -101,9 +114,16 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 	@query('#dropzone')
 	private _dropzone!: UmbDropzoneMediaElement;
 
+	@query('#media-picker-view-popover')
+	private _viewPopover?: UUIPopoverContainerElement;
+
+	@state()
+	private _currentView: UmbMediaPickerView = 'cards';
+
 	#pagingMap = new Map<string, UmbPaginationManager>();
 	#contextCulture?: string | null;
 	#locationInteractionMemoryUnique: string = 'UmbMediaItemPickerLocation';
+	#viewInteractionMemoryUnique: string = 'UmbMediaItemPickerView';
 	#clipboardCollectionRepository = new UmbClipboardCollectionRepository(this);
 
 	constructor() {
@@ -163,6 +183,11 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 			}
 		}
 
+		const viewFromMemory = this.#getViewFromInteractionMemory();
+		if (viewFromMemory) {
+			this._currentView = viewFromMemory;
+		}
+
 		await this.#loadFolderTypes();
 		this.#loadChildrenOfCurrentMediaItem();
 		this.#checkClipboardEntries();
@@ -207,8 +232,7 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 				entityType: this._currentMediaEntity.entityType,
 			},
 			dataType: this.#dataType,
-			skip,
-			take,
+			paging: { skip, take },
 		});
 
 		this._currentChildren = data?.items ?? [];
@@ -262,6 +286,15 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 		}
 	}
 
+	#onViewSelect(view: UmbMediaPickerView) {
+		this._currentView = view;
+		this.#setViewInInteractionMemory(view);
+		// TODO: This ignore is just needed for JSON SCHEMA TO WORK, As its not updated with latest TS yet.
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
+		this._viewPopover?.hidePopover();
+	}
+
 	// TODO: move to location manager in context
 	#onOpen(item: UmbMediaTreeItemModel | UmbMediaSearchItemModel) {
 		this.#clearSearch();
@@ -283,14 +316,14 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 		this.#setLocationInInteractionMemory();
 	}
 
-	#onSelected(item: UmbMediaTreeItemModel | UmbMediaSearchItemModel) {
-		const selection = this.data?.multiple ? [...this.value.selection, item.unique!] : [item.unique!];
+	#onSelected(unique: string) {
+		const selection = this.data?.multiple ? [...this.value.selection, unique] : [unique];
 		this._isSelectionMode = selection.length > 0;
 		this.modalContext?.setValue({ selection });
 	}
 
-	#onDeselected(item: UmbMediaTreeItemModel | UmbMediaSearchItemModel) {
-		const selection = this.value.selection.filter((value) => value !== item.unique);
+	#onDeselected(unique: string) {
+		const selection = this.value.selection.filter((value) => value !== unique);
 		this._isSelectionMode = selection.length > 0;
 		this.modalContext?.setValue({ selection });
 	}
@@ -424,6 +457,19 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 		return memory?.value?.location;
 	}
 
+	#setViewInInteractionMemory(view: UmbMediaPickerView) {
+		const memory: UmbInteractionMemoryModel = {
+			unique: this.#viewInteractionMemoryUnique,
+			value: { view },
+		};
+		this._pickerContext?.interactionMemory.setMemory(memory);
+	}
+
+	#getViewFromInteractionMemory(): UmbMediaPickerView | undefined {
+		const memory = this._pickerContext.interactionMemory.getMemory(this.#viewInteractionMemoryUnique);
+		return memory?.value?.view;
+	}
+
 	override render() {
 		return html`
 			<umb-body-layout headline=${this.localize.term('defaultdialogs_chooseMedia')}>
@@ -454,13 +500,15 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 		return html`
 			${!this._searchResult.length && !this._searching
 				? html`<div class="container"><p>${this.localize.term('content_listViewNoItems')}</p></div>`
-				: html`<div id="media-grid">
-						${repeat(
-					this._searchResult,
-					(item) => item.unique,
-					(item) => this.#renderCard(item),
-				)}
-					</div>`}
+				: this._currentView === 'table'
+					? this.#renderTable(this._searchResult)
+					: html`<div id="media-grid">
+							${repeat(
+								this._searchResult,
+								(item) => item.unique,
+								(item) => this.#renderCard(item),
+							)}
+						</div>`}
 		`;
 	}
 
@@ -468,22 +516,24 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 		return html`
 			${!this._currentChildren.length
 				? html`<div class="container"><p>${this.localize.term('content_listViewNoItems')}</p></div>`
-				: html`<div id="media-grid">
-							${repeat(
-					this._currentChildren,
-					(item) => item.unique,
-					(item) => this.#renderCard(item),
-				)}
-						</div>
-						${this._currentTotalPages > 1
+				: html`${this._currentView === 'table'
+						? this.#renderTable(this._currentChildren)
+						: html`<div id="media-grid">
+								${repeat(
+									this._currentChildren,
+									(item) => item.unique,
+									(item) => this.#renderCard(item),
+								)}
+							</div>`}
+					${this._currentTotalPages > 1
 						? html`<uui-pagination
-									.current=${this._currentPage}
-									.total=${this._currentTotalPages}
-									firstlabel=${this.localize.term('general_first')}
-									previouslabel=${this.localize.term('general_previous')}
-									nextlabel=${this.localize.term('general_next')}
-									lastlabel=${this.localize.term('general_last')}
-									@change=${this.#onPageChange}></uui-pagination>`
+								.current=${this._currentPage}
+								.total=${this._currentTotalPages}
+								firstlabel=${this.localize.term('general_first')}
+								previouslabel=${this.localize.term('general_previous')}
+								nextlabel=${this.localize.term('general_next')}
+								lastlabel=${this.localize.term('general_last')}
+								@change=${this.#onPageChange}></uui-pagination>`
 						: nothing}`}
 		`;
 	}
@@ -499,17 +549,17 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 						value=${this._searchQuery}>
 						<div slot="prepend">
 							${this._searching
-				? html`<uui-loader-circle id="searching-indicator"></uui-loader-circle>`
-				: html`<uui-icon name="search"></uui-icon>`}
+								? html`<uui-loader-circle id="searching-indicator"></uui-loader-circle>`
+								: html`<uui-icon name="search"></uui-icon>`}
 						</div>
 					</uui-input>
 
 					${this._currentMediaEntity.unique && this._currentMediaEntity.unique !== this._startNode?.unique
-				? html`<uui-checkbox
+						? html`<uui-checkbox
 								?checked=${this._searchFrom?.unique === this._currentMediaEntity.unique}
 								@change=${this.#onSearchFromChange}
 								label="Search only in ${this._currentMediaEntity.name}"></uui-checkbox>`
-				: nothing}
+						: nothing}
 				</div>
 				<uui-button
 					@click=${() => this._dropzone.browse()}
@@ -517,14 +567,35 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 					look="outline"
 					color="default"></uui-button>
 				${this._hasClipboardMediaEntries
-				? html`<uui-button
+					? html`<uui-button
 							@click=${this.#pasteFromClipboard}
 							label="Paste from clipboard"
 							look="outline"
 							color="default">
 							<uui-icon name="icon-clipboard-paste"></uui-icon>
 						</uui-button>`
-				: nothing}
+					: nothing}
+				<uui-button compact popovertarget="media-picker-view-popover" label="View">
+					<umb-icon name=${this._currentView === 'cards' ? 'icon-grid' : 'icon-table'}></umb-icon>
+				</uui-button>
+				<uui-popover-container id="media-picker-view-popover" placement="bottom-end">
+					<umb-popover-layout>
+						<div id="view-dropdown">
+							<uui-menu-item
+								label=${this.localize.term('collection_cardViewLabel')}
+								@click-label=${() => this.#onViewSelect('cards')}
+								?active=${this._currentView === 'cards'}>
+								<umb-icon slot="icon" name="icon-grid"></umb-icon>
+							</uui-menu-item>
+							<uui-menu-item
+								label=${this.localize.term('collection_tableViewLabel')}
+								@click-label=${() => this.#onViewSelect('table')}
+								?active=${this._currentView === 'table'}>
+								<umb-icon slot="icon" name="icon-table"></umb-icon>
+							</uui-menu-item>
+						</div>
+					</umb-popover-layout>
+				</uui-popover-container>
 			</div>
 		`;
 	}
@@ -552,7 +623,6 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 		this._submitModal();
 	}
 
-
 	async #resolveMediaKeysFromClipboard(uniques: string[]): Promise<string[]> {
 		const clipboardContext = await this.getContext(UMB_CLIPBOARD_CONTEXT);
 
@@ -562,7 +632,7 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 			const entry = await clipboardContext?.read(unique);
 			if (!entry) continue;
 
-			const mediaPickerValue = entry?.values.find(v => v.type === UMB_MEDIA_PICKER_CLIPBOARD_ENTRY_VALUE_TYPE)?.value;
+			const mediaPickerValue = entry?.values.find((v) => v.type === UMB_MEDIA_PICKER_CLIPBOARD_ENTRY_VALUE_TYPE)?.value;
 
 			if (!mediaPickerValue) continue;
 
@@ -598,16 +668,87 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 				.name=${item.name}
 				data-mark="${item.entityType}:${item.unique}"
 				@open=${() => this.#onOpen(item)}
-				@selected=${() => this.#onSelected(item)}
-				@deselected=${() => this.#onDeselected(item)}
+				@selected=${() => this.#onSelected(item.unique!)}
+				@deselected=${() => this.#onDeselected(item.unique!)}
 				?selected=${this.value?.selection?.find((value) => value === item.unique)}
 				?selectable=${selectable}
 				?select-only=${this._isSelectionMode || canNavigate === false}>
-				<umb-imaging-thumbnail
-					unique=${item.unique}
-					alt=${item.name}
-					icon=${item.mediaType.icon}></umb-imaging-thumbnail>
+				<umb-media-thumbnail unique=${item.unique} alt=${item.name} icon=${item.mediaType.icon}></umb-media-thumbnail>
 			</uui-card-media>
+		`;
+	}
+
+	#buildTableItems(items: Array<UmbMediaTreeItemModel | UmbMediaSearchItemModel>): Array<UmbTableItem> {
+		return items.map((item) => {
+			const canNavigate = this.#allowNavigateToMedia(item);
+			const selectable = this._selectableFilter(item);
+			// When not in selection mode, navigable items open on click (matching card behaviour).
+			// Mark them as non-selectable so the row doesn't intercept the click for selection.
+			const selectableInTable = this._isSelectionMode ? selectable : !canNavigate && selectable;
+			return {
+				id: item.unique,
+				icon: item.mediaType.icon,
+				selectable: selectableInTable,
+				data: [
+					{
+						columnAlias: 'name',
+						value:
+							canNavigate && !this._isSelectionMode
+								? html`<uui-button
+										look="default"
+										compact
+										label=${item.name}
+										@click=${(e: Event) => {
+											e.stopPropagation();
+											this.#onOpen(item);
+										}}
+										>${item.name}</uui-button
+									>`
+								: html`<span class="table-name">${item.name}</span>`,
+					},
+					{
+						columnAlias: 'createDate',
+						value: 'createDate' in item ? this.localize.dateTime(item.createDate) : '',
+					},
+				],
+			};
+		});
+	}
+
+	#onTableSelected(event: UmbTableSelectedEvent) {
+		const itemId = event.getItemId();
+		if (!itemId) return;
+		this.#onSelected(itemId);
+	}
+
+	#onTableDeselected(event: UmbTableDeselectedEvent) {
+		const itemId = event.getItemId();
+		if (!itemId) return;
+		this.#onDeselected(itemId);
+	}
+
+	#renderTable(items: Array<UmbMediaTreeItemModel | UmbMediaSearchItemModel>) {
+		const tableColumns: Array<UmbTableColumn> = [
+			{
+				name: this.localize.term('general_name'),
+				alias: 'name',
+			},
+			{
+				name: this.localize.term('content_createDate'),
+				alias: 'createDate',
+			},
+		];
+		const tableConfig: UmbTableConfig = {
+			allowSelection: true,
+		};
+		return html`
+			<umb-table
+				.config=${tableConfig}
+				.columns=${tableColumns}
+				.items=${this.#buildTableItems(items)}
+				.selection=${this.value?.selection ?? []}
+				@selected=${this.#onTableSelected}
+				@deselected=${this.#onTableDeselected}></umb-table>
 		`;
 	}
 
@@ -620,10 +761,10 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 
 		const startNode: UmbMediaPathModel | undefined = this._startNode
 			? {
-				entityType: this._startNode.entityType,
-				unique: this._startNode.unique,
-				name: this._startNode.name,
-			}
+					entityType: this._startNode.entityType,
+					unique: this._startNode.unique,
+					name: this._startNode.name,
+				}
 			: undefined;
 
 		return html`<umb-media-picker-folder-path
@@ -666,7 +807,7 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 				padding-bottom: 5px; /** The modal is a bit jumpy due to the img card focus/hover border. This fixes the issue. */
 			}
 
-			umb-icon {
+			#media-grid umb-icon {
 				font-size: var(--uui-size-8);
 			}
 
@@ -686,8 +827,29 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 			}
 
 			uui-pagination {
-				display: block;
 				margin-top: var(--uui-size-layout-1);
+			}
+
+			.table-name {
+				flex: 1;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+
+			#view-dropdown {
+				padding: var(--uui-size-space-3);
+				--uui-button-content-align: left;
+				--uui-menu-item-flat-structure: 1;
+			}
+
+			umb-media-picker-folder-path {
+				overflow: hidden;
+				min-width: 0;
+				flex: 1 1 0%;
+			}
+			div[slot='actions'] {
+				flex-shrink: 0;
 			}
 		`,
 	];

@@ -138,7 +138,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 		await umbConfirmModal(this, {
 			headline: `${this.localize.term('actions_delete')} property`,
 			content: html`<umb-localize key="contentTypeEditor_confirmDeletePropertyMessage" .args=${[this._property.name ?? unique]}>Are you sure you want to delete the property <strong>${this._property.name ?? unique}</strong></umb-localize></div>`,
-			confirmLabel: this.localize.term('actions_delete'),
+			confirmLabel: '#actions_delete',
 			color: 'danger',
 		});
 
@@ -231,7 +231,10 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 					UMB_EDIT_PROPERTY_TYPE_WORKSPACE_PATH_PATTERN.generateLocal({ unique: this.property.unique })}>
 					${this.#renderPropertyName()} ${this.#renderPropertyTags()}
 					<uui-action-bar>
-						<uui-button label="${this.localize.term('actions_delete')}" data-mark="action:delete" @click="${this.#requestRemove}">
+						<uui-button
+							label="${this.localize.term('actions_delete')}"
+							data-mark="action:delete"
+							@click="${this.#requestRemove}">
 							<uui-icon name="delete"></uui-icon>
 						</uui-button>
 					</uui-action-bar>

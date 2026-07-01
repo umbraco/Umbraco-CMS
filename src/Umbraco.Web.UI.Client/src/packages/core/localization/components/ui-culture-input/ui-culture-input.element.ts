@@ -23,6 +23,9 @@ export class UmbUiCultureInputElement extends UmbFormControlMixin<string, typeof
 	private _options: Array<UmbCultureInputOption> = [];
 
 	@property({ type: String })
+	label = '';
+
+	@property({ type: String })
 	override set value(value: string | undefined) {
 		if (value && typeof value === 'string') {
 			const oldValue = super.value;
@@ -111,6 +114,7 @@ export class UmbUiCultureInputElement extends UmbFormControlMixin<string, typeof
 	override render() {
 		return html`
 			<uui-select
+				label=${this.label || this.localize.term('general_language')}
 				.options=${this._options.map((e) => ({ ...e, selected: e.value == this.value }))}
 				@change=${this.#onCustomValidationChange}>
 			</uui-select>

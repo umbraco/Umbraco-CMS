@@ -9,11 +9,21 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Search;
 
+/// <summary>
+/// Handles notifications related to indexing operations for media items in Umbraco.
+/// This includes responding to events that affect the search index for media content.
+/// </summary>
 public sealed class MediaIndexingNotificationHandler : INotificationHandler<MediaCacheRefresherNotification>
 {
     private readonly IMediaService _mediaService;
     private readonly IUmbracoIndexingHandler _umbracoIndexingHandler;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MediaIndexingNotificationHandler"/> class.
+    /// Handles notifications related to media indexing in Umbraco.
+    /// </summary>
+    /// <param name="umbracoIndexingHandler">The handler responsible for managing Umbraco content indexing operations.</param>
+    /// <param name="mediaService">The service used to manage and interact with media items in Umbraco.</param>
     public MediaIndexingNotificationHandler(IUmbracoIndexingHandler umbracoIndexingHandler, IMediaService mediaService)
     {
         _umbracoIndexingHandler =
@@ -21,6 +31,11 @@ public sealed class MediaIndexingNotificationHandler : INotificationHandler<Medi
         _mediaService = mediaService ?? throw new ArgumentNullException(nameof(mediaService));
     }
 
+    /// <summary>
+    /// Handles <see cref="MediaCacheRefresherNotification"/> events to update or remove media items in the search index
+    /// according to the type of change (add, update, delete, or refresh branch) described in the notification payloads.
+    /// </summary>
+    /// <param name="args">The notification containing information about media cache changes and their payloads.</param>
     public void Handle(MediaCacheRefresherNotification args)
     {
         if (!_umbracoIndexingHandler.Enabled)

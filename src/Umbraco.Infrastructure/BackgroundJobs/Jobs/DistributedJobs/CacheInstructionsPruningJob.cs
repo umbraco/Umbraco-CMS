@@ -1,7 +1,5 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Sync;
@@ -42,21 +40,9 @@ internal class CacheInstructionsPruningJob : IDistributedBackgroundJob
         _lastSyncedManager = lastSyncedManager;
     }
 
-    [Obsolete("Use the constructor with ILastSyncedManager parameter instead. Scheduled for removal in Umbraco 18.")]
-    public CacheInstructionsPruningJob(
-        IOptions<GlobalSettings> globalSettings,
-        ICacheInstructionRepository cacheInstructionRepository,
-        ICoreScopeProvider scopeProvider,
-        TimeProvider timeProvider)
-        : this(
-            globalSettings,
-            cacheInstructionRepository,
-            scopeProvider,
-            timeProvider,
-            StaticServiceProvider.Instance.GetRequiredService<ILastSyncedManager>())
-    {
-    }
-
+    /// <summary>
+    /// Gets the display name of the CacheInstructionsPruningJob, used to identify this background job.
+    /// </summary>
     public string Name => "CacheInstructionsPruningJob";
 
     /// <inheritdoc />

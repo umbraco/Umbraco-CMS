@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Security.Authorization;
 using Umbraco.Cms.Web.Common.Authorization;
@@ -6,6 +6,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Media;
 
+/// <summary>
+/// Serves as the base controller for handling updates to media entities in the Umbraco CMS Management API.
+/// </summary>
 public abstract class UpdateMediaControllerBase : MediaControllerBase
 {
     private readonly IAuthorizationService _authorizationService;

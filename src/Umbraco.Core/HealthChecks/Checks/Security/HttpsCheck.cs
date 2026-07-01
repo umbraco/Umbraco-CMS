@@ -1,6 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
@@ -74,13 +75,45 @@ public class HttpsCheck : HealthCheck
         return sslErrors == SslPolicyErrors.None;
     }
 
-    private async Task<HealthCheckStatus> CheckForValidCertificate()
+    private bool TryGetApplicationUrl(
+        [NotNullWhen(true)] out Uri? applicationUrl,
+        [NotNullWhen(false)] out HealthCheckStatus? unavailableStatus)
     {
+        applicationUrl = _hostingEnvironment.ApplicationMainUrl;
+        if (applicationUrl is not null)
+        {
+            unavailableStatus = null;
+            return true;
+        }
+
+        unavailableStatus = new HealthCheckStatus(
+            _textService.Localize("healthcheck", "httpsCheckNoApplicationUrl"))
+        {
+            ResultType = StatusResultType.Info,
+        };
+        return false;
+    }
+
+    /// <summary>
+    ///     Checks that the site's HTTPS certificate is valid and not nearing expiry by making a HEAD request to the application URL over HTTPS.
+    /// </summary>
+    /// <remarks>
+    ///     Exposed as <c>internal</c> (rather than <c>private</c>) solely to enable direct unit testing of the individual
+    ///     check in isolation; calling <see cref="GetStatusAsync" /> would additionally execute the other checks, and with a
+    ///     valid application URL configured that would mean a real outbound HTTPS request on every test run.
+    /// </remarks>
+    internal async Task<HealthCheckStatus> CheckForValidCertificate()
+    {
+        if (TryGetApplicationUrl(out Uri? applicationUrl, out HealthCheckStatus? unavailable) is false)
+        {
+            return unavailable;
+        }
+
         string message;
         StatusResultType result;
 
         // Attempt to access the site over HTTPS to see if it HTTPS is supported and a valid certificate has been configured
-        var urlBuilder = new UriBuilder(_hostingEnvironment.ApplicationMainUrl) { Scheme = Uri.UriSchemeHttps };
+        var urlBuilder = new UriBuilder(applicationUrl) { Scheme = Uri.UriSchemeHttps };
         Uri url = urlBuilder.Uri;
 
         using var request = new HttpRequestMessage(HttpMethod.Head, url);
@@ -113,7 +146,7 @@ public class HttpsCheck : HealthCheck
                 else if (daysToExpiry < NumberOfDaysForExpiryWarning)
                 {
                     result = StatusResultType.Warning;
-                    message = _textService.Localize("healthcheck", "httpsCheckExpiringCertificate", new[] { daysToExpiry.ToString() });
+                    message = _textService.Localize("healthcheck", "httpsCheckExpiringCertificate", [daysToExpiry.ToString()]);
                 }
                 else
                 {
@@ -124,7 +157,7 @@ public class HttpsCheck : HealthCheck
             else
             {
                 result = StatusResultType.Error;
-                message = _textService.Localize("healthcheck", "healthCheckInvalidUrl", new[] { url.AbsoluteUri, response.ReasonPhrase });
+                message = _textService.Localize("healthcheck", "healthCheckInvalidUrl", [url.AbsoluteUri, response.ReasonPhrase]);
             }
         }
         catch (Exception ex)
@@ -132,12 +165,12 @@ public class HttpsCheck : HealthCheck
             if (ex is WebException exception)
             {
                 message = exception.Status == WebExceptionStatus.TrustFailure
-                    ? _textService.Localize("healthcheck", "httpsCheckInvalidCertificate", new[] { exception.Message })
-                    : _textService.Localize("healthcheck", "healthCheckInvalidUrl", new[] { url.AbsoluteUri, exception.Message });
+                    ? _textService.Localize("healthcheck", "httpsCheckInvalidCertificate", [exception.Message])
+                    : _textService.Localize("healthcheck", "healthCheckInvalidUrl", [url.AbsoluteUri, exception.Message]);
             }
             else
             {
-                message = _textService.Localize("healthcheck", "healthCheckInvalidUrl", new[] { url.AbsoluteUri, ex.Message });
+                message = _textService.Localize("healthcheck", "healthCheckInvalidUrl", [url.AbsoluteUri, ex.Message]);
             }
 
             result = StatusResultType.Error;
@@ -152,13 +185,25 @@ public class HttpsCheck : HealthCheck
         };
     }
 
-    private Task<HealthCheckStatus> CheckIfCurrentSchemeIsHttps()
+    /// <summary>
+    ///     Checks whether the application URL's scheme is HTTPS.
+    /// </summary>
+    /// <remarks>
+    ///     Exposed as <c>internal</c> (rather than <c>private</c>) solely to enable direct unit testing of the individual
+    ///     check in isolation, so that tests can cover the scheme branches without also running <see cref="CheckForValidCertificate" />
+    ///     (which would make a real outbound HTTPS request).
+    /// </remarks>
+    internal Task<HealthCheckStatus> CheckIfCurrentSchemeIsHttps()
     {
-        Uri uri = _hostingEnvironment.ApplicationMainUrl;
-        var success = uri.Scheme == Uri.UriSchemeHttps;
+        if (TryGetApplicationUrl(out Uri? applicationUrl, out HealthCheckStatus? unavailable) is false)
+        {
+            return Task.FromResult(unavailable);
+        }
+
+        var success = applicationUrl.Scheme == Uri.UriSchemeHttps;
 
         return Task.FromResult(
-            new HealthCheckStatus(_textService.Localize("healthcheck", "httpsCheckIsCurrentSchemeHttps", new[] { success ? string.Empty : "not" }))
+            new HealthCheckStatus(_textService.Localize("healthcheck", "httpsCheckIsCurrentSchemeHttps", [success ? string.Empty : "not"]))
             {
                 ResultType = success ? StatusResultType.Success : StatusResultType.Error,
                 ReadMoreLink = success
@@ -167,21 +212,33 @@ public class HttpsCheck : HealthCheck
             });
     }
 
-    private Task<HealthCheckStatus> CheckHttpsConfigurationSetting()
+    /// <summary>
+    ///     Checks whether the <see cref="GlobalSettings.UseHttps" /> configuration setting agrees with the scheme of the application URL.
+    /// </summary>
+    /// <remarks>
+    ///     Exposed as <c>internal</c> (rather than <c>private</c>) solely to enable direct unit testing of the individual
+    ///     check in isolation, so that tests can cover the configuration branches without also running <see cref="CheckForValidCertificate" />
+    ///     (which would make a real outbound HTTPS request).
+    /// </remarks>
+    internal Task<HealthCheckStatus> CheckHttpsConfigurationSetting()
     {
+        if (TryGetApplicationUrl(out Uri? applicationUrl, out HealthCheckStatus? unavailable) is false)
+        {
+            return Task.FromResult(unavailable);
+        }
+
         var httpsSettingEnabled = _globalSettings.CurrentValue.UseHttps;
-        Uri uri = _hostingEnvironment.ApplicationMainUrl;
 
         string resultMessage;
         StatusResultType resultType;
-        if (uri.Scheme != Uri.UriSchemeHttps)
+        if (applicationUrl.Scheme != Uri.UriSchemeHttps)
         {
             resultMessage = _textService.Localize("healthcheck", "httpsCheckConfigurationRectifyNotPossible");
             resultType = StatusResultType.Info;
         }
         else
         {
-            resultMessage = _textService.Localize("healthcheck", "httpsCheckConfigurationCheckResult", new[] { httpsSettingEnabled.ToString(), httpsSettingEnabled ? string.Empty : "not" });
+            resultMessage = _textService.Localize("healthcheck", "httpsCheckConfigurationCheckResult", [httpsSettingEnabled.ToString(), httpsSettingEnabled ? string.Empty : "not"]);
             resultType = httpsSettingEnabled ? StatusResultType.Success : StatusResultType.Error;
         }
 

@@ -10,6 +10,11 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Examine;
 
+/// <summary>
+/// Responsible for constructing <see cref="ValueSet"/> instances representing media items
+/// for indexing by the Examine search engine in Umbraco.
+/// This builder extracts relevant properties from media entities to facilitate efficient searching and retrieval.
+/// </summary>
 public class MediaValueSetBuilder : BaseValueSetBuilder<IMedia>
 {
     private readonly ContentSettings _contentSettings;
@@ -19,6 +24,16 @@ public class MediaValueSetBuilder : BaseValueSetBuilder<IMedia>
     private readonly UrlSegmentProviderCollection _urlSegmentProviders;
     private readonly IUserService _userService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.Examine.MediaValueSetBuilder"/> class.
+    /// </summary>
+    /// <param name="propertyEditors">A collection of <see cref="PropertyEditorCollection"/> used to manage property editors for media items.</param>
+    /// <param name="urlSegmentProviders">A collection of <see cref="UrlSegmentProviderCollection"/> used to generate URL segments for media items.</param>
+    /// <param name="mediaUrlGenerators">A collection of <see cref="MediaUrlGeneratorCollection"/> used to generate URLs for media items.</param>
+    /// <param name="userService">An implementation of <see cref="IUserService"/> for accessing user-related operations.</param>
+    /// <param name="shortStringHelper">An implementation of <see cref="IShortStringHelper"/> for string manipulation and formatting.</param>
+    /// <param name="contentSettings">The <see cref="IOptions{ContentSettings}"/> providing configuration options for content.</param>
+    /// <param name="contentTypeService">An implementation of <see cref="IContentTypeService"/> for accessing content type information.</param>
     public MediaValueSetBuilder(
         PropertyEditorCollection propertyEditors,
         UrlSegmentProviderCollection urlSegmentProviders,

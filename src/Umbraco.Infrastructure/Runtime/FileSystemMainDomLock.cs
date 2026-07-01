@@ -20,6 +20,13 @@ internal sealed class FileSystemMainDomLock : IMainDomLock
 
     private FileStream? _lockFileStream;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="FileSystemMainDomLock"/> class, which manages MainDom locking using the file system.
+    /// </summary>
+    /// <param name="logger">The logger used for logging lock-related events and errors.</param>
+    /// <param name="mainDomKeyGenerator">The generator responsible for creating unique keys for MainDom ownership.</param>
+    /// <param name="hostingEnvironment">Provides information about the current hosting environment.</param>
+    /// <param name="globalSettings">The monitor for global settings, used to access configuration values.</param>
     public FileSystemMainDomLock(
         ILogger<FileSystemMainDomLock> logger,
         IMainDomKeyGenerator mainDomKeyGenerator,
@@ -35,6 +42,11 @@ internal sealed class FileSystemMainDomLock : IMainDomLock
         _releaseSignalFilePath = $"{_lockFilePath}_release";
     }
 
+    /// <summary>
+    /// Attempts to acquire the MainDom lock asynchronously within the specified timeout period.
+    /// </summary>
+    /// <param name="millisecondsTimeout">The maximum time in milliseconds to wait for the lock.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains true if the lock was acquired; otherwise, false.</returns>
     public Task<bool> AcquireLockAsync(int millisecondsTimeout)
     {
         var stopwatch = new Stopwatch();
@@ -78,7 +90,14 @@ internal sealed class FileSystemMainDomLock : IMainDomLock
         return Task.FromResult(false);
     }
 
-    // Create a long running task to poll to check if anyone has created a lock release file.
+    /// <summary>
+    /// Starts (if not already started) a long-running asynchronous task that listens for the creation of a lock release signal file, indicating that the main domain lock should be released.
+    /// If the listening task is already running, returns the existing task instance.
+    /// </summary>
+    /// <remarks>Create a long running task to poll to check if anyone has created a lock release file.</remarks>
+    /// <returns>
+    /// A <see cref="Task"/> representing the asynchronous listening operation for the lock release signal file.
+    /// </returns>
     public Task ListenAsync()
     {
         if (_listenForReleaseSignalFileTask != null)
@@ -99,6 +118,10 @@ internal sealed class FileSystemMainDomLock : IMainDomLock
     /// <summary>Releases the resources used by this <see cref="FileSystemMainDomLock" />.</summary>
     public void Dispose() => Dispose(true);
 
+    /// <summary>
+    /// Creates a signal file at the specified path to indicate that the lock has been released.
+    /// This file can be used by other processes to detect the release of the lock.
+    /// </summary>
     public void CreateLockReleaseSignalFile() =>
         File.Open(
                 _releaseSignalFilePath,
@@ -107,6 +130,9 @@ internal sealed class FileSystemMainDomLock : IMainDomLock
                 FileShare.ReadWrite | FileShare.Delete)
             .Close();
 
+    /// <summary>
+    /// Deletes the lock release signal file used to coordinate main domain (MainDom) ownership.
+    /// </summary>
     public void DeleteLockReleaseSignalFile() =>
         File.Delete(_releaseSignalFilePath);
 

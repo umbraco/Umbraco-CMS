@@ -1,11 +1,12 @@
-import type { UmbDocumentVariantOptionModel } from '../types.js';
 import { UmbDocumentWorkspaceSplitViewElement } from './document-workspace-split-view.element.js';
-import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from './document-workspace.context-token.js';
+import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from './context/document-workspace.context-token.js';
 import { customElement, state, css, html } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbRoute, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
 import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
+import { createObservablePart } from '@umbraco-cms/backoffice/observable-api';
+import type { UmbDocumentVariantOptionModel } from '../types.js';
 
 // TODO: This seem fully identical with Media Workspace Editor, so we can refactor this to a generic component. [NL]
 @customElement('umb-document-workspace-editor')
@@ -19,8 +20,7 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 
 	#workspaceRoute?: string;
 	#appCulture?: string;
-	#variants?: Array<UmbDocumentVariantOptionModel>;
-	#isForbidden = false;
+	#variants?: Array<Pick<UmbDocumentVariantOptionModel, 'culture' | 'segment' | 'unique'>>;
 
 	@state()
 	private _routes?: Array<UmbRoute>;
@@ -34,29 +34,33 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 		this.consumeContext(UMB_APP_LANGUAGE_CONTEXT, (instance) => {
 			this.#appLanguage = instance;
 			this.observe(this.#appLanguage?.appLanguageCulture, (appCulture) => {
+				const previousCulture = this.#appCulture;
 				this.#appCulture = appCulture;
-				this.#generateRoutes();
+				if (previousCulture === undefined) {
+					// Only relevant to call generate routes initially, a later update of appCulture has no effect on the routes.
+					this.#generateRoutes();
+				}
+				this.#syncUrlToCulture(previousCulture, appCulture);
 			});
 		});
 
 		this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
 			this.observe(
-				this.#workspaceContext?.variantOptions,
+				this.#workspaceContext
+					? createObservablePart(this.#workspaceContext.variantOptions, (variants) =>
+							variants.map((v) => ({
+								culture: v.culture,
+								segment: v.segment,
+								unique: v.unique,
+							})),
+						)
+					: undefined,
 				(variants) => {
 					this.#variants = variants;
 					this.#generateRoutes();
 				},
 				'_observeVariants',
-			);
-
-			this.observe(
-				this.#workspaceContext?.forbidden.isOn,
-				(isForbidden) => {
-					this.#isForbidden = isForbidden ?? false;
-					this.#generateRoutes();
-				},
-				'_observeForbidden',
 			);
 
 			this.observe(
@@ -69,10 +73,42 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 		});
 	}
 
+	#syncUrlToCulture(previousCulture: string | undefined, appCulture: string | undefined) {
+		if (!previousCulture || !appCulture || previousCulture === appCulture || !this.#workspaceRoute) return;
+
+		const currentPath = window.location.pathname;
+		const routePrefix = this.#workspaceRoute + '/';
+
+		if (!currentPath.startsWith(routePrefix)) return;
+
+		const remainingPath = currentPath.substring(routePrefix.length);
+
+		// Skip split-view paths
+		if (remainingPath.includes('_&_')) return;
+
+		// Separate the variant unique from any trailing path (e.g., /view/info)
+		const slashIndex = remainingPath.indexOf('/');
+		const variantUnique = slashIndex === -1 ? remainingPath : remainingPath.substring(0, slashIndex);
+		const pathSuffix = slashIndex === -1 ? '' : remainingPath.substring(slashIndex);
+
+		// Find the current variant to verify its culture matches the previous one
+		const currentVariant = this.#variants?.find((v) => v.unique === variantUnique);
+		if (currentVariant?.culture !== previousCulture) return;
+
+		// Find the equivalent variant with the new culture, preserving the segment
+		const newVariant = this.#variants?.find((v) => v.culture === appCulture && v.segment === currentVariant.segment);
+		if (!newVariant) return;
+
+		history.replaceState(
+			null,
+			'',
+			`${this.#workspaceRoute}/${newVariant.unique}${pathSuffix}${window.location.search}`,
+		);
+	}
+
 	#generateRoutes() {
 		if (!this.#variants || this.#variants.length === 0 || !this.#appCulture) {
-			this._routes = [];
-			this.#ensureForbiddenRoute(this._routes);
+			this._routes = [this.#createNotFoundRoute()];
 			return;
 		}
 
@@ -144,25 +180,21 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 			});
 		}
 
-		this.#ensureForbiddenRoute(routes);
+		routes.push(this.#createNotFoundRoute());
 
 		this._routes = routes;
 	}
 
-	/**
-	 * Ensure that there is a route to handle forbidden access.
-	 * This route will display a forbidden message when the user does not have permission to access certain resources.
-	 * Also handles not found routes.
-	 * @param routes
-	 */
-	#ensureForbiddenRoute(routes: Array<UmbRoute> = []) {
-		routes.push({
+	#createNotFoundRoute(): UmbRoute {
+		return {
 			path: '**',
 			component: async () => {
 				const router = await import('@umbraco-cms/backoffice/router');
-				return this.#isForbidden ? router.UmbRouteForbiddenElement : router.UmbRouteNotFoundElement;
+				return this.#workspaceContext?.forbidden.getIsOn()
+					? router.UmbRouteForbiddenElement
+					: router.UmbRouteNotFoundElement;
 			},
-		});
+		};
 	}
 
 	private _gotWorkspaceRoute = (e: UmbRouterSlotInitEvent) => {

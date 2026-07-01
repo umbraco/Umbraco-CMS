@@ -390,7 +390,7 @@ export default {
 		enterFolderName: 'Rhoi enw ffolder i mewn',
 		updateData: 'Dewiswch fath a theitl',
 		noDocumentTypes:
-			"Nid oes unrhyw fathau o ddogfennau caniataol ar gael am greu cynnwys fan hyn. Rhaid i chi alluogi'r rhain yn <strong>Mathau o Ddogfennau</strong> o fewn y adran <strong>Gosodiadau</strong>, gan olygu y opsiwn <strong>Mathau o nod blentyn caniataol</strong> o dan <strong>Caniatadau</strong>",
+			"Nid oes unrhyw fathau o ddogfennau caniataol ar gael am greu cynnwys fan hyn. Rhaid i chi alluogi'r rhain yn <strong>Mathau o Ddogfennau</strong> o fewn y adran <strong>Gosodiadau</strong>, gan olygu y opsiwn <strong>Mathau o nod blentyn caniataol</strong> o dan <strong>Strwythyr</strong>",
 		noDocumentTypesAtRoot:
 			'Nid oes unrhyw fathau o ddogfennau ar gael. Rhaid i chi creu rhain yn <strong>Mathau o Ddogfennau</strong> tu fewn y adran <strong>Gosodiadau</strong>.',
 		noDocumentTypesWithNoSettingsAccess:
@@ -398,7 +398,7 @@ export default {
 		noDocumentTypesEditPermissions: 'Golygu caniatâd ar gyfer y math hwn o ddogfen',
 		noDocumentTypesCreateNew: 'Creu Math o Ddogfen newydd',
 		noDocumentTypesAllowedAtRoot:
-			"Nid oes unrhyw fathau o ddogfennau caniataol ar gael am greu cynnwys fan hyn. Rhaid i chi alluogi'r rhain yn <strong>Mathau o Ddogfennau</strong> o fewn y adran <strong>Gosodiadau</strong>, gan olygu y opsiwn <strong>Caniatáu fel gwraidd</strong> o dan <strong>Caniatadau</strong>",
+			"Nid oes unrhyw fathau o ddogfennau caniataol ar gael am greu cynnwys fan hyn. Rhaid i chi alluogi'r rhain yn <strong>Mathau o Ddogfennau</strong> o fewn y adran <strong>Gosodiadau</strong>, gan olygu y opsiwn <strong>Caniatáu fel gwraidd</strong> o dan <strong>Strwythyr</strong>",
 		noMediaTypes:
 			'Nid oes unrhyw fathau o gyfrwng caniataol ar gael. Rhaid i chi alluogi\'r rhain yn yr adran gosodiadau o dan <strong>"mathau o gyfrwng"</strong>.',
 		noMediaTypesWithNoSettingsAccess:
@@ -747,6 +747,7 @@ export default {
 		content: 'Cynnwys',
 		continue: 'Bwrw ymlaen',
 		copy: 'Copïo',
+		copied: 'Wedi gopïo!',
 		create: 'Creu',
 		cropSection: 'Adran tocio',
 		database: 'Cronfa ddata',
@@ -1030,8 +1031,6 @@ export default {
 		signInWith: 'Mewngofnodwch gyda',
 		timeout: 'Sesiwn wedi cyrraedd terfyn amser',
 		userFailedLogin: 'Wps! Mae mewngofnodi wedi methu. Gwiriwch eich manylion a thrio eto.',
-		bottomText:
-			'<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">Umbraco.com</a></p> ',
 		forgottenPassword: 'Wedi anghofio eich cyfrinair?',
 		forgottenPasswordInstruction:
 			"Bydd ebost yn cael ei anfon i'r cyfeiriad darparwyd gyda dolen i ailosod eich cyfrinair",
@@ -1043,17 +1042,6 @@ export default {
 		setPasswordInstruction: 'Darparwch gyfrinair newydd',
 		setPasswordConfirmation: "Mae eich cyfrinair wedi'i ddiweddaru",
 		resetCodeExpired: "Mae'r ddolen rydych wedi clicio arno naill ai yn annilys neu wedi dod i ben",
-		resetPasswordEmailCopySubject: 'Umbraco: Ailosod Cyfrinair',
-		resetPasswordEmailCopyFormat:
-			"\n        <html>\n\t\t\t<head>\n\t\t\t\t<meta name='viewport' content='width=device-width'>\n\t\t\t\t<meta http-equiv='Content-Type' content='text/html; charset=UTF-8'>\n\t\t\t</head>\n\t\t\t<body class='' style='font-family: sans-serif; -webkit-font-smoothing: antialiased; font-size: 14px; color: #392F54; line-height: 22px; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; background: #1d1333; margin: 0; padding: 0;' bgcolor='#1d1333'>\n\t\t\t\t<style type='text/css'> @media only screen and (max-width: 620px) {table[class=body] h1 {font-size: 28px !important; margin-bottom: 10px !important; } table[class=body] .wrapper {padding: 32px !important; } table[class=body] .article {padding: 32px !important; } table[class=body] .content {padding: 24px !important; } table[class=body] .container {padding: 0 !important; width: 100% !important; } table[class=body] .main {border-left-width: 0 !important; border-radius: 0 !important; border-right-width: 0 !important; } table[class=body] .btn table {width: 100% !important; } table[class=body] .btn a {width: 100% !important; } table[class=body] .img-responsive {height: auto !important; max-width: 100% !important; width: auto !important; } } .btn-primary table td:hover {background-color: #34495e !important; } .btn-primary a:hover {background-color: #34495e !important; border-color: #34495e !important; } .btn  a:visited {color:#FFFFFF;} </style>\n\t\t\t\t<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" class=\"body\" style=\"border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #1d1333;\" bgcolor=\"#1d1333\">\n\t\t\t\t\t<tr>\n\t\t\t\t\t\t<td style=\"font-family: sans-serif; font-size: 14px; vertical-align: top; padding: 24px;\" valign=\"top\">\n\t\t\t\t\t\t\t<table style=\"border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;\">\n\t\t\t\t\t\t\t\t<tr>\n\t\t\t\t\t\t\t\t\t<td background=\"https://umbraco.com/umbraco/assets/img/application/logo.png\" bgcolor=\"#1d1333\" width=\"28\" height=\"28\" valign=\"top\" style=\"font-family: sans-serif; font-size: 14px; vertical-align: top;\">\n\t\t\t\t\t\t\t\t\t\t<!--[if gte mso 9]> <v:rect xmlns:v=\"urn:schemas-microsoft-com:vml\" fill=\"true\" stroke=\"false\" style=\"width:30px;height:30px;\"> <v:fill type=\"tile\" src=\"https://umbraco.com/umbraco/assets/img/application/logo.png\" color=\"#1d1333\" /> <v:textbox inset=\"0,0,0,0\"> <![endif]-->\n\t\t\t\t\t\t\t\t\t\t<div> </div>\n\t\t\t\t\t\t\t\t\t\t<!--[if gte mso 9]> </v:textbox> </v:rect> <![endif]-->\n\t\t\t\t\t\t\t\t\t</td>\n\t\t\t\t\t\t\t\t\t<td style=\"font-family: sans-serif; font-size: 14px; vertical-align: top;\" valign=\"top\"></td>\n\t\t\t\t\t\t\t\t</tr>\n\t\t\t\t\t\t\t</table>\n\t\t\t\t\t\t</td>\n\t\t\t\t\t</tr>\n\t\t\t\t</table>\n\t\t\t\t<table border='0' cellpadding='0' cellspacing='0' class='body' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #1d1333;' bgcolor='#1d1333'>\n\t\t\t\t\t<tr>\n\t\t\t\t\t\t<td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'> </td>\n\t\t\t\t\t\t<td class='container' style='font-family: sans-serif; font-size: 14px; vertical-align: top; display: block; max-width: 560px; width: 560px; margin: 0 auto; padding: 10px;' valign='top'>\n\t\t\t\t\t\t\t<div class='content' style='box-sizing: border-box; display: block; max-width: 560px; margin: 0 auto; padding: 10px;'>\n\t\t\t\t\t\t\t\t<br>\n\t\t\t\t\t\t\t\t<table class='main' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; border-radius: 3px; background: #FFFFFF;' bgcolor='#FFFFFF'>\n\t\t\t\t\t\t\t\t\t<tr>\n\t\t\t\t\t\t\t\t\t\t<td class='wrapper' style='font-family: sans-serif; font-size: 14px; vertical-align: top; box-sizing: border-box; padding: 50px;' valign='top'>\n\t\t\t\t\t\t\t\t\t\t\t<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;'>\n\t\t\t\t\t\t\t\t\t\t\t\t<tr>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<td style='line-height: 24px; font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<h1 style='color: #392F54; font-family: sans-serif; font-weight: bold; line-height: 1.4; font-size: 24px; text-align: left; text-transform: capitalize; margin: 0 0 30px;' align='left'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tAilosod cyfrinair wedi dymuno\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t</h1>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tEich enw defnyddiwr ar gyfer swyddfa gefn Umbraco yw: <strong>%0%</strong>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t</p>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: auto;'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<tbody>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<tr>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<td style='font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background: #35C786;' align='center' bgcolor='#35C786' valign='top'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<a href='%1%' target='_blank' rel='noopener' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tCliciwch y ddolen yma er mwyn ailosod eich cyfrinair\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t</a>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t</td>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t</tr>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t</tbody>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t</table>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t</p>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<p style='max-width: 400px; display: block; color: #392F54; font-family: sans-serif; font-size: 14px; line-height: 20px; font-weight: normal; margin: 15px 0;'>Os na allwch glicio ar y ddolen yma, copïwch a gludwch y URL i mewn i'ch porwr:</p>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<table border='0' cellpadding='0' cellspacing='0'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<tr>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<td style='-ms-word-break: break-all; word-break: break-all; font-family: sans-serif; font-size: 11px; line-height:14px;'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<font style=\"-ms-word-break: break-all; word-break: break-all; font-size: 11px; line-height:14px;\">\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<a style='-ms-word-break: break-all; word-break: break-all; color: #392F54; text-decoration: underline; font-size: 11px; line-height:15px;' href='%1%'>%1%</a>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t</font>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t</td>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t</tr>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t</table>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t</p>\n\t\t\t\t\t\t\t\t\t\t\t\t\t</td>\n\t\t\t\t\t\t\t\t\t\t\t\t</tr>\n\t\t\t\t\t\t\t\t\t\t\t</table>\n\t\t\t\t\t\t\t\t\t\t</td>\n\t\t\t\t\t\t\t\t\t</tr>\n\t\t\t\t\t\t\t\t</table>\n\t\t\t\t\t\t\t\t<br><br><br>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</td>\n\t\t\t\t\t\t<td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'> </td>\n\t\t\t\t\t</tr>\n\t\t\t\t</table>\n\t\t\t</body>\n\t\t</html>\n\t",
-		'2faTitle': 'Un cam olaf',
-		'2faText': "Rydych chi wedi galluogi dilysu 2-ffactor ac mae'n rhaid i chi wirio pwy ydych chi.",
-		'2faMultipleText': 'Dewiswch ddarparwr 2 ffactor',
-		'2faCodeInput': 'Cod dilysu',
-		'2faCodeInputHelp': 'Rhowch y cod dilysu os gwelwch yn dda',
-		'2faInvalidCode': "Cod annilys wedi'i nodi",
-		mfaSecurityCodeSubject: 'Umbraco: Cod Diogelwch',
-		mfaSecurityCodeMessage: 'Eich cod diogelwch yw: %0%',
 	},
 	main: {
 		dashboard: 'Dashfwrdd',
@@ -1301,14 +1289,14 @@ export default {
 	},
 	sections: {
 		content: 'Cynnwys',
-		forms: 'Ffurflenni',
+		library: 'Llyfrgell',
 		media: 'Cyfrwng',
 		member: 'Aelodau',
 		packages: 'Pecynnau',
+		marketplace: 'Marchnad',
 		settings: 'Gosodiadau',
 		translation: 'Cyfieithiad',
 		users: 'Defnyddwyr',
-		marketplace: 'Marchnad',
 	},
 	settings: {
 		defaulttemplate: 'Templed diofyn',
@@ -1605,9 +1593,19 @@ export default {
 		chooseChildNode: 'Dewis nod blentyn',
 		compositionsDescription:
 			"Etifeddu tabiau a phriodweddau o fath o ddogfen sy'n bodoli eisoes. Bydd tabiau newydd yn cael eu ychwanegu at y fath o ddogfen bresennol neu eu cyfuno os mae tab gyda enw yr union yr un fath yn bodoli eisoes.",
+		compositionsDescriptionMediaType:
+			"Etifeddu tabiau a phriodweddau o fath o gyfrwng sy'n bodoli eisoes. Bydd tabiau newydd yn cael eu ychwanegu at y fath o gyfrwng bresennol neu eu cyfuno os mae tab gyda enw yr union yr un fath yn bodoli eisoes.",
+		compositionsDescriptionMemberType:
+			"Etifeddu tabiau a phriodweddau o fath o aelod sy'n bodoli eisoes. Bydd tabiau newydd yn cael eu ychwanegu at y fath o aelod bresennol neu eu cyfuno os mae tab gyda enw yr union yr un fath yn bodoli eisoes.",
 		compositionInUse:
 			"Mae'r math o gynnwys yma wedi'i ddefnyddio mewn cyfansoddiad, felly ni ellir ei gyfansoddi ei hunan.",
+		compositionInUseMediaType:
+			"Mae'r math o gyfrwng yma wedi'i ddefnyddio mewn cyfansoddiad, felly ni ellir ei gyfansoddi ei hunan.",
+		compositionInUseMemberType:
+			"Mae'r math o aelod yma wedi'i ddefnyddio mewn cyfansoddiad, felly ni ellir ei gyfansoddi ei hunan.",
 		noAvailableCompositions: "Nid oes unrhyw fathau o gynnwys ar gael i'w defnyddio fel cyfansoddiad.",
+		noAvailableCompositionsMediaType: "Nid oes unrhyw fathau o gyfrwng ar gael i'w defnyddio fel cyfansoddiad.",
+		noAvailableCompositionsMemberType: "Nid oes unrhyw fathau o aelod ar gael i'w defnyddio fel cyfansoddiad.",
 		compositionRemoveWarning:
 			"Bydd dileu cyfansoddiad yn dileu'r holl ddata eiddo priodwedd gysylltiedig. Ar ôl i chi arbed y math o ddogfen, bydd ddim ffordd nôl.",
 		availableEditors: 'Golygyddion ar gael',
@@ -1645,6 +1643,10 @@ export default {
 		compositionUsageHeading: "Ble mae'r cyfansoddiad yma'n cael ei ddefnyddio?",
 		compositionUsageSpecification:
 			"Mae'r cyfansoddiad yma yn cael ei ddefnyddio'n bresennol yng nghyfansoddiad o'r mathau o gynnwys ganlynol:",
+		compositionUsageSpecificationMediaType:
+			"Mae'r cyfansoddiad yma yn cael ei ddefnyddio'n bresennol yng nghyfansoddiad o'r mathau o gyfrwng ganlynol:",
+		compositionUsageSpecificationMemberType:
+			"Mae'r cyfansoddiad yma yn cael ei ddefnyddio'n bresennol yng nghyfansoddiad o'r mathau o aelod ganlynol:",
 		variantsHeading: 'Caniatáu amrywiadau',
 		cultureVariantHeading: 'Caniatáu amrywiad  yn ôl ddiwylliant',
 		segmentVariantHeading: 'Caniatáu segmentiad',
@@ -2087,6 +2089,8 @@ export default {
 	redirectUrls: {
 		disableUrlTracker: 'Analluogi olinydd URL',
 		enableUrlTracker: 'Galluogi olinydd URL',
+		urlTrackerEnabled: "Wedi'i alluogi",
+		urlTrackerDisabled: "Wedi'i analluogi",
 		culture: 'Diwylliant',
 		originalUrl: 'URL gwreiddiol',
 		redirectedTo: 'Ailgyfeirwyd I',
@@ -2166,7 +2170,8 @@ export default {
 		openBackofficeSearch: 'Agor chwiliad swyddfa gefn',
 		openCloseBackofficeHelp: 'Agor/Cau cymorth swyddfa gefn',
 		openCloseBackofficeProfileOptions: 'Agor/Cau eich opsiynau proffil',
-		profileOptions: 'Opsiynau proffil',
+		profileOptions: 'Proffil defnyddiwr ar gyfer %0% (%1%)',
+		profileOptionsDefault: 'Proffil defnyddiwr',
 		assignDomainDescription: 'Sefydli Diwylliannau ac Enwau Gwesteia am %0%',
 		createDescription: 'Creu nod newydd o dan %0%',
 		protectDescription: 'Sefydli Mynediad Cyhoeddus ar %0%',

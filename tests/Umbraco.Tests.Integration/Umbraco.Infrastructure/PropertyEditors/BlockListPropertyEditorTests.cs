@@ -35,14 +35,14 @@ internal sealed class BlockListPropertyEditorTests : UmbracoIntegrationTest
     {
         var textPageContentType = ContentTypeBuilder.CreateTextPageContentType("myContentType");
         textPageContentType.AllowedTemplates = Enumerable.Empty<ITemplate>();
-        ContentTypeService.Save(textPageContentType);
+        await ContentTypeService.CreateAsync(textPageContentType, Constants.Security.SuperUserKey);
 
         var textPage = ContentBuilder.CreateTextpageContent(textPageContentType, "My Picked Content", -1);
         ContentService.Save(textPage);
 
         var elementType = ContentTypeBuilder.CreateAllTypesContentType("myElementType", "My Element Type");
         elementType.IsElement = true;
-        ContentTypeService.Save(elementType);
+        await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
 
         var blockListContentType = await CreateBlockListContentType(elementType);
 
@@ -100,7 +100,7 @@ internal sealed class BlockListPropertyEditorTests : UmbracoIntegrationTest
     {
         var elementType = ContentTypeBuilder.CreateAllTypesContentType("myElementType", "My Element Type");
         elementType.IsElement = true;
-        ContentTypeService.Save(elementType);
+        await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
 
         var blockListContentType = await CreateBlockListContentType(elementType);
 
@@ -166,11 +166,11 @@ internal sealed class BlockListPropertyEditorTests : UmbracoIntegrationTest
         elementType.IsElement = true;
         elementType.Variations = ContentVariation.Culture;
         elementType.PropertyTypes.First(p => p.Alias == "tags").Variations = ContentVariation.Culture;
-        ContentTypeService.Save(elementType);
+        await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
 
         var blockListContentType = await CreateBlockListContentType(elementType);
         blockListContentType.Variations = ContentVariation.Culture;
-        ContentTypeService.Save(blockListContentType);
+        await ContentTypeService.CreateAsync(blockListContentType, Constants.Security.SuperUserKey);
 
         var contentElementKey = Guid.NewGuid();
         var blockListValue = new BlockListValue
@@ -239,7 +239,7 @@ internal sealed class BlockListPropertyEditorTests : UmbracoIntegrationTest
     {
         var elementType = ContentTypeBuilder.CreateAllTypesContentType("myElementType", "My Element Type");
         elementType.IsElement = true;
-        ContentTypeService.Save(elementType);
+        await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
 
         var blockListContentType = await CreateBlockListContentType(elementType);
 
@@ -289,7 +289,7 @@ internal sealed class BlockListPropertyEditorTests : UmbracoIntegrationTest
 
         elementType.Variations = ContentVariation.Culture;
         elementType.PropertyTypes.First(pt => pt.Alias == "singleLineText").Variations = ContentVariation.Culture;
-        ContentTypeService.Save(elementType);
+        await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
 
         var valueEditor = await GetValueEditor(blockListContentType);
         var toEditorValue = valueEditor.ToEditor(content.Properties["blocks"]!) as BlockListValue;
@@ -322,7 +322,7 @@ internal sealed class BlockListPropertyEditorTests : UmbracoIntegrationTest
         elementType.IsElement = true;
         elementType.Variations = ContentVariation.Culture;
         elementType.PropertyTypes.First(pt => pt.Alias == "singleLineText").Variations = ContentVariation.Culture;
-        ContentTypeService.Save(elementType);
+        await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
 
         var blockListContentType = await CreateBlockListContentType(elementType);
 
@@ -373,7 +373,7 @@ internal sealed class BlockListPropertyEditorTests : UmbracoIntegrationTest
 
         elementType.PropertyTypes.First(pt => pt.Alias == "singleLineText").Variations = ContentVariation.Nothing;
         elementType.Variations = ContentVariation.Nothing;
-        ContentTypeService.Save(elementType);
+        await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
 
         var valueEditor = await GetValueEditor(blockListContentType);
         var toEditorValue = valueEditor.ToEditor(content.Properties["blocks"]!) as BlockListValue;
@@ -430,7 +430,7 @@ internal sealed class BlockListPropertyEditorTests : UmbracoIntegrationTest
             .WithDataTypeId(blockListDataType.Id)
             .Done()
             .Build();
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
         // re-fetch to wire up all key bindings (particularly to the datatype)
         return await ContentTypeService.GetAsync(contentType.Key);
     }

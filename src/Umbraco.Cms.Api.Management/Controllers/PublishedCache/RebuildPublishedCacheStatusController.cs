@@ -6,11 +6,19 @@ using Umbraco.Cms.Core.PublishedCache;
 
 namespace Umbraco.Cms.Api.Management.Controllers.PublishedCache;
 
+/// <summary>
+/// Controller for retrieving the status of the published cache rebuild process.
+/// </summary>
 [ApiVersion("1.0")]
 public class RebuildPublishedCacheStatusController : PublishedCacheControllerBase
 {
     private readonly IDatabaseCacheRebuilder _databaseCacheRebuilder;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="RebuildPublishedCacheStatusController"/> class,
+    /// which manages the status of the published cache rebuild process.
+    /// </summary>
+    /// <param name="databaseCacheRebuilder">An instance responsible for rebuilding the database cache.</param>
     public RebuildPublishedCacheStatusController(IDatabaseCacheRebuilder databaseCacheRebuilder) => _databaseCacheRebuilder = databaseCacheRebuilder;
 
     [HttpGet("rebuild/status")]

@@ -3,6 +3,7 @@ import { manifest as sourceTypeManifest } from './config/source-type/manifests.j
 import { manifest as schemaManifest } from './Umbraco.MultiNodeTreePicker.js';
 import { manifests as dynamicRootManifests } from './dynamic-root/manifests.js';
 import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/property-editor';
+import { manifests as valueSummaryManifests } from './value-summary/manifests.js';
 
 const manifest: ManifestPropertyEditorUi = {
 	type: 'propertyEditorUi',
@@ -12,15 +13,16 @@ const manifest: ManifestPropertyEditorUi = {
 	meta: {
 		label: 'Content Picker',
 		icon: 'icon-page-add',
-		group: 'pickers',
+		group: '#propertyEditorUIGroups_pickers',
+		keywords: ['select', 'page', 'node', 'reference', 'related', 'link', 'pages', 'content'],
 		propertyEditorSchemaAlias: 'Umbraco.MultiNodeTreePicker',
 		supportsReadOnly: true,
 		settings: {
 			properties: [
 				{
 					alias: 'filter',
-					label: 'Allow items of type',
-					description: 'Select the applicable types',
+					label: 'Accepted types',
+					description: 'Limit to specific types',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.ContentPicker.SourceType',
 				},
 			],
@@ -30,4 +32,10 @@ const manifest: ManifestPropertyEditorUi = {
 
 const config: Array<ManifestPropertyEditorUi> = [sourceManifest, sourceTypeManifest];
 
-export const manifests: Array<UmbExtensionManifest> = [manifest, ...config, schemaManifest, ...dynamicRootManifests];
+export const manifests: Array<UmbExtensionManifest> = [
+	manifest,
+	...config,
+	schemaManifest,
+	...dynamicRootManifests,
+	...valueSummaryManifests,
+];

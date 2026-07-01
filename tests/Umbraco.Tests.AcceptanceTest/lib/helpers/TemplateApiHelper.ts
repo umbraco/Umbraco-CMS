@@ -313,8 +313,156 @@ export class TemplateApiHelper {
     return await this.create(name, alias, templateContent);
   }
 
+  private readonly memberAuthTemplateHeader =
+    '@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage\n' +
+    '@using Umbraco.Cms.Web.Common.Models\n' +
+    '@using Umbraco.Cms.Web.Website.Controllers\n' +
+    '@using Umbraco.Cms.Web.Website.Models\n' +
+    '@using Umbraco.Extensions\n' +
+    '@inject MemberModelBuilderFactory memberModelBuilderFactory\n' +
+    '@{\n' +
+    '    Layout = null;\n' +
+    '    var memberIdentity = Context.User.GetMemberIdentity();\n' +
+    '    var isMemberAuthenticated = memberIdentity?.IsAuthenticated ?? false;\n' +
+    '}\n' +
+    '<!DOCTYPE html>\n' +
+    '<html><head><title>Member Auth Test</title></head><body>\n' +
+    '<span data-mark="member-auth-state">@(isMemberAuthenticated ? "authenticated" : "anonymous")</span>\n' +
+    '<span data-mark="member-auth-name">@memberIdentity?.Name</span>\n';
+
+  private readonly memberLoginFormBody =
+    '\n@{ var loginModel = new LoginModel(); loginModel.RedirectUrl = null; }' +
+    '\n<div class="login-form">' +
+    '\n@using (Html.BeginUmbracoForm<UmbLoginController>("HandleLogin", new { RedirectUrl = loginModel.RedirectUrl }))' +
+    '\n{' +
+    '\n    <h4>Log in with a local account.</h4>' +
+    '\n    <div asp-validation-summary="All" class="text-danger"></div>' +
+    '\n    <div class="mb-3">' +
+    '\n        <label asp-for="@loginModel.Username" class="form-label"></label>' +
+    '\n        <input asp-for="@loginModel.Username" class="form-control" />' +
+    '\n    </div>' +
+    '\n    <div class="mb-3">' +
+    '\n        <label asp-for="@loginModel.Password" class="form-label"></label>' +
+    '\n        <input asp-for="@loginModel.Password" class="form-control" />' +
+    '\n    </div>' +
+    '\n    <div class="mb-3 form-check">' +
+    '\n        <input asp-for="@loginModel.RememberMe" class="form-check-input" />' +
+    '\n        <label asp-for="@loginModel.RememberMe" class="form-check-label">Remember me</label>' +
+    '\n    </div>' +
+    '\n    <button type="submit" class="btn btn-primary">Log in</button>' +
+    '\n}' +
+    '\n</div>\n';
+
+  private readonly memberRegisterFormBody =
+    '\n@{' +
+    '\n    var registerModel = memberModelBuilderFactory' +
+    '\n        .CreateRegisterModel()' +
+    '\n        .WithMemberTypeAlias("Member")' +
+    '\n        .WithRedirectUrl(null)' +
+    '\n        .WithCustomProperties(false)' +
+    '\n        .WithAutomaticLogIn(true)' +
+    '\n        .Build();' +
+    '\n    var success = TempData["FormSuccess"] != null;' +
+    '\n}' +
+    '\n@if (success)' +
+    '\n{' +
+    '\n    <p class="text-success">Registration succeeded.</p>' +
+    '\n}' +
+    '\nelse' +
+    '\n{' +
+    '\n    using (Html.BeginUmbracoForm<UmbRegisterController>("HandleRegisterMember",' +
+    '\n        new { MemberTypeAlias = registerModel.MemberTypeAlias, UsernameIsEmail = registerModel.UsernameIsEmail, RedirectUrl = registerModel.RedirectUrl, AutomaticLogIn = registerModel.AutomaticLogIn }))' +
+    '\n    {' +
+    '\n        <h2>Create a new account.</h2>' +
+    '\n        <div asp-validation-summary="All" class="text-danger"></div>' +
+    '\n        <div class="mb-3">' +
+    '\n            <label asp-for="@registerModel.Name" class="form-label"></label>' +
+    '\n            <input asp-for="@registerModel.Name" class="form-control" />' +
+    '\n        </div>' +
+    '\n        <div class="mb-3">' +
+    '\n            <label asp-for="@registerModel.Email" class="form-label"></label>' +
+    '\n            <input asp-for="@registerModel.Email" class="form-control" />' +
+    '\n        </div>' +
+    '\n        <div class="mb-3">' +
+    '\n            <label asp-for="@registerModel.Password" class="form-label"></label>' +
+    '\n            <input asp-for="@registerModel.Password" class="form-control" />' +
+    '\n        </div>' +
+    '\n        <div class="mb-3">' +
+    '\n            <label asp-for="@registerModel.ConfirmPassword" class="form-label"></label>' +
+    '\n            <input asp-for="@registerModel.ConfirmPassword" class="form-control" />' +
+    '\n        </div>' +
+    '\n        <button type="submit" class="btn btn-primary">Register</button>' +
+    '\n    }' +
+    '\n}\n';
+
+  private readonly memberProfileFormBody =
+    '\n@{' +
+    '\n    var profileModel = await memberModelBuilderFactory' +
+    '\n        .CreateProfileModel()' +
+    '\n        .WithRedirectUrl(null)' +
+    '\n        .WithCustomProperties(false)' +
+    '\n        .BuildForCurrentMemberAsync();' +
+    '\n    var success = TempData["FormSuccess"] != null;' +
+    '\n}' +
+    '\n@if (profileModel != null)' +
+    '\n{' +
+    '\n    if (success)' +
+    '\n    {' +
+    '\n        <p class="text-success">Profile updated</p>' +
+    '\n    }' +
+    '\n    using (Html.BeginUmbracoForm<UmbProfileController>("HandleUpdateProfile", new { RedirectUrl = profileModel.RedirectUrl }))' +
+    '\n    {' +
+    '\n        <h2>Update your account.</h2>' +
+    '\n        <div asp-validation-summary="All" class="text-danger"></div>' +
+    '\n        <div class="mb-3">' +
+    '\n            <label asp-for="@profileModel.Name" class="form-label"></label>' +
+    '\n            <input asp-for="@profileModel.Name" class="form-control" />' +
+    '\n        </div>' +
+    '\n        <div class="mb-3">' +
+    '\n            <label asp-for="@profileModel.Email" class="form-label"></label>' +
+    '\n            <input asp-for="@profileModel.Email" class="form-control" />' +
+    '\n        </div>' +
+    '\n        <input asp-for="@profileModel.UserName" type="hidden" />' +
+    '\n        <button type="submit" class="btn btn-primary">Update</button>' +
+    '\n    }' +
+    '\n}\n';
+
+  private readonly memberLoginStatusBody =
+    '\n@{ var logoutModel = new PostRedirectModel(); logoutModel.RedirectUrl = null; }' +
+    '\n@if (isMemberAuthenticated)' +
+    '\n{' +
+    '\n    <div class="login-status">' +
+    '\n        <p>Welcome back <strong>@memberIdentity?.Name</strong>!</p>' +
+    '\n        @using (Html.BeginUmbracoForm<UmbLoginStatusController>("HandleLogout", new { RedirectUrl = logoutModel.RedirectUrl }))' +
+    '\n        {' +
+    '\n            <button type="submit" class="btn btn-primary">Log out</button>' +
+    '\n        }' +
+    '\n    </div>' +
+    '\n}\n';
+
+  async createMemberLoginTemplate(name: string) {
+    return await this.createTemplateWithContent(
+      name,
+      this.memberAuthTemplateHeader + this.memberLoginFormBody + this.memberLoginStatusBody + '</body></html>\n',
+    );
+  }
+
+  async createMemberRegistrationTemplate(name: string) {
+    return await this.createTemplateWithContent(
+      name,
+      this.memberAuthTemplateHeader + this.memberRegisterFormBody + this.memberLoginStatusBody + '</body></html>\n',
+    );
+  }
+
+  async createMemberProfileTemplate(name: string) {
+    return await this.createTemplateWithContent(
+      name,
+      this.memberAuthTemplateHeader + this.memberLoginFormBody + this.memberProfileFormBody + this.memberLoginStatusBody + '</body></html>\n',
+    );
+  }
+
   async createTemplateWithEntityDataPickerValue(templateName: string, propertyName: string) {
-    const templateContent = 
+    const templateContent =
       '@using Umbraco.Cms.Core.Models;\n' +
       '@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage;\n' +
       '@{\n' +
@@ -367,6 +515,112 @@ export class TemplateApiHelper {
       '\n\t}' +
       '\n}';
     return this.createTemplateWithDisplayingValue(name, templateContent);
+  }
+
+  private buildElementPickerLoopTemplate(elementPickerPropertyName: string, perElementLines: string[], options: {captureFirst?: boolean; afterLoopLines?: string[]} = {}) {
+    const propertyAlias = AliasHelper.toAlias(elementPickerPropertyName);
+    const {captureFirst = false, afterLoopLines = []} = options;
+    return '\n@using Umbraco.Cms.Core.Models.PublishedContent' +
+      '\n@{' +
+      '\n\tvar elements = Model.Value<IEnumerable<IPublishedElement>>("' + propertyAlias + '");' +
+      '\n}' +
+      '\n@if (elements != null' + (captureFirst ? ' && elements.Any()' : '') + ')' +
+      '\n{' +
+      (captureFirst ? '\n\tvar first = elements.First();' : '') +
+      '\n\tforeach (var element in elements)' +
+      '\n\t{' +
+      perElementLines.map(line => '\n\t\t' + line).join('') +
+      '\n\t}' +
+      '\n}' +
+      afterLoopLines.map(line => '\n' + line).join('');
+  }
+
+  async createTemplateWithDisplayingElementPickerExtensionMethods(name: string, elementPickerPropertyName: string, elementTypeAlias: string, pageDocumentTypeAlias: string) {
+    const templateContent = this.buildElementPickerLoopTemplate(elementPickerPropertyName, [
+      '<p>Name: @element.Name()</p>',
+      '<p>HasCultureEn: @element.HasCulture("en-US")</p>',
+      '<p>HasCultureDa: @element.HasCulture("da")</p>',
+      '<p>CultureDate: @element.CultureDate().Year</p>',
+      '<p>IsDocumentType: @element.IsDocumentType("' + elementTypeAlias + '")</p>',
+      '<p>NotDocumentType: @element.IsDocumentType("nonExistingAlias")</p>',
+      '<p>CreatorName: @element.CreatorName()</p>',
+      '<p>WriterName: @element.WriterName()</p>',
+    ], {
+      afterLoopLines: [
+        '<p>PageName: @Model.Name</p>',
+        '<p>PageIsDocumentType: @Model.IsDocumentType("' + pageDocumentTypeAlias + '")</p>',
+        '<p>PageCreatorName: @Model.CreatorName()</p>',
+      ],
+    });
+    return this.createTemplateWithDisplayingValue(name, templateContent);
+  }
+
+  async createTemplateWithDisplayingElementPickerVarianceAndIdentityMethods(name: string, elementPickerPropertyName: string, elementTypeAlias: string, pageDocumentTypeAlias: string) {
+    const upperElementTypeAlias = elementTypeAlias.toUpperCase();
+    const templateContent = this.buildElementPickerLoopTemplate(elementPickerPropertyName, [
+      '<p>Name-en: [@element.Name("en-US")]</p>',
+      '<p>Name-da: [@element.Name("da")]</p>',
+      '<p>Name-fr: [@element.Name("fr")]</p>',
+      '<p>InvariantOrEn: @element.IsInvariantOrHasCulture("en-US")</p>',
+      '<p>InvariantOrDa: @element.IsInvariantOrHasCulture("da")</p>',
+      '<p>InvariantOrFr: @element.IsInvariantOrHasCulture("fr")</p>',
+      '<p>HasCultureUpper: @element.HasCulture("EN-US")</p>',
+      '<p>HasCultureEmpty: @element.HasCulture("")</p>',
+      '<p>IsDocTypeUpper: @element.IsDocumentType("' + upperElementTypeAlias + '")</p>',
+      '<p>CultureDateDa: @element.CultureDate("da").Year</p>',
+      '<p>CultureDateFr: @element.CultureDate("fr").Year</p>',
+      '<p>HasValueTextstringDa: @element.HasValue("textstring", "da")</p>',
+      '<p>HasValueMissing: @element.HasValue("nonExistingProp")</p>',
+      '<p>IsEqualFirst-@(element.Name()): @element.IsEqual(first)</p>',
+      '<p>IsNotEqualFirst-@(element.Name()): @element.IsNotEqual(first)</p>',
+    ], {
+      captureFirst: true,
+      afterLoopLines: [
+        '<p>PageHasCultureEn: @Model.HasCulture("en-US")</p>',
+        '<p>PageInvariantOrFr: @Model.IsInvariantOrHasCulture("fr")</p>',
+        '<p>PageCultureDateEn: @Model.CultureDate("en-US").Year</p>',
+        '<p>PageIsEqualSelf: @Model.IsEqual(Model)</p>',
+      ],
+    });
+    return this.createTemplateWithDisplayingValue(name, templateContent);
+  }
+
+  async createTemplateWithDisplayingElementPickerCompositionMethods(name: string, elementPickerPropertyName: string, baseElementTypeAlias: string, childElementTypeAlias: string) {
+    const templateContent = this.buildElementPickerLoopTemplate(elementPickerPropertyName, [
+      '<p>IsDocTypeBase: @element.IsDocumentType("' + baseElementTypeAlias + '")</p>',
+      '<p>IsDocTypeBaseRecursive: @element.IsDocumentType("' + baseElementTypeAlias + '", true)</p>',
+      '<p>IsComposedOfBase: @element.IsComposedOf("' + baseElementTypeAlias + '")</p>',
+      '<p>IsDocTypeChild: @element.IsDocumentType("' + childElementTypeAlias + '")</p>',
+    ]);
+    return this.createTemplateWithDisplayingValue(name, templateContent);
+  }
+
+  async createTemplateWithDisplayingElementPickerFallbackMethods(name: string, elementPickerPropertyName: string, propertyAlias: string) {
+    await this.ensureNameNotExists(name);
+    const alias = AliasHelper.toAlias(name);
+    const elementPickerAlias = AliasHelper.toAlias(elementPickerPropertyName);
+    const content =
+      '@using Umbraco.Cms.Core.Models.PublishedContent' +
+      '\n@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage' +
+      '\n@inject IPublishedValueFallback PublishedValueFallback' +
+      '\n@{' +
+      '\n\tLayout = null;' +
+      '\n\tvar elements = Model.Value<IEnumerable<IPublishedElement>>("' + elementPickerAlias + '");' +
+      '\n}' +
+      '\n<div data-mark="content-render-value">' +
+      '\n@if (elements != null)' +
+      '\n{' +
+      '\n\tforeach (var element in elements)' +
+      '\n\t{' +
+      '\n\t\t<p>HasValueDaNoFallback: @element.HasValue("' + propertyAlias + '", "da")</p>' +
+      '\n\t\t<p>HasValueDaFallbackLanguage: @element.HasValue(PublishedValueFallback, "' + propertyAlias + '", "da", null, Fallback.ToLanguage)</p>' +
+      '\n\t\t<p>TextDaNoFallback: [@(element.Value<string>("' + propertyAlias + '", "da"))]</p>' +
+      '\n\t\t<p>TextDaFallbackLanguage: [@(element.Value<string>("' + propertyAlias + '", "da", null, Fallback.ToLanguage))]</p>' +
+      '\n\t}' +
+      '\n}' +
+      '\n</div>\n';
+    const templateId = await this.create(name, alias, content);
+    return templateId === undefined ? '' : templateId;
   }
 
   async createTemplateWithDisplayingBlockGridItems(name: string, blockGridPropertyName: string, elementPropertyAlias: string, noBlocksMessage: string = 'No blocks available') {

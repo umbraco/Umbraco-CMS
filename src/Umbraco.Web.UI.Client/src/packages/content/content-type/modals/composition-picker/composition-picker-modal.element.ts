@@ -83,11 +83,11 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 
 		if (existingCompositionHasBeenRemoved) {
 			await umbConfirmModal(this, {
-				headline: this.localize.term('general_remove'),
+				headline: '#general_remove',
 				content: html`<div style="max-width:400px">
 					${this.localize.term('contentTypeEditor_compositionRemoveWarning')}
 				</div>`,
-				confirmLabel: this.localize.term('general_submit'),
+				confirmLabel: '#general_submit',
 				color: 'danger',
 			});
 		}
@@ -126,12 +126,10 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 			return;
 		}
 
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-expect-error
 		const grouped = Object.groupBy(data, (item) => '/' + item.folderPath.join('/'));
-		this._compatibleCompositions = Object.keys(grouped)
-			.sort((a, b) => a.localeCompare(b))
-			.map((key) => ({ path: key, compositions: grouped[key] }));
+		this._compatibleCompositions = Object.entries(grouped)
+			.sort(([a], [b]) => a.localeCompare(b))
+			.map(([path, compositions]) => ({ path, compositions: compositions ?? [] }));
 
 		this._loading = false;
 	}
@@ -144,6 +142,21 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 	#onSelectionRemove(unique: string) {
 		this._selection = this._selection.filter((s) => s !== unique);
 		this.modalContext?.setValue({ selection: this._selection });
+	}
+
+	get #typeKeySuffix(): string {
+		switch (this.data?.entityType) {
+			case 'media-type':
+				return 'MediaType';
+			case 'member-type':
+				return 'MemberType';
+			default:
+				return '';
+		}
+	}
+
+	get #editPathBase(): string {
+		return `/section/settings/workspace/${this.data?.entityType ?? 'document-type'}/edit/`;
 	}
 
 	override render() {
@@ -170,13 +183,13 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 
 	#renderHasReference() {
 		return html`
-			<umb-localize key="contentTypeEditor_compositionInUse">
+			<umb-localize key="contentTypeEditor_compositionInUse${this.#typeKeySuffix}">
 				This Content Type is used in a composition, and therefore cannot be composed itself.
 			</umb-localize>
 			<h4>
 				<umb-localize key="contentTypeEditor_compositionUsageHeading">Where is this composition used?</umb-localize>
 			</h4>
-			<umb-localize key="contentTypeEditor_compositionUsageSpecification">
+			<umb-localize key="contentTypeEditor_compositionUsageSpecification${this.#typeKeySuffix}">
 				This composition is currently used in the composition of the following Content Types:
 			</umb-localize>
 			<div class="reference-list">
@@ -185,7 +198,7 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 					(item) => item.unique,
 					(item) => html`
 						<uui-ref-node-document-type
-							href=${'/section/settings/workspace/document-type/edit/' + item.unique}
+							href=${this.#editPathBase + item.unique}
 							name=${this.localize.string(item.name)}>
 							<umb-icon slot="icon" name=${item.icon}></umb-icon>
 						</uui-ref-node-document-type>
@@ -204,7 +217,7 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 
 		if (this._compatibleCompositions) {
 			return html`
-				<umb-localize key="contentTypeEditor_compositionsDescription">
+				<umb-localize key="contentTypeEditor_compositionsDescription${this.#typeKeySuffix}">
 					Inherit tabs and properties from an existing Document Type. New tabs will be<br />added to the current
 					Document Type or merged if a tab with an identical name exists.<br />
 				</umb-localize>
@@ -226,7 +239,7 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 			`;
 		} else {
 			return html`
-				<umb-localize key="contentTypeEditor_noAvailableCompositions">
+				<umb-localize key="contentTypeEditor_noAvailableCompositions${this.#typeKeySuffix}">
 					There are no Content Types available to use as a composition
 				</umb-localize>
 			`;
@@ -240,8 +253,8 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 			(compositions) => {
 				const usedForInheritance = this._usedForInheritance.includes(compositions.unique);
 				const usedForComposition = this._usedForComposition.includes(compositions.unique);
-				/* The server will return isCompatible as false if the Doc Type is currently being used in a composition. 
-				Therefore, we need to account for this in the "isDisabled" check to ensure it remains enabled. 
+				/* The server will return isCompatible as false if the Doc Type is currently being used in a composition.
+				Therefore, we need to account for this in the "isDisabled" check to ensure it remains enabled.
 				Otherwise, it would become disabled and couldn't be deselected by the user. */
 				const isDisabled = usedForInheritance || (compositions.isCompatible === false && !usedForComposition);
 				return html`

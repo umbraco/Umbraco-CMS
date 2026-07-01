@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -12,6 +12,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.UserGroup;
 
+/// <summary>
+/// Controller for managing user groups identified by their unique key.
+/// </summary>
 [ApiVersion("1.0")]
 public class ByKeyUserGroupController : UserGroupControllerBase
 {
@@ -19,6 +22,12 @@ public class ByKeyUserGroupController : UserGroupControllerBase
     private readonly IUserGroupService _userGroupService;
     private readonly IUserGroupPresentationFactory _userGroupPresentationFactory;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ByKeyUserGroupController"/> class with the specified services.
+    /// </summary>
+    /// <param name="authorizationService">Service used to perform authorization and permission checks.</param>
+    /// <param name="userGroupService">Service for managing user groups.</param>
+    /// <param name="userGroupPresentationFactory">Factory for creating user group presentation models.</param>
     public ByKeyUserGroupController(
         IAuthorizationService authorizationService,
         IUserGroupService userGroupService,
@@ -29,6 +38,15 @@ public class ByKeyUserGroupController : UserGroupControllerBase
         _userGroupPresentationFactory = userGroupPresentationFactory;
     }
 
+    /// <summary>
+    /// Retrieves a user group by its unique identifier.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="id">The unique identifier (GUID) of the user group to retrieve.</param>
+    /// <returns>
+    /// An <see cref="IActionResult"/> containing a <see cref="UserGroupResponseModel"/> with status 200 (OK) if found;
+    /// status 404 (Not Found) if the user group does not exist; or status 403 (Forbidden) if the user is not authorized.
+    /// </returns>
     [HttpGet("{id:guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(UserGroupResponseModel), StatusCodes.Status200OK)]

@@ -1,4 +1,6 @@
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbDefaultCollectionMenuElement } from './default-collection-menu.element.js';
+import { UmbDefaultCollectionMenuContext } from './default-collection-menu.context.js';
 
 export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
 	{
@@ -9,8 +11,8 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 		manifest: {
 			type: 'collectionMenu',
 			kind: 'default',
-			element: () => import('./default-collection-menu.element.js'),
-			api: () => import('./default-collection-menu.context.js'),
+			element: UmbDefaultCollectionMenuElement,
+			api: UmbDefaultCollectionMenuContext,
 		},
 	},
 ];

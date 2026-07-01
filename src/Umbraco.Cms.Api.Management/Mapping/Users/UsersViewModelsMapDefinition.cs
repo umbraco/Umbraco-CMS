@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Api.Management.ViewModels;
+using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.User;
 using Umbraco.Cms.Api.Management.ViewModels.User.Current;
 using Umbraco.Cms.Core.Mapping;
@@ -8,8 +8,16 @@ using Umbraco.Cms.Core.Security;
 
 namespace Umbraco.Cms.Api.Management.Mapping.Users;
 
+/// <summary>
+/// Defines the mapping configuration between user entities and their view models.
+/// </summary>
 public class UsersViewModelsMapDefinition : IMapDefinition
 {
+    /// <summary>
+    /// Configures the object-object mappings for user-related view models and response models.
+    /// This includes mappings for password changes, user creation results, and external login providers.
+    /// </summary>
+    /// <param name="mapper">The <see cref="IUmbracoMapper"/> instance on which to define the mappings.</param>
     public void DefineMaps(IUmbracoMapper mapper)
     {
         mapper.Define<PasswordChangedModel, ResetPasswordUserResponseModel>((_, _) => new ResetPasswordUserResponseModel(), Map);

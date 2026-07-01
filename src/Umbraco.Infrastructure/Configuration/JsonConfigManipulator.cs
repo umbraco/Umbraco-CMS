@@ -25,6 +25,11 @@ internal sealed class JsonConfigManipulator : IConfigManipulator
     private readonly ILogger<JsonConfigManipulator> _logger;
     private readonly SemaphoreSlim _lock = new(1, 1);
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="JsonConfigManipulator"/> class.
+    /// </summary>
+    /// <param name="configuration">The <see cref="IConfiguration"/> instance containing configuration settings.</param>
+    /// <param name="logger">The <see cref="ILogger{JsonConfigManipulator}"/> instance used for logging operations.</param>
     public JsonConfigManipulator(IConfiguration configuration, ILogger<JsonConfigManipulator> logger)
     {
         _configuration = configuration;
@@ -99,6 +104,7 @@ internal sealed class JsonConfigManipulator : IConfigManipulator
     }
 
     /// <inheritdoc />
+    [Obsolete("This method is no longer used by Umbraco. Set the Umbraco:CMS:WebRouting:DisableRedirectUrlTracking configuration key instead. Scheduled for removal in Umbraco 19.")]
     public async Task SaveDisableRedirectUrlTrackingAsync(bool disable)
         => await CreateOrUpdateConfigValueAsync(DisableRedirectUrlTrackingPath, disable);
 

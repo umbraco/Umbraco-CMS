@@ -237,8 +237,16 @@ export class UmbTreeItemChildrenManager<
 		// When reloading we only want to send the target values with the request if we can find the target to reload from.
 		const canSendTarget = reload === false || (reload && this.targetPagination.hasBaseTargetInCurrentItems());
 
+		// If all known items fit within a single page, skip target pagination and load from
+		// the start instead, this prevents "show more" appearing on small lists after operations
+		// that change item order like sort children.
+		const hasCustomTargetWindow = this.#takeBeforeTarget !== undefined || this.#takeAfterTarget !== undefined;
+		const totalKnownItems = this.offsetPagination.getTotalItems();
+		const fitsInSinglePage =
+			!hasCustomTargetWindow && reload && totalKnownItems > 0 && totalKnownItems <= this.offsetPagination.getPageSize();
+
 		const targetPaging: UmbTargetPaginationRequestModel | undefined =
-			baseTarget && baseTarget.unique && canSendTarget
+			!fitsInSinglePage && baseTarget && baseTarget.unique && canSendTarget
 				? {
 						target: {
 							unique: baseTarget.unique,
@@ -275,15 +283,11 @@ export class UmbTreeItemChildrenManager<
 						unique: parent.unique,
 						entityType: parent.entityType,
 					},
-					skip: offsetPaging.skip, // including this for backward compatibility
-					take: offsetPaging.take, // including this for backward compatibility
 					paging: targetPaging || offsetPaging,
 					foldersOnly,
 					...additionalArgs,
 				})
 			: await repository.requestTreeRootItems({
-					skip: offsetPaging.skip, // including this for backward compatibility
-					take: offsetPaging.take, // including this for backward compatibility
 					paging: targetPaging || offsetPaging,
 					foldersOnly,
 					...additionalArgs,
@@ -385,10 +389,6 @@ export class UmbTreeItemChildrenManager<
 		}
 
 		if (data) {
-			if (data.totalBefore === undefined) {
-				throw new Error('totalBefore is missing in the response');
-			}
-
 			const items = data.items as Array<TreeItemType>;
 
 			// We have loaded previous items so we add them to the top of the array
@@ -432,26 +432,17 @@ export class UmbTreeItemChildrenManager<
 			takeAfter: this.targetPagination.getTakeSize(),
 		};
 
-		const offsetPaging: UmbOffsetPaginationRequestModel = {
-			skip: this.offsetPagination.getSkip(),
-			take: this.offsetPagination.getPageSize(),
-		};
-
 		const { data, error } = parent?.unique
 			? await repository.requestTreeItemsOf({
 					parent: {
 						unique: parent.unique,
 						entityType: parent.entityType,
 					},
-					skip: offsetPaging.skip, // including this for backward compatibility
-					take: offsetPaging.take, // including this for backward compatibility
 					paging: targetPaging,
 					foldersOnly,
 					...additionalArgs,
 				})
 			: await repository.requestTreeRootItems({
-					skip: offsetPaging.skip, // including this for backward compatibility
-					take: offsetPaging.take, // including this for backward compatibility
 					paging: targetPaging,
 					foldersOnly,
 					...additionalArgs,
@@ -551,15 +542,11 @@ export class UmbTreeItemChildrenManager<
 		const { data } = parent?.unique
 			? await repository.requestTreeItemsOf({
 					parent: { unique: parent.unique, entityType: parent.entityType },
-					skip: offsetPaging.skip,
-					take: offsetPaging.take,
 					paging: offsetPaging,
 					foldersOnly,
 					...additionalArgs,
 				})
 			: await repository.requestTreeRootItems({
-					skip: offsetPaging.skip,
-					take: offsetPaging.take,
 					paging: offsetPaging,
 					foldersOnly,
 					...additionalArgs,

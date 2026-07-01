@@ -7,41 +7,34 @@ namespace Umbraco.Cms.Core.Services;
 /// </summary>
 public class DictionaryService : IDictionaryService
 {
-    private readonly ILocalizationService _localizationService;
+    private readonly IDictionaryItemService _dictionaryItemService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DictionaryService"/> class.
     /// </summary>
-    /// <param name="localizationService">The localization service.</param>
-    public DictionaryService(ILocalizationService localizationService) => _localizationService = localizationService;
+    /// <param name="dictionaryItemService">The dictionary item service.</param>
+    public DictionaryService(IDictionaryItemService dictionaryItemService) => _dictionaryItemService = dictionaryItemService;
 
     /// <inheritdoc />
-    public string CalculatePath(Guid? parentId, int sourceId)
+    public async Task<string> CalculatePathAsync(Guid? parentId, int sourceId)
     {
-        string path;
-
-        // TODO: check if there is a better way
-        if (parentId.HasValue)
+        if (parentId.HasValue is false)
         {
-            var ids = new List<int> { -1 };
-            var parentIds = new List<int>();
-            GetParentId(parentId.Value, parentIds);
-            parentIds.Reverse();
-            ids.AddRange(parentIds);
-            ids.Add(sourceId);
-            path = string.Join(",", ids);
-        }
-        else
-        {
-            path = "-1," + sourceId;
+            return "-1," + sourceId;
         }
 
-        return path;
+        var ids = new List<int> { -1 };
+        var parentIds = new List<int>();
+        await GetParentIdAsync(parentId.Value, parentIds);
+        parentIds.Reverse();
+        ids.AddRange(parentIds);
+        ids.Add(sourceId);
+        return string.Join(",", ids);
     }
 
-    private void GetParentId(Guid parentId, List<int> ids)
+    private async Task GetParentIdAsync(Guid parentId, List<int> ids)
     {
-        IDictionaryItem? dictionary = _localizationService.GetDictionaryItemById(parentId);
+        IDictionaryItem? dictionary = await _dictionaryItemService.GetAsync(parentId);
         if (dictionary == null)
         {
             return;
@@ -51,7 +44,7 @@ public class DictionaryService : IDictionaryService
 
         if (dictionary.ParentId.HasValue)
         {
-            GetParentId(dictionary.ParentId.Value, ids);
+            await GetParentIdAsync(dictionary.ParentId.Value, ids);
         }
     }
 }

@@ -52,8 +52,8 @@ internal sealed class DatabaseDataCreator
         },
         new()
         {
-            Name = "Find all logs that are from the namespace 'Umbraco.Core'",
-            Query = "StartsWith(SourceContext, 'Umbraco.Core')",
+            Name = "Find all logs that are within the namespace 'Umbraco.Cms'",
+            Query = "StartsWith(SourceContext, 'Umbraco.Cms')",
         },
         new()
         {
@@ -211,10 +211,106 @@ internal sealed class DatabaseDataCreator
     {
         var userGroupKeyToPermissions = new Dictionary<Guid, IEnumerable<string>>()
         {
-            [Constants.Security.AdminGroupKey] = [ActionNew.ActionLetter, ActionUpdate.ActionLetter, ActionDelete.ActionLetter, ActionMove.ActionLetter, ActionCopy.ActionLetter, ActionSort.ActionLetter, ActionRollback.ActionLetter, ActionProtect.ActionLetter, ActionAssignDomain.ActionLetter, ActionPublish.ActionLetter, ActionRights.ActionLetter, ActionUnpublish.ActionLetter, ActionBrowse.ActionLetter, ActionCreateBlueprintFromContent.ActionLetter, ActionNotify.ActionLetter, ":", "5", "7", "T", ActionDocumentPropertyRead.ActionLetter, ActionDocumentPropertyWrite.ActionLetter],
-            [Constants.Security.EditorGroupKey] = [ActionNew.ActionLetter, ActionUpdate.ActionLetter, ActionDelete.ActionLetter, ActionMove.ActionLetter, ActionCopy.ActionLetter, ActionSort.ActionLetter, ActionRollback.ActionLetter, ActionProtect.ActionLetter, ActionPublish.ActionLetter, ActionUnpublish.ActionLetter, ActionBrowse.ActionLetter, ActionCreateBlueprintFromContent.ActionLetter, ActionNotify.ActionLetter, ":", "5", "T", ActionDocumentPropertyRead.ActionLetter, ActionDocumentPropertyWrite.ActionLetter],
-            [Constants.Security.WriterGroupKey] = [ActionNew.ActionLetter, ActionUpdate.ActionLetter, ActionBrowse.ActionLetter, ActionNotify.ActionLetter, ":", ActionDocumentPropertyRead.ActionLetter, ActionDocumentPropertyWrite.ActionLetter],
-            [Constants.Security.TranslatorGroupKey] = [ActionUpdate.ActionLetter, ActionBrowse.ActionLetter, ActionDocumentPropertyRead.ActionLetter, ActionDocumentPropertyWrite.ActionLetter],
+            [Constants.Security.AdminGroupKey] =
+            [
+                ActionNew.ActionLetter,
+                ActionUpdate.ActionLetter,
+                ActionDelete.ActionLetter,
+                ActionMove.ActionLetter,
+                ActionCopy.ActionLetter,
+                ActionSort.ActionLetter,
+                ActionRollback.ActionLetter,
+                ActionProtect.ActionLetter,
+                ActionAssignDomain.ActionLetter,
+                ActionPublish.ActionLetter,
+                ActionRights.ActionLetter,
+                ActionUnpublish.ActionLetter,
+                ActionBrowse.ActionLetter,
+                ActionCreateBlueprintFromContent.ActionLetter,
+                ActionNotify.ActionLetter,
+                ":",
+                "5",
+                "7",
+                "T",
+                ActionDocumentPropertyRead.ActionLetter,
+                ActionDocumentPropertyWrite.ActionLetter,
+                ActionElementNew.ActionLetter,
+                ActionElementUpdate.ActionLetter,
+                ActionElementDelete.ActionLetter,
+                ActionElementMove.ActionLetter,
+                ActionElementCopy.ActionLetter,
+                ActionElementPublish.ActionLetter,
+                ActionElementUnpublish.ActionLetter,
+                ActionElementBrowse.ActionLetter,
+                ActionElementRollback.ActionLetter,
+                ActionElementContainerNew.ActionLetter,
+                ActionElementContainerUpdate.ActionLetter,
+                ActionElementContainerDelete.ActionLetter,
+                ActionElementContainerMove.ActionLetter,
+                ActionElementContainerBrowse.ActionLetter,
+            ],
+            [Constants.Security.EditorGroupKey] =
+            [
+                ActionNew.ActionLetter,
+                ActionUpdate.ActionLetter,
+                ActionDelete.ActionLetter,
+                ActionMove.ActionLetter,
+                ActionCopy.ActionLetter,
+                ActionSort.ActionLetter,
+                ActionRollback.ActionLetter,
+                ActionProtect.ActionLetter,
+                ActionPublish.ActionLetter,
+                ActionUnpublish.ActionLetter,
+                ActionBrowse.ActionLetter,
+                ActionCreateBlueprintFromContent.ActionLetter,
+                ActionNotify.ActionLetter,
+                ":",
+                "5",
+                "T",
+                ActionDocumentPropertyRead.ActionLetter,
+                ActionDocumentPropertyWrite.ActionLetter,
+                ActionElementNew.ActionLetter,
+                ActionElementUpdate.ActionLetter,
+                ActionElementDelete.ActionLetter,
+                ActionElementMove.ActionLetter,
+                ActionElementCopy.ActionLetter,
+                ActionElementPublish.ActionLetter,
+                ActionElementUnpublish.ActionLetter,
+                ActionElementBrowse.ActionLetter,
+                ActionElementRollback.ActionLetter,
+                ActionElementContainerNew.ActionLetter,
+                ActionElementContainerUpdate.ActionLetter,
+                ActionElementContainerDelete.ActionLetter,
+                ActionElementContainerMove.ActionLetter,
+                ActionElementContainerBrowse.ActionLetter,
+            ],
+            [Constants.Security.WriterGroupKey] =
+            [
+                ActionNew.ActionLetter,
+                ActionUpdate.ActionLetter,
+                ActionBrowse.ActionLetter,
+                ActionNotify.ActionLetter,
+                ":",
+                ActionDocumentPropertyRead.ActionLetter,
+                ActionDocumentPropertyWrite.ActionLetter,
+                ActionElementNew.ActionLetter,
+                ActionElementUpdate.ActionLetter,
+                ActionElementBrowse.ActionLetter,
+                ActionElementContainerNew.ActionLetter,
+                ActionElementContainerUpdate.ActionLetter,
+                ActionElementContainerBrowse.ActionLetter,
+            ],
+            [Constants.Security.TranslatorGroupKey] =
+            [
+                ActionUpdate.ActionLetter,
+                ActionBrowse.ActionLetter,
+                ActionDocumentPropertyRead.ActionLetter,
+                ActionDocumentPropertyWrite.ActionLetter,
+                ActionElementUpdate.ActionLetter,
+                ActionElementBrowse.ActionLetter,
+                ActionElementContainerUpdate.ActionLetter,
+                ActionElementContainerBrowse.ActionLetter,
+            ],
         };
 
         var i = 1;
@@ -324,6 +420,21 @@ internal sealed class DatabaseDataCreator
                 UniqueId = Constants.System.RecycleBinMediaKey,
                 Text = "Recycle Bin",
                 NodeObjectType = Constants.ObjectTypes.MediaRecycleBin,
+                CreateDate = DateTime.UtcNow,
+            });
+        _database.Insert(Constants.DatabaseSchema.Tables.Node, "id", false,
+            new NodeDto
+            {
+                NodeId = Constants.System.RecycleBinElement,
+                Trashed = false,
+                ParentId = -1,
+                UserId = -1,
+                Level = 0,
+                Path = "-1,-22",
+                SortOrder = 0,
+                UniqueId = Constants.System.RecycleBinElementKey,
+                Text = "Recycle Bin",
+                NodeObjectType = Constants.ObjectTypes.ElementRecycleBin,
                 CreateDate = DateTime.UtcNow,
             });
 
@@ -1113,6 +1224,7 @@ internal sealed class DatabaseDataCreator
         _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.DistributedJobs, Name = "DistributedJobs" });
         _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.CacheVersion, Name = "CacheVersion" });
         _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.DocumentUrlAliases, Name = "DocumentUrlAliases" });
+        _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.ElementTree, Name = "ElementTree" });
     }
 
     private void CreateContentTypeData()
@@ -1298,6 +1410,7 @@ internal sealed class DatabaseDataCreator
                 Key = Constants.Security.AdminGroupKey,
                 StartMediaId = -1,
                 StartContentId = -1,
+                StartElementId = -1,
                 Alias = Constants.Security.AdminGroupAlias,
                 Name = "Administrators",
                 Description = "Users with full access to all sections and functionality",
@@ -1316,6 +1429,7 @@ internal sealed class DatabaseDataCreator
                 Key = Constants.Security.WriterGroupKey,
                 StartMediaId = -1,
                 StartContentId = -1,
+                StartElementId = -1,
                 Alias = WriterGroupAlias,
                 Name = "Writers",
                 Description = "Users with permission to create and update but not publish content",
@@ -1334,6 +1448,7 @@ internal sealed class DatabaseDataCreator
                 Key = Constants.Security.EditorGroupKey,
                 StartMediaId = -1,
                 StartContentId = -1,
+                StartElementId = -1,
                 Alias = EditorGroupAlias,
                 Name = "Editors",
                 Description = "Users with full permission to create, update and publish content",
@@ -1352,6 +1467,7 @@ internal sealed class DatabaseDataCreator
                 Key = Constants.Security.TranslatorGroupKey,
                 StartMediaId = -1,
                 StartContentId = -1,
+                StartElementId = -1,
                 Alias = TranslatorGroupAlias,
                 Name = "Translators",
                 Description = "Users with permission to manage dictionary entries",
@@ -1402,12 +1518,15 @@ internal sealed class DatabaseDataCreator
         _database.Insert(new UserGroup2AppDto { UserGroupId = 1, AppAlias = Constants.Applications.Users });
         _database.Insert(new UserGroup2AppDto { UserGroupId = 1, AppAlias = Constants.Applications.Forms });
         _database.Insert(new UserGroup2AppDto { UserGroupId = 1, AppAlias = Constants.Applications.Translation });
+        _database.Insert(new UserGroup2AppDto { UserGroupId = 1, AppAlias = Constants.Applications.Library });
 
         _database.Insert(new UserGroup2AppDto { UserGroupId = 2, AppAlias = Constants.Applications.Content });
+        _database.Insert(new UserGroup2AppDto { UserGroupId = 2, AppAlias = Constants.Applications.Library });
 
         _database.Insert(new UserGroup2AppDto { UserGroupId = 3, AppAlias = Constants.Applications.Content });
         _database.Insert(new UserGroup2AppDto { UserGroupId = 3, AppAlias = Constants.Applications.Media });
         _database.Insert(new UserGroup2AppDto { UserGroupId = 3, AppAlias = Constants.Applications.Forms });
+        _database.Insert(new UserGroup2AppDto { UserGroupId = 3, AppAlias = Constants.Applications.Library });
 
         _database.Insert(new UserGroup2AppDto { UserGroupId = 4, AppAlias = Constants.Applications.Translation });
     }
@@ -1947,6 +2066,44 @@ internal sealed class DatabaseDataCreator
                     Description = null,
                     Variations = (byte)ContentVariation.Nothing,
                 });
+            _database.Insert(
+                Constants.DatabaseSchema.Tables.PropertyType,
+                "id",
+                false,
+                new PropertyTypeDto
+                {
+                    Id = 53,
+                    UniqueId = new Guid("5BC7E468-C53E-41A6-A522-2723F3B94514"),
+                    DataTypeId = Constants.DataTypes.LabelPixels,
+                    ContentTypeId = 1037,
+                    PropertyTypeGroupId = 55,
+                    Alias = Constants.Conventions.Media.Width,
+                    Name = "Width",
+                    SortOrder = 0,
+                    Mandatory = false,
+                    ValidationRegExp = null,
+                    Description = null,
+                    Variations = (byte)ContentVariation.Nothing,
+                });
+            _database.Insert(
+                Constants.DatabaseSchema.Tables.PropertyType,
+                "id",
+                false,
+                new PropertyTypeDto
+                {
+                    Id = 54,
+                    UniqueId = new Guid("9E4C2B59-6BC6-4648-BB71-B0F45DDBC274"),
+                    DataTypeId = Constants.DataTypes.LabelPixels,
+                    ContentTypeId = 1037,
+                    PropertyTypeGroupId = 55,
+                    Alias = Constants.Conventions.Media.Height,
+                    Name = "Height",
+                    SortOrder = 0,
+                    Mandatory = false,
+                    ValidationRegExp = null,
+                    Description = null,
+                    Variations = (byte)ContentVariation.Nothing,
+                });
         }
 
         // Membership property types.
@@ -2132,7 +2289,7 @@ internal sealed class DatabaseDataCreator
                     EditorAlias = Constants.PropertyEditors.Aliases.RichText,
                     EditorUiAlias = "Umb.PropertyEditorUi.Tiptap",
                     DbType = "Ntext",
-                    Configuration = "{\"extensions\": [\"Umb.Tiptap.RichTextEssentials\", \"Umb.Tiptap.Anchor\", \"Umb.Tiptap.Block\", \"Umb.Tiptap.Blockquote\", \"Umb.Tiptap.Bold\", \"Umb.Tiptap.BulletList\", \"Umb.Tiptap.CodeBlock\", \"Umb.Tiptap.Embed\", \"Umb.Tiptap.Figure\", \"Umb.Tiptap.Heading\", \"Umb.Tiptap.HorizontalRule\", \"Umb.Tiptap.HtmlAttributeClass\", \"Umb.Tiptap.HtmlAttributeDataset\", \"Umb.Tiptap.HtmlAttributeId\", \"Umb.Tiptap.HtmlAttributeStyle\", \"Umb.Tiptap.HtmlTagDiv\", \"Umb.Tiptap.HtmlTagSpan\", \"Umb.Tiptap.Image\", \"Umb.Tiptap.Italic\", \"Umb.Tiptap.Link\", \"Umb.Tiptap.MediaUpload\", \"Umb.Tiptap.OrderedList\", \"Umb.Tiptap.Strike\", \"Umb.Tiptap.Subscript\", \"Umb.Tiptap.Superscript\", \"Umb.Tiptap.Table\", \"Umb.Tiptap.TextAlign\", \"Umb.Tiptap.TextDirection\", \"Umb.Tiptap.TextIndent\", \"Umb.Tiptap.TrailingNode\", \"Umb.Tiptap.Underline\"], \"maxImageSize\": 500, \"overlaySize\": \"medium\", \"toolbar\": [[[\"Umb.Tiptap.Toolbar.SourceEditor\"], [\"Umb.Tiptap.Toolbar.Bold\", \"Umb.Tiptap.Toolbar.Italic\", \"Umb.Tiptap.Toolbar.Underline\"], [\"Umb.Tiptap.Toolbar.TextAlignLeft\", \"Umb.Tiptap.Toolbar.TextAlignCenter\", \"Umb.Tiptap.Toolbar.TextAlignRight\"], [\"Umb.Tiptap.Toolbar.BulletList\", \"Umb.Tiptap.Toolbar.OrderedList\"], [\"Umb.Tiptap.Toolbar.Blockquote\", \"Umb.Tiptap.Toolbar.HorizontalRule\"], [\"Umb.Tiptap.Toolbar.Link\", \"Umb.Tiptap.Toolbar.Unlink\"], [\"Umb.Tiptap.Toolbar.MediaPicker\", \"Umb.Tiptap.Toolbar.EmbeddedMedia\"]]]}",
+                    Configuration = "{\"extensions\": [\"Umb.Tiptap.RichTextEssentials\", \"Umb.Tiptap.Anchor\", \"Umb.Tiptap.Block\", \"Umb.Tiptap.Blockquote\", \"Umb.Tiptap.Bold\", \"Umb.Tiptap.BulletList\", \"Umb.Tiptap.CodeBlock\", \"Umb.Tiptap.Embed\", \"Umb.Tiptap.Figure\", \"Umb.Tiptap.Heading\", \"Umb.Tiptap.HorizontalRule\", \"Umb.Tiptap.HtmlAttributeClass\", \"Umb.Tiptap.HtmlAttributeDataset\", \"Umb.Tiptap.HtmlAttributeId\", \"Umb.Tiptap.HtmlAttributeStyle\", \"Umb.Tiptap.HtmlTagDiv\", \"Umb.Tiptap.HtmlTagSpan\", \"Umb.Tiptap.Image\", \"Umb.Tiptap.Italic\", \"Umb.Tiptap.Link\", \"Umb.Tiptap.MediaUpload\", \"Umb.Tiptap.OrderedList\", \"Umb.Tiptap.Strike\", \"Umb.Tiptap.Subscript\", \"Umb.Tiptap.Superscript\", \"Umb.Tiptap.Table\", \"Umb.Tiptap.TextAlign\", \"Umb.Tiptap.TextDirection\", \"Umb.Tiptap.TextIndent\", \"Umb.Tiptap.TrailingNode\", \"Umb.Tiptap.Underline\"], \"maxImageSize\": 500, \"overlaySize\": \"medium\", \"toolbar\": [[[\"Umb.Tiptap.Toolbar.SourceEditor\"], [\"Umb.Tiptap.Toolbar.Bold\", \"Umb.Tiptap.Toolbar.Italic\", \"Umb.Tiptap.Toolbar.Underline\"], [\"Umb.Tiptap.Toolbar.TextAlignLeft\", \"Umb.Tiptap.Toolbar.TextAlignCenter\", \"Umb.Tiptap.Toolbar.TextAlignRight\"], [\"Umb.Tiptap.Toolbar.BulletList\", \"Umb.Tiptap.Toolbar.OrderedList\"], [\"Umb.Tiptap.Toolbar.Blockquote\", \"Umb.Tiptap.Toolbar.HorizontalRule\"], [\"Umb.Tiptap.Toolbar.Link\", \"Umb.Tiptap.Toolbar.Unlink\"], [\"Umb.Tiptap.Toolbar.MediaPicker\", \"Umb.Tiptap.Toolbar.EmbeddedMedia\"]]], \"allowedMediaTypes\": \"" + Constants.MediaTypes.Guids.Image + "," + Constants.MediaTypes.Guids.Svg + "\"}",
                 });
         }
 
@@ -2653,7 +2810,30 @@ internal sealed class DatabaseDataCreator
             null,
             false,
             true);
-
+        CreateRelationTypeData(
+            7,
+            Constants.Conventions.RelationTypes.RelatedElementAlias,
+            Constants.Conventions.RelationTypes.RelatedElementName,
+            null,
+            null,
+            false,
+            true);
+        CreateRelationTypeData(
+            8,
+            Constants.Conventions.RelationTypes.RelateParentElementContainerOnElementDeleteAlias,
+            Constants.Conventions.RelationTypes.RelateParentElementContainerOnElementDeleteName,
+            Constants.ObjectTypes.ElementContainer,
+            Constants.ObjectTypes.Element,
+            false,
+            false);
+        CreateRelationTypeData(
+            9,
+            Constants.Conventions.RelationTypes.RelateParentElementContainerOnContainerDeleteAlias,
+            Constants.Conventions.RelationTypes.RelateParentElementContainerOnContainerDeleteName,
+            Constants.ObjectTypes.ElementContainer,
+            Constants.ObjectTypes.ElementContainer,
+            false,
+            false);
     }
 
     private void CreateRelationTypeData(

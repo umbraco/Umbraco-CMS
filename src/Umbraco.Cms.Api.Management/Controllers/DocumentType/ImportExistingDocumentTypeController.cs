@@ -12,6 +12,9 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DocumentType;
 
+/// <summary>
+/// API controller responsible for handling the import of existing document types in the Umbraco CMS.
+/// </summary>
 [ApiVersion("1.0")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
 public class ImportExistingDocumentTypeController : DocumentTypeControllerBase
@@ -19,6 +22,11 @@ public class ImportExistingDocumentTypeController : DocumentTypeControllerBase
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly IContentTypeImportService _contentTypeImportService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ImportExistingDocumentTypeController"/> class.
+    /// </summary>
+    /// <param name="backOfficeSecurityAccessor">Accessor for back office security, used to manage authentication and authorization for the controller.</param>
+    /// <param name="contentTypeImportService">Service responsible for importing content types into the system.</param>
     public ImportExistingDocumentTypeController(
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
         IContentTypeImportService contentTypeImportService)

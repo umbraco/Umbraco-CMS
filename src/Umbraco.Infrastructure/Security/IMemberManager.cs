@@ -10,14 +10,14 @@ public interface IMemberManager : IUmbracoUserManager<MemberIdentityUser>
     /// <summary>
     ///     Returns the <see cref="IPublishedContent" /> instance for the specified <see cref="MemberIdentityUser" />
     /// </summary>
-    /// <param name="user"></param>
-    /// <returns></returns>
+    /// <param name="user">The member identity user.</param>
+    /// <returns>The published content for the member, or null if not found.</returns>
     IPublishedContent? AsPublishedMember(MemberIdentityUser user);
 
     /// <summary>
     ///     Returns the currently logged in member if there is one, else returns null
     /// </summary>
-    /// <returns></returns>
+    /// <returns>The current member, or null if not logged in.</returns>
     Task<MemberIdentityUser?> GetCurrentMemberAsync();
 
     /// <summary>
@@ -35,7 +35,7 @@ public interface IMemberManager : IUmbracoUserManager<MemberIdentityUser>
     /// <summary>
     ///     Check if a member is logged in
     /// </summary>
-    /// <returns></returns>
+    /// <returns>True if a member is logged in.</returns>
     bool IsLoggedIn();
 
     /// <summary>
@@ -48,8 +48,8 @@ public interface IMemberManager : IUmbracoUserManager<MemberIdentityUser>
     /// <summary>
     ///     Checks if the current user has access to the paths
     /// </summary>
-    /// <param name="paths"></param>
-    /// <returns></returns>
+    /// <param name="paths">The document paths to check access for.</param>
+    /// <returns>A dictionary mapping each path to whether the member has access.</returns>
     Task<IReadOnlyDictionary<string, bool>> MemberHasAccessAsync(IEnumerable<string> paths);
 
     /// <summary>
@@ -59,5 +59,10 @@ public interface IMemberManager : IUmbracoUserManager<MemberIdentityUser>
     /// <returns>True if the document object is protected</returns>
     Task<bool> IsProtectedAsync(string path);
 
+    /// <summary>
+    /// Checks if the document objects specified by their paths are protected by the "Protect Pages" functionality in Umbraco.
+    /// </summary>
+    /// <param name="paths">The full paths of the document objects to check.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains a read-only dictionary mapping each document path to a boolean value indicating whether the corresponding document object is protected.</returns>
     Task<IReadOnlyDictionary<string, bool>> IsProtectedAsync(IEnumerable<string> paths);
 }

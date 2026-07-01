@@ -11,7 +11,7 @@ public partial class ContentBlueprintEditingServiceTests
     [Test]
     public async Task Can_Create_From_Content()
     {
-        var contentType = CreateInvariantContentType();
+        var contentType = await CreateInvariantContentType();
 
         var createModel = new ContentCreateModel
         {

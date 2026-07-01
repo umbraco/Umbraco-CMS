@@ -12,6 +12,12 @@ public class EnsureDefaultMediaFolderHasDefaultCollection : AsyncMigrationBase
     private readonly IMediaTypeService _mediaTypeService;
     private readonly IDataTypeService _dataTypeService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="EnsureDefaultMediaFolderHasDefaultCollection"/> class.
+    /// </summary>
+    /// <param name="context">The <see cref="IMigrationContext"/> for the migration operation.</param>
+    /// <param name="mediaTypeService">The <see cref="IMediaTypeService"/> used to manage media types.</param>
+    /// <param name="dataTypeService">The <see cref="IDataTypeService"/> used to manage data types.</param>
     public EnsureDefaultMediaFolderHasDefaultCollection(
         IMigrationContext context,
         IMediaTypeService mediaTypeService,

@@ -1,6 +1,8 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Security.Cryptography;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using OpenIddict.Abstractions;
 using OpenIddict.Server;
@@ -41,6 +43,7 @@ internal sealed class HideBackOfficeTokensHandler
 
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IDataProtectionProvider _dataProtectionProvider;
+    private readonly ILogger<HideBackOfficeTokensHandler> _logger;
 #pragma warning disable CS0618 // Type or member is obsolete
     private readonly BackOfficeTokenCookieSettings _backOfficeTokenCookieSettings;
 #pragma warning restore CS0618 // Type or member is obsolete
@@ -51,11 +54,13 @@ internal sealed class HideBackOfficeTokensHandler
     /// </summary>
     /// <param name="httpContextAccessor">The HTTP context accessor.</param>
     /// <param name="dataProtectionProvider">The data protection provider for encrypting cookie values.</param>
+    /// <param name="logger">The logger.</param>
     /// <param name="backOfficeTokenCookieSettings">The back-office token cookie settings.</param>
     /// <param name="globalSettings">The global settings.</param>
     public HideBackOfficeTokensHandler(
         IHttpContextAccessor httpContextAccessor,
         IDataProtectionProvider dataProtectionProvider,
+        ILogger<HideBackOfficeTokensHandler> logger,
 #pragma warning disable CS0618 // Type or member is obsolete
         IOptions<BackOfficeTokenCookieSettings> backOfficeTokenCookieSettings,
 #pragma warning restore CS0618 // Type or member is obsolete
@@ -63,6 +68,7 @@ internal sealed class HideBackOfficeTokensHandler
     {
         _httpContextAccessor = httpContextAccessor;
         _dataProtectionProvider = dataProtectionProvider;
+        _logger = logger;
         _backOfficeTokenCookieSettings = backOfficeTokenCookieSettings.Value;
         _globalSettings = globalSettings.Value;
 
@@ -291,8 +297,19 @@ internal sealed class HideBackOfficeTokensHandler
         var key = GetCookieKey(httpContext, cookieName);
         if (httpContext.Request.Cookies.TryGetValue(key, out var cookieValue))
         {
-            value = EncryptionHelper.Decrypt(cookieValue, _dataProtectionProvider);
-            return true;
+            try
+            {
+                value = EncryptionHelper.Decrypt(cookieValue, _dataProtectionProvider);
+                return true;
+            }
+            catch (CryptographicException ex)
+            {
+                // Decryption can fail if the data protection key ring has changed
+                // (e.g., after deployment, app pool recycle, or slot swap).
+                // Treat this as a missing cookie — the user will need to re-authenticate.
+                _logger.LogWarning(ex, "Failed to decrypt back-office token cookie '{CookieName}'. The user will need to re-authenticate.", cookieName);
+                RemoveCookie(httpContext, cookieName);
+            }
         }
 
         value = null;

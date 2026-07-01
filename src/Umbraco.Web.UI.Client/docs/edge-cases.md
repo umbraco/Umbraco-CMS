@@ -581,4 +581,130 @@ async loadById(id: string, options?: LoadOptions): Promise<UmbContentModel> {
 }
 ```
 
+---
+
+### Auth & Cross-tab Coordination
+
+**`window.opener` is set for ANY window opened with `window.open()`**
+
+Not just OAuth popups. The preview window, for example, also has `window.opener` set. Do not use `window.opener` alone as a signal that you are in the OAuth code exchange flow — check the pathname too:
+
+```typescript
+// ❌ Too broad — breaks preview window, any other window.open() target
+if (window.opener) return;
+
+// ✅ Specific to the OAuth code exchange popup
+const pathname = pathWithoutBasePath({ start: true, end: false });
+if (window.opener && pathname === '/oauth_complete') return;
+```
+
+This mistake caused issue #22083 (preview window stuck loading) — the `window.opener` guard in `#setAuthStatus()` prevented `setInitialState()` from running in the preview window, so `isAuthorized` never became `true`.
+
+**BroadcastChannel does NOT deliver messages to the sender's own tab**
+
+Only other tabs/windows receive the message. Do not call methods that broadcast inside a BroadcastChannel handler — this causes N² message storms:
+
+```typescript
+// ❌ This tab sent 'sessionUpdate', now it receives it back and broadcasts again
+this.#channel.onmessage = (evt) => {
+	if (evt.data.type === 'sessionUpdate') {
+		this.#updateSession(...); // #updateSession also calls postMessage — storm!
+	}
+};
+
+// ✅ Use the local-only setter inside handlers, not the broadcasting wrapper
+this.#channel.onmessage = (evt) => {
+	if (evt.data.type === 'sessionUpdate') {
+		this.#setSessionLocally(...); // no broadcast
+	}
+};
+```
+
+**`sessionRequest` must guard against sharing expired sessions**
+
+When a new tab asks for the current session via BroadcastChannel `sessionRequest`, only respond if the session is still valid. Sharing an expired session causes the recipient to believe it is already authorized and skip the auth flow:
+
+```typescript
+// ✅ Guard with isSessionValid() before responding
+case 'sessionRequest': {
+	if (this.isSessionValid()) {
+		this.#channel.postMessage({ type: 'sessionResponse', session: this.#session.getValue()! });
+	}
+	break;
+}
+```
+
+**Web Lock `umb:token-refresh` deduplicates concurrent `/token` calls across tabs**
+
+Only one tab at a time should call `/token`. If your code needs to wait for an ongoing refresh in another tab before sending a request (to avoid using a token that is about to be revoked), query the lock state first and then conditionally wait:
+
+```typescript
+// Check if another tab is currently refreshing
+const state = await navigator.locks.query();
+if (state.held?.some((l) => l.name === 'umb:token-refresh')) {
+	// Wait for it to finish (no-op inside the lock)
+	await navigator.locks.request('umb:token-refresh', async () => {});
+}
+// Now safe to proceed — cookie reflects the latest token
+```
+
+Note: there is a TOCTOU gap between `query()` and `request()`. If the lock releases between the two calls, `request()` acquires and releases immediately — this is harmless.
+
+
+### Routing (`umb-router-slot` + dynamic routes)
+
+When a view owns an `umb-router-slot` and computes its routes from observable data (e.g. workspace/design editors), three behaviours of the slot must be respected. Getting any one of them wrong leaves the view stuck on a path it cannot recover from.
+
+**Guard the slot until routes are populated**
+
+If `umb-router-slot` mounts with `routes = undefined` (or an early/empty array), it fires `init`/`change` against whatever the URL currently is, settles on that local path, and does **not** re-match the URL when the routes array is replaced later. Always wrap the slot:
+
+```typescript
+// ❌ Slot mounts with undefined routes, locks in the wrong active path
+return html`<umb-router-slot .routes=${this._routes}></umb-router-slot>`;
+
+// ✅ Slot only mounts once real routes are in hand
+return html`
+	${this._routes
+		? html`<umb-router-slot .routes=${this._routes}></umb-router-slot>`
+		: nothing}
+`;
+```
+
+`umb-workspace-editor` (`packages/core/workspace/components/workspace-editor/workspace-editor.element.ts`) uses this guard; views that build their own router-slot must do the same.
+
+**Don't compute routes against not-yet-loaded data**
+
+Helpers like `UmbContentTypeContainerStructureHelper.childContainers` ship with `[]` as their initial value, so the first observer callback fires synchronously with empty data. If `#createRoutes()` runs at that point, the slot sees a wrong route set first. Await the structure load before wiring the helper:
+
+```typescript
+this.consumeContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT, async (workspaceContext) => {
+	this.#workspaceContext = workspaceContext;
+	if (!workspaceContext) return;
+
+	// Block route generation until real containers are loaded
+	await workspaceContext.structure.whenLoaded();
+
+	this.#tabsStructureHelper.setStructureManager(workspaceContext.structure);
+	this.#observeRootGroups();
+});
+```
+
+**`redirectTo` doesn't fire on the initial route attachment**
+
+The router-slot library only applies `redirectTo` on navigation events, not when routes are first attached. A `path: ''` route with `redirectTo: 'foo'` will leave the slot sitting on the empty local path forever. Use **route duplication** instead — copy the target route onto the empty path:
+
+```typescript
+// ❌ Redirect never fires when the slot mounts late (e.g. inside a modal workspace)
+routes.push({ path: '', pathMatch: 'full', redirectTo: 'tab/settings' });
+
+// ✅ Duplicate the landing route directly under the empty path
+const defaultRoute = routes[0]; // or whichever is the landing route
+routes.push({ ...defaultRoute, path: '' });
+```
+
+`umb-workspace-editor` uses this pattern — see the `// Duplicate first workspace and use it for the empty path scenario.` block in `workspace-editor.element.ts`.
+
+Do **not** add `pathMatch: 'full'` to the duplicated empty-path route. The modal sub-router appends modal paths (e.g. `/add-property/-1/container-root`) to the current active local path. With `path: ''` matching prefix-wise (regex `/^/`), the main route stays matched and the modal-router can resolve the appended segment. With `pathMatch: 'full'`, the empty-path route only matches an exactly-empty URL — modal URLs fall through to the catch-all, the route component unmounts, the modal registration is torn down, and the modal never opens.
+
 
