@@ -196,7 +196,7 @@ internal sealed class RedirectUrlRepository : EntityRepositoryBase<Guid, IRedire
     /// <param name="pageIndex">The zero-based index of the page to retrieve.</param>
     /// <param name="pageSize">The number of items per page.</param>
     /// <param name="total">Outputs the total number of redirect URLs available.</param>
-    /// <returns>An enumerable collection of redirect URLs for the specified page.</returns
+    /// <returns>An enumerable collection of redirect URLs for the specified page.</returns>
     public IEnumerable<IRedirectUrl> GetAllUrls(int rootContentId, long pageIndex, int pageSize, out long total)
     {
         Sql<ISqlContext> sql = GetBaseQuery(false)

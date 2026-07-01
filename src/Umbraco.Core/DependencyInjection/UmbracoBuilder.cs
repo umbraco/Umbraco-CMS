@@ -390,6 +390,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<ElementNavigationService, ElementNavigationService>();
             Services.AddUnique<IElementNavigationQueryService>(x => x.GetRequiredService<ElementNavigationService>());
             Services.AddUnique<IElementNavigationManagementService>(x => x.GetRequiredService<ElementNavigationService>());
+            Services.AddSingleton<IMemoryCacheSizeReporter>(x => x.GetRequiredService<ElementNavigationService>());
 
             Services.AddUnique<DocumentPublishStatusService, DocumentPublishStatusService>();
             Services.AddUnique<IDocumentPublishStatusQueryService>(x => x.GetRequiredService<DocumentPublishStatusService>());

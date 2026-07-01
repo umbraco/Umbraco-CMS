@@ -193,6 +193,10 @@ export class UmbDocumentVariantLanguagePickerElement extends UmbLitElement {
 				--uui-menu-item-border-radius: var(--uui-border-radius);
 			}
 
+			uui-menu-item:not(:last-of-type) {
+				margin-bottom: 1px;
+			}
+
 			uui-checkbox {
 				margin-bottom: var(--uui-size-space-3);
 			}

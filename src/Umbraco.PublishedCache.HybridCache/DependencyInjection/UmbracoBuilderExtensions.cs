@@ -52,7 +52,9 @@ public static class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IMemoryCacheSizeReporter>(s => s.GetRequiredService<DocumentCacheService>());
         builder.Services.AddSingleton<IMemoryCacheSizeReporter>(s => s.GetRequiredService<MediaCacheService>());
         builder.Services.AddSingleton<IMemberCacheService, MemberCacheService>();
-        builder.Services.AddSingleton<IElementCacheService, ElementCacheService>();
+        builder.Services.AddSingleton<ElementCacheService>();
+        builder.Services.AddSingleton<IElementCacheService>(s => s.GetRequiredService<ElementCacheService>());
+        builder.Services.AddSingleton<IMemoryCacheSizeReporter>(s => s.GetRequiredService<ElementCacheService>());
         builder.Services.AddSingleton<IBlockElementService, BlockElementService>();
         builder.Services.AddSingleton<IDomainCacheService, DomainCacheService>();
         builder.Services.AddSingleton<IPublishedContentFactory, PublishedContentFactory>();

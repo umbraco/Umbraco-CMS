@@ -36,7 +36,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
     private readonly ILogger<DocumentCacheService> _logger;
     private HashSet<Guid>? _seedKeys;
 
-    private readonly ConvertedPublishedContentCache<string> _publishedContentCache = new();
+    private readonly ConvertedPublishedContentCache<string, IPublishedContent> _publishedContentCache = new();
 
     // Monotonic counter bumped whenever the in-memory cache (L0/L1) is invalidated or refreshed.
     // GetNodeAsync captures it before reading the backing store and re-checks it before writing
