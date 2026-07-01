@@ -13,6 +13,11 @@ public interface IApiElement
     Guid Id { get; }
 
     /// <summary>
+    ///     Gets the name of the element.
+    /// </summary>
+    string? Name { get; }
+
+    /// <summary>
     ///     Gets the content type alias of the element.
     /// </summary>
     /// <remarks>
