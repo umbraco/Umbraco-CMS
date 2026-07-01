@@ -59,6 +59,7 @@ public static class UmbracoBuilderApiExtensions
         string? jsonOptionsName = null)
         where TConfigureOptions : ConfigureUmbracoOpenApiOptionsBase
     {
+        apiName = apiName.ToLowerInvariant();
         builder.Services.AddOpenApi(apiName);
         builder.Services.ConfigureOptions<TConfigureOptions>();
         builder.Services.AddOpenApiDocumentToUi(apiName, apiTitle);

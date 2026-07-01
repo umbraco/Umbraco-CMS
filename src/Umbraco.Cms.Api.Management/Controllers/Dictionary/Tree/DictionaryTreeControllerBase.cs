@@ -24,8 +24,8 @@ namespace Umbraco.Cms.Api.Management.Controllers.Dictionary.Tree;
 public class DictionaryTreeControllerBase : NamedEntityTreeControllerBase<NamedEntityTreeItemResponseModel>
 {
     public DictionaryTreeControllerBase(
-        IEntityService entityService, 
-        FlagProviderCollection flagProviders, 
+        IEntityService entityService,
+        FlagProviderCollection flagProviders,
         IDictionaryItemService dictionaryItemService)
         : base(entityService, flagProviders) =>
         DictionaryItemService = dictionaryItemService;
