@@ -1,24 +1,17 @@
 using NUnit.Framework;
 using Umbraco.Cms.Core.Manifest;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Manifest;
 
 [TestFixture]
 public class PackageManifestCacheBusterTests
 {
-    private static string ShortHash(string value) => value.GenerateHash()[..7];
-
     [Test]
     public void ComputeCacheBuster_CombinesVersionWithShortHostHash()
     {
         var result = PackageManifestCacheBuster.ComputeCacheBuster("1.2.3", "deploy-1");
-        Assert.That(result, Is.EqualTo($"1.2.3-{ShortHash("deploy-1")}"));
+        Assert.That(result, Is.EqualTo("1.2.3-deploy-1"));
     }
-
-    [Test]
-    public void ComputeCacheBuster_UsesShortHashOfSevenCharacters()
-        => Assert.That(PackageManifestCacheBuster.ComputeCacheBuster("1.2.3", "deploy-1")!.Split('-')[^1], Has.Length.EqualTo(7));
 
     [TestCase(null)]
     [TestCase("")]
@@ -28,7 +21,7 @@ public class PackageManifestCacheBusterTests
 
     [Test]
     public void ComputeCacheBuster_UsesShortHashAlone_WhenNoVersion()
-        => Assert.That(PackageManifestCacheBuster.ComputeCacheBuster(null, "deploy-1"), Is.EqualTo(ShortHash("deploy-1")));
+        => Assert.That(PackageManifestCacheBuster.ComputeCacheBuster(null, "deploy-1"), Is.EqualTo("deploy-1"));
 
     [Test]
     public void ComputeCacheBuster_ReturnsNull_WhenNoVersionAndNoHostCacheBuster()

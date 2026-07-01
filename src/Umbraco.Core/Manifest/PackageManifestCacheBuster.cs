@@ -9,8 +9,6 @@ namespace Umbraco.Cms.Core.Manifest;
 /// </summary>
 public static class PackageManifestCacheBuster
 {
-    private const int ShortHashLength = 7;
-
     // The /App_Plugins root with a trailing slash, so the StartsWith check honours a path-segment boundary
     // (and never matches e.g. "/App_PluginsFoo/...").
     private static readonly string _appPluginsPrefix = Constants.SystemDirectories.AppPlugins.EnsureEndsWith('/');
@@ -22,20 +20,13 @@ public static class PackageManifestCacheBuster
     ///     to <c>null</c> when there is nothing to bust.
     /// </summary>
     public static string? ComputeCacheBuster(string? version, string? cacheBuster)
-    {
-        var hasVersion = string.IsNullOrWhiteSpace(version) is false;
-        var shortHash = string.IsNullOrWhiteSpace(cacheBuster)
-            ? null
-            : cacheBuster.GenerateHash()[..ShortHashLength];
-
-        return (hasVersion, shortHash) switch
+        => (version.NullOrWhiteSpaceAsNull(), cacheBuster.NullOrWhiteSpaceAsNull()) switch
         {
-            (true, not null) => $"{version}-{shortHash}",
-            (true, null) => version,
-            (false, not null) => shortHash,
+            (not null, not null) => $"{version}-{cacheBuster}",
+            (not null, null) => version,
+            (null, not null) => cacheBuster,
             _ => null,
         };
-    }
 
     /// <summary>
     ///     Appends <c>?umb__rnd=&lt;cacheBuster&gt;</c> to a clean <c>/App_Plugins</c> URL. URLs outside
