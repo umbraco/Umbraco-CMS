@@ -190,6 +190,26 @@ public class RteBlockHelperTests
     }
 
     /// <summary>
+    /// Two direct-sibling inline blocks must each be converted independently — the inline parallel to
+    /// <see cref="ConvertBlockUdisToKeys_TwoConsecutiveSiblingBlocks_ConvertsEachIndividually"/>.
+    /// </summary>
+    [Test]
+    public void ConvertBlockUdisToKeys_TwoConsecutiveInlineSiblings_ConvertsEachIndividually()
+    {
+        var input =
+            @"<umb-rte-block-inline data-content-udi=""umb://element/5e499fc237be4b1d974670526f3b00b7""><!--Umbraco-Block--></umb-rte-block-inline>" +
+            @"<umb-rte-block-inline data-content-udi=""umb://element/9db16c0d251e414c874967090f2cf3cc""><!--Umbraco-Block--></umb-rte-block-inline>";
+
+        var result = RteBlockHelper.ConvertBlockUdisToKeys(input);
+
+        Assert.AreEqual(
+            @"<umb-rte-block-inline data-content-key=""5e499fc2-37be-4b1d-9746-70526f3b00b7""><!--Umbraco-Block--></umb-rte-block-inline>" +
+            @"<umb-rte-block-inline data-content-key=""9db16c0d-251e-414c-8749-67090f2cf3cc""><!--Umbraco-Block--></umb-rte-block-inline>",
+            result);
+        StringAssert.DoesNotContain("umb://element/", result);
+    }
+
+    /// <summary>
     /// An inline block carrying an optional <c>class</c> attribute must be converted, preserving the class.
     /// </summary>
     [Test]
