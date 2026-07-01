@@ -1879,7 +1879,6 @@ export class DocumentApiHelper {
   }
 
   async createPublishedDocumentWithTwoNameVersionsAndTwoTextVersions(originalName: string, updatedName: string, documentTypeName: string, dataTypeName: string, originalText: string, updatedText: string) {
-    await this.ensureNameNotExists(originalName);
     await this.ensureNameNotExists(updatedName);
     const dataTypeData = await this.api.dataType.getByName(dataTypeName);
     const documentTypeId = await this.api.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);

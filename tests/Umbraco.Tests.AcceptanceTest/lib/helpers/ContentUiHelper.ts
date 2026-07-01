@@ -1069,6 +1069,7 @@ export class ContentUiHelper extends UiBaseLocators {
       this.page.locator(`[name="${mediaPickerName}"] [label="Remove"] svg`),
     );
     await this.clickConfirmRemoveButton();
+    await this.isMediaNameVisible(mediaPickerName, false);
   }
 
   async isMediaNameVisible(mediaName: string, isVisible: boolean = true) {
@@ -1548,7 +1549,7 @@ export class ContentUiHelper extends UiBaseLocators {
     // Wait for the modal's async pre-selection of the current version, otherwise it clobbers our pick.
     await expect(this.activeRollbackItem).toBeVisible();
     const previousVersion = this.rollbackItem.filter({hasNotText: "Current published version"}).last();
-    await previousVersion.click();
+    await this.click(previousVersion);
     await expect(previousVersion).toHaveClass(/active/);
   }
 
