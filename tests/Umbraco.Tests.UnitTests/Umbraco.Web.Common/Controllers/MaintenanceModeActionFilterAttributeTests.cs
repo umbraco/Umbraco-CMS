@@ -12,6 +12,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.ActionsResults;
 using Umbraco.Cms.Web.Common.Controllers;
@@ -152,12 +153,64 @@ public class MaintenanceModeActionFilterAttributeTests
         Assert.That(context.Result, Is.Null);
     }
 
-    private static void InvokeFilter(RuntimeLevel level, GlobalSettings settings, ActionExecutingContext context)
+    [Test]
+    public void OnActionExecuting_MvcController_WhenRunButNotReadyAndMaintenanceEnabled_SetsMaintenanceResult()
+    {
+        // After a background unattended upgrade the runtime is at Run before per-server caches are seeded.
+        // The front-end must be blocked in that window so no request poisons a not-yet-seeded cache (#22581).
+        var settings = new GlobalSettings { ShowMaintenancePageWhenInUpgradeState = true };
+        var context = CreateMvcControllerContext();
+
+        InvokeFilter(RuntimeLevel.Run, settings, context, isReady: false);
+
+        Assert.That(context.Result, Is.InstanceOf<MaintenanceResult>());
+    }
+
+    [Test]
+    public void OnActionExecuting_MvcController_WhenRunButNotReadyAndMaintenanceDisabled_DoesNotSetResult()
+    {
+        var settings = new GlobalSettings { ShowMaintenancePageWhenInUpgradeState = false };
+        var context = CreateMvcControllerContext();
+
+        InvokeFilter(RuntimeLevel.Run, settings, context, isReady: false);
+
+        Assert.That(context.Result, Is.Null);
+    }
+
+    [Test]
+    public void OnActionExecuting_MvcController_WhenRunAndReady_DoesNotSetResult()
+    {
+        var settings = new GlobalSettings { ShowMaintenancePageWhenInUpgradeState = true };
+        var context = CreateMvcControllerContext();
+
+        InvokeFilter(RuntimeLevel.Run, settings, context, isReady: true);
+
+        Assert.That(context.Result, Is.Null);
+    }
+
+    [Test]
+    public void OnActionExecuting_ApiController_WhenRunButNotReadyAndMaintenanceEnabled_SetsProblemDetailsResult()
+    {
+        var settings = new GlobalSettings { ShowMaintenancePageWhenInUpgradeState = true };
+        var context = CreateApiControllerContext();
+
+        InvokeFilter(RuntimeLevel.Run, settings, context, isReady: false);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(context.Result, Is.InstanceOf<ObjectResult>());
+            var result = (ObjectResult)context.Result!;
+            Assert.That(result.StatusCode, Is.EqualTo(StatusCodes.Status503ServiceUnavailable));
+        });
+    }
+
+    private static void InvokeFilter(RuntimeLevel level, GlobalSettings settings, ActionExecutingContext context, bool isReady = true)
     {
         var attribute = new MaintenanceModeActionFilterAttribute();
         var services = new ServiceCollection()
             .AddSingleton(Mock.Of<IRuntimeState>(s => s.Level == level))
             .AddSingleton(Mock.Of<IOptionsMonitor<GlobalSettings>>(m => m.CurrentValue == settings))
+            .AddSingleton(Mock.Of<IContentRoutingReadiness>(r => r.IsReady == isReady))
             .BuildServiceProvider();
 
         var filter = (IActionFilter)attribute.CreateInstance(services);

@@ -11,6 +11,7 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Notifications;
+using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Install;
 
@@ -229,11 +230,61 @@ public class UnattendedUpgradeBackgroundServiceTests
             Times.Once);
     }
 
+    [Test]
+    public async Task ExecuteAsync_WhenUpgradeSucceeds_MarksContentRoutingReadyAfterStartingNotification()
+    {
+        // The readiness signal must be set only after UmbracoApplicationStartingNotification has completed
+        // (i.e. the per-server caches are seeded), never before. See #22581.
+        var runtimeState = CreateMockRuntimeState();
+        var eventAggregator = new Mock<IEventAggregator>();
+        SetupPublishAsync(eventAggregator);
+
+        var callOrder = new List<string>();
+        eventAggregator
+            .Setup(x => x.PublishAsync(It.IsAny<UmbracoApplicationStartingNotification>(), It.IsAny<CancellationToken>()))
+            .Callback(() => callOrder.Add("starting"))
+            .Returns(Task.CompletedTask);
+
+        var readiness = new Mock<IContentRoutingReadiness>();
+        readiness.Setup(x => x.MarkReady()).Callback(() => callOrder.Add("ready"));
+
+        var sut = CreateSut(runtimeState.Object, eventAggregator.Object, contentRoutingReadiness: readiness.Object);
+
+        await sut.StartAsync(CancellationToken.None);
+        await sut.ExecuteTask!;
+
+        readiness.Verify(x => x.MarkReady(), Times.Once);
+        Assert.That(callOrder, Is.EqualTo(new[] { "starting", "ready" }));
+    }
+
+    [Test]
+    public async Task ExecuteAsync_WhenBootFailed_DoesNotMarkContentRoutingReady()
+    {
+        var runtimeState = CreateMockRuntimeState();
+        runtimeState
+            .Setup(x => x.DetermineRuntimeLevel())
+            .Throws(new InvalidOperationException("db gone"));
+
+        var eventAggregator = new Mock<IEventAggregator>();
+        SetupPublishAsync(
+            eventAggregator,
+            premigrationResult: RuntimePremigrationsUpgradeNotification.PremigrationUpgradeResult.CoreUpgradeComplete);
+
+        var readiness = new Mock<IContentRoutingReadiness>();
+        var sut = CreateSut(runtimeState.Object, eventAggregator.Object, contentRoutingReadiness: readiness.Object);
+
+        await sut.StartAsync(CancellationToken.None);
+        await sut.ExecuteTask!;
+
+        readiness.Verify(x => x.MarkReady(), Times.Never);
+    }
+
     private static UnattendedUpgradeBackgroundService CreateSut(
         IRuntimeState runtimeState,
         IEventAggregator eventAggregator,
         IHostApplicationLifetime? hostApplicationLifetime = null,
-        IMigrationCoordinator? coordinator = null)
+        IMigrationCoordinator? coordinator = null,
+        IContentRoutingReadiness? contentRoutingReadiness = null)
     {
         var components = new ComponentCollection(
             () => Enumerable.Empty<IAsyncComponent>(),
@@ -249,6 +300,7 @@ public class UnattendedUpgradeBackgroundServiceTests
             components,
             hostApplicationLifetime ?? CreateMockLifetime().Object,
             coordinator,
+            contentRoutingReadiness ?? Mock.Of<IContentRoutingReadiness>(),
             NullLogger<UnattendedUpgradeBackgroundService>.Instance);
     }
 

@@ -49,6 +49,7 @@ public class UmbracoRouteValueTransformer : DynamicRouteValueTransformer
     private readonly IUmbracoContextAccessor _umbracoContextAccessor;
     private readonly IUmbracoVirtualPageRoute _umbracoVirtualPageRoute;
     private readonly IDocumentUrlService _urlService;
+    private readonly IContentRoutingReadiness _contentRoutingReadiness;
     private GlobalSettings _globalSettings;
 
     /// <summary>
@@ -66,7 +67,8 @@ public class UmbracoRouteValueTransformer : DynamicRouteValueTransformer
         IPublicAccessRequestHandler publicAccessRequestHandler,
         IUmbracoVirtualPageRoute umbracoVirtualPageRoute,
         IOptionsMonitor<GlobalSettings> globalSettings,
-        IDocumentUrlService urlService)
+        IDocumentUrlService urlService,
+        IContentRoutingReadiness contentRoutingReadiness)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _umbracoContextAccessor =
@@ -83,6 +85,41 @@ public class UmbracoRouteValueTransformer : DynamicRouteValueTransformer
         _globalSettings = globalSettings.CurrentValue;
         globalSettings.OnChange(x => _globalSettings = x);
         _urlService = urlService;
+        _contentRoutingReadiness = contentRoutingReadiness;
+    }
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="UmbracoRouteValueTransformer" /> class.
+    /// </summary>
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
+    public UmbracoRouteValueTransformer(
+        ILogger<UmbracoRouteValueTransformer> logger,
+        IUmbracoContextAccessor umbracoContextAccessor,
+        IPublishedRouter publishedRouter,
+        IRuntimeState runtime,
+        IUmbracoRouteValuesFactory routeValuesFactory,
+        IRoutableDocumentFilter routableDocumentFilter,
+        IDataProtectionProvider dataProtectionProvider,
+        IControllerActionSearcher controllerActionSearcher,
+        IPublicAccessRequestHandler publicAccessRequestHandler,
+        IUmbracoVirtualPageRoute umbracoVirtualPageRoute,
+        IOptionsMonitor<GlobalSettings> globalSettings,
+        IDocumentUrlService urlService)
+    : this(
+        logger,
+        umbracoContextAccessor,
+        publishedRouter,
+        runtime,
+        routeValuesFactory,
+        routableDocumentFilter,
+        dataProtectionProvider,
+        controllerActionSearcher,
+        publicAccessRequestHandler,
+        umbracoVirtualPageRoute,
+        globalSettings,
+        urlService,
+        StaticServiceProvider.Instance.GetRequiredService<IContentRoutingReadiness>())
+    {
     }
 
     /// <summary>
@@ -113,7 +150,8 @@ public class UmbracoRouteValueTransformer : DynamicRouteValueTransformer
         publicAccessRequestHandler,
         umbracoVirtualPageRoute,
         globalSettings,
-        StaticServiceProvider.Instance.GetRequiredService<IDocumentUrlService>())
+        StaticServiceProvider.Instance.GetRequiredService<IDocumentUrlService>(),
+        StaticServiceProvider.Instance.GetRequiredService<IContentRoutingReadiness>())
     {
     }
 
@@ -131,6 +169,15 @@ public class UmbracoRouteValueTransformer : DynamicRouteValueTransformer
         // Return null so the dynamic route is removed from candidates, leaving any static routes
         // (e.g. surface controllers) to be matched and handled by their own action filters.
         if (_runtime.Level == RuntimeLevel.Upgrading)
+        {
+            return null!;
+        }
+
+        // After a background unattended upgrade the runtime reaches Run before this server has finished
+        // seeding its per-server content caches. Don't route content yet: returning null drops the dynamic
+        // route so nothing enters the content pipeline and caches a negative result that would otherwise
+        // persist until the process restarts. See #22581.
+        if (_contentRoutingReadiness.IsInInitializationWindow(_runtime))
         {
             return null!;
         }
