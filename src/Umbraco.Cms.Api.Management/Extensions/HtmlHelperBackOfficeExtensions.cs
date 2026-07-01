@@ -50,6 +50,8 @@ public static class HtmlHelperBackOfficeExtensions
         // Inject the BackOffice cache buster into the import string to handle BackOffice assets
         var importmapScript = sb.ToString()
             .Replace(backOfficePathGenerator.BackOfficeVirtualDirectory, backOfficePathGenerator.BackOfficeAssetsPath)
+
+            // TODO: Remove this when CacheBusterToken is gone. Scheduled for removal in Umbraco 20.
             .Replace(Constants.Web.CacheBusterToken, backOfficePathGenerator.BackOfficeCacheBustHash);
 
         return html.Raw(importmapScript);
