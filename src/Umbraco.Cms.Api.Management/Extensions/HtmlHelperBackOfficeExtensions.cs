@@ -12,7 +12,7 @@ using Umbraco.Cms.Web.Common.Hosting;
 namespace Umbraco.Cms.Api.Management.Extensions;
 
 /// <summary>
-/// Provides extension methods for <see cref="HtmlHelper"/> related to Umbraco back office functionality.
+/// Provides extension methods for <see cref="IHtmlHelper"/> related to Umbraco back office functionality.
 /// </summary>
 public static class HtmlHelperBackOfficeExtensions
 {
