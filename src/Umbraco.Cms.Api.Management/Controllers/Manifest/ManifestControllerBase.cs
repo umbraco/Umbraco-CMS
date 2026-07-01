@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Manifest;
 public abstract class ManifestControllerBase : ManagementApiControllerBase
 {
     /// <summary>
-    ///     Replaces the {Constants.Web.CacheBusterToken} with the supplied cache buster hash.
+    ///     Replaces the <see cref="Constants.Web.CacheBusterToken"/> with the supplied cacheBustHash string.
     /// </summary>
     /// <param name="models">The collection of manifest response models.</param>
     /// <param name="cacheBustHash">The cache buster hash to replace the token with.</param>
