@@ -1,11 +1,11 @@
 #if DEBUG
     using System.Diagnostics;
 #endif
-using System.Collections.Concurrent;
 using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
@@ -20,7 +20,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache.Services;
 
-internal sealed class DocumentCacheService : IDocumentCacheService
+internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCacheSizeReporter
 {
     private readonly IDatabaseCacheRepository _databaseCacheRepository;
     private readonly IIdKeyMap _idKeyMap;
@@ -36,7 +36,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService
     private readonly ILogger<DocumentCacheService> _logger;
     private HashSet<Guid>? _seedKeys;
 
-    private readonly ConcurrentDictionary<string, IPublishedContent> _publishedContentCache = [];
+    private readonly ConvertedPublishedContentCache<string, IPublishedContent> _publishedContentCache = new();
 
     // Monotonic counter bumped whenever the in-memory cache (L0/L1) is invalidated or refreshed.
     // GetNodeAsync captures it before reading the backing store and re-checks it before writing
@@ -100,6 +100,15 @@ internal sealed class DocumentCacheService : IDocumentCacheService
         _logger = logger;
     }
 
+    /// <inheritdoc />
+    public string CacheName => "Published content (converted, L0)";
+
+    /// <inheritdoc />
+    public long GetApproximateCount() => _publishedContentCache.Count;
+
+    /// <inheritdoc />
+    public long? GetApproximateBytes() => _publishedContentCache.ApproximateSizeInBytes;
+
     public async Task<IPublishedContent?> GetByKeyAsync(Guid key, bool? preview = null)
     {
         bool calculatedPreview = preview ?? GetPreview();
@@ -124,7 +133,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService
     public bool TryGetCached(Guid key, bool preview, out IPublishedContent? content)
     {
         // Mirror the L0 (published content cache) fast path in GetNodeAsync.
-        if (preview is false && _publishedContentCache.TryGetValue(GetCacheKey(key, preview), out content))
+        if (preview is false && _publishedContentCache.TryGet(GetCacheKey(key, preview), out content))
         {
             return true;
         }
@@ -137,7 +146,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService
     {
         var cacheKey = GetCacheKey(key, preview);
 
-        if (preview is false && _publishedContentCache.TryGetValue(cacheKey, out IPublishedContent? cached))
+        if (preview is false && _publishedContentCache.TryGet(cacheKey, out IPublishedContent? cached))
         {
             return cached;
         }
@@ -185,7 +194,10 @@ internal sealed class DocumentCacheService : IDocumentCacheService
         // refresh has already written fresher content and we must not overwrite it with this one.
         if (result is not null && snapshotIsCurrent)
         {
-            _publishedContentCache[cacheKey] = result;
+            // The size estimate runs unconditionally (not only when reporting is enabled): it is cheap
+            // (O(properties), no IO/decompression) and only on the cache-miss path, and keeping the running
+            // total always-current means it is accurate the moment debug reporting is switched on.
+            _publishedContentCache.Set(cacheKey, result, ContentCacheNodeSizeEstimator.EstimateBytes(contentCacheNode));
         }
 
         return result;
@@ -267,7 +279,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService
         {
             var cacheKey = GetCacheKey(publishedNode.Key, false);
             await _hybridCache.SetAsync(cacheKey, publishedNode, GetEntryOptions(publishedNode.Key, false), GenerateTags(publishedNode));
-            _publishedContentCache.Remove(cacheKey, out _);
+            _publishedContentCache.Remove(cacheKey);
             InvalidateMemoryCacheGeneration();
         }
         else
@@ -477,7 +489,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService
     public void ClearConvertedContentCache(IReadOnlyCollection<int> contentTypeIds)
     {
         var ids = contentTypeIds as int[] ?? contentTypeIds.ToArray();
-        _publishedContentCache.RemoveAll(content => ids.Contains(content.Value.ContentType.Id));
+        _publishedContentCache.RemoveWhere(content => ids.Contains(content.ContentType.Id));
         InvalidateMemoryCacheGeneration();
     }
 
@@ -485,7 +497,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService
     {
         var cacheKey = GetCacheKey(key, false);
         await _hybridCache.RemoveAsync(cacheKey);
-        _publishedContentCache.Remove(cacheKey, out _);
+        _publishedContentCache.Remove(cacheKey);
         InvalidateMemoryCacheGeneration();
     }
 
