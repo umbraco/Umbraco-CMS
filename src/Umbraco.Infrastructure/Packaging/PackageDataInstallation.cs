@@ -60,6 +60,33 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         /// <summary>
         /// Initializes a new instance of the <see cref="PackageDataInstallation"/> class.
         /// </summary>
+        /// <param name="dataValueEditorFactory">The data value editor factory.</param>
+        /// <param name="logger">The logger.</param>
+        /// <param name="partialViewService">The partial view service.</param>
+        /// <param name="partialViewFolderService">The partial view folder service.</param>
+        /// <param name="languageService">The language service.</param>
+        /// <param name="dictionaryItemService">The dictionary item service.</param>
+        /// <param name="userIdKeyResolver">The user ID key resolver.</param>
+        /// <param name="dataTypeService">The data type service.</param>
+        /// <param name="entityService">The entity service.</param>
+        /// <param name="contentTypeService">The content type service.</param>
+        /// <param name="contentService">The content service.</param>
+        /// <param name="propertyEditors">The collection of property editors.</param>
+        /// <param name="scopeProvider">The scope provider.</param>
+        /// <param name="shortStringHelper">The short string helper.</param>
+        /// <param name="serializer">The configuration editor JSON serializer.</param>
+        /// <param name="mediaService">The media service.</param>
+        /// <param name="mediaTypeService">The media type service.</param>
+        /// <param name="templateContentParserService">The template content parser service.</param>
+        /// <param name="templateService">The template service.</param>
+        /// <param name="stylesheetService">The stylesheet service.</param>
+        /// <param name="stylesheetFolderService">The stylesheet folder service.</param>
+        /// <param name="scriptService">The script service.</param>
+        /// <param name="scriptFolderService">The script folder service.</param>
+        /// <param name="memberTypeService">The member type service.</param>
+        /// <param name="dataTypeContainerService">The data type container service for resolving data type folders.</param>
+        /// <param name="elementService">The element service for installing element instances.</param>
+        /// <param name="elementContainerService">The element container service for managing element folders.</param>
         public PackageDataInstallation(
             IDataValueEditorFactory dataValueEditorFactory,
             ILogger<PackageDataInstallation> logger,
@@ -121,6 +148,31 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         /// <summary>
         /// Initializes a new instance of the <see cref="PackageDataInstallation"/> class.
         /// </summary>
+        /// <param name="dataValueEditorFactory">The data value editor factory.</param>
+        /// <param name="logger">The logger.</param>
+        /// <param name="partialViewService">The partial view service.</param>
+        /// <param name="partialViewFolderService">The partial view folder service.</param>
+        /// <param name="languageService">The language service.</param>
+        /// <param name="dictionaryItemService">The dictionary item service.</param>
+        /// <param name="userIdKeyResolver">The user ID key resolver.</param>
+        /// <param name="dataTypeService">The data type service.</param>
+        /// <param name="entityService">The entity service.</param>
+        /// <param name="contentTypeService">The content type service.</param>
+        /// <param name="contentService">The content service.</param>
+        /// <param name="propertyEditors">The collection of property editors.</param>
+        /// <param name="scopeProvider">The scope provider.</param>
+        /// <param name="shortStringHelper">The short string helper.</param>
+        /// <param name="serializer">The configuration editor JSON serializer.</param>
+        /// <param name="mediaService">The media service.</param>
+        /// <param name="mediaTypeService">The media type service.</param>
+        /// <param name="templateContentParserService">The template content parser service.</param>
+        /// <param name="templateService">The template service.</param>
+        /// <param name="stylesheetService">The stylesheet service.</param>
+        /// <param name="stylesheetFolderService">The stylesheet folder service.</param>
+        /// <param name="scriptService">The script service.</param>
+        /// <param name="scriptFolderService">The script folder service.</param>
+        /// <param name="memberTypeService">The member type service.</param>
+        /// <param name="dataTypeContainerService">The data type container service.</param>
         [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 20.")]
         public PackageDataInstallation(
             IDataValueEditorFactory dataValueEditorFactory,
