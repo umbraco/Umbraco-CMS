@@ -199,7 +199,7 @@ namespace Umbraco.Extensions
         /// <param name="sql">The base <see cref="Sql{ISqlContext}"/> instance to which the join will be appended.</param>
         /// <param name="nestedQuery">The nested <see cref="Sql{ISqlContext}"/> subquery to join.</param>
         /// <param name="alias">The alias to assign to the nested subquery in the join clause. The alias will be quoted according to the SQL syntax provider.</param>
-        /// <returns>A <see cref="SqlJoinClause{ISqlContext}"/> representing the INNER JOIN with the nested subquery and alias.</returns>
+        /// <returns>A <see cref="Sql{ISqlContext}.SqlJoinClause{ISqlContext}"/> representing the INNER JOIN with the nested subquery and alias.</returns>
         public static Sql<ISqlContext>.SqlJoinClause<ISqlContext> InnerJoinNested(this Sql<ISqlContext> sql, Sql<ISqlContext> nestedQuery, string alias)
         {
             return new Sql<ISqlContext>.SqlJoinClause<ISqlContext>(sql.Append("INNER JOIN (").Append(nestedQuery)
