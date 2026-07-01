@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Core.Models.DeliveryApi;
 /// </summary>
 public class ApiElement : IApiElement
 {
-    [Obsolete("TODO: SOMETHING V20")]
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 20.")]
     public ApiElement(Guid id, string contentType, IDictionary<string, object?> properties)
         : this(id, string.Empty, contentType, properties)
     {
