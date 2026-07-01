@@ -100,6 +100,9 @@ public class MaintenanceModeActionFilterAttributeTests
             Assert.That(result.StatusCode, Is.EqualTo(StatusCodes.Status503ServiceUnavailable));
             Assert.That(result.Value, Is.InstanceOf<ProblemDetails>());
             Assert.That(((ProblemDetails)result.Value!).Status, Is.EqualTo(StatusCodes.Status503ServiceUnavailable));
+
+            // The Upgrading state should report an upgrade in progress (distinct from the readiness window).
+            Assert.That(((ProblemDetails)result.Value!).Detail, Does.Contain("upgraded"));
         });
     }
 
@@ -201,6 +204,11 @@ public class MaintenanceModeActionFilterAttributeTests
             Assert.That(context.Result, Is.InstanceOf<ObjectResult>());
             var result = (ObjectResult)context.Result!;
             Assert.That(result.StatusCode, Is.EqualTo(StatusCodes.Status503ServiceUnavailable));
+
+            // The initialization-window message must not misleadingly claim an upgrade is in progress.
+            var detail = ((ProblemDetails)result.Value!).Detail;
+            Assert.That(detail, Does.Contain("starting up"));
+            Assert.That(detail, Does.Not.Contain("upgraded"));
         });
     }
 

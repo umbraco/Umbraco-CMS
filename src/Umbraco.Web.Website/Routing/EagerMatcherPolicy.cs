@@ -89,6 +89,12 @@ internal sealed class EagerMatcherPolicy : MatcherPolicy, IEndpointSelectorPolic
             // yet (background unattended upgrade). Show the maintenance page instead of letting the request
             // enter the content pipeline, where it could observe and cache a negative result that persists
             // until the process restarts. See #22581.
+            //
+            // If TryRouteToMaintenancePage returns false here (maintenance page disabled, or a static route
+            // can serve the request) we intentionally fall through to normal candidate evaluation. That does
+            // NOT drop the initialization-window protection: UmbracoRouteValueTransformer.TransformAsync gates
+            // the same window independently and returns null for the dynamic content route, so the content
+            // pipeline is still not entered. These are two deliberate layers of the same guard.
             if (TryRouteToMaintenancePage(candidates))
             {
                 return;
