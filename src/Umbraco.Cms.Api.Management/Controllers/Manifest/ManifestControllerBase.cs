@@ -13,6 +13,12 @@ namespace Umbraco.Cms.Api.Management.Controllers.Manifest;
 [ApiExplorerSettings(GroupName = "Manifest")]
 public abstract class ManifestControllerBase : ManagementApiControllerBase
 {
+    /// <summary>
+    ///     Replaces the {Constants.Web.CacheBusterToken} with the supplied cache buster hash.
+    /// </summary>
+    /// <param name="models">The collection of manifest response models.</param>
+    /// <param name="cacheBustHash">The cache buster hash to replace the token with.</param>
+    [Obsolete("You do not need to use this anymore, as cache busting is now appended automatically by the BackOffice client. Scheduled for removal in Umbraco 20.")]
     protected static void ReplaceCacheBusterTokens(
         IEnumerable<ManifestResponseModel> models, string cacheBustHash)
     {
