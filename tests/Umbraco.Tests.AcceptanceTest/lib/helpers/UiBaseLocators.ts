@@ -1095,8 +1095,7 @@ export class UiBaseLocators extends BasePage {
   }
 
   async isBackOfficeMainVisible(isVisible: boolean = true) {
-    await this.page.waitForTimeout(ConstantHelper.timeout.medium);
-    await this.isVisible(this.backOfficeMain, isVisible);
+    await this.isVisible(this.backOfficeMain, isVisible, ConstantHelper.timeout.navigation);
   }
 
   // Link & Button Click by Name Methods

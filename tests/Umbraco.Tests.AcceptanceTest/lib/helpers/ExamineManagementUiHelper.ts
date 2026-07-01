@@ -23,8 +23,8 @@ export class ExamineManagementUiHelper extends UiBaseLocators {
     await this.containsText(this.indexersContent, text);
   }
 
-  checkIndexersCount() {
-    return this.indexerItems.count();
+  async doesIndexersHaveCount(count: number) {
+    await this.hasCount(this.indexerItems, count);
   }
 
   async clickIndexByName(indexName: string) {
