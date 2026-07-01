@@ -122,7 +122,9 @@ export class UmbPropertyValuePresetBuilderController<
 		let value: unknown = incomingCallArgs.value;
 
 		// Only process value if it is `undefined`, if a property has a value we do not want to process it. [NL]
-		if (value === undefined) {
+		// TODO: For v.19, we should run presets for all value always. Make it up to the preset to decide if it should process the value or not. [NL]
+		// Consider how we should communicate such change, as some might have build their own presets that rely on the current behavior. [NL]
+		if (value === undefined || value === null) {
 			const callArgs: UmbPropertyValuePresetApiCallArgs = {
 				...this.#baseCreateArgs!,
 				alias: propertyType.alias,
