@@ -117,7 +117,7 @@ internal sealed class PackageManifestService : IPackageManifestService
             ? PackageManifestCacheBuster.ComputeCacheBuster(manifest.Version, hostCacheBuster)
             : null;
 
-        foreach ((var key, var value) in importmap.Imports)
+        foreach (var (key, value) in importmap.Imports)
         {
             importDict[key] = PackageManifestCacheBuster.ApplyCacheBust(value, cacheBuster);
         }
@@ -136,7 +136,7 @@ internal sealed class PackageManifestService : IPackageManifestService
     private static Dictionary<string, string> StampScope(Dictionary<string, string> scopeImports, string? cacheBuster)
     {
         var stampedScope = new Dictionary<string, string>();
-        foreach ((var key, var value) in scopeImports)
+        foreach (var (key, value) in scopeImports)
         {
             stampedScope[key] = PackageManifestCacheBuster.ApplyCacheBust(value, cacheBuster);
         }
