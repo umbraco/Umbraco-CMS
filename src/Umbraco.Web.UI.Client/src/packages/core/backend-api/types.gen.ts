@@ -433,6 +433,7 @@ export type CreatePackageRequestModel = {
     contentLoadChildNodes: boolean;
     mediaIds: Array<string>;
     mediaLoadChildNodes: boolean;
+    elementIds?: null | Array<string>;
     documentTypes: Array<string>;
     mediaTypes: Array<string>;
     dataTypes: Array<string>;
@@ -2321,6 +2322,7 @@ export type PackageDefinitionResponseModel = {
     contentLoadChildNodes: boolean;
     mediaIds: Array<string>;
     mediaLoadChildNodes: boolean;
+    elementIds?: null | Array<string>;
     documentTypes: Array<string>;
     mediaTypes: Array<string>;
     dataTypes: Array<string>;
@@ -4260,6 +4262,7 @@ export type UpdatePackageRequestModel = {
     contentLoadChildNodes: boolean;
     mediaIds: Array<string>;
     mediaLoadChildNodes: boolean;
+    elementIds?: null | Array<string>;
     documentTypes: Array<string>;
     mediaTypes: Array<string>;
     dataTypes: Array<string>;

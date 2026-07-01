@@ -60,7 +60,7 @@ public interface IEntityXmlSerializer
     /// </summary>
     /// <param name="element">The element item to serialize.</param>
     /// <returns>An <see cref="XElement"/> containing the XML representation of the element item.</returns>
-    // TODO (V19): Remove the default implementation and make this a required interface member.
+    // TODO (V20): Remove the default implementation and make this a required interface member.
     XElement Serialize(IElement element) => throw new NotImplementedException();
 
     /// <summary>

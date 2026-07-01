@@ -33,7 +33,8 @@ public class PackageModelBase
     /// <summary>
     ///     Gets or sets the list of keys for the selected elements.
     /// </summary>
-    public IList<Guid> ElementIds { get; set; } = new List<Guid>();
+    // TODO (V20): make non-nullable
+    public IList<Guid>? ElementIds { get; set; } = new List<Guid>();
 
     /// <summary>
     ///     Gets or sets the list of ids for the selected document types.

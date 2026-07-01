@@ -41340,6 +41340,16 @@
           "mediaLoadChildNodes": {
             "type": "boolean"
           },
+          "elementIds": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
           "documentTypes": {
             "type": "array",
             "items": {
@@ -47816,6 +47826,16 @@
           "mediaLoadChildNodes": {
             "type": "boolean"
           },
+          "elementIds": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
           "documentTypes": {
             "type": "array",
             "items": {
@@ -52161,6 +52181,16 @@
           },
           "mediaLoadChildNodes": {
             "type": "boolean"
+          },
+          "elementIds": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
           },
           "documentTypes": {
             "type": "array",
