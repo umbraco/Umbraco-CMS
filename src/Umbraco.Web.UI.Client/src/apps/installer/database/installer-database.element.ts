@@ -246,7 +246,6 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 				@input=${this._handleChange}
 				.value=${this.databaseFormData.server ?? ''}
 				.placeholder=${this._selectedDatabase?.serverPlaceholder ?? ''}
-				autocomplete="off"
 				required
 				required-message="Server is required"></uui-input>
 		</uui-form-layout-item>
