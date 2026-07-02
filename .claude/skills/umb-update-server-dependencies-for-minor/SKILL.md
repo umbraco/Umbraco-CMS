@@ -12,8 +12,7 @@ Bumps every NuGet dependency that is behind to its latest available **minor or p
 
 **Guardrails (non-negotiable):**
 - **Never** update a major version. Only minors and patches where a newer one exists.
-- **Never** update intentionally-held packages (anything carrying a `TODO`/hold comment in `Directory.Packages.props`).
-
+- **Never** update packages explicitly held back for compatibility (e.g. marked "HOLD"/"do not bump" in `Directory.Packages.props`). `TODO` comments there may also mark transitive security pins, which are in-scope to bump if needed (see step 3).
 ## Prerequisites
 
 - `dotnet-outdated-tool` installed globally: `dotnet tool install --global dotnet-outdated-tool` (verify with `dotnet outdated --version`).
@@ -44,13 +43,12 @@ git switch -c v{major}/task/update-backend-dependencies
 
 ### 2. Discover what is outdated
 
-Run dotnet-outdated restricted to minor/patch and stable-only. `--version-lock Major` keeps updates within the current major; `--pre-release Never` skips pre-release upgrades (and leaves current pre-release/held packages alone):
-
+Run dotnet-outdated restricted to minor/patch and stable-only. `--version-lock Major` keeps updates within the current major; `--pre-release Never` skips upgrading to pre-release versions:
 ```bash
 dotnet outdated --version-lock Major --pre-release Never umbraco.sln
 ```
 
-Review the report. Everything listed is a legitimate minor/patch candidate. Note anything you intend to skip (held packages should not appear, but double-check).
+Review the report. Everything listed is a legitimate minor/patch candidate. Note anything you intend to skip, and verify afterwards (via `git diff`) that no intentionally pinned/held versions were changed; revert any that were.
 
 ### 3. Apply the updates
 
