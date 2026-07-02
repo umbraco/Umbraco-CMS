@@ -45,7 +45,7 @@ internal sealed class PublishedUrlInfoProviderTests : PublishedUrlInfoProviderTe
     }
 
     [Test]
-    public async Task Invariant_Content_Ignores_Requested_Culture()
+    public async Task Can_Ignore_Requested_Culture_For_Invariant_Content()
     {
         // Arrange: Add a second language (Danish) alongside the default English
         var danishLanguage = new LanguageBuilder()

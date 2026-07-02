@@ -40,7 +40,7 @@ public class DocumentUrlFactoryTests
     }
 
     [Test]
-    public async Task CreateUrlsAsync_Passes_Requested_Culture_To_Provider()
+    public async Task Can_Pass_Requested_Culture_To_Provider()
     {
         var (factory, provider) = CreateFactory();
         var content = CreateContent();
@@ -53,7 +53,7 @@ public class DocumentUrlFactoryTests
     }
 
     [Test]
-    public async Task CreateUrlsAsync_Without_Culture_Requests_All_Cultures()
+    public async Task Can_Request_All_Cultures_When_No_Culture_Provided()
     {
         var (factory, provider) = CreateFactory();
         var content = CreateContent();
@@ -65,7 +65,7 @@ public class DocumentUrlFactoryTests
     }
 
     [Test]
-    public async Task CreateUrlSetsAsync_Passes_Requested_Culture_For_Every_Item()
+    public async Task Can_Pass_Requested_Culture_For_Every_Item()
     {
         var (factory, provider) = CreateFactory();
         var contentA = CreateContent();
@@ -82,7 +82,7 @@ public class DocumentUrlFactoryTests
     }
 
     [Test]
-    public async Task CreateUrlSetsAsync_Without_Culture_Requests_All_Cultures()
+    public async Task Can_Request_All_Cultures_For_Url_Sets_When_No_Culture_Provided()
     {
         var (factory, provider) = CreateFactory();
         var content = CreateContent();

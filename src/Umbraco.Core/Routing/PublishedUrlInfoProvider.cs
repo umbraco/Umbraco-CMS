@@ -62,56 +62,43 @@ public class PublishedUrlInfoProvider : IPublishedUrlInfoProvider
     /// <inheritdoc />
     public async Task<ISet<UrlInfo>> GetAllAsync(IContent content, string? culture)
     {
-        HashSet<UrlInfo> urlInfos = [];
         var isInvariant = !content.ContentType.VariesByCulture();
 
-        // For variant content, restrict to the requested culture, matched against the installed cultures
-        // (using their casing). Culture is ignored for invariant content, which returns all of its domain urls.
-        string? scopedCulture = null;
-        if (culture is not null && isInvariant is false)
+        // Variant content restricted to a single culture, matched against the installed cultures (using their casing).
+        if (isInvariant is false && culture is not null)
         {
-            scopedCulture = (await _languageService.GetAllIsoCodesAsync())
+            var matchedCulture = (await _languageService.GetAllIsoCodesAsync())
                 .FirstOrDefault(x => x.InvariantEquals(culture));
 
             // A specific culture was requested that is not an installed culture - there are no urls to report.
-            if (scopedCulture is null)
-            {
-                return urlInfos;
-            }
+            return matchedCulture is null
+                ? new HashSet<UrlInfo>()
+                : await BuildUrlInfosAsync(content, [matchedCulture], scopedCulture: matchedCulture, isInvariant);
         }
 
-        IEnumerable<string> cultures = scopedCulture is not null
-            ? [scopedCulture]
-            : await GetCulturesForUrlLookupAsync(content);
+        // Invariant content (culture ignored), or all cultures.
+        IReadOnlyCollection<string> cultures = (await GetCulturesForUrlLookupAsync(content)).ToArray();
+        return await BuildUrlInfosAsync(content, cultures, scopedCulture: null, isInvariant);
+    }
 
+    /// <summary>
+    /// Builds the set of <see cref="UrlInfo" /> for the given cultures, plus the "other" URLs (unless the content is
+    /// trashed). When <paramref name="scopedCulture" /> is set, the "other" URLs are filtered to that culture.
+    /// </summary>
+    private async Task<ISet<UrlInfo>> BuildUrlInfosAsync(
+        IContent content,
+        IReadOnlyCollection<string> cultures,
+        string? scopedCulture,
+        bool isInvariant)
+    {
+        var urlInfos = new HashSet<UrlInfo>();
         foreach (var contentCulture in cultures)
         {
-            var url = _publishedUrlProvider.GetUrl(content.Key, culture: contentCulture);
-
-            // Handle "could not get URL"
-            if (url is Constants.Routing.Unroutable or Constants.Routing.UrlProviderException)
+            UrlInfo? urlInfo = await GetCultureUrlInfoAsync(content, contentCulture, isInvariant);
+            if (urlInfo is not null)
             {
-                // For invariant content, a missing URL just means there's no domain
-                // for this culture — not a problem worth reporting.
-                if (isInvariant)
-                {
-                    continue;
-                }
-
-                urlInfos.Add(UrlInfo.AsMessage(_localizedTextService.Localize("content", "getUrlException"), UrlProviderAlias, contentCulture));
-                continue;
+                urlInfos.Add(urlInfo);
             }
-
-            // Check for collision
-            Attempt<UrlInfo?> hasCollision = await VerifyCollisionAsync(content, url, contentCulture);
-
-            if (hasCollision is { Success: true, Result: not null })
-            {
-                urlInfos.Add(hasCollision.Result);
-                continue;
-            }
-
-            urlInfos.Add(UrlInfo.AsUrl(url, UrlProviderAlias, contentCulture));
         }
 
         // If the content is trashed, we can't get the other URLs, as we have no parent structure to navigate through.
@@ -120,18 +107,46 @@ public class PublishedUrlInfoProvider : IPublishedUrlInfoProvider
             return urlInfos;
         }
 
-        // Then get "other" urls - I.E. Not what you'd get with GetUrl(), this includes all the urls registered using domains.
-        // for these 'other' URLs, we don't check whether they are routable, collide, anything - we just report them.
-        // When scoped to a single culture, only report the other urls for that culture.
-        foreach (UrlInfo otherUrl in _publishedUrlProvider.GetOtherUrls(content.Id)
-                     .Where(x => scopedCulture is null || string.Equals(x.Culture, scopedCulture, StringComparison.OrdinalIgnoreCase))
-                     .OrderBy(x => x.Message).ThenBy(x => x.Culture))
+        foreach (UrlInfo otherUrl in GetOtherUrls(content, scopedCulture))
         {
             urlInfos.Add(otherUrl);
         }
 
         return urlInfos;
     }
+
+    /// <summary>
+    /// Gets the <see cref="UrlInfo" /> for a single culture, or <c>null</c> if there is nothing to report
+    /// (an unroutable URL on invariant content). Reports a message for an unroutable URL or a collision.
+    /// </summary>
+    private async Task<UrlInfo?> GetCultureUrlInfoAsync(IContent content, string culture, bool isInvariant)
+    {
+        var url = _publishedUrlProvider.GetUrl(content.Key, culture: culture);
+
+        if (url is Constants.Routing.Unroutable or Constants.Routing.UrlProviderException)
+        {
+            // For invariant content, a missing URL just means there's no domain for this culture - not worth reporting.
+            return isInvariant
+                ? null
+                : UrlInfo.AsMessage(_localizedTextService.Localize("content", "getUrlException"), UrlProviderAlias, culture);
+        }
+
+        Attempt<UrlInfo?> hasCollision = await VerifyCollisionAsync(content, url, culture);
+        return hasCollision is { Success: true, Result: not null }
+            ? hasCollision.Result
+            : UrlInfo.AsUrl(url, UrlProviderAlias, culture);
+    }
+
+    /// <summary>
+    /// Gets the "other" URLs - i.e. not what you'd get with GetUrl(), including all the URLs registered using domains.
+    /// These are not checked for routability or collisions - they are just reported. When scoped to a single culture,
+    /// only the other URLs for that culture are returned.
+    /// </summary>
+    private IEnumerable<UrlInfo> GetOtherUrls(IContent content, string? scopedCulture)
+        => _publishedUrlProvider.GetOtherUrls(content.Id)
+            .Where(x => scopedCulture is null || string.Equals(x.Culture, scopedCulture, StringComparison.OrdinalIgnoreCase))
+            .OrderBy(x => x.Message)
+            .ThenBy(x => x.Culture);
 
     /// <summary>
     /// Gets the cultures to query URLs for.

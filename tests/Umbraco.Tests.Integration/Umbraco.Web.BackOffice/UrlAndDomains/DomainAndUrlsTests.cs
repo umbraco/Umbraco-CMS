@@ -274,7 +274,7 @@ internal sealed class DomainAndUrlsTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Resolving_Urls_For_An_Unknown_Culture_Returns_No_Urls()
+    public async Task Cannot_Resolve_Urls_For_An_Unknown_Culture()
     {
         var domainService = GetRequiredService<IDomainService>();
         var updateModel = new DomainsUpdateModel
