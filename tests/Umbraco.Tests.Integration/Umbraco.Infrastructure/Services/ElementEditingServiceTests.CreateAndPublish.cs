@@ -131,6 +131,27 @@ public partial class ElementEditingServiceTests
     }
 
     [Test]
+    public async Task Cannot_CreateAndPublish_Invariant_Without_Name()
+    {
+        var elementType = await CreateInvariantElementType();
+
+        var createModel = new ElementCreateModel
+        {
+            ContentTypeKey = elementType.Key,
+            ParentKey = Constants.System.RootKey,
+            Variants = [],
+            Properties =
+            [
+                new PropertyValueModel { Alias = "title", Value = "The title value" }
+            ],
+        };
+
+        var result = await ElementEditingService.CreateAndPublishAsync(createModel, [], Constants.Security.SuperUserKey);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.ContentTypeCultureVarianceMismatch, result.Status);
+    }
+
+    [Test]
     public async Task Cannot_CreateAndPublish_Without_Content_Type()
     {
         var createModel = new ElementCreateModel

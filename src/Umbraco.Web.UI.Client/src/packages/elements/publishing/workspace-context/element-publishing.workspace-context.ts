@@ -230,28 +230,40 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 
 		return this.#elementWorkspaceContext.validateAndSubmit(
 			async () => {
-				if (!this.#elementWorkspaceContext) {
-					throw new Error('Element workspace context is missing');
-				}
+				try {
+					if (!this.#elementWorkspaceContext) {
+						throw new Error('Element workspace context is missing');
+					}
 
-				// Save the element before scheduling
-				await this.#elementWorkspaceContext.performCreateOrUpdate(variantIds, saveData);
+					// Save the element before scheduling
+					await this.#elementWorkspaceContext.performCreateOrUpdate(variantIds, saveData);
 
-				// Schedule the element
-				const { error } = await this.#publishingRepository.publish(unique, variants);
-				if (error) {
+					// Schedule the element
+					const { error } = await this.#publishingRepository.publish(unique, variants);
+					if (error) {
+						throw error;
+					}
+
+					const notification = {
+						data: { message: this.#localize.term('speechBubbles_editContentScheduledSavedText') },
+					};
+					this.#notificationContext?.peek('positive', notification);
+
+					// reload the element so all states are updated after the schedule operation
+					await this.#elementWorkspaceContext.reload();
+
+					// request reload of this entity
+					const structureEvent = new UmbRequestReloadStructureForEntityEvent({ entityType, unique });
+					this.#eventContext?.dispatchEvent(structureEvent);
+				} catch (error) {
+					// Notify only on the publish path. The validation-failure path below already
+					// notifies, so a shared top-level .catch would fire a second toast.
+					this.#notificationContext?.peek('danger', {
+						data: { message: this.#localize.term('speechBubbles_editContentScheduledNotSavedText') },
+					});
+
 					return Promise.reject(error);
 				}
-
-				const notification = { data: { message: this.#localize.term('speechBubbles_editContentScheduledSavedText') } };
-				this.#notificationContext?.peek('positive', notification);
-
-				// reload the element so all states are updated after the schedule operation
-				await this.#elementWorkspaceContext.reload();
-
-				// request reload of this entity
-				const structureEvent = new UmbRequestReloadStructureForEntityEvent({ entityType, unique });
-				this.#eventContext?.dispatchEvent(structureEvent);
 			},
 			async (reason?: unknown) => {
 				this.#notificationContext?.peek('danger', {
@@ -326,8 +338,15 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 		await this.#elementWorkspaceContext.askServerToValidate(saveData, variantIds);
 
 		return this.#elementWorkspaceContext.validateAndSubmit(
-			async () => {
-				return this.#performSaveAndPublish(variantIds, saveData);
+			() => {
+				// Notify only on the publish path. The validation-failure path below already
+				// notifies, so a shared top-level .catch would fire a second, contradictory toast.
+				return this.#performSaveAndPublish(variantIds, saveData).catch((error) => {
+					this.#notificationContext?.peek('danger', {
+						data: { message: this.#localize.term('speechBubbles_editElementPublishedFailed') },
+					});
+					return Promise.reject(error);
+				});
 			},
 			async (reason?: unknown) => {
 				// If data of the selection is not valid Then just save:

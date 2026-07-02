@@ -1615,6 +1615,7 @@ export default {
 		editContentPublishedFailedByValidation: 'Document could not be published, but we saved it for you',
 		editContentPublishedFailedByParent: 'Document could not be published, because a parent page is not published',
 		editContentPublishedHeader: 'Document published',
+		editElementPublishedFailed: 'Element could not be published or saved',
 		editElementPublishedHeader: 'Element published',
 		editContentPublishedReloadFailed: 'Document published, but the editor could not be refreshed',
 		editElementPublishedReloadFailed: 'Element published, but the editor could not be refreshed',
