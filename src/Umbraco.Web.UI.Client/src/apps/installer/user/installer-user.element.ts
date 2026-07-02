@@ -83,7 +83,6 @@ export class UmbInstallerUserElement extends UmbLitElement {
 						<uui-input
 							autocomplete="email"
 							type="email"
-							autocomplete="email"
 							id="email"
 							.value=${this._userFormData?.email ?? ''}
 							name="email"
@@ -99,7 +98,6 @@ export class UmbInstallerUserElement extends UmbLitElement {
 							id="password"
 							name="password"
 							label="password"
-							autocomplete="new-password"
 							minlength=${this._minimumPasswordLength}
 							.minlengthMessage=${`Password must be at least ${this._minimumPasswordLength} characters long!`}
 							.value=${this._userFormData?.password ?? ''}
