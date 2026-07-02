@@ -41,12 +41,9 @@ import type {
 	UmbTableItem,
 	UmbTableSelectedEvent,
 } from '@umbraco-cms/backoffice/components';
-import {
-	UMB_CLIPBOARD_CONTEXT,
-	UMB_CLIPBOARD_ENTRY_PICKER_MODAL,
-	UmbClipboardCollectionRepository,
-} from '@umbraco-cms/backoffice/clipboard';
-import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
+import { UmbPropertyClipboardManager } from '@umbraco-cms/backoffice/clipboard';
+import type { UmbMediaPickerValueModel } from '../../property-editors/types.js';
+import type { UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
 
 import './components/index.js';
 import '@umbraco-cms/backoffice/imaging';
@@ -109,7 +106,10 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 	private _searching: boolean = false;
 
 	@state()
-	private _hasClipboardMediaEntries: boolean = false;
+	private _openClipboard = false;
+
+	@state()
+	private _clipboardAvailable = false;
 
 	@query('#dropzone')
 	private _dropzone!: UmbDropzoneMediaElement;
@@ -124,7 +124,7 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 	#contextCulture?: string | null;
 	#locationInteractionMemoryUnique: string = 'UmbMediaItemPickerLocation';
 	#viewInteractionMemoryUnique: string = 'UmbMediaItemPickerView';
-	#clipboardCollectionRepository = new UmbClipboardCollectionRepository(this);
+	#clipboardManager = new UmbPropertyClipboardManager(this);
 
 	constructor() {
 		super();
@@ -139,6 +139,12 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 			this.observe(context?.culture, (culture) => {
 				this.#contextCulture = culture;
 			});
+		});
+
+		// The clipboard is only available for property editors that opt in (e.g. the Media Picker). When it is
+		// absent — such as a Content Picker configured for media — the clipboard tab stays hidden.
+		this.observe(this.#clipboardManager.isAvailable, (available) => {
+			this._clipboardAvailable = available;
 		});
 	}
 
@@ -190,21 +196,6 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 
 		await this.#loadFolderTypes();
 		this.#loadChildrenOfCurrentMediaItem();
-		this.#checkClipboardEntries();
-	}
-
-	async #checkClipboardEntries() {
-		// Check if any clipboard entries exist for the media picker.
-		try {
-			const { data } = await this.#clipboardCollectionRepository.requestCollection({
-				types: [UMB_MEDIA_PICKER_CLIPBOARD_ENTRY_VALUE_TYPE],
-				take: 1,
-			});
-			this._hasClipboardMediaEntries = (data?.total ?? data?.items?.length ?? 0) > 0;
-		} catch {
-			// If clipboard is not available for some reason, just hide the button.
-			this._hasClipboardMediaEntries = false;
-		}
 	}
 
 	async #loadFolderTypes() {
@@ -473,7 +464,8 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 	override render() {
 		return html`
 			<umb-body-layout headline=${this.localize.term('defaultdialogs_chooseMedia')}>
-				${this.#renderBody()} ${this.#renderBreadcrumb()}
+				${this.#renderNavigation()}
+				${this._openClipboard ? this.#renderClipboard() : html`${this.#renderBody()} ${this.#renderBreadcrumb()}`}
 				<div slot="actions">
 					<uui-button label=${this.localize.term('general_close')} @click=${this._rejectModal}></uui-button>
 					<uui-button
@@ -483,6 +475,40 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 						@click=${this._submitModal}></uui-button>
 				</div>
 			</umb-body-layout>
+		`;
+	}
+
+	#renderNavigation() {
+		return html`
+			<uui-tab-group slot="navigation">
+				<uui-tab
+					label=${this.localize.term('general_choose')}
+					?active=${!this._openClipboard}
+					@click=${() => (this._openClipboard = false)}>
+					<umb-icon slot="icon" name="icon-picture"></umb-icon>
+					${this.localize.term('general_choose')}
+				</uui-tab>
+				${this._clipboardAvailable
+					? html`<uui-tab
+							label=${this.localize.term('general_clipboard')}
+							?active=${this._openClipboard}
+							@click=${() => (this._openClipboard = true)}>
+							<umb-icon slot="icon" name="icon-clipboard"></umb-icon>
+							${this.localize.term('general_clipboard')}
+						</uui-tab>`
+					: nothing}
+			</uui-tab-group>
+		`;
+	}
+
+	#renderClipboard() {
+		return html`
+			<umb-clipboard-entry-picker
+				.config=${{
+					multiple: this.data?.multiple ?? false,
+					entryTypes: [UMB_MEDIA_PICKER_CLIPBOARD_ENTRY_VALUE_TYPE],
+				}}
+				@selection-change=${this.#onClipboardSelectionChange}></umb-clipboard-entry-picker>
 		`;
 	}
 
@@ -566,15 +592,6 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 					label=${this.localize.term('general_upload')}
 					look="outline"
 					color="default"></uui-button>
-				${this._hasClipboardMediaEntries
-					? html`<uui-button
-							@click=${this.#pasteFromClipboard}
-							label="Paste from clipboard"
-							look="outline"
-							color="default">
-							<uui-icon name="icon-clipboard-paste"></uui-icon>
-						</uui-button>`
-					: nothing}
 				<uui-button compact popovertarget="media-picker-view-popover" label="View">
 					<umb-icon name=${this._currentView === 'cards' ? 'icon-grid' : 'icon-table'}></umb-icon>
 				</uui-button>
@@ -600,47 +617,22 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 		`;
 	}
 
-	async #pasteFromClipboard() {
-		// Open the generic clipboard entry picker, filtered to media picker clipboard entries.
-		const result = await umbOpenModal(this, UMB_CLIPBOARD_ENTRY_PICKER_MODAL, {
-			data: {
-				multiple: this.data?.multiple ?? false,
-				entryTypes: [UMB_MEDIA_PICKER_CLIPBOARD_ENTRY_VALUE_TYPE],
-			},
-		});
-
-		// Filter out potential nulls from the generic picker selection type.
-		const selectedUniques = (result?.selection ?? []).filter(
+	async #onClipboardSelectionChange(event: UmbSelectionChangeEvent) {
+		const target = event.target as HTMLElement & { selection?: Array<string | null> };
+		const uniques = (target.selection ?? []).filter(
 			(unique): unique is string => typeof unique === 'string' && unique.length > 0,
 		);
 
-		if (!selectedUniques.length) return;
+		if (!uniques.length) return;
 
-		const mediaKeys = await this.#resolveMediaKeysFromClipboard(selectedUniques);
+		const mediaKeys = await this.#resolveMediaKeysFromClipboard(uniques);
 		this.#updateSelection(mediaKeys);
-		// Immediately submit the media picker modal so the chosen clipboard items
-		// are applied to the underlying media picker property.
-		this._submitModal();
 	}
 
 	async #resolveMediaKeysFromClipboard(uniques: string[]): Promise<string[]> {
-		const clipboardContext = await this.getContext(UMB_CLIPBOARD_CONTEXT);
-
-		const mediaKeys: string[] = [];
-
-		for (const unique of uniques) {
-			const entry = await clipboardContext?.read(unique);
-			if (!entry) continue;
-
-			const mediaPickerValue = entry?.values.find((v) => v.type === UMB_MEDIA_PICKER_CLIPBOARD_ENTRY_VALUE_TYPE)?.value;
-
-			if (!mediaPickerValue) continue;
-
-			for (const item of mediaPickerValue) {
-				mediaKeys.push(item.mediaKey);
-			}
-		}
-		return mediaKeys;
+		// The controller runs the registered media-picker paste translator per entry.
+		const values = await this.#clipboardManager.readMultiple<UmbMediaPickerValueModel>(uniques);
+		return values.flat().map((entry) => entry.mediaKey);
 	}
 
 	#updateSelection(mediaKeys: string[]) {
@@ -776,6 +768,12 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 
 	static override styles = [
 		css`
+			uui-tab-group {
+				--uui-tab-divider: var(--uui-color-border);
+				border-left: 1px solid var(--uui-color-border);
+				border-right: 1px solid var(--uui-color-border);
+			}
+
 			#toolbar {
 				display: flex;
 				gap: var(--uui-size-6);
