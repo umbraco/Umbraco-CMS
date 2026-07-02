@@ -20,7 +20,7 @@ public static partial class Constants
         /// <summary>
         ///     The installer cookie name (obsolete).
         /// </summary>
-        [Obsolete("InstallerCookieName is no longer used. Scheduled for removal in Umbraco 20.")]
+        [Obsolete("InstallerCookieName is no longer used. Scheduled for removal in Umbraco 19.")]
         public const string InstallerCookieName = "umb_installId";
 
         /// <summary>
@@ -41,7 +41,7 @@ public static partial class Constants
         /// <summary>
         ///     The token used to replace the cache buster hash in web assets.
         /// </summary>
-        [Obsolete("This has been replaced by automatic cachebuster appending to assets. Scheduled for removal in Umbraco 19.")]
+        [Obsolete("This has been replaced by automatic cachebuster appending to assets. Scheduled for removal in Umbraco 20.")]
         public const string CacheBusterToken = "%CACHE_BUSTER%";
 
         /// <summary>
