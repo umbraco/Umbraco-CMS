@@ -1,6 +1,6 @@
 ---
 name: umb-update-server-dependencies-for-minor
-description: Update all server-side (NuGet) dependencies to their latest minor/patch versions for the current branch's version line, then open a PR. Runs dotnet-outdated, bumps minors and patches only (never majors, never pre-releases), syncs the template projects, builds and runs unit tests, commits, and creates a PR. Use when asked to update/bump backend/server/NuGet/.NET dependencies for a release (e.g. "update server dependencies for 17.6", "bump NuGet packages to latest minors").
+description: Update all server-side (NuGet) dependencies to their latest minor/patch versions for the current branch's version line, then open a PR. Runs dotnet-outdated, bumps minors and patches only (never majors; never moves a stable package onto a pre-release), syncs the template projects, builds and runs unit tests, commits, and creates a PR. Use when asked to update/bump backend/server/NuGet/.NET dependencies for a release (e.g. "update server dependencies for 17.6", "bump NuGet packages to latest minors").
 argument-hint: [base-branch] (optional; defaults to the current branch)
 ---
 
@@ -12,7 +12,9 @@ Bumps every NuGet dependency that is behind to its latest available **minor or p
 
 **Guardrails (non-negotiable):**
 - **Never** update a major version. Only minors and patches where a newer one exists.
+- **Never** move a stable package onto a pre-release. Packages already on a pre-release *may* be updated to a newer pre-release — this is what `--pre-release Auto` does.
 - **Never** update packages explicitly held back for compatibility (e.g. marked "HOLD"/"do not bump" in `Directory.Packages.props`). `TODO` comments there may also mark transitive security pins, which are in-scope to bump if needed (see step 3).
+
 ## Prerequisites
 
 - `dotnet-outdated-tool` installed globally: `dotnet tool install --global dotnet-outdated-tool` (verify with `dotnet outdated --version`).
@@ -43,19 +45,20 @@ git switch -c v{major}/task/update-backend-dependencies
 
 ### 2. Discover what is outdated
 
-Run dotnet-outdated restricted to minor/patch and stable-only. `--version-lock Major` keeps updates within the current major; `--pre-release Never` skips upgrading to pre-release versions:
+Run dotnet-outdated restricted to within the current major. `--version-lock Major` keeps updates inside the current major version; `--pre-release Auto` (the default) offers a pre-release upgrade **only when the package is already on a pre-release** — so a stable package never jumps to a pre-release, while an existing pre-release can move to a newer pre-release:
+
 ```bash
-dotnet outdated --version-lock Major --pre-release Never umbraco.sln
+dotnet outdated --version-lock Major --pre-release Auto umbraco.sln
 ```
 
-Review the report. Everything listed is a legitimate minor/patch candidate. Note anything you intend to skip, and verify afterwards (via `git diff`) that no intentionally pinned/held versions were changed; revert any that were.
+Review the report. Everything listed is a legitimate minor/patch (or same-track pre-release) candidate. Note anything you intend to skip, and verify afterwards (via `git diff`) that no intentionally pinned/held versions were changed; revert any that were.
 
 ### 3. Apply the updates
 
 Apply the same filter with `-u`:
 
 ```bash
-dotnet outdated --version-lock Major --pre-release Never -u umbraco.sln
+dotnet outdated --version-lock Major --pre-release Auto -u umbraco.sln
 ```
 
 `dotnet-outdated` restores per-package and may print `Failed to restore project after upgrading!` for the test projects — this is a known quirk with the multi-level `tests/Directory.Packages.props` merge; the version writes still land. Verify with `git diff` afterwards.
@@ -116,12 +119,14 @@ updates are included.
 git push -u origin <branch>
 ```
 
-Generate the PR body from the actual `git diff` of the package files (do not invent versions). Use tables grouping the changes, and keep the **Testing** section to a single line — CI is the source of truth, do not paste build/test counts. Create it against the line's dev branch (`v{major}/dev` for a v-line, `main` for the current major):
+Generate the PR body from the actual `git diff` of the package files (do not invent versions). Use tables grouping the changes, and keep the **Testing** section to a single line — CI is the source of truth, do not paste build/test counts.
+
+Fill in the template below and **write it to a temp file** (e.g. `/tmp/pr-body.md`), then create the PR against the line's dev branch (`v{major}/dev` for a v-line, `main` for the current major):
 
 ```bash
 gh pr create --base <dev-branch> --head <branch> \
   --title "Dependencies: Update NuGet packages to latest minor and patch versions" \
-  --body-file <path>
+  --body-file /tmp/pr-body.md
 ```
 
 **PR body template:**
@@ -151,6 +156,7 @@ Routine dependency maintenance for the **{version}** release. Updates all NuGet 
 ### Deliberately left unchanged
 
 - Any package where only a **major** update is available (out of scope for this PR).
+- Intentionally-held packages carrying a `HOLD`/`do not bump` comment (e.g. `Umbraco.Code`).
 
 ## Testing
 
