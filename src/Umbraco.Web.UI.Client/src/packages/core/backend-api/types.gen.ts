@@ -1551,6 +1551,7 @@ export type ManifestResponseModel = {
     name: string;
     id?: null | string;
     version?: null | string;
+    cacheBuster?: string;
     extensions: Array<unknown>;
 };
 
