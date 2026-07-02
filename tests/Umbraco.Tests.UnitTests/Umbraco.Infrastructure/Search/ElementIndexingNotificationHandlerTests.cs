@@ -22,20 +22,6 @@ public class ElementIndexingNotificationHandlerTests
     }
 
     [Test]
-    public void Handle_ElementSavedNotification_QueuesElementIds()
-    {
-        var element1 = ElementWithId(10);
-        var element2 = ElementWithId(20);
-        var notification = new ElementSavedNotification([element1, element2], new EventMessages());
-
-        _sut.Handle(notification);
-
-        _mockReindexService.Verify(
-            s => s.QueueElementReindex(It.Is<IReadOnlyCollection<int>>(ids => ids.SequenceEqual(new[] { 10, 20 }))),
-            Times.Once);
-    }
-
-    [Test]
     public void Handle_ElementPublishedNotification_QueuesElementIds()
     {
         var element1 = ElementWithId(30);
@@ -47,16 +33,6 @@ public class ElementIndexingNotificationHandlerTests
         _mockReindexService.Verify(
             s => s.QueueElementReindex(It.Is<IReadOnlyCollection<int>>(ids => ids.SequenceEqual(new[] { 30, 40 }))),
             Times.Once);
-    }
-
-    [Test]
-    public void Handle_ElementSavedNotification_WhenEmpty_DoesNotQueue()
-    {
-        var notification = new ElementSavedNotification([], new EventMessages());
-
-        _sut.Handle(notification);
-
-        _mockReindexService.Verify(s => s.QueueElementReindex(It.IsAny<IReadOnlyCollection<int>>()), Times.Never);
     }
 
     [Test]

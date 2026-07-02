@@ -6,19 +6,19 @@ using Umbraco.Cms.Core.Services;
 namespace Umbraco.Cms.Infrastructure.Search;
 
 /// <summary>
-/// Queues reindexing of documents that reference elements when those elements are saved or published.
+/// Queues reindexing of documents that reference elements when those elements are published.
 /// </summary>
+/// <remarks>
+/// Only published element values are flattened into the (published) external index, so a draft save cannot change
+/// what referencing documents index. Reindexing is therefore triggered on publish only, not on save.
+/// </remarks>
 internal sealed class ElementIndexingNotificationHandler :
-    INotificationHandler<ElementSavedNotification>,
     INotificationHandler<ElementPublishedNotification>
 {
     private readonly IDeferredSearchReindexService _deferredSearchReindexService;
 
     public ElementIndexingNotificationHandler(IDeferredSearchReindexService deferredSearchReindexService)
         => _deferredSearchReindexService = deferredSearchReindexService;
-
-    public void Handle(ElementSavedNotification notification)
-        => QueueElementReindex(notification.SavedEntities);
 
     public void Handle(ElementPublishedNotification notification)
         => QueueElementReindex(notification.PublishedEntities);

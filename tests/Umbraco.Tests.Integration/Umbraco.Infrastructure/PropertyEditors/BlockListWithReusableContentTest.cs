@@ -850,17 +850,28 @@ internal class BlockListWithReusableContentTest : BlockEditorWithReusableContent
                 { elementType.Key, elementType }, { contentType.Key, contentType },
             }).ToList();
 
-        var indexValue = indexValues.FirstOrDefault(v => v.Culture is null && v.FieldName == "blocks");
-        Assert.IsNotNull(indexValue);
-        Assert.AreEqual(1, indexValue!.Values.Count());
+        if (published)
+        {
+            var indexValue = indexValues.FirstOrDefault(v => v.Culture is null && v.FieldName == "blocks");
+            Assert.IsNotNull(indexValue);
+            Assert.AreEqual(1, indexValue!.Values.Count());
 
-        var indexedValue = indexValue.Values.First() as string;
-        Assert.IsNotNull(indexedValue);
+            var indexedValue = indexValue.Values.First() as string;
+            Assert.IsNotNull(indexedValue);
 
-        var values = indexedValue!.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
-        Assert.AreEqual(2, values.Length);
-        Assert.Contains("The reusable invariant text", values);
-        Assert.Contains("The reusable variant text", values);
+            var values = indexedValue!.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
+            Assert.AreEqual(2, values.Length);
+            Assert.Contains("The reusable invariant text", values);
+            Assert.Contains("The reusable variant text", values);
+        }
+        else
+        {
+            // External element content is only flattened into the published value set (external index), not the
+            // draft value set (internal/back-office index).
+            var allText = string.Join(Environment.NewLine, indexValues.SelectMany(v => v.Values).OfType<string>());
+            Assert.IsFalse(allText.Contains("The reusable invariant text"), "External element content must not be indexed in the draft value set.");
+            Assert.IsFalse(allText.Contains("The reusable variant text"), "External element content must not be indexed in the draft value set.");
+        }
     }
 
     [TestCase(true)]
@@ -912,8 +923,20 @@ internal class BlockListWithReusableContentTest : BlockEditorWithReusableContent
                 { elementType.Key, elementType }, { contentType.Key, contentType },
             }).ToList();
 
-        AssertIndexValues("en-US", "The reusable English text");
-        AssertIndexValues("da-DK", "The reusable Danish text");
+        if (published)
+        {
+            AssertIndexValues("en-US", "The reusable English text");
+            AssertIndexValues("da-DK", "The reusable Danish text");
+        }
+        else
+        {
+            // External element content is only flattened into the published value set (external index), not the
+            // draft value set (internal/back-office index).
+            var allText = string.Join(Environment.NewLine, indexValues.SelectMany(v => v.Values).OfType<string>());
+            Assert.IsFalse(allText.Contains("The reusable English text"), "External element content must not be indexed in the draft value set.");
+            Assert.IsFalse(allText.Contains("The reusable Danish text"), "External element content must not be indexed in the draft value set.");
+            Assert.IsFalse(allText.Contains("The reusable invariant text"), "External element content must not be indexed in the draft value set.");
+        }
 
         void AssertIndexValues(string culture, string variantText)
         {
