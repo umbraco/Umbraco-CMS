@@ -213,6 +213,7 @@ export class UiBaseLocators extends BasePage {
   public readonly collectionTreeItemTableRow: Locator;
   public readonly createActionButtonCollection: Locator;
   public readonly createActionBtn: Locator;
+  public readonly createActionExpandSymbol: Locator;
   public readonly createOptionActionListModal: Locator;
   public readonly clearSelectionBtn: Locator;
   public readonly collectionSelectionActions: Locator;
@@ -567,6 +568,9 @@ export class UiBaseLocators extends BasePage {
     this.createActionBtn = page
       .locator("umb-collection-create-action-button")
       .locator('[label="Create"]');
+    this.createActionExpandSymbol = page
+      .locator("umb-collection-create-action-button")
+      .locator("uui-symbol-expand");
     this.createOptionActionListModal = page.locator(
       "umb-entity-create-option-action-list-modal",
     );
@@ -1758,6 +1762,10 @@ export class UiBaseLocators extends BasePage {
   }
 
   async clickCreateActionWithOptionName(optionName: string) {
+    // Before its options load the button renders a single-option variant whose click
+    // executes that option directly instead of opening a menu. Wait for the multi-option
+    // dropdown (its expand chevron) so the click opens the options menu.
+    await this.waitForVisible(this.createActionExpandSymbol);
     await this.clickCreateActionButton();
     const createOptionLocator = this.createActionButtonCollection.locator(
       '[label="' + optionName + '"], [label="' + optionName + '..."]',
