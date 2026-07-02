@@ -441,7 +441,9 @@ export class UmbTreeItemChildrenManager<
 		};
 
 		const offsetPaging: UmbOffsetPaginationRequestModel = {
-			skip: this.offsetPagination.getSkip(),
+			// Derive skip from the already-loaded children rather than the page counter: the page number
+			// is only advanced after this request completes, so reading it here would trail by one page.
+			skip: this.#children.getValue().length,
 			take: this.offsetPagination.getPageSize(),
 		};
 

@@ -13,21 +13,26 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { aTimeout, expect } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 
-type RequestCall = { parentUnique: string | null };
+type RequestCall = { parentUnique: string | null; skip?: number; take?: number };
 
 class UmbTestTreeRepository {
 	public itemsOfCalls: Array<RequestCall> = [];
 	public rootCalls = 0;
 	public items: Array<UmbTreeItemModel> = [];
+	public total?: number;
 
 	async requestTreeItemsOf(args: any) {
-		this.itemsOfCalls.push({ parentUnique: args.parent.unique });
-		return { data: { items: this.items, total: this.items.length, totalBefore: 0, totalAfter: 0 } };
+		this.itemsOfCalls.push({ parentUnique: args.parent.unique, skip: args.skip, take: args.take });
+		return {
+			data: { items: this.items, total: this.total ?? this.items.length, totalBefore: 0, totalAfter: 0 },
+		};
 	}
 
 	async requestTreeRootItems() {
 		this.rootCalls++;
-		return { data: { items: this.items, total: this.items.length, totalBefore: 0, totalAfter: 0 } };
+		return {
+			data: { items: this.items, total: this.total ?? this.items.length, totalBefore: 0, totalAfter: 0 },
+		};
 	}
 }
 
@@ -192,6 +197,45 @@ describe('UmbTreeItemChildrenManager', () => {
 			await aTimeout(0);
 
 			expect(repository.itemsOfCalls.length).to.equal(1);
+		});
+	});
+
+	describe('load next children', () => {
+		const parentFolder: UmbTreeItemModel = {
+			unique: 'parent-folder-id',
+			entityType: 'test-entity-type',
+			name: 'Parent Folder',
+			hasChildren: true,
+			isFolder: true,
+			parent: { unique: null, entityType: 'test-root-entity-type' },
+		};
+
+		const firstPage: Array<UmbTreeItemModel> = Array.from({ length: 3 }, (_, i) => ({
+			unique: `child-${i}`,
+			entityType: 'test-entity-type',
+			name: `Child ${i}`,
+			hasChildren: false,
+			isFolder: false,
+			parent: { unique: parentFolder.unique, entityType: parentFolder.entityType },
+		}));
+
+		it('requests the next slice using the loaded item count as skip on the first "load more"', async () => {
+			// More items exist on the server than the first page, so "load more" is meaningful.
+			repository.items = firstPage;
+			repository.total = 10;
+			manager.setTakeSize(firstPage.length);
+			manager.setTreeItem(parentFolder);
+
+			await manager.loadChildren();
+			expect(repository.itemsOfCalls.length).to.equal(1);
+			expect(repository.itemsOfCalls[0].skip).to.equal(0);
+
+			await manager.loadNextChildren();
+
+			// The page counter is only advanced after the request completes, so deriving skip from it
+			// would re-request page 1 (skip 0). It must instead reflect the already-loaded children.
+			expect(repository.itemsOfCalls.length).to.equal(2);
+			expect(repository.itemsOfCalls[1].skip).to.equal(firstPage.length);
 		});
 	});
 });
