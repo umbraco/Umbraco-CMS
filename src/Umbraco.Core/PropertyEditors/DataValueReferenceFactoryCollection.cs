@@ -25,30 +25,14 @@ public class DataValueReferenceFactoryCollection : BuilderCollectionBase<IDataVa
 
     /// <summary>
     /// Gets all unique references from the specified properties.
-    /// Includes both <see cref="IPropertyValue.EditedValue" /> and <see cref="IPropertyValue.PublishedValue" /> for each property.
     /// </summary>
     /// <param name="properties">The properties.</param>
     /// <param name="propertyEditors">The property editors.</param>
+    /// <param name="trackPublishedValues">Whether to include <see cref="IPropertyValue.PublishedValue" /> when collecting references (disable to avoid stale published values on unpublished entities).</param>
     /// <returns>
     /// The unique references from the specified properties.
     /// </returns>
-    public ISet<UmbracoEntityReference> GetAllReferences(IPropertyCollection properties, PropertyEditorCollection propertyEditors)
-        => GetAllReferences(properties, propertyEditors, trackPublishedValues: true);
-
-    /// <summary>
-    /// Gets all unique references from the specified properties.
-    /// </summary>
-    /// <param name="properties">The properties.</param>
-    /// <param name="propertyEditors">The property editors.</param>
-    /// <param name="trackPublishedValues">
-    /// When <c>true</c>, both <see cref="IPropertyValue.EditedValue" /> and <see cref="IPropertyValue.PublishedValue" /> are included.
-    /// When <c>false</c>, only <see cref="IPropertyValue.EditedValue" /> is included — use this for unpublished content
-    /// to avoid retaining stale relations from the previously-published property snapshot.
-    /// </param>
-    /// <returns>
-    /// The unique references from the specified properties.
-    /// </returns>
-    public ISet<UmbracoEntityReference> GetAllReferences(IPropertyCollection properties, PropertyEditorCollection propertyEditors, bool trackPublishedValues)
+    public ISet<UmbracoEntityReference> GetAllReferences(IPropertyCollection properties, PropertyEditorCollection propertyEditors, bool trackPublishedValues = true)
     {
         var references = new HashSet<UmbracoEntityReference>();
 

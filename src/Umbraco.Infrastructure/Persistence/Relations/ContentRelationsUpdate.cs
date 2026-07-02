@@ -94,13 +94,12 @@ internal sealed class ContentRelationsUpdate :
 
     private void PersistRelations(IScope scope, IContentBase entity)
     {
-        // When we are working with a IContent node that are published we need to track both the editedValues and publishedValues to GetAllReferences
-        // But for IMember and IMedia witch don´t have a published state we can exclude the publishedValues
-        // But also for IContent witch are unpublished, we only need to consider the editedValues to aviod stale publishedValues data.
-        var trackPublishedValues = entity is IContent content && content.Published;
+        // Track PublishedValue only for entities that have a published state and are currently published.
+        // For unpublished entities (or entities without a published state) we only track EditedValue to avoid stale PublishedValue relations.
+        var trackPublishedValues = entity is IPublishableContentBase publishable && publishable.Published;
 
         // Get all references and automatic relation type aliases.
-        ISet <UmbracoEntityReference> references = _dataValueReferenceFactories.GetAllReferences(entity.Properties, _propertyEditors, trackPublishedValues);
+        ISet<UmbracoEntityReference> references = _dataValueReferenceFactories.GetAllReferences(entity.Properties, _propertyEditors, trackPublishedValues);
         ISet<string> automaticRelationTypeAliases = _dataValueReferenceFactories.GetAllAutomaticRelationTypesAliases(_propertyEditors);
 
         if (references.Count == 0)
