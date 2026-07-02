@@ -583,19 +583,19 @@ export abstract class UmbBlockEntryContext<
 			'observeWorkspacePath',
 		);
 
-		this.observe(
-			mergeObservables(
-				[this.contentElementTypeKey, this._entries!.libraryAllowedElementTypeKeys],
-				([contentElementTypeKey, libraryAllowedElementTypeKeys]) =>
-					contentElementTypeKey === undefined
-						? undefined
-						: libraryAllowedElementTypeKeys.includes(contentElementTypeKey),
-			),
-			(isAllowedInLibrary) => {
-				this.#isAllowedInLibrary.setValue(isAllowedInLibrary);
-			},
-			'observeIsAllowedInLibrary',
-		);
+		if (this._entries) {
+			this.observe(
+				mergeObservables(
+					[this.contentElementTypeKey, this._entries.libraryAllowedElementTypeKeys],
+					([contentElementTypeKey, libraryAllowedElementTypeKeys]) =>
+						contentElementTypeKey ? libraryAllowedElementTypeKeys.includes(contentElementTypeKey) : undefined,
+				),
+				(isAllowedInLibrary) => {
+					this.#isAllowedInLibrary.setValue(isAllowedInLibrary);
+				},
+				'observeIsAllowedInLibrary',
+			);
+		}
 
 		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
 			.addAdditionalPath('element')

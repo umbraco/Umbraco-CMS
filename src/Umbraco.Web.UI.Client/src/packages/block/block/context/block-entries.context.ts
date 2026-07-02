@@ -37,7 +37,7 @@ export abstract class UmbBlockEntriesContext<
 
 	#libraryAllowedElementTypeKeys = new UmbArrayState<string>([], (x) => x);
 	readonly libraryAllowedElementTypeKeys = this.#libraryAllowedElementTypeKeys.asObservable();
-	#libraryAllowedLoaded: Promise<void>;
+	#libraryAllowedElementTypeKeysPromise: Promise<Array<string>>;
 
 	getLength() {
 		return this._layoutEntries.getValue().length;
@@ -60,15 +60,15 @@ export abstract class UmbBlockEntriesContext<
 			this._gotBlockManager();
 		}).asPromise({ preventTimeout: true });
 
-		this.#libraryAllowedLoaded = this.#loadLibraryAllowedElementTypeKeys();
+		this.#libraryAllowedElementTypeKeysPromise = this.#loadLibraryAllowedElementTypeKeys();
 	}
 
-	async #loadLibraryAllowedElementTypeKeys() {
+	async #loadLibraryAllowedElementTypeKeys(): Promise<Array<string>> {
 		const repo = new UmbElementTypeStructureRepository(this);
 		const { data: allowedTypes } = await repo.requestAllowedChildrenOf(null, null);
-		this.#libraryAllowedElementTypeKeys.setValue(
-			allowedTypes?.items.filter((t) => t.unique).map((t) => t.unique!) ?? [],
-		);
+		const keys = allowedTypes?.items.filter((t) => t.unique).map((t) => t.unique!) ?? [];
+		this.#libraryAllowedElementTypeKeys.setValue(keys);
+		return keys;
 	}
 
 	async getManager() {
@@ -114,9 +114,9 @@ export abstract class UmbBlockEntriesContext<
 	 * @returns {Promise<Array<string>>} The allowed element type uniques.
 	 */
 	protected async _getLibraryAllowedElementTypeKeys(blockTypes: Array<BlockType>): Promise<Array<string>> {
-		await this.#libraryAllowedLoaded;
+		const allowedKeys = await this.#libraryAllowedElementTypeKeysPromise;
 		const blockTypeKeys = new Set(blockTypes.map((bt) => bt.contentElementTypeKey));
-		return this.#libraryAllowedElementTypeKeys.getValue().filter((key) => blockTypeKeys.has(key));
+		return allowedKeys.filter((key) => blockTypeKeys.has(key));
 	}
 
 	public abstract create(
