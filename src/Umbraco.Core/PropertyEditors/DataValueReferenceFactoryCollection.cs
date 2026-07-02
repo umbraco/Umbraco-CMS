@@ -28,10 +28,11 @@ public class DataValueReferenceFactoryCollection : BuilderCollectionBase<IDataVa
     /// </summary>
     /// <param name="properties">The properties.</param>
     /// <param name="propertyEditors">The property editors.</param>
+    /// <param name="trackPublishedValues">Flag to excluded the PublishedValue to aviod stale date in unpublished nodes.</param>
     /// <returns>
     /// The unique references from the specified properties.
     /// </returns>
-    public ISet<UmbracoEntityReference> GetAllReferences(IPropertyCollection properties, PropertyEditorCollection propertyEditors)
+    public ISet<UmbracoEntityReference> GetAllReferences(IPropertyCollection properties, PropertyEditorCollection propertyEditors, bool trackPublishedValues = true)
     {
         var references = new HashSet<UmbracoEntityReference>();
 
@@ -48,7 +49,11 @@ public class DataValueReferenceFactoryCollection : BuilderCollectionBase<IDataVa
             foreach (IPropertyValue propertyValue in propertyValuesByPropertyEditorAlias.SelectMany(x => x))
             {
                 values.Add(propertyValue.EditedValue);
-                values.Add(propertyValue.PublishedValue);
+
+                if (trackPublishedValues)
+                {
+                    values.Add(propertyValue.PublishedValue);
+                }
             }
 
             references.UnionWith(GetReferences(dataEditor, values, propertyValuesByPropertyEditorAlias.Key));
