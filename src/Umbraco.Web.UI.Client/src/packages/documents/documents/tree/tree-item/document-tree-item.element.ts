@@ -57,7 +57,9 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 	override _renderExpandSymbol = () => {
 		// If this in the menu and it is a collection, then we will enforce the user to the Collection view instead of expanding.
 		// `this._forceShowExpand` is equivalent to hasCollection for this element.
-		if (this._isMenu && this._forceShowExpand) {
+		// Exception: a "no access" collection is an ancestor of the user's start node, so it must stay
+		// expandable in the tree (render the normal caret) to let the user browse down to it.
+		if (this._isMenu && this._forceShowExpand && !this._noAccess) {
 			return html`<umb-icon data-mark="open-collection" name="icon-list" style="font-size: 8px;"></umb-icon>`;
 		} else {
 			return undefined;

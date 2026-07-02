@@ -4,7 +4,7 @@ namespace Umbraco.Cms.Core.Cache;
 /// Estimates the total size of a large collection by sizing a bounded sample and extrapolating across the
 /// full count, so a per-tick size diagnostic does not pay an O(n) cost on very large caches.
 /// </summary>
-internal static class SampledSizeEstimator
+public static class SampledSizeEstimator
 {
     /// <summary>
     /// Sizes up to <paramref name="maxSample" /> items from <paramref name="items" /> and scales the sampled

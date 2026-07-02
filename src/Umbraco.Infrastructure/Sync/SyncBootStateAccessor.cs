@@ -44,7 +44,7 @@ public class SyncBootStateAccessor : ISyncBootStateAccessor
     /// <summary>
     /// Returns the current synchronization boot state, initializing it if it has not already been created.
     /// </summary>
-    /// <returns>The <see cref="Umbraco.Cms.Infrastructure.Sync.SyncBootState"/> representing the current synchronization boot state.</returns>
+    /// <returns>The <see cref="SyncBootState"/> representing the current synchronization boot state.</returns>
     public SyncBootState GetSyncBootState()
         => LazyInitializer.EnsureInitialized(
             ref _syncBootState,
