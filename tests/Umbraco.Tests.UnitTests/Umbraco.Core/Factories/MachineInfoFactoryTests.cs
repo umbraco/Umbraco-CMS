@@ -1,6 +1,3 @@
-// Copyright (c) Umbraco.
-// See LICENSE for more details.
-
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
@@ -13,19 +10,6 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Factories;
 [TestFixture]
 public class MachineInfoFactoryTests
 {
-    private string? _savedWebsiteInstanceId;
-
-    [SetUp]
-    public void SetUp()
-    {
-        _savedWebsiteInstanceId = Environment.GetEnvironmentVariable(MachineInfoFactory.AzureWebsiteInstanceIdEnvironmentVariable);
-        Environment.SetEnvironmentVariable(MachineInfoFactory.AzureWebsiteInstanceIdEnvironmentVariable, null);
-    }
-
-    [TearDown]
-    public void TearDown() =>
-        Environment.SetEnvironmentVariable(MachineInfoFactory.AzureWebsiteInstanceIdEnvironmentVariable, _savedWebsiteInstanceId);
-
     [Test]
     public void BuildMachineIdentifier_WithNoSiteName_ReturnsMachineNameOnly()
     {
@@ -55,96 +39,49 @@ public class MachineInfoFactoryTests
     }
 
     [Test]
-    public void GetMachineIdentifier_WithNoSiteName_ReturnsSameResultAsBuildMachineIdentifier()
+    public void GetMachineIdentifier_UsesFirstNonNullProvider()
     {
-        var factory = CreateFactory(siteName: null);
-        var result = factory.GetMachineIdentifier();
-        Assert.AreEqual(MachineInfoFactory.BuildMachineIdentifier(Environment.MachineName, null), result);
+        var factory = CreateFactory(siteName: null, Provider(null), Provider("second-provider"));
+        Assert.AreEqual("second-provider", factory.GetMachineIdentifier());
     }
 
     [Test]
-    public void GetMachineIdentifier_WithEmptySiteName_ReturnsSameResultAsBuildMachineIdentifier()
+    public void GetMachineIdentifier_AppendsSiteNameToProviderResult()
     {
-        var factory = CreateFactory(siteName: string.Empty);
-        var result = factory.GetMachineIdentifier();
-        Assert.AreEqual(MachineInfoFactory.BuildMachineIdentifier(Environment.MachineName, string.Empty), result);
+        var factory = CreateFactory(siteName: "site1", Provider("base-id"));
+        Assert.AreEqual("base-id/site1", factory.GetMachineIdentifier());
     }
 
     [Test]
-    public void GetMachineIdentifier_WithWhitespaceSiteName_ReturnsSameResultAsBuildMachineIdentifier()
+    public void GetMachineIdentifier_WhenAllProvidersReturnNull_ThrowsInvalidOperationException()
     {
-        var factory = CreateFactory(siteName: "   ");
-        var result = factory.GetMachineIdentifier();
-        Assert.AreEqual(MachineInfoFactory.BuildMachineIdentifier(Environment.MachineName, "   "), result);
-    }
-
-    [Test]
-    public void GetMachineIdentifier_WithSiteName_ReturnsSameResultAsBuildMachineIdentifier()
-    {
-        var factory = CreateFactory(siteName: "site1");
-        var result = factory.GetMachineIdentifier();
-        Assert.AreEqual(MachineInfoFactory.BuildMachineIdentifier(Environment.MachineName, "site1"), result);
-    }
-
-    [Test]
-    public void GetMachineIdentifier_WithSiteNameThatExceedsMaxLength_ThrowsInvalidOperationException()
-    {
-        var siteName = new string('x', MachineInfoFactory.MaxMachineIdentifierLength);
-
-        var factory = CreateFactory(siteName);
-
+        var factory = CreateFactory(siteName: null, Provider(null), Provider(null));
         Assert.Throws<InvalidOperationException>(() => factory.GetMachineIdentifier());
     }
 
     [Test]
-    public void GetMachineIdentifier_WithMachineIdentifier_ReturnsMachineIdentifierDirectly()
+    public void GetMachineIdentifier_WhenIdentifierExceedsMaxLength_ThrowsInvalidOperationException()
     {
-        var factory = CreateFactory(siteName: null, machineIdentifier: "my-stable-id");
-        Assert.AreEqual("my-stable-id", factory.GetMachineIdentifier());
-    }
-
-    [Test]
-    public void GetMachineIdentifier_WithMachineIdentifier_AppendsSiteName()
-    {
-        var factory = CreateFactory(siteName: "site1", machineIdentifier: "my-stable-id");
-        Assert.AreEqual("my-stable-id/site1", factory.GetMachineIdentifier());
-    }
-
-    [Test]
-    public void GetMachineIdentifier_WithMachineIdentifierThatExceedsMaxLength_ThrowsInvalidOperationException()
-    {
-        var factory = CreateFactory(siteName: null, machineIdentifier: new string('x', MachineInfoFactory.MaxMachineIdentifierLength + 1));
+        var factory = CreateFactory(siteName: null, Provider(new string('x', MachineInfoFactory.MaxMachineIdentifierLength + 1)));
         Assert.Throws<InvalidOperationException>(() => factory.GetMachineIdentifier());
     }
 
     [Test]
-    public void GetMachineIdentifier_WithWebsiteInstanceId_UsesInstanceId()
+    public void GetMachineIdentifier_WhenCombinedWithSiteNameExceedsMaxLength_ThrowsInvalidOperationException()
     {
-        Environment.SetEnvironmentVariable(MachineInfoFactory.AzureWebsiteInstanceIdEnvironmentVariable, "abc123instanceid");
-        var factory = CreateFactory(siteName: null);
-        Assert.AreEqual("abc123instanceid", factory.GetMachineIdentifier());
+        var factory = CreateFactory(
+            siteName: new string('s', MachineInfoFactory.MaxMachineIdentifierLength),
+            Provider(new string('x', MachineInfoFactory.MaxMachineIdentifierLength)));
+        Assert.Throws<InvalidOperationException>(() => factory.GetMachineIdentifier());
     }
 
-    [Test]
-    public void GetMachineIdentifier_WithWebsiteInstanceIdAndSiteName_UsesInstanceIdSlashSiteName()
-    {
-        Environment.SetEnvironmentVariable(MachineInfoFactory.AzureWebsiteInstanceIdEnvironmentVariable, "abc123instanceid");
-        var factory = CreateFactory(siteName: "mysite");
-        Assert.AreEqual("abc123instanceid/mysite", factory.GetMachineIdentifier());
-    }
+    private static IMachineIdentityProvider Provider(string? value)
+        => Mock.Of<IMachineIdentityProvider>(p => p.GetMachineIdentifier() == value);
 
-    [Test]
-    public void GetMachineIdentifier_WithMachineIdentifierAndWebsiteInstanceId_PrefersMachineIdentifier()
+    private static MachineInfoFactory CreateFactory(string? siteName, params IMachineIdentityProvider[] providers)
     {
-        Environment.SetEnvironmentVariable(MachineInfoFactory.AzureWebsiteInstanceIdEnvironmentVariable, "abc123instanceid");
-        var factory = CreateFactory(siteName: null, machineIdentifier: "explicit-override");
-        Assert.AreEqual("explicit-override", factory.GetMachineIdentifier());
-    }
-
-    private static MachineInfoFactory CreateFactory(string? siteName, string? machineIdentifier = null)
-    {
-        var hostingEnvironment = Mock.Of<IHostingEnvironment>();
-        var hostingSettings = Options.Create(new HostingSettings { SiteName = siteName, MachineIdentifier = machineIdentifier });
-        return new MachineInfoFactory(hostingEnvironment, hostingSettings);
+        var collection = new MachineIdentityProviderCollection(() => providers);
+        var settings = Options.Create(new HostingSettings { SiteName = siteName });
+        return new MachineInfoFactory(Mock.Of<IHostingEnvironment>(), collection, settings);
     }
 }
