@@ -2,60 +2,55 @@ import { umbUrlPatternToString } from './url-pattern-to-string.function.js';
 import { expect } from '@open-wc/testing';
 
 describe('umbUrlPatternToString', () => {
-	describe('when params is null', () => {
-		it('should return the pattern unchanged', () => {
-			expect(umbUrlPatternToString('/section/:id/edit', null)).to.eq('/section/:id/edit');
-		});
-
-		it('should return a pattern without parameters unchanged', () => {
-			expect(umbUrlPatternToString('/section/dashboard', null)).to.eq('/section/dashboard');
-		});
+	it('replaces a single parameter with its value', () => {
+		expect(umbUrlPatternToString('/section/:id', { id: '123' })).to.equal('/section/123');
 	});
 
-	describe('parameter replacement', () => {
-		it('should replace a single parameter with its value', () => {
-			expect(umbUrlPatternToString('/section/:id', { id: '123' })).to.eq('/section/123');
-		});
-
-		it('should replace multiple parameters with their values', () => {
-			expect(umbUrlPatternToString('/:section/:id/edit', { section: 'content', id: '123' })).to.eq(
-				'/content/123/edit',
-			);
-		});
-
-		it('should leave the pattern unchanged when it has no parameters', () => {
-			expect(umbUrlPatternToString('/section/dashboard', { id: '123' })).to.eq('/section/dashboard');
-		});
-
-		it('should replace a parameter that spans the rest of a path segment', () => {
-			expect(umbUrlPatternToString('/section/:entityType', { entityType: 'document-type' })).to.eq(
-				'/section/document-type',
-			);
-		});
+	it('replaces multiple parameters with their values', () => {
+		expect(umbUrlPatternToString('/:section/:id/edit', { section: 'content', id: '123' })).to.equal(
+			'/content/123/edit',
+		);
 	});
 
-	describe('value coercion', () => {
-		it('should coerce a number value to a string', () => {
-			expect(umbUrlPatternToString('/page/:index', { index: 42 })).to.eq('/page/42');
-		});
-
-		it('should call toString on an object value', () => {
-			const value = { toString: () => 'custom' };
-			expect(umbUrlPatternToString('/section/:id', { id: value })).to.eq('/section/custom');
-		});
-
-		it('should render a null value as the string "null"', () => {
-			expect(umbUrlPatternToString('/section/:id', { id: null })).to.eq('/section/null');
-		});
+	it('replaces a parameter that spans the rest of a path segment', () => {
+		expect(umbUrlPatternToString('/section/:entityType', { entityType: 'document-type' })).to.equal(
+			'/section/document-type',
+		);
 	});
 
-	describe('missing parameters', () => {
-		it('should keep the literal token when the value is undefined', () => {
-			expect(umbUrlPatternToString('/section/:id', {})).to.eq('/section/:id');
-		});
+	it('matches parameter names containing underscores and hyphens', () => {
+		expect(umbUrlPatternToString('/section/:user_id-foo', { 'user_id-foo': 'bar' })).to.equal('/section/bar');
+	});
 
-		it('should replace known parameters and keep unknown ones literal', () => {
-			expect(umbUrlPatternToString('/:section/:id', { section: 'content' })).to.eq('/content/:id');
-		});
+	it('coerces a number value to a string', () => {
+		expect(umbUrlPatternToString('/page/:index', { index: 42 })).to.equal('/page/42');
+	});
+
+	it('calls toString on an object value', () => {
+		expect(umbUrlPatternToString('/section/:id', { id: { toString: () => 'custom' } })).to.equal('/section/custom');
+	});
+
+	it('renders a null value as the string "null"', () => {
+		expect(umbUrlPatternToString('/section/:id', { id: null })).to.equal('/section/null');
+	});
+
+	it('keeps the literal token when the value is undefined', () => {
+		expect(umbUrlPatternToString('/section/:id', {})).to.equal('/section/:id');
+	});
+
+	it('replaces known parameters and keeps unknown ones literal', () => {
+		expect(umbUrlPatternToString('/:section/:id', { section: 'content' })).to.equal('/content/:id');
+	});
+
+	it('leaves the pattern unchanged when it has no parameters', () => {
+		expect(umbUrlPatternToString('/section/dashboard', { id: '123' })).to.equal('/section/dashboard');
+	});
+
+	it('returns the pattern unchanged when params is null', () => {
+		expect(umbUrlPatternToString('/section/:id/edit', null)).to.equal('/section/:id/edit');
+	});
+
+	it('returns a pattern without parameters unchanged when params is null', () => {
+		expect(umbUrlPatternToString('/section/dashboard', null)).to.equal('/section/dashboard');
 	});
 });
