@@ -28,7 +28,7 @@ public class DataValueReferenceFactoryCollection : BuilderCollectionBase<IDataVa
     /// </summary>
     /// <param name="properties">The properties.</param>
     /// <param name="propertyEditors">The property editors.</param>
-    /// <param name="trackPublishedValues">Flag to excluded the PublishedValue to aviod stale date in unpublished nodes.</param>
+    /// <param name="trackPublishedValues">Whether to include <see cref="IPropertyValue.PublishedValue" /> when collecting references (disable to avoid stale published values on unpublished entities).</param>
     /// <returns>
     /// The unique references from the specified properties.
     /// </returns>
