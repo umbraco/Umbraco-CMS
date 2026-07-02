@@ -35,7 +35,6 @@ export class UmbDocumentTreeItemContext extends UmbDefaultTreeItemContext<
 	// TODO: Move to API
 	readonly ancestors = this._treeItem.asObservablePart((item) => item?.ancestors ?? []);
 	readonly isTrashed = this._treeItem.asObservablePart((item) => item?.isTrashed ?? false);
-	readonly noAccess = this._treeItem.asObservablePart((item) => item?.noAccess ?? false);
 
 	// A collection is only browsed via its Collection view when the user can actually access it.
 	// When the node is a "no access" ancestor of the user's start node, it must remain expandable
