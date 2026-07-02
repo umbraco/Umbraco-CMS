@@ -1,68 +1,25 @@
-import { UmbElementVariantState } from '../variant-state.js';
 import type { UmbElementVariantOptionModel } from '../types.js';
 import { sortVariants } from '../utils.js';
 import { UMB_ELEMENT_PUBLISHING_WORKSPACE_CONTEXT } from '../publishing/index.js';
-import { customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbWorkspaceSplitViewVariantSelectorElement } from '@umbraco-cms/backoffice/workspace';
+import { customElement } from '@umbraco-cms/backoffice/external/lit';
+import { UmbPublishableSplitViewVariantSelectorElement } from '@umbraco-cms/backoffice/content';
+import type { UmbEntityVariantModel, UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';
 
 @customElement('umb-element-workspace-split-view-variant-selector')
-export class UmbElementWorkspaceSplitViewVariantSelectorElement extends UmbWorkspaceSplitViewVariantSelectorElement<UmbElementVariantOptionModel> {
-	protected override _variantSorter = sortVariants;
+export class UmbElementWorkspaceSplitViewVariantSelectorElement extends UmbPublishableSplitViewVariantSelectorElement<
+	UmbElementVariantOptionModel,
+	typeof UMB_ELEMENT_PUBLISHING_WORKSPACE_CONTEXT.TYPE
+> {
+	// UmbElementVariantOptionModel is an empty interface, so TypeScript widens the inherited
+	// _variantSorter parameter to the base UmbEntityVariantOptionModel constraint. Declare the
+	// override with that signature and delegate to the element-specific sorter.
+	protected override _variantSorter = (
+		a: UmbEntityVariantOptionModel<UmbEntityVariantModel>,
+		b: UmbEntityVariantOptionModel<UmbEntityVariantModel>,
+	): number => sortVariants(a as UmbElementVariantOptionModel, b as UmbElementVariantOptionModel);
 
-	@state()
-	private _variantsWithPendingChanges: Array<any> = [];
-
-	#elementPublishingWorkspaceContext?: typeof UMB_ELEMENT_PUBLISHING_WORKSPACE_CONTEXT.TYPE;
-
-	#publishStateLocalizationMap = {
-		[UmbElementVariantState.DRAFT]: 'content_unpublished',
-		[UmbElementVariantState.PUBLISHED]: 'content_published',
-		// TODO: The pending changes state can be removed once the management Api removes this state
-		// We only keep it here to make typescript happy
-		// We should also make our own state model for this
-		[UmbElementVariantState.PUBLISHED_PENDING_CHANGES]: 'content_published',
-		[UmbElementVariantState.NOT_CREATED]: 'content_notCreated',
-		[UmbElementVariantState.TRASHED]: 'mediaPicker_trashed',
-	};
-
-	constructor() {
-		super();
-		this.consumeContext(UMB_ELEMENT_PUBLISHING_WORKSPACE_CONTEXT, (instance) => {
-			this.#elementPublishingWorkspaceContext = instance;
-			this.#observePendingChanges();
-		});
-	}
-
-	#observePendingChanges() {
-		this.observe(
-			this.#elementPublishingWorkspaceContext?.publishedPendingChanges.variantsWithChanges,
-			(variants) => {
-				this._variantsWithPendingChanges = variants || [];
-			},
-			'_observePendingChanges',
-		);
-	}
-
-	#hasPendingChanges(variant: UmbElementVariantOptionModel) {
-		return this._variantsWithPendingChanges.some((x) => x.variantId.compare(variant));
-	}
-
-	#getVariantState(variantOption: UmbElementVariantOptionModel) {
-		let term = this.#publishStateLocalizationMap[variantOption.variant?.state || UmbElementVariantState.NOT_CREATED];
-
-		if (
-			(variantOption.variant?.state === UmbElementVariantState.PUBLISHED ||
-				variantOption.variant?.state === UmbElementVariantState.PUBLISHED_PENDING_CHANGES) &&
-			this.#hasPendingChanges(variantOption)
-		) {
-			term = 'content_publishedPendingChanges';
-		}
-
-		return this.localize.term(term);
-	}
-
-	protected override _renderVariantDetails(variantOption: UmbElementVariantOptionModel) {
-		return html`${this.#getVariantState(variantOption)}`;
+	protected override getPublishingContextToken() {
+		return UMB_ELEMENT_PUBLISHING_WORKSPACE_CONTEXT;
 	}
 }
 

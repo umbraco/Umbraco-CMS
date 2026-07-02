@@ -351,31 +351,49 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 		const entityType = this.#elementWorkspaceContext.getEntityType();
 		if (!entityType) throw new Error('Entity type is missing');
 
-		await this.#elementWorkspaceContext.performCreateOrUpdate(variantIds, saveData);
+		// The publish already succeeded server-side once we reach the read-back; a failed read-back must not be
+		// reported as a publish failure, so we fall back to the submitted data and flag the editor as stale.
+		let reloadAfterPublishFailed = false;
+		const loadAfterPublish = async (): Promise<UmbElementDetailModel> => {
+			try {
+				return await this.#elementWorkspaceContext!.loadWithoutPersist();
+			} catch {
+				reloadAfterPublishFailed = true;
+				return saveData;
+			}
+		};
 
-		const { error } = await this.#publishingRepository.publish(
-			unique,
-			variantIds.map((variantId) => ({ variantId })),
-		);
+		await this.#elementWorkspaceContext.performCreateOrUpdate(variantIds, saveData, {
+			create: async (data, ids, parent) => {
+				const { error } = await this.#publishingRepository.createAndPublish(data, ids, parent.unique);
+				if (error) throw new Error('Error creating and publishing element', { cause: error });
+				return loadAfterPublish();
+			},
+			update: async (data, ids) => {
+				const { error } = await this.#publishingRepository.updateAndPublish(data, ids);
+				if (error) throw new Error('Error updating and publishing element', { cause: error });
+				return loadAfterPublish();
+			},
+		});
 
-		if (!error) {
-			this.#notificationContext?.peek('positive', {
-				data: { message: this.#localize.term('speechBubbles_editElementPublishedHeader') },
+		this.#notificationContext?.peek('positive', {
+			data: {
+				message: this.#localize.term('speechBubbles_editElementPublishedHeader'),
+			},
+		});
+
+		if (reloadAfterPublishFailed) {
+			this.#notificationContext?.peek('warning', {
+				data: {
+					message: this.#localize.term('speechBubbles_editElementPublishedReloadFailed'),
+				},
 			});
-
-			// Clear stale published data and pending changes state so the
-			// persistedData observer does not run a comparison against outdated
-			// data during reload, which would briefly show a false-positive
-			// "pending changes" state.
-			this.#clear();
-
-			// reload the element so all states are updated after the publish operation
-			await this.#elementWorkspaceContext.reload();
-			await this.#loadAndProcessLastPublished();
-
-			const event = new UmbRequestReloadStructureForEntityEvent({ unique, entityType });
-			this.#eventContext?.dispatchEvent(event);
 		}
+
+		await this.#loadAndProcessLastPublished();
+
+		const event = new UmbRequestReloadStructureForEntityEvent({ unique, entityType });
+		this.#eventContext?.dispatchEvent(event);
 	}
 
 	#publishableVariantsFilter = (option: UmbElementVariantOptionModel) => {

@@ -388,6 +388,12 @@
     <Compile Update="Umbraco.Infrastructure\Services\ElementEditingServiceTests.Restore.cs">
       <DependentUpon>ElementEditingServiceTests.cs</DependentUpon>
     </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\ElementEditingServiceTests.CreateAndPublish.cs">
+      <DependentUpon>ElementEditingServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\ElementEditingServiceTests.UpdateAndPublish.cs">
+      <DependentUpon>ElementEditingServiceTests.cs</DependentUpon>
+    </Compile>
     <Compile Update="Umbraco.Infrastructure\Services\ElementContainerServiceTests.Restore.cs">
       <DependentUpon>ElementContainerServiceTests.cs</DependentUpon>
     </Compile>
