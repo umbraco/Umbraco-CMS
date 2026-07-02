@@ -848,8 +848,10 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   async clickSaveAndPublishButtonAndWaitForContentToBeUpdated() {
+    // Wait for the publish call, not the save: save-and-publish fires PUT /document/{id}
+    // then PUT /document/{id}/publish, so waiting on /document returns mid-publish.
     return await this.waitForResponseAfterExecutingPromise(
-      ConstantHelper.apiEndpoints.document,
+      '/publish',
       this.clickSaveAndPublishButton(),
       ConstantHelper.statusCodes.ok,
     );
@@ -857,7 +859,7 @@ export class ContentUiHelper extends UiBaseLocators {
 
   async clickSaveAndPublishButtonAndWaitForContentToBePublished() {
     return await this.waitForResponseAfterExecutingPromise(
-      ConstantHelper.apiEndpoints.document,
+      '/publish',
       this.clickSaveAndPublishButton(),
       ConstantHelper.statusCodes.ok,
     );
