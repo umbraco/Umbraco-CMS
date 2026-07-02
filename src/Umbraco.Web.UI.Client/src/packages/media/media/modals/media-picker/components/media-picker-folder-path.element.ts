@@ -161,8 +161,8 @@ export class UmbMediaPickerFolderPathElement extends UmbLitElement {
 
 	#onSubmit(e: SubmitEvent) {
 		e.preventDefault();
-		const formData = new FormData(e.target as HTMLFormElement);
-		this.#addFolder(formData.get('folderName')?.toString());
+		const folderName = new FormData(e.target as HTMLFormElement).get('folderName');
+		this.#addFolder(typeof folderName === 'string' ? folderName : undefined);
 	}
 
 	async #addFolder(newName?: string) {
