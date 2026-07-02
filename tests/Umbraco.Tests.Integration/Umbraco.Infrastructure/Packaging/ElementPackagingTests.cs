@@ -32,7 +32,7 @@ internal sealed class ElementPackagingTests : UmbracoIntegrationTest
     private IPackageDataInstallation PackageDataInstallation => GetRequiredService<IPackageDataInstallation>();
 
     [Test]
-    public async Task Serialize_ElementType_Includes_AllowedInLibrary()
+    public async Task Can_Serialize_Element_Type_With_AllowedInLibrary()
     {
         var elementType = ContentTypeBuilder.CreateSimpleElementType("element1", "Element 1");
         await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
@@ -46,7 +46,7 @@ internal sealed class ElementPackagingTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Serialize_Element_Produces_Expected_Xml()
+    public async Task Can_Serialize_Element_To_Expected_Xml()
     {
         var elementType = ContentTypeBuilder.CreateSimpleElementType("element2", "Element 2");
         await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
