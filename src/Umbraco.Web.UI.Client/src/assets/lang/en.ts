@@ -2153,6 +2153,13 @@ export default {
 		advancedGroup: 'Advanced',
 		webhooks: 'Webhooks',
 	},
+	tree: {
+		classicViewLabel: 'Tree',
+		cardViewLabel: 'Cards',
+		tableViewLabel: 'Table',
+		children: 'Children',
+		noItems: 'No items',
+	},
 	update: {
 		updateAvailable: 'New update ready',
 		updateDownloadText: '%0% is ready, click here for download',

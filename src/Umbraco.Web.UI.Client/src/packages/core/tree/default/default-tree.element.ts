@@ -7,9 +7,17 @@ import type {
 } from '../types.js';
 import type { UmbTreeExpansionModel } from '../expansion-manager/types.js';
 import type { UmbDefaultTreeContext } from './default-tree.context.js';
-import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+
+import { css, customElement, html, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
+import { UmbInteractionMemoriesChangeEvent } from '@umbraco-cms/backoffice/interaction-memory';
+import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
+import { jsonStringComparison } from '@umbraco-cms/backoffice/observable-api';
+
+import '../components/tree-toolbar.element.js';
 
 @customElement('umb-default-tree')
 export class UmbDefaultTreeElement extends UmbLitElement {
@@ -26,7 +34,53 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 	}
 	public set api(value: UmbDefaultTreeContext<UmbTreeItemModel, UmbTreeRootModel> | undefined) {
 		this._api = value;
-		this.#observeData();
+		if (value) {
+			// Derive emptiness from the loaded children, not `hasChildren`: the latter is also written by the
+			// concurrent tree-root load (with the root's own child count), which can clobber the start node's value
+			// and intermittently hide the empty state.
+			this.observe(value.rootItems, (items) => (this._hasItems = (items?.length ?? 0) > 0), 'umbTreeRootItemsObserver');
+			// Track loading so the empty state isn't shown before the children have loaded, or while reloading.
+			this.observe(
+				value.isLoading,
+				(isLoading) => {
+					this._isLoading = isLoading ?? false;
+					if (isLoading) {
+						this.#hasBeenLoading = true;
+					} else if (this.#hasBeenLoading) {
+						this._initialLoadDone = true;
+					}
+				},
+				'umbTreeIsLoadingObserver',
+			);
+		}
+		if (value?.view) {
+			this.observe(
+				value.view.currentView,
+				async (manifest) => {
+					const element = manifest ? await createExtensionElement(manifest) : null;
+					if (element && 'manifest' in element) {
+						(element as HTMLElement & { manifest: unknown }).manifest = manifest;
+					}
+					this._viewElement = element;
+				},
+				'umbTreeCurrentViewObserver',
+			);
+		}
+		if (value?.interactionMemory) {
+			// Snapshot before forwarding so the first observer emission is not treated as a change.
+			this.#lastDispatchedMemories = this.interactionMemories ?? [];
+			this.interactionMemories?.forEach((m) => value.interactionMemory!.setMemory(m));
+			this.observe(
+				value.interactionMemory.memories,
+				(memories) => {
+					if (!jsonStringComparison(memories, this.#lastDispatchedMemories)) {
+						this.#lastDispatchedMemories = memories;
+						this.dispatchEvent(new UmbInteractionMemoriesChangeEvent());
+					}
+				},
+				'umbTreeInteractionMemoryObserver',
+			);
+		}
 	}
 
 	@property({ type: Object, attribute: false })
@@ -59,45 +113,30 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 	@property({ attribute: false })
 	expansion: UmbTreeExpansionModel = [];
 
-	@state()
-	private _rootItems: UmbTreeItemModel[] = [];
+	@property({ type: Boolean, attribute: 'show-toolbar' })
+	showToolbar: boolean = false;
+
+	@property({ type: Boolean, attribute: 'show-tree-actions' })
+	showTreeActions: boolean = false;
+
+	@property({ attribute: false })
+	interactionMemories?: Array<UmbInteractionMemoryModel>;
+
+	#lastDispatchedMemories: Array<UmbInteractionMemoryModel> = [];
 
 	@state()
-	private _treeRoot?: UmbTreeRootModel;
+	private _viewElement?: HTMLElement | null;
 
 	@state()
-	private _currentPage = 1;
+	private _hasItems = false;
 
 	@state()
-	private _hasPreviousItems = false;
+	private _isLoading = false;
 
 	@state()
-	private _hasNextItems = false;
+	private _initialLoadDone = false;
 
-	@state()
-	private _isLoadingPrevChildren = false;
-
-	@state()
-	private _isLoadingNextChildren = false;
-
-	#observeData() {
-		this.observe(this._api?.treeRoot, (treeRoot) => (this._treeRoot = treeRoot), '_observeTreeRoot');
-		this.observe(this._api?.rootItems, (rootItems) => (this._rootItems = rootItems ?? []), '_observeRootItems');
-		this.observe(this._api?.pagination.currentPage, (value) => (this._currentPage = value ?? 1), '_observeCurrentPage');
-		this.observe(this._api?.isLoadingPrevChildren, (value) => (this._isLoadingPrevChildren = value ?? false), '_observeIsLoadingPrevChildren');
-		this.observe(this._api?.isLoadingNextChildren, (value) => (this._isLoadingNextChildren = value ?? false), '_observeIsLoadingNextChildren');
-
-		this.observe(
-			this._api?.targetPagination?.totalPrevItems,
-			(value) => (this._hasPreviousItems = value ? value > 0 : false),
-			'_observeTotalPrevItems',
-		);
-		this.observe(
-			this._api?.targetPagination?.totalNextItems,
-			(value) => (this._hasNextItems = value ? value > 0 : false),
-			'_observeTotalNextItems',
-		);
-	}
+	#hasBeenLoading = false;
 
 	protected override async updated(
 		_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>,
@@ -105,12 +144,16 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 		super.updated(_changedProperties);
 		if (this._api === undefined) return;
 
+		if (_changedProperties.has('api')) {
+			this._api.loadTree();
+		}
+
 		if (_changedProperties.has('selectionConfiguration')) {
 			this._selectionConfiguration = this.selectionConfiguration;
-
 			this._api!.selection.setMultiple(this._selectionConfiguration.multiple ?? false);
 			this._api!.selection.setSelectable(this._selectionConfiguration.selectable ?? true);
 			this._api!.selection.setSelection(this._selectionConfiguration.selection ?? []);
+			this._api!.setSelectOnly(this._selectionConfiguration.selectOnly);
 		}
 
 		if (_changedProperties.has('startNode')) {
@@ -140,6 +183,19 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 		if (_changedProperties.has('expansion')) {
 			this._api!.setExpansion(this.expansion);
 		}
+
+		if (_changedProperties.has('hideTreeItemActions')) {
+			this._api!.setHideTreeItemActions?.(this.hideTreeItemActions);
+		}
+
+		if (_changedProperties.has('isMenu')) {
+			this._api!.setIsMenu?.(this.isMenu ?? false);
+		}
+
+		if (_changedProperties.has('interactionMemories') && this._api?.interactionMemory) {
+			this.#lastDispatchedMemories = this.interactionMemories ?? [];
+			this.interactionMemories?.forEach((m) => this._api!.interactionMemory!.setMemory(m));
+		}
 	}
 
 	getSelection() {
@@ -150,74 +206,45 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 		return this._api?.expansion.getExpansion();
 	}
 
-	#onLoadPrev(event: any) {
-		event.stopPropagation();
-		this._api?.loadPrevItems?.();
-	}
-
-	#onLoadNext(event: any) {
-		event.stopPropagation();
-		const next = (this._currentPage = this._currentPage + 1);
-		this._api?.pagination.setCurrentPageNumber(next);
-	}
-
 	override render() {
-		return html` ${this.#renderTreeRoot()} ${this.#renderRootItems()}`;
-	}
-
-	#renderTreeRoot() {
-		if (this.hideTreeRoot || this._treeRoot === undefined) return nothing;
 		return html`
-			<umb-tree-item
-				.entityType=${this._treeRoot.entityType}
-				.props=${{
-					hideActions: this.hideTreeItemActions,
-					item: this._treeRoot,
-					isMenu: this.isMenu,
-				}}></umb-tree-item>
+			${this.showToolbar
+				? html`<umb-tree-toolbar .showTreeActions=${this.showTreeActions}></umb-tree-toolbar>`
+				: nothing}
+			${this._viewElement ?? nothing} ${this.#renderEmptyState()}
 		`;
 	}
 
-	#renderRootItems() {
-		// only show the root items directly if the tree root is hidden
-		if (this.hideTreeRoot === true) {
-			return html`
-				${this.#renderLoadPrevButton()}
-				${repeat(
-					this._rootItems,
-					(item, index) => item.name + '___' + index,
-					(item) => html`
-						<umb-tree-item
-							.entityType=${item.entityType}
-							.props=${{ hideActions: this.hideTreeItemActions, item, isMenu: this.isMenu }}></umb-tree-item>
-					`,
-				)}
-				${this.#renderLoadNextButton()}
-			`;
-		} else {
-			return nothing;
-		}
+	#renderEmptyState() {
+		// The empty state belongs to the children list, not a single view, so it is presented once here — mirroring
+		// the collection pattern. It is only relevant when the children are shown on their own (root hidden or drilled
+		// into a start node) and never in the sidebar menu.
+		if (this.isMenu || !(this.hideTreeRoot || this.startNode)) return nothing;
+		if (!this._initialLoadDone || this._isLoading || this._hasItems) return nothing;
+		return html`<div id="empty-state" class="uui-text"><h4>${this.localize.term('tree_noItems')}</h4></div>`;
 	}
 
-	#renderLoadPrevButton() {
-		if (!this._hasPreviousItems) return nothing;
-		return html`<umb-tree-load-prev-button
-			@click=${this.#onLoadPrev}
-			.loading=${this._isLoadingPrevChildren}></umb-tree-load-prev-button>`;
-	}
+	static override styles = [
+		UmbTextStyles,
+		css`
+			:host {
+				display: contents;
+			}
 
-	#renderLoadNextButton() {
-		if (!this._hasNextItems) return nothing;
-		return html`<umb-tree-load-more-button
-			@click=${this.#onLoadNext}
-			.loading=${this._isLoadingNextChildren}></umb-tree-load-more-button> `;
-	}
+			#empty-state {
+				text-align: center;
+				padding: var(--uui-size-layout-1);
+				opacity: 0;
+				animation: fadeIn 100ms 100ms forwards;
+			}
 
-	static override styles = css`
-		#load-more {
-			width: 100%;
-		}
-	`;
+			@keyframes fadeIn {
+				100% {
+					opacity: 1;
+				}
+			}
+		`,
+	];
 }
 
 export default UmbDefaultTreeElement;
