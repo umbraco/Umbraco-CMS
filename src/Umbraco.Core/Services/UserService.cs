@@ -606,7 +606,7 @@ internal partial class UserService : RepositoryService, IUserService
 
     private static Attempt<UserCreationResult, UserOperationStatus> MapCreationFailure(IdentityCreationResult identityCreationResult)
     {
-        if (identityCreationResult.WasCancelledByNotification)
+        if (identityCreationResult.CancelledByNotification)
         {
             return Attempt.FailWithStatus(UserOperationStatus.CancelledByNotification, new UserCreationResult());
         }

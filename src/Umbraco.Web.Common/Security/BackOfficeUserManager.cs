@@ -282,7 +282,7 @@ public class BackOfficeUserManager : UmbracoUserManager<BackOfficeIdentityUser, 
         {
             if (created.Errors.Any(e => e.Code == nameof(UserOperationStatus.CancelledByNotification)))
             {
-                return IdentityCreationResult.CancelledByNotification();
+                return IdentityCreationResult.Cancel();
             }
 
             return IdentityCreationResult.Fail(created.Errors.ToErrorMessage());

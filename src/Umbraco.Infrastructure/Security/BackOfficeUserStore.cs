@@ -220,9 +220,13 @@ public class BackOfficeUserStore :
 
         UserOperationStatus saveStatus = SaveAsync(userEntity).GetAwaiter().GetResult();
 
-        if (TryCreateCancelledResult(saveStatus, out Task<IdentityResult>? cancelledResult))
+        if (saveStatus == UserOperationStatus.CancelledByNotification)
         {
-            return cancelledResult!;
+            return Task.FromResult(IdentityResult.Failed(new IdentityError
+            {
+                Code = nameof(UserOperationStatus.CancelledByNotification),
+                Description = "User creation was cancelled by a notification handler.",
+            }));
         }
 
         if (!userEntity.HasIdentity)
@@ -234,12 +238,12 @@ public class BackOfficeUserStore :
         user.Id = UserIdToString(userEntity.Id);
         user.Key = userEntity.Key;
 
-        SaveDirtyExternalLoginsAndTokens(userEntity.Key, user, isLoginsPropertyDirty, isTokensPropertyDirty);
+        SaveExternalLoginsAndTokens(userEntity.Key, user, isLoginsPropertyDirty, isTokensPropertyDirty);
 
         return Task.FromResult(IdentityResult.Success);
     }
 
-    private void SaveDirtyExternalLoginsAndTokens(
+    private void SaveExternalLoginsAndTokens(
         Guid userKey,
         BackOfficeIdentityUser user,
         bool isLoginsPropertyDirty,
@@ -264,22 +268,6 @@ public class BackOfficeUserStore :
                     x.Name,
                     x.Value)));
         }
-    }
-
-    private static bool TryCreateCancelledResult(UserOperationStatus saveStatus, out Task<IdentityResult>? result)
-    {
-        if (saveStatus != UserOperationStatus.CancelledByNotification)
-        {
-            result = null;
-            return false;
-        }
-
-        result = Task.FromResult(IdentityResult.Failed(new IdentityError
-        {
-            Code = nameof(UserOperationStatus.CancelledByNotification),
-            Description = "User creation was cancelled by a notification handler."
-        }));
-        return true;
     }
 
     /// <inheritdoc />
@@ -464,25 +452,7 @@ public class BackOfficeUserStore :
                     SaveAsync(found).GetAwaiter().GetResult();
                 }
 
-                if (isLoginsPropertyDirty)
-                {
-                    _externalLoginService.Save(
-                        found.Key,
-                        user.Logins.Select(x => new ExternalLogin(
-                            x.LoginProvider,
-                            x.ProviderKey,
-                            x.UserData)));
-                }
-
-                if (isTokensPropertyDirty)
-                {
-                    _externalLoginService.Save(
-                        found.Key,
-                        user.LoginTokens.Select(x => new ExternalLoginToken(
-                            x.LoginProvider,
-                            x.Name,
-                            x.Value)));
-                }
+                SaveExternalLoginsAndTokens(found.Key, user, isLoginsPropertyDirty, isTokensPropertyDirty);
             }
 
             scope.Complete();
