@@ -76,7 +76,8 @@ export class UmbPropertyEditorUITextBoxElement
 		this._inputMode = config.getValueByAlias<UUIInputMode>('inputMode') || this.#defaultInputMode;
 		this._maxChars = this.#parseNumber(config.getValueByAlias('maxChars'));
 		this._placeholder = this.localize.string(config.getValueByAlias<string>('placeholder'));
-		this._autocomplete = config.getValueByAlias<string>('autocomplete');
+		const autocomplete = config.getValueByAlias<string | Array<string>>('autocomplete');
+		this._autocomplete = Array.isArray(autocomplete) ? autocomplete[0] : autocomplete;
 	}
 
 	protected override firstUpdated(): void {
