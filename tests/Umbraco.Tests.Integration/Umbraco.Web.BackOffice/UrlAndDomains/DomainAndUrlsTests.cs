@@ -274,7 +274,7 @@ internal sealed class DomainAndUrlsTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Resolving_Urls_For_An_Unknown_Culture_Falls_Back_To_All_Cultures()
+    public async Task Resolving_Urls_For_An_Unknown_Culture_Returns_No_Urls()
     {
         var domainService = GetRequiredService<IDomainService>();
         var updateModel = new DomainsUpdateModel
@@ -290,13 +290,11 @@ internal sealed class DomainAndUrlsTests : UmbracoIntegrationTest
 
         var publishedUrlInfoProvider = GetRequiredService<IPublishedUrlInfoProvider>();
 
-        var allUrls = await publishedUrlInfoProvider.GetAllAsync(Root);
         var unknownCultureUrls = await publishedUrlInfoProvider.GetAllAsync(Root, "xx-XX");
 
-        // An unknown culture is not a valid installed culture, so it falls back to all cultures.
-        CollectionAssert.AreEquivalent(
-            allUrls.Select(x => x.Url?.ToString()),
-            unknownCultureUrls.Select(x => x.Url?.ToString()));
+        // An unknown culture is not an installed culture, so there are no urls to report for it -
+        // rather than falling back to (expensively) resolving all cultures.
+        Assert.IsEmpty(unknownCultureUrls);
     }
 
     [Test]

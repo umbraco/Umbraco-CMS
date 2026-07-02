@@ -65,9 +65,20 @@ public class PublishedUrlInfoProvider : IPublishedUrlInfoProvider
         HashSet<UrlInfo> urlInfos = [];
         var isInvariant = !content.ContentType.VariesByCulture();
 
-        // For variant content, restrict to the requested culture when it is a valid installed culture.
-        // For invariant content, no culture, or an unknown culture, this is null and all cultures are resolved.
-        string? scopedCulture = await ResolveScopedCultureAsync(content, culture);
+        // For variant content, restrict to the requested culture, matched against the installed cultures
+        // (using their casing). Culture is ignored for invariant content, which returns all of its domain urls.
+        string? scopedCulture = null;
+        if (culture is not null && isInvariant is false)
+        {
+            scopedCulture = (await _languageService.GetAllIsoCodesAsync())
+                .FirstOrDefault(x => x.InvariantEquals(culture));
+
+            // A specific culture was requested that is not an installed culture - there are no urls to report.
+            if (scopedCulture is null)
+            {
+                return urlInfos;
+            }
+        }
 
         IEnumerable<string> cultures = scopedCulture is not null
             ? [scopedCulture]
@@ -120,23 +131,6 @@ public class PublishedUrlInfoProvider : IPublishedUrlInfoProvider
         }
 
         return urlInfos;
-    }
-
-    /// <summary>
-    /// Resolves the single culture to scope the URL lookup to, or <c>null</c> to resolve all cultures.
-    /// Returns null for invariant content, when no culture is requested, or when the requested culture
-    /// is not a valid installed culture (in which case all cultures are resolved). Otherwise returns the
-    /// installed culture matching the request (using the installed culture's casing).
-    /// </summary>
-    private async Task<string?> ResolveScopedCultureAsync(IContent content, string? culture)
-    {
-        if (culture is null || content.ContentType.VariesByCulture() is false)
-        {
-            return null;
-        }
-
-        IEnumerable<string> isoCodes = await _languageService.GetAllIsoCodesAsync();
-        return isoCodes.FirstOrDefault(x => x.InvariantEquals(culture));
     }
 
     /// <summary>
