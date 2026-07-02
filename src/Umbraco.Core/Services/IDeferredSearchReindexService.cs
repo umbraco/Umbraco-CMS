@@ -28,5 +28,5 @@ public interface IDeferredSearchReindexService
     ///     (transitively) embed them via block editors.
     /// </summary>
     /// <param name="elementIds">The element node ids that changed.</param>
-    void QueueElementReindex(IReadOnlyCollection<int> elementIds);
+    void QueueDocumentReindexForChangedElements(IReadOnlyCollection<int> elementIds);
 }

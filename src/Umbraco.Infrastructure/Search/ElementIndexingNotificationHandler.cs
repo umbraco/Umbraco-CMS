@@ -28,7 +28,7 @@ internal sealed class ElementIndexingNotificationHandler :
         var ids = elements.Select(e => e.Id).ToArray();
         if (ids.Length > 0)
         {
-            _deferredSearchReindexService.QueueElementReindex(ids);
+            _deferredSearchReindexService.QueueDocumentReindexForChangedElements(ids);
         }
     }
 }
