@@ -154,6 +154,7 @@ export class UmbMediaPickerFolderPathElement extends UmbLitElement {
 
 	async #addFolder(e: UUIInputEvent) {
 		e.stopPropagation();
+		if (!this._typingNewFolder) return;
 
 		const newName = e.target.value as string;
 		this._typingNewFolder = false;
@@ -196,12 +197,18 @@ export class UmbMediaPickerFolderPathElement extends UmbLitElement {
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
-	#onKeypress(e: KeyboardEvent) {
+	#cancelFolderCreation() {
+		this._typingNewFolder = false;
+		this._selectingFolderType = false;
+	}
+
+	#onKeydown(e: KeyboardEvent) {
 		if (e.key === 'Enter') {
-			requestAnimationFrame(() => {
-				const element = this.getHostElement().shadowRoot!.querySelector('#new-folder') as UUIInputElement;
-				element.blur();
-			});
+			this.#addFolder(e as unknown as UUIInputEvent);
+		} else if (e.key === 'Escape') {
+			e.preventDefault();
+			e.stopImmediatePropagation();
+			this.#cancelFolderCreation();
 		}
 	}
 
@@ -230,7 +237,7 @@ export class UmbMediaPickerFolderPathElement extends UmbLitElement {
 				label=${this.localize.term('create_enterFolderName')}
 				placeholder=${this.localize.term('create_enterFolderName')}
 				@blur=${this.#addFolder}
-				@keypress=${this.#onKeypress}></uui-input>`;
+				@keydown=${this.#onKeydown}></uui-input>`;
 		}
 
 		if (this._selectingFolderType) {
