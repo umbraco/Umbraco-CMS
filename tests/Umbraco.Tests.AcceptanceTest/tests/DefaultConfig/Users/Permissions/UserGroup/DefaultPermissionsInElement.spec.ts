@@ -382,7 +382,7 @@ test('can rollback element with rollback permission enabled', async ({umbracoApi
   await umbracoUi.library.clickInfoTab();
   await umbracoUi.library.clickRollbackButton();
   await umbracoUi.waitForTimeout(ConstantHelper.wait.medium);// Wait for the rollback items to load
-  await umbracoUi.library.clickLatestRollBackItem();
+  await umbracoUi.library.clickPreviousRollBackItem();
   await umbracoUi.library.clickRollbackContainerButton();
 
   // Assert

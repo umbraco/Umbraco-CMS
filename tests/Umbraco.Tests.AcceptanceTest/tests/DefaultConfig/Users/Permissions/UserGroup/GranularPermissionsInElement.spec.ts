@@ -216,7 +216,7 @@ test('can rollback a specific element with rollback permission enabled', async (
   await umbracoUi.library.clickInfoTab();
   await umbracoUi.library.clickRollbackButton();
   await umbracoUi.waitForTimeout(ConstantHelper.wait.medium);
-  await umbracoUi.library.clickLatestRollBackItem();
+  await umbracoUi.library.clickPreviousRollBackItem();
   await umbracoUi.library.clickRollbackContainerButton();
 
   // Assert

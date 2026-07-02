@@ -616,7 +616,7 @@ test('can rollback content with rollback permission enabled', {tag: '@release'},
   await umbracoUi.content.doesDocumentPropertyHaveValue(dataTypeName, updatedTextStringText);
   await umbracoUi.content.clickInfoTab();
   await umbracoUi.content.clickRollbackButton();
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.medium);// Wait for the rollback items to load
+  await umbracoUi.content.waitForRollbackItems();
   await umbracoUi.content.clickPreviousRollBackItem();
   await umbracoUi.content.clickRollbackContainerButton();
 

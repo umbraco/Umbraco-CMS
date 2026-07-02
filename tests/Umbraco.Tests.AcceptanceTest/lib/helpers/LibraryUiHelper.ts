@@ -96,6 +96,7 @@ export class LibraryUiHelper extends UiBaseLocators {
   private readonly selectLoginPageElement: Locator;
   private readonly selectErrorPageElement: Locator;
   private readonly rollbackItem: Locator;
+  private readonly activeRollbackItem: Locator;
   private readonly actionsMenu: Locator;
   private readonly linkToElementBtn: Locator;
   private readonly linkToMediaBtn: Locator;
@@ -295,6 +296,7 @@ export class LibraryUiHelper extends UiBaseLocators {
     this.selectLoginPageElement = page.locator('.select-item').filter({hasText: 'Login Page'}).locator('umb-input-element').locator('#button');
     this.selectErrorPageElement = page.locator('.select-item').filter({hasText: 'Error Page'}).locator('umb-input-element').locator('#button');
     this.rollbackItem = page.locator('.rollback-item');
+    this.activeRollbackItem = page.locator('.rollback-item.active');
     this.actionsMenu = page.locator('uui-scroll-container');
     this.linkToElementBtn = this.linkPickerModal.getByTestId('action:element').locator('#button');
     this.linkToMediaBtn = this.linkPickerModal.getByTestId('action:media').locator('#button');
@@ -1127,8 +1129,12 @@ export class LibraryUiHelper extends UiBaseLocators {
     await this.click(this.rollbackContainerBtn);
   }
 
-  async clickLatestRollBackItem() {
-    await this.click(this.rollbackItem.last());
+  async clickPreviousRollBackItem() {
+    // Wait for the modal's async pre-selection of the current version, otherwise it clobbers our pick.
+    await expect(this.activeRollbackItem).toBeVisible();
+    const previousVersion = this.rollbackItem.filter({hasNotText: "Current published version"}).last();
+    await this.click(previousVersion);
+    await expect(previousVersion).toHaveClass(/active/);
   }
 
   async clickPublicAccessButton() {
