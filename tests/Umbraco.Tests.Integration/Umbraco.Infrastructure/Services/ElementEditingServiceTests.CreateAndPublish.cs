@@ -131,10 +131,12 @@ public partial class ElementEditingServiceTests
     }
 
     [Test]
-    public async Task Cannot_CreateAndPublish_Invariant_Without_Name()
+    public async Task Cannot_CreateAndPublish_Invariant_Without_Variants()
     {
         var elementType = await CreateInvariantElementType();
 
+        // An invariant content type requires exactly one invariant variant (which carries the name);
+        // supplying no variants is therefore a variance mismatch.
         var createModel = new ElementCreateModel
         {
             ContentTypeKey = elementType.Key,
@@ -148,7 +150,10 @@ public partial class ElementEditingServiceTests
 
         var result = await ElementEditingService.CreateAndPublishAsync(createModel, [], Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.ContentTypeCultureVarianceMismatch, result.Status);
+        Assert.AreEqual(
+            ContentEditingOperationStatus.ContentTypeCultureVarianceMismatch,
+            result.Status,
+            "Creating an invariant element without any variants should fail with a variance mismatch.");
     }
 
     [Test]
