@@ -28,7 +28,7 @@ public class PackageManifest
     /// <summary>
     ///     Gets or sets a value indicating whether Umbraco automatically appends a cache-buster to this package's clean
     ///     <c>/App_Plugins</c> URLs (importmap and extensions). <c>true</c> by default; set <c>false</c> to opt out of the
-    ///     automatic stamping only — an explicit <c>%CACHE_BUSTER%</c> token still resolves regardless.
+    ///     automatic stamping only.
     /// </summary>
     public bool AllowCacheBusting { get; set; } = true;
 
