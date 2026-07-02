@@ -1798,9 +1798,19 @@ export default {
 		chooseChildNode: 'Vælg child node',
 		compositionsDescription:
 			'Nedarv faner og egenskaber fra en anden dokumenttype. Nye faner vil blive\n      tilføjet den nuværende dokumenttype eller sammenflettet hvis fanenavnene er ens.\n    ',
+		compositionsDescriptionMediaType:
+			'Nedarv faner og egenskaber fra en anden medietype. Nye faner vil blive\n      tilføjet den nuværende medietype eller sammenflettet hvis fanenavnene er ens.\n    ',
+		compositionsDescriptionMemberType:
+			'Nedarv faner og egenskaber fra en anden medlemstype. Nye faner vil blive\n      tilføjet den nuværende medlemstype eller sammenflettet hvis fanenavnene er ens.\n    ',
 		compositionInUse:
 			'Indholdstypen bliver brugt i en komposition og kan derfor ikke blive anvendt som\n      komposition\n    ',
+		compositionInUseMediaType:
+			'Medietypen bliver brugt i en komposition og kan derfor ikke blive anvendt som\n      komposition\n    ',
+		compositionInUseMemberType:
+			'Medlemstypen bliver brugt i en komposition og kan derfor ikke blive anvendt som\n      komposition\n    ',
 		noAvailableCompositions: 'Der er ingen indholdstyper tilgængelige at bruge som komposition',
+		noAvailableCompositionsMediaType: 'Der er ingen medietyper tilgængelige at bruge som komposition',
+		noAvailableCompositionsMemberType: 'Der er ingen medlemstyper tilgængelige at bruge som komposition',
 		compositionRemoveWarning:
 			'Når du fjerner en komposition vil alle associerede indholdsdata blive slettet.\n      Når først dokumenttypen er gemt, er der ingen vej tilbage.\n    ',
 		availableEditors: 'Opret ny indstilling',
@@ -1838,6 +1848,8 @@ export default {
 		tabHasNoSortOrder: 'fane har ingen sorteringsrækkefølge',
 		compositionUsageHeading: 'Hvor er denne komposition brugt?',
 		compositionUsageSpecification: 'Denne komposition brugt i kompositionen af de følgende indholdstyper:\n    ',
+		compositionUsageSpecificationMediaType: 'Denne komposition brugt i kompositionen af de følgende medietyper:\n    ',
+		compositionUsageSpecificationMemberType: 'Denne komposition brugt i kompositionen af de følgende medlemstyper:\n    ',
 		variantsHeading: 'Tillad variationer',
 		cultureVariantHeading: 'Tillad sprogvariation',
 		segmentVariantHeading: 'Tillad segmentering',
@@ -2053,6 +2065,12 @@ export default {
 		structureGroup: 'Struktur',
 		advancedGroup: 'Avanceret',
 		webhooks: 'Webhooks',
+	},
+	tree: {
+		classicViewLabel: 'Træ',
+		cardViewLabel: 'Kort',
+		tableViewLabel: 'Tabel',
+		children: 'Underelementer',
 	},
 	update: {
 		updateAvailable: 'Ny opdatering er klar',

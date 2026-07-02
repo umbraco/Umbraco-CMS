@@ -1523,9 +1523,19 @@ export default {
 		chooseChildNode: 'Scegli nodo figlio',
 		compositionsDescription:
 			'Eredita schede e proprietà da un tipo di documento esistente. Le nuove schede verranno aggiunte al tipo di documento corrente o unite se esiste una scheda con un nome identico.',
+		compositionsDescriptionMediaType:
+			'Eredita schede e proprietà da un tipo di media esistente. Le nuove schede verranno aggiunte al tipo di media corrente o unite se esiste una scheda con un nome identico.',
+		compositionsDescriptionMemberType:
+			'Eredita schede e proprietà da un tipo di membro esistente. Le nuove schede verranno aggiunte al tipo di membro corrente o unite se esiste una scheda con un nome identico.',
 		compositionInUse:
-			'Questo tipo di contenuto è utlizzato in una composizione, e quindi non può essere composto da se stesso.',
+			'Questo tipo di contenuto è utilizzato in una composizione, e quindi non può essere composto da se stesso.',
+		compositionInUseMediaType:
+			'Questo tipo di media è utilizzato in una composizione, e quindi non può essere composto da se stesso.',
+		compositionInUseMemberType:
+			'Questo tipo di membro è utilizzato in una composizione, e quindi non può essere composto da se stesso.',
 		noAvailableCompositions: 'Non ci sono tipi di contenuto utilizzabili come composizione.',
+		noAvailableCompositionsMediaType: 'Non ci sono tipi di media utilizzabili come composizione.',
+		noAvailableCompositionsMemberType: 'Non ci sono tipi di membro utilizzabili come composizione.',
 		compositionRemoveWarning:
 			'Rimuovendo una composizione si elimineranno tutti i dati associati ad essa. Una volta salvato il tipo di documento non ci sarà nessun modo di recuperare i dati.',
 		availableEditors: 'Crea nuovo',
@@ -1563,6 +1573,8 @@ export default {
 		tabHasNoSortOrder: 'la scheda non ha un ordine',
 		compositionUsageHeading: 'Dove è usata questa composizione?',
 		compositionUsageSpecification: 'Questa composizione è usata nella composizione dei seguenti tipi di contenuto:',
+		compositionUsageSpecificationMediaType: 'Questa composizione è usata nella composizione dei seguenti tipi di media:',
+		compositionUsageSpecificationMemberType: 'Questa composizione è usata nella composizione dei seguenti tipi di membro:',
 		variantsHeading: 'Consenti variazioni',
 		cultureVariantHeading: 'Consenti variazioni in base alla lingua',
 		segmentVariantHeading: 'Consenti segmentazione',
