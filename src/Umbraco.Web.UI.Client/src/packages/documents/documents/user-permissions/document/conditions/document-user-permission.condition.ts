@@ -73,12 +73,11 @@ export class UmbDocumentUserPermissionCondition
 		if (!this.#entityType) return;
 		if (this.#unique === undefined) return;
 
-		// Path including the current document and all ancestors
+		// Path based on all ancestors and the current document:
 		const path = [...this.#ancestors, this.#unique].filter((unique) => unique !== null);
 
-		// Path access mirrors the backend gate (ContentPermissions.HasPathAccess):
-		// verbs are only relevant once the document is within the user's start-node scope.
-		if (!this.#hasStartNodeAccess(path)) {
+		// Check if the user has 'start-node' access to this document:
+		if (this.config.skipStartNodes !== true && !this.#hasStartNodeAccess(path)) {
 			this.permitted = false;
 			return;
 		}
