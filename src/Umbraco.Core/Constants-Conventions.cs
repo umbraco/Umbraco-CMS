@@ -358,12 +358,12 @@ public static partial class Constants
             public const string RelatedElementAlias = "umbElement";
 
             /// <summary>
-            ///     Name for default relation type "External Block Element".
+            ///     Name for default relation type "Related External Block Element".
             /// </summary>
-            public const string RelatedExternalBlockElementName = "External Block Element";
+            public const string RelatedExternalBlockElementName = "Related External Block Element";
 
             /// <summary>
-            ///     Alias for default relation type "External Block Element".
+            ///     Alias for default relation type "Related External Block Element".
             /// </summary>
             public const string RelatedExternalBlockElementAlias = "umbExternalBlockElement";
 
