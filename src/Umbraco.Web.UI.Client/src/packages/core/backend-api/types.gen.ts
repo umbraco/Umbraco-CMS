@@ -161,6 +161,16 @@ export type CopyMemberTypeRequestModel = {
     target?: ReferenceByIdModel | null;
 };
 
+export type CreateAndPublishDocumentRequestModel = {
+    values: Array<DocumentValueModel>;
+    variants: Array<DocumentVariantRequestModel>;
+    id?: string | null;
+    parent?: ReferenceByIdModel | null;
+    documentType: ReferenceByIdModel;
+    template: ReferenceByIdModel | null;
+    culturesToPublish: Array<string>;
+};
+
 export type CreateDataTypeRequestModel = {
     name: string;
     editorAlias: string;
@@ -2732,6 +2742,13 @@ export type UnlockUsersRequestModel = {
 
 export type UnpublishDocumentRequestModel = {
     cultures?: Array<string> | null;
+};
+
+export type UpdateAndPublishDocumentRequestModel = {
+    values: Array<DocumentValueModel>;
+    variants: Array<DocumentVariantRequestModel>;
+    template?: ReferenceByIdModel | null;
+    culturesToPublish: Array<string>;
 };
 
 export type UpdateCurrentUserRequestModel = {
@@ -7320,6 +7337,43 @@ export type PutDocumentByIdUnpublishResponses = {
     200: unknown;
 };
 
+export type PutDocumentByIdUpdateAndPublishData = {
+    body?: UpdateAndPublishDocumentRequestModel;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/umbraco/management/api/v1/document/{id}/update-and-publish';
+};
+
+export type PutDocumentByIdUpdateAndPublishErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type PutDocumentByIdUpdateAndPublishError = PutDocumentByIdUpdateAndPublishErrors[keyof PutDocumentByIdUpdateAndPublishErrors];
+
+export type PutDocumentByIdUpdateAndPublishResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
 export type PutUmbracoManagementApiV11DocumentByIdValidate11Data = {
     body?: ValidateUpdateDocumentRequestModel;
     path: {
@@ -7414,6 +7468,41 @@ export type GetDocumentConfigurationResponses = {
 };
 
 export type GetDocumentConfigurationResponse = GetDocumentConfigurationResponses[keyof GetDocumentConfigurationResponses];
+
+export type PostDocumentCreateAndPublishData = {
+    body?: CreateAndPublishDocumentRequestModel;
+    path?: never;
+    query?: never;
+    url: '/umbraco/management/api/v1/document/create-and-publish';
+};
+
+export type PostDocumentCreateAndPublishErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type PostDocumentCreateAndPublishError = PostDocumentCreateAndPublishErrors[keyof PostDocumentCreateAndPublishErrors];
+
+export type PostDocumentCreateAndPublishResponses = {
+    /**
+     * Created
+     */
+    201: unknown;
+};
 
 export type PutDocumentSortData = {
     body?: SortingRequestModel;

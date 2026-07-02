@@ -276,7 +276,7 @@ public class PublishedContentQuery : IPublishedContentQuery
     /// Retrieves the media items corresponding to the specified IDs.
     /// </summary>
     /// <param name="ids">A collection of media item IDs to retrieve.</param>
-    /// <returns>An <see cref="IEnumerable{T}"/> of <see cref="Umbraco.Cms.Core.Models.IPublishedContent"/> representing the found media items.</returns>
+    /// <returns>An <see cref="IEnumerable{T}"/> of <see cref="IPublishedContent"/> representing the found media items.</returns>
     public IEnumerable<IPublishedContent> Media(IEnumerable<int> ids)
         => ItemsByIds(_publishedMediaCache, ids);
 
@@ -284,7 +284,7 @@ public class PublishedContentQuery : IPublishedContentQuery
     /// Retrieves a collection of media items corresponding to the specified identifiers.
     /// </summary>
     /// <param name="ids">A collection of identifiers for the media items to retrieve.</param>
-    /// <returns>An <see cref="IEnumerable{T}"/> of <see cref="Umbraco.Cms.Core.Models.IPublishedContent"/> representing the found media items.</returns>
+    /// <returns>An <see cref="IEnumerable{T}"/> of <see cref="IPublishedContent"/> representing the found media items.</returns>
     public IEnumerable<IPublishedContent> Media(IEnumerable<object> ids)
         => ids.Select(Media).WhereNotNull();
 
