@@ -218,7 +218,16 @@ public class BackOfficeUserStore :
 
         UpdateMemberProperties(userEntity, user);
 
-        SaveAsync(userEntity).GetAwaiter().GetResult();
+        UserOperationStatus saveStatus = SaveAsync(userEntity).GetAwaiter().GetResult();
+
+        if (saveStatus == UserOperationStatus.CancelledByNotification)
+        {
+            return Task.FromResult(IdentityResult.Failed(new IdentityError
+            {
+                Code = nameof(UserOperationStatus.CancelledByNotification),
+                Description = "User creation was cancelled by a notification handler.",
+            }));
+        }
 
         if (!userEntity.HasIdentity)
         {
@@ -229,10 +238,21 @@ public class BackOfficeUserStore :
         user.Id = UserIdToString(userEntity.Id);
         user.Key = userEntity.Key;
 
+        SaveExternalLoginsAndTokens(userEntity.Key, user, isLoginsPropertyDirty, isTokensPropertyDirty);
+
+        return Task.FromResult(IdentityResult.Success);
+    }
+
+    private void SaveExternalLoginsAndTokens(
+        Guid userKey,
+        BackOfficeIdentityUser user,
+        bool isLoginsPropertyDirty,
+        bool isTokensPropertyDirty)
+    {
         if (isLoginsPropertyDirty)
         {
             _externalLoginService.Save(
-                userEntity.Key,
+                userKey,
                 user.Logins.Select(x => new ExternalLogin(
                     x.LoginProvider,
                     x.ProviderKey,
@@ -242,14 +262,12 @@ public class BackOfficeUserStore :
         if (isTokensPropertyDirty)
         {
             _externalLoginService.Save(
-                userEntity.Key,
+                userKey,
                 user.LoginTokens.Select(x => new ExternalLoginToken(
                     x.LoginProvider,
                     x.Name,
                     x.Value)));
         }
-
-        return Task.FromResult(IdentityResult.Success);
     }
 
     /// <inheritdoc />
@@ -434,25 +452,7 @@ public class BackOfficeUserStore :
                     SaveAsync(found).GetAwaiter().GetResult();
                 }
 
-                if (isLoginsPropertyDirty)
-                {
-                    _externalLoginService.Save(
-                        found.Key,
-                        user.Logins.Select(x => new ExternalLogin(
-                            x.LoginProvider,
-                            x.ProviderKey,
-                            x.UserData)));
-                }
-
-                if (isTokensPropertyDirty)
-                {
-                    _externalLoginService.Save(
-                        found.Key,
-                        user.LoginTokens.Select(x => new ExternalLoginToken(
-                            x.LoginProvider,
-                            x.Name,
-                            x.Value)));
-                }
+                SaveExternalLoginsAndTokens(found.Key, user, isLoginsPropertyDirty, isTokensPropertyDirty);
             }
 
             scope.Complete();
