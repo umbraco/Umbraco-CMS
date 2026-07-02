@@ -17,6 +17,8 @@ export class UmbDocumentUserPermissionCondition
 	#documentPermissions: Array<DocumentPermissionPresentationModel> = [];
 	#fallbackPermissions: string[] = [];
 	#ancestors: Array<UmbEntityUnique> = [];
+	#documentStartNodeUniques: Array<string> = [];
+	#hasDocumentRootAccess = false;
 
 	constructor(
 		host: UmbControllerHost,
@@ -30,6 +32,8 @@ export class UmbDocumentUserPermissionCondition
 				(currentUser) => {
 					this.#documentPermissions = currentUser?.permissions?.filter(isDocumentUserPermission) || [];
 					this.#fallbackPermissions = currentUser?.fallbackPermissions || [];
+					this.#documentStartNodeUniques = currentUser?.documentStartNodeUniques?.map((x) => x.unique) ?? [];
+					this.#hasDocumentRootAccess = currentUser?.hasDocumentRootAccess ?? false;
 					this.#checkPermissions();
 				},
 				'umbUserPermissionConditionObserver',
@@ -69,6 +73,16 @@ export class UmbDocumentUserPermissionCondition
 		if (!this.#entityType) return;
 		if (this.#unique === undefined) return;
 
+		// Path including the current document and all ancestors
+		const path = [...this.#ancestors, this.#unique].filter((unique) => unique !== null);
+
+		// Path access mirrors the backend gate (ContentPermissions.HasPathAccess):
+		// verbs are only relevant once the document is within the user's start-node scope.
+		if (!this.#hasStartNodeAccess(path)) {
+			this.permitted = false;
+			return;
+		}
+
 		const hasDocumentPermissions = this.#documentPermissions.length > 0;
 
 		// if there is no permissions for any documents we use the fallback permissions
@@ -80,8 +94,6 @@ export class UmbDocumentUserPermissionCondition
 		// If there are document permissions, we need to check the full path to see if any permissions are defined for the current document
 		// If we find multiple permissions in the same path, we will apply the closest one
 		if (hasDocumentPermissions) {
-			// Path including the current document and all ancestors
-			const path = [...this.#ancestors, this.#unique].filter((unique) => unique !== null);
 			// Reverse the path to find the closest document permission quickly
 			const reversedPath = [...path].reverse();
 			const documentPermissionsMap = new Map(this.#documentPermissions.map((p) => [p.document.id, p]));
@@ -101,6 +113,12 @@ export class UmbDocumentUserPermissionCondition
 			// we found permissions - check them
 			this.#check(match.verbs);
 		}
+	}
+
+	#hasStartNodeAccess(path: Array<UmbEntityUnique>): boolean {
+		if (this.#hasDocumentRootAccess) return true;
+		if (this.#documentStartNodeUniques.length === 0) return false;
+		return path.some((unique) => unique !== null && this.#documentStartNodeUniques.includes(unique));
 	}
 
 	#check(verbs: Array<string>) {
