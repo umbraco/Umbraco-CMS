@@ -11,6 +11,9 @@ import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
  */
 const EXPIRY_SAFETY_MARGIN_IN_SECONDS = 5;
 
+/** Maximum delay (in ms) that setTimeout supports (2^31 - 1). Values above this fire immediately in browsers. */
+const MAX_TIMEOUT_MS = 2_147_483_647;
+
 export class UmbAuthSessionTimeoutController extends UmbControllerBase {
 	#host: UmbAuthContext;
 	#timeoutId?: ReturnType<typeof setTimeout>;
@@ -89,7 +92,8 @@ export class UmbAuthSessionTimeoutController extends UmbControllerBase {
 			// Already in the buffer zone
 			this.#onSessionExpiring(expiresAt);
 		} else {
-			this.#timeoutId = setTimeout(() => this.#onSessionExpiring(expiresAt), secondsUntilWarning * 1000);
+			const delayMs = Math.min(secondsUntilWarning * 1000, MAX_TIMEOUT_MS);
+			this.#timeoutId = setTimeout(() => this.#onSessionExpiring(expiresAt), delayMs);
 		}
 	}
 
