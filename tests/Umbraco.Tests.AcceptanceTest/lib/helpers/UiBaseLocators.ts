@@ -341,14 +341,14 @@ export class UiBaseLocators extends BasePage {
     // Document Type & Property Editor
     this.documentTypeNode = page.locator("uui-ref-node-document-type");
     this.propertyNameTxt = page
-      .getByTestId("input:entity-name")
+      .getByTestId("input:propertytype-name")
       .locator("#input")
       .first();
     this.selectPropertyEditorBtn = page.getByLabel("Select Property Editor");
     this.editorSettingsBtn = page.getByLabel("Editor settings");
     this.enterPropertyEditorDescriptionTxt = page
       .locator("uui-modal-sidebar")
-      .getByTestId("input:entity-description")
+      .getByTestId("input:propertytype-description")
       .locator("#textarea");
     this.property = page.locator("umb-property");
     this.addPropertyBtn = page.getByLabel("Add property", { exact: true });
