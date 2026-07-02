@@ -61,7 +61,17 @@ export class MemberUiHelper extends UiBaseLocators {
   }
 
   async isMemberWithNameVisible(memberName: string, isVisible: boolean = true) {
-    await this.isVisible(this.memberTableCollectionRow.getByText(memberName, {exact: true}), isVisible);
+    const memberRow = this.memberTableCollectionRow.getByText(memberName, {exact: true});
+    if (!isVisible) {
+      await this.isVisible(memberRow, false);
+      return;
+    }
+    await expect(async () => {
+      if (!(await memberRow.isVisible())) {
+        await this.page.reload();
+      }
+      await expect(memberRow).toBeVisible({timeout: ConstantHelper.timeout.medium});
+    }).toPass({timeout: ConstantHelper.timeout.navigation});
   }
 
   async clickMembersSidebarButton() {
@@ -74,6 +84,7 @@ export class MemberUiHelper extends UiBaseLocators {
 
   async enterComments(comment: string) {
     await this.enterText(this.commentsTxt, comment);
+    await this.commentsTxt.blur();
   }
 
   async enterUsername(username: string) {
@@ -154,7 +165,7 @@ export class MemberUiHelper extends UiBaseLocators {
   }
 
   async clickSaveButtonAndWaitForMemberToBeUpdated() {
-    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.member, this.clickSaveButton(), ConstantHelper.statusCodes.ok);
+    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.member, this.clickSaveButton(), ConstantHelper.statusCodes.ok, ConstantHelper.httpMethods.put);
   }
 
   async clickConfirmToDeleteButtonAndWaitForMemberToBeDeleted() {

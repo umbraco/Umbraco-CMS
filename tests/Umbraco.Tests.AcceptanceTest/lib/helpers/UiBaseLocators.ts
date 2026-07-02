@@ -55,6 +55,7 @@ export class UiBaseLocators extends BasePage {
   public readonly backOfficeHeader: Locator;
   public readonly backOfficeMain: Locator;
   public readonly sectionLinks: Locator;
+  public readonly activeSectionLink: Locator;
   public readonly sectionSidebar: Locator;
   public readonly menuItem: Locator;
   public readonly actionsMenuContainer: Locator;
@@ -202,6 +203,7 @@ export class UiBaseLocators extends BasePage {
 
   // User
   public readonly currentUserAvatarBtn: Locator;
+  public readonly currentUserModal: Locator;
   public readonly newPasswordTxt: Locator;
   public readonly confirmPasswordTxt: Locator;
   public readonly currentPasswordTxt: Locator;
@@ -323,6 +325,7 @@ export class UiBaseLocators extends BasePage {
     this.backOfficeHeader = page.locator("umb-backoffice-header");
     this.backOfficeMain = page.locator("umb-backoffice-main");
     this.sectionLinks = page.getByTestId("section-links");
+    this.activeSectionLink = this.sectionLinks.locator("[active]");
     this.sectionSidebar = page.locator("umb-section-sidebar");
     this.menuItem = page.locator("uui-menu-item");
     this.actionsMenuContainer = page.locator("uui-scroll-container");
@@ -551,6 +554,7 @@ export class UiBaseLocators extends BasePage {
     this.currentUserAvatarBtn = page
       .getByTestId("header-app:Umb.HeaderApp.CurrentUser")
       .locator("uui-avatar");
+    this.currentUserModal = page.locator("umb-current-user-modal");
     this.currentPasswordTxt = page.locator('input[name="oldPassword"]');
     this.newPasswordTxt = page.locator('input[name="newPassword"]');
     this.confirmPasswordTxt = page.locator('input[name="confirmPassword"]');
@@ -1064,8 +1068,7 @@ export class UiBaseLocators extends BasePage {
         );
       }
     }
-    const alreadySelected = await this.sectionLinks
-      .locator("[active]")
+    const alreadySelected = await this.activeSectionLink
       .getByText(sectionName)
       .isVisible();
     if (alreadySelected && !skipReload) {
@@ -1745,7 +1748,14 @@ export class UiBaseLocators extends BasePage {
 
   // User Methods
   async clickCurrentUserAvatarButton() {
-    await this.click(this.currentUserAvatarBtn, { force: true });
+    await expect(async () => {
+      if (!(await this.currentUserModal.isVisible())) {
+        await this.click(this.currentUserAvatarBtn);
+      }
+      await expect(this.currentUserModal).toBeVisible({
+        timeout: ConstantHelper.timeout.short,
+      });
+    }).toPass({timeout: ConstantHelper.timeout.medium});
   }
 
   // Collection Methods
@@ -1998,10 +2008,11 @@ export class UiBaseLocators extends BasePage {
     url: string,
     promise: Promise<void>,
     statusCode: number,
+    method?: string,
   ) {
     const [response] = await Promise.all([
       this.page.waitForResponse(
-        (resp) => resp.url().includes(url) && resp.status() === statusCode,
+        (resp) => resp.url().includes(url) && resp.status() === statusCode && (method === undefined || resp.request().method() === method),
       ),
       promise,
     ]);

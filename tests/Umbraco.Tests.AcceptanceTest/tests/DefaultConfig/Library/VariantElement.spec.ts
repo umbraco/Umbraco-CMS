@@ -73,7 +73,7 @@ test('can create element with multiple culture variants', async ({umbracoApi, um
   await umbracoUi.library.enterElementName(elementNameEnglish);
   await umbracoUi.library.enterTextstring(englishText);
   await umbracoUi.library.clickSaveButton();
-  await umbracoUi.library.clickSaveModalButtonAndWaitForElementToBeCreated();
+  const elementId = await umbracoUi.library.clickSaveModalButtonAndWaitForElementToBeCreated();
   await umbracoUi.waitForTimeout(ConstantHelper.wait.short); // This wait is needed to ensure the element is created before adding a variant
   // Add Danish variant using variant selector
   await umbracoUi.library.clickSelectVariantButton();
@@ -84,7 +84,7 @@ test('can create element with multiple culture variants', async ({umbracoApi, um
   await umbracoUi.library.clickSaveModalButtonAndWaitForElementToBeUpdated();
 
   // Assert
-  const elementData = await umbracoApi.element.getByName(elementNameEnglish);
+  const elementData = await umbracoApi.element.get(elementId);
   expect(elementData.variants.length).toEqual(2);
   const englishVariant = elementData.variants.find((variant: any) => variant.culture === 'en-US');
   expect(englishVariant).toBeDefined();

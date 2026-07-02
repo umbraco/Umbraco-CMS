@@ -136,6 +136,7 @@ export class ContentUiHelper extends UiBaseLocators {
   private readonly saveContentBtn: Locator;
   private readonly splitView: Locator;
   private readonly tiptapInput: Locator;
+  private readonly tipTapRteInput: Locator;
   private readonly rteBlockInline: Locator;
   private readonly modalCreateBtn: Locator;
   private readonly modalUpdateBtn: Locator;
@@ -476,6 +477,7 @@ export class ContentUiHelper extends UiBaseLocators {
     );
     this.blockWorkspace = page.locator("umb-block-workspace-editor");
     this.tiptapInput = page.locator("umb-input-tiptap");
+    this.tipTapRteInput = page.getByTestId("input:tiptap-rte");
     this.rteBlockInline = page.locator("umb-rte-block-inline");
     this.modalCreateBtn = this.backofficeModalContainer.getByLabel("Create", {
       exact: true,
@@ -879,7 +881,7 @@ export class ContentUiHelper extends UiBaseLocators {
 
   async clickContainerSaveAndPublishButtonAndWaitForContentToBePublished() {
     return await this.waitForResponseAfterExecutingPromise(
-      ConstantHelper.apiEndpoints.document,
+      '/publish',
       this.clickContainerSaveAndPublishButton(),
       ConstantHelper.statusCodes.ok,
     );
@@ -1526,7 +1528,12 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   async clickRollbackButton() {
-    await this.click(this.rollbackBtn, { force: true });
+    await this.waitForResponseAfterExecutingPromise(
+      '/document-version',
+      this.click(this.rollbackBtn, { force: true }),
+      ConstantHelper.statusCodes.ok,
+      ConstantHelper.httpMethods.get,
+    );
   }
 
   async clickRollbackContainerButton(documentId?: string) {
@@ -1536,7 +1543,7 @@ export class ContentUiHelper extends UiBaseLocators {
       await Promise.all([
         this.waitForResponse(
           (resp) =>
-            resp.request().method() === 'GET' &&
+            resp.request().method() === ConstantHelper.httpMethods.get &&
             resp.status() === ConstantHelper.statusCodes.ok &&
             new URL(resp.url()).pathname === expectedPath,
         ),
@@ -2278,6 +2285,12 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   // TipTap
+  async isImageInTipTapEditorVisible(imageName: string) {
+    await this.isVisible(
+      this.tipTapRteInput.getByRole("img", {name: imageName}),
+    );
+  }
+
   async enterRTETipTapEditor(value: string) {
     await this.enterText(this.tipTapEditor, value);
   }

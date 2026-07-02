@@ -224,7 +224,16 @@ export class MediaUiHelper extends UiBaseLocators {
     return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.recycleBinMedia, this.clickConfirmEmptyRecycleBinButton(), ConstantHelper.statusCodes.ok);
   }
 
-  async clickChooseModalButtonAndWaitForMediaItemsToBeMoved(movedMediaItems: number) {
-    return await this.waitForMultipleResponsesAfterExecutingPromise('/move', this.clickChooseModalButton(), 200, movedMediaItems);
+  async clickChooseModalButtonAndWaitForMediaItemsToBeMoved(mediaIds: string[]) {
+    await Promise.all([
+      ...mediaIds.map((id) =>
+        this.waitForResponse(
+          (resp) =>
+            resp.url().includes(`/media/${id}/move`) &&
+            resp.status() === ConstantHelper.statusCodes.ok,
+        ),
+      ),
+      this.clickChooseModalButton(),
+    ]);
   }
 }

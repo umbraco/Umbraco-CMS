@@ -68,6 +68,7 @@ test('can copy and paste a single block into the same document and group', async
   await umbracoUi.content.clickPasteFromClipboardButtonForProperty(groupName, blockListDataTypeName);
   await umbracoUi.content.selectClipboardEntryWithName(contentName, blockListDataTypeName, elementTypeName);
   await umbracoUi.content.clickSubmitButton();
+  await umbracoUi.content.doesBlockListPropertyHaveBlockAmount(groupName, blockListDataTypeName, 2);
   await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
@@ -92,6 +93,7 @@ test('can copy and paste a single block into the same document but different gro
   await umbracoUi.content.clickPasteFromClipboardButtonForProperty(secondGroupName, secondBlockListPropertyName);
   await umbracoUi.content.selectClipboardEntryWithName(contentName, blockListDataTypeName, elementTypeName);
   await umbracoUi.content.clickSubmitButton();
+  await umbracoUi.content.doesBlockListPropertyHaveBlockAmount(secondGroupName, secondBlockListPropertyName, 1);
   await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
@@ -120,6 +122,7 @@ test('can copy and paste a single block into another document', async ({umbracoA
   await umbracoUi.content.clickPasteFromClipboardButtonForProperty(groupName, blockListDataTypeName);
   await umbracoUi.content.selectClipboardEntryWithName(contentName, blockListDataTypeName, elementTypeName);
   await umbracoUi.content.clickSubmitButton();
+  await umbracoUi.content.doesBlockListPropertyHaveBlockAmount(groupName, blockListDataTypeName, 1);
   await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
@@ -277,6 +280,7 @@ test('can copy block from a block list to a block grid',  async ({umbracoApi, um
   await umbracoUi.content.clickPasteFromClipboardButtonForProperty(blockGridGroupName, blockGridDataTypeName);
   await umbracoUi.content.selectClipboardEntryWithName(contentName, blockListDataTypeName, elementTypeName);
   await umbracoUi.content.clickSubmitButton();
+  await umbracoUi.content.doesBlockGridPropertyHaveBlockAmount(blockGridGroupName, blockGridDataTypeName, 2);
   await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
