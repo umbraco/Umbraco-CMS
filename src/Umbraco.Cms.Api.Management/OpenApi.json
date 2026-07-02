@@ -46018,6 +46018,10 @@
             "type": "string",
             "nullable": true
           },
+          "cacheBuster": {
+            "type": "string",
+            "nullable": true
+          },
           "extensions": {
             "type": "array",
             "items": { }
