@@ -4,6 +4,7 @@ export * from './entity-bulk-actions/constants.js';
 export * from './folder/constants.js';
 export * from './item/constants.js';
 export * from './modals/constants.js';
+export * from './property-editor/constants.js';
 export * from './recycle-bin/constants.js';
 export * from './reference/constants.js';
 export * from './repository/constants.js';

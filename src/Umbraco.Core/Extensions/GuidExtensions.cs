@@ -6,7 +6,7 @@ namespace Umbraco.Cms.Core.Extensions;
 public static class GuidExtensions
 {
     /// <summary>
-    /// Determines whether the GUID was created from an integer using <see cref="IntExtensions.ToGuid(int)"/>.
+    /// Determines whether the GUID was created from an integer using <see cref="Umbraco.Extensions.IntExtensions.ToGuid(int)"/>.
     /// </summary>
     /// <param name="guid">The GUID to check.</param>
     /// <returns><c>true</c> if the GUID was created from an integer; otherwise, <c>false</c>.</returns>
@@ -29,7 +29,7 @@ public static class GuidExtensions
     /// <param name="guid">The GUID to convert.</param>
     /// <returns>The integer value.</returns>
     /// <remarks>
-    /// This method should only be used on GUIDs that were created using <see cref="IntExtensions.ToGuid(int)"/>.
+    /// This method should only be used on GUIDs that were created using <see cref="Umbraco.Extensions.IntExtensions.ToGuid(int)"/>.
     /// </remarks>
     public static int ToInt(this Guid guid)
     {
