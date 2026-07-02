@@ -1284,6 +1284,12 @@
               "string"
             ]
           },
+          "name": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
           "createDate": {
             "type": "string",
             "format": "date-time"
@@ -1335,12 +1341,6 @@
           "id": {
             "type": "string",
             "format": "uuid"
-          },
-          "name": {
-            "type": [
-              "null",
-              "string"
-            ]
           },
           "properties": {
             "type": [
@@ -1377,6 +1377,12 @@
               "string"
             ]
           },
+          "name": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
           "createDate": {
             "type": "string",
             "format": "date-time"
@@ -1428,12 +1434,6 @@
           "id": {
             "type": "string",
             "format": "uuid"
-          },
-          "name": {
-            "type": [
-              "null",
-              "string"
-            ]
           },
           "properties": {
             "type": [
