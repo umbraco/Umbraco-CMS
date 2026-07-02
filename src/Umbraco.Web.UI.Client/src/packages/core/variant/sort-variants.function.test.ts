@@ -1,7 +1,7 @@
 import { expect } from '@open-wc/testing';
 import type { UmbEntityVariantOptionModel } from './types.js';
 import { sortVariants } from './sort-variants.function.js';
-import { DocumentVariantStateModel as State } from '@umbraco-cms/backoffice/external/backend-api';
+import { PublishableVariantStateModel as State } from '@umbraco-cms/backoffice/external/backend-api';
 
 function makeVariant(
 	name: string,

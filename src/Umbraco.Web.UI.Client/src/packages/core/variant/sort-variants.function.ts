@@ -1,5 +1,5 @@
 import type { UmbEntityVariantOptionModel } from './types.js';
-import { DocumentVariantStateModel as UmbPublishableVariantState } from '@umbraco-cms/backoffice/external/backend-api';
+import { PublishableVariantStateModel as UmbPublishableVariantState } from '@umbraco-cms/backoffice/external/backend-api';
 
 const variantStatesOrder: Record<string, number> = {
 	[UmbPublishableVariantState.PUBLISHED_PENDING_CHANGES]: 1,
