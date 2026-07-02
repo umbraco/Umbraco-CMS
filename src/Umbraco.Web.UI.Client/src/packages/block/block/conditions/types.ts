@@ -35,6 +35,11 @@ export interface BlockEntryIsReadOnlyConditionConfig extends UmbConditionConfigB
 	match?: boolean;
 }
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
+export interface BlockEntryIsAllowedInLibraryConditionConfig extends UmbConditionConfigBase<'Umb.Condition.BlockEntryIsAllowedInLibrary'> {
+	match?: boolean;
+}
+
 // NOTE: Named with a `Umb` prefix, as clashed with `BlockEntryIsExposedConditionConfig`,
 // but that one is a misnomer as the condition targets the block workspace. [LK]
 export interface UmbBlockEntryIsExposedConditionConfig extends UmbConditionConfigBase<'Umb.Condition.BlockEntryIsExposed'> {
@@ -52,6 +57,7 @@ declare global {
 			| BlockWorkspaceIsReadOnlyConditionConfig
 			| BlockEntryIsReadOnlyConditionConfig
 			| BlockEntryHasSettingsConditionConfig
+			| BlockEntryIsAllowedInLibraryConditionConfig
 			| UmbBlockEntryIsExposedConditionConfig;
 	}
 }
