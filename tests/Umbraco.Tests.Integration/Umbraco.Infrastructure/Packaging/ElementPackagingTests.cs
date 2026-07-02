@@ -190,4 +190,64 @@ internal sealed class ElementPackagingTests : UmbracoIntegrationTest
             Assert.That(summary.EntityContainersInstalled.Count(), Is.EqualTo(2));
         });
     }
+
+    [Test]
+    public async Task Can_Match_Existing_Root_Folder_By_Key_When_Renamed()
+    {
+        // Arrange: an element in a root container. On the target install that container has the same key
+        // as the package but a *different* name - i.e. it was renamed after the package was built.
+        var elementType = ContentTypeBuilder.CreateSimpleElementType("element5", "Element 5");
+        await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
+
+        var folderKey = Guid.NewGuid();
+        EntityContainer container =
+            (await ElementContainerService.CreateAsync(folderKey, "RenamedOnTarget", null, Constants.Security.SuperUserKey)).Result!;
+
+        IElement element = new Element("My Element", container.Id, elementType);
+        element.SetValue("title", "Renamed Folder Title");
+        ElementService.Save(element);
+        var elementKey = element.Key;
+
+        // Reload so Level/Path are populated, then serialize.
+        element = ElementService.GetById(elementKey)!;
+        XElement serialized = Serializer.Serialize(element);
+
+        // Simulate the package having been built while the folder still had its original name (same key).
+        serialized.SetAttributeValue("Folders", "OriginalName");
+
+        var packageXml = new XDocument(
+            new XElement(
+                "umbPackage",
+                new XElement("info", new XElement("package", new XElement("name", "ElementPackage"))),
+                new XElement("DocumentTypes", Serializer.Serialize(elementType)),
+                new XElement(
+                    "Elements",
+                    new XElement(
+                        "ElementSet",
+                        new XAttribute("importMode", "root"),
+                        serialized))));
+
+        // Remove the element so the install genuinely re-creates it, but keep the (renamed) container.
+        ElementService.Delete(element);
+        Assert.That(ElementService.GetById(elementKey), Is.Null);
+
+        // Act
+        CompiledPackage compiledPackage = CompiledPackageXmlParser.ToCompiledPackage(packageXml);
+#pragma warning disable CS0618
+        InstallationSummary summary = PackageDataInstallation.InstallPackageData(compiledPackage, Constants.Security.SuperUserId);
+#pragma warning restore CS0618
+
+        // Assert: the existing folder is matched by key (not duplicated by its packaged name), so the element
+        // lands back under it and no new container is installed.
+        IElement reloaded = ElementService.GetById(elementKey)!;
+        EntityContainer? parent = await ElementContainerService.GetParentAsync(reloaded);
+        Assert.Multiple(() =>
+        {
+            Assert.That(reloaded, Is.Not.Null);
+            Assert.That(parent, Is.Not.Null);
+            Assert.That(parent!.Key, Is.EqualTo(folderKey));
+            Assert.That(parent.Name, Is.EqualTo("RenamedOnTarget"));
+            Assert.That(summary.EntityContainersInstalled.Count(), Is.EqualTo(0));
+        });
+    }
 }
