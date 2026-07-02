@@ -1,6 +1,7 @@
 import type { UmbPublishedVariantWithPendingChanges } from '../publishing/index.js';
 import { html, state } from '@umbraco-cms/backoffice/external/lit';
 import { PublishableVariantStateModel as UmbPublishableVariantState } from '@umbraco-cms/backoffice/external/backend-api';
+import { sortVariants } from '@umbraco-cms/backoffice/variant';
 import { UmbWorkspaceSplitViewVariantSelectorElement } from '@umbraco-cms/backoffice/workspace';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
@@ -36,6 +37,8 @@ export abstract class UmbPublishableSplitViewVariantSelectorElement<
 	 * @returns {UmbContextToken<TContext>} The context token for the publishable workspace context.
 	 */
 	protected abstract getPublishingContextToken(): UmbContextToken<TContext>;
+
+	protected override _variantSorter = sortVariants;
 
 	@state()
 	private _variantsWithPendingChanges: Array<UmbPublishedVariantWithPendingChanges> = [];
