@@ -18,7 +18,6 @@ export class UmbCurrentUserGroupCondition
 	}
 
 	#observeCurrentUser = async (currentUser: UmbCurrentUserModel) => {
-		// If currentUser is not yet available, return early to avoid errors
 		if (!currentUser) {
 			this.permitted = false;
 			return;
