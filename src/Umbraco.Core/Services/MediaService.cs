@@ -82,7 +82,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="loggerFactory">The <see cref="ILoggerFactory"/> for creating loggers.</param>
         /// <param name="eventMessagesFactory">The <see cref="IEventMessagesFactory"/> for creating event messages.</param>
         /// <param name="mediaRepository">The <see cref="IMediaRepository"/> for media persistence.</param>
-        /// <param name="auditRepository">The audit repository (obsolete, not used).</param>
+        /// <param name="auditService">The <see cref="IAuditService"/> for audit handling.</param>
         /// <param name="mediaTypeRepository">The <see cref="IMediaTypeRepository"/> for media type persistence.</param>
         /// <param name="entityRepository">The <see cref="IEntityRepository"/> for entity operations.</param>
         /// <param name="shortStringHelper">The <see cref="IShortStringHelper"/> for string operations.</param>
