@@ -3246,7 +3246,13 @@ public class ContentService : RepositoryService, IContentService
         {
             scope.WriteLock(Constants.Locks.ContentTree);
 
-            OperationResult ret = Sort(scope, itemsA, userId, evtMsgs);
+            // Reload within the lock so sorting operates on fully-loaded entities. Callers may pass
+            // partially-loaded content (e.g. loaded with loadTemplates: false or without property data),
+            // and saving those directly would wipe the template and property data (#23120).
+            // GetByIds returns items in the requested order, preserving the caller's ordering that drives the sort.
+            IContent[] reloaded = GetByIds(itemsA.Select(x => x.Id).ToArray()).ToArray();
+
+            OperationResult ret = Sort(scope, reloaded, userId, evtMsgs);
             scope.Complete();
             return ret;
         }
@@ -3282,6 +3288,43 @@ public class ContentService : RepositoryService, IContentService
             scope.Complete();
             return ret;
         }
+    }
+
+    /// <inheritdoc />
+    public OperationResult SortChildren(int parentId, IReadOnlyList<int> orderedChildIds, int userId = Constants.Security.SuperUserId)
+    {
+        EventMessages evtMsgs = EventMessagesFactory.Get();
+        if (orderedChildIds.Count == 0)
+        {
+            return new OperationResult(OperationResultType.NoOperation, evtMsgs);
+        }
+
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.WriteLock(Constants.Locks.ContentTree);
+
+        _documentRepository.UpdateSortOrder(orderedChildIds);
+
+        // Sort order lives in umbracoNode; neither the published cache nor the content repository cache keeps
+        // a separate serialized copy of it, so refreshing the affected branch (which invalidates both and has
+        // them reload from umbracoNode) is enough to pick up the new order without re-saving each child.
+        if (parentId == Constants.System.Root)
+        {
+            IContent[] roots = GetByIds(orderedChildIds).ToArray();
+            scope.Notifications.Publish(new ContentTreeChangeNotification(roots, TreeChangeTypes.RefreshNode, evtMsgs));
+        }
+        else
+        {
+            IContent? parent = GetById(parentId);
+            if (parent is not null)
+            {
+                scope.Notifications.Publish(new ContentTreeChangeNotification(parent, TreeChangeTypes.RefreshBranch, evtMsgs));
+            }
+        }
+
+        Audit(AuditType.Sort, userId, parentId);
+
+        scope.Complete();
+        return OperationResult.Succeed(evtMsgs);
     }
 
     private OperationResult Sort(ICoreScope scope, IContent[] itemsA, int userId, EventMessages eventMessages)

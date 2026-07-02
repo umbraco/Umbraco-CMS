@@ -344,7 +344,7 @@ export default {
 		enterFolderName: 'Introduisez un nom de dossier',
 		updateData: 'Choisissez un type et un titre',
 		noDocumentTypes:
-			"Il n'y a aucun type de document disponible pour créer du contenu ici. Vous devez d'abord les activer dans <strong>Types de documents</strong> sous la section <strong>Paramètres</strong>, en modifiant les <strong>Types de noeuds enfants autorisés</strong> sous les <strong>Permissions</strong>.",
+			"Il n'y a aucun type de document disponible pour créer du contenu ici. Vous devez d'abord les activer dans <strong>Types de documents</strong> sous la section <strong>Paramètres</strong>, en modifiant les <strong>Types de noeuds enfants autorisés</strong> sous la <strong>Structure</strong>.",
 		noDocumentTypesAtRoot:
 			"Il n'y a aucun type de document disponible pour créer du contenu ici. Vous devez d'abord les activer dans <strong>Types de documents</strong> sous la section <strong>Paramètres</strong>.",
 		noDocumentTypesWithNoSettingsAccess:
@@ -352,9 +352,9 @@ export default {
 		noDocumentTypesEditPermissions: 'Modifier les permissions pour ce type de document',
 		noDocumentTypesCreateNew: 'Créer un nouveau type de document',
 		noDocumentTypesAllowedAtRoot:
-			"Il n'y a aucun type de document disponible pour créer du contenu ici. Vous devez d'abord les activer dans <strong>Types de documents</strong> sous la section <strong>Paramètres</strong>, en modifiant l'option <strong>Autoriser comme racine</strong> sous les <strong>Permissions</strong>.",
+			"Il n'y a aucun type de document disponible pour créer du contenu ici. Vous devez d'abord les activer dans <strong>Types de documents</strong> sous la section <strong>Paramètres</strong>, en modifiant l'option <strong>Autoriser comme racine</strong> sous la <strong>Structure</strong>.",
 		noMediaTypes:
-			"Il n'y a aucun type de média disponible pour créer un media ici. Vous devez d'abord les activer dans <strong>Types de médias</strong> dans la section <strong>Paramètres</strong>, en modifiant les <strong>Types de noeuds enfants autorisés</strong> sous les <strong>Permissions</strong>.",
+			"Il n'y a aucun type de média disponible pour créer un media ici. Vous devez d'abord les activer dans <strong>Types de médias</strong> dans la section <strong>Paramètres</strong>, en modifiant les <strong>Types de noeuds enfants autorisés</strong> sous la <strong>Structure</strong>.",
 		noMediaTypesWithNoSettingsAccess:
 			"Le media sélectionné dans l'arborescence n'autorise pas la création d'un autre media sous lui.",
 		noMediaTypesEditPermissions: 'Modifier les permissions pour ce type de media',
@@ -924,7 +924,7 @@ export default {
 		greeting5: 'Bienvenue',
 		greeting6: 'Bienvenue',
 		instruction: 'Connectez-vous ci-dessous',
-		signInWith: 'Identifiez-vous avec',
+		signInWith: 'Identifiez-vous avec {0}',
 		timeout: 'La session a expiré',
 		bottomText:
 			'<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">Umbraco.com</a></p> ',
@@ -1403,10 +1403,20 @@ export default {
 		childNodesDescription: 'Autorisez la création de contenu des types spécifiés sous le contenu de ce type-ci',
 		chooseChildNode: 'Choisissez les noeuds enfants',
 		compositionsDescription:
-			"Hériter des onglets et propriétés d'un type de document existant. De nouveaux onglets seront ajoutés au type de document actuel, ou fusionnés s'il existe un onglet avec un nom sililaire.",
+			"Hériter des onglets et propriétés d'un type de document existant. De nouveaux onglets seront ajoutés au type de document actuel, ou fusionnés s'il existe un onglet avec un nom similaire.",
+		compositionsDescriptionMediaType:
+			"Hériter des onglets et propriétés d'un type de media existant. De nouveaux onglets seront ajoutés au type de media actuel, ou fusionnés s'il existe un onglet avec un nom similaire.",
+		compositionsDescriptionMemberType:
+			"Hériter des onglets et propriétés d'un type de membre existant. De nouveaux onglets seront ajoutés au type de membre actuel, ou fusionnés s'il existe un onglet avec un nom similaire.",
 		compositionInUse:
 			'Ce type de contenu est utilisé dans une composition, et ne peut donc pas être lui-même un composé.',
+		compositionInUseMediaType:
+			'Ce type de media est utilisé dans une composition, et ne peut donc pas être lui-même un composé.',
+		compositionInUseMemberType:
+			'Ce type de membre est utilisé dans une composition, et ne peut donc pas être lui-même un composé.',
 		noAvailableCompositions: "Il n'y a pas de type de contenu disponible à utiliser dans une composition.",
+		noAvailableCompositionsMediaType: "Il n'y a pas de type de media disponible à utiliser dans une composition.",
+		noAvailableCompositionsMemberType: "Il n'y a pas de type de membre disponible à utiliser dans une composition.",
 		compositionRemoveWarning:
 			"La suppression d'une composition supprimera les données de toutes les propriétés associées. Une fois que vous sauvegardez le type de document, il n'y a plus moyen de faire marche arrière.",
 		availableEditors: 'Editeurs disponibles',
@@ -1443,6 +1453,10 @@ export default {
 		compositionUsageHeading: 'Où cette composition est-elle utilisée?',
 		compositionUsageSpecification:
 			'Cette composition est actuellement utilisée dans la composition des types de contenu suivants :',
+		compositionUsageSpecificationMediaType:
+			'Cette composition est actuellement utilisée dans la composition des types de media suivants :',
+		compositionUsageSpecificationMemberType:
+			'Cette composition est actuellement utilisée dans la composition des types de membre suivants :',
 		variantsHeading: 'Permettre une variation par culture',
 		variantsDescription: 'Permettre aux éditeurs de créer du contenu de ce type dans différentes langues.',
 		allowVaryByCulture: 'Permettre une variation par culture',
@@ -1789,6 +1803,8 @@ export default {
 	redirectUrls: {
 		disableUrlTracker: 'Désactiver URL tracker',
 		enableUrlTracker: 'Activer URL tracker',
+		urlTrackerEnabled: 'Activé',
+		urlTrackerDisabled: 'Désactivé',
 		culture: 'Culture',
 		originalUrl: 'URL original',
 		redirectedTo: 'Redirigé Vers',

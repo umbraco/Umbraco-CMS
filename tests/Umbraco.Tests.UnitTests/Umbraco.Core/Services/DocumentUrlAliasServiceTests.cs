@@ -681,4 +681,131 @@ public class DocumentUrlAliasServiceTests
     }
 
     #endregion
+
+    #region UpdateAliasCache Tests
+
+    /// <summary>
+    /// <see cref="DocumentUrlAliasService.UpdateAliasCacheAsync"/> must never call <c>Save</c> or
+    /// <c>DeleteByDocumentKey</c> on the repository. Its contract is to refresh the in-memory cache only.
+    /// </summary>
+    [Test]
+    public async Task UpdateAliasCacheAsync_DoesNotCallRepositorySave_OrDelete()
+    {
+        var (service, aliasRepositoryMock, contentServiceMock) = CreateServiceWithMocks();
+
+        var documentKey = Guid.NewGuid();
+        contentServiceMock.Setup(x => x.GetById(documentKey))
+            .Returns(CreateInvariantContentWithAlias(documentKey, "my-alias"));
+
+        await service.UpdateAliasCacheAsync(documentKey);
+
+        aliasRepositoryMock.Verify(
+            x => x.Save(It.IsAny<IEnumerable<PublishedDocumentUrlAlias>>()),
+            Times.Never,
+            "UpdateAliasCacheAsync must not write URL aliases to the database.");
+        aliasRepositoryMock.Verify(
+            x => x.DeleteByDocumentKey(It.IsAny<IEnumerable<Guid>>()),
+            Times.Never,
+            "UpdateAliasCacheAsync must not delete URL aliases from the database.");
+    }
+
+    /// <summary>
+    /// Even when a document has no aliases, <see cref="DocumentUrlAliasService.UpdateAliasCacheAsync"/>
+    /// must not issue a database delete — it is a cache-only operation.
+    /// </summary>
+    [Test]
+    public async Task UpdateAliasCacheAsync_WhenContentHasNoAlias_DoesNotCallRepositoryDelete()
+    {
+        var (service, aliasRepositoryMock, contentServiceMock) = CreateServiceWithMocks();
+
+        var documentKey = Guid.NewGuid();
+        contentServiceMock.Setup(x => x.GetById(documentKey))
+            .Returns(CreateInvariantContentWithAlias(documentKey, aliasValue: null));
+
+        await service.UpdateAliasCacheAsync(documentKey);
+
+        aliasRepositoryMock.Verify(
+            x => x.DeleteByDocumentKey(It.IsAny<IEnumerable<Guid>>()),
+            Times.Never,
+            "UpdateAliasCacheAsync must not delete URL aliases from the database even when no alias exists.");
+    }
+
+    /// <summary>
+    /// After <see cref="DocumentUrlAliasService.DeleteAliasesFromCacheAsync"/> evicts a cached alias,
+    /// <see cref="DocumentUrlAliasService.UpdateAliasCacheAsync"/> must restore it from the content data
+    /// without writing to the database, so subsequent lookups succeed again.
+    /// </summary>
+    [Test]
+    public async Task UpdateAliasCacheAsync_StillPopulatesInMemoryCache()
+    {
+        var documentKey = Guid.NewGuid();
+
+        var seeded = new[]
+        {
+            new PublishedDocumentUrlAlias
+            {
+                DocumentKey = documentKey,
+                NullableLanguageId = null,
+                Alias = "my-alias",
+            },
+        };
+        var languages = new List<ILanguage> { CreateMockLanguage(1, "en-US") };
+
+        // Create the service+mocks manually so we can configure both the repository (for InitAsync
+        // seed) and the content service (for UpdateAliasCacheAsync's GetById call).
+        var (service, aliasRepositoryMock, contentServiceMock) = CreateServiceWithMocks(
+            serverRole: ServerRole.Single,
+            languages: languages);
+        aliasRepositoryMock.Setup(x => x.GetAll()).Returns(seeded);
+        await service.InitAsync(forceEmpty: false, CancellationToken.None);
+
+        // Evict the alias from the in-memory cache so it cannot be found.
+        await service.DeleteAliasesFromCacheAsync(new[] { documentKey });
+        Assert.That(
+            await service.GetDocumentKeysByAliasAsync("my-alias", culture: null),
+            Is.Empty,
+            "Pre-condition: alias must not be resolvable after cache eviction.");
+
+        // Wire up the content service so UpdateAliasCacheAsync can repopulate the cache.
+        contentServiceMock.Setup(x => x.GetById(documentKey))
+            .Returns(CreateInvariantContentWithAlias(documentKey, "my-alias"));
+
+        await service.UpdateAliasCacheAsync(documentKey);
+
+        var result = (await service.GetDocumentKeysByAliasAsync("my-alias", culture: null)).ToList();
+        Assert.That(
+            result,
+            Does.Contain(documentKey),
+            "UpdateAliasCacheAsync must repopulate the in-memory cache without a database write.");
+
+        aliasRepositoryMock.Verify(
+            x => x.Save(It.IsAny<IEnumerable<PublishedDocumentUrlAlias>>()),
+            Times.Never);
+        aliasRepositoryMock.Verify(
+            x => x.DeleteByDocumentKey(It.IsAny<IEnumerable<Guid>>()),
+            Times.Never);
+    }
+
+    /// <summary>
+    /// <see cref="DocumentUrlAliasService.UpdateAliasCacheWithDescendantsAsync"/> must not call
+    /// <c>Save</c> or <c>DeleteByDocumentKey</c> — it is a cache-only operation, even for subtrees.
+    /// </summary>
+    [Test]
+    public async Task UpdateAliasCacheWithDescendantsAsync_DoesNotCallRepositorySave()
+    {
+        var (service, aliasRepositoryMock, _) = CreateServiceWithMocks();
+
+        await service.UpdateAliasCacheWithDescendantsAsync(Guid.NewGuid());
+
+        aliasRepositoryMock.Verify(
+            x => x.Save(It.IsAny<IEnumerable<PublishedDocumentUrlAlias>>()),
+            Times.Never,
+            "UpdateAliasCacheWithDescendantsAsync must not write URL aliases to the database.");
+        aliasRepositoryMock.Verify(
+            x => x.DeleteByDocumentKey(It.IsAny<IEnumerable<Guid>>()),
+            Times.Never,
+            "UpdateAliasCacheWithDescendantsAsync must not delete URL aliases from the database.");
+    }
+
+    #endregion
 }

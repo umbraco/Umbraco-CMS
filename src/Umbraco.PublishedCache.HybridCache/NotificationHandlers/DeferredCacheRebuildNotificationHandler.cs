@@ -1,5 +1,5 @@
 using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PublishedCache;
@@ -16,8 +16,8 @@ namespace Umbraco.Cms.Infrastructure.HybridCache.NotificationHandlers;
 ///     deferred rebuild's background transaction and the original save transaction.
 /// </remarks>
 internal sealed class DeferredCacheRebuildNotificationHandler :
-    INotificationHandler<ContentTypeChangedNotification>,
-    INotificationHandler<MediaTypeChangedNotification>
+    IDistributedCacheNotificationHandler<ContentTypeChangedNotification>,
+    IDistributedCacheNotificationHandler<MediaTypeChangedNotification>
 {
     private readonly IDeferredCacheRebuildService _deferredCacheRebuildService;
     private readonly CacheSettings _cacheSettings;

@@ -60,7 +60,7 @@ public sealed class UmbracoServices
     /// Retrieves all content, media, and member type models from the respective Umbraco services.
     /// </summary>
     /// <returns>
-    /// A list of <see cref="Umbraco.Cms.Infrastructure.ModelsBuilder.TypeModel"/> objects representing all content, media, and member types defined in the system.
+    /// A list of <see cref="TypeModel"/> objects representing all content, media, and member types defined in the system.
     /// </returns>
     public IList<TypeModel> GetAllTypes()
     {

@@ -542,6 +542,22 @@ public interface IContentService : IContentServiceBase<IContent>
     /// <returns>The operation result.</returns>
     OperationResult Sort(IEnumerable<int>? ids, int userId = Constants.Security.SuperUserId);
 
+    /// <summary>
+    ///     Sorts the children of a parent by persisting the supplied (already ordered) child identifiers
+    ///     as the new sort order, in a single set-based update.
+    /// </summary>
+    /// <param name="parentId">The identifier of the parent, or <see cref="Constants.System.Root"/> for the root.</param>
+    /// <param name="orderedChildIds">The child document identifiers, in the desired order.</param>
+    /// <param name="userId">The identifier of the user performing the action.</param>
+    /// <returns>The operation result.</returns>
+    /// <remarks>
+    ///     Unlike <see cref="Sort(IEnumerable{int}?, int)" />, this does not load the children or fire per-item
+    ///     save/sort notifications; it persists the order directly and refreshes the affected cache branch.
+    /// </remarks>
+    // TODO (V19): Remove the default implementation.
+    OperationResult SortChildren(int parentId, IReadOnlyList<int> orderedChildIds, int userId = Constants.Security.SuperUserId)
+        => throw new NotImplementedException();
+
     #endregion
 
     #region Publish Document

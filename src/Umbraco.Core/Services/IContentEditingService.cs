@@ -119,6 +119,18 @@ public interface IContentEditingService
     Task<ContentEditingOperationStatus> SortAsync(Guid? parentKey, IEnumerable<SortingModel> sortingModels, Guid userKey);
 
     /// <summary>
+    ///     Sorts the children of a parent by a system field.
+    /// </summary>
+    /// <param name="parentKey">The unique identifier of the parent, or <c>null</c> for root-level sorting.</param>
+    /// <param name="field">The system field to sort the children by.</param>
+    /// <param name="direction">The direction to sort in.</param>
+    /// <param name="culture">The culture whose variant name to sort by, or <c>null</c> to sort by the invariant name. Only applies when sorting by <see cref="ContentSortField.Name"/>. The culture is not validated: a child that does not vary by the given culture - or an unrecognised culture - falls back to the invariant name.</param>
+    /// <param name="userKey">The unique identifier of the user performing the action.</param>
+    /// <returns>The operation status indicating success or failure.</returns>
+    Task<ContentEditingOperationStatus> SortByFieldAsync(Guid? parentKey, ContentSortField field, Direction direction, string? culture, Guid userKey)
+        => throw new NotImplementedException(); // TODO (V19): Remove default implementation.
+
+    /// <summary>
     ///     Deletes a content item whether it is in the recycle bin or not.
     /// </summary>
     /// <param name="key">The unique identifier of the content item to delete.</param>

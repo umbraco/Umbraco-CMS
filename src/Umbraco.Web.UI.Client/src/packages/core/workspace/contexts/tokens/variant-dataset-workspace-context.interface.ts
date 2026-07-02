@@ -1,5 +1,5 @@
 import type { UmbWorkspaceSplitViewManager } from '../../controllers/workspace-split-view-manager.controller.js';
-import type { UmbPropertyDatasetContext } from '../../../property/property-dataset/property-dataset-context.interface.js';
+import type { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import type { UmbSubmittableWorkspaceContext } from './submittable-workspace-context.interface.js';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbVariantId, UmbEntityVariantModel, UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';

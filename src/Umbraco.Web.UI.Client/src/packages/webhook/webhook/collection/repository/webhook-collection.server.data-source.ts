@@ -29,8 +29,11 @@ export class UmbWebhookCollectionServerDataSource implements UmbWebhookCollectio
 	 * @returns {*}
 	 * @memberof UmbWebhookCollectionServerDataSource
 	 */
-	async getCollection(_filter: UmbWebhookCollectionFilterModel) {
-		const { data, error } = await tryExecute(this.#host, WebhookService.getWebhook({ query: _filter }));
+	async getCollection(filter: UmbWebhookCollectionFilterModel) {
+		const { data, error } = await tryExecute(
+			this.#host,
+			WebhookService.getWebhook({ query: { skip: filter.skip, take: filter.take } }),
+		);
 
 		if (error || !data) {
 			return { error };
