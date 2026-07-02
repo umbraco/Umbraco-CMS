@@ -125,6 +125,13 @@ export class UmbCodeEditorElement extends UmbLitElement implements UmbCodeEditor
 	wordWrap = false;
 
 	/**
+	 * Whether to enable auto-height mode where the editor grows to fit content.
+	 * @memberof UmbCodeEditorElement
+	 */
+	@property({ type: Boolean, attribute: 'auto-height' })
+	autoHeight = false;
+
+	/**
 	 * Whether to enable folding. Default is true.
 	 * @memberof UmbCodeEditorElement
 	 */
@@ -160,8 +167,30 @@ export class UmbCodeEditorElement extends UmbLitElement implements UmbCodeEditor
 		// Options
 		this.#editor = new UmbCodeEditorController(this, this.#constructorOptions());
 
+		if (this.autoHeight) {
+			this.#setupAutoHeight();
+		}
+
 		this._loading = false;
 		this.dispatchEvent(new UmbCodeEditorLoadedEvent());
+	}
+
+	#setupAutoHeight() {
+		const monacoEditor = this.#editor?.monacoEditor;
+		if (!monacoEditor) return;
+
+		monacoEditor.onDidContentSizeChange((e) => {
+			if (e.contentHeightChanged) {
+				const contentHeight = monacoEditor.getContentHeight();
+				this.container.style.height = `${contentHeight}px`;
+				monacoEditor.layout();
+			}
+		});
+
+		// Set initial height
+		const contentHeight = monacoEditor.getContentHeight();
+		this.container.style.height = `${contentHeight}px`;
+		monacoEditor.layout();
 	}
 
 	protected override updated(_changedProperties: PropertyValues<this>): void {
@@ -174,6 +203,7 @@ export class UmbCodeEditorElement extends UmbLitElement implements UmbCodeEditor
 			_changedProperties.has('readonly') ||
 			_changedProperties.has('code') ||
 			_changedProperties.has('label') ||
+			_changedProperties.has('autoHeight') ||
 			_changedProperties.has('disableFolding')
 		) {
 			this.#editor?.updateOptions(this.#constructorOptions());
@@ -190,6 +220,7 @@ export class UmbCodeEditorElement extends UmbLitElement implements UmbCodeEditor
 			wordWrap: this.wordWrap ? 'on' : 'off',
 			readOnly: this.readonly,
 			folding: !this.disableFolding,
+			autoHeight: this.autoHeight,
 			value: this.code,
 		};
 	}
