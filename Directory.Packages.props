@@ -95,5 +95,11 @@
       Pin it forward until both of those dependencies reference a fixed version.
     -->
     <PackageVersion Include="System.Security.Cryptography.Xml" Version="10.0.9" />
+    <!--
+      Microsoft.AspNetCore.OpenApi and Swashbuckle only require Microsoft.OpenApi >= 2.0.0, which otherwise
+      resolves to a vulnerable 2.0.0 (CVE-2026-49451, GHSA-v5pm-xwqc-g5wc). Pin forward to a patched 2.x
+      until the referencing packages raise their floor.
+    -->
+    <PackageVersion Include="Microsoft.OpenApi" Version="2.9.0" />
   </ItemGroup>
 </Project>

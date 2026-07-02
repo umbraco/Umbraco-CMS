@@ -30,6 +30,16 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!--
+    Umbraco.Web.UI opts out of central package management, so the Microsoft.OpenApi transitive pin in
+    Directory.Packages.props does not reach it. Reference it directly to force the patched version instead
+    of the vulnerable 2.0.0 that Swashbuckle / Microsoft.AspNetCore.OpenApi otherwise resolve
+    (CVE-2026-49451, GHSA-v5pm-xwqc-g5wc).
+    -->
+    <PackageReference Include="Microsoft.OpenApi" Version="2.9.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <!-- Ensure the AppLocalIcu setting is the same as the referenced ICU package version and changes are also done to the template project! -->
     <!-- Opt-in to app-local ICU to ensure consistent globalization APIs across different platforms -->
     <PackageReference Include="Microsoft.ICU.ICU4C.Runtime" Version="72.1.0.3" />
