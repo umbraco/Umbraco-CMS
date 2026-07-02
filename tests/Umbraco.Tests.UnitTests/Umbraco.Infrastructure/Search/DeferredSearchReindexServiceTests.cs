@@ -478,19 +478,15 @@ public class DeferredSearchReindexServiceTests
     private void SetupRelationGraph(Dictionary<int, (int id, Guid objectType)[]> graph)
     {
         _relationService
-            .Setup(r => r.GetPagedParentEntitiesByChildId(
-                It.IsAny<int>(),
-                It.IsAny<long>(),
-                It.IsAny<int>(),
-                out It.Ref<long>.IsAny,
+            .Setup(r => r.GetParentEntitiesByChildIds(
+                It.IsAny<IEnumerable<int>>(),
                 It.IsAny<IEnumerable<string>>(),
                 It.IsAny<UmbracoObjectTypes[]>()))
-            .Returns((int id, long pageIndex, int pageSize, out long total, IEnumerable<string> aliases, UmbracoObjectTypes[] types) =>
-            {
-                (int id, Guid objectType)[] parents = graph.TryGetValue(id, out (int id, Guid objectType)[]? p) ? p : [];
-                total = parents.Length;
-                return pageIndex == 0 ? parents.Select(parent => CreateEntity(parent.id, parent.objectType)).ToArray() : [];
-            });
+            .Returns((IEnumerable<int> childIds, IEnumerable<string> aliases, UmbracoObjectTypes[] types) =>
+                childIds
+                    .SelectMany(id => graph.TryGetValue(id, out (int id, Guid objectType)[]? parents) ? parents : [])
+                    .Select(parent => CreateEntity(parent.id, parent.objectType))
+                    .ToArray());
     }
 
     private static IEntitySlim CreateEntity(int id, Guid nodeObjectType)

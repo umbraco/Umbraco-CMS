@@ -339,6 +339,48 @@ internal sealed class RelationRepository : EntityRepositoryBase<int, IRelation>,
                 }
             });
 
+    /// <inheritdoc />
+    public IEnumerable<IUmbracoEntity> GetParentEntitiesByChildIds(
+        int[] childIds,
+        int[] relationTypes,
+        params Guid[] entityTypes)
+    {
+        if (childIds.Length == 0)
+        {
+            return [];
+        }
+
+        var results = new List<IUmbracoEntity>();
+        var childIdsPerQuery = Constants.Sql.MaxParameterCount - relationTypes.Length - entityTypes.Length;
+        foreach (IEnumerable<int> group in childIds.InGroupsOf(childIdsPerQuery))
+        {
+            var batch = group.ToArray();
+            results.AddRange(
+                _entityRepository.GetPagedResultsByQuery(
+                    Query<IUmbracoEntity>(),
+                    entityTypes,
+                    0,
+                    int.MaxValue,
+                    out _,
+                    null,
+                    null,
+                    sql =>
+                    {
+                        SqlJoinRelations(sql);
+
+                        sql.WhereIn<RelationDto>(rel => rel.ChildId, batch);
+                        sql.Where<RelationDto, NodeDto>((rel, node) => node.NodeId == rel.ParentId);
+
+                        if (relationTypes.Length > 0)
+                        {
+                            sql.WhereIn<RelationDto>(rel => rel.RelationType, relationTypes);
+                        }
+                    }));
+        }
+
+        return results;
+    }
+
     /// <summary>
     /// Retrieves a paged collection of child entities related to the specified parent entity by its ID.
     /// </summary>

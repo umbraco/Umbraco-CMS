@@ -300,7 +300,7 @@ internal sealed class DeferredSearchReindexService : IDeferredSearchReindexServi
         }
 
         var publishChecked = new Dictionary<int, bool>();
-        foreach (IEnumerable<int> batch in documentIds.InGroupsOf(Constants.Sql.MaxParameterCount))
+        foreach (IEnumerable<int> batch in documentIds.InGroupsOf(_indexingSettings.CurrentValue.BatchSize))
         {
             var batchIds = batch.ToArray();
             IContent[] documents;
@@ -325,57 +325,38 @@ internal sealed class DeferredSearchReindexService : IDeferredSearchReindexServi
 
     internal IReadOnlyCollection<int> FindDocumentIdsReferencingElements(IEnumerable<int> elementIds)
     {
-        var visitedElementIds = new HashSet<int>();
         var documentIds = new HashSet<int>();
-        var queue = new Queue<int>(elementIds);
+        var visitedElementIds = new HashSet<int>(elementIds);
+        var currentLevel = new HashSet<int>(visitedElementIds);
 
-        while (queue.Count > 0)
+        // Walk the relation graph one level at a time, resolving every element in a level with a single query.
+        while (currentLevel.Count > 0)
         {
-            var elementId = queue.Dequeue();
-            if (visitedElementIds.Add(elementId) is false)
-            {
-                continue;
-            }
-
-            foreach (IEntitySlim parent in GetParentEntities(elementId).Cast<IEntitySlim>())
+            var nextLevel = new HashSet<int>();
+            foreach (IEntitySlim parent in GetParentEntities(currentLevel.ToArray()).Cast<IEntitySlim>())
             {
                 if (parent.NodeObjectType == Constants.ObjectTypes.Document)
                 {
                     documentIds.Add(parent.Id);
                 }
-                else if (parent.NodeObjectType == Constants.ObjectTypes.Element && visitedElementIds.Contains(parent.Id) is false)
+                else if (parent.NodeObjectType == Constants.ObjectTypes.Element && visitedElementIds.Add(parent.Id))
                 {
-                    queue.Enqueue(parent.Id);
+                    nextLevel.Add(parent.Id);
                 }
             }
+
+            currentLevel = nextLevel;
         }
 
         return documentIds;
     }
 
-    private IEnumerable<IUmbracoEntity> GetParentEntities(int childId)
-    {
-        var results = new List<IUmbracoEntity>();
-        var pageSize = _indexingSettings.CurrentValue.BatchSize;
-        long page = 0;
-        var total = long.MaxValue;
-        while (page * pageSize < total)
-        {
-            IUmbracoEntity[] items = _relationService
-                .GetPagedParentEntitiesByChildId(
-                    childId,
-                    page++,
-                    pageSize,
-                    out total,
-                    [Constants.Conventions.RelationTypes.RelatedExternalBlockElementAlias],
-                    UmbracoObjectTypes.Document,
-                    UmbracoObjectTypes.Element)
-                .ToArray();
-            results.AddRange(items);
-        }
-
-        return results;
-    }
+    private IEnumerable<IUmbracoEntity> GetParentEntities(int[] childIds)
+        => _relationService.GetParentEntitiesByChildIds(
+            childIds,
+            [Constants.Conventions.RelationTypes.RelatedExternalBlockElementAlias],
+            UmbracoObjectTypes.Document,
+            UmbracoObjectTypes.Element);
 
     /// <summary>
     ///     Pages through a repository without acquiring distributed locks and invokes an action for each item.

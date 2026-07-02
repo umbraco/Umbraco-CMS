@@ -438,29 +438,56 @@ public class RelationService : RepositoryService, IRelationService
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
 
         ICollection<string> aliases = relationTypeAliases as ICollection<string> ?? relationTypeAliases.ToArray();
-        if (aliases.Count == 0)
-        {
-            // No alias filter requested: return parents across all relation types.
-            return _relationRepository.GetPagedParentEntitiesByChildId(
-                id, pageIndex, pageSize, out totalChildren, [], entityTypes.Select(x => x.GetGuid()).ToArray());
-        }
-
-        int[] relationTypeIds = _relationTypeRepository.GetMany(Array.Empty<int>())
-            .Where(relationType => aliases.Contains(relationType.Alias))
-            .Select(relationType => relationType.Id)
-            .ToArray();
+        int[]? relationTypeIds = ResolveRelationTypeIdFilter(aliases);
 
         // Aliases were requested but none exist: filter to those types only, so there are no matches.
         // Delegating with an empty id array would instead be treated as "no filter" (all relation types).
-        if (relationTypeIds.Length == 0)
+        if (relationTypeIds is { Length: 0 })
         {
             totalChildren = 0;
             return [];
         }
 
         return _relationRepository.GetPagedParentEntitiesByChildId(
-            id, pageIndex, pageSize, out totalChildren, relationTypeIds, entityTypes.Select(x => x.GetGuid()).ToArray());
+            id, pageIndex, pageSize, out totalChildren, relationTypeIds ?? [], entityTypes.Select(x => x.GetGuid()).ToArray());
     }
+
+    /// <inheritdoc />
+    public IEnumerable<IUmbracoEntity> GetParentEntitiesByChildIds(
+        IEnumerable<int> childIds,
+        IEnumerable<string> relationTypeAliases,
+        params UmbracoObjectTypes[] entityTypes)
+    {
+        var childIdsArray = childIds as int[] ?? childIds.ToArray();
+        if (childIdsArray.Length == 0)
+        {
+            return [];
+        }
+
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+
+        ICollection<string> aliases = relationTypeAliases as ICollection<string> ?? relationTypeAliases.ToArray();
+        var relationTypeIds = ResolveRelationTypeIdFilter(aliases);
+        if (relationTypeIds is { Length: 0 })
+        {
+            return [];
+        }
+
+        return _relationRepository.GetParentEntitiesByChildIds(
+            childIdsArray,
+            relationTypeIds ?? [],
+            entityTypes.Select(x => x.GetGuid()).ToArray());
+    }
+
+    // Resolves relation type aliases to their ids. Returns null when no alias filter is requested (match all
+    // relation types); returns an empty array when a filter was requested but no alias matched (match none).
+    private int[]? ResolveRelationTypeIdFilter(ICollection<string> relationTypeAliases)
+        => relationTypeAliases.Count == 0
+            ? null
+            : _relationTypeRepository.GetMany(Array.Empty<int>())
+                .Where(relationType => relationTypeAliases.Contains(relationType.Alias))
+                .Select(relationType => relationType.Id)
+                .ToArray();
 
     /// <inheritdoc />
     public IEnumerable<IUmbracoEntity> GetPagedChildEntitiesByParentId(int id, long pageIndex, int pageSize, out long totalChildren, params UmbracoObjectTypes[] entityTypes)

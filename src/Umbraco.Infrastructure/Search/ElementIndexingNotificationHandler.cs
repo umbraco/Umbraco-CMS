@@ -18,12 +18,12 @@ internal sealed class ElementIndexingNotificationHandler :
         => _deferredSearchReindexService = deferredSearchReindexService;
 
     public void Handle(ElementSavedNotification notification)
-        => QueueElementIds(notification.SavedEntities);
+        => QueueDocumentReindexForChangedElements(notification.SavedEntities);
 
     public void Handle(ElementPublishedNotification notification)
-        => QueueElementIds(notification.PublishedEntities);
+        => QueueDocumentReindexForChangedElements(notification.PublishedEntities);
 
-    private void QueueElementIds(IEnumerable<IElement> elements)
+    private void QueueDocumentReindexForChangedElements(IEnumerable<IElement> elements)
     {
         var ids = elements.Select(e => e.Id).ToArray();
         if (ids.Length > 0)
