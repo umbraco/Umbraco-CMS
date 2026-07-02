@@ -114,7 +114,7 @@ internal sealed class DeferredSearchReindexService : IDeferredSearchReindexServi
     }
 
     /// <inheritdoc />
-    public void QueueDocumentReindexForChangedElements(IReadOnlyCollection<int> elementIds)
+    public void QueueElementReindex(IReadOnlyCollection<int> elementIds)
     {
         foreach (var id in elementIds)
         {
