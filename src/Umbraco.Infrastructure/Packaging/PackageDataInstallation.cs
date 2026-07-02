@@ -792,7 +792,10 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             EntityContainer? existing;
             if (parent is null)
             {
-                existing = (await _elementContainerService.GetAsync(folderName, 1)).FirstOrDefault();
+                // Match by key first (more reliable when folders have been renamed in the destination), then by name.
+                // Level 1 = root level folders, there can only be one with the same name.
+                existing = await _elementContainerService.GetAsync(folderKey)
+                           ?? (await _elementContainerService.GetAsync(folderName, 1)).FirstOrDefault();
             }
             else
             {
