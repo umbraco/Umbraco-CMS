@@ -65,6 +65,9 @@ export abstract class UmbBlockEntryContext<
 	#isExternalContent = new UmbBooleanState(false);
 	readonly isExternalContent = this.#isExternalContent.asObservable();
 
+	#isAllowedInLibrary = new UmbBooleanState(undefined);
+	readonly isAllowedInLibrary = this.#isAllowedInLibrary.asObservable();
+
 	#externalContentVariantState = new UmbStringState(undefined);
 	readonly externalContentVariantState = this.#externalContentVariantState.asObservable();
 
@@ -578,6 +581,20 @@ export abstract class UmbBlockEntryContext<
 				this.#workspacePath.setValue(workspacePath);
 			},
 			'observeWorkspacePath',
+		);
+
+		this.observe(
+			mergeObservables(
+				[this.contentElementTypeKey, this._entries!.libraryAllowedElementTypeKeys],
+				([contentElementTypeKey, libraryAllowedElementTypeKeys]) =>
+					contentElementTypeKey === undefined
+						? undefined
+						: libraryAllowedElementTypeKeys.includes(contentElementTypeKey),
+			),
+			(isAllowedInLibrary) => {
+				this.#isAllowedInLibrary.setValue(isAllowedInLibrary);
+			},
+			'observeIsAllowedInLibrary',
 		);
 
 		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
