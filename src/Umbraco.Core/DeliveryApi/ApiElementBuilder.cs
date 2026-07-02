@@ -29,6 +29,7 @@ public sealed class ApiElementBuilder : IApiElementBuilder
 
         return new ApiElement(
             element.Key,
+            element.Name,
             element.ContentType.Alias,
             properties);
     }

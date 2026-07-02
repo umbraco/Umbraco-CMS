@@ -15,7 +15,7 @@ public class TemplatePresentationFactory : ITemplatePresentationFactory
     private readonly IUmbracoMapper _mapper;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Factories.TemplatePresentationFactory"/> class.
+    /// Initializes a new instance of the <see cref="TemplatePresentationFactory"/> class.
     /// </summary>
     /// <param name="templateService">An instance of <see cref="ITemplateService"/> used for template operations.</param>
     /// <param name="mapper">An instance of <see cref="IUmbracoMapper"/> used for mapping objects.</param>
@@ -28,12 +28,12 @@ public class TemplatePresentationFactory : ITemplatePresentationFactory
     }
 
     /// <summary>
-    /// Asynchronously creates a <see cref="Umbraco.Cms.Api.Management.Models.TemplateResponseModel" /> from the specified <see cref="Umbraco.Cms.Core.Models.ITemplate" />.
+    /// Asynchronously creates a <see cref="TemplateResponseModel" /> from the specified <see cref="ITemplate" />.
     /// If the template has a layout template, its reference will be included in the response model.
     /// </summary>
     /// <param name="template">The template from which to create the response model.</param>
     /// <returns>
-    /// A task representing the asynchronous operation. The task result contains the created <see cref="Umbraco.Cms.Api.Management.Models.TemplateResponseModel" />.
+    /// A task representing the asynchronous operation. The task result contains the created <see cref="TemplateResponseModel" />.
     /// </returns>
     public async Task<TemplateResponseModel> CreateTemplateResponseModelAsync(ITemplate template)
     {
