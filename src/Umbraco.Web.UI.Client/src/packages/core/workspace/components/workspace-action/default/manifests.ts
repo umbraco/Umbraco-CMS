@@ -1,4 +1,5 @@
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
+import UmbWorkspaceActionElement from './workspace-action.element.js';
 
 export const manifest: UmbExtensionManifestKind = {
 	type: 'kind',
@@ -9,7 +10,7 @@ export const manifest: UmbExtensionManifestKind = {
 		type: 'workspaceAction',
 		kind: 'default',
 		weight: 1000,
-		element: () => import('./workspace-action.element.js'),
+		element: UmbWorkspaceActionElement,
 		meta: {
 			label: '(Missing label in manifest)',
 		},

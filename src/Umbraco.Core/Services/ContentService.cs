@@ -1233,11 +1233,7 @@ public class ContentService : RepositoryService, IContentService
                 $"Cannot save (un)publishing content with name: {content.Name} - and state: {content.PublishedState}, use the dedicated SavePublished method.");
         }
 
-        if (content.Name != null && content.Name.Length > 255)
-        {
-            throw new InvalidOperationException(
-                $"Content with the name {content.Name} cannot be more than 255 characters in length.");
-        }
+        EnsureNameLengthIsValid(content);
 
         EventMessages eventMessages = EventMessagesFactory.Get();
 
@@ -1361,10 +1357,7 @@ public class ContentService : RepositoryService, IContentService
             throw new ArgumentNullException(nameof(cultures));
         }
 
-        if (cultures.Any(c => c.IsNullOrWhiteSpace()) || cultures.Distinct().Count() != cultures.Length)
-        {
-            throw new ArgumentException("Cultures cannot be null or whitespace", nameof(cultures));
-        }
+        EnsureCulturesAreValid(cultures, nameof(cultures));
 
         cultures = cultures.Select(x => x.EnsureCultureCode()!).ToArray();
 
@@ -1376,17 +1369,9 @@ public class ContentService : RepositoryService, IContentService
             return new PublishResult(PublishResultType.FailedPublishUnsavedChanges, evtMsgs, content);
         }
 
-        if (content.Name != null && content.Name.Length > 255)
-        {
-            throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
-        }
+        EnsureNameLengthIsValid(content);
 
-        PublishedState publishedState = content.PublishedState;
-        if (publishedState != PublishedState.Published && publishedState != PublishedState.Unpublished)
-        {
-            throw new InvalidOperationException(
-                $"Cannot save-and-publish (un)publishing content, use the dedicated {nameof(CommitDocumentChanges)} method.");
-        }
+        EnsurePublishedStateAllowsPublish(content);
 
         // cannot accept invariant (null or empty) culture for variant content type
         // cannot accept a specific culture for invariant content type (but '*' is ok)
@@ -1435,6 +1420,130 @@ public class ContentService : RepositoryService, IContentService
             scope.Complete();
             return result;
         }
+    }
+
+    /// <inheritdoc />
+    public PublishResult SaveAndPublish(IContent content, string[] culturesToPublish, int userId = Constants.Security.SuperUserId)
+    {
+        if (content == null)
+        {
+            throw new ArgumentNullException(nameof(content));
+        }
+
+        if (culturesToPublish == null)
+        {
+            throw new ArgumentNullException(nameof(culturesToPublish));
+        }
+
+        // wildcards and nulls are not accepted here; cultures must be explicit
+        if (culturesToPublish.Any(x => x == null || x == "*"))
+        {
+            throw new InvalidOperationException(
+                "Only valid cultures are allowed to be used in this method, wildcards or nulls are not allowed");
+        }
+
+        EnsureCulturesAreValid(culturesToPublish, nameof(culturesToPublish));
+
+        culturesToPublish = culturesToPublish.Select(x => x.EnsureCultureCode()!).ToArray();
+
+        EnsureNameLengthIsValid(content);
+
+        EnsurePublishedStateAllowsPublish(content);
+
+        var varies = content.ContentType.VariesByCulture();
+        if (varies is false)
+        {
+            if (culturesToPublish.Length > 0)
+            {
+                throw new ArgumentException(
+                    "Cultures cannot be specified when publishing invariant content types.",
+                    nameof(culturesToPublish));
+            }
+
+            // doesn't vary; publish the invariant culture in a single scope alongside the save
+            return SaveAndPublish(content, userId: userId);
+        }
+
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.WriteLock(Constants.Locks.ContentTree);
+
+        var allLangs = _languageRepository.GetMany().ToList();
+
+        EventMessages evtMsgs = EventMessagesFactory.Get();
+
+        var savingNotification = new ContentSavingNotification(content, evtMsgs);
+        if (scope.Notifications.PublishCancelable(savingNotification))
+        {
+            return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, content);
+        }
+
+        IEnumerable<CultureImpact> impacts =
+            culturesToPublish.Select(x => _cultureImpactFactory.ImpactExplicit(x, IsDefaultCulture(allLangs, x)));
+
+        // publish the culture(s)
+        // we don't care about the response here, this response will be rechecked below but we need to set the culture info values now.
+        foreach (CultureImpact impact in impacts)
+        {
+            content.PublishCulture(impact, DateTime.UtcNow, _propertyEditorCollection);
+        }
+
+        PublishResult result = CommitDocumentChangesInternal(scope, content, evtMsgs, allLangs, savingNotification.State, userId);
+        scope.Complete();
+        return result;
+    }
+
+    private PublishResult SaveAndPublish(IContent content, string culture = "*", int userId = Constants.Security.SuperUserId)
+    {
+        EventMessages evtMsgs = EventMessagesFactory.Get();
+
+        EnsurePublishedStateAllowsPublish(content);
+
+        // cannot accept invariant (null or empty) culture for variant content type
+        // cannot accept a specific culture for invariant content type (but '*' is ok)
+        if (content.ContentType.VariesByCulture())
+        {
+            if (culture.IsNullOrWhiteSpace())
+            {
+                throw new NotSupportedException("Invariant culture is not supported by variant content types.");
+            }
+        }
+        else
+        {
+            if (!culture.IsNullOrWhiteSpace() && culture != "*")
+            {
+                throw new NotSupportedException(
+                    $"Culture \"{culture}\" is not supported by invariant content types.");
+            }
+        }
+
+        EnsureNameLengthIsValid(content);
+
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.WriteLock(Constants.Locks.ContentTree);
+
+        var allLangs = _languageRepository.GetMany().ToList();
+
+        // Change state to publishing
+        content.PublishedState = PublishedState.Publishing;
+        var savingNotification = new ContentSavingNotification(content, evtMsgs);
+        if (scope.Notifications.PublishCancelable(savingNotification))
+        {
+            return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, content);
+        }
+
+        // if culture is specific, first publish the invariant values, then publish the culture itself.
+        // if culture is '*', then publish them all (including variants)
+
+        // this will create the correct culture impact even if culture is * or null
+        var impact = _cultureImpactFactory.Create(culture, IsDefaultCulture(allLangs, culture), content);
+
+        // publish the culture(s)
+        // we don't care about the response here, this response will be rechecked below but we need to set the culture info values now.
+        content.PublishCulture(impact, DateTime.UtcNow, _propertyEditorCollection);
+
+        PublishResult result = CommitDocumentChangesInternal(scope, content, evtMsgs, allLangs, savingNotification.State, userId);
+        scope.Complete();
+        return result;
     }
 
     /// <inheritdoc />
@@ -1670,9 +1779,7 @@ public class ContentService : RepositoryService, IContentService
         {
             // Determine cultures publishing/unpublishing which will be based on previous calls to content.PublishCulture and ClearPublishInfo
             culturesUnpublishing = content.GetCulturesUnpublishing();
-            culturesPublishing = variesByCulture
-                ? content.PublishCultureInfos?.Values.Where(x => x.IsDirty()).Select(x => x.Culture).ToList()
-                : null;
+            culturesPublishing = GetCulturesPublishing(content);
 
             // ensure that the document can be published, and publish handling events, business rules, etc
             publishResult = StrategyCanPublish(
@@ -1743,6 +1850,12 @@ public class ContentService : RepositoryService, IContentService
         // won't happen in a branch
         if (unpublishing)
         {
+            if (culturesUnpublishing is null)
+            {
+                culturesUnpublishing = content.GetCulturesUnpublishing();
+                culturesPublishing = GetCulturesPublishing(content);
+            }
+
             IContent? newest = GetById(content.Id); // ensure we have the newest version - in scope
             if (content.VersionId != newest?.VersionId)
             {
@@ -1805,12 +1918,13 @@ public class ContentService : RepositoryService, IContentService
                     var langs = GetLanguageDetailsForAuditEntry(allLangs, culturesUnpublishing);
                     Audit(AuditType.UnpublishVariant, userId, content.Id, $"Unpublished languages: {langs}", langs);
 
-                    if (publishResult == null)
+                    PublishResultType? publishResultType = publishResult?.Result ?? unpublishResult?.Result;
+                    if (publishResultType == null)
                     {
-                        throw new PanicException("publishResult == null - should not happen");
+                        throw new PanicException("publishResultType == null - should not happen");
                     }
 
-                    switch (publishResult.Result)
+                    switch (publishResultType)
                     {
                         case PublishResultType.FailedPublishMandatoryCultureMissing:
                             // Occurs when a mandatory culture was unpublished (which means we tried publishing the document without a mandatory culture)
@@ -2427,6 +2541,11 @@ public class ContentService : RepositoryService, IContentService
 
         return result;
     }
+
+    private IReadOnlyList<string>? GetCulturesPublishing(IContent content)
+        => content.ContentType.VariesByCulture()
+            ? content.PublishCultureInfos?.Values.Where(x => x.IsDirty()).Select(x => x.Culture).ToList()
+            : null;
 
     #endregion
 
@@ -3127,7 +3246,13 @@ public class ContentService : RepositoryService, IContentService
         {
             scope.WriteLock(Constants.Locks.ContentTree);
 
-            OperationResult ret = Sort(scope, itemsA, userId, evtMsgs);
+            // Reload within the lock so sorting operates on fully-loaded entities. Callers may pass
+            // partially-loaded content (e.g. loaded with loadTemplates: false or without property data),
+            // and saving those directly would wipe the template and property data (#23120).
+            // GetByIds returns items in the requested order, preserving the caller's ordering that drives the sort.
+            IContent[] reloaded = GetByIds(itemsA.Select(x => x.Id).ToArray()).ToArray();
+
+            OperationResult ret = Sort(scope, reloaded, userId, evtMsgs);
             scope.Complete();
             return ret;
         }
@@ -3163,6 +3288,43 @@ public class ContentService : RepositoryService, IContentService
             scope.Complete();
             return ret;
         }
+    }
+
+    /// <inheritdoc />
+    public OperationResult SortChildren(int parentId, IReadOnlyList<int> orderedChildIds, int userId = Constants.Security.SuperUserId)
+    {
+        EventMessages evtMsgs = EventMessagesFactory.Get();
+        if (orderedChildIds.Count == 0)
+        {
+            return new OperationResult(OperationResultType.NoOperation, evtMsgs);
+        }
+
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.WriteLock(Constants.Locks.ContentTree);
+
+        _documentRepository.UpdateSortOrder(orderedChildIds);
+
+        // Sort order lives in umbracoNode; neither the published cache nor the content repository cache keeps
+        // a separate serialized copy of it, so refreshing the affected branch (which invalidates both and has
+        // them reload from umbracoNode) is enough to pick up the new order without re-saving each child.
+        if (parentId == Constants.System.Root)
+        {
+            IContent[] roots = GetByIds(orderedChildIds).ToArray();
+            scope.Notifications.Publish(new ContentTreeChangeNotification(roots, TreeChangeTypes.RefreshNode, evtMsgs));
+        }
+        else
+        {
+            IContent? parent = GetById(parentId);
+            if (parent is not null)
+            {
+                scope.Notifications.Publish(new ContentTreeChangeNotification(parent, TreeChangeTypes.RefreshBranch, evtMsgs));
+            }
+        }
+
+        Audit(AuditType.Sort, userId, parentId);
+
+        scope.Complete();
+        return OperationResult.Succeed(evtMsgs);
     }
 
     private OperationResult Sort(ICoreScope scope, IContent[] itemsA, int userId, EventMessages eventMessages)
@@ -3231,6 +3393,34 @@ public class ContentService : RepositoryService, IContentService
     }
 
     private static bool HasUnsavedChanges(IContent content) => content.HasIdentity is false || content.IsDirty();
+
+    private const int MaxContentNameLength = 255;
+
+    private static void EnsureNameLengthIsValid(IContent content)
+    {
+        if (content.Name?.Length > MaxContentNameLength)
+        {
+            throw new InvalidOperationException($"Name cannot be more than {MaxContentNameLength} characters in length.");
+        }
+    }
+
+    private static void EnsureCulturesAreValid(string[] cultures, string paramName)
+    {
+        if (cultures.Any(c => c.IsNullOrWhiteSpace()) || cultures.Distinct().Count() != cultures.Length)
+        {
+            throw new ArgumentException("Cultures cannot be null or whitespace, and must be distinct.", paramName);
+        }
+    }
+
+    private static void EnsurePublishedStateAllowsPublish(IContent content)
+    {
+        PublishedState publishedState = content.PublishedState;
+        if (publishedState != PublishedState.Published && publishedState != PublishedState.Unpublished)
+        {
+            throw new InvalidOperationException(
+                $"Cannot save-and-publish (un)publishing content, use the dedicated {nameof(CommitDocumentChanges)} method.");
+        }
+    }
 
     /// <summary>
     /// Checks the data integrity of the content tree and optionally fixes issues.

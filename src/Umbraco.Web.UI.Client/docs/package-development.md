@@ -20,8 +20,7 @@ src/packages/media/          <- package root
 │   ├── index.ts
 │   ├── manifests.ts
 │   └── ...
-├── manifests.ts             <- aggregates all module manifests
-└── umbraco-package.ts       <- bundle entry point
+└── umbraco-package.ts       <- aggregates module manifests + bundle entry point
 ```
 
 ### Public vs. Private Modules
@@ -65,7 +64,7 @@ declare global {
 
 ### Manifest Bundling
 
-Each sub-feature exports its own `manifests` array, aggregated up to the package root. See [Manifests & Aliases — Manifest Bundling](./manifests.md#manifest-bundling) for the pattern.
+Each sub-feature exports its own `manifests` array from its local `manifests.ts`. These bubble up to `umbraco-package.ts`, which assembles them and registers the bundle — there is no separate root-level `manifests.ts`. See [Manifests & Aliases — Package Bundles](./manifests.md#package-bundles-internal-packages) for the full pattern.
 
 ---
 
@@ -98,6 +97,16 @@ This ensures TypeScript, the browser import map, and test configs all resolve th
 No hardcoded UI-facing strings. All user-visible text must go through the localization system. Keys live in `src/assets/lang/en.ts`, grouped by feature area, referenced as `group_keyName` (e.g., `this.localize.term('actions_create')`).
 
 For step-by-step instructions on adding localization keys and using them in elements or controllers, use the `general-add-localization` skill.
+
+### Active language
+
+The active language is driven by the shell elements `<umb-app>` and `<umb-auth>`, not by `<html lang>`:
+
+- Razor sets `lang` on the shell element from `GlobalSettings.DefaultUILanguage`. The shell reads its own `lang` on connect and calls `umbLocalizationRegistry.loadLanguage(this.lang)`.
+- After login, `current-user.context` calls `loadLanguage(user.languageIsoCode)` and the shell mirrors the new value back onto its own `lang` attribute via `umbLocalizationRegistry.currentLanguage`.
+- `<html lang>` is the static `"en"` for the noscript fallback text. Don't conflate it with the dynamic UI language.
+
+If you're adding a new shell-like element (rare — most code lives inside `<umb-app>`), give it a `lang` attribute and the same subscribe-and-mirror pattern. For everything else, just use `this.localize` and the inherited context resolves the rest.
 
 ---
 

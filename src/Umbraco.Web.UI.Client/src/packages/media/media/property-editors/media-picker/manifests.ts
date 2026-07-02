@@ -1,4 +1,5 @@
 import { manifest as schemaManifest } from './Umbraco.MediaPicker.js';
+import { manifests as valueSummaryManifests } from './value-summary/manifests.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -10,7 +11,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 			label: 'Media Picker',
 			propertyEditorSchemaAlias: 'Umbraco.MediaPicker3',
 			icon: 'icon-picture',
-			group: 'media',
+			group: '#propertyEditorUIGroups_media',
 			keywords: [
 				'select',
 				'image',
@@ -31,4 +32,5 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 	},
 	schemaManifest,
+	...valueSummaryManifests,
 ];

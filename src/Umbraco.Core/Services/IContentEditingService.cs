@@ -42,6 +42,17 @@ public interface IContentEditingService
     Task<Attempt<ContentCreateResult, ContentEditingOperationStatus>> CreateAsync(ContentCreateModel createModel, Guid userKey);
 
     /// <summary>
+    ///     Creates and publishes a new content item.
+    /// </summary>
+    /// <param name="createModel">The model containing the content data.</param>
+    /// <param name="culturesToPublish">The cultures to publish.</param>
+    /// <param name="userKey">The unique identifier of the user performing the action.</param>
+    /// <returns>An attempt containing the creation result or an error status.</returns>
+    // TODO (V19): Remove default implementation.
+    Task<Attempt<ContentCreateResult, ContentEditingOperationStatus>> CreateAndPublishAsync(ContentCreateModel createModel, string[] culturesToPublish, Guid userKey)
+        => throw new NotImplementedException();
+
+    /// <summary>
     ///     Updates an existing content item.
     /// </summary>
     /// <param name="key">The unique identifier of the content item to update.</param>
@@ -49,6 +60,18 @@ public interface IContentEditingService
     /// <param name="userKey">The unique identifier of the user performing the action.</param>
     /// <returns>An attempt containing the update result or an error status.</returns>
     Task<Attempt<ContentUpdateResult, ContentEditingOperationStatus>> UpdateAsync(Guid key, ContentUpdateModel updateModel, Guid userKey);
+
+    /// <summary>
+    ///     Updates and publishes an existing content item.
+    /// </summary>
+    /// <param name="key">The unique identifier of the content item to update.</param>
+    /// <param name="updateModel">The model containing the updated content data.</param>
+    /// <param name="culturesToPublish">The cultures to publish.</param>
+    /// <param name="userKey">The unique identifier of the user performing the action.</param>
+    /// <returns>An attempt containing the update result or an error status.</returns>
+    // TODO (V19): Remove default implementation.
+    Task<Attempt<ContentUpdateResult, ContentEditingOperationStatus>> UpdateAndPublishAsync(Guid key, ContentUpdateModel updateModel, string[] culturesToPublish, Guid userKey)
+        => throw new NotImplementedException();
 
     /// <summary>
     ///     Moves a content item to the recycle bin.
@@ -94,6 +117,18 @@ public interface IContentEditingService
     /// <param name="userKey">The unique identifier of the user performing the action.</param>
     /// <returns>The operation status indicating success or failure.</returns>
     Task<ContentEditingOperationStatus> SortAsync(Guid? parentKey, IEnumerable<SortingModel> sortingModels, Guid userKey);
+
+    /// <summary>
+    ///     Sorts the children of a parent by a system field.
+    /// </summary>
+    /// <param name="parentKey">The unique identifier of the parent, or <c>null</c> for root-level sorting.</param>
+    /// <param name="field">The system field to sort the children by.</param>
+    /// <param name="direction">The direction to sort in.</param>
+    /// <param name="culture">The culture whose variant name to sort by, or <c>null</c> to sort by the invariant name. Only applies when sorting by <see cref="ContentSortField.Name"/>. The culture is not validated: a child that does not vary by the given culture - or an unrecognised culture - falls back to the invariant name.</param>
+    /// <param name="userKey">The unique identifier of the user performing the action.</param>
+    /// <returns>The operation status indicating success or failure.</returns>
+    Task<ContentEditingOperationStatus> SortByFieldAsync(Guid? parentKey, ContentSortField field, Direction direction, string? culture, Guid userKey)
+        => throw new NotImplementedException(); // TODO (V19): Remove default implementation.
 
     /// <summary>
     ///     Deletes a content item whether it is in the recycle bin or not.

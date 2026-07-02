@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
@@ -22,7 +23,7 @@ namespace Umbraco.Cms.Core.Services;
 /// <summary>
 /// Implements <see href="IDocumentUrlService" /> operations for handling document URLs.
 /// </summary>
-public class DocumentUrlService : IDocumentUrlService
+public class DocumentUrlService : IDocumentUrlService, IMemoryCacheSizeReporter
 {
     /// <summary>
     /// Represents the key used to identify the URL generation rebuild operation.
@@ -52,6 +53,33 @@ public class DocumentUrlService : IDocumentUrlService
 
     /// <inheritdoc/>
     public bool IsInitialized { get; private set; }
+
+    /// <inheritdoc />
+    public string CacheName => "Document URL segments";
+
+    /// <inheritdoc />
+    public long GetApproximateCount() => _documentUrlCache.Count;
+
+    /// <inheritdoc />
+    // The dictionary is enumerated directly (not via .Values, which snapshot-copies the whole collection).
+    public long? GetApproximateBytes()
+        => SampledSizeEstimator.Estimate(_documentUrlCache.Count, _documentUrlCache, static kvp => EstimateUrlSegmentCacheBytes(kvp.Value));
+
+    private static long EstimateUrlSegmentCacheBytes(UrlSegmentCache entry)
+    {
+        // UrlCacheKey (struct: Guid + nullable int + bool) + dictionary bucket + the cache object header.
+        long bytes = 64 + (entry.PrimarySegment.Length * 2L);
+        if (entry.AlternateSegments is not null)
+        {
+            bytes += 24; // array header
+            foreach (var segment in entry.AlternateSegments)
+            {
+                bytes += 16 + ((segment?.Length ?? 0) * 2L);
+            }
+        }
+
+        return bytes;
+    }
 
     /// <summary>
     /// Struct-based cache key for memory-efficient URL segment caching.
@@ -154,7 +182,7 @@ public class DocumentUrlService : IDocumentUrlService
         IPublishStatusQueryService publishStatusQueryService,
         IDomainCacheService domainCacheService)
 #pragma warning disable CS0618 // Type or member is obsolete
-        :this(
+        : this(
             logger,
             documentUrlRepository,
             documentRepository,
@@ -604,7 +632,35 @@ public class DocumentUrlService : IDocumentUrlService
     }
 
     /// <inheritdoc/>
-    public async Task CreateOrUpdateUrlSegmentsAsync(IEnumerable<IContent> documentsEnumerable)
+    public async Task CreateOrUpdateUrlSegmentsAsync(IEnumerable<IContent> documents)
+        => await CreateOrUpdateUrlSegmentsInternalAsync(documents, skipDatabaseWrite: false);
+
+    /// <inheritdoc/>
+    public async Task UpdateUrlSegmentCacheAsync(Guid key)
+    {
+        IContent? content = _contentService.GetById(key);
+        if (content is not null)
+        {
+            await CreateOrUpdateUrlSegmentsInternalAsync(content.Yield(), skipDatabaseWrite: true);
+        }
+    }
+
+    /// <inheritdoc/>
+    public async Task UpdateUrlSegmentCacheWithDescendantsAsync(Guid key)
+    {
+        var id = _idKeyMap.GetIdForKey(key, UmbracoObjectTypes.Document).Result;
+        IContent? item = _contentService.GetById(id);
+        if (item is null)
+        {
+            _logger.LogDebug("Skipping URL segment cache update for document with key {DocumentKey} — document not found.", key);
+            return;
+        }
+
+        IEnumerable<IContent> descendants = _contentService.GetPagedDescendants(id, 0, int.MaxValue, out _);
+        await CreateOrUpdateUrlSegmentsInternalAsync(new List<IContent>(descendants) { item }, skipDatabaseWrite: true);
+    }
+
+    private async Task CreateOrUpdateUrlSegmentsInternalAsync(IEnumerable<IContent> documentsEnumerable, bool skipDatabaseWrite)
     {
         IEnumerable<IContent> documents = documentsEnumerable as IContent[] ?? documentsEnumerable.ToArray();
         if (documents.Any() is false)
@@ -664,7 +720,7 @@ public class DocumentUrlService : IDocumentUrlService
             }
         }
 
-        if (toSave.Count > 0 && SkipDatabaseWrites() is false)
+        if (!skipDatabaseWrite && toSave.Count > 0 && SkipDatabaseWrites() is false)
         {
             scope.WriteLock(Constants.Locks.DocumentUrls);
             _documentUrlRepository.Save(toSave);

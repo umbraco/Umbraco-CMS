@@ -1,4 +1,5 @@
 import { manifest as trueFalseSchemaManifest } from './Umbraco.TrueFalse.js';
+import { manifests as valueSummaryManifests } from './value-summary/manifests.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -17,7 +18,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 			label: 'Toggle',
 			propertyEditorSchemaAlias: 'Umbraco.TrueFalse',
 			icon: 'icon-checkbox',
-			group: 'common',
+			group: '#propertyEditorUIGroups_common',
 			keywords: [
 				'boolean',
 				'switch',
@@ -89,4 +90,5 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 	},
 	trueFalseSchemaManifest,
+	...valueSummaryManifests,
 ];

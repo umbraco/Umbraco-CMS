@@ -1,4 +1,5 @@
 import { manifest as schemaManifest } from './Umbraco.MultiUrlPicker.js';
+import { manifests as valueSummaryManifests } from './value-summary/manifests.js';
 
 export const manifests = [
 	{
@@ -10,7 +11,7 @@ export const manifests = [
 			label: 'Multi URL Picker',
 			propertyEditorSchemaAlias: 'Umbraco.MultiUrlPicker',
 			icon: 'icon-link',
-			group: 'pickers',
+			group: '#propertyEditorUIGroups_pickers',
 			keywords: ['url', 'link', 'cta', 'links'],
 			supportsReadOnly: true,
 			settings: {
@@ -38,4 +39,5 @@ export const manifests = [
 		},
 	},
 	schemaManifest,
+	...valueSummaryManifests,
 ];
