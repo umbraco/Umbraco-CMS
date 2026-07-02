@@ -16,7 +16,7 @@ describe('umbUrlPatternToString', () => {
 		expect(umbUrlPatternToString('/edit/:id', { id: 42 })).to.equal('/edit/42');
 	});
 
-	it('uses an objects toString() method', () => {
+	it("uses an object's toString() method", () => {
 		expect(umbUrlPatternToString('/edit/:id', { id: { toString: () => 'object-id' } })).to.equal('/edit/object-id');
 	});
 
