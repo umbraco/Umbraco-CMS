@@ -314,5 +314,11 @@
     <Compile Update="Umbraco.Infrastructure\Services\UserServiceTests.Permissions.cs">
       <DependentUpon>UserServiceTests.cs</DependentUpon>
     </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\ContentEditingServiceTests.CreateAndPublish.cs">
+      <DependentUpon>ContentEditingServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\ContentEditingServiceTests.UpdateAndPublish.cs">
+      <DependentUpon>ContentEditingServiceTests.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
 </Project>
