@@ -4,7 +4,7 @@ import type { UmbTreeItemModel, UmbTreeRootModel } from '../../types.js';
 import { UmbTreeItemChildrenManager } from '../tree-item-children.manager.js';
 import { UmbTreeItemTargetExpansionManager } from '../tree-item-expansion.manager.js';
 import type { UMB_TREE_CONTEXT } from '../../tree.context.token.js';
-import { UmbTreeItemApiBase } from '../../tree-item-api/tree-item-api-base.js';
+import { UmbTreeItemApiContextBase } from '../../tree-item-api/tree-item-api-context-base.js';
 import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
@@ -13,7 +13,7 @@ export abstract class UmbTreeItemContextBase<
 	TreeRootType extends UmbTreeRootModel,
 	ManifestType extends ManifestTreeItem = ManifestTreeItem,
 >
-	extends UmbTreeItemApiBase<TreeItemType, ManifestType>
+	extends UmbTreeItemApiContextBase<TreeItemType, ManifestType>
 	implements UmbTreeItemContext<TreeItemType>
 {
 	protected readonly _treeItemChildrenManager = new UmbTreeItemChildrenManager<TreeItemType, TreeRootType>(this);

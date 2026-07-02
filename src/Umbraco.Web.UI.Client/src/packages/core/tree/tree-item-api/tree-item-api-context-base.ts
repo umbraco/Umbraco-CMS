@@ -22,7 +22,7 @@ import type { ManifestBase } from '@umbraco-cms/backoffice/extension-api';
  * Provides itself as `UMB_TREE_ITEM_BASE_CONTEXT` so entity action conditions
  * can discover a tree item regardless of which tree view is active.
  */
-export abstract class UmbTreeItemApiBase<
+export abstract class UmbTreeItemApiContextBase<
 	TreeItemType extends UmbTreeItemModel = UmbTreeItemModel,
 	ManifestType extends ManifestBase = ManifestBase,
 >

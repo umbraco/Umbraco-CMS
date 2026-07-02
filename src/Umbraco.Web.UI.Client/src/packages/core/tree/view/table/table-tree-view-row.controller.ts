@@ -1,10 +1,10 @@
 import type { UmbTreeItemModel } from '../../types.js';
-import { UmbTreeItemApiBase } from '../../tree-item-api/tree-item-api-base.js';
+import { UmbTreeItemApiContextBase } from '../../tree-item-api/tree-item-api-context-base.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbElementControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbEntityContext } from '@umbraco-cms/backoffice/entity';
 
-class UmbTableTreeViewItemApi extends UmbTreeItemApiBase<UmbTreeItemModel> {}
+class UmbTableTreeViewItemApi extends UmbTreeItemApiContextBase<UmbTreeItemModel> {}
 
 export interface UmbTableTreeViewRowChangeCallbacks {
 	onNoAccessChange: () => void;
