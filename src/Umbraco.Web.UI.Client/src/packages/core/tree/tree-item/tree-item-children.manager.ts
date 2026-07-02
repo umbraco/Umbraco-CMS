@@ -2,7 +2,7 @@ import type { UmbTreeRootItemsRequestArgs } from '../data/index.js';
 import type { UmbTreeItemModel, UmbTreeRootModel, UmbTreeStartNode } from '../types.js';
 import { UMB_TREE_CONTEXT } from '../tree.context.token.js';
 import { UmbRequestReloadTreeItemChildrenEvent } from '../entity-actions/reload-tree-item-children/index.js';
-import { UMB_TREE_ITEM_CONTEXT } from './tree-item.context.token.js';
+import { UMB_TREE_ITEM_EXPANDABLE_CONTEXT } from './tree-item.context.token.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState, UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
@@ -70,7 +70,7 @@ export class UmbTreeItemChildrenManager<
 	#actionEventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
 
 	#treeContext?: typeof UMB_TREE_CONTEXT.TYPE;
-	#parentTreeItemContext?: typeof UMB_TREE_ITEM_CONTEXT.TYPE;
+	#parentTreeItemContext?: typeof UMB_TREE_ITEM_EXPANDABLE_CONTEXT.TYPE;
 	#requestMaxRetries = 2;
 
 	constructor(host: UmbControllerHost) {
@@ -81,7 +81,7 @@ export class UmbTreeItemChildrenManager<
 			this.#treeContext = treeContext;
 		});
 
-		this.consumeContext(UMB_TREE_ITEM_CONTEXT, (instance) => {
+		this.consumeContext(UMB_TREE_ITEM_EXPANDABLE_CONTEXT, (instance) => {
 			this.#parentTreeItemContext = instance;
 		}).skipHost();
 	}

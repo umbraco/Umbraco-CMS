@@ -1,6 +1,6 @@
 import type { UmbTreeItemModel } from '../types.js';
 import { UMB_TREE_CONTEXT } from '../tree.context.token.js';
-import { UMB_TREE_ITEM_BASE_CONTEXT } from '../tree-item/tree-item.context.token.js';
+import { UMB_TREE_ITEM_CONTEXT } from '../tree-item/tree-item.context.token.js';
 import { UmbTreeItemEntityActionManager } from '../tree-item/tree-item-entity-action.manager.js';
 import type { UmbTreeItemApi } from './tree-item-api.interface.js';
 import { combineLatest, map } from '@umbraco-cms/backoffice/external/rxjs';
@@ -19,7 +19,7 @@ import type { ManifestBase } from '@umbraco-cms/backoffice/extension-api';
  * Abstract base for tree item apis. Handles item data, selection, active state,
  * path, and entity actions — without children, expansion, or pagination.
  *
- * Provides itself as `UMB_TREE_ITEM_BASE_CONTEXT` so entity action conditions
+ * Provides itself as `UMB_TREE_ITEM_CONTEXT` so entity action conditions
  * can discover a tree item regardless of which tree view is active.
  */
 export abstract class UmbTreeItemApiContextBase<
@@ -94,7 +94,7 @@ export abstract class UmbTreeItemApiContextBase<
 	}
 
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_TREE_ITEM_BASE_CONTEXT);
+		super(host, UMB_TREE_ITEM_CONTEXT);
 
 		this._treeContextConsumer = this.consumeContext(UMB_TREE_CONTEXT, (context) => {
 			this._treeContext = context;

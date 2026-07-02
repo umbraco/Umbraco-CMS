@@ -1,6 +1,6 @@
 import { UmbTableTreeViewRowController } from './table-tree-view-row.controller.js';
 import type { UmbTreeItemModel } from '../../types.js';
-import { UMB_TREE_ITEM_BASE_CONTEXT } from '../../tree-item/tree-item.context.token.js';
+import { UMB_TREE_ITEM_CONTEXT } from '../../tree-item/tree-item.context.token.js';
 import { expect } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
@@ -70,7 +70,7 @@ describe('UmbTableTreeViewRowController', () => {
 		it('provides the tree item api context on the row element', async () => {
 			controller = new UmbTableTreeViewRowController(host, treeItem.entityType, treeItem.unique, treeItem);
 
-			const api = await child.getContext(UMB_TREE_ITEM_BASE_CONTEXT);
+			const api = await child.getContext(UMB_TREE_ITEM_CONTEXT);
 
 			expect(api).to.exist;
 		});
@@ -132,12 +132,12 @@ describe('UmbTableTreeViewRowController', () => {
 	describe('destroy', () => {
 		it('removes the provided contexts', async () => {
 			controller = new UmbTableTreeViewRowController(host, treeItem.entityType, treeItem.unique, treeItem);
-			expect(await resolvesWithin(child.getContext(UMB_TREE_ITEM_BASE_CONTEXT), 100)).to.be.true;
+			expect(await resolvesWithin(child.getContext(UMB_TREE_ITEM_CONTEXT), 100)).to.be.true;
 
 			controller.destroy();
 			controller = undefined;
 
-			expect(await resolvesWithin(child.getContext(UMB_TREE_ITEM_BASE_CONTEXT), 50)).to.be.false;
+			expect(await resolvesWithin(child.getContext(UMB_TREE_ITEM_CONTEXT), 50)).to.be.false;
 		});
 
 		it('can be called multiple times without throwing', () => {
