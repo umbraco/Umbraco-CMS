@@ -2022,6 +2022,7 @@ export default {
 		cardViewLabel: 'Kort',
 		tableViewLabel: 'Tabel',
 		children: 'Underelementer',
+		noItems: 'Ingen elementer',
 	},
 	update: {
 		updateAvailable: 'Ny opdatering er klar',
