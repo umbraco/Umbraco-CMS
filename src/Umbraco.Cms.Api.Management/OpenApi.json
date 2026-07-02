@@ -46460,6 +46460,10 @@
               "string"
             ]
           },
+          "cacheBuster": {
+            "type": "string",
+            "nullable": true
+          },
           "extensions": {
             "type": "array"
           }
