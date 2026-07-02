@@ -137,6 +137,95 @@ public class DataValueReferenceFactoryCollectionTests
     }
 
     [Test]
+    public void GetAllReferences_All_Variants_For_Published_And_UnPublished_States_With_IDataValueReference_Editor()
+    {
+        var collection = new DataValueReferenceFactoryCollection(() => Enumerable.Empty<IDataValueReferenceFactory>(), new NullLogger<DataValueReferenceFactoryCollection>());
+
+        var mediaPicker = new MediaPicker3PropertyEditor(
+            DataValueEditorFactory,
+            IOHelper);
+        var propertyEditors = new PropertyEditorCollection(new DataEditorCollection(() => mediaPicker.Yield()));
+        var trackedUdi1 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
+        var trackedUdi2 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
+        var trackedUdi3 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
+        var trackedUdi4 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
+        var trackedUdi5 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
+        var serializer = new SystemTextConfigurationEditorJsonSerializer(new DefaultJsonSerializerEncoderFactory());
+        var property =
+            new Property(
+                new PropertyType(ShortStringHelper, new DataType(mediaPicker, serializer))
+                {
+                    Variations = ContentVariation.CultureAndSegment,
+                })
+            {
+                Values = new List<PropertyValue>
+                {
+                    // Ignored (no culture)
+                    new() { EditedValue = trackedUdi1 },
+                    new() { Culture = "en-US", EditedValue = trackedUdi2 },
+                    new() { Culture = "en-US", Segment = "A", EditedValue = trackedUdi3, PublishedValue= trackedUdi5 },
+
+                    // Ignored (no culture)
+                    new() { Segment = "A", EditedValue = trackedUdi4 },
+
+                    // Duplicate
+                    new() { Culture = "en-US", Segment = "B", EditedValue = trackedUdi3 },
+                },
+            };
+        var properties = new PropertyCollection { property };
+        var result = collection.GetAllReferences(properties, propertyEditors, true).ToArray();
+
+        Assert.AreEqual(3, result.Count());
+        Assert.AreEqual(trackedUdi2, result.ElementAt(0).Udi.ToString());
+        Assert.AreEqual(trackedUdi3, result.ElementAt(1).Udi.ToString());
+        Assert.AreEqual(trackedUdi5, result.ElementAt(2).Udi.ToString());
+    }
+
+    [Test]
+    public void GetAllReferences_All_Variants_For_UnPublished_State_With_IDataValueReference_Editor()
+    {
+        var collection = new DataValueReferenceFactoryCollection(() => Enumerable.Empty<IDataValueReferenceFactory>(), new NullLogger<DataValueReferenceFactoryCollection>());
+
+        var mediaPicker = new MediaPicker3PropertyEditor(
+            DataValueEditorFactory,
+            IOHelper);
+        var propertyEditors = new PropertyEditorCollection(new DataEditorCollection(() => mediaPicker.Yield()));
+        var trackedUdi1 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
+        var trackedUdi2 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
+        var trackedUdi3 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
+        var trackedUdi4 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
+        var trackedUdi5 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
+        var serializer = new SystemTextConfigurationEditorJsonSerializer(new DefaultJsonSerializerEncoderFactory());
+        var property =
+            new Property(
+                new PropertyType(ShortStringHelper, new DataType(mediaPicker, serializer))
+                {
+                    Variations = ContentVariation.CultureAndSegment,
+                })
+            {
+                Values = new List<PropertyValue>
+                {
+                    // Ignored (no culture)
+                    new() { EditedValue = trackedUdi1 },
+                    new() { Culture = "en-US", EditedValue = trackedUdi2 },
+                    new() { Culture = "en-US", Segment = "A", EditedValue = trackedUdi3, PublishedValue= trackedUdi5 },
+
+                    // Ignored (no culture)
+                    new() { Segment = "A", EditedValue = trackedUdi4 },
+
+                    // Duplicate
+                    new() { Culture = "en-US", Segment = "B", EditedValue = trackedUdi3 },
+                },
+            };
+        var properties = new PropertyCollection { property };
+        var result = collection.GetAllReferences(properties, propertyEditors, false).ToArray();
+
+        Assert.AreEqual(2, result.Count());
+        Assert.AreEqual(trackedUdi2, result.ElementAt(0).Udi.ToString());
+        Assert.AreEqual(trackedUdi3, result.ElementAt(1).Udi.ToString());
+    }
+
+    [Test]
     public void GetAllReferences_Invariant_With_IDataValueReference_Editor()
     {
         var collection = new DataValueReferenceFactoryCollection(() => Enumerable.Empty<IDataValueReferenceFactory>(), new NullLogger<DataValueReferenceFactoryCollection>());
