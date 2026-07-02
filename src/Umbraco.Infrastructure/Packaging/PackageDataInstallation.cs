@@ -769,7 +769,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
 
             Guid[] folderKeys = element.Attribute("FolderKeys")?.Value
                 .Split(Constants.CharArrays.ForwardSlash)
-                .Select(Guid.Parse)
+                .Select(s => Guid.TryParse(s, out Guid g) ? g : Guid.NewGuid())
                 .ToArray() ?? [];
 
             EntityContainer? current = null;
@@ -797,7 +797,10 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             else
             {
                 // Match among children by key first (more reliable when folders have been renamed), then by name.
-                IEntitySlim[] children = _entityService.GetChildren(parent.Id).ToArray();
+                // Filter to containers only — GetChildren also returns element instances stored in the folder.
+                IEntitySlim[] children = _entityService.GetChildren(parent.Id)
+                    .Where(x => x.NodeObjectType == Constants.ObjectTypes.ElementContainer)
+                    .ToArray();
                 IEntitySlim? matchingChild = children.FirstOrDefault(x => x.Key == folderKey)
                                              ?? children.FirstOrDefault(x => x.Name.InvariantEquals(folderName));
                 existing = matchingChild is not null
