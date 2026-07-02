@@ -78,7 +78,7 @@ internal static class DataTypeFactory
     /// Creates a <see cref="Umbraco.Cms.Infrastructure.Persistence.Dtos.DataTypeDto"/> from the specified <see cref="Umbraco.Cms.Core.Models.IDataType"/> entity, serializing its configuration using the provided JSON serializer.
     /// </summary>
     /// <param name="entity">The <see cref="Umbraco.Cms.Core.Models.IDataType"/> to convert.</param>
-    /// <param name="serializer">The <see cref="Umbraco.Cms.Core.PropertyEditors.IConfigurationEditorJsonSerializer"/> used to serialize the configuration data.</param>
+    /// <param name="serializer">The <see cref="IConfigurationEditorJsonSerializer"/> used to serialize the configuration data.</param>
     /// <returns>A <see cref="Umbraco.Cms.Infrastructure.Persistence.Dtos.DataTypeDto"/> representing the converted data type entity.</returns>
     public static DataTypeDto BuildDto(IDataType entity, IConfigurationEditorJsonSerializer serializer)
     {

@@ -414,7 +414,8 @@ export class UmbInputMultiUrlElement extends UmbFormControlMixin<string, typeof 
 				href=${ifDefined(href)}
 				name=${name || url}
 				detail=${ifDefined(name ? url : undefined)}
-				?readonly=${this.readonly}>
+				?readonly=${this.readonly}
+				?standalone=${this.max === 1 && this.urls?.length === 1}>
 				<umb-icon slot="icon" name=${link.icon || 'icon-link'}></umb-icon>
 				${when(
 					!this.readonly,

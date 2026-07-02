@@ -13,6 +13,7 @@ import {
 	UmbWorkspaceIsNewRedirectController,
 	type ManifestWorkspace,
 	UmbWorkspaceIsNewRedirectControllerAlias,
+	umbWorkspaceWillNavigateAway,
 } from '@umbraco-cms/backoffice/workspace';
 import {
 	UmbBooleanState,
@@ -297,6 +298,8 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 
 		// Await one animation frame:
 		await new Promise((resolve) => requestAnimationFrame(() => resolve(true)));
+		// Check have we been destroyed while waiting for the animation frame? then back out:
+		if (!this.#blockManager) return;
 		const prefix = this.getIsNew() === true ? '#general_add' : '#general_edit';
 		const label = this.#labelRender.toString();
 		const title = `${prefix} ${label}`;
@@ -349,10 +352,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	 * @memberof UmbEntityWorkspaceContextBase
 	 */
 	protected _checkWillNavigateAway(newUrl: string | URL): boolean {
-		if (newUrl instanceof URL) {
-			newUrl = newUrl.href;
-		}
-		return !newUrl.includes(this.routes.getActiveLocalPath());
+		return umbWorkspaceWillNavigateAway(this.routes, this.getUnique(), newUrl);
 	}
 
 	setEditorSize(editorSize: UUIModalSidebarSize) {
