@@ -12,8 +12,6 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Manifest;
 [TestFixture]
 public class PackageManifestServiceTests
 {
-    private static string ShortHash(string value) => value.GenerateHash()[..7];
-
     private static PackageManifestService CreateService(params PackageManifest[] manifests)
         => CreateService(string.Empty, manifests);
 
@@ -143,7 +141,7 @@ public class PackageManifestServiceTests
 
         var result = await service.GetPackageManifestImportmapAsync();
 
-        Assert.That(result.Imports["pkg"], Is.EqualTo($"/App_Plugins/Pkg/index.js?umb__rnd=2.0.0-{ShortHash("deploy-1")}"));
+        Assert.That(result.Imports["pkg"], Is.EqualTo($"/App_Plugins/Pkg/index.js?umb__rnd=2.0.0-deploy-1"));
     }
 
     [Test]
@@ -155,6 +153,6 @@ public class PackageManifestServiceTests
 
         var result = await service.GetPackageManifestImportmapAsync();
 
-        Assert.That(result.Imports["pkg"], Is.EqualTo($"/App_Plugins/Pkg/index.js?umb__rnd={ShortHash("deploy-1")}"));
+        Assert.That(result.Imports["pkg"], Is.EqualTo($"/App_Plugins/Pkg/index.js?umb__rnd=deploy-1"));
     }
 }
