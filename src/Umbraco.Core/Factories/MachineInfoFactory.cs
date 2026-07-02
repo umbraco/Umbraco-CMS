@@ -37,7 +37,7 @@ internal sealed class MachineInfoFactory : IMachineInfoFactory
     /// <inheritdoc />
     public string GetMachineIdentifier()
     {
-        var baseName = _providers.Select(p => p.GetMachineIdentifier()).FirstOrDefault(id => id is not null)
+        var baseName = _providers.Select(p => p.GetMachineIdentifier()).FirstOrDefault(id => string.IsNullOrWhiteSpace(id) is false)
             ?? throw new InvalidOperationException($"No {nameof(IMachineIdentityProvider)} returned a machine identifier.");
 
         var identifier = BuildMachineIdentifier(baseName, _hostingSettings.Value.SiteName);

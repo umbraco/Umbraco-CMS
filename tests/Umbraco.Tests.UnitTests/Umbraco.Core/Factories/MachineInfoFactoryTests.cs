@@ -46,6 +46,13 @@ public class MachineInfoFactoryTests
     }
 
     [Test]
+    public void GetMachineIdentifier_SkipsWhitespaceProviderResults()
+    {
+        var factory = CreateFactory(siteName: null, Provider("   "), Provider("real-id"));
+        Assert.AreEqual("real-id", factory.GetMachineIdentifier());
+    }
+
+    [Test]
     public void GetMachineIdentifier_AppendsSiteNameToProviderResult()
     {
         var factory = CreateFactory(siteName: "site1", Provider("base-id"));
