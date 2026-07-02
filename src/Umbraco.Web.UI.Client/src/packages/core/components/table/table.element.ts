@@ -23,11 +23,13 @@ export interface UmbTableItem {
 	data: Array<UmbTableItemData>;
 	selectable?: boolean;
 	active?: boolean;
-	hasChildren?: boolean;
-	/** When set, the children-expand indicator becomes an anchor linking to this href. */
-	href?: string;
-	/** When set (and no `href` is provided), the children-expand indicator becomes a button invoking this callback. */
-	onOpen?: () => void;
+	/** When set, the row shows a children indicator. The nested options control what activating it does. */
+	childrenIndicator?: {
+		/** When set, the indicator becomes an anchor linking to this href. */
+		href?: string;
+		/** When set (and no `href` is provided), the indicator becomes a button invoking this callback. */
+		onOpen?: () => void;
+	};
 }
 
 export interface UmbTableItemData {
@@ -223,7 +225,7 @@ export class UmbTableElement extends UmbLitElement {
 			for (const id of this.#rowRenderedCallbacks.keys()) {
 				if (!currentIds.has(id)) this.#rowRenderedCallbacks.delete(id);
 			}
-			this._hasChildrenColumn = this._items.some((i) => i.hasChildren);
+			this._hasChildrenColumn = this._items.some((i) => i.childrenIndicator);
 		}
 		if (changedProperties.has('_items') || changedProperties.has('columns')) {
 			this._columnConfigurationHash = JSON.stringify([
@@ -438,24 +440,25 @@ export class UmbTableElement extends UmbLitElement {
 	};
 
 	#renderChildrenIndicator(item: UmbTableItem) {
-		if (!item.hasChildren) return nothing;
+		const indicator = item.childrenIndicator;
+		if (!indicator) return nothing;
 
 		const symbol = html`<uui-symbol-expand></uui-symbol-expand>`;
 
-		if (item.href) {
+		if (indicator.href) {
 			return html`
-				<uui-button compact label=${this.localize.term('general_open')} href=${item.href}>${symbol}</uui-button>
+				<uui-button compact label=${this.localize.term('general_open')} href=${indicator.href}>${symbol}</uui-button>
 			`;
 		}
 
-		if (item.onOpen) {
+		if (indicator.onOpen) {
 			return html`
 				<uui-button
 					compact
 					label=${this.localize.term('general_open')}
 					@click=${(e: Event) => {
 						e.stopPropagation();
-						item.onOpen?.();
+						indicator.onOpen?.();
 					}}>
 					${symbol}
 				</uui-button>

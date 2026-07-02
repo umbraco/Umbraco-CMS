@@ -111,11 +111,13 @@ export class UmbTableTreeViewElement extends UmbTreeViewElementBase<UmbTreeItemM
 		const nameData = rows[idx].data.find((d) => d.columnAlias === 'name');
 		if (nameData?.value?.href === href) return null;
 
+		const childrenIndicator = rows[idx].childrenIndicator;
+
 		return [
 			...rows.slice(0, idx),
 			{
 				...rows[idx],
-				href,
+				childrenIndicator: childrenIndicator ? { ...childrenIndicator, href } : undefined,
 				data: rows[idx].data.map((d) => (d.columnAlias === 'name' ? { ...d, value: { ...d.value, href } } : d)),
 			},
 			...rows.slice(idx + 1),
@@ -205,11 +207,9 @@ export class UmbTableTreeViewElement extends UmbTreeViewElementBase<UmbTreeItemM
 			id,
 			icon,
 			entityType: item.entityType,
-			hasChildren: item.hasChildren,
+			childrenIndicator: item.hasChildren ? { href, onOpen } : undefined,
 			selectable: !noAccess && this._isSelectableItem(item as UmbTreeItemModel),
 			active: isActive,
-			href,
-			onOpen,
 			data: [
 				{
 					columnAlias: 'name',
