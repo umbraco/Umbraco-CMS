@@ -159,67 +159,6 @@ internal sealed class RelationServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task GetPagedParentEntitiesByChildId_Filters_By_Relation_Type_Alias()
-    {
-        var contentType = ContentTypeBuilder.CreateBasicContentType("blah");
-        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
-
-        var parent = ContentBuilder.CreateBasicContent(contentType);
-        ContentService.Save(parent);
-
-        var child = ContentBuilder.CreateBasicContent(contentType);
-        ContentService.Save(child);
-
-        RelationService.Relate(parent.Id, child.Id, Constants.Conventions.RelationTypes.RelatedElementAlias);
-
-        var filtered = RelationService.GetPagedParentEntitiesByChildId(
-            child.Id,
-            0,
-            100,
-            out _,
-            new[] { Constants.Conventions.RelationTypes.RelatedExternalBlockElementAlias },
-            UmbracoObjectTypes.Document).ToArray();
-        Assert.IsEmpty(filtered);
-
-        var matching = RelationService.GetPagedParentEntitiesByChildId(
-            child.Id,
-            0,
-            100,
-            out _,
-            new[] { Constants.Conventions.RelationTypes.RelatedElementAlias },
-            UmbracoObjectTypes.Document).ToArray();
-        Assert.AreEqual(1, matching.Length);
-        Assert.AreEqual(parent.Id, matching[0].Id);
-    }
-
-    [Test]
-    public async Task GetPagedParentEntitiesByChildId_Returns_Empty_For_Unknown_Relation_Type_Alias()
-    {
-        var contentType = ContentTypeBuilder.CreateBasicContentType("blah");
-        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
-
-        var parent = ContentBuilder.CreateBasicContent(contentType);
-        ContentService.Save(parent);
-
-        var child = ContentBuilder.CreateBasicContent(contentType);
-        ContentService.Save(child);
-
-        RelationService.Relate(parent.Id, child.Id, Constants.Conventions.RelationTypes.RelatedElementAlias);
-
-        // An alias that does not resolve to any relation type must filter everything out, not fall back to "all".
-        var filtered = RelationService.GetPagedParentEntitiesByChildId(
-            child.Id,
-            0,
-            100,
-            out var total,
-            new[] { "aliasThatDoesNotExist" },
-            UmbracoObjectTypes.Document).ToArray();
-
-        Assert.IsEmpty(filtered);
-        Assert.AreEqual(0, total);
-    }
-
-    [Test]
     public async Task GetParentEntitiesByChildIds_Returns_Parents_For_All_Children_Filtered_By_Alias()
     {
         var contentType = ContentTypeBuilder.CreateBasicContentType("blah");
