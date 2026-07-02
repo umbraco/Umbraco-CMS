@@ -119,10 +119,7 @@ internal sealed class DocumentPresentationFactory
         return responseModel;
     }
 
-    /// <inheritdoc/>
-    public Attempt<List<CulturePublishScheduleModel>, ContentPublishingOperationStatus>
-        CreateCulturePublishScheduleModels(PublishDocumentRequestModel requestModel)
-        => CreateCulturePublishScheduleModels(requestModel.PublishSchedules);
+
 
     /// <inheritdoc/>
     protected override DocumentVariantItemResponseModel CreateVariantItemResponseModel(

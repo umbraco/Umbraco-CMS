@@ -81,6 +81,7 @@ export class UmbInstallerUserElement extends UmbLitElement {
 					<uui-form-layout-item>
 						<uui-label id="emailLabel" for="email" slot="label" required>Email</uui-label>
 						<uui-input
+							autocomplete="email"
 							type="email"
 							autocomplete="email"
 							id="email"
@@ -94,6 +95,7 @@ export class UmbInstallerUserElement extends UmbLitElement {
 					<uui-form-layout-item>
 						<uui-label id="passwordLabel" for="password" slot="label" required>Password</uui-label>
 						<uui-input-password
+							autocomplete="new-password"
 							id="password"
 							name="password"
 							label="password"
