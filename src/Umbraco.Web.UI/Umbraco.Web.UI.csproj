@@ -26,12 +26,12 @@
 
   <ItemGroup>
     <!-- Add design/build time support for EF Core migrations -->
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" PrivateAssets="all" Version="10.0.7" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" PrivateAssets="all" Version="10.0.9" />
     <!--
     Added the following direct dependency due to Microsoft.EntityFrameworkCore.Design having a dependency on an insecure version.
     Review for removal when Microsoft.EntityFrameworkCore.Design is updated to a newer version.
     -->
-    <PackageReference Include="Microsoft.Build.Tasks.Core" PrivateAssets="all" Version="18.4.0" />
+    <PackageReference Include="Microsoft.Build.Tasks.Core" PrivateAssets="all" Version="18.7.1" />
     <!--
     Added to align Microsoft.CodeAnalysis.* transitive versions brought in by Microsoft.EntityFrameworkCore.Design,
     which otherwise pulls in Microsoft.CodeAnalysis.CSharp 5.3.0 alongside Microsoft.CodeAnalysis.CSharp.Workspaces 5.0.0
