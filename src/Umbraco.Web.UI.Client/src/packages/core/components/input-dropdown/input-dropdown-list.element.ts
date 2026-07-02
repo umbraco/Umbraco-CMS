@@ -78,7 +78,7 @@ export class UmbInputDropdownListElement extends UmbFormControlMixin<
 		return html`
 			<uui-select
 				label=${this.localize.term('general_fieldFor', [this.name])}
-				.placeholder=${this.placeholder ?? ''}
+				.placeholder=${this.localize.string(this.placeholder)}
 				.options=${this.options ?? []}
 				@change=${this.#onChange}
 				?readonly=${this.readonly}>
