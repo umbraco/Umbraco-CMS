@@ -5,8 +5,10 @@ import { UmbItemRepositoryBase } from '@umbraco-cms/backoffice/repository';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbDocumentUrlRepository extends UmbItemRepositoryBase<UmbDocumentUrlsModel> {
-	// A dedicated data source is used for the culture-aware request, as the inherited `requestItems`
-	// does not carry a culture. It otherwise mirrors the base flow (store population included).
+	// The culture-aware request needs its own data source instance: `UmbItemRepositoryBase` keeps its
+	// data source private and the inherited `requestItems` signature cannot carry a culture. Extending
+	// the item base keeps this consistent with `UmbMediaUrlRepository`; `requestUrls` otherwise mirrors
+	// the base flow, including store population.
 	#urlSource = new UmbDocumentUrlServerDataSource(this);
 
 	constructor(host: UmbControllerHost) {

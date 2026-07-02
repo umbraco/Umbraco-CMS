@@ -23,6 +23,7 @@ public interface IPublishedUrlInfoProvider
     /// Ignored for invariant content, which always returns all of its domain urls.
     /// </param>
     /// <returns>Set of published url infos.</returns>
+    // TODO (V19): Remove the default implementation.
     Task<ISet<UrlInfo>> GetAllAsync(IContent content, string? culture)
         => GetAllAsync(content);
 }
