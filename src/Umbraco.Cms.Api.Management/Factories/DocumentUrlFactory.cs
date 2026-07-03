@@ -44,7 +44,7 @@ public class DocumentUrlFactory : IDocumentUrlFactory
     }
 
     /// <summary>
-    /// Asynchronously generates a collection of <see cref="Umbraco.Cms.Api.Management.Factories.DocumentUrlInfo"/> instances representing the URLs for the specified content item.
+    /// Asynchronously generates a collection of <see cref="DocumentUrlInfo"/> instances representing the URLs for the specified content item.
     /// </summary>
     /// <param name="content">The content item for which to generate URLs.</param>
     /// <returns>A task representing the asynchronous operation. The task result contains an <see cref="IEnumerable{DocumentUrlInfo}"/> with the generated URLs.</returns>

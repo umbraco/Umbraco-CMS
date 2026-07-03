@@ -50,9 +50,9 @@ internal sealed class PackagePresentationFactory : IPackagePresentationFactory
     }
 
     /// <summary>
-    /// Creates a <see cref="Umbraco.Cms.Api.Management.Models.PackageConfigurationResponseModel" /> instance populated with package configuration data, including the marketplace URL.
+    /// Creates a <see cref="PackageConfigurationResponseModel" /> instance populated with package configuration data, including the marketplace URL.
     /// </summary>
-    /// <returns>A <see cref="Umbraco.Cms.Api.Management.Models.PackageConfigurationResponseModel" /> containing the package's configuration details.</returns>
+    /// <returns>A <see cref="PackageConfigurationResponseModel" /> containing the package's configuration details.</returns>
     public PackageConfigurationResponseModel CreateConfigurationResponseModel() =>
         new()
         {

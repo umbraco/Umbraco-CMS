@@ -281,7 +281,7 @@ public class SecuritySettings
     ///     for the <c>Umbraco:CMS:Security:UserPassword</c> configuration section.
     ///     <para>
     ///         Do not use this property to read password configuration at runtime.
-    ///         Inject <see cref="IOptions{UserPasswordConfigurationSettings}"/> directly instead,
+    ///         Inject <see cref="Microsoft.Extensions.Options.IOptions{UserPasswordConfigurationSettings}"/> directly instead,
     ///         as that is the canonical registration used by all consumers.
     ///     </para>
     ///     <para>
@@ -299,7 +299,7 @@ public class SecuritySettings
     ///     for the <c>Umbraco:CMS:Security:MemberPassword</c> configuration section.
     ///     <para>
     ///         Do not use this property to read password configuration at runtime.
-    ///         Inject <see cref="IOptions{MemberPasswordConfigurationSettings}"/> directly instead,
+    ///         Inject <see cref="Microsoft.Extensions.Options.IOptions{MemberPasswordConfigurationSettings}"/> directly instead,
     ///         as that is the canonical registration used by all consumers.
     ///     </para>
     ///     <para>
