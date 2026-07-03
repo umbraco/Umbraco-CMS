@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.ContentPublishing;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Relations;
 using Umbraco.Cms.Infrastructure.Search;
@@ -51,27 +52,45 @@ internal sealed class DeferredSearchReindexServiceElementTests : BlockEditorWith
     }
 
     [Test]
-    public async Task Does_Not_Find_Document_Referencing_Element_Via_Generic_Element_Relation()
+    public async Task Does_Not_Find_Document_Referencing_Element_Via_Element_Picker()
     {
         var elementType = await CreateElementType(ContentVariation.Nothing);
-        var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = await CreateContentType(ContentVariation.Nothing, blockListDataType);
-
-        // A published element, and a plain document with NO external block content.
         var elementKey = await CreateAndPublishInvariantReusableElement(elementType.Key);
+
+        // A document that references the element through an element picker, which produces a generic umbElement relation.
+        var elementPickerDataType = await CreateElementPickerDataType();
+        var contentType = await CreateContentType(ContentVariation.Nothing, elementPickerDataType);
         var document = new ContentBuilder().WithContentType(contentType).WithName("Picker page").Build();
+        document.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(new[] { elementKey }));
         ContentService.Save(document);
         PublishContent(document, ["*"]);
 
         var elementId = ElementId(elementKey);
 
-        // Simulate an element-picker reference: a generic umbElement relation document(parent) -> element(child).
+        // The picker created a umbElement relation from the document to the element...
         var relationService = GetRequiredService<IRelationService>();
-        relationService.Relate(document.Id, elementId, Constants.Conventions.RelationTypes.RelatedElementAlias);
+        var pickerRelations = relationService.GetByParent(document, Constants.Conventions.RelationTypes.RelatedElementAlias).ToArray();
+        Assert.AreEqual(1, pickerRelations.Length, "The element picker should create a umbElement relation to the element.");
 
+        // ...but a picker reference does not index the element's content, so the document must not be reindexed.
         var documentIds = Service.FindDocumentIdsReferencingElements([elementId]);
+        Assert.IsFalse(documentIds.Contains(document.Id), "Documents referencing an element only via the element picker must not be reindexed.");
+    }
 
-        Assert.IsFalse(documentIds.Contains(document.Id), "Documents referencing an element only via the generic umbElement relation (element picker) must not be reindexed.");
+    private async Task<IDataType> CreateElementPickerDataType()
+    {
+        var dataType = new DataType(
+            GetRequiredService<PropertyEditorCollection>()[Constants.PropertyEditors.Aliases.ElementPicker],
+            GetRequiredService<IConfigurationEditorJsonSerializer>())
+        {
+            Name = "My Element Picker",
+            DatabaseType = ValueStorageType.Ntext,
+            ParentId = Constants.System.Root,
+            CreateDate = DateTime.UtcNow,
+        };
+
+        await GetRequiredService<IDataTypeService>().CreateAsync(dataType, Constants.Security.SuperUserKey);
+        return dataType;
     }
 
     [Test]
