@@ -104,7 +104,14 @@ export class UmbContentTypeWorkspaceEditorHeaderElement extends UmbLitElement {
 	override render() {
 		return html`
 			<div id="header">
-				<uui-button id="icon" compact label=${this.#iconTitle ?? 'icon'} look="outline" title=${ifDefined(this.#iconTitle)} ?disabled=${this._isRestricted} @click=${this._handleIconClick}>
+				<uui-button
+					id="icon"
+					compact
+					label=${this.#iconTitle ?? 'icon'}
+					look="outline"
+					title=${ifDefined(this.#iconTitle)}
+					?disabled=${this._isRestricted}
+					@click=${this._handleIconClick}>
 					<umb-icon aria-hidden="true" name=${ifDefined(this._icon)}></umb-icon>
 				</uui-button>
 
@@ -117,6 +124,7 @@ export class UmbContentTypeWorkspaceEditorHeaderElement extends UmbLitElement {
 						?auto-generate-alias=${this._isNew}
 						?readonly=${this._isRestricted}
 						?alias-readonly=${this._isRestricted}
+						.autocomplete=${'off'}
 						@change=${this.#onNameAndAliasChange}
 						required
 						${umbBindToValidation(this, '$.name', this._name)}

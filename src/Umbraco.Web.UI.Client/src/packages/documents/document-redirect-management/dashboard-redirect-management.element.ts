@@ -137,6 +137,7 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 						<div id="search-wrapper">
 							<uui-input
 								id="search"
+								name="redirect-search"
 								label=${this.localize.term('redirectUrls_originalUrl')}
 								placeholder=${this.localize.term('redirectUrls_originalUrl')}
 								@keypress=${this.#onKeypress}></uui-input>
