@@ -24,6 +24,11 @@ public class GlobalSettingsValidator
             return ValidateOptionsResult.Fail(message2);
         }
 
+        if (!ValidateTimeOutSetting(options.TimeOut, out var message3))
+        {
+            return ValidateOptionsResult.Fail(message3);
+        }
+
         return ValidateOptionsResult.Success;
     }
 
@@ -40,6 +45,25 @@ public class GlobalSettingsValidator
         {
             message =
                 $"The `{Constants.Configuration.ConfigGlobal}:{nameof(GlobalSettings.DistributedLockingWriteLockDefaultTimeout)}` should not be configured as less than {minimumTimeOut} ms";
+            return false;
+        }
+
+        message = string.Empty;
+        return true;
+    }
+
+    private bool ValidateTimeOutSetting(TimeSpan configuredTimeOut, out string message)
+    {
+        // JavaScript's setTimeout maximum delay is 2^31 - 1 milliseconds (~24.85 days).
+        // Values exceeding this cause timers to fire immediately, breaking session management.
+        var maxTimeOut = TimeSpan.FromMilliseconds(2_147_483_647);
+
+        if (configuredTimeOut > maxTimeOut)
+        {
+            message =
+                $"The `{Constants.Configuration.ConfigGlobal}:{nameof(GlobalSettings.TimeOut)}` must not exceed {maxTimeOut.TotalDays:F0} days (~24.85 days). " +
+                $"Values larger than this overflow the browser's maximum timer delay and break session management. " +
+                $"Consider using the `KeepUserLoggedIn` setting instead.";
             return false;
         }
 
