@@ -248,5 +248,27 @@ describe('UmbDocumentUserPermissionCondition', () => {
 				done();
 			}, 200);
 		});
+
+		it('is permitted with skipStartNodes:true even when outside start-node subtree', (done) => {
+			hostElement.setDocumentStartNodeAccess(false, ['permissions-document-id']);
+			hostElement.setEntity({ unique: 'no-permissions-document-id', entityType: UMB_DOCUMENT_ENTITY_TYPE });
+			hostElement.setEntityAncestors([
+				{ unique: 'no-permissions-parent-document-id', entityType: UMB_DOCUMENT_ENTITY_TYPE },
+			]);
+
+			condition = new UmbDocumentUserPermissionCondition(hostElement, {
+				host: hostElement,
+				config: {
+					alias: UMB_DOCUMENT_USER_PERMISSION_CONDITION_ALIAS,
+					allOf: [UMB_USER_PERMISSION_DOCUMENT_READ],
+					skipStartNodes: true, // bypass start-node check
+				},
+				onChange: () => {
+					expect(condition.permitted).to.be.true;
+					condition.hostDisconnected();
+					done();
+				},
+			});
+		});
 	});
 });
