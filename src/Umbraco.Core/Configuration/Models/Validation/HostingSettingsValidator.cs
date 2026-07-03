@@ -42,7 +42,7 @@ public class HostingSettingsValidator
                 : $"'{Constants.Configuration.ConfigHostingPrefix}{nameof(HostingSettings.MachineIdentifier)}' or '{Constants.Configuration.ConfigHostingPrefix}{nameof(HostingSettings.SiteName)}'";
 
             return ValidateOptionsResult.Fail(
-                $"The combined machine identifier '{identifier}' ({identifier.Length} characters) exceeds the maximum allowed length of {MachineInfoFactory.MaxMachineIdentifierLength} characters. " +
+                $"The machine identifier '{identifier}' ({identifier.Length} characters) exceeds the maximum allowed length of {MachineInfoFactory.MaxMachineIdentifierLength} characters. " +
                 $"Please shorten the value of {settingHint}.");
         }
 
