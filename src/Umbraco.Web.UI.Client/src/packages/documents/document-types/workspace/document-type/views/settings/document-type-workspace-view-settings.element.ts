@@ -179,6 +179,12 @@ export class UmbDocumentTypeWorkspaceViewSettingsElement extends UmbLitElement i
 					</div>
 				</umb-property-layout>
 			</uui-box>
+			${this.#renderHistoryCleanup()}
+		`;
+	}
+
+	#renderHistoryCleanup() {
+		return html`
 			<uui-box headline=${this.localize.term('contentTypeEditor_historyCleanupHeading')}>
 				<umb-property-layout
 					alias="HistoryCleanup"

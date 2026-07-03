@@ -206,15 +206,7 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 
 		//this.#sorter.disable();
 
-		this.consumeContext(UMB_SERVER_CONTEXT, (context) => {
-			this.observe(
-				context?.isProductionMode,
-				(isProductionMode) => {
-					this._isRestricted = isProductionMode !== false;
-				},
-				'_observeProductionMode',
-			);
-		});
+		this.#observeProductionMode();
 
 		this.consumeContext(UMB_CONTENT_TYPE_DESIGN_EDITOR_CONTEXT, (context) => {
 			this.observe(
@@ -262,6 +254,18 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 		this.observe(this.#propertyStructureHelper.propertyStructure, (propertyStructure) => {
 			this._properties = propertyStructure;
 			this.#sorter.setModel(this._properties);
+		});
+	}
+
+	#observeProductionMode() {
+		this.consumeContext(UMB_SERVER_CONTEXT, (context) => {
+			this.observe(
+				context?.isProductionMode,
+				(isProductionMode) => {
+					this._isRestricted = isProductionMode !== false;
+				},
+				'_observeProductionMode',
+			);
 		});
 	}
 
