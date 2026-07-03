@@ -37,18 +37,30 @@ internal sealed class MachineInfoFactory : IMachineInfoFactory
     /// <inheritdoc />
     public string GetMachineIdentifier()
     {
-        var baseName = _providers.Select(p => p.GetMachineIdentifier()).FirstOrDefault(id => string.IsNullOrWhiteSpace(id) is false)
-            ?? throw new InvalidOperationException($"No {nameof(IMachineIdentityProvider)} returned a machine identifier.");
+        (IMachineIdentityProvider provider, string? identifier) = _providers
+            .Select(p => (Provider: p, Identifier: p.GetMachineIdentifier()))
+            .FirstOrDefault(x => string.IsNullOrWhiteSpace(x.Identifier) is false);
 
-        var identifier = BuildMachineIdentifier(baseName, _hostingSettings.Value.SiteName);
-
-        if (identifier.Length > MaxMachineIdentifierLength)
+        if (provider is null)
         {
-            throw new InvalidOperationException(
-                $"The machine identifier '{identifier}' ({identifier.Length} characters) exceeds the maximum allowed length of {MaxMachineIdentifierLength} characters.");
+            throw new InvalidOperationException($"No {nameof(IMachineIdentityProvider)} returned a machine identifier.");
         }
 
-        return identifier;
+        var siteName = _hostingSettings.Value.SiteName;
+        var machineIdentifier = BuildMachineIdentifier(identifier!, siteName);
+
+        if (machineIdentifier.Length > MaxMachineIdentifierLength)
+        {
+            var siteNameHint = string.IsNullOrWhiteSpace(siteName)
+                ? "Shorten the base identifier at its source."
+                : $"Shorten '{Constants.Configuration.ConfigHostingPrefix}{nameof(HostingSettings.SiteName)}' or the base identifier at its source.";
+
+            throw new InvalidOperationException(
+                $"The machine identifier '{machineIdentifier}' ({machineIdentifier.Length} characters) exceeds the maximum allowed length of {MaxMachineIdentifierLength} characters. " +
+                $"The base identifier was provided by '{provider.GetType().Name}'. {siteNameHint}");
+        }
+
+        return machineIdentifier;
     }
 
     private string? _localIdentity;
