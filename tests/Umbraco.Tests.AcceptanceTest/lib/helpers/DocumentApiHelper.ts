@@ -627,6 +627,14 @@ export class DocumentApiHelper {
     return document.variants[0].state === 'Published';
   }
 
+  async waitUntilDocumentIsPublished(id: string) {
+    await expect.poll(() => this.isDocumentPublished(id)).toBeTruthy();
+  }
+
+  async waitUntilImageMediaPickerDoesNotContainImage(id: string, propertyAlias: string, mediaKey: string) {
+    await expect.poll(() => this.doesImageMediaPickerContainImage(id, propertyAlias, mediaKey)).toBeFalsy();
+  }
+
   async createPublishedDocumentWithImageCropper(documentName: string, cropValue: any, dataTypeId: string, templateId: string, propertyName: string = 'Test Property Name', documentTypeName: string = 'Test Document Type', focalPoint: {left: number, top: number} = {left: 0.5, top: 0.5}) {
     // Create temporary file
     const temporaryFile = await this.api.temporaryFile.createDefaultTemporaryImageFile();
@@ -1508,14 +1516,14 @@ export class DocumentApiHelper {
 
     const documentBuilder = new DocumentBuilder()
       .withDocumentTypeId(documentTypeId);
-    
+
     for (const culture of cultures) {
       documentBuilder.addVariant()
         .withName(documentName)
         .withCulture(culture)
         .done();
     }
-    
+
     const alias = AliasHelper.toAlias(dataTypeName);
     for (const value of values) {
       const valueBuilder = documentBuilder.addValue()

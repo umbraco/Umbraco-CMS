@@ -173,6 +173,8 @@ test('can add a media image to a media picker in variant content, remove it and 
   // Removes media item from the media picker
   await umbracoUi.content.removeMediaPickerByName(mediaFileName);
   await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeUpdated();
+  // Wait for the removal to persist before re-adding, otherwise the picker still shows the item and the add button stays hidden.
+  await umbracoApi.document.waitUntilImageMediaPickerDoesNotContainImage(contentName, AliasHelper.toAlias(dataTypeName), mediaFileId);
   // Adds media item to a media picker again
   await umbracoUi.content.clickChooseButtonAndSelectMediaWithKey(mediaFileId);
   await umbracoUi.content.clickChooseModalButton();
