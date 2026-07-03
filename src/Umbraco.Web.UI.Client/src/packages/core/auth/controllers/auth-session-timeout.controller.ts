@@ -11,7 +11,7 @@ import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
  */
 const EXPIRY_SAFETY_MARGIN_IN_SECONDS = 5;
 
-/** Maximum delay (in ms) that setTimeout supports (2^31 - 1). Values above this fire immediately in browsers. */
+/** Maximum delay (in ms) that setTimeout supports (2^31 - 1). Larger delays fire immediately in browsers. */
 const MAX_TIMEOUT_MS = 2_147_483_647;
 
 export class UmbAuthSessionTimeoutController extends UmbControllerBase {
@@ -91,10 +91,23 @@ export class UmbAuthSessionTimeoutController extends UmbControllerBase {
 		if (secondsUntilWarning <= 0) {
 			// Already in the buffer zone
 			this.#onSessionExpiring(expiresAt);
-		} else {
-			const delayMs = Math.min(secondsUntilWarning * 1000, MAX_TIMEOUT_MS);
-			this.#timeoutId = setTimeout(() => this.#onSessionExpiring(expiresAt), delayMs);
+			return;
 		}
+
+		let delayMs = secondsUntilWarning * 1000;
+		if (delayMs > MAX_TIMEOUT_MS) {
+			// Not expected in practice: both session.expiresAt and session.accessTokenExpiresAt derive
+			// from the server-issued token lifetime that Global:TimeOut governs, and server-side
+			// validation bounds Global:TimeOut below setTimeout's ceiling.
+			// Clamp and warn so a regression producing an out-of-range session lifetime surfaces here,
+			// rather than setTimeout silently firing the check immediately.
+			console.warn(
+				`[Auth] Session warning delay ${delayMs}ms exceeds the maximum supported setTimeout delay; clamping to ${MAX_TIMEOUT_MS}ms.`,
+			);
+			delayMs = MAX_TIMEOUT_MS;
+		}
+
+		this.#timeoutId = setTimeout(() => this.#onSessionExpiring(expiresAt), delayMs);
 	}
 
 	/**
