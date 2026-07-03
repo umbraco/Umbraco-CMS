@@ -17,11 +17,11 @@ export type UmbDocumentUserPermissionConditionConfig =
 		oneOf?: Array<string>;
 
 		/**
-		 * If true, the condition will skip the start-node check and only check the permissions.
+		 * If true, the condition will ignorer the user start-node check and only check the permissions.
 		 * Use this carefully, as this will permit access for Documents that are outside the user's start-node scope.
 		 * @default false
 		 */
-		skipStartNodes?: boolean;
+		ignorerUserStartNodes?: boolean;
 	};
 
 declare global {

@@ -83,7 +83,7 @@ export class UmbDocumentUserPermissionCondition
 		const path = [...this.#ancestors, this.#unique].filter((unique) => unique !== null);
 
 		// Check if the user has 'start-node' access to this document:
-		if (this.config.skipStartNodes !== true && !this.#hasStartNodeAccess(path)) {
+		if (this.config.ignorerUserStartNodes !== true && !this.#hasStartNodeAccess(path)) {
 			this.permitted = false;
 			return;
 		}
