@@ -1,6 +1,15 @@
 import { customElement, html, nothing, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbCollectionDefaultElement } from '@umbraco-cms/backoffice/collection';
 import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
+import type { UmbRoute } from '@umbraco-cms/backoffice/router';
+
+// The base collection state we need to reproduce its layout while injecting the notice.
+type UmbCollectionRenderState = {
+	_routes?: Array<UmbRoute>;
+	_hasItems: boolean;
+	_initialLoadDone: boolean;
+	_emptyLabel?: string;
+};
 
 @customElement('umb-dictionary-collection')
 export class UmbDictionaryCollectionElement extends UmbCollectionDefaultElement {
@@ -25,10 +34,31 @@ export class UmbDictionaryCollectionElement extends UmbCollectionDefaultElement 
 		`;
 	}
 
-	// Render the notice above the whole collection layout so it sits full-width at the top without
-	// overlapping the (transparent) collection header. super.render() keeps the standard collection UI.
+	// Mirrors UmbCollectionDefaultElement.render(), but places the production-mode notice inside the
+	// body-layout right before the router slot so it sits full-width at the top of the content area.
 	override render() {
-		return html`${this.#renderProductionModeNotice()}${super.render()}`;
+		const base = this as unknown as UmbCollectionRenderState;
+		if (!base._routes) return nothing;
+		return html`
+			<umb-body-layout header-transparent class=${base._hasItems ? 'has-items' : ''}>
+				${this.#renderProductionModeNotice()}
+				<umb-router-slot id="router" .routes=${base._routes}></umb-router-slot>
+				${this.renderToolbar()} ${base._hasItems ? this.#renderContent() : this.#renderEmptyState(base)}
+			</umb-body-layout>
+		`;
+	}
+
+	#renderContent() {
+		return html`${this.renderPagination()} ${this.renderSelectionActions()}`;
+	}
+
+	#renderEmptyState(base: UmbCollectionRenderState) {
+		if (!base._initialLoadDone) return nothing;
+		return html`
+			<div id="empty-state" class="uui-text">
+				<h4>${this.localize.string(base._emptyLabel)}</h4>
+			</div>
+		`;
 	}
 
 	#renderProductionModeNotice() {
