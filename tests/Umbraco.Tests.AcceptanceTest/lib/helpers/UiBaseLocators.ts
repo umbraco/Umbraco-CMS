@@ -210,6 +210,7 @@ export class UiBaseLocators extends BasePage {
   public readonly changePhotoBtn: Locator;
   public readonly removePhotoBtn: Locator;
   public readonly languageBtn: Locator;
+  public readonly uiCultureInput: Locator;
 
   // Collection & Table
   public readonly collectionTreeItemTableRow: Locator;
@@ -561,6 +562,7 @@ export class UiBaseLocators extends BasePage {
     this.changePhotoBtn = page.getByLabel('Change photo');
     this.removePhotoBtn = page.getByLabel('Remove photo');
     this.languageBtn = page.locator('[label="UI Culture"] select');
+    this.uiCultureInput = page.locator('umb-ui-culture-input');
 
     // Collection & Table
     this.collectionTreeItemTableRow = page.locator(
@@ -2151,11 +2153,9 @@ export class UiBaseLocators extends BasePage {
   }
 
   async selectUserLanguage(language: string) {
-    // Re-select until the change round-trips to the model; an early selection is clobbered by the async load.
-    const cultureInput = this.page.locator('umb-ui-culture-input');
     await expect(async () => {
       await this.languageBtn.selectOption(language, {force: true});
-      await expect(cultureInput).toHaveAttribute('value', language.toLowerCase(), {timeout: ConstantHelper.timeout.short});
+      await expect(this.uiCultureInput).toHaveAttribute('value', language.toLowerCase(), {timeout: ConstantHelper.timeout.short});
     }).toPass({timeout: ConstantHelper.timeout.medium});
   }
 }

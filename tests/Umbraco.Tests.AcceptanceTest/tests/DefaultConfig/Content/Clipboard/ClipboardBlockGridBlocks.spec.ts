@@ -147,6 +147,7 @@ test('can copy and paste multiple blocks into the same document and group', {tag
   await umbracoUi.content.clickPasteFromClipboardButtonForProperty(groupName, blockGridDataTypeName);
   await umbracoUi.content.selectClipboardEntriesWithName(contentName, blockGridDataTypeName);
   await umbracoUi.content.clickSubmitButton();
+  await umbracoUi.content.doesBlockGridPropertyHaveBlockAmount(groupName, blockGridDataTypeName, 4);
   await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
@@ -178,6 +179,7 @@ test('can copy and paste multiple blocks into the same document but different gr
   await umbracoUi.content.clickPasteFromClipboardButtonForProperty(secondGroupName, secondBlockGridPropertyName);
   await umbracoUi.content.selectClipboardEntriesWithName(contentName, blockGridDataTypeName);
   await umbracoUi.content.clickSubmitButton();
+  await umbracoUi.content.doesBlockGridPropertyHaveBlockAmount(secondGroupName, secondBlockGridPropertyName, 2);
   await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
@@ -213,6 +215,7 @@ test('can copy and paste multiple blocks into another document',  async ({umbrac
   await umbracoUi.content.clickPasteFromClipboardButtonForProperty(groupName, blockGridDataTypeName);
   await umbracoUi.content.selectClipboardEntriesWithName(contentName, blockGridDataTypeName);
   await umbracoUi.content.clickSubmitButton();
+  await umbracoUi.content.doesBlockGridPropertyHaveBlockAmount(groupName, blockGridDataTypeName, 2);
   await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
