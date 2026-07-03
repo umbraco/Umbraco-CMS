@@ -65,5 +65,14 @@
     <Compile Update="Umbraco.Core\Extensions\ContentExtensionsTests.GetStatus.cs">
       <DependentUpon>ContentExtensionsTests.cs</DependentUpon>
     </Compile>
+    <Compile Update="Umbraco.Core\Factories\MachineIdentityProviderTests.Configured.cs">
+      <DependentUpon>MachineIdentityProviderTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Factories\MachineIdentityProviderTests.Default.cs">
+      <DependentUpon>MachineIdentityProviderTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Factories\MachineIdentityProviderTests.AzureWebsiteInstanceId.cs">
+      <DependentUpon>MachineIdentityProviderTests.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
 </Project>
