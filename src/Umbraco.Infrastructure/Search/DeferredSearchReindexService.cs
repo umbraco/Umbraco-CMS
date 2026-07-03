@@ -312,10 +312,15 @@ internal sealed class DeferredSearchReindexService : IDeferredSearchReindexServi
             foreach (IContent document in documents)
             {
                 var isPublished = false;
-                if (document.Published && publishChecked.TryGetValue(document.Id, out isPublished) is false)
+                if (document.Published)
                 {
-                    isPublished = _publishStatusQueryService.HasPublishedAncestorPath(document.Key);
-                    publishChecked[document.Id] = isPublished;
+                    // The published-ancestor check depends only on the ancestor chain, so cache it per parent —
+                    // sibling documents under the same parent share the result.
+                    if (publishChecked.TryGetValue(document.ParentId, out isPublished) is false)
+                    {
+                        isPublished = _publishStatusQueryService.HasPublishedAncestorPath(document.Key);
+                        publishChecked[document.ParentId] = isPublished;
+                    }
                 }
 
                 _umbracoIndexingHandler.ReIndexForContent(document, isPublished);
