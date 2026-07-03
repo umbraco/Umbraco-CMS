@@ -1123,6 +1123,10 @@ export class LibraryUiHelper extends UiBaseLocators {
     await this.click(this.rollbackItem.last());
   }
 
+  async waitForRollbackItems() {
+    await expect(this.rollbackItem).not.toHaveCount(0);
+  }
+
   async clickPublicAccessButton() {
     await this.click(this.publicAccessBtn);
   }

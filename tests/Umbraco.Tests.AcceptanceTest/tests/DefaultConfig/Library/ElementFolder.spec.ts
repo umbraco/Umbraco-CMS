@@ -171,3 +171,29 @@ test('can create an element in a nested folder', async ({umbracoApi, umbracoUi})
   await umbracoApi.element.ensureNameNotExists(parentFolderName);
 });
 
+
+test('can move an element folder to another folder', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const targetFolderName = 'TargetElementFolder';
+  await umbracoApi.element.ensureNameNotExists(targetFolderName);
+  await umbracoApi.element.createDefaultElementFolder(elementFolderName);
+  const targetFolderId = await umbracoApi.element.createDefaultElementFolder(targetFolderName);
+
+  // Act
+  await umbracoUi.library.goToSection(ConstantHelper.sections.library);
+  await umbracoUi.library.clickActionsMenuForElement(elementFolderName);
+  await umbracoUi.library.clickMoveToActionMenuOption();
+  await umbracoUi.library.moveToElementWithName([], targetFolderName);
+
+  // Assert
+  await umbracoUi.library.clickActionsMenuForElement(targetFolderName);
+  await umbracoUi.library.clickReloadChildrenActionMenuOption();
+  await umbracoUi.library.openElementCaretButtonForName(targetFolderName);
+  await umbracoUi.library.isChildElementInTreeVisible(targetFolderName, elementFolderName, true);
+  const targetChildren = await umbracoApi.element.getChildren(targetFolderId);
+  expect(targetChildren[0].name).toBe(elementFolderName);
+
+  // Clean
+  await umbracoApi.element.ensureNameNotExists(targetFolderName);
+});
+

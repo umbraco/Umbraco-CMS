@@ -77,3 +77,21 @@ test('can set minimum and maximum amount', async ({umbracoApi, umbracoUi}) => {
   // Assert
   expect(await umbracoApi.dataType.doesElementPickerHaveMinAndMaxAmount(customDataTypeName, minAmount, maxAmount)).toBeTruthy();
 });
+
+test('can restrict the element picker to allowed content types', async ({umbracoApi}) => {
+  // Arrange
+  const elementTypeName = 'TestElementTypeForElementPickerConfig';
+  const textStringDataTypeName = 'Textstring';
+  await umbracoApi.documentType.ensureNameNotExists(elementTypeName);
+  const textStringDataType = await umbracoApi.dataType.getByName(textStringDataTypeName);
+  const elementTypeId = await umbracoApi.documentType.createElementTypeWithPropertyInTab(elementTypeName, 'TestTab', 'TestGroup', textStringDataTypeName, textStringDataType.id);
+
+  // Act
+  await umbracoApi.dataType.createDefaultElementPickerWithAllowedContentTypes(customDataTypeName, [elementTypeId]);
+
+  // Assert
+  expect(await umbracoApi.dataType.doesElementPickerHaveAllowedContentTypes(customDataTypeName, [elementTypeId])).toBeTruthy();
+
+  // Clean
+  await umbracoApi.documentType.ensureNameNotExists(elementTypeName);
+});

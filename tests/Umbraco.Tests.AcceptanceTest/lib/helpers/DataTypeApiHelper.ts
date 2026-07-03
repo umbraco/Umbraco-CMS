@@ -2210,4 +2210,21 @@ export class DataTypeApiHelper {
       return valueData?.value.max === max && valueData?.value.min === min;
     }
   }
+
+  async createDefaultElementPickerWithAllowedContentTypes(name: string, elementTypeIds: string[]) {
+    await this.ensureNameNotExists(name);
+
+    const builder = new ElementPickerDataTypeBuilder()
+      .withName(name)
+      .withAllowedContentTypes(elementTypeIds)
+      .build();
+
+    return await this.save(builder);
+  }
+
+  async doesElementPickerHaveAllowedContentTypes(dataTypeName: string, elementTypeIds: string[]) {
+    const dataTypeData = await this.getByName(dataTypeName);
+    const valueData = dataTypeData.values.find(item => item.alias === 'allowedContentTypes');
+    return valueData?.value === elementTypeIds.join(',');
+  }
 }
