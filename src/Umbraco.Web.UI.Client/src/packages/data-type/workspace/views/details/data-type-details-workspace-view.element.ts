@@ -6,6 +6,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { umbBindToValidation } from '@umbraco-cms/backoffice/validation';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
+import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 
 @customElement('umb-data-type-details-workspace-view')
 export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement implements UmbWorkspaceViewElement {
@@ -30,6 +31,10 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement im
 	@state()
 	private _supportedDataSourceTypes: Array<string> = [];
 
+	// Restricted until the server confirms it is not in production runtime mode (safe default).
+	@state()
+	private _isRestricted = true;
+
 	#workspaceContext?: typeof UMB_DATA_TYPE_WORKSPACE_CONTEXT.TYPE;
 
 	constructor() {
@@ -38,6 +43,12 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement im
 		this.consumeContext(UMB_DATA_TYPE_WORKSPACE_CONTEXT, (workspaceContext) => {
 			this.#workspaceContext = workspaceContext;
 			this.#observeDataType();
+		});
+
+		this.consumeContext(UMB_SERVER_CONTEXT, (context) => {
+			this.observe(context?.isProductionMode, (isProductionMode) => {
+				this._isRestricted = isProductionMode !== false;
+			});
 		});
 	}
 
@@ -82,8 +93,24 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement im
 		this.#workspaceContext?.setPropertyEditorDataSourceAlias(value || undefined);
 	}
 
+	#renderProductionModeNotice() {
+		if (!this._isRestricted) return nothing;
+		return html`
+			<uui-box id="production-mode-notice">
+				<div class="notice">
+					<umb-icon name="icon-info"></umb-icon>
+					<div>
+						<strong><umb-localize key="general_productionMode">Production Mode</umb-localize></strong>
+						<p><umb-localize key="general_runtimeModeProductionSchema"></umb-localize></p>
+					</div>
+				</div>
+			</uui-box>
+		`;
+	}
+
 	override render() {
 		return html`
+			${this.#renderProductionModeNotice()}
 			<uui-box>
 				<umb-property-layout
 					data-mark="property:editorUiAlias"
@@ -96,6 +123,7 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement im
 						.propertyEditorUiAlias=${this._propertyEditorUiAlias}
 						.propertyEditorUiIcon=${this._propertyEditorUiIcon}
 						.propertyEditorSchemaAlias=${this._propertyEditorSchemaAlias}
+						?readonly=${this._isRestricted}
 						${umbBindToValidation(this, '$.editorUiAlias', this._propertyEditorUiAlias)}>
 					</umb-data-type-details-workspace-property-editor-picker>
 				</umb-property-layout>
@@ -115,6 +143,8 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement im
 					.dataSourceTypes=${this._supportedDataSourceTypes}
 					slot="editor"
 					max="1"
+					?readonly=${this._isRestricted}
+					?disabled=${this._isRestricted}
 					@change=${this.#onDataSourceChange}
 					required
 					${umbBindToValidation(
@@ -152,6 +182,28 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement im
 
 			uui-box {
 				margin-top: var(--uui-size-layout-1);
+			}
+
+			#production-mode-notice {
+				--uui-box-default-padding: var(--uui-size-space-4) var(--uui-size-space-5);
+				border-left: 4px solid var(--uui-color-warning-standalone, #f0ac00);
+			}
+
+			#production-mode-notice .notice {
+				display: flex;
+				gap: var(--uui-size-space-4);
+				align-items: flex-start;
+			}
+
+			#production-mode-notice umb-icon {
+				flex: 0 0 auto;
+				font-size: var(--uui-size-6);
+				margin-top: 2px;
+				color: var(--uui-color-warning-standalone, #f0ac00);
+			}
+
+			#production-mode-notice p {
+				margin: var(--uui-size-space-2) 0 0;
 			}
 
 			#btn-add {

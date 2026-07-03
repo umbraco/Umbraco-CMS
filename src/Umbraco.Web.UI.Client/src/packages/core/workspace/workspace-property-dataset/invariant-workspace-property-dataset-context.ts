@@ -82,4 +82,8 @@ export class UmbInvariantWorkspacePropertyDatasetContext<
 	getReadOnly() {
 		return this.#readOnly.getValue();
 	}
+
+	setReadOnly(value: boolean) {
+		this.#readOnly.setValue(value);
+	}
 }
