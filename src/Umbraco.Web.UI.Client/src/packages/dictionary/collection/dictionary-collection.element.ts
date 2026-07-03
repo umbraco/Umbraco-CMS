@@ -19,13 +19,16 @@ export class UmbDictionaryCollectionElement extends UmbCollectionDefaultElement 
 
 	protected override renderToolbar() {
 		return html`
-			<div slot="header" style="display: flex; flex-direction: column; gap: var(--uui-size-space-3); width: 100%;">
-				${this.#renderProductionModeNotice()}
-				<umb-collection-toolbar>
-					<umb-collection-filter-field></umb-collection-filter-field>
-				</umb-collection-toolbar>
-			</div>
+			<umb-collection-toolbar slot="header">
+				<umb-collection-filter-field></umb-collection-filter-field>
+			</umb-collection-toolbar>
 		`;
+	}
+
+	// Render the notice above the whole collection layout so it sits full-width at the top without
+	// overlapping the (transparent) collection header. super.render() keeps the standard collection UI.
+	override render() {
+		return html`${this.#renderProductionModeNotice()}${super.render()}`;
 	}
 
 	#renderProductionModeNotice() {
