@@ -24,8 +24,8 @@ public interface IDeferredSearchReindexService
     void QueueMemberTypeReindex(IReadOnlyCollection<int> memberTypeIds);
 
     /// <summary>
-    ///     Queues a set of element node ids whose change requires re-indexing the documents that
-    ///     (transitively) embed them via block editors.
+    ///     Queues a set of element node ids so that any content whose search index depends on those
+    ///     elements is re-indexed after the elements are updated.
     /// </summary>
     /// <param name="elementIds">The element node ids that changed.</param>
     void QueueElementReindex(IReadOnlyCollection<int> elementIds);
