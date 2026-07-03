@@ -8,7 +8,10 @@ import { UmbMediaPickerContext } from './media-picker.context.js';
 import type { UmbMediaPathModel } from './types.js';
 import type { UmbMediaPickerFolderPathElement } from './components/media-picker-folder-path.element.js';
 import type { UmbMediaPickerModalData, UmbMediaPickerModalValue } from './media-picker-modal.token.js';
-import { UMB_MEDIA_PICKER_CLIPBOARD_ENTRY_VALUE_TYPE } from '../../clipboard/constants.js';
+import {
+	UMB_MEDIA_CLIPBOARD_ENTRY_VALUE_TYPE,
+	UMB_RICH_MEDIA_CLIPBOARD_ENTRY_VALUE_TYPE,
+} from '../../clipboard/constants.js';
 import {
 	css,
 	customElement,
@@ -41,8 +44,15 @@ import type {
 	UmbTableItem,
 	UmbTableSelectedEvent,
 } from '@umbraco-cms/backoffice/components';
-import { UmbPropertyClipboardManager } from '@umbraco-cms/backoffice/clipboard';
-import type { UmbMediaPickerValueModel } from '../../property-editors/types.js';
+import {
+	UMB_CLIPBOARD_CONTEXT,
+	UmbPropertyClipboardManager,
+	type UmbClipboardEntryValuesType,
+} from '@umbraco-cms/backoffice/clipboard';
+import type {
+	UmbMediaClipboardEntryValueModel,
+	UmbRichMediaClipboardEntryValueModel,
+} from '../../clipboard/types.js';
 import type { UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
 
 import './components/index.js';
@@ -506,7 +516,7 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 			<umb-clipboard-entry-picker
 				.config=${{
 					multiple: this.data?.multiple ?? false,
-					entryTypes: [UMB_MEDIA_PICKER_CLIPBOARD_ENTRY_VALUE_TYPE],
+					entryTypes: [UMB_RICH_MEDIA_CLIPBOARD_ENTRY_VALUE_TYPE, UMB_MEDIA_CLIPBOARD_ENTRY_VALUE_TYPE],
 				}}
 				@selection-change=${this.#onClipboardSelectionChange}></umb-clipboard-entry-picker>
 		`;
@@ -630,9 +640,33 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 	}
 
 	async #resolveMediaKeysFromClipboard(uniques: string[]): Promise<string[]> {
-		// The controller runs the registered media-picker paste translator per entry.
-		const values = await this.#clipboardManager.readMultiple<UmbMediaPickerValueModel>(uniques);
-		return values.flat().map((entry) => entry.mediaKey);
+		// The modal is a media selector, so it resolves clipboard entries to media keys directly — independent
+		// of which editor opened it — rather than to the host editor's value shape.
+		const clipboardContext = await this.getContext(UMB_CLIPBOARD_CONTEXT);
+		if (!clipboardContext) return [];
+
+		const mediaKeys: Array<string> = [];
+		for (const unique of uniques) {
+			const entry = await clipboardContext.read(unique);
+			if (!entry) continue;
+			mediaKeys.push(...this.#extractMediaUniques(entry.values));
+		}
+		return mediaKeys;
+	}
+
+	#extractMediaUniques(values: UmbClipboardEntryValuesType): Array<string> {
+		// Prefer the higher-fidelity richMedia value, falling back to the bare media value.
+		const richMedia = values.find((value) => value.type === UMB_RICH_MEDIA_CLIPBOARD_ENTRY_VALUE_TYPE)?.value as
+			| UmbRichMediaClipboardEntryValueModel
+			| undefined;
+		if (richMedia?.length) {
+			return richMedia.map((item) => item.unique);
+		}
+
+		const media = values.find((value) => value.type === UMB_MEDIA_CLIPBOARD_ENTRY_VALUE_TYPE)?.value as
+			| UmbMediaClipboardEntryValueModel
+			| undefined;
+		return media?.map((item) => item.unique) ?? [];
 	}
 
 	#updateSelection(mediaKeys: string[]) {

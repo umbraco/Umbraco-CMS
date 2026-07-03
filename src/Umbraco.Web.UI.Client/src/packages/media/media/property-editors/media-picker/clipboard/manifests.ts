@@ -1,5 +1,5 @@
-import { manifests as copyManifests } from './copy/manifests.js';
-import { manifests as pasteManifests } from './paste/manifests.js';
+import { manifests as richMediaManifests } from './rich-media/manifests.js';
+import { manifests as mediaManifests } from './media/manifests.js';
 import {
 	UMB_PROPERTY_HAS_VALUE_CONDITION_ALIAS,
 	UMB_WRITABLE_PROPERTY_CONDITION_ALIAS,
@@ -39,7 +39,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 			},
 		],
 	},
-	...copyManifests,
-	...pasteManifests,
+	...richMediaManifests,
+	...mediaManifests,
 ];
-

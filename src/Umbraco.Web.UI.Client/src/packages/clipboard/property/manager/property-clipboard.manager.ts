@@ -75,25 +75,4 @@ export class UmbPropertyClipboardManager extends UmbControllerBase {
 			propertyEditorUiAlias,
 		});
 	}
-
-	/**
-	 * Reads clipboard entries and translates them to the hosting editor's property value via the paste translator.
-	 * @param {Array<string>} uniques The clipboard entry uniques to read.
-	 * @returns {Promise<Array<ValueType>>} The translated property values, or an empty array if none could be resolved.
-	 * @memberof UmbPropertyClipboardManager
-	 */
-	async readMultiple<ValueType = unknown>(uniques: Array<string>): Promise<Array<ValueType>> {
-		if (!uniques.length) return [];
-		if (!this.#clipboardContext) return [];
-
-		const propertyEditorUiAlias = this.#propertyContext?.getEditorManifest()?.alias;
-		if (!propertyEditorUiAlias) return [];
-
-		try {
-			return await this.#clipboardContext.readMultiple<ValueType>(uniques, propertyEditorUiAlias);
-		} catch {
-			// readMultiple throws when nothing resolves — treat as no result.
-			return [];
-		}
-	}
 }
