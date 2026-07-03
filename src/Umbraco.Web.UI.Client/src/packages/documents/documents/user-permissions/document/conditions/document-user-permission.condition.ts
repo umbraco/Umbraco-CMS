@@ -114,10 +114,10 @@ export class UmbDocumentUserPermissionCondition
 		}
 	}
 
-	#hasStartNodeAccess(path: Array<UmbEntityUnique>): boolean {
+	#hasStartNodeAccess(path: Array<string>): boolean {
 		if (this.#hasDocumentRootAccess) return true;
 		if (this.#documentStartNodeUniques.length === 0) return false;
-		return path.some((unique) => unique !== null && this.#documentStartNodeUniques.includes(unique));
+		return path.some((unique) => this.#documentStartNodeUniques.includes(unique));
 	}
 
 	#check(verbs: Array<string>) {
