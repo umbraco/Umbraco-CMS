@@ -968,6 +968,7 @@ export default {
 		password: 'Password',
 		path: 'Path',
 		pixels: 'pixels',
+		placeholder: 'Placeholder',
 		pleasewait: 'One moment please...',
 		previous: 'Previous',
 		properties: 'Properties',
@@ -2544,6 +2545,8 @@ export default {
 	textbox: {
 		characters_left: '<strong>%0%</strong> characters left.',
 		characters_exceed: 'Maximum %0% characters, <strong>%1%</strong> too many.',
+		maxCharsLabel: 'Maximum allowed characters',
+		autocompleteLabel: 'Autocomplete',
 	},
 	recycleBin: {
 		contentTrashed: 'Trashed content with Id: {0} related to original parent content with Id: {1}',
