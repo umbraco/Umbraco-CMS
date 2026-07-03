@@ -1,3 +1,4 @@
+export * from './production-mode-workspace-action/index.js';
 export * from './workspace-action-menu-item/index.js';
 export * from './workspace-action-menu/index.js';
 export * from './workspace-action/index.js';

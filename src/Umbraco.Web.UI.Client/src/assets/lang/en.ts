@@ -1045,6 +1045,8 @@ export default {
 			return `in ${duration}`;
 		},
 		clipboard: 'Clipboard',
+		productionMode: 'Production Mode',
+		runtimeModeProduction: 'This is not editable while the runtime mode is set to <code>Production</code>.',
 	},
 	colors: {
 		black: 'Black',

@@ -1,6 +1,7 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Api.Management.Filters;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 
@@ -10,6 +11,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.MemberType.Folder;
 /// API controller responsible for handling requests to delete member type folders in the Umbraco CMS.
 /// </summary>
 [ApiVersion("1.0")]
+[DenyInRuntimeModeProduction]
 public class DeleteMemberTypeFolderController : MemberTypeFolderControllerBase
 {
     /// <summary>

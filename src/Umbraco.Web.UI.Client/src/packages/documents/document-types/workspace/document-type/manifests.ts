@@ -1,6 +1,12 @@
 import { UMB_DOCUMENT_TYPE_COMPOSITION_REPOSITORY_ALIAS } from '../../constants.js';
 import { UMB_DOCUMENT_TYPE_WORKSPACE_ALIAS } from './constants.js';
-import { UMB_WORKSPACE_CONDITION_ALIAS, UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
+import {
+	UMB_WORKSPACE_CONDITION_ALIAS,
+	UmbProductionModeWorkspaceActionApi,
+	UmbProductionModeWorkspaceActionElement,
+	UmbSubmitWorkspaceAction,
+} from '@umbraco-cms/backoffice/workspace';
+import { UMB_IS_SERVER_PRODUCTION_MODE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/server';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -100,6 +106,27 @@ export const manifests: Array<UmbExtensionManifest> = [
 			{
 				alias: UMB_WORKSPACE_CONDITION_ALIAS,
 				match: UMB_DOCUMENT_TYPE_WORKSPACE_ALIAS,
+			},
+			{
+				alias: UMB_IS_SERVER_PRODUCTION_MODE_CONDITION_ALIAS,
+				match: false,
+			},
+		],
+	},
+	{
+		type: 'workspaceAction',
+		alias: 'Umb.WorkspaceAction.DocumentType.ProductionMode',
+		name: 'Document Type Production Mode Workspace Action',
+		api: UmbProductionModeWorkspaceActionApi,
+		element: UmbProductionModeWorkspaceActionElement,
+		conditions: [
+			{
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
+				match: UMB_DOCUMENT_TYPE_WORKSPACE_ALIAS,
+			},
+			{
+				alias: UMB_IS_SERVER_PRODUCTION_MODE_CONDITION_ALIAS,
+				match: true,
 			},
 		],
 	},

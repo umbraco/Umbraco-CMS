@@ -5,6 +5,7 @@ import { manifests as workspaceManifests } from './workspace/manifests.js';
 import { manifests as repositoryManifests } from './repository/manifests.js';
 import { UMB_DATA_TYPE_FOLDER_WORKSPACE_ALIAS } from './workspace/index.js';
 import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
+import { UMB_IS_SERVER_PRODUCTION_MODE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/server';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -16,6 +17,12 @@ export const manifests: Array<UmbExtensionManifest> = [
 		meta: {
 			folderRepositoryAlias: UMB_DATA_TYPE_FOLDER_REPOSITORY_ALIAS,
 		},
+		conditions: [
+			{
+				alias: UMB_IS_SERVER_PRODUCTION_MODE_CONDITION_ALIAS,
+				match: false,
+			},
+		],
 	},
 	{
 		type: 'entityAction',
@@ -26,6 +33,12 @@ export const manifests: Array<UmbExtensionManifest> = [
 		meta: {
 			folderRepositoryAlias: UMB_DATA_TYPE_FOLDER_REPOSITORY_ALIAS,
 		},
+		conditions: [
+			{
+				alias: UMB_IS_SERVER_PRODUCTION_MODE_CONDITION_ALIAS,
+				match: false,
+			},
+		],
 	},
 	{
 		type: 'workspaceView',

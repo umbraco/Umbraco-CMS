@@ -2,6 +2,7 @@ import { UMB_MEMBER_TYPE_FOLDER_ENTITY_TYPE } from '../../entity.js';
 import { UMB_MEMBER_TYPE_FOLDER_REPOSITORY_ALIAS } from './repository/constants.js';
 import { manifests as repositoryManifests } from './repository/manifests.js';
 import { manifests as workspaceManifests } from './workspace/manifests.js';
+import { UMB_IS_SERVER_PRODUCTION_MODE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/server';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -13,6 +14,12 @@ export const manifests: Array<UmbExtensionManifest> = [
 		meta: {
 			folderRepositoryAlias: UMB_MEMBER_TYPE_FOLDER_REPOSITORY_ALIAS,
 		},
+		conditions: [
+			{
+				alias: UMB_IS_SERVER_PRODUCTION_MODE_CONDITION_ALIAS,
+				match: false,
+			},
+		],
 	},
 	{
 		type: 'entityAction',
@@ -23,6 +30,12 @@ export const manifests: Array<UmbExtensionManifest> = [
 		meta: {
 			folderRepositoryAlias: UMB_MEMBER_TYPE_FOLDER_REPOSITORY_ALIAS,
 		},
+		conditions: [
+			{
+				alias: UMB_IS_SERVER_PRODUCTION_MODE_CONDITION_ALIAS,
+				match: false,
+			},
+		],
 	},
 	...repositoryManifests,
 	...workspaceManifests,

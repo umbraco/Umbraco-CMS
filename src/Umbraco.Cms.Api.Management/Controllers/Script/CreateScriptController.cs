@@ -2,6 +2,7 @@ using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Extensions;
+using Umbraco.Cms.Api.Management.Filters;
 using Umbraco.Cms.Api.Management.ViewModels.Script;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Mapping;
@@ -16,6 +17,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Script;
 /// Controller for creating scripts via the Umbraco CMS Management API.
 /// </summary>
 [ApiVersion("1.0")]
+[DenyInRuntimeModeProduction]
 public class CreateScriptController : ScriptControllerBase
 {
     private readonly IScriptService _scriptService;

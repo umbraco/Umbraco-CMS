@@ -60,7 +60,7 @@ internal sealed class StylesheetRepositoryTest : UmbracoIntegrationTest
     private IStylesheetRepository CreateRepository()
     {
         var globalSettings = new GlobalSettings();
-        return new StylesheetRepository(_fileSystems);
+        return new StylesheetRepository(_fileSystems, GetRequiredService<IOptionsMonitor<RuntimeSettings>>());
     }
 
     [Test]

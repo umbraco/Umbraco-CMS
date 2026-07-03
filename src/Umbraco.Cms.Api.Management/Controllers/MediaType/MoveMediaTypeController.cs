@@ -2,6 +2,7 @@ using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Api.Management.Filters;
 using Umbraco.Cms.Api.Management.ViewModels.MediaType;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
@@ -16,6 +17,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.MediaType;
 /// </summary>
 [ApiVersion("1.0")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessMediaTypes)]
+[DenyInRuntimeModeProduction]
 public class MoveMediaTypeController : MediaTypeControllerBase
 {
     private readonly IMediaTypeService _mediaTypeService;

@@ -2,6 +2,7 @@ using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Api.Management.Filters;
 using Umbraco.Cms.Api.Management.ViewModels.MemberType;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
@@ -16,6 +17,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.MemberType;
 /// </summary>
 [ApiVersion("1.0")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessMemberTypes)]
+[DenyInRuntimeModeProduction]
 public class MoveMemberTypeController : MemberTypeControllerBase
 {
     private readonly IMemberTypeService _memberTypeService;
