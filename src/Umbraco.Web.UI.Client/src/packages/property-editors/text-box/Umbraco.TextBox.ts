@@ -18,26 +18,6 @@ export const manifest: ManifestPropertyEditorSchema = {
 						{ alias: 'placeholder', value: '512' },
 					],
 				},
-				{
-					alias: 'autocomplete',
-					label: '#textbox_autocompleteLabel',
-					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Dropdown',
-					config: [
-						{
-							alias: 'items',
-							value: [
-								{ name: 'On', value: 'on' },
-								{ name: 'Off', value: 'off' },
-							],
-						},
-					],
-				},
-				{
-					alias: 'placeholder',
-					label: '#general_placeholder',
-					description: 'Placeholder text shown inside the input when empty',
-					propertyEditorUiAlias: 'Umb.PropertyEditorUi.TextBox',
-				},
 			],
 			defaultData: [
 				{
