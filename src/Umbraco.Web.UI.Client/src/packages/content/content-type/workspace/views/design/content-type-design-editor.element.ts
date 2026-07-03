@@ -540,11 +540,12 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 	}
 
 	#renderAddButton() {
-		if (this._sortModeActive || this._isRestricted) return;
+		if (this._sortModeActive) return;
 		return html`
 			<uui-button
 				id="add-tab"
 				data-mark="add-tab-button"
+				?disabled=${this._isRestricted}
 				@click="${this.#addTab}"
 				label=${this.localize.term('contentTypeEditor_addTab')}>
 				<uui-icon name="icon-add"></uui-icon>
@@ -554,9 +555,6 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 	}
 
 	#renderActions() {
-		// In production runtime mode the structure is read-only, so hide the mutating actions.
-		if (this._isRestricted) return nothing;
-
 		const sortButtonText = this._sortModeActive
 			? this.localize.term('general_reorderDone')
 			: this.localize.term('general_reorder');
@@ -570,6 +568,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 								look="outline"
 								label=${this.localize.term('contentTypeEditor_compositions')}
 								compact
+								?disabled=${this._isRestricted}
 								@click=${this.#openCompositionModal}>
 								<uui-icon name="icon-merge"></uui-icon>
 								<umb-localize key="contentTypeEditor_compositions"></umb-localize>
@@ -581,6 +580,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 					look="outline"
 					label=${sortButtonText}
 					compact
+					?disabled=${this._isRestricted}
 					@click=${this.#toggleSortMode}>
 					<uui-icon name="icon-height"></uui-icon>
 					${sortButtonText}

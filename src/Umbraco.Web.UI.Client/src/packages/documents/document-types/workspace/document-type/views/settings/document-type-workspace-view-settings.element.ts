@@ -13,6 +13,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UUIBooleanInputEvent, UUIToggleElement } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
+import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 
 @customElement('umb-document-type-workspace-view-settings')
 export class UmbDocumentTypeWorkspaceViewSettingsElement extends UmbLitElement implements UmbWorkspaceViewElement {
@@ -39,6 +40,10 @@ export class UmbDocumentTypeWorkspaceViewSettingsElement extends UmbLitElement i
 	@state()
 	private _useSegments?: boolean;
 
+	// Restricted until the server confirms it is not in production runtime mode (safe default).
+	@state()
+	private _isRestricted = true;
+
 	#configurationRepository = new UmbDocumentTypeConfigurationRepository(this);
 
 	constructor() {
@@ -48,6 +53,34 @@ export class UmbDocumentTypeWorkspaceViewSettingsElement extends UmbLitElement i
 			this.#workspaceContext = documentTypeContext;
 			this.#observeDocumentType();
 		});
+
+		// In production runtime mode the schema is read-only. Making the whole view inert disables every
+		// input/toggle/button at once without wiring each one, and the dimmed styling signals it is read-only.
+		this.consumeContext(UMB_SERVER_CONTEXT, (context) => {
+			this.observe(
+				context?.isProductionMode,
+				(isProductionMode) => {
+					this._isRestricted = isProductionMode !== false;
+					this.inert = this._isRestricted;
+				},
+				'_observeProductionMode',
+			);
+		});
+	}
+
+	#renderProductionModeNotice() {
+		if (!this._isRestricted) return nothing;
+		return html`
+			<uui-box id="production-mode-notice">
+				<div class="notice">
+					<umb-icon name="icon-info"></umb-icon>
+					<div>
+						<strong><umb-localize key="general_productionMode">Production Mode</umb-localize></strong>
+						<p><umb-localize key="general_runtimeModeProductionSchema"></umb-localize></p>
+					</div>
+				</div>
+			</uui-box>
+		`;
 	}
 
 	protected override async firstUpdated(_changedProperties: PropertyValues): Promise<void> {
@@ -108,6 +141,7 @@ export class UmbDocumentTypeWorkspaceViewSettingsElement extends UmbLitElement i
 
 	override render() {
 		return html`
+			${this.#renderProductionModeNotice()}
 			<uui-box headline="Data variations">
 				<umb-property-layout
 					alias="VaryByCulture"
@@ -248,6 +282,27 @@ export class UmbDocumentTypeWorkspaceViewSettingsElement extends UmbLitElement i
 				display: block;
 				margin: var(--uui-size-layout-1);
 				padding-bottom: var(--uui-size-layout-1); // To enforce some distance to the bottom of the scroll-container.
+			}
+			:host([inert]) > :not(#production-mode-notice) {
+				opacity: 0.6;
+			}
+			#production-mode-notice {
+				--uui-box-default-padding: var(--uui-size-space-4) var(--uui-size-space-5);
+				border-left: 4px solid var(--uui-color-warning-standalone, #f0ac00);
+			}
+			#production-mode-notice .notice {
+				display: flex;
+				gap: var(--uui-size-space-4);
+				align-items: flex-start;
+			}
+			#production-mode-notice umb-icon {
+				flex: 0 0 auto;
+				font-size: var(--uui-size-6);
+				margin-top: 2px;
+				color: var(--uui-color-warning-standalone, #f0ac00);
+			}
+			#production-mode-notice p {
+				margin: var(--uui-size-space-2) 0 0;
 			}
 			uui-box {
 				margin-top: var(--uui-size-layout-1);

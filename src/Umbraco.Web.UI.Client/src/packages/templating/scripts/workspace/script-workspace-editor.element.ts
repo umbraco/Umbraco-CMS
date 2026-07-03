@@ -102,6 +102,7 @@ export class UmbScriptWorkspaceEditorElement extends UmbLitElement {
 
 			#production-mode-notice {
 				display: block;
+				min-height: 0;
 				margin: var(--uui-size-layout-1) var(--uui-size-layout-1) 0;
 				--uui-box-default-padding: var(--uui-size-space-4) var(--uui-size-space-5);
 				border-left: 4px solid var(--uui-color-warning-standalone, #f0ac00);

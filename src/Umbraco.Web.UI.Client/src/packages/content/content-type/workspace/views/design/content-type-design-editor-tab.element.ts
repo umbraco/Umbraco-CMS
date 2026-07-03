@@ -307,13 +307,14 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 	}
 
 	#renderAddGroupButton() {
-		if (this._sortModeActive || this._isRestricted) return;
+		if (this._sortModeActive) return;
 		return html`
 			<uui-button
 				id="btn-add"
 				label=${this.localize.term('contentTypeEditor_addGroup')}
 				data-mark="action:add-group"
 				look="placeholder"
+				?disabled=${this._isRestricted}
 				@click=${this.#onAddGroup}></uui-button>
 		`;
 	}

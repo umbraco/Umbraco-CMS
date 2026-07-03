@@ -368,12 +368,13 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 					</div>
 
 					${when(
-						!this._sortModeActive && !this._isRestricted,
+						!this._sortModeActive,
 						() => html`
 							<uui-button
 								id="btn-add"
-								href=${ifDefined(this._newPropertyPath)}
+								href=${ifDefined(this._isRestricted ? undefined : this._newPropertyPath)}
 								label=${this.localize.term('contentTypeEditor_addProperty')}
+								?disabled=${this._isRestricted}
 								look="placeholder"></uui-button>
 						`,
 					)}

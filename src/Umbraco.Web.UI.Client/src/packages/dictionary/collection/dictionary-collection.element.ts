@@ -19,10 +19,12 @@ export class UmbDictionaryCollectionElement extends UmbCollectionDefaultElement 
 
 	protected override renderToolbar() {
 		return html`
-			<umb-collection-toolbar slot="header">
-				<umb-collection-filter-field></umb-collection-filter-field>
-			</umb-collection-toolbar>
-			${this.#renderProductionModeNotice()}
+			<div slot="header" style="display: flex; flex-direction: column; gap: var(--uui-size-space-3); width: 100%;">
+				${this.#renderProductionModeNotice()}
+				<umb-collection-toolbar>
+					<umb-collection-filter-field></umb-collection-filter-field>
+				</umb-collection-toolbar>
+			</div>
 		`;
 	}
 
@@ -30,8 +32,7 @@ export class UmbDictionaryCollectionElement extends UmbCollectionDefaultElement 
 		if (!this._isRestricted) return nothing;
 		return html`
 			<uui-box
-				slot="header"
-				style="width: 100%; --uui-box-default-padding: var(--uui-size-space-4) var(--uui-size-space-5); border-left: 4px solid var(--uui-color-warning-standalone, #f0ac00);">
+				style="display: block; --uui-box-default-padding: var(--uui-size-space-4) var(--uui-size-space-5); border-left: 4px solid var(--uui-color-warning-standalone, #f0ac00);">
 				<div style="display: flex; gap: var(--uui-size-space-4); align-items: flex-start;">
 					<umb-icon
 						name="icon-info"
