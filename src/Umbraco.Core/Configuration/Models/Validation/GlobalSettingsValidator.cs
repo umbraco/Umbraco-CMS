@@ -54,14 +54,15 @@ public class GlobalSettingsValidator
 
     private bool ValidateTimeOutSetting(TimeSpan configuredTimeOut, out string message)
     {
-        // JavaScript's setTimeout maximum delay is 2^31 - 1 milliseconds (~24.85 days).
-        // Values exceeding this cause timers to fire immediately, breaking session management.
-        var maxTimeOut = TimeSpan.FromMilliseconds(2_147_483_647);
+        // JavaScript's setTimeout maximum delay is 2^31 - 1 milliseconds (~24.85 days); values
+        // exceeding it cause timers to fire immediately, breaking session management.
+        // Cap at a clean 24 days, comfortably below the limit.
+        var maxTimeOut = TimeSpan.FromDays(24);
 
         if (configuredTimeOut > maxTimeOut)
         {
             message =
-                $"The `{Constants.Configuration.ConfigGlobal}:{nameof(GlobalSettings.TimeOut)}` must not exceed {maxTimeOut.TotalDays:F0} days (~24.85 days). " +
+                $"The `{Constants.Configuration.ConfigGlobal}:{nameof(GlobalSettings.TimeOut)}` must not exceed {maxTimeOut.TotalDays:F0} days. " +
                 $"Values larger than this overflow the browser's maximum timer delay and break session management. " +
                 $"Consider using the `KeepUserLoggedIn` setting instead.";
             return false;
