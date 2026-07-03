@@ -19,7 +19,7 @@ public class CreateAndPublishElementControllerTests : ManagementApiUserGroupTest
     private Guid _elementTypeKey;
 
     [SetUp]
-    public async Task Setup()
+    public async Task CreateElementType()
     {
         var elementType = new ContentTypeBuilder()
             .WithAlias(Guid.NewGuid().ToString())

@@ -786,15 +786,8 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
     /// <inheritdoc />
     public PublishResult SaveAndPublish(TContent content, string[] culturesToPublish, int userId = Constants.Security.SuperUserId)
     {
-        if (content == null)
-        {
-            throw new ArgumentNullException(nameof(content));
-        }
-
-        if (culturesToPublish == null)
-        {
-            throw new ArgumentNullException(nameof(culturesToPublish));
-        }
+        ArgumentNullException.ThrowIfNull(content);
+        ArgumentNullException.ThrowIfNull(culturesToPublish);
 
         // wildcards and nulls are not accepted here; cultures must be explicit
         if (culturesToPublish.Any(x => x == null || x == "*"))
@@ -904,10 +897,9 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         return result;
     }
 
-    private const int MaxContentNameLength = 255;
-
     private static void EnsureNameLengthIsValid(TContent content)
     {
+        const int MaxContentNameLength = 255;
         if (content.Name?.Length > MaxContentNameLength)
         {
             throw new InvalidOperationException($"Name cannot be more than {MaxContentNameLength} characters in length.");
@@ -935,10 +927,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
     /// <inheritdoc />
     public PublishResult Unpublish(TContent content, string? culture = "*", int userId = Constants.Security.SuperUserId)
     {
-        if (content == null)
-        {
-            throw new ArgumentNullException(nameof(content));
-        }
+        ArgumentNullException.ThrowIfNull(content);
 
         EventMessages evtMsgs = EventMessagesFactory.Get();
 

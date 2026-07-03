@@ -108,6 +108,7 @@ public interface IPublishableContentService<TContent> : IContentServiceBase<TCon
     /// <param name="content">The content to publish.</param>
     /// <param name="culturesToPublish">The cultures to publish, or an empty array for invariant content.</param>
     /// <param name="userId">The identifier of the user performing the action.</param>
+    /// <returns>The result of the publish operation, or a failure result if saving failed.</returns>
     // TODO (V19): Remove the default implementation when the method is no longer new.
     PublishResult SaveAndPublish(TContent content, string[] culturesToPublish, int userId = Constants.Security.SuperUserId)
     {
