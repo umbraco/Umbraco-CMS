@@ -60,7 +60,7 @@ public interface IRelationRepository : IReadWriteQueryRepository<int, IRelation>
     /// <param name="childIds">The identifiers of the child entities.</param>
     /// <param name="relationTypes">Relation type IDs to filter by. Pass an empty array to include all relation types.</param>
     /// <param name="entityTypes">The entity types to filter by.</param>
-    /// <returns>The distinct parent entities related to any of the specified children. May contain duplicates when a parent relates to several of the children.</returns>
+    /// <returns>The distinct parent entities related to any of the specified children.</returns>
     IEnumerable<IUmbracoEntity> GetParentEntitiesByChildIds(
         int[] childIds,
         int[] relationTypes,

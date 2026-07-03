@@ -248,7 +248,7 @@ public interface IRelationService : IService
     /// <param name="childIds">The child entity ids.</param>
     /// <param name="relationTypeAliases">Relation type aliases to filter by. Pass an empty sequence to include all relation types.</param>
     /// <param name="entityTypes">The entity types to filter by.</param>
-    /// <returns>The parent entities related to any of the specified children. May contain duplicates when a parent relates to several of the children.</returns>
+    /// <returns>The distinct parent entities related to any of the specified children.</returns>
     IEnumerable<IUmbracoEntity> GetParentEntitiesByChildIds(
         IEnumerable<int> childIds,
         IEnumerable<string> relationTypeAliases,

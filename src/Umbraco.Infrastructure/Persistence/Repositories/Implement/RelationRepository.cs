@@ -350,35 +350,41 @@ internal sealed class RelationRepository : EntityRepositoryBase<int, IRelation>,
             return [];
         }
 
-        var results = new List<IUmbracoEntity>();
+        // A parent relates to a separate row per child, so it can be returned more than once (within a batch or
+        // across batches); de-duplicate by node id so each parent entity is returned once.
+        var results = new Dictionary<int, IUmbracoEntity>();
         var childIdsPerQuery = Constants.Sql.MaxParameterCount - relationTypes.Length - entityTypes.Length;
         foreach (IEnumerable<int> group in childIds.InGroupsOf(childIdsPerQuery))
         {
             var batch = group.ToArray();
-            results.AddRange(
-                _entityRepository.GetPagedResultsByQuery(
-                    Query<IUmbracoEntity>(),
-                    entityTypes,
-                    0,
-                    int.MaxValue,
-                    out _,
-                    null,
-                    null,
-                    sql =>
+            IEnumerable<IUmbracoEntity> parents = _entityRepository.GetPagedResultsByQuery(
+                Query<IUmbracoEntity>(),
+                entityTypes,
+                0,
+                int.MaxValue,
+                out _,
+                null,
+                null,
+                sql =>
+                {
+                    SqlJoinRelations(sql);
+
+                    sql.WhereIn<RelationDto>(rel => rel.ChildId, batch);
+                    sql.Where<RelationDto, NodeDto>((rel, node) => node.NodeId == rel.ParentId);
+
+                    if (relationTypes.Length > 0)
                     {
-                        SqlJoinRelations(sql);
+                        sql.WhereIn<RelationDto>(rel => rel.RelationType, relationTypes);
+                    }
+                });
 
-                        sql.WhereIn<RelationDto>(rel => rel.ChildId, batch);
-                        sql.Where<RelationDto, NodeDto>((rel, node) => node.NodeId == rel.ParentId);
-
-                        if (relationTypes.Length > 0)
-                        {
-                            sql.WhereIn<RelationDto>(rel => rel.RelationType, relationTypes);
-                        }
-                    }));
+            foreach (IUmbracoEntity parent in parents)
+            {
+                results.TryAdd(parent.Id, parent);
+            }
         }
 
-        return results;
+        return results.Values;
     }
 
     /// <summary>
