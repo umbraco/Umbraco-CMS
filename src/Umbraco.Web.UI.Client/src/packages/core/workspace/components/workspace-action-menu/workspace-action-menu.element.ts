@@ -67,7 +67,7 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 				margin="6"
 				placement="top-end"
 				@toggle=${this.#onPopoverToggle}
-				@click="${this._onPopoverClickCapture}}">
+				@click=${this._onPopoverClickCapture}>
 				<umb-popover-layout id="workspace-action-popover-layout">
 					<uui-scroll-container>
 						${repeat(
