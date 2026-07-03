@@ -36,6 +36,13 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 	UmbLitElement,
 ) {
 	/**
+	 * Prohibits dropping files onto the dropzone. Unlike `disabled`, the drop hint is still shown while
+	 * dragging (rendered in a danger colour), but any dropped files are rejected.
+	 */
+	@property({ type: Boolean, reflect: true, attribute: 'no-access' })
+	noAccess: boolean = false;
+
+	/**
 	 * Comma-separated list of accepted mime types or file extensions.
 	 */
 	@property({ type: String })
@@ -148,7 +155,10 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 				@change=${this.onUpload}
 				@click=${this.#handleBrowse}>
 				<slot>
-					<uui-button label=${this.localize.term('media_clickToUpload')} @click=${this.#handleBrowse}></uui-button>
+					<uui-button
+						label=${this.localize.term('media_clickToUpload')}
+						@click=${this.#handleBrowse}
+						.disabled=${this.noAccess}></uui-button>
 				</slot>
 			</uui-file-dropzone>
 			${this.renderUploader()}
@@ -211,9 +221,7 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 					${when(
 						item.status === UmbFileDropzoneItemStatus.NOT_ALLOWED,
 						() =>
-							html`<div class="error">
-								${item.statusMessage ?? this.localize.term('media_disallowedFileType')}.
-							</div>`,
+							html`<div class="error">${item.statusMessage ?? this.localize.term('media_disallowedFileType')}.</div>`,
 					)}
 				</div>
 				<div class="fileActions">
@@ -233,14 +241,23 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 		`;
 	}
 
+	// TODO: Make this method private in v.22.
+	/**
+	 * @param {UUIFileDropzoneEvent} e - The event from the file dropzone.
+	 * @deprecated Overwrite `_handleUpload` instead. This method will be removed in v.22.
+	 */
 	protected async onUpload(e: UUIFileDropzoneEvent) {
 		e.stopImmediatePropagation();
 
-		if (this.#isDisabled) return;
+		if (this.#isDisabled || this.noAccess) return;
 		if (!e.detail.files.length && !e.detail.folders.length) return;
 
-		const uploadables = this._manager.createTemporaryFiles(e.detail.files);
+		const uploadables = await this._handleUpload(e);
 		this.dispatchEvent(new UmbDropzoneSubmittedEvent(await uploadables));
+	}
+
+	protected async _handleUpload(e: UUIFileDropzoneEvent): Promise<Array<UmbUploadableItem>> {
+		return await this._manager.createTemporaryFiles(e.detail.files);
 	}
 
 	#handleBrowse(e: Event) {
@@ -287,6 +304,11 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 				border-color: var(--uui-color-default-emphasis);
 				--uui-color-default: var(--uui-color-default-emphasis);
 				color: var(--uui-color-default-emphasis);
+			}
+
+			:host([no-access][dragging]:not([disabled])) #dropzone {
+				/** TODO: This is hacky, ideally we transfer dropzone to backoffice and make a noAccess state for it [NL] */
+				--uui-color-default: var(--uui-color-danger);
 			}
 
 			#dropzone {

@@ -534,7 +534,8 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 				id="dropzone"
 				multiple
 				@change=${this.#onDropzoneChange}
-				.parentUnique=${this._currentMediaEntity.unique}></umb-dropzone-media>
+				.parentUnique=${this._currentMediaEntity.unique}
+				.noAccess=${this._noAccess}></umb-dropzone-media>
 			${this._searchQuery ? this.#renderSearchResult() : this.#renderCurrentChildren()} `;
 	}
 
