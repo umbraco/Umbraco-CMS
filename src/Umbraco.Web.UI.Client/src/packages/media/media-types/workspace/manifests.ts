@@ -2,6 +2,7 @@ import { UMB_MEDIA_TYPE_COMPOSITION_REPOSITORY_ALIAS } from '../constants.js';
 import { UMB_MEDIA_TYPE_WORKSPACE_ALIAS } from './constants.js';
 import {
 	UMB_WORKSPACE_CONDITION_ALIAS,
+	UmbProductionModeInfoAppElement,
 	UmbProductionModeWorkspaceActionApi,
 	UmbProductionModeWorkspaceActionElement,
 	UmbSubmitWorkspaceAction,
@@ -83,6 +84,23 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Media Type Production Mode Workspace Action',
 		api: UmbProductionModeWorkspaceActionApi,
 		element: UmbProductionModeWorkspaceActionElement,
+		conditions: [
+			{
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
+				match: UMB_MEDIA_TYPE_WORKSPACE_ALIAS,
+			},
+			{
+				alias: UMB_IS_SERVER_PRODUCTION_MODE_CONDITION_ALIAS,
+				match: true,
+			},
+		],
+	},
+	{
+		type: 'workspaceInfoApp',
+		alias: 'Umb.WorkspaceInfoApp.MediaType.ProductionMode',
+		name: 'Media Type Production Mode Notice',
+		element: UmbProductionModeInfoAppElement,
+		weight: 1000,
 		conditions: [
 			{
 				alias: UMB_WORKSPACE_CONDITION_ALIAS,

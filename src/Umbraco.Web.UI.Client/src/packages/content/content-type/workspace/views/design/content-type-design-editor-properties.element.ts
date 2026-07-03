@@ -14,6 +14,7 @@ import {
 	when,
 } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { type UmbSorterConfig, UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
@@ -196,10 +197,24 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 	@state()
 	private _sortModeActive?: boolean;
 
+	// Restricted until the server confirms it is not in production runtime mode (safe default).
+	@state()
+	private _isRestricted = true;
+
 	constructor() {
 		super();
 
 		//this.#sorter.disable();
+
+		this.consumeContext(UMB_SERVER_CONTEXT, (context) => {
+			this.observe(
+				context?.isProductionMode,
+				(isProductionMode) => {
+					this._isRestricted = isProductionMode !== false;
+				},
+				'_observeProductionMode',
+			);
+		});
 
 		this.consumeContext(UMB_CONTENT_TYPE_DESIGN_EDITOR_CONTEXT, (context) => {
 			this.observe(
@@ -353,7 +368,7 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 					</div>
 
 					${when(
-						!this._sortModeActive,
+						!this._sortModeActive && !this._isRestricted,
 						() => html`
 							<uui-button
 								id="btn-add"

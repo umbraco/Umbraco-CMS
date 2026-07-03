@@ -1047,6 +1047,8 @@ export default {
 		clipboard: 'Clipboard',
 		productionMode: 'Production Mode',
 		runtimeModeProduction: 'This is not editable while the runtime mode is set to <code>Production</code>.',
+		runtimeModeProductionSchema:
+			'This environment runs in production runtime mode, so schema changes are read-only here. Make your changes in a local development environment and deploy them to this environment.',
 	},
 	colors: {
 		black: 'Black',

@@ -12,6 +12,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
+import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 import type { UmbSorterConfig } from '@umbraco-cms/backoffice/sorter';
 
 import './content-type-design-editor-properties.element.js';
@@ -197,11 +198,25 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 	@state()
 	private _editContentTypePath?: string;
 
+	// Restricted until the server confirms it is not in production runtime mode (safe default).
+	@state()
+	private _isRestricted = true;
+
 	#groupStructureHelper = new UmbContentTypeContainerStructureHelper<UmbContentTypeModel>(this);
 	#contentTypeWorkspaceContext?: typeof UMB_CONTENT_TYPE_WORKSPACE_CONTEXT.TYPE;
 
 	constructor() {
 		super();
+
+		this.consumeContext(UMB_SERVER_CONTEXT, (context) => {
+			this.observe(
+				context?.isProductionMode,
+				(isProductionMode) => {
+					this._isRestricted = isProductionMode !== false;
+				},
+				'_observeProductionMode',
+			);
+		});
 
 		this.consumeContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT, (context) => {
 			this.#contentTypeWorkspaceContext = context;
@@ -292,7 +307,7 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 	}
 
 	#renderAddGroupButton() {
-		if (this._sortModeActive) return;
+		if (this._sortModeActive || this._isRestricted) return;
 		return html`
 			<uui-button
 				id="btn-add"

@@ -6,6 +6,7 @@ import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UMB_ICON_PICKER_MODAL } from '@umbraco-cms/backoffice/icon';
 import type { UUITextareaElement } from '@umbraco-cms/backoffice/external/uui';
 import { umbBindToValidation } from '@umbraco-cms/backoffice/validation';
+import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 
 @customElement('umb-content-type-workspace-editor-header')
 export class UmbContentTypeWorkspaceEditorHeaderElement extends UmbLitElement {
@@ -24,6 +25,10 @@ export class UmbContentTypeWorkspaceEditorHeaderElement extends UmbLitElement {
 	@state()
 	private _isNew?: boolean;
 
+	// Restricted until the server confirms it is not in production runtime mode (safe default).
+	@state()
+	private _isRestricted = true;
+
 	#workspaceContext?: typeof UMB_CONTENT_TYPE_WORKSPACE_CONTEXT.TYPE;
 
 	constructor() {
@@ -32,6 +37,16 @@ export class UmbContentTypeWorkspaceEditorHeaderElement extends UmbLitElement {
 		this.consumeContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
 			this.#observeContentType();
+		});
+
+		this.consumeContext(UMB_SERVER_CONTEXT, (context) => {
+			this.observe(
+				context?.isProductionMode,
+				(isProductionMode) => {
+					this._isRestricted = isProductionMode !== false;
+				},
+				'_observeProductionMode',
+			);
 		});
 	}
 
@@ -89,7 +104,7 @@ export class UmbContentTypeWorkspaceEditorHeaderElement extends UmbLitElement {
 	override render() {
 		return html`
 			<div id="header">
-				<uui-button id="icon" compact label=${this.#iconTitle ?? 'icon'} look="outline" title=${ifDefined(this.#iconTitle)} @click=${this._handleIconClick}>
+				<uui-button id="icon" compact label=${this.#iconTitle ?? 'icon'} look="outline" title=${ifDefined(this.#iconTitle)} ?disabled=${this._isRestricted} @click=${this._handleIconClick}>
 					<umb-icon aria-hidden="true" name=${ifDefined(this._icon)}></umb-icon>
 				</uui-button>
 
@@ -100,6 +115,8 @@ export class UmbContentTypeWorkspaceEditorHeaderElement extends UmbLitElement {
 						.value=${this._name}
 						.alias=${this._alias}
 						?auto-generate-alias=${this._isNew}
+						?readonly=${this._isRestricted}
+						?alias-readonly=${this._isRestricted}
 						@change=${this.#onNameAndAliasChange}
 						required
 						${umbBindToValidation(this, '$.name', this._name)}
@@ -111,6 +128,7 @@ export class UmbContentTypeWorkspaceEditorHeaderElement extends UmbLitElement {
 						.label=${this.localize.term('placeholders_enterDescription')}
 						.value=${this._description}
 						.placeholder=${this.localize.term('placeholders_enterDescription')}
+						?readonly=${this._isRestricted}
 						@input=${this.#onDescriptionChange}></uui-input>
 				</div>
 			</div>
