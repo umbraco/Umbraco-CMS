@@ -14,11 +14,12 @@ export class UmbDocumentUserPermissionCondition
 {
 	#entityType: string | undefined;
 	#unique: string | null | undefined;
+	#hasUser?: boolean;
 	#documentPermissions: Array<DocumentPermissionPresentationModel> = [];
 	#fallbackPermissions: string[] = [];
 	#ancestors: Array<UmbEntityUnique> = [];
 	#documentStartNodeUniques: Array<string> = [];
-	#hasDocumentRootAccess = false;
+	#hasDocumentRootAccess: boolean = false;
 
 	constructor(
 		host: UmbControllerHost,
@@ -30,6 +31,7 @@ export class UmbDocumentUserPermissionCondition
 			this.observe(
 				context?.currentUser,
 				(currentUser) => {
+					this.#hasUser = currentUser !== undefined;
 					this.#documentPermissions = currentUser?.permissions?.filter(isDocumentUserPermission) || [];
 					this.#fallbackPermissions = currentUser?.fallbackPermissions || [];
 					this.#documentStartNodeUniques = currentUser?.documentStartNodeUniques?.map((x) => x.unique) ?? [];
@@ -72,6 +74,10 @@ export class UmbDocumentUserPermissionCondition
 	#checkPermissions() {
 		if (!this.#entityType) return;
 		if (this.#unique === undefined) return;
+		if (!this.#hasUser) {
+			this.permitted = false;
+			return;
+		}
 
 		// Path based on all ancestors and the current document:
 		const path = [...this.#ancestors, this.#unique].filter((unique) => unique !== null);
