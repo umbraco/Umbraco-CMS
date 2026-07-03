@@ -127,7 +127,7 @@ internal abstract class BlockValuePropertyIndexValueFactoryBase<TSerialized> : J
 
         // External element content is only flattened into the published value set (the external index); the draft
         // value set (the internal/back-office index) excludes it, so shared element content is not searchable there.
-        Dictionary<Guid, RawDataItem>? externalDataByKey = _indexingSettings.CurrentValue.IndexExternalElements && published
+        Dictionary<Guid, RawDataItem>? externalDataByKey = _indexingSettings.CurrentValue.IndexExternalBlockElements && published
             ? GetExternalElementDataItems(allLayouts, published)
             : null;
         foreach (IBlockLayoutItem layout in allLayouts)

@@ -28,9 +28,9 @@ internal class BlockListWithReusableContentTest : BlockEditorWithReusableContent
         => builder.Services.Configure<ContentSettings>(config =>
             config.AllowEditInvariantFromNonDefault = true);
 
-    public static void ConfigureIndexExternalElementsTrue(IUmbracoBuilder builder)
+    public static void ConfigureIndexExternalBlockElementsTrue(IUmbracoBuilder builder)
         => builder.Services.Configure<IndexingSettings>(config =>
-            config.IndexExternalElements = true);
+            config.IndexExternalBlockElements = true);
 
     [Test]
     public async Task Can_Handle_Reusable_Element()
@@ -803,7 +803,7 @@ internal class BlockListWithReusableContentTest : BlockEditorWithReusableContent
 
     [TestCase(true)]
     [TestCase(false)]
-    [ConfigureBuilder(ActionName = nameof(ConfigureIndexExternalElementsTrue))]
+    [ConfigureBuilder(ActionName = nameof(ConfigureIndexExternalBlockElementsTrue))]
     public async Task Can_Include_Invariant_Reusable_Elements_In_Search_Indexing(bool published)
     {
         var elementType = await CreateElementType(ContentVariation.Nothing);
@@ -876,7 +876,7 @@ internal class BlockListWithReusableContentTest : BlockEditorWithReusableContent
 
     [TestCase(true)]
     [TestCase(false)]
-    [ConfigureBuilder(ActionName = nameof(ConfigureIndexExternalElementsTrue))]
+    [ConfigureBuilder(ActionName = nameof(ConfigureIndexExternalBlockElementsTrue))]
     public async Task Can_Include_Variant_Reusable_Elements_In_Search_Indexing(bool published)
     {
         var elementType = await CreateElementType(ContentVariation.Culture);
