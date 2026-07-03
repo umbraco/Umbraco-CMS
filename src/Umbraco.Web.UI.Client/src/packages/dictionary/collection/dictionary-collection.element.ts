@@ -4,12 +4,15 @@ import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 
 // The base collection state we need to reproduce its layout while injecting the notice.
+// These mirror private members of UmbCollectionDefaultElement, hence the underscore-prefixed names.
+/* eslint-disable @typescript-eslint/naming-convention */
 type UmbCollectionRenderState = {
 	_routes?: Array<UmbRoute>;
 	_hasItems: boolean;
 	_initialLoadDone: boolean;
 	_emptyLabel?: string;
 };
+/* eslint-enable @typescript-eslint/naming-convention */
 
 @customElement('umb-dictionary-collection')
 export class UmbDictionaryCollectionElement extends UmbCollectionDefaultElement {
