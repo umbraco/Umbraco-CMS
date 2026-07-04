@@ -4,6 +4,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
@@ -39,13 +40,14 @@ internal sealed class FileUploadNotificationHandlerTests : UmbracoIntegrationTes
             new PrefixAllResolver(sp.GetRequiredService<MediaFileManager>(), Prefix));
 
         builder.AddNotificationHandler<ContentCopiedNotification, FileUploadContentCopiedOrScaffoldedNotificationHandler>();
+        builder.AddNotificationHandler<ContentScaffoldedNotification, FileUploadContentCopiedOrScaffoldedNotificationHandler>();
         builder.AddNotificationHandler<ContentDeletedNotification, FileUploadContentDeletedNotificationHandler>();
     }
 
     [Test]
     public async Task Can_Copy_File_Upload_To_Resolved_Path()
     {
-        (IContent content, var sourceRelativePath) = await CreateContentWithUploadedFileAsync();
+        (_, IContent content, var sourceRelativePath) = await CreateContentWithUploadedFileAsync();
 
         IContent? copy = ContentService.Copy(content, Constants.System.Root, relateToOriginal: false);
         Assert.IsNotNull(copy);
@@ -65,7 +67,7 @@ internal sealed class FileUploadNotificationHandlerTests : UmbracoIntegrationTes
     [Test]
     public async Task Can_Delete_File_On_Content_Delete()
     {
-        (IContent content, var sourceRelativePath) = await CreateContentWithUploadedFileAsync();
+        (_, IContent content, var sourceRelativePath) = await CreateContentWithUploadedFileAsync();
         Assert.IsTrue(MediaFileManager.FileSystem.FileExists(sourceRelativePath));
 
         ContentService.Delete(content);
@@ -75,7 +77,32 @@ internal sealed class FileUploadNotificationHandlerTests : UmbracoIntegrationTes
             "Expected the associated file to be removed when the content was deleted.");
     }
 
-    private async Task<(IContent Content, string SourceRelativePath)> CreateContentWithUploadedFileAsync()
+    [Test]
+    public async Task Can_Scaffold_File_Upload_To_Resolved_Path_Without_Resave()
+    {
+        (IContentType contentType, IContent original, _) = await CreateContentWithUploadedFileAsync();
+
+        // A scaffold is an in-memory target that the handler updates but does not re-save (postUpdateAction is null).
+        IContent scaffold = new ContentBuilder()
+            .WithContentType(contentType)
+            .WithName("Scaffold")
+            .Build();
+
+        GetRequiredService<IEventAggregator>().Publish(
+            new ContentScaffoldedNotification(original, scaffold, Constants.System.Root, new EventMessages()));
+
+        var scaffoldedValue = scaffold.GetValue<string>("file");
+        Assert.IsNotNull(scaffoldedValue, "Expected the scaffolded (in-memory) property value to be populated.");
+
+        var relativePath = MediaFileManager.FileSystem.GetRelativePath(scaffoldedValue!);
+        Assert.Multiple(() =>
+        {
+            Assert.That(relativePath, Does.StartWith(Prefix + "/"), "Expected the scaffolded file to be under the resolver's prefix.");
+            Assert.IsTrue(MediaFileManager.FileSystem.FileExists(relativePath), "Expected the scaffolded file to physically exist.");
+        });
+    }
+
+    private async Task<(IContentType ContentType, IContent Content, string SourceRelativePath)> CreateContentWithUploadedFileAsync()
     {
         var contentType = new ContentTypeBuilder()
             .WithAlias("uploadPage")
@@ -101,7 +128,7 @@ internal sealed class FileUploadNotificationHandlerTests : UmbracoIntegrationTes
         content.SetValue("file", MediaFileManager.FileSystem.GetUrl(sourceRelativePath));
         ContentService.Save(content);
 
-        return (content, sourceRelativePath);
+        return (contentType, content, sourceRelativePath);
     }
 
     private sealed class PrefixAllResolver : IFileUploadPathResolver

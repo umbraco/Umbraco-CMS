@@ -223,8 +223,8 @@ internal sealed class FileUploadPropertyValueEditor : DataValueEditor, IDisposab
             return null;
         }
 
-        // get the filepath
-        string filepath = GetMediaPath(file, dataTypeConfiguration, contentKey, propertyTypeKey);
+        // resolve the storage path; IFileUploadPathResolver is the point of extensibility for where files are stored
+        string filepath = _fileUploadPathResolver.ResolvePath(file.FileName, dataTypeConfiguration, contentKey, propertyTypeKey);
 
         using (Stream filestream = file.OpenReadStream())
         {
@@ -240,13 +240,6 @@ internal sealed class FileUploadPropertyValueEditor : DataValueEditor, IDisposab
 
         return filepath;
     }
-
-    /// <summary>
-    /// Provides media path.
-    /// </summary>
-    /// <returns>File system relative path</returns>
-    private string GetMediaPath(TemporaryFileModel file, object? dataTypeConfiguration, Guid contentKey, Guid propertyTypeKey)
-        => _fileUploadPathResolver.ResolvePath(file.FileName, dataTypeConfiguration, contentKey, propertyTypeKey);
 
     /// <summary>
     /// Releases the managed resources used by the <see cref="FileUploadPropertyValueEditor"/>, including any active subscriptions.
