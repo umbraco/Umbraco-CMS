@@ -14,18 +14,28 @@ namespace Umbraco.Cms.Infrastructure.PropertyEditors.NotificationHandlers;
 /// </summary>
 internal abstract class FileUploadNotificationHandlerBase
 {
+    private readonly HashSet<string> _uploadFieldPropertyEditorAliases;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="FileUploadNotificationHandlerBase"/> class.
     /// </summary>
     protected FileUploadNotificationHandlerBase(
         IJsonSerializer jsonSerializer,
         MediaFileManager mediaFileManager,
-        IBlockEditorElementTypeCache elementTypeCache)
+        IBlockEditorElementTypeCache elementTypeCache,
+        PropertyEditorCollection propertyEditors)
     {
         JsonSerializer = jsonSerializer;
         MediaFileManager = mediaFileManager;
         ElementTypeCache = elementTypeCache;
         FileUploadValueParser = new FileUploadValueParser(jsonSerializer);
+
+        // Cache the aliases of the file upload editor and any editors derived from it, so that recognising an
+        // upload field is a set lookup rather than a scan of the property editor collection per property.
+        _uploadFieldPropertyEditorAliases = propertyEditors
+            .Where(propertyEditor => propertyEditor is FileUploadPropertyEditor)
+            .Select(propertyEditor => propertyEditor.Alias)
+            .ToHashSet();
     }
 
     /// <summary>
@@ -55,8 +65,12 @@ internal abstract class FileUploadNotificationHandlerBase
     /// <returns>
     ///     <c>true</c> if the specified property is an upload field; otherwise, <c>false</c>.
     /// </returns>
-    protected static bool IsUploadFieldPropertyType(IPropertyType propertyType)
-        => propertyType.PropertyEditorAlias == Constants.PropertyEditors.Aliases.UploadField;
+    /// <remarks>
+    ///     Recognises the built-in file upload editor and any editor derived from
+    ///     <see cref="FileUploadPropertyEditor"/>.
+    /// </remarks>
+    protected bool IsUploadFieldPropertyType(IPropertyType propertyType)
+        => _uploadFieldPropertyEditorAliases.Contains(propertyType.PropertyEditorAlias);
 
     /// <summary>
     ///     Gets a value indicating whether a property is an block list field.

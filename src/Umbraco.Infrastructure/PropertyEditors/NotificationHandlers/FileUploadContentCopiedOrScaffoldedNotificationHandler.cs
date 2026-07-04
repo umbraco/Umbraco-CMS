@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Cache.PropertyEditors;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.IO;
@@ -10,6 +11,7 @@ using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.PropertyEditors.NotificationHandlers;
 
@@ -23,6 +25,8 @@ internal sealed class FileUploadContentCopiedOrScaffoldedNotificationHandler : F
     INotificationHandler<ContentSavedBlueprintNotification>
 {
     private readonly IContentService _contentService;
+    private readonly IFileUploadPathResolver _fileUploadPathResolver;
+    private readonly IDataTypeConfigurationCache _dataTypeConfigurationCache;
     private readonly BlockEditorValues<BlockListValue, BlockListLayoutItem> _blockListEditorValues;
     private readonly BlockEditorValues<BlockGridValue, BlockGridLayoutItem> _blockGridEditorValues;
 
@@ -34,12 +38,17 @@ internal sealed class FileUploadContentCopiedOrScaffoldedNotificationHandler : F
         MediaFileManager mediaFileManager,
         IBlockEditorElementTypeCache elementTypeCache,
         ILogger<FileUploadContentCopiedOrScaffoldedNotificationHandler> logger,
-        IContentService contentService)
-        : base(jsonSerializer, mediaFileManager, elementTypeCache)
+        IContentService contentService,
+        PropertyEditorCollection propertyEditors,
+        IFileUploadPathResolver fileUploadPathResolver,
+        IDataTypeConfigurationCache dataTypeConfigurationCache)
+        : base(jsonSerializer, mediaFileManager, elementTypeCache, propertyEditors)
     {
         _blockListEditorValues = new(new BlockListEditorDataConverter(jsonSerializer), elementTypeCache, logger);
         _blockGridEditorValues = new(new BlockGridEditorDataConverter(jsonSerializer), elementTypeCache, logger);
         _contentService = contentService;
+        _fileUploadPathResolver = fileUploadPathResolver;
+        _dataTypeConfigurationCache = dataTypeConfigurationCache;
     }
 
     /// <inheritdoc/>
@@ -323,7 +332,21 @@ internal sealed class FileUploadContentCopiedOrScaffoldedNotificationHandler : F
     private string CopyFile(string sourceUrl, IContent destinationContent, IPropertyType propertyType)
     {
         var sourcePath = MediaFileManager.FileSystem.GetRelativePath(sourceUrl);
-        var copyPath = MediaFileManager.CopyFile(destinationContent, propertyType, sourcePath);
+
+        // The destination path is resolved via IFileUploadPathResolver and the file copied at the file system
+        // level directly, rather than via MediaFileManager.CopyFile, because the latter computes the destination
+        // path itself and so cannot honour a custom resolver (e.g. one that applies a per-data-type prefix).
+        // When the source file does not exist the copy path is left null, so GetUrl returns the media root url.
+        string? copyPath = null;
+        if (MediaFileManager.FileSystem.FileExists(sourcePath))
+        {
+            var fileName = Path.GetFileName(sourcePath);
+            object? dataTypeConfiguration = _dataTypeConfigurationCache.GetConfiguration(propertyType.DataTypeKey);
+            copyPath = _fileUploadPathResolver.ResolvePath(fileName, dataTypeConfiguration, destinationContent.Key, propertyType.Key);
+
+            MediaFileManager.FileSystem.CopyFile(sourcePath, copyPath);
+        }
+
         return MediaFileManager.FileSystem.GetUrl(copyPath);
     }
 }

@@ -39,8 +39,9 @@ internal sealed class FileUploadContentDeletedNotificationHandler : FileUploadNo
         MediaFileManager mediaFileManager,
         IBlockEditorElementTypeCache elementTypeCache,
         ILogger<FileUploadContentDeletedNotificationHandler> logger,
-        IOptionsMonitor<ContentSettings> contentSettngs)
-        : base(jsonSerializer, mediaFileManager, elementTypeCache)
+        IOptionsMonitor<ContentSettings> contentSettngs,
+        PropertyEditorCollection propertyEditors)
+        : base(jsonSerializer, mediaFileManager, elementTypeCache, propertyEditors)
     {
         _blockListEditorValues = new(new BlockListEditorDataConverter(jsonSerializer), elementTypeCache, logger);
         _blockGridEditorValues = new(new BlockGridEditorDataConverter(jsonSerializer), elementTypeCache, logger);
