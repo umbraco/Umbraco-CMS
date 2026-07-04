@@ -18,6 +18,8 @@ public class PublishedUrlInfoProviderTests
     private static readonly Guid _contentKey = new("2b3f9a4d-0c1e-4b6a-9c2d-1e2f3a4b5c6d");
     private const int ContentId = 1234;
 
+    private static readonly string[] _installedCultures = ["en-US", "da-DK"];
+
     private Mock<IPublishedUrlProvider> _urlProvider = null!;
     private Mock<ILanguageService> _languageService = null!;
     private Mock<IPublishedRouter> _router = null!;
@@ -34,7 +36,7 @@ public class PublishedUrlInfoProviderTests
         _urlProvider.Setup(x => x.GetOtherUrls(It.IsAny<int>())).Returns(Array.Empty<UrlInfo>());
 
         _languageService = new Mock<ILanguageService>();
-        _languageService.Setup(x => x.GetAllAsync()).ReturnsAsync([CreateLanguage("en-US"), CreateLanguage("da-DK")]);
+        _languageService.Setup(x => x.GetAllAsync()).ReturnsAsync(_installedCultures.Select(CreateLanguage).ToArray());
         _languageService.Setup(x => x.GetDefaultIsoCodeAsync()).ReturnsAsync("en-US");
 
         // Default routing result: the generated URL routes back to the same content (no collision).
@@ -57,7 +59,7 @@ public class PublishedUrlInfoProviderTests
         ISet<UrlInfo> result = await CreateSut().GetAllAsync(CreateContent(variesByCulture: true));
 
         Assert.AreEqual(2, result.Count);
-        CollectionAssert.AreEquivalent(new[] { "en-US", "da-DK" }, result.Select(x => x.Culture));
+        CollectionAssert.AreEquivalent(_installedCultures, result.Select(x => x.Culture));
         Assert.IsTrue(result.All(x => x.Url is not null));
     }
 

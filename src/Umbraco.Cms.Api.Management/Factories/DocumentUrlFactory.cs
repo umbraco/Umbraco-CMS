@@ -52,7 +52,7 @@ public class DocumentUrlFactory : IDocumentUrlFactory
         => CreateUrlsAsync(content, culture: null);
 
     /// <summary>
-    /// Asynchronously generates a collection of <see cref="Umbraco.Cms.Api.Management.Factories.DocumentUrlInfo"/> instances representing the URLs for the specified content item, optionally restricted to a single culture.
+    /// Asynchronously generates a collection of <see cref="DocumentUrlInfo"/> instances representing the URLs for the specified content item, optionally restricted to a single culture.
     /// </summary>
     /// <param name="content">The content item for which to generate URLs.</param>
     /// <param name="culture">The culture to restrict variant content urls to, or <c>null</c> for all cultures.</param>

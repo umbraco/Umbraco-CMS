@@ -9,7 +9,7 @@ export class UmbDocumentUrlRepository extends UmbItemRepositoryBase<UmbDocumentU
 	// data source private and the inherited `requestItems` signature cannot carry a culture. Extending
 	// the item base keeps this consistent with `UmbMediaUrlRepository`; `requestUrls` otherwise mirrors
 	// the base flow, including store population.
-	#urlSource = new UmbDocumentUrlServerDataSource(this);
+	readonly #urlSource = new UmbDocumentUrlServerDataSource(this);
 
 	constructor(host: UmbControllerHost) {
 		super(host, UmbDocumentUrlServerDataSource, UMB_DOCUMENT_URL_STORE_CONTEXT);

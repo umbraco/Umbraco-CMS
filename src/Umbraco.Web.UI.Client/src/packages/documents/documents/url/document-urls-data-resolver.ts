@@ -15,9 +15,9 @@ export class UmbDocumentUrlsDataResolver extends UmbControllerBase {
 	#displayVariantId?: UmbVariantId;
 	#data?: Array<UmbDocumentUrlModel> | undefined;
 
-	#init: Promise<unknown>;
+	readonly #init: Promise<unknown>;
 
-	#urls = new UmbArrayState<UmbDocumentUrlModel>([], (url) => url.url);
+	readonly #urls = new UmbArrayState<UmbDocumentUrlModel>([], (url) => url.url);
 	/**
 	 * The urls for the current culture
 	 * @returns {ObservableArray<UmbDocumentUrlModel>} The urls for the current culture
@@ -25,7 +25,7 @@ export class UmbDocumentUrlsDataResolver extends UmbControllerBase {
 	 */
 	public readonly urls = this.#urls.asObservable();
 
-	#requestCulture = new UmbStringState<string | undefined>(undefined);
+	readonly #requestCulture = new UmbStringState<string | undefined>(undefined);
 	/**
 	 * The culture to request urls for from the server. Emits whenever the displayed culture changes.
 	 * Resolves to undefined for invariant documents (meaning all cultures).
