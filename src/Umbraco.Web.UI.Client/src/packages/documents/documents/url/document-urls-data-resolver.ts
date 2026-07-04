@@ -11,7 +11,6 @@ import { UMB_VARIANT_CONTEXT, type UmbVariantId } from '@umbraco-cms/backoffice/
  * @augments {UmbControllerBase}
  */
 export class UmbDocumentUrlsDataResolver extends UmbControllerBase {
-	#appCulture?: string;
 	#variantId?: UmbVariantId;
 	#displayVariantId?: UmbVariantId;
 	#data?: Array<UmbDocumentUrlModel> | undefined;
@@ -109,6 +108,9 @@ export class UmbDocumentUrlsDataResolver extends UmbControllerBase {
 
 	#setCultureAwareValues() {
 		this.#setUrls();
+
+		// TODO: when the variant context gains a dedicated "request/effective culture" accessor, resolve the
+		// invariant->all-cultures decision through it instead of here.
 		this.#requestCulture.setValue(this.#variantId?.isCultureInvariant() ? undefined : this.#getCurrentCulture());
 	}
 
@@ -118,7 +120,9 @@ export class UmbDocumentUrlsDataResolver extends UmbControllerBase {
 	}
 
 	#getCurrentCulture(): string | undefined {
-		return this.#variantId?.culture || this.#displayVariantId?.culture || this.#appCulture;
+		// Culture resolution (incl. inheritance/fallback) is owned by the variant context; we read its
+		// already-resolved display variant rather than re-deriving it here.
+		return this.#displayVariantId?.culture ?? undefined;
 	}
 
 	#getDataForCurrentCulture(): Array<UmbDocumentUrlModel> | undefined {
