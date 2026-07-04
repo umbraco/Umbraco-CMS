@@ -1272,5 +1272,44 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         Assert.That(await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("my-single-alias-draft-edit", isoCode), Is.Empty);
     }
 
+    [Test]
+    public async Task CreateOrUpdateAliasesAsync_Ignores_Draft_Alias_Edit_On_Published_Variant_Culture()
+    {
+        // Arrange - create a culture-variant content type with a CULTURE-VARIED umbracoUrlAlias property,
+        // publish one culture with an alias, then edit that culture's alias as a draft without re-publishing.
+        var template = TemplateBuilder.CreateTextPageTemplate("variantDraftEditTemplate");
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+
+        var variantContentType = CreateCultureVariantContentTypeWithUrlAlias(template.Id, "pageWithVariantAliasDraftEdit");
+        await ContentTypeService.CreateAsync(variantContentType, Constants.Security.SuperUserKey);
+
+        var defaultLanguage = (await LanguageService.GetDefaultLanguageAsync())!;
+
+        var content = new ContentBuilder()
+            .WithContentType(variantContentType)
+            .WithCultureName(defaultLanguage.IsoCode, "Page With Variant Alias Draft Edit")
+            .Build();
+        content.SetValue(Constants.Conventions.Content.UrlAlias, "variant-published-alias", defaultLanguage.IsoCode);
+        content.ParentId = RootPage.Id;
+        ContentService.Save(content, -1);
+        ContentService.Publish(content, [defaultLanguage.IsoCode]);
+
+        await DocumentUrlAliasService.CreateOrUpdateAliasesAsync(content.Key);
+
+        // Sanity check - the published alias resolves before the draft edit.
+        Assert.That(await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("variant-published-alias", defaultLanguage.IsoCode), Does.Contain(content.Key));
+
+        // Act - edit the alias for the published culture and save without re-publishing.
+        var draftContent = ContentService.GetById(content.Key)!;
+        draftContent.SetValue(Constants.Conventions.Content.UrlAlias, "variant-draft-alias", defaultLanguage.IsoCode);
+        ContentService.Save(draftContent, -1);
+
+        await DocumentUrlAliasService.CreateOrUpdateAliasesAsync(draftContent.Key);
+
+        // Assert - the published alias should still resolve; the unpublished draft alias should not.
+        Assert.That(await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("variant-published-alias", defaultLanguage.IsoCode), Does.Contain(content.Key));
+        Assert.That(await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("variant-draft-alias", defaultLanguage.IsoCode), Is.Empty);
+    }
+
     #endregion
 }
