@@ -1,34 +1,61 @@
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Events;
-using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Changes;
+using Umbraco.Cms.Core.Sync;
+using Umbraco.Cms.Infrastructure.Examine;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Search;
 
 /// <summary>
-/// Queues reindexing of documents that reference elements when those elements are published.
+/// Queues reindexing of documents whose search index depends on an element whenever that element's cache is refreshed
+/// (publish, unpublish, trash or delete).
 /// </summary>
 /// <remarks>
-/// Only published element values are flattened into the (published) external index, so a draft save cannot change
-/// what referencing documents index. Reindexing is therefore triggered on publish only, not on save.
+/// Bound to the element cache-refresher notification, which is broadcast to every server via the distributed cache,
+/// so each server reindexes its own local search index. Entity notifications (e.g. published/unpublished) would only
+/// fire on the server that handled the request.
 /// </remarks>
-internal sealed class ElementIndexingNotificationHandler :
-    INotificationHandler<ElementPublishedNotification>
+internal sealed class ElementIndexingNotificationHandler : INotificationHandler<ElementCacheRefresherNotification>
 {
     private readonly IDeferredSearchReindexService _deferredSearchReindexService;
+    private readonly IUmbracoIndexingHandler _umbracoIndexingHandler;
 
-    public ElementIndexingNotificationHandler(IDeferredSearchReindexService deferredSearchReindexService)
-        => _deferredSearchReindexService = deferredSearchReindexService;
-
-    public void Handle(ElementPublishedNotification notification)
-        => QueueElementReindex(notification.PublishedEntities);
-
-    private void QueueElementReindex(IEnumerable<IElement> elements)
+    public ElementIndexingNotificationHandler(
+        IDeferredSearchReindexService deferredSearchReindexService,
+        IUmbracoIndexingHandler umbracoIndexingHandler)
     {
-        var ids = elements.Select(e => e.Id).ToArray();
-        if (ids.Length > 0)
+        _deferredSearchReindexService = deferredSearchReindexService;
+        _umbracoIndexingHandler = umbracoIndexingHandler;
+    }
+
+    public void Handle(ElementCacheRefresherNotification notification)
+    {
+        if (_umbracoIndexingHandler.Enabled is false || Suspendable.ExamineEvents.CanIndex is false)
         {
-            _deferredSearchReindexService.QueueElementReindex(ids);
+            return;
         }
+
+        if (notification.MessageType != MessageType.RefreshByPayload)
+        {
+            return;
+        }
+
+        var elementIds = ((ElementCacheRefresher.JsonPayload[])notification.MessageObject)
+            .Where(payload => payload.ChangeTypes.HasType(TreeChangeTypes.RefreshNode)
+                || payload.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch)
+                || payload.ChangeTypes.HasType(TreeChangeTypes.Remove))
+            .Select(payload => payload.Id)
+            .Distinct()
+            .ToArray();
+
+        if (elementIds.Length == 0)
+        {
+            return;
+        }
+
+        _deferredSearchReindexService.QueueElementReindex(elementIds);
     }
 }

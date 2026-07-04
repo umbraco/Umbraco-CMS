@@ -1,9 +1,11 @@
 using Moq;
 using NUnit.Framework;
-using Umbraco.Cms.Core.Events;
-using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Changes;
+using Umbraco.Cms.Core.Sync;
+using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Infrastructure.Search;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Search;
@@ -12,21 +14,28 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Search;
 public class ElementIndexingNotificationHandlerTests
 {
     private Mock<IDeferredSearchReindexService> _mockReindexService = null!;
+    private Mock<IUmbracoIndexingHandler> _mockIndexingHandler = null!;
     private ElementIndexingNotificationHandler _sut = null!;
 
     [SetUp]
     public void SetUp()
     {
         _mockReindexService = new Mock<IDeferredSearchReindexService>();
-        _sut = new ElementIndexingNotificationHandler(_mockReindexService.Object);
+        _mockIndexingHandler = new Mock<IUmbracoIndexingHandler>();
+        _mockIndexingHandler.Setup(x => x.Enabled).Returns(true);
+        _sut = new ElementIndexingNotificationHandler(_mockReindexService.Object, _mockIndexingHandler.Object);
     }
 
     [Test]
-    public void Handle_ElementPublishedNotification_QueuesElementIds()
+    public void Handle_QueuesChangedElementIds()
     {
-        var element1 = ElementWithId(30);
-        var element2 = ElementWithId(40);
-        var notification = new ElementPublishedNotification([element1, element2], new EventMessages());
+        var notification = new ElementCacheRefresherNotification(
+            new[]
+            {
+                new ElementCacheRefresher.JsonPayload(30, Guid.NewGuid(), TreeChangeTypes.RefreshNode),
+                new ElementCacheRefresher.JsonPayload(40, Guid.NewGuid(), TreeChangeTypes.RefreshBranch),
+            },
+            MessageType.RefreshByPayload);
 
         _sut.Handle(notification);
 
@@ -36,19 +45,41 @@ public class ElementIndexingNotificationHandlerTests
     }
 
     [Test]
-    public void Handle_ElementPublishedNotification_WhenEmpty_DoesNotQueue()
+    public void Handle_QueuesRemovedElementIds()
     {
-        var notification = new ElementPublishedNotification([], new EventMessages());
+        var notification = new ElementCacheRefresherNotification(
+            new[] { new ElementCacheRefresher.JsonPayload(50, Guid.NewGuid(), TreeChangeTypes.Remove) },
+            MessageType.RefreshByPayload);
+
+        _sut.Handle(notification);
+
+        _mockReindexService.Verify(
+            s => s.QueueElementReindex(It.Is<IReadOnlyCollection<int>>(ids => ids.SequenceEqual(new[] { 50 }))),
+            Times.Once);
+    }
+
+    [Test]
+    public void Handle_WhenIndexingDisabled_DoesNotQueue()
+    {
+        _mockIndexingHandler.Setup(x => x.Enabled).Returns(false);
+        var notification = new ElementCacheRefresherNotification(
+            new[] { new ElementCacheRefresher.JsonPayload(60, Guid.NewGuid(), TreeChangeTypes.RefreshNode) },
+            MessageType.RefreshByPayload);
 
         _sut.Handle(notification);
 
         _mockReindexService.Verify(s => s.QueueElementReindex(It.IsAny<IReadOnlyCollection<int>>()), Times.Never);
     }
 
-    private static IElement ElementWithId(int id)
+    [Test]
+    public void Handle_RefreshAll_DoesNotQueue()
     {
-        var mock = new Mock<IElement>();
-        mock.Setup(e => e.Id).Returns(id);
-        return mock.Object;
+        var notification = new ElementCacheRefresherNotification(
+            new[] { new ElementCacheRefresher.JsonPayload(0, Guid.Empty, TreeChangeTypes.RefreshAll) },
+            MessageType.RefreshByPayload);
+
+        _sut.Handle(notification);
+
+        _mockReindexService.Verify(s => s.QueueElementReindex(It.IsAny<IReadOnlyCollection<int>>()), Times.Never);
     }
 }
