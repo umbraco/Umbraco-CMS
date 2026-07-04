@@ -1230,4 +1230,47 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
     }
 
     #endregion
+
+    #region Draft Alias Should Not Affect Published Routing (Issue #23206)
+
+    [Test]
+    public async Task CreateOrUpdateAliasesAsync_Ignores_Draft_Alias_Colliding_With_Published_Alias_On_Another_Document()
+    {
+        var isoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
+
+        // Page A is already published (from setup) with alias "my-single-alias".
+        // Page B is saved as a draft only, reusing the same alias.
+        var pageB = ContentBuilder.CreateSimpleContent(ContentType, "Page B", RootPage.Id);
+        pageB.SetValue(Constants.Conventions.Content.UrlAlias, "my-single-alias");
+        ContentService.Save(pageB, -1);
+
+        await DocumentUrlAliasService.CreateOrUpdateAliasesAsync(pageB.Key);
+
+        // Only the published page (A) should resolve for the shared alias - the unpublished
+        // draft (B) must not evict or shadow it.
+        var result = (await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("my-single-alias", isoCode)).ToList();
+
+        Assert.That(result, Does.Contain(new Guid(PageWithSingleAliasKey)), "Published page should still resolve for the alias.");
+        Assert.That(result, Does.Not.Contain(pageB.Key), "Unpublished draft should not be resolvable via the alias.");
+    }
+
+    [Test]
+    public async Task CreateOrUpdateAliasesAsync_Ignores_Draft_Alias_Edit_On_Published_Document()
+    {
+        var isoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
+        var documentKey = new Guid(PageWithSingleAliasKey);
+
+        // Re-fetch the published content and change its alias without publishing.
+        var content = ContentService.GetById(documentKey)!;
+        content.SetValue(Constants.Conventions.Content.UrlAlias, "my-single-alias-draft-edit");
+        ContentService.Save(content, -1);
+
+        await DocumentUrlAliasService.CreateOrUpdateAliasesAsync(content.Key);
+
+        // The still-published alias should keep resolving; the unpublished draft alias should not.
+        Assert.That(await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("my-single-alias", isoCode), Does.Contain(documentKey));
+        Assert.That(await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("my-single-alias-draft-edit", isoCode), Is.Empty);
+    }
+
+    #endregion
 }

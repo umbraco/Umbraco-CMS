@@ -485,7 +485,9 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
         // Store alias for ALL languages (like DocumentUrlService).
         if (document.ContentType.VariesByCulture() is false || aliasPropertyVariesByCulture is false)
         {
-            var aliasValue = document.GetValue<string>(Constants.Conventions.Content.UrlAlias);
+            // Aliases are routing data for the published site, so only the published property value counts -
+            // GetValue(published: true) returns null until the document is actually published.
+            var aliasValue = document.GetValue<string>(Constants.Conventions.Content.UrlAlias, published: true);
 
             if (!string.IsNullOrWhiteSpace(aliasValue))
             {
@@ -507,7 +509,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
         IEnumerable<ILanguage> languages = await _languageService.GetAllAsync();
         foreach (ILanguage language in languages)
         {
-            var aliasValue = document.GetValue<string>(Constants.Conventions.Content.UrlAlias, language.IsoCode);
+            var aliasValue = document.GetValue<string>(Constants.Conventions.Content.UrlAlias, language.IsoCode, published: true);
 
             if (string.IsNullOrWhiteSpace(aliasValue))
             {
