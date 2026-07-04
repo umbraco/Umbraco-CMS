@@ -917,6 +917,7 @@ export class LibraryUiHelper extends UiBaseLocators {
   }
 
   async clickSelectVariantButton() {
+    // Retry the open: an early click can be lost to the async variant load, leaving the list closed.
     const variantRow = this.cultureVariant.first();
     await expect(async () => {
       if (!(await variantRow.isVisible())) {
@@ -927,7 +928,7 @@ export class LibraryUiHelper extends UiBaseLocators {
   }
 
   async clickExpendSegmentButton(elementName: string) {
-    await this.cultureVariant.filter({hasText: elementName}).locator(this.expandSegmentBtn).click();
+    await this.click(this.cultureVariant.filter({hasText: elementName}).locator(this.expandSegmentBtn));
   }
 
   async clickVariantAddModeButtonForLanguageName(language: string) {

@@ -84,6 +84,7 @@ export class MemberUiHelper extends UiBaseLocators {
 
   async enterComments(comment: string) {
     await this.enterText(this.commentsTxt, comment);
+    // Blur to commit the value: the uui textarea commits on change/blur, not on fill, so a later save would miss it.
     await this.commentsTxt.blur();
   }
 

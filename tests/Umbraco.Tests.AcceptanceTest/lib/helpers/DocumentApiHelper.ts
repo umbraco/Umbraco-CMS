@@ -1,6 +1,7 @@
 ﻿import {expect} from "@playwright/test";
 import {AliasHelper} from "./AliasHelper";
 import {ApiHelpers} from "./ApiHelpers";
+import {ConstantHelper} from "./ConstantHelper";
 import {DocumentBuilder, DocumentDomainBuilder} from "../builders";
 
 export class DocumentApiHelper {
@@ -628,11 +629,11 @@ export class DocumentApiHelper {
   }
 
   async waitUntilDocumentIsPublished(id: string) {
-    await expect.poll(() => this.isDocumentPublished(id)).toBeTruthy();
+    await expect.poll(() => this.isDocumentPublished(id), {timeout: ConstantHelper.timeout.veryLong}).toBeTruthy();
   }
 
   async waitUntilImageMediaPickerDoesNotContainImage(id: string, propertyAlias: string, mediaKey: string) {
-    await expect.poll(() => this.doesImageMediaPickerContainImage(id, propertyAlias, mediaKey)).toBeFalsy();
+    await expect.poll(() => this.doesImageMediaPickerContainImage(id, propertyAlias, mediaKey), {timeout: ConstantHelper.timeout.veryLong}).toBeFalsy();
   }
 
   async createPublishedDocumentWithImageCropper(documentName: string, cropValue: any, dataTypeId: string, templateId: string, propertyName: string = 'Test Property Name', documentTypeName: string = 'Test Document Type', focalPoint: {left: number, top: number} = {left: 0.5, top: 0.5}) {

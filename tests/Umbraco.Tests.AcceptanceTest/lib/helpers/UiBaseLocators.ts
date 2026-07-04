@@ -1750,6 +1750,7 @@ export class UiBaseLocators extends BasePage {
 
   // User Methods
   async clickCurrentUserAvatarButton() {
+    // Retry the open: the first click can land before the avatar is interactive, leaving the modal closed.
     await expect(async () => {
       if (!(await this.currentUserModal.isVisible())) {
         await this.click(this.currentUserAvatarBtn);

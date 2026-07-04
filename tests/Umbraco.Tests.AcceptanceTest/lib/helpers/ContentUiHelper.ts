@@ -1522,6 +1522,8 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   async clickRollbackButton() {
+    // Opening Rollback triggers a GET /document-version to load the version history;
+    // wait for that response so the versions are ready before we pick one.
     await this.waitForResponseAfterExecutingPromise(
       '/document-version',
       this.click(this.rollbackBtn, { force: true }),
