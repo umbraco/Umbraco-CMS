@@ -17,6 +17,7 @@ internal sealed class FileUploadPathResolver : IFileUploadPathResolver
     /// <summary>
     /// Initializes a new instance of the <see cref="FileUploadPathResolver"/> class.
     /// </summary>
+    /// <param name="mediaFileManager">Manages media file storage and computes the standard media path.</param>
     public FileUploadPathResolver(MediaFileManager mediaFileManager)
         => _mediaFileManager = mediaFileManager;
 

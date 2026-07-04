@@ -83,7 +83,7 @@ internal sealed class FileUploadNotificationHandlerTests : UmbracoIntegrationTes
         (IContentType contentType, IContent original, _) = await CreateContentWithUploadedFileAsync();
 
         // A scaffold is an in-memory target that the handler updates but does not re-save (postUpdateAction is null).
-        IContent scaffold = new ContentBuilder()
+        Content scaffold = new ContentBuilder()
             .WithContentType(contentType)
             .WithName("Scaffold")
             .Build();

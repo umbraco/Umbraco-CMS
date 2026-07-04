@@ -33,6 +33,14 @@ internal sealed class FileUploadContentCopiedOrScaffoldedNotificationHandler : F
     /// <summary>
     /// Initializes a new instance of the <see cref="FileUploadContentCopiedOrScaffoldedNotificationHandler"/> class.
     /// </summary>
+    /// <param name="jsonSerializer">Serializes and deserializes property values.</param>
+    /// <param name="mediaFileManager">Manages media file storage operations.</param>
+    /// <param name="elementTypeCache">Caches block editor element types.</param>
+    /// <param name="logger">The logger.</param>
+    /// <param name="contentService">Used to re-save content once copied files have been processed.</param>
+    /// <param name="propertyEditors">The collection of registered property editors, used to recognise upload fields.</param>
+    /// <param name="fileUploadPathResolver">Resolves the storage path for the copied file.</param>
+    /// <param name="dataTypeConfigurationCache">Provides the data type configuration passed to the path resolver.</param>
     public FileUploadContentCopiedOrScaffoldedNotificationHandler(
         IJsonSerializer jsonSerializer,
         MediaFileManager mediaFileManager,
