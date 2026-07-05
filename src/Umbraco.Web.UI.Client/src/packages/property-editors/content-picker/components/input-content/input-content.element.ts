@@ -26,15 +26,39 @@ export class UmbInputContentElement extends UmbFormControlMixin<string | undefin
 	}
 	#type: UmbContentPickerSource['type'] = 'content';
 
+	/**
+	 * This is a minimum amount of selected items in this input.
+	 * @type {number}
+	 * @attr
+	 * @default undefined
+	 */
 	@property({ type: Number })
 	min = 0;
 
+	/**
+	 * Min validation message.
+	 * @type {string}
+	 * @attr
+	 * @default
+	 */
 	@property({ type: String, attribute: 'min-message' })
-	minMessage = 'This field need more items';
+	minMessage = 'This field needs more items';
 
+	/**
+	 * This is a maximum amount of selected items in this input.
+	 * @type {number}
+	 * @attr
+	 * @default undefined
+	 */
 	@property({ type: Number })
 	max = 0;
 
+	/**
+	 * Max validation message.
+	 * @type {string}
+	 * @attr
+	 * @default
+	 */
 	@property({ type: String, attribute: 'max-message' })
 	maxMessage = 'This field exceeds the allowed amount of items';
 
