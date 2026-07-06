@@ -9,6 +9,13 @@ import type { umbHttpClient } from '@umbraco-cms/backoffice/http-client';
 
 const MAX_RETRIES = 3;
 
+/**
+ * HTTP statuses used by proxies/gateways (Cloudflare, nginx, IIS ARR, etc.) to report that they closed
+ * the connection before the origin server responded, rather than a real application error response.
+ * @see https://github.com/umbraco/Umbraco-CMS/issues/16041
+ */
+const GATEWAY_TIMEOUT_STATUSES = [408, 504, 522, 523, 524, 525, 526, 527, 530, 598, 599];
+
 export class UmbApiInterceptorController extends UmbControllerBase {
 	/**
 	 * Store pending requests that received a 401 response and are waiting for re-authentication.
@@ -195,6 +202,21 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 					stack: undefined,
 				};
 				return this.#createResponse(notFoundProblemDetails, response);
+			}
+
+			// Special handling for proxy/gateway timeouts. These respond with their own (usually non-JSON) error
+			// page instead of ours, so without this the request would surface as a generic, unhelpful server error.
+			if (GATEWAY_TIMEOUT_STATUSES.includes(response.status)) {
+				const timeoutProblemDetails: UmbProblemDetails = {
+					status: response.status,
+					title: 'The request timed out',
+					detail:
+						'A proxy or gateway between your browser and the server closed the connection before it responded. The action you performed may still have completed on the server — please check before trying again.',
+					errors: undefined,
+					type: 'GatewayTimeout',
+					stack: undefined,
+				};
+				return this.#createResponse(timeoutProblemDetails, response);
 			}
 
 			// For all other errors, we will build a ProblemDetails object

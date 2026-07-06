@@ -34,6 +34,20 @@ export class UmbResourceController<T = unknown> extends UmbControllerBase {
 			return error;
 		} else if (UmbApiError.isUmbApiError(error)) {
 			return error;
+		} else if (error instanceof TypeError) {
+			// The fetch() promise rejects with a TypeError when it never received a response at all, e.g. a DNS
+			// failure, a refused/reset connection, or a proxy (such as Cloudflare) dropping the connection on a
+			// long-running request. This is distinct from an HTTP error response, which resolves normally.
+			// See https://github.com/umbraco/Umbraco-CMS/issues/16041
+			return new UmbApiError('Connection lost', 0, null, {
+				status: 0,
+				title: 'Connection lost',
+				detail:
+					'The connection to the server was lost while the request was in progress. If you were saving or publishing, it may have completed on the server — please check before trying again.',
+				errors: undefined,
+				type: 'NetworkError',
+				stack: error.stack,
+			});
 		}
 
 		// If the error is not recognizable, for example if it has no ProblemDetails body, we will return a generic UmbApiError.
