@@ -96,7 +96,7 @@ internal sealed class ContentRelationsUpdate :
     {
         // Track PublishedValue only for entities that have a published state and are currently published.
         // For unpublished entities (or entities without a published state) we only track EditedValue to avoid stale PublishedValue relations.
-        var trackPublishedValues = entity is IPublishableContentBase publishable && publishable.Published;
+        var trackPublishedValues = entity is IContent publishable && publishable.Published;
 
         // Get all references and automatic relation type aliases.
         ISet<UmbracoEntityReference> references = _dataValueReferenceFactories.GetAllReferences(entity.Properties, _propertyEditors, trackPublishedValues);

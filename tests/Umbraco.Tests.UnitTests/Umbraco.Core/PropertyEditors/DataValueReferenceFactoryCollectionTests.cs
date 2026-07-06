@@ -137,7 +137,7 @@ public class DataValueReferenceFactoryCollectionTests
     }
 
     [Test]
-    public void GetAllReferences_All_Variants_For_Published_And_UnPublished_States_With_IDataValueReference_Editor()
+    public void GetAllReferences_All_Variants_For_Published_And_Unpublished_States_With_IDataValueReference_Editor()
     {
         var collection = new DataValueReferenceFactoryCollection(() => Enumerable.Empty<IDataValueReferenceFactory>(), new NullLogger<DataValueReferenceFactoryCollection>());
 
