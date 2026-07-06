@@ -1,6 +1,6 @@
 # Umbraco.Cms.Imaging.ImageSharp
 
-Image processing library using **ImageSharp 3.x** and **ImageSharp.Web** for on-the-fly image manipulation, resizing, cropping, and caching.
+Image processing library using **ImageSharp 4.x** and **ImageSharp.Web** for on-the-fly image manipulation, resizing, cropping, and caching.
 
 ---
 
@@ -37,10 +37,10 @@ Umbraco.Cms.Imaging.ImageSharp/
 ### Relationship to ImageSharp2
 
 Two imaging packages exist:
-- **Umbraco.Cms.Imaging.ImageSharp** (this package) - Uses ImageSharp 3.x (default)
-- **Umbraco.Cms.Imaging.ImageSharp2** - Uses ImageSharp 2.x for backwards compatibility
+- **Umbraco.Cms.Imaging.ImageSharp** (this package) - Uses ImageSharp 4.x (default)
+- **Umbraco.Cms.Imaging.ImageSharp2** - Uses ImageSharp 2.x for backwards compatibility, and as the option free of ImageSharp's build-time licence enforcement (see §6)
 
-**Key difference**: ImageSharp 3.x WebP encoder defaults to Lossless (10x larger files), so this package explicitly sets `WebpFileFormatType.Lossy` at `ConfigureImageSharpMiddlewareOptions.cs:108-115`.
+**Key difference**: ImageSharp 3.x+ WebP encoder defaults to Lossless (10x larger files), so this package explicitly sets `WebpFileFormatType.Lossy` at `ConfigureImageSharpMiddlewareOptions.cs:108-115`.
 
 ---
 
@@ -156,9 +156,9 @@ Query parameters `rnd` or `v` trigger immutable cache headers (`ConfigureImageSh
 
 ## 5. Edge Cases
 
-### WebP Encoding Change (ImageSharp 3.x)
+### WebP Encoding Change (ImageSharp 3.x+)
 
-`ConfigureImageSharpMiddlewareOptions.cs:108-115` - ImageSharp 3.x defaults WebP to Lossless for PNGs, creating ~10x larger files. This is overridden:
+`ConfigureImageSharpMiddlewareOptions.cs:108-115` - ImageSharp 3.x+ defaults WebP to Lossless for PNGs, creating ~10x larger files. This is overridden:
 ```csharp
 options.Configuration.ImageFormatsManager.SetEncoder(
     WebpFormat.Instance,
@@ -180,6 +180,21 @@ SupportedImageFileTypes = configuration.ImageFormats.SelectMany(f => f.FileExten
 ```
 
 Default includes: jpg, jpeg, png, gif, bmp, webp, tiff, etc.
+
+---
+
+## 6. ImageSharp 4 Licensing & Build
+
+ImageSharp 4 adds a **build-time licence check** to projects that reference it **directly** (the Split License terms are unchanged from v3 — only enforcement is new). Both package references use `ExcludeAssets="build"`:
+```xml
+<PackageReference Include="SixLabors.ImageSharp" ExcludeAssets="build" />
+<PackageReference Include="SixLabors.ImageSharp.Web" ExcludeAssets="build" />
+```
+The check ships in the package's MSBuild `build/` assets, so excluding them means **no `sixlabors.lic` is needed to build this repo** (CI, contributors, forks); `compile`/`runtime` assets still flow, so the library is unaffected. **Keep `ExcludeAssets="build"`** and **never commit a licence file/key** — Umbraco holds a free Community/OSS licence for compliance, kept out of the source tree.
+
+Excluding `build` assets also drops ImageSharp's implicit `global using` injection; all source files here use explicit `using SixLabors.*;`, so add an explicit `using` if you reference a new ImageSharp namespace.
+
+Umbraco sites consume ImageSharp transitively and need no licence — only a project adding its own **direct** `PackageReference` to `SixLabors.ImageSharp[.Web]` is subject to the check.
 
 ---
 
