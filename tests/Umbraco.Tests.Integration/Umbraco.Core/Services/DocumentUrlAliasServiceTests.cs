@@ -821,6 +821,26 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
+    public async Task RebuildAllAliasesAsync_Ignores_Draft_Alias_Edit_On_Published_Document()
+    {
+        var isoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
+        var documentKey = new Guid(PageWithSingleAliasKey);
+
+        // The page is published (from setup) with alias "my-single-alias". Edit the alias as a draft only.
+        var content = ContentService.GetById(documentKey)!;
+        content.SetValue(Constants.Conventions.Content.UrlAlias, "my-single-alias-draft-edit");
+        ContentService.Save(content, -1);
+
+        // Act - a full rebuild (as happens on startup after the rebuild key changes) must read the
+        // published property value, not the current draft one.
+        await DocumentUrlAliasService.RebuildAllAliasesAsync();
+
+        // Assert - the published alias should still resolve; the unpublished draft alias should not.
+        Assert.That(await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("my-single-alias", isoCode), Does.Contain(documentKey));
+        Assert.That(await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("my-single-alias-draft-edit", isoCode), Is.Empty);
+    }
+
+    [Test]
     public async Task RebuildAllAliasesAsync_Handles_Empty_Database()
     {
         // Arrange - clear all aliases from documents

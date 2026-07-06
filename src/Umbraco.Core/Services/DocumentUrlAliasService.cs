@@ -32,8 +32,10 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     /// Here, however, the alias parsing logic is internal and not customizable, so we simply use a constant value.
     /// By doing this we can keep the same logic for rebuild on startup after a migration, provide a means of triggering
     /// a rebuild, and we have future-proofing in case the alias parsing logic changes in future versions.
+    /// Bumped to "2" so that installs which persisted draft alias values (before aliases were restricted to the
+    /// published property value) rebuild once on startup and flush the stale entries.
     /// </remarks>
-    private const string CurrentRebuildValue = "1";
+    private const string CurrentRebuildValue = "2";
 
     private readonly ILogger<DocumentUrlAliasService> _logger;
     private readonly IDocumentUrlAliasRepository _documentUrlAliasRepository;
