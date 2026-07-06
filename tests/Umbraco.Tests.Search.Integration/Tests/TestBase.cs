@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.HostedServices;
 using Umbraco.Cms.Core.Models;
@@ -15,7 +16,7 @@ using Umbraco.Tests.Search.Integration.Services;
 
 namespace Umbraco.Tests.Search.Integration.Tests;
 
-public abstract class TestBase : UmbracoIntegrationTestWithPackageMigrations
+public abstract class TestBase : UmbracoIntegrationTest
 {
     // these tests all run against the test indexer, which does not care about the origin
     // of content changes, so the origin value does not matter unless explicitly stated

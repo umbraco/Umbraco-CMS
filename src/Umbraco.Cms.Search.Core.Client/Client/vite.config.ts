@@ -1,6 +1,18 @@
 import { defineConfig } from 'vite';
+import { resolve } from 'node:path';
+import viteTSConfigPaths from 'vite-tsconfig-paths';
 
 export default defineConfig({
+  plugins: [
+    viteTSConfigPaths({
+      projects: ['./tsconfig.json', '../../Umbraco.Web.UI.Client/tsconfig.json'],
+    }),
+  ],
+  server: {
+    fs: {
+      allow: [import.meta.dirname, resolve(import.meta.dirname, '../../Umbraco.Web.UI.Client')],
+    },
+  },
   build: {
     lib: {
       entry: {

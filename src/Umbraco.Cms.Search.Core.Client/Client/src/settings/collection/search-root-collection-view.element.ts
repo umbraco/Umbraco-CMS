@@ -42,7 +42,7 @@ export default class UmbSearchRootCollectionView extends UmbLitElement {
     },
   ];
 
-  #collectionContext?: UmbDefaultCollectionContext<UmbSearchIndex, never>;
+  #collectionContext?: UmbDefaultCollectionContext<UmbSearchIndex>;
 
   constructor() {
     super();

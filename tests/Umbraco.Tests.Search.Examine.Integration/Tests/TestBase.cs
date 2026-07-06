@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using Umbraco.Cms.Tests.Integration.Testing;
 using System.Reflection;
 using Examine;
 using Examine.Lucene.Providers;
@@ -22,7 +23,7 @@ namespace Umbraco.Tests.Search.Examine.Integration.Tests;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public abstract class TestBase : UmbracoIntegrationTestWithPackageMigrations
+public abstract class TestBase : UmbracoIntegrationTest
 {
     // these tests all run against the Examine search provider, which does not care about the origin
     // of content changes, so the origin value does not matter.

@@ -137,7 +137,7 @@ cd src/Umbraco.Web.UI
 dotnet run
 ```
 
-Note: the search services are not yet registered in the default install — call `AddSearchCore()` / `AddExamineSearchProvider()` / `AddBackOfficeSearch()` / `AddDeliveryApiSearch()` from a composer or startup code to enable them.
+The core search and the Examine provider are registered in the default install (side-by-side with the legacy Examine indexes) via `SearchCoreComposer` and `ExamineSearchProviderComposer`. `AddBackOfficeSearch()` and `AddDeliveryApiSearch()` are still opt-in — call them from a composer or startup code to switch backoffice search and Delivery API querying onto the new indexes.
 
 ## Architecture
 

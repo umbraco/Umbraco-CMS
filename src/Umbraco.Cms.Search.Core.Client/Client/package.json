@@ -27,22 +27,26 @@
   "peerDependencies": {
     "@umbraco-cms/backoffice": ">=17.0.0"
   },
+  "peerDependenciesMeta": {
+    "@umbraco-cms/backoffice": {
+      "optional": true
+    }
+  },
   "scripts": {
     "watch": "vite build --watch",
     "build": "tsc && vite build",
     "types:generate": "tsc -p tsconfig.types.json",
     "prepack": "npm run types:generate",
     "generate-client": "node ./scripts/generate-openapi.js https://localhost:44324/umbraco/openapi/search.json src/settings/api",
+    "generate:tsconfig": "node ./scripts/generate-tsconfig.js",
     "lint": "eslint . --max-warnings 0",
     "lint:fix": "eslint . --fix",
     "lint:errors-only": "eslint . --quiet",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },
-  "dependencies": {
-    "@umbraco-cms/backoffice": "18.0.0"
-  },
   "devDependencies": {
+    "vite-tsconfig-paths": "^6.1.1",
     "@eslint/js": "^10.0.1",
     "@typescript-eslint/eslint-plugin": "^8.62.1",
     "@typescript-eslint/parser": "^8.62.1",

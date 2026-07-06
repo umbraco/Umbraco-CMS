@@ -34,7 +34,7 @@ namespace Umbraco.Tests.Search.Examine.Integration.Tests.ContentTests.Persistenc
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class ContentServiceTests : UmbracoIntegrationTestWithPackageMigrations
+public class ContentServiceTests : UmbracoIntegrationTest
 {
     private bool _indexingComplete;
 

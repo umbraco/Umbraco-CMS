@@ -11,6 +11,8 @@ public static class UmbracoBuilderExtensions
     public static IUmbracoBuilder AddDeliveryApiSearch(this IUmbracoBuilder builder)
     {
         // swap out the core query provider with a custom one based on the search abstractions
+        // TODO (V19): When this is wired into the default install, replace AddSingleton with AddUnique - as AddSingleton
+        // only wins over the core ApiContentQueryProvider registration when this method runs after AddDeliveryApi().
         builder.Services.AddSingleton<IApiContentQueryProvider, DeliveryApiContentQueryProvider>();
 
         // add a content indexer for Delivery API selectors, filters, sorters etc.

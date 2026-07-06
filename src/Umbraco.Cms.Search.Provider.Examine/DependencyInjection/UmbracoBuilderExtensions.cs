@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.OpenApi;
 using Umbraco.Cms.Api.Common.OpenApi;
 using Umbraco.Cms.Api.Management.OpenApi;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Notifications;
@@ -25,11 +26,22 @@ public static class UmbracoBuilderExtensions
     /// <summary>
     /// Adds the Umbraco Search provider for Examine.
     /// </summary>
+    /// <remarks>
+    /// This method is idempotent - calling it multiple times has no effect after the first call.
+    /// </remarks>
     public static IUmbracoBuilder AddExamineSearchProvider(this IUmbracoBuilder builder)
     {
-        IConfigurationSection section = builder.Config.GetSection(ExamineSearchProviderSettings.SectionName);
-        builder.Services.Configure<ExamineSearchProviderSettings>(section);
+        // Idempotency check - safe to call multiple times.
+        if (builder.Services.Any(s => s.ServiceType == typeof(AddExamineSearchProviderMarker)))
+        {
+            return builder;
+        }
 
+        builder.Services.AddSingleton<AddExamineSearchProviderMarker>();
+
+        // The settings are registered as options via AddConfiguration(), but the zero-downtime branch below
+        // needs the value synchronously at composition time, so read the section directly.
+        IConfigurationSection section = builder.Config.GetSection(Umbraco.Cms.Core.Constants.Configuration.ConfigSearchExamine);
         ExamineSearchProviderSettings settings = section.Get<ExamineSearchProviderSettings>() ?? new ExamineSearchProviderSettings();
 
         if (settings.ZeroDowntimeIndexing)
@@ -133,4 +145,8 @@ public static class UmbracoBuilderExtensions
         builder.Services.AddExamineLuceneIndex<LuceneIndex, ConfigurationEnabledDirectoryFactory>(alias + ActiveIndexManager.SuffixA, _ => { });
         builder.Services.AddExamineLuceneIndex<LuceneIndex, ConfigurationEnabledDirectoryFactory>(alias + ActiveIndexManager.SuffixB, _ => { });
 }
+
+    private sealed class AddExamineSearchProviderMarker
+    {
+    }
 }

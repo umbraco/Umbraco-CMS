@@ -1,3 +1,4 @@
+using Umbraco.Cms.Tests.Integration.Testing;
 using System.Diagnostics;
 using System.Reflection;
 using Examine;
@@ -29,7 +30,7 @@ namespace Umbraco.Tests.Search.Examine.Integration.Tests.ContentTests.Persistenc
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class MediaServiceTests : UmbracoIntegrationTestWithPackageMigrations
+public class MediaServiceTests : UmbracoIntegrationTest
 {
     private bool _indexingComplete;
 

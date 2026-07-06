@@ -1,3 +1,4 @@
+using Umbraco.Cms.Tests.Integration.Testing;
 using System.Diagnostics;
 using System.Reflection;
 using Examine;
@@ -33,7 +34,7 @@ namespace Umbraco.Tests.Search.Examine.Integration.Tests.ContentTests.Persistenc
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class RebuildTests : UmbracoIntegrationTestWithPackageMigrations
+public class RebuildTests : UmbracoIntegrationTest
 {
     private bool _indexingComplete;
 
