@@ -163,7 +163,7 @@ public class DataValueReferenceFactoryCollectionTests
                     // Ignored (no culture)
                     new() { EditedValue = trackedUdi1 },
                     new() { Culture = "en-US", EditedValue = trackedUdi2 },
-                    new() { Culture = "en-US", Segment = "A", EditedValue = trackedUdi3, PublishedValue= trackedUdi5 },
+                    new() { Culture = "en-US", Segment = "A", EditedValue = trackedUdi3, PublishedValue = trackedUdi5 },
 
                     // Ignored (no culture)
                     new() { Segment = "A", EditedValue = trackedUdi4 },
@@ -182,7 +182,7 @@ public class DataValueReferenceFactoryCollectionTests
     }
 
     [Test]
-    public void GetAllReferences_All_Variants_For_UnPublished_State_With_IDataValueReference_Editor()
+    public void GetAllReferences_All_Variants_For_Unpublished_State_With_IDataValueReference_Editor()
     {
         var collection = new DataValueReferenceFactoryCollection(() => Enumerable.Empty<IDataValueReferenceFactory>(), new NullLogger<DataValueReferenceFactoryCollection>());
 
@@ -208,7 +208,7 @@ public class DataValueReferenceFactoryCollectionTests
                     // Ignored (no culture)
                     new() { EditedValue = trackedUdi1 },
                     new() { Culture = "en-US", EditedValue = trackedUdi2 },
-                    new() { Culture = "en-US", Segment = "A", EditedValue = trackedUdi3, PublishedValue= trackedUdi5 },
+                    new() { Culture = "en-US", Segment = "A", EditedValue = trackedUdi3, PublishedValue = trackedUdi5 },
 
                     // Ignored (no culture)
                     new() { Segment = "A", EditedValue = trackedUdi4 },
