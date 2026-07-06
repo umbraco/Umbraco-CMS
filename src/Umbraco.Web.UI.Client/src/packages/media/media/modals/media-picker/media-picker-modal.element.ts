@@ -518,6 +518,7 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 			<div id="toolbar">
 				<div id="search">
 					<uui-input
+						name="media-search"
 						label=${this.localize.term('general_search')}
 						placeholder=${this.localize.term('placeholders_search')}
 						@input=${this.#onSearch}
