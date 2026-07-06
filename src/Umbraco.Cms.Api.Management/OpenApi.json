@@ -37374,6 +37374,57 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/user/batch": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Gets multiple users.",
+        "description": "Gets multiple users identified by the provided Ids.",
+        "operationId": "GetUserBatch",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "uniqueItems": true,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/BatchResponseModelUserResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/user/configuration": {
       "get": {
         "tags": [
@@ -38579,7 +38630,7 @@
           "User"
         ],
         "summary": "Enables users.",
-        "description": "Enables the user accounts identified by the provided Ids. The response contains the server-computed state of each enabled user, which may not be Active (e.g. Inactive for a user that has never logged in).",
+        "description": "Enables the user accounts identified by the provided Ids.",
         "operationId": "PostUserEnable",
         "requestBody": {
           "content": {
@@ -38624,17 +38675,6 @@
                     "$ref": "#/components/schemas/NotificationHeaderModel"
                   },
                   "nullable": true
-                }
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/BatchResponseModelUserStateResponseModel"
-                    }
-                  ]
                 }
               }
             }
@@ -40564,7 +40604,7 @@
         },
         "additionalProperties": false
       },
-      "BatchResponseModelUserStateResponseModel": {
+      "BatchResponseModelUserResponseModel": {
         "required": [
           "items",
           "total"
@@ -40580,7 +40620,7 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/UserStateResponseModel"
+                  "$ref": "#/components/schemas/UserResponseModel"
                 }
               ]
             }
@@ -54138,22 +54178,6 @@
           "All"
         ],
         "type": "string"
-      },
-      "UserStateResponseModel": {
-        "required": [
-          "state",
-          "user"
-        ],
-        "type": "object",
-        "properties": {
-          "user": {
-            "$ref": "#/components/schemas/ReferenceByIdModel"
-          },
-          "state": {
-            "$ref": "#/components/schemas/UserStateModel"
-          }
-        },
-        "additionalProperties": false
       },
       "UserTwoFactorProviderModel": {
         "required": [

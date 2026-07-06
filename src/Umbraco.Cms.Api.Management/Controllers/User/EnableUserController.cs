@@ -2,9 +2,8 @@ using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Api.Management.ViewModels;
+using Umbraco.Cms.Api.Management.Security.Authorization.User;
 using Umbraco.Cms.Api.Management.ViewModels.User;
-using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Security.Authorization;
 using Umbraco.Cms.Core.Services;
@@ -46,22 +45,20 @@ public class EnableUserController : UserControllerBase
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <param name="model">The request model containing a collection of user Ids to enable.</param>
     /// <returns>
-    /// An <see cref="IActionResult"/> that returns <c>200 OK</c> with the server-computed state of each enabled user, or a <see cref="ProblemDetails"/> result with appropriate status code if the operation failed (e.g., <c>400 Bad Request</c> or <c>404 Not Found</c>).
+    /// An <see cref="IActionResult"/> that returns <c>200 OK</c> if the users were enabled successfully, or a <see cref="ProblemDetails"/> result with appropriate status code if the operation failed (e.g., <c>400 Bad Request</c> or <c>404 Not Found</c>).
     /// </returns>
     [HttpPost("enable")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(BatchResponseModel<UserStateResponseModel>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [EndpointSummary("Enables users.")]
-    [EndpointDescription("Enables the user accounts identified by the provided Ids. The response contains the server-computed state of each enabled user, which may not be Active (e.g. Inactive for a user that has never logged in).")]
+    [EndpointDescription("Enables the user accounts identified by the provided Ids.")]
     public async Task<IActionResult> EnableUsers(CancellationToken cancellationToken, EnableUserRequestModel model)
     {
-        Guid[] userIds = model.UserIds.Select(x => x.Id).ToArray();
-
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,
-            UserPermissionResource.WithKeys(userIds),
+            UserPermissionResource.WithKeys(model.UserIds.Select(x => x.Id)),
             AuthorizationPolicies.UserPermissionByResource);
 
         if (!authorizationResult.Succeeded)
@@ -69,26 +66,10 @@ public class EnableUserController : UserControllerBase
             return Forbidden();
         }
 
-        UserOperationStatus result = await _userService.EnableAsync(CurrentUserKey(_backOfficeSecurityAccessor), userIds.ToHashSet());
+        UserOperationStatus result = await _userService.EnableAsync(CurrentUserKey(_backOfficeSecurityAccessor), model.UserIds.Select(x => x.Id).ToHashSet());
 
-        if (result is not UserOperationStatus.Success)
-        {
-            return UserOperationStatusResult(result);
-        }
-
-        IEnumerable<IUser> enabledUsers = await _userService.GetAsync(userIds);
-        UserStateResponseModel[] items = enabledUsers
-            .Select(user => new UserStateResponseModel
-            {
-                User = new ReferenceByIdModel(user.Key),
-                State = user.UserState,
-            })
-            .ToArray();
-
-        return Ok(new BatchResponseModel<UserStateResponseModel>
-        {
-            Total = items.Length,
-            Items = items,
-        });
+        return result is UserOperationStatus.Success
+            ? Ok()
+            : UserOperationStatusResult(result);
     }
 }
