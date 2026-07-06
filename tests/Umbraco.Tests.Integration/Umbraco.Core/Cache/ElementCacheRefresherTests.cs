@@ -14,7 +14,6 @@ using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
-using Umbraco.Extensions;
 using IUmbracoBuilder = Umbraco.Cms.Core.DependencyInjection.IUmbracoBuilder;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Cache;
@@ -36,7 +35,6 @@ internal sealed class ElementCacheRefresherTests : UmbracoIntegrationTest
     {
         base.CustomTestSetup(builder);
 
-        builder.AddUmbracoHybridCache();
         builder.Services.AddUnique<IServerMessenger, ContentEventsTests.LocalServerMessenger>();
 
         // The binder that turns element tree changes into a distributed element cache refresh, plus a probe that
