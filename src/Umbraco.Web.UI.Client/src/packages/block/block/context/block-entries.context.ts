@@ -35,6 +35,10 @@ export abstract class UmbBlockEntriesContext<
 	readonly layoutEntries = this._layoutEntries.asObservable();
 	readonly layoutEntriesLength = this._layoutEntries.asObservablePart((x) => x.length);
 
+	#libraryAllowedElementTypeKeys = new UmbArrayState<string>([], (x) => x);
+	readonly libraryAllowedElementTypeKeys = this.#libraryAllowedElementTypeKeys.asObservable();
+	#libraryAllowedElementTypeKeysPromise: Promise<Array<string>>;
+
 	getLength() {
 		return this._layoutEntries.getValue().length;
 	}
@@ -55,6 +59,16 @@ export abstract class UmbBlockEntriesContext<
 			this._manager = blockGridManager;
 			this._gotBlockManager();
 		}).asPromise({ preventTimeout: true });
+
+		this.#libraryAllowedElementTypeKeysPromise = this.#loadLibraryAllowedElementTypeKeys();
+	}
+
+	async #loadLibraryAllowedElementTypeKeys(): Promise<Array<string>> {
+		const repo = new UmbElementTypeStructureRepository(this);
+		const { data: allowedTypes } = await repo.requestAllowedChildrenOf(null, null);
+		const keys = allowedTypes?.items.filter((t) => t.unique).map((t) => t.unique!) ?? [];
+		this.#libraryAllowedElementTypeKeys.setValue(keys);
+		return keys;
 	}
 
 	async getManager() {
@@ -96,12 +110,13 @@ export abstract class UmbBlockEntriesContext<
 	 * Returns the element type uniques allowed at the library root that overlap
 	 * with the given block types — used to filter the library picker in the
 	 * block catalogue modal.
+	 * @param {Array<BlockType>} blockTypes The block types to filter by.
+	 * @returns {Promise<Array<string>>} The allowed element type uniques.
 	 */
 	protected async _getLibraryAllowedElementTypeKeys(blockTypes: Array<BlockType>): Promise<Array<string>> {
+		const allowedKeys = await this.#libraryAllowedElementTypeKeysPromise;
 		const blockTypeKeys = new Set(blockTypes.map((bt) => bt.contentElementTypeKey));
-		const repo = new UmbElementTypeStructureRepository(this);
-		const { data: allowedTypes } = await repo.requestAllowedChildrenOf(null, null);
-		return allowedTypes?.items.filter((t) => t.unique && blockTypeKeys.has(t.unique)).map((t) => t.unique!) ?? [];
+		return allowedKeys.filter((key) => blockTypeKeys.has(key));
 	}
 
 	public abstract create(
