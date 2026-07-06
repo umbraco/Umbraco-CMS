@@ -2,6 +2,7 @@ import type { UmbInstallerContext } from '../installer.context.js';
 import { UMB_INSTALLER_CONTEXT } from '../installer.context.js';
 import type { CSSResultGroup } from '@umbraco-cms/backoffice/external/lit';
 import { css, html, customElement, state, unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
+import { sanitizeHTML } from '@umbraco-cms/backoffice/utils';
 
 import type {
 	ConsentLevelPresentationModel,
@@ -73,10 +74,13 @@ export class UmbInstallerConsentElement extends UmbLitElement {
 
 	private _renderSlider() {
 		if (!this._telemetryLevels || this._telemetryLevels.length < 1) return;
-
+		const sanitizedDescription = this._selectedTelemetry?.description
+			? sanitizeHTML(this._selectedTelemetry.description)
+			: '';
 		return html`
 			<uui-slider
 				${umbFocus()}
+				autocomplete="off"
 				@input=${this._handleChange}
 				name="telemetryLevel"
 				label="telemetry-level"
@@ -85,7 +89,7 @@ export class UmbInstallerConsentElement extends UmbLitElement {
 				min="1"
 				max=${this._telemetryLevels.length}></uui-slider>
 			<h2>${this._selectedTelemetry.level}</h2>
-			<p>${unsafeHTML(this._selectedTelemetry.description)}</p>
+			<p>${unsafeHTML(sanitizedDescription)}</p>
 		`;
 	}
 

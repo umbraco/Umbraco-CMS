@@ -23,6 +23,7 @@
     content: "Content",
     media: "Media",
     settings: "Settings",
+    library: "Library",
     packages: "Packages",
     members: "Members",
     dictionary: "Translation",
@@ -54,7 +55,7 @@
   public static readonly access = {
     denied: 'Access denied'
   }
-  
+
   public static readonly approvedColorSettings = {
     0: ['Include labels?', 'Displays colored field and a label for each color in the color picker, rather than just a colored field.'],
     1: ['Colors', 'Add, remove or sort colors (and labels).'],
@@ -65,8 +66,9 @@
   }
 
   public static readonly contentPickerSettings = {
-    0: ['Ignore user start nodes', 'Selecting this option allows a user to choose nodes that they normally dont have access to.'],
-    1: ['Start node', '']
+    0: ['Accepted types', 'Limit to specific types'],
+    1: ['Start node', ''],
+    2: ['Ignore user start nodes', 'Selecting this option allows a user to choose nodes that they normally dont have access to.']
   }
 
   public static readonly datePickerSettings = {
@@ -201,7 +203,7 @@
     1: ['Granular permissions', 'Assign permissions to Document property values'],
   }
 
-  public static readonly userGroupPermissionsSettings = {
+  public static readonly userGroupDocumentPermissionsSettings = {
     0: ['Read', 'Allow access to read a Document', 'Umb.Document.Read'],
     1: ['Create Document Blueprint', 'Allow access to create a Document Blueprint', 'Umb.Document.CreateBlueprint'],
     2: ['Delete', 'Allow access to delete a Document', 'Umb.Document.Delete'],
@@ -218,15 +220,27 @@
     13: ['Rollback', 'Allow access to roll back a Document to a previous state', 'Umb.Document.Rollback']
   }
 
+  public static readonly sectionAliases = {
+    content: 'Umb.Section.Content',
+    library: 'Umb.Section.Library',
+    media: 'Umb.Section.Media',
+    members: 'Umb.Section.Members',
+    packages: 'Umb.Section.Packages',
+    settings: 'Umb.Section.Settings',
+    translation: 'Umb.Section.Translation',
+    users: 'Umb.Section.Users',
+  }
+
   public static readonly userGroupSectionsSettings = {
     0: ['Content', 'Umb.Section.Content'],
     1: ['Forms', 'Umb.Section.Forms'],
-    2: ['Media', 'Umb.Section.Media'],
-    3: ['Members', 'Umb.Section.Members'],
-    4: ['Packages', 'Umb.Section.Packages'],
-    5: ['Settings', 'Umb.Section.Settings'],
-    6: ['Translation', 'Umb.Section.Translation'],
-    7: ['Users', 'Umb.Section.Users'],
+    2: ['Library', 'Umb.Section.Library'],
+    3: ['Media', 'Umb.Section.Media'],
+    4: ['Members', 'Umb.Section.Members'],
+    5: ['Packages', 'Umb.Section.Packages'],
+    6: ['Settings', 'Umb.Section.Settings'],
+    7: ['Translation', 'Umb.Section.Translation'],
+    8: ['Users', 'Umb.Section.Users'],
   }
 
   public static readonly trashDeleteDialogMessage = {
@@ -270,7 +284,8 @@
 
   public static readonly statusCodes = {
     ok: 200,
-    created: 201
+    created: 201,
+    forbidden: 403
   }
 
   public static readonly apiEndpoints = {
@@ -302,9 +317,21 @@
     webhook: '/umbraco/management/api/v1/webhook',
     recycleBinDocument: '/umbraco/management/api/v1/recycle-bin/document',
     recycleBinMedia: '/umbraco/management/api/v1/recycle-bin/media',
+    recycleBinElement: '/umbraco/management/api/v1/recycle-bin/element',
     domains: '/domains',
     notifications: '/notifications',
-    currentUser: '/umbraco/management/api/v1/user/current'
+    currentUser: '/umbraco/management/api/v1/user/current',
+    revoke: '/umbraco/management/api/v1/security/back-office/revoke',
+    documentSearch: '/umbraco/management/api/v1/item/document/search',
+    mediaSearch: '/umbraco/management/api/v1/item/media/search',
+    memberSearch: '/umbraco/management/api/v1/item/member/search',
+    elementSearch: '/umbraco/management/api/v1/item/element/search',
+    element: '/umbraco/management/api/v1/element',
+    elementFolder: '/umbraco/management/api/v1/element/folder',
+    treeElementRoot: '/umbraco/management/api/v1/tree/element/root',
+    treeElementChildren: '/umbraco/management/api/v1/tree/element/children',
+    currentUserProfile: '/umbraco/management/api/v1/user/current/profile',
+    currentUserAvatar: '/umbraco/management/api/v1/user/current/avatar'
   }
 
   public static readonly userGroupDescriptionValues = {
@@ -315,8 +342,79 @@
     'Writers': 'Users with permission to create and update but not publish content'
   }
 
+  public static readonly userGroupElementPermissionsSettings = {
+    0: ['Read', 'Allow access to read an element', 'Umb.Element.Read'],
+    1: ['Create', 'Allow access to create an element', 'Umb.Element.Create'],
+    2: ['Delete', 'Allow access to delete an element', 'Umb.Element.Delete'],
+    3: ['Publish', 'Allow access to publish an element', 'Umb.Element.Publish'],
+    4: ['Unpublish', 'Allow access to unpublish an element', 'Umb.Element.Unpublish'],
+    5: ['Update', 'Allow access to save an element', 'Umb.Element.Update'],
+    6: ['Duplicate', 'Allow access to duplicate an element', 'Umb.Element.Duplicate'],
+    7: ['Move', 'Allow access to move an element', 'Umb.Element.Move'],
+    8: ['Rollback', 'Allow access to rollback an element to a previous state', 'Umb.Element.Rollback']
+  }
+
+  public static readonly userGroupElementFolderPermissionsSettings = {
+    0: ['Read', 'Allow access to read an element folder', 'Umb.ElementContainer.Read'],
+    1: ['Create', 'Allow access to create an element folder', 'Umb.ElementContainer.Create'],
+    2: ['Delete', 'Allow access to delete an element folder', 'Umb.ElementContainer.Delete'],
+    3: ['Update', 'Allow access to save an element folder', 'Umb.ElementContainer.Update'],
+    4: ['Move', 'Allow access to move an element folder', 'Umb.ElementContainer.Move']
+  }
+
   public static readonly healthCheckMessages = {
     imagingHMACSecretKeyIsNotConfigured: 'No HMAC secret key is configured for image URL signing. It is recommended to set Umbraco:CMS:Imaging:HMACSecretKey to prevent unauthorized image manipulation requests.',
     imagingHMACSecretKeyIsConfigured: 'The HMAC secret key for image URL signing is configured'
+  }
+
+  public static readonly loginErrorMessages = {
+    lockedAccount: 'Your account has been locked out. Please try again later.',
+    invalidCredentials: "Oops! We couldn't log you in. Please check your credentials and try again.",
+    emptyEmail: 'Please fill in an email',
+    emptyPassword: 'Please fill in a password'
+  }
+
+  public static readonly forgottenPasswordMessages = {
+    confirmation: 'We sent an email with password reset instructions, if the email address matches a registered user.',
+    notFoundUserError: 'The specified user was not found.'
+  }
+
+  public static readonly auditTrailMessages = {
+    contentSaved: 'Content saved',
+    contentSavedAndPublished: 'Content saved and Published',
+    contentUnpublished: 'Content unpublished',
+    contentMoved: 'Content moved',
+    contentCopied: 'Content copied',
+    contentDeleted: 'Content deleted',
+    contentRolledBack: 'Content rolled back',
+    contentSorted: 'Sort child items performed by user',
+    elementSaved: 'Element saved',
+    elementSavedAndPublished: 'Element saved and published',
+    elementUnpublished: 'Element unpublished',
+    elementMoved: 'Element moved',
+    elementCopied: 'Element copied',
+    elementDeleted: 'Element deleted',
+    elementRolledBack: 'Element rolled back'
+  }
+
+  public static readonly auditTrailTypes = {
+    save: 'Save',
+    delete: 'Delete',
+    move: 'Move',
+    sort: 'Sort',
+    publish: 'Publish',
+    rollback: 'Rollback',
+    copy: 'Copy',
+    unpublish: 'Unpublish'
+  }
+
+  public static readonly documentUrlInfoMessages = {
+    cannotBeRouted: 'This document is published but its URL cannot be routed'
+  }
+
+  public static readonly elementTypeChangeMessages = {
+    elementHasContent: 'Cannot change to document type because content has already been created with this element type.',
+    documentHasContent: 'Cannot change to element type because content has already been created with this document type.',
+    elementUsedInBlockEditor: 'Cannot change to document type because this element type is used in the configuration of a data type.',
   }
 }

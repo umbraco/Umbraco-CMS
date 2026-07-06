@@ -41,6 +41,7 @@ public static partial class Constants
         /// <summary>
         ///     The token used to replace the cache buster hash in web assets.
         /// </summary>
+        [Obsolete("This has been replaced by automatic cachebuster appending to assets. Scheduled for removal in Umbraco 20.")]
         public const string CacheBusterToken = "%CACHE_BUSTER%";
 
         /// <summary>

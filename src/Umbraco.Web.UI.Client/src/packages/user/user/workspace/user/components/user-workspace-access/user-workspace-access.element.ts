@@ -28,33 +28,51 @@ export class UmbUserWorkspaceAccessElement extends UmbLitElement {
 	}
 
 	override render() {
-		return html` <uui-box headline=${this.localize.term('user_access')}>
-			<div slot="header" class="faded-text">
-				<umb-localize key="user_accessHelp"
-					>Based on the assigned groups and start nodes, the user has access to the following nodes</umb-localize
-				>
-			</div>
-
-			${this.#renderDocumentStartNodes()}
-			<hr />
-			${this.#renderMediaStartNodes()}
-		</uui-box>`;
+		return html`
+			<uui-box headline=${this.localize.term('user_access')}>
+				<div slot="header" class="faded-text">
+					<umb-localize key="user_accessHelp"
+						>Based on the assigned groups and start nodes, the user has access to the following nodes</umb-localize
+					>
+				</div>
+				<div>
+					${this.#renderDocumentStartNodes()} ${this.#renderMediaStartNodes()} ${this.#renderElementStartNodes()}
+				</div>
+			</uui-box>
+		`;
 	}
 
 	#renderDocumentStartNodes() {
-		return html` <b><umb-localize key="sections_content">Content</umb-localize></b>
-			<umb-user-document-start-node
-				readonly
-				.uniques=${this._calculatedStartNodes?.documentStartNodeUniques.map((reference) => reference.unique) ||
-				[]}></umb-user-document-start-node>`;
+		const uniques = this._calculatedStartNodes?.documentStartNodeUniques.map((reference) => reference.unique) || [];
+		return html`
+			<umb-property-layout label=${this.localize.term('sections_content')} orientation="vertical">
+				<div slot="editor">
+					<umb-user-document-start-node readonly .uniques=${uniques}></umb-user-document-start-node>
+				</div>
+			</umb-property-layout>
+		`;
+	}
+
+	#renderElementStartNodes() {
+		const uniques = this._calculatedStartNodes?.elementStartNodeUniques.map((reference) => reference.unique) || [];
+		return html`
+			<umb-property-layout label=${this.localize.term('general_elements')} orientation="vertical">
+				<div slot="editor">
+					<umb-user-element-start-node readonly .uniques=${uniques}></umb-user-element-start-node>
+				</div>
+			</umb-property-layout>
+		`;
 	}
 
 	#renderMediaStartNodes() {
-		return html` <b><umb-localize key="sections_media">Media</umb-localize></b>
-			<umb-user-media-start-node
-				readonly
-				.uniques=${this._calculatedStartNodes?.mediaStartNodeUniques.map((reference) => reference.unique) ||
-				[]}></umb-user-media-start-node>`;
+		const uniques = this._calculatedStartNodes?.mediaStartNodeUniques.map((reference) => reference.unique) || [];
+		return html`
+			<umb-property-layout label=${this.localize.term('sections_media')} orientation="vertical">
+				<div slot="editor">
+					<umb-user-media-start-node readonly .uniques=${uniques}></umb-user-media-start-node>
+				</div>
+			</umb-property-layout>
+		`;
 	}
 
 	static override styles = [

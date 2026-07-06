@@ -2,14 +2,14 @@ import { css, customElement, html, nothing, property, query, when } from '@umbra
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { UmbChangeEvent, UmbInputEvent, UmbDeleteEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { UUIFormControlWithBasicsMixin } from '@umbraco-cms/backoffice/external/uui';
 import type { UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
 /**
  * @element umb-input-multiple-text-string-item
  */
 @customElement('umb-input-multiple-text-string-item')
-export class UmbInputMultipleTextStringItemElement extends UUIFormControlMixin(UmbLitElement, '') {
+export class UmbInputMultipleTextStringItemElement extends UUIFormControlWithBasicsMixin(UmbLitElement, '') {
 	/**
 	 * Disables the input
 	 * @type {boolean}
@@ -107,7 +107,6 @@ export class UmbInputMultipleTextStringItemElement extends UUIFormControlMixin(U
 					<uui-button
 						compact
 						label="${this.localize.term('general_remove')} ${this.value}"
-						look="outline"
 						?disabled=${this.disabled}
 						@click=${this.#onDelete}>
 						<uui-icon name="icon-trash"></uui-icon>
@@ -128,6 +127,7 @@ export class UmbInputMultipleTextStringItemElement extends UUIFormControlMixin(U
 
 			#validation-message {
 				flex: 1;
+				margin-bottom: calc(var(--uui-size-1) * -1);
 			}
 
 			#input {
@@ -136,10 +136,27 @@ export class UmbInputMultipleTextStringItemElement extends UUIFormControlMixin(U
 
 			.handle {
 				cursor: grab;
+				opacity: 0.6;
+				transition: opacity 120ms;
 			}
 
 			.handle:active {
 				cursor: grabbing;
+			}
+
+			uui-button {
+				opacity: 0;
+				transition: opacity 120ms;
+			}
+
+			:host(:hover),
+			:host(:focus-within) {
+				uui-button {
+					opacity: 1;
+				}
+				.handle {
+					opacity: 1;
+				}
 			}
 		`,
 	];

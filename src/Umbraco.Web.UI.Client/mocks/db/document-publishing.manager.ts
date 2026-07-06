@@ -1,12 +1,16 @@
 import type { UmbMockDocumentModel } from '../data/mock-data-set.types.js';
 import type { UmbDocumentMockDB } from './document.db.js';
 import type {
+	CreateAndPublishDocumentRequestModel,
 	PublishDocumentRequestModel,
 	PublishDocumentWithDescendantsRequestModel,
 	UnpublishDocumentRequestModel,
+	UpdateAndPublishDocumentRequestModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { DocumentVariantResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+
+type UmbDocumentVariantState = DocumentVariantResponseModel['state'];
 
 export class UmbMockDocumentPublishingManager {
 	#documentDb: UmbDocumentMockDB;
@@ -43,9 +47,37 @@ export class UmbMockDocumentPublishingManager {
 
 			const variant = document.variants.find((x) => x.culture === culture.culture);
 			if (variant) {
-				variant.state = DocumentVariantStateModel.PUBLISHED;
+				variant.state = 'Published' as UmbDocumentVariantState;
 				variant.scheduledPublishDate = publishTime;
 				variant.scheduledUnpublishDate = unpublishTime;
+				variant.updateDate = new Date().toISOString();
+			}
+		});
+
+		this.#documentDb.detail.update(id, document);
+	}
+
+	createAndPublish(data: CreateAndPublishDocumentRequestModel) {
+		const id = this.#documentDb.detail.create(data);
+		this.#publishCultures(id, data.culturesToPublish);
+		return id;
+	}
+
+	updateAndPublish(id: string, data: UpdateAndPublishDocumentRequestModel) {
+		this.#documentDb.detail.update(id, data);
+		this.#publishCultures(id, data.culturesToPublish);
+	}
+
+	#publishCultures(id: string, culturesToPublish: Array<string>) {
+		const document: UmbMockDocumentModel = this.#documentDb.detail.read(id);
+
+		// Invariant content types publish with an empty cultures array; publish the invariant variant in that case.
+		const cultures: Array<string | null> = culturesToPublish.length > 0 ? culturesToPublish : [null];
+
+		cultures.forEach((culture) => {
+			const variant = document.variants.find((x) => x.culture === culture);
+			if (variant) {
+				variant.state = 'Published' as UmbDocumentVariantState;
 				variant.updateDate = new Date().toISOString();
 			}
 		});
@@ -62,11 +94,8 @@ export class UmbMockDocumentPublishingManager {
 			for (const culture of data.cultures) {
 				for (const d of documents) {
 					const variant = document.variants.find((x) => x.culture === culture);
-					if (
-						variant &&
-						(data.includeUnpublishedDescendants || variant.state !== DocumentVariantStateModel.PUBLISHED)
-					) {
-						variant.state = DocumentVariantStateModel.PUBLISHED;
+					if (variant && (data.includeUnpublishedDescendants || variant.state !== 'Published')) {
+						variant.state = 'Published' as UmbDocumentVariantState;
 						variant.updateDate = new Date().toISOString();
 					}
 					this.#documentDb.detail.update(d.id, d);
@@ -123,7 +152,7 @@ export class UmbMockDocumentPublishingManager {
 				const variant = document.variants.find((x) => x.culture === culture);
 
 				if (variant) {
-					variant.state = DocumentVariantStateModel.DRAFT;
+					variant.state = 'Draft' as UmbDocumentVariantState;
 					variant.scheduledPublishDate = null;
 					variant.scheduledUnpublishDate = null;
 					variant.updateDate = new Date().toISOString();
@@ -131,7 +160,7 @@ export class UmbMockDocumentPublishingManager {
 			});
 		} else {
 			document.variants.forEach((variant) => {
-				variant.state = DocumentVariantStateModel.DRAFT;
+				variant.state = 'Draft' as UmbDocumentVariantState;
 				variant.scheduledPublishDate = null;
 				variant.scheduledUnpublishDate = null;
 				variant.updateDate = new Date().toISOString();

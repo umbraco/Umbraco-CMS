@@ -15,8 +15,9 @@ SQLite-specific EF Core provider for Umbraco CMS. Contains SQLite migrations and
 This is a thin provider project that implements SQLite-specific functionality for the EF Core persistence layer:
 
 1. **Migration Provider** - Executes SQLite-specific migrations
-2. **Migration Provider Setup** - Configures DbContext to use SQLite
+2. **Migration Provider Setup** - Configures DbContext to use SQLite (incl. transient-error retry)
 3. **Migrations** - SQLite-specific migration files for OpenIddict tables
+4. **Retrying Execution Strategy** - Retries transient SQLite lock errors on EF Core operations
 
 ### Folder Structure
 
@@ -30,7 +31,8 @@ Umbraco.Cms.Persistence.EFCore.Sqlite/
 │   └── UmbracoDbContextModelSnapshot.cs         # Current model state
 ├── EFCoreSqliteComposer.cs                       # DI registration
 ├── SqliteMigrationProvider.cs                    # IMigrationProvider impl
-└── SqliteMigrationProviderSetup.cs               # IMigrationProviderSetup impl
+├── SqliteMigrationProviderSetup.cs               # IMigrationProviderSetup impl
+└── SqliteRetryingExecutionStrategy.cs            # IExecutionStrategy for transient lock errors
 ```
 
 ### Relationship with Parent Project
@@ -65,7 +67,19 @@ Registers `IMigrationProvider` and `IMigrationProviderSetup` for SQLite.
 
 ### SqliteMigrationProviderSetup (line 11-14)
 
-Configures `DbContextOptionsBuilder` with `UseSqlite` and migrations assembly.
+Configures `DbContextOptionsBuilder` with `UseSqlite`, the migrations assembly, and the
+`SqliteRetryingExecutionStrategy` (see below). Invoked from
+`UmbracoDbContext.ConfigureOptions` for every `UmbracoDbContext` instance, so all EF Core
+access to the Umbraco database (including OpenIddict's token store) inherits the retry.
+
+### SqliteRetryingExecutionStrategy
+
+Custom `Microsoft.EntityFrameworkCore.Storage.ExecutionStrategy` that retries on transient
+SQLite errors (`SQLITE_BUSY`, `SQLITE_LOCKED`) using `SqliteExceptionExtensions.IsBusyOrLocked`
+from the parent project. Defaults inherit `ExecutionStrategy.DefaultMaxRetryCount` (6) and
+`ExecutionStrategy.DefaultMaxDelay` (30s), giving a ~56-second retry budget — see the class's
+XML doc for the rationale and the unattended-upgrade escape hatch for very long migrations.
+Added to resolve issue #22939 (OpenIddict token reads failing during long migrations).
 
 ---
 
@@ -122,7 +136,8 @@ All tables prefixed with `umbraco`:
 | File | Purpose |
 |------|---------|
 | `SqliteMigrationProvider.cs` | Migration execution |
-| `SqliteMigrationProviderSetup.cs` | DbContext configuration |
+| `SqliteMigrationProviderSetup.cs` | DbContext configuration (UseSqlite + retry strategy) |
+| `SqliteRetryingExecutionStrategy.cs` | Retry on transient SQLite BUSY/LOCKED errors |
 | `EFCoreSqliteComposer.cs` | DI registration |
 | `Migrations/*.cs` | Migration files |
 

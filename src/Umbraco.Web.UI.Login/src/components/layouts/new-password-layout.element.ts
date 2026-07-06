@@ -1,5 +1,5 @@
 import type { UUIButtonState, UUIInputPasswordElement } from '@umbraco-cms/backoffice/external/uui';
-import { type CSSResultGroup, css, html, nothing, customElement, property, query, state } from '@umbraco-cms/backoffice/external/lit';
+import { type CSSResultGroup, css, html, nothing, customElement, property, query, state, type PropertyValues } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from "@umbraco-cms/backoffice/lit-element";
 
 import { UMB_AUTH_CONTEXT } from '../../contexts';
@@ -54,6 +54,32 @@ export default class UmbNewPasswordLayoutElement extends UmbLitElement {
     });
   }
 
+  protected override firstUpdated(_changedProperties: PropertyValues): void {
+    super.firstUpdated(_changedProperties);
+    if (!this.passwordElement || !this.confirmPasswordElement) return;
+    this.passwordElement.addEventListener('invalid', this.#handlePasswordInvalid);
+    this.confirmPasswordElement.addEventListener('invalid', this.#handlePasswordInvalid);
+  }
+
+  override disconnectedCallback(): void {
+    this.passwordElement?.removeEventListener('invalid', this.#handlePasswordInvalid);
+    this.confirmPasswordElement?.removeEventListener('invalid', this.#handlePasswordInvalid);
+    super.disconnectedCallback();
+  }
+
+  #handlePasswordInput = (event: Event): void => {
+    const input = event.target as UUIInputPasswordElement;
+    input.setCustomValidity('');
+  };
+
+  #handlePasswordInvalid = (event: Event): void => {
+    const input = event.currentTarget as UUIInputPasswordElement;
+    if (input.validity?.patternMismatch) {
+      const passwordValidityText = this.localize.term('login_invalidPasswordMessage') ?? 'The password is not strong enough.';
+      input.setCustomValidity(passwordValidityText);
+    }
+  };
+
   #onSubmit(event: Event) {
     event.preventDefault();
     if (!this._passwordConfiguration) return;
@@ -106,7 +132,7 @@ export default class UmbNewPasswordLayoutElement extends UmbLitElement {
 
     if (passwordIsInvalid) {
       const passwordValidityText = this.localize.term(
-        'auth_errorInPasswordFormat',
+        'login_errorInPasswordFormat',
         this._passwordConfiguration.minimumPasswordLength,
         this._passwordConfiguration.requireNonLetterOrDigit ? 1 : 0
       ) ?? 'The password does not meet the minimum requirements!';
@@ -116,7 +142,7 @@ export default class UmbNewPasswordLayoutElement extends UmbLitElement {
 
     if (password !== passwordConfirm) {
       const passwordValidityText = this.localize.term(
-        'auth_passwordMismatch'
+        'login_passwordMismatch'
       ) ?? "The confirmed password doesn't match the new password!";
       this.confirmPasswordElement.setCustomValidity(passwordValidityText);
       return;
@@ -130,7 +156,7 @@ export default class UmbNewPasswordLayoutElement extends UmbLitElement {
       return html`
         <h1>Hi!</h1>
         <span>
-          <umb-localize key="auth_userInviteWelcomeMessage">
+          <umb-localize key="login_userInviteWelcomeMessage">
             Welcome to Umbraco! Just need to get your password setup and then you're good to go
           </umb-localize>
         </span>
@@ -138,10 +164,10 @@ export default class UmbNewPasswordLayoutElement extends UmbLitElement {
     } else {
       return html`
         <h1>
-          <umb-localize key="auth_newPassword">New password</umb-localize>
+          <umb-localize key="login_newPassword">New password</umb-localize>
         </h1>
         <span>
-            <umb-localize key="auth_setPasswordInstruction">Please provide a new password.</umb-localize>
+            <umb-localize key="login_setPasswordInstruction">Please provide a new password.</umb-localize>
         </span>
       `;
     }
@@ -154,7 +180,7 @@ export default class UmbNewPasswordLayoutElement extends UmbLitElement {
           <header id="header">${this.renderHeader()}</header>
           <uui-form-layout-item>
             <uui-label id="passwordLabel" for="password" slot="label" required>
-              <umb-localize key="auth_newPassword">New password</umb-localize>
+              <umb-localize key="login_newPassword">New password</umb-localize>
             </uui-label>
             <uui-input-password
               type="password"
@@ -162,17 +188,18 @@ export default class UmbNewPasswordLayoutElement extends UmbLitElement {
               name="password"
               autocomplete="new-password"
               pattern="${this._passwordPattern}"
+              @input=${this.#handlePasswordInput}
               .minlength=${this._passwordConfiguration?.minimumPasswordLength}
-              .minlengthMessage=${this.localize.term('auth_passwordMinLength', this._passwordConfiguration?.minimumPasswordLength ?? 10)}
-              .label=${this.localize.term('auth_newPassword')}
+              .minlengthMessage=${this.localize.term('login_passwordMinLength', this._passwordConfiguration?.minimumPasswordLength ?? 10)}
+              .label=${this.localize.term('login_newPassword')}
               required
-              required-message=${this.localize.term('auth_passwordIsBlank')}>
+              required-message=${this.localize.term('login_passwordIsBlank')}>
             </uui-input-password>
           </uui-form-layout-item>
 
           <uui-form-layout-item>
             <uui-label id="confirmPasswordLabel" for="confirmPassword" slot="label" required>
-              <umb-localize key="auth_confirmNewPassword">Confirm new password</umb-localize>
+              <umb-localize key="login_confirmNewPassword">Confirm new password</umb-localize>
             </uui-label>
             <uui-input-password
               type="password"
@@ -180,18 +207,19 @@ export default class UmbNewPasswordLayoutElement extends UmbLitElement {
               name="confirmPassword"
               autocomplete="new-password"
               pattern="${this._passwordPattern}"
+              @input=${this.#handlePasswordInput}
               .minlength=${this._passwordConfiguration?.minimumPasswordLength}
-              .minlengthMessage=${this.localize.term('auth_passwordMinLength', this._passwordConfiguration?.minimumPasswordLength ?? 10)}
-              .label=${this.localize.term('auth_confirmNewPassword')}
+              .minlengthMessage=${this.localize.term('login_passwordMinLength', this._passwordConfiguration?.minimumPasswordLength ?? 10)}
+              .label=${this.localize.term('login_confirmNewPassword')}
               required
-              required-message=${this.localize.term('auth_required')}></uui-input-password>
+              required-message=${this.localize.term('login_required')}></uui-input-password>
           </uui-form-layout-item>
 
           ${this.#renderErrorMessage()}
 
           <uui-button
             type="submit"
-            label=${this.localize.term('auth_continue')}
+            label=${this.localize.term('login_continue')}
             look="primary"
             color="default"
             .state=${this.state}></uui-button>

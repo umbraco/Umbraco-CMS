@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.TestHost;
@@ -30,6 +31,7 @@ using Umbraco.Cms.Tests.Integration.DependencyInjection;
 using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Cms.Web.Common.Controllers;
 using Umbraco.Cms.Web.Website.Controllers;
+using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Tests.Integration.TestServerTest
 {
@@ -76,6 +78,8 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
         [SetUp]
         public virtual void Setup()
         {
+            InMemoryConfiguration[Constants.Configuration.ConfigModelsMode] = "Nothing";
+
             // Don't cache factory if using NewSchemaPerTest
             if (TestOptions.Database == UmbracoTestOptions.Database.NewSchemaPerTest ||
                 TestOptions.Database == UmbracoTestOptions.Database.NewEmptyPerTest)
@@ -157,18 +161,6 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
             _factoryCache.Clear();
         }
 
-        /// <summary>
-        /// Prepare a url before using <see cref="Client"/>.
-        /// This returns the url but also sets the HttpContext.request into to use this url.
-        /// </summary>
-        /// <returns>The string URL of the controller action.</returns>
-        protected string PrepareApiControllerUrl<T>(Expression<Func<T, object>> methodSelector)
-            where T : UmbracoApiController
-        {
-            var url = LinkGenerator.GetUmbracoApiService(methodSelector);
-            return PrepareUrl(url);
-        }
-
         protected string GetManagementApiUrl<T>(Expression<Func<T, object>> methodSelector)
             where T : ManagementApiControllerBase
         {
@@ -179,6 +171,17 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
             // So we do not want to add this to the query string
             methodParams.Remove(methodParams.FirstOrDefault(x => x.Value is CancellationToken).Key);
             methodParams["version"] = method?.GetCustomAttribute<MapToApiVersionAttribute>()?.Versions[0].MajorVersion.ToString();
+
+            // Rename keys if [FromQuery(Name = "...")] specifies a different name
+            var parameters = method?.GetParameters() ?? [];
+            foreach (var (paramName, queryName) in parameters
+                .Select(p => (ParamName: p.Name, QueryName: p.GetCustomAttribute<FromQueryAttribute>()?.Name))
+                .Where(x => x is { ParamName: not null, QueryName: not null } && methodParams.ContainsKey(x.ParamName)))
+            {
+                methodParams[queryName!] = methodParams[paramName!];
+                methodParams.Remove(paramName!);
+            }
+
             return LinkGenerator.GetUmbracoControllerUrl(method.Name, ControllerExtensions.GetControllerName<T>(), null, methodParams);
         }
 

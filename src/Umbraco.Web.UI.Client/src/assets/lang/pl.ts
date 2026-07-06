@@ -460,6 +460,7 @@ export default {
 		constrainProportions: 'Zachowaj proporcje',
 		continue: 'Kontynuuj',
 		copy: 'Kopiuj',
+		copied: 'Skopiowano!',
 		create: 'Utwórz',
 		database: 'Baza danych',
 		date: 'Data',
@@ -690,8 +691,6 @@ export default {
 		instruction: 'Zaloguj się poniżej',
 		signInWith: 'Zaloguj się z',
 		timeout: 'Sesja wygasła',
-		bottomText:
-			'<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">umbraco.com</a></p> ',
 		forgottenPassword: 'Zapomniałeś hasła?',
 		forgottenPasswordInstruction: 'E-mail z linkiem do zresetowania hasła zostanie wysłany na podany adres',
 		requestPasswordResetConfirmation:
@@ -700,9 +699,6 @@ export default {
 		setPasswordInstruction: 'Proszę wpisać nowe hasło',
 		setPasswordConfirmation: 'Twoje hasło zostało zmienione',
 		resetCodeExpired: 'Link, na który kliknąłeś jest niewłaściwy lub wygasł',
-		resetPasswordEmailCopySubject: 'Umbraco: Resetowanie hasła',
-		resetPasswordEmailCopyFormat:
-			'<p>Twoja nazwa użytkownika do zalogowania się w Umbraco backoffice to: <strong>%0%</strong></p><p>Kliknij <a href="%1%"><strong>tutaj</strong></a>, aby zresetować Twoje hasło lub kopiuj/wklej ten URL w przeglądarce:</p><p><em>%1%</em></p>',
 	},
 	main: {
 		dashboard: 'Panel zarządzania',
@@ -850,20 +846,13 @@ export default {
 		editscript: 'Edytuj skrypt',
 	},
 	sections: {
-		concierge: 'Concierge',
 		content: 'Treść',
-		courier: 'Kurier',
-		developer: 'Deweloper',
-		installer: 'Konfigurator Umbraco',
+		library: 'Biblioteka',
 		media: 'Media',
 		member: 'Członkowie',
-		newsletters: 'Biuletyny',
 		settings: 'Ustawienia',
-		statistics: 'Statystyki',
 		translation: 'Tłumaczenie',
 		users: 'Użytkownicy',
-		help: 'Pomoc',
-		forms: 'Formularze',
 	},
 	settings: {
 		defaulttemplate: 'Domyślny szablon',
@@ -1073,8 +1062,16 @@ export default {
 		chooseChildNode: 'Wybierz węzeł dziecka',
 		compositionsDescription:
 			'Odziedzicz zakładki i właściwości z istniejącego typu dokumentu. Nowe zakładki będą dodane do bieżącego typu dokumentu lub złączone jeśli zakładka z identyczną nazwą już istnieje.',
+		compositionsDescriptionMediaType:
+			'Odziedzicz zakładki i właściwości z istniejącego typu mediów. Nowe zakładki będą dodane do bieżącego typu mediów lub złączone jeśli zakładka z identyczną nazwą już istnieje.',
+		compositionsDescriptionMemberType:
+			'Odziedzicz zakładki i właściwości z istniejącego typu członka. Nowe zakładki będą dodane do bieżącego typu członka lub złączone jeśli zakładka z identyczną nazwą już istnieje.',
 		compositionInUse: 'Ten typ zawartości jest używany w kompozycji, przez co sam nie może być złożony.',
+		compositionInUseMediaType: 'Ten typ mediów jest używany w kompozycji, przez co sam nie może być złożony.',
+		compositionInUseMemberType: 'Ten typ członka jest używany w kompozycji, przez co sam nie może być złożony.',
 		noAvailableCompositions: 'Brak możliwych typów zawartości do użycia jako kompozycja.',
+		noAvailableCompositionsMediaType: 'Brak możliwych typów mediów do użycia jako kompozycja.',
+		noAvailableCompositionsMemberType: 'Brak możliwych typów członka do użycia jako kompozycja.',
 		availableEditors: 'Dostępni edytorzy',
 		reuse: 'Użyj ponownie',
 		editorSettings: 'Ustawienia edytora',
@@ -1281,6 +1278,8 @@ export default {
 	redirectUrls: {
 		disableUrlTracker: 'Wyłącz śledzenie URL',
 		enableUrlTracker: 'Włącz śledzenie URL',
+		urlTrackerEnabled: 'Włączone',
+		urlTrackerDisabled: 'Wyłączone',
 		originalUrl: 'Oryginalny URL',
 		redirectedTo: 'Przekierowane do',
 		noRedirects: 'Nie stworzono żadnych przekierowań',

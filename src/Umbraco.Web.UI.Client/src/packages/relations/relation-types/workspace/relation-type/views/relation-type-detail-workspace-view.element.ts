@@ -51,8 +51,16 @@ export class UmbRelationTypeDetailWorkspaceViewElement extends UmbLitElement imp
 
 		this.consumeContext(UMB_RELATION_TYPE_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
-			this.#requestRelations();
 			this.#observeDetails();
+			this.observe(
+				instance?.unique,
+				(unique) => {
+					if (unique) {
+						this.#requestRelations();
+					}
+				},
+				'_observeUnique',
+			);
 		});
 	}
 
@@ -72,6 +80,7 @@ export class UmbRelationTypeDetailWorkspaceViewElement extends UmbLitElement imp
 				this._isBidirectional = isBidirectional;
 				this._isDependency = isDependency;
 			},
+			'_observeDetails',
 		);
 	}
 
@@ -224,7 +233,6 @@ export class UmbRelationTypeDetailWorkspaceViewElement extends UmbLitElement imp
 
 			uui-pagination {
 				margin-top: var(--uui-size-layout-1);
-				display: block;
 			}
 		`,
 	];

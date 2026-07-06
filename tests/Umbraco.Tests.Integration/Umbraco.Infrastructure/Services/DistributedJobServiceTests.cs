@@ -17,20 +17,27 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 internal sealed class DistributedJobServiceTests : UmbracoIntegrationTest
 {
     private const string TestJobName = "TestDistributedJob";
-    private static readonly TimeSpan TestJobPeriod = TimeSpan.FromMinutes(5);
-    private static readonly TimeSpan TestMaxExecutionTime = TimeSpan.FromMinutes(10);
+    private const string AlignedTestJobName = "AlignedTestDistributedJob";
+
+    private static readonly TimeSpan _testJobPeriod = TimeSpan.FromMinutes(5);
+
+    // A long, clock-divisible period (boundaries on the hour) keeps the aligned tests robust against running
+    // near a boundary — the chance of crossing a top-of-hour mid-test is negligible.
+    private static readonly TimeSpan _alignedTestJobPeriod = TimeSpan.FromHours(1);
+    private static readonly TimeSpan _testMaxExecutionTime = TimeSpan.FromMinutes(10);
 
     private IDistributedJobService DistributedJobService => GetRequiredService<IDistributedJobService>();
 
     protected override void CustomTestSetup(IUmbracoBuilder builder)
     {
-        // Register a test job
+        // Register a test job and a clock-aligned test job
         builder.Services.AddSingleton<IDistributedBackgroundJob, TestDistributedJob>();
+        builder.Services.AddSingleton<IDistributedBackgroundJob, AlignedTestDistributedJob>();
 
         // Configure settings with a known MaximumExecutionTime for testing
         builder.Services.PostConfigure<DistributedJobSettings>(options =>
         {
-            options.MaximumExecutionTime = TestMaxExecutionTime;
+            options.MaximumExecutionTime = _testMaxExecutionTime;
         });
     }
 
@@ -41,7 +48,7 @@ internal sealed class DistributedJobServiceTests : UmbracoIntegrationTest
         await DistributedJobService.EnsureJobsAsync();
 
         // Set the job's LastRun to be older than the period
-        SetJobState(TestJobName, lastRun: DateTime.UtcNow - TestJobPeriod - TimeSpan.FromMinutes(1), isRunning: false);
+        SetJobState(TestJobName, lastRun: DateTime.UtcNow - _testJobPeriod - TimeSpan.FromMinutes(1), isRunning: false);
 
         // Act
         var job = await DistributedJobService.TryTakeRunnableAsync();
@@ -80,7 +87,7 @@ internal sealed class DistributedJobServiceTests : UmbracoIntegrationTest
         // Set the job as running with a recent LastAttemptedRun (not timed out)
         SetJobState(
             TestJobName,
-            lastRun: DateTime.UtcNow - TestJobPeriod - TimeSpan.FromMinutes(1),
+            lastRun: DateTime.UtcNow - _testJobPeriod - TimeSpan.FromMinutes(1),
             isRunning: true,
             lastAttemptedRun: DateTime.UtcNow);
 
@@ -98,7 +105,7 @@ internal sealed class DistributedJobServiceTests : UmbracoIntegrationTest
         await DistributedJobService.EnsureJobsAsync();
 
         // Set the job as running but with LastAttemptedRun older than Period + MaxExecutionTime (timed out)
-        var timedOutTime = DateTime.UtcNow - TestJobPeriod - TestMaxExecutionTime - TimeSpan.FromMinutes(1);
+        var timedOutTime = DateTime.UtcNow - _testJobPeriod - _testMaxExecutionTime - TimeSpan.FromMinutes(1);
         SetJobState(
             TestJobName,
             lastRun: timedOutTime - TimeSpan.FromMinutes(1),
@@ -118,7 +125,7 @@ internal sealed class DistributedJobServiceTests : UmbracoIntegrationTest
     {
         // Arrange - Ensure jobs are registered and take a job
         await DistributedJobService.EnsureJobsAsync();
-        SetJobState(TestJobName, lastRun: DateTime.UtcNow - TestJobPeriod - TimeSpan.FromMinutes(1), isRunning: false);
+        SetJobState(TestJobName, lastRun: DateTime.UtcNow - _testJobPeriod - TimeSpan.FromMinutes(1), isRunning: false);
 
         var job = await DistributedJobService.TryTakeRunnableAsync();
         Assert.IsNotNull(job);
@@ -144,7 +151,7 @@ internal sealed class DistributedJobServiceTests : UmbracoIntegrationTest
         // Assert
         var jobState = GetJobState(TestJobName);
         Assert.IsNotNull(jobState);
-        Assert.AreEqual(TestJobPeriod.Ticks, jobState.Period);
+        Assert.AreEqual(_testJobPeriod.Ticks, jobState.Period);
     }
 
     [Test]
@@ -154,7 +161,7 @@ internal sealed class DistributedJobServiceTests : UmbracoIntegrationTest
         await DistributedJobService.EnsureJobsAsync();
 
         // Set the job's LastRun to be older than the period
-        SetJobState(TestJobName, lastRun: DateTime.UtcNow - TestJobPeriod - TimeSpan.FromMinutes(1), isRunning: false);
+        SetJobState(TestJobName, lastRun: DateTime.UtcNow - _testJobPeriod - TimeSpan.FromMinutes(1), isRunning: false);
 
         // Act - Take the first job
         var job1 = await DistributedJobService.TryTakeRunnableAsync();
@@ -175,10 +182,10 @@ internal sealed class DistributedJobServiceTests : UmbracoIntegrationTest
 
         // Set the job as running with LastAttemptedRun just slightly before the timeout threshold
         // This tests the boundary condition
-        var justBeforeTimeout = DateTime.UtcNow - TestJobPeriod - TestMaxExecutionTime + TimeSpan.FromSeconds(30);
+        var justBeforeTimeout = DateTime.UtcNow - _testJobPeriod - _testMaxExecutionTime + TimeSpan.FromSeconds(30);
         SetJobState(
             TestJobName,
-            lastRun: justBeforeTimeout - TestJobPeriod,
+            lastRun: justBeforeTimeout - _testJobPeriod,
             isRunning: true,
             lastAttemptedRun: justBeforeTimeout);
 
@@ -218,7 +225,7 @@ internal sealed class DistributedJobServiceTests : UmbracoIntegrationTest
         await DistributedJobService.EnsureJobsAsync();
 
         // Manually change the period in the database to simulate a mismatch
-        var originalPeriod = TestJobPeriod;
+        var originalPeriod = _testJobPeriod;
         var differentPeriod = TimeSpan.FromHours(99);
         UpdateJobPeriod(TestJobName, differentPeriod);
 
@@ -250,7 +257,41 @@ internal sealed class DistributedJobServiceTests : UmbracoIntegrationTest
         // Assert - Job should still exist with same properties
         Assert.AreEqual(afterFirst.Id, afterSecond.Id);
         Assert.AreEqual(afterSecond.Id, afterThird.Id);
-        Assert.AreEqual(TestJobPeriod.Ticks, afterThird.Period);
+        Assert.AreEqual(_testJobPeriod.Ticks, afterThird.Period);
+    }
+
+    [Test]
+    public async Task TryTakeRunnableAsync_AlignedJobBoundaryPassedSinceLastRun_ReturnsJob()
+    {
+        // Arrange
+        await DistributedJobService.EnsureJobsAsync();
+
+        // A 1-hour-aligned job whose last run was two hours ago: at least one top-of-hour boundary has passed since.
+        SetJobState(AlignedTestJobName, lastRun: DateTime.UtcNow - TimeSpan.FromHours(2), isRunning: false);
+
+        // Act
+        var job = await DistributedJobService.TryTakeRunnableAsync();
+
+        // Assert - only the aligned job is due (all other jobs were just seeded with LastRun = now)
+        Assert.IsNotNull(job);
+        Assert.AreEqual(AlignedTestJobName, job!.Name);
+    }
+
+    [Test]
+    public async Task TryTakeRunnableAsync_AlignedJobNoBoundarySinceLastRun_ReturnsNull()
+    {
+        // Arrange
+        await DistributedJobService.EnsureJobsAsync();
+
+        // Last run is set slightly in the future so the most recent clock boundary is guaranteed to be before it,
+        // even if the wall clock crosses a top-of-hour between here and the poll (avoids a boundary race).
+        SetJobState(AlignedTestJobName, lastRun: DateTime.UtcNow.AddMinutes(1), isRunning: false);
+
+        // Act
+        var job = await DistributedJobService.TryTakeRunnableAsync();
+
+        // Assert
+        Assert.IsNull(job);
     }
 
     private void SetJobState(string jobName, DateTime lastRun, bool isRunning, DateTime? lastAttemptedRun = null)
@@ -326,7 +367,21 @@ internal sealed class DistributedJobServiceTests : UmbracoIntegrationTest
     {
         public string Name => TestJobName;
 
-        public TimeSpan Period => TestJobPeriod;
+        public TimeSpan Period => _testJobPeriod;
+
+        public Task ExecuteAsync() => Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// A clock-aligned test implementation of <see cref="IDistributedBackgroundJob"/>.
+    /// </summary>
+    private sealed class AlignedTestDistributedJob : IDistributedBackgroundJob
+    {
+        public string Name => AlignedTestJobName;
+
+        public TimeSpan Period => _alignedTestJobPeriod;
+
+        public bool AlignToClock => true;
 
         public Task ExecuteAsync() => Task.CompletedTask;
     }

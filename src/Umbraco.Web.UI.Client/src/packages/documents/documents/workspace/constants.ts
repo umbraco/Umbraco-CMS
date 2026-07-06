@@ -1,7 +1,7 @@
 import type { UmbDocumentVariantModel } from '../types.js';
 
 export * from './conditions/constants.js';
-export * from './document-workspace.context-token.js';
+export * from './context/document-workspace.context-token.js';
 
 export const UMB_DOCUMENT_WORKSPACE_ALIAS = 'Umb.Workspace.Document';
 

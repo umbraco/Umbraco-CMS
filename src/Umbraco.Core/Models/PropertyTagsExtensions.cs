@@ -1,5 +1,7 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
@@ -18,8 +20,9 @@ public static class PropertyTagsExtensions
     /// <param name="property">The property.</param>
     /// <param name="propertyEditors">The property editors collection.</param>
     /// <param name="dataTypeService">The data type service.</param>
+    /// <param name="idKeyMap">The cached id-to-key map used to resolve int data type IDs to GUID keys.</param>
     /// <returns>The tag configuration if available; otherwise, <c>null</c>.</returns>
-    public static TagConfiguration? GetTagConfiguration(this IProperty property, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService)
+    public static TagConfiguration? GetTagConfiguration(this IProperty property, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, IIdKeyMap idKeyMap)
     {
         if (property == null)
         {
@@ -29,9 +32,7 @@ public static class PropertyTagsExtensions
         IDataEditor? editor = propertyEditors[property.PropertyType?.PropertyEditorAlias];
         TagsPropertyEditorAttribute? tagAttribute = GetTagAttribute(editor);
 
-        var configurationObject = property.PropertyType is null
-            ? null
-            : dataTypeService.GetDataType(property.PropertyType.DataTypeId)?.ConfigurationObject;
+        var configurationObject = property.PropertyType?.GetDataType(dataTypeService, idKeyMap)?.ConfigurationObject;
         TagConfiguration? configuration = configurationObject as TagConfiguration;
 
         if (configuration is not null && configuration.Delimiter == default)
@@ -41,6 +42,16 @@ public static class PropertyTagsExtensions
 
         return configuration;
     }
+
+    /// <summary>
+    ///     Gets the tag configuration for a property from the datatype configuration and editor tag configuration attribute.
+    /// </summary>
+    [Obsolete("Use the overload taking an IIdKeyMap. Scheduled for removal in Umbraco 19.")]
+    public static TagConfiguration? GetTagConfiguration(this IProperty property, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService)
+        => property.GetTagConfiguration(
+            propertyEditors,
+            dataTypeService,
+            StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>());
 
     /// <summary>
     ///     Gets the tags property editor attribute from the data editor.
@@ -58,14 +69,14 @@ public static class PropertyTagsExtensions
     /// <param name="culture">A culture, for multi-lingual properties.</param>
     /// <param name="propertyEditors"></param>
     /// <param name="dataTypeService"></param>
-    public static void AssignTags(this IProperty property, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, IJsonSerializer serializer, IEnumerable<string> tags, bool merge = false, string? culture = null)
+    public static void AssignTags(this IProperty property, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, IIdKeyMap idKeyMap, IJsonSerializer serializer, IEnumerable<string> tags, bool merge = false, string? culture = null)
     {
         if (property == null)
         {
             throw new ArgumentNullException(nameof(property));
         }
 
-        TagConfiguration? configuration = property.GetTagConfiguration(propertyEditors, dataTypeService);
+        TagConfiguration? configuration = property.GetTagConfiguration(propertyEditors, dataTypeService, idKeyMap);
         if (configuration == null)
         {
             throw new NotSupportedException($"Property with alias \"{property.Alias}\" does not support tags.");
@@ -73,6 +84,20 @@ public static class PropertyTagsExtensions
 
         property.AssignTags(tags, merge, configuration.StorageType, serializer, configuration.Delimiter, culture);
     }
+
+    /// <summary>
+    ///     Assign tags.
+    /// </summary>
+    [Obsolete("Use the overload taking an IIdKeyMap. Scheduled for removal in Umbraco 19.")]
+    public static void AssignTags(this IProperty property, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, IJsonSerializer serializer, IEnumerable<string> tags, bool merge = false, string? culture = null)
+        => property.AssignTags(
+            propertyEditors,
+            dataTypeService,
+            StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>(),
+            serializer,
+            tags,
+            merge,
+            culture);
 
     /// <summary>
     ///     Removes tags.
@@ -83,14 +108,14 @@ public static class PropertyTagsExtensions
     /// <param name="culture">A culture, for multi-lingual properties.</param>
     /// <param name="propertyEditors"></param>
     /// <param name="dataTypeService"></param>
-    public static void RemoveTags(this IProperty property, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, IJsonSerializer serializer, IEnumerable<string> tags, string? culture = null)
+    public static void RemoveTags(this IProperty property, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, IIdKeyMap idKeyMap, IJsonSerializer serializer, IEnumerable<string> tags, string? culture = null)
     {
         if (property == null)
         {
             throw new ArgumentNullException(nameof(property));
         }
 
-        TagConfiguration? configuration = property.GetTagConfiguration(propertyEditors, dataTypeService);
+        TagConfiguration? configuration = property.GetTagConfiguration(propertyEditors, dataTypeService, idKeyMap);
         if (configuration == null)
         {
             throw new NotSupportedException($"Property with alias \"{property.Alias}\" does not support tags.");
@@ -98,6 +123,19 @@ public static class PropertyTagsExtensions
 
         property.RemoveTags(tags, configuration.StorageType, serializer, configuration.Delimiter, culture);
     }
+
+    /// <summary>
+    ///     Removes tags.
+    /// </summary>
+    [Obsolete("Use the overload taking an IIdKeyMap. Scheduled for removal in Umbraco 19.")]
+    public static void RemoveTags(this IProperty property, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, IJsonSerializer serializer, IEnumerable<string> tags, string? culture = null)
+        => property.RemoveTags(
+            propertyEditors,
+            dataTypeService,
+            StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>(),
+            serializer,
+            tags,
+            culture);
 
     /// <summary>
     ///     Gets the tags value from a property. Used by ContentRepositoryBase.
@@ -108,14 +146,14 @@ public static class PropertyTagsExtensions
     /// <param name="serializer">The JSON serializer.</param>
     /// <param name="culture">A culture, for multi-lingual properties.</param>
     /// <returns>An enumeration of tag values.</returns>
-    public static IEnumerable<string> GetTagsValue(this IProperty property, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, IJsonSerializer serializer, string? culture = null)
+    public static IEnumerable<string> GetTagsValue(this IProperty property, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, IIdKeyMap idKeyMap, IJsonSerializer serializer, string? culture = null)
     {
         if (property == null)
         {
             throw new ArgumentNullException(nameof(property));
         }
 
-        TagConfiguration? configuration = property.GetTagConfiguration(propertyEditors, dataTypeService);
+        TagConfiguration? configuration = property.GetTagConfiguration(propertyEditors, dataTypeService, idKeyMap);
         if (configuration == null)
         {
             throw new NotSupportedException($"Property with alias \"{property.Alias}\" does not support tags.");
@@ -123,6 +161,18 @@ public static class PropertyTagsExtensions
 
         return property.GetTagsValue(configuration.StorageType, serializer, configuration.Delimiter, culture);
     }
+
+    /// <summary>
+    ///     Gets the tags value from a property. Used by ContentRepositoryBase.
+    /// </summary>
+    [Obsolete("Use the overload taking an IIdKeyMap. Scheduled for removal in Umbraco 19.")]
+    public static IEnumerable<string> GetTagsValue(this IProperty property, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, IJsonSerializer serializer, string? culture = null)
+        => property.GetTagsValue(
+            propertyEditors,
+            dataTypeService,
+            StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>(),
+            serializer,
+            culture);
 
     /// <summary>
     ///     Sets tags on a content property, based on the property editor tags configuration.

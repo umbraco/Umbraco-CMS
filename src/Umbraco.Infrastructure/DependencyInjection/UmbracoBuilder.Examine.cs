@@ -53,7 +53,6 @@ public static partial class UmbracoBuilderExtensions
                 factory.GetRequiredService<IShortStringHelper>(),
                 factory.GetRequiredService<IScopeProvider>(),
                 true,
-                factory.GetRequiredService<ILocalizationService>(),
                 factory.GetRequiredService<IContentTypeService>(),
                 factory.GetRequiredService<ILogger<ContentValueSetBuilder>>(),
                 factory.GetRequiredService<IDocumentUrlService>(),
@@ -66,7 +65,6 @@ public static partial class UmbracoBuilderExtensions
                 factory.GetRequiredService<IShortStringHelper>(),
                 factory.GetRequiredService<IScopeProvider>(),
                 false,
-                factory.GetRequiredService<ILocalizationService>(),
                 factory.GetRequiredService<IContentTypeService>(),
                 factory.GetRequiredService<ILogger<ContentValueSetBuilder>>(),
                 factory.GetRequiredService<IDocumentUrlService>(),
@@ -93,7 +91,7 @@ public static partial class UmbracoBuilderExtensions
         builder.AddNotificationHandler<ExternalMemberCacheRefresherNotification, ExternalMemberIndexingNotificationHandler>();
         builder.AddNotificationAsyncHandler<LanguageCacheRefresherNotification, LanguageIndexingNotificationHandler>();
 
-        builder.AddNotificationHandler<UmbracoRequestBeginNotification, RebuildOnStartupHandler>();
+        builder.AddNotificationAsyncHandler<UmbracoApplicationStartedNotification, RebuildOnStartedHandler>();
 
         return builder;
     }

@@ -5,7 +5,6 @@ import { UmbRequestReloadTreeItemChildrenEvent } from '../entity-actions/reload-
 import { UMB_TREE_ITEM_CONTEXT } from './tree-item.context.token.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbArrayState, UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import {
 	UmbPaginationManager,
@@ -35,6 +34,9 @@ export class UmbTreeItemChildrenManager<
 
 	#children = new UmbArrayState<TreeItemType>([], (x) => x.unique);
 	public readonly children = this.#children.asObservable();
+
+	#currentPageChildren = new UmbArrayState<TreeItemType>([], (x) => x.unique);
+	public readonly currentPageChildren = this.#currentPageChildren.asObservable();
 
 	#hasChildren = new UmbBooleanState(false);
 	public readonly hasChildren = this.#hasChildren.asObservable();
@@ -73,9 +75,6 @@ export class UmbTreeItemChildrenManager<
 
 	constructor(host: UmbControllerHost) {
 		super(host);
-		// listen for page changes on the pagination manager
-		this.offsetPagination.addEventListener(UmbChangeEvent.TYPE, this.#onPageChange);
-
 		this.#listenForActionEvents();
 
 		this.consumeContext(UMB_TREE_CONTEXT, (treeContext) => {
@@ -237,8 +236,16 @@ export class UmbTreeItemChildrenManager<
 		// When reloading we only want to send the target values with the request if we can find the target to reload from.
 		const canSendTarget = reload === false || (reload && this.targetPagination.hasBaseTargetInCurrentItems());
 
+		// If all known items fit within a single page, skip target pagination and load from
+		// the start instead, this prevents "show more" appearing on small lists after operations
+		// that change item order like sort children.
+		const hasCustomTargetWindow = this.#takeBeforeTarget !== undefined || this.#takeAfterTarget !== undefined;
+		const totalKnownItems = this.offsetPagination.getTotalItems();
+		const fitsInSinglePage =
+			!hasCustomTargetWindow && reload && totalKnownItems > 0 && totalKnownItems <= this.offsetPagination.getPageSize();
+
 		const targetPaging: UmbTargetPaginationRequestModel | undefined =
-			baseTarget && baseTarget.unique && canSendTarget
+			!fitsInSinglePage && baseTarget && baseTarget.unique && canSendTarget
 				? {
 						target: {
 							unique: baseTarget.unique,
@@ -275,15 +282,11 @@ export class UmbTreeItemChildrenManager<
 						unique: parent.unique,
 						entityType: parent.entityType,
 					},
-					skip: offsetPaging.skip, // including this for backward compatibility
-					take: offsetPaging.take, // including this for backward compatibility
 					paging: targetPaging || offsetPaging,
 					foldersOnly,
 					...additionalArgs,
 				})
 			: await repository.requestTreeRootItems({
-					skip: offsetPaging.skip, // including this for backward compatibility
-					take: offsetPaging.take, // including this for backward compatibility
 					paging: targetPaging || offsetPaging,
 					foldersOnly,
 					...additionalArgs,
@@ -311,6 +314,7 @@ export class UmbTreeItemChildrenManager<
 		if (data) {
 			const items = data.items as Array<TreeItemType>;
 			this.#children.setValue(items);
+			this.#currentPageChildren.setValue(items);
 			this.setHasChildren(data.total > 0);
 
 			this.offsetPagination.setTotalItems(data.total);
@@ -385,10 +389,6 @@ export class UmbTreeItemChildrenManager<
 		}
 
 		if (data) {
-			if (data.totalBefore === undefined) {
-				throw new Error('totalBefore is missing in the response');
-			}
-
 			const items = data.items as Array<TreeItemType>;
 
 			// We have loaded previous items so we add them to the top of the array
@@ -432,26 +432,17 @@ export class UmbTreeItemChildrenManager<
 			takeAfter: this.targetPagination.getTakeSize(),
 		};
 
-		const offsetPaging: UmbOffsetPaginationRequestModel = {
-			skip: this.offsetPagination.getSkip(),
-			take: this.offsetPagination.getPageSize(),
-		};
-
 		const { data, error } = parent?.unique
 			? await repository.requestTreeItemsOf({
 					parent: {
 						unique: parent.unique,
 						entityType: parent.entityType,
 					},
-					skip: offsetPaging.skip, // including this for backward compatibility
-					take: offsetPaging.take, // including this for backward compatibility
 					paging: targetPaging,
 					foldersOnly,
 					...additionalArgs,
 				})
 			: await repository.requestTreeRootItems({
-					skip: offsetPaging.skip, // including this for backward compatibility
-					take: offsetPaging.take, // including this for backward compatibility
 					paging: targetPaging,
 					foldersOnly,
 					...additionalArgs,
@@ -476,9 +467,11 @@ export class UmbTreeItemChildrenManager<
 		if (data) {
 			const items = data.items as Array<TreeItemType>;
 			this.#children.append(items);
+			this.#currentPageChildren.setValue(items);
 			this.setHasChildren(data.total > 0);
 
 			this.offsetPagination.setTotalItems(data.total);
+			this.offsetPagination.setCurrentPageNumber(this.offsetPagination.getCurrentPageNumber() + 1);
 
 			this.targetPagination.appendCurrentItems(data.items);
 			this.targetPagination.setTotalItems(data.total);
@@ -518,6 +511,7 @@ export class UmbTreeItemChildrenManager<
 	 */
 	public clear(): void {
 		this.#children.setValue([]);
+		this.#currentPageChildren.setValue([]);
 		this.offsetPagination.clear();
 		this.targetPagination.clear();
 	}
@@ -551,15 +545,11 @@ export class UmbTreeItemChildrenManager<
 		const { data } = parent?.unique
 			? await repository.requestTreeItemsOf({
 					parent: { unique: parent.unique, entityType: parent.entityType },
-					skip: offsetPaging.skip,
-					take: offsetPaging.take,
 					paging: offsetPaging,
 					foldersOnly,
 					...additionalArgs,
 				})
 			: await repository.requestTreeRootItems({
-					skip: offsetPaging.skip,
-					take: offsetPaging.take,
 					paging: offsetPaging,
 					foldersOnly,
 					...additionalArgs,
@@ -599,7 +589,11 @@ export class UmbTreeItemChildrenManager<
 		}
 	}
 
-	#onPageChange = () => this.loadNextChildren();
+	public async loadPage(pageNumber: number): Promise<void> {
+		this.offsetPagination.setCurrentPageNumber(pageNumber);
+		this.#children.setValue([]);
+		await this.#loadChildren();
+	}
 
 	#listenForActionEvents() {
 		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (instance) => {
@@ -624,26 +618,37 @@ export class UmbTreeItemChildrenManager<
 	}
 
 	#onReloadChildrenRequest = (event: UmbEntityActionEvent) => {
-		const entityType = this.getTreeItem()?.entityType;
-		const unique = this.getTreeItem()?.unique;
+		// Match against the parent we actually load children for. When drilled into a start node
+		// the children belong to the start node, not the tree root held by getTreeItem().
+		const parent = this.getStartNode() || this.getTreeItem();
 
-		if (event.getEntityType() !== entityType) return;
-		if (event.getUnique() !== unique) return;
+		if (event.getEntityType() !== parent?.entityType) return;
+		if (event.getUnique() !== parent?.unique) return;
 
 		this.reloadChildren();
 	};
 
 	#onReloadStructureForEntityRequest = async (event: UmbRequestReloadStructureForEntityEvent) => {
-		const entityType = this.getTreeItem()?.entityType;
-		const unique = this.getTreeItem()?.unique;
+		const entity = { entityType: event.getEntityType(), unique: event.getUnique() };
 
-		if (event.getEntityType() !== entityType) return;
-		if (event.getUnique() !== unique) return;
+		// A child we are currently displaying changed its structure (e.g. was deleted, moved or
+		// renamed). Reload our own children so the change is reflected. This is the manager that
+		// owns the displayed list, so it also covers flat card/table views where the children have
+		// no individual tree-item context to react on their own behalf.
+		if (this.isChildLoaded(entity)) {
+			this.reloadChildren();
+			return;
+		}
 
-		if (this.#parentTreeItemContext) {
-			this.#parentTreeItemContext.reloadChildren();
-		} else if (this.#treeContext) {
-			this.#treeContext.reloadTree();
+		// Our own item changed and no parent manager displays us as a child (we are the
+		// root/context-level manager). Reload the whole tree so the change is picked up.
+		const treeItem = this.getTreeItem();
+		if (
+			!this.#parentTreeItemContext &&
+			event.getEntityType() === treeItem?.entityType &&
+			event.getUnique() === treeItem?.unique
+		) {
+			this.#treeContext?.reloadTree();
 		}
 	};
 

@@ -1,4 +1,6 @@
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbDefaultWorkspaceElement } from './default-workspace.element.js';
+import { UmbDefaultWorkspaceContext } from './default-workspace.context.js';
 
 export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
 	{
@@ -9,8 +11,8 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 		manifest: {
 			type: 'workspace',
 			kind: 'default',
-			element: () => import('./default-workspace.element.js'),
-			api: () => import('./default-workspace.context.js'),
+			element: UmbDefaultWorkspaceElement,
+			api: UmbDefaultWorkspaceContext,
 		},
 	},
 ];

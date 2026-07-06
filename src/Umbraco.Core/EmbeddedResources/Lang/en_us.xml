@@ -452,7 +452,8 @@
 	    0: Comma delimitted list of failed folder paths
   	-->
     <key alias="umbracoApplicationUrlCheckResultTrue"><![CDATA[The appSetting 'Umbraco:CMS:WebRouting:UmbracoApplicationUrl' is set to <strong>%0%</strong>.]]></key>
-    <key alias="umbracoApplicationUrlCheckResultFalse">The appSetting 'Umbraco:CMS:WebRouting:UmbracoApplicationUrl' is not set.</key>
+    <key alias="umbracoApplicationUrlCheckResultFalse"><![CDATA[The appSetting 'Umbraco:CMS:WebRouting:UmbracoApplicationUrl' is not set, so the application URL will be auto-detected from incoming requests. Setting it explicitly is recommended.]]></key>
+    <key alias="umbracoApplicationUrlCheckResultError"><![CDATA[The appSetting 'Umbraco:CMS:WebRouting:UmbracoApplicationUrl' is not set and application URL auto-detection is disabled ('Umbraco:CMS:WebRouting:ApplicationUrlDetection' is 'None'). Features that require an absolute URL, such as password reset and invitation emails, will not work. Set the application URL explicitly, or enable auto-detection.]]></key>
     <key alias="clickJackingCheckHeaderFound">
       <![CDATA[The header or meta-tag <strong>X-Frame-Options</strong> used to control whether a site can be IFRAMEd by another was found.]]></key>
     <key alias="clickJackingCheckHeaderNotFound">
@@ -508,10 +509,6 @@
     <key alias="scheduledHealthCheckEmailBody">
       <![CDATA[<html><body><p>Results of the scheduled Umbraco Health Checks run on %0% at %1% are as follows:</p>%2%</body></html>]]></key>
     <key alias="scheduledHealthCheckEmailSubject">Umbraco Health Check Status: %0%</key>
-  </area>
-  <area alias="recycleBin">
-    <key alias="contentTrashed">Trashed content with Id: {0} related to original parent content with Id: {1}</key>
-    <key alias="mediaTrashed">Trashed media with Id: {0} related to original parent media item with Id: {1}</key>
   </area>
   <area alias="permissions">
     <key alias="FolderCreation">Folder creation</key>

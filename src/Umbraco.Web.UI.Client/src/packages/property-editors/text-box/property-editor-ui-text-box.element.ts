@@ -1,4 +1,4 @@
-import { css, customElement, html, nothing, property, state, unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, ifDefined, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
@@ -37,6 +37,13 @@ export class UmbPropertyEditorUITextBoxElement
 	mandatoryMessage = UMB_VALIDATION_EMPTY_LOCALIZATION_KEY;
 
 	/**
+	 * The alias of this field.
+	 * @type {string}
+	 */
+	@property({ type: String })
+	alias?: string;
+
+	/**
 	 * The name of this field.
 	 * @type {string}
 	 */
@@ -59,13 +66,18 @@ export class UmbPropertyEditorUITextBoxElement
 	@state()
 	private _placeholder?: string;
 
+	@state()
+	private _autocomplete?: string;
+
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
 
 		this._type = config.getValueByAlias<UUIInputType>('inputType') ?? this.#defaultType;
 		this._inputMode = config.getValueByAlias<UUIInputMode>('inputMode') || this.#defaultInputMode;
 		this._maxChars = this.#parseNumber(config.getValueByAlias('maxChars'));
-		this._placeholder = this.localize.string(config.getValueByAlias<string>('placeholder') ?? '');
+		this._placeholder = this.localize.string(config.getValueByAlias<string>('placeholder'));
+		const autocomplete = config.getValueByAlias<string | Array<string>>('autocomplete');
+		this._autocomplete = Array.isArray(autocomplete) ? autocomplete[0] : autocomplete;
 	}
 
 	protected override firstUpdated(): void {
@@ -108,20 +120,22 @@ export class UmbPropertyEditorUITextBoxElement
 		const { remaining, visible } = getCharacterCountState(this._maxChars, this.value?.length ?? 0);
 		if (!visible) return nothing;
 
-		return html`<div class="char-count">${unsafeHTML(this.localize.term('textbox_characters_left', remaining))}</div>`;
+		return html`<div class="char-count">${this.localize.htmlString('#textbox_characters_left', remaining)}</div>`;
 	}
 
 	override render() {
 		return html`
 			<uui-input
+				.name=${this.alias ?? ''}
 				.inputMode=${this._inputMode}
 				.label=${this.localize.term('general_fieldFor', [this.name])}
 				.maxlength=${this._maxChars}
 				.maxlengthMessage=${this.#getMaxLengthMessage.bind(this)}
-				.placeholder=${this._placeholder ?? ''}
+				placeholder=${ifDefined(this._placeholder)}
 				.requiredMessage=${this.mandatoryMessage}
 				.type=${this._type}
 				.value=${this.value ?? ''}
+				.autocomplete=${this._autocomplete ?? 'on'}
 				?readonly=${this.readonly}
 				?required=${this.mandatory}
 				@input=${this.#onInput}>

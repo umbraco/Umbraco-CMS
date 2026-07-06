@@ -10,8 +10,7 @@ public interface IDocumentUrlService
     /// <summary>
     /// Gets a value indicating whether the service has been initialized.
     /// </summary>
-    // TODO (V18): Remove the default implementation.
-    bool IsInitialized => false;
+    bool IsInitialized { get; }
 
     /// <summary>
     /// Initializes the service and ensure the content in the database is correct with the current configuration.
@@ -100,4 +99,20 @@ public interface IDocumentUrlService
     /// Gets a value indicating whether any URLs have been cached.
     /// </summary>
     bool HasAny();
+
+    /// <summary>
+    /// Updates the in-memory URL segment cache for a single document without writing to the database.
+    /// </summary>
+    /// <param name="key">The document key.</param>
+    // TODO (V19): Remove default implementation when external implementations have had time to adopt.
+    Task UpdateUrlSegmentCacheAsync(Guid key)
+        => CreateOrUpdateUrlSegmentsAsync(key);
+
+    /// <summary>
+    /// Updates the in-memory URL segment cache for a document and its descendants without writing to the database.
+    /// </summary>
+    /// <param name="key">The document key.</param>
+    // TODO (V19): Remove default implementation when external implementations have had time to adopt.
+    Task UpdateUrlSegmentCacheWithDescendantsAsync(Guid key)
+        => CreateOrUpdateUrlSegmentsWithDescendantsAsync(key);
 }
