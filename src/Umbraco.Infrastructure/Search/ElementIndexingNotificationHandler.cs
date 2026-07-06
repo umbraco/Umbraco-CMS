@@ -43,10 +43,13 @@ internal sealed class ElementIndexingNotificationHandler : INotificationHandler<
             return;
         }
 
+        // Only a change to the element's published state affects the (published) external index. Publish and unpublish
+        // carry the affected cultures ("*" when invariant), trash/delete comes through as Remove. A draft save carries
+        // neither, so it is ignored - draft values never enter the external index.
         var elementIds = ((ElementCacheRefresher.JsonPayload[])notification.MessageObject)
-            .Where(payload => payload.ChangeTypes.HasType(TreeChangeTypes.RefreshNode)
-                || payload.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch)
-                || payload.ChangeTypes.HasType(TreeChangeTypes.Remove))
+            .Where(payload => payload.ChangeTypes.HasType(TreeChangeTypes.Remove)
+                || payload.PublishedCultures?.Length > 0
+                || payload.UnpublishedCultures?.Length > 0)
             .Select(payload => payload.Id)
             .Distinct()
             .ToArray();

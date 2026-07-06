@@ -27,13 +27,19 @@ public class ElementIndexingNotificationHandlerTests
     }
 
     [Test]
-    public void Handle_QueuesChangedElementIds()
+    public void Handle_QueuesPublishedAndUnpublishedElementIds()
     {
         var notification = new ElementCacheRefresherNotification(
             new[]
             {
-                new ElementCacheRefresher.JsonPayload(30, Guid.NewGuid(), TreeChangeTypes.RefreshNode),
-                new ElementCacheRefresher.JsonPayload(40, Guid.NewGuid(), TreeChangeTypes.RefreshBranch),
+                new ElementCacheRefresher.JsonPayload(30, Guid.NewGuid(), TreeChangeTypes.RefreshNode)
+                {
+                    PublishedCultures = ["*"],
+                },
+                new ElementCacheRefresher.JsonPayload(40, Guid.NewGuid(), TreeChangeTypes.RefreshNode)
+                {
+                    UnpublishedCultures = ["*"],
+                },
             },
             MessageType.RefreshByPayload);
 
@@ -59,11 +65,31 @@ public class ElementIndexingNotificationHandlerTests
     }
 
     [Test]
+    public void Handle_DraftSave_DoesNotQueue()
+    {
+        // A draft save comes through as RefreshNode with no published/unpublished cultures. Draft values never enter
+        // the external index, so it must not trigger a reindex of referencing documents.
+        var notification = new ElementCacheRefresherNotification(
+            new[] { new ElementCacheRefresher.JsonPayload(70, Guid.NewGuid(), TreeChangeTypes.RefreshNode) },
+            MessageType.RefreshByPayload);
+
+        _sut.Handle(notification);
+
+        _mockReindexService.Verify(s => s.QueueElementReindex(It.IsAny<IReadOnlyCollection<int>>()), Times.Never);
+    }
+
+    [Test]
     public void Handle_WhenIndexingDisabled_DoesNotQueue()
     {
         _mockIndexingHandler.Setup(x => x.Enabled).Returns(false);
         var notification = new ElementCacheRefresherNotification(
-            new[] { new ElementCacheRefresher.JsonPayload(60, Guid.NewGuid(), TreeChangeTypes.RefreshNode) },
+            new[]
+            {
+                new ElementCacheRefresher.JsonPayload(60, Guid.NewGuid(), TreeChangeTypes.RefreshNode)
+                {
+                    PublishedCultures = ["*"],
+                },
+            },
             MessageType.RefreshByPayload);
 
         _sut.Handle(notification);
