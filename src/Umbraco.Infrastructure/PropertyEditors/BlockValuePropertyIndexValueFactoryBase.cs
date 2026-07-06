@@ -180,6 +180,8 @@ internal abstract class BlockValuePropertyIndexValueFactoryBase<TSerialized> : J
     {
         Guid[] externalKeys = allLayouts.Where(l => l.IsExternalContent).Select(l => l.ContentKey).ToArray();
         return _elementService.GetByIds(externalKeys)
+            // A trashed element is not live, so its content must not be flattened into a referencing document's index.
+            .Where(element => element.Trashed is false)
             .ToDictionary(
                 element => element.Key,
                 element => new RawDataItem
