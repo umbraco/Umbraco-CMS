@@ -228,7 +228,8 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 		await this.#elementWorkspaceContext.runMandatoryValidationForSaveData(saveData, variantIds);
 		await this.#elementWorkspaceContext.askServerToValidate(saveData, variantIds);
 
-		return this.#elementWorkspaceContext.validateAndSubmit(
+		return this.#elementWorkspaceContext.validateVariantsAndSubmit(
+			variantIds,
 			async () => {
 				try {
 					if (!this.#elementWorkspaceContext) {
@@ -337,7 +338,8 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 		await this.#elementWorkspaceContext.runMandatoryValidationForSaveData(saveData, variantIds);
 		await this.#elementWorkspaceContext.askServerToValidate(saveData, variantIds);
 
-		return this.#elementWorkspaceContext.validateAndSubmit(
+		return this.#elementWorkspaceContext.validateVariantsAndSubmit(
+			variantIds,
 			() => {
 				// Notify only on the publish path. The validation-failure path below already
 				// notifies, so a shared top-level .catch would fire a second, contradictory toast.
