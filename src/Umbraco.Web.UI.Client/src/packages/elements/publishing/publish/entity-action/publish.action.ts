@@ -9,6 +9,7 @@ import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 
@@ -34,6 +35,15 @@ export class UmbPublishElementEntityAction extends UmbEntityActionBase<never> {
 		const appLanguageContext = await this.getContext(UMB_APP_LANGUAGE_CONTEXT);
 		if (!appLanguageContext) throw new Error('The app language context is missing');
 		const appCulture = appLanguageContext.getAppCulture();
+
+		const currentUserContext = await this.getContext(UMB_CURRENT_USER_CONTEXT);
+		if (!currentUserContext) throw new Error('The current user context is missing');
+		const currentUserAllowedLanguages = currentUserContext.getLanguages();
+		const currentUserHasAccessToAllLanguages = currentUserContext.getHasAccessToAllLanguages();
+
+		if (currentUserAllowedLanguages === undefined) throw new Error('The current user languages are missing');
+		if (currentUserHasAccessToAllLanguages === undefined)
+			throw new Error('The current user access to all languages is missing');
 
 		const options: Array<UmbElementVariantOptionModel> = elementData.variants
 			// only display culture variants as options
@@ -67,6 +77,11 @@ export class UmbPublishElementEntityAction extends UmbEntityActionBase<never> {
 			data: {
 				confirmLabel: '#actions_publish',
 				options,
+				pickableFilter: (option) => {
+					if (!option.culture) return false;
+					if (currentUserHasAccessToAllLanguages) return true;
+					return currentUserAllowedLanguages.includes(option.culture);
+				},
 			},
 			value: { selection },
 		}).catch(() => undefined);
