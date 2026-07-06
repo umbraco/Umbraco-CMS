@@ -126,6 +126,7 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 		await new UmbUnpublishElementEntityAction(this, { unique, entityType, meta: {} as never }).execute();
 
 		// Reload workspace data to reflect the unpublished state
+		// TODO: reload only when unpublish actually occurred [LK]
 		await this.#elementWorkspaceContext.reload();
 		await this.#loadAndProcessLastPublished();
 	}

@@ -5,6 +5,7 @@ import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
+// TODO: Turn this into a Repository with a Store that holds the cache [NL]
 /**
  * A context for fetching and caching the element configuration.
  * @internal
