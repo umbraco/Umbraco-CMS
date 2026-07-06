@@ -21,6 +21,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Relations;
 internal sealed class ContentRelationsUpdate :
     IDistributedCacheNotificationHandler<ContentSavedNotification>,
     IDistributedCacheNotificationHandler<ContentPublishedNotification>,
+    IDistributedCacheNotificationHandler<ContentUnpublishedNotification>,
     IDistributedCacheNotificationHandler<MediaSavedNotification>,
     IDistributedCacheNotificationHandler<MemberSavedNotification>,
     IDistributedCacheNotificationHandler<ElementSavedNotification>,
@@ -63,6 +64,12 @@ internal sealed class ContentRelationsUpdate :
 
     /// <inheritdoc/>
     public void Handle(IEnumerable<ContentPublishedNotification> notifications) => PersistRelations(notifications.SelectMany(x => x.PublishedEntities));
+
+    /// <inheritdoc/>
+    public void Handle(ContentUnpublishedNotification notification) => PersistRelations(notification.UnpublishedEntities);
+
+    /// <inheritdoc/>
+    public void Handle(IEnumerable<ContentUnpublishedNotification> notifications) => PersistRelations(notifications.SelectMany(x => x.UnpublishedEntities));
 
     /// <inheritdoc/>
     public void Handle(MediaSavedNotification notification) => PersistRelations(notification.SavedEntities);
