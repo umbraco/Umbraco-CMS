@@ -5,7 +5,7 @@ import { UmbElementPublishingRepository } from '../repository/index.js';
 import { UmbElementPublishedPendingChangesManager } from '../pending-changes/index.js';
 import type { UmbElementVariantPublishModel } from '../types.js';
 import { UMB_ELEMENT_PUBLISH_MODAL } from '../publish/constants.js';
-import { UMB_ELEMENT_UNPUBLISH_MODAL } from '../unpublish/constants.js';
+import { UmbUnpublishElementEntityAction } from '../unpublish/index.js';
 import { UMB_ELEMENT_SCHEDULE_MODAL } from '../schedule-publish/constants.js';
 import { UMB_ELEMENT_ENTITY_TYPE } from '../../entity.js';
 import { UMB_ELEMENT_WORKSPACE_ALIAS } from '../../workspace/constants.js';
@@ -122,59 +122,12 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 		const entityType = this.#elementWorkspaceContext.getEntityType();
 		if (!entityType) throw new Error('Entity type is missing');
 
-		const { options, selected } = await this.#determineVariantOptions();
+		// TODO: remove meta
+		await new UmbUnpublishElementEntityAction(this, { unique, entityType, meta: {} as never }).execute();
 
-		// Filter to only show published variants
-		const publishedOptions = options.filter(
-			(option) =>
-				option.variant?.state === UmbElementVariantState.PUBLISHED ||
-				option.variant?.state === UmbElementVariantState.PUBLISHED_PENDING_CHANGES,
-		);
-
-		if (publishedOptions.length === 0) {
-			this.#notificationContext?.peek('warning', {
-				data: { message: this.#localize.term('content_itemNotPublished') },
-			});
-			return;
-		}
-
-		// If invariant (single culture = null), unpublish directly without modal
-		if (publishedOptions.length === 1 && publishedOptions[0].culture === null) {
-			const variantIds = [UmbVariantId.CreateInvariant()];
-			await this.#performUnpublish(unique, entityType, variantIds);
-			return;
-		}
-
-		const result = await umbOpenModal(this, UMB_ELEMENT_UNPUBLISH_MODAL, {
-			data: {
-				options: publishedOptions,
-				pickableFilter: this.#publishableVariantsFilter,
-			},
-			value: { selection: selected.filter((s) => publishedOptions.some((o) => o.unique === s)) },
-		}).catch(() => undefined);
-
-		if (!result?.selection.length) return;
-
-		const variantIds = result.selection.map((x) => UmbVariantId.FromString(x));
-		await this.#performUnpublish(unique, entityType, variantIds);
-	}
-
-	async #performUnpublish(unique: string, entityType: string, variantIds: Array<UmbVariantId>) {
-		const { error } = await this.#publishingRepository.unpublish(unique, variantIds);
-
-		if (!error) {
-			this.#notificationContext?.peek('positive', {
-				data: { message: this.#localize.term('speechBubbles_editElementUnpublishedHeader') },
-			});
-
-			this.#clear();
-
-			await this.#elementWorkspaceContext?.reload();
-			await this.#loadAndProcessLastPublished();
-
-			const event = new UmbRequestReloadStructureForEntityEvent({ unique, entityType });
-			this.#eventContext?.dispatchEvent(event);
-		}
+		// Reload workspace data to reflect the unpublished state
+		await this.#elementWorkspaceContext.reload();
+		await this.#loadAndProcessLastPublished();
 	}
 
 	/**
