@@ -70,6 +70,7 @@ export class UmbDocumentWorkspaceContext
 	#isTrashedContext = new UmbIsTrashedEntityContext(this);
 	#entityContentTypeContext = new UmbEntityContentTypeEntityContext(this);
 	#documentSegmentRepository = new UmbDocumentSegmentRepository(this);
+	#previewController = new UmbPreviewController(this);
 	#actionEventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
 
 	constructor(host: UmbControllerHost) {
@@ -340,8 +341,7 @@ export class UmbDocumentWorkspaceContext
 			await this.performCreateOrUpdate(variantIds, saveData);
 		}
 
-		const previewController = new UmbPreviewController(this);
-		await previewController.preview({
+		await this.#previewController.preview({
 			unique,
 			urlProviderAlias,
 			culture: firstVariantId.culture,

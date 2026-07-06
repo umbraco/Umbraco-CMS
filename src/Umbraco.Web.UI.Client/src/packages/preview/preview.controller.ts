@@ -3,7 +3,7 @@ import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-
 import { umbPeekError } from '@umbraco-cms/backoffice/notification';
 import { UmbPreviewRepository } from '@umbraco-cms/backoffice/preview';
 
-interface UmbPreviewControllerArgs {
+export interface UmbPreviewControllerArgs {
 	urlProviderAlias: string;
 	unique: string;
 	culture: string | undefined | null;
@@ -15,6 +15,20 @@ export class UmbPreviewController extends UmbControllerBase {
 	#previewWindowDocumentId: string | null = null;
 	#previewWindowUrlProviderAlias: string | null = null;
 
+	#localize = new UmbLocalizationController(this);
+
+	/**
+	 * Opens a preview window for the given document, reusing an existing window when one is already
+	 * open for the same document and URL provider. If no preview URL can be resolved, an error notification
+	 * is shown and an error is thrown.
+	 * @param {UmbPreviewControllerArgs} args - The preview arguments.
+	 * @param {string} args.urlProviderAlias - The alias of the URL provider used to resolve the preview URL.
+	 * @param {string} args.unique - The unique identifier of the document to preview.
+	 * @param {string | undefined | null} args.culture - The culture to preview, or undefined/null for the default culture.
+	 * @param {string | undefined | null} args.segment - The segment to preview, or undefined/null for no segment.
+	 * @returns {Promise<void>} Resolves once the preview window has been opened or focused.
+	 * @memberof UmbPreviewController
+	 */
 	async preview(args: UmbPreviewControllerArgs) {
 		// Check if preview window is still open and showing the same document + provider
 		// If so, just focus it and let SignalR handle the refresh
@@ -55,11 +69,10 @@ export class UmbPreviewController extends UmbControllerBase {
 		}
 
 		if (previewUrlData.message) {
-			const localize = new UmbLocalizationController(this._host);
 
 			umbPeekError(this._host, {
 				color: 'danger',
-				headline: localize.term('general_preview'),
+				headline: this.#localize.term('general_preview'),
 				message: previewUrlData.message,
 			});
 
