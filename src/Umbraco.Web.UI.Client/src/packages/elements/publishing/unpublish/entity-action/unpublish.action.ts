@@ -79,6 +79,7 @@ export class UmbUnpublishElementEntityAction extends UmbEntityActionBase<never> 
 
 		const result = await umbOpenModal(this, UMB_ELEMENT_UNPUBLISH_MODAL, {
 			data: {
+				elementUnique: this.args.unique,
 				options,
 				pickableFilter: (option) => {
 					if (!option.culture) return false;
