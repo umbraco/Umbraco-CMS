@@ -12,8 +12,7 @@ export interface UmbPreviewControllerArgs {
 
 export class UmbPreviewController extends UmbControllerBase {
 	#previewWindow: WindowProxy | null = null;
-	#previewWindowDocumentId: string | null = null;
-	#previewWindowUrlProviderAlias: string | null = null;
+	#previewWindowKey: string | null = null;
 
 	#localize = new UmbLocalizationController(this);
 
@@ -30,23 +29,10 @@ export class UmbPreviewController extends UmbControllerBase {
 	 * @memberof UmbPreviewController
 	 */
 	async preview(args: UmbPreviewControllerArgs) {
-		// Check if preview window is still open and showing the same document + provider
-		// If so, just focus it and let SignalR handle the refresh
-		try {
-			if (
-				this.#previewWindow &&
-				!this.#previewWindow.closed &&
-				this.#previewWindowDocumentId === args.unique &&
-				this.#previewWindowUrlProviderAlias === args.urlProviderAlias
-			) {
-				this.#previewWindow.focus();
-				return;
-			}
-		} catch {
-			// Window reference is stale, continue to create new preview session
-			this.#previewWindow = null;
-			this.#previewWindowDocumentId = null;
-			this.#previewWindowUrlProviderAlias = null;
+		// If a preview window is still open for the same document + provider, just focus it
+		// and let SignalR handle the refresh
+		if (this.#tryFocusExistingWindow(args)) {
+			return;
 		}
 
 		const previewRepository = new UmbPreviewRepository(this);
@@ -62,21 +48,40 @@ export class UmbPreviewController extends UmbControllerBase {
 			const previewUrl = new URL(previewUrlData.url, window.document.baseURI);
 			previewUrl.searchParams.set('rnd', Date.now().toString());
 			this.#previewWindow = window.open(previewUrl.toString(), `umbpreview-${args.unique}`);
-			this.#previewWindowDocumentId = args.unique;
-			this.#previewWindowUrlProviderAlias = args.urlProviderAlias;
+			this.#previewWindowKey = this.#windowKey(args);
 			this.#previewWindow?.focus();
 			return;
 		}
 
-		if (previewUrlData.message) {
-
-			umbPeekError(this._host, {
-				color: 'danger',
-				headline: this.#localize.term('general_preview'),
-				message: previewUrlData.message,
-			});
-
-			throw new Error(previewUrlData.message);
+		if (!previewUrlData.message) {
+			return;
 		}
+
+		umbPeekError(this._host, {
+			color: 'danger',
+			headline: this.#localize.term('general_preview'),
+			message: previewUrlData.message,
+		});
+
+		throw new Error(previewUrlData.message);
+	}
+
+	#windowKey(args: UmbPreviewControllerArgs): string {
+		return `${args.unique}_${args.urlProviderAlias}`;
+	}
+
+	#tryFocusExistingWindow(args: UmbPreviewControllerArgs): boolean {
+		try {
+			if (!this.#previewWindow?.closed && this.#previewWindowKey === this.#windowKey(args)) {
+				this.#previewWindow?.focus();
+				return true;
+			}
+		} catch {
+			// Window reference is stale, continue to create new preview session
+			this.#previewWindow = null;
+			this.#previewWindowKey = null;
+		}
+
+		return false;
 	}
 }
