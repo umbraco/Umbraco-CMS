@@ -1,4 +1,6 @@
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
@@ -22,17 +24,26 @@ internal sealed class ElementIndexingNotificationHandler : INotificationHandler<
 {
     private readonly IDeferredSearchReindexService _deferredSearchReindexService;
     private readonly IUmbracoIndexingHandler _umbracoIndexingHandler;
+    private readonly IOptionsMonitor<IndexingSettings> _indexingSettings;
 
     public ElementIndexingNotificationHandler(
         IDeferredSearchReindexService deferredSearchReindexService,
-        IUmbracoIndexingHandler umbracoIndexingHandler)
+        IUmbracoIndexingHandler umbracoIndexingHandler,
+        IOptionsMonitor<IndexingSettings> indexingSettings)
     {
         _deferredSearchReindexService = deferredSearchReindexService;
         _umbracoIndexingHandler = umbracoIndexingHandler;
+        _indexingSettings = indexingSettings;
     }
 
     public void Handle(ElementCacheRefresherNotification notification)
     {
+        // Nothing to reindex when the feature is disabled; skip early to avoid waking the background worker.
+        if (_indexingSettings.CurrentValue.IndexExternalBlockElements is false)
+        {
+            return;
+        }
+
         if (_umbracoIndexingHandler.Enabled is false || Suspendable.ExamineEvents.CanIndex is false)
         {
             return;

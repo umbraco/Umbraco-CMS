@@ -1,6 +1,8 @@
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Changes;
@@ -15,6 +17,7 @@ public class ElementIndexingNotificationHandlerTests
 {
     private Mock<IDeferredSearchReindexService> _mockReindexService = null!;
     private Mock<IUmbracoIndexingHandler> _mockIndexingHandler = null!;
+    private Mock<IOptionsMonitor<IndexingSettings>> _mockIndexingSettings = null!;
     private ElementIndexingNotificationHandler _sut = null!;
 
     [SetUp]
@@ -23,7 +26,12 @@ public class ElementIndexingNotificationHandlerTests
         _mockReindexService = new Mock<IDeferredSearchReindexService>();
         _mockIndexingHandler = new Mock<IUmbracoIndexingHandler>();
         _mockIndexingHandler.Setup(x => x.Enabled).Returns(true);
-        _sut = new ElementIndexingNotificationHandler(_mockReindexService.Object, _mockIndexingHandler.Object);
+        _mockIndexingSettings = new Mock<IOptionsMonitor<IndexingSettings>>();
+        _mockIndexingSettings.Setup(x => x.CurrentValue).Returns(new IndexingSettings { IndexExternalBlockElements = true });
+        _sut = new ElementIndexingNotificationHandler(
+            _mockReindexService.Object,
+            _mockIndexingHandler.Object,
+            _mockIndexingSettings.Object);
     }
 
     [Test]
