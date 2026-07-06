@@ -396,12 +396,8 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 				// If data of the selection is not valid Then just save:
 				await this.#documentWorkspaceContext!.performCreateOrUpdate(variantIds, saveData);
 				// Notifying that the save was successful, but we did not publish, which is what we want to symbolize here. [NL]
-				const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
-				if (!notificationContext) {
-					throw new Error('Notification context is missing');
-				}
 				// TODO: Get rid of the save notification.
-				notificationContext.peek('danger', {
+				this.#notificationContext?.peek('danger', {
 					data: { message: this.#localize.term('speechBubbles_editContentPublishedFailedByValidation') },
 				});
 				// Reject even thought the save was successful, but we did not publish, which is what we want to symbolize here. [NL]
