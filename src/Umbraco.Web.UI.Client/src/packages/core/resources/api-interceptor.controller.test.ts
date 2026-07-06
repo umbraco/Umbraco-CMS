@@ -48,6 +48,8 @@ describe('UmbApiInterceptorController', () => {
 		expect(result.status).to.equal(524);
 		expect(body.type).to.equal('GatewayTimeout');
 		expect(body.title).to.not.include('<html>');
+		// The status code is preserved in the detail so it can be reported/searched on, e.g. in a support ticket.
+		expect(body.detail).to.include('524');
 	});
 
 	it('rewrites a gateway-timeout (504) response the same way', async () => {

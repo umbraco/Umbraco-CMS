@@ -30,6 +30,8 @@ describe('UmbResourceController', () => {
 			expect(UmbApiError.isUmbApiError(result)).to.be.true;
 			expect(result.status).to.equal(0);
 			expect(result.problemDetails.type).to.equal('NetworkError');
+			// The browser's own error message is preserved in the detail for diagnostic/support purposes.
+			expect(result.problemDetails.detail).to.include('Failed to fetch');
 		});
 
 		it('maps ProblemDetails-like errors to an UmbApiError carrying the original problem details', () => {

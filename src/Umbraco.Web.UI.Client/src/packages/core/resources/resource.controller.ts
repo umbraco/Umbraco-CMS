@@ -42,8 +42,7 @@ export class UmbResourceController<T = unknown> extends UmbControllerBase {
 			return new UmbApiError('Connection lost', 0, null, {
 				status: 0,
 				title: 'Connection lost',
-				detail:
-					'The connection to the server was lost while the request was in progress. If you were saving or publishing, it may have completed on the server — please check before trying again.',
+				detail: `The connection to the server was lost while the request was in progress (${error.message}). If you were saving or publishing, it may have completed on the server — please check before trying again.`,
 				errors: undefined,
 				type: 'NetworkError',
 				stack: error.stack,

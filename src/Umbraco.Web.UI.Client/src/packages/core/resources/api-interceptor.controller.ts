@@ -210,8 +210,7 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 				const timeoutProblemDetails: UmbProblemDetails = {
 					status: response.status,
 					title: 'The request timed out',
-					detail:
-						'A proxy or gateway between your browser and the server closed the connection before it responded. The action you performed may still have completed on the server — please check before trying again.',
+					detail: `A proxy or gateway between your browser and the server closed the connection before it responded (HTTP ${response.status}). The action you performed may still have completed on the server — please check before trying again.`,
 					errors: undefined,
 					type: 'GatewayTimeout',
 					stack: undefined,
