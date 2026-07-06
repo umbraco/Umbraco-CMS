@@ -6,8 +6,8 @@ import { umbPeekError } from '@umbraco-cms/backoffice/notification';
 export interface UmbPreviewControllerArgs {
 	urlProviderAlias: string;
 	unique: string;
-	culture: string | undefined | null;
-	segment: string | undefined | null;
+	culture?: string | null;
+	segment?: string | null;
 }
 
 export class UmbPreviewController extends UmbControllerBase {
@@ -23,8 +23,8 @@ export class UmbPreviewController extends UmbControllerBase {
 	 * @param {UmbPreviewControllerArgs} args - The preview arguments.
 	 * @param {string} args.urlProviderAlias - The alias of the URL provider used to resolve the preview URL.
 	 * @param {string} args.unique - The unique identifier of the document to preview.
-	 * @param {string | undefined | null} args.culture - The culture to preview, or undefined/null for the default culture.
-	 * @param {string | undefined | null} args.segment - The segment to preview, or undefined/null for no segment.
+	 * @param {string | null} args.culture - The culture to preview, or null for the default culture.
+	 * @param {string | null} args.segment - The segment to preview, or null for no segment.
 	 * @returns {Promise<void>} Resolves once the preview window has been opened or focused.
 	 * @memberof UmbPreviewController
 	 */
