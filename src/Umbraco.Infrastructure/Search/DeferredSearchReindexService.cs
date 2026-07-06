@@ -293,6 +293,13 @@ internal sealed class DeferredSearchReindexService : IDeferredSearchReindexServi
 
     private void ReindexDocumentsReferencingElements(int[] elementIds)
     {
+        // External block element content only participates in the index when the feature is enabled; with it off there
+        // is nothing to refresh, so skip the traversal and reindex entirely.
+        if (_indexingSettings.CurrentValue.IndexExternalBlockElements is false)
+        {
+            return;
+        }
+
         IReadOnlyCollection<int> documentIds = FindDocumentIdsReferencingElements(elementIds);
         if (documentIds.Count == 0)
         {
@@ -311,19 +318,27 @@ internal sealed class DeferredSearchReindexService : IDeferredSearchReindexServi
 
             foreach (IContent document in documents)
             {
-                var isPublished = false;
-                if (document.Published)
+                // External element content is flattened only into the external (published) index, so a document that
+                // is not effectively published has no entry that could contain it - reindexing it would be a no-op.
+                if (document.Published is false)
                 {
-                    // The published-ancestor check depends only on the ancestor chain, so cache it per parent —
-                    // sibling documents under the same parent share the result.
-                    if (publishChecked.TryGetValue(document.ParentId, out isPublished) is false)
-                    {
-                        isPublished = _publishStatusQueryService.HasPublishedAncestorPath(document.Key);
-                        publishChecked[document.ParentId] = isPublished;
-                    }
+                    continue;
                 }
 
-                _umbracoIndexingHandler.ReIndexForContent(document, isPublished);
+                // The published-ancestor check depends only on the ancestor chain, so cache it per parent —
+                // sibling documents under the same parent share the result.
+                if (publishChecked.TryGetValue(document.ParentId, out var ancestorPublished) is false)
+                {
+                    ancestorPublished = _publishStatusQueryService.HasPublishedAncestorPath(document.Key);
+                    publishChecked[document.ParentId] = ancestorPublished;
+                }
+
+                if (ancestorPublished is false)
+                {
+                    continue;
+                }
+
+                _umbracoIndexingHandler.ReIndexForContent(document, true);
             }
         }
     }

@@ -12,7 +12,6 @@ using Umbraco.Cms.Infrastructure.Persistence.Relations;
 using Umbraco.Cms.Infrastructure.Search;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
-using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.PropertyEditors;
 using IUmbracoBuilder = Umbraco.Cms.Core.DependencyInjection.IUmbracoBuilder;
 
