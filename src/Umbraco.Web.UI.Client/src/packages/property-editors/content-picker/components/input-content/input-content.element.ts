@@ -30,7 +30,7 @@ export class UmbInputContentElement extends UmbFormControlMixin<string | undefin
 	 * This is a minimum amount of selected items in this input.
 	 * @type {number}
 	 * @attr
-	 * @default undefined
+	 * @default 0
 	 */
 	@property({ type: Number })
 	min = 0;
@@ -48,7 +48,7 @@ export class UmbInputContentElement extends UmbFormControlMixin<string | undefin
 	 * This is a maximum amount of selected items in this input.
 	 * @type {number}
 	 * @attr
-	 * @default undefined
+	 * @default 0
 	 */
 	@property({ type: Number })
 	max = 0;
