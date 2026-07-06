@@ -1,7 +1,7 @@
+import { UmbPreviewRepository } from './repository/preview.repository.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import { umbPeekError } from '@umbraco-cms/backoffice/notification';
-import { UmbPreviewRepository } from '@umbraco-cms/backoffice/preview';
 
 export interface UmbPreviewControllerArgs {
 	urlProviderAlias: string;
