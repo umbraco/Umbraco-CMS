@@ -877,6 +877,51 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
+    public async Task RebuildAllAliasesAsync_Ignores_Alias_For_Unpublished_Culture()
+    {
+        // Arrange - a second language and a culture-variant content type with a culture-varied alias.
+        var secondLanguage = new LanguageBuilder()
+            .WithCultureInfo("fr-FR")
+            .WithIsDefault(false)
+            .Build();
+        await LanguageService.CreateAsync(secondLanguage, Constants.Security.SuperUserKey);
+
+        var defaultIsoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
+
+        var template = TemplateBuilder.CreateTextPageTemplate("unpublishCultureTemplate");
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+
+        var variantContentType = CreateCultureVariantContentTypeWithUrlAlias(template.Id, "pageWithAliasUnpublishCulture");
+        await ContentTypeService.CreateAsync(variantContentType, Constants.Security.SuperUserKey);
+
+        var content = new ContentBuilder()
+            .WithContentType(variantContentType)
+            .WithCultureName(defaultIsoCode, "Multi Culture Page")
+            .WithCultureName("fr-FR", "Page Multi Culture")
+            .Build();
+        content.ParentId = RootPage.Id;
+        content.SetValue(Constants.Conventions.Content.UrlAlias, "default-culture-alias", defaultIsoCode);
+        content.SetValue(Constants.Conventions.Content.UrlAlias, "french-culture-alias", "fr-FR");
+        ContentService.Save(content, -1);
+        ContentService.Publish(content, [defaultIsoCode, "fr-FR"]);
+
+        await DocumentUrlAliasService.CreateOrUpdateAliasesAsync(content.Key);
+
+        // Sanity check - both aliases resolve while both cultures are published.
+        Assert.That(await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("default-culture-alias", defaultIsoCode), Does.Contain(content.Key));
+        Assert.That(await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("french-culture-alias", "fr-FR"), Does.Contain(content.Key));
+
+        // Act - unpublish only the French culture (the document stays published via the default culture),
+        // then rebuild the whole table from scratch.
+        ContentService.Unpublish(content, "fr-FR");
+        await DocumentUrlAliasService.RebuildAllAliasesAsync();
+
+        // Assert - the still-published culture's alias resolves; the unpublished culture's alias does not.
+        Assert.That(await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("default-culture-alias", defaultIsoCode), Does.Contain(content.Key));
+        Assert.That(await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("french-culture-alias", "fr-FR"), Is.Empty);
+    }
+
+    [Test]
     public async Task RebuildAllAliasesAsync_Handles_Empty_Database()
     {
         // Arrange - clear all aliases from documents
