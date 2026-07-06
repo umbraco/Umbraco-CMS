@@ -19,10 +19,9 @@ export const Figure = Node.create<UmbTiptapFigureOptions>({
 	atom: true,
 
 	addAttributes() {
+		// `null` default avoids emitting an empty `figcaption=""` on freshly built figures.
 		return {
-			figcaption: {
-				default: '',
-			},
+			figcaption: { default: null },
 		};
 	},
 
@@ -33,17 +32,7 @@ export const Figure = Node.create<UmbTiptapFigureOptions>({
 	},
 
 	parseHTML() {
-		return [
-			{
-				tag: this.name,
-				getAttrs: (dom) => {
-					const figcaption = dom.querySelector('figcaption');
-					return {
-						figcaption: figcaption?.textContent || '',
-					};
-				},
-			},
-		];
+		return [{ tag: this.name }];
 	},
 
 	renderHTML({ HTMLAttributes }) {

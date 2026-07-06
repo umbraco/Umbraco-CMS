@@ -570,11 +570,7 @@ internal partial class UserService : RepositoryService, IUserService
 
         if (identityCreationResult.Succeded is false)
         {
-            // If we fail from something in Identity we can't know exactly why, so we have to resolve to returning an unknown failure.
-            // But there should be more information in the message.
-            return Attempt.FailWithStatus(
-                UserOperationStatus.UnknownFailure,
-                new UserCreationResult { Error = new ValidationResult(identityCreationResult.ErrorMessage) });
+            return MapCreationFailure(identityCreationResult);
         }
 
         // The user is now created, so we can fetch it to map it to a result model with our generated password.
@@ -606,6 +602,20 @@ internal partial class UserService : RepositoryService, IUserService
         };
 
         return Attempt.SucceedWithStatus(UserOperationStatus.Success, creationResult);
+    }
+
+    private static Attempt<UserCreationResult, UserOperationStatus> MapCreationFailure(IdentityCreationResult identityCreationResult)
+    {
+        if (identityCreationResult.CancelledByNotification)
+        {
+            return Attempt.FailWithStatus(UserOperationStatus.CancelledByNotification, new UserCreationResult());
+        }
+
+        // If we fail from something in Identity we can't know exactly why, so we have to resolve to returning an unknown failure.
+        // But there should be more information in the message.
+        return Attempt.FailWithStatus(
+            UserOperationStatus.UnknownFailure,
+            new UserCreationResult { Error = new ValidationResult(identityCreationResult.ErrorMessage) });
     }
 
     /// <inheritdoc/>

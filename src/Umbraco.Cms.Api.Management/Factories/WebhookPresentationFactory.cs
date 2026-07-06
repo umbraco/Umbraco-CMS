@@ -75,10 +75,10 @@ internal sealed class WebhookPresentationFactory : IWebhookPresentationFactory
     }
 
     /// <summary>
-    /// Creates a new instance of <see cref="WebhookResponseModel"/> based on the specified <see cref="IWebhook"/>.
+    /// Creates a new instance of <see cref="WebhookLogResponseModel"/> based on the specified <see cref="WebhookLog"/>.
     /// </summary>
-    /// <param name="webhook">The <see cref="IWebhook"/> instance from which to create the response model.</param>
-    /// <returns>A <see cref="WebhookResponseModel"/> populated with data from the provided webhook.</returns>
+    /// <param name="webhookLog">The <see cref="WebhookLog"/> instance from which to create the response model.</param>
+    /// <returns>A <see cref="WebhookLogResponseModel"/> populated with data from the provided webhook log.</returns>
     public WebhookLogResponseModel CreateResponseModel(WebhookLog webhookLog)
     {
         var webhookLogResponseModel = new WebhookLogResponseModel
