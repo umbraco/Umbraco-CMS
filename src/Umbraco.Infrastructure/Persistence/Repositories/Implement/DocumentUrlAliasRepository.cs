@@ -105,6 +105,10 @@ internal class DocumentUrlAliasRepository : IDocumentUrlAliasRepository
     }
 
     /// <inheritdoc/>
+    public void DeleteAll()
+        => Database.Execute(Database.SqlContext.Sql().Delete<DocumentUrlAliasDto>());
+
+    /// <inheritdoc/>
     /// <remarks>
     /// This gets all document aliases directly from property data (using an optimized SQL query).
     /// This is more efficient than loading all IContent objects.

@@ -841,6 +841,42 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
+    public async Task RebuildAllAliasesAsync_Removes_Orphaned_Alias_For_Document_Without_Published_Alias()
+    {
+        var isoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
+        var documentKey = new Guid(PageWithNoAliasKey);
+
+        // Simulate a stale row persisted by an older (buggy) version: an alias row exists in the table for a
+        // published document whose published version has no umbracoUrlAlias value. The rebuild must clear it.
+        using (CoreScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            DocumentUrlAliasRepository.Save(new[]
+            {
+                new PublishedDocumentUrlAlias
+                {
+                    DocumentKey = documentKey,
+                    NullableLanguageId = null,
+                    Alias = "orphaned-alias",
+                },
+            });
+        }
+
+        // Act - rebuild.
+        await DocumentUrlAliasService.RebuildAllAliasesAsync();
+
+        // Assert - the orphaned alias is gone from the database (and so cannot be reloaded into the cache).
+        Assert.That(await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("orphaned-alias", isoCode), Is.Empty);
+
+        List<PublishedDocumentUrlAlias> storedAliases;
+        using (CoreScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            storedAliases = DocumentUrlAliasRepository.GetAll().Where(a => a.DocumentKey == documentKey).ToList();
+        }
+
+        Assert.That(storedAliases, Is.Empty);
+    }
+
+    [Test]
     public async Task RebuildAllAliasesAsync_Handles_Empty_Database()
     {
         // Arrange - clear all aliases from documents

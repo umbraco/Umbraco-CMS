@@ -418,7 +418,6 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
         // Use optimized SQL query to fetch only documents with aliases
         IEnumerable<DocumentUrlAliasRaw> rawAliases = _documentUrlAliasRepository.GetAllDocumentUrlAliases();
 
-        var documentKeys = rawAliases.Select(x => x.DocumentKey).Distinct().ToList();
         var toSave = new List<PublishedDocumentUrlAlias>();
 
         foreach (DocumentUrlAliasRaw raw in rawAliases)
@@ -450,9 +449,14 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
             }
         }
 
-        // Clear existing database records and save new
         scope.WriteLock(Constants.Locks.DocumentUrlAliases);
-        _documentUrlAliasRepository.DeleteByDocumentKey(documentKeys);
+
+        // A rebuild is authoritative, so clear the whole table first and repopulate from scratch. Deleting only the
+        // keys still returned by the query above would orphan rows for documents whose published alias was removed,
+        // or that only had a draft alias persisted by an older version (before aliases were restricted to the
+        // published value), and InitAsync would reload those straight back into the routing cache.
+        _documentUrlAliasRepository.DeleteAll();
+
         if (toSave.Count > 0)
         {
             _documentUrlAliasRepository.Save(toSave);
