@@ -38,6 +38,9 @@ export class UmbResourceController<T = unknown> extends UmbControllerBase {
 			// The fetch() promise rejects with a TypeError when it never received a response at all, e.g. a DNS
 			// failure, a refused/reset connection, or a proxy (such as Cloudflare) dropping the connection on a
 			// long-running request. This is distinct from an HTTP error response, which resolves normally.
+			// This check is intentionally broad: an unrelated TypeError thrown elsewhere in the same promise
+			// chain would also land here and be reported as "Connection lost", since this method has no way
+			// to distinguish it from a genuine fetch() rejection.
 			// See https://github.com/umbraco/Umbraco-CMS/issues/16041
 			return new UmbApiError('Connection lost', 0, null, {
 				status: 0,

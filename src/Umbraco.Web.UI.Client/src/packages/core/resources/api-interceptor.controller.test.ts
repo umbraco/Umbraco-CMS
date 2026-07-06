@@ -30,6 +30,8 @@ describe('UmbApiInterceptorController', () => {
 		} as unknown as typeof umbHttpClient;
 
 		controller.addErrorInterceptor(fakeClient);
+
+		expect(responseInterceptors).to.have.lengthOf(1);
 	});
 
 	afterEach(() => {
@@ -62,6 +64,33 @@ describe('UmbApiInterceptorController', () => {
 		const body = await result.json();
 
 		expect(body.type).to.equal('GatewayTimeout');
+	});
+
+	it('rewrites a gateway-unreachable (523) response with a message that does not claim the action ran', async () => {
+		const originalResponse = new Response('<html>523: Origin is unreachable</html>', {
+			status: 523,
+			headers: { 'Content-Type': 'text/html' },
+		});
+
+		const result = await responseInterceptors[0](originalResponse, new Request('https://example.com'), {});
+		const body = await result.json();
+
+		expect(body.type).to.equal('GatewayUnreachable');
+		expect(body.detail).to.include('523');
+		expect(body.detail).to.not.include('may still have completed');
+	});
+
+	it('does not special-case a 408 Request Timeout, since that is sent by the origin itself, not a gateway', async () => {
+		const originalResponse = new Response(JSON.stringify({ type: 'ServerError', title: 'Request Timeout', status: 408 }), {
+			status: 408,
+			headers: { 'Content-Type': 'application/json' },
+		});
+
+		const result = await responseInterceptors[0](originalResponse, new Request('https://example.com'), {});
+		const body = await result.json();
+
+		expect(body.type).to.not.equal('GatewayTimeout');
+		expect(body.type).to.not.equal('GatewayUnreachable');
 	});
 
 	it('leaves other error responses to fall through to the generic ServerError branch', async () => {
