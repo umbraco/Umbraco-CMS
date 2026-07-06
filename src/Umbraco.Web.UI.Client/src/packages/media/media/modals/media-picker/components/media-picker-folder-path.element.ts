@@ -261,7 +261,7 @@ export class UmbMediaPickerFolderPathElement extends UmbLitElement {
 								<uui-icon name="remove"></uui-icon>
 							</uui-button>
 						</uui-input>
-						<uui-button compact type="submit" label=${this.localize.term('actions_create')}></uui-button>
+						<uui-button look="outline" type="submit" label=${this.localize.term('actions_create')}></uui-button>
 					</form>
 				</uui-form>
 			`;
@@ -302,7 +302,6 @@ export class UmbMediaPickerFolderPathElement extends UmbLitElement {
 				display: flex;
 				align-items: center;
 				margin: 0 var(--uui-size-3);
-				overflow: hidden;
 				min-width: 0;
 			}
 
@@ -316,7 +315,6 @@ export class UmbMediaPickerFolderPathElement extends UmbLitElement {
 
 			#new-folder {
 				width: 220px;
-				height: 100%;
 			}
 
 			#folder-type-selection {
