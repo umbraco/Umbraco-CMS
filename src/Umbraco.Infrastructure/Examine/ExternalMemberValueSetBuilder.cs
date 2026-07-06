@@ -29,7 +29,7 @@ public class ExternalMemberValueSetBuilder : IValueSetBuilder<ExternalMemberIden
     {
         foreach (ExternalMemberIdentity member in members)
         {
-            var values = new Dictionary<string, IEnumerable<object?>>
+            var values = new Dictionary<string, IEnumerable<object>>
             {
                 { UmbracoExamineFieldNames.NodeKeyFieldName, new object[] { member.Key } },
                 { UmbracoExamineFieldNames.NodeNameFieldName, member.Name?.Yield() ?? Enumerable.Empty<string>() },
@@ -49,7 +49,7 @@ public class ExternalMemberValueSetBuilder : IValueSetBuilder<ExternalMemberIden
         }
     }
 
-    private static void AddProfileDataFields(Dictionary<string, IEnumerable<object?>> values, string? profileData)
+    private static void AddProfileDataFields(Dictionary<string, IEnumerable<object>> values, string? profileData)
     {
         if (string.IsNullOrWhiteSpace(profileData))
         {

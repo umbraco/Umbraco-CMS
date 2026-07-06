@@ -1,0 +1,66 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="Moq" />
+    <PackageReference Include="NUnit" />
+    <PackageReference Include="NUnit3TestAdapter" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="NUnit.Framework" />
+  </ItemGroup>
+
+  <Import Project="..\..\src\Umbraco.Cms.Targets\buildTransitive\Umbraco.Cms.Targets.props" />
+  <Import Project="..\..\src\Umbraco.Cms.Targets\buildTransitive\Umbraco.Cms.Targets.targets" />
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Umbraco.Cms.Search.BackOffice\Umbraco.Cms.Search.BackOffice.csproj" />
+    <ProjectReference Include="..\..\src\Umbraco.Cms.Search.Core\Umbraco.Cms.Search.Core.csproj" />
+    <ProjectReference Include="..\Umbraco.Tests.Integration\Umbraco.Tests.Integration.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="appsettings.Tests.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Tests\InvariantContentStructureTests.Published.cs">
+      <DependentUpon>InvariantContentStructureTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Tests\InvariantContentStructureTests.Draft.cs">
+      <DependentUpon>InvariantContentStructureTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Tests\InvariantContentTests.Published.cs">
+      <DependentUpon>InvariantContentTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Tests\InvariantContentTests.Draft.cs">
+      <DependentUpon>InvariantContentTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Tests\PublishedContentCacheRefresherTests.Variant.cs">
+      <DependentUpon>PublishedContentCacheRefresherTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Tests\PublishedContentCacheRefresherTests.Invariant.cs">
+      <DependentUpon>PublishedContentCacheRefresherTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Tests\BackOffice\IndexedEntitySearchServiceTests.Content.cs">
+      <DependentUpon>IndexedEntitySearchServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Tests\BackOffice\IndexedEntitySearchServiceTests.Media.cs">
+      <DependentUpon>IndexedEntitySearchServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Tests\BackOffice\ContentSearchServiceTests.Content.cs">
+      <DependentUpon>ContentSearchServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Tests\BackOffice\ContentSearchServiceTests.Media.cs">
+      <DependentUpon>ContentSearchServiceTests.cs</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+</Project>

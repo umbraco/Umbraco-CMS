@@ -57,7 +57,7 @@ public class UmbracoContentIndex : UmbracoExamineIndex, IUmbracoContentIndex
     /// <summary>
     ///     Special check for invalid paths.
     /// </summary>
-    protected override void PerformIndexItems(IEnumerable<ValueSet> values, Action<IndexOperationEventArgs> onComplete)
+    protected override void PerformIndexItems(IEnumerable<ValueSet> values, Action<IndexOperationEventArgs>? onComplete)
     {
         // We don't want to re-enumerate this list, but we need to split it into 2x enumerables: invalid and valid items.
         // The Invalid items will be deleted, these are items that have invalid paths (i.e. moved to the recycle bin, etc...)
@@ -110,7 +110,7 @@ public class UmbracoContentIndex : UmbracoExamineIndex, IUmbracoContentIndex
         if ((hasDeletes && !hasUpdates) || (!hasDeletes && !hasUpdates))
         {
             // We need to manually call the completed method.
-            onComplete(new IndexOperationEventArgs(this, 0));
+            onComplete?.Invoke(new IndexOperationEventArgs(this, 0));
         }
     }
 

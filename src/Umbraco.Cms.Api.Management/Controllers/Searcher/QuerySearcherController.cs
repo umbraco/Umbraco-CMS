@@ -58,7 +58,7 @@ public class QuerySearcherController : SearcherControllerBase
             return Task.FromResult<ActionResult<PagedViewModel<SearchResultResponseModel>>>(new PagedViewModel<SearchResultResponseModel>());
         }
 
-        if (!_examineManagerService.TryFindSearcher(searcherName, out ISearcher searcher))
+        if (!_examineManagerService.TryFindSearcher(searcherName, out ISearcher? searcher))
         {
             var invalidModelProblem = new ProblemDetails
             {

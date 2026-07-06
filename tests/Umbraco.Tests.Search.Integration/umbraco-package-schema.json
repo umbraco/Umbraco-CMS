@@ -1,0 +1,99 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "definitions": {
+        "(ManifestUfmFilter|ManifestUfmComponent|ManifestMarkedExtension|ManifestPropertyValueCloner|UmbPropertyEditorExtensions|ManifestPropertyValuePreset|ManifestPropertyValueResolver|ManifestEntityActionDuplicateToKind|ManifestEntityActionMoveToKind|ManifestEntityActionReloadTreeItemChildrenKind|ManifestEntityActionSortChildrenOfKind|UmbSectionExtensions|ManifestDashboard|ManifestWorkspaceDefaultKind|ManifestWorkspaceActionDefaultKind|ManifestWorkspaceFooterApp|ManifestWorkspaceFooterAppMenuBreadcrumbKind|ManifestWorkspaceFooterAppVariantMenuBreadcrumbKind|ManifestWorkspaceViewContentTypeDesignEditorKind|ManifestWorkspaceView<MetaWorkspaceView>|ManifestWorkspaceRoutableKind|ManifestWorkspaceContext|ManifestTreeItem|ManifestTree|ManifestEntityActionCreateFolderKind|ManifestEntityActionDeleteFolderKind|ManifestEntityActionUpdateFolderKind|ManifestEntityCreateOptionActionFolderKind|ManifestMenu|ManifestMenuItem|ManifestMenuItemActionKind|ManifestMenuItemLinkKind|ManifestWorkspaceContextMenuStructureKind|ManifestMenuItemTreeKind|ManifestModal|ManifestCollectionAction|ManifestCollection|ManifestCollectionActionCreateKind|ManifestCollectionTextFilter|ManifestCollectionMenu|ManifestCollectionView|ManifestCollectionViewTableKind|ManifestWorkspaceViewCollectionKind|ManifestValueSummary|ManifestAuditLogActionDefaultKind|ManifestEntityActionContentRollbackKind|ManifestWorkspaceInfoAppAuditLogKind|ManifestWorkspaceViewContentCollectionKind|ManifestEntityActionSortChildrenOfContentKind|ManifestUserProfileApp|ManifestAuthProvider|ManifestIcons|ManifestEntityUserPermission|ManifestGranularUserPermission|ManifestLocalization|ManifestPickerSearchResultItem|ManifestCollectionMenuItem|ManifestPropertyEditorDataSource|ManifestEntityActionDeleteKind|ManifestEntityActionDefaultKind|ManifestEntityActionCreateKind|ManifestSearchProvider|ManifestSearchResultItem|ManifestGlobalSearch|ManifestAppEntryPoint|ManifestBackofficeEntryPoint|ManifestEntryPoint|UmbCoreManifestTypes|ManifestEntityItemRef<MetaEntityItemRef>|ManifestDataSourceDataMapping<MetaDataSourceDataMapping>|ManifestPropertyContext<MetaPropertyContext>|ManifestSectionContext<MetaSectionContext>|ManifestWorkspaceActionMenuItem<MetaWorkspaceActionMenuItem>|ManifestWorkspaceActionMenuItemDefaultKind<MetaWorkspaceActionMenuItemDefaultKind>|ManifestWorkspaceInfoApp<MetaWorkspaceInfoApp>|ManifestWorkspaceAction<MetaWorkspaceAction,UmbWorkspaceAction<MetaWorkspaceAction>>|ManifestWorkspace<MetaWorkspace,UmbControllerHostElement,UmbWorkspaceContext>|ManifestEntityCreateOptionAction<MetaEntityCreateOptionAction>|ManifestEntityCollectionItemCard<MetaEntityCollectionItemCard>|ManifestEntityCollectionItemRef<MetaEntityCollectionItemRef>|ManifestAuditLogAction<MetaAuditLogAction>|ManifestCurrentUserAction<MetaCurrentUserAction>|ManifestPropertyValidationPathTranslator<any>|ManifestEntityAction<MetaEntityAction>|ManifestEntityBulkActionDeleteKind|UmbEntityBulkActionExtensions|ManifestExternalLoginProvider|ManifestGlobalContext|ManifestHeaderApp|ManifestHeaderAppButtonKind|ManifestMfaLoginProvider|ManifestPreviewAppProvider|ManifestRepository<UmbApi>|UmbStoreExtensions)[]": {
+            "type": "object"
+        },
+        "UmbracoPackageImportmap": {
+            "properties": {
+                "imports": {
+                    "$ref": "#/definitions/UmbracoPackageImportmapValue",
+                    "description": "This is used to define the module specifiers and their respective paths for the package to be used in the browser.",
+                    "examples": [
+                        {
+                            "library": "./path/to/library.js",
+                            "library/*": "./path/to/library/*"
+                        }
+                    ],
+                    "title": "A module specifier with a path for the importmap"
+                },
+                "scopes": {
+                    "$ref": "#/definitions/UmbracoPackageImportmapScopes",
+                    "description": "This is used to define the scopes for the package to be used in the browser. It has to specify a path and a value that is an object with module specifiers and their respective paths.",
+                    "examples": [
+                        {
+                            "/path/to/library": {
+                                "library": "./path/to/some/other/library.js"
+                            }
+                        }
+                    ],
+                    "title": "The importmap scopes for the package"
+                }
+            },
+            "required": [
+                "imports"
+            ],
+            "type": "object"
+        },
+        "UmbracoPackageImportmapScopes": {
+            "additionalProperties": {
+                "$ref": "#/definitions/UmbracoPackageImportmapValue"
+            },
+            "type": "object"
+        },
+        "UmbracoPackageImportmapValue": {
+            "additionalProperties": {
+                "type": "string"
+            },
+            "type": "object"
+        }
+    },
+    "description": "Umbraco package manifest JSON",
+    "properties": {
+        "allowPackageTelemetry": {
+            "default": true,
+            "title": "Decides if the package sends telemetry data for collection",
+            "type": "boolean"
+        },
+        "allowPublicAccess": {
+            "default": false,
+            "title": "Decides if the package is allowed to be accessed by the public, e.g. on the login screen",
+            "type": "boolean"
+        },
+        "allowTelemetry": {
+            "default": true,
+            "title": "Decides if the package sends telemetry data for collection",
+            "type": "boolean"
+        },
+        "extensions": {
+            "$ref": "#/definitions/(ManifestUfmFilter%7CManifestUfmComponent%7CManifestMarkedExtension%7CManifestPropertyValueCloner%7CUmbPropertyEditorExtensions%7CManifestPropertyValuePreset%7CManifestPropertyValueResolver%7CManifestEntityActionDuplicateToKind%7CManifestEntityActionMoveToKind%7CManifestEntityActionReloadTreeItemChildrenKind%7CManifestEntityActionSortChildrenOfKind%7CUmbSectionExtensions%7CManifestDashboard%7CManifestWorkspaceDefaultKind%7CManifestWorkspaceActionDefaultKind%7CManifestWorkspaceFooterApp%7CManifestWorkspaceFooterAppMenuBreadcrumbKind%7CManifestWorkspaceFooterAppVariantMenuBreadcrumbKind%7CManifestWorkspaceViewContentTypeDesignEditorKind%7CManifestWorkspaceView%3CMetaWorkspaceView%3E%7CManifestWorkspaceRoutableKind%7CManifestWorkspaceContext%7CManifestTreeItem%7CManifestTree%7CManifestEntityActionCreateFolderKind%7CManifestEntityActionDeleteFolderKind%7CManifestEntityActionUpdateFolderKind%7CManifestEntityCreateOptionActionFolderKind%7CManifestMenu%7CManifestMenuItem%7CManifestMenuItemActionKind%7CManifestMenuItemLinkKind%7CManifestWorkspaceContextMenuStructureKind%7CManifestMenuItemTreeKind%7CManifestModal%7CManifestCollectionAction%7CManifestCollection%7CManifestCollectionActionCreateKind%7CManifestCollectionTextFilter%7CManifestCollectionMenu%7CManifestCollectionView%7CManifestCollectionViewTableKind%7CManifestWorkspaceViewCollectionKind%7CManifestValueSummary%7CManifestAuditLogActionDefaultKind%7CManifestEntityActionContentRollbackKind%7CManifestWorkspaceInfoAppAuditLogKind%7CManifestWorkspaceViewContentCollectionKind%7CManifestEntityActionSortChildrenOfContentKind%7CManifestUserProfileApp%7CManifestAuthProvider%7CManifestIcons%7CManifestEntityUserPermission%7CManifestGranularUserPermission%7CManifestLocalization%7CManifestPickerSearchResultItem%7CManifestCollectionMenuItem%7CManifestPropertyEditorDataSource%7CManifestEntityActionDeleteKind%7CManifestEntityActionDefaultKind%7CManifestEntityActionCreateKind%7CManifestSearchProvider%7CManifestSearchResultItem%7CManifestGlobalSearch%7CManifestAppEntryPoint%7CManifestBackofficeEntryPoint%7CManifestEntryPoint%7CUmbCoreManifestTypes%7CManifestEntityItemRef%3CMetaEntityItemRef%3E%7CManifestDataSourceDataMapping%3CMetaDataSourceDataMapping%3E%7CManifestPropertyContext%3CMetaPropertyContext%3E%7CManifestSectionContext%3CMetaSectionContext%3E%7CManifestWorkspaceActionMenuItem%3CMetaWorkspaceActionMenuItem%3E%7CManifestWorkspaceActionMenuItemDefaultKind%3CMetaWorkspaceActionMenuItemDefaultKind%3E%7CManifestWorkspaceInfoApp%3CMetaWorkspaceInfoApp%3E%7CManifestWorkspaceAction%3CMetaWorkspaceAction%2CUmbWorkspaceAction%3CMetaWorkspaceAction%3E%3E%7CManifestWorkspace%3CMetaWorkspace%2CUmbControllerHostElement%2CUmbWorkspaceContext%3E%7CManifestEntityCreateOptionAction%3CMetaEntityCreateOptionAction%3E%7CManifestEntityCollectionItemCard%3CMetaEntityCollectionItemCard%3E%7CManifestEntityCollectionItemRef%3CMetaEntityCollectionItemRef%3E%7CManifestAuditLogAction%3CMetaAuditLogAction%3E%7CManifestCurrentUserAction%3CMetaCurrentUserAction%3E%7CManifestPropertyValidationPathTranslator%3Cany%3E%7CManifestEntityAction%3CMetaEntityAction%3E%7CManifestEntityBulkActionDeleteKind%7CUmbEntityBulkActionExtensions%7CManifestExternalLoginProvider%7CManifestGlobalContext%7CManifestHeaderApp%7CManifestHeaderAppButtonKind%7CManifestMfaLoginProvider%7CManifestPreviewAppProvider%7CManifestRepository%3CUmbApi%3E%7CUmbStoreExtensions)%5B%5D",
+            "title": "An array of Umbraco package manifest types that will be installed"
+        },
+        "id": {
+            "title": "The unique identifier of the Umbraco package",
+            "type": "string"
+        },
+        "importmap": {
+            "$ref": "#/definitions/UmbracoPackageImportmap",
+            "description": "This is used to define the imports and the scopes for the package to be used in the browser. It will be combined with the global importmap.",
+            "title": "The importmap for the package"
+        },
+        "name": {
+            "title": "The name of the Umbraco package",
+            "type": "string"
+        },
+        "version": {
+            "examples": [
+                "0.1.0"
+            ],
+            "title": "The version of the Umbraco package in the style of semver",
+            "type": "string"
+        }
+    },
+    "required": [
+        "extensions",
+        "name"
+    ],
+    "type": "object"
+}
+

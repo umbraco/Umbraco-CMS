@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <PropertyGroup>
+    <Title>Umbraco CMS - Search - Core Client</Title>
+    <Description>Contains the backoffice UI for Umbraco Search.</Description>
+    <PackageTags>umbraco search</PackageTags>
+    <StaticWebAssetBasePath>/</StaticWebAssetBasePath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Dont include the client folder as part of packaging nuget build -->
+    <Content Remove="Client\**" />
+
+    <!-- However make the Umbraco-package.json included for dotnet pack or nuget package and visible to the solution -->
+    <None Include="Client\public\umbraco-package.json" Pack="false" />
+    <None Include="Client\package.json" Pack="false" />
+    <None Include="Client\tsconfig.json" Pack="false" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\" />
+  </ItemGroup>
+
+</Project>

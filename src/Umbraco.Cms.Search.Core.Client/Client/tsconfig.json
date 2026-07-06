@@ -1,0 +1,13 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    /* Path mappings */
+    "paths": {
+      "@umbraco-cms/search/global": ["./src/global/index.ts"],
+      "@umbraco-cms/search/settings": ["./src/settings/index.ts"]
+    },
+
+    "types": ["@umbraco-cms/backoffice/extension-types"]
+  },
+  "include": ["src"]
+}

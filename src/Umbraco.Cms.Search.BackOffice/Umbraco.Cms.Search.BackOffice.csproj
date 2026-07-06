@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Title>Umbraco CMS - Search - BackOffice</Title>
+    <Description>Integrates Umbraco Search with the backoffice search services in Umbraco CMS.</Description>
+    <PackageTags>umbraco search</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Umbraco.Cms.Search.Core\Umbraco.Cms.Search.Core.csproj" />
+    <ProjectReference Include="..\Umbraco.Examine.Lucene\Umbraco.Examine.Lucene.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Examine;
 
 namespace Umbraco.Cms.Api.Management.Services;
@@ -13,5 +14,5 @@ public interface IExamineManagerService
     /// <param name="searcherName">The name of the searcher to find.</param>
     /// <param name="searcher">When this method returns, contains the found searcher if the searcher was found; otherwise, null.</param>
     /// <returns>True if the searcher was found; otherwise, false.</returns>
-    bool TryFindSearcher(string searcherName, out ISearcher searcher);
+    bool TryFindSearcher(string searcherName, [MaybeNullWhen(false)] out ISearcher searcher);
 }

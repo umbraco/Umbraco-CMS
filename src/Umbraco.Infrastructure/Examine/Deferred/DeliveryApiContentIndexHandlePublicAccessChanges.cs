@@ -203,7 +203,7 @@ internal sealed class DeliveryApiContentIndexHandlePublicAccessChanges : Deliver
                 .Execute(QueryOptions.SkipTake(page * pageSize, pageSize));
             total = results.TotalItemCount;
 
-            ids.AddRange(results.Select(result => int.Parse(result[UmbracoExamineFieldNames.DeliveryApiContentIndex.Id])));
+            ids.AddRange(results.Select(result => int.Parse(result[UmbracoExamineFieldNames.DeliveryApiContentIndex.Id]!)));
 
             page++;
         }

@@ -72,7 +72,7 @@ public abstract class UmbracoExamineIndex : LuceneIndex, IUmbracoIndex, IIndexDi
         }
     }
 
-    protected override void PerformIndexItems(IEnumerable<ValueSet> values, Action<IndexOperationEventArgs> onComplete)
+    protected override void PerformIndexItems(IEnumerable<ValueSet> values, Action<IndexOperationEventArgs>? onComplete)
     {
         if (CanInitialize())
         {

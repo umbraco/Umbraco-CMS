@@ -101,7 +101,7 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
             var urlValue = _documentUrlService.IsInitialized
                 ? _documentUrlService.GetUrlSegment(c.Key, defaultCulture, false)
                 : c.GetUrlSegment(_shortStringHelper, _urlSegmentProviders, defaultCulture); // Fallback when DocumentUrlService is not yet initialized (e.g. during upgrade)
-            var values = new Dictionary<string, IEnumerable<object?>>
+            var values = new Dictionary<string, IEnumerable<object>>
             {
                 { "icon", c.ContentType.Icon?.Yield() ?? Enumerable.Empty<string>() },
                 {

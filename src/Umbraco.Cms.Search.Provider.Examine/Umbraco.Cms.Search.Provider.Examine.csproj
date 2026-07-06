@@ -1,0 +1,39 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <PropertyGroup>
+    <Title>Umbraco CMS - Search - Examine provider</Title>
+    <Description>An Examine (Lucene) based search provider for Umbraco Search.</Description>
+    <PackageTags>umbraco search examine</PackageTags>
+    <StaticWebAssetBasePath>/</StaticWebAssetBasePath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Examine" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Umbraco.Cms.Search.Core\Umbraco.Cms.Search.Core.csproj" />
+    <ProjectReference Include="..\Umbraco.Examine.Lucene\Umbraco.Examine.Lucene.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Dont include the client folder as part of packaging nuget build -->
+    <Content Remove="Client\**" />
+
+    <!-- However make these files visible to the solution -->
+    <None Include="Client\public\umbraco-package.json" Pack="false" />
+    <None Include="Client\package.json" Pack="false" />
+    <None Include="Client\tsconfig.json" Pack="false" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+      <_Parameter1>Umbraco.Tests.Search.Examine.Integration</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+
+</Project>
