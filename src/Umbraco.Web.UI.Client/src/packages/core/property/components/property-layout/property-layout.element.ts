@@ -1,4 +1,4 @@
-import { css, customElement, html, property, when } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, ifDefined, property, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
@@ -15,40 +15,40 @@ import '@umbraco-cms/backoffice/ufm';
 export class UmbPropertyLayoutElement extends UmbLitElement {
 	/**
 	 * Alias. The technical name of the property.
-	 * @type {string}
+	 * @type {string | undefined}
 	 * @attr
-	 * @default ''
+	 * @default undefined
 	 */
 	@property({ type: String })
-	public alias = '';
+	public alias?: string;
 
 	/**
 	 * Label. Name of the property.
-	 * @type {string}
+	 * @type {string | undefined}
 	 * @attr
-	 * @default ''
+	 * @default undefined
 	 */
 	@property({ type: String })
-	public label = '';
+	public label?: string;
 
 	/**
 	 * Orientation: Horizontal is the default where label goes left and editor right.
 	 * Vertical is where label goes above the editor.
 	 * @enum ['horizontal', 'vertical']
 	 * @attr
-	 * @default ''
+	 * @default 'horizontal'
 	 */
 	@property({ type: String, reflect: true })
 	public orientation: 'horizontal' | 'vertical' = 'horizontal';
 
 	/**
 	 * Description: render a description underneath the label.
-	 * @type {string}
+	 * @type {string | undefined}
 	 * @attr
-	 * @default ''
+	 * @default undefined
 	 */
 	@property({ type: String })
-	public description = '';
+	public description?: string;
 
 	/**
 	 * @description Make the property appear invalid.
@@ -72,7 +72,7 @@ export class UmbPropertyLayoutElement extends UmbLitElement {
 		// TODO: Only show alias on label if user has access to DocumentType within settings:
 		return html`
 			<div id="headerColumn">
-				<uui-label id="label" title=${this.alias} ?required=${this.mandatory}>
+				<uui-label id="label" title=${ifDefined(this.alias)} ?required=${this.mandatory}>
 					${this.localize.string(this.label)}
 					${when(
 						this.invalid,

@@ -76,4 +76,9 @@ public class CompiledPackage
     ///     Gets or sets the collection of compiled media content.
     /// </summary>
     public IEnumerable<CompiledPackageContentBase> Media { get; set; } = null!;
+
+    /// <summary>
+    ///     Gets or sets the collection of compiled element content.
+    /// </summary>
+    public IEnumerable<CompiledPackageContentBase> Elements { get; set; } = null!;
 }

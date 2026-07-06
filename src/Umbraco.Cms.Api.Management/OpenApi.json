@@ -37278,6 +37278,8 @@
         "tags": [
           "User"
         ],
+        "summary": "Gets element permissions for the current user.",
+        "description": "Gets the element permissions for the currently authenticated user.",
         "operationId": "GetUserCurrentPermissionsElement",
         "parameters": [
           {
@@ -37298,10 +37300,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/UserPermissionsResponseModel"
-                  }
+                  "$ref": "#/components/schemas/UserPermissionsResponseModel"
                 }
               }
             }
@@ -41948,6 +41947,16 @@
           },
           "mediaLoadChildNodes": {
             "type": "boolean"
+          },
+          "elementIds": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
           },
           "documentTypes": {
             "type": "array",
@@ -48429,6 +48438,16 @@
           "mediaLoadChildNodes": {
             "type": "boolean"
           },
+          "elementIds": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
           "documentTypes": {
             "type": "array",
             "items": {
@@ -52840,6 +52859,16 @@
           },
           "mediaLoadChildNodes": {
             "type": "boolean"
+          },
+          "elementIds": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
           },
           "documentTypes": {
             "type": "array",
