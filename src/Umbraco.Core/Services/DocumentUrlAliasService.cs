@@ -33,7 +33,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     /// By doing this we can keep the same logic for rebuild on startup after a migration, provide a means of triggering
     /// a rebuild, and we have future-proofing in case the alias parsing logic changes in future versions.
     /// Bumped to "2" so that installs which persisted draft alias values (before aliases were restricted to the
-    /// published property value) rebuild once on startup and flush the stale entries.
+    /// published property value, see #23206) rebuild once on startup and flush the stale entries.
     /// </remarks>
     private const string CurrentRebuildValue = "2";
 
@@ -451,10 +451,8 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
 
         scope.WriteLock(Constants.Locks.DocumentUrlAliases);
 
-        // A rebuild is authoritative, so clear the whole table first and repopulate from scratch. Deleting only the
-        // keys still returned by the query above would orphan rows for documents whose published alias was removed,
-        // or that only had a draft alias persisted by an older version (before aliases were restricted to the
-        // published value), and InitAsync would reload those straight back into the routing cache.
+        // Clear the table first and repopulate from scratch in case the rebuild no longer includes document URL aliases
+        // that are currently stored.
         _documentUrlAliasRepository.DeleteAll();
 
         if (toSave.Count > 0)
