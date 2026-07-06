@@ -490,7 +490,9 @@ public class DeferredSearchReindexServiceTests
     }
 
     private static IEntitySlim CreateEntity(int id, Guid nodeObjectType)
-        => Mock.Of<IEntitySlim>(e => e.Id == id && e.NodeObjectType == nodeObjectType);
+        => nodeObjectType == Constants.ObjectTypes.Element
+            ? Mock.Of<IPublishableContentEntitySlim>(e => e.Id == id && e.NodeObjectType == nodeObjectType && e.Published)
+            : Mock.Of<IEntitySlim>(e => e.Id == id && e.NodeObjectType == nodeObjectType);
 
     private static IContent CreateContent(int id, bool published)
     {
