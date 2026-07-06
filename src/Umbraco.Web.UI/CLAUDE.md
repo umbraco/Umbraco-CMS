@@ -260,7 +260,6 @@ This project is for **development only**:
 Does NOT use central package management. Versions specified directly:
 - `Microsoft.EntityFrameworkCore.Design` - For EF Core migrations tooling
 - `Microsoft.Build.Tasks.Core` - Security fix for EFCore.Design dependency
-- `Microsoft.CodeAnalysis.CSharp.Workspaces` / `Microsoft.CodeAnalysis.Workspaces.MSBuild` - Aligns transitive Microsoft.CodeAnalysis versions pulled in by EFCore.Design (fixes NU1107/NU1608)
 - `Microsoft.ICU.ICU4C.Runtime` - Globalization (gated by `UmbracoUseAppLocalIcu`, see §6)
 
 ### Umbraco Targets Import
