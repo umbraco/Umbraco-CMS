@@ -5,6 +5,7 @@ export * from './entity-actions/index.js';
 export * from './entity.js';
 export * from './folder/index.js';
 export * from './global-components/index.js';
+export * from './global-contexts/index.js';
 export * from './item/index.js';
 export * from './menu/index.js';
 export * from './modals/index.js';
