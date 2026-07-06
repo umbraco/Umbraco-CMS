@@ -351,21 +351,21 @@ internal sealed class DeferredSearchReindexService : IDeferredSearchReindexServi
 
         while (currentLevel.Count > 0)
         {
-            var childIds = currentLevel.ToArray();
-
-            foreach (IUmbracoEntity document in GetParentEntities(childIds, UmbracoObjectTypes.Document))
-            {
-                documentIds.Add(document.Id);
-            }
-
             var nextLevel = new HashSet<int>();
-            foreach (IUmbracoEntity element in GetParentEntities(childIds, UmbracoObjectTypes.Element))
+            foreach (IEntitySlim parent in GetParentEntities(currentLevel.ToArray()).Cast<IEntitySlim>())
             {
-                // Only climb through a published element: an unpublished element's content (and anything nested in it)
-                // is not part of any document's published index, so a change below it cannot propagate upward.
-                if (visitedElementIds.Add(element.Id) && element is IPublishableContentEntitySlim { Published: true })
+                if (parent.NodeObjectType == Constants.ObjectTypes.Document)
                 {
-                    nextLevel.Add(element.Id);
+                    documentIds.Add(parent.Id);
+                }
+                else if (parent.NodeObjectType == Constants.ObjectTypes.Element && visitedElementIds.Add(parent.Id))
+                {
+                    // Only climb through a published element: an unpublished element's content (and anything nested in
+                    // it) is not part of any document's published index, so a change below it cannot propagate upward.
+                    if (parent is IPublishableContentEntitySlim { Published: true })
+                    {
+                        nextLevel.Add(parent.Id);
+                    }
                 }
             }
 
@@ -375,11 +375,12 @@ internal sealed class DeferredSearchReindexService : IDeferredSearchReindexServi
         return documentIds;
     }
 
-    private IEnumerable<IUmbracoEntity> GetParentEntities(int[] childIds, UmbracoObjectTypes entityType)
+    private IEnumerable<IUmbracoEntity> GetParentEntities(int[] childIds)
         => _relationService.GetParentEntitiesByChildIds(
             childIds,
             [Constants.Conventions.RelationTypes.RelatedExternalBlockElementAlias],
-            entityType);
+            UmbracoObjectTypes.Document,
+            UmbracoObjectTypes.Element);
 
     /// <summary>
     ///     Pages through a repository without acquiring distributed locks and invokes an action for each item.
