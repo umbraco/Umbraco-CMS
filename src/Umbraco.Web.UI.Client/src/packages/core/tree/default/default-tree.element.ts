@@ -220,7 +220,10 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 		// the collection pattern. It is only relevant when the children are shown on their own (root hidden or drilled
 		// into a start node) and never in the sidebar menu.
 		if (this.isMenu || !(this.hideTreeRoot || this.startNode)) return nothing;
-		if (!this._initialLoadDone || this._isLoading || this._hasItems) return nothing;
+		if (!this._initialLoadDone) {
+			return html`<umb-view-loader></umb-view-loader>`;
+		}
+		if (this._isLoading || this._hasItems) return nothing;
 		return html`<div id="empty-state" class="uui-text"><h4>${this.localize.term('tree_noItems')}</h4></div>`;
 	}
 
