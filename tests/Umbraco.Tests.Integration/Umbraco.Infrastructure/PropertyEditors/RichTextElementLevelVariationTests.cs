@@ -5,7 +5,6 @@ using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
-using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 
@@ -447,7 +446,7 @@ internal sealed class RichTextElementLevelVariationTests : BlockEditorElementVar
             });
 
         Assert.AreEqual(3, indexValues.Count());
-        Assert.NotNull(indexValues.FirstOrDefault(value => value.FieldName.StartsWith(UmbracoExamineFieldNames.RawFieldPrefix)));
+        Assert.NotNull(indexValues.FirstOrDefault(value => value.FieldName.StartsWith(PropertyIndexingConstants.RawFieldPrefix)));
 
         AssertIndexedValues(
             "en-US",
@@ -515,7 +514,7 @@ internal sealed class RichTextElementLevelVariationTests : BlockEditorElementVar
             });
 
         Assert.AreEqual(3, indexValues.Count());
-        Assert.NotNull(indexValues.FirstOrDefault(value => value.FieldName.StartsWith(UmbracoExamineFieldNames.RawFieldPrefix)));
+        Assert.NotNull(indexValues.FirstOrDefault(value => value.FieldName.StartsWith(PropertyIndexingConstants.RawFieldPrefix)));
 
         if (published)
         {
@@ -617,7 +616,7 @@ internal sealed class RichTextElementLevelVariationTests : BlockEditorElementVar
                 });
 
             Assert.AreEqual(2, indexValues.Count());
-            Assert.NotNull(indexValues.FirstOrDefault(value => value.FieldName.StartsWith(UmbracoExamineFieldNames.RawFieldPrefix)));
+            Assert.NotNull(indexValues.FirstOrDefault(value => value.FieldName.StartsWith(PropertyIndexingConstants.RawFieldPrefix)));
 
             var indexValue = indexValues.FirstOrDefault(v => v.Culture.InvariantEquals(culture) && v.FieldName == "blocks");
             Assert.IsNotNull(indexValue);

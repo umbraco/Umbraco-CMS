@@ -4,7 +4,6 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
@@ -72,7 +71,7 @@ internal sealed class RichTextPropertyIndexValueFactory : BlockValuePropertyInde
             new IndexValue
             {
                 Culture = culture,
-                FieldName = $"{UmbracoExamineFieldNames.RawFieldPrefix}{property.Alias}",
+                FieldName = $"{PropertyIndexingConstants.RawFieldPrefix}{property.Alias}",
                 Values = [richTextEditorValue.Markup]
             }
         };

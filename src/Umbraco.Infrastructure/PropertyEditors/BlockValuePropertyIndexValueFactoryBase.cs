@@ -5,7 +5,6 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
@@ -92,10 +91,10 @@ internal abstract class BlockValuePropertyIndexValueFactoryBase<TSerialized> : J
         foreach (IndexValue indexValue in indexContent)
         {
             // Tests if key includes the RawFieldPrefix and it is not in the start
-            if (indexValue.FieldName.Substring(1).Contains(UmbracoExamineFieldNames.RawFieldPrefix))
+            if (indexValue.FieldName.Substring(1).Contains(PropertyIndexingConstants.RawFieldPrefix))
             {
-                indexValue.FieldName = UmbracoExamineFieldNames.RawFieldPrefix +
-                                       indexValue.FieldName.Replace(UmbracoExamineFieldNames.RawFieldPrefix, string.Empty);
+                indexValue.FieldName = PropertyIndexingConstants.RawFieldPrefix +
+                                       indexValue.FieldName.Replace(PropertyIndexingConstants.RawFieldPrefix, string.Empty);
             }
         }
 
@@ -220,7 +219,7 @@ internal abstract class BlockValuePropertyIndexValueFactoryBase<TSerialized> : J
         foreach (IndexValue indexValue in indexedContent.Where(v => v.Culture == culture || v.Culture is null))
         {
             // Ignore Raw fields
-            if (indexValue.FieldName.Contains(UmbracoExamineFieldNames.RawFieldPrefix))
+            if (indexValue.FieldName.Contains(PropertyIndexingConstants.RawFieldPrefix))
             {
                 continue;
             }

@@ -73,7 +73,6 @@ public static partial class UmbracoBuilderExtensions
                 factory.GetRequiredService<ILanguageService>()));
         builder.Services.AddUnique<IPackageDataInstallation, PackageDataInstallation>();
         builder.Services.AddUnique<IPackageInstallation, PackageInstallation>();
-        builder.Services.AddTransient<IExamineIndexCountService, ExamineIndexCountService>();
         builder.Services.AddUnique<IUserDataService, UserDataService>();
         builder.Services.AddUnique<ISystemTroubleshootingInformationService, SystemTroubleshootingInformationTelemetryProvider>();
         builder.Services.AddTransient<IUsageInformationService, UsageInformationService>();

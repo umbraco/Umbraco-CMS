@@ -12,10 +12,12 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Notifications;
+using Umbraco.Cms.Infrastructure.Telemetry.Interfaces;
 using Umbraco.Cms.Search.Core.Notifications;
 using Umbraco.Cms.Search.Provider.Examine.Lucene;
 using Umbraco.Cms.Search.Provider.Examine.NotificationHandlers;
 using Umbraco.Cms.Search.Provider.Examine.Services;
+using Umbraco.Cms.Search.Provider.Examine.Telemetry;
 
 namespace Umbraco.Cms.Search.Provider.Examine.DependencyInjection;
 
@@ -86,6 +88,8 @@ public static class UmbracoBuilderExtensions
             });
 
         builder.AddNotificationHandler<UmbracoApplicationStartedNotification, RebuildNotificationHandler>();
+
+        builder.Services.AddTransient<IDetailedTelemetryProvider, ExamineTelemetryProvider>();
 
         builder.Services.AddExamineSearchProviderServices();
 

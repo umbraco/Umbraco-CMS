@@ -1,4 +1,3 @@
-using Examine;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
@@ -43,7 +42,6 @@ using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.Configuration;
 using Umbraco.Cms.Infrastructure.DeliveryApi;
 using Umbraco.Cms.Infrastructure.DistributedLocking;
-using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Infrastructure.HealthChecks;
 using Umbraco.Cms.Infrastructure.Install;
 using Umbraco.Cms.Infrastructure.Mail;
@@ -197,8 +195,6 @@ public static partial class UmbracoBuilderExtensions
 
         builder.Services.AddTransient<IUserInviteSender, EmailUserInviteSender>();
         builder.Services.AddTransient<IUserForgotPasswordSender, EmailUserForgotPasswordSender>();
-
-        builder.Services.AddSingleton<IExamineManager, NoopExamineManager>();
 
         builder.Services.AddScoped<ITagQuery, TagQuery>();
 
