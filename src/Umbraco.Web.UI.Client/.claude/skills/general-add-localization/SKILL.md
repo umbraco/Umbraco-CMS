@@ -44,7 +44,7 @@ A group covers a **shared UX area**, not just the one component you're editing. 
 
 1. **If you already have a good idea of the scope** (from the surrounding code, the feature being worked on, etc.), propose it: "This looks like it belongs to the `{scope}` scope — should that be the localization group?"
 2. **If you don't**, ask directly: "What is the common group name for this localization?"
-3. **Either way, check for an existing match first.** Search the groups already in `en.ts` for one that already covers this UX area, and if you find one, ask whether it should be reused instead of creating a new group: "`{existingGroup}` already covers this — should I use that instead?"
+3. **Either way, check for an existing match first.** Search the groups already in `src/assets/lang/en.ts` for one that already covers this UX area, and if you find one, ask whether it should be reused instead of creating a new group: "`{existingGroup}` already covers this — should I use that instead?"
 
 Examples already in this codebase:
 
