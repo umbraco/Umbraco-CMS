@@ -58,10 +58,10 @@ public class ConfigurationPresentationFactory : IConfigurationPresentationFactor
         };
 
     /// <summary>
-    /// Creates a new <see cref="Umbraco.Cms.Api.Management.Models.DocumentTypeConfigurationResponseModel"/> instance populated with the current document type configuration settings, including data type mutability, template availability, segment usage, and reserved field names.
+    /// Creates a new <see cref="DocumentTypeConfigurationResponseModel"/> instance populated with the current document type configuration settings, including data type mutability, template availability, segment usage, and reserved field names.
     /// </summary>
     /// <returns>
-    /// A <see cref="Umbraco.Cms.Api.Management.Models.DocumentTypeConfigurationResponseModel"/> representing the current document type configuration.
+    /// A <see cref="DocumentTypeConfigurationResponseModel"/> representing the current document type configuration.
     /// </returns>
     public DocumentTypeConfigurationResponseModel CreateDocumentTypeConfigurationResponseModel() =>
         new()
@@ -80,9 +80,9 @@ public class ConfigurationPresentationFactory : IConfigurationPresentationFactor
         new();
 
     /// <summary>
-    /// Creates a <see cref="Umbraco.Cms.Api.Management.Models.MemberTypeConfigurationResponseModel"/> containing the reserved member field names.
+    /// Creates a <see cref="MemberTypeConfigurationResponseModel"/> containing the reserved member field names.
     /// </summary>
-    /// <returns>A <see cref="Umbraco.Cms.Api.Management.Models.MemberTypeConfigurationResponseModel"/> with reserved member field names populated.</returns>
+    /// <returns>A <see cref="MemberTypeConfigurationResponseModel"/> with reserved member field names populated.</returns>
     public MemberTypeConfigurationResponseModel CreateMemberTypeConfigurationResponseModel() =>
         new()
         {
@@ -90,9 +90,9 @@ public class ConfigurationPresentationFactory : IConfigurationPresentationFactor
         };
 
     /// <summary>
-    /// Creates a new instance of <see cref="Umbraco.Cms.Api.Management.Models.MediaConfigurationResponseModel"/> with media configuration settings.
+    /// Creates a new instance of <see cref="MediaConfigurationResponseModel"/> with media configuration settings.
     /// </summary>
-    /// <returns>A <see cref="Umbraco.Cms.Api.Management.Models.MediaConfigurationResponseModel"/> containing the media configuration.</returns>
+    /// <returns>A <see cref="MediaConfigurationResponseModel"/> containing the media configuration.</returns>
     public MediaConfigurationResponseModel CreateMediaConfigurationResponseModel() =>
         new()
         {
@@ -101,10 +101,10 @@ public class ConfigurationPresentationFactory : IConfigurationPresentationFactor
         };
 
     /// <summary>
-    /// Creates a new instance of <see cref="Umbraco.Cms.Api.Management.Models.MediaTypeConfigurationResponseModel"/> containing configuration data for media types.
+    /// Creates a new instance of <see cref="MediaTypeConfigurationResponseModel"/> containing configuration data for media types.
     /// </summary>
     /// <returns>
-    /// A <see cref="Umbraco.Cms.Api.Management.Models.MediaTypeConfigurationResponseModel"/> that includes the list of reserved field names for media types.
+    /// A <see cref="MediaTypeConfigurationResponseModel"/> that includes the list of reserved field names for media types.
     /// </returns>
     public MediaTypeConfigurationResponseModel CreateMediaTypeConfigurationResponseModel() =>
         new()

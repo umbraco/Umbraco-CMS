@@ -137,6 +137,7 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 						<div id="search-wrapper">
 							<uui-input
 								id="search"
+								name="redirect-search"
 								label=${this.localize.term('redirectUrls_originalUrl')}
 								placeholder=${this.localize.term('redirectUrls_originalUrl')}
 								@keypress=${this.#onKeypress}></uui-input>
@@ -294,6 +295,8 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 				align-items: center;
 				gap: var(--uui-size-1);
 				text-wrap: nowrap;
+				background-color: transparent;
+				color: var(--uui-color-text);
 			}
 
 			#search-wrapper {

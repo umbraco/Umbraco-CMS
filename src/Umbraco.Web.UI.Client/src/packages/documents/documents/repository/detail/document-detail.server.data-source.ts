@@ -11,6 +11,7 @@ import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { umbDeepMerge, type UmbDeepPartialObject } from '@umbraco-cms/backoffice/utils';
 import { UmbDocumentTypeDetailServerDataSource } from '@umbraco-cms/backoffice/document-type';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import { umbMapDocumentCreateRequestBody, umbMapDocumentUpdateRequestBody } from './document-detail-request.mappers.js';
 
 /**
  * A data source for the Document that fetches data from the server
@@ -125,15 +126,7 @@ export class UmbDocumentServerDataSource
 		if (!model) throw new Error('Document is missing');
 		if (!model.unique) throw new Error('Document unique is missing');
 
-		// TODO: make data mapper to prevent errors
-		const body: CreateDocumentRequestModel = {
-			id: model.unique,
-			parent: parentUnique ? { id: parentUnique } : null,
-			documentType: { id: model.documentType.unique },
-			template: model.template ? { id: model.template.unique } : null,
-			values: model.values,
-			variants: model.variants,
-		};
+		const body: CreateDocumentRequestModel = umbMapDocumentCreateRequestBody(model, parentUnique);
 
 		const { data, error } = await tryExecute(
 			this,
@@ -158,12 +151,7 @@ export class UmbDocumentServerDataSource
 	async update(model: UmbDocumentDetailModel) {
 		if (!model.unique) throw new Error('Unique is missing');
 
-		// TODO: make data mapper to prevent errors
-		const body: UpdateDocumentRequestModel = {
-			template: model.template ? { id: model.template.unique } : null,
-			values: model.values,
-			variants: model.variants,
-		};
+		const body: UpdateDocumentRequestModel = umbMapDocumentUpdateRequestBody(model);
 
 		const { error } = await tryExecute(
 			this,

@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Api.Management.Factories;
 internal sealed class MemberTypeEditingPresentationFactory : ContentTypeEditingPresentationFactory<IMemberType>, IMemberTypeEditingPresentationFactory
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Factories.MemberTypeEditingPresentationFactory"/> class,
+    /// Initializes a new instance of the <see cref="MemberTypeEditingPresentationFactory"/> class,
     /// providing functionality for creating member type editing presentations.
     /// </summary>
     /// <param name="memberTypeService">The service used to manage and retrieve member types.</param>
@@ -46,11 +46,11 @@ internal sealed class MemberTypeEditingPresentationFactory : ContentTypeEditingP
     }
 
     /// <summary>
-    /// Maps an <see cref="Umbraco.Cms.Api.Management.Models.UpdateMemberTypeRequestModel" /> to a <see cref="Umbraco.Cms.Api.Management.Models.MemberTypeUpdateModel" />.
+    /// Maps an <see cref="UpdateMemberTypeRequestModel" /> to a <see cref="MemberTypeUpdateModel" />.
     /// This includes mapping compositions and updating property sensitivity and visibility based on the request model.
     /// </summary>
     /// <param name="requestModel">The request model containing the updated member type information.</param>
-    /// <returns>A <see cref="Umbraco.Cms.Api.Management.Models.MemberTypeUpdateModel" /> that reflects the changes specified in the request model.</returns>
+    /// <returns>A <see cref="MemberTypeUpdateModel" /> that reflects the changes specified in the request model.</returns>
     public MemberTypeUpdateModel MapUpdateModel(UpdateMemberTypeRequestModel requestModel)
     {
         MemberTypeUpdateModel updateModel = MapContentTypeEditingModel<

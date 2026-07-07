@@ -1,10 +1,16 @@
 import type { UmbDocumentDetailModel, UmbDocumentVariantPublishModel } from '../../types.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
+import {
+	umbMapDocumentCreateRequestBody,
+	umbMapDocumentUpdateRequestBody,
+} from '../../repository/detail/document-detail-request.mappers.js';
 import type {
+	CreateAndPublishDocumentRequestModel,
 	CultureAndScheduleRequestModel,
 	PublishDocumentRequestModel,
 	PublishDocumentWithDescendantsRequestModel,
 	UnpublishDocumentRequestModel,
+	UpdateAndPublishDocumentRequestModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -27,6 +33,67 @@ export class UmbDocumentPublishingServerDataSource {
 	 */
 	constructor(host: UmbControllerHost) {
 		this.#host = host;
+	}
+
+	/**
+	 * Creates and publishes a new Document on the server in a single operation
+	 * @param {UmbDocumentDetailModel} model - Document Model
+	 * @param {Array<UmbVariantId>} variantIds - The variants to publish after creating
+	 * @param {string | null} parentUnique - The unique of the parent to create under
+	 * @returns {*}
+	 * @memberof UmbDocumentPublishingServerDataSource
+	 */
+	async createAndPublish(
+		model: UmbDocumentDetailModel,
+		variantIds: Array<UmbVariantId>,
+		parentUnique: string | null = null,
+	) {
+		if (!model) throw new Error('Document is missing');
+		if (!model.unique) throw new Error('Document unique is missing');
+
+		const body: CreateAndPublishDocumentRequestModel = {
+			...umbMapDocumentCreateRequestBody(model, parentUnique),
+			culturesToPublish: this.#mapCulturesToPublish(variantIds),
+		};
+
+		// 201 Created returns only the key (no document body). The workspace reloads after this to refresh
+		// its state, so we deliberately do NOT re-read the full document here — that would be a redundant
+		// round-trip on top of the reload.
+		return tryExecute(this.#host, DocumentService.postDocumentCreateAndPublish({ body }));
+	}
+
+	/**
+	 * Updates and publishes a Document on the server in a single operation
+	 * @param {UmbDocumentDetailModel} model - Document Model
+	 * @param {Array<UmbVariantId>} variantIds - The variants to publish after updating
+	 * @returns {*}
+	 * @memberof UmbDocumentPublishingServerDataSource
+	 */
+	async updateAndPublish(model: UmbDocumentDetailModel, variantIds: Array<UmbVariantId>) {
+		if (!model.unique) throw new Error('Unique is missing');
+
+		const body: UpdateAndPublishDocumentRequestModel = {
+			...umbMapDocumentUpdateRequestBody(model),
+			culturesToPublish: this.#mapCulturesToPublish(variantIds),
+		};
+
+		// 200 returns only a notification header (no document body). The workspace reloads after this to
+		// refresh its state, so we deliberately do NOT re-read the full document here.
+		return tryExecute(
+			this.#host,
+			DocumentService.putDocumentByIdUpdateAndPublish({ path: { id: model.unique }, body }),
+		);
+	}
+
+	/**
+	 * Maps the selected variants to the culture codes accepted by the create/update-and-publish endpoints.
+	 * Invariant content types require an empty array (cultures cannot be specified), and the server rejects
+	 * `null`/`"*"` entries, so invariant variants are filtered out and only distinct culture codes remain.
+	 * @param {Array<UmbVariantId>} variantIds - The selected variants to publish
+	 * @returns {Array<string>} The distinct culture codes to publish
+	 */
+	#mapCulturesToPublish(variantIds: Array<UmbVariantId>): Array<string> {
+		return [...new Set(variantIds.filter((x) => !x.isCultureInvariant()).map((x) => x.toCultureString()))];
 	}
 
 	/**

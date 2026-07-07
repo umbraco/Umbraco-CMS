@@ -1,4 +1,6 @@
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbDefaultValueSummaryElement } from './default-value-summary.element.js';
+import { UmbValueSummaryDefaultApi } from './default-value-summary.api.js';
 
 export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
 	{
@@ -9,8 +11,8 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 		manifest: {
 			type: 'valueSummary',
 			kind: 'default',
-			element: () => import('./default-value-summary.js'),
-			api: () => import('./default-value-summary.js'),
+			element: UmbDefaultValueSummaryElement,
+			api: UmbValueSummaryDefaultApi,
 		},
 	},
 ];
