@@ -30,7 +30,7 @@ internal sealed class ElementCacheService : IElementCacheService, IMemoryCacheSi
     private readonly ILogger<ElementCacheService> _logger;
     private HashSet<Guid>? _seedKeys;
 
-    private readonly ConvertedPublishedContentCache<string, IPublishedElement> _publishedElementCache = new();
+    private readonly IConvertedPublishedContentCache<string, IPublishedElement> _publishedElementCache;
 
     // Monotonic counter bumped whenever the in-memory cache (L0/L1) is invalidated or refreshed.
     // GetNodeAsync captures it before reading the backing store and re-checks it before writing
@@ -76,7 +76,8 @@ internal sealed class ElementCacheService : IElementCacheService, IMemoryCacheSi
         IPublishedModelFactory publishedModelFactory,
         IPreviewService previewService,
         IOptions<CacheSettings> cacheSettings,
-        ILogger<ElementCacheService> logger)
+        ILogger<ElementCacheService> logger,
+        IConvertedPublishedContentCacheFactory cacheFactory)
     {
         _databaseCacheRepository = databaseCacheRepository;
         _scopeProvider = scopeProvider;
@@ -88,6 +89,7 @@ internal sealed class ElementCacheService : IElementCacheService, IMemoryCacheSi
         _previewService = previewService;
         _cacheSettings = cacheSettings.Value;
         _logger = logger;
+        _publishedElementCache = cacheFactory.Create<string, IPublishedElement>(_cacheSettings.Entry.Element.MaximumLocalCacheItems, CacheName);
     }
 
     /// <inheritdoc />
@@ -161,9 +163,15 @@ internal sealed class ElementCacheService : IElementCacheService, IMemoryCacheSi
 
         IPublishedElement? result = _publishedContentFactory.ToIPublishedElement(contentCacheNode, preview)?.CreateModel(_publishedModelFactory);
 
-        // Only populate the L0 cache when our snapshot is still current; otherwise a concurrent
-        // refresh has already written fresher content and we must not overwrite it with this one.
-        if (result is not null && snapshotIsCurrent)
+        // Only published elements are stored in L0: the read fast path above is guarded by preview is false, so a
+        // draft entry would never be served back, and draft keys have no per-key invalidation (RemoveFromMemoryCacheAsync
+        // only removes the published key) so they would linger until a full clear. In bounded mode they would also
+        // waste eviction slots and dilute the W-TinyLFU frequency signal.
+        //
+        // Only populate when our snapshot is still current; otherwise a concurrent refresh has already written
+        // fresher content and we must not overwrite it with this stale one (the clobber that leaves L0 stale
+        // until a full clear).
+        if (result is not null && preview is false && snapshotIsCurrent)
         {
             // The size estimate is cheap (O(properties), no IO/decompression) and only runs on the
             // cache-miss path, so keeping the running total always-current means it is accurate the

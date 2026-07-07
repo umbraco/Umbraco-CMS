@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -45,6 +46,10 @@ public static class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IDomainCache, DomainCache>();
         builder.Services.AddSingleton<IElementsCache, ElementsDictionaryAppCache>();
         builder.Services.AddSingleton<IPublishedContentTypeCache, PublishedContentTypeCache>();
+        builder.Services.AddSingleton<IConvertedPublishedContentCacheFactory>(s =>
+            new ConvertedPublishedContentCacheFactory(
+                s.GetService<IBoundedConvertedPublishedContentCacheFactory>(),
+                s.GetRequiredService<ILogger<ConvertedPublishedContentCacheFactory>>()));
         builder.Services.AddSingleton<DocumentCacheService>();
         builder.Services.AddSingleton<IDocumentCacheService>(s => s.GetRequiredService<DocumentCacheService>());
         builder.Services.AddSingleton<MediaCacheService>();

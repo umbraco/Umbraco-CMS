@@ -161,7 +161,7 @@ public class MigrationPlan
     /// <summary>
     /// Adds a transition from the current state to the specified target state using the specified migration type.
     /// </summary>
-    /// <typeparam name="TMigration">The type of <see cref="IMigration"/> to execute for the transition.</typeparam>
+    /// <typeparam name="TMigration">The type of <see cref="AsyncMigrationBase"/> to execute for the transition.</typeparam>
     /// <param name="targetState">The name of the target state to transition to.</param>
     /// <returns>The current <see cref="MigrationPlan"/> instance, allowing for method chaining.</returns>
     public MigrationPlan To<TMigration>(string targetState)
@@ -333,13 +333,12 @@ public class MigrationPlan
     /// <summary>
     ///     Initiates the process of merging multiple migration branches into a single branch within the migration plan.
     /// </summary>
-    /// <returns>A <see cref="Umbraco.Cms.Infrastructure.Migrations.MigrationPlan.MergeBuilder" /> instance used to configure and define the merge operation.</returns>
+    /// <returns>A <see cref="MergeBuilder" /> instance used to configure and define the merge operation.</returns>
     public MergeBuilder Merge() => new(this);
 
     /// <summary>
     ///     Validates the plan.
     /// </summary>
-    /// <returns>The plan's final state.</returns>
     public void Validate()
     {
         if (_finalState != null)

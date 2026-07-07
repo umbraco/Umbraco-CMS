@@ -32,6 +32,15 @@ export class UmbInputEntityElement extends UmbFormControlMixin<string | undefine
 		return undefined;
 	}
 
+	@property({ attribute: false })
+	getIcon?: (item: UmbItemModel) => string;
+
+	/**
+	 * This is a minimum amount of selected items in this input.
+	 * @type {number}
+	 * @attr
+	 * @default
+	 */
 	@property({ type: Number })
 	public set min(value: number) {
 		this.#min = value;
@@ -44,9 +53,21 @@ export class UmbInputEntityElement extends UmbFormControlMixin<string | undefine
 	}
 	#min: number = 0;
 
+	/**
+	 * Min validation message.
+	 * @type {string}
+	 * @attr
+	 * @default
+	 */
 	@property({ type: String, attribute: 'min-message' })
-	minMessage = 'This field need more items';
+	minMessage = 'This field needs more items';
 
+	/**
+	 * This is a maximum amount of selected items in this input.
+	 * @type {number}
+	 * @attr
+	 * @default
+	 */
 	@property({ type: Number })
 	public set max(value: number) {
 		this.#max = value;
@@ -59,10 +80,13 @@ export class UmbInputEntityElement extends UmbFormControlMixin<string | undefine
 	}
 	#max: number = Infinity;
 
-	@property({ attribute: false })
-	getIcon?: (item: UmbItemModel) => string;
-
-	@property({ type: String, attribute: 'min-message' })
+	/**
+	 * Max validation message.
+	 * @type {string}
+	 * @attr
+	 * @default
+	 */
+	@property({ type: String, attribute: 'max-message' })
 	maxMessage = 'This field exceeds the allowed amount of items';
 
 	@property({ type: Array })
