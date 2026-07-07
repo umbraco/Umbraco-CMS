@@ -40,28 +40,28 @@ export default {
 
 #### Choosing a group
 
-A group should cover a reasonable **scope of usage**, not just the one component you're currently editing. Before naming a group, ask: "where else in the backoffice does this same UX pattern show up?" If several features share the same UX, they should share the same group — otherwise the same kind of text ends up duplicated (and inconsistently worded) across `myFeatureA` and `myFeatureB`.
+A group covers a **shared UX area**, not just the one component you're editing. Ask: "where else does this same UX show up?" — features with matching UX should share a group, or the same kind of text ends up duplicated and inconsistently worded elsewhere.
 
 Examples already in this codebase:
 
-- `blockEditor` — shared by Block List, Block Grid, and Block RTE, because they share the same block-configuration and editing UX
-- `contentTypeEditor` — shared by Document Type, Media Type, and Member Type editing
-- `codeEditor` — shared by anything embedding the code editor
+- `blockEditor` — Block List, Block Grid, and Block RTE share the same block-configuration UX
+- `contentTypeEditor` — Document Type, Media Type, and Member Type share the same editing UX
+- `codeEditor` — anything embedding the code editor
 
-Check whether an existing group already covers the UX area before creating a new one. Only introduce a new group when the text belongs to a feature area with no existing overlap.
+Reuse an existing group when it covers the UX area. Only create a new one when there's no overlap.
 
 #### Choosing a term
 
-A term describes the **situation the text is used in** — not the wording of the text itself. Two situations that happen to use identical English wording today should still get two separate terms, since the copy for one may change independently of the other later.
+A term names the **situation**, not the wording — two situations with identical English text today should still get separate terms, since the copy can diverge later.
 
-Build the term from two parts:
+Build it from two parts:
 
-1. **How it's presented** — the UI role the text plays: `Title`, `Description`, `Action`, `Label`, `Notice`, `Message`, `ValidationMessage`, `Headline`, etc.
-2. **What it represents** — a short name for the subject or situation: `CreateBlock`, `ConfirmDelete`, `AddGroup`.
+1. **Presentation role**: `Title`, `Description`, `Action`, `Label`, `Notice`, `Message`, `ValidationMessage`, `Headline`, etc.
+2. **Subject**: `CreateBlock`, `ConfirmDelete`, `AddGroup`.
 
-Combined, in either order depending on what reads best: `createAction`, `confirmDeleteTitle`, `addGroupDescription`.
+Combined: `createAction`, `confirmDeleteTitle`, `addGroupDescription`.
 
-This matters most when several terms belong to the same moment in the UI. Take the `blockEditor` group's "delete a block group" confirmation:
+Example — three terms for one dialog in the `blockEditor` group, same subject (`confirmDeleteBlockGroup`) with different roles:
 
 ```typescript
 confirmDeleteBlockGroupTitle: 'Delete group?',
@@ -69,7 +69,7 @@ confirmDeleteBlockGroupMessage: 'Are you sure you want to delete group <strong>%
 confirmDeleteBlockGroupNotice: 'The content of these Blocks will still be present, editing of this content will no longer be available and will be shown as unsupported content.',
 ```
 
-Same subject (`confirmDeleteBlockGroup`), three presentation roles (`Title`, `Message`, `Notice`). Naming them this way keeps every piece of that one dialog grouped together, and makes it obvious they belong to the same situation even though the wording has nothing in common.
+Grouping by subject keeps every piece of the dialog together, even though the wording shares nothing.
 
 ### Value types
 
