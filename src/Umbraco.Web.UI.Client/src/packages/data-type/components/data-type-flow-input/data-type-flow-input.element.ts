@@ -103,7 +103,7 @@ export class UmbInputDataTypeElement extends UmbFormControlMixin(UmbLitElement, 
 			: html`
 					<uui-button
 						id="empty-state-button"
-						label=${this.localize.term('propertyEditorPicker_selectPropertyEditor')}
+						label=${this.localize.term('propertyEditorPicker_selectAction')}
 						look="placeholder"
 						color="default"
 						@blur=${() => {

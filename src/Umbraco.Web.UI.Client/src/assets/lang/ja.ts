@@ -699,7 +699,7 @@ export default {
 		noColors: '設定済みの色はありません。',
 	},
 	propertyEditorPicker: {
-		selectPropertyEditor: 'プロパティ エディターの選択',
+		selectAction: 'プロパティエディターの選択',
 	},
 	relatedlinks: {
 		enterExternal: '外部リンクを入力',
