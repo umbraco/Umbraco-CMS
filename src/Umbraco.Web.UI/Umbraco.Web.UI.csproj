@@ -47,11 +47,27 @@
     <PackageReference Include="Microsoft.OpenApi" Version="2.9.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <!-- Ensure the AppLocalIcu setting is the same as the referenced ICU package version and changes are also done to the template project! -->
-    <!-- Opt-in to app-local ICU to ensure consistent globalization APIs across different platforms -->
-    <PackageReference Include="Microsoft.ICU.ICU4C.Runtime" Version="72.1.0.3" />
-    <RuntimeHostConfigurationOption Include="System.Globalization.AppLocalIcu" Value="72.1.0.3" Condition="$(RuntimeIdentifier.StartsWith('linux')) or $(RuntimeIdentifier.StartsWith('win')) or ('$(RuntimeIdentifier)' == '' and !$([MSBuild]::IsOSPlatform('osx')))" />
+  <PropertyGroup>
+    <!--
+      Opt-in to app-local ICU to ensure consistent globalization APIs across different platforms.
+      Default mirrors prior behaviour introduced in https://github.com/umbraco/Umbraco-CMS/pull/11276: enabled unless building on macOS without an explicit RuntimeIdentifier.
+      To override:
+        * Build/publish:  dotnet publish -p:UmbracoUseAppLocalIcu=false
+        * Post-publish:   edit System.Globalization.AppLocalIcu in the published *.runtimeconfig.json
+      Note: DOTNET_SYSTEM_GLOBALIZATION_APPLOCALICU is only honored when AppLocalIcu is absent from runtimeconfig.json
+      (verified on .NET 10) — the general .NET 9 env-var-precedence rule does not apply to this knob, since it is
+      resolved by the native host before the CLR boots. Use one of the two override paths above instead.
+      Keep UmbracoAppLocalIcuVersion in sync with the referenced Microsoft.ICU.ICU4C.Runtime package version
+      and with the equivalent property in templates/UmbracoProject/UmbracoProject.csproj.
+    -->
+    <UmbracoUseAppLocalIcu Condition="'$(UmbracoUseAppLocalIcu)' == '' and ($(RuntimeIdentifier.StartsWith('linux')) or $(RuntimeIdentifier.StartsWith('win')) or ('$(RuntimeIdentifier)' == '' and !$([MSBuild]::IsOSPlatform('osx'))))">true</UmbracoUseAppLocalIcu>
+    <UmbracoUseAppLocalIcu Condition="'$(UmbracoUseAppLocalIcu)' == ''">false</UmbracoUseAppLocalIcu>
+    <UmbracoAppLocalIcuVersion Condition="'$(UmbracoAppLocalIcuVersion)' == ''">72.1.0.3</UmbracoAppLocalIcuVersion>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(UmbracoUseAppLocalIcu)' == 'true'">
+    <PackageReference Include="Microsoft.ICU.ICU4C.Runtime" Version="$(UmbracoAppLocalIcuVersion)" />
+    <RuntimeHostConfigurationOption Include="System.Globalization.AppLocalIcu" Value="$(UmbracoAppLocalIcuVersion)" />
   </ItemGroup>
 
   <PropertyGroup>
