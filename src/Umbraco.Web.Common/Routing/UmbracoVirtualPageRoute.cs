@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Web;
@@ -54,8 +53,15 @@ public class UmbracoVirtualPageRoute : IUmbracoVirtualPageRoute
     /// <returns>Nothing</returns>
     public async Task SetupVirtualPageRoute(HttpContext httpContext)
     {
-        // Try and find an endpoint for the current path...
+        // Try and find an endpoint for the current path. The name-based lookup only matches named routes
+        // (e.g. custom routes registered via ForUmbracoPage), so fall back to matching by route pattern,
+        // which also finds attribute-routed IVirtualPageController endpoints that have no route name (#14165).
         Endpoint? endpoint = _endpointDataSource.GetEndpointByPath(_linkParser, httpContext.Request.Path, out RouteValueDictionary? routeValues);
+
+        if (endpoint is null || IsVirtualPageEndpoint(endpoint) is false)
+        {
+            endpoint = _endpointDataSource.GetEndpointByRoutePattern(httpContext.Request.Path, IsVirtualPageEndpoint, out routeValues);
+        }
 
         if (endpoint != null && routeValues != null)
         {
@@ -87,6 +93,24 @@ public class UmbracoVirtualPageRoute : IUmbracoVirtualPageRoute
                 }
             }
         }
+    }
+
+    /// <summary>
+    /// Determines whether an endpoint is a virtual page endpoint: one whose content is resolved either by an
+    /// <see cref="IVirtualPageController" /> or by a delegate registered via <c>ForUmbracoPage</c>
+    /// (a <see cref="CustomRouteContentFinderDelegate" />). Mirrors the two mechanisms handled by
+    /// <see cref="FindContent(Endpoint, ActionExecutingContext)" />.
+    /// </summary>
+    internal static bool IsVirtualPageEndpoint(Endpoint endpoint)
+    {
+        ControllerActionDescriptor? controllerActionDescriptor = endpoint.GetControllerActionDescriptor();
+        if (controllerActionDescriptor is null)
+        {
+            return false;
+        }
+
+        return endpoint.Metadata.OfType<CustomRouteContentFinderDelegate>().Any()
+               || typeof(IVirtualPageController).IsAssignableFrom(controllerActionDescriptor.ControllerTypeInfo);
     }
 
     /// <summary>
