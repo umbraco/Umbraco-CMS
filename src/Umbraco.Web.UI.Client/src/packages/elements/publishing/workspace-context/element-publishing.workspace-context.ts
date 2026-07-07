@@ -4,7 +4,6 @@ import { UmbElementVariantState } from '../../variant-state.js';
 import { UmbElementPublishingRepository } from '../repository/index.js';
 import { UmbElementPublishedPendingChangesManager } from '../pending-changes/index.js';
 import type { UmbElementVariantPublishModel } from '../types.js';
-import { UMB_ELEMENT_PUBLISH_MODAL } from '../publish/constants.js';
 import { UmbElementUnpublishManifestEntityActionMeta } from '../unpublish/entity-action/constants.js';
 import { UMB_ELEMENT_SCHEDULE_MODAL } from '../schedule-publish/constants.js';
 import { UMB_ELEMENT_ENTITY_TYPE } from '../../entity.js';
@@ -14,7 +13,7 @@ import { UMB_ELEMENT_PUBLISHING_SHORTCUT_UNIQUE } from './constants.js';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
-import { UmbContentUnpublishEntityAction } from '@umbraco-cms/backoffice/content';
+import { UMB_CONTENT_PUBLISH_MODAL, UmbContentUnpublishEntityAction } from '@umbraco-cms/backoffice/content';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
@@ -263,11 +262,11 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 			variantIds.push(UmbVariantId.Create(options[0]));
 		} else {
 			// If there are multiple variants, we will open the modal to let the user pick which variants to publish.
-			const result = await umbOpenModal(this, UMB_ELEMENT_PUBLISH_MODAL, {
+			const result = await umbOpenModal(this, UMB_CONTENT_PUBLISH_MODAL, {
 				data: {
 					headline: this.#localize.term('content_saveAndPublishModalTitle'),
 					options,
-					pickableFilter: this.#publishableVariantsFilter,
+					pickableFilter: (option) => this.#publishableVariantsFilter(option as UmbElementVariantOptionModel),
 				},
 				value: { selection: selected },
 			}).catch(() => undefined);
