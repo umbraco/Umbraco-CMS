@@ -9,7 +9,7 @@ import type {
 import { css, customElement, html, nothing, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
+import { UmbDeprecation, UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 import type {
 	UmbConfirmActionModalEntityReferencesConfig,
 	UmbConfirmActionModalEntityReferencesElement,
@@ -37,6 +37,16 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 	UmbDocumentUnpublishModalValue
 > {
 	protected readonly _selectionManager = new UmbSelectionManager<string>(this);
+
+	constructor() {
+		super();
+
+		new UmbDeprecation({
+			deprecated: 'UmbDocumentUnpublishModalElement is deprecated.',
+			removeInVersion: '19.0.0',
+			solution: 'Use umb-content-unpublish-modal from @umbraco-cms/backoffice/content instead.',
+		}).warn();
+	}
 
 	@state()
 	private _options: Array<UmbDocumentVariantOptionModel> = [];

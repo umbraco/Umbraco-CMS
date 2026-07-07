@@ -10,15 +10,20 @@ import { UmbRepositoryBase, type UmbRepositoryResponse } from '@umbraco-cms/back
  * @augments UmbRepositoryBase
  */
 export class UmbDocumentConfigurationRepository extends UmbRepositoryBase implements UmbContentConfigurationRepository {
-	#serverDataSource = new UmbDocumentConfigurationServerDataSource(this);
+	/**
+	 * The cached document configuration, shared across all instances.
+	 */
+	static #configuration: Promise<UmbRepositoryResponse<UmbDocumentConfigurationModel>>;
+
+	readonly #serverDataSource = new UmbDocumentConfigurationServerDataSource(this);
 
 	/**
-	 * Requests the Document configuration
+	 * Requests the Document configuration from the server, or returns the cached configuration if it has already been fetched.
 	 * @returns {Promise<UmbRepositoryResponse<UmbDocumentConfigurationModel>>} - The document configuration.
 	 * @memberof UmbDocumentConfigurationRepository
 	 */
 	requestConfiguration(): Promise<UmbRepositoryResponse<UmbDocumentConfigurationModel>> {
-		return this.#serverDataSource.getConfiguration();
+		return (UmbDocumentConfigurationRepository.#configuration ??= this.#serverDataSource.getConfiguration());
 	}
 }
 

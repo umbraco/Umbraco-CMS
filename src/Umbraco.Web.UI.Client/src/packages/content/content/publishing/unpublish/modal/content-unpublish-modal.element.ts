@@ -1,16 +1,17 @@
 import type { UmbContentConfigurationRepository } from '../../../configuration/types.js';
 import type { UmbContentUnpublishModalData, UmbContentUnpublishModalValue } from './types.js';
-import { css, customElement, html, nothing, state, when } from '@umbraco-cms/backoffice/external/lit';
-import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
-import type { UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';
+import { css, customElement, html, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
+import { UmbPublishableVariantState } from '@umbraco-cms/backoffice/variant';
+import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import type {
 	UmbConfirmActionModalEntityReferencesConfig,
 	UmbConfirmActionModalEntityReferencesElement,
 } from '@umbraco-cms/backoffice/relations';
-import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import type { UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';
 
 import '../../../variant-picker/content-variant-language-picker.element.js';
 
@@ -20,7 +21,10 @@ import '../../../variant-picker/content-variant-language-picker.element.js';
  * @returns {boolean} boolean
  */
 export function isPublished(option: UmbEntityVariantOptionModel): boolean {
-	return option.variant?.state === 'Published' || option.variant?.state === 'PublishedPendingChanges';
+	return (
+		option.variant?.state === UmbPublishableVariantState.PUBLISHED ||
+		option.variant?.state === UmbPublishableVariantState.PUBLISHED_PENDING_CHANGES
+	);
 }
 
 @customElement('umb-content-unpublish-modal')
@@ -41,7 +45,7 @@ export class UmbContentUnpublishModalElement extends UmbModalBaseElement<
 	//   false     = blocked (button disabled, references exist and disableUnpublishWhenReferenced is set)
 	//   true       = allowed (button enabled)
 	@state()
-	private _canUnpublish: boolean | undefined = true;
+	private _canUnpublish: boolean | undefined = undefined;
 
 	@state()
 	private _hasInvalidSelection = true;
@@ -52,7 +56,7 @@ export class UmbContentUnpublishModalElement extends UmbModalBaseElement<
 	@state()
 	private _referencesConfig?: UmbConfirmActionModalEntityReferencesConfig;
 
-	#pickableFilter = (option: UmbEntityVariantOptionModel) => {
+	readonly #pickableFilter = (option: UmbEntityVariantOptionModel) => {
 		if (!option.variant) {
 			return false;
 		}
@@ -73,15 +77,20 @@ export class UmbContentUnpublishModalElement extends UmbModalBaseElement<
 	}
 
 	#configureReferences() {
-		if (!this.data?.unique || !this.data.itemRepositoryAlias || !this.data.referenceRepositoryAlias) return;
-
-		this._canUnpublish = undefined;
+		if (!this.#hasReferencesConfig()) {
+			this._canUnpublish = true;
+			return;
+		}
 
 		this._referencesConfig = {
-			itemRepositoryAlias: this.data.itemRepositoryAlias,
-			referenceRepositoryAlias: this.data.referenceRepositoryAlias,
-			unique: this.data.unique,
+			itemRepositoryAlias: this.data!.itemRepositoryAlias!,
+			referenceRepositoryAlias: this.data!.referenceRepositoryAlias!,
+			unique: this.data!.unique!,
 		};
+	}
+
+	#hasReferencesConfig(): boolean {
+		return !!this.data?.unique && !!this.data.itemRepositoryAlias && !!this.data.referenceRepositoryAlias;
 	}
 
 	async #configureSelectionManager() {
@@ -90,9 +99,7 @@ export class UmbContentUnpublishModalElement extends UmbModalBaseElement<
 
 		// Only display variants that are relevant to pick from, i.e. variants that are published or published with pending changes.
 		// If we don't know the state (e.g. from a bulk publishing selection) we need to consider it available for selection.
-		this._options =
-			this.data?.options.filter((option) => (option.variant && option.variant.state === null) || isPublished(option)) ??
-			[];
+		this._options = this.data?.options.filter((option) => option.variant?.state === null || isPublished(option)) ?? [];
 
 		let selected = this.value?.selection ?? [];
 
@@ -146,54 +153,66 @@ export class UmbContentUnpublishModalElement extends UmbModalBaseElement<
 			return;
 		}
 
-		const configurationRepository = await createExtensionApiByAlias<UmbContentConfigurationRepository>(
-			this,
-			this.data.configurationRepositoryAlias,
-		);
-		const { data: configuration } = await configurationRepository.requestConfiguration();
-		this._canUnpublish = (configuration?.disableUnpublishWhenReferenced ?? false) !== true;
+		try {
+			const configurationRepository = await createExtensionApiByAlias<UmbContentConfigurationRepository>(
+				this,
+				this.data.configurationRepositoryAlias,
+			);
+			const { data: configuration } = await configurationRepository.requestConfiguration();
+			this._canUnpublish = (configuration?.disableUnpublishWhenReferenced ?? false) !== true;
+		} catch {
+			// Configuration could not be resolved — fail open, consistent with the "configuration unavailable" default.
+			this._canUnpublish = true;
+		}
 	}
 
-	private _requiredFilter = (variantOption: UmbEntityVariantOptionModel): boolean => {
+	private readonly _requiredFilter = (variantOption: UmbEntityVariantOptionModel): boolean => {
 		return variantOption.language.isMandatory && !this._selection.includes(variantOption.unique);
 	};
 
 	override render() {
-		return html`<uui-dialog-layout headline=${this.localize.term('content_unpublish')}>
-			<p>
-				<umb-localize key="prompt_confirmUnpublish"></umb-localize>
-			</p>
-			${when(
-				!this._isInvariant,
-				() => html`
-					<umb-content-variant-language-picker
-						.selectionManager=${this._selectionManager}
-						.variantLanguageOptions=${this._options}
-						.requiredFilter=${this._hasInvalidSelection ? this._requiredFilter : undefined}
-						.pickableFilter=${this.#pickableFilter}></umb-content-variant-language-picker>
-				`,
-			)}
-			${this._referencesConfig
-				? html`<umb-confirm-action-modal-entity-references
-						.config=${this._referencesConfig}
-						@change=${this.#onReferencesChange}></umb-confirm-action-modal-entity-references>`
-				: nothing}
-
-			<div slot="actions">
-				<uui-button label=${this.localize.term('general_close')} @click=${this.#close}></uui-button>
-				<uui-button
-					label="${this.localize.term('actions_unpublish')}"
-					?disabled=${this._hasInvalidSelection ||
-					!this._canUnpublish ||
-					(!this._isInvariant && this._selection.length === 0)}
-					look="primary"
-					color="warning"
-					@click=${this.#submit}></uui-button>
-			</div>
-		</uui-dialog-layout> `;
+		return html`
+			<uui-dialog-layout headline=${this.localize.term('content_unpublish')}>
+				<p>
+					<umb-localize key="prompt_confirmUnpublish"></umb-localize>
+				</p>
+				${when(
+					!this._isInvariant,
+					() => html`
+						<umb-content-variant-language-picker
+							.selectionManager=${this._selectionManager}
+							.variantLanguageOptions=${this._options}
+							.requiredFilter=${this._hasInvalidSelection ? this._requiredFilter : undefined}
+							.pickableFilter=${this.#pickableFilter}
+							.renderAdditionalLabel=${this.data?.renderAdditionalLabel}>
+						</umb-content-variant-language-picker>
+					`,
+				)}
+				${when(
+					this._referencesConfig,
+					() => html`
+						<umb-confirm-action-modal-entity-references
+							.config=${this._referencesConfig}
+							@change=${this.#onReferencesChange}>
+						</umb-confirm-action-modal-entity-references>
+					`,
+				)}
+				<div slot="actions">
+					<uui-button label=${this.localize.term('general_close')} @click=${this.#close}></uui-button>
+					<uui-button
+						label=${this.localize.term('actions_unpublish')}
+						look="primary"
+						color="warning"
+						?disabled=${this._hasInvalidSelection ||
+						!this._canUnpublish ||
+						(!this._isInvariant && this._selection.length === 0)}
+						@click=${this.#submit}></uui-button>
+				</div>
+			</uui-dialog-layout>
+		`;
 	}
 
-	static override styles = [
+	static override readonly styles = [
 		UmbTextStyles,
 		css`
 			:host {

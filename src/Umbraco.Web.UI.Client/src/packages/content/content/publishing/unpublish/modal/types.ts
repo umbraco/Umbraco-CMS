@@ -8,6 +8,7 @@ export interface UmbContentUnpublishModalData<
 	itemRepositoryAlias?: string;
 	referenceRepositoryAlias?: string;
 	configurationRepositoryAlias?: string;
+	renderAdditionalLabel?: (option: VariantOptionModelType) => unknown;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type

@@ -1,9 +1,12 @@
-import { UMB_DOCUMENT_UNPUBLISH_META } from '../entity-action/meta.js';
+import { UmbDocumentUnpublishManifestEntityActionMeta } from '../entity-action/constants.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../../constants.js';
+import type { UmbDocumentVariantOptionModel } from '../../../types.js';
 import { UmbDocumentPublishingRepository } from '../../repository/index.js';
 import { UmbDocumentPublishEntityBulkAction } from '../../publish/entity-bulk-action/publish.bulk-action.js';
 import { UmbDocumentItemRepository } from '../../../item/repository/index.js';
 import { UMB_CONTENT_UNPUBLISH_MODAL, UmbContentUnpublishEntityAction } from '@umbraco-cms/backoffice/content';
+import { html, nothing } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';
 import { umbConfirmModal, umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UmbEntityBulkActionBase } from '@umbraco-cms/backoffice/entity-bulk-action';
 import { UmbLanguageCollectionRepository } from '@umbraco-cms/backoffice/language';
@@ -33,7 +36,7 @@ export class UmbDocumentUnpublishEntityBulkAction extends UmbEntityBulkActionBas
 			const action = new UmbContentUnpublishEntityAction(this._host, {
 				unique: this.selection[0],
 				entityType: UMB_DOCUMENT_ENTITY_TYPE,
-				meta: UMB_DOCUMENT_UNPUBLISH_META,
+				meta: UmbDocumentUnpublishManifestEntityActionMeta,
 			});
 			await action.execute();
 			return;
@@ -91,6 +94,16 @@ export class UmbDocumentUnpublishEntityBulkAction extends UmbEntityBulkActionBas
 		const result = await umbOpenModal(this, UMB_CONTENT_UNPUBLISH_MODAL, {
 			data: {
 				options,
+				renderAdditionalLabel: (option: UmbEntityVariantOptionModel) => {
+					const documentCount = (option as UmbDocumentVariantOptionModel).documentCount;
+					return documentCount !== undefined
+						? html`<div class="label-status">
+								<umb-localize key="general_documentCount" .args=${[documentCount]}>
+									${documentCount} documents
+								</umb-localize>
+							</div>`
+						: nothing;
+				},
 			},
 			value: { selection },
 		}).catch(() => undefined);

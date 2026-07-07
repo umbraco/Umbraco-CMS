@@ -1,14 +1,11 @@
-import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
-import { sortVariants, type UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';
+import { css, customElement, html, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { sortVariants, UmbPublishableVariantState } from '@umbraco-cms/backoffice/variant';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { PropertyValues } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';
 import type { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 import type { UUIBooleanInputElement } from '@umbraco-cms/backoffice/external/uui';
-
-const UMB_CONTENT_VARIANT_STATE_PUBLISHED = 'Published';
-const UMB_CONTENT_VARIANT_STATE_PUBLISHED_PENDING_CHANGES = 'PublishedPendingChanges';
-const UMB_CONTENT_VARIANT_STATE_DRAFT = 'Draft';
 
 @customElement('umb-content-variant-language-picker')
 export class UmbContentVariantLanguagePickerElement extends UmbLitElement {
@@ -61,6 +58,14 @@ export class UmbContentVariantLanguagePickerElement extends UmbLitElement {
 	@property({ attribute: false })
 	public requiredFilter?: (item: UmbEntityVariantOptionModel) => boolean;
 
+	/**
+	 * A render callback letting callers inject supplementary label content (e.g. a reference count) for an option,
+	 * without this shared component needing to know about content-type-specific fields.
+	 * @memberof UmbContentVariantLanguagePickerElement
+	 */
+	@property({ attribute: false })
+	public renderAdditionalLabel?: (option: UmbEntityVariantOptionModel) => unknown;
+
 	protected override updated(_changedProperties: PropertyValues): void {
 		super.updated(_changedProperties);
 
@@ -97,9 +102,11 @@ export class UmbContentVariantLanguagePickerElement extends UmbLitElement {
 
 	override render() {
 		if (this.variantLanguageOptions.length === 0) {
-			return html`<uui-box>
-				<umb-localize key="content_noVariantsToProcess">There are no available variants</umb-localize>
-			</uui-box>`;
+			return html`
+				<uui-box>
+					<umb-localize key="content_noVariantsToProcess">There are no available variants</umb-localize>
+				</uui-box>
+			`;
 		}
 
 		return html`
@@ -110,7 +117,7 @@ export class UmbContentVariantLanguagePickerElement extends UmbLitElement {
 			${repeat(
 				this.variantLanguageOptions,
 				(option) => option.unique,
-				(option) => html` ${this.#renderItem(option)} `,
+				(option) => this.#renderItem(option),
 			)}
 		`;
 	}
@@ -129,46 +136,45 @@ export class UmbContentVariantLanguagePickerElement extends UmbLitElement {
 				@deselected=${() => this.selectionManager.deselect(option.unique)}
 				?selected=${selected}>
 				<uui-icon slot="icon" name="icon-globe"></uui-icon>
-				${UmbContentVariantLanguagePickerElement.renderLabel(option, mustSelect)}
+				${UmbContentVariantLanguagePickerElement.renderLabel(option, mustSelect, this.renderAdditionalLabel)}
 			</uui-menu-item>
 		`;
 	}
 
-	static renderLabel(option: UmbEntityVariantOptionModel, mustSelect?: boolean) {
-		// Some content types (e.g. documents) additionally report a reference count on the option; render it if present.
-		const documentCount = (option as { documentCount?: number }).documentCount;
-		return html`<div class="label" slot="label">
+	static renderLabel(
+		option: UmbEntityVariantOptionModel,
+		mustSelect?: boolean,
+		renderAdditionalLabel?: (option: UmbEntityVariantOptionModel) => unknown,
+	) {
+		return html` <div class="label" slot="label">
 			<strong> ${option.language.name} </strong>
 			<div class="label-status">${UmbContentVariantLanguagePickerElement.renderVariantStatus(option)}</div>
-			${documentCount !== undefined
-				? html`<div class="label-status">
-						<umb-localize key="general_documentCount" .args=${[documentCount]}>
-							${documentCount} documents
-						</umb-localize>
-					</div>`
-				: nothing}
-			${option.language.isMandatory && mustSelect
-				? html`<div class="label-status">
+			${renderAdditionalLabel?.(option)}
+			${when(
+				option.language.isMandatory && mustSelect,
+				() => html`
+					<div class="label-status">
 						<umb-localize key="languages_mandatoryLanguage">Mandatory language</umb-localize>
-					</div>`
-				: nothing}
+					</div>
+				`,
+			)}
 		</div>`;
 	}
 
 	static renderVariantStatus(option: UmbEntityVariantOptionModel) {
 		switch (option.variant?.state) {
-			case UMB_CONTENT_VARIANT_STATE_PUBLISHED:
+			case UmbPublishableVariantState.PUBLISHED:
 				return html`<umb-localize key="content_published">Published</umb-localize>`;
-			case UMB_CONTENT_VARIANT_STATE_PUBLISHED_PENDING_CHANGES:
+			case UmbPublishableVariantState.PUBLISHED_PENDING_CHANGES:
 				return html`<umb-localize key="content_publishedPendingChanges">Published with pending changes</umb-localize>`;
-			case UMB_CONTENT_VARIANT_STATE_DRAFT:
+			case UmbPublishableVariantState.DRAFT:
 				return html`<umb-localize key="content_unpublished">Draft</umb-localize>`;
 			default:
 				return html`<umb-localize key="content_notCreated">Not created</umb-localize>`;
 		}
 	}
 
-	static override styles = [
+	static override readonly styles = [
 		UmbTextStyles,
 		css`
 			.required {

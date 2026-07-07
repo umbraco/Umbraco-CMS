@@ -9,7 +9,7 @@ import { UmbDocumentPublishedPendingChangesManager } from '../pending-changes/in
 import { UMB_DOCUMENT_SCHEDULE_MODAL } from '../schedule-publish/constants.js';
 import { UMB_DOCUMENT_PUBLISH_WITH_DESCENDANTS_MODAL } from '../publish-with-descendants/constants.js';
 import { UMB_DOCUMENT_PUBLISH_MODAL } from '../publish/constants.js';
-import { UMB_DOCUMENT_UNPUBLISH_META } from '../unpublish/entity-action/meta.js';
+import { UmbDocumentUnpublishManifestEntityActionMeta } from '../unpublish/entity-action/constants.js';
 import { UMB_DOCUMENT_ENTITY_TYPE, UMB_DOCUMENT_WORKSPACE_ALIAS } from '../../constants.js';
 import { UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT } from './document-publishing.workspace-context.token.js';
 import { UMB_DOCUMENT_PUBLISHING_SHORTCUT_UNIQUE } from './constants.js';
@@ -332,7 +332,11 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 		const entityType = this.#documentWorkspaceContext.getEntityType();
 		if (!entityType) throw new Error('Entity type is missing');
 
-		const action = new UmbContentUnpublishEntityAction(this, { unique, entityType, meta: UMB_DOCUMENT_UNPUBLISH_META });
+		const action = new UmbContentUnpublishEntityAction(this, {
+			unique,
+			entityType,
+			meta: UmbDocumentUnpublishManifestEntityActionMeta,
+		});
 		const didUnpublish = await action.executeWithResult();
 		if (!didUnpublish) return;
 

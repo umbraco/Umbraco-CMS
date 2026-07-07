@@ -12,6 +12,14 @@ import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 
+/**
+ * @description - Shared entity action for unpublishing content-like entities (Document, Element, ...).
+ * Resolves its detail/publishing/item/reference/configuration repositories by alias from `meta`, so a single
+ * implementation can serve every consumer registered against the `contentUnpublish` kind.
+ * @exports
+ * @class UmbContentUnpublishEntityAction
+ * @augments UmbEntityActionBase
+ */
 export class UmbContentUnpublishEntityAction extends UmbEntityActionBase<MetaEntityActionContentUnpublishKind> {
 	override async execute() {
 		await this.executeWithResult();

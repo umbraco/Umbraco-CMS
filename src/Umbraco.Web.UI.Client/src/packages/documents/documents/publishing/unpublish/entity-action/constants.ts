@@ -4,7 +4,7 @@ import { UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS, UMB_DOCUMENT_REFERENCE_REPOSITORY_A
 import { UMB_DOCUMENT_PUBLISHING_REPOSITORY_ALIAS } from '../../repository/constants.js';
 import type { MetaEntityActionContentUnpublishKind } from '@umbraco-cms/backoffice/content';
 
-export const UMB_DOCUMENT_UNPUBLISH_META: MetaEntityActionContentUnpublishKind = {
+export const UmbDocumentUnpublishManifestEntityActionMeta: MetaEntityActionContentUnpublishKind = {
 	icon: 'icon-globe',
 	label: '#actions_unpublish',
 	additionalOptions: true,
