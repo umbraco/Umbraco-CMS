@@ -816,6 +816,38 @@ internal sealed class PackageDataInstallationTests : UmbracoIntegrationTestWithC
         });
     }
 
+    [Test]
+    public async Task ImportContentBase_Assigns_Non_Default_Template_Via_TemplateAlias()
+    {
+        // Arrange
+        var xml = XElement.Parse(ImportResources.ContentWithNonDefaultTemplate_Package);
+        var templateElement = xml.Descendants("Templates").First();
+        var docTypesElement = xml.Descendants("DocumentTypes").First();
+        var documentSetElement = xml.Descendants("DocumentSet").First();
+        var packageDocument = CompiledPackageContentBase.Create(documentSetElement);
+
+        var importedTemplates = await PackageDataInstallation.ImportTemplatesAsync(templateElement.Elements("Template").ToList(), -1);
+        Assert.AreEqual(2, importedTemplates.Count);
+        var importedContentTypes = PackageDataInstallation.ImportDocumentTypes(docTypesElement.Elements("DocumentType"), -1)
+            .ToDictionary(x => x.Alias, x => x);
+        Assert.AreEqual(1, importedContentTypes.Count);
+
+        // Act
+        var contents = PackageDataInstallation.ImportContentBase(
+            packageDocument.Yield(),
+            importedContentTypes,
+            -1,
+            ContentTypeService,
+            ContentService);
+
+        // Assert - content should have nonDefaultTemplate assigned (resolved by templateAlias, not bogus int 99999)
+        var templateService = GetRequiredService<ITemplateService>();
+        var expectedTemplate = await templateService.GetAsync("nonDefaultTemplate");
+        Assert.IsNotNull(expectedTemplate);
+        Assert.AreEqual(1, contents.Count);
+        Assert.AreEqual(expectedTemplate.Id, contents.Single().TemplateId);
+    }
+
     private async Task AddLanguages()
     {
         var norwegian = new Language("nb-NO", "Norwegian Bokmål (Norway)");

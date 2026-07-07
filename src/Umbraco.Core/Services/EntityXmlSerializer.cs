@@ -28,6 +28,7 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
     private readonly PropertyEditorCollection _propertyEditors;
     private readonly IShortStringHelper _shortStringHelper;
     private readonly UrlSegmentProviderCollection _urlSegmentProviders;
+    private readonly ITemplateService _templateService;
     private readonly IUserService _userService;
 
     /// <summary>
@@ -43,6 +44,7 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
     /// <param name="shortStringHelper">The helper for string operations.</param>
     /// <param name="propertyEditors">The collection of property editors.</param>
     /// <param name="configurationEditorJsonSerializer">The serializer for configuration data.</param>
+    /// <param name="templateService">The template service for template lookups.</param>
     public EntityXmlSerializer(
         IContentService contentService,
         IMediaService mediaService,
@@ -53,7 +55,8 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
         UrlSegmentProviderCollection urlSegmentProviders,
         IShortStringHelper shortStringHelper,
         PropertyEditorCollection propertyEditors,
-        IConfigurationEditorJsonSerializer configurationEditorJsonSerializer)
+        IConfigurationEditorJsonSerializer configurationEditorJsonSerializer,
+        ITemplateService templateService)
     {
         _contentTypeService = contentTypeService;
         _mediaService = mediaService;
@@ -65,6 +68,7 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
         _shortStringHelper = shortStringHelper;
         _propertyEditors = propertyEditors;
         _configurationEditorJsonSerializer = configurationEditorJsonSerializer;
+        _templateService = templateService;
     }
 
     /// <inheritdoc />
@@ -92,6 +96,11 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
         xml.Add(new XAttribute("writerID", content.WriterId));
 
         xml.Add(new XAttribute("template", content.TemplateId?.ToString(CultureInfo.InvariantCulture) ?? string.Empty));
+
+        ITemplate? assignedTemplate = content.TemplateId.HasValue
+            ? _templateService.GetAsync(content.TemplateId.Value).GetAwaiter().GetResult()
+            : null;
+        xml.Add(new XAttribute("templateAlias", assignedTemplate?.Alias ?? string.Empty));
 
         xml.Add(new XAttribute("isPublished", content.Published));
 

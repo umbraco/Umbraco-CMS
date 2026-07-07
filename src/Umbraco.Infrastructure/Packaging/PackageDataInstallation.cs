@@ -519,14 +519,18 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             var sortOrder = element.Attribute("sortOrder")?.Value ?? string.Empty;
             var nodeName = element.Attribute("nodeName")?.Value ?? string.Empty;
             var templateId = element.AttributeValue<int?>("template");
+            var templateAlias = element.AttributeValue<string?>("templateAlias");
 
             IEnumerable<XElement>? properties = from property in element.Elements()
                                                 where property.Attribute("isDoc") == null
                                                 select property;
 
-            //TODO: This will almost never work, we can't reference a template by an INT Id within a package manifest, we need to change the
-            // packager to package templates by UDI and resolve by the same, in 98% of cases, this isn't going to work, or it will resolve the wrong template.
-            ITemplate? template = templateId.HasValue ? _fileService.GetTemplate(templateId.Value) : null;
+            // Resolve template by alias (stable across installs). Fall back to int ID for packages
+            // exported before templateAlias was introduced, though that lookup will rarely succeed
+            // since int IDs are database-specific and won't match across systems.
+            ITemplate? template = !string.IsNullOrEmpty(templateAlias)
+                ? _templateService.GetAsync(templateAlias).GetAwaiter().GetResult()
+                : templateId.HasValue ? _templateService.GetAsync(templateId.Value).GetAwaiter().GetResult() : null;
 
             //now double check this is correct since its an INT it could very well be pointing to an invalid template :/
             if (template != null && contentType is IContentType contentTypex)
