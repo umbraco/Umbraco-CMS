@@ -334,7 +334,31 @@ public class ImageCropperValue : TemporaryFileUploadValueBase, IHtmlEncodedStrin
                                                 && left.Width == right.Width
                                                 && left.Height == right.Height
                                                 && string.Equals(left.AltText, right.AltText)
+                                                && AltTextByCultureEquals(left.AltTextByCulture, right.AltTextByCulture)
                                                 && Equals(left.Coordinates, right.Coordinates));
+
+        private static bool AltTextByCultureEquals(Dictionary<string, string>? left, Dictionary<string, string>? right)
+        {
+            if (ReferenceEquals(left, right))
+            {
+                return true;
+            }
+
+            if (left is null || right is null || left.Count != right.Count)
+            {
+                return false;
+            }
+
+            foreach (KeyValuePair<string, string> entry in left)
+            {
+                if (right.TryGetValue(entry.Key, out var value) == false || string.Equals(entry.Value, value) == false)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
 
         public static bool operator ==(ImageCropperCrop? left, ImageCropperCrop? right)
             => Equals(left, right);
@@ -356,6 +380,19 @@ public class ImageCropperValue : TemporaryFileUploadValueBase, IHtmlEncodedStrin
                 hashCode = (hashCode * 397) ^ Width;
                 hashCode = (hashCode * 397) ^ Height;
                 hashCode = (hashCode * 397) ^ (AltText?.GetHashCode() ?? 0);
+                if (AltTextByCulture is not null)
+                {
+                    // XOR-combine the entries so the hash is independent of dictionary enumeration order,
+                    // matching the order-insensitive comparison in Equals.
+                    var altTextByCultureHash = 0;
+                    foreach (KeyValuePair<string, string> entry in AltTextByCulture)
+                    {
+                        altTextByCultureHash ^= (entry.Key.GetHashCode() * 397) ^ entry.Value.GetHashCode();
+                    }
+
+                    hashCode = (hashCode * 397) ^ altTextByCultureHash;
+                }
+
                 hashCode = (hashCode * 397) ^ (Coordinates?.GetHashCode() ?? 0);
                 return hashCode;
                 // ReSharper restore NonReadonlyMemberInGetHashCode

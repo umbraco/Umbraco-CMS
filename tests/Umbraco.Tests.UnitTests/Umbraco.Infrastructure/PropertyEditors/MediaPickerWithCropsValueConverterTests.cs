@@ -220,6 +220,25 @@ public class MediaPickerWithCropsValueConverterTests
         Assert.AreEqual(PropertyCacheLevel.Elements, converter.GetPropertyCacheLevel(propertyType));
     }
 
+    [Test]
+    public void GetPropertyCacheLevel_Returns_Elements_When_Decorative_On_Invariant_Property()
+    {
+        // Decorative alt text is always empty, so it never varies by culture and stays cacheable
+        var converter = CreateConverter(MockAccessor(new VariationContext("en")));
+        var propertyType = CreatePropertyType(new MediaPicker3Configuration { AltTextMode = "decorative" });
+
+        Assert.AreEqual(PropertyCacheLevel.Elements, converter.GetPropertyCacheLevel(propertyType));
+    }
+
+    [Test]
+    public void GetPropertyCacheLevel_Returns_None_When_PerCrop_AltText_Enabled_On_Invariant_Property()
+    {
+        var converter = CreateConverter(MockAccessor(new VariationContext("en")));
+        var propertyType = CreatePropertyType(new MediaPicker3Configuration { EnableAltTextPerCrop = true });
+
+        Assert.AreEqual(PropertyCacheLevel.None, converter.GetPropertyCacheLevel(propertyType));
+    }
+
     private static IPublishedPropertyType CreatePropertyType(
         MediaPicker3Configuration configuration,
         ContentVariation variations = ContentVariation.Nothing)

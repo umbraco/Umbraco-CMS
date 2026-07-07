@@ -166,7 +166,7 @@ public class MediaPickerWithCropsValueConverter : PropertyValueConverterBase, ID
                     Crops = ResolveCropsForCulture(dto.Crops, culture),
                     FocalPoint = dto.FocalPoint,
                     Src = mediaItem.Url(_publishedUrlProvider),
-                    AltText = ResolveCultureAltText(dto.AltText, dto.AltTextByCulture, culture),
+                    AltText = ResolveMediaAltText(dto, configuration, culture),
                 };
 
                 localCrops.ApplyConfiguration(configuration);
@@ -257,8 +257,9 @@ public class MediaPickerWithCropsValueConverter : PropertyValueConverterBase, ID
 
     // Per-culture alt text overrides are only stored on invariant (shared) properties — for those, an
     // invariant value is shared across cultures, so caching it would serve one culture's alt text to all.
-    // Culture-varying properties already cache per culture, and properties with no alt text feature enabled
-    // never produce a culture-dependent value, so both can keep the normal (cacheable) cache level.
+    // Culture-varying properties already cache per culture, and properties whose alt text is never
+    // culture-dependent ("off" produces no alt text, "decorative" always produces an empty string)
+    // can keep the normal (cacheable) cache level.
     private static bool RequiresPerRequestCultureResolution(IPublishedPropertyType propertyType)
     {
         if (propertyType.Variations.VariesByCulture())
@@ -268,8 +269,18 @@ public class MediaPickerWithCropsValueConverter : PropertyValueConverterBase, ID
 
         MediaPicker3Configuration? configuration = propertyType.DataType.ConfigurationAs<MediaPicker3Configuration>();
         return configuration is not null
-               && (configuration.AltTextMode != "off" || configuration.EnableAltTextPerCrop);
+               && (configuration.AltTextMode == "altText" || configuration.EnableAltTextPerCrop);
     }
+
+    // Decorative images must always render with an empty alt attribute (WCAG 1.1.1), even when alt text
+    // was stored before the data type was switched to decorative mode.
+    private static string? ResolveMediaAltText(
+        MediaPicker3PropertyEditor.MediaPicker3PropertyValueEditor.MediaWithCropsDto dto,
+        MediaPicker3Configuration? configuration,
+        string? culture)
+        => configuration?.AltTextMode == "decorative"
+            ? string.Empty
+            : ResolveCultureAltText(dto.AltText, dto.AltTextByCulture, culture);
 
     // Resolve per-crop alt text from AltTextByCulture when a culture context is active; otherwise the stored crops are used as-is.
     private static IEnumerable<ImageCropperValue.ImageCropperCrop>? ResolveCropsForCulture(IEnumerable<ImageCropperValue.ImageCropperCrop>? crops, string? culture)

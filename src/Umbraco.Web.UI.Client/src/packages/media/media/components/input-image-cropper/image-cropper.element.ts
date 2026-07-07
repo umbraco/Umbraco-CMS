@@ -72,6 +72,7 @@ export class UmbImageCropperElement extends UmbLitElement {
 	}
 
 	#onViewportKeydown = (event: KeyboardEvent) => {
+		if (this.displayOnly) return;
 		const step = event.shiftKey ? 20 : 5;
 		switch (event.key) {
 			case 'ArrowLeft':

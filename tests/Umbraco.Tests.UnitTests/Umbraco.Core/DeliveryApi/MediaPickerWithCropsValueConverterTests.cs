@@ -357,6 +357,35 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
     }
 
     [Test]
+    public void MediaPickerWithCropsValueConverter_AltText_IsEmpty_WhenDataTypeIsDecorative()
+    {
+        var publishedPropertyType = SetupMediaPropertyType(false, altTextMode: "decorative");
+        var mediaKey = SetupMedia("Test media", ".jpg", 100, 200, "irrelevant", 500);
+
+        var serializer = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
+
+        var inter = serializer.Serialize(new[]
+        {
+            new MediaPicker3PropertyEditor.MediaPicker3PropertyValueEditor.MediaWithCropsDto
+            {
+                Key = Guid.NewGuid(),
+                MediaKey = mediaKey,
+                Crops = Array.Empty<ImageCropperValue.ImageCropperCrop>(),
+                // Alt text stored before the data type was switched to decorative must not leak through
+                AltText = "Stale alt text",
+                AltTextByCulture = new Dictionary<string, string> { ["da-DK"] = "Gammel alt tekst" },
+            }
+        });
+
+        var result = MediaPickerWithCropsValueConverter(culture: "da-DK")
+            .ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false, false)
+            as IEnumerable<IApiMediaWithCrops>;
+
+        Assert.NotNull(result);
+        Assert.AreEqual(string.Empty, result.Single().AltText);
+    }
+
+    [Test]
     public void GetDeliveryApiPropertyCacheLevel_Returns_Elements_When_AltText_Disabled()
     {
         var converter = MediaPickerWithCropsValueConverter();
@@ -469,11 +498,12 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
         Assert.AreEqual(expected, crop!.AltText);
     }
 
-    private IPublishedPropertyType SetupMediaPropertyType(bool multiSelect)
+    private IPublishedPropertyType SetupMediaPropertyType(bool multiSelect, string altTextMode = "off")
     {
         var publishedDataType = new PublishedDataType(123, "test", "test", new Lazy<object>(() => new MediaPicker3Configuration
         {
             Multiple = multiSelect,
+            AltTextMode = altTextMode,
             EnableLocalFocalPoint = true,
             Crops = new MediaPicker3Configuration.CropConfiguration[]
             {
