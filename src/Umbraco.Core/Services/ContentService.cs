@@ -2600,10 +2600,11 @@ public class ContentService : RepositoryService, IContentService
             ? content.PublishCultureInfos?.Values.Where(x => x.IsDirty()).Select(x => x.Culture).ToList()
             : null;
 
-    // Builds the culture map carried on the content notifications, keyed by content Key. Change tracking on the
-    // entity is reset once persisted, so the affected cultures have to be captured here at raise-time. The cultures
-    // are snapshotted (never a live view of the entity's own collections). Returns null when there are no cultures
-    // to report so consumers can treat "unknown" and "none" alike.
+    // Builds the per-document culture map carried on the content notifications, keyed by content Key. Persisting the
+    // entity resets its change tracking, so the cultures are captured here when the notification is raised, because a
+    // handler cannot recompute them from the entity afterwards. ToArray() takes a copy so the notification holds a
+    // stable snapshot: some callers pass a live view over the entity's own collection (e.g. content.PublishedCultures)
+    // that would otherwise change as the entity is mutated. Returns null (not an empty map) when there is nothing to report.
     private static IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? BuildCultureMap(IContent content, IEnumerable<string>? cultures)
     {
         if (cultures is null)
