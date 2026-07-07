@@ -16,7 +16,7 @@ internal static class EmailMessageExtensions
                 $"Email could not be sent.  Could not parse from address {fromEmail} as a valid email address.");
         }
 
-        var messageToSend = new MimeMessage { From = { fromAddress }, Subject = mailMessage.Subject ?? string.Empty };
+        var messageToSend = new MimeMessage { From = { fromAddress }, Subject = mailMessage.Subject! };
 
         AddAddresses(messageToSend, mailMessage.To, x => x.To, true);
         AddAddresses(messageToSend, mailMessage.Cc, x => x.Cc);
@@ -45,7 +45,7 @@ internal static class EmailMessageExtensions
         else
         {
             messageToSend.Body =
-                new TextPart(mailMessage.IsBodyHtml ? TextFormat.Html : TextFormat.Plain) { Text = mailMessage.Body ?? string.Empty };
+                new TextPart(mailMessage.IsBodyHtml ? TextFormat.Html : TextFormat.Plain) { Text = mailMessage.Body! };
         }
 
         return messageToSend;
