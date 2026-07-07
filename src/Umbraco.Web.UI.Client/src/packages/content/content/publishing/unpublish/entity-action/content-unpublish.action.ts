@@ -1,28 +1,29 @@
-import type { UmbDocumentVariantOptionModel } from '../../../types.js';
-import { UMB_DOCUMENT_UNPUBLISH_MODAL } from '../constants.js';
-import { UmbDocumentDetailRepository } from '../../../repository/index.js';
-import { UmbDocumentPublishingRepository } from '../../repository/index.js';
+import { UMB_CONTENT_UNPUBLISH_MODAL } from '../modal/constants.js';
+import type { UmbContentDetailModel } from '../../../types.js';
+import type { MetaEntityActionContentUnpublishKind, UmbContentUnpublishingRepository } from './types.js';
 import { UMB_APP_LANGUAGE_CONTEXT, UmbLanguageCollectionRepository } from '@umbraco-cms/backoffice/language';
-import {
-	type UmbEntityActionArgs,
-	UmbEntityActionBase,
-	UmbRequestReloadStructureForEntityEvent,
-} from '@umbraco-cms/backoffice/entity-action';
-import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbEntityActionBase, UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
+import { UmbVariantId, type UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
+import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 
-export class UmbUnpublishDocumentEntityAction extends UmbEntityActionBase<never> {
-	constructor(host: UmbControllerHost, args: UmbEntityActionArgs<never>) {
-		super(host, args);
+export class UmbContentUnpublishEntityAction extends UmbEntityActionBase<MetaEntityActionContentUnpublishKind> {
+	override async execute() {
+		await this.executeWithResult();
 	}
 
-	override async execute() {
-		if (!this.args.unique) throw new Error('The document unique identifier is missing');
+	/**
+	 * Runs the unpublish flow and reports whether an unpublish actually occurred.
+	 * @returns {Promise<boolean>} `true` if the entity was unpublished, `false` if the user cancelled or made no selection.
+	 * @memberof UmbContentUnpublishEntityAction
+	 */
+	public async executeWithResult(): Promise<boolean> {
+		if (!this.args.unique) throw new Error('The unique identifier is missing');
 
 		const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
 		const localize = new UmbLocalizationController(this);
@@ -30,10 +31,13 @@ export class UmbUnpublishDocumentEntityAction extends UmbEntityActionBase<never>
 		const languageRepository = new UmbLanguageCollectionRepository(this._host);
 		const { data: languageData } = await languageRepository.requestAllItems();
 
-		const documentRepository = new UmbDocumentDetailRepository(this._host);
-		const { data: documentData } = await documentRepository.requestByUnique(this.args.unique);
+		const detailRepository = await createExtensionApiByAlias<UmbDetailRepository<UmbContentDetailModel>>(
+			this,
+			this.args.meta.detailRepositoryAlias,
+		);
+		const { data: detailData } = await detailRepository.requestByUnique(this.args.unique);
 
-		if (!documentData) throw new Error('The document was not found');
+		if (!detailData) throw new Error('The item was not found');
 
 		const appLanguageContext = await this.getContext(UMB_APP_LANGUAGE_CONTEXT);
 		if (!appLanguageContext) throw new Error('The app language context is missing');
@@ -48,9 +52,9 @@ export class UmbUnpublishDocumentEntityAction extends UmbEntityActionBase<never>
 		if (currentUserHasAccessToAllLanguages === undefined)
 			throw new Error('The current user access to all languages is missing');
 
-		const cultureVariantOptions = documentData.variants.filter((variant) => variant.segment === null);
+		const cultureVariantOptions = detailData.variants.filter((variant) => variant.segment === null);
 
-		const options: Array<UmbDocumentVariantOptionModel> = cultureVariantOptions.map<UmbDocumentVariantOptionModel>(
+		const options: Array<UmbEntityVariantOptionModel> = cultureVariantOptions.map<UmbEntityVariantOptionModel>(
 			(variant) => ({
 				culture: variant.culture,
 				segment: variant.segment,
@@ -67,8 +71,7 @@ export class UmbUnpublishDocumentEntityAction extends UmbEntityActionBase<never>
 			}),
 		);
 
-		// Figure out the default selections
-		// TODO: Missing features to pre-select the variant that fits with the variant-id of the tree/collection? (Again only relevant if the action is executed from a Tree or Collection) [NL]
+		// Figure out the default selection:
 		const selection: Array<string> = [];
 		// If the app language is one of the options, select it by default:
 		if (appCulture && options.some((o) => o.unique === appCulture)) {
@@ -78,48 +81,56 @@ export class UmbUnpublishDocumentEntityAction extends UmbEntityActionBase<never>
 			selection.push(options[0].unique);
 		}
 
-		const result = await umbOpenModal(this, UMB_DOCUMENT_UNPUBLISH_MODAL, {
+		const result = await umbOpenModal(this, UMB_CONTENT_UNPUBLISH_MODAL, {
 			data: {
-				documentUnique: this.args.unique,
+				unique: this.args.unique,
 				options,
 				pickableFilter: (option) => {
 					if (!option.culture) return false;
 					if (currentUserHasAccessToAllLanguages) return true;
 					return currentUserAllowedLanguages.includes(option.culture);
 				},
+				itemRepositoryAlias: this.args.meta.itemRepositoryAlias,
+				referenceRepositoryAlias: this.args.meta.referenceRepositoryAlias,
+				configurationRepositoryAlias: this.args.meta.configurationRepositoryAlias,
 			},
 			value: { selection },
 		}).catch(() => undefined);
 
-		if (!result?.selection.length) return;
+		if (!result?.selection.length) return false;
 
 		const variantIds = result?.selection.map((x) => UmbVariantId.FromString(x)) ?? [];
 
-		if (!variantIds.length) return;
+		if (!variantIds.length) return false;
 
-		const publishingRepository = new UmbDocumentPublishingRepository(this._host);
+		const publishingRepository = await createExtensionApiByAlias<UmbContentUnpublishingRepository>(
+			this,
+			this.args.meta.publishingRepositoryAlias,
+		);
 		const { error } = await publishingRepository.unpublish(this.args.unique, variantIds);
 
 		if (error) {
 			throw error;
 		}
 
-		if (!error) {
-			notificationContext?.peek('positive', {
-				data: {
-					message: localize.term('speechBubbles_editContentUnpublishedHeader'),
-				},
-			});
+		notificationContext?.peek('positive', {
+			data: {
+				message: localize.string(
+					this.args.meta.unpublishedNotificationMessage || '#speechBubbles_editContentUnpublishedHeader',
+				),
+			},
+		});
 
-			const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
-			const event = new UmbRequestReloadStructureForEntityEvent({
-				unique: this.args.unique,
-				entityType: this.args.entityType,
-			});
+		const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+		const event = new UmbRequestReloadStructureForEntityEvent({
+			unique: this.args.unique,
+			entityType: this.args.entityType,
+		});
 
-			actionEventContext?.dispatchEvent(event);
-		}
+		actionEventContext?.dispatchEvent(event);
+
+		return true;
 	}
 }
 
-export default UmbUnpublishDocumentEntityAction;
+export { UmbContentUnpublishEntityAction as api };

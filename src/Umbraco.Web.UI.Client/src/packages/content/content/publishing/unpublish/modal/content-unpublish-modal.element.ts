@@ -1,51 +1,47 @@
-import { UmbDocumentVariantState } from '../../../variant-state.js';
-import type { UmbDocumentVariantOptionModel } from '../../../types.js';
-import { UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS, UMB_DOCUMENT_REFERENCE_REPOSITORY_ALIAS } from '../../../constants.js';
-import { UMB_DOCUMENT_CONFIGURATION_CONTEXT } from '../../../global-contexts/index.js';
-import type {
-	UmbDocumentUnpublishModalData,
-	UmbDocumentUnpublishModalValue,
-} from './document-unpublish-modal.token.js';
+import type { UmbContentConfigurationRepository } from '../../../configuration/types.js';
+import type { UmbContentUnpublishModalData, UmbContentUnpublishModalValue } from './types.js';
 import { css, customElement, html, nothing, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
+import type { UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';
+import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import type {
 	UmbConfirmActionModalEntityReferencesConfig,
 	UmbConfirmActionModalEntityReferencesElement,
 } from '@umbraco-cms/backoffice/relations';
 import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
-import '../../../modals/shared/document-variant-language-picker.element.js';
+import '../../../variant-picker/content-variant-language-picker.element.js';
 
 /**
  * @function isPublished
- * @param {UmbDocumentVariantOptionModel} option - the option to check.
+ * @param {UmbEntityVariantOptionModel} option - the option to check.
  * @returns {boolean} boolean
  */
-export function isPublished(option: UmbDocumentVariantOptionModel): boolean {
-	return (
-		option.variant?.state === UmbDocumentVariantState.PUBLISHED ||
-		option.variant?.state === UmbDocumentVariantState.PUBLISHED_PENDING_CHANGES
-	);
+export function isPublished(option: UmbEntityVariantOptionModel): boolean {
+	return option.variant?.state === 'Published' || option.variant?.state === 'PublishedPendingChanges';
 }
 
-/** @deprecated Use `umb-content-unpublish-modal` from `@umbraco-cms/backoffice/content` instead. Scheduled for removal in Umbraco 19. */
-@customElement('umb-document-unpublish-modal')
-export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
-	UmbDocumentUnpublishModalData,
-	UmbDocumentUnpublishModalValue
+@customElement('umb-content-unpublish-modal')
+export class UmbContentUnpublishModalElement extends UmbModalBaseElement<
+	UmbContentUnpublishModalData,
+	UmbContentUnpublishModalValue
 > {
 	protected readonly _selectionManager = new UmbSelectionManager<string>(this);
 
 	@state()
-	private _options: Array<UmbDocumentVariantOptionModel> = [];
+	private _options: Array<UmbEntityVariantOptionModel> = [];
 
 	@state()
 	private _selection: Array<string> = [];
 
+	// Three-state model for reference-aware unpublishing:
+	//   undefined = loading (button disabled, no bypass possible while references are still being checked)
+	//   false     = blocked (button disabled, references exist and disableUnpublishWhenReferenced is set)
+	//   true       = allowed (button enabled)
 	@state()
-	private _canUnpublish = true;
+	private _canUnpublish: boolean | undefined = true;
 
 	@state()
 	private _hasInvalidSelection = true;
@@ -56,7 +52,7 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 	@state()
 	private _referencesConfig?: UmbConfirmActionModalEntityReferencesConfig;
 
-	#pickableFilter = (option: UmbDocumentVariantOptionModel) => {
+	#pickableFilter = (option: UmbEntityVariantOptionModel) => {
 		if (!option.variant) {
 			return false;
 		}
@@ -77,12 +73,14 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 	}
 
 	#configureReferences() {
-		if (!this.data?.documentUnique) return;
+		if (!this.data?.unique || !this.data.itemRepositoryAlias || !this.data.referenceRepositoryAlias) return;
+
+		this._canUnpublish = undefined;
 
 		this._referencesConfig = {
-			itemRepositoryAlias: UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS,
-			referenceRepositoryAlias: UMB_DOCUMENT_REFERENCE_REPOSITORY_ALIAS,
-			unique: this.data.documentUnique,
+			itemRepositoryAlias: this.data.itemRepositoryAlias,
+			referenceRepositoryAlias: this.data.referenceRepositoryAlias,
+			unique: this.data.unique,
 		};
 	}
 
@@ -136,17 +134,27 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 	async #onReferencesChange(event: UmbChangeEvent) {
 		event.stopPropagation();
 		const target = event.target as UmbConfirmActionModalEntityReferencesElement;
-		const getReferencedByTotal = target.getTotalReferencedBy();
-		const descendantsWithReferencesTotal = target.getTotalDescendantsWithReferences();
-		const total = getReferencedByTotal + descendantsWithReferencesTotal;
+		const total = target.getTotalReferencedBy() + target.getTotalDescendantsWithReferences();
 
-		if (total > 0) {
-			const context = await this.getContext(UMB_DOCUMENT_CONFIGURATION_CONTEXT);
-			this._canUnpublish = (await context?.getDocumentConfiguration())?.disableUnpublishWhenReferenced === false;
+		if (total === 0) {
+			this._canUnpublish = true;
+			return;
 		}
+
+		if (!this.data?.configurationRepositoryAlias) {
+			this._canUnpublish = true;
+			return;
+		}
+
+		const configurationRepository = await createExtensionApiByAlias<UmbContentConfigurationRepository>(
+			this,
+			this.data.configurationRepositoryAlias,
+		);
+		const { data: configuration } = await configurationRepository.requestConfiguration();
+		this._canUnpublish = (configuration?.disableUnpublishWhenReferenced ?? false) !== true;
 	}
 
-	private _requiredFilter = (variantOption: UmbDocumentVariantOptionModel): boolean => {
+	private _requiredFilter = (variantOption: UmbEntityVariantOptionModel): boolean => {
 		return variantOption.language.isMandatory && !this._selection.includes(variantOption.unique);
 	};
 
@@ -158,11 +166,11 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 			${when(
 				!this._isInvariant,
 				() => html`
-					<umb-document-variant-language-picker
+					<umb-content-variant-language-picker
 						.selectionManager=${this._selectionManager}
 						.variantLanguageOptions=${this._options}
 						.requiredFilter=${this._hasInvalidSelection ? this._requiredFilter : undefined}
-						.pickableFilter=${this.#pickableFilter}></umb-document-variant-language-picker>
+						.pickableFilter=${this.#pickableFilter}></umb-content-variant-language-picker>
 				`,
 			)}
 			${this._referencesConfig
@@ -207,10 +215,10 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 	];
 }
 
-export default UmbDocumentUnpublishModalElement;
+export default UmbContentUnpublishModalElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-document-unpublish-modal': UmbDocumentUnpublishModalElement;
+		'umb-content-unpublish-modal': UmbContentUnpublishModalElement;
 	}
 }

@@ -1,8 +1,9 @@
-import { UmbUnpublishDocumentEntityAction } from '../entity-action/index.js';
-import { UMB_DOCUMENT_ENTITY_TYPE, UMB_DOCUMENT_UNPUBLISH_MODAL } from '../../../constants.js';
+import { UMB_DOCUMENT_UNPUBLISH_META } from '../entity-action/meta.js';
+import { UMB_DOCUMENT_ENTITY_TYPE } from '../../../constants.js';
 import { UmbDocumentPublishingRepository } from '../../repository/index.js';
 import { UmbDocumentPublishEntityBulkAction } from '../../publish/entity-bulk-action/publish.bulk-action.js';
 import { UmbDocumentItemRepository } from '../../../item/repository/index.js';
+import { UMB_CONTENT_UNPUBLISH_MODAL, UmbContentUnpublishEntityAction } from '@umbraco-cms/backoffice/content';
 import { umbConfirmModal, umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UmbEntityBulkActionBase } from '@umbraco-cms/backoffice/entity-bulk-action';
 import { UmbLanguageCollectionRepository } from '@umbraco-cms/backoffice/language';
@@ -29,10 +30,10 @@ export class UmbDocumentUnpublishEntityBulkAction extends UmbEntityBulkActionBas
 
 		// If there is only one selection, we can refer to the regular unpublish entity action:
 		if (this.selection.length === 1) {
-			const action = new UmbUnpublishDocumentEntityAction(this._host, {
+			const action = new UmbContentUnpublishEntityAction(this._host, {
 				unique: this.selection[0],
 				entityType: UMB_DOCUMENT_ENTITY_TYPE,
-				meta: {} as never,
+				meta: UMB_DOCUMENT_UNPUBLISH_META,
 			});
 			await action.execute();
 			return;
@@ -87,7 +88,7 @@ export class UmbDocumentUnpublishEntityBulkAction extends UmbEntityBulkActionBas
 		// Pre-select all cultures from the selected documents
 		const selection: Array<string> = options.map((o) => o.unique);
 
-		const result = await umbOpenModal(this, UMB_DOCUMENT_UNPUBLISH_MODAL, {
+		const result = await umbOpenModal(this, UMB_CONTENT_UNPUBLISH_MODAL, {
 			data: {
 				options,
 			},
