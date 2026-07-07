@@ -154,7 +154,13 @@ public class EmailSender : IEmailSender
 
         if (string.IsNullOrWhiteSpace(_globalSettings.Smtp!.Host))
         {
-            throw new InvalidOperationException("Cannot send email over SMTP: no host is configured.");
+            // We only reach here without an SMTP host when the pickup-directory path above was skipped.
+            // The one way that happens is a pickup directory configured without the required 'From' address,
+            // so point the user at that rather than reporting a generic missing-host error.
+            throw new InvalidOperationException(
+                _globalSettings.IsPickupDirectoryLocationConfigured
+                    ? "Cannot send email: a pickup directory is configured but no 'From' address is set (Smtp.From), and no SMTP host is configured as a fallback. Set Smtp.From to use the pickup directory, or configure an SMTP host."
+                    : "Cannot send email over SMTP: no host is configured.");
         }
 
         using var client = new SmtpClient();
