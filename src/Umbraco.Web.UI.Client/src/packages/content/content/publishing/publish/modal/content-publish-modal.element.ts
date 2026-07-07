@@ -1,35 +1,24 @@
-import { UmbDocumentVariantState } from '../../../variant-state.js';
-import type { UmbDocumentVariantOptionModel } from '../../../types.js';
 import { isNotPublishedMandatory } from '../../utils.js';
-import type { UmbDocumentPublishModalData, UmbDocumentPublishModalValue } from './document-publish-modal.token.js';
+import type { UmbContentPublishModalData, UmbContentPublishModalValue } from './types.js';
 import { css, customElement, html, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import { UmbDeprecation, UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
+import { UmbPublishableVariantState } from '@umbraco-cms/backoffice/variant';
+import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import type { UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';
 
-import '../../../modals/shared/document-variant-language-picker.element.js';
+import '../../../variant-picker/content-variant-language-picker.element.js';
 
-/** @deprecated Use `umb-content-publish-modal` from `@umbraco-cms/backoffice/content` instead. Scheduled for removal in Umbraco 19. */
-@customElement('umb-document-publish-modal')
-export class UmbDocumentPublishModalElement extends UmbModalBaseElement<
-	UmbDocumentPublishModalData,
-	UmbDocumentPublishModalValue
+@customElement('umb-content-publish-modal')
+export class UmbContentPublishModalElement extends UmbModalBaseElement<
+	UmbContentPublishModalData,
+	UmbContentPublishModalValue
 > {
 	#selectionManager = new UmbSelectionManager<string>(this);
 
-	constructor() {
-		super();
-
-		new UmbDeprecation({
-			deprecated: 'UmbDocumentPublishModalElement is deprecated.',
-			removeInVersion: '19.0.0',
-			solution: 'Use umb-content-publish-modal from @umbraco-cms/backoffice/content instead.',
-		}).warn();
-	}
-
 	@state()
-	private _options: Array<UmbDocumentVariantOptionModel> = [];
+	private _options: Array<UmbEntityVariantOptionModel> = [];
 
 	@state()
 	private _hasNotSelectedMandatory?: boolean;
@@ -40,8 +29,8 @@ export class UmbDocumentPublishModalElement extends UmbModalBaseElement<
 	@state()
 	private _isInvariant = false;
 
-	#pickableFilter = (option: UmbDocumentVariantOptionModel) => {
-		if (!option.variant || option.variant.state === UmbDocumentVariantState.NOT_CREATED) {
+	#pickableFilter = (option: UmbEntityVariantOptionModel) => {
+		if (!option.variant || option.variant.state === UmbPublishableVariantState.NOT_CREATED) {
 			return false;
 		}
 		return this.data?.pickableFilter ? this.data.pickableFilter(option) : true;
@@ -69,7 +58,7 @@ export class UmbDocumentPublishModalElement extends UmbModalBaseElement<
 				(option) =>
 					(option.variant && option.variant.state === null) ||
 					isNotPublishedMandatory(option) ||
-					option.variant?.state !== UmbDocumentVariantState.NOT_CREATED,
+					option.variant?.state !== UmbPublishableVariantState.NOT_CREATED,
 			) ?? [];
 
 		let selected = this.value?.selection ?? [];
@@ -78,16 +67,6 @@ export class UmbDocumentPublishModalElement extends UmbModalBaseElement<
 
 		// Filter selection based on options:
 		selected = selected.filter((s) => validOptions.some((o) => o.unique === s));
-
-		// Additionally select mandatory languages:
-		// [NL]: I think for now lets make it an active choice to select the languages. If you just made them, they would be selected. So it just to underline the act of actually selecting these languages.
-		/*
-		this._options.forEach((variant) => {
-			if (variant.language?.isMandatory) {
-				selected.push(variant.unique);
-			}
-		});
-		*/
 
 		this.#selectionManager.setSelection(selected);
 
@@ -123,11 +102,11 @@ export class UmbDocumentPublishModalElement extends UmbModalBaseElement<
 				${when(
 					!this._isInvariant,
 					() =>
-						html`<umb-document-variant-language-picker
+						html`<umb-content-variant-language-picker
 							.selectionManager=${this.#selectionManager}
 							.variantLanguageOptions=${this._options}
 							.requiredFilter=${isNotPublishedMandatory}
-							.pickableFilter=${this.#pickableFilter}></umb-document-variant-language-picker>`,
+							.pickableFilter=${this.#pickableFilter}></umb-content-variant-language-picker>`,
 				)}
 
 				<div slot="actions">
@@ -146,7 +125,7 @@ export class UmbDocumentPublishModalElement extends UmbModalBaseElement<
 		`;
 	}
 
-	static override styles = [
+	static override readonly styles = [
 		UmbTextStyles,
 		css`
 			:host {
@@ -158,10 +137,10 @@ export class UmbDocumentPublishModalElement extends UmbModalBaseElement<
 	];
 }
 
-export default UmbDocumentPublishModalElement;
+export default UmbContentPublishModalElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-document-publish-modal': UmbDocumentPublishModalElement;
+		'umb-content-publish-modal': UmbContentPublishModalElement;
 	}
 }
