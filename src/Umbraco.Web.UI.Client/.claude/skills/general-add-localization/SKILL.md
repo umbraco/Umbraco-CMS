@@ -40,7 +40,11 @@ export default {
 
 #### Choosing a group
 
-A group covers a **shared UX area**, not just the one component you're editing. Ask: "where else does this same UX show up?" — features with matching UX should share a group, or the same kind of text ends up duplicated and inconsistently worded elsewhere.
+A group covers a **shared UX area**, not just the one component you're editing. Don't pick a group unilaterally — confirm it with the user:
+
+1. **If you already have a good idea of the scope** (from the surrounding code, the feature being worked on, etc.), propose it: "This looks like it belongs to the `{scope}` scope — should that be the localization group?"
+2. **If you don't**, ask directly: "What is the common group name for this localization?"
+3. **Either way, check for an existing match first.** Search the groups already in `en.ts` for one that already covers this UX area, and if you find one, ask whether it should be reused instead of creating a new group: "`{existingGroup}` already covers this — should I use that instead?"
 
 Examples already in this codebase:
 
@@ -48,7 +52,7 @@ Examples already in this codebase:
 - `contentTypeEditor` — Document Type, Media Type, and Member Type share the same editing UX
 - `codeEditor` — anything embedding the code editor
 
-Reuse an existing group when it covers the UX area. Only create a new one when there's no overlap.
+Only create a new group once the user confirms no existing one fits.
 
 #### Choosing a term
 
