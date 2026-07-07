@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Linq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -26,12 +25,12 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
 {
     [SetUp]
-    public void SetupTest()
+    public async Task SetupTest()
     {
         ContentRepositoryBase.ThrowOnWarning = true;
         _globalSettings = new GlobalSettings();
 
-        CreateTestData();
+        await CreateTestData();
     }
 
     [TearDown]
@@ -43,7 +42,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
 
     private ILanguageService LanguageService => GetRequiredService<ILanguageService>();
 
-    private IFileService FileService => GetRequiredService<IFileService>();
+    private ITemplateService TemplateService => GetRequiredService<ITemplateService>();
 
     private GlobalSettings _globalSettings;
     private IContentType _contentType;
@@ -57,13 +56,13 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         .AddNotificationHandler<ContentUnpublishedNotification, ContentNotificationHandler>()
         .AddNotificationHandler<ContentTreeChangeNotification, ContentNotificationHandler>();
 
-    private void CreateTestData()
+    private async Task CreateTestData()
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
-        FileService.SaveTemplate(template); // else, FK violation on contentType!
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey); // else, FK violation on contentType!
 
         _contentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id);
-        ContentTypeService.Save(_contentType);
+        await ContentTypeService.CreateAsync(_contentType, Constants.Security.SuperUserKey);
     }
 
     [Test]
@@ -77,7 +76,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
             propertyType.Variations = ContentVariation.Culture;
         }
 
-        ContentTypeService.Save(_contentType);
+        await ContentTypeService.UpdateAsync(_contentType, Constants.Security.SuperUserKey);
 
         IContent document = new Content("content", -1, _contentType);
         document.SetCultureName("hello", "en-US");
@@ -251,7 +250,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
             propertyType.Variations = ContentVariation.Culture;
         }
 
-        ContentTypeService.Save(_contentType);
+        await ContentTypeService.UpdateAsync(_contentType, Constants.Security.SuperUserKey);
 
         IContent document = new Content("content", -1, _contentType);
         document.SetCultureName("hello", "en-US");
@@ -404,11 +403,11 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Set_Mandatory_Value_When_Publishing()
+    public async Task Can_Set_Mandatory_Value_When_Publishing()
     {
         var titleProperty = _contentType.PropertyTypes.First(x => x.Alias == "title");
         titleProperty.Mandatory = true; // make this required!
-        ContentTypeService.Save(_contentType);
+        await ContentTypeService.UpdateAsync(_contentType, Constants.Security.SuperUserKey);
 
         IContent document = new Content("content", -1, _contentType);
 
@@ -460,7 +459,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
             propertyType.Variations = ContentVariation.Culture;
         }
 
-        ContentTypeService.Save(_contentType);
+        await ContentTypeService.UpdateAsync(_contentType, Constants.Security.SuperUserKey);
 
         IContent document = new Content("content", -1, _contentType);
         document.SetCultureName("hello", "en-US");
@@ -584,7 +583,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
             propertyType.Variations = ContentVariation.Culture;
         }
 
-        ContentTypeService.Save(_contentType);
+        await ContentTypeService.UpdateAsync(_contentType, Constants.Security.SuperUserKey);
 
         IContent document = new Content("content", -1, _contentType);
         document.SetCultureName("hello", "en-US");
@@ -664,7 +663,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
             propertyType.Variations = ContentVariation.Culture;
         }
 
-        ContentTypeService.Save(_contentType);
+        await ContentTypeService.UpdateAsync(_contentType, Constants.Security.SuperUserKey);
 
         IContent document = new Content("content", -1, _contentType);
         document.SetCultureName("hello", "en-US");
@@ -741,7 +740,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
             propertyType.Variations = ContentVariation.Culture;
         }
 
-        ContentTypeService.Save(_contentType);
+        await ContentTypeService.UpdateAsync(_contentType, Constants.Security.SuperUserKey);
 
         IContent document = new Content("content", -1, _contentType);
         document.SetCultureName("hello", "en-US");
@@ -789,7 +788,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
             propertyType.Variations = ContentVariation.Culture;
         }
 
-        ContentTypeService.Save(_contentType);
+        await ContentTypeService.UpdateAsync(_contentType, Constants.Security.SuperUserKey);
 
         IContent documentOne = new Content("one", -1, _contentType);
         documentOne.SetCultureName("one-en", "en-US");
@@ -836,7 +835,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
             propertyType.Variations = ContentVariation.Culture;
         }
 
-        ContentTypeService.Save(_contentType);
+        await ContentTypeService.UpdateAsync(_contentType, Constants.Security.SuperUserKey);
 
         IContent document = new Content("content", -1, _contentType);
         document.SetCultureName("hello", "en-US");
@@ -881,7 +880,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         // _contentType stays invariant; add a second, culture-variant content type so the bulk save is heterogeneous
         IContentType variantContentType = ContentTypeBuilder.CreateBasicContentType("variantPage", "Variant Page");
         variantContentType.Variations = ContentVariation.Culture;
-        ContentTypeService.Save(variantContentType);
+        await ContentTypeService.CreateAsync(variantContentType, Constants.Security.SuperUserKey);
 
         IContent invariantDocument = new Content("invariant", -1, _contentType);
 
@@ -957,6 +956,181 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         finally
         {
             ContentNotificationHandler.PublishedContent = null;
+        }
+    }
+
+    [Test]
+    [LongRunning]
+    public async Task Can_Read_Per_Document_Published_Cultures_For_Branch_Publish_With_Mixed_Variance()
+    {
+        // invariant root
+        IContent root = new Content("root", -1, _contentType);
+        ContentService.Save(root);
+        ContentService.Publish(root, ["*"]);
+
+        // variant descendant of the invariant root - a branch can legitimately mix content type variance
+        IContentType variantContentType = ContentTypeBuilder.CreateBasicContentType("variantPage", "Variant Page");
+        variantContentType.Variations = ContentVariation.Culture;
+        await ContentTypeService.CreateAsync(variantContentType, Constants.Security.SuperUserKey);
+
+        IContent child = new Content("child", root.Id, variantContentType);
+        child.SetCultureName("child-en", "en-US");
+        ContentService.Save(child);
+        ContentService.Publish(child, ["en-US"]);
+
+        // re-get - dirty properties need resetting
+        root = ContentService.GetById(root.Id);
+
+        var publishedWasCalled = false;
+
+        ContentNotificationHandler.PublishedContent = notification =>
+        {
+            Assert.IsNotNull(notification.PublishedCultures);
+
+            // variance is per document: the invariant root reports "*", the variant descendant reports its culture
+            Assert.IsTrue(notification.PublishedCultures.ContainsKey(root.Key));
+            Assert.IsTrue(notification.PublishedCultures.ContainsKey(child.Key));
+            CollectionAssert.AreEquivalent(new[] { "*" }, notification.PublishedCultures[root.Key]);
+            CollectionAssert.AreEquivalent(new[] { "en-US" }, notification.PublishedCultures[child.Key]);
+
+            publishedWasCalled = true;
+        };
+
+        try
+        {
+            ContentService.PublishBranch(root, PublishBranchFilter.ForceRepublish, ["*"]);
+            Assert.IsTrue(publishedWasCalled);
+        }
+        finally
+        {
+            ContentNotificationHandler.PublishedContent = null;
+        }
+    }
+
+    [Test]
+    public void Can_Read_Unpublished_Cultures_When_Deleting_Invariant()
+    {
+        IContent document = new Content("content", -1, _contentType);
+        ContentService.Save(document);
+        ContentService.Publish(document, ["*"]);
+
+        // re-get - dirty properties need resetting
+        document = ContentService.GetById(document.Id);
+
+        var unpublishedWasCalled = false;
+
+        ContentNotificationHandler.UnpublishedContent = notification =>
+        {
+            IContent unpublished = notification.UnpublishedEntities.First();
+
+            Assert.IsNotNull(notification.UnpublishedCultures);
+            Assert.IsTrue(notification.UnpublishedCultures.ContainsKey(unpublished.Key));
+            CollectionAssert.AreEquivalent(new[] { "*" }, notification.UnpublishedCultures[unpublished.Key]);
+
+            unpublishedWasCalled = true;
+        };
+
+        try
+        {
+            ContentService.Delete(document);
+            Assert.IsTrue(unpublishedWasCalled);
+        }
+        finally
+        {
+            ContentNotificationHandler.UnpublishedContent = null;
+        }
+    }
+
+    [Test]
+    [LongRunning]
+    public async Task Can_Read_Unpublished_Cultures_When_Deleting_Variant()
+    {
+        await LanguageService.CreateAsync(new Language("fr-FR", "French (France)"), Constants.Security.SuperUserKey);
+
+        _contentType.Variations = ContentVariation.Culture;
+        foreach (IPropertyType propertyType in _contentType.PropertyTypes)
+        {
+            propertyType.Variations = ContentVariation.Culture;
+        }
+
+        await ContentTypeService.UpdateAsync(_contentType, Constants.Security.SuperUserKey);
+
+        IContent document = new Content("content", -1, _contentType);
+        document.SetCultureName("hello", "en-US");
+        document.SetCultureName("bonjour", "fr-FR");
+        ContentService.Save(document);
+        ContentService.Publish(document, document.AvailableCultures.ToArray());
+
+        // re-get - dirty properties need resetting
+        document = ContentService.GetById(document.Id);
+
+        var unpublishedWasCalled = false;
+
+        ContentNotificationHandler.UnpublishedContent = notification =>
+        {
+            IContent unpublished = notification.UnpublishedEntities.First();
+
+            Assert.IsNotNull(notification.UnpublishedCultures);
+            Assert.IsTrue(notification.UnpublishedCultures.ContainsKey(unpublished.Key));
+
+            // deleting a published document reports every culture that was published
+            CollectionAssert.AreEquivalent(new[] { "en-US", "fr-FR" }, notification.UnpublishedCultures[unpublished.Key]);
+
+            unpublishedWasCalled = true;
+        };
+
+        try
+        {
+            ContentService.Delete(document);
+            Assert.IsTrue(unpublishedWasCalled);
+        }
+        finally
+        {
+            ContentNotificationHandler.UnpublishedContent = null;
+        }
+    }
+
+    [Test]
+    [LongRunning]
+    public async Task Can_Read_Unpublished_Cultures_When_Deleting_Of_Types()
+    {
+        await LanguageService.CreateAsync(new Language("fr-FR", "French (France)"), Constants.Security.SuperUserKey);
+
+        _contentType.Variations = ContentVariation.Culture;
+        foreach (IPropertyType propertyType in _contentType.PropertyTypes)
+        {
+            propertyType.Variations = ContentVariation.Culture;
+        }
+
+        await ContentTypeService.UpdateAsync(_contentType, Constants.Security.SuperUserKey);
+
+        IContent document = new Content("content", -1, _contentType);
+        document.SetCultureName("hello", "en-US");
+        document.SetCultureName("bonjour", "fr-FR");
+        ContentService.Save(document);
+        ContentService.Publish(document, document.AvailableCultures.ToArray());
+
+        var unpublishedWasCalled = false;
+
+        ContentNotificationHandler.UnpublishedContent = notification =>
+        {
+            IContent unpublished = notification.UnpublishedEntities.First();
+
+            Assert.IsNotNull(notification.UnpublishedCultures);
+            Assert.IsTrue(notification.UnpublishedCultures.ContainsKey(unpublished.Key));
+            CollectionAssert.AreEquivalent(new[] { "en-US", "fr-FR" }, notification.UnpublishedCultures[unpublished.Key]);
+
+            unpublishedWasCalled = true;
+        };
+
+        try
+        {
+            ContentService.DeleteOfTypes(new[] { _contentType.Id });
+            Assert.IsTrue(unpublishedWasCalled);
+        }
+        finally
+        {
+            ContentNotificationHandler.UnpublishedContent = null;
         }
     }
 

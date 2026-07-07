@@ -2438,8 +2438,12 @@ public class ContentService : RepositoryService, IContentService
 
             void TrackPublishedCultures(IContent publishedDocument, HashSet<string>? documentCulturesToPublish)
             {
-                IReadOnlyCollection<string>? cultures = variesByCulture ? documentCulturesToPublish : ["*"];
-                if (cultures is { Count: > 0 })
+                // a branch can mix variant and invariant content types, so determine variance per document rather
+                // than from the branch root; snapshot the cultures so the notification never holds a mutable set
+                IReadOnlyCollection<string> cultures = publishedDocument.ContentType.VariesByCulture()
+                    ? documentCulturesToPublish?.ToArray() ?? []
+                    : ["*"];
+                if (cultures.Count > 0)
                 {
                     publishedCulturesByDocument[publishedDocument.Key] = cultures;
                 }
