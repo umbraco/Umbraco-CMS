@@ -185,27 +185,7 @@ public class ImageCropperValue : TemporaryFileUploadValueBase, IHtmlEncodedStrin
     public ImageCropperValue Merge(ImageCropperValue imageCropperValue)
     {
         List<ImageCropperCrop> crops = Crops?.ToList() ?? new List<ImageCropperCrop>();
-
-        IEnumerable<ImageCropperCrop>? incomingCrops = imageCropperValue.Crops;
-        if (incomingCrops != null)
-        {
-            foreach (ImageCropperCrop incomingCrop in incomingCrops)
-            {
-                ImageCropperCrop? crop = crops.FirstOrDefault(x => x.Alias == incomingCrop.Alias);
-                if (crop is null)
-                {
-                    // Add incoming crop
-                    crops.Add(incomingCrop);
-                }
-                else
-                {
-                    // Keep this instance's values, but backfill anything it is missing from the incoming crop
-                    crop.Coordinates ??= incomingCrop.Coordinates;
-                    crop.AltText ??= incomingCrop.AltText;
-                    crop.AltTextByCulture ??= incomingCrop.AltTextByCulture;
-                }
-            }
-        }
+        MergeCrops(crops, imageCropperValue.Crops);
 
         return new ImageCropperValue
         {
@@ -214,6 +194,30 @@ public class ImageCropperValue : TemporaryFileUploadValueBase, IHtmlEncodedStrin
             FocalPoint = FocalPoint ?? imageCropperValue.FocalPoint,
             AltText = AltText ?? imageCropperValue.AltText,
         };
+    }
+
+    // Existing crops keep their values, but anything they are missing is backfilled from the incoming crops.
+    private static void MergeCrops(List<ImageCropperCrop> crops, IEnumerable<ImageCropperCrop>? incomingCrops)
+    {
+        if (incomingCrops is null)
+        {
+            return;
+        }
+
+        foreach (ImageCropperCrop incomingCrop in incomingCrops)
+        {
+            ImageCropperCrop? crop = crops.FirstOrDefault(x => x.Alias == incomingCrop.Alias);
+            if (crop is null)
+            {
+                crops.Add(incomingCrop);
+            }
+            else
+            {
+                crop.Coordinates ??= incomingCrop.Coordinates;
+                crop.AltText ??= incomingCrop.AltText;
+                crop.AltTextByCulture ??= incomingCrop.AltTextByCulture;
+            }
+        }
     }
 
     /// <summary>
