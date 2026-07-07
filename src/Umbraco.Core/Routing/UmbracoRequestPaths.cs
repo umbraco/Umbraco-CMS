@@ -161,13 +161,18 @@ public class UmbracoRequestPaths
     /// </summary>
     public bool IsClientSideRequest(string absPath)
     {
+        var ext = Path.GetExtension(absPath);
+        if (ext.IsNullOrWhiteSpace())
+        {
+            return false;
+        }
+
         if (_deliveryApiSettings.Value.Enabled && TrimAppPath(absPath).InvariantStartsWith(_deliveryApiPath))
         {
             return false;
         }
 
-        var ext = Path.GetExtension(absPath);
-        return !ext.IsNullOrWhiteSpace();
+        return true;
     }
 
     private string TrimAppPath(string absPath)
