@@ -60,10 +60,10 @@ A term names the **situation**, not the wording — two situations with identica
 
 Build it from two parts:
 
-1. **Presentation role**: `Title`, `Description`, `Action`, `Label`, `Notice`, `Message`, `ValidationMessage`, `Headline`, etc.
-2. **Subject**: `CreateBlock`, `ConfirmDelete`, `AddGroup`.
+1. **Subject**: `CreateBlock`, `ConfirmDelete`, `AddGroup`.
+2. **Presentation role**: `Title`, `Description`, `Action`, `Label`, `Notice`, `Message`, `ValidationMessage`, `Headline`, etc.
 
-Combined: `createAction`, `confirmDeleteTitle`, `addGroupDescription`.
+Combined (subject + role suffix): `createAction`, `confirmDeleteTitle`, `addGroupDescription`.
 
 Example — three terms for one dialog in the `blockEditor` group, same subject (`confirmDeleteBlockGroup`) with different roles:
 
