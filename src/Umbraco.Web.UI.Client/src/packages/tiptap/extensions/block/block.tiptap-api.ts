@@ -50,11 +50,13 @@ export default class UmbTiptapBlockElementApi extends UmbTiptapExtensionApiBase 
 		const editor = this._editor;
 		if (!editor) return;
 
-		const existingLayoutKeys = Array.from(editor.view.dom.querySelectorAll('umb-rte-block, umb-rte-block-inline')).map(
-			(x) => x.getAttribute(UMB_BLOCK_RTE_DATA_LAYOUT_KEY),
+		const existingLayoutKeys = new Set(
+			Array.from(editor.view.dom.querySelectorAll('umb-rte-block, umb-rte-block-inline')).map((x) =>
+				x.getAttribute(UMB_BLOCK_RTE_DATA_LAYOUT_KEY),
+			),
 		);
 
-		const newLayouts = layouts.filter((x) => !existingLayoutKeys.includes(x.key));
+		const newLayouts = layouts.filter((x) => !existingLayoutKeys.has(x.key));
 
 		newLayouts.forEach((layout) => {
 			const contentTypeKey = this.#managerContext?.getContentTypeKeyOfContentKey(layout.contentKey);

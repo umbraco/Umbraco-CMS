@@ -351,27 +351,34 @@ export abstract class UmbPropertyEditorUiRteElementBase
 			this.#managerContext.setOneLayout(layout);
 			this.#unusedLayoutLookup.delete(layoutKey);
 
-			// External blocks have no local content to restore — their content remains in
-			// the manager's externalContentValues state and will be re-synced into the editor
-			// DOM automatically when #updateBlocks re-fires after the layout is restored.
-			if (!layout.isExternalContent) {
-				const contentBlock = this.#unusedContentLookup.get(layoutKey);
-				if (contentBlock) {
-					this.#managerContext.setOneContent(contentBlock);
-					this.#managerContext.setOneExpose(layout.contentKey, UmbVariantId.CreateInvariant());
-					this.#unusedContentLookup.delete(layoutKey);
-				}
-			}
-
-			// Settings can exist for both local and external blocks; always restore them.
-			if (layout.settingsKey && this.#unusedSettingsLookup.has(layout.settingsKey)) {
-				const settingsBlock = this.#unusedSettingsLookup.get(layout.settingsKey);
-				if (settingsBlock) {
-					this.#managerContext.setOneSettings(settingsBlock);
-					this.#unusedSettingsLookup.delete(layout.settingsKey);
-				}
-			}
+			this.#restoreUnusedContent(layout, layoutKey);
+			this.#restoreUnusedSettings(layout);
 		}
+	}
+
+	// External blocks have no local content to restore — their content remains in
+	// the manager's externalContentValues state and will be re-synced into the editor
+	// DOM automatically when #updateBlocks re-fires after the layout is restored.
+	#restoreUnusedContent(layout: UmbBlockRteLayoutModel, layoutKey: string) {
+		if (layout.isExternalContent) return;
+
+		const contentBlock = this.#unusedContentLookup.get(layoutKey);
+		if (!contentBlock) return;
+
+		this.#managerContext.setOneContent(contentBlock);
+		this.#managerContext.setOneExpose(layout.contentKey, UmbVariantId.CreateInvariant());
+		this.#unusedContentLookup.delete(layoutKey);
+	}
+
+	// Settings can exist for both local and external blocks; always restore them.
+	#restoreUnusedSettings(layout: UmbBlockRteLayoutModel) {
+		if (!layout.settingsKey || !this.#unusedSettingsLookup.has(layout.settingsKey)) return;
+
+		const settingsBlock = this.#unusedSettingsLookup.get(layout.settingsKey);
+		if (!settingsBlock) return;
+
+		this.#managerContext.setOneSettings(settingsBlock);
+		this.#unusedSettingsLookup.delete(layout.settingsKey);
 	}
 
 	/**
@@ -379,7 +386,7 @@ export abstract class UmbPropertyEditorUiRteElementBase
 	 * @since 19.0.0 — parameter semantics changed from content keys to layout keys.
 	 */
 	protected _filterUnusedBlocks(usedLayoutKeys: (string | null)[]) {
-		const unusedLayouts = this.#managerContext.getLayouts().filter((x) => usedLayoutKeys.indexOf(x.key) === -1);
+		const unusedLayouts = this.#managerContext.getLayouts().filter((x) => !usedLayoutKeys.includes(x.key));
 
 		// Temporarily set the unused layouts to the lookup, as they could be restored later, e.g. via an RTE undo action. [LK]
 		this.#restoreUnusedBlocks(usedLayoutKeys);

@@ -30,7 +30,7 @@ export class UmbPropertyEditorUiTiptapElement extends UmbPropertyEditorUiRteElem
 		let blockElement: RegExpExecArray | null;
 		while ((blockElement = blockRegex.exec(markup)) !== null) {
 			const tag = blockElement[0];
-			const layoutKey = tag.match(/ data-key="([^"]+)"/)?.[1] ?? tag.match(/ data-content-key="([^"]+)"/)?.[1];
+			const layoutKey = / data-key="([^"]+)"/.exec(tag)?.[1] ?? / data-content-key="([^"]+)"/.exec(tag)?.[1];
 			if (layoutKey) {
 				usedLayoutKeys.push(layoutKey);
 			}
