@@ -45,6 +45,47 @@ public sealed class ContentPublishedNotification : EnumerableObjectNotification<
         : base(target, messages) => IncludeDescendants = includeDescendants;
 
     /// <summary>
+    ///     Initializes a new instance of the <see cref="ContentPublishedNotification"/> class with multiple content items,
+    ///     the descendant flag and the cultures that were published and unpublished per item.
+    /// </summary>
+    /// <param name="target">The collection of content items that were published.</param>
+    /// <param name="messages">The event messages collection.</param>
+    /// <param name="includeDescendants">A value indicating whether descendants were included in the publish operation.</param>
+    /// <param name="publishedCultures">The cultures that were published, keyed by content <see cref="Umbraco.Cms.Core.Models.Entities.IEntity.Key"/>.</param>
+    /// <param name="unpublishedCultures">The cultures that were unpublished as part of the publish operation, keyed by content <see cref="Umbraco.Cms.Core.Models.Entities.IEntity.Key"/>.</param>
+    public ContentPublishedNotification(
+        IEnumerable<IContent> target,
+        EventMessages messages,
+        bool includeDescendants,
+        IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? publishedCultures,
+        IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? unpublishedCultures)
+        : base(target, messages)
+    {
+        IncludeDescendants = includeDescendants;
+        PublishedCultures = publishedCultures;
+        UnpublishedCultures = unpublishedCultures;
+    }
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="ContentPublishedNotification"/> class with a single content item
+    ///     and the cultures that were published and unpublished.
+    /// </summary>
+    /// <param name="target">The content item that was published.</param>
+    /// <param name="messages">The event messages collection.</param>
+    /// <param name="publishedCultures">The cultures that were published, keyed by content <see cref="Umbraco.Cms.Core.Models.Entities.IEntity.Key"/>.</param>
+    /// <param name="unpublishedCultures">The cultures that were unpublished as part of the publish operation, keyed by content <see cref="Umbraco.Cms.Core.Models.Entities.IEntity.Key"/>.</param>
+    public ContentPublishedNotification(
+        IContent target,
+        EventMessages messages,
+        IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? publishedCultures,
+        IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? unpublishedCultures)
+        : base(target, messages)
+    {
+        PublishedCultures = publishedCultures;
+        UnpublishedCultures = unpublishedCultures;
+    }
+
+    /// <summary>
     ///     Gets the collection of <see cref="IContent"/> items that were published.
     /// </summary>
     public IEnumerable<IContent> PublishedEntities => Target;
@@ -53,4 +94,37 @@ public sealed class ContentPublishedNotification : EnumerableObjectNotification<
     ///     Gets a value indicating whether descendants were included in the publish operation.
     /// </summary>
     public bool IncludeDescendants { get; }
+
+    /// <summary>
+    ///     Gets the cultures that were published for each content item, keyed by content
+    ///     <see cref="Umbraco.Cms.Core.Models.Entities.IEntity.Key"/>.
+    /// </summary>
+    /// <remarks>
+    ///     This reports every culture explicitly published in the operation (not only those whose data changed) — contrast
+    ///     with <see cref="ContentSavedNotification.SavedCultures"/>, which is a changed-only delta. For a branch publish
+    ///     (<see cref="IncludeDescendants"/> is <c>true</c>) each published document has its own entry. Populated at
+    ///     raise-time (change tracking on the entity is reset once persisted, so it cannot be recovered from
+    ///     <see cref="PublishedEntities"/> afterwards). For invariant content the value is <c>["*"]</c>. A document is
+    ///     absent (and the whole dictionary may be <c>null</c>) when no per-culture delta was tracked — e.g. descendants
+    ///     re-published as a side effect of publishing an ancestor.
+    /// </remarks>
+    public IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? PublishedCultures { get; }
+
+    /// <summary>
+    ///     Gets the cultures that were unpublished as part of this publish operation, keyed by content
+    ///     <see cref="Umbraco.Cms.Core.Models.Entities.IEntity.Key"/>.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Unpublishing an individual culture of a variant document is performed as a publish operation (the document is
+    ///         re-published with that culture cleared), so the affected culture is reported <em>here</em> — not on a
+    ///         <see cref="ContentUnpublishedNotification"/>, which is only raised when the document as a whole is unpublished.
+    ///     </para>
+    ///     <para>
+    ///         Note that unpublishing several cultures at once is processed one culture at a time, so it raises one
+    ///         <see cref="ContentPublishedNotification"/> per culture — each carrying a single entry here — rather than one
+    ///         notification listing them all. Populated at raise-time; <c>null</c> when no cultures were unpublished.
+    ///     </para>
+    /// </remarks>
+    public IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? UnpublishedCultures { get; }
 }
