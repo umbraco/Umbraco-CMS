@@ -79,12 +79,12 @@ public class JsonBlockValueConverter : JsonConverter<BlockValue>
     }
 
     /// <summary>
-    /// Writes the JSON representation of the specified <see cref="Umbraco.Cms.Core.Models.BlockValue" /> to the provided <see cref="System.Text.Json.Utf8JsonWriter" />.
+    /// Writes the JSON representation of the specified <see cref="BlockValue" /> to the provided <see cref="Utf8JsonWriter" />.
     /// The output includes the content data, optional settings data, expose data, and a layout object containing block layout items grouped by property editor alias.
     /// </summary>
-    /// <param name="writer">The <see cref="System.Text.Json.Utf8JsonWriter" /> to write the JSON to.</param>
-    /// <param name="value">The <see cref="Umbraco.Cms.Core.Models.BlockValue" /> instance to serialize.</param>
-    /// <param name="options">The <see cref="System.Text.Json.JsonSerializerOptions" /> to use when serializing the value.</param>
+    /// <param name="writer">The <see cref="Utf8JsonWriter" /> to write the JSON to.</param>
+    /// <param name="value">The <see cref="BlockValue" /> instance to serialize.</param>
+    /// <param name="options">The <see cref="JsonSerializerOptions" /> to use when serializing the value.</param>
     public override void Write(Utf8JsonWriter writer, BlockValue value, JsonSerializerOptions options)
     {
         value.Layout.TryGetValue(value.PropertyEditorAlias, out IEnumerable<IBlockLayoutItem>? blockLayoutItems);

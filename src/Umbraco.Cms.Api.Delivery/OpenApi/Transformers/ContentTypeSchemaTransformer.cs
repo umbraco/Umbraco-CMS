@@ -1,5 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
+using System.Text.Json.Nodes;
+using System.Text.Json.Schema;
 using System.Text.Json.Serialization.Metadata;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.OpenApi;
@@ -340,6 +342,12 @@ public sealed class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IO
         }
 
         var schemaId = GetSchemaId(jsonTypeInfo);
+
+        // Types that produce 'true' in JSON Schema (unconstrained: JsonNode, object, custom-converter types) should be inline {} rather than named components.
+        if (jsonTypeInfo.Kind == JsonTypeInfoKind.None && jsonTypeInfo.GetJsonSchemaAsNode().GetValueKind() == JsonValueKind.True)
+        {
+            return new OpenApiSchema();
+        }
 
         // If this is one of the types we handle, and we already started generating it, return a placeholder
         // to avoid circular reference issues.

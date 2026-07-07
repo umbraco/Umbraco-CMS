@@ -41,7 +41,7 @@ public class MemberIdentityUser : UmbracoIdentityUser
 
     /// <summary>
     /// Gets or sets the date and time when the member account was most recently locked out.
-    /// This value is set when the <see cref="IsLockedOut"/> flag is updated.
+    /// This value is set when the <see cref="UmbracoIdentityUser.IsLockedOut"/> flag is updated.
     /// </summary>
     /// <remarks>No change tracking because the persisted value is only set with the IsLockedOut flag</remarks>
     public DateTime? LastLockoutDate { get; set; }

@@ -66,8 +66,9 @@
   }
 
   public static readonly contentPickerSettings = {
-    0: ['Ignore user start nodes', 'Selecting this option allows a user to choose nodes that they normally dont have access to.'],
-    1: ['Start node', '']
+    0: ['Accepted types', 'Limit to specific types'],
+    1: ['Start node', ''],
+    2: ['Ignore user start nodes', 'Selecting this option allows a user to choose nodes that they normally dont have access to.']
   }
 
   public static readonly datePickerSettings = {
@@ -283,11 +284,23 @@
 
   public static readonly statusCodes = {
     ok: 200,
-    created: 201
+    created: 201,
+    forbidden: 403
   }
 
+  public static readonly httpMethods = {
+    get: 'GET',
+    post: 'POST',
+    put: 'PUT',
+    delete: 'DELETE'
+  }
+
+  // Matched against response URLs via url().includes(), so entries are either full paths
+  // (e.g. '/umbraco/management/api/v1/document') or path fragments (e.g. '/update-and-publish').
   public static readonly apiEndpoints = {
+    profilingStatus: '/umbraco/management/api/v1/profiling/status',
     document: '/umbraco/management/api/v1/document',
+    updateAndPublish: '/update-and-publish',
     documentType: '/umbraco/management/api/v1/document-type',
     documentTypeFolder: '/umbraco/management/api/v1/document-type/folder',
     documentBlueprint: '/umbraco/management/api/v1/document-blueprint',
@@ -352,6 +365,14 @@
     8: ['Rollback', 'Allow access to rollback an element to a previous state', 'Umb.Element.Rollback']
   }
 
+  public static readonly userGroupElementFolderPermissionsSettings = {
+    0: ['Read', 'Allow access to read an element folder', 'Umb.ElementContainer.Read'],
+    1: ['Create', 'Allow access to create an element folder', 'Umb.ElementContainer.Create'],
+    2: ['Delete', 'Allow access to delete an element folder', 'Umb.ElementContainer.Delete'],
+    3: ['Update', 'Allow access to save an element folder', 'Umb.ElementContainer.Update'],
+    4: ['Move', 'Allow access to move an element folder', 'Umb.ElementContainer.Move']
+  }
+
   public static readonly healthCheckMessages = {
     imagingHMACSecretKeyIsNotConfigured: 'No HMAC secret key is configured for image URL signing. It is recommended to set Umbraco:CMS:Imaging:HMACSecretKey to prevent unauthorized image manipulation requests.',
     imagingHMACSecretKeyIsConfigured: 'The HMAC secret key for image URL signing is configured'
@@ -397,4 +418,14 @@
     copy: 'Copy',
     unpublish: 'Unpublish'
   }
- }
+
+  public static readonly documentUrlInfoMessages = {
+    cannotBeRouted: 'This document is published but its URL cannot be routed'
+  }
+
+  public static readonly elementTypeChangeMessages = {
+    elementHasContent: 'Cannot change to document type because content has already been created with this element type.',
+    documentHasContent: 'Cannot change to element type because content has already been created with this document type.',
+    elementUsedInBlockEditor: 'Cannot change to document type because this element type is used in the configuration of a data type.',
+  }
+}

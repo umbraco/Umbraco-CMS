@@ -198,6 +198,152 @@ public partial class ContentEditingServiceTests
         Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
     }
 
+    [Test]
+    public async Task Cannot_Validate_Create_At_Root_When_Not_Allowed_As_Root()
+    {
+        var createModel = await BuildTextPageRootCreateModel(allowedAsRoot: false);
+
+        var result = await ContentEditingService.ValidateCreateAsync(createModel, Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.NotAllowed, result.Status);
+    }
+
+    [Test]
+    [ConfigureBuilder(ActionName = nameof(ConfigureContentTypeFilterToDisallowTextPageAtRoot))]
+    public async Task Cannot_Validate_Create_At_Root_With_Content_Type_Filter()
+    {
+        var createModel = await BuildTextPageRootCreateModel(allowedAsRoot: true);
+
+        var result = await ContentEditingService.ValidateCreateAsync(createModel, Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.NotAllowed, result.Status);
+    }
+
+    [Test]
+    [ConfigureBuilder(ActionName = nameof(ConfigureContentTypeFilterToAllowTextPageAtRoot))]
+    public async Task Can_Validate_Create_At_Root_With_Content_Type_Filter()
+    {
+        var createModel = await BuildTextPageRootCreateModel(allowedAsRoot: true);
+
+        var result = await ContentEditingService.ValidateCreateAsync(createModel, Constants.Security.SuperUserKey);
+
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+    }
+
+    [Test]
+    public async Task Cannot_Validate_Create_As_Child_When_Not_Allowed_By_Parent()
+    {
+        var createModel = await BuildTextPageChildCreateModel(parentAllowsChild: false);
+
+        var result = await ContentEditingService.ValidateCreateAsync(createModel, Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.NotAllowed, result.Status);
+    }
+
+    [Test]
+    public async Task Can_Validate_Create_As_Child_When_Allowed_By_Parent()
+    {
+        var createModel = await BuildTextPageChildCreateModel(parentAllowsChild: true);
+
+        var result = await ContentEditingService.ValidateCreateAsync(createModel, Constants.Security.SuperUserKey);
+
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+    }
+
+    [Test]
+    [ConfigureBuilder(ActionName = nameof(ConfigureContentTypeFilterToDisallowTextPageAsChild))]
+    public async Task Cannot_Validate_Create_As_Child_With_Content_Type_Filter()
+    {
+        // The parent allows the child type, so the only reason creation is disallowed is the content type filter.
+        var createModel = await BuildTextPageChildCreateModel(parentAllowsChild: true);
+
+        var result = await ContentEditingService.ValidateCreateAsync(createModel, Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.NotAllowed, result.Status);
+    }
+
+    private async Task<ContentCreateModel> BuildTextPageChildCreateModel(bool parentAllowsChild)
+    {
+        var template = TemplateBuilder.CreateTextPageTemplate();
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+
+        var childContentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id);
+        childContentType.AllowedAsRoot = false;
+        await ContentTypeService.CreateAsync(childContentType, Constants.Security.SuperUserKey);
+
+        var rootContentType = ContentTypeBuilder.CreateBasicContentType();
+        rootContentType.AllowedAsRoot = true;
+        if (parentAllowsChild)
+        {
+            rootContentType.AllowedContentTypes = new[]
+            {
+                new ContentTypeSort(childContentType.Key, 1, childContentType.Alias)
+            };
+        }
+
+        await ContentTypeService.CreateAsync(rootContentType, Constants.Security.SuperUserKey);
+
+        var rootKey = (await ContentEditingService.CreateAsync(
+            new ContentCreateModel
+            {
+                ContentTypeKey = rootContentType.Key,
+                ParentKey = Constants.System.RootKey,
+                Variants =
+                [
+                    new VariantModel { Name = "Root" }
+                ],
+            },
+            Constants.Security.SuperUserKey)).Result.Content!.Key;
+
+        return new ContentCreateModel
+        {
+            ContentTypeKey = childContentType.Key,
+            TemplateKey = template.Key,
+            ParentKey = rootKey,
+            Variants =
+            [
+                new VariantModel { Name = "Test Create Child" }
+            ],
+            Properties =
+            [
+                new PropertyValueModel { Alias = "title", Value = "The child title value" },
+                new PropertyValueModel { Alias = "bodyText", Value = "The child body text" }
+            ]
+        };
+    }
+
+    private async Task<ContentCreateModel> BuildTextPageRootCreateModel(bool allowedAsRoot)
+    {
+        var template = TemplateBuilder.CreateTextPageTemplate();
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+
+        var contentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id);
+        contentType.AllowedAsRoot = allowedAsRoot;
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+
+        return new ContentCreateModel
+        {
+            ContentTypeKey = contentType.Key,
+            TemplateKey = template.Key,
+            ParentKey = Constants.System.RootKey,
+            Variants =
+            [
+                new VariantModel { Name = "Test Create" }
+            ],
+            Properties =
+            [
+                new PropertyValueModel { Alias = "title", Value = "The title value" },
+                new PropertyValueModel { Alias = "bodyText", Value = "The body text" }
+            ]
+        };
+    }
+
     private async Task<IUser> CreateEnglishLanguageOnlyEditor()
     {
         var enUSLanguage = await LanguageService.GetAsync("en-US");

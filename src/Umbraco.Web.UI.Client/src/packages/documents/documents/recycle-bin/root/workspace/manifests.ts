@@ -1,3 +1,7 @@
+import {
+	UMB_DOCUMENT_USER_PERMISSION_CONDITION_ALIAS,
+	UMB_USER_PERMISSION_DOCUMENT_READ,
+} from '../../../user-permissions/constants.js';
 import { UMB_DOCUMENT_RECYCLE_BIN_TREE_ITEM_CHILDREN_COLLECTION_ALIAS } from '../../tree/constants.js';
 import { UMB_DOCUMENT_RECYCLE_BIN_ROOT_ENTITY_TYPE } from '../entity.js';
 import { UMB_DOCUMENT_RECYCLE_BIN_ROOT_WORKSPACE_ALIAS } from './constants.js';
@@ -29,6 +33,10 @@ export const manifests: Array<UmbExtensionManifest> = [
 			{
 				alias: UMB_WORKSPACE_CONDITION_ALIAS,
 				match: UMB_DOCUMENT_RECYCLE_BIN_ROOT_WORKSPACE_ALIAS,
+			},
+			{
+				alias: UMB_DOCUMENT_USER_PERMISSION_CONDITION_ALIAS,
+				allOf: [UMB_USER_PERMISSION_DOCUMENT_READ],
 			},
 		],
 	},

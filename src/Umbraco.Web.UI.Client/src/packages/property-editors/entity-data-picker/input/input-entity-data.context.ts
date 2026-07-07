@@ -77,6 +77,10 @@ export class UmbEntityDataPickerInputContext extends UmbPickerInputContext<
 	 * @memberof UmbEntityDataPickerInputContext
 	 */
 	setDataSourceApi(api: UmbPickerDataSource | undefined) {
+		// Skip if unchanged: re-setting the same API rebuilds the modal token/route, which would
+		// close and reopen an already-open picker modal on every re-render. [MR]
+		if (api === this.#dataSourceApi) return;
+
 		if (api) {
 			this.#dataSourceApi = api;
 			api.setConfig?.(this.#dataSourceConfig);
