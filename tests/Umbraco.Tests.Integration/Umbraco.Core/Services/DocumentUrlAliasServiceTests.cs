@@ -855,7 +855,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
                 new PublishedDocumentUrlAlias
                 {
                     DocumentKey = documentKey,
-                    NullableLanguageId = null,
+                    LanguageId = null,
                     Alias = "orphaned-alias",
                 },
             });
