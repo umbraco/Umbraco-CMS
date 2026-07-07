@@ -5,7 +5,7 @@ import { UmbElementPublishingRepository } from '../repository/index.js';
 import { UmbElementPublishedPendingChangesManager } from '../pending-changes/index.js';
 import type { UmbElementVariantPublishModel } from '../types.js';
 import { UMB_ELEMENT_PUBLISH_MODAL } from '../publish/constants.js';
-import { UMB_ELEMENT_UNPUBLISH_META } from '../unpublish/entity-action/meta.js';
+import { UmbElementUnpublishManifestEntityActionMeta } from '../unpublish/entity-action/constants.js';
 import { UMB_ELEMENT_SCHEDULE_MODAL } from '../schedule-publish/constants.js';
 import { UMB_ELEMENT_ENTITY_TYPE } from '../../entity.js';
 import { UMB_ELEMENT_WORKSPACE_ALIAS } from '../../workspace/constants.js';
@@ -123,7 +123,11 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 		const entityType = this.#elementWorkspaceContext.getEntityType();
 		if (!entityType) throw new Error('Entity type is missing');
 
-		const action = new UmbContentUnpublishEntityAction(this, { unique, entityType, meta: UMB_ELEMENT_UNPUBLISH_META });
+		const action = new UmbContentUnpublishEntityAction(this, {
+			unique,
+			entityType,
+			meta: UmbElementUnpublishManifestEntityActionMeta,
+		});
 		const didUnpublish = await action.executeWithResult();
 		if (!didUnpublish) return;
 

@@ -3,7 +3,7 @@ import {
 	UMB_ELEMENT_USER_PERMISSION_CONDITION_ALIAS,
 	UMB_USER_PERMISSION_ELEMENT_UNPUBLISH,
 } from '../../../user-permissions/constants.js';
-import { UMB_ELEMENT_UNPUBLISH_META } from './meta.js';
+import { UmbElementUnpublishManifestEntityActionMeta } from './constants.js';
 import { UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS } from '@umbraco-cms/backoffice/recycle-bin';
 
 export const manifests: Array<UmbExtensionManifest> = [
@@ -14,7 +14,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Unpublish Element Entity Action',
 		weight: 500,
 		forEntityTypes: [UMB_ELEMENT_ENTITY_TYPE],
-		meta: UMB_ELEMENT_UNPUBLISH_META,
+		meta: UmbElementUnpublishManifestEntityActionMeta,
 		conditions: [
 			{
 				alias: UMB_ELEMENT_USER_PERMISSION_CONDITION_ALIAS,

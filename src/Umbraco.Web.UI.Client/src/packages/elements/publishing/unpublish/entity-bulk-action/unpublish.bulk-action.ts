@@ -1,4 +1,4 @@
-import { UMB_ELEMENT_UNPUBLISH_META } from '../entity-action/meta.js';
+import { UmbElementUnpublishManifestEntityActionMeta } from '../entity-action/constants.js';
 import type { UmbElementVariantOptionModel } from '../../../types.js';
 import { UMB_ELEMENT_ENTITY_TYPE } from '../../../entity.js';
 import { UmbElementPublishingRepository } from '../../repository/index.js';
@@ -33,7 +33,7 @@ export class UmbElementUnpublishEntityBulkAction extends UmbEntityBulkActionBase
 			const action = new UmbContentUnpublishEntityAction(this._host, {
 				unique: this.selection[0],
 				entityType: UMB_ELEMENT_ENTITY_TYPE,
-				meta: UMB_ELEMENT_UNPUBLISH_META,
+				meta: UmbElementUnpublishManifestEntityActionMeta,
 			});
 			await action.execute();
 			return;
