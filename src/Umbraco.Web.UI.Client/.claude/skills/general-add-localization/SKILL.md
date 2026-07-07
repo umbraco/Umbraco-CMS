@@ -95,7 +95,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 @customElement('umb-my-element')
 export class UmbMyElement extends UmbLitElement {
 	override render() {
-		return html` <uui-button label=${this.localize.term('myFeature_myLabel')}></uui-button> `;
+		return html`<uui-button label=${this.localize.term('myFeature_myLabel')}></uui-button>`;
 	}
 }
 ```
