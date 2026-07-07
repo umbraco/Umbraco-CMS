@@ -1,13 +1,12 @@
 import type { UmbBlockRteLayoutModel } from '../../types.js';
-import { UMB_BLOCK_RTE } from '../../constants.js';
 import { UmbBlockRteEntryContext } from '../../context/block-rte-entry.context.js';
-import { css, customElement, html, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { UMB_BLOCK_RTE } from '../../constants.js';
+import { css, customElement, html, nothing, property, when, state } from '@umbraco-cms/backoffice/external/lit';
 import { stringOrStringArrayContains, UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { UmbElementVariantState } from '@umbraco-cms/backoffice/element';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbDataPathBlockElementDataQuery } from '@umbraco-cms/backoffice/block';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbObserveValidationStateController } from '@umbraco-cms/backoffice/validation';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type {
 	ManifestBlockEditorCustomView,
 	UmbBlockEditorCustomViewProperties,
@@ -16,6 +15,7 @@ import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/propert
 import type { UmbExtensionElementInitializer } from '@umbraco-cms/backoffice/extension-api';
 
 import '../ref-rte-block/index.js';
+import '../unsupported-rte-block/index.js';
 import '../../../block/action/block-action-list.element.js';
 
 /**
@@ -94,6 +94,10 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 	@state()
 	private _contentTypeAlias?: string;
 
+	/** Reflects whether the block's content type is no longer registered. Set internally by context — do not set externally. */
+	@property({ type: Boolean, attribute: 'unsupported', reflect: true })
+	unsupported?: boolean;
+
 	@state()
 	private _contentTypeName?: string;
 
@@ -141,85 +145,7 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 		// We do not have index for RTE Blocks at the moment.
 		this.#context.setIndex(0);
 
-		this.observe(
-			this.#context.showContentEdit,
-			(showContentEdit) => {
-				this._showContentEdit = showContentEdit;
-				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config!, showContentEdit } });
-			},
-			null,
-		);
-		this.observe(
-			this.#context.settingsElementTypeKey,
-			(key) => {
-				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config!, showSettingsEdit: !!key } });
-			},
-			null,
-		);
-		this.observe(
-			this.#context.contentElementTypeAlias,
-			(alias) => {
-				this._contentTypeAlias = alias;
-			},
-			null,
-		);
-		this.observe(
-			this.#context.contentElementTypeName,
-			(contentElementTypeName) => {
-				this._contentTypeName = contentElementTypeName;
-			},
-			null,
-		);
-		this.observe(
-			this.#context.blockType,
-			(blockType) => {
-				this.#updateBlockViewProps({ blockType });
-			},
-			null,
-		);
-		this.observe(this.#context.index, (index) => this.#updateBlockViewProps({ index }), null);
-		this.observe(
-			this.#context.label,
-			(label) => {
-				this.#updateBlockViewProps({ label });
-				this._label = label;
-			},
-			null,
-		);
-		this.observe(
-			this.#context.contentElementTypeIcon,
-			(icon) => {
-				this.#updateBlockViewProps({ icon });
-				this._icon = icon;
-			},
-			null,
-		);
-		this.observe(
-			this.#context.hasExpose,
-			(exposed) => {
-				this._localExpose = exposed;
-				this.#updateExposedState();
-			},
-			null,
-		);
-
-		this.observe(
-			this.#context.isExternalContent,
-			(isExternalContent) => {
-				this._isExternalContent = isExternalContent ?? false;
-				this.#updateExposedState();
-			},
-			null,
-		);
-
-		this.observe(
-			this.#context.externalContentVariantState,
-			(state) => {
-				this._externalContentVariantState = state;
-				this.#updateExposedState();
-			},
-			null,
-		);
+		this.#observeBlockViewProps();
 
 		this.observe(this.#context.actionsVisibility, (showActions) => (this._showActions = showActions), null);
 
@@ -278,6 +204,83 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 		);
 	}
 
+	#observeBlockViewProps() {
+		this.observe(
+			this.#context.showContentEdit,
+			(showContentEdit) => {
+				this._showContentEdit = showContentEdit;
+				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config!, showContentEdit } });
+			},
+			null,
+		);
+		this.observe(
+			this.#context.settingsElementTypeKey,
+			(key) => {
+				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config!, showSettingsEdit: !!key } });
+			},
+			null,
+		);
+		this.observe(this.#context.contentElementTypeAlias, (alias) => (this._contentTypeAlias = alias), null);
+		this.observe(this.#context.contentElementTypeName, (name) => (this._contentTypeName = name), null);
+		this.observe(
+			this.#context.blockType,
+			(blockType) => {
+				this.#updateBlockViewProps({ blockType });
+			},
+			null,
+		);
+		this.observe(this.#context.index, (index) => this.#updateBlockViewProps({ index }), null);
+		this.observe(
+			this.#context.label,
+			(label) => {
+				this.#updateBlockViewProps({ label });
+				this._label = label;
+			},
+			null,
+		);
+		this.observe(
+			this.#context.contentElementTypeIcon,
+			(icon) => {
+				this.#updateBlockViewProps({ icon });
+				this._icon = icon;
+			},
+			null,
+		);
+		this.observe(
+			this.#context.hasExpose,
+			(exposed) => {
+				this._localExpose = exposed;
+				this.#updateExposedState();
+			},
+			null,
+		);
+		this.observe(
+			this.#context.isExternalContent,
+			(isExternalContent) => {
+				this._isExternalContent = isExternalContent ?? false;
+				this.#updateExposedState();
+			},
+			null,
+		);
+		this.observe(
+			this.#context.externalContentVariantState,
+			(state) => {
+				this._externalContentVariantState = state;
+				this.#updateExposedState();
+			},
+			null,
+		);
+		this.observe(
+			this.#context.unsupported,
+			(unsupported) => {
+				if (unsupported === undefined) return;
+				this.#updateBlockViewProps({ unsupported });
+				this.unsupported = unsupported;
+			},
+			null,
+		);
+	}
+
 	async #observeData() {
 		this.observe(
 			await this.#context.contentValues(),
@@ -301,6 +304,10 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 	}
 
 	readonly #filterBlockCustomViews = (manifest: ManifestBlockEditorCustomView) => {
+		if (this.unsupported) {
+			return false;
+		}
+
 		const elementTypeAlias = this._contentTypeAlias ?? '';
 		const isForBlockEditor =
 			!manifest.forBlockEditor || stringOrStringArrayContains(manifest.forBlockEditor, UMB_BLOCK_RTE);
@@ -330,25 +337,27 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 	};
 
 	#renderBlock() {
-		return this.contentKey && this._contentTypeAlias
-			? html`
-					<div class="umb-block-rte__block uui-text uui-font">
-						<umb-entity-frame .label=${this._label}></umb-entity-frame>
-						<umb-extension-slot
-							type="blockEditorCustomView"
-							default-element="umb-ref-rte-block"
-							.renderMethod=${this.#extensionSlotRenderMethod}
-							.fallbackRenderMethod=${this.#renderBuiltinBlockView}
-							.props=${this._blockViewProps}
-							.filter=${this.#filterBlockCustomViews}
-							single></umb-extension-slot>
-						${this.#renderActionBar()}
-						${!this._showContentEdit && this._contentInvalid
-							? html`<uui-badge attention color="invalid" label="Invalid content">!</uui-badge>`
-							: nothing}
-					</div>
-				`
-			: nothing;
+		return when(
+			this.contentKey && (this._contentTypeAlias || this.unsupported),
+			() => html`
+				<div class="umb-block-rte__block uui-text uui-font">
+					<umb-entity-frame .label=${this._label}></umb-entity-frame>
+					<umb-extension-slot
+						type="blockEditorCustomView"
+						default-element="umb-ref-rte-block"
+						.renderMethod=${this.#extensionSlotRenderMethod}
+						.fallbackRenderMethod=${this.#renderBuiltinBlockView}
+						.props=${this._blockViewProps}
+						.filter=${this.#filterBlockCustomViews}
+						single></umb-extension-slot>
+					${this.#renderActionBar()}
+					${when(
+						!this._showContentEdit && this._contentInvalid,
+						() => html`<uui-badge attention color="invalid" label="Invalid content">!</uui-badge>`,
+					)}
+				</div>
+			`,
+		);
 	}
 
 	#renderActionBar() {
@@ -356,11 +365,14 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 		return html`<umb-block-action-list id="actions" .blockEditor=${UMB_BLOCK_RTE}></umb-block-action-list>`;
 	}
 
+	#renderUnsupportedBlock() {
+		return html`<umb-unsupported-rte-block></umb-unsupported-rte-block>`;
+	}
+
 	#renderBuiltinBlockView = () => {
-		// TODO: Missing unsupported rendering [NL]
-		/*if (this._unsupported) {
+		if (this.unsupported) {
 			return this.#renderUnsupportedBlock();
-		}*/
+		}
 		return this.#renderRefBlock();
 	};
 
@@ -383,7 +395,6 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 	}
 
 	static override readonly styles = [
-		UmbTextStyles,
 		css`
 			:host {
 				position: relative;
@@ -402,10 +413,8 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 			}
 
 			:host(.ProseMirror-selectednode) {
-				umb-ref-rte-block {
-					--uui-color-default-contrast: initial;
-					outline: 3px solid var(--uui-color-focus);
-				}
+				--uui-color-default-contrast: initial;
+				outline: 3px solid var(--uui-color-focus);
 			}
 
 			umb-extension-slot::part(component) {

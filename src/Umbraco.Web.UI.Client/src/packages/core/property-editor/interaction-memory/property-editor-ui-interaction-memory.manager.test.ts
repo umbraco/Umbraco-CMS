@@ -8,14 +8,16 @@ import { UmbInteractionMemoryContext } from '@umbraco-cms/backoffice/interaction
 
 @customElement('test-my-controller-host')
 class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {
+	public interactionMemoryContext: UmbInteractionMemoryContext;
 	constructor() {
 		super();
-		new UmbInteractionMemoryContext(this);
+		this.interactionMemoryContext = new UmbInteractionMemoryContext(this);
 	}
 }
 
 describe('UmbPropertyEditorUiInteractionMemoryManager', () => {
 	let manager: UmbPropertyEditorUiInteractionMemoryManager;
+	let interactionMemoryContext: UmbInteractionMemoryContext;
 	let childMemories = [
 		{ unique: '1', value: 'Value 1' },
 		{ unique: '2', value: 'Value 2' },
@@ -24,6 +26,7 @@ describe('UmbPropertyEditorUiInteractionMemoryManager', () => {
 	beforeEach(() => {
 		const hostElement = new UmbTestControllerHostElement();
 		document.body.appendChild(hostElement);
+		interactionMemoryContext = hostElement.interactionMemoryContext;
 
 		manager = new UmbPropertyEditorUiInteractionMemoryManager(hostElement, {
 			memoryUniquePrefix: 'TestPrefix',
@@ -99,6 +102,64 @@ describe('UmbPropertyEditorUiInteractionMemoryManager', () => {
 
 				manager.saveMemoriesForPropertyEditor(childMemories);
 				manager.saveMemoriesForPropertyEditor(updatedChildMemories);
+			});
+		});
+
+		describe('observes the interactionMemoryContext', () => {
+			it('reflects memory updates made directly on the context', async () => {
+				// Seed via the manager so the context owns an entry whose unique we can discover.
+				await manager.saveMemoriesForPropertyEditor(childMemories);
+
+				const storedMemories = interactionMemoryContext.memory.getAllMemories();
+				expect(storedMemories).to.have.lengthOf(1);
+				const memoryUnique = storedMemories[0].unique;
+
+				const externalMemories = [
+					{ unique: 'external-1', value: 'External Value 1' },
+					{ unique: 'external-2', value: 'External Value 2' },
+					{ unique: 'external-3', value: 'External Value 3' },
+				];
+
+				const updatePropagated = new Promise<void>((resolve) => {
+					manager.memoriesForPropertyEditor.subscribe((memories) => {
+						if (memories.length === externalMemories.length) {
+							expect(memories).to.deep.equal(externalMemories);
+							resolve();
+						}
+					});
+				});
+
+				interactionMemoryContext.memory.setMemory({
+					unique: memoryUnique,
+					memories: externalMemories,
+				});
+
+				await updatePropagated;
+			});
+
+			it('clears its memories when the context deletes the entry', async () => {
+				await manager.saveMemoriesForPropertyEditor(childMemories);
+
+				const storedMemories = interactionMemoryContext.memory.getAllMemories();
+				expect(storedMemories).to.have.lengthOf(1);
+				const memoryUnique = storedMemories[0].unique;
+
+				const deletionPropagated = new Promise<void>((resolve) => {
+					let sawSeededValue = false;
+					manager.memoriesForPropertyEditor.subscribe((memories) => {
+						if (!sawSeededValue && memories.length === childMemories.length) {
+							sawSeededValue = true;
+							return;
+						}
+						if (sawSeededValue && memories.length === 0) {
+							resolve();
+						}
+					});
+				});
+
+				interactionMemoryContext.memory.deleteMemory(memoryUnique);
+
+				await deletionPropagated;
 			});
 		});
 

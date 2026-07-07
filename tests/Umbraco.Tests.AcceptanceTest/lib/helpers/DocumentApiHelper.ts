@@ -161,6 +161,18 @@ export class DocumentApiHelper {
     return response.status();
   }
 
+  async unpublish(id: string, cultures: string[] | null = null) {
+    if (id == null) {
+      return;
+    }
+    const response = await this.api.put(this.api.baseUrl + '/umbraco/management/api/v1/document/' + id + '/unpublish', {cultures});
+    return response.status();
+  }
+
+  async unpublishDocumentWithCulture(id: string, culture: string) {
+    return await this.unpublish(id, [culture]);
+  }
+
   async getDocumentUrl(id: string) {
     const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/document/urls?id=' + id);
     const urls = await response.json();
@@ -459,6 +471,55 @@ export class DocumentApiHelper {
       .build();
 
     return await this.create(document);
+  }
+
+  async createVariantDocumentWithParent(documentTypeId: string, parentId: string | null, cultureVariants: {culture: string, name: string}[]) {
+    const builder = new DocumentBuilder()
+      .withDocumentTypeId(documentTypeId);
+
+    if (parentId !== null) {
+      builder.withParentId(parentId);
+    }
+
+    for (const variant of cultureVariants) {
+      builder.addVariant()
+        .withName(variant.name)
+        .withCulture(variant.culture)
+        .done();
+    }
+
+    return await this.create(builder.build());
+  }
+
+  // Creates and publishes a chain of variant documents (each the parent of the next) and returns their ids in order.
+  // Each level maps culture => name; the cultures to publish are derived from those keys.
+  async createPublishedVariantChain(documentTypeId: string, levels: {[culture: string]: string}[]) {
+    const ids: string[] = [];
+    let parentId: string | null = null;
+    for (const level of levels) {
+      const cultures = Object.keys(level);
+      const variants = cultures.map(culture => ({culture, name: level[culture]}));
+      const id = await this.createVariantDocumentWithParent(documentTypeId, parentId, variants);
+      await this.publishDocumentWithCultures(id, cultures);
+      ids.push(id);
+      parentId = id;
+    }
+    return ids;
+  }
+
+  // Creates and publishes a chain of invariant documents (each the parent of the next) and returns their ids in order.
+  async createPublishedInvariantChain(documentTypeId: string, names: string[]) {
+    const ids: string[] = [];
+    let parentId: string | null = null;
+    for (const name of names) {
+      const id = parentId === null
+        ? await this.createDefaultDocument(name, documentTypeId)
+        : await this.createDefaultDocumentWithParent(name, documentTypeId, parentId);
+      await this.publish(id);
+      ids.push(id);
+      parentId = id;
+    }
+    return ids;
   }
 
   async createDocumentWithMultipleVariants(documentName: string, documentTypeId: string, dataTypeAlias: string, cultureVariants: {isoCode: string, name: string, value: string}[]) {
@@ -1504,6 +1565,14 @@ export class DocumentApiHelper {
           "culture": culture
         }
       ]
+    };
+
+    return await this.publish(id, publishScheduleData);
+  }
+
+  async publishDocumentWithCultures(id: string, cultures: string[]) {
+    const publishScheduleData = {
+      "publishSchedules": cultures.map(culture => ({culture}))
     };
 
     return await this.publish(id, publishScheduleData);

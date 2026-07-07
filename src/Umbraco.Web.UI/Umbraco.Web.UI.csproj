@@ -26,12 +26,7 @@
 
   <ItemGroup>
     <!-- Add design/build time support for EF Core migrations -->
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" PrivateAssets="all" Version="10.0.7" />
-    <!--
-    Added the following direct dependency due to Microsoft.EntityFrameworkCore.Design having a dependency on an insecure version.
-    Review for removal when Microsoft.EntityFrameworkCore.Design is updated to a newer version.
-    -->
-    <PackageReference Include="Microsoft.Build.Tasks.Core" PrivateAssets="all" Version="18.4.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" PrivateAssets="all" Version="10.0.9" />
     <!--
     Added to align Microsoft.CodeAnalysis.* transitive versions brought in by Microsoft.EntityFrameworkCore.Design,
     which otherwise pulls in Microsoft.CodeAnalysis.CSharp 5.3.0 alongside Microsoft.CodeAnalysis.CSharp.Workspaces 5.0.0
@@ -40,6 +35,16 @@
     -->
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" PrivateAssets="all" Version="5.3.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" PrivateAssets="all" Version="5.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!--
+    Umbraco.Web.UI opts out of central package management, so the Microsoft.OpenApi transitive pin in
+    Directory.Packages.props does not reach it. Reference it directly to force the patched version instead
+    of the vulnerable 2.0.0 that Swashbuckle / Microsoft.AspNetCore.OpenApi otherwise resolve
+    (CVE-2026-49451, GHSA-v5pm-xwqc-g5wc).
+    -->
+    <PackageReference Include="Microsoft.OpenApi" Version="2.9.0" />
   </ItemGroup>
 
   <ItemGroup>

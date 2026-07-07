@@ -42,3 +42,8 @@ export interface UmbBlockValueType<
 > extends UmbBlockValueDataPropertiesBaseType {
 	layout: { [key: string]: Array<BlockLayoutType> | undefined };
 }
+
+export type UmbBlockLabelUfmValueType = Record<string, unknown> & {
+	$settings?: Record<string, unknown>;
+	$index?: number;
+};
