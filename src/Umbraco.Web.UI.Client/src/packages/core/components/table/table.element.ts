@@ -616,7 +616,7 @@ export class UmbTableElement extends UmbLitElement {
 				align-items: center;
 				justify-content: space-between;
 				width: 100%;
-				text-align: left;
+				text-align: inherit;
 			}
 
 			uui-table-head-cell button > span {
