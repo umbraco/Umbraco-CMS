@@ -24,6 +24,11 @@
 	--uui-border-radius: var(--uui-size-1);
 	--uui-border-radius-2: var(--uui-size-1);
 	--uui-border-radius-3: var(--uui-size-1);
+
+	--uui-palette-spanish-pink: #f5c1bc;
+	--uui-palette-spanish-pink-light: rgb(248, 214, 211);
+	--uui-palette-spanish-pink-dark: rgb(232, 192, 189);
+	--uui-palette-spanish-pink-dimmed: rgb(219, 212, 212);
 }
 
 @font-face {
