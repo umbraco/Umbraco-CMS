@@ -134,6 +134,114 @@ public class RteBlockHelperTests
             result);
     }
 
+    /// <summary>
+    /// An isolated inline block (<c>&lt;umb-rte-block-inline&gt;</c>) must be converted. The v13 RTE
+    /// emits both block and inline variants, and the closing tag differs (<c>&lt;/umb-rte-block-inline&gt;</c>).
+    /// </summary>
+    [Test]
+    public void ConvertBlockUdisToKeys_SingleInlineBlock_ConvertsUdiToHyphenatedGuidKey()
+    {
+        var input = @"<p>before</p><umb-rte-block-inline data-content-udi=""umb://element/5e499fc237be4b1d974670526f3b00b7""><!--Umbraco-Block--></umb-rte-block-inline><p>after</p>";
+
+        var result = RteBlockHelper.ConvertBlockUdisToKeys(input);
+
+        Assert.AreEqual(
+            @"<p>before</p><umb-rte-block-inline data-content-key=""5e499fc2-37be-4b1d-9746-70526f3b00b7""><!--Umbraco-Block--></umb-rte-block-inline><p>after</p>",
+            result);
+    }
+
+    /// <summary>
+    /// An inline block immediately followed by a block-level block must convert each independently —
+    /// the inline closing tag must not let the match span across into the next block's closing tag.
+    /// </summary>
+    [Test]
+    public void ConvertBlockUdisToKeys_InlineFollowedByBlock_ConvertsEachIndividually()
+    {
+        var input =
+            @"<umb-rte-block-inline data-content-udi=""umb://element/5e499fc237be4b1d974670526f3b00b7""><!--Umbraco-Block--></umb-rte-block-inline>" +
+            @"<umb-rte-block data-content-udi=""umb://element/9db16c0d251e414c874967090f2cf3cc""><!--Umbraco-Block--></umb-rte-block>";
+
+        var result = RteBlockHelper.ConvertBlockUdisToKeys(input);
+
+        Assert.AreEqual(
+            @"<umb-rte-block-inline data-content-key=""5e499fc2-37be-4b1d-9746-70526f3b00b7""><!--Umbraco-Block--></umb-rte-block-inline>" +
+            @"<umb-rte-block data-content-key=""9db16c0d-251e-414c-8749-67090f2cf3cc""><!--Umbraco-Block--></umb-rte-block>",
+            result);
+        StringAssert.DoesNotContain("umb://element/", result);
+    }
+
+    /// <summary>
+    /// A block-level block immediately followed by an inline block must convert each independently.
+    /// </summary>
+    [Test]
+    public void ConvertBlockUdisToKeys_BlockFollowedByInline_ConvertsEachIndividually()
+    {
+        var input =
+            @"<umb-rte-block data-content-udi=""umb://element/5e499fc237be4b1d974670526f3b00b7""><!--Umbraco-Block--></umb-rte-block>" +
+            @"<umb-rte-block-inline data-content-udi=""umb://element/9db16c0d251e414c874967090f2cf3cc""><!--Umbraco-Block--></umb-rte-block-inline>";
+
+        var result = RteBlockHelper.ConvertBlockUdisToKeys(input);
+
+        Assert.AreEqual(
+            @"<umb-rte-block data-content-key=""5e499fc2-37be-4b1d-9746-70526f3b00b7""><!--Umbraco-Block--></umb-rte-block>" +
+            @"<umb-rte-block-inline data-content-key=""9db16c0d-251e-414c-8749-67090f2cf3cc""><!--Umbraco-Block--></umb-rte-block-inline>",
+            result);
+        StringAssert.DoesNotContain("umb://element/", result);
+    }
+
+    /// <summary>
+    /// Two direct-sibling inline blocks must each be converted independently — the inline parallel to
+    /// <see cref="ConvertBlockUdisToKeys_TwoConsecutiveSiblingBlocks_ConvertsEachIndividually"/>.
+    /// </summary>
+    [Test]
+    public void ConvertBlockUdisToKeys_TwoConsecutiveInlineSiblings_ConvertsEachIndividually()
+    {
+        var input =
+            @"<umb-rte-block-inline data-content-udi=""umb://element/5e499fc237be4b1d974670526f3b00b7""><!--Umbraco-Block--></umb-rte-block-inline>" +
+            @"<umb-rte-block-inline data-content-udi=""umb://element/9db16c0d251e414c874967090f2cf3cc""><!--Umbraco-Block--></umb-rte-block-inline>";
+
+        var result = RteBlockHelper.ConvertBlockUdisToKeys(input);
+
+        Assert.AreEqual(
+            @"<umb-rte-block-inline data-content-key=""5e499fc2-37be-4b1d-9746-70526f3b00b7""><!--Umbraco-Block--></umb-rte-block-inline>" +
+            @"<umb-rte-block-inline data-content-key=""9db16c0d-251e-414c-8749-67090f2cf3cc""><!--Umbraco-Block--></umb-rte-block-inline>",
+            result);
+        StringAssert.DoesNotContain("umb://element/", result);
+    }
+
+    /// <summary>
+    /// An inline block carrying an optional <c>class</c> attribute must be converted, preserving the class.
+    /// </summary>
+    [Test]
+    public void ConvertBlockUdisToKeys_InlineBlockWithClassAttribute_ConvertsUdiToKey()
+    {
+        var input = @"<umb-rte-block-inline class=""some-class"" data-content-udi=""umb://element/5e499fc237be4b1d974670526f3b00b7""><!--Umbraco-Block--></umb-rte-block-inline>";
+
+        var result = RteBlockHelper.ConvertBlockUdisToKeys(input);
+
+        Assert.AreEqual(
+            @"<umb-rte-block-inline class=""some-class"" data-content-key=""5e499fc2-37be-4b1d-9746-70526f3b00b7""><!--Umbraco-Block--></umb-rte-block-inline>",
+            result);
+    }
+
+    /// <summary>
+    /// When an inline block's UDI fails to parse, the block is dropped — consistent with block-level behaviour.
+    /// </summary>
+    [Test]
+    public void ConvertBlockUdisToKeys_MalformedUdiInlineBlock_IsDroppedFromOutput()
+    {
+        var input =
+            @"<p>before</p>" +
+            @"<umb-rte-block-inline data-content-udi=""not-a-valid-udi""><!--Umbraco-Block--></umb-rte-block-inline>" +
+            @"<p>after</p>";
+
+        var result = RteBlockHelper.ConvertBlockUdisToKeys(input);
+
+        Assert.AreEqual(
+            @"<p>before</p><p>after</p>",
+            result);
+    }
+
     [Test]
     public void ConvertBlockUdisToKeys_MarkupWithoutBlocks_ReturnsUnchanged()
     {
@@ -169,6 +277,20 @@ public class RteBlockHelperTests
             @"<umb-rte-block data-content-udi=""umb://element/5e499fc237be4b1d974670526f3b00b7""><!--Umbraco-Block--></umb-rte-block>" +
             @"<umb-rte-block data-content-udi=""umb://element/9db16c0d251e414c874967090f2cf3cc""><!--Umbraco-Block--></umb-rte-block>" +
             @"<umb-rte-block data-content-udi=""umb://element/c2c956b94a0945f29a1a366ad488545b""><!--Umbraco-Block--></umb-rte-block>";
+
+        Assert.AreEqual(3, RteBlockHelper.BlockRegex().Matches(input).Count);
+    }
+
+    /// <summary>
+    /// A mix of block-level and inline sibling blocks produces one match per element (no collapsing).
+    /// </summary>
+    [Test]
+    public void BlockRegex_MixedBlockAndInlineSiblings_ProducesOneMatchPerBlock()
+    {
+        var input =
+            @"<umb-rte-block-inline data-content-udi=""umb://element/5e499fc237be4b1d974670526f3b00b7""><!--Umbraco-Block--></umb-rte-block-inline>" +
+            @"<umb-rte-block data-content-udi=""umb://element/9db16c0d251e414c874967090f2cf3cc""><!--Umbraco-Block--></umb-rte-block>" +
+            @"<umb-rte-block-inline data-content-udi=""umb://element/c2c956b94a0945f29a1a366ad488545b""><!--Umbraco-Block--></umb-rte-block-inline>";
 
         Assert.AreEqual(3, RteBlockHelper.BlockRegex().Matches(input).Count);
     }

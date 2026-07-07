@@ -46,7 +46,7 @@ export class MemberTypeUiHelper extends UiBaseLocators {
 
   async goToMemberType(memberTypeName: string) {
     await this.clickRootFolderCaretButton();
-    await this.clickLabelWithName(memberTypeName);
+    await this.clickTreeItemWithName(memberTypeName);
   }
 
   async enterMemberTypeName(name: string) {

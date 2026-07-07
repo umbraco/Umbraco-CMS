@@ -377,9 +377,11 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<DocumentNavigationService, DocumentNavigationService>();
             Services.AddUnique<IDocumentNavigationQueryService>(x => x.GetRequiredService<DocumentNavigationService>());
             Services.AddUnique<IDocumentNavigationManagementService>(x => x.GetRequiredService<DocumentNavigationService>());
+            Services.AddSingleton<IMemoryCacheSizeReporter>(x => x.GetRequiredService<DocumentNavigationService>());
             Services.AddUnique<MediaNavigationService, MediaNavigationService>();
             Services.AddUnique<IMediaNavigationQueryService>(x => x.GetRequiredService<MediaNavigationService>());
             Services.AddUnique<IMediaNavigationManagementService>(x => x.GetRequiredService<MediaNavigationService>());
+            Services.AddSingleton<IMemoryCacheSizeReporter>(x => x.GetRequiredService<MediaNavigationService>());
 
             Services.AddUnique<PublishStatusService, PublishStatusService>();
             Services.AddUnique<IPublishStatusManagementService>(x => x.GetRequiredService<PublishStatusService>());
@@ -453,7 +455,9 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IElementSwitchValidator, ElementSwitchValidator>();
 
             // Routing
-            Services.AddUnique<IDocumentUrlService, DocumentUrlService>();
+            Services.AddUnique<DocumentUrlService, DocumentUrlService>();
+            Services.AddUnique<IDocumentUrlService>(x => x.GetRequiredService<DocumentUrlService>());
+            Services.AddSingleton<IMemoryCacheSizeReporter>(x => x.GetRequiredService<DocumentUrlService>());
             Services.AddNotificationAsyncHandler<UmbracoApplicationStartingNotification, DocumentUrlServiceInitializerNotificationHandler>();
             Services.AddUnique<IDocumentUrlAliasService, DocumentUrlAliasService>();
             Services.AddNotificationAsyncHandler<UmbracoApplicationStartingNotification, DocumentUrlAliasServiceInitializerNotificationHandler>();

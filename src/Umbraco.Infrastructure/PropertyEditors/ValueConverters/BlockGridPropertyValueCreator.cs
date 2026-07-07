@@ -41,7 +41,7 @@ internal sealed class BlockGridPropertyValueCreator : BlockPropertyValueCreatorB
     /// <param name="referenceCacheLevel">The <see cref="PropertyCacheLevel"/> to use when resolving references within the block grid.</param>
     /// <param name="intermediateBlockModelValue">A string containing the intermediate (typically JSON) representation of the block grid's data.</param>
     /// <param name="preview">True if the model should be created in preview mode; otherwise, false.</param>
-    /// <param name="blockConfigurations">An array of <see cref="BlockGridBlockConfiguration"/> objects that define the available block types and their settings.</param>
+    /// <param name="blockConfigurations">An array of <see cref="BlockGridConfiguration.BlockGridBlockConfiguration"/> objects that define the available block types and their settings.</param>
     /// <param name="gridColumns">The number of columns in the grid layout, or null to use the default configuration.</param>
     /// <returns>A <see cref="BlockGridModel"/> representing the structured block grid data for the given property and configuration.</returns>
     public async Task<BlockGridModel> CreateBlockModelAsync(IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, string intermediateBlockModelValue, bool preview, BlockGridConfiguration.BlockGridBlockConfiguration[] blockConfigurations, int? gridColumns)
