@@ -5,7 +5,7 @@ import { UmbElementPublishingRepository } from '../repository/index.js';
 import { UmbElementPublishedPendingChangesManager } from '../pending-changes/index.js';
 import type { UmbElementVariantPublishModel } from '../types.js';
 import { UMB_ELEMENT_PUBLISH_MODAL } from '../publish/constants.js';
-import { UmbUnpublishElementEntityAction } from '../unpublish/index.js';
+import { UMB_ELEMENT_UNPUBLISH_META } from '../unpublish/entity-action/meta.js';
 import { UMB_ELEMENT_SCHEDULE_MODAL } from '../schedule-publish/constants.js';
 import { UMB_ELEMENT_ENTITY_TYPE } from '../../entity.js';
 import { UMB_ELEMENT_WORKSPACE_ALIAS } from '../../workspace/constants.js';
@@ -14,6 +14,7 @@ import { UMB_ELEMENT_PUBLISHING_SHORTCUT_UNIQUE } from './constants.js';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
+import { UmbContentUnpublishEntityAction } from '@umbraco-cms/backoffice/content';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
@@ -122,11 +123,11 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 		const entityType = this.#elementWorkspaceContext.getEntityType();
 		if (!entityType) throw new Error('Entity type is missing');
 
-		// TODO: remove meta
-		await new UmbUnpublishElementEntityAction(this, { unique, entityType, meta: {} as never }).execute();
+		const action = new UmbContentUnpublishEntityAction(this, { unique, entityType, meta: UMB_ELEMENT_UNPUBLISH_META });
+		const didUnpublish = await action.executeWithResult();
+		if (!didUnpublish) return;
 
 		// Reload workspace data to reflect the unpublished state
-		// TODO: reload only when unpublish actually occurred [LK]
 		await this.#elementWorkspaceContext.reload();
 		await this.#loadAndProcessLastPublished();
 	}

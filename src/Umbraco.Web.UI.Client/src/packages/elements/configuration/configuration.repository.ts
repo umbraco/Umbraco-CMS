@@ -1,5 +1,6 @@
 import { UmbElementConfigurationServerDataSource } from './configuration.server.data-source.js';
 import type { UmbElementConfigurationModel } from './types.js';
+import type { UmbContentConfigurationRepository } from '@umbraco-cms/backoffice/content';
 import { UmbRepositoryBase, type UmbRepositoryResponse } from '@umbraco-cms/backoffice/repository';
 
 /**
@@ -8,7 +9,7 @@ import { UmbRepositoryBase, type UmbRepositoryResponse } from '@umbraco-cms/back
  * @class UmbElementConfigurationRepository
  * @augments UmbRepositoryBase
  */
-export class UmbElementConfigurationRepository extends UmbRepositoryBase {
+export class UmbElementConfigurationRepository extends UmbRepositoryBase implements UmbContentConfigurationRepository {
 	#serverDataSource = new UmbElementConfigurationServerDataSource(this);
 	/**
 	 * Requests the Element configuration
@@ -19,3 +20,5 @@ export class UmbElementConfigurationRepository extends UmbRepositoryBase {
 		return this.#serverDataSource.getConfiguration();
 	}
 }
+
+export { UmbElementConfigurationRepository as api };
