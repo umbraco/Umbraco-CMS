@@ -127,6 +127,8 @@ internal sealed class ConfigureIndexOptions : IConfigureNamedOptions<LuceneDirec
             new() { PropertyName = CoreConstants.FieldNames.ObjectType, FieldValues = FieldValues.Keywords },
             new() { PropertyName = CoreConstants.FieldNames.SortOrder, FieldValues = FieldValues.Integers },
             new() { PropertyName = CoreConstants.FieldNames.Name, FieldValues = FieldValues.TextsR1, Sortable = true },
+            // the name keyword bucket enables exact name matching (e.g. Delivery API "name:" Is-filters)
+            new() { PropertyName = CoreConstants.FieldNames.Name, FieldValues = FieldValues.Keywords },
             new() { PropertyName = CoreConstants.FieldNames.Tags, FieldValues = FieldValues.Keywords },
         ];
 

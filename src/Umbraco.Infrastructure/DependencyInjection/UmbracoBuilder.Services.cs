@@ -82,10 +82,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddUnique<IMediaListViewService, MediaListViewService>();
         builder.Services.AddUnique<IEntitySearchService, EntitySearchService>();
         builder.Services.AddUnique<IContentTypeSearchService, ContentTypeSearchService>();
-        builder.Services.AddUnique<IIndexedEntitySearchService, IndexedEntitySearchService>();
         builder.Services.TryAddTransient<IReservedFieldNamesService, ReservedFieldNamesService>();
-        builder.Services.AddUnique<IContentSearchService, ContentSearchService>();
-        builder.Services.AddUnique<IMediaSearchService, MediaSearchService>();
         builder.Services.AddUnique<IDistributedJobService, DistributedJobService>();
         builder.Services.AddUnique<IMemberFilterService, MemberFilterService>();
         builder.Services.AddUnique<IPropertyEditorSchemaService, PropertyEditorSchemaService>();

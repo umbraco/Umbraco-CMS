@@ -15,7 +15,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Umbraco.Cms.Search.Core\Umbraco.Cms.Search.Core.csproj" />
-    <ProjectReference Include="..\Umbraco.Examine.Lucene\Umbraco.Examine.Lucene.csproj" />
   </ItemGroup>
 
   <ItemGroup>

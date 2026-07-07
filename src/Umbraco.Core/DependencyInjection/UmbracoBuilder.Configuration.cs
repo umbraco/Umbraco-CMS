@@ -62,7 +62,6 @@ public static partial class UmbracoBuilderExtensions
         builder
             .AddUmbracoOptions<ModelsBuilderSettings>()
             .AddUmbracoOptions<IndexCreatorSettings>()
-            .AddUmbracoOptions<SearchSettings>()
             .AddUmbracoOptions<ExamineSearchProviderSettings>()
             .AddUmbracoOptions<MarketplaceSettings>()
             .AddUmbracoOptions<ContentSettings>()

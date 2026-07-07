@@ -48,16 +48,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Update="Umbraco.Examine.Lucene\UmbracoExamine\TestFiles.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <SubType>Designer</SubType>
-      <LastGenOutput>TestFiles.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-    <Compile Update="Umbraco.Examine.Lucene\UmbracoExamine\TestFiles.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>TestFiles.resx</DependentUpon>
-    </Compile>
     <Content Include="Umbraco.Infrastructure\Services\Importing\*.xml" />
     <EmbeddedResource Update="Umbraco.Infrastructure\Services\Importing\ImportResources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

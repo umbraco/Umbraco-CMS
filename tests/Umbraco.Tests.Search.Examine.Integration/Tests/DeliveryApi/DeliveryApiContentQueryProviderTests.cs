@@ -166,6 +166,38 @@ public class DeliveryApiContentQueryProviderTests : TestBase
     }
 
     [Test]
+    public async Task NameFilter_Is_MatchesExactName()
+    {
+        await CreatePublishedSiteStructure();
+
+        PagedModel<Guid> result = ExecuteQuery(
+            Provider.AllContentSelectorOption(),
+            new FilterOption { FieldName = "name", Values = ["Alpha Site"], Operator = FilterOperation.Is });
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Total, Is.EqualTo(1));
+            Assert.That(result.Items.Single(), Is.EqualTo(RootAlphaKey));
+        });
+    }
+
+    [Test]
+    public async Task NameFilter_IsNot_ExcludesExactName()
+    {
+        await CreatePublishedSiteStructure();
+
+        PagedModel<Guid> result = ExecuteQuery(
+            Provider.AllContentSelectorOption(),
+            new FilterOption { FieldName = "name", Values = ["Alpha Site"], Operator = FilterOperation.IsNot });
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Total, Is.EqualTo(4));
+            Assert.That(result.Items, Does.Not.Contain(RootAlphaKey));
+        });
+    }
+
+    [Test]
     public async Task NameFilter_DoesNotContain_ExcludesAnalyzedText()
     {
         await CreatePublishedSiteStructure();

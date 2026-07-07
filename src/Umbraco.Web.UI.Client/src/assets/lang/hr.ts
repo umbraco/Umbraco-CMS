@@ -573,34 +573,6 @@ export default {
 		changeKeyError: "Stavka '%0%' već postoji.",
 		overviewTitle: 'Pregled riječnika',
 	},
-	examineManagement: {
-		configuredSearchers: 'Konfigurirani pretraživači',
-		configuredSearchersDescription:
-			'Prikazuje svojstva i alate za bilo koji konfigurirani pretraživač (npr. kao multi-indeksni pretraživač)',
-		fieldValues: 'Vrijednosti polja',
-		healthStatus: 'Status zdravlja',
-		healthStatusDescription: 'Status zdravlja indeksa i da li se može pročitati',
-		indexers: 'Indeksi',
-		indexInfo: 'Indeks info',
-		contentInIndex: 'Sadržaj u indeksu',
-		indexInfoDescription: 'Navodi svojstva indeksa',
-		manageIndexes: 'Upravljanje Examine-ovim indeksima',
-		manageIndexesDescription:
-			'Omogućava vam pregled detalja svakog indeksa i pruža neke alate za upravljanje indeksima',
-		rebuildIndex: 'Obnovi indeks',
-		rebuildIndexWarning:
-			'\n      Ovo će uzrokovati obnavljanje indexa.<br />\n      Ovisno o količini sadržaja vaše web stranice, ovo bi moglo potrajati.<br />\n      Nije preporučljivo obnavljati index-e tijekom velike posjećenosti vaše web stranice ili u vrijeme kada urednik uređuje sadržaj stranice.\n     ',
-		searchers: 'Pretraživači',
-		searchDescription: 'Pretražite indeks i pogledajte rezultate',
-		tools: 'Alati',
-		toolsDescription: 'Alati za upravljanje indeksima',
-		fields: 'polja',
-		indexCannotRead: 'Indeks se ne može pročitati i morat će se ponovo obnoviti',
-		processIsTakingLonger:
-			'Proces traje duže od očekivanog, provjerite Umbraco log zapis da vidite\n       da li je bilo grešaka tijekom ove operacije\n    ',
-		indexCannotRebuild: 'Ovaj indeks se ne može ponovo obnoviti jer mu nije dodijeljen',
-		iIndexPopulator: 'IIndexPopulator',
-	},
 	placeholders: {
 		username: 'Upišite svoje korisničko ime',
 		password: 'Upišite svoju lozinku',
@@ -2012,7 +1984,6 @@ export default {
 		contentRedirectManager: 'Preusmjeravanje URL-ova',
 		mediaFolderBrowser: 'Sadržaj',
 		settingsWelcome: 'Dobrodošli',
-		settingsExamine: 'Examine menadžment',
 		settingsPublishedStatus: 'Status stranice',
 		settingsModelsBuilder: 'Generator modela',
 		settingsHealthCheck: 'Provjera zdravlja',

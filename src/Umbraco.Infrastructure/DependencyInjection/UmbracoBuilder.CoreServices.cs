@@ -60,7 +60,6 @@ using Umbraco.Cms.Infrastructure.Routing;
 using Umbraco.Cms.Infrastructure.Runtime;
 using Umbraco.Cms.Infrastructure.Runtime.RuntimeModeValidators;
 using Umbraco.Cms.Infrastructure.Scoping;
-using Umbraco.Cms.Infrastructure.Search;
 using Umbraco.Cms.Infrastructure.Security;
 using Umbraco.Cms.Infrastructure.Serialization;
 using Umbraco.Cms.Infrastructure.Services.Implement;
@@ -200,11 +199,9 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddTransient<IUserForgotPasswordSender, EmailUserForgotPasswordSender>();
 
         builder.Services.AddSingleton<IExamineManager, NoopExamineManager>();
-        builder.Services.AddSingleton<IIndexRebuilder, NoopIndexRebuilder>();
 
         builder.Services.AddScoped<ITagQuery, TagQuery>();
 
-        builder.Services.AddSingleton<IUmbracoTreeSearcherFields, UmbracoTreeSearcherFields>();
         builder.Services.AddSingleton<IPublishedContentQueryAccessor, PublishedContentQueryAccessor>(sp =>
             new PublishedContentQueryAccessor(sp.GetRequiredService<IScopedServiceProvider>()));
         builder.Services.AddScoped<IPublishedContentQuery>(factory =>
@@ -212,7 +209,6 @@ public static partial class UmbracoBuilderExtensions
             IUmbracoContextAccessor umbCtx = factory.GetRequiredService<IUmbracoContextAccessor>();
             return new PublishedContentQuery(
                 factory.GetRequiredService<IVariationContextAccessor>(),
-                factory.GetRequiredService<IExamineManager>(),
                 factory.GetRequiredService<IPublishedContentCache>(),
                 factory.GetRequiredService<IPublishedMediaCache>(),
                 factory.GetRequiredService<IDocumentNavigationQueryService>(),
@@ -226,7 +222,6 @@ public static partial class UmbracoBuilderExtensions
 
         builder.Services.AddSingleton<IUmbracoComponentRenderer, UmbracoComponentRenderer>();
 
-        builder.Services.AddSingleton<IBackOfficeExamineSearcher, NoopBackOfficeExamineSearcher>();
 
         builder.Services.AddSingleton<UploadAutoFillProperties>();
         builder.Services.AddSingleton<IImageDimensionExtractor, NoopImageDimensionExtractor>();

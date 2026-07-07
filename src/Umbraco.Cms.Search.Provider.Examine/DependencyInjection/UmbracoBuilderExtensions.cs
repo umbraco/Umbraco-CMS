@@ -12,12 +12,10 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Notifications;
-using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Search.Core.Notifications;
-using Umbraco.Cms.Search.Provider.Examine.Configuration;
+using Umbraco.Cms.Search.Provider.Examine.Lucene;
 using Umbraco.Cms.Search.Provider.Examine.NotificationHandlers;
 using Umbraco.Cms.Search.Provider.Examine.Services;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Search.Provider.Examine.DependencyInjection;
 
@@ -69,6 +67,11 @@ public static class UmbracoBuilderExtensions
 
         builder.Services.AddSingleton<IIndexCommitMonitor, IndexCommitMonitor>();
 
+        // Lucene directory, lock factory and application root infrastructure required by the index registrations above.
+        builder.Services.AddSingleton<IApplicationRoot, UmbracoApplicationRoot>();
+        builder.Services.AddSingleton<ILockFactory, UmbracoLockFactory>();
+        builder.Services.AddSingleton<ConfigurationEnabledDirectoryFactory>();
+
         // This is needed, due to locking of indexes on Azure, to read more on this issue go here: https://github.com/umbraco/Umbraco-CMS/pull/15571
         builder.Services.AddSingleton<UmbracoTempEnvFileSystemDirectoryFactory>();
         builder.Services.RemoveAll<SyncedFileSystemDirectoryFactory>();
@@ -103,23 +106,6 @@ public static class UmbracoBuilderExtensions
                     // client has concise method names instead of the verbose path-based defaults.
                     options.AddOperationTransformer<ActionNameOperationIdTransformer>();
                 }));
-
-        return builder;
-    }
-
-    /// <summary>
-    /// Disables the handling of the default Examine indexes from Umbraco Core.
-    /// </summary>
-    /// <remarks>
-    /// This prevents Umbraco from maintaining the default Examine indexes, thus freeing up server resources.
-    ///
-    /// Only use this if the default Examine indexes are no longer used; that is, if Umbraco Search powers both
-    /// frontend search, backoffice search and the Delivery API (when applicable).
-    /// </remarks>
-    public static IUmbracoBuilder DisableDefaultExamineIndexes(this IUmbracoBuilder builder)
-    {
-        builder.Services.AddSingleton<ExamineManager>();
-        builder.Services.AddUnique<IExamineManager, MaskedCoreIndexesExamineManager>();
 
         return builder;
     }

@@ -175,7 +175,8 @@ internal sealed class SystemFieldsContentIndexer : ISystemFieldsContentIndexer
                 continue;
             }
 
-            yield return new IndexField(Constants.FieldNames.Name, new() { TextsR1 = [name] }, culture, null);
+            // the name is indexed both as analyzed text (for free text search) and as a keyword (for exact matching, e.g. Delivery API name filters)
+            yield return new IndexField(Constants.FieldNames.Name, new() { TextsR1 = [name], Keywords = [name] }, culture, null);
         }
     }
 

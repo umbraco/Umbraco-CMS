@@ -522,33 +522,6 @@ export default {
 		changeKeyError: "La clé '%0%' existe déjà.",
 		overviewTitle: 'Aperçu du dictionaire',
 	},
-	examineManagement: {
-		configuredSearchers: 'Recherches configurées',
-		configuredSearchersDescription:
-			'Affiche les propriétés et les outils de chaque Recherche configurée (e.g. une recherche multi-index)',
-		fieldValues: 'Valeurs du champ',
-		healthStatus: 'Etat de santé',
-		healthStatusDescription: "L'état de santé de l'index et s'il peut être lu",
-		indexers: 'Indexeurs',
-		indexInfo: 'Info Index',
-		indexInfoDescription: "Liste les propriétés de l'index",
-		manageIndexes: "Gérer les index d'Examine",
-		manageIndexesDescription:
-			'Vous permet de voir les détails de chaque index et fournit des outils pour gérer les index',
-		rebuildIndex: "Reconstruire l'index",
-		rebuildIndexWarning:
-			"\n      Ceci provoquera la reconstruction de l'index.<br />\n      Cela pourrait prendre un certain temps en fonction de la quantité de contenu présente dans votre site.<br />\n      Il est déconseillé de reconstruire un index pendant les périodes de trafic intense sur le site web ou quand les éditeurs sont en train d'éditer du contenu.\n     ",
-		searchers: 'Recherches',
-		searchDescription: "Rechercher dans l'index et afficher les résultats",
-		tools: 'Outils',
-		toolsDescription: "Outils pour gérer l'index",
-		fields: 'champs',
-		indexCannotRead: "L'index ne peut pas être lu et devra être reconstruit",
-		processIsTakingLonger:
-			"Le processus dure plus de temps que prévu, vérifiez les logs Umbraco afin de voir s'il y a eu des erreurs pendant cette opératon",
-		indexCannotRebuild: "Cet index ne peut pas être reconstruit parce qu'on ne lui a pas assigné de",
-		iIndexPopulator: 'IIndexPopulator',
-	},
 	placeholders: {
 		username: "Votre nom d'utilisateur",
 		password: 'Votre mot de passe',
@@ -1839,7 +1812,6 @@ export default {
 		contentRedirectManager: "Gestion des redirections d'URL",
 		mediaFolderBrowser: 'Contenu',
 		settingsWelcome: 'Bienvenue',
-		settingsExamine: "Gestion d'Examine",
 		settingsPublishedStatus: 'Statut Publié',
 		settingsModelsBuilder: 'Models Builder',
 		settingsHealthCheck: 'Health Check',

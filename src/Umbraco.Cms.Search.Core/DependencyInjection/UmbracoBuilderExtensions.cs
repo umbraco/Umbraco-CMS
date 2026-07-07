@@ -24,6 +24,7 @@ using Umbraco.Cms.Search.Core.PropertyValueHandlers.Collection;
 using Umbraco.Cms.Search.Core.Services;
 using Umbraco.Cms.Search.Core.Services.ContentIndexing;
 using Umbraco.Cms.Search.Core.Services.ContentIndexing.Indexers;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Search.Core.DependencyInjection;
 
@@ -71,6 +72,9 @@ public static class UmbracoBuilderExtensions
 
         builder.Services.AddSingleton<IIndexDocumentRepository, IndexDocumentRepository>();
         builder.Services.AddSingleton<IIndexDocumentService, IndexDocumentService>();
+
+        // replace the core IPublishedContentQuery with the search enabled implementation (same scoped lifetime as the core registration)
+        builder.Services.AddUnique<Umbraco.Cms.Core.IPublishedContentQuery, SearchEnabledPublishedContentQuery>(ServiceLifetime.Scoped);
 
         // we need these notification handlers explicitly registered for the distributed content index refresher
         builder.Services.AddTransient<DraftContentNotificationHandler>();

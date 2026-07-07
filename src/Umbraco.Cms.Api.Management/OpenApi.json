@@ -16023,225 +16023,6 @@
         ]
       }
     },
-    "/umbraco/management/api/v1/indexer": {
-      "get": {
-        "tags": [
-          "Indexer"
-        ],
-        "summary": "Gets a collection of indexers.",
-        "description": "Gets a collection of configured search indexers in the Umbraco installation.",
-        "operationId": "GetIndexer",
-        "parameters": [
-          {
-            "name": "skip",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 0
-            }
-          },
-          {
-            "name": "take",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 100
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PagedIndexResponseModel"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "The resource is protected and requires an authentication token"
-          }
-        },
-        "security": [
-          {
-            "Backoffice-User": [ ]
-          }
-        ]
-      }
-    },
-    "/umbraco/management/api/v1/indexer/{indexName}": {
-      "get": {
-        "tags": [
-          "Indexer"
-        ],
-        "summary": "Gets indexer details.",
-        "description": "Gets detailed information about the indexer identified by the provided name.",
-        "operationId": "GetIndexerByIndexName",
-        "parameters": [
-          {
-            "name": "indexName",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/IndexResponseModel"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "The resource is protected and requires an authentication token"
-          }
-        },
-        "security": [
-          {
-            "Backoffice-User": [ ]
-          }
-        ]
-      }
-    },
-    "/umbraco/management/api/v1/indexer/{indexName}/rebuild": {
-      "post": {
-        "tags": [
-          "Indexer"
-        ],
-        "summary": "Rebuilds an indexer.",
-        "description": "Rebuilds the search index for the indexer identified by the provided name.",
-        "operationId": "PostIndexerByIndexNameRebuild",
-        "parameters": [
-          {
-            "name": "indexName",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "400": {
-            "description": "Bad Request",
-            "headers": {
-              "Umb-Notifications": {
-                "description": "The list of notifications produced during the request.",
-                "schema": {
-                  "type": [
-                    "null",
-                    "array"
-                  ],
-                  "items": {
-                    "$ref": "#/components/schemas/NotificationHeaderModel"
-                  }
-                }
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "headers": {
-              "Umb-Notifications": {
-                "description": "The list of notifications produced during the request.",
-                "schema": {
-                  "type": [
-                    "null",
-                    "array"
-                  ],
-                  "items": {
-                    "$ref": "#/components/schemas/NotificationHeaderModel"
-                  }
-                }
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Conflict",
-            "headers": {
-              "Umb-Notifications": {
-                "description": "The list of notifications produced during the request.",
-                "schema": {
-                  "type": [
-                    "null",
-                    "array"
-                  ],
-                  "items": {
-                    "$ref": "#/components/schemas/NotificationHeaderModel"
-                  }
-                }
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "OK",
-            "headers": {
-              "Umb-Notifications": {
-                "description": "The list of notifications produced during the request.",
-                "schema": {
-                  "type": [
-                    "null",
-                    "array"
-                  ],
-                  "items": {
-                    "$ref": "#/components/schemas/NotificationHeaderModel"
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "The resource is protected and requires an authentication token"
-          }
-        },
-        "security": [
-          {
-            "Backoffice-User": [ ]
-          }
-        ]
-      }
-    },
     "/umbraco/management/api/v1/install/settings": {
       "get": {
         "tags": [
@@ -30305,131 +30086,6 @@
         ]
       }
     },
-    "/umbraco/management/api/v1/searcher": {
-      "get": {
-        "tags": [
-          "Searcher"
-        ],
-        "summary": "Gets a collection of searchers.",
-        "description": "Gets a collection of configured searchers in the Umbraco installation.",
-        "operationId": "GetSearcher",
-        "parameters": [
-          {
-            "name": "skip",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 0
-            }
-          },
-          {
-            "name": "take",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 100
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PagedSearcherResponseModel"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "The resource is protected and requires an authentication token"
-          }
-        },
-        "security": [
-          {
-            "Backoffice-User": [ ]
-          }
-        ]
-      }
-    },
-    "/umbraco/management/api/v1/searcher/{searcherName}/query": {
-      "get": {
-        "tags": [
-          "Searcher"
-        ],
-        "summary": "Queries a searcher.",
-        "description": "Queries a named searcher with the provided search term and returns a paginated collection of search results.",
-        "operationId": "GetSearcherBySearcherNameQuery",
-        "parameters": [
-          {
-            "name": "searcherName",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "term",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "skip",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 0
-            }
-          },
-          {
-            "name": "take",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 100
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PagedSearchResultResponseModel"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "The resource is protected and requires an authentication token"
-          }
-        },
-        "security": [
-          {
-            "Backoffice-User": [ ]
-          }
-        ]
-      }
-    },
     "/umbraco/management/api/v1/security/configuration": {
       "get": {
         "tags": [
@@ -44071,24 +43727,6 @@
           }
         }
       },
-      "FieldPresentationModel": {
-        "required": [
-          "name",
-          "values"
-        ],
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "values": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          }
-        }
-      },
       "FileSystemFolderModel": {
         "required": [
           "path"
@@ -44360,31 +43998,6 @@
           }
         }
       },
-      "HealthStatusModel": {
-        "enum": [
-          "Healthy",
-          "Unhealthy",
-          "Rebuilding",
-          "Corrupt"
-        ]
-      },
-      "HealthStatusResponseModel": {
-        "required": [
-          "status"
-        ],
-        "type": "object",
-        "properties": {
-          "status": {
-            "$ref": "#/components/schemas/HealthStatusModel"
-          },
-          "message": {
-            "type": [
-              "null",
-              "string"
-            ]
-          }
-        }
-      },
       "HelpPageResponseModel": {
         "type": "object",
         "properties": {
@@ -44476,51 +44089,6 @@
         "properties": {
           "file": {
             "$ref": "#/components/schemas/ReferenceByIdModel"
-          }
-        }
-      },
-      "IndexResponseModel": {
-        "required": [
-          "name",
-          "canRebuild",
-          "documentCount",
-          "fieldCount",
-          "healthStatus",
-          "searcherName"
-        ],
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "healthStatus": {
-            "$ref": "#/components/schemas/HealthStatusResponseModel"
-          },
-          "canRebuild": {
-            "type": "boolean"
-          },
-          "searcherName": {
-            "type": "string"
-          },
-          "documentCount": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "fieldCount": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "providerProperties": {
-            "type": [
-              "null",
-              "object"
-            ]
-          },
-          "uniqueKeyFieldName": {
-            "type": [
-              "null",
-              "string"
-            ]
           }
         }
       },
@@ -47978,28 +47546,6 @@
         },
         "description": "Represents a paged collection of items with total count."
       },
-      "PagedIndexResponseModel": {
-        "required": [
-          "total",
-          "items"
-        ],
-        "type": "object",
-        "properties": {
-          "total": {
-            "type": "integer",
-            "description": "Gets or sets the total number of items available.",
-            "format": "int64"
-          },
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/IndexResponseModel"
-            },
-            "description": "Gets or sets the items in the current page."
-          }
-        },
-        "description": "Represents a paged collection of items with total count."
-      },
       "PagedIReferenceResponseModel": {
         "required": [
           "total",
@@ -48720,50 +48266,6 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/SavedLogSearchResponseModel"
-            },
-            "description": "Gets or sets the items in the current page."
-          }
-        },
-        "description": "Represents a paged collection of items with total count."
-      },
-      "PagedSearcherResponseModel": {
-        "required": [
-          "total",
-          "items"
-        ],
-        "type": "object",
-        "properties": {
-          "total": {
-            "type": "integer",
-            "description": "Gets or sets the total number of items available.",
-            "format": "int64"
-          },
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/SearcherResponseModel"
-            },
-            "description": "Gets or sets the items in the current page."
-          }
-        },
-        "description": "Represents a paged collection of items with total count."
-      },
-      "PagedSearchResultResponseModel": {
-        "required": [
-          "total",
-          "items"
-        ],
-        "type": "object",
-        "properties": {
-          "total": {
-            "type": "integer",
-            "description": "Gets or sets the total number of items available.",
-            "format": "int64"
-          },
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/SearchResultResponseModel"
             },
             "description": "Gets or sets the items in the current page."
           }
@@ -49882,45 +49384,6 @@
           },
           "path": {
             "type": "string"
-          }
-        }
-      },
-      "SearcherResponseModel": {
-        "required": [
-          "name"
-        ],
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          }
-        }
-      },
-      "SearchResultResponseModel": {
-        "required": [
-          "id",
-          "score",
-          "fieldCount",
-          "fields"
-        ],
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "score": {
-            "type": "number",
-            "format": "float"
-          },
-          "fieldCount": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "fields": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/FieldPresentationModel"
-            }
           }
         }
       },
@@ -53392,9 +52855,6 @@
       "name": "Import"
     },
     {
-      "name": "Indexer"
-    },
-    {
       "name": "Install"
     },
     {
@@ -53459,9 +52919,6 @@
     },
     {
       "name": "Script"
-    },
-    {
-      "name": "Searcher"
     },
     {
       "name": "Security"
