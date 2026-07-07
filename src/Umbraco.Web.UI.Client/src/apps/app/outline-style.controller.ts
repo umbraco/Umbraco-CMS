@@ -30,6 +30,7 @@ export class UmbOutlineStyleController extends UmbControllerBase {
 
 	override hostDisconnected(): void {
 		super.hostDisconnected();
+		document.body.style.removeProperty('--uui-show-focus-outline');
 
 		const host = this.getHostElement();
 		host.removeEventListener('pointerdown', this.#onPointerDown);
