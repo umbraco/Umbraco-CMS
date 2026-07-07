@@ -849,6 +849,11 @@ export class ContentUiHelper extends UiBaseLocators {
     );
   }
 
+  /**
+   * @deprecated Save-and-publish waits on the publish response, not a plain update.
+   * Prefer {@link clickSaveAndPublishButtonAndWaitForContentToBePublished}.
+   * TODO: remove once all callers have migrated.
+   */
   async clickSaveAndPublishButtonAndWaitForContentToBeUpdated() {
     return await this.clickSaveAndPublishButtonAndWaitForContentToBePublished();
   }

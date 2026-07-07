@@ -295,6 +295,8 @@
     delete: 'DELETE'
   }
 
+  // Matched against response URLs via url().includes(), so entries are either full paths
+  // (e.g. '/umbraco/management/api/v1/document') or path fragments (e.g. '/update-and-publish').
   public static readonly apiEndpoints = {
     profilingStatus: '/umbraco/management/api/v1/profiling/status',
     document: '/umbraco/management/api/v1/document',
