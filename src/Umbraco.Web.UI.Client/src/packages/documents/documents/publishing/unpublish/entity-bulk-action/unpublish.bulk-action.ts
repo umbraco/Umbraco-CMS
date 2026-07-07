@@ -20,28 +20,31 @@ import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 export class UmbDocumentUnpublishEntityBulkAction extends UmbEntityBulkActionBase<object> {
 	async execute() {
 		const entityContext = await this.getContext(UMB_ENTITY_CONTEXT);
-		if (!entityContext) {
-			throw new Error('Entity context not found');
-		}
+		if (!entityContext) throw new Error('Entity context not found');
+
 		const entityType = entityContext.getEntityType();
 		const unique = entityContext.getUnique();
-
-		const localize = new UmbLocalizationController(this);
-
 		if (!entityType) throw new Error('Entity type not found');
 		if (unique === undefined) throw new Error('Entity unique not found');
 
 		// If there is only one selection, we can refer to the regular unpublish entity action:
 		if (this.selection.length === 1) {
-			const action = new UmbContentUnpublishEntityAction(this._host, {
-				unique: this.selection[0],
-				entityType: UMB_DOCUMENT_ENTITY_TYPE,
-				meta: UmbDocumentUnpublishManifestEntityActionMeta,
-			});
-			await action.execute();
-			return;
+			return this.#unpublishSingleSelection();
 		}
 
+		return this.#unpublishMultipleSelections(entityType, unique);
+	}
+
+	async #unpublishSingleSelection(): Promise<void> {
+		const action = new UmbContentUnpublishEntityAction(this._host, {
+			unique: this.selection[0],
+			entityType: UMB_DOCUMENT_ENTITY_TYPE,
+			meta: UmbDocumentUnpublishManifestEntityActionMeta,
+		});
+		await action.execute();
+	}
+
+	async #unpublishMultipleSelections(entityType: string, unique: string | null): Promise<void> {
 		// Fetch document items and languages in parallel
 		const itemRepository = new UmbDocumentItemRepository(this._host);
 		const languageRepository = new UmbLanguageCollectionRepository(this._host);
@@ -60,75 +63,90 @@ export class UmbDocumentUnpublishEntityBulkAction extends UmbEntityBulkActionBas
 
 		// If there is only one language available, or all selected documents are invariant, we can skip the modal and unpublish directly:
 		if (options.length === 1 || allInvariant) {
-			const confirm = await umbConfirmModal(this, {
-				headline: '#actions_unpublish',
-				content: '#prompt_confirmListViewUnpublish',
-				color: 'warning',
-				confirmLabel: '#actions_unpublish',
-			}).catch(() => false);
-
-			if (confirm !== false) {
-				// For invariant documents, use null culture; otherwise use the first language
-				const variantId = allInvariant
-					? UmbVariantId.CreateInvariant()
-					: new UmbVariantId(options[0].language.unique, null);
-
-				const documentCnt = await this.#unpublishDocuments(this.selection, [variantId]);
-
-				const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
-				notificationContext?.peek('positive', {
-					data: {
-						headline: localize.term('speechBubbles_contentUnpublished'),
-						message: localize.term('speechBubbles_editMultiContentUnpublishedText', documentCnt),
-					},
-				});
-
-				await this.#reloadChildren(entityType, unique);
-			}
-			return;
+			return this.#unpublishSingleVariant(entityType, unique, options, allInvariant);
 		}
 
+		return this.#unpublishSelectedVariants(entityType, unique, options);
+	}
+
+	async #unpublishSingleVariant(
+		entityType: string,
+		unique: string | null,
+		options: Array<UmbDocumentVariantOptionModel>,
+		allInvariant: boolean,
+	): Promise<void> {
+		const confirm = await umbConfirmModal(this, {
+			headline: '#actions_unpublish',
+			content: '#prompt_confirmListViewUnpublish',
+			color: 'warning',
+			confirmLabel: '#actions_unpublish',
+		}).catch(() => false);
+
+		if (confirm === false) return;
+
+		// For invariant documents, use null culture; otherwise use the first language
+		const variantId = allInvariant
+			? UmbVariantId.CreateInvariant()
+			: new UmbVariantId(options[0].language.unique, null);
+
+		const documentCnt = await this.#unpublishDocuments(this.selection, [variantId]);
+
+		const localize = new UmbLocalizationController(this);
+		const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
+		notificationContext?.peek('positive', {
+			data: {
+				headline: localize.term('speechBubbles_contentUnpublished'),
+				message: localize.term('speechBubbles_editMultiContentUnpublishedText', documentCnt),
+			},
+		});
+
+		await this.#reloadChildren(entityType, unique);
+	}
+
+	async #unpublishSelectedVariants(
+		entityType: string,
+		unique: string | null,
+		options: Array<UmbDocumentVariantOptionModel>,
+	): Promise<void> {
 		// Pre-select all cultures from the selected documents
 		const selection: Array<string> = options.map((o) => o.unique);
 
 		const result = await umbOpenModal(this, UMB_CONTENT_UNPUBLISH_MODAL, {
 			data: {
 				options,
-				renderAdditionalLabel: (option: UmbEntityVariantOptionModel) => {
-					const documentCount = (option as UmbDocumentVariantOptionModel).documentCount;
-					return documentCount !== undefined
-						? html`<div class="label-status">
-								<umb-localize key="general_documentCount" .args=${[documentCount]}>
-									${documentCount} documents
-								</umb-localize>
-							</div>`
-						: nothing;
-				},
+				renderAdditionalLabel: UmbDocumentUnpublishEntityBulkAction.#renderDocumentCountLabel,
 			},
 			value: { selection },
 		}).catch(() => undefined);
 
-		if (!result?.selection.length) return;
-
 		const variantIds = result?.selection.map((x) => UmbVariantId.FromString(x)) ?? [];
+		if (!variantIds.length) return;
 
-		if (variantIds.length) {
-			const documentCnt = await this.#unpublishDocuments(this.selection, variantIds);
+		const documentCnt = await this.#unpublishDocuments(this.selection, variantIds);
 
-			const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
-			notificationContext?.peek('positive', {
-				data: {
-					headline: localize.term('speechBubbles_contentUnpublished'),
-					message: localize.term(
-						'speechBubbles_editMultiVariantUnpublishedText',
-						documentCnt,
-						localize.list(variantIds.map((v) => v.culture ?? '')),
-					),
-				},
-			});
+		const localize = new UmbLocalizationController(this);
+		const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
+		notificationContext?.peek('positive', {
+			data: {
+				headline: localize.term('speechBubbles_contentUnpublished'),
+				message: localize.term(
+					'speechBubbles_editMultiVariantUnpublishedText',
+					documentCnt,
+					localize.list(variantIds.map((v) => v.culture ?? '')),
+				),
+			},
+		});
 
-			await this.#reloadChildren(entityType, unique);
-		}
+		await this.#reloadChildren(entityType, unique);
+	}
+
+	static #renderDocumentCountLabel(option: UmbEntityVariantOptionModel) {
+		const documentCount = (option as UmbDocumentVariantOptionModel).documentCount;
+		return documentCount !== undefined
+			? html`<div class="label-status">
+					<umb-localize key="general_documentCount" .args=${[documentCount]}> ${documentCount} documents </umb-localize>
+				</div>`
+			: nothing;
 	}
 
 	async #unpublishDocuments(uniques: Array<string>, variantIds: Array<UmbVariantId>): Promise<number> {
