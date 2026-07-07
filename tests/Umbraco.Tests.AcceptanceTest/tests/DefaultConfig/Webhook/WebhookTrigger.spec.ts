@@ -42,7 +42,7 @@ test('can trigger when content is published', async ({umbracoApi, umbracoUi}) =>
   await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
 
   // Assert
-  const webhookSiteData = await umbracoApi.webhook.getWebhookSiteRequestResponse(webhookSiteToken);
+  const webhookSiteData = await umbracoApi.webhook.getWebhookSiteRequestResponse(webhookSiteToken, undefined, undefined, contentId);
   expect(webhookSiteData[0].content).toContain(contentId);
 });
 
@@ -62,7 +62,7 @@ test('can trigger when content is deleted', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.clickConfirmEmptyRecycleBinButtonAndWaitForRecycleBinToBeEmptied();
 
   // Assert
-  const webhookSiteData = await umbracoApi.webhook.getWebhookSiteRequestResponse(webhookSiteToken);
+  const webhookSiteData = await umbracoApi.webhook.getWebhookSiteRequestResponse(webhookSiteToken, undefined, undefined, contentId);
   expect(webhookSiteData[0].content).toContain(contentId);
 });
 
@@ -84,7 +84,7 @@ test('can trigger when content is unpublished', async ({umbracoApi, umbracoUi}) 
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.unpublished);
 
   // Assert
-  const webhookSiteData = await umbracoApi.webhook.getWebhookSiteRequestResponse(webhookSiteToken);
+  const webhookSiteData = await umbracoApi.webhook.getWebhookSiteRequestResponse(webhookSiteToken, undefined, undefined, contentId);
   expect(webhookSiteData[0].content).toContain(contentId);
 });
 
@@ -103,7 +103,7 @@ test('can trigger when media is saved', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.media.clickSaveButtonAndWaitForMediaToBeUpdated();
 
   // Assert
-  const webhookSiteData = await umbracoApi.webhook.getWebhookSiteRequestResponse(webhookSiteToken);
+  const webhookSiteData = await umbracoApi.webhook.getWebhookSiteRequestResponse(webhookSiteToken, undefined, undefined, mediaId);
   expect(webhookSiteData[0].content).toContain(mediaId);
 });
 
@@ -123,7 +123,7 @@ test('can trigger when media is deleted', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.media.deleteMediaItemAndWaitForMediaToBeDeleted(mediaName);
 
   // Assert
-  const webhookSiteData = await umbracoApi.webhook.getWebhookSiteRequestResponse(webhookSiteToken);
+  const webhookSiteData = await umbracoApi.webhook.getWebhookSiteRequestResponse(webhookSiteToken, undefined, undefined, mediaId);
   expect(webhookSiteData[0].content).toContain(mediaId);
 });
 
@@ -147,7 +147,7 @@ test('can trigger the webhook for a specific media type', async ({umbracoApi, um
   await umbracoUi.media.deleteMediaItem(secondMediaName);
 
   // Assert
-  const webhookSiteData = await umbracoApi.webhook.getWebhookSiteRequestResponse(webhookSiteToken);
+  const webhookSiteData = await umbracoApi.webhook.getWebhookSiteRequestResponse(webhookSiteToken, undefined, undefined, mediaId);
   expect(webhookSiteData[0].content).toContain(mediaId);
   expect(webhookSiteData[0].content).not.toContain(secondMediaId);
 
@@ -181,7 +181,7 @@ test('can trigger the webhook for a specific content type', async ({umbracoApi, 
   await umbracoUi.content.isSuccessNotificationVisible();
 
   // Assert
-  const webhookSiteData = await umbracoApi.webhook.getWebhookSiteRequestResponse(webhookSiteToken);
+  const webhookSiteData = await umbracoApi.webhook.getWebhookSiteRequestResponse(webhookSiteToken, undefined, undefined, contentId);
   expect(webhookSiteData[0].content).toContain(contentId);
   expect(webhookSiteData[0].content).not.toContain(secondContentId);
 
@@ -220,7 +220,7 @@ test('can custom header for the webhook request', async ({umbracoApi, umbracoUi}
   const headerName = 'test-header-name';
   const headerValue = 'automation-test';
   await umbracoApi.webhook.createWebhookWithHeader(webhookName, webhookSiteToken, event, headerName, headerValue);
-  await umbracoApi.document.createDefaultDocument(documentName, documentTypeId);
+  const contentId = await umbracoApi.document.createDefaultDocument(documentName, documentTypeId);
 
   await umbracoUi.goToBackOffice();
   await umbracoUi.webhook.goToSection(ConstantHelper.sections.content);
@@ -232,6 +232,6 @@ test('can custom header for the webhook request', async ({umbracoApi, umbracoUi}
   await umbracoUi.content.isSuccessNotificationVisible();
 
   // Assert
-  const webhookSiteData = await umbracoApi.webhook.getWebhookSiteRequestResponse(webhookSiteToken);
+  const webhookSiteData = await umbracoApi.webhook.getWebhookSiteRequestResponse(webhookSiteToken, undefined, undefined, contentId);
   expect(webhookSiteData[0].headers[headerName]).toEqual([headerValue]);
 });

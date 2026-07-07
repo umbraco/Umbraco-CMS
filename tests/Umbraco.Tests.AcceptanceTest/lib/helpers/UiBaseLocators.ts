@@ -55,6 +55,7 @@ export class UiBaseLocators extends BasePage {
   public readonly backOfficeHeader: Locator;
   public readonly backOfficeMain: Locator;
   public readonly sectionLinks: Locator;
+  public readonly activeSectionLink: Locator;
   public readonly sectionSidebar: Locator;
   public readonly menuItem: Locator;
   public readonly actionsMenuContainer: Locator;
@@ -202,17 +203,20 @@ export class UiBaseLocators extends BasePage {
 
   // User
   public readonly currentUserAvatarBtn: Locator;
+  public readonly currentUserModal: Locator;
   public readonly newPasswordTxt: Locator;
   public readonly confirmPasswordTxt: Locator;
   public readonly currentPasswordTxt: Locator;
   public readonly changePhotoBtn: Locator;
   public readonly removePhotoBtn: Locator;
   public readonly languageBtn: Locator;
+  public readonly uiCultureInput: Locator;
 
   // Collection & Table
   public readonly collectionTreeItemTableRow: Locator;
   public readonly createActionButtonCollection: Locator;
   public readonly createActionBtn: Locator;
+  public readonly createActionExpandSymbol: Locator;
   public readonly createOptionActionListModal: Locator;
   public readonly clearSelectionBtn: Locator;
   public readonly collectionSelectionActions: Locator;
@@ -322,6 +326,7 @@ export class UiBaseLocators extends BasePage {
     this.backOfficeHeader = page.locator("umb-backoffice-header");
     this.backOfficeMain = page.locator("umb-backoffice-main");
     this.sectionLinks = page.getByTestId("section-links");
+    this.activeSectionLink = this.sectionLinks.locator("[active]");
     this.sectionSidebar = page.locator("umb-section-sidebar");
     this.menuItem = page.locator("uui-menu-item");
     this.actionsMenuContainer = page.locator("uui-scroll-container");
@@ -550,12 +555,14 @@ export class UiBaseLocators extends BasePage {
     this.currentUserAvatarBtn = page
       .getByTestId("header-app:Umb.HeaderApp.CurrentUser")
       .locator("uui-avatar");
+    this.currentUserModal = page.locator("umb-current-user-modal");
     this.currentPasswordTxt = page.locator('input[name="oldPassword"]');
     this.newPasswordTxt = page.locator('input[name="newPassword"]');
     this.confirmPasswordTxt = page.locator('input[name="confirmPassword"]');
     this.changePhotoBtn = page.getByLabel('Change photo');
     this.removePhotoBtn = page.getByLabel('Remove photo');
     this.languageBtn = page.locator('[label="UI Culture"] select');
+    this.uiCultureInput = page.locator('umb-ui-culture-input');
 
     // Collection & Table
     this.collectionTreeItemTableRow = page.locator(
@@ -567,6 +574,9 @@ export class UiBaseLocators extends BasePage {
     this.createActionBtn = page
       .locator("umb-collection-create-action-button")
       .locator('[label="Create"]');
+    this.createActionExpandSymbol = page
+      .locator("umb-collection-create-action-button")
+      .locator("uui-symbol-expand");
     this.createOptionActionListModal = page.locator(
       "umb-entity-create-option-action-list-modal",
     );
@@ -866,6 +876,12 @@ export class UiBaseLocators extends BasePage {
     await this.enterText(this.folderNameTxt, folderName, { verify: true });
   }
 
+  async enterRenameFolderName(folderName: string) {
+    await expect(this.folderNameTxt).toBeVisible();
+    await expect(this.folderNameTxt).not.toHaveValue("");
+    await this.enterText(this.folderNameTxt, folderName, { verify: true });
+  }
+
   async createFolder(folderName: string) {
     await this.clickCreateActionMenuOption();
     await this.clickNewFolderThreeDotsButton();
@@ -1054,8 +1070,7 @@ export class UiBaseLocators extends BasePage {
         );
       }
     }
-    const alreadySelected = await this.sectionLinks
-      .locator("[active]")
+    const alreadySelected = await this.activeSectionLink
       .getByText(sectionName)
       .isVisible();
     if (alreadySelected && !skipReload) {
@@ -1087,8 +1102,7 @@ export class UiBaseLocators extends BasePage {
   }
 
   async isBackOfficeMainVisible(isVisible: boolean = true) {
-    await this.page.waitForTimeout(ConstantHelper.timeout.medium);
-    await this.isVisible(this.backOfficeMain, isVisible);
+    await this.isVisible(this.backOfficeMain, isVisible, ConstantHelper.timeout.navigation);
   }
 
   // Link & Button Click by Name Methods
@@ -1496,6 +1510,8 @@ export class UiBaseLocators extends BasePage {
     await this.clickSubmitButton();
     await this.clickTreeItemWithName(dictionaryName, this.page);
     await this.click(this.chooseBtn);
+    // Wait for the snippet to land in the editor before returning, so a following save can't race the insert.
+    await this.containsText(this.monacoEditor, dictionaryName);
   }
 
   async insertSystemFieldValue(fieldValue: string) {
@@ -1740,7 +1756,15 @@ export class UiBaseLocators extends BasePage {
 
   // User Methods
   async clickCurrentUserAvatarButton() {
-    await this.click(this.currentUserAvatarBtn, { force: true });
+    // Retry the open: the first click can land before the avatar is interactive, leaving the modal closed.
+    await expect(async () => {
+      if (!(await this.currentUserModal.isVisible())) {
+        await this.click(this.currentUserAvatarBtn);
+      }
+      await expect(this.currentUserModal).toBeVisible({
+        timeout: ConstantHelper.timeout.short,
+      });
+    }).toPass({timeout: ConstantHelper.timeout.medium});
   }
 
   // Collection Methods
@@ -1757,6 +1781,10 @@ export class UiBaseLocators extends BasePage {
   }
 
   async clickCreateActionWithOptionName(optionName: string) {
+    // Before its options load the button renders a single-option variant whose click
+    // executes that option directly instead of opening a menu. Wait for the multi-option
+    // dropdown (its expand chevron) so the click opens the options menu.
+    await this.waitForVisible(this.createActionExpandSymbol);
     await this.clickCreateActionButton();
     const createOptionLocator = this.createActionButtonCollection.locator(
       '[label="' + optionName + '"], [label="' + optionName + '..."]',
@@ -1989,10 +2017,11 @@ export class UiBaseLocators extends BasePage {
     url: string,
     promise: Promise<void>,
     statusCode: number,
+    method?: string,
   ) {
     const [response] = await Promise.all([
       this.page.waitForResponse(
-        (resp) => resp.url().includes(url) && resp.status() === statusCode,
+        (resp) => resp.url().includes(url) && resp.status() === statusCode && (method === undefined || resp.request().method() === method),
       ),
       promise,
     ]);
@@ -2131,6 +2160,9 @@ export class UiBaseLocators extends BasePage {
   }
 
   async selectUserLanguage(language: string) {
-    await this.languageBtn.selectOption(language, {force: true});
+    await expect(async () => {
+      await this.languageBtn.selectOption(language, {force: true});
+      await expect(this.uiCultureInput).toHaveAttribute('value', language.toLowerCase(), {timeout: ConstantHelper.timeout.short});
+    }).toPass({timeout: ConstantHelper.timeout.medium});
   }
 }

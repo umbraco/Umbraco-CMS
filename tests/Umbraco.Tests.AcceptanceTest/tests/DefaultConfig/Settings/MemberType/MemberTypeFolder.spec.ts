@@ -51,7 +51,7 @@ test('can rename a member type folder', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.memberType.clickRootFolderCaretButton();
   await umbracoUi.memberType.clickActionsMenuForName(oldFolderName);
   await umbracoUi.memberType.clickUpdateActionMenuOption();
-  await umbracoUi.memberType.enterFolderName(memberTypeFolderName);
+  await umbracoUi.memberType.enterRenameFolderName(memberTypeFolderName);
   await umbracoUi.memberType.clickConfirmRenameButtonAndWaitForMemberTypeToBeRenamed();
 
   // Assert

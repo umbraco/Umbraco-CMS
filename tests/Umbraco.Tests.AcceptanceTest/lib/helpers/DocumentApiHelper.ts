@@ -1,6 +1,7 @@
 ﻿import {expect} from "@playwright/test";
 import {AliasHelper} from "./AliasHelper";
 import {ApiHelpers} from "./ApiHelpers";
+import {ConstantHelper} from "./ConstantHelper";
 import {DocumentBuilder, DocumentDomainBuilder} from "../builders";
 
 export class DocumentApiHelper {
@@ -625,6 +626,14 @@ export class DocumentApiHelper {
   async isDocumentPublished(id: string) {
     const document = await this.get(id);
     return document.variants[0].state === 'Published';
+  }
+
+  async waitUntilDocumentIsPublished(id: string) {
+    await expect.poll(() => this.isDocumentPublished(id), {timeout: ConstantHelper.timeout.veryLong}).toBeTruthy();
+  }
+
+  async waitUntilImageMediaPickerDoesNotContainImage(id: string, propertyAlias: string, mediaKey: string) {
+    await expect.poll(() => this.doesImageMediaPickerContainImage(id, propertyAlias, mediaKey), {timeout: ConstantHelper.timeout.veryLong}).toBeFalsy();
   }
 
   async createPublishedDocumentWithImageCropper(documentName: string, cropValue: any, dataTypeId: string, templateId: string, propertyName: string = 'Test Property Name', documentTypeName: string = 'Test Document Type', focalPoint: {left: number, top: number} = {left: 0.5, top: 0.5}) {
@@ -1508,14 +1517,14 @@ export class DocumentApiHelper {
 
     const documentBuilder = new DocumentBuilder()
       .withDocumentTypeId(documentTypeId);
-    
+
     for (const culture of cultures) {
       documentBuilder.addVariant()
         .withName(documentName)
         .withCulture(culture)
         .done();
     }
-    
+
     const alias = AliasHelper.toAlias(dataTypeName);
     for (const value of values) {
       const valueBuilder = documentBuilder.addValue()
@@ -1879,6 +1888,7 @@ export class DocumentApiHelper {
   }
 
   async createPublishedDocumentWithTwoNameVersionsAndTwoTextVersions(originalName: string, updatedName: string, documentTypeName: string, dataTypeName: string, originalText: string, updatedText: string) {
+    await this.ensureNameNotExists(updatedName);
     const dataTypeData = await this.api.dataType.getByName(dataTypeName);
     const documentTypeId = await this.api.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
     const documentId = await this.createDocumentWithTextContent(originalName, documentTypeId, originalText, dataTypeName);
