@@ -395,9 +395,11 @@ export function UmbFormControlMixin<
 			super.updated(changedProperties);
 			// If still pristine and the input had focus and the value has changed, then we need to check validity, as the value might have been changed after focus was left. [NL]
 			if (this.pristine && this.#hadFocus && changedProperties.has('value')) {
+				// checkValidity will set pristine to false for it self and all connected form controls and then run validators, hence not running _runValidators() below. [NL]
 				this.checkValidity();
+			} else {
+				this._runValidators();
 			}
-			this._runValidators();
 		}
 
 		#onFormSubmit = () => {
