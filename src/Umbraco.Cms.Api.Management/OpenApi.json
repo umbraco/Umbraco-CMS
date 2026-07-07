@@ -45020,7 +45020,7 @@
             "format": "uuid"
           }
         }
-      },x
+      },
       "HealthCheckResultResponseModel": {
         "required": [
           "message",
