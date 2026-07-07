@@ -210,10 +210,14 @@ internal sealed class RelationRepository : AsyncEntityRepositoryBase<int, IRelat
                     {
                         entity.UpdatingEntity();
                         RelationDto dto = RelationFactory.BuildDto(entity);
-                        db.Relations.Update(dto);
+                        await db.Relations.Where(x => x.Id == dto.Id).ExecuteUpdateAsync(
+                            setter => setter
+                            .SetProperty(x => x.ParentId, dto.ParentId)
+                            .SetProperty(x => x.ChildId, dto.ChildId)
+                            .SetProperty(x => x.RelationType, dto.RelationType)
+                            .SetProperty(x => x.Datetime, dto.Datetime)
+                            .SetProperty(x => x.Comment, dto.Comment), cancellationToken);
                     }
-
-                    await db.SaveChangesAsync(cancellationToken);
                 }
                 else
                 {
@@ -254,7 +258,13 @@ internal sealed class RelationRepository : AsyncEntityRepositoryBase<int, IRelat
                     foreach (ReadOnlyRelation entity in hasIdentityGroup)
                     {
                         RelationDto dto = RelationFactory.BuildDto(entity);
-                        db.Relations.Update(dto);
+                        await db.Relations.Where(x => x.Id == dto.Id).ExecuteUpdateAsync(
+                            setter => setter
+                            .SetProperty(x => x.ParentId, dto.ParentId)
+                            .SetProperty(x => x.ChildId, dto.ChildId)
+                            .SetProperty(x => x.RelationType, dto.RelationType)
+                            .SetProperty(x => x.Datetime, dto.Datetime)
+                            .SetProperty(x => x.Comment, dto.Comment), cancellationToken);
                     }
                 }
                 else
@@ -392,8 +402,12 @@ internal sealed class RelationRepository : AsyncEntityRepositoryBase<int, IRelat
             item.UpdatingEntity();
 
             RelationDto dto = RelationFactory.BuildDto(item);
-            db.Relations.Update(dto);
-            await db.SaveChangesAsync();
+            await db.Relations.Where(x => x.Id == dto.Id).ExecuteUpdateAsync(setter => setter
+                .SetProperty(x => x.ParentId, dto.ParentId)
+                .SetProperty(x => x.ChildId, dto.ChildId)
+                .SetProperty(x => x.RelationType, dto.RelationType)
+                .SetProperty(x => x.Datetime, dto.Datetime)
+                .SetProperty(x => x.Comment, dto.Comment));
 
             await PopulateObjectTypesAsync(db, [item], CancellationToken.None);
             item.ResetDirtyProperties();
