@@ -88,7 +88,7 @@ export class WebhookApiHelper {
     return webhookToken;
   }
 
-  async getWebhookSiteRequestResponse(webhookSiteToken: string, expectedContent?: string, timeoutMs: number = 15000, pollInterval: number = 1000) {
+  async getWebhookSiteRequestResponse(webhookSiteToken: string, timeoutMs: number = 15000, pollInterval: number = 1000, expectedContent?: string) {
     const requestUrl = this.webhookSiteUrl + 'token/' + webhookSiteToken + '/requests';
     const start = Date.now();
 

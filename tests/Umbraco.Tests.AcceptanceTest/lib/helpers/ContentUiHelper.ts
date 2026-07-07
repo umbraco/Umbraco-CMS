@@ -855,9 +855,10 @@ export class ContentUiHelper extends UiBaseLocators {
 
   async clickSaveAndPublishButtonAndWaitForContentToBePublished() {
     return await this.waitForResponseAfterExecutingPromise(
-      '/publish',
+      ConstantHelper.apiEndpoints.updateAndPublish,
       this.clickSaveAndPublishButton(),
       ConstantHelper.statusCodes.ok,
+      ConstantHelper.httpMethods.put,
     );
   }
 
@@ -875,9 +876,10 @@ export class ContentUiHelper extends UiBaseLocators {
 
   async clickContainerSaveAndPublishButtonAndWaitForContentToBePublished() {
     return await this.waitForResponseAfterExecutingPromise(
-      '/publish',
+      ConstantHelper.apiEndpoints.updateAndPublish,
       this.clickContainerSaveAndPublishButton(),
       ConstantHelper.statusCodes.ok,
+      ConstantHelper.httpMethods.put,
     );
   }
 
@@ -1556,6 +1558,11 @@ export class ContentUiHelper extends UiBaseLocators {
     const previousVersion = this.rollbackItem.filter({hasNotText: "Current published version"}).last();
     await this.click(previousVersion);
     await expect(previousVersion).toHaveClass(/active/);
+  }
+
+  /** @deprecated Prefer {@link clickPreviousRollBackItem}; kept for backwards compatibility. */
+  async clickLatestRollBackItem() {
+    await this.click(this.rollbackItem.last());
   }
 
   async waitForRollbackItems() {

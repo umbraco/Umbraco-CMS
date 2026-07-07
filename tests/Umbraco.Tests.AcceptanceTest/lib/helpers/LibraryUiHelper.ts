@@ -1138,6 +1138,11 @@ export class LibraryUiHelper extends UiBaseLocators {
     await expect(previousVersion).toHaveClass(/active/);
   }
 
+  /** @deprecated Prefer {@link clickPreviousRollBackItem}; kept for backwards compatibility. */
+  async clickLatestRollBackItem() {
+    await this.click(this.rollbackItem.last());
+  }
+
   async clickPublicAccessButton() {
     await this.click(this.publicAccessBtn);
   }

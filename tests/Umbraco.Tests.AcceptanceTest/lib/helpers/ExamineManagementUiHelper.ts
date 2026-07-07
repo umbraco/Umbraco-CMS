@@ -27,6 +27,11 @@ export class ExamineManagementUiHelper extends UiBaseLocators {
     await this.hasCount(this.indexerItems, count);
   }
 
+  /** @deprecated Prefer {@link doesIndexersHaveCount} (deterministic assertion); kept for backwards compatibility. */
+  checkIndexersCount() {
+    return this.indexerItems.count();
+  }
+
   async clickIndexByName(indexName: string) {
     await this.click(this.page.getByRole('link', {name: indexName}));
   }
