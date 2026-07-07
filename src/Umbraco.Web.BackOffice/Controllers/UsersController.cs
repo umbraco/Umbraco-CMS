@@ -673,7 +673,7 @@ public class UsersController : BackOfficeNotificationsController
         // This needs to be in the correct mailto format including the name, else
         // the name cannot be captured in the email sending notification.
         // i.e. "Some Person" <hello@example.com>
-        var toMailBoxAddress = new MailboxAddress(to?.Name, to?.Email);
+        var toMailBoxAddress = new MailboxAddress(to?.Name, to?.Email ?? string.Empty);
 
         var mailMessage = new EmailMessage(senderEmail, toMailBoxAddress.ToString(), emailSubject, emailBody, true);
 

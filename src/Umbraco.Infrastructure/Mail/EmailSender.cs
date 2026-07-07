@@ -152,10 +152,15 @@ public class EmailSender : IEmailSender
             while (true);
         }
 
+        if (string.IsNullOrWhiteSpace(_globalSettings.Smtp!.Host))
+        {
+            throw new InvalidOperationException("Cannot send email over SMTP: no host is configured.");
+        }
+
         using var client = new SmtpClient();
 
         await client.ConnectAsync(
-            _globalSettings.Smtp!.Host,
+            _globalSettings.Smtp.Host,
             _globalSettings.Smtp.Port,
             (SecureSocketOptions)(int)_globalSettings.Smtp.SecureSocketOptions);
 
