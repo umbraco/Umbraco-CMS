@@ -131,9 +131,9 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
             }
         }
 
-        IEnumerable<IBlockLayoutItem> allExternalLayoutItems = blockValue.Layout.Values
-            .SelectMany(layouts => layouts)
-            .Union(blockValue.Layout.Values.SelectMany(layouts => layouts.SelectMany(l => l.GetContainedLayouts())))
+        var topLevelLayoutItems = blockValue.Layout.Values.SelectMany(layouts => layouts).ToArray();
+        IEnumerable<IBlockLayoutItem> allExternalLayoutItems = topLevelLayoutItems
+            .Union(topLevelLayoutItems.SelectMany(l => l.GetContainedLayouts()))
             .Where(l => l.IsExternalContent);
 
         foreach (IBlockLayoutItem layout in allExternalLayoutItems)

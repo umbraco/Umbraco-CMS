@@ -128,7 +128,7 @@ internal abstract class BlockValuePropertyIndexValueFactoryBase<TSerialized> : J
         // External element content is only flattened into the published value set (the external index); the draft
         // value set (the internal/back-office index) excludes it, so shared element content is not searchable there.
         Dictionary<Guid, RawDataItem>? externalDataByKey = _indexingSettings.CurrentValue.IndexExternalBlockElements && published
-            ? GetExternalElementDataItems(allLayouts, published)
+            ? GetExternalElementDataItems(allLayouts)
             : null;
         foreach (IBlockLayoutItem layout in allLayouts)
         {
@@ -176,7 +176,9 @@ internal abstract class BlockValuePropertyIndexValueFactoryBase<TSerialized> : J
         }
     }
 
-    private Dictionary<Guid, RawDataItem> GetExternalElementDataItems(IBlockLayoutItem[] allLayouts, bool published)
+    // External element content is only ever flattened into the published value set (see the caller), so this always
+    // takes the published value.
+    private Dictionary<Guid, RawDataItem> GetExternalElementDataItems(IBlockLayoutItem[] allLayouts)
     {
         Guid[] externalKeys = allLayouts.Where(l => l.IsExternalContent).Select(l => l.ContentKey).ToArray();
         return _elementService.GetByIds(externalKeys)
@@ -195,9 +197,7 @@ internal abstract class BlockValuePropertyIndexValueFactoryBase<TSerialized> : J
                             {
                                 Alias = property.Alias,
                                 Culture = value.Culture,
-                                Value = published
-                                    ? value.PublishedValue
-                                    : value.EditedValue,
+                                Value = value.PublishedValue,
                             }))
                         .ToArray(),
                 });
