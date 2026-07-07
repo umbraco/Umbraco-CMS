@@ -37,14 +37,45 @@ export default {
 - **Group**: camelCase feature name (e.g., `actions`, `general`, `content`, `media`, `user`)
 - **Term**: camelCase descriptive name (e.g., `assignDomain`, `auditTrail`, `browse`)
 - **Full key** used in code: `group_termName` (underscore separator)
-- Add to an **existing group** when the text belongs to that feature area
-- Create a **new group** only for new feature areas
+
+#### Choosing a group
+
+A group should cover a reasonable **scope of usage**, not just the one component you're currently editing. Before naming a group, ask: "where else in the backoffice does this same UX pattern show up?" If several features share the same UX, they should share the same group — otherwise the same kind of text ends up duplicated (and inconsistently worded) across `myFeatureA` and `myFeatureB`.
+
+Examples already in this codebase:
+
+- `blockEditor` — shared by Block List, Block Grid, and Block RTE, because they share the same block-configuration and editing UX
+- `contentTypeEditor` — shared by Document Type, Media Type, and Member Type editing
+- `codeEditor` — shared by anything embedding the code editor
+
+Check whether an existing group already covers the UX area before creating a new one. Only introduce a new group when the text belongs to a feature area with no existing overlap.
+
+#### Choosing a term
+
+A term describes the **situation the text is used in** — not the wording of the text itself. Two situations that happen to use identical English wording today should still get two separate terms, since the copy for one may change independently of the other later.
+
+Build the term from two parts:
+
+1. **How it's presented** — the UI role the text plays: `Title`, `Description`, `Action`, `Label`, `Notice`, `Message`, `ValidationMessage`, `Headline`, etc.
+2. **What it represents** — a short name for the subject or situation: `CreateBlock`, `ConfirmDelete`, `AddGroup`.
+
+Combined, in either order depending on what reads best: `createAction`, `confirmDeleteTitle`, `addGroupDescription`.
+
+This matters most when several terms belong to the same moment in the UI. Take the `blockEditor` group's "delete a block group" confirmation:
+
+```typescript
+confirmDeleteBlockGroupTitle: 'Delete group?',
+confirmDeleteBlockGroupMessage: 'Are you sure you want to delete group <strong>%0%</strong>?',
+confirmDeleteBlockGroupNotice: 'The content of these Blocks will still be present, editing of this content will no longer be available and will be shown as unsupported content.',
+```
+
+Same subject (`confirmDeleteBlockGroup`), three presentation roles (`Title`, `Message`, `Notice`). Naming them this way keeps every piece of that one dialog grouped together, and makes it obvious they belong to the same situation even though the wording has nothing in common.
 
 ### Value types
 
-| Type | Use when | Example |
-|------|----------|---------|
-| `string` | Static text | `myLabel: 'My Label'` |
+| Type               | Use when                 | Example                                           |
+| ------------------ | ------------------------ | ------------------------------------------------- |
+| `string`           | Static text              | `myLabel: 'My Label'`                             |
 | `(args) => string` | Text with dynamic values | `createFor: (name: string) => \`Create ${name}\`` |
 
 ## Step 2: Use the localized text
@@ -60,9 +91,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 @customElement('umb-my-element')
 export class UmbMyElement extends UmbLitElement {
 	override render() {
-		return html`
-			<uui-button label=${this.localize.term('myFeature_myLabel')}></uui-button>
-		`;
+		return html` <uui-button label=${this.localize.term('myFeature_myLabel')}></uui-button> `;
 	}
 }
 ```
