@@ -18,12 +18,12 @@ public class ConfigurationEnabledDirectoryFactory : DirectoryFactoryBase
 {
     private readonly IApplicationRoot _applicationRoot;
     private readonly IServiceProvider _services;
-    private readonly IndexCreatorSettings _settings;
+    private readonly ExamineSearchProviderSettings _settings;
     private IDirectoryFactory? _directoryFactory;
 
     public ConfigurationEnabledDirectoryFactory(
         IServiceProvider services,
-        IOptions<IndexCreatorSettings> settings,
+        IOptions<ExamineSearchProviderSettings> settings,
         IApplicationRoot applicationRoot)
     {
         _services = services;

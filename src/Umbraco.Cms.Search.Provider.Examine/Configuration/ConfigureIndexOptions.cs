@@ -11,12 +11,12 @@ namespace Umbraco.Cms.Search.Provider.Examine.Configuration;
 
 internal sealed class ConfigureIndexOptions : IConfigureNamedOptions<LuceneDirectoryIndexOptions>
 {
-    private readonly IndexCreatorSettings _indexCreatorSettings;
+    private readonly ExamineSearchProviderSettings _examineSearchProviderSettings;
     private readonly FieldOptions _fieldOptions;
 
-    public ConfigureIndexOptions(IOptions<FieldOptions> options, IOptions<IndexCreatorSettings> settings)
+    public ConfigureIndexOptions(IOptions<FieldOptions> options, IOptions<ExamineSearchProviderSettings> settings)
     {
-        _indexCreatorSettings = settings.Value;
+        _examineSearchProviderSettings = settings.Value;
         _fieldOptions = options.Value;
     }
 
@@ -34,7 +34,7 @@ internal sealed class ConfigureIndexOptions : IConfigureNamedOptions<LuceneDirec
         AddFields(options, CoreSystemFieldsOptions(), (field, fieldValues) => FieldNameHelper.FieldName(field.PropertyName, fieldValues));
         AddFields(options, _fieldOptions.Fields, (field, fieldValues) => FieldNameHelper.FieldName(field.PropertyName, fieldValues));
 
-        if (_indexCreatorSettings.LuceneDirectoryFactory == LuceneDirectoryFactory.SyncedTempFileSystemDirectoryFactory)
+        if (_examineSearchProviderSettings.LuceneDirectoryFactory == LuceneDirectoryFactory.SyncedTempFileSystemDirectoryFactory)
         {
             // if this directory factory is enabled then a snapshot deletion policy is required
             options.IndexDeletionPolicy = new SnapshotDeletionPolicy(new KeepOnlyLastCommitDeletionPolicy());

@@ -36,8 +36,6 @@ internal sealed class UmbracoCmsSchema
 
         public required ImagingSettings Imaging { get; set; }
 
-        public required IndexCreatorSettings Examine { get; set; }
-
         public required IndexingSettings Indexing { get; set; }
 
         public required LoggingSettings Logging { get; set; }

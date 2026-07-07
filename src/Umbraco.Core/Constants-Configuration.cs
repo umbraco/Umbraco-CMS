@@ -151,11 +151,6 @@ public static partial class Constants
         public const string ConfigImaging = ConfigPrefix + "Imaging";
 
         /// <summary>
-        ///     The configuration key for Examine search settings.
-        /// </summary>
-        public const string ConfigExamine = ConfigPrefix + "Examine";
-
-        /// <summary>
         ///     The configuration key for indexing settings.
         /// </summary>
         public const string ConfigIndexing = ConfigPrefix + "Indexing";
