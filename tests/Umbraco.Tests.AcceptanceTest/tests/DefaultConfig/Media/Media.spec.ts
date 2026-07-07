@@ -333,7 +333,7 @@ test('can move a media item to a folder', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.media.clickMoveToActionMenuOption();
   await umbracoUi.media.openCaretButtonForName('Media', true);
   await umbracoUi.media.clickModalTextByName(folderName);
-  await umbracoUi.media.clickChooseModalButtonAndWaitForMediaItemsToBeMoved([mediaFileId]);
+  await umbracoUi.media.clickChooseModalButtonAndWaitForMediaWithIdsToBeMoved([mediaFileId]);
 
   // Assert
   await umbracoUi.media.doesSuccessNotificationHaveText(NotificationConstantHelper.success.moved);

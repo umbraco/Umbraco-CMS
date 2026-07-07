@@ -129,7 +129,7 @@ test('can allow bulk move in the media section', async ({umbracoApi, umbracoUi})
   await umbracoUi.media.clickBulkMoveToButton();
   await umbracoUi.media.openCaretButtonForName('Media', true);
   await umbracoUi.media.clickModalTextByName(mediaFolderName);
-  await umbracoUi.media.clickChooseModalButtonAndWaitForMediaItemsToBeMoved([firstMediaFileId, secondMediaFileId]);
+  await umbracoUi.media.clickChooseModalButtonAndWaitForMediaWithIdsToBeMoved([firstMediaFileId, secondMediaFileId]);
 
   // Assert
   expect(await umbracoApi.media.doesMediaItemHaveChildName(mediaFolderId, firstMediaFileName)).toBeTruthy();
