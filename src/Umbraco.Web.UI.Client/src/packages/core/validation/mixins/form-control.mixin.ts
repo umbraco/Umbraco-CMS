@@ -152,7 +152,7 @@ export function UmbFormControlMixin<
 		private _pristine: boolean = true;
 
 		#value: ValueType | DefaultValueType = defaultValue as unknown as DefaultValueType;
-		#valueOnFocus: ValueType | DefaultValueType = undefined as unknown as DefaultValueType;
+		#valueOnFocus: ValueType | DefaultValueType | undefined = undefined;
 		// A state to capture late edits to the value after focus has been lost, so we can trigger validation for late value changes. [NL]
 		#hadFocus?: boolean;
 
@@ -167,6 +167,7 @@ export function UmbFormControlMixin<
 
 			this.addEventListener('focus', () => {
 				this.#valueOnFocus = this.value;
+				this.#hadFocus = false;
 			});
 			this.addEventListener('blur', () => {
 				if (this.pristine) {
@@ -175,7 +176,7 @@ export function UmbFormControlMixin<
 						this.checkValidity();
 					}
 				}
-				this.#valueOnFocus = undefined as unknown as ValueType | DefaultValueType;
+				this.#valueOnFocus = undefined;
 			});
 		}
 
@@ -416,7 +417,9 @@ export function UmbFormControlMixin<
 		}
 		public formResetCallback() {
 			this.pristine = true;
+			this.#hadFocus = false;
 			this.value = this.getInitialValue() ?? this.getDefaultValue();
+			this.#valueOnFocus = undefined;
 		}
 
 		protected getDefaultValue(): DefaultValueType {
