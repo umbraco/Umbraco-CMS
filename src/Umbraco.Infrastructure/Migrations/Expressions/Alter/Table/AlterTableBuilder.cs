@@ -271,8 +271,6 @@ public class AlterTableBuilder : ExpressionBuilderBase<AlterTableExpression, IAl
     /// <summary>
     /// Creates a foreign key constraint from the current table to the specified primary table and column.
     /// </summary>
-    /// <param name="primaryTableName">The name of the primary (referenced) table.</param>
-    /// <param name="primaryColumnName">The name of the primary (referenced) column.</param>
     /// <returns>An object to configure cascade options for the foreign key constraint.</returns>
     public IAlterTableColumnOptionForeignKeyCascadeBuilder ForeignKey()
     {
