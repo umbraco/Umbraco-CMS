@@ -2597,8 +2597,9 @@ public class ContentService : RepositoryService, IContentService
             : null;
 
     // Builds the culture map carried on the content notifications, keyed by content Key. Change tracking on the
-    // entity is reset once persisted, so the affected cultures have to be captured here at raise-time. Returns null
-    // when there are no cultures to report so consumers can treat "unknown" and "none" alike.
+    // entity is reset once persisted, so the affected cultures have to be captured here at raise-time. The cultures
+    // are snapshotted (never a live view of the entity's own collections). Returns null when there are no cultures
+    // to report so consumers can treat "unknown" and "none" alike.
     private static IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? BuildCultureMap(IContent content, IEnumerable<string>? cultures)
     {
         if (cultures is null)
@@ -2606,8 +2607,8 @@ public class ContentService : RepositoryService, IContentService
             return null;
         }
 
-        IReadOnlyCollection<string> cultureList = cultures as IReadOnlyCollection<string> ?? cultures.ToArray();
-        return cultureList.Count == 0
+        string[] cultureList = cultures.ToArray();
+        return cultureList.Length == 0
             ? null
             : new Dictionary<Guid, IReadOnlyCollection<string>> { [content.Key] = cultureList };
     }
