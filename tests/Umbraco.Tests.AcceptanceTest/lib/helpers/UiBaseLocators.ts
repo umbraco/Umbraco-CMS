@@ -354,14 +354,14 @@ export class UiBaseLocators extends BasePage {
     // Document Type & Property Editor
     this.documentTypeNode = page.locator("uui-ref-node-document-type");
     this.propertyNameTxt = page
-      .getByTestId("input:entity-name")
+      .getByTestId("input:propertytype-name")
       .locator("#input")
       .first();
     this.selectPropertyEditorBtn = page.getByLabel("Select Property Editor");
     this.editorSettingsBtn = page.getByLabel("Editor settings");
     this.enterPropertyEditorDescriptionTxt = page
       .locator("uui-modal-sidebar")
-      .getByTestId("input:entity-description")
+      .getByTestId("input:propertytype-description")
       .locator("#textarea");
     this.propertyEditorChangeBtn = page.locator('[label="Property editor"]').getByLabel('Change');
     this.property = page.locator("umb-property");
@@ -1069,9 +1069,7 @@ export class UiBaseLocators extends BasePage {
 
   async goToSettingsTreeItem(settingsTreeItemName: string) {
     await this.goToSection(ConstantHelper.sections.settings);
-    await this.click(
-      this.page.getByLabel(settingsTreeItemName, { exact: true }),
-    );
+    await this.clickTreeItemWithName(settingsTreeItemName);
   }
 
   async goToWorkspacePath(path: string) {
@@ -1116,6 +1114,14 @@ export class UiBaseLocators extends BasePage {
     await this.click(this.page.getByLabel(name, { exact: isExact }), {
       force: toForce,
     });
+  }
+
+  // Clicks a tree item by its visible label text, like the content/media tree helpers do. We target the
+  // rendered text rather than the menu item's accessible name (its <a> lives in uui-menu-item's shadow), so
+  // the click keeps working regardless of how the tree item renders its label HTML. Scope defaults to the
+  // section sidebar; pass a modal/other root for trees rendered elsewhere (e.g. pickers).
+  async clickTreeItemWithName(name: string, scope?: Locator | Page) {
+    await this.click((scope ?? this.sectionSidebar).getByText(name, { exact: true }));
   }
 
   async clickButtonWithName(name: string, isExact: boolean = false) {
@@ -1488,7 +1494,7 @@ export class UiBaseLocators extends BasePage {
     await this.clickInsertButton();
     await this.click(this.insertDictionaryItemBtn);
     await this.clickSubmitButton();
-    await this.click(this.page.getByLabel(dictionaryName));
+    await this.clickTreeItemWithName(dictionaryName, this.page);
     await this.click(this.chooseBtn);
   }
 
@@ -1507,7 +1513,7 @@ export class UiBaseLocators extends BasePage {
     await this.clickInsertButton();
     await this.click(this.insertPartialViewBtn);
     await this.clickSubmitButton();
-    await this.click(this.page.getByLabel(partialViewName));
+    await this.clickTreeItemWithName(partialViewName, this.page);
     await this.clickChooseButton();
   }
 

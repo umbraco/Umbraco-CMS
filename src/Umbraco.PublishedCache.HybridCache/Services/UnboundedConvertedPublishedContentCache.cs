@@ -4,38 +4,26 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 namespace Umbraco.Cms.Infrastructure.HybridCache.Services;
 
 /// <summary>
-///     Encapsulates the in-process (L0) cache of converted <see cref="IPublishedElement" /> behind a single
-///     insert/remove/clear path, tracking both the entry count and an approximate retained byte total.
+///     The unbounded (historical) L0 converted-content cache: a plain <see cref="ConcurrentDictionary{TKey,TValue}" />
+///     that only ever evicts on content change or explicit clear. Walking the whole published tree (Delivery API
+///     crawl, sitemap, warm-up) therefore retains the whole tree's converted form.
 /// </summary>
-/// <remarks>
-///     Routing every mutation through this one type keeps the byte total consistent by construction —
-///     there is exactly one place that adds on insert and subtracts on remove/clear. The byte total is an
-///     <em>approximation</em> (the per-entry size is supplied by the caller and the running total is updated
-///     without locking the whole structure), suitable for diagnostics, not exact accounting.
-///     This is also the seam the later bounded/eviction-aware implementation slots into.
-/// </remarks>
 /// <typeparam name="TKey">The cache key type.</typeparam>
 /// <typeparam name="TValue">The cached converted type.</typeparam>
-internal sealed class ConvertedPublishedContentCache<TKey, TValue>
+internal sealed class UnboundedConvertedPublishedContentCache<TKey, TValue> : IConvertedPublishedContentCache<TKey, TValue>
     where TKey : notnull
     where TValue : class, IPublishedElement
 {
     private readonly ConcurrentDictionary<TKey, CacheEntry> _cache = new();
     private long _approximateSizeInBytes;
 
-    /// <summary>
-    ///     Gets the number of entries currently held.
-    /// </summary>
+    /// <inheritdoc />
     public long Count => _cache.Count;
 
-    /// <summary>
-    ///     Gets the approximate retained size, in bytes, of the cached entries.
-    /// </summary>
-    public long ApproximateSizeInBytes => Interlocked.Read(ref _approximateSizeInBytes);
+    /// <inheritdoc />
+    public long ApproximateSizeInBytes => Math.Max(0, Interlocked.Read(ref _approximateSizeInBytes));
 
-    /// <summary>
-    ///     Attempts to get a cached converted content item.
-    /// </summary>
+    /// <inheritdoc />
     public bool TryGet(TKey key, out TValue? content)
     {
         if (_cache.TryGetValue(key, out CacheEntry entry))
@@ -48,10 +36,7 @@ internal sealed class ConvertedPublishedContentCache<TKey, TValue>
         return false;
     }
 
-    /// <summary>
-    ///     Adds or replaces a cached converted content item, adjusting the running byte total by the supplied
-    ///     per-entry size estimate.
-    /// </summary>
+    /// <inheritdoc />
     public void Set(TKey key, TValue content, long approximateSizeInBytes)
     {
         var entry = new CacheEntry(content, approximateSizeInBytes);
@@ -69,9 +54,7 @@ internal sealed class ConvertedPublishedContentCache<TKey, TValue>
         Interlocked.Add(ref _approximateSizeInBytes, delta);
     }
 
-    /// <summary>
-    ///     Removes a cached entry, subtracting its size from the running total.
-    /// </summary>
+    /// <inheritdoc />
     public bool Remove(TKey key)
     {
         if (_cache.TryRemove(key, out CacheEntry entry))
@@ -83,23 +66,19 @@ internal sealed class ConvertedPublishedContentCache<TKey, TValue>
         return false;
     }
 
-    /// <summary>
-    ///     Removes every entry whose content matches the predicate, subtracting their sizes from the total.
-    /// </summary>
+    /// <inheritdoc />
     public void RemoveWhere(Func<TValue, bool> predicate)
     {
-        foreach (KeyValuePair<TKey, CacheEntry> kvp in _cache)
+        foreach (KeyValuePair<TKey, CacheEntry> entry in _cache)
         {
-            if (predicate(kvp.Value.Content) && _cache.TryRemove(kvp.Key, out CacheEntry removed))
+            if (predicate(entry.Value.Content) && _cache.TryRemove(entry.Key, out CacheEntry removed))
             {
                 Interlocked.Add(ref _approximateSizeInBytes, -removed.Size);
             }
         }
     }
 
-    /// <summary>
-    ///     Removes all entries and resets the running byte total.
-    /// </summary>
+    /// <inheritdoc />
     public void Clear()
     {
         _cache.Clear();

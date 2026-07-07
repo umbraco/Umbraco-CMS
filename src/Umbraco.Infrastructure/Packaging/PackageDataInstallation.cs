@@ -2,9 +2,11 @@ using System.Globalization;
 using System.Net;
 using System.Xml.Linq;
 using System.Xml.XPath;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Collections;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.FileSystem;
@@ -52,10 +54,39 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         private readonly IContentTypeService _contentTypeService;
         private readonly IContentService _contentService;
         private readonly IMemberTypeService _memberTypeService;
+        private readonly IElementService _elementService;
+        private readonly IElementContainerService _elementContainerService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PackageDataInstallation"/> class.
         /// </summary>
+        /// <param name="dataValueEditorFactory">The data value editor factory.</param>
+        /// <param name="logger">The logger.</param>
+        /// <param name="partialViewService">The partial view service.</param>
+        /// <param name="partialViewFolderService">The partial view folder service.</param>
+        /// <param name="languageService">The language service.</param>
+        /// <param name="dictionaryItemService">The dictionary item service.</param>
+        /// <param name="userIdKeyResolver">The user ID key resolver.</param>
+        /// <param name="dataTypeService">The data type service.</param>
+        /// <param name="entityService">The entity service.</param>
+        /// <param name="contentTypeService">The content type service.</param>
+        /// <param name="contentService">The content service.</param>
+        /// <param name="propertyEditors">The collection of property editors.</param>
+        /// <param name="scopeProvider">The scope provider.</param>
+        /// <param name="shortStringHelper">The short string helper.</param>
+        /// <param name="serializer">The configuration editor JSON serializer.</param>
+        /// <param name="mediaService">The media service.</param>
+        /// <param name="mediaTypeService">The media type service.</param>
+        /// <param name="templateContentParserService">The template content parser service.</param>
+        /// <param name="templateService">The template service.</param>
+        /// <param name="stylesheetService">The stylesheet service.</param>
+        /// <param name="stylesheetFolderService">The stylesheet folder service.</param>
+        /// <param name="scriptService">The script service.</param>
+        /// <param name="scriptFolderService">The script folder service.</param>
+        /// <param name="memberTypeService">The member type service.</param>
+        /// <param name="dataTypeContainerService">The data type container service for resolving data type folders.</param>
+        /// <param name="elementService">The element service for installing element instances.</param>
+        /// <param name="elementContainerService">The element container service for managing element folders.</param>
         public PackageDataInstallation(
             IDataValueEditorFactory dataValueEditorFactory,
             ILogger<PackageDataInstallation> logger,
@@ -81,7 +112,9 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             IScriptService scriptService,
             IScriptFolderService scriptFolderService,
             IMemberTypeService memberTypeService,
-            IDataTypeContainerService dataTypeContainerService)
+            IDataTypeContainerService dataTypeContainerService,
+            IElementService elementService,
+            IElementContainerService elementContainerService)
         {
             _dataValueEditorFactory = dataValueEditorFactory;
             _logger = logger;
@@ -108,6 +141,94 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             _memberTypeService = memberTypeService;
             _dataTypeContainerService = dataTypeContainerService;
             _userIdKeyResolver = userIdKeyResolver;
+            _elementService = elementService;
+            _elementContainerService = elementContainerService;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PackageDataInstallation"/> class.
+        /// </summary>
+        /// <param name="dataValueEditorFactory">The data value editor factory.</param>
+        /// <param name="logger">The logger.</param>
+        /// <param name="partialViewService">The partial view service.</param>
+        /// <param name="partialViewFolderService">The partial view folder service.</param>
+        /// <param name="languageService">The language service.</param>
+        /// <param name="dictionaryItemService">The dictionary item service.</param>
+        /// <param name="userIdKeyResolver">The user ID key resolver.</param>
+        /// <param name="dataTypeService">The data type service.</param>
+        /// <param name="entityService">The entity service.</param>
+        /// <param name="contentTypeService">The content type service.</param>
+        /// <param name="contentService">The content service.</param>
+        /// <param name="propertyEditors">The collection of property editors.</param>
+        /// <param name="scopeProvider">The scope provider.</param>
+        /// <param name="shortStringHelper">The short string helper.</param>
+        /// <param name="serializer">The configuration editor JSON serializer.</param>
+        /// <param name="mediaService">The media service.</param>
+        /// <param name="mediaTypeService">The media type service.</param>
+        /// <param name="templateContentParserService">The template content parser service.</param>
+        /// <param name="templateService">The template service.</param>
+        /// <param name="stylesheetService">The stylesheet service.</param>
+        /// <param name="stylesheetFolderService">The stylesheet folder service.</param>
+        /// <param name="scriptService">The script service.</param>
+        /// <param name="scriptFolderService">The script folder service.</param>
+        /// <param name="memberTypeService">The member type service.</param>
+        /// <param name="dataTypeContainerService">The data type container service.</param>
+        [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 20.")]
+        public PackageDataInstallation(
+            IDataValueEditorFactory dataValueEditorFactory,
+            ILogger<PackageDataInstallation> logger,
+            IPartialViewService partialViewService,
+            IPartialViewFolderService partialViewFolderService,
+            ILanguageService languageService,
+            IDictionaryItemService dictionaryItemService,
+            IUserIdKeyResolver userIdKeyResolver,
+            IDataTypeService dataTypeService,
+            IEntityService entityService,
+            IContentTypeService contentTypeService,
+            IContentService contentService,
+            PropertyEditorCollection propertyEditors,
+            IScopeProvider scopeProvider,
+            IShortStringHelper shortStringHelper,
+            IConfigurationEditorJsonSerializer serializer,
+            IMediaService mediaService,
+            IMediaTypeService mediaTypeService,
+            ITemplateContentParserService templateContentParserService,
+            ITemplateService templateService,
+            IStylesheetService stylesheetService,
+            IStylesheetFolderService stylesheetFolderService,
+            IScriptService scriptService,
+            IScriptFolderService scriptFolderService,
+            IMemberTypeService memberTypeService,
+            IDataTypeContainerService dataTypeContainerService)
+            : this(
+                dataValueEditorFactory,
+                logger,
+                partialViewService,
+                partialViewFolderService,
+                languageService,
+                dictionaryItemService,
+                userIdKeyResolver,
+                dataTypeService,
+                entityService,
+                contentTypeService,
+                contentService,
+                propertyEditors,
+                scopeProvider,
+                shortStringHelper,
+                serializer,
+                mediaService,
+                mediaTypeService,
+                templateContentParserService,
+                templateService,
+                stylesheetService,
+                stylesheetFolderService,
+                scriptService,
+                scriptFolderService,
+                memberTypeService,
+                dataTypeContainerService,
+                StaticServiceProvider.Instance.GetRequiredService<IElementService>(),
+                StaticServiceProvider.Instance.GetRequiredService<IElementContainerService>())
+        {
         }
 
         #region Install/Uninstall
@@ -172,6 +293,12 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                     userId,
                     _mediaTypeService,
                     _mediaService);
+
+                // Element types live in the DocumentTypes section, so reuse the already-imported document types.
+                (IReadOnlyList<IElement> importedElements, IEnumerable<EntityContainer> elementEntityContainersInstalled) =
+                    ImportElementsAsync(compiledPackage.Elements, importedDocTypes, userId).GetAwaiter().GetResult();
+                installationSummary.ElementsInstalled = importedElements;
+                entityContainersInstalled.AddRange(elementEntityContainersInstalled);
 
                 scope.Complete();
 
@@ -513,6 +640,15 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         {
             switch (contentType)
             {
+                case IContentType c when typeof(IElement).IsAssignableFrom(typeof(TContentBase)):
+                    var element = new Element(name, parentId, c)
+                    {
+                        Key = key,
+                        Level = level,
+                        SortOrder = sortOrder,
+                    };
+                    return element as TContentBase;
+
                 case IContentType c:
                     if (parent is null)
                     {
@@ -562,6 +698,148 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 default:
                     throw new NotSupportedException($"Type {typeof(TContentTypeComposition)} is not supported");
             }
+        }
+
+        #endregion
+
+        #region Elements
+
+        private async Task<(IReadOnlyList<IElement> Elements, IEnumerable<EntityContainer> ContainersInstalled)>
+            ImportElementsAsync(
+                IEnumerable<CompiledPackageContentBase> elementSets,
+                IDictionary<string, IContentType> importedDocumentTypes,
+                int userId)
+        {
+            // Each ElementSet wraps a single element root (flagged with isDoc=""); elements never nest.
+            var roots = elementSets
+                .SelectMany(x => x.XmlData.Elements()
+                    .Where(e => (string?)e.Attribute("isDoc") == string.Empty))
+                .ToList();
+
+            (Dictionary<Guid, int> elementParentIds, IEnumerable<EntityContainer> containersInstalled) =
+                await CreateElementFolderStructureAsync(roots);
+
+            var installed = new List<IElement>();
+            foreach (IGrouping<int, XElement> group in roots
+                         .GroupBy(root => GetElementParentId(root, elementParentIds)))
+            {
+                installed.AddRange(
+                    ImportContentBase(
+                        group.AsEnumerable(),
+                        group.Key,
+                        importedDocumentTypes,
+                        userId,
+                        _contentTypeService,
+                        _elementService));
+            }
+
+            return (installed, containersInstalled);
+        }
+
+        private async Task<(Dictionary<Guid, int> ElementParentIds, IEnumerable<EntityContainer> ContainersInstalled)>
+            CreateElementFolderStructureAsync(IEnumerable<XElement> elements)
+        {
+            var elementParentIds = new Dictionary<Guid, int>();
+            var trackEntityContainersInstalled = new List<EntityContainer>();
+
+            foreach (XElement element in elements)
+            {
+                await ProcessElementFolderAsync(element, elementParentIds, trackEntityContainersInstalled);
+            }
+
+            return (elementParentIds, trackEntityContainersInstalled);
+        }
+
+        private async Task ProcessElementFolderAsync(
+            XElement element,
+            Dictionary<Guid, int> elementParentIds,
+            List<EntityContainer> trackEntityContainersInstalled)
+        {
+            if (Guid.TryParse(element.Attribute("key")?.Value, out Guid elementKey) is false)
+            {
+                return;
+            }
+
+            var folderNames = element.Attribute("Folders")?.Value
+                .Split(Constants.CharArrays.ForwardSlash) ?? [];
+            if (folderNames.Length == 0)
+            {
+                return;
+            }
+
+            Guid[] folderKeys = element.Attribute("FolderKeys")?.Value
+                .Split(Constants.CharArrays.ForwardSlash)
+                .Select(s => Guid.TryParse(s, out Guid g) ? g : Guid.NewGuid())
+                .ToArray() ?? [];
+
+            EntityContainer? current = null;
+            for (var i = 0; i < folderNames.Length; i++)
+            {
+                var folderName = WebUtility.UrlDecode(folderNames[i]);
+                Guid folderKey = folderKeys.Length > i ? folderKeys[i] : Guid.NewGuid();
+                current = await CreateOrGetElementFolderAsync(folderName, folderKey, current, trackEntityContainersInstalled);
+            }
+
+            elementParentIds[elementKey] = current!.Id;
+        }
+
+        private async Task<EntityContainer?> CreateOrGetElementFolderAsync(
+            string folderName,
+            Guid folderKey,
+            EntityContainer? parent,
+            List<EntityContainer> trackEntityContainersInstalled)
+        {
+            EntityContainer? existing;
+            if (parent is null)
+            {
+                // Match by key first (more reliable when folders have been renamed in the destination), then by name.
+                // Level 1 = root level folders, there can only be one with the same name.
+                existing = await _elementContainerService.GetAsync(folderKey)
+                           ?? (await _elementContainerService.GetAsync(folderName, 1)).FirstOrDefault();
+            }
+            else
+            {
+                // Match among children by key first (more reliable when folders have been renamed), then by name.
+                // Filter to containers only — GetChildren also returns element instances stored in the folder.
+                IEntitySlim[] children = _entityService.GetChildren(parent.Id)
+                    .Where(x => x.NodeObjectType == Constants.ObjectTypes.ElementContainer)
+                    .ToArray();
+                IEntitySlim? matchingChild = children.FirstOrDefault(x => x.Key == folderKey)
+                                             ?? children.FirstOrDefault(x => x.Name.InvariantEquals(folderName));
+                existing = matchingChild is not null
+                    ? await _elementContainerService.GetAsync(matchingChild.Key)
+                    : null;
+            }
+
+            if (existing is not null)
+            {
+                return existing;
+            }
+
+            Attempt<EntityContainer?, EntityContainerOperationStatus> tryCreateFolder =
+                await _elementContainerService.CreateAsync(folderKey, folderName, parent?.Key, Constants.Security.SuperUserKey);
+            if (tryCreateFolder.Success is false)
+            {
+                _logger.LogError(
+                    "Could not create element folder: {FolderName}. Status: {Status}",
+                    folderName,
+                    tryCreateFolder.Status);
+                throw new InvalidOperationException($"Could not create element folder '{folderName}'. Status: {tryCreateFolder.Status}");
+            }
+
+            trackEntityContainersInstalled.Add(tryCreateFolder.Result!);
+            return tryCreateFolder.Result;
+        }
+
+        private static int GetElementParentId(XElement element, Dictionary<Guid, int> elementParentIds)
+        {
+            if (Guid.TryParse(element.Attribute("key")?.Value, out Guid key)
+                && elementParentIds.TryGetValue(key, out var containerId))
+            {
+                return containerId;
+            }
+
+            return Constants.System.Root;
         }
 
         #endregion
@@ -988,6 +1266,12 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             if (isElement != null)
             {
                 contentType.IsElement = isElement.Value.InvariantEquals("true");
+            }
+
+            XElement? allowedInLibrary = infoElement.Element("AllowedInLibrary");
+            if (allowedInLibrary != null)
+            {
+                contentType.AllowedInLibrary = allowedInLibrary.Value.InvariantEquals("true");
             }
 
             XElement? variationsElement = infoElement.Element("Variations");

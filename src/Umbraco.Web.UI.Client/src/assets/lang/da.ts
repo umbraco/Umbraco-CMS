@@ -2066,6 +2066,13 @@ export default {
 		advancedGroup: 'Avanceret',
 		webhooks: 'Webhooks',
 	},
+	tree: {
+		classicViewLabel: 'Træ',
+		cardViewLabel: 'Kort',
+		tableViewLabel: 'Tabel',
+		children: 'Underelementer',
+		noItems: 'Ingen elementer',
+	},
 	update: {
 		updateAvailable: 'Ny opdatering er klar',
 		updateDownloadText: '%0% er klar, klik her for at downloade',
