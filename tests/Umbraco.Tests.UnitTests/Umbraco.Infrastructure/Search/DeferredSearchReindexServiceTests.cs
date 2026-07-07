@@ -69,13 +69,13 @@ public class DeferredSearchReindexServiceTests
     [TearDown]
     public void TearDown() => _service.Dispose();
 
-    private DeferredSearchReindexService CreateService(CancellationToken shutdownToken = default)
+    private DeferredSearchReindexService CreateService(CancellationToken shutdownToken = default, bool indexExternalBlockElements = false)
     {
         var lifetime = new Mock<IHostApplicationLifetime>();
         lifetime.Setup(x => x.ApplicationStopping).Returns(shutdownToken);
 
         var indexingSettings = new Mock<IOptionsMonitor<IndexingSettings>>();
-        indexingSettings.Setup(x => x.CurrentValue).Returns(new IndexingSettings { BatchSize = 100 });
+        indexingSettings.Setup(x => x.CurrentValue).Returns(new IndexingSettings { BatchSize = 100, IndexExternalBlockElements = indexExternalBlockElements });
 
         return new DeferredSearchReindexService(
             _documentRepository.Object,
@@ -473,6 +473,36 @@ public class DeferredSearchReindexServiceTests
         var documentIds = _service.FindDocumentIdsReferencingElements([2]);
 
         CollectionAssert.AreEquivalent(new[] { 100 }, documentIds);
+    }
+
+    /// <summary>
+    ///     Verifies that when external block element indexing is disabled, queuing an element reindex neither traverses
+    ///     relations nor reindexes any document - the service guard short-circuits (the other half of the double guard
+    ///     also enforced by the notification handler).
+    /// </summary>
+    [Test]
+    public async Task QueueElementReindex_WhenExternalBlockElementIndexingDisabled_SkipsTraversalAndReindex()
+    {
+        // A relation graph that would otherwise yield document 100 to reindex, proving the guard short-circuits first.
+        SetupRelationGraph(new Dictionary<int, (int id, Guid objectType)[]>
+        {
+            { 1, [(100, Constants.ObjectTypes.Document)] },
+        });
+
+        using var service = CreateService(indexExternalBlockElements: false);
+        service.QueueElementReindex([1]);
+        using var cts = new CancellationTokenSource(_testTimeout);
+        await service.WaitForWorkerIdleAsync(cts.Token);
+
+        _relationService.Verify(
+            x => x.GetParentEntitiesByChildIds(
+                It.IsAny<IEnumerable<int>>(),
+                It.IsAny<IEnumerable<string>>(),
+                It.IsAny<UmbracoObjectTypes[]>()),
+            Times.Never);
+        _umbracoIndexingHandler.Verify(
+            x => x.ReIndexForContent(It.IsAny<IContent>(), It.IsAny<bool>()),
+            Times.Never);
     }
 
     private void SetupRelationGraph(Dictionary<int, (int id, Guid objectType)[]> graph)

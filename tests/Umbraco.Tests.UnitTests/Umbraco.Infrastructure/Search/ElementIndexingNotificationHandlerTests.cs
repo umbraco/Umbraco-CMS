@@ -106,6 +106,25 @@ public class ElementIndexingNotificationHandlerTests
     }
 
     [Test]
+    public void Handle_WhenExternalBlockElementIndexingDisabled_DoesNotQueue()
+    {
+        _mockIndexingSettings.Setup(x => x.CurrentValue).Returns(new IndexingSettings { IndexExternalBlockElements = false });
+        var notification = new ElementCacheRefresherNotification(
+            new[]
+            {
+                new ElementCacheRefresher.JsonPayload(90, Guid.NewGuid(), TreeChangeTypes.RefreshNode)
+                {
+                    PublishedCultures = ["*"],
+                },
+            },
+            MessageType.RefreshByPayload);
+
+        _sut.Handle(notification);
+
+        _mockReindexService.Verify(s => s.QueueElementReindex(It.IsAny<IReadOnlyCollection<int>>()), Times.Never);
+    }
+
+    [Test]
     public void Handle_RefreshAll_DoesNotQueue()
     {
         var notification = new ElementCacheRefresherNotification(
