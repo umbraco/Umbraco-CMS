@@ -161,6 +161,11 @@ public static partial class Constants
         public const string ConfigIndexing = ConfigPrefix + "Indexing";
 
         /// <summary>
+        ///     The configuration key for Umbraco Search settings.
+        /// </summary>
+        public const string ConfigSearch = ConfigPrefix + "Search";
+
+        /// <summary>
         ///     The configuration key for the Examine provider for Umbraco Search.
         /// </summary>
         public const string ConfigSearchExamine = ConfigPrefix + "Search:Examine";

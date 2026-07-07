@@ -4,6 +4,7 @@ using Microsoft.OpenApi;
 using Umbraco.Cms.Api.Common.OpenApi;
 using Umbraco.Cms.Api.Management.OpenApi;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.ServerEvents;
 using Umbraco.Cms.Search.Core.Cache;
 using Umbraco.Cms.Search.Core.Notifications;
 using Umbraco.Cms.Search.Core.Cache.Content;
@@ -86,9 +87,16 @@ public static class UmbracoBuilderExtensions
             .AddNotificationHandler<ContentTypeCacheRefresherNotification, RebuildIndexesNotificationHandler>()
             .AddNotificationHandler<MemberTypeCacheRefresherNotification, RebuildIndexesNotificationHandler>()
             .AddNotificationHandler<MediaTypeCacheRefresherNotification, RebuildIndexesNotificationHandler>()
-            .AddNotificationHandler<RebuildIndexCacheRefresherNotification, RebuildIndexesNotificationHandler>()
-            .AddNotificationAsyncHandler<IndexRebuildStartingNotification, IndexRebuildServerEventNotificationHandler>()
-            .AddNotificationAsyncHandler<IndexRebuildCompletedNotification, IndexRebuildServerEventNotificationHandler>();
+            .AddNotificationHandler<RebuildIndexCacheRefresherNotification, RebuildIndexesNotificationHandler>();
+
+        // Index rebuild server events (for the backoffice UI) require the server event infrastructure, which is
+        // only registered when the Management API is composed - skip them in hosts without a backoffice.
+        if (builder.Services.Any(s => s.ServiceType == typeof(IServerEventRouter)))
+        {
+            builder
+                .AddNotificationAsyncHandler<IndexRebuildStartingNotification, IndexRebuildServerEventNotificationHandler>()
+                .AddNotificationAsyncHandler<IndexRebuildCompletedNotification, IndexRebuildServerEventNotificationHandler>();
+        }
 
         builder
             .AddNotificationHandler<DraftContentCacheRefresherNotification, ContentIndexingNotificationHandler>()

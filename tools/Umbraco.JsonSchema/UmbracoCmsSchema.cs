@@ -88,7 +88,7 @@ internal sealed class UmbracoCmsSchema
     /// <summary>
     /// Configuration of Umbraco Search.
     /// </summary>
-    public class SearchDefinition
+    public class SearchDefinition : SearchSettings
     {
         public required ExamineSearchProviderSettings Examine { get; set; }
     }
