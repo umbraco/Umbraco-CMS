@@ -175,10 +175,8 @@ public class DataValueReferenceFactoryCollectionTests
         var properties = new PropertyCollection { property };
         var result = collection.GetAllReferences(properties, propertyEditors, true).ToArray();
 
-        Assert.AreEqual(3, result.Count());
-        Assert.AreEqual(trackedUdi2, result.ElementAt(0).Udi.ToString());
-        Assert.AreEqual(trackedUdi3, result.ElementAt(1).Udi.ToString());
-        Assert.AreEqual(trackedUdi5, result.ElementAt(2).Udi.ToString());
+        var resultUdis = result.Select(x => x.Udi.ToString()).ToArray();
+        Assert.That(resultUdis, Is.EquivalentTo(new[] { trackedUdi2, trackedUdi3, trackedUdi5 }));
     }
 
     [Test]
@@ -220,9 +218,42 @@ public class DataValueReferenceFactoryCollectionTests
         var properties = new PropertyCollection { property };
         var result = collection.GetAllReferences(properties, propertyEditors, false).ToArray();
 
-        Assert.AreEqual(2, result.Count());
-        Assert.AreEqual(trackedUdi2, result.ElementAt(0).Udi.ToString());
-        Assert.AreEqual(trackedUdi3, result.ElementAt(1).Udi.ToString());
+        var resultUdis = result.Select(x => x.Udi.ToString()).ToArray();
+        Assert.That(resultUdis, Is.EquivalentTo(new[] { trackedUdi2, trackedUdi3 }));
+    }
+
+    [Test]
+    public void GetAllReferences_Without_TrackPublishedValues_Argument_Tracks_Published_Values()
+    {
+        var collection = new DataValueReferenceFactoryCollection(() => Enumerable.Empty<IDataValueReferenceFactory>(), new NullLogger<DataValueReferenceFactoryCollection>());
+
+        var mediaPicker = new MediaPicker3PropertyEditor(
+            DataValueEditorFactory,
+            IOHelper);
+        var propertyEditors = new PropertyEditorCollection(new DataEditorCollection(() => mediaPicker.Yield()));
+        var trackedUdi1 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
+        var trackedUdi2 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
+        var serializer = new SystemTextConfigurationEditorJsonSerializer(new DefaultJsonSerializerEncoderFactory());
+        var property =
+            new Property(
+                new PropertyType(ShortStringHelper, new DataType(mediaPicker, serializer))
+                {
+                    Variations = ContentVariation.CultureAndSegment,
+                })
+            {
+                Values = new List<PropertyValue>
+                {
+                    new() { Culture = "en-US", Segment = "A", EditedValue = trackedUdi1, PublishedValue = trackedUdi2 },
+                },
+            };
+        var properties = new PropertyCollection { property };
+
+        // The flag-less overload must behave identically to passing trackPublishedValues: true.
+        var defaultResult = collection.GetAllReferences(properties, propertyEditors).Select(x => x.Udi.ToString()).ToArray();
+        var explicitResult = collection.GetAllReferences(properties, propertyEditors, true).Select(x => x.Udi.ToString()).ToArray();
+
+        Assert.That(defaultResult, Is.EquivalentTo(explicitResult));
+        Assert.That(defaultResult, Is.EquivalentTo(new[] { trackedUdi1, trackedUdi2 }));
     }
 
     [Test]
