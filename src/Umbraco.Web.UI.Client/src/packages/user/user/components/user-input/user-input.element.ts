@@ -74,7 +74,7 @@ export class UmbUserInputElement extends UmbFormControlMixin<string, typeof UmbL
 
 	/**
 	 * Min validation message.
-	 * @type {boolean}
+	 * @type {string}
 	 * @attr
 	 * @default
 	 */
@@ -97,7 +97,7 @@ export class UmbUserInputElement extends UmbFormControlMixin<string, typeof UmbL
 
 	/**
 	 * Max validation message.
-	 * @type {boolean}
+	 * @type {string}
 	 * @attr
 	 * @default
 	 */

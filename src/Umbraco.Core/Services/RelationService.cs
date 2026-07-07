@@ -840,6 +840,8 @@ public class RelationService : RepositoryService, IRelationService
             UmbracoObjectTypes.MemberType,
             UmbracoObjectTypes.DataType,
             UmbracoObjectTypes.MemberGroup,
+            UmbracoObjectTypes.Element,
+            UmbracoObjectTypes.ElementContainer,
             UmbracoObjectTypes.ROOT,
             UmbracoObjectTypes.RecycleBin,
         ];

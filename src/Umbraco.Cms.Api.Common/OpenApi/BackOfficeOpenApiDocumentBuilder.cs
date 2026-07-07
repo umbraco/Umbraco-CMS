@@ -2,9 +2,9 @@ using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.OpenApi;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Api.Common.Attributes;
 using Umbraco.Cms.Api.Common.DependencyInjection;
 using Umbraco.Cms.Core.DependencyInjection;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Common.OpenApi;
 
@@ -116,12 +116,20 @@ public sealed class BackOfficeOpenApiDocumentBuilder
     /// <param name="builder">The Umbraco builder to register services against.</param>
     internal void Build(IUmbracoBuilder builder)
     {
+        // AddOpenApi lowercases the document name when registering its keyed services (https://github.com/dotnet/aspnetcore/blob/v10.0.9/src/OpenApi/src/Extensions/OpenApiServiceCollectionExtensions.cs#L64),
+        // so we must normalise here to keep AddOpenApiDocumentToUi and ReplaceOpenApiSchemaService in sync.
+        string lowercasedDocumentName = DocumentName.ToLowerInvariant();
+
         builder.Services.AddOpenApi(
-            DocumentName,
+            lowercasedDocumentName,
             options =>
             {
+                // ShouldInclude matches [MapToApi] case-insensitively to align with how documents are registered.
                 options.ShouldInclude = apiDescription =>
-                    apiDescription.ActionDescriptor.HasMapToApiAttribute(DocumentName);
+                    apiDescription.ActionDescriptor.EndpointMetadata
+                        ?.OfType<MapToApiAttribute>()
+                        .Any(a => a.ApiName.Equals(DocumentName, StringComparison.OrdinalIgnoreCase))
+                    ?? false;
 
                 options.CreateSchemaReferenceId = UmbracoSchemaIdGenerator.CreateSchemaReferenceId;
 
@@ -158,12 +166,12 @@ public sealed class BackOfficeOpenApiDocumentBuilder
 
         if (_includedInUi)
         {
-            builder.Services.AddOpenApiDocumentToUi(DocumentName, _uiTitle ?? _title);
+            builder.Services.AddOpenApiDocumentToUi(lowercasedDocumentName, _uiTitle ?? _title ?? DocumentName);
         }
 
         if (_httpJsonOptionsFactory is not null)
         {
-            builder.Services.ReplaceOpenApiSchemaService(DocumentName, _httpJsonOptionsFactory);
+            builder.Services.ReplaceOpenApiSchemaService(lowercasedDocumentName, _httpJsonOptionsFactory);
         }
     }
 }

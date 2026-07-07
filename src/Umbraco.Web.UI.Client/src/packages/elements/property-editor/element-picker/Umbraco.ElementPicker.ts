@@ -13,7 +13,7 @@ export const manifest: ManifestPropertyEditorSchema = {
 					label: 'Ignore user start nodes',
 					description: "Selecting this option allows a user to choose nodes that they normally don't have access to.",
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
-					weight: 120,
+					weight: 100,
 				},
 			],
 		},
