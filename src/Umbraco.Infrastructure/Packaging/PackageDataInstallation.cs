@@ -528,9 +528,15 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             // Resolve template by alias (stable across installs). Fall back to int ID for packages
             // exported before templateAlias was introduced, though that lookup will rarely succeed
             // since int IDs are database-specific and won't match across systems.
-            ITemplate? template = !string.IsNullOrEmpty(templateAlias)
-                ? _templateService.GetAsync(templateAlias).GetAwaiter().GetResult()
-                : templateId.HasValue ? _templateService.GetAsync(templateId.Value).GetAwaiter().GetResult() : null;
+            ITemplate? template = null;
+            if (!string.IsNullOrEmpty(templateAlias))
+            {
+                template = _templateService.GetAsync(templateAlias).GetAwaiter().GetResult();
+            }
+            else if (templateId.HasValue)
+            {
+                template = _templateService.GetAsync(templateId.Value).GetAwaiter().GetResult();
+            }
 
             //now double check this is correct since its an INT it could very well be pointing to an invalid template :/
             if (template != null && contentType is IContentType contentTypex)

@@ -817,7 +817,7 @@ internal sealed class PackageDataInstallationTests : UmbracoIntegrationTestWithC
     }
 
     [Test]
-    public async Task ImportContentBase_Assigns_Non_Default_Template_Via_TemplateAlias()
+    public async Task Can_Import_Content_With_Non_Default_Template_Via_TemplateAlias()
     {
         // Arrange
         var xml = XElement.Parse(ImportResources.ContentWithNonDefaultTemplate_Package);
