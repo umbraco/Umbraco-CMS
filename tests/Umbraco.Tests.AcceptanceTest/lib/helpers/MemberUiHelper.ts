@@ -68,10 +68,18 @@ export class MemberUiHelper extends UiBaseLocators {
     }
     await expect(async () => {
       if (!(await memberRow.isVisible())) {
-        await this.page.reload();
+        await this.reopenMembersCollection();
       }
       await expect(memberRow).toBeVisible({timeout: ConstantHelper.timeout.medium});
     }).toPass({timeout: ConstantHelper.timeout.navigation});
+  }
+
+  // Leave and re-enter the Members collection so the table remounts and refetches, without a full page reload.
+  // skipReload guards against goToSection falling back to a page reload if we were already on the section.
+  private async reopenMembersCollection() {
+    await this.goToSection(ConstantHelper.sections.content, true, true);
+    await this.goToSection(ConstantHelper.sections.members, true, true);
+    await this.clickMembersSidebarButton();
   }
 
   async clickMembersSidebarButton() {
