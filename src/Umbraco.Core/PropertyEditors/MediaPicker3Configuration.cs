@@ -62,6 +62,10 @@ public class MediaPicker3Configuration : IIgnoreUserStartNodesConfig
     /// <summary>
     /// Gets or sets a value indicating whether per-crop alternative text is enabled.
     /// </summary>
+    /// <remarks>
+    /// Only takes effect when <see cref="AltTextMode"/> is "altText" — per-crop alt text refines the
+    /// alt text field, so it is inactive when alt text is off or the image is marked as decorative.
+    /// </remarks>
     [ConfigurationField("enableAltTextPerCrop")]
     public bool EnableAltTextPerCrop { get; set; }
 

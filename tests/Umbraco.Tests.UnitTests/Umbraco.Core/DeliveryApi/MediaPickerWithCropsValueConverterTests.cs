@@ -304,7 +304,7 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
     [Test]
     public void MediaPickerWithCropsValueConverter_AltText_IsPopulated_WhenDtoContainsAltText()
     {
-        var publishedPropertyType = SetupMediaPropertyType(false);
+        var publishedPropertyType = SetupMediaPropertyType(false, altTextMode: "altText");
         var mediaKey = SetupMedia("Test media", ".jpg", 100, 200, "irrelevant", 500);
 
         var serializer = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
@@ -386,6 +386,76 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
     }
 
     [Test]
+    public void MediaPickerWithCropsValueConverter_AltText_IsNull_WhenDataTypeIsOff()
+    {
+        var publishedPropertyType = SetupMediaPropertyType(false);
+        var mediaKey = SetupMedia("Test media", ".jpg", 100, 200, "irrelevant", 500);
+
+        var serializer = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
+
+        var inter = serializer.Serialize(new[]
+        {
+            new MediaPicker3PropertyEditor.MediaPicker3PropertyValueEditor.MediaWithCropsDto
+            {
+                Key = Guid.NewGuid(),
+                MediaKey = mediaKey,
+                Crops = Array.Empty<ImageCropperValue.ImageCropperCrop>(),
+                // Alt text stored before the data type was switched off must not leak through
+                AltText = "Stale alt text",
+                AltTextByCulture = new Dictionary<string, string> { ["da-DK"] = "Gammel alt tekst" },
+            }
+        });
+
+        var result = MediaPickerWithCropsValueConverter(culture: "da-DK")
+            .ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false, false)
+            as IEnumerable<IApiMediaWithCrops>;
+
+        Assert.NotNull(result);
+        Assert.IsNull(result.Single().AltText);
+    }
+
+    [TestCase("off", true, TestName = "Crop alt text is stripped when alt text mode is off")]
+    [TestCase("decorative", true, TestName = "Crop alt text is stripped when data type is decorative")]
+    [TestCase("altText", false, TestName = "Crop alt text is stripped when per-crop alt text is disabled")]
+    public void MediaPickerWithCropsValueConverter_CropAltText_IsStripped_WhenPerCropAltTextIsNotActive(string altTextMode, bool enableAltTextPerCrop)
+    {
+        var publishedPropertyType = SetupMediaPropertyType(false, altTextMode: altTextMode, enableAltTextPerCrop: enableAltTextPerCrop);
+        var mediaKey = SetupMedia("Test media", ".jpg", 100, 200, "irrelevant", 500);
+
+        var serializer = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
+        var inter = serializer.Serialize(new[]
+        {
+            new MediaPicker3PropertyEditor.MediaPicker3PropertyValueEditor.MediaWithCropsDto
+            {
+                Key = Guid.NewGuid(),
+                MediaKey = mediaKey,
+                Crops =
+                [
+                    new ImageCropperValue.ImageCropperCrop
+                    {
+                        Alias = "one",
+                        Width = 200,
+                        Height = 100,
+                        Coordinates = new ImageCropperValue.ImageCropperCropCoordinates { X1 = 1m, X2 = 2m, Y1 = 10m, Y2 = 20m },
+                        // Crop alt text stored before per-crop alt text was deactivated must not leak through
+                        AltText = "Stale crop alt",
+                        AltTextByCulture = new Dictionary<string, string> { ["da-DK"] = "Gammel crop alt tekst" },
+                    }
+                ],
+            }
+        });
+
+        var result = MediaPickerWithCropsValueConverter(culture: "da-DK")
+            .ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false, false)
+            as IEnumerable<IApiMediaWithCrops>;
+
+        Assert.NotNull(result);
+        var crop = result.Single().Crops?.Single();
+        Assert.NotNull(crop);
+        Assert.IsNull(crop!.AltText);
+    }
+
+    [Test]
     public void GetDeliveryApiPropertyCacheLevel_Returns_Elements_When_AltText_Disabled()
     {
         var converter = MediaPickerWithCropsValueConverter();
@@ -435,7 +505,7 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
     [TestCase("da-DK", "fr-FR", "Default alt text", TestName = "DeliveryApi falls back to invariant alt text when culture not in dictionary")]
     public void DeliveryApi_Resolves_Media_AltText(string altTextCultureKey, string requestCulture, string expected)
     {
-        var publishedPropertyType = SetupMediaPropertyType(false);
+        var publishedPropertyType = SetupMediaPropertyType(false, altTextMode: "altText");
         var mediaKey = SetupMedia("Test media", ".jpg", 100, 200, "irrelevant", 500);
 
         var serializer = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
@@ -463,7 +533,7 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
     [TestCase("fr-FR", "Default crop alt", TestName = "DeliveryApi falls back to invariant crop alt text when culture not in dictionary")]
     public void DeliveryApi_Resolves_Crop_AltText(string requestCulture, string expected)
     {
-        var publishedPropertyType = SetupMediaPropertyType(false);
+        var publishedPropertyType = SetupMediaPropertyType(false, altTextMode: "altText", enableAltTextPerCrop: true);
         var mediaKey = SetupMedia("Test media", ".jpg", 100, 200, "irrelevant", 500);
 
         var serializer = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
@@ -498,12 +568,13 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
         Assert.AreEqual(expected, crop!.AltText);
     }
 
-    private IPublishedPropertyType SetupMediaPropertyType(bool multiSelect, string altTextMode = "off")
+    private IPublishedPropertyType SetupMediaPropertyType(bool multiSelect, string altTextMode = "off", bool enableAltTextPerCrop = false)
     {
         var publishedDataType = new PublishedDataType(123, "test", "test", new Lazy<object>(() => new MediaPicker3Configuration
         {
             Multiple = multiSelect,
             AltTextMode = altTextMode,
+            EnableAltTextPerCrop = enableAltTextPerCrop,
             EnableLocalFocalPoint = true,
             Crops = new MediaPicker3Configuration.CropConfiguration[]
             {

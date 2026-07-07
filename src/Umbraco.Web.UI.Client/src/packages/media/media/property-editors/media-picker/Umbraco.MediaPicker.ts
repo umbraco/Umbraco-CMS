@@ -77,7 +77,7 @@ export const manifest: ManifestPropertyEditorSchema = {
 					alias: 'enableAltTextPerCrop',
 					label: 'Alternative text per crop',
 					description:
-						"Enable individual alt text per image crop. Only useful when crops represent entirely different images. If this setting is later disabled, the first crop's alt text is used as the main alt text.",
+						"Enable individual alt text per image crop. Only applies when 'Alternative text' is set to 'Show alt text field'. Only useful when crops represent entirely different images.",
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
 				},
 			],

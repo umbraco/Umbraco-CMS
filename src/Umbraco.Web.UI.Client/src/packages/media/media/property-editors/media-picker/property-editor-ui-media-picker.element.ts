@@ -36,7 +36,9 @@ export class UmbPropertyEditorUIMediaPickerElement
 		this._preselectedCrops = config?.getValueByAlias<Array<UmbCropModel>>('crops') ?? [];
 		this._altTextMode = config.getValueByAlias<'off' | 'altText' | 'decorative'>('altTextMode') ?? 'off';
 		this._hideZoomCrop = Boolean(config.getValueByAlias('hideZoomCrop'));
-		this._enableAltTextPerCrop = Boolean(config.getValueByAlias('enableAltTextPerCrop'));
+		// Per-crop alt text is a refinement of the alt text field, so it only applies when the field is shown
+		this._enableAltTextPerCrop =
+			this._altTextMode === 'altText' && Boolean(config.getValueByAlias('enableAltTextPerCrop'));
 
 		const startNodeId = config.getValueByAlias<string>('startNodeId') ?? '';
 		this._startNode = startNodeId ? { unique: startNodeId, entityType: UMB_MEDIA_ENTITY_TYPE } : undefined;

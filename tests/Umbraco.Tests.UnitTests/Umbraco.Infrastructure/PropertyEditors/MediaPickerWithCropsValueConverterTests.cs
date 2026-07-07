@@ -234,9 +234,21 @@ public class MediaPickerWithCropsValueConverterTests
     public void GetPropertyCacheLevel_Returns_None_When_PerCrop_AltText_Enabled_On_Invariant_Property()
     {
         var converter = CreateConverter(MockAccessor(new VariationContext("en")));
-        var propertyType = CreatePropertyType(new MediaPicker3Configuration { EnableAltTextPerCrop = true });
+        var propertyType = CreatePropertyType(
+            new MediaPicker3Configuration { AltTextMode = "altText", EnableAltTextPerCrop = true });
 
         Assert.AreEqual(PropertyCacheLevel.None, converter.GetPropertyCacheLevel(propertyType));
+    }
+
+    [Test]
+    public void GetPropertyCacheLevel_Returns_Elements_When_PerCrop_AltText_Enabled_Without_AltText_Mode()
+    {
+        // Per-crop alt text only takes effect when alt text mode is "altText", so with any other mode
+        // no culture-dependent alt text can surface and the converted value stays cacheable
+        var converter = CreateConverter(MockAccessor(new VariationContext("en")));
+        var propertyType = CreatePropertyType(new MediaPicker3Configuration { EnableAltTextPerCrop = true });
+
+        Assert.AreEqual(PropertyCacheLevel.Elements, converter.GetPropertyCacheLevel(propertyType));
     }
 
     private static IPublishedPropertyType CreatePropertyType(

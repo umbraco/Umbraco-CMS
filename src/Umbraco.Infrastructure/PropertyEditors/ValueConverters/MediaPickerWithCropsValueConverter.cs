@@ -155,6 +155,9 @@ public class MediaPickerWithCropsValueConverter : PropertyValueConverterBase, ID
             MediaPicker3PropertyEditor.MediaPicker3PropertyValueEditor.Deserialize(_jsonSerializer, inter);
         MediaPicker3Configuration? configuration = propertyType.DataType.ConfigurationAs<MediaPicker3Configuration>();
         var culture = _variationContextAccessor.VariationContext?.Culture;
+        var perCropAltTextActive = configuration is not null
+                                   && configuration.AltTextMode == "altText"
+                                   && configuration.EnableAltTextPerCrop;
 
         foreach (MediaPicker3PropertyEditor.MediaPicker3PropertyValueEditor.MediaWithCropsDto dto in dtos)
         {
@@ -163,7 +166,7 @@ public class MediaPickerWithCropsValueConverter : PropertyValueConverterBase, ID
             {
                 var localCrops = new ImageCropperValue
                 {
-                    Crops = ResolveCropsForCulture(dto.Crops, culture),
+                    Crops = ResolveCropsForCulture(dto.Crops, culture, perCropAltTextActive),
                     FocalPoint = dto.FocalPoint,
                     Src = mediaItem.Url(_publishedUrlProvider),
                     AltText = ResolveMediaAltText(dto, configuration, culture),
@@ -258,8 +261,8 @@ public class MediaPickerWithCropsValueConverter : PropertyValueConverterBase, ID
     // Per-culture alt text overrides are only stored on invariant (shared) properties — for those, an
     // invariant value is shared across cultures, so caching it would serve one culture's alt text to all.
     // Culture-varying properties already cache per culture, and properties whose alt text is never
-    // culture-dependent ("off" produces no alt text, "decorative" always produces an empty string)
-    // can keep the normal (cacheable) cache level.
+    // culture-dependent ("off" produces no alt text, "decorative" always produces an empty string,
+    // and per-crop alt text only takes effect in "altText" mode) can keep the normal (cacheable) cache level.
     private static bool RequiresPerRequestCultureResolution(IPublishedPropertyType propertyType)
     {
         if (propertyType.Variations.VariesByCulture())
@@ -268,23 +271,44 @@ public class MediaPickerWithCropsValueConverter : PropertyValueConverterBase, ID
         }
 
         MediaPicker3Configuration? configuration = propertyType.DataType.ConfigurationAs<MediaPicker3Configuration>();
-        return configuration is not null
-               && (configuration.AltTextMode == "altText" || configuration.EnableAltTextPerCrop);
+        return configuration?.AltTextMode == "altText";
     }
 
-    // Decorative images must always render with an empty alt attribute (WCAG 1.1.1), even when alt text
-    // was stored before the data type was switched to decorative mode.
+    // Alt text stored before the data type configuration changed must not leak through: "off" means alt
+    // text is not applicable, and decorative images must always render with an empty alt attribute (WCAG 1.1.1).
     private static string? ResolveMediaAltText(
         MediaPicker3PropertyEditor.MediaPicker3PropertyValueEditor.MediaWithCropsDto dto,
         MediaPicker3Configuration? configuration,
         string? culture)
-        => configuration?.AltTextMode == "decorative"
-            ? string.Empty
-            : ResolveCultureAltText(dto.AltText, dto.AltTextByCulture, culture);
+        => configuration?.AltTextMode switch
+        {
+            "altText" => ResolveCultureAltText(dto.AltText, dto.AltTextByCulture, culture),
+            "decorative" => string.Empty,
+            _ => null,
+        };
 
-    // Resolve per-crop alt text from AltTextByCulture when a culture context is active; otherwise the stored crops are used as-is.
-    private static IEnumerable<ImageCropperValue.ImageCropperCrop>? ResolveCropsForCulture(IEnumerable<ImageCropperValue.ImageCropperCrop>? crops, string? culture)
+    // Per-crop alt text is a refinement of the alt text field, so it only surfaces when the data type both
+    // enables it and shows the alt text field — otherwise stored crop alt text is stripped so values entered
+    // before the configuration changed cannot leak through. When active, per-crop alt text is resolved from
+    // AltTextByCulture if a culture context is set; otherwise the stored crops are used as-is.
+    private static IEnumerable<ImageCropperValue.ImageCropperCrop>? ResolveCropsForCulture(
+        IEnumerable<ImageCropperValue.ImageCropperCrop>? crops,
+        string? culture,
+        bool perCropAltTextActive)
     {
+        if (perCropAltTextActive is false)
+        {
+            return crops?.Select(crop => crop.AltText is null && crop.AltTextByCulture is null
+                ? crop
+                : new ImageCropperValue.ImageCropperCrop
+                {
+                    Alias = crop.Alias,
+                    Width = crop.Width,
+                    Height = crop.Height,
+                    Coordinates = crop.Coordinates,
+                });
+        }
+
         if (string.IsNullOrEmpty(culture))
         {
             return crops;
