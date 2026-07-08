@@ -247,12 +247,14 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 				if (!isUmbNotifications(notifications)) return response;
 
 				for (const notification of notifications) {
+					// Backend event messages may contain HTML (e.g. links) and are rendered sanitized by the
+					// notification layout via htmlMessage. The plain message must stay markup-free because it is
+					// read by screen readers (see umb-backoffice-notification-container).
 					this.#peekError(
 						notification.category,
-						notification.message,
+						this.#extractText(notification.message),
 						undefined,
 						extractUmbNotificationColor(notification.type),
-						// Backend event messages may contain HTML (e.g. links); rendered sanitized by the notification layout.
 						notification.message,
 					);
 				}
@@ -335,6 +337,15 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 				'Content-Type': contentType,
 			},
 		});
+	}
+
+	/**
+	 * Extracts the plain text of an HTML string using an inert document, so nothing is executed or loaded.
+	 * @param {string} html The HTML string.
+	 * @returns {string} The text content of the parsed HTML.
+	 */
+	#extractText(html: string): string {
+		return new DOMParser().parseFromString(html, 'text/html').body.textContent ?? '';
 	}
 
 	/**
