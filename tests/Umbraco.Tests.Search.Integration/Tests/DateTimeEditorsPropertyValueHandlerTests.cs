@@ -117,6 +117,36 @@ public class DateTimeEditorsPropertyValueHandlerTests : PropertyValueHandlerTest
         Assert.That(document.Fields.Any(f => f.FieldName == "dateOnlyValue"), Is.False);
     }
 
+    [Test]
+    public void WrongShapeJsonValue_IsNotIndexed_AndDoesNotPreventDocumentIndexing()
+    {
+        // NOTE: only saved (draft index), not published - publishing a wrong-shape stored value fails
+        //       property validation with an unrelated, pre-existing exception in TypedJsonValidatorRunner.
+        Content content = new ContentBuilder()
+            .WithContentType(GetContentType())
+            .WithName("Date Time Editors")
+            .WithPropertyValues(new
+            {
+                dateOnlyValue = "[1,2,3]",
+                dateTimeUnspecifiedValue = JsonSerializer.Serialize(new DateTimeValueConverterBase.DateTimeDto
+                {
+                    Date = new DateTimeOffset(2004, 05, 06, 07, 08, 09, TimeSpan.Zero)
+                })
+            })
+            .Build();
+
+        ContentService.Save(content);
+
+        TestIndexDocument document = IndexerAndSearcher.Dump(IndexAliases.DraftContent).Single();
+        Assert.Multiple(() =>
+        {
+            Assert.That(document.Fields.Any(f => f.FieldName == "dateOnlyValue"), Is.False);
+
+            DateTimeOffset? dateTimeUnspecifiedValue = document.Fields.FirstOrDefault(f => f.FieldName == "dateTimeUnspecifiedValue")?.Value.DateTimeOffsets?.SingleOrDefault();
+            Assert.That(dateTimeUnspecifiedValue, Is.EqualTo(new DateTimeOffset(2004, 05, 06, 07, 08, 09, TimeSpan.Zero)));
+        });
+    }
+
     private IContentType GetContentType() => ContentTypeService.Get(ContentTypeAlias)
         ?? throw new InvalidOperationException($"Could not find the content type \"{ContentTypeAlias}\"");
 

@@ -27,17 +27,30 @@ internal sealed class DateTimeOffsetPropertyValueHandler : IPropertyValueHandler
 
     public IEnumerable<IndexField> GetIndexFields(IProperty property, string? culture, string? segment, bool published, IContentBase contentContext)
     {
-        object? value = property.GetValue(culture, segment, published);
-
-        DateTimeOffset? dateTimeOffset = value switch
-        {
-            DateTime dateTime => _dateTimeOffsetConverter.ToDateTimeOffset(dateTime),
-            string json when _jsonSerializer.TryDeserialize(json, out DateTimeValueConverterBase.DateTimeDto? dto) => dto.Date.ToUniversalTime(),
-            _ => null,
-        };
+        DateTimeOffset? dateTimeOffset = ParsePropertyValue(property, culture, segment, published);
 
         return dateTimeOffset is not null
             ? [new IndexField(property.Alias, new IndexValue { DateTimeOffsets = [dateTimeOffset.Value] }, culture, segment)]
             : [];
+    }
+
+    private DateTimeOffset? ParsePropertyValue(IProperty property, string? culture, string? segment, bool published)
+    {
+        object? value = property.GetValue(culture, segment, published);
+
+        try
+        {
+            return value switch
+            {
+                DateTime dateTime => _dateTimeOffsetConverter.ToDateTimeOffset(dateTime),
+                string json when _jsonSerializer.TryDeserialize(json, out DateTimeValueConverterBase.DateTimeDto? dto) => dto.Date.ToUniversalTime(),
+                _ => null,
+            };
+        }
+        catch
+        {
+            // silently fail - this is an invalid property value, expect it to be reported elsewhere
+            return null;
+        }
     }
 }
