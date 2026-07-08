@@ -518,6 +518,7 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 			<div id="toolbar">
 				<div id="search">
 					<uui-input
+						name="media-search"
 						label=${this.localize.term('general_search')}
 						placeholder=${this.localize.term('placeholders_search')}
 						@input=${this.#onSearch}
@@ -582,10 +583,7 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 				?selected=${this.value?.selection?.find((value) => value === item.unique)}
 				?selectable=${selectable}
 				?select-only=${this._isSelectionMode || canNavigate === false}>
-				<umb-imaging-thumbnail
-					unique=${item.unique}
-					alt=${item.name}
-					icon=${item.mediaType.icon}></umb-imaging-thumbnail>
+				<umb-media-thumbnail unique=${item.unique} alt=${item.name} icon=${item.mediaType.icon}></umb-media-thumbnail>
 			</uui-card-media>
 		`;
 	}
@@ -757,7 +755,6 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 			}
 
 			umb-media-picker-folder-path {
-				overflow: hidden;
 				min-width: 0;
 				flex: 1 1 0%;
 			}

@@ -75,7 +75,7 @@ public interface ILogViewer
     /// <param name="logLevels">An optional array of log levels to include.</param>
     /// <returns>A paged result containing the log messages.</returns>
     /// <remarks>
-    /// This method is obsolete. Use <see cref="ILogViewerService.GetPagedLogs"/> instead. Scheduled for removal in Umbraco 15.
+    /// This method is obsolete. Use <see cref="Services.ILogViewerService.GetPagedLogsAsync"/> instead. Scheduled for removal in Umbraco 15.
     /// </remarks>
     [Obsolete("Use ILogViewerService.GetPagedLogs instead. Scheduled for removal in Umbraco 15.")]
     PagedResult<LogMessage> GetLogs(
