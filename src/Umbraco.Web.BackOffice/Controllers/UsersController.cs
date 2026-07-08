@@ -670,10 +670,15 @@ public class UsersController : BackOfficeNotificationsController
             UmbracoUserExtensions.GetUserCulture(to?.Language, _localizedTextService, _globalSettings),
             new[] { name, from, WebUtility.HtmlEncode(message)!.ReplaceLineEndings("<br/>"), inviteUri.ToString(), senderEmail });
 
+        // An invite email cannot be sent without a recipient address, so fail fast with a clear
+        // message rather than constructing an invalid MailboxAddress from an empty string.
+        var toEmail = to?.Email ??
+            throw new InvalidOperationException("Cannot send user invite email: recipient email address is missing.");
+
         // This needs to be in the correct mailto format including the name, else
         // the name cannot be captured in the email sending notification.
         // i.e. "Some Person" <hello@example.com>
-        var toMailBoxAddress = new MailboxAddress(to?.Name, to?.Email);
+        var toMailBoxAddress = new MailboxAddress(to?.Name, toEmail);
 
         var mailMessage = new EmailMessage(senderEmail, toMailBoxAddress.ToString(), emailSubject, emailBody, true);
 
