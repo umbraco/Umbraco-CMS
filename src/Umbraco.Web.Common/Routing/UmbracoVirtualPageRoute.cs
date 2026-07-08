@@ -137,10 +137,34 @@ public class UmbracoVirtualPageRoute : IUmbracoVirtualPageRoute
                 new RouteData(routeValues),
                 controllerActionDescriptor),
             filters: new List<IFilterMetadata>(),
-            actionArguments: new Dictionary<string, object?>(),
+            actionArguments: BuildActionArguments(routeValues, controllerActionDescriptor),
             controller: controller);
 
         return FindContent(endpoint, actionExecutingContext);
+    }
+
+    // Populates the action arguments from the matched route values, keyed by the action's parameter names.
+    // The real MVC pipeline model-binds these for us, but this dummy context is built outside of it (on a
+    // surface controller POST), so a FindContent that reads ActionArguments - as the documented example does -
+    // would otherwise see nothing.
+    private static IDictionary<string, object?> BuildActionArguments(
+        RouteValueDictionary routeValues,
+        ControllerActionDescriptor controllerActionDescriptor)
+    {
+        var actionArguments = new Dictionary<string, object?>();
+
+        if (controllerActionDescriptor.MethodInfo is not null)
+        {
+            foreach (var parameter in controllerActionDescriptor.MethodInfo.GetParameters())
+            {
+                if (parameter.Name is not null && routeValues.TryGetValue(parameter.Name, out var value))
+                {
+                    actionArguments[parameter.Name] = value;
+                }
+            }
+        }
+
+        return actionArguments;
     }
 
     /// <summary>

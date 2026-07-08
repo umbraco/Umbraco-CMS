@@ -107,6 +107,30 @@ public class UmbracoVirtualPageRouteTests
         Assert.IsNull(result);
     }
 
+    [Test]
+    public void FindContent_Populates_ActionArguments_From_The_Route_Values()
+    {
+        // A FindContent that resolves the item from ActionArguments (the documented pattern) must work when
+        // the context is built for a surface POST, where there is no MVC model binding to populate them (#14165).
+        var content = Mock.Of<IPublishedContent>();
+        var controller = new ActionArgumentReadingController(content);
+        RouteEndpoint endpoint = CreateEndpoint("products/{sku}");
+        var actionDescriptor = new ControllerActionDescriptor
+        {
+            ControllerTypeInfo = typeof(ActionArgumentReadingController).GetTypeInfo(),
+            MethodInfo = typeof(ActionArgumentReadingController).GetMethod(nameof(ActionArgumentReadingController.Index))!,
+            ControllerName = nameof(ActionArgumentReadingController),
+            ActionName = nameof(ActionArgumentReadingController.Index),
+        };
+        var routeValues = new RouteValueDictionary { ["sku"] = "ABC123" };
+
+        UmbracoVirtualPageRoute route = CreateRoute(new DefaultEndpointDataSource(endpoint), Mock.Of<IPublishedRequest>());
+
+        IPublishedContent? result = route.FindContent(endpoint, new DefaultHttpContext(), routeValues, actionDescriptor, controller);
+
+        Assert.AreSame(content, result);
+    }
+
     private static UmbracoVirtualPageRoute CreateRoute(EndpointDataSource dataSource, IPublishedRequest publishedRequest)
     {
         var publishedRouter = new Mock<IPublishedRouter>();
@@ -180,5 +204,19 @@ public class UmbracoVirtualPageRouteTests
 
     private class TestNonVirtualController
     {
+    }
+
+    private class ActionArgumentReadingController : IVirtualPageController
+    {
+        private readonly IPublishedContent _content;
+
+        public ActionArgumentReadingController(IPublishedContent content) => _content = content;
+
+        public IActionResult Index(string sku) => new EmptyResult();
+
+        public IPublishedContent? FindContent(ActionExecutingContext actionExecutingContext)
+            => actionExecutingContext.ActionArguments.TryGetValue("sku", out var sku) && sku is "ABC123"
+                ? _content
+                : null;
     }
 }
