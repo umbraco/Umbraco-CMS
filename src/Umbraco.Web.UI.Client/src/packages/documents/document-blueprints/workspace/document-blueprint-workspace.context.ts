@@ -116,7 +116,9 @@ export class UmbDocumentBlueprintWorkspaceContext
 		variantIds: Array<UmbVariantId> = [],
 	): Promise<void> {
 		const namedVariants = saveData.variants.filter((v) => v.name);
-		const filteredVariantIds = variantIds.filter((variantId) => namedVariants.some((v) => variantId.compare(v)));
+		const filteredVariantIds = variantIds.filter((variantId) =>
+			namedVariants.some((v) => variantId.culture === v.culture),
+		);
 		return super.runMandatoryValidationForSaveData({ ...saveData, variants: namedVariants }, filteredVariantIds);
 	}
 

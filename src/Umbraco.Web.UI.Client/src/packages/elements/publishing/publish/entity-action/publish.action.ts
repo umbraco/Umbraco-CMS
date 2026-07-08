@@ -35,12 +35,10 @@ export class UmbPublishElementEntityAction extends UmbEntityActionBase<never> {
 		if (!appLanguageContext) throw new Error('The app language context is missing');
 		const appCulture = appLanguageContext.getAppCulture();
 
-		const options: Array<UmbElementVariantOptionModel> = elementData.variants
-			// only display culture variants as options
-			.filter((variant) => variant.segment === null)
-			.map<UmbElementVariantOptionModel>((variant) => ({
+		const options: Array<UmbElementVariantOptionModel> = elementData.variants.map<UmbElementVariantOptionModel>(
+			(variant) => ({
 				culture: variant.culture,
-				segment: variant.segment,
+				segment: null,
 				language: languageData?.items.find((language) => language.unique === variant.culture) ?? {
 					name: appCulture!,
 					entityType: 'language',
@@ -50,8 +48,9 @@ export class UmbPublishElementEntityAction extends UmbEntityActionBase<never> {
 					unique: appCulture!,
 				},
 				variant,
-				unique: new UmbVariantId(variant.culture, variant.segment).toString(),
-			}));
+				unique: new UmbVariantId(variant.culture, null).toString(),
+			}),
+		);
 
 		// Figure out the default selections
 		const selection: Array<string> = [];
@@ -75,18 +74,11 @@ export class UmbPublishElementEntityAction extends UmbEntityActionBase<never> {
 
 		const variantIds = result?.selection.map((x) => UmbVariantId.FromString(x)) ?? [];
 
-		// find all segments of a selected culture
-		const publishableVariantIds = variantIds.flatMap((variantId) =>
-			elementData.variants
-				.filter((variant) => variantId.culture === variant.culture)
-				.map((variant) => UmbVariantId.Create(variant).toSegment(variant.segment)),
-		);
-
-		if (publishableVariantIds.length) {
+		if (variantIds.length) {
 			const publishingRepository = new UmbElementPublishingRepository(this._host);
 			const { error } = await publishingRepository.publish(
 				this.args.unique,
-				publishableVariantIds.map((variantId) => ({ variantId })),
+				variantIds.map((variantId) => ({ variantId })),
 			);
 
 			if (error) {
@@ -109,7 +101,7 @@ export class UmbPublishElementEntityAction extends UmbEntityActionBase<never> {
 						headline: localize.term('speechBubbles_editContentPublishedHeader'),
 						message: localize.term(
 							'speechBubbles_editVariantElementPublishedText',
-							localize.list(elementVariants.map((v) => UmbVariantId.Create(v).toString() ?? v.name)),
+							localize.list(elementVariants.map((v) => UmbVariantId.CreateFromPartial(v).toString() ?? v.name)),
 						),
 					},
 				});

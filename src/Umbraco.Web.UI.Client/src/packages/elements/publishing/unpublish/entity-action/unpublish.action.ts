@@ -38,12 +38,10 @@ export class UmbUnpublishElementEntityAction extends UmbEntityActionBase<never> 
 		if (!appLanguageContext) throw new Error('The app language context is missing');
 		const appCulture = appLanguageContext.getAppCulture();
 
-		const cultureVariantOptions = elementData.variants.filter((variant) => variant.segment === null);
-
-		const options: Array<UmbElementVariantOptionModel> = cultureVariantOptions.map<UmbElementVariantOptionModel>(
+		const options: Array<UmbElementVariantOptionModel> = elementData.variants.map<UmbElementVariantOptionModel>(
 			(variant) => ({
 				culture: variant.culture,
-				segment: variant.segment,
+				segment: null,
 				language: languageData?.items.find((language) => language.unique === variant.culture) ?? {
 					name: appCulture!,
 					entityType: 'language',
@@ -53,7 +51,7 @@ export class UmbUnpublishElementEntityAction extends UmbEntityActionBase<never> 
 					unique: appCulture!,
 				},
 				variant,
-				unique: new UmbVariantId(variant.culture, variant.segment).toString(),
+				unique: new UmbVariantId(variant.culture, null).toString(),
 			}),
 		);
 

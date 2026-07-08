@@ -188,6 +188,9 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	async getVariantOptions(): Promise<Array<VariantOptionModelType>> {
 		return firstValueFrom(this.variantOptions);
 	}
+	async getCultureVariantOptions(): Promise<Array<VariantOptionModelType>> {
+		return (await firstValueFrom(this.variantOptions)).filter((x) => !x.segment);
+	}
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	protected _variantOptionsFilter = (variantOption: VariantOptionModelType) => true;
 
@@ -264,7 +267,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 				if (!varies) {
 					return [
 						{
-							variant: variants.find((x) => new UmbVariantId(x.culture, x.segment).isInvariant()),
+							variant: variants.find((x) => x.culture === null && !(x as any).segment),
 							language: languages.find((x) => x.isDefault),
 							culture: null,
 							segment: null,
@@ -277,7 +280,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 				if (variesByCulture && !variesBySegment) {
 					return languages.map((language) => {
 						return {
-							variant: variants.find((x) => x.culture === language.unique),
+							variant: variants.find((x) => x.culture === language.unique && !(x as any).segment),
 							language,
 							culture: language.unique,
 							segment: null,
@@ -289,7 +292,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 				// Only segment variation
 				if (!variesByCulture && variesBySegment) {
 					const invariantCulture = {
-						variant: variants.find((x) => new UmbVariantId(x.culture, x.segment).isInvariant()),
+						variant: undefined, // We do not store variant-data for segments. [NL]
 						language: languages.find((x) => x.isDefault),
 						culture: null,
 						segment: null,
@@ -300,7 +303,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 					const availableSegments = segments.filter((s) => !s.cultures);
 					const segmentsForInvariantCulture = availableSegments.map((segment) => {
 						return {
-							variant: variants.find((x) => x.culture === null && x.segment === segment.alias),
+							variant: undefined, // We do not store variant-data for segments. [NL]
 							language: languages.find((x) => x.isDefault),
 							segmentInfo: segment,
 							culture: null,
@@ -316,7 +319,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 				if (variesByCulture && variesBySegment) {
 					return languages.flatMap((language) => {
 						const culture = {
-							variant: variants.find((x) => x.culture === language.unique && x.segment === null),
+							variant: variants.find((x) => x.culture === language.unique && !(x as any).segment),
 							language,
 							culture: language.unique,
 							segment: null,
@@ -327,7 +330,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 						const availableSegments = segments.filter((s) => !s.cultures || s.cultures.includes(language.unique));
 						const segmentsForCulture = availableSegments.map((segment) => {
 							return {
-								variant: variants.find((x) => x.culture === language.unique && x.segment === segment.alias),
+								variant: undefined, // We do not store variant-data for segments. [NL]
 								language,
 								segmentInfo: segment,
 								culture: language.unique,
@@ -368,9 +371,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		this.observe(
 			observeMultiple([this.splitView.activeVariantByIndex(0), this.variants]),
 			([activeVariant, variants]) => {
-				const variantName = variants.find(
-					(v) => v.culture === activeVariant?.culture && v.segment === activeVariant?.segment,
-				)?.name;
+				const variantName = variants.find((v) => v.culture === activeVariant?.culture && !(v as any).segment)?.name;
 				this.view.setTitle(variantName);
 			},
 			null,
@@ -518,16 +519,18 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		const variants = this._data.getCurrent()?.variants;
 		if (!variants) return;
 		if (variantId) {
-			return variants.find((x) => variantId.compare(x))?.name;
+			return variants.find((x) => variantId.culture === x.culture && !(x as any).segment)?.name;
 		}
 		// Get the first active variant's name
 		const activeVariant = this.splitView.getActiveVariants()[0];
 		if (activeVariant) {
-			const activeVariantId = UmbVariantId.Create(activeVariant);
-			return variants.find((x) => activeVariantId.compare(x))?.name;
+			return variants.find((x) => activeVariant.culture === x.culture && !(x as any).segment)?.name;
 		}
-		// Fallback to first variant if no active variant is set
-		return variants[0]?.name;
+		// Fallback to first variant if no active variant is set, and it is not a segment variant, since segments should not exist as varaint-entries. [NL]
+		if (variants[0] && !(variants[0] as any).segment) {
+			return variants[0].name;
+		}
+		return undefined;
 	}
 
 	/**
@@ -548,16 +551,23 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	 */
 	public name(variantId?: UmbVariantId): Observable<string> {
 		if (variantId) {
+			if (variantId.segment) {
+				// Segments cannot have a name, so we return an empty string for them. [NL]
+				return this._data.createObservablePartOfCurrent(() => '');
+			}
 			// Explicit variant requested
 			return this._data.createObservablePartOfCurrent(
-				(data) => data?.variants?.find((x) => variantId.compare(x))?.name ?? '',
+				(data) => data?.variants?.find((x) => x.culture === variantId.culture && !(x as any).segment)?.name ?? '',
 			);
 		}
 		// No variant specified - observe first active variant's name
 		return mergeObservables([this.splitView.activeVariantByIndex(0), this.variants], ([activeVariant, variants]) => {
 			if (!activeVariant || !variants) return '';
-			const activeVariantId = UmbVariantId.Create(activeVariant);
-			return variants.find((x) => activeVariantId.compare(x))?.name ?? '';
+			if (activeVariant.segment) {
+				// Segments cannot have a name, so we return an empty string for them. [NL]
+				return '';
+			}
+			return variants.find((x) => x.culture === activeVariant.culture && !(x as any).segment)?.name ?? '';
 		});
 	}
 
@@ -597,7 +607,13 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	 * @memberof UmbContentDetailWorkspaceContextBase
 	 */
 	public variantById(variantId: UmbVariantId): Observable<VariantModelType | undefined> {
-		return this._data.createObservablePartOfCurrent((data) => data?.variants?.find((x) => variantId.compare(x)));
+		if (variantId.segment) {
+			// Segments cannot have a variant-data, so we return undefined for them. [NL]
+			return this._data.createObservablePartOfCurrent(() => undefined);
+		}
+		return this._data.createObservablePartOfCurrent((data) =>
+			data?.variants?.find((x) => variantId.culture === x.culture && !(x as any).segment),
+		);
 	}
 
 	/**
@@ -607,7 +623,11 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	 * @memberof UmbContentDetailWorkspaceContextBase
 	 */
 	public getVariant(variantId: UmbVariantId): VariantModelType | undefined {
-		return this._data.getCurrent()?.variants?.find((x) => variantId.compare(x));
+		if (variantId.segment) {
+			// Segments cannot have a variant-data, so we return undefined for them. [NL]
+			return undefined;
+		}
+		return this._data.getCurrent()?.variants?.find((x) => variantId.culture === x.culture && !(x as any).segment);
 	}
 
 	public getVariants(): Array<VariantModelType> | undefined {
@@ -661,13 +681,14 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	 * @param {UmbVariantId | undefined} variantId - The variant id of the property
 	 * @returns {ReturnType | undefined} The value or undefined if not set or found.
 	 */
-	public getPropertyValue<ReturnType = unknown>(alias: string, variantId?: UmbVariantId) {
+	public getPropertyValue<ReturnType = unknown>(
+		alias: string,
+		variantId: UmbVariantId = UmbVariantId.CreateInvariant(),
+	) {
 		const currentData = this._data.getCurrent();
 		if (currentData) {
 			// No variantId means invariant: match only entries with culture === null and segment === null.
-			const newDataSet = currentData.values?.find(
-				(x) => x.alias === alias && (variantId ?? UmbVariantId.CreateInvariant()).compare(x),
-			);
+			const newDataSet = currentData.values?.find((x) => x.alias === alias && variantId.compare(x));
 			return newDataSet?.value as ReturnType;
 		}
 		return undefined;
@@ -681,10 +702,13 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	 * @param {UmbVariantId} [variantId] - The variant id of the property
 	 * @memberof UmbContentDetailWorkspaceContextBase
 	 */
-	public async setPropertyValue<ValueType = unknown>(alias: string, value: ValueType, variantId?: UmbVariantId) {
+	public async setPropertyValue<ValueType = unknown>(
+		alias: string,
+		value: ValueType,
+		variantId: UmbVariantId = UmbVariantId.CreateInvariant(),
+	) {
 		try {
 			this.initiatePropertyValueChange();
-			variantId ??= UmbVariantId.CreateInvariant();
 			const property = await this.structure.getPropertyStructureByAlias(alias);
 
 			if (!property) {
@@ -734,7 +758,8 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	async #ensureVariantsExistsForProperty(variantId: UmbVariantId, entry: UmbElementValueModel) {
 		// TODO: Implement queueing of these operations to ensure this does not execute too often. [NL]
 
-		const cultureOptions = await this.getVariantOptions();
+		const cultureOptions = await this.getCultureVariantOptions();
+		// TODO: make sure they are unique:
 		let valueVariantIds: Array<UmbVariantId> = [];
 
 		// Find inner values to determine if any of this holds variants that needs to be created.
@@ -750,32 +775,35 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		 * We need to ensure variant-entries across all culture variants for the given segment variant, when er property is configured to vary by segment but not culture.
 		 * This is the only different case, in all other cases its fine to just target the given variant.
 		 */
-		const variantOptionsToCheck: Array<UmbVariantId> = [];
+		const variantOptionsToCheck = new Map<string, UmbVariantId>();
 		for (const variant of valueVariantIds) {
 			// If a non-culture but segmented value, then spread across all cultures for the given segment:
-			if (this.getVariesByCulture() && variant.culture === null && variant.segment !== null) {
+			/*if (this.getVariesByCulture() && variant.culture === null && variant.segment !== null) {
 				// get all culture options:
-				for (const cultureOption of cultureOptions) {
-					if (cultureOption.segment === variant.segment) {
-						variantOptionsToCheck.push(UmbVariantId.Create(cultureOption));
+				for (const option of variantOptions) {
+					if (option.segment === variant.segment) {
+						const optionVariant = UmbVariantId.Create(option);
+						variantOptionsToCheck.set(optionVariant.toString(), optionVariant);
 					}
 				}
-				// If a non-segmented but culture-variant value, then spread across all segments for the given culture:
-			}
+			}*/
+			// If a non-segmented but culture-variant value, then spread across all segments for the given culture:
 			if (this.getVariesBySegment() && variant.culture !== null && variant.segment === null) {
-				// get all culture options:
-				for (const cultureOption of cultureOptions) {
-					if (cultureOption.culture === variant.culture) {
-						variantOptionsToCheck.push(UmbVariantId.Create(cultureOption));
+				// get all segment options:
+				for (const option of cultureOptions) {
+					if (option.culture === variant.culture) {
+						const optionVariant = UmbVariantId.Create(option);
+						variantOptionsToCheck.set(optionVariant.toString(), optionVariant);
 					}
 				}
 			} else if (cultureOptions.some((x) => variant.compare(x))) {
 				// otherwise we can parse the variant-id on:
-				variantOptionsToCheck.push(variant);
+				const segmentInvariant = variant.toSegmentInvariant();
+				variantOptionsToCheck.set(segmentInvariant.toString(), segmentInvariant);
 			}
 		}
 
-		this._data.ensureVariantsData(variantOptionsToCheck);
+		this._data.ensureVariantsData(Array.from(variantOptionsToCheck.values()));
 	}
 
 	public initiatePropertyValueChange() {
@@ -799,7 +827,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		options: VariantOptionModelType[];
 		selected: string[];
 	}> {
-		const options = (await this.getVariantOptions()).filter((option) => option.segment === null);
+		const options = await this.getCultureVariantOptions();
 
 		const activeVariants = this.splitView.getActiveVariants();
 		const activeVariantIds = activeVariants.map((activeVariant) => UmbVariantId.Create(activeVariant));
@@ -843,18 +871,20 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	 */
 	public async runMandatoryValidationForSaveData(saveData: DetailModelType, variantIds: Array<UmbVariantId> = []) {
 		// Check that the data is valid before we save it.
+		// Filter away segment variants as we do not want to validate them:
+		variantIds = variantIds.filter((variant) => variant.isSegmentInvariant());
 		// If we vary by culture then we do not want to validate the invariant variant.
 		if (this.getVariesByCulture()) {
 			variantIds = variantIds.filter((variant) => !variant.isCultureInvariant());
 		}
 		const missingVariants = variantIds.filter((variant) => {
-			return !saveData.variants.some((y) => variant.compare(y));
+			return !saveData.variants.some((v) => variant.culture === v.culture);
 		});
 		if (missingVariants.length > 0) {
 			throw new Error('One or more selected variants have not been created');
 		}
-		// Check variants have a name:
-		const variantsWithoutAName = saveData.variants.filter((x) => !x.name);
+		// Check variants have a name (prevents potential segment variants to be taken into account):
+		const variantsWithoutAName = saveData.variants.filter((x) => !x.name && !(x as any).segment);
 		if (variantsWithoutAName.length > 0) {
 			const validationContext = await this.getContext(UMB_VALIDATION_CONTEXT);
 			if (!validationContext) {
@@ -868,8 +898,8 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 				);
 			});
 			throw new Error(
-				'All variants must have a name, these variants are missing a name: ' +
-					variantsWithoutAName.map((x) => (x.culture ?? 'invariant') + '_' + (x.segment ?? '')).join(', '),
+				'All culture variants must have a name, these cultures are missing a name: ' +
+					variantsWithoutAName.map((x) => x.culture ?? 'invariant').join(', '),
 			);
 		}
 	}

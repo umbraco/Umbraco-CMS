@@ -57,7 +57,6 @@ export class UmbMemberServerDataSource extends UmbControllerBase implements UmbD
 				{
 					name: '',
 					culture: null,
-					segment: null,
 					createDate: new Date().toISOString(),
 					updateDate: new Date().toISOString(),
 					flags: [],
@@ -118,7 +117,6 @@ export class UmbMemberServerDataSource extends UmbControllerBase implements UmbD
 			variants: data.variants.map((variant) => {
 				return {
 					culture: variant.culture || null,
-					segment: variant.segment || null,
 					name: variant.name,
 					createDate: variant.createDate,
 					updateDate: variant.updateDate,

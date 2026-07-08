@@ -2,15 +2,25 @@ import type { UmbContentLikeDetailModel, UmbPotentialContentValueModel } from '.
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbVariantId, type UmbVariantDataModel } from '@umbraco-cms/backoffice/variant';
+import { UmbVariantId, type UmbEntityVariantModel, type UmbVariantDataModel } from '@umbraco-cms/backoffice/variant';
 
 /**
  * @function defaultCompareVariantMethod
+ * @param {UmbEntityVariantModel} a - the first variant to compare.
+ * @param {UmbEntityVariantModel} b - the second variant to compare.
+ * @returns {boolean} - true if the two models are equally unique.
+ */
+function defaultCompareVariantMethod(a: UmbEntityVariantModel, b: UmbEntityVariantModel) {
+	return a.culture === b.culture;
+}
+
+/**
+ * @function defaultCompareVariantDataMethod
  * @param {UmbVariantDataModel} a - the first variant to compare.
  * @param {UmbVariantDataModel} b - the second variant to compare.
  * @returns {boolean} - true if the two models are equally unique.
  */
-function defaultCompareVariantMethod(a: UmbVariantDataModel, b: UmbVariantDataModel) {
+function defaultCompareVariantDataMethod(a: UmbVariantDataModel, b: UmbVariantDataModel) {
 	return a.culture === b.culture && a.segment === b.segment;
 }
 
@@ -183,7 +193,7 @@ export class UmbMergeContentVariantDataController extends UmbControllerBase {
 						persistedVariants,
 						values,
 						variantsToStore,
-						api.compareVariants ?? defaultCompareVariantMethod,
+						api.compareVariants ?? defaultCompareVariantDataMethod,
 					);
 				})) ?? newValue;
 		}
@@ -214,7 +224,7 @@ export class UmbMergeContentVariantDataController extends UmbControllerBase {
 	 * @param {(UmbVariantDataModel, UmbVariantDataModel) => boolean} compare - The compare method, which compares the unique properties of the variants.
 	 * @returns {UmbVariantDataModel[]} A new array of variants.
 	 */
-	#processVariants<VariantModel extends UmbVariantDataModel = UmbVariantDataModel>(
+	#processVariants<VariantModel extends { culture: string | null } = UmbEntityVariantModel>(
 		persistedVariants: Array<VariantModel> | undefined,
 		draftVariants: Array<VariantModel>,
 		variantsToStore: Array<UmbVariantId>,
@@ -229,7 +239,7 @@ export class UmbMergeContentVariantDataController extends UmbControllerBase {
 				const persistedVariant = persistedVariants?.find((x) => compare(x, value));
 
 				// Should this value be saved?
-				if (variantsToStore.some((x) => x.compare(value))) {
+				if (variantsToStore.some((x) => x.equal(UmbVariantId.CreateFromPartial(value)))) {
 					const draftVariant = draftVariants?.find((x) => compare(x, value));
 
 					return draftVariant;

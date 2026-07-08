@@ -85,9 +85,7 @@ export abstract class UmbBlockManagerContext<
 
 	readonly #externalContentValues = new UmbArrayState(<Array<UmbBlockDataModel>>[], (x) => x.key);
 	readonly #externalContentVariants = new UmbArrayState(
-		<
-			Array<{ key: string; variants: Array<{ culture: string | null; segment: string | null; state: string | null }> }>
-		>[],
+		<Array<{ key: string; variants: Array<{ culture: string | null; state: string | null }> }>>[],
 		(x) => x.key,
 	);
 	#elementRepository = new UmbElementDetailRepository(this);
@@ -356,7 +354,7 @@ export abstract class UmbBlockManagerContext<
 			([entry, variantId]) => {
 				if (!entry?.variants.length) return null;
 				if (!variantId) return entry.variants[0]?.state ?? null;
-				const match = entry.variants.find((v) => v.culture === variantId.culture && v.segment === variantId.segment);
+				const match = entry.variants.find((v) => v.culture === variantId.culture);
 				return match?.state ?? entry.variants[0]?.state ?? null;
 			},
 		);
@@ -389,7 +387,6 @@ export abstract class UmbBlockManagerContext<
 						key: data.unique,
 						variants: data.variants.map((v) => ({
 							culture: v.culture ?? null,
-							segment: v.segment ?? null,
 							state: v.state ?? null,
 						})),
 					});
@@ -542,7 +539,6 @@ export abstract class UmbBlockManagerContext<
 			variants: [
 				{
 					culture: null,
-					segment: null,
 					state: null,
 					name: result.name,
 					publishDate: null,

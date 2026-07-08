@@ -20,10 +20,8 @@ export interface UmbVariantPropertyValueModel extends UmbVariantDataModel, UmbPr
 export interface UmbEntityVariantModel {
 	name: string;
 	culture: string | null;
-	segment: string | null;
 	createDate: string | null;
 	updateDate: string | null;
-	// TODO: Can we remove partial from this one: [NL]
 	state?: string | null;
 	flags: Array<UmbEntityFlag>;
 }
