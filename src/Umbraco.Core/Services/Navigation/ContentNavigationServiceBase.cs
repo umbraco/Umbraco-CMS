@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Navigation;
 using Umbraco.Cms.Core.Persistence.Repositories;
@@ -75,6 +76,27 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
 
     private NavigationSnapshot _navigation = new(new(), []);
     private NavigationSnapshot _recycleBinNavigation = new(new(), []);
+
+    /// <summary>
+    ///     Gets the approximate number of nodes currently held in memory across the active navigation
+    ///     structure and the recycle bin structure, for diagnostics. Each snapshot reference is read once,
+    ///     so the count is consistent per structure even if a rebuild swaps a snapshot concurrently.
+    /// </summary>
+    private protected long GetNavigationNodeCount()
+        => _navigation.Structure.Count + _recycleBinNavigation.Structure.Count;
+
+    /// <summary>
+    ///     Gets an approximate retained size, in bytes, of the navigation structures (active tree plus
+    ///     recycle bin), for diagnostics. Sampled and structural — a coarse estimate, not a heap measurement.
+    /// </summary>
+    private protected long GetNavigationApproximateBytes()
+        => EstimateStructureBytes(_navigation.Structure) + EstimateStructureBytes(_recycleBinNavigation.Structure);
+
+    // The dictionary is enumerated directly (not via .Values, which snapshot-copies the whole collection).
+    // Per-node estimate: fixed fields (key, content-type key, parent, sort order, lock) + dictionary bucket,
+    // plus an allowance per child key (held in the child set and the cached ordered array).
+    private static long EstimateStructureBytes(ConcurrentDictionary<Guid, NavigationNode> structure)
+        => SampledSizeEstimator.Estimate(structure.Count, structure, static kvp => 120 + (40L * kvp.Value.Children.Count));
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="ContentNavigationServiceBase{TContentType, TContentTypeService}"/> class.
@@ -471,7 +493,8 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
             return false; // Node with this key already exists
         }
 
-        parentNode?.AddChild(_navigation.Structure, key);
+        // If sortOrder supplied → caller is asserting the position, preserve it; otherwise append last.
+        parentNode?.AddChild(_navigation.Structure, key, appendAsLastItem: sortOrder is null);
 
         _navigation.Invalidate();
         return true;
@@ -1005,7 +1028,10 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
             childrenWithSortOrder.Add((childNodeKey, childNode.SortOrder));
         }
 
-        childrenWithSortOrder.Sort((a, b) => a.SortOrder.CompareTo(b.SortOrder));
+        // Shares NavigationNode's canonical sibling ordering (SortOrder, then key tie-break) so the
+        // content-type-filtered path stays in sync with the unfiltered, cached path.
+        childrenWithSortOrder.Sort((a, b) =>
+            NavigationNode.CompareBySortOrderThenKey(a.SortOrder, a.ChildNodeKey, b.SortOrder, b.ChildNodeKey));
         return childrenWithSortOrder.ConvertAll(childWithSortOrder => childWithSortOrder.ChildNodeKey);
     }
 
@@ -1054,10 +1080,12 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
                 continue;
             }
 
-            // If the parent node exists in the nodesStructure, add the node to the parent's children (parent is set as well)
+            // If the parent node exists in the nodesStructure, add the node to the parent's children (parent is set as well).
+            // The node already carries its persisted SortOrder (set on construction above), so the child is linked without
+            // reassigning it — the load order here is by path (parent-first), not sort order, and must not redefine it.
             if (nodesStructure.TryGetValue(parentKey, out NavigationNode? parentNode))
             {
-                parentNode.AddChild(nodesStructure, entity.Key);
+                parentNode.AddChild(nodesStructure, entity.Key, appendAsLastItem: false);
             }
         }
     }

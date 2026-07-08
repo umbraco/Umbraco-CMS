@@ -173,6 +173,16 @@ export type CopyMemberTypeRequestModel = {
     target?: null | ReferenceByIdModel;
 };
 
+export type CreateAndPublishDocumentRequestModel = {
+    culturesToPublish: Array<string>;
+    template: null | ReferenceByIdModel;
+    documentType: ReferenceByIdModel;
+    parent?: null | ReferenceByIdModel;
+    id?: null | string;
+    values: Array<DocumentValueModel>;
+    variants: Array<DocumentVariantRequestModel>;
+};
+
 export type CreateDataTypeRequestModel = {
     id?: null | string;
     parent?: null | ReferenceByIdModel;
@@ -406,6 +416,7 @@ export type CreatePackageRequestModel = {
     contentLoadChildNodes: boolean;
     mediaIds: Array<string>;
     mediaLoadChildNodes: boolean;
+    elementIds?: null | Array<string>;
     documentTypes: Array<string>;
     mediaTypes: Array<string>;
     dataTypes: Array<string>;
@@ -1541,6 +1552,7 @@ export type ManifestResponseModel = {
     name: string;
     id?: null | string;
     version?: null | string;
+    cacheBuster?: null | string;
     extensions: Array<unknown>;
 };
 
@@ -2033,6 +2045,7 @@ export type PackageDefinitionResponseModel = {
     contentLoadChildNodes: boolean;
     mediaIds: Array<string>;
     mediaLoadChildNodes: boolean;
+    elementIds?: null | Array<string>;
     documentTypes: Array<string>;
     mediaTypes: Array<string>;
     dataTypes: Array<string>;
@@ -2977,6 +2990,13 @@ export type UnpublishElementRequestModel = {
     cultures?: null | Array<string>;
 };
 
+export type UpdateAndPublishDocumentRequestModel = {
+    culturesToPublish: Array<string>;
+    template?: null | ReferenceByIdModel;
+    values: Array<DocumentValueModel>;
+    variants: Array<DocumentVariantRequestModel>;
+};
+
 export type UpdateCurrentUserRequestModel = {
     languageIsoCode: string;
 };
@@ -3179,6 +3199,7 @@ export type UpdatePackageRequestModel = {
     contentLoadChildNodes: boolean;
     mediaIds: Array<string>;
     mediaLoadChildNodes: boolean;
+    elementIds?: null | Array<string>;
     documentTypes: Array<string>;
     mediaTypes: Array<string>;
     dataTypes: Array<string>;
@@ -5820,6 +5841,43 @@ export type PutDocumentByIdUnpublishResponses = {
     200: unknown;
 };
 
+export type PutDocumentByIdUpdateAndPublishData = {
+    body: UpdateAndPublishDocumentRequestModel;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/umbraco/management/api/v1/document/{id}/update-and-publish';
+};
+
+export type PutDocumentByIdUpdateAndPublishErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type PutDocumentByIdUpdateAndPublishError = PutDocumentByIdUpdateAndPublishErrors[keyof PutDocumentByIdUpdateAndPublishErrors];
+
+export type PutDocumentByIdUpdateAndPublishResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
 export type GetDocumentAreReferencedData = {
     body?: never;
     path?: never;
@@ -5877,6 +5935,41 @@ export type GetDocumentConfigurationResponses = {
 };
 
 export type GetDocumentConfigurationResponse = GetDocumentConfigurationResponses[keyof GetDocumentConfigurationResponses];
+
+export type PostDocumentCreateAndPublishData = {
+    body: CreateAndPublishDocumentRequestModel;
+    path?: never;
+    query?: never;
+    url: '/umbraco/management/api/v1/document/create-and-publish';
+};
+
+export type PostDocumentCreateAndPublishErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type PostDocumentCreateAndPublishError = PostDocumentCreateAndPublishErrors[keyof PostDocumentCreateAndPublishErrors];
+
+export type PostDocumentCreateAndPublishResponses = {
+    /**
+     * Created
+     */
+    201: unknown;
+};
 
 export type PutDocumentRootSortChildrenData = {
     body: SortDocumentChildrenByFieldRequestModel;
@@ -18953,7 +19046,7 @@ export type GetUserCurrentPermissionsElementResponses = {
     /**
      * OK
      */
-    200: Array<UserPermissionsResponseModel>;
+    200: UserPermissionsResponseModel;
 };
 
 export type GetUserCurrentPermissionsElementResponse = GetUserCurrentPermissionsElementResponses[keyof GetUserCurrentPermissionsElementResponses];

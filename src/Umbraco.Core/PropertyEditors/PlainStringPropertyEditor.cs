@@ -1,4 +1,5 @@
 using System.Text.Json.Nodes;
+using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
@@ -17,6 +18,10 @@ public class PlainStringPropertyEditor : DataEditor, IValueSchemaProvider
     public PlainStringPropertyEditor(IDataValueEditorFactory dataValueEditorFactory)
         : base(dataValueEditorFactory)
         => SupportsReadOnly = true;
+
+    /// <inheritdoc />
+    protected override IDataValueEditor CreateValueEditor() =>
+        DataValueEditorFactory.Create<TextOnlyValueEditor>(Attribute!);
 
     /// <inheritdoc />
     public Type? GetValueType(object? configuration) => typeof(string);
