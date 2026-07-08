@@ -27,7 +27,7 @@ public class QueryConditionExtensionsTests
             },
         };
 
-        Assert.DoesNotThrow(() => condition.BuildCondition<IPublishedContent>("x"));
+        Assert.That(() => condition.BuildCondition<IPublishedContent>("x"), Throws.Nothing);
     }
 
     [Test]
@@ -68,12 +68,13 @@ public class QueryConditionExtensionsTests
         });
     }
 
-    [Test]
-    public void Can_Build_And_Evaluate_CreateDate_GreaterThan_Condition()
+    [TestCase("CreateDate")]
+    [TestCase("UpdateDate")]
+    public void Can_Build_And_Evaluate_Date_GreaterThan_Condition(string alias)
     {
         var condition = new QueryCondition
         {
-            Property = new PropertyModel { Alias = "CreateDate", Type = "datetime" },
+            Property = new PropertyModel { Alias = alias, Type = "datetime" },
             Term = new OperatorTerm { Operator = Operator.GreaterThan },
             ConstraintValue = "2024-01-01",
         };
@@ -82,17 +83,32 @@ public class QueryConditionExtensionsTests
 
         Assert.Multiple(() =>
         {
-            Assert.That(predicate(MockContent(createDate: new DateTime(2024, 06, 01))), Is.True);
-            Assert.That(predicate(MockContent(createDate: new DateTime(2023, 06, 01))), Is.False);
+            Assert.That(predicate(MockContentWithDate(alias, new DateTime(2024, 06, 01))), Is.True);
+            Assert.That(predicate(MockContentWithDate(alias, new DateTime(2023, 06, 01))), Is.False);
         });
     }
 
-    private static IPublishedContent MockContent(string name = "", int id = 0, DateTime createDate = default)
+    private static IPublishedContent MockContent(string name = "", int id = 0)
     {
         var content = new Mock<IPublishedContent>();
         content.SetupGet(x => x.Name).Returns(name);
         content.SetupGet(x => x.Id).Returns(id);
-        content.SetupGet(x => x.CreateDate).Returns(createDate);
+        return content.Object;
+    }
+
+    private static IPublishedContent MockContentWithDate(string alias, DateTime date)
+    {
+        var content = new Mock<IPublishedContent>();
+        switch (alias)
+        {
+            case "CreateDate":
+                content.SetupGet(x => x.CreateDate).Returns(date);
+                break;
+            case "UpdateDate":
+                content.SetupGet(x => x.UpdateDate).Returns(date);
+                break;
+        }
+
         return content.Object;
     }
 }

@@ -90,13 +90,16 @@ public static class QueryConditionExtensions
     /// <param name="propertyName">The name of the property to find.</param>
     /// <returns>The matching <see cref="PropertyInfo" />.</returns>
     /// <remarks>
-    ///     <see cref="Type.GetProperty(string)" /> on an interface does not return members declared on base
-    ///     interfaces, so when the property is not found directly (e.g. <c>IPublishedContent</c> exposing
-    ///     <c>Name</c>/<c>Id</c> via <c>IPublishedElement</c>) the inherited interfaces are searched explicitly.
+    ///     <see cref="Type.GetProperty(string, BindingFlags)" /> on an interface does not return members declared on
+    ///     base interfaces, so when the property is not found directly (e.g. <c>IPublishedContent</c> exposing
+    ///     <c>Name</c>/<c>Id</c> via <c>IPublishedElement</c>) the inherited interfaces are searched explicitly. The
+    ///     lookup is restricted to public instance properties to mirror <see cref="Expression.Property(Expression, string)" />.
     /// </remarks>
     private static PropertyInfo GetPropertyInfo(Type type, string propertyName)
     {
-        PropertyInfo? propertyInfo = type.GetProperty(propertyName);
+        const BindingFlags bindingFlags = BindingFlags.Instance | BindingFlags.Public;
+
+        PropertyInfo? propertyInfo = type.GetProperty(propertyName, bindingFlags);
         if (propertyInfo is not null)
         {
             return propertyInfo;
@@ -104,13 +107,13 @@ public static class QueryConditionExtensions
 
         foreach (Type interfaceType in type.GetInterfaces())
         {
-            propertyInfo = interfaceType.GetProperty(propertyName);
+            propertyInfo = interfaceType.GetProperty(propertyName, bindingFlags);
             if (propertyInfo is not null)
             {
                 return propertyInfo;
             }
         }
 
-        throw new InvalidOperationException($"Property '{propertyName}' is not defined for type '{type}'.");
+        throw new ArgumentException($"Instance property '{propertyName}' is not defined for type '{type}'", nameof(propertyName));
     }
 }
