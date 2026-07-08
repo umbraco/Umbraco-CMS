@@ -4,6 +4,7 @@ import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
+import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 
 /**
  * A context for fetching and caching the document configuration.
@@ -24,6 +25,20 @@ export class UmbDocumentConfigurationContext extends UmbContextBase implements U
 		const { data } = await this.#repository.requestConfiguration();
 
 		return data ?? null;
+	}
+
+	/**
+	 * @deprecated Deprecated since v17. Use `getDocumentConfiguration()` instead. Will be removed in v19.
+	 * @returns {Promise<UmbDocumentConfigurationModel | null>} A promise that resolves to the document configuration, or null if the configuration could not be fetched.
+	 */
+	fetchDocumentConfiguration(): Promise<UmbDocumentConfigurationModel | null> {
+		new UmbDeprecation({
+			deprecated: 'UmbDocumentConfigurationContext.fetchDocumentConfiguration()',
+			removeInVersion: '19.0.0',
+			solution: 'Use getDocumentConfiguration() instead.',
+		}).warn();
+
+		return this.getDocumentConfiguration();
 	}
 }
 
