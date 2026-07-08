@@ -445,43 +445,25 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
 
         Guid contentObjectType = Constants.ObjectTypes.Document;
 
-        long total = 0;
         Dictionary<int, byte>? contentTypeVariations = null;
         Dictionary<short, string>? languageMap = null;
         Dictionary<int, List<PropertyTypeInfo>>? propertyInfoByContentType = null;
 
-        // Delete and pre-fetch in one step, then release locks before the paging loop.
-        executeStep(() =>
-        {
-            RemoveByObjectType(contentObjectType, contentTypeIds);
-
-            Sql<ISqlContext> countSql = Sql()
-                .SelectCount()
-                .From<NodeDto>()
-                .InnerJoin<ContentDto>().On<NodeDto, ContentDto>((n, c) => n.NodeId == c.NodeId)
-                .Where<NodeDto>(x => x.NodeObjectType == contentObjectType);
-
-            if (contentTypeIds.Count > 0)
-            {
-                countSql = countSql.WhereIn<ContentDto>(x => x.ContentTypeId, contentTypeIds);
-            }
-
-            total = Database.ExecuteScalar<long>(countSql);
-
-            if (total == 0)
-            {
-                return;
-            }
-
-            contentTypeVariations = GetContentTypeVariations(contentTypeIds);
-            languageMap = GetLanguageMap();
-            propertyInfoByContentType = GetPropertyInfoByContentType(contentTypeIds);
-        });
+        // Delete stale rows in batches (each its own step); the returned count of affected nodes is the
+        // number to repopulate, so no separate count query is needed.
+        long total = RemoveByObjectTypeInBatches(contentObjectType, contentTypeIds, executeStep);
 
         if (total == 0)
         {
             return;
         }
+
+        executeStep(() =>
+        {
+            contentTypeVariations = GetContentTypeVariations(contentTypeIds);
+            languageMap = GetLanguageMap();
+            propertyInfoByContentType = GetPropertyInfoByContentType(contentTypeIds);
+        });
 
         long processed = 0;
         long pageIndex = 0;
@@ -1023,38 +1005,21 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
 
         Guid mediaObjectType = Constants.ObjectTypes.Media;
 
-        long total = 0;
         Dictionary<int, List<string>>? propertyAliasesByContentType = null;
 
-        executeStep(() =>
-        {
-            RemoveByObjectType(mediaObjectType, contentTypeIds);
-
-            Sql<ISqlContext> countSql = Sql()
-                .SelectCount()
-                .From<NodeDto>()
-                .InnerJoin<ContentDto>().On<NodeDto, ContentDto>((n, c) => n.NodeId == c.NodeId)
-                .Where<NodeDto>(x => x.NodeObjectType == mediaObjectType);
-
-            if (contentTypeIds.Count > 0)
-            {
-                countSql = countSql.WhereIn<ContentDto>(x => x.ContentTypeId, contentTypeIds);
-            }
-
-            total = Database.ExecuteScalar<long>(countSql);
-
-            if (total == 0)
-            {
-                return;
-            }
-
-            propertyAliasesByContentType = GetPropertyAliasesByContentType(contentTypeIds);
-        });
+        // Delete stale rows in batches (each its own step); the returned count of affected nodes is the
+        // number to repopulate, so no separate count query is needed.
+        long total = RemoveByObjectTypeInBatches(mediaObjectType, contentTypeIds, executeStep);
 
         if (total == 0)
         {
             return;
         }
+
+        executeStep(() =>
+        {
+            propertyAliasesByContentType = GetPropertyAliasesByContentType(contentTypeIds);
+        });
 
         long processed = 0;
         long pageIndex = 0;
@@ -1344,37 +1309,21 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
 
         Guid memberObjectType = Constants.ObjectTypes.Member;
 
-        long total = 0;
         Dictionary<int, List<string>>? propertyAliasesByContentType = null;
 
-        executeStep(() =>
-        {
-            RemoveByObjectType(memberObjectType, contentTypeIds);
-
-            Sql<ISqlContext> countSql = Sql()
-                .SelectCount()
-                .From<NodeDto>()
-                .InnerJoin<ContentDto>().On<NodeDto, ContentDto>((n, c) => n.NodeId == c.NodeId)
-                .Where<NodeDto>(x => x.NodeObjectType == memberObjectType);
-
-            if (contentTypeIds.Count > 0)
-            {
-                countSql = countSql.WhereIn<ContentDto>(x => x.ContentTypeId, contentTypeIds);
-            }
-
-            total = Database.ExecuteScalar<long>(countSql);
-            if (total == 0)
-            {
-                return;
-            }
-
-            propertyAliasesByContentType = GetPropertyAliasesByContentType(contentTypeIds);
-        });
+        // Delete stale rows in batches (each its own step); the returned count of affected nodes is the
+        // number to repopulate, so no separate count query is needed.
+        long total = RemoveByObjectTypeInBatches(memberObjectType, contentTypeIds, executeStep);
 
         if (total == 0)
         {
             return;
         }
+
+        executeStep(() =>
+        {
+            propertyAliasesByContentType = GetPropertyAliasesByContentType(contentTypeIds);
+        });
 
         long processed = 0;
         long pageIndex = 0;
@@ -1413,6 +1362,112 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
 
             pageIndex++;
         }
+    }
+
+    /// <summary>
+    ///     Deletes the <c>cmsContentNu</c> rows for the given object type in batches, running each batch through
+    ///     the supplied <paramref name="executeStep" /> delegate.
+    /// </summary>
+    /// <remarks>
+    ///     Batching avoids a single unbounded DELETE that can escalate to a table lock, bloat the transaction
+    ///     log, and (for a content type backing a lot of content) exceed the command timeout. When the caller's
+    ///     <paramref name="executeStep" /> opens a fresh scope per step (the deferred rebuild path), each batch
+    ///     commits in its own transaction, so the locks and log space it uses are released between batches
+    ///     instead of accumulating across the whole delete. When it runs inline (the immediate path) the batches
+    ///     share the ambient transaction, but each DELETE statement is still individually bounded.
+    /// </remarks>
+    /// <returns>The number of content nodes affected, i.e. the number that will need repopulating.</returns>
+    private long RemoveByObjectTypeInBatches(Guid objectType, IReadOnlyCollection<int> contentTypeIds, Action<Action> executeStep)
+    {
+        // A full clear (no content type filter) is only used by full rebuilds, where the table has typically
+        // already been truncated, so keep it as a single statement.
+        if (contentTypeIds.Count == 0)
+        {
+            long allCount = 0;
+            executeStep(() =>
+            {
+                RemoveByObjectType(objectType, contentTypeIds);
+                allCount = CountByObjectType(objectType, contentTypeIds);
+            });
+            return allCount;
+        }
+
+        // The node ids come from the (stable) source tables, not cmsContentNu, so fetching them once up front
+        // is safe: concurrent foreground saves during a deferred rebuild only add/remove rows we either
+        // correctly skip (new rows are preserved) or harmlessly no-op on (already-removed rows).
+        List<int> nodeIds = [];
+        executeStep(() => nodeIds = GetNodeIdsByContentTypes(objectType, contentTypeIds));
+
+        var batchSize = Math.Clamp(_nucacheSettings.Value.ContentTypeRebuildDeleteBatchSize, 1, Constants.Sql.MaxParameterCount);
+        var totalBatches = (int)Math.Ceiling(nodeIds.Count / (double)batchSize);
+
+        _logger.LogDebug(
+            "Rebuild: deleting cmsContentNu rows for object type {ObjectType} — {NodeCount} node(s) in {BatchCount} batch(es) of up to {BatchSize}.",
+            objectType,
+            nodeIds.Count,
+            totalBatches,
+            batchSize);
+
+        var batchNumber = 0;
+        foreach (IEnumerable<int> batch in nodeIds.InGroupsOf(batchSize))
+        {
+            var nodeIdBatch = batch.ToArray();
+            var currentBatchNumber = ++batchNumber;
+            executeStep(() =>
+            {
+                DeleteContentNuByNodeIds(nodeIdBatch);
+                _logger.LogDebug(
+                    "Rebuild: deleted cmsContentNu batch {BatchNumber}/{BatchCount} ({NodeCount} node(s)) for object type {ObjectType}.",
+                    currentBatchNumber,
+                    totalBatches,
+                    nodeIdBatch.Length,
+                    objectType);
+            });
+        }
+
+        return nodeIds.Count;
+    }
+
+    private List<int> GetNodeIdsByContentTypes(Guid objectType, IReadOnlyCollection<int> contentTypeIds)
+    {
+        Sql<ISqlContext> sql = Sql()
+            .Select<NodeDto>(x => x.NodeId)
+            .From<NodeDto>()
+            .InnerJoin<ContentDto>().On<NodeDto, ContentDto>((n, c) => n.NodeId == c.NodeId)
+            .Where<NodeDto>(x => x.NodeObjectType == objectType)
+            .WhereIn<ContentDto>(x => x.ContentTypeId, contentTypeIds);
+
+        return Database.Fetch<int>(sql);
+    }
+
+    private long CountByObjectType(Guid objectType, IReadOnlyCollection<int> contentTypeIds)
+    {
+        Sql<ISqlContext> sql = Sql()
+            .SelectCount()
+            .From<NodeDto>()
+            .InnerJoin<ContentDto>().On<NodeDto, ContentDto>((n, c) => n.NodeId == c.NodeId)
+            .Where<NodeDto>(x => x.NodeObjectType == objectType);
+
+        if (contentTypeIds.Count > 0)
+        {
+            sql = sql.WhereIn<ContentDto>(x => x.ContentTypeId, contentTypeIds);
+        }
+
+        return Database.ExecuteScalar<long>(sql);
+    }
+
+    private void DeleteContentNuByNodeIds(IReadOnlyCollection<int> nodeIds)
+    {
+        if (nodeIds.Count == 0)
+        {
+            return;
+        }
+
+        Sql<ISqlContext> sql = Sql()
+            .Delete<ContentNuDto>()
+            .WhereIn<ContentNuDto>(x => x.NodeId, nodeIds);
+
+        Database.Execute(sql);
     }
 
     private void RemoveByObjectType(Guid objectType, IReadOnlyCollection<int> contentTypeIds)
