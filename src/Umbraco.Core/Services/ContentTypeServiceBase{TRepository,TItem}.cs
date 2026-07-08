@@ -1223,6 +1223,10 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
 
     /// <inheritdoc />
     public async Task<PagedModel<TItem>> GetAllAllowedInLibraryAsync(int skip, int take)
+        => await GetAllAllowedInLibraryAsync(null, skip, take);
+
+    /// <inheritdoc />
+    public async Task<PagedModel<TItem>> GetAllAllowedInLibraryAsync(Guid? parentKey, int skip, int take)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
         scope.ReadLock(ReadLockIds);
@@ -1232,7 +1236,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
 
         foreach (IContentTypeFilter filter in _contentTypeFilters)
         {
-            contentTypes = await filter.FilterAllowedInLibraryAsync(contentTypes);
+            contentTypes = await filter.FilterAllowedInLibraryAsync(contentTypes, parentKey);
         }
 
         contentTypes = contentTypes.ToArray();
