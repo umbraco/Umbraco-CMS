@@ -1,7 +1,10 @@
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
 using Umbraco.Cms.Api.Management.ViewModels.Element;
 using Umbraco.Cms.Api.Management.ViewModels.Element.Item;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentPublishing;
 using Umbraco.Cms.Core.Models.Entities;
@@ -14,6 +17,17 @@ namespace Umbraco.Cms.Api.Management.Factories;
 /// </summary>
 public interface IElementPresentationFactory
 {
+    /// <summary>
+    /// Creates a published element response model asynchronously from the given element.
+    /// </summary>
+    /// <param name="element">The element to create the published response model from.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the published element response model.</returns>
+    // TODO (V20): Remove the default implementation.
+    Task<PublishedElementResponseModel> CreatePublishedResponseModelAsync(IElement element)
+        => Task.FromResult(
+            StaticServiceProvider.Instance.GetRequiredService<IUmbracoMapper>()
+                .Map<PublishedElementResponseModel>(element)!);
+
     /// <summary>
     /// Creates a response model for the given element and its schedule.
     /// </summary>

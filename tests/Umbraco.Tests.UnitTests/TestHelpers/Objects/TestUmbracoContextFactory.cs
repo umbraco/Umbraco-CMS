@@ -24,12 +24,14 @@ public class TestUmbracoContextFactory
         IUmbracoContextAccessor umbracoContextAccessor = null,
         IHttpContextAccessor httpContextAccessor = null,
         IPublishedUrlProvider publishedUrlProvider = null,
-        UmbracoRequestPathsOptions umbracoRequestPathsOptions = null)
+        UmbracoRequestPathsOptions umbracoRequestPathsOptions = null,
+        DeliveryApiSettings deliveryApiSettings = null)
     {
         umbracoContextAccessor ??= new TestUmbracoContextAccessor();
         httpContextAccessor ??= Mock.Of<IHttpContextAccessor>();
         publishedUrlProvider ??= Mock.Of<IPublishedUrlProvider>();
         umbracoRequestPathsOptions ??= new UmbracoRequestPathsOptions();
+        deliveryApiSettings ??= new DeliveryApiSettings();
 
         var contentCache = new Mock<IPublishedContentCache>();
         var mediaCache = new Mock<IPublishedMediaCache>();
@@ -41,7 +43,10 @@ public class TestUmbracoContextFactory
 
         var umbracoContextFactory = new UmbracoContextFactory(
             umbracoContextAccessor,
-            new UmbracoRequestPaths(hostingEnvironment, Options.Create(umbracoRequestPathsOptions)),
+            new UmbracoRequestPaths(
+                hostingEnvironment,
+                Options.Create(umbracoRequestPathsOptions),
+                Options.Create(deliveryApiSettings)),
             hostingEnvironment,
             new UriUtility(hostingEnvironment),
             new AspNetCoreCookieManager(httpContextAccessor),

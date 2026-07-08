@@ -354,6 +354,10 @@ export class DataTypeUiHelper extends UiBaseLocators {
     await this.openCaretButtonForName('Data Types');
   }
 
+  async reloadDataTypeTree() {
+    await this.reloadTree('Data Types');
+  }
+
   async createDataTypeFolder(folderName: string) {
     await this.clickCreateActionMenuOption();
     await this.clickFolderButton();

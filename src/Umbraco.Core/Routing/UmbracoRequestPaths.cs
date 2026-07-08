@@ -1,5 +1,7 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Extensions;
 
@@ -19,16 +21,26 @@ public class UmbracoRequestPaths
     private readonly string _surfaceMvcPath;
     private readonly string _apiMvcPath;
     private readonly string _managementApiPath;
-    private readonly string _installPath;
+    private readonly string _deliveryApiPath;
     private readonly IOptions<UmbracoRequestPathsOptions> _umbracoRequestPathsOptions;
+    private readonly IOptions<DeliveryApiSettings> _deliveryApiSettings;
+
+    [Obsolete("Please use the constructor that accepts all arguments. Scheduled for removal in Umbraco 19.")]
+    public UmbracoRequestPaths(IHostingEnvironment hostingEnvironment, IOptions<UmbracoRequestPathsOptions> umbracoRequestPathsOptions)
+        : this(hostingEnvironment, umbracoRequestPathsOptions, StaticServiceProvider.Instance.GetRequiredService<IOptions<DeliveryApiSettings>>())
+    {
+    }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="UmbracoRequestPaths" /> class.
     /// </summary>
-    public UmbracoRequestPaths(IHostingEnvironment hostingEnvironment, IOptions<UmbracoRequestPathsOptions> umbracoRequestPathsOptions)
+    public UmbracoRequestPaths(
+        IHostingEnvironment hostingEnvironment,
+        IOptions<UmbracoRequestPathsOptions> umbracoRequestPathsOptions,
+        IOptions<DeliveryApiSettings> deliveryApiSettings)
     {
         _appPath = hostingEnvironment.ApplicationVirtualPath;
-        _backOfficePath = hostingEnvironment.GetBackOfficePath().EnsureStartsWith('/').TrimStart(_appPath).EnsureStartsWith('/');
+        _backOfficePath = TrimAppPath(hostingEnvironment.GetBackOfficePath().EnsureStartsWith('/'));
 
         const string mvcArea = Constants.System.UmbracoPathSegment;
         _defaultUmbPath = "/" + mvcArea;
@@ -38,9 +50,10 @@ public class UmbracoRequestPaths
         _surfaceMvcPath = "/" + mvcArea + "/Surface/";
         _apiMvcPath = "/" + mvcArea + "/Api/";
         _managementApiPath = "/" + mvcArea + Constants.Web.ManagementApiPath;
-        _installPath = hostingEnvironment.ToAbsolute(Constants.SystemDirectories.Install);
+        _deliveryApiPath = "/" + mvcArea + Constants.Web.DeliveryApiPath;
 
         _umbracoRequestPathsOptions = umbracoRequestPathsOptions;
+        _deliveryApiSettings = deliveryApiSettings;
     }
 
     /// <summary>
@@ -69,7 +82,7 @@ public class UmbracoRequestPaths
     /// </remarks>
     public bool IsBackOfficeRequest(string absPath)
     {
-        string urlPath = absPath.TrimStart(_appPath).EnsureStartsWith('/');
+        string urlPath = TrimAppPath(absPath);
 
         // check if this is in the umbraco back office
         if (!urlPath.InvariantStartsWith(_backOfficePath))
@@ -147,6 +160,19 @@ public class UmbracoRequestPaths
     public bool IsClientSideRequest(string absPath)
     {
         var ext = Path.GetExtension(absPath);
-        return !ext.IsNullOrWhiteSpace();
+        if (ext.IsNullOrWhiteSpace())
+        {
+            return false;
+        }
+
+        if (_deliveryApiSettings.Value.Enabled && TrimAppPath(absPath).InvariantStartsWith(_deliveryApiPath))
+        {
+            return false;
+        }
+
+        return true;
     }
+
+    private string TrimAppPath(string absPath)
+        => absPath.TrimStart(_appPath).EnsureStartsWith('/');
 }

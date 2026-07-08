@@ -55,6 +55,7 @@ test('can create a data type folder using create options', async ({umbracoApi, u
 test('can create a data type in a folder using create options', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.dataType.createFolder(dataTypeFolderName);
+  await umbracoUi.dataType.reloadDataTypeTree();
   await umbracoUi.dataType.goToDataType(dataTypeFolderName);
 
   // Act
@@ -77,6 +78,7 @@ test('can create a data type folder in a folder using create options', async ({u
   const childFolderName = 'Test Child Folder';
   await umbracoApi.dataType.ensureNameNotExists(childFolderName);
   await umbracoApi.dataType.createFolder(dataTypeFolderName);
+  await umbracoUi.dataType.reloadDataTypeTree();
   await umbracoUi.dataType.goToDataType(dataTypeFolderName);
 
   // Act

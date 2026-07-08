@@ -36,6 +36,7 @@ test('can add a media in RTE Tiptap property editor', async ({umbracoApi, umbrac
   await umbracoUi.content.selectMediaWithName(imageName);
   await umbracoUi.content.clickChooseModalButton();
   await umbracoUi.content.clickMediaCaptionAltTextModalSubmitButton();
+  await umbracoUi.content.isImageInTipTapEditorVisible(imageName);
   await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
 
   // Assert
