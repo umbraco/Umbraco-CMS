@@ -1,6 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
@@ -36,7 +37,8 @@ public class CacheRefreshingNotificationHandlerTests
             _documentCacheService.Object,
             _mediaCacheService.Object,
             _publishedContentTypeCache.Object,
-            Options.Create(new CacheSettings { ContentTypeRebuildMode = mode }));
+            Options.Create(new CacheSettings { ContentTypeRebuildMode = mode }),
+            NullLogger<CacheRefreshingNotificationHandler>.Instance);
 
     /// <summary>
     ///     Verifies that a structural content type change in immediate mode triggers a synchronous database cache rebuild.
@@ -131,6 +133,68 @@ public class CacheRefreshingNotificationHandlerTests
         _documentCacheService.Verify(
             x => x.ClearConvertedContentCache(),
             Times.Never);
+    }
+
+    /// <summary>
+    ///     Verifies that a property-removal (RawDataUnaffected) content type change skips the database rebuild and
+    ///     only clears the converted cache, since the stored cmsContentNu blob stays valid.
+    /// </summary>
+    [Test]
+    public async Task RawDataUnaffected_Content_Type_Change_Skips_Rebuild_And_Clears_Converted_Cache()
+    {
+        // Arrange
+        var contentType = CreateContentType(100);
+#pragma warning disable CS0618 // Type or member is obsolete
+        var notification = new ContentTypeRefreshedNotification(
+            new ContentTypeChange<IContentType>(contentType, ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RawDataUnaffected),
+            new EventMessages());
+#pragma warning restore CS0618 // Type or member is obsolete
+
+        _documentCacheService
+            .Setup(x => x.ClearConvertedContentCache(It.Is<IReadOnlyCollection<int>>(ids => ids.Count == 1 && ids.Contains(100))));
+
+        // Act
+        await _handler.HandleAsync(notification, CancellationToken.None);
+
+        // Assert — no raw database rebuild for a property removal.
+        _documentCacheService.Verify(
+            x => x.Rebuild(It.IsAny<IReadOnlyCollection<int>>()),
+            Times.Never);
+
+        // Assert — converted cache is cleared selectively by content type ID.
+        _documentCacheService.Verify(
+            x => x.ClearConvertedContentCache(It.Is<IReadOnlyCollection<int>>(ids => ids.Count == 1 && ids.Contains(100))),
+            Times.Once);
+    }
+
+    /// <summary>
+    ///     Verifies that a property-removal (RawDataUnaffected) media type change skips the database rebuild and
+    ///     only clears the converted cache.
+    /// </summary>
+    [Test]
+    public async Task RawDataUnaffected_Media_Type_Change_Skips_Rebuild_And_Clears_Converted_Cache()
+    {
+        // Arrange
+        var mediaType = CreateMediaType(200);
+#pragma warning disable CS0618 // Type or member is obsolete
+        var notification = new MediaTypeRefreshedNotification(
+            new ContentTypeChange<IMediaType>(mediaType, ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RawDataUnaffected),
+            new EventMessages());
+#pragma warning restore CS0618 // Type or member is obsolete
+
+        _mediaCacheService
+            .Setup(x => x.ClearConvertedContentCache(It.Is<IReadOnlyCollection<int>>(ids => ids.Count == 1 && ids.Contains(200))));
+
+        // Act
+        await _handler.HandleAsync(notification, CancellationToken.None);
+
+        // Assert
+        _mediaCacheService.Verify(
+            x => x.Rebuild(It.IsAny<IReadOnlyCollection<int>>()),
+            Times.Never);
+        _mediaCacheService.Verify(
+            x => x.ClearConvertedContentCache(It.Is<IReadOnlyCollection<int>>(ids => ids.Count == 1 && ids.Contains(200))),
+            Times.Once);
     }
 
     /// <summary>

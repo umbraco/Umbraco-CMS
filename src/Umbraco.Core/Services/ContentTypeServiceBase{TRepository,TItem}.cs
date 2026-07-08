@@ -357,6 +357,14 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
 
         var changes = new List<ContentTypeChange<TItem>>();
 
+        // Track which types genuinely need a raw cmsContentNu rebuild vs. which only had a property removed.
+        // A type can appear via more than one path (e.g. a batch save touching a composition, where the same
+        // type is both saved directly and returned by GetComposedOf as a different instance), so we key these
+        // by Id — not entity reference — and resolve the RawDataUnaffected flag once at the end: it is only
+        // safe when *nothing* required a rebuild for that Id.
+        var rebuildRequiredIds = new HashSet<int>();
+        var rawDataUnaffectedCandidateIds = new HashSet<int>();
+
         foreach (TItem contentType in contentTypes)
         {
             var dirty = (IRememberBeingDirty)contentType;
@@ -406,8 +414,19 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
 
             if (hasAliasChanged || hasPropertyMainImpact)
             {
+                // A property removal is the only structural change that does not require a raw cmsContentNu
+                // rebuild: the removed alias simply stops resolving against the content type, so the stored
+                // blob's orphaned value is never read. Any other structural cause does need a rebuild.
+                var rawDataUnaffected = hasAnyPropertyBeenRemoved &&
+                    hasAliasChanged is false &&
+                    hasAnyPropertyChangedAlias is false &&
+                    hasContentTypeVariationChanged is false &&
+                    hasAnyPropertyVariationChanged is false &&
+                    hasAnyCompositionBeenRemoved is false;
+
                 // add that one, as a main change
                 AddChange(changes, contentType, ContentTypeChangeTypes.RefreshMain);
+                (rawDataUnaffected ? rawDataUnaffectedCandidateIds : rebuildRequiredIds).Add(contentType.Id);
 
                 // Add VariationChanged flag if content type variation changed.
                 // This is used by DocumentUrlService to rebuild URL cache with correct languageId.
@@ -420,7 +439,9 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
                 {
                     foreach (TItem c in GetComposedOf(contentType.Id))
                     {
+                        // Composing types inherit the same property change, so they share its rebuild requirement.
                         AddChange(changes, c, ContentTypeChangeTypes.RefreshMain);
+                        (rawDataUnaffected ? rawDataUnaffectedCandidateIds : rebuildRequiredIds).Add(c.Id);
                     }
                 }
             }
@@ -428,6 +449,15 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
             {
                 // add that one, as an other change
                 AddChange(changes, contentType, ContentTypeChangeTypes.RefreshOther);
+            }
+        }
+
+        // Flag the raw data as unaffected only for types that were never independently marked as needing a rebuild.
+        foreach (ContentTypeChange<TItem> change in changes)
+        {
+            if (rawDataUnaffectedCandidateIds.Contains(change.Item.Id) && rebuildRequiredIds.Contains(change.Item.Id) is false)
+            {
+                change.ChangeTypes |= ContentTypeChangeTypes.RawDataUnaffected;
             }
         }
 
