@@ -71,6 +71,7 @@ export class UmbPackageRepository extends UmbControllerBase implements UmbApi {
 			contentLoadChildNodes: false,
 			mediaIds: [],
 			mediaLoadChildNodes: false,
+			elementIds: [],
 			documentTypes: [],
 			mediaTypes: [],
 			dataTypes: [],
