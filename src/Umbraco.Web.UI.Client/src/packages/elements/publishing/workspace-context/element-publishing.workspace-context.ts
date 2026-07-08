@@ -445,10 +445,9 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 		const hasPublishedVariant = this.#hasPublishedVariant();
 		if (!hasPublishedVariant) return;
 
-		// TODO: Implement once ElementService.getElementByIdPublished endpoint exists [LK]
-		// const { data } = await this.#publishingRepository.published(unique);
-		// this.#publishedElementData = data;
-		// this.#processPendingChanges();
+		const { data } = await this.#publishingRepository.published(unique);
+		this.#publishedElementData = data;
+		this.#processPendingChanges();
 	}
 
 	#processPendingChanges() {
