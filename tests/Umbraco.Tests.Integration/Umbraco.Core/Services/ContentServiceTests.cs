@@ -41,13 +41,12 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithContent
 {
     [SetUp]
-    public void Setup() => ContentRepositoryBase.ThrowOnWarning = true;
+    public new void Setup() => ContentRepositoryBase.ThrowOnWarning = true;
 
     [TearDown]
     public void Teardown() => ContentRepositoryBase.ThrowOnWarning = false;
     // TODO: Add test to verify there is only ONE newest document/content in {Constants.DatabaseSchema.Tables.Document} table after updating.
     // TODO: Add test to delete specific version (with and without deleting prior versions) and versions by date.
-
 
     private ILocalizedTextService LocalizedTextService => GetRequiredService<ILocalizedTextService>();
 
