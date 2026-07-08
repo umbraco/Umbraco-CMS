@@ -1,6 +1,6 @@
 import { useMockHandlers, resetMockHandlers } from '../../../../../mocks/index.js';
-import { UmbDocumentConfigurationRepository, resetUmbDocumentConfigurationCache } from './configuration.repository.js';
-import type { UmbDocumentConfigurationModel } from './types.js';
+import { UmbMediaConfigurationRepository, resetUmbMediaConfigurationCache } from './configuration.repository.js';
+import type { UmbMediaConfigurationModel } from './types.js';
 import { expect } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
@@ -8,29 +8,26 @@ import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 const { http, HttpResponse } = window.MockServiceWorker;
 
-const UMB_SLUG = '/document';
+const UMB_SLUG = '/media';
 
-const configuration: UmbDocumentConfigurationModel = {
+const configuration: UmbMediaConfigurationModel = {
 	disableDeleteWhenReferenced: true,
-	disableUnpublishWhenReferenced: true,
-	allowEditInvariantFromNonDefault: false,
-	allowNonExistingSegmentsCreation: false,
 };
 
-@customElement('umb-test-document-configuration-repository-host')
-class UmbTestDocumentConfigurationRepositoryHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
+@customElement('umb-test-media-configuration-repository-host')
+class UmbTestMediaConfigurationRepositoryHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
 
-describe('UmbDocumentConfigurationRepository', () => {
-	let host: UmbTestDocumentConfigurationRepositoryHostElement;
-	let repository: UmbDocumentConfigurationRepository;
+describe('UmbMediaConfigurationRepository', () => {
+	let host: UmbTestMediaConfigurationRepositoryHostElement;
+	let repository: UmbMediaConfigurationRepository;
 	let requestCount: number;
 
 	beforeEach(() => {
 		requestCount = 0;
-		resetUmbDocumentConfigurationCache();
-		host = new UmbTestDocumentConfigurationRepositoryHostElement();
+		resetUmbMediaConfigurationCache();
+		host = new UmbTestMediaConfigurationRepositoryHostElement();
 		document.body.appendChild(host);
-		repository = new UmbDocumentConfigurationRepository(host);
+		repository = new UmbMediaConfigurationRepository(host);
 	});
 
 	afterEach(() => {
