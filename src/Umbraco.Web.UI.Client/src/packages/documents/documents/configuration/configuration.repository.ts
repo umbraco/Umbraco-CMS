@@ -4,17 +4,17 @@ import type { UmbContentConfigurationRepository } from '@umbraco-cms/backoffice/
 import { UmbRepositoryBase, type UmbRepositoryResponse } from '@umbraco-cms/backoffice/repository';
 
 /**
+ * The cached document configuration, shared across all repository instances.
+ */
+let configurationPromise: Promise<UmbRepositoryResponse<UmbDocumentConfigurationModel>> | undefined;
+
+/**
  * @description - Repository for Document configuration.
  * @exports
  * @class UmbDocumentConfigurationRepository
  * @augments UmbRepositoryBase
  */
 export class UmbDocumentConfigurationRepository extends UmbRepositoryBase implements UmbContentConfigurationRepository {
-	/**
-	 * The cached document configuration, shared across all instances.
-	 */
-	static #configuration: Promise<UmbRepositoryResponse<UmbDocumentConfigurationModel>>;
-
 	readonly #serverDataSource = new UmbDocumentConfigurationServerDataSource(this);
 
 	/**
@@ -23,7 +23,8 @@ export class UmbDocumentConfigurationRepository extends UmbRepositoryBase implem
 	 * @memberof UmbDocumentConfigurationRepository
 	 */
 	requestConfiguration(): Promise<UmbRepositoryResponse<UmbDocumentConfigurationModel>> {
-		return (UmbDocumentConfigurationRepository.#configuration ??= this.#serverDataSource.getConfiguration());
+		configurationPromise ??= this.#serverDataSource.getConfiguration();
+		return configurationPromise;
 	}
 }
 
