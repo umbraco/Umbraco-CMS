@@ -39,7 +39,8 @@ public static class QueryConditionExtensions
         }
 
         ParameterExpression parameterExpression = Expression.Parameter(typeof(T), parameterAlias);
-        MemberExpression propertyExpression = Expression.Property(parameterExpression, condition.Property.Alias);
+        PropertyInfo propertyInfo = GetPropertyInfo(typeof(T), condition.Property.Alias);
+        MemberExpression propertyExpression = Expression.Property(parameterExpression, propertyInfo);
 
         ConstantExpression valueExpression = Expression.Constant(constraintValue);
         Expression bodyExpression;
@@ -80,5 +81,36 @@ public static class QueryConditionExtensions
             Expression.Lambda<Func<T, bool>>(bodyExpression.Reduce(), parameterExpression);
 
         return predicate;
+    }
+
+    /// <summary>
+    ///     Gets the property with the specified name from the type or one of its inherited interfaces.
+    /// </summary>
+    /// <param name="type">The type to search for the property.</param>
+    /// <param name="propertyName">The name of the property to find.</param>
+    /// <returns>The matching <see cref="PropertyInfo" />.</returns>
+    /// <remarks>
+    ///     <see cref="Type.GetProperty(string)" /> on an interface does not return members declared on base
+    ///     interfaces, so when the property is not found directly (e.g. <c>IPublishedContent</c> exposing
+    ///     <c>Name</c>/<c>Id</c> via <c>IPublishedElement</c>) the inherited interfaces are searched explicitly.
+    /// </remarks>
+    private static PropertyInfo GetPropertyInfo(Type type, string propertyName)
+    {
+        PropertyInfo? propertyInfo = type.GetProperty(propertyName);
+        if (propertyInfo is not null)
+        {
+            return propertyInfo;
+        }
+
+        foreach (Type interfaceType in type.GetInterfaces())
+        {
+            propertyInfo = interfaceType.GetProperty(propertyName);
+            if (propertyInfo is not null)
+            {
+                return propertyInfo;
+            }
+        }
+
+        throw new InvalidOperationException($"Property '{propertyName}' is not defined for type '{type}'.");
     }
 }
