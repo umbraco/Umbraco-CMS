@@ -1,4 +1,4 @@
-import {ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
+import {ConstantHelper, DocumentTypeBuilder, test} from '@umbraco/acceptance-test-helpers';
 import {expect} from '@playwright/test';
 
 const documentFolderName = 'TestFolder';
@@ -119,4 +119,28 @@ test('can create a folder in a folder in a folder', {tag: '@smoke'}, async ({umb
   // Clean
   await umbracoApi.documentType.ensureNameNotExists(grandParentFolderName);
   await umbracoApi.documentType.ensureNameNotExists(parentFolderName);
+});
+
+test('can find a document type in a sibling nested folder', async ({umbracoApi}) => {
+  // Arrange
+  const firstChildFolderName = 'AAFirstChildFolder';
+  const nestedFolderName = 'NestedFolder';
+  const secondChildFolderName = 'ZZSecondChildFolder';
+  const targetDocumentTypeName = 'TargetDocumentType';
+  const parentFolderId = await umbracoApi.documentType.createFolder(documentFolderName);
+  const firstChildFolderId = await umbracoApi.documentType.createFolder(firstChildFolderName, parentFolderId);
+  await umbracoApi.documentType.createFolder(nestedFolderName, firstChildFolderId);
+  const secondChildFolderId = await umbracoApi.documentType.createFolder(secondChildFolderName, parentFolderId);
+  const targetDocumentType = new DocumentTypeBuilder()
+    .withName(targetDocumentTypeName)
+    .withFolderId(secondChildFolderId)
+    .build();
+  const targetDocumentTypeId = await umbracoApi.documentType.create(targetDocumentType);
+
+  // Act
+  const documentTypeData = await umbracoApi.documentType.getByName(targetDocumentTypeName);
+
+  // Assert
+  expect(documentTypeData).toBeTruthy();
+  expect(documentTypeData.id).toBe(targetDocumentTypeId);
 });

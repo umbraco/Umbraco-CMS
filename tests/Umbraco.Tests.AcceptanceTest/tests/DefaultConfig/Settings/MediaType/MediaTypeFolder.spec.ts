@@ -1,4 +1,4 @@
-import {ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
+import {ConstantHelper, MediaTypeBuilder, test} from '@umbraco/acceptance-test-helpers';
 import {expect} from "@playwright/test";
 
 const mediaTypeFolderName = 'TestMediaTypeFolder';
@@ -115,4 +115,29 @@ test('can create a media type folder in a folder in a folder', async ({umbracoAp
   // Clean
   await umbracoApi.mediaType.ensureNameNotExists(childFolderName);
   await umbracoApi.mediaType.ensureNameNotExists(grandparentFolderName);
+});
+
+test('can find a media type in a sibling nested folder', async ({umbracoApi}) => {
+  // Arrange
+  const firstChildFolderName = 'AAFirstChildFolder';
+  const nestedFolderName = 'NestedFolder';
+  const secondChildFolderName = 'ZZSecondChildFolder';
+  const targetMediaTypeName = 'TargetMediaType';
+  const parentFolderId = await umbracoApi.mediaType.createFolder(mediaTypeFolderName);
+  const firstChildFolderId = await umbracoApi.mediaType.createFolder(firstChildFolderName, parentFolderId);
+  await umbracoApi.mediaType.createFolder(nestedFolderName, firstChildFolderId);
+  const secondChildFolderId = await umbracoApi.mediaType.createFolder(secondChildFolderName, parentFolderId);
+  const targetMediaType = new MediaTypeBuilder()
+    .withName(targetMediaTypeName)
+    .withAlias('targetMediaType')
+    .withFolderId(secondChildFolderId)
+    .build();
+  const targetMediaTypeId = await umbracoApi.mediaType.create(targetMediaType);
+
+  // Act
+  const mediaTypeData = await umbracoApi.mediaType.getByName(targetMediaTypeName);
+
+  // Assert
+  expect(mediaTypeData).toBeTruthy();
+  expect(mediaTypeData.id).toBe(targetMediaTypeId);
 });

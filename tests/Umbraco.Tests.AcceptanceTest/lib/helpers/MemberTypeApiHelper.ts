@@ -43,7 +43,10 @@ export class MemberTypeApiHelper {
         }
         return await this.delete(child.id);
       } else if (child.hasChildren) {
-        return await this.recurseChildren(name, child.id, toDelete);
+        const result = await this.recurseChildren(name, child.id, toDelete);
+        if (result) {
+          return result;
+        }
       }
     }
     return false;
