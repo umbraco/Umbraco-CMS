@@ -39,4 +39,9 @@ public class ImageCrop
     ///     Gets the coordinates of the crop area.
     /// </summary>
     public ImageCropCoordinates? Coordinates { get; }
+
+    /// <summary>
+    ///     Gets the alternative text for this specific crop, if defined.
+    /// </summary>
+    public string? AltText { get; init; }
 }

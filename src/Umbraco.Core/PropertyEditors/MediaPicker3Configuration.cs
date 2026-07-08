@@ -41,6 +41,34 @@ public class MediaPicker3Configuration : IIgnoreUserStartNodesConfig
     [ConfigurationField("crops")]
     public CropConfiguration[]? Crops { get; set; }
 
+    /// <summary>
+    /// Gets or sets the alt text mode for media items.
+    /// </summary>
+    /// <remarks>
+    /// Valid values: "off", "altText", "decorative". Defaults to "off" so that pre-existing data types
+    /// whose stored configuration does not contain this field are not silently upgraded to show alt text
+    /// prompts. The TypeScript property editor UI also falls back to "off" when the field is absent,
+    /// ensuring both tiers agree.
+    /// </remarks>
+    [ConfigurationField("altTextMode")]
+    public string AltTextMode { get; set; } = "off";
+
+    /// <summary>
+    /// Gets or sets a value indicating whether to hide the zoom control in the crop editor.
+    /// </summary>
+    [ConfigurationField("hideZoomCrop")]
+    public bool HideZoomCrop { get; set; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether per-crop alternative text is enabled.
+    /// </summary>
+    /// <remarks>
+    /// Only takes effect when <see cref="AltTextMode"/> is "altText" — per-crop alt text refines the
+    /// alt text field, so it is inactive when alt text is off or the image is marked as decorative.
+    /// </remarks>
+    [ConfigurationField("enableAltTextPerCrop")]
+    public bool EnableAltTextPerCrop { get; set; }
+
     /// <inheritdoc />
     [ConfigurationField(Constants.DataTypes.ReservedPreValueKeys.IgnoreUserStartNodes)]
     public bool IgnoreUserStartNodes { get; set; }

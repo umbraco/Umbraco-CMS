@@ -1,8 +1,10 @@
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services.Navigation;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.DeliveryApi;
 
@@ -32,11 +34,10 @@ internal sealed class ApiMediaWithCropsResponseBuilder : ApiMediaWithCropsBuilde
     protected override IApiMediaWithCropsResponse Create(
         IPublishedContent media,
         IApiMedia inner,
-        ImageFocalPoint? focalPoint,
-        IEnumerable<ImageCrop>? crops)
+        ImageCropperValue localCrops)
     {
         var path = $"/{string.Join("/", PathSegments(media).Reverse())}/";
-        return new ApiMediaWithCropsResponse(inner, focalPoint, crops, path, media.CreateDate, media.UpdateDate);
+        return new ApiMediaWithCropsResponse(inner, localCrops.GetImageFocalPoint(), localCrops.GetImageCrops(), path, media.CreateDate, media.UpdateDate, localCrops.AltText);
     }
 
     private IEnumerable<string> PathSegments(IPublishedContent media)

@@ -4,6 +4,8 @@ export type UmbMediaPickerPropertyValueEntry = {
 	mediaTypeAlias: string;
 	focalPoint: UmbFocalPointModel | null;
 	crops: Array<UmbCropModel>;
+	altText?: string;
+	altTextByCulture?: Record<string, string>;
 };
 
 export type UmbMediaPickerValueModel = Array<UmbMediaPickerPropertyValueEntry>;
@@ -19,6 +21,9 @@ export type UmbCropModel = {
 		y1: number;
 		y2: number;
 	};
+	altText?: string;
+	/** Per-culture alternative text for this crop. Keys are ISO culture codes (e.g. 'en-US', 'da-DK'). */
+	altTextByCulture?: Record<string, string>;
 };
 
 export interface UmbFocalPointModel {

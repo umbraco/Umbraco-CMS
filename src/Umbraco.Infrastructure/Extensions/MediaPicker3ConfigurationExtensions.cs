@@ -25,10 +25,12 @@ public static class MediaPicker3ConfigurationExtensions
 
                 crops.Add(new ImageCropperValue.ImageCropperCrop
                 {
-                    Alias = configuredCrop.Alias,
+                    Alias = configuredCrop.Alias ?? string.Empty,
                     Width = configuredCrop.Width,
                     Height = configuredCrop.Height,
                     Coordinates = crop?.Coordinates,
+                    AltText = crop?.AltText,
+                    AltTextByCulture = crop?.AltTextByCulture,
                 });
             }
         }

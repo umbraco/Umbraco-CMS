@@ -2,11 +2,11 @@ import { UMB_MEDIA_PICKER_MODAL } from '../media-picker/media-picker-modal.token
 import { UmbMediaUrlRepository } from '../../url/index.js';
 import type { UmbCropModel, UmbMediaItemModel } from '../../types.js';
 import type { UmbImageCropperPropertyEditorValue } from '../../components/index.js';
-import type { UmbInputImageCropperFieldElement } from '../../components/input-image-cropper/image-cropper-field.element.js';
 import type {
 	UmbImageCropperEditorModalData,
 	UmbImageCropperEditorModalValue,
 } from './image-cropper-editor-modal.token.js';
+import type { UmbImageCropperEditorFieldElement } from './components/image-cropper-editor-field.element.js';
 import { css, customElement, html, nothing, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbTemporaryFileConfigRepository } from '@umbraco-cms/backoffice/temporary-file';
@@ -36,6 +36,27 @@ export class UmbImageCropperEditorModalElement extends UmbModalBaseElement<
 
 	@state()
 	private _hideFocalPoint = false;
+
+	@state()
+	private _hideZoomCrop = false;
+
+	@state()
+	private _enableAltTextPerCrop = false;
+
+	@state()
+	private _altTextMode: 'off' | 'altText' | 'decorative' = 'off';
+
+	@state()
+	private _altText: string = '';
+
+	@state()
+	private _culture?: string;
+
+	@state()
+	private _readonlyMedia = false;
+
+	@state()
+	private _statusAnnouncement = '';
 
 	@state()
 	private _crops: Array<UmbCropModel> = [];
@@ -74,15 +95,28 @@ export class UmbImageCropperEditorModalElement extends UmbModalBaseElement<
 	override connectedCallback(): void {
 		super.connectedCallback();
 
-		this._key = this.data?.key ?? '';
-		this._unique = this.data?.unique ?? '';
-
-		this._hideFocalPoint = this.data?.hideFocalPoint ?? false;
-		this._crops = this.data?.cropOptions ?? [];
-		this._pickableFilter = this.data?.pickableFilter;
+		this.#applyModalData();
 
 		this.#observeAcceptedFileTypes();
 		this.#getSrc();
+	}
+
+	#applyModalData(): void {
+		this._altText = this.value?.altText ?? '';
+
+		const data = this.data;
+		if (!data) return;
+
+		this._key = data.key ?? '';
+		this._unique = data.unique ?? '';
+		this._hideFocalPoint = data.hideFocalPoint ?? false;
+		this._hideZoomCrop = data.hideZoomCrop ?? false;
+		this._enableAltTextPerCrop = data.enableAltTextPerCrop ?? false;
+		this._altTextMode = data.altTextMode ?? 'off';
+		this._culture = data.culture;
+		this._readonlyMedia = data.readonlyMedia ?? false;
+		this._crops = data.cropOptions ?? [];
+		this._pickableFilter = data.pickableFilter;
 	}
 
 	async #observeAcceptedFileTypes() {
@@ -94,6 +128,13 @@ export class UmbImageCropperEditorModalElement extends UmbModalBaseElement<
 		);
 	}
 
+	override firstUpdated(_changedProperties: Map<PropertyKey, unknown>) {
+		super.firstUpdated(_changedProperties);
+		if (this._readonlyMedia && this._culture) {
+			this._statusAnnouncement = this.localize.term('mediaPicker_sharedPropertyCultureNotice', [this._culture]);
+		}
+	}
+
 	async #getSrc() {
 		const { data } = await this.#urlRepository.requestItems([this._unique]);
 		const item = data?.[0];
@@ -101,6 +142,7 @@ export class UmbImageCropperEditorModalElement extends UmbModalBaseElement<
 		if (!item?.url) {
 			this._isCroppable = false;
 			this._imageCropperValue = undefined;
+			this.#focusFirstInteractive();
 			return;
 		}
 
@@ -125,6 +167,20 @@ export class UmbImageCropperEditorModalElement extends UmbModalBaseElement<
 			focalPoint: this.value.focalPoint ?? null,
 		};
 		this._imageCropperValue = value;
+
+		await this.updateComplete;
+		this.#focusFirstInteractive();
+	}
+
+	async #focusFirstInteractive() {
+		await this.updateComplete;
+		const field = this.shadowRoot?.querySelector<HTMLElement>('umb-image-cropper-editor-field');
+		if (field) {
+			field.focus();
+			return;
+		}
+		const firstButton = this.shadowRoot?.querySelector<HTMLElement>('uui-button');
+		firstButton?.focus();
 	}
 
 	async #openMediaPicker() {
@@ -142,17 +198,20 @@ export class UmbImageCropperEditorModalElement extends UmbModalBaseElement<
 		}
 
 		this._unique = selected;
+		this._altText = '';
 
-		this.value = { ...this.value, unique: this._unique };
+		this.value = { ...this.value, unique: this._unique, altText: '' };
 
 		this._isCroppable = false;
 
 		this.#getSrc();
 	}
 
-	#onChange(e: CustomEvent & { target: UmbInputImageCropperFieldElement }) {
+	#onChange(e: CustomEvent & { target: UmbImageCropperEditorFieldElement }) {
 		const value = e.target.value;
 		if (!value) return;
+
+		this._altText = e.target.altText;
 
 		if (this._imageCropperValue) {
 			this._imageCropperValue.crops = value.crops;
@@ -164,18 +223,24 @@ export class UmbImageCropperEditorModalElement extends UmbModalBaseElement<
 			unique: this._unique,
 			crops: value.crops,
 			focalPoint: value.focalPoint,
+			altText: this._altText,
 		};
+
+		this._statusAnnouncement = this.localize.term('mediaPicker_cropSaved');
 	}
 
 	override render() {
 		return html`
+			<div class="sr-only" role="status" aria-live="polite" aria-atomic="true">${this._statusAnnouncement}</div>
 			<umb-body-layout headline=${this.localize.term('defaultdialogs_selectMedia')}>
-				<div id="layout">
-					${when(
-						this._isCroppable,
-						() => this.#renderImageCropper(),
-						() => this.#renderFilePreview(),
-					)}
+				<div id="content">
+					<div id="layout">
+						${when(
+							this._isCroppable,
+							() => this.#renderImageCropper(),
+							() => this.#renderFilePreview(),
+						)}
+					</div>
 				</div>
 				<div slot="actions">
 					<uui-button label=${this.localize.term('general_close')} @click=${this._rejectModal}></uui-button>
@@ -208,12 +273,33 @@ export class UmbImageCropperEditorModalElement extends UmbModalBaseElement<
 	#renderImageCropper() {
 		if (!this._imageCropperValue) return nothing;
 		return html`
+			${this._readonlyMedia && this._culture ? this.#renderCultureNotice() : nothing}
 			<umb-image-cropper-editor-field
 				.value=${this._imageCropperValue}
-				?hideFocalPoint=${this._hideFocalPoint}
+				.altText=${this._altText}
+				.altTextMode=${this._altTextMode}
+				.culture=${this._culture}
+				?hideFocalPoint=${this._hideFocalPoint || this._readonlyMedia}
+				?hideZoomCrop=${this._hideZoomCrop || this._readonlyMedia}
+				?enable-alt-text-per-crop=${this._enableAltTextPerCrop}
+				?readonly-media=${this._readonlyMedia}
 				@change=${this.#onChange}>
-				<div slot="actions">${this.#renderActions()}</div>
+				<div slot="actions">${this._readonlyMedia ? nothing : this.#renderActions()}</div>
 			</umb-image-cropper-editor-field>
+		`;
+	}
+
+	#renderCultureNotice() {
+		return html`
+			<div class="culture-notice" role="note">
+				<uui-icon name="icon-info" aria-hidden="true"></uui-icon>
+				<span>
+					<umb-localize key="mediaPicker_sharedPropertyCultureNotice" .args=${[this._culture]}
+						>Editing alternative text for the ${this._culture} language. Image selection and crop editing are only
+						available on the default language tab.</umb-localize
+					>
+				</span>
+			</div>
 		`;
 	}
 
@@ -245,8 +331,33 @@ export class UmbImageCropperEditorModalElement extends UmbModalBaseElement<
 	static override styles = [
 		UmbTextStyles,
 		css`
-			#layout {
+			.culture-notice {
+				display: flex;
+				align-items: flex-start;
+				gap: var(--uui-size-space-3);
+				padding: var(--uui-size-space-3) var(--uui-size-space-4);
+				background: var(--uui-color-surface-emphasis);
+				border-left: 3px solid var(--uui-color-interactive);
+				font-size: var(--uui-type-small-size);
+				color: var(--uui-color-text-alt);
+				flex-shrink: 0;
+
+				uui-icon {
+					flex-shrink: 0;
+					margin-top: 1px;
+				}
+			}
+
+			#content {
+				display: flex;
+				flex-direction: column;
 				height: 100%;
+				min-height: 0;
+			}
+
+			#layout {
+				flex: 1;
+				min-height: 0;
 				display: flex;
 				flex-direction: column;
 				justify-content: space-between;
@@ -254,6 +365,7 @@ export class UmbImageCropperEditorModalElement extends UmbModalBaseElement<
 
 			umb-image-cropper-editor-field {
 				flex: 1;
+				min-height: 0;
 			}
 
 			#main {

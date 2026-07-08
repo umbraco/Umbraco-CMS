@@ -11,8 +11,13 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 /// <summary>
 ///     Represents a value of the image cropper value editor.
 /// </summary>
-public class ImageCropperValue :TemporaryFileUploadValueBase, IHtmlEncodedString, IEquatable<ImageCropperValue>
+public class ImageCropperValue : TemporaryFileUploadValueBase, IHtmlEncodedString, IEquatable<ImageCropperValue>
 {
+    /// <summary>
+    ///     Gets or sets the alternative text for the image.
+    /// </summary>
+    public string? AltText { get; set; }
+
     /// <summary>
     ///     Gets or sets the value focal point.
     /// </summary>
@@ -180,32 +185,39 @@ public class ImageCropperValue :TemporaryFileUploadValueBase, IHtmlEncodedString
     public ImageCropperValue Merge(ImageCropperValue imageCropperValue)
     {
         List<ImageCropperCrop> crops = Crops?.ToList() ?? new List<ImageCropperCrop>();
-
-        IEnumerable<ImageCropperCrop>? incomingCrops = imageCropperValue.Crops;
-        if (incomingCrops != null)
-        {
-            foreach (ImageCropperCrop incomingCrop in incomingCrops)
-            {
-                ImageCropperCrop? crop = crops.FirstOrDefault(x => x.Alias == incomingCrop.Alias);
-                if (crop is null)
-                {
-                    // Add incoming crop
-                    crops.Add(incomingCrop);
-                }
-                else if (crop.Coordinates is null)
-                {
-                    // Use incoming crop coordinates
-                    crop.Coordinates = incomingCrop.Coordinates;
-                }
-            }
-        }
+        MergeCrops(crops, imageCropperValue.Crops);
 
         return new ImageCropperValue
         {
             Src = !string.IsNullOrWhiteSpace(Src) ? Src : imageCropperValue.Src,
             Crops = crops,
-            FocalPoint = FocalPoint ?? imageCropperValue.FocalPoint
+            FocalPoint = FocalPoint ?? imageCropperValue.FocalPoint,
+            AltText = AltText ?? imageCropperValue.AltText,
         };
+    }
+
+    // Existing crops keep their values, but anything they are missing is backfilled from the incoming crops.
+    private static void MergeCrops(List<ImageCropperCrop> crops, IEnumerable<ImageCropperCrop>? incomingCrops)
+    {
+        if (incomingCrops is null)
+        {
+            return;
+        }
+
+        foreach (ImageCropperCrop incomingCrop in incomingCrops)
+        {
+            ImageCropperCrop? crop = crops.FirstOrDefault(x => x.Alias == incomingCrop.Alias);
+            if (crop is null)
+            {
+                crops.Add(incomingCrop);
+            }
+            else
+            {
+                crop.Coordinates ??= incomingCrop.Coordinates;
+                crop.AltText ??= incomingCrop.AltText;
+                crop.AltTextByCulture ??= incomingCrop.AltTextByCulture;
+            }
+        }
     }
 
     /// <summary>
@@ -247,7 +259,7 @@ public class ImageCropperValue :TemporaryFileUploadValueBase, IHtmlEncodedString
 
         private static bool Equals(ImageCropperFocalPoint left, ImageCropperFocalPoint? right)
             => ReferenceEquals(left, right) // deals with both being null, too
-               || (!ReferenceEquals(left, null) && !ReferenceEquals(right, null)
+               || (left is not null && right is not null
                                                 && left.Left == right.Left
                                                 && left.Top == right.Top);
 
@@ -299,6 +311,16 @@ public class ImageCropperValue :TemporaryFileUploadValueBase, IHtmlEncodedString
         /// <summary>Gets or sets the coordinates for the image crop.</summary>
         public ImageCropperCropCoordinates? Coordinates { get; set; }
 
+        /// <summary>Gets or sets the alternative text for this crop.</summary>
+        public string? AltText { get; set; }
+
+        /// <summary>
+        /// Gets or sets per-culture alternative text overrides for this crop.
+        /// Keys are ISO culture codes (e.g. "en-US", "da-DK"), matched case-insensitively. When a matching
+        /// culture entry exists, it takes precedence over <see cref="AltText"/> during value conversion.
+        /// </summary>
+        public Dictionary<string, string>? AltTextByCulture { get; set; }
+
         #region IEquatable
 
         /// <inheritdoc />
@@ -311,11 +333,36 @@ public class ImageCropperValue :TemporaryFileUploadValueBase, IHtmlEncodedString
 
         private static bool Equals(ImageCropperCrop? left, ImageCropperCrop? right)
             => ReferenceEquals(left, right) // deals with both being null, too
-               || (!ReferenceEquals(left, null) && !ReferenceEquals(right, null)
+               || (left is not null && right is not null
                                                 && string.Equals(left.Alias, right.Alias)
                                                 && left.Width == right.Width
                                                 && left.Height == right.Height
+                                                && string.Equals(left.AltText, right.AltText)
+                                                && AltTextByCultureEquals(left.AltTextByCulture, right.AltTextByCulture)
                                                 && Equals(left.Coordinates, right.Coordinates));
+
+        private static bool AltTextByCultureEquals(Dictionary<string, string>? left, Dictionary<string, string>? right)
+        {
+            if (ReferenceEquals(left, right))
+            {
+                return true;
+            }
+
+            if (left is null || right is null || left.Count != right.Count)
+            {
+                return false;
+            }
+
+            foreach (KeyValuePair<string, string> entry in left)
+            {
+                if (right.TryGetValue(entry.Key, out var value) == false || string.Equals(entry.Value, value) == false)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
 
         public static bool operator ==(ImageCropperCrop? left, ImageCropperCrop? right)
             => Equals(left, right);
@@ -336,6 +383,20 @@ public class ImageCropperValue :TemporaryFileUploadValueBase, IHtmlEncodedString
                 var hashCode = Alias?.GetHashCode() ?? 0;
                 hashCode = (hashCode * 397) ^ Width;
                 hashCode = (hashCode * 397) ^ Height;
+                hashCode = (hashCode * 397) ^ (AltText?.GetHashCode() ?? 0);
+                if (AltTextByCulture is not null)
+                {
+                    // XOR-combine the entries so the hash is independent of dictionary enumeration order,
+                    // matching the order-insensitive comparison in Equals.
+                    var altTextByCultureHash = 0;
+                    foreach (KeyValuePair<string, string> entry in AltTextByCulture)
+                    {
+                        altTextByCultureHash ^= (entry.Key.GetHashCode() * 397) ^ entry.Value.GetHashCode();
+                    }
+
+                    hashCode = (hashCode * 397) ^ altTextByCultureHash;
+                }
+
                 hashCode = (hashCode * 397) ^ (Coordinates?.GetHashCode() ?? 0);
                 return hashCode;
                 // ReSharper restore NonReadonlyMemberInGetHashCode
@@ -382,7 +443,7 @@ public class ImageCropperValue :TemporaryFileUploadValueBase, IHtmlEncodedString
 
         private static bool Equals(ImageCropperCropCoordinates? left, ImageCropperCropCoordinates? right)
             => ReferenceEquals(left, right) // deals with both being null, too
-               || (!ReferenceEquals(left, null) && !ReferenceEquals(right, null)
+               || (left is not null && right is not null
                                                 && left.X1 == right.X1
                                                 && left.X2 == right.X2
                                                 && left.Y1 == right.Y1
@@ -428,8 +489,9 @@ public class ImageCropperValue :TemporaryFileUploadValueBase, IHtmlEncodedString
 
     private static bool Equals(ImageCropperValue? left, ImageCropperValue? right)
         => ReferenceEquals(left, right) // deals with both being null, too
-           || (!ReferenceEquals(left, null) && !ReferenceEquals(right, null)
+           || (left is not null && right is not null
                                             && string.Equals(left.Src, right.Src)
+                                            && string.Equals(left.AltText, right.AltText)
                                             && Equals(left.FocalPoint, right.FocalPoint)
                                             && left.ComparableCrops.SequenceEqual(right.ComparableCrops));
 
@@ -453,6 +515,7 @@ public class ImageCropperValue :TemporaryFileUploadValueBase, IHtmlEncodedString
             // properties are, practically, readonly
             // ReSharper disable NonReadonlyMemberInGetHashCode
             var hashCode = Src?.GetHashCode() ?? 0;
+            hashCode = (hashCode * 397) ^ (AltText?.GetHashCode() ?? 0);
             hashCode = (hashCode * 397) ^ (FocalPoint?.GetHashCode() ?? 0);
             hashCode = (hashCode * 397) ^ (Crops?.GetHashCode() ?? 0);
             return hashCode;

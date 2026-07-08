@@ -32,5 +32,8 @@ public static class DeliveryApiImageExtensions
             crop.Height,
             crop.Coordinates is not null
                 ? new ImageCropCoordinates(crop.Coordinates.X1, crop.Coordinates.Y1, crop.Coordinates.X2, crop.Coordinates.Y2)
-                : null));
+                : null)
+        {
+            AltText = crop.AltText,
+        });
 }

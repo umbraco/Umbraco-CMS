@@ -65,6 +65,9 @@ export class UmbInputImageCropperFieldElement extends UmbLitElement {
 	@property({ type: Boolean })
 	hideFocalPoint = false;
 
+	@property({ type: Boolean })
+	hideZoomCrop = false;
+
 	@state()
 	src = '';
 
@@ -107,7 +110,7 @@ export class UmbInputImageCropperFieldElement extends UmbLitElement {
 		this.currentCrop = { ...this.crops[index] };
 	}
 
-	#onCropChange = (event: UmbImageCropChangeEvent) => {
+	protected _onCropChange = (event: UmbImageCropChangeEvent) => {
 		const target = event.target as UmbImageCropperElement;
 		const value = target.value;
 
@@ -157,7 +160,8 @@ export class UmbInputImageCropperFieldElement extends UmbLitElement {
 					.src=${this.source}
 					.value=${this.currentCrop}
 					?hideFocalPoint=${this.hideFocalPoint}
-					@imagecrop-change=${this.#onCropChange}>
+					?hideZoom=${this.hideZoomCrop}
+					@imagecrop-change=${this._onCropChange}>
 				</umb-image-cropper>
 			`;
 		}
@@ -241,7 +245,8 @@ export class UmbInputImageCropperFieldElement extends UmbLitElement {
 			}
 
 			umb-image-cropper-focus-setter {
-				height: calc(100% - 33px - var(--uui-size-space-1)); /* Temp solution to make room for actions */
+				height: calc(100% - 33px - var(--uui-size-space-1));
+				min-height: 400px;
 			}
 
 			#side {

@@ -1561,6 +1561,12 @@
               "$ref": "#/components/schemas/ImageCropModel"
             }
           },
+          "altText": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
           "id": {
             "type": "string",
             "format": "uuid"
@@ -1697,6 +1703,12 @@
             "items": {
               "$ref": "#/components/schemas/ImageCropModel"
             }
+          },
+          "altText": {
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "id": {
             "type": "string",
@@ -1848,6 +1860,12 @@
           },
           "coordinates": {
             "$ref": "#/components/schemas/ImageCropCoordinatesModel"
+          },
+          "altText": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },

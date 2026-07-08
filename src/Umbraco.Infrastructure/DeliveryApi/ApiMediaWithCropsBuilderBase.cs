@@ -23,8 +23,7 @@ internal abstract class ApiMediaWithCropsBuilderBase<T>
     protected abstract T Create(
         IPublishedContent media,
         IApiMedia inner,
-        ImageFocalPoint? focalPoint,
-        IEnumerable<ImageCrop>? crops);
+        ImageCropperValue localCrops);
 
     /// <summary>
     /// Builds an instance of <typeparamref name="T" /> from the specified <see cref="MediaWithCrops" />.
@@ -44,7 +43,7 @@ internal abstract class ApiMediaWithCropsBuilderBase<T>
             localCrops = localCrops.Merge(mediaCrops);
         }
 
-        return Create(media.Content, inner, localCrops.GetImageFocalPoint(), localCrops.GetImageCrops());
+        return Create(media.Content, inner, localCrops);
     }
 
     /// <summary>

@@ -127,7 +127,7 @@ public class MediaPicker3PropertyEditor : DataEditor, IValueSchemaProvider
         if (config?.Crops is { Length: > 0 })
         {
             var cropAliases = new JsonArray();
-            foreach (var crop in config.Crops)
+            foreach (MediaPicker3Configuration.CropConfiguration crop in config.Crops)
             {
                 if (!string.IsNullOrEmpty(crop.Alias))
                 {
@@ -137,7 +137,7 @@ public class MediaPicker3PropertyEditor : DataEditor, IValueSchemaProvider
 
             if (cropAliases.Count > 0)
             {
-                var aliasProperty = cropItemSchema["properties"]!["alias"]!.AsObject();
+                JsonObject aliasProperty = cropItemSchema["properties"]!["alias"]!.AsObject();
                 aliasProperty["enum"] = cropAliases;
             }
         }
@@ -349,7 +349,7 @@ public class MediaPicker3PropertyEditor : DataEditor, IValueSchemaProvider
                             Key = Guid.NewGuid(),
                             MediaKey = guidUdi.Guid,
                             Crops = Enumerable.Empty<ImageCropperValue.ImageCropperCrop>(),
-                            FocalPoint = new ImageCropperValue.ImageCropperFocalPoint {Left = 0.5m, Top = 0.5m},
+                            FocalPoint = new ImageCropperValue.ImageCropperFocalPoint { Left = 0.5m, Top = 0.5m },
                         };
                     }
                 }
@@ -458,6 +458,18 @@ public class MediaPicker3PropertyEditor : DataEditor, IValueSchemaProvider
             public ImageCropperValue.ImageCropperFocalPoint? FocalPoint { get; set; }
 
             /// <summary>
+            /// Gets or sets the alternative text for the media item.
+            /// </summary>
+            public string? AltText { get; set; }
+
+            /// <summary>
+            /// Gets or sets per-culture alternative text overrides.
+            /// Keys are ISO culture codes (e.g. "en-US", "da-DK"), matched case-insensitively. When a
+            /// matching culture entry exists, it takes precedence over <see cref="AltText"/> during value conversion.
+            /// </summary>
+            public Dictionary<string, string>? AltTextByCulture { get; set; }
+
+            /// <summary>
             ///     Removes redundant crop data/default focal point.
             /// </summary>
             /// <remarks>
@@ -466,7 +478,8 @@ public class MediaPicker3PropertyEditor : DataEditor, IValueSchemaProvider
             /// </remarks>
             internal void Prune()
             {
-                Crops = Crops?.Where(crop => crop.Coordinates != null).ToArray();
+                // Keep crops that have custom coordinates, per-crop alt text, or per-culture alt text — dropping neither silently.
+                Crops = Crops?.Where(crop => crop.Coordinates != null || !string.IsNullOrEmpty(crop.AltText) || crop.AltTextByCulture?.Count > 0).ToArray();
                 if (FocalPoint is { Top: 0.5m, Left: 0.5m })
                 {
                     FocalPoint = null;
@@ -495,6 +508,8 @@ public class MediaPicker3PropertyEditor : DataEditor, IValueSchemaProvider
                             Width = configuredCrop.Width,
                             Height = configuredCrop.Height,
                             Coordinates = crop?.Coordinates,
+                            AltText = crop?.AltText,
+                            AltTextByCulture = crop?.AltTextByCulture,
                         });
                     }
                 }

@@ -1,6 +1,8 @@
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.DeliveryApi;
 
@@ -19,7 +21,6 @@ internal sealed class ApiMediaWithCropsBuilder : ApiMediaWithCropsBuilderBase<IA
     protected override IApiMediaWithCrops Create(
         IPublishedContent media,
         IApiMedia inner,
-        ImageFocalPoint? focalPoint,
-        IEnumerable<ImageCrop>? crops)
-        => new ApiMediaWithCrops(inner, focalPoint, crops);
+        ImageCropperValue localCrops)
+        => new ApiMediaWithCrops(inner, localCrops.GetImageFocalPoint(), localCrops.GetImageCrops(), localCrops.AltText);
 }

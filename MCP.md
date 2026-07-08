@@ -4,12 +4,13 @@ This repository includes configuration for [Model Context Protocol (MCP)](https:
 
 ## Overview
 
-MCP allows AI assistants (like Claude) to interact with external tools and services. This repository configures two MCP servers:
+MCP allows AI assistants (like Claude) to interact with external tools and services. This repository configures three MCP servers:
 
 | Server | Purpose | Package |
 |--------|---------|---------|
 | **umbraco-cms** | Manage Umbraco content types, documents, and media | `@umbraco-cms/mcp-dev@17` |
 | **playwright** | Browser automation for testing and debugging | `@playwright/mcp@latest` |
+| **wcag** | Look up WCAG 2.x / ATAG 2.0 success criteria, understanding docs, and techniques | `wcag-guidelines-mcp` |
 
 ## Quick Start
 
@@ -41,6 +42,31 @@ Create an OAuth client in your Umbraco instance with:
 - **Client ID**: `umbraco-back-office-mcp`
 - **Client Secret**: The value you set in `.env.local`
 - **Grant Type**: Client Credentials
+
+## WCAG Guidelines Server
+
+The `wcag` server uses the [`wcag-guidelines-mcp`](https://www.npmjs.com/package/wcag-guidelines-mcp) package to surface WCAG 2.x success criteria, understanding documents, and sufficient/advisory techniques — directly inside the AI assistant context, without leaving your editor.
+
+### No setup required
+
+Unlike the Umbraco and Playwright servers, the WCAG server needs no environment variables and no running service. `npx -y wcag-guidelines-mcp` is self-contained and starts automatically via the `.mcp.json` configuration.
+
+### When it's useful
+
+Query the WCAG server during any UI change — not just dedicated accessibility work. Before marking a criterion as satisfied, ask the AI to look up the exact success condition and techniques for that criterion. This is more reliable than relying on training-data summaries of the spec, which can be incomplete or refer to older WCAG versions.
+
+**Examples of useful queries:**
+
+- Look up `1.1.1 Non-text Content` when adding an alt text field to confirm the correct success condition and the decorative-image exception.
+- Look up `2.1.1 Keyboard` when adding a custom interactive widget to confirm all functionality is reachable without a mouse.
+- Look up `3.3.2 Labels or Instructions` when adding form inputs to confirm the label association requirements.
+- Enumerate all ATAG 2.0 Part B criteria to confirm an authoring tool feature actively helps authors produce accessible content.
+
+### Why it's committed to the repo
+
+Accessibility requirements apply to every backoffice UI change, not just dedicated a11y sprints. Having the WCAG server available by default normalises querying the spec as a routine part of development, rather than an afterthought.
+
+---
 
 ## Environment Variables Reference
 
@@ -141,4 +167,5 @@ Create `.claude/settings.local.json` to override permissions for your environmen
 - [Model Context Protocol Documentation](https://modelcontextprotocol.io/)
 - [Umbraco MCP Package](https://www.npmjs.com/package/@umbraco-cms/mcp-dev)
 - [Playwright MCP](https://www.npmjs.com/package/@playwright/mcp)
+- [WCAG Guidelines MCP](https://www.npmjs.com/package/wcag-guidelines-mcp)
 - [Claude Code Documentation](https://docs.anthropic.com/claude-code)

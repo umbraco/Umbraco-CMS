@@ -10,14 +10,17 @@ internal class ApiMediaWithCrops : IApiMediaWithCrops
     /// <param name="inner">The media item to wrap.</param>
     /// <param name="focalPoint">The focal point of the image, or <c>null</c> if not specified.</param>
     /// <param name="crops">A collection of image crops, or <c>null</c> if not specified.</param>
+    /// <param name="altText">The alternative text for the media item, or <c>null</c> if not specified.</param>
     public ApiMediaWithCrops(
         IApiMedia inner,
         ImageFocalPoint? focalPoint,
-        IEnumerable<ImageCrop>? crops)
+        IEnumerable<ImageCrop>? crops,
+        string? altText = null)
     {
         _inner = inner;
         FocalPoint = focalPoint;
         Crops = crops;
+        AltText = altText;
     }
 
     /// <summary>
@@ -70,4 +73,9 @@ internal class ApiMediaWithCrops : IApiMediaWithCrops
     /// Gets the collection of image crop definitions associated with this media item.
     /// </summary>
     public IEnumerable<ImageCrop>? Crops { get; }
+
+    /// <summary>
+    /// Gets the alternative text for this media item.
+    /// </summary>
+    public string? AltText { get; }
 }
