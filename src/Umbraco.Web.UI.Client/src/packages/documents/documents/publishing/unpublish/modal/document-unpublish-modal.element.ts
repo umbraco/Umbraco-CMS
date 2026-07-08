@@ -203,16 +203,6 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 				min-width: 600px;
 				max-width: 90vw;
 			}
-
-			#references {
-				--uui-table-cell-padding: 0;
-			}
-
-			#references-warning {
-				margin-top: 1rem;
-				background-color: var(--uui-color-danger);
-				color: var(--uui-color-danger-contrast);
-			}
 		`,
 	];
 }
