@@ -661,7 +661,9 @@ public class ReflectionUtilitiesTests
 
         public int Field1 = 33;
 #pragma warning disable SA1306 // Field names should begin with lower-case letter
+#pragma warning disable CS0414 // Field is assigned but its value is never used
         private readonly int Field2 = 66;
+#pragma warning restore CS0414 // Field is assigned but its value is never used
 #pragma warning restore SA1306 // Field names should begin with lower-case letter
 
         public Class1()
