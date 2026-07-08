@@ -343,7 +343,7 @@ internal sealed class RelationRepository : EntityRepositoryBase<int, IRelation>,
     public IEnumerable<IUmbracoEntity> GetParentEntitiesByChildIds(
         int[] childIds,
         int[] relationTypes,
-        params Guid[] entityTypes)
+        Guid entityType)
     {
         if (childIds.Length == 0)
         {
@@ -353,13 +353,13 @@ internal sealed class RelationRepository : EntityRepositoryBase<int, IRelation>,
         // A parent relates to a separate row per child, so it can be returned more than once (within a batch or
         // across batches); de-duplicate by node id so each parent entity is returned once.
         var results = new Dictionary<int, IUmbracoEntity>();
-        var childIdsPerQuery = Constants.Sql.MaxParameterCount - relationTypes.Length - entityTypes.Length;
+        var childIdsPerQuery = Constants.Sql.MaxParameterCount - relationTypes.Length - 1;
         foreach (IEnumerable<int> group in childIds.InGroupsOf(childIdsPerQuery))
         {
             var batch = group.ToArray();
             IEnumerable<IUmbracoEntity> parents = _entityRepository.GetPagedResultsByQuery(
                 Query<IUmbracoEntity>(),
-                entityTypes,
+                [entityType],
                 0,
                 int.MaxValue,
                 out _,

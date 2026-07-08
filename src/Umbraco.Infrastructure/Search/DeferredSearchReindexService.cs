@@ -114,7 +114,7 @@ internal sealed class DeferredSearchReindexService : IDeferredSearchReindexServi
     }
 
     /// <inheritdoc />
-    public void QueueElementReindex(IReadOnlyCollection<int> elementIds)
+    public void QueueReindexOnElementChange(IReadOnlyCollection<int> elementIds)
     {
         foreach (var id in elementIds)
         {
@@ -351,21 +351,24 @@ internal sealed class DeferredSearchReindexService : IDeferredSearchReindexServi
 
         while (currentLevel.Count > 0)
         {
-            var nextLevel = new HashSet<int>();
-            foreach (IEntitySlim parent in GetParentEntities(currentLevel.ToArray()).Cast<IEntitySlim>())
+            var childIds = currentLevel.ToArray();
+
+            // Query one object type per call: fetching multiple types in a single call is not fully supported at the
+            // moment (the published state is not filled correctly), so documents and elements are fetched separately.
+            // This could be improved in the future to support a single multi-type query.
+            foreach (IUmbracoEntity document in GetParentEntities(childIds, UmbracoObjectTypes.Document))
             {
-                if (parent.NodeObjectType == Constants.ObjectTypes.Document)
+                documentIds.Add(document.Id);
+            }
+
+            var nextLevel = new HashSet<int>();
+            foreach (IEntitySlim element in GetParentEntities(childIds, UmbracoObjectTypes.Element).Cast<IEntitySlim>())
+            {
+                // Only climb through a published element: an unpublished element's content (and anything nested in it)
+                // is not part of any document's published index, so a change below it should not propagate upward.
+                if (visitedElementIds.Add(element.Id) && element is IPublishableContentEntitySlim { Published: true })
                 {
-                    documentIds.Add(parent.Id);
-                }
-                else if (parent.NodeObjectType == Constants.ObjectTypes.Element && visitedElementIds.Add(parent.Id))
-                {
-                    // Only climb through a published element: an unpublished element's content (and anything nested in
-                    // it) is not part of any document's published index, so a change below it cannot propagate upward.
-                    if (parent is IPublishableContentEntitySlim { Published: true })
-                    {
-                        nextLevel.Add(parent.Id);
-                    }
+                    nextLevel.Add(element.Id);
                 }
             }
 
@@ -375,12 +378,11 @@ internal sealed class DeferredSearchReindexService : IDeferredSearchReindexServi
         return documentIds;
     }
 
-    private IEnumerable<IUmbracoEntity> GetParentEntities(int[] childIds)
+    private IEnumerable<IUmbracoEntity> GetParentEntities(int[] childIds, UmbracoObjectTypes entityType)
         => _relationService.GetParentEntitiesByChildIds(
             childIds,
             [Constants.Conventions.RelationTypes.RelatedExternalBlockElementAlias],
-            UmbracoObjectTypes.Document,
-            UmbracoObjectTypes.Element);
+            entityType);
 
     /// <summary>
     ///     Pages through a repository without acquiring distributed locks and invokes an action for each item.

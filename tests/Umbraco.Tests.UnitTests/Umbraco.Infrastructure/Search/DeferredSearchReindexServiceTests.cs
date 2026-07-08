@@ -481,7 +481,7 @@ public class DeferredSearchReindexServiceTests
     ///     also enforced by the notification handler).
     /// </summary>
     [Test]
-    public async Task QueueElementReindex_WhenExternalBlockElementIndexingDisabled_SkipsTraversalAndReindex()
+    public async Task QueueReindexOnElementChange_WhenExternalBlockElementIndexingDisabled_SkipsTraversalAndReindex()
     {
         // A relation graph that would otherwise yield document 100 to reindex, proving the guard short-circuits first.
         SetupRelationGraph(new Dictionary<int, (int id, Guid objectType)[]>
@@ -490,7 +490,7 @@ public class DeferredSearchReindexServiceTests
         });
 
         using var service = CreateService(indexExternalBlockElements: false);
-        service.QueueElementReindex([1]);
+        service.QueueReindexOnElementChange([1]);
         using var cts = new CancellationTokenSource(_testTimeout);
         await service.WaitForWorkerIdleAsync(cts.Token);
 
@@ -498,7 +498,7 @@ public class DeferredSearchReindexServiceTests
             x => x.GetParentEntitiesByChildIds(
                 It.IsAny<IEnumerable<int>>(),
                 It.IsAny<IEnumerable<string>>(),
-                It.IsAny<UmbracoObjectTypes[]>()),
+                It.IsAny<UmbracoObjectTypes>()),
             Times.Never);
         _umbracoIndexingHandler.Verify(
             x => x.ReIndexForContent(It.IsAny<IContent>(), It.IsAny<bool>()),
@@ -511,12 +511,18 @@ public class DeferredSearchReindexServiceTests
             .Setup(r => r.GetParentEntitiesByChildIds(
                 It.IsAny<IEnumerable<int>>(),
                 It.IsAny<IEnumerable<string>>(),
-                It.IsAny<UmbracoObjectTypes[]>()))
-            .Returns((IEnumerable<int> childIds, IEnumerable<string> aliases, UmbracoObjectTypes[] types) =>
-                childIds
+                It.IsAny<UmbracoObjectTypes>()))
+            .Returns((IEnumerable<int> childIds, IEnumerable<string> aliases, UmbracoObjectTypes type) =>
+            {
+                // The service queries one object type per call, so mirror the real repository and return only the
+                // parents of the requested type.
+                var wantedType = type.GetGuid();
+                return childIds
                     .SelectMany(id => graph.TryGetValue(id, out (int id, Guid objectType)[]? parents) ? parents : [])
+                    .Where(parent => parent.objectType == wantedType)
                     .Select(parent => CreateEntity(parent.id, parent.objectType))
-                    .ToArray());
+                    .ToArray();
+            });
     }
 
     private static IEntitySlim CreateEntity(int id, Guid nodeObjectType)

@@ -1037,21 +1037,13 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
                     .AndSelect<NodeDto>("ContentTypeNode", x => Alias(x.UniqueId, "ContentTypeKey"));
             }
 
-            if (isContent && isElement)
-            {
-                // A node is either a document or an element, never both, so the published/edited flags live in only
-                // one of the joined tables. Selecting them from both would collide on the shared column name and drop
-                // one (leaving elements looking unpublished); coalesce so whichever table matched wins.
-                sql
-                    .Append($", COALESCE({syntax.GetQuotedColumn(DocumentDto.TableName, "published")}, {syntax.GetQuotedColumn(ElementDto.TableName, "published")}) AS {syntax.GetQuotedColumnName("published")}")
-                    .Append($", COALESCE({syntax.GetQuotedColumn(DocumentDto.TableName, "edited")}, {syntax.GetQuotedColumn(ElementDto.TableName, "edited")}) AS {syntax.GetQuotedColumnName("edited")}");
-            }
-            else if (isContent)
+            if (isContent)
             {
                 sql
                     .AndSelect<DocumentDto>(x => x.Published, x => x.Edited);
             }
-            else if (isElement)
+
+            if (isElement)
             {
                 sql
                     .AndSelect<ElementDto>(x => x.Published, x => x.Edited);

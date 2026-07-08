@@ -436,7 +436,7 @@ public class RelationService : RepositoryService, IRelationService
     public IEnumerable<IUmbracoEntity> GetParentEntitiesByChildIds(
         IEnumerable<int> childIds,
         IEnumerable<string> relationTypeAliases,
-        params UmbracoObjectTypes[] entityTypes)
+        UmbracoObjectTypes entityType)
     {
         var childIdsArray = childIds as int[] ?? childIds.ToArray();
         if (childIdsArray.Length == 0)
@@ -456,7 +456,7 @@ public class RelationService : RepositoryService, IRelationService
         return _relationRepository.GetParentEntitiesByChildIds(
             childIdsArray,
             relationTypeIds ?? [],
-            entityTypes.Select(x => x.GetGuid()).ToArray());
+            entityType.GetGuid());
     }
 
     // Resolves relation type aliases to their ids. Returns null when no alias filter is requested (match all

@@ -54,7 +54,7 @@ public class ElementIndexingNotificationHandlerTests
         _sut.Handle(notification);
 
         _mockReindexService.Verify(
-            s => s.QueueElementReindex(It.Is<IReadOnlyCollection<int>>(ids => ids.SequenceEqual(new[] { 30, 40 }))),
+            s => s.QueueReindexOnElementChange(It.Is<IReadOnlyCollection<int>>(ids => ids.SequenceEqual(new[] { 30, 40 }))),
             Times.Once);
     }
 
@@ -68,7 +68,7 @@ public class ElementIndexingNotificationHandlerTests
         _sut.Handle(notification);
 
         _mockReindexService.Verify(
-            s => s.QueueElementReindex(It.Is<IReadOnlyCollection<int>>(ids => ids.SequenceEqual(new[] { 50 }))),
+            s => s.QueueReindexOnElementChange(It.Is<IReadOnlyCollection<int>>(ids => ids.SequenceEqual(new[] { 50 }))),
             Times.Once);
     }
 
@@ -83,7 +83,7 @@ public class ElementIndexingNotificationHandlerTests
 
         _sut.Handle(notification);
 
-        _mockReindexService.Verify(s => s.QueueElementReindex(It.IsAny<IReadOnlyCollection<int>>()), Times.Never);
+        _mockReindexService.Verify(s => s.QueueReindexOnElementChange(It.IsAny<IReadOnlyCollection<int>>()), Times.Never);
     }
 
     [Test]
@@ -102,7 +102,7 @@ public class ElementIndexingNotificationHandlerTests
 
         _sut.Handle(notification);
 
-        _mockReindexService.Verify(s => s.QueueElementReindex(It.IsAny<IReadOnlyCollection<int>>()), Times.Never);
+        _mockReindexService.Verify(s => s.QueueReindexOnElementChange(It.IsAny<IReadOnlyCollection<int>>()), Times.Never);
     }
 
     [Test]
@@ -121,7 +121,7 @@ public class ElementIndexingNotificationHandlerTests
 
         _sut.Handle(notification);
 
-        _mockReindexService.Verify(s => s.QueueElementReindex(It.IsAny<IReadOnlyCollection<int>>()), Times.Never);
+        _mockReindexService.Verify(s => s.QueueReindexOnElementChange(It.IsAny<IReadOnlyCollection<int>>()), Times.Never);
     }
 
     [Test]
@@ -133,6 +133,6 @@ public class ElementIndexingNotificationHandlerTests
 
         _sut.Handle(notification);
 
-        _mockReindexService.Verify(s => s.QueueElementReindex(It.IsAny<IReadOnlyCollection<int>>()), Times.Never);
+        _mockReindexService.Verify(s => s.QueueReindexOnElementChange(It.IsAny<IReadOnlyCollection<int>>()), Times.Never);
     }
 }

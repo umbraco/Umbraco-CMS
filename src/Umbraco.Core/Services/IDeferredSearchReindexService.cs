@@ -28,5 +28,5 @@ public interface IDeferredSearchReindexService
     ///     elements is re-indexed after the elements are updated.
     /// </summary>
     /// <param name="elementIds">The element node ids that changed.</param>
-    void QueueElementReindex(IReadOnlyCollection<int> elementIds);
+    void QueueReindexOnElementChange(IReadOnlyCollection<int> elementIds);
 }

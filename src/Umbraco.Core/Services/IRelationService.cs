@@ -247,12 +247,12 @@ public interface IRelationService : IService
     /// </summary>
     /// <param name="childIds">The child entity ids.</param>
     /// <param name="relationTypeAliases">Relation type aliases to filter by. Pass an empty sequence to include all relation types.</param>
-    /// <param name="entityTypes">The entity types to filter by.</param>
-    /// <returns>The distinct parent entities related to any of the specified children.</returns>
+    /// <param name="entityType">The entity type to filter by.</param>
+    /// <returns>The distinct parent entities of the given type related to any of the specified children.</returns>
     IEnumerable<IUmbracoEntity> GetParentEntitiesByChildIds(
         IEnumerable<int> childIds,
         IEnumerable<string> relationTypeAliases,
-        params UmbracoObjectTypes[] entityTypes);
+        UmbracoObjectTypes entityType);
 
     /// <summary>
     ///     Returns paged child entities for a related parent id
