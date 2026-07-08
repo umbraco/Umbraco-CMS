@@ -7692,6 +7692,7 @@ export type GetDocumentTypeAllowedInLibraryData = {
     body?: never;
     path?: never;
     query?: {
+        parentKey?: string;
         skip?: number;
         take?: number;
     };

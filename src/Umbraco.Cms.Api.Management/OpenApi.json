@@ -10309,6 +10309,14 @@
         "operationId": "GetDocumentTypeAllowedInLibrary",
         "parameters": [
           {
+            "name": "parentKey",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
             "name": "skip",
             "in": "query",
             "schema": {
