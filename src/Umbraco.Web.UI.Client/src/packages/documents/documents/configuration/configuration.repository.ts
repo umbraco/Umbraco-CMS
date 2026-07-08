@@ -18,14 +18,26 @@ export class UmbDocumentConfigurationRepository extends UmbRepositoryBase implem
 	readonly #serverDataSource = new UmbDocumentConfigurationServerDataSource(this);
 
 	/**
-	 * Requests the Document configuration from the server, or returns the cached configuration if it has already been fetched.
+	 * Requests the Document configuration from the server, or returns the cached configuration if it has already been fetched. Error responses are not cached.
 	 * @returns {Promise<UmbRepositoryResponse<UmbDocumentConfigurationModel>>} - The document configuration.
 	 * @memberof UmbDocumentConfigurationRepository
 	 */
-	requestConfiguration(): Promise<UmbRepositoryResponse<UmbDocumentConfigurationModel>> {
+	async requestConfiguration(): Promise<UmbRepositoryResponse<UmbDocumentConfigurationModel>> {
 		configurationPromise ??= this.#serverDataSource.getConfiguration();
-		return configurationPromise;
+		const response = await configurationPromise;
+		if (response.error) {
+			configurationPromise = undefined;
+		}
+		return response;
 	}
 }
 
 export { UmbDocumentConfigurationRepository as api };
+
+/**
+ * Test-only.
+ * @internal
+ */
+export function resetUmbDocumentConfigurationCache(): void {
+	configurationPromise = undefined;
+}
