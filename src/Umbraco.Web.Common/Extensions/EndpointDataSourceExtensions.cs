@@ -59,33 +59,14 @@ public static class EndpointDataSourceExtensions
         Func<Endpoint, bool> predicate,
         out RouteValueDictionary? routeValues)
     {
-        foreach (RouteEndpoint endpoint in endpointDataSource.Endpoints
+        IEnumerable<RouteEndpoint> candidates = endpointDataSource.Endpoints
             .OfType<RouteEndpoint>()
-            .OrderBy(endpoint => endpoint.Order))
+            .Where(endpoint => IsMatchableCandidate(endpoint, predicate))
+            .OrderBy(endpoint => endpoint.Order);
+
+        foreach (RouteEndpoint endpoint in candidates)
         {
-            if (endpoint.RoutePattern.RawText is null)
-            {
-                continue;
-            }
-
-            // Skip dynamic endpoints (e.g. the Umbraco content catch-all) since they match every path.
-            if (endpoint.Metadata.OfType<IDynamicEndpointMetadata>().Any(metadata => metadata.IsDynamic))
-            {
-                continue;
-            }
-
-            // Skip endpoints suppressed from matching - they do not participate in routing.
-            if (endpoint.Metadata.OfType<ISuppressMatchingMetadata>().FirstOrDefault()?.SuppressMatching == true)
-            {
-                continue;
-            }
-
-            if (predicate(endpoint) is false)
-            {
-                continue;
-            }
-
-            RouteTemplate routeTemplate = RouteTemplateCache.GetOrAdd(endpoint.RoutePattern.RawText, TemplateParser.Parse);
+            RouteTemplate routeTemplate = RouteTemplateCache.GetOrAdd(endpoint.RoutePattern.RawText!, TemplateParser.Parse);
             var matchedRouteValues = new RouteValueDictionary();
             if (new TemplateMatcher(routeTemplate, []).TryMatch(path, matchedRouteValues))
             {
@@ -96,5 +77,28 @@ public static class EndpointDataSourceExtensions
 
         routeValues = null;
         return null;
+    }
+
+    // An endpoint is a matchable candidate if it can participate in routing (has a route pattern, and is
+    // neither a dynamic endpoint - e.g. the Umbraco content catch-all, which matches every path - nor
+    // suppressed from matching) and it satisfies the caller's predicate.
+    private static bool IsMatchableCandidate(RouteEndpoint endpoint, Func<Endpoint, bool> predicate)
+    {
+        if (endpoint.RoutePattern.RawText is null)
+        {
+            return false;
+        }
+
+        if (endpoint.Metadata.OfType<IDynamicEndpointMetadata>().Any(metadata => metadata.IsDynamic))
+        {
+            return false;
+        }
+
+        if (endpoint.Metadata.OfType<ISuppressMatchingMetadata>().FirstOrDefault()?.SuppressMatching == true)
+        {
+            return false;
+        }
+
+        return predicate(endpoint);
     }
 }

@@ -1,3 +1,4 @@
+using System.Reflection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
@@ -25,7 +26,7 @@ public class UmbracoVirtualPageRoute : IUmbracoVirtualPageRoute
     private readonly IUmbracoContextAccessor _umbracoContextAccessor;
 
     /// <summary>
-    /// Constructor.
+    /// Initializes a new instance of the <see cref="UmbracoVirtualPageRoute"/> class.
     /// </summary>
     /// <param name="endpointDataSource">The endpoint data source.</param>
     /// <param name="linkParser">The link parser.</param>
@@ -53,58 +54,72 @@ public class UmbracoVirtualPageRoute : IUmbracoVirtualPageRoute
     /// <returns>Nothing</returns>
     public async Task SetupVirtualPageRoute(HttpContext httpContext)
     {
-        // This runs for every surface controller POST. If the request already routed to a real, non-404
-        // content item then it is a normal content page - not a virtual page - so there is nothing to set up
-        // and we can skip the endpoint lookup below. Note a virtual page URL typically routes to the
-        // configured 404 content (non-null PublishedContent), so we must also check it is not a 404.
-        if (_umbracoContextAccessor.TryGetUmbracoContext(out IUmbracoContext? umbracoContext)
-            && umbracoContext.PublishedRequest is { } publishedRequest
-            && publishedRequest.HasPublishedContent()
-            && publishedRequest.Is404() is false)
+        // This runs for every surface controller POST. If the request already routed to real content then it
+        // is a normal content page - not a virtual page - so there is nothing to set up.
+        if (IsRequestAlreadyRoutedToContent())
         {
             return;
         }
 
-        // Try and find an endpoint for the current path. The name-based lookup only matches named routes
-        // (e.g. custom routes registered via ForUmbracoPage), so fall back to matching by route pattern,
-        // which also finds attribute-routed IVirtualPageController endpoints that have no route name (#14165).
-        Endpoint? endpoint = _endpointDataSource.GetEndpointByPath(_linkParser, httpContext.Request.Path, out RouteValueDictionary? routeValues);
-
-        if (endpoint is null || IsVirtualPageEndpoint(endpoint) is false)
+        Endpoint? endpoint = FindVirtualPageEndpoint(httpContext, out RouteValueDictionary? routeValues);
+        if (endpoint is null || routeValues is null)
         {
-            endpoint = _endpointDataSource.GetEndpointByRoutePattern(httpContext.Request.Path, IsVirtualPageEndpoint, out routeValues);
+            return;
         }
 
-        if (endpoint != null && routeValues != null)
+        ControllerActionDescriptor? controllerActionDescriptor = endpoint.GetControllerActionDescriptor();
+        if (controllerActionDescriptor is null)
         {
-            ControllerActionDescriptor? controllerActionDescriptor = endpoint.GetControllerActionDescriptor();
-
-            if (controllerActionDescriptor != null)
-            {
-                Type controllerType = controllerActionDescriptor.ControllerTypeInfo.AsType();
-
-                if (controllerType != null)
-                {
-                    // Get the controller for the endpoint. We need to fallback to ActivatorUtilities if the controller is not registered in DI.
-                    var controller = httpContext.RequestServices.GetService(controllerType)
-                                     ?? ActivatorUtilities.CreateInstance(httpContext.RequestServices, controllerType);
-
-                    // Try and find the content if this is a virtual page
-                    IPublishedContent? publishedContent = FindContent(
-                        endpoint,
-                        httpContext,
-                        routeValues,
-                        controllerActionDescriptor,
-                        controller);
-
-                    if (publishedContent != null)
-                    {
-                        // If we have content then set the route values
-                        await SetRouteValues(httpContext, publishedContent, controllerActionDescriptor);
-                    }
-                }
-            }
+            return;
         }
+
+        Type controllerType = controllerActionDescriptor.ControllerTypeInfo.AsType();
+
+        // Get the controller for the endpoint, falling back to ActivatorUtilities if it is not registered in DI.
+        var controller = httpContext.RequestServices.GetService(controllerType)
+                         ?? ActivatorUtilities.CreateInstance(httpContext.RequestServices, controllerType);
+
+        IPublishedContent? publishedContent = FindContent(endpoint, httpContext, routeValues, controllerActionDescriptor, controller);
+        if (publishedContent is not null)
+        {
+            await SetRouteValues(httpContext, publishedContent, controllerActionDescriptor);
+        }
+    }
+
+    /// <summary>
+    /// Gets a value indicating whether the request already routed to a real, non-404 content item
+    /// (a normal content page rather than a virtual page).
+    /// </summary>
+    /// <remarks>
+    /// A virtual page URL typically routes to the configured 404 content (non-null PublishedContent),
+    /// so this also checks that the request is not a 404.
+    /// </remarks>
+    private bool IsRequestAlreadyRoutedToContent()
+        => _umbracoContextAccessor.TryGetUmbracoContext(out IUmbracoContext? umbracoContext)
+           && umbracoContext.PublishedRequest is { } publishedRequest
+           && publishedRequest.HasPublishedContent()
+           && publishedRequest.Is404() is false;
+
+    /// <summary>
+    /// Finds the endpoint that matches the current request path, or null if none matches.
+    /// </summary>
+    /// <param name="httpContext">The HTTP context.</param>
+    /// <param name="routeValues">The route values parsed from the matching endpoint, or null if none matched.</param>
+    /// <returns>The matching endpoint, or null if none matched.</returns>
+    /// <remarks>
+    /// The name-based lookup only matches named routes (e.g. custom routes registered via ForUmbracoPage), so
+    /// this falls back to matching by route pattern, which also finds attribute-routed
+    /// <see cref="IVirtualPageController" /> endpoints that have no route name (#14165).
+    /// </remarks>
+    private Endpoint? FindVirtualPageEndpoint(HttpContext httpContext, out RouteValueDictionary? routeValues)
+    {
+        Endpoint? endpoint = _endpointDataSource.GetEndpointByPath(_linkParser, httpContext.Request.Path, out routeValues);
+        if (endpoint is not null && IsVirtualPageEndpoint(endpoint))
+        {
+            return endpoint;
+        }
+
+        return _endpointDataSource.GetEndpointByRoutePattern(httpContext.Request.Path, IsVirtualPageEndpoint, out routeValues);
     }
 
     /// <summary>
@@ -153,7 +168,7 @@ public class UmbracoVirtualPageRoute : IUmbracoVirtualPageRoute
                 httpContext,
                 new RouteData(routeValues),
                 controllerActionDescriptor),
-            filters: new List<IFilterMetadata>(),
+            filters: [],
             actionArguments: BuildActionArguments(routeValues, controllerActionDescriptor),
             controller: controller);
 
@@ -174,7 +189,7 @@ public class UmbracoVirtualPageRoute : IUmbracoVirtualPageRoute
 
         if (controllerActionDescriptor.MethodInfo is not null)
         {
-            foreach (var parameter in controllerActionDescriptor.MethodInfo.GetParameters())
+            foreach (ParameterInfo parameter in controllerActionDescriptor.MethodInfo.GetParameters())
             {
                 if (parameter.Name is not null && routeValues.TryGetValue(parameter.Name, out var value))
                 {
