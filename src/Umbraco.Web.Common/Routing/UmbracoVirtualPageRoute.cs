@@ -175,12 +175,15 @@ public class UmbracoVirtualPageRoute : IUmbracoVirtualPageRoute
         return FindContent(endpoint, actionExecutingContext);
     }
 
-    // Populates the action arguments from the matched route values, keyed by the action's parameter names.
-    // The real MVC pipeline model-binds these for us, but this dummy context is built outside of it (on a
-    // surface controller POST), so a FindContent that reads ActionArguments - as the documented example does -
-    // would otherwise see nothing.
-    // Note: values are the raw route values (strings); they are NOT type-converted the way MVC model binding
-    // would (e.g. "42" stays a string, it is not converted to an int parameter's value).
+    /// <summary>
+    /// Populates the action arguments from the matched route values, keyed by the action's parameter names.
+    /// </summary>
+    /// <remarks>
+    /// The real MVC pipeline model-binds these for us, but this dummy context is built outside of it (on a
+    /// surface controller POST), so a FindContent that reads ActionArguments - as the documented example does -
+    /// would otherwise see nothing. Values are the raw route values (strings); they are NOT type-converted the
+    /// way MVC model binding would (e.g. "42" stays a string, it is not converted to an int parameter's value).
+    /// </remarks>
     private static IDictionary<string, object?> BuildActionArguments(
         RouteValueDictionary routeValues,
         ControllerActionDescriptor controllerActionDescriptor)
