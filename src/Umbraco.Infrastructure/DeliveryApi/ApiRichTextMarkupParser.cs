@@ -122,11 +122,11 @@ internal sealed class ApiRichTextMarkupParser : ApiRichTextParserBase, IApiRichT
                 var currentImageSource = image.GetAttributeValue("src", string.Empty);
                 var currentImageQueryString = currentImageSource.Contains('?')
                     ? $"?{currentImageSource.Split('?').Last()}"
-                    : null;
+                    : string.Empty;
 
                 // Re-sign the URL so a rotated HMAC secret key doesn't break previously-authored images.
                 // No-op when HMAC isn't configured.
-                var refreshedSrc = _imageUrlTokenGenerator.RefreshSignature($"{mediaUrl}{currentImageQueryString}");
+                var refreshedSrc = _imageUrlTokenGenerator.RefreshSignature(mediaUrl.AppendQueryStringToUrl(currentImageQueryString));
                 image.SetAttributeValue("src", refreshedSrc);
                 image.Attributes.Remove("data-udi");
 
