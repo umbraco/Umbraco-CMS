@@ -15,7 +15,7 @@ export class UmbContentPublishModalElement extends UmbModalBaseElement<
 	UmbContentPublishModalData,
 	UmbContentPublishModalValue
 > {
-	#selectionManager = new UmbSelectionManager<string>(this);
+	readonly #selectionManager = new UmbSelectionManager<string>(this);
 
 	@state()
 	private _options: Array<UmbEntityVariantOptionModel> = [];
@@ -24,12 +24,9 @@ export class UmbContentPublishModalElement extends UmbModalBaseElement<
 	private _hasNotSelectedMandatory?: boolean;
 
 	@state()
-	private _hasInvalidSelection = true;
-
-	@state()
 	private _isInvariant = false;
 
-	#pickableFilter = (option: UmbEntityVariantOptionModel) => {
+	readonly #pickableFilter = (option: UmbEntityVariantOptionModel) => {
 		if (!option.variant || option.variant.state === UmbPublishableVariantState.NOT_CREATED) {
 			return false;
 		}
@@ -40,7 +37,6 @@ export class UmbContentPublishModalElement extends UmbModalBaseElement<
 		// If invariant, don't display the variant selection component.
 		if (this.data?.options.length === 1 && this.data.options[0].culture === null) {
 			this._isInvariant = true;
-			this._hasInvalidSelection = false;
 			return;
 		}
 
@@ -51,37 +47,36 @@ export class UmbContentPublishModalElement extends UmbModalBaseElement<
 		this.#selectionManager.setMultiple(true);
 		this.#selectionManager.setSelectable(true);
 
-		// Only display variants that are relevant to pick from, i.e. variants that are draft, not-published-mandatory or published with pending changes.
-		// If we don't know the state (e.g. from a bulk publishing selection) we need to consider it available for selection.
-		this._options =
-			this.data?.options.filter(
-				(option) =>
-					(option.variant && option.variant.state === null) ||
-					isNotPublishedMandatory(option) ||
-					option.variant?.state !== UmbPublishableVariantState.NOT_CREATED,
-			) ?? [];
-
-		let selected = this.value?.selection ?? [];
+		this._options = this.#filterSelectableOptions(this.data?.options ?? []);
 
 		const validOptions = this._options.filter((o) => this.#pickableFilter(o));
 
 		// Filter selection based on options:
-		selected = selected.filter((s) => validOptions.some((o) => o.unique === s));
+		const selected = (this.value?.selection ?? []).filter((s) => validOptions.some((o) => o.unique === s));
 
 		this.#selectionManager.setSelection(selected);
 
-		this.observe(
-			this.#selectionManager.selection,
-			(selection: Array<string>) => {
-				if (!this._options && !selection) return;
+		this.observe(this.#selectionManager.selection, this.#handleSelectionChange, 'observeSelection');
+	}
 
-				//Getting not published mandatory options — the options that are mandatory and not currently published.
-				const missingMandatoryOptions = this._options.filter(isNotPublishedMandatory);
-				this._hasNotSelectedMandatory = missingMandatoryOptions.some((option) => !selection.includes(option.unique));
-			},
-			'observeSelection',
+	#filterSelectableOptions(options: Array<UmbEntityVariantOptionModel>): Array<UmbEntityVariantOptionModel> {
+		// Only display variants that are relevant to pick from, i.e. variants that are draft, not-published-mandatory or published with pending changes.
+		// If we don't know the state (e.g. from a bulk publishing selection) we need to consider it available for selection.
+		return options.filter(
+			(option) =>
+				option.variant?.state === null ||
+				isNotPublishedMandatory(option) ||
+				(option.variant && option.variant.state !== UmbPublishableVariantState.NOT_CREATED),
 		);
 	}
+
+	readonly #handleSelectionChange = (selection: Array<string>) => {
+		if (!this._options && !selection) return;
+
+		//Getting not published mandatory options — the options that are mandatory and not currently published.
+		const missingMandatoryOptions = this._options.filter(isNotPublishedMandatory);
+		this._hasNotSelectedMandatory = missingMandatoryOptions.some((option) => !selection.includes(option.unique));
+	};
 
 	#submit() {
 		this.value = { selection: this._isInvariant ? ['invariant'] : this.#selectionManager.getSelection() };

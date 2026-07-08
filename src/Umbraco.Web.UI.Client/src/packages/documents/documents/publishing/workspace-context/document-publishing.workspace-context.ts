@@ -368,6 +368,8 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 				data: {
 					headline: this.#localize.term('content_saveAndPublishModalTitle'),
 					options,
+					// The shared modal's pickableFilter is typed against the generic UmbEntityVariantOptionModel, but
+					// #determineVariantOptions() (which supplies `options` above) only ever returns document variants here.
 					pickableFilter: (option) => this.#publishableVariantsFilter(option as UmbDocumentVariantOptionModel),
 				},
 				value: { selection: selected },
