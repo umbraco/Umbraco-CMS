@@ -226,13 +226,12 @@ export class ContentUiHelper extends UiBaseLocators {
       name: "Reload children…",
     });
     this.contentTree = page.locator('umb-tree[alias="Umb.Tree.Document"]');
-    this.richTextAreaTxt = page
-      .frameLocator('iframe[title="Rich Text Area"]')
-      .locator("#tinymce");
-    this.textAreaTxt = page.locator("umb-property-editor-ui-textarea textarea");
-    this.plusIconBtn = page.locator("#icon-add svg");
-    this.enterTagTxt = page.getByPlaceholder("Enter tag");
-    this.menuItemTree = page.locator("umb-menu-item-tree-default");
+    this.richTextAreaTxt = page.frameLocator('iframe[title="Rich Text Area"]').locator('#tinymce');
+    this.textAreaTxt = page.locator('umb-property-editor-ui-textarea textarea');
+    this.plusIconBtn = page.locator('#icon-add svg');
+    this.enterTagTxt = page.getByPlaceholder('Enter tag');
+    this.menuItemTree = page.locator('umb-menu-item-tree-default');
+    this.confirmToUnpublishBtn = page.locator('umb-content-unpublish-modal').getByLabel('Unpublish');
     this.confirmToPublishBtn = page.locator('umb-document-publish-modal').getByLabel('Publish');
     this.confirmToUnpublishBtn = page
       .locator("umb-document-unpublish-modal")
