@@ -79,9 +79,14 @@ public static class EndpointDataSourceExtensions
         return null;
     }
 
-    // An endpoint is a matchable candidate if it can participate in routing (has a route pattern, and is
-    // neither a dynamic endpoint - e.g. the Umbraco content catch-all, which matches every path - nor
-    // suppressed from matching) and it satisfies the caller's predicate.
+    /// <summary>
+    /// Determines whether an endpoint is a matchable candidate: it can participate in routing and satisfies
+    /// the caller's predicate.
+    /// </summary>
+    /// <remarks>
+    /// An endpoint can participate in routing when it has a route pattern and is neither a dynamic endpoint
+    /// (e.g. the Umbraco content catch-all, which matches every path) nor suppressed from matching.
+    /// </remarks>
     private static bool IsMatchableCandidate(RouteEndpoint endpoint, Func<Endpoint, bool> predicate)
     {
         if (endpoint.RoutePattern.RawText is null)
