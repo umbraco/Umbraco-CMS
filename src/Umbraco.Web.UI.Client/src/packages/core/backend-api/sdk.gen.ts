@@ -6752,6 +6752,11 @@ export class UserService {
         });
     }
     
+    /**
+     * Gets element permissions for the current user.
+     *
+     * Gets the element permissions for the currently authenticated user.
+     */
     public static getUserCurrentPermissionsElement<ThrowOnError extends boolean = true>(options?: Options<GetUserCurrentPermissionsElementData, ThrowOnError>) {
         return (options?.client ?? client).get<GetUserCurrentPermissionsElementResponses, GetUserCurrentPermissionsElementErrors, ThrowOnError>({
             security: [{ scheme: 'bearer', type: 'http' }],

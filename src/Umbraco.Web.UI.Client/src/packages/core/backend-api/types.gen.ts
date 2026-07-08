@@ -1552,7 +1552,7 @@ export type ManifestResponseModel = {
     name: string;
     id?: null | string;
     version?: null | string;
-    cacheBuster?: string;
+    cacheBuster?: null | string;
     extensions: Array<unknown>;
 };
 
@@ -7683,6 +7683,7 @@ export type GetDocumentTypeAllowedInLibraryData = {
     body?: never;
     path?: never;
     query?: {
+        parentKey?: string;
         skip?: number;
         take?: number;
     };
