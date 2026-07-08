@@ -239,8 +239,6 @@ public static partial class UmbracoBuilderExtensions
 
         builder.Services.AddTransient<IFireAndForgetRunner, FireAndForgetRunner>();
 
-        builder.AddPropertyIndexValueFactories();
-
         builder.AddDeliveryApiCoreServices();
         builder.Services.AddTransient<IWebhookFiringService, WebhookFiringService>();
 
@@ -265,26 +263,6 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IRichTextRequiredValidator, RichTextRequiredValidator>();
 
         builder.Services.AddSingleton<IRichTextRegexValidator, RichTextRegexValidator>();
-
-        return builder;
-    }
-
-    /// <summary>
-    /// Registers the default property index value factories used for indexing property values in Umbraco's search infrastructure.
-    /// </summary>
-    /// <param name="builder">The <see cref="IUmbracoBuilder"/> to add the property index value factories to.</param>
-    /// <returns>The same <see cref="Umbraco.Cms.Core.DependencyInjection.IUmbracoBuilder"/> instance so that multiple calls can be chained.</returns>
-    public static IUmbracoBuilder AddPropertyIndexValueFactories(this IUmbracoBuilder builder)
-    {
-        builder.Services.AddSingleton<IBlockListPropertyIndexValueFactory, BlockListPropertyIndexValueFactory>();
-        builder.Services.AddSingleton<IBlockGridPropertyIndexValueFactory, BlockGridPropertyIndexValueFactory>();
-        builder.Services.AddSingleton<ISingleBlockPropertyIndexValueFactory, SingleBlockPropertyIndexValueFactory>();
-        builder.Services.AddSingleton<ITagPropertyIndexValueFactory, TagPropertyIndexValueFactory>();
-        builder.Services.AddSingleton<IRichTextPropertyIndexValueFactory, RichTextPropertyIndexValueFactory>();
-        builder.Services.AddSingleton<IDateOnlyPropertyIndexValueFactory, DateOnlyPropertyIndexValueFactory>();
-        builder.Services.AddSingleton<ITimeOnlyPropertyIndexValueFactory, TimeOnlyPropertyIndexValueFactory>();
-        builder.Services.AddSingleton<IDateTimeUnspecifiedPropertyIndexValueFactory, DateTimeUnspecifiedPropertyIndexValueFactory>();
-        builder.Services.AddSingleton<IDateTimeWithTimeZonePropertyIndexValueFactory, DateTimeWithTimeZonePropertyIndexValueFactory>();
 
         return builder;
     }

@@ -33,34 +33,24 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 public class RichTextPropertyEditor : DataEditor, IValueSchemaProvider
 {
     private readonly IIOHelper _ioHelper;
-    private readonly IRichTextPropertyIndexValueFactory _richTextPropertyIndexValueFactory;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RichTextPropertyEditor"/> class.
     /// </summary>
     /// <param name="dataValueEditorFactory">Factory used to create data value editors for property values.</param>
     /// <param name="ioHelper">Helper for IO operations, such as resolving file paths.</param>
-    /// <param name="richTextPropertyIndexValueFactory">Factory for creating index values specific to rich text properties.</param>
     /// <remarks>
     /// The constructor will set up the property editor based on the attribute if one is found.
     /// </remarks>
     public RichTextPropertyEditor(
         IDataValueEditorFactory dataValueEditorFactory,
-        IIOHelper ioHelper,
-        IRichTextPropertyIndexValueFactory richTextPropertyIndexValueFactory)
+        IIOHelper ioHelper)
         : base(dataValueEditorFactory)
     {
         _ioHelper = ioHelper;
-        _richTextPropertyIndexValueFactory = richTextPropertyIndexValueFactory;
 
         SupportsReadOnly = true;
     }
-
-    /// <summary>
-    /// Gets the <see cref="IPropertyIndexValueFactory"/> instance used to generate index values for properties edited with the rich text property editor.
-    /// This factory is used to extract and format property values for search indexing.
-    /// </summary>
-    public override IPropertyIndexValueFactory PropertyIndexValueFactory => _richTextPropertyIndexValueFactory;
 
     /// <summary>
     /// Gets a value indicating whether this property editor supports configurable elements. Always returns <c>true</c> for the rich text property editor.

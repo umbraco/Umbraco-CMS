@@ -40,9 +40,6 @@ public class MediaPicker3PropertyEditor : DataEditor, IValueSchemaProvider
     }
 
     /// <inheritdoc />
-    public override IPropertyIndexValueFactory PropertyIndexValueFactory { get; } = new NoopPropertyIndexValueFactory();
-
-    /// <inheritdoc />
     public Type? GetValueType(object? configuration) => typeof(string); // JSON string representation
 
     /// <inheritdoc />
