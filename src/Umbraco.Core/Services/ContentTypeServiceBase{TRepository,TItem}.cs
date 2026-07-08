@@ -452,10 +452,15 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
             }
         }
 
-        // Flag the raw data as unaffected only for types that were never independently marked as needing a rebuild.
+        // Flag the raw data as unaffected only for types that were never independently marked as needing a
+        // rebuild. RawDataUnaffected supplements RefreshMain, so only apply it to entries that already carry
+        // RefreshMain — a batch save can emit a separate RefreshOther-only entry for the same Id, which must
+        // not be flagged.
         foreach (ContentTypeChange<TItem> change in changes)
         {
-            if (rawDataUnaffectedCandidateIds.Contains(change.Item.Id) && rebuildRequiredIds.Contains(change.Item.Id) is false)
+            if (change.ChangeTypes.HasType(ContentTypeChangeTypes.RefreshMain)
+                && rawDataUnaffectedCandidateIds.Contains(change.Item.Id)
+                && rebuildRequiredIds.Contains(change.Item.Id) is false)
             {
                 change.ChangeTypes |= ContentTypeChangeTypes.RawDataUnaffected;
             }
