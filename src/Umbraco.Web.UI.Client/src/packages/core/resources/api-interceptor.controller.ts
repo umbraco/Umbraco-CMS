@@ -252,6 +252,8 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 						notification.message,
 						undefined,
 						extractUmbNotificationColor(notification.type),
+						// Backend event messages may contain HTML (e.g. links); rendered sanitized by the notification layout.
+						notification.message,
 					);
 				}
 			} catch {
@@ -341,8 +343,15 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 	 * @param {string} message The message of the error notification.
 	 * @param {Record<string, string[]>} [errors] Validation errors keyed by field name.
 	 * @param {UmbNotificationColor} [color] The color of the notification.
+	 * @param {string} [htmlMessage] A message rendered as sanitized HTML, taking precedence over `message`.
 	 */
-	async #peekError(headline: string, message: string, errors?: Record<string, string[]>, color?: UmbNotificationColor) {
+	async #peekError(
+		headline: string,
+		message: string,
+		errors?: Record<string, string[]>,
+		color?: UmbNotificationColor,
+		htmlMessage?: string,
+	) {
 		// Store the host for usage in the following async context
 		const host = this._host;
 
@@ -350,6 +359,7 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 		(await import('@umbraco-cms/backoffice/notification')).umbPeekError(host, {
 			headline,
 			message,
+			htmlMessage,
 			errors,
 			color,
 		});

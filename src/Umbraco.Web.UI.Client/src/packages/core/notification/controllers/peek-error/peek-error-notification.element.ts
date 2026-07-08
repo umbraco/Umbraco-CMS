@@ -37,10 +37,19 @@ export class UmbPeekErrorNotificationElement extends UmbLitElement {
 	}
 
 	get #message() {
+		const message = this.#renderMessage();
 		const detail = this.data?.detail;
 		if (detail && detail.length <= DETAIL_MAX_LENGTH) {
-			return html`${this.data?.message}
+			return html`${message}
 				<p class="detail">${detail}</p>`;
+		}
+		return message;
+	}
+
+	#renderMessage() {
+		const htmlMessage = this.data?.htmlMessage;
+		if (htmlMessage) {
+			return typeof htmlMessage === 'string' ? unsafeHTML(sanitizeHTML(htmlMessage)) : htmlMessage;
 		}
 		return this.data?.message;
 	}
@@ -79,7 +88,7 @@ export class UmbPeekErrorNotificationElement extends UmbLitElement {
 	protected override render() {
 		if (!this.data) return nothing;
 		return html`<uui-toast-notification-layout headline=${ifDefined(this.data.headline)}>
-			${typeof this.#message === 'string' ? unsafeHTML(sanitizeHTML(this.#message)) : this.#message} ${this.#actions}
+			${this.#message} ${this.#actions}
 		</uui-toast-notification-layout>`;
 	}
 

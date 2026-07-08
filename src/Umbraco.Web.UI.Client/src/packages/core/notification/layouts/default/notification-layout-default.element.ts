@@ -26,10 +26,18 @@ export class UmbNotificationLayoutDefaultElement extends LitElement {
 	override render() {
 		return html`
 			<uui-toast-notification-layout id="layout" headline="${ifDefined(this.data.headline)}" class="uui-text">
-				<div id="message">${unsafeHTML(sanitizeHTML(this.data.message))}</div>
+				<div id="message">${this.#renderMessage()}</div>
 				${this.#renderStructuredList(this.data.structuredList)}
 			</uui-toast-notification-layout>
 		`;
+	}
+
+	#renderMessage() {
+		const htmlMessage = this.data.htmlMessage;
+		if (htmlMessage) {
+			return typeof htmlMessage === 'string' ? unsafeHTML(sanitizeHTML(htmlMessage)) : htmlMessage;
+		}
+		return this.data.message;
 	}
 
 	#renderStructuredList(list: unknown) {
