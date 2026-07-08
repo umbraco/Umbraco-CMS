@@ -46,7 +46,6 @@ export class UmbMediaServerDataSource extends UmbControllerBase implements UmbDe
 			variants: [
 				{
 					culture: null,
-					segment: null,
 					name: '',
 					createDate: null,
 					updateDate: null,
@@ -84,7 +83,6 @@ export class UmbMediaServerDataSource extends UmbControllerBase implements UmbDe
 				return {
 					state: null,
 					culture: variant.culture || null,
-					segment: variant.segment || null,
 					name: variant.name,
 					createDate: variant.createDate,
 					updateDate: variant.updateDate,
@@ -123,7 +121,6 @@ export class UmbMediaServerDataSource extends UmbControllerBase implements UmbDe
 			values: model.values,
 			variants: model.variants.map((variant) => ({
 				culture: variant.culture || null,
-				segment: variant.segment || null,
 				name: variant.name,
 			})),
 		};

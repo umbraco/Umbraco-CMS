@@ -34,7 +34,7 @@ export class UmbElementPublishedPendingChangesManager extends UmbControllerBase 
 		if (args.persistedData.unique !== args.publishedData.unique)
 			throw new Error('Persisted and published data does not have the same unique');
 
-		const variantIds = args.persistedData.variants?.map((x) => UmbVariantId.Create(x)) ?? [];
+		const variantIds = args.persistedData.variants?.map((x) => UmbVariantId.CreateFromPartial(x)) ?? [];
 
 		const pendingChangesPromises = variantIds.map(async (variantId) => {
 			const mergedData = await new UmbMergeContentVariantDataController(this).process(

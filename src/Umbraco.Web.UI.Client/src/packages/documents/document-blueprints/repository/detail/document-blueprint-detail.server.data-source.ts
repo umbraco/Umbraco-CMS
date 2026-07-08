@@ -204,7 +204,6 @@ export class UmbDocumentBlueprintServerDataSource implements UmbDetailDataSource
 			variants: data.variants.map((variant) => {
 				return {
 					culture: variant.culture || null,
-					segment: variant.segment || null,
 					state: variant.state,
 					name: variant.name,
 					publishDate: variant.publishDate || null,

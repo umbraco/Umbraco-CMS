@@ -48,12 +48,10 @@ export class UmbUnpublishDocumentEntityAction extends UmbEntityActionBase<never>
 		if (currentUserHasAccessToAllLanguages === undefined)
 			throw new Error('The current user access to all languages is missing');
 
-		const cultureVariantOptions = documentData.variants.filter((variant) => variant.segment === null);
-
-		const options: Array<UmbDocumentVariantOptionModel> = cultureVariantOptions.map<UmbDocumentVariantOptionModel>(
+		const options: Array<UmbDocumentVariantOptionModel> = documentData.variants.map<UmbDocumentVariantOptionModel>(
 			(variant) => ({
 				culture: variant.culture,
-				segment: variant.segment,
+				segment: null,
 				language: languageData?.items.find((language) => language.unique === variant.culture) ?? {
 					name: appCulture!,
 					entityType: 'language',
@@ -63,7 +61,7 @@ export class UmbUnpublishDocumentEntityAction extends UmbEntityActionBase<never>
 					unique: appCulture!,
 				},
 				variant,
-				unique: new UmbVariantId(variant.culture, variant.segment).toString(),
+				unique: new UmbVariantId(variant.culture, null).toString(),
 			}),
 		);
 
