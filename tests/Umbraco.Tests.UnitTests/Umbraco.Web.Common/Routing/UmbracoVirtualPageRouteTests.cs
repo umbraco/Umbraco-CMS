@@ -70,6 +70,29 @@ public class UmbracoVirtualPageRouteTests
     }
 
     [Test]
+    public async Task SetupVirtualPageRoute_Does_Nothing_When_The_Request_Already_Routed_To_Content()
+    {
+        // A virtual page endpoint that WOULD match the path if the lookup ran.
+        RouteEndpoint endpoint = CreateEndpoint(
+            "products/{sku}",
+            new EndpointMetadataCollection(CreateActionDescriptor<TestVirtualPageController>()));
+        var dataSource = new DefaultEndpointDataSource(endpoint);
+
+        // The request already routed to a real, non-404 content item (i.e. a normal content page).
+        var routedRequest = Mock.Of<IPublishedRequest>(r =>
+            r.PublishedContent == Mock.Of<IPublishedContent>() && r.ResponseStatusCode == 200);
+        var routedContext = Mock.Of<IUmbracoContext>(c => c.PublishedRequest == routedRequest);
+
+        UmbracoVirtualPageRoute route = CreateRoute(dataSource, Mock.Of<IPublishedRequest>(), routedContext);
+
+        HttpContext httpContext = CreateHttpContext("/products/ABC123", new TestVirtualPageController(Mock.Of<IPublishedContent>()));
+
+        await route.SetupVirtualPageRoute(httpContext);
+
+        Assert.IsNull(httpContext.Features.Get<UmbracoRouteValues>());
+    }
+
+    [Test]
     public void FindContent_Uses_The_Virtual_Page_Controller()
     {
         var content = Mock.Of<IPublishedContent>();
@@ -131,7 +154,10 @@ public class UmbracoVirtualPageRouteTests
         Assert.AreSame(content, result);
     }
 
-    private static UmbracoVirtualPageRoute CreateRoute(EndpointDataSource dataSource, IPublishedRequest publishedRequest)
+    private static UmbracoVirtualPageRoute CreateRoute(
+        EndpointDataSource dataSource,
+        IPublishedRequest publishedRequest,
+        IUmbracoContext? routedContext = null)
     {
         var publishedRouter = new Mock<IPublishedRouter>();
         publishedRouter
@@ -141,11 +167,11 @@ public class UmbracoVirtualPageRouteTests
             .Setup(x => x.RouteRequestAsync(It.IsAny<IPublishedRequestBuilder>(), It.IsAny<RouteRequestOptions>()))
             .ReturnsAsync(publishedRequest);
 
-        IUmbracoContext? umbracoContext = null;
+        IUmbracoContext? umbracoContext = routedContext;
         var umbracoContextAccessor = new Mock<IUmbracoContextAccessor>();
         umbracoContextAccessor
             .Setup(x => x.TryGetUmbracoContext(out umbracoContext))
-            .Returns(false);
+            .Returns(routedContext is not null);
 
         return new UmbracoVirtualPageRoute(
             dataSource,

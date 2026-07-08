@@ -53,6 +53,18 @@ public class UmbracoVirtualPageRoute : IUmbracoVirtualPageRoute
     /// <returns>Nothing</returns>
     public async Task SetupVirtualPageRoute(HttpContext httpContext)
     {
+        // This runs for every surface controller POST. If the request already routed to a real, non-404
+        // content item then it is a normal content page - not a virtual page - so there is nothing to set up
+        // and we can skip the endpoint lookup below. Note a virtual page URL typically routes to the
+        // configured 404 content (non-null PublishedContent), so we must also check it is not a 404.
+        if (_umbracoContextAccessor.TryGetUmbracoContext(out IUmbracoContext? umbracoContext)
+            && umbracoContext.PublishedRequest is { } publishedRequest
+            && publishedRequest.HasPublishedContent()
+            && publishedRequest.Is404() is false)
+        {
+            return;
+        }
+
         // Try and find an endpoint for the current path. The name-based lookup only matches named routes
         // (e.g. custom routes registered via ForUmbracoPage), so fall back to matching by route pattern,
         // which also finds attribute-routed IVirtualPageController endpoints that have no route name (#14165).
@@ -124,6 +136,11 @@ public class UmbracoVirtualPageRoute : IUmbracoVirtualPageRoute
     /// <param name="controllerActionDescriptor">The action descriptor.</param>
     /// <param name="controller">The controller.</param>
     /// <returns></returns>
+    /// <remarks>
+    /// The action arguments on the created context are populated from the raw route values (strings) and are
+    /// not model-bound/type-converted as they would be by MVC. A FindContent implementation should therefore
+    /// treat a route argument as a string (e.g. <c>sku is string s</c>) rather than expecting a converted type.
+    /// </remarks>
     public IPublishedContent? FindContent(
         Endpoint endpoint,
         HttpContext httpContext,
@@ -147,6 +164,8 @@ public class UmbracoVirtualPageRoute : IUmbracoVirtualPageRoute
     // The real MVC pipeline model-binds these for us, but this dummy context is built outside of it (on a
     // surface controller POST), so a FindContent that reads ActionArguments - as the documented example does -
     // would otherwise see nothing.
+    // Note: values are the raw route values (strings); they are NOT type-converted the way MVC model binding
+    // would (e.g. "42" stays a string, it is not converted to an int parameter's value).
     private static IDictionary<string, object?> BuildActionArguments(
         RouteValueDictionary routeValues,
         ControllerActionDescriptor controllerActionDescriptor)

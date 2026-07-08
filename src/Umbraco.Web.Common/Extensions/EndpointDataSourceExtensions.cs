@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Routing.Template;
@@ -9,6 +10,10 @@ namespace Umbraco.Cms.Web.Common.Extensions;
 /// </summary>
 public static class EndpointDataSourceExtensions
 {
+    // Parsed route templates are cached by their raw text to avoid re-parsing the same fixed set of
+    // endpoint patterns on every call. The key space is bounded by the number of registered endpoints.
+    private static readonly ConcurrentDictionary<string, RouteTemplate> RouteTemplateCache = new();
+
     /// <summary>
     /// Gets an endpoint that matches the specified path.
     /// </summary>
@@ -69,13 +74,20 @@ public static class EndpointDataSourceExtensions
                 continue;
             }
 
+            // Skip endpoints suppressed from matching - they do not participate in routing.
+            if (endpoint.Metadata.OfType<ISuppressMatchingMetadata>().FirstOrDefault()?.SuppressMatching == true)
+            {
+                continue;
+            }
+
             if (predicate(endpoint) is false)
             {
                 continue;
             }
 
+            RouteTemplate routeTemplate = RouteTemplateCache.GetOrAdd(endpoint.RoutePattern.RawText, TemplateParser.Parse);
             var matchedRouteValues = new RouteValueDictionary();
-            if (new TemplateMatcher(TemplateParser.Parse(endpoint.RoutePattern.RawText), []).TryMatch(path, matchedRouteValues))
+            if (new TemplateMatcher(routeTemplate, []).TryMatch(path, matchedRouteValues))
             {
                 routeValues = matchedRouteValues;
                 return endpoint;
