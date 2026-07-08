@@ -164,7 +164,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 
 		const variantIds = variants.map((x) => x.variantId);
 		const saveData = await this.#documentWorkspaceContext.constructSaveData(variantIds);
-		await this.#documentWorkspaceContext.runMandatoryValidationForSaveData(saveData);
+		await this.#documentWorkspaceContext.runMandatoryValidationForSaveData(saveData, variantIds);
 		await this.#documentWorkspaceContext.askServerToValidate(saveData, variantIds);
 
 		return this.#documentWorkspaceContext.validateVariantsAndSubmit(
