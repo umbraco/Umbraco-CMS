@@ -28,6 +28,19 @@ import { isTestEnvironment, UmbDeprecation } from '@umbraco-cms/backoffice/utils
  */
 const TOKEN_EXPIRY_MULTIPLIER = 4;
 
+/**
+ * TEMPORARY TESTING BYPASS — NOT FOR PRODUCTION.
+ *
+ * When true, the backoffice skips the OpenID Connect authorization-code / token-exchange
+ * flow entirely and trusts the authentication cookie(s) issued by the server login at
+ * `/umbraco/login`. Those cookies are already sent on every Management API request
+ * (`credentials: 'include'`), so the client only needs to consider itself authorized.
+ *
+ * This deliberately ignores access-token expiry, refresh, and "seconds until logout" UX.
+ * Flip back to `false` (or delete the gated branches) to restore the real OIDC flow.
+ */
+const COOKIE_AUTH_BYPASS = true;
+
 export interface UmbAuthSession {
 	/** When the access token expires (issuedAt + expiresIn). Used to decide when to refresh. */
 	accessTokenExpiresAt: number;
@@ -407,6 +420,11 @@ export class UmbAuthContext extends UmbContextBase {
 	 * @returns True if the user is authorized, otherwise false.
 	 */
 	getIsAuthorized() {
+		if (COOKIE_AUTH_BYPASS) {
+			// TEMP: trust the server-issued login cookie; never redirect to /authorize.
+			this.#isAuthorized.setValue(true);
+			return true;
+		}
 		if (this.#isBypassed) {
 			this.#isAuthorized.setValue(true);
 			return true;
@@ -424,6 +442,17 @@ export class UmbAuthContext extends UmbContextBase {
 	 * @returns {Promise<void>}
 	 */
 	async setInitialState(): Promise<void> {
+		if (COOKIE_AUTH_BYPASS) {
+			// TEMP: skip the OIDC token exchange. Establish a long-lived in-memory session
+			// so the app treats us as authorized and the timeout machinery stays dormant.
+			// Real auth rides on the httpOnly login cookie sent with every request.
+			if (!this.#session.getValue()) {
+				const oneYearInSeconds = 365 * 24 * 60 * 60;
+				this.#setSessionLocally(oneYearInSeconds, Math.floor(Date.now() / 1000));
+			}
+			return;
+		}
+
 		// If we already have a session, no need to re-initialize
 		if (this.#session.getValue()) {
 			return;
@@ -695,7 +724,7 @@ export class UmbAuthContext extends UmbContextBase {
 		client.setConfig({
 			baseUrl: this.#serverUrl,
 			credentials: 'include',
-			auth: this.getLatestToken.bind(this),
+			auth: COOKIE_AUTH_BYPASS ? undefined : this.getLatestToken.bind(this),
 		});
 
 		// Lazy single instance — see #interceptorController field comment. Controller
