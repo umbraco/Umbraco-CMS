@@ -40,7 +40,7 @@ export class UmbMemberWorkspaceEditorElement extends UmbLitElement {
 				(kind) => {
 					this._isExternalOnly = kind === UmbMemberKind.EXTERNAL_ONLY;
 					if (this._isExternalOnly) {
-						this.#variants = [];
+						this.#variants = [{ unique: 'invariant', culture: null, segment: null }];
 						this._generateRoutes();
 					}
 				},
