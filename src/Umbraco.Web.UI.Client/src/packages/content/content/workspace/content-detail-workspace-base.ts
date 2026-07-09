@@ -188,7 +188,6 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	async getVariantOptions(): Promise<Array<VariantOptionModelType>> {
 		return firstValueFrom(this.variantOptions);
 	}
-
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	protected _variantOptionsFilter = (variantOption: VariantOptionModelType) => true;
 
