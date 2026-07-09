@@ -101,7 +101,7 @@ public interface IUserRepository : IReadWriteQueryRepository<Guid, IUser>
     /// <param name="userKinds">Optional parameter to filter by specified user kind</param>
     /// <param name="filter"></param>
     /// <returns></returns>
-    // TODO (V20): Remove the default implementation.
+    // TODO (V20): Remove the default implementation when the obsolete GetPagedResultsByQuery overload is removed.
     IEnumerable<IUser> GetPagedResultsByQuery(
         IQuery<IUser>? query,
         long pageIndex,
