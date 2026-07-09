@@ -18,9 +18,11 @@ export class UmbElementTypeStructureServerDataSource extends UmbContentTypeStruc
 	}
 }
 
-const getAllowedChildrenOf = (_unique: string | null, _parentContentUnique: string | null) => {
+const getAllowedChildrenOf = (_unique: string | null, parentUnique: string | null) => {
 	// eslint-disable-next-line local-rules/no-direct-api-import
-	return DocumentTypeService.getDocumentTypeAllowedInLibrary({});
+	return DocumentTypeService.getDocumentTypeAllowedInLibrary({
+		query: { parentKey: parentUnique ?? undefined },
+	});
 };
 
 const mapper = (item: AllowedDocumentTypeModel): UmbAllowedElementTypeModel => {

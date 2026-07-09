@@ -1,9 +1,12 @@
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Services.Filters;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Tests.Common.Builders;
+using Umbraco.Cms.Tests.Integration.Attributes;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
@@ -38,7 +41,7 @@ public partial class ElementEditingServiceTests
         // re-get and re-test
         VerifyCreate(await ElementEditingService.GetAsync(result.Result.Content!.Key));
 
-        void VerifyCreate(IElement? createdElement)
+        static void VerifyCreate(IElement? createdElement)
         {
             Assert.IsNotNull(createdElement);
             Assert.AreNotEqual(Guid.Empty, createdElement.Key);
@@ -217,7 +220,7 @@ public partial class ElementEditingServiceTests
         // re-get and re-test
         VerifyCreate(await ElementEditingService.GetAsync(result.Result.Content.Key));
 
-        void VerifyCreate(IElement? createdElement)
+        static void VerifyCreate(IElement? createdElement)
         {
             Assert.IsNotNull(createdElement);
             Assert.AreEqual("The English Name", createdElement.GetCultureName("en-US"));
@@ -495,5 +498,102 @@ public partial class ElementEditingServiceTests
         var result = await ElementEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentEditingOperationStatus.NotAllowed, result.Status);
+    }
+
+    [Test]
+    [ConfigureBuilder(ActionName = nameof(ConfigureContentTypeFilterToDisallowElementInFolders))]
+    public async Task Cannot_Create_In_A_Folder_When_Disallowed_By_Content_Type_Filter()
+    {
+        var elementType = await CreateInvariantElementType();
+
+        var containerKey = Guid.NewGuid();
+        await ElementContainerService.CreateAsync(containerKey, "Root Container", null, Constants.Security.SuperUserKey);
+
+        var createModel = CreateElementModel(elementType.Key, containerKey);
+
+        var result = await ElementEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.NotAllowed, result.Status);
+    }
+
+    [Test]
+    [ConfigureBuilder(ActionName = nameof(ConfigureContentTypeFilterToDisallowElementInFolders))]
+    public async Task Can_Create_At_Root_When_Only_Folders_Disallowed_By_Content_Type_Filter()
+    {
+        var elementType = await CreateInvariantElementType();
+
+        var createModel = CreateElementModel(elementType.Key, Constants.System.RootKey);
+
+        var result = await ElementEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+    }
+
+    [Test]
+    [ConfigureBuilder(ActionName = nameof(ConfigureContentTypeFilterToDisallowElementAtRoot))]
+    public async Task Cannot_Create_At_Root_When_Disallowed_By_Content_Type_Filter()
+    {
+        var elementType = await CreateInvariantElementType();
+
+        var createModel = CreateElementModel(elementType.Key, Constants.System.RootKey);
+
+        var result = await ElementEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.NotAllowed, result.Status);
+    }
+
+    [Test]
+    public async Task Can_Create_With_Empty_Parent_Key_Treated_As_Root()
+    {
+        var elementType = await CreateInvariantElementType();
+
+        var createModel = CreateElementModel(elementType.Key, Guid.Empty);
+
+        var result = await ElementEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+        Assert.AreEqual(Constants.System.Root, result.Result.Content!.ParentId);
+    }
+
+    private static ElementCreateModel CreateElementModel(Guid contentTypeKey, Guid? parentKey)
+        => new()
+        {
+            ContentTypeKey = contentTypeKey,
+            ParentKey = parentKey,
+            Variants =
+            [
+                new VariantModel { Name = "Test Create" }
+            ],
+            Properties =
+            [
+                new PropertyValueModel { Alias = "title", Value = "The title value" },
+                new PropertyValueModel { Alias = "text", Value = "The text value" }
+            ],
+        };
+
+    public static void ConfigureContentTypeFilterToDisallowElementInFolders(IUmbracoBuilder builder)
+        => builder.ContentTypeFilters()
+            .Append<ContentTypeFilterDisallowingInFolders>();
+
+    public static void ConfigureContentTypeFilterToDisallowElementAtRoot(IUmbracoBuilder builder)
+        => builder.ContentTypeFilters()
+            .Append<ContentTypeFilterDisallowingAtRoot>();
+
+    private sealed class ContentTypeFilterDisallowingInFolders : IContentTypeFilter
+    {
+        public Task<IEnumerable<TItem>> FilterAllowedInLibraryAsync<TItem>(IEnumerable<TItem> contentTypes, Guid? parentKey)
+            where TItem : IContentTypeComposition
+            => Task.FromResult(parentKey.HasValue ? [] : contentTypes);
+    }
+
+    private sealed class ContentTypeFilterDisallowingAtRoot : IContentTypeFilter
+    {
+        public Task<IEnumerable<TItem>> FilterAllowedInLibraryAsync<TItem>(IEnumerable<TItem> contentTypes, Guid? parentKey)
+            where TItem : IContentTypeComposition
+            => Task.FromResult(parentKey.HasValue ? contentTypes : []);
     }
 }

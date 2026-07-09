@@ -19,29 +19,29 @@ public interface IConfigurationPresentationFactory
     DocumentConfigurationResponseModel CreateDocumentConfigurationResponseModel();
 
     /// <summary>
-    /// Creates a new instance of <see cref="Umbraco.Cms.Api.Management.Models.DocumentTypeConfigurationResponseModel"/>.
+    /// Creates a new instance of <see cref="DocumentTypeConfigurationResponseModel"/>.
     /// </summary>
-    /// <returns>A <see cref="Umbraco.Cms.Api.Management.Models.DocumentTypeConfigurationResponseModel"/> representing the document type configuration.</returns>
+    /// <returns>A <see cref="DocumentTypeConfigurationResponseModel"/> representing the document type configuration.</returns>
     DocumentTypeConfigurationResponseModel CreateDocumentTypeConfigurationResponseModel()
         => throw new NotImplementedException();
 
     /// <summary>
-    /// Creates and returns a new <see cref="Umbraco.Cms.Api.Management.Models.MemberTypeConfigurationResponseModel"/> instance.
+    /// Creates and returns a new <see cref="MemberTypeConfigurationResponseModel"/> instance.
     /// </summary>
-    /// <returns>The created <see cref="Umbraco.Cms.Api.Management.Models.MemberTypeConfigurationResponseModel"/>.</returns>
+    /// <returns>The created <see cref="MemberTypeConfigurationResponseModel"/>.</returns>
     MemberTypeConfigurationResponseModel CreateMemberTypeConfigurationResponseModel()
         => throw new NotImplementedException();
 
     /// <summary>
     /// Creates a media configuration response model.
     /// </summary>
-    /// <returns>A <see cref="Umbraco.Cms.Api.Management.Models.MediaConfigurationResponseModel"/> representing the media configuration.</returns>
+    /// <returns>A <see cref="MediaConfigurationResponseModel"/> representing the media configuration.</returns>
     MediaConfigurationResponseModel CreateMediaConfigurationResponseModel();
 
     /// <summary>
-    /// Creates a <see cref="Umbraco.Cms.Api.Management.Models.MediaTypeConfigurationResponseModel"/> representing the media type configuration.
+    /// Creates a <see cref="MediaTypeConfigurationResponseModel"/> representing the media type configuration.
     /// </summary>
-    /// <returns>The created <see cref="Umbraco.Cms.Api.Management.Models.MediaTypeConfigurationResponseModel"/>.</returns>
+    /// <returns>The created <see cref="MediaTypeConfigurationResponseModel"/>.</returns>
     MediaTypeConfigurationResponseModel CreateMediaTypeConfigurationResponseModel()
         => throw new NotImplementedException();
 

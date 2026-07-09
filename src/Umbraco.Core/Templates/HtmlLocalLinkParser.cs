@@ -186,8 +186,7 @@ public sealed partial class HtmlLocalLinkParser
                 null,
                 new GuidUdi(typeMatch.Groups["type"].Value.ToLowerInvariant(), guid),
                 linkTag.Groups["locallink"].Value,
-                cultureMatch.Success ? cultureMatch.Groups["culture"].Value : null
-            );
+                cultureMatch.Success ? cultureMatch.Groups["culture"].Value : null);
         }
 
         // also return legacy results for values that have not been migrated

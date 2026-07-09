@@ -517,6 +517,7 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 			<div id="toolbar">
 				<div id="search">
 					<uui-input
+						name="media-search"
 						label=${this.localize.term('general_search')}
 						placeholder=${this.localize.term('placeholders_search')}
 						@input=${this.#onSearch}
@@ -752,7 +753,6 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 			}
 
 			umb-media-picker-folder-path {
-				overflow: hidden;
 				min-width: 0;
 				flex: 1 1 0%;
 			}
