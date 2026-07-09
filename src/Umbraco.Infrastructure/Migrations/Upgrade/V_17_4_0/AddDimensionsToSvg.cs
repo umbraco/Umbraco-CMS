@@ -72,14 +72,18 @@ public class AddDimensionsToSvg : AsyncMigrationBase
             : 0;
 
         // Add new properties (AddPropertyType handles duplicates, so the migration is idempotent).
+        // The keys are set explicitly to match the clean install (DatabaseDataCreator) so that upgraded
+        // and clean-installed sites end up identical - otherwise the keys would be randomly generated.
         vectorGraphicsMediaType.AddPropertyType(new PropertyType(_shortStringHelper, labelPixelDataType, Constants.Conventions.Media.Width)
         {
+            Key = new Guid(Constants.Conventions.Media.PropertyTypeKeys.VectorGraphicsWidth),
             Name = "Width",
             SortOrder = highestSort + 1,
             PropertyGroupId = new Lazy<int>(()=> propertyGroup.Id),
         });
         vectorGraphicsMediaType.AddPropertyType(new PropertyType(_shortStringHelper, labelPixelDataType, Constants.Conventions.Media.Height)
         {
+            Key = new Guid(Constants.Conventions.Media.PropertyTypeKeys.VectorGraphicsHeight),
             Name = "Height",
             SortOrder = highestSort + 2,
             PropertyGroupId = new Lazy<int>(()=> propertyGroup.Id),
