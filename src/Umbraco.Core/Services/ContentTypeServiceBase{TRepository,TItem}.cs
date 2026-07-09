@@ -412,17 +412,26 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
             var hasPropertyMainImpact = hasContentTypeVariationChanged || hasAnyPropertyVariationChanged
                                                                        || hasAnyCompositionBeenRemoved || hasAnyPropertyBeenRemoved || hasAnyPropertyChangedAlias;
 
+            // A composition change dirties the composition collection (add or remove). Adding a composition can
+            // reintroduce a just-removed alias behind a different property type, and the cmsContentNu blob is
+            // keyed by alias — so the stale value would resolve to the new property. Treat any composition
+            // change as requiring a rebuild.
+            var hasCompositionChanged = dirty.WasPropertyDirty("ContentTypeComposition");
+
             if (hasAliasChanged || hasPropertyMainImpact)
             {
                 // A property removal is the only structural change that does not require a raw cmsContentNu
                 // rebuild: the removed alias simply stops resolving against the content type, so the stored
-                // blob's orphaned value is never read. Any other structural cause does need a rebuild.
+                // blob's orphaned value is never read. This holds only when nothing in the same change
+                // reintroduces that alias (e.g. an added composition bringing it back), so any composition
+                // change disqualifies it. Any other structural cause also needs a rebuild.
                 var rawDataUnaffected = hasAnyPropertyBeenRemoved &&
                     hasAliasChanged is false &&
                     hasAnyPropertyChangedAlias is false &&
                     hasContentTypeVariationChanged is false &&
                     hasAnyPropertyVariationChanged is false &&
-                    hasAnyCompositionBeenRemoved is false;
+                    hasAnyCompositionBeenRemoved is false &&
+                    hasCompositionChanged is false;
 
                 // add that one, as a main change
                 AddChange(changes, contentType, ContentTypeChangeTypes.RefreshMain);
