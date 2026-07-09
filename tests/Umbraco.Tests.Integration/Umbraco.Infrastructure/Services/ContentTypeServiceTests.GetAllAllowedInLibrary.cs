@@ -125,6 +125,59 @@ internal sealed partial class ContentTypeServiceTests
         Assert.AreEqual("otherElement", result.Items.First().Alias);
     }
 
+    [Test]
+    [ConfigureBuilder(ActionName = nameof(ConfigureContentTypeFilterCapturingParentKey))]
+    public async Task GetAllAllowedInLibrary_Threads_ParentKey_To_Filter()
+    {
+        ContentTypeFilterCapturingParentKey.Reset();
+
+        var element = ContentTypeBuilder.CreateBasicElementType("allowedElement", "Allowed Element");
+        element.AllowedInLibrary = true;
+        await ContentTypeService.CreateAsync(element, Constants.Security.SuperUserKey);
+
+        var parentKey = Guid.NewGuid();
+        await ContentTypeService.GetAllAllowedInLibraryAsync(parentKey, 0, 100);
+
+        Assert.IsTrue(ContentTypeFilterCapturingParentKey.WasCalled);
+        Assert.AreEqual(parentKey, ContentTypeFilterCapturingParentKey.LastParentKey);
+    }
+
+    [Test]
+    [ConfigureBuilder(ActionName = nameof(ConfigureContentTypeFilterCapturingParentKey))]
+    public async Task GetAllAllowedInLibrary_Threads_Null_ParentKey_At_Root_To_Filter()
+    {
+        ContentTypeFilterCapturingParentKey.Reset();
+
+        var element = ContentTypeBuilder.CreateBasicElementType("allowedElement", "Allowed Element");
+        element.AllowedInLibrary = true;
+        await ContentTypeService.CreateAsync(element, Constants.Security.SuperUserKey);
+
+        await ContentTypeService.GetAllAllowedInLibraryAsync(null, 0, 100);
+
+        Assert.IsTrue(ContentTypeFilterCapturingParentKey.WasCalled);
+        Assert.IsNull(ContentTypeFilterCapturingParentKey.LastParentKey);
+    }
+
+    [Test]
+    [ConfigureBuilder(ActionName = nameof(ConfigureContentTypeFilterToAllowInLibrary))]
+    public async Task GetAllAllowedInLibrary_With_ParentKey_Still_Invokes_Obsolete_Filter_Override()
+    {
+        var allowed = ContentTypeBuilder.CreateBasicElementType("allowedElement", "Allowed Element");
+        allowed.AllowedInLibrary = true;
+        await ContentTypeService.CreateAsync(allowed, Constants.Security.SuperUserKey);
+
+        var other = ContentTypeBuilder.CreateBasicElementType("otherElement", "Other Element");
+        other.AllowedInLibrary = true;
+        await ContentTypeService.CreateAsync(other, Constants.Security.SuperUserKey);
+
+        // A filter that overrides only the obsolete single-argument method must still be invoked via the
+        // default delegation when the new parent-key-aware overload is called.
+        var result = await ContentTypeService.GetAllAllowedInLibraryAsync(Guid.NewGuid(), 0, 100);
+
+        Assert.AreEqual(1, result.Total);
+        Assert.AreEqual("allowedElement", result.Items.First().Alias);
+    }
+
     public static void ConfigureContentTypeFilterToAllowInLibrary(IUmbracoBuilder builder)
         => builder.ContentTypeFilters()
             .Append<ContentTypeFilterForAllowedInLibrary>();
@@ -133,15 +186,42 @@ internal sealed partial class ContentTypeServiceTests
         => builder.ContentTypeFilters()
             .Append<ContentTypeFilterForDisallowedInLibrary>();
 
+    public static void ConfigureContentTypeFilterCapturingParentKey(IUmbracoBuilder builder)
+        => builder.ContentTypeFilters()
+            .Append<ContentTypeFilterCapturingParentKey>();
+
     private class ContentTypeFilterForAllowedInLibrary() : ContentTypeFilterForInLibrary(true);
 
     private class ContentTypeFilterForDisallowedInLibrary() : ContentTypeFilterForInLibrary(false);
 
+#pragma warning disable CS0618 // Type or member is obsolete
     private abstract class ContentTypeFilterForInLibrary(bool allowed) : IContentTypeFilter
     {
         public Task<IEnumerable<TItem>> FilterAllowedInLibraryAsync<TItem>(IEnumerable<TItem> contentTypes)
             where TItem : IContentTypeComposition
             => Task.FromResult(contentTypes.Where(x =>
                 (allowed && x.Alias == "allowedElement") || (!allowed && x.Alias != "allowedElement")));
+    }
+#pragma warning restore CS0618 // Type or member is obsolete
+
+    private class ContentTypeFilterCapturingParentKey : IContentTypeFilter
+    {
+        public static bool WasCalled { get; private set; }
+
+        public static Guid? LastParentKey { get; private set; }
+
+        public static void Reset()
+        {
+            WasCalled = false;
+            LastParentKey = null;
+        }
+
+        public Task<IEnumerable<TItem>> FilterAllowedInLibraryAsync<TItem>(IEnumerable<TItem> contentTypes, Guid? parentKey)
+            where TItem : IContentTypeComposition
+        {
+            WasCalled = true;
+            LastParentKey = parentKey;
+            return Task.FromResult(contentTypes);
+        }
     }
 }
