@@ -94,6 +94,15 @@ internal sealed class ContentRelationsUpdate :
 
     private void PersistRelations(IScope scope, IContentBase entity)
     {
+        // The entity's node may already have been permanently deleted by the time this notification is
+        // dispatched (e.g. ContentService.DeleteOfTypes raises ContentUnpublishedNotification for content
+        // it then deletes within the same scope, before scoped notifications are dispatched post-commit).
+        // Persisting relations for a non-existent node would violate the umbracoRelation FK constraint.
+        if (NodeExists(scope, entity.Id) is false)
+        {
+            return;
+        }
+
         // Track PublishedValue only for entities that have a published state and are currently published.
         // For unpublished entities (or entities without a published state) we only track EditedValue to avoid stale PublishedValue relations.
         var trackPublishedValues = entity is IContent { Published: true };
@@ -209,6 +218,16 @@ internal sealed class ContentRelationsUpdate :
         {
             scope.Notifications.Publish(new RelationDeletedNotification(relationsToDelete, new EventMessages()) { IsAutomatic = true });
         }
+    }
+
+    private static bool NodeExists(IScope scope, int nodeId)
+    {
+        Sql<ISqlContext> sql = scope.SqlContext.Sql()
+            .SelectCount()
+            .From<NodeDto>()
+            .Where<NodeDto>(x => x.NodeId == nodeId);
+
+        return scope.Database.ExecuteScalar<int>(sql) > 0;
     }
 
     private IRelation[] GetExistingAutomaticRelations(IScope scope, int entityId, ISet<string> automaticRelationTypeAliases)
