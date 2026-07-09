@@ -2,6 +2,7 @@ import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '../../entity.js';
 import { UMB_DOCUMENT_TYPE_TREE_ALIAS, UMB_DOCUMENT_TYPE_TREE_REPOSITORY_ALIAS } from '../../tree/index.js';
 import { UMB_DUPLICATE_DOCUMENT_TYPE_REPOSITORY_ALIAS } from './repository/index.js';
 import { manifests as repositoryManifests } from './repository/manifests.js';
+import { UMB_IS_SERVER_PRODUCTION_MODE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/server';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -16,6 +17,12 @@ export const manifests: Array<UmbExtensionManifest> = [
 			treeRepositoryAlias: UMB_DOCUMENT_TYPE_TREE_REPOSITORY_ALIAS,
 			foldersOnly: true,
 		},
+		conditions: [
+			{
+				alias: UMB_IS_SERVER_PRODUCTION_MODE_CONDITION_ALIAS,
+				match: false,
+			},
+		],
 	},
 	...repositoryManifests,
 ];

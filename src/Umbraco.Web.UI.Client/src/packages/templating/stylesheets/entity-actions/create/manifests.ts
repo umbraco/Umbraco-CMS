@@ -1,5 +1,6 @@
 import { UMB_STYLESHEET_FOLDER_ENTITY_TYPE, UMB_STYLESHEET_ROOT_ENTITY_TYPE } from '../../entity.js';
 import { UMB_STYLESHEET_FOLDER_REPOSITORY_ALIAS } from '../../tree/folder/repository/index.js';
+import { UMB_IS_SERVER_PRODUCTION_MODE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/server';
 
 /** @deprecated No longer used internally. This will be removed in Umbraco 18. [LK] */
 const modal: UmbExtensionManifest = {
@@ -22,6 +23,12 @@ const entityAction: UmbExtensionManifest = {
 		additionalOptions: true,
 		headline: '#create_createUnder #treeHeaders_documentTypes',
 	},
+	conditions: [
+		{
+			alias: UMB_IS_SERVER_PRODUCTION_MODE_CONDITION_ALIAS,
+			match: false,
+		},
+	],
 };
 
 const entityCreateOptionActions: Array<UmbExtensionManifest> = [

@@ -14,6 +14,7 @@ import {
 	when,
 } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { type UmbSorterConfig, UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
@@ -196,10 +197,16 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 	@state()
 	private _sortModeActive?: boolean;
 
+	// Restricted until the server confirms it is not in production runtime mode (safe default).
+	@state()
+	private _isRestricted = true;
+
 	constructor() {
 		super();
 
 		//this.#sorter.disable();
+
+		this.#observeProductionMode();
 
 		this.consumeContext(UMB_CONTENT_TYPE_DESIGN_EDITOR_CONTEXT, (context) => {
 			this.observe(
@@ -247,6 +254,18 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 		this.observe(this.#propertyStructureHelper.propertyStructure, (propertyStructure) => {
 			this._properties = propertyStructure;
 			this.#sorter.setModel(this._properties);
+		});
+	}
+
+	#observeProductionMode() {
+		this.consumeContext(UMB_SERVER_CONTEXT, (context) => {
+			this.observe(
+				context?.isProductionMode,
+				(isProductionMode) => {
+					this._isRestricted = isProductionMode !== false;
+				},
+				'_observeProductionMode',
+			);
 		});
 	}
 
@@ -357,8 +376,9 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 						() => html`
 							<uui-button
 								id="btn-add"
-								href=${ifDefined(this._newPropertyPath)}
+								href=${ifDefined(this._isRestricted ? undefined : this._newPropertyPath)}
 								label=${this.localize.term('contentTypeEditor_addProperty')}
+								?disabled=${this._isRestricted}
 								look="placeholder"></uui-button>
 						`,
 					)}

@@ -1,3 +1,5 @@
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
@@ -10,14 +12,15 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 /// </summary>
 internal sealed class StylesheetRepository : FileRepository<string, IStylesheet>, IStylesheetRepository
 {
+    private readonly IOptionsMonitor<RuntimeSettings> _runtimeSettings;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="StylesheetRepository"/> class, which manages stylesheet files in the Umbraco CMS.
     /// </summary>
     /// <param name="fileSystems">The file systems used by the repository to access and manage stylesheet files.</param>
-    public StylesheetRepository(FileSystems fileSystems)
-        : base(fileSystems.StylesheetsFileSystem)
-    {
-    }
+    /// <param name="runtimeSettings">The runtime configuration settings.</param>
+    public StylesheetRepository(FileSystems fileSystems, IOptionsMonitor<RuntimeSettings> runtimeSettings)
+        : base(fileSystems.StylesheetsFileSystem) => _runtimeSettings = runtimeSettings;
 
     #region Overrides of FileRepository<string,Stylesheet>
 
@@ -134,6 +137,42 @@ internal sealed class StylesheetRepository : FileRepository<string, IStylesheet>
                 }
             }
         }
+    }
+
+    /// <inheritdoc />
+    protected override void PersistNewItem(IStylesheet entity)
+    {
+        // The file is part of the deployment artifact in production, so don't write to disk.
+        if (_runtimeSettings.CurrentValue.Mode == RuntimeMode.Production)
+        {
+            return;
+        }
+
+        base.PersistNewItem(entity);
+    }
+
+    /// <inheritdoc />
+    protected override void PersistUpdatedItem(IStylesheet entity)
+    {
+        // The file is part of the deployment artifact in production, so don't write to disk.
+        if (_runtimeSettings.CurrentValue.Mode == RuntimeMode.Production)
+        {
+            return;
+        }
+
+        base.PersistUpdatedItem(entity);
+    }
+
+    /// <inheritdoc />
+    protected override void PersistDeletedItem(IStylesheet entity)
+    {
+        // The file is part of the deployment artifact in production, so don't remove it from disk.
+        if (_runtimeSettings.CurrentValue.Mode == RuntimeMode.Production)
+        {
+            return;
+        }
+
+        base.PersistDeletedItem(entity);
     }
 
     #endregion

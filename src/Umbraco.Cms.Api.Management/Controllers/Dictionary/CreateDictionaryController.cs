@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Factories;
+using Umbraco.Cms.Api.Management.Filters;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
@@ -19,6 +20,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Dictionary;
 /// API controller responsible for handling requests to create new dictionary items in Umbraco CMS.
 /// </summary>
 [ApiVersion("1.0")]
+[DenyInRuntimeModeProduction]
 public class CreateDictionaryController : DictionaryControllerBase
 {
     private readonly IDictionaryItemService _dictionaryItemService;

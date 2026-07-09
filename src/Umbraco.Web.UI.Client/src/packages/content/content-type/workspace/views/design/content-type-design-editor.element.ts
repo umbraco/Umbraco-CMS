@@ -30,6 +30,7 @@ import type { UmbConfirmModalData } from '@umbraco-cms/backoffice/modal';
 import { umbConfirmModal, umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
+import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 
 import '@umbraco-cms/backoffice/components';
 
@@ -134,10 +135,24 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 	@state()
 	private _sortModeActive?: boolean;
 
+	// Restricted until the server confirms it is not in production runtime mode (safe default).
+	@state()
+	private _isRestricted = true;
+
 	constructor() {
 		super();
 
 		this.#sorter.disable();
+
+		this.consumeContext(UMB_SERVER_CONTEXT, (context) => {
+			this.observe(
+				context?.isProductionMode,
+				(isProductionMode) => {
+					this._isRestricted = isProductionMode !== false;
+				},
+				'_observeProductionMode',
+			);
+		});
 
 		this.observe(
 			this.#designContext.isSorting,
@@ -479,6 +494,21 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		window.history.replaceState(null, '', path);
 	}
 
+	#renderProductionModeNotice() {
+		if (!this._isRestricted) return nothing;
+		return html`
+			<uui-box id="production-mode-notice">
+				<div class="notice">
+					<umb-icon name="icon-info"></umb-icon>
+					<div>
+						<strong><umb-localize key="general_productionMode">Production Mode</umb-localize></strong>
+						<p><umb-localize key="general_runtimeModeProductionSchema"></umb-localize></p>
+					</div>
+				</div>
+			</uui-box>
+		`;
+	}
+
 	override render() {
 		return html`
 			<umb-body-layout header-fit-height>
@@ -486,6 +516,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 					<div id="container-list">${this.renderTabsNavigation()}</div>
 					${this.#renderActions()}
 				</div>
+				${this.#renderProductionModeNotice()}
 				${this._routes
 					? html`<umb-router-slot
 							.routes=${this._routes}
@@ -514,6 +545,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 			<uui-button
 				id="add-tab"
 				data-mark="add-tab-button"
+				?disabled=${this._isRestricted}
 				@click="${this.#addTab}"
 				label=${this.localize.term('contentTypeEditor_addTab')}>
 				<uui-icon name="icon-add"></uui-icon>
@@ -536,6 +568,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 								look="outline"
 								label=${this.localize.term('contentTypeEditor_compositions')}
 								compact
+								?disabled=${this._isRestricted}
 								@click=${this.#openCompositionModal}>
 								<uui-icon name="icon-merge"></uui-icon>
 								<umb-localize key="contentTypeEditor_compositions"></umb-localize>
@@ -547,6 +580,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 					look="outline"
 					label=${sortButtonText}
 					compact
+					?disabled=${this._isRestricted}
 					@click=${this.#toggleSortMode}>
 					<uui-icon name="icon-height"></uui-icon>
 					${sortButtonText}
@@ -697,6 +731,30 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 				flex-direction: column;
 				height: 100%;
 				--uui-tab-background: var(--uui-color-surface);
+			}
+
+			#production-mode-notice {
+				display: block;
+				margin-bottom: var(--uui-size-layout-1);
+				--uui-box-default-padding: var(--uui-size-space-4) var(--uui-size-space-5);
+				border-left: 4px solid var(--uui-color-warning-standalone, #f0ac00);
+			}
+
+			#production-mode-notice .notice {
+				display: flex;
+				gap: var(--uui-size-space-4);
+				align-items: flex-start;
+			}
+
+			#production-mode-notice umb-icon {
+				flex: 0 0 auto;
+				font-size: var(--uui-size-6);
+				margin-top: 2px;
+				color: var(--uui-color-warning-standalone, #f0ac00);
+			}
+
+			#production-mode-notice p {
+				margin: var(--uui-size-space-2) 0 0;
 			}
 
 			#buttons-wrapper {

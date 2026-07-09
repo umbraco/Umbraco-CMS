@@ -2,6 +2,7 @@ using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Extensions;
+using Umbraco.Cms.Api.Management.Filters;
 using Umbraco.Cms.Api.Management.ViewModels.Script;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Mapping;
@@ -16,6 +17,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Script;
 /// Provides API endpoints for renaming script files within the management system.
 /// </summary>
 [ApiVersion("1.0")]
+[DenyInRuntimeModeProduction]
 public class RenameScriptController : ScriptControllerBase
 {
     private readonly IScriptService _scriptService;

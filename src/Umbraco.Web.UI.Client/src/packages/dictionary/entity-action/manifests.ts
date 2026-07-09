@@ -1,6 +1,7 @@
 import { UMB_DICTIONARY_ENTITY_TYPE, UMB_DICTIONARY_ROOT_ENTITY_TYPE } from '../entity.js';
 import { UMB_DICTIONARY_DETAIL_REPOSITORY_ALIAS, UMB_DICTIONARY_ITEM_REPOSITORY_ALIAS } from '../repository/index.js';
 import { manifests as moveManifests } from './move-to/manifests.js';
+import { UMB_IS_SERVER_PRODUCTION_MODE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/server';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -16,6 +17,12 @@ export const manifests: Array<UmbExtensionManifest> = [
 			label: '#actions_createFor',
 			additionalOptions: true,
 		},
+		conditions: [
+			{
+				alias: UMB_IS_SERVER_PRODUCTION_MODE_CONDITION_ALIAS,
+				match: false,
+			},
+		],
 	},
 	{
 		type: 'entityAction',
@@ -44,6 +51,12 @@ export const manifests: Array<UmbExtensionManifest> = [
 			label: '#actions_import',
 			additionalOptions: true,
 		},
+		conditions: [
+			{
+				alias: UMB_IS_SERVER_PRODUCTION_MODE_CONDITION_ALIAS,
+				match: false,
+			},
+		],
 	},
 	{
 		type: 'entityAction',
@@ -55,6 +68,12 @@ export const manifests: Array<UmbExtensionManifest> = [
 			itemRepositoryAlias: UMB_DICTIONARY_ITEM_REPOSITORY_ALIAS,
 			detailRepositoryAlias: UMB_DICTIONARY_DETAIL_REPOSITORY_ALIAS,
 		},
+		conditions: [
+			{
+				alias: UMB_IS_SERVER_PRODUCTION_MODE_CONDITION_ALIAS,
+				match: false,
+			},
+		],
 	},
 	{
 		type: 'modal',

@@ -80,6 +80,7 @@ export class UmbPartialViewWorkspaceEditorElement extends UmbLitElement {
 				<umb-workspace-header-name-editable
 					slot="header"
 					?readonly=${this._isNew === false || this._isRestricted}></umb-workspace-header-name-editable>
+				${this.#renderProductionModeNotice()}
 				<uui-box>
 					<div slot="header" id="code-editor-menu-container">
 						<umb-templating-insert-menu
@@ -99,6 +100,21 @@ export class UmbPartialViewWorkspaceEditorElement extends UmbLitElement {
 					${this.#renderCodeEditor()}
 				</uui-box>
 			</umb-entity-detail-workspace-editor>
+		`;
+	}
+
+	#renderProductionModeNotice() {
+		if (!this._isRestricted) return nothing;
+		return html`
+			<uui-box id="production-mode-notice">
+				<div class="notice">
+					<umb-icon name="icon-info"></umb-icon>
+					<div>
+						<strong><umb-localize key="general_productionMode">Production Mode</umb-localize></strong>
+						<p><umb-localize key="general_runtimeModeProductionSchema"></umb-localize></p>
+					</div>
+				</div>
+			</uui-box>
 		`;
 	}
 
@@ -127,6 +143,31 @@ export class UmbPartialViewWorkspaceEditorElement extends UmbLitElement {
 
 			umb-code-editor {
 				--editor-height: calc(100dvh - 300px);
+			}
+
+			#production-mode-notice {
+				display: block;
+				min-height: 0;
+				margin: var(--uui-size-layout-1) var(--uui-size-layout-1) 0;
+				--uui-box-default-padding: var(--uui-size-space-4) var(--uui-size-space-5);
+				border-left: 4px solid var(--uui-color-warning-standalone, #f0ac00);
+			}
+
+			#production-mode-notice .notice {
+				display: flex;
+				gap: var(--uui-size-space-4);
+				align-items: flex-start;
+			}
+
+			#production-mode-notice umb-icon {
+				flex: 0 0 auto;
+				font-size: var(--uui-size-6);
+				margin-top: 2px;
+				color: var(--uui-color-warning-standalone, #f0ac00);
+			}
+
+			#production-mode-notice p {
+				margin: var(--uui-size-space-2) 0 0;
 			}
 
 			uui-box {

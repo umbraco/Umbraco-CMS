@@ -205,6 +205,8 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 					${umbFocus()}>
 				</umb-input-with-alias>
 
+				${this.#renderProductionModeNotice()}
+
 				<uui-box>
 					<div slot="header" id="code-editor-menu-container">${this.#renderMasterTemplatePicker()}</div>
 					<div slot="header-actions">
@@ -234,6 +236,21 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 		`;
 	}
 
+	#renderProductionModeNotice() {
+		if (!this._isRestricted) return nothing;
+		return html`
+			<uui-box id="production-mode-notice">
+				<div class="notice">
+					<umb-icon name="icon-info"></umb-icon>
+					<div>
+						<strong><umb-localize key="general_productionMode">Production Mode</umb-localize></strong>
+						<p><umb-localize key="general_runtimeModeProductionSchema"></umb-localize></p>
+					</div>
+				</div>
+			</uui-box>
+		`;
+	}
+
 	#renderCodeEditor() {
 		return html`
 			<umb-code-editor
@@ -251,6 +268,31 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 				display: grid;
 				place-items: center;
 				min-height: calc(100dvh - 360px);
+			}
+
+			#production-mode-notice {
+				display: block;
+				min-height: 0;
+				margin: var(--uui-size-layout-1) var(--uui-size-layout-1) 0;
+				--uui-box-default-padding: var(--uui-size-space-4) var(--uui-size-space-5);
+				border-left: 4px solid var(--uui-color-warning-standalone, #f0ac00);
+			}
+
+			#production-mode-notice .notice {
+				display: flex;
+				gap: var(--uui-size-space-4);
+				align-items: flex-start;
+			}
+
+			#production-mode-notice umb-icon {
+				flex: 0 0 auto;
+				font-size: var(--uui-size-6);
+				margin-top: 2px;
+				color: var(--uui-color-warning-standalone, #f0ac00);
+			}
+
+			#production-mode-notice p {
+				margin: var(--uui-size-space-2) 0 0;
 			}
 
 			umb-code-editor {

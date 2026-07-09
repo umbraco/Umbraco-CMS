@@ -1,3 +1,5 @@
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
@@ -10,14 +12,15 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 /// </summary>
 internal sealed class ScriptRepository : FileRepository<string, IScript>, IScriptRepository
 {
+    private readonly IOptionsMonitor<RuntimeSettings> _runtimeSettings;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="ScriptRepository"/> class, which manages script files in the specified file systems.
     /// </summary>
     /// <param name="fileSystems">An instance of <see cref="FileSystems"/> that provides access to the file systems used by the repository.</param>
-    public ScriptRepository(FileSystems fileSystems)
-        : base(fileSystems.ScriptsFileSystem)
-    {
-    }
+    /// <param name="runtimeSettings">The runtime configuration settings.</param>
+    public ScriptRepository(FileSystems fileSystems, IOptionsMonitor<RuntimeSettings> runtimeSettings)
+        : base(fileSystems.ScriptsFileSystem) => _runtimeSettings = runtimeSettings;
 
     /// <summary>
     /// Retrieves a script from the file system by its identifier.
@@ -113,5 +116,41 @@ internal sealed class ScriptRepository : FileRepository<string, IScript>, IScrip
                 }
             }
         }
+    }
+
+    /// <inheritdoc />
+    protected override void PersistNewItem(IScript entity)
+    {
+        // The file is part of the deployment artifact in production, so don't write to disk.
+        if (_runtimeSettings.CurrentValue.Mode == RuntimeMode.Production)
+        {
+            return;
+        }
+
+        base.PersistNewItem(entity);
+    }
+
+    /// <inheritdoc />
+    protected override void PersistUpdatedItem(IScript entity)
+    {
+        // The file is part of the deployment artifact in production, so don't write to disk.
+        if (_runtimeSettings.CurrentValue.Mode == RuntimeMode.Production)
+        {
+            return;
+        }
+
+        base.PersistUpdatedItem(entity);
+    }
+
+    /// <inheritdoc />
+    protected override void PersistDeletedItem(IScript entity)
+    {
+        // The file is part of the deployment artifact in production, so don't remove it from disk.
+        if (_runtimeSettings.CurrentValue.Mode == RuntimeMode.Production)
+        {
+            return;
+        }
+
+        base.PersistDeletedItem(entity);
     }
 }

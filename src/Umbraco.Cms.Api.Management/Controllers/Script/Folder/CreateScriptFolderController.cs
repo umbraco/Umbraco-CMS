@@ -2,6 +2,7 @@ using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Extensions;
+using Umbraco.Cms.Api.Management.Filters;
 using Umbraco.Cms.Api.Management.ViewModels.Script.Folder;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Mapping;
@@ -15,6 +16,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Script.Folder;
 /// API controller for creating script folders in Umbraco CMS.
 /// </summary>
 [ApiVersion("1.0")]
+[DenyInRuntimeModeProduction]
 public class CreateScriptFolderController : ScriptFolderControllerBase
 {
     private readonly IScriptFolderService _scriptFolderService;

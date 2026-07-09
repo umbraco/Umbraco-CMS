@@ -60,7 +60,7 @@ internal sealed class ScriptRepositoryTest : UmbracoIntegrationTest
     private IScriptRepository CreateRepository()
     {
         var globalSettings = new GlobalSettings();
-        return new ScriptRepository(_fileSystems);
+        return new ScriptRepository(_fileSystems, GetRequiredService<IOptionsMonitor<RuntimeSettings>>());
     }
 
     [Test]

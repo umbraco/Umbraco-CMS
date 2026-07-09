@@ -2,6 +2,7 @@ using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Extensions;
+using Umbraco.Cms.Api.Management.Filters;
 using Umbraco.Cms.Core.Services.FileSystem;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
@@ -11,6 +12,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Stylesheet.Folder;
 /// API controller responsible for handling requests to delete stylesheet folders in the Umbraco CMS.
 /// </summary>
 [ApiVersion("1.0")]
+[DenyInRuntimeModeProduction]
 public class DeleteStylesheetFolderController : StylesheetFolderControllerBase
 {
     private readonly IStylesheetFolderService _stylesheetFolderService;

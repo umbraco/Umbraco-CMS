@@ -2,6 +2,7 @@ import { UMB_SCRIPT_WORKSPACE_CONTEXT } from './script-workspace.context-token.j
 import { css, html, customElement, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
+import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 
 import '@umbraco-cms/backoffice/code-editor';
 
@@ -13,10 +14,20 @@ export class UmbScriptWorkspaceEditorElement extends UmbLitElement {
 	@state()
 	private _isNew?: boolean;
 
+	// Restricted until the server confirms it is not in production runtime mode (safe default).
+	@state()
+	private _isRestricted = true;
+
 	#context?: typeof UMB_SCRIPT_WORKSPACE_CONTEXT.TYPE;
 
 	constructor() {
 		super();
+
+		this.consumeContext(UMB_SERVER_CONTEXT, (context) => {
+			this.observe(context?.isProductionMode, (isProductionMode) => {
+				this._isRestricted = isProductionMode !== false;
+			});
+		});
 
 		this.consumeContext(UMB_SCRIPT_WORKSPACE_CONTEXT, (context) => {
 			this.#context = context;
@@ -44,10 +55,26 @@ export class UmbScriptWorkspaceEditorElement extends UmbLitElement {
 
 	#renderBody() {
 		return html`
+			${this.#renderProductionModeNotice()}
 			<uui-box>
 				<!-- the div below in the header is to make the box display nicely with code editor -->
 				<div slot="header"></div>
 				${this.#renderCodeEditor()}
+			</uui-box>
+		`;
+	}
+
+	#renderProductionModeNotice() {
+		if (!this._isRestricted) return nothing;
+		return html`
+			<uui-box id="production-mode-notice">
+				<div class="notice">
+					<umb-icon name="icon-info"></umb-icon>
+					<div>
+						<strong><umb-localize key="general_productionMode">Production Mode</umb-localize></strong>
+						<p><umb-localize key="general_runtimeModeProductionSchema"></umb-localize></p>
+					</div>
+				</div>
 			</uui-box>
 		`;
 	}
@@ -62,6 +89,7 @@ export class UmbScriptWorkspaceEditorElement extends UmbLitElement {
 				id="content"
 				language="javascript"
 				.code=${this._content ?? ''}
+				?readonly=${this._isRestricted}
 				@input=${this.#onCodeEditorInput}></umb-code-editor>
 		`;
 	}
@@ -70,6 +98,31 @@ export class UmbScriptWorkspaceEditorElement extends UmbLitElement {
 		css`
 			umb-code-editor {
 				--editor-height: calc(100dvh - 260px);
+			}
+
+			#production-mode-notice {
+				display: block;
+				min-height: 0;
+				margin: var(--uui-size-layout-1) var(--uui-size-layout-1) 0;
+				--uui-box-default-padding: var(--uui-size-space-4) var(--uui-size-space-5);
+				border-left: 4px solid var(--uui-color-warning-standalone, #f0ac00);
+			}
+
+			#production-mode-notice .notice {
+				display: flex;
+				gap: var(--uui-size-space-4);
+				align-items: flex-start;
+			}
+
+			#production-mode-notice umb-icon {
+				flex: 0 0 auto;
+				font-size: var(--uui-size-6);
+				margin-top: 2px;
+				color: var(--uui-color-warning-standalone, #f0ac00);
+			}
+
+			#production-mode-notice p {
+				margin: var(--uui-size-space-2) 0 0;
 			}
 
 			uui-box {
