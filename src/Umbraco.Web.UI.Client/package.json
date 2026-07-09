@@ -226,8 +226,8 @@
 		"generate:ui-api-docs": "npm run generate:check-const-test && typedoc --options typedoc.config.js"
 	},
 	"engines": {
-		"node": ">=22.17.1",
-		"npm": ">=10.9.2"
+		"node": ">=24.13",
+		"npm": ">=11"
 	},
 	"dependencies": {
 		"element-internals-polyfill": "^3.0.2"
@@ -262,7 +262,7 @@
 		"eslint-plugin-wc": "^3.1.0",
 		"globals": "^17.5.0",
 		"madge": "^8.0.0",
-		"msw": "^2.13.3",
+		"msw": "^2.13.5",
 		"playwright-msw": "^3.0.1",
 		"postcss": "^8.5.9",
 		"postcss-cli": "^11.0.1",

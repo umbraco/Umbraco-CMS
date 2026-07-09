@@ -24,6 +24,7 @@ using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Mail;
+using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Packaging;
@@ -219,6 +220,11 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddSingleton<HtmlLocalLinkParser>();
             Services.AddSingleton<HtmlImageSourceParser>();
             Services.AddSingleton<HtmlUrlParser>();
+
+            // Default no-op signer. The ImageSharp 3+ package replaces this with a real implementation
+            // that re-signs URLs using the current HMACSecretKey; ImageSharp 2 leaves the no-op in
+            // place (it has no HMAC support).
+            Services.AddSingleton<IImageUrlTokenGenerator, NoopImageUrlTokenGenerator>();
 
             // register properties fallback
             Services.AddUnique<IPublishedValueFallback, PublishedValueFallback>();
