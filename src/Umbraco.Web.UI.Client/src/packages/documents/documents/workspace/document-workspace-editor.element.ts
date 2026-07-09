@@ -9,6 +9,7 @@ import { createObservablePart } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbDocumentVariantOptionModel } from '../types.js';
 import { UMB_WORKSPACE_VARIANT_DELIMITER } from '@umbraco-cms/backoffice/workspace';
 
+// TODO: Refactor across all four content workspace editors (document, document blueprint, media, member) to use a base component. [NL]
 // TODO: This seem fully identical with Media Workspace Editor, so we can refactor this to a generic component. [NL]
 @customElement('umb-document-workspace-editor')
 export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
@@ -47,31 +48,38 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 
 		this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
-			this.observe(
-				this.#workspaceContext
-					? createObservablePart(this.#workspaceContext.variantOptions, (variants) =>
-							variants.map((v) => ({
-								culture: v.culture,
-								segment: v.segment,
-								unique: v.unique,
-							})),
-						)
-					: undefined,
-				(variants) => {
-					this.#variants = variants;
-					this.#generateRoutes();
-				},
-				'_observeVariants',
-			);
-
-			this.observe(
-				this.#workspaceContext?.loading.isOn,
-				(loading) => {
-					this._loading = loading ?? false;
-				},
-				'_observeLoading',
-			);
+			this.#observeVariants();
+			this.#observeLoading();
 		});
+	}
+
+	#observeVariants() {
+		this.observe(
+			this.#workspaceContext
+				? createObservablePart(this.#workspaceContext.variantOptions, (variants) =>
+						variants.map((v) => ({
+							culture: v.culture,
+							segment: v.segment,
+							unique: v.unique,
+						})),
+					)
+				: undefined,
+			(variants) => {
+				this.#variants = variants;
+				this.#generateRoutes();
+			},
+			'_observeVariants',
+		);
+	}
+
+	#observeLoading() {
+		this.observe(
+			this.#workspaceContext?.loading.isOn,
+			(loading) => {
+				this._loading = loading ?? false;
+			},
+			'_observeLoading',
+		);
 	}
 
 	#syncUrlToCulture(previousCulture: string | undefined, appCulture: string | undefined) {
@@ -116,36 +124,6 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 		// Generate split view routes for all available routes
 		const routes: Array<UmbRoute> = [];
 
-		/*
-		// Split view routes:
-		this.#variants.forEach((variantA) => {
-			this.#variants!.forEach((variantB) => {
-				routes.push({
-					// TODO: When implementing Segments, be aware if using the unique still is URL Safe, cause its most likely not... [NL]
-					path: variantA.unique + UMB_WORKSPACE_VARIANT_DELIMITER + variantB.unique,
-					preserveQuery: true,
-					component: this._splitViewElement,
-					setup: (_component, info) => {
-						this.#workspaceContext?.splitView.setVariantParts(info.match.fragments.consumed);
-					},
-				});
-			});
-		});
-
-		// Single view:
-		this.#variants.forEach((variant) => {
-			routes.push({
-				// TODO: When implementing Segments, be aware if using the unique still is URL Safe, cause its most likely not... [NL]
-				path: variant.unique,
-				preserveQuery: true,
-				component: this._splitViewElement,
-				setup: (_component, info) => {
-						this.#workspaceContext?.splitView.setVariantParts(info.match.fragments.consumed);
-				},
-			});
-		});
-		*/
-
 		routes.push({
 			path: '/:variantPath/',
 			preserveQuery: true,
@@ -166,7 +144,7 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 		});
 
 		if (routes.length !== 0) {
-			// Using first single view as the default route for now (hence the math below):
+			// Find a decent variant to use as the default route:
 			routes.push({
 				path: '',
 				preserveQuery: true,
