@@ -9,6 +9,22 @@ import type { umbHttpClient } from '@umbraco-cms/backoffice/http-client';
 
 const MAX_RETRIES = 3;
 
+/**
+ * HTTP statuses used by proxies/gateways (nginx, ALB, IIS ARR, Cloudflare's 524/598, etc.) to report that
+ * the origin server *received* the request but didn't respond before the proxy gave up waiting. The action
+ * may still complete (or have completed) on the server.
+ * @see https://github.com/umbraco/Umbraco-CMS/issues/16041
+ */
+const GATEWAY_TIMEOUT_STATUSES = [504, 524, 598];
+
+/**
+ * HTTP statuses used by proxies/gateways to report that they could not establish or complete a connection
+ * to the origin server at all (TCP/TLS/DNS failure) — the request never reached the server, so the action
+ * cannot have been performed.
+ * @see https://github.com/umbraco/Umbraco-CMS/issues/16041
+ */
+const GATEWAY_UNREACHABLE_STATUSES = [521, 522, 523, 525, 526, 530, 599];
+
 export class UmbApiInterceptorController extends UmbControllerBase {
 	/**
 	 * Store pending requests that received a 401 response and are waiting for re-authentication.
@@ -195,6 +211,34 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 					stack: undefined,
 				};
 				return this.#createResponse(notFoundProblemDetails, response);
+			}
+
+			// Special handling for proxy/gateway timeouts. These respond with their own (usually non-JSON) error
+			// page instead of ours, so without this the request would surface as a generic, unhelpful server error.
+			if (GATEWAY_TIMEOUT_STATUSES.includes(response.status)) {
+				const timeoutProblemDetails: UmbProblemDetails = {
+					status: response.status,
+					title: 'The request timed out',
+					detail: `A proxy or gateway between your browser and the server sent your request through, but didn't receive a response in time (HTTP ${response.status}). The action you performed may still have completed on the server — please check before trying again.`,
+					errors: undefined,
+					type: 'GatewayTimeout',
+					stack: undefined,
+				};
+				return this.#createResponse(timeoutProblemDetails, response);
+			}
+
+			// Special handling for proxies/gateways that could not reach the server at all (as opposed to
+			// GATEWAY_TIMEOUT_STATUSES, where the server received the request but didn't respond in time).
+			if (GATEWAY_UNREACHABLE_STATUSES.includes(response.status)) {
+				const unreachableProblemDetails: UmbProblemDetails = {
+					status: response.status,
+					title: 'The server could not be reached',
+					detail: `A proxy or gateway between your browser and the server could not connect to it (HTTP ${response.status}). Your request was not received, so no action was performed — please try again once the connection issue is resolved.`,
+					errors: undefined,
+					type: 'GatewayUnreachable',
+					stack: undefined,
+				};
+				return this.#createResponse(unreachableProblemDetails, response);
 			}
 
 			// For all other errors, we will build a ProblemDetails object
