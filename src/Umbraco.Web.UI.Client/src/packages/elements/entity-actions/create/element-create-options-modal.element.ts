@@ -35,7 +35,8 @@ export class UmbElementCreateOptionsModalElement extends UmbModalBaseElement<
 	}
 
 	async #retrieveAllowedElementTypes() {
-		const { data } = await this.#elementTypeStructureRepository.requestAllowedChildrenOf(null, null);
+		const parentUnique = this.data?.parent?.unique ?? null;
+		const { data } = await this.#elementTypeStructureRepository.requestAllowedChildrenOf(null, parentUnique);
 
 		if (data) {
 			this._allowedElementTypes = data.items;

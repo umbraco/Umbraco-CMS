@@ -1552,7 +1552,7 @@ export type ManifestResponseModel = {
     name: string;
     id?: null | string;
     version?: null | string;
-    cacheBuster?: string;
+    cacheBuster?: null | string;
     extensions: Array<unknown>;
 };
 
@@ -2512,6 +2512,15 @@ export type PublishedDocumentResponseModel = {
     flags: Array<FlagModel>;
     values: Array<DocumentValueResponseModel>;
     variants: Array<DocumentVariantResponseModel>;
+};
+
+export type PublishedElementResponseModel = {
+    isTrashed: boolean;
+    documentType: DocumentTypeReferenceResponseModel;
+    id: string;
+    flags: Array<FlagModel>;
+    values: Array<ElementValueResponseModel>;
+    variants: Array<ElementVariantResponseModel>;
 };
 
 export type PublishElementRequestModel = {
@@ -7683,6 +7692,7 @@ export type GetDocumentTypeAllowedInLibraryData = {
     body?: never;
     path?: never;
     query?: {
+        parentKey?: string;
         skip?: number;
         take?: number;
     };
@@ -8735,6 +8745,41 @@ export type PutElementByIdPublishResponses = {
      */
     200: unknown;
 };
+
+export type GetElementByIdPublishedData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/umbraco/management/api/v1/element/{id}/published';
+};
+
+export type GetElementByIdPublishedErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type GetElementByIdPublishedError = GetElementByIdPublishedErrors[keyof GetElementByIdPublishedErrors];
+
+export type GetElementByIdPublishedResponses = {
+    /**
+     * OK
+     */
+    200: PublishedElementResponseModel;
+};
+
+export type GetElementByIdPublishedResponse = GetElementByIdPublishedResponses[keyof GetElementByIdPublishedResponses];
 
 export type GetElementByIdReferencedByData = {
     body?: never;

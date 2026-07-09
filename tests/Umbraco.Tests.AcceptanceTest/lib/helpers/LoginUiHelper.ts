@@ -69,7 +69,7 @@ export class LoginUiHelper extends UiBaseLocators {
   }
 
   async clickLogoutButtonAndWaitForUserLogout() {
-    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.revoke, this.logoutBtn.click(), ConstantHelper.statusCodes.ok);
+    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.revoke, this.click(this.logoutBtn), ConstantHelper.statusCodes.ok);
   }
 
   async clickForgottenPasswordButton() {

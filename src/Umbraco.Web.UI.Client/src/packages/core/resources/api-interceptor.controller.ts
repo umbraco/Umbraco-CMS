@@ -247,11 +247,15 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 				if (!isUmbNotifications(notifications)) return response;
 
 				for (const notification of notifications) {
+					// Backend event messages may contain HTML (e.g. links) and are rendered sanitized by the
+					// notification layout via htmlMessage. The plain message must stay markup-free because it is
+					// read by screen readers (see umb-backoffice-notification-container).
 					this.#peekError(
 						notification.category,
-						notification.message,
+						this.#extractText(notification.message),
 						undefined,
 						extractUmbNotificationColor(notification.type),
+						notification.message,
 					);
 				}
 			} catch {
@@ -336,13 +340,29 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 	}
 
 	/**
+	 * Extracts the plain text of an HTML string using an inert document, so nothing is executed or loaded.
+	 * @param {string} html The HTML string.
+	 * @returns {string} The text content of the parsed HTML.
+	 */
+	#extractText(html: string): string {
+		return new DOMParser().parseFromString(html, 'text/html').body.textContent ?? '';
+	}
+
+	/**
 	 * Helper to show a notification error.
 	 * @param {string} headline The headline of the error notification.
 	 * @param {string} message The message of the error notification.
 	 * @param {Record<string, string[]>} [errors] Validation errors keyed by field name.
 	 * @param {UmbNotificationColor} [color] The color of the notification.
+	 * @param {string} [htmlMessage] A message rendered as sanitized HTML, taking precedence over `message`.
 	 */
-	async #peekError(headline: string, message: string, errors?: Record<string, string[]>, color?: UmbNotificationColor) {
+	async #peekError(
+		headline: string,
+		message: string,
+		errors?: Record<string, string[]>,
+		color?: UmbNotificationColor,
+		htmlMessage?: string,
+	) {
 		// Store the host for usage in the following async context
 		const host = this._host;
 
@@ -350,6 +370,7 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 		(await import('@umbraco-cms/backoffice/notification')).umbPeekError(host, {
 			headline,
 			message,
+			htmlMessage,
 			errors,
 			color,
 		});
