@@ -233,9 +233,6 @@ export class ContentUiHelper extends UiBaseLocators {
     this.menuItemTree = page.locator('umb-menu-item-tree-default');
     this.confirmToUnpublishBtn = page.locator('umb-content-unpublish-modal').getByLabel('Unpublish');
     this.confirmToPublishBtn = page.locator('umb-document-publish-modal').getByLabel('Publish');
-    this.confirmToUnpublishBtn = page
-      .locator("umb-document-unpublish-modal")
-      .getByLabel("Unpublish");
     this.dropdown = page.locator("select#native");
     this.splitView = page.locator("#splitViews");
     this.setADateTxt = page.getByLabel("Set a date…");
@@ -2220,19 +2217,10 @@ export class ContentUiHelper extends UiBaseLocators {
     await this.click(blocklistBlock);
   }
 
-  async doesBlockEditorBlockWithNameContainValue(
-    groupName: string,
-    propertyName: string,
-    inputType: string = ConstantHelper.inputTypes.general,
-    value,
-  ) {
-    await expect(
-      this.blockWorkspaceEditTab
-        .filter({ hasText: groupName })
-        .locator(this.property)
-        .filter({ hasText: propertyName })
-        .locator(inputType),
-    ).toContainText(value);
+  async doesBlockEditorBlockWithNameContainValue(groupName: string, propertyName: string, inputType: string = ConstantHelper.inputTypes.general, value) {
+    // This wait is currently necessary as it can take a bit longer than expected for the block to load
+    await this.waitForTimeout(ConstantHelper.wait.short);
+    await expect(this.blockWorkspaceEditTab.filter({hasText: groupName}).locator(this.property).filter({hasText: propertyName}).locator(inputType)).toContainText(value, {timeout: ConstantHelper.timeout.long});
   }
 
   async clickCloseButton() {
