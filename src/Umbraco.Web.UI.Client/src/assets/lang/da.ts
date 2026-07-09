@@ -2227,6 +2227,7 @@ export default {
 		stateApproved: 'Godkendt',
 		stateInvited: 'Inviteret',
 		stateInactive: 'Inaktiv',
+		type: 'Type',
 		sortNameAscending: 'Navn (A-Å)',
 		sortNameDescending: 'Navn (Å-A)',
 		sortCreateDateAscending: 'Nyeste',

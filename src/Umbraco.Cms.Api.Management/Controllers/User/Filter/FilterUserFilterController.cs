@@ -51,13 +51,11 @@ public class FilterUserFilterController : UserFilterControllerBase
     /// <param name="userStates">User states to include in the result.</param>
     /// <param name="filter">A string that must be present in the users name or username.</param>
     /// <returns>A paged result of the users matching the query.</returns>
-    [HttpGet]
-    [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(PagedViewModel<UserResponseModel>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    [EndpointSummary("Gets a filtered collection of users.")]
-    [EndpointDescription("Filters users based on the provided criteria with support for pagination.")]
+    /// <remarks>
+    /// This method is obsolete. Use <c>Filter2</c> instead.
+    /// </remarks>
+    [Obsolete("Use the Filter2 action method instead. Scheduled for removal in Umbraco 20, when Filter2 will be renamed back to Filter.")]
+    [NonAction]
     public async Task<IActionResult> Filter(
         CancellationToken cancellationToken,
         int skip = 0,
@@ -67,11 +65,44 @@ public class FilterUserFilterController : UserFilterControllerBase
         [FromQuery] HashSet<Guid>? userGroupIds = null,
         [FromQuery] HashSet<UserState>? userStates = null,
         string filter = "")
+        => await Filter2(cancellationToken, skip, take, orderBy, orderDirection, userGroupIds, userStates, userKinds: null, filter);
+
+    /// <summary>
+    /// Query users
+    /// </summary>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <param name="skip">Amount to skip.</param>
+    /// <param name="take">Amount to take.</param>
+    /// <param name="orderBy">Property to order by.</param>
+    /// <param name="orderDirection">Direction to order in.</param>
+    /// <param name="userGroupIds">Keys of the user groups to include in the result.</param>
+    /// <param name="userStates">User states to include in the result.</param>
+    /// <param name="userKinds">User kinds to include in the result.</param>
+    /// <param name="filter">A string that must be present in the users name or username.</param>
+    /// <returns>A paged result of the users matching the query.</returns>
+    [HttpGet]
+    [MapToApiVersion("1.0")]
+    [ProducesResponseType(typeof(PagedViewModel<UserResponseModel>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Gets a filtered collection of users.")]
+    [EndpointDescription("Filters users based on the provided criteria with support for pagination.")]
+    public async Task<IActionResult> Filter2(
+        CancellationToken cancellationToken,
+        int skip = 0,
+        int take = 100,
+        UserOrder orderBy = UserOrder.UserName,
+        Direction orderDirection = Direction.Ascending,
+        [FromQuery] HashSet<Guid>? userGroupIds = null,
+        [FromQuery] HashSet<UserState>? userStates = null,
+        [FromQuery] HashSet<UserKind>? userKinds = null,
+        string filter = "")
     {
         var userFilter = new UserFilter
         {
             IncludedUserGroups = userGroupIds,
             IncludeUserStates = userStates,
+            IncludeUserKinds = userKinds,
             NameFilters = string.IsNullOrEmpty(filter) ? null : new HashSet<string> { filter }
         };
 

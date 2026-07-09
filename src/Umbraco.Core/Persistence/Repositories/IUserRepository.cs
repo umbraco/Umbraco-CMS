@@ -69,6 +69,7 @@ public interface IUserRepository : IReadWriteQueryRepository<Guid, IUser>
     /// <param name="userState">Optional parameter to filter by specified user state</param>
     /// <param name="filter"></param>
     /// <returns></returns>
+    [Obsolete("Please use the method overload with all parameters. Scheduled for removal in Umbraco 20.")]
     IEnumerable<IUser> GetPagedResultsByQuery(
         IQuery<IUser>? query,
         long pageIndex,
@@ -80,6 +81,56 @@ public interface IUserRepository : IReadWriteQueryRepository<Guid, IUser>
         string[]? excludeUserGroups = null,
         UserState[]? userState = null,
         IQuery<IUser>? filter = null);
+
+    /// <summary>
+    ///     Gets paged user results
+    /// </summary>
+    /// <param name="query"></param>
+    /// <param name="pageIndex"></param>
+    /// <param name="pageSize"></param>
+    /// <param name="totalRecords"></param>
+    /// <param name="orderBy"></param>
+    /// <param name="orderDirection"></param>
+    /// <param name="includeUserGroups">
+    ///     A filter to only include user that belong to these user groups
+    /// </param>
+    /// <param name="excludeUserGroups">
+    ///     A filter to only include users that do not belong to these user groups
+    /// </param>
+    /// <param name="userState">Optional parameter to filter by specified user state</param>
+    /// <param name="userKinds">Optional parameter to filter by specified user kind</param>
+    /// <param name="filter"></param>
+    /// <returns></returns>
+    // TODO (V20): Remove the default implementation.
+    IEnumerable<IUser> GetPagedResultsByQuery(
+        IQuery<IUser>? query,
+        long pageIndex,
+        int pageSize,
+        out long totalRecords,
+        Expression<Func<IUser, object?>> orderBy,
+        Direction orderDirection,
+        string[]? includeUserGroups,
+        string[]? excludeUserGroups,
+        UserState[]? userState,
+        UserKind[]? userKinds,
+        IQuery<IUser>? filter = null)
+    {
+#pragma warning disable CS0618 // Type or member is obsolete
+        IEnumerable<IUser> result = GetPagedResultsByQuery(
+            query,
+            pageIndex,
+            pageSize,
+            out totalRecords,
+            orderBy,
+            orderDirection,
+            includeUserGroups,
+            excludeUserGroups,
+            userState,
+            filter);
+#pragma warning restore CS0618 // Type or member is obsolete
+
+        return result;
+    }
 
     /// <summary>
     ///     Returns a user by username

@@ -1227,6 +1227,32 @@ SELECT 4 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName}
         string[]? excludeUserGroups = null,
         UserState[]? userState = null,
         IQuery<IUser>? filter = null)
+        => GetPagedResultsByQuery(
+            query,
+            pageIndex,
+            pageSize,
+            out totalRecords,
+            orderBy,
+            orderDirection,
+            includeUserGroups,
+            excludeUserGroups,
+            userState,
+            userKinds: null,
+            filter);
+
+    /// <inheritdoc />
+    public IEnumerable<IUser> GetPagedResultsByQuery(
+        IQuery<IUser>? query,
+        long pageIndex,
+        int pageSize,
+        out long totalRecords,
+        Expression<Func<IUser, object?>> orderBy,
+        Direction orderDirection,
+        string[]? includeUserGroups,
+        string[]? excludeUserGroups,
+        UserState[]? userState,
+        UserKind[]? userKinds,
+        IQuery<IUser>? filter = null)
     {
         ArgumentNullException.ThrowIfNull(orderBy);
 
@@ -1242,7 +1268,7 @@ SELECT 4 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName}
         }
 
         // get filtered sql
-        Sql<ISqlContext> filteredSql = ApplyFilter(sql, query, includeUserGroups, excludeUserGroups, userState, filter);
+        Sql<ISqlContext> filteredSql = ApplyFilter(sql, query, includeUserGroups, excludeUserGroups, userState, userKinds, filter);
 
         // get sorted sql
         Sql<ISqlContext> sqlNodeIdsWithSort =
@@ -1330,9 +1356,9 @@ SELECT 4 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName}
         return Get(userId);
     }
 
-    private Sql<ISqlContext> ApplyFilter(Sql<ISqlContext> sql, IQuery<IUser>? query, string[]? includeUserGroups, string[]? excludeUserGroups, UserState[]? userState, IQuery<IUser>? filter)
+    private Sql<ISqlContext> ApplyFilter(Sql<ISqlContext> sql, IQuery<IUser>? query, string[]? includeUserGroups, string[]? excludeUserGroups, UserState[]? userState, UserKind[]? userKinds, IQuery<IUser>? filter)
     {
-        Sql<ISqlContext>? filterSql = PrepareFilterSql(includeUserGroups, excludeUserGroups, userState, filter);
+        Sql<ISqlContext>? filterSql = PrepareFilterSql(includeUserGroups, excludeUserGroups, userState, userKinds, filter);
         if (filterSql == null)
         {
             return sql;
@@ -1422,7 +1448,7 @@ SELECT 4 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName}
         Database.Execute($"DELETE FROM {QuoteTableName("umbracoOpenIddictTokens")} WHERE {QuoteColumnName("Subject")} IN ('{userKeysForInClause}')");
     }
 
-    private Sql<ISqlContext>? PrepareFilterSql(string[]? includeUserGroups, string[]? excludeUserGroups, UserState[]? userState, IQuery<IUser>? filter)
+    private Sql<ISqlContext>? PrepareFilterSql(string[]? includeUserGroups, string[]? excludeUserGroups, UserState[]? userState, UserKind[]? userKinds, IQuery<IUser>? filter)
     {
         Sql<ISqlContext>? filterSql = null;
 
@@ -1431,7 +1457,8 @@ SELECT 4 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName}
         if (hasCustomFilter
             || (includeUserGroups != null && includeUserGroups.Length > 0)
             || (excludeUserGroups != null && excludeUserGroups.Length > 0)
-            || (userState != null && userState.Length > 0 && userState.Contains(UserState.All) == false))
+            || (userState != null && userState.Length > 0 && userState.Contains(UserState.All) == false)
+            || (userKinds != null && userKinds.Length > 0))
         {
             filterSql = SqlContext.Sql();
 
@@ -1448,6 +1475,8 @@ SELECT 4 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName}
             FilterByExcludedUserGroups(excludeUserGroups, filterSql);
 
             FilterByUserState(userState, filterSql);
+
+            FilterByUserKind(userKinds, filterSql);
         }
 
         return filterSql;
@@ -1548,6 +1577,21 @@ SELECT 4 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName}
 
                 filterSql.Append("AND " + sb);
             }
+        }
+    }
+
+    /// <summary>
+    /// Appends user kind filtering conditions to the specified SQL filter based on the provided user kinds.
+    /// </summary>
+    /// <param name="userKinds">An array of user kinds to filter by. If null or empty, no conditions are added.</param>
+    /// <param name="filterSql">The SQL filter to which the user kind condition is appended.</param>
+    private void FilterByUserKind(UserKind[]? userKinds, Sql<ISqlContext> filterSql)
+    {
+        if (userKinds != null && userKinds.Length > 0)
+        {
+            var kindColumn = QuoteColumnName("kind");
+            var kindValues = userKinds.Select(x => (short)x).ToArray();
+            filterSql.Append($"AND ({kindColumn} IN (@kinds))", new { kinds = kindValues });
         }
     }
 

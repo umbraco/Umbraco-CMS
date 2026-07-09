@@ -2,7 +2,7 @@ import type { UmbUserDetailModel } from '../types.js';
 import { UMB_EDIT_USER_WORKSPACE_PATH_PATTERN } from '../paths.js';
 import { UMB_COLLECTION_VIEW_USER_GRID } from './views/index.js';
 import type { UmbUserCollectionFilterModel, UmbUserOrderByOption } from './types.js';
-import type { UmbUserOrderByType, UmbUserStateFilterType } from './utils/index.js';
+import type { UmbUserKindFilterType, UmbUserOrderByType, UmbUserStateFilterType } from './utils/index.js';
 import { UmbUserOrderBy } from './utils/index.js';
 import { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -102,6 +102,15 @@ export class UmbUserCollectionContext extends UmbDefaultCollectionContext<
 	 */
 	setOrderByFilter(orderBy: UmbUserOrderByType) {
 		this.setFilter({ orderBy });
+	}
+
+	/**
+	 * Sets the kind filter for the collection and refreshes the collection.
+	 * @param {Array<UmbUserKindFilterType>} selection
+	 * @memberof UmbUserCollectionContext
+	 */
+	setKindFilter(selection: Array<UmbUserKindFilterType>) {
+		this.setFilter({ userKinds: selection });
 	}
 
 	/**

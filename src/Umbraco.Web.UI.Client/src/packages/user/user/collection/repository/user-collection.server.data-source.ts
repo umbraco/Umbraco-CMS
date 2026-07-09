@@ -4,6 +4,7 @@ import type { UmbUserCollectionFilterModel } from '../types.js';
 import type { UmbCollectionDataSource } from '@umbraco-cms/backoffice/collection';
 import type {
 	DirectionModel,
+	UserKindModel,
 	UserOrderModel,
 	UserResponseModel,
 	UserStateModel,
@@ -47,6 +48,7 @@ export class UmbUserCollectionServerDataSource implements UmbCollectionDataSourc
 					take: filter.take,
 					userGroupIds: filter.userGroupIds,
 					userStates: filter.userStates as unknown as Array<UserStateModel>, // TODO: This is a temporary workaround to avoid a type error.
+					userKinds: filter.userKinds as unknown as Array<UserKindModel>, // TODO: This is a temporary workaround to avoid a type error.
 				},
 			}),
 		);

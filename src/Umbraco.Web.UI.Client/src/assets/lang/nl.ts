@@ -1813,6 +1813,7 @@ export default {
 		stateLockedOut: 'Vergrendeld',
 		stateInvited: 'Uitgenodigd',
 		stateInactive: 'Inactief',
+		type: 'Type',
 		sortNameAscending: 'Naam (A-Z)',
 		sortNameDescending: 'Naam (Z-A)',
 		sortCreateDateAscending: 'Oudste',

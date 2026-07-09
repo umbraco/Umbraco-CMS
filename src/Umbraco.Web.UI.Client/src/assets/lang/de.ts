@@ -1885,6 +1885,7 @@ export default {
 		stateLockedOut: 'Ausgeschlossen',
 		stateInvited: 'Eingeladen',
 		stateInactive: 'Nicht aktiv',
+		type: 'Typ',
 		sortNameAscending: 'Name (A-Z)',
 		sortNameDescending: 'Name (Z-A)',
 		sortCreateDateAscending: 'Oldest',

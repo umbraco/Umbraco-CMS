@@ -594,6 +594,25 @@ test('can filter by user groups', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.user.doesUserSectionContainUserWithText(defaultUserGroupName);
 });
 
+test('can filter by user type', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
+  await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id], 'Api');
+  userCount = await umbracoApi.user.getUsersCount();
+  await umbracoUi.user.goToUsers();
+
+  // Act
+  await umbracoUi.user.doesUserSectionContainUserAmount(userCount);
+  await umbracoUi.user.filterByTypeName('API User');
+
+  // Assert
+  // Wait for filtering to be done
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
+  const userData = await umbracoApi.user.filterByUserKinds('Api');
+  await umbracoUi.user.doesUserSectionContainUserAmount(userData.total);
+  await umbracoUi.user.doesUserSectionContainUserWithText(nameOfTheUser);
+});
+
 test('can order by newest user', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
