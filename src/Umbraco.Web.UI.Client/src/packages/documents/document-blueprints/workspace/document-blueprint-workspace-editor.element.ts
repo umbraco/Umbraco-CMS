@@ -5,7 +5,7 @@ import { customElement, state, css, html } from '@umbraco-cms/backoffice/externa
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbRoute, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
-import { UMB_WORKSPACE_VARIANT_DELIMITER } from '@umbraco-cms/backoffice/workspace';
+import { UMB_WORKSPACE_PATH_VARIANT_DELIMITER } from '@umbraco-cms/backoffice/workspace';
 import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
 
 // TODO: Refactor across all four content workspace editors (document, document blueprint, media, member) to use a base component. [NL]
@@ -85,7 +85,7 @@ export class UmbDocumentBlueprintWorkspaceEditorElement extends UmbLitElement {
 		const remainingPath = currentPath.substring(routePrefix.length);
 
 		// Skip split-view paths
-		if (remainingPath.includes(UMB_WORKSPACE_VARIANT_DELIMITER)) return;
+		if (remainingPath.includes(UMB_WORKSPACE_PATH_VARIANT_DELIMITER)) return;
 
 		// Separate the variant unique from any trailing path (e.g., /view/info)
 		const slashIndex = remainingPath.indexOf('/');

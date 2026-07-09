@@ -1,1 +1,1 @@
-export const UMB_WORKSPACE_VARIANT_DELIMITER = '_&_';
+export const UMB_WORKSPACE_PATH_VARIANT_DELIMITER = '_&_';

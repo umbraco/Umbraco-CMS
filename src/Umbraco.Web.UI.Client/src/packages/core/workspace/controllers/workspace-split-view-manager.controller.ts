@@ -1,7 +1,7 @@
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
-import { UMB_WORKSPACE_VARIANT_DELIMITER } from './constants.js';
+import { UMB_WORKSPACE_PATH_VARIANT_DELIMITER } from './constants.js';
 
 export type UmbActiveVariant = {
 	index: number;
@@ -80,7 +80,7 @@ export class UmbWorkspaceSplitViewManager {
 
 				const variantPart: string = newVariants
 					.map((v) => UmbVariantId.Create(v).toString())
-					.join(UMB_WORKSPACE_VARIANT_DELIMITER);
+					.join(UMB_WORKSPACE_PATH_VARIANT_DELIMITER);
 
 				const additionalPathname = this.#getAdditionalPathname();
 				history.pushState(null, '', `${workspaceRoute}/${variantPart}${additionalPathname}`);
@@ -102,7 +102,7 @@ export class UmbWorkspaceSplitViewManager {
 			history.pushState(
 				null,
 				'',
-				`${workspaceRoute}/${currentVariantId}${UMB_WORKSPACE_VARIANT_DELIMITER}${newVariant}`,
+				`${workspaceRoute}/${currentVariantId}${UMB_WORKSPACE_PATH_VARIANT_DELIMITER}${newVariant}`,
 			);
 			return true;
 		}
@@ -118,7 +118,7 @@ export class UmbWorkspaceSplitViewManager {
 
 				const variantPart: string = newVariants
 					.map((v) => UmbVariantId.Create(v))
-					.join(UMB_WORKSPACE_VARIANT_DELIMITER);
+					.join(UMB_WORKSPACE_PATH_VARIANT_DELIMITER);
 
 				history.pushState(null, '', `${workspaceRoute}/${variantPart}`);
 				return true;
@@ -128,7 +128,7 @@ export class UmbWorkspaceSplitViewManager {
 	}
 
 	public setVariantParts(routeFragment: string) {
-		const variantSplit = routeFragment.split(UMB_WORKSPACE_VARIANT_DELIMITER);
+		const variantSplit = routeFragment.split(UMB_WORKSPACE_PATH_VARIANT_DELIMITER);
 		this.openVariants(variantSplit.map((v) => UmbVariantId.FromString(v)));
 	}
 
@@ -150,7 +150,7 @@ export class UmbWorkspaceSplitViewManager {
 		const activeVariants = this.getActiveVariants();
 		const currentVariantPart: string = activeVariants
 			.map((v) => UmbVariantId.Create(v).toString())
-			.join(UMB_WORKSPACE_VARIANT_DELIMITER);
+			.join(UMB_WORKSPACE_PATH_VARIANT_DELIMITER);
 
 		return `${workspaceRoute}/${currentVariantPart}`;
 	}

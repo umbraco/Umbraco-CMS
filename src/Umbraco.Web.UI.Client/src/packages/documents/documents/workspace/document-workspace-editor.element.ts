@@ -7,7 +7,7 @@ import type { UmbRoute, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/r
 import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
 import { createObservablePart } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbDocumentVariantOptionModel } from '../types.js';
-import { UMB_WORKSPACE_VARIANT_DELIMITER } from '@umbraco-cms/backoffice/workspace';
+import { UMB_WORKSPACE_PATH_VARIANT_DELIMITER } from '@umbraco-cms/backoffice/workspace';
 
 // TODO: Refactor across all four content workspace editors (document, document blueprint, media, member) to use a base component. [NL]
 // TODO: This seem fully identical with Media Workspace Editor, so we can refactor this to a generic component. [NL]
@@ -93,7 +93,7 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 		const remainingPath = currentPath.substring(routePrefix.length);
 
 		// Skip split-view paths
-		if (remainingPath.includes(UMB_WORKSPACE_VARIANT_DELIMITER)) return;
+		if (remainingPath.includes(UMB_WORKSPACE_PATH_VARIANT_DELIMITER)) return;
 
 		// Separate the variant unique from any trailing path (e.g., /view/info)
 		const slashIndex = remainingPath.indexOf('/');
