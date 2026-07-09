@@ -39,7 +39,13 @@ public static class QueryConditionExtensions
         }
 
         ParameterExpression parameterExpression = Expression.Parameter(typeof(T), parameterAlias);
-        PropertyInfo propertyInfo = GetPropertyInfo(typeof(T), condition.Property.Alias);
+
+        // GetPublicProperties resolves properties inherited from base interfaces (e.g. IPublishedContent
+        // exposing Name/Id via IPublishedElement), which Expression.Property(expression, string) cannot.
+        PropertyInfo propertyInfo = typeof(T).GetPublicProperties().FirstOrDefault(p => p.Name == condition.Property.Alias)
+            ?? throw new ArgumentException(
+                $"Instance property '{condition.Property.Alias}' is not defined for type '{typeof(T)}'",
+                nameof(condition));
         MemberExpression propertyExpression = Expression.Property(parameterExpression, propertyInfo);
 
         ConstantExpression valueExpression = Expression.Constant(constraintValue);
@@ -81,39 +87,5 @@ public static class QueryConditionExtensions
             Expression.Lambda<Func<T, bool>>(bodyExpression.Reduce(), parameterExpression);
 
         return predicate;
-    }
-
-    /// <summary>
-    ///     Gets the property with the specified name from the type or one of its inherited interfaces.
-    /// </summary>
-    /// <param name="type">The type to search for the property.</param>
-    /// <param name="propertyName">The name of the property to find.</param>
-    /// <returns>The matching <see cref="PropertyInfo" />.</returns>
-    /// <remarks>
-    ///     <see cref="Type.GetProperty(string, BindingFlags)" /> on an interface does not return members declared on
-    ///     base interfaces, so when the property is not found directly (e.g. <c>IPublishedContent</c> exposing
-    ///     <c>Name</c>/<c>Id</c> via <c>IPublishedElement</c>) the inherited interfaces are searched explicitly. The
-    ///     lookup is restricted to public instance properties to mirror <see cref="Expression.Property(Expression, string)" />.
-    /// </remarks>
-    private static PropertyInfo GetPropertyInfo(Type type, string propertyName)
-    {
-        const BindingFlags bindingFlags = BindingFlags.Instance | BindingFlags.Public;
-
-        PropertyInfo? propertyInfo = type.GetProperty(propertyName, bindingFlags);
-        if (propertyInfo is not null)
-        {
-            return propertyInfo;
-        }
-
-        foreach (Type interfaceType in type.GetInterfaces())
-        {
-            propertyInfo = interfaceType.GetProperty(propertyName, bindingFlags);
-            if (propertyInfo is not null)
-            {
-                return propertyInfo;
-            }
-        }
-
-        throw new ArgumentException($"Instance property '{propertyName}' is not defined for type '{type}'", nameof(propertyName));
     }
 }
