@@ -7,8 +7,9 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbValidationController } from '@umbraco-cms/backoffice/validation';
 import type { UmbReadOnlyVariantGuardManager } from '@umbraco-cms/backoffice/utils';
 
-export interface UmbVariantDatasetWorkspaceContext<VariantType extends UmbEntityVariantModel = UmbEntityVariantModel>
-	extends UmbSubmittableWorkspaceContext {
+export interface UmbVariantDatasetWorkspaceContext<
+	VariantType extends UmbEntityVariantModel = UmbEntityVariantModel,
+> extends UmbSubmittableWorkspaceContext {
 	// Name:
 	getName(variantId?: UmbVariantId): string | undefined;
 	setName(name: string, variantId?: UmbVariantId): void;
@@ -17,6 +18,7 @@ export interface UmbVariantDatasetWorkspaceContext<VariantType extends UmbEntity
 	// Variant:
 	variants: Observable<Array<VariantType>>;
 	variantOptions: Observable<Array<UmbEntityVariantOptionModel<VariantType>>>;
+	getVariantOptions(): Promise<Array<UmbEntityVariantOptionModel<VariantType>>>;
 	splitView: UmbWorkspaceSplitViewManager;
 	getVariant(variantId: UmbVariantId): VariantType | undefined;
 	readonly readOnlyGuard: UmbReadOnlyVariantGuardManager;

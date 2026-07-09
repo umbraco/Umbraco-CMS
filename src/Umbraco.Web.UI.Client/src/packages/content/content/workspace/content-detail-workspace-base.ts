@@ -185,9 +185,19 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	// TODO: fix type error
 	public readonly variantOptions;
 
+	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+	// @ts-ignore
+	// TODO: fix type error
 	async getVariantOptions(): Promise<Array<VariantOptionModelType>> {
 		return firstValueFrom(this.variantOptions);
 	}
+
+	async isVariantOptions(variantId: UmbVariantId): Promise<boolean> {
+		const variantUnique = variantId.toString();
+		const options = await this.getVariantOptions();
+		return options.some((option) => option.unique === variantUnique);
+	}
+
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	protected _variantOptionsFilter = (variantOption: VariantOptionModelType) => true;
 

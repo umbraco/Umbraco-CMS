@@ -24,6 +24,9 @@ export class UmbWorkspaceSplitViewContext extends UmbContextBase {
 	#isNew = new UmbBooleanState(undefined);
 	isNew = this.#isNew.asObservable();
 
+	#notFound = new UmbBooleanState(undefined);
+	notFound = this.#notFound.asObservable();
+
 	#variantId = new UmbClassState<UmbVariantId | undefined>(undefined);
 	variantId = this.#variantId.asObservable();
 
@@ -70,17 +73,33 @@ export class UmbWorkspaceSplitViewContext extends UmbContextBase {
 				if (!activeVariantInfo) return;
 
 				this.#datasetContext?.destroy();
+				if (!this.#workspaceContext) {
+					throw new Error('Workspace context is not available.');
+				}
 				const variantId = UmbVariantId.Create(activeVariantInfo);
 				this.#variantId.setValue(variantId);
+				this.getHostElement().setAttribute(UMB_MARK_ATTRIBUTE_NAME, 'workspace-split-view:' + variantId.toString());
+
+				// Check if this variant is a valid variant option in the workspace context:
+				// TODO: Utilize isVariantOptions from v.19 [NL]
+				// like this: if (!this.#workspaceContext?.getVariantOptions(variantId)) {
+
+				const variantUnique = variantId.toString();
+				const options = await this.#workspaceContext.getVariantOptions();
+				const option = options.some((option) => option.unique === variantUnique);
+				if (!option) {
+					this.#notFound.setValue(true);
+					return;
+				}
 
 				const validationContext = this.#workspaceContext?.getVariantValidationContext(variantId);
 				if (validationContext) {
 					validationContext.provideAt(this);
 					this.#variantVariantValidationContext = validationContext;
 				}
-
 				this.#datasetContext = this.#workspaceContext?.createPropertyDatasetContext(this, variantId);
-				this.getHostElement().setAttribute(UMB_MARK_ATTRIBUTE_NAME, 'workspace-split-view:' + variantId.toString());
+
+				this.#notFound.setValue(false);
 			},
 			'_observeActiveVariant',
 		);

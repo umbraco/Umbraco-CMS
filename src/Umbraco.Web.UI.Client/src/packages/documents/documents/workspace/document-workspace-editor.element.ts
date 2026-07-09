@@ -85,7 +85,7 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 		const remainingPath = currentPath.substring(routePrefix.length);
 
 		// Skip split-view paths
-		if (remainingPath.includes('_&_')) return;
+		if (remainingPath.includes(UMB_WORKSPACE_VARIANT_DELIMITER)) return;
 
 		// Separate the variant unique from any trailing path (e.g., /view/info)
 		const slashIndex = remainingPath.indexOf('/');
@@ -147,7 +147,7 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 		*/
 
 		routes.push({
-			path: ':variantPath',
+			path: '/:variantPath/',
 			preserveQuery: true,
 			component: this._splitViewElement,
 			setup: async (_component, info) => {
@@ -179,22 +179,22 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 					// get current get variables from url, and check if openCollection is set:
 					const urlSearchParams = new URLSearchParams(window.location.search);
 					const openCollection = urlSearchParams.has('openCollection');
+					const view = openCollection ? `/view/collection` : '';
 
 					// Is there a path matching the current culture?
-					let path = routes.find((route) => route.path === this.#appCulture)?.path;
+					let variant = this.#variants?.find((v) => v.culture === this.#appCulture);
 
-					if (!path) {
-						// if not is there then a path matching the first variant unique.
-						path = routes.find((route) => route.path === this.#variants?.[0]?.unique)?.path;
+					if (!variant) {
+						// If no match on app culture, then try to find a variant with no culture:
+						variant = this.#variants?.find((v) => !v.culture);
 					}
 
-					if (!path) {
-						// If not is there then a path matching the first variant unique that is not a culture.
-						// TODO: Notice: here is a specific index used for fallback, this could be made more solid [NL]
-						path = routes[routes.length - 3].path;
+					if (!variant) {
+						// If none then just use the first variant as a fallback.
+						variant = this.#variants?.[0];
 					}
 
-					history.replaceState({}, '', `${this.#workspaceRoute}/${path}${openCollection ? `/view/collection` : ''}`);
+					history.replaceState({}, '', `${this.#workspaceRoute}/${variant?.unique}${view}`);
 				},
 			});
 		}
