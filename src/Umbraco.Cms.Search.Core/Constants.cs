@@ -6,7 +6,7 @@ public static class Constants
     {
         private const string IndexPrefix = "Umb_";
 
-        public const string PublishedContent = $"{IndexPrefix}PublishedContent";
+        public const string PublishedContent = Umbraco.Cms.Core.Constants.UmbracoIndexes.PublishedContentIndexName;
 
         public const string DraftContent = $"{IndexPrefix}Content";
 

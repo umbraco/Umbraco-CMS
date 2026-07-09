@@ -121,7 +121,7 @@ public interface IPublishedContentQuery
     /// <param name="culture">The culture (defaults to a culture insensitive search).</param>
     /// <param name="indexName">
     ///     The name of the index to search (defaults to
-    ///     <see cref="Constants.UmbracoIndexes.ExternalIndexName" />).
+    ///     <see cref="Constants.UmbracoIndexes.PublishedContentIndexName" />).
     /// </param>
     /// <param name="loadedFields">
     ///     This parameter is no longer used, because the results are loaded from the published snapshot
@@ -145,7 +145,7 @@ public interface IPublishedContentQuery
         int take,
         out long totalRecords,
         string culture = "*",
-        string indexName = Constants.UmbracoIndexes.ExternalIndexName,
+        string indexName = Constants.UmbracoIndexes.PublishedContentIndexName,
         ISet<string>? loadedFields = null);
 
     /// <summary>
@@ -155,7 +155,7 @@ public interface IPublishedContentQuery
     /// <param name="culture">The culture (defaults to a culture insensitive search).</param>
     /// <param name="indexName">
     ///     The name of the index to search (defaults to
-    ///     <see cref="Cms.Core.Constants.UmbracoIndexes.ExternalIndexName" />).
+    ///     <see cref="Constants.UmbracoIndexes.PublishedContentIndexName" />).
     /// </param>
     /// <returns>
     ///     The search results.
@@ -169,5 +169,5 @@ public interface IPublishedContentQuery
     ///     </para>
     ///     <para>While enumerating results, the ambient culture is changed to be the searched culture.</para>
     /// </remarks>
-    IEnumerable<PublishedSearchResult> Search(string term, string culture = "*", string indexName = Constants.UmbracoIndexes.ExternalIndexName);
+    IEnumerable<PublishedSearchResult> Search(string term, string culture = "*", string indexName = Constants.UmbracoIndexes.PublishedContentIndexName);
 }

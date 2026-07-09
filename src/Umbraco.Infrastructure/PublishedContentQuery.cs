@@ -290,7 +290,7 @@ public class PublishedContentQuery : IPublishedContentQuery
     public IEnumerable<PublishedSearchResult> Search(
         string term,
         string culture = "*",
-        string indexName = Constants.UmbracoIndexes.ExternalIndexName)
+        string indexName = Constants.UmbracoIndexes.PublishedContentIndexName)
         => Search(term, 0, 0, out _, culture, indexName);
 
     /// <inheritdoc />
@@ -300,7 +300,7 @@ public class PublishedContentQuery : IPublishedContentQuery
         int take,
         out long totalRecords,
         string culture = "*",
-        string indexName = Constants.UmbracoIndexes.ExternalIndexName,
+        string indexName = Constants.UmbracoIndexes.PublishedContentIndexName,
         ISet<string>? loadedFields = null)
         => throw new NotSupportedException(
             "Content search requires Umbraco Search. The search enabled implementation replaces this one when Umbraco Search is composed (see Umbraco.Cms.Search.Core).");

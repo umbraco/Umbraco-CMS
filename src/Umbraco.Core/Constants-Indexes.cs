@@ -3,28 +3,13 @@ namespace Umbraco.Cms.Core;
 public static partial class Constants
 {
     /// <summary>
-    ///     Contains constants for Umbraco Examine search index names.
+    ///     Contains constants for Umbraco Search index names.
     /// </summary>
     public static class UmbracoIndexes
     {
         /// <summary>
-        ///     The name of the internal content index (includes unpublished content).
+        ///     The name of the default published content index used for template searches via <see cref="IPublishedContentQuery" />.
         /// </summary>
-        public const string InternalIndexName = "InternalIndex";
-
-        /// <summary>
-        ///     The name of the external content index (published content only).
-        /// </summary>
-        public const string ExternalIndexName = "ExternalIndex";
-
-        /// <summary>
-        ///     The name of the members index.
-        /// </summary>
-        public const string MembersIndexName = "MembersIndex";
-
-        /// <summary>
-        ///     The name of the Delivery API content index.
-        /// </summary>
-        public const string DeliveryApiContentIndexName = "DeliveryApiContentIndex";
+        public const string PublishedContentIndexName = "Umb_PublishedContent";
     }
 }

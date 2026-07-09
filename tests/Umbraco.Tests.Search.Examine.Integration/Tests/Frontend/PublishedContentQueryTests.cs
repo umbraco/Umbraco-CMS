@@ -69,12 +69,12 @@ public class PublishedContentQueryTests : TestBase
     }
 
     [Test]
-    public async Task Search_MapsLegacyExternalIndexNameToPublishedContentIndex()
+    public async Task Search_WithExplicitPublishedContentIndexName_FindsPublishedContentByTerm()
     {
         await CreatePublishedSiteStructure();
 
         PublishedSearchResult[] results = PublishedContentQuery
-            .Search("Beta", 0, 10, out var totalRecords, indexName: Constants.UmbracoIndexes.ExternalIndexName)
+            .Search("Beta", 0, 10, out var totalRecords, indexName: Umbraco.Cms.Search.Core.Constants.IndexAliases.PublishedContent)
             .ToArray();
 
         Assert.Multiple(() =>

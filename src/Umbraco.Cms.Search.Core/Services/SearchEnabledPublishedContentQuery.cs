@@ -3,7 +3,6 @@ using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Infrastructure;
 using Umbraco.Cms.Search.Core.Models.Searching;
-using CoreConstants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Search.Core.Services;
 
@@ -43,15 +42,14 @@ internal sealed class SearchEnabledPublishedContentQuery : PublishedContentQuery
         int take,
         out long totalRecords,
         string culture = "*",
-        string indexName = CoreConstants.UmbracoIndexes.ExternalIndexName,
+        string indexName = Constants.IndexAliases.PublishedContent,
         ISet<string>? loadedFields = null)
     {
         ArgumentOutOfRangeException.ThrowIfNegative(skip);
         ArgumentOutOfRangeException.ThrowIfNegative(take);
 
-        var indexAlias = MapIndexAlias(indexName);
-        ISearcher searcher = _searcherResolver.GetSearcher(indexAlias)
-                             ?? throw new InvalidOperationException($"No searcher could be resolved for the index alias {indexAlias}.");
+        ISearcher searcher = _searcherResolver.GetSearcher(indexName)
+                             ?? throw new InvalidOperationException($"No searcher could be resolved for the index alias {indexName}.");
 
         // NOTE: the legacy "*" culture searched across all cultures; the search abstraction searches one culture
         //       (plus invariant), so "*" is mapped to the ambient variation context culture.
@@ -62,7 +60,7 @@ internal sealed class SearchEnabledPublishedContentQuery : PublishedContentQuery
 
         SearchResult result = searcher
             .SearchAsync(
-                indexAlias,
+                indexName,
                 query: term,
                 culture: searchCulture,
                 skip: skip,
@@ -89,13 +87,4 @@ internal sealed class SearchEnabledPublishedContentQuery : PublishedContentQuery
             .Where(x => x.Content is not null)
             .Select(x => new PublishedSearchResult(x.Content!, x.Score))
             .ToArray();
-
-    private static string MapIndexAlias(string indexName)
-        => indexName switch
-        {
-            // map the legacy index names for source compatibility with pre-existing template code
-            CoreConstants.UmbracoIndexes.ExternalIndexName or "" => Constants.IndexAliases.PublishedContent,
-            CoreConstants.UmbracoIndexes.InternalIndexName => Constants.IndexAliases.DraftContent,
-            _ => indexName,
-        };
 }
