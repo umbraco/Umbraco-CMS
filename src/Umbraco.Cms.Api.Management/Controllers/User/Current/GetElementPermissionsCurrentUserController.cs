@@ -29,6 +29,7 @@ public class GetElementPermissionsCurrentUserController : CurrentUserControllerB
     /// <param name="backOfficeSecurityAccessor">Provides access to back office security information for the current user.</param>
     /// <param name="mapper">The Umbraco object mapper used for mapping between models.</param>
     /// <param name="elementPermissionService">Service for managing element permissions.</param>
+    [ActivatorUtilitiesConstructor]
     public GetElementPermissionsCurrentUserController(
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
         IUmbracoMapper mapper,

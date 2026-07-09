@@ -45,6 +45,8 @@
     <ProjectReference Include="..\..\src\Umbraco.Cms\Umbraco.Cms.csproj" />
     <ProjectReference Include="..\..\src\Umbraco.PublishedCache.HybridCache\Umbraco.PublishedCache.HybridCache.csproj" />
     <ProjectReference Include="..\..\src\Umbraco.PublishedCache.HybridCache.Bounded\Umbraco.PublishedCache.HybridCache.Bounded.csproj" />
+    <ProjectReference Include="..\..\src\Umbraco.Cms.Search.Core\Umbraco.Cms.Search.Core.csproj" />
+    <ProjectReference Include="..\..\src\Umbraco.Cms.Search.BackOffice\Umbraco.Cms.Search.BackOffice.csproj" />
     <ProjectReference Include="..\Umbraco.Tests.Common\Umbraco.Tests.Common.csproj" />
   </ItemGroup>
 
