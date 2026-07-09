@@ -118,5 +118,5 @@ public abstract class TestBase : UmbracoIntegrationTest
         _indexingComplete = true;
     }
 
-    protected string GetIndexAlias(bool publish) => publish ? Cms.Search.Core.Constants.IndexAliases.PublishedContent : Cms.Search.Core.Constants.IndexAliases.DraftContent;
+    protected string GetIndexAlias(bool publish) => publish ? Cms.Core.Constants.IndexAliases.PublishedContent : Cms.Core.Constants.IndexAliases.DraftContent;
 }

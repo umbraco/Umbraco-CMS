@@ -20,7 +20,7 @@ internal sealed class ContentSearchService : ContentSearchServiceBase<IContent>,
 
     protected override UmbracoObjectTypes ObjectType => UmbracoObjectTypes.Document;
 
-    protected override string IndexAlias => Constants.IndexAliases.DraftContent;
+    protected override string IndexAlias => Umbraco.Cms.Core.Constants.IndexAliases.DraftContent;
 
     protected override IEnumerable<IContent> SearchChildrenFromDatabase(int parentId, Ordering? ordering, long pageNumber, int pageSize, out long total)
         => _contentService.GetPagedChildren(parentId, pageNumber, pageSize, out total, null, ordering);

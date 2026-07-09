@@ -95,7 +95,7 @@ public class MediaServiceTests : UmbracoIntegrationTest
         // Update the media name
         _rootMedia.Name = "Updated Root Media";
 
-        await WaitForIndexing(Constants.IndexAliases.DraftMedia, () =>
+        await WaitForIndexing(Umbraco.Cms.Core.Constants.IndexAliases.DraftMedia, () =>
         {
             MediaService.Save(_rootMedia);
             return Task.CompletedTask;
@@ -124,7 +124,7 @@ public class MediaServiceTests : UmbracoIntegrationTest
         }
 
         // Delete the media
-        await WaitForIndexing(Constants.IndexAliases.DraftMedia, () =>
+        await WaitForIndexing(Umbraco.Cms.Core.Constants.IndexAliases.DraftMedia, () =>
         {
             MediaService.Delete(_rootMedia);
             return Task.CompletedTask;
@@ -152,7 +152,7 @@ public class MediaServiceTests : UmbracoIntegrationTest
             .Build();
         await MediaTypeService.CreateAsync(mediaType, Umbraco.Cms.Core.Constants.Security.SuperUserKey);
 
-        await WaitForIndexing(Constants.IndexAliases.DraftMedia, () =>
+        await WaitForIndexing(Umbraco.Cms.Core.Constants.IndexAliases.DraftMedia, () =>
         {
             _rootMedia = new MediaBuilder()
                 .WithMediaType(mediaType)

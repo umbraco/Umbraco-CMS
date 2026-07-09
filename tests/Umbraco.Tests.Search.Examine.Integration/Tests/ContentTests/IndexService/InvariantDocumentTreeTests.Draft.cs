@@ -13,7 +13,7 @@ public partial class InvariantDocumentTreeTests
     public async Task DraftStructure_YieldsAllDocuments()
     {
         await CreateInvariantDocumentTree(false);
-        IIndex index = GetIndex(Cms.Search.Core.Constants.IndexAliases.DraftContent);
+        IIndex index = GetIndex(Cms.Core.Constants.IndexAliases.DraftContent);
 
         ISearchResult[] results = index.Searcher.CreateQuery().All().Execute().ToArray();
 
@@ -30,7 +30,7 @@ public partial class InvariantDocumentTreeTests
     public async Task DraftStructure_YieldsNoPublishedDocuments()
     {
         await CreateInvariantDocumentTree(false);
-        IIndex index = GetIndex(Cms.Search.Core.Constants.IndexAliases.PublishedContent);
+        IIndex index = GetIndex(Cms.Core.Constants.IndexAliases.PublishedContent);
 
         ISearchResults results = index.Searcher.CreateQuery().All().Execute();
         Assert.That(results.Count(), Is.EqualTo(0));
@@ -41,14 +41,14 @@ public partial class InvariantDocumentTreeTests
     {
         await CreateInvariantDocumentTree(false);
 
-        await WaitForIndexing(Cms.Search.Core.Constants.IndexAliases.DraftContent, () =>
+        await WaitForIndexing(Cms.Core.Constants.IndexAliases.DraftContent, () =>
         {
             IContent root = ContentService.GetById(RootKey)!;
             ContentService.MoveToRecycleBin(root);
             return Task.CompletedTask;
         });
 
-        IIndex index = GetIndex(Cms.Search.Core.Constants.IndexAliases.DraftContent);
+        IIndex index = GetIndex(Cms.Core.Constants.IndexAliases.DraftContent);
         ISearchResult[] results = index.Searcher.CreateQuery().All().Execute().ToArray();
 
         Assert.Multiple(() =>
@@ -65,14 +65,14 @@ public partial class InvariantDocumentTreeTests
     public async Task DraftStructure_WithChildDeleted_YieldsNothingBelowRoot()
     {
         await CreateInvariantDocumentTree(false);
-        await WaitForIndexing(Cms.Search.Core.Constants.IndexAliases.DraftContent, () =>
+        await WaitForIndexing(Cms.Core.Constants.IndexAliases.DraftContent, () =>
         {
             IContent child = ContentService.GetById(ChildKey)!;
             ContentService.Delete(child);
             return Task.CompletedTask;
         });
 
-        IIndex index = GetIndex(Cms.Search.Core.Constants.IndexAliases.DraftContent);
+        IIndex index = GetIndex(Cms.Core.Constants.IndexAliases.DraftContent);
         ISearchResult[] results = index.Searcher.CreateQuery().All().Execute().ToArray();
 
         Assert.Multiple(() =>
@@ -86,7 +86,7 @@ public partial class InvariantDocumentTreeTests
     public async Task DraftStructure_WithGrandchildDeleted_YieldsNothingBelowChild()
     {
         await CreateInvariantDocumentTree(false);
-        await WaitForIndexing(Cms.Search.Core.Constants.IndexAliases.DraftContent, () =>
+        await WaitForIndexing(Cms.Core.Constants.IndexAliases.DraftContent, () =>
         {
             IContent grandchild = ContentService.GetById(GrandchildKey)!;
             ContentService.Delete(grandchild);
@@ -94,7 +94,7 @@ public partial class InvariantDocumentTreeTests
         });
 
 
-        IIndex index = GetIndex(Cms.Search.Core.Constants.IndexAliases.DraftContent);
+        IIndex index = GetIndex(Cms.Core.Constants.IndexAliases.DraftContent);
         ISearchResult[] results = index.Searcher.CreateQuery().All().Execute().ToArray();
 
         Assert.Multiple(() =>
@@ -158,7 +158,7 @@ public partial class InvariantDocumentTreeTests
                 })
             .Build();
 
-        await WaitForIndexing(publish ? Cms.Search.Core.Constants.IndexAliases.PublishedContent : Cms.Search.Core.Constants.IndexAliases.DraftContent, () =>
+        await WaitForIndexing(publish ? Cms.Core.Constants.IndexAliases.PublishedContent : Cms.Core.Constants.IndexAliases.DraftContent, () =>
         {
             if (publish)
             {

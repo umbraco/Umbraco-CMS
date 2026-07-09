@@ -46,10 +46,10 @@ public static class UmbracoBuilderExtensions
 
         if (settings.ZeroDowntimeIndexing)
         {
-            builder.AddActiveAndShadowIndex(Core.Constants.IndexAliases.DraftContent);
-            builder.AddActiveAndShadowIndex(Core.Constants.IndexAliases.PublishedContent);
-            builder.AddActiveAndShadowIndex(Core.Constants.IndexAliases.DraftMedia);
-            builder.AddActiveAndShadowIndex(Core.Constants.IndexAliases.DraftMembers);
+            builder.AddActiveAndShadowIndex(Umbraco.Cms.Core.Constants.IndexAliases.DraftContent);
+            builder.AddActiveAndShadowIndex(Umbraco.Cms.Core.Constants.IndexAliases.PublishedContent);
+            builder.AddActiveAndShadowIndex(Umbraco.Cms.Core.Constants.IndexAliases.DraftMedia);
+            builder.AddActiveAndShadowIndex(Umbraco.Cms.Core.Constants.IndexAliases.DraftMembers);
 
             builder.Services.AddSingleton<IActiveIndexManager, ActiveIndexManager>();
 
@@ -59,10 +59,10 @@ public static class UmbracoBuilderExtensions
         }
         else
         {
-            builder.Services.AddExamineLuceneIndex<LuceneIndex, ConfigurationEnabledDirectoryFactory>(Core.Constants.IndexAliases.DraftContent, _ => { });
-            builder.Services.AddExamineLuceneIndex<LuceneIndex, ConfigurationEnabledDirectoryFactory>(Core.Constants.IndexAliases.PublishedContent, _ => { });
-            builder.Services.AddExamineLuceneIndex<LuceneIndex, ConfigurationEnabledDirectoryFactory>(Core.Constants.IndexAliases.DraftMedia, _ => { });
-            builder.Services.AddExamineLuceneIndex<LuceneIndex, ConfigurationEnabledDirectoryFactory>(Core.Constants.IndexAliases.DraftMembers, _ => { });
+            builder.Services.AddExamineLuceneIndex<LuceneIndex, ConfigurationEnabledDirectoryFactory>(Umbraco.Cms.Core.Constants.IndexAliases.DraftContent, _ => { });
+            builder.Services.AddExamineLuceneIndex<LuceneIndex, ConfigurationEnabledDirectoryFactory>(Umbraco.Cms.Core.Constants.IndexAliases.PublishedContent, _ => { });
+            builder.Services.AddExamineLuceneIndex<LuceneIndex, ConfigurationEnabledDirectoryFactory>(Umbraco.Cms.Core.Constants.IndexAliases.DraftMedia, _ => { });
+            builder.Services.AddExamineLuceneIndex<LuceneIndex, ConfigurationEnabledDirectoryFactory>(Umbraco.Cms.Core.Constants.IndexAliases.DraftMembers, _ => { });
 
             builder.Services.AddSingleton<IActiveIndexManager, NoopActiveIndexManager>();
         }

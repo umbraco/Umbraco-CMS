@@ -29,7 +29,7 @@ namespace Umbraco.Tests.Search.Examine.Integration.Tests;
 public class CustomSearchProviderTests
 {
     private ServiceProvider _serviceProvider = null!;
-    private const string IndexAlias = Constants.IndexAliases.PublishedContent;
+    private const string IndexAlias = Umbraco.Cms.Core.Constants.IndexAliases.PublishedContent;
     private const string CustomGuidFieldName = "customGuids";
 
     private Dictionary<int, Guid> DocumentIds { get; } = [];
@@ -452,10 +452,10 @@ internal static class CustomIndexerServiceCollectionExtensions
         // Register dual indexes (_a and _b) per logical alias for zero-downtime reindexing
         string[] aliases =
         [
-            Constants.IndexAliases.DraftContent,
-            Constants.IndexAliases.PublishedContent,
-            Constants.IndexAliases.DraftMedia,
-            Constants.IndexAliases.DraftMembers,
+            Umbraco.Cms.Core.Constants.IndexAliases.DraftContent,
+            Umbraco.Cms.Core.Constants.IndexAliases.PublishedContent,
+            Umbraco.Cms.Core.Constants.IndexAliases.DraftMedia,
+            Umbraco.Cms.Core.Constants.IndexAliases.DraftMembers,
         ];
         foreach (var alias in aliases)
         {

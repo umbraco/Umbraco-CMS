@@ -2,19 +2,6 @@
 
 public static class Constants
 {
-    public static class IndexAliases
-    {
-        private const string IndexPrefix = "Umb_";
-
-        public const string PublishedContent = Umbraco.Cms.Core.Constants.UmbracoIndexes.PublishedContentIndexName;
-
-        public const string DraftContent = $"{IndexPrefix}Content";
-
-        public const string DraftMedia = $"{IndexPrefix}Media";
-
-        public const string DraftMembers = $"{IndexPrefix}Members";
-    }
-
     public static class FieldNames
     {
         private const string FieldPrefix = "Umb_";

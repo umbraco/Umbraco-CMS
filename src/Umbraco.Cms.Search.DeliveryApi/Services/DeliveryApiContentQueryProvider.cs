@@ -102,7 +102,7 @@ internal sealed class DeliveryApiContentQueryProvider : IApiContentQueryProvider
 
         AccessContext? accessContext = GetAccessContextAsync().GetAwaiter().GetResult();
 
-        var indexAlias = preview ? Constants.IndexAliases.DraftContent : Constants.IndexAliases.PublishedContent;
+        var indexAlias = preview ? Umbraco.Cms.Core.Constants.IndexAliases.DraftContent : Umbraco.Cms.Core.Constants.IndexAliases.PublishedContent;
         SearchResult result = _searcher
             .SearchAsync(indexAlias, null, filters, null, sorters, culture, null, accessContext, skip, take)
             .GetAwaiter()

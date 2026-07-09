@@ -48,8 +48,8 @@ public static class PublishedContentSearchExtensions
     private static IEnumerable<PublishedSearchResult> Search(string term, string? culture, Filter filter)
     {
         IServiceProvider services = StaticServiceProvider.Instance;
-        ISearcher searcher = services.GetRequiredService<ISearcherResolver>().GetSearcher(SearchConstants.IndexAliases.PublishedContent)
-                             ?? throw new InvalidOperationException($"No searcher could be resolved for the index alias {SearchConstants.IndexAliases.PublishedContent}.");
+        ISearcher searcher = services.GetRequiredService<ISearcherResolver>().GetSearcher(Umbraco.Cms.Core.Constants.IndexAliases.PublishedContent)
+                             ?? throw new InvalidOperationException($"No searcher could be resolved for the index alias {Umbraco.Cms.Core.Constants.IndexAliases.PublishedContent}.");
 
         var searchCulture = culture
                             ?? services.GetRequiredService<IVariationContextAccessor>().VariationContext?.Culture;
@@ -57,7 +57,7 @@ public static class PublishedContentSearchExtensions
 
         SearchResult result = searcher
             .SearchAsync(
-                SearchConstants.IndexAliases.PublishedContent,
+                Umbraco.Cms.Core.Constants.IndexAliases.PublishedContent,
                 query: term,
                 filters: [filter],
                 culture: searchCulture,

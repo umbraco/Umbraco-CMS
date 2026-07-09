@@ -166,7 +166,7 @@ public class ContentServiceTests : UmbracoIntegrationTest
         }
     }
 
-    private string GetIndexAlias(bool publish) => publish ? Constants.IndexAliases.PublishedContent : Constants.IndexAliases.DraftContent;
+    private string GetIndexAlias(bool publish) => publish ? Umbraco.Cms.Core.Constants.IndexAliases.PublishedContent : Umbraco.Cms.Core.Constants.IndexAliases.DraftContent;
 
     public async Task TestSetup(bool publish)
     {

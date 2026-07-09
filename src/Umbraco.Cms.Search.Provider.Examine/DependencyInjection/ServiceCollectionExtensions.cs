@@ -32,10 +32,10 @@ internal static class ServiceCollectionExtensions
 
         services.Configure<IndexOptions>(options =>
         {
-            options.RegisterContentIndex<IExamineIndexer, IExamineSearcher, IDraftContentChangeStrategy>(Core.Constants.IndexAliases.DraftContent, UmbracoObjectTypes.Document);
-            options.RegisterContentIndex<IExamineIndexer, IExamineSearcher, IPublishedContentChangeStrategy>(Core.Constants.IndexAliases.PublishedContent, UmbracoObjectTypes.Document);
-            options.RegisterContentIndex<IExamineIndexer, IExamineSearcher, IDraftContentChangeStrategy>(Core.Constants.IndexAliases.DraftMedia, UmbracoObjectTypes.Media);
-            options.RegisterContentIndex<IExamineIndexer, IExamineSearcher, IDraftContentChangeStrategy>(Core.Constants.IndexAliases.DraftMembers, UmbracoObjectTypes.Member);
+            options.RegisterContentIndex<IExamineIndexer, IExamineSearcher, IDraftContentChangeStrategy>(Umbraco.Cms.Core.Constants.IndexAliases.DraftContent, UmbracoObjectTypes.Document);
+            options.RegisterContentIndex<IExamineIndexer, IExamineSearcher, IPublishedContentChangeStrategy>(Umbraco.Cms.Core.Constants.IndexAliases.PublishedContent, UmbracoObjectTypes.Document);
+            options.RegisterContentIndex<IExamineIndexer, IExamineSearcher, IDraftContentChangeStrategy>(Umbraco.Cms.Core.Constants.IndexAliases.DraftMedia, UmbracoObjectTypes.Media);
+            options.RegisterContentIndex<IExamineIndexer, IExamineSearcher, IDraftContentChangeStrategy>(Umbraco.Cms.Core.Constants.IndexAliases.DraftMembers, UmbracoObjectTypes.Member);
         });
     }
 }

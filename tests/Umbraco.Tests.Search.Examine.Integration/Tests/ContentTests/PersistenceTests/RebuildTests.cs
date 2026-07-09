@@ -193,7 +193,7 @@ public class RebuildTests : UmbracoIntegrationTest
         }
     }
 
-    private string GetIndexAlias(bool publish) => publish ? Constants.IndexAliases.PublishedContent : Constants.IndexAliases.DraftContent;
+    private string GetIndexAlias(bool publish) => publish ? Umbraco.Cms.Core.Constants.IndexAliases.PublishedContent : Umbraco.Cms.Core.Constants.IndexAliases.DraftContent;
 
     /// <summary>
     /// Creates content and waits for indexing (so database persistence happens).

@@ -231,8 +231,8 @@ public class ZeroDowntimeReindexingTests : TestBase
     {
         await SetUpContent(publish: true);
 
-        var publishedAlias = Constants.IndexAliases.PublishedContent;
-        var draftAlias = Constants.IndexAliases.DraftContent;
+        var publishedAlias = Umbraco.Cms.Core.Constants.IndexAliases.PublishedContent;
+        var draftAlias = Umbraco.Cms.Core.Constants.IndexAliases.DraftContent;
 
         ActiveIndexManager.StartRebuilding(publishedAlias);
 

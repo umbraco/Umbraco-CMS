@@ -55,9 +55,9 @@ internal sealed class IndexedEntitySearchService : IndexedSearchServiceBase, IIn
 
         var indexAlias = objectType switch
         {
-            UmbracoObjectTypes.Document => Constants.IndexAliases.DraftContent,
-            UmbracoObjectTypes.Media => Constants.IndexAliases.DraftMedia,
-            UmbracoObjectTypes.Member => Constants.IndexAliases.DraftMembers,
+            UmbracoObjectTypes.Document => Umbraco.Cms.Core.Constants.IndexAliases.DraftContent,
+            UmbracoObjectTypes.Media => Umbraco.Cms.Core.Constants.IndexAliases.DraftMedia,
+            UmbracoObjectTypes.Member => Umbraco.Cms.Core.Constants.IndexAliases.DraftMembers,
             _ => throw new ArgumentOutOfRangeException(nameof(objectType), objectType, null)
         };
 

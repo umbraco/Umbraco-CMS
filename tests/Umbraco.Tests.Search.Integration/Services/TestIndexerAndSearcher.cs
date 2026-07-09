@@ -78,8 +78,8 @@ public class TestIndexerAndSearcher : IIndexer, ISearcher
     {
         indexAlias = indexAlias switch
         {
-            Constants.IndexAliases.DraftContent => TestBase.IndexAliases.DraftContent,
-            Constants.IndexAliases.DraftMedia => TestBase.IndexAliases.Media,
+            Umbraco.Cms.Core.Constants.IndexAliases.DraftContent => TestBase.IndexAliases.DraftContent,
+            Umbraco.Cms.Core.Constants.IndexAliases.DraftMedia => TestBase.IndexAliases.Media,
             _ => indexAlias
         };
 

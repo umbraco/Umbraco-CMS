@@ -15,7 +15,7 @@ public class NoopActiveIndexManagerTests
     private IActiveIndexManager _activeIndexManager;
     private IExamineManager _examineManager;
 
-    private const string IndexAlias = Constants.IndexAliases.PublishedContent;
+    private const string IndexAlias = Umbraco.Cms.Core.Constants.IndexAliases.PublishedContent;
 
     [SetUp]
     public void SetUp()
@@ -97,10 +97,10 @@ public class NoopActiveIndexManagerTests
     {
         Assert.Multiple(() =>
         {
-            Assert.That(_examineManager.TryGetIndex(Constants.IndexAliases.DraftContent, out _), Is.True);
-            Assert.That(_examineManager.TryGetIndex(Constants.IndexAliases.PublishedContent, out _), Is.True);
-            Assert.That(_examineManager.TryGetIndex(Constants.IndexAliases.DraftMedia, out _), Is.True);
-            Assert.That(_examineManager.TryGetIndex(Constants.IndexAliases.DraftMembers, out _), Is.True);
+            Assert.That(_examineManager.TryGetIndex(Umbraco.Cms.Core.Constants.IndexAliases.DraftContent, out _), Is.True);
+            Assert.That(_examineManager.TryGetIndex(Umbraco.Cms.Core.Constants.IndexAliases.PublishedContent, out _), Is.True);
+            Assert.That(_examineManager.TryGetIndex(Umbraco.Cms.Core.Constants.IndexAliases.DraftMedia, out _), Is.True);
+            Assert.That(_examineManager.TryGetIndex(Umbraco.Cms.Core.Constants.IndexAliases.DraftMembers, out _), Is.True);
         });
     }
 }

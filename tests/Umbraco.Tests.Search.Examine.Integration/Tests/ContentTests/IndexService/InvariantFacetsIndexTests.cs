@@ -22,8 +22,8 @@ public class InvariantFacetsIndexTests : IndexTestBase
         await CreateCountDocuments([1, 2]);
 
         IIndex index = GetIndex(publish
-            ? Cms.Search.Core.Constants.IndexAliases.PublishedContent
-            : Cms.Search.Core.Constants.IndexAliases.DraftContent);
+            ? Cms.Core.Constants.IndexAliases.PublishedContent
+            : Cms.Core.Constants.IndexAliases.DraftContent);
 
         var fieldName = FieldNameHelper.FieldName("otherName", Constants.FieldValues.Integers);
         ISearchResults results = index.Searcher.CreateQuery()
@@ -47,8 +47,8 @@ public class InvariantFacetsIndexTests : IndexTestBase
         await CreateDecimalDocuments([3.6, 600.4]);
 
         IIndex index = GetIndex(publish
-            ? Cms.Search.Core.Constants.IndexAliases.PublishedContent
-            : Cms.Search.Core.Constants.IndexAliases.DraftContent);
+            ? Cms.Core.Constants.IndexAliases.PublishedContent
+            : Cms.Core.Constants.IndexAliases.DraftContent);
 
         var fieldName = FieldNameHelper.FieldName("decimalproperty", Constants.FieldValues.Decimals);
         ISearchResults results = index.Searcher.CreateQuery()
@@ -72,8 +72,8 @@ public class InvariantFacetsIndexTests : IndexTestBase
         await CreateTitleDocuments(["Title", "Title", "Another"]);
 
         IIndex index = GetIndex(publish
-            ? Cms.Search.Core.Constants.IndexAliases.PublishedContent
-            : Cms.Search.Core.Constants.IndexAliases.DraftContent);
+            ? Cms.Core.Constants.IndexAliases.PublishedContent
+            : Cms.Core.Constants.IndexAliases.DraftContent);
 
         var fieldName = FieldNameHelper.FieldName("title", Constants.FieldValues.Texts);
         ISearchResults results = index.Searcher.CreateQuery()
@@ -98,8 +98,8 @@ public class InvariantFacetsIndexTests : IndexTestBase
         await CreateCountDocuments([1, 2, 99, 101, 170]);
 
         IIndex index = GetIndex(publish
-            ? Cms.Search.Core.Constants.IndexAliases.PublishedContent
-            : Cms.Search.Core.Constants.IndexAliases.DraftContent);
+            ? Cms.Core.Constants.IndexAliases.PublishedContent
+            : Cms.Core.Constants.IndexAliases.DraftContent);
 
         var fieldName = FieldNameHelper.FieldName("otherName", Constants.FieldValues.Integers);
         ISearchResults results = index.Searcher.CreateQuery()
@@ -147,7 +147,7 @@ public class InvariantFacetsIndexTests : IndexTestBase
     {
         await CreateTitleDocType();
 
-        await WaitForIndexing(Cms.Search.Core.Constants.IndexAliases.PublishedContent, () =>
+        await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, () =>
         {
             foreach (var stringValue in values)
             {
@@ -195,7 +195,7 @@ public class InvariantFacetsIndexTests : IndexTestBase
     {
         await CreateDecimalDocType();
 
-        await WaitForIndexing(Cms.Search.Core.Constants.IndexAliases.PublishedContent, () =>
+        await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, () =>
         {
             foreach (var doubleValue in values)
             {
@@ -220,7 +220,7 @@ public class InvariantFacetsIndexTests : IndexTestBase
     {
         await CreateCountDocType();
 
-        await WaitForIndexing(Cms.Search.Core.Constants.IndexAliases.PublishedContent, () =>
+        await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, () =>
         {
             foreach (var countValue in values)
             {

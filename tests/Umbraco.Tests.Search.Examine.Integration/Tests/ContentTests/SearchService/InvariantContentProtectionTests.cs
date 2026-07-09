@@ -26,7 +26,7 @@ public class InvariantContentProtectionTests : SearcherTestBase
     {
         await MemberGroupService.CreateAsync(new MemberGroup() {Name = "testGroup"});
 
-        await WaitForIndexing(Cms.Search.Core.Constants.IndexAliases.PublishedContent, async () =>
+        await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, async () =>
         {
             await PublicAccessService.CreateAsync(
                 new PublicAccessEntrySlim
@@ -54,7 +54,7 @@ public class InvariantContentProtectionTests : SearcherTestBase
         Member customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
         MemberService.Save(customMember);
 
-        await WaitForIndexing(Cms.Search.Core.Constants.IndexAliases.PublishedContent, async () =>
+        await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, async () =>
         {
             await PublicAccessService.CreateAsync(
                 new PublicAccessEntrySlim
@@ -78,7 +78,7 @@ public class InvariantContentProtectionTests : SearcherTestBase
     {
         Attempt<IMemberGroup?, MemberGroupOperationStatus> result = await MemberGroupService.CreateAsync(new MemberGroup { Name = "testGroup" });
 
-        await WaitForIndexing(Cms.Search.Core.Constants.IndexAliases.PublishedContent, async () =>
+        await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, async () =>
         {
             await PublicAccessService.CreateAsync(
                 new PublicAccessEntrySlim
@@ -114,7 +114,7 @@ public class InvariantContentProtectionTests : SearcherTestBase
         Member customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
         MemberService.Save(customMember);
 
-        await WaitForIndexing(Cms.Search.Core.Constants.IndexAliases.PublishedContent, async () =>
+        await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, async () =>
         {
             await PublicAccessService.CreateAsync(
                 new PublicAccessEntrySlim
@@ -141,7 +141,7 @@ public class InvariantContentProtectionTests : SearcherTestBase
         await MemberGroupService.CreateAsync(new MemberGroup { Name = "rightGroup" });
         Attempt<IMemberGroup?, MemberGroupOperationStatus> wrongGroupAttempt = await MemberGroupService.CreateAsync(new MemberGroup { Name = "wrongGroup" });
 
-        await WaitForIndexing(Cms.Search.Core.Constants.IndexAliases.PublishedContent, async () =>
+        await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, async () =>
         {
             await PublicAccessService.CreateAsync(
                 new PublicAccessEntrySlim
@@ -173,7 +173,7 @@ public class InvariantContentProtectionTests : SearcherTestBase
     {
         await MemberGroupService.CreateAsync(new MemberGroup() {Name = "testGroup"});
 
-        await WaitForIndexing(Cms.Search.Core.Constants.IndexAliases.PublishedContent, async () =>
+        await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, async () =>
         {
             await PublicAccessService.CreateAsync(
                 new PublicAccessEntrySlim
@@ -185,7 +185,7 @@ public class InvariantContentProtectionTests : SearcherTestBase
                 });
         });
 
-        SearchResult results = await Searcher.SearchAsync(Cms.Search.Core.Constants.IndexAliases.PublishedContent, "root title", null, null, null, null, null, AccessContext.BypassProtection(), 0, 100);
+        SearchResult results = await Searcher.SearchAsync(Cms.Core.Constants.IndexAliases.PublishedContent, "root title", null, null, null, null, null, AccessContext.BypassProtection(), 0, 100);
 
         Assert.That(results.Total, Is.EqualTo(1));
     }
@@ -211,7 +211,7 @@ public class InvariantContentProtectionTests : SearcherTestBase
                 new {title = "root title",})
             .Build();
 
-        await WaitForIndexing(Cms.Search.Core.Constants.IndexAliases.PublishedContent, () =>
+        await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, () =>
         {
             ContentService.Save(root);
             ContentService.Publish(root, ["*"]);

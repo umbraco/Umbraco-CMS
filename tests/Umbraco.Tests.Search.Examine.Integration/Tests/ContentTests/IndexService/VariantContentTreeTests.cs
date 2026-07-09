@@ -24,7 +24,7 @@ public class VariantContentTreeTests : IndexTestBase
     public async Task VariantStructure_YieldsAllDocuments()
     {
         await PublishEntireStructure();
-        IIndex index = GetIndex(Cms.Search.Core.Constants.IndexAliases.PublishedContent);
+        IIndex index = GetIndex(Cms.Core.Constants.IndexAliases.PublishedContent);
 
         ISearchResults results = index.Searcher.CreateQuery().All().Execute();
         // 3 documents (root, child, grandchild) x 3 cultures = 9 documents
@@ -35,14 +35,14 @@ public class VariantContentTreeTests : IndexTestBase
     public async Task VariantStructure_WithRootUnpublished_YieldsNoDocuments()
     {
         await PublishEntireStructure();
-        await WaitForIndexing(Cms.Search.Core.Constants.IndexAliases.PublishedContent, () =>
+        await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, () =>
         {
             IContent root = ContentService.GetById(RootKey)!;
             ContentService.Unpublish(root);
             return Task.CompletedTask;
         });
 
-        IIndex publishedIndex = GetIndex(Cms.Search.Core.Constants.IndexAliases.PublishedContent);
+        IIndex publishedIndex = GetIndex(Cms.Core.Constants.IndexAliases.PublishedContent);
         ISearchResults publishedResultsRootEnglish = publishedIndex.Searcher.Search(EnglishRootTitle);
         ISearchResults publishedResultsRootDanish = publishedIndex.Searcher.Search(DanishRootTitle);
         ISearchResults publishedResultsRootJapanese = publishedIndex.Searcher.Search(JapaneseRootTitle);
@@ -70,14 +70,14 @@ public class VariantContentTreeTests : IndexTestBase
     public async Task VariantStructure_WithChildUnpublished_YieldsNoDocumentsBelowRoot()
     {
         await PublishEntireStructure();
-        await WaitForIndexing(Cms.Search.Core.Constants.IndexAliases.PublishedContent, () =>
+        await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, () =>
         {
             IContent child = ContentService.GetById(ChildKey)!;
             ContentService.Unpublish(child);
             return Task.CompletedTask;
         });
 
-        IIndex publishedIndex = GetIndex(Cms.Search.Core.Constants.IndexAliases.PublishedContent);
+        IIndex publishedIndex = GetIndex(Cms.Core.Constants.IndexAliases.PublishedContent);
         ISearchResults publishedResultsRootEnglish = publishedIndex.Searcher.Search(EnglishRootTitle);
         ISearchResults publishedResultsRootDanish = publishedIndex.Searcher.Search(DanishRootTitle);
         ISearchResults publishedResultsRootJapanese = publishedIndex.Searcher.Search(JapaneseRootTitle);
@@ -105,14 +105,14 @@ public class VariantContentTreeTests : IndexTestBase
     public async Task VariantStructure_WithGrandChildUnpublished_YieldsNoDocumentsBelowChild()
     {
         await PublishEntireStructure();
-        await WaitForIndexing(Cms.Search.Core.Constants.IndexAliases.PublishedContent, () =>
+        await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, () =>
         {
             IContent grandChild = ContentService.GetById(GrandchildKey)!;
             ContentService.Unpublish(grandChild);
             return Task.CompletedTask;
         });
 
-        IIndex publishedIndex = GetIndex(Cms.Search.Core.Constants.IndexAliases.PublishedContent);
+        IIndex publishedIndex = GetIndex(Cms.Core.Constants.IndexAliases.PublishedContent);
         ISearchResults publishedResultsRootEnglish = publishedIndex.Searcher.Search(EnglishRootTitle);
         ISearchResults publishedResultsRootDanish = publishedIndex.Searcher.Search(DanishRootTitle);
         ISearchResults publishedResultsRootJapanese = publishedIndex.Searcher.Search(JapaneseRootTitle);
@@ -141,7 +141,7 @@ public class VariantContentTreeTests : IndexTestBase
     [TestCase("ja-JP")]
     public async Task PublishedStructureSingleCulture_YieldsAllPublishedDocumentsInOneCultures(string culture)
     {
-        await WaitForIndexing(Cms.Search.Core.Constants.IndexAliases.PublishedContent, () =>
+        await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, () =>
         {
             IContent root = ContentService.GetById(RootKey)!;
             ContentService.PublishBranch(root, PublishBranchFilter.IncludeUnpublished, [culture]);
@@ -158,7 +158,7 @@ public class VariantContentTreeTests : IndexTestBase
     public async Task PublishedStructureInAllCultures_WithUnpublishedRootInSingleCulture_YieldsAllDocumentInPublishedRootCulture(string cultureToUnpublish, string expectedCulture, string otherExpectedCulture)
     {
         await PublishEntireStructure();
-        await WaitForIndexing(Cms.Search.Core.Constants.IndexAliases.PublishedContent, () =>
+        await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, () =>
         {
             IContent root = ContentService.GetById(RootKey)!;
             PublishResult result = ContentService.Unpublish(root, cultureToUnpublish);
@@ -190,7 +190,7 @@ public class VariantContentTreeTests : IndexTestBase
         var allCultures = new[] { "en-US", "da-DK", "ja-JP" };
         var expectedSet = new HashSet<string>(expectedExistingCultures);
 
-        IIndex publishedIndex = GetIndex(Cms.Search.Core.Constants.IndexAliases.PublishedContent);
+        IIndex publishedIndex = GetIndex(Cms.Core.Constants.IndexAliases.PublishedContent);
 
         Assert.Multiple(() =>
         {
@@ -315,7 +315,7 @@ public class VariantContentTreeTests : IndexTestBase
         grandchild.SetValue("body", "孫-ボディ-segment-1", "ja-JP", "segment-1");
         grandchild.SetValue("body", "孫-ボディ-segment-2", "ja-JP", "segment-2");
 
-        await WaitForIndexing(Cms.Search.Core.Constants.IndexAliases.DraftContent, () =>
+        await WaitForIndexing(Cms.Core.Constants.IndexAliases.DraftContent, () =>
         {
             ContentService.Save(grandchild);
             return Task.CompletedTask;
@@ -323,7 +323,7 @@ public class VariantContentTreeTests : IndexTestBase
     }
 
     private async Task PublishEntireStructure() =>
-        await WaitForIndexing(Cms.Search.Core.Constants.IndexAliases.PublishedContent, () =>
+        await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, () =>
         {
             IContent root = ContentService.GetById(RootKey)!;
             ContentService.PublishBranch(root, PublishBranchFilter.IncludeUnpublished, ["*"]);

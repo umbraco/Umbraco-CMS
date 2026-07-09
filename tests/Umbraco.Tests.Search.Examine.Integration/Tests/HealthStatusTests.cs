@@ -8,7 +8,7 @@ namespace Umbraco.Tests.Search.Examine.Integration.Tests;
 [TestFixture]
 public class HealthStatusTests : SearcherTestBase
 {
-    private const string IndexAlias = Constants.IndexAliases.PublishedContent;
+    private const string IndexAlias = Umbraco.Cms.Core.Constants.IndexAliases.PublishedContent;
 
     [Test]
     [Order(1)]

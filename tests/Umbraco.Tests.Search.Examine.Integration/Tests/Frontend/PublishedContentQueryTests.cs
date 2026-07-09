@@ -74,7 +74,7 @@ public class PublishedContentQueryTests : TestBase
         await CreatePublishedSiteStructure();
 
         PublishedSearchResult[] results = PublishedContentQuery
-            .Search("Beta", 0, 10, out var totalRecords, indexName: Umbraco.Cms.Search.Core.Constants.IndexAliases.PublishedContent)
+            .Search("Beta", 0, 10, out var totalRecords, indexName: Umbraco.Cms.Core.Constants.IndexAliases.PublishedContent)
             .ToArray();
 
         Assert.Multiple(() =>

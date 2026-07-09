@@ -15,7 +15,7 @@ public class MediaIndexServiceTests : IndexTestBase
     {
         await CreateMediaAsync();
 
-        IIndex index = GetIndex(Cms.Search.Core.Constants.IndexAliases.DraftMedia);
+        IIndex index = GetIndex(Cms.Core.Constants.IndexAliases.DraftMedia);
 
         ISearchResults results = index.Searcher.CreateQuery().All().Execute();
         Assert.That(results.TotalItemCount, Is.EqualTo(1));
@@ -35,7 +35,7 @@ public class MediaIndexServiceTests : IndexTestBase
             .Build();
         await GetRequiredService<IMediaTypeService>().CreateAsync(mediaType, Constants.Security.SuperUserKey);
 
-        await WaitForIndexing(Cms.Search.Core.Constants.IndexAliases.DraftMedia, () =>
+        await WaitForIndexing(Cms.Core.Constants.IndexAliases.DraftMedia, () =>
         {
             GetRequiredService<IMediaService>().Save(
                 new MediaBuilder()

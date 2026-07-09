@@ -19,8 +19,8 @@ public class ContentIndexingServiceExplicitIndexRegistrationsTests : ContentInde
 
         builder.Services.Configure<IndexOptions>(options =>
         {
-            options.RegisterContentIndex<TestIndexerAndSearcher, TestIndexerAndSearcher, TestContentChangeStrategy>(Constants.IndexAliases.PublishedContent, UmbracoObjectTypes.Document);
-            options.RegisterContentIndex<TestIndexerAndSearcher, TestIndexerAndSearcher, TestContentChangeStrategy>(Constants.IndexAliases.DraftContent, UmbracoObjectTypes.Document);
+            options.RegisterContentIndex<TestIndexerAndSearcher, TestIndexerAndSearcher, TestContentChangeStrategy>(Umbraco.Cms.Core.Constants.IndexAliases.PublishedContent, UmbracoObjectTypes.Document);
+            options.RegisterContentIndex<TestIndexerAndSearcher, TestIndexerAndSearcher, TestContentChangeStrategy>(Umbraco.Cms.Core.Constants.IndexAliases.DraftContent, UmbracoObjectTypes.Document);
         });
     }
 
@@ -37,10 +37,10 @@ public class ContentIndexingServiceExplicitIndexRegistrationsTests : ContentInde
 
         Assert.Multiple(() =>
         {
-            Assert.That(Strategy.HandledIndexInfos[0][0].IndexAlias, Is.EqualTo(Constants.IndexAliases.PublishedContent));
+            Assert.That(Strategy.HandledIndexInfos[0][0].IndexAlias, Is.EqualTo(Umbraco.Cms.Core.Constants.IndexAliases.PublishedContent));
             Assert.That(Strategy.HandledIndexInfos[0][0].Indexer, Is.TypeOf<TestIndexerAndSearcher>());
 
-            Assert.That(Strategy.HandledIndexInfos[0][1].IndexAlias, Is.EqualTo(Constants.IndexAliases.DraftContent));
+            Assert.That(Strategy.HandledIndexInfos[0][1].IndexAlias, Is.EqualTo(Umbraco.Cms.Core.Constants.IndexAliases.DraftContent));
             Assert.That(Strategy.HandledIndexInfos[0][1].Indexer, Is.TypeOf<TestIndexerAndSearcher>());
         });
     }

@@ -20,8 +20,8 @@ public class InvariantSortableIndexTests : IndexTestBase
         await CreateTitleDocuments(["C Title", "A Title", "B Title"]);
 
         IIndex index = GetIndex(publish
-            ? Cms.Search.Core.Constants.IndexAliases.PublishedContent
-            : Cms.Search.Core.Constants.IndexAliases.DraftContent);
+            ? Cms.Core.Constants.IndexAliases.PublishedContent
+            : Cms.Core.Constants.IndexAliases.DraftContent);
 
         var fieldName = FieldNameHelper.FieldName("sortableTitle", Constants.FieldValues.Texts);
         ISearchResults results = index.Searcher.CreateQuery().All().OrderBy(new SortableField(fieldName, SortType.String)).Execute();
@@ -58,7 +58,7 @@ public class InvariantSortableIndexTests : IndexTestBase
     {
         await CreateTitleDocType();
 
-        await WaitForIndexing(Cms.Search.Core.Constants.IndexAliases.PublishedContent, () =>
+        await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, () =>
         {
             foreach (var stringValue in values)
             {

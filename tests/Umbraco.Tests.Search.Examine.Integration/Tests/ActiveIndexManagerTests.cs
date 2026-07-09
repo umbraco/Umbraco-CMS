@@ -15,7 +15,7 @@ public class ActiveIndexManagerTests
     private IActiveIndexManager _activeIndexManager;
     private IExamineManager _examineManager;
 
-    private const string IndexAlias = Constants.IndexAliases.PublishedContent;
+    private const string IndexAlias = Umbraco.Cms.Core.Constants.IndexAliases.PublishedContent;
 
     [SetUp]
     public void SetUp()
@@ -192,8 +192,8 @@ public class ActiveIndexManagerTests
     [Test]
     public void DifferentIndexAliases_HaveIndependentState()
     {
-        var publishedAlias = Constants.IndexAliases.PublishedContent;
-        var draftAlias = Constants.IndexAliases.DraftContent;
+        var publishedAlias = Umbraco.Cms.Core.Constants.IndexAliases.PublishedContent;
+        var draftAlias = Umbraco.Cms.Core.Constants.IndexAliases.DraftContent;
 
         _activeIndexManager.StartRebuilding(publishedAlias);
 
@@ -207,8 +207,8 @@ public class ActiveIndexManagerTests
     [Test]
     public void DifferentIndexAliases_SwapIndependently()
     {
-        var publishedAlias = Constants.IndexAliases.PublishedContent;
-        var draftAlias = Constants.IndexAliases.DraftContent;
+        var publishedAlias = Umbraco.Cms.Core.Constants.IndexAliases.PublishedContent;
+        var draftAlias = Umbraco.Cms.Core.Constants.IndexAliases.DraftContent;
 
         // Swap published only
         _activeIndexManager.StartRebuilding(publishedAlias);

@@ -42,7 +42,7 @@ internal sealed class SearchEnabledPublishedContentQuery : PublishedContentQuery
         int take,
         out long totalRecords,
         string culture = "*",
-        string indexName = Constants.IndexAliases.PublishedContent,
+        string indexName = Umbraco.Cms.Core.Constants.IndexAliases.PublishedContent,
         ISet<string>? loadedFields = null)
     {
         ArgumentOutOfRangeException.ThrowIfNegative(skip);

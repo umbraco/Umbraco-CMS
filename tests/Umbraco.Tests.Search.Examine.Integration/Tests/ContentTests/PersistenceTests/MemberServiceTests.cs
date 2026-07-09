@@ -96,7 +96,7 @@ public class MemberServiceTests : UmbracoIntegrationTest
         // Update the member name
         _member.Name = "Updated Member Name";
 
-        await WaitForIndexing(Constants.IndexAliases.DraftMembers, () =>
+        await WaitForIndexing(Umbraco.Cms.Core.Constants.IndexAliases.DraftMembers, () =>
         {
             MemberService.Save(_member);
             return Task.CompletedTask;
@@ -150,7 +150,7 @@ public class MemberServiceTests : UmbracoIntegrationTest
             .Build();
         await MemberTypeService.CreateAsync(memberType, Umbraco.Cms.Core.Constants.Security.SuperUserKey);
 
-        await WaitForIndexing(Constants.IndexAliases.DraftMembers, () =>
+        await WaitForIndexing(Umbraco.Cms.Core.Constants.IndexAliases.DraftMembers, () =>
         {
             _member = new MemberBuilder()
                 .WithMemberType(memberType)
