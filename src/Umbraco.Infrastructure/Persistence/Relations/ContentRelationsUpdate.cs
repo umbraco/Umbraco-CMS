@@ -64,10 +64,10 @@ internal sealed class ContentRelationsUpdate :
     public void Handle(IEnumerable<ContentPublishedNotification> notifications) => PersistRelations(notifications.SelectMany(x => x.PublishedEntities));
 
     /// <inheritdoc/>
-    public void Handle(ContentUnpublishedNotification notification) => PersistRelations(notification.UnpublishedEntities);
+    public void Handle(ContentUnpublishedNotification notification) => PersistRelations(notification.UnpublishedEntities, checkNodeExists: true);
 
     /// <inheritdoc/>
-    public void Handle(IEnumerable<ContentUnpublishedNotification> notifications) => PersistRelations(notifications.SelectMany(x => x.UnpublishedEntities));
+    public void Handle(IEnumerable<ContentUnpublishedNotification> notifications) => PersistRelations(notifications.SelectMany(x => x.UnpublishedEntities), checkNodeExists: true);
 
     /// <inheritdoc/>
     public void Handle(MediaSavedNotification notification) => PersistRelations(notification.SavedEntities);
@@ -81,24 +81,25 @@ internal sealed class ContentRelationsUpdate :
     /// <inheritdoc/>
     public void Handle(IEnumerable<MemberSavedNotification> notifications) => PersistRelations(notifications.SelectMany(x => x.SavedEntities));
 
-    private void PersistRelations(IEnumerable<IContentBase> entities)
+    private void PersistRelations(IEnumerable<IContentBase> entities, bool checkNodeExists = false)
     {
         using IScope scope = _scopeProvider.CreateScope();
         foreach (IContentBase entity in entities)
         {
-            PersistRelations(scope, entity);
+            PersistRelations(scope, entity, checkNodeExists);
         }
 
         scope.Complete();
     }
 
-    private void PersistRelations(IScope scope, IContentBase entity)
+    private void PersistRelations(IScope scope, IContentBase entity, bool checkNodeExists)
     {
-        // The entity's node may already have been permanently deleted by the time this notification is
-        // dispatched (e.g. ContentService.DeleteOfTypes raises ContentUnpublishedNotification for content
-        // it then deletes within the same scope, before scoped notifications are dispatched post-commit).
-        // Persisting relations for a non-existent node would violate the umbracoRelation FK constraint.
-        if (NodeExists(scope, entity.Id) is false)
+        // ContentService.DeleteOfTypes raises ContentUnpublishedNotification for content it then permanently
+        // deletes within the same scope, so the node may already be gone by the time this runs - persisting
+        // relations for it would violate the umbracoRelation FK constraint (#23331). Only the unpublish
+        // handlers opt into this check (the one known caller with this pattern); save/publish fire far more
+        // often, so they skip the extra lookup.
+        if (checkNodeExists && NodeExists(scope, entity.Id) is false)
         {
             return;
         }
