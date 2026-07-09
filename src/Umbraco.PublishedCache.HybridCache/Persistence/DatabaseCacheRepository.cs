@@ -508,10 +508,16 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
                 pageComplete = true;
             });
 
+            // The break IS reachable: the executeStep delegate's early return (a page yielding no nodes — e.g.
+            // content removed concurrently, leaving the total row count stale) leaves pageComplete false, which
+            // guards against looping indefinitely. SonarLint cannot see through the delegate, so it incorrectly
+            // reports the condition as always false.
+#pragma warning disable S2583 // Conditionally executed code should be reachable
             if (!pageComplete)
             {
                 break;
             }
+#pragma warning restore S2583
 
             pageIndex++;
         }
@@ -1051,10 +1057,16 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
                 pageComplete = true;
             });
 
+            // The break IS reachable: the executeStep delegate's early return (a page yielding no nodes — e.g.
+            // content removed concurrently, leaving the total row count stale) leaves pageComplete false, which
+            // guards against looping indefinitely. SonarLint cannot see through the delegate, so it incorrectly
+            // reports the condition as always false.
+#pragma warning disable S2583 // Conditionally executed code should be reachable
             if (!pageComplete)
             {
                 break;
             }
+#pragma warning restore S2583
 
             pageIndex++;
         }
@@ -1355,10 +1367,16 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
                 pageComplete = true;
             });
 
+            // The break IS reachable: the executeStep delegate's early return (a page yielding no nodes — e.g.
+            // content removed concurrently, leaving the total row count stale) leaves pageComplete false, which
+            // guards against looping indefinitely. SonarLint cannot see through the delegate, so it incorrectly
+            // reports the condition as always false.
+#pragma warning disable S2583 // Conditionally executed code should be reachable
             if (!pageComplete)
             {
                 break;
             }
+#pragma warning restore S2583
 
             pageIndex++;
         }
@@ -1401,12 +1419,15 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         var batchSize = Math.Clamp(_nucacheSettings.Value.ContentTypeRebuildDeleteBatchSize, 1, Constants.Sql.MaxParameterCount);
         var totalBatches = (int)Math.Ceiling(nodeIds.Count / (double)batchSize);
 
-        _logger.LogDebug(
-            "Rebuild: deleting cmsContentNu rows for object type {ObjectType} — {NodeCount} node(s) in {BatchCount} batch(es) of up to {BatchSize}.",
-            objectType,
-            nodeIds.Count,
-            totalBatches,
-            batchSize);
+        if (_logger.IsEnabled(LogLevel.Debug))
+        {
+            _logger.LogDebug(
+                "Rebuild: deleting cmsContentNu rows for object type {ObjectType} — {NodeCount} node(s) in {BatchCount} batch(es) of up to {BatchSize}.",
+                objectType,
+                nodeIds.Count,
+                totalBatches,
+                batchSize);
+        }
 
         var batchNumber = 0;
         foreach (IEnumerable<int> batch in nodeIds.InGroupsOf(batchSize))
@@ -1416,12 +1437,15 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
             executeStep(() =>
             {
                 DeleteContentNuByNodeIds(nodeIdBatch);
-                _logger.LogDebug(
-                    "Rebuild: deleted cmsContentNu batch {BatchNumber}/{BatchCount} ({NodeCount} node(s)) for object type {ObjectType}.",
-                    currentBatchNumber,
-                    totalBatches,
-                    nodeIdBatch.Length,
-                    objectType);
+                if (_logger.IsEnabled(LogLevel.Debug))
+                {
+                    _logger.LogDebug(
+                        "Rebuild: deleted cmsContentNu batch {BatchNumber}/{BatchCount} ({NodeCount} node(s)) for object type {ObjectType}.",
+                        currentBatchNumber,
+                        totalBatches,
+                        nodeIdBatch.Length,
+                        objectType);
+                }
             });
         }
 
@@ -1456,9 +1480,9 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         return Database.ExecuteScalar<long>(sql);
     }
 
-    private void DeleteContentNuByNodeIds(IReadOnlyCollection<int> nodeIds)
+    private void DeleteContentNuByNodeIds(int[] nodeIds)
     {
-        if (nodeIds.Count == 0)
+        if (nodeIds.Length == 0)
         {
             return;
         }

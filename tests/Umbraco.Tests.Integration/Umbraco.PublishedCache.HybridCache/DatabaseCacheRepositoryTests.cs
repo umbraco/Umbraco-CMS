@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
@@ -15,6 +16,7 @@ using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Common.Testing;
+using Umbraco.Cms.Tests.Integration.Attributes;
 using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
@@ -29,10 +31,12 @@ internal sealed class DatabaseCacheRepositoryTests : UmbracoIntegrationTestWithC
         builder.AddNotificationHandler<ContentTreeChangeNotification, ContentTreeChangeDistributedCacheNotificationHandler>();
         builder.AddNotificationHandler<MediaTreeChangeNotification, MediaTreeChangeDistributedCacheNotificationHandler>();
         builder.Services.AddUnique<IServerMessenger, ContentEventsTests.LocalServerMessenger>();
-
-        // Force several delete batches over the handful of fixture documents so the batched delete loop is exercised.
-        builder.Services.PostConfigure<NuCacheSettings>(options => options.ContentTypeRebuildDeleteBatchSize = 2);
     }
+
+    // Applied via [ConfigureBuilder] to only the batched-delete test, so the tiny batch size doesn't change the
+    // number of SQL statements other tests in this fixture issue.
+    public static void ConfigureSmallDeleteBatchSize(IUmbracoBuilder builder) =>
+        builder.Services.PostConfigure<NuCacheSettings>(options => options.ContentTypeRebuildDeleteBatchSize = 2);
 
     private IDatabaseCacheRepository DatabaseCacheRepository => GetRequiredService<IDatabaseCacheRepository>();
 
@@ -119,8 +123,13 @@ internal sealed class DatabaseCacheRepositoryTests : UmbracoIntegrationTestWithC
     }
 
     [Test]
+    [ConfigureBuilder(ActionName = nameof(ConfigureSmallDeleteBatchSize))]
     public void Rebuild_Deletes_Stale_Rows_In_Batches_And_Repopulates()
     {
+        // Guard: the [ConfigureBuilder] override must be in effect, otherwise the default (large) batch size
+        // would delete every row in one statement and this test would no longer exercise the batching loop.
+        Assert.That(GetRequiredService<IOptions<NuCacheSettings>>().Value.ContentTypeRebuildDeleteBatchSize, Is.EqualTo(2));
+
         // Arrange — populate the cache for the document type, then mark every row for the type as stale.
         // If the batched delete failed to remove a row, the repopulation's insert-where-not-exists would
         // skip it and the stale marker would survive — so this proves the delete actually runs (with a
