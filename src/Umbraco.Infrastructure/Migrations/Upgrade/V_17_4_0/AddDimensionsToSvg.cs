@@ -71,23 +71,39 @@ public class AddDimensionsToSvg : AsyncMigrationBase
             ? vectorGraphicsMediaType.PropertyTypes.Max(x => x.SortOrder)
             : 0;
 
-        // Add new properties (AddPropertyType handles duplicates, so the migration is idempotent).
+        var updated = false;
+
         // The keys are set explicitly to match the clean install (DatabaseDataCreator) so that upgraded
         // and clean-installed sites end up identical - otherwise the keys would be randomly generated.
-        vectorGraphicsMediaType.AddPropertyType(new PropertyType(_shortStringHelper, labelPixelDataType, Constants.Conventions.Media.Width)
+        if (vectorGraphicsMediaType.PropertyTypes.Any(x => x.Alias == Constants.Conventions.Media.Width) is false)
         {
-            Key = new Guid(Constants.Conventions.Media.PropertyTypeKeys.VectorGraphicsWidth),
-            Name = "Width",
-            SortOrder = highestSort + 1,
-            PropertyGroupId = new Lazy<int>(()=> propertyGroup.Id),
-        });
-        vectorGraphicsMediaType.AddPropertyType(new PropertyType(_shortStringHelper, labelPixelDataType, Constants.Conventions.Media.Height)
+            vectorGraphicsMediaType.AddPropertyType(new PropertyType(_shortStringHelper, labelPixelDataType, Constants.Conventions.Media.Width)
+            {
+                Key = new Guid(Constants.Conventions.Media.PropertyTypeKeys.VectorGraphicsWidth),
+                Name = "Width",
+                SortOrder = highestSort + 1,
+                PropertyGroupId = new Lazy<int>(()=> propertyGroup.Id),
+            });
+            updated = true;
+        }
+
+        if (vectorGraphicsMediaType.PropertyTypes.Any(x => x.Alias == Constants.Conventions.Media.Height) is false)
         {
-            Key = new Guid(Constants.Conventions.Media.PropertyTypeKeys.VectorGraphicsHeight),
-            Name = "Height",
-            SortOrder = highestSort + 2,
-            PropertyGroupId = new Lazy<int>(()=> propertyGroup.Id),
-        });
+            vectorGraphicsMediaType.AddPropertyType(new PropertyType(_shortStringHelper, labelPixelDataType, Constants.Conventions.Media.Height)
+            {
+                Key = new Guid(Constants.Conventions.Media.PropertyTypeKeys.VectorGraphicsHeight),
+                Name = "Height",
+                SortOrder = highestSort + 2,
+                PropertyGroupId = new Lazy<int>(()=> propertyGroup.Id),
+            });
+            updated = true;
+        }
+
+        if (updated is false)
+        {
+            _logger.LogInformation("Vector Graphics Media Type already has width/height properties, skipping update.");
+            return;
+        }
 
         Attempt<ContentTypeOperationStatus> attempt = await _mediaTypeService.UpdateAsync(vectorGraphicsMediaType, Constants.Security.SuperUserKey);
         if (attempt.Success is false)
