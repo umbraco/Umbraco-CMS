@@ -5,7 +5,7 @@ export type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 export type ObserverCallback<T> = (value: T) => void;
 
 /**
- * Typescript helper to infer type of the value of an Observable. Including potentially becoming 'undefined' if the Observable type is possibly 'undefined'.
+ * TypeScript helper to infer type of the value of an Observable. Including potentially becoming 'undefined' if the Observable type is possibly 'undefined'.
  */
 export type UmbObserverValueType<ObservableType> =
 	| (ObservableType extends Observable<infer U> ? U : never)
