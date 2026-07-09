@@ -15,7 +15,7 @@ const MAX_RETRIES = 3;
  * may still complete (or have completed) on the server.
  * @see https://github.com/umbraco/Umbraco-CMS/issues/16041
  */
-const GATEWAY_TIMEOUT_STATUSES = [504, 524, 598];
+const GATEWAY_TIMEOUT_STATUSES = new Set([504, 524, 598]);
 
 /**
  * HTTP statuses used by proxies/gateways to report that they could not establish or complete a connection
@@ -23,7 +23,7 @@ const GATEWAY_TIMEOUT_STATUSES = [504, 524, 598];
  * cannot have been performed.
  * @see https://github.com/umbraco/Umbraco-CMS/issues/16041
  */
-const GATEWAY_UNREACHABLE_STATUSES = [521, 522, 523, 525, 526, 530, 599];
+const GATEWAY_UNREACHABLE_STATUSES = new Set([521, 522, 523, 525, 526, 530, 599]);
 
 export class UmbApiInterceptorController extends UmbControllerBase {
 	/**
@@ -215,7 +215,7 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 
 			// Special handling for proxy/gateway timeouts. These respond with their own (usually non-JSON) error
 			// page instead of ours, so without this the request would surface as a generic, unhelpful server error.
-			if (GATEWAY_TIMEOUT_STATUSES.includes(response.status)) {
+			if (GATEWAY_TIMEOUT_STATUSES.has(response.status)) {
 				const timeoutProblemDetails: UmbProblemDetails = {
 					status: response.status,
 					title: 'The request timed out',
@@ -229,7 +229,7 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 
 			// Special handling for proxies/gateways that could not reach the server at all (as opposed to
 			// GATEWAY_TIMEOUT_STATUSES, where the server received the request but didn't respond in time).
-			if (GATEWAY_UNREACHABLE_STATUSES.includes(response.status)) {
+			if (GATEWAY_UNREACHABLE_STATUSES.has(response.status)) {
 				const unreachableProblemDetails: UmbProblemDetails = {
 					status: response.status,
 					title: 'The server could not be reached',
