@@ -10,6 +10,6 @@ public interface IDetailedTelemetryProvider
     /// <summary>
     /// Retrieves detailed telemetry usage information.
     /// </summary>
-    /// <returns>An enumerable collection of <see cref="Umbraco.Cms.Infrastructure.Telemetry.UsageInformation"/> objects containing usage data.</returns>
+    /// <returns>An enumerable collection of <see cref="UsageInformation"/> objects containing usage data.</returns>
     IEnumerable<UsageInformation> GetInformation();
 }

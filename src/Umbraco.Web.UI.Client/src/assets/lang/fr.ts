@@ -897,7 +897,7 @@ export default {
 		greeting5: 'Bienvenue',
 		greeting6: 'Bienvenue',
 		instruction: 'Connectez-vous ci-dessous',
-		signInWith: 'Identifiez-vous avec',
+		signInWith: 'Identifiez-vous avec {0}',
 		timeout: 'La session a expiré',
 		forgottenPassword: 'Mot de passe oublié?',
 		forgottenPasswordInstruction:
@@ -1091,7 +1091,7 @@ export default {
 	},
 	sections: {
 		content: 'Contenu',
-		forms: 'Formulaires',
+		library: 'Bibliothèque',
 		media: 'Medias',
 		member: 'Membres',
 		packages: 'Packages',
@@ -1371,10 +1371,20 @@ export default {
 		childNodesDescription: 'Autorisez la création de contenu des types spécifiés sous le contenu de ce type-ci',
 		chooseChildNode: 'Choisissez les noeuds enfants',
 		compositionsDescription:
-			"Hériter des onglets et propriétés d'un type de document existant. De nouveaux onglets seront ajoutés au type de document actuel, ou fusionnés s'il existe un onglet avec un nom sililaire.",
+			"Hériter des onglets et propriétés d'un type de document existant. De nouveaux onglets seront ajoutés au type de document actuel, ou fusionnés s'il existe un onglet avec un nom similaire.",
+		compositionsDescriptionMediaType:
+			"Hériter des onglets et propriétés d'un type de media existant. De nouveaux onglets seront ajoutés au type de media actuel, ou fusionnés s'il existe un onglet avec un nom similaire.",
+		compositionsDescriptionMemberType:
+			"Hériter des onglets et propriétés d'un type de membre existant. De nouveaux onglets seront ajoutés au type de membre actuel, ou fusionnés s'il existe un onglet avec un nom similaire.",
 		compositionInUse:
 			'Ce type de contenu est utilisé dans une composition, et ne peut donc pas être lui-même un composé.',
+		compositionInUseMediaType:
+			'Ce type de media est utilisé dans une composition, et ne peut donc pas être lui-même un composé.',
+		compositionInUseMemberType:
+			'Ce type de membre est utilisé dans une composition, et ne peut donc pas être lui-même un composé.',
 		noAvailableCompositions: "Il n'y a pas de type de contenu disponible à utiliser dans une composition.",
+		noAvailableCompositionsMediaType: "Il n'y a pas de type de media disponible à utiliser dans une composition.",
+		noAvailableCompositionsMemberType: "Il n'y a pas de type de membre disponible à utiliser dans une composition.",
 		compositionRemoveWarning:
 			"La suppression d'une composition supprimera les données de toutes les propriétés associées. Une fois que vous sauvegardez le type de document, il n'y a plus moyen de faire marche arrière.",
 		availableEditors: 'Editeurs disponibles',
@@ -1411,6 +1421,10 @@ export default {
 		compositionUsageHeading: 'Où cette composition est-elle utilisée?',
 		compositionUsageSpecification:
 			'Cette composition est actuellement utilisée dans la composition des types de contenu suivants :',
+		compositionUsageSpecificationMediaType:
+			'Cette composition est actuellement utilisée dans la composition des types de media suivants :',
+		compositionUsageSpecificationMemberType:
+			'Cette composition est actuellement utilisée dans la composition des types de membre suivants :',
 		variantsHeading: 'Permettre une variation par culture',
 		variantsDescription: 'Permettre aux éditeurs de créer du contenu de ce type dans différentes langues.',
 		allowVaryByCulture: 'Permettre une variation par culture',

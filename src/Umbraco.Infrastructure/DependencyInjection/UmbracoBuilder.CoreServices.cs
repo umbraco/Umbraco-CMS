@@ -437,6 +437,7 @@ public static partial class UmbracoBuilderExtensions
             .AddNotificationHandler<MemberTypeChangedNotification, MemberTypeChangedDistributedCacheNotificationHandler>()
             .AddNotificationHandler<ContentTreeChangeNotification, ContentTreeChangeDistributedCacheNotificationHandler>()
             .AddNotificationHandler<ElementTreeChangeNotification, ElementTreeChangeDistributedCacheNotificationHandler>()
+            .AddNotificationHandler<EntityContainerDeletedNotification, ElementContainerDeletedDistributedCacheNotificationHandler>()
             ;
 
         // add notification handlers for auditing
@@ -468,6 +469,7 @@ public static partial class UmbracoBuilderExtensions
         builder
             .AddNotificationHandler<ContentSavedNotification, ContentRelationsUpdate>()
             .AddNotificationHandler<ContentPublishedNotification, ContentRelationsUpdate>()
+            .AddNotificationHandler<ContentUnpublishedNotification, ContentRelationsUpdate>()
             .AddNotificationHandler<MediaSavedNotification, ContentRelationsUpdate>()
             .AddNotificationHandler<MemberSavedNotification, ContentRelationsUpdate>()
             .AddNotificationHandler<ElementSavedNotification, ContentRelationsUpdate>()

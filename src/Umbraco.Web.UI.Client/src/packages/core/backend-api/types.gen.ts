@@ -41,9 +41,6 @@ export type AuditLogResponseModel = {
     parameters?: null | string;
 };
 
-/**
- * Defines audit types.
- */
 export enum AuditTypeModel {
     NEW = 'New',
     SAVE = 'Save',
@@ -144,6 +141,12 @@ export type ConsentLevelPresentationModel = {
     description: string;
 };
 
+export enum ContentSortFieldModel {
+    NAME = 'Name',
+    CREATE_DATE = 'CreateDate',
+    UPDATE_DATE = 'UpdateDate'
+}
+
 export type CopyDataTypeRequestModel = {
     target?: null | ReferenceByIdModel;
 };
@@ -168,6 +171,16 @@ export type CopyMediaTypeRequestModel = {
 
 export type CopyMemberTypeRequestModel = {
     target?: null | ReferenceByIdModel;
+};
+
+export type CreateAndPublishDocumentRequestModel = {
+    culturesToPublish: Array<string>;
+    template: null | ReferenceByIdModel;
+    documentType: ReferenceByIdModel;
+    parent?: null | ReferenceByIdModel;
+    id?: null | string;
+    values: Array<DocumentValueModel>;
+    variants: Array<DocumentVariantRequestModel>;
 };
 
 export type CreateDataTypeRequestModel = {
@@ -197,13 +210,7 @@ export type CreateDocumentBlueprintRequestModel = {
     documentType: ReferenceByIdModel;
     parent?: null | ReferenceByIdModel;
     id?: null | string;
-    /**
-     * Gets or sets the collection of property values for the content.
-     */
     values: Array<DocumentValueModel>;
-    /**
-     * Gets or sets the collection of variant models for culture and segment variations.
-     */
     variants: Array<DocumentVariantRequestModel>;
 };
 
@@ -212,13 +219,7 @@ export type CreateDocumentRequestModel = {
     documentType: ReferenceByIdModel;
     parent?: null | ReferenceByIdModel;
     id?: null | string;
-    /**
-     * Gets or sets the collection of property values for the content.
-     */
     values: Array<DocumentValueModel>;
-    /**
-     * Gets or sets the collection of variant models for culture and segment variations.
-     */
     variants: Array<DocumentVariantRequestModel>;
 };
 
@@ -276,13 +277,7 @@ export type CreateElementRequestModel = {
     documentType: ReferenceByIdModel;
     parent?: null | ReferenceByIdModel;
     id?: null | string;
-    /**
-     * Gets or sets the collection of property values for the content.
-     */
     values: Array<ElementValueModel>;
-    /**
-     * Gets or sets the collection of variant models for culture and segment variations.
-     */
     variants: Array<ElementVariantRequestModel>;
 };
 
@@ -310,13 +305,7 @@ export type CreateMediaRequestModel = {
     mediaType: ReferenceByIdModel;
     parent?: null | ReferenceByIdModel;
     id?: null | string;
-    /**
-     * Gets or sets the collection of property values for the content.
-     */
     values: Array<MediaValueModel>;
-    /**
-     * Gets or sets the collection of variant models for culture and segment variations.
-     */
     variants: Array<MediaVariantRequestModel>;
 };
 
@@ -374,13 +363,7 @@ export type CreateMemberRequestModel = {
     groups?: null | Array<string>;
     isApproved: boolean;
     id?: null | string;
-    /**
-     * Gets or sets the collection of property values for the content.
-     */
     values: Array<MemberValueModel>;
-    /**
-     * Gets or sets the collection of variant models for culture and segment variations.
-     */
     variants: Array<MemberVariantRequestModel>;
 };
 
@@ -433,6 +416,7 @@ export type CreatePackageRequestModel = {
     contentLoadChildNodes: boolean;
     mediaIds: Array<string>;
     mediaLoadChildNodes: boolean;
+    elementIds?: null | Array<string>;
     documentTypes: Array<string>;
     mediaTypes: Array<string>;
     dataTypes: Array<string>;
@@ -604,9 +588,6 @@ export type DatabaseSettingsPresentationModel = {
     requiresConnectionTest: boolean;
 };
 
-/**
- * Specifies the mode for allowing data type changes after they have been used.
- */
 export enum DataTypeChangeModeModel {
     TRUE = 'True',
     FALSE = 'False',
@@ -699,9 +680,6 @@ export type DictionaryOverviewResponseModel = {
     translatedIsoCodes: Array<string>;
 };
 
-/**
- * Defines the direction for sorting operations.
- */
 export enum DirectionModel {
     ASCENDING = 'Ascending',
     DESCENDING = 'Descending'
@@ -722,13 +700,7 @@ export type DocumentBlueprintResponseModel = {
     documentType: DocumentTypeReferenceResponseModel;
     id: string;
     flags: Array<FlagModel>;
-    /**
-     * Gets or sets the collection of property values for the content.
-     */
     values: Array<DocumentValueResponseModel>;
-    /**
-     * Gets or sets the collection of variant models for culture and segment variations.
-     */
     variants: Array<DocumentVariantResponseModel>;
 };
 
@@ -753,13 +725,7 @@ export type DocumentCollectionResponseModel = {
     sortOrder: number;
     id: string;
     flags: Array<FlagModel>;
-    /**
-     * Gets or sets the collection of property values for the content.
-     */
     values: Array<DocumentValueResponseModel>;
-    /**
-     * Gets or sets the collection of variant models for culture and segment variations.
-     */
     variants: Array<DocumentVariantResponseModel>;
 };
 
@@ -802,13 +768,7 @@ export type DocumentResponseModel = {
     documentType: DocumentTypeReferenceResponseModel;
     id: string;
     flags: Array<FlagModel>;
-    /**
-     * Gets or sets the collection of property values for the content.
-     */
     values: Array<DocumentValueResponseModel>;
-    /**
-     * Gets or sets the collection of variant models for culture and segment variations.
-     */
     variants: Array<DocumentVariantResponseModel>;
 };
 
@@ -963,44 +923,17 @@ export type DocumentUrlInfoResponseModel = {
 };
 
 export type DocumentValueModel = {
-    /**
-     * Gets or sets the culture code for this value, or `null` for invariant properties.
-     */
     culture?: null | string;
-    /**
-     * Gets or sets the segment identifier for this value, or `null` for non-segmented properties.
-     */
     segment?: null | string;
-    /**
-     * Gets or sets the property type alias.
-     */
     alias: string;
-    /**
-     * Gets or sets the property value.
-     */
     value?: unknown;
 };
 
 export type DocumentValueResponseModel = {
-    /**
-     * Gets or sets the alias of the property editor used for this value.
-     */
     editorAlias: string;
-    /**
-     * Gets or sets the culture code for this value, or `null` for invariant properties.
-     */
     culture?: null | string;
-    /**
-     * Gets or sets the segment identifier for this value, or `null` for non-segmented properties.
-     */
     segment?: null | string;
-    /**
-     * Gets or sets the property type alias.
-     */
     alias: string;
-    /**
-     * Gets or sets the property value.
-     */
     value?: unknown;
 };
 
@@ -1013,17 +946,8 @@ export type DocumentVariantItemResponseModel = {
 };
 
 export type DocumentVariantRequestModel = {
-    /**
-     * Gets or sets the culture code for this variant, or `null` for invariant content.
-     */
     culture?: null | string;
-    /**
-     * Gets or sets the segment identifier for this variant, or `null` for non-segmented content.
-     */
     segment?: null | string;
-    /**
-     * Gets or sets the name of the content for this variant.
-     */
     name: string;
 };
 
@@ -1036,17 +960,8 @@ export type DocumentVariantResponseModel = {
     scheduledUnpublishDate?: null | string;
     createDate: string;
     updateDate: string;
-    /**
-     * Gets or sets the culture code for this variant, or `null` for invariant content.
-     */
     culture?: null | string;
-    /**
-     * Gets or sets the segment identifier for this variant, or `null` for non-segmented content.
-     */
     segment?: null | string;
-    /**
-     * Gets or sets the name of the content for this variant.
-     */
     name: string;
 };
 
@@ -1066,13 +981,7 @@ export type DocumentVersionResponseModel = {
     documentType: DocumentTypeReferenceResponseModel;
     id: string;
     flags: Array<FlagModel>;
-    /**
-     * Gets or sets the collection of property values for the content.
-     */
     values: Array<DocumentValueResponseModel>;
-    /**
-     * Gets or sets the collection of variant models for culture and segment variations.
-     */
     variants: Array<DocumentVariantResponseModel>;
 };
 
@@ -1150,13 +1059,7 @@ export type ElementResponseModel = {
     documentType: DocumentTypeReferenceResponseModel;
     id: string;
     flags: Array<FlagModel>;
-    /**
-     * Gets or sets the collection of property values for the content.
-     */
     values: Array<ElementValueResponseModel>;
-    /**
-     * Gets or sets the collection of variant models for culture and segment variations.
-     */
     variants: Array<ElementVariantResponseModel>;
 };
 
@@ -1174,44 +1077,17 @@ export type ElementTreeItemResponseModel = {
 };
 
 export type ElementValueModel = {
-    /**
-     * Gets or sets the culture code for this value, or `null` for invariant properties.
-     */
     culture?: null | string;
-    /**
-     * Gets or sets the segment identifier for this value, or `null` for non-segmented properties.
-     */
     segment?: null | string;
-    /**
-     * Gets or sets the property type alias.
-     */
     alias: string;
-    /**
-     * Gets or sets the property value.
-     */
     value?: unknown;
 };
 
 export type ElementValueResponseModel = {
-    /**
-     * Gets or sets the alias of the property editor used for this value.
-     */
     editorAlias: string;
-    /**
-     * Gets or sets the culture code for this value, or `null` for invariant properties.
-     */
     culture?: null | string;
-    /**
-     * Gets or sets the segment identifier for this value, or `null` for non-segmented properties.
-     */
     segment?: null | string;
-    /**
-     * Gets or sets the property type alias.
-     */
     alias: string;
-    /**
-     * Gets or sets the property value.
-     */
     value?: unknown;
 };
 
@@ -1224,17 +1100,8 @@ export type ElementVariantItemResponseModel = {
 };
 
 export type ElementVariantRequestModel = {
-    /**
-     * Gets or sets the culture code for this variant, or `null` for invariant content.
-     */
     culture?: null | string;
-    /**
-     * Gets or sets the segment identifier for this variant, or `null` for non-segmented content.
-     */
     segment?: null | string;
-    /**
-     * Gets or sets the name of the content for this variant.
-     */
     name: string;
 };
 
@@ -1247,17 +1114,8 @@ export type ElementVariantResponseModel = {
     scheduledUnpublishDate?: null | string;
     createDate: string;
     updateDate: string;
-    /**
-     * Gets or sets the culture code for this variant, or `null` for invariant content.
-     */
     culture?: null | string;
-    /**
-     * Gets or sets the segment identifier for this variant, or `null` for non-segmented content.
-     */
     segment?: null | string;
-    /**
-     * Gets or sets the name of the content for this variant.
-     */
     name: string;
 };
 
@@ -1277,13 +1135,7 @@ export type ElementVersionResponseModel = {
     documentType: DocumentTypeReferenceResponseModel;
     id: string;
     flags: Array<FlagModel>;
-    /**
-     * Gets or sets the collection of property values for the content.
-     */
     values: Array<ElementValueResponseModel>;
-    /**
-     * Gets or sets the collection of variant models for culture and segment variations.
-     */
     variants: Array<ElementVariantResponseModel>;
 };
 
@@ -1302,9 +1154,6 @@ export type EntityImportAnalysisResponseModel = {
     key?: null | string;
 };
 
-/**
- * The type of event message
- */
 export enum EventMessageTypeModel {
     DEFAULT = 'Default',
     INFO = 'Info',
@@ -1569,16 +1418,10 @@ export type IReferenceResponseModelMemberTypePropertyTypeReferenceResponseModel 
     name?: null | string;
 };
 
-/**
- * Marker interface that is used to setup different two factor methods. The interface ensures the openapi docs will show all possible implementations.
- */
 export type ISetupTwoFactorModel = {
     $type?: 'NoopSetupTwoFactorModel';
 } & ISetupTwoFactorModelNoopSetupTwoFactorModel;
 
-/**
- * A No-operation implementation of the ISetupTwoFactorModel.
- */
 export type ISetupTwoFactorModelNoopSetupTwoFactorModel = {
     $type: 'NoopSetupTwoFactorModel';
 };
@@ -1647,9 +1490,6 @@ export type LogLevelCountsReponseModel = {
     fatal: number;
 };
 
-/**
- * Specifies the level of a log event.
- */
 export enum LogLevelModel {
     VERBOSE = 'Verbose',
     DEBUG = 'Debug',
@@ -1682,6 +1522,7 @@ export type ManifestResponseModel = {
     name: string;
     id?: null | string;
     version?: null | string;
+    cacheBuster?: null | string;
     extensions: Array<unknown>;
 };
 
@@ -1691,13 +1532,7 @@ export type MediaCollectionResponseModel = {
     sortOrder: number;
     id: string;
     flags: Array<FlagModel>;
-    /**
-     * Gets or sets the collection of property values for the content.
-     */
     values: Array<MediaValueResponseModel>;
-    /**
-     * Gets or sets the collection of variant models for culture and segment variations.
-     */
     variants: Array<MediaVariantResponseModel>;
 };
 
@@ -1730,13 +1565,7 @@ export type MediaResponseModel = {
     mediaType: MediaTypeReferenceResponseModel;
     id: string;
     flags: Array<FlagModel>;
-    /**
-     * Gets or sets the collection of property values for the content.
-     */
     values: Array<MediaValueResponseModel>;
-    /**
-     * Gets or sets the collection of variant models for culture and segment variations.
-     */
     variants: Array<MediaVariantResponseModel>;
 };
 
@@ -1867,76 +1696,31 @@ export type MediaUrlInfoResponseModel = {
 };
 
 export type MediaValueModel = {
-    /**
-     * Gets or sets the culture code for this value, or `null` for invariant properties.
-     */
     culture?: null | string;
-    /**
-     * Gets or sets the segment identifier for this value, or `null` for non-segmented properties.
-     */
     segment?: null | string;
-    /**
-     * Gets or sets the property type alias.
-     */
     alias: string;
-    /**
-     * Gets or sets the property value.
-     */
     value?: unknown;
 };
 
 export type MediaValueResponseModel = {
-    /**
-     * Gets or sets the alias of the property editor used for this value.
-     */
     editorAlias: string;
-    /**
-     * Gets or sets the culture code for this value, or `null` for invariant properties.
-     */
     culture?: null | string;
-    /**
-     * Gets or sets the segment identifier for this value, or `null` for non-segmented properties.
-     */
     segment?: null | string;
-    /**
-     * Gets or sets the property type alias.
-     */
     alias: string;
-    /**
-     * Gets or sets the property value.
-     */
     value?: unknown;
 };
 
 export type MediaVariantRequestModel = {
-    /**
-     * Gets or sets the culture code for this variant, or `null` for invariant content.
-     */
     culture?: null | string;
-    /**
-     * Gets or sets the segment identifier for this variant, or `null` for non-segmented content.
-     */
     segment?: null | string;
-    /**
-     * Gets or sets the name of the content for this variant.
-     */
     name: string;
 };
 
 export type MediaVariantResponseModel = {
     createDate: string;
     updateDate: string;
-    /**
-     * Gets or sets the culture code for this variant, or `null` for invariant content.
-     */
     culture?: null | string;
-    /**
-     * Gets or sets the segment identifier for this variant, or `null` for non-segmented content.
-     */
     segment?: null | string;
-    /**
-     * Gets or sets the name of the content for this variant.
-     */
     name: string;
 };
 
@@ -1959,9 +1743,6 @@ export type MemberItemResponseModel = {
     flags: Array<FlagModel>;
 };
 
-/**
- * Represents the kind or type of member.
- */
 export enum MemberKindModel {
     DEFAULT = 'Default',
     API = 'Api',
@@ -1984,13 +1765,7 @@ export type MemberResponseModel = {
     profileData?: null | string;
     id: string;
     flags: Array<FlagModel>;
-    /**
-     * Gets or sets the collection of property values for the content.
-     */
     values: Array<MemberValueResponseModel>;
-    /**
-     * Gets or sets the collection of variant models for culture and segment variations.
-     */
     variants: Array<MemberVariantResponseModel>;
 };
 
@@ -2086,76 +1861,31 @@ export type MemberTypeTreeItemResponseModel = {
 };
 
 export type MemberValueModel = {
-    /**
-     * Gets or sets the culture code for this value, or `null` for invariant properties.
-     */
     culture?: null | string;
-    /**
-     * Gets or sets the segment identifier for this value, or `null` for non-segmented properties.
-     */
     segment?: null | string;
-    /**
-     * Gets or sets the property type alias.
-     */
     alias: string;
-    /**
-     * Gets or sets the property value.
-     */
     value?: unknown;
 };
 
 export type MemberValueResponseModel = {
-    /**
-     * Gets or sets the alias of the property editor used for this value.
-     */
     editorAlias: string;
-    /**
-     * Gets or sets the culture code for this value, or `null` for invariant properties.
-     */
     culture?: null | string;
-    /**
-     * Gets or sets the segment identifier for this value, or `null` for non-segmented properties.
-     */
     segment?: null | string;
-    /**
-     * Gets or sets the property type alias.
-     */
     alias: string;
-    /**
-     * Gets or sets the property value.
-     */
     value?: unknown;
 };
 
 export type MemberVariantRequestModel = {
-    /**
-     * Gets or sets the culture code for this variant, or `null` for invariant content.
-     */
     culture?: null | string;
-    /**
-     * Gets or sets the segment identifier for this variant, or `null` for non-segmented content.
-     */
     segment?: null | string;
-    /**
-     * Gets or sets the name of the content for this variant.
-     */
     name: string;
 };
 
 export type MemberVariantResponseModel = {
     createDate: string;
     updateDate: string;
-    /**
-     * Gets or sets the culture code for this variant, or `null` for invariant content.
-     */
     culture?: null | string;
-    /**
-     * Gets or sets the segment identifier for this variant, or `null` for non-segmented content.
-     */
     segment?: null | string;
-    /**
-     * Gets or sets the name of the content for this variant.
-     */
     name: string;
 };
 
@@ -2252,9 +1982,6 @@ export type OEmbedResponseModel = {
     markup: string;
 };
 
-/**
- * Represents the comparison operators available for template query conditions.
- */
 export enum OperatorModel {
     EQUALS = 'Equals',
     NOT_EQUALS = 'NotEquals',
@@ -2270,9 +1997,6 @@ export type OutOfDateStatusResponseModel = {
     status: OutOfDateTypeModel;
 };
 
-/**
- * Defines the status of whether something is up to date.
- */
 export enum OutOfDateTypeModel {
     OUT_OF_DATE = 'OutOfDate',
     CURRENT = 'Current',
@@ -2291,6 +2015,7 @@ export type PackageDefinitionResponseModel = {
     contentLoadChildNodes: boolean;
     mediaIds: Array<string>;
     mediaLoadChildNodes: boolean;
+    elementIds?: null | Array<string>;
     documentTypes: Array<string>;
     mediaTypes: Array<string>;
     dataTypes: Array<string>;
@@ -2307,885 +2032,318 @@ export type PackageMigrationStatusResponseModel = {
     hasPendingMigrations: boolean;
 };
 
-/**
- * Represents a paged collection of items with total count.
- */
 export type PagedAllowedDocumentTypeModel = {
-    /**
-     * Gets or sets the total number of items available.
-     */
     total: number;
-    /**
-     * Gets or sets the items in the current page.
-     */
     items: Array<AllowedDocumentTypeModel>;
 };
 
-/**
- * Represents a paged collection of items with total count.
- */
 export type PagedAllowedMediaTypeModel = {
-    /**
-     * Gets or sets the total number of items available.
-     */
     total: number;
-    /**
-     * Gets or sets the items in the current page.
-     */
     items: Array<AllowedMediaTypeModel>;
 };
 
-/**
- * Represents a paged collection of items with total count.
- */
 export type PagedAllowedMemberTypeModel = {
-    /**
-     * Gets or sets the total number of items available.
-     */
     total: number;
-    /**
-     * Gets or sets the items in the current page.
-     */
     items: Array<AllowedMemberTypeModel>;
 };
 
-/**
- * Represents a paged collection of items with total count.
- */
 export type PagedAuditLogResponseModel = {
-    /**
-     * Gets or sets the total number of items available.
-     */
     total: number;
-    /**
-     * Gets or sets the items in the current page.
-     */
     items: Array<AuditLogResponseModel>;
 };
 
-/**
- * Represents a paged collection of items with total count.
- */
 export type PagedCultureReponseModel = {
-    /**
-     * Gets or sets the total number of items available.
-     */
     total: number;
-    /**
-     * Gets or sets the items in the current page.
-     */
     items: Array<CultureReponseModel>;
 };
 
-/**
- * Represents a paged collection of items with total count.
- */
 export type PagedDataTypeItemResponseModel = {
-    /**
-     * Gets or sets the total number of items available.
-     */
     total: number;
-    /**
-     * Gets or sets the items in the current page.
-     */
     items: Array<DataTypeItemResponseModel>;
 };
 
-/**
- * Represents a paged collection of items with total count.
- */
 export type PagedDataTypeTreeItemResponseModel = {
-    /**
-     * Gets or sets the total number of items available.
-     */
     total: number;
-    /**
-     * Gets or sets the items in the current page.
-     */
     items: Array<DataTypeTreeItemResponseModel>;
 };
 
-/**
- * Represents a paged collection of items with total count.
- */
 export type PagedDictionaryOverviewResponseModel = {
-    /**
-     * Gets or sets the total number of items available.
-     */
     total: number;
-    /**
-     * Gets or sets the items in the current page.
-     */
     items: Array<DictionaryOverviewResponseModel>;
 };
 
-/**
- * Represents a paged collection of items with total count.
- */
 export type PagedDocumentBlueprintTreeItemResponseModel = {
-    /**
-     * Gets or sets the total number of items available.
-     */
     total: number;
-    /**
-     * Gets or sets the items in the current page.
-     */
     items: Array<DocumentBlueprintTreeItemResponseModel>;
 };
 
-/**
- * Represents a paged collection of items with total count.
- */
 export type PagedDocumentCollectionResponseModel = {
-    /**
-     * Gets or sets the total number of items available.
-     */
     total: number;
-    /**
-     * Gets or sets the items in the current page.
-     */
     items: Array<DocumentCollectionResponseModel>;
 };
 
-/**
- * Represents a paged collection of items with total count.
- */
 export type PagedDocumentRecycleBinItemResponseModel = {
-    /**
-     * Gets or sets the total number of items available.
-     */
     total: number;
-    /**
-     * Gets or sets the items in the current page.
-     */
     items: Array<DocumentRecycleBinItemResponseModel>;
 };
 
-/**
- * Represents a paged collection of items with total count.
- */
 export type PagedDocumentTreeItemResponseModel = {
-    /**
-     * Gets or sets the total number of items available.
-     */
     total: number;
-    /**
-     * Gets or sets the items in the current page.
-     */
     items: Array<DocumentTreeItemResponseModel>;
 };
 
-/**
- * Represents a paged collection of items with total count.
- */
 export type PagedDocumentTypeBlueprintItemResponseModel = {
-    /**
-     * Gets or sets the total number of items available.
-     */
     total: number;
-    /**
-     * Gets or sets the items in the current page.
-     */
     items: Array<DocumentTypeBlueprintItemResponseModel>;
 };
 
-/**
- * Represents a paged collection of items with total count.
- */
 export type PagedDocumentTypeTreeItemResponseModel = {
-    /**
-     * Gets or sets the total number of items available.
-     */
     total: number;
-    /**
-     * Gets or sets the items in the current page.
-     */
     items: Array<DocumentTypeTreeItemResponseModel>;
 };
 
-/**
- * Represents a paged collection of items with total count.
- */
 export type PagedDocumentVersionItemResponseModel = {
-    /**
-     * Gets or sets the total number of items available.
-     */
     total: number;
-    /**
-     * Gets or sets the items in the current page.
-     */
     items: Array<DocumentVersionItemResponseModel>;
 };
 
-/**
- * Represents a paged collection of items with total count.
- */
 export type PagedElementRecycleBinItemResponseModel = {
-    /**
-     * Gets or sets the total number of items available.
-     */
     total: number;
-    /**
-     * Gets or sets the items in the current page.
-     */
     items: Array<ElementRecycleBinItemResponseModel>;
 };
 
-/**
- * Represents a paged collection of items with total count.
- */
 export type PagedElementTreeItemResponseModel = {
-    /**
-     * Gets or sets the total number of items available.
-     */
     total: number;
-    /**
-     * Gets or sets the items in the current page.
-     */
     items: Array<ElementTreeItemResponseModel>;
 };
 
-/**
- * Represents a paged collection of items with total count.
- */
 export type PagedElementVersionItemResponseModel = {
-    /**
-     * Gets or sets the total number of items available.
-     */
     total: number;
-    /**
-     * Gets or sets the items in the current page.
-     */
     items: Array<ElementVersionItemResponseModel>;
 };
 
-/**
- * Represents a paged collection of items with total count.
- */
 export type PagedFileSystemTreeItemPresentationModel = {
-    /**
-     * Gets or sets the total number of items available.
-     */
     total: number;
-    /**
-     * Gets or sets the items in the current page.
-     */
     items: Array<FileSystemTreeItemPresentationModel>;
 };
 
-/**
- * Represents a paged collection of items with total count.
- */
 export type PagedHealthCheckGroupResponseModel = {
-    /**
-     * Gets or sets the total number of items available.
-     */
     total: number;
-    /**
-     * Gets or sets the items in the current page.
-     */
     items: Array<HealthCheckGroupResponseModel>;
 };
 
-/**
- * Represents a paged collection of items with total count.
- */
 export type PagedHelpPageResponseModel = {
-    /**
-     * Gets or sets the total number of items available.
-     */
     total: number;
-    /**
-     * Gets or sets the items in the current page.
-     */
     items: Array<HelpPageResponseModel>;
 };
 
-/**
- * Represents a paged collection of items with total count.
- */
 export type PagedIReferenceResponseModel = {
-    /**
-     * Gets or sets the total number of items available.
-     */
     total: number;
-    /**
-     * Gets or sets the items in the current page.
-     */
     items: Array<IReferenceResponseModel>;
 };
 
-/**
- * Represents a paged collection of items with total count.
- */
 export type PagedLanguageResponseModel = {
-    /**
-     * Gets or sets the total number of items available.
-     */
     total: number;
-    /**
-     * Gets or sets the items in the current page.
-     */
     items: Array<LanguageResponseModel>;
 };
 
-/**
- * Represents a paged collection of items with total count.
- */
 export type PagedLoggerResponseModel = {
-    /**
-     * Gets or sets the total number of items available.
-     */
     total: number;
-    /**
-     * Gets or sets the items in the current page.
-     */
     items: Array<LoggerResponseModel>;
 };
 
-/**
- * Represents a paged collection of items with total count.
- */
 export type PagedLogMessageResponseModel = {
-    /**
-     * Gets or sets the total number of items available.
-     */
     total: number;
-    /**
-     * Gets or sets the items in the current page.
-     */
     items: Array<LogMessageResponseModel>;
 };
 
-/**
- * Represents a paged collection of items with total count.
- */
 export type PagedLogTemplateResponseModel = {
-    /**
-     * Gets or sets the total number of items available.
-     */
     total: number;
-    /**
-     * Gets or sets the items in the current page.
-     */
     items: Array<LogTemplateResponseModel>;
 };
 
-/**
- * Represents a paged collection of items with total count.
- */
 export type PagedMediaCollectionResponseModel = {
-    /**
-     * Gets or sets the total number of items available.
-     */
     total: number;
-    /**
-     * Gets or sets the items in the current page.
-     */
     items: Array<MediaCollectionResponseModel>;
 };
 
-/**
- * Represents a paged collection of items with total count.
- */
 export type PagedMediaRecycleBinItemResponseModel = {
-    /**
-     * Gets or sets the total number of items available.
-     */
     total: number;
-    /**
-     * Gets or sets the items in the current page.
-     */
     items: Array<MediaRecycleBinItemResponseModel>;
 };
 
-/**
- * Represents a paged collection of items with total count.
- */
 export type PagedMediaTreeItemResponseModel = {
-    /**
-     * Gets or sets the total number of items available.
-     */
     total: number;
-    /**
-     * Gets or sets the items in the current page.
-     */
     items: Array<MediaTreeItemResponseModel>;
 };
 
-/**
- * Represents a paged collection of items with total count.
- */
 export type PagedMediaTypeTreeItemResponseModel = {
-    /**
-     * Gets or sets the total number of items available.
-     */
     total: number;
-    /**
-     * Gets or sets the items in the current page.
-     */
     items: Array<MediaTypeTreeItemResponseModel>;
 };
 
-/**
- * Represents a paged collection of items with total count.
- */
 export type PagedMemberGroupResponseModel = {
-    /**
-     * Gets or sets the total number of items available.
-     */
     total: number;
-    /**
-     * Gets or sets the items in the current page.
-     */
     items: Array<MemberGroupResponseModel>;
 };
 
-/**
- * Represents a paged collection of items with total count.
- */
 export type PagedMemberResponseModel = {
-    /**
-     * Gets or sets the total number of items available.
-     */
     total: number;
-    /**
-     * Gets or sets the items in the current page.
-     */
     items: Array<MemberResponseModel>;
 };
 
-/**
- * Represents a paged collection of items with total count.
- */
 export type PagedMemberTypeTreeItemResponseModel = {
-    /**
-     * Gets or sets the total number of items available.
-     */
     total: number;
-    /**
-     * Gets or sets the items in the current page.
-     */
     items: Array<MemberTypeTreeItemResponseModel>;
 };
 
-/**
- * Represents a paged collection of items with total count information.
- */
 export type PagedModelAllowedMediaTypeItemResponseModel = {
-    /**
-     * Gets the items for the current page.
-     */
     items: Array<AllowedMediaTypeItemResponseModel>;
-    /**
-     * Gets the total number of items available across all pages.
-     */
     total: number;
 };
 
-/**
- * Represents a paged collection of items with total count information.
- */
 export type PagedModelDataTypeItemResponseModel = {
-    /**
-     * Gets the items for the current page.
-     */
     items: Array<DataTypeItemResponseModel>;
-    /**
-     * Gets the total number of items available across all pages.
-     */
     total: number;
 };
 
-/**
- * Represents a paged collection of items with total count information.
- */
 export type PagedModelDocumentItemResponseModel = {
-    /**
-     * Gets the items for the current page.
-     */
     items: Array<DocumentItemResponseModel>;
-    /**
-     * Gets the total number of items available across all pages.
-     */
     total: number;
 };
 
-/**
- * Represents a paged collection of items with total count information.
- */
 export type PagedModelDocumentTypeItemResponseModel = {
-    /**
-     * Gets the items for the current page.
-     */
     items: Array<DocumentTypeItemResponseModel>;
-    /**
-     * Gets the total number of items available across all pages.
-     */
     total: number;
 };
 
-/**
- * Represents a paged collection of items with total count information.
- */
 export type PagedModelElementItemResponseModel = {
-    /**
-     * Gets the items for the current page.
-     */
     items: Array<ElementItemResponseModel>;
-    /**
-     * Gets the total number of items available across all pages.
-     */
     total: number;
 };
 
-/**
- * Represents a paged collection of items with total count information.
- */
 export type PagedModelMediaItemResponseModel = {
-    /**
-     * Gets the items for the current page.
-     */
     items: Array<MediaItemResponseModel>;
-    /**
-     * Gets the total number of items available across all pages.
-     */
     total: number;
 };
 
-/**
- * Represents a paged collection of items with total count information.
- */
 export type PagedModelMediaTypeItemResponseModel = {
-    /**
-     * Gets the items for the current page.
-     */
     items: Array<MediaTypeItemResponseModel>;
-    /**
-     * Gets the total number of items available across all pages.
-     */
     total: number;
 };
 
-/**
- * Represents a paged collection of items with total count information.
- */
 export type PagedModelMemberItemResponseModel = {
-    /**
-     * Gets the items for the current page.
-     */
     items: Array<MemberItemResponseModel>;
-    /**
-     * Gets the total number of items available across all pages.
-     */
     total: number;
 };
 
-/**
- * Represents a paged collection of items with total count information.
- */
 export type PagedModelMemberTypeItemResponseModel = {
-    /**
-     * Gets the items for the current page.
-     */
     items: Array<MemberTypeItemResponseModel>;
-    /**
-     * Gets the total number of items available across all pages.
-     */
     total: number;
 };
 
-/**
- * Represents a paged collection of items with total count information.
- */
 export type PagedModelTemplateItemResponseModel = {
-    /**
-     * Gets the items for the current page.
-     */
     items: Array<TemplateItemResponseModel>;
-    /**
-     * Gets the total number of items available across all pages.
-     */
     total: number;
 };
 
-/**
- * Represents a paged collection of items with total count.
- */
 export type PagedNamedEntityTreeItemResponseModel = {
-    /**
-     * Gets or sets the total number of items available.
-     */
     total: number;
-    /**
-     * Gets or sets the items in the current page.
-     */
     items: Array<NamedEntityTreeItemResponseModel>;
 };
 
-/**
- * Represents a paged collection of items with total count.
- */
 export type PagedObjectTypeResponseModel = {
-    /**
-     * Gets or sets the total number of items available.
-     */
     total: number;
-    /**
-     * Gets or sets the items in the current page.
-     */
     items: Array<ObjectTypeResponseModel>;
 };
 
-/**
- * Represents a paged collection of items with total count.
- */
 export type PagedPackageDefinitionResponseModel = {
-    /**
-     * Gets or sets the total number of items available.
-     */
     total: number;
-    /**
-     * Gets or sets the items in the current page.
-     */
     items: Array<PackageDefinitionResponseModel>;
 };
 
-/**
- * Represents a paged collection of items with total count.
- */
 export type PagedPackageMigrationStatusResponseModel = {
-    /**
-     * Gets or sets the total number of items available.
-     */
     total: number;
-    /**
-     * Gets or sets the items in the current page.
-     */
     items: Array<PackageMigrationStatusResponseModel>;
 };
 
-/**
- * Represents a paged collection of items with total count.
- */
 export type PagedPartialViewSnippetItemResponseModel = {
-    /**
-     * Gets or sets the total number of items available.
-     */
     total: number;
-    /**
-     * Gets or sets the items in the current page.
-     */
     items: Array<PartialViewSnippetItemResponseModel>;
 };
 
-/**
- * Represents a paged collection of items with total count.
- */
 export type PagedProblemDetailsModel = {
-    /**
-     * Gets or sets the total number of items available.
-     */
     total: number;
-    /**
-     * Gets or sets the items in the current page.
-     */
     items: Array<ProblemDetails>;
 };
 
-/**
- * Represents a paged collection of items with total count.
- */
 export type PagedRedirectUrlResponseModel = {
-    /**
-     * Gets or sets the total number of items available.
-     */
     total: number;
-    /**
-     * Gets or sets the items in the current page.
-     */
     items: Array<RedirectUrlResponseModel>;
 };
 
-/**
- * Represents a paged collection of items with total count.
- */
 export type PagedReferenceByIdModel = {
-    /**
-     * Gets or sets the total number of items available.
-     */
     total: number;
-    /**
-     * Gets or sets the items in the current page.
-     */
     items: Array<ReferenceByIdModel>;
 };
 
-/**
- * Represents a paged collection of items with total count.
- */
 export type PagedRelationResponseModel = {
-    /**
-     * Gets or sets the total number of items available.
-     */
     total: number;
-    /**
-     * Gets or sets the items in the current page.
-     */
     items: Array<RelationResponseModel>;
 };
 
-/**
- * Represents a paged collection of items with total count.
- */
 export type PagedRelationTypeResponseModel = {
-    /**
-     * Gets or sets the total number of items available.
-     */
     total: number;
-    /**
-     * Gets or sets the items in the current page.
-     */
     items: Array<RelationTypeResponseModel>;
 };
 
-/**
- * Represents a paged collection of items with total count.
- */
 export type PagedSavedLogSearchResponseModel = {
-    /**
-     * Gets or sets the total number of items available.
-     */
     total: number;
-    /**
-     * Gets or sets the items in the current page.
-     */
     items: Array<SavedLogSearchResponseModel>;
 };
 
-/**
- * Represents a paged collection of items with total count.
- */
 export type PagedSegmentResponseModel = {
-    /**
-     * Gets or sets the total number of items available.
-     */
     total: number;
-    /**
-     * Gets or sets the items in the current page.
-     */
     items: Array<SegmentResponseModel>;
 };
 
-/**
- * Represents a paged collection of items with total count.
- */
 export type PagedTagResponseModel = {
-    /**
-     * Gets or sets the total number of items available.
-     */
     total: number;
-    /**
-     * Gets or sets the items in the current page.
-     */
     items: Array<TagResponseModel>;
 };
 
-/**
- * Represents a paged collection of items with total count.
- */
 export type PagedTelemetryResponseModel = {
-    /**
-     * Gets or sets the total number of items available.
-     */
     total: number;
-    /**
-     * Gets or sets the items in the current page.
-     */
     items: Array<TelemetryResponseModel>;
 };
 
-/**
- * Represents a paged collection of items with total count.
- */
 export type PagedUserDataResponseModel = {
-    /**
-     * Gets or sets the total number of items available.
-     */
     total: number;
-    /**
-     * Gets or sets the items in the current page.
-     */
     items: Array<UserDataResponseModel>;
 };
 
-/**
- * Represents a paged collection of items with total count.
- */
 export type PagedUserGroupResponseModel = {
-    /**
-     * Gets or sets the total number of items available.
-     */
     total: number;
-    /**
-     * Gets or sets the items in the current page.
-     */
     items: Array<UserGroupResponseModel>;
 };
 
-/**
- * Represents a paged collection of items with total count.
- */
 export type PagedUserResponseModel = {
-    /**
-     * Gets or sets the total number of items available.
-     */
     total: number;
-    /**
-     * Gets or sets the items in the current page.
-     */
     items: Array<UserResponseModel>;
 };
 
-/**
- * Represents a paged collection of items with total count.
- */
 export type PagedWebhookEventModel = {
-    /**
-     * Gets or sets the total number of items available.
-     */
     total: number;
-    /**
-     * Gets or sets the items in the current page.
-     */
     items: Array<WebhookEventModel>;
 };
 
-/**
- * Represents a paged collection of items with total count.
- */
 export type PagedWebhookLogResponseModel = {
-    /**
-     * Gets or sets the total number of items available.
-     */
     total: number;
-    /**
-     * Gets or sets the items in the current page.
-     */
     items: Array<WebhookLogResponseModel>;
 };
 
-/**
- * Represents a paged collection of items with total count.
- */
 export type PagedWebhookResponseModel = {
-    /**
-     * Gets or sets the total number of items available.
-     */
     total: number;
-    /**
-     * Gets or sets the items in the current page.
-     */
     items: Array<WebhookResponseModel>;
 };
 
@@ -3246,9 +2404,6 @@ export type ProblemDetails = {
     instance?: null | string;
 };
 
-/**
- * A fluent builder for creating RFC 7807 ProblemDetails responses.
- */
 export type ProblemDetailsBuilderModel = {
     [key: string]: unknown;
 };
@@ -3310,14 +2465,17 @@ export type PublishedDocumentResponseModel = {
     documentType: DocumentTypeReferenceResponseModel;
     id: string;
     flags: Array<FlagModel>;
-    /**
-     * Gets or sets the collection of property values for the content.
-     */
     values: Array<DocumentValueResponseModel>;
-    /**
-     * Gets or sets the collection of variant models for culture and segment variations.
-     */
     variants: Array<DocumentVariantResponseModel>;
+};
+
+export type PublishedElementResponseModel = {
+    isTrashed: boolean;
+    documentType: DocumentTypeReferenceResponseModel;
+    id: string;
+    flags: Array<FlagModel>;
+    values: Array<ElementValueResponseModel>;
+    variants: Array<ElementVariantResponseModel>;
 };
 
 export type PublishElementRequestModel = {
@@ -3333,9 +2491,6 @@ export type RebuildStatusModel = {
     isRebuilding: boolean;
 };
 
-/**
- * Represents the status of redirect URL tracking.
- */
 export enum RedirectStatusModel {
     ENABLED = 'Enabled',
     DISABLED = 'Disabled'
@@ -3421,9 +2576,6 @@ export type ResetPasswordUserResponseModel = {
     resetPassword?: null | string;
 };
 
-/**
- * Describes the levels in which the runtime can run.
- */
 export enum RuntimeLevelModel {
     UNKNOWN = 'Unknown',
     BOOT = 'Boot',
@@ -3434,9 +2586,6 @@ export enum RuntimeLevelModel {
     BOOT_FAILED = 'BootFailed'
 }
 
-/**
- * Represents the configured Umbraco runtime mode.
- */
 export enum RuntimeModeModel {
     BACKOFFICE_DEVELOPMENT = 'BackofficeDevelopment',
     DEVELOPMENT = 'Development',
@@ -3524,9 +2673,20 @@ export type SignalRClientSettingsResponseModel = {
     skipNegotiation: boolean;
 };
 
+export type SortDocumentChildrenByFieldRequestModel = {
+    culture?: null | string;
+    field: ContentSortFieldModel;
+    direction: DirectionModel;
+};
+
 export type SortingRequestModel = {
     parent?: null | ReferenceByIdModel;
     sorting: Array<ItemSortingRequestModel>;
+};
+
+export type SortMediaChildrenByFieldRequestModel = {
+    field: ContentSortFieldModel;
+    direction: DirectionModel;
 };
 
 export type StaticFileItemResponseModel = {
@@ -3536,9 +2696,6 @@ export type StaticFileItemResponseModel = {
     path: string;
 };
 
-/**
- * Specifies the result type of a health check status.
- */
 export enum StatusResultTypeModel {
     SUCCESS = 'Success',
     WARNING = 'Warning',
@@ -3566,237 +2723,81 @@ export type StylesheetResponseModel = {
     path: string;
 };
 
-/**
- * Represents a subset of items with counts of items before and after the subset.
- */
 export type SubsetDataTypeTreeItemResponseModel = {
-    /**
-     * Gets or sets the total number of items before this subset.
-     */
     totalBefore: number;
-    /**
-     * Gets or sets the total number of items after this subset.
-     */
     totalAfter: number;
-    /**
-     * Gets or sets the items in the subset.
-     */
     items: Array<DataTypeTreeItemResponseModel>;
 };
 
-/**
- * Represents a subset of items with counts of items before and after the subset.
- */
 export type SubsetDocumentBlueprintTreeItemResponseModel = {
-    /**
-     * Gets or sets the total number of items before this subset.
-     */
     totalBefore: number;
-    /**
-     * Gets or sets the total number of items after this subset.
-     */
     totalAfter: number;
-    /**
-     * Gets or sets the items in the subset.
-     */
     items: Array<DocumentBlueprintTreeItemResponseModel>;
 };
 
-/**
- * Represents a subset of items with counts of items before and after the subset.
- */
 export type SubsetDocumentRecycleBinItemResponseModel = {
-    /**
-     * Gets or sets the total number of items before this subset.
-     */
     totalBefore: number;
-    /**
-     * Gets or sets the total number of items after this subset.
-     */
     totalAfter: number;
-    /**
-     * Gets or sets the items in the subset.
-     */
     items: Array<DocumentRecycleBinItemResponseModel>;
 };
 
-/**
- * Represents a subset of items with counts of items before and after the subset.
- */
 export type SubsetDocumentTreeItemResponseModel = {
-    /**
-     * Gets or sets the total number of items before this subset.
-     */
     totalBefore: number;
-    /**
-     * Gets or sets the total number of items after this subset.
-     */
     totalAfter: number;
-    /**
-     * Gets or sets the items in the subset.
-     */
     items: Array<DocumentTreeItemResponseModel>;
 };
 
-/**
- * Represents a subset of items with counts of items before and after the subset.
- */
 export type SubsetDocumentTypeTreeItemResponseModel = {
-    /**
-     * Gets or sets the total number of items before this subset.
-     */
     totalBefore: number;
-    /**
-     * Gets or sets the total number of items after this subset.
-     */
     totalAfter: number;
-    /**
-     * Gets or sets the items in the subset.
-     */
     items: Array<DocumentTypeTreeItemResponseModel>;
 };
 
-/**
- * Represents a subset of items with counts of items before and after the subset.
- */
 export type SubsetElementRecycleBinItemResponseModel = {
-    /**
-     * Gets or sets the total number of items before this subset.
-     */
     totalBefore: number;
-    /**
-     * Gets or sets the total number of items after this subset.
-     */
     totalAfter: number;
-    /**
-     * Gets or sets the items in the subset.
-     */
     items: Array<ElementRecycleBinItemResponseModel>;
 };
 
-/**
- * Represents a subset of items with counts of items before and after the subset.
- */
 export type SubsetElementTreeItemResponseModel = {
-    /**
-     * Gets or sets the total number of items before this subset.
-     */
     totalBefore: number;
-    /**
-     * Gets or sets the total number of items after this subset.
-     */
     totalAfter: number;
-    /**
-     * Gets or sets the items in the subset.
-     */
     items: Array<ElementTreeItemResponseModel>;
 };
 
-/**
- * Represents a subset of items with counts of items before and after the subset.
- */
 export type SubsetFileSystemTreeItemPresentationModel = {
-    /**
-     * Gets or sets the total number of items before this subset.
-     */
     totalBefore: number;
-    /**
-     * Gets or sets the total number of items after this subset.
-     */
     totalAfter: number;
-    /**
-     * Gets or sets the items in the subset.
-     */
     items: Array<FileSystemTreeItemPresentationModel>;
 };
 
-/**
- * Represents a subset of items with counts of items before and after the subset.
- */
 export type SubsetMediaRecycleBinItemResponseModel = {
-    /**
-     * Gets or sets the total number of items before this subset.
-     */
     totalBefore: number;
-    /**
-     * Gets or sets the total number of items after this subset.
-     */
     totalAfter: number;
-    /**
-     * Gets or sets the items in the subset.
-     */
     items: Array<MediaRecycleBinItemResponseModel>;
 };
 
-/**
- * Represents a subset of items with counts of items before and after the subset.
- */
 export type SubsetMediaTreeItemResponseModel = {
-    /**
-     * Gets or sets the total number of items before this subset.
-     */
     totalBefore: number;
-    /**
-     * Gets or sets the total number of items after this subset.
-     */
     totalAfter: number;
-    /**
-     * Gets or sets the items in the subset.
-     */
     items: Array<MediaTreeItemResponseModel>;
 };
 
-/**
- * Represents a subset of items with counts of items before and after the subset.
- */
 export type SubsetMediaTypeTreeItemResponseModel = {
-    /**
-     * Gets or sets the total number of items before this subset.
-     */
     totalBefore: number;
-    /**
-     * Gets or sets the total number of items after this subset.
-     */
     totalAfter: number;
-    /**
-     * Gets or sets the items in the subset.
-     */
     items: Array<MediaTypeTreeItemResponseModel>;
 };
 
-/**
- * Represents a subset of items with counts of items before and after the subset.
- */
 export type SubsetMemberTypeTreeItemResponseModel = {
-    /**
-     * Gets or sets the total number of items before this subset.
-     */
     totalBefore: number;
-    /**
-     * Gets or sets the total number of items after this subset.
-     */
     totalAfter: number;
-    /**
-     * Gets or sets the items in the subset.
-     */
     items: Array<MemberTypeTreeItemResponseModel>;
 };
 
-/**
- * Represents a subset of items with counts of items before and after the subset.
- */
 export type SubsetNamedEntityTreeItemResponseModel = {
-    /**
-     * Gets or sets the total number of items before this subset.
-     */
     totalBefore: number;
-    /**
-     * Gets or sets the total number of items after this subset.
-     */
     totalAfter: number;
-    /**
-     * Gets or sets the items in the subset.
-     */
     items: Array<NamedEntityTreeItemResponseModel>;
 };
 
@@ -3807,9 +2808,6 @@ export type TagResponseModel = {
     nodeCount: number;
 };
 
-/**
- * Defines the level of telemetry data to be collected and sent.
- */
 export enum TelemetryLevelModel {
     MINIMAL = 'Minimal',
     BASIC = 'Basic',
@@ -3945,6 +2943,13 @@ export type UnpublishElementRequestModel = {
     cultures?: null | Array<string>;
 };
 
+export type UpdateAndPublishDocumentRequestModel = {
+    culturesToPublish: Array<string>;
+    template?: null | ReferenceByIdModel;
+    values: Array<DocumentValueModel>;
+    variants: Array<DocumentVariantRequestModel>;
+};
+
 export type UpdateCurrentUserRequestModel = {
     languageIsoCode: string;
 };
@@ -3962,13 +2967,7 @@ export type UpdateDictionaryItemRequestModel = {
 };
 
 export type UpdateDocumentBlueprintRequestModel = {
-    /**
-     * Gets or sets the collection of property values for the content.
-     */
     values: Array<DocumentValueModel>;
-    /**
-     * Gets or sets the collection of variant models for culture and segment variations.
-     */
     variants: Array<DocumentVariantRequestModel>;
 };
 
@@ -3978,13 +2977,7 @@ export type UpdateDocumentNotificationsRequestModel = {
 
 export type UpdateDocumentRequestModel = {
     template?: null | ReferenceByIdModel;
-    /**
-     * Gets or sets the collection of property values for the content.
-     */
     values: Array<DocumentValueModel>;
-    /**
-     * Gets or sets the collection of variant models for culture and segment variations.
-     */
     variants: Array<DocumentVariantRequestModel>;
 };
 
@@ -4036,13 +3029,7 @@ export type UpdateDomainsRequestModel = {
 };
 
 export type UpdateElementRequestModel = {
-    /**
-     * Gets or sets the collection of property values for the content.
-     */
     values: Array<ElementValueModel>;
-    /**
-     * Gets or sets the collection of variant models for culture and segment variations.
-     */
     variants: Array<ElementVariantRequestModel>;
 };
 
@@ -4058,13 +3045,7 @@ export type UpdateLanguageRequestModel = {
 };
 
 export type UpdateMediaRequestModel = {
-    /**
-     * Gets or sets the collection of property values for the content.
-     */
     values: Array<MediaValueModel>;
-    /**
-     * Gets or sets the collection of variant models for culture and segment variations.
-     */
     variants: Array<MediaVariantRequestModel>;
 };
 
@@ -4120,13 +3101,7 @@ export type UpdateMemberRequestModel = {
     isApproved: boolean;
     isLockedOut: boolean;
     isTwoFactorEnabled: boolean;
-    /**
-     * Gets or sets the collection of property values for the content.
-     */
     values: Array<MemberValueModel>;
-    /**
-     * Gets or sets the collection of variant models for culture and segment variations.
-     */
     variants: Array<MemberVariantRequestModel>;
 };
 
@@ -4177,6 +3152,7 @@ export type UpdatePackageRequestModel = {
     contentLoadChildNodes: boolean;
     mediaIds: Array<string>;
     mediaLoadChildNodes: boolean;
+    elementIds?: null | Array<string>;
     documentTypes: Array<string>;
     mediaTypes: Array<string>;
     dataTypes: Array<string>;
@@ -4290,9 +3266,6 @@ export type UserDataModel = {
     value: string;
 };
 
-/**
- * Represents the status of a user data operation.
- */
 export enum UserDataOperationStatusModel {
     SUCCESS = 'Success',
     NOT_FOUND = 'NotFound',
@@ -4307,26 +3280,10 @@ export type UserDataResponseModel = {
     value: string;
 };
 
-/**
- * Represents information about an external login provider and its association with a user.
- */
 export type UserExternalLoginProviderModel = {
-    /**
-     * Gets the authentication scheme name of the external login provider.
-     */
     providerSchemeName: string;
-    /**
-     * Gets or sets the provider-specific key identifying the user with this provider.
-     * The provider key, or `null` if the user is not linked to this provider.
-     */
     providerKey: null | string;
-    /**
-     * Gets a value indicating whether this external login provider is linked to the user.
-     */
     isLinkedOnUser: boolean;
-    /**
-     * Gets a value indicating whether manual linking is enabled for this provider.
-     */
     hasManualLinkingEnabled: boolean;
 };
 
@@ -4374,17 +3331,11 @@ export type UserItemResponseModel = {
     flags: Array<FlagModel>;
 };
 
-/**
- * Represents the kind or type of user.
- */
 export enum UserKindModel {
     DEFAULT = 'Default',
     API = 'Api'
 }
 
-/**
- * Specifies the field by which to order user query results.
- */
 export enum UserOrderModel {
     USER_NAME = 'UserName',
     LANGUAGE = 'Language',
@@ -4438,9 +3389,6 @@ export type UserSettingsPresentationModel = {
     consentLevels: Array<ConsentLevelPresentationModel>;
 };
 
-/**
- * The state of a user
- */
 export enum UserStateModel {
     ACTIVE = 'Active',
     DISABLED = 'Disabled',
@@ -4450,42 +3398,21 @@ export enum UserStateModel {
     ALL = 'All'
 }
 
-/**
- * Represents information about a two-factor authentication provider and its status for a user.
- */
 export type UserTwoFactorProviderModel = {
-    /**
-     * Gets the name of the two-factor authentication provider.
-     */
     providerName: string;
-    /**
-     * Gets a value indicating whether this two-factor provider is enabled for the user.
-     */
     isEnabledOnUser: boolean;
 };
 
 export type ValidateUpdateDocumentRequestModel = {
     cultures?: null | Array<string>;
     template?: null | ReferenceByIdModel;
-    /**
-     * Gets or sets the collection of property values for the content.
-     */
     values: Array<DocumentValueModel>;
-    /**
-     * Gets or sets the collection of variant models for culture and segment variations.
-     */
     variants: Array<DocumentVariantRequestModel>;
 };
 
 export type ValidateUpdateElementRequestModel = {
     cultures?: null | Array<string>;
-    /**
-     * Gets or sets the collection of property values for the content.
-     */
     values: Array<ElementValueModel>;
-    /**
-     * Gets or sets the collection of variant models for culture and segment variations.
-     */
     variants: Array<ElementVariantRequestModel>;
 };
 
@@ -6793,6 +5720,43 @@ export type GetDocumentByIdReferencedDescendantsResponses = {
 
 export type GetDocumentByIdReferencedDescendantsResponse = GetDocumentByIdReferencedDescendantsResponses[keyof GetDocumentByIdReferencedDescendantsResponses];
 
+export type PutDocumentByIdSortChildrenData = {
+    body: SortDocumentChildrenByFieldRequestModel;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/umbraco/management/api/v1/document/{id}/sort-children';
+};
+
+export type PutDocumentByIdSortChildrenErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type PutDocumentByIdSortChildrenError = PutDocumentByIdSortChildrenErrors[keyof PutDocumentByIdSortChildrenErrors];
+
+export type PutDocumentByIdSortChildrenResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
 export type PutDocumentByIdUnpublishData = {
     body: UnpublishDocumentRequestModel;
     path: {
@@ -6824,6 +5788,43 @@ export type PutDocumentByIdUnpublishErrors = {
 export type PutDocumentByIdUnpublishError = PutDocumentByIdUnpublishErrors[keyof PutDocumentByIdUnpublishErrors];
 
 export type PutDocumentByIdUnpublishResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
+export type PutDocumentByIdUpdateAndPublishData = {
+    body: UpdateAndPublishDocumentRequestModel;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/umbraco/management/api/v1/document/{id}/update-and-publish';
+};
+
+export type PutDocumentByIdUpdateAndPublishErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type PutDocumentByIdUpdateAndPublishError = PutDocumentByIdUpdateAndPublishErrors[keyof PutDocumentByIdUpdateAndPublishErrors];
+
+export type PutDocumentByIdUpdateAndPublishResponses = {
     /**
      * OK
      */
@@ -6887,6 +5888,72 @@ export type GetDocumentConfigurationResponses = {
 };
 
 export type GetDocumentConfigurationResponse = GetDocumentConfigurationResponses[keyof GetDocumentConfigurationResponses];
+
+export type PostDocumentCreateAndPublishData = {
+    body: CreateAndPublishDocumentRequestModel;
+    path?: never;
+    query?: never;
+    url: '/umbraco/management/api/v1/document/create-and-publish';
+};
+
+export type PostDocumentCreateAndPublishErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type PostDocumentCreateAndPublishError = PostDocumentCreateAndPublishErrors[keyof PostDocumentCreateAndPublishErrors];
+
+export type PostDocumentCreateAndPublishResponses = {
+    /**
+     * Created
+     */
+    201: unknown;
+};
+
+export type PutDocumentRootSortChildrenData = {
+    body: SortDocumentChildrenByFieldRequestModel;
+    path?: never;
+    query?: never;
+    url: '/umbraco/management/api/v1/document/root/sort-children';
+};
+
+export type PutDocumentRootSortChildrenErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+};
+
+export type PutDocumentRootSortChildrenError = PutDocumentRootSortChildrenErrors[keyof PutDocumentRootSortChildrenErrors];
+
+export type PutDocumentRootSortChildrenResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
 
 export type PutDocumentSortData = {
     body: SortingRequestModel;
@@ -8569,6 +7636,7 @@ export type GetDocumentTypeAllowedInLibraryData = {
     body?: never;
     path?: never;
     query?: {
+        parentKey?: string;
         skip?: number;
         take?: number;
     };
@@ -9621,6 +8689,41 @@ export type PutElementByIdPublishResponses = {
      */
     200: unknown;
 };
+
+export type GetElementByIdPublishedData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/umbraco/management/api/v1/element/{id}/published';
+};
+
+export type GetElementByIdPublishedErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type GetElementByIdPublishedError = GetElementByIdPublishedErrors[keyof GetElementByIdPublishedErrors];
+
+export type GetElementByIdPublishedResponses = {
+    /**
+     * OK
+     */
+    200: PublishedElementResponseModel;
+};
+
+export type GetElementByIdPublishedResponse = GetElementByIdPublishedResponses[keyof GetElementByIdPublishedResponses];
 
 export type GetElementByIdReferencedByData = {
     body?: never;
@@ -12195,6 +11298,43 @@ export type GetMediaByIdReferencedDescendantsResponses = {
 
 export type GetMediaByIdReferencedDescendantsResponse = GetMediaByIdReferencedDescendantsResponses[keyof GetMediaByIdReferencedDescendantsResponses];
 
+export type PutMediaByIdSortChildrenData = {
+    body: SortMediaChildrenByFieldRequestModel;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/umbraco/management/api/v1/media/{id}/sort-children';
+};
+
+export type PutMediaByIdSortChildrenErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type PutMediaByIdSortChildrenError = PutMediaByIdSortChildrenErrors[keyof PutMediaByIdSortChildrenErrors];
+
+export type PutMediaByIdSortChildrenResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
 export type PutMediaByIdValidateData = {
     body: UpdateMediaRequestModel;
     path: {
@@ -12289,6 +11429,37 @@ export type GetMediaConfigurationResponses = {
 };
 
 export type GetMediaConfigurationResponse = GetMediaConfigurationResponses[keyof GetMediaConfigurationResponses];
+
+export type PutMediaRootSortChildrenData = {
+    body: SortMediaChildrenByFieldRequestModel;
+    path?: never;
+    query?: never;
+    url: '/umbraco/management/api/v1/media/root/sort-children';
+};
+
+export type PutMediaRootSortChildrenErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+};
+
+export type PutMediaRootSortChildrenError = PutMediaRootSortChildrenErrors[keyof PutMediaRootSortChildrenErrors];
+
+export type PutMediaRootSortChildrenResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
 
 export type PutMediaSortData = {
     body: SortingRequestModel;
@@ -16454,6 +15625,10 @@ export type DeleteRedirectManagementByIdData = {
 
 export type DeleteRedirectManagementByIdErrors = {
     /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
      * The resource is protected and requires an authentication token
      */
     401: unknown;
@@ -16461,7 +15636,13 @@ export type DeleteRedirectManagementByIdErrors = {
      * The authenticated user does not have access to this resource
      */
     403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
 };
+
+export type DeleteRedirectManagementByIdError = DeleteRedirectManagementByIdErrors[keyof DeleteRedirectManagementByIdErrors];
 
 export type DeleteRedirectManagementByIdResponses = {
     /**
@@ -19698,7 +18879,7 @@ export type GetUserCurrentPermissionsElementResponses = {
     /**
      * OK
      */
-    200: Array<UserPermissionsResponseModel>;
+    200: UserPermissionsResponseModel;
 };
 
 export type GetUserCurrentPermissionsElementResponse = GetUserCurrentPermissionsElementResponses[keyof GetUserCurrentPermissionsElementResponses];

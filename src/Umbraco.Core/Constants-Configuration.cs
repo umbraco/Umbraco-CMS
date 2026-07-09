@@ -292,6 +292,11 @@ public static partial class Constants
         public const string ConfigDistributedJobs = ConfigPrefix + "DistributedJobs";
 
         /// <summary>
+        ///     The configuration key for scheduled publishing settings.
+        /// </summary>
+        public const string ConfigScheduledPublishing = ConfigPrefix + "ScheduledPublishing";
+
+        /// <summary>
         ///     The configuration key for backoffice token cookie settings.
         /// </summary>
         public const string ConfigBackOfficeTokenCookie = ConfigSecurity + ":BackOfficeTokenCookie";

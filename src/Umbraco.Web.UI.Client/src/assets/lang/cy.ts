@@ -1259,14 +1259,14 @@ export default {
 	},
 	sections: {
 		content: 'Cynnwys',
-		forms: 'Ffurflenni',
+		library: 'Llyfrgell',
 		media: 'Cyfrwng',
 		member: 'Aelodau',
 		packages: 'Pecynnau',
+		marketplace: 'Marchnad',
 		settings: 'Gosodiadau',
 		translation: 'Cyfieithiad',
 		users: 'Defnyddwyr',
-		marketplace: 'Marchnad',
 	},
 	settings: {
 		defaulttemplate: 'Templed diofyn',
@@ -1563,9 +1563,19 @@ export default {
 		chooseChildNode: 'Dewis nod blentyn',
 		compositionsDescription:
 			"Etifeddu tabiau a phriodweddau o fath o ddogfen sy'n bodoli eisoes. Bydd tabiau newydd yn cael eu ychwanegu at y fath o ddogfen bresennol neu eu cyfuno os mae tab gyda enw yr union yr un fath yn bodoli eisoes.",
+		compositionsDescriptionMediaType:
+			"Etifeddu tabiau a phriodweddau o fath o gyfrwng sy'n bodoli eisoes. Bydd tabiau newydd yn cael eu ychwanegu at y fath o gyfrwng bresennol neu eu cyfuno os mae tab gyda enw yr union yr un fath yn bodoli eisoes.",
+		compositionsDescriptionMemberType:
+			"Etifeddu tabiau a phriodweddau o fath o aelod sy'n bodoli eisoes. Bydd tabiau newydd yn cael eu ychwanegu at y fath o aelod bresennol neu eu cyfuno os mae tab gyda enw yr union yr un fath yn bodoli eisoes.",
 		compositionInUse:
 			"Mae'r math o gynnwys yma wedi'i ddefnyddio mewn cyfansoddiad, felly ni ellir ei gyfansoddi ei hunan.",
+		compositionInUseMediaType:
+			"Mae'r math o gyfrwng yma wedi'i ddefnyddio mewn cyfansoddiad, felly ni ellir ei gyfansoddi ei hunan.",
+		compositionInUseMemberType:
+			"Mae'r math o aelod yma wedi'i ddefnyddio mewn cyfansoddiad, felly ni ellir ei gyfansoddi ei hunan.",
 		noAvailableCompositions: "Nid oes unrhyw fathau o gynnwys ar gael i'w defnyddio fel cyfansoddiad.",
+		noAvailableCompositionsMediaType: "Nid oes unrhyw fathau o gyfrwng ar gael i'w defnyddio fel cyfansoddiad.",
+		noAvailableCompositionsMemberType: "Nid oes unrhyw fathau o aelod ar gael i'w defnyddio fel cyfansoddiad.",
 		compositionRemoveWarning:
 			"Bydd dileu cyfansoddiad yn dileu'r holl ddata eiddo priodwedd gysylltiedig. Ar ôl i chi arbed y math o ddogfen, bydd ddim ffordd nôl.",
 		availableEditors: 'Golygyddion ar gael',
@@ -1603,6 +1613,10 @@ export default {
 		compositionUsageHeading: "Ble mae'r cyfansoddiad yma'n cael ei ddefnyddio?",
 		compositionUsageSpecification:
 			"Mae'r cyfansoddiad yma yn cael ei ddefnyddio'n bresennol yng nghyfansoddiad o'r mathau o gynnwys ganlynol:",
+		compositionUsageSpecificationMediaType:
+			"Mae'r cyfansoddiad yma yn cael ei ddefnyddio'n bresennol yng nghyfansoddiad o'r mathau o gyfrwng ganlynol:",
+		compositionUsageSpecificationMemberType:
+			"Mae'r cyfansoddiad yma yn cael ei ddefnyddio'n bresennol yng nghyfansoddiad o'r mathau o aelod ganlynol:",
 		variantsHeading: 'Caniatáu amrywiadau',
 		cultureVariantHeading: 'Caniatáu amrywiad  yn ôl ddiwylliant',
 		segmentVariantHeading: 'Caniatáu segmentiad',

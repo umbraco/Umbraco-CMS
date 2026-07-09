@@ -5531,6 +5531,129 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/document/{id}/sort-children": {
+      "put": {
+        "tags": [
+          "Document"
+        ],
+        "summary": "Sorts the children of a document by a field.",
+        "description": "Sorts the children of the specified parent document by a system field in the given direction. When sorting by name, an optional culture selects the variant name; the culture is not validated, so children that do not vary by it (or an unrecognised culture) fall back to the invariant name.",
+        "operationId": "PutDocumentByIdSortChildren",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SortDocumentChildrenByFieldRequestModel"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/document/{id}/unpublish": {
       "put": {
         "tags": [
@@ -5555,6 +5678,129 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/UnpublishDocumentRequestModel"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/document/{id}/update-and-publish": {
+      "put": {
+        "tags": [
+          "Document"
+        ],
+        "summary": "Updates and publishes a document.",
+        "description": "Updates and publishes a document identified by the provided Id with the details from the request model.",
+        "operationId": "PutDocumentByIdUpdateAndPublish",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAndPublishDocumentRequestModel"
               }
             }
           },
@@ -5742,6 +5988,221 @@
           },
           "403": {
             "description": "The authenticated user does not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/document/create-and-publish": {
+      "post": {
+        "tags": [
+          "Document"
+        ],
+        "summary": "Creates and publishes a new document.",
+        "description": "Creates and publishes a new document with the configuration specified in the request model.",
+        "operationId": "PostDocumentCreateAndPublish",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAndPublishDocumentRequestModel"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "headers": {
+              "Umb-Generated-Resource": {
+                "description": "Identifier of the newly created resource",
+                "schema": {
+                  "type": "string",
+                  "description": "Identifier of the newly created resource"
+                }
+              },
+              "Location": {
+                "description": "Location of the newly created resource",
+                "schema": {
+                  "type": "string",
+                  "description": "Location of the newly created resource",
+                  "format": "uri"
+                }
+              },
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/document/root/sort-children": {
+      "put": {
+        "tags": [
+          "Document"
+        ],
+        "summary": "Sorts the root-level documents by a field.",
+        "description": "Sorts the root-level documents by a system field in the given direction. When sorting by name, an optional culture selects the variant name; the culture is not validated, so documents that do not vary by it (or an unrecognised culture) fall back to the invariant name.",
+        "operationId": "PutDocumentRootSortChildren",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SortDocumentChildrenByFieldRequestModel"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -9848,6 +10309,14 @@
         "operationId": "GetDocumentTypeAllowedInLibrary",
         "parameters": [
           {
+            "name": "parentKey",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
             "name": "skip",
             "in": "query",
             "schema": {
@@ -12480,6 +12949,60 @@
                 }
               }
             }
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/element/{id}/published": {
+      "get": {
+        "tags": [
+          "Element"
+        ],
+        "summary": "Gets a published element.",
+        "description": "Gets a published element identified by the provided Id.",
+        "operationId": "GetElementByIdPublished",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublishedElementResponseModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource"
           }
         },
         "security": [
@@ -18595,6 +19118,129 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/media/{id}/sort-children": {
+      "put": {
+        "tags": [
+          "Media"
+        ],
+        "summary": "Sorts the children of a media item by a field.",
+        "description": "Sorts the children of the specified parent media item by a system field in the given direction.",
+        "operationId": "PutMediaByIdSortChildren",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SortMediaChildrenByFieldRequestModel"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/media/{id}/validate": {
       "put": {
         "tags": [
@@ -18806,6 +19452,94 @@
           },
           "403": {
             "description": "The authenticated user does not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/media/root/sort-children": {
+      "put": {
+        "tags": [
+          "Media"
+        ],
+        "summary": "Sorts the root-level media items by a field.",
+        "description": "Sorts the root-level media items by a system field in the given direction.",
+        "operationId": "PutMediaRootSortChildren",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SortMediaChildrenByFieldRequestModel"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -28641,6 +29375,54 @@
               }
             }
           },
+          "400": {
+            "description": "Bad Request",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
           "401": {
             "description": "The resource is protected and requires an authentication token"
           },
@@ -33086,7 +33868,7 @@
         "operationId": "PostTemporaryFile",
         "requestBody": {
           "content": {
-            "application/x-www-form-urlencoded": {
+            "multipart/form-data": {
               "schema": {
                 "type": "object",
                 "properties": {
@@ -35964,6 +36746,8 @@
         "tags": [
           "User"
         ],
+        "summary": "Gets element permissions for the current user.",
+        "description": "Gets the element permissions for the currently authenticated user.",
         "operationId": "GetUserCurrentPermissionsElement",
         "parameters": [
           {
@@ -35984,10 +36768,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/UserPermissionsResponseModel"
-                  }
+                  "$ref": "#/components/schemas/UserPermissionsResponseModel"
                 }
               }
             }
@@ -39031,8 +39812,7 @@
           "Custom",
           "ContentVersionPreventCleanup",
           "ContentVersionEnableCleanup"
-        ],
-        "description": "Defines audit types."
+        ]
       },
       "AvailableDocumentTypeCompositionResponseModel": {
         "required": [
@@ -39297,6 +40077,13 @@
           }
         }
       },
+      "ContentSortFieldModel": {
+        "enum": [
+          "Name",
+          "CreateDate",
+          "UpdateDate"
+        ]
+      },
       "CopyDataTypeRequestModel": {
         "type": "object",
         "properties": {
@@ -39394,6 +40181,66 @@
                 "$ref": "#/components/schemas/ReferenceByIdModel"
               }
             ]
+          }
+        }
+      },
+      "CreateAndPublishDocumentRequestModel": {
+        "required": [
+          "template",
+          "documentType",
+          "culturesToPublish",
+          "values",
+          "variants"
+        ],
+        "type": "object",
+        "properties": {
+          "culturesToPublish": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "template": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ]
+          },
+          "documentType": {
+            "$ref": "#/components/schemas/ReferenceByIdModel"
+          },
+          "parent": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ]
+          },
+          "id": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "values": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DocumentValueModel"
+            }
+          },
+          "variants": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DocumentVariantRequestModel"
+            }
           }
         }
       },
@@ -39539,15 +40386,13 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DocumentValueModel"
-            },
-            "description": "Gets or sets the collection of property values for the content."
+            }
           },
           "variants": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DocumentVariantRequestModel"
-            },
-            "description": "Gets or sets the collection of variant models for culture and segment variations."
+            }
           }
         }
       },
@@ -39594,15 +40439,13 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DocumentValueModel"
-            },
-            "description": "Gets or sets the collection of property values for the content."
+            }
           },
           "variants": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DocumentVariantRequestModel"
-            },
-            "description": "Gets or sets the collection of variant models for culture and segment variations."
+            }
           }
         }
       },
@@ -39876,15 +40719,13 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/ElementValueModel"
-            },
-            "description": "Gets or sets the collection of property values for the content."
+            }
           },
           "variants": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/ElementVariantRequestModel"
-            },
-            "description": "Gets or sets the collection of variant models for culture and segment variations."
+            }
           }
         }
       },
@@ -39996,15 +40837,13 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/MediaValueModel"
-            },
-            "description": "Gets or sets the collection of property values for the content."
+            }
           },
           "variants": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/MediaVariantRequestModel"
-            },
-            "description": "Gets or sets the collection of variant models for culture and segment variations."
+            }
           }
         }
       },
@@ -40272,15 +41111,13 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/MemberValueModel"
-            },
-            "description": "Gets or sets the collection of property values for the content."
+            }
           },
           "variants": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/MemberVariantRequestModel"
-            },
-            "description": "Gets or sets the collection of variant models for culture and segment variations."
+            }
           }
         }
       },
@@ -40529,6 +41366,16 @@
           },
           "mediaLoadChildNodes": {
             "type": "boolean"
+          },
+          "elementIds": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
           },
           "documentTypes": {
             "type": "array",
@@ -41290,8 +42137,7 @@
           "True",
           "False",
           "FalseWithHelpText"
-        ],
-        "description": "Specifies the mode for allowing data type changes after they have been used."
+        ]
       },
       "DatatypeConfigurationResponseModel": {
         "required": [
@@ -41640,8 +42486,7 @@
         "enum": [
           "Ascending",
           "Descending"
-        ],
-        "description": "Defines the direction for sorting operations."
+        ]
       },
       "DisableUserRequestModel": {
         "required": [
@@ -41711,15 +42556,13 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DocumentValueResponseModel"
-            },
-            "description": "Gets or sets the collection of property values for the content."
+            }
           },
           "variants": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DocumentVariantResponseModel"
-            },
-            "description": "Gets or sets the collection of variant models for culture and segment variations."
+            }
           }
         }
       },
@@ -41837,15 +42680,13 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DocumentValueResponseModel"
-            },
-            "description": "Gets or sets the collection of property values for the content."
+            }
           },
           "variants": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DocumentVariantResponseModel"
-            },
-            "description": "Gets or sets the collection of variant models for culture and segment variations."
+            }
           }
         }
       },
@@ -42026,15 +42867,13 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DocumentValueResponseModel"
-            },
-            "description": "Gets or sets the collection of property values for the content."
+            }
           },
           "variants": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DocumentVariantResponseModel"
-            },
-            "description": "Gets or sets the collection of variant models for culture and segment variations."
+            }
           }
         }
       },
@@ -42698,23 +43537,18 @@
             "type": [
               "null",
               "string"
-            ],
-            "description": "Gets or sets the culture code for this value, or `null` for invariant properties."
+            ]
           },
           "segment": {
             "type": [
               "null",
               "string"
-            ],
-            "description": "Gets or sets the segment identifier for this value, or `null` for non-segmented properties."
+            ]
           },
           "alias": {
-            "type": "string",
-            "description": "Gets or sets the property type alias."
+            "type": "string"
           },
-          "value": {
-            "description": "Gets or sets the property value."
-          }
+          "value": { }
         }
       },
       "DocumentValueResponseModel": {
@@ -42725,30 +43559,24 @@
         "type": "object",
         "properties": {
           "editorAlias": {
-            "type": "string",
-            "description": "Gets or sets the alias of the property editor used for this value."
+            "type": "string"
           },
           "culture": {
             "type": [
               "null",
               "string"
-            ],
-            "description": "Gets or sets the culture code for this value, or `null` for invariant properties."
+            ]
           },
           "segment": {
             "type": [
               "null",
               "string"
-            ],
-            "description": "Gets or sets the segment identifier for this value, or `null` for non-segmented properties."
+            ]
           },
           "alias": {
-            "type": "string",
-            "description": "Gets or sets the property type alias."
+            "type": "string"
           },
-          "value": {
-            "description": "Gets or sets the property value."
-          }
+          "value": { }
         }
       },
       "DocumentVariantItemResponseModel": {
@@ -42794,19 +43622,16 @@
             "type": [
               "null",
               "string"
-            ],
-            "description": "Gets or sets the culture code for this variant, or `null` for invariant content."
+            ]
           },
           "segment": {
             "type": [
               "null",
               "string"
-            ],
-            "description": "Gets or sets the segment identifier for this variant, or `null` for non-segmented content."
+            ]
           },
           "name": {
-            "type": "string",
-            "description": "Gets or sets the name of the content for this variant."
+            "type": "string"
           }
         }
       },
@@ -42867,19 +43692,16 @@
             "type": [
               "null",
               "string"
-            ],
-            "description": "Gets or sets the culture code for this variant, or `null` for invariant content."
+            ]
           },
           "segment": {
             "type": [
               "null",
               "string"
-            ],
-            "description": "Gets or sets the segment identifier for this variant, or `null` for non-segmented content."
+            ]
           },
           "name": {
-            "type": "string",
-            "description": "Gets or sets the name of the content for this variant."
+            "type": "string"
           }
         }
       },
@@ -42961,15 +43783,13 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DocumentValueResponseModel"
-            },
-            "description": "Gets or sets the collection of property values for the content."
+            }
           },
           "variants": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DocumentVariantResponseModel"
-            },
-            "description": "Gets or sets the collection of variant models for culture and segment variations."
+            }
           }
         }
       },
@@ -43281,15 +44101,13 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/ElementValueResponseModel"
-            },
-            "description": "Gets or sets the collection of property values for the content."
+            }
           },
           "variants": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/ElementVariantResponseModel"
-            },
-            "description": "Gets or sets the collection of variant models for culture and segment variations."
+            }
           }
         }
       },
@@ -43370,23 +44188,18 @@
             "type": [
               "null",
               "string"
-            ],
-            "description": "Gets or sets the culture code for this value, or `null` for invariant properties."
+            ]
           },
           "segment": {
             "type": [
               "null",
               "string"
-            ],
-            "description": "Gets or sets the segment identifier for this value, or `null` for non-segmented properties."
+            ]
           },
           "alias": {
-            "type": "string",
-            "description": "Gets or sets the property type alias."
+            "type": "string"
           },
-          "value": {
-            "description": "Gets or sets the property value."
-          }
+          "value": { }
         }
       },
       "ElementValueResponseModel": {
@@ -43397,30 +44210,24 @@
         "type": "object",
         "properties": {
           "editorAlias": {
-            "type": "string",
-            "description": "Gets or sets the alias of the property editor used for this value."
+            "type": "string"
           },
           "culture": {
             "type": [
               "null",
               "string"
-            ],
-            "description": "Gets or sets the culture code for this value, or `null` for invariant properties."
+            ]
           },
           "segment": {
             "type": [
               "null",
               "string"
-            ],
-            "description": "Gets or sets the segment identifier for this value, or `null` for non-segmented properties."
+            ]
           },
           "alias": {
-            "type": "string",
-            "description": "Gets or sets the property type alias."
+            "type": "string"
           },
-          "value": {
-            "description": "Gets or sets the property value."
-          }
+          "value": { }
         }
       },
       "ElementVariantItemResponseModel": {
@@ -43466,19 +44273,16 @@
             "type": [
               "null",
               "string"
-            ],
-            "description": "Gets or sets the culture code for this variant, or `null` for invariant content."
+            ]
           },
           "segment": {
             "type": [
               "null",
               "string"
-            ],
-            "description": "Gets or sets the segment identifier for this variant, or `null` for non-segmented content."
+            ]
           },
           "name": {
-            "type": "string",
-            "description": "Gets or sets the name of the content for this variant."
+            "type": "string"
           }
         }
       },
@@ -43539,19 +44343,16 @@
             "type": [
               "null",
               "string"
-            ],
-            "description": "Gets or sets the culture code for this variant, or `null` for invariant content."
+            ]
           },
           "segment": {
             "type": [
               "null",
               "string"
-            ],
-            "description": "Gets or sets the segment identifier for this variant, or `null` for non-segmented content."
+            ]
           },
           "name": {
-            "type": "string",
-            "description": "Gets or sets the name of the content for this variant."
+            "type": "string"
           }
         }
       },
@@ -43633,15 +44434,13 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/ElementValueResponseModel"
-            },
-            "description": "Gets or sets the collection of property values for the content."
+            }
           },
           "variants": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/ElementVariantResponseModel"
-            },
-            "description": "Gets or sets the collection of variant models for culture and segment variations."
+            }
           }
         }
       },
@@ -43705,8 +44504,7 @@
           "Error",
           "Success",
           "Warning"
-        ],
-        "description": "The type of event message"
+        ]
       },
       "FetchResponseModelDataTypeSchemaItemResponseModel": {
         "required": [
@@ -44656,7 +45454,6 @@
             "$ref": "#/components/schemas/ISetupTwoFactorModelNoopSetupTwoFactorModel"
           }
         ],
-        "description": "Marker interface that is used to setup different two factor methods. The interface ensures the openapi docs will show all possible implementations.",
         "discriminator": {
           "propertyName": "$type",
           "mapping": {
@@ -44675,8 +45472,7 @@
             ],
             "type": "string"
           }
-        },
-        "description": "A No-operation implementation of the ISetupTwoFactorModel."
+        }
       },
       "ItemAncestorsResponseModelDocumentItemResponseModel": {
         "required": [
@@ -44904,8 +45700,7 @@
           "Warning",
           "Error",
           "Fatal"
-        ],
-        "description": "Specifies the level of a log event."
+        ]
       },
       "LogMessagePropertyPresentationModel": {
         "required": [
@@ -45005,6 +45800,12 @@
               "string"
             ]
           },
+          "cacheBuster": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
           "extensions": {
             "type": "array"
           }
@@ -45048,15 +45849,13 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/MediaValueResponseModel"
-            },
-            "description": "Gets or sets the collection of property values for the content."
+            }
           },
           "variants": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/MediaVariantResponseModel"
-            },
-            "description": "Gets or sets the collection of variant models for culture and segment variations."
+            }
           }
         }
       },
@@ -45196,15 +45995,13 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/MediaValueResponseModel"
-            },
-            "description": "Gets or sets the collection of property values for the content."
+            }
           },
           "variants": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/MediaVariantResponseModel"
-            },
-            "description": "Gets or sets the collection of variant models for culture and segment variations."
+            }
           }
         }
       },
@@ -45755,23 +46552,18 @@
             "type": [
               "null",
               "string"
-            ],
-            "description": "Gets or sets the culture code for this value, or `null` for invariant properties."
+            ]
           },
           "segment": {
             "type": [
               "null",
               "string"
-            ],
-            "description": "Gets or sets the segment identifier for this value, or `null` for non-segmented properties."
+            ]
           },
           "alias": {
-            "type": "string",
-            "description": "Gets or sets the property type alias."
+            "type": "string"
           },
-          "value": {
-            "description": "Gets or sets the property value."
-          }
+          "value": { }
         }
       },
       "MediaValueResponseModel": {
@@ -45782,30 +46574,24 @@
         "type": "object",
         "properties": {
           "editorAlias": {
-            "type": "string",
-            "description": "Gets or sets the alias of the property editor used for this value."
+            "type": "string"
           },
           "culture": {
             "type": [
               "null",
               "string"
-            ],
-            "description": "Gets or sets the culture code for this value, or `null` for invariant properties."
+            ]
           },
           "segment": {
             "type": [
               "null",
               "string"
-            ],
-            "description": "Gets or sets the segment identifier for this value, or `null` for non-segmented properties."
+            ]
           },
           "alias": {
-            "type": "string",
-            "description": "Gets or sets the property type alias."
+            "type": "string"
           },
-          "value": {
-            "description": "Gets or sets the property value."
-          }
+          "value": { }
         }
       },
       "MediaVariantRequestModel": {
@@ -45818,19 +46604,16 @@
             "type": [
               "null",
               "string"
-            ],
-            "description": "Gets or sets the culture code for this variant, or `null` for invariant content."
+            ]
           },
           "segment": {
             "type": [
               "null",
               "string"
-            ],
-            "description": "Gets or sets the segment identifier for this variant, or `null` for non-segmented content."
+            ]
           },
           "name": {
-            "type": "string",
-            "description": "Gets or sets the name of the content for this variant."
+            "type": "string"
           }
         }
       },
@@ -45854,19 +46637,16 @@
             "type": [
               "null",
               "string"
-            ],
-            "description": "Gets or sets the culture code for this variant, or `null` for invariant content."
+            ]
           },
           "segment": {
             "type": [
               "null",
               "string"
-            ],
-            "description": "Gets or sets the segment identifier for this variant, or `null` for non-segmented content."
+            ]
           },
           "name": {
-            "type": "string",
-            "description": "Gets or sets the name of the content for this variant."
+            "type": "string"
           }
         }
       },
@@ -45948,8 +46728,7 @@
           "Default",
           "Api",
           "ExternalOnly"
-        ],
-        "description": "Represents the kind or type of member."
+        ]
       },
       "MemberResponseModel": {
         "required": [
@@ -46042,15 +46821,13 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/MemberValueResponseModel"
-            },
-            "description": "Gets or sets the collection of property values for the content."
+            }
           },
           "variants": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/MemberVariantResponseModel"
-            },
-            "description": "Gets or sets the collection of variant models for culture and segment variations."
+            }
           }
         }
       },
@@ -46448,23 +47225,18 @@
             "type": [
               "null",
               "string"
-            ],
-            "description": "Gets or sets the culture code for this value, or `null` for invariant properties."
+            ]
           },
           "segment": {
             "type": [
               "null",
               "string"
-            ],
-            "description": "Gets or sets the segment identifier for this value, or `null` for non-segmented properties."
+            ]
           },
           "alias": {
-            "type": "string",
-            "description": "Gets or sets the property type alias."
+            "type": "string"
           },
-          "value": {
-            "description": "Gets or sets the property value."
-          }
+          "value": { }
         }
       },
       "MemberValueResponseModel": {
@@ -46475,30 +47247,24 @@
         "type": "object",
         "properties": {
           "editorAlias": {
-            "type": "string",
-            "description": "Gets or sets the alias of the property editor used for this value."
+            "type": "string"
           },
           "culture": {
             "type": [
               "null",
               "string"
-            ],
-            "description": "Gets or sets the culture code for this value, or `null` for invariant properties."
+            ]
           },
           "segment": {
             "type": [
               "null",
               "string"
-            ],
-            "description": "Gets or sets the segment identifier for this value, or `null` for non-segmented properties."
+            ]
           },
           "alias": {
-            "type": "string",
-            "description": "Gets or sets the property type alias."
+            "type": "string"
           },
-          "value": {
-            "description": "Gets or sets the property value."
-          }
+          "value": { }
         }
       },
       "MemberVariantRequestModel": {
@@ -46511,19 +47277,16 @@
             "type": [
               "null",
               "string"
-            ],
-            "description": "Gets or sets the culture code for this variant, or `null` for invariant content."
+            ]
           },
           "segment": {
             "type": [
               "null",
               "string"
-            ],
-            "description": "Gets or sets the segment identifier for this variant, or `null` for non-segmented content."
+            ]
           },
           "name": {
-            "type": "string",
-            "description": "Gets or sets the name of the content for this variant."
+            "type": "string"
           }
         }
       },
@@ -46547,19 +47310,16 @@
             "type": [
               "null",
               "string"
-            ],
-            "description": "Gets or sets the culture code for this variant, or `null` for invariant content."
+            ]
           },
           "segment": {
             "type": [
               "null",
               "string"
-            ],
-            "description": "Gets or sets the segment identifier for this variant, or `null` for non-segmented content."
+            ]
           },
           "name": {
-            "type": "string",
-            "description": "Gets or sets the name of the content for this variant."
+            "type": "string"
           }
         }
       },
@@ -46931,8 +47691,7 @@
           "LessThanEqualTo",
           "GreaterThan",
           "GreaterThanEqualTo"
-        ],
-        "description": "Represents the comparison operators available for template query conditions."
+        ]
       },
       "OutOfDateStatusResponseModel": {
         "required": [
@@ -46950,8 +47709,7 @@
           "OutOfDate",
           "Current",
           "Unknown"
-        ],
-        "description": "Defines the status of whether something is up to date."
+        ]
       },
       "PackageConfigurationResponseModel": {
         "required": [
@@ -47012,6 +47770,16 @@
           },
           "mediaLoadChildNodes": {
             "type": "boolean"
+          },
+          "elementIds": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
           },
           "documentTypes": {
             "type": "array",
@@ -47093,18 +47861,15 @@
         "properties": {
           "total": {
             "type": "integer",
-            "description": "Gets or sets the total number of items available.",
             "format": "int64"
           },
           "items": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/AllowedDocumentTypeModel"
-            },
-            "description": "Gets or sets the items in the current page."
+            }
           }
-        },
-        "description": "Represents a paged collection of items with total count."
+        }
       },
       "PagedAllowedMediaTypeModel": {
         "required": [
@@ -47115,18 +47880,15 @@
         "properties": {
           "total": {
             "type": "integer",
-            "description": "Gets or sets the total number of items available.",
             "format": "int64"
           },
           "items": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/AllowedMediaTypeModel"
-            },
-            "description": "Gets or sets the items in the current page."
+            }
           }
-        },
-        "description": "Represents a paged collection of items with total count."
+        }
       },
       "PagedAllowedMemberTypeModel": {
         "required": [
@@ -47137,18 +47899,15 @@
         "properties": {
           "total": {
             "type": "integer",
-            "description": "Gets or sets the total number of items available.",
             "format": "int64"
           },
           "items": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/AllowedMemberTypeModel"
-            },
-            "description": "Gets or sets the items in the current page."
+            }
           }
-        },
-        "description": "Represents a paged collection of items with total count."
+        }
       },
       "PagedAuditLogResponseModel": {
         "required": [
@@ -47159,18 +47918,15 @@
         "properties": {
           "total": {
             "type": "integer",
-            "description": "Gets or sets the total number of items available.",
             "format": "int64"
           },
           "items": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/AuditLogResponseModel"
-            },
-            "description": "Gets or sets the items in the current page."
+            }
           }
-        },
-        "description": "Represents a paged collection of items with total count."
+        }
       },
       "PagedCultureReponseModel": {
         "required": [
@@ -47181,18 +47937,15 @@
         "properties": {
           "total": {
             "type": "integer",
-            "description": "Gets or sets the total number of items available.",
             "format": "int64"
           },
           "items": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/CultureReponseModel"
-            },
-            "description": "Gets or sets the items in the current page."
+            }
           }
-        },
-        "description": "Represents a paged collection of items with total count."
+        }
       },
       "PagedDataTypeItemResponseModel": {
         "required": [
@@ -47203,18 +47956,15 @@
         "properties": {
           "total": {
             "type": "integer",
-            "description": "Gets or sets the total number of items available.",
             "format": "int64"
           },
           "items": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DataTypeItemResponseModel"
-            },
-            "description": "Gets or sets the items in the current page."
+            }
           }
-        },
-        "description": "Represents a paged collection of items with total count."
+        }
       },
       "PagedDataTypeTreeItemResponseModel": {
         "required": [
@@ -47225,18 +47975,15 @@
         "properties": {
           "total": {
             "type": "integer",
-            "description": "Gets or sets the total number of items available.",
             "format": "int64"
           },
           "items": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DataTypeTreeItemResponseModel"
-            },
-            "description": "Gets or sets the items in the current page."
+            }
           }
-        },
-        "description": "Represents a paged collection of items with total count."
+        }
       },
       "PagedDictionaryOverviewResponseModel": {
         "required": [
@@ -47247,18 +47994,15 @@
         "properties": {
           "total": {
             "type": "integer",
-            "description": "Gets or sets the total number of items available.",
             "format": "int64"
           },
           "items": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DictionaryOverviewResponseModel"
-            },
-            "description": "Gets or sets the items in the current page."
+            }
           }
-        },
-        "description": "Represents a paged collection of items with total count."
+        }
       },
       "PagedDocumentBlueprintTreeItemResponseModel": {
         "required": [
@@ -47269,18 +48013,15 @@
         "properties": {
           "total": {
             "type": "integer",
-            "description": "Gets or sets the total number of items available.",
             "format": "int64"
           },
           "items": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DocumentBlueprintTreeItemResponseModel"
-            },
-            "description": "Gets or sets the items in the current page."
+            }
           }
-        },
-        "description": "Represents a paged collection of items with total count."
+        }
       },
       "PagedDocumentCollectionResponseModel": {
         "required": [
@@ -47291,18 +48032,15 @@
         "properties": {
           "total": {
             "type": "integer",
-            "description": "Gets or sets the total number of items available.",
             "format": "int64"
           },
           "items": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DocumentCollectionResponseModel"
-            },
-            "description": "Gets or sets the items in the current page."
+            }
           }
-        },
-        "description": "Represents a paged collection of items with total count."
+        }
       },
       "PagedDocumentRecycleBinItemResponseModel": {
         "required": [
@@ -47313,18 +48051,15 @@
         "properties": {
           "total": {
             "type": "integer",
-            "description": "Gets or sets the total number of items available.",
             "format": "int64"
           },
           "items": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DocumentRecycleBinItemResponseModel"
-            },
-            "description": "Gets or sets the items in the current page."
+            }
           }
-        },
-        "description": "Represents a paged collection of items with total count."
+        }
       },
       "PagedDocumentTreeItemResponseModel": {
         "required": [
@@ -47335,18 +48070,15 @@
         "properties": {
           "total": {
             "type": "integer",
-            "description": "Gets or sets the total number of items available.",
             "format": "int64"
           },
           "items": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DocumentTreeItemResponseModel"
-            },
-            "description": "Gets or sets the items in the current page."
+            }
           }
-        },
-        "description": "Represents a paged collection of items with total count."
+        }
       },
       "PagedDocumentTypeBlueprintItemResponseModel": {
         "required": [
@@ -47357,18 +48089,15 @@
         "properties": {
           "total": {
             "type": "integer",
-            "description": "Gets or sets the total number of items available.",
             "format": "int64"
           },
           "items": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DocumentTypeBlueprintItemResponseModel"
-            },
-            "description": "Gets or sets the items in the current page."
+            }
           }
-        },
-        "description": "Represents a paged collection of items with total count."
+        }
       },
       "PagedDocumentTypeTreeItemResponseModel": {
         "required": [
@@ -47379,18 +48108,15 @@
         "properties": {
           "total": {
             "type": "integer",
-            "description": "Gets or sets the total number of items available.",
             "format": "int64"
           },
           "items": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DocumentTypeTreeItemResponseModel"
-            },
-            "description": "Gets or sets the items in the current page."
+            }
           }
-        },
-        "description": "Represents a paged collection of items with total count."
+        }
       },
       "PagedDocumentVersionItemResponseModel": {
         "required": [
@@ -47401,18 +48127,15 @@
         "properties": {
           "total": {
             "type": "integer",
-            "description": "Gets or sets the total number of items available.",
             "format": "int64"
           },
           "items": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DocumentVersionItemResponseModel"
-            },
-            "description": "Gets or sets the items in the current page."
+            }
           }
-        },
-        "description": "Represents a paged collection of items with total count."
+        }
       },
       "PagedElementRecycleBinItemResponseModel": {
         "required": [
@@ -47423,18 +48146,15 @@
         "properties": {
           "total": {
             "type": "integer",
-            "description": "Gets or sets the total number of items available.",
             "format": "int64"
           },
           "items": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/ElementRecycleBinItemResponseModel"
-            },
-            "description": "Gets or sets the items in the current page."
+            }
           }
-        },
-        "description": "Represents a paged collection of items with total count."
+        }
       },
       "PagedElementTreeItemResponseModel": {
         "required": [
@@ -47445,18 +48165,15 @@
         "properties": {
           "total": {
             "type": "integer",
-            "description": "Gets or sets the total number of items available.",
             "format": "int64"
           },
           "items": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/ElementTreeItemResponseModel"
-            },
-            "description": "Gets or sets the items in the current page."
+            }
           }
-        },
-        "description": "Represents a paged collection of items with total count."
+        }
       },
       "PagedElementVersionItemResponseModel": {
         "required": [
@@ -47467,18 +48184,15 @@
         "properties": {
           "total": {
             "type": "integer",
-            "description": "Gets or sets the total number of items available.",
             "format": "int64"
           },
           "items": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/ElementVersionItemResponseModel"
-            },
-            "description": "Gets or sets the items in the current page."
+            }
           }
-        },
-        "description": "Represents a paged collection of items with total count."
+        }
       },
       "PagedFileSystemTreeItemPresentationModel": {
         "required": [
@@ -47489,18 +48203,15 @@
         "properties": {
           "total": {
             "type": "integer",
-            "description": "Gets or sets the total number of items available.",
             "format": "int64"
           },
           "items": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/FileSystemTreeItemPresentationModel"
-            },
-            "description": "Gets or sets the items in the current page."
+            }
           }
-        },
-        "description": "Represents a paged collection of items with total count."
+        }
       },
       "PagedHealthCheckGroupResponseModel": {
         "required": [
@@ -47511,18 +48222,15 @@
         "properties": {
           "total": {
             "type": "integer",
-            "description": "Gets or sets the total number of items available.",
             "format": "int64"
           },
           "items": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/HealthCheckGroupResponseModel"
-            },
-            "description": "Gets or sets the items in the current page."
+            }
           }
-        },
-        "description": "Represents a paged collection of items with total count."
+        }
       },
       "PagedHelpPageResponseModel": {
         "required": [
@@ -47533,18 +48241,15 @@
         "properties": {
           "total": {
             "type": "integer",
-            "description": "Gets or sets the total number of items available.",
             "format": "int64"
           },
           "items": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/HelpPageResponseModel"
-            },
-            "description": "Gets or sets the items in the current page."
+            }
           }
-        },
-        "description": "Represents a paged collection of items with total count."
+        }
       },
       "PagedIReferenceResponseModel": {
         "required": [
@@ -47555,18 +48260,15 @@
         "properties": {
           "total": {
             "type": "integer",
-            "description": "Gets or sets the total number of items available.",
             "format": "int64"
           },
           "items": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/IReferenceResponseModel"
-            },
-            "description": "Gets or sets the items in the current page."
+            }
           }
-        },
-        "description": "Represents a paged collection of items with total count."
+        }
       },
       "PagedLanguageResponseModel": {
         "required": [
@@ -47577,18 +48279,15 @@
         "properties": {
           "total": {
             "type": "integer",
-            "description": "Gets or sets the total number of items available.",
             "format": "int64"
           },
           "items": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/LanguageResponseModel"
-            },
-            "description": "Gets or sets the items in the current page."
+            }
           }
-        },
-        "description": "Represents a paged collection of items with total count."
+        }
       },
       "PagedLoggerResponseModel": {
         "required": [
@@ -47599,18 +48298,15 @@
         "properties": {
           "total": {
             "type": "integer",
-            "description": "Gets or sets the total number of items available.",
             "format": "int64"
           },
           "items": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/LoggerResponseModel"
-            },
-            "description": "Gets or sets the items in the current page."
+            }
           }
-        },
-        "description": "Represents a paged collection of items with total count."
+        }
       },
       "PagedLogMessageResponseModel": {
         "required": [
@@ -47621,18 +48317,15 @@
         "properties": {
           "total": {
             "type": "integer",
-            "description": "Gets or sets the total number of items available.",
             "format": "int64"
           },
           "items": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/LogMessageResponseModel"
-            },
-            "description": "Gets or sets the items in the current page."
+            }
           }
-        },
-        "description": "Represents a paged collection of items with total count."
+        }
       },
       "PagedLogTemplateResponseModel": {
         "required": [
@@ -47643,18 +48336,15 @@
         "properties": {
           "total": {
             "type": "integer",
-            "description": "Gets or sets the total number of items available.",
             "format": "int64"
           },
           "items": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/LogTemplateResponseModel"
-            },
-            "description": "Gets or sets the items in the current page."
+            }
           }
-        },
-        "description": "Represents a paged collection of items with total count."
+        }
       },
       "PagedMediaCollectionResponseModel": {
         "required": [
@@ -47665,18 +48355,15 @@
         "properties": {
           "total": {
             "type": "integer",
-            "description": "Gets or sets the total number of items available.",
             "format": "int64"
           },
           "items": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/MediaCollectionResponseModel"
-            },
-            "description": "Gets or sets the items in the current page."
+            }
           }
-        },
-        "description": "Represents a paged collection of items with total count."
+        }
       },
       "PagedMediaRecycleBinItemResponseModel": {
         "required": [
@@ -47687,18 +48374,15 @@
         "properties": {
           "total": {
             "type": "integer",
-            "description": "Gets or sets the total number of items available.",
             "format": "int64"
           },
           "items": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/MediaRecycleBinItemResponseModel"
-            },
-            "description": "Gets or sets the items in the current page."
+            }
           }
-        },
-        "description": "Represents a paged collection of items with total count."
+        }
       },
       "PagedMediaTreeItemResponseModel": {
         "required": [
@@ -47709,18 +48393,15 @@
         "properties": {
           "total": {
             "type": "integer",
-            "description": "Gets or sets the total number of items available.",
             "format": "int64"
           },
           "items": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/MediaTreeItemResponseModel"
-            },
-            "description": "Gets or sets the items in the current page."
+            }
           }
-        },
-        "description": "Represents a paged collection of items with total count."
+        }
       },
       "PagedMediaTypeTreeItemResponseModel": {
         "required": [
@@ -47731,18 +48412,15 @@
         "properties": {
           "total": {
             "type": "integer",
-            "description": "Gets or sets the total number of items available.",
             "format": "int64"
           },
           "items": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/MediaTypeTreeItemResponseModel"
-            },
-            "description": "Gets or sets the items in the current page."
+            }
           }
-        },
-        "description": "Represents a paged collection of items with total count."
+        }
       },
       "PagedMemberGroupResponseModel": {
         "required": [
@@ -47753,18 +48431,15 @@
         "properties": {
           "total": {
             "type": "integer",
-            "description": "Gets or sets the total number of items available.",
             "format": "int64"
           },
           "items": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/MemberGroupResponseModel"
-            },
-            "description": "Gets or sets the items in the current page."
+            }
           }
-        },
-        "description": "Represents a paged collection of items with total count."
+        }
       },
       "PagedMemberResponseModel": {
         "required": [
@@ -47775,18 +48450,15 @@
         "properties": {
           "total": {
             "type": "integer",
-            "description": "Gets or sets the total number of items available.",
             "format": "int64"
           },
           "items": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/MemberResponseModel"
-            },
-            "description": "Gets or sets the items in the current page."
+            }
           }
-        },
-        "description": "Represents a paged collection of items with total count."
+        }
       },
       "PagedMemberTypeTreeItemResponseModel": {
         "required": [
@@ -47797,18 +48469,15 @@
         "properties": {
           "total": {
             "type": "integer",
-            "description": "Gets or sets the total number of items available.",
             "format": "int64"
           },
           "items": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/MemberTypeTreeItemResponseModel"
-            },
-            "description": "Gets or sets the items in the current page."
+            }
           }
-        },
-        "description": "Represents a paged collection of items with total count."
+        }
       },
       "PagedModelAllowedMediaTypeItemResponseModel": {
         "required": [
@@ -47821,16 +48490,13 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/AllowedMediaTypeItemResponseModel"
-            },
-            "description": "Gets the items for the current page."
+            }
           },
           "total": {
             "type": "integer",
-            "description": "Gets the total number of items available across all pages.",
             "format": "int64"
           }
-        },
-        "description": "Represents a paged collection of items with total count information."
+        }
       },
       "PagedModelDataTypeItemResponseModel": {
         "required": [
@@ -47843,16 +48509,13 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DataTypeItemResponseModel"
-            },
-            "description": "Gets the items for the current page."
+            }
           },
           "total": {
             "type": "integer",
-            "description": "Gets the total number of items available across all pages.",
             "format": "int64"
           }
-        },
-        "description": "Represents a paged collection of items with total count information."
+        }
       },
       "PagedModelDocumentItemResponseModel": {
         "required": [
@@ -47865,16 +48528,13 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DocumentItemResponseModel"
-            },
-            "description": "Gets the items for the current page."
+            }
           },
           "total": {
             "type": "integer",
-            "description": "Gets the total number of items available across all pages.",
             "format": "int64"
           }
-        },
-        "description": "Represents a paged collection of items with total count information."
+        }
       },
       "PagedModelDocumentTypeItemResponseModel": {
         "required": [
@@ -47887,16 +48547,13 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DocumentTypeItemResponseModel"
-            },
-            "description": "Gets the items for the current page."
+            }
           },
           "total": {
             "type": "integer",
-            "description": "Gets the total number of items available across all pages.",
             "format": "int64"
           }
-        },
-        "description": "Represents a paged collection of items with total count information."
+        }
       },
       "PagedModelElementItemResponseModel": {
         "required": [
@@ -47909,16 +48566,13 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/ElementItemResponseModel"
-            },
-            "description": "Gets the items for the current page."
+            }
           },
           "total": {
             "type": "integer",
-            "description": "Gets the total number of items available across all pages.",
             "format": "int64"
           }
-        },
-        "description": "Represents a paged collection of items with total count information."
+        }
       },
       "PagedModelMediaItemResponseModel": {
         "required": [
@@ -47931,16 +48585,13 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/MediaItemResponseModel"
-            },
-            "description": "Gets the items for the current page."
+            }
           },
           "total": {
             "type": "integer",
-            "description": "Gets the total number of items available across all pages.",
             "format": "int64"
           }
-        },
-        "description": "Represents a paged collection of items with total count information."
+        }
       },
       "PagedModelMediaTypeItemResponseModel": {
         "required": [
@@ -47953,16 +48604,13 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/MediaTypeItemResponseModel"
-            },
-            "description": "Gets the items for the current page."
+            }
           },
           "total": {
             "type": "integer",
-            "description": "Gets the total number of items available across all pages.",
             "format": "int64"
           }
-        },
-        "description": "Represents a paged collection of items with total count information."
+        }
       },
       "PagedModelMemberItemResponseModel": {
         "required": [
@@ -47975,16 +48623,13 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/MemberItemResponseModel"
-            },
-            "description": "Gets the items for the current page."
+            }
           },
           "total": {
             "type": "integer",
-            "description": "Gets the total number of items available across all pages.",
             "format": "int64"
           }
-        },
-        "description": "Represents a paged collection of items with total count information."
+        }
       },
       "PagedModelMemberTypeItemResponseModel": {
         "required": [
@@ -47997,16 +48642,13 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/MemberTypeItemResponseModel"
-            },
-            "description": "Gets the items for the current page."
+            }
           },
           "total": {
             "type": "integer",
-            "description": "Gets the total number of items available across all pages.",
             "format": "int64"
           }
-        },
-        "description": "Represents a paged collection of items with total count information."
+        }
       },
       "PagedModelTemplateItemResponseModel": {
         "required": [
@@ -48019,16 +48661,13 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/TemplateItemResponseModel"
-            },
-            "description": "Gets the items for the current page."
+            }
           },
           "total": {
             "type": "integer",
-            "description": "Gets the total number of items available across all pages.",
             "format": "int64"
           }
-        },
-        "description": "Represents a paged collection of items with total count information."
+        }
       },
       "PagedNamedEntityTreeItemResponseModel": {
         "required": [
@@ -48039,18 +48678,15 @@
         "properties": {
           "total": {
             "type": "integer",
-            "description": "Gets or sets the total number of items available.",
             "format": "int64"
           },
           "items": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/NamedEntityTreeItemResponseModel"
-            },
-            "description": "Gets or sets the items in the current page."
+            }
           }
-        },
-        "description": "Represents a paged collection of items with total count."
+        }
       },
       "PagedObjectTypeResponseModel": {
         "required": [
@@ -48061,18 +48697,15 @@
         "properties": {
           "total": {
             "type": "integer",
-            "description": "Gets or sets the total number of items available.",
             "format": "int64"
           },
           "items": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/ObjectTypeResponseModel"
-            },
-            "description": "Gets or sets the items in the current page."
+            }
           }
-        },
-        "description": "Represents a paged collection of items with total count."
+        }
       },
       "PagedPackageDefinitionResponseModel": {
         "required": [
@@ -48083,18 +48716,15 @@
         "properties": {
           "total": {
             "type": "integer",
-            "description": "Gets or sets the total number of items available.",
             "format": "int64"
           },
           "items": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/PackageDefinitionResponseModel"
-            },
-            "description": "Gets or sets the items in the current page."
+            }
           }
-        },
-        "description": "Represents a paged collection of items with total count."
+        }
       },
       "PagedPackageMigrationStatusResponseModel": {
         "required": [
@@ -48105,18 +48735,15 @@
         "properties": {
           "total": {
             "type": "integer",
-            "description": "Gets or sets the total number of items available.",
             "format": "int64"
           },
           "items": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/PackageMigrationStatusResponseModel"
-            },
-            "description": "Gets or sets the items in the current page."
+            }
           }
-        },
-        "description": "Represents a paged collection of items with total count."
+        }
       },
       "PagedPartialViewSnippetItemResponseModel": {
         "required": [
@@ -48127,18 +48754,15 @@
         "properties": {
           "total": {
             "type": "integer",
-            "description": "Gets or sets the total number of items available.",
             "format": "int64"
           },
           "items": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/PartialViewSnippetItemResponseModel"
-            },
-            "description": "Gets or sets the items in the current page."
+            }
           }
-        },
-        "description": "Represents a paged collection of items with total count."
+        }
       },
       "PagedProblemDetailsModel": {
         "required": [
@@ -48149,18 +48773,15 @@
         "properties": {
           "total": {
             "type": "integer",
-            "description": "Gets or sets the total number of items available.",
             "format": "int64"
           },
           "items": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/ProblemDetails"
-            },
-            "description": "Gets or sets the items in the current page."
+            }
           }
-        },
-        "description": "Represents a paged collection of items with total count."
+        }
       },
       "PagedRedirectUrlResponseModel": {
         "required": [
@@ -48171,18 +48792,15 @@
         "properties": {
           "total": {
             "type": "integer",
-            "description": "Gets or sets the total number of items available.",
             "format": "int64"
           },
           "items": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/RedirectUrlResponseModel"
-            },
-            "description": "Gets or sets the items in the current page."
+            }
           }
-        },
-        "description": "Represents a paged collection of items with total count."
+        }
       },
       "PagedReferenceByIdModel": {
         "required": [
@@ -48193,18 +48811,15 @@
         "properties": {
           "total": {
             "type": "integer",
-            "description": "Gets or sets the total number of items available.",
             "format": "int64"
           },
           "items": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/ReferenceByIdModel"
-            },
-            "description": "Gets or sets the items in the current page."
+            }
           }
-        },
-        "description": "Represents a paged collection of items with total count."
+        }
       },
       "PagedRelationResponseModel": {
         "required": [
@@ -48215,18 +48830,15 @@
         "properties": {
           "total": {
             "type": "integer",
-            "description": "Gets or sets the total number of items available.",
             "format": "int64"
           },
           "items": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/RelationResponseModel"
-            },
-            "description": "Gets or sets the items in the current page."
+            }
           }
-        },
-        "description": "Represents a paged collection of items with total count."
+        }
       },
       "PagedRelationTypeResponseModel": {
         "required": [
@@ -48237,18 +48849,15 @@
         "properties": {
           "total": {
             "type": "integer",
-            "description": "Gets or sets the total number of items available.",
             "format": "int64"
           },
           "items": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/RelationTypeResponseModel"
-            },
-            "description": "Gets or sets the items in the current page."
+            }
           }
-        },
-        "description": "Represents a paged collection of items with total count."
+        }
       },
       "PagedSavedLogSearchResponseModel": {
         "required": [
@@ -48259,18 +48868,15 @@
         "properties": {
           "total": {
             "type": "integer",
-            "description": "Gets or sets the total number of items available.",
             "format": "int64"
           },
           "items": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/SavedLogSearchResponseModel"
-            },
-            "description": "Gets or sets the items in the current page."
+            }
           }
-        },
-        "description": "Represents a paged collection of items with total count."
+        }
       },
       "PagedSegmentResponseModel": {
         "required": [
@@ -48281,18 +48887,15 @@
         "properties": {
           "total": {
             "type": "integer",
-            "description": "Gets or sets the total number of items available.",
             "format": "int64"
           },
           "items": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/SegmentResponseModel"
-            },
-            "description": "Gets or sets the items in the current page."
+            }
           }
-        },
-        "description": "Represents a paged collection of items with total count."
+        }
       },
       "PagedTagResponseModel": {
         "required": [
@@ -48303,18 +48906,15 @@
         "properties": {
           "total": {
             "type": "integer",
-            "description": "Gets or sets the total number of items available.",
             "format": "int64"
           },
           "items": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/TagResponseModel"
-            },
-            "description": "Gets or sets the items in the current page."
+            }
           }
-        },
-        "description": "Represents a paged collection of items with total count."
+        }
       },
       "PagedTelemetryResponseModel": {
         "required": [
@@ -48325,18 +48925,15 @@
         "properties": {
           "total": {
             "type": "integer",
-            "description": "Gets or sets the total number of items available.",
             "format": "int64"
           },
           "items": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/TelemetryResponseModel"
-            },
-            "description": "Gets or sets the items in the current page."
+            }
           }
-        },
-        "description": "Represents a paged collection of items with total count."
+        }
       },
       "PagedUserDataResponseModel": {
         "required": [
@@ -48347,18 +48944,15 @@
         "properties": {
           "total": {
             "type": "integer",
-            "description": "Gets or sets the total number of items available.",
             "format": "int64"
           },
           "items": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/UserDataResponseModel"
-            },
-            "description": "Gets or sets the items in the current page."
+            }
           }
-        },
-        "description": "Represents a paged collection of items with total count."
+        }
       },
       "PagedUserGroupResponseModel": {
         "required": [
@@ -48369,18 +48963,15 @@
         "properties": {
           "total": {
             "type": "integer",
-            "description": "Gets or sets the total number of items available.",
             "format": "int64"
           },
           "items": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/UserGroupResponseModel"
-            },
-            "description": "Gets or sets the items in the current page."
+            }
           }
-        },
-        "description": "Represents a paged collection of items with total count."
+        }
       },
       "PagedUserResponseModel": {
         "required": [
@@ -48391,18 +48982,15 @@
         "properties": {
           "total": {
             "type": "integer",
-            "description": "Gets or sets the total number of items available.",
             "format": "int64"
           },
           "items": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/UserResponseModel"
-            },
-            "description": "Gets or sets the items in the current page."
+            }
           }
-        },
-        "description": "Represents a paged collection of items with total count."
+        }
       },
       "PagedWebhookEventModel": {
         "required": [
@@ -48413,18 +49001,15 @@
         "properties": {
           "total": {
             "type": "integer",
-            "description": "Gets or sets the total number of items available.",
             "format": "int64"
           },
           "items": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/WebhookEventModel"
-            },
-            "description": "Gets or sets the items in the current page."
+            }
           }
-        },
-        "description": "Represents a paged collection of items with total count."
+        }
       },
       "PagedWebhookLogResponseModel": {
         "required": [
@@ -48435,18 +49020,15 @@
         "properties": {
           "total": {
             "type": "integer",
-            "description": "Gets or sets the total number of items available.",
             "format": "int64"
           },
           "items": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/WebhookLogResponseModel"
-            },
-            "description": "Gets or sets the items in the current page."
+            }
           }
-        },
-        "description": "Represents a paged collection of items with total count."
+        }
       },
       "PagedWebhookResponseModel": {
         "required": [
@@ -48457,18 +49039,15 @@
         "properties": {
           "total": {
             "type": "integer",
-            "description": "Gets or sets the total number of items available.",
             "format": "int64"
           },
           "items": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/WebhookResponseModel"
-            },
-            "description": "Gets or sets the items in the current page."
+            }
           }
-        },
-        "description": "Represents a paged collection of items with total count."
+        }
       },
       "PartialViewFolderResponseModel": {
         "required": [
@@ -48683,8 +49262,7 @@
         }
       },
       "ProblemDetailsBuilderModel": {
-        "type": "object",
-        "description": "A fluent builder for creating RFC 7807 ProblemDetails responses."
+        "type": "object"
       },
       "ProfilingStatusRequestModel": {
         "required": [
@@ -48892,15 +49470,54 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DocumentValueResponseModel"
-            },
-            "description": "Gets or sets the collection of property values for the content."
+            }
           },
           "variants": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DocumentVariantResponseModel"
-            },
-            "description": "Gets or sets the collection of variant models for culture and segment variations."
+            }
+          }
+        }
+      },
+      "PublishedElementResponseModel": {
+        "required": [
+          "isTrashed",
+          "documentType",
+          "id",
+          "flags",
+          "values",
+          "variants"
+        ],
+        "type": "object",
+        "properties": {
+          "isTrashed": {
+            "type": "boolean"
+          },
+          "documentType": {
+            "$ref": "#/components/schemas/DocumentTypeReferenceResponseModel"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "flags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FlagModel"
+            }
+          },
+          "values": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ElementValueResponseModel"
+            }
+          },
+          "variants": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ElementVariantResponseModel"
+            }
           }
         }
       },
@@ -48949,8 +49566,7 @@
         "enum": [
           "Enabled",
           "Disabled"
-        ],
-        "description": "Represents the status of redirect URL tracking."
+        ]
       },
       "RedirectUrlResponseModel": {
         "required": [
@@ -49244,16 +49860,14 @@
           "Upgrading",
           "Run",
           "BootFailed"
-        ],
-        "description": "Describes the levels in which the runtime can run."
+        ]
       },
       "RuntimeModeModel": {
         "enum": [
           "BackofficeDevelopment",
           "Development",
           "Production"
-        ],
-        "description": "Represents the configured Umbraco runtime mode."
+        ]
       },
       "SavedLogSearchRequestModel": {
         "required": [
@@ -49535,6 +50149,27 @@
           }
         }
       },
+      "SortDocumentChildrenByFieldRequestModel": {
+        "required": [
+          "field",
+          "direction"
+        ],
+        "type": "object",
+        "properties": {
+          "culture": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "field": {
+            "$ref": "#/components/schemas/ContentSortFieldModel"
+          },
+          "direction": {
+            "$ref": "#/components/schemas/DirectionModel"
+          }
+        }
+      },
       "SortingRequestModel": {
         "required": [
           "sorting"
@@ -49556,6 +50191,21 @@
             "items": {
               "$ref": "#/components/schemas/ItemSortingRequestModel"
             }
+          }
+        }
+      },
+      "SortMediaChildrenByFieldRequestModel": {
+        "required": [
+          "field",
+          "direction"
+        ],
+        "type": "object",
+        "properties": {
+          "field": {
+            "$ref": "#/components/schemas/ContentSortFieldModel"
+          },
+          "direction": {
+            "$ref": "#/components/schemas/DirectionModel"
           }
         }
       },
@@ -49594,8 +50244,7 @@
           "Warning",
           "Error",
           "Info"
-        ],
-        "description": "Specifies the result type of a health check status."
+        ]
       },
       "StylesheetFolderResponseModel": {
         "required": [
@@ -49690,23 +50339,19 @@
         "properties": {
           "totalBefore": {
             "type": "integer",
-            "description": "Gets or sets the total number of items before this subset.",
             "format": "int64"
           },
           "totalAfter": {
             "type": "integer",
-            "description": "Gets or sets the total number of items after this subset.",
             "format": "int64"
           },
           "items": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DataTypeTreeItemResponseModel"
-            },
-            "description": "Gets or sets the items in the subset."
+            }
           }
-        },
-        "description": "Represents a subset of items with counts of items before and after the subset."
+        }
       },
       "SubsetDocumentBlueprintTreeItemResponseModel": {
         "required": [
@@ -49718,23 +50363,19 @@
         "properties": {
           "totalBefore": {
             "type": "integer",
-            "description": "Gets or sets the total number of items before this subset.",
             "format": "int64"
           },
           "totalAfter": {
             "type": "integer",
-            "description": "Gets or sets the total number of items after this subset.",
             "format": "int64"
           },
           "items": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DocumentBlueprintTreeItemResponseModel"
-            },
-            "description": "Gets or sets the items in the subset."
+            }
           }
-        },
-        "description": "Represents a subset of items with counts of items before and after the subset."
+        }
       },
       "SubsetDocumentRecycleBinItemResponseModel": {
         "required": [
@@ -49746,23 +50387,19 @@
         "properties": {
           "totalBefore": {
             "type": "integer",
-            "description": "Gets or sets the total number of items before this subset.",
             "format": "int64"
           },
           "totalAfter": {
             "type": "integer",
-            "description": "Gets or sets the total number of items after this subset.",
             "format": "int64"
           },
           "items": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DocumentRecycleBinItemResponseModel"
-            },
-            "description": "Gets or sets the items in the subset."
+            }
           }
-        },
-        "description": "Represents a subset of items with counts of items before and after the subset."
+        }
       },
       "SubsetDocumentTreeItemResponseModel": {
         "required": [
@@ -49774,23 +50411,19 @@
         "properties": {
           "totalBefore": {
             "type": "integer",
-            "description": "Gets or sets the total number of items before this subset.",
             "format": "int64"
           },
           "totalAfter": {
             "type": "integer",
-            "description": "Gets or sets the total number of items after this subset.",
             "format": "int64"
           },
           "items": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DocumentTreeItemResponseModel"
-            },
-            "description": "Gets or sets the items in the subset."
+            }
           }
-        },
-        "description": "Represents a subset of items with counts of items before and after the subset."
+        }
       },
       "SubsetDocumentTypeTreeItemResponseModel": {
         "required": [
@@ -49802,23 +50435,19 @@
         "properties": {
           "totalBefore": {
             "type": "integer",
-            "description": "Gets or sets the total number of items before this subset.",
             "format": "int64"
           },
           "totalAfter": {
             "type": "integer",
-            "description": "Gets or sets the total number of items after this subset.",
             "format": "int64"
           },
           "items": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DocumentTypeTreeItemResponseModel"
-            },
-            "description": "Gets or sets the items in the subset."
+            }
           }
-        },
-        "description": "Represents a subset of items with counts of items before and after the subset."
+        }
       },
       "SubsetElementRecycleBinItemResponseModel": {
         "required": [
@@ -49830,23 +50459,19 @@
         "properties": {
           "totalBefore": {
             "type": "integer",
-            "description": "Gets or sets the total number of items before this subset.",
             "format": "int64"
           },
           "totalAfter": {
             "type": "integer",
-            "description": "Gets or sets the total number of items after this subset.",
             "format": "int64"
           },
           "items": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/ElementRecycleBinItemResponseModel"
-            },
-            "description": "Gets or sets the items in the subset."
+            }
           }
-        },
-        "description": "Represents a subset of items with counts of items before and after the subset."
+        }
       },
       "SubsetElementTreeItemResponseModel": {
         "required": [
@@ -49858,23 +50483,19 @@
         "properties": {
           "totalBefore": {
             "type": "integer",
-            "description": "Gets or sets the total number of items before this subset.",
             "format": "int64"
           },
           "totalAfter": {
             "type": "integer",
-            "description": "Gets or sets the total number of items after this subset.",
             "format": "int64"
           },
           "items": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/ElementTreeItemResponseModel"
-            },
-            "description": "Gets or sets the items in the subset."
+            }
           }
-        },
-        "description": "Represents a subset of items with counts of items before and after the subset."
+        }
       },
       "SubsetFileSystemTreeItemPresentationModel": {
         "required": [
@@ -49886,23 +50507,19 @@
         "properties": {
           "totalBefore": {
             "type": "integer",
-            "description": "Gets or sets the total number of items before this subset.",
             "format": "int64"
           },
           "totalAfter": {
             "type": "integer",
-            "description": "Gets or sets the total number of items after this subset.",
             "format": "int64"
           },
           "items": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/FileSystemTreeItemPresentationModel"
-            },
-            "description": "Gets or sets the items in the subset."
+            }
           }
-        },
-        "description": "Represents a subset of items with counts of items before and after the subset."
+        }
       },
       "SubsetMediaRecycleBinItemResponseModel": {
         "required": [
@@ -49914,23 +50531,19 @@
         "properties": {
           "totalBefore": {
             "type": "integer",
-            "description": "Gets or sets the total number of items before this subset.",
             "format": "int64"
           },
           "totalAfter": {
             "type": "integer",
-            "description": "Gets or sets the total number of items after this subset.",
             "format": "int64"
           },
           "items": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/MediaRecycleBinItemResponseModel"
-            },
-            "description": "Gets or sets the items in the subset."
+            }
           }
-        },
-        "description": "Represents a subset of items with counts of items before and after the subset."
+        }
       },
       "SubsetMediaTreeItemResponseModel": {
         "required": [
@@ -49942,23 +50555,19 @@
         "properties": {
           "totalBefore": {
             "type": "integer",
-            "description": "Gets or sets the total number of items before this subset.",
             "format": "int64"
           },
           "totalAfter": {
             "type": "integer",
-            "description": "Gets or sets the total number of items after this subset.",
             "format": "int64"
           },
           "items": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/MediaTreeItemResponseModel"
-            },
-            "description": "Gets or sets the items in the subset."
+            }
           }
-        },
-        "description": "Represents a subset of items with counts of items before and after the subset."
+        }
       },
       "SubsetMediaTypeTreeItemResponseModel": {
         "required": [
@@ -49970,23 +50579,19 @@
         "properties": {
           "totalBefore": {
             "type": "integer",
-            "description": "Gets or sets the total number of items before this subset.",
             "format": "int64"
           },
           "totalAfter": {
             "type": "integer",
-            "description": "Gets or sets the total number of items after this subset.",
             "format": "int64"
           },
           "items": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/MediaTypeTreeItemResponseModel"
-            },
-            "description": "Gets or sets the items in the subset."
+            }
           }
-        },
-        "description": "Represents a subset of items with counts of items before and after the subset."
+        }
       },
       "SubsetMemberTypeTreeItemResponseModel": {
         "required": [
@@ -49998,23 +50603,19 @@
         "properties": {
           "totalBefore": {
             "type": "integer",
-            "description": "Gets or sets the total number of items before this subset.",
             "format": "int64"
           },
           "totalAfter": {
             "type": "integer",
-            "description": "Gets or sets the total number of items after this subset.",
             "format": "int64"
           },
           "items": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/MemberTypeTreeItemResponseModel"
-            },
-            "description": "Gets or sets the items in the subset."
+            }
           }
-        },
-        "description": "Represents a subset of items with counts of items before and after the subset."
+        }
       },
       "SubsetNamedEntityTreeItemResponseModel": {
         "required": [
@@ -50026,23 +50627,19 @@
         "properties": {
           "totalBefore": {
             "type": "integer",
-            "description": "Gets or sets the total number of items before this subset.",
             "format": "int64"
           },
           "totalAfter": {
             "type": "integer",
-            "description": "Gets or sets the total number of items after this subset.",
             "format": "int64"
           },
           "items": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/NamedEntityTreeItemResponseModel"
-            },
-            "description": "Gets or sets the items in the subset."
+            }
           }
-        },
-        "description": "Represents a subset of items with counts of items before and after the subset."
+        }
       },
       "TagResponseModel": {
         "required": [
@@ -50078,8 +50675,7 @@
           "Minimal",
           "Basic",
           "Detailed"
-        ],
-        "description": "Defines the level of telemetry data to be collected and sent."
+        ]
       },
       "TelemetryRequestModel": {
         "required": [
@@ -50574,6 +51170,44 @@
           }
         }
       },
+      "UpdateAndPublishDocumentRequestModel": {
+        "required": [
+          "culturesToPublish",
+          "values",
+          "variants"
+        ],
+        "type": "object",
+        "properties": {
+          "culturesToPublish": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "template": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ]
+          },
+          "values": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DocumentValueModel"
+            }
+          },
+          "variants": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DocumentVariantRequestModel"
+            }
+          }
+        }
+      },
       "UpdateCurrentUserRequestModel": {
         "required": [
           "languageIsoCode"
@@ -50640,15 +51274,13 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DocumentValueModel"
-            },
-            "description": "Gets or sets the collection of property values for the content."
+            }
           },
           "variants": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DocumentVariantRequestModel"
-            },
-            "description": "Gets or sets the collection of variant models for culture and segment variations."
+            }
           }
         }
       },
@@ -50687,15 +51319,13 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DocumentValueModel"
-            },
-            "description": "Gets or sets the collection of property values for the content."
+            }
           },
           "variants": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DocumentVariantRequestModel"
-            },
-            "description": "Gets or sets the collection of variant models for culture and segment variations."
+            }
           }
         }
       },
@@ -50932,15 +51562,13 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/ElementValueModel"
-            },
-            "description": "Gets or sets the collection of property values for the content."
+            }
           },
           "variants": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/ElementVariantRequestModel"
-            },
-            "description": "Gets or sets the collection of variant models for culture and segment variations."
+            }
           }
         }
       },
@@ -50991,15 +51619,13 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/MediaValueModel"
-            },
-            "description": "Gets or sets the collection of property values for the content."
+            }
           },
           "variants": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/MediaVariantRequestModel"
-            },
-            "description": "Gets or sets the collection of variant models for culture and segment variations."
+            }
           }
         }
       },
@@ -51248,15 +51874,13 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/MemberValueModel"
-            },
-            "description": "Gets or sets the collection of property values for the content."
+            }
           },
           "variants": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/MemberVariantRequestModel"
-            },
-            "description": "Gets or sets the collection of variant models for culture and segment variations."
+            }
           }
         }
       },
@@ -51485,6 +52109,16 @@
           },
           "mediaLoadChildNodes": {
             "type": "boolean"
+          },
+          "elementIds": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
           },
           "documentTypes": {
             "type": "array",
@@ -51955,8 +52589,7 @@
           "NotFound",
           "UserNotFound",
           "AlreadyExists"
-        ],
-        "description": "Represents the status of a user data operation."
+        ]
       },
       "UserDataResponseModel": {
         "required": [
@@ -51992,26 +52625,21 @@
         "type": "object",
         "properties": {
           "providerSchemeName": {
-            "type": "string",
-            "description": "Gets the authentication scheme name of the external login provider."
+            "type": "string"
           },
           "providerKey": {
             "type": [
               "null",
               "string"
-            ],
-            "description": "Gets or sets the provider-specific key identifying the user with this provider.\nThe provider key, or `null` if the user is not linked to this provider."
+            ]
           },
           "isLinkedOnUser": {
-            "type": "boolean",
-            "description": "Gets a value indicating whether this external login provider is linked to the user."
+            "type": "boolean"
           },
           "hasManualLinkingEnabled": {
-            "type": "boolean",
-            "description": "Gets a value indicating whether manual linking is enabled for this provider."
+            "type": "boolean"
           }
-        },
-        "description": "Represents information about an external login provider and its association with a user."
+        }
       },
       "UserGroupItemResponseModel": {
         "required": [
@@ -52225,8 +52853,7 @@
         "enum": [
           "Default",
           "Api"
-        ],
-        "description": "Represents the kind or type of user."
+        ]
       },
       "UserOrderModel": {
         "enum": [
@@ -52240,8 +52867,7 @@
           "IsApproved",
           "IsLockedOut",
           "LastLoginDate"
-        ],
-        "description": "Specifies the field by which to order user query results."
+        ]
       },
       "UserPermissionModel": {
         "required": [
@@ -52433,8 +53059,7 @@
           "Invited",
           "Inactive",
           "All"
-        ],
-        "description": "The state of a user"
+        ]
       },
       "UserTwoFactorProviderModel": {
         "required": [
@@ -52444,15 +53069,12 @@
         "type": "object",
         "properties": {
           "providerName": {
-            "type": "string",
-            "description": "Gets the name of the two-factor authentication provider."
+            "type": "string"
           },
           "isEnabledOnUser": {
-            "type": "boolean",
-            "description": "Gets a value indicating whether this two-factor provider is enabled for the user."
+            "type": "boolean"
           }
-        },
-        "description": "Represents information about a two-factor authentication provider and its status for a user."
+        }
       },
       "ValidateUpdateDocumentRequestModel": {
         "required": [
@@ -52484,15 +53106,13 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DocumentValueModel"
-            },
-            "description": "Gets or sets the collection of property values for the content."
+            }
           },
           "variants": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DocumentVariantRequestModel"
-            },
-            "description": "Gets or sets the collection of variant models for culture and segment variations."
+            }
           }
         }
       },
@@ -52516,15 +53136,13 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/ElementValueModel"
-            },
-            "description": "Gets or sets the collection of property values for the content."
+            }
           },
           "variants": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/ElementVariantRequestModel"
-            },
-            "description": "Gets or sets the collection of variant models for culture and segment variations."
+            }
           }
         }
       },
