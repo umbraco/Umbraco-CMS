@@ -53,6 +53,10 @@ export class UmbWorkspaceSplitViewManager {
 		return this.#activeVariantsInfo.asObservablePart((data) => data.find((x) => x.index === index) || undefined);
 	}
 
+	/**
+	 * @param {Array<UmbVariantId>} variants - An array of UmbVariantId objects representing the variants to be opened in the split view.
+	 * @description - Updates the active variants in the split view based on the provided array of UmbVariantId objects. This will not merge with existing variants, removing any excess variants and adding new ones as necessary.
+	 */
 	public openVariants(variants: Array<UmbVariantId>) {
 		const active = this.getActiveVariants();
 		this.#activeVariantsInfo.mute();
