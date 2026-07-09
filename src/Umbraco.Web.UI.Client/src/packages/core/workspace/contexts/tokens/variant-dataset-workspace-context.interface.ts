@@ -18,7 +18,6 @@ export interface UmbVariantDatasetWorkspaceContext<
 	// Variant:
 	variants: Observable<Array<VariantType>>;
 	variantOptions: Observable<Array<UmbEntityVariantOptionModel<VariantType>>>;
-	getVariantOptions(): Promise<Array<UmbEntityVariantOptionModel<VariantType>>>;
 	splitView: UmbWorkspaceSplitViewManager;
 	getVariant(variantId: UmbVariantId): VariantType | undefined;
 	readonly readOnlyGuard: UmbReadOnlyVariantGuardManager;

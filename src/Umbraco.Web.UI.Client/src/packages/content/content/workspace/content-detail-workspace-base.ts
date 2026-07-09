@@ -185,9 +185,6 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	// TODO: fix type error
 	public readonly variantOptions;
 
-	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-	// @ts-ignore
-	// TODO: fix type error
 	async getVariantOptions(): Promise<Array<VariantOptionModelType>> {
 		return firstValueFrom(this.variantOptions);
 	}
