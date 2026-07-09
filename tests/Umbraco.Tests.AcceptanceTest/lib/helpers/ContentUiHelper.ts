@@ -233,9 +233,6 @@ export class ContentUiHelper extends UiBaseLocators {
     this.menuItemTree = page.locator('umb-menu-item-tree-default');
     this.confirmToUnpublishBtn = page.locator('umb-content-unpublish-modal').getByLabel('Unpublish');
     this.confirmToPublishBtn = page.locator('umb-document-publish-modal').getByLabel('Publish');
-    this.confirmToUnpublishBtn = page
-      .locator("umb-document-unpublish-modal")
-      .getByLabel("Unpublish");
     this.dropdown = page.locator("select#native");
     this.splitView = page.locator("#splitViews");
     this.setADateTxt = page.getByLabel("Set a date…");
