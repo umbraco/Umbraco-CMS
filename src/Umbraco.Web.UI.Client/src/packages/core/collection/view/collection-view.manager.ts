@@ -106,7 +106,7 @@ export class UmbCollectionViewManager extends UmbControllerBase {
 
 			routes = views.map((view) => {
 				return {
-					path: `${view.meta.pathName}`,
+					path: `${view.meta.pathname}`,
 					component: () => createExtensionElement(view),
 					setup: (component) => this.#setupViewComponent(component, view),
 				};

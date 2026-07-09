@@ -15,7 +15,7 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 			meta: {
 				label: 'Cards',
 				icon: 'icon-grid',
-				pathName: 'cards',
+				pathname: 'cards',
 			},
 		},
 	},

@@ -25,6 +25,12 @@ export interface MetaCollectionView {
 	/**
 	 * The URL pathname for this collection view that can be deep linked to by sharing the url
 	 */
+	pathname: string;
+
+	/**
+	 * @deprecated Use {@link pathname} instead. This will be removed in Umbraco 20.
+	 * The URL pathname for this collection view that can be deep linked to by sharing the url
+	 */
 	pathName: string;
 }
 

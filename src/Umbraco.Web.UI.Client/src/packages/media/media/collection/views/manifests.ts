@@ -11,7 +11,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		meta: {
 			label: 'Grid',
 			icon: 'icon-grid',
-			pathName: 'grid',
+			pathname: 'grid',
 		},
 		conditions: [
 			{
@@ -29,7 +29,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		meta: {
 			label: 'Table',
 			icon: 'icon-table',
-			pathName: 'table',
+			pathname: 'table',
 		},
 		conditions: [
 			{

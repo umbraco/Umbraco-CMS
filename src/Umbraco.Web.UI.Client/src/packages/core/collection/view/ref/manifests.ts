@@ -15,7 +15,7 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 			meta: {
 				label: 'List',
 				icon: 'icon-list',
-				pathName: 'refs',
+				pathname: 'refs',
 			},
 		},
 	},
