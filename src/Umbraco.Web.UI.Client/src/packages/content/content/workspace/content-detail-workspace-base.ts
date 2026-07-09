@@ -32,6 +32,7 @@ import {
 	UmbRequestReloadChildrenOfEntityEvent,
 	UmbRequestReloadStructureForEntityEvent,
 } from '@umbraco-cms/backoffice/entity-action';
+import type { UmbEntityActionEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UmbLanguageCollectionRepository } from '@umbraco-cms/backoffice/language';
 import {
 	UmbPropertyValueFlatMapperController,
@@ -51,6 +52,7 @@ import type { ClassConstructor } from '@umbraco-cms/backoffice/extension-api';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbContentTypeDetailModel, UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import type { UmbDetailRepository, UmbDetailRepositoryConstructor } from '@umbraco-cms/backoffice/repository';
 import type {
 	UmbEntityDetailWorkspaceContextArgs,
@@ -82,6 +84,18 @@ export interface UmbContentDetailWorkspaceContextArgs<
 }
 
 /**
+ * Interface for the third argument of performCreateOrUpdate, relevant if the persistence method should be different from default.
+ */
+export interface UmbContentWorkspaceCreateOrUpdatePersistMethods<DetailModelType extends UmbContentDetailModel> {
+	create?: (
+		saveData: DetailModelType,
+		variantIds: Array<UmbVariantId>,
+		parent: UmbEntityModel,
+	) => Promise<DetailModelType>;
+	update?: (saveData: DetailModelType, variantIds: Array<UmbVariantId>) => Promise<DetailModelType>;
+}
+
+/**
  * The base class for a content detail workspace context.
  * @exports
  * @abstract
@@ -96,16 +110,16 @@ export interface UmbContentDetailWorkspaceContextArgs<
  * @template CreateArgsType
  */
 export abstract class UmbContentDetailWorkspaceContextBase<
-		DetailModelType extends UmbContentDetailModel<VariantModelType>,
-		DetailRepositoryType extends UmbDetailRepository<DetailModelType> = UmbDetailRepository<DetailModelType>,
-		ContentTypeDetailModelType extends UmbContentTypeDetailModel = UmbContentTypeDetailModel,
-		VariantModelType extends UmbEntityVariantModel = DetailModelType extends { variants: UmbEntityVariantModel[] }
-			? DetailModelType['variants'][0]
-			: never,
-		VariantOptionModelType extends UmbEntityVariantOptionModel = UmbEntityVariantOptionModel<VariantModelType>,
-		CreateArgsType extends
-			UmbEntityDetailWorkspaceContextCreateArgs<DetailModelType> = UmbEntityDetailWorkspaceContextCreateArgs<DetailModelType>,
-	>
+	DetailModelType extends UmbContentDetailModel<VariantModelType>,
+	DetailRepositoryType extends UmbDetailRepository<DetailModelType> = UmbDetailRepository<DetailModelType>,
+	ContentTypeDetailModelType extends UmbContentTypeDetailModel = UmbContentTypeDetailModel,
+	VariantModelType extends UmbEntityVariantModel = DetailModelType extends { variants: UmbEntityVariantModel[] }
+		? DetailModelType['variants'][0]
+		: never,
+	VariantOptionModelType extends UmbEntityVariantOptionModel = UmbEntityVariantOptionModel<VariantModelType>,
+	CreateArgsType extends UmbEntityDetailWorkspaceContextCreateArgs<DetailModelType> =
+		UmbEntityDetailWorkspaceContextCreateArgs<DetailModelType>,
+>
 	extends UmbEntityDetailWorkspaceContextBase<DetailModelType, DetailRepositoryType, CreateArgsType>
 	implements
 		UmbContentWorkspaceContext<DetailModelType, ContentTypeDetailModelType, VariantModelType>,
@@ -1046,119 +1060,113 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	 * Perform the create or update of the content
 	 * @param {Array<UmbVariantId>} variantIds - The variant ids to save
 	 * @param {DetailModelType} saveData - The data to save
+	 * @param {UmbContentWorkspaceCreateOrUpdatePersistMethods<DetailModelType>} [persistenceMethod] - Optional custom persistence logic.
 	 * @memberof UmbContentDetailWorkspaceContextBase
 	 */
-	public async performCreateOrUpdate(variantIds: Array<UmbVariantId>, saveData: DetailModelType) {
+	public async performCreateOrUpdate(
+		variantIds: Array<UmbVariantId>,
+		saveData: DetailModelType,
+		persistenceMethod?: UmbContentWorkspaceCreateOrUpdatePersistMethods<DetailModelType>,
+	) {
 		if (this.getIsNew()) {
-			await this.#create(variantIds, saveData);
+			await this.#create(variantIds, saveData, persistenceMethod?.create);
 		} else {
-			await this.#update(variantIds, saveData);
+			await this.#update(variantIds, saveData, persistenceMethod?.update);
 		}
 	}
 
-	async #create(variantIds: Array<UmbVariantId>, saveData: DetailModelType) {
-		if (!this._detailRepository) throw new Error('Detail repository is not set');
-
+	async #create(
+		variantIds: Array<UmbVariantId>,
+		saveData: DetailModelType,
+		overwriteCreate?: UmbContentWorkspaceCreateOrUpdatePersistMethods<DetailModelType>['create'],
+	) {
 		const parent = this._internal_getCreateUnderParent();
 		if (!parent) throw new Error('Parent is not set');
 
-		const { data, error } = await this._detailRepository.create(saveData, parent.unique);
-		if (!data || error) {
-			throw new Error('Error creating content');
-		}
+		const persisted = overwriteCreate
+			? await overwriteCreate(saveData, variantIds, parent)
+			: await this.#defaultCreatePersistence(saveData, parent.unique);
 
-		const variantIdsIncludingInvariant = [...variantIds, UmbVariantId.CreateInvariant()];
-
-		// Only update the variants that was chosen to be saved:
-		const persistedData = this._data.getCurrent();
-		const newPersistedData = await new UmbMergeContentVariantDataController(this).process(
-			persistedData,
-			data,
-			variantIds,
-			variantIdsIncludingInvariant,
-		);
-		this._data.setPersisted(newPersistedData);
-
-		// Only update the variants that was chosen to be saved:
-		const currentData = this._data.getCurrent();
-		const newCurrentData = await new UmbMergeContentVariantDataController(this).process(
-			currentData,
-			data,
-			variantIds,
-			variantIdsIncludingInvariant,
-		);
-		this._data.setCurrent(newCurrentData);
+		// Set persisted AND current before flipping isNew: the flip triggers the new->edit redirect,
+		// whose navigation guard compares the two states with an order-sensitive comparison.
+		await this.#applyPersistedData(persisted, variantIds);
 		this.setIsNew(false);
 
-		const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
-		if (!eventContext) {
-			throw new Error('Event context is missing');
-		}
-
-		const reloadStructureEvent = new UmbRequestReloadStructureForEntityEvent({
-			entityType: parent.entityType,
-			unique: parent.unique,
-		});
-
-		eventContext.dispatchEvent(reloadStructureEvent);
-
-		const reloadChildrenEvent = new UmbRequestReloadChildrenOfEntityEvent({
-			entityType: parent.entityType,
-			unique: parent.unique,
-		});
-
-		eventContext.dispatchEvent(reloadChildrenEvent);
+		await this.#dispatchActionEvents(
+			new UmbRequestReloadStructureForEntityEvent({ entityType: parent.entityType, unique: parent.unique }),
+			new UmbRequestReloadChildrenOfEntityEvent({ entityType: parent.entityType, unique: parent.unique }),
+		);
 	}
 
-	async #update(variantIds: Array<UmbVariantId>, saveData: DetailModelType) {
-		if (!this._detailRepository) throw new Error('Detail repository is not set');
+	async #update(
+		variantIds: Array<UmbVariantId>,
+		saveData: DetailModelType,
+		overwriteUpdate?: UmbContentWorkspaceCreateOrUpdatePersistMethods<DetailModelType>['update'],
+	) {
+		const persisted = overwriteUpdate
+			? await overwriteUpdate(saveData, variantIds)
+			: await this.#defaultUpdatePersistence(saveData);
 
+		await this.#applyPersistedData(persisted, variantIds);
+
+		const unique = this.getUnique();
+		if (!unique) {
+			return;
+		}
+		const entityType = this.getEntityType();
+		await this.#dispatchActionEvents(
+			new UmbRequestReloadStructureForEntityEvent({ unique, entityType }),
+			new UmbEntityUpdatedEvent({ unique, entityType, eventUnique: this._workspaceEventUnique }),
+		);
+	}
+
+	async #defaultCreatePersistence(saveData: DetailModelType, parentUnique: string | null): Promise<DetailModelType> {
+		if (!this._detailRepository) throw new Error('Detail repository is not set');
+		const { data, error } = await this._detailRepository.create(saveData, parentUnique);
+		if (!data || error) throw new Error('Error creating content');
+		return data;
+	}
+
+	async #defaultUpdatePersistence(saveData: DetailModelType): Promise<DetailModelType> {
+		if (!this._detailRepository) throw new Error('Detail repository is not set');
 		const { data, error } = await this._detailRepository.save(saveData);
-		if (!data || error) {
-			throw new Error('Error saving content');
+		if (!data || error) throw new Error('Error saving content');
+		return data;
+	}
+
+	/**
+	 * Partial update the current data with the persisted data, only for the variants that were saved.
+	 * @param {DetailModelType | undefined} persisted - The saved document, or undefined if not returned
+	 * @param {Array<UmbVariantId>} variantIds - The variants that were saved
+	 */
+	async #applyPersistedData(persisted: DetailModelType | undefined, variantIds: Array<UmbVariantId>) {
+		if (!persisted) {
+			throw new Error('Persisted data is missing, persistence methods should return latest draft from the server.');
 		}
 
 		const variantIdsIncludingInvariant = [...variantIds, UmbVariantId.CreateInvariant()];
 
-		// Only update the variants that was chosen to be saved:
-		// Use getPersisted() as the base so non-saved variants retain the actual
-		// server state, not unsaved local edits from current data.
-		const persistedData = this._data.getPersisted();
 		const newPersistedData = await new UmbMergeContentVariantDataController(this).process(
-			persistedData,
-			data,
+			this._data.getPersisted(),
+			persisted,
 			variantIds,
 			variantIdsIncludingInvariant,
 		);
 		this._data.setPersisted(newPersistedData);
 
-		// Only update the variants that was chosen to be saved:
-		const currentData = this._data.getCurrent();
 		const newCurrentData = await new UmbMergeContentVariantDataController(this).process(
-			currentData,
-			data,
+			this._data.getCurrent(),
+			persisted,
 			variantIds,
 			variantIdsIncludingInvariant,
 		);
 		this._data.setCurrent(newCurrentData);
+	}
 
-		const unique = this.getUnique()!;
-		const entityType = this.getEntityType();
-
+	async #dispatchActionEvents(...events: Array<UmbEntityActionEvent>) {
 		const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
-		if (!eventContext) {
-			throw new Error('Event context is missing');
-		}
-		const structureEvent = new UmbRequestReloadStructureForEntityEvent({ unique, entityType });
-		eventContext.dispatchEvent(structureEvent);
-
-		const updatedEvent = new UmbEntityUpdatedEvent({
-			unique,
-			entityType,
-			eventUnique: this._workspaceEventUnique,
-		});
-
-		eventContext.dispatchEvent(updatedEvent);
+		if (!eventContext) throw new Error('Event context is missing');
+		events.forEach((event) => eventContext.dispatchEvent(event));
 	}
 
 	override resetState() {

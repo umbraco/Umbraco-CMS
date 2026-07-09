@@ -180,7 +180,7 @@ public static class ApplicationBuilderExtensions
     ///     </para>
     ///     <para>
     ///         <c>GET /umbraco/api/health/ready</c> — 200 only when <see cref="RuntimeLevel.Run"/>,
-    ///         503 Degraded during <see cref="RuntimeLevel.Upgrading"/> and other non-Run states.
+    ///         503 (Unhealthy) during <see cref="RuntimeLevel.Upgrading"/> and other non-Run states.
     ///     </para>
     /// </remarks>
     public static IApplicationBuilder UseUmbracoHealthChecks(this IApplicationBuilder app)

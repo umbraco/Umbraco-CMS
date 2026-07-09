@@ -74,12 +74,12 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 
 	/**
 	 * Min validation message.
-	 * @type {boolean}
+	 * @type {string}
 	 * @attr
 	 * @default
 	 */
 	@property({ type: String, attribute: 'min-message' })
-	minMessage = 'This field need more items';
+	minMessage = 'This field needs more items';
 
 	/**
 	 * This is a maximum amount of selected items in this input.
@@ -92,11 +92,11 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 
 	/**
 	 * Max validation message.
-	 * @type {boolean}
+	 * @type {string}
 	 * @attr
 	 * @default
 	 */
-	@property({ type: String, attribute: 'min-message' })
+	@property({ type: String, attribute: 'max-message' })
 	maxMessage = 'This field exceeds the allowed amount of items';
 
 	@property({ type: Array })
@@ -441,10 +441,6 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 				gap: var(--uui-size-space-5);
 				grid-template-columns: repeat(auto-fill, minmax(var(--umb-card-medium-min-width), 1fr));
 				grid-auto-rows: var(--umb-card-medium-min-width);
-			}
-
-			#dropzone {
-				margin-bottom: var(--uui-size-space-5);
 			}
 
 			#btn-add {
