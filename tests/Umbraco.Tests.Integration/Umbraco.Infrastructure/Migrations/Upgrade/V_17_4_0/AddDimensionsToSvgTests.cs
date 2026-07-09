@@ -77,6 +77,26 @@ internal sealed class AddDimensionsToSvgTests : UmbracoIntegrationTest
         });
     }
 
+    [Test]
+    public async Task Migration_Is_Idempotent_When_Dimensions_Already_Present()
+    {
+        // The clean install already has Width/Height with the canonical keys. Running the migration
+        // against that state must not duplicate the properties or change their keys.
+        await ExecuteMigration();
+
+        IMediaType mediaType = MediaTypeService.Get(Constants.Conventions.MediaTypes.VectorGraphicsAlias)!;
+        IPropertyType[] widths = mediaType.PropertyTypes.Where(x => x.Alias == Constants.Conventions.Media.Width).ToArray();
+        IPropertyType[] heights = mediaType.PropertyTypes.Where(x => x.Alias == Constants.Conventions.Media.Height).ToArray();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(widths, Has.Length.EqualTo(1), "Width property was duplicated by the migration.");
+            Assert.That(heights, Has.Length.EqualTo(1), "Height property was duplicated by the migration.");
+            Assert.That(widths[0].Key, Is.EqualTo(_expectedWidthKey));
+            Assert.That(heights[0].Key, Is.EqualTo(_expectedHeightKey));
+        });
+    }
+
     private async Task RemoveDimensionPropertiesToSimulatePreMigrationState()
     {
         IMediaType mediaType = MediaTypeService.Get(Constants.Conventions.MediaTypes.VectorGraphicsAlias)!;
