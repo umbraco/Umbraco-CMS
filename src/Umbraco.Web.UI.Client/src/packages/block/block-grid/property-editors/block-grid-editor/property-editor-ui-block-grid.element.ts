@@ -94,6 +94,11 @@ export class UmbPropertyEditorUIBlockGridElement
 
 		if (!value) {
 			super.value = undefined;
+			// Clear manager state so blocks are actually removed
+			this.#managerContext.setLayouts([]);
+			this.#managerContext.setContents([]);
+			this.#managerContext.setSettings([]);
+			this.#managerContext.setExposes([]);
 			return;
 		}
 
@@ -170,9 +175,9 @@ export class UmbPropertyEditorUIBlockGridElement
 			}
 		}).passContextAliasMatches();
 
-		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
+		this.consumeContext(UMB_PROPERTY_CONTEXT, (propertyContext) => {
 			this.observe(
-				context?.dataPath,
+				propertyContext?.dataPath,
 				(dataPath) => {
 					if (dataPath) {
 						// Set the data path for the local validation context:
@@ -182,10 +187,7 @@ export class UmbPropertyEditorUIBlockGridElement
 				},
 				'observeDataPath',
 			);
-		});
 
-		// TODO: Prevent initial notification from these observes
-		this.consumeContext(UMB_PROPERTY_CONTEXT, (propertyContext) => {
 			this.observe(
 				observeMultiple([
 					this.#managerContext.layouts,

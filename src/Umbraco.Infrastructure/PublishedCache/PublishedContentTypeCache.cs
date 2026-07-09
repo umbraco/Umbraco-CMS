@@ -24,7 +24,15 @@ public class PublishedContentTypeCache : IPublishedContentTypeCache
     private readonly Dictionary<string, IPublishedContentType> _typesByAlias = new();
     private readonly Dictionary<int, IPublishedContentType> _typesById = new();
 
-    // default ctor
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PublishedContentTypeCache"/> class.
+    /// </summary>
+    /// <remarks>default ctor</remarks>
+    /// <param name="contentTypeService">The service used to manage content types. Typically injected as a dependency.</param>
+    /// <param name="mediaTypeService">The service used to manage media types. Typically injected as a dependency.</param>
+    /// <param name="memberTypeService">The service used to manage member types. Typically injected as a dependency.</param>
+    /// <param name="publishedContentTypeFactory">The factory used to create published content types.</param>
+    /// <param name="logger">The logger used for logging cache-related events and errors.</param>
     public PublishedContentTypeCache(
         IContentTypeService? contentTypeService,
         IMediaTypeService? mediaTypeService,
@@ -39,23 +47,12 @@ public class PublishedContentTypeCache : IPublishedContentTypeCache
         _publishedContentTypeFactory = publishedContentTypeFactory;
     }
 
-    // for unit tests ONLY
-#pragma warning disable CS8618
-    internal PublishedContentTypeCache(
-        ILogger<PublishedContentTypeCache> logger,
-        IPublishedContentTypeFactory publishedContentTypeFactory)
-#pragma warning restore CS8618
-    {
-        _logger = logger;
-        _publishedContentTypeFactory = publishedContentTypeFactory;
-    }
-
     /// <summary>
     ///     Clears all cached content types.
     /// </summary>
     public void ClearAll()
     {
-        if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+        if (_logger.IsEnabled(LogLevel.Debug))
         {
             _logger.LogDebug("Clear all.");
         }
@@ -66,6 +63,7 @@ public class PublishedContentTypeCache : IPublishedContentTypeCache
 
             _typesByAlias.Clear();
             _typesById.Clear();
+            _keyToIdMap.Clear();
         }
         finally
         {
@@ -82,7 +80,7 @@ public class PublishedContentTypeCache : IPublishedContentTypeCache
     /// <param name="id">An identifier.</param>
     public void ClearContentType(int id)
     {
-        if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+        if (_logger.IsEnabled(LogLevel.Debug))
         {
             _logger.LogDebug("Clear content type w/id {ContentTypeId}", id);
         }
@@ -100,8 +98,20 @@ public class PublishedContentTypeCache : IPublishedContentTypeCache
             {
                 _lock.EnterWriteLock();
 
-                _typesByAlias.Remove(GetAliasKey(type));
+                // Multiple alias entries can point to the same type because Get(itemType, alias)
+                // keys by the *requested* itemType, which may not match the type's actual ItemType
+                // (e.g. Get(Content, alias) for an element type). Remove all of them.
+                var aliasKeysToRemove = _typesByAlias
+                    .Where(kvp => kvp.Value.Id == id)
+                    .Select(kvp => kvp.Key)
+                    .ToList();
+                foreach (var aliasKey in aliasKeysToRemove)
+                {
+                    _typesByAlias.Remove(aliasKey);
+                }
+
                 _typesById.Remove(id);
+                _keyToIdMap.Remove(type.Key);
             }
             finally
             {
@@ -120,6 +130,8 @@ public class PublishedContentTypeCache : IPublishedContentTypeCache
         }
     }
 
+    /// <summary>Clears the cached content types for the specified IDs.</summary>
+    /// <param name="ids">The collection of content type IDs to clear from the cache.</param>
     public void ClearContentTypes(IEnumerable<int> ids)
     {
         foreach (var id in ids)
@@ -134,9 +146,14 @@ public class PublishedContentTypeCache : IPublishedContentTypeCache
     /// <param name="id">A data type identifier.</param>
     public void ClearDataType(int id) => ClearByDataTypeId(id);
 
+    /// <summary>
+    /// Removes and returns all published content types that have at least one property using the specified data type ID.
+    /// </summary>
+    /// <param name="id">The unique identifier of the data type whose associated content types should be cleared.</param>
+    /// <returns>An enumerable of <see cref="IPublishedContentType"/> instances that were removed from the cache.</returns>
     public IEnumerable<IPublishedContentType> ClearByDataTypeId(int id)
     {
-        if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+        if (_logger.IsEnabled(LogLevel.Debug))
         {
             _logger.LogDebug("Clear data type w/id {DataTypeId}.", id);
         }
@@ -152,10 +169,23 @@ public class PublishedContentTypeCache : IPublishedContentTypeCache
 
             toRemove = _typesById.Values
                 .Where(x => x.PropertyTypes.Any(xx => xx.DataType.Id == id)).ToArray();
+
+            var idsToRemove = toRemove.Select(x => x.Id).ToHashSet();
+
+            // See ClearContentType for why we scan _typesByAlias instead of using GetAliasKey(type).
+            var aliasKeysToRemove = _typesByAlias
+                .Where(kvp => idsToRemove.Contains(kvp.Value.Id))
+                .Select(kvp => kvp.Key)
+                .ToList();
+            foreach (var aliasKey in aliasKeysToRemove)
+            {
+                _typesByAlias.Remove(aliasKey);
+            }
+
             foreach (IPublishedContentType type in toRemove)
             {
-                _typesByAlias.Remove(GetAliasKey(type));
                 _typesById.Remove(type.Id);
+                _keyToIdMap.Remove(type.Key);
             }
         }
         finally
@@ -238,8 +268,22 @@ public class PublishedContentTypeCache : IPublishedContentTypeCache
             try
             {
                 _lock.EnterWriteLock();
+
+                // If a previous lookup under a different itemType prefix already cached this
+                // content type by id, reuse that instance so _typesById and every alias entry
+                // point at the same object.
+                if (_typesById.TryGetValue(type.Id, out IPublishedContentType? existing))
+                {
+                    type = existing;
+                }
+                else
+                {
+                    _typesById[type.Id] = type;
+                }
+
                 _keyToIdMap[type.Key] = type.Id;
-                return _typesByAlias[aliasKey] = _typesById[type.Id] = type;
+                _typesByAlias[aliasKey] = type;
+                return type;
             }
             finally
             {
@@ -349,6 +393,7 @@ public class PublishedContentTypeCache : IPublishedContentTypeCache
         IContentTypeComposition? contentType = itemType switch
         {
             PublishedItemType.Content => _contentTypeService?.Get(alias),
+            PublishedItemType.Element => _contentTypeService?.Get(alias),
             PublishedItemType.Media => _mediaTypeService?.Get(alias),
             PublishedItemType.Member => _memberTypeService?.Get(alias),
             _ => throw new ArgumentOutOfRangeException(nameof(itemType)),
@@ -367,6 +412,7 @@ public class PublishedContentTypeCache : IPublishedContentTypeCache
         IContentTypeComposition? contentType = itemType switch
         {
             PublishedItemType.Content => _contentTypeService?.Get(id),
+            PublishedItemType.Element => _contentTypeService?.Get(id),
             PublishedItemType.Media => _mediaTypeService?.Get(id),
             PublishedItemType.Member => _memberTypeService?.Get(id),
             _ => throw new ArgumentOutOfRangeException(nameof(itemType)),

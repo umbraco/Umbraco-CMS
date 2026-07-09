@@ -11,10 +11,9 @@
       TODO: Fix and remove overrides:
       [CS0618] handle member obsolete appropriately
       [SA1401] make fields private
-      [SA1649] update file name
       [IDE1006] fix naming rule violation
     -->
-    <WarningsNotAsErrors>$(WarningsNotAsErrors),CS0618,SA1401,SA1649,IDE1006</WarningsNotAsErrors>
+    <WarningsNotAsErrors>$(WarningsNotAsErrors),CS0618,SA1401,IDE1006</WarningsNotAsErrors>
   </PropertyGroup>
 
   <ItemGroup>

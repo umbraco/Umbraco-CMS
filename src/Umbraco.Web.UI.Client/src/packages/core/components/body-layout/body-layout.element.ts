@@ -92,7 +92,9 @@ export class UmbBodyLayoutElement extends LitElement {
 				this._navigationSlotHasChildren
 					? ''
 					: 'none'}">
-				${this.headline ? html`<h3 id="headline" title=${this.headline}>${this.headline}</h3>` : nothing}
+				${this.headline
+					? html`<h3 id="headline" title=${this.headline} data-mark="layout-headline">${this.headline}</h3>`
+					: nothing}
 
 				<slot
 					id="header-slot"
@@ -117,11 +119,10 @@ export class UmbBodyLayoutElement extends LitElement {
 					}}></slot>
 			</div>
 
-			<!-- This div should be changed for the uui-scroll-container when it gets updated -->
-			<div id="main">
+			<uui-scroll-container id="main">
 				${this.loading ? html`<uui-loader-bar></uui-loader-bar>` : nothing}
 				<slot></slot>
-			</div>
+			</uui-scroll-container>
 
 			<slot name="footer"></slot>
 			<umb-footer-layout style="display:${this._footerSlotHasChildren || this._actionsSlotHasChildren ? '' : 'none'}">
@@ -166,7 +167,7 @@ export class UmbBodyLayoutElement extends LitElement {
 				background-color: transparent;
 				border-color: transparent;
 				transition: box-shadow 150ms ease-in-out;
-				box-shadow: 0 -1px 0px 0px rgba(0, 0, 0, 0.5);
+				clip-path: inset(0px -15px -15px -15px);
 			}
 			:host([header-transparent][scrolling]) #header {
 				/* This should be using the uui-shadows but for now they are too drastic for this use case */
@@ -203,7 +204,6 @@ export class UmbBodyLayoutElement extends LitElement {
 				align-items: center;
 				box-sizing: border-box;
 				min-width: 0;
-				flex-shrink: 0;
 			}
 			#navigation-slot {
 				margin-left: auto;
@@ -222,7 +222,6 @@ export class UmbBodyLayoutElement extends LitElement {
 				display: block;
 				flex: 1;
 				flex-direction: column;
-				overflow-y: auto;
 				padding: var(--uui-size-layout-1);
 			}
 

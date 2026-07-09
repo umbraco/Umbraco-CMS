@@ -26,15 +26,39 @@ export class UmbInputContentElement extends UmbFormControlMixin<string | undefin
 	}
 	#type: UmbContentPickerSource['type'] = 'content';
 
+	/**
+	 * This is a minimum amount of selected items in this input.
+	 * @type {number}
+	 * @attr
+	 * @default 0
+	 */
 	@property({ type: Number })
 	min = 0;
 
+	/**
+	 * Min validation message.
+	 * @type {string}
+	 * @attr
+	 * @default
+	 */
 	@property({ type: String, attribute: 'min-message' })
-	minMessage = 'This field need more items';
+	minMessage = 'This field needs more items';
 
+	/**
+	 * This is a maximum amount of selected items in this input.
+	 * @type {number}
+	 * @attr
+	 * @default 0
+	 */
 	@property({ type: Number })
 	max = 0;
 
+	/**
+	 * Max validation message.
+	 * @type {string}
+	 * @attr
+	 * @default
+	 */
 	@property({ type: String, attribute: 'max-message' })
 	maxMessage = 'This field exceeds the allowed amount of items';
 
@@ -42,13 +66,13 @@ export class UmbInputContentElement extends UmbFormControlMixin<string | undefin
 	startNode?: UmbTreeStartNode;
 
 	@property()
-	public set allowedContentTypeIds(value: string) {
-		this.#allowedContentTypeIds = value ? value.split(',') : [];
+	public set allowedContentTypeIds(value: string | undefined) {
+		this.#allowedContentTypeIds = value ? value.split(',') : undefined;
 	}
-	public get allowedContentTypeIds(): string {
-		return this.#allowedContentTypeIds.join(',');
+	public get allowedContentTypeIds(): string | undefined {
+		return this.#allowedContentTypeIds?.join(',');
 	}
-	#allowedContentTypeIds: Array<string> = [];
+	#allowedContentTypeIds?: Array<string>;
 
 	@property({ type: Array })
 	public set selection(values: Array<UmbReferenceByUniqueAndType>) {

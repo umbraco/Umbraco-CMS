@@ -15,7 +15,7 @@ export class UmbPartialViewTreeStore extends UmbUniqueTreeStore {
 	 * @memberof UmbPartialViewTreeStore
 	 */
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_PARTIAL_VIEW_TREE_STORE_CONTEXT.toString());
+		super(host, UMB_PARTIAL_VIEW_TREE_STORE_CONTEXT);
 	}
 }
 

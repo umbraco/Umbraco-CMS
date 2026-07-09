@@ -1,23 +1,40 @@
-﻿using System.Globalization;
+using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using OpenIddict.Abstractions;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Security;
 
 namespace Umbraco.Cms.Api.Management.Security;
 
+/// <summary>
+/// Manages back office applications in the Umbraco CMS management security context.
+/// </summary>
 public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IBackOfficeApplicationManager
 {
     private readonly IWebHostEnvironment _webHostEnvironment;
     private readonly IRuntimeState _runtimeState;
+    private readonly ILogger<BackOfficeApplicationManager> _logger;
     private readonly Uri? _backOfficeHost;
     private readonly string _authorizeCallbackPathName;
     private readonly string _authorizeCallbackLogoutPathName;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="BackOfficeApplicationManager"/> class with the specified dependencies.
+    /// </summary>
+    /// <param name="applicationManager">The OpenIddict application manager used for managing backoffice applications.</param>
+    /// <param name="webHostEnvironment">Provides information about the web hosting environment.</param>
+    /// <param name="securitySettings">The security settings options for configuration.</param>
+    /// <param name="runtimeState">The current runtime state of the Umbraco application.</param>
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
     public BackOfficeApplicationManager(
         IOpenIddictApplicationManager applicationManager,
         IWebHostEnvironment webHostEnvironment,
@@ -30,12 +47,47 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
         _backOfficeHost = securitySettings.Value.BackOfficeHost;
         _authorizeCallbackPathName = securitySettings.Value.AuthorizeCallbackPathName;
         _authorizeCallbackLogoutPathName = securitySettings.Value.AuthorizeCallbackLogoutPathName;
+        _logger = StaticServiceProvider.Instance.GetRequiredService<ILogger<BackOfficeApplicationManager>>();
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="BackOfficeApplicationManager"/> class.
+    /// </summary>
+    /// <param name="applicationManager">The OpenIddict application manager used for managing backoffice authentication applications.</param>
+    /// <param name="webHostEnvironment">Provides information about the web hosting environment.</param>
+    /// <param name="securitySettings">The security settings options for configuring backoffice security.</param>
+    /// <param name="runtimeState">The current runtime state of the Umbraco application.</param>
+    /// <param name="logger">The logger used for logging events related to the backoffice application manager.</param>
+    public BackOfficeApplicationManager(
+        IOpenIddictApplicationManager applicationManager,
+        IWebHostEnvironment webHostEnvironment,
+        IOptions<SecuritySettings> securitySettings,
+        IRuntimeState runtimeState,
+        ILogger<BackOfficeApplicationManager> logger)
+        : base(applicationManager)
+    {
+        _webHostEnvironment = webHostEnvironment;
+        _runtimeState = runtimeState;
+        _logger = logger;
+        _backOfficeHost = securitySettings.Value.BackOfficeHost;
+        _authorizeCallbackPathName = securitySettings.Value.AuthorizeCallbackPathName;
+        _authorizeCallbackLogoutPathName = securitySettings.Value.AuthorizeCallbackLogoutPathName;
+    }
+
+    /// <summary>
+    /// Ensures that the back office application is properly configured with the specified back office hosts.
+    /// This includes merging the provided hosts with those already configured, validating that all hosts are absolute URIs,
+    /// and creating or updating the OpenId applications required for back office authentication.
+    /// In production environments, developer-specific OpenId applications (such as Swagger and Postman) are removed;
+    /// in non-production environments, these are created or updated as needed.
+    /// </summary>
+    /// <param name="backOfficeHosts">A collection of absolute <see cref="Uri"/> instances representing the back office hosts to configure.</param>
+    /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete.</param>
+    /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
     public async Task EnsureBackOfficeApplicationAsync(IEnumerable<Uri> backOfficeHosts, CancellationToken cancellationToken = default)
     {
         // Install is okay without this, because we do not need a token to install,
-        // but upgrades do, so we need to execute for everything higher then or equal to upgrade.
+        // but upgrades do, so we need to execute for everything higher than or equal to upgrade.
         if (_runtimeState.Level < RuntimeLevel.Upgrade)
         {
             return;
@@ -46,6 +98,18 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
         {
             throw new ArgumentException($"Expected absolute URLs, got: {string.Join(", ", backOfficeHostsAsArray.Select(url => url.ToString()))}", nameof(backOfficeHosts));
         }
+
+        // A balanced environment:
+        // - has 2 or more dedicated CD (Content Delivery) servers - ServerRole.Subscriber
+        // - has 1 or more dedicated CM (Content Management) servers - ServerRole.SchedulingPublisher
+        // The CD and CM URLs are different for the backoffice and the individual servers do not start at the same time, for example:
+        // CD www.domain.com/umbraco
+        // CM cms.domain.com/umbraco
+        // To access the Umbraco Backoffice, it is absolutely necessary to add the address of each server to the OpenId, as they share one database!
+        // Destination table: umbracoOpenIddictApplications
+        // Destination Fields: RedirectUris and PostLogoutRedirectUris
+        // Read saved settings from DB and add unique additional servers.
+        backOfficeHostsAsArray = await MergeWithExistingBackOfficeHostsAsync(backOfficeHostsAsArray, cancellationToken);
 
         await CreateOrUpdate(
             BackofficeOpenIddictApplicationDescriptor(backOfficeHostsAsArray),
@@ -74,6 +138,14 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
         }
     }
 
+    /// <summary>
+    /// Ensures that a back-office client credentials application with the specified client ID and secret exists.
+    /// If such an application does not exist, it will be created; if it exists, it will be updated as necessary.
+    /// </summary>
+    /// <param name="clientId">The client identifier for the back-office application.</param>
+    /// <param name="clientSecret">The client secret for the back-office application.</param>
+    /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
+    /// <returns>A task that represents the asynchronous operation. The task does not return a value.</returns>
     public async Task EnsureBackOfficeClientCredentialsApplicationAsync(string clientId, string clientSecret, CancellationToken cancellationToken = default)
     {
         var applicationDescriptor = new OpenIddictApplicationDescriptor
@@ -96,14 +168,102 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
     public async Task DeleteBackOfficeClientCredentialsApplicationAsync(string clientId, CancellationToken cancellationToken = default)
         => await Delete(clientId, cancellationToken);
 
+    /// <summary>
+    /// Merges new back-office hosts with existing hosts from the database.
+    /// Uses OpenIddict API to read existing redirect URIs and extracts unique authorities (hosts).
+    /// Handles invalid URIs gracefully by skipping them.
+    /// </summary>
+    /// <param name="newHosts">The new hosts to merge</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>Array of merged unique hosts (by authority, case-insensitive)</returns>
+    private async Task<Uri[]> MergeWithExistingBackOfficeHostsAsync(Uri[] newHosts, CancellationToken cancellationToken)
+    {
+        // Find an existing back-office application
+        var application = await ApplicationManager.FindByClientIdAsync(Constants.OAuthClientIds.BackOffice, cancellationToken);
+        if (application is null)
+        {
+            // No existing application, return new hosts as-is
+            return newHosts;
+        }
+
+        // Get existing redirect URIs using OpenIddict API
+        ImmutableArray<string> existingRedirectUris = await ApplicationManager.GetRedirectUrisAsync(application, cancellationToken);
+
+        // Use HashSet for O(n) performance and automatic deduplication
+        // Case-insensitive comparison for authorities (host names)
+        var mergedAuthorities = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        // Extract authorities from existing redirect URIs
+        foreach (var existingUriString in existingRedirectUris)
+        {
+            if (TryGetAuthorityFromUriString(existingUriString, out var authority))
+            {
+                mergedAuthorities.Add(authority);
+            }
+        }
+
+        // Add new hosts' authorities
+        foreach (Uri newHost in newHosts)
+        {
+            if (TryGetAuthorityFromUri(newHost, out var authority))
+            {
+                mergedAuthorities.Add(authority);
+            }
+        }
+
+        // Convert back to Uri array
+        return mergedAuthorities.Select(authority => new Uri(authority)).ToArray();
+    }
+
+    private bool TryGetAuthorityFromUri(Uri uri, [NotNullWhen(true)] out string? authority)
+    {
+        try
+        {
+            if (uri.IsAbsoluteUri)
+            {
+                authority = uri.GetLeftPart(UriPartial.Authority);
+                return true;
+            }
+        }
+        catch (InvalidOperationException)
+        {
+            // GetLeftPart can throw InvalidOperationException for some URI types
+            // Skip malformed URIs
+            _logger.LogDebug("Could not extract authority from URI {Uri} as the left part could not be identified, skipping", uri);
+        }
+
+        authority = null;
+        return false;
+    }
+
+    private bool TryGetAuthorityFromUriString(string uriString, [NotNullWhen(true)] out string? authority)
+    {
+        try
+        {
+            var existingUri = new Uri(uriString);
+            if (TryGetAuthorityFromUri(existingUri, out authority))
+            {
+                return true;
+            }
+        }
+        catch (UriFormatException)
+        {
+            // Skip URIs with invalid format
+            _logger.LogDebug("Could not extract authority from uriString {String} because of malformed uri format, skipping", uriString);
+        }
+
+        authority = null;
+        return false;
+    }
+
     internal OpenIddictApplicationDescriptor BackofficeOpenIddictApplicationDescriptor(Uri backOfficeUrl)
         => BackofficeOpenIddictApplicationDescriptor([backOfficeUrl]);
 
     internal OpenIddictApplicationDescriptor BackofficeOpenIddictApplicationDescriptor(Uri[] backOfficeHosts)
     {
-        if (_backOfficeHost is not null)
+        if (_backOfficeHost is not null && backOfficeHosts.Contains(_backOfficeHost) is false)
         {
-            backOfficeHosts = [_backOfficeHost];
+            backOfficeHosts = backOfficeHosts.Append(_backOfficeHost).ToArray();
         }
 
         var descriptor = new OpenIddictApplicationDescriptor

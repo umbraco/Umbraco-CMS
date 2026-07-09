@@ -24,6 +24,7 @@ using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Mail;
+using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Packaging;
@@ -54,21 +55,29 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.DependencyInjection
 {
+    /// <summary>
+    ///     The default implementation of <see cref="IUmbracoBuilder" /> used to configure Umbraco services and dependencies.
+    /// </summary>
     public class UmbracoBuilder : IUmbracoBuilder
     {
         private readonly Dictionary<Type, ICollectionBuilder> _builders = new Dictionary<Type, ICollectionBuilder>();
 
+        /// <inheritdoc />
         public IServiceCollection Services { get; }
 
+        /// <inheritdoc />
         public IConfiguration Config { get; }
 
+        /// <inheritdoc />
         public TypeLoader TypeLoader { get; }
 
         /// <inheritdoc />
         public ILoggerFactory BuilderLoggerFactory { get; }
 
+        /// <inheritdoc />
         public IProfiler Profiler { get; }
 
+        /// <inheritdoc />
         public AppCaches AppCaches { get; }
 
         /// <summary>
@@ -133,6 +142,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             return builder;
         }
 
+        /// <inheritdoc />
         public void Build()
         {
             foreach (ICollectionBuilder builder in _builders.Values)
@@ -143,6 +153,9 @@ namespace Umbraco.Cms.Core.DependencyInjection
             _builders.Clear();
         }
 
+        /// <summary>
+        ///     Adds all core Umbraco services to the service collection.
+        /// </summary>
         private void AddCoreServices()
         {
             Services.AddSingleton(AppCaches);
@@ -208,6 +221,11 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddSingleton<HtmlImageSourceParser>();
             Services.AddSingleton<HtmlUrlParser>();
 
+            // Default no-op signer. The ImageSharp 3+ package replaces this with a real implementation
+            // that re-signs URLs using the current HMACSecretKey; ImageSharp 2 leaves the no-op in
+            // place (it has no HMAC support).
+            Services.AddSingleton<IImageUrlTokenGenerator, NoopImageUrlTokenGenerator>();
+
             // register properties fallback
             Services.AddUnique<IPublishedValueFallback, PublishedValueFallback>();
 
@@ -270,6 +288,9 @@ namespace Umbraco.Cms.Core.DependencyInjection
 
             // Register telemetry service used to gather data about installed packages
             Services.AddUnique<ISiteIdentifierService, SiteIdentifierService>();
+
+            // Register HMAC secret key service for imaging URL authentication
+            Services.AddUnique<IHmacSecretKeyService, HmacSecretKeyService>();
             Services.AddUnique<ITelemetryService, TelemetryService>();
 
             Services.AddUnique<IKeyValueService, KeyValueService>();
@@ -305,6 +326,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IContentValidationService, ContentValidationService>();
             Services.AddUnique<IContentVersionCleanupPolicy, DefaultContentVersionCleanupPolicy>();
             Services.AddUnique<IMemberService, MemberService>();
+            Services.AddUnique<IExternalMemberService, ExternalMemberService>();
             Services.AddUnique<IMemberValidationService, MemberValidationService>();
             Services.AddUnique<IMediaPermissionService, MediaPermissionService>();
             Services.AddUnique<IMediaService, MediaService>();
@@ -316,11 +338,11 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IContentTypeEditingService, ContentTypeEditingService>();
             Services.AddUnique<IMediaTypeEditingService, MediaTypeEditingService>();
             Services.AddUnique<IFileService, FileService>();
-            Services.AddUnique<ITemplateService, TemplateService>();
+            Services.AddUnique<ITemplateService>(sp => ActivatorUtilities.CreateInstance<TemplateService>(sp));
             Services.AddUnique<IScriptService, ScriptService>();
             Services.AddUnique<IStylesheetService, StylesheetService>();
             Services.AddUnique<IStylesheetFolderService, StylesheetFolderService>();
-            Services.AddUnique<IPartialViewService, PartialViewService>();
+            Services.AddUnique<IPartialViewService>(sp => ActivatorUtilities.CreateInstance<PartialViewService>(sp));
             Services.AddUnique<IScriptFolderService, ScriptFolderService>();
             Services.AddUnique<IPartialViewFolderService, PartialViewFolderService>();
             Services.AddUnique<ITemporaryFileService, TemporaryFileService>();
@@ -361,9 +383,11 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<DocumentNavigationService, DocumentNavigationService>();
             Services.AddUnique<IDocumentNavigationQueryService>(x => x.GetRequiredService<DocumentNavigationService>());
             Services.AddUnique<IDocumentNavigationManagementService>(x => x.GetRequiredService<DocumentNavigationService>());
+            Services.AddSingleton<IMemoryCacheSizeReporter>(x => x.GetRequiredService<DocumentNavigationService>());
             Services.AddUnique<MediaNavigationService, MediaNavigationService>();
             Services.AddUnique<IMediaNavigationQueryService>(x => x.GetRequiredService<MediaNavigationService>());
             Services.AddUnique<IMediaNavigationManagementService>(x => x.GetRequiredService<MediaNavigationService>());
+            Services.AddSingleton<IMemoryCacheSizeReporter>(x => x.GetRequiredService<MediaNavigationService>());
 
             Services.AddUnique<PublishStatusService, PublishStatusService>();
             Services.AddUnique<IPublishStatusManagementService>(x => x.GetRequiredService<PublishStatusService>());
@@ -437,8 +461,14 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IElementSwitchValidator, ElementSwitchValidator>();
 
             // Routing
-            Services.AddUnique<IDocumentUrlService, DocumentUrlService>();
+            Services.AddUnique<DocumentUrlService, DocumentUrlService>();
+            Services.AddUnique<IDocumentUrlService>(x => x.GetRequiredService<DocumentUrlService>());
+            Services.AddSingleton<IMemoryCacheSizeReporter>(x => x.GetRequiredService<DocumentUrlService>());
             Services.AddNotificationAsyncHandler<UmbracoApplicationStartingNotification, DocumentUrlServiceInitializerNotificationHandler>();
+            Services.AddUnique<IDocumentUrlAliasService, DocumentUrlAliasService>();
+            Services.AddNotificationAsyncHandler<UmbracoApplicationStartingNotification, DocumentUrlAliasServiceInitializerNotificationHandler>();
+            Services.AddNotificationAsyncHandler<ContentTypeChangedNotification, DocumentUrlServiceContentTypeChangedNotificationHandler>();
+            Services.AddNotificationAsyncHandler<ContentTreeChangeNotification, DocumentUrlServiceContentTreeChangeNotificationHandler>();
         }
     }
 }

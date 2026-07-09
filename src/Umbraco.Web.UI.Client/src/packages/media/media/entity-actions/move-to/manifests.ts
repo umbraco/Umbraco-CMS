@@ -11,6 +11,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		alias: 'Umb.EntityAction.Media.MoveTo',
 		name: 'Move Media Entity Action',
 		forEntityTypes: [UMB_MEDIA_ENTITY_TYPE],
+		api: () => import('./media-move-to.action.js'),
 		meta: {
 			treeRepositoryAlias: UMB_MEDIA_TREE_REPOSITORY_ALIAS,
 			moveRepositoryAlias: UMB_MOVE_MEDIA_REPOSITORY_ALIAS,

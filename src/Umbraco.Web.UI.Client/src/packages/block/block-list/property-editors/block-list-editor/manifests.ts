@@ -12,17 +12,11 @@ const propertyEditorUi: UmbExtensionManifest = {
 		label: 'Block List',
 		propertyEditorSchemaAlias: UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS,
 		icon: 'icon-thumbnail-list',
-		group: 'richContent',
+		group: '#propertyEditorUIGroups_richContent',
+		keywords: ['component', 'list', 'items', 'blocks', 'cards', 'faq', 'testimonials', 'features', 'services'],
 		supportsReadOnly: true,
 		settings: {
 			properties: [
-				{
-					alias: 'useSingleBlockMode',
-					label: 'Single block mode',
-					description:
-						'When in Single block mode, the output will be BlockListItem<>, instead of BlockListModel.\n\n**NOTE:**\nSingle block mode requires a maximum of one available block, and an amount set to minimum 1 and maximum 1 blocks.',
-					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
-				},
 				{
 					alias: 'useLiveEditing',
 					label: 'Live editing mode',
@@ -41,6 +35,18 @@ const propertyEditorUi: UmbExtensionManifest = {
 					label: 'Property editor width',
 					description: 'Optional CSS override, example: 800px or 100%',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.TextBox',
+				},
+				{
+					alias: 'createModalSize',
+					label: '#blockEditor_labelCreateModalSize',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.OverlaySize',
+					config: [{ alias: 'defaultOptionLabel', value: 'Auto' }],
+				},
+				{
+					alias: 'useSingleBlockMode',
+					label: 'Single block mode',
+					description: '_Deprecated: Use the Property Editor "Single Block" instead._',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
 				},
 			],
 		},

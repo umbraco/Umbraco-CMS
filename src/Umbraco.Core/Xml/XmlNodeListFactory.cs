@@ -5,8 +5,18 @@ using System.Xml.XPath;
 // source: mvpxml.codeplex.com
 namespace Umbraco.Cms.Core.Xml;
 
+/// <summary>
+///     Factory class for creating <see cref="XmlNodeList" /> instances from various sources.
+/// </summary>
+/// <remarks>
+///     This factory provides methods to create XmlNodeList implementations from XPath iterators.
+///     The class uses a private constructor to prevent direct instantiation.
+/// </remarks>
 public class XmlNodeListFactory
 {
+    /// <summary>
+    ///     Prevents a default instance of the <see cref="XmlNodeListFactory" /> class from being created.
+    /// </summary>
     private XmlNodeListFactory()
     {
     }

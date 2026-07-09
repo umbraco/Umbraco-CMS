@@ -1,33 +1,88 @@
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DeliveryApi;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Common.Rendering;
 
+/// <summary>
+///     Implements output expansion strategy for element-only rendering in the Delivery API.
+/// </summary>
+/// <remarks>
+///     This strategy handles the expansion and filtering of properties when rendering content
+///     through the Delivery API based on expand and fields query parameters.
+/// </remarks>
 public class ElementOnlyOutputExpansionStrategy : IOutputExpansionStrategy
 {
+    /// <summary>
+    ///     The parameter value indicating all properties should be included.
+    /// </summary>
     protected const string All = "$all";
+
+    /// <summary>
+    ///     The parameter value indicating no properties should be included.
+    /// </summary>
     protected const string None = "";
+
+    /// <summary>
+    ///     The name of the expand query parameter.
+    /// </summary>
     protected const string ExpandParameterName = "expand";
+
+    /// <summary>
+    ///     The name of the fields query parameter.
+    /// </summary>
     protected const string FieldsParameterName = "fields";
 
     private readonly IApiPropertyRenderer _propertyRenderer;
+    private readonly IApiPublishedContentCache _apiPublishedContentCache;
+    private readonly IRequestMemberAccessService _requestMemberAccessService;
 
+    /// <summary>
+    ///     Gets the stack of expand property nodes for tracking nested expansions.
+    /// </summary>
     protected Stack<Node?> ExpandProperties { get; } = new();
 
+    /// <summary>
+    ///     Gets the stack of include property nodes for tracking nested field selections.
+    /// </summary>
     protected Stack<Node?> IncludeProperties { get; } = new();
 
-    public ElementOnlyOutputExpansionStrategy(
-        IApiPropertyRenderer propertyRenderer)
+    [Obsolete("Please use the constructor that accepts all parameters. Scheduled for removal in V20.")]
+    public ElementOnlyOutputExpansionStrategy(IApiPropertyRenderer propertyRenderer)
+        : this(
+            propertyRenderer,
+            StaticServiceProvider.Instance.GetRequiredService<IApiPublishedContentCache>(),
+            StaticServiceProvider.Instance.GetRequiredService<IRequestMemberAccessService>())
     {
-        _propertyRenderer = propertyRenderer;
     }
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="ElementOnlyOutputExpansionStrategy"/> class.
+    /// </summary>
+    /// <param name="propertyRenderer">The property renderer for converting property values.</param>
+    /// <param name="apiPublishedContentCache">The published content cache for the Delivery API.</param>
+    /// <param name="requestMemberAccessService">The service responsible for contextual access control in the Delivery API.</param>
+    public ElementOnlyOutputExpansionStrategy(
+        IApiPropertyRenderer propertyRenderer,
+        IApiPublishedContentCache apiPublishedContentCache,
+        IRequestMemberAccessService requestMemberAccessService)
+    {
+        _propertyRenderer = propertyRenderer;
+        _apiPublishedContentCache = apiPublishedContentCache;
+        _requestMemberAccessService = requestMemberAccessService;
+    }
+
+    /// <inheritdoc/>
     public virtual IDictionary<string, object?> MapContentProperties(IPublishedContent content)
         => content.ItemType == PublishedItemType.Content
             ? MapProperties(content.Properties)
             : throw new ArgumentException($"Invalid item type. This method can only be used with item type {nameof(PublishedItemType.Content)}, got: {content.ItemType}");
 
+    /// <inheritdoc/>
     public virtual IDictionary<string, object?> MapMediaProperties(IPublishedContent media, bool skipUmbracoProperties = true)
     {
         if (media.ItemType != PublishedItemType.Media)
@@ -45,6 +100,7 @@ public class ElementOnlyOutputExpansionStrategy : IOutputExpansionStrategy
             : new Dictionary<string, object?>();
     }
 
+    /// <inheritdoc/>
     public virtual IDictionary<string, object?> MapElementProperties(IPublishedElement element)
         => MapProperties(element.Properties, true);
 
@@ -85,14 +141,74 @@ public class ElementOnlyOutputExpansionStrategy : IOutputExpansionStrategy
            ?? currentProperties?.Items.FirstOrDefault(i => i.Key == "properties")?.Items.FirstOrDefault(i => i.Key == All || i.Key == propertyAlias);
 
     private object? GetPropertyValue(IPublishedProperty property)
-        => _propertyRenderer.GetPropertyValue(property, ExpandProperties.Peek() is not null);
+    {
+        var expanding = ExpandProperties.Peek() is not null;
+        var propertyValue = _propertyRenderer.GetPropertyValue(property, expanding);
 
+        // If the property value is content (e.g. from a content picker or a multi-node tree picker), we need to
+        // add additional access control handling, to prevent leaking content that should not have been output.
+        return propertyValue switch
+        {
+            IApiContent apiContent => ApplyContentAccessControl(apiContent, expanding),
+            IEnumerable<IApiContent> apiContents => apiContents
+                .Select(apiContent => ApplyContentAccessControl(apiContent, expanding))
+                .WhereNotNull()
+                .ToArray(),
+            _ => propertyValue,
+        };
+    }
+
+    private IApiContent? ApplyContentAccessControl(IApiContent apiContent, bool expanding)
+    {
+        IPublishedContent? content = _apiPublishedContentCache.GetById(apiContent.Id);
+        if (content is null)
+        {
+            // The content was actually resolved in the property value converter, but it is not permitted
+            // to output through the Delivery API. Omit it from the output (an explicit null value for a single
+            // reference; excluded from the collection for a multi-node tree picker).
+            return null;
+        }
+
+        // Shortcut the access check below if it is not required.
+        if (expanding is false)
+        {
+            return apiContent;
+        }
+
+        // The content is being expanded. We need to make sure it's permitted.
+        PublicAccessStatus access = _requestMemberAccessService.MemberHasAccessToAsync(content).GetAwaiter().GetResult();
+        if (access is not PublicAccessStatus.AccessAccepted)
+        {
+            // The current auth context does not allow access to the content. We still need to return the content
+            // reference for rendering (i.e. a link to a page, which returns 401 and causes a redirect to a login
+            // screen), but we must make sure the page content is not leaked.
+            apiContent.Properties.Clear();
+        }
+
+        return apiContent;
+    }
+
+    /// <summary>
+    ///     Represents a node in the parsed expand/fields parameter tree structure.
+    /// </summary>
     protected sealed class Node
     {
+        /// <summary>
+        ///     Gets the key of this node.
+        /// </summary>
         public string Key { get; private set; } = string.Empty;
 
+        /// <summary>
+        ///     Gets the child nodes of this node.
+        /// </summary>
         public List<Node> Items { get; } = new();
 
+        /// <summary>
+        ///     Parses an expand/fields parameter value into a node tree structure.
+        /// </summary>
+        /// <param name="value">The parameter value to parse.</param>
+        /// <returns>The root node of the parsed tree.</returns>
+        /// <exception cref="ArgumentException">Thrown when the value has invalid syntax.</exception>
         public static Node Parse(string value)
         {
             // verify that there are as many start brackets as there are end brackets

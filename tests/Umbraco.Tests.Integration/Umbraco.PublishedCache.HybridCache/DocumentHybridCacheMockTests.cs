@@ -87,6 +87,9 @@ internal sealed class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithC
         _mockDatabaseCacheRepository.Setup(r => r.GetContentSourcesAsync(It.IsAny<IEnumerable<Guid>>(), false))
             .ReturnsAsync([publishedTestCacheNode]);
 
+        _mockDatabaseCacheRepository.Setup(r => r.GetContentSourceForPublishStatesAsync(It.IsAny<Guid>()))
+            .ReturnsAsync((draftTestCacheNode, publishedTestCacheNode));
+
         _mockDatabaseCacheRepository.Setup(r => r.GetContentByContentTypeKey(It.IsAny<IReadOnlyCollection<Guid>>(), ContentCacheDataSerializerEntityType.Document)).Returns(
             new List<ContentCacheNode>()
             {
@@ -97,6 +100,7 @@ internal sealed class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithC
 
         var mockedPublishedStatusService = new Mock<IPublishStatusQueryService>();
         mockedPublishedStatusService.Setup(x => x.IsDocumentPublishedInAnyCulture(It.IsAny<Guid>())).Returns(true);
+        mockedPublishedStatusService.Setup(x => x.HasPublishedAncestorPath(It.IsAny<Guid>())).Returns(true);
 
         _documentCacheService = new DocumentCacheService(
             _mockDatabaseCacheRepository.Object,
@@ -110,7 +114,8 @@ internal sealed class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithC
             GetRequiredService<IPublishedModelFactory>(),
             GetRequiredService<IPreviewService>(),
             mockedPublishedStatusService.Object,
-            new NullLogger<DocumentCacheService>());
+            new NullLogger<DocumentCacheService>(),
+            new ConvertedPublishedContentCacheFactory(null, new NullLogger<ConvertedPublishedContentCacheFactory>()));
 
         _mockedCache = new DocumentCache(
             _documentCacheService,
@@ -233,6 +238,97 @@ internal sealed class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithC
         AssertTextPage(textPage);
 
         _mockDatabaseCacheRepository.Verify(x => x.GetContentSourceAsync(It.IsAny<Guid>(), It.IsAny<bool>()), Times.Exactly(1));
+    }
+
+    [Test]
+    public async Task RefreshMemoryCache_Fetches_Draft_And_Published()
+    {
+        // Arrange
+        var hybridCache = GetRequiredService<Microsoft.Extensions.Caching.Hybrid.HybridCache>();
+
+        // Clear both draft and published cache entries.
+        await hybridCache.RemoveAsync($"{Textpage.Key}+draft");
+        await hybridCache.RemoveAsync($"{Textpage.Key}");
+
+        // Act
+        await _documentCacheService.RefreshMemoryCacheAsync(Textpage.Key);
+
+        // Assert - verify only a single call was made to the combined method for retrieving both states.
+        _mockDatabaseCacheRepository.Verify(
+            x => x.GetContentSourceForPublishStatesAsync(Textpage.Key),
+            Times.Exactly(1));
+
+        // Verify individual GetContentSourceAsync was NOT called
+        _mockDatabaseCacheRepository.Verify(
+            x => x.GetContentSourceAsync(It.IsAny<Guid>(), It.IsAny<bool>()),
+            Times.Never);
+
+        // Verify content is now cached - fetching should not hit the repository again.
+        var draftPage = await _mockedCache.GetByIdAsync(Textpage.Key, true);
+        var publishedPage = await _mockedCache.GetByIdAsync(Textpage.Key, false);
+
+        Assert.IsNotNull(draftPage);
+        Assert.IsNotNull(publishedPage);
+        Assert.AreEqual(Textpage.Name, draftPage.Name);
+        Assert.AreEqual(Textpage.Name, publishedPage.Name);
+
+        // Verify no additional repository calls were made (content served from cache).
+        _mockDatabaseCacheRepository.Verify(
+            x => x.GetContentSourceAsync(It.IsAny<Guid>(), It.IsAny<bool>()),
+            Times.Never);
+        _mockDatabaseCacheRepository.Verify(
+            x => x.GetContentSourceForPublishStatesAsync(It.IsAny<Guid>()),
+            Times.Exactly(1));
+    }
+
+    [Test]
+    public async Task Null_Is_Not_Cached_When_Content_Exists_But_Ancestor_Check_Fails()
+    {
+        // Arrange - create a new DocumentCacheService with a controllable HasPublishedAncestorPath mock.
+        var ancestorCheckReturnsTrue = false;
+
+        var controllableMock = new Mock<IPublishStatusQueryService>();
+        controllableMock.Setup(x => x.IsDocumentPublishedInAnyCulture(It.IsAny<Guid>())).Returns(true);
+        controllableMock.Setup(x => x.HasPublishedAncestorPath(It.IsAny<Guid>()))
+            .Returns(() => ancestorCheckReturnsTrue);
+
+        var controlledCacheService = new DocumentCacheService(
+            _mockDatabaseCacheRepository.Object,
+            GetRequiredService<IIdKeyMap>(),
+            GetRequiredService<ICoreScopeProvider>(),
+            GetRequiredService<Microsoft.Extensions.Caching.Hybrid.HybridCache>(),
+            GetRequiredService<IPublishedContentFactory>(),
+            GetRequiredService<ICacheNodeFactory>(),
+            GetSeedProviders(controllableMock.Object),
+            new OptionsWrapper<CacheSettings>(new CacheSettings()),
+            GetRequiredService<IPublishedModelFactory>(),
+            GetRequiredService<IPreviewService>(),
+            controllableMock.Object,
+            new NullLogger<DocumentCacheService>(),
+            new ConvertedPublishedContentCacheFactory(null, new NullLogger<ConvertedPublishedContentCacheFactory>()));
+
+        var controlledCache = new DocumentCache(
+            controlledCacheService,
+            GetRequiredService<IPublishedContentTypeCache>(),
+            GetRequiredService<IDocumentNavigationQueryService>(),
+            GetRequiredService<IDocumentUrlService>(),
+            new Lazy<IPublishedUrlProvider>(GetRequiredService<IPublishedUrlProvider>));
+
+        // Clear any existing cache entry for this key.
+        var hybridCache = GetRequiredService<Microsoft.Extensions.Caching.Hybrid.HybridCache>();
+        await hybridCache.RemoveAsync($"{Textpage.Key}");
+
+        // Act 1 - ancestor check returns false, so GetByKeyAsync should return null.
+        var firstResult = await controlledCache.GetByIdAsync(Textpage.Key, false);
+        Assert.IsNull(firstResult, "First call should return null when ancestor check fails");
+
+        // Act 2 - now the ancestor check returns true.
+        ancestorCheckReturnsTrue = true;
+        var secondResult = await controlledCache.GetByIdAsync(Textpage.Key, false);
+
+        // Assert - the null from step 1 should NOT have been cached, so step 2 should
+        // hit the database again and return the content.
+        Assert.IsNotNull(secondResult, "Second call should return content because null should not have been cached when ancestor check failed");
     }
 
     private void AssertTextPage(IPublishedContent textPage)

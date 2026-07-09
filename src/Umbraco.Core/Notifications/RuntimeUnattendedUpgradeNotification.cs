@@ -1,3 +1,6 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 namespace Umbraco.Cms.Core.Notifications;
 
 /// <summary>
@@ -9,11 +12,29 @@ namespace Umbraco.Cms.Core.Notifications;
 /// </remarks>
 public class RuntimeUnattendedUpgradeNotification : INotification
 {
+    /// <summary>
+    ///     Represents the possible results of an unattended upgrade operation.
+    /// </summary>
     public enum UpgradeResult
     {
+        /// <summary>
+        ///     No upgrade was required.
+        /// </summary>
         NotRequired = 0,
+
+        /// <summary>
+        ///     The upgrade encountered errors.
+        /// </summary>
         HasErrors = 1,
+
+        /// <summary>
+        ///     The core upgrade completed successfully.
+        /// </summary>
         CoreUpgradeComplete = 100,
+
+        /// <summary>
+        ///     The package migration completed successfully.
+        /// </summary>
         PackageMigrationComplete = 101,
     }
 

@@ -1,11 +1,46 @@
 using System.Collections.Immutable;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Persistence.Querying;
+using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Core.Persistence.Repositories;
 
+/// <summary>
+///     Represents a repository for <see cref="IContent" /> document entities.
+/// </summary>
 public interface IDocumentRepository : IContentRepository<int, IContent>, IReadRepository<Guid, IContent>
 {
+    /// <summary>
+    ///     Gets paged documents.
+    /// </summary>
+    /// <param name="query">The base query for documents.</param>
+    /// <param name="pageIndex">The page index (zero-based).</param>
+    /// <param name="pageSize">The number of items per page.</param>
+    /// <param name="totalRecords">Output parameter with total record count.</param>
+    /// <param name="propertyAliases">
+    ///     Optional array of property aliases to load. If null, all properties are loaded.
+    ///     If empty array, no custom properties are loaded (only system properties).
+    /// </param>
+    /// <param name="filter">Optional filter query.</param>
+    /// <param name="ordering">The ordering specification.</param>
+    /// <param name="loadTemplates">
+    ///     Whether to load templates. Set to false for performance optimization when templates are not needed
+    ///     (e.g., collection views). Default is true.
+    /// </param>
+    /// <returns>A collection of documents for the specified page.</returns>
+    /// <remarks>Here, <paramref name="filter" /> can be null but <paramref name="ordering" /> cannot.</remarks>
+    IEnumerable<IContent> GetPage(
+        IQuery<IContent>? query,
+        long pageIndex,
+        int pageSize,
+        out long totalRecords,
+        string[]? propertyAliases,
+        IQuery<IContent>? filter,
+        Ordering? ordering,
+        bool loadTemplates)
+        => GetPage(query, pageIndex, pageSize, out totalRecords, propertyAliases, filter, ordering);
+
     /// <summary>
     ///     Gets publish/unpublish schedule for a content node.
     /// </summary>
@@ -25,12 +60,31 @@ public interface IDocumentRepository : IContentRepository<int, IContent>, IReadR
     /// <summary>
     ///     Clears the publishing schedule for all entries having an a date before (lower than, or equal to) a specified date.
     /// </summary>
+    /// <summary>
+    ///     Clears the publishing schedule for all entries having a date before (lower than, or equal to) a specified date.
+    /// </summary>
+    /// <param name="date">The cutoff date.</param>
     void ClearSchedule(DateTime date);
 
+    /// <summary>
+    ///     Clears the publishing schedule for entries matching the specified action and having a date before the specified date.
+    /// </summary>
+    /// <param name="date">The cutoff date.</param>
+    /// <param name="action">The schedule action to clear.</param>
     void ClearSchedule(DateTime date, ContentScheduleAction action);
 
+    /// <summary>
+    ///     Checks whether there is content scheduled for expiration before the specified date.
+    /// </summary>
+    /// <param name="date">The date to check.</param>
+    /// <returns><c>true</c> if there is content scheduled for expiration; otherwise, <c>false</c>.</returns>
     bool HasContentForExpiration(DateTime date);
 
+    /// <summary>
+    ///     Checks whether there is content scheduled for release before the specified date.
+    /// </summary>
+    /// <param name="date">The date to check.</param>
+    /// <returns><c>true</c> if there is content scheduled for release; otherwise, <c>false</c>.</returns>
     bool HasContentForRelease(DateTime date);
 
     /// <summary>
@@ -69,6 +123,11 @@ public interface IDocumentRepository : IContentRepository<int, IContent>, IReadR
     /// </remarks>
     int CountPublished(string? contentTypeAlias = null);
 
+    /// <summary>
+    ///     Checks whether the path to a content item is published.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <returns><c>true</c> if the path is published; otherwise, <c>false</c>.</returns>
     bool IsPathPublished(IContent? content);
 
     /// <summary>

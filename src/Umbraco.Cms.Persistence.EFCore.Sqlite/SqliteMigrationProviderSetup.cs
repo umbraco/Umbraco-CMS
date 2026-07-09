@@ -1,15 +1,28 @@
 using Microsoft.EntityFrameworkCore;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Persistence.EFCore.Migrations;
 
 namespace Umbraco.Cms.Persistence.EFCore.Sqlite;
 
+/// <summary>
+/// Configures the EF Core DbContext to use SQLite as the database provider.
+/// </summary>
 public class SqliteMigrationProviderSetup : IMigrationProviderSetup
 {
+    /// <inheritdoc />
     public string ProviderName => Constants.ProviderNames.SQLLite;
 
+    /// <inheritdoc />
     public void Setup(DbContextOptionsBuilder builder, string? connectionString)
     {
-        builder.UseSqlite(connectionString, x => x.MigrationsAssembly(GetType().Assembly.FullName));
+        builder.UseSqlite(connectionString, x =>
+        {
+            x.MigrationsAssembly(GetType().Assembly.FullName);
+
+            // Retry transient SQLite errors (BUSY / LOCKED). See SqliteRetryingExecutionStrategy
+            // for the rationale — long-running migrations or schema-modifying operations can
+            // briefly lock the database in a way that surfaces as a hard error to concurrent
+            // EF Core readers (notably OpenIddict token validation). See issue #22939.
+            x.ExecutionStrategy(deps => new SqliteRetryingExecutionStrategy(deps));
+        });
     }
 }

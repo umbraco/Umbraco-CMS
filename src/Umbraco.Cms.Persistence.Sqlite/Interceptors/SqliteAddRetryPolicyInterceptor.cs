@@ -5,8 +5,12 @@ using Umbraco.Cms.Persistence.Sqlite.Services;
 
 namespace Umbraco.Cms.Persistence.Sqlite.Interceptors;
 
+/// <summary>
+/// Wraps SQLite connections with retry policies for transient error handling.
+/// </summary>
 public class SqliteAddRetryPolicyInterceptor : SqliteConnectionInterceptor
 {
+    /// <inheritdoc />
     public override DbConnection OnConnectionOpened(IDatabase database, DbConnection conn)
     {
         RetryStrategy retryStrategy = RetryStrategy.DefaultExponential;

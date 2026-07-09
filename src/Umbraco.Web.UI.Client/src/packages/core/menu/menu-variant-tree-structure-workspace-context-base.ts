@@ -10,7 +10,8 @@ import { UmbAncestorsEntityContext, UmbParentEntityContext, type UmbEntityModel 
 import {
 	UMB_SUBMITTABLE_TREE_ENTITY_WORKSPACE_CONTEXT,
 	UMB_VARIANT_WORKSPACE_CONTEXT,
-	UMB_WORKSPACE_PATH_PATTERN,
+	UMB_WORKSPACE_EDIT_PATH_PATTERN,
+	UMB_WORKSPACE_EDIT_VARIANT_PATH_PATTERN,
 } from '@umbraco-cms/backoffice/workspace';
 import { linkEntityExpansionEntries } from '@umbraco-cms/backoffice/utils';
 import { UMB_MODAL_CONTEXT } from '@umbraco-cms/backoffice/modal';
@@ -89,7 +90,6 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 				(value) => {
 					// Workspace has changed from new to existing
 					if (value === false && this.#isNew === true) {
-						// TODO: We do not need to request here as we already know the structure and unique
 						this.#requestStructure();
 					}
 					this.#isNew = value;
@@ -101,29 +101,34 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 
 	getItemHref(structureItem: UmbVariantStructureItemModel): string | undefined {
 		const sectionName = this._sectionContext?.getPathname();
-		if (!sectionName) {
-			return undefined;
-		}
-		UMB_WORKSPACE_PATH_PATTERN.generateAbsolute({
-			sectionName,
-			entityType: structureItem.entityType,
-		});
-		const path = `section/${this._sectionContext!.getPathname()}/workspace/${structureItem.entityType}/edit/${structureItem.unique}`;
+		if (!sectionName) return undefined;
+
+		const unique = structureItem.unique;
+		if (!unique) return undefined;
 
 		// find related variant id from structure item:
-		const itemVariantFit = structureItem.variants.find((variant) => {
-			return (
+		const itemVariantFit = structureItem.variants.find(
+			(variant) =>
 				variant.culture === this.#workspaceActiveVariantId?.culture &&
-				variant.segment === this.#workspaceActiveVariantId?.segment
-			);
-		});
+				variant.segment === this.#workspaceActiveVariantId?.segment,
+		);
+
 		if (itemVariantFit) {
 			const variantId = UmbVariantId.CreateFromPartial(itemVariantFit);
-			return `${path}/${variantId.toString()}`;
+			return UMB_WORKSPACE_EDIT_VARIANT_PATH_PATTERN.generateAbsolute({
+				sectionName,
+				entityType: structureItem.entityType,
+				unique,
+				variantId: variantId.toString(),
+			});
 		}
 
 		// If no related variantID, then lets the redirect go to the main-variant:
-		return path;
+		return UMB_WORKSPACE_EDIT_PATH_PATTERN.generateAbsolute({
+			sectionName,
+			entityType: structureItem.entityType,
+			unique,
+		});
 	}
 
 	async #requestStructure() {
@@ -138,10 +143,16 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 		let structureItems: Array<UmbVariantStructureItemModel> = [];
 
 		const unique = (await this.observe(uniqueObservable, () => {})?.asPromise()) as string;
-		if (unique === undefined) throw new Error('Unique is not available');
+		if (unique === undefined) {
+			if (this._host) console.warn('[UmbMenuVariantTreeStructureWorkspaceContextBase] unique not available');
+			return;
+		}
 
 		const entityType = (await this.observe(entityTypeObservable, () => {})?.asPromise()) as string;
-		if (!entityType) throw new Error('Entity type is not available');
+		if (!entityType) {
+			if (this._host) console.warn('[UmbMenuVariantTreeStructureWorkspaceContextBase] entityType not available');
+			return;
+		}
 
 		// TODO: introduce variant tree item model
 		const treeRepository = await createExtensionApiByAlias<UmbTreeRepository<any, UmbTreeRootModel>>(
@@ -179,6 +190,10 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 			});
 
 			structureItems.push(...treeItemAncestors);
+
+			// Guard: this context may have been destroyed while the async requests were in flight
+			// (e.g. a condition such as IS_NOT_TRASHED flips before the API response arrives).
+			if (!this._host) return;
 
 			this.#structure.setValue(structureItems);
 			this.#setParentData(structureItems);

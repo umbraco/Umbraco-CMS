@@ -43,7 +43,7 @@ internal sealed class RedirectUrlServiceTests : UmbracoIntegrationTestWithConten
                 Mock.Of<IRepositoryCacheVersionService>(),
                 Mock.Of<ICacheSyncService>());
             var rootContent = ContentService.GetRootContent().First();
-            var subPages = ContentService.GetPagedChildren(rootContent.Id, 0, 3, out _).ToList();
+            var subPages = ContentService.GetPagedChildren(rootContent.Id, 0, 3, out _, propertyAliases: null, filter: null, ordering: null).ToList();
             _firstSubPage = subPages[0];
             _secondSubPage = subPages[1];
             _thirdSubPage = subPages[2];

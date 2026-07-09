@@ -4,9 +4,18 @@ using Umbraco.Cms.Infrastructure.Migrations.Expressions.Update.Expressions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Update;
 
+/// <summary>
+/// Provides a fluent builder for constructing expressions that update data within database migrations.
+/// Use this builder to specify the table, columns, and values to update as part of a migration step.
+/// </summary>
 public class UpdateDataBuilder : ExpressionBuilderBase<UpdateDataExpression>,
     IUpdateTableBuilder, IUpdateWhereBuilder, IExecutableBuilder
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.Migrations.Expressions.Update.UpdateDataBuilder"/> class
+    /// with the specified update data expression.
+    /// </summary>
+    /// <param name="expression">The <see cref="UpdateDataExpression"/> that defines the data to be updated in the migration.</param>
     public UpdateDataBuilder(UpdateDataExpression expression)
         : base(expression)
     {

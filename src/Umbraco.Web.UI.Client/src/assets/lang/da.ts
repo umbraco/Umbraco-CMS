@@ -405,6 +405,8 @@ export default {
 			'Træk dine filer ind i dropzonen for, at uploade dem til\n      mediebiblioteket.\n    ',
 		fileSecurityValidationFailure: 'En eller flere fil-sikkerhedsvalideringer er fejlet',
 		uploadNotAllowed: 'Upload er ikke tiladt på denne lokation',
+		uploadValidationFailed: (mediaTypeName: string) =>
+			`Medietypen ${mediaTypeName} har en eller flere påkrævede egenskaber. Det skal uploades individuelt via menuen 'Opret'`,
 	},
 	member: {
 		createNewMember: 'Opret et nyt medlem',
@@ -448,7 +450,7 @@ export default {
 		noDocumentTypesEditPermissions: 'Rediger tilladelser for denne dokumenttype.',
 		noDocumentTypesCreateNew: 'Opret en ny dokumenttype',
 		noDocumentTypesAllowedAtRoot:
-			'Der er ingen tilladte Dokumenttyper tilgængelige for at lave indhold her. Du skal tillade dette i <strong>Dokumenttyper</strong> inde i <strong>Indstillinger</strong> sektionen, ved at ændre <strong>Tillad på rodniveau</strong> indestillingen under <strong>Permissions</strong>.',
+			'Der er ingen tilladte Dokumenttyper tilgængelige for at lave indhold her. Du skal tillade dette i <strong>Dokumenttyper</strong> inde i <strong>Indstillinger</strong> sektionen, ved at ændre <strong>Tillad på rodniveau</strong> indestillingen under <strong>Struktur</strong>.',
 		noMediaTypes:
 			'Der kunne ikke findes nogen tilladte media typer. Du skal tillade disse i indstillinger under <strong>"media typer"</strong>.',
 		noMediaTypesWithNoSettingsAccess: 'Det valgte medie i træet tillader ikke at medier oprettes under det.\n    ',
@@ -614,7 +616,7 @@ export default {
 		noMacroParams: 'Der er ingen parametre for denne makro',
 		noMacros: 'Der er ikke tilføjet nogen makroer',
 		externalLoginProviders: 'Eksternt login',
-		exceptionDetail: 'Undtagelsesdetaljer',
+		exceptionDetail: 'Fejldetaljer',
 		stacktrace: 'Stacktrace',
 		innerException: 'Indre undtagelse',
 		linkYour: 'Link din {0} konto',
@@ -634,11 +636,15 @@ export default {
 		deleteLayout: 'You are deleting the layout',
 		deletingALayout:
 			'Modifying layout will result in loss of data for any existing content that is based on this configuration.',
-		seeErrorAction: 'Se fejlen',
+		seeErrorAction: 'Se hele fejlbeskeden',
 		seeErrorDialogHeadline: 'Fejl detaljer',
 		selectEvent: 'Vælg begivenhed',
 		editWebhook: 'Rediger webhook',
+		cannotTrashWhenReferenced: (name: string) =>
+			`<strong>${name}</strong> kan ikke flyttes til papirkurven, fordi det refereres af andre elementer.`,
 		confirmTrash: (name: string) => `Er du sikker på, at du vil flytte <strong>${name}</strong> til papirkurven?`,
+		cannotBulkTrashWhenReferenced: (total: number) =>
+			`De valgte <strong>${total} ${total === 1 ? 'element' : 'elementer'}</strong> kan ikke flyttes til papirkurven, fordi mindst \u00e9t element refereres af andet indhold.`,
 		confirmBulkTrash: (total: number) =>
 			`Er du sikker på, at du vil flytte <strong>${total} ${total === 1 ? 'element' : 'elementer'}</strong> til papirkurven?`,
 		confirmBulkDelete: (total: number) =>
@@ -838,6 +844,7 @@ export default {
 		content: 'Indhold',
 		continue: 'Fortsæt',
 		copy: 'Kopiér',
+		copied: 'Kopieret!',
 		create: 'Opret',
 		cropSection: 'Beskær sektion',
 		database: 'Database',
@@ -846,6 +853,7 @@ export default {
 		delete: 'Slet',
 		deleted: 'Slettet',
 		deleting: 'Sletter...',
+		description: 'Beskrivelse',
 		design: 'Design',
 		details: 'Detaljer',
 		dictionary: 'Ordbog',
@@ -1006,6 +1014,7 @@ export default {
 		manifest: 'Manifest',
 		toggleFor: 'Toggle for %0%',
 		document: 'Dokument',
+		documentCount: (count: number) => (count === 1 ? '1 dokument' : `${count} dokumenter`),
 	},
 	colors: {
 		black: 'Sort',
@@ -1397,9 +1406,9 @@ export default {
 	rollback: {
 		changes: 'Ændringer',
 		headline: 'Vælg en version at sammenligne med den nuværende version',
-		diffHelp:
-			'Her vises forskellene mellem den nuværende version og den valgte version<br /><del>Rød</del> tekst vil ikke blive vist i den valgte version. <ins>Grøn betyder tilføjet</ins>',
-		noDiff: 'Der er ingen forskelle mellem den nuværende version og den valgte version',
+		diffHelp: '<del>Rød tekst</del> vil blive fjernet i den valgte version, <ins>grøn tekst</ins> vil blive tilføjet.',
+		showDiff: 'Vis forskelle mellem den nuværende version og den valgte version.',
+		noDiff: 'Der er ingen forskelle mellem den nuværende version og den valgte version.',
 		documentRolledBack: 'Dokument tilbagerullet',
 		htmlHelp:
 			"Her vises den valgte version som html. Hvis du ønsker at se forskellen mellem de 2 versioner\n      på samme tid, brug 'diff'-oversigten\n    ",
@@ -1440,6 +1449,7 @@ export default {
 		tabs: 'Faneblade',
 		createMatchingTemplate: 'Opret tilsvarende skabelon',
 		addIcon: 'Tilføj ikon',
+		changeIcon: 'Skift ikon',
 		contentTypeEnabled: 'Master Content Type enabled',
 		contentTypeUses: 'This Content Type uses',
 		noPropertiesDefinedOnTab:
@@ -1739,9 +1749,19 @@ export default {
 		chooseChildNode: 'Vælg child node',
 		compositionsDescription:
 			'Nedarv faner og egenskaber fra en anden dokumenttype. Nye faner vil blive\n      tilføjet den nuværende dokumenttype eller sammenflettet hvis fanenavnene er ens.\n    ',
+		compositionsDescriptionMediaType:
+			'Nedarv faner og egenskaber fra en anden medietype. Nye faner vil blive\n      tilføjet den nuværende medietype eller sammenflettet hvis fanenavnene er ens.\n    ',
+		compositionsDescriptionMemberType:
+			'Nedarv faner og egenskaber fra en anden medlemstype. Nye faner vil blive\n      tilføjet den nuværende medlemstype eller sammenflettet hvis fanenavnene er ens.\n    ',
 		compositionInUse:
 			'Indholdstypen bliver brugt i en komposition og kan derfor ikke blive anvendt som\n      komposition\n    ',
+		compositionInUseMediaType:
+			'Medietypen bliver brugt i en komposition og kan derfor ikke blive anvendt som\n      komposition\n    ',
+		compositionInUseMemberType:
+			'Medlemstypen bliver brugt i en komposition og kan derfor ikke blive anvendt som\n      komposition\n    ',
 		noAvailableCompositions: 'Der er ingen indholdstyper tilgængelige at bruge som komposition',
+		noAvailableCompositionsMediaType: 'Der er ingen medietyper tilgængelige at bruge som komposition',
+		noAvailableCompositionsMemberType: 'Der er ingen medlemstyper tilgængelige at bruge som komposition',
 		compositionRemoveWarning:
 			'Når du fjerner en komposition vil alle associerede indholdsdata blive slettet.\n      Når først dokumenttypen er gemt, er der ingen vej tilbage.\n    ',
 		availableEditors: 'Opret ny indstilling',
@@ -1749,6 +1769,7 @@ export default {
 		editorSettings: 'Input indstillinger',
 		searchResultSettings: 'Tilgængelige indstillinger',
 		searchResultEditors: 'Opret ny indstilling',
+		suggestedEditors: 'Forslag',
 		configuration: 'Konfiguration',
 		yesDelete: 'Ja, slet',
 		movedUnderneath: 'blev flyttet til',
@@ -1778,6 +1799,8 @@ export default {
 		tabHasNoSortOrder: 'fane har ingen sorteringsrækkefølge',
 		compositionUsageHeading: 'Hvor er denne komposition brugt?',
 		compositionUsageSpecification: 'Denne komposition brugt i kompositionen af de følgende indholdstyper:\n    ',
+		compositionUsageSpecificationMediaType: 'Denne komposition brugt i kompositionen af de følgende medietyper:\n    ',
+		compositionUsageSpecificationMemberType: 'Denne komposition brugt i kompositionen af de følgende medlemstyper:\n    ',
 		variantsHeading: 'Tillad variationer',
 		cultureVariantHeading: 'Tillad sprogvariation',
 		segmentVariantHeading: 'Tillad segmentering',
@@ -1994,6 +2017,13 @@ export default {
 		advancedGroup: 'Avanceret',
 		webhooks: 'Webhooks',
 	},
+	tree: {
+		classicViewLabel: 'Træ',
+		cardViewLabel: 'Kort',
+		tableViewLabel: 'Tabel',
+		children: 'Underelementer',
+		noItems: 'Ingen elementer',
+	},
 	update: {
 		updateAvailable: 'Ny opdatering er klar',
 		updateDownloadText: '%0% er klar, klik her for at downloade',
@@ -2017,13 +2047,14 @@ export default {
 		},
 		changePassword: 'Skift dit kodeord',
 		changePhoto: 'Skift billede',
-		configureMfa: 'Konfigurer MFA',
+		configureMfa: 'Konfigurer 2FA',
 		newPassword: 'Nyt kodeord',
 		newPasswordFormatLengthTip: 'Minium %0% karakterer tilbage!',
 		newPasswordFormatNonAlphaTip: 'Der skal som minium være %0% specielle karakterer.',
 		noLockouts: 'er ikke blevet låst ude',
 		noPasswordChange: 'Kodeordet er ikke blevet ændret',
 		confirmNewPassword: 'Gentag dit nye kodeord',
+		confirmPassword: 'Bekræft kodeord',
 		changePasswordDescription:
 			"Du kan ændre dit kodeord, som giver dig adgang til Umbraco backoffice ved at\n      udfylde formularen og klikke på knappen 'Skift dit kodeord'\n    ",
 		contentChannel: 'Indholdskanal',
@@ -2235,6 +2266,8 @@ export default {
 	redirectUrls: {
 		disableUrlTracker: 'Slå URL tracker fra',
 		enableUrlTracker: 'Slå URL tracker til',
+		urlTrackerEnabled: 'Aktiveret',
+		urlTrackerDisabled: 'Deaktiveret',
 		culture: 'Kultur',
 		originalUrl: 'Original URL',
 		redirectedTo: 'Viderestillet til',
@@ -2253,6 +2286,10 @@ export default {
 		enabledConfirm: 'URL tracker er nu slået fra.',
 		enableError:
 			'Der opstod en fejl under forsøget på at slå URL trackeren til, der findes mere information\n      i logfilen.\n    ',
+	},
+	embeddedMedia: {
+		dimensionsDescription:
+			'Disse værdier sendes som den maksimale bredde og højde til embed-udbyderen. Udbyderen kan justere de endelige dimensioner for at overholde sine egne begrænsninger.',
 	},
 	emptyStates: {
 		emptyDictionaryTree: 'Ingen ordbog elementer at vælge imellem',
@@ -2315,7 +2352,8 @@ export default {
 		openBackofficeSearch: 'Åben backoffice søgning',
 		openCloseBackofficeHelp: 'Åben/Luk backoffice hjælp',
 		openCloseBackofficeProfileOptions: 'Åben/Luk dine profil indstillinger',
-		profileOptions: 'Profil indstillinger',
+		profileOptions: 'Brugerprofil for %0% (%1%)',
+		profileOptionsDefault: 'Brugerprofil',
 		assignDomainDescription: 'Tilføj domæne på %0%',
 		createDescription: 'Opret ny node under %0%',
 		protectDescription: 'Opsæt offentlig adgang på %0%',
@@ -2641,6 +2679,18 @@ export default {
 		title: 'Vælg Property Editor',
 		openPropertyEditorPicker: 'Vælg Property Editor',
 	},
+
+	propertyEditorUIGroups: {
+		advanced: 'Advanceret',
+		blocks: 'Bloks',
+		common: 'Generelt',
+		date: 'Dato og tid',
+		lists: 'Lister',
+		media: 'Medier',
+		people: 'Personer',
+		pickers: 'Vælgere',
+		richContent: 'Beriget indhold',
+	},
 	healthcheck: {
 		checkSuccessMessage: "Value is set to the recommended value: '%0%'.",
 		checkErrorMessageDifferentExpectedValue:
@@ -2848,6 +2898,8 @@ export default {
 	collection: {
 		noItemsTitle: 'Intet indhold',
 		addCollectionConfiguration: 'Tilføj samling',
+		cardViewLabel: 'Kort',
+		tableViewLabel: 'Tabel',
 	},
 	linkPicker: {
 		modalSource: 'Kilde',
@@ -2858,5 +2910,9 @@ export default {
 		resetUrlHeadline: 'Nulstil URL?',
 		resetUrlMessage: 'Er du sikker på, at du vil nulstille denne URL?',
 		resetUrlLabel: 'Nulstil',
+		selectLanguageHint: 'Vælg sprog for linket',
+		selectLanguageDefault: 'Auto (besøgendes sprog)',
+		configCultureSpecificDocumentLinksLabel: 'Kulturspecifikke dokumentlinks',
+		configCultureSpecificDocumentLinksDescription: 'Tillad brugeren at vælge specifik kultur for dokumenter.',
 	},
 } as UmbLocalizationDictionary;

@@ -221,12 +221,12 @@ export class UmbInputDocumentPropertyValueUserPermissionElement extends UUIFormC
 
 		const documentType = this._documentTypes?.find((item) => item.unique === permission.documentType.unique);
 		const propertyType = documentType?.properties.find((item) => item.unique === permission.propertyType.unique);
-		const permissionName = `${documentType?.name}: ${propertyType?.name} (${propertyType?.alias})`;
+		const permissionName = `${this.localize.string(documentType?.name)}: ${this.localize.string(propertyType?.name)} (${propertyType?.alias})`;
 		const verbNames = this.#getVerbNamesForPermission(permission);
 
 		return html`
 			<uui-ref-node .name=${permissionName} .detail=${verbNames || ''} readonly>
-				${documentType?.icon ? html`<uui-icon slot="icon" name=${ifDefined(documentType?.icon)}></uui-icon>` : nothing}
+				${documentType?.icon ? html`<umb-icon slot="icon" name=${ifDefined(documentType?.icon)}></umb-icon>` : nothing}
 				<uui-action-bar slot="actions"
 					>${this.#renderEditButton(permission)} ${this.#renderRemoveButton(permission)}</uui-action-bar
 				>

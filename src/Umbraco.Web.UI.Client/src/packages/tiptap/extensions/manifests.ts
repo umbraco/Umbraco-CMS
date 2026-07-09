@@ -1,6 +1,7 @@
+import { manifest as actionButtonKind } from './tiptap-toolbar-action-button.kind.js';
 import { manifest as buttonKind } from './tiptap-toolbar-button.kind.js';
-import { manifest as colorPickerButton } from './tiptap-toolbar-color-picker-button.kind.js';
-import { manifest as menuButton } from './tiptap-toolbar-menu.kind.js';
+import { manifest as colorPickerButtonKind } from './tiptap-toolbar-color-picker-button.kind.js';
+import { manifest as menuButtonKind } from './tiptap-toolbar-menu.kind.js';
 import { manifest as styleMenuKind } from './style-menu/style-menu.kind.js';
 import { manifests as anchor } from './anchor/manifests.js';
 import { manifests as block } from './block/manifests.js';
@@ -45,7 +46,7 @@ import { manifests as undoRedo } from './undo-redo/manifests.js';
 import { manifests as viewSource } from './view-source/manifests.js';
 import { manifests as wordCount } from './word-count/manifests.js';
 
-const kinds = [buttonKind, colorPickerButton, menuButton, styleMenuKind];
+const kinds = [actionButtonKind, buttonKind, colorPickerButtonKind, menuButtonKind, styleMenuKind];
 
 export const manifests = [
 	...kinds,

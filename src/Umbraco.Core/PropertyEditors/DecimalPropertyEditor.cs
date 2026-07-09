@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
+using System.Text.Json.Nodes;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
@@ -20,7 +21,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     Constants.PropertyEditors.Aliases.Decimal,
     ValueType = ValueTypes.Decimal,
     ValueEditorIsReusable = true)]
-public class DecimalPropertyEditor : DataEditor
+public class DecimalPropertyEditor : DataEditor, IValueSchemaProvider
 {
     /// <summary>
     ///     Initializes a new instance of the <see cref="DecimalPropertyEditor" /> class.
@@ -29,6 +30,45 @@ public class DecimalPropertyEditor : DataEditor
         IDataValueEditorFactory dataValueEditorFactory)
         : base(dataValueEditorFactory) =>
         SupportsReadOnly = true;
+
+    /// <inheritdoc />
+    public Type? GetValueType(object? configuration) => typeof(decimal?);
+
+    /// <inheritdoc />
+    public JsonObject? GetValueSchema(object? configuration)
+    {
+        var schema = new JsonObject
+        {
+            ["$schema"] = "https://json-schema.org/draft/2020-12/schema",
+            ["type"] = new JsonArray("number", "null"),
+        };
+
+        // Add min/max/step constraints from configuration if available
+        if (configuration is IDictionary<string, object> configDict)
+        {
+            if (configDict.TryGetValue("min", out var minValue) && minValue is double min)
+            {
+                schema["minimum"] = min;
+            }
+
+            if (configDict.TryGetValue("max", out var maxValue) && maxValue is double max)
+            {
+                schema["maximum"] = max;
+            }
+
+            if (configDict.TryGetValue("step", out var stepValue) && stepValue is double step && step > 0)
+            {
+                schema["multipleOf"] = step;
+            }
+            else
+            {
+                // Default: allow up to 6 decimal places, matching DB DECIMAL(38,6)
+                schema["multipleOf"] = 0.000001;
+            }
+        }
+
+        return schema;
+    }
 
     /// <inheritdoc />
     protected override IDataValueEditor CreateValueEditor()
@@ -200,9 +240,20 @@ public class DecimalPropertyEditor : DataEditor
                     yield break;
                 }
 
-                if (TryGetConfiguredValue(dataTypeConfiguration, ConfigurationKeyMinValue, out double min) &&
-                    TryGetConfiguredValue(dataTypeConfiguration, ConfigurationKeyStepValue, out double step) &&
-                    ValidationHelper.IsValueValidForStep((decimal)parsedDecimalValue, (decimal)min, (decimal)step) is false)
+                // Default min to 0 if not configured (step validation is relative to min).
+                if (TryGetConfiguredValue(dataTypeConfiguration, ConfigurationKeyMinValue, out double min) is false)
+                {
+                    min = 0;
+                }
+
+                // Default step to 0.000001 (6 decimal places) if not configured,
+                // matching the database DECIMAL(38,6) column precision.
+                if (TryGetConfiguredValue(dataTypeConfiguration, ConfigurationKeyStepValue, out double step) is false)
+                {
+                    step = 0.000001;
+                }
+
+                if (ValidationHelper.IsValueValidForStep((decimal)parsedDecimalValue, (decimal)min, (decimal)step) is false)
                 {
                     yield return new ValidationResult(
                         LocalizedTextService.Localize("validation", "invalidStep", [parsedDecimalValue.ToString(), step.ToString(), min.ToString()]),

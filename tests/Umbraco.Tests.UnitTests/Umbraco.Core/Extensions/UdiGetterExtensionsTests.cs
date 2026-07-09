@@ -57,7 +57,7 @@ public class UdiGetterExtensionsTests
     [TestCase("6ad82c70-685c-4e04-9b36-d81bd779d16f", "umb://media/6ad82c70685c4e049b36d81bd779d16f")]
     public void GetUdiForMedia(Guid key, string expected)
     {
-        Media entity = new MediaBuilder()
+        global::Umbraco.Cms.Core.Models.Media entity = new MediaBuilder()
             .WithKey(key)
             .WithMediaType(MediaTypeBuilder.CreateImageMediaType())
             .Build();

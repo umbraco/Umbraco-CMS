@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
@@ -16,31 +17,50 @@ public class PublishStatusService : IPublishStatusManagementService, IPublishSta
     private readonly ILanguageService _languageService;
     private readonly IDocumentNavigationQueryService _documentNavigationQueryService;
 
-    private readonly IDictionary<Guid, ISet<string>> _publishedCultures = new Dictionary<Guid, ISet<string>>();
-
-    private string? DefaultCulture { get; set; }
+    private ConcurrentDictionary<Guid, ISet<string>> _publishedCultures = new();
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="PublishStatusService"/> class.
+    /// Gets or sets the default culture ISO code used when no culture is specified.
     /// </summary>
-    public PublishStatusService(
-        ILogger<PublishStatusService> logger,
-        IPublishStatusRepository publishStatusRepository,
-        ICoreScopeProvider coreScopeProvider,
-        ILanguageService languageService,
-        IDocumentNavigationQueryService documentNavigationQueryService)
-    {
-        _logger = logger;
-        _publishStatusRepository = publishStatusRepository;
-        _coreScopeProvider = coreScopeProvider;
-        _languageService = languageService;
-        _documentNavigationQueryService = documentNavigationQueryService;
-    }
+    private string? DefaultCulture { get; set; }
+
+/// <summary>
+/// Initializes a new instance of the <see cref="PublishStatusService"/> class.
+/// </summary>
+/// <param name="logger">The logger for diagnostic output.</param>
+/// <param name="publishStatusRepository">The repository for accessing publish status data.</param>
+/// <param name="coreScopeProvider">The provider for creating database scopes.</param>
+/// <param name="languageService">The service for retrieving language information.</param>
+/// <param name="documentNavigationQueryService">The service for querying document navigation structure.</param>
+public PublishStatusService(
+    ILogger<PublishStatusService> logger,
+    IPublishStatusRepository publishStatusRepository,
+    ICoreScopeProvider coreScopeProvider,
+    ILanguageService languageService,
+    IDocumentNavigationQueryService documentNavigationQueryService)
+{
+    _logger = logger;
+    _publishStatusRepository = publishStatusRepository;
+    _coreScopeProvider = coreScopeProvider;
+    _languageService = languageService;
+    _documentNavigationQueryService = documentNavigationQueryService;
+}
 
     /// <inheritdoc/>
     public async Task InitializeAsync(CancellationToken cancellationToken)
     {
-        _publishedCultures.Clear();
+        // On subscriber/CD servers in a load-balanced setup, cache refresh notifications can trigger
+        // re-initialization while other threads are reading _publishedCultures. The previous approach
+        // called _publishedCultures.Clear() then gradually re-added entries, creating a window where
+        // concurrent readers (e.g. HasPublishedAncestorPath) would see an empty dictionary and
+        // incorrectly conclude that content is unpublished.
+        //
+        // Instead, we build a completely new dictionary from the DB, then swap it in with
+        // Interlocked.Exchange. Readers that already hold a reference to the old dictionary continue
+        // to use it safely; new readers pick up the fully populated replacement. There is no window
+        // where the dictionary is empty.
+        //
+        // Verified by: PublishStatusServiceTests.Concurrent_Initialize_Never_Transiently_Loses_Published_Status
         IDictionary<Guid, ISet<string>> publishStatus;
         using (ICoreScope scope = _coreScopeProvider.CreateCoreScope())
         {
@@ -48,15 +68,10 @@ public class PublishStatusService : IPublishStatusManagementService, IPublishSta
             scope.Complete();
         }
 
-        foreach ((Guid documentKey, ISet<string> publishedCultures) in publishStatus)
-        {
-            if (_publishedCultures.TryAdd(documentKey, publishedCultures) is false)
-            {
-                _logger.LogWarning("Failed to add published cultures for document {DocumentKey}", documentKey);
-            }
-        }
-
+        var newDictionary = new ConcurrentDictionary<Guid, ISet<string>>(publishStatus);
         DefaultCulture = await _languageService.GetDefaultIsoCodeAsync();
+
+        Interlocked.Exchange(ref _publishedCultures, newDictionary);
     }
 
     /// <inheritdoc/>
@@ -92,6 +107,13 @@ public class PublishStatusService : IPublishStatusManagementService, IPublishSta
 
     /// <inheritdoc/>
     public bool HasPublishedAncestorPath(Guid contentKey)
+        => HasPublishedAncestorPathInternal(contentKey, null);
+
+    /// <inheritdoc/>
+    public bool HasPublishedAncestorPath(Guid contentKey, string culture)
+        => HasPublishedAncestorPathInternal(contentKey, culture);
+
+    private bool HasPublishedAncestorPathInternal(Guid contentKey, string? culture)
     {
         var success = _documentNavigationQueryService.TryGetAncestorsKeys(contentKey, out IEnumerable<Guid> keys);
         if (success is false)
@@ -104,8 +126,11 @@ public class PublishStatusService : IPublishStatusManagementService, IPublishSta
 
         foreach (Guid key in keys)
         {
+            var isPublished = culture is null
+                ? IsDocumentPublishedInAnyCulture(key)
+                : IsDocumentPublished(key, culture);
 
-            if (IsDocumentPublishedInAnyCulture(key) is false)
+            if (isPublished is false)
             {
                 return false;
             }
@@ -119,14 +144,14 @@ public class PublishStatusService : IPublishStatusManagementService, IPublishSta
     {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         ISet<string> publishedCultures = await _publishStatusRepository.GetPublishStatusAsync(documentKey, cancellationToken);
-        _publishedCultures[documentKey] = publishedCultures;
+        UpdatePublishedCultures(documentKey, publishedCultures);
         scope.Complete();
     }
 
     /// <inheritdoc/>
     public Task RemoveAsync(Guid documentKey, CancellationToken cancellationToken)
     {
-        _publishedCultures.Remove(documentKey);
+        RemovePublishedCultures(documentKey);
         return Task.CompletedTask;
     }
 
@@ -142,7 +167,22 @@ public class PublishStatusService : IPublishStatusManagementService, IPublishSta
 
         foreach ((Guid documentKey, ISet<string> publishedCultures) in publishStatus)
         {
-            _publishedCultures[documentKey] = publishedCultures;
+            UpdatePublishedCultures(documentKey, publishedCultures);
         }
     }
+
+    private void UpdatePublishedCultures(Guid documentKey, ISet<string> publishedCultures)
+    {
+        if (publishedCultures.Count > 0)
+        {
+            _publishedCultures[documentKey] = publishedCultures;
+        }
+        else
+        {
+            RemovePublishedCultures(documentKey);
+        }
+    }
+
+    private void RemovePublishedCultures(Guid documentKey)
+        => _publishedCultures.TryRemove(documentKey, out _);
 }

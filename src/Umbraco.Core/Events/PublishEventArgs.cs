@@ -1,5 +1,9 @@
 namespace Umbraco.Cms.Core.Events;
 
+/// <summary>
+///     Represents event data for publish operations.
+/// </summary>
+/// <typeparam name="TEntity">The type of the entity being published.</typeparam>
 public class PublishEventArgs<TEntity> : CancellableEnumerableObjectEventArgs<TEntity>,
     IEquatable<PublishEventArgs<TEntity>>
 {
@@ -90,9 +94,16 @@ public class PublishEventArgs<TEntity> : CancellableEnumerableObjectEventArgs<TE
     /// </summary>
     public IEnumerable<TEntity>? PublishedEntities => EventObject;
 
+    /// <summary>
+    ///     Determines whether two <see cref="PublishEventArgs{TEntity}" /> instances are equal.
+    /// </summary>
+    /// <param name="left">The first instance to compare.</param>
+    /// <param name="right">The second instance to compare.</param>
+    /// <returns><c>true</c> if the instances are equal; otherwise, <c>false</c>.</returns>
     public static bool operator ==(PublishEventArgs<TEntity> left, PublishEventArgs<TEntity> right) =>
         Equals(left, right);
 
+    /// <inheritdoc />
     public bool Equals(PublishEventArgs<TEntity>? other)
     {
         if (ReferenceEquals(null, other))
@@ -108,6 +119,7 @@ public class PublishEventArgs<TEntity> : CancellableEnumerableObjectEventArgs<TE
         return base.Equals(other);
     }
 
+    /// <inheritdoc />
     public override bool Equals(object? obj)
     {
         if (ReferenceEquals(null, obj))
@@ -128,6 +140,7 @@ public class PublishEventArgs<TEntity> : CancellableEnumerableObjectEventArgs<TE
         return Equals((PublishEventArgs<TEntity>)obj);
     }
 
+    /// <inheritdoc />
     public override int GetHashCode()
     {
         unchecked
@@ -136,6 +149,12 @@ public class PublishEventArgs<TEntity> : CancellableEnumerableObjectEventArgs<TE
         }
     }
 
+    /// <summary>
+    ///     Determines whether two <see cref="PublishEventArgs{TEntity}" /> instances are not equal.
+    /// </summary>
+    /// <param name="left">The first instance to compare.</param>
+    /// <param name="right">The second instance to compare.</param>
+    /// <returns><c>true</c> if the instances are not equal; otherwise, <c>false</c>.</returns>
     public static bool operator !=(PublishEventArgs<TEntity> left, PublishEventArgs<TEntity> right) =>
         !Equals(left, right);
 }

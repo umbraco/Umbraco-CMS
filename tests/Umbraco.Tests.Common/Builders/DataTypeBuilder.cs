@@ -136,7 +136,7 @@ public class DataTypeBuilder
         var name = _name ?? Guid.NewGuid().ToString();
         var level = _level ?? 0;
         var path = _path ?? $"-1,{id}";
-        var creatorId = _creatorId ?? 1;
+        var creatorId = _creatorId ?? Constants.Security.SuperUserId;
         var databaseType = _databaseType ?? ValueStorageType.Ntext;
         var sortOrder = _sortOrder ?? 0;
         var serializer = new SystemTextConfigurationEditorJsonSerializer(new DefaultJsonSerializerEncoderFactory());

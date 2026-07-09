@@ -3,6 +3,9 @@ using Umbraco.Cms.Core.Composing;
 
 namespace Umbraco.Extensions;
 
+/// <summary>
+///     Provides extension methods for <see cref="ITypeFinder"/> to simplify type discovery operations.
+/// </summary>
 public static class TypeFinderExtensions
 {
     /// <summary>

@@ -54,8 +54,8 @@ internal sealed class ContentTypeCommonRepository : IContentTypeCommonRepository
     /// <inheritdoc />
     public IEnumerable<IContentTypeComposition>? GetAllTypes() =>
 
-        // use a 5 minutes sliding cache - same as FullDataSet cache policy
-        _appCaches.RuntimeCache.GetCacheItem(CacheKey, GetAllTypesInternal, TimeSpan.FromMinutes(5), true);
+        // use a sliding cache - same as FullDataSet cache policy
+        _appCaches.RuntimeCache.GetCacheItem(CacheKey, GetAllTypesInternal, RepositoryCacheConstants.DefaultCacheDuration, true);
 
     /// <inheritdoc />
     public void ClearCache() => _appCaches.RuntimeCache.Clear(CacheKey);
@@ -214,7 +214,7 @@ internal sealed class ContentTypeCommonRepository : IContentTypeCommonRepository
         List<ContentTypeTemplateDto>? templateDtos = Database?.Fetch<ContentTypeTemplateDto>(sql1);
 
         // var templates = templateRepository.GetMany(templateDtos.Select(x => x.TemplateNodeId).ToArray()).ToDictionary(x => x.Id, x => x);
-        IEnumerable<ITemplate>? allTemplates = _templateRepository.GetMany();
+        IEnumerable<ITemplate>? allTemplates = _templateRepository.GetMany((int[]?)null);
 
         var templates = allTemplates.ToDictionary(x => x.Id, x => x);
         var templateDtoIx = 0;

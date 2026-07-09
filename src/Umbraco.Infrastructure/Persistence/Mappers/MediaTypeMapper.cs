@@ -11,6 +11,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Mappers;
 [MapperFor(typeof(MediaType))]
 public sealed class MediaTypeMapper : BaseMapper
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MediaTypeMapper"/> class.
+    /// </summary>
+    /// <param name="sqlContext">The lazy-loaded SQL context to be used by the mapper.</param>
+    /// <param name="maps">The configuration store containing mapping definitions.</param>
     public MediaTypeMapper(Lazy<ISqlContext> sqlContext, MapperConfigurationStore maps)
         : base(sqlContext, maps)
     {

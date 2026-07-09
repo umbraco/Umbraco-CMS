@@ -6,13 +6,14 @@ export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'propertyEditorUi',
 		alias: 'Umb.PropertyEditorUi.BlockSingle',
-		name: 'Block Single Property Editor UI',
+		name: 'Single Block Property Editor UI',
 		element: () => import('./property-editor-ui-block-single.element.js'),
 		meta: {
-			label: 'Block Single',
+			label: 'Single Block',
 			propertyEditorSchemaAlias: UMB_BLOCK_SINGLE_PROPERTY_EDITOR_SCHEMA_ALIAS,
 			icon: 'icon-shape-square',
-			group: 'richContent',
+			group: '#propertyEditorUIGroups_richContent',
+			keywords: ['component', 'widget', 'banner', 'hero', 'cta', 'promo', 'cta', 'callout', 'spotlight', 'feature'],
 			supportsReadOnly: true,
 			settings: {
 				properties: [
@@ -28,6 +29,12 @@ export const manifests: Array<UmbExtensionManifest> = [
 						label: 'Inline editing mode',
 						description: 'Use the inline editor as the default block view.',
 						propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
+					},
+					{
+						alias: 'createModalSize',
+						label: '#blockEditor_labelCreateModalSize',
+						propertyEditorUiAlias: 'Umb.PropertyEditorUi.OverlaySize',
+						config: [{ alias: 'defaultOptionLabel', value: 'Auto' }],
 					},
 					{
 						alias: 'maxPropertyWidth',

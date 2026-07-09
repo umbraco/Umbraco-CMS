@@ -1,5 +1,6 @@
 ﻿using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.Mapping.Item;
+using Umbraco.Cms.Api.Management.Services.Entities;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Extensions;
@@ -13,6 +14,7 @@ internal static class EntityBuilderExtensions
         builder.WithCollectionBuilder<MapDefinitionCollectionBuilder>()
             .Add<ItemTypeMapDefinition>();
         builder.Services.AddUnique<IFileItemPresentationFactory, FileItemPresentationFactory>();
+        builder.Services.AddUnique<IItemAncestorService, ItemAncestorService>();
 
         return builder;
     }

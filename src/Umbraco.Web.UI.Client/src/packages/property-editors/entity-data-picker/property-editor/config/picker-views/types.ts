@@ -1,0 +1,6 @@
+export type UmbEntityDataPickerPickerViewsConfigurationPropertyValue =
+	Array<UmbEntityDataPickerPickerViewsConfigurationPropertyValueEntry>;
+
+export interface UmbEntityDataPickerPickerViewsConfigurationPropertyValueEntry {
+	alias: string;
+}

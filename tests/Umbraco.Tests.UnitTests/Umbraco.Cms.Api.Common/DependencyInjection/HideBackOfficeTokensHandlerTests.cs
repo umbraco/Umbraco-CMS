@@ -1,7 +1,10 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Security.Cryptography;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
@@ -36,16 +39,19 @@ internal class HideBackOfficeTokensHandlerTests
         public HideBackOfficeTokensHandler Sut => field ??= new HideBackOfficeTokensHandler(
             HttpContextAccessor.Object,
             DataProtectionProvider.Object,
+            NullLogger<HideBackOfficeTokensHandler>.Instance,
             Options.Create(BackOfficeTokenCookieSettings),
             Options.Create(GlobalSettings));
 
         public Mock<IHttpContextAccessor> HttpContextAccessor { get; } = new();
 
-        private Mock<IDataProtectionProvider> DataProtectionProvider { get; } = new();
+        public Mock<IDataProtectionProvider> DataProtectionProvider { get; } = new();
 
         public Mock<IDataProtector> DataProtector { get; } = new();
 
-        private BackOfficeTokenCookieSettings BackOfficeTokenCookieSettings { get; set; } = new();
+#pragma warning disable CS0618 // Type or member is obsolete
+        public BackOfficeTokenCookieSettings BackOfficeTokenCookieSettings { get; set; } = new();
+#pragma warning restore CS0618 // Type or member is obsolete
 
         public GlobalSettings GlobalSettings { get; set; } = new();
 
@@ -211,6 +217,27 @@ internal class HideBackOfficeTokensHandlerTests
         }
     }
 
+    [Test]
+    public async Task ApplyTokenResponse_CookieSiteNamePostfix()
+    {
+        // Arrange
+        var setup = new TestSetup();
+        setup.BackOfficeTokenCookieSettings.SiteName = "-test-site-name";
+        setup.GlobalSettings.UseHttps = false;
+        setup.SetupHttpContext(isHttps: false);
+
+        var context = CreateApplyTokenResponseContext(Constants.OAuthClientIds.BackOffice, AccessTokenValue, RefreshTokenValue);
+
+        // Act
+        await setup.Sut.HandleAsync(context);
+
+        // Assert
+        Assert.IsFalse(setup.ResponseCookies.ContainsKey(AccessTokenCookieName));
+        Assert.IsFalse(setup.ResponseCookies.ContainsKey(RefreshTokenCookieName));
+        Assert.IsTrue(setup.ResponseCookies.ContainsKey($"{AccessTokenCookieName}-test-site-name"));
+        Assert.IsTrue(setup.ResponseCookies.ContainsKey($"{RefreshTokenCookieName}-test-site-name"));
+    }
+
     #endregion
 
     #region ApplyAuthorizationResponseContext Handler Tests
@@ -274,6 +301,25 @@ internal class HideBackOfficeTokensHandlerTests
         {
             Assert.IsFalse(setup.ResponseCookies.ContainsKey($"{SecureCookiePrefix}{PkceCodeCookieName}"));
         }
+    }
+
+    [Test]
+    public async Task ApplyAuthorizationResponse_CookieSiteNamePostfix()
+    {
+        // Arrange
+        var setup = new TestSetup();
+        setup.BackOfficeTokenCookieSettings.SiteName = "-test-site-name";
+        setup.GlobalSettings.UseHttps = false;
+        setup.SetupHttpContext(isHttps: false);
+
+        var context = CreateApplyAuthorizationResponseContext(Constants.OAuthClientIds.BackOffice, PkceCodeValue);
+
+        // Act
+        await setup.Sut.HandleAsync(context);
+
+        // Assert
+        Assert.IsFalse(setup.ResponseCookies.ContainsKey(PkceCodeCookieName));
+        Assert.IsTrue(setup.ResponseCookies.ContainsKey($"{PkceCodeCookieName}-test-site-name"));
     }
 
     #endregion
@@ -444,6 +490,165 @@ internal class HideBackOfficeTokensHandlerTests
 
     #endregion
 
+    #region ExtractRevocationRequestContext Handler Tests
+
+    [Test]
+    public async Task HandleAsync_ExtractRevocationRequest_NonBackOfficeClient_DoesNothing()
+    {
+        // Arrange
+        var setup = new TestSetup();
+        setup.GlobalSettings.UseHttps = false;
+        setup.SetupHttpContext(isHttps: false);
+
+        var context = CreateExtractRevocationRequestContext("other-client", RedactedTokenValue, "access_token");
+
+        // Act
+        await setup.Sut.HandleAsync(context);
+
+        // Assert - values should remain unchanged (handler skips non-back-office clients)
+        Assert.AreEqual(RedactedTokenValue, context.Request.Token);
+    }
+
+    [Test]
+    public async Task HandleAsync_ExtractRevocationRequest_RestoresAccessTokenFromCookie()
+    {
+        // Arrange
+        var setup = new TestSetup();
+        setup.GlobalSettings.UseHttps = false;
+        var encryptedToken = setup.EncryptValue(AccessTokenValue);
+        setup.SetupHttpContext(isHttps: false, requestCookies: new Dictionary<string, string> { { AccessTokenCookieName, encryptedToken } });
+
+        var context = CreateExtractRevocationRequestContext(Constants.OAuthClientIds.BackOffice, RedactedTokenValue, "access_token");
+
+        // Act
+        await setup.Sut.HandleAsync(context);
+
+        // Assert
+        Assert.AreEqual(AccessTokenValue, context.Request.Token);
+    }
+
+    [Test]
+    public async Task HandleAsync_ExtractRevocationRequest_RestoresRefreshTokenFromCookie()
+    {
+        // Arrange
+        var setup = new TestSetup();
+        setup.GlobalSettings.UseHttps = false;
+        var encryptedToken = setup.EncryptValue(RefreshTokenValue);
+        setup.SetupHttpContext(isHttps: false, requestCookies: new Dictionary<string, string> { { RefreshTokenCookieName, encryptedToken } });
+
+        var context = CreateExtractRevocationRequestContext(Constants.OAuthClientIds.BackOffice, RedactedTokenValue, "refresh_token");
+
+        // Act
+        await setup.Sut.HandleAsync(context);
+
+        // Assert
+        Assert.AreEqual(RefreshTokenValue, context.Request.Token);
+    }
+
+    [Test]
+    public async Task HandleAsync_ExtractRevocationRequest_DiscardsNonRedactedToken()
+    {
+        // Arrange
+        var setup = new TestSetup();
+        setup.GlobalSettings.UseHttps = false;
+        setup.SetupHttpContext(isHttps: false);
+
+        var context = CreateExtractRevocationRequestContext(Constants.OAuthClientIds.BackOffice, "non-redacted-token", "access_token");
+
+        // Act
+        await setup.Sut.HandleAsync(context);
+
+        // Assert - token should be nullified for security
+        Assert.IsNull(context.Request.Token);
+    }
+
+    [Test]
+    public async Task HandleAsync_ExtractRevocationRequest_NoTokenTypeHint_TriesAccessTokenCookie()
+    {
+        // Arrange
+        var setup = new TestSetup();
+        setup.GlobalSettings.UseHttps = false;
+        var encryptedToken = setup.EncryptValue(AccessTokenValue);
+        setup.SetupHttpContext(isHttps: false, requestCookies: new Dictionary<string, string> { { AccessTokenCookieName, encryptedToken } });
+
+        var context = CreateExtractRevocationRequestContext(Constants.OAuthClientIds.BackOffice, RedactedTokenValue, null);
+
+        // Act
+        await setup.Sut.HandleAsync(context);
+
+        // Assert - without a hint, it should default to access token cookie
+        Assert.AreEqual(AccessTokenValue, context.Request.Token);
+    }
+
+    [Test]
+    public async Task HandleAsync_ExtractRevocationRequest_RedactedTokenButCookieMissing_NullsToken()
+    {
+        // Arrange
+        var setup = new TestSetup();
+        setup.GlobalSettings.UseHttps = false;
+        setup.SetupHttpContext(isHttps: false); // no cookies
+
+        var context = CreateExtractRevocationRequestContext(Constants.OAuthClientIds.BackOffice, RedactedTokenValue, "access_token");
+
+        // Act
+        await setup.Sut.HandleAsync(context);
+
+        // Assert - token should be nullified to prevent IDX10400 errors downstream
+        Assert.IsNull(context.Request.Token);
+    }
+
+    [TestCase(true, false, TestName = "ExtractRevocationRequest_UseHttpsTrue_HttpRequest_UsesSecurePrefix")]
+    [TestCase(true, true, TestName = "ExtractRevocationRequest_UseHttpsTrue_HttpsRequest_UsesSecurePrefix")]
+    [TestCase(false, true, TestName = "ExtractRevocationRequest_UseHttpsFalse_HttpsRequest_UsesSecurePrefix")]
+    [TestCase(false, false, TestName = "ExtractRevocationRequest_UseHttpsFalse_HttpRequest_NoPrefix")]
+    public async Task ExtractRevocationRequest_AccessToken_CookiePrefix(bool useHttps, bool isHttps)
+    {
+        // Arrange
+        var setup = new TestSetup();
+        setup.GlobalSettings.UseHttps = useHttps;
+        var encryptedToken = setup.EncryptValue(AccessTokenValue);
+        var expectedCookieName = setup.GetExpectedCookieName(AccessTokenCookieName, useHttps, isHttps);
+        setup.SetupHttpContext(isHttps: isHttps, requestCookies: new Dictionary<string, string>
+        {
+            { expectedCookieName, encryptedToken }
+        });
+
+        var context = CreateExtractRevocationRequestContext(Constants.OAuthClientIds.BackOffice, RedactedTokenValue, "access_token");
+
+        // Act
+        await setup.Sut.HandleAsync(context);
+
+        // Assert
+        Assert.AreEqual(AccessTokenValue, context.Request.Token);
+    }
+
+    [TestCase(true, false, TestName = "ExtractRevocationRequest_RefreshToken_UseHttpsTrue_HttpRequest_UsesSecurePrefix")]
+    [TestCase(true, true, TestName = "ExtractRevocationRequest_RefreshToken_UseHttpsTrue_HttpsRequest_UsesSecurePrefix")]
+    [TestCase(false, true, TestName = "ExtractRevocationRequest_RefreshToken_UseHttpsFalse_HttpsRequest_UsesSecurePrefix")]
+    [TestCase(false, false, TestName = "ExtractRevocationRequest_RefreshToken_UseHttpsFalse_HttpRequest_NoPrefix")]
+    public async Task ExtractRevocationRequest_RefreshToken_CookiePrefix(bool useHttps, bool isHttps)
+    {
+        // Arrange
+        var setup = new TestSetup();
+        setup.GlobalSettings.UseHttps = useHttps;
+        var encryptedToken = setup.EncryptValue(RefreshTokenValue);
+        var expectedCookieName = setup.GetExpectedCookieName(RefreshTokenCookieName, useHttps, isHttps);
+        setup.SetupHttpContext(isHttps: isHttps, requestCookies: new Dictionary<string, string>
+        {
+            { expectedCookieName, encryptedToken }
+        });
+
+        var context = CreateExtractRevocationRequestContext(Constants.OAuthClientIds.BackOffice, RedactedTokenValue, "refresh_token");
+
+        // Act
+        await setup.Sut.HandleAsync(context);
+
+        // Assert
+        Assert.AreEqual(RefreshTokenValue, context.Request.Token);
+    }
+
+    #endregion
+
     #region ProcessAuthenticationContext Handler Tests
 
     [Test]
@@ -573,6 +778,86 @@ internal class HideBackOfficeTokensHandlerTests
 
     #endregion
 
+    #region Decryption Failure Tests
+
+    [Test]
+    public async Task HandleAsync_ProcessAuthentication_DecryptionFailure_DoesNotRestoreToken()
+    {
+        // Arrange
+        var setup = new TestSetup();
+        setup.GlobalSettings.UseHttps = false;
+        var encryptedToken = setup.EncryptValue(AccessTokenValue);
+        setup.SetupHttpContext(isHttps: false, requestCookies: new Dictionary<string, string> { { AccessTokenCookieName, encryptedToken } });
+
+        // Make the protector throw on unprotect (simulating changed data protection keys)
+        setup.DataProtector.Setup(p => p.Unprotect(It.IsAny<byte[]>()))
+            .Throws(new CryptographicException("The payload was invalid."));
+
+        var context = CreateProcessAuthenticationContext(RedactedTokenValue);
+
+        // Act
+        await setup.Sut.HandleAsync(context);
+
+        // Assert - token should remain redacted (not restored), triggering a 401
+        Assert.AreEqual(RedactedTokenValue, context.AccessToken);
+        Assert.IsTrue(setup.DeletedCookies.Contains(AccessTokenCookieName));
+    }
+
+    [Test]
+    public async Task HandleAsync_ExtractTokenRequest_DecryptionFailure_NullsPkceCodeAndRefreshToken()
+    {
+        // Arrange
+        var setup = new TestSetup();
+        setup.GlobalSettings.UseHttps = false;
+        var encryptedCode = setup.EncryptValue(PkceCodeValue);
+        var encryptedToken = setup.EncryptValue(RefreshTokenValue);
+        setup.SetupHttpContext(isHttps: false, requestCookies: new Dictionary<string, string>
+        {
+            { PkceCodeCookieName, encryptedCode },
+            { RefreshTokenCookieName, encryptedToken },
+        });
+
+        // Make the protector throw on unprotect (simulating changed data protection keys)
+        setup.DataProtector.Setup(p => p.Unprotect(It.IsAny<byte[]>()))
+            .Throws(new CryptographicException("The payload was invalid."));
+
+        var context = CreateExtractTokenRequestContext(Constants.OAuthClientIds.BackOffice, RedactedTokenValue, RedactedTokenValue);
+
+        // Act
+        await setup.Sut.HandleAsync(context);
+
+        // Assert - both should be nulled since cookies couldn't be decrypted
+        Assert.IsNull(context.Request.Code);
+        Assert.IsNull(context.Request.RefreshToken);
+        Assert.IsTrue(setup.DeletedCookies.Contains(PkceCodeCookieName));
+        Assert.IsTrue(setup.DeletedCookies.Contains(RefreshTokenCookieName));
+    }
+
+    [Test]
+    public async Task HandleAsync_ExtractRevocationRequest_DecryptionFailure_NullsToken()
+    {
+        // Arrange
+        var setup = new TestSetup();
+        setup.GlobalSettings.UseHttps = false;
+        var encryptedToken = setup.EncryptValue(AccessTokenValue);
+        setup.SetupHttpContext(isHttps: false, requestCookies: new Dictionary<string, string> { { AccessTokenCookieName, encryptedToken } });
+
+        // Make the protector throw on unprotect (simulating changed data protection keys)
+        setup.DataProtector.Setup(p => p.Unprotect(It.IsAny<byte[]>()))
+            .Throws(new CryptographicException("The payload was invalid."));
+
+        var context = CreateExtractRevocationRequestContext(Constants.OAuthClientIds.BackOffice, RedactedTokenValue, "access_token");
+
+        // Act
+        await setup.Sut.HandleAsync(context);
+
+        // Assert - token should be nulled since cookie couldn't be decrypted
+        Assert.IsNull(context.Request.Token);
+        Assert.IsTrue(setup.DeletedCookies.Contains(AccessTokenCookieName));
+    }
+
+    #endregion
+
     #region Context Factory Methods
 
     private static OpenIddictServerEvents.ApplyTokenResponseContext CreateApplyTokenResponseContext(
@@ -581,13 +866,14 @@ internal class HideBackOfficeTokensHandlerTests
         string? refreshToken)
     {
         var transaction = new OpenIddictServerTransaction();
-        var context = new OpenIddictServerEvents.ApplyTokenResponseContext(transaction);
-
-        context.Request = new OpenIddict.Abstractions.OpenIddictRequest { ClientId = clientId };
-        context.Response = new OpenIddict.Abstractions.OpenIddictResponse
+        var context = new OpenIddictServerEvents.ApplyTokenResponseContext(transaction)
         {
-            AccessToken = accessToken,
-            RefreshToken = refreshToken
+            Request = new OpenIddict.Abstractions.OpenIddictRequest { ClientId = clientId },
+            Response = new OpenIddict.Abstractions.OpenIddictResponse
+            {
+                AccessToken = accessToken,
+                RefreshToken = refreshToken,
+            },
         };
 
         return context;
@@ -598,10 +884,11 @@ internal class HideBackOfficeTokensHandlerTests
         string? code)
     {
         var transaction = new OpenIddictServerTransaction();
-        var context = new OpenIddictServerEvents.ApplyAuthorizationResponseContext(transaction);
-
-        context.Request = new OpenIddict.Abstractions.OpenIddictRequest { ClientId = clientId };
-        context.Response = new OpenIddict.Abstractions.OpenIddictResponse { Code = code };
+        var context = new OpenIddictServerEvents.ApplyAuthorizationResponseContext(transaction)
+        {
+            Request = new OpenIddict.Abstractions.OpenIddictRequest { ClientId = clientId },
+            Response = new OpenIddict.Abstractions.OpenIddictResponse { Code = code },
+        };
 
         return context;
     }
@@ -612,13 +899,33 @@ internal class HideBackOfficeTokensHandlerTests
         string? refreshToken)
     {
         var transaction = new OpenIddictServerTransaction();
-        var context = new OpenIddictServerEvents.ExtractTokenRequestContext(transaction);
-
-        context.Request = new OpenIddict.Abstractions.OpenIddictRequest
+        var context = new OpenIddictServerEvents.ExtractTokenRequestContext(transaction)
         {
-            ClientId = clientId,
-            Code = code,
-            RefreshToken = refreshToken
+            Request = new OpenIddict.Abstractions.OpenIddictRequest
+            {
+                ClientId = clientId,
+                Code = code,
+                RefreshToken = refreshToken,
+            }
+        };
+
+        return context;
+    }
+
+    private static OpenIddictServerEvents.ExtractRevocationRequestContext CreateExtractRevocationRequestContext(
+        string? clientId,
+        string? token,
+        string? tokenTypeHint)
+    {
+        var transaction = new OpenIddictServerTransaction();
+        var context = new OpenIddictServerEvents.ExtractRevocationRequestContext(transaction)
+        {
+            Request = new OpenIddict.Abstractions.OpenIddictRequest
+            {
+                ClientId = clientId,
+                Token = token,
+                TokenTypeHint = tokenTypeHint,
+            },
         };
 
         return context;

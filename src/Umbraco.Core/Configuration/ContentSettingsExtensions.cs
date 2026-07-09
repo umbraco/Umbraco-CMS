@@ -2,6 +2,9 @@ using Umbraco.Cms.Core.Configuration.Models;
 
 namespace Umbraco.Extensions;
 
+/// <summary>
+///     Extension methods for <see cref="ContentSettings" />.
+/// </summary>
 public static class ContentSettingsExtensions
 {
     /// <summary>

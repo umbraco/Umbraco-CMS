@@ -10,12 +10,24 @@ export const manifests: Array<UmbExtensionManifest> = [
 		meta: {
 			label: 'Entity Data Picker',
 			icon: 'icon-page-add',
-			group: 'pickers',
+			group: '#propertyEditorUIGroups_pickers',
+			keywords: ['select', 'entity', 'data', 'source', 'pick'],
 			propertyEditorSchemaAlias: 'Umbraco.EntityDataPicker',
 			supportsReadOnly: true,
 			supportsDataSource: {
 				enabled: true,
 				forDataSourceTypes: [UMB_PICKER_DATA_SOURCE_TYPE],
+			},
+			settings: {
+				properties: [
+					{
+						alias: 'pickerViews',
+						label: 'Picker Views',
+						description:
+							'Configure which views are available in the picker. Only applicable for collection-based data sources.',
+						propertyEditorUiAlias: 'Umb.PropertyEditorUi.EntityDataPicker.PickerViewsConfiguration',
+					},
+				],
 			},
 		},
 	},

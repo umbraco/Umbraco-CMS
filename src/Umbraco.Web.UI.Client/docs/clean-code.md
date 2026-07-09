@@ -170,6 +170,86 @@ export class UmbMyController extends UmbControllerBase {
 #controller = new UmbMyController(this, new UmbContentRepository());
 ```
 
+### Event Listener Cleanup Pattern
+
+**Critical for Memory Leak Prevention**:
+
+When adding event listeners, you must ensure they can be properly removed. Using `.bind(this)` creates a new function reference each time, making cleanup impossible.
+
+**Wrong Pattern - Memory Leak**:
+
+```typescript
+export class UmbMyElement extends LitElement {
+	constructor() {
+		super();
+		// ❌ BAD: Each .bind(this) creates a NEW function reference
+		window.addEventListener('storage', this.#onStorageEvent.bind(this));
+	}
+
+	disconnectedCallback() {
+		// ❌ This creates ANOTHER function reference - doesn't remove the original listener!
+		window.removeEventListener('storage', this.#onStorageEvent.bind(this));
+	}
+
+	#onStorageEvent(evt: StorageEvent) {
+		// Handler logic
+	}
+}
+```
+
+**Correct Pattern - Arrow Function Property**:
+
+```typescript
+export class UmbMyElement extends LitElement {
+	// ✅ GOOD: Arrow function property maintains consistent reference
+	#onStorageEvent = async (evt: StorageEvent) => {
+		// Handler logic
+		if (evt.key === 'myKey') {
+			await this.handleStorageChange();
+		}
+	};
+
+	constructor() {
+		super();
+		// ✅ GOOD: No .bind() needed - arrow function preserves 'this'
+		window.addEventListener('storage', this.#onStorageEvent);
+	}
+
+	disconnectedCallback() {
+		// ✅ GOOD: Removes the SAME function reference
+		window.removeEventListener('storage', this.#onStorageEvent);
+	}
+}
+```
+
+**Key Points**:
+- Use arrow function properties for event handlers
+- Arrow functions automatically bind `this` without creating new references
+- Each `addEventListener` and `removeEventListener` must use the SAME function reference
+- Always remove event listeners in `disconnectedCallback()` for custom elements
+- This pattern prevents memory leaks by ensuring proper cleanup
+
+**Common Event Listener Scenarios**:
+
+```typescript
+// Document/window events
+document.addEventListener('dragenter', this.#onDragEnter);
+window.addEventListener('storage', this.#onStorage);
+
+// Programmatically created elements
+this.#element = new MyElement();
+this.#element.addEventListener('action-executed', this.#onAction);
+
+// Always clean up in disconnectedCallback
+disconnectedCallback() {
+	document.removeEventListener('dragenter', this.#onDragEnter);
+	window.removeEventListener('storage', this.#onStorage);
+	if (this.#element) {
+		this.#element.removeEventListener('action-executed', this.#onAction);
+	}
+}
+```
+
 ### Avoid Code Smells
 
 **Magic Numbers/Strings**:
@@ -342,13 +422,23 @@ type ReadonlyContent = Readonly<UmbContentModel>;
 
 ### Comments and Documentation
 
-**When to Comment**:
-- Explain "why" not "what"
-- Document complex algorithms
-- JSDoc for public APIs
-- Warn about gotchas or non-obvious behavior
+> See the [project-wide Code Comment Policy](../../../CLAUDE.md#8-code-comment-policy) for the full rules. The summary below applies them to TypeScript / Lit code.
 
-**JSDoc for Web Components**:
+**Default to no comment.** Well-named functions, methods, and variables are the primary documentation. A line calling `resetState()` does not need `// Reset state` above it. A method named `validateInput` does not need `// Validate input` above it.
+
+**When NOT to write a comment**:
+- Restating what the code does. If the comment is a paraphrase of the next two lines, delete it.
+- Narrating a sequence of calls. The order is already in the code.
+- Pointing at the current task, fix, callers, or PR (`// Used by X`, `// Added for the Y flow`, `// Fix for issue Z`). That metadata belongs in the commit message and PR description, not in source — it rots.
+
+**When a comment IS justified** — only when removing it would leave a future reader confused:
+- A non-obvious **WHY**: a hidden constraint, ordering requirement, or business rule that is not visible from the code.
+- A **workaround** for a specific bug or browser quirk. Anchor it to an issue (`(#21996)`) so it can be deleted when the upstream fix lands.
+- A subtle **invariant** the type system does not enforce.
+- An **edge case** the code intentionally handles that would surprise a reader.
+- **Public API docs** — JSDoc on exported symbols and Lit components (required for web-component-analyzer).
+
+**JSDoc for Web Components** (still required — this is the public contract):
 
 ```typescript
 /**
@@ -373,14 +463,32 @@ export class UmbDocumentActionButton extends LitElement {
 
 ```typescript
 // TODO: Implement pagination [NL]
-// FIXME: Memory leak in subscription [JOV]
-// HACK: Temporary workaround for API bug [LK]
+// TODO: Memory leak in subscription [JOV]
+// TODO: Temporary workaround for API bug [LK]
 ```
 
+A TODO with no author or no trigger is dead text — require one of them.
+
 **Remove Dead Code**:
-- Don't comment out code, delete it (Git history preserves it)
 - Remove unused imports, functions, variables
-- Clean up console.logs before committing
+- Clean up `console.log` calls before committing
+
+### Feature Parity with Core Equivalents
+
+When implementing a new component that mirrors an existing core or sibling implementation (e.g. a new collection action alongside document/media/member equivalents), do a side-by-side comparison against the core version before considering it done.
+
+**Checklist**:
+
+1. **Full API surface**: Read the reference implementation's controller/API usage line by line. Every method call, callback, and property access on controllers in the reference must have a counterpart in the new implementation — don't cherry-pick only the obvious ones.
+2. **Error handling**: Match the core's error handling pattern (e.g. `.catch(() => {})` on `execute()` calls) to prevent unhandled promise rejections.
+3. **Type hierarchy**: Before defining new interfaces, search for existing base types (e.g. `UmbNamedEntityModel` vs `UmbEntityModel`) that already declare the fields you need. Use the most specific base.
+4. **UI consistency**: Check CSS from sibling implementations (e.g. `max-height` on scroll containers, icon fallbacks like `?? 'icon-document'`).
+5. **Context-appropriate strings**: Don't reuse localization keys from another domain (e.g. `create_noDocumentTypes` in an elements context). Either create a new key or use only the inline fallback text.
+
+**Core components to compare against** (common patterns):
+- Collection create actions: `src/packages/core/collection/action/create/collection-create-action.element.ts`
+- Entity create option modals: `src/packages/core/entity-action/common/create/modal/entity-create-option-action-list-modal.element.ts`
+- Document/media/member equivalents in their respective `src/packages/` directories
 
 ### Patterns to Avoid
 

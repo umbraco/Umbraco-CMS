@@ -11,6 +11,9 @@ namespace Umbraco.Cms.Core.Configuration.Models;
 [UmbracoOptions(Constants.Configuration.ConfigExceptionFilter)]
 public class ExceptionFilterSettings
 {
+    /// <summary>
+    ///     The default value for whether the exception filter is disabled.
+    /// </summary>
     internal const bool StaticDisabled = false;
 
     /// <summary>

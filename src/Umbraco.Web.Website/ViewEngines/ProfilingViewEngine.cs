@@ -8,30 +8,28 @@ public class ProfilingViewEngine : IViewEngine
 {
     private readonly string _name;
     private readonly IProfiler _profiler;
-
-    //TODO: can this be made private and with underscore?
-    internal readonly IViewEngine Inner;
+    private readonly IViewEngine _inner;
 
     public ProfilingViewEngine(IViewEngine inner, IProfiler profiler)
     {
-        Inner = inner;
+        _inner = inner;
         _profiler = profiler;
         _name = inner.GetType().Name;
     }
 
     public ViewEngineResult FindView(ActionContext context, string viewName, bool isMainPage)
     {
-        using (_profiler.IsEnabled ? _profiler.Step(string.Format("{0}.FindView, {1}, {2}", _name, viewName, isMainPage)) : null)
+        using (_profiler.IsEnabled ? _profiler.Step($"{_name}.FindView, {viewName}, {isMainPage}") : null)
         {
-            return WrapResult(Inner.FindView(context, viewName, isMainPage));
+            return WrapResult(_inner.FindView(context, viewName, isMainPage));
         }
     }
 
     public ViewEngineResult GetView(string? executingFilePath, string viewPath, bool isMainPage)
     {
-        using (_profiler.IsEnabled ? _profiler.Step(string.Format("{0}.GetView, {1}, {2}, {3}", _name, executingFilePath, viewPath, isMainPage)) : null)
+        using (_profiler.IsEnabled ? _profiler.Step($"{_name}.GetView, {executingFilePath}, {viewPath}, {isMainPage}") : null)
         {
-            return Inner.GetView(executingFilePath, viewPath, isMainPage);
+            return _inner.GetView(executingFilePath, viewPath, isMainPage);
         }
     }
 

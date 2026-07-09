@@ -1,7 +1,13 @@
 namespace Umbraco.Cms.Core.Models.ContentEditing;
 
+/// <summary>
+///     Represents a filter for retrieving available content type compositions.
+/// </summary>
 public class GetAvailableCompositionsFilter
 {
+    /// <summary>
+    ///     Gets or sets the content type ID to get compositions for.
+    /// </summary>
     public int ContentTypeId { get; set; }
 
     /// <summary>

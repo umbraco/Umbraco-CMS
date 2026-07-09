@@ -11,6 +11,7 @@ public class ContentEntitySlim : EntitySlim, IContentEntitySlim
     /// <inheritdoc />
     public Guid ContentTypeKey { get; set; }
 
+    /// <inheritdoc />
     public Guid? ListViewKey { get; set; }
 
     /// <inheritdoc />

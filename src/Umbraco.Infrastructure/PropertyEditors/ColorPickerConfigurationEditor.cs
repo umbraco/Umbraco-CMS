@@ -15,6 +15,8 @@ internal sealed partial class ColorPickerConfigurationEditor : ConfigurationEdit
     /// <summary>
     /// Initializes a new instance of the <see cref="ColorPickerConfigurationEditor"/> class.
     /// </summary>
+    /// <param name="ioHelper">Provides methods for IO operations within the Umbraco CMS.</param>
+    /// <param name="configurationEditorJsonSerializer">Handles serialization and deserialization of configuration editor settings as JSON.</param>
     public ColorPickerConfigurationEditor(IIOHelper ioHelper, IConfigurationEditorJsonSerializer configurationEditorJsonSerializer)
         : base(ioHelper)
     {
@@ -99,7 +101,7 @@ internal sealed partial class ColorPickerConfigurationEditor : ConfigurationEdit
             return normalizedValue;
         }
 
-        [GeneratedRegex("^([0-9a-f]{3}|[0-9a-f]{6})$", RegexOptions.IgnoreCase, "en-GB")]
+        [GeneratedRegex("^([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})$", RegexOptions.IgnoreCase, "en-GB")]
         private static partial Regex ColorPattern();
     }
 }

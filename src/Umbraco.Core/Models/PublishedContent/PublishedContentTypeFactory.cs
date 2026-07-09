@@ -14,6 +14,12 @@ public class PublishedContentTypeFactory : IPublishedContentTypeFactory
     private object _publishedDataTypesLocker = new();
     private Dictionary<int, PublishedDataType>? _publishedDataTypes;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="PublishedContentTypeFactory"/> class.
+    /// </summary>
+    /// <param name="publishedModelFactory">The published model factory.</param>
+    /// <param name="propertyValueConverters">The property value converters.</param>
+    /// <param name="dataTypeService">The data type service.</param>
     public PublishedContentTypeFactory(
         IPublishedModelFactory publishedModelFactory,
         PropertyValueConverterCollection propertyValueConverters,

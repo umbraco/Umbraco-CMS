@@ -46,8 +46,6 @@ export class UmbLogViewerPollingButtonElement extends UmbLitElement {
 		if (this._dropdownElement) {
 			this._dropdownElement.open = false;
 		}
-
-		this.#togglePolling();
 	}
 
 	#getPollingLabel(): string {

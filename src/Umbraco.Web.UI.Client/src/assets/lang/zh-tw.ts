@@ -362,6 +362,7 @@ export default {
 		constrainProportions: '強制屬性',
 		continue: '繼續',
 		copy: '複製',
+		copied: '已複製！',
 		create: '創建',
 		database: '資料庫',
 		date: '時間',
@@ -684,8 +685,8 @@ export default {
 		reset: '重設',
 	},
 	rollback: {
-		diffHelp:
-			'這顯示目前版本以及所選版本的差異。<br /><del>紅色</del> 文字將不會顯示於所選版本，而<ins>綠色</ins>表示增加部分。',
+		diffHelp: '<del>紅色文字</del>將在所選版本中被移除，<ins>綠色文字</ins>將被新增。',
+		showDiff: '顯示目前（草稿）版本與所選版本之間的差異。',
 		documentRolledBack: '文檔已回滾',
 		htmlHelp: '這顯示所選版本的HTML格式，如果您想要比較兩版本的差異，請使用比較檢視',
 		rollbackTo: '回滾至',
@@ -860,8 +861,16 @@ export default {
 		chooseChildNode: '選擇子節點',
 		compositionsDescription:
 			'從已存在的文檔類別中繼承選項卡以及屬性。新選項卡將被新增至目前文檔種類或合併至已存在同名的選項卡中。',
+		compositionsDescriptionMediaType:
+			'從已存在的媒體類別中繼承選項卡以及屬性。新選項卡將被新增至目前媒體種類或合併至已存在同名的選項卡中。',
+		compositionsDescriptionMemberType:
+			'從已存在的會員類別中繼承選項卡以及屬性。新選項卡將被新增至目前會員種類或合併至已存在同名的選項卡中。',
 		compositionInUse: '此內容種類已經用於集合中，因此不能重複添加本身。',
+		compositionInUseMediaType: '此媒體種類已經用於集合中，因此不能重複添加本身。',
+		compositionInUseMemberType: '此會員種類已經用於集合中，因此不能重複添加本身。',
 		noAvailableCompositions: '沒有可用於集合的內容種類。',
+		noAvailableCompositionsMediaType: '沒有可用於集合的媒體種類。',
+		noAvailableCompositionsMemberType: '沒有可用於集合的會員種類。',
 		availableEditors: '可用的編輯器',
 		reuse: '重複使用',
 		editorSettings: '編輯器設定',
@@ -972,6 +981,7 @@ export default {
 		changePassword: '更改密碼',
 		newPassword: '更改密碼',
 		confirmNewPassword: '確認新密碼',
+		confirmPassword: '確認密碼',
 		changePasswordDescription: '要改變密碼，請在框中輸入新密碼，然後按一下“更改密碼”。',
 		contentChannel: '內容頻道',
 		descriptionField: '描述欄位',
@@ -1041,6 +1051,8 @@ export default {
 	redirectUrls: {
 		disableUrlTracker: '停止網址追蹤器',
 		enableUrlTracker: '啟動網址追蹤器',
+		urlTrackerEnabled: '已啟用',
+		urlTrackerDisabled: '已停用',
 		originalUrl: '原本網址',
 		redirectedTo: '轉址成',
 		noRedirects: '沒有任何轉址',

@@ -9,16 +9,20 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 [DefaultPropertyValueConverter]
 public class SimpleRichTextValueConverter : PropertyValueConverterBase
 {
+    /// <inheritdoc />
     public override bool IsConverter(IPublishedPropertyType propertyType)
         => propertyType.EditorAlias == Constants.PropertyEditors.Aliases.RichText;
 
+    /// <inheritdoc />
     public override Type GetPropertyValueType(IPublishedPropertyType propertyType)
         => typeof(IHtmlEncodedString);
 
+    /// <inheritdoc />
     // PropertyCacheLevel.Content is ok here because that converter does not parse {locallink}
     public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
         => PropertyCacheLevel.Element;
 
+    /// <inheritdoc />
     public override object? ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview) =>
 
         // in xml a string is: string
@@ -26,6 +30,7 @@ public class SimpleRichTextValueConverter : PropertyValueConverterBase
         // default value is: null
         source;
 
+    /// <inheritdoc />
     public override object ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview) =>
 
         // source should come from ConvertSource and be a string (or null) already

@@ -93,6 +93,8 @@ export class UmbUserWorkspaceAssignAccessElement extends UmbLitElement {
 		});
 		// TODO make contexts method
 		this.#workspaceContext?.updateProperty('documentStartNodeUniques', selection);
+		// When specific start nodes are selected, disable root access
+		this.#workspaceContext?.updateProperty('hasDocumentRootAccess', false);
 	}
 
 	#onAllowAllMediaChange(event: UUIBooleanInputEvent) {
@@ -113,6 +115,8 @@ export class UmbUserWorkspaceAssignAccessElement extends UmbLitElement {
 		});
 		// TODO make contexts method
 		this.#workspaceContext?.updateProperty('mediaStartNodeUniques', selection);
+		// When specific start nodes are selected, disable root access
+		this.#workspaceContext?.updateProperty('hasMediaRootAccess', false);
 	}
 
 	override render() {
@@ -179,6 +183,7 @@ export class UmbUserWorkspaceAssignAccessElement extends UmbLitElement {
 					? html`
 							<umb-input-media
 								slot="editor"
+								folder-filter="foldersOnly"
 								.selection=${this._mediaStartNodeUniques.map((reference) => reference.unique)}
 								@change=${this.#onMediaStartNodeChange}></umb-input-media>
 						`

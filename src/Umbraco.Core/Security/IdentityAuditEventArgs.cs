@@ -1,18 +1,68 @@
 namespace Umbraco.Cms.Core.Security;
 
+/// <summary>
+///     Specifies the type of audit event that occurred.
+/// </summary>
 public enum AuditEvent
 {
+    /// <summary>
+    ///     The user account was locked due to too many failed login attempts.
+    /// </summary>
     AccountLocked,
+
+    /// <summary>
+    ///     The user account was unlocked.
+    /// </summary>
     AccountUnlocked,
+
+    /// <summary>
+    ///     A forgot password request was made.
+    /// </summary>
     ForgotPasswordRequested,
+
+    /// <summary>
+    ///     The password was successfully changed via the forgot password flow.
+    /// </summary>
     ForgotPasswordChangedSuccess,
+
+    /// <summary>
+    ///     A login attempt failed.
+    /// </summary>
     LoginFailed,
+
+    /// <summary>
+    ///     The login requires additional verification (e.g., two-factor authentication).
+    /// </summary>
     LoginRequiresVerification,
+
+    /// <summary>
+    ///     The login was successful.
+    /// </summary>
     LoginSucces,
+
+    /// <summary>
+    ///     The user logged out successfully.
+    /// </summary>
     LogoutSuccess,
+
+    /// <summary>
+    ///     The user's password was changed.
+    /// </summary>
     PasswordChanged,
+
+    /// <summary>
+    ///     The user's password was reset.
+    /// </summary>
     PasswordReset,
+
+    /// <summary>
+    ///     The failed access count was reset for the user.
+    /// </summary>
     ResetAccessFailedCount,
+
+    /// <summary>
+    ///     A user invite is being sent.
+    /// </summary>
     SendingUserInvite,
 }
 
@@ -35,6 +85,15 @@ public class IdentityAuditEventArgs : EventArgs
         AffectedUser = affectedUser;
     }
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="IdentityAuditEventArgs" /> class
+    ///     with the affected user defaulting to the super user.
+    /// </summary>
+    /// <param name="action">The audit action that was triggered.</param>
+    /// <param name="ipAddress">The source IP address of the user performing the action.</param>
+    /// <param name="performingUser">The identifier of the user performing the action.</param>
+    /// <param name="comment">An optional comment about the action being logged.</param>
+    /// <param name="affectedUsername">The username of the affected user.</param>
     public IdentityAuditEventArgs(AuditEvent action, string ipAddress, string performingUser, string comment, string affectedUsername)
         : this(action, ipAddress, performingUser, comment, Constants.Security.SuperUserIdAsString, affectedUsername)
     {

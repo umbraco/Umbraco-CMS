@@ -11,8 +11,12 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Core.Services;
 
 /// <summary>
-///     Serializes entities to XML
+///     Serializes entities to XML for export, packaging, and data transfer operations.
 /// </summary>
+/// <remarks>
+///     This service supports serializing content, media, members, data types, dictionary items,
+///     templates, stylesheets, languages, and content types to XML format.
+/// </remarks>
 internal sealed class EntityXmlSerializer : IEntityXmlSerializer
 {
     private readonly IConfigurationEditorJsonSerializer _configurationEditorJsonSerializer;
@@ -24,8 +28,23 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
     private readonly PropertyEditorCollection _propertyEditors;
     private readonly IShortStringHelper _shortStringHelper;
     private readonly UrlSegmentProviderCollection _urlSegmentProviders;
+    private readonly ITemplateService _templateService;
     private readonly IUserService _userService;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="EntityXmlSerializer" /> class.
+    /// </summary>
+    /// <param name="contentService">The content service for content operations.</param>
+    /// <param name="mediaService">The media service for media operations.</param>
+    /// <param name="dataTypeService">The data type service for data type operations.</param>
+    /// <param name="userService">The user service for user lookups.</param>
+    /// <param name="localizationService">The localization service for dictionary items.</param>
+    /// <param name="contentTypeService">The content type service for content type operations.</param>
+    /// <param name="urlSegmentProviders">The collection of URL segment providers.</param>
+    /// <param name="shortStringHelper">The helper for string operations.</param>
+    /// <param name="propertyEditors">The collection of property editors.</param>
+    /// <param name="configurationEditorJsonSerializer">The serializer for configuration data.</param>
+    /// <param name="templateService">The template service for template lookups.</param>
     public EntityXmlSerializer(
         IContentService contentService,
         IMediaService mediaService,
@@ -36,7 +55,8 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
         UrlSegmentProviderCollection urlSegmentProviders,
         IShortStringHelper shortStringHelper,
         PropertyEditorCollection propertyEditors,
-        IConfigurationEditorJsonSerializer configurationEditorJsonSerializer)
+        IConfigurationEditorJsonSerializer configurationEditorJsonSerializer,
+        ITemplateService templateService)
     {
         _contentTypeService = contentTypeService;
         _mediaService = mediaService;
@@ -48,11 +68,10 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
         _shortStringHelper = shortStringHelper;
         _propertyEditors = propertyEditors;
         _configurationEditorJsonSerializer = configurationEditorJsonSerializer;
+        _templateService = templateService;
     }
 
-    /// <summary>
-    ///     Exports an IContent item as an XElement.
-    /// </summary>
+    /// <inheritdoc />
     public XElement Serialize(
         IContent content,
         bool published,
@@ -63,6 +82,11 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
             throw new ArgumentNullException(nameof(content));
         }
 
+        return Serialize(content, published, withDescendants, new Dictionary<int, ITemplate?>());
+    }
+
+    private XElement Serialize(IContent content, bool published, bool withDescendants, Dictionary<int, ITemplate?> templateCache)
+    {
         var nodeName = content.ContentType.Alias.ToSafeAlias(_shortStringHelper);
 
         XElement xml = SerializeContentBase(content, content.GetUrlSegment(_shortStringHelper, _urlSegmentProviders), nodeName, published);
@@ -78,6 +102,15 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
 
         xml.Add(new XAttribute("template", content.TemplateId?.ToString(CultureInfo.InvariantCulture) ?? string.Empty));
 
+        ITemplate? assignedTemplate = null;
+        if (content.TemplateId.HasValue && !templateCache.TryGetValue(content.TemplateId.Value, out assignedTemplate))
+        {
+            assignedTemplate = _templateService.GetAsync(content.TemplateId.Value).GetAwaiter().GetResult();
+            templateCache[content.TemplateId.Value] = assignedTemplate;
+        }
+
+        xml.Add(new XAttribute("templateAlias", assignedTemplate?.Alias ?? string.Empty));
+
         xml.Add(new XAttribute("isPublished", content.Published));
 
         if (withDescendants)
@@ -88,17 +121,15 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
             while (page * pageSize < total)
             {
                 IEnumerable<IContent> children =
-                    _contentService.GetPagedChildren(content.Id, page++, pageSize, out total);
-                SerializeChildren(children, xml, published);
+                    _contentService.GetPagedChildren(content.Id, page++, pageSize, out total, propertyAliases: null, filter: null, ordering: null);
+                SerializeChildren(children, xml, published, templateCache);
             }
         }
 
         return xml;
     }
 
-    /// <summary>
-    ///     Exports an IMedia item as an XElement.
-    /// </summary>
+    /// <inheritdoc />
     public XElement Serialize(
         IMedia media,
         bool withDescendants = false,
@@ -167,9 +198,7 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
         return xml;
     }
 
-    /// <summary>
-    ///     Exports an IMember item as an XElement.
-    /// </summary>
+    /// <inheritdoc />
     public XElement Serialize(IMember member)
     {
         var nodeName = member.ContentType.Alias.ToSafeAlias(_shortStringHelper);
@@ -188,11 +217,7 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
         return xml;
     }
 
-    /// <summary>
-    ///     Exports a list of Data Types
-    /// </summary>
-    /// <param name="dataTypeDefinitions">List of data types to export</param>
-    /// <returns><see cref="XElement" /> containing the xml representation of the IDataTypeDefinition objects</returns>
+    /// <inheritdoc />
     public XElement Serialize(IEnumerable<IDataType> dataTypeDefinitions)
     {
         var container = new XElement("DataTypes");
@@ -204,6 +229,7 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
         return container;
     }
 
+    /// <inheritdoc />
     public XElement Serialize(IDataType dataType)
     {
         var xml = new XElement("DataType");
@@ -237,12 +263,7 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
         return xml;
     }
 
-    /// <summary>
-    ///     Exports a list of <see cref="IDictionaryItem" /> items to xml as an <see cref="XElement" />
-    /// </summary>
-    /// <param name="dictionaryItem">List of dictionary items to export</param>
-    /// <param name="includeChildren">Optional boolean indicating whether or not to include children</param>
-    /// <returns><see cref="XElement" /> containing the xml representation of the IDictionaryItem objects</returns>
+    /// <inheritdoc />
     public XElement Serialize(IEnumerable<IDictionaryItem> dictionaryItem, bool includeChildren = true)
     {
         var xml = new XElement("DictionaryItems");
@@ -254,12 +275,7 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
         return xml;
     }
 
-    /// <summary>
-    ///     Exports a single <see cref="IDictionaryItem" /> item to xml as an <see cref="XElement" />
-    /// </summary>
-    /// <param name="dictionaryItem">Dictionary Item to export</param>
-    /// <param name="includeChildren">Optional boolean indicating whether or not to include children</param>
-    /// <returns><see cref="XElement" /> containing the xml representation of the IDictionaryItem object</returns>
+    /// <inheritdoc />
     public XElement Serialize(IDictionaryItem dictionaryItem, bool includeChildren)
     {
         XElement xml = Serialize(dictionaryItem);
@@ -279,6 +295,7 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
         return xml;
     }
 
+    /// <inheritdoc />
     public XElement Serialize(IStylesheet stylesheet, bool includeProperties)
     {
         var xml = new XElement(
@@ -310,11 +327,7 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
         return xml;
     }
 
-    /// <summary>
-    ///     Exports a list of <see cref="ILanguage" /> items to xml as an <see cref="XElement" />
-    /// </summary>
-    /// <param name="languages">List of Languages to export</param>
-    /// <returns><see cref="XElement" /> containing the xml representation of the ILanguage objects</returns>
+    /// <inheritdoc />
     public XElement Serialize(IEnumerable<ILanguage> languages)
     {
         var xml = new XElement("Languages");
@@ -326,6 +339,7 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
         return xml;
     }
 
+    /// <inheritdoc />
     public XElement Serialize(ILanguage language)
     {
         var xml = new XElement(
@@ -337,6 +351,7 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
         return xml;
     }
 
+    /// <inheritdoc />
     public XElement Serialize(ITemplate template)
     {
         var xml = new XElement("Template");
@@ -358,11 +373,7 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
         return xml;
     }
 
-    /// <summary>
-    ///     Exports a list of <see cref="ITemplate" /> items to xml as an <see cref="XElement" />
-    /// </summary>
-    /// <param name="templates"></param>
-    /// <returns></returns>
+    /// <inheritdoc />
     public XElement Serialize(IEnumerable<ITemplate> templates)
     {
         var xml = new XElement("Templates");
@@ -374,10 +385,18 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
         return xml;
     }
 
+    /// <inheritdoc />
     public XElement Serialize(IMediaType mediaType) => SerializeMediaOrMemberType(mediaType, IEntityXmlSerializer.MediaTypeElementName);
 
+    /// <inheritdoc />
     public XElement Serialize(IMemberType memberType) => SerializeMediaOrMemberType(memberType, IEntityXmlSerializer.MemberTypeElementName);
 
+    /// <summary>
+    ///     Serializes a media type or member type to an <see cref="XElement" />.
+    /// </summary>
+    /// <param name="mediaType">The content type composition to serialize.</param>
+    /// <param name="elementName">The XML element name to use for the root element.</param>
+    /// <returns>An <see cref="XElement" /> containing the XML representation of the content type.</returns>
     private XElement SerializeMediaOrMemberType(IContentTypeComposition mediaType, string elementName)
     {
         var info = new XElement(
@@ -423,6 +442,7 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
         return xml;
     }
 
+    /// <inheritdoc />
     public XElement Serialize(IContentType contentType)
     {
         var info = new XElement(
@@ -526,6 +546,11 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
         return xml;
     }
 
+    /// <summary>
+    ///     Serializes a single dictionary item to an <see cref="XElement" /> without child items.
+    /// </summary>
+    /// <param name="dictionaryItem">The dictionary item to serialize.</param>
+    /// <returns>An <see cref="XElement" /> containing the XML representation of the dictionary item.</returns>
     private XElement Serialize(IDictionaryItem dictionaryItem)
     {
         var xml = new XElement(
@@ -544,6 +569,12 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
         return xml;
     }
 
+    /// <summary>
+    ///     Serializes property types to a collection of <see cref="XElement" /> objects.
+    /// </summary>
+    /// <param name="propertyTypes">The property types to serialize.</param>
+    /// <param name="propertyGroups">The property groups for looking up group information.</param>
+    /// <returns>A collection of <see cref="XElement" /> objects representing the property types.</returns>
     private IEnumerable<XElement> SerializePropertyTypes(
         IEnumerable<IPropertyType> propertyTypes,
         IEnumerable<PropertyGroup> propertyGroups)
@@ -563,6 +594,11 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
         }
     }
 
+    /// <summary>
+    ///     Serializes property groups to a collection of <see cref="XElement" /> objects.
+    /// </summary>
+    /// <param name="propertyGroups">The property groups to serialize.</param>
+    /// <returns>A collection of <see cref="XElement" /> objects representing the property groups.</returns>
     private IEnumerable<XElement> SerializePropertyGroups(IEnumerable<PropertyGroup> propertyGroups)
     {
         foreach (PropertyGroup propertyGroup in propertyGroups)
@@ -578,6 +614,13 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
         }
     }
 
+    /// <summary>
+    ///     Serializes a single property type to an <see cref="XElement" />.
+    /// </summary>
+    /// <param name="propertyType">The property type to serialize.</param>
+    /// <param name="definition">The data type definition for the property.</param>
+    /// <param name="propertyGroup">The property group the property belongs to, if any.</param>
+    /// <returns>An <see cref="XElement" /> containing the XML representation of the property type.</returns>
     private XElement SerializePropertyType(IPropertyType propertyType, IDataType? definition, PropertyGroup? propertyGroup)
         => new(
             "GenericProperty",
@@ -595,6 +638,11 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
             propertyType.ValidationRegExpMessage != null ? new XElement("ValidationRegExpMessage", propertyType.ValidationRegExpMessage) : null,
             propertyType.Description != null ? new XElement("Description", new XCData(propertyType.Description)) : null);
 
+    /// <summary>
+    ///     Serializes a history cleanup policy to an <see cref="XElement" />.
+    /// </summary>
+    /// <param name="cleanupPolicy">The cleanup policy to serialize.</param>
+    /// <returns>An <see cref="XElement" /> containing the XML representation of the cleanup policy.</returns>
     private XElement SerializeCleanupPolicy(HistoryCleanup cleanupPolicy)
     {
         if (cleanupPolicy == null)
@@ -619,7 +667,14 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
         return element;
     }
 
-    // exports an IContentBase (IContent, IMedia or IMember) as an XElement.
+    /// <summary>
+    ///     Exports an <see cref="IContentBase" /> (IContent, IMedia or IMember) as an <see cref="XElement" />.
+    /// </summary>
+    /// <param name="contentBase">The content base item to serialize.</param>
+    /// <param name="urlValue">The URL segment value for the content.</param>
+    /// <param name="nodeName">The XML node name to use.</param>
+    /// <param name="published">Whether to serialize the published version.</param>
+    /// <returns>An <see cref="XElement" /> containing the XML representation of the content base.</returns>
     private XElement SerializeContentBase(IContentBase contentBase, string? urlValue, string nodeName, bool published)
     {
         var xml = new XElement(
@@ -651,7 +706,12 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
         return xml;
     }
 
-    // exports a property as XElements.
+    /// <summary>
+    ///     Exports a property as <see cref="XElement" /> objects.
+    /// </summary>
+    /// <param name="property">The property to serialize.</param>
+    /// <param name="published">Whether to serialize the published value.</param>
+    /// <returns>A collection of <see cref="XElement" /> objects representing the property.</returns>
     private IEnumerable<XElement> SerializeProperty(IProperty property, bool published)
     {
         IPropertyType propertyType = property.PropertyType;
@@ -663,13 +723,18 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
             : propertyEditor.GetValueEditor().ConvertDbToXml(property, published);
     }
 
-    // exports an IContent item descendants.
-    private void SerializeChildren(IEnumerable<IContent> children, XElement xml, bool published)
+    /// <summary>
+    ///     Exports <see cref="IContent" /> item descendants recursively.
+    /// </summary>
+    /// <param name="children">The child content items to serialize.</param>
+    /// <param name="xml">The parent XML element to add children to.</param>
+    /// <param name="published">Whether to serialize the published version.</param>
+    private void SerializeChildren(IEnumerable<IContent> children, XElement xml, bool published, Dictionary<int, ITemplate?> templateCache)
     {
         foreach (IContent child in children)
         {
             // add the child xml
-            XElement childXml = Serialize(child, published);
+            XElement childXml = Serialize(child, published, false, templateCache);
             xml.Add(childXml);
 
             const int pageSize = 500;
@@ -678,15 +743,20 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
             while (page * pageSize < total)
             {
                 IEnumerable<IContent> grandChildren =
-                    _contentService.GetPagedChildren(child.Id, page++, pageSize, out total);
+                    _contentService.GetPagedChildren(child.Id, page++, pageSize, out total, propertyAliases: null, filter: null, ordering: null);
 
                 // recurse
-                SerializeChildren(grandChildren, childXml, published);
+                SerializeChildren(grandChildren, childXml, published, templateCache);
             }
         }
     }
 
-    // exports an IMedia item descendants.
+    /// <summary>
+    ///     Exports <see cref="IMedia" /> item descendants recursively.
+    /// </summary>
+    /// <param name="children">The child media items to serialize.</param>
+    /// <param name="xml">The parent XML element to add children to.</param>
+    /// <param name="onMediaItemSerialized">Optional callback invoked after each media item is serialized.</param>
     private void SerializeChildren(IEnumerable<IMedia> children, XElement xml, Action<IMedia, XElement>? onMediaItemSerialized)
     {
         foreach (IMedia child in children)
@@ -710,12 +780,19 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
     }
 
     /// <summary>
-    /// We have two properties containing configuration data:
-    /// 1. ConfigurationData - a dictionary that contains all the configuration data stored as key/value pairs.
-    /// 2. ConfigurationObject - a strongly typed object that represents the configuration data known to the server.
-    /// To fully be able to restore the package, we need to serialize the full ConfigurationData dictionary, not
-    /// just the configuration properties known to the server.
+    ///     Serializes the configuration data for a data type to JSON.
     /// </summary>
+    /// <param name="dataType">The data type whose configuration to serialize.</param>
+    /// <returns>A JSON string representing the data type configuration.</returns>
+    /// <remarks>
+    ///     We have two properties containing configuration data:
+    ///     <list type="number">
+    ///         <item><description>ConfigurationData - a dictionary that contains all the configuration data stored as key/value pairs.</description></item>
+    ///         <item><description>ConfigurationObject - a strongly typed object that represents the configuration data known to the server.</description></item>
+    ///     </list>
+    ///     To fully be able to restore the package, we need to serialize the full ConfigurationData dictionary, not
+    ///     just the configuration properties known to the server.
+    /// </remarks>
     private string SerializeDataTypeConfiguration(IDataType dataType) =>
         _configurationEditorJsonSerializer.Serialize(dataType.ConfigurationData);
 }

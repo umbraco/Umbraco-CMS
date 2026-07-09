@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
@@ -143,6 +144,32 @@ internal sealed class DocumentHybridCacheTests : UmbracoIntegrationTestWithConte
     }
 
     [Test]
+    public async Task Filtering_By_IsPublished_In_Preview_Mode_Returns_Published_Content()
+    {
+        // Arrange - Initialize the publish status service to simulate production state
+        // (in production, this runs at startup via PostRuntimePremigrationsUpgradeNotification)
+        var publishStatusManagementService = GetRequiredService<IPublishStatusManagementService>();
+        await publishStatusManagementService.InitializeAsync(CancellationToken.None);
+
+        // PublishedTextPage is published, Textpage is draft-only (from base class setup)
+        // Load both in preview mode (simulating a backoffice user viewing the frontend)
+        var publishedPage = await PublishedContentHybridCache.GetByIdAsync(PublishedTextPageId, true);
+        var unpublishedPage = await PublishedContentHybridCache.GetByIdAsync(TextpageId, true);
+
+        Assert.IsNotNull(publishedPage);
+        Assert.IsNotNull(unpublishedPage);
+
+        var allPages = new[] { publishedPage!, unpublishedPage! };
+
+        // Act - filter by IsPublished (the exact pattern that fails in Razor templates)
+        var filteredPages = allPages.Where(x => x.IsPublished()).ToList();
+
+        // Assert - only the published page should pass the filter
+        Assert.AreEqual(1, filteredPages.Count);
+        Assert.AreEqual(PublishedTextPage.Key!.Value, filteredPages[0].Key);
+    }
+
+    [Test]
     public async Task Can_Get_Updated_Draft_Content_By_Id()
     {
         // Arrange
@@ -212,7 +239,7 @@ internal sealed class DocumentHybridCacheTests : UmbracoIntegrationTestWithConte
     public async Task Can_Get_Updated_Draft_Published_Content_By_Key(bool preview, bool result)
     {
         // Arrange
-        PublishedTextPage.Variants = [new() { Name = NewName }];;
+        PublishedTextPage.Variants = [new() { Name = NewName }];
         ContentUpdateModel updateModel = new ContentUpdateModel
         {
             Properties = PublishedTextPage.Properties,
@@ -554,6 +581,65 @@ internal sealed class DocumentHybridCacheTests : UmbracoIntegrationTestWithConte
 
         var hasContentForTextPageCached = await DocumentCacheService.HasContentByIdAsync(testPage.Id);
         Assert.IsTrue(hasContentForTextPageCached);
+    }
+
+    [TestCase(true)]
+    [TestCase(false)]
+    public async Task Cannot_Get_Trashed_Content_By_Key(bool preview)
+    {
+        // Arrange - Verify published content is in cache
+        var textPage = await PublishedContentHybridCache.GetByIdAsync(PublishedTextPage.Key.Value, preview);
+        Assert.IsNotNull(textPage, "Content should be in cache before trashing");
+
+        // Act - Trash the document (move to recycle bin)
+        var trashResult = await ContentEditingService.MoveToRecycleBinAsync(PublishedTextPage.Key.Value, Constants.Security.SuperUserKey);
+        Assert.IsTrue(trashResult.Success);
+
+        // Assert - Content should no longer be in the cache
+        var trashedPage = await PublishedContentHybridCache.GetByIdAsync(PublishedTextPage.Key.Value, preview);
+        Assert.IsNull(trashedPage, "Trashed content should not be in cache");
+    }
+
+    [TestCase(true)]
+    [TestCase(false)]
+    public async Task Cannot_Get_Trashed_Content_By_Id(bool preview)
+    {
+        // Arrange - Verify published content is in cache
+        var textPage = await PublishedContentHybridCache.GetByIdAsync(PublishedTextPageId, preview);
+        Assert.IsNotNull(textPage, "Content should be in cache before trashing");
+
+        // Act - Trash the document (move to recycle bin)
+        var trashResult = await ContentEditingService.MoveToRecycleBinAsync(PublishedTextPage.Key.Value, Constants.Security.SuperUserKey);
+        Assert.IsTrue(trashResult.Success);
+
+        // Assert - Content should no longer be in the cache
+        var trashedPage = await PublishedContentHybridCache.GetByIdAsync(PublishedTextPageId, preview);
+        Assert.IsNull(trashedPage, "Trashed content should not be in cache");
+    }
+
+    [Test]
+    public async Task Restored_Content_Is_Available_In_Draft_Cache()
+    {
+        // Arrange - Verify published content is in cache, then trash it
+        var textPage = await PublishedContentHybridCache.GetByIdAsync(PublishedTextPage.Key.Value, true);
+        Assert.IsNotNull(textPage, "Content should be in cache before trashing");
+
+        var trashResult = await ContentEditingService.MoveToRecycleBinAsync(PublishedTextPage.Key.Value, Constants.Security.SuperUserKey);
+        Assert.IsTrue(trashResult.Success);
+
+        var trashedPage = await PublishedContentHybridCache.GetByIdAsync(PublishedTextPage.Key.Value, true);
+        Assert.IsNull(trashedPage, "Trashed content should not be in cache");
+
+        // Act - Restore to root (original location)
+        var restoreResult = await ContentEditingService.RestoreAsync(PublishedTextPage.Key.Value, null, Constants.Security.SuperUserKey);
+        Assert.IsTrue(restoreResult.Success);
+
+        // Assert - Restored content should be back in the draft cache, but not republished automatically
+        var restoredDraft = await PublishedContentHybridCache.GetByIdAsync(PublishedTextPage.Key.Value, true);
+        Assert.IsNotNull(restoredDraft, "Restored content should be in the draft cache");
+
+        var restoredPublished = await PublishedContentHybridCache.GetByIdAsync(PublishedTextPage.Key.Value, false);
+        Assert.IsNull(restoredPublished, "Restored content should not be in the published cache until it is republished");
     }
 
     private void AssertTextPage(IPublishedContent textPage)

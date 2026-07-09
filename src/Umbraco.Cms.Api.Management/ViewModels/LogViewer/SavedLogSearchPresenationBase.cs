@@ -1,5 +1,8 @@
 namespace Umbraco.Cms.Api.Management.ViewModels.LogViewer;
 
+/// <summary>
+/// Serves as the base class for representing saved log search presentations in the Log Viewer.
+/// </summary>
 public class SavedLogSearchPresenationBase
 {
     /// <summary>

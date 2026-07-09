@@ -1,5 +1,5 @@
-﻿import { ConstantHelper, NotificationConstantHelper, test } from "@umbraco/playwright-testhelpers";
-import { expect } from "@playwright/test";
+﻿import {ConstantHelper, test} from "@umbraco/acceptance-test-helpers";
+import {expect} from "@playwright/test";
 
 const editorAlias = 'Umbraco.DateTime';
 const editorUiAlias = 'Umb.PropertyEditorUi.DatePicker';
@@ -27,10 +27,9 @@ test('can update date format', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.dataType.enterDateFormatValue(dateFormatValue);
-  await umbracoUi.dataType.clickSaveButton();
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
-  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'format', dateFormatValue)).toBeTruthy();
 });
 

@@ -1,5 +1,6 @@
 export * from './forbidden/route-forbidden.element.js';
 export * from './not-found/route-not-found.element.js';
+export * from './route.context-token.js';
 export * from './route.context.js';
 export * from './router-slot-change.event.js';
 export * from './router-slot-init.event.js';

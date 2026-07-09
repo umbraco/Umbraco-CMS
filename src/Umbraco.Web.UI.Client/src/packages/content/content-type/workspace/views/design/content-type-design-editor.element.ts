@@ -31,6 +31,8 @@ import { umbConfirmModal, umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 
+import '@umbraco-cms/backoffice/components';
+
 @customElement('umb-content-type-design-editor')
 export class UmbContentTypeDesignEditorElement extends UmbLitElement implements UmbWorkspaceViewElement {
 	#sorter = new UmbSorterController<UmbPropertyTypeContainerMergedModel, UUITabElement>(this, {
@@ -102,6 +104,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 	#tabsStructureHelper = new UmbContentTypeContainerStructureHelper<UmbContentTypeModel>(this);
 	#currentTabComponent?: UmbContentTypeDesignEditorTabElement;
 	#processingTabId?: string;
+	#landingLocalPath?: string;
 
 	set manifest(value: ManifestWorkspaceViewContentTypeDesignEditorKind) {
 		this._compositionRepositoryAlias = value.meta.compositionRepositoryAlias;
@@ -109,7 +112,9 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 
 	@state()
 	private _compositionRepositoryAlias?: string;
-	//private _hasRootProperties = false;
+
+	@state()
+	private _hasRootProperties = false;
 
 	@state()
 	private _hasRootGroups = false;
@@ -155,12 +160,33 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 			this.#createRoutes();
 		});
 
-		// _hasRootProperties can be gotten via _tabsStructureHelper.hasProperties. But we do not support root properties currently.
+		this.observe(
+			this.#tabsStructureHelper.hasProperties,
+			(hasRootProperties) => {
+				this._hasRootProperties = hasRootProperties;
+				this.#createRoutes();
+			},
+			'observeRootProperties',
+		);
 
-		this.consumeContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT, (workspaceContext) => {
+		this.consumeContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT, async (workspaceContext) => {
 			this.#workspaceContext = workspaceContext;
-			this.#tabsStructureHelper.setStructureManager(workspaceContext?.structure);
+			if (!workspaceContext) return;
 
+			// The router-slot does not re-match the URL when its routes are replaced, so the
+			// initial route set must reflect real data. Awaiting the structure load here ensures
+			// the tabs helper subscribes to populated containers and #createRoutes runs against
+			// actual tabs/groups rather than the empty initial emissions of the underlying state.
+			await workspaceContext.structure.whenLoaded();
+			if (workspaceContext !== this.#workspaceContext) return; // stale, superseded by newer context
+
+			// Ensure root-group state is correct before the first route set is generated. #createRoutes() can
+			// run synchronously when setStructureManager attaches observers, and umb-router-slot does not
+			// re-match the URL when routes are replaced.
+			this._hasRootGroups = (await workspaceContext.structure.getRootContainers('Group')).length > 0;
+			if (workspaceContext !== this.#workspaceContext) return; // stale, superseded by newer context
+
+			this.#tabsStructureHelper.setStructureManager(workspaceContext.structure);
 			this.#observeRootGroups();
 		});
 	}
@@ -216,21 +242,22 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 			},
 		});
 
-		if (this._hasRootGroups || this._tabs.length === 0) {
-			routes.push({
-				path: '',
-				pathMatch: 'full',
-				redirectTo: 'root',
-				guards: [() => this.#processingTabId === undefined],
-			});
-		} else {
-			routes.push({
-				path: '',
-				pathMatch: 'full',
-				redirectTo: routes[0]?.path,
-				guards: [() => this.#processingTabId === undefined],
-			});
-		}
+		// Duplicate the landing route onto the empty path rather than using `redirectTo`. The
+		// router-slot library only applies `redirectTo` on navigation events, not on the initial
+		// route attachment, so an empty-path redirect would leave the view stuck. The landing
+		// route is `root` when the content type has root properties/groups (or has no tabs),
+		// otherwise the first tab. Note: we deliberately do NOT set `pathMatch: 'full'`, because
+		// the modal sub-router appends paths like `/add-property/...` to the active local path;
+		// with `path: ''` matching prefix-wise (regex `/^/`), the tab stays mounted and the
+		// modal-router can match the appended segment.
+		const defaultRoute =
+			this._hasRootGroups || this._hasRootProperties || this._tabs.length === 0 ? routes[routes.length - 1] : routes[0];
+		this.#landingLocalPath = defaultRoute.path;
+		routes.push({
+			...defaultRoute,
+			path: '',
+			guards: [() => this.#processingTabId === undefined],
+		});
 
 		if (routes.length !== 0) {
 			routes.push({
@@ -281,11 +308,9 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 
 	async #requestDeleteTab(tab: UmbPropertyTypeContainerMergedModel | undefined) {
 		if (!tab || !tab.ownerId) return;
-		// TODO: Localize this:
-		const tabName = tab.name === '' ? 'Unnamed' : tab.name;
-		// TODO: Localize this:
+		const tabName = tab.name === '' ? this.localize.term('general_unnamed') : tab.name;
 		const modalData: UmbConfirmModalData = {
-			headline: 'Delete tab',
+			headline: '#contentTypeEditor_deleteTab',
 			content: html`<umb-localize key="contentTypeEditor_confirmDeleteTabMessage" .args=${[tabName]}>
 					Are you sure you want to delete the tab <strong>${tabName}</strong>
 				</umb-localize>
@@ -294,7 +319,8 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 						This will delete all items that doesn't belong to a composition.
 					</umb-localize>
 				</div>`,
-			confirmLabel: this.localize.term('actions_delete'),
+			cancelLabel: '#general_cancel',
+			confirmLabel: '#actions_delete',
 			color: 'danger',
 		};
 
@@ -424,6 +450,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 			isElement: ownerContentType.isElement,
 			currentPropertyAliases,
 			isNew: this.#workspaceContext.getIsNew()!,
+			entityType: this.#workspaceContext.getEntityType(),
 		};
 
 		const value = await umbOpenModal(this, UMB_COMPOSITION_PICKER_MODAL, {
@@ -456,29 +483,41 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		return html`
 			<umb-body-layout header-fit-height>
 				<div id="header" slot="header">
-					<div id="container-list">${this.renderTabsNavigation()} ${this.#renderAddButton()}</div>
+					<div id="container-list">${this.renderTabsNavigation()}</div>
 					${this.#renderActions()}
 				</div>
-				<umb-router-slot
-					.routes=${this._routes}
-					@init=${(event: UmbRouterSlotInitEvent) => {
-						this._routerPath = event.target.absoluteRouterPath;
-					}}
-					@change=${(event: UmbRouterSlotChangeEvent) => {
-						this._activePath = event.target.absoluteActiveViewPath ?? '';
-					}}>
-				</umb-router-slot>
+				${this._routes
+					? html`<umb-router-slot
+							.routes=${this._routes}
+							@init=${(event: UmbRouterSlotInitEvent) => {
+								this._routerPath = event.target.absoluteRouterPath;
+							}}
+							@change=${(event: UmbRouterSlotChangeEvent) => {
+								let activePath = event.target.absoluteActiveViewPath ?? '';
+								// When the duplicated empty-path landing route is active, the router reports
+								// the absolute path as `${routerPath}/` with no local segment. Map it back to
+								// the canonical landing path so tab-navigation highlight and rename UI work.
+								if (this.#landingLocalPath && activePath === this._routerPath + '/') {
+									activePath = this._routerPath + '/' + this.#landingLocalPath;
+								}
+								this._activePath = activePath;
+							}}>
+						</umb-router-slot>`
+					: nothing}
 			</umb-body-layout>
 		`;
 	}
 
 	#renderAddButton() {
-		// TODO: Localize this:
 		if (this._sortModeActive) return;
 		return html`
-			<uui-button id="add-tab" data-mark="add-tab-button" @click="${this.#addTab}" label="Add tab">
+			<uui-button
+				id="add-tab"
+				data-mark="add-tab-button"
+				@click="${this.#addTab}"
+				label=${this.localize.term('contentTypeEditor_addTab')}>
 				<uui-icon name="icon-add"></uui-icon>
-				Add tab
+				<umb-localize key="contentTypeEditor_addTab">Add tab</umb-localize>
 			</uui-button>
 		`;
 	}
@@ -499,7 +538,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 								compact
 								@click=${this.#openCompositionModal}>
 								<uui-icon name="icon-merge"></uui-icon>
-								${this.localize.term('contentTypeEditor_compositions')}
+								<umb-localize key="contentTypeEditor_compositions"></umb-localize>
 							</uui-button>
 						`
 					: ''}
@@ -517,34 +556,35 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 	}
 
 	renderTabsNavigation() {
-		if (!this._tabs || this._tabs.length === 0) return;
-
 		return html`
-			<div id="tabs-group">
-				<uui-tab-group>
-					${this.renderRootTab()}
-					${repeat(
-						this._tabs,
-						(tab) => tab.ownerId ?? tab.ids[0],
-						(tab) => this.renderTab(tab),
-					)}
-				</uui-tab-group>
-			</div>
+			<umb-scrollable-container id="tabs-group">
+				${this._tabs && this._tabs.length > 0
+					? html`<uui-tab-group>
+							${this.renderRootTab()}
+							${repeat(
+								this._tabs,
+								(tab) => tab.ownerId ?? tab.ids[0],
+								(tab) => this.renderTab(tab),
+							)}
+						</uui-tab-group>`
+					: nothing}
+				${this.#renderAddButton()}
+			</umb-scrollable-container>
 		`;
 	}
 
 	renderRootTab() {
 		const path = this._routerPath + '/root';
 		const rootTabActive = path === this._activePath;
-		if (!this._hasRootGroups && !this._sortModeActive) {
-			// If we don't have any root groups and we are not in sort mode, then we don't want to render the root tab.
+		if (!this._hasRootGroups && !this._hasRootProperties && !this._sortModeActive) {
+			// If we don't have any root groups/properties and we are not in sort mode, then we don't want to render the root tab.
 			return nothing;
 		}
 		return html`
 			<uui-tab
 				id="root-tab"
 				data-mark="root-tab"
-				class=${this._hasRootGroups || rootTabActive ? '' : 'content-tab-is-empty'}
+				class=${this._hasRootGroups || this._hasRootProperties || rootTabActive ? '' : 'content-tab-is-empty'}
 				label=${this.localize.term('general_generic')}
 				.active=${rootTabActive}
 				href=${path}
@@ -560,7 +600,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		const ownedTab = tab.ownerId ? true : false;
 
 		return html`<uui-tab
-			label=${tab.name && tab.name !== '' ? tab.name : 'Unnamed'}
+			label=${tab.name && tab.name !== '' ? tab.name : this.localize.term('general_unnamed')}
 			.active=${tabActive}
 			href=${path}
 			data-umb-tab-id=${ifDefined(tab.ownerId ?? tab.ids[0])}
@@ -573,9 +613,8 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 	}
 
 	renderTabInner(tab: UmbPropertyTypeContainerMergedModel, tabActive: boolean, ownedTab: boolean) {
-		// TODO: Localize this:
 		const hasTabName = tab.name && tab.name !== '';
-		const tabName = hasTabName ? tab.name : 'Unnamed';
+		const tabName = hasTabName ? tab.name : '#general_unnamed';
 		const tabId = tab.ownerId ?? tab.ids[0];
 		if (this._sortModeActive) {
 			return html`<div class="tab-inner">
@@ -583,7 +622,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 					? html`<uui-icon name="icon-grip" class="drag-${tabId}"> </uui-icon>${this.localize.string(tabName)}
 							<uui-input
 								data-mark="tab:sort-input"
-								label="sort order"
+								label=${this.localize.term('sort_sortOrder')}
 								type="number"
 								value=${ifDefined(tab.sortOrder)}
 								style="width:50px"
@@ -598,7 +637,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 					data-mark="tab:name-input"
 					id="input"
 					look="placeholder"
-					placeholder="Unnamed"
+					placeholder=${this.localize.term('general_unnamed')}
 					label=${this.localize.term('settings_tabname')}
 					value="${tab.name!}"
 					auto-width
@@ -612,7 +651,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 
 		if (ownedTab) {
 			return html`<div class="not-active">
-				<span class=${hasTabName ? '' : 'invalid'}>${hasTabName ? this.localize.string(tabName) : 'Unnamed'}</span>
+				<span class=${hasTabName ? '' : 'invalid'}>${this.localize.string(tabName)}</span>
 				${this.renderDeleteFor(tab)}
 			</div>`;
 		} else {
@@ -689,10 +728,13 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 
 			#container-list {
 				display: flex;
+				overflow-x: hidden;
+				min-width: 0;
+				flex: 1;
 			}
 
 			#tabs-group {
-				display: flex;
+				min-width: 0;
 			}
 
 			#actions {
@@ -702,6 +744,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 
 			uui-tab-group {
 				flex-wrap: nowrap;
+				flex-shrink: 0;
 			}
 
 			uui-tab.content-tab-is-empty {
@@ -767,6 +810,10 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 
 			[drag-placeholder] {
 				opacity: 0.2;
+			}
+
+			#add-tab {
+				flex-shrink: 0;
 			}
 		`,
 	];

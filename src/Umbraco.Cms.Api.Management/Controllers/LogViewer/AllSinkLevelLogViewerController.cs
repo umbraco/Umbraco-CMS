@@ -9,12 +9,20 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.LogViewer;
 
+/// <summary>
+/// Provides an API controller for viewing log entries across all configured sink levels in the logging system.
+/// </summary>
 [ApiVersion("1.0")]
 public class AllSinkLevelLogViewerController : LogViewerControllerBase
 {
     private readonly ILogViewerService _logViewerService;
     private readonly IUmbracoMapper _umbracoMapper;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AllSinkLevelLogViewerController"/> class, which provides log viewing functionality for all sink levels.
+    /// </summary>
+    /// <param name="logViewerService">The service used to retrieve and manage log entries.</param>
+    /// <param name="umbracoMapper">The mapper used to map between Umbraco domain models and API models.</param>
     public AllSinkLevelLogViewerController(ILogViewerService logViewerService, IUmbracoMapper umbracoMapper)
     {
         _logViewerService = logViewerService;
@@ -31,6 +39,8 @@ public class AllSinkLevelLogViewerController : LogViewerControllerBase
     [HttpGet("level")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<LoggerResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a collection of log sink levels.")]
+    [EndpointDescription("Gets a collection of configured log sinks with their minimum log levels.")]
     public Task<ActionResult<PagedViewModel<LoggerResponseModel>>> AllLogLevels(
         CancellationToken cancellationToken,
         int skip = 0,

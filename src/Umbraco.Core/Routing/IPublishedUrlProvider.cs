@@ -3,6 +3,9 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 
 namespace Umbraco.Cms.Core.Routing;
 
+/// <summary>
+///     Provides URLs for published content and media items.
+/// </summary>
 public interface IPublishedUrlProvider
 {
     /// <summary>
@@ -44,10 +47,17 @@ public interface IPublishedUrlProvider
     ///         If the published content is multi-lingual, gets the url for the specified culture or,
     ///         when no culture is specified, the current culture.
     ///     </para>
-    ///     <para>If the provider is unable to provide a url, it returns "#".</para>
+    ///     <para>If the provider is unable to provide a url, it returns <see cref="Constants.Routing.Unroutable"/>.</para>
     /// </remarks>
     string GetUrl(IPublishedContent content, UrlMode mode = UrlMode.Default, string? culture = null, Uri? current = null);
 
+    /// <summary>
+    ///     Gets the url of a published content from a route.
+    /// </summary>
+    /// <param name="id">The published content identifier.</param>
+    /// <param name="route">The route.</param>
+    /// <param name="culture">A culture.</param>
+    /// <returns>The url for the published content.</returns>
     string GetUrlFromRoute(int id, string? route, string? culture);
 
     /// <summary>

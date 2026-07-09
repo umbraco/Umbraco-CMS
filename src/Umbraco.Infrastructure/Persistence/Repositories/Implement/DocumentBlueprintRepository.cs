@@ -22,6 +22,24 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 /// </remarks>
 internal sealed class DocumentBlueprintRepository : DocumentRepository, IDocumentBlueprintRepository
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DocumentBlueprintRepository"/> class, which manages document blueprints in the persistence layer.
+    /// </summary>
+    /// <param name="scopeAccessor">Provides access to the current database scope for transactional operations.</param>
+    /// <param name="appCaches">The cache manager for application-level and request-level caching.</param>
+    /// <param name="logger">The logger used for logging repository operations and errors.</param>
+    /// <param name="loggerFactory">Factory for creating logger instances.</param>
+    /// <param name="contentTypeRepository">Repository for accessing content type definitions.</param>
+    /// <param name="templateRepository">Repository for accessing template entities.</param>
+    /// <param name="tagRepository">Repository for managing tags associated with content.</param>
+    /// <param name="languageRepository">Repository for accessing language definitions.</param>
+    /// <param name="relationRepository">Repository for managing entity relations.</param>
+    /// <param name="relationTypeRepository">Repository for managing relation types.</param>
+    /// <param name="propertyEditorCollection">Collection of property editors used for content properties.</param>
+    /// <param name="dataTypeService">Service for managing data types.</param>
+    /// <param name="dataValueReferenceFactories">Collection of factories for resolving data value references.</param>
+    /// <param name="serializer">The JSON serializer for serializing and deserializing data.</param>
+    /// <param name="eventAggregator">Publishes and subscribes to domain events.</param>
     public DocumentBlueprintRepository(
         IScopeAccessor scopeAccessor,
         AppCaches appCaches,

@@ -4,11 +4,19 @@ using Umbraco.Cms.Core.Scoping;
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <summary>
+///     Provides key-value storage operations for persisting simple settings.
+/// </summary>
 internal sealed class KeyValueService : IKeyValueService
 {
     private readonly IKeyValueRepository _repository;
     private readonly ICoreScopeProvider _scopeProvider;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="KeyValueService" /> class.
+    /// </summary>
+    /// <param name="scopeProvider">The core scope provider.</param>
+    /// <param name="repository">The key-value repository.</param>
     public KeyValueService(ICoreScopeProvider scopeProvider, IKeyValueRepository repository)
     {
         _scopeProvider = scopeProvider;

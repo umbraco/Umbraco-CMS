@@ -11,9 +11,6 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 	#api: UmbDocumentTreeItemContext | undefined;
 
 	@property({ type: Object, attribute: false })
-	public override get api(): UmbDocumentTreeItemContext | undefined {
-		return this.#api;
-	}
 	public override set api(value: UmbDocumentTreeItemContext | undefined) {
 		this.#api = value;
 
@@ -26,10 +23,13 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 				this.requestUpdate('_forceShowExpand', oldValue);
 			});
 			this.observe(this.#api.icon, (icon) => (this.#icon = icon || ''));
-			this.observe(this.#api.flags, (flags) => (this._flags = flags || ''));
+			this.observe(this.#api.flags, (flags) => (this._flags = flags || []));
 		}
 
 		super.api = value;
+	}
+	public override get api(): UmbDocumentTreeItemContext | undefined {
+		return this.#api;
 	}
 
 	@state()
@@ -57,7 +57,9 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 	override _renderExpandSymbol = () => {
 		// If this in the menu and it is a collection, then we will enforce the user to the Collection view instead of expanding.
 		// `this._forceShowExpand` is equivalent to hasCollection for this element.
-		if (this._isMenu && this._forceShowExpand) {
+		// Exception: a "no access" collection is an ancestor of the user's start node, so it must stay
+		// expandable in the tree (render the normal caret) to let the user browse down to it.
+		if (this._isMenu && this._forceShowExpand && !this._noAccess) {
 			return html`<umb-icon data-mark="open-collection" name="icon-list" style="font-size: 8px;"></umb-icon>`;
 		} else {
 			return undefined;
@@ -65,7 +67,9 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 	};
 
 	override renderLabel() {
-		return html`<span id="label" slot="label" class=${classMap({ draft: this._isDraft })}>${this._name}</span> `;
+		return html`<span id="label" slot="label" class=${classMap({ draft: this._isDraft, noAccess: this._noAccess })}>
+			${this._name}
+		</span> `;
 	}
 
 	static override styles = [

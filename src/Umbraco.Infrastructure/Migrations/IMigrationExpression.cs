@@ -5,5 +5,8 @@ namespace Umbraco.Cms.Infrastructure.Migrations;
 /// </summary>
 public interface IMigrationExpression
 {
+    /// <summary>
+    /// Executes the defined migration operation represented by this expression.
+    /// </summary>
     void Execute();
 }

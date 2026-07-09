@@ -1,5 +1,8 @@
 namespace Umbraco.Cms.Core.Configuration;
 
+/// <summary>
+///     Defines the contract for manipulating configuration settings.
+/// </summary>
 public interface IConfigManipulator
 {
     /// <summary>
@@ -33,6 +36,7 @@ public interface IConfigManipulator
     /// </summary>
     /// <param name="disable">The value to save.</param>
     /// <returns></returns>
+    [Obsolete("This method is no longer used by Umbraco. Set the Umbraco:CMS:WebRouting:DisableRedirectUrlTracking configuration key instead. Scheduled for removal in Umbraco 19.")]
     Task SaveDisableRedirectUrlTrackingAsync(bool disable);
 
     /// <summary>
@@ -44,4 +48,15 @@ public interface IConfigManipulator
     /// <param name="id">The ID to save.</param>
     /// <returns></returns>
     Task SetGlobalIdAsync(string id);
+
+    /// <summary>
+    /// Sets the imaging HMAC secret key in the configuration file.
+    /// <remarks>
+    /// Will create the node if it does not already exist.
+    /// </remarks>
+    /// </summary>
+    /// <param name="base64Key">The base64-encoded key to save.</param>
+    // TODO (V18): Remove the default implementation.
+    Task SetImagingHmacSecretKeyAsync(string base64Key)
+        => Task.CompletedTask;
 }

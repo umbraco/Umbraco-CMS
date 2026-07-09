@@ -1,4 +1,4 @@
-import {AliasHelper, test} from '@umbraco/playwright-testhelpers';
+import {AliasHelper, test} from '@umbraco/acceptance-test-helpers';
 
 // Content
 const contentName = 'Test Rendering Content';

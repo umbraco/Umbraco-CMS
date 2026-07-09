@@ -1,4 +1,4 @@
-import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
+import {ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 import {expect} from "@playwright/test";
 
 // Content
@@ -27,10 +27,9 @@ test('can see the custom collection view when choosing layout for new collection
   
   // Act
   await umbracoUi.dataType.addLayouts(layoutName);
-  await umbracoUi.dataType.clickSaveButton();
-  
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
+
   // Assert
-  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesListViewHaveLayout(customDataTypeName, layoutName, 'icon-list', layoutCollectionView)).toBeTruthy();
 });
 

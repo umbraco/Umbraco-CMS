@@ -5,6 +5,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { customElement, state, css, html } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbRoute, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
+import { createObservablePart } from '@umbraco-cms/backoffice/observable-api';
 
 @customElement('umb-media-workspace-editor')
 export class UmbMediaWorkspaceEditorElement extends UmbLitElement {
@@ -13,11 +14,13 @@ export class UmbMediaWorkspaceEditorElement extends UmbLitElement {
 	private _splitViewElement = new UmbMediaWorkspaceSplitViewElement();
 
 	#workspaceContext?: typeof UMB_MEDIA_WORKSPACE_CONTEXT.TYPE;
-	#variants?: Array<UmbMediaVariantOptionModel>;
-	#isForbidden = false;
+	#variants?: Array<Pick<UmbMediaVariantOptionModel, 'culture' | 'segment' | 'unique'>>;
 
 	@state()
 	private _routes?: Array<UmbRoute>;
+
+	@state()
+	private _loading?: boolean = true;
 
 	constructor() {
 		super();
@@ -25,13 +28,21 @@ export class UmbMediaWorkspaceEditorElement extends UmbLitElement {
 		this.consumeContext(UMB_MEDIA_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
 			this.#observeVariants();
-			this.#observeForbidden();
+			this.#observeLoading();
 		});
 	}
 
 	#observeVariants() {
 		this.observe(
-			this.#workspaceContext?.variantOptions,
+			this.#workspaceContext
+				? createObservablePart(this.#workspaceContext.variantOptions, (variants) =>
+						variants.map((v) => ({
+							culture: v.culture,
+							segment: v.segment,
+							unique: v.unique,
+						})),
+					)
+				: undefined,
 			(options) => {
 				this.#variants = options;
 				this._generateRoutes();
@@ -40,18 +51,22 @@ export class UmbMediaWorkspaceEditorElement extends UmbLitElement {
 		);
 	}
 
-	#observeForbidden() {
+	#observeLoading() {
 		this.observe(
-			this.#workspaceContext?.forbidden.isOn,
-			(forbidden) => {
-				this.#isForbidden = forbidden ?? false;
-				this._generateRoutes();
+			this.#workspaceContext?.loading.isOn,
+			(loading) => {
+				this._loading = loading ?? false;
 			},
-			'_observeForbidden',
+			'_observeLoading',
 		);
 	}
 
 	private async _generateRoutes() {
+		if (!this.#variants || this.#variants.length === 0) {
+			this._routes = [this.#createNotFoundRoute()];
+			return;
+		}
+
 		// Generate split view routes for all available routes
 		const routes: Array<UmbRoute> = [];
 
@@ -93,15 +108,21 @@ export class UmbMediaWorkspaceEditorElement extends UmbLitElement {
 			});
 		}
 
-		routes.push({
-			path: `**`,
-			component: async () => {
-				const router = await import('@umbraco-cms/backoffice/router');
-				return this.#isForbidden ? router.UmbRouteForbiddenElement : router.UmbRouteNotFoundElement;
-			},
-		});
+		routes.push(this.#createNotFoundRoute());
 
 		this._routes = routes;
+	}
+
+	#createNotFoundRoute(): UmbRoute {
+		return {
+			path: '**',
+			component: async () => {
+				const router = await import('@umbraco-cms/backoffice/router');
+				return this.#workspaceContext?.forbidden.getIsOn()
+					? router.UmbRouteForbiddenElement
+					: router.UmbRouteNotFoundElement;
+			},
+		};
 	}
 
 	private _gotWorkspaceRoute = (e: UmbRouterSlotInitEvent) => {
@@ -109,9 +130,9 @@ export class UmbMediaWorkspaceEditorElement extends UmbLitElement {
 	};
 
 	override render() {
-		return this._routes && this._routes.length > 0
+		return !this._loading && this._routes && this._routes.length > 0
 			? html`<umb-router-slot .routes=${this._routes} @init=${this._gotWorkspaceRoute}></umb-router-slot>`
-			: '';
+			: html`<umb-view-loader></umb-view-loader>`;
 	}
 
 	static override styles = [

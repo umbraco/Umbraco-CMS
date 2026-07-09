@@ -1,6 +1,6 @@
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { css, customElement, html, property, when } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbBlockDataType } from '@umbraco-cms/backoffice/block';
+import type { UmbBlockDataType, UmbBlockLabelUfmValueType } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockEditorCustomViewConfiguration } from '@umbraco-cms/backoffice/block-custom-view';
 
 import '@umbraco-cms/backoffice/ufm';
@@ -30,7 +30,7 @@ export class UmbBlockGridBlockElement extends UmbLitElement {
 	settings?: UmbBlockDataType;
 
 	override render() {
-		const blockValue = { ...this.content, $settings: this.settings, $index: this.index };
+		const blockValue: UmbBlockLabelUfmValueType = { ...this.content, $settings: this.settings, $index: this.index };
 		return html`
 			<umb-ref-grid-block
 				standalone
@@ -53,8 +53,9 @@ export class UmbBlockGridBlockElement extends UmbLitElement {
 
 	static override styles = [
 		css`
-			umb-block-grid-areas-container {
-				margin-top: calc(var(--uui-size-2) + 1px);
+			:host {
+				display: block;
+				margin-bottom: 1px;
 			}
 
 			umb-block-grid-areas-container::part(area) {

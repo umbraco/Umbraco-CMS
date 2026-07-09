@@ -8,6 +8,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Website.Controllers;
 using Umbraco.Extensions;
 using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
+using IBackOfficeEnabledMarker = Umbraco.Cms.Core.DependencyInjection.IBackOfficeEnabledMarker;
 
 namespace Umbraco.Cms.Web.UI.Composers
 {
@@ -53,8 +54,19 @@ namespace Umbraco.Cms.Web.UI.Composers
             var feature = new ControllerFeature();
             builder.PartManager.PopulateFeature(feature);
 
+            // Check if backoffice is enabled via marker interface.
+            bool backofficeEnabled = builder.Services
+                .Any(s => s.ServiceType == typeof(IBackOfficeEnabledMarker));
+
             foreach (Type controller in feature.Controllers.Select(c => c.AsType()))
             {
+                // Skip Management API controllers if backoffice not enabled.
+                if (backofficeEnabled is false &&
+                    controller.Assembly.GetName().Name?.StartsWith("Umbraco.Cms.Api.Management", StringComparison.Ordinal) == true)
+                {
+                    continue;
+                }
+
                 builder.Services.TryAddTransient(controller, controller);
             }
 

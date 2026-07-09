@@ -1,5 +1,8 @@
 namespace Umbraco.Cms.Api.Management.ViewModels.LogViewer;
 
+/// <summary>
+/// Represents the response model for a log template in the log viewer API.
+/// </summary>
 public class LogTemplateResponseModel
 {
     /// <summary>

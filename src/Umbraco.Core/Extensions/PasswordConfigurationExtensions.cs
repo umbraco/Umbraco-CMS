@@ -5,6 +5,9 @@ using Umbraco.Cms.Core.Configuration;
 
 namespace Umbraco.Extensions;
 
+/// <summary>
+/// Provides extension methods for <see cref="IPasswordConfiguration"/>.
+/// </summary>
 public static class PasswordConfigurationExtensions
 {
     /// <summary>
@@ -29,6 +32,11 @@ public static class PasswordConfigurationExtensions
             { "allowManuallyChangingPassword", allowManuallyChangingPassword },
         };
 
+    /// <summary>
+    /// Gets the minimum number of non-alphanumeric characters required for a password.
+    /// </summary>
+    /// <param name="passwordConfiguration">The password configuration.</param>
+    /// <returns>1 if non-letter or digit characters are required; otherwise, 0.</returns>
     public static int GetMinNonAlphaNumericChars(this IPasswordConfiguration passwordConfiguration) =>
         passwordConfiguration.RequireNonLetterOrDigit ? 1 : 0;
 }

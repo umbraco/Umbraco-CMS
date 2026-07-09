@@ -18,6 +18,7 @@ export default {
 		changeDataType: 'Datatype aanpassen',
 		copy: 'Kopiëren',
 		create: 'Nieuw',
+		createFor: (name: string) => (name ? `Item aanmaken voor ${name}` : 'Aanmaken'),
 		export: 'Export',
 		createPackage: 'Nieuwe package',
 		createGroup: 'Groep maken',
@@ -56,6 +57,7 @@ export default {
 		setGroup: 'Groep instellen',
 		sort: 'Sorteren',
 		translate: 'Vertalen',
+		trash: 'Verwijderen',
 		update: 'Bijwerken',
 		setPermissions: 'Rechten instellen',
 		unlock: 'Deblokkeer',
@@ -332,7 +334,7 @@ export default {
 	media: {
 		clickToUpload: 'Klik om te uploaden',
 		orClickHereToUpload: 'Of klik hier om bestanden te kiezen',
-		disallowedFileType: 'Kan dit bestand niet uploaden, het heeft niet het juiste bestandstype.',
+		disallowedFileType: 'Kan dit bestand niet uploaden, het heeft niet het juiste bestandstype',
 		maxFileSize: 'Maximale bestandsgrootte is',
 		mediaRoot: 'Media root',
 		moveToSameFolderFailed: 'De bovenliggende map en de doelmap kunnen niet hetzelfde zijn',
@@ -340,6 +342,8 @@ export default {
 		renameFolderFailed: 'Kan de map met id %0% niet hernoemen',
 		dragAndDropYourFilesIntoTheArea: 'Sleep en zet je bestand(en) neer in dit gebied',
 		uploadNotAllowed: 'Upload is niet toegelaten in deze locatie.',
+		uploadValidationFailed: (mediaTypeName: string) =>
+			`Het mediatype ${mediaTypeName} heeft een of meer vereiste eigenschappen. Het moet afzonderlijk worden geüpload via het menu 'Maken'`,
 		fileSecurityValidationFailure: 'Een of meerdere veiligheid validaties zijn gefaald voor het bestand',
 	},
 	member: {
@@ -362,7 +366,7 @@ export default {
 		noDocumentTypesEditPermissions: 'Rechten aanpassen voor dit documenttype',
 		noDocumentTypesCreateNew: 'Nieuw documenttype aanmaken',
 		noDocumentTypesAllowedAtRoot:
-			'Er zijn geen toegestane ​​documenttypes beschikbaar om hier aan te maken. Je moet deze inschakelen bij <strong>Documenttypes</strong> in de sectie <strong>Instellingen</strong>, de optie <strong>Toestaan op root-niveau</strong> onder <strong>Rechten</strong>.',
+			'Er zijn geen toegestane ​​documenttypes beschikbaar om hier aan te maken. Je moet deze inschakelen bij <strong>Documenttypes</strong> in de sectie <strong>Instellingen</strong>, de optie <strong>Toestaan op root-niveau</strong> onder <strong>Structuur</strong>.',
 		noMediaTypes:
 			'Er zijn geen toegestande mediatypes beschikbaar. Schakel deze in in de sectie Instellingen onder <strong>"Mediatypes"</strong>.',
 		noMediaTypesWithNoSettingsAccess:
@@ -677,6 +681,7 @@ export default {
 		content: 'Inhoud',
 		continue: 'Doorgaan',
 		copy: 'Kopiëren',
+		copied: 'Gekopieerd!',
 		create: 'Aanmaken',
 		cropSection: 'Sectie bijsnijden',
 		database: 'Database',
@@ -941,7 +946,7 @@ export default {
 		greeting5: 'Welkom',
 		greeting6: 'Welkom',
 		instruction: 'log hieronder in',
-		signInWith: 'Inloggen met',
+		signInWith: 'Inloggen met {0}',
 		timeout: 'Sessie is verlopen',
 		bottomText:
 			'<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">umbraco.com</a></p>',
@@ -1147,7 +1152,8 @@ export default {
 		headline: 'Selecteer een versie om te vergelijken met de huidige versie',
 		currentVersion: 'Huidige versie',
 		diffHelp:
-			'Hier worden de verschillen getoond tussen de huidige en de geselecteerde versie<br /><del>Rode</del> tekst wordt niet getoond in de geselecteerde versie, <ins>groen betekent toegevoegd</ins>',
+			'<del>Rode tekst</del> wordt verwijderd in de geselecteerde versie, <ins>groene tekst</ins> wordt toegevoegd.',
+		showDiff: 'Toon verschillen tussen de huidige (concept) versie en de geselecteerde versie.',
 		documentRolledBack: 'Document is teruggezet',
 		htmlHelp:
 			'Hiermee wordt de geselecteerde versie als html getoond, als u de verschillen tussen de twee\n      versies tegelijk wilt zien, gebruik dan de diff view\n    ',
@@ -1184,6 +1190,7 @@ export default {
 		tab: 'Tab',
 		tabname: 'Tab titel',
 		tabs: 'Tabs',
+		changeIcon: 'Pictogram wijzigen',
 		contentTypeEnabled: 'Basis inhoudstype ingeschakeld',
 		contentTypeUses: 'Dit inhoudstype gebruikt',
 		noPropertiesDefinedOnTab:
@@ -1450,9 +1457,19 @@ export default {
 		chooseChildNode: 'Kies onderliggende node',
 		compositionsDescription:
 			'Overgeërfde tabs en properties van een bestaand documenttype. Nieuwe tabs\n      worden toegevoegd aan het huidige documenttype of samengevoegd als een tab met dezelfde naam al bestaat.\n    ',
+		compositionsDescriptionMediaType:
+			'Overgeërfde tabs en properties van een bestaand mediatype. Nieuwe tabs\n      worden toegevoegd aan het huidige mediatype of samengevoegd als een tab met dezelfde naam al bestaat.\n    ',
+		compositionsDescriptionMemberType:
+			'Overgeërfde tabs en properties van een bestaand lidtype. Nieuwe tabs\n      worden toegevoegd aan het huidige lidtype of samengevoegd als een tab met dezelfde naam al bestaat.\n    ',
 		compositionInUse:
 			'Dit contenttype wordt gebruikt in een compositie en kan daarom niet zelf een\n      compositie worden.\n    ',
+		compositionInUseMediaType:
+			'Dit mediatype wordt gebruikt in een compositie en kan daarom niet zelf een\n      compositie worden.\n    ',
+		compositionInUseMemberType:
+			'Dit lidtype wordt gebruikt in een compositie en kan daarom niet zelf een\n      compositie worden.\n    ',
 		noAvailableCompositions: 'Er zijn geen contenttypen beschikbaar om als compositie te gebruiken.',
+		noAvailableCompositionsMediaType: 'Er zijn geen mediatypen beschikbaar om als compositie te gebruiken.',
+		noAvailableCompositionsMemberType: 'Er zijn geen lidtypen beschikbaar om als compositie te gebruiken.',
 		compositionRemoveWarning:
 			'Een compositie verwijderen zal alle bijbehorende eigenschapsdata ook\n      verwijderen. Zodra je het documenttype hebt opgeslagen is er geen weg meer terug.\n    ',
 		availableEditors: 'Beschikbare editors',
@@ -1490,6 +1507,10 @@ export default {
 		compositionUsageHeading: 'Waar wordt deze compositie gebruikt?',
 		compositionUsageSpecification:
 			'Deze samenstelling wordt momenteel gebruikt bij de samenstelling van de\n      volgende inhoudstypen:\n    ',
+		compositionUsageSpecificationMediaType:
+			'Deze samenstelling wordt momenteel gebruikt bij de samenstelling van de\n      volgende mediatypen:\n    ',
+		compositionUsageSpecificationMemberType:
+			'Deze samenstelling wordt momenteel gebruikt bij de samenstelling van de\n      volgende lidtypen:\n    ',
 		variantsHeading: 'Variaties toestaan',
 		cultureVariantHeading: 'Variëren per cultuur toestaan',
 		segmentVariantHeading: 'Segmentatie toestaan',
@@ -1673,6 +1694,7 @@ export default {
 		noLockouts: 'is niet gedeblokkeerd',
 		noPasswordChange: 'Het wachtwoord is niet gewijzigd',
 		confirmNewPassword: 'Bevestig nieuw wachtwoord',
+		confirmPassword: 'Bevestig wachtwoord',
 		changePasswordDescription:
 			"Je kunt je wachtwoord veranderen door onderstaand formulier in te vullen en\n      op de knop 'Verander wachtwoord' te klikken\n    ",
 		contentChannel: 'Inhoudskanaal',
@@ -1851,6 +1873,8 @@ export default {
 	redirectUrls: {
 		disableUrlTracker: 'URL tracker uitschakelen',
 		enableUrlTracker: 'URL tracker inschakelen',
+		urlTrackerEnabled: 'Ingeschakeld',
+		urlTrackerDisabled: 'Uitgeschakeld',
 		culture: 'Cultuur',
 		originalUrl: 'Originele URL',
 		redirectedTo: 'Doorgestuurd naar',
@@ -1930,7 +1954,8 @@ export default {
 		openBackofficeSearch: 'Backoffice zoeken openen',
 		openCloseBackofficeHelp: 'Backoffice help openen/sluiten',
 		openCloseBackofficeProfileOptions: 'Jouw profiel opties openen/sluiten',
-		profileOptions: 'Profiel opties',
+		profileOptions: 'Gebruikersprofiel voor %0% (%1%)',
+		profileOptionsDefault: 'Gebruikersprofiel',
 		assignDomainDescription: 'Cultuur en Hostnamen instellen voor %0%',
 		createDescription: 'Nieuwe node aanmaken onder %0%',
 		protectDescription: 'Openbare toegang instellen op %0%',

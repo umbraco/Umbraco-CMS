@@ -1,3 +1,4 @@
+import { UmbMediaPickerFolderFilter } from '../../components/input-media/input-media.context.js';
 import type { UmbInputMediaElement } from '../../components/index.js';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
@@ -47,6 +48,7 @@ export class UmbPropertyEditorUIMediaEntityPickerElement extends UmbLitElement i
 				.min=${this._min}
 				.max=${this._max}
 				.value=${this.value}
+				.folderFilter=${UmbMediaPickerFolderFilter.FOLDERS_ONLY}
 				?readonly=${this.readonly}
 				@change=${this.#onChange}></umb-input-media>
 		`;

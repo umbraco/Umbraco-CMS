@@ -13,17 +13,14 @@ import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type'
 @customElement('umb-property-type-based-property')
 export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 	@property({ type: Object, attribute: false })
-	public set property(value: UmbPropertyTypeModel | undefined) {
-		const oldProperty = this._property;
-		this._property = value;
-		if (this._property?.dataType.unique !== oldProperty?.dataType.unique) {
-			this._observeDataType(this._property?.dataType.unique);
-		}
-	}
-	public get property(): UmbPropertyTypeModel | undefined {
-		return this._property;
-	}
-	private _property?: UmbPropertyTypeModel;
+	public property?: UmbPropertyTypeModel;
+
+	/**
+	 * Optional pre-loaded data type detail. When provided, the element uses this directly instead of loading individually.
+	 * @type {UmbDataTypeDetailModel}
+	 */
+	@property({ attribute: false })
+	public dataTypeDetail?: UmbDataTypeDetailModel;
 
 	@property({ type: String, attribute: 'data-path' })
 	public dataPath?: string;
@@ -66,6 +63,8 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 
 	#context = new UmbPropertyTypeBasedPropertyContext(this);
 
+	#lastDataTypeUnique?: string;
+
 	private async _checkSchemaSupport() {
 		if (!this._ownerEntityType || !this._propertyEditorSchemaAlias) return;
 
@@ -77,63 +76,86 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 		}
 	}
 
-	private async _observeDataType(dataTypeUnique?: string) {
+	override willUpdate(changedProperties: Map<string, unknown>) {
+		super.willUpdate(changedProperties);
+
+		if (changedProperties.has('property') || changedProperties.has('dataTypeDetail')) {
+			const propertyDataTypeUnique = this.property?.dataType.unique;
+
+			if (propertyDataTypeUnique !== this.#lastDataTypeUnique || changedProperties.has('dataTypeDetail')) {
+				this.#lastDataTypeUnique = propertyDataTypeUnique;
+
+				if (this.dataTypeDetail && propertyDataTypeUnique && this.dataTypeDetail.unique === propertyDataTypeUnique) {
+					// Use provided data type detail directly — no API call needed
+					this._dataTypeObserver?.destroy();
+					this.#applyDataType(this.dataTypeDetail);
+				} else if (propertyDataTypeUnique) {
+					// Fall back to individual loading
+					this.#observeDataType(propertyDataTypeUnique);
+				}
+			}
+		}
+	}
+
+	async #observeDataType(dataTypeUnique: string) {
 		this._dataTypeObserver?.destroy();
-		if (dataTypeUnique) {
-			// Its not technically needed to have await here, this is only to ensure that the data is loaded before we observe it, and thereby only updating the DOM with the latest data.
-			await this._dataTypeDetailRepository.requestByUnique(dataTypeUnique);
-			this._dataTypeObserver = this.observe(
-				await this._dataTypeDetailRepository.byUnique(dataTypeUnique),
-				(dataType) => {
-					const contextValue = dataType ? { unique: dataType.unique } : undefined;
-					this.#context.setDataType(contextValue);
 
-					this._dataTypeValues = dataType?.values;
-					this._propertyEditorUiAlias = dataType?.editorUiAlias || undefined;
-					this._propertyEditorSchemaAlias = dataType?.editorAlias || undefined;
-					this._propertyEditorDataSourceAlias = dataType?.editorDataSourceAlias || undefined;
-					this._checkSchemaSupport();
+		await this._dataTypeDetailRepository.requestByUnique(dataTypeUnique);
+		this._dataTypeObserver = this.observe(
+			await this._dataTypeDetailRepository.byUnique(dataTypeUnique),
+			(dataTypeDetail) => {
+				this.#applyDataType(dataTypeDetail);
+			},
+			'_observeDataType',
+		);
+	}
 
-					// If there is no UI, we will look up the Property editor model to find the default UI alias:
-					if (!this._propertyEditorUiAlias && dataType?.editorAlias) {
-						//use 'dataType.editorAlias' to look up the extension in the registry:
-						// TODO: lets implement a way to observe once. [NL]
-						this.observe(
-							umbExtensionsRegistry.byTypeAndAlias('propertyEditorSchema', dataType.editorAlias),
-							(extension) => {
-								if (!extension) return;
-								this._propertyEditorUiAlias = extension?.meta.defaultPropertyEditorUiAlias;
-								this.removeUmbControllerByAlias('_observePropertyEditorSchema');
-							},
-							'_observePropertyEditorSchema',
-						);
-					} else {
-						this.removeUmbControllerByAlias('_observePropertyEditorSchema');
-					}
+	#applyDataType(dataType: UmbDataTypeDetailModel | undefined) {
+		const contextValue = dataType ? { unique: dataType.unique } : undefined;
+		this.#context.setDataType(contextValue);
+
+		this._dataTypeValues = dataType?.values;
+		this._propertyEditorUiAlias = dataType?.editorUiAlias || undefined;
+		this._propertyEditorSchemaAlias = dataType?.editorAlias || undefined;
+		this._propertyEditorDataSourceAlias = dataType?.editorDataSourceAlias || undefined;
+		this._checkSchemaSupport();
+
+		// If there is no UI, we will look up the Property editor model to find the default UI alias:
+		if (!this._propertyEditorUiAlias && dataType?.editorAlias) {
+			//use 'dataType.editorAlias' to look up the extension in the registry:
+			// TODO: lets implement a way to observe once. [NL]
+			this.observe(
+				umbExtensionsRegistry.byTypeAndAlias('propertyEditorSchema', dataType.editorAlias),
+				(extension) => {
+					if (!extension) return;
+					this._propertyEditorUiAlias = extension?.meta.defaultPropertyEditorUiAlias;
+					this.removeUmbControllerByAlias('_observePropertyEditorSchema');
 				},
-				'_observeDataType',
+				'_observePropertyEditorSchema',
 			);
+		} else {
+			this.removeUmbControllerByAlias('_observePropertyEditorSchema');
 		}
 	}
 
 	override render() {
-		if (!this._propertyEditorUiAlias || !this._property?.alias) return;
+		if (!this._propertyEditorUiAlias || !this.property?.alias) return;
 		if (this._isUnsupported) {
 			return html`<umb-unsupported-property
-				.alias=${this._property.alias}
+				.alias=${this.property.alias}
 				.schema=${this._propertyEditorSchemaAlias!}></umb-unsupported-property>`;
 		}
 		return html`
 			<umb-property
 				.dataPath=${this.dataPath}
-				.alias=${this._property.alias}
-				.label=${this._property.name}
-				.description=${this._property.description ?? undefined}
-				.appearance=${this._property.appearance}
+				.alias=${this.property.alias}
+				.label=${this.property.name}
+				.description=${this.property.description ?? undefined}
+				.appearance=${this.property.appearance}
 				property-editor-ui-alias=${ifDefined(this._propertyEditorUiAlias)}
 				property-editor-data-source-alias=${ifDefined(this._propertyEditorDataSourceAlias)}
 				.config=${this._dataTypeValues}
-				.validation=${this._property.validation}
+				.validation=${this.property.validation}
 				?readonly=${this.readonly}>
 			</umb-property>
 		`;

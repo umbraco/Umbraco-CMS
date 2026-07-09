@@ -4,10 +4,17 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <summary>
+/// Provides services for checking dictionary item culture permissions for users.
+/// </summary>
 public class DictionaryPermissionService : IDictionaryPermissionService
 {
     private readonly ILanguageService _languageService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DictionaryPermissionService"/> class.
+    /// </summary>
+    /// <param name="languageService">The language service.</param>
     public DictionaryPermissionService(ILanguageService languageService)
     {
         _languageService = languageService;

@@ -1,4 +1,5 @@
 import { manifest as schemaManifest } from './Umbraco.MultiUrlPicker.js';
+import { manifests as valueSummaryManifests } from './value-summary/manifests.js';
 
 export const manifests = [
 	{
@@ -10,7 +11,8 @@ export const manifests = [
 			label: 'Multi URL Picker',
 			propertyEditorSchemaAlias: 'Umbraco.MultiUrlPicker',
 			icon: 'icon-link',
-			group: 'pickers',
+			group: '#propertyEditorUIGroups_pickers',
+			keywords: ['url', 'link', 'cta', 'links'],
 			supportsReadOnly: true,
 			settings: {
 				properties: [
@@ -26,9 +28,16 @@ export const manifests = [
 						description: 'Selecting this hides the anchor/query string input field in the link picker overlay.',
 						propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
 					},
+					{
+						alias: 'allowCultureSpecificDocumentLinks',
+						label: '#linkPicker_configCultureSpecificDocumentLinksLabel',
+						description: '{#linkPicker_configCultureSpecificDocumentLinksDescription}',
+						propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
+					},
 				],
 			},
 		},
 	},
 	schemaManifest,
+	...valueSummaryManifests,
 ];

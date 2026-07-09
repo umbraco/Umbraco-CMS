@@ -162,7 +162,8 @@ public abstract class UmbracoIntegrationTest : UmbracoIntegrationTestBase
         builder.AddConfiguration()
             .AddUmbracoCore()
             .AddWebComponents()
-            .AddBackOfficeAuthentication()
+            .AddBackOfficeCookieAuthentication()
+            .AddBackOfficeOpenIddictServices()
             .AddBackOfficeIdentity()
             .AddMembersIdentity()
             .AddExamine()
@@ -178,7 +179,8 @@ public abstract class UmbracoIntegrationTest : UmbracoIntegrationTestBase
                 .AddCoreMappingProfiles();
         }
 
-        services.RemoveAll(x=>x.ImplementationType == typeof(DocumentUrlServiceInitializerNotificationHandler));
+        services.RemoveAll(x => x.ImplementationType == typeof(DocumentUrlServiceInitializerNotificationHandler));
+        services.RemoveAll(x => x.ImplementationType == typeof(DocumentUrlAliasServiceInitializerNotificationHandler));
         services.AddSignalR();
         services.AddMvc();
 

@@ -6,8 +6,18 @@ using Umbraco.Cms.Infrastructure.Persistence;
 // ReSharper disable once CheckNamespace
 namespace Umbraco.Cms.Core.Scoping;
 
+// File is named LegacyIScope.cs to avoid conflict with Umbraco.Cms.Infrastructure.Scoping.IScope.cs in the same folder
+#pragma warning disable SA1649 // File name should match first type name
+
+/// <summary>
+/// Represents a scope for database operations and event handling.
+/// </summary>
+/// <remarks>
+/// This interface is obsolete. Please use <see cref="Infrastructure.Scoping.IScope" /> or <see cref="ICoreScope" /> instead.
+/// </remarks>
 [Obsolete("Please use Umbraco.Cms.Infrastructure.Scoping.IScope or Umbraco.Cms.Core.Scoping.ICoreScope instead.")]
 public interface IScope : Infrastructure.Scoping.IScope
+#pragma warning restore SA1649 // File name should match first type name
 {
     /// <summary>
     /// Gets the scope database.
@@ -77,10 +87,29 @@ public interface IScope : Infrastructure.Scoping.IScope
     /// <param name="lockId">The lock object identifier.</param>
     new void ReadLock(TimeSpan timeout, int lockId);
 
+    /// <summary>
+    /// Eagerly acquires write locks on the specified lock objects.
+    /// </summary>
+    /// <param name="lockIds">Array of lock object identifiers.</param>
     new void EagerWriteLock(params int[] lockIds);
+
+    /// <summary>
+    /// Eagerly acquires a write lock on the specified lock object with a timeout.
+    /// </summary>
+    /// <param name="timeout">The database timeout.</param>
+    /// <param name="lockId">The lock object identifier.</param>
     new void EagerWriteLock(TimeSpan timeout, int lockId);
 
+    /// <summary>
+    /// Eagerly acquires a read lock on the specified lock object with a timeout.
+    /// </summary>
+    /// <param name="timeout">The database timeout.</param>
+    /// <param name="lockId">The lock object identifier.</param>
     new void EagerReadLock(TimeSpan timeout, int lockId);
 
+    /// <summary>
+    /// Eagerly acquires read locks on the specified lock objects.
+    /// </summary>
+    /// <param name="lockIds">Array of lock object identifiers.</param>
     new void EagerReadLock(params int[] lockIds);
 }

@@ -14,7 +14,6 @@ using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.Persistence;
-using Umbraco.Cms.Web.Common.ActionsResults;
 using Umbraco.Cms.Web.Common.Filters;
 using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Extensions;
@@ -22,6 +21,10 @@ using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
 namespace Umbraco.Cms.Web.Website.Controllers;
 
+/// <summary>
+///     Surface controller that handles external (OAuth/OpenID) sign-in, sign-in callbacks, account
+///     linking and disassociation for members.
+/// </summary>
 [UmbracoMemberAuthorize]
 public class UmbExternalLoginController : SurfaceController
 {
@@ -31,6 +34,9 @@ public class UmbExternalLoginController : SurfaceController
     private readonly IOptions<SecuritySettings> _securitySettings;
     private readonly ITwoFactorLoginService _twoFactorLoginService;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="UmbExternalLoginController" /> class.
+    /// </summary>
     public UmbExternalLoginController(
         ILogger<UmbExternalLoginController> logger,
         IUmbracoContextAccessor umbracoContextAccessor,
@@ -81,8 +87,14 @@ public class UmbExternalLoginController : SurfaceController
     }
 
     /// <summary>
-    ///     Endpoint used my the login provider to call back to our solution.
+    ///     Endpoint used by the login provider to call back to our solution after an external sign-in attempt.
     /// </summary>
+    /// <param name="returnUrl">The URL to redirect to after a successful sign-in.</param>
+    /// <returns>
+    ///     A redirect to the return URL on success; a 400 response when no local member can be matched for
+    ///     a two-factor challenge; otherwise the current page with provider errors populated in
+    ///     <see cref="Controller.ViewData" />.
+    /// </returns>
     [HttpGet]
     [AllowAnonymous]
     public async Task<IActionResult> ExternalLoginCallback(string returnUrl)
@@ -192,6 +204,12 @@ public class UmbExternalLoginController : SurfaceController
         }
     }
 
+    /// <summary>
+    ///     Begins the flow that links an external login provider to the currently authenticated member's account.
+    /// </summary>
+    /// <param name="provider">The name of the external login provider.</param>
+    /// <param name="returnUrl">Optional URL to redirect to after the link callback completes.</param>
+    /// <returns>A challenge result that redirects to the external provider.</returns>
     [HttpPost]
     [ValidateAntiForgeryToken]
     public IActionResult LinkLogin(string provider, string? returnUrl = null)
@@ -214,6 +232,14 @@ public class UmbExternalLoginController : SurfaceController
         return Challenge(properties, provider);
     }
 
+    /// <summary>
+    ///     Endpoint used by the login provider to call back after an account-linking attempt.
+    /// </summary>
+    /// <param name="returnUrl">The URL to redirect to after a successful link.</param>
+    /// <returns>
+    ///     A redirect to the return URL on success; otherwise the current page with provider errors
+    ///     populated in <see cref="Controller.ViewData" />.
+    /// </returns>
     [HttpGet]
     public async Task<IActionResult> ExternalLinkLoginCallback(string returnUrl)
     {
@@ -262,6 +288,16 @@ public class UmbExternalLoginController : SurfaceController
     private IActionResult RedirectToLocal(string returnUrl) =>
         Url.IsLocalUrl(returnUrl) ? Redirect(returnUrl) : RedirectToCurrentUmbracoPage();
 
+    /// <summary>
+    ///     Removes the link between the authenticated member and an external login provider.
+    /// </summary>
+    /// <param name="provider">The name of the external login provider to unlink.</param>
+    /// <param name="providerKey">The provider-assigned key identifying the external login.</param>
+    /// <param name="returnUrl">Optional URL to redirect to on success.</param>
+    /// <returns>
+    ///     A redirect to the return URL on success; otherwise the current page with identity errors
+    ///     added to ModelState.
+    /// </returns>
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Disassociate(string provider, string providerKey, string? returnUrl = null)

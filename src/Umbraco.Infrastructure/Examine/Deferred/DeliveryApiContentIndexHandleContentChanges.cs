@@ -16,6 +16,15 @@ internal sealed class DeliveryApiContentIndexHandleContentChanges : DeliveryApiC
     private readonly IDeliveryApiContentIndexHelper _deliveryApiContentIndexHelper;
     private readonly IBackgroundTaskQueue _backgroundTaskQueue;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DeliveryApiContentIndexHandleContentChanges"/> class.
+    /// </summary>
+    /// <param name="changes">A list of key-value pairs representing content item IDs and their associated <see cref="TreeChangeTypes"/> to be handled.</param>
+    /// <param name="deliveryApiIndexingHandler">The handler responsible for managing Delivery API content indexing operations.</param>
+    /// <param name="contentService">The service used to access and manage content items.</param>
+    /// <param name="deliveryApiContentIndexValueSetBuilder">Builds value sets for indexing Delivery API content.</param>
+    /// <param name="deliveryApiContentIndexHelper">Provides helper methods for Delivery API content indexing.</param>
+    /// <param name="backgroundTaskQueue">A queue for scheduling background tasks related to content indexing.</param>
     public DeliveryApiContentIndexHandleContentChanges(
         IList<KeyValuePair<int, TreeChangeTypes>> changes,
         DeliveryApiIndexingHandler deliveryApiIndexingHandler,
@@ -32,6 +41,12 @@ internal sealed class DeliveryApiContentIndexHandleContentChanges : DeliveryApiC
         _deliveryApiContentIndexHelper = deliveryApiContentIndexHelper;
     }
 
+    /// <summary>
+    /// Processes pending content changes for the delivery API content index.
+    /// This method queues a background work item that removes or reindexes content items as needed,
+    /// ensuring the index reflects the latest content state. Content removals and reindexing are handled
+    /// based on the type of change detected for each content item.
+    /// </summary>
     public void Execute() => _backgroundTaskQueue.QueueBackgroundWorkItem(_ =>
     {
         IIndex index = _deliveryApiIndexingHandler.GetIndex()
@@ -153,10 +168,21 @@ internal sealed class DeliveryApiContentIndexHandleContentChanges : DeliveryApiC
 
     private sealed class CulturePublishStatus : IEquatable<CulturePublishStatus>
     {
+        /// <summary>
+        /// Gets or sets the culture identifier for the publish status.
+        /// </summary>
         public required string Culture { get; set; }
 
+        /// <summary>
+        /// Gets or sets the value indicating the published status for the specific culture.
+        /// </summary>
         public required string Published { get; set; }
 
+        /// <summary>
+        /// Determines whether the specified <see cref="CulturePublishStatus"/> is equal to the current instance.
+        /// </summary>
+        /// <param name="other">The other <see cref="CulturePublishStatus"/> to compare with this instance.</param>
+        /// <returns><c>true</c> if the specified <see cref="CulturePublishStatus"/> is equal to the current instance; otherwise, <c>false</c>.</returns>
         public bool Equals(CulturePublishStatus? other)
         {
             if (ReferenceEquals(null, other))
@@ -172,6 +198,11 @@ internal sealed class DeliveryApiContentIndexHandleContentChanges : DeliveryApiC
             return Culture == other.Culture && Published == other.Published;
         }
 
+        /// <summary>
+        /// Determines whether the specified object is equal to the current <see cref="CulturePublishStatus"/> instance.
+        /// </summary>
+        /// <param name="obj">The object to compare with the current instance.</param>
+        /// <returns><c>true</c> if the specified object is equal to the current instance; otherwise, <c>false</c>.</returns>
         public override bool Equals(object? obj)
         {
             if (ReferenceEquals(null, obj))
@@ -192,6 +223,10 @@ internal sealed class DeliveryApiContentIndexHandleContentChanges : DeliveryApiC
             return Equals((CulturePublishStatus)obj);
         }
 
+        /// <summary>
+        /// Returns a hash code for this instance, computed from the <c>Culture</c> and <c>Published</c> properties.
+        /// </summary>
+        /// <returns>A hash code for the current <see cref="CulturePublishStatus"/> object.</returns>
         public override int GetHashCode() => HashCode.Combine(Culture, Published);
     }
 

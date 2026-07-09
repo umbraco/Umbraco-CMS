@@ -11,12 +11,20 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DocumentType;
 
+/// <summary>
+/// Controller responsible for handling requests to move document types within the system.
+/// Provides endpoints for relocating document type definitions.
+/// </summary>
 [ApiVersion("1.0")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
 public class MoveDocumentTypeController : DocumentTypeControllerBase
 {
     private readonly IContentTypeService _contentTypeService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MoveDocumentTypeController"/> class.
+    /// </summary>
+    /// <param name="contentTypeService">The service used to manage content types.</param>
     public MoveDocumentTypeController(IContentTypeService contentTypeService)
         => _contentTypeService = contentTypeService;
 
@@ -25,6 +33,8 @@ public class MoveDocumentTypeController : DocumentTypeControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Moves a document type.")]
+    [EndpointDescription("Moves a document type identified by the provided Id to a different location.")]
     public async Task<IActionResult> Move(
         CancellationToken cancellationToken,
         Guid id,

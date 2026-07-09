@@ -1,6 +1,7 @@
 import { UmbTiptapToolbarButtonElement } from './tiptap-toolbar-button.element.js';
 import { customElement, html, when } from '@umbraco-cms/backoffice/external/lit';
 
+/** @deprecated No longer used internally. Please use `UmbTiptapToolbarButtonActionElement` (`umb-tiptap-toolbar-button-action`) instead. This will be removed in Umbraco 19. [LK] */
 @customElement('umb-tiptap-toolbar-button-disabled')
 export class UmbTiptapToolbarButtonDisabledElement extends UmbTiptapToolbarButtonElement {
 	override render() {
@@ -15,7 +16,7 @@ export class UmbTiptapToolbarButtonDisabledElement extends UmbTiptapToolbarButto
 				@click=${() => this.api?.execute(this.editor)}>
 				${when(
 					this.manifest?.meta.icon,
-					() => html`<umb-icon name=${this.manifest!.meta.icon}></umb-icon>`,
+					(icon) => html`<umb-icon name=${icon}></umb-icon>`,
 					() => html`<span>${label}</span>`,
 				)}
 			</uui-button>

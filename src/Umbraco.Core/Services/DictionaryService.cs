@@ -1,13 +1,21 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <summary>
+/// Provides helper services for dictionary-related operations, such as path calculation.
+/// </summary>
 public class DictionaryService : IDictionaryService
 {
     private readonly ILocalizationService _localizationService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DictionaryService"/> class.
+    /// </summary>
+    /// <param name="localizationService">The localization service.</param>
     public DictionaryService(ILocalizationService localizationService) => _localizationService = localizationService;
 
+    /// <inheritdoc />
     public string CalculatePath(Guid? parentId, int sourceId)
     {
         string path;

@@ -20,6 +20,11 @@ public abstract class File : EntityBase, IFile
     private string? _name;
     private string _path;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="File" /> class with the specified path.
+    /// </summary>
+    /// <param name="path">The path to the file.</param>
+    /// <param name="getFileContent">An optional function to lazily load file content.</param>
     protected File(string path, Func<File, string?>? getFileContent = null)
     {
         _path = SanitizePath(path);
@@ -28,6 +33,9 @@ public abstract class File : EntityBase, IFile
         _content = getFileContent != null ? null : string.Empty;
     }
 
+    /// <summary>
+    ///     Gets or sets the function used to lazily load file content.
+    /// </summary>
     public Func<File, string?>? GetFileContent { get; set; }
 
     /// <summary>
@@ -122,11 +130,14 @@ public abstract class File : EntityBase, IFile
     /// </summary>
     public string? VirtualPath { get; set; }
 
-    // Don't strip the start - this was a bug fixed in 7.3, see ScriptRepositoryTests.PathTests
-    // .TrimStart(System.IO.Path.DirectorySeparatorChar)
-    // .TrimStart('/');
-    // this exists so that class that manage name and alias differently, eg Template,
-    // can implement their own cloning - (though really, not sure it's even needed)
+    /// <summary>
+    ///     Performs deep cloning of the name and alias properties.
+    /// </summary>
+    /// <param name="clone">The cloned file instance.</param>
+    /// <remarks>
+    ///     This exists so that classes that manage name and alias differently, e.g. Template,
+    ///     can implement their own cloning.
+    /// </remarks>
     protected virtual void DeepCloneNameAndAlias(File clone)
     {
         // set fields that have a lazy value, by forcing evaluation of the lazy
@@ -139,6 +150,7 @@ public abstract class File : EntityBase, IFile
             .Replace('\\', System.IO.Path.DirectorySeparatorChar)
             .Replace('/', System.IO.Path.DirectorySeparatorChar);
 
+    /// <inheritdoc />
     protected override void PerformDeepClone(object clone)
     {
         base.PerformDeepClone(clone);

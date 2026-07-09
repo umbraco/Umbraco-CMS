@@ -41,6 +41,7 @@ public class GuidUdi : Udi
     /// <inheritdoc />
     public override bool IsRoot => Guid == Guid.Empty;
 
+    /// <inheritdoc />
     public override bool Equals(object? obj)
     {
         if (obj is not GuidUdi other)
@@ -51,8 +52,14 @@ public class GuidUdi : Udi
         return EntityType == other.EntityType && Guid == other.Guid;
     }
 
+    /// <inheritdoc />
     public override int GetHashCode() => base.GetHashCode();
 
+    /// <summary>
+    ///     Ensures that this GuidUdi is not a root Udi.
+    /// </summary>
+    /// <returns>This GuidUdi.</returns>
+    /// <exception cref="Exception">When this Udi is a root Udi.</exception>
     public GuidUdi EnsureClosed()
     {
         EnsureNotRoot();

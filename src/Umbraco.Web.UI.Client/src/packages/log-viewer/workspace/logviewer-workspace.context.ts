@@ -197,8 +197,8 @@ export class UmbLogViewerWorkspaceContext extends UmbContextBase implements UmbW
 						query: 'Has(Duration) and Duration > 1000',
 					},
 					{
-						name: "Find all logs that are from the namespace 'Umbraco.Core'",
-						query: "StartsWith(SourceContext, 'Umbraco.Core')",
+						name: "Find all logs that are within the namespace 'Umbraco.Cms'",
+						query: "StartsWith(SourceContext, 'Umbraco.Cms')",
 					},
 					{
 						name: 'Find all logs that use a specific log message template',
@@ -300,6 +300,14 @@ export class UmbLogViewerWorkspaceContext extends UmbContextBase implements UmbW
 		this.#logLevelsFilter.setValue(logLevels);
 	}
 
+	#startPolling(interval: UmbPoolingInterval) {
+		this.stopPolling();
+		this.#intervalID = setInterval(() => {
+			this.currentPage = 1;
+			this.getLogs();
+		}, interval) as unknown as number;
+	}
+
 	togglePolling() {
 		const isEnabled = !this.#polling.getValue().enabled;
 		this.#polling.update({
@@ -307,10 +315,7 @@ export class UmbLogViewerWorkspaceContext extends UmbContextBase implements UmbW
 		});
 
 		if (isEnabled) {
-			this.#intervalID = setInterval(() => {
-				this.currentPage = 1;
-				this.getLogs();
-			}, this.#polling.getValue().interval) as unknown as number;
+			this.#startPolling(this.#polling.getValue().interval);
 			return;
 		}
 
@@ -318,7 +323,17 @@ export class UmbLogViewerWorkspaceContext extends UmbContextBase implements UmbW
 	}
 
 	setPollingInterval(interval: UmbPoolingInterval) {
+		const wasEnabled = this.#polling.getValue().enabled;
 		this.#polling.update({ interval });
+
+		// If polling was already enabled, restart it with the new interval
+		// If polling was disabled, enable it and start it with the new interval
+		if (wasEnabled) {
+			this.#startPolling(interval);
+		} else {
+			this.#polling.update({ enabled: true });
+			this.#startPolling(interval);
+		}
 	}
 
 	toggleSortOrder() {

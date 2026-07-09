@@ -1,4 +1,5 @@
 import { UMB_PROPERTY_DATASET_CONTEXT } from '../../property-dataset/index.js';
+import { UMB_PROPERTY_CONTEXT } from './property.context-token.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import {
@@ -9,7 +10,6 @@ import {
 	UmbObjectState,
 	UmbStringState,
 } from '@umbraco-cms/backoffice/observable-api';
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type {
 	ManifestPropertyEditorUi,
@@ -414,5 +414,3 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase {
 		this.#datasetContext = undefined;
 	}
 }
-
-export const UMB_PROPERTY_CONTEXT = new UmbContextToken<UmbPropertyContext>('UmbPropertyContext');

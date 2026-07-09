@@ -8,9 +8,18 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.MemberType.Tree;
 
+/// <summary>
+/// Controller responsible for retrieving and managing the child nodes of member types in the tree structure within the management API.
+/// </summary>
 [ApiVersion("1.0")]
 public class ChildrenMemberTypeTreeController : MemberTypeTreeControllerBase
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ChildrenMemberTypeTreeController"/> class, which manages the retrieval of child member types in the member type tree.
+    /// </summary>
+    /// <param name="entityService">The service used to interact with entities in the system.</param>
+    /// <param name="flagProviders">A collection of providers that supply additional flags or metadata for entities.</param>
+    /// <param name="memberTypeService">The service used to manage member types.</param>
     public ChildrenMemberTypeTreeController(IEntityService entityService, FlagProviderCollection flagProviders, IMemberTypeService memberTypeService)
         : base(entityService, flagProviders, memberTypeService)
     { }
@@ -18,6 +27,8 @@ public class ChildrenMemberTypeTreeController : MemberTypeTreeControllerBase
     [HttpGet("children")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<MemberTypeTreeItemResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a collection of member type tree child items.")]
+    [EndpointDescription("Gets a paginated collection of member type tree items that are children of the provided parent Id.")]
     public async Task<ActionResult<PagedViewModel<MemberTypeTreeItemResponseModel>>> Children(
         CancellationToken cancellationToken,
         Guid parentId,

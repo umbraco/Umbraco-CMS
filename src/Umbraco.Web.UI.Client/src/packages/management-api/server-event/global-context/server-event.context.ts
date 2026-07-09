@@ -3,7 +3,12 @@ import type { UmbManagementApiServerEventModel } from './types.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
-import { HubConnectionBuilder, type HubConnection } from '@umbraco-cms/backoffice/external/signalr';
+import {
+	HubConnectionBuilder,
+	HttpTransportType,
+	type HubConnection,
+	type IHttpConnectionOptions,
+} from '@umbraco-cms/backoffice/external/signalr';
 import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { filter, Subject } from '@umbraco-cms/backoffice/external/rxjs';
@@ -56,20 +61,18 @@ export class UmbManagementApiServerEventContext extends UmbContextBase {
 
 		this.consumeContext(UMB_SERVER_CONTEXT, (context) => {
 			this.#serverContext = context;
+			this.#observeIsAuthorized();
 		});
 	}
 
 	#observeIsAuthorized() {
-		this.observe(this.#authContext?.isAuthorized, async (isAuthorized) => {
+		if (!this.#authContext || !this.#serverContext) return;
+
+		this.observe(this.#authContext.isAuthorized, (isAuthorized) => {
 			if (isAuthorized === undefined) return;
 
 			if (isAuthorized) {
-				const token = await this.#authContext?.getLatestToken();
-				if (token) {
-					this.#initHubConnection(token);
-				} else {
-					throw new Error('No auth token found');
-				}
+				this.#initHubConnection('[redacted]');
 			} else {
 				this.#isConnected.setValue(false);
 				this.#connection?.stop();
@@ -88,11 +91,18 @@ export class UmbManagementApiServerEventContext extends UmbContextBase {
 		// TODO: get the url from a server config?
 		const serverEventHubUrl = `${serverURL}/umbraco/serverEventHub`;
 
-		this.#connection = new HubConnectionBuilder()
-			.withUrl(serverEventHubUrl, {
-				accessTokenFactory: () => token,
-			})
-			.build();
+		const skipNegotiation = this.#serverContext?.getServerConnection()?.getSignalRSkipNegotiation() ?? false;
+
+		const hubOptions: IHttpConnectionOptions = {
+			accessTokenFactory: () => token,
+		};
+
+		if (skipNegotiation) {
+			hubOptions.skipNegotiation = true;
+			hubOptions.transport = HttpTransportType.WebSockets;
+		}
+
+		this.#connection = new HubConnectionBuilder().withUrl(serverEventHubUrl, hubOptions).build();
 
 		this.#connection.on('notify', (payload) => {
 			const event: UmbManagementApiServerEventModel = {

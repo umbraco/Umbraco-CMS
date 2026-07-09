@@ -20,6 +20,15 @@ internal sealed class DeliveryApiContentIndexHandleContentTypeChanges : Delivery
     private readonly IBackgroundTaskQueue _backgroundTaskQueue;
     private readonly IDeliveryApiCompositeIdHandler _deliveryApiCompositeIdHandler;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DeliveryApiContentIndexHandleContentTypeChanges"/> class, responsible for handling content type changes and updating the Delivery API content index accordingly.
+    /// </summary>
+    /// <param name="changes">A list of key-value pairs representing content type IDs and their associated change types to be processed.</param>
+    /// <param name="deliveryApiIndexingHandler">The handler responsible for managing Delivery API indexing operations.</param>
+    /// <param name="deliveryApiContentIndexValueSetBuilder">The builder used to create value sets for indexing Delivery API content.</param>
+    /// <param name="contentService">The service used to access and manage content items.</param>
+    /// <param name="backgroundTaskQueue">The queue for scheduling background tasks related to indexing.</param>
+    /// <param name="deliveryApiCompositeIdHandler">The handler for managing composite IDs within the Delivery API.</param>
     public DeliveryApiContentIndexHandleContentTypeChanges(
         IList<KeyValuePair<int, ContentTypeChangeTypes>> changes,
         DeliveryApiIndexingHandler deliveryApiIndexingHandler,
@@ -36,6 +45,11 @@ internal sealed class DeliveryApiContentIndexHandleContentTypeChanges : Delivery
         _deliveryApiCompositeIdHandler = deliveryApiCompositeIdHandler;
     }
 
+    /// <summary>
+    /// Initiates asynchronous processing of content type changes for the Delivery API content index.
+    /// This method queues a background work item that examines tracked content type changes, determines which content types require updates,
+    /// and updates the index accordingly. Content type deletions are handled separately by content cache refresh notifications.
+    /// </summary>
     public void Execute() => _backgroundTaskQueue.QueueBackgroundWorkItem(_ =>
     {
         var updatedContentTypeIds = new List<int>();

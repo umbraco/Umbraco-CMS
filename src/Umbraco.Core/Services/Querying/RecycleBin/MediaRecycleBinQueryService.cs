@@ -4,12 +4,21 @@ using Umbraco.Cms.Core.Scoping;
 
 namespace Umbraco.Cms.Core.Services.Querying.RecycleBin;
 
+/// <summary>
+/// Provides query operations for media items in the recycle bin.
+/// </summary>
 public class MediaRecycleBinQueryService : IMediaRecycleBinQueryService
 {
     private readonly IEntityService _entityService;
     private readonly ICoreScopeProvider _scopeProvider;
     private readonly IRelationService _relationService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MediaRecycleBinQueryService"/> class.
+    /// </summary>
+    /// <param name="entityService">The entity service.</param>
+    /// <param name="scopeProvider">The core scope provider.</param>
+    /// <param name="relationService">The relation service.</param>
     public MediaRecycleBinQueryService(
         IEntityService entityService,
         ICoreScopeProvider scopeProvider,
@@ -20,6 +29,7 @@ public class MediaRecycleBinQueryService : IMediaRecycleBinQueryService
         _relationService = relationService;
     }
 
+    /// <inheritdoc />
     public Task<Attempt<IMediaEntitySlim?, RecycleBinQueryResultType>> GetOriginalParentAsync(Guid trashedMediaId)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);

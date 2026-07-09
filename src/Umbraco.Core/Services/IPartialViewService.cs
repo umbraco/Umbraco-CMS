@@ -1,10 +1,13 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Core.Snippets;
 using PartialViewSnippet = Umbraco.Cms.Core.Snippets.PartialViewSnippet;
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <summary>
+///     Defines the Partial View Service, which provides operations for managing <see cref="IPartialView" /> files.
+/// </summary>
 public interface IPartialViewService : IBasicFileService<IPartialView>
 {
     /// <summary>

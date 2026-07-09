@@ -367,7 +367,7 @@ export default {
 		enterFolderName: 'Unesite naziv foldera',
 		updateData: 'Odaberite vrstu i naslov',
 		noDocumentTypes:
-			'Nema dozvoljenih tipova dokumenata dostupnih za kreiranje sadržaja ovdje. Morate ih omogućiti u <strong>Dokument Tip</strong> unutar sekcije <strong>Postavke</strong>, uređivanjem <strong>Dozvoljeni tipovi podređenih čvorova</strong> unutar <strong>Dozvole</strong>.',
+			'Nema dozvoljenih tipova dokumenata dostupnih za kreiranje sadržaja ovdje. Morate ih omogućiti u <strong>Dokument Tip</strong> unutar sekcije <strong>Postavke</strong>, uređivanjem <strong>Dozvoljeni tipovi podređenih čvorova</strong> unutar <strong>Struktura</strong>.',
 		noDocumentTypesAtRoot:
 			'Nema dozvoljenih tipova dokumenata dostupnih za kreiranje sadržaja ovdje. Morate ih kreirati u <strong>Dokument Tip</strong> unutar sekcije <strong>Postavke</strong>.',
 		noDocumentTypesWithNoSettingsAccess:
@@ -375,9 +375,9 @@ export default {
 		noDocumentTypesEditPermissions: 'Uredi dozvole za ovaj tip dokumenta',
 		noDocumentTypesCreateNew: 'Kreiraj novi tip dokumenta',
 		noDocumentTypesAllowedAtRoot:
-			'Nema dozvoljenih tipova dokumenata dostupnih za kreiranje sadržaja ovdje. Morate ih omogućiti u <strong>Dokument Tip</strong> unutar sekcije <strong>Postavke</strong>, izmjenom <strong>Dozvoli kao root</strong> opcije unutar <strong>Dozvole</strong>.',
+			'Nema dozvoljenih tipova dokumenata dostupnih za kreiranje sadržaja ovdje. Morate ih omogućiti u <strong>Dokument Tip</strong> unutar sekcije <strong>Postavke</strong>, izmjenom <strong>Dozvoli kao root</strong> opcije unutar <strong>Struktura</strong>.',
 		noMediaTypes:
-			'Nema dozvoljenih tipova medija dostupnih za kreiranje medija ovdje. Morate ih omogućiti u <strong>Media Tip</strong> unutar sekcije <strong>Postavke</strong>, uređivanjem <strong>Dozvoljeni tipovi podređenih čvorova</strong> unutar <strong>Dozvole</strong>.',
+			'Nema dozvoljenih tipova medija dostupnih za kreiranje medija ovdje. Morate ih omogućiti u <strong>Media Tip</strong> unutar sekcije <strong>Postavke</strong>, uređivanjem <strong>Dozvoljeni tipovi podređenih čvorova</strong> unutar <strong>Struktura</strong>.',
 		noMediaTypesWithNoSettingsAccess:
 			'Odabrani medij u stablu ne dopušta bilo koji drugi medij\n       kreiran ispod njega.\n    ',
 		noMediaTypesEditPermissions: 'Uredi dozvole za ovaj tip medija',
@@ -709,6 +709,7 @@ export default {
 		content: 'Sadržaj',
 		continue: 'Nastavi',
 		copy: 'Kopiraj',
+		copied: 'Kopirano!',
 		create: 'Kreiraj',
 		database: 'Baza podataka',
 		date: 'Datum',
@@ -1182,9 +1183,9 @@ export default {
 		changes: 'Promjene',
 		created: 'Kreirano',
 		currentVersion: 'Trenutna verzija',
-		diffHelp:
-			'Ovo pokazuje razlike između trenutne verzije (nacrta) i odabrane verzije<br /><del>Crveni tekst</del> će biti uklonjen u odabranoj verziji, <ins>zeleni tekst</ins> će biti dodan',
-		noDiff: 'Nema razlike između trenutne verzije (nacrta) i odabrane verzije',
+		diffHelp: '<del>Crveni tekst</del> će biti uklonjen u odabranoj verziji, <ins>zeleni tekst</ins> će biti dodan.',
+		showDiff: 'Prikaži razlike između trenutne (nacrt) verzije i odabrane verzije.',
+		noDiff: 'Nema razlike između trenutne verzije (nacrta) i odabrane verzije.',
 		documentRolledBack: 'Dokument je vraćen',
 		headline: 'Odaberite verziju koju želite usporediti sa trenutnom verzijom',
 		htmlHelp:
@@ -1488,8 +1489,16 @@ export default {
 		chooseChildNode: 'Odaberite podređeni čvor',
 		compositionsDescription:
 			'Naslijediti kartice i svojstva iz postojeće vrste dokumenta. Nove kartice će biti\n      dodano trenutnoj vrsti dokumenta ili spojeno ako postoji kartica s identičnim imenom.\n    ',
+		compositionsDescriptionMediaType:
+			'Naslijediti kartice i svojstva iz postojeće vrste medija. Nove kartice će biti\n      dodano trenutnoj vrsti medija ili spojeno ako postoji kartica s identičnim imenom.\n    ',
+		compositionsDescriptionMemberType:
+			'Naslijediti kartice i svojstva iz postojeće vrste člana. Nove kartice će biti\n      dodano trenutnoj vrsti člana ili spojeno ako postoji kartica s identičnim imenom.\n    ',
 		compositionInUse: 'Ovaj tip sadržaja se koristi u kompoziciji i stoga se ne može sam sastaviti.\n    ',
+		compositionInUseMediaType: 'Ovaj tip medija se koristi u kompoziciji i stoga se ne može sam sastaviti.\n    ',
+		compositionInUseMemberType: 'Ovaj tip člana se koristi u kompoziciji i stoga se ne može sam sastaviti.\n    ',
 		noAvailableCompositions: 'Nema dostupnih tipova sadržaja za upotrebu kao kompozicija.',
+		noAvailableCompositionsMediaType: 'Nema dostupnih tipova medija za upotrebu kao kompozicija.',
+		noAvailableCompositionsMemberType: 'Nema dostupnih tipova člana za upotrebu kao kompozicija.',
 		compositionRemoveWarning:
 			'Uklanjanje kompozicije će izbrisati sve povezane podatke o svojstvu. Jednom ti\n      sačuvajte tip dokumenta, nema povratka.\n    ',
 		availableEditors: 'Napravi novi',
@@ -1524,6 +1533,8 @@ export default {
 		tabHasNoSortOrder: 'kartica nema redoslijed sortiranja',
 		compositionUsageHeading: 'Gdje se koristi ovaj sastav?',
 		compositionUsageSpecification: 'Ovaj sastav se trenutno koristi u sastavu sljedećih\n      tipa sadržaja:\n    ',
+		compositionUsageSpecificationMediaType: 'Ovaj sastav se trenutno koristi u sastavu sljedećih\n      tipa medija:\n    ',
+		compositionUsageSpecificationMemberType: 'Ovaj sastav se trenutno koristi u sastavu sljedećih\n      tipa člana:\n    ',
 		variantsHeading: 'Dozvoli varijacije',
 		cultureVariantHeading: 'Dozvolite varirati u zavisnosti od kulture',
 		segmentVariantHeading: 'Dozvoli segmentaciju',
@@ -1701,6 +1712,7 @@ export default {
 		noLockouts: 'nije zaključan',
 		noPasswordChange: 'Lozinka nije promijenjena',
 		confirmNewPassword: 'Potvrdite novu lozinku',
+		confirmPassword: 'Potvrdi lozinku',
 		changePasswordDescription:
 			"Možete promijeniti lozinku za pristup Umbraco backofficeu popunjavanjem\n       izađite iz donjeg obrasca i kliknite na dugme 'Promijeni lozinku'\n    ",
 		contentChannel: 'Kanal sadržaja',
@@ -1906,6 +1918,8 @@ export default {
 	redirectUrls: {
 		disableUrlTracker: 'Onemogući URL tragač',
 		enableUrlTracker: 'Omogući URL tragač',
+		urlTrackerEnabled: 'Omogućen',
+		urlTrackerDisabled: 'Onemogućen',
 		originalUrl: 'Originalni URL',
 		redirectedTo: 'Preusmjeri na',
 		redirectUrlManagement: 'Preusmjeravanje URL-ova',
@@ -1983,7 +1997,8 @@ export default {
 		openBackofficeSearch: 'Otvorite backoffice pretragu',
 		openCloseBackofficeHelp: 'Otvori/Zatvori pomoć za backoffice',
 		openCloseBackofficeProfileOptions: 'Opcije otvaranja/zatvaranja profila',
-		profileOptions: 'Opcije profila',
+		profileOptions: 'Profil korisnika za %0% (%1%)',
+		profileOptionsDefault: 'Profil korisnika',
 		assignDomainDescription: 'Postavite kulturu i imena hostova za %0%',
 		createDescription: 'Kreirajte novi čvor ispod %0%',
 		protectDescription: 'Postavite ograničenja pristupa uključena %0%',

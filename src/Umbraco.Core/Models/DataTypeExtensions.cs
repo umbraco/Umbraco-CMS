@@ -8,12 +8,11 @@ namespace Umbraco.Extensions;
 /// </summary>
 public static class DataTypeExtensions
 {
-    private static readonly ISet<Guid> IdsOfBuildInDataTypes = new HashSet<Guid>
+    private static readonly ISet<Guid> _idsOfBuildInDataTypes = new HashSet<Guid>
     {
         Constants.DataTypes.Guids.ContentPickerGuid,
         Constants.DataTypes.Guids.MemberPickerGuid,
         Constants.DataTypes.Guids.RelatedLinksGuid,
-        Constants.DataTypes.Guids.MemberGuid,
         Constants.DataTypes.Guids.ImageCropperGuid,
         Constants.DataTypes.Guids.TagsGuid,
         Constants.DataTypes.Guids.ListViewContentGuid,
@@ -95,7 +94,7 @@ public static class DataTypeExtensions
     /// <summary>
     ///     Returns true if this data type is build-in/default.
     /// </summary>
-    public static bool IsBuildInDataType(Guid key) => IdsOfBuildInDataTypes.Contains(key);
+    public static bool IsBuildInDataType(Guid key) => _idsOfBuildInDataTypes.Contains(key);
 
     /// <summary>
     ///     Returns true if this data type can be deleted.

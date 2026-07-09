@@ -35,8 +35,20 @@ public class CoreRuntime : IRuntime
     private CancellationToken _cancellationToken;
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="CoreRuntime" /> class.
+    ///     Initializes a new instance of the <see cref="CoreRuntime" /> class, which manages the core runtime lifecycle and services for Umbraco.
     /// </summary>
+    /// <param name="state">The current runtime state of the Umbraco application.</param>
+    /// <param name="loggerFactory">The factory used to create logger instances for diagnostic and operational logging.</param>
+    /// <param name="components">The collection of components to be managed by the runtime.</param>
+    /// <param name="applicationShutdownRegistry">The registry used to track and manage application shutdown events.</param>
+    /// <param name="profilingLogger">The logger used for profiling and performance diagnostics.</param>
+    /// <param name="mainDom">The MainDom instance responsible for ensuring a single active Umbraco process.</param>
+    /// <param name="databaseFactory">The factory for creating and managing Umbraco database connections.</param>
+    /// <param name="eventAggregator">The event aggregator for publishing and subscribing to application events.</param>
+    /// <param name="hostingEnvironment">The hosting environment abstraction for accessing environment-specific information.</param>
+    /// <param name="umbracoVersion">The current version information for the Umbraco application.</param>
+    /// <param name="serviceProvider">The service provider for resolving application services.</param>
+    /// <param name="hostApplicationLifetime">The interface for managing application lifetime events, such as startup and shutdown.</param>
     public CoreRuntime(
         IRuntimeState state,
         ILoggerFactory loggerFactory,
@@ -113,11 +125,23 @@ public class CoreRuntime : IRuntime
             return;
         }
 
-        IApplicationShutdownRegistry hostingEnvironmentLifetime = _applicationShutdownRegistry;
-        if (hostingEnvironmentLifetime == null)
+        if (State.Level == RuntimeLevel.Upgrading && isRestarting is false)
         {
-            throw new InvalidOperationException($"An instance of {typeof(IApplicationShutdownRegistry)} could not be resolved from the container, ensure that one if registered in your runtime before calling {nameof(IRuntime)}.{nameof(StartAsync)}");
+            // Unattended upgrade: the database factory is already configured for upgrade.
+            // The UnattendedUpgradeBackgroundService will run the migration sequence once the
+            // HTTP server has started, allowing liveness probes to respond immediately.
+            //
+            // During a restart (e.g. after completing the install screen), the background service
+            // has already exited and will not re-run, so we must fall through to the synchronous
+            // migration path below.
+            // This is OK, because it's only for unattended upgrades and not new installs that we
+            // are concerned about ensuring upgrades run in the background whilst the site reports
+            // itself as healthy.
+            return;
         }
+
+        IApplicationShutdownRegistry hostingEnvironmentLifetime = _applicationShutdownRegistry
+            ?? throw new InvalidOperationException($"An instance of {typeof(IApplicationShutdownRegistry)} could not be resolved from the container, ensure that one if registered in your runtime before calling {nameof(IRuntime)}.{nameof(StartAsync)}");
 
         var premigrationUpgradeNotification = new RuntimePremigrationsUpgradeNotification();
         await _eventAggregator.PublishAsync(premigrationUpgradeNotification, cancellationToken);
@@ -139,7 +163,6 @@ public class CoreRuntime : IRuntime
                 break;
         }
 
-        //
         var postRuntimePremigrationsUpgradeNotification = new PostRuntimePremigrationsUpgradeNotification();
         await _eventAggregator.PublishAsync(postRuntimePremigrationsUpgradeNotification, cancellationToken);
 
@@ -221,7 +244,7 @@ public class CoreRuntime : IRuntime
                 _logger.LogDebug("Runtime level: {RuntimeLevel} - {RuntimeLevelReason}", State.Level, State.Reason);
             }
 
-            if (State.Level == RuntimeLevel.Upgrade)
+            if (State.Level is RuntimeLevel.Upgrade or RuntimeLevel.Upgrading)
             {
                 if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
                 {

@@ -62,6 +62,11 @@ internal sealed class ComposerGraph
         }
     }
 
+    /// <summary>
+    /// Gets a formatted report of composers and their dependencies.
+    /// </summary>
+    /// <param name="requirements">A dictionary of types to their required dependencies.</param>
+    /// <returns>A formatted string containing the composers report.</returns>
     internal static string GetComposersReport(Dictionary<Type, List<Type>?> requirements)
     {
         var text = new StringBuilder();
@@ -116,6 +121,10 @@ internal sealed class ComposerGraph
         return text.ToString();
     }
 
+    /// <summary>
+    /// Prepares and orders the composer types based on their dependencies.
+    /// </summary>
+    /// <returns>An ordered collection of composer types.</returns>
     internal IEnumerable<Type> PrepareComposerTypes()
     {
         Dictionary<Type, List<Type>?> requirements = GetRequirements();
@@ -134,6 +143,11 @@ internal sealed class ComposerGraph
         return sortedComposerTypes;
     }
 
+    /// <summary>
+    /// Gets the dependency requirements for all composer types.
+    /// </summary>
+    /// <param name="throwOnMissing">If set to <c>true</c>, throws an exception when required dependencies are missing.</param>
+    /// <returns>A dictionary mapping each type to its required dependencies.</returns>
     internal Dictionary<Type, List<Type>?> GetRequirements(bool throwOnMissing = true)
     {
         // create a list, remove those that cannot be enabled due to runtime level
@@ -202,6 +216,11 @@ internal sealed class ComposerGraph
         return requirements;
     }
 
+    /// <summary>
+    /// Sorts the composers based on their dependency requirements.
+    /// </summary>
+    /// <param name="requirements">A dictionary of types to their required dependencies.</param>
+    /// <returns>A sorted collection of composer types.</returns>
     internal IEnumerable<Type> SortComposers(Dictionary<Type, List<Type>?> requirements)
     {
         // sort composers
@@ -415,10 +434,19 @@ internal sealed class ComposerGraph
         }
     }
 
+    /// <summary>
+    /// Stores enable/disable information for a composer type.
+    /// </summary>
     private sealed class EnableInfo
     {
+        /// <summary>
+        /// Gets or sets a value indicating whether the composer is enabled.
+        /// </summary>
         public bool Enabled { get; set; }
 
+        /// <summary>
+        /// Gets or sets the weight of the enable/disable declaration.
+        /// </summary>
         public int Weight { get; set; } = -1;
     }
 }

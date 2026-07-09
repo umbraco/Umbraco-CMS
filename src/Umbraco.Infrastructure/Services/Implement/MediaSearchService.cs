@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Services;
@@ -10,12 +10,20 @@ internal sealed class MediaSearchService : ContentSearchServiceBase<IMedia>, IMe
 {
     private readonly IMediaService _mediaService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MediaSearchService"/> class.
+    /// </summary>
+    /// <param name="sqlContext">The <see cref="ISqlContext"/> used for database operations.</param>
+    /// <param name="idKeyMap">The <see cref="IIdKeyMap"/> used for mapping entity IDs.</param>
+    /// <param name="logger">The <see cref="ILogger{MediaSearchService}"/> instance used for logging.</param>
+    /// <param name="mediaService">The <see cref="IMediaService"/> used for managing media entities.</param>
     public MediaSearchService(ISqlContext sqlContext, IIdKeyMap idKeyMap, ILogger<MediaSearchService> logger, IMediaService mediaService)
         : base(sqlContext, idKeyMap, logger)
         => _mediaService = mediaService;
 
     protected override UmbracoObjectTypes ObjectType => UmbracoObjectTypes.Media;
 
+    [Obsolete("Please use the method overload with all parameters. Scheduled for removal in Umbraco 19.")]
     protected override Task<IEnumerable<IMedia>> SearchChildrenAsync(
         IQuery<IMedia>? query,
         int parentId,
@@ -23,6 +31,19 @@ internal sealed class MediaSearchService : ContentSearchServiceBase<IMedia>, IMe
         long pageNumber,
         int pageSize,
         out long total)
+        => SearchChildrenAsync(query, parentId, propertyAliases: null, ordering: ordering, loadTemplates: true, pageNumber: pageNumber, pageSize: pageSize, total: out total);
+
+    protected override Task<IEnumerable<IMedia>> SearchChildrenAsync(
+        IQuery<IMedia>? query,
+        int parentId,
+        string[]? propertyAliases,
+        Ordering? ordering,
+        bool loadTemplates,
+        long pageNumber,
+        int pageSize,
+        out long total)
+
+        // Note: loadTemplates parameter is ignored for media as media items don't have templates.
         => Task.FromResult(_mediaService.GetPagedChildren(
             parentId,
             pageNumber,

@@ -3,12 +3,20 @@ using Umbraco.Cms.Core.Webhooks;
 
 namespace Umbraco.Cms.Core.Configuration.Models;
 
+/// <summary>
+///     Typed configuration options for webhook settings.
+/// </summary>
 [UmbracoOptions(Constants.Configuration.ConfigWebhook)]
 public class WebhookSettings
 {
     private const bool StaticEnabled = true;
     private const int StaticMaximumRetries = 5;
+
+    /// <summary>
+    ///     The default value for the <see cref="Period" /> setting.
+    /// </summary>
     internal const string StaticPeriod = "00:00:10";
+
     private const bool StaticEnableLoggingCleanup = true;
     private const int StaticKeepLogsForDays = 30;
     private const WebhookPayloadType StaticPayloadType = Constants.Webhooks.DefaultPayloadType;

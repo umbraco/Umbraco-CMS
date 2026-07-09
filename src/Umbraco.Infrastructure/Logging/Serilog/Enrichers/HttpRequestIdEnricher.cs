@@ -20,6 +20,10 @@ public class HttpRequestIdEnricher : ILogEventEnricher
 
     private readonly IRequestCache _requestCache;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="HttpRequestIdEnricher"/> class.
+    /// </summary>
+    /// <param name="requestCache">The <see cref="IRequestCache"/> used to retrieve the HTTP request ID.</param>
     public HttpRequestIdEnricher(IRequestCache requestCache) =>
         _requestCache = requestCache ?? throw new ArgumentNullException(nameof(requestCache));
 

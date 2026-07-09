@@ -2,6 +2,9 @@ namespace Umbraco.Cms.Core;
 
 public static partial class Constants
 {
+    /// <summary>
+    ///     Contains icon name constants used throughout the Umbraco backoffice.
+    /// </summary>
     public static class Icons
     {
         /// <summary>

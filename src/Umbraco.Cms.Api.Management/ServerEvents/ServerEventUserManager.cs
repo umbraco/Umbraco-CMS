@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using Microsoft.AspNetCore.SignalR;
 using Umbraco.Cms.Core.Models.ServerEvents;
 using Umbraco.Cms.Core.ServerEvents;
@@ -13,6 +13,12 @@ internal sealed class ServerEventUserManager : IServerEventUserManager
     private readonly IServerEventAuthorizationService _serverEventAuthorizationService;
     private readonly IHubContext<ServerEventHub, IServerEventHub> _eventHub;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ServerEventUserManager"/> class.
+    /// </summary>
+    /// <param name="userConnectionManager">Manages user connections for server events.</param>
+    /// <param name="serverEventAuthorizationService">Service used to authorize server event actions for users.</param>
+    /// <param name="eventHub">The SignalR hub context for <see cref="ServerEventHub"/>, used to communicate with connected clients.</param>
     public ServerEventUserManager(
         IUserConnectionManager userConnectionManager,
         IServerEventAuthorizationService serverEventAuthorizationService,

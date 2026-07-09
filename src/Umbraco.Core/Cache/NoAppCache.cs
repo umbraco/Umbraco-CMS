@@ -7,6 +7,12 @@ namespace Umbraco.Cms.Core.Cache;
 /// </summary>
 public class NoAppCache : IAppPolicyCache, IRequestCache
 {
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="NoAppCache" /> class.
+    /// </summary>
+    /// <remarks>
+    ///     Protected to enforce singleton pattern via <see cref="Instance" />.
+    /// </remarks>
     protected NoAppCache()
     {
     }
@@ -74,12 +80,19 @@ public class NoAppCache : IAppPolicyCache, IRequestCache
     {
     }
 
+    /// <inheritdoc />
     public bool Set(string key, object? value) => false;
 
+    /// <inheritdoc />
     public bool Remove(string key) => false;
 
+    /// <summary>
+    ///     Returns an enumerator that iterates through an empty collection.
+    /// </summary>
+    /// <returns>An enumerator for an empty collection.</returns>
     public IEnumerator<KeyValuePair<string, object?>> GetEnumerator() =>
         new Dictionary<string, object?>().GetEnumerator();
 
+    /// <inheritdoc />
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 }

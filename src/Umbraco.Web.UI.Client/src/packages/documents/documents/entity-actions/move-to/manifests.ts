@@ -12,6 +12,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		alias: 'Umb.EntityAction.Document.MoveTo',
 		name: 'Move Document Entity Action',
 		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
+		api: () => import('./document-move-to.action.js'),
 		meta: {
 			treeRepositoryAlias: UMB_DOCUMENT_TREE_REPOSITORY_ALIAS,
 			moveRepositoryAlias: UMB_MOVE_DOCUMENT_REPOSITORY_ALIAS,

@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -11,6 +11,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.DeliveryApi;
 
+/// <summary>
+///     Default implementation of <see cref="IApiContentRouteBuilder"/> that builds content routes for the Delivery API.
+/// </summary>
 public sealed class ApiContentRouteBuilder : IApiContentRouteBuilder
 {
     private readonly IApiContentPathProvider _apiContentPathProvider;
@@ -23,6 +26,18 @@ public sealed class ApiContentRouteBuilder : IApiContentRouteBuilder
     private readonly IDocumentUrlService _documentUrlService;
     private RequestHandlerSettings _requestSettings;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="ApiContentRouteBuilder"/> class.
+    /// </summary>
+    /// <param name="apiContentPathProvider">The API content path provider.</param>
+    /// <param name="globalSettings">The global settings.</param>
+    /// <param name="variationContextAccessor">The variation context accessor.</param>
+    /// <param name="requestPreviewService">The request preview service.</param>
+    /// <param name="requestSettings">The request handler settings.</param>
+    /// <param name="contentCache">The published content cache.</param>
+    /// <param name="navigationQueryService">The document navigation query service.</param>
+    /// <param name="publishStatusQueryService">The publish status query service.</param>
+    /// <param name="documentUrlService">The document URL service.</param>
     public ApiContentRouteBuilder(
         IApiContentPathProvider apiContentPathProvider,
         IOptions<GlobalSettings> globalSettings,
@@ -46,6 +61,7 @@ public sealed class ApiContentRouteBuilder : IApiContentRouteBuilder
         requestSettings.OnChange(settings => _requestSettings = settings);
     }
 
+    /// <inheritdoc />
     public IApiContentRoute? Build(IPublishedContent content, string? culture = null)
     {
         if (content.ItemType != PublishedItemType.Content)
@@ -92,7 +108,7 @@ public sealed class ApiContentRouteBuilder : IApiContentRouteBuilder
         var contentPath = _apiContentPathProvider.GetContentPath(content, culture);
 
         // in some scenarios the published content is actually routable, but due to the built-in handling of i.e. lacking culture setup
-        // the URL provider resolves the content URL as empty string or "#". since the Delivery API handles routing explicitly,
+        // the URL provider resolves the content URL as empty or unrouetable. since the Delivery API handles routing explicitly,
         // we can perform fallback to the content route.
         if (IsInvalidContentPath(contentPath))
         {
@@ -115,7 +131,7 @@ public sealed class ApiContentRouteBuilder : IApiContentRouteBuilder
 
     private string ContentPreviewPath(IPublishedContent content) => $"{Constants.DeliveryApi.Routing.PreviewContentPathPrefix}{content.Key:D}{(_requestSettings.AddTrailingSlash ? "/" : string.Empty)}";
 
-    private static bool IsInvalidContentPath(string? path) => path.IsNullOrWhiteSpace() || "#".Equals(path);
+    private static bool IsInvalidContentPath(string? path) => path.IsNullOrWhiteSpace() || Constants.Routing.Unroutable.Equals(path);
 
     private IPublishedContent? GetRoot(IPublishedContent content, bool isPreview)
     {

@@ -24,6 +24,7 @@ public sealed class SystemTextWebhookJsonSerializer : SystemTextJsonSerializerBa
     /// <summary>
     /// Initializes a new instance of the <see cref="SystemTextWebhookJsonSerializer" /> class.
     /// </summary>
+    /// <param name="jsonSerializerEncoderFactory">Factory used to create JSON serializer encoders for webhook payload serialization.</param>
     public SystemTextWebhookJsonSerializer(IJsonSerializerEncoderFactory jsonSerializerEncoderFactory)
         : base(jsonSerializerEncoderFactory)
         => _jsonSerializerOptions = new JsonSerializerOptions()

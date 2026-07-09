@@ -7,4 +7,5 @@ export interface UmbMediaCardItemModel extends UmbMediaItemModel {
 
 export interface UmbMediaPathModel extends UmbEntityModel {
 	name: string;
+	mediaType?: { unique: string };
 }

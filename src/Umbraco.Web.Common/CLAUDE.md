@@ -63,7 +63,8 @@ Umbraco.Web.Common/
 │   └── UmbracoPublishedContentCultureProvider.cs
 ├── Middleware/
 │   ├── BootFailedMiddleware.cs                # Startup failure handling (81 lines)
-│   └── PreviewAuthenticationMiddleware.cs     # Preview mode auth (84 lines)
+│   ├── PreviewAuthenticationMiddleware.cs     # Preview mode auth (84 lines)
+│   └── UmbracoBackOfficeCacheHeadersMiddleware.cs  # Cache-Control on cache-busted backoffice asset path
 ├── Routing/
 │   ├── IAreaRoutes.cs                         # Area routing interface
 │   ├── IRoutableDocumentFilter.cs             # Content routing filter
@@ -256,6 +257,8 @@ ASP.NET Core Identity sign-in manager for members.
 
 ### Middleware
 
+**Convention**: middleware lives in `Middleware/` as a class implementing `IMiddleware`, registered as a singleton next to its dependencies' registration (generic middleware in `AddWebComponents`; feature-specific middleware where the feature's services are added, e.g. backoffice middleware in `AddBackOfficeCore`), and wired into the pipeline via `app.UseMiddleware<TMiddleware>()`. Companion `IApplicationBuilder` extension methods are thin one-line `UseMiddleware<T>()` wrappers — inline `builder.Use(async …)` lambdas bypass DI and are harder to test; `CspNonceExtensions` and `Web.UI/WebApplicationExtensions` are tiny pre-existing exceptions, not a precedent for new work.
+
 **BootFailedMiddleware** (lines 17-81):
 - Intercepts requests when `RuntimeLevel == BootFailed`
 - Debug mode: Rethrows exception for stack trace
@@ -265,6 +268,11 @@ ASP.NET Core Identity sign-in manager for members.
 - Adds backoffice identity to principal for preview requests
 - Skips client-side requests and backoffice paths
 - Uses `IPreviewService.TryGetPreviewClaimsIdentityAsync()`
+
+**UmbracoBackOfficeCacheHeadersMiddleware**:
+- Sets `Cache-Control: public, max-age=31536000, immutable` on responses under the cache-busted backoffice asset prefix (`/umbraco/backoffice/<hash>/…`); `no-cache` in debug mode
+- Runs before `UseUmbracoBackOfficeRewrites` so the original (hash-bearing) path can be matched
+- Non-destructive: uses `Response.OnStarting` + `ContainsKey` guard so any consumer override wins
 
 ---
 

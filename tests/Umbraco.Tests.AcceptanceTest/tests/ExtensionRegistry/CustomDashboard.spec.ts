@@ -1,4 +1,4 @@
-import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
+import {ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 
 // Dashboard
 const dashboardName = 'Welcome Dashboard';

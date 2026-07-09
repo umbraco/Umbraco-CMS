@@ -1,4 +1,5 @@
 import { ensureLocalPath } from './ensure-local-path.function.js';
+import { hasOwnOpener } from './has-own-opener.function.js';
 
 export const UMB_STORAGE_REDIRECT_URL = 'umb:auth:redirect';
 
@@ -38,6 +39,10 @@ export function setStoredPath(path: string): void {
  * @param {boolean} force - If true, will redirect using Location
  */
 export function redirectToStoredPath(basePath: string, force = false): void {
+	// If this is a popup window, the parent will handle navigation.
+	// The BroadcastChannel message already notified the parent.
+	if (hasOwnOpener(basePath)) return;
+
 	const url = retrieveStoredPath();
 	const isBackofficePath = url?.pathname.startsWith(basePath) ?? false;
 

@@ -1,6 +1,6 @@
 import { UmbPickerSearchResultItemElementBase } from '../picker-search-result-item-element-base.js';
 import { getItemFallbackIcon, getItemFallbackName } from '@umbraco-cms/backoffice/entity-item';
-import { customElement, html, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbSearchResultItemModel } from '@umbraco-cms/backoffice/search';
 
 @customElement('umb-default-picker-search-result-item')
@@ -22,6 +22,15 @@ export class UmbDefaultPickerSearchResultItemElement extends UmbPickerSearchResu
 			</umb-ref-item>
 		`;
 	}
+
+	static override styles = [
+		css`
+			umb-ref-item {
+				padding-top: 0;
+				padding-bottom: 0;
+			}
+		`,
+	];
 }
 
 export { UmbDefaultPickerSearchResultItemElement as element };

@@ -5,8 +5,18 @@ using Umbraco.Cms.Infrastructure.Persistence;
 // ReSharper disable once CheckNamespace
 namespace Umbraco.Cms.Core.Scoping;
 
+// File is named LegacyIScopeProvider.cs to avoid conflict with Umbraco.Cms.Infrastructure.Scoping.IScopeProvider.cs in the same folder
+#pragma warning disable SA1649 // File name should match first type name
+
+/// <summary>
+/// Provides scopes for database operations.
+/// </summary>
+/// <remarks>
+/// This interface is obsolete. Please use <see cref="Infrastructure.Scoping.IScopeProvider" /> or <see cref="ICoreScopeProvider" /> instead.
+/// </remarks>
 [Obsolete("Please use Umbraco.Cms.Infrastructure.Scoping.IScopeProvider or Umbraco.Cms.Core.Scoping.ICoreScopeProvider instead.")]
 public interface IScopeProvider : ICoreScopeProvider
+#pragma warning restore SA1649 // File name should match first type name
 {
     /// <summary>
     /// Creates an ambient scope.

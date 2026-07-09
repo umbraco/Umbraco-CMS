@@ -1,14 +1,15 @@
 import type { UmbMediaTypeItemModel } from '../../types.js';
 import { UmbMediaTypePickerInputContext } from './input-media-type.context.js';
-import { css, html, customElement, property, state, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
-import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import type { UmbRepositoryItemsStatus } from '@umbraco-cms/backoffice/repository';
+import type { UmbTreeItemModel } from '@umbraco-cms/backoffice/tree';
 
 import '@umbraco-cms/backoffice/entity-item';
 
@@ -48,12 +49,12 @@ export class UmbInputMediaTypeElement extends UmbFormControlMixin<string | undef
 
 	/**
 	 * Min validation message.
-	 * @type {boolean}
+	 * @type {string}
 	 * @attr
 	 * @default
 	 */
 	@property({ type: String, attribute: 'min-message' })
-	minMessage = 'This field need more items';
+	minMessage = 'This field needs more items';
 
 	/**
 	 * This is a maximum amount of selected items in this input.
@@ -71,11 +72,11 @@ export class UmbInputMediaTypeElement extends UmbFormControlMixin<string | undef
 
 	/**
 	 * Max validation message.
-	 * @type {boolean}
+	 * @type {string}
 	 * @attr
 	 * @default
 	 */
-	@property({ type: String, attribute: 'min-message' })
+	@property({ type: String, attribute: 'max-message' })
 	maxMessage = 'This field exceeds the allowed amount of items';
 
 	@property({ type: Array })
@@ -139,9 +140,14 @@ export class UmbInputMediaTypeElement extends UmbFormControlMixin<string | undef
 		return undefined;
 	}
 
+	#getPickableFilter() {
+		return (x: UmbTreeItemModel) => !x.isFolder;
+	}
+
 	#openPicker() {
 		this.#pickerContext.openPicker({
 			hideTreeRoot: true,
+			pickableFilter: this.#getPickableFilter(),
 		});
 	}
 

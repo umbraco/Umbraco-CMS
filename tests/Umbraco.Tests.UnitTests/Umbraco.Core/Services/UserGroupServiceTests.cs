@@ -173,6 +173,276 @@ public class UserGroupServiceTests
         Assert.AreEqual(status, updateAttempt.Status);
     }
 
+    [Test]
+    public async Task UpdateUserGroupsOnUsers_Admin_Can_Assign_Any_Groups()
+    {
+        // Arrange - admin performing user assigning a group they don't belong to (sensitive)
+        // This verifies the admin bypass: without it, assigning "sensitive" would be unauthorized.
+        var performingUserKey = Guid.NewGuid();
+        var targetUserKey = Guid.NewGuid();
+        var sensitiveGroupKey = Constants.Security.SensitiveDataGroupKey;
+        var adminGroupKey = Constants.Security.AdminGroupKey;
+
+        var service = SetupUserGroupServiceForUpdateUserGroups(
+            performingUserKey,
+            performingUserGroupAliases: [Constants.Security.AdminGroupAlias],
+            targetUserKey,
+            targetUserCurrentGroupAliases: ["editor"],
+            requestedGroups: [(adminGroupKey, Constants.Security.AdminGroupAlias), (sensitiveGroupKey, "sensitive")]);
+
+        // Act
+        var result = await service.UpdateUserGroupsOnUsersAsync(
+            new HashSet<Guid> { adminGroupKey, sensitiveGroupKey },
+            new HashSet<Guid> { targetUserKey },
+            performingUserKey);
+
+        // Assert
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(UserGroupOperationStatus.Success, result.Result);
+    }
+
+    [Test]
+    public async Task UpdateUserGroupsOnUsers_NonAdmin_Can_Add_Groups_They_Belong_To()
+    {
+        // Arrange - Editor performing user adding Editor group to a Writer user
+        var performingUserKey = Guid.NewGuid();
+        var targetUserKey = Guid.NewGuid();
+        var writerGroupKey = Guid.NewGuid();
+        var editorGroupKey = Guid.NewGuid();
+
+        var service = SetupUserGroupServiceForUpdateUserGroups(
+            performingUserKey,
+            performingUserGroupAliases: ["editor"],
+            targetUserKey,
+            targetUserCurrentGroupAliases: ["writer"],
+            requestedGroups: [(writerGroupKey, "writer"), (editorGroupKey, "editor")]);
+
+        // Act
+        var result = await service.UpdateUserGroupsOnUsersAsync(
+            new HashSet<Guid> { writerGroupKey, editorGroupKey },
+            new HashSet<Guid> { targetUserKey },
+            performingUserKey);
+
+        // Assert
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(UserGroupOperationStatus.Success, result.Result);
+    }
+
+    [Test]
+    public async Task UpdateUserGroupsOnUsers_NonAdmin_Cannot_Add_Groups_They_Do_Not_Belong_To()
+    {
+        // Arrange - Editor performing user trying to add Admin group to an Editor user
+        var performingUserKey = Guid.NewGuid();
+        var targetUserKey = Guid.NewGuid();
+        var editorGroupKey = Guid.NewGuid();
+        var adminGroupKey = Constants.Security.AdminGroupKey;
+
+        var service = SetupUserGroupServiceForUpdateUserGroups(
+            performingUserKey,
+            performingUserGroupAliases: ["editor"],
+            targetUserKey,
+            targetUserCurrentGroupAliases: ["editor"],
+            requestedGroups: [(editorGroupKey, "editor"), (adminGroupKey, Constants.Security.AdminGroupAlias)]);
+
+        // Act
+        var result = await service.UpdateUserGroupsOnUsersAsync(
+            new HashSet<Guid> { editorGroupKey, adminGroupKey },
+            new HashSet<Guid> { targetUserKey },
+            performingUserKey);
+
+        // Assert
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(UserGroupOperationStatus.Unauthorized, result.Result);
+    }
+
+    [Test]
+    public async Task UpdateUserGroupsOnUsers_NonAdmin_Can_Keep_Existing_Groups_They_Do_Not_Belong_To()
+    {
+        // Arrange - Editor user keeping Writer+Translator (existing) and adding Editor (own group)
+        var performingUserKey = Guid.NewGuid();
+        var targetUserKey = Guid.NewGuid();
+        var writerGroupKey = Guid.NewGuid();
+        var translatorGroupKey = Guid.NewGuid();
+        var editorGroupKey = Guid.NewGuid();
+
+        var service = SetupUserGroupServiceForUpdateUserGroups(
+            performingUserKey,
+            performingUserGroupAliases: ["editor"],
+            targetUserKey,
+            targetUserCurrentGroupAliases: ["writer", "translator"],
+            requestedGroups: [(writerGroupKey, "writer"), (translatorGroupKey, "translator"), (editorGroupKey, "editor")]);
+
+        // Act
+        var result = await service.UpdateUserGroupsOnUsersAsync(
+            new HashSet<Guid> { writerGroupKey, translatorGroupKey, editorGroupKey },
+            new HashSet<Guid> { targetUserKey },
+            performingUserKey);
+
+        // Assert
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(UserGroupOperationStatus.Success, result.Result);
+    }
+
+    [Test]
+    public async Task UpdateUserGroupsOnUsers_NonAdmin_Can_Remove_Groups()
+    {
+        // Arrange - Editor user removing Writer group from a user that has both Writer and Editor
+        var performingUserKey = Guid.NewGuid();
+        var targetUserKey = Guid.NewGuid();
+        var editorGroupKey = Guid.NewGuid();
+
+        var service = SetupUserGroupServiceForUpdateUserGroups(
+            performingUserKey,
+            performingUserGroupAliases: ["editor"],
+            targetUserKey,
+            targetUserCurrentGroupAliases: ["writer", "editor"],
+            requestedGroups: [(editorGroupKey, "editor")]);
+
+        // Act
+        var result = await service.UpdateUserGroupsOnUsersAsync(
+            new HashSet<Guid> { editorGroupKey },
+            new HashSet<Guid> { targetUserKey },
+            performingUserKey);
+
+        // Assert
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(UserGroupOperationStatus.Success, result.Result);
+    }
+
+    [Test]
+    public async Task UpdateUserGroupsOnUsers_NonAdmin_Cannot_Escalate_Via_Replacement()
+    {
+        // Arrange - Editor user replacing their Editor group with Admin group
+        var performingUserKey = Guid.NewGuid();
+        var targetUserKey = Guid.NewGuid();
+        var adminGroupKey = Constants.Security.AdminGroupKey;
+
+        var service = SetupUserGroupServiceForUpdateUserGroups(
+            performingUserKey,
+            performingUserGroupAliases: ["editor"],
+            targetUserKey,
+            targetUserCurrentGroupAliases: ["editor"],
+            requestedGroups: [(adminGroupKey, Constants.Security.AdminGroupAlias)]);
+
+        // Act
+        var result = await service.UpdateUserGroupsOnUsersAsync(
+            new HashSet<Guid> { adminGroupKey },
+            new HashSet<Guid> { targetUserKey },
+            performingUserKey);
+
+        // Assert
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(UserGroupOperationStatus.Unauthorized, result.Result);
+    }
+
+    [Test]
+    public async Task UpdateUserGroupsOnUsers_Missing_Performing_User_Returns_MissingUser()
+    {
+        // Arrange - performing user key that doesn't resolve to a user
+        var performingUserKey = Guid.NewGuid();
+        var targetUserKey = Guid.NewGuid();
+        var editorGroupKey = Guid.NewGuid();
+
+        var scope = new Mock<ICoreScope>();
+        var provider = new Mock<ICoreScopeProvider>();
+        provider.Setup(p => p.CreateCoreScope(
+            It.IsAny<IsolationLevel>(),
+            It.IsAny<RepositoryCacheMode>(),
+            It.IsAny<IEventDispatcher?>(),
+            It.IsAny<IScopedNotificationPublisher?>(),
+            It.IsAny<bool?>(),
+            It.IsAny<bool>(),
+            It.IsAny<bool>()))
+            .Returns(scope.Object);
+
+        var query = new Mock<IQuery<IUserGroup>>();
+        query.Setup(q => q.Where(It.IsAny<Expression<Func<IUserGroup, bool>>>())).Returns(query.Object);
+        provider.Setup(p => p.CreateQuery<IUserGroup>()).Returns(query.Object);
+
+        var targetUser = SetupUserWithGroupAccess(targetUserKey, ["editor"]);
+        var userService = new Mock<IUserService>();
+        // Performing user not found
+        userService.Setup(s => s.GetAsync(performingUserKey)).Returns(Task.FromResult<IUser?>(null));
+        userService.Setup(s => s.GetAsync(It.IsAny<IEnumerable<Guid>>()))
+            .Returns(Task.FromResult<IEnumerable<IUser>>(new[] { targetUser.Object }));
+
+        var userGroupRepository = new Mock<IUserGroupRepository>();
+        userGroupRepository
+            .Setup(r => r.Get(It.IsAny<IQuery<IUserGroup>>()))
+            .Returns(new[] { new UserGroup(Mock.Of<IShortStringHelper>(), 0, "editor", "Editor", null) { Key = editorGroupKey } });
+
+        var service = new UserGroupService(
+            provider.Object,
+            Mock.Of<ILoggerFactory>(),
+            Mock.Of<IEventMessagesFactory>(),
+            userGroupRepository.Object,
+            Mock.Of<IUserGroupPermissionService>(),
+            Mock.Of<IEntityService>(),
+            userService.Object,
+            Mock.Of<ILogger<UserGroupService>>());
+
+        // Act
+        var result = await service.UpdateUserGroupsOnUsersAsync(
+            new HashSet<Guid> { editorGroupKey },
+            new HashSet<Guid> { targetUserKey },
+            performingUserKey);
+
+        // Assert
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(UserGroupOperationStatus.MissingUser, result.Result);
+    }
+
+    private UserGroupService SetupUserGroupServiceForUpdateUserGroups(
+        Guid performingUserKey,
+        string[] performingUserGroupAliases,
+        Guid targetUserKey,
+        string[] targetUserCurrentGroupAliases,
+        (Guid Key, string Alias)[] requestedGroups)
+    {
+        var scope = new Mock<ICoreScope>();
+        var provider = new Mock<ICoreScopeProvider>();
+        provider.Setup(p => p.CreateCoreScope(
+            It.IsAny<IsolationLevel>(),
+            It.IsAny<RepositoryCacheMode>(),
+            It.IsAny<IEventDispatcher?>(),
+            It.IsAny<IScopedNotificationPublisher?>(),
+            It.IsAny<bool?>(),
+            It.IsAny<bool>(),
+            It.IsAny<bool>()))
+            .Returns(scope.Object);
+
+        var query = new Mock<IQuery<IUserGroup>>();
+        query.Setup(q => q.Where(It.IsAny<Expression<Func<IUserGroup, bool>>>())).Returns(query.Object);
+        provider.Setup(p => p.CreateQuery<IUserGroup>()).Returns(query.Object);
+
+        var performingUser = SetupUserWithGroupAccess(performingUserKey, performingUserGroupAliases);
+        var targetUser = SetupUserWithGroupAccess(targetUserKey, targetUserCurrentGroupAliases);
+
+        var userService = new Mock<IUserService>();
+        userService.Setup(s => s.GetAsync(performingUserKey)).Returns(Task.FromResult<IUser?>(performingUser.Object));
+        userService.Setup(s => s.GetAsync(It.IsAny<IEnumerable<Guid>>()))
+            .Returns(Task.FromResult<IEnumerable<IUser>>(new[] { targetUser.Object }));
+
+        IUserGroup[] userGroups = requestedGroups
+            .Select(g => new UserGroup(Mock.Of<IShortStringHelper>(), 0, g.Alias, g.Alias, null) { Key = g.Key })
+            .ToArray<IUserGroup>();
+
+        var userGroupRepository = new Mock<IUserGroupRepository>();
+        userGroupRepository
+            .Setup(r => r.Get(It.IsAny<IQuery<IUserGroup>>()))
+            .Returns(userGroups);
+
+        return new UserGroupService(
+            provider.Object,
+            Mock.Of<ILoggerFactory>(),
+            Mock.Of<IEventMessagesFactory>(),
+            userGroupRepository.Object,
+            Mock.Of<IUserGroupPermissionService>(),
+            Mock.Of<IEntityService>(),
+            userService.Object,
+            Mock.Of<ILogger<UserGroupService>>());
+    }
+
     private IEnumerable<IReadOnlyUserGroup> CreateGroups(params string[] aliases)
         => aliases.Select(alias =>
         {

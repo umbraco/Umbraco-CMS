@@ -3,6 +3,9 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 
 namespace Umbraco.Cms.Core.PublishedCache;
 
+/// <summary>
+///     Provides a cache for published member content.
+/// </summary>
 public interface IPublishedMemberCache
 {
     /// <summary>

@@ -11,10 +11,10 @@ namespace Umbraco.Cms.Tests.Integration.ManagementApi.Culture;
 
 public class AllCultureControllerTests : ManagementApiUserGroupTestBase<AllCultureController>
 {
-    ILanguageService LanguageService => GetRequiredService<ILanguageService>();
+    private ILanguageService LanguageService => GetRequiredService<ILanguageService>();
 
     [SetUp]
-    public async Task Setup()
+    public new async Task Setup()
     {
         var langDa = new LanguageBuilder()
             .WithCultureInfo("da-DK")

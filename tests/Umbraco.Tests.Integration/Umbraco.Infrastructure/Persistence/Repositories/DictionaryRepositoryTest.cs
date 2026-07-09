@@ -2,10 +2,12 @@
 // See LICENSE for more details.
 
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Services;
@@ -25,17 +27,22 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
 
     private IDictionaryRepository CreateRepository() => GetRequiredService<IDictionaryRepository>();
 
-    private IDictionaryRepository CreateRepositoryWithCache(AppCaches cache) =>
+    private IDictionaryRepository CreateRepositoryWithCache(AppCaches cache, bool enableValueSearch = false)
+    {
+        var dictionarySettingsMonitor = new Mock<IOptionsMonitor<DictionarySettings>>();
+        dictionarySettingsMonitor.Setup(x => x.CurrentValue).Returns(new DictionarySettings { EnableValueSearch = enableValueSearch });
 
         // Create a repository with a real runtime cache.
-        new DictionaryRepository(
+        return new DictionaryRepository(
             GetRequiredService<IScopeAccessor>(),
             cache,
             GetRequiredService<ILogger<DictionaryRepository>>(),
             GetRequiredService<ILoggerFactory>(),
             GetRequiredService<ILanguageRepository>(),
             GetRequiredService<IRepositoryCacheVersionService>(),
-            GetRequiredService<ICacheSyncService>());
+            GetRequiredService<ICacheSyncService>(),
+            dictionarySettingsMonitor.Object);
+    }
 
     [Test]
     public async Task Can_Perform_Get_By_Key_On_DictionaryRepository()
@@ -536,6 +543,109 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
             var dictionaryItem = repository.Get("Read More Updated");
 
             Assert.IsNotNull(dictionaryItem);
+        }
+    }
+
+    /// <summary>
+    /// Verifies that <see cref="IDictionaryRepository.GetDictionaryItemDescendants"/> returns each
+    /// dictionary item exactly once when items have multiple translations.
+    /// </summary>
+    /// <remarks>
+    /// Regression test for https://github.com/umbraco/Umbraco-CMS/issues/22640.
+    /// The underlying SQL left-joins cmsDictionary with cmsLanguageText (one row per
+    /// translation) and relies on NPoco's FetchOneToMany to collapse them back into a
+    /// single dictionary item. FetchOneToMany only merges adjacent rows that share the
+    /// same primary key, so the SQL must order rows such that translations for the same
+    /// dictionary item are contiguous. Without that ordering, items with multiple
+    /// translations get yielded multiple times.
+    /// </remarks>
+    [Test]
+    public async Task GetDictionaryItemDescendants_With_Multiple_Translations_Returns_Each_Item_Exactly_Once()
+    {
+        var languageService = GetRequiredService<ILanguageService>();
+        var languageDe = new Language("de-DE", "German (Germany)");
+        await languageService.CreateAsync(languageDe, Constants.Security.SuperUserKey);
+        var languageFr = new Language("fr-FR", "French (France)");
+        await languageService.CreateAsync(languageFr, Constants.Security.SuperUserKey);
+
+        var languageEn = await languageService.GetAsync("en-US");
+        var languageDk = await languageService.GetAsync("da-DK");
+
+        var dictionaryItemService = GetRequiredService<IDictionaryItemService>();
+        var additionalKeys = new[] { "Header", "Footer", "Sidebar", "Title", "Subtitle" };
+        foreach (var key in additionalKeys)
+        {
+            await dictionaryItemService.CreateAsync(
+                new DictionaryItem(key)
+                {
+                    Translations =
+                    [
+                        new DictionaryTranslation(languageEn, $"{key} (en)"),
+                        new DictionaryTranslation(languageDk, $"{key} (dk)"),
+                        new DictionaryTranslation(languageDe, $"{key} (de)"),
+                        new DictionaryTranslation(languageFr, $"{key} (fr)"),
+                    ],
+                },
+                Constants.Security.SuperUserKey);
+        }
+
+        using (ScopeProvider.CreateScope())
+        {
+            var repository = CreateRepository();
+
+            var results = repository.GetDictionaryItemDescendants(null).ToArray();
+
+            // 2 items from CreateTestData ("Read More", "Article") + the 5 items added above.
+            var expectedKeys = new[] { "Read More", "Article" }.Concat(additionalKeys).OrderBy(x => x).ToArray();
+            Assert.Multiple(() =>
+            {
+                Assert.That(results.Select(x => x.ItemKey).OrderBy(x => x), Is.EqualTo(expectedKeys));
+                Assert.That(results.Select(x => x.Key).Distinct().Count(), Is.EqualTo(results.Length), "Each dictionary item should appear exactly once.");
+            });
+        }
+    }
+
+    [Test]
+    public void GetDictionaryItemDescendants_WithValueSearch_Disabled_Does_Not_Return_Items_Matching_Only_Translation_Value()
+    {
+        // Arrange
+        var cache = AppCaches.Create(Mock.Of<IRequestCache>());
+        var repository = CreateRepositoryWithCache(cache, enableValueSearch: false);
+
+        using (ScopeProvider.CreateScope())
+        {
+            // Act - Search for "Læs" which only exists in Danish translation value, not in any key
+            var results = repository.GetDictionaryItemDescendants(null, "Læs").ToArray();
+
+            // Assert - Should not find anything because value search is disabled
+            Assert.That(results, Is.Empty);
+        }
+    }
+
+    [Test]
+    public void GetDictionaryItemDescendants_WithValueSearch_Enabled_Returns_Items_Matching_Translation_Value()
+    {
+        // Arrange
+        var cache = AppCaches.Create(Mock.Of<IRequestCache>());
+        var repository = CreateRepositoryWithCache(cache, enableValueSearch: true);
+
+        using (ScopeProvider.CreateScope())
+        {
+            // Act - Search for "Læs" which only exists in Danish translation value, not in any key
+            var results = repository.GetDictionaryItemDescendants(null, "Læs").ToArray();
+
+            // Assert - Should find "Read More" because its Danish translation contains "Læs mere"
+            Assert.That(results, Has.Length.EqualTo(1));
+            Assert.That(results[0].ItemKey, Is.EqualTo("Read More"));
+
+            // - also verify that both languages have a translation
+            var translatedIsoCodes = results[0]
+                .Translations
+                .Where(translation => translation.Value.IsNullOrWhiteSpace() == false)
+                .Select(translation => translation.LanguageIsoCode)
+                .ToArray();
+            Assert.That(translatedIsoCodes, Does.Contain("en-US"));
+            Assert.That(translatedIsoCodes, Does.Contain("da-DK"));
         }
     }
 

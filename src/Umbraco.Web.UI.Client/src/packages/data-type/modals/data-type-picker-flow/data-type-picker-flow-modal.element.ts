@@ -13,13 +13,16 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registr
 import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
-import { UmbPaginationManager, debounce, fromCamelCase } from '@umbraco-cms/backoffice/utils';
+import { UmbPaginationManager, debounce, fromCamelCaseIfCamelCase } from '@umbraco-cms/backoffice/utils';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_CONTENT_TYPE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content-type';
 import { UMB_PROPERTY_TYPE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/property-type';
+import { UmbPropertyEditorUISearchController } from '@umbraco-cms/backoffice/property-editor';
 import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+
+const MAX_SUGGESTIONS = 5;
 
 @customElement('umb-data-type-picker-flow-modal')
 export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
@@ -30,6 +33,9 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 
 	public override set data(value: UmbDataTypePickerFlowModalData) {
 		super.data = value;
+		if (value?.suggestionQuery) {
+			this.#loadSuggestions(value.suggestionQuery).catch(this.#onSearchError);
+		}
 	}
 
 	@state()
@@ -39,10 +45,16 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 	private _groupedPropertyEditorUIs: Array<{ key: string; items: Array<ManifestPropertyEditorUi> }> = [];
 
 	@state()
+	private _suggestedPropertyEditorUIs: Array<ManifestPropertyEditorUi> = [];
+
+	@state()
 	private _currentPage = 1;
 
 	@state()
 	private _dataTypePickerModalRouteBuilder?: UmbModalRouteBuilder;
+
+	@state()
+	private _isFiltering = false;
 
 	pagination = new UmbPaginationManager();
 
@@ -60,6 +72,9 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 	#groupLookup: Record<string, string> = {};
 
 	#propertyEditorUIs: Array<ManifestPropertyEditorUi> = [];
+
+	#searchController = new UmbPropertyEditorUISearchController(this);
+	#suggestionSearchController = new UmbPropertyEditorUISearchController(this);
 
 	constructor() {
 		super();
@@ -91,8 +106,10 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 					.sort((a, b) => a.meta.label.localeCompare(b.meta.label));
 
 				this.#groupLookup = Object.fromEntries(propertyEditorUIs.map((ui) => [ui.alias, ui.meta.group]));
+				this.#searchController.setPropertyEditorUIs(this.#propertyEditorUIs);
+				this.#suggestionSearchController.setPropertyEditorUIs(this.#propertyEditorUIs);
 
-				this.#performFiltering();
+				this.#performFiltering().catch(this.#onSearchError);
 			}).asPromise(),
 		]);
 
@@ -161,21 +178,35 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 			});
 	}
 
+	async #loadSuggestions(propertyLabel: string) {
+		try {
+			await this.#initPromise;
+			const results = await this.#suggestionSearchController.search(propertyLabel);
+			this._suggestedPropertyEditorUIs = results.slice(0, MAX_SUGGESTIONS);
+		} catch (error) {
+			if ((error as DOMException)?.name !== 'AbortError') throw error;
+		}
+	}
+
 	async #getDataTypes() {
-		this.pagination.setCurrentPageNumber(this._currentPage);
+		try {
+			this.pagination.setCurrentPageNumber(this._currentPage);
 
-		const { data } = await this.#collectionRepository.requestCollection({
-			skip: this.pagination.getSkip(),
-			take: this.pagination.getPageSize(),
-			name: this.#currentFilterQuery,
-		});
+			const { data } = await this.#collectionRepository.requestCollection({
+				skip: this.pagination.getSkip(),
+				take: this.pagination.getPageSize(),
+				name: this.#currentFilterQuery,
+			});
 
-		this.pagination.setTotalItems(data?.total ?? 0);
+			this.pagination.setTotalItems(data?.total ?? 0);
 
-		if (this.pagination.getCurrentPageNumber() > 1) {
-			this.#dataTypes = [...this.#dataTypes, ...(data?.items ?? [])];
-		} else {
-			this.#dataTypes = data?.items ?? [];
+			if (this.pagination.getCurrentPageNumber() > 1) {
+				this.#dataTypes = [...this.#dataTypes, ...(data?.items ?? [])];
+			} else {
+				this.#dataTypes = data?.items ?? [];
+			}
+		} finally {
+			this._isFiltering = false;
 		}
 	}
 
@@ -192,60 +223,87 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 
 	async #onLoadMore() {
 		this._currentPage = this._currentPage + 1;
-		this.#handleFiltering();
+		this.#handleFiltering().catch(this.#onSearchError);
 	}
 
 	#onFilterInput(event: UUIInputEvent) {
-		this.#currentFilterQuery = (event.target.value as string).toLocaleLowerCase();
+		this._isFiltering = true;
+		this.#currentFilterQuery = (event.target.value as string).toLowerCase();
 		this.#debouncedFilterInput();
 	}
 
 	#debouncedFilterInput = debounce(() => {
 		this._currentPage = 1;
-		this.#handleFiltering();
+		this.#handleFiltering().catch(this.#onSearchError);
 	}, 250);
+
+	#onSearchError = (error: unknown) => {
+		if ((error as DOMException)?.name !== 'AbortError') {
+			console.error(error);
+		}
+	};
+
+	override disconnectedCallback() {
+		super.disconnectedCallback();
+		this.#debouncedFilterInput.cancel();
+	}
 
 	async #handleFiltering() {
 		await this.#getDataTypes();
-		this.#performFiltering();
+		await this.#performFiltering();
 	}
 
-	#performFiltering() {
+	#resolveGroupName(group: string): string {
+		if (group.startsWith('#')) {
+			return this.localize.string(group);
+		}
+
+		// Backward compatibility: external packages may still register camelCase group names.
+		return fromCamelCaseIfCamelCase(group);
+	}
+
+	async #performFiltering() {
 		if (this.#currentFilterQuery) {
 			const filteredDataTypes = this.#dataTypes
 				.filter((dataType) => dataType.name?.toLowerCase().includes(this.#currentFilterQuery))
 				.sort((a, b) => a.name.localeCompare(b.name));
 
-			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-			// @ts-expect-error
-			const grouped = Object.groupBy(filteredDataTypes, (dataType: UmbDataTypeItemModel) =>
-				fromCamelCase(this.#groupLookup[dataType.propertyEditorUiAlias] ?? 'Uncategorized'),
-			);
+			this._groupedDataTypes = this.#groupDataTypes(filteredDataTypes);
 
-			this._groupedDataTypes = Object.keys(grouped)
-				.sort((a, b) => a.localeCompare(b))
-				.map((key) => ({ key, items: grouped[key] }));
+			try {
+				const filteredUIs = await this.#searchController.search(this.#currentFilterQuery);
+				this._groupedPropertyEditorUIs = this.#groupUIs(filteredUIs);
+			} catch (error) {
+				if ((error as DOMException)?.name !== 'AbortError') throw error;
+			}
 		} else {
 			this._groupedDataTypes = [];
+			this._groupedPropertyEditorUIs = this.#groupUIs(this.#propertyEditorUIs);
 		}
+	}
 
-		const filteredUIs = !this.#currentFilterQuery
-			? this.#propertyEditorUIs
-			: this.#propertyEditorUIs.filter(
-					(propertyEditorUI) =>
-						propertyEditorUI.name.toLowerCase().includes(this.#currentFilterQuery) ||
-						propertyEditorUI.alias.toLowerCase().includes(this.#currentFilterQuery),
-				);
-
+	#groupDataTypes(dataTypes: Array<UmbDataTypeItemModel>) {
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-expect-error
-		const grouped = Object.groupBy(filteredUIs, (propertyEditorUi: ManifestPropertyEditorUi) =>
-			fromCamelCase(propertyEditorUi.meta.group ?? 'Uncategorized'),
+		const grouped = Object.groupBy(dataTypes, (dataType: UmbDataTypeItemModel) =>
+			this.#resolveGroupName(this.#groupLookup[dataType.propertyEditorUiAlias] ?? 'Uncategorized'),
 		);
 
-		this._groupedPropertyEditorUIs = Object.keys(grouped)
+		return Object.keys(grouped)
 			.sort((a, b) => a.localeCompare(b))
-			.map((key) => ({ key, items: grouped[key] }));
+			.map((key) => ({ key, items: grouped[key] as Array<UmbDataTypeItemModel> }));
+	}
+
+	#groupUIs(uis: Array<ManifestPropertyEditorUi>) {
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-expect-error
+		const grouped = Object.groupBy(uis, (propertyEditorUi: ManifestPropertyEditorUi) =>
+			this.#resolveGroupName(propertyEditorUi.meta.group ?? 'Uncategorized'),
+		);
+
+		return Object.keys(grouped)
+			.sort((a, b) => a.localeCompare(b))
+			.map((key) => ({ key, items: grouped[key] as Array<ManifestPropertyEditorUi> }));
 	}
 
 	override render() {
@@ -260,7 +318,20 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 	}
 
 	#renderGrid() {
-		return this.#currentFilterQuery ? this.#renderFilteredList() : this.#renderUIs();
+		return this.#currentFilterQuery
+			? this.#renderFilteredList()
+			: html`${this.#renderSuggestions()}${this.#renderUIs()}`;
+	}
+
+	#renderSuggestions() {
+		if (this._suggestedPropertyEditorUIs.length === 0) return nothing;
+		return html`
+			<h5 class="category-name">
+				<umb-localize key="contentTypeEditor_suggestedEditors">Suggestions</umb-localize>
+			</h5>
+			${this.#renderGroupUIs(this._suggestedPropertyEditorUIs)}
+			<hr />
+		`;
 	}
 
 	#renderFilter() {
@@ -271,7 +342,11 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 			placeholder=${this.localize.term('placeholders_filter')}
 			label=${this.localize.term('placeholders_filter')}
 			${umbFocus()}>
-			<uui-icon name="search" slot="prepend" id="filter-icon"></uui-icon>
+			<div slot="prepend">
+				${this._isFiltering
+					? html`<uui-loader-circle id="filtering-indicator"></uui-loader-circle>`
+					: html`<uui-icon name="search"></uui-icon>`}
+			</div>
 		</uui-input>`;
 	}
 
@@ -370,7 +445,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 		return html`
 			<div class="item-content">
 				<umb-icon name=${propertyEditorUI.meta.icon} class="icon"></umb-icon>
-				${label}
+				<span class="label" title=${label}>${label}</span>
 			</div>
 		`;
 	}
@@ -386,7 +461,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 							<uui-button .label=${dataType.name} type="button" @click=${() => this.#handleDataTypeClick(dataType)}>
 								<div class="item-content">
 									<umb-icon name=${dataType.icon ?? 'icon-circle-dotted'} class="icon"></umb-icon>
-									${dataType.name}
+									<span class="label" title=${dataType.name}>${dataType.name}</span>
 								</div>
 							</uui-button>
 						</li>
@@ -404,11 +479,13 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 				margin-bottom: var(--uui-size-space-4);
 			}
 
-			#filter-icon {
-				height: 100%;
-				padding-left: var(--uui-size-space-2);
+			uui-input [slot='prepend'] {
 				display: flex;
-				color: var(--uui-color-border);
+				align-items: center;
+			}
+
+			#filtering-indicator {
+				margin-left: 7px;
 			}
 
 			#item-grid {
@@ -453,8 +530,10 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 
 				padding: var(--uui-size-space-2);
 
-				display: grid;
-				grid-template-rows: 40px 1fr;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: flex-start;
 				height: 100%;
 				width: 100%;
 				word-break: break-word;
@@ -462,7 +541,15 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 
 			#item-grid .item .icon {
 				font-size: 2em;
-				margin: auto;
+				margin-bottom: var(--uui-size-space-2);
+			}
+
+			#item-grid .item .label {
+				max-width: 100%;
+				min-width: 0;
+				display: -webkit-box;
+				overflow: hidden;
+				padding-bottom: 0.1em;
 			}
 
 			.category-name {
@@ -471,6 +558,13 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 
 			.choice-type-headline {
 				border-bottom: 1px solid var(--uui-color-divider);
+			}
+
+			.loader-container {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				padding: var(--uui-size-space-6);
 			}
 		`,
 	];

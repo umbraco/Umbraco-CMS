@@ -23,10 +23,10 @@ public class LockingMechanism : ILockingMechanism
     private Queue<IDistributedLock>? _acquiredLocks;
 
     /// <summary>
-    /// Constructs an instance of LockingMechanism
+    ///     Initializes a new instance of the <see cref="LockingMechanism"/> class.
     /// </summary>
-    /// <param name="distributedLockingMechanismFactory"></param>
-    /// <param name="logger"></param>
+    /// <param name="distributedLockingMechanismFactory">The factory for creating distributed locking mechanisms.</param>
+    /// <param name="logger">The logger for logging lock-related messages.</param>
     public LockingMechanism(IDistributedLockingMechanismFactory distributedLockingMechanismFactory, ILogger<LockingMechanism> logger)
     {
         _distributedLockingMechanismFactory = distributedLockingMechanismFactory;
@@ -37,22 +37,26 @@ public class LockingMechanism : ILockingMechanism
     /// <inheritdoc />
     public void ReadLock(Guid instanceId, TimeSpan? timeout = null, params int[] lockIds) => LazyReadLockInner(instanceId, timeout, lockIds);
 
+    /// <inheritdoc />
     public void ReadLock(Guid instanceId, params int[] lockIds) => ReadLock(instanceId, null, lockIds);
 
     /// <inheritdoc />
     public void WriteLock(Guid instanceId, TimeSpan? timeout = null, params int[] lockIds) => LazyWriteLockInner(instanceId, timeout, lockIds);
 
+    /// <inheritdoc />
     public void WriteLock(Guid instanceId, params int[] lockIds) => WriteLock(instanceId, null, lockIds);
 
     /// <inheritdoc />
     public void EagerReadLock(Guid instanceId, TimeSpan? timeout = null, params int[] lockIds) => EagerReadLockInner(instanceId, timeout, lockIds);
 
+    /// <inheritdoc />
     public void EagerReadLock(Guid instanceId, params int[] lockIds) =>
         EagerReadLock(instanceId, null, lockIds);
 
     /// <inheritdoc />
     public void EagerWriteLock(Guid instanceId, TimeSpan? timeout = null, params int[] lockIds) => EagerWriteLockInner(instanceId, timeout, lockIds);
 
+    /// <inheritdoc />
     public void EagerWriteLock(Guid instanceId, params int[] lockIds) =>
         EagerWriteLock(instanceId, null, lockIds);
 
@@ -252,10 +256,7 @@ public class LockingMechanism : ILockingMechanism
         }
     }
 
-    /// <summary>
-    ///     Clears all lock counters for a given scope instance, signalling that the scope has been disposed.
-    /// </summary>
-    /// <param name="instanceId">Instance ID of the scope to clear.</param>
+    /// <inheritdoc />
     public void ClearLocks(Guid instanceId)
     {
         lock (_locker)
@@ -282,6 +283,7 @@ public class LockingMechanism : ILockingMechanism
         }
     }
 
+    /// <inheritdoc />
     public void EnsureLocksCleared(Guid instanceId)
     {
         while (!_acquiredLocks?.IsCollectionEmpty() ?? false)
@@ -301,16 +303,7 @@ public class LockingMechanism : ILockingMechanism
         throw exception;
     }
 
-    /// <summary>
-    ///     When we require a ReadLock or a WriteLock we don't immediately request these locks from the database,
-    ///     instead we only request them when necessary (lazily).
-    ///     To do this, we queue requests for read/write locks.
-    ///     This is so that if there's a request for either of these
-    ///     locks, but the service/repository returns an item from the cache, we don't end up making a DB call to make the
-    ///     read/write lock.
-    ///     This executes the queue of requested locks in order in an efficient way lazily whenever the database instance is
-    ///     resolved.
-    /// </summary>
+    /// <inheritdoc />
     public void EnsureLocks(Guid scopeInstanceId)
     {
         lock (_locker)
@@ -389,8 +382,10 @@ public class LockingMechanism : ILockingMechanism
     }
 
 
+    /// <inheritdoc />
     public Dictionary<Guid, Dictionary<int, int>>? GetReadLocks() => _readLocksDictionary;
 
+    /// <inheritdoc />
     public Dictionary<Guid, Dictionary<int, int>>? GetWriteLocks() => _writeLocksDictionary;
 
     /// <inheritdoc />

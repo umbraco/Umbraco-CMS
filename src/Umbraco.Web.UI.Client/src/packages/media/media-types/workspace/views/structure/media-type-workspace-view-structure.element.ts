@@ -47,7 +47,7 @@ export class UmbMediaTypeWorkspaceViewStructureElement extends UmbLitElement imp
 				const oldValue = this._allowedContentTypeIDs;
 				this._allowedContentTypeIDs = allowedContentTypes
 					?.map((x) => x.contentType.unique)
-					.filter((x) => x !== undefined) as Array<string>;
+					.filter((x) => x !== undefined);
 				this.requestUpdate('_allowedContentTypeIDs', oldValue);
 			},
 			'_allowedContentTypesObserver',

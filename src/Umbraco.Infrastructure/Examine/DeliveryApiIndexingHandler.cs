@@ -32,6 +32,20 @@ internal sealed class DeliveryApiIndexingHandler : IDeliveryApiIndexingHandler
     private readonly IDeliveryApiCompositeIdHandler _deliveryApiCompositeIdHandler;
 
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.Examine.DeliveryApiIndexingHandler"/> class, responsible for handling Examine indexing for the Delivery API.
+    /// </summary>
+    /// <param name="mainDomHandler">Handles main domain (MainDom) events for Examine indexing coordination.</param>
+    /// <param name="examineManager">Manages Examine indexes and searchers.</param>
+    /// <param name="scopeProvider">Provides database scope management for transactional operations.</param>
+    /// <param name="logger">The logger used for logging indexing operations and errors.</param>
+    /// <param name="deliveryApiSettings">Monitors configuration settings for the Delivery API.</param>
+    /// <param name="contentService">Service for accessing and managing Umbraco content items.</param>
+    /// <param name="publicAccessService">Service for managing public access permissions on content.</param>
+    /// <param name="deliveryApiContentIndexValueSetBuilder">Builds value sets for content items to be indexed for the Delivery API.</param>
+    /// <param name="deliveryApiContentIndexHelper">Provides helper methods for content indexing specific to the Delivery API.</param>
+    /// <param name="backgroundTaskQueue">Queue for scheduling background indexing tasks.</param>
+    /// <param name="deliveryApiCompositeIdHandler">Handles composite IDs for Delivery API content indexing.</param>
     public DeliveryApiIndexingHandler(
         ExamineIndexingMainDomHandler mainDomHandler,
         IExamineManager examineManager,

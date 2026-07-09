@@ -13,6 +13,10 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Persistence.EFCore.Locking;
 
+/// <summary>
+/// Implements distributed locking for SQL Server databases using EF Core.
+/// </summary>
+/// <typeparam name="T">The type of DbContext.</typeparam>
 internal sealed class SqlServerEFCoreDistributedLockingMechanism<T> : IDistributedLockingMechanism
     where T : DbContext
 {
@@ -38,6 +42,7 @@ internal sealed class SqlServerEFCoreDistributedLockingMechanism<T> : IDistribut
         connectionStrings.OnChange(x=>_connectionStrings = x);
     }
 
+    /// <inheritdoc />
     public bool HasActiveRelatedScope => _scopeAccessor.Value.AmbientScope is not null;
 
     /// <inheritdoc />
@@ -58,11 +63,21 @@ internal sealed class SqlServerEFCoreDistributedLockingMechanism<T> : IDistribut
         return new SqlServerDistributedLock(this, lockId, DistributedLockType.WriteLock, obtainLockTimeout.Value);
     }
 
+    /// <summary>
+    /// Represents a distributed lock for SQL Server databases.
+    /// </summary>
     private sealed class SqlServerDistributedLock : IDistributedLock
     {
         private readonly SqlServerEFCoreDistributedLockingMechanism<T> _parent;
         private readonly TimeSpan _timeout;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SqlServerDistributedLock"/> class.
+        /// </summary>
+        /// <param name="parent">The parent locking mechanism.</param>
+        /// <param name="lockId">The lock identifier.</param>
+        /// <param name="lockType">The type of lock.</param>
+        /// <param name="timeout">The timeout for obtaining the lock.</param>
         public SqlServerDistributedLock(
             SqlServerEFCoreDistributedLockingMechanism<T> parent,
             int lockId,
@@ -103,14 +118,18 @@ internal sealed class SqlServerEFCoreDistributedLockingMechanism<T> : IDistribut
             _parent._logger.LogDebug("Acquired {lockType} for id {id}", LockType, LockId);
         }
 
+        /// <inheritdoc />
         public int LockId { get; }
 
+        /// <inheritdoc />
         public DistributedLockType LockType { get; }
 
+        /// <inheritdoc />
+        /// <remarks>Mostly no-op, cleaned up by completing transaction in scope.</remarks>
         public void Dispose() =>
-            // Mostly no op, cleaned up by completing transaction in scope.
             _parent._logger.LogDebug("Dropped {lockType} for id {id}", LockType, LockId);
 
+        /// <inheritdoc />
         public override string ToString()
             => $"SqlServerDistributedLock({LockId}, {LockType}";
 
@@ -138,7 +157,7 @@ internal sealed class SqlServerEFCoreDistributedLockingMechanism<T> : IDistribut
                         "A transaction with minimum ReadCommitted isolation level is required.");
                 }
 
-                var number = await dbContext.Database.ExecuteScalarAsync<int?>($"SET LOCK_TIMEOUT {(int)_timeout.TotalMilliseconds};SELECT value FROM dbo.umbracoLock WITH (REPEATABLEREAD) WHERE id={LockId}");
+                var number = await dbContext.Database.ExecuteScalarAsync<int?>($"SET LOCK_TIMEOUT {(int)_timeout.TotalMilliseconds};SELECT value FROM dbo.umbracoLock WITH (ROWLOCK, REPEATABLEREAD) WHERE id={LockId}");
 
                 if (number == null)
                 {
@@ -171,7 +190,7 @@ internal sealed class SqlServerEFCoreDistributedLockingMechanism<T> : IDistribut
                 }
 
 #pragma warning disable EF1002
-                var rowsAffected = await dbContext.Database.ExecuteSqlRawAsync(@$"SET LOCK_TIMEOUT {(int)_timeout.TotalMilliseconds};UPDATE umbracoLock WITH (REPEATABLEREAD) SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END) WHERE id={LockId}");
+                var rowsAffected = await dbContext.Database.ExecuteSqlRawAsync(@$"SET LOCK_TIMEOUT {(int)_timeout.TotalMilliseconds};UPDATE umbracoLock WITH (ROWLOCK, REPEATABLEREAD) SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END) WHERE id={LockId}");
 #pragma warning restore EF1002
 
                 if (rowsAffected == 0)

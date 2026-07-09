@@ -7,11 +7,18 @@ using Umbraco.Cms.Infrastructure.Install;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Package;
 
+/// <summary>
+/// API controller responsible for executing migration packages within the Umbraco CMS management context.
+/// </summary>
 [ApiVersion("1.0")]
 public class RunMigrationPackageController : PackageControllerBase
 {
     private readonly PackageMigrationRunner _packageMigrationRunner;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="RunMigrationPackageController"/> class.
+    /// </summary>
+    /// <param name="packageMigrationRunner">An instance of <see cref="PackageMigrationRunner"/> used to execute package migrations.</param>
     public RunMigrationPackageController(PackageMigrationRunner packageMigrationRunner)
         => _packageMigrationRunner = packageMigrationRunner;
 
@@ -26,6 +33,8 @@ public class RunMigrationPackageController : PackageControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [EndpointSummary("Runs pending package migrations.")]
+    [EndpointDescription("Executes all pending package migrations to update the database schema.")]
     public async Task<IActionResult> RunMigrations(CancellationToken cancellationToken, string name)
     {
         Attempt<bool, PackageMigrationOperationStatus> result = await _packageMigrationRunner.RunPendingPackageMigrations(name);

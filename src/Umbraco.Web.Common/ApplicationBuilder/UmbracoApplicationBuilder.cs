@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
@@ -73,7 +74,13 @@ public class UmbracoApplicationBuilder : IUmbracoApplicationBuilder, IUmbracoEnd
 
         AppBuilder.UseUmbracoMediaFileProvider();
 
-        AppBuilder.UseUmbracoBackOfficeRewrites();
+        // Only use backoffice rewrites if backoffice is enabled
+        if (ApplicationServices.GetService<IBackOfficeEnabledMarker>() is not null)
+        {
+            // Must run before the rewriter so the cache-bust hash is still present on the request path.
+            AppBuilder.UseUmbracoBackOfficeCacheHeaders();
+            AppBuilder.UseUmbracoBackOfficeRewrites();
+        }
 
         AppBuilder.UseStaticFiles();
 
@@ -90,6 +97,18 @@ public class UmbracoApplicationBuilder : IUmbracoApplicationBuilder, IUmbracoEnd
 
         AppBuilder.UseAuthentication();
         AppBuilder.UseAuthorization();
+
+        // Register output cache middleware only when Umbraco itself has enabled output caching
+        // (via Website template caching or Delivery API caching configuration). Gating on
+        // IUmbracoManagedOutputCacheMarker rather than IOutputCacheStore ensures we don't
+        // duplicate UseOutputCache() when the application has called services.AddOutputCache(...)
+        // for its own purposes (which also registers IOutputCacheStore).
+        // Placed after auth (policies may check preview/access state) but before antiforgery, localization,
+        // and session so that cache hits bypass those middlewares for better throughput.
+        if (ApplicationServices.GetService<IUmbracoManagedOutputCacheMarker>() is not null)
+        {
+            AppBuilder.UseOutputCache();
+        }
 
         AppBuilder.UseAntiforgery();
 

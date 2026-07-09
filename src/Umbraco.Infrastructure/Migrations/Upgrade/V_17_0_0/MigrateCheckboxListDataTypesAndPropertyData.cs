@@ -16,6 +16,8 @@ public class MigrateCheckboxListDataTypesAndPropertyData : AsyncMigrationBase
     /// <summary>
     /// Initializes a new instance of the <see cref="MigrateCheckboxListDataTypesAndPropertyData"/> class.
     /// </summary>
+    /// <param name="context">The migration context used to manage the migration process.</param>
+    /// <param name="dataTypeService">The service used to access and manage data types.</param>
     public MigrateCheckboxListDataTypesAndPropertyData(IMigrationContext context, IDataTypeService dataTypeService)
         : base(context) => _dataTypeService = dataTypeService;
 

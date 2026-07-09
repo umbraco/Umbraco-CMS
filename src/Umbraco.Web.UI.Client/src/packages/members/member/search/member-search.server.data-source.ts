@@ -37,6 +37,8 @@ export class UmbMemberSearchServerDataSource
 				query: {
 					query: args.query,
 					allowedMemberTypes: args.allowedContentTypes?.map((memberReference) => memberReference.unique),
+					skip: args.paging?.skip,
+					take: args.paging?.take,
 				},
 			}),
 		);

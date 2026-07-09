@@ -26,7 +26,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
 {
     [SetUp]
-    public void Setup() => ContentRepositoryBase.ThrowOnWarning = true;
+    public new void Setup() => ContentRepositoryBase.ThrowOnWarning = true;
 
     [TearDown]
     public void Teardown() => ContentRepositoryBase.ThrowOnWarning = false;

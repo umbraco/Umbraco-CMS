@@ -56,7 +56,7 @@ export default defineConfig({
     },
     {
       name: 'extensionRegistry',
-      testMatch: 'ExtensionRegistry/*.spec.ts',
+      testMatch: 'ExtensionRegistry/**/*.spec.ts',
       dependencies: ['setup'],
       use: {
         ...devices['Desktop Chrome'],
@@ -95,6 +95,15 @@ export default defineConfig({
         ignoreHTTPSErrors: true,
       }
     },
+    // Unauthenticated: this exercises the login screen itself (a late-registered auth provider).
+    {
+      name: 'authProviderLateRegistration',
+      testMatch: 'AuthProviderLateRegistration/**/*.spec.ts',
+      use: {
+        ...devices['Desktop Chrome'],
+        ignoreHTTPSErrors: true,
+      }
+    },
     // This project is used to test the install steps, for that we do not need to authenticate.
     {
       name: 'unattendedInstallConfig',
@@ -104,8 +113,30 @@ export default defineConfig({
       }
     },
     {
+      name: 'contentSettingConfig',
+      testMatch: 'ContentSettingConfig/**',
+      dependencies: ['setup'],
+      use: {
+        ...devices['Desktop Chrome'],
+        // Use prepared auth state.
+        ignoreHTTPSErrors: true,
+        storageState: STORAGE_STATE
+      }
+    },
+    {
       name: 'smtp',
       testMatch: 'SMTP/*.spec.ts',
+      dependencies: ['setup'],
+      use: {
+        ...devices['Desktop Chrome'],
+        // Use prepared auth state.
+        ignoreHTTPSErrors: true,
+        storageState: STORAGE_STATE
+      }
+    },
+    {
+      name: 'imagingSettingConfig',
+      testMatch: 'ImagingSettingConfig/*.spec.ts',
       dependencies: ['setup'],
       use: {
         ...devices['Desktop Chrome'],

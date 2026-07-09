@@ -3,17 +3,13 @@
     {
       "src": [
         {
-          "src": "../../src",
+          "src": "../../src/Umbraco.Cms/bin/Release",
           "files": [
-            "**/*.csproj"
+            "**/Umbraco.*.dll"
           ],
           "exclude": [
-            "**/obj/**",
-            "**/bin/**",
-            "**/Umbraco.Web.csproj",
-            "**/Umbraco.Web.UI.csproj",
-            "**/Umbraco.Cms.StaticAssets.csproj",
-            "**/JsonSchema.csproj"
+            "**/Umbraco.Cms.StaticAssets.dll",
+            "**/Umbraco.Cms.Targets.dll"
           ]
         }
       ],

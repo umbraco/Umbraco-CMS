@@ -42,22 +42,30 @@ export class UmbPickerSearchFieldElement extends UmbLitElement {
 		if (!this._isSearchable) return nothing;
 
 		return html`
-			<uui-input .value=${this._query} placeholder="Search..." @input=${this.#onInput}>
+			<uui-input
+				.value=${this._query}
+				label=${this.localize.term('general_search')}
+				placeholder=${this.localize.term('placeholders_search')}
+				@input=${this.#onInput}>
 				<div slot="prepend">
 					${this._searching
 						? html`<uui-loader-circle id="searching-indicator"></uui-loader-circle>`
-						: html`<uui-icon name="search"></uui-icon>`}
+						: html`<uui-icon name="search" aria-hidden="true"></uui-icon>`}
 				</div>
 
 				${this._query
 					? html`
-							<uui-button slot="append" type="button" @click=${() => this.#pickerContext?.search.clear()} compact>
+							<uui-button
+								label=${this.localize.term('general_clear')}
+								slot="append"
+								type="button"
+								@click=${() => this.#pickerContext?.search.clear()}
+								compact>
 								<uui-icon name="icon-delete"></uui-icon>
 							</uui-button>
 						`
 					: nothing}
 			</uui-input>
-			<div id="divider"></div>
 		`;
 	}
 
@@ -66,6 +74,7 @@ export class UmbPickerSearchFieldElement extends UmbLitElement {
 		css`
 			uui-input {
 				width: 100%;
+				margin-bottom: var(--uui-size-4);
 			}
 
 			uui-input [slot='prepend'] {
@@ -73,17 +82,8 @@ export class UmbPickerSearchFieldElement extends UmbLitElement {
 				align-items: center;
 			}
 
-			#divider {
-				width: 100%;
-				height: 1px;
-				background-color: var(--uui-color-divider);
-				margin-top: var(--uui-size-space-5);
-				margin-bottom: var(--uui-size-space-3);
-			}
-
 			#searching-indicator {
 				margin-left: 7px;
-				margin-top: 4px;
 			}
 		`,
 	];

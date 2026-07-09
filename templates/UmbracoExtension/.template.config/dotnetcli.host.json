@@ -1,11 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/dotnetcli.host.json",
   "symbolInfo": {
-    "Framework": {
-      "longName": "Framework",
-      "shortName": "F",
-      "isHidden": true
-    },
     "UmbracoVersion": {
       "longName": "version",
       "shortName": ""
@@ -25,6 +20,10 @@
     "SiteDomain": {
       "longName": "site-domain",
       "shortName": "sd"
+    },
+    "PackageManagement": {
+      "longName": "package-management",
+      "shortName": "pm"
     }
   }
 }

@@ -17,6 +17,7 @@ namespace Umbraco.Cms.Web.Website.Controllers;
 ///     Provides a base class for front-end add-in controllers.
 /// </summary>
 [AutoValidateAntiforgeryToken]
+[MaintenanceModeActionFilter]
 public abstract class SurfaceController : PluginController
 {
     /// <summary>

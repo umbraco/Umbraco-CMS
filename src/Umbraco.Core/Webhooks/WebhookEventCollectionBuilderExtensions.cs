@@ -64,9 +64,16 @@ public static class WebhookEventCollectionBuilderExtensions
     /// </summary>
     public sealed class WebhookEventCollectionBuilderCms
     {
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="WebhookEventCollectionBuilderCms" /> class.
+        /// </summary>
+        /// <param name="builder">The webhook event collection builder.</param>
         internal WebhookEventCollectionBuilderCms(WebhookEventCollectionBuilder builder)
             => Builder = builder;
 
+        /// <summary>
+        ///     Gets the underlying webhook event collection builder.
+        /// </summary>
         internal WebhookEventCollectionBuilder Builder { get; }
     }
 }

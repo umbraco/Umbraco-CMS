@@ -8,6 +8,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.HealthChecks.Checks.Security;
 
+/// <summary>
+///     Health check for the Umbraco application URL configuration.
+/// </summary>
 [HealthCheck(
     "6708CA45-E96E-40B8-A40A-0607C1CA7F28",
     "Application URL Configuration",
@@ -18,6 +21,11 @@ public class UmbracoApplicationUrlCheck : HealthCheck
     private readonly ILocalizedTextService _textService;
     private readonly IOptionsMonitor<WebRoutingSettings> _webRoutingSettings;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="UmbracoApplicationUrlCheck" /> class.
+    /// </summary>
+    /// <param name="textService">The localized text service.</param>
+    /// <param name="webRoutingSettings">The web routing settings monitor.</param>
     public UmbracoApplicationUrlCheck(
         ILocalizedTextService textService,
         IOptionsMonitor<WebRoutingSettings> webRoutingSettings)
@@ -26,42 +34,44 @@ public class UmbracoApplicationUrlCheck : HealthCheck
         _webRoutingSettings = webRoutingSettings;
     }
 
-    /// <summary>
-    ///     Executes the action and returns its status
-    /// </summary>
+    /// <inheritdoc />
     public override HealthCheckStatus ExecuteAction(HealthCheckAction action) =>
         throw new InvalidOperationException("UmbracoApplicationUrlCheck has no executable actions");
 
-    /// <summary>
-    ///     Get the status for this health check
-    /// </summary>
+    /// <inheritdoc />
     public override Task<IEnumerable<HealthCheckStatus>> GetStatusAsync() =>
         Task.FromResult(CheckUmbracoApplicationUrl().Yield());
 
     private HealthCheckStatus CheckUmbracoApplicationUrl()
     {
-        var url = _webRoutingSettings.CurrentValue.UmbracoApplicationUrl;
+        WebRoutingSettings settings = _webRoutingSettings.CurrentValue;
+        var url = settings.UmbracoApplicationUrl;
 
         string resultMessage;
         StatusResultType resultType;
-        var success = false;
 
-        if (url.IsNullOrWhiteSpace())
+        if (url.IsNullOrWhiteSpace() is false)
         {
-            resultMessage = _textService.Localize("healthcheck", "umbracoApplicationUrlCheckResultFalse");
-            resultType = StatusResultType.Warning;
+            resultMessage = _textService.Localize("healthcheck", "umbracoApplicationUrlCheckResultTrue", [url]);
+            resultType = StatusResultType.Success;
+        }
+        else if (settings.ApplicationUrlDetection == ApplicationUrlDetection.None)
+        {
+            // No explicit URL and auto-detection is disabled, so the application URL can never be established.
+            // Features that require an absolute URL (e.g. password reset and invitation emails) will not work.
+            resultMessage = _textService.Localize("healthcheck", "umbracoApplicationUrlCheckResultError");
+            resultType = StatusResultType.Error;
         }
         else
         {
-            resultMessage = _textService.Localize("healthcheck", "umbracoApplicationUrlCheckResultTrue", new[] { url });
-            resultType = StatusResultType.Success;
-            success = true;
+            resultMessage = _textService.Localize("healthcheck", "umbracoApplicationUrlCheckResultFalse");
+            resultType = StatusResultType.Warning;
         }
 
         return new HealthCheckStatus(resultMessage)
         {
             ResultType = resultType,
-            ReadMoreLink = success
+            ReadMoreLink = resultType == StatusResultType.Success
                 ? null
                 : Constants.HealthChecks.DocumentationLinks.Security.UmbracoApplicationUrlCheck,
         };

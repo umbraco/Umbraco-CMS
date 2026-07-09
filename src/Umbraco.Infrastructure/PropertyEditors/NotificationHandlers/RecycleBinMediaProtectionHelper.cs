@@ -1,5 +1,6 @@
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Infrastructure.PropertyEditors.NotificationHandlers;
 
@@ -26,5 +27,37 @@ internal static class RecycleBinMediaProtectionHelper
         IEnumerable<string> filePathsToRename = filePaths
             .Select(x => Path.ChangeExtension(x, Constants.Conventions.Media.TrashedMediaSuffix + Path.GetExtension(x)));
         mediaFileManager.RemoveSuffixFromMediaFiles(filePathsToRename, Constants.Conventions.Media.TrashedMediaSuffix);
+    }
+
+    /// <summary>
+    /// Deletes all media files, accounting for recycle bin protection (trashed files have .deleted suffix on disk).
+    /// </summary>
+    /// <param name="deletedMedia">Deleted media entities.</param>
+    /// <param name="containedFilePaths">Function to extract file paths from media entities.</param>
+    /// <param name="mediaFileManager">The media file manager.</param>
+    public static void DeleteContainedFilesWithProtection(
+        IEnumerable<IMedia> deletedMedia,
+        Func<IEnumerable<IMedia>, IEnumerable<string>> containedFilePaths,
+        MediaFileManager mediaFileManager)
+    {
+        // Typically all deleted media will have Trashed == true since they come from the recycle bin.
+        // However, media can be force-deleted programmatically bypassing the recycle bin, in which
+        // case the files won't have the .deleted suffix on disk. We handle both cases here.
+        var trashedMedia = deletedMedia.Where(m => m.Trashed).ToList();
+        var nonTrashedMedia = deletedMedia.Where(m => !m.Trashed).ToList();
+
+        // Delete trashed media files (with .deleted suffix on disk).
+        if (trashedMedia.Count > 0)
+        {
+            IEnumerable<string> trashedPaths = containedFilePaths(trashedMedia)
+                .Select(x => Path.ChangeExtension(x, Constants.Conventions.Media.TrashedMediaSuffix + Path.GetExtension(x)));
+            mediaFileManager.DeleteMediaFiles(trashedPaths);
+        }
+
+        // Delete non-trashed media files (original paths).
+        if (nonTrashedMedia.Count > 0)
+        {
+            mediaFileManager.DeleteMediaFiles(containedFilePaths(nonTrashedMedia));
+        }
     }
 }

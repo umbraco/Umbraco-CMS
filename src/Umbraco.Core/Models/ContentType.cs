@@ -12,6 +12,9 @@ namespace Umbraco.Cms.Core.Models;
 [DataContract(IsReference = true)]
 public class ContentType : ContentTypeCompositionBase, IContentType
 {
+    /// <summary>
+    ///     Constant indicating that content types support publishing.
+    /// </summary>
     public const bool SupportsPublishingConst = true;
 
     // Custom comparer for enumerable
@@ -68,6 +71,9 @@ public class ContentType : ContentTypeCompositionBase, IContentType
     /// <inheritdoc />
     public override ISimpleContentType ToSimple() => new SimpleContentType(this);
 
+    /// <summary>
+    ///     Gets or sets the identifier of the default template for this content type.
+    /// </summary>
     [DataMember]
     public int DefaultTemplateId
     {
@@ -96,6 +102,9 @@ public class ContentType : ContentTypeCompositionBase, IContentType
         }
     }
 
+    /// <summary>
+    ///     Gets or sets the history cleanup configuration for this content type.
+    /// </summary>
     public HistoryCleanup? HistoryCleanup
     {
         get => _historyCleanup;

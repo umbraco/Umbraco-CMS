@@ -339,7 +339,7 @@ export default {
 		enterFolderName: 'Bir klasör adı girin',
 		updateData: 'Bir tür ve başlık seçin',
 		noDocumentTypes:
-			"Burada içerik oluşturmak için izin verilen doküman türü yok. Bunları, <strong>İzinler</strong> altında <strong>İzin verilen alt düğüm türlerini</strong> düzenleyerek <strong>Ayarlar</strong> bölümündeki <strong>Belge Türleri</strong> 'nde etkinleştirmelisiniz.",
+			"Burada içerik oluşturmak için izin verilen doküman türü yok. Bunları, <strong>Yapı</strong> altında <strong>İzin verilen alt düğüm türlerini</strong> düzenleyerek <strong>Ayarlar</strong> bölümündeki <strong>Belge Türleri</strong> 'nde etkinleştirmelisiniz.",
 		noDocumentTypesAtRoot:
 			"Burada içerik oluşturmak için uygun bir belge türü yok. Öncelikle belge türlerini <strong>Ayarlar</strong> bölümündeki <strong>Belge Türleri</strong> 'nde oluşturmanız gerekiyor.",
 		noDocumentTypesWithNoSettingsAccess:
@@ -347,9 +347,9 @@ export default {
 		noDocumentTypesEditPermissions: 'Şu belge türü için izinleri düzenleyin',
 		noDocumentTypesCreateNew: 'Yeni bir belge türü oluşturun',
 		noDocumentTypesAllowedAtRoot:
-			"Burada içerik oluşturmak için izin verilen belge türü yok. Bunları, <strong>İzinler</strong> altında <strong>Kök olarak izin ver</strong> seçeneğini değiştirerek, <strong>Ayarlar</strong> bölümündeki <strong>Belge Türleri</strong> 'nde etkinleştirmeniz gerekir. ",
+			"Burada içerik oluşturmak için izin verilen belge türü yok. Bunları, <strong>Yapı</strong> altında <strong>Kök olarak izin ver</strong> seçeneğini değiştirerek, <strong>Ayarlar</strong> bölümündeki <strong>Belge Türleri</strong> 'nde etkinleştirmeniz gerekir. ",
 		noMediaTypes:
-			"Burada medya oluşturmak için izin verilen medya türü yok. Bunları, <strong>İzinler</strong> altında <strong>İzin verilen alt düğüm türlerini</strong> düzenleyerek <strong>Ayarlar</strong> bölümündeki <strong>Medya Türleri</strong> 'nde etkinleştirmelisiniz. .",
+			"Burada medya oluşturmak için izin verilen medya türü yok. Bunları, <strong>Yapı</strong> altında <strong>İzin verilen alt düğüm türlerini</strong> düzenleyerek <strong>Ayarlar</strong> bölümündeki <strong>Medya Türleri</strong> 'nde etkinleştirmelisiniz. .",
 		noMediaTypesWithNoSettingsAccess: 'Ağaçtaki seçili ortam, altında başka bir ortamın oluşturulmasına izin vermiyor.',
 		noMediaTypesEditPermissions: 'Şu medya türü için izinleri düzenleyin:',
 		documentTypeWithoutTemplate: 'Şablonsuz Belge Türü',
@@ -653,6 +653,7 @@ export default {
 		content: 'İçerik',
 		continue: 'Devam et',
 		copy: 'Kopyala',
+		copied: 'Kopyalandı!',
 		create: 'Oluştur',
 		cropSection: 'Bölümü kırp',
 		database: 'Veritabanı',
@@ -1093,8 +1094,8 @@ export default {
 	},
 	rollback: {
 		changes: 'Değişiklikler',
-		diffHelp:
-			'Bu, mevcut sürüm ile seçili sürüm arasındaki farkları gösterir <br /> <del> Kırmızı </del> metin seçili sürümde gösterilmeyecektir. , <ins> yeşil eklendi demektir </ins>',
+		diffHelp: '<del>Kırmızı metin</del> seçili sürümde kaldırılacak, <ins>yeşil metin</ins> eklenecektir.',
+		showDiff: 'Mevcut (taslak) sürüm ile seçili sürüm arasındaki farkları göster.',
 		documentRolledBack: 'Belge geri alındı ​​',
 		headline: 'Mevcut sürümle karşılaştırmak için bir sürüm seçin',
 		htmlHelp:
@@ -1375,8 +1376,16 @@ export default {
 		chooseChildNode: 'Alt düğümü seçin',
 		compositionsDescription:
 			'Mevcut bir belge türünden sekmeleri ve özellikleri devralın. Mevcut belge türüne yeni sekmeler eklenecek veya aynı ada sahip bir sekme varsa birleştirilecektir.',
+		compositionsDescriptionMediaType:
+			'Mevcut bir medya türünden sekmeleri ve özellikleri devralın. Mevcut medya türüne yeni sekmeler eklenecek veya aynı ada sahip bir sekme varsa birleştirilecektir.',
+		compositionsDescriptionMemberType:
+			'Mevcut bir üye türünden sekmeleri ve özellikleri devralın. Mevcut üye türüne yeni sekmeler eklenecek veya aynı ada sahip bir sekme varsa birleştirilecektir.',
 		compositionInUse: 'Bu içerik türü bir bestede kullanıldığından kendi başına oluşturulamaz.',
+		compositionInUseMediaType: 'Bu medya türü bir bestede kullanıldığından kendi başına oluşturulamaz.',
+		compositionInUseMemberType: 'Bu üye türü bir bestede kullanıldığından kendi başına oluşturulamaz.',
 		noAvailableCompositions: 'Beste olarak kullanılabilecek içerik türü yok.',
+		noAvailableCompositionsMediaType: 'Beste olarak kullanılabilecek medya türü yok.',
+		noAvailableCompositionsMemberType: 'Beste olarak kullanılabilecek üye türü yok.',
 		compositionRemoveWarning:
 			'Bir kompozisyonun kaldırılması, ilişkili tüm özellik verilerini silecektir. Belge türünü kaydettikten sonra geri dönüş yoktur.',
 		availableEditors: 'Yeni oluştur',
@@ -1411,6 +1420,8 @@ export default {
 		tabHasNoSortOrder: 'sekmesinde sıralama düzeni yok',
 		compositionUsageHeading: 'Bu beste nerede kullanılıyor?',
 		compositionUsageSpecification: 'Bu beste şu anda aşağıdaki içerik türlerinin oluşturulmasında kullanılmaktadır:',
+		compositionUsageSpecificationMediaType: 'Bu beste şu anda aşağıdaki medya türlerinin oluşturulmasında kullanılmaktadır:',
+		compositionUsageSpecificationMemberType: 'Bu beste şu anda aşağıdaki üye türlerinin oluşturulmasında kullanılmaktadır:',
 		cultureVariantHeading: 'Kültüre göre değişikliklere izin ver',
 		segmentVariantHeading: 'Segmentasyona izin ver',
 		cultureVariantLabel: 'Kültüre göre değişiklik yapın',
@@ -1568,6 +1579,7 @@ export default {
 		noLockouts: 'kilitlenmedi',
 		noPasswordChange: 'Şifre değiştirilmedi',
 		confirmNewPassword: 'Yeni şifreyi onaylayın',
+		confirmPassword: 'Şifreyi onayla',
 		changePasswordDescription:
 			"Aşağıdaki formu doldurarak ve 'Şifreyi Değiştir' düğmesini tıklayarak Umbraco Arka Ofisine erişim şifrenizi değiştirebilirsiniz",
 		contentChannel: 'İçerik Kanalı',
@@ -1737,6 +1749,8 @@ export default {
 	redirectUrls: {
 		disableUrlTracker: 'URL izleyiciyi devre dışı bırakın',
 		enableUrlTracker: 'URL izleyiciyi etkinleştir',
+		urlTrackerEnabled: 'Etkin',
+		urlTrackerDisabled: 'Devre Dışı',
 		originalUrl: 'Orijinal URL',
 		redirectedTo: 'Yönlendirildi',
 		redirectUrlManagement: 'URL Yönetimini Yeniden Yönlendir',
@@ -1811,7 +1825,8 @@ export default {
 		openBackofficeSearch: 'Arka ofis aramasını aç',
 		openCloseBackofficeHelp: 'Backoffice yardımını Aç / Kapat',
 		openCloseBackofficeProfileOptions: 'Profil seçeneklerinizi açın / kapatın',
-		profileOptions: 'Profil seçenekleri',
+		profileOptions: 'Kullanıcı profili %0% (%1%) için',
+		profileOptionsDefault: 'Kullanıcı profili',
 		assignDomainDescription: '%0% için Kurulum Kültürü ve Ana Bilgisayar Adları',
 		createDescription: '%0% altında yeni düğüm oluştur',
 		protectDescription: '%0% üzerinde genel erişim kurun',

@@ -12,13 +12,32 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Searcher;
 
+/// <summary>
+/// Controller responsible for handling search queries within the management API.
+/// </summary>
 [ApiVersion("1.0")]
 public class QuerySearcherController : SearcherControllerBase
 {
     private readonly IExamineManagerService _examineManagerService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="QuerySearcherController"/> class.
+    /// </summary>
+    /// <param name="examineManagerService">An instance of <see cref="IExamineManagerService"/> used to manage examine operations.</param>
     public QuerySearcherController(IExamineManagerService examineManagerService) => _examineManagerService = examineManagerService;
 
+    /// <summary>
+    /// Executes a search query against the specified searcher and returns a paged list of results.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="searcherName">The name of the searcher to query.</param>
+    /// <param name="term">The search term to query for. If null or whitespace, an empty result set is returned.</param>
+    /// <param name="skip">The number of results to skip for paging.</param>
+    /// <param name="take">The number of results to return for paging.</param>
+    /// <returns>
+    /// A task representing the asynchronous operation. The task result contains an <see cref="ActionResult{T}"/> with a <see cref="PagedViewModel{SearchResultResponseModel}"/> of search results.
+    /// Returns <c>NotFound</c> if the specified searcher does not exist, or <c>BadRequest</c> if the query cannot be parsed.
+    /// </returns>
     [Microsoft.AspNetCore.Mvc.HttpGet("{searcherName}/query")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<SearchResultResponseModel>), StatusCodes.Status200OK)]

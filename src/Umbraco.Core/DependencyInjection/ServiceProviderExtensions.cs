@@ -42,6 +42,11 @@ public static class ServiceProviderExtensions
     public static object CreateInstance(this IServiceProvider serviceProvider, Type type, params object[] args)
         => ActivatorUtilities.CreateInstance(serviceProvider, type, args);
 
+    /// <summary>
+    ///     Creates the default published model factory using types discovered by the type loader.
+    /// </summary>
+    /// <param name="factory">The service provider.</param>
+    /// <returns>A new <see cref="PublishedModelFactory"/> instance configured with discovered model types.</returns>
     [EditorBrowsable(EditorBrowsableState.Never)]
     public static PublishedModelFactory CreateDefaultPublishedModelFactory(this IServiceProvider factory)
     {

@@ -6,11 +6,26 @@ using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Persistence.Repositories;
 
+/// <summary>
+///     Represents a base repository for content type composition entities.
+/// </summary>
+/// <typeparam name="TItem">The type of content type composition.</typeparam>
 public interface IContentTypeRepositoryBase<TItem> : IReadWriteQueryRepository<int, TItem>, IReadRepository<Guid, TItem>
     where TItem : IContentTypeComposition
 {
+    /// <summary>
+    ///     Gets a content type by its alias.
+    /// </summary>
+    /// <param name="alias">The alias of the content type.</param>
+    /// <returns>The content type if found; otherwise, <c>null</c>.</returns>
     TItem? Get(string alias);
 
+    /// <summary>
+    ///     Moves a content type to a container.
+    /// </summary>
+    /// <param name="moving">The content type to move.</param>
+    /// <param name="container">The target container.</param>
+    /// <returns>A collection of move event information.</returns>
     IEnumerable<MoveEventInfo<TItem>> Move(TItem moving, EntityContainer container);
 
     /// <summary>
@@ -39,4 +54,12 @@ public interface IContentTypeRepositoryBase<TItem> : IReadWriteQueryRepository<i
     ///     Returns true or false depending on whether content nodes have been created based on the provided content type id.
     /// </summary>
     bool HasContentNodes(int id);
+
+    /// <summary>
+    ///     Gets the allowed parent keys for a child content type.
+    /// </summary>
+    /// <param name="key">The child content type.</param>
+    /// <returns>An IEnumerable of the allowed parent keys.</returns>
+    /// TODO (V18): Remove default implementation.
+    IEnumerable<Guid> GetAllowedParentKeys(Guid key) => [];
 }

@@ -262,6 +262,7 @@ export default {
 		constrainProportions: 'שמור על פרופורציות',
 		continue: 'המשך',
 		copy: 'העתק',
+		copied: 'הועתק!',
 		create: 'צור',
 		database: 'בסיס נתונים',
 		date: 'תאריך',
@@ -538,8 +539,8 @@ export default {
 		removeLink: 'הסר קישור',
 	},
 	rollback: {
-		diffHelp:
-			'להלן ההבדלים בין הגירסא הנוכחית לבין הגרסא שנבחרה. <br />טקסט <del>אדום</del> לא יוצג בגרסא שנבחרה, טקסט <ins>ירוק</ins> מייצט טקסט שנוסף.',
+		diffHelp: '<del>טקסט אדום</del> יוסר בגרסה הנבחרת, <ins>טקסט ירוק</ins> יתווסף.',
+		showDiff: 'הצג הבדלים בין הגרסה הנוכחית (טיוטה) לבין הגרסה הנבחרת.',
 		documentRolledBack: 'המסמך שוחזר בהצלחה',
 		htmlHelp: 'להלן הגרסא שנבחרה כHTML, אם הינך לצפות בשינויים בין שתי הגרסאות בו זמנית, בחר ב diff',
 		rollbackTo: 'חזור לאחור אל',
@@ -761,6 +762,8 @@ export default {
 		categoryField: 'שדה קטגוריה',
 		changePassword: 'שנה את הסיסמה שלך',
 		changePasswordDescription: "בעמוד זה ניתן לשנות את הסיסמה שלך ולאחר מכן ללחוץ על הכפתור 'שנה סיסמה'\t למטה",
+		confirmNewPassword: 'אשר סיסמה חדשה',
+		confirmPassword: 'אשר סיסמה',
 		contentChannel: 'ערוץ תוכן',
 		descriptionField: 'שדה תיאור',
 		disabled: 'נטרל משתמש',

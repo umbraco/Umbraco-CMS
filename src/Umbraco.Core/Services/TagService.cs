@@ -18,6 +18,13 @@ public class TagService : RepositoryService, ITagService
 {
     private readonly ITagRepository _tagRepository;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="TagService" /> class.
+    /// </summary>
+    /// <param name="provider">The scope provider for unit of work operations.</param>
+    /// <param name="loggerFactory">The logger factory for creating loggers.</param>
+    /// <param name="eventMessagesFactory">The factory for creating event messages.</param>
+    /// <param name="tagRepository">The repository for tag data access.</param>
     public TagService(ICoreScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory, ITagRepository tagRepository)
         : base(provider, loggerFactory, eventMessagesFactory) =>
         _tagRepository = tagRepository;
@@ -103,6 +110,12 @@ public class TagService : RepositoryService, ITagService
         }
     }
 
+    /// <summary>
+    ///     Gets all tags asynchronously, optionally filtered by group and culture.
+    /// </summary>
+    /// <param name="group">The optional tag group to filter by.</param>
+    /// <param name="culture">The optional culture to filter by.</param>
+    /// <returns>A task that represents the asynchronous operation containing the tags.</returns>
     public Task<IEnumerable<ITag>> GetAllAsync(string? group = null, string? culture = null)
     {
         if (culture == string.Empty)
@@ -113,6 +126,13 @@ public class TagService : RepositoryService, ITagService
         return Task.FromResult(GetAllTags(group, culture));
     }
 
+    /// <summary>
+    ///     Gets tags matching the specified query text, optionally filtered by group and culture.
+    /// </summary>
+    /// <param name="query">The text to search for in tag names.</param>
+    /// <param name="group">The optional tag group to filter by.</param>
+    /// <param name="culture">The optional culture to filter by.</param>
+    /// <returns>A task that represents the asynchronous operation containing the matching tags.</returns>
     public async Task<IEnumerable<ITag>> GetByQueryAsync(string query, string? group = null, string? culture = null) => (await GetAllAsync(group, culture)).Where(x => x.Text.InvariantContains(query));
 
     /// <inheritdoc />

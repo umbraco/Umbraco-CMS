@@ -7,22 +7,33 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 
 [TableName(TableName)]
-[PrimaryKey("key", AutoIncrement = false)]
+[PrimaryKey(PrimaryKeyColumnName, AutoIncrement = false)]
 [ExplicitColumns]
 internal sealed class KeyValueDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.KeyValue;
+    public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.PrimaryKeyNameKey;
 
-    [Column("key")]
+    /// <summary>
+    /// Gets or sets the unique key for this key-value pair.
+    /// This value serves as the identifier and is limited to 256 characters.
+    /// </summary>
+    [Column(PrimaryKeyColumnName)]
     [Length(256)]
     [PrimaryKeyColumn(AutoIncrement = false, Clustered = true)]
     public string Key { get; set; } = null!;
 
+    /// <summary>
+    /// Gets or sets the value associated with the key.
+    /// </summary>
     [Column("value")]
     [SpecialDbType(SpecialDbTypes.NVARCHARMAX)]
     [NullSetting(NullSetting = NullSettings.Null)]
     public string? Value { get; set; }
 
+    /// <summary>
+    /// Gets or sets the date and time when the key value was last updated.
+    /// </summary>
     [Column("updated")]
     [Constraint(Default = SystemMethods.CurrentUTCDateTime)]
     public DateTime UpdateDate { get; set; }

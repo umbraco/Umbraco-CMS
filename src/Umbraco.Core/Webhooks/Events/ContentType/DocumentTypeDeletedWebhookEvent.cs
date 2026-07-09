@@ -7,9 +7,19 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Webhooks.Events;
 
+/// <summary>
+/// Webhook event that fires when a document type is deleted.
+/// </summary>
 [WebhookEvent("Document Type Deleted")]
 public class DocumentTypeDeletedWebhookEvent : WebhookEventBase<ContentTypeDeletedNotification>
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DocumentTypeDeletedWebhookEvent"/> class.
+    /// </summary>
+    /// <param name="webhookFiringService">The webhook firing service.</param>
+    /// <param name="webHookService">The webhook service.</param>
+    /// <param name="webhookSettings">The webhook settings.</param>
+    /// <param name="serverRoleAccessor">The server role accessor.</param>
     public DocumentTypeDeletedWebhookEvent(
         IWebhookFiringService webhookFiringService,
         IWebhookService webHookService,
@@ -19,8 +29,10 @@ public class DocumentTypeDeletedWebhookEvent : WebhookEventBase<ContentTypeDelet
     {
     }
 
+    /// <inheritdoc />
     public override string Alias => Constants.WebhookEvents.Aliases.DocumentTypeDeleted;
 
+    /// <inheritdoc />
     public override object ConvertNotificationToRequestPayload(ContentTypeDeletedNotification notification)
         => notification.DeletedEntities.Select(entity => new DefaultPayloadModel { Id = entity.Key });
 }

@@ -1,5 +1,8 @@
-﻿namespace Umbraco.Cms.Core.Models.ServerEvents;
+namespace Umbraco.Cms.Core.Models.ServerEvents;
 
+/// <summary>
+///     Represents the result of server event authorization, indicating which event sources the user can and cannot access.
+/// </summary>
 public class SeverEventAuthorizationResult
 {
     /// <summary>

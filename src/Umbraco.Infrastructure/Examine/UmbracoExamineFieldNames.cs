@@ -2,6 +2,9 @@ using Examine;
 
 namespace Umbraco.Cms.Infrastructure.Examine;
 
+/// <summary>
+/// Provides constant field names used by Umbraco for indexing and searching content with Examine.
+/// </summary>
 public static class UmbracoExamineFieldNames
 {
     /// <summary>
@@ -60,5 +63,10 @@ public static class UmbracoExamineFieldNames
         ///     The allowed members and member roles (for protected content)
         /// </summary>
         public const string ProtectedAccess = "protectedAccess";
+
+        /// <summary>
+        ///     The content key (GUID), used as the unique entity identifier for this index
+        /// </summary>
+        public const string ItemId = "itemId";
     }
 }

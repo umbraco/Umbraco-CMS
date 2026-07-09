@@ -6,9 +6,19 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Webhooks.Events;
 
+/// <summary>
+/// Legacy webhook event that fires when a user successfully logs in, using the legacy payload format.
+/// </summary>
 [WebhookEvent("User Login Success")]
 public class LegacyUserLoginSuccessWebhookEvent : WebhookEventBase<UserLoginSuccessNotification>
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="LegacyUserLoginSuccessWebhookEvent"/> class.
+    /// </summary>
+    /// <param name="webhookFiringService">The webhook firing service.</param>
+    /// <param name="webHookService">The webhook service.</param>
+    /// <param name="webhookSettings">The webhook settings.</param>
+    /// <param name="serverRoleAccessor">The server role accessor.</param>
     public LegacyUserLoginSuccessWebhookEvent(
         IWebhookFiringService webhookFiringService,
         IWebhookService webHookService,
@@ -18,5 +28,6 @@ public class LegacyUserLoginSuccessWebhookEvent : WebhookEventBase<UserLoginSucc
     {
     }
 
+    /// <inheritdoc />
     public override string Alias => Constants.WebhookEvents.Aliases.UserLoginSuccess;
 }

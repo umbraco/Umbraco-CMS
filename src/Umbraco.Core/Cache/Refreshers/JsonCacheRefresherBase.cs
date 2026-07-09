@@ -24,6 +24,9 @@ public abstract class JsonCacheRefresherBase<TNotification, TJsonPayload> : Cach
         : base(appCaches, eventAggregator, factory) =>
         JsonSerializer = jsonSerializer;
 
+    /// <summary>
+    ///     Gets the JSON serializer.
+    /// </summary>
     protected IJsonSerializer JsonSerializer { get; }
 
     /// <summary>
@@ -47,6 +50,11 @@ public abstract class JsonCacheRefresherBase<TNotification, TJsonPayload> : Cach
     /// <returns>The deserialized object payload.</returns>
     public TJsonPayload[]? Deserialize(string json) => JsonSerializer.Deserialize<TJsonPayload[]>(json);
 
+    /// <summary>
+    ///     Serializes the specified payloads to a JSON string.
+    /// </summary>
+    /// <param name="jsonPayloads">The payloads to serialize.</param>
+    /// <returns>The JSON string representation of the payloads.</returns>
     public string Serialize(params TJsonPayload[] jsonPayloads) => JsonSerializer.Serialize(jsonPayloads);
 
     #endregion

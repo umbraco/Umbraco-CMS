@@ -1,6 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System.Text.Json.Nodes;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Serialization;
@@ -14,7 +15,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 [DataEditor(
     Constants.PropertyEditors.Aliases.Label,
     ValueEditorIsReusable = true)]
-public class LabelPropertyEditor : DataEditor
+public class LabelPropertyEditor : DataEditor, IValueSchemaProvider
 {
     private readonly IIOHelper _ioHelper;
 
@@ -29,6 +30,17 @@ public class LabelPropertyEditor : DataEditor
     }
 
     /// <inheritdoc />
+    public Type? GetValueType(object? configuration) => typeof(string);
+
+    /// <inheritdoc />
+    public JsonObject? GetValueSchema(object? configuration) => new()
+    {
+        ["$schema"] = "https://json-schema.org/draft/2020-12/schema",
+        ["type"] = new JsonArray("string", "null"),
+        ["description"] = "Read-only value, any value provided will be ignored",
+    };
+
+    /// <inheritdoc />
     protected override IDataValueEditor CreateValueEditor() =>
         DataValueEditorFactory.Create<LabelPropertyValueEditor>(Attribute!);
 
@@ -36,9 +48,18 @@ public class LabelPropertyEditor : DataEditor
     protected override IConfigurationEditor CreateConfigurationEditor() =>
         new LabelConfigurationEditor(_ioHelper);
 
-    // provides the property value editor
+    /// <summary>
+    /// Provides the property value editor for label properties.
+    /// </summary>
     internal sealed class LabelPropertyValueEditor : DataValueEditor
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="LabelPropertyValueEditor"/> class.
+        /// </summary>
+        /// <param name="shortStringHelper">The short string helper.</param>
+        /// <param name="jsonSerializer">The JSON serializer.</param>
+        /// <param name="ioHelper">The IO helper.</param>
+        /// <param name="attribute">The data editor attribute.</param>
         public LabelPropertyValueEditor(
             IShortStringHelper shortStringHelper,
             IJsonSerializer jsonSerializer,

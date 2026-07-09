@@ -6,6 +6,10 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories;
 
+/// <summary>
+/// Defines additional repository operations for entities beyond those provided by the base <see cref="IEntityRepository"/>.
+/// Typically used for advanced or extended entity data access scenarios.
+/// </summary>
 public interface IEntityRepositoryExtended : IEntityRepository
 {
     /// <summary>

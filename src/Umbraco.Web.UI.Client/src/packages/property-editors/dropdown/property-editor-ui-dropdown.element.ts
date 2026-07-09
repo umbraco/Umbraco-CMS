@@ -27,6 +27,9 @@ export class UmbPropertyEditorUIDropdownElement
 	private _multiple: boolean = false;
 
 	@state()
+	private _placeholder?: string;
+
+	@state()
 	private _options: Array<Option & { invalid?: boolean }> = [];
 
 	@property({ type: Array })
@@ -90,6 +93,7 @@ export class UmbPropertyEditorUIDropdownElement
 		}
 
 		this._multiple = config.getValueByAlias<boolean>('multiple') ?? false;
+		this._placeholder = config.getValueByAlias<string>('placeholder');
 	}
 
 	protected override firstUpdated() {
@@ -155,7 +159,12 @@ export class UmbPropertyEditorUIDropdownElement
 		}
 
 		return html`
-			<select id="native" multiple ?required=${this.mandatory} @change=${this.#onChangeMultiple}>
+			<select
+				id="native"
+				aria-label="${this.name ?? this.localize.term('general_choose')}"
+				multiple
+				?required=${this.mandatory}
+				@change=${this.#onChangeMultiple}>
 				${map(
 					this._options,
 					(item) => html`<option value=${item.value} ?selected=${item.selected}>${item.name}</option>`,
@@ -169,6 +178,7 @@ export class UmbPropertyEditorUIDropdownElement
 			<umb-input-dropdown-list
 				.name=${this.name}
 				.options=${this._options}
+				.placeholder=${this._placeholder}
 				.required=${this.mandatory}
 				.requiredMessage=${this.mandatoryMessage}
 				?readonly=${this.readonly}

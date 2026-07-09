@@ -48,7 +48,8 @@ export class UmbBackofficeHeaderLogoElement extends UmbLitElement {
 			<uui-popover-container id="logo-popover" placement="bottom-start">
 				<umb-popover-layout>
 					<div id="modal">
-						<umb-app-logo id="logo" logo-type="logo"></umb-app-logo>
+						<img id="logo" src="/umbraco/backoffice/assets/umbraco-logo.svg" alt="Umbraco" loading="lazy" />
+
 						<span>${this._version ?? nothing}</span>
 
 						<a href="https://umbraco.com" target="_blank" rel="noopener">Umbraco.com</a>
@@ -90,10 +91,8 @@ export class UmbBackofficeHeaderLogoElement extends UmbLitElement {
 
 			#logo {
 				display: var(--umb-logo-display, block);
-				> img {
-					width: var(--umb-logo-width, auto);
-					height: var(--umb-logo-height, 55px);
-				}
+				width: var(--umb-logo-width, auto);
+				height: var(--umb-logo-height, 55px);
 			}
 
 			#modal {

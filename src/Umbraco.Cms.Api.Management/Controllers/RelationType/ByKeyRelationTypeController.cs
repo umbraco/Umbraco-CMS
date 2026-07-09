@@ -8,12 +8,20 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.RelationType;
 
+/// <summary>
+/// Controller for managing relation types by their unique key.
+/// </summary>
 [ApiVersion("1.0")]
 public class ByKeyRelationTypeController : RelationTypeControllerBase
 {
     private readonly IRelationService _relationService;
     private readonly IUmbracoMapper _mapper;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ByKeyRelationTypeController"/> class, which manages relation types by their unique key.
+    /// </summary>
+    /// <param name="relationService">The service used to manage relations.</param>
+    /// <param name="mapper">The mapper used for mapping Umbraco objects.</param>
     public ByKeyRelationTypeController(IRelationService relationService, IUmbracoMapper mapper)
     {
         _relationService = relationService;
@@ -24,6 +32,8 @@ public class ByKeyRelationTypeController : RelationTypeControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(RelationTypeResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Gets a relation type.")]
+    [EndpointDescription("Gets a relation type identified by the provided Id.")]
     public Task<IActionResult> ByKey(CancellationToken cancellationToken, Guid id)
     {
         IRelationType? relationType = _relationService.GetRelationTypeById(id);

@@ -12,6 +12,7 @@ import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import type { UmbRepositoryItemsStatus } from '@umbraco-cms/backoffice/repository';
 
 import '@umbraco-cms/backoffice/entity-item';
+import { UUIBlinkAnimationValue } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-input-document-type')
 export class UmbInputDocumentTypeElement extends UmbFormControlMixin<string | undefined, typeof UmbLitElement>(
@@ -53,6 +54,7 @@ export class UmbInputDocumentTypeElement extends UmbFormControlMixin<string | un
 	/**
 	 * This is a minimum amount of selected items in this input.
 	 * @type {number}
+	 * @attr
 	 * @default
 	 */
 	@property({ type: Number })
@@ -65,15 +67,17 @@ export class UmbInputDocumentTypeElement extends UmbFormControlMixin<string | un
 
 	/**
 	 * Min validation message.
-	 * @type {boolean}
+	 * @type {string}
+	 * @attr
 	 * @default
 	 */
 	@property({ type: String, attribute: 'min-message' })
-	minMessage = 'This field need more items';
+	minMessage = 'This field needs more items';
 
 	/**
 	 * This is a maximum amount of selected items in this input.
 	 * @type {number}
+	 * @attr
 	 * @default
 	 */
 	@property({ type: Number })
@@ -86,10 +90,11 @@ export class UmbInputDocumentTypeElement extends UmbFormControlMixin<string | un
 
 	/**
 	 * Max validation message.
-	 * @type {boolean}
+	 * @type {string}
+	 * @attr
 	 * @default
 	 */
-	@property({ type: String, attribute: 'min-message' })
+	@property({ type: String, attribute: 'max-message' })
 	maxMessage = 'This field exceeds the allowed amount of items';
 
 	@property({ type: Array })
@@ -164,9 +169,9 @@ export class UmbInputDocumentTypeElement extends UmbFormControlMixin<string | un
 			return (x: UmbDocumentTypeTreeItemModel) => !x.isFolder && x.isElement === false;
 		}
 		if (this.elementTypesOnly) {
-			return (x: UmbDocumentTypeTreeItemModel) => x.isElement;
+			return (x: UmbDocumentTypeTreeItemModel) => !x.isFolder && x.isElement;
 		}
-		return undefined;
+		return (x: UmbDocumentTypeTreeItemModel) => !x.isFolder;
 	}
 
 	#openPicker() {
@@ -280,6 +285,43 @@ export class UmbInputDocumentTypeElement extends UmbFormControlMixin<string | un
 		css`
 			#btn-add {
 				width: 100%;
+			}
+
+			uui-ref-node-document-type::after {
+				content: '';
+				position: absolute;
+				z-index: 1;
+				pointer-events: none;
+				inset: 0;
+				border: 1px solid transparent;
+				border-radius: var(--uui-border-radius);
+
+				transition: border-color 240ms ease-in;
+			}
+
+			uui-ref-node-document-type[drag-placeholder] {
+				--uui-color-focus: transparent;
+				color: transparent;
+			}
+
+			uui-ref-node-document-type[drag-placeholder]::after {
+				display: block;
+				border-width: 2px;
+				border-color: var(--uui-color-interactive-emphasis);
+				animation: ${UUIBlinkAnimationValue};
+			}
+			uui-ref-node-document-type[drag-placeholder]::before {
+				content: '';
+				position: absolute;
+				pointer-events: none;
+				inset: 0;
+				border-radius: var(--uui-border-radius);
+				background-color: var(--uui-color-interactive-emphasis);
+				opacity: 0.12;
+			}
+			uui-ref-node-document-type[drag-placeholder] > * {
+				transition: opacity 50ms 16ms;
+				opacity: 0;
 			}
 		`,
 	];

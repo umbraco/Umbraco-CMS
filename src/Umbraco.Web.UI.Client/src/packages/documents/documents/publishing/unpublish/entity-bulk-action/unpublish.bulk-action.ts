@@ -1,10 +1,15 @@
-import { UmbUnpublishDocumentEntityAction } from '../entity-action/index.js';
+import { UmbDocumentUnpublishManifestEntityActionMeta } from '../entity-action/constants.js';
+import { UMB_DOCUMENT_ENTITY_TYPE } from '../../../constants.js';
 import type { UmbDocumentVariantOptionModel } from '../../../types.js';
-import { UMB_DOCUMENT_ENTITY_TYPE, UMB_DOCUMENT_UNPUBLISH_MODAL } from '../../../constants.js';
 import { UmbDocumentPublishingRepository } from '../../repository/index.js';
+import { UmbDocumentPublishEntityBulkAction } from '../../publish/entity-bulk-action/publish.bulk-action.js';
+import { UmbDocumentItemRepository } from '../../../item/repository/index.js';
+import { UMB_CONTENT_UNPUBLISH_MODAL, UmbContentUnpublishEntityAction } from '@umbraco-cms/backoffice/content';
+import { html, nothing } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';
 import { umbConfirmModal, umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UmbEntityBulkActionBase } from '@umbraco-cms/backoffice/entity-bulk-action';
-import { UMB_APP_LANGUAGE_CONTEXT, UmbLanguageCollectionRepository } from '@umbraco-cms/backoffice/language';
+import { UmbLanguageCollectionRepository } from '@umbraco-cms/backoffice/language';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import { UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
@@ -15,143 +20,150 @@ import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 export class UmbDocumentUnpublishEntityBulkAction extends UmbEntityBulkActionBase<object> {
 	async execute() {
 		const entityContext = await this.getContext(UMB_ENTITY_CONTEXT);
-		if (!entityContext) {
-			throw new Error('Entity context not found');
-		}
+		if (!entityContext) throw new Error('Entity context not found');
+
 		const entityType = entityContext.getEntityType();
 		const unique = entityContext.getUnique();
-
-		const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
-		const localize = new UmbLocalizationController(this);
-
 		if (!entityType) throw new Error('Entity type not found');
 		if (unique === undefined) throw new Error('Entity unique not found');
 
 		// If there is only one selection, we can refer to the regular unpublish entity action:
 		if (this.selection.length === 1) {
-			const action = new UmbUnpublishDocumentEntityAction(this._host, {
-				unique: this.selection[0],
-				entityType: UMB_DOCUMENT_ENTITY_TYPE,
-				meta: {} as never,
-			});
-			await action.execute();
-			return;
+			return this.#unpublishSingleSelection();
 		}
 
+		return this.#unpublishMultipleSelections(entityType, unique);
+	}
+
+	async #unpublishSingleSelection(): Promise<void> {
+		const action = new UmbContentUnpublishEntityAction(this._host, {
+			unique: this.selection[0],
+			entityType: UMB_DOCUMENT_ENTITY_TYPE,
+			meta: UmbDocumentUnpublishManifestEntityActionMeta,
+		});
+		await action.execute();
+	}
+
+	async #unpublishMultipleSelections(entityType: string, unique: string | null): Promise<void> {
+		// Fetch document items and languages in parallel
+		const itemRepository = new UmbDocumentItemRepository(this._host);
 		const languageRepository = new UmbLanguageCollectionRepository(this._host);
-		const { data: languageData } = await languageRepository.requestCollection({});
 
-		const options: UmbDocumentVariantOptionModel[] = (languageData?.items ?? []).map((language) => ({
-			language,
-			variant: {
-				name: language.name,
-				culture: language.unique,
-				state: null,
-				createDate: null,
-				publishDate: null,
-				updateDate: null,
-				segment: null,
-				scheduledPublishDate: null,
-				scheduledUnpublishDate: null,
-				flags: [],
-			},
-			unique: new UmbVariantId(language.unique, null).toString(),
-			culture: language.unique,
-			segment: null,
-		}));
+		const [{ data: documentItems }, { data: languageData }] = await Promise.all([
+			itemRepository.requestItems(this.selection),
+			languageRepository.requestAllItems(),
+		]);
 
-		const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
-		if (!eventContext) {
-			throw new Error('Event context not found');
+		if (!documentItems?.length) return;
+
+		const { allInvariant, options } = UmbDocumentPublishEntityBulkAction.buildVariantOptions(
+			documentItems,
+			languageData?.items ?? [],
+		);
+
+		// If there is only one language available, or all selected documents are invariant, we can skip the modal and unpublish directly:
+		if (options.length === 1 || allInvariant) {
+			return this.#unpublishSingleVariant(entityType, unique, options, allInvariant);
 		}
-		const event = new UmbRequestReloadChildrenOfEntityEvent({
-			entityType,
-			unique,
+
+		return this.#unpublishSelectedVariants(entityType, unique, options);
+	}
+
+	async #unpublishSingleVariant(
+		entityType: string,
+		unique: string | null,
+		options: Array<UmbDocumentVariantOptionModel>,
+		allInvariant: boolean,
+	): Promise<void> {
+		const confirm = await umbConfirmModal(this, {
+			headline: '#actions_unpublish',
+			content: '#prompt_confirmListViewUnpublish',
+			color: 'warning',
+			confirmLabel: '#actions_unpublish',
+		}).catch(() => false);
+
+		if (confirm === false) return;
+
+		// For invariant documents, use null culture; otherwise use the first language
+		const variantId = allInvariant
+			? UmbVariantId.CreateInvariant()
+			: new UmbVariantId(options[0].language.unique, null);
+
+		const documentCnt = await this.#unpublishDocuments(this.selection, [variantId]);
+
+		const localize = new UmbLocalizationController(this);
+		const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
+		notificationContext?.peek('positive', {
+			data: {
+				headline: localize.term('speechBubbles_contentUnpublished'),
+				message: localize.term('speechBubbles_editMultiContentUnpublishedText', documentCnt),
+			},
 		});
 
-		// If there is only one language available, we can skip the modal and unpublish directly:
-		if (options.length === 1) {
-			const localizationController = new UmbLocalizationController(this._host);
-			const confirm = await umbConfirmModal(this, {
-				headline: localizationController.term('actions_unpublish'),
-				content: localizationController.term('prompt_confirmListViewUnpublish'),
-				color: 'warning',
-				confirmLabel: localizationController.term('actions_unpublish'),
-			}).catch(() => false);
+		await this.#reloadChildren(entityType, unique);
+	}
 
-			if (confirm !== false) {
-				const variantId = new UmbVariantId(options[0].language.unique, null);
-				const publishingRepository = new UmbDocumentPublishingRepository(this._host);
-				let documentCnt = 0;
+	async #unpublishSelectedVariants(
+		entityType: string,
+		unique: string | null,
+		options: Array<UmbDocumentVariantOptionModel>,
+	): Promise<void> {
+		// Pre-select all cultures from the selected documents
+		const selection: Array<string> = options.map((o) => o.unique);
 
-				for (let i = 0; i < this.selection.length; i++) {
-					const id = this.selection[i];
-					const { error } = await publishingRepository.unpublish(id, [variantId]);
-
-					if (!error) {
-						documentCnt++;
-					}
-				}
-
-				notificationContext?.peek('positive', {
-					data: {
-						headline: localize.term('speechBubbles_contentUnpublished'),
-						message: localize.term('speechBubbles_editMultiContentUnpublishedText', documentCnt),
-					},
-				});
-
-				eventContext.dispatchEvent(event);
-			}
-			return;
-		}
-
-		// Figure out the default selections
-		// TODO: Missing features to pre-select the variant that fits with the variant-id of the tree/collection? (Again only relevant if the action is executed from a Tree or Collection) [NL]
-		const selection: Array<string> = [];
-		const context = await this.getContext(UMB_APP_LANGUAGE_CONTEXT);
-		if (!context) throw new Error('App language context not found');
-		const appCulture = context.getAppCulture();
-		// If the app language is one of the options, select it by default:
-		if (appCulture && options.some((o) => o.unique === appCulture)) {
-			selection.push(new UmbVariantId(appCulture, null).toString());
-		}
-
-		const result = await umbOpenModal(this, UMB_DOCUMENT_UNPUBLISH_MODAL, {
+		const result = await umbOpenModal(this, UMB_CONTENT_UNPUBLISH_MODAL, {
 			data: {
 				options,
+				renderAdditionalLabel: UmbDocumentUnpublishEntityBulkAction.#renderDocumentCountLabel,
 			},
 			value: { selection },
 		}).catch(() => undefined);
 
-		if (!result?.selection.length) return;
-
 		const variantIds = result?.selection.map((x) => UmbVariantId.FromString(x)) ?? [];
+		if (!variantIds.length) return;
 
+		const documentCnt = await this.#unpublishDocuments(this.selection, variantIds);
+
+		const localize = new UmbLocalizationController(this);
+		const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
+		notificationContext?.peek('positive', {
+			data: {
+				headline: localize.term('speechBubbles_contentUnpublished'),
+				message: localize.term(
+					'speechBubbles_editMultiVariantUnpublishedText',
+					documentCnt,
+					localize.list(variantIds.map((v) => v.culture ?? '')),
+				),
+			},
+		});
+
+		await this.#reloadChildren(entityType, unique);
+	}
+
+	static #renderDocumentCountLabel(option: UmbEntityVariantOptionModel) {
+		const documentCount = (option as UmbDocumentVariantOptionModel).documentCount;
+		return documentCount !== undefined
+			? html`<div class="label-status">
+					<umb-localize key="general_documentCount" .args=${[documentCount]}> ${documentCount} documents </umb-localize>
+				</div>`
+			: nothing;
+	}
+
+	async #unpublishDocuments(uniques: Array<string>, variantIds: Array<UmbVariantId>): Promise<number> {
 		const repository = new UmbDocumentPublishingRepository(this._host);
-
-		if (variantIds.length) {
-			let documentCnt = 0;
-			for (const unique of this.selection) {
-				const { error } = await repository.unpublish(unique, variantIds);
-
-				if (!error) {
-					documentCnt++;
-				}
-			}
-
-			notificationContext?.peek('positive', {
-				data: {
-					headline: localize.term('speechBubbles_contentUnpublished'),
-					message: localize.term(
-						'speechBubbles_editMultiVariantUnpublishedText',
-						documentCnt,
-						localize.list(variantIds.map((v) => v.culture ?? '')),
-					),
-				},
-			});
-
-			eventContext.dispatchEvent(event);
+		let successCount = 0;
+		for (const unique of uniques) {
+			const { error } = await repository.unpublish(unique, variantIds);
+			if (!error) successCount++;
 		}
+		return successCount;
+	}
+
+	async #reloadChildren(entityType: string, unique: string | null): Promise<void> {
+		const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+		if (!eventContext) return;
+		const event = new UmbRequestReloadChildrenOfEntityEvent({ entityType, unique });
+		eventContext.dispatchEvent(event);
 	}
 }
 

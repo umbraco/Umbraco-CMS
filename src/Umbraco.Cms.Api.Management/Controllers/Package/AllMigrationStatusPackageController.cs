@@ -13,24 +13,43 @@ using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Package;
 
+/// <summary>
+/// Controller for retrieving the migration status of all packages.
+/// </summary>
 [ApiVersion("1.0")]
 public class AllMigrationStatusPackageController : PackageControllerBase
 {
     private readonly IPackagingService _packagingService;
     private readonly IPackagePresentationFactory _packagePresentationFactory;
 
-    [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in V18.")]
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AllMigrationStatusPackageController"/> class, responsible for handling migration status operations for packages.
+    /// </summary>
+    /// <param name="packagingService">The service used to manage package-related operations and migrations.</param>
+    /// <param name="umbracoMapper">The mapper used to convert between Umbraco domain models and API models.</param>
+    [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in Umbraco 18.")]
     public AllMigrationStatusPackageController(IPackagingService packagingService, IUmbracoMapper umbracoMapper)
         : this(packagingService, StaticServiceProvider.Instance.GetRequiredService<IPackagePresentationFactory>())
     {
     }
 
-    [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in V18.")]
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AllMigrationStatusPackageController"/> class.
+    /// </summary>
+    /// <param name="packagingService">Service used for managing package operations and migrations.</param>
+    /// <param name="umbracoMapper">The mapper used to map between Umbraco domain and API models.</param>
+    /// <param name="packagePresentationFactory">Factory for creating package presentation models.</param>
+    [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in Umbraco 18.")]
     public AllMigrationStatusPackageController(IPackagingService packagingService, IUmbracoMapper umbracoMapper, IPackagePresentationFactory packagePresentationFactory)
         : this(packagingService, packagePresentationFactory)
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AllMigrationStatusPackageController"/> class, which handles migration status operations for packages.
+    /// </summary>
+    /// <param name="packagingService">Service used for package-related operations.</param>
+    /// <param name="packagePresentationFactory">Factory for creating package presentation models.</param>
     [ActivatorUtilitiesConstructor]
     public AllMigrationStatusPackageController(IPackagingService packagingService, IPackagePresentationFactory packagePresentationFactory)
     {
@@ -48,6 +67,8 @@ public class AllMigrationStatusPackageController : PackageControllerBase
     [HttpGet("migration-status")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<PackageMigrationStatusResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets all package migration statuses.")]
+    [EndpointDescription("Gets a paginated collection of migration status for all installed packages.")]
     public async Task<ActionResult<PagedViewModel<PackageMigrationStatusResponseModel>>> AllMigrationStatuses(
         CancellationToken cancellationToken,
         int skip = 0,

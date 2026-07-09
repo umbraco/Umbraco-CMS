@@ -3,13 +3,23 @@ import type { UmbScriptCreateOptionsModalData } from './types.js';
 import { html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbCreateFolderEntityAction } from '@umbraco-cms/backoffice/tree';
+import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 
+/** @deprecated Use the `Umb.EntityAction.Script.Create` entity action with `entityCreateOptionAction` extensions instead. Scheduled for removal in Umbraco 19. */
 @customElement('umb-script-create-options-modal')
 export class UmbScriptCreateOptionsModalElement extends UmbModalBaseElement<UmbScriptCreateOptionsModalData, string> {
 	#createFolderAction?: UmbCreateFolderEntityAction;
 
 	override connectedCallback(): void {
 		super.connectedCallback();
+
+		new UmbDeprecation({
+			deprecated: 'UMB_SCRIPT_CREATE_OPTIONS_MODAL and its associated modal element are deprecated.',
+			removeInVersion: '19.0.0',
+			solution:
+				'Use the Umb.EntityAction.Script.Create entity action with entityCreateOptionAction extensions instead.',
+		}).warn();
+
 		if (!this.data?.parent) throw new Error('A parent is required to create a folder');
 
 		this.#createFolderAction = new UmbCreateFolderEntityAction(this, {

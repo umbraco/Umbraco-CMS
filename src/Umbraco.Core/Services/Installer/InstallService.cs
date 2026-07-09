@@ -1,16 +1,30 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Installer;
 using Umbraco.Cms.Core.Models.Installer;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services.Installer;
 
+/// <summary>
+/// Provides functionality for performing a fresh installation of Umbraco CMS.
+/// </summary>
+/// <remarks>
+/// This service orchestrates the installation process by executing all registered install steps
+/// in the <see cref="NewInstallStepCollection"/>. It validates that the runtime is in the correct
+/// state before proceeding with installation.
+/// </remarks>
 public class InstallService : IInstallService
 {
     private readonly ILogger<InstallService> _logger;
     private readonly NewInstallStepCollection _installSteps;
     private readonly IRuntimeState _runtimeState;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="InstallService"/> class.
+    /// </summary>
+    /// <param name="logger">The logger for recording installation progress and errors.</param>
+    /// <param name="installSteps">The collection of installation steps to execute.</param>
+    /// <param name="runtimeState">The runtime state used to verify the system is ready for installation.</param>
     public InstallService(
         ILogger<InstallService> logger,
         NewInstallStepCollection installSteps,

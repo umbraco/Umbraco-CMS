@@ -10,10 +10,17 @@ namespace Umbraco.Cms.Core.Notifications;
 /// </summary>
 public class RelationDeletedNotification : DeletedNotification<IRelation>
 {
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="RelationDeletedNotification"/> class
+    ///     with a single relation.
+    /// </summary>
+    /// <param name="target">The relation that was deleted.</param>
+    /// <param name="messages">The event messages collection.</param>
     public RelationDeletedNotification(IRelation target, EventMessages messages)
         : base(target, messages)
     {
     }
+
     /// <summary>
     /// Initializes a new instance of the <see cref="RelationDeletedNotification"/>.
     /// </summary>
@@ -27,4 +34,11 @@ public class RelationDeletedNotification : DeletedNotification<IRelation>
         : base(target, messages)
     {
     }
+
+    /// <summary>
+    ///     Gets or sets a value indicating whether the relations were deleted automatically
+    ///     as a side-effect of content being saved (e.g. umbMedia, umbDocument, umbMember),
+    ///     rather than explicitly via <see cref="Services.IRelationService"/>.
+    /// </summary>
+    public bool IsAutomatic { get; set; }
 }

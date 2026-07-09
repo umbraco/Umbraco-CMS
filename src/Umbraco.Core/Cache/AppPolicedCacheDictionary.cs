@@ -1,5 +1,4 @@
 using System.Collections.Concurrent;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Cache;
 
@@ -24,6 +23,7 @@ public abstract class AppPolicedCacheDictionary<TKey> : IDisposable
     /// <param name="cacheFactory"></param>
     protected AppPolicedCacheDictionary(Func<TKey, IAppPolicyCache> cacheFactory) => _cacheFactory = cacheFactory;
 
+    /// <inheritdoc />
     public void Dispose() =>
 
         // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
@@ -33,7 +33,7 @@ public abstract class AppPolicedCacheDictionary<TKey> : IDisposable
     ///     Gets or creates a cache.
     /// </summary>
     public IAppPolicyCache GetOrCreate(TKey key)
-        => _caches.GetOrAdd(key, k => _cacheFactory(k));
+        => _caches.GetOrAdd(key, _cacheFactory);
 
     /// <summary>
     ///     Removes a cache.
@@ -75,6 +75,10 @@ public abstract class AppPolicedCacheDictionary<TKey> : IDisposable
         }
     }
 
+    /// <summary>
+    ///     Releases unmanaged and - optionally - managed resources.
+    /// </summary>
+    /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
     protected virtual void Dispose(bool disposing)
     {
         if (!_disposedValue)

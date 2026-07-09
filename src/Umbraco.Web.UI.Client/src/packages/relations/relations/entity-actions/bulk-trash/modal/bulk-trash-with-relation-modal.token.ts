@@ -4,6 +4,7 @@ export interface UmbBulkTrashWithRelationConfirmModalData {
 	uniques: Array<string>;
 	itemRepositoryAlias: string;
 	referenceRepositoryAlias: string;
+	disableDeleteWhenReferenced?: boolean;
 }
 
 export type UmbBulkTrashWithRelationConfirmModalValue = undefined;

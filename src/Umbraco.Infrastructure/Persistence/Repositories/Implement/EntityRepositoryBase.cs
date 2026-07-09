@@ -27,8 +27,13 @@ public abstract class EntityRepositoryBase<TId, TEntity> : RepositoryBase, IRead
     private IQuery<TEntity>? _hasIdQuery;
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="EntityRepositoryBase{TId, TEntity}" /> class.
+    /// Initializes a new instance of the <see cref="EntityRepositoryBase{TId, TEntity}" /> class.
     /// </summary>
+    /// <param name="scopeAccessor">The scope accessor.</param>
+    /// <param name="appCaches">The application caches.</param>
+    /// <param name="logger">The logger.</param>
+    /// <param name="repositoryCacheVersionService">The repository cache version service.</param>
+    /// <param name="cacheSyncService">The cache synchronization service.</param>
     protected EntityRepositoryBase(
         IScopeAccessor scopeAccessor,
         AppCaches appCaches,
@@ -56,9 +61,13 @@ public abstract class EntityRepositoryBase<TId, TEntity> : RepositoryBase, IRead
     {
     }
 
+// TODO (V18): Make these fields into read-only properties.
+
+#pragma warning disable IDE1006 // Naming Styles
     protected readonly IRepositoryCacheVersionService RepositoryCacheVersionService;
 
     protected readonly ICacheSyncService CacheSyncService;
+#pragma warning restore IDE1006 // Naming Styles
 
     /// <summary>
     ///     Gets the logger
@@ -151,14 +160,17 @@ public abstract class EntityRepositoryBase<TId, TEntity> : RepositoryBase, IRead
     }
 
     /// <summary>
-    ///     Deletes the passed in entity
+    /// Deletes the specified entity.
     /// </summary>
+    /// <param name="entity">The entity to delete.</param>
     public virtual void Delete(TEntity entity)
         => CachePolicy.Delete(entity, PersistDeletedItem);
 
     /// <summary>
     ///     Gets an entity by the passed in Id utilizing the repository's cache policy
     /// </summary>
+    /// <param name="id">The Id of the entity to get.</param>
+    /// <returns>The entity matching the specified Id, or null if not found.</returns>
     public TEntity? Get(TId? id)
         => CachePolicy.Get(id, PerformGet, PerformGetAll);
 
@@ -173,11 +185,11 @@ public abstract class EntityRepositoryBase<TId, TEntity> : RepositoryBase, IRead
             // don't query by anything that is a default of T (like a zero)
             // TODO: I think we should enabled this in case accidental calls are made to get all with invalid ids
             // .Where(x => Equals(x, default(TId)) == false)
-            .ToArray();
+            .ToArray() ?? [];
 
         // can't query more than 2000 ids at a time... but if someone is really querying 2000+ entities,
         // the additional overhead of fetching them in groups is minimal compared to the lookup time of each group
-        if (ids?.Length <= Constants.Sql.MaxParameterCount)
+        if (ids.Length <= Constants.Sql.MaxParameterCount)
         {
             return CachePolicy.GetAll(ids, PerformGetAll);
         }
@@ -193,8 +205,10 @@ public abstract class EntityRepositoryBase<TId, TEntity> : RepositoryBase, IRead
     }
 
     /// <summary>
-    ///     Gets a list of entities by the passed in query
+    /// Retrieves a collection of entities that satisfy the specified query criteria.
     /// </summary>
+    /// <param name="query">The query used to filter and select entities.</param>
+    /// <returns>An enumerable collection of entities matching the query.</returns>
     public IEnumerable<TEntity> Get(IQuery<TEntity> query) =>
 
         // ensure we don't include any null refs in the returned collection!
@@ -208,8 +222,10 @@ public abstract class EntityRepositoryBase<TId, TEntity> : RepositoryBase, IRead
         => CachePolicy.Exists(id, PerformExists, PerformGetAll);
 
     /// <summary>
-    ///     Returns an integer with the count of entities found with the passed in query
+    /// Returns the number of entities that match the specified query.
     /// </summary>
+    /// <param name="query">The query used to filter entities to count. If null, all entities are counted.</param>
+    /// <returns>The count of entities matching the query.</returns>
     public int Count(IQuery<TEntity>? query)
         => PerformCount(query);
 
@@ -228,8 +244,7 @@ public abstract class EntityRepositoryBase<TId, TEntity> : RepositoryBase, IRead
             ScopeAccessor,
             DefaultOptions,
             RepositoryCacheVersionService,
-            CacheSyncService
-            );
+            CacheSyncService);
 
     protected abstract TEntity? PerformGet(TId? id);
 

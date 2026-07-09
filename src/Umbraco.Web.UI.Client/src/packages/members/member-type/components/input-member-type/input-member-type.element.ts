@@ -4,6 +4,7 @@ import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbRepositoryItemsStatus } from '@umbraco-cms/backoffice/repository';
+import type { UmbTreeItemModel } from '@umbraco-cms/backoffice/tree';
 import type { UmbUniqueItemModel } from '@umbraco-cms/backoffice/models';
 
 import '@umbraco-cms/backoffice/entity-item';
@@ -28,12 +29,12 @@ export class UmbInputMemberTypeElement extends UmbFormControlMixin<string | unde
 
 	/**
 	 * Min validation message.
-	 * @type {boolean}
+	 * @type {string}
 	 * @attr
 	 * @default
 	 */
 	@property({ type: String, attribute: 'min-message' })
-	minMessage = 'This field need more items';
+	minMessage = 'This field needs more items';
 
 	/**
 	 * This is a maximum amount of selected items in this input.
@@ -51,11 +52,11 @@ export class UmbInputMemberTypeElement extends UmbFormControlMixin<string | unde
 
 	/**
 	 * Max validation message.
-	 * @type {boolean}
+	 * @type {string}
 	 * @attr
 	 * @default
 	 */
-	@property({ type: String, attribute: 'min-message' })
+	@property({ type: String, attribute: 'max-message' })
 	maxMessage = 'This field exceeds the allowed amount of items';
 
 	public set selection(ids: Array<string>) {
@@ -105,9 +106,14 @@ export class UmbInputMemberTypeElement extends UmbFormControlMixin<string | unde
 		return undefined;
 	}
 
+	#getPickableFilter() {
+		return (x: UmbTreeItemModel) => !x.isFolder;
+	}
+
 	#openPicker() {
 		this.#pickerContext.openPicker({
 			hideTreeRoot: true,
+			pickableFilter: this.#getPickableFilter(),
 		});
 	}
 

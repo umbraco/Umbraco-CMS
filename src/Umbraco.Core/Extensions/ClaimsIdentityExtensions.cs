@@ -13,6 +13,9 @@ using Umbraco.Cms.Core.Security;
 
 namespace Umbraco.Extensions;
 
+/// <summary>
+/// Provides extension methods for <see cref="ClaimsIdentity"/> and <see cref="IIdentity"/>.
+/// </summary>
 public static class ClaimsIdentityExtensions
 {
     private static string? _authenticationType;
@@ -37,6 +40,12 @@ public static class ClaimsIdentityExtensions
         ClaimTypes.Locality, Constants.Security.SecurityStampClaimType,
     };
 
+    /// <summary>
+    /// Gets the user ID from the identity, converted to the specified type.
+    /// </summary>
+    /// <typeparam name="T">The type to convert the user ID to.</typeparam>
+    /// <param name="identity">The identity.</param>
+    /// <returns>The user ID converted to the specified type, or the default value if not found or conversion fails.</returns>
     public static T? GetUserId<T>(this IIdentity identity)
     {
         var strId = identity.GetUserId();
@@ -119,6 +128,12 @@ public static class ClaimsIdentityExtensions
         return username;
     }
 
+    /// <summary>
+    /// Gets the email address from the identity.
+    /// </summary>
+    /// <param name="identity">The identity.</param>
+    /// <returns>The email address if found; otherwise, null.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when identity is null.</exception>
     public static string? GetEmail(this IIdentity identity)
     {
         if (identity == null)
@@ -344,7 +359,7 @@ public static class ClaimsIdentityExtensions
     /// </summary>
     /// <param name="identity"></param>
     /// <returns>Array of start content nodes</returns>
-    [Obsolete("Please use the UserExtensions class to access user start node info. Will be removed in V15.")]
+    [Obsolete("Please use the UserExtensions class to access user start node info. Scheduled for removal in Umbraco 18.")]
     public static int[] GetStartContentNodes(this ClaimsIdentity identity) =>
         identity.FindAll(x => x.Type == Constants.Security.StartContentNodeIdClaimType)
             .Select(node => int.TryParse(node.Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var i)
@@ -357,7 +372,7 @@ public static class ClaimsIdentityExtensions
     /// </summary>
     /// <param name="identity"></param>
     /// <returns>Array of start media nodes</returns>
-    [Obsolete("Please use the UserExtensions class to access user start node info. Will be removed in V15.")]
+    [Obsolete("Please use the UserExtensions class to access user start node info. Scheduled for removal in Umbraco 18.")]
     public static int[] GetStartMediaNodes(this ClaimsIdentity identity) =>
         identity.FindAll(x => x.Type == Constants.Security.StartMediaNodeIdClaimType)
             .Select(node => int.TryParse(node.Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var i)
@@ -370,7 +385,7 @@ public static class ClaimsIdentityExtensions
     /// </summary>
     /// <param name="identity"></param>
     /// <returns></returns>
-    [Obsolete("Please use IUser.AllowedSections instead. Will be removed in V15.")]
+    [Obsolete("Please use IUser.AllowedSections instead. Scheduled for removal in Umbraco 18.")]
     public static string[] GetAllowedApplications(this ClaimsIdentity identity) => identity
         .FindAll(x => x.Type == Constants.Security.AllowedApplicationsClaimType).Select(app => app.Value).ToArray();
 

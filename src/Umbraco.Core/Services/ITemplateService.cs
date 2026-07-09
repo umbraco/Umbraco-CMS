@@ -1,8 +1,11 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <summary>
+/// Provides methods for managing templates (views) used for rendering content.
+/// </summary>
 public interface ITemplateService : IService
 {
     /// <summary>
@@ -68,7 +71,7 @@ public interface ITemplateService : IService
     /// <returns>
     ///     The template created
     /// </returns>
-    [Obsolete("Use the overload that includes name and alias parameters instead. Scheduled for removal in v19.")]
+    [Obsolete("Use the overload that includes name and alias parameters instead. Scheduled for removal in Umbraco 19.")]
     Task<Attempt<ITemplate, TemplateOperationStatus>> CreateForContentTypeAsync(
         string contentTypeAlias,
         string? contentTypeName,

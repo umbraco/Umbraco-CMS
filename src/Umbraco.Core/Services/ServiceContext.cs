@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Services;
+namespace Umbraco.Cms.Core.Services;
 
 /// <summary>
 ///     Represents the Umbraco Service context, which provides access to all services.
@@ -34,8 +34,35 @@ public class ServiceContext
     private readonly Lazy<IWebhookService>? _webhookService;
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="ServiceContext" /> class with lazy services.
+    /// Initializes a new instance of the <see cref="ServiceContext" /> class with lazy services.
     /// </summary>
+    /// <param name="publicAccessService">The public access service.</param>
+    /// <param name="domainService">The domain service.</param>
+    /// <param name="auditService">The audit service.</param>
+    /// <param name="localizedTextService">The localized text service.</param>
+    /// <param name="tagService">The tag service.</param>
+    /// <param name="contentService">The content service.</param>
+    /// <param name="userService">The user service.</param>
+    /// <param name="memberService">The member service.</param>
+    /// <param name="mediaService">The media service.</param>
+    /// <param name="contentTypeService">The content type service.</param>
+    /// <param name="mediaTypeService">The media type service.</param>
+    /// <param name="dataTypeService">The data type service.</param>
+    /// <param name="fileService">The file service.</param>
+    /// <param name="localizationService">The localization service.</param>
+    /// <param name="packagingService">The packaging service.</param>
+    /// <param name="serverRegistrationService">The server registration service.</param>
+    /// <param name="entityService">The entity service.</param>
+    /// <param name="relationService">The relation service.</param>
+    /// <param name="memberTypeService">The member type service.</param>
+    /// <param name="memberGroupService">The member group service.</param>
+    /// <param name="notificationService">The notification service.</param>
+    /// <param name="externalLoginService">The external login service.</param>
+    /// <param name="redirectUrlService">The redirect URL service.</param>
+    /// <param name="consentService">The consent service.</param>
+    /// <param name="keyValueService">The key-value service.</param>
+    /// <param name="contentTypeBaseServiceProvider">The content type base service provider.</param>
+    /// <param name="webhookService">The webhook service.</param>
     public ServiceContext(
         Lazy<IPublicAccessService>? publicAccessService,
         Lazy<IDomainService>? domainService,
@@ -230,10 +257,38 @@ public class ServiceContext
     public IWebhookService? WebhookService => _webhookService?.Value;
 
     /// <summary>
-    ///     Creates a partial service context with only some services (for tests).
+    /// Creates a partial service context with only some services (for tests).
     /// </summary>
+    /// <param name="contentService">The content service.</param>
+    /// <param name="mediaService">The media service.</param>
+    /// <param name="contentTypeService">The content type service.</param>
+    /// <param name="mediaTypeService">The media type service.</param>
+    /// <param name="dataTypeService">The data type service.</param>
+    /// <param name="fileService">The file service.</param>
+    /// <param name="localizationService">The localization service.</param>
+    /// <param name="packagingService">The packaging service.</param>
+    /// <param name="entityService">The entity service.</param>
+    /// <param name="relationService">The relation service.</param>
+    /// <param name="memberGroupService">The member group service.</param>
+    /// <param name="memberTypeService">The member type service.</param>
+    /// <param name="memberService">The member service.</param>
+    /// <param name="userService">The user service.</param>
+    /// <param name="tagService">The tag service.</param>
+    /// <param name="notificationService">The notification service.</param>
+    /// <param name="localizedTextService">The localized text service.</param>
+    /// <param name="auditService">The audit service.</param>
+    /// <param name="domainService">The domain service.</param>
+    /// <param name="publicAccessService">The public access service.</param>
+    /// <param name="externalLoginService">The external login service.</param>
+    /// <param name="serverRegistrationService">The server registration service.</param>
+    /// <param name="redirectUrlService">The redirect URL service.</param>
+    /// <param name="consentService">The consent service.</param>
+    /// <param name="keyValueService">The key-value service.</param>
+    /// <param name="contentTypeBaseServiceProvider">The content type base service provider.</param>
+    /// <param name="webhookService">The webhook service.</param>
+    /// <returns>A new <see cref="ServiceContext"/> instance with the specified services.</returns>
     /// <remarks>
-    ///     <para>Using a true constructor for this confuses DI containers.</para>
+    /// <para>Using a true constructor for this confuses DI containers.</para>
     /// </remarks>
     public static ServiceContext CreatePartial(
         IContentService? contentService = null,
@@ -296,7 +351,6 @@ public class ServiceContext
             Lazy(consentService),
             Lazy(keyValueService),
             Lazy(contentTypeBaseServiceProvider),
-            Lazy(webhookService)
-            );
+            Lazy(webhookService));
     }
 }

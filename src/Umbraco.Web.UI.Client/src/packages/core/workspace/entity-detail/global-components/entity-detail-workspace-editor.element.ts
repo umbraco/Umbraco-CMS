@@ -1,6 +1,8 @@
 import { UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT } from '../entity-detail-workspace.context-token.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { css, customElement, html, ifDefined, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import { UmbEntityDeletedEvent } from '@umbraco-cms/backoffice/entity-action';
 
 @customElement('umb-entity-detail-workspace-editor')
 export class UmbEntityDetailWorkspaceEditorElement extends UmbLitElement {
@@ -23,6 +25,8 @@ export class UmbEntityDetailWorkspaceEditorElement extends UmbLitElement {
 	private _isNew? = false;
 
 	#context?: typeof UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT.TYPE;
+	#eventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
+	#unique?: string | null;
 
 	constructor() {
 		super();
@@ -34,8 +38,34 @@ export class UmbEntityDetailWorkspaceEditorElement extends UmbLitElement {
 			this.observe(this.#context?.forbidden.isOn, (isForbidden) => (this._isForbidden = isForbidden ?? false));
 			this.observe(this.#context?.data, (data) => (this._exists = !!data));
 			this.observe(this.#context?.isNew, (isNew) => (this._isNew = isNew));
+			this.observe(this.#context?.unique, (unique) => (this.#unique = unique));
+		});
+
+		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (context) => {
+			this.#eventContext?.removeEventListener(
+				UmbEntityDeletedEvent.TYPE,
+				this.#onEntityDeletedEvent as unknown as EventListener,
+			);
+			this.#eventContext = context;
+			this.#eventContext?.addEventListener(
+				UmbEntityDeletedEvent.TYPE,
+				this.#onEntityDeletedEvent as unknown as EventListener,
+			);
 		});
 	}
+
+	#onEntityDeletedEvent = (event: UmbEntityDeletedEvent) => {
+		// Ignore events if we don't have a unique identifier (e.g., new unsaved entity)
+		if (!this.#unique) return;
+
+		if (event.getEntityType() !== this._entityType) return;
+		if (event.getUnique() !== this.#unique) return;
+
+		// Navigate to the back path when the entity is deleted
+		if (this.backPath) {
+			history.pushState({}, '', this.backPath);
+		}
+	};
 
 	#renderForbidden() {
 		if (!this._isLoading && this._isForbidden) {
@@ -75,6 +105,14 @@ export class UmbEntityDetailWorkspaceEditorElement extends UmbLitElement {
 		return html`<umb-workspace-entity-action-menu
 			slot="action-menu"
 			data-mark="workspace:action-menu"></umb-workspace-entity-action-menu>`;
+	}
+
+	override destroy(): void {
+		this.#eventContext?.removeEventListener(
+			UmbEntityDeletedEvent.TYPE,
+			this.#onEntityDeletedEvent as unknown as EventListener,
+		);
+		super.destroy();
 	}
 
 	static override styles = [

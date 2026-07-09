@@ -1,7 +1,8 @@
+import type { DelayConditionConfig } from './delay.condition.js';
 import type { SwitchConditionConfig } from './switch.condition.js';
 import type { UmbConditionConfigBase } from '@umbraco-cms/backoffice/extension-api';
 
-export type UmbCoreConditionConfigs = SwitchConditionConfig | UmbConditionConfigBase;
+export type UmbCoreConditionConfigs = DelayConditionConfig | SwitchConditionConfig | UmbConditionConfigBase;
 
 type UnionOfProperties<T> = T extends object ? T[keyof T] : never;
 

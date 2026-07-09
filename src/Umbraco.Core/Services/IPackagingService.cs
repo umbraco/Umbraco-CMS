@@ -7,6 +7,9 @@ using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <summary>
+///     Provides operations for installing, exporting, and managing Umbraco packages.
+/// </summary>
 public interface IPackagingService : IService
 {
     /// <summary>
@@ -23,6 +26,12 @@ public interface IPackagingService : IService
     /// <param name="userId"></param>
     InstallationSummary InstallCompiledPackageData(FileInfo packageXmlFile, int userId = Constants.Security.SuperUserId);
 
+    /// <summary>
+    ///     Installs the data, entities, objects contained in an umbraco package XML document.
+    /// </summary>
+    /// <param name="packageXml">The package XML document.</param>
+    /// <param name="userId">The user identifier performing the installation.</param>
+    /// <returns>An <see cref="InstallationSummary"/> containing the results of the installation.</returns>
     InstallationSummary InstallCompiledPackageData(XDocument? packageXml, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
@@ -36,6 +45,11 @@ public interface IPackagingService : IService
     /// </summary>
     Task<PagedModel<InstalledPackage>> GetInstalledPackagesFromMigrationPlansAsync(int skip, int take);
 
+    /// <summary>
+    ///     Gets an installed package by its name.
+    /// </summary>
+    /// <param name="packageName">The name of the package.</param>
+    /// <returns>The <see cref="InstalledPackage"/> if found; otherwise, <c>null</c>.</returns>
     InstalledPackage? GetInstalledPackageByName(string packageName);
 
     /// <summary>

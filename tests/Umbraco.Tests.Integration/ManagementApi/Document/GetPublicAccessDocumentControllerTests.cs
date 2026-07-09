@@ -29,7 +29,7 @@ public class GetPublicAccessDocumentControllerTests : ManagementApiUserGroupTest
     private Guid _contentErrorPageKey;
 
     [SetUp]
-    public async Task Setup()
+    public new async Task Setup()
     {
         // Template
         var template = TemplateBuilder.CreateTextPageTemplate(Guid.NewGuid().ToString());
@@ -92,7 +92,7 @@ public class GetPublicAccessDocumentControllerTests : ManagementApiUserGroupTest
     }
 
     protected override Expression<Func<GetPublicAccessDocumentController, object>> MethodSelector =>
-        x => x.GetPublicAccess(CancellationToken.None, _contentDefaultPageKey);
+        x => x.GetPublicAccess(CancellationToken.None, _contentDefaultPageKey, true);
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {

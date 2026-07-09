@@ -6,9 +6,19 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Webhooks.Events;
 
+/// <summary>
+/// Webhook event that fires when a member type is changed.
+/// </summary>
 [WebhookEvent("Member Type Changed")]
 public class MemberTypeChangedWebhookEvent : WebhookEventBase<MemberTypeChangedNotification>
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MemberTypeChangedWebhookEvent"/> class.
+    /// </summary>
+    /// <param name="webhookFiringService">The webhook firing service.</param>
+    /// <param name="webHookService">The webhook service.</param>
+    /// <param name="webhookSettings">The webhook settings.</param>
+    /// <param name="serverRoleAccessor">The server role accessor.</param>
     public MemberTypeChangedWebhookEvent(
         IWebhookFiringService webhookFiringService,
         IWebhookService webHookService,
@@ -18,8 +28,10 @@ public class MemberTypeChangedWebhookEvent : WebhookEventBase<MemberTypeChangedN
     {
     }
 
+    /// <inheritdoc />
     public override string Alias => Constants.WebhookEvents.Aliases.MemberTypeChanged;
 
+    /// <inheritdoc />
     public override object ConvertNotificationToRequestPayload(MemberTypeChangedNotification notification)
         => notification.Changes.Select(contentTypeChange => new
         {

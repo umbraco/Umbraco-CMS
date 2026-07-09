@@ -2,6 +2,9 @@ using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Persistence.Repositories;
 
+/// <summary>
+///     Represents a repository for <see cref="ITag" /> entities.
+/// </summary>
 public interface ITagRepository : IReadWriteQueryRepository<int, ITag>
 {
     #region Assign and Remove Tags
@@ -61,7 +64,13 @@ public interface ITagRepository : IReadWriteQueryRepository<int, ITag>
     /// </summary>
     TaggedEntity? GetTaggedEntityById(int id);
 
-    /// Gets all entities of a type, tagged with any tag in the specified group.
+    /// <summary>
+    ///     Gets all entities of a type, tagged with any tag in the specified group.
+    /// </summary>
+    /// <param name="objectType">The type of tagged entities.</param>
+    /// <param name="group">The tag group.</param>
+    /// <param name="culture">The optional culture.</param>
+    /// <returns>A collection of tagged entities.</returns>
     IEnumerable<TaggedEntity> GetTaggedEntitiesByTagGroup(TaggableObjectTypes objectType, string group, string? culture = null);
 
     /// <summary>

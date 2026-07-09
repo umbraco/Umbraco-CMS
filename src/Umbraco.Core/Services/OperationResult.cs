@@ -18,6 +18,12 @@ namespace Umbraco.Cms.Core.Services;
 public class OperationResult<TResultType>
     where TResultType : struct
 {
+    /// <summary>
+    ///     Static constructor that validates the type parameter constraints.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">
+    ///     Thrown when <typeparamref name="TResultType"/> is not an enum or its underlying type is not <see cref="byte"/>.
+    /// </exception>
     static OperationResult()
     {
         // ensure that TResultType is an enum and the underlying type is byte
@@ -37,6 +43,8 @@ public class OperationResult<TResultType>
     /// <summary>
     ///     Initializes a new instance of the <see cref="OperationResult{TResultType}" /> class.
     /// </summary>
+    /// <param name="result">The result status of the operation.</param>
+    /// <param name="eventMessages">The event messages produced by the operation, or <c>null</c> if none.</param>
     public OperationResult(TResultType result, EventMessages? eventMessages)
     {
         Result = result;
@@ -116,14 +124,31 @@ public class OperationResult : OperationResult<OperationResultType>
     {
     }
 
+    /// <summary>
+    ///     Creates a successful operation result.
+    /// </summary>
+    /// <param name="eventMessages">The event messages produced by the operation.</param>
+    /// <returns>A new <see cref="OperationResult"/> instance indicating success.</returns>
     public static OperationResult Succeed(EventMessages eventMessages) =>
         new OperationResult(OperationResultType.Success, eventMessages);
 
+    /// <summary>
+    ///     Creates a cancelled operation result.
+    /// </summary>
+    /// <param name="eventMessages">The event messages produced by the operation.</param>
+    /// <returns>A new <see cref="OperationResult"/> instance indicating the operation was cancelled by an event.</returns>
     public static OperationResult Cancel(EventMessages eventMessages) =>
         new OperationResult(OperationResultType.FailedCancelledByEvent, eventMessages);
 
     // TODO: this exists to support services that still return Attempt<OperationResult>
     // these services should directly return an OperationResult, and then this static class should be deleted
+    /// <summary>
+    ///     Provides factory methods for creating <see cref="Attempt{TResult}"/> instances wrapping <see cref="OperationResult"/> objects.
+    /// </summary>
+    /// <remarks>
+    ///     This static class exists to support services that still return <c>Attempt&lt;OperationResult&gt;</c>.
+    ///     These services should directly return an <see cref="OperationResult"/>, and then this static class should be deleted.
+    /// </remarks>
     public static class Attempt
     {
         /// <summary>
@@ -134,20 +159,49 @@ public class OperationResult : OperationResult<OperationResultType>
         public static Attempt<OperationResult?> Succeed(EventMessages eventMessages) =>
             Core.Attempt.Succeed(new OperationResult(OperationResultType.Success, eventMessages));
 
+        /// <summary>
+        ///     Creates a successful operation attempt with a typed value.
+        /// </summary>
+        /// <typeparam name="TValue">The type of the entity value.</typeparam>
+        /// <param name="eventMessages">The event messages produced by the operation.</param>
+        /// <returns>A new attempt instance indicating success.</returns>
         public static Attempt<OperationResult<OperationResultType, TValue>?>
             Succeed<TValue>(EventMessages eventMessages) => Core.Attempt.Succeed(
             new OperationResult<OperationResultType, TValue>(OperationResultType.Success, eventMessages));
 
+        /// <summary>
+        ///     Creates a successful operation attempt with a typed value and entity.
+        /// </summary>
+        /// <typeparam name="TValue">The type of the entity value.</typeparam>
+        /// <param name="eventMessages">The event messages produced by the operation.</param>
+        /// <param name="value">The entity value associated with the operation.</param>
+        /// <returns>A new attempt instance indicating success.</returns>
         public static Attempt<OperationResult<OperationResultType, TValue>?>
             Succeed<TValue>(EventMessages eventMessages, TValue value) => Core.Attempt.Succeed(
             new OperationResult<OperationResultType, TValue>(OperationResultType.Success, eventMessages, value));
 
+        /// <summary>
+        ///     Creates a successful operation attempt with a custom status type.
+        /// </summary>
+        /// <typeparam name="TStatusType">The type of the status enumeration.</typeparam>
+        /// <param name="statusType">The status type indicating the operation result.</param>
+        /// <param name="eventMessages">The event messages produced by the operation.</param>
+        /// <returns>A new attempt instance indicating success.</returns>
         public static Attempt<OperationResult<TStatusType>?> Succeed<TStatusType>(
             TStatusType statusType,
             EventMessages eventMessages)
             where TStatusType : struct =>
             Core.Attempt.Succeed(new OperationResult<TStatusType>(statusType, eventMessages));
 
+        /// <summary>
+        ///     Creates a successful operation attempt with a custom status type and entity value.
+        /// </summary>
+        /// <typeparam name="TStatusType">The type of the status enumeration.</typeparam>
+        /// <typeparam name="TValue">The type of the entity value.</typeparam>
+        /// <param name="statusType">The status type indicating the operation result.</param>
+        /// <param name="eventMessages">The event messages produced by the operation.</param>
+        /// <param name="value">The entity value associated with the operation.</param>
+        /// <returns>A new attempt instance indicating success.</returns>
         public static Attempt<OperationResult<TStatusType, TValue>?> Succeed<TStatusType, TValue>(
             TStatusType statusType, EventMessages eventMessages, TValue value)
             where TStatusType : struct =>
@@ -169,12 +223,25 @@ public class OperationResult : OperationResult<OperationResultType>
         public static Attempt<OperationResult?> Cancel(EventMessages eventMessages) =>
             Core.Attempt.Fail(new OperationResult(OperationResultType.FailedCancelledByEvent, eventMessages));
 
+        /// <summary>
+        ///     Creates a failed operation attempt indicating that the operation was cancelled, with a typed value.
+        /// </summary>
+        /// <typeparam name="TValue">The type of the entity value.</typeparam>
+        /// <param name="eventMessages">The event messages produced by the operation.</param>
+        /// <returns>A new attempt instance indicating cancellation.</returns>
         public static Attempt<OperationResult<OperationResultType, TValue>?>
             Cancel<TValue>(EventMessages eventMessages) => Core.Attempt.Fail(
             new OperationResult<OperationResultType, TValue>(
                 OperationResultType.FailedCancelledByEvent,
                 eventMessages));
 
+        /// <summary>
+        ///     Creates a failed operation attempt indicating that the operation was cancelled, with a typed value and entity.
+        /// </summary>
+        /// <typeparam name="TValue">The type of the entity value.</typeparam>
+        /// <param name="eventMessages">The event messages produced by the operation.</param>
+        /// <param name="value">The entity value associated with the operation.</param>
+        /// <returns>A new attempt instance indicating cancellation.</returns>
         public static Attempt<OperationResult<OperationResultType, TValue>?>
             Cancel<TValue>(EventMessages eventMessages, TValue value) => Core.Attempt.Fail(
             new OperationResult<OperationResultType, TValue>(OperationResultType.FailedCancelledByEvent, eventMessages, value));
@@ -193,17 +260,39 @@ public class OperationResult : OperationResult<OperationResultType>
                 exception);
         }
 
+        /// <summary>
+        ///     Creates a failed operation attempt indicating that an exception was thrown, with a typed value.
+        /// </summary>
+        /// <typeparam name="TValue">The type of the entity value.</typeparam>
+        /// <param name="eventMessages">The event messages produced by the operation.</param>
+        /// <param name="exception">The exception that caused the operation to fail.</param>
+        /// <returns>A new attempt instance indicating failure due to an exception.</returns>
         public static Attempt<OperationResult<OperationResultType, TValue>?>
             Fail<TValue>(EventMessages eventMessages, Exception exception) => Core.Attempt.Fail(
             new OperationResult<OperationResultType, TValue>(OperationResultType.FailedExceptionThrown, eventMessages),
             exception);
 
+        /// <summary>
+        ///     Creates a failed operation attempt with a custom status type.
+        /// </summary>
+        /// <typeparam name="TStatusType">The type of the status enumeration.</typeparam>
+        /// <param name="statusType">The status type indicating the failure reason.</param>
+        /// <param name="eventMessages">The event messages produced by the operation.</param>
+        /// <returns>A new attempt instance indicating failure.</returns>
         public static Attempt<OperationResult<TStatusType>?> Fail<TStatusType>(
             TStatusType statusType,
             EventMessages eventMessages)
             where TStatusType : struct =>
             Core.Attempt.Fail(new OperationResult<TStatusType>(statusType, eventMessages));
 
+        /// <summary>
+        ///     Creates a failed operation attempt with a custom status type and exception.
+        /// </summary>
+        /// <typeparam name="TStatusType">The type of the status enumeration.</typeparam>
+        /// <param name="statusType">The status type indicating the failure reason.</param>
+        /// <param name="eventMessages">The event messages produced by the operation.</param>
+        /// <param name="exception">The exception that caused the operation to fail.</param>
+        /// <returns>A new attempt instance indicating failure.</returns>
         public static Attempt<OperationResult<TStatusType>?> Fail<TStatusType>(
             TStatusType statusType,
             EventMessages eventMessages,
@@ -211,12 +300,29 @@ public class OperationResult : OperationResult<OperationResultType>
             where TStatusType : struct =>
             Core.Attempt.Fail(new OperationResult<TStatusType>(statusType, eventMessages), exception);
 
+        /// <summary>
+        ///     Creates a failed operation attempt with a custom status type and typed value.
+        /// </summary>
+        /// <typeparam name="TStatusType">The type of the status enumeration.</typeparam>
+        /// <typeparam name="TValue">The type of the entity value.</typeparam>
+        /// <param name="statusType">The status type indicating the failure reason.</param>
+        /// <param name="eventMessages">The event messages produced by the operation.</param>
+        /// <returns>A new attempt instance indicating failure.</returns>
         public static Attempt<OperationResult<TStatusType, TValue>?> Fail<TStatusType, TValue>(
             TStatusType statusType,
             EventMessages eventMessages)
             where TStatusType : struct =>
             Core.Attempt.Fail(new OperationResult<TStatusType, TValue>(statusType, eventMessages));
 
+        /// <summary>
+        ///     Creates a failed operation attempt with a custom status type, typed value, and entity.
+        /// </summary>
+        /// <typeparam name="TStatusType">The type of the status enumeration.</typeparam>
+        /// <typeparam name="TValue">The type of the entity value.</typeparam>
+        /// <param name="statusType">The status type indicating the failure reason.</param>
+        /// <param name="eventMessages">The event messages produced by the operation.</param>
+        /// <param name="value">The entity value associated with the operation.</param>
+        /// <returns>A new attempt instance indicating failure.</returns>
         public static Attempt<OperationResult<TStatusType, TValue>?> Fail<TStatusType, TValue>(
             TStatusType statusType,
             EventMessages eventMessages,
@@ -224,6 +330,15 @@ public class OperationResult : OperationResult<OperationResultType>
             where TStatusType : struct =>
             Core.Attempt.Fail(new OperationResult<TStatusType, TValue>(statusType, eventMessages, value));
 
+        /// <summary>
+        ///     Creates a failed operation attempt with a custom status type, typed value, and exception.
+        /// </summary>
+        /// <typeparam name="TStatusType">The type of the status enumeration.</typeparam>
+        /// <typeparam name="TValue">The type of the entity value.</typeparam>
+        /// <param name="statusType">The status type indicating the failure reason.</param>
+        /// <param name="eventMessages">The event messages produced by the operation.</param>
+        /// <param name="exception">The exception that caused the operation to fail.</param>
+        /// <returns>A new attempt instance indicating failure.</returns>
         public static Attempt<OperationResult<TStatusType, TValue>?> Fail<TStatusType, TValue>(
             TStatusType statusType,
             EventMessages eventMessages,
@@ -231,6 +346,16 @@ public class OperationResult : OperationResult<OperationResultType>
             where TStatusType : struct =>
             Core.Attempt.Fail(new OperationResult<TStatusType, TValue>(statusType, eventMessages), exception);
 
+        /// <summary>
+        ///     Creates a failed operation attempt with a custom status type, typed value, entity, and exception.
+        /// </summary>
+        /// <typeparam name="TStatusType">The type of the status enumeration.</typeparam>
+        /// <typeparam name="TValue">The type of the entity value.</typeparam>
+        /// <param name="statusType">The status type indicating the failure reason.</param>
+        /// <param name="eventMessages">The event messages produced by the operation.</param>
+        /// <param name="value">The entity value associated with the operation.</param>
+        /// <param name="exception">The exception that caused the operation to fail.</param>
+        /// <returns>A new attempt instance indicating failure.</returns>
         public static Attempt<OperationResult<TStatusType, TValue>?> Fail<TStatusType, TValue>(
             TStatusType statusType,
             EventMessages eventMessages,
@@ -239,6 +364,12 @@ public class OperationResult : OperationResult<OperationResultType>
             where TStatusType : struct =>
             Core.Attempt.Fail(new OperationResult<TStatusType, TValue>(statusType, eventMessages, value), exception);
 
+        /// <summary>
+        ///     Creates a failed operation attempt indicating that the operation cannot be performed.
+        /// </summary>
+        /// <typeparam name="TValue">The type of the entity value.</typeparam>
+        /// <param name="eventMessages">The event messages produced by the operation.</param>
+        /// <returns>A new attempt instance indicating the operation cannot be performed.</returns>
         public static Attempt<OperationResult<OperationResultType, TValue>?>
             Cannot<TValue>(EventMessages eventMessages) => Core.Attempt.Fail(
             new OperationResult<OperationResultType, TValue>(OperationResultType.FailedCannot, eventMessages));

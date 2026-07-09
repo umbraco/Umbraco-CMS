@@ -1,9 +1,12 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.DeliveryApi;
 
+/// <summary>
+///     A no-operation implementation of <see cref="IApiMediaQueryService"/> that always returns empty results.
+/// </summary>
 public sealed class NoopApiMediaQueryService : IApiMediaQueryService
 {
     /// <inheritdoc />

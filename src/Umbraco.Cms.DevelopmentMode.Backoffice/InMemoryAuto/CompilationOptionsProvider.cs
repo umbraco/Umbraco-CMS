@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using Microsoft.AspNetCore.Hosting;
@@ -77,9 +77,9 @@ internal class CompilationOptionsProvider
             _optionsInitialized = true;
         }
 
-        Debug.Assert(_parseOptions is not null);
-        Debug.Assert(_compilationOptions is not null);
-        Debug.Assert(_emitOptions is not null);
+        Debug.Assert(_parseOptions is not null, "Parse options should be initialized.");
+        Debug.Assert(_compilationOptions is not null, "Compilation options should be initialized.");
+        Debug.Assert(_emitOptions is not null, "Emit options should be initialized.");
     }
 
     private DependencyContextCompilationOptions GetDependencyContextCompilationOptions()

@@ -56,7 +56,8 @@ public class MemberManagerTests
             new IdentityErrorDescriber(),
             Mock.Of<IExternalLoginWithKeyService>(),
             Mock.Of<ITwoFactorLoginService>(),
-            Mock.Of<IPublishedMemberCache>());
+            Mock.Of<IPublishedMemberCache>(),
+            Mock.Of<IExternalMemberService>());
 
         _mockIdentityOptions = new Mock<IOptions<IdentityOptions>>();
         var idOptions = new IdentityOptions { Lockout = { AllowedForNewUsers = false } };
@@ -242,6 +243,73 @@ public class MemberManagerTests
 
         // assert
         Assert.IsFalse(result);
+    }
+
+    [Test]
+    public async Task GivenAUserExists_AndIncorrectCurrentPasswordIsProvided_ThenChangePasswordShouldReturnPasswordMismatchError()
+    {
+        // arrange
+        var currentPassword = "wrongPassword";
+        var newPassword = "newPassword123!";
+
+        var sut = CreateSut();
+
+        var fakeUser = CreateValidUser();
+        var fakeMember = CreateMember(fakeUser);
+
+        MockMemberServiceForCreateMember(fakeMember);
+
+        _mockMemberService.Setup(x => x.GetByUsername(It.Is<string>(y => y == fakeUser.UserName))).Returns(fakeMember);
+
+        _mockPasswordHasher
+            .Setup(x => x.VerifyHashedPassword(It.IsAny<MemberIdentityUser>(), It.IsAny<string>(), It.Is<string>(p => p == currentPassword)))
+            .Returns(PasswordVerificationResult.Failed);
+
+        // act
+        await sut.CreateAsync(fakeUser);
+        var result = await sut.ChangePasswordAsync(fakeUser, currentPassword, newPassword);
+
+        // assert
+        Assert.IsFalse(result.Succeeded);
+        var passwordMismatchError = result.Errors.FirstOrDefault(e => e.Code == nameof(IdentityErrorDescriber.PasswordMismatch));
+        Assert.IsNotNull(passwordMismatchError);
+    }
+
+    [Test]
+    public void GivenAnExternalOnlyMember_WhenGeneratePasswordResetToken_ThenThrowsInvalidOperation()
+    {
+        // Arrange
+        var sut = CreateSut();
+        var externalUser = new MemberIdentityUser
+        {
+            UserName = "external@test.com",
+            Email = "external@test.com",
+            IsExternalOnly = true,
+        };
+
+        // Act & Assert
+        Assert.ThrowsAsync<InvalidOperationException>(
+            async () => await sut.GeneratePasswordResetTokenAsync(externalUser));
+    }
+
+    [Test]
+    public async Task GivenAnExternalOnlyMember_WhenResetPassword_ThenReturnsFailed()
+    {
+        // Arrange
+        var sut = CreateSut();
+        var externalUser = new MemberIdentityUser
+        {
+            UserName = "external@test.com",
+            Email = "external@test.com",
+            IsExternalOnly = true,
+        };
+
+        // Act
+        IdentityResult result = await sut.ResetPasswordAsync(externalUser, "any-token", "newPassword123!");
+
+        // Assert
+        Assert.IsFalse(result.Succeeded);
+        Assert.IsTrue(result.Errors.Any(e => e.Code == "ExternalMemberCannotResetPassword"));
     }
 
     private static MemberIdentityUser CreateValidUser() =>

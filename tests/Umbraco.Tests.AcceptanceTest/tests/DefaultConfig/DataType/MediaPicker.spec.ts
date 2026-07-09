@@ -1,4 +1,4 @@
-﻿import {AliasHelper, ConstantHelper, test} from '@umbraco/playwright-testhelpers';
+import {AliasHelper, ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 import {expect} from "@playwright/test";
 
 const mediaPickerTypes = [
@@ -28,10 +28,9 @@ test('can update pick multiple items', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.dataType.clickPickMultipleItemsToggle();
-  await umbracoUi.dataType.clickSaveButton();
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
-  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'multiple', true)).toBeTruthy();
 });
 
@@ -44,10 +43,9 @@ test('can update amount', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.dataType.enterAmountValue(minValue.toString(), maxValue.toString());
-  await umbracoUi.dataType.clickSaveButton();
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
-  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesMediaPickerHaveMinAndMaxAmount(customDataTypeName, minValue, maxValue)).toBeTruthy();
 });
 
@@ -58,10 +56,9 @@ test('can update enable focal point', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.dataType.clickEnableFocalPointToggle();
-  await umbracoUi.dataType.clickSaveButton();
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
-  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'enableLocalFocalPoint', true)).toBeTruthy();
 });
 
@@ -81,10 +78,9 @@ test('can add image crop', async ({umbracoApi, umbracoUi}) => {
     cropObject.height.toString()
   );
   await umbracoUi.dataType.clickCreateCropButton();
-  await umbracoUi.dataType.clickSaveButton();
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
-  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesDataTypeHaveCrops(customDataTypeName, cropObject.label, cropObject.alias, cropObject.width, cropObject.height)).toBeTruthy();
 });
 
@@ -95,10 +91,9 @@ test('can update ignore user start nodes', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.dataType.clickIgnoreUserStartNodesToggle();
-  await umbracoUi.dataType.clickSaveButton();
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
-  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'ignoreUserStartNodes', true)).toBeTruthy();
 });
 
@@ -111,10 +106,9 @@ test('can add accepted types', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.dataType.addAcceptedType(mediaTypeName);
-  await umbracoUi.dataType.clickSaveButton();
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
-  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'filter', mediaTypeData.id)).toBeTruthy();
 });
 
@@ -127,55 +121,91 @@ test('can remove accepted types', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.dataType.removeAcceptedType(mediaTypeName);
-  await umbracoUi.dataType.clickSaveButton();
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
-  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'filter', mediaTypeData.id)).toBeFalsy();
 });
 
-test('can add start node', async ({umbracoApi, umbracoUi}) => {
+test('cannot add a media file as start node', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   // Create media
-  const mediaName = 'TestStartNode';
-  const mediaId = await umbracoApi.media.createDefaultMediaWithArticle(mediaName);
+  const mediaName = 'TestStartNodeFile';
+  await umbracoApi.media.createDefaultMediaWithArticle(mediaName);
   expect(await umbracoApi.media.doesNameExist(mediaName)).toBeTruthy();
   await umbracoApi.dataType.createDefaultMediaPickerDataType(customDataTypeName);
   await umbracoUi.dataType.goToDataType(customDataTypeName);
 
   // Act
   await umbracoUi.dataType.clickChooseStartNodeButton();
-  await umbracoUi.dataType.addMediaStartNode(mediaName);
-  await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
-  expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'startNodeId', mediaId)).toBeTruthy();
+  await umbracoUi.dataType.isMediaCardItemWithNameDisabled(mediaName);
 
   // Clean
   await umbracoApi.media.ensureNameNotExists(mediaName);
 });
 
-test('can remove start node', async ({umbracoApi, umbracoUi}) => {
+test('can add a media folder as start node', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  // Create media
-  const mediaName = 'TestStartNode';
-  await umbracoApi.media.ensureNameNotExists(mediaName);
-  const mediaId = await umbracoApi.media.createDefaultMediaWithArticle(mediaName);
-  expect(await umbracoApi.media.doesNameExist(mediaName)).toBeTruthy();
-  await umbracoApi.dataType.createImageMediaPickerDataTypeWithStartNodeId(customDataTypeName, mediaId);
+  const mediaFolderName = 'TestStartNodeFolder';
+  const mediaFolderId = await umbracoApi.media.createDefaultMediaFolder(mediaFolderName);
+  await umbracoApi.dataType.createDefaultMediaPickerDataType(customDataTypeName);
   await umbracoUi.dataType.goToDataType(customDataTypeName);
 
   // Act
-  await umbracoUi.dataType.removeMediaStartNode(mediaName);
-  await umbracoUi.dataType.clickSaveButton();
+  await umbracoUi.dataType.clickChooseStartNodeButton();
+  await umbracoUi.dataType.selectMediaWithName(mediaFolderName);
+  await umbracoUi.dataType.clickChooseModalButton();
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
-  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
-  expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'startNodeId', mediaId)).toBeFalsy();
+  expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'startNodeId', mediaFolderId)).toBeTruthy();
 
   // Clean
-  await umbracoApi.media.ensureNameNotExists(mediaName);
+  await umbracoApi.media.ensureNameNotExists(mediaFolderName);
+});
+
+test('can remove a media folder start node', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const mediaFolderName = 'TestStartNodeFolder';
+  const mediaFolderId = await umbracoApi.media.createDefaultMediaFolder(mediaFolderName);
+  await umbracoApi.dataType.createMediaPickerDataTypeWithStartNodeId(customDataTypeName, mediaFolderId);
+  await umbracoUi.dataType.goToDataType(customDataTypeName);
+
+  // Act
+  await umbracoUi.dataType.removeMediaStartNode(mediaFolderName);
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
+
+  // Assert
+  expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'startNodeId', mediaFolderId)).toBeFalsy();
+
+  // Clean
+  await umbracoApi.media.ensureNameNotExists(mediaFolderName);
+});
+
+test('can add a nested media folder as start node', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const parentFolderName = 'ParentMediaFolder';
+  const childFolderName = 'ChildMediaFolder';
+  await umbracoApi.media.ensureNameNotExists(parentFolderName);
+  const parentFolderId = await umbracoApi.media.createDefaultMediaFolder(parentFolderName);
+  const childFolderId = await umbracoApi.media.createDefaultMediaFolderAndParentId(childFolderName, parentFolderId);
+  await umbracoApi.dataType.createDefaultMediaPickerDataType(customDataTypeName);
+  await umbracoUi.dataType.goToDataType(customDataTypeName);
+
+  // Act
+  await umbracoUi.dataType.clickChooseStartNodeButton();
+  await umbracoUi.dataType.clickMediaWithName(parentFolderName);
+  await umbracoUi.dataType.selectMediaWithName(childFolderName);
+  await umbracoUi.dataType.clickChooseModalButton();
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
+
+  // Assert
+  expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'startNodeId', childFolderId)).toBeTruthy();
+
+  // Clean
+  await umbracoApi.media.ensureNameNotExists(parentFolderName);
 });
 
 for (const mediaPicker of mediaPickerTypes) {

@@ -108,7 +108,7 @@ export class UmbDocumentPropertyValueUserPermissionFlowPropertyTypeModalElement 
 							(item) => item.unique,
 							(item) => html`
 								<uui-ref-node
-									name=${item.name ?? ''}
+									name=${this.localize.string(item.name ?? '')}
 									detail=${this.#getItemDetail(item)}
 									?selectable=${this._pickableFilter(item)}
 									select-only

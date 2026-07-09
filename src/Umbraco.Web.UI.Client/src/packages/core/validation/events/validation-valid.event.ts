@@ -7,3 +7,9 @@ export class UmbValidationValidEvent extends UmbValidationEvent {
 		super(UmbValidationValidEvent.TYPE);
 	}
 }
+
+declare global {
+	interface GlobalEventHandlersEventMap {
+		[UmbValidationValidEvent.TYPE]: UmbValidationValidEvent;
+	}
+}

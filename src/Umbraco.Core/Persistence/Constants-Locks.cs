@@ -100,5 +100,10 @@ public static partial class Constants
         ///     All distributed jobs.
         /// </summary>
         public const int DistributedJobs = -347;
+
+        /// <summary>
+        ///     All document URL aliases.
+        /// </summary>
+        public const int DocumentUrlAliases = -348;
     }
 }

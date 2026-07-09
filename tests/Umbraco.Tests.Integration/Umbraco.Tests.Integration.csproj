@@ -43,6 +43,7 @@
     <ProjectReference Include="..\..\src\Umbraco.Cms.Persistence.EFCore\Umbraco.Cms.Persistence.EFCore.csproj" />
     <ProjectReference Include="..\..\src\Umbraco.Cms\Umbraco.Cms.csproj" />
     <ProjectReference Include="..\..\src\Umbraco.PublishedCache.HybridCache\Umbraco.PublishedCache.HybridCache.csproj" />
+    <ProjectReference Include="..\..\src\Umbraco.PublishedCache.HybridCache.Bounded\Umbraco.PublishedCache.HybridCache.Bounded.csproj" />
     <ProjectReference Include="..\Umbraco.Tests.Common\Umbraco.Tests.Common.csproj" />
   </ItemGroup>
 
@@ -94,11 +95,20 @@
     <Compile Update="Umbraco.Infrastructure\Services\ContentEditingServiceTests.Sort.cs">
       <DependentUpon>ContentEditingServiceTests.cs</DependentUpon>
     </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\ContentEditingServiceTests.SortByField.cs">
+      <DependentUpon>ContentEditingServiceTests.cs</DependentUpon>
+    </Compile>
     <Compile Update="Umbraco.Infrastructure\Services\ContentEditingServiceTests.Update.cs">
       <DependentUpon>ContentEditingServiceTests.cs</DependentUpon>
     </Compile>
     <Compile Update="Umbraco.Infrastructure\Services\ContentEditingServiceTests.Validate.cs">
       <DependentUpon>ContentEditingServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\MediaEditingServiceTests.MoveToRecycleBin.cs">
+      <DependentUpon>MediaEditingServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\MediaEditingServiceTests.SortByField.cs">
+      <DependentUpon>MediaEditingServiceTests.cs</DependentUpon>
     </Compile>
     <Compile Update="Umbraco.Infrastructure\Services\ContentPublishingServiceTests.Publish.cs">
       <DependentUpon>ContentPublishingServiceTests.cs</DependentUpon>
@@ -268,9 +278,6 @@
     <Compile Update="Umbraco.Core\Services\MediaNavigationServiceTests.Update.cs">
       <DependentUpon>MediaNavigationServiceTests.cs</DependentUpon>
     </Compile>
-    <Compile Update="Umbraco.Core\Services\PublishedUrlInfoProvider_hidetoplevel_false.cs">
-      <DependentUpon>PublishedUrlInfoProviderTestsBase.cs</DependentUpon>
-    </Compile>
     <Compile Update="Umbraco.Core\Services\PublishedUrlInfoProviderTests.cs">
       <DependentUpon>PublishedUrlInfoProviderTestsBase.cs</DependentUpon>
     </Compile>
@@ -278,6 +285,9 @@
       <DependentUpon>PublishStatusServiceTests.cs</DependentUpon>
     </Compile>
     <Compile Update="Umbraco.Core\Services\PublishStatusServiceTests.Query.cs">
+      <DependentUpon>PublishStatusServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\PublishStatusServiceTests.ThreadSafety.cs">
       <DependentUpon>PublishStatusServiceTests.cs</DependentUpon>
     </Compile>
     <Compile Update="ManagementApi\Services\UserStartNodeEntitiesServiceTests.ChildUserAccessEntities.cs">
@@ -300,6 +310,15 @@
     </Compile>
     <Compile Update="Umbraco.Infrastructure\Services\ContentBlueprintEditingServiceTests.GetScaffold.cs">
       <DependentUpon>ContentBlueprintEditingServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\UserServiceTests.Permissions.cs">
+      <DependentUpon>UserServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\ContentEditingServiceTests.CreateAndPublish.cs">
+      <DependentUpon>ContentEditingServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\ContentEditingServiceTests.UpdateAndPublish.cs">
+      <DependentUpon>ContentEditingServiceTests.cs</DependentUpon>
     </Compile>
   </ItemGroup>
 </Project>

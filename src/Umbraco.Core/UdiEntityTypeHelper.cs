@@ -2,8 +2,17 @@ using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core;
 
+/// <summary>
+///     Provides helper methods for converting between UDI entity types and Umbraco object types.
+/// </summary>
 public static class UdiEntityTypeHelper
 {
+    /// <summary>
+    ///     Converts an <see cref="UmbracoObjectTypes" /> value to its corresponding UDI entity type string.
+    /// </summary>
+    /// <param name="umbracoObjectType">The Umbraco object type to convert.</param>
+    /// <returns>The UDI entity type string.</returns>
+    /// <exception cref="NotSupportedException">The Umbraco object type does not have a matching entity type.</exception>
     public static string FromUmbracoObjectType(UmbracoObjectTypes umbracoObjectType)
     {
         switch (umbracoObjectType)
@@ -34,6 +43,8 @@ public static class UdiEntityTypeHelper
                 return Constants.UdiEntityType.DataTypeContainer;
             case UmbracoObjectTypes.MemberType:
                 return Constants.UdiEntityType.MemberType;
+            case UmbracoObjectTypes.MemberTypeContainer:
+                return Constants.UdiEntityType.MemberTypeContainer;
             case UmbracoObjectTypes.MemberGroup:
                 return Constants.UdiEntityType.MemberGroup;
             case UmbracoObjectTypes.RelationType:
@@ -52,6 +63,12 @@ public static class UdiEntityTypeHelper
             $"UmbracoObjectType \"{umbracoObjectType}\" does not have a matching EntityType.");
     }
 
+    /// <summary>
+    ///     Converts a UDI entity type string to its corresponding <see cref="UmbracoObjectTypes" /> value.
+    /// </summary>
+    /// <param name="entityType">The UDI entity type string to convert.</param>
+    /// <returns>The corresponding <see cref="UmbracoObjectTypes" /> value.</returns>
+    /// <exception cref="NotSupportedException">The entity type does not have a matching Umbraco object type.</exception>
     public static UmbracoObjectTypes ToUmbracoObjectType(string entityType)
     {
         switch (entityType)
@@ -60,6 +77,8 @@ public static class UdiEntityTypeHelper
                 return UmbracoObjectTypes.Document;
             case Constants.UdiEntityType.DocumentBlueprint:
                 return UmbracoObjectTypes.DocumentBlueprint;
+            case Constants.UdiEntityType.DocumentBlueprintContainer:
+                return UmbracoObjectTypes.DocumentBlueprintContainer;
             case Constants.UdiEntityType.Media:
                 return UmbracoObjectTypes.Media;
             case Constants.UdiEntityType.Member:
@@ -80,6 +99,8 @@ public static class UdiEntityTypeHelper
                 return UmbracoObjectTypes.DataTypeContainer;
             case Constants.UdiEntityType.MemberType:
                 return UmbracoObjectTypes.MemberType;
+            case Constants.UdiEntityType.MemberTypeContainer:
+                return UmbracoObjectTypes.MemberTypeContainer;
             case Constants.UdiEntityType.MemberGroup:
                 return UmbracoObjectTypes.MemberGroup;
             case Constants.UdiEntityType.RelationType:

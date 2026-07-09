@@ -2,12 +2,20 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 
 namespace Umbraco.Cms.Core.Routing;
 
+/// <summary>
+///     Provides the default implementation of <see cref="IUrlAssembler" />.
+/// </summary>
 public class DefaultUrlAssembler : IUrlAssembler
 {
     private readonly UriUtility _uriUtility;
 
-public DefaultUrlAssembler(UriUtility uriUtility) => _uriUtility = uriUtility;
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="DefaultUrlAssembler" /> class.
+    /// </summary>
+    /// <param name="uriUtility">The URI utility.</param>
+    public DefaultUrlAssembler(UriUtility uriUtility) => _uriUtility = uriUtility;
 
+    /// <inheritdoc />
     public Uri AssembleUrl(string path, Uri current, UrlMode mode)
     {
         if (string.IsNullOrWhiteSpace(path))

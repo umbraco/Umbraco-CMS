@@ -1,5 +1,8 @@
 namespace Umbraco.Cms.Core.Models;
 
+/// <summary>
+///     Represents the base model for renaming a text file.
+/// </summary>
 public abstract class TextFileRenameModel
 {
     /// <summary>

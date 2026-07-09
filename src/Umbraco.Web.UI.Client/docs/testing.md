@@ -1,8 +1,25 @@
 # Testing
-[← Umbraco Backoffice](../CLAUDE.md) | [← Monorepo Root](../../CLAUDE.md)
 
 ---
 
+## Testing Strategy
+
+The project uses two layers of testing:
+
+1. **Client-side tests** (this project) — Unit and integration tests running in-browser via `@web/test-runner`. API calls are intercepted by **MSW (Mock Service Worker)** request handlers, providing realistic mocked responses without a running backend.
+2. **E2E acceptance tests** (`tests/Umbraco.Tests.AcceptanceTest/`) — Playwright tests running against a real CMS installation. These live outside the client project and cover full user journeys end-to-end.
+
+### Testing Priority by Code Area
+
+All tests matter, but some code changes carry more risk than others. The closer code is to the foundation, the wider the blast radius when it breaks — and the more critical it is to have test coverage.
+
+| Priority | Area | Rationale |
+|----------|------|-----------|
+| **Critical** | `src/libs/` | Framework foundations used by everything. Changes here **must** have tests. |
+| **High** | `src/packages/core/` | UI framework infrastructure. Classes (contexts, controllers, managers, repositories) should be covered by unit tests. Element tests are important but secondary. |
+| **Standard** | `src/packages/*` (CMS packages) | Domain features. Tests are valuable and encouraged, but these areas also have coverage from the E2E acceptance tests. |
+
+This is not a reason to skip tests for CMS packages — it's a guide for where to invest testing effort first when time is limited.
 
 ### Testing Philosophy
 
@@ -186,21 +203,17 @@ test.describe('Content Editor', () => {
 
 ### Mocking Best Practices
 
-**MSW (Mock Service Worker)** for API mocking:
+**MSW (Mock Service Worker)** for API mocking. MSW intercepts requests at the network level — tests hit the same code paths as production, with realistic responses. Handlers are defined in `src/mocks/handlers/` and loaded globally before tests run.
 
 ```typescript
-import { rest } from 'msw';
+const { http, HttpResponse } = window.MockServiceWorker;
 
 export const handlers = [
-	rest.get('/umbraco/management/api/v1/document/:id', (req, res, ctx) => {
-		const { id } = req.params;
-		return res(
-			ctx.json({
-				id,
-				name: 'Test Document',
-				// ... mock data
-			})
-		);
+	http.get('/umbraco/management/api/v1/document/:id', ({ params }) => {
+		return HttpResponse.json({
+			id: params.id,
+			name: 'Test Document',
+		});
 	}),
 ];
 ```

@@ -15,7 +15,7 @@ export class UmbClipboardEntryDetailStore extends UmbDetailStoreBase<UmbClipboar
 	 * @memberof UmbClipboardEntryDetailStore
 	 */
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_CLIPBOARD_ENTRY_DETAIL_STORE_CONTEXT.toString());
+		super(host, UMB_CLIPBOARD_ENTRY_DETAIL_STORE_CONTEXT);
 	}
 }
 

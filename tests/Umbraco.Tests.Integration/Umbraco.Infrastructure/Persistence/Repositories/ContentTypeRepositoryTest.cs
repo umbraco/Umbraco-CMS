@@ -5,7 +5,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Cms.Api.Management.Mapping.Permissions;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -39,8 +38,6 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
 
     private FileSystems FileSystems => GetRequiredService<FileSystems>();
 
-    private IUmbracoMapper Mapper => GetRequiredService<IUmbracoMapper>();
-
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
     private IDocumentTypeContainerRepository DocumentTypeContainerRepository =>
@@ -56,6 +53,10 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
     private IContentService ContentService => GetRequiredService<IContentService>();
 
     private IUserGroupRepository UserGroupRepository => GetRequiredService<IUserGroupRepository>();
+
+    private ITemplateRepository TemplateRepository => GetRequiredService<ITemplateRepository>();
+
+    private ILanguageRepository LanguageRepository => GetRequiredService<ILanguageRepository>();
 
     private ContentTypeRepository ContentTypeRepository =>
         (ContentTypeRepository)GetRequiredService<IContentTypeRepository>();
@@ -74,6 +75,171 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
     }
 
     // TODO: Add test to verify SetDefaultTemplates updates both AllowedTemplates and DefaultTemplate(id).
+
+    [Test]
+    public void Retrieval_By_Id_After_Retrieval_By_Id_Is_Cached()
+    {
+        var realCache = new AppCaches(
+            new ObjectCacheAppCache(),
+            new DictionaryAppCache(),
+            new IsolatedCaches(t => new ObjectCacheAppCache()));
+
+        var provider = ScopeProvider;
+        var scopeAccessor = ScopeAccessor;
+
+        using var scope = provider.CreateScope();
+        var repository = CreateRepository((IScopeAccessor)provider, realCache);
+
+        var database = scopeAccessor.AmbientScope.Database;
+
+        var contentType = _simpleContentType;
+        database.EnableSqlCount = true;
+
+        // Clear the isolated cache for IContentType so the next retrieval hits the database
+        realCache.IsolatedCaches.ClearCache<IContentType>();
+
+        // Initial request by Id should hit the database.
+        repository.Get(contentType.Id);
+        Assert.Greater(database.SqlCount, 0);
+
+        // Reset counter.
+        database.EnableSqlCount = false;
+        database.EnableSqlCount = true;
+
+        // Subsequent requests should use the cache.
+        repository.Get(contentType.Id);
+        Assert.AreEqual(0, database.SqlCount);
+    }
+
+    [Test]
+    public void Retrieval_By_Key_After_Retrieval_By_Key_Is_Cached()
+    {
+        var realCache = new AppCaches(
+            new ObjectCacheAppCache(),
+            new DictionaryAppCache(),
+            new IsolatedCaches(t => new ObjectCacheAppCache()));
+
+        var provider = ScopeProvider;
+        var scopeAccessor = ScopeAccessor;
+
+        using var scope = provider.CreateScope();
+        var repository = CreateRepository((IScopeAccessor)provider, realCache);
+
+        var database = scopeAccessor.AmbientScope.Database;
+
+        var contentType = _simpleContentType;
+        database.EnableSqlCount = true;
+
+        // Clear the isolated cache for IContentType so the next retrieval hits the database
+        realCache.IsolatedCaches.ClearCache<IContentType>();
+
+        // Initial request by key should hit the database.
+        repository.Get(contentType.Key);
+        Assert.Greater(database.SqlCount, 0);
+
+        // Reset counter.
+        database.EnableSqlCount = false;
+        database.EnableSqlCount = true;
+
+        // Subsequent requests should use the cache.
+        repository.Get(contentType.Key);
+        Assert.AreEqual(0, database.SqlCount);
+    }
+
+    [Test]
+    public void Retrieval_By_Key_After_Retrieval_By_Id_Is_Cached()
+    {
+        var realCache = new AppCaches(
+            new ObjectCacheAppCache(),
+            new DictionaryAppCache(),
+            new IsolatedCaches(t => new ObjectCacheAppCache()));
+
+        var provider = ScopeProvider;
+        var scopeAccessor = ScopeAccessor;
+
+        using var scope = provider.CreateScope();
+        var repository = CreateRepository((IScopeAccessor)provider, realCache);
+
+        var database = scopeAccessor.AmbientScope.Database;
+
+        var contentType = _simpleContentType;
+        database.EnableSqlCount = true;
+
+        // Clear the isolated cache for IContentType so the next retrieval hits the database
+        realCache.IsolatedCaches.ClearCache<IContentType>();
+
+        // Initial request by ID should hit the database.
+        repository.Get(contentType.Id);
+        Assert.Greater(database.SqlCount, 0);
+
+        // Reset counter.
+        database.EnableSqlCount = false;
+        database.EnableSqlCount = true;
+
+        // Subsequent requests should use the cache, since the cache by Id and Key was populated on retrieval.
+        repository.Get(contentType.Id);
+        Assert.AreEqual(0, database.SqlCount);
+
+        repository.Get(contentType.Key);
+        Assert.AreEqual(0, database.SqlCount);
+    }
+
+    [Test]
+    public void Retrieval_By_Id_After_Retrieval_By_Key_Is_Cached()
+    {
+        var realCache = new AppCaches(
+            new ObjectCacheAppCache(),
+            new DictionaryAppCache(),
+            new IsolatedCaches(t => new ObjectCacheAppCache()));
+
+        var provider = ScopeProvider;
+        var scopeAccessor = ScopeAccessor;
+
+        using var scope = provider.CreateScope();
+        var repository = CreateRepository((IScopeAccessor)provider, realCache);
+
+        var database = scopeAccessor.AmbientScope.Database;
+
+        var contentType = _simpleContentType;
+        database.EnableSqlCount = true;
+
+        // Clear the isolated cache for IContentType so the next retrieval hits the database
+        realCache.IsolatedCaches.ClearCache<IContentType>();
+
+        // Initial request by key should hit the database.
+        repository.Get(contentType.Key);
+        Assert.Greater(database.SqlCount, 0);
+
+        // Reset counter.
+        database.EnableSqlCount = false;
+        database.EnableSqlCount = true;
+
+        // Subsequent requests should use the cache, since the cache by Id and Key was populated on retrieval.
+        repository.Get(contentType.Key);
+        Assert.AreEqual(0, database.SqlCount);
+
+        repository.Get(contentType.Id);
+        Assert.AreEqual(0, database.SqlCount);
+    }
+
+    private ContentTypeRepository CreateRepository(IScopeAccessor scopeAccessor, AppCaches? appCaches = null)
+    {
+        appCaches ??= AppCaches;
+
+        var commonRepository =
+            new ContentTypeCommonRepository(scopeAccessor, TemplateRepository, appCaches, ShortStringHelper);
+
+        return new ContentTypeRepository(
+            scopeAccessor,
+            appCaches,
+            LoggerFactory.CreateLogger<ContentTypeRepository>(),
+            commonRepository,
+            LanguageRepository,
+            ShortStringHelper,
+            Mock.Of<IRepositoryCacheVersionService>(),
+            IdKeyMap,
+            Mock.Of<ICacheSyncService>());
+    }
 
     [Test]
     public void Maps_Templates_Correctly()
@@ -1001,5 +1167,109 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
 
         Assert.AreEqual(4, userGroup.GranularPermissions.Count);
         return userGroup;
+    }
+
+    [Test]
+    public void Get_By_Guid_Returns_Deep_Clone_Not_Cached_Instance()
+    {
+        var provider = ScopeProvider;
+        using (var scope = provider.CreateScope())
+        {
+            var repository = ContentTypeRepository;
+
+            var first = repository.Get(_simpleContentType.Key);
+            var second = repository.Get(_simpleContentType.Key);
+
+            Assert.IsNotNull(first);
+            Assert.IsNotNull(second);
+            Assert.AreEqual(first.Id, second.Id);
+
+            // Must be different object references (deep clones, not the cached original).
+            Assert.AreNotSame(first, second);
+        }
+    }
+
+    [Test]
+    public void Get_By_Alias_Returns_Correct_ContentType()
+    {
+        var provider = ScopeProvider;
+        using (var scope = provider.CreateScope())
+        {
+            var repository = ContentTypeRepository;
+
+            // Case-insensitive alias lookup.
+            var result = repository.Get("UMBTEXTPAGE");
+
+            Assert.IsNotNull(result);
+            Assert.AreEqual(_simpleContentType.Id, result!.Id);
+            Assert.AreEqual("umbTextpage", result.Alias);
+        }
+    }
+
+    [Test]
+    public void Get_By_Alias_Returns_Deep_Clone_Not_Cached_Instance()
+    {
+        var provider = ScopeProvider;
+        using (var scope = provider.CreateScope())
+        {
+            var repository = ContentTypeRepository;
+
+            var first = repository.Get("umbTextpage");
+            var second = repository.Get("umbTextpage");
+
+            Assert.IsNotNull(first);
+            Assert.IsNotNull(second);
+            Assert.AreEqual(first!.Id, second!.Id);
+            Assert.AreNotSame(first, second);
+        }
+    }
+
+    [Test]
+    public void Exists_By_Guid_Returns_True_For_Existing_Type()
+    {
+        var provider = ScopeProvider;
+        using (var scope = provider.CreateScope())
+        {
+            var repository = ContentTypeRepository;
+
+            var exists = repository.Exists(_simpleContentType.Key);
+
+            Assert.IsTrue(exists);
+        }
+    }
+
+    [Test]
+    public void Exists_By_Guid_Returns_False_For_NonExisting_Type()
+    {
+        var provider = ScopeProvider;
+        using (var scope = provider.CreateScope())
+        {
+            var repository = ContentTypeRepository;
+
+            var exists = repository.Exists(Guid.NewGuid());
+
+            Assert.IsFalse(exists);
+        }
+    }
+
+    [Test]
+    public void Get_By_Guid_Mutation_Does_Not_Affect_Subsequent_Get()
+    {
+        var provider = ScopeProvider;
+        using (var scope = provider.CreateScope())
+        {
+            var repository = ContentTypeRepository;
+
+            // Get a content type and mutate its name.
+            var first = repository.Get(_simpleContentType.Key);
+            Assert.IsNotNull(first);
+            var originalName = first!.Name;
+            first.Name = "MUTATED_NAME_" + Guid.NewGuid();
+
+            // A subsequent Get should return an unmodified clone.
+            var second = repository.Get(_simpleContentType.Key);
+            Assert.IsNotNull(second);
+            Assert.AreEqual(originalName, second!.Name, "Mutation of a returned entity should not affect the cached copy");
+        }
     }
 }

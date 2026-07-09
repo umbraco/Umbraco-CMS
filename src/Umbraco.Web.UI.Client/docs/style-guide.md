@@ -3,6 +3,10 @@
 
 ---
 
+This guide covers naming and formatting conventions. For visual design choices — icons, colours, buttons, and UX copy — see [design-choices.md](./design-choices.md).
+
+---
+
 
 ### Naming Conventions
 
@@ -112,6 +116,56 @@
 - **Object methods**: `Object.keys`, `Object.values`, `Object.entries`
 - **Private fields**: `#privateField`
 
+### Event Handler Guidelines
+
+**Event handlers must be arrow function properties** to prevent memory leaks:
+
+```typescript
+// ✅ GOOD: Arrow function property
+export class UmbMyElement extends LitElement {
+	#onStorageEvent = async (evt: StorageEvent) => {
+		// Handler logic
+	};
+
+	constructor() {
+		super();
+		window.addEventListener('storage', this.#onStorageEvent);
+	}
+
+	disconnectedCallback() {
+		window.removeEventListener('storage', this.#onStorageEvent);
+	}
+}
+
+// ❌ BAD: Using .bind(this) creates new function references
+export class UmbBadElement extends LitElement {
+	constructor() {
+		super();
+		// Each .bind(this) creates a NEW reference!
+		window.addEventListener('storage', this.#onStorageEvent.bind(this));
+	}
+
+	disconnectedCallback() {
+		// This creates ANOTHER reference - doesn't remove the original!
+		window.removeEventListener('storage', this.#onStorageEvent.bind(this));
+	}
+
+	#onStorageEvent(evt: StorageEvent) {
+		// Handler logic
+	}
+}
+```
+
+**Placement in Class**:
+- Place event handler arrow functions near the top of the class with other properties
+- Place them after state properties but before constructor
+- Add a comment indicating they are event handlers
+
+**Naming**:
+- Private handlers: `#onEventName` or `#handleEventName`
+- Protected handlers: `_onEventName` or `_handleEventName`
+- Use descriptive names: `#onStorageEvent`, `#handleDragEnter`, `#onActionExecuted`
+
 ### Language Features to Avoid
 
 - `var` (use `const`/`let`)
@@ -146,11 +200,22 @@
 - `@cssprop` - CSS custom properties
 - `@csspart` - CSS parts
 
+### Third-Party Library Names
+
+Use the correct capitalization for third-party libraries:
+
+| Library | Correct | Incorrect              |
+|---------|---------|------------------------|
+| Tiptap  | Tiptap  | TipTap, tipTap, TIPTAP |
+| Lit     | Lit     | LIT, lit (in prose)    |
+| RxJS    | RxJS    | rxjs (in prose), RXJS  |
+
 ### Documentation
 
+- **Default to no comment.** Self-descriptive code (good names, small functions) is the primary documentation. See [Code Comment Policy](../../../CLAUDE.md#8-code-comment-policy) and [Clean Code → Comments and Documentation](./clean-code.md#comments-and-documentation) for the full rules and worked examples.
 - **Public APIs**: JSDoc comments with `@description`, `@param`, `@returns`, `@example`
 - **Web Components**: JSDoc with web-component-analyzer tags
-- **Complex logic**: Inline comments explaining "why" not "what"
+- **Inline comments**: only for the non-obvious WHY (hidden constraints, ordering, workarounds, edge cases). Never restate what the code does.
 - **TODOs**: Format as `// TODO: description [initials]`
 - **Deprecated**: Use `@deprecated` tag with migration instructions
 

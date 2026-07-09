@@ -5,6 +5,9 @@ using Umbraco.Cms.Core.Models.Entities;
 
 namespace Umbraco.Extensions;
 
+/// <summary>
+///     Provides extension methods for <see cref="IEntity" />.
+/// </summary>
 public static class EntityExtensions
 {
     /// <summary>

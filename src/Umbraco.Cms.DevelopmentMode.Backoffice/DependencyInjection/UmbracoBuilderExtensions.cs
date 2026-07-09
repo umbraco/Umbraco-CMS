@@ -107,6 +107,10 @@ public static class UmbracoBuilderExtensions
         // Since these services expect the ModelsMode to be InMemoryAuto
         if (builder.Config.GetModelsMode() == ModelsModeConstants.InMemoryAuto)
         {
+            // Ensure ModelsBuilder services (including UmbracoServices) are registered.
+            // This is normally done by AddWebsite(), but in a delivery-API-only setup
+            // it may not have been called. AddModelsBuilder() is idempotent.
+            builder.AddModelsBuilder();
             builder.Services.AddSingleton<UmbracoRazorReferenceManager>();
             builder.Services.AddSingleton<CompilationOptionsProvider>();
             builder.Services.AddSingleton<IViewCompilerProvider, UmbracoViewCompilerProvider>();

@@ -15,7 +15,7 @@ export class UmbDocumentTreeStore extends UmbUniqueTreeStore {
 	 * @memberof UmbDocumentTreeStore
 	 */
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_DOCUMENT_TREE_STORE_CONTEXT.toString());
+		super(host, UMB_DOCUMENT_TREE_STORE_CONTEXT);
 	}
 }
 

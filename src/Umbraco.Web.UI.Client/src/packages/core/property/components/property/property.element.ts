@@ -224,6 +224,9 @@ export class UmbPropertyElement extends UmbLitElement {
 			this.#propertyContext.alias,
 			(alias) => {
 				this._alias = alias;
+				if (this._element) {
+					this._element.alias = alias;
+				}
 				this.#pathAddendum.setAddendum(alias);
 			},
 			null,
@@ -320,6 +323,11 @@ export class UmbPropertyElement extends UmbLitElement {
 	}
 
 	private async _gotEditorUI(manifest?: ManifestPropertyEditorUi | null): Promise<void> {
+		if (this._element && this._element.manifest === manifest) {
+			// If we already have an element and the manifest haven't changed, we don't need to do anything.
+			return;
+		}
+
 		this.#extensionsController?.destroy();
 		this.#propertyContext.setEditor(undefined);
 		this.#propertyContext.setEditorManifest(manifest ?? undefined);
@@ -355,6 +363,7 @@ export class UmbPropertyElement extends UmbLitElement {
 				// No need to observe mandatory or label, as we already do so and set it on the _element if present: [NL]
 				this._element.manifest = manifest;
 				this._element.mandatory = this._mandatory;
+				this._element.alias = this._alias;
 				this._element.name = this._label;
 				this._element.dataSourceAlias = this.#propertyContext.getEditorDataSourceAlias();
 

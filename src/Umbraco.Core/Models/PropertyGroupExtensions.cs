@@ -1,5 +1,8 @@
 namespace Umbraco.Cms.Core.Models;
 
+/// <summary>
+///     Provides extension methods for <see cref="PropertyGroup" />.
+/// </summary>
 public static class PropertyGroupExtensions
 {
     private const char AliasSeparator = '/';
@@ -13,6 +16,11 @@ public static class PropertyGroupExtensions
     /// </returns>
     public static string? GetLocalAlias(this PropertyGroup propertyGroup) => GetLocalAlias(propertyGroup.Alias);
 
+    /// <summary>
+    ///     Gets the local alias from a full alias string.
+    /// </summary>
+    /// <param name="alias">The full alias.</param>
+    /// <returns>The local alias portion after the last separator.</returns>
     internal static string? GetLocalAlias(string alias)
     {
         var lastIndex = alias?.LastIndexOf(AliasSeparator) ?? -1;
@@ -24,6 +32,11 @@ public static class PropertyGroupExtensions
         return alias;
     }
 
+    /// <summary>
+    ///     Gets the parent alias from a full alias string.
+    /// </summary>
+    /// <param name="alias">The full alias.</param>
+    /// <returns>The parent alias portion before the last separator, or <c>null</c> if there is no separator.</returns>
     internal static string? GetParentAlias(string? alias)
     {
         var lastIndex = alias?.LastIndexOf(AliasSeparator) ?? -1;

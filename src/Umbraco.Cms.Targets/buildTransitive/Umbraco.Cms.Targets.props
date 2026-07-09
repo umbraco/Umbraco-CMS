@@ -14,4 +14,18 @@
     <UmbracoJsonSchemaFiles Include="$(MSBuildThisFileDirectory)..\appsettings-schema.Umbraco.Cms.json" Weight="-90" />
     <UmbracoPackageSchemaFiles Include="$(MSBuildThisFileDirectory)..\umbraco-package-schema.json" Weight="-90" />
   </ItemGroup>
+
+  <!--
+    The Razor editor in modern Visual Studio and the C# extension for VS Code use the Razor source generator
+    for IDE functionality. We need to add some things to make sure it works correctly, but we
+    only do them for design time builds, so that we don't impact regular builds or CI.
+    We also have an escape hatch in case it does cause issues, users can set EnableCohostEditorCompatibility=false
+    in their project file to disable this.
+
+    CompilerVisibleProperty is surfaced to generators via AnalyzerConfigOptionsProvider, not as a source-generator input file,
+    so it doesn't enter the hintName-collision codepath that AdditionalFiles does. Keeping it at evaluation time is safe.
+  -->
+  <ItemGroup Condition="'$(DesignTimeBuild)' == 'true' and '$(EnableCohostEditorCompatibility)' != 'false'">
+    <CompilerVisibleProperty Include="MSBuildProjectDirectory" />
+  </ItemGroup>
 </Project>

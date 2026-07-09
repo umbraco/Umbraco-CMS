@@ -231,7 +231,7 @@ internal sealed class EagerMatcherPolicy : MatcherPolicy, IEndpointSelectorPolic
 
     private Task<bool> HandleInstallUpgrade(HttpContext httpContext, CandidateSet candidates)
     {
-        if (_runtimeState.Level != RuntimeLevel.Upgrade)
+        if (_runtimeState.Level is not RuntimeLevel.Upgrade and not RuntimeLevel.Upgrading)
         {
             // We need to let the installer API requests through
             // Currently we do this with a check for the installer path
@@ -250,8 +250,8 @@ internal sealed class EagerMatcherPolicy : MatcherPolicy, IEndpointSelectorPolic
             return Task.FromResult(true);
         }
 
-        // Check if maintenance page should be shown
-        // Current behaviour is that statically routed endpoints still work in upgrade state
+        // Check if maintenance page should be shown.
+        // Current behaviour is that statically routed endpoints still work in upgrade state.
         // This means that IF there is a static route, we should not show the maintenance page.
         // And instead carry on as we normally would.
         var hasStaticRoute = false;
@@ -266,7 +266,7 @@ internal sealed class EagerMatcherPolicy : MatcherPolicy, IEndpointSelectorPolic
             }
         }
 
-        if (_runtimeState.Level != RuntimeLevel.Upgrade
+        if (_runtimeState.Level is not RuntimeLevel.Upgrade and not RuntimeLevel.Upgrading
             || _globalSettings.ShowMaintenancePageWhenInUpgradeState is false
             || hasStaticRoute)
         {
@@ -282,6 +282,5 @@ internal sealed class EagerMatcherPolicy : MatcherPolicy, IEndpointSelectorPolic
         });
 
         return Task.FromResult(true);
-
     }
 }

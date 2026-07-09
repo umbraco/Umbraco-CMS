@@ -10,12 +10,25 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Webhooks.Events;
 
+/// <summary>
+/// Abstract base class for extended content webhook events that include full Delivery API content payloads.
+/// </summary>
+/// <typeparam name="TNotification">The type of notification this webhook event handles.</typeparam>
 public abstract class ExtendedContentWebhookEventBase<TNotification> : WebhookEventContentBase<TNotification, IContent>
     where TNotification : INotification
 {
     private readonly IOutputExpansionStrategyAccessor _outputExpansionStrategyAccessor;
     private readonly IVariationContextAccessor _variationContextAccessor;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ExtendedContentWebhookEventBase{TNotification}"/> class.
+    /// </summary>
+    /// <param name="webhookFiringService">The webhook firing service.</param>
+    /// <param name="webhookService">The webhook service.</param>
+    /// <param name="webhookSettings">The webhook settings.</param>
+    /// <param name="serverRoleAccessor">The server role accessor.</param>
+    /// <param name="outputExpansionStrategyAccessor">The output expansion strategy accessor.</param>
+    /// <param name="variationContextAccessor">The variation context accessor.</param>
     public ExtendedContentWebhookEventBase(
         IWebhookFiringService webhookFiringService,
         IWebhookService webhookService,
@@ -29,6 +42,12 @@ public abstract class ExtendedContentWebhookEventBase<TNotification> : WebhookEv
         _variationContextAccessor = variationContextAccessor;
     }
 
+    /// <summary>
+    /// Builds a dictionary of culture-specific properties for the given content.
+    /// </summary>
+    /// <param name="publishedContent">The published content.</param>
+    /// <param name="deliveryContent">The Delivery API content response.</param>
+    /// <returns>A dictionary containing culture codes as keys and culture-specific data as values.</returns>
     public Dictionary<string, object> BuildCultureProperties(
         IPublishedContent publishedContent,
         IApiContentResponse deliveryContent)

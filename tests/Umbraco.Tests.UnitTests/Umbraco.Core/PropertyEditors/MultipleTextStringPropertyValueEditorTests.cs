@@ -1,5 +1,4 @@
 using System.Globalization;
-using System.Text.Json.Nodes;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
@@ -164,11 +163,11 @@ public class MultipleTextStringPropertyValueEditorTests
         }
     }
 
-    [TestCase("", false)]
-    [TestCase("one", false)]
-    [TestCase("one\ntwo", true)]
-    [TestCase("one\ntwo\nthree", true)]
-    public void Validates_Number_Of_Items_Is_Greater_Than_Or_Equal_To_Configured_Min_Raw_Property_Value(string value, bool expectedSuccess)
+    [TestCase("", false, "outOfRangeMultipleItemsMinimum")]
+    [TestCase("one", false, "outOfRangeSingleItemMinimum")]
+    [TestCase("one\ntwo", true, "")]
+    [TestCase("one\ntwo\nthree", true, "")]
+    public void Validates_Number_Of_Items_Is_Greater_Than_Or_Equal_To_Configured_Min_Raw_Property_Value(string value, bool expectedSuccess, string expectedValidationMessageKey)
     {
         var editor = CreateValueEditor();
         var result = editor.Validate(value, false, null, PropertyValidationContext.Empty());
@@ -181,7 +180,7 @@ public class MultipleTextStringPropertyValueEditorTests
             Assert.AreEqual(1, result.Count());
 
             var validationResult = result.First();
-            Assert.AreEqual($"validation_outOfRangeSingleItemMinimum", validationResult.ErrorMessage);
+            Assert.AreEqual($"validation_{expectedValidationMessageKey}", validationResult.ErrorMessage);
         }
     }
 
@@ -247,6 +246,108 @@ public class MultipleTextStringPropertyValueEditorTests
         Assert.IsEmpty(result);
     }
 
+    [Test]
+    public void FromEditor_Filters_Empty_Strings()
+    {
+        var fromEditor = FromEditor(new[] { "one", string.Empty, "two", "  ", "three" }) as string;
+        Assert.AreEqual("one\ntwo\nthree", fromEditor);
+    }
+
+    [Test]
+    public void FromEditor_Returns_Null_For_Empty_Collection()
+    {
+        var fromEditor = FromEditor(Array.Empty<string>());
+        Assert.IsNull(fromEditor);
+    }
+
+    [Test]
+    public void FromEditor_Returns_Null_When_All_Strings_Are_Empty()
+    {
+        var fromEditor = FromEditor(new[] { string.Empty, "  ", "\t" });
+        Assert.IsNull(fromEditor);
+    }
+
+    [Test]
+    public void FromEditor_Preserves_Non_Empty_Strings_Mixed_With_Empty()
+    {
+        var fromEditor = FromEditor(new[] { string.Empty, "valid@email.com", string.Empty }) as string;
+        Assert.AreEqual("valid@email.com", fromEditor);
+    }
+
+    [Test]
+    public void Format_Validator_Skips_Empty_Strings()
+    {
+        var editor = CreateValueEditor();
+        editor.ConfigurationObject = new MultipleTextStringConfiguration();
+
+        // Email regex pattern - empty strings should be skipped, not fail validation.
+        const string emailRegex = @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$";
+        var value = new[] { string.Empty, "valid@email.com" };
+
+        var result = editor.Validate(value, false, emailRegex, PropertyValidationContext.Empty());
+        Assert.IsEmpty(result);
+    }
+
+    [Test]
+    public void Format_Validator_Fails_For_Invalid_Non_Empty_Strings()
+    {
+        var editor = CreateValueEditor();
+        editor.ConfigurationObject = new MultipleTextStringConfiguration();
+
+        const string emailRegex = @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$";
+        var value = new[] { "not-an-email", "valid@email.com" };
+
+        var result = editor.Validate(value, false, emailRegex, PropertyValidationContext.Empty());
+        Assert.IsNotEmpty(result);
+    }
+
+    [Test]
+    public void MinMax_Validator_Does_Not_Count_Empty_Strings()
+    {
+        var editor = CreateValueEditor();
+        editor.ConfigurationObject = new MultipleTextStringConfiguration { Min = 2, Max = 4 };
+
+        // 2 non-empty + 2 empty = should count as 2, meeting min=2
+        var value = new[] { "one", string.Empty, "two", string.Empty };
+        var result = editor.Validate(value, false, null, PropertyValidationContext.Empty());
+        Assert.IsEmpty(result);
+    }
+
+    [Test]
+    public void MinMax_Validator_Does_Not_Count_Empty_Strings_Below_Min()
+    {
+        var editor = CreateValueEditor();
+        editor.ConfigurationObject = new MultipleTextStringConfiguration { Min = 2, Max = 4 };
+
+        // 1 non-empty + 2 empty = should count as 1, failing min=2
+        var value = new[] { "one", string.Empty, string.Empty };
+        var result = editor.Validate(value, false, null, PropertyValidationContext.Empty());
+        Assert.AreEqual(1, result.Count());
+        Assert.AreEqual("validation_outOfRangeSingleItemMinimum", result.First().ErrorMessage);
+    }
+
+    [Test]
+    public void Required_Validator_Fails_When_All_Strings_Are_Empty()
+    {
+        var editor = CreateValueEditor();
+        editor.ConfigurationObject = new MultipleTextStringConfiguration();
+
+        var value = new[] { string.Empty, "  " };
+        var result = editor.Validate(value, true, null, PropertyValidationContext.Empty());
+        Assert.IsNotEmpty(result);
+    }
+
+    [Test]
+    public void Required_Validator_Passes_When_Non_Empty_Strings_Present()
+    {
+        var editor = CreateValueEditor();
+        editor.ConfigurationObject = new MultipleTextStringConfiguration();
+
+        var value = new[] { string.Empty, "valid@email.com" };
+        var result = editor.Validate(value, true, null, PropertyValidationContext.Empty());
+        Assert.IsEmpty(result);
+    }
+
     private static object? FromEditor(object? value, int max = 0)
         => CreateValueEditor().FromEditor(new ContentPropertyData(value, new MultipleTextStringConfiguration { Max = max }), null);
 
@@ -279,7 +380,7 @@ public class MultipleTextStringPropertyValueEditorTests
             ConfigurationObject = new MultipleTextStringConfiguration
             {
                 Min = 2,
-                Max = 4
+                Max = 4,
             },
         };
     }

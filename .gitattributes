@@ -55,3 +55,8 @@
 *.sln text=auto eol=crlf merge=union
 
 *.gitattributes text=auto
+
+# Generated files - hidden by default in GitHub diffs
+src/Umbraco.Web.UI.Client/src/packages/core/backend-api/** linguist-generated
+src/Umbraco.Web.UI.Login/src/api/** linguist-generated
+src/Umbraco.Cms.Api.Management/OpenApi.json linguist-generated

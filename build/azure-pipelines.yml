@@ -107,9 +107,17 @@ stages:
               command: build
               projects: $(solution)
               arguments: "--configuration $(buildConfiguration) --no-restore --property:ContinuousIntegrationBuild=true --property:GeneratePackageOnBuild=true --property:PackageOutputPath=$(Build.ArtifactStagingDirectory)/nupkg"
+          # Publish compiled DLLs for C# API documentation generation
+          # Separate artifact to avoid increasing build_output size for all builds
+          - task: PublishPipelineArtifact@1
+            displayName: Publish DocFX DLLs
+            condition: and(succeeded(), or(eq(variables['build.NBGV_PublicRelease'], 'True'), eq('${{ parameters.buildApiDocs }}', 'True')))
+            inputs:
+              targetPath: $(Build.SourcesDirectory)/src/Umbraco.Cms/bin/Release
+              artifactName: csharp-docs-dlls
           - powershell: |
               dotnet tool install --global CycloneDX
-              dotnet-CycloneDX $(solution) --output $(Build.ArtifactStagingDirectory)/bom --filename bom-dotnet.xml
+              dotnet-CycloneDX $(solution) --spec-version 1.5 --output $(Build.ArtifactStagingDirectory)/bom --filename bom-dotnet.xml
             displayName: 'Generate Backend BOM'
           - powershell: |
               npm install --global @cyclonedx/cyclonedx-npm
@@ -167,6 +175,34 @@ stages:
             artifact: bom-frontend
             displayName: 'Publish Frontend BOM'
 
+      - job: C
+        displayName: Build Test Helpers Package
+        pool:
+          vmImage: "ubuntu-latest"
+        steps:
+          - checkout: self
+            submodules: false
+            lfs: false
+            fetchDepth: 500
+          - template: templates/e2e-install.yml
+            parameters:
+              nodeVersion: ${{ variables.nodeVersion }}
+              npm_config_cache: ${{ variables.npm_config_cache }}
+          - template: templates/set-npm-version.yml
+            parameters:
+              workingDirectory: tests/Umbraco.Tests.AcceptanceTest
+          - bash: |
+              echo "##[command]Running npm pack"
+              mkdir $(Build.ArtifactStagingDirectory)/npm-testhelpers
+              npm pack --pack-destination $(Build.ArtifactStagingDirectory)/npm-testhelpers
+            displayName: Run npm pack
+            workingDirectory: tests/Umbraco.Tests.AcceptanceTest
+          - task: PublishPipelineArtifact@1
+            displayName: Publish Test Helpers npm artifact
+            inputs:
+              targetPath: $(Build.ArtifactStagingDirectory)/npm-testhelpers
+              artifactName: npm-testhelpers
+
   - stage: E2E_BOM
     displayName: E2E Tests BOM Generation
     dependsOn: []
@@ -200,12 +236,22 @@ stages:
     variables:
       umbracoMajorVersion: $[ stageDependencies.Build.A.outputs['build.NBGV_VersionMajor'] ]
     jobs:
-      # C# API Reference
+      # C# API Reference - uses pre-compiled DLLs for faster generation (csproj approach caused timeouts)
       - job:
         displayName: Build C# API Reference
         pool:
           vmImage: "windows-latest"
         steps:
+          - checkout: self
+            submodules: false
+            lfs: false
+            fetchDepth: 1
+            fetchFilter: tree:0
+          - task: DownloadPipelineArtifact@2
+            displayName: Download DocFX DLLs
+            inputs:
+              artifact: csharp-docs-dlls
+              path: $(Build.SourcesDirectory)/src/Umbraco.Cms/bin/Release
           - task: UseDotNet@2
             displayName: Use .NET SDK from global.json
             inputs:
@@ -215,7 +261,7 @@ stages:
             inputs:
               targetType: inline
               script: |
-                choco install docfx --version=2.59.4 -y
+                dotnet tool install -g docfx --version 2.78.4
                 if ($lastexitcode -ne 0){
                     throw ("Error installing DocFX")
                 }
@@ -561,7 +607,6 @@ stages:
       UMBRACO__CMS__GLOBAL__VERSIONCHECKPERIOD: 0
       UMBRACO__CMS__GLOBAL__USEHTTPS: true
       UMBRACO__CMS__HEALTHCHECKS__NOTIFICATION__ENABLED: false
-      UMBRACO__CMS__KEEPALIVE__DISABLEKEEPALIVETASK: true
       UMBRACO__CMS__WEBROUTING__UMBRACOAPPLICATIONURL: https://localhost:44331/
       ASPNETCORE_URLS: https://localhost:44331
     jobs:
@@ -780,52 +825,56 @@ stages:
                 publishFeedCredentials: "MyGet - Umbraco Nightly"
               ${{ else }}:
                 publishFeedCredentials: "MyGet - Pre-releases"
+      # Pre-release/nightly feeds: keep the `latest` dist-tag default (no `next` split).
       - job:
         displayName: Push to pre-release feed (npm)
         steps:
-          - checkout: none
-          - download: current
-            artifact: npm
-          - bash: |
-              # Check if we are on a nightly build
-              if [ $isNightly = "False" ]; then
-                  echo "##[debug]Prerelease build detected"
-                  registry="https://www.myget.org/F/umbracoprereleases/npm/"
-              else
-                  echo "##[debug]Nightly build detected"
-                  registry="https://www.myget.org/F/umbraconightly/npm/"
-              fi
-              echo "@umbraco-cms:registry=$registry" >> .npmrc
-            env:
-              isNightly: ${{parameters.isNightly}}
-            workingDirectory: $(Pipeline.Workspace)/npm
-            displayName: Add scoped registry to .npmrc
-          - task: npmAuthenticate@0
-            displayName: Authenticate with npm (MyGet)
-            inputs:
-              workingFile: "$(Pipeline.Workspace)/npm/.npmrc"
+          - template: templates/npm-publish.yml
+            parameters:
+              artifactName: npm
               customEndpoint: "MyGet (npm) - Umbracoprereleases, MyGet (npm) - Umbraconightly"
-          - bash: |
-              # Setup temp npm project to load in defaults from the local .npmrc
-              npm init -y
-
-              # Find the first .tgz file in the current directory and publish it
-              files=( ./*.tgz )
-              npm publish "${files[0]}"
-            displayName: Push to npm (MyGet)
-            workingDirectory: $(Pipeline.Workspace)/npm
+              displayName: Push to npm (MyGet)
+              ${{ if eq(parameters.isNightly, true) }}:
+                registry: https://www.myget.org/F/umbraconightly/npm/
+              ${{ else }}:
+                registry: https://www.myget.org/F/umbracoprereleases/npm/
+      - job: PublishTestHelpersNpm
+        displayName: Push TestHelpers to pre-release feed (npm)
+        steps:
+          - template: templates/npm-publish.yml
+            parameters:
+              artifactName: npm-testhelpers
+              customEndpoint: "MyGet (npm) - Umbracoprereleases, MyGet (npm) - Umbraconightly"
+              displayName: Push test helpers to npm (MyGet)
+              ${{ if eq(parameters.isNightly, true) }}:
+                registry: https://www.myget.org/F/umbraconightly/npm/
+              ${{ else }}:
+                registry: https://www.myget.org/F/umbracoprereleases/npm/
 
   - stage: Deploy_NuGet
     displayName: NuGet release
-    dependsOn:
-      - Deploy_MyGet
-      - Build_Docs
-    condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.nuGetDeploy}}))
+    dependsOn: Deploy_MyGet
+    # Run only when Deploy_MyGet actually ran (succeeded or failed) — not when it was skipped due to an upstream test failure.
+    # Inspect Deploy_MyGet's direct result rather than succeeded()/failed(), which are transitive across the full ancestor graph.
+    # Approval is required every run via the WaitForApproval job below.
+    condition: and(in(dependencies.Deploy_MyGet.result, 'Succeeded', 'SucceededWithIssues', 'Failed'), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.nuGetDeploy}}))
     jobs:
-      - job:
+      - job: WaitForApproval
+        displayName: Wait for manual approval
+        pool: server
+        timeoutInMinutes: 4320 # 3 days
+        steps:
+          - task: ManualValidation@0
+            displayName: Manual approval to push to NuGet
+            inputs:
+              notifyUsers: ''
+              instructions: 'Approve to push the NuGet release.'
+              onTimeout: 'reject'
+      - job: Push
+        displayName: Push to NuGet
+        dependsOn: WaitForApproval
         pool:
           vmImage: "windows-latest" # NuGetCommand@2 is no longer supported on Ubuntu 24.04 so we'll use windows until an alternative is available.
-        displayName: Push to NuGet
         steps:
           - checkout: none
           - task: DownloadPipelineArtifact@2
@@ -843,33 +892,36 @@ stages:
 
   - stage: Deploy_Npm
     displayName: Npm release
-    condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.npmDeploy}}))
+    # Inspect Deploy_NuGet.result directly so a MyGet failure (which is in the transitive ancestor graph)
+    # doesn't cascade-skip this stage via succeeded(). Deploy_NuGet must itself have succeeded — a NuGet
+    # failure deliberately blocks the npm release.
+    condition: and(in(dependencies.Deploy_NuGet.result, 'Succeeded', 'SucceededWithIssues'), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.npmDeploy}}))
     dependsOn:
       - Deploy_NuGet
+    variables:
+      # `latest` for stable releases, `next` for prereleases.
+      npmDistTag: $[ iif(eq(stageDependencies.Build.A.outputs['build.NBGV_PrereleaseVersionNoLeadingHyphen'], ''), 'latest', 'next') ]
     jobs:
       - job: Publish
         displayName: Push to NPM
         steps:
-          - checkout: none
-          - download: current
-            artifact: npm
-          - bash: echo "@umbraco-cms:registry=https://registry.npmjs.org" >> .npmrc
-            workingDirectory: $(Pipeline.Workspace)/npm
-            displayName: Add scoped registry to .npmrc
-          - task: npmAuthenticate@0
-            displayName: Authenticate with npm
-            inputs:
-              workingFile: $(Pipeline.Workspace)/npm/.npmrc
+          - template: templates/npm-publish.yml
+            parameters:
+              artifactName: npm
+              registry: https://registry.npmjs.org/
               customEndpoint: "NPM - Umbraco Backoffice"
-          - script: |
-              # Setup temp npm project to load in defaults from the local .npmrc
-              npm init -y
-
-              # Find the first .tgz file in the current directory and publish it
-              files=( ./*.tgz )
-              npm publish "${files[0]}"
-            displayName: Push to npm
-            workingDirectory: $(Pipeline.Workspace)/npm
+              displayName: Push to npm
+              npmTag: $(npmDistTag)
+      - job: PublishTestHelpers
+        displayName: Push Test Helpers to NPM
+        steps:
+          - template: templates/npm-publish.yml
+            parameters:
+              artifactName: npm-testhelpers
+              registry: https://registry.npmjs.org/
+              customEndpoint: "NPM - Umbraco Backoffice"
+              displayName: Push test helpers to npm
+              npmTag: $(npmDistTag)
 
   - stage: Upload_API_Docs
     pool:
@@ -879,8 +931,12 @@ stages:
     displayName: Upload API Documentation
     dependsOn:
       - Build
+      - Build_Docs
       - Deploy_NuGet
-    condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.uploadApiDocs}}))
+    # Build_Docs must have produced artifacts (we won't upload anything otherwise) and Deploy_NuGet must
+    # have succeeded — a NuGet failure deliberately blocks the docs upload. Direct result checks avoid
+    # transitive succeeded()/failed() which would cascade-skip on a MyGet failure.
+    condition: and(in(dependencies.Build_Docs.result, 'Succeeded', 'SucceededWithIssues'), in(dependencies.Deploy_NuGet.result, 'Succeeded', 'SucceededWithIssues'), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.uploadApiDocs}}))
     jobs:
       - job:
         displayName: Upload C# Docs

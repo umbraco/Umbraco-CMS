@@ -1,5 +1,8 @@
 namespace Umbraco.Cms.Core.Collections;
 
+/// <summary>
+///     Specifies the behavior when deep cloning a <see cref="DeepCloneableList{T}" />.
+/// </summary>
 public enum ListCloneBehavior
 {
     /// <summary>

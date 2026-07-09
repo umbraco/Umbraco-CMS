@@ -1,8 +1,8 @@
 import type { UmbModalToken } from '../token/modal-token.js';
 import { UmbModalContext } from './modal.context.js';
 import type { UmbModalContextClassArgs } from './modal.context.js';
+import { UMB_MODAL_MANAGER_CONTEXT } from './modal-manager.context-token.js';
 import { UmbBasicState, appendToFrozenArray } from '@umbraco-cms/backoffice/observable-api';
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
@@ -88,6 +88,4 @@ export class UmbModalManagerContext extends UmbContextBase {
 	}
 }
 
-export const UMB_MODAL_MANAGER_CONTEXT = new UmbContextToken<UmbModalManagerContext, UmbModalManagerContext>(
-	'UmbModalManagerContext',
-);
+export { UMB_MODAL_MANAGER_CONTEXT } from './modal-manager.context-token.js';

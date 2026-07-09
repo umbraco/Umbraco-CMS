@@ -1,5 +1,8 @@
 namespace Umbraco.Cms.Core.Logging;
 
+/// <summary>
+///     Provides extension methods for <see cref="IProfiler"/>.
+/// </summary>
 internal static class ProfilerExtensions
 {
     /// <summary>

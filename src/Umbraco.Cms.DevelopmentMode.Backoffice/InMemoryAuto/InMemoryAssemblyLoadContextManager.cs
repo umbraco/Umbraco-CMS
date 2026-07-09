@@ -3,12 +3,15 @@ using System.Runtime.Loader;
 
 namespace Umbraco.Cms.DevelopmentMode.Backoffice.InMemoryAuto;
 
-internal sealed class InMemoryAssemblyLoadContextManager
+internal sealed class InMemoryAssemblyLoadContextManager : IDisposable
 {
     private UmbracoAssemblyLoadContext? _currentAssemblyLoadContext;
 
     public InMemoryAssemblyLoadContextManager() =>
         AssemblyLoadContext.Default.Resolving += OnResolvingDefaultAssemblyLoadContext;
+
+    public void Dispose() =>
+        AssemblyLoadContext.Default.Resolving -= OnResolvingDefaultAssemblyLoadContext;
 
     private string? _modelsAssemblyLocation;
 

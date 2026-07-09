@@ -14,6 +14,14 @@ namespace Umbraco.Cms.Core.DependencyInjection;
 /// </summary>
 public static partial class UmbracoBuilderExtensions
 {
+    /// <summary>
+    ///     Adds Umbraco options of type <typeparamref name="TOptions" /> to the builder.
+    /// </summary>
+    /// <typeparam name="TOptions">The type of options to add. Must have the <see cref="UmbracoOptionsAttribute" />.</typeparam>
+    /// <param name="builder">The builder.</param>
+    /// <param name="configure">Optional action to configure the <see cref="OptionsBuilder{TOptions}" />.</param>
+    /// <returns>The <see cref="IUmbracoBuilder" />.</returns>
+    /// <exception cref="ArgumentException">Thrown when <typeparamref name="TOptions" /> does not have the <see cref="UmbracoOptionsAttribute" />.</exception>
     private static IUmbracoBuilder AddUmbracoOptions<TOptions>(this IUmbracoBuilder builder, Action<OptionsBuilder<TOptions>>? configure = null)
         where TOptions : class
     {
@@ -44,12 +52,16 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IValidateOptions<DeliveryApiSettings>, DeliveryApiSettingsValidator>();
         builder.Services.AddSingleton<IValidateOptions<GlobalSettings>, GlobalSettingsValidator>();
         builder.Services.AddSingleton<IValidateOptions<HealthChecksSettings>, HealthChecksSettingsValidator>();
+        builder.Services.AddSingleton<IValidateOptions<HostingSettings>, HostingSettingsValidator>();
         builder.Services.AddSingleton<IValidateOptions<LoggingSettings>, LoggingSettingsValidator>();
         builder.Services.AddSingleton<IValidateOptions<RequestHandlerSettings>, RequestHandlerSettingsValidator>();
         builder.Services.AddSingleton<IValidateOptions<UnattendedSettings>, UnattendedSettingsValidator>();
         builder.Services.AddSingleton<IValidateOptions<SecuritySettings>, SecuritySettingsValidator>();
+        builder.Services.AddSingleton<IValidateOptions<ScheduledPublishingSettings>, ScheduledPublishingSettingsValidator>();
 
         // Register configuration sections.
+        // TODO (V18): Remove the registrations of UserPasswordConfigurationSettings and MemberPasswordConfigurationSettings.
+        // Update any class taking these as constructor dependencies to instead take SecuritySettings and read the UserPassword or MemberPassword properties.
         builder
             .AddUmbracoOptions<ModelsBuilderSettings>()
             .AddUmbracoOptions<IndexCreatorSettings>()
@@ -57,6 +69,7 @@ public static partial class UmbracoBuilderExtensions
             .AddUmbracoOptions<ContentSettings>()
             .AddUmbracoOptions<DeliveryApiSettings>()
             .AddUmbracoOptions<CoreDebugSettings>()
+            .AddUmbracoOptions<DictionarySettings>()
             .AddUmbracoOptions<ExceptionFilterSettings>()
             .AddUmbracoOptions<GlobalSettings>(optionsBuilder => optionsBuilder.PostConfigure(options =>
             {
@@ -90,7 +103,10 @@ public static partial class UmbracoBuilderExtensions
             .AddUmbracoOptions<CacheSettings>()
             .AddUmbracoOptions<SystemDateMigrationSettings>()
             .AddUmbracoOptions<DistributedJobSettings>()
-            .AddUmbracoOptions<BackOfficeTokenCookieSettings>();
+            .AddUmbracoOptions<ScheduledPublishingSettings>(options => options.ValidateOnStart())
+            .AddUmbracoOptions<BackOfficeTokenCookieSettings>()
+            .AddUmbracoOptions<WebsiteSettings>()
+            .AddUmbracoOptions<SignalRSettings>();
 
         // Configure connection string and ensure it's updated when the configuration changes
         builder.Services.AddSingleton<IConfigureOptions<ConnectionStrings>, ConfigureConnectionStrings>();

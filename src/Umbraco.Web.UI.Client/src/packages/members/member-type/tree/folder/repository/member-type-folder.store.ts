@@ -15,7 +15,7 @@ export class UmbMemberTypeFolderStore extends UmbDetailStoreBase<UmbFolderModel>
 	 * @memberof UmbMemberTypeStore
 	 */
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_MEMBER_TYPE_FOLDER_STORE_CONTEXT.toString());
+		super(host, UMB_MEMBER_TYPE_FOLDER_STORE_CONTEXT);
 	}
 }
 

@@ -26,6 +26,11 @@ public static partial class Constants
         public static readonly Guid? RootKey = null;
 
         /// <summary>
+        /// The GUID identifier for global system root node that is stored in the database.
+        /// </summary>
+        public static readonly Guid RootSystemKey = new("916724a5-173d-4619-b97e-b9de133dd6f5");
+
+        /// <summary>
         /// The integer identifier for content's recycle bin.
         /// </summary>
         public const int RecycleBinContent = -20;
@@ -114,6 +119,9 @@ public static partial class Constants
         /// </summary>
         public const string DataDirectoryPlaceholder = "|DataDirectory|";
 
+        /// <summary>
+        ///     The wildcard character used to represent the invariant culture.
+        /// </summary>
         public const string InvariantCulture = "*";
     }
 }

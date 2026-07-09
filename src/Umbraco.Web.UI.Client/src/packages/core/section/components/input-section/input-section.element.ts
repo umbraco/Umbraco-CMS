@@ -1,6 +1,6 @@
 import type { UmbSectionItemModel } from '../../types.js';
 import { UmbSectionPickerInputContext } from './input-section.context.js';
-import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
@@ -25,12 +25,12 @@ export class UmbInputSectionElement extends UmbFormControlMixin<string | undefin
 
 	/**
 	 * Min validation message.
-	 * @type {boolean}
+	 * @type {string}
 	 * @attr
 	 * @default
 	 */
 	@property({ type: String, attribute: 'min-message' })
-	minMessage = 'This field need more items';
+	minMessage = 'This field needs more items';
 
 	/**
 	 * This is a maximum amount of selected items in this input.
@@ -48,11 +48,11 @@ export class UmbInputSectionElement extends UmbFormControlMixin<string | undefin
 
 	/**
 	 * Max validation message.
-	 * @type {boolean}
+	 * @type {string}
 	 * @attr
 	 * @default
 	 */
-	@property({ type: String, attribute: 'min-message' })
+	@property({ type: String, attribute: 'max-message' })
 	maxMessage = 'This field exceeds the allowed amount of items';
 
 	public set selection(uniques: Array<string>) {
@@ -91,7 +91,10 @@ export class UmbInputSectionElement extends UmbFormControlMixin<string | undefin
 		);
 
 		this.observe(this.#pickerContext.selection, (selection) => (this.value = selection.join(',')));
-		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems));
+		this.observe(
+			this.#pickerContext.selectedItems,
+			(selectedItems) => (this._items = [...selectedItems].sort((a, b) => (b.weight ?? 0) - (a.weight ?? 0))),
+		);
 	}
 
 	protected override getFormElement() {
@@ -100,7 +103,7 @@ export class UmbInputSectionElement extends UmbFormControlMixin<string | undefin
 
 	override render() {
 		return html`
-			<uui-ref-list>${this._items?.map((item) => this._renderItem(item))}</uui-ref-list>
+			<uui-ref-list>${repeat(this._items ?? [], (item) => item.unique, (item) => this._renderItem(item))}</uui-ref-list>
 			<uui-button
 				id="btn-add"
 				look="placeholder"

@@ -20,7 +20,7 @@ public interface IIndexingRebuilderService
     /// <param name="index">The index to rebuild.</param>
     /// <param name="indexName">The name of the index to rebuild.</param>
     /// <returns>Whether the rebuild was successfully scheduled.</returns>
-    [Obsolete("Use TryRebuildAsync() instead. Scheduled for removal in V19.")]
+    [Obsolete("Use TryRebuildAsync() instead. Scheduled for removal in Umbraco 19.")]
     bool TryRebuild(IIndex index, string indexName);
 
     /// <summary>
@@ -36,7 +36,7 @@ public interface IIndexingRebuilderService
     /// </summary>
     /// <param name="indexName">The name of the index to check.</param>
     /// <returns>Whether the index is currently being rebuilt.</returns>
-    [Obsolete("Use IsRebuildingAsync() instead. Scheduled for removal in V19.")]
+    [Obsolete("Use IsRebuildingAsync() instead. Scheduled for removal in Umbraco 19.")]
     bool IsRebuilding(string indexName);
 
     /// <summary>

@@ -42,6 +42,13 @@ public abstract class AutomaticPackageMigrationPlan : PackageMigrationPlan
         : base(packageId, packageName, planName)
     { }
 
+    /// <summary>
+    /// Automatic package migration plans must always run from initial state because
+    /// the final state is a hash of the embedded package data. When the data changes,
+    /// the old hash no longer exists in the transition graph.
+    /// </summary>
+    public override bool IgnoreCurrentState => true;
+
     /// <inheritdoc />
     protected sealed override void DefinePlan()
     {

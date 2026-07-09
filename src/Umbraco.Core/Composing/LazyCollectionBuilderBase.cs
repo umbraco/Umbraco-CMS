@@ -17,6 +17,9 @@ public abstract class
     private readonly List<Type> _excluded = new();
     private readonly List<Func<IEnumerable<Type>>> _producers = new();
 
+    /// <summary>
+    /// Gets the current builder instance.
+    /// </summary>
     protected abstract TBuilder This { get; }
 
     /// <summary>
@@ -122,6 +125,7 @@ public abstract class
         return This;
     }
 
+    /// <inheritdoc />
     protected override IEnumerable<Type> GetRegisteringTypes(IEnumerable<Type> types) =>
         types
             .Union(_producers.SelectMany(x => x()))

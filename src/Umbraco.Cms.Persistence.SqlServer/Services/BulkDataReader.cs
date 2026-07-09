@@ -70,7 +70,7 @@ internal abstract class BulkDataReader : IDataReader
                     throw new InvalidOperationException("AddSchemaTableRows did not add rows.");
                 }
 
-                Debug.Assert(_schemaTable?.Rows.Count == FieldCount);
+                Debug.Assert(_schemaTable?.Rows.Count == FieldCount, "Schema table row count should match field count.");
             }
 
             return new ReadOnlyCollection<SqlBulkCopyColumnMapping>(_columnMappings!);
@@ -105,11 +105,11 @@ internal abstract class BulkDataReader : IDataReader
     /// <remarks>
     ///     Call
     ///     <see
-    ///         cref="AddSchemaTableRow(string,Nullable{Int32},Nullable{Int16},Nullable{Int16},bool,bool,bool,SqlDbType,string,string,string,string,string)" />
+    ///         cref="AddSchemaTableRow(string,Nullable{int},Nullable{short},Nullable{short},bool,bool,bool,SqlDbType,string,string,string,string,string)" />
     ///     to do this for each row.
     /// </remarks>
     /// <seealso
-    ///     cref="AddSchemaTableRow(string,Nullable{Int32},Nullable{Int16},Nullable{Int16},bool,bool,bool,SqlDbType,string,string,string,string,string)" />
+    ///     cref="AddSchemaTableRow(string,Nullable{int},Nullable{short},Nullable{short},bool,bool,bool,SqlDbType,string,string,string,string,string)" />
     protected abstract void AddSchemaTableRows();
 
     /// <summary>
@@ -118,11 +118,11 @@ internal abstract class BulkDataReader : IDataReader
     /// <remarks>
     ///     This is used for checking the parameters of
     ///     <see
-    ///         cref="AddSchemaTableRow(string,Nullable{Int32},Nullable{Int16},Nullable{Int16},bool,bool,bool,SqlDbType,string,string,string,string,string)" />
+    ///         cref="AddSchemaTableRow(string,Nullable{int},Nullable{short},Nullable{short},bool,bool,bool,SqlDbType,string,string,string,string,string)" />
     ///     .
     /// </remarks>
     /// <seealso
-    ///     cref="AddSchemaTableRow(string,Nullable{Int32},Nullable{Int16},Nullable{Int16},bool,bool,bool,SqlDbType,string,string,string,string,string)" />
+    ///     cref="AddSchemaTableRow(string,Nullable{int},Nullable{short},Nullable{short},bool,bool,bool,SqlDbType,string,string,string,string,string)" />
     private static readonly Dictionary<SqlDbType, List<string>> AllowedOptionalColumnCombinations = new()
     {
         {SqlDbType.BigInt, new List<string>()},
@@ -1311,7 +1311,7 @@ internal abstract class BulkDataReader : IDataReader
 
             AddSchemaTableRows();
 
-            Debug.Assert(_schemaTable.Rows.Count == FieldCount);
+            Debug.Assert(_schemaTable.Rows.Count == FieldCount, "Schema table row count should match field count.");
         }
 
         return _schemaTable!;

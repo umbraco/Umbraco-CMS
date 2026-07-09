@@ -1,10 +1,15 @@
-﻿using Umbraco.Cms.Api.Management.ViewModels.Member;
+using Umbraco.Cms.Api.Management.ViewModels.Member;
 using Umbraco.Cms.Core.Models.ContentEditing;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
 internal sealed class MemberEditingPresentationFactory : ContentEditingPresentationFactory<MemberValueModel, MemberVariantRequestModel>, IMemberEditingPresentationFactory
 {
+    /// <summary>
+    /// Maps a <see cref="CreateMemberRequestModel"/> to a <see cref="MemberCreateModel"/>.
+    /// </summary>
+    /// <param name="createRequestModel">The create member request model to map from.</param>
+    /// <returns>A <see cref="MemberCreateModel"/> representing the mapped member.</returns>
     public MemberCreateModel MapCreateModel(CreateMemberRequestModel createRequestModel)
     {
         MemberCreateModel model = MapContentEditingModel<MemberCreateModel>(createRequestModel);

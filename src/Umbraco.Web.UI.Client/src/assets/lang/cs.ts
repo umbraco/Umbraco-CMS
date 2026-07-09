@@ -343,7 +343,7 @@ export default {
 		noDocumentTypesEditPermissions: 'Oprávnění k úpravám pro tento typ dokumentu',
 		noDocumentTypesCreateNew: 'Vytvořit nový typ dokumentu',
 		noDocumentTypesAllowedAtRoot:
-			'Nejsou zde k dispozici žádné povolené typy dokumentů pro vytváření obsahu. Musíte je povolit v sekci <strong>Typy dokumentů</strong> v části <strong>Nastavení</strong> změnou možnosti <strong>Povolit jako root</strong> v části <strong>Oprávnění</strong>.',
+			'Nejsou zde k dispozici žádné povolené typy dokumentů pro vytváření obsahu. Musíte je povolit v sekci <strong>Typy dokumentů</strong> v části <strong>Nastavení</strong> změnou možnosti <strong>Povolit jako root</strong> v části <strong>Struktura</strong>.',
 		noMediaTypes:
 			'Nejsou dostupné žádné povolené typy medií. Tyto musíte povolit v sekci nastavení pod <strong>"typy medií"</strong>.',
 		noMediaTypesWithNoSettingsAccess: 'Vybraná média ve stromu neumožňuje vytváření pod nimi žádná další média.',
@@ -639,6 +639,7 @@ export default {
 		content: 'Obsah',
 		continue: 'Pokračovat',
 		copy: 'Kopírovat',
+		copied: 'Zkopírováno!',
 		create: 'Vytvořit',
 		database: 'Databáze',
 		date: 'Datum',
@@ -1082,8 +1083,8 @@ export default {
 	},
 	rollback: {
 		headline: 'Vyberte verzi, kterou chcete porovnat s aktuální verzí',
-		diffHelp:
-			'Tohle ukazuje rozdíly mezi současnou verzi a vybranou verzi<br /><del>Červený</del> text nebude ve vybrané verzi zobrazen, <ins>zelený znamená přidaný</ins>].',
+		diffHelp: '<del>Červený text</del> bude ve vybrané verzi odstraněn, <ins>zelený text</ins> bude přidán.',
+		showDiff: 'Zobrazit rozdíly mezi aktuální (koncept) verzí a vybranou verzí.',
 		documentRolledBack: 'Dokument byl vrácen na starší verzi',
 		htmlHelp:
 			'Tohle zobrazuje vybranou verzi jako html, jestliže chcete vidět rozdíly mezi 2 verzemi najednou, použijte rozdílové zobrazení',
@@ -1380,8 +1381,16 @@ export default {
 		chooseChildNode: 'Vybrat podřízený uzel',
 		compositionsDescription:
 			'Zdědí záložky a vlastnosti z existujícího typu dokumentu. Nové záložky budou přidány do aktuálního typu dokumentu nebo sloučeny, pokud existuje záložka se stejným názvem.',
+		compositionsDescriptionMediaType:
+			'Zdědí záložky a vlastnosti z existujícího typu média. Nové záložky budou přidány do aktuálního typu média nebo sloučeny, pokud existuje záložka se stejným názvem.',
+		compositionsDescriptionMemberType:
+			'Zdědí záložky a vlastnosti z existujícího typu člena. Nové záložky budou přidány do aktuálního typu člena nebo sloučeny, pokud existuje záložka se stejným názvem.',
 		compositionInUse: 'Tento typ obsahu se používá ve složení, a proto jej nelze poskládat.',
+		compositionInUseMediaType: 'Tento typ média se používá ve složení, a proto jej nelze poskládat.',
+		compositionInUseMemberType: 'Tento typ člena se používá ve složení, a proto jej nelze poskládat.',
 		noAvailableCompositions: 'Nejsou k dispozici žádné typy obsahu, které lze použít jako složení.',
+		noAvailableCompositionsMediaType: 'Nejsou k dispozici žádné typy média, které lze použít jako složení.',
+		noAvailableCompositionsMemberType: 'Nejsou k dispozici žádné typy člena, které lze použít jako složení.',
 		compositionRemoveWarning:
 			'Odebráním složení odstraníte všechna související data vlastností. Jakmile uložíte typ dokumentu, již není cesta zpět.',
 		availableEditors: 'Vytvořit nové',
@@ -1414,6 +1423,8 @@ export default {
 		tabHasNoSortOrder: 'záložka nemá žádné řazení',
 		compositionUsageHeading: 'Kde se toto složení používá?',
 		compositionUsageSpecification: 'Toto složení se v současnosti používá ve složení následujících typů obsahu:',
+		compositionUsageSpecificationMediaType: 'Toto složení se v současnosti používá ve složení následujících typů média:',
+		compositionUsageSpecificationMemberType: 'Toto složení se v současnosti používá ve složení následujících typů člena:',
 		variantsHeading: 'Povolit různé jazyky',
 		variantsDescription: 'Povolit editorům vytvářet obsah tohoto typu v různých jazycích.',
 		allowVaryByCulture: 'Povolit různé jazyky',
@@ -1567,6 +1578,7 @@ export default {
 		noLockouts: 'nebyl uzamčen',
 		noPasswordChange: 'Heslo nebylo změněno',
 		confirmNewPassword: 'Potvrdit heslo',
+		confirmPassword: 'Potvrdit heslo',
 		changePasswordDescription:
 			"Můžete změnit své heslo pro přístup do administrace Umbraca vyplněním formuláře níže a kliknutím na tlačítko 'Změnit Heslo'",
 		contentChannel: 'Kanál obsahu',
@@ -1734,6 +1746,8 @@ export default {
 	redirectUrls: {
 		disableUrlTracker: 'Zakázat sledování URL',
 		enableUrlTracker: 'Povolit sledování URL',
+		urlTrackerEnabled: 'Povoleno',
+		urlTrackerDisabled: 'Zakázáno',
 		culture: 'Jazyk',
 		originalUrl: 'Originální URL',
 		redirectedTo: 'Přesměrováno na',
@@ -1808,7 +1822,8 @@ export default {
 		openBackofficeSearch: 'Otevřít hledání v backoffice',
 		openCloseBackofficeHelp: 'Otevřít/zavřít nápovědu backoffice',
 		openCloseBackofficeProfileOptions: 'Otevřít/zavřít možnosti vašeho profilu',
-		profileOptions: 'Opcije profila',
+		profileOptions: 'Profil uživatele pro %0% (%1%)',
+		profileOptionsDefault: 'Profil uživatele',
 		openContextMenu: 'Otevřít kontextové menu pro',
 		currentLanguage: 'Aktuální jazyk',
 		switchLanguage: 'Přepnout jazyk na',

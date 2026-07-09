@@ -1,25 +1,25 @@
-import { UmbDocumentVariantState, type UmbDocumentVariantOptionModel } from '../../types.js';
-import type { UUIBooleanInputElement } from '@umbraco-cms/backoffice/external/uui';
-import {
-	css,
-	customElement,
-	html,
-	nothing,
-	property,
-	repeat,
-	state,
-	type PropertyValues,
-} from '@umbraco-cms/backoffice/external/lit';
+import { UmbDocumentVariantState } from '../../variant-state.js';
+import type { UmbDocumentVariantOptionModel } from '../../types.js';
+import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import { sortVariants } from '@umbraco-cms/backoffice/variant';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import type { PropertyValues } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
+import type { UUIBooleanInputElement } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-document-variant-language-picker')
 export class UmbDocumentVariantLanguagePickerElement extends UmbLitElement {
 	#selectionManager!: UmbSelectionManager<string>;
 
 	@property({ type: Array, attribute: false })
-	variantLanguageOptions: Array<UmbDocumentVariantOptionModel> = [];
+	public get variantLanguageOptions(): Array<UmbDocumentVariantOptionModel> {
+		return this.#variantLanguageOptions;
+	}
+	public set variantLanguageOptions(value: Array<UmbDocumentVariantOptionModel>) {
+		this.#variantLanguageOptions = [...value].sort(sortVariants);
+	}
+	#variantLanguageOptions: Array<UmbDocumentVariantOptionModel> = [];
 
 	@property({ attribute: false })
 	set selectionManager(value: UmbSelectionManager<string>) {
@@ -136,6 +136,13 @@ export class UmbDocumentVariantLanguagePickerElement extends UmbLitElement {
 		return html`<div class="label" slot="label">
 			<strong> ${option.language.name} </strong>
 			<div class="label-status">${UmbDocumentVariantLanguagePickerElement.renderVariantStatus(option)}</div>
+			${option.documentCount !== undefined
+				? html`<div class="label-status">
+						<umb-localize key="general_documentCount" .args=${[option.documentCount]}>
+							${option.documentCount} documents
+						</umb-localize>
+					</div>`
+				: nothing}
 			${option.language.isMandatory && mustSelect
 				? html`<div class="label-status">
 						<umb-localize key="languages_mandatoryLanguage">Mandatory language</umb-localize>

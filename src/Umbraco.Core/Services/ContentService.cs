@@ -47,6 +47,26 @@ public class ContentService : RepositoryService, IContentService
 
     #region Constructors
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ContentService"/> class.
+    /// </summary>
+    /// <param name="provider">The core scope provider.</param>
+    /// <param name="loggerFactory">The logger factory.</param>
+    /// <param name="eventMessagesFactory">The event messages factory.</param>
+    /// <param name="documentRepository">The document repository.</param>
+    /// <param name="entityRepository">The entity repository.</param>
+    /// <param name="auditService">The audit service.</param>
+    /// <param name="contentTypeRepository">The content type repository.</param>
+    /// <param name="documentBlueprintRepository">The document blueprint repository.</param>
+    /// <param name="languageRepository">The language repository.</param>
+    /// <param name="propertyValidationService">The property validation service.</param>
+    /// <param name="shortStringHelper">The short string helper.</param>
+    /// <param name="cultureImpactFactory">The culture impact factory.</param>
+    /// <param name="userIdKeyResolver">The user ID key resolver.</param>
+    /// <param name="propertyEditorCollection">The property editor collection.</param>
+    /// <param name="idKeyMap">The ID key map.</param>
+    /// <param name="optionsMonitor">The content settings options monitor.</param>
+    /// <param name="relationService">The relation service.</param>
     public ContentService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -88,7 +108,27 @@ public class ContentService : RepositoryService, IContentService
         _logger = loggerFactory.CreateLogger<ContentService>();
     }
 
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ContentService"/> class.
+    /// </summary>
+    /// <param name="provider">The core scope provider.</param>
+    /// <param name="loggerFactory">The logger factory.</param>
+    /// <param name="eventMessagesFactory">The event messages factory.</param>
+    /// <param name="documentRepository">The document repository.</param>
+    /// <param name="entityRepository">The entity repository.</param>
+    /// <param name="auditRepository">The audit repository.</param>
+    /// <param name="contentTypeRepository">The content type repository.</param>
+    /// <param name="documentBlueprintRepository">The document blueprint repository.</param>
+    /// <param name="languageRepository">The language repository.</param>
+    /// <param name="propertyValidationService">The property validation service.</param>
+    /// <param name="shortStringHelper">The short string helper.</param>
+    /// <param name="cultureImpactFactory">The culture impact factory.</param>
+    /// <param name="userIdKeyResolver">The user ID key resolver.</param>
+    /// <param name="propertyEditorCollection">The property editor collection.</param>
+    /// <param name="idKeyMap">The ID key map.</param>
+    /// <param name="optionsMonitor">The content settings options monitor.</param>
+    /// <param name="relationService">The relation service.</param>
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
     public ContentService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -128,7 +168,28 @@ public class ContentService : RepositoryService, IContentService
     {
     }
 
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ContentService"/> class.
+    /// </summary>
+    /// <param name="provider">The core scope provider.</param>
+    /// <param name="loggerFactory">The logger factory.</param>
+    /// <param name="eventMessagesFactory">The event messages factory.</param>
+    /// <param name="documentRepository">The document repository.</param>
+    /// <param name="entityRepository">The entity repository.</param>
+    /// <param name="auditRepository">The audit repository.</param>
+    /// <param name="auditService">The audit service.</param>
+    /// <param name="contentTypeRepository">The content type repository.</param>
+    /// <param name="documentBlueprintRepository">The document blueprint repository.</param>
+    /// <param name="languageRepository">The language repository.</param>
+    /// <param name="propertyValidationService">The property validation service.</param>
+    /// <param name="shortStringHelper">The short string helper.</param>
+    /// <param name="cultureImpactFactory">The culture impact factory.</param>
+    /// <param name="userIdKeyResolver">The user ID key resolver.</param>
+    /// <param name="propertyEditorCollection">The property editor collection.</param>
+    /// <param name="idKeyMap">The ID key map.</param>
+    /// <param name="optionsMonitor">The content settings options monitor.</param>
+    /// <param name="relationService">The relation service.</param>
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
     public ContentService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -181,6 +242,14 @@ public class ContentService : RepositoryService, IContentService
 
     #region Rollback
 
+    /// <summary>
+    /// Rolls back an <see cref="IContent"/> item to a previous version.
+    /// </summary>
+    /// <param name="id">The ID of the content to roll back.</param>
+    /// <param name="versionId">The version ID to roll back to.</param>
+    /// <param name="culture">The culture to roll back, or "*" for all cultures.</param>
+    /// <param name="userId">The optional ID of the user performing the rollback.</param>
+    /// <returns>An <see cref="OperationResult"/> indicating the result of the operation.</returns>
     public OperationResult Rollback(int id, int versionId, string culture = "*", int userId = Constants.Security.SuperUserId)
     {
         EventMessages evtMsgs = EventMessagesFactory.Get();
@@ -242,6 +311,11 @@ public class ContentService : RepositoryService, IContentService
 
     #region Count
 
+    /// <summary>
+    /// Gets the count of published <see cref="IContent"/> items.
+    /// </summary>
+    /// <param name="contentTypeAlias">The optional content type alias to filter by.</param>
+    /// <returns>The count of published content items.</returns>
     public int CountPublished(string? contentTypeAlias = null)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -251,6 +325,11 @@ public class ContentService : RepositoryService, IContentService
         }
     }
 
+    /// <summary>
+    /// Gets the count of all <see cref="IContent"/> items.
+    /// </summary>
+    /// <param name="contentTypeAlias">The optional content type alias to filter by.</param>
+    /// <returns>The count of content items.</returns>
     public int Count(string? contentTypeAlias = null)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -260,6 +339,12 @@ public class ContentService : RepositoryService, IContentService
         }
     }
 
+    /// <summary>
+    /// Gets the count of child <see cref="IContent"/> items under a specified parent.
+    /// </summary>
+    /// <param name="parentId">The ID of the parent content.</param>
+    /// <param name="contentTypeAlias">The optional content type alias to filter by.</param>
+    /// <returns>The count of child content items.</returns>
     public int CountChildren(int parentId, string? contentTypeAlias = null)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -269,6 +354,12 @@ public class ContentService : RepositoryService, IContentService
         }
     }
 
+    /// <summary>
+    /// Gets the count of descendant <see cref="IContent"/> items under a specified parent.
+    /// </summary>
+    /// <param name="parentId">The ID of the parent content.</param>
+    /// <param name="contentTypeAlias">The optional content type alias to filter by.</param>
+    /// <returns>The count of descendant content items.</returns>
     public int CountDescendants(int parentId, string? contentTypeAlias = null)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -583,6 +674,11 @@ public class ContentService : RepositoryService, IContentService
         }
     }
 
+    /// <summary>
+    /// Gets the content schedule collection for the specified content key.
+    /// </summary>
+    /// <param name="contentId">The unique key of the content to retrieve the schedule for.</param>
+    /// <returns>The <see cref="ContentScheduleCollection"/> for the specified content, or an empty collection if not found.</returns>
     public ContentScheduleCollection GetContentScheduleByContentId(Guid contentId)
     {
         Attempt<int> idAttempt = _idKeyMap.GetIdForKey(contentId, UmbracoObjectTypes.Document);
@@ -605,11 +701,7 @@ public class ContentService : RepositoryService, IContentService
         }
     }
 
-    /// <summary>
-    /// </summary>
-    /// <param name="contents"></param>
-    /// <param name="userId"></param>
-    /// <returns></returns>
+    /// <inheritdoc />
     Attempt<OperationResult?> IContentServiceBase<IContent>.Save(IEnumerable<IContent> contents, int userId) =>
         Attempt.Succeed(Save(contents, userId));
 
@@ -673,6 +765,7 @@ public class ContentService : RepositoryService, IContentService
                 pageIndex,
                 pageSize,
                 out totalRecords,
+                null,
                 filter,
                 ordering);
         }
@@ -705,6 +798,7 @@ public class ContentService : RepositoryService, IContentService
                 pageIndex,
                 pageSize,
                 out totalRecords,
+                null,
                 filter,
                 ordering);
         }
@@ -840,7 +934,12 @@ public class ContentService : RepositoryService, IContentService
     }
 
     /// <inheritdoc />
+    [Obsolete("Please use the method overload with all parameters. Scheduled for removal in Umbraco 19.")]
     public IEnumerable<IContent> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalChildren, IQuery<IContent>? filter = null, Ordering? ordering = null)
+        => GetPagedChildren(id, pageIndex, pageSize, out totalChildren, propertyAliases: null, filter: filter, ordering: ordering);
+
+    /// <inheritdoc />
+    public IEnumerable<IContent> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalChildren, string[]? propertyAliases, IQuery<IContent>? filter, Ordering? ordering, bool loadTemplates = true)
     {
         if (pageIndex < 0)
         {
@@ -859,7 +958,7 @@ public class ContentService : RepositoryService, IContentService
             scope.ReadLock(Constants.Locks.ContentTree);
 
             IQuery<IContent>? query = Query<IContent>()?.Where(x => x.ParentId == id);
-            return _documentRepository.GetPage(query, pageIndex, pageSize, out totalChildren, filter, ordering);
+            return _documentRepository.GetPage(query, pageIndex, pageSize, out totalChildren, propertyAliases, filter, ordering, loadTemplates);
         }
     }
 
@@ -918,7 +1017,7 @@ public class ContentService : RepositoryService, IContentService
             throw new ArgumentNullException(nameof(ordering));
         }
 
-        return _documentRepository.GetPage(query, pageIndex, pageSize, out totalChildren, filter, ordering);
+        return _documentRepository.GetPage(query, pageIndex, pageSize, out totalChildren, propertyAliases: null, filter, ordering);
     }
 
     /// <summary>
@@ -1009,7 +1108,7 @@ public class ContentService : RepositoryService, IContentService
             scope.ReadLock(Constants.Locks.ContentTree);
             IQuery<IContent>? query = Query<IContent>()?
                 .Where(x => x.Path.StartsWith(Constants.System.RecycleBinContentPathPrefix));
-            return _documentRepository.GetPage(query, pageIndex, pageSize, out totalRecords, filter, ordering);
+            return _documentRepository.GetPage(query, pageIndex, pageSize, out totalRecords, propertyAliases: null, filter, ordering);
         }
     }
 
@@ -1022,6 +1121,7 @@ public class ContentService : RepositoryService, IContentService
 
 
     /// <inheritdoc/>
+    [Obsolete("Use GetContentSchedulesByKeys instead. Scheduled for removal in Umbraco 19.")]
     public IDictionary<int, IEnumerable<ContentSchedule>> GetContentSchedulesByIds(Guid[] keys)
     {
         if (keys.Length == 0)
@@ -1029,8 +1129,31 @@ public class ContentService : RepositoryService, IContentService
             return ImmutableDictionary<int, IEnumerable<ContentSchedule>>.Empty;
         }
 
-        List<int> contentIds = [];
-        foreach (var key in keys)
+        IDictionary<Guid, IEnumerable<ContentSchedule>> guidKeyedResults = GetContentSchedulesByKeys(keys);
+
+        var intKeyedResults = new Dictionary<int, IEnumerable<ContentSchedule>>(guidKeyedResults.Count);
+        foreach (KeyValuePair<Guid, IEnumerable<ContentSchedule>> entry in guidKeyedResults)
+        {
+            Attempt<int> contentId = _idKeyMap.GetIdForKey(entry.Key, UmbracoObjectTypes.Document);
+            if (contentId.Success)
+            {
+                intKeyedResults[contentId.Result] = entry.Value;
+            }
+        }
+
+        return intKeyedResults;
+    }
+
+    /// <inheritdoc/>
+    public IDictionary<Guid, IEnumerable<ContentSchedule>> GetContentSchedulesByKeys(Guid[] keys)
+    {
+        if (keys.Length == 0)
+        {
+            return ImmutableDictionary<Guid, IEnumerable<ContentSchedule>>.Empty;
+        }
+
+        Dictionary<int, Guid> intToKeyMap = new(keys.Length);
+        foreach (Guid key in keys)
         {
             Attempt<int> contentId = _idKeyMap.GetIdForKey(key, UmbracoObjectTypes.Document);
             if (contentId.Success is false)
@@ -1038,14 +1161,25 @@ public class ContentService : RepositoryService, IContentService
                 continue;
             }
 
-            contentIds.Add(contentId.Result);
+            intToKeyMap[contentId.Result] = key;
         }
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        scope.ReadLock(Constants.Locks.ContentTree);
+
+        IDictionary<int, IEnumerable<ContentSchedule>> intKeyedResults =
+            _documentRepository.GetContentSchedulesByIds(intToKeyMap.Keys.ToArray());
+
+        var guidKeyedResults = new Dictionary<Guid, IEnumerable<ContentSchedule>>(intKeyedResults.Count);
+        foreach (KeyValuePair<int, IEnumerable<ContentSchedule>> entry in intKeyedResults)
         {
-            scope.ReadLock(Constants.Locks.ContentTree);
-            return _documentRepository.GetContentSchedulesByIds(contentIds.ToArray());
+            if (intToKeyMap.TryGetValue(entry.Key, out Guid guidKey))
+            {
+                guidKeyedResults[guidKey] = entry.Value;
+            }
         }
+
+        return guidKeyedResults;
     }
 
     /// <summary>
@@ -1071,6 +1205,11 @@ public class ContentService : RepositoryService, IContentService
         return parent == null || IsPathPublished(parent);
     }
 
+    /// <summary>
+    /// Checks if the <see cref="IContent"/> and all its ancestors are published.
+    /// </summary>
+    /// <param name="content">The content to check.</param>
+    /// <returns><c>true</c> if the content and all its ancestors are published; otherwise, <c>false</c>.</returns>
     public bool IsPathPublished(IContent? content)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -1094,16 +1233,14 @@ public class ContentService : RepositoryService, IContentService
                 $"Cannot save (un)publishing content with name: {content.Name} - and state: {content.PublishedState}, use the dedicated SavePublished method.");
         }
 
-        if (content.Name != null && content.Name.Length > 255)
-        {
-            throw new InvalidOperationException(
-                $"Content with the name {content.Name} cannot be more than 255 characters in length.");
-        }
+        EnsureNameLengthIsValid(content);
 
         EventMessages eventMessages = EventMessagesFactory.Get();
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
+            scope.WriteLock(Constants.Locks.ContentTree);
+
             var savingNotification = new ContentSavingNotification(content, eventMessages);
             if (scope.Notifications.PublishCancelable(savingNotification))
             {
@@ -1111,7 +1248,6 @@ public class ContentService : RepositoryService, IContentService
                 return OperationResult.Cancel(eventMessages);
             }
 
-            scope.WriteLock(Constants.Locks.ContentTree);
             userId ??= Constants.Security.SuperUserId;
 
             if (content.HasIdentity == false)
@@ -1171,6 +1307,8 @@ public class ContentService : RepositoryService, IContentService
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
+            scope.WriteLock(Constants.Locks.ContentTree);
+
             var savingNotification = new ContentSavingNotification(contentsA, eventMessages);
             if (scope.Notifications.PublishCancelable(savingNotification))
             {
@@ -1178,7 +1316,6 @@ public class ContentService : RepositoryService, IContentService
                 return OperationResult.Cancel(eventMessages);
             }
 
-            scope.WriteLock(Constants.Locks.ContentTree);
             foreach (IContent content in contentsA)
             {
                 if (content.HasIdentity == false)
@@ -1220,10 +1357,7 @@ public class ContentService : RepositoryService, IContentService
             throw new ArgumentNullException(nameof(cultures));
         }
 
-        if (cultures.Any(c => c.IsNullOrWhiteSpace()) || cultures.Distinct().Count() != cultures.Length)
-        {
-            throw new ArgumentException("Cultures cannot be null or whitespace", nameof(cultures));
-        }
+        EnsureCulturesAreValid(cultures, nameof(cultures));
 
         cultures = cultures.Select(x => x.EnsureCultureCode()!).ToArray();
 
@@ -1235,17 +1369,9 @@ public class ContentService : RepositoryService, IContentService
             return new PublishResult(PublishResultType.FailedPublishUnsavedChanges, evtMsgs, content);
         }
 
-        if (content.Name != null && content.Name.Length > 255)
-        {
-            throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
-        }
+        EnsureNameLengthIsValid(content);
 
-        PublishedState publishedState = content.PublishedState;
-        if (publishedState != PublishedState.Published && publishedState != PublishedState.Unpublished)
-        {
-            throw new InvalidOperationException(
-                $"Cannot save-and-publish (un)publishing content, use the dedicated {nameof(CommitDocumentChanges)} method.");
-        }
+        EnsurePublishedStateAllowsPublish(content);
 
         // cannot accept invariant (null or empty) culture for variant content type
         // cannot accept a specific culture for invariant content type (but '*' is ok)
@@ -1294,6 +1420,130 @@ public class ContentService : RepositoryService, IContentService
             scope.Complete();
             return result;
         }
+    }
+
+    /// <inheritdoc />
+    public PublishResult SaveAndPublish(IContent content, string[] culturesToPublish, int userId = Constants.Security.SuperUserId)
+    {
+        if (content == null)
+        {
+            throw new ArgumentNullException(nameof(content));
+        }
+
+        if (culturesToPublish == null)
+        {
+            throw new ArgumentNullException(nameof(culturesToPublish));
+        }
+
+        // wildcards and nulls are not accepted here; cultures must be explicit
+        if (culturesToPublish.Any(x => x == null || x == "*"))
+        {
+            throw new InvalidOperationException(
+                "Only valid cultures are allowed to be used in this method, wildcards or nulls are not allowed");
+        }
+
+        EnsureCulturesAreValid(culturesToPublish, nameof(culturesToPublish));
+
+        culturesToPublish = culturesToPublish.Select(x => x.EnsureCultureCode()!).ToArray();
+
+        EnsureNameLengthIsValid(content);
+
+        EnsurePublishedStateAllowsPublish(content);
+
+        var varies = content.ContentType.VariesByCulture();
+        if (varies is false)
+        {
+            if (culturesToPublish.Length > 0)
+            {
+                throw new ArgumentException(
+                    "Cultures cannot be specified when publishing invariant content types.",
+                    nameof(culturesToPublish));
+            }
+
+            // doesn't vary; publish the invariant culture in a single scope alongside the save
+            return SaveAndPublish(content, userId: userId);
+        }
+
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.WriteLock(Constants.Locks.ContentTree);
+
+        var allLangs = _languageRepository.GetMany().ToList();
+
+        EventMessages evtMsgs = EventMessagesFactory.Get();
+
+        var savingNotification = new ContentSavingNotification(content, evtMsgs);
+        if (scope.Notifications.PublishCancelable(savingNotification))
+        {
+            return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, content);
+        }
+
+        IEnumerable<CultureImpact> impacts =
+            culturesToPublish.Select(x => _cultureImpactFactory.ImpactExplicit(x, IsDefaultCulture(allLangs, x)));
+
+        // publish the culture(s)
+        // we don't care about the response here, this response will be rechecked below but we need to set the culture info values now.
+        foreach (CultureImpact impact in impacts)
+        {
+            content.PublishCulture(impact, DateTime.UtcNow, _propertyEditorCollection);
+        }
+
+        PublishResult result = CommitDocumentChangesInternal(scope, content, evtMsgs, allLangs, savingNotification.State, userId);
+        scope.Complete();
+        return result;
+    }
+
+    private PublishResult SaveAndPublish(IContent content, string culture = "*", int userId = Constants.Security.SuperUserId)
+    {
+        EventMessages evtMsgs = EventMessagesFactory.Get();
+
+        EnsurePublishedStateAllowsPublish(content);
+
+        // cannot accept invariant (null or empty) culture for variant content type
+        // cannot accept a specific culture for invariant content type (but '*' is ok)
+        if (content.ContentType.VariesByCulture())
+        {
+            if (culture.IsNullOrWhiteSpace())
+            {
+                throw new NotSupportedException("Invariant culture is not supported by variant content types.");
+            }
+        }
+        else
+        {
+            if (!culture.IsNullOrWhiteSpace() && culture != "*")
+            {
+                throw new NotSupportedException(
+                    $"Culture \"{culture}\" is not supported by invariant content types.");
+            }
+        }
+
+        EnsureNameLengthIsValid(content);
+
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.WriteLock(Constants.Locks.ContentTree);
+
+        var allLangs = _languageRepository.GetMany().ToList();
+
+        // Change state to publishing
+        content.PublishedState = PublishedState.Publishing;
+        var savingNotification = new ContentSavingNotification(content, evtMsgs);
+        if (scope.Notifications.PublishCancelable(savingNotification))
+        {
+            return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, content);
+        }
+
+        // if culture is specific, first publish the invariant values, then publish the culture itself.
+        // if culture is '*', then publish them all (including variants)
+
+        // this will create the correct culture impact even if culture is * or null
+        var impact = _cultureImpactFactory.Create(culture, IsDefaultCulture(allLangs, culture), content);
+
+        // publish the culture(s)
+        // we don't care about the response here, this response will be rechecked below but we need to set the culture info values now.
+        content.PublishCulture(impact, DateTime.UtcNow, _propertyEditorCollection);
+
+        PublishResult result = CommitDocumentChangesInternal(scope, content, evtMsgs, allLangs, savingNotification.State, userId);
+        scope.Complete();
+        return result;
     }
 
     /// <inheritdoc />
@@ -1406,10 +1656,9 @@ public class ContentService : RepositoryService, IContentService
     ///         <see cref="ContentRepositoryExtensions.UnpublishCulture" />.
     ///     </para>
     ///     <para>
-    ///         When publishing or unpublishing a single culture, or all cultures, use <see cref="SaveAndPublish" />
+    ///         When publishing or unpublishing a single culture, or all cultures, use the publishing operations
     ///         and <see cref="Unpublish" />. But if the flexibility to both publish and unpublish in a single operation is
-    ///         required
-    ///         then this method needs to be used in combination with <see cref="ContentRepositoryExtensions.PublishCulture" />
+    ///         required, then this method needs to be used in combination with <see cref="ContentRepositoryExtensions.PublishCulture" />
     ///         and <see cref="ContentRepositoryExtensions.UnpublishCulture" />
     ///         on the content itself - this prepares the content, but does not commit anything - and then, invoke
     ///         <see cref="CommitDocumentChanges" /> to actually commit the changes to the database.
@@ -1530,9 +1779,7 @@ public class ContentService : RepositoryService, IContentService
         {
             // Determine cultures publishing/unpublishing which will be based on previous calls to content.PublishCulture and ClearPublishInfo
             culturesUnpublishing = content.GetCulturesUnpublishing();
-            culturesPublishing = variesByCulture
-                ? content.PublishCultureInfos?.Values.Where(x => x.IsDirty()).Select(x => x.Culture).ToList()
-                : null;
+            culturesPublishing = GetCulturesPublishing(content);
 
             // ensure that the document can be published, and publish handling events, business rules, etc
             publishResult = StrategyCanPublish(
@@ -1603,6 +1850,12 @@ public class ContentService : RepositoryService, IContentService
         // won't happen in a branch
         if (unpublishing)
         {
+            if (culturesUnpublishing is null)
+            {
+                culturesUnpublishing = content.GetCulturesUnpublishing();
+                culturesPublishing = GetCulturesPublishing(content);
+            }
+
             IContent? newest = GetById(content.Id); // ensure we have the newest version - in scope
             if (content.VersionId != newest?.VersionId)
             {
@@ -1665,12 +1918,13 @@ public class ContentService : RepositoryService, IContentService
                     var langs = GetLanguageDetailsForAuditEntry(allLangs, culturesUnpublishing);
                     Audit(AuditType.UnpublishVariant, userId, content.Id, $"Unpublished languages: {langs}", langs);
 
-                    if (publishResult == null)
+                    PublishResultType? publishResultType = publishResult?.Result ?? unpublishResult?.Result;
+                    if (publishResultType == null)
                     {
-                        throw new PanicException("publishResult == null - should not happen");
+                        throw new PanicException("publishResultType == null - should not happen");
                     }
 
-                    switch (publishResult.Result)
+                    switch (publishResultType)
                     {
                         case PublishResultType.FailedPublishMandatoryCultureMissing:
                             // Occurs when a mandatory culture was unpublished (which means we tried publishing the document without a mandatory culture)
@@ -2106,6 +2360,14 @@ public class ContentService : RepositoryService, IContentService
 
     private static bool ProvidedCulturesIndicatePublishAll(string[] cultures) => cultures.Length == 0 || (cultures.Length == 1 && cultures[0] == "invariant");
 
+    /// <summary>
+    /// Publishes a branch of content items starting from the specified document.
+    /// </summary>
+    /// <param name="document">The content item to start publishing from.</param>
+    /// <param name="shouldPublish">A function that determines which cultures should be published for each content item. Returns null if the item should not be published.</param>
+    /// <param name="publishCultures">A function that handles the actual publishing of cultures for each content item.</param>
+    /// <param name="userId">The identifier of the user performing the publish operation.</param>
+    /// <returns>A collection of <see cref="PublishResult"/> representing the results of publishing each content item in the branch.</returns>
     internal IEnumerable<PublishResult> PublishBranch(
         IContent document,
         Func<IContent, HashSet<string>?> shouldPublish,
@@ -2280,6 +2542,11 @@ public class ContentService : RepositoryService, IContentService
         return result;
     }
 
+    private IReadOnlyList<string>? GetCulturesPublishing(IContent content)
+        => content.ContentType.VariesByCulture()
+            ? content.PublishCultureInfos?.Values.Where(x => x.IsDirty()).Select(x => x.Culture).ToList()
+            : null;
+
     #endregion
 
     #region Delete
@@ -2291,13 +2558,13 @@ public class ContentService : RepositoryService, IContentService
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
+            scope.WriteLock(Constants.Locks.ContentTree);
+
             if (scope.Notifications.PublishCancelable(new ContentDeletingNotification(content, eventMessages)))
             {
                 scope.Complete();
                 return OperationResult.Cancel(eventMessages);
             }
-
-            scope.WriteLock(Constants.Locks.ContentTree);
 
             // if it's not trashed yet, and published, we should unpublish
             // but... Unpublishing event makes no sense (not going to cancel?) and no need to save
@@ -2362,6 +2629,8 @@ public class ContentService : RepositoryService, IContentService
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
+            scope.WriteLock(Constants.Locks.ContentTree);
+
             var deletingVersionsNotification =
                 new ContentDeletingVersionsNotification(id, evtMsgs, dateToRetain: versionDate);
             if (scope.Notifications.PublishCancelable(deletingVersionsNotification))
@@ -2370,7 +2639,6 @@ public class ContentService : RepositoryService, IContentService
                 return;
             }
 
-            scope.WriteLock(Constants.Locks.ContentTree);
             _documentRepository.DeleteVersions(id, versionDate);
 
             scope.Notifications.Publish(
@@ -2396,6 +2664,8 @@ public class ContentService : RepositoryService, IContentService
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
+            scope.WriteLock(Constants.Locks.ContentTree);
+
             var deletingVersionsNotification = new ContentDeletingVersionsNotification(id, evtMsgs, versionId);
             if (scope.Notifications.PublishCancelable(deletingVersionsNotification))
             {
@@ -2409,7 +2679,6 @@ public class ContentService : RepositoryService, IContentService
                 DeleteVersions(id, content?.UpdateDate ?? DateTime.UtcNow, userId);
             }
 
-            scope.WriteLock(Constants.Locks.ContentTree);
             IContent? c = _documentRepository.Get(id);
 
             // don't delete the current or published version
@@ -2630,6 +2899,11 @@ public class ContentService : RepositoryService, IContentService
         _documentRepository.Save(content);
     }
 
+    /// <summary>
+    /// Empties the Recycle Bin by deleting all <see cref="IContent"/> items that reside in the bin asynchronously.
+    /// </summary>
+    /// <param name="userId">The unique key of the user performing the operation.</param>
+    /// <returns>An <see cref="OperationResult"/> indicating the result of the operation.</returns>
     public async Task<OperationResult> EmptyRecycleBinAsync(Guid userId)
         => EmptyRecycleBin(await _userIdKeyResolver.GetAsync(userId));
 
@@ -2659,9 +2933,22 @@ public class ContentService : RepositoryService, IContentService
 
             if (contents is not null)
             {
+                // When checking if an item is related, we need to exclude the "relate parent on delete" relation type,
+                // as this is automatically created when items are trashed and would prevent emptying the recycle bin.
+                int[]? relateParentOnDeleteRelationTypeIds = null;
+                if (_contentSettings.DisableDeleteWhenReferenced)
+                {
+                    IRelationType? relateParentOnDeleteRelationType = _relationService.GetRelationTypeByAlias(
+                        Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteAlias);
+                    if (relateParentOnDeleteRelationType is not null)
+                    {
+                        relateParentOnDeleteRelationTypeIds = [relateParentOnDeleteRelationType.Id];
+                    }
+                }
+
                 foreach (IContent content in contents)
                 {
-                    if (_contentSettings.DisableDeleteWhenReferenced && _relationService.IsRelated(content.Id, RelationDirectionFilter.Child))
+                    if (_contentSettings.DisableDeleteWhenReferenced && _relationService.IsRelated(content.Id, RelationDirectionFilter.Child, excludeRelationTypeIds: relateParentOnDeleteRelationTypeIds))
                     {
                         continue;
                     }
@@ -2684,6 +2971,10 @@ public class ContentService : RepositoryService, IContentService
         return OperationResult.Succeed(eventMessages);
     }
 
+    /// <summary>
+    /// Checks if there are any <see cref="IContent"/> items in the Recycle Bin.
+    /// </summary>
+    /// <returns><c>true</c> if there are items in the Recycle Bin; otherwise, <c>false</c>.</returns>
     public bool RecycleBinSmells()
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -2732,6 +3023,8 @@ public class ContentService : RepositoryService, IContentService
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
+            scope.WriteLock(Constants.Locks.ContentTree);
+
             TryGetParentKey(parentId, out Guid? parentKey);
             if (scope.Notifications.PublishCancelable(new ContentCopyingNotification(content, copy, parentId, parentKey, eventMessages)))
             {
@@ -2744,14 +3037,16 @@ public class ContentService : RepositoryService, IContentService
             // meaning that the event has to trigger for every copied content including descendants
             var copies = new List<Tuple<IContent, IContent>>();
 
-            scope.WriteLock(Constants.Locks.ContentTree);
-
             // a copy is not published (but not really unpublishing either)
             // update the create author and last edit author
             if (copy.Published)
             {
                 copy.Published = false;
             }
+
+            // clear any per-culture published state copied from the source - the copy is unpublished,
+            // so no culture variations should be marked as published either (see #22540).
+            copy.ClearPublishInfos();
 
             copy.CreatorId = userId;
             copy.WriterId = userId;
@@ -2816,6 +3111,10 @@ public class ContentService : RepositoryService, IContentService
                         {
                             descendantCopy.Published = false;
                         }
+
+                        // clear any per-culture published state copied from the source - the copy is unpublished,
+                        // so no culture variations should be marked as published either (see #22540).
+                        descendantCopy.ClearPublishInfos();
 
                         descendantCopy.CreatorId = userId;
                         descendantCopy.WriterId = userId;
@@ -2947,7 +3246,13 @@ public class ContentService : RepositoryService, IContentService
         {
             scope.WriteLock(Constants.Locks.ContentTree);
 
-            OperationResult ret = Sort(scope, itemsA, userId, evtMsgs);
+            // Reload within the lock so sorting operates on fully-loaded entities. Callers may pass
+            // partially-loaded content (e.g. loaded with loadTemplates: false or without property data),
+            // and saving those directly would wipe the template and property data (#23120).
+            // GetByIds returns items in the requested order, preserving the caller's ordering that drives the sort.
+            IContent[] reloaded = GetByIds(itemsA.Select(x => x.Id).ToArray()).ToArray();
+
+            OperationResult ret = Sort(scope, reloaded, userId, evtMsgs);
             scope.Complete();
             return ret;
         }
@@ -2983,6 +3288,43 @@ public class ContentService : RepositoryService, IContentService
             scope.Complete();
             return ret;
         }
+    }
+
+    /// <inheritdoc />
+    public OperationResult SortChildren(int parentId, IReadOnlyList<int> orderedChildIds, int userId = Constants.Security.SuperUserId)
+    {
+        EventMessages evtMsgs = EventMessagesFactory.Get();
+        if (orderedChildIds.Count == 0)
+        {
+            return new OperationResult(OperationResultType.NoOperation, evtMsgs);
+        }
+
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.WriteLock(Constants.Locks.ContentTree);
+
+        _documentRepository.UpdateSortOrder(orderedChildIds);
+
+        // Sort order lives in umbracoNode; neither the published cache nor the content repository cache keeps
+        // a separate serialized copy of it, so refreshing the affected branch (which invalidates both and has
+        // them reload from umbracoNode) is enough to pick up the new order without re-saving each child.
+        if (parentId == Constants.System.Root)
+        {
+            IContent[] roots = GetByIds(orderedChildIds).ToArray();
+            scope.Notifications.Publish(new ContentTreeChangeNotification(roots, TreeChangeTypes.RefreshNode, evtMsgs));
+        }
+        else
+        {
+            IContent? parent = GetById(parentId);
+            if (parent is not null)
+            {
+                scope.Notifications.Publish(new ContentTreeChangeNotification(parent, TreeChangeTypes.RefreshBranch, evtMsgs));
+            }
+        }
+
+        Audit(AuditType.Sort, userId, parentId);
+
+        scope.Complete();
+        return OperationResult.Succeed(evtMsgs);
     }
 
     private OperationResult Sort(ICoreScope scope, IContent[] itemsA, int userId, EventMessages eventMessages)
@@ -3052,6 +3394,39 @@ public class ContentService : RepositoryService, IContentService
 
     private static bool HasUnsavedChanges(IContent content) => content.HasIdentity is false || content.IsDirty();
 
+    private const int MaxContentNameLength = 255;
+
+    private static void EnsureNameLengthIsValid(IContent content)
+    {
+        if (content.Name?.Length > MaxContentNameLength)
+        {
+            throw new InvalidOperationException($"Name cannot be more than {MaxContentNameLength} characters in length.");
+        }
+    }
+
+    private static void EnsureCulturesAreValid(string[] cultures, string paramName)
+    {
+        if (cultures.Any(c => c.IsNullOrWhiteSpace()) || cultures.Distinct().Count() != cultures.Length)
+        {
+            throw new ArgumentException("Cultures cannot be null or whitespace, and must be distinct.", paramName);
+        }
+    }
+
+    private static void EnsurePublishedStateAllowsPublish(IContent content)
+    {
+        PublishedState publishedState = content.PublishedState;
+        if (publishedState != PublishedState.Published && publishedState != PublishedState.Unpublished)
+        {
+            throw new InvalidOperationException(
+                $"Cannot save-and-publish (un)publishing content, use the dedicated {nameof(CommitDocumentChanges)} method.");
+        }
+    }
+
+    /// <summary>
+    /// Checks the data integrity of the content tree and optionally fixes issues.
+    /// </summary>
+    /// <param name="options">The options for the data integrity check.</param>
+    /// <returns>A <see cref="ContentDataIntegrityReport"/> containing the results of the integrity check.</returns>
     public ContentDataIntegrityReport CheckDataIntegrity(ContentDataIntegrityReportOptions options)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
@@ -3091,6 +3466,16 @@ public class ContentService : RepositoryService, IContentService
         }
     }
 
+    /// <summary>
+    /// Gets the published descendants of the specified content item while holding the content tree lock.
+    /// </summary>
+    /// <param name="content">The content item to retrieve published descendants from.</param>
+    /// <returns>An enumerable of published <see cref="IContent"/> descendants.</returns>
+    /// <remarks>
+    /// This method should only be called within a scope that already holds the content tree read lock.
+    /// The returned contents include all published versions below the content, but are filtered to exclude
+    /// items that are not directly published because they are below an unpublished content.
+    /// </remarks>
     internal IEnumerable<IContent> GetPublishedDescendantsLocked(IContent content)
     {
         var pathMatch = content.Path + ",";
@@ -3629,6 +4014,11 @@ public class ContentService : RepositoryService, IContentService
 
     #region Blueprints
 
+    /// <summary>
+    /// Gets a content blueprint by its integer ID.
+    /// </summary>
+    /// <param name="id">The ID of the blueprint to retrieve.</param>
+    /// <returns>The <see cref="IContent"/> blueprint, or <c>null</c> if not found.</returns>
     public IContent? GetBlueprintById(int id)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -3644,6 +4034,11 @@ public class ContentService : RepositoryService, IContentService
         }
     }
 
+    /// <summary>
+    /// Gets a content blueprint by its unique key.
+    /// </summary>
+    /// <param name="id">The unique key of the blueprint to retrieve.</param>
+    /// <returns>The <see cref="IContent"/> blueprint, or <c>null</c> if not found.</returns>
     public IContent? GetBlueprintById(Guid id)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -3659,9 +4054,20 @@ public class ContentService : RepositoryService, IContentService
         }
     }
 
+    /// <summary>
+    /// Saves a content blueprint.
+    /// </summary>
+    /// <param name="content">The blueprint content to save.</param>
+    /// <param name="userId">The optional ID of the user saving the blueprint.</param>
     public void SaveBlueprint(IContent content, int userId = Constants.Security.SuperUserId)
         => SaveBlueprint(content, null, userId);
 
+    /// <summary>
+    /// Saves a content blueprint with reference to the source content it was created from.
+    /// </summary>
+    /// <param name="content">The blueprint content to save.</param>
+    /// <param name="createdFromContent">The original content the blueprint was created from, or <c>null</c>.</param>
+    /// <param name="userId">The optional ID of the user saving the blueprint.</param>
     public void SaveBlueprint(IContent content, IContent? createdFromContent, int userId = Constants.Security.SuperUserId)
     {
         EventMessages evtMsgs = EventMessagesFactory.Get();
@@ -3690,6 +4096,38 @@ public class ContentService : RepositoryService, IContentService
         }
     }
 
+    /// <summary>
+    /// Moves a content blueprint to a different container.
+    /// </summary>
+    /// <param name="content">The blueprint content to move.</param>
+    /// <param name="userId">The optional ID of the user moving the blueprint.</param>
+    public void MoveBlueprint(IContent content, int userId = Constants.Security.SuperUserId)
+    {
+        EventMessages evtMsgs = EventMessagesFactory.Get();
+
+        content.Blueprint = true;
+
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        {
+            scope.WriteLock(Constants.Locks.ContentTree);
+
+            content.WriterId = userId;
+
+            _documentBlueprintRepository.Save(content);
+
+            Audit(AuditType.Move, userId, content.Id);
+
+            scope.Notifications.Publish(new ContentTreeChangeNotification(content, TreeChangeTypes.RefreshNode, evtMsgs));
+
+            scope.Complete();
+        }
+    }
+
+    /// <summary>
+    /// Deletes a content blueprint.
+    /// </summary>
+    /// <param name="content">The blueprint content to delete.</param>
+    /// <param name="userId">The optional ID of the user deleting the blueprint.</param>
     public void DeleteBlueprint(IContent content, int userId = Constants.Security.SuperUserId)
     {
         EventMessages evtMsgs = EventMessagesFactory.Get();
@@ -3706,6 +4144,13 @@ public class ContentService : RepositoryService, IContentService
 
     private static readonly string?[] ArrayOfOneNullString = { null };
 
+    /// <summary>
+    /// Creates a new <see cref="IContent"/> from a blueprint.
+    /// </summary>
+    /// <param name="blueprint">The blueprint to create the content from.</param>
+    /// <param name="name">The name for the new content.</param>
+    /// <param name="userId">The optional ID of the user creating the content.</param>
+    /// <returns>The newly created <see cref="IContent"/> based on the blueprint.</returns>
     public IContent CreateBlueprintFromContent(
         IContent blueprint,
         string name,
@@ -3752,10 +4197,15 @@ public class ContentService : RepositoryService, IContentService
     }
 
     /// <inheritdoc />
-    [Obsolete("Use IContentBlueprintEditingService.GetScaffoldedAsync() instead. Scheduled for removal in V18.")]
+    [Obsolete("Use IContentBlueprintEditingService.GetScaffoldedAsync() instead. Scheduled for removal in Umbraco 18.")]
     public IContent CreateContentFromBlueprint(IContent blueprint, string name, int userId = Constants.Security.SuperUserId)
         => CreateBlueprintFromContent(blueprint, name, userId);
 
+    /// <summary>
+    /// Gets all content blueprints for the specified content type IDs.
+    /// </summary>
+    /// <param name="contentTypeId">The content type IDs to get blueprints for, or empty to get all blueprints.</param>
+    /// <returns>A collection of <see cref="IContent"/> blueprints.</returns>
     public IEnumerable<IContent> GetBlueprintsForContentTypes(params int[] contentTypeId)
     {
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -3777,6 +4227,11 @@ public class ContentService : RepositoryService, IContentService
         }
     }
 
+    /// <summary>
+    /// Deletes all content blueprints of the specified content type IDs.
+    /// </summary>
+    /// <param name="contentTypeIds">The content type IDs whose blueprints should be deleted.</param>
+    /// <param name="userId">The optional ID of the user deleting the blueprints.</param>
     public void DeleteBlueprintsOfTypes(IEnumerable<int> contentTypeIds, int userId = Constants.Security.SuperUserId)
     {
         EventMessages evtMsgs = EventMessagesFactory.Get();
@@ -3815,6 +4270,11 @@ public class ContentService : RepositoryService, IContentService
         }
     }
 
+    /// <summary>
+    /// Deletes all content blueprints of the specified content type ID.
+    /// </summary>
+    /// <param name="contentTypeId">The content type ID whose blueprints should be deleted.</param>
+    /// <param name="userId">The optional ID of the user deleting the blueprints.</param>
     public void DeleteBlueprintsOfType(int contentTypeId, int userId = Constants.Security.SuperUserId) =>
         DeleteBlueprintsOfTypes(new[] { contentTypeId }, userId);
 

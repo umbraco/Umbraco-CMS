@@ -27,6 +27,15 @@ public interface IAuditService : IService
         string? comment = null,
         string? parameters = null) => throw new NotImplementedException();
 
+    /// <summary>
+    /// Adds an audit log entry.
+    /// </summary>
+    /// <param name="type">The type of audit entry.</param>
+    /// <param name="userId">The identifier of the user performing the action.</param>
+    /// <param name="objectId">The identifier of the object being audited.</param>
+    /// <param name="entityType">The type of entity being audited.</param>
+    /// <param name="comment">A comment describing the action.</param>
+    /// <param name="parameters">Optional parameters associated with the audit entry.</param>
     [Obsolete("Use AddAsync() instead. Scheduled for removal in Umbraco 19.")]
     void Add(AuditType type, int userId, int objectId, string? entityType, string comment, string? parameters = null);
 
@@ -53,6 +62,12 @@ public interface IAuditService : IService
         DateTimeOffset? sinceDate = null,
         AuditType[]? auditTypeFilter = null) => throw new NotImplementedException();
 
+    /// <summary>
+    /// Gets audit logs filtered by audit type.
+    /// </summary>
+    /// <param name="type">The audit type to filter by.</param>
+    /// <param name="sinceDate">Optional date to filter logs since.</param>
+    /// <returns>A collection of audit items matching the criteria.</returns>
     [Obsolete("Use GetItemsAsync() instead. Scheduled for removal in Umbraco 19.")]
     IEnumerable<IAuditItem> GetLogs(AuditType type, DateTime? sinceDate = null);
 
@@ -136,6 +151,11 @@ public interface IAuditService : IService
         AuditType[]? auditTypeFilter = null,
         IQuery<IAuditItem>? customFilter = null);
 
+    /// <summary>
+    /// Gets audit logs for a specific object.
+    /// </summary>
+    /// <param name="objectId">The identifier of the object to get logs for.</param>
+    /// <returns>A collection of audit items for the specified object.</returns>
     [Obsolete("Use GetItemsByEntityAsync() instead. Scheduled for removal in Umbraco 19.")]
     IEnumerable<IAuditItem> GetLogs(int objectId);
 
@@ -191,6 +211,13 @@ public interface IAuditService : IService
         AuditType[]? auditTypeFilter = null,
         IQuery<IAuditItem>? customFilter = null);
 
+    /// <summary>
+    /// Gets audit logs for a specific user filtered by audit type.
+    /// </summary>
+    /// <param name="userId">The identifier of the user.</param>
+    /// <param name="type">The audit type to filter by.</param>
+    /// <param name="sinceDate">Optional date to filter logs since.</param>
+    /// <returns>A collection of audit items for the specified user matching the criteria.</returns>
     [Obsolete("Use GetPagedItemsByUserAsync() instead. Scheduled for removal in Umbraco 19.")]
     IEnumerable<IAuditItem> GetUserLogs(int userId, AuditType type, DateTime? sinceDate = null);
 
@@ -231,6 +258,10 @@ public interface IAuditService : IService
     /// <returns>Task representing the asynchronous operation.</returns>
     public Task CleanLogsAsync(int maximumAgeOfLogsInMinutes) => throw new NotImplementedException();
 
+    /// <summary>
+    /// Cleans audit logs older than the specified maximum age.
+    /// </summary>
+    /// <param name="maximumAgeOfLogsInMinutes">The maximum age of logs to keep, in minutes.</param>
     [Obsolete("Use CleanLogsAsync() instead. Scheduled for removal in Umbraco 19.")]
     void CleanLogs(int maximumAgeOfLogsInMinutes);
 }

@@ -3,14 +3,30 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Strings.Css;
 
+/// <summary>
+///     Represents a CSS rule with a name, selector, and styles, formatted for Umbraco's Rich Text Editor.
+/// </summary>
 public class StylesheetRule
 {
+    /// <summary>
+    ///     Gets or sets the name of the stylesheet rule.
+    /// </summary>
     public string Name { get; set; } = null!;
 
+    /// <summary>
+    ///     Gets or sets the CSS selector for this rule.
+    /// </summary>
     public string Selector { get; set; } = null!;
 
+    /// <summary>
+    ///     Gets or sets the CSS styles for this rule.
+    /// </summary>
     public string Styles { get; set; } = null!;
 
+    /// <summary>
+    ///     Returns a string representation of the stylesheet rule in Umbraco's format.
+    /// </summary>
+    /// <returns>A CSS-formatted string with the Umbraco name comment, selector, and styles.</returns>
     public override string ToString()
     {
         var sb = new StringBuilder();

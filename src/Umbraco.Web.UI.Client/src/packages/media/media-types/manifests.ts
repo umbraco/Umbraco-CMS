@@ -1,4 +1,5 @@
 import { manifests as entityActionsManifests } from './entity-actions/manifests.js';
+import { manifests as mediaTypeRootManifests } from './media-type-root/manifests.js';
 import { manifests as menuManifests } from './menu/manifests.js';
 import { manifests as propertyEditorUiManifests } from './property-editors/manifests.js';
 import { manifests as propertyTypeManifests } from './property-type/manifests.js';
@@ -6,11 +7,13 @@ import { manifests as repositoryManifests } from './repository/manifests.js';
 import { manifests as searchManifests } from './search/manifests.js';
 import { manifests as treeManifests } from './tree/manifests.js';
 import { manifests as workspaceManifests } from './workspace/manifests.js';
+import * as entryPointModule from './entry-point.js';
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
 export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
 	...entityActionsManifests,
 	...menuManifests,
+	...mediaTypeRootManifests,
 	...propertyEditorUiManifests,
 	...propertyTypeManifests,
 	...repositoryManifests,
@@ -21,6 +24,6 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 		name: 'Media Type Backoffice Entry Point',
 		alias: 'Umb.EntryPoint.MediaType',
 		type: 'backofficeEntryPoint',
-		js: () => import('./entry-point.js'),
+		js: entryPointModule,
 	},
 ];

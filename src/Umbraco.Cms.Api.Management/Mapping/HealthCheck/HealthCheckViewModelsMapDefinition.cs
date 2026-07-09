@@ -5,8 +5,17 @@ using Umbraco.Cms.Core.Mapping;
 
 namespace Umbraco.Cms.Api.Management.Mapping.HealthCheck;
 
+/// <summary>
+/// Provides mapping configuration for converting HealthCheck models to their corresponding view models within the API management layer.
+/// </summary>
 public class HealthCheckViewModelsMapDefinition : IMapDefinition
 {
+    /// <summary>
+    /// Configures the object mappings between health check domain models and their corresponding view models
+    /// for use within the Umbraco management API. This includes mappings for health check actions, statuses,
+    /// and groupings, enabling transformation between API request/response models and internal representations.
+    /// </summary>
+    /// <param name="mapper">The <see cref="IUmbracoMapper"/> instance used to define the mappings.</param>
     public void DefineMaps(IUmbracoMapper mapper)
     {
         mapper.Define<HealthCheckActionRequestModel, HealthCheckAction>((_, _) => new HealthCheckAction(), Map);

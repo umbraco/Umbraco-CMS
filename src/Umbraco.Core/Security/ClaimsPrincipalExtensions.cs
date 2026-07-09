@@ -8,8 +8,16 @@ using Umbraco.Cms.Core;
 
 namespace Umbraco.Extensions;
 
+/// <summary>
+///     Extension methods for <see cref="ClaimsPrincipal" /> and related types.
+/// </summary>
 public static class ClaimsPrincipalExtensions
 {
+    /// <summary>
+    ///     Determines whether the specified claims identity is a back office authentication type.
+    /// </summary>
+    /// <param name="claimsIdentity">The claims identity to check.</param>
+    /// <returns><c>true</c> if the identity is authenticated with the back office authentication type; otherwise, <c>false</c>.</returns>
     public static bool IsBackOfficeAuthenticationType(this ClaimsIdentity? claimsIdentity)
     {
         if (claimsIdentity is null)

@@ -35,6 +35,18 @@ namespace Umbraco.Cms.Infrastructure.Scoping
         private CoreDebugSettings _coreDebugSettings;
         private readonly MediaFileManager _mediaFileManager;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.Scoping.ScopeProvider"/> class.
+        /// </summary>
+        /// <param name="ambientScopeStack">Provides access to the ambient scope stack for managing scope lifetimes.</param>
+        /// <param name="ambientContextStack">Provides access to the ambient context stack for managing contextual data within scopes.</param>
+        /// <param name="distributedLockingMechanismFactory">Factory for creating distributed locking mechanisms.</param>
+        /// <param name="databaseFactory">Factory for creating Umbraco database connections.</param>
+        /// <param name="fileSystems">The file systems used by Umbraco for media and other storage.</param>
+        /// <param name="coreDebugSettings">Monitor for core debug settings.</param>
+        /// <param name="mediaFileManager">Manages media files within Umbraco.</param>
+        /// <param name="loggerFactory">Factory for creating logger instances.</param>
+        /// <param name="eventAggregator">Aggregates and dispatches events within the application.</param>
         public ScopeProvider(
             IAmbientScopeStack ambientScopeStack,
             IAmbientScopeContextStack ambientContextStack,
@@ -62,10 +74,19 @@ namespace Umbraco.Cms.Infrastructure.Scoping
             coreDebugSettings.OnChange(x => _coreDebugSettings = x);
         }
 
+        /// <summary>
+        /// Gets the factory responsible for creating distributed locking mechanisms used by the scope provider.
+        /// </summary>
         public IDistributedLockingMechanismFactory DistributedLockingMechanismFactory { get; }
 
+        /// <summary>
+        /// Gets the <see cref="IUmbracoDatabaseFactory"/> instance used by this scope provider to create database connections.
+        /// </summary>
         public IUmbracoDatabaseFactory DatabaseFactory { get; }
 
+        /// <summary>
+        /// Gets the <see cref="ISqlContext"/> instance associated with this scope provider.
+        /// </summary>
         public ISqlContext SqlContext => DatabaseFactory.SqlContext;
 
 
@@ -93,10 +114,17 @@ namespace Umbraco.Cms.Infrastructure.Scoping
 
         IScope? IScopeAccessor.AmbientScope => _ambientScopeStack.AmbientScope;
 
+        /// <summary>
+        /// Removes the current ambient scope from the scope stack.
+        /// </summary>
         public void PopAmbientScope() => _ambientScopeStack.Pop();
 
         #endregion
 
+        /// <summary>
+        /// Pushes the specified <see cref="Scope"/> onto the ambient scope stack.
+        /// </summary>
+        /// <param name="scope">The scope to push onto the ambient scope stack.</param>
         public void PushAmbientScope(Scope scope)
         {
             if (scope is null)
@@ -107,6 +135,11 @@ namespace Umbraco.Cms.Infrastructure.Scoping
             _ambientScopeStack.Push(scope);
         }
 
+        /// <summary>
+        /// Pushes the specified ambient scope context onto the internal stack.
+        /// </summary>
+        /// <param name="scopeContext">The scope context to push. Cannot be null.</param>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="scopeContext"/> is <c>null</c>.</exception>
         public void PushAmbientScopeContext(IScopeContext? scopeContext)
         {
             if (scopeContext is null)
@@ -116,6 +149,10 @@ namespace Umbraco.Cms.Infrastructure.Scoping
             _ambientContextStack.Push(scopeContext);
         }
 
+        /// <summary>
+        /// Removes (pops) the current ambient scope context from the internal context stack, updating the active scope.
+        /// Typically used to manage nested scope lifecycles.
+        /// </summary>
         public void PopAmbientScopeContext() => _ambientContextStack.Pop();
 
         /// <inheritdoc />

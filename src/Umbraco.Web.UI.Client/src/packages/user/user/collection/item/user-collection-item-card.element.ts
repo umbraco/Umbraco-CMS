@@ -142,6 +142,8 @@ export class UmbUserCollectionItemCardElement extends UmbLitElement implements U
 		css`
 			uui-card-user {
 				width: 100%;
+				min-width: auto;
+				height: 100%;
 				justify-content: normal;
 				padding-top: var(--uui-size-space-5);
 				flex-direction: column;

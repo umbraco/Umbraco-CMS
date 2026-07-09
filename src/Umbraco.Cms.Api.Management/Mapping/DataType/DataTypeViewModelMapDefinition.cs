@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Api.Management.ViewModels.DataType;
+using Umbraco.Cms.Api.Management.ViewModels.DataType;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -6,8 +6,15 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Mapping.DataType;
 
+/// <summary>
+/// Provides mapping configuration between data type entities and their corresponding view models in the management API.
+/// </summary>
 public class DataTypeViewModelMapDefinition : IMapDefinition
 {
+    /// <summary>
+    /// Configures object-object mapping definitions for data type view models using the provided mapper.
+    /// </summary>
+    /// <param name="mapper">The <see cref="IUmbracoMapper"/> instance used to define the mappings between <see cref="IDataType"/> and <see cref="DataTypeResponseModel"/>.</param>
     public void DefineMaps(IUmbracoMapper mapper)
         => mapper.Define<IDataType, DataTypeResponseModel>((_, _) => new DataTypeResponseModel(), Map);
 

@@ -270,7 +270,7 @@ export class UmbSplitPanelElement extends UmbLitElement {
 			--umb-split-panel-initial-position: 50%;
 			--umb-split-panel-start-min-width: 0;
 			--umb-split-panel-end-min-width: 0;
-			--umb-split-panel-divider-touch-area-width: 20px;
+			--umb-split-panel-divider-touch-area-width: 12px;
 			--umb-split-panel-divider-width: 1px;
 			--umb-split-panel-divider-color: transparent;
 			--umb-split-panel-slot-overflow: hidden;
@@ -297,10 +297,9 @@ export class UmbSplitPanelElement extends UmbLitElement {
 		#divider-touch-area {
 			position: absolute;
 			top: 0;
-			left: 5px;
+			left: -1px;
 			height: 100%;
 			width: var(--umb-split-panel-divider-touch-area-width);
-			transform: translateX(-50%);
 			cursor: col-resize;
 		}
 		/* Do we want a line that shows the divider? */

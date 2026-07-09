@@ -7,14 +7,22 @@ namespace Umbraco.Cms.Core.Models;
 /// </summary>
 public class ContentTypeSort : IValueObject, IDeepCloneable
 {
-    // this parameterless ctor should never be used BUT is required by AutoMapper in EntityMapperProfile
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="ContentTypeSort" /> class.
+    /// </summary>
+    /// <remarks>
+    ///     This parameterless constructor should not be used directly but is required by AutoMapper in EntityMapperProfile.
+    /// </remarks>
     public ContentTypeSort()
     {
     }
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="T:System.Object" /> class.
+    ///     Initializes a new instance of the <see cref="ContentTypeSort" /> class with the specified values.
     /// </summary>
+    /// <param name="key">The unique key of the content type.</param>
+    /// <param name="sortOrder">The sort order position.</param>
+    /// <param name="alias">The alias of the content type.</param>
     public ContentTypeSort(Guid key, int sortOrder, string alias)
     {
         SortOrder = sortOrder;
@@ -37,12 +45,14 @@ public class ContentTypeSort : IValueObject, IDeepCloneable
     /// </summary>
     public Guid Key { get; set; }
 
+    /// <inheritdoc />
     public object DeepClone()
     {
         var clone = (ContentTypeSort)MemberwiseClone();
         return clone;
     }
 
+    /// <inheritdoc />
     public override bool Equals(object? obj)
     {
         if (ReferenceEquals(null, obj))
@@ -63,9 +73,15 @@ public class ContentTypeSort : IValueObject, IDeepCloneable
         return Equals((ContentTypeSort)obj);
     }
 
+    /// <summary>
+    ///     Determines whether the specified <see cref="ContentTypeSort" /> is equal to this instance.
+    /// </summary>
+    /// <param name="other">The <see cref="ContentTypeSort" /> to compare with this instance.</param>
+    /// <returns><c>true</c> if the specified object is equal to this instance; otherwise, <c>false</c>.</returns>
     protected bool Equals(ContentTypeSort other) =>
         Key.Equals(other.Key) && string.Equals(Alias, other.Alias);
 
+    /// <inheritdoc />
     public override int GetHashCode()
     {
         unchecked
