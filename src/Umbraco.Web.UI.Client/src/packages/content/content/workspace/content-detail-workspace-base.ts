@@ -189,12 +189,6 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		return firstValueFrom(this.variantOptions);
 	}
 
-	async isVariantOptions(variantId: UmbVariantId): Promise<boolean> {
-		const variantUnique = variantId.toString();
-		const options = await this.getVariantOptions();
-		return options.some((option) => option.unique === variantUnique);
-	}
-
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	protected _variantOptionsFilter = (variantOption: VariantOptionModelType) => true;
 
