@@ -3,6 +3,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
+using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -16,6 +17,7 @@ public class ApiRichTextMarkupParserTests
 {
     private Mock<IApiContentRouteBuilder> _apiContentRouteBuilder;
     private Mock<IApiMediaUrlProvider> _apiMediaUrlProvider;
+    private Mock<IImageUrlTokenGenerator> _imageUrlTokenGenerator;
 
     [Test]
     public void Can_Parse_Legacy_LocalLinks()
@@ -178,6 +180,41 @@ public class ApiRichTextMarkupParserTests
         Assert.AreEqual(expectedOutput, parsedHtml);
     }
 
+    [Test]
+    public void LocalImages_Are_ReSigned_Via_TokenGenerator()
+    {
+        // Verifies the token generator is given the rebuilt src (provider URL + persisted query string)
+        // and that its return value replaces the src attribute. The signer is responsible for handling
+        // any HTML-entity encoding in the query string (RTE markup typically uses &amp;).
+        var key1 = Guid.Parse("395bdc0e8f4d4ad4af7f3a3f6265651e");
+        var data1 = new MockData()
+            .WithKey(key1)
+            .WithMediaUrl("https://localhost:44331/media/bdofwokn/77gtp8fbrxmgkefatp10aw.webp");
+
+        var mockData = new Dictionary<Guid, MockData>
+        {
+            { key1, data1 },
+        };
+        var parser = BuildDefaultSut(mockData);
+
+        // override the no-op behaviour set up in BuildDefaultSut to verify the call shape
+        _imageUrlTokenGenerator.Reset();
+        _imageUrlTokenGenerator
+            .Setup(g => g.RefreshSignature(It.IsAny<string>()))
+            .Returns<string>(_ => "FRESH_URL");
+
+        var html =
+            @"<p><img src=""/media/bdofwokn/77gtp8fbrxmgkefatp10aw.webp?width=500&amp;hmac=stale"" data-udi=""umb://media/395bdc0e8f4d4ad4af7f3a3f6265651e""></p>";
+
+        var parsedHtml = parser.Parse(html);
+
+        // The signer receives the raw attribute value as returned by HtmlAgilityPack (entities not decoded).
+        _imageUrlTokenGenerator.Verify(
+            g => g.RefreshSignature("https://localhost:44331/media/bdofwokn/77gtp8fbrxmgkefatp10aw.webp?width=500&amp;hmac=stale"),
+            Times.Once);
+        StringAssert.Contains(@"src=""FRESH_URL""", parsedHtml);
+    }
+
     private ApiRichTextMarkupParser BuildDefaultSut(Dictionary<Guid, MockData> mockData)
     {
         var contentCacheMock = new Mock<IPublishedContentCache>();
@@ -201,11 +238,16 @@ public class ApiRichTextMarkupParserTests
         _apiContentRouteBuilder.Setup(acrb => acrb.Build(It.IsAny<IPublishedContent>(), It.IsAny<string>()))
             .Returns<IPublishedContent, string>((content, culture) => mockData[content.Key].ApiContentRoute);
 
+        _imageUrlTokenGenerator = new Mock<IImageUrlTokenGenerator>();
+        _imageUrlTokenGenerator.Setup(g => g.RefreshSignature(It.IsAny<string>()))
+            .Returns<string>(url => url);
+
         return new ApiRichTextMarkupParser(
             _apiContentRouteBuilder.Object,
             _apiMediaUrlProvider.Object,
             contentCacheMock.Object,
             mediaCacheMock.Object,
+            _imageUrlTokenGenerator.Object,
             Mock.Of<ILogger<ApiRichTextMarkupParser>>());
     }
 

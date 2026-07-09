@@ -704,7 +704,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         /// </summary>
         /// <param name="options">Specifies options for the integrity check, such as whether to automatically fix issues found.</param>
         /// <returns>
-        /// A <see cref="Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.ContentDataIntegrityReport"/> detailing any nodes with invalid paths or levels, and indicating which issues were fixed if applicable.
+        /// A <see cref="ContentDataIntegrityReport"/> detailing any nodes with invalid paths or levels, and indicating which issues were fixed if applicable.
         /// </returns>
         public ContentDataIntegrityReport CheckDataIntegrity(ContentDataIntegrityReportOptions options)
         {

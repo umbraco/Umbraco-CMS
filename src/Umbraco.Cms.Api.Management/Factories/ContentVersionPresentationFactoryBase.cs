@@ -31,6 +31,13 @@ internal abstract class ContentVersionPresentationFactoryBase<TVersionItemRespon
         bool isCurrentDraftVersion,
         bool preventCleanup);
 
+    /// <summary>
+    /// Asynchronously creates a <typeparamref name="TVersionItemResponseModel"/> instance from the specified <see cref="ContentVersionMeta"/>.
+    /// </summary>
+    /// <param name="contentVersion">The content version metadata from which to construct the response model.</param>
+    /// <returns>
+    /// A task representing the asynchronous operation. The result contains the constructed <typeparamref name="TVersionItemResponseModel"/> representing the provided content version.
+    /// </returns>
     public async Task<TVersionItemResponseModel> CreateAsync(ContentVersionMeta contentVersion)
     {
         ReferenceByIdModel userReference = contentVersion.UserId switch
@@ -52,6 +59,11 @@ internal abstract class ContentVersionPresentationFactoryBase<TVersionItemRespon
             contentVersion.PreventCleanup);
     }
 
+    /// <summary>
+    /// Creates multiple version item response models asynchronously from the given content versions.
+    /// </summary>
+    /// <param name="contentVersions">The collection of content version metadata to create response models for.</param>
+    /// <returns>A task representing the asynchronous operation, containing an enumerable of version item response models.</returns>
     public async Task<IEnumerable<TVersionItemResponseModel>> CreateMultipleAsync(IEnumerable<ContentVersionMeta> contentVersions)
         => await CreateMultipleImplAsync(contentVersions).ToArrayAsync();
 

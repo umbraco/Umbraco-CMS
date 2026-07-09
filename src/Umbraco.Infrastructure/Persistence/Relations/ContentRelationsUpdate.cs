@@ -21,6 +21,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Relations;
 internal sealed class ContentRelationsUpdate :
     IDistributedCacheNotificationHandler<ContentSavedNotification>,
     IDistributedCacheNotificationHandler<ContentPublishedNotification>,
+    IDistributedCacheNotificationHandler<ContentUnpublishedNotification>,
     IDistributedCacheNotificationHandler<MediaSavedNotification>,
     IDistributedCacheNotificationHandler<MemberSavedNotification>,
     IDistributedCacheNotificationHandler<ElementSavedNotification>,
@@ -65,6 +66,12 @@ internal sealed class ContentRelationsUpdate :
     public void Handle(IEnumerable<ContentPublishedNotification> notifications) => PersistRelations(notifications.SelectMany(x => x.PublishedEntities));
 
     /// <inheritdoc/>
+    public void Handle(ContentUnpublishedNotification notification) => PersistRelations(notification.UnpublishedEntities);
+
+    /// <inheritdoc/>
+    public void Handle(IEnumerable<ContentUnpublishedNotification> notifications) => PersistRelations(notifications.SelectMany(x => x.UnpublishedEntities));
+
+    /// <inheritdoc/>
     public void Handle(MediaSavedNotification notification) => PersistRelations(notification.SavedEntities);
 
     /// <inheritdoc/>
@@ -101,8 +108,12 @@ internal sealed class ContentRelationsUpdate :
 
     private void PersistRelations(IScope scope, IContentBase entity)
     {
+        // Track PublishedValue only for entities that have a published state and are currently published.
+        // For unpublished entities (or entities without a published state) we only track EditedValue to avoid stale PublishedValue relations.
+        var trackPublishedValues = entity is IContent { Published: true };
+
         // Get all references and automatic relation type aliases.
-        ISet<UmbracoEntityReference> references = _dataValueReferenceFactories.GetAllReferences(entity.Properties, _propertyEditors);
+        ISet<UmbracoEntityReference> references = _dataValueReferenceFactories.GetAllReferences(entity.Properties, _propertyEditors, trackPublishedValues);
         ISet<string> automaticRelationTypeAliases = _dataValueReferenceFactories.GetAllAutomaticRelationTypesAliases(_propertyEditors);
 
         if (references.Count == 0)

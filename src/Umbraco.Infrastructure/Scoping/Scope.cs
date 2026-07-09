@@ -236,7 +236,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
         }
 
         /// <summary>
-        /// Gets a value indicating whether this scope was created by <see cref="CreateDetachedScope"/>, making it detachable.
+        /// Gets a value indicating whether this scope was created by <see cref="ScopeProvider.CreateDetachedScope"/>, making it detachable.
         /// </summary>
         /// <remarks>
         /// a value indicating whether the scope is detachable
@@ -274,7 +274,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
         /// <summary>
         /// Gets the <see cref="IScopeContext"/> associated with this scope, which is used for attaching and detaching resources or state during the scope's lifetime.
         /// </summary>
-        /// <remarks>the context (for attaching & detaching only)</remarks>
+        /// <remarks>the context (for attaching &amp; detaching only)</remarks>
         public IScopeContext? Context { get; }
 
         /// <summary>

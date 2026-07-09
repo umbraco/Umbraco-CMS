@@ -37,7 +37,7 @@ internal static class RelationTypeFactory
     /// Creates a <see cref="RelationTypeDto"/> instance from the specified <see cref="IRelationType"/> entity.
     /// </summary>
     /// <param name="entity">The <see cref="IRelationType"/> entity to convert.</param>
-    /// <returns>A <see cref="RelationTypeDto"/> that represents the provided relation type entity.</returns
+    /// <returns>A <see cref="RelationTypeDto"/> that represents the provided relation type entity.</returns>
     public static RelationTypeDto BuildDto(IRelationType entity)
     {
         var isDependency = false;

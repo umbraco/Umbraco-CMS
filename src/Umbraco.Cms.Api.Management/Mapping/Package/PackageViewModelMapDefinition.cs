@@ -40,6 +40,7 @@ public class PackageViewModelMapDefinition : IMapDefinition
         target.DataTypes = source.DataTypes;
         target.MediaUdis = source.MediaIds.Select(x => new GuidUdi(Constants.UdiEntityType.Media, x)).ToList();
         target.MediaLoadChildNodes = source.MediaLoadChildNodes;
+        target.Elements = source.ElementIds ?? new List<Guid>();
     }
 
     // Umbraco.Code.MapAll
@@ -52,6 +53,7 @@ public class PackageViewModelMapDefinition : IMapDefinition
         target.ContentLoadChildNodes = source.ContentLoadChildNodes;
         target.MediaIds = source.MediaUdis.Select(x => x.Guid).ToList();
         target.MediaLoadChildNodes = source.MediaLoadChildNodes;
+        target.ElementIds = source.Elements;
         target.DocumentTypes = source.DocumentTypes;
         target.MediaTypes = source.MediaTypes;
         target.DataTypes = source.DataTypes;

@@ -134,7 +134,7 @@ test('can rename an element folder with update permission enabled', async ({umbr
   // Act
   await umbracoUi.library.clickActionsMenuForElement(folderName);
   await umbracoUi.library.clickRenameActionMenuOption();
-  await umbracoUi.library.enterFolderName(newFolderName);
+  await umbracoUi.library.enterRenameFolderName(newFolderName);
   await umbracoUi.library.clickConfirmRenameFolderButtonAndWaitForElementFolderToBeRenamed();
 
   // Assert

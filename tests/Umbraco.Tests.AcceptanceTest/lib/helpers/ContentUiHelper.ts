@@ -101,6 +101,7 @@ export class ContentUiHelper extends UiBaseLocators {
   private readonly selectLoginPageDocument: Locator;
   private readonly selectErrorPageDocument: Locator;
   private readonly rollbackItem: Locator;
+  private readonly activeRollbackItem: Locator;
   private readonly actionsMenu: Locator;
   private readonly linkToDocumentBtn: Locator;
   private readonly linkToMediaBtn: Locator;
@@ -135,6 +136,7 @@ export class ContentUiHelper extends UiBaseLocators {
   private readonly saveContentBtn: Locator;
   private readonly splitView: Locator;
   private readonly tiptapInput: Locator;
+  private readonly tipTapRteInput: Locator;
   private readonly rteBlockInline: Locator;
   private readonly modalCreateBtn: Locator;
   private readonly modalUpdateBtn: Locator;
@@ -224,17 +226,13 @@ export class ContentUiHelper extends UiBaseLocators {
       name: "Reload children…",
     });
     this.contentTree = page.locator('umb-tree[alias="Umb.Tree.Document"]');
-    this.richTextAreaTxt = page
-      .frameLocator('iframe[title="Rich Text Area"]')
-      .locator("#tinymce");
-    this.textAreaTxt = page.locator("umb-property-editor-ui-textarea textarea");
-    this.plusIconBtn = page.locator("#icon-add svg");
-    this.enterTagTxt = page.getByPlaceholder("Enter tag");
-    this.menuItemTree = page.locator("umb-menu-item-tree-default");
+    this.richTextAreaTxt = page.frameLocator('iframe[title="Rich Text Area"]').locator('#tinymce');
+    this.textAreaTxt = page.locator('umb-property-editor-ui-textarea textarea');
+    this.plusIconBtn = page.locator('#icon-add svg');
+    this.enterTagTxt = page.getByPlaceholder('Enter tag');
+    this.menuItemTree = page.locator('umb-menu-item-tree-default');
+    this.confirmToUnpublishBtn = page.locator('umb-content-unpublish-modal').getByLabel('Unpublish');
     this.confirmToPublishBtn = page.locator('umb-document-publish-modal').getByLabel('Publish');
-    this.confirmToUnpublishBtn = page
-      .locator("umb-document-unpublish-modal")
-      .getByLabel("Unpublish");
     this.dropdown = page.locator("select#native");
     this.splitView = page.locator("#splitViews");
     this.setADateTxt = page.getByLabel("Set a date…");
@@ -411,6 +409,7 @@ export class ContentUiHelper extends UiBaseLocators {
       .locator("umb-input-document")
       .locator("#button");
     this.rollbackItem = page.locator(".rollback-item");
+    this.activeRollbackItem = page.locator(".rollback-item.active");
     this.actionsMenu = page.locator("uui-scroll-container");
     this.linkToDocumentBtn = this.linkPickerModal
       .getByTestId("action:document")
@@ -474,6 +473,7 @@ export class ContentUiHelper extends UiBaseLocators {
     );
     this.blockWorkspace = page.locator("umb-block-workspace-editor");
     this.tiptapInput = page.locator("umb-input-tiptap");
+    this.tipTapRteInput = page.getByTestId("input:tiptap-rte");
     this.rteBlockInline = page.locator("umb-rte-block-inline");
     this.modalCreateBtn = this.backofficeModalContainer.getByLabel("Create", {
       exact: true,
@@ -845,19 +845,21 @@ export class ContentUiHelper extends UiBaseLocators {
     );
   }
 
+  /**
+   * @deprecated Save-and-publish waits on the publish response, not a plain update.
+   * Prefer {@link clickSaveAndPublishButtonAndWaitForContentToBePublished}.
+   * TODO: remove once all callers have migrated.
+   */
   async clickSaveAndPublishButtonAndWaitForContentToBeUpdated() {
-    return await this.waitForResponseAfterExecutingPromise(
-      ConstantHelper.apiEndpoints.document,
-      this.clickSaveAndPublishButton(),
-      ConstantHelper.statusCodes.ok,
-    );
+    return await this.clickSaveAndPublishButtonAndWaitForContentToBePublished();
   }
 
   async clickSaveAndPublishButtonAndWaitForContentToBePublished() {
     return await this.waitForResponseAfterExecutingPromise(
-      ConstantHelper.apiEndpoints.document,
+      ConstantHelper.apiEndpoints.updateAndPublish,
       this.clickSaveAndPublishButton(),
       ConstantHelper.statusCodes.ok,
+      ConstantHelper.httpMethods.put,
     );
   }
 
@@ -875,9 +877,10 @@ export class ContentUiHelper extends UiBaseLocators {
 
   async clickContainerSaveAndPublishButtonAndWaitForContentToBePublished() {
     return await this.waitForResponseAfterExecutingPromise(
-      ConstantHelper.apiEndpoints.document,
+      ConstantHelper.apiEndpoints.updateAndPublish,
       this.clickContainerSaveAndPublishButton(),
       ConstantHelper.statusCodes.ok,
+      ConstantHelper.httpMethods.put,
     );
   }
 
@@ -1067,6 +1070,7 @@ export class ContentUiHelper extends UiBaseLocators {
       this.page.locator(`[name="${mediaPickerName}"] [label="Remove"] svg`),
     );
     await this.clickConfirmRemoveButton();
+    await this.isMediaNameVisible(mediaPickerName, false);
   }
 
   async isMediaNameVisible(mediaName: string, isVisible: boolean = true) {
@@ -1405,7 +1409,7 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   async isDocumentReadOnly(isVisible: boolean = true) {
-    await this.isVisible(this.documentReadOnly, isVisible);
+    await this.isVisible(this.documentReadOnly, isVisible, ConstantHelper.timeout.long);
   }
 
   async isDocumentNameInputEditable(isEditable: boolean = true) {
@@ -1521,7 +1525,14 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   async clickRollbackButton() {
-    await this.click(this.rollbackBtn, { force: true });
+    // Opening Rollback triggers a GET /document-version to load the version history;
+    // wait for that response so the versions are ready before we pick one.
+    await this.waitForResponseAfterExecutingPromise(
+      '/document-version',
+      this.click(this.rollbackBtn, { force: true }),
+      ConstantHelper.statusCodes.ok,
+      ConstantHelper.httpMethods.get,
+    );
   }
 
   async clickRollbackContainerButton(documentId?: string) {
@@ -1531,7 +1542,7 @@ export class ContentUiHelper extends UiBaseLocators {
       await Promise.all([
         this.waitForResponse(
           (resp) =>
-            resp.request().method() === 'GET' &&
+            resp.request().method() === ConstantHelper.httpMethods.get &&
             resp.status() === ConstantHelper.statusCodes.ok &&
             new URL(resp.url()).pathname === expectedPath,
         ),
@@ -1542,6 +1553,15 @@ export class ContentUiHelper extends UiBaseLocators {
     await this.click(this.rollbackContainerBtn);
   }
 
+  async clickPreviousRollBackItem() {
+    // Wait for the modal's async pre-selection of the current version, otherwise it clobbers our pick.
+    await expect(this.activeRollbackItem).toBeVisible();
+    const previousVersion = this.rollbackItem.filter({hasNotText: "Current published version"}).last();
+    await this.click(previousVersion);
+    await expect(previousVersion).toHaveClass(/active/);
+  }
+
+  /** @deprecated Prefer {@link clickPreviousRollBackItem}; kept for backwards compatibility. */
   async clickLatestRollBackItem() {
     await this.click(this.rollbackItem.last());
   }
@@ -2197,19 +2217,10 @@ export class ContentUiHelper extends UiBaseLocators {
     await this.click(blocklistBlock);
   }
 
-  async doesBlockEditorBlockWithNameContainValue(
-    groupName: string,
-    propertyName: string,
-    inputType: string = ConstantHelper.inputTypes.general,
-    value,
-  ) {
-    await expect(
-      this.blockWorkspaceEditTab
-        .filter({ hasText: groupName })
-        .locator(this.property)
-        .filter({ hasText: propertyName })
-        .locator(inputType),
-    ).toContainText(value);
+  async doesBlockEditorBlockWithNameContainValue(groupName: string, propertyName: string, inputType: string = ConstantHelper.inputTypes.general, value) {
+    // This wait is currently necessary as it can take a bit longer than expected for the block to load
+    await this.waitForTimeout(ConstantHelper.wait.short);
+    await expect(this.blockWorkspaceEditTab.filter({hasText: groupName}).locator(this.property).filter({hasText: propertyName}).locator(inputType)).toContainText(value, {timeout: ConstantHelper.timeout.long});
   }
 
   async clickCloseButton() {
@@ -2269,6 +2280,12 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   // TipTap
+  async isImageInTipTapEditorVisible(imageName: string) {
+    await this.isVisible(
+      this.tipTapRteInput.getByRole("img", {name: imageName}),
+    );
+  }
+
   async enterRTETipTapEditor(value: string) {
     await this.enterText(this.tipTapEditor, value);
   }
