@@ -77,9 +77,6 @@ export class UmbWorkspaceSplitViewContext extends UmbContextBase {
 
 				const variantId = UmbVariantId.Create(activeVariantInfo);
 
-				// No need to update if the variantId is the same.
-				if (this.#variantId.getValue()?.equal(variantId)) return;
-
 				this.#variantVariantValidationContext?.unprovide();
 				this.#datasetContext?.destroy();
 
