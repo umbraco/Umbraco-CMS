@@ -129,7 +129,9 @@ internal sealed class CacheRefreshingNotificationHandler :
             }
             else
             {
-                _logger.LogDebug("Content type change: deferring the document database cache rebuild for content type(s) {ContentTypeIds}.", rebuildIds);
+                // In deferred mode this handler does nothing here; DeferredCacheRebuildNotificationHandler
+                // performs the rebuild in response to ContentTypeChangedNotification after the scope commits.
+                _logger.LogDebug("Content type change: document database cache rebuild for content type(s) {ContentTypeIds} left to the deferred rebuild (ContentTypeRebuildMode.Deferred).", rebuildIds);
             }
         }
 
@@ -205,7 +207,9 @@ internal sealed class CacheRefreshingNotificationHandler :
             }
             else
             {
-                _logger.LogDebug("Media type change: deferring the media database cache rebuild for media type(s) {MediaTypeIds}.", rebuildIds);
+                // In deferred mode this handler does nothing here; DeferredCacheRebuildNotificationHandler
+                // performs the rebuild in response to MediaTypeChangedNotification after the scope commits.
+                _logger.LogDebug("Media type change: media database cache rebuild for media type(s) {MediaTypeIds} left to the deferred rebuild (ContentTypeRebuildMode.Deferred).", rebuildIds);
             }
         }
 

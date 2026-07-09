@@ -1,3 +1,4 @@
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
@@ -21,13 +22,21 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.PublishedCache.HybridCache;
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
 internal sealed class DocumentHybridCacheDocumentTypeTests : UmbracoIntegrationTestWithContentEditing
 {
+    // Per-test (the fixture is instantiated per test) capture of content type changes, so nothing leaks between
+    // tests. The instance is registered below so the capture handler writes into it.
+    private readonly List<ContentTypeChange<IContentType>> _capturedContentTypeChanges = [];
+
     protected override void CustomTestSetup(IUmbracoBuilder builder)
     {
         builder.AddNotificationHandler<ContentTreeChangeNotification, ContentTreeChangeDistributedCacheNotificationHandler>();
         builder.AddNotificationHandler<ContentTypeChangedNotification, ContentTypeChangedDistributedCacheNotificationHandler>();
         builder.AddNotificationHandler<ContentTypeChangedNotification, ContentTypeChangeCapture>();
+        builder.Services.AddSingleton(_capturedContentTypeChanges);
         builder.Services.AddUnique<IServerMessenger, ContentEventsTests.LocalServerMessenger>();
     }
+
+    [SetUp]
+    public void ResetCapturedContentTypeChanges() => _capturedContentTypeChanges.Clear();
 
     private IPublishedContentCache PublishedContentHybridCache => GetRequiredService<IPublishedContentCache>();
 
@@ -100,7 +109,7 @@ internal sealed class DocumentHybridCacheDocumentTypeTests : UmbracoIntegrationT
         var composition = await CreateContentType("compositionType", "compProp");
         var composing = await CreateContentType("composingType", "ownProp", composition);
 
-        ContentTypeChangeCapture.Changes.Clear();
+        _capturedContentTypeChanges.Clear();
 
         // Act
         composing.RemoveContentType("compositionType");
@@ -127,7 +136,7 @@ internal sealed class DocumentHybridCacheDocumentTypeTests : UmbracoIntegrationT
         var composition = await CreateContentType("compositionType", "compProp");
         var composing = await CreateContentType("composingType", "ownProp", composition);
 
-        ContentTypeChangeCapture.Changes.Clear();
+        _capturedContentTypeChanges.Clear();
 
         // Act - composing removes its own property (candidate); composition renames its property alias
         // (rebuild-required, propagates to composing). Saved together as a single batch so both changes are
@@ -146,8 +155,8 @@ internal sealed class DocumentHybridCacheDocumentTypeTests : UmbracoIntegrationT
         });
     }
 
-    private static IReadOnlyList<ContentTypeChangeTypes> ChangeTypesFor(int contentTypeId) =>
-        ContentTypeChangeCapture.Changes.Where(c => c.Item.Id == contentTypeId).Select(c => c.ChangeTypes).ToList();
+    private IReadOnlyList<ContentTypeChangeTypes> ChangeTypesFor(int contentTypeId) =>
+        _capturedContentTypeChanges.Where(c => c.Item.Id == contentTypeId).Select(c => c.ChangeTypes).ToList();
 
     private async Task<IContentType> CreateContentType(string alias, string propertyAlias, IContentType? composition = null)
     {
@@ -181,11 +190,10 @@ internal sealed class DocumentHybridCacheDocumentTypeTests : UmbracoIntegrationT
         return (draft.Data ?? string.Empty) + "|" + Convert.ToBase64String(draft.RawData ?? Array.Empty<byte>());
     }
 
-    private sealed class ContentTypeChangeCapture : INotificationHandler<ContentTypeChangedNotification>
+    private sealed class ContentTypeChangeCapture(List<ContentTypeChange<IContentType>> capturedChanges)
+        : INotificationHandler<ContentTypeChangedNotification>
     {
-        public static readonly List<ContentTypeChange<IContentType>> Changes = new();
-
-        public void Handle(ContentTypeChangedNotification notification) => Changes.AddRange(notification.Changes);
+        public void Handle(ContentTypeChangedNotification notification) => capturedChanges.AddRange(notification.Changes);
     }
 
     [Test]

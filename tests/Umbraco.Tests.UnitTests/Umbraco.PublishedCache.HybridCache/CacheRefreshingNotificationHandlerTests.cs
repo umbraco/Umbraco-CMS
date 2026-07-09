@@ -338,6 +338,38 @@ public class CacheRefreshingNotificationHandlerTests
             Times.Once);
     }
 
+    /// <summary>
+    ///     Verifies the deferred + RawDataUnaffected combination: a property removal in deferred mode still
+    ///     clears the converted cache here (the stored blob stays valid) and never rebuilds. The paired
+    ///     "must not queue a deferred rebuild" behaviour is covered by DeferredCacheRebuildNotificationHandlerTests.
+    /// </summary>
+    [Test]
+    public async Task Deferred_Mode_RawDataUnaffected_Change_Clears_Converted_Cache_And_Skips_Rebuild()
+    {
+        // Arrange
+        var handler = CreateHandler(ContentTypeRebuildMode.Deferred);
+        var contentType = CreateContentType(100);
+#pragma warning disable CS0618 // Type or member is obsolete
+        var notification = new ContentTypeRefreshedNotification(
+            new ContentTypeChange<IContentType>(contentType, ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RawDataUnaffected),
+            new EventMessages());
+#pragma warning restore CS0618 // Type or member is obsolete
+
+        _documentCacheService
+            .Setup(x => x.ClearConvertedContentCache(It.Is<IReadOnlyCollection<int>>(ids => ids.Count == 1 && ids.Contains(100))));
+
+        // Act
+        await handler.HandleAsync(notification, CancellationToken.None);
+
+        // Assert — converted cache is cleared (never deferred), and no rebuild happens in either mode.
+        _documentCacheService.Verify(
+            x => x.ClearConvertedContentCache(It.Is<IReadOnlyCollection<int>>(ids => ids.Count == 1 && ids.Contains(100))),
+            Times.Once);
+        _documentCacheService.Verify(
+            x => x.Rebuild(It.IsAny<IReadOnlyCollection<int>>()),
+            Times.Never);
+    }
+
     private static IContentType CreateContentType(int id)
     {
         var mock = new Mock<IContentType>();
