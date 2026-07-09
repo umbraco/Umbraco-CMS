@@ -1,0 +1,1 @@
+export const UMB_WORKSPACE_VARIANT_DELIMITER = '_&_';

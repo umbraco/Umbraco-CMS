@@ -5,6 +5,7 @@ import { customElement, state, css, html } from '@umbraco-cms/backoffice/externa
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbRoute, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
+import { UMB_WORKSPACE_VARIANT_DELIMITER } from '@umbraco-cms/backoffice/workspace';
 
 @customElement('umb-document-blueprint-workspace-editor')
 export class UmbDocumentBlueprintWorkspaceEditorElement extends UmbLitElement {
@@ -59,11 +60,9 @@ export class UmbDocumentBlueprintWorkspaceEditorElement extends UmbLitElement {
 		this.#variants?.forEach((variantA) => {
 			this.#variants?.forEach((variantB) => {
 				routes.push({
-					// TODO: When implementing Segments, be aware if using the unique is URL Safe... [NL]
-					path: variantA.unique + '_&_' + variantB.unique,
+					path: variantA.unique + UMB_WORKSPACE_VARIANT_DELIMITER + variantB.unique,
 					component: this._splitViewElement,
 					setup: (_component, info) => {
-						// Set split view/active info..
 						this.#workspaceContext?.splitView.setVariantParts(info.match.fragments.consumed);
 					},
 				});
@@ -73,13 +72,10 @@ export class UmbDocumentBlueprintWorkspaceEditorElement extends UmbLitElement {
 		// Single view:
 		this.#variants?.forEach((variant) => {
 			routes.push({
-				// TODO: When implementing Segments, be aware if using the unique is URL Safe... [NL]
 				path: variant.unique,
 				component: this._splitViewElement,
 				setup: (_component, info) => {
-					// cause we might come from a split-view, we need to reset index 1.
-					this.#workspaceContext?.splitView.removeActiveVariant(1);
-					this.#workspaceContext?.splitView.handleVariantFolderPart(0, info.match.fragments.consumed);
+					this.#workspaceContext?.splitView.setVariantParts(info.match.fragments.consumed);
 				},
 			});
 		});

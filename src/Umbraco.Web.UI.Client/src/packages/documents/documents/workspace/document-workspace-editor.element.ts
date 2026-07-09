@@ -7,6 +7,7 @@ import type { UmbRoute, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/r
 import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
 import { createObservablePart } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbDocumentVariantOptionModel } from '../types.js';
+import { UMB_WORKSPACE_VARIANT_DELIMITER } from '@umbraco-cms/backoffice/workspace';
 
 // TODO: This seem fully identical with Media Workspace Editor, so we can refactor this to a generic component. [NL]
 @customElement('umb-document-workspace-editor')
@@ -115,16 +116,16 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 		// Generate split view routes for all available routes
 		const routes: Array<UmbRoute> = [];
 
+		/*
 		// Split view routes:
 		this.#variants.forEach((variantA) => {
 			this.#variants!.forEach((variantB) => {
 				routes.push({
 					// TODO: When implementing Segments, be aware if using the unique still is URL Safe, cause its most likely not... [NL]
-					path: variantA.unique + '_&_' + variantB.unique,
+					path: variantA.unique + UMB_WORKSPACE_VARIANT_DELIMITER + variantB.unique,
 					preserveQuery: true,
 					component: this._splitViewElement,
 					setup: (_component, info) => {
-						// Set split view/active info..
 						this.#workspaceContext?.splitView.setVariantParts(info.match.fragments.consumed);
 					},
 				});
@@ -139,11 +140,29 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 				preserveQuery: true,
 				component: this._splitViewElement,
 				setup: (_component, info) => {
-					// cause we might come from a split-view, we need to reset index 1.
-					this.#workspaceContext?.splitView.removeActiveVariant(1);
-					this.#workspaceContext?.splitView.handleVariantFolderPart(0, info.match.fragments.consumed);
+						this.#workspaceContext?.splitView.setVariantParts(info.match.fragments.consumed);
 				},
 			});
+		});
+		*/
+
+		routes.push({
+			path: ':variantPath',
+			preserveQuery: true,
+			component: this._splitViewElement,
+			setup: async (_component, info) => {
+				const variants = this.#variants;
+				if (!variants) {
+					throw new Error('Variants are not available when resolving the route.');
+				}
+				if (!this.#workspaceContext) {
+					throw new Error('Workspace context is not available when resolving the route.');
+				}
+
+				const consumed = info.match.fragments.consumed;
+
+				this.#workspaceContext?.splitView.setVariantParts(consumed);
+			},
 		});
 
 		if (routes.length !== 0) {
