@@ -41,24 +41,6 @@ public class GetElementPermissionsCurrentUserController : CurrentUserControllerB
         _elementPermissionService = elementPermissionService;
     }
 
-    ///// <summary>
-    ///// Initializes a new instance of the <see cref="GetElementPermissionsCurrentUserController"/> class.
-    ///// </summary>
-    ///// <remarks>
-    ///// This constructor exists only to give the dependency injection container an unambiguous (greediest) constructor
-    ///// to select while the obsolete <see cref="IUserService"/> constructor remains. Use the constructor without
-    ///// <see cref="IUserService"/>.
-    ///// </remarks>
-    //[Obsolete("This constructor exists only to satisfy dependency injection. Please use the constructor without IUserService. Scheduled for removal in Umbraco 20.")]
-    //public GetElementPermissionsCurrentUserController(
-    //    IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-    //    IUserService userService,
-    //    IUmbracoMapper mapper,
-    //    IElementPermissionService elementPermissionService)
-    //    : this(backOfficeSecurityAccessor, mapper, elementPermissionService)
-    //{
-    //}
-
     /// <summary>
     /// Initializes a new instance of the <see cref="GetElementPermissionsCurrentUserController"/> class.
     /// </summary>
