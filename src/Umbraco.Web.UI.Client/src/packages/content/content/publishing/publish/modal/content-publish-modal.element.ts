@@ -71,9 +71,6 @@ export class UmbContentPublishModalElement extends UmbModalBaseElement<
 	}
 
 	readonly #handleSelectionChange = (selection: Array<string>) => {
-		if (!this._options && !selection) return;
-
-		//Getting not published mandatory options — the options that are mandatory and not currently published.
 		const missingMandatoryOptions = this._options.filter(isNotPublishedMandatory);
 		this._hasNotSelectedMandatory = missingMandatoryOptions.some((option) => !selection.includes(option.unique));
 	};
