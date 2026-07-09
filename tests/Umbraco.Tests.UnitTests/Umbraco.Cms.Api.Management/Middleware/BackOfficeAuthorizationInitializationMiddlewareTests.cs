@@ -156,8 +156,9 @@ public class BackOfficeAuthorizationInitializationMiddlewareTests
         mockHostingEnvironment.Setup(x => x.ToAbsolute(It.IsAny<string>()))
             .Returns<string>(path => path.TrimStart('~'));
 
-        var options = Options.Create(new UmbracoRequestPathsOptions());
+        var umbracoRequestPathsOptions = Options.Create(new UmbracoRequestPathsOptions());
+        var deliveryApiSettings = Options.Create(new DeliveryApiSettings());
 
-        return new UmbracoRequestPaths(mockHostingEnvironment.Object, options);
+        return new UmbracoRequestPaths(mockHostingEnvironment.Object, umbracoRequestPathsOptions, deliveryApiSettings);
     }
 }

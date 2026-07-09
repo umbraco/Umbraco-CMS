@@ -755,7 +755,6 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 			}
 
 			umb-media-picker-folder-path {
-				overflow: hidden;
 				min-width: 0;
 				flex: 1 1 0%;
 			}

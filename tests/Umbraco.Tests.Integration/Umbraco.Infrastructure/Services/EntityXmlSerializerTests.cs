@@ -128,6 +128,7 @@ internal sealed class EntityXmlSerializerTests : UmbracoIntegrationTest
         Assert.AreEqual(content.GetWriterProfile(UserService).Name, (string)element.Attribute("writerName"));
         Assert.AreEqual(content.WriterId.ToString(), (string)element.Attribute("writerID"));
         Assert.AreEqual(content.TemplateId.ToString(), (string)element.Attribute("template"));
+        Assert.AreEqual(template.Alias, (string)element.Attribute("templateAlias"));
 
         Assert.AreEqual(content.Properties["title"].GetValue().ToString(), element.Elements("title").Single().Value);
         Assert.AreEqual(
