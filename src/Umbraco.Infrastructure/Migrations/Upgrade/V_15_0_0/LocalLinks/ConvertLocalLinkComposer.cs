@@ -5,7 +5,7 @@ using Umbraco.Cms.Core.DependencyInjection;
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_15_0_0.LocalLinks;
 
 /// <summary>
-/// Registers the <see cref="ConvertLocalLink"/> migration with the Umbraco composer pipeline.
+/// Registers the <see cref="ConvertLocalLinks"/> migration with the Umbraco composer pipeline.
 /// </summary>
 [Obsolete("Scheduled for removal in Umbraco 18.")]
 public class ConvertLocalLinkComposer : IComposer

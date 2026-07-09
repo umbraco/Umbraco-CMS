@@ -370,7 +370,7 @@ export class DataTypeUiHelper extends UiBaseLocators {
 
   async goToDataType(dataTypeName: string) {
     await this.clickRootFolderCaretButton();
-    await this.click(this.sectionSidebar.getByLabel(dataTypeName, {exact: true}));
+    await this.clickTreeItemWithName(dataTypeName);
   }
 
   async clickMoveToButton() {
@@ -719,7 +719,7 @@ export class DataTypeUiHelper extends UiBaseLocators {
 
   async addStylesheet(stylesheetName: string) {
     await this.click(this.addStylesheetBtn);
-    await this.click(this.page.getByLabel(stylesheetName));
+    await this.clickTreeItemWithName(stylesheetName, this.page);
     await this.click(this.chooseModalBtn);
   }
 
@@ -937,7 +937,7 @@ export class DataTypeUiHelper extends UiBaseLocators {
     await this.click(this.chooseCustomStylesheetBtn);
     await this.openCaretButtonForName('wwwroot');
     await this.openCaretButtonForName('css');
-    await this.clickLabelWithName(name, true);
+    await this.clickTreeItemWithName(name, this.sidebarModal);
     await this.clickChooseModalButton();
   }
 
@@ -948,7 +948,7 @@ export class DataTypeUiHelper extends UiBaseLocators {
     await this.clickExpandChildItemsForMediaButton();
     for (let i = 0; i < mediaItems.length; i++) {
       if (i === mediaItems.length - 1) {
-        await this.clickLabelWithName(mediaItems[i], true);
+        await this.clickTreeItemWithName(mediaItems[i], this.sidebarModal);
       } else {
         await this.click(this.sidebarModal.locator(`uui-menu-item[label="${mediaItems[i]}"] #caret-button`));
       }
