@@ -92,16 +92,18 @@ export class UmbWorkspaceSplitViewContext extends UmbContextBase {
 
 	#observeVariantOption() {
 		this.observe(this.variantId, (variantId) => {
+			// TODO: move this logic to a method that creates an observable part in the workspace context, so that the split view context can just consume it. [NL]
+			// TODO: eventually consider a getSplitViewVariantOptionByIndex(index) method in the workspace context, that returns an observable part of the variant option for the given index, to enable merging the two observations. [NL]
 			this.observe(
-				this.#workspaceContext
+				this.#workspaceContext && variantId
 					? createObservablePart(this.#workspaceContext.variantOptions, (variants) =>
-							variants.find((v) => v.unique === variantId?.toString()),
+							variants.find((v) => v.unique === variantId.toString()),
 						)
 					: undefined,
-				(variantOptions) => {
-					this.#notFound.setValue(variantOptions === undefined);
+				(variantOption) => {
+					this.#notFound.setValue(variantOption === undefined);
 
-					if (!variantOptions || !variantId || !this.#workspaceContext) return;
+					if (!variantOption || !variantId || !this.#workspaceContext) return;
 
 					// Finish setting up the split view context by providing the validation context and creating the dataset context for the active variant.
 					const validationContext = this.#workspaceContext?.getVariantValidationContext(variantId);
