@@ -256,6 +256,8 @@ describe('UmbDocumentUserPermissionCondition', () => {
 				{ unique: 'no-permissions-parent-document-id', entityType: UMB_DOCUMENT_ENTITY_TYPE },
 			]);
 
+			let callbackCount = 0;
+
 			condition = new UmbDocumentUserPermissionCondition(hostElement, {
 				host: hostElement,
 				config: {
@@ -264,9 +266,12 @@ describe('UmbDocumentUserPermissionCondition', () => {
 					ignorerUserStartNodes: true, // bypass start-node check
 				},
 				onChange: () => {
-					expect(condition.permitted).to.be.true;
-					condition.hostDisconnected();
-					done();
+					callbackCount++;
+					if (callbackCount === 1) {
+						expect(condition.permitted).to.be.true;
+						condition.hostDisconnected();
+						done();
+					}
 				},
 			});
 		});
