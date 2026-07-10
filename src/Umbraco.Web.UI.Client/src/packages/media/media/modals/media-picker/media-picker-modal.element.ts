@@ -198,9 +198,13 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 
 		// Get ancestors of the current media item and check if any of them are start-nodes. If so, access is granted:
 		// TODO: This is also requested by the media-picker-folder-path.element.ts, we should optimize that to only become one request.
-		const { data } = await this.#mediaTreeRepository.requestTreeItemAncestors({
+		const { data, error } = await this.#mediaTreeRepository.requestTreeItemAncestors({
 			treeItem: { unique, entityType: this._currentMediaEntity.entityType },
 		});
+
+		if (error) {
+			throw new Error(`Failed to get ancestors of media item with unique ${unique}: ${error.message}`);
+		}
 
 		// If unique changed then user navigated in the mean time:
 		if (this._currentMediaEntity.unique !== unique) return;
