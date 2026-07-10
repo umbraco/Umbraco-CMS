@@ -244,7 +244,7 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 	// TODO: remove this method in v.21.
 	/**
 	 * Handles the upload of files and folders dropped onto the dropzone.
-	 * Previously this was overwritten by the consumer of the component, but now it is recommended to overwrite `_handleUpload` instead.
+	 * Previously this could be overwritten by the consumer of the component, but now it is recommended to overwrite `_handleUpload` instead.
 	 * By default, it uses the dropzone manager to create temporary files for the dropped items.
 	 * @deprecated Overwrite `_handleUpload` instead. This method will be removed in v.21.
 	 * @param {UUIFileDropzoneEvent} e - The event from the file dropzone.
