@@ -85,12 +85,12 @@ public interface IUserRepository : IReadWriteQueryRepository<Guid, IUser>
     /// <summary>
     ///     Gets paged user results
     /// </summary>
-    /// <param name="query"></param>
-    /// <param name="pageIndex"></param>
-    /// <param name="pageSize"></param>
-    /// <param name="totalRecords"></param>
-    /// <param name="orderBy"></param>
-    /// <param name="orderDirection"></param>
+    /// <param name="query">The base query to filter users by, or <c>null</c> for no base query.</param>
+    /// <param name="pageIndex">The zero-based page index.</param>
+    /// <param name="pageSize">The number of items per page.</param>
+    /// <param name="totalRecords">The total number of records matching the query.</param>
+    /// <param name="orderBy">The expression to order the results by.</param>
+    /// <param name="orderDirection">The direction to order the results in.</param>
     /// <param name="includeUserGroups">
     ///     A filter to only include user that belong to these user groups
     /// </param>
@@ -99,8 +99,8 @@ public interface IUserRepository : IReadWriteQueryRepository<Guid, IUser>
     /// </param>
     /// <param name="userState">Optional parameter to filter by specified user state</param>
     /// <param name="userKinds">Optional parameter to filter by specified user kind</param>
-    /// <param name="filter"></param>
-    /// <returns></returns>
+    /// <param name="filter">An optional additional query to further filter the results.</param>
+    /// <returns>A paged enumerable of users matching the query.</returns>
     // TODO (V20): Remove the default implementation when the obsolete GetPagedResultsByQuery overload is removed.
     IEnumerable<IUser> GetPagedResultsByQuery(
         IQuery<IUser>? query,
