@@ -374,10 +374,8 @@ export class UmbTableElement extends UmbLitElement {
 
 	private _renderHeaderCell(column: UmbTableColumn) {
 		return html`
-			<uui-table-head-cell style="--uui-table-cell-padding: 0 var(--uui-size-5)">
-				${column.allowSorting
-					? html`${this._renderSortingUI(column)}`
-					: html`<span style="text-align:${column.align ?? 'left'};">${column.name}</span>`}
+			<uui-table-head-cell style="--uui-table-cell-padding: 0 var(--uui-size-5); text-align:${column.align ?? 'left'};">
+				${column.allowSorting ? html`${this._renderSortingUI(column)}` : html`<span>${column.name}</span>`}
 			</uui-table-head-cell>
 		`;
 	}
@@ -387,7 +385,7 @@ export class UmbTableElement extends UmbLitElement {
 			<button
 				style="padding: var(--uui-size-5) var(--uui-size-1);"
 				@click="${() => this._handleOrderingChange(column)}">
-				<span style="text-align:${column.align ?? 'left'};">${column.name}</span>
+				<span>${column.name}</span>
 				<uui-symbol-sort ?active=${this.orderingColumn === column.alias} ?descending=${this.orderingDesc}>
 				</uui-symbol-sort>
 			</button>
@@ -618,6 +616,7 @@ export class UmbTableElement extends UmbLitElement {
 				align-items: center;
 				justify-content: space-between;
 				width: 100%;
+				text-align: inherit;
 			}
 
 			uui-table-head-cell button > span {
