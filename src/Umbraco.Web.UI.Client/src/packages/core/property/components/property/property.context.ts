@@ -160,10 +160,9 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase {
 
 	private async _observeProperty(): Promise<void> {
 		const alias = this.#alias.getValue();
-		if (!this.#datasetContext || !alias) return;
 
 		this.observe(
-			await this.#datasetContext.propertyVariantId?.(alias),
+			alias ? await this.#datasetContext?.propertyVariantId?.(alias) : undefined,
 			(variantId) => {
 				this.#variantId.setValue(variantId);
 			},
@@ -171,14 +170,14 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase {
 		);
 
 		this.observe(
-			await this.#datasetContext.propertyValueByAlias<ValueType>(alias),
+			alias ? await this.#datasetContext?.propertyValueByAlias<ValueType>(alias) : undefined,
 			(value) => {
 				this.#value.setValue(value);
 			},
 			'observeValue',
 		);
 
-		this.observe(this.#datasetContext.readOnly, (value) => {
+		this.observe(this.#datasetContext?.readOnly, (value) => {
 			const unique = 'UMB_DATASET';
 
 			if (value) {
