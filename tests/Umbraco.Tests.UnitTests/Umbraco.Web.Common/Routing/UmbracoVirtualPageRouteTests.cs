@@ -181,7 +181,7 @@ public class UmbracoVirtualPageRouteTests
             umbracoContextAccessor.Object);
     }
 
-    private static HttpContext CreateHttpContext(string path, object? controller = null)
+    private static DefaultHttpContext CreateHttpContext(string path, object? controller = null)
     {
         var services = new ServiceCollection();
         if (controller is not null)
@@ -238,7 +238,7 @@ public class UmbracoVirtualPageRouteTests
 
         public ActionArgumentReadingController(IPublishedContent content) => _content = content;
 
-        public IActionResult Index(string sku) => new EmptyResult();
+        public EmptyResult Index(string sku) => new();
 
         public IPublishedContent? FindContent(ActionExecutingContext actionExecutingContext)
             => actionExecutingContext.ActionArguments.TryGetValue("sku", out var sku) && sku is "ABC123"

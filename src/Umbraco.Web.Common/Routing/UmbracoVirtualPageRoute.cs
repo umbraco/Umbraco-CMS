@@ -128,6 +128,8 @@ public class UmbracoVirtualPageRoute : IUmbracoVirtualPageRoute
     /// (a <see cref="CustomRouteContentFinderDelegate" />). Mirrors the two mechanisms handled by
     /// <see cref="FindContent(Endpoint, ActionExecutingContext)" />.
     /// </summary>
+    /// <param name="endpoint">The endpoint to check.</param>
+    /// <returns><c>true</c> if the endpoint is a virtual page endpoint; otherwise, <c>false</c>.</returns>
     internal static bool IsVirtualPageEndpoint(Endpoint endpoint)
     {
         ControllerActionDescriptor? controllerActionDescriptor = endpoint.GetControllerActionDescriptor();
@@ -184,7 +186,7 @@ public class UmbracoVirtualPageRoute : IUmbracoVirtualPageRoute
     /// would otherwise see nothing. Values are the raw route values (strings); they are NOT type-converted the
     /// way MVC model binding would (e.g. "42" stays a string, it is not converted to an int parameter's value).
     /// </remarks>
-    private static IDictionary<string, object?> BuildActionArguments(
+    private static Dictionary<string, object?> BuildActionArguments(
         RouteValueDictionary routeValues,
         ControllerActionDescriptor controllerActionDescriptor)
     {
