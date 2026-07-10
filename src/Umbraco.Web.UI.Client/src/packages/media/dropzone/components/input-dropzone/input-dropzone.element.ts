@@ -18,7 +18,7 @@ import {
 import type { UUIFileDropzoneElement, UUIFileDropzoneEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { formatBytes } from '@umbraco-cms/backoffice/utils';
+import { formatBytes, UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 /**
@@ -152,7 +152,7 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 				?multiple=${this.multiple}
 				?disabled=${this.#isDisabled}
 				?disallowFolderUpload=${this.disableFolderUpload}
-				@change=${this.onUpload}
+				@change=${this.#onUpload}
 				@click=${this.#handleBrowse}>
 				<slot>
 					<uui-button
@@ -241,19 +241,31 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 		`;
 	}
 
-	// TODO: Make this method private in v.22.
+	// TODO: remove this method in v.21.
 	/**
+	 * Handles the upload of files and folders dropped onto the dropzone.
+	 * Previously this was overwritten by the consumer of the component, but now it is recommended to overwrite `_handleUpload` instead.
+	 * By default, it uses the dropzone manager to create temporary files for the dropped items.
+	 * @deprecated Overwrite `_handleUpload` instead. This method will be removed in v.21.
 	 * @param {UUIFileDropzoneEvent} e - The event from the file dropzone.
-	 * @deprecated Overwrite `_handleUpload` instead. This method will be removed in v.22.
 	 */
 	protected async onUpload(e: UUIFileDropzoneEvent) {
+		new UmbDeprecation({
+			deprecated: 'UmbExtensionCollectionFilterModel .type property.',
+			removeInVersion: '21',
+			solution: 'Use the .extensionTypes property instead.',
+		}).warn();
+		await this.#onUpload(e);
+	}
+
+	async #onUpload(e: UUIFileDropzoneEvent) {
 		e.stopImmediatePropagation();
 
 		if (this.#isDisabled || this.noAccess) return;
 		if (!e.detail.files.length && !e.detail.folders.length) return;
 
-		const uploadables = await this._handleUpload(e);
-		this.dispatchEvent(new UmbDropzoneSubmittedEvent(uploadables));
+		const uploads = await this._handleUpload(e);
+		this.dispatchEvent(new UmbDropzoneSubmittedEvent(uploads));
 	}
 
 	/**
