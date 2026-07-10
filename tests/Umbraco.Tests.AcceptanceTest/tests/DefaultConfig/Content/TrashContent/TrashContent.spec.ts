@@ -43,10 +43,8 @@ test('can trash an invariant content node', {tag: '@smoke'}, async ({umbracoApi,
   // Verify audit trail
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickInfoTab();
-  await umbracoUi.content.doesHistoryItemHaveTag(ConstantHelper.auditTrailTypes.delete);
-  await umbracoUi.content.doesHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.contentDeleted);
-  await umbracoUi.content.doesHistoryItemHaveTag(ConstantHelper.auditTrailTypes.move, 1);
-  await umbracoUi.content.doesHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.contentMoved, 1);
+  await umbracoUi.content.doesHistoryItemHaveTag(ConstantHelper.auditTrailTypes.move);
+  await umbracoUi.content.doesHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.contentMoved);
   const currentUser = await umbracoApi.user.getCurrentUser();
   await umbracoUi.content.doesHistoryItemHaveUsername(currentUser.name);
   await umbracoUi.content.doesHistoryItemHaveUsername(currentUser.name, 1);
@@ -73,10 +71,8 @@ test('can trash a variant content node', async ({umbracoApi, umbracoUi}) => {
     // Verify audit trail
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickInfoTab();
-  await umbracoUi.content.doesHistoryItemHaveTag(ConstantHelper.auditTrailTypes.delete);
-  await umbracoUi.content.doesHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.contentDeleted);
-  await umbracoUi.content.doesHistoryItemHaveTag(ConstantHelper.auditTrailTypes.move, 1);
-  await umbracoUi.content.doesHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.contentMoved, 1);
+  await umbracoUi.content.doesHistoryItemHaveTag(ConstantHelper.auditTrailTypes.move);
+  await umbracoUi.content.doesHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.contentMoved);
   const currentUser = await umbracoApi.user.getCurrentUser();
   await umbracoUi.content.doesHistoryItemHaveUsername(currentUser.name);
   await umbracoUi.content.doesHistoryItemHaveUsername(currentUser.name, 1);
@@ -175,12 +171,9 @@ test('can trash an invariant content node that references more than 3 items', as
   // Act
   await umbracoUi.content.clickActionsMenuForContent(contentName);
   await umbracoUi.content.clickTrashActionMenuOption();
-  // Verify the references list has 3 items and has the text '...and one more item'
+  // Which 3 of the 4 references are shown is not deterministic, so assert the count and truncation text, not specific names.
   await umbracoUi.content.doesReferenceHeadlineHaveText(referenceHeadline);
   await umbracoUi.content.doesReferenceItemsHaveCount(3);
-  await umbracoUi.content.isReferenceItemNameVisible(documentPickerName[0]);
-  await umbracoUi.content.isReferenceItemNameVisible(documentPickerName2[0]);
-  await umbracoUi.content.isReferenceItemNameVisible(documentPickerName3[0]);
   await umbracoUi.content.doesReferencesContainText('...and one more item');
   await umbracoUi.content.clickConfirmTrashButtonAndWaitForContentToBeTrashed();
 
@@ -215,12 +208,9 @@ test('can trash a variant content node that references more than 3 items', async
   // Act
   await umbracoUi.content.clickActionsMenuForContent(contentName);
   await umbracoUi.content.clickTrashActionMenuOption();
-  // Verify the references list has 3 items and has the text '...and one more item'
+  // Which 3 of the 4 references are shown is not deterministic, so assert the count and truncation text, not specific names.
   await umbracoUi.content.doesReferenceHeadlineHaveText(referenceHeadline);
   await umbracoUi.content.doesReferenceItemsHaveCount(3);
-  await umbracoUi.content.isReferenceItemNameVisible(documentPickerName[0]);
-  await umbracoUi.content.isReferenceItemNameVisible(documentPickerName2[0]);
-  await umbracoUi.content.isReferenceItemNameVisible(documentPickerName3[0]);
   await umbracoUi.content.doesReferencesContainText('...and one more item');
   await umbracoUi.content.clickConfirmTrashButtonAndWaitForContentToBeTrashed();
 

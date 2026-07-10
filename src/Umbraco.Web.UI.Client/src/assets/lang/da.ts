@@ -450,7 +450,7 @@ export default {
 		noDocumentTypesEditPermissions: 'Rediger tilladelser for denne dokumenttype.',
 		noDocumentTypesCreateNew: 'Opret en ny dokumenttype',
 		noDocumentTypesAllowedAtRoot:
-			'Der er ingen tilladte Dokumenttyper tilgængelige for at lave indhold her. Du skal tillade dette i <strong>Dokumenttyper</strong> inde i <strong>Indstillinger</strong> sektionen, ved at ændre <strong>Tillad på rodniveau</strong> indestillingen under <strong>Permissions</strong>.',
+			'Der er ingen tilladte Dokumenttyper tilgængelige for at lave indhold her. Du skal tillade dette i <strong>Dokumenttyper</strong> inde i <strong>Indstillinger</strong> sektionen, ved at ændre <strong>Tillad på rodniveau</strong> indestillingen under <strong>Struktur</strong>.',
 		noMediaTypes:
 			'Der kunne ikke findes nogen tilladte media typer. Du skal tillade disse i indstillinger under <strong>"media typer"</strong>.',
 		noMediaTypesWithNoSettingsAccess: 'Det valgte medie i træet tillader ikke at medier oprettes under det.\n    ',
@@ -844,6 +844,7 @@ export default {
 		content: 'Indhold',
 		continue: 'Fortsæt',
 		copy: 'Kopiér',
+		copied: 'Kopieret!',
 		create: 'Opret',
 		cropSection: 'Beskær sektion',
 		database: 'Database',
@@ -1178,6 +1179,54 @@ export default {
 		instruction: 'Log ind på Umbraco',
 		signInWith: 'Log ind med {0}',
 		timeout: 'Du er blevet logget ud på grund af inaktivitet, vil du logge ind igen?',
+		continue: 'Fortsæt',
+		validate: 'Indsend',
+		login: 'Log ind',
+		email: 'E-mail',
+		username: 'Brugernavn',
+		password: 'Adgangskode',
+		submit: 'Indsend',
+		required: 'Påkrævet',
+		success: 'Succes',
+		forgottenPassword: 'Glemt adgangskode?',
+		forgottenPasswordInstruction:
+			'En e-mail vil blive sendt til den angivne adresse med et link til at nulstille din adgangskode',
+		requestPasswordResetConfirmation:
+			'En e-mail med instruktioner for nulstilling af adgangskoden vil blive sendt til den angivne adresse, hvis det matcher vores optegnelser',
+		setPasswordInstruction: 'Vælg venligst en ny adgangskode',
+		setPasswordConfirmation: 'Din adgangskode er blevet opdateret',
+		rememberMe: 'Husk mig',
+		error: 'Fejl',
+		defaultError: 'Der er opstået en ukendt fejl.',
+		errorInPasswordFormat: 'Kodeordet skal være på minimum %0% tegn og indeholde mindst %1% alfanumeriske tegn.',
+		passwordMismatch: 'Adgangskoderne er ikke ens.',
+		passwordMinLength: 'Adgangskoden skal være mindst {0} tegn lang.',
+		passwordIsBlank: 'Din nye adgangskode kan ikke være tom.',
+		userFailedLogin: 'Ups! Vi kunne ikke logge dig ind. Tjek at dit brugernavn og adgangskode er korrekt og prøv igen.',
+		userLockedOut: 'Din konto er blevet låst. Prøv igen senere.',
+		receivedErrorFromServer: 'Der skete en fejl på serveren',
+		resetCodeExpired: 'Det link, du har klikket på, er ugyldigt eller udløbet',
+		userInviteWelcomeMessage:
+			'Hej og velkommen til Umbraco! På bare 1 minut vil du være klar til at komme i gang, vi skal bare have dig til at oprette en adgangskode.',
+		userInviteExpiredMessage:
+			'Velkommen til Umbraco! Desværre er din invitation udløbet. Kontakt din administrator og bed om at gensende invitationen.',
+		newPassword: 'Ny adgangskode',
+		confirmNewPassword: 'Bekræft adgangskode',
+		mfaTitle: 'Sidste skridt!',
+		mfaCodeInputHelp: 'Indtast venligst bekræftelseskoden',
+		mfaText: 'Du har aktiveret multi-faktor godkendelse. Du skal nu bekræfte din identitet.',
+		mfaMultipleText: 'Vælg venligst en godkendelsesmetode',
+		mfaCodeInput: 'Kode',
+		mfaInvalidCode: 'Forkert kode indtastet',
+		returnToLogin: 'Tilbage til log ind',
+		localLoginDisabled:
+			'Desværre er det ikke muligt at logge ind direkte. Det er blevet deaktiveret af en login-udbyder.',
+		friendlyGreeting: 'Hej!',
+		requiredEmailValidationMessage: 'Udfyld venligst en e-mail',
+		requiredUsernameValidationMessage: 'Udfyld venligst et brugernavn',
+		requiredPasswordValidationMessage: 'Udfyld venligst en adgangskode',
+		showPassword: 'Vis adgangskode',
+		hidePassword: 'Skjul adgangskode',
 	},
 	main: {
 		dashboard: 'Skrivebord',
@@ -1426,6 +1475,7 @@ export default {
 	},
 	sections: {
 		content: 'Indhold',
+		library: 'Bibliotek',
 		media: 'Mediearkiv',
 		member: 'Medlemmer',
 		packages: 'Pakker',
@@ -1748,9 +1798,19 @@ export default {
 		chooseChildNode: 'Vælg child node',
 		compositionsDescription:
 			'Nedarv faner og egenskaber fra en anden dokumenttype. Nye faner vil blive\n      tilføjet den nuværende dokumenttype eller sammenflettet hvis fanenavnene er ens.\n    ',
+		compositionsDescriptionMediaType:
+			'Nedarv faner og egenskaber fra en anden medietype. Nye faner vil blive\n      tilføjet den nuværende medietype eller sammenflettet hvis fanenavnene er ens.\n    ',
+		compositionsDescriptionMemberType:
+			'Nedarv faner og egenskaber fra en anden medlemstype. Nye faner vil blive\n      tilføjet den nuværende medlemstype eller sammenflettet hvis fanenavnene er ens.\n    ',
 		compositionInUse:
 			'Indholdstypen bliver brugt i en komposition og kan derfor ikke blive anvendt som\n      komposition\n    ',
+		compositionInUseMediaType:
+			'Medietypen bliver brugt i en komposition og kan derfor ikke blive anvendt som\n      komposition\n    ',
+		compositionInUseMemberType:
+			'Medlemstypen bliver brugt i en komposition og kan derfor ikke blive anvendt som\n      komposition\n    ',
 		noAvailableCompositions: 'Der er ingen indholdstyper tilgængelige at bruge som komposition',
+		noAvailableCompositionsMediaType: 'Der er ingen medietyper tilgængelige at bruge som komposition',
+		noAvailableCompositionsMemberType: 'Der er ingen medlemstyper tilgængelige at bruge som komposition',
 		compositionRemoveWarning:
 			'Når du fjerner en komposition vil alle associerede indholdsdata blive slettet.\n      Når først dokumenttypen er gemt, er der ingen vej tilbage.\n    ',
 		availableEditors: 'Opret ny indstilling',
@@ -1788,6 +1848,8 @@ export default {
 		tabHasNoSortOrder: 'fane har ingen sorteringsrækkefølge',
 		compositionUsageHeading: 'Hvor er denne komposition brugt?',
 		compositionUsageSpecification: 'Denne komposition brugt i kompositionen af de følgende indholdstyper:\n    ',
+		compositionUsageSpecificationMediaType: 'Denne komposition brugt i kompositionen af de følgende medietyper:\n    ',
+		compositionUsageSpecificationMemberType: 'Denne komposition brugt i kompositionen af de følgende medlemstyper:\n    ',
 		variantsHeading: 'Tillad variationer',
 		cultureVariantHeading: 'Tillad sprogvariation',
 		segmentVariantHeading: 'Tillad segmentering',
@@ -2003,6 +2065,13 @@ export default {
 		structureGroup: 'Struktur',
 		advancedGroup: 'Avanceret',
 		webhooks: 'Webhooks',
+	},
+	tree: {
+		classicViewLabel: 'Træ',
+		cardViewLabel: 'Kort',
+		tableViewLabel: 'Tabel',
+		children: 'Underelementer',
+		noItems: 'Ingen elementer',
 	},
 	update: {
 		updateAvailable: 'Ny opdatering er klar',
@@ -2246,6 +2315,8 @@ export default {
 	redirectUrls: {
 		disableUrlTracker: 'Slå URL tracker fra',
 		enableUrlTracker: 'Slå URL tracker til',
+		urlTrackerEnabled: 'Aktiveret',
+		urlTrackerDisabled: 'Deaktiveret',
 		culture: 'Kultur',
 		originalUrl: 'Original URL',
 		redirectedTo: 'Viderestillet til',
@@ -2656,6 +2727,18 @@ export default {
 	propertyEditorPicker: {
 		title: 'Vælg Property Editor',
 		openPropertyEditorPicker: 'Vælg Property Editor',
+	},
+
+	propertyEditorUIGroups: {
+		advanced: 'Advanceret',
+		blocks: 'Bloks',
+		common: 'Generelt',
+		date: 'Dato og tid',
+		lists: 'Lister',
+		media: 'Medier',
+		people: 'Personer',
+		pickers: 'Vælgere',
+		richContent: 'Beriget indhold',
 	},
 	healthcheck: {
 		checkSuccessMessage: "Value is set to the recommended value: '%0%'.",

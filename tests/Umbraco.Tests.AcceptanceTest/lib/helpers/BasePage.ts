@@ -495,6 +495,15 @@ export class BasePage {
   }
 
   /**
+   * Asserts that an element does not contain specific text.
+   * @param locator - The element to check
+   * @param text - The text that should not be present
+   */
+  async doesNotContainText(locator: Locator, text: string, timeout?: number): Promise<void> {
+    await expect(locator).not.toContainText(text, {timeout: timeout ?? ConstantHelper.timeout.medium});
+  }
+
+  /**
    * Asserts that an element has specific text.
    * @param locator - The element to check
    * @param text - The exact text expected

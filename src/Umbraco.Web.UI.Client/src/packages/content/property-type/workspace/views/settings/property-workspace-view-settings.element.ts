@@ -6,7 +6,12 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_CONTENT_TYPE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content-type';
 import type { UmbPropertyTypeScaffoldModel } from '@umbraco-cms/backoffice/content-type';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
-import type { UUIBooleanInputEvent, UUIInputEvent, UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
+import type {
+	UUIBooleanInputEvent,
+	UUIInputEvent,
+	UUISelectEvent,
+	UUISelectOption,
+} from '@umbraco-cms/backoffice/external/uui';
 import type { UmbInputWithAliasElement } from '@umbraco-cms/backoffice/components';
 
 @customElement('umb-property-type-workspace-view-settings')
@@ -14,7 +19,7 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 	#context?: typeof UMB_PROPERTY_TYPE_WORKSPACE_CONTEXT.TYPE;
 
 	@state()
-	private _customValidationOptions: Array<Option> = [
+	private _customValidationOptions: Array<UUISelectOption> = [
 		{
 			name: this.localize.term('validation_validateNothing'),
 			value: '!NOVALIDATION!',
@@ -188,9 +193,9 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 			<uui-box class="uui-text">
 				<umb-property-layout label=${this.localize.term('general_name')} orientation="vertical" mandatory>
 					<umb-input-with-alias
-						id="name-input"
-						data-mark="input:entity-name"
-						name="name"
+						data-mark="input:propertytype-name"
+						name="propertyTypeName"
+						autocomplete="on"
 						slot="editor"
 						required
 						.value=${this._data?.name ?? ''}
@@ -204,8 +209,7 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 
 				<umb-property-layout label=${this.localize.term('general_description')} orientation="vertical">
 					<uui-textarea
-						id="description-input"
-						data-mark="input:entity-description"
+						data-mark="input:propertytype-description"
 						label="${this.localize.term('general_description')}"
 						slot="editor"
 						name="description"
@@ -217,7 +221,7 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 				<umb-property-layout label=${this.localize.term('general_propertyEditor')} orientation="vertical" mandatory>
 					<umb-data-type-flow-input
 						slot="editor"
-						id="data-type-input"
+						data-mark="input:data-type"
 						label="${this.localize.term('general_propertyEditor')}"
 						.value=${this._data?.dataType?.unique ?? ''}
 						.suggestionQuery=${this._data?.name}

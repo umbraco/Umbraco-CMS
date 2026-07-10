@@ -21,10 +21,10 @@ public class DomainTelemetryProvider : IDetailedTelemetryProvider
     /// <summary>
     /// Gets usage information related to domains.
     /// </summary>
-    /// <returns>An enumerable of <see cref="Umbraco.Cms.Infrastructure.Telemetry.UsageInformation"/> containing domain usage data.</returns>
+    /// <returns>An enumerable of <see cref="UsageInformation"/> containing domain usage data.</returns>
     public IEnumerable<UsageInformation> GetInformation()
     {
-        var domains = _domainService.GetAll(true).Count();
+        var domains = _domainService.GetAllAsync(true).GetAwaiter().GetResult().Count();
         yield return new UsageInformation(Constants.Telemetry.DomainCount, domains);
     }
 }

@@ -23,11 +23,15 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
     private readonly IContentService _contentService;
     private readonly IContentTypeService _contentTypeService;
     private readonly IDataTypeService _dataTypeService;
-    private readonly ILocalizationService _localizationService;
+    private readonly IDataTypeContainerService _dataTypeContainerService;
+    private readonly IIdKeyMap _idKeyMap;
+    private readonly IDictionaryItemService _dictionaryItemService;
     private readonly IMediaService _mediaService;
+    private readonly IElementContainerService _elementContainerService;
     private readonly PropertyEditorCollection _propertyEditors;
     private readonly IShortStringHelper _shortStringHelper;
     private readonly UrlSegmentProviderCollection _urlSegmentProviders;
+    private readonly ITemplateService _templateService;
     private readonly IUserService _userService;
 
     /// <summary>
@@ -37,34 +41,46 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
     /// <param name="mediaService">The media service for media operations.</param>
     /// <param name="dataTypeService">The data type service for data type operations.</param>
     /// <param name="userService">The user service for user lookups.</param>
-    /// <param name="localizationService">The localization service for dictionary items.</param>
+    /// <param name="dictionaryItemService">The dictionary item service for dictionary item operations.</param>
     /// <param name="contentTypeService">The content type service for content type operations.</param>
     /// <param name="urlSegmentProviders">The collection of URL segment providers.</param>
     /// <param name="shortStringHelper">The helper for string operations.</param>
     /// <param name="propertyEditors">The collection of property editors.</param>
     /// <param name="configurationEditorJsonSerializer">The serializer for configuration data.</param>
+    /// <param name="dataTypeContainerService">The data type container service for resolving ancestor folders.</param>
+    /// <param name="idKeyMap">The cached id-to-key map used to resolve int data type IDs to GUID keys.</param>
+    /// <param name="elementContainerService">The element container service used to resolve an element's ancestor folders.</param>
+    /// <param name="templateService">The template service for template lookups.</param>
     public EntityXmlSerializer(
         IContentService contentService,
         IMediaService mediaService,
         IDataTypeService dataTypeService,
         IUserService userService,
-        ILocalizationService localizationService,
+        IDictionaryItemService dictionaryItemService,
         IContentTypeService contentTypeService,
         UrlSegmentProviderCollection urlSegmentProviders,
         IShortStringHelper shortStringHelper,
         PropertyEditorCollection propertyEditors,
-        IConfigurationEditorJsonSerializer configurationEditorJsonSerializer)
+        IConfigurationEditorJsonSerializer configurationEditorJsonSerializer,
+        IDataTypeContainerService dataTypeContainerService,
+        IIdKeyMap idKeyMap,
+        IElementContainerService elementContainerService,
+        ITemplateService templateService)
     {
         _contentTypeService = contentTypeService;
         _mediaService = mediaService;
+        _elementContainerService = elementContainerService;
         _contentService = contentService;
         _dataTypeService = dataTypeService;
         _userService = userService;
-        _localizationService = localizationService;
+        _dictionaryItemService = dictionaryItemService;
         _urlSegmentProviders = urlSegmentProviders;
         _shortStringHelper = shortStringHelper;
         _propertyEditors = propertyEditors;
         _configurationEditorJsonSerializer = configurationEditorJsonSerializer;
+        _dataTypeContainerService = dataTypeContainerService;
+        _idKeyMap = idKeyMap;
+        _templateService = templateService;
     }
 
     /// <inheritdoc />
@@ -78,6 +94,11 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
             throw new ArgumentNullException(nameof(content));
         }
 
+        return Serialize(content, published, withDescendants, new Dictionary<int, ITemplate?>());
+    }
+
+    private XElement Serialize(IContent content, bool published, bool withDescendants, Dictionary<int, ITemplate?> templateCache)
+    {
         var nodeName = content.ContentType.Alias.ToSafeAlias(_shortStringHelper);
 
         XElement xml = SerializeContentBase(content, content.GetUrlSegment(_shortStringHelper, _urlSegmentProviders), nodeName, published);
@@ -93,6 +114,15 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
 
         xml.Add(new XAttribute("template", content.TemplateId?.ToString(CultureInfo.InvariantCulture) ?? string.Empty));
 
+        ITemplate? assignedTemplate = null;
+        if (content.TemplateId.HasValue && !templateCache.TryGetValue(content.TemplateId.Value, out assignedTemplate))
+        {
+            assignedTemplate = _templateService.GetAsync(content.TemplateId.Value).GetAwaiter().GetResult();
+            templateCache[content.TemplateId.Value] = assignedTemplate;
+        }
+
+        xml.Add(new XAttribute("templateAlias", assignedTemplate?.Alias ?? string.Empty));
+
         xml.Add(new XAttribute("isPublished", content.Published));
 
         if (withDescendants)
@@ -104,7 +134,38 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
             {
                 IEnumerable<IContent> children =
                     _contentService.GetPagedChildren(content.Id, page++, pageSize, out total, propertyAliases: null, filter: null, ordering: null);
-                SerializeChildren(children, xml, published);
+                SerializeChildren(children, xml, published, templateCache);
+            }
+        }
+
+        return xml;
+    }
+
+    /// <inheritdoc />
+    public XElement Serialize(IElement element)
+    {
+        ArgumentNullException.ThrowIfNull(element);
+
+        var nodeName = element.ContentType.Alias.ToSafeAlias(_shortStringHelper);
+
+        XElement xml = SerializeContentBase(element, element.GetUrlSegment(_shortStringHelper, _urlSegmentProviders), nodeName, element.Published);
+
+        xml.Add(new XAttribute("nodeType", element.ContentType.Id));
+        xml.Add(new XAttribute("nodeTypeAlias", element.ContentType.Alias));
+        xml.Add(new XAttribute("creatorName", _userService.GetProfileById(element.CreatorId)?.Name ?? "??"));
+        xml.Add(new XAttribute("writerName", _userService.GetProfileById(element.WriterId)?.Name ?? "??"));
+        xml.Add(new XAttribute("writerID", element.WriterId));
+        xml.Add(new XAttribute("isPublished", element.Published));
+
+        // Elements live in (nestable) containers, not in an element hierarchy. Encode the ancestor
+        // container path so the structure can be recreated on import (mirrors how data types store folders).
+        if (element.Level != 1)
+        {
+            IReadOnlyList<EntityContainer> folders = GetAncestorContainersAsync(element).GetAwaiter().GetResult();
+            if (folders.Count > 0)
+            {
+                xml.Add(new XAttribute("Folders", string.Join("/", folders.Select(x => WebUtility.UrlEncode(x.Name)))));
+                xml.Add(new XAttribute("FolderKeys", string.Join("/", folders.Select(x => x.Key))));
             }
         }
 
@@ -132,9 +193,9 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
             throw new ArgumentNullException(nameof(_userService));
         }
 
-        if (_localizationService == null)
+        if (_dictionaryItemService == null)
         {
-            throw new ArgumentNullException(nameof(_localizationService));
+            throw new ArgumentNullException(nameof(_dictionaryItemService));
         }
 
         if (media == null)
@@ -229,7 +290,7 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
         if (dataType.Level != 1)
         {
             // get URL encoded folder names
-            IOrderedEnumerable<EntityContainer> folders = _dataTypeService.GetContainers(dataType)
+            IOrderedEnumerable<EntityContainer> folders = GetAncestorContainers(dataType)
                 .OrderBy(x => x.Level);
 
             folderNames = string.Join("/", folders.Select(x => WebUtility.UrlEncode(x.Name)).ToArray());
@@ -264,7 +325,7 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
 
         if (includeChildren)
         {
-            IEnumerable<IDictionaryItem>? children = _localizationService.GetDictionaryItemChildren(dictionaryItem.Key);
+            IEnumerable<IDictionaryItem>? children = _dictionaryItemService.GetChildrenAsync(dictionaryItem.Key).GetAwaiter().GetResult();
             if (children is not null)
             {
                 foreach (IDictionaryItem child in children)
@@ -341,16 +402,6 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
         xml.Add(new XElement("Key", template.Key));
         xml.Add(new XElement("Alias", template.Alias));
         xml.Add(new XElement("Design", new XCData(template.Content!)));
-
-        if (template is Template concreteTemplate && concreteTemplate.MasterTemplateId != null)
-        {
-            if (concreteTemplate.MasterTemplateId.IsValueCreated &&
-                concreteTemplate.MasterTemplateId.Value != default)
-            {
-                xml.Add(new XElement("Master", concreteTemplate.MasterTemplateId.ToString()));
-                xml.Add(new XElement("MasterAlias", concreteTemplate.MasterTemplateAlias));
-            }
-        }
 
         return xml;
     }
@@ -438,6 +489,7 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
             new XElement("AllowAtRoot", contentType.AllowedAsRoot.ToString()),
             new XElement("ListView", contentType.ListView.ToString()),
             new XElement("IsElement", contentType.IsElement.ToString()),
+            new XElement("AllowedInLibrary", contentType.AllowedInLibrary.ToString()),
             new XElement("Variations", contentType.Variations.ToString()));
 
         IContentTypeComposition? masterContentType =
@@ -563,7 +615,12 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
     {
         foreach (IPropertyType propertyType in propertyTypes)
         {
-            IDataType? definition = _dataTypeService.GetDataType(propertyType.DataTypeId);
+            IDataType? definition = null;
+            Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForId(propertyType.DataTypeId, UmbracoObjectTypes.DataType);
+            if (keyAttempt.Success)
+            {
+                definition = _dataTypeService.GetAsync(keyAttempt.Result).GetAwaiter().GetResult();
+            }
 
             PropertyGroup? propertyGroup = propertyType.PropertyGroupId == null // true generic property
                 ? null
@@ -711,12 +768,12 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
     /// <param name="children">The child content items to serialize.</param>
     /// <param name="xml">The parent XML element to add children to.</param>
     /// <param name="published">Whether to serialize the published version.</param>
-    private void SerializeChildren(IEnumerable<IContent> children, XElement xml, bool published)
+    private void SerializeChildren(IEnumerable<IContent> children, XElement xml, bool published, Dictionary<int, ITemplate?> templateCache)
     {
         foreach (IContent child in children)
         {
             // add the child xml
-            XElement childXml = Serialize(child, published);
+            XElement childXml = Serialize(child, published, false, templateCache);
             xml.Add(childXml);
 
             const int pageSize = 500;
@@ -728,7 +785,7 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
                     _contentService.GetPagedChildren(child.Id, page++, pageSize, out total, propertyAliases: null, filter: null, ordering: null);
 
                 // recurse
-                SerializeChildren(grandChildren, childXml, published);
+                SerializeChildren(grandChildren, childXml, published, templateCache);
             }
         }
     }
@@ -777,4 +834,40 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
     /// </remarks>
     private string SerializeDataTypeConfiguration(IDataType dataType) =>
         _configurationEditorJsonSerializer.Serialize(dataType.ConfigurationData);
+
+    /// <summary>
+    ///     Gets all ancestor containers of a given data type by walking up the container tree
+    ///     using <see cref="IDataTypeContainerService"/>.
+    /// </summary>
+    /// <param name="dataType">The data type whose ancestor containers to retrieve.</param>
+    /// <returns>The ancestor containers of the data type, ordered from root to nearest parent.</returns>
+    private IEnumerable<EntityContainer> GetAncestorContainers(IDataType dataType)
+    {
+        var ancestors = new List<EntityContainer>();
+        EntityContainer? parent = _dataTypeContainerService.GetParentAsync(dataType).GetAwaiter().GetResult();
+        while (parent is not null)
+        {
+            ancestors.Add(parent);
+            parent = _dataTypeContainerService.GetParentAsync(parent).GetAwaiter().GetResult();
+        }
+
+        // Reverse to go from root to closest ancestor (matches the previous ordering by Level).
+        ancestors.Reverse();
+        return ancestors;
+    }
+
+    private async Task<IReadOnlyList<EntityContainer>> GetAncestorContainersAsync(IElement element)
+    {
+        var ancestors = new List<EntityContainer>();
+        EntityContainer? parent = await _elementContainerService.GetParentAsync(element);
+        while (parent is not null)
+        {
+            ancestors.Add(parent);
+            parent = await _elementContainerService.GetParentAsync(parent);
+        }
+
+        // Reverse to go from root to closest ancestor.
+        ancestors.Reverse();
+        return ancestors;
+    }
 }

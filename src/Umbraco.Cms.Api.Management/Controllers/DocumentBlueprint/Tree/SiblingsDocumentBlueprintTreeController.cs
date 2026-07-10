@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.Services.Flags;
@@ -14,19 +13,12 @@ namespace Umbraco.Cms.Api.Management.Controllers.DocumentBlueprint.Tree;
 /// </summary>
 public class SiblingsDocumentBlueprintTreeController : DocumentBlueprintTreeControllerBase
 {
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
-    public SiblingsDocumentBlueprintTreeController(IEntityService entityService, IDocumentPresentationFactory documentPresentationFactory)
-        : base(entityService, documentPresentationFactory)
-    {
-    }
-
     /// <summary>
     /// Initializes a new instance of the <see cref="SiblingsDocumentBlueprintTreeController"/> class.
     /// </summary>
     /// <param name="entityService">Service used for entity operations within the Umbraco CMS.</param>
     /// <param name="flagProviders">A collection of providers that supply flags for document blueprints.</param>
     /// <param name="documentPresentationFactory">Factory responsible for creating document presentation models.</param>
-    [ActivatorUtilitiesConstructor]
     public SiblingsDocumentBlueprintTreeController(IEntityService entityService, FlagProviderCollection flagProviders, IDocumentPresentationFactory documentPresentationFactory)
         : base(entityService, flagProviders, documentPresentationFactory)
     {

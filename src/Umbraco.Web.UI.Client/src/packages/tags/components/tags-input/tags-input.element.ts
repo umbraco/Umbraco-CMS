@@ -12,12 +12,12 @@ import {
 } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { UUIFormControlWithBasicsMixin } from '@umbraco-cms/backoffice/external/uui';
 import type { TagResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UUIInputElement, UUIInputEvent, UUITagElement } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-tags-input')
-export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') {
+export class UmbTagsInputElement extends UUIFormControlWithBasicsMixin(UmbLitElement, '') {
 	@property({ type: String })
 	group?: string;
 
@@ -189,6 +189,9 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 	}
 
 	protected override updated(): void {
+		// #main-tag is not rendered in readonly mode, and the queries can resolve to null
+		// during transient re-renders, so guard before touching the elements.
+		if (!this._mainTag || !this._widthTracker) return;
 		this._mainTag.style.width = `${this._widthTracker.offsetWidth - 4}px`;
 	}
 

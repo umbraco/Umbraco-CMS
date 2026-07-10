@@ -1,11 +1,9 @@
 using System.Globalization;
 using System.Text.RegularExpressions;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
@@ -55,6 +53,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             PropertyEditorCollection propertyEditors,
             DataValueReferenceFactoryCollection dataValueReferenceFactories,
             IDataTypeService dataTypeService,
+            IIdKeyMap idKeyMap,
             IEventAggregator eventAggregator,
             IRepositoryCacheVersionService repositoryCacheVersionService,
             ICacheSyncService cacheSyncService)
@@ -66,6 +65,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 cacheSyncService)
         {
             DataTypeService = dataTypeService;
+            IdKeyMap = idKeyMap;
             LanguageRepository = languageRepository;
             RelationRepository = relationRepository;
             RelationTypeRepository = relationTypeRepository;
@@ -73,35 +73,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             _dataValueReferenceFactories = dataValueReferenceFactories;
             _eventAggregator = eventAggregator;
         }
-
-        [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
-        protected ContentRepositoryBase(
-            IScopeAccessor scopeAccessor,
-            AppCaches cache,
-            ILogger<EntityRepositoryBase<TId, TEntity>> logger,
-            ILanguageRepository languageRepository,
-            IRelationRepository relationRepository,
-            IRelationTypeRepository relationTypeRepository,
-            PropertyEditorCollection propertyEditors,
-            DataValueReferenceFactoryCollection dataValueReferenceFactories,
-            IDataTypeService dataTypeService,
-            IEventAggregator eventAggregator)
-            : this(
-                scopeAccessor,
-                cache,
-                logger,
-                languageRepository,
-                relationRepository,
-                relationTypeRepository,
-                propertyEditors,
-                dataValueReferenceFactories,
-                dataTypeService,
-                eventAggregator,
-                StaticServiceProvider.Instance.GetRequiredService<IRepositoryCacheVersionService>(),
-                StaticServiceProvider.Instance.GetRequiredService<ICacheSyncService>())
-        {
-        }
-
 
         protected abstract TRepository This { get; }
 
@@ -113,6 +84,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         protected ILanguageRepository LanguageRepository { get; }
 
         protected IDataTypeService DataTypeService { get; }
+
+        /// <summary>
+        /// Gets the cached id-to-key map used to resolve int data type IDs to GUID keys.
+        /// </summary>
+        protected IIdKeyMap IdKeyMap { get; }
 
         protected IRelationRepository RelationRepository { get; }
 
@@ -354,7 +330,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 if (editor.GetValueEditor() is not IDataValueTags tagsProvider)
                 {
                     // support for legacy tag editors, everything from here down to the last continue can be removed when TagsPropertyEditorAttribute is removed
-                    TagConfiguration? tagConfiguration = property.GetTagConfiguration(PropertyEditors, DataTypeService);
+                    TagConfiguration? tagConfiguration = property.GetTagConfiguration(PropertyEditors, DataTypeService, IdKeyMap);
                     if (tagConfiguration == null)
                     {
                         continue;
@@ -365,7 +341,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                         var tags = new List<ITag>();
                         foreach (IPropertyValue pvalue in property.Values)
                         {
-                            IEnumerable<string> tagsValue = property.GetTagsValue(PropertyEditors, DataTypeService, serializer, pvalue.Culture);
+                            IEnumerable<string> tagsValue = property.GetTagsValue(PropertyEditors, DataTypeService, IdKeyMap, serializer, pvalue.Culture);
                             var languageId = LanguageRepository.GetIdByIsoCode(pvalue.Culture);
                             IEnumerable<Tag> cultureTags = tagsValue.Select(x => new Tag { Group = tagConfiguration.Group, Text = x, LanguageId = languageId });
                             tags.AddRange(cultureTags);
@@ -375,7 +351,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     }
                     else
                     {
-                        IEnumerable<string> tagsValue = property.GetTagsValue(PropertyEditors, DataTypeService, serializer); // strings
+                        IEnumerable<string> tagsValue = property.GetTagsValue(PropertyEditors, DataTypeService, IdKeyMap, serializer); // strings
                         IEnumerable<Tag> tags = tagsValue.Select(x => new Tag { Group = tagConfiguration.Group, Text = x });
                         tagRepo.Assign(entity.Id, property.PropertyTypeId, tags);
                     }
@@ -383,7 +359,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     continue; // not implementing IDataValueTags, continue
                 }
 
-                object? configurationObject = DataTypeService.GetDataType(property.PropertyType.DataTypeId)?.ConfigurationObject;
+                object? configurationObject = property.PropertyType.GetDataType(DataTypeService, IdKeyMap)?.ConfigurationObject;
 
                 if (property.PropertyType.VariesByCulture())
                 {
@@ -447,7 +423,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     continue;
                 }
 
-                object? configurationObject = DataTypeService.GetDataType(property.PropertyType.DataTypeId)?.ConfigurationObject;
+                object? configurationObject = property.PropertyType.GetDataType(DataTypeService, IdKeyMap)?.ConfigurationObject;
 
                 // Set sortable values for each matching DTO
                 foreach (PropertyDataDto dto in dtos)
@@ -728,7 +704,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         /// </summary>
         /// <param name="options">Specifies options for the integrity check, such as whether to automatically fix issues found.</param>
         /// <returns>
-        /// A <see cref="Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.ContentDataIntegrityReport"/> detailing any nodes with invalid paths or levels, and indicating which issues were fixed if applicable.
+        /// A <see cref="ContentDataIntegrityReport"/> detailing any nodes with invalid paths or levels, and indicating which issues were fixed if applicable.
         /// </returns>
         public ContentDataIntegrityReport CheckDataIntegrity(ContentDataIntegrityReportOptions options)
         {
@@ -1297,6 +1273,36 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         /// </summary>
         public abstract int RecycleBinId { get; }
 
+        /// <inheritdoc />
+        public void UpdateSortOrder(IReadOnlyList<int> orderedNodeIds)
+        {
+            if (orderedNodeIds.Count == 0)
+            {
+                return;
+            }
+
+            var nodeTable = SqlSyntax.GetQuotedTableName(NodeDto.TableName);
+            var idColumn = SqlSyntax.GetQuotedColumnName(NodeDto.IdColumnName);
+            var sortOrderColumn = SqlSyntax.GetQuotedColumnName(NodeDto.SortOrderColumnName);
+
+            // Each node's new sort order is its position in the ordered collection.
+            var ordered = orderedNodeIds
+                .Select((id, sortOrder) => new KeyValuePair<int, int>(id, sortOrder))
+                .ToList();
+
+            // Two parameters per node (id + sort order), so batch to stay within the SQL Server parameter limit.
+            foreach (IEnumerable<KeyValuePair<int, int>> group in ordered.InGroupsOf(Constants.Sql.MaxParameterCount / 2))
+            {
+                List<KeyValuePair<int, int>> groupList = group.ToList();
+                var args = groupList.SelectMany(pair => new object[] { pair.Key, pair.Value }).ToArray();
+                var whenClauses = string.Join(" ", groupList.Select((_, i) => $"WHEN @{i * 2} THEN @{(i * 2) + 1}"));
+                var inClause = string.Join(", ", groupList.Select((_, i) => $"@{i * 2}"));
+
+                var sql = $"UPDATE {nodeTable} SET {sortOrderColumn} = CASE {idColumn} {whenClauses} END WHERE {idColumn} IN ({inClause})";
+                Database.Execute(sql, args);
+            }
+        }
+
         /// <summary>
         /// Gets all entities that are currently in the recycle bin.
         /// </summary>
@@ -1307,10 +1313,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         }
 
         #endregion
-
-        [Obsolete("This method is no longer used as the persistance of relations has been moved to the ContentRelationsUpdate notification handler. Scheduled for removal in Umbraco 18.")]
-        protected void PersistRelations(TEntity entity)
-            => Logger.LogWarning("ContentRepositoryBase.PersistRelations was called but this is now an obsolete, no-op method that is unused in Umbraco. No relations were persisted. Relations persistence has moved to the ContentRelationsUpdate notification handler.");
 
         /// <summary>
         /// Inserts property values for the content entity

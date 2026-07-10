@@ -100,7 +100,7 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 				<uui-box>
 					<umb-property-layout label=${this.localize.term('general_url')} orientation="vertical">
 						<div slot="editor">
-							<uui-input id="url" .value=${this._url} @input=${this.#onUrlChange} required="true" ${umbFocus()}>
+							<uui-input id="url" label=${this.localize.term('general_url')} .value=${this._url} @input=${this.#onUrlChange} required="true" ${umbFocus()}>
 								<uui-button
 									slot="append"
 									look="primary"

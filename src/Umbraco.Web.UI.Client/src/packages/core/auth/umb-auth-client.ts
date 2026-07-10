@@ -44,6 +44,12 @@ export interface UmbTokenEndpointResponse {
 	issuedAt: number;
 }
 
+export interface UmbTokenRequestResult {
+	response?: UmbTokenEndpointResponse;
+	/** True when the server definitively rejected the grant (e.g. `invalid_grant`) — retrying cannot succeed. */
+	fatal?: boolean;
+}
+
 /**
  * Minimal PKCE + token endpoint client.
  * All token values are `[redacted]` with cookie auth — this client only tracks session timing.
@@ -129,7 +135,7 @@ export class UmbAuthClient {
 		});
 		/* eslint-enable @typescript-eslint/naming-convention */
 
-		return this.#performTokenRequest(body);
+		return (await this.#performTokenRequest(body)).response;
 	}
 
 	/**
@@ -139,7 +145,7 @@ export class UmbAuthClient {
 	 * the real token from the httpOnly cookie. The parameter must be present
 	 * (OpenIddict's pipeline requires it) but the value is ignored by the handler.
 	 */
-	async refreshToken(): Promise<UmbTokenEndpointResponse | undefined> {
+	async refreshToken(): Promise<UmbTokenRequestResult> {
 		/* eslint-disable @typescript-eslint/naming-convention */
 		const body = new URLSearchParams({
 			client_id: this.#clientId,
@@ -184,7 +190,7 @@ export class UmbAuthClient {
 		this.#state = undefined;
 	}
 
-	async #performTokenRequest(body: URLSearchParams): Promise<UmbTokenEndpointResponse | undefined> {
+	async #performTokenRequest(body: URLSearchParams): Promise<UmbTokenRequestResult> {
 		try {
 			const response = await fetch(this.#endpoints.tokenEndpoint, {
 				method: 'POST',
@@ -195,7 +201,7 @@ export class UmbAuthClient {
 
 			if (!response.ok) {
 				console.error('[UmbAuthClient] Token request failed:', response.status, response.statusText);
-				return undefined;
+				return { fatal: await this.#isDefinitiveRejection(response) };
 			}
 
 			const json = await response.json();
@@ -205,10 +211,28 @@ export class UmbAuthClient {
 			}
 			const issuedAt = json.issued_at ?? Math.floor(Date.now() / 1000);
 
-			return { expiresIn, issuedAt };
+			return { response: { expiresIn, issuedAt } };
 		} catch (error) {
+			// Network errors are transient — the request may succeed on a later attempt
 			console.error('[UmbAuthClient] Token request error:', error);
-			return undefined;
+			return {};
+		}
+	}
+
+	/**
+	 * An OAuth error response (e.g. `invalid_grant` for an expired or revoked refresh token)
+	 * means the grant itself was rejected — retrying with the same token cannot succeed.
+	 * Other statuses (5xx, 429) are treated as transient.
+	 * @param {Response} response The non-OK token endpoint response.
+	 * @returns {Promise<boolean>} True when the failure is a definitive rejection.
+	 */
+	async #isDefinitiveRejection(response: Response): Promise<boolean> {
+		if (response.status !== 400 && response.status !== 401) return false;
+		try {
+			const json = await response.json();
+			return typeof json?.error === 'string';
+		} catch {
+			return false;
 		}
 	}
 }

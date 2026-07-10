@@ -2,7 +2,7 @@ import { expect } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import { UmbVariantPropertyGuardManager } from './variant-property-guard.manager.js';
-import { UmbVariantId } from '../../variant/variant-id.class.js';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 @customElement('test-my-controller-host')
 class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}

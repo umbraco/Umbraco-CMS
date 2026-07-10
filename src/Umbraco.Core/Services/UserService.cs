@@ -570,11 +570,7 @@ internal partial class UserService : RepositoryService, IUserService
 
         if (identityCreationResult.Succeded is false)
         {
-            // If we fail from something in Identity we can't know exactly why, so we have to resolve to returning an unknown failure.
-            // But there should be more information in the message.
-            return Attempt.FailWithStatus(
-                UserOperationStatus.UnknownFailure,
-                new UserCreationResult { Error = new ValidationResult(identityCreationResult.ErrorMessage) });
+            return MapCreationFailure(identityCreationResult);
         }
 
         // The user is now created, so we can fetch it to map it to a result model with our generated password.
@@ -606,6 +602,20 @@ internal partial class UserService : RepositoryService, IUserService
         };
 
         return Attempt.SucceedWithStatus(UserOperationStatus.Success, creationResult);
+    }
+
+    private static Attempt<UserCreationResult, UserOperationStatus> MapCreationFailure(IdentityCreationResult identityCreationResult)
+    {
+        if (identityCreationResult.CancelledByNotification)
+        {
+            return Attempt.FailWithStatus(UserOperationStatus.CancelledByNotification, new UserCreationResult());
+        }
+
+        // If we fail from something in Identity we can't know exactly why, so we have to resolve to returning an unknown failure.
+        // But there should be more information in the message.
+        return Attempt.FailWithStatus(
+            UserOperationStatus.UnknownFailure,
+            new UserCreationResult { Error = new ValidationResult(identityCreationResult.ErrorMessage) });
     }
 
     /// <inheritdoc/>
@@ -909,6 +919,14 @@ internal partial class UserService : RepositoryService, IUserService
             return Attempt.FailWithStatus<IUser?, UserOperationStatus>(UserOperationStatus.MediaStartNodeNotFound, existingUser);
         }
 
+        List<int>? startElementIds = GetIdsFromKeys(model.ElementStartNodeKeys, UmbracoObjectTypes.ElementContainer);
+
+        if (startElementIds is null || startElementIds.Count != model.ElementStartNodeKeys.Count)
+        {
+            scope.Complete();
+            return Attempt.FailWithStatus<IUser?, UserOperationStatus>(UserOperationStatus.ElementStartNodeNotFound, existingUser);
+        }
+
         if (model.HasContentRootAccess)
         {
             startContentIds.Add(Constants.System.Root);
@@ -917,6 +935,11 @@ internal partial class UserService : RepositoryService, IUserService
         if (model.HasMediaRootAccess)
         {
             startMediaIds.Add(Constants.System.Root);
+        }
+
+        if (model.HasElementRootAccess)
+        {
+            startElementIds.Add(Constants.System.Root);
         }
 
         Attempt<string?> isAuthorized = _userEditorAuthorizationHelper.IsAuthorized(
@@ -943,7 +966,7 @@ internal partial class UserService : RepositoryService, IUserService
         // TODO: This probably shouldn't live here, once we have user content start nodes as keys this can be moved to a mapper
         // Alternatively it should be a map definition, but then we need to use entity service to resolve the IDs
         // TODO: Add auditing
-        IUser updated = MapUserUpdate(model, userGroups, existingUser, startContentIds, startMediaIds);
+        IUser updated = MapUserUpdate(model, userGroups, existingUser, startContentIds, startMediaIds, startElementIds);
         UserOperationStatus saveStatus = await userStore.SaveAsync(updated);
 
         if (saveStatus is not UserOperationStatus.Success)
@@ -1041,13 +1064,15 @@ internal partial class UserService : RepositoryService, IUserService
     /// <param name="target">The target user to update.</param>
     /// <param name="startContentIds">The content start node IDs.</param>
     /// <param name="startMediaIds">The media start node IDs.</param>
+    /// <param name="startElementIds">The element start node IDs.</param>
     /// <returns>The updated <see cref="IUser" />.</returns>
     private IUser MapUserUpdate(
         UserUpdateModel source,
         ISet<IUserGroup> sourceUserGroups,
         IUser target,
         List<int> startContentIds,
-        List<int> startMediaIds)
+        List<int> startMediaIds,
+        List<int> startElementIds)
     {
         target.Name = source.Name;
         target.Language = source.LanguageIsoCode;
@@ -1055,6 +1080,7 @@ internal partial class UserService : RepositoryService, IUserService
         target.Username = source.UserName;
         target.StartContentIds = startContentIds.ToArray();
         target.StartMediaIds = startMediaIds.ToArray();
+        target.StartElementIds = startElementIds.ToArray();
 
         target.ClearGroups();
         foreach (IUserGroup group in sourceUserGroups)
@@ -2050,36 +2076,52 @@ internal partial class UserService : RepositoryService, IUserService
     }
 
     /// <inheritdoc/>
-    public async Task<Attempt<IEnumerable<NodePermissions>, UserOperationStatus>> GetMediaPermissionsAsync(Guid userKey, IEnumerable<Guid> mediaKeys)
-    {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
-        Attempt<Dictionary<Guid, int>?> idAttempt = CreateIdKeyMap(mediaKeys, UmbracoObjectTypes.Media);
-
-        if (idAttempt.Success is false || idAttempt.Result is null)
-        {
-            return Attempt.FailWithStatus(UserOperationStatus.MediaNodeNotFound, Enumerable.Empty<NodePermissions>());
-        }
-
-        Attempt<IEnumerable<NodePermissions>, UserOperationStatus> permissions =
-            await GetPermissionsAsync(userKey, idAttempt.Result, [UmbracoObjectTypes.Media]);
-        scope.Complete();
-
-        return permissions;
-    }
+    public async Task<Attempt<IEnumerable<NodePermissions>, UserOperationStatus>> GetMediaPermissionsAsync(
+        Guid userKey,
+        IEnumerable<Guid> mediaKeys)
+        => await GetContentPermissionsAsync(
+            userKey,
+            mediaKeys,
+            UserOperationStatus.MediaNodeNotFound,
+            UmbracoObjectTypes.Media);
 
     /// <inheritdoc/>
-    public async Task<Attempt<IEnumerable<NodePermissions>, UserOperationStatus>> GetDocumentPermissionsAsync(Guid userKey, IEnumerable<Guid> contentKeys)
+    public async Task<Attempt<IEnumerable<NodePermissions>, UserOperationStatus>> GetDocumentPermissionsAsync(
+        Guid userKey,
+        IEnumerable<Guid> contentKeys)
+        => await GetContentPermissionsAsync(
+            userKey,
+            contentKeys,
+            UserOperationStatus.ContentNodeNotFound,
+            UmbracoObjectTypes.Document);
+
+    /// <inheritdoc/>
+    public async Task<Attempt<IEnumerable<NodePermissions>, UserOperationStatus>> GetElementPermissionsAsync(
+        Guid userKey,
+        IEnumerable<Guid> elementKeys)
+        => await GetContentPermissionsAsync(
+            userKey,
+            elementKeys,
+            UserOperationStatus.ElementNodeNotFound,
+            UmbracoObjectTypes.Element,
+            UmbracoObjectTypes.ElementContainer);
+
+    private async Task<Attempt<IEnumerable<NodePermissions>, UserOperationStatus>> GetContentPermissionsAsync(
+        Guid userKey,
+        IEnumerable<Guid> contentKeys,
+        UserOperationStatus failedOperationStatus,
+        params UmbracoObjectTypes[] objectTypes)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
-        Attempt<Dictionary<Guid, int>?> idAttempt = CreateIdKeyMap(contentKeys, UmbracoObjectTypes.Document);
+        Attempt<Dictionary<Guid, int>?> idAttempt = CreateIdKeyMap(contentKeys, objectTypes);
 
         if (idAttempt.Success is false || idAttempt.Result is null)
         {
-            return Attempt.FailWithStatus(UserOperationStatus.ContentNodeNotFound, Enumerable.Empty<NodePermissions>());
+            return Attempt.FailWithStatus(failedOperationStatus, Enumerable.Empty<NodePermissions>());
         }
 
         Attempt<IEnumerable<NodePermissions>, UserOperationStatus> permissions =
-            await GetPermissionsAsync(userKey, idAttempt.Result, [UmbracoObjectTypes.Document]);
+            await GetPermissionsAsync(userKey, idAttempt.Result, objectTypes);
         scope.Complete();
 
         return permissions;
@@ -2157,20 +2199,32 @@ internal partial class UserService : RepositoryService, IUserService
     /// <param name="nodeKeys">The keys of the nodes.</param>
     /// <param name="objectType">The type of Umbraco object.</param>
     /// <returns>An attempt containing the key-to-ID mapping or <c>null</c> if any key was not found.</returns>
-    private Attempt<Dictionary<Guid, int>?> CreateIdKeyMap(IEnumerable<Guid> nodeKeys, UmbracoObjectTypes objectType)
+    private Attempt<Dictionary<Guid, int>?> CreateIdKeyMap(IEnumerable<Guid> nodeKeys, params UmbracoObjectTypes[] objectTypes)
     {
         // We'll return this as a dictionary we can link the id and key again later.
         Dictionary<Guid, int> idKeys = new();
 
         foreach (Guid key in nodeKeys)
         {
-            Attempt<int> idAttempt = _entityService.GetId(key, objectType);
-            if (idAttempt.Success is false)
+            Attempt<int>? successfulAttempt = null;
+            foreach (UmbracoObjectTypes objectType in objectTypes)
+            {
+                Attempt<int> idAttempt = _entityService.GetId(key, objectType);
+                if (idAttempt.Success is false)
+                {
+                    continue;
+                }
+
+                successfulAttempt = idAttempt;
+                break;
+            }
+
+            if (successfulAttempt is null)
             {
                 return Attempt.Fail<Dictionary<Guid, int>?>(null);
             }
 
-            idKeys[key] = idAttempt.Result;
+            idKeys[key] = successfulAttempt.Value.Result;
         }
 
         return Attempt.Succeed<Dictionary<Guid, int>?>(idKeys);

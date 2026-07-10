@@ -16,16 +16,12 @@ public class ApiContent : ApiElement, IApiContent
     /// <param name="route">The route information for the content.</param>
     /// <param name="properties">The property values of the content.</param>
     public ApiContent(Guid id, string name, string contentType, DateTime createDate, DateTime updateDate, IApiContentRoute route, IDictionary<string, object?> properties)
-        : base(id, contentType, properties)
+        : base(id, name, contentType, properties)
     {
-        Name = name;
         CreateDate = createDate;
         UpdateDate = updateDate;
         Route = route;
     }
-
-    /// <inheritdoc />
-    public string Name { get; }
 
     /// <inheritdoc />
     public DateTime CreateDate { get; }

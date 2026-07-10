@@ -25,26 +25,17 @@ public class DomainsController : DocumentControllerBase
     private readonly IDomainService _domainService;
     private readonly IUmbracoMapper _umbracoMapper;
 
-    [ActivatorUtilitiesConstructor]
     /// <summary>
     /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Controllers.Document.DomainsController"/> class.
     /// </summary>
     /// <param name="domainService">Service used to manage domain-related operations.</param>
     /// <param name="umbracoMapper">The mapper used to map Umbraco objects to API models.</param>
+    [ActivatorUtilitiesConstructor]
     public DomainsController(IAuthorizationService authorizationService, IDomainService domainService, IUmbracoMapper umbracoMapper)
     {
         _authorizationService = authorizationService;
         _domainService = domainService;
         _umbracoMapper = umbracoMapper;
-    }
-
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
-    public DomainsController(IDomainService domainService, IUmbracoMapper umbracoMapper)
-        : this(
-            StaticServiceProvider.Instance.GetRequiredService<IAuthorizationService>(),
-            domainService,
-            umbracoMapper)
-    {
     }
 
     /// <summary>

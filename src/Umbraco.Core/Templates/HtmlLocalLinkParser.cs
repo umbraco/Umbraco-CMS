@@ -101,12 +101,6 @@ public sealed partial class HtmlLocalLinkParser
     /// <summary>
     ///     Parses the string looking for the {localLink} syntax and updates them to their correct links.
     /// </summary>
-    [Obsolete("This method overload is no longer used in Umbraco and delegates to the overload without the preview parameter. Scheduled for removal in Umbraco 18.")]
-    public string EnsureInternalLinks(string text, bool preview) => EnsureInternalLinks(text);
-
-    /// <summary>
-    ///     Parses the string looking for the {localLink} syntax and updates them to their correct links.
-    /// </summary>
     public string EnsureInternalLinks(string text) => EnsureInternalLinks(text, UrlMode.Default);
 
     /// <summary>
@@ -192,8 +186,7 @@ public sealed partial class HtmlLocalLinkParser
                 null,
                 new GuidUdi(typeMatch.Groups["type"].Value.ToLowerInvariant(), guid),
                 linkTag.Groups["locallink"].Value,
-                cultureMatch.Success ? cultureMatch.Groups["culture"].Value : null
-            );
+                cultureMatch.Success ? cultureMatch.Groups["culture"].Value : null);
         }
 
         // also return legacy results for values that have not been migrated

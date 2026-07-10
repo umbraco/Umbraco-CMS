@@ -1,0 +1,96 @@
+import { UmbElementFolderItemRepository } from '../folder/repository/item/element-folder-item.repository.js';
+import { UmbElementItemRepository } from '../item/repository/element-item.repository.js';
+import { UmbElementTreeRepository } from '../tree/element-tree.repository.js';
+import type { UmbElementTreeChildrenOfRequestArgs, UmbElementTreeRootItemsRequestArgs } from '../tree/types.js';
+import type { UmbElementTreeItemModel } from '../tree/types.js';
+import { getConfigValue } from '@umbraco-cms/backoffice/utils';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import { UmbElementFolderItemDataResolver } from '../folder/data-resolver/element-folder-item-data-resolver.js';
+import { UmbElementItemDataResolver } from '../item/data-resolver/element-item-data-resolver.js';
+import { UMB_PROPERTY_TYPE_BASED_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/content';
+import type {
+	UmbTreeAncestorsOfRequestArgs,
+	UmbTreeChildrenOfRequestArgs,
+	UmbTreeItemModel,
+	UmbTreeRootItemsRequestArgs,
+	UmbTreeStartNode,
+} from '@umbraco-cms/backoffice/tree';
+import type { UmbConfigCollectionModel } from '@umbraco-cms/backoffice/utils';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbItemDataResolver } from '@umbraco-cms/backoffice/entity-item';
+import type { UmbPickerTreeDataSource } from '@umbraco-cms/backoffice/picker-data-source';
+
+export class UmbElementTreePickerDataSource extends UmbControllerBase implements UmbPickerTreeDataSource {
+	#allowedContentTypeIds?: Array<string>;
+	#dataType?: { unique: string };
+	#elementItem = new UmbElementItemRepository(this);
+	#folderItem = new UmbElementFolderItemRepository(this);
+	#folderOnly = false;
+	#tree = new UmbElementTreeRepository(this);
+	#startNode?: UmbTreeStartNode;
+
+	constructor(host: UmbControllerHost) {
+		super(host);
+
+		this.consumeContext(UMB_PROPERTY_TYPE_BASED_PROPERTY_CONTEXT, (context) => {
+			this.observe(context?.dataType, (dataType) => {
+				this.#dataType = dataType;
+			});
+		});
+	}
+
+	createItemDataResolver(host: UmbControllerHost): UmbItemDataResolver {
+		return this.#folderOnly ? new UmbElementFolderItemDataResolver(host) : new UmbElementItemDataResolver(host);
+	}
+
+	setConfig(config: UmbConfigCollectionModel | undefined) {
+		this.#folderOnly = Boolean(getConfigValue(config, 'folderOnly'));
+		this.#startNode = getConfigValue(config, 'startNode');
+		this.#allowedContentTypeIds = getConfigValue(config, 'allowedContentTypeIds');
+	}
+
+	async requestTreeStartNode() {
+		return this.#startNode ?? undefined;
+	}
+
+	requestTreeRoot() {
+		return this.#tree.requestTreeRoot();
+	}
+
+	requestTreeRootItems(args: UmbTreeRootItemsRequestArgs) {
+		const typedArgs: UmbElementTreeRootItemsRequestArgs = {
+			...args,
+			foldersOnly: this.#folderOnly,
+			dataType: this.#dataType,
+		};
+		return this.#tree.requestTreeRootItems(typedArgs);
+	}
+
+	requestTreeItemsOf(args: UmbTreeChildrenOfRequestArgs) {
+		const typedArgs: UmbElementTreeChildrenOfRequestArgs = {
+			...args,
+			foldersOnly: this.#folderOnly,
+			dataType: this.#dataType,
+		};
+		return this.#tree.requestTreeItemsOf(typedArgs);
+	}
+
+	requestTreeItemAncestors(args: UmbTreeAncestorsOfRequestArgs) {
+		return this.#tree.requestTreeItemAncestors(args);
+	}
+
+	requestItems(uniques: Array<string>) {
+		return this.#folderOnly ? this.#folderItem.requestItems(uniques) : this.#elementItem.requestItems(uniques);
+	}
+
+	treePickableFilter = (treeItem: UmbTreeItemModel): boolean => {
+		if (treeItem.isFolder !== this.#folderOnly) return false;
+
+		if (!this.#folderOnly && this.#allowedContentTypeIds?.length) {
+			const elementItem = treeItem as UmbElementTreeItemModel;
+			return this.#allowedContentTypeIds.includes(elementItem.documentType.unique);
+		}
+
+		return true;
+	};
+}

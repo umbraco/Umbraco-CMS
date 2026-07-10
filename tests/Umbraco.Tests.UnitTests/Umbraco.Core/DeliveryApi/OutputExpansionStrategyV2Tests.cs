@@ -7,6 +7,7 @@ using Umbraco.Cms.Api.Delivery.Rendering;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Security;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.DeliveryApi;
 
@@ -24,7 +25,7 @@ public class OutputExpansionStrategyV2Tests : OutputExpansionStrategyTestBase
         var accessor = CreateOutputExpansionStrategyAccessor($"properties[{rootPropertyTypeAlias}[properties[{nestedPropertyTypeAlias}]]]");
         var apiContentBuilder = new ApiContentBuilder(new ApiContentNameProvider(), ApiContentRouteBuilder(), accessor, CreateVariationContextAccessor());
 
-        var content = new Mock<IPublishedContent>();
+        var content = CreatePublishedContentMock();
 
         var nestedContentPickerContent = CreateSimplePickedContent(987, 654);
         var contentPickerContent = CreateMultiLevelPickedContent(123, nestedContentPickerContent, nestedPropertyTypeAlias, apiContentBuilder);
@@ -61,7 +62,7 @@ public class OutputExpansionStrategyV2Tests : OutputExpansionStrategyTestBase
         var contentPickerValue = CreateSimplePickedContent(111, 222);
         var contentPicker2Value = CreateSimplePickedContent(666, 777);
 
-        var content = new Mock<IPublishedContent>();
+        var content = CreatePublishedContentMock();
         SetupContentMock(
             content,
             CreateNumberProperty(content.Object, 444, "number"),
@@ -104,7 +105,7 @@ public class OutputExpansionStrategyV2Tests : OutputExpansionStrategyTestBase
         var contentPickerValue = CreateSimplePickedContent(111, 222);
         var contentPicker2Value = CreateSimplePickedContent(666, 777);
 
-        var content = new Mock<IPublishedContent>();
+        var content = CreatePublishedContentMock();
         SetupContentMock(
             content,
             CreateNumberProperty(content.Object, 444, "number"),
@@ -161,7 +162,7 @@ public class OutputExpansionStrategyV2Tests : OutputExpansionStrategyTestBase
         var nestedContentPickerValue = CreateSimplePickedContent(111, 222);
         var contentPickerValue = CreateMultiLevelPickedContent(987, nestedContentPickerValue, "contentPicker", apiContentBuilder);
 
-        var content = new Mock<IPublishedContent>();
+        var content = CreatePublishedContentMock();
         SetupContentMock(content, CreateElementProperty(content.Object, "element", 333, contentPickerValue.Key, "contentPicker", apiContentBuilder, apiElementBuilder));
 
         var result = apiContentBuilder.Build(content.Object);
@@ -193,7 +194,7 @@ public class OutputExpansionStrategyV2Tests : OutputExpansionStrategyTestBase
         var nestedContentPickerValue = CreateSimplePickedContent(111, 222);
         var contentPickerValue = CreateMultiLevelPickedContent(987, nestedContentPickerValue, "nestedContentPicker", apiContentBuilder);
 
-        var content = new Mock<IPublishedContent>();
+        var content = CreatePublishedContentMock();
         SetupContentMock(content, CreateElementProperty(content.Object, "element", 333, contentPickerValue.Key, "contentPicker", apiContentBuilder, apiElementBuilder));
 
         var result = apiContentBuilder.Build(content.Object);
@@ -223,7 +224,7 @@ public class OutputExpansionStrategyV2Tests : OutputExpansionStrategyTestBase
         var accessor = CreateOutputExpansionStrategyAccessor($"properties[level1Picker[properties[level2Picker[properties[level3Picker[properties[level4Picker]]]]]]]");
         var apiContentBuilder = new ApiContentBuilder(new ApiContentNameProvider(), ApiContentRouteBuilder(), accessor, CreateVariationContextAccessor());
 
-        var content = new Mock<IPublishedContent>();
+        var content = CreatePublishedContentMock();
 
         var level5PickedContent = CreateSimplePickedContent(1234, 5678);
         var level4PickedContent = CreateMultiLevelPickedContent(444, level5PickedContent, "level4Picker", apiContentBuilder);
@@ -286,7 +287,7 @@ public class OutputExpansionStrategyV2Tests : OutputExpansionStrategyTestBase
         var accessor = CreateOutputExpansionStrategyAccessor(expand ? "properties[$all]" : null, "properties[contentPickerOne[properties[numberOne]],contentPickerTwo[properties[numberTwo]]]");
         var apiContentBuilder = new ApiContentBuilder(new ApiContentNameProvider(), ApiContentRouteBuilder(), accessor, CreateVariationContextAccessor());
 
-        var content = new Mock<IPublishedContent>();
+        var content = CreatePublishedContentMock();
 
         var contentPickerOneContent = CreateSimplePickedContent(12, 34);
         var contentPickerOneProperty = CreateContentPickerProperty(content.Object, contentPickerOneContent.Key, "contentPickerOne", apiContentBuilder);
@@ -338,12 +339,24 @@ public class OutputExpansionStrategyV2Tests : OutputExpansionStrategyTestBase
             .SetupGet(r => r.Query)
             .Returns(new QueryCollection(new Dictionary<string, StringValues> { { "expand", expand }, { "fields", fields } }));
 
+        var apiPublishedContentCacheMock = new Mock<IApiPublishedContentCache>();
+        apiPublishedContentCacheMock
+            .Setup(m => m.GetById(It.IsAny<Guid>()))
+            .Returns((Guid id) => Mock.Of<IPublishedContent>(c => c.Key == id));
+
+        var requestMemberAccessServiceMock = new Mock<IRequestMemberAccessService>();
+        requestMemberAccessServiceMock
+            .Setup(m => m.MemberHasAccessToAsync(It.IsAny<IPublishedContent>()))
+            .Returns(Task.FromResult(PublicAccessStatus.AccessAccepted));
+
         httpContextMock.SetupGet(c => c.Request).Returns(httpRequestMock.Object);
         httpContextAccessorMock.SetupGet(a => a.HttpContext).Returns(httpContextMock.Object);
         IOutputExpansionStrategy outputExpansionStrategy = new RequestContextOutputExpansionStrategyV2(
             httpContextAccessorMock.Object,
             new ApiPropertyRenderer(new NoopPublishedValueFallback()),
-            Mock.Of<ILogger<RequestContextOutputExpansionStrategyV2>>());
+            Mock.Of<ILogger<RequestContextOutputExpansionStrategyV2>>(),
+            apiPublishedContentCacheMock.Object,
+            requestMemberAccessServiceMock.Object);
         var outputExpansionStrategyAccessorMock = new Mock<IOutputExpansionStrategyAccessor>();
         outputExpansionStrategyAccessorMock.Setup(s => s.TryGetValue(out outputExpansionStrategy)).Returns(true);
 

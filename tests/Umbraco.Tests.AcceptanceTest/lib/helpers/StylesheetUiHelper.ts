@@ -7,13 +7,11 @@ export class StylesheetUiHelper extends UiBaseLocators{
   private readonly newStylesheetFolderBtn: Locator;
   private readonly stylesheetNameTxt: Locator;
   private readonly stylesheetTree: Locator;
-  private readonly stylesheetCreateModal: Locator;
 
   constructor(page: Page) {
     super(page);
-    this.stylesheetCreateModal = page.locator('umb-entity-create-option-action-list-modal');
-    this.newStylesheetBtn = this.stylesheetCreateModal.locator('umb-ref-item', {hasText: 'Stylesheet'});
-    this.newStylesheetFolderBtn = this.stylesheetCreateModal.locator('umb-ref-item', {hasText: 'Folder'});
+    this.newStylesheetBtn = this.createOptionActionListModal.locator('umb-ref-item', {hasText: 'Stylesheet'});
+    this.newStylesheetFolderBtn = this.createOptionActionListModal.locator('umb-ref-item', {hasText: 'Folder'});
     this.stylesheetNameTxt = page.locator('umb-stylesheet-workspace-editor').locator('#nameInput #input');
     this.stylesheetTree = page.locator('umb-tree[alias="Umb.Tree.Stylesheet"]');
   }
@@ -63,7 +61,7 @@ export class StylesheetUiHelper extends UiBaseLocators{
 
   async openStylesheetByNameAtRoot(stylesheetName: string) {
     await this.reloadStylesheetTree();
-    await this.click(this.page.getByLabel(stylesheetName, {exact: true}));
+    await this.clickTreeItemWithName(stylesheetName);
   }
 
   async reloadStylesheetTree() {
@@ -80,7 +78,7 @@ export class StylesheetUiHelper extends UiBaseLocators{
   async goToStylesheet(stylesheetName: string) {
     await this.goToSection(ConstantHelper.sections.settings);
     await this.reloadStylesheetTree();
-    await this.click(this.page.getByLabel(stylesheetName, {exact: true}));
+    await this.clickTreeItemWithName(stylesheetName);
   }
 
   async clickConfirmToDeleteButtonAndWaitForStylesheetToBeDeleted() {
