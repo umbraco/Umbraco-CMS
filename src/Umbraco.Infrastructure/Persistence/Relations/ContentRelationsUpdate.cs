@@ -149,34 +149,7 @@ internal sealed class ContentRelationsUpdate :
         }).ToDictionary(x => x.UniqueId, x => x.NodeId);
 
         // Get all valid relations.
-        var relations = new List<(int ChildId, int RelationTypeId)>(references.Count);
-        foreach (UmbracoEntityReference reference in references)
-        {
-            if (string.IsNullOrEmpty(reference.RelationTypeAlias))
-            {
-                // Reference does not specify a relation type alias, so skip adding a relation.
-                _logger.LogDebug("The reference to {Udi} does not specify a relation type alias, so it will not be saved as relation.", reference.Udi);
-            }
-            else if (automaticRelationTypeAliases.Contains(reference.RelationTypeAlias) is false)
-            {
-                // Returning a reference that doesn't use an automatic relation type is an issue that should be fixed in code.
-                _logger.LogError("The reference to {Udi} uses a relation type {RelationTypeAlias} that is not an automatic relation type.", reference.Udi, reference.RelationTypeAlias);
-            }
-            else if (relationTypeLookup.TryGetValue(reference.RelationTypeAlias, out IRelationType? relationType) is false)
-            {
-                // A non-existent relation type could be caused by an environment issue (e.g. it was manually removed).
-                _logger.LogWarning("The reference to {Udi} uses a relation type {RelationTypeAlias} that does not exist.", reference.Udi, reference.RelationTypeAlias);
-            }
-            else if (reference.Udi is not GuidUdi udi || !keysLookup.TryGetValue(udi.Guid, out var id))
-            {
-                // Relations only support references to items that are stored in the NodeDto table (because of foreign key constraints).
-                _logger.LogInformation("The reference to {Udi} can not be saved as relation, because it doesn't have a node ID.", reference.Udi);
-            }
-            else
-            {
-                relations.Add((id, relationType.Id));
-            }
-        }
+        List<(int ChildId, int RelationTypeId)> relations = ResolveValidRelations(references, automaticRelationTypeAliases, relationTypeLookup, keysLookup);
 
         // Get all existing relations (optimize for adding new and keeping existing relations).
         IQuery<IRelation> query = scope.SqlContext.Query<IRelation>()
@@ -248,6 +221,44 @@ internal sealed class ContentRelationsUpdate :
             .WhereIn(x => x.RelationTypeId, relationTypeIds);
 
         return _relationRepository.GetPagedRelationsByQuery(query, 0, int.MaxValue, out _, null).ToArray();
+    }
+
+    private List<(int ChildId, int RelationTypeId)> ResolveValidRelations(
+        ISet<UmbracoEntityReference> references,
+        ISet<string> automaticRelationTypeAliases,
+        IReadOnlyDictionary<string, IRelationType> relationTypeLookup,
+        IReadOnlyDictionary<Guid, int> keysLookup)
+    {
+        var relations = new List<(int ChildId, int RelationTypeId)>(references.Count);
+        foreach (UmbracoEntityReference reference in references)
+        {
+            if (string.IsNullOrEmpty(reference.RelationTypeAlias))
+            {
+                // Reference does not specify a relation type alias, so skip adding a relation.
+                _logger.LogDebug("The reference to {Udi} does not specify a relation type alias, so it will not be saved as relation.", reference.Udi);
+            }
+            else if (automaticRelationTypeAliases.Contains(reference.RelationTypeAlias) is false)
+            {
+                // Returning a reference that doesn't use an automatic relation type is an issue that should be fixed in code.
+                _logger.LogError("The reference to {Udi} uses a relation type {RelationTypeAlias} that is not an automatic relation type.", reference.Udi, reference.RelationTypeAlias);
+            }
+            else if (relationTypeLookup.TryGetValue(reference.RelationTypeAlias, out IRelationType? relationType) is false)
+            {
+                // A non-existent relation type could be caused by an environment issue (e.g. it was manually removed).
+                _logger.LogWarning("The reference to {Udi} uses a relation type {RelationTypeAlias} that does not exist.", reference.Udi, reference.RelationTypeAlias);
+            }
+            else if (reference.Udi is not GuidUdi udi || !keysLookup.TryGetValue(udi.Guid, out var id))
+            {
+                // Relations only support references to items that are stored in the NodeDto table (because of foreign key constraints).
+                _logger.LogInformation("The reference to {Udi} can not be saved as relation, because it doesn't have a node ID.", reference.Udi);
+            }
+            else
+            {
+                relations.Add((id, relationType.Id));
+            }
+        }
+
+        return relations;
     }
 
     private sealed class NodeIdKey
