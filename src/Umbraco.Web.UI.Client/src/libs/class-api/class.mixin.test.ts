@@ -3,12 +3,11 @@ import { aTimeout, expect, fixture } from '@open-wc/testing';
 import { customElement, html } from '@umbraco-cms/backoffice/external/lit';
 import {
 	UmbControllerHostElementMixin,
-	type UmbController,
 	type UmbControllerHostElement,
 } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbBasicState } from '@umbraco-cms/backoffice/observable-api';
-import type { ClassConstructor } from '../extension-api/types/index.js';
+import type { ClassConstructor } from '@umbraco-cms/backoffice/extension-api';
 
 @customElement('umb-test-class-mixin-host')
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
