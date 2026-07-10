@@ -143,7 +143,9 @@ internal sealed class DocumentHybridCacheDocumentTypeTests : UmbracoIntegrationT
         // classified in one ComposeContentTypeChanges call — which is what exercises the multi-type guard.
         composing.RemovePropertyType("ownProp");
         composition.PropertyTypes.First(p => p.Alias == "compProp").Alias = "compPropRenamed";
-        ContentTypeService.Save(new[] { composing, composition });
+#pragma warning disable CS0618 // Type or member is obsolete
+        ContentTypeService.Save([composing, composition]);
+#pragma warning restore CS0618 // Type or member is obsolete
 
         // Assert - the composing type keeps a full rebuild; the guard prevents the removal-only flag.
         // (It can surface as more than one change entry — the guard must leave none of them flagged.)

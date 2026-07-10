@@ -124,10 +124,14 @@ internal sealed class CacheRefreshingNotificationHandler :
         {
             if (_cacheSettings.ContentTypeRebuildMode != ContentTypeRebuildMode.Deferred)
             {
-                _logger.LogDebug("Content type change: rebuilding the document database cache for content type(s) {ContentTypeIds}.", rebuildIds);
+                if (_logger.IsEnabled(LogLevel.Debug))
+                {
+                    _logger.LogDebug("Content type change: rebuilding the document database cache for content type(s) {ContentTypeIds}.", rebuildIds);
+                }
+
                 _documentCacheService.Rebuild(rebuildIds);
             }
-            else
+            else if (_logger.IsEnabled(LogLevel.Debug))
             {
                 // In deferred mode this handler does nothing here; DeferredCacheRebuildNotificationHandler
                 // performs the rebuild in response to ContentTypeChangedNotification after the scope commits.
@@ -146,7 +150,11 @@ internal sealed class CacheRefreshingNotificationHandler :
 
         if (clearConvertedCacheIds.Length > 0)
         {
-            _logger.LogDebug("Content type change: clearing the converted document cache only (no database rebuild) for content type(s) {ContentTypeIds}.", clearConvertedCacheIds);
+            if (_logger.IsEnabled(LogLevel.Debug))
+            {
+                _logger.LogDebug("Content type change: clearing the converted document cache only (no database rebuild) for content type(s) {ContentTypeIds}.", clearConvertedCacheIds);
+            }
+
             _documentCacheService.ClearConvertedContentCache(clearConvertedCacheIds);
         }
 
@@ -202,10 +210,14 @@ internal sealed class CacheRefreshingNotificationHandler :
         {
             if (_cacheSettings.ContentTypeRebuildMode != ContentTypeRebuildMode.Deferred)
             {
-                _logger.LogDebug("Media type change: rebuilding the media database cache for media type(s) {MediaTypeIds}.", rebuildIds);
+                if (_logger.IsEnabled(LogLevel.Debug))
+                {
+                    _logger.LogDebug("Media type change: rebuilding the media database cache for media type(s) {MediaTypeIds}.", rebuildIds);
+                }
+
                 _mediaCacheService.Rebuild(rebuildIds);
             }
-            else
+            else if (_logger.IsEnabled(LogLevel.Debug))
             {
                 // In deferred mode this handler does nothing here; DeferredCacheRebuildNotificationHandler
                 // performs the rebuild in response to MediaTypeChangedNotification after the scope commits.
@@ -224,7 +236,11 @@ internal sealed class CacheRefreshingNotificationHandler :
 
         if (clearConvertedCacheIds.Length > 0)
         {
-            _logger.LogDebug("Media type change: clearing the converted media cache only (no database rebuild) for media type(s) {MediaTypeIds}.", clearConvertedCacheIds);
+            if (_logger.IsEnabled(LogLevel.Debug))
+            {
+                _logger.LogDebug("Media type change: clearing the converted media cache only (no database rebuild) for media type(s) {MediaTypeIds}.", clearConvertedCacheIds);
+            }
+
             _mediaCacheService.ClearConvertedContentCache(clearConvertedCacheIds);
         }
 
