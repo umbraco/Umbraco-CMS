@@ -3,16 +3,12 @@ import { UmbIntegerPropertyValuePreset } from './integer-property-value-preset.j
 import { UmbDecimalPropertyValuePreset } from './decimal-property-value-preset.js';
 import type { UmbPropertyEditorConfig } from '@umbraco-cms/backoffice/property-editor';
 
-const typeArgs = {} as any;
-const callArgs = {} as any;
-
 const config = (values: Record<string, unknown>): UmbPropertyEditorConfig =>
 	Object.entries(values).map(([alias, value]) => ({ alias, value }));
 
 describe('UmbIntegerPropertyValuePreset', () => {
 	const preset = new UmbIntegerPropertyValuePreset();
-	const process = (value: number | undefined, cfg: UmbPropertyEditorConfig = []) =>
-		preset.processValue(value, cfg, typeArgs, callArgs);
+	const process = (value: number | undefined, cfg: UmbPropertyEditorConfig = []) => preset.processValue(value, cfg);
 
 	describe('min configuration', () => {
 		it('keeps the value undefined when min is zero (#21787)', async () => {
@@ -99,8 +95,7 @@ describe('UmbIntegerPropertyValuePreset', () => {
 
 describe('UmbDecimalPropertyValuePreset', () => {
 	const preset = new UmbDecimalPropertyValuePreset();
-	const process = (value: number | undefined, cfg: UmbPropertyEditorConfig = []) =>
-		preset.processValue(value, cfg, typeArgs, callArgs);
+	const process = (value: number | undefined, cfg: UmbPropertyEditorConfig = []) => preset.processValue(value, cfg);
 
 	describe('min configuration', () => {
 		it('keeps the value undefined when min is zero (#21787)', async () => {
