@@ -104,16 +104,7 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
     /// <inheritdoc />
     public long? GetApproximateBytes() => _publishedContentCache.ApproximateSizeInBytes;
 
-    public async Task<IPublishedContent?> GetByKeyAsync(Guid key)
-    {
-        Attempt<int> idAttempt = _idKeyMap.GetIdForKey(key, UmbracoObjectTypes.Media);
-        if (idAttempt.Success is false)
-        {
-            return null;
-        }
-
-        return await GetNodeAsync(key);
-    }
+    public async Task<IPublishedContent?> GetByKeyAsync(Guid key) => await GetNodeAsync(key);
 
     public async Task<IPublishedContent?> GetByIdAsync(int id)
     {
