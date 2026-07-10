@@ -52,20 +52,18 @@ describe('UmbContextBase', () => {
 		const consumerHost = new UmbTestClass(host);
 
 		const received: Array<UmbTestGreetingContext | undefined> = [];
-		await new Promise<void>((resolve) => {
-			consumerHost.consumeContext(UMB_TEST_GREETING_CONTEXT, (value) => {
+		await consumerHost
+			.consumeContext(UMB_TEST_GREETING_CONTEXT, (value) => {
 				received.push(value);
-				if (received.length === 1) resolve();
-			});
-		});
+			})
+			.asPromise();
 
 		expect(received[0]).to.equal(ctx);
 
+		ctx.destroy();
 		await Promise.resolve();
 
 		expect(received.at(-1)).to.be.undefined;
-
-		ctx.destroy();
 	});
 
 	it('is removed from the host on destroy', () => {
