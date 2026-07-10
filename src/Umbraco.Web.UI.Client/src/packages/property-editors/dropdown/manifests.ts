@@ -10,9 +10,18 @@ export const manifests: Array<UmbExtensionManifest> = [
 			label: 'Dropdown',
 			propertyEditorSchemaAlias: 'Umbraco.DropDown.Flexible',
 			icon: 'icon-list',
-			group: 'lists',
+			group: '#propertyEditorUIGroups_lists',
 			keywords: ['select', 'dropdown', 'choice', 'option', 'list'],
 			supportsReadOnly: true,
+			settings: {
+				properties: [
+					{
+						alias: 'placeholder',
+						label: '#general_placeholder',
+						propertyEditorUiAlias: 'Umb.PropertyEditorUi.TextBox',
+					},
+				],
+			},
 		},
 	},
 	schemaManifest,

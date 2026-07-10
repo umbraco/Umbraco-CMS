@@ -1,4 +1,5 @@
 import { manifest as schemaManifest } from './Umbraco.DateTimeUnspecified.js';
+import { manifests as valueSummaryManifests } from './value-summary/manifests.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -10,7 +11,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 			label: 'Date Time (unspecified)',
 			propertyEditorSchemaAlias: 'Umbraco.DateTimeUnspecified',
 			icon: 'icon-calendar-alt',
-			group: 'date',
+			group: '#propertyEditorUIGroups_date',
 			keywords: [
 				'date',
 				'time',
@@ -53,4 +54,5 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 	},
 	schemaManifest,
+	...valueSummaryManifests,
 ];

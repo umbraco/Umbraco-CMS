@@ -70,7 +70,7 @@ export class UmbMediaItemRefElement extends UmbLitElement {
 			<uui-ref-node
 				name=${this.item.name}
 				href=${ifDefined(this.#getHref(this.item))}
-				?readonly=${this.readonly || !this._userHasSectionAccess}
+				?readonly=${this.readonly || !this._userHasSectionAccess || !this._editPath}
 				?standalone=${this.standalone}>
 				<slot name="actions" slot="actions"></slot>
 				${this.#renderIcon(this.item)}

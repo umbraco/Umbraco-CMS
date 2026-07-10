@@ -73,13 +73,13 @@ internal static class ContentTypeFactory
     #region IMemberType
 
     /// <summary>
-    /// Constructs an <see cref="Umbraco.Cms.Core.Models.IMemberType"/> entity from the specified <see cref="ContentTypeDto"/>,
+    /// Constructs an <see cref="IMemberType"/> entity from the specified <see cref="ContentTypeDto"/>,
     /// initializing it with data from the DTO and using the provided <see cref="IShortStringHelper"/> for string operations.
     /// </summary>
     /// <param name="shortStringHelper">An instance of <see cref="IShortStringHelper"/> used to assist with string manipulation during entity creation.</param>
     /// <param name="dto">A <see cref="ContentTypeDto"/> containing the data required to build the member type entity.</param>
     /// <returns>
-    /// A new <see cref="Umbraco.Cms.Core.Models.IMemberType"/> instance populated with values from the provided DTO.
+    /// A new <see cref="IMemberType"/> instance populated with values from the provided DTO.
     /// </returns>
     public static IMemberType BuildMemberTypeEntity(IShortStringHelper shortStringHelper, ContentTypeDto dto)
     {
@@ -99,10 +99,10 @@ internal static class ContentTypeFactory
     }
 
     /// <summary>
-    /// Creates a collection of <see cref="Umbraco.Cms.Core.Models.Membership.MemberPropertyTypeDto"/> objects representing the property types defined on the specified <see cref="Umbraco.Cms.Core.Models.IMemberType"/>.
+    /// Creates a collection of <see cref="MemberPropertyTypeDto"/> objects representing the property types defined on the specified <see cref="IMemberType"/>.
     /// </summary>
     /// <param name="entity">The member type entity whose property types will be converted to DTOs.</param>
-    /// <returns>An enumerable of <see cref="Umbraco.Cms.Core.Models.Membership.MemberPropertyTypeDto"/> for each property type on the member type, or an empty collection if none exist.</returns>
+    /// <returns>An enumerable of <see cref="MemberPropertyTypeDto"/> for each property type on the member type, or an empty collection if none exist.</returns>
     public static IEnumerable<MemberPropertyTypeDto> BuildMemberPropertyTypeDtos(IMemberType entity)
     {
         if (entity is not MemberType memberType || memberType.PropertyTypes.Any() == false)
