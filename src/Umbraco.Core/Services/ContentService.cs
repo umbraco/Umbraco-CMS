@@ -2440,10 +2440,10 @@ public class ContentService : RepositoryService, IContentService
             {
                 // a branch can mix variant and invariant content types, so determine variance per document rather
                 // than from the branch root; snapshot the cultures so the notification never holds a mutable set
-                IReadOnlyCollection<string> cultures = publishedDocument.ContentType.VariesByCulture()
+                string[] cultures = publishedDocument.ContentType.VariesByCulture()
                     ? documentCulturesToPublish?.ToArray() ?? []
                     : ["*"];
-                if (cultures.Count > 0)
+                if (cultures.Length > 0)
                 {
                     publishedCulturesByDocument[publishedDocument.Key] = cultures;
                 }
@@ -2605,7 +2605,7 @@ public class ContentService : RepositoryService, IContentService
     // handler cannot recompute them from the entity afterwards. ToArray() takes a copy so the notification holds a
     // stable snapshot: some callers pass a live view over the entity's own collection (e.g. content.PublishedCultures)
     // that would otherwise change as the entity is mutated. Returns null (not an empty map) when there is nothing to report.
-    private static IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? BuildCultureMap(IContent content, IEnumerable<string>? cultures)
+    private static Dictionary<Guid, IReadOnlyCollection<string>>? BuildCultureMap(IContent content, IEnumerable<string>? cultures)
     {
         if (cultures is null)
         {
