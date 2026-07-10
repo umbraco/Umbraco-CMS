@@ -4,6 +4,11 @@ import { UmbModalToken, type UmbPickerModalData, type UmbPickerModalValue } from
 
 export interface UmbClipboardEntryPickerModalData extends UmbPickerModalData<UmbClipboardEntryDetailModel> {
 	asyncFilter?: (item: UmbClipboardEntryDetailModel) => Promise<boolean>;
+	/**
+	 * Optional list of clipboard entry value types to show.
+	 * This is forwarded to the underlying collection filter as `types`.
+	 */
+	entryTypes?: Array<string>;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type

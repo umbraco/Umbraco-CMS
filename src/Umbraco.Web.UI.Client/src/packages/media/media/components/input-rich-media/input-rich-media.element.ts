@@ -19,6 +19,7 @@ import { UMB_MEDIA_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/media-type';
 import '@umbraco-cms/backoffice/imaging';
 import { UmbEntityInputInteractionMemoryManager } from '@umbraco-cms/backoffice/entity';
 import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
+import { UmbPropertyClipboardManager } from '@umbraco-cms/backoffice/clipboard';
 
 type UmbRichMediaCardModel = {
 	unique: string;
@@ -168,9 +169,13 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 	@state()
 	private _routeBuilder?: UmbModalRouteBuilder;
 
+	@state()
+	private _clipboardAvailable = false;
+
 	readonly #itemManager = new UmbRepositoryItemsManager<UmbMediaItemModel>(this, UMB_MEDIA_ITEM_REPOSITORY_ALIAS);
 
 	readonly #pickerInputContext = new UmbMediaPickerInputContext(this);
+	readonly #clipboardManager = new UmbPropertyClipboardManager(this);
 	readonly #interactionMemoryManager = new UmbEntityInputInteractionMemoryManager(
 		this,
 		this.#pickerInputContext.interactionMemory,
@@ -181,6 +186,10 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 
 		this.observe(this.#itemManager.items, () => {
 			this.#populateCards();
+		});
+
+		this.observe(this.#clipboardManager.isAvailable, (available) => {
+			this._clipboardAvailable = available;
 		});
 
 		new UmbModalRouteRegistrationController(this, UMB_IMAGE_CROPPER_EDITOR_MODAL)
@@ -412,11 +421,32 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 		if (this.readonly) return nothing;
 		return html`
 			<uui-action-bar slot="actions">
+				${this._clipboardAvailable
+					? html`<uui-button
+							label=${this.localize.term('clipboard_labelForCopyToClipboard')}
+							look="secondary"
+							@click=${() => this.#copyToClipboard(item)}>
+							<uui-icon name="icon-clipboard-copy"></uui-icon>
+						</uui-button>`
+					: nothing}
 				<uui-button label=${this.localize.term('general_remove')} look="secondary" @click=${() => this.#onRemove(item)}>
 					<uui-icon name="icon-trash"></uui-icon>
 				</uui-button>
 			</uui-action-bar>
 		`;
+	}
+
+	async #copyToClipboard(item: UmbRichMediaCardModel) {
+		const entry = this.value?.find((x) => x.mediaKey === item.media);
+		if (!entry) {
+			throw new Error('Could not find media picker value for item.');
+		}
+
+		await this.#clipboardManager.write({
+			propertyValue: [structuredClone(entry)],
+			itemName: item.name,
+			icon: item.icon,
+		});
 	}
 
 	#renderIsTrashed(item: UmbRichMediaCardModel) {
