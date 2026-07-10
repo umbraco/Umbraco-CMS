@@ -253,7 +253,7 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 		if (!e.detail.files.length && !e.detail.folders.length) return;
 
 		const uploadables = await this._handleUpload(e);
-		this.dispatchEvent(new UmbDropzoneSubmittedEvent(await uploadables));
+		this.dispatchEvent(new UmbDropzoneSubmittedEvent(uploadables));
 	}
 
 	/**
