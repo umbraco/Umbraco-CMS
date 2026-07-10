@@ -1,5 +1,5 @@
 import { UMB_MEDIA_GRID_COLLECTION_VIEW_ALIAS, UMB_MEDIA_TABLE_COLLECTION_VIEW_ALIAS } from './constants.js';
-import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collection';
+import { UMB_COLLECTION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/collection';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -15,7 +15,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 		conditions: [
 			{
-				alias: UMB_COLLECTION_ALIAS_CONDITION,
+				alias: UMB_COLLECTION_CONDITION_ALIAS,
 				match: 'Umb.Collection.Media',
 			},
 		],
@@ -33,7 +33,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 		conditions: [
 			{
-				alias: UMB_COLLECTION_ALIAS_CONDITION,
+				alias: UMB_COLLECTION_CONDITION_ALIAS,
 				match: 'Umb.Collection.Media',
 			},
 		],

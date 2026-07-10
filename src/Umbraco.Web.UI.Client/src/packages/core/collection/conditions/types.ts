@@ -1,8 +1,8 @@
-import type { UMB_COLLECTION_ALIAS_CONDITION, UMB_COLLECTION_HAS_ITEMS_CONDITION_ALIAS } from './constants.js';
+import type { UMB_COLLECTION_CONDITION_ALIAS, UMB_COLLECTION_HAS_ITEMS_CONDITION_ALIAS } from './constants.js';
 import type { UmbConditionConfigBase } from '@umbraco-cms/backoffice/extension-api';
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
-export type CollectionAliasConditionConfig = UmbConditionConfigBase<typeof UMB_COLLECTION_ALIAS_CONDITION> & {
+export type CollectionAliasConditionConfig = UmbConditionConfigBase<typeof UMB_COLLECTION_CONDITION_ALIAS> & {
 	/**
 	 * The collection that this extension should be available in
 	 * @example

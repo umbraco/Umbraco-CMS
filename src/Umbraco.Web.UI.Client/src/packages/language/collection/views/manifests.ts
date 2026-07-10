@@ -1,6 +1,6 @@
 import { UMB_LANGUAGE_COLLECTION_ALIAS } from '../constants.js';
 import { UMB_LANGUAGE_TABLE_COLLECTION_VIEW_ALIAS } from './constants.js';
-import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collection';
+import { UMB_COLLECTION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/collection';
 import { UMB_BOOLEAN_VALUE_TYPE } from '@umbraco-cms/backoffice/value-type';
 
 export const manifests: Array<UmbExtensionManifest> = [
@@ -36,7 +36,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 		conditions: [
 			{
-				alias: UMB_COLLECTION_ALIAS_CONDITION,
+				alias: UMB_COLLECTION_CONDITION_ALIAS,
 				match: UMB_LANGUAGE_COLLECTION_ALIAS,
 			},
 		],

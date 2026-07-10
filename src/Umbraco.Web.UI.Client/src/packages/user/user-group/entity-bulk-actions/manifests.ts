@@ -2,7 +2,7 @@ import { UMB_USER_GROUP_COLLECTION_ALIAS } from '../collection/index.js';
 import { UMB_USER_GROUP_DETAIL_REPOSITORY_ALIAS, UMB_USER_GROUP_ITEM_REPOSITORY_ALIAS } from '../constants.js';
 import { UMB_USER_GROUP_ENTITY_TYPE } from '../entity.js';
 import { UMB_ENTITY_BULK_ACTION_DELETE_KIND } from '@umbraco-cms/backoffice/entity-bulk-action';
-import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collection';
+import { UMB_COLLECTION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/collection';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -18,7 +18,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 		conditions: [
 			{
-				alias: UMB_COLLECTION_ALIAS_CONDITION,
+				alias: UMB_COLLECTION_CONDITION_ALIAS,
 				match: UMB_USER_GROUP_COLLECTION_ALIAS,
 			},
 		],

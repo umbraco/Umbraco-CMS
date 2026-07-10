@@ -2,7 +2,7 @@ import { UMB_MEDIA_COLLECTION_ALIAS, UMB_MEDIA_TREE_ALIAS } from '../../constant
 import { UMB_MEDIA_ENTITY_TYPE } from '../../entity.js';
 import { UMB_BULK_MOVE_MEDIA_REPOSITORY_ALIAS } from './constants.js';
 import { manifests as repositoryManifests } from './repository/manifests.js';
-import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collection';
+import { UMB_COLLECTION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/collection';
 
 const bulkMoveAction: UmbExtensionManifest = {
 	type: 'entityBulkAction',
@@ -17,7 +17,7 @@ const bulkMoveAction: UmbExtensionManifest = {
 	},
 	conditions: [
 		{
-			alias: UMB_COLLECTION_ALIAS_CONDITION,
+			alias: UMB_COLLECTION_CONDITION_ALIAS,
 			match: UMB_MEDIA_COLLECTION_ALIAS,
 		},
 	],

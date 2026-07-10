@@ -1,7 +1,7 @@
 import { UMB_USER_GROUP_COLLECTION_ALIAS } from '../constants.js';
 import { UMB_USER_GROUP_TABLE_COLLECTION_VIEW_ALIAS } from './constants.js';
 import { UMB_SECTION_ALIASES_VALUE_TYPE } from '@umbraco-cms/backoffice/section';
-import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collection';
+import { UMB_COLLECTION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/collection';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -32,7 +32,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 		conditions: [
 			{
-				alias: UMB_COLLECTION_ALIAS_CONDITION,
+				alias: UMB_COLLECTION_CONDITION_ALIAS,
 				match: UMB_USER_GROUP_COLLECTION_ALIAS,
 			},
 		],
