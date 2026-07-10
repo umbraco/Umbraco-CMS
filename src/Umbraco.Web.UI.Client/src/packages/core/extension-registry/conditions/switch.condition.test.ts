@@ -34,22 +34,32 @@ describe('UmbSwitchCondition', () => {
 		// since cumulative wait drift would otherwise make assertions racy.
 		const frequencyMs = 30;
 		const transitions: Array<boolean> = [];
+		let timeout: ReturnType<typeof setTimeout> | undefined;
+		let condition: UmbSwitchCondition | undefined;
 
-		await new Promise<void>((resolve, reject) => {
-			const timeout = setTimeout(() => reject(new Error('Switch condition did not flip twice in time')), 1000);
+		try {
+			await new Promise<void>((resolve, reject) => {
+				timeout = setTimeout(() => {
+					condition?.destroy();
+					reject(new Error('Switch condition did not flip twice in time'));
+				}, 1000);
 
-			const condition = new UmbSwitchCondition(host, {
-				config: baseConfig(String(frequencyMs)),
-				onChange: (permitted) => {
-					transitions.push(permitted);
-					if (transitions.length === 2) {
-						clearTimeout(timeout);
-						condition.destroy();
-						resolve();
-					}
-				},
+				condition = new UmbSwitchCondition(host, {
+					config: baseConfig(String(frequencyMs)),
+					onChange: (permitted) => {
+						transitions.push(permitted);
+						if (transitions.length === 2) {
+							clearTimeout(timeout);
+							condition?.destroy();
+							resolve();
+						}
+					},
+				});
 			});
-		});
+		} finally {
+			if (timeout) clearTimeout(timeout);
+			condition?.destroy();
+		}
 
 		expect(transitions).to.eql([true, false]);
 	});
