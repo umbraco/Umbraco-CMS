@@ -47,7 +47,7 @@ export class UmbDocumentPublishingServerDataSource {
 		model: UmbDocumentDetailModel,
 		variantIds: Array<UmbVariantId>,
 		parentUnique: string | null = null,
-	) {
+	): Promise<UmbDataSourceResponse<string>> {
 		if (!model) throw new Error('Document is missing');
 		if (!model.unique) throw new Error('Document unique is missing');
 
@@ -59,7 +59,11 @@ export class UmbDocumentPublishingServerDataSource {
 		// 201 Created returns only the key (no document body). The workspace reloads after this to refresh
 		// its state, so we deliberately do NOT re-read the full document here — that would be a redundant
 		// round-trip on top of the reload.
-		return tryExecute(this.#host, DocumentService.postDocumentCreateAndPublish({ body }));
+		const { data, error } = await tryExecute(this.#host, DocumentService.postDocumentCreateAndPublish({ body }));
+
+		// The generated response type is `unknown` (Swagger has no schema for the empty 201 body), but the
+		// Umb-Generated-Resource interceptor rewrites it to the created document's key at runtime.
+		return { data: data as string | undefined, error };
 	}
 
 	/**
