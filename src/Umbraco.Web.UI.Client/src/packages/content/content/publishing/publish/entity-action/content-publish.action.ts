@@ -1,6 +1,6 @@
-import { UMB_CONTENT_UNPUBLISH_MODAL } from '../modal/constants.js';
+import { UMB_CONTENT_PUBLISH_MODAL } from '../modal/constants.js';
 import type { UmbContentDetailModel } from '../../../types.js';
-import type { MetaEntityActionContentUnpublishKind, UmbContentUnpublishingRepository } from './types.js';
+import type { MetaEntityActionContentPublishKind, UmbContentPublishingRepository } from './types.js';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UmbEntityActionBase, UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
@@ -15,24 +15,15 @@ import type { UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/varian
 import type { UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 
 /**
- * @description - Shared entity action for unpublishing content-like entities (Document, Element, ...).
- * Resolves its detail/publishing/item/reference/configuration repositories by alias from `meta`, so a single
- * implementation can serve every consumer registered against the `contentUnpublish` kind.
+ * @description - Shared entity action for publishing content-like entities (Document, Element, ...).
+ * Resolves its detail/publishing repositories by alias from `meta`, so a single implementation can serve every
+ * consumer registered against the `contentPublish` kind.
  * @exports
- * @class UmbContentUnpublishEntityAction
+ * @class UmbContentPublishEntityAction
  * @augments UmbEntityActionBase
  */
-export class UmbContentUnpublishEntityAction extends UmbEntityActionBase<MetaEntityActionContentUnpublishKind> {
+export class UmbContentPublishEntityAction extends UmbEntityActionBase<MetaEntityActionContentPublishKind> {
 	override async execute() {
-		await this.executeWithResult();
-	}
-
-	/**
-	 * Runs the unpublish flow and reports whether an unpublish actually occurred.
-	 * @returns {Promise<boolean>} `true` if the entity was unpublished, `false` if the user cancelled or made no selection.
-	 * @memberof UmbContentUnpublishEntityAction
-	 */
-	public async executeWithResult(): Promise<boolean> {
 		if (!this.args.unique) throw new Error('The unique identifier is missing');
 		const unique = this.args.unique;
 
@@ -43,30 +34,26 @@ export class UmbContentUnpublishEntityAction extends UmbEntityActionBase<MetaEnt
 		const options = this.#buildVariantOptions(detailData, languageData, appCulture);
 		const selection = this.#determineDefaultSelection(options, appCulture);
 
-		const result = await umbOpenModal(this, UMB_CONTENT_UNPUBLISH_MODAL, {
+		const result = await umbOpenModal(this, UMB_CONTENT_PUBLISH_MODAL, {
 			data: {
-				unique,
+				confirmLabel: '#actions_publish',
 				options,
 				pickableFilter: (option) =>
 					this.#isLanguagePickable(option, currentUserAllowedLanguages, currentUserHasAccessToAllLanguages),
-				itemRepositoryAlias: this.args.meta.itemRepositoryAlias,
-				referenceRepositoryAlias: this.args.meta.referenceRepositoryAlias,
-				configurationRepositoryAlias: this.args.meta.configurationRepositoryAlias,
 			},
 			value: { selection },
 		}).catch(() => undefined);
 
-		if (!result?.selection.length) return false;
+		if (!result?.selection.length) return;
 
 		const variantIds = result.selection.map((x) => UmbVariantId.FromString(x));
+		const publishableVariantIds = this.#resolvePublishableVariantIds(detailData, variantIds);
 
-		if (!variantIds.length) return false;
+		if (!publishableVariantIds.length) return;
 
-		await this.#unpublish(unique, variantIds);
-		await this.#notifyUnpublished();
+		await this.#publish(unique, publishableVariantIds);
+		await this.#notifyPublished(options, detailData, result.selection);
 		await this.#dispatchReloadEvent(unique);
-
-		return true;
 	}
 
 	async #resolveDetailData(unique: string): Promise<{
@@ -115,6 +102,7 @@ export class UmbContentUnpublishEntityAction extends UmbEntityActionBase<MetaEnt
 		languageData: { items: Array<UmbLanguageDetailModel> } | undefined,
 		appCulture: string | undefined,
 	): Array<UmbEntityVariantOptionModel> {
+		// only display culture variants as options
 		const cultureVariantOptions = detailData.variants.filter((variant) => variant.segment === null);
 
 		return cultureVariantOptions.map<UmbEntityVariantOptionModel>((variant) => ({
@@ -137,7 +125,7 @@ export class UmbContentUnpublishEntityAction extends UmbEntityActionBase<MetaEnt
 		options: Array<UmbEntityVariantOptionModel>,
 		appCulture: string | undefined,
 	): Array<string> {
-		if (!options.length) throw new Error('No variants are available to unpublish');
+		if (!options.length) throw new Error('No variants are available to publish');
 
 		// If the app language is one of the options, select it by default:
 		if (appCulture && options.some((o) => o.unique === appCulture)) {
@@ -158,32 +146,68 @@ export class UmbContentUnpublishEntityAction extends UmbEntityActionBase<MetaEnt
 		return currentUserAllowedLanguages.includes(option.culture);
 	}
 
-	async #unpublish(unique: string, variantIds: Array<UmbVariantId>): Promise<void> {
+	#resolvePublishableVariantIds(
+		detailData: UmbContentDetailModel,
+		variantIds: Array<UmbVariantId>,
+	): Array<UmbVariantId> {
+		// find all segments of a selected culture
+		return variantIds.flatMap((variantId) =>
+			detailData.variants
+				.filter((variant) => variantId.culture === variant.culture)
+				.map((variant) => UmbVariantId.Create(variant).toSegment(variant.segment)),
+		);
+	}
+
+	async #publish(unique: string, publishableVariantIds: Array<UmbVariantId>): Promise<void> {
 		if (!this.args.meta.publishingRepositoryAlias)
 			throw new Error('The publishing repository alias is missing in meta');
 
-		const publishingRepository = await createExtensionApiByAlias<UmbContentUnpublishingRepository>(
+		const publishingRepository = await createExtensionApiByAlias<UmbContentPublishingRepository>(
 			this,
 			this.args.meta.publishingRepositoryAlias,
 		);
-		const { error } = await publishingRepository.unpublish(unique, variantIds);
+		const { error } = await publishingRepository.publish(
+			unique,
+			publishableVariantIds.map((variantId) => ({ variantId })),
+		);
 
 		if (error) {
 			throw error;
 		}
 	}
 
-	async #notifyUnpublished(): Promise<void> {
+	async #notifyPublished(
+		options: Array<UmbEntityVariantOptionModel>,
+		detailData: UmbContentDetailModel,
+		selection: Array<string>,
+	): Promise<void> {
 		const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
 		const localize = new UmbLocalizationController(this);
 
-		notificationContext?.peek('positive', {
-			data: {
-				message: localize.string(
-					this.args.meta.unpublishedNotificationMessage || '#speechBubbles_editContentUnpublishedHeader',
-				),
-			},
-		});
+		// If the content is invariant, we need to show a different notification
+		const isInvariant = options.length === 1 && options[0].culture === null;
+
+		if (isInvariant) {
+			notificationContext?.peek('positive', {
+				data: {
+					headline: localize.term('speechBubbles_editContentPublishedHeader'),
+					message: localize.string(
+						this.args.meta.publishedNotificationMessage || '#speechBubbles_editContentPublishedText',
+					),
+				},
+			});
+		} else {
+			const publishedVariants = detailData.variants.filter((variant) => selection.includes(variant.culture!));
+			notificationContext?.peek('positive', {
+				data: {
+					headline: localize.term('speechBubbles_editContentPublishedHeader'),
+					message: localize.string(
+						this.args.meta.variantPublishedNotificationMessage || '#speechBubbles_editVariantPublishedText',
+						localize.list(publishedVariants.map((v) => UmbVariantId.Create(v).toString() ?? v.name)),
+					),
+				},
+			});
+		}
 	}
 
 	async #dispatchReloadEvent(unique: string): Promise<void> {
@@ -197,4 +221,4 @@ export class UmbContentUnpublishEntityAction extends UmbEntityActionBase<MetaEnt
 	}
 }
 
-export { UmbContentUnpublishEntityAction as api };
+export { UmbContentPublishEntityAction as api };
