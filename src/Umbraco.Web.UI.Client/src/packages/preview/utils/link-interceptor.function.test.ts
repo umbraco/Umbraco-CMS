@@ -1,5 +1,5 @@
 import { expect } from '@open-wc/testing';
-import { attachPreviewLinkInterceptor } from './preview-link-interceptor.function.js';
+import { attachLinkInterceptor } from './link-interceptor.function.js';
 
 type WindowOpenSpy = {
 	calls: Array<{ url?: string | URL; target?: string; features?: string }>;
@@ -27,7 +27,7 @@ function clickAnchor(anchor: HTMLAnchorElement): MouseEvent {
 	return event;
 }
 
-describe('attachPreviewLinkInterceptor', () => {
+describe('attachLinkInterceptor', () => {
 	let iframe: HTMLIFrameElement;
 	let openSpy: WindowOpenSpy;
 
@@ -36,7 +36,7 @@ describe('attachPreviewLinkInterceptor', () => {
 		document.body.appendChild(iframe);
 		// Same-origin about:blank — contentDocument is immediately writable.
 		iframe.contentDocument!.body.innerHTML = '';
-		attachPreviewLinkInterceptor(iframe);
+		attachLinkInterceptor(iframe);
 		openSpy = spyOnWindowOpen();
 	});
 
@@ -61,7 +61,7 @@ describe('attachPreviewLinkInterceptor', () => {
 		it('returns silently and does not throw', () => {
 			const detachedIframe = document.createElement('iframe');
 			Object.defineProperty(detachedIframe, 'contentDocument', { value: null });
-			expect(() => attachPreviewLinkInterceptor(detachedIframe)).to.not.throw();
+			expect(() => attachLinkInterceptor(detachedIframe)).to.not.throw();
 		});
 	});
 
@@ -276,8 +276,8 @@ describe('attachPreviewLinkInterceptor', () => {
 		it('does not stack listeners when called multiple times on the same document', () => {
 			// Simulates the back/forward cache scenario where `load` fires repeatedly for the
 			// same Document — the interceptor should remain a single listener.
-			attachPreviewLinkInterceptor(iframe);
-			attachPreviewLinkInterceptor(iframe);
+			attachLinkInterceptor(iframe);
+			attachLinkInterceptor(iframe);
 
 			const anchor = appendAnchor({ href: '/files/brochure.pdf' });
 			clickAnchor(anchor);
@@ -295,7 +295,7 @@ describe('attachPreviewLinkInterceptor', () => {
 			iframe.remove();
 			iframe = document.createElement('iframe');
 			document.body.appendChild(iframe);
-			attachPreviewLinkInterceptor(iframe);
+			attachLinkInterceptor(iframe);
 
 			const secondAnchor = iframe.contentDocument!.createElement('a');
 			secondAnchor.setAttribute('href', '/files/second.pdf');

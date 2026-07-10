@@ -25,8 +25,9 @@ const instrumentedDocuments = new WeakSet<Document>();
  * Runs in the capture phase and intercepts unconditionally for matched links, so SPA
  * routers that preventDefault on all anchor clicks (for client-side navigation) do not
  * silence this handler.
+ * @param {HTMLIFrameElement} iframe The iframe element.
  */
-export function attachPreviewLinkInterceptor(iframe: HTMLIFrameElement): void {
+export function attachLinkInterceptor(iframe: HTMLIFrameElement): void {
 	const doc = iframe.contentDocument;
 	if (!doc) return;
 	if (instrumentedDocuments.has(doc)) return;

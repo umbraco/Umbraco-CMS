@@ -7,7 +7,6 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPreviewContext } from '@umbraco-cms/backoffice/preview';
 import { UmbServerExtensionRegistrator } from '@umbraco-cms/backoffice/extension-api';
 import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
-import { attachPreviewLinkInterceptor } from './preview-link-interceptor.function.js';
 
 const CORE_PACKAGES = [import('../../packages/preview/umbraco-package.js')];
 
@@ -53,7 +52,6 @@ export class UmbPreviewElement extends UmbLitElement {
 	}
 
 	#onIFrameLoad(event: Event & { target: HTMLIFrameElement }) {
-		attachPreviewLinkInterceptor(event.target);
 		this.#context.iframeLoaded(event.target);
 	}
 
