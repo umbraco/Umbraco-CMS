@@ -24,7 +24,13 @@ public sealed class MediaCache : IPublishedMediaCache
 
     public IPublishedContent? GetById(bool preview, int contentId) => GetByIdAsync(contentId).GetAwaiter().GetResult();
 
-    public IPublishedContent? GetById(bool preview, Guid contentId)
+    // Media has no draft/preview dimension, so preview is ignored and this delegates to the
+    // single-argument Guid overload where the sync fast path lives.
+    public IPublishedContent? GetById(bool preview, Guid contentId) => GetById(contentId);
+
+    public IPublishedContent? GetById(int contentId) => GetByIdAsync(contentId).GetAwaiter().GetResult();
+
+    public IPublishedContent? GetById(Guid contentId)
     {
         // Sync fast path: when the converted-content L0 cache already holds the item we can
         // return it without spinning up an async state machine. This is the dominant case on
@@ -37,11 +43,6 @@ public sealed class MediaCache : IPublishedMediaCache
 
         return GetByIdAsync(contentId).GetAwaiter().GetResult();
     }
-
-
-    public IPublishedContent? GetById(int contentId) => GetByIdAsync(contentId).GetAwaiter().GetResult();
-
-    public IPublishedContent? GetById(Guid contentId) => GetByIdAsync(contentId).GetAwaiter().GetResult();
 
     public IEnumerable<IPublishedContent> GetAtRoot(bool preview, string? culture = null)
     {
