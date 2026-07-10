@@ -1,10 +1,7 @@
 import { UmbControllerBase } from './controller-base.class.js';
 import { expect, fixture } from '@open-wc/testing';
 import { customElement, html } from '@umbraco-cms/backoffice/external/lit';
-import {
-	UmbControllerHostElementMixin,
-	type UmbControllerHostElement,
-} from '@umbraco-cms/backoffice/controller-api';
+import { UmbControllerHostElementMixin, type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 @customElement('umb-test-controller-base-host')
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -98,7 +95,6 @@ describe('UmbControllerBase', () => {
 		});
 
 		it('triggers hostDisconnected on the controller when removed from a connected host', async () => {
-			document.body.appendChild(host);
 			const controller = new UmbTestControllerBase(host);
 
 			// Wait one microtask cycle — the host schedules `hostConnected` on the
@@ -108,8 +104,6 @@ describe('UmbControllerBase', () => {
 
 			host.removeUmbController(controller);
 			expect(controller.hostDisconnectedCalls).to.equal(1);
-
-			document.body.removeChild(host);
 		});
 	});
 });

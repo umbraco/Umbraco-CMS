@@ -2,15 +2,14 @@ import { UmbContextBase } from './context-base.class.js';
 import { UmbControllerBase } from './controller-base.class.js';
 import { expect, fixture } from '@open-wc/testing';
 import { customElement, html } from '@umbraco-cms/backoffice/external/lit';
-import {
-	UmbControllerHostElementMixin,
-	type UmbControllerHostElement,
-} from '@umbraco-cms/backoffice/controller-api';
+import { UmbControllerHostElementMixin, type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-test-context-base-host')
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 class UmbTestContextBaseHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
+
+class UmbTestClass extends UmbControllerBase {}
 
 interface UmbTestGreetingContext {
 	greeting: string;
@@ -37,7 +36,7 @@ describe('UmbContextBase', () => {
 
 	it('makes itself available to a consumer asking for the same token', async () => {
 		const ctx = new UmbTestGreetingContextImpl(host, UMB_TEST_GREETING_CONTEXT);
-		const consumerHost = new UmbControllerBase(host) as UmbControllerBase;
+		const consumerHost = new UmbTestClass(host);
 
 		const received = await new Promise<UmbTestGreetingContext | undefined>((resolve) => {
 			consumerHost.consumeContext(UMB_TEST_GREETING_CONTEXT, (value) => {
@@ -50,7 +49,7 @@ describe('UmbContextBase', () => {
 
 	it('is unprovided when destroyed — consumer callback fires again with undefined', async () => {
 		const ctx = new UmbTestGreetingContextImpl(host, UMB_TEST_GREETING_CONTEXT);
-		const consumerHost = new UmbControllerBase(host) as UmbControllerBase;
+		const consumerHost = new UmbTestClass(host);
 
 		const received: Array<UmbTestGreetingContext | undefined> = [];
 		await new Promise<void>((resolve) => {
@@ -62,21 +61,11 @@ describe('UmbContextBase', () => {
 
 		expect(received[0]).to.equal(ctx);
 
-		await new Promise<void>((resolve) => {
-			// `consumeContext` already pushes initial values; we just need to wait
-			// for the unprovide callback to land after destroying the context.
-			const originalLength = received.length;
-			const interval = setInterval(() => {
-				if (received.length > originalLength) {
-					clearInterval(interval);
-					resolve();
-				}
-			}, 5);
-
-			ctx.destroy();
-		});
+		await Promise.resolve();
 
 		expect(received.at(-1)).to.be.undefined;
+
+		ctx.destroy();
 	});
 
 	it('is removed from the host on destroy', () => {

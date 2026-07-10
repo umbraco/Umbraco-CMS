@@ -3,16 +3,18 @@ import { aTimeout, expect, fixture } from '@open-wc/testing';
 import { customElement, html } from '@umbraco-cms/backoffice/external/lit';
 import {
 	UmbControllerHostElementMixin,
+	type UmbController,
 	type UmbControllerHostElement,
 } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbBasicState } from '@umbraco-cms/backoffice/observable-api';
+import type { ClassConstructor } from '../extension-api/types/index.js';
 
 @customElement('umb-test-class-mixin-host')
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 class UmbTestClassMixinHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
 
-class UmbTestClass extends UmbClassMixin(EventTarget) {}
+class UmbTestClass extends UmbClassMixin<ClassConstructor<EventTarget>>(EventTarget) {}
 
 describe('UmbClassMixin', () => {
 	let host: UmbControllerHostElement;
@@ -117,9 +119,7 @@ describe('UmbClassMixin', () => {
 			Object.assign(instance, { getHostElement: () => hostEl });
 
 		it('lets a child controller resolve a context provided by a parent', async () => {
-			const TOKEN = new UmbContextToken<{ getHostElement(): Element; greeting: string }>(
-				'UmbTestClassMixin.Greeting',
-			);
+			const TOKEN = new UmbContextToken<{ getHostElement(): Element; greeting: string }>('UmbTestClassMixin.Greeting');
 			const provider = new UmbTestClass(host);
 			const apiInstance = minimalApi({ greeting: 'hello' }, host);
 			provider.provideContext(TOKEN, apiInstance);
