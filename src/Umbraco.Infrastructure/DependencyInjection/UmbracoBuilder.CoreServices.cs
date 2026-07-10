@@ -94,6 +94,7 @@ public static partial class UmbracoBuilderExtensions
         builder.AddNotificationAsyncHandler<RuntimeUnattendedInstallNotification, UnattendedInstaller>();
         builder.AddNotificationAsyncHandler<RuntimeUnattendedUpgradeNotification, UnattendedUpgrader>();
         builder.AddNotificationAsyncHandler<RuntimePremigrationsUpgradeNotification, PremigrationUpgrader>();
+        builder.Services.AddSingleton<IMigrationCoordinator, MigrationCoordinator>();
         builder.Services.AddHostedService<UnattendedUpgradeBackgroundService>();
 
         // Database availability check.
@@ -485,6 +486,7 @@ public static partial class UmbracoBuilderExtensions
         builder
             .AddNotificationHandler<ContentSavedNotification, ContentRelationsUpdate>()
             .AddNotificationHandler<ContentPublishedNotification, ContentRelationsUpdate>()
+            .AddNotificationHandler<ContentUnpublishedNotification, ContentRelationsUpdate>()
             .AddNotificationHandler<MediaSavedNotification, ContentRelationsUpdate>()
             .AddNotificationHandler<MemberSavedNotification, ContentRelationsUpdate>();
 

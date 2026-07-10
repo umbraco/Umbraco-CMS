@@ -1,4 +1,5 @@
 import { manifests as schemaManifests } from './Umbraco.MultipleTextString.js';
+import { manifests as valueSummaryManifests } from './value-summary/manifests.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -10,10 +11,11 @@ export const manifests: Array<UmbExtensionManifest> = [
 			label: 'Multiple Text String',
 			propertyEditorSchemaAlias: 'Umbraco.MultipleTextstring',
 			icon: 'icon-ordered-list',
-			group: 'lists',
+			group: '#propertyEditorUIGroups_lists',
 			keywords: ['string', 'list', 'items', 'values', 'features', 'tags', 'keywords', 'bullets', 'entries', 'array'],
 			supportsReadOnly: true,
 		},
 	},
 	...schemaManifests,
+	...valueSummaryManifests,
 ];

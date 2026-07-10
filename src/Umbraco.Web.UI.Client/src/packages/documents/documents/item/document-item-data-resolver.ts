@@ -1,34 +1,37 @@
 import { UmbDocumentVariantState } from '../variant-state.js';
-import type { UmbDocumentItemModel } from './types.js';
-import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbEntityFlag } from '@umbraco-cms/backoffice/entity-flag';
+import type { UmbDocumentItemModel, UmbDocumentItemVariantModel } from './types.js';
 import {
 	UmbArrayState,
 	UmbBasicState,
 	UmbBooleanState,
 	UmbObjectState,
 	UmbStringState,
-	type Observable,
 } from '@umbraco-cms/backoffice/observable-api';
-import { type UmbVariantContext, UMB_VARIANT_CONTEXT } from '@umbraco-cms/backoffice/variant';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import type { UmbEntityFlag } from '@umbraco-cms/backoffice/entity-flag';
+import { UMB_VARIANT_CONTEXT } from '@umbraco-cms/backoffice/variant';
+import type { Observable } from '@umbraco-cms/backoffice/observable-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbItemDataResolver } from '@umbraco-cms/backoffice/entity-item';
+import type { UmbVariantContext } from '@umbraco-cms/backoffice/variant';
 
 type UmbDocumentItemDataResolverModel = Omit<UmbDocumentItemModel, 'parent' | 'hasChildren'>;
 
 /**
  *
- * @param variants
+ * @param {Array<UmbDocumentItemVariantModel>} variants - An array of variants to check
+ * @returns {boolean} Returns true if the variants are invariant, false otherwise
  */
-function isVariantsInvariant(variants: Array<{ culture: string | null }>): boolean {
+function isVariantsInvariant(variants: Array<UmbDocumentItemVariantModel>): boolean {
 	return variants?.[0]?.culture === null;
 }
 /**
  *
- * @param variants
- * @param culture
+ * @param {Array<UmbDocumentItemVariantModel>} variants - An array of variants to search
+ * @param {string} culture - The culture to find
+ * @returns {T | undefined} Returns the variant with the matching culture, or undefined if not found
  */
-function findVariant<T extends { culture: string | null }>(variants: Array<T>, culture: string): T | undefined {
+function findVariant<T extends UmbDocumentItemVariantModel>(variants: Array<T>, culture: string): T | undefined {
 	return variants.find((x) => x.culture === culture);
 }
 

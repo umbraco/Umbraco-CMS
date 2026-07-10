@@ -1,4 +1,5 @@
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
+import UmbEntityActionDefaultElement from './entity-action.element.js';
 
 export const UMB_ENTITY_ACTION_DEFAULT_KIND_MANIFEST: UmbExtensionManifestKind = {
 	type: 'kind',
@@ -9,7 +10,7 @@ export const UMB_ENTITY_ACTION_DEFAULT_KIND_MANIFEST: UmbExtensionManifestKind =
 		type: 'entityAction',
 		kind: 'default',
 		weight: 1000,
-		element: () => import('./entity-action.element.js'),
+		element: UmbEntityActionDefaultElement,
 		meta: {
 			icon: '',
 			label: 'Default Entity Action',

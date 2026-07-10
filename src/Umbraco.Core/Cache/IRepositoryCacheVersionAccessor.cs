@@ -26,8 +26,20 @@ public interface IRepositoryCacheVersionAccessor
     /// Notifies of a version change on a given cache key.
     /// </summary>
     /// <param name="cacheKey">Key of the changed version.</param>
+    [Obsolete("Use version that takes newVersion, scheduled for removal in V19")]
     void VersionChanged(string cacheKey)
     { }
+
+    /// <summary>
+    /// Notifies of a version change on a given cache key, providing the new version so internal caches
+    /// can be updated in-place without a database round-trip.
+    /// </summary>
+    /// <param name="cacheKey">Key of the changed version.</param>
+    /// <param name="newVersion">The new version GUID that was just written to the database.</param>
+    void VersionChanged(string cacheKey, Guid newVersion)
+    {
+        VersionChanged(cacheKey);
+    }
 
     /// <summary>
     /// Notifies the accessor that caches have been synchronized.

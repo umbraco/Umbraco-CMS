@@ -103,4 +103,5 @@ describe('UmbTreeExpansionManager', () => {
 			expect(manager.getExpansion()).to.deep.equal([]);
 		});
 	});
+
 });

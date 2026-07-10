@@ -8,6 +8,7 @@ export * from './info-app/index.js';
 export * from './modals/index.js';
 export * from './paths.js';
 export * from './submittable/index.js';
+export * from './utils/check-will-navigate-away.function.js';
 export * from './utils/object-to-property-value-array.function.js';
 export * from './workspace-property-dataset/index.js';
 export * from './workspace.context-token.js';

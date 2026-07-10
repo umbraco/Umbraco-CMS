@@ -3,7 +3,7 @@ import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBasicState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbReadOnlyVariantGuardManager } from './readonly-variant-guard.manager.js';
-import { UmbVariantId } from '../../variant/variant-id.class.js';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 @customElement('test-my-controller-host')
 class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}

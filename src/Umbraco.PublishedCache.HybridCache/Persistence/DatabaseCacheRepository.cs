@@ -207,21 +207,28 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     /// <inheritdoc/>
     public async Task<IEnumerable<ContentCacheNode>> GetContentSourcesAsync(IEnumerable<Guid> keys, bool preview = false)
     {
-        Sql<ISqlContext>? sql = SqlContentSourcesSelect()
-            .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Document))
-            .WhereIn<NodeDto>(x => x.UniqueId, keys)
-            .Append(SqlOrderByLevelIdSortOrder(SqlContext));
+        // Batch the WHERE IN to stay within SQL Server's parameter limit.
+        // The configurable document seed batch size is applied upstream; this method only enforces MaxParameterCount.
+        Guid[] keysArray = keys as Guid[] ?? keys.ToArray();
+        var dtos = new List<ContentSourceDto>(keysArray.Length);
+        foreach (IEnumerable<Guid> group in keysArray.InGroupsOf(Constants.Sql.MaxParameterCount))
+        {
+            Sql<ISqlContext>? sql = SqlContentSourcesSelect()
+                .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Document))
+                .WhereIn<NodeDto>(x => x.UniqueId, group)
+                .Append(SqlOrderByLevelIdSortOrder(SqlContext));
 
-        List<ContentSourceDto> dtos = await Database.FetchAsync<ContentSourceDto>(sql);
+            dtos.AddRange(await Database.FetchAsync<ContentSourceDto>(sql));
+        }
 
-        dtos = dtos
+        var filtered = dtos
             .Where(x => x is not null)
             .Where(x => preview || ((x.PubDataRaw is not null || x.PubData is not null) && (!x.Published || x.PubName is not null)))
             .ToList();
 
         IContentCacheDataSerializer serializer =
             _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Document);
-        return dtos
+        return filtered
             .Select(x => CreateContentNodeKit(x, serializer, preview))
             .OfType<ContentCacheNode>();
     }
@@ -379,20 +386,27 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     /// <inheritdoc/>
     public async Task<IEnumerable<ContentCacheNode>> GetMediaSourcesAsync(IEnumerable<Guid> keys)
     {
-        Sql<ISqlContext>? sql = SqlMediaSourcesSelect()
-            .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Media))
-            .WhereIn<NodeDto>(x => x.UniqueId, keys)
-            .Append(SqlOrderByLevelIdSortOrder(SqlContext));
+        // Batch the WHERE IN by Constants.Sql.MaxParameterCount so callers configuring
+        // CacheSettings.MediaSeedBatchSize above that limit do not hit SQL Server's 2100 parameter limit.
+        Guid[] keysArray = keys as Guid[] ?? keys.ToArray();
+        var dtos = new List<ContentSourceDto>(keysArray.Length);
+        foreach (IEnumerable<Guid> group in keysArray.InGroupsOf(Constants.Sql.MaxParameterCount))
+        {
+            Sql<ISqlContext>? sql = SqlMediaSourcesSelect()
+                .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Media))
+                .WhereIn<NodeDto>(x => x.UniqueId, group)
+                .Append(SqlOrderByLevelIdSortOrder(SqlContext));
 
-        List<ContentSourceDto> dtos = await Database.FetchAsync<ContentSourceDto>(sql);
+            dtos.AddRange(await Database.FetchAsync<ContentSourceDto>(sql));
+        }
 
-        dtos = dtos
+        var filtered = dtos
             .Where(x => x is not null)
             .ToList();
 
         IContentCacheDataSerializer serializer =
             _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Media);
-        return dtos
+        return filtered
             .Select(x => CreateMediaNodeKit(x, serializer));
     }
 
@@ -578,107 +592,135 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     /// </summary>
     private List<CacheRebuildDocumentDto> GetDocumentMetadataForNodes(List<int> nodeIds)
     {
-        // Query content metadata with both edit and published version info
+        // Query content metadata with both edit and published version info.
         // Uses nested join pattern to ensure we only get the published ContentVersion
-        // (where a DocumentVersionDto with Published=true exists)
-        Sql<ISqlContext> sql = Sql()
-            .Select<NodeDto>(
-                x => x.NodeId,
-                x => x.UniqueId,
-                x => x.Text,
-                x => x.Path,
-                x => x.Level,
-                x => x.ParentId,
-                x => x.SortOrder,
-                x => x.CreateDate,
-                x => Alias(x.UserId, "CreatorId"))
-            .AndSelect<ContentDto>(x => x.ContentTypeId)
-            .AndSelect<DocumentDto>(x => x.Published)
-            .AndSelect<ContentVersionDto>(
-                x => Alias(x.Id, "EditVersionId"),
-                x => Alias(x.Text, "EditName"),
-                x => Alias(x.VersionDate, "EditVersionDate"),
-                x => Alias(x.UserId, "EditWriterId"))
-            .AndSelect<ContentVersionDto>(
-                "pcv",
-                x => Alias(x.Id, "PublishedVersionId"),
-                x => Alias(x.Text, "PublishedName"),
-                x => Alias(x.VersionDate, "PublishedVersionDate"),
-                x => Alias(x.UserId, "PublishedWriterId"))
-            .From<NodeDto>()
-            .InnerJoin<ContentDto>().On<NodeDto, ContentDto>((n, c) => n.NodeId == c.NodeId)
-            .InnerJoin<DocumentDto>().On<NodeDto, DocumentDto>((n, d) => n.NodeId == d.NodeId)
-            .InnerJoin<ContentVersionDto>().On<NodeDto, ContentVersionDto>((n, cv) => n.NodeId == cv.NodeId && cv.Current)
+        // (where a DocumentVersionDto with Published=true exists).
+        // Batched on nodeIds so a NuCacheSettings.SqlPageSize larger than MaxParameterCount still works.
+        var results = new List<CacheRebuildDocumentDto>(nodeIds.Count);
+        foreach (IEnumerable<int> group in nodeIds.InGroupsOf(Constants.Sql.MaxParameterCount))
+        {
+            Sql<ISqlContext> sql = Sql()
+                .Select<NodeDto>(
+                    x => x.NodeId,
+                    x => x.UniqueId,
+                    x => x.Text,
+                    x => x.Path,
+                    x => x.Level,
+                    x => x.ParentId,
+                    x => x.SortOrder,
+                    x => x.CreateDate,
+                    x => Alias(x.UserId, "CreatorId"))
+                .AndSelect<ContentDto>(x => x.ContentTypeId)
+                .AndSelect<DocumentDto>(x => x.Published)
+                .AndSelect<ContentVersionDto>(
+                    x => Alias(x.Id, "EditVersionId"),
+                    x => Alias(x.Text, "EditName"),
+                    x => Alias(x.VersionDate, "EditVersionDate"),
+                    x => Alias(x.UserId, "EditWriterId"))
+                .AndSelect<ContentVersionDto>(
+                    "pcv",
+                    x => Alias(x.Id, "PublishedVersionId"),
+                    x => Alias(x.Text, "PublishedName"),
+                    x => Alias(x.VersionDate, "PublishedVersionDate"),
+                    x => Alias(x.UserId, "PublishedWriterId"))
+                .From<NodeDto>()
+                .InnerJoin<ContentDto>().On<NodeDto, ContentDto>((n, c) => n.NodeId == c.NodeId)
+                .InnerJoin<DocumentDto>().On<NodeDto, DocumentDto>((n, d) => n.NodeId == d.NodeId)
+                .InnerJoin<ContentVersionDto>().On<NodeDto, ContentVersionDto>((n, cv) => n.NodeId == cv.NodeId && cv.Current)
 
-            // Nested join: ContentVersionDto "pcv" INNER JOIN DocumentVersionDto "pdv" ON published=true
-            // This ensures pcv only includes rows where there's a published DocumentVersion
-            .LeftJoin<ContentVersionDto>(
-                j => j.InnerJoin<DocumentVersionDto>("pdv")
-                      .On<ContentVersionDto, DocumentVersionDto>(
-                          (left, right) => left.Id == right.Id && right.Published == true, "pcv", "pdv"),
-                "pcv")
+                // Nested join: ContentVersionDto "pcv" INNER JOIN DocumentVersionDto "pdv" ON published=true.
+                // This ensures pcv only includes rows where there's a published DocumentVersion.
+                .LeftJoin<ContentVersionDto>(
+                    j => j.InnerJoin<DocumentVersionDto>("pdv")
+                          .On<ContentVersionDto, DocumentVersionDto>(
+                              (left, right) => left.Id == right.Id && right.Published == true, "pcv", "pdv"),
+                    "pcv")
 
-            .On<NodeDto, ContentVersionDto>((n, cv) => n.NodeId == cv.NodeId, aliasRight: "pcv")
-            .WhereIn<NodeDto>(x => x.NodeId, nodeIds);
+                .On<NodeDto, ContentVersionDto>((n, cv) => n.NodeId == cv.NodeId, aliasRight: "pcv")
+                .WhereIn<NodeDto>(x => x.NodeId, group);
 
-        return Database.Fetch<CacheRebuildDocumentDto>(sql);
+            results.AddRange(Database.Fetch<CacheRebuildDocumentDto>(sql));
+        }
+
+        return results;
     }
 
     /// <summary>
     /// Gets property data for the specified node IDs using efficient JOIN on nodeId.
     /// This avoids the expensive WHERE IN on versionId that causes index scans.
+    /// Batched on nodeIds so a NuCacheSettings.SqlPageSize larger than MaxParameterCount still works.
     /// </summary>
     private List<CacheRebuildPropertyDto> GetPropertyDataForNodes(List<int> nodeIds)
     {
-        // JOIN through nodeId → versionId path for efficient query plan
-        Sql<ISqlContext> sql = Sql()
-            .Select<PropertyDataDto>(
-                x => x.VersionId,
-                x => x.LanguageId,
-                x => x.Segment,
-                x => x.IntegerValue,
-                x => x.DecimalValue,
-                x => x.DateValue,
-                x => x.VarcharValue,
-                x => x.TextValue)
-            .AndSelect<PropertyTypeDto>(x => Alias(x.Alias, "PropertyAlias"))
-            .From<PropertyDataDto>()
-            .InnerJoin<PropertyTypeDto>().On<PropertyDataDto, PropertyTypeDto>((pd, pt) => pd.PropertyTypeId == pt.Id)
-            .InnerJoin<ContentVersionDto>().On<PropertyDataDto, ContentVersionDto>((pd, cv) => pd.VersionId == cv.Id)
-            .WhereIn<ContentVersionDto>(x => x.NodeId, nodeIds);
+        var results = new List<CacheRebuildPropertyDto>();
+        foreach (IEnumerable<int> group in nodeIds.InGroupsOf(Constants.Sql.MaxParameterCount))
+        {
+            // JOIN through nodeId → versionId path for efficient query plan.
+            Sql<ISqlContext> sql = Sql()
+                .Select<PropertyDataDto>(
+                    x => x.VersionId,
+                    x => x.LanguageId,
+                    x => x.Segment,
+                    x => x.IntegerValue,
+                    x => x.DecimalValue,
+                    x => x.DateValue,
+                    x => x.VarcharValue,
+                    x => x.TextValue)
+                .AndSelect<PropertyTypeDto>(x => Alias(x.Alias, "PropertyAlias"))
+                .From<PropertyDataDto>()
+                .InnerJoin<PropertyTypeDto>().On<PropertyDataDto, PropertyTypeDto>((pd, pt) => pd.PropertyTypeId == pt.Id)
+                .InnerJoin<ContentVersionDto>().On<PropertyDataDto, ContentVersionDto>((pd, cv) => pd.VersionId == cv.Id)
+                .WhereIn<ContentVersionDto>(x => x.NodeId, group);
 
-        return Database.Fetch<CacheRebuildPropertyDto>(sql);
+            results.AddRange(Database.Fetch<CacheRebuildPropertyDto>(sql));
+        }
+
+        return results;
     }
 
     /// <summary>
     /// Gets culture variation data for the specified node IDs.
+    /// Batched on nodeIds so a NuCacheSettings.SqlPageSize larger than MaxParameterCount still works.
     /// </summary>
     private List<CacheRebuildCultureDto> GetCultureDataForNodes(List<int> nodeIds)
     {
-        Sql<ISqlContext> sql = Sql()
-            .Select<ContentVersionCultureVariationDto>(x => x.VersionId, x => x.Name, x => x.UpdateDate)
-            .AndSelect<LanguageDto>(x => Alias(x.IsoCode, "IsoCode"))
-            .From<ContentVersionCultureVariationDto>()
-            .InnerJoin<LanguageDto>().On<ContentVersionCultureVariationDto, LanguageDto>((cv, l) => cv.LanguageId == l.Id)
-            .InnerJoin<ContentVersionDto>().On<ContentVersionCultureVariationDto, ContentVersionDto>((ccv, cv) => ccv.VersionId == cv.Id)
-            .WhereIn<ContentVersionDto>(x => x.NodeId, nodeIds);
+        var results = new List<CacheRebuildCultureDto>();
+        foreach (IEnumerable<int> group in nodeIds.InGroupsOf(Constants.Sql.MaxParameterCount))
+        {
+            Sql<ISqlContext> sql = Sql()
+                .Select<ContentVersionCultureVariationDto>(x => x.VersionId, x => x.Name, x => x.UpdateDate)
+                .AndSelect<LanguageDto>(x => Alias(x.IsoCode, "IsoCode"))
+                .From<ContentVersionCultureVariationDto>()
+                .InnerJoin<LanguageDto>().On<ContentVersionCultureVariationDto, LanguageDto>((cv, l) => cv.LanguageId == l.Id)
+                .InnerJoin<ContentVersionDto>().On<ContentVersionCultureVariationDto, ContentVersionDto>((ccv, cv) => ccv.VersionId == cv.Id)
+                .WhereIn<ContentVersionDto>(x => x.NodeId, group);
 
-        return Database.Fetch<CacheRebuildCultureDto>(sql);
+            results.AddRange(Database.Fetch<CacheRebuildCultureDto>(sql));
+        }
+
+        return results;
     }
 
     /// <summary>
     /// Gets document culture variation data (edited status per culture) for the specified node IDs.
+    /// Batched on nodeIds so a NuCacheSettings.SqlPageSize larger than MaxParameterCount still works.
     /// </summary>
     private List<CacheRebuildDocumentCultureDto> GetDocumentCultureDataForNodes(List<int> nodeIds)
     {
-        Sql<ISqlContext> sql = Sql()
-            .Select<DocumentCultureVariationDto>(x => x.NodeId, x => x.Edited)
-            .AndSelect<LanguageDto>(x => Alias(x.IsoCode, "IsoCode"))
-            .From<DocumentCultureVariationDto>()
-            .InnerJoin<LanguageDto>().On<DocumentCultureVariationDto, LanguageDto>((dcv, l) => dcv.LanguageId == l.Id)
-            .WhereIn<DocumentCultureVariationDto>(x => x.NodeId, nodeIds);
+        var results = new List<CacheRebuildDocumentCultureDto>();
+        foreach (IEnumerable<int> group in nodeIds.InGroupsOf(Constants.Sql.MaxParameterCount))
+        {
+            Sql<ISqlContext> sql = Sql()
+                .Select<DocumentCultureVariationDto>(x => x.NodeId, x => x.Edited)
+                .AndSelect<LanguageDto>(x => Alias(x.IsoCode, "IsoCode"))
+                .From<DocumentCultureVariationDto>()
+                .InnerJoin<LanguageDto>().On<DocumentCultureVariationDto, LanguageDto>((dcv, l) => dcv.LanguageId == l.Id)
+                .WhereIn<DocumentCultureVariationDto>(x => x.NodeId, group);
 
-        return Database.Fetch<CacheRebuildDocumentCultureDto>(sql);
+            results.AddRange(Database.Fetch<CacheRebuildDocumentCultureDto>(sql));
+        }
+
+        return results;
     }
 
     /// <summary>
@@ -1207,31 +1249,38 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
 
     /// <summary>
     /// Gets content metadata for the specified node IDs using efficient JOIN. Used for media and members.
+    /// Batched on nodeIds so a NuCacheSettings.SqlPageSize larger than MaxParameterCount still works.
     /// </summary>
     private List<CacheRebuildContentDto> GetContentMetadataForNodes(List<int> nodeIds)
     {
-        Sql<ISqlContext> sql = Sql()
-            .Select<NodeDto>(
-                x => x.NodeId,
-                x => x.UniqueId,
-                x => x.Text,
-                x => x.Path,
-                x => x.Level,
-                x => x.ParentId,
-                x => x.SortOrder,
-                x => x.CreateDate,
-                x => Alias(x.UserId, "CreatorId"))
-            .AndSelect<ContentDto>(x => x.ContentTypeId)
-            .AndSelect<ContentVersionDto>(
-                x => Alias(x.Id, "VersionId"),
-                x => Alias(x.VersionDate, "VersionDate"),
-                x => Alias(x.UserId, "WriterId"))
-            .From<NodeDto>()
-            .InnerJoin<ContentDto>().On<NodeDto, ContentDto>((n, c) => n.NodeId == c.NodeId)
-            .InnerJoin<ContentVersionDto>().On<NodeDto, ContentVersionDto>((n, cv) => n.NodeId == cv.NodeId && cv.Current)
-            .WhereIn<NodeDto>(x => x.NodeId, nodeIds);
+        var results = new List<CacheRebuildContentDto>(nodeIds.Count);
+        foreach (IEnumerable<int> group in nodeIds.InGroupsOf(Constants.Sql.MaxParameterCount))
+        {
+            Sql<ISqlContext> sql = Sql()
+                .Select<NodeDto>(
+                    x => x.NodeId,
+                    x => x.UniqueId,
+                    x => x.Text,
+                    x => x.Path,
+                    x => x.Level,
+                    x => x.ParentId,
+                    x => x.SortOrder,
+                    x => x.CreateDate,
+                    x => Alias(x.UserId, "CreatorId"))
+                .AndSelect<ContentDto>(x => x.ContentTypeId)
+                .AndSelect<ContentVersionDto>(
+                    x => Alias(x.Id, "VersionId"),
+                    x => Alias(x.VersionDate, "VersionDate"),
+                    x => Alias(x.UserId, "WriterId"))
+                .From<NodeDto>()
+                .InnerJoin<ContentDto>().On<NodeDto, ContentDto>((n, c) => n.NodeId == c.NodeId)
+                .InnerJoin<ContentVersionDto>().On<NodeDto, ContentVersionDto>((n, cv) => n.NodeId == cv.NodeId && cv.Current)
+                .WhereIn<NodeDto>(x => x.NodeId, group);
 
-        return Database.Fetch<CacheRebuildContentDto>(sql);
+            results.AddRange(Database.Fetch<CacheRebuildContentDto>(sql));
+        }
+
+        return results;
     }
 
     /// <summary>

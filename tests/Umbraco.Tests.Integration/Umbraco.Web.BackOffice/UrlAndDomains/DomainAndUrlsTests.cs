@@ -26,7 +26,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.UrlAndDomains;
 internal sealed class DomainAndUrlsTests : UmbracoIntegrationTest
 {
     [SetUp]
-    public void Setup()
+    public new void Setup()
     {
         var xml = PackageMigrationResource.GetEmbeddedPackageDataManifest(GetType());
         var packagingService = GetRequiredService<IPackagingService>();
