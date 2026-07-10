@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.PropertyEditors;
 
 internal sealed partial class BlockListElementLevelVariationTests : BlockEditorElementVariationTestBase
 {
-    public static new void ConfigureAllowEditInvariantFromNonDefaultTrue(IUmbracoBuilder builder)
+    public static void ConfigureAllowEditInvariantFromNonDefaultTrue(IUmbracoBuilder builder)
     {
         builder.Services.Configure<ContentSettings>(config =>
             config.AllowEditInvariantFromNonDefault = true);

@@ -42,6 +42,12 @@ export interface UmbracoPackage {
 	allowPublicAccess?: boolean;
 
 	/**
+	 * @title Whether Umbraco automatically appends a cache-buster to this package's clean /App_Plugins assets (importmap and extensions)
+	 * @default true
+	 */
+	allowCacheBusting?: boolean;
+
+	/**
 	 * @title An array of Umbraco package manifest types that will be installed
 	 * @required
 	 */

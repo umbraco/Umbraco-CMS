@@ -44,17 +44,14 @@ export class UmbDuplicateToModalElement extends UmbModalBaseElement<UmbDuplicate
 
 		return html`
 			<umb-body-layout headline=${this.localize.term('actions_copyTo')}>
-				<uui-box>
-					<umb-tree
-						alias=${this.data.treeAlias}
-						.props=${{
-							foldersOnly: this.data?.foldersOnly,
-							expandTreeRoot: true,
-							expansion: this._treeExpansion,
-						}}
-						@selection-change=${this.#onTreeSelectionChange}></umb-tree>
-				</uui-box>
-
+				<umb-tree
+					alias=${this.data.treeAlias}
+					.props=${{
+						foldersOnly: this.data?.foldersOnly,
+						expandTreeRoot: true,
+						expansion: this._treeExpansion,
+					}}
+					@selection-change=${this.#onTreeSelectionChange}></umb-tree>
 				${this.#renderActions()}
 			</umb-body-layout>
 		`;
