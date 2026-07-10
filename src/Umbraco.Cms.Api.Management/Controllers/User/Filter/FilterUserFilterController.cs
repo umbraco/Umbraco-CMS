@@ -40,8 +40,13 @@ public class FilterUserFilterController : UserFilterControllerBase
     }
 
     /// <summary>
-    /// Query users
+    /// Gets a paged collection of users matching the supplied filter criteria (user groups, user states and a
+    /// name/username search term), ordered and paged according to the query parameters.
     /// </summary>
+    /// <remarks>
+    /// This overload is obsolete as it cannot filter by user kind. It delegates to <see cref="Filter2" />, which
+    /// owns the live route and additionally supports the <c>userKinds</c> filter.
+    /// </remarks>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <param name="skip">Amount to skip.</param>
     /// <param name="take">Amount to take.</param>
@@ -51,9 +56,6 @@ public class FilterUserFilterController : UserFilterControllerBase
     /// <param name="userStates">User states to include in the result.</param>
     /// <param name="filter">A string that must be present in the users name or username.</param>
     /// <returns>A paged result of the users matching the query.</returns>
-    /// <remarks>
-    /// This method is obsolete. Use <c>Filter2</c> instead.
-    /// </remarks>
     [Obsolete("Use the Filter2 action method instead. Scheduled for removal in Umbraco 20, when Filter2 will be renamed back to Filter.")]
     [NonAction]
     public async Task<IActionResult> Filter(
@@ -68,7 +70,8 @@ public class FilterUserFilterController : UserFilterControllerBase
         => await Filter2(cancellationToken, skip, take, orderBy, orderDirection, userGroupIds, userStates, userKinds: null, filter);
 
     /// <summary>
-    /// Query users
+    /// Gets a paged collection of users matching the supplied filter criteria (user groups, user states,
+    /// user kinds and a name/username search term), ordered and paged according to the query parameters.
     /// </summary>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <param name="skip">Amount to skip.</param>
@@ -77,7 +80,7 @@ public class FilterUserFilterController : UserFilterControllerBase
     /// <param name="orderDirection">Direction to order in.</param>
     /// <param name="userGroupIds">Keys of the user groups to include in the result.</param>
     /// <param name="userStates">User states to include in the result.</param>
-    /// <param name="userKinds">User kinds to include in the result.</param>
+    /// <param name="userKinds">User kinds (e.g. default backoffice users or API users) to include in the result.</param>
     /// <param name="filter">A string that must be present in the users name or username.</param>
     /// <returns>A paged result of the users matching the query.</returns>
     [HttpGet]
@@ -86,7 +89,7 @@ public class FilterUserFilterController : UserFilterControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [EndpointSummary("Gets a filtered collection of users.")]
-    [EndpointDescription("Filters users based on the provided criteria with support for pagination.")]
+    [EndpointDescription("Returns a paged collection of users matching the provided criteria — user groups, user states, user kinds (default or API users) and a name/username search term.")]
     public async Task<IActionResult> Filter2(
         CancellationToken cancellationToken,
         int skip = 0,

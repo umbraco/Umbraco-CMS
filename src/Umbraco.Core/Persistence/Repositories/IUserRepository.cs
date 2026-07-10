@@ -10,33 +10,31 @@ namespace Umbraco.Cms.Core.Persistence.Repositories;
 public interface IUserRepository : IReadWriteQueryRepository<Guid, IUser>
 {
     /// <summary>
-    ///     Gets the count of items based on a complex query
+    ///     Gets the count of users matching the specified query.
     /// </summary>
-    /// <param name="query"></param>
-    /// <returns></returns>
+    /// <param name="query">The query to filter users by, or <c>null</c> to count all users.</param>
+    /// <returns>The number of users matching the query.</returns>
     int GetCountByQuery(IQuery<IUser>? query);
 
     /// <summary>
-    ///     Checks if a user with the username exists
+    ///     Checks whether a user with the specified username exists.
     /// </summary>
-    /// <param name="username"></param>
-    /// <returns></returns>
+    /// <param name="username">The username to check for.</param>
+    /// <returns><c>true</c> if a user with the username exists; otherwise, <c>false</c>.</returns>
     bool ExistsByUserName(string username);
 
     /// <summary>
-    ///     Returns a user by id
+    ///     Returns a user by their integer identifier.
     /// </summary>
-    /// <param name="id"></param>
-    /// <returns>
-    ///     A cached <see cref="IUser" /> instance
-    /// </returns>
+    /// <param name="id">The user identifier.</param>
+    /// <returns>A cached <see cref="IUser" /> instance if found; otherwise, <c>null</c>.</returns>
     IUser? Get(int id);
 
     /// <summary>
-    ///     Checks if a user with the login exists
+    ///     Checks whether a user with the specified login exists.
     /// </summary>
-    /// <param name="login"></param>
-    /// <returns></returns>
+    /// <param name="login">The login to check for.</param>
+    /// <returns><c>true</c> if a user with the login exists; otherwise, <c>false</c>.</returns>
     bool ExistsByLogin(string login);
 
     /// <summary>
@@ -52,23 +50,23 @@ public interface IUserRepository : IReadWriteQueryRepository<Guid, IUser>
     IEnumerable<IUser> GetAllNotInGroup(int groupId);
 
     /// <summary>
-    ///     Gets paged user results
+    ///     Gets a paged collection of users matching the specified query and filters.
     /// </summary>
-    /// <param name="query"></param>
-    /// <param name="pageIndex"></param>
-    /// <param name="pageSize"></param>
-    /// <param name="totalRecords"></param>
-    /// <param name="orderBy"></param>
-    /// <param name="orderDirection"></param>
+    /// <param name="query">The base query to filter users by, or <c>null</c> for no base query.</param>
+    /// <param name="pageIndex">The zero-based page index.</param>
+    /// <param name="pageSize">The number of items per page.</param>
+    /// <param name="totalRecords">When this method returns, contains the total number of users matching the query.</param>
+    /// <param name="orderBy">The expression to order the results by.</param>
+    /// <param name="orderDirection">The direction to order the results in.</param>
     /// <param name="includeUserGroups">
-    ///     A filter to only include user that belong to these user groups
+    ///     A filter to only include users that belong to these user groups.
     /// </param>
     /// <param name="excludeUserGroups">
-    ///     A filter to only include users that do not belong to these user groups
+    ///     A filter to only include users that do not belong to these user groups.
     /// </param>
-    /// <param name="userState">Optional parameter to filter by specified user state</param>
-    /// <param name="filter"></param>
-    /// <returns></returns>
+    /// <param name="userState">An optional filter to only include users in the specified states.</param>
+    /// <param name="filter">An optional additional query to further filter the results.</param>
+    /// <returns>A paged enumerable of users matching the query.</returns>
     [Obsolete("Please use the method overload with all parameters. Scheduled for removal in Umbraco 20.")]
     IEnumerable<IUser> GetPagedResultsByQuery(
         IQuery<IUser>? query,
@@ -83,24 +81,29 @@ public interface IUserRepository : IReadWriteQueryRepository<Guid, IUser>
         IQuery<IUser>? filter = null);
 
     /// <summary>
-    ///     Gets paged user results
+    ///     Gets a paged collection of users matching the specified query and filters, including a filter by user kind.
     /// </summary>
     /// <param name="query">The base query to filter users by, or <c>null</c> for no base query.</param>
     /// <param name="pageIndex">The zero-based page index.</param>
     /// <param name="pageSize">The number of items per page.</param>
-    /// <param name="totalRecords">The total number of records matching the query.</param>
+    /// <param name="totalRecords">When this method returns, contains the total number of users matching the query.</param>
     /// <param name="orderBy">The expression to order the results by.</param>
     /// <param name="orderDirection">The direction to order the results in.</param>
     /// <param name="includeUserGroups">
-    ///     A filter to only include user that belong to these user groups
+    ///     A filter to only include users that belong to these user groups.
     /// </param>
     /// <param name="excludeUserGroups">
-    ///     A filter to only include users that do not belong to these user groups
+    ///     A filter to only include users that do not belong to these user groups.
     /// </param>
-    /// <param name="userState">Optional parameter to filter by specified user state</param>
-    /// <param name="userKinds">Optional parameter to filter by specified user kind</param>
+    /// <param name="userState">An optional filter to only include users in the specified states.</param>
+    /// <param name="userKinds">An optional filter to only include users of the specified kinds.</param>
     /// <param name="filter">An optional additional query to further filter the results.</param>
     /// <returns>A paged enumerable of users matching the query.</returns>
+    /// <remarks>
+    ///     The default implementation delegates to the obsolete overload without user kind support, and therefore
+    ///     throws <see cref="NotSupportedException" /> if <paramref name="userKinds" /> is supplied.
+    ///     Implementers must override this method to support filtering by user kind.
+    /// </remarks>
     // TODO (V20): Remove the default implementation when the obsolete GetPagedResultsByQuery overload is removed.
     IEnumerable<IUser> GetPagedResultsByQuery(
         IQuery<IUser>? query,
@@ -139,60 +142,56 @@ public interface IUserRepository : IReadWriteQueryRepository<Guid, IUser>
     }
 
     /// <summary>
-    ///     Returns a user by username
+    ///     Returns a user by their username.
     /// </summary>
-    /// <param name="username"></param>
+    /// <param name="username">The username to find the user by.</param>
     /// <param name="includeSecurityData">
-    ///     This is only used for a shim in order to upgrade to 7.7
+    ///     This is only used for a shim in order to upgrade to 7.7.
     /// </param>
-    /// <returns>
-    ///     A non cached <see cref="IUser" /> instance
-    /// </returns>
+    /// <returns>A non cached <see cref="IUser" /> instance if found; otherwise, <c>null</c>.</returns>
     IUser? GetByUsername(string username, bool includeSecurityData);
 
     /// <summary>
-    /// Gets a user by username for upgrade purposes, this will only return a result if the current runtime state is upgrade.
+    ///     Gets a user by username for upgrade purposes; this will only return a result if the current runtime state is upgrade.
     /// </summary>
     /// <remarks>
-    /// This only resolves the minimum amount of fields required to authorize for an upgrade.
-    /// We need this to be able to add new columns to the user table.
+    ///     This only resolves the minimum amount of fields required to authorize for an upgrade.
+    ///     We need this to be able to add new columns to the user table.
     /// </remarks>
     /// <param name="username">The username to find the user by.</param>
-    /// <returns>An uncached <see cref="IUser"/> instance.</returns>
+    /// <returns>An uncached <see cref="IUser" /> instance if found; otherwise, <c>null</c>.</returns>
     IUser? GetForUpgradeByUsername(string username) => GetByUsername(username, false);
 
     /// <summary>
-    /// Gets a user by email for upgrade purposes, this will only return a result if the current runtime state is upgrade.
+    ///     Gets a user by email for upgrade purposes; this will only return a result if the current runtime state is upgrade.
     /// </summary>
     /// <remarks>
-    /// This only resolves the minimum amount of fields required to authorize for an upgrade.
-    /// We need this to be able to add new columns to the user table.
+    ///     This only resolves the minimum amount of fields required to authorize for an upgrade.
+    ///     We need this to be able to add new columns to the user table.
     /// </remarks>
     /// <param name="email">The email to find the user by.</param>
-    /// <returns>An uncached <see cref="IUser"/> instance.</returns>
-    IUser? GetForUpgradeByEmail(string email) => GetMany().FirstOrDefault(x=>x.Email == email);
+    /// <returns>An uncached <see cref="IUser" /> instance if found; otherwise, <c>null</c>.</returns>
+    IUser? GetForUpgradeByEmail(string email) => GetMany().FirstOrDefault(x => x.Email == email);
 
     /// <summary>
-    /// Gets a user for upgrade purposes, this will only return a result if the current runtime state is upgrade.
+    ///     Gets a user for upgrade purposes; this will only return a result if the current runtime state is upgrade.
     /// </summary>
     /// <remarks>
-    /// This only resolves the minimum amount of fields required to authorize for an upgrade.
-    /// We need this to be able to add new columns to the user table.
+    ///     This only resolves the minimum amount of fields required to authorize for an upgrade.
+    ///     We need this to be able to add new columns to the user table.
     /// </remarks>
-    /// <param name="id">The id to find the user by.</param>
-    /// <returns>An uncached <see cref="IUser"/> instance.</returns>
+    /// <param name="id">The identifier to find the user by.</param>
+    /// <returns>An uncached <see cref="IUser" /> instance if found; otherwise, <c>null</c>.</returns>
     IUser? GetForUpgrade(int id) => Get(id, false);
 
     /// <summary>
-    ///     Returns a user by id
+    ///     Returns a user by their integer identifier.
     /// </summary>
-    /// <param name="id"></param>
+    /// <param name="id">The user identifier.</param>
     /// <param name="includeSecurityData">
-    ///     This is only used for a shim in order to upgrade to 7.7
+    ///     This is only used for a shim in order to upgrade to 7.7.
     /// </param>
-    /// <returns>
-    ///     A non cached <see cref="IUser" /> instance
-    /// </returns>
+    /// <returns>A non cached <see cref="IUser" /> instance if found; otherwise, <c>null</c>.</returns>
     IUser? Get(int? id, bool includeSecurityData);
 
     /// <summary>

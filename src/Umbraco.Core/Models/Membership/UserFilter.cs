@@ -38,13 +38,13 @@ public class UserFilter
     /// <param name="target">User filter to merge with.</param>
     /// <returns>A new filter containing the union of the two filters. </returns>
     public UserFilter Merge(UserFilter target) =>
-        new UserFilter
+        new()
         {
             IncludedUserGroups = MergeSet(IncludedUserGroups, target.IncludedUserGroups),
             ExcludeUserGroups = MergeSet(ExcludeUserGroups, target.ExcludeUserGroups),
             IncludeUserStates = MergeSet(IncludeUserStates, target.IncludeUserStates),
             NameFilters = MergeSet(NameFilters, target.NameFilters),
-            IncludeUserKinds = MergeSet(IncludeUserKinds, target.IncludeUserKinds)
+            IncludeUserKinds = MergeSet(IncludeUserKinds, target.IncludeUserKinds),
         };
 
     /// <summary>
