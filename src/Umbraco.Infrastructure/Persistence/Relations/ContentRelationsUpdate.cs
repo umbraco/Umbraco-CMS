@@ -226,7 +226,7 @@ internal sealed class ContentRelationsUpdate :
     private List<(int ChildId, int RelationTypeId)> ResolveValidRelations(
         ISet<UmbracoEntityReference> references,
         ISet<string> automaticRelationTypeAliases,
-        IReadOnlyDictionary<string, IRelationType> relationTypeLookup,
+        Dictionary<string, IRelationType> relationTypeLookup,
         IReadOnlyDictionary<Guid, int> keysLookup)
     {
         var relations = new List<(int ChildId, int RelationTypeId)>(references.Count);
