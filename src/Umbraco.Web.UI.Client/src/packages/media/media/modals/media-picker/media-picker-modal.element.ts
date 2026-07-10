@@ -19,22 +19,18 @@ import {
 	state,
 } from '@umbraco-cms/backoffice/external/lit';
 import { debounce, UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
+import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
+import { UmbFileDropzoneItemStatus } from '@umbraco-cms/backoffice/dropzone';
 import { UmbMediaTypeStructureRepository } from '@umbraco-cms/backoffice/media-type';
 import { UmbPickerModalBaseElement } from '@umbraco-cms/backoffice/picker';
+import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
 import { UMB_PROPERTY_TYPE_BASED_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/content';
 import { UMB_VARIANT_CONTEXT } from '@umbraco-cms/backoffice/variant';
-import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
-import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import type { PropertyValues } from '@umbraco-cms/backoffice/external/lit';
-import { UmbFileDropzoneItemStatus, type UmbDropzoneChangeEvent } from '@umbraco-cms/backoffice/dropzone';
+import type { UmbDropzoneChangeEvent } from '@umbraco-cms/backoffice/dropzone';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
 import type { UmbPickerContext } from '@umbraco-cms/backoffice/picker';
-import type {
-	UUIInputEvent,
-	UUIPaginationEvent,
-	UUIPopoverContainerElement,
-} from '@umbraco-cms/backoffice/external/uui';
 import type {
 	UmbTableColumn,
 	UmbTableConfig,
@@ -42,6 +38,11 @@ import type {
 	UmbTableItem,
 	UmbTableSelectedEvent,
 } from '@umbraco-cms/backoffice/components';
+import type {
+	UUIInputEvent,
+	UUIPaginationEvent,
+	UUIPopoverContainerElement,
+} from '@umbraco-cms/backoffice/external/uui';
 
 import './components/index.js';
 import '@umbraco-cms/backoffice/imaging';

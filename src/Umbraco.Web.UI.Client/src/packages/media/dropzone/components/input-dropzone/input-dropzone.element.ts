@@ -15,11 +15,11 @@ import {
 	state,
 	when,
 } from '@umbraco-cms/backoffice/external/lit';
-import type { UUIFileDropzoneElement, UUIFileDropzoneEvent } from '@umbraco-cms/backoffice/external/uui';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { formatBytes, UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import type { UUIFileDropzoneElement, UUIFileDropzoneEvent } from '@umbraco-cms/backoffice/external/uui';
 
 /**
  * A dropzone for uploading files and folders.
