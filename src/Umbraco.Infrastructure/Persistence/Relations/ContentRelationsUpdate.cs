@@ -227,7 +227,7 @@ internal sealed class ContentRelationsUpdate :
         ISet<UmbracoEntityReference> references,
         ISet<string> automaticRelationTypeAliases,
         Dictionary<string, IRelationType> relationTypeLookup,
-        IReadOnlyDictionary<Guid, int> keysLookup)
+        Dictionary<Guid, int> keysLookup)
     {
         var relations = new List<(int ChildId, int RelationTypeId)>(references.Count);
         foreach (UmbracoEntityReference reference in references)
