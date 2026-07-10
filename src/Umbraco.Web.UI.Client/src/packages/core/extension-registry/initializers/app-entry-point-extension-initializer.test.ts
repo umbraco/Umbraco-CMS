@@ -11,15 +11,34 @@ class UmbTestAppEntryPointHostElement extends UmbElementMixin(HTMLElement) {}
 
 const ALIAS = 'Umb.Test.AppEntryPoint';
 
-const waitLoaded = (initializer: UmbAppEntryPointExtensionInitializer) =>
-	new Promise<void>((resolve) => {
-		const sub = initializer.loaded.subscribe((value) => {
-			if (value === true) {
-				resolve();
-				queueMicrotask(() => sub.unsubscribe());
-			}
-		});
-	});
+const waitLoaded = async (
+	initializer: UmbAppEntryPointExtensionInitializer,
+	timeout = 100,
+) => {
+	let sub: { unsubscribe: () => void } | undefined;
+	const cleanup = () => sub?.unsubscribe();
+
+	try {
+		await Promise.race([
+			new Promise<void>((resolve) => {
+				sub = initializer.loaded.subscribe((value) => {
+					if (value === true) {
+						cleanup();
+						resolve();
+					}
+				});
+			}),
+			aTimeout(timeout).then(() => {
+				cleanup();
+				throw new Error(
+					`Timed out after ${timeout}ms waiting for UmbAppEntryPointExtensionInitializer.loaded to emit true.`,
+				);
+			}),
+		]);
+	} finally {
+		cleanup();
+	}
+};
 
 describe('UmbAppEntryPointExtensionInitializer', () => {
 	let host: UmbElement;
