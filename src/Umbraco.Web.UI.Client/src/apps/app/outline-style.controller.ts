@@ -11,13 +11,13 @@ export class UmbOutlineStyleController extends UmbControllerBase {
 		host.addEventListener('keydown', this.#onKeyDown as EventListener, { capture: true });
 	}
 
-	#onPointerDown = () => {
+	readonly #onPointerDown = () => {
 		if (!this.#hideFocusOutline) {
 			document.body.style.setProperty('--uui-show-focus-outline', '0');
 			this.#hideFocusOutline = true;
 		}
 	};
-	#onKeyDown = (e: KeyboardEvent) => {
+	readonly #onKeyDown = (e: KeyboardEvent) => {
 		// If tab or shift tab is pressed, we want to show the focus outline, but only if the last interaction was not a pointer event.
 		if (e.key !== 'Tab') return;
 
