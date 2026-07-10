@@ -97,12 +97,12 @@ describe('UmbControllerBase', () => {
 		it('triggers hostDisconnected on the controller when removed from a connected host', async () => {
 			const controller = new UmbTestControllerBase(host);
 
-			// Wait one microtask cycle — the host schedules `hostConnected` on the
-			// next tick when a controller is added to an already-attached host.
 			await Promise.resolve();
 			expect(controller.hostConnectedCalls).to.equal(1);
+			expect(controller.hostDisconnectedCalls).to.equal(0);
 
 			host.removeUmbController(controller);
+			expect(controller.hostConnectedCalls).to.equal(1);
 			expect(controller.hostDisconnectedCalls).to.equal(1);
 		});
 	});
