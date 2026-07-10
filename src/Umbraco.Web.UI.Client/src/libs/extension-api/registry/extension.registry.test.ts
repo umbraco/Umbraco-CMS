@@ -75,6 +75,29 @@ describe('UmbExtensionRegistry', () => {
 		expect(registeredExtensions?.[0]?.alias).to.eq('Umb.Test.Section.1');
 	});
 
+	it('should ignorer extension of same alias', () => {
+		const manifestWithSameAlias = {
+			alias: manifests[0].alias,
+			type: 'section',
+			name: 'test-section-1-duplicate',
+		};
+
+		// Suppress the expected console.error from the duplicate-registration check.
+		const originalError = console.error;
+		const errors: Array<unknown[]> = [];
+		console.error = (...args) => errors.push(args);
+		try {
+			extensionRegistry.register(manifestWithSameAlias);
+		} finally {
+			console.error = originalError;
+		}
+
+		// The first registration is preserved, the second is rejected.
+		const ext = extensionRegistry.getByAlias(manifests[0].alias) as { name: string };
+		expect(ext?.name).to.equal('test-section-1');
+		expect(errors.length).to.equal(1);
+	});
+
 	it('should say that an extension is registered', () => {
 		expect(extensionRegistry.isRegistered('Umb.Test.Section.1')).to.be.true;
 	});
