@@ -8,7 +8,6 @@ import { UmbDocumentPublishingRepository } from '../repository/index.js';
 import { UmbDocumentPublishedPendingChangesManager } from '../pending-changes/index.js';
 import { UMB_DOCUMENT_SCHEDULE_MODAL } from '../schedule-publish/constants.js';
 import { UMB_DOCUMENT_PUBLISH_WITH_DESCENDANTS_MODAL } from '../publish-with-descendants/constants.js';
-import { UMB_DOCUMENT_PUBLISH_MODAL } from '../publish/constants.js';
 import { UmbDocumentUnpublishManifestEntityActionMeta } from '../unpublish/entity-action/constants.js';
 import { UMB_DOCUMENT_ENTITY_TYPE, UMB_DOCUMENT_WORKSPACE_ALIAS } from '../../constants.js';
 import { UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT } from './document-publishing.workspace-context.token.js';
@@ -17,7 +16,7 @@ import { UmbDocumentVariantState } from '../../variant-state.js';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
-import { UmbContentUnpublishEntityAction } from '@umbraco-cms/backoffice/content';
+import { UMB_CONTENT_PUBLISH_MODAL, UmbContentUnpublishEntityAction } from '@umbraco-cms/backoffice/content';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import {
@@ -365,11 +364,13 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 			variantIds.push(UmbVariantId.Create(options[0]));
 		} else {
 			// If there are multiple variants, we will open the modal to let the user pick which variants to publish.
-			const result = await umbOpenModal(this, UMB_DOCUMENT_PUBLISH_MODAL, {
+			const result = await umbOpenModal(this, UMB_CONTENT_PUBLISH_MODAL, {
 				data: {
 					headline: this.#localize.term('content_saveAndPublishModalTitle'),
 					options,
-					pickableFilter: this.#publishableVariantsFilter,
+					// The shared modal's pickableFilter is typed against the generic UmbEntityVariantOptionModel, but
+					// #determineVariantOptions() (which supplies `options` above) only ever returns document variants here.
+					pickableFilter: (option) => this.#publishableVariantsFilter(option as UmbDocumentVariantOptionModel),
 				},
 				value: { selection: selected },
 			}).catch(() => undefined);
