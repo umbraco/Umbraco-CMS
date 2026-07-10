@@ -1,11 +1,7 @@
 import { UmbMediaDropzoneManager } from './media-dropzone.manager.js';
-import {
-	UmbInputDropzoneElement,
-	UmbFileDropzoneItemStatus,
-	UmbDropzoneSubmittedEvent,
-	type UmbUploadableItem,
-} from '@umbraco-cms/backoffice/dropzone';
 import { css, customElement, property } from '@umbraco-cms/backoffice/external/lit';
+import { UmbInputDropzoneElement, UmbFileDropzoneItemStatus } from '@umbraco-cms/backoffice/dropzone';
+import type { UmbUploadableItem } from '@umbraco-cms/backoffice/dropzone';
 import type { UUIFileDropzoneEvent } from '@umbraco-cms/backoffice/external/uui';
 
 /**
@@ -107,12 +103,8 @@ export class UmbDropzoneMediaElement extends UmbInputDropzoneElement {
 		document.removeEventListener('drop', this.#handleDrop);
 	}
 
-	override async onUpload(event: UUIFileDropzoneEvent) {
-		if (this.disabled) return;
-		if (!event.detail.files.length && !event.detail.folders.length) return;
-
-		const uploadable = this._manager.createMediaItems(event.detail, this.parentUnique);
-		this.dispatchEvent(new UmbDropzoneSubmittedEvent(uploadable));
+	protected override async _handleUpload(event: UUIFileDropzoneEvent) {
+		return this._manager.createMediaItems(event.detail, this.parentUnique);
 	}
 
 	static override styles = [
