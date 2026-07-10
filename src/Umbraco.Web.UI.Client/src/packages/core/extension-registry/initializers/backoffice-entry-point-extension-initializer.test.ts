@@ -10,16 +10,30 @@ import { UmbExtensionRegistry } from '@umbraco-cms/backoffice/extension-api';
 class UmbTestBackofficeEntryPointHostElement extends UmbElementMixin(HTMLElement) {}
 
 const ALIAS = 'Umb.Test.BackofficeEntryPoint';
+const WAIT_LOADED_TIMEOUT_MS = 100;
 
-const waitLoaded = (initializer: UmbBackofficeEntryPointExtensionInitializer) =>
-	new Promise<void>((resolve) => {
-		const sub = initializer.loaded.subscribe((value) => {
-			if (value === true) {
-				resolve();
-				queueMicrotask(() => sub.unsubscribe());
-			}
-		});
-	});
+const waitLoaded = async (initializer: UmbBackofficeEntryPointExtensionInitializer) => {
+	let sub: { unsubscribe: () => void } | undefined;
+
+	try {
+		await Promise.race([
+			new Promise<void>((resolve) => {
+				sub = initializer.loaded.subscribe((value) => {
+					if (value === true) {
+						resolve();
+					}
+				});
+			}),
+			aTimeout(WAIT_LOADED_TIMEOUT_MS).then(() => {
+				throw new Error(
+					`Timed out waiting for UmbBackofficeEntryPointExtensionInitializer.loaded to emit true after ${WAIT_LOADED_TIMEOUT_MS}ms.`,
+				);
+			}),
+		]);
+	} finally {
+		sub?.unsubscribe();
+	}
+};
 
 describe('UmbBackofficeEntryPointExtensionInitializer', () => {
 	let host: UmbElement;
