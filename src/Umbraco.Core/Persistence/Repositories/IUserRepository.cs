@@ -115,6 +115,12 @@ public interface IUserRepository : IReadWriteQueryRepository<Guid, IUser>
         UserKind[]? userKinds,
         IQuery<IUser>? filter = null)
     {
+        if (userKinds is { Length: > 0 })
+        {
+            throw new System.NotSupportedException(
+                $"{nameof(IUserRepository)} implementers must override {nameof(GetPagedResultsByQuery)} to support filtering by {nameof(userKinds)}.");
+        }
+
 #pragma warning disable CS0618 // Type or member is obsolete
         IEnumerable<IUser> result = GetPagedResultsByQuery(
             query,
