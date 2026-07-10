@@ -256,6 +256,13 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 		this.dispatchEvent(new UmbDropzoneSubmittedEvent(await uploadables));
 	}
 
+	/**
+	 * Handles the upload of files and folders dropped onto the dropzone.
+	 * Override this method to customize the upload behavior.
+	 * By default, it uses the dropzone manager to create temporary files for the dropped items.
+	 * @param {UUIFileDropzoneEvent} e - The event from the file dropzone.
+	 * @returns {Promise<Array<UmbUploadableItem>>} - A promise that resolves to an array of uploadable items.
+	 */
 	protected async _handleUpload(e: UUIFileDropzoneEvent): Promise<Array<UmbUploadableItem>> {
 		return await this._manager.createTemporaryFiles(e.detail.files);
 	}
