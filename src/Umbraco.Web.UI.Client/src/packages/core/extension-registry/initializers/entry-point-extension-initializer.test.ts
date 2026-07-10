@@ -11,15 +11,28 @@ class UmbTestEntryPointHostElement extends UmbElementMixin(HTMLElement) {}
 
 const ALIAS = 'Umb.Test.EntryPoint';
 
-const waitLoaded = (initializer: UmbEntryPointExtensionInitializer) =>
-	new Promise<void>((resolve) => {
-		const sub = initializer.loaded.subscribe((value) => {
-			if (value === true) {
-				resolve();
-				queueMicrotask(() => sub.unsubscribe());
-			}
-		});
-	});
+const waitLoaded = async (initializer: UmbEntryPointExtensionInitializer, timeout = 1000) => {
+	let sub: { unsubscribe: () => void } | undefined;
+
+	try {
+		await Promise.race([
+			new Promise<void>((resolve) => {
+				sub = initializer.loaded.subscribe((value) => {
+					if (value === true) {
+						resolve();
+					}
+				});
+			}),
+			aTimeout(timeout).then(() => {
+				throw new Error(
+					`Timed out after ${timeout}ms waiting for UmbEntryPointExtensionInitializer.loaded to emit true.`,
+				);
+			}),
+		]);
+	} finally {
+		sub?.unsubscribe();
+	}
+};
 
 // The (deprecated) entry-point initializer logs an error on every instantiation.
 // Suppress it for the duration of each test so the noise doesn't pollute output,
