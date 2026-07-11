@@ -35,13 +35,11 @@ public class HybridCacheColdMediaNavigationBenchmarks
         }
     }
 
+    // Fixed tree shape (≈ 5,051 nodes); not a [Params] since there is only one value to sweep.
+    private const int BranchCount = 50;
+    private const int LeafCount = 100;
+
     private SyntheticPublishedMediaTreeFixture _fixture = null!;
-
-    [Params(50)]
-    public int BranchCount { get; set; }
-
-    [Params(100)]
-    public int LeafCount { get; set; }
 
     [Params(0, 1)]
     public int RepoLatencyMs { get; set; }

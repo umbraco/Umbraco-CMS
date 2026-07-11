@@ -128,6 +128,7 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
         return await GetNodeAsync(key);
     }
 
+    /// <inheritdoc />
     public async Task<IReadOnlyList<IPublishedContent>> GetByKeysAsync(IReadOnlyCollection<Guid> keys)
     {
         // Capture the generation once before any backing-store read so a concurrent refresh landing
@@ -140,8 +141,8 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
 
         foreach (Guid key in keys)
         {
-            // L0 (converted) fast path.
-            if (_publishedContentCache.TryGet(key, out IPublishedContent? cached) && cached is not null)
+            // L0 (converted) fast path (via the shared TryGetCached).
+            if (TryGetCached(key, out IPublishedContent? cached) && cached is not null)
             {
                 resultsByKey[key] = cached;
                 continue;

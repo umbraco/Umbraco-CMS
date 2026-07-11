@@ -25,7 +25,7 @@ internal sealed class MediaHybridCacheMockTests : UmbracoIntegrationTest
 {
     private Mock<IDatabaseCacheRepository> _mockDatabaseCacheRepository;
     private IMediaCacheService _mediaCacheService;
-    private IMedia _mediaItem;
+    private Media _mediaItem;
 
     protected override void CustomTestSetup(IUmbracoBuilder builder) => builder.AddUmbracoHybridCache();
 

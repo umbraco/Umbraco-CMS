@@ -390,7 +390,7 @@ public class PublishedContentStatusFilteringServiceTests
     // - even IDs are published, odd are not (relevant only for non-preview)
     // When warm, TryGetCached serves every key from L0; otherwise every key misses L0 and is routed
     // through the batched GetByKeysAsync, whose requested keys are recorded in the returned list.
-    private (
+    private static (
         PublishedContentStatusFilteringService Service,
         Dictionary<Guid, IPublishedContent> Items,
         Mock<IPublishStatusQueryService> StatusMock,
@@ -635,7 +635,7 @@ public class PublishedContentStatusFilteringServiceTests
 
     // Routes every key through the batched GetByKeysAsync (L0 always misses), returning the matching
     // items in order. This isolates the filtering service from the cache-tier logic under test elsewhere.
-    private IDocumentCacheService SetupDocumentCacheService(Dictionary<Guid, IPublishedContent> items)
+    private static IDocumentCacheService SetupDocumentCacheService(Dictionary<Guid, IPublishedContent> items)
     {
         var serviceMock = new Mock<IDocumentCacheService>();
         serviceMock

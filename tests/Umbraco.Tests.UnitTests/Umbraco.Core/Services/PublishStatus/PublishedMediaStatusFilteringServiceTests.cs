@@ -72,7 +72,7 @@ public class PublishedMediaStatusFilteringServiceTests
 
     // When warm, TryGetCached serves every key from L0; otherwise every key misses L0 and is routed
     // through the batched GetByKeysAsync, whose requested keys are recorded in the returned list.
-    private (
+    private static (
         PublishedMediaStatusFilteringService Service,
         Dictionary<Guid, IPublishedContent> Items,
         List<Guid> BatchedKeys,

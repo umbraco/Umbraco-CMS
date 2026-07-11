@@ -40,6 +40,15 @@ internal static class ChunkedPublishedContentEnumerator
 {
     private const int MaxChunkSize = 256;
 
+    /// <summary>
+    /// Lazily materialises <paramref name="keys"/> into <see cref="IPublishedContent"/> in growing chunks,
+    /// serving in-memory (L0) hits synchronously and batching the database read for the rest.
+    /// </summary>
+    /// <param name="keys">The keys to materialise, in the order they should be yielded.</param>
+    /// <param name="tryGetCached">The synchronous L0 probe.</param>
+    /// <param name="materialiseMisses">The batched materialiser for keys that missed L0.</param>
+    /// <param name="predicate">An optional post-materialisation filter (e.g. a culture check); <c>null</c> to include all.</param>
+    /// <returns>The resolved items, in input order, with missing and filtered-out items omitted.</returns>
     public static IEnumerable<IPublishedContent> Enumerate(
         IEnumerable<Guid> keys,
         TryGetCachedDelegate tryGetCached,
@@ -51,60 +60,11 @@ internal static class ChunkedPublishedContentEnumerator
 
         using IEnumerator<Guid> enumerator = keys.GetEnumerator();
 
-        while (true)
+        while (FillChunk(enumerator, chunkSize, buffer))
         {
-            buffer.Clear();
-            while (buffer.Count < chunkSize && enumerator.MoveNext())
+            foreach (IPublishedContent item in ResolveChunk(buffer, tryGetCached, materialiseMisses))
             {
-                buffer.Add(enumerator.Current);
-            }
-
-            if (buffer.Count == 0)
-            {
-                yield break;
-            }
-
-            // Synchronous L0 pass: hits fill their slot directly; misses are collected for a single
-            // batched materialisation. An all-hit chunk skips the async/batched path entirely.
-            var slots = new IPublishedContent?[buffer.Count];
-            List<Guid>? misses = null;
-            for (var i = 0; i < buffer.Count; i++)
-            {
-                if (tryGetCached(buffer[i], out IPublishedContent? cached) && cached is not null)
-                {
-                    slots[i] = cached;
-                }
-                else
-                {
-                    (misses ??= []).Add(buffer[i]);
-                }
-            }
-
-            if (misses is not null)
-            {
-                IReadOnlyList<IPublishedContent> fetched = materialiseMisses(misses);
-                if (fetched.Count > 0)
-                {
-                    var byKey = new Dictionary<Guid, IPublishedContent>(fetched.Count);
-                    foreach (IPublishedContent item in fetched)
-                    {
-                        byKey[item.Key] = item;
-                    }
-
-                    for (var i = 0; i < buffer.Count; i++)
-                    {
-                        if (slots[i] is null && byKey.TryGetValue(buffer[i], out IPublishedContent? item))
-                        {
-                            slots[i] = item;
-                        }
-                    }
-                }
-            }
-
-            for (var i = 0; i < buffer.Count; i++)
-            {
-                IPublishedContent? item = slots[i];
-                if (item is not null && (predicate is null || predicate(item)))
+                if (predicate is null || predicate(item))
                 {
                     yield return item;
                 }
@@ -117,6 +77,79 @@ internal static class ChunkedPublishedContentEnumerator
             }
 
             chunkSize = Math.Min(chunkSize * 2, MaxChunkSize);
+        }
+    }
+
+    // Refills the reusable buffer with up to chunkSize keys; returns false once the source is exhausted.
+    private static bool FillChunk(IEnumerator<Guid> enumerator, int chunkSize, List<Guid> buffer)
+    {
+        buffer.Clear();
+        while (buffer.Count < chunkSize && enumerator.MoveNext())
+        {
+            buffer.Add(enumerator.Current);
+        }
+
+        return buffer.Count > 0;
+    }
+
+    // Resolves one chunk to its items in buffer order: L0 hits served directly, the rest materialised in
+    // a single batched call. An all-hit chunk never invokes the batched materialiser.
+    private static List<IPublishedContent> ResolveChunk(
+        List<Guid> chunk,
+        TryGetCachedDelegate tryGetCached,
+        MaterialiseMissesDelegate materialiseMisses)
+    {
+        var slots = new IPublishedContent?[chunk.Count];
+        List<Guid>? misses = null;
+        for (var i = 0; i < chunk.Count; i++)
+        {
+            if (tryGetCached(chunk[i], out IPublishedContent? cached) && cached is not null)
+            {
+                slots[i] = cached;
+            }
+            else
+            {
+                (misses ??= []).Add(chunk[i]);
+            }
+        }
+
+        if (misses is not null)
+        {
+            PlaceMisses(chunk, slots, materialiseMisses(misses));
+        }
+
+        var resolved = new List<IPublishedContent>(chunk.Count);
+        foreach (IPublishedContent? item in slots)
+        {
+            if (item is not null)
+            {
+                resolved.Add(item);
+            }
+        }
+
+        return resolved;
+    }
+
+    // Slots the batch-materialised items back into their input positions, keyed by content key.
+    private static void PlaceMisses(List<Guid> chunk, IPublishedContent?[] slots, IReadOnlyList<IPublishedContent> fetched)
+    {
+        if (fetched.Count == 0)
+        {
+            return;
+        }
+
+        var byKey = new Dictionary<Guid, IPublishedContent>(fetched.Count);
+        foreach (IPublishedContent item in fetched)
+        {
+            byKey[item.Key] = item;
+        }
+
+        for (var i = 0; i < chunk.Count; i++)
+        {
+            if (slots[i] is null && byKey.TryGetValue(chunk[i], out IPublishedContent? item))
+            {
+                slots[i] = item;
+            }
         }
     }
 }

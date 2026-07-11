@@ -132,6 +132,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
         return await GetNodeAsync(key, calculatedPreview);
     }
 
+    /// <inheritdoc />
     public async Task<IReadOnlyList<IPublishedContent>> GetByKeysAsync(IReadOnlyCollection<Guid> keys, bool? preview = null)
     {
         bool calculatedPreview = preview ?? GetPreview();
@@ -148,10 +149,8 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
         {
             var cacheKey = GetCacheKey(key, calculatedPreview);
 
-            // L0 (converted) fast path — published only, mirroring GetNodeAsync.
-            if (calculatedPreview is false
-                && _publishedContentCache.TryGet(cacheKey, out IPublishedContent? cached)
-                && cached is not null)
+            // L0 (converted) fast path — published only, mirroring GetNodeAsync (via the shared TryGetCached).
+            if (TryGetCached(key, calculatedPreview, out IPublishedContent? cached) && cached is not null)
             {
                 resultsByKey[key] = cached;
                 continue;
