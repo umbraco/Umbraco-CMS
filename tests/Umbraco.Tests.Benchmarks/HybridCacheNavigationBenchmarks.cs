@@ -44,18 +44,13 @@ public class HybridCacheNavigationBenchmarks
 
     private SyntheticPublishedTreeFixture _fixture = null!;
 
-    /// <summary>
-    /// Approximate total node count: <c>1 + BranchCount + (BranchCount * LeafCount)</c>.
-    /// The single 50 × 100 = 5,051-node configuration is the case closest to the reported workload;
-    /// it's enough to see the impact of the targeted improvements without paying for the full matrix
-    /// each iterate-and-compare cycle. Add more <c>[Params]</c> values when producing the final
-    /// PR-description numbers if scaling behaviour matters.
-    /// </summary>
-    [Params(50)]
-    public int BranchCount { get; set; }
-
-    [Params(100)]
-    public int LeafCount { get; set; }
+    // Approximate total node count: 1 + BranchCount + (BranchCount * LeafCount).
+    // The single 50 × 100 ≈ 5,051-node configuration is the case closest to the reported workload;
+    // it's enough to see the impact of the targeted improvements without paying for the full matrix
+    // each iterate-and-compare cycle. Kept as constants rather than single-value [Params]; to sweep
+    // scaling behaviour for final PR-description numbers, promote these to [Params] with 2+ values.
+    private const int BranchCount = 50;
+    private const int LeafCount = 100;
 
     [GlobalSetup]
     public void Setup()
