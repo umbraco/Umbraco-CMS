@@ -30,6 +30,11 @@ namespace Umbraco.Tests.Benchmarks.Fixtures;
 internal sealed class SyntheticPublishedTreeFixture
 {
     private readonly List<Guid> _allKeys = new();
+    private readonly Dictionary<Guid, ContentCacheNode> _nodesByKey = new();
+    private Microsoft.Extensions.Caching.Hybrid.HybridCache _hybridCache = null!;
+    private DocumentCacheService _cacheService = null!;
+    private int _singleFetchCount;
+    private int _batchFetchCount;
 
     public IDocumentNavigationQueryService NavigationQueryService { get; private set; } = null!;
 
@@ -45,7 +50,13 @@ internal sealed class SyntheticPublishedTreeFixture
 
     public Guid RootKey { get; private set; }
 
-    public async Task InitialiseAsync(int branchCount, int leafCount, int propertyCount = 10)
+    /// <summary>Number of single-item repository fetches issued since the last <see cref="ResetColdAsync"/>.</summary>
+    public int SingleFetchCount => _singleFetchCount;
+
+    /// <summary>Number of batched repository fetches issued since the last <see cref="ResetColdAsync"/>.</summary>
+    public int BatchFetchCount => _batchFetchCount;
+
+    public async Task InitialiseAsync(int branchCount, int leafCount, int propertyCount = 10, bool seed = true, int repoLatencyMs = 0)
     {
         IPublishedModelFactory publishedModelFactory = new NoopPublishedModelFactory();
         IVariationContextAccessor variationContextAccessor = new ThreadCultureVariationContextAccessor();
@@ -104,10 +115,37 @@ internal sealed class SyntheticPublishedTreeFixture
         publishStatusMock.Setup(x => x.HasPublishedAncestorPath(It.IsAny<Guid>(), It.IsAny<string>())).Returns(true);
         publishStatusMock.Setup(x => x.HasPublishedAncestorPath(It.IsAny<Guid>())).Returns(true);
 
-        // Repository: never called because we pre-seed the cache, but provide a safe stub.
+        // Repository: when seeded, never called (everything is pre-seeded into HybridCache below).
+        // When NOT seeded, it serves nodes from the in-memory map, counting round trips and applying
+        // an optional per-call latency so the benchmark can model database round-trip cost — the single
+        // vs batched read count is what distinguishes the cold per-key path from the batched one.
         var repoMock = new Mock<IDatabaseCacheRepository>();
         repoMock.Setup(r => r.GetContentSourceAsync(It.IsAny<Guid>(), It.IsAny<bool>()))
-            .ReturnsAsync((ContentCacheNode?)null);
+            .Returns(async (Guid key, bool _) =>
+            {
+                Interlocked.Increment(ref _singleFetchCount);
+                if (repoLatencyMs > 0)
+                {
+                    await Task.Delay(repoLatencyMs);
+                }
+
+                return _nodesByKey.GetValueOrDefault(key);
+            });
+        repoMock.Setup(r => r.GetContentSourcesAsync(It.IsAny<IEnumerable<Guid>>(), It.IsAny<bool>()))
+            .Returns(async (IEnumerable<Guid> keys, bool _) =>
+            {
+                Interlocked.Increment(ref _batchFetchCount);
+                if (repoLatencyMs > 0)
+                {
+                    await Task.Delay(repoLatencyMs);
+                }
+
+                return (IEnumerable<ContentCacheNode>)keys
+                    .Select(k => _nodesByKey.GetValueOrDefault(k))
+                    .Where(n => n is not null)
+                    .Select(n => n!)
+                    .ToArray();
+            });
 
         var previewMock = new Mock<IPreviewService>();
         previewMock.Setup(x => x.IsInPreview()).Returns(false);
@@ -143,11 +181,23 @@ internal sealed class SyntheticPublishedTreeFixture
             NullLogger<DocumentCacheService>.Instance,
             new ConvertedPublishedContentCacheFactory(null, NullLogger<ConvertedPublishedContentCacheFactory>.Instance));
 
-        // Seed every node directly so reads stay in-memory and never reach the repository stub.
+        _hybridCache = hybridCache;
+        _cacheService = cacheService;
+
+        // Build every node up front so the repository stub can serve them in the cold (unseeded) mode.
         foreach (Guid key in _allKeys)
         {
-            ContentCacheNode node = BuildContentCacheNode(key, contentType.Id, propertyCount);
-            await hybridCache.SetAsync(key.ToString(), node);
+            _nodesByKey[key] = BuildContentCacheNode(key, contentType.Id, propertyCount);
+        }
+
+        // When seeding, prime HybridCache (L1) directly so reads stay in-memory and never reach the
+        // repository. When cold, leave L1 empty so reads fall through to the (batched) repository.
+        if (seed)
+        {
+            foreach (Guid key in _allKeys)
+            {
+                await hybridCache.SetAsync(key.ToString(), _nodesByKey[key]);
+            }
         }
 
         var documentCache = new DocumentCache(
@@ -164,9 +214,26 @@ internal sealed class SyntheticPublishedTreeFixture
             variationContextAccessor,
             publishStatusMock.Object,
             previewMock.Object,
-            documentCache);
+            documentCache,
+            cacheService);
 
         Root = (await cacheService.GetByKeyAsync(RootKey, false))!;
+    }
+
+    /// <summary>
+    /// Evicts the tree from the converted (L0) and HybridCache (L1) tiers and resets the fetch counters,
+    /// so the next traversal is measured cold. Intended for a benchmark <c>[IterationSetup]</c>.
+    /// </summary>
+    public async Task ResetColdAsync()
+    {
+        _cacheService.ClearConvertedContentCache();
+        foreach (Guid key in _allKeys)
+        {
+            await _hybridCache.RemoveAsync(key.ToString());
+        }
+
+        Interlocked.Exchange(ref _singleFetchCount, 0);
+        Interlocked.Exchange(ref _batchFetchCount, 0);
     }
 
     private static IPublishedContentType BuildTestContentType(
