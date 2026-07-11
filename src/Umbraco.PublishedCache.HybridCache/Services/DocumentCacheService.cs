@@ -132,6 +132,113 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
         return await GetNodeAsync(key, calculatedPreview);
     }
 
+    public async Task<IReadOnlyList<IPublishedContent>> GetByKeysAsync(IReadOnlyCollection<Guid> keys, bool? preview = null)
+    {
+        bool calculatedPreview = preview ?? GetPreview();
+
+        // Capture the generation once before any backing-store read so a concurrent publish/refresh
+        // landing mid-fetch makes us skip the write-back rather than clobber fresher entries — the
+        // same stale-set guard GetNodeAsync applies per key, here applied once for the whole set.
+        var generation = Interlocked.Read(ref _cacheGeneration);
+
+        var resultsByKey = new Dictionary<Guid, IPublishedContent>(keys.Count);
+        var coldKeys = new List<Guid>();
+
+        foreach (Guid key in keys)
+        {
+            var cacheKey = GetCacheKey(key, calculatedPreview);
+
+            // L0 (converted) fast path — published only, mirroring GetNodeAsync.
+            if (calculatedPreview is false
+                && _publishedContentCache.TryGet(cacheKey, out IPublishedContent? cached)
+                && cached is not null)
+            {
+                resultsByKey[key] = cached;
+                continue;
+            }
+
+            // L1/L2 probe without a database hit (same primitive GetNodeAsync uses); a genuine miss
+            // is deferred to the single batched database read below.
+            (bool exists, ContentCacheNode? node) = await _hybridCache.TryGetValueAsync<ContentCacheNode?>(cacheKey, CancellationToken.None);
+            if (exists is false)
+            {
+                coldKeys.Add(key);
+                continue;
+            }
+
+            await AddMaterialisedAsync(key, node, calculatedPreview, generation, fromDatabase: false, resultsByKey);
+        }
+
+        if (coldKeys.Count > 0)
+        {
+            IReadOnlyCollection<ContentCacheNode> coldNodes;
+            using (ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true))
+            {
+                coldNodes = (await _databaseCacheRepository.GetContentSourcesAsync(coldKeys, calculatedPreview)).ToArray();
+            }
+
+            foreach (ContentCacheNode node in coldNodes)
+            {
+                await AddMaterialisedAsync(node.Key, node, calculatedPreview, generation, fromDatabase: true, resultsByKey);
+            }
+        }
+
+        // Return in input order; keys that resolved to nothing (missing/unpublished) are omitted.
+        var ordered = new List<IPublishedContent>(resultsByKey.Count);
+        foreach (Guid key in keys)
+        {
+            if (resultsByKey.TryGetValue(key, out IPublishedContent? content))
+            {
+                ordered.Add(content);
+            }
+        }
+
+        return ordered;
+    }
+
+    // Converts a resolved cache node to IPublishedContent and, when our snapshot is still current,
+    // populates L0 (and, for freshly database-read nodes, L1). A database-read node additionally has
+    // the published-ancestor guard applied, mirroring GetNodeAsync's read-through result.
+    private async Task AddMaterialisedAsync(
+        Guid key,
+        ContentCacheNode? node,
+        bool preview,
+        long generation,
+        bool fromDatabase,
+        Dictionary<Guid, IPublishedContent> resultsByKey)
+    {
+        if (node is null)
+        {
+            return;
+        }
+
+        if (fromDatabase && preview is false && _publishStatusQueryService.HasPublishedAncestorPath(node.Key) is false)
+        {
+            return;
+        }
+
+        IPublishedContent? content = _publishedContentFactory.ToIPublishedContent(node, preview).CreateModel(_publishedModelFactory);
+        if (content is null)
+        {
+            return;
+        }
+
+        resultsByKey[key] = content;
+
+        if (preview is false && IsCacheGenerationCurrent(generation))
+        {
+            var cacheKey = GetCacheKey(key, preview);
+
+            // Only a node read from the database still needs writing to L1; an L1/L2 hit is already there.
+            if (fromDatabase)
+            {
+                await _hybridCache.SetAsync(cacheKey, node, GetEntryOptions(key, preview), GenerateTags(node));
+            }
+
+            _publishedContentCache.Set(cacheKey, content, ContentCacheNodeSizeEstimator.EstimateBytes(node));
+        }
+    }
+
     public bool TryGetCached(Guid key, bool preview, out IPublishedContent? content)
     {
         // Mirror the L0 (published content cache) fast path in GetNodeAsync.

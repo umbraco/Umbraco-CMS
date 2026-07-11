@@ -29,6 +29,34 @@ public interface IDocumentCacheService
     Task<IPublishedContent?> GetByIdAsync(int id, bool? preview = null);
 
     /// <summary>
+    /// Gets multiple published content items by their unique keys, fetching any not already cached
+    /// from the database in a single batched query rather than one at a time.
+    /// </summary>
+    /// <param name="keys">The unique keys of the content to retrieve.</param>
+    /// <param name="preview">Optional value indicating whether to include unpublished content. If <c>null</c>, uses the default preview setting.</param>
+    /// <returns>The published content items that exist, in the same order as <paramref name="keys"/> (missing items omitted).</returns>
+    /// <remarks>
+    /// Used to materialise sets of keys (e.g. children/descendants) without the per-item database
+    /// round trip and scope of repeated <see cref="GetByKeyAsync"/> calls when the cache is cold.
+    /// The default implementation falls back to per-key retrieval so existing implementations keep working.
+    /// </remarks>
+    // TODO (V19): Remove the default implementation.
+    async Task<IReadOnlyList<IPublishedContent>> GetByKeysAsync(IReadOnlyCollection<Guid> keys, bool? preview = null)
+    {
+        var result = new List<IPublishedContent>(keys.Count);
+        foreach (Guid key in keys)
+        {
+            IPublishedContent? content = await GetByKeyAsync(key, preview);
+            if (content is not null)
+            {
+                result.Add(content);
+            }
+        }
+
+        return result;
+    }
+
+    /// <summary>
     /// Attempts to retrieve a content item from the in-memory converted-content cache without
     /// touching the distributed cache or the database.
     /// </summary>
