@@ -201,7 +201,7 @@ internal sealed class SyntheticPublishedMediaTreeFixture
         Interlocked.Exchange(ref _batchFetchCount, 0);
     }
 
-    private static IPublishedContentType BuildTestMediaType(
+    private static PublishedContentType BuildTestMediaType(
         PropertyValueConverterCollection converters,
         IPublishedModelFactory modelFactory,
         int propertyCount)

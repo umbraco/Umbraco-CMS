@@ -8,6 +8,11 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Services.PublishStatus;
 [TestFixture]
 public class ChunkedPublishedContentEnumeratorTests
 {
+    // Held as static readonly fields (rather than inline array literals) so the assertion calls do not
+    // allocate a fresh array each time.
+    private static readonly int[] EvenIds = [0, 2, 4, 6, 8];
+    private static readonly int[] FirstFiveIds = [0, 1, 2, 3, 4];
+
     [Test]
     public void Enumerate_AllCached_ReturnsAllInOrder_WithoutMaterialising()
     {
@@ -103,7 +108,7 @@ public class ChunkedPublishedContentEnumeratorTests
             .Enumerate(keys, WarmFrom(items), materialise, x => x.Id % 2 == 0)
             .ToArray();
 
-        CollectionAssert.AreEqual(new[] { 0, 2, 4, 6, 8 }, result.Select(x => x.Id));
+        CollectionAssert.AreEqual(EvenIds, result.Select(x => x.Id));
     }
 
     [Test]
@@ -136,7 +141,7 @@ public class ChunkedPublishedContentEnumeratorTests
             .Enumerate(keys, AllMiss(), materialise, predicate: null)
             .ToArray();
 
-        CollectionAssert.AreEqual(new[] { 0, 1, 2, 3, 4 }, result.Select(x => x.Id));
+        CollectionAssert.AreEqual(FirstFiveIds, result.Select(x => x.Id));
     }
 
     [Test]

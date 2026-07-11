@@ -50,10 +50,10 @@ internal sealed class SyntheticPublishedTreeFixture
 
     public Guid RootKey { get; private set; }
 
-    /// <summary>Number of single-item repository fetches issued since the last <see cref="ResetColdAsync"/>.</summary>
+    /// <summary>Gets the number of single-item repository fetches issued since the last <see cref="ResetColdAsync"/>.</summary>
     public int SingleFetchCount => _singleFetchCount;
 
-    /// <summary>Number of batched repository fetches issued since the last <see cref="ResetColdAsync"/>.</summary>
+    /// <summary>Gets the number of batched repository fetches issued since the last <see cref="ResetColdAsync"/>.</summary>
     public int BatchFetchCount => _batchFetchCount;
 
     public async Task InitialiseAsync(int branchCount, int leafCount, int propertyCount = 10, bool seed = true, int repoLatencyMs = 0)
@@ -236,7 +236,7 @@ internal sealed class SyntheticPublishedTreeFixture
         Interlocked.Exchange(ref _batchFetchCount, 0);
     }
 
-    private static IPublishedContentType BuildTestContentType(
+    private static PublishedContentType BuildTestContentType(
         PropertyValueConverterCollection converters,
         IPublishedModelFactory modelFactory,
         int propertyCount)
