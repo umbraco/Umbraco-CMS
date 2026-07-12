@@ -181,6 +181,31 @@ public class ApiRichTextMarkupParserTests
     }
 
     [Test]
+    public void Can_Parse_Inline_LocalImages_With_Cache_Buster()
+    {
+        var key1 = Guid.Parse("395bdc0e8f4d4ad4af7f3a3f6265651e");
+        var data1 = new MockData()
+            .WithKey(key1)
+            .WithMediaUrl("https://localhost:44331/media/bdofwokn/77gtp8fbrxmgkefatp10aw.webp?rand=1234");
+
+        var mockData = new Dictionary<Guid, MockData>
+        {
+            { key1, data1 },
+        };
+        var parser = BuildDefaultSut(mockData);
+
+        var markup =
+            @"<p>An image</p>\n<p><img src=""?rmode=max&amp;width=500&amp;height=500"" alt="""" width=""500"" height=""500"" data-udi=""umb://media/395bdc0e8f4d4ad4af7f3a3f6265651e""></p>";
+
+        var expectedOutput =
+            @"<p>An image</p>\n<p><img src=""https://localhost:44331/media/bdofwokn/77gtp8fbrxmgkefatp10aw.webp?rand=1234&rmode=max&amp;width=500&amp;height=500"" alt="""" width=""500"" height=""500""></p>";
+
+        var parsedHtml = parser.Parse(markup);
+
+        Assert.AreEqual(expectedOutput, parsedHtml);
+    }
+
+    [Test]
     public void LocalImages_Are_ReSigned_Via_TokenGenerator()
     {
         // Verifies the token generator is given the rebuilt src (provider URL + persisted query string)

@@ -264,4 +264,46 @@ public class HtmlImageSourceParserTests
             @"<img src=""/media/1001/image.jpg?width=100"" data-udi=""umb://media/81BB2036034F418BB61FC7160D68DCD4""/>",
             result);
     }
+
+    [Test]
+    public void Ensure_ImageSources_Processing_With_Cache_Buster()
+    {
+        var sourceHtml = """<div><img data-udi="umb://media/81BB2036034F418BB61FC7160D68DCD4" src="?width=100&height=500" /></div>""";
+        var fakeMediaUrl = "/media/1001/image.jpg?rand=1234";
+
+        var parser = new HtmlImageSourceParser(guid => fakeMediaUrl, NoopSigner());
+        var actual = parser.EnsureImageSources(sourceHtml);
+
+        Assert.AreEqual(
+            """<div><img data-udi="umb://media/81BB2036034F418BB61FC7160D68DCD4" src="/media/1001/image.jpg?rand=1234&width=100&height=500" /></div>""",
+            actual);
+    }
+
+    [Test]
+    public void Ensure_ImageSources_With_Cache_Buster_And_No_Query_String()
+    {
+        var sourceHtml = """<div><img data-udi="umb://media/81BB2036034F418BB61FC7160D68DCD4" src="" /></div>""";
+        var fakeMediaUrl = "/media/1001/image.jpg?rand=1234";
+
+        var parser = new HtmlImageSourceParser(guid => fakeMediaUrl, NoopSigner());
+        var actual = parser.EnsureImageSources(sourceHtml);
+
+        Assert.AreEqual(
+            """<div><img data-udi="umb://media/81BB2036034F418BB61FC7160D68DCD4" src="/media/1001/image.jpg?rand=1234" /></div>""",
+            actual);
+    }
+
+    [Test]
+    public void Ensure_ImageSources_With_No_Query_String_Does_Not_Append_Trailing_Query()
+    {
+        var sourceHtml = """<div><img data-udi="umb://media/81BB2036034F418BB61FC7160D68DCD4" src="" /></div>""";
+        var fakeMediaUrl = "/media/1001/image.jpg";
+
+        var parser = new HtmlImageSourceParser(guid => fakeMediaUrl, NoopSigner());
+        var actual = parser.EnsureImageSources(sourceHtml);
+
+        Assert.AreEqual(
+            """<div><img data-udi="umb://media/81BB2036034F418BB61FC7160D68DCD4" src="/media/1001/image.jpg" /></div>""",
+            actual);
+    }
 }
