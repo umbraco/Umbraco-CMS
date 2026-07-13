@@ -136,7 +136,11 @@ public sealed partial class HtmlImageSourceParser
 
             // Re-sign the URL so a rotated HMAC secret key doesn't break previously-authored images.
             // No-op when HMAC isn't configured.
-            var refreshedSrc = _imageUrlTokenGenerator.RefreshSignature($"{mediaUrl}{src.Groups[2].Value}");
+            var queryString = src.Groups[2].Value;
+            var composedUrl = queryString.IsNullOrWhiteSpace()
+                ? mediaUrl
+                : mediaUrl.AppendQueryStringToUrl(queryString);
+            var refreshedSrc = _imageUrlTokenGenerator.RefreshSignature(composedUrl);
 
             return match.Value.Replace(src.Value, $"src=\"{refreshedSrc}\"");
         });
