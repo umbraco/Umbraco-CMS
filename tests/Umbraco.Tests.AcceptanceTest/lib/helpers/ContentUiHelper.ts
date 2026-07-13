@@ -232,7 +232,7 @@ export class ContentUiHelper extends UiBaseLocators {
     this.enterTagTxt = page.getByPlaceholder('Enter tag');
     this.menuItemTree = page.locator('umb-menu-item-tree-default');
     this.confirmToUnpublishBtn = page.locator('umb-content-unpublish-modal').getByLabel('Unpublish');
-    this.confirmToPublishBtn = page.locator('umb-document-publish-modal').getByLabel('Publish');
+    this.confirmToPublishBtn = page.locator('umb-content-publish-modal').getByLabel('Publish');
     this.dropdown = page.locator("select#native");
     this.splitView = page.locator("#splitViews");
     this.setADateTxt = page.getByLabel("Set a date…");
@@ -527,7 +527,7 @@ export class ContentUiHelper extends UiBaseLocators {
       '[label="Select all"]',
     );
     this.confirmToPublishBtn = page
-      .locator("umb-document-publish-modal")
+      .locator("umb-content-publish-modal")
       .getByLabel("Publish");
     // Publish with descendants
     this.documentPublishWithDescendantsModal = page.locator(
