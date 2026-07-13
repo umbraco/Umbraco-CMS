@@ -4,6 +4,13 @@ export type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export type ObserverCallback<T> = (value: T) => void;
 
+/**
+ * TypeScript helper to infer type of the value of an Observable. Including potentially becoming 'undefined' if the Observable type is possibly 'undefined'.
+ */
+export type UmbObserverValueType<ObservableType> =
+	| (ObservableType extends Observable<infer U> ? U : never)
+	| (undefined extends ObservableType ? undefined : never);
+
 export class UmbObserver<T> {
 	#source!: Observable<T>;
 	#callback?: ObserverCallback<T>;
