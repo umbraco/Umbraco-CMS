@@ -21,6 +21,7 @@ describe('UmbDelayCondition', () => {
 
 	it('starts not permitted', () => {
 		const condition = new UmbDelayCondition(host, {
+			host,
 			config: baseConfig('30'),
 			onChange: () => {},
 		});
@@ -33,6 +34,7 @@ describe('UmbDelayCondition', () => {
 		const transitions: Array<boolean> = [];
 
 		const condition = new UmbDelayCondition(host, {
+			host,
 			config: baseConfig(String(offsetMs)),
 			onChange: (permitted) => transitions.push(permitted),
 		});
@@ -53,6 +55,7 @@ describe('UmbDelayCondition', () => {
 	it('does not fire onChange after destroy() when destroyed before the timer elapses', async () => {
 		let callCount = 0;
 		const condition = new UmbDelayCondition(host, {
+			host,
 			config: baseConfig('30'),
 			onChange: () => callCount++,
 		});
@@ -65,15 +68,15 @@ describe('UmbDelayCondition', () => {
 
 	it('throws when offset is not a positive number', () => {
 		expect(
-			() => new UmbDelayCondition(host, { config: baseConfig('0'), onChange: () => {} }),
+			() => new UmbDelayCondition(host, { host, config: baseConfig('0'), onChange: () => {} }),
 		).to.throw(/Offset must be a positive number/);
 
 		expect(
-			() => new UmbDelayCondition(host, { config: baseConfig('-5'), onChange: () => {} }),
+			() => new UmbDelayCondition(host, { host, config: baseConfig('-5'), onChange: () => {} }),
 		).to.throw(/Offset must be a positive number/);
 
 		expect(
-			() => new UmbDelayCondition(host, { config: baseConfig('not-a-number'), onChange: () => {} }),
+			() => new UmbDelayCondition(host, { host, config: baseConfig('not-a-number'), onChange: () => {} }),
 		).to.throw(/Offset must be a positive number/);
 	});
 });
