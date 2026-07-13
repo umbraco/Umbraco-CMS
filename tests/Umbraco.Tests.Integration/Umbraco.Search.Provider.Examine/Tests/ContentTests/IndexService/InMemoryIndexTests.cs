@@ -1,4 +1,4 @@
-﻿using Examine;
+using Examine;
 using Examine.Lucene;
 using Examine.Lucene.Providers;
 using Microsoft.Extensions.DependencyInjection;

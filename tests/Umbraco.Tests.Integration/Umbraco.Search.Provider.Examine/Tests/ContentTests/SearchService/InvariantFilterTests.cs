@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Search.Core.Models.Searching;
@@ -32,7 +32,7 @@ public class InvariantFilterTests : SearcherTestBase
         };
 
         SearchResult results = await Searcher.SearchAsync(
-            indexAlias:indexAlias,
+            indexAlias: indexAlias,
             filters: new List<Filter> { new KeywordFilter("Umb_PathIds", [key], negate), new KeywordFilter("Umb_Id", [key], true) });
 
         Assert.That(results.Total, Is.EqualTo(expectedCount));
@@ -61,7 +61,7 @@ public class InvariantFilterTests : SearcherTestBase
         };
 
         SearchResult results = await Searcher.SearchAsync(
-            indexAlias:indexAlias,
+            indexAlias: indexAlias,
             filters: new List<Filter> { new KeywordFilter("Umb_ParentId", [key], negate) });
 
         Assert.Multiple(() =>
@@ -80,7 +80,7 @@ public class InvariantFilterTests : SearcherTestBase
 
         SearchResult results = await Searcher.SearchAsync(
             indexAlias: indexAlias,
-            filters:new List<Filter> { new TextFilter("title", ["Test"], negate) });
+            filters: new List<Filter> { new TextFilter("title", ["Test"], negate) });
 
         Assert.That(results.Total, Is.EqualTo(expectedCount));
     }
@@ -95,7 +95,7 @@ public class InvariantFilterTests : SearcherTestBase
 
         SearchResult results = await Searcher.SearchAsync(
             indexAlias: indexAlias,
-            filters:new List<Filter> { new IntegerRangeFilter("count", [new IntegerRangeFilterRange(null, null)], negate) });
+            filters: new List<Filter> { new IntegerRangeFilter("count", [new IntegerRangeFilterRange(null, null)], negate) });
 
         Assert.That(results.Total, Is.EqualTo(expectedCount));
     }
@@ -215,7 +215,7 @@ public class InvariantFilterTests : SearcherTestBase
 
         SearchResult results = await Searcher.SearchAsync(
             indexAlias: indexAlias,
-            filters: new List<Filter> { new DateTimeOffsetExactFilter("datetime", [ new DateTime(2025, 06, 06)], negate) });
+            filters: new List<Filter> { new DateTimeOffsetExactFilter("datetime", [new DateTime(2025, 06, 06)], negate) });
 
         Assert.That(results.Total, Is.EqualTo(expectedCount));
     }
@@ -342,7 +342,7 @@ public class InvariantFilterTests : SearcherTestBase
                 {
                     title = "Test",
                     count = 12,
-                    datetime =  new DateTime(2025, 06, 06),
+                    datetime = new DateTime(2025, 06, 06),
                     decimalproperty = DecimalValue
                 })
             .Build();
@@ -362,7 +362,7 @@ public class InvariantFilterTests : SearcherTestBase
                     {
                         title = "Test",
                         count = 12,
-                        datetime =  new DateTime(2025, 06, 06),
+                        datetime = new DateTime(2025, 06, 06),
                         decimalproperty = DecimalValue
                     })
                 .Build();

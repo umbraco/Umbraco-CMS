@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Search.Core.Models.Searching;
@@ -69,8 +69,8 @@ public class VariantDocumentTests : SearcherTestBase
 
     [TestCase(true, "en-US", "segment-1", "bodySegment1")]
     [TestCase(false, "en-US", "segment-2", "bodySegment2")]
-    [TestCase(true, "da-DK","segment-1", "kropSegment1")]
-    [TestCase(false, "da-DK","segment-2", "kropSegment2")]
+    [TestCase(true, "da-DK", "segment-1", "kropSegment1")]
+    [TestCase(false, "da-DK", "segment-2", "kropSegment2")]
     [TestCase(true, "ja-JP", "segment-1", "ボディSegment1")]
     [TestCase(false, "ja-JP", "segment-2", "ボディSegment2")]
     public async Task CanSearchVariantTextBySegment(bool publish, string culture, string segment, string expectedValue)

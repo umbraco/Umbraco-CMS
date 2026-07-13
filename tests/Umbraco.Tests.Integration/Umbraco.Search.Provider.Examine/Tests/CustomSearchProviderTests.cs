@@ -16,8 +16,8 @@ using Umbraco.Cms.Search.Provider.Examine.DependencyInjection;
 using Umbraco.Cms.Search.Provider.Examine.Helpers;
 using Umbraco.Cms.Search.Provider.Examine.Services;
 using Umbraco.Cms.Tests.Integration.Umbraco.Search.Provider.Examine.Tests.ContentTests.IndexService;
-using SearchResult = Umbraco.Cms.Search.Core.Models.Searching.SearchResult;
 using ISearcher = Umbraco.Cms.Search.Core.Services.ISearcher;
+using SearchResult = Umbraco.Cms.Search.Core.Models.Searching.SearchResult;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Provider.Examine.Tests;
 

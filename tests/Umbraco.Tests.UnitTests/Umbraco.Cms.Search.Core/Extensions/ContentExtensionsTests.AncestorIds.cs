@@ -20,6 +20,6 @@ public partial class ContentExtensionsTests
         contentMock.SetupGet(m => m.Path).Returns(contentPath);
 
         IEnumerable<int> result = contentMock.Object.AncestorIds();
-        Assert.That(result.SequenceEqual(expectedAncestorIds ?? []) , Is.True);
+        Assert.That(result.SequenceEqual(expectedAncestorIds ?? []), Is.True);
     }
 }

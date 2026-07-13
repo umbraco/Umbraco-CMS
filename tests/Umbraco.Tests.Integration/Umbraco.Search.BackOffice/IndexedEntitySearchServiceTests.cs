@@ -1,5 +1,5 @@
-﻿using Umbraco.Cms.Core.Models;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.BackOffice;

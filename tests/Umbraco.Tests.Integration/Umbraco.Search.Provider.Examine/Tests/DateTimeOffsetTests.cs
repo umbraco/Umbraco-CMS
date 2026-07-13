@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Search.Core.Models.Searching;
 using Umbraco.Cms.Search.Core.Models.Searching.Faceting;
@@ -178,7 +178,7 @@ public class DateTimeOffsetTests : SearcherTestBase
             .Range(1, filtered ? 3 : 100)
             .SelectMany(i => new[] { i }.Select(i2 => StartDate().AddDays(i2)))
             .GroupBy(i => i)
-            .Select(group => new { Key = group.Key, Count = group.Count() })
+            .Select(group => new { group.Key, Count = group.Count() })
             .ToArray();
 
         // expecting
@@ -279,7 +279,7 @@ public class DateTimeOffsetTests : SearcherTestBase
                         .WhereNotNull()
                         .Distinct())
                 .GroupBy(key => key)
-                .Select(group => new { Key = group.Key, Count = group.Count() })
+                .Select(group => new { group.Key, Count = group.Count() })
                 .WhereNotNull()
                 .ToArray();
 

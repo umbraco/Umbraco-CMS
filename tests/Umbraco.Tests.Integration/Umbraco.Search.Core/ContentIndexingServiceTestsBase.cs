@@ -1,5 +1,5 @@
-﻿using Umbraco.Cms.Core.HostedServices;
 using NUnit.Framework;
+using Umbraco.Cms.Core.HostedServices;
 using Umbraco.Cms.Core.ServerEvents;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Search.Core.DependencyInjection;

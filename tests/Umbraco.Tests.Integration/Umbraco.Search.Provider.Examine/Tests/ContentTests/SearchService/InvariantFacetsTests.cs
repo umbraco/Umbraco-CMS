@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
@@ -27,7 +27,7 @@ public class InvariantFacetsTests : SearcherTestBase
         await CreateCountDocuments([1, 2, 101]);
 
         var indexAlias = GetIndexAlias(publish);
-        SearchResult result = await Searcher.SearchAsync(indexAlias, null, null, new List<Facet>(){ new IntegerRangeFacet("count", new []{ new IntegerRangeFacetRange("Below 100", 0, 100)})}, null, null, null, null, 0, 100);
+        SearchResult result = await Searcher.SearchAsync(indexAlias, null, null, new List<Facet>() { new IntegerRangeFacet("count", new[] { new IntegerRangeFacetRange("Below 100", 0, 100) }) }, null, null, null, null, 0, 100);
         Assert.Multiple(() =>
         {
             Assert.That(result.Facets, Is.Not.Empty);
@@ -42,9 +42,9 @@ public class InvariantFacetsTests : SearcherTestBase
         await CreateCountDocuments([1, 1, 2]);
 
         var indexAlias = GetIndexAlias(publish);
-        IEnumerable<FacetResult> facets = (await Searcher.SearchAsync(indexAlias, null, null, new List<Facet>(){ new IntegerExactFacet("count")}, null, null, null, null, 0, 100)).Facets;
-        var firstFacetValues = (IntegerExactFacetValue) facets.First().Values.First();
-        var secondFacetValues = (IntegerExactFacetValue) facets.First().Values.Last();
+        IEnumerable<FacetResult> facets = (await Searcher.SearchAsync(indexAlias, null, null, new List<Facet>() { new IntegerExactFacet("count") }, null, null, null, null, 0, 100)).Facets;
+        var firstFacetValues = (IntegerExactFacetValue)facets.First().Values.First();
+        var secondFacetValues = (IntegerExactFacetValue)facets.First().Values.Last();
         Assert.Multiple(() =>
         {
             Assert.That(facets, Is.Not.Empty);
@@ -157,8 +157,8 @@ public class InvariantFacetsTests : SearcherTestBase
 
         var indexAlias = GetIndexAlias(publish);
         IEnumerable<FacetResult> facets = (await Searcher.SearchAsync(indexAlias, null, null, new List<Facet> { new DecimalExactFacet("decimalproperty") }, null, null, null, null, 0, 100)).Facets;
-        var firstFacetValues = (DecimalExactFacetValue) facets.First().Values.First();
-        var secondFacetValues = (DecimalExactFacetValue) facets.First().Values.Last();
+        var firstFacetValues = (DecimalExactFacetValue)facets.First().Values.First();
+        var secondFacetValues = (DecimalExactFacetValue)facets.First().Values.Last();
         Assert.Multiple(() =>
         {
             Assert.That(facets, Is.Not.Empty);
@@ -177,8 +177,8 @@ public class InvariantFacetsTests : SearcherTestBase
 
         var indexAlias = GetIndexAlias(publish);
         IEnumerable<FacetResult> facets = (await Searcher.SearchAsync(indexAlias, null, null, new List<Facet> { new KeywordFacet("dropDown") }, null, null, null, null, 0, 100)).Facets;
-        var firstFacetValues = (KeywordFacetValue) facets.First().Values.First();
-        var secondFacetValues = (KeywordFacetValue) facets.First().Values.Last();
+        var firstFacetValues = (KeywordFacetValue)facets.First().Values.First();
+        var secondFacetValues = (KeywordFacetValue)facets.First().Values.Last();
         Assert.Multiple(() =>
         {
             Assert.That(facets, Is.Not.Empty);
@@ -196,7 +196,7 @@ public class InvariantFacetsTests : SearcherTestBase
         await CreateDatetimeDocuments([new DateTime(2025, 06, 06), new DateTime(2025, 02, 01), new DateTime(2024, 01, 01)]);
 
         var indexAlias = GetIndexAlias(publish);
-        SearchResult result = await Searcher.SearchAsync(indexAlias, null, null, new List<Facet>(){ new DateTimeOffsetRangeFacet("datetime", [new DateTimeOffsetRangeFacetRange("Below 100", new DateTime(2025, 01, 01), null)])}, null, null, null, null, 0, 100);
+        SearchResult result = await Searcher.SearchAsync(indexAlias, null, null, new List<Facet>() { new DateTimeOffsetRangeFacet("datetime", [new DateTimeOffsetRangeFacetRange("Below 100", new DateTime(2025, 01, 01), null)]) }, null, null, null, null, 0, 100);
         Assert.Multiple(() =>
         {
             Assert.That(result.Facets, Is.Not.Empty);
@@ -214,9 +214,9 @@ public class InvariantFacetsTests : SearcherTestBase
         await CreateDatetimeDocuments([firstDateTime, secondDateTime, thirdDateTime]);
 
         var indexAlias = GetIndexAlias(publish);
-        SearchResult result = await Searcher.SearchAsync(indexAlias, null, null, new List<Facet>(){ new DateTimeOffsetExactFacet("datetime")}, null, null, null, null, 0, 100);
-        var firstFacetValues = (DateTimeOffsetExactFacetValue) result.Facets.First().Values.First();
-        var secondFacetValues = (DateTimeOffsetExactFacetValue) result.Facets.First().Values.Last();
+        SearchResult result = await Searcher.SearchAsync(indexAlias, null, null, new List<Facet>() { new DateTimeOffsetExactFacet("datetime") }, null, null, null, null, 0, 100);
+        var firstFacetValues = (DateTimeOffsetExactFacetValue)result.Facets.First().Values.First();
+        var secondFacetValues = (DateTimeOffsetExactFacetValue)result.Facets.First().Values.Last();
         Assert.Multiple(() =>
         {
             Assert.That(result.Facets, Is.Not.Empty);
@@ -263,9 +263,9 @@ public class InvariantFacetsTests : SearcherTestBase
             {
                 Content document = new ContentBuilder()
                     .WithContentType(ContentType)
-                    .WithName($"document-{dateTimeOffset.ToString()}")
+                    .WithName($"document-{dateTimeOffset}")
                     .WithPropertyValues(
-                        new {datetime = dateTimeOffset})
+                        new { datetime = dateTimeOffset })
                     .Build();
 
                 SaveAndPublish(document);
@@ -376,7 +376,7 @@ public class InvariantFacetsTests : SearcherTestBase
                     .WithContentType(ContentType)
                     .WithName($"document-{stringValue}")
                     .WithPropertyValues(
-                        new {dropDown = $"[\"{stringValue}\"]"})
+                        new { dropDown = $"[\"{stringValue}\"]" })
                     .Build();
 
                 SaveAndPublish(document);

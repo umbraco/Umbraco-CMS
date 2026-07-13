@@ -1,4 +1,3 @@
-using Umbraco.Cms.Tests.Integration.Testing;
 using System.Diagnostics;
 using System.Reflection;
 using Examine;
@@ -24,10 +23,11 @@ using Umbraco.Cms.Search.Core.Services.ContentIndexing;
 using Umbraco.Cms.Search.Provider.Examine.Services;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
+using Umbraco.Cms.Tests.Integration.Testing;
+using Umbraco.Cms.Tests.Integration.Testing.Search;
 using Umbraco.Cms.Tests.Integration.Umbraco.Search.Provider.Examine.Attributes;
 using Umbraco.Cms.Tests.Integration.Umbraco.Search.Provider.Examine.Extensions;
 using Umbraco.Cms.Tests.Integration.Umbraco.Search.Provider.Examine.Tests.ContentTests.IndexService;
-using Umbraco.Cms.Tests.Integration.Testing.Search;
 using Constants = Umbraco.Cms.Search.Core.Constants;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Provider.Examine.Tests.ContentTests.PersistenceTests;

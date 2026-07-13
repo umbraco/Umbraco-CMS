@@ -1,4 +1,4 @@
-﻿using Examine.Lucene;
+using Examine.Lucene;
 using Examine.Lucene.Providers;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;

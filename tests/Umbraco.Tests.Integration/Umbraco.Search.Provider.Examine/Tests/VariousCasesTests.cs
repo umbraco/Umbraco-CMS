@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Search.Core.Models.Searching;
@@ -253,7 +253,7 @@ public class VariousCasesTests : SearcherTestBase
     {
         SearchResult result = await SearchAsync(
             filters: [new IntegerExactFilter(FieldMultipleValues, [1, 10, 25, 51, 100], false)],
-            facets: [new IntegerExactFacet(FieldSingleValue)] );
+            facets: [new IntegerExactFacet(FieldSingleValue)]);
 
         Assert.That(result.Total, Is.EqualTo(5));
 

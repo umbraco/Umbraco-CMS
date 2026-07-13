@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -168,7 +168,7 @@ public class BlockListPropertyValueHandlerTests : PropertyValueHandlerTestsBase
         TestIndexDocument document = IndexerAndSearcher.Dump(IndexAliases.PublishedContent).Single();
         IndexValue? tagsValue = document.Fields.FirstOrDefault(f => f.FieldName == Cms.Search.Core.Constants.FieldNames.Tags)?.Value;
         Assert.That(tagsValue, Is.Not.Null);
-        CollectionAssert.AreEquivalent(new [] { "One", "Two", "Three", "Four", "Five", "Six" }, tagsValue.Keywords);
+        CollectionAssert.AreEquivalent(new[] { "One", "Two", "Three", "Four", "Five", "Six" }, tagsValue.Keywords);
 
         return;
 
@@ -186,9 +186,9 @@ public class BlockListPropertyValueHandlerTests : PropertyValueHandlerTestsBase
             {
                 CollectionAssert.AreEqual(new[] { "The TextBox value", "The TextArea value", "First", "Second", "Third", "Link One" }, indexValue.Texts);
 
-                CollectionAssert.AreEqual(new [] { 1234, 1, 1, 1 }, indexValue.Integers);
+                CollectionAssert.AreEqual(new[] { 1234, 1, 1, 1 }, indexValue.Integers);
 
-                CollectionAssert.AreEqual(new [] { 56.78m, 1.23m, 2.34m, 5.67m }, indexValue.Decimals);
+                CollectionAssert.AreEqual(new[] { 56.78m, 1.23m, 2.34m, 5.67m }, indexValue.Decimals);
 
                 CollectionAssert.AreEqual(
                     new[]
@@ -198,7 +198,7 @@ public class BlockListPropertyValueHandlerTests : PropertyValueHandlerTestsBase
                     },
                     indexValue.DateTimeOffsets);
 
-                CollectionAssert.AreEqual(new [] { "One", "Two", "Three", "Four", "Five", "Six", "55bf7f6d-acd2-4f1e-92bd-f0b5c41dbfed" }, indexValue.Keywords);
+                CollectionAssert.AreEqual(new[] { "One", "Two", "Three", "Four", "Five", "Six", "55bf7f6d-acd2-4f1e-92bd-f0b5c41dbfed" }, indexValue.Keywords);
             });
         }
     }
@@ -339,7 +339,7 @@ public class BlockListPropertyValueHandlerTests : PropertyValueHandlerTestsBase
 
         IndexValue? tagsValue = document.Fields.FirstOrDefault(f => f.FieldName == Cms.Search.Core.Constants.FieldNames.Tags)?.Value;
         Assert.That(tagsValue, Is.Not.Null);
-        CollectionAssert.AreEquivalent(new [] { "One", "Two", "Three", "Four", "Five", "Six" }, tagsValue.Keywords);
+        CollectionAssert.AreEquivalent(new[] { "One", "Two", "Three", "Four", "Five", "Six" }, tagsValue.Keywords);
     }
 
     [Test]
@@ -607,10 +607,10 @@ public class BlockListPropertyValueHandlerTests : PropertyValueHandlerTestsBase
         IndexValue? blocksValue = documents[0].Fields.FirstOrDefault(f => f.FieldName is "blocks")?.Value;
         Assert.That(blocksValue, Is.Not.Null);
 
-        CollectionAssert.AreEqual(new [] { "H1 Heading #1", "H1 Heading #2"}, blocksValue.TextsR1);
-        CollectionAssert.AreEqual(new [] { "H2 Heading #1", "H2 Heading #2"}, blocksValue.TextsR2);
-        CollectionAssert.AreEqual(new [] { "H3 Heading #1", "H3 Heading #2"}, blocksValue.TextsR3);
-        CollectionAssert.AreEqual(new [] { "Paragraph #1", "Paragraph #2"}, blocksValue.Texts);
+        CollectionAssert.AreEqual(new[] { "H1 Heading #1", "H1 Heading #2" }, blocksValue.TextsR1);
+        CollectionAssert.AreEqual(new[] { "H2 Heading #1", "H2 Heading #2" }, blocksValue.TextsR2);
+        CollectionAssert.AreEqual(new[] { "H3 Heading #1", "H3 Heading #2" }, blocksValue.TextsR3);
+        CollectionAssert.AreEqual(new[] { "Paragraph #1", "Paragraph #2" }, blocksValue.Texts);
     }
 
     private async Task<IContentType> CreateAllSimpleEditorsElementType(bool forBlockLevelVariance = false)

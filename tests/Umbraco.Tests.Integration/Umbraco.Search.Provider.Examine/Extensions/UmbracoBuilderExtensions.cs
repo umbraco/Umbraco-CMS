@@ -1,4 +1,4 @@
-﻿using Examine.Lucene.Directories;
+using Examine.Lucene.Directories;
 using Examine.Lucene.Providers;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Notifications;

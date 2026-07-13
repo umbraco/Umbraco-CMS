@@ -105,7 +105,7 @@ public class VariantContentStructureTests : VariantContentTestBase
             Assert.That(root.Published, Is.True);
             Assert.That(
                 root.PublishedCultures.Select(c => c.ToLowerInvariant()),
-                Is.EquivalentTo(new [] { expectedCulture.ToLowerInvariant() }));
+                Is.EquivalentTo(new[] { expectedCulture.ToLowerInvariant() }));
         });
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
@@ -201,7 +201,7 @@ public class VariantContentStructureTests : VariantContentTestBase
             Assert.That(grandchild.Published, Is.True);
             Assert.That(
                 grandchild.PublishedCultures.Select(c => c.ToLowerInvariant()),
-                Is.EquivalentTo(new [] { expectedCulture.ToLowerInvariant() }));
+                Is.EquivalentTo(new[] { expectedCulture.ToLowerInvariant() }));
         });
 
         Assert.That(GreatGrandchild().Published, Is.True);

@@ -1,4 +1,4 @@
-﻿using Examine;
+using Examine;
 using Umbraco.Cms.Search.Core.Services;
 using Umbraco.Cms.Search.Provider.Examine.Services;
 

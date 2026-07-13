@@ -1,4 +1,4 @@
-﻿using Examine.Lucene.Directories;
+using Examine.Lucene.Directories;
 using Examine.Lucene.Providers;
 using Directory = Lucene.Net.Store.Directory;
 

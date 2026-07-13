@@ -60,11 +60,11 @@ public class MarkdownPropertyValueHandlerTests : ContentTestBase
 
         Assert.Multiple(() =>
         {
-            CollectionAssert.AreEqual(new [] { "H1 Heading #1" }, markdownValue.TextsR1);
-            CollectionAssert.AreEqual(new [] { "H2 Heading #1", "H2 Heading #2" }, markdownValue.TextsR2);
-            CollectionAssert.AreEqual(new [] { "H3 Heading #1", "H3 Heading #2", "H3 Heading #3" }, markdownValue.TextsR3);
+            CollectionAssert.AreEqual(new[] { "H1 Heading #1" }, markdownValue.TextsR1);
+            CollectionAssert.AreEqual(new[] { "H2 Heading #1", "H2 Heading #2" }, markdownValue.TextsR2);
+            CollectionAssert.AreEqual(new[] { "H3 Heading #1", "H3 Heading #2", "H3 Heading #3" }, markdownValue.TextsR3);
 
-            CollectionAssert.AreEqual(new [] { "Paragraph #1 Paragraph #2", "Paragraph #3 Paragraph #4", "Paragraph #5", "Paragraph #6" }, markdownValue.Texts);
+            CollectionAssert.AreEqual(new[] { "Paragraph #1 Paragraph #2", "Paragraph #3 Paragraph #4", "Paragraph #5", "Paragraph #6" }, markdownValue.Texts);
         });
     }
 
@@ -94,7 +94,7 @@ public class MarkdownPropertyValueHandlerTests : ContentTestBase
         TestIndexDocument document = documents.Single();
         IndexValue? markdownValue = document.Fields.FirstOrDefault(f => f.FieldName == "markdownValue")?.Value;
         Assert.That(markdownValue, Is.Not.Null);
-        CollectionAssert.AreEqual(new [] { "Some bold text", "A link to somewhere" }, markdownValue.Texts);
+        CollectionAssert.AreEqual(new[] { "Some bold text", "A link to somewhere" }, markdownValue.Texts);
     }
 
     [TestCase(null)]
@@ -144,7 +144,7 @@ public class MarkdownPropertyValueHandlerTests : ContentTestBase
         TestIndexDocument document = documents.Single();
         IndexValue? markdownValue = document.Fields.FirstOrDefault(f => f.FieldName == "markdownValue")?.Value;
         Assert.That(markdownValue, Is.Not.Null);
-        CollectionAssert.AreEqual(new [] { value.ToString() }, markdownValue.Texts);
+        CollectionAssert.AreEqual(new[] { value.ToString() }, markdownValue.Texts);
     }
 
     [SetUp]

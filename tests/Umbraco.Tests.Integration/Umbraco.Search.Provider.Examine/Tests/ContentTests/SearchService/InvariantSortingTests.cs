@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
@@ -48,7 +48,7 @@ public class InvariantSortingTests : SearcherTestBase
     [TestCase(false, Direction.Ascending)]
     public async Task CanSortDecimals(bool publish, Direction direction)
     {
-        double[] doubles = [5,12412d, 0,51251d, 1.15215d, 3.251d, 2.251512d, 125.5215d, 142.214124d];
+        double[] doubles = [5, 12412d, 0, 51251d, 1.15215d, 3.251d, 2.251512d, 125.5215d, 142.214124d];
         KeyValuePair<Guid, double>[] keys = (await CreateDecimalDocuments(doubles)).OrderBy(x => x.Value, direction).ToArray();
 
         var indexAlias = GetIndexAlias(publish);
@@ -267,7 +267,7 @@ public class InvariantSortingTests : SearcherTestBase
                     .WithContentType(ContentType)
                     .WithName($"document-{stringValue}")
                     .WithPropertyValues(
-                        new {dropDown = $"[\"{stringValue}\"]"})
+                        new { dropDown = $"[\"{stringValue}\"]" })
                     .Build();
 
                 SaveAndPublish(document);
@@ -306,11 +306,11 @@ public class InvariantSortingTests : SearcherTestBase
                     .WithContentType(ContentType)
                     .WithName($"document-{stringValue}")
                     .WithPropertyValues(
-                        new {title = stringValue})
+                        new { title = stringValue })
                     .Build();
 
                 ContentService.Save(document);
-                ContentService.Publish(document, new[] {"*"});
+                ContentService.Publish(document, new[] { "*" });
                 keys.Add(document.Key, stringValue);
             }
 
@@ -353,7 +353,7 @@ public class InvariantSortingTests : SearcherTestBase
                     .Build();
 
                 ContentService.Save(document);
-                ContentService.Publish(document, new []{ "*"});
+                ContentService.Publish(document, new[] { "*" });
                 keys.Add(document.Key, dateTimeOffset);
             }
 
@@ -406,7 +406,7 @@ public class InvariantSortingTests : SearcherTestBase
                     .Build();
 
                 ContentService.Save(document);
-                ContentService.Publish(document, new []{ "*"});
+                ContentService.Publish(document, new[] { "*" });
                 keys.Add(document.Key, doubleValue);
             }
 
@@ -436,7 +436,7 @@ public class InvariantSortingTests : SearcherTestBase
                     .Build();
 
                 ContentService.Save(document);
-                ContentService.Publish(document, new []{ "*"});
+                ContentService.Publish(document, new[] { "*" });
                 keys.Add(document.Key, countValue);
             }
 

@@ -1,4 +1,4 @@
-﻿using Examine;
+using Examine;
 using Examine.Search;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;

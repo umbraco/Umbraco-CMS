@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Provider.Examine.Attributes;
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Provider.Examine.Attributes;
 
 // the core ConfigureBuilderAttribute won't execute from other assemblies at the moment, so this is a workaround
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = true)]

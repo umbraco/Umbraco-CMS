@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.BackOffice;
 

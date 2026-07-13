@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using Umbraco.Cms.Tests.Integration.Testing;
+using System.Diagnostics;
 using System.Reflection;
 using Examine;
 using Examine.Lucene.Providers;
@@ -14,10 +13,11 @@ using Umbraco.Cms.Search.Core.DependencyInjection;
 using Umbraco.Cms.Search.Core.NotificationHandlers;
 using Umbraco.Cms.Search.Provider.Examine.Services;
 using Umbraco.Cms.Tests.Common.Testing;
+using Umbraco.Cms.Tests.Integration.Testing;
+using Umbraco.Cms.Tests.Integration.Testing.Search;
 using Umbraco.Cms.Tests.Integration.Umbraco.Search.Provider.Examine.Attributes;
 using Umbraco.Cms.Tests.Integration.Umbraco.Search.Provider.Examine.Extensions;
 using Umbraco.Cms.Tests.Integration.Umbraco.Search.Provider.Examine.Tests.ContentTests.IndexService;
-using Umbraco.Cms.Tests.Integration.Testing.Search;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Provider.Examine.Tests;
 

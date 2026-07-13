@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
@@ -24,7 +24,7 @@ public class InvariantContentProtectionTests : SearcherTestBase
     [TestCase(false)]
     public async Task CannotGetProtectedContent_Group(bool publish)
     {
-        await MemberGroupService.CreateAsync(new MemberGroup() {Name = "testGroup"});
+        await MemberGroupService.CreateAsync(new MemberGroup() { Name = "testGroup" });
 
         await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, async () =>
         {
@@ -171,7 +171,7 @@ public class InvariantContentProtectionTests : SearcherTestBase
     [Test]
     public async Task CanBypassProtection()
     {
-        await MemberGroupService.CreateAsync(new MemberGroup() {Name = "testGroup"});
+        await MemberGroupService.CreateAsync(new MemberGroup() { Name = "testGroup" });
 
         await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, async () =>
         {
@@ -208,7 +208,7 @@ public class InvariantContentProtectionTests : SearcherTestBase
             .WithContentType(contentType)
             .WithName("Root")
             .WithPropertyValues(
-                new {title = "root title",})
+                new { title = "root title", })
             .Build();
 
         await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, () =>

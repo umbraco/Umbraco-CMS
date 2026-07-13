@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Search.Provider.Examine.Configuration;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Provider.Examine;

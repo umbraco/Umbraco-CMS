@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Search.Core.Models.Searching;
 using Umbraco.Cms.Search.Core.Models.Searching.Faceting;
@@ -8,7 +8,7 @@ using Umbraco.Cms.Search.Core.Models.Searching.Sorting;
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Provider.Examine.Tests;
 
 // tests specifically related to the IndexValue.Keywords collection
-public  class KeywordTests : SearcherTestBase
+public class KeywordTests : SearcherTestBase
 {
     [Test]
     public async Task CanFilterSingleDocumentByKeyword()
@@ -112,7 +112,7 @@ public  class KeywordTests : SearcherTestBase
             .Range(1, filtered ? 3 : 100)
             .SelectMany(i => new[] { $"single{i}" })
             .GroupBy(i => i)
-            .Select(group => new { Key = group.Key, Count = group.Count() })
+            .Select(group => new { group.Key, Count = group.Count() })
             .ToArray();
 
         // expecting

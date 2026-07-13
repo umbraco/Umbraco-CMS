@@ -1,4 +1,4 @@
-﻿using Lucene.Net.Store;
+using Lucene.Net.Store;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Provider.Examine;
 

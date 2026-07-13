@@ -174,7 +174,7 @@ public class BlockGridPropertyValueHandlerTests : PropertyValueHandlerTestsBase
         TestIndexDocument document = IndexerAndSearcher.Dump(IndexAliases.PublishedContent).Single();
         IndexValue? tagsValue = document.Fields.FirstOrDefault(f => f.FieldName == Cms.Search.Core.Constants.FieldNames.Tags)?.Value;
         Assert.That(tagsValue, Is.Not.Null);
-        CollectionAssert.AreEquivalent(new [] { "One", "Two", "Three", "Four", "Five", "Six" }, tagsValue.Keywords);
+        CollectionAssert.AreEquivalent(new[] { "One", "Two", "Three", "Four", "Five", "Six" }, tagsValue.Keywords);
 
         return;
 
@@ -192,9 +192,9 @@ public class BlockGridPropertyValueHandlerTests : PropertyValueHandlerTestsBase
             {
                 CollectionAssert.AreEqual(new[] { "The TextBox value", "The TextArea value", "First", "Second", "Third", "Link One" }, indexValue.Texts);
 
-                CollectionAssert.AreEqual(new [] { 1234, 1, 1, 1 }, indexValue.Integers);
+                CollectionAssert.AreEqual(new[] { 1234, 1, 1, 1 }, indexValue.Integers);
 
-                CollectionAssert.AreEqual(new [] { 56.78m, 1.23m, 2.34m, 5.67m }, indexValue.Decimals);
+                CollectionAssert.AreEqual(new[] { 56.78m, 1.23m, 2.34m, 5.67m }, indexValue.Decimals);
 
                 CollectionAssert.AreEqual(
                     new[]
@@ -204,7 +204,7 @@ public class BlockGridPropertyValueHandlerTests : PropertyValueHandlerTestsBase
                     },
                     indexValue.DateTimeOffsets);
 
-                CollectionAssert.AreEqual(new [] { "One", "Two", "Three", "Four", "Five", "Six", "55bf7f6d-acd2-4f1e-92bd-f0b5c41dbfed" }, indexValue.Keywords);
+                CollectionAssert.AreEqual(new[] { "One", "Two", "Three", "Four", "Five", "Six", "55bf7f6d-acd2-4f1e-92bd-f0b5c41dbfed" }, indexValue.Keywords);
             });
         }
     }
@@ -322,7 +322,7 @@ public class BlockGridPropertyValueHandlerTests : PropertyValueHandlerTestsBase
 
         IndexValue? tagsValue = document.Fields.FirstOrDefault(f => f.FieldName == Cms.Search.Core.Constants.FieldNames.Tags)?.Value;
         Assert.That(tagsValue, Is.Not.Null);
-        CollectionAssert.AreEquivalent(new [] { "One", "Two", "Three", "Four", "Five", "Six" }, tagsValue.Keywords);
+        CollectionAssert.AreEquivalent(new[] { "One", "Two", "Three", "Four", "Five", "Six" }, tagsValue.Keywords);
     }
 
     private async Task<IContentType> CreateAllSimpleEditorsElementType(bool forBlockLevelVariance = false)

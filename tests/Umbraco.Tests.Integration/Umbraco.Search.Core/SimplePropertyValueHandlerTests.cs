@@ -1,5 +1,5 @@
-﻿using Umbraco.Cms.Core.Models;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Search.Core.PropertyValueHandlers;
@@ -38,7 +38,7 @@ public class SimplePropertyValueHandlerTests : PropertyValueHandlerTestsBase
                     booleanAsStringValue = "1",
                     sliderSingleValue = "123.45",
                     sliderRangeValue = "123.45,567.89",
-                    multiUrlPickerValue = jsonSerializer.Serialize(new []
+                    multiUrlPickerValue = jsonSerializer.Serialize(new[]
                     {
                         new MultiUrlPickerValueEditor.LinkDto
                         {
@@ -89,16 +89,16 @@ public class SimplePropertyValueHandlerTests : PropertyValueHandlerTestsBase
             Assert.That(dateAndTimeValue, Is.EqualTo(new DateTimeOffset(new DateOnly(2004, 05, 06), new TimeOnly(07, 08, 09), TimeSpan.Zero)));
 
             var tagsAsJsonValue = document.Fields.FirstOrDefault(f => f.FieldName == "tagsAsJsonValue")?.Value.Keywords?.ToArray();
-            CollectionAssert.AreEqual(tagsAsJsonValue, new [] {"One", "Two", "Three"});
+            CollectionAssert.AreEqual(tagsAsJsonValue, new[] { "One", "Two", "Three" });
 
             var tagsAsCsvValue = document.Fields.FirstOrDefault(f => f.FieldName == "tagsAsCsvValue")?.Value.Keywords?.ToArray();
-            CollectionAssert.AreEqual(tagsAsCsvValue, new [] {"Four", "Five", "Six"});
+            CollectionAssert.AreEqual(tagsAsCsvValue, new[] { "Four", "Five", "Six" });
 
             var allTagsValue = document.Fields.FirstOrDefault(f => f.FieldName == Cms.Search.Core.Constants.FieldNames.Tags)?.Value.Keywords?.ToArray();
-            CollectionAssert.AreEquivalent(allTagsValue, new [] {"One", "Two", "Three", "Four", "Five", "Six"});
+            CollectionAssert.AreEquivalent(allTagsValue, new[] { "One", "Two", "Three", "Four", "Five", "Six" });
 
             var multipleTextstringsValue = document.Fields.FirstOrDefault(f => f.FieldName == "multipleTextstringsValue")?.Value.Texts?.ToArray();
-            CollectionAssert.AreEqual(multipleTextstringsValue, new [] {"First", "Second", "Third"});
+            CollectionAssert.AreEqual(multipleTextstringsValue, new[] { "First", "Second", "Third" });
 
             var contentPickerValue = document.Fields.FirstOrDefault(f => f.FieldName == "contentPickerValue")?.Value.Keywords?.SingleOrDefault();
             CollectionAssert.AreEqual(contentPickerValue, "55bf7f6d-acd2-4f1e-92bd-f0b5c41dbfed");

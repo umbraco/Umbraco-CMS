@@ -1,5 +1,5 @@
-﻿using Umbraco.Cms.Core;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Search.BackOffice.DependencyInjection;
@@ -96,7 +96,7 @@ public abstract class BackOfficeTestBase : TestBase
                     .WithPropertyValues(
                         new
                         {
-                            title = $"child title single{j}child triple{j/3}child oddeven{j%2}child shared shared{i}"
+                            title = $"child title single{j}child triple{j / 3}child oddeven{j % 2}child shared shared{i}"
                         })
                     .Build();
                 ContentService.Save(child);
@@ -156,7 +156,7 @@ public abstract class BackOfficeTestBase : TestBase
                     .WithPropertyValues(
                         new
                         {
-                            title = $"child title single{j}child triple{j/3}child oddeven{j%2}child shared shared{i}"
+                            title = $"child title single{j}child triple{j / 3}child oddeven{j % 2}child shared shared{i}"
                         })
                     .WithParentId(folder.Id)
                     .Build();

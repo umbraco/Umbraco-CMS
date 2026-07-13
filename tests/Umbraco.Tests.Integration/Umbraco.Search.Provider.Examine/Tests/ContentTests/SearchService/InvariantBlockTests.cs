@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
@@ -121,7 +121,7 @@ public class InvariantBlockTests : SearcherTestBase
         Content content = new ContentBuilder()
             .WithContentType(blockListContentType)
             .WithName("My Blocks")
-            .WithPropertyValues(new {blocks = blocksPropertyValue})
+            .WithPropertyValues(new { blocks = blocksPropertyValue })
             .Build();
 
         var indexAlias = GetIndexAlias(false);

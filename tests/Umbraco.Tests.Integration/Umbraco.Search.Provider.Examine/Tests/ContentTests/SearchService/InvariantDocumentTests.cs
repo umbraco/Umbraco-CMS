@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Search.Core.Models.Searching;
@@ -165,7 +165,7 @@ public class InvariantDocumentTests : SearcherTestBase
         await WaitForIndexing(GetIndexAlias(true), () =>
         {
             ContentService.Save(root);
-            ContentService.Publish(root, new[] {"*"});
+            ContentService.Publish(root, new[] { "*" });
             return Task.CompletedTask;
         });
 

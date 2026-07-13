@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Umbraco.Cms.Core;
 using ISearcher = Umbraco.Cms.Search.Core.Services.ISearcher;
 

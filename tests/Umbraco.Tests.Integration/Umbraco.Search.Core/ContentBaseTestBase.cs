@@ -1,5 +1,5 @@
-﻿using Umbraco.Cms.Core.Models;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Search.Core;
 using Umbraco.Cms.Search.Core.Extensions;
 using Umbraco.Cms.Search.Core.Helpers;

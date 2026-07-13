@@ -1,5 +1,5 @@
-﻿using Umbraco.Cms.Core.Models;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Search.Core.Services.ContentIndexing;
 

@@ -1,4 +1,4 @@
-﻿using Examine;
+using Examine;
 using Examine.Search;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
@@ -141,8 +141,8 @@ public class VariantDocumentTests : IndexTestBase
 
     [TestCase(true, "en-US", "segment-1", "body-segment-1")]
     [TestCase(false, "en-US", "segment-2", "body-segment-2")]
-    [TestCase(true, "da-DK","segment-1", "krop-segment-1")]
-    [TestCase(false, "da-DK","segment-2", "krop-segment-2")]
+    [TestCase(true, "da-DK", "segment-1", "krop-segment-1")]
+    [TestCase(false, "da-DK", "segment-2", "krop-segment-2")]
     [TestCase(true, "ja-JP", "segment-1", "ボディ-segment-1")]
     [TestCase(false, "ja-JP", "segment-2", "ボディ-segment-2")]
     public async Task CanIndexVariantTextBySegment(bool publish, string culture, string segment, string expectedValue)

@@ -1,5 +1,5 @@
-﻿using Umbraco.Cms.Core;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
@@ -36,7 +36,7 @@ public class MultiNodeTreePickerPropertyValueHandlerTests : ContentTestBase
 
         TestIndexDocument document = documents.Single();
         IEnumerable<string>? explicitPickerValue = document.Fields.FirstOrDefault(f => f.FieldName == "explicitPickerValue")?.Value.Keywords;
-        Assert.That(explicitPickerValue, Is.EqualTo(new [] {"7c7ad126-bdbc-46c1-8cc1-c281bf575d97", "b9cc8a2e-9a02-4bbe-b0ca-38e197316517"}).AsCollection);
+        Assert.That(explicitPickerValue, Is.EqualTo(new[] { "7c7ad126-bdbc-46c1-8cc1-c281bf575d97", "b9cc8a2e-9a02-4bbe-b0ca-38e197316517" }).AsCollection);
     }
 
     [Test]
@@ -60,7 +60,7 @@ public class MultiNodeTreePickerPropertyValueHandlerTests : ContentTestBase
 
         TestIndexDocument document = documents.Single();
         IEnumerable<string>? implicitPickerValue = document.Fields.FirstOrDefault(f => f.FieldName == "implicitPickerValue")?.Value.Keywords;
-        Assert.That(implicitPickerValue, Is.EqualTo(new [] {"7c7ad126-bdbc-46c1-8cc1-c281bf575d97", "b9cc8a2e-9a02-4bbe-b0ca-38e197316517"}).AsCollection);
+        Assert.That(implicitPickerValue, Is.EqualTo(new[] { "7c7ad126-bdbc-46c1-8cc1-c281bf575d97", "b9cc8a2e-9a02-4bbe-b0ca-38e197316517" }).AsCollection);
     }
 
     [Test]
@@ -111,7 +111,7 @@ public class MultiNodeTreePickerPropertyValueHandlerTests : ContentTestBase
 
         TestIndexDocument document = documents.Single();
         IEnumerable<string>? explicitPickerValue = document.Fields.FirstOrDefault(f => f.FieldName == "explicitPickerValue")?.Value.Keywords;
-        Assert.That(explicitPickerValue, Is.EqualTo(new [] {"b9cc8a2e-9a02-4bbe-b0ca-38e197316517"}).AsCollection);
+        Assert.That(explicitPickerValue, Is.EqualTo(new[] { "b9cc8a2e-9a02-4bbe-b0ca-38e197316517" }).AsCollection);
     }
 
     [SetUp]

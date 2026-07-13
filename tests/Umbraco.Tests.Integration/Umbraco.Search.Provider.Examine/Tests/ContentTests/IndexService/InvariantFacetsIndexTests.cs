@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using Examine;
 using Examine.Lucene;
 using Examine.Search;
@@ -104,7 +104,7 @@ public class InvariantFacetsIndexTests : IndexTestBase
         var fieldName = FieldNameHelper.FieldName("otherName", Constants.FieldValues.Integers);
         ISearchResults results = index.Searcher.CreateQuery()
             .All()
-            .WithFacets(facets => facets.FacetLongRange(fieldName, new Int64Range("0-9", 0, true, 9, true),  new Int64Range("100-199", 100, true, 199, true)))
+            .WithFacets(facets => facets.FacetLongRange(fieldName, new Int64Range("0-9", 0, true, 9, true), new Int64Range("100-199", 100, true, 199, true)))
             .Execute();
 
         IFacetResult[] facets = results.GetFacets().ToArray();

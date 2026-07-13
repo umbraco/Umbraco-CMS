@@ -1,5 +1,5 @@
-﻿using Umbraco.Cms.Core.Models;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Tests.Integration.Testing.Search;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Core;
@@ -8,7 +8,7 @@ public partial class InvariantContentTests : InvariantContentTestBase
 {
     private void SetupDraftContent()
     {
-        foreach (Guid key in new [] { RootKey, ChildKey, GrandchildKey, GreatGrandchildKey })
+        foreach (Guid key in new[] { RootKey, ChildKey, GrandchildKey, GreatGrandchildKey })
         {
             IContent content = ContentService.GetById(key)
                                ?? throw new InvalidOperationException($"Could not find content for key: {key}");
