@@ -10,6 +10,9 @@ import {
 } from '@umbraco-cms/backoffice/repository';
 
 export class UmbUserDetailRepository extends UmbDetailRepositoryBase<UmbUserDetailModel, UmbUserDetailDataSource> {
+	// TODO: Consider promoting `requestByUniques` into `UmbDetailRepositoryBase` so every detail
+	// repository shares it; this class only re-consumes the store context because the base's
+	// `#init`/`#detailStore` are private.
 	#init: Promise<unknown>;
 	#detailStore?: UmbUserDetailStore;
 
