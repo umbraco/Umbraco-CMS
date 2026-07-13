@@ -4,7 +4,9 @@ import type { UmbTreeExpansionModel } from './expansion-manager/types.js';
 import type { UmbTreeItemActiveManager } from './active-manager/tree-active-manager.js';
 import type { UmbTreeRepository } from './data/tree-repository.interface.js';
 import type { UmbTreeRootItemsRequestArgs } from './data/types.js';
+import type { UmbTreeViewManager } from './view/tree-view.manager.js';
 import type { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
+import type { UmbInteractionMemoryManager } from '@umbraco-cms/backoffice/interaction-memory';
 import type { Observable } from '@umbraco-cms/backoffice/observable-api';
 import type {
 	UmbPaginationManager,
@@ -20,10 +22,15 @@ export interface UmbTreeContext<
 	manifest: ManifestTree | undefined;
 
 	readonly activeManager: UmbTreeItemActiveManager;
+	readonly interactionMemory?: UmbInteractionMemoryManager;
+	readonly view?: UmbTreeViewManager;
 
 	readonly treeRoot: Observable<TreeRootType | undefined>;
 	readonly hideTreeRoot: Observable<boolean | undefined>;
 	readonly expandTreeRoot: Observable<boolean | undefined>;
+	readonly hideTreeItemActions?: Observable<boolean>;
+	readonly isMenu?: Observable<boolean | undefined>;
+	readonly selectOnly?: Observable<boolean | undefined>;
 
 	selectableFilter?(item: TreeItemType): boolean;
 	filter?(item: TreeItemType): boolean;
@@ -32,25 +39,39 @@ export interface UmbTreeContext<
 	readonly expansion: UmbTreeExpansionManager;
 
 	readonly rootItems: Observable<TreeItemType[]>;
+	readonly currentPageItems?: Observable<TreeItemType[]>;
 	readonly hasChildren: Observable<boolean>;
 	readonly pagination: UmbPaginationManager;
 	readonly targetPagination: UmbTargetPaginationManager;
 	readonly startNode: Observable<UmbTreeStartNode | undefined>;
 	readonly foldersOnly: Observable<boolean>;
 	readonly additionalRequestArgs: Observable<Partial<RequestArgsType> | object>;
+	readonly isLoading?: Observable<boolean>;
 	readonly isLoadingPrevChildren: Observable<boolean>;
 	readonly isLoadingNextChildren: Observable<boolean>;
 
 	getRepository(): UmbTreeRepository | undefined;
 
+	open?(item: TreeItemType): void;
+
 	loadTree(): void;
 	reloadTree(): void;
+	loadPage?(pageNumber: number): void;
 	loadMore(): void;
 	loadPrevItems(): void;
 	loadNextItems(): void;
 
 	setHideTreeRoot(hideTreeRoot: boolean): void;
 	getHideTreeRoot(): boolean;
+
+	setHideTreeItemActions?(value: boolean): void;
+	getHideTreeItemActions?(): boolean;
+
+	setSelectOnly?(value: boolean | undefined): void;
+	getSelectOnly?(): boolean;
+
+	setIsMenu?(value: boolean): void;
+	getIsMenu?(): boolean;
 
 	setStartNode(startNode: UmbTreeStartNode | undefined): void;
 	getStartNode(): UmbTreeStartNode | undefined;

@@ -37,6 +37,12 @@ export const manifests: Array<UmbExtensionManifest> = [
 						propertyEditorUiAlias: 'Umb.PropertyEditorUi.Integer',
 						config: [{ alias: 'min', value: 0 }],
 					},
+					{
+						alias: 'placeholder',
+						label: '#general_placeholder',
+						description: 'Placeholder text shown inside the textarea when empty',
+						propertyEditorUiAlias: 'Umb.PropertyEditorUi.TextBox',
+					},
 				],
 				defaultData: [{ alias: 'rows', value: 10 }],
 			},

@@ -43,7 +43,7 @@ internal sealed class RichTextBlockPropertyValueCreator : BlockPropertyValueCrea
     /// <param name="referenceCacheLevel">The cache level to use for property references during model creation.</param>
     /// <param name="blockValue">The <see cref="RichTextBlockValue"/> representing the value to convert.</param>
     /// <param name="preview">True to create the model in preview mode; otherwise, false.</param>
-    /// <param name="blockConfigurations">An array of <see cref="RichTextBlockConfiguration"/> objects that define the configuration for each block type.</param>
+    /// <param name="blockConfigurations">An array of <see cref="RichTextConfiguration.RichTextBlockConfiguration"/> objects that define the configuration for each block type.</param>
     /// <returns>A <see cref="RichTextBlockModel"/> that represents the parsed and configured block content, or <see cref="RichTextBlockModel.Empty"/> if the value is invalid or empty.</returns>
     public async Task<RichTextBlockModel> CreateBlockModelAsync(IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, RichTextBlockValue blockValue, bool preview, RichTextConfiguration.RichTextBlockConfiguration[] blockConfigurations)
     {
