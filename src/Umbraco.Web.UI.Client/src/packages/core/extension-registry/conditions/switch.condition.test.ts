@@ -21,6 +21,7 @@ describe('UmbSwitchCondition', () => {
 
 	it('starts not permitted', () => {
 		const condition = new UmbSwitchCondition(host, {
+			host,
 			config: baseConfig('30'),
 			onChange: () => {},
 		});
@@ -45,6 +46,7 @@ describe('UmbSwitchCondition', () => {
 				}, 1000);
 
 				condition = new UmbSwitchCondition(host, {
+					host,
 					config: baseConfig(String(frequencyMs)),
 					onChange: (permitted) => {
 						transitions.push(permitted);
@@ -69,6 +71,7 @@ describe('UmbSwitchCondition', () => {
 		let callCount = 0;
 
 		const condition = new UmbSwitchCondition(host, {
+			host,
 			config: baseConfig(String(frequencyMs)),
 			onChange: () => callCount++,
 		});
@@ -81,15 +84,15 @@ describe('UmbSwitchCondition', () => {
 
 	it('throws when frequency is not a positive number', () => {
 		expect(
-			() => new UmbSwitchCondition(host, { config: baseConfig('0'), onChange: () => {} }),
+			() => new UmbSwitchCondition(host, { host, config: baseConfig('0'), onChange: () => {} }),
 		).to.throw(/Frequency must be a positive number/);
 
 		expect(
-			() => new UmbSwitchCondition(host, { config: baseConfig('-5'), onChange: () => {} }),
+			() => new UmbSwitchCondition(host, { host, config: baseConfig('-5'), onChange: () => {} }),
 		).to.throw(/Frequency must be a positive number/);
 
 		expect(
-			() => new UmbSwitchCondition(host, { config: baseConfig('NaN-string'), onChange: () => {} }),
+			() => new UmbSwitchCondition(host, { host, config: baseConfig('NaN-string'), onChange: () => {} }),
 		).to.throw(/Frequency must be a positive number/);
 	});
 });
