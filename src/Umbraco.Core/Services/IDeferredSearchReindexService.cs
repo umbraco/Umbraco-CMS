@@ -22,4 +22,11 @@ public interface IDeferredSearchReindexService
     /// </summary>
     /// <param name="memberTypeIds">The member type IDs to reindex.</param>
     void QueueMemberTypeReindex(IReadOnlyCollection<int> memberTypeIds);
+
+    /// <summary>
+    ///     Queues a set of element node ids so that any content whose search index depends on those
+    ///     elements is re-indexed after the elements are updated.
+    /// </summary>
+    /// <param name="elementIds">The element node ids that changed.</param>
+    void QueueReindexOnElementChange(IReadOnlyCollection<int> elementIds);
 }

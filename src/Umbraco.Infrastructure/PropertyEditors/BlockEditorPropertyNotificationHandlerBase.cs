@@ -126,7 +126,7 @@ public abstract class BlockEditorPropertyNotificationHandlerBase<TBlockLayoutIte
     private void ParseKeys(JsonArray contentData, JsonArray settingsData, JsonObject layoutData)
     {
         // recurse a JSON object to find all contained block editor layouts
-        List<JsonObject> GetLayoutItemsRecursively(JsonObject jsonObject)
+        static List<JsonObject> GetLayoutItemsRecursively(JsonObject jsonObject)
         {
             var layoutItems = new List<JsonObject>();
             if (jsonObject.ContainsKey("key") && jsonObject.ContainsKey("contentKey"))
@@ -151,7 +151,7 @@ public abstract class BlockEditorPropertyNotificationHandlerBase<TBlockLayoutIte
         // grab keys applicable for replacement from all the layouts - that is:
         // - the key of the layout itself ("key").
         // - the key of the content item ("contentKey").
-        //   - ONLY for local content; do NOT replace content item keys for shared content.
+        //   - ONLY for local content; do NOT replace content item keys for external content.
         // - the key of the settings item ("settingsKey") if present.
         List<JsonObject> layoutItems = GetLayoutItemsRecursively(layoutData);
         var keys = layoutItems.SelectMany(layoutItem => new[]
