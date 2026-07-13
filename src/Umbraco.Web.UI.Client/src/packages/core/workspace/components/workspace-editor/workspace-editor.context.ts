@@ -75,7 +75,7 @@ export class UmbWorkspaceEditorContext extends UmbContextBase {
 		(previousValue: Array<UmbWorkspaceViewContext>, currentValue: Array<UmbWorkspaceViewContext>): boolean => {
 			return (
 				previousValue === currentValue &&
-				currentValue.some(
+				currentValue.every(
 					(x) => x.manifest === previousValue.find((y) => y.manifest.alias === x.manifest.alias)?.manifest,
 				)
 			);
