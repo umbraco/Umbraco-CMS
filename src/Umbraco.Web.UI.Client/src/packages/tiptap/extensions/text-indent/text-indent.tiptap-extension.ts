@@ -40,13 +40,16 @@ export const TextIndent = Extension.create<UmbTiptapTextIndentOptions>({
 						parseHTML: (element) => {
 							const minLevel = this.options.minLevel;
 							const maxLevel = this.options.maxLevel;
-							const indent = element.style.textIndent;
-							return indent ? Math.max(minLevel, Math.min(maxLevel, parseInt(indent, 10))) : null;
+							// Support both padding-left (current) and text-indent (legacy) for parsing
+							const paddingLeft = element.style.paddingLeft;
+							const textIndent = element.style.textIndent;
+							const value = paddingLeft || textIndent;
+							return value ? Math.max(minLevel, Math.min(maxLevel, parseInt(value, 10))) : null;
 						},
 						renderHTML: (attributes) => {
 							if (!attributes.indent) return {};
 							return {
-								style: `text-indent: ${attributes.indent}rem;`,
+								style: `padding-left: ${attributes.indent}rem;`,
 							};
 						},
 					},

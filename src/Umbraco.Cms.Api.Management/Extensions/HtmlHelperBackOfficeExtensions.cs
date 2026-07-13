@@ -12,7 +12,7 @@ using Umbraco.Cms.Web.Common.Hosting;
 namespace Umbraco.Cms.Api.Management.Extensions;
 
 /// <summary>
-/// Provides extension methods for <see cref="HtmlHelper"/> related to Umbraco back office functionality.
+/// Provides extension methods for <see cref="IHtmlHelper"/> related to Umbraco back office functionality.
 /// </summary>
 public static class HtmlHelperBackOfficeExtensions
 {
@@ -28,6 +28,7 @@ public static class HtmlHelperBackOfficeExtensions
     /// <param name="jsonSerializer">The JSON serializer used to serialize the package imports.</param>
     /// <param name="backOfficePathGenerator">The path generator for BackOffice assets and cache busting.</param>
     /// <param name="packageManifestService">The service to retrieve package manifest import maps.</param>
+    /// <param name="cspNonceService">The service to retrieve the CSP nonce for the script tag.</param>
     /// <returns>A <see cref="Task"/> containing the html content for the BackOffice import map.</returns>
     public static async Task<IHtmlContent> BackOfficeImportMapScriptAsync(
         this IHtmlHelper html,
@@ -49,6 +50,8 @@ public static class HtmlHelperBackOfficeExtensions
         // Inject the BackOffice cache buster into the import string to handle BackOffice assets
         var importmapScript = sb.ToString()
             .Replace(backOfficePathGenerator.BackOfficeVirtualDirectory, backOfficePathGenerator.BackOfficeAssetsPath)
+
+            // TODO: Remove this when CacheBusterToken is gone. Scheduled for removal in Umbraco 20.
             .Replace(Constants.Web.CacheBusterToken, backOfficePathGenerator.BackOfficeCacheBustHash);
 
         return html.Raw(importmapScript);

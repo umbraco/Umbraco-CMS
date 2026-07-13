@@ -212,6 +212,7 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 				() => html`
 					<uui-input
 						id="search"
+						name="block-search"
 						@input=${this.#onSearch}
 						label=${this.localize.term('general_search')}
 						placeholder=${this.localize.term('placeholders_search')}>

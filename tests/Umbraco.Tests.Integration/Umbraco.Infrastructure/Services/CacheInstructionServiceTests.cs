@@ -286,7 +286,6 @@ internal sealed class CacheInstructionServiceTests : UmbracoIntegrationTest
 
         lastSynced = await lastSyncedManager.GetLastSyncedExternalAsync();
         Assert.AreEqual(2, lastSynced);
-        var debug = true;
     }
 
     private void CreateAndDeliveryMultipleInstructions(CacheInstructionService sut)

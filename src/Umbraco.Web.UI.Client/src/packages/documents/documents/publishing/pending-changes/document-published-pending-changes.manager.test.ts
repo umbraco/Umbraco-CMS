@@ -106,6 +106,12 @@ describe('UmbSelectionManager', () => {
 				expect(variantsWithChanges).to.have.lengthOf(1);
 				expect(variantsWithChanges[0].variantId.toString()).to.equal('invariant');
 			});
+
+			it('should not have variants with changes when only template differs', async () => {
+				persistedDocument.template = { unique: 'template-1' };
+				await manager.process({ persistedData: persistedDocument, publishedData: publishedDocument });
+				expect(manager.getVariantsWithChanges()).to.be.an('array').that.is.empty;
+			});
 		});
 
 		describe('variant data', () => {
