@@ -1,3 +1,3 @@
 export * from './context/index.js';
 export * from './repository/index.js';
-export * from './preview.controller.js';
+export * from './controllers/preview.controller.js';

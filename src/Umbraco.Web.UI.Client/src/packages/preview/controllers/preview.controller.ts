@@ -1,4 +1,4 @@
-import { UmbPreviewRepository } from './repository/preview.repository.js';
+import { UmbPreviewRepository } from '../repository/preview.repository.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import { umbPeekError } from '@umbraco-cms/backoffice/notification';
@@ -14,6 +14,7 @@ export class UmbPreviewController extends UmbControllerBase {
 	#previewWindow: WindowProxy | null = null;
 	#previewWindowKey: string | null = null;
 
+	#previewRepository = new UmbPreviewRepository(this);
 	#localize = new UmbLocalizationController(this);
 
 	/**
@@ -23,8 +24,8 @@ export class UmbPreviewController extends UmbControllerBase {
 	 * @param {UmbPreviewControllerArgs} args - The preview arguments.
 	 * @param {string} args.urlProviderAlias - The alias of the URL provider used to resolve the preview URL.
 	 * @param {string} args.unique - The unique identifier of the document to preview.
-	 * @param {string | null} args.culture - The culture to preview, or null for the default culture.
-	 * @param {string | null} args.segment - The segment to preview, or null for no segment.
+	 * @param {string | null | undefined} args.culture - The culture to preview, or null/undefined for the default culture.
+	 * @param {string | null | undefined} args.segment - The segment to preview, or null/undefined for no segment.
 	 * @returns {Promise<void>} Resolves once the preview window has been opened or focused.
 	 * @memberof UmbPreviewController
 	 */
@@ -35,8 +36,7 @@ export class UmbPreviewController extends UmbControllerBase {
 			return;
 		}
 
-		const previewRepository = new UmbPreviewRepository(this);
-		const previewUrlData = await previewRepository.getPreviewUrl(
+		const previewUrlData = await this.#previewRepository.getPreviewUrl(
 			args.unique,
 			args.urlProviderAlias,
 			args.culture ?? undefined,
