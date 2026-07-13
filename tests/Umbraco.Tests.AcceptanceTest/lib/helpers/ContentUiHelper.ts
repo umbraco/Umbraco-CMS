@@ -226,17 +226,13 @@ export class ContentUiHelper extends UiBaseLocators {
       name: "Reload children…",
     });
     this.contentTree = page.locator('umb-tree[alias="Umb.Tree.Document"]');
-    this.richTextAreaTxt = page
-      .frameLocator('iframe[title="Rich Text Area"]')
-      .locator("#tinymce");
-    this.textAreaTxt = page.locator("umb-property-editor-ui-textarea textarea");
-    this.plusIconBtn = page.locator("#icon-add svg");
-    this.enterTagTxt = page.getByPlaceholder("Enter tag");
-    this.menuItemTree = page.locator("umb-menu-item-tree-default");
-    this.confirmToPublishBtn = page.locator('umb-document-publish-modal').getByLabel('Publish');
-    this.confirmToUnpublishBtn = page
-      .locator("umb-document-unpublish-modal")
-      .getByLabel("Unpublish");
+    this.richTextAreaTxt = page.frameLocator('iframe[title="Rich Text Area"]').locator('#tinymce');
+    this.textAreaTxt = page.locator('umb-property-editor-ui-textarea textarea');
+    this.plusIconBtn = page.locator('#icon-add svg');
+    this.enterTagTxt = page.getByPlaceholder('Enter tag');
+    this.menuItemTree = page.locator('umb-menu-item-tree-default');
+    this.confirmToUnpublishBtn = page.locator('umb-content-unpublish-modal').getByLabel('Unpublish');
+    this.confirmToPublishBtn = page.locator('umb-content-publish-modal').getByLabel('Publish');
     this.dropdown = page.locator("select#native");
     this.splitView = page.locator("#splitViews");
     this.setADateTxt = page.getByLabel("Set a date…");
@@ -531,7 +527,7 @@ export class ContentUiHelper extends UiBaseLocators {
       '[label="Select all"]',
     );
     this.confirmToPublishBtn = page
-      .locator("umb-document-publish-modal")
+      .locator("umb-content-publish-modal")
       .getByLabel("Publish");
     // Publish with descendants
     this.documentPublishWithDescendantsModal = page.locator(
@@ -2221,19 +2217,10 @@ export class ContentUiHelper extends UiBaseLocators {
     await this.click(blocklistBlock);
   }
 
-  async doesBlockEditorBlockWithNameContainValue(
-    groupName: string,
-    propertyName: string,
-    inputType: string = ConstantHelper.inputTypes.general,
-    value,
-  ) {
-    await expect(
-      this.blockWorkspaceEditTab
-        .filter({ hasText: groupName })
-        .locator(this.property)
-        .filter({ hasText: propertyName })
-        .locator(inputType),
-    ).toContainText(value);
+  async doesBlockEditorBlockWithNameContainValue(groupName: string, propertyName: string, inputType: string = ConstantHelper.inputTypes.general, value) {
+    // This wait is currently necessary as it can take a bit longer than expected for the block to load
+    await this.waitForTimeout(ConstantHelper.wait.short);
+    await expect(this.blockWorkspaceEditTab.filter({hasText: groupName}).locator(this.property).filter({hasText: propertyName}).locator(inputType)).toContainText(value, {timeout: ConstantHelper.timeout.long});
   }
 
   async clickCloseButton() {
