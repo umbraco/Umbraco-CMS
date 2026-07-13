@@ -19,6 +19,10 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache.Services;
 
+/// <summary>
+/// Caches published media across the converted-content (L0) cache, the HybridCache (L1/L2) tier and
+/// the database, and handles seeding, refreshing and rebuilding those caches.
+/// </summary>
 internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeReporter
 {
     private readonly IDatabaseCacheRepository _databaseCacheRepository;
@@ -48,7 +52,10 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
     // refreshing ever shows up in profiling.
     private long _cacheGeneration;
 
+#pragma warning disable IDE0032 // Use auto property - auto-property can't express the lazy initialization of the seed keys and reset, so we use a backing field instead.
     private HashSet<Guid>? _seedKeys;
+#pragma warning restore IDE0032 // Use auto property
+
     private HashSet<Guid> SeedKeys
     {
         get
@@ -69,6 +76,20 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
         }
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MediaCacheService"/> class.
+    /// </summary>
+    /// <param name="databaseCacheRepository">The repository providing cached media from the database.</param>
+    /// <param name="idKeyMap">The id/key map used to resolve integer identifiers to keys.</param>
+    /// <param name="scopeProvider">The scope provider for database access.</param>
+    /// <param name="hybridCache">The HybridCache (L1/L2) backing store for cache nodes.</param>
+    /// <param name="publishedContentFactory">The factory that converts cache nodes to <see cref="IPublishedContent"/>.</param>
+    /// <param name="cacheNodeFactory">The factory that builds cache nodes from media.</param>
+    /// <param name="seedKeyProviders">The providers that supply the keys to seed on startup.</param>
+    /// <param name="publishedModelFactory">The factory that creates strongly-typed published models.</param>
+    /// <param name="cacheSettings">The cache configuration options.</param>
+    /// <param name="logger">The logger.</param>
+    /// <param name="cacheFactory">The factory that creates the in-memory converted-content (L0) cache.</param>
     public MediaCacheService(
         IDatabaseCacheRepository databaseCacheRepository,
         IIdKeyMap idKeyMap,
@@ -104,6 +125,7 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
     /// <inheritdoc />
     public long? GetApproximateBytes() => _publishedContentCache.ApproximateSizeInBytes;
 
+    /// <inheritdoc />
     public async Task<IPublishedContent?> GetByKeyAsync(Guid key)
     {
         Attempt<int> idAttempt = _idKeyMap.GetIdForKey(key, UmbracoObjectTypes.Media);
@@ -115,6 +137,7 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
         return await GetNodeAsync(key);
     }
 
+    /// <inheritdoc />
     public async Task<IPublishedContent?> GetByIdAsync(int id)
     {
         Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForId(id, UmbracoObjectTypes.Media);
@@ -222,6 +245,7 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
         }
     }
 
+    /// <inheritdoc />
     public bool TryGetCached(Guid key, out IPublishedContent? content)
     {
         // Mirror the L0 (published content cache) fast path in GetNodeAsync.
@@ -305,6 +329,7 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
     private bool IsCacheGenerationCurrent(long capturedGeneration)
         => Interlocked.Read(ref _cacheGeneration) == capturedGeneration;
 
+    /// <inheritdoc />
     public async Task<bool> HasContentByIdAsync(int id)
     {
         Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForId(id, UmbracoObjectTypes.Media);
@@ -316,6 +341,7 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
         return await _hybridCache.ExistsAsync<ContentCacheNode?>(GetCacheKey(keyAttempt.Result), CancellationToken.None);
     }
 
+    /// <inheritdoc />
     public async Task RefreshMediaAsync(IMedia media)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
@@ -335,6 +361,7 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
         scope.Complete();
     }
 
+    /// <inheritdoc />
     public async Task DeleteItemAsync(IContentBase media)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
@@ -342,6 +369,7 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
         scope.Complete();
     }
 
+    /// <inheritdoc />
     public async Task SeedAsync(CancellationToken cancellationToken)
     {
 #if DEBUG
@@ -400,6 +428,7 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
 #endif
     }
 
+    /// <inheritdoc />
     public async Task RefreshMemoryCacheAsync(Guid key)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
@@ -421,6 +450,7 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
         scope.Complete();
     }
 
+    /// <inheritdoc />
     public async Task ClearMemoryCacheAsync(CancellationToken cancellationToken)
     {
         // Bump first so any read-through that read the backing store before this clear is rejected
@@ -434,9 +464,11 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
         await SeedAsync(cancellationToken);
     }
 
+    /// <inheritdoc />
     public async Task RemoveFromMemoryCacheAsync(Guid key)
         => await ClearPublishedCacheAsync(key);
 
+    /// <inheritdoc />
     public async Task RebuildMemoryCacheByContentTypeAsync(IEnumerable<int> mediaTypeIds)
     {
         // Clear the hybrid cache by media type tag for the affected media types.
@@ -448,12 +480,14 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
         ClearConvertedContentCache(mediaTypeIdsAsArray);
     }
 
+    /// <inheritdoc />
     public void ClearConvertedContentCache()
     {
         _publishedContentCache.Clear();
         InvalidateMemoryCacheGeneration();
     }
 
+    /// <inheritdoc />
     public void ClearConvertedContentCache(IReadOnlyCollection<int> mediaTypeIds)
     {
         var ids = mediaTypeIds as int[] ?? mediaTypeIds.ToArray();
@@ -461,6 +495,7 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
         InvalidateMemoryCacheGeneration();
     }
 
+    /// <inheritdoc />
     public void Rebuild(IReadOnlyCollection<int> contentTypeIds)
         => _databaseCacheRepository.Rebuild(
             null,
@@ -473,6 +508,7 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
                 scope.Complete();
             });
 
+    /// <inheritdoc />
     public IEnumerable<IPublishedContent> GetByContentType(IPublishedContentType contentType)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();

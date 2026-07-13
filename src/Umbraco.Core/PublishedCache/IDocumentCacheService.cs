@@ -40,7 +40,7 @@ public interface IDocumentCacheService
     /// round trip and scope of repeated <see cref="GetByKeyAsync"/> calls when the cache is cold.
     /// The default implementation falls back to per-key retrieval so existing implementations keep working.
     /// </remarks>
-    // TODO (V19): Remove the default implementation.
+    // TODO (V19): Remove the default implementation and reference to it in the remarks.
     async Task<IReadOnlyList<IPublishedContent>> GetByKeysAsync(IReadOnlyCollection<Guid> keys, bool? preview = null)
     {
         var result = new List<IPublishedContent>(keys.Count);

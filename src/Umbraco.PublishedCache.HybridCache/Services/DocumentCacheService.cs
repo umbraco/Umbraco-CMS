@@ -20,6 +20,10 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache.Services;
 
+/// <summary>
+/// Caches published documents (content) across the converted-content (L0) cache, the HybridCache
+/// (L1/L2) tier and the database, and handles seeding, refreshing and rebuilding those caches.
+/// </summary>
 internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCacheSizeReporter
 {
     private readonly IDatabaseCacheRepository _databaseCacheRepository;
@@ -34,7 +38,6 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
     private readonly IPublishStatusQueryService _publishStatusQueryService;
     private readonly CacheSettings _cacheSettings;
     private readonly ILogger<DocumentCacheService> _logger;
-    private HashSet<Guid>? _seedKeys;
 
     private readonly IConvertedPublishedContentCache<string> _publishedContentCache;
 
@@ -51,6 +54,10 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
     // Global is correctness-robust; only revisit if read-through churn under heavy concurrent
     // publishing ever shows up in profiling.
     private long _cacheGeneration;
+
+#pragma warning disable IDE0032 // Use auto property - auto-property can't express the lazy initialization of the seed keys and reset, so we use a backing field instead.
+    private HashSet<Guid>? _seedKeys;
+#pragma warning restore IDE0032 // Use auto property
 
     private HashSet<Guid> SeedKeys
     {
@@ -72,6 +79,22 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
         }
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DocumentCacheService"/> class.
+    /// </summary>
+    /// <param name="databaseCacheRepository">The repository providing cached content from the database.</param>
+    /// <param name="idKeyMap">The id/key map used to resolve integer identifiers to keys.</param>
+    /// <param name="scopeProvider">The scope provider for database access.</param>
+    /// <param name="hybridCache">The HybridCache (L1/L2) backing store for cache nodes.</param>
+    /// <param name="publishedContentFactory">The factory that converts cache nodes to <see cref="IPublishedContent"/>.</param>
+    /// <param name="cacheNodeFactory">The factory that builds cache nodes from content.</param>
+    /// <param name="seedKeyProviders">The providers that supply the keys to seed on startup.</param>
+    /// <param name="cacheSettings">The cache configuration options.</param>
+    /// <param name="publishedModelFactory">The factory that creates strongly-typed published models.</param>
+    /// <param name="previewService">The service that determines whether the current request is in preview.</param>
+    /// <param name="publishStatusQueryService">The service used to check published state and ancestor paths.</param>
+    /// <param name="logger">The logger.</param>
+    /// <param name="cacheFactory">The factory that creates the in-memory converted-content (L0) cache.</param>
     public DocumentCacheService(
         IDatabaseCacheRepository databaseCacheRepository,
         IIdKeyMap idKeyMap,
@@ -111,6 +134,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
     /// <inheritdoc />
     public long? GetApproximateBytes() => _publishedContentCache.ApproximateSizeInBytes;
 
+    /// <inheritdoc />
     public async Task<IPublishedContent?> GetByKeyAsync(Guid key, bool? preview = null)
     {
         bool calculatedPreview = preview ?? GetPreview();
@@ -118,6 +142,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
         return await GetNodeAsync(key, calculatedPreview);
     }
 
+    /// <inheritdoc />
     public async Task<IPublishedContent?> GetByIdAsync(int id, bool? preview = null)
     {
         Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForId(id, UmbracoObjectTypes.Document);
@@ -238,6 +263,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
         }
     }
 
+    /// <inheritdoc />
     public bool TryGetCached(Guid key, bool preview, out IPublishedContent? content)
     {
         // Mirror the L0 (published content cache) fast path in GetNodeAsync.
@@ -348,6 +374,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
     private bool IsCacheGenerationCurrent(long capturedGeneration)
         => Interlocked.Read(ref _cacheGeneration) == capturedGeneration;
 
+    /// <inheritdoc />
     public IEnumerable<IPublishedContent> GetByContentType(IPublishedContentType contentType)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
@@ -359,6 +386,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
             .WhereNotNull();
     }
 
+    /// <inheritdoc />
     public async Task ClearMemoryCacheAsync(CancellationToken cancellationToken)
     {
         // Bump first so any read-through that read the backing store before this clear is rejected
@@ -372,6 +400,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
         await SeedAsync(cancellationToken);
     }
 
+    /// <inheritdoc />
     public async Task RefreshMemoryCacheAsync(Guid key)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
@@ -407,12 +436,14 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
         scope.Complete();
     }
 
+    /// <inheritdoc />
     public async Task RemoveFromMemoryCacheAsync(Guid key)
     {
         await _hybridCache.RemoveAsync(GetCacheKey(key, true));
         await ClearPublishedCacheAsync(key);
     }
 
+    /// <inheritdoc />
     public async Task SeedAsync(CancellationToken cancellationToken)
     {
 #if DEBUG
@@ -474,7 +505,9 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
 #endif
     }
 
-    // Internal for test purposes.
+    /// <summary>
+    /// Resets the cached seed keys so they are recomputed on next access. Internal for test purposes.
+    /// </summary>
     internal void ResetSeedKeys() => _seedKeys = null;
 
     private HybridCacheEntryOptions GetSeedEntryOptions() => new()
@@ -497,6 +530,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
         };
     }
 
+    /// <inheritdoc />
     public async Task<bool> HasContentByIdAsync(int id, bool preview = false)
     {
         Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForId(id, UmbracoObjectTypes.Document);
@@ -508,6 +542,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
         return await _hybridCache.ExistsAsync<ContentCacheNode?>(GetCacheKey(keyAttempt.Result, preview), CancellationToken.None);
     }
 
+    /// <inheritdoc />
     public async Task RefreshContentAsync(IContent content)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
@@ -562,6 +597,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
             ? [Constants.Cache.Tags.Content]
             : [Constants.Cache.Tags.Content, ContentTypeIdTag(cacheNode.ContentTypeId)];
 
+    /// <inheritdoc />
     public async Task DeleteItemAsync(IContentBase content)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
@@ -569,6 +605,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
         scope.Complete();
     }
 
+    /// <inheritdoc />
     public void Rebuild(IReadOnlyCollection<int> contentTypeIds)
         => _databaseCacheRepository.Rebuild(
             contentTypeIds.ToList(),
@@ -581,6 +618,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
                 scope.Complete();
             });
 
+    /// <inheritdoc />
     public async Task RebuildMemoryCacheByContentTypeAsync(IEnumerable<int> contentTypeIds)
     {
         // Clear the hybrid cache by content type tag for the affected content types.
@@ -592,12 +630,14 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
         ClearConvertedContentCache(contentTypeIdsAsArray);
     }
 
+    /// <inheritdoc />
     public void ClearConvertedContentCache()
     {
         _publishedContentCache.Clear();
         InvalidateMemoryCacheGeneration();
     }
 
+    /// <inheritdoc />
     public void ClearConvertedContentCache(IReadOnlyCollection<int> contentTypeIds)
     {
         var ids = contentTypeIds as int[] ?? contentTypeIds.ToArray();

@@ -10,7 +10,6 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PublishedCache;
-using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Navigation;
@@ -61,7 +60,7 @@ internal sealed class SyntheticPublishedMediaTreeFixture
         IElementsCache elementsCache = new ElementsDictionaryAppCache();
         var converters = new PropertyValueConverterCollection(() => Enumerable.Empty<IPropertyValueConverter>());
 
-        IPublishedContentType contentType = BuildTestMediaType(converters, publishedModelFactory, propertyCount);
+        PublishedContentType contentType = BuildTestMediaType(converters, publishedModelFactory, propertyCount);
         Guid contentTypeKey = contentType.Key;
 
         MediaNavigationService navigationService = BuildNavigationService();

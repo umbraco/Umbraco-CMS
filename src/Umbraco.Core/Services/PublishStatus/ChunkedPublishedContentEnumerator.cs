@@ -80,7 +80,10 @@ internal static class ChunkedPublishedContentEnumerator
         }
     }
 
-    // Refills the reusable buffer with up to chunkSize keys; returns false once the source is exhausted.
+    /// <summary>
+    /// Refills the reusable buffer with up to <paramref name="chunkSize"/> keys from the source.
+    /// </summary>
+    /// <returns><c>true</c> if the buffer holds at least one key; <c>false</c> once the source is exhausted.</returns>
     private static bool FillChunk(IEnumerator<Guid> enumerator, int chunkSize, List<Guid> buffer)
     {
         buffer.Clear();
@@ -92,8 +95,10 @@ internal static class ChunkedPublishedContentEnumerator
         return buffer.Count > 0;
     }
 
-    // Resolves one chunk to its items in buffer order: L0 hits served directly, the rest materialised in
-    // a single batched call. An all-hit chunk never invokes the batched materialiser.
+    /// <summary>
+    /// Resolves one chunk to its items in buffer order: L0 hits are served directly and the rest are
+    /// materialised in a single batched call. An all-hit chunk never invokes the batched materialiser.
+    /// </summary>
     private static List<IPublishedContent> ResolveChunk(
         List<Guid> chunk,
         TryGetCachedDelegate tryGetCached,
@@ -130,7 +135,9 @@ internal static class ChunkedPublishedContentEnumerator
         return resolved;
     }
 
-    // Slots the batch-materialised items back into their input positions, keyed by content key.
+    /// <summary>
+    /// Slots the batch-materialised items back into their input positions, keyed by content key.
+    /// </summary>
     private static void PlaceMisses(List<Guid> chunk, IPublishedContent?[] slots, IReadOnlyList<IPublishedContent> fetched)
     {
         if (fetched.Count == 0)

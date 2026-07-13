@@ -64,7 +64,7 @@ internal sealed class SyntheticPublishedTreeFixture
         IElementsCache elementsCache = new ElementsDictionaryAppCache();
         var converters = new PropertyValueConverterCollection(() => Enumerable.Empty<IPropertyValueConverter>());
 
-        IPublishedContentType contentType = BuildTestContentType(converters, publishedModelFactory, propertyCount);
+        PublishedContentType contentType = BuildTestContentType(converters, publishedModelFactory, propertyCount);
         Guid contentTypeKey = contentType.Key;
 
         DocumentNavigationService navigationService = BuildNavigationService();
