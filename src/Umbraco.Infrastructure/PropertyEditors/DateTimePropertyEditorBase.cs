@@ -103,7 +103,7 @@ public abstract class DateTimePropertyEditorBase : DataEditor, IValueSchemaProvi
         /// <param name="attribute">The data editor attribute that defines editor metadata.</param>
         /// <param name="localizedTextService">Service for retrieving localized text resources.</param>
         /// <param name="logger">Logger instance for logging events and errors.</param>
-        /// <param name="mappingFunc">A function that maps a <see cref="DateTimeDto"/> to its string representation.</param>
+        /// <param name="mappingFunc">A function that maps a <see cref="DateTimeValueConverterBase.DateTimeDto"/> to its string representation.</param>
         public DateTimeDataValueEditor(
             IShortStringHelper shortStringHelper,
             IJsonSerializer jsonSerializer,
