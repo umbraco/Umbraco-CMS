@@ -6,6 +6,7 @@ import { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
 import { UmbAncestorsEntityContext, UmbEntityContext, type UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { useMockSet } from '@umbraco-cms/internal/mock-manager';
 import { UmbElementOrElementFolderUserPermissionCondition } from './element-or-element-folder-user-permission.condition.js';
+import type { UmbElementOrElementFolderUserPermissionConditionConfig } from './types.js';
 import { UMB_ELEMENT_OR_ELEMENT_FOLDER_USER_PERMISSION_CONDITION_ALIAS } from './constants.js';
 import { UMB_USER_PERMISSION_ELEMENT_READ } from '../constants.js';
 import { UMB_USER_PERMISSION_ELEMENT_FOLDER_READ } from '../../folder/user-permissions/constants.js';
@@ -37,7 +38,7 @@ class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLEle
 	}
 }
 
-const CONDITION_CONFIG = {
+const CONDITION_CONFIG: UmbElementOrElementFolderUserPermissionConditionConfig = {
 	alias: UMB_ELEMENT_OR_ELEMENT_FOLDER_USER_PERMISSION_CONDITION_ALIAS,
 	element: { allOf: [UMB_USER_PERMISSION_ELEMENT_READ] },
 	folder: { allOf: [UMB_USER_PERMISSION_ELEMENT_FOLDER_READ] },
