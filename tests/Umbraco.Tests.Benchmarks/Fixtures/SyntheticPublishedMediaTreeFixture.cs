@@ -23,7 +23,7 @@ using Umbraco.Cms.Infrastructure.Serialization;
 namespace Umbraco.Tests.Benchmarks.Fixtures;
 
 /// <summary>
-/// Media equivalent of <see cref="SyntheticPublishedTreeFixture"/>: builds an in-memory published-media
+/// Media equivalent of <see cref="SyntheticPublishedDocumentTreeFixture"/>: builds an in-memory published-media
 /// stack populated with a synthetic tree so benchmarks can exercise <c>Children()</c> / <c>Descendants()</c>
 /// on media without a database. Supports a cold (unseeded) mode backed by a latency-injecting,
 /// round-trip-counting repository so the batched read-through can be measured against the reported

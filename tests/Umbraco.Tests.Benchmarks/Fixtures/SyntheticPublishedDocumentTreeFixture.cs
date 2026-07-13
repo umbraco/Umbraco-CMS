@@ -27,7 +27,7 @@ namespace Umbraco.Tests.Benchmarks.Fixtures;
 /// Builds an in-memory published-content stack populated with a synthetic tree of a given shape,
 /// so benchmarks can exercise <c>Children()</c> / <c>Descendants()</c> without a database.
 /// </summary>
-internal sealed class SyntheticPublishedTreeFixture
+internal sealed class SyntheticPublishedDocumentTreeFixture
 {
     private readonly List<Guid> _allKeys = new();
     private readonly Dictionary<Guid, ContentCacheNode> _nodesByKey = new();

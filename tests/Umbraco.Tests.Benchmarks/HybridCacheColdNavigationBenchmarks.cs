@@ -44,7 +44,7 @@ public class HybridCacheColdNavigationBenchmarks
         }
     }
 
-    private SyntheticPublishedTreeFixture _fixture = null!;
+    private SyntheticPublishedDocumentTreeFixture _fixture = null!;
 
     // Fixed tree shape (≈ 5,051 nodes); not a [Params] since there is only one value to sweep.
     private const int BranchCount = 50;
@@ -56,7 +56,7 @@ public class HybridCacheColdNavigationBenchmarks
     [GlobalSetup]
     public void Setup()
     {
-        _fixture = new SyntheticPublishedTreeFixture();
+        _fixture = new SyntheticPublishedDocumentTreeFixture();
         _fixture.InitialiseAsync(BranchCount, LeafCount, seed: false, repoLatencyMs: RepoLatencyMs).GetAwaiter().GetResult();
     }
 

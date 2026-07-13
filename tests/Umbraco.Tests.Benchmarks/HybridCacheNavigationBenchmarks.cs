@@ -42,7 +42,7 @@ public class HybridCacheNavigationBenchmarks
         }
     }
 
-    private SyntheticPublishedTreeFixture _fixture = null!;
+    private SyntheticPublishedDocumentTreeFixture _fixture = null!;
 
     // Approximate total node count: 1 + BranchCount + (BranchCount * LeafCount).
     // The single 50 × 100 ≈ 5,051-node configuration is the case closest to the reported workload;
@@ -55,7 +55,7 @@ public class HybridCacheNavigationBenchmarks
     [GlobalSetup]
     public void Setup()
     {
-        _fixture = new SyntheticPublishedTreeFixture();
+        _fixture = new SyntheticPublishedDocumentTreeFixture();
         _fixture.InitialiseAsync(BranchCount, LeafCount).GetAwaiter().GetResult();
 
         // Warm the converted-content cache so each benchmark measures the steady-state
