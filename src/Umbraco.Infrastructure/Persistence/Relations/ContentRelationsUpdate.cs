@@ -30,6 +30,7 @@ internal sealed class ContentRelationsUpdate :
     private readonly PropertyEditorCollection _propertyEditors;
     private readonly IRelationRepository _relationRepository;
     private readonly IRelationTypeRepository _relationTypeRepository;
+    private readonly IEntityRepository _entityRepository;
     private readonly ILogger<ContentRelationsUpdate> _logger;
 
     /// <summary>
@@ -41,6 +42,7 @@ internal sealed class ContentRelationsUpdate :
         PropertyEditorCollection propertyEditors,
         IRelationRepository relationRepository,
         IRelationTypeRepository relationTypeRepository,
+        IEntityRepository entityRepository,
         ILogger<ContentRelationsUpdate> logger)
     {
         _scopeProvider = scopeProvider;
@@ -48,6 +50,7 @@ internal sealed class ContentRelationsUpdate :
         _propertyEditors = propertyEditors;
         _relationRepository = relationRepository;
         _relationTypeRepository = relationTypeRepository;
+        _entityRepository = entityRepository;
         _logger = logger;
     }
 
@@ -99,7 +102,7 @@ internal sealed class ContentRelationsUpdate :
         // relations for it would violate the umbracoRelation FK constraint (#23331). Only the unpublish
         // handlers opt into this check (the one known caller with this pattern); save/publish fire far more
         // often, so they skip the extra lookup.
-        if (checkNodeExists && NodeExists(scope, entity.Id) is false)
+        if (checkNodeExists && _entityRepository.Exists(entity.Id) is false)
         {
             return;
         }
@@ -192,16 +195,6 @@ internal sealed class ContentRelationsUpdate :
         {
             scope.Notifications.Publish(new RelationDeletedNotification(relationsToDelete, new EventMessages()) { IsAutomatic = true });
         }
-    }
-
-    private static bool NodeExists(IScope scope, int nodeId)
-    {
-        Sql<ISqlContext> sql = scope.SqlContext.Sql()
-            .SelectCount()
-            .From<NodeDto>()
-            .Where<NodeDto>(x => x.NodeId == nodeId);
-
-        return scope.Database.ExecuteScalar<int>(sql) > 0;
     }
 
     private IRelation[] GetExistingAutomaticRelations(IScope scope, int entityId, ISet<string> automaticRelationTypeAliases)

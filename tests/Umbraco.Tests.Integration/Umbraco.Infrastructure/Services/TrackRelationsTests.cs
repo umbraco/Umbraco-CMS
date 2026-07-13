@@ -303,7 +303,6 @@ internal sealed class TrackRelationsTests : UmbracoIntegrationTestWithContent
                 .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.ContentPicker)
                 .Done()
             .Build();
-        sourceType.AllowedContentTypes = [new ContentTypeSort(targetType.Key, 0, targetType.Alias)];
         await ContentTypeService.CreateAsync(sourceType, Constants.Security.SuperUserKey);
 
         var target = new ContentBuilder().WithContentType(targetType).WithName("Target").Build();
