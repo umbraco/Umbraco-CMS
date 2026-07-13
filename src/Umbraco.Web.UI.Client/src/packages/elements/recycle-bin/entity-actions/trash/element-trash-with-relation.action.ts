@@ -1,4 +1,4 @@
-import { UMB_ELEMENT_CONFIGURATION_CONTEXT } from '../../../global-contexts/index.js';
+import { UmbElementConfigurationRepository } from '../../../configuration/configuration.repository.js';
 import {
 	UMB_TRASH_WITH_RELATION_CONFIRM_MODAL,
 	UmbTrashWithRelationEntityAction,
@@ -7,8 +7,7 @@ import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 
 export class UmbElementTrashWithRelationEntityAction extends UmbTrashWithRelationEntityAction {
 	protected override async _confirmTrash(item: any) {
-		const configContext = await this.getContext(UMB_ELEMENT_CONFIGURATION_CONTEXT);
-		const config = await configContext?.getElementConfiguration();
+		const { data: config } = await new UmbElementConfigurationRepository(this).requestConfiguration();
 
 		await umbOpenModal(this, UMB_TRASH_WITH_RELATION_CONFIRM_MODAL, {
 			data: {
