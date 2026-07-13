@@ -53,7 +53,7 @@ describe('UmbResourceController', () => {
 
 			const result = controller.mapToUmbError(cancelError);
 
-			expect(UmbCancelError.isUmbCancelError(result)).to.be.true;
+			expect(UmbCancelError.isUmbCancelError(result)).to.equal(true);
 		});
 
 		it('falls back to a generic Unknown error for unrecognizable non-Error values', () => {

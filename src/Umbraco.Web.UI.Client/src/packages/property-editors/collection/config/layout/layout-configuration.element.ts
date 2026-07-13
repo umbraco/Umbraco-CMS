@@ -210,7 +210,7 @@ export class UmbPropertyEditorUICollectionLayoutConfigurationElement
 			}
 
 			.layout-item > uui-button {
-				flex: 0 0 var(--uui-size-10);
+				min-width: var(--uui-size-11);
 			}
 
 			.layout-item > uui-input,
