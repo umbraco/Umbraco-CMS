@@ -23,6 +23,7 @@ internal sealed class ElementEditingService
     private readonly ILogger<ElementEditingService> _logger;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
     private readonly IElementContainerService _containerService;
+    private readonly ContentTypeFilterCollection _contentTypeFilters;
     private readonly IEventMessagesFactory _eventMessagesFactory;
     private readonly IIdKeyMap _idKeyMap;
     private readonly IAuditService _auditService;
@@ -65,6 +66,7 @@ internal sealed class ElementEditingService
         _logger = logger;
         _userIdKeyResolver = userIdKeyResolver;
         _containerService = containerService;
+        _contentTypeFilters = contentTypeFilters;
         _eventMessagesFactory = eventMessagesFactory;
         _idKeyMap = idKeyMap;
         _auditService = auditService;
@@ -107,6 +109,15 @@ internal sealed class ElementEditingService
         }
 
         if (contentType.IsElement is false || contentType.AllowedInLibrary is false)
+        {
+            return Attempt.FailWithStatus(ContentEditingOperationStatus.NotAllowed, new ContentValidationResult());
+        }
+
+        // A content type filter could prevent the element from being created under the requested parent,
+        // consistent with the validation applied when actually creating the element. Treat an empty key as the
+        // library root, consistent with the create/move paths.
+        Guid? parentKey = createModel.ParentKey == Guid.Empty ? null : createModel.ParentKey;
+        if (await IsAllowedInLibraryByContentTypeFilters(contentType, parentKey) is false)
         {
             return Attempt.FailWithStatus(ContentEditingOperationStatus.NotAllowed, new ContentValidationResult());
         }
@@ -208,15 +219,41 @@ internal sealed class ElementEditingService
 
     protected override async Task<(int? ParentId, ContentEditingOperationStatus OperationStatus)> TryGetAndValidateParentIdAsync(Guid? parentKey, IContentType contentType)
     {
+        // Treat an empty key as the library root, consistent with the move/restore and container operations.
+        if (parentKey == Guid.Empty)
+        {
+            parentKey = null;
+        }
+
         if (parentKey.HasValue is false)
         {
-            return (Constants.System.Root, ContentEditingOperationStatus.Success);
+            // We could have a content type filter registered that prevents the element from being created at the library root.
+            return await IsAllowedInLibraryByContentTypeFilters(contentType, null)
+                ? (Constants.System.Root, ContentEditingOperationStatus.Success)
+                : (null, ContentEditingOperationStatus.NotAllowed);
         }
 
         EntityContainer? container = await _containerService.GetAsync(parentKey.Value);
-        return container is not null
+        if (container is null)
+        {
+            return (null, ContentEditingOperationStatus.ParentNotFound);
+        }
+
+        // We could have a content type filter registered that prevents the element from being created under this container.
+        return await IsAllowedInLibraryByContentTypeFilters(contentType, parentKey.Value)
             ? (container.Id, ContentEditingOperationStatus.Success)
-            : (null, ContentEditingOperationStatus.ParentNotFound);
+            : (null, ContentEditingOperationStatus.NotAllowed);
+    }
+
+    private async Task<bool> IsAllowedInLibraryByContentTypeFilters(IContentType contentType, Guid? parentKey)
+    {
+        IEnumerable<IContentType> filteredContentTypes = [contentType];
+        foreach (IContentTypeFilter filter in _contentTypeFilters)
+        {
+            filteredContentTypes = await filter.FilterAllowedInLibraryAsync(filteredContentTypes, parentKey);
+        }
+
+        return filteredContentTypes.Any();
     }
 
     /// <inheritdoc/>
@@ -305,6 +342,20 @@ internal sealed class ElementEditingService
             }
 
             parentId = container.Id;
+        }
+
+        IContentType? contentType = ContentTypeService.Get(element.ContentType.Key);
+        if (contentType is null)
+        {
+            return Attempt.Fail(ContentEditingOperationStatus.ContentTypeNotFound);
+        }
+
+        // A content type filter could prevent the element from being moved to (or restored at) this destination,
+        // consistent with the validation applied when creating an element.
+        Guid? targetParentKey = containerKey.HasValue && containerKey.Value != Guid.Empty ? containerKey.Value : null;
+        if (await IsAllowedInLibraryByContentTypeFilters(contentType, targetParentKey) is false)
+        {
+            return Attempt.Fail(ContentEditingOperationStatus.NotAllowed);
         }
 
         var originalPath = element.Path;

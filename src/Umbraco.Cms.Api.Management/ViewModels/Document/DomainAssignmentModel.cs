@@ -6,7 +6,6 @@ namespace Umbraco.Cms.Api.Management.ViewModels.Document;
 public sealed class DomainAssignmentModel
 {
     /// <summary>Gets or sets the domain name assigned to the document.</summary>
-    
     public required string DomainName { get; set; }
 
     /// <summary>

@@ -110,7 +110,7 @@ export class DocumentTypeUiHelper extends UiBaseLocators {
 
   async goToDocumentType(documentTypeName: string) {
     await this.clickRootFolderCaretButton();
-    await this.clickLabelWithName(documentTypeName);
+    await this.clickTreeItemWithName(documentTypeName);
   }
 
   async enterDocumentTypeName(documentTypeName: string) {

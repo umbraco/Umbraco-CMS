@@ -9,7 +9,7 @@ public class AllowedInLibraryDocumentTypeControllerTests
     : ManagementApiUserGroupTestBase<AllowedInLibraryDocumentTypeController>
 {
     protected override Expression<Func<AllowedInLibraryDocumentTypeController, object>> MethodSelector =>
-        x => x.AllowedInLibrary(CancellationToken.None, 0, 100);
+        x => x.AllowedInLibrary(CancellationToken.None, null, 0, 100);
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel
         => new() { ExpectedStatusCode = HttpStatusCode.OK };

@@ -11,7 +11,7 @@ export class CurrentUserProfileUiHelper extends UiBaseLocators {
 
   constructor(page: Page) {
     super(page);
-    this.changePasswordBtn = page.getByLabel('Change password');
+    this.changePasswordBtn = page.getByLabel('Change your password');
     this.editBtn = page.locator('umb-current-user-modal').getByLabel('Edit', {exact: true});
     this.currentUserWorkspace = page.locator('umb-current-user-workspace-editor');
     this.workspaceSaveBtn = this.currentUserWorkspace.getByTestId('workspace-action:Umb.WorkspaceAction.CurrentUser.Save');

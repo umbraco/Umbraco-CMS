@@ -227,9 +227,9 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
     /// <summary>
     /// Determines the database type to use, potentially updating it based on the provided connection string.
     /// </summary>
-    /// <param name="current">The current <see cref="Umbraco.Cms.Infrastructure.Persistence.DatabaseType"/>.</param>
+    /// <param name="current">The current <see cref="DatabaseType"/>.</param>
     /// <param name="connectionString">An optional connection string that may influence the database type.</param>
-    /// <returns>The resulting <see cref="Umbraco.Cms.Infrastructure.Persistence.DatabaseType"/>.</returns>
+    /// <returns>The resulting <see cref="DatabaseType"/>.</returns>
     public virtual DatabaseType GetUpdatedDatabaseType(DatabaseType current, string? connectionString) => current;
 
     /// <summary>
@@ -301,7 +301,7 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
     /// Returns the specified name quoted with double quotes for use in SQL statements.
     /// </summary>
     /// <param name="name">The name to quote. Can be <c>null</c>.</param>
-    /// <returns>The quoted name as a string, or <c>"null"</c> if <paramref name="name"/> is <c>null</c>.</returns
+    /// <returns>The quoted name as a string, or <c>"null"</c> if <paramref name="name"/> is <c>null</c>.</returns>
     public virtual string GetQuotedName(string? name) => $"\"{name}\"";
 
     /// <summary>
@@ -504,7 +504,7 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
     /// <param name="sql">The base SQL query to which the left join and nested join will be applied.</param>
     /// <param name="nestedJoin">A function that defines the nested join logic to be included within the left join.</param>
     /// <param name="alias">An optional alias for the joined table.</param>
-    /// <returns>A <see cref="SqlJoinClause{ISqlContext}"/> representing the constructed left join with the nested join applied.</returns>
+    /// <returns>A <see cref="Sql{ISqlContext}.SqlJoinClause{ISqlContext}"/> representing the constructed left join with the nested join applied.</returns>
     public abstract Sql<ISqlContext>.SqlJoinClause<ISqlContext> LeftJoinWithNestedJoin<TDto>(
         Sql<ISqlContext> sql,
         Func<Sql<ISqlContext>, Sql<ISqlContext>> nestedJoin,
