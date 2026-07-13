@@ -385,13 +385,6 @@ stages:
               projects: "tests/Umbraco.Tests.UnitTests/Umbraco.Tests.UnitTests.csproj"
               arguments: "--configuration $(buildConfiguration) --no-build"
               testRunTitle: Unit Tests - $(Agent.OS)
-          - task: DotNetCoreCLI@2
-            displayName: Run dotnet test (Search)
-            inputs:
-              command: test
-              projects: "tests/Umbraco.Tests.Search.UnitTests/Umbraco.Tests.Search.UnitTests.csproj"
-              arguments: "--configuration $(buildConfiguration) --no-build"
-              testRunTitle: Search Unit Tests - $(Agent.OS)
 
   - stage: Integration
     displayName: Integration Tests
@@ -418,8 +411,8 @@ stages:
               testFilter: "(FullyQualifiedName~Umbraco.Infrastructure.Service)"
             LinuxPart3Of3:
               vmImage: "ubuntu-latest"
-              # Filter tests that are not part of the Umbraco.Infrastructure and ManagementApi namespace. So this will run all tests that are not part of the Umbraco.Infrastructure and ManagementApi namespace
-              testFilter: "(FullyQualifiedName!~Umbraco.Infrastructure) & (FullyQualifiedName!~ManagementApi)"
+              # Run all tests that are not part of the Umbraco.Infrastructure, ManagementApi, or Umbraco.Search namespaces (Umbraco.Search runs in its own Search Integration Tests job)
+              testFilter: "(FullyQualifiedName!~Umbraco.Infrastructure) & (FullyQualifiedName!~ManagementApi) & (FullyQualifiedName!~Umbraco.Search)"
             macOSPart1Of3:
               vmImage: "macOS-latest"
               # Filter tests that are part of the Umbraco.Infrastructure namespace but not part of the Umbraco.Infrastructure.Service namespace
@@ -430,8 +423,8 @@ stages:
               testFilter: "(FullyQualifiedName~Umbraco.Infrastructure.Service)"
             macOSPart3Of3:
               vmImage: "macOS-latest"
-              # Filter tests that are not part of the Umbraco.Infrastructure and ManagementApi namespace. So this will run all tests that are not part of the Umbraco.Infrastructure and the ManagementApi namespace
-              testFilter: "(FullyQualifiedName!~Umbraco.Infrastructure) & (FullyQualifiedName!~ManagementApi)"
+              # Run all tests that are not part of the Umbraco.Infrastructure, ManagementApi, or Umbraco.Search namespaces (Umbraco.Search runs in its own Search Integration Tests job)
+              testFilter: "(FullyQualifiedName!~Umbraco.Infrastructure) & (FullyQualifiedName!~ManagementApi) & (FullyQualifiedName!~Umbraco.Search)"
         pool:
           vmImage: $(vmImage)
         variables:
@@ -502,10 +495,8 @@ stages:
             displayName: Run dotnet test
             inputs:
               command: test
-              projects: |
-                tests/Umbraco.Tests.Search.Integration/Umbraco.Tests.Search.Integration.csproj
-                tests/Umbraco.Tests.Search.Examine.Integration/Umbraco.Tests.Search.Examine.Integration.csproj
-              arguments: "--configuration $(buildConfiguration) --no-build"
+              projects: "tests/Umbraco.Tests.Integration/Umbraco.Tests.Integration.csproj"
+              arguments: '--filter "FullyQualifiedName~Umbraco.Search" --configuration $(buildConfiguration) --no-build'
               testRunTitle: Search Integration Tests SQLite - $(Agent.OS)
       # Integration Tests (SQL Server)
       - job:
@@ -532,8 +523,8 @@ stages:
               vmImage: "windows-latest"
               Tests__Database__DatabaseType: LocalDb
               Tests__Database__SQLServerMasterConnectionString: N/A
-              # Filter tests that are not part of the Umbraco.Infrastructure and ManagementApi namespace. So this will run all tests that are not part of the Umbraco.Infrastructure and ManagementApi namespace
-              testFilter: "(FullyQualifiedName!~Umbraco.Infrastructure) & (FullyQualifiedName!~ManagementApi)"
+              # Run all tests that are not part of the Umbraco.Infrastructure, ManagementApi, or Umbraco.Search namespaces (Umbraco.Search runs in its own Search Integration Tests job)
+              testFilter: "(FullyQualifiedName!~Umbraco.Infrastructure) & (FullyQualifiedName!~ManagementApi) & (FullyQualifiedName!~Umbraco.Search)"
             LinuxPart1Of3:
               vmImage: "ubuntu-latest"
               SA_PASSWORD: UmbracoIntegration123!
@@ -553,8 +544,8 @@ stages:
               SA_PASSWORD: UmbracoIntegration123!
               Tests__Database__DatabaseType: SqlServer
               Tests__Database__SQLServerMasterConnectionString: "Server=(local);User Id=sa;Password=$(SA_PASSWORD);TrustServerCertificate=True"
-              # Filter tests that are not part of the Umbraco.Infrastructure and ManagementApi namespace. So this will run all tests that are not part of the Umbraco.Infrastructure and ManagementApi namespace
-              testFilter: "(FullyQualifiedName!~Umbraco.Infrastructure) & (FullyQualifiedName!~ManagementApi)"
+              # Run all tests that are not part of the Umbraco.Infrastructure, ManagementApi, or Umbraco.Search namespaces (Umbraco.Search runs in its own Search Integration Tests job)
+              testFilter: "(FullyQualifiedName!~Umbraco.Infrastructure) & (FullyQualifiedName!~ManagementApi) & (FullyQualifiedName!~Umbraco.Search)"
         pool:
           vmImage: $(vmImage)
         steps:
@@ -699,10 +690,8 @@ stages:
             displayName: Run dotnet test
             inputs:
               command: test
-              projects: |
-                tests/Umbraco.Tests.Search.Integration/Umbraco.Tests.Search.Integration.csproj
-                tests/Umbraco.Tests.Search.Examine.Integration/Umbraco.Tests.Search.Examine.Integration.csproj
-              arguments: "--configuration $(buildConfiguration) --no-build"
+              projects: "tests/Umbraco.Tests.Integration/Umbraco.Tests.Integration.csproj"
+              arguments: '--filter "FullyQualifiedName~Umbraco.Search" --configuration $(buildConfiguration) --no-build'
               testRunTitle: Search Integration Tests SQL Server - $(Agent.OS)
 
           - pwsh: docker stop mssql

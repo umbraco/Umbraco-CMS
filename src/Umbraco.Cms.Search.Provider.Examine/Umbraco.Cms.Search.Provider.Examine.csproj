@@ -33,7 +33,7 @@
 
   <ItemGroup>
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
-      <_Parameter1>Umbraco.Tests.Search.Examine.Integration</_Parameter1>
+      <_Parameter1>Umbraco.Tests.Integration</_Parameter1>
     </AssemblyAttribute>
   </ItemGroup>
 

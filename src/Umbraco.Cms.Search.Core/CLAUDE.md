@@ -89,16 +89,20 @@ dotnet build src/Umbraco.Cms.Search.Core/Umbraco.Cms.Search.Core.csproj
 
 ### Running Tests
 
+The search tests live in the main Umbraco test projects: unit tests under
+`tests/Umbraco.Tests.UnitTests` (namespace `...Umbraco.Cms.Search.Core`) and integration tests
+under `tests/Umbraco.Tests.Integration` (namespaces `...Umbraco.Search.Core`,
+`...Umbraco.Search.BackOffice`, `...Umbraco.Search.Provider.Examine`).
+
 ```bash
-# Run unit tests only
-dotnet test tests/Umbraco.Tests.Search.UnitTests/Umbraco.Tests.Search.UnitTests.csproj
+# Run the search unit tests (filtered out of the full unit-test project)
+dotnet test tests/Umbraco.Tests.UnitTests/Umbraco.Tests.UnitTests.csproj --filter "FullyQualifiedName~Umbraco.Cms.Search"
 
-# Run integration tests (SQLite by default, see appsettings.Tests.json)
-dotnet test tests/Umbraco.Tests.Search.Integration/Umbraco.Tests.Search.Integration.csproj
-dotnet test tests/Umbraco.Tests.Search.Examine.Integration/Umbraco.Tests.Search.Examine.Integration.csproj
+# Run the search integration tests (SQLite by default, see appsettings.Tests.json)
+dotnet test tests/Umbraco.Tests.Integration/Umbraco.Tests.Integration.csproj --filter "FullyQualifiedName~Umbraco.Search"
 
-# Run specific test by filter
-dotnet test --filter "FullyQualifiedName~ContentExtensionsTests"
+# Run a specific test by filter
+dotnet test tests/Umbraco.Tests.Integration/Umbraco.Tests.Integration.csproj --filter "FullyQualifiedName~ContentExtensionsTests"
 ```
 
 ### Client Development (Backoffice UI)
@@ -375,19 +379,19 @@ Repositories abstract API calls and provide clean interfaces for UI components. 
 
 ## Testing Strategy
 
-### Unit Tests (Umbraco.Test.Search.Unit)
+### Unit Tests (`Umbraco.Tests.UnitTests`, namespace `...Umbraco.Cms.Search.Core`)
 
 - Test extensions, helpers, and models in isolation
 - Use Moq for dependencies
 - Focus on business logic without infrastructure dependencies
 
-### Integration Tests (Umbraco.Test.Search.Integration)
+### Integration Tests (`Umbraco.Tests.Integration`, namespaces `...Umbraco.Search.Core` and `...Umbraco.Search.BackOffice`)
 
 - Test core services with real Umbraco infrastructure
 - Use `Umbraco.Cms.Tests.Integration` base classes
 - Test content indexing workflows end-to-end
 
-### Provider Integration Tests (Umbraco.Test.Search.Examine.Integration)
+### Provider Integration Tests (`Umbraco.Tests.Integration`, namespace `...Umbraco.Search.Provider.Examine`)
 
 - Test Examine-specific implementations
 - Verify Lucene index behavior
