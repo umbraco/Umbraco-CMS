@@ -122,6 +122,7 @@ export const TextIndent = Extension.create<UmbTiptapTextIndentOptions>({
 				}
 				return this.editor.commands.textIndent();
 			},
+			// eslint-disable-next-line @typescript-eslint/naming-convention
 			'Shift-Tab': () => {
 				if (this.editor.isActive('listItem')) {
 					// Attempt to lift; if not possible, just prevent focus loss
