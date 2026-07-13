@@ -10309,6 +10309,14 @@
         "operationId": "GetDocumentTypeAllowedInLibrary",
         "parameters": [
           {
+            "name": "parentKey",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
             "name": "skip",
             "in": "query",
             "schema": {
@@ -12941,6 +12949,60 @@
                 }
               }
             }
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/element/{id}/published": {
+      "get": {
+        "tags": [
+          "Element"
+        ],
+        "summary": "Gets a published element.",
+        "description": "Gets a published element identified by the provided Id.",
+        "operationId": "GetElementByIdPublished",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublishedElementResponseModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource"
           }
         },
         "security": [
@@ -46171,8 +46233,10 @@
             ]
           },
           "cacheBuster": {
-            "type": "string",
-            "nullable": true
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "extensions": {
             "type": "array"
@@ -49901,6 +49965,47 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DocumentVariantResponseModel"
+            }
+          }
+        }
+      },
+      "PublishedElementResponseModel": {
+        "required": [
+          "isTrashed",
+          "documentType",
+          "id",
+          "flags",
+          "values",
+          "variants"
+        ],
+        "type": "object",
+        "properties": {
+          "isTrashed": {
+            "type": "boolean"
+          },
+          "documentType": {
+            "$ref": "#/components/schemas/DocumentTypeReferenceResponseModel"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "flags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FlagModel"
+            }
+          },
+          "values": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ElementValueResponseModel"
+            }
+          },
+          "variants": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ElementVariantResponseModel"
             }
           }
         }

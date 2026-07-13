@@ -62,6 +62,51 @@ describe('UmbNotificationLayoutDefault', () => {
 				const messageElement: HTMLElement | null = element.renderRoot.querySelector('#message');
 				expect(messageElement?.innerText).to.equal('Notification message');
 			});
+
+			it('renders HTML in the message as plain text', async () => {
+				element.data = { message: 'Hello <strong>world</strong>' };
+				await element.updateComplete;
+				const messageElement: HTMLElement | null = element.renderRoot.querySelector('#message');
+				expect(messageElement?.querySelector('strong')).to.be.null;
+				expect(messageElement?.textContent).to.contain('Hello <strong>world</strong>');
+			});
+		});
+
+		describe('htmlMessage', () => {
+			it('renders an HTML string as HTML', async () => {
+				element.data = { message: 'fallback', htmlMessage: 'Visit <a href="/umbraco">the backoffice</a>' };
+				await element.updateComplete;
+				const anchor = element.renderRoot.querySelector('#message a');
+				expect(anchor).to.not.be.null;
+				expect(anchor?.getAttribute('href')).to.equal('/umbraco');
+			});
+
+			it('takes precedence over message', async () => {
+				element.data = { message: 'plain message', htmlMessage: '<em>html message</em>' };
+				await element.updateComplete;
+				const messageElement: HTMLElement | null = element.renderRoot.querySelector('#message');
+				expect(messageElement?.querySelector('em')).to.not.be.null;
+				expect(messageElement?.textContent).to.not.contain('plain message');
+			});
+
+			it('sanitizes an HTML string before rendering', async () => {
+				element.data = {
+					message: 'fallback',
+					htmlMessage: 'Hello <img src="x" onerror="window.__xss = true"><script>window.__xss = true;</script>',
+				};
+				await element.updateComplete;
+				const messageElement: HTMLElement | null = element.renderRoot.querySelector('#message');
+				expect(messageElement?.querySelector('script')).to.be.null;
+				expect(messageElement?.querySelector('img')?.getAttribute('onerror')).to.be.null;
+				expect((window as unknown as { __xss?: boolean }).__xss).to.be.undefined;
+			});
+
+			it('renders a TemplateResult as-is', async () => {
+				element.data = { message: 'fallback', htmlMessage: html`Rendered <code>template</code>` };
+				await element.updateComplete;
+				const messageElement: HTMLElement | null = element.renderRoot.querySelector('#message');
+				expect(messageElement?.querySelector('code')?.textContent).to.equal('template');
+			});
 		});
 	});
 });

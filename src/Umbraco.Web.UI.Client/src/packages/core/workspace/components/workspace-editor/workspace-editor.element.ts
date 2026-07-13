@@ -2,7 +2,17 @@ import { UMB_WORKSPACE_VIEW_PATH_PATTERN } from '../../paths.js';
 import type { ManifestWorkspaceView } from '../../types.js';
 import { UmbWorkspaceEditorContext } from './workspace-editor.context.js';
 import type { UmbWorkspaceViewContext } from './workspace-view.context.js';
-import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
+import {
+	css,
+	customElement,
+	html,
+	nothing,
+	property,
+	repeat,
+	state,
+	when,
+	type PropertyValues,
+} from '@umbraco-cms/backoffice/external/lit';
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -26,7 +36,7 @@ import type { UmbVariantHint } from '@umbraco-cms/backoffice/hint';
 @customElement('umb-workspace-editor')
 export class UmbWorkspaceEditorElement extends UmbLitElement {
 	//
-	#navigationContext = new UmbWorkspaceEditorContext(this);
+	#context = new UmbWorkspaceEditorContext(this);
 	#workspaceViewHintObservers: Array<UmbObserverController> = [];
 
 	@property()
@@ -44,6 +54,9 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 	@property({ type: Boolean })
 	public loading = false;
 
+	@property({ type: Boolean })
+	public notFound?: boolean;
+
 	@property({ attribute: false })
 	public get variantId(): UmbVariantId | undefined {
 		return this._variantId;
@@ -53,14 +66,14 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 			return;
 		}
 		this._variantId = value;
-		this.#navigationContext.setVariantId(value);
+		this.#context.setVariantId(value);
 		this.#observeWorkspaceViewHints();
 	}
 	private _variantId?: UmbVariantId | undefined;
 
 	@property({ attribute: false })
 	public set overrides(value: Array<UmbDeepPartialObject<ManifestWorkspaceView>> | undefined) {
-		this.#navigationContext.setOverrides(value);
+		this.#context.setOverrides(value);
 	}
 	public get overrides(): Array<UmbDeepPartialObject<ManifestWorkspaceView>> | undefined {
 		return undefined;
@@ -84,7 +97,7 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 	constructor() {
 		super();
 		this.observe(
-			this.#navigationContext.views,
+			this.#context.views,
 			(views) => {
 				this._workspaceViews = views;
 				this.#observeWorkspaceViewHints();
@@ -92,6 +105,14 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 			},
 			null,
 		);
+	}
+
+	override willUpdate(changedProperties: PropertyValues<this>) {
+		super.willUpdate(changedProperties);
+		// only need to check changed properties for an expensive computation.
+		if (changedProperties.has('notFound')) {
+			this.#createRoutes();
+		}
 	}
 
 	#observeWorkspaceViewHints() {
@@ -117,7 +138,7 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 	#createRoutes() {
 		const newRoutes: UmbRoute[] = [];
 
-		if (this._workspaceViews.length > 0) {
+		if (!this.notFound && this._workspaceViews.length > 0) {
 			this._workspaceViews.forEach((context) => {
 				const manifest = context.manifest;
 				const path = UMB_WORKSPACE_VIEW_PATH_PATTERN.generateLocal({ viewPathname: manifest.meta.pathname });
@@ -157,10 +178,16 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 		// TODO: Deprecate the slot feature, to rely purely on routes, cause currently bringing an additional route would mean the slotted content would never be shown. [NL]
 		return html`
 			<umb-body-layout main-no-padding .headline=${this.headline} ?loading=${this.loading}>
-				${this.#renderBackButton()}
-				<slot name="header" slot="header"></slot>
-				<slot name="action-menu" slot="action-menu"></slot>
-				${this.#renderViews()} ${this.#renderRoutes()}
+				${when(
+					!this.notFound,
+					() => html`
+						${this.#renderBackButton()}
+						<slot name="header" slot="header"></slot>
+						<slot name="action-menu" slot="action-menu"></slot>
+						${this.#renderViews()}
+					`,
+				)}
+				${this.#renderRoutes()}
 				<slot></slot>
 				${when(
 					!this.enforceNoFooter,
@@ -283,11 +310,6 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 			umb-badge {
 				font-size: var(--uui-type-small-size);
 				right: -1.5em;
-			}
-
-			umb-extension-slot[slot='actions'] {
-				display: flex;
-				gap: var(--uui-size-space-2);
 			}
 		`,
 	];

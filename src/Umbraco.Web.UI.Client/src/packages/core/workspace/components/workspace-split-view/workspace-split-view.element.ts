@@ -50,7 +50,10 @@ export class UmbWorkspaceSplitViewElement extends UmbLitElement {
 	private _variantSelectorSlotHasContent = false;
 
 	@state()
-	private _isNew = false;
+	private _notFound?: boolean;
+
+	@state()
+	private _isNew?: boolean;
 
 	@state()
 	private _variantId?: UmbVariantId;
@@ -65,9 +68,17 @@ export class UmbWorkspaceSplitViewElement extends UmbLitElement {
 		super();
 
 		this.observe(
+			this.splitViewContext.notFound,
+			(notFound) => {
+				this._notFound = notFound;
+			},
+			null,
+		);
+
+		this.observe(
 			this.splitViewContext.isNew,
 			(isNew) => {
-				this._isNew = isNew ?? false;
+				this._isNew = isNew;
 			},
 			null,
 		);
@@ -85,6 +96,7 @@ export class UmbWorkspaceSplitViewElement extends UmbLitElement {
 		return html`
 			<umb-workspace-editor
 				.loading=${this.loading}
+				.notFound=${this._notFound}
 				back-path=${ifDefined(this.backPath)}
 				.hideNavigation=${!this.displayNavigation}
 				.variantId=${this._variantId}
@@ -104,6 +116,7 @@ export class UmbWorkspaceSplitViewElement extends UmbLitElement {
 	}
 
 	#renderEntityActions() {
+		if (this._notFound) return nothing;
 		if (this._isNew) return nothing;
 		if (!this.displayNavigation) return nothing;
 
