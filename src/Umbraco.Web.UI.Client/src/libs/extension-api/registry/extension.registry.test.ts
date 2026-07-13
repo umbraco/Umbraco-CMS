@@ -75,7 +75,7 @@ describe('UmbExtensionRegistry', () => {
 		expect(registeredExtensions?.[0]?.alias).to.eq('Umb.Test.Section.1');
 	});
 
-	it('should ignorer extension of same alias', () => {
+	it('should ignore extension of same alias', () => {
 		const manifestWithSameAlias = {
 			alias: manifests[0].alias,
 			type: 'section',
@@ -95,7 +95,7 @@ describe('UmbExtensionRegistry', () => {
 		// The first registration is preserved, the second is rejected.
 		const ext = extensionRegistry.getByAlias(manifests[0].alias) as { name: string };
 		expect(ext?.name).to.equal('test-section-1');
-		expect(errors.length).to.equal(1);
+		expect(errors).to.have.lengthOf(1);
 	});
 
 	it('should say that an extension is registered', () => {

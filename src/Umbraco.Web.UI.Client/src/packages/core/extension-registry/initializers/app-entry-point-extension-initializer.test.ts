@@ -87,7 +87,7 @@ describe('UmbAppEntryPointExtensionInitializer', () => {
 		} as ManifestAppEntryPoint);
 
 		await waitLoaded(initializer);
-		expect(onInitArgs.length).to.equal(1);
+		expect(onInitArgs).to.have.lengthOf(1);
 		expect(onInitArgs[0][0]).to.equal(host);
 		expect(onInitArgs[0][1]).to.equal(registry);
 
