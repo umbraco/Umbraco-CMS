@@ -281,6 +281,7 @@ export default {
 			'Klik <em>Udgiv med undersider</em> for at udgive <strong>de valgte sprog</strong> og de samme sprog for sider under og dermed gøre deres indhold offentligt tilgængelige.',
 		releaseDate: 'Udgivelsesdato',
 		unpublishDate: 'Afpubliceringsdato',
+		scheduleForAllLanguages: 'Planlæg for alle valgte sprog',
 		removeDate: 'Fjern dato',
 		setDate: 'Vælg dato',
 		sortDone: 'Sorteringsrækkefølgen er opdateret',

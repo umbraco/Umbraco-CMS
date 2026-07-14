@@ -282,6 +282,7 @@ export default {
 		noVariantsToProcess: 'Không có biến thể nào có sẵn',
 		releaseDate: 'Xuất bản vào',
 		unpublishDate: 'Hủy xuất bản vào',
+		scheduleForAllLanguages: 'Lên lịch cho tất cả ngôn ngữ đã chọn',
 		removeDate: 'Xóa ngày',
 		setDate: 'Đặt ngày',
 		sortDone: 'Thứ tự sắp xếp đã được cập nhật',
