@@ -1,8 +1,8 @@
-import { UmbUnpublishElementEntityAction } from '../entity-action/index.js';
+import { UmbElementUnpublishManifestEntityActionMeta } from '../entity-action/constants.js';
 import type { UmbElementVariantOptionModel } from '../../../types.js';
 import { UMB_ELEMENT_ENTITY_TYPE } from '../../../entity.js';
-import { UMB_ELEMENT_UNPUBLISH_MODAL } from '../modal/constants.js';
 import { UmbElementPublishingRepository } from '../../repository/index.js';
+import { UMB_CONTENT_UNPUBLISH_MODAL, UmbContentUnpublishEntityAction } from '@umbraco-cms/backoffice/content';
 import { umbConfirmModal, umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UmbEntityBulkActionBase } from '@umbraco-cms/backoffice/entity-bulk-action';
 import { UMB_APP_LANGUAGE_CONTEXT, UmbLanguageCollectionRepository } from '@umbraco-cms/backoffice/language';
@@ -30,10 +30,10 @@ export class UmbElementUnpublishEntityBulkAction extends UmbEntityBulkActionBase
 
 		// If there is only one selection, we can refer to the regular unpublish entity action:
 		if (this.selection.length === 1) {
-			const action = new UmbUnpublishElementEntityAction(this._host, {
+			const action = new UmbContentUnpublishEntityAction(this._host, {
 				unique: this.selection[0],
 				entityType: UMB_ELEMENT_ENTITY_TYPE,
-				meta: {} as never,
+				meta: UmbElementUnpublishManifestEntityActionMeta,
 			});
 			await action.execute();
 			return;
@@ -116,7 +116,7 @@ export class UmbElementUnpublishEntityBulkAction extends UmbEntityBulkActionBase
 			selection.push(new UmbVariantId(appCulture, null).toString());
 		}
 
-		const result = await umbOpenModal(this, UMB_ELEMENT_UNPUBLISH_MODAL, {
+		const result = await umbOpenModal(this, UMB_CONTENT_UNPUBLISH_MODAL, {
 			data: {
 				options,
 			},
