@@ -1,17 +1,9 @@
-import {
-	css,
-	customElement,
-	html,
-	ifDefined,
-	nothing,
-	property,
-	repeat,
-	when,
-} from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, ifDefined, property, when } from '@umbraco-cms/backoffice/external/lit';
 import { extractUmbColorVariable } from '@umbraco-cms/backoffice/resources';
 import { simpleHashCode } from '@umbraco-cms/backoffice/observable-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
+import type { UmbSortableListElement } from '@umbraco-cms/backoffice/sorter';
+import '@umbraco-cms/backoffice/sorter';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbInputManifestElement } from '@umbraco-cms/backoffice/components';
@@ -38,25 +30,9 @@ export class UmbPropertyEditorUICollectionLayoutConfigurationElement
 	extends UmbLitElement
 	implements UmbPropertyEditorUiElement
 {
-	#sorter = new UmbSorterController<UmbCollectionLayoutConfiguration>(this, {
-		getUniqueOfElement: (element) => {
-			return element.id;
-		},
-		getUniqueOfModel: (modelEntry) => {
-			return this.#getUnique(modelEntry);
-		},
-		itemSelector: '.layout-item',
-		containerSelector: '#layout-wrapper',
-		onChange: ({ model }) => {
-			this.value = model;
-			this.dispatchEvent(new UmbChangeEvent());
-		},
-	});
-
 	@property({ type: Array })
 	public set value(value: Array<UmbCollectionLayoutConfiguration> | undefined) {
 		this.#value = value ?? [];
-		this.#sorter.setModel(this.#value);
 	}
 	public get value(): Array<UmbCollectionLayoutConfiguration> {
 		return this.#value;
@@ -68,8 +44,12 @@ export class UmbPropertyEditorUICollectionLayoutConfigurationElement
 
 	async #focusNewItem() {
 		await this.updateComplete;
-		const input = this.shadowRoot?.querySelector('.layout-item:last-of-type > uui-input') as UUIInputElement;
-		input.focus();
+		const list = this.shadowRoot?.querySelector('umb-sortable-list');
+		await list?.updateComplete;
+		const input = list?.shadowRoot?.querySelector('umb-sortable-list-item:last-of-type > uui-input') as
+			| UUIInputElement
+			| undefined;
+		input?.focus();
 	}
 
 	#onAdd(event: { target: UmbInputManifestElement }) {
@@ -98,6 +78,7 @@ export class UmbPropertyEditorUICollectionLayoutConfigurationElement
 	}
 
 	#onChangeLabel(e: UUIInputEvent, index: number) {
+		e.stopPropagation();
 		const values = [...(this.value ?? [])];
 		values[index] = { ...values[index], name: e.target.value as string };
 		this.value = values;
@@ -132,9 +113,18 @@ export class UmbPropertyEditorUICollectionLayoutConfigurationElement
 		return 'x' + simpleHashCode('' + layout.collectionView + layout.name + layout.icon).toString(16);
 	}
 
+	#onSort(e: Event) {
+		this.value = (e.target as UmbSortableListElement<UmbCollectionLayoutConfiguration>).items;
+		this.dispatchEvent(new UmbChangeEvent());
+	}
+
 	override render() {
 		return html`
-			<div id="layout-wrapper">${this.#renderLayouts()}</div>
+			<umb-sortable-list
+				.items=${this.value}
+				.getUnique=${(layout: UmbCollectionLayoutConfiguration) => this.#getUnique(layout)}
+				.renderMethod=${(layout: UmbCollectionLayoutConfiguration, index: number) => this.#renderLayout(layout, index)}
+				@change=${this.#onSort}></umb-sortable-list>
 			${this.#renderInput()}
 		`;
 	}
@@ -143,93 +133,49 @@ export class UmbPropertyEditorUICollectionLayoutConfigurationElement
 		return html`<umb-input-manifest extension-type="collectionView" @change=${this.#onAdd}></umb-input-manifest>`;
 	}
 
-	#renderLayouts() {
-		if (!this.value) return nothing;
-		return repeat(
-			this.value,
-			(layout) => this.#getUnique(layout),
-			(layout, index) => this.#renderLayout(layout, index),
-		);
-	}
-
 	#renderLayout(layout: UmbCollectionLayoutConfiguration, index: number) {
 		const icon = this.#parseIcon(layout.icon);
 		const varName = icon.color ? extractUmbColorVariable(icon.color) : undefined;
 		return html`
-			<div class="layout-item" id=${this.#getUnique(layout)}>
-				<uui-icon class="drag-handle" name="icon-grip"></uui-icon>
-
-				<uui-button compact look="outline" label="pick icon" @click=${() => this.#onIconChange(icon, index)}>
-					${when(
-						icon.color,
-						() => html`<uui-icon name=${ifDefined(icon.icon)} style="color:var(${varName})"></uui-icon>`,
-						() => html`<uui-icon name=${ifDefined(icon.icon)}></uui-icon>`,
-					)}
-				</uui-button>
-
-				<uui-input
-					label="name"
-					value=${ifDefined(layout.name)}
-					placeholder="Enter a label..."
-					@change=${(e: UUIInputEvent) => this.#onChangeLabel(e, index)}></uui-input>
-
-				<div class="alias">
-					<code>${layout.collectionView}</code>
-				</div>
-
-				<div class="actions">
+			<umb-sortable-list-item .unique=${this.#getUnique(layout)}>
+				<div style="display:flex;align-items:center;gap:var(--uui-size-6);">
 					<uui-button
-						label=${this.localize.term('general_remove')}
-						look="secondary"
-						@click=${() => this.#onRemove(index)}></uui-button>
+						compact
+						look="outline"
+						label="pick icon"
+						style="min-width:var(--uui-size-11);"
+						@click=${() => this.#onIconChange(icon, index)}>
+						${when(
+							icon.color,
+							() => html`<uui-icon name=${ifDefined(icon.icon)} style="color:var(${varName})"></uui-icon>`,
+							() => html`<uui-icon name=${ifDefined(icon.icon)}></uui-icon>`,
+						)}
+					</uui-button>
+					<uui-input
+						label="name"
+						value=${ifDefined(layout.name)}
+						placeholder="Enter a label..."
+						style="flex:1;"
+						@change=${(e: UUIInputEvent) => this.#onChangeLabel(e, index)}>
+					</uui-input>
+					<div class="alias" style="flex:1;word-break:break-all;">
+						<code>${layout.collectionView}</code>
+					</div>
 				</div>
-			</div>
+				<uui-action-bar slot="actions">
+					<uui-button label=${this.localize.term('general_remove')} @click=${() => this.#onRemove(index)}>
+						<uui-icon name="icon-trash"></uui-icon> </uui-button
+				></uui-action-bar>
+			</umb-sortable-list-item>
 		`;
 	}
 
-	static override styles = [
+	static override readonly styles = [
 		UmbTextStyles,
 		css`
-			#layout-wrapper {
-				display: flex;
-				flex-direction: column;
-				gap: 1px;
+			umb-sortable-list {
+				display: block;
 				margin-bottom: var(--uui-size-1);
-			}
-
-			.layout-item {
-				background-color: var(--uui-color-surface-alt);
-				display: flex;
-				align-items: center;
-				gap: var(--uui-size-6);
-				padding: var(--uui-size-3) var(--uui-size-6);
-			}
-
-			.layout-item > uui-icon {
-				flex: 0 0 var(--uui-size-6);
-			}
-
-			.layout-item > uui-button {
-				min-width: var(--uui-size-11);
-			}
-
-			.layout-item > uui-input,
-			.layout-item > .alias {
-				flex: 1;
-			}
-
-			.layout-item > .actions {
-				flex: 0 0 auto;
-				display: flex;
-				justify-content: flex-end;
-			}
-
-			.drag-handle {
-				cursor: grab;
-			}
-
-			.drag-handle:active {
-				cursor: grabbing;
 			}
 		`,
 	];
