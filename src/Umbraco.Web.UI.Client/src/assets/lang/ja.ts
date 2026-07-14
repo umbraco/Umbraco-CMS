@@ -768,6 +768,15 @@ export default {
 		sortHelp:
 			'上下にアイテムをドラッグするなどして適当に配置したり、列のヘッダーをクリックしてコレクション全体をソートできます',
 		sortPleaseWait: ' 項目の並べ替えには少し時間がかかります。しばらくお待ちください。',
+		sortByFieldHeadline: 'フィールドで並べ替え',
+		sortByFieldSentence: 'すべての子項目を次で並べ替え:',
+		sortByFieldDirectionLabel: '方向',
+		sortByFieldAscending: '昇順',
+		sortByFieldDescending: '降順',
+		sortByFieldNameOption: '名前',
+		sortByFieldCreateDateOption: '作成日',
+		sortByFieldUpdateDateOption: '最終編集',
+		sortIndividuallyHeadline: '個別に並べ替え',
 	},
 	speechBubbles: {
 		validationFailedHeader: '検証',

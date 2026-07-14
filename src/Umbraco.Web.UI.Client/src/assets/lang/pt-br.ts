@@ -405,6 +405,15 @@ export default {
 		sortHelp:
 			'Arraste os diferentes itens para cima ou para baixo para definir como os mesmos serão arranjados. Ou clique no título da coluna para classificar a coleção completa de itens',
 		sortPleaseWait: 'Favor esperar. Itens estão sendo classificados, isto pode demorar um tempo.',
+		sortByFieldHeadline: 'Classificar por campo',
+		sortByFieldSentence: 'Classificar todos os itens filhos por',
+		sortByFieldDirectionLabel: 'Direção',
+		sortByFieldAscending: 'Crescente',
+		sortByFieldDescending: 'Decrescente',
+		sortByFieldNameOption: 'Nome',
+		sortByFieldCreateDateOption: 'Criado',
+		sortByFieldUpdateDateOption: 'Última edição',
+		sortIndividuallyHeadline: 'Classificar individualmente',
 	},
 	speechBubbles: {
 		contentPublishedFailedByEvent: 'Publicação foi cancelada por add-in de terceiros',

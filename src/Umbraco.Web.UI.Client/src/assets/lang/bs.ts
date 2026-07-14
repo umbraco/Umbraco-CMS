@@ -1241,6 +1241,15 @@ export default {
 		sortHelp:
 			'Povucite različite stavke gore ili dolje ispod da postavite kako bi trebale biti raspoređene. Ili kliknite na\n       zaglavlja kolona za sortiranje cijele kolekcije stavki\n    ',
 		sortPleaseWait: 'Pričekajte. Stavke se sortiraju, ovo može potrajati.',
+		sortByFieldHeadline: 'Sortiraj po polju',
+		sortByFieldSentence: 'Sortiraj sve podređene stavke po',
+		sortByFieldDirectionLabel: 'Smjer',
+		sortByFieldAscending: 'Rastuće',
+		sortByFieldDescending: 'Opadajuće',
+		sortByFieldNameOption: 'Naziv',
+		sortByFieldCreateDateOption: 'Kreirano',
+		sortByFieldUpdateDateOption: 'Zadnja izmjena',
+		sortIndividuallyHeadline: 'Sortiraj pojedinačno',
 	},
 	speechBubbles: {
 		validationFailedHeader: 'Validacija',

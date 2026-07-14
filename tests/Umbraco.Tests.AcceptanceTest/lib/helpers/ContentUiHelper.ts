@@ -95,6 +95,9 @@ export class ContentUiHelper extends UiBaseLocators {
   private readonly publicAccessBtn: Locator;
   private readonly uuiCheckbox: Locator;
   private readonly sortBtn: Locator;
+  private readonly sortByFieldTab: Locator;
+  private readonly sortByFieldSelect: Locator;
+  private readonly sortByFieldDirectionSelect: Locator;
   private readonly containerSaveBtn: Locator
   private readonly groupBasedProtectionBtn: Locator;
   private readonly chooseMemberGroupBtn: Locator;
@@ -308,6 +311,9 @@ export class ContentUiHelper extends UiBaseLocators {
     this.publicAccessBtn = page.getByRole('button', {name: 'Public Access'});
     this.uuiCheckbox = page.locator('uui-checkbox');
     this.sortBtn = page.getByLabel('Sort', {exact: true});
+    this.sortByFieldTab = page.getByTestId('sort-children-of-modal:tab-by-field');
+    this.sortByFieldSelect = page.locator('umb-sort-children-of-content-modal [label="Sort by field"] select');
+    this.sortByFieldDirectionSelect = page.locator('umb-sort-children-of-content-modal [label="Direction"] select');
     this.containerSaveBtn = this.container.getByLabel('Save');
     this.groupBasedProtectionBtn = page.locator('span').filter({hasText: 'Group based protection'});
     this.chooseMemberGroupBtn = page.locator('umb-input-member-group').getByLabel('Choose');
@@ -1234,6 +1240,24 @@ export class ContentUiHelper extends UiBaseLocators {
 
   async clickSortButton() {
     await this.click(this.sortBtn);
+  }
+
+  async clickSortByFieldTab() {
+    await this.click(this.sortByFieldTab);
+  }
+
+  async selectSortByField(fieldName: string) {
+    await this.selectByText(this.sortByFieldSelect, fieldName);
+  }
+
+  async selectSortByFieldDirection(directionName: string) {
+    await this.selectByText(this.sortByFieldDirectionSelect, directionName);
+  }
+
+  async prepareSortByField(fieldName: string, directionName: string) {
+    await this.clickSortByFieldTab();
+    await this.selectSortByField(fieldName);
+    await this.selectSortByFieldDirection(directionName);
   }
 
   async doesIndexDocumentInTreeContainName(parentName: string, childName: string, index: number) {
