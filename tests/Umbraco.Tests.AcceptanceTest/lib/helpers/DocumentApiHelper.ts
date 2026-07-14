@@ -1156,6 +1156,54 @@ export class DocumentApiHelper {
     return await this.create(document);
   }
 
+  async createDefaultDocumentWithAnEmptyBlockListEditor(documentName: string, elementTypeId: string, documentTypeName: string, blockListDataTypeName: string) {
+    const blockListDataTypeId = await this.api.dataType.createBlockListDataTypeWithABlock(blockListDataTypeName, elementTypeId) || '';
+    const documentTypeId = await this.api.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, blockListDataTypeName, blockListDataTypeId) || '';
+    return await this.createDefaultDocument(documentName, documentTypeId);
+  }
+
+  async createDefaultDocumentWithAnEmptyBlockGridEditor(documentName: string, elementTypeId: string, documentTypeName: string, blockGridDataTypeName: string) {
+    const blockGridDataTypeId = await this.api.dataType.createBlockGridWithABlock(blockGridDataTypeName, elementTypeId) || '';
+    const documentTypeId = await this.api.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, blockGridDataTypeName, blockGridDataTypeId) || '';
+    return await this.createDefaultDocument(documentName, documentTypeId);
+  }
+
+  async createDefaultDocumentWithAnEmptyRichTextEditor(documentName: string, elementTypeId: string, documentTypeName: string, richTextDataTypeName: string) {
+    const richTextDataTypeId = await this.api.dataType.createRichTextEditorWithABlock(richTextDataTypeName, elementTypeId) || '';
+    const documentTypeId = await this.api.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, richTextDataTypeName, richTextDataTypeId) || '';
+    return await this.createDefaultDocument(documentName, documentTypeId);
+  }
+
+  async getBlockListValue(documentName: string) {
+    const document = await this.getByName(documentName);
+    return document.values.find(value => value.editorAlias === 'Umbraco.BlockList')?.value;
+  }
+
+  async getBlockGridValue(documentName: string) {
+    const document = await this.getByName(documentName);
+    return document.values.find(value => value.editorAlias === 'Umbraco.BlockGrid')?.value;
+  }
+
+  async createDefaultDocumentWithAnEmptySingleBlockEditor(documentName: string, elementTypeId: string, documentTypeName: string, singleBlockDataTypeName: string) {
+    const singleBlockDataTypeId = await this.api.dataType.createSingleBlockDataTypeWithABlock(singleBlockDataTypeName, elementTypeId) || '';
+    const documentTypeId = await this.api.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, singleBlockDataTypeName, singleBlockDataTypeId) || '';
+    return await this.createDefaultDocument(documentName, documentTypeId);
+  }
+
+  async getSingleBlockValue(documentName: string) {
+    const document = await this.getByName(documentName);
+    return document.values.find(value => value.editorAlias === 'Umbraco.SingleBlock')?.value;
+  }
+
+  async getRichTextBlocksValue(documentName: string) {
+    const document = await this.getByName(documentName);
+    return document.values.find(value => value.editorAlias === 'Umbraco.RichText')?.value?.blocks;
+  }
+
+  getBlockContentPropertyValue(blockValue, contentKey: string) {
+    return blockValue?.contentData.find(contentData => contentData.key === contentKey)?.values[0]?.value;
+  }
+
   async createDefaultDocumentWithABlockListEditorAndBlockWithValueAndTwoGroups(documentName: string, documentTypeName: string, blockListDataTypeName: string, elementTypeId: string, elementTypePropertyAlias: string, elementTypePropertyValue: string, elementTypePropertyEditorAlias: string, groupName: string = 'TestGroup', secondPropertyName: string, secondGroupName: string = 'GroupTwoName') {
     const crypto = require('crypto');
     const blockContentKey = crypto.randomUUID();
