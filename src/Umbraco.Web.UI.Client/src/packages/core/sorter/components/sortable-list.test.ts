@@ -78,4 +78,15 @@ describe('UmbSortableListElement', () => {
 		expect(element.itemSelector).to.equal('umb-sortable-list-item');
 		expect(element.handleSelector).to.equal('.handle');
 	});
+
+	it('has no identifier by default', () => {
+		expect(element.identifier).to.be.undefined;
+	});
+
+	it('accepts a custom identifier attribute', async () => {
+		const custom = await fixture<UmbSortableListElement<string>>(
+			html`<umb-sortable-list identifier="Umb.SorterIdentifier.Test"></umb-sortable-list>`,
+		);
+		expect(custom.identifier).to.equal('Umb.SorterIdentifier.Test');
+	});
 });

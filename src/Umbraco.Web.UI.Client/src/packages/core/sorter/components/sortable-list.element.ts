@@ -40,6 +40,20 @@ export class UmbSortableListElement<T = unknown> extends UmbLitElement {
 	readonly #sorter = new UmbSorterController<T>(this, this.#sorterConfig);
 
 	/**
+	 * An identifier shared between sortable lists, allowing items to be dragged from one list to another that shares the same identifier.
+	 * @type {string}
+	 * @attr
+	 */
+	@property()
+	public get identifier(): string | undefined {
+		// UmbSorterController assigns a Symbol default when none is set, so only surface an explicit string identifier.
+		return typeof this.#sorterConfig.identifier === 'string' ? this.#sorterConfig.identifier : undefined;
+	}
+	public set identifier(value: string | undefined) {
+		this.#sorterConfig.identifier = value || undefined;
+	}
+
+	/**
 	 * The selector used to find the items to sort within this element's shadow root.
 	 * @type {string}
 	 * @attr item-selector
