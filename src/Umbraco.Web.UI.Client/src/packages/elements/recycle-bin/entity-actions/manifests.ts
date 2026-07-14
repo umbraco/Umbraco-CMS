@@ -34,6 +34,7 @@ const elementActions: Array<UmbExtensionManifest> = [
 		kind: 'trashWithRelation',
 		alias: 'Umb.EntityAction.Element.RecycleBin.Trash',
 		name: 'Trash Element Entity Action',
+		api: () => import('./trash/element-trash-with-relation.action.js'),
 		forEntityTypes: [UMB_ELEMENT_ENTITY_TYPE],
 		meta: {
 			itemDataResolver: UmbElementItemDataResolver,
@@ -41,7 +42,6 @@ const elementActions: Array<UmbExtensionManifest> = [
 			recycleBinRepositoryAlias: UMB_ELEMENT_RECYCLE_BIN_REPOSITORY_ALIAS,
 			referenceRepositoryAlias: UMB_ELEMENT_REFERENCE_REPOSITORY_ALIAS,
 		},
-
 		conditions: [
 			{
 				alias: UMB_ELEMENT_USER_PERMISSION_CONDITION_ALIAS,

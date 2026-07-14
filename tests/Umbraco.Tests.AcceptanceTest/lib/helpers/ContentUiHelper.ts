@@ -224,7 +224,7 @@ export class ContentUiHelper extends UiBaseLocators {
     this.enterTagTxt = page.getByPlaceholder('Enter tag');
     this.menuItemTree = page.locator('umb-menu-item-tree-default');
     this.confirmToUnpublishBtn = page.locator('umb-content-unpublish-modal').getByLabel('Unpublish');
-    this.confirmToPublishBtn = page.locator('umb-document-publish-modal').getByLabel('Publish');
+    this.confirmToPublishBtn = page.locator('umb-content-publish-modal').getByLabel('Publish');
     this.dropdown = page.locator("select#native");
     this.splitView = page.locator("#splitViews");
     this.setADateTxt = page.getByLabel("Set a date…");
@@ -418,21 +418,46 @@ export class ContentUiHelper extends UiBaseLocators {
     this.tiptapStatusbarWordCount = page.locator('umb-tiptap-statusbar-word-count');
     this.tiptapStatusbarElementPath = page.locator('umb-tiptap-statusbar-element-path');
     // Scheduled Publishing
-    this.workspaceActionMenu = page.locator('umb-workspace-action-menu');
-    this.workspaceActionMenuItem = page.locator('umb-workspace-action-menu-item');
-    this.viewMoreOptionsBtn = this.workspaceActionMenu.locator('#popover-trigger');
-    this.schedulePublishBtn = this.workspaceActionMenuItem.getByLabel('Schedule publish', {exact: true});
-    this.documentScheduleModal = page.locator('umb-document-schedule-modal');
-    this.schedulePublishModalBtn = this.documentScheduleModal.getByLabel('Schedule publish', {exact: true});
-    this.publishAtFormLayout = this.documentScheduleModal.locator('uui-form-layout-item').first();
-    this.unpublishAtFormLayout = this.documentScheduleModal.locator('uui-form-layout-item').last();
-    this.publishAtValidationMessage = this.publishAtFormLayout.locator('#messages');
-    this.unpublishAtValidationMessage = this.unpublishAtFormLayout.locator('#messages');
-    this.lastPublished = this.generalItem.filter({hasText: 'Last published'}).locator('umb-localize-date');
-    this.publishAt = this.generalItem.filter({hasText: 'Publish at'}).locator('umb-localize-date');
-    this.removeAt = this.generalItem.filter({hasText: 'Remove at'}).locator('umb-localize-date');
-    this.selectAllCheckbox = this.documentScheduleModal.locator('[label="Select all"]');
-    this.confirmToPublishBtn = page.locator('umb-document-publish-modal').getByLabel('Publish');
+    this.workspaceActionMenu = page.locator("umb-workspace-action-menu");
+    this.workspaceActionMenuItem = page.locator(
+      "umb-workspace-action-menu-item",
+    );
+    this.viewMoreOptionsBtn =
+      this.workspaceActionMenu.locator("#popover-trigger");
+    this.schedulePublishBtn = this.workspaceActionMenuItem.getByLabel(
+      "Schedule publish",
+      { exact: true },
+    );
+    this.documentScheduleModal = page.locator("umb-document-schedule-modal");
+    this.schedulePublishModalBtn = this.documentScheduleModal.getByLabel(
+      "Schedule publish",
+      { exact: true },
+    );
+    this.publishAtFormLayout = this.documentScheduleModal
+      .locator("uui-form-layout-item")
+      .first();
+    this.unpublishAtFormLayout = this.documentScheduleModal
+      .locator("uui-form-layout-item")
+      .last();
+    this.publishAtValidationMessage =
+      this.publishAtFormLayout.locator("#messages");
+    this.unpublishAtValidationMessage =
+      this.unpublishAtFormLayout.locator("#messages");
+    this.lastPublished = this.generalItem
+      .filter({ hasText: "Last published" })
+      .locator("umb-localize-date");
+    this.publishAt = this.generalItem
+      .filter({ hasText: "Publish at" })
+      .locator("umb-localize-date");
+    this.removeAt = this.generalItem
+      .filter({ hasText: "Remove at" })
+      .locator("umb-localize-date");
+    this.selectAllCheckbox = this.documentScheduleModal.locator(
+      '[label="Select all"]',
+    );
+    this.confirmToPublishBtn = page
+      .locator("umb-content-publish-modal")
+      .getByLabel("Publish");
     // Publish with descendants
     this.documentPublishWithDescendantsModal = page.locator('umb-document-publish-with-descendants-modal');
     this.publishWithDescendantsBtn = this.workspaceActionMenuItem.getByLabel('Publish with descendants', {exact: true});

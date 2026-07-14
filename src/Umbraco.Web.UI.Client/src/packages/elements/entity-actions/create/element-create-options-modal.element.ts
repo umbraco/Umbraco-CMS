@@ -1,5 +1,9 @@
 import { UmbElementTypeStructureRepository } from '../../repository/structure/index.js';
 import { UMB_CREATE_ELEMENT_WORKSPACE_PATH_PATTERN } from '../../paths.js';
+import {
+	UMB_ELEMENT_USER_PERMISSION_CONDITION_ALIAS,
+	UMB_USER_PERMISSION_ELEMENT_CREATE,
+} from '../../user-permissions/constants.js';
 import type { UmbAllowedElementTypeModel } from '../../repository/structure/index.js';
 import type { UmbElementEntityTypeUnion } from '../../entity.js';
 import type {
@@ -8,7 +12,7 @@ import type {
 } from './element-create-options-modal.token.js';
 import { css, customElement, html, nothing, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbExtensionsApiInitializer } from '@umbraco-cms/backoffice/extension-api';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { createExtensionApiByAlias, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import type { ManifestEntityCreateOptionAction } from '@umbraco-cms/backoffice/entity-create-option-action';
 import type { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
@@ -29,8 +33,24 @@ export class UmbElementCreateOptionsModalElement extends UmbModalBaseElement<
 	@state()
 	private _hrefList: Array<string | undefined> = [];
 
+	constructor() {
+		super();
+		createExtensionApiByAlias(this, UMB_ELEMENT_USER_PERMISSION_CONDITION_ALIAS, [
+			{
+				config: {
+					alias: UMB_ELEMENT_USER_PERMISSION_CONDITION_ALIAS,
+					allOf: [UMB_USER_PERMISSION_ELEMENT_CREATE],
+				},
+				onChange: (permitted: boolean) => {
+					if (permitted && this._allowedElementTypes.length === 0) {
+						this.#retrieveAllowedElementTypes();
+					}
+				},
+			},
+		]);
+	}
+
 	override async firstUpdated() {
-		this.#retrieveAllowedElementTypes();
 		this.#initCreateOptionActions();
 	}
 

@@ -11,17 +11,25 @@ import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UMB_TREE_PICKER_MODAL } from '@umbraco-cms/backoffice/tree';
 import type { MetaEntityBulkActionDuplicateToKind } from '@umbraco-cms/backoffice/extension-registry';
 
-export class UmbMediaDuplicateEntityBulkAction extends UmbEntityBulkActionBase<MetaEntityBulkActionDuplicateToKind> {
+export class UmbDuplicateToEntityBulkAction extends UmbEntityBulkActionBase<MetaEntityBulkActionDuplicateToKind> {
+	#searchConfig() {
+		const alias = this.args.meta.searchProviderAlias;
+		return alias ? { providerAlias: alias } : undefined;
+	}
+
 	async execute() {
 		if (this.selection?.length === 0) return;
 
 		const value = await umbOpenModal(this, UMB_TREE_PICKER_MODAL, {
 			data: {
+				headline: '#actions_copyTo',
+				confirmLabel: '#general_copy',
 				foldersOnly: this.args.meta.foldersOnly,
 				hideTreeRoot: this.args.meta.hideTreeRoot,
 				treeAlias: this.args.meta.treeAlias,
+				search: this.#searchConfig(),
 			},
-		});
+		}).catch(() => undefined);
 
 		if (!value?.selection?.length) return;
 
@@ -60,4 +68,4 @@ export class UmbMediaDuplicateEntityBulkAction extends UmbEntityBulkActionBase<M
 	}
 }
 
-export { UmbMediaDuplicateEntityBulkAction as api };
+export { UmbDuplicateToEntityBulkAction as api };
