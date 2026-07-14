@@ -26,7 +26,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
 });
 
-test('can insert a block from the Library', async ({umbracoApi, umbracoUi}) => {
+test('can insert a block from the Library', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const libraryElementId = await umbracoApi.element.createDefaultElement(libraryElementName, elementTypeId);
   await umbracoApi.element.publish(libraryElementId);
@@ -50,7 +50,8 @@ test('can insert a block from the Library', async ({umbracoApi, umbracoUi}) => {
 
 test('can disconnect a block from the Library', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const libraryElementId = await umbracoApi.element.createElementWithTextContent(libraryElementName, elementTypeId, 'Shared grid library text', propertyInBlock);
+  const sharedText = 'Shared grid library text';
+  const libraryElementId = await umbracoApi.element.createElementWithTextContent(libraryElementName, elementTypeId, sharedText, propertyInBlock);
   await umbracoApi.element.publish(libraryElementId);
   await umbracoApi.document.createDefaultDocumentWithAnEmptyBlockGridEditor(contentName, elementTypeId, documentTypeName, customDataTypeName);
   await umbracoUi.goToBackOffice();
@@ -69,6 +70,7 @@ test('can disconnect a block from the Library', async ({umbracoApi, umbracoUi}) 
   const layoutItem = blockGridValue.layout[blockGridEditorAlias][0];
   expect(layoutItem.isExternalContent).not.toBe(true);
   expect(layoutItem.contentKey).not.toBe(libraryElementId);
+  expect(umbracoApi.document.getBlockContentPropertyValue(blockGridValue, layoutItem.contentKey)).toBe(sharedText);
   expect(await umbracoApi.element.doesNameExist(libraryElementName)).toBeTruthy();
 });
 
@@ -131,7 +133,7 @@ test('updates the draft indicator when the referenced Library element is publish
   await umbracoUi.content.doesBlockHaveDraftTag(false, 'grid');
 });
 
-test('can transfer a local block to the Library', async ({umbracoApi, umbracoUi}) => {
+test('can transfer a local block to the Library', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const localBlockText = 'Local grid block content';
   await umbracoApi.document.createDefaultDocumentWithAnEmptyBlockGridEditor(contentName, elementTypeId, documentTypeName, customDataTypeName);

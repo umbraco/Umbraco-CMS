@@ -26,7 +26,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
 });
 
-test('can insert a block from the Library', async ({umbracoApi, umbracoUi}) => {
+test('can insert a block from the Library', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const libraryElementId = await umbracoApi.element.createDefaultElement(libraryElementName, elementTypeId);
   await umbracoApi.element.publish(libraryElementId);
@@ -133,7 +133,7 @@ test('updates the draft indicator when the referenced Library element is publish
   await umbracoUi.content.doesBlockHaveDraftTag(false, 'single');
 });
 
-test('can transfer a local block to the Library', async ({umbracoApi, umbracoUi}) => {
+test('can transfer a local block to the Library', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const localBlockText = 'Local single block content';
   await umbracoApi.document.createDefaultDocumentWithAnEmptySingleBlockEditor(contentName, elementTypeId, documentTypeName, customDataTypeName);

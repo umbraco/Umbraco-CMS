@@ -51,7 +51,7 @@ test.fixme('can insert a block from the Library', async ({umbracoApi, umbracoUi}
   expect(layoutItem.contentKey).toBe(libraryElementId);
 });
 
-test('can transfer a local block to the Library', async ({umbracoApi, umbracoUi}) => {
+test('can transfer a local block to the Library', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const localBlockText = 'Local rte block content';
   await umbracoApi.document.createDefaultDocumentWithAnEmptyRichTextEditor(contentName, elementTypeId, documentTypeName, customDataTypeName);

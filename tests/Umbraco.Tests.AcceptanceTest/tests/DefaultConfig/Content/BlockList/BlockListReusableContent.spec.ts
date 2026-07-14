@@ -35,7 +35,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.dataType.ensureNameNotExists(elementPickerDataTypeName);
 });
 
-test('can insert a block from the Library', async ({umbracoApi, umbracoUi}) => {
+test('can insert a block from the Library', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const libraryElementId = await umbracoApi.element.createDefaultElement(libraryElementName, elementTypeId);
   await umbracoApi.element.publish(libraryElementId);
@@ -211,7 +211,7 @@ test('cannot confirm a transfer until both a name and a location are provided', 
   await umbracoUi.content.isConfirmTransferToLibraryButtonEnabled(true);
 });
 
-test('can transfer a local block to the Library', async ({umbracoApi, umbracoUi}) => {
+test('can transfer a local block to the Library', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const localBlockText = 'Local block content';
   await umbracoApi.document.createDefaultDocumentWithAnEmptyBlockListEditor(contentName, elementTypeId, documentTypeName, customDataTypeName);
