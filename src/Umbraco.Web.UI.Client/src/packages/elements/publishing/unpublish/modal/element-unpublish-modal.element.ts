@@ -4,7 +4,7 @@ import type { UmbElementUnpublishModalData, UmbElementUnpublishModalValue } from
 import { css, customElement, html, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
+import { UmbDeprecation, UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 
 import '../../../modals/shared/element-variant-language-picker.element.js';
 
@@ -20,12 +20,23 @@ export function isPublished(option: UmbElementVariantOptionModel): boolean {
 	);
 }
 
+/** @deprecated Use `umb-content-unpublish-modal` from `@umbraco-cms/backoffice/content` instead. Scheduled for removal in Umbraco 20. */
 @customElement('umb-element-unpublish-modal')
 export class UmbElementUnpublishModalElement extends UmbModalBaseElement<
 	UmbElementUnpublishModalData,
 	UmbElementUnpublishModalValue
 > {
 	protected readonly _selectionManager = new UmbSelectionManager<string>(this);
+
+	constructor() {
+		super();
+
+		new UmbDeprecation({
+			deprecated: 'UmbElementUnpublishModalElement is deprecated.',
+			removeInVersion: '20.0.0',
+			solution: 'Use umb-content-unpublish-modal from @umbraco-cms/backoffice/content instead.',
+		}).warn();
+	}
 
 	@state()
 	private _options: Array<UmbElementVariantOptionModel> = [];

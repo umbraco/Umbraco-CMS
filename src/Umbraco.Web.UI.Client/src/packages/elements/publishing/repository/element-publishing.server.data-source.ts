@@ -1,8 +1,11 @@
 import type { UmbElementVariantPublishModel } from '../types.js';
+import type { UmbElementDetailModel } from '../../types.js';
+import { umbMapElementResponseToDetailModel } from '../../repository/detail/element-detail-response.mappers.js';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { ElementService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 
 /**
  * A server data source for Element publishing
@@ -74,5 +77,28 @@ export class UmbElementPublishingServerDataSource {
 				body: { cultures: variantIds.map((variant) => variant.toCultureString()) },
 			}),
 		);
+	}
+
+	/**
+	 * Get the published Element by its unique
+	 * @param {string} unique - Element unique
+	 * @returns {Promise<UmbDataSourceResponse<UmbElementDetailModel>>} Published element
+	 * @memberof UmbElementPublishingServerDataSource
+	 */
+	async published(unique: string): Promise<UmbDataSourceResponse<UmbElementDetailModel>> {
+		if (!unique) throw new Error('Unique is missing');
+
+		const { data, error } = await tryExecute(
+			this.#host,
+			ElementService.getElementByIdPublished({ path: { id: unique } }),
+		);
+
+		if (error || !data) {
+			return { error };
+		}
+
+		const element = umbMapElementResponseToDetailModel(data);
+
+		return { data: element };
 	}
 }
