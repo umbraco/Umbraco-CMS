@@ -70,16 +70,18 @@ public class UmbracoBackOfficeCacheHeadersMiddleware : IMiddleware
     {
         if (IsCacheableAssetRequest(context.Request))
         {
-            context.Response.OnStarting(static state =>
-            {
-                (HttpResponse response, string value) = ((HttpResponse, string))state;
-                if (ShouldSetCacheControl(response))
+            context.Response.OnStarting(
+                static state =>
                 {
-                    response.Headers[HeaderNames.CacheControl] = value;
-                }
+                    (HttpResponse response, string value) = ((HttpResponse, string))state;
+                    if (ShouldSetCacheControl(response))
+                    {
+                        response.Headers[HeaderNames.CacheControl] = value;
+                    }
 
-                return Task.CompletedTask;
-            }, (context.Response, _headerValue));
+                    return Task.CompletedTask;
+                },
+                (context.Response, _headerValue));
         }
 
         await next(context);
