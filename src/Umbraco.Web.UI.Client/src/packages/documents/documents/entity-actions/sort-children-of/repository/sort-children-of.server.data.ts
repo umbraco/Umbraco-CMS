@@ -1,5 +1,5 @@
 import { DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
-import type { ContentSortFieldModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { ContentSortFieldModel, DirectionModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import type {
@@ -52,7 +52,11 @@ export class UmbSortChildrenOfDocumentServerDataSource implements UmbSortChildre
 	 * @memberof UmbSortChildrenOfDocumentServerDataSource
 	 */
 	async sortChildrenOfByField(args: UmbSortChildrenOfByFieldArgs) {
-		const body = { field: args.field as ContentSortFieldModel, direction: args.direction, culture: args.culture ?? null };
+		const body = {
+			field: args.field as ContentSortFieldModel,
+			direction: args.direction as DirectionModel,
+			culture: args.culture ?? null,
+		};
 
 		return args.unique
 			? tryExecute(this.#host, DocumentService.putDocumentByIdSortChildren({ path: { id: args.unique }, body }))

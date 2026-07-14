@@ -1,5 +1,5 @@
 import type { ManifestEntityAction, MetaEntityActionDefaultKind } from '@umbraco-cms/backoffice/entity-action';
-import type { DirectionModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { UmbDirectionType } from '@umbraco-cms/backoffice/utils';
 
 export type { UmbSortChildrenOfRepository } from './sort-children-of-repository.interface.js';
 export type { UmbSortChildrenOfDataSource } from './sort-children-of-data-source.interface.js';
@@ -20,7 +20,7 @@ export interface UmbSortChildrenOfByFieldArgs {
 	 * (e.g. the Content sort fields for documents and media).
 	 */
 	field: string;
-	direction: DirectionModel;
+	direction: UmbDirectionType;
 	/**
 	 * The culture to sort by, for variant entities. Omitted or null for invariant sorting.
 	 */

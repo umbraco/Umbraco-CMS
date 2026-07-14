@@ -1,5 +1,5 @@
 import { MediaService } from '@umbraco-cms/backoffice/external/backend-api';
-import type { ContentSortFieldModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { ContentSortFieldModel, DirectionModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import type {
@@ -52,7 +52,7 @@ export class UmbSortChildrenOfMediaServerDataSource implements UmbSortChildrenOf
 	 * @memberof UmbSortChildrenOfMediaServerDataSource
 	 */
 	async sortChildrenOfByField(args: UmbSortChildrenOfByFieldArgs) {
-		const body = { field: args.field as ContentSortFieldModel, direction: args.direction };
+		const body = { field: args.field as ContentSortFieldModel, direction: args.direction as DirectionModel };
 
 		return args.unique
 			? tryExecute(this.#host, MediaService.putMediaByIdSortChildren({ path: { id: args.unique }, body }))

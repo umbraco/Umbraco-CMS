@@ -2,7 +2,9 @@ import { UmbSortChildrenOfMediaServerDataSource } from './sort-children-of.serve
 import { expect } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
-import { ContentSortFieldModel, DirectionModel, MediaService } from '@umbraco-cms/backoffice/external/backend-api';
+import { ContentSortFieldModel, MediaService } from '@umbraco-cms/backoffice/external/backend-api';
+import { UmbDirection } from '@umbraco-cms/backoffice/utils';
+import type { UmbDirectionType } from '@umbraco-cms/backoffice/utils';
 
 @customElement('test-sort-children-of-media-data-source-host')
 class UmbTestSortChildrenOfMediaDataSourceHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
@@ -47,7 +49,7 @@ describe('UmbSortChildrenOfMediaServerDataSource', () => {
 		const { error } = await dataSource.sortChildrenOfByField({
 			unique: 'media-id',
 			field: ContentSortFieldModel.UPDATE_DATE,
-			direction: DirectionModel.DESCENDING,
+			direction: UmbDirection.DESCENDING as UmbDirectionType,
 			culture: 'da',
 		});
 
@@ -62,7 +64,7 @@ describe('UmbSortChildrenOfMediaServerDataSource', () => {
 		const { error } = await dataSource.sortChildrenOfByField({
 			unique: null,
 			field: ContentSortFieldModel.NAME,
-			direction: DirectionModel.ASCENDING,
+			direction: UmbDirection.ASCENDING as UmbDirectionType,
 		});
 
 		expect(error).to.be.undefined;

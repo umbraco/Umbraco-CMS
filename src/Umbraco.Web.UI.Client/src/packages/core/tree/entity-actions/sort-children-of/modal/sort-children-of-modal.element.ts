@@ -6,8 +6,8 @@ import { css, customElement, html, nothing, state } from '@umbraco-cms/backoffic
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import { UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
-import { DirectionModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { UmbDirection, UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
+import type { UmbDirectionType } from '@umbraco-cms/backoffice/utils';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIButtonState, UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
 import type {
@@ -68,7 +68,7 @@ export class UmbSortChildrenOfModalElement<
 	private _selectedField?: string;
 
 	@state()
-	private _selectedDirection: DirectionModel = DirectionModel.ASCENDING;
+	private _selectedDirection: UmbDirectionType = UmbDirection.ASCENDING as UmbDirectionType;
 
 	protected _sortedUniques = new Set<string>();
 
@@ -310,7 +310,7 @@ export class UmbSortChildrenOfModalElement<
 	}
 
 	#onDirectionChange(event: UUISelectEvent) {
-		this._selectedDirection = event.target.value as DirectionModel;
+		this._selectedDirection = event.target.value as UmbDirectionType;
 	}
 
 	override render() {
@@ -380,13 +380,13 @@ export class UmbSortChildrenOfModalElement<
 		const directionOptions = [
 			{
 				name: this.localize.term('sort_sortByFieldAscending'),
-				value: DirectionModel.ASCENDING,
-				selected: this._selectedDirection === DirectionModel.ASCENDING,
+				value: UmbDirection.ASCENDING,
+				selected: this._selectedDirection === UmbDirection.ASCENDING,
 			},
 			{
 				name: this.localize.term('sort_sortByFieldDescending'),
-				value: DirectionModel.DESCENDING,
-				selected: this._selectedDirection === DirectionModel.DESCENDING,
+				value: UmbDirection.DESCENDING,
+				selected: this._selectedDirection === UmbDirection.DESCENDING,
 			},
 		];
 

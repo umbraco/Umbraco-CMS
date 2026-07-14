@@ -2,7 +2,9 @@ import { UmbSortChildrenOfDocumentServerDataSource } from './sort-children-of.se
 import { expect } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
-import { ContentSortFieldModel, DirectionModel, DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
+import { ContentSortFieldModel, DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
+import { UmbDirection } from '@umbraco-cms/backoffice/utils';
+import type { UmbDirectionType } from '@umbraco-cms/backoffice/utils';
 
 @customElement('test-sort-children-of-document-data-source-host')
 class UmbTestSortChildrenOfDocumentDataSourceHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
@@ -47,7 +49,7 @@ describe('UmbSortChildrenOfDocumentServerDataSource', () => {
 		const { error } = await dataSource.sortChildrenOfByField({
 			unique: 'document-id',
 			field: ContentSortFieldModel.NAME,
-			direction: DirectionModel.DESCENDING,
+			direction: UmbDirection.DESCENDING as UmbDirectionType,
 			culture: 'da',
 		});
 
@@ -61,7 +63,7 @@ describe('UmbSortChildrenOfDocumentServerDataSource', () => {
 		const { error } = await dataSource.sortChildrenOfByField({
 			unique: null,
 			field: ContentSortFieldModel.CREATE_DATE,
-			direction: DirectionModel.ASCENDING,
+			direction: UmbDirection.ASCENDING as UmbDirectionType,
 		});
 
 		expect(error).to.be.undefined;
