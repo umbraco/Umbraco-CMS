@@ -1807,6 +1807,8 @@ export class ContentUiHelper extends UiBaseLocators {
     await this.waitForHidden(this.blockCatalogueModal);
   }
 
+  // `family` only selects the "add block" entry point here (RTE uses the tiptap picker, everything
+  // else uses the shared add-block button); the library catalogue steps that follow are identical.
   async insertBlockFromLibraryWithName(elementName: string, family: BlockFamily = "list") {
     if (family === "rte") {
       // The tiptap block picker inserts at the current cursor position, so focus the editor first.
