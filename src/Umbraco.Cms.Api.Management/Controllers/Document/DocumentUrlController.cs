@@ -53,7 +53,7 @@ public class DocumentUrlController : DocumentControllerBase
     [ProducesResponseType(typeof(IEnumerable<DocumentUrlInfoResponseModel>), StatusCodes.Status200OK)]
     [EndpointSummary("Gets URLs for a document.")]
     [EndpointDescription("Gets the URLs for the document identified by the provided Id.")]
-    public async Task<IActionResult> GetUrls([FromQuery(Name = "id")] HashSet<Guid> ids, [FromQuery] string? culture = null)
+    public async Task<IActionResult> GetUrls([FromQuery(Name = "id")] HashSet<Guid> ids, [FromQuery] string? culture)
     {
         IEnumerable<IContent> items = _contentService.GetByIds(ids);
 
