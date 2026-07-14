@@ -90,7 +90,7 @@ export class UmbPropertyEditorUICollectionLayoutConfigurationElement
 		await umbConfirmModal(this, {
 			color: 'danger',
 			headline: `#actions_remove?`,
-			content: `#defaultdialogs_confirmremove ${layout.name}?`,
+			content: `#defaultdialogs_confirmremove ${layout.name ?? ''}?`,
 			confirmLabel: '#actions_remove',
 		});
 

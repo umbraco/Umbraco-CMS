@@ -88,7 +88,7 @@ export class UmbPropertyEditorUICollectionColumnConfigurationElement
 		await umbConfirmModal(this, {
 			color: 'danger',
 			headline: `#actions_remove?`,
-			content: `#defaultdialogs_confirmremove ${column.header}?`,
+			content: `#defaultdialogs_confirmremove ${column.header ?? ''}?`,
 			confirmLabel: '#actions_remove',
 		});
 
