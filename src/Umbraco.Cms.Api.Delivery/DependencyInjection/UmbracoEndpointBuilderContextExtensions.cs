@@ -6,7 +6,7 @@ namespace Umbraco.Extensions;
 /// <summary>
 /// <see cref="IApplicationBuilder" /> extensions for the Umbraco Delivery API.
 /// </summary>
-public static class DeliveryApiApplicationBuilderExtensions
+public static class UmbracoEndpointBuilderContextExtensions
 {
     /// <summary>
     /// Sets up routes for the Umbraco Delivery API.
