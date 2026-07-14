@@ -84,7 +84,7 @@ export class UmbSortableListElement<T = unknown> extends UmbLitElement {
 	 * @type {(item: T) => string}
 	 */
 	@property({ attribute: false })
-	public getUnique: (item: T) => string = () => '';
+	public getUnique: (item: T) => string = (): string => '';
 
 	/**
 	 * Renders the markup for an item. The returned template must be rooted at an element carrying
@@ -92,7 +92,7 @@ export class UmbSortableListElement<T = unknown> extends UmbLitElement {
 	 * @type {(item: T, index: number) => TemplateResult}
 	 */
 	@property({ attribute: false })
-	public renderMethod: (item: T, index: number) => TemplateResult = () => html``;
+	public renderMethod: (item: T, index: number) => TemplateResult = (): TemplateResult => html``;
 
 	/**
 	 * Disables sorting.

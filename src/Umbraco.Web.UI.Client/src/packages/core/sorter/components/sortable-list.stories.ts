@@ -20,9 +20,9 @@ const meta: Meta<UmbSortableListElement<string>> = {
 			.renderMethod=${(item: string) => html`
 				<umb-sortable-list-item .unique=${item} ?disabled=${args.disabled}>
 					<uui-input .value=${item} ?disabled=${args.disabled}></uui-input>
-					<uui-button slot="actions" label="Remove" look="secondary" compact>
-						<uui-icon name="icon-trash"></uui-icon>
-					</uui-button>
+					<uui-action-bar slot="actions">
+						<uui-button label="Remove"><uui-icon name="icon-trash"></uui-icon></uui-button>
+					</uui-action-bar>
 				</umb-sortable-list-item>
 			`}
 			?disabled=${args.disabled}>

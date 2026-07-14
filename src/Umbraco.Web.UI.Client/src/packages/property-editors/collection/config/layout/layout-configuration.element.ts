@@ -1,18 +1,19 @@
 import { css, customElement, html, ifDefined, property, when } from '@umbraco-cms/backoffice/external/lit';
 import { extractUmbColorVariable } from '@umbraco-cms/backoffice/resources';
 import { simpleHashCode } from '@umbraco-cms/backoffice/observable-api';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbSortableListElement } from '@umbraco-cms/backoffice/sorter';
-import '@umbraco-cms/backoffice/sorter';
+import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UMB_ICON_PICKER_MODAL } from '@umbraco-cms/backoffice/icon';
 import type { UmbInputManifestElement } from '@umbraco-cms/backoffice/components';
 import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorUiElement,
 } from '@umbraco-cms/backoffice/property-editor';
+import type { UmbSortableListElement } from '@umbraco-cms/backoffice/sorter';
 import type { UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
-import { UMB_ICON_PICKER_MODAL } from '@umbraco-cms/backoffice/icon';
+
+import '@umbraco-cms/backoffice/sorter';
 
 interface UmbCollectionLayoutConfiguration {
 	icon?: string;
@@ -85,10 +86,18 @@ export class UmbPropertyEditorUICollectionLayoutConfigurationElement
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
-	#onRemove(unique: number) {
+	async #onRemove(layout: UmbCollectionLayoutConfiguration, index: number) {
+		await umbConfirmModal(this, {
+			color: 'danger',
+			headline: `#actions_remove?`,
+			content: `#defaultdialogs_confirmremove ${layout.name}?`,
+			confirmLabel: '#actions_remove',
+		});
+
 		const values = [...(this.value ?? [])];
-		values.splice(unique, 1);
+		values.splice(index, 1);
 		this.value = values;
+
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
@@ -163,7 +172,7 @@ export class UmbPropertyEditorUICollectionLayoutConfigurationElement
 					</div>
 				</div>
 				<uui-action-bar slot="actions">
-					<uui-button label=${this.localize.term('general_remove')} @click=${() => this.#onRemove(index)}>
+					<uui-button label=${this.localize.term('general_remove')} @click=${() => this.#onRemove(layout, index)}>
 						<uui-icon name="icon-trash"></uui-icon> </uui-button
 				></uui-action-bar>
 			</umb-sortable-list-item>
@@ -171,7 +180,6 @@ export class UmbPropertyEditorUICollectionLayoutConfigurationElement
 	}
 
 	static override readonly styles = [
-		UmbTextStyles,
 		css`
 			umb-sortable-list {
 				display: block;

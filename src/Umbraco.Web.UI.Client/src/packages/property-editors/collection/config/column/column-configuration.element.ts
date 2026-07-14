@@ -1,19 +1,19 @@
 import type { UmbInputCollectionContentTypePropertyElement } from './components/index.js';
-import type { UmbCollectionColumnConfiguration } from '@umbraco-cms/backoffice/collection';
 import { css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbSortableListElement } from '@umbraco-cms/backoffice/sorter';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import type { UmbCollectionColumnConfiguration } from '@umbraco-cms/backoffice/collection';
 import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorUiElement,
 } from '@umbraco-cms/backoffice/property-editor';
+import type { UmbSortableListElement } from '@umbraco-cms/backoffice/sorter';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
 // import of local components
 import './components/index.js';
 import '@umbraco-cms/backoffice/sorter';
-import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 /**
  * @element umb-property-editor-ui-collection-column-configuration
@@ -84,14 +84,18 @@ export class UmbPropertyEditorUICollectionColumnConfigurationElement
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
-	#onRemove(unique: string) {
-		const newValue: Array<UmbCollectionColumnConfiguration> = [];
-
-		this.value?.forEach((config) => {
-			if (config.alias !== unique) newValue.push(config);
+	async #onRemove(column: UmbCollectionColumnConfiguration, index: number) {
+		await umbConfirmModal(this, {
+			color: 'danger',
+			headline: `#actions_remove?`,
+			content: `#defaultdialogs_confirmremove ${column.header}?`,
+			confirmLabel: '#actions_remove',
 		});
 
-		this.value = newValue;
+		const values = [...(this.value ?? [])];
+		values.splice(index, 1);
+		this.value = values;
+
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
@@ -105,8 +109,9 @@ export class UmbPropertyEditorUICollectionColumnConfigurationElement
 			<umb-sortable-list
 				.items=${this.value}
 				.getUnique=${(column: UmbCollectionColumnConfiguration) => column.alias}
-				.renderMethod=${(column: UmbCollectionColumnConfiguration) => this.#renderColumn(column)}
-				@change=${this.#onSort}></umb-sortable-list>
+				.renderMethod=${(column: UmbCollectionColumnConfiguration, index: number) => this.#renderColumn(column, index)}
+				@change=${this.#onSort}>
+			</umb-sortable-list>
 			${this.#renderInput()}
 		`;
 	}
@@ -120,7 +125,7 @@ export class UmbPropertyEditorUICollectionColumnConfigurationElement
 		`;
 	}
 
-	#renderColumn(column: UmbCollectionColumnConfiguration) {
+	#renderColumn(column: UmbCollectionColumnConfiguration, index: number) {
 		return html`
 			<umb-sortable-list-item .unique=${column.alias}>
 				<div style="display:flex;align-items:center;gap:var(--uui-size-6);">
@@ -144,7 +149,7 @@ export class UmbPropertyEditorUICollectionColumnConfigurationElement
 					</uui-input>
 				</div>
 				<uui-action-bar slot="actions">
-					<uui-button label=${this.localize.term('general_remove')} @click=${() => this.#onRemove(column.alias)}>
+					<uui-button label=${this.localize.term('general_remove')} @click=${() => this.#onRemove(column, index)}>
 						<uui-icon name="icon-trash"></uui-icon>
 					</uui-button>
 				</uui-action-bar>
@@ -153,7 +158,6 @@ export class UmbPropertyEditorUICollectionColumnConfigurationElement
 	}
 
 	static override readonly styles = [
-		UmbTextStyles,
 		css`
 			umb-sortable-list {
 				display: block;
