@@ -44,6 +44,12 @@ export const detailHandlers = [
 		return HttpResponse.json(umbUserMockDb.clientCredentials(id));
 	}),
 
+	http.get(umbracoPath(`${UMB_SLUG}/batch`), ({ request }) => {
+		const ids = new URL(request.url).searchParams.getAll('id');
+		const response = umbUserMockDb.detail.readBatch(ids);
+		return HttpResponse.json(response);
+	}),
+
 	http.get(umbracoPath(`${UMB_SLUG}/:id`), ({ params }) => {
 		const id = params.id as string;
 		if (!id) return new HttpResponse(null, { status: 400 });

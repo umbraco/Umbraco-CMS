@@ -112,6 +112,11 @@ export type BatchResponseModelMemberTypeResponseModel = {
     items: Array<MemberTypeResponseModel>;
 };
 
+export type BatchResponseModelUserResponseModel = {
+    total: number;
+    items: Array<UserResponseModel>;
+};
+
 export type CalculatedUserStartNodesResponseModel = {
     id: string;
     documentStartNodeIds: Array<ReferenceByIdModel>;
@@ -18680,6 +18685,35 @@ export type PostUserAvatarByIdResponses = {
      */
     200: unknown;
 };
+
+export type GetUserBatchData = {
+    body?: never;
+    path?: never;
+    query?: {
+        id?: Array<string>;
+    };
+    url: '/umbraco/management/api/v1/user/batch';
+};
+
+export type GetUserBatchErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+};
+
+export type GetUserBatchResponses = {
+    /**
+     * OK
+     */
+    200: BatchResponseModelUserResponseModel;
+};
+
+export type GetUserBatchResponse = GetUserBatchResponses[keyof GetUserBatchResponses];
 
 export type GetUserConfigurationData = {
     body?: never;
