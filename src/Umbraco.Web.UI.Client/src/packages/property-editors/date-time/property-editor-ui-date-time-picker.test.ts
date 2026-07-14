@@ -18,6 +18,54 @@ describe('UmbPropertyEditorUIDateTimePickerElement', () => {
 		expect(element).to.be.instanceOf(UmbPropertyEditorUIDateTimePickerElement);
 	});
 
+	it('expands a date-only bound to span the whole day on a datetime-local field', async () => {
+		element.config = new UmbPropertyEditorConfigCollection([
+			{ alias: 'min', value: '2026-07-01' },
+			{ alias: 'max', value: '2026-07-30' },
+		]);
+		await element.updateComplete;
+		const inputElement = element.shadowRoot!.querySelector('umb-input-date') as UmbInputDateElement;
+		expect(inputElement.min).to.equal('2026-07-01T00:00:00');
+		expect(inputElement.max).to.equal('2026-07-30T23:59:59');
+	});
+
+	it('preserves an explicit time on a datetime-local bound', async () => {
+		element.config = new UmbPropertyEditorConfigCollection([
+			{ alias: 'min', value: '2026-07-01T09:30' },
+			{ alias: 'max', value: '2026-07-30T17:45' },
+		]);
+		await element.updateComplete;
+		const inputElement = element.shadowRoot!.querySelector('umb-input-date') as UmbInputDateElement;
+		expect(inputElement.min).to.equal('2026-07-01T09:30:00');
+		expect(inputElement.max).to.equal('2026-07-30T17:45:00');
+	});
+
+	it('parses a stored SQL-style datetime bound', async () => {
+		element.config = new UmbPropertyEditorConfigCollection([
+			{ alias: 'min', value: '2026-07-01 08:15:00' },
+			{ alias: 'max', value: '2026-07-30 17:45:00' },
+		]);
+		await element.updateComplete;
+		const inputElement = element.shadowRoot!.querySelector('umb-input-date') as UmbInputDateElement;
+		expect(inputElement.min).to.equal('2026-07-01T08:15:00');
+		expect(inputElement.max).to.equal('2026-07-30T17:45:00');
+	});
+
+	it('passes an unparseable bound through unchanged', async () => {
+		element.config = new UmbPropertyEditorConfigCollection([{ alias: 'min', value: 'not-a-date' }]);
+		await element.updateComplete;
+		const inputElement = element.shadowRoot!.querySelector('umb-input-date') as UmbInputDateElement;
+		expect(inputElement.min).to.equal('not-a-date');
+	});
+
+	it('leaves a bound unset when its config value is absent', async () => {
+		element.config = new UmbPropertyEditorConfigCollection([{ alias: 'min', value: '2026-07-01' }]);
+		await element.updateComplete;
+		const inputElement = element.shadowRoot!.querySelector('umb-input-date') as UmbInputDateElement;
+		expect(inputElement.min).to.equal('2026-07-01T00:00:00');
+		expect(inputElement.max).to.be.undefined;
+	});
+
 	if ((window as UmbTestRunnerWindow).__UMBRACO_TEST_RUN_A11Y_TEST) {
 		it('passes the a11y audit', async () => {
 			await expect(element).shadowDom.to.be.accessible(defaultA11yConfig);
@@ -66,6 +114,17 @@ describe('UmbPropertyEditorUIDateOnlyPickerElement', () => {
 		expect(element).to.be.instanceOf(UmbPropertyEditorUIDateOnlyPickerElement);
 	});
 
+	it('applies min/max config to the date input as date-only values', async () => {
+		element.config = new UmbPropertyEditorConfigCollection([
+			{ alias: 'min', value: '2026-07-01' },
+			{ alias: 'max', value: '2026-07-30' },
+		]);
+		await element.updateComplete;
+		const inputElement = element.shadowRoot!.querySelector('umb-input-date') as UmbInputDateElement;
+		expect(inputElement.min).to.equal('2026-07-01');
+		expect(inputElement.max).to.equal('2026-07-30');
+	});
+
 	if ((window as UmbTestRunnerWindow).__UMBRACO_TEST_RUN_A11Y_TEST) {
 		it('passes the a11y audit', async () => {
 			await expect(element).shadowDom.to.be.accessible(defaultA11yConfig);
@@ -82,6 +141,17 @@ describe('UmbPropertyEditorUITimeOnlyPickerElement', () => {
 
 	it('is defined with its own instance', () => {
 		expect(element).to.be.instanceOf(UmbPropertyEditorUITimeOnlyPickerElement);
+	});
+
+	it('applies min/max config to the date input as time values', async () => {
+		element.config = new UmbPropertyEditorConfigCollection([
+			{ alias: 'min', value: '09:00:00' },
+			{ alias: 'max', value: '17:30:00' },
+		]);
+		await element.updateComplete;
+		const inputElement = element.shadowRoot!.querySelector('umb-input-date') as UmbInputDateElement;
+		expect(inputElement.min).to.equal('09:00:00');
+		expect(inputElement.max).to.equal('17:30:00');
 	});
 
 	if ((window as UmbTestRunnerWindow).__UMBRACO_TEST_RUN_A11Y_TEST) {
