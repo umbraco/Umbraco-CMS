@@ -1,5 +1,7 @@
+import type { UmbInputDateElement } from '@umbraco-cms/backoffice/components';
 import { expect, fixture, html } from '@open-wc/testing';
 import { type UmbTestRunnerWindow, defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
+import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import UmbPropertyEditorUIDateTimePickerElement from './date-time-picker/property-editor-ui-date-time-picker.element.js';
 import UmbPropertyEditorUIDateOnlyPickerElement from './date-only-picker/property-editor-ui-date-only-picker.element.js';
 import UmbPropertyEditorUITimeOnlyPickerElement from './time-only-picker/property-editor-ui-time-only-picker.element.js';
@@ -32,6 +34,17 @@ describe('UmbPropertyEditorUIDateTimeWithTimeZonePickerElement', () => {
 
 	it('is defined with its own instance', () => {
 		expect(element).to.be.instanceOf(UmbPropertyEditorUIDateTimeWithTimeZonePickerElement);
+	});
+
+	it('applies min/max config to the date input, normalised for a datetime-local field', async () => {
+		element.config = new UmbPropertyEditorConfigCollection([
+			{ alias: 'min', value: '2026-07-01' },
+			{ alias: 'max', value: '2026-07-30' },
+		]);
+		await element.updateComplete;
+		const inputElement = element.shadowRoot!.querySelector('umb-input-date') as UmbInputDateElement;
+		expect(inputElement.min).to.equal('2026-07-01T00:00:00');
+		expect(inputElement.max).to.equal('2026-07-30T23:59:59');
 	});
 
 	if ((window as UmbTestRunnerWindow).__UMBRACO_TEST_RUN_A11Y_TEST) {
