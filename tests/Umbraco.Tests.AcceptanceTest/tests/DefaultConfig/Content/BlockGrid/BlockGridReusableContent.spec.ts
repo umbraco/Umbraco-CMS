@@ -61,7 +61,7 @@ test('can disconnect a block from the Library', async ({umbracoApi, umbracoUi}) 
   await umbracoUi.content.insertBlockFromLibraryWithName(libraryElementName, 'grid');
   await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
   await umbracoUi.content.clickDisconnectFromLibraryBlockButton('grid');
-  await umbracoUi.content.clickConfirmDisconnectFromLibraryButton();
+  await umbracoUi.content.clickConfirmDisconnectFromLibraryButton('grid');
   await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
@@ -146,6 +146,7 @@ test('can transfer a local block to the Library', async ({umbracoApi, umbracoUi}
   await umbracoUi.content.clickCreateModalButton();
   await umbracoUi.content.clickTransferToLibraryBlockButton('grid');
   await umbracoUi.content.transferBlockToLibraryRoot(transferElementName);
+  await umbracoUi.content.isBlockMarkedAsReference(true, 'grid');
   await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert

@@ -1,5 +1,6 @@
 import {DataTypeBuilder} from './dataTypeBuilder';
 import {BlockListBlockBuilder} from './blockListBuilder';
+import {BlockListDataTypeBuilder} from './blockListDataTypeBuilder';
 
 export class SingleBlockDataTypeBuilder extends DataTypeBuilder {
   blockBuilder: BlockListBlockBuilder[];
@@ -12,8 +13,10 @@ export class SingleBlockDataTypeBuilder extends DataTypeBuilder {
   }
 
   addBlock() {
-    // The Single Block editor reuses the same block-type config shape as Block List.
-    const builder = new BlockListBlockBuilder(this as any);
+    // Reuse Block List's block builder: it only calls the shared done()/build(), so passing this
+    // sibling builder as its parent is safe. The `as unknown as` cast is needed because TypeScript
+    // rejects a direct cast between the two sibling types; it's compile-time only.
+    const builder = new BlockListBlockBuilder(this as unknown as BlockListDataTypeBuilder);
     this.blockBuilder.push(builder);
     return builder;
   }

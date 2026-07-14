@@ -226,6 +226,7 @@ test('can transfer a local block to the Library', async ({umbracoApi, umbracoUi}
   await umbracoUi.content.clickCreateModalButton();
   await umbracoUi.content.clickTransferToLibraryBlockButton();
   await umbracoUi.content.transferBlockToLibraryRoot(transferElementName);
+  await umbracoUi.content.isBlockMarkedAsReference(true);
   await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert

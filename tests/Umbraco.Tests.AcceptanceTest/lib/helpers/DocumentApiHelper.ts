@@ -1200,7 +1200,7 @@ export class DocumentApiHelper {
     return document.values.find(value => value.editorAlias === 'Umbraco.RichText')?.value?.blocks;
   }
 
-  getBlockContentPropertyValue(blockValue, contentKey: string) {
+  getBlockContentPropertyValue(blockValue: any, contentKey: string) {
     return blockValue?.contentData.find(contentData => contentData.key === contentKey)?.values[0]?.value;
   }
 

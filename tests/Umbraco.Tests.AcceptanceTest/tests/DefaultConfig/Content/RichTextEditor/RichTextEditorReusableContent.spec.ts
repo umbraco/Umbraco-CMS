@@ -13,10 +13,6 @@ const richTextBlockEditorAlias = 'Umbraco.RichText';
 let elementTypeId = '';
 
 test.beforeEach(async ({umbracoApi}) => {
-  await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
-  await umbracoApi.document.ensureNameNotExists(contentName);
-  await umbracoApi.element.ensureNameNotExists(libraryElementName);
-  await umbracoApi.element.ensureNameNotExists(transferElementName);
   const textStringData = await umbracoApi.dataType.getByName(propertyInBlock);
   elementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, propertyInBlock, textStringData.id);
 });
@@ -94,7 +90,7 @@ test.fixme('can disconnect a block from the Library', async ({umbracoApi, umbrac
   await umbracoUi.content.insertBlockFromLibraryWithName(libraryElementName, 'rte');
   await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
   await umbracoUi.content.clickDisconnectFromLibraryBlockButton('rte');
-  await umbracoUi.content.clickConfirmDisconnectFromLibraryButton();
+  await umbracoUi.content.clickConfirmDisconnectFromLibraryButton('rte');
   await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert

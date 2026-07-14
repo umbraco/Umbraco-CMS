@@ -11,10 +11,6 @@ const groupName = 'testGroup';
 let elementTypeId = '';
 
 test.beforeEach(async ({umbracoApi}) => {
-  await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
-  await umbracoApi.document.ensureNameNotExists(contentName);
-  await umbracoApi.element.ensureNameNotExists(libraryElementName);
-  await umbracoApi.template.ensureNameNotExists(templateName);
   const textStringData = await umbracoApi.dataType.getByName(propertyInBlock);
   elementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, propertyInBlock, textStringData.id);
 });

@@ -2,6 +2,8 @@ import { Page, Locator, expect } from "@playwright/test";
 import { UiBaseLocators } from "./UiBaseLocators";
 import { ConstantHelper } from "./ConstantHelper";
 
+export type BlockFamily = "list" | "grid" | "rte" | "single";
+
 export class ContentUiHelper extends UiBaseLocators {
   private readonly contentNameTxt: Locator;
   private readonly saveAndPublishBtn: Locator;
@@ -1805,7 +1807,7 @@ export class ContentUiHelper extends UiBaseLocators {
     await this.waitForHidden(this.blockCatalogueModal);
   }
 
-  async insertBlockFromLibraryWithName(elementName: string, family: "list" | "grid" | "rte" | "single" = "list") {
+  async insertBlockFromLibraryWithName(elementName: string, family: BlockFamily = "list") {
     if (family === "rte") {
       // The tiptap block picker inserts at the current cursor position, so focus the editor first.
       await this.tipTapEditor.click();
@@ -1821,7 +1823,7 @@ export class ContentUiHelper extends UiBaseLocators {
   // The block catalogue modal and the hover action bar are shared across the block-list,
   // block-grid and RTE editors, so these reusable-content helpers are family-agnostic apart
   // from the entry element they hover. Pass the family to target the right entry.
-  private blockEntryForFamily(family: "list" | "grid" | "rte" | "single") {
+  private blockEntryForFamily(family: BlockFamily) {
     switch (family) {
       case "grid":
         return this.blockGridEntry;
@@ -1834,18 +1836,18 @@ export class ContentUiHelper extends UiBaseLocators {
     }
   }
 
-  async clickEditBlockButton(family: "list" | "grid" | "rte" | "single" = "list") {
+  async clickEditBlockButton(family: BlockFamily = "list") {
     await this.hoverAndClick(this.blockEntryForFamily(family).first(), this.editBlockEntryBtn);
   }
 
-  async clickTransferToLibraryBlockButton(family: "list" | "grid" | "rte" | "single" = "list") {
+  async clickTransferToLibraryBlockButton(family: BlockFamily = "list") {
     await this.hoverAndClick(
       this.blockEntryForFamily(family).first(),
       this.transferToLibraryBlockActionBtn.first(),
     );
   }
 
-  async clickDisconnectFromLibraryBlockButton(family: "list" | "grid" | "rte" | "single" = "list") {
+  async clickDisconnectFromLibraryBlockButton(family: BlockFamily = "list") {
     await this.hoverAndClick(
       this.blockEntryForFamily(family).first(),
       this.disconnectFromLibraryBlockActionBtn.first(),
@@ -1888,18 +1890,21 @@ export class ContentUiHelper extends UiBaseLocators {
     await this.waitForHidden(this.transferToLibraryModal);
   }
 
-  async clickConfirmDisconnectFromLibraryButton() {
+  async clickConfirmDisconnectFromLibraryButton(family: BlockFamily = "list") {
     await this.click(this.confirmDisconnectFromLibraryBtn);
+    // Disconnecting fetches the element and swaps the layout to local content asynchronously, so
+    // wait until the block has actually dropped its reference marker before letting callers save.
+    await this.isBlockMarkedAsReference(false, family);
   }
 
-  async isBlockLinkIconVisible(isVisible: boolean = true, family: "list" | "grid" | "rte" | "single" = "list") {
+  async isBlockLinkIconVisible(isVisible: boolean = true, family: BlockFamily = "list") {
     await this.isVisible(
       this.blockEntryForFamily(family).first().locator('uui-icon[name="link"]'),
       isVisible,
     );
   }
 
-  async isBlockMarkedAsReference(isReference: boolean = true, family: "list" | "grid" | "rte" | "single" = "list") {
+  async isBlockMarkedAsReference(isReference: boolean = true, family: BlockFamily = "list") {
     // Referenced (external) blocks get the dedicated reference colour via the reflected is-reference attribute.
     const entry = this.blockEntryForFamily(family).first();
     if (isReference) {
@@ -1909,11 +1914,11 @@ export class ContentUiHelper extends UiBaseLocators {
     }
   }
 
-  async isBlockEntryVisible(isVisible: boolean = true, family: "list" | "grid" | "rte" | "single" = "list") {
+  async isBlockEntryVisible(isVisible: boolean = true, family: BlockFamily = "list") {
     await this.isVisible(this.blockEntryForFamily(family).first(), isVisible);
   }
 
-  async doesBlockHaveDraftTag(isVisible: boolean = true, family: "list" | "grid" | "rte" | "single" = "list") {
+  async doesBlockHaveDraftTag(isVisible: boolean = true, family: BlockFamily = "list") {
     await this.isVisible(
       this.blockEntryForFamily(family)
         .first()
