@@ -10,7 +10,7 @@ import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorUiElement,
 } from '@umbraco-cms/backoffice/property-editor';
-import type { UmbSortableListElement } from '@umbraco-cms/backoffice/sorter';
+import type { UmbSortableListElement, UmbSortableListItemElement } from '@umbraco-cms/backoffice/sorter';
 import type { UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
 import '@umbraco-cms/backoffice/sorter';
@@ -45,15 +45,22 @@ export class UmbPropertyEditorUICollectionLayoutConfigurationElement
 
 	async #focusNewItem() {
 		await this.updateComplete;
+
 		const list = this.shadowRoot?.querySelector('umb-sortable-list');
 		await list?.updateComplete;
-		const input = list?.shadowRoot?.querySelector('umb-sortable-list-item:last-of-type > uui-input') as
-			| UUIInputElement
+
+		const item = list?.shadowRoot?.querySelector('umb-sortable-list-item:last-of-type') as
+			| UmbSortableListItemElement
 			| undefined;
+
+		// The item's <slot> only exists in its shadow root once its own first update completes, so its
+		// slotted uui-input isn't part of the rendered tree (and therefore not focusable) until then.
+		await item?.updateComplete;
+		const input = item?.querySelector('uui-input') as UUIInputElement | undefined;
 		input?.focus();
 	}
 
-	#onAdd(event: { target: UmbInputManifestElement }) {
+	async #onAdd(event: { target: UmbInputManifestElement }) {
 		const manifest = event.target.value;
 
 		const duplicate = this.value?.find((config) => manifest?.value === config.collectionView);
@@ -75,7 +82,7 @@ export class UmbPropertyEditorUICollectionLayoutConfigurationElement
 
 		this.dispatchEvent(new UmbChangeEvent());
 
-		this.#focusNewItem();
+		await this.#focusNewItem();
 	}
 
 	#onChangeLabel(e: UUIInputEvent, index: number) {
