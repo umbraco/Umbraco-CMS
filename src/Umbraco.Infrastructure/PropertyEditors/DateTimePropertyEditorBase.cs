@@ -70,10 +70,8 @@ public abstract class DateTimePropertyEditorBase : DataEditor, IValueSchemaProvi
         new DateTimeConfigurationEditor(_ioHelper);
 
     /// <inheritdoc />
-#pragma warning disable CS8974 // Converting method group to non-delegate type
     protected override IDataValueEditor CreateValueEditor() =>
-        DataValueEditorFactory.Create<DateTimeDataValueEditor>(Attribute!, MapDateToEditorFormat);
-#pragma warning restore CS8974 // Converting method group to non-delegate type
+        DataValueEditorFactory.Create<DateTimeDataValueEditor>(Attribute!, (Func<DateTimeValueConverterBase.DateTimeDto, string>)MapDateToEditorFormat);
 
     /// <summary>
     /// Converts the specified date and time value to a string formatted for use in the property editor.
