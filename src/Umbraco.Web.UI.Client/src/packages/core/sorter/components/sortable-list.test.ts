@@ -23,7 +23,7 @@ describe('UmbSortableListElement', () => {
 		element.items = [];
 		await element.updateComplete;
 		const items = element.shadowRoot!.querySelectorAll('umb-sortable-list-item');
-		expect(items.length).to.equal(0);
+		expect(items).to.have.lengthOf(0);
 	});
 
 	it('renders an item per entry, in order', async () => {
@@ -31,7 +31,7 @@ describe('UmbSortableListElement', () => {
 		await element.updateComplete;
 
 		const items = element.shadowRoot!.querySelectorAll('umb-sortable-list-item');
-		expect(items.length).to.equal(3);
+		expect(items).to.have.lengthOf(3);
 		expect(Array.from(items).map((item) => item.textContent?.trim())).to.deep.equal(['a', 'b', 'c']);
 	});
 
