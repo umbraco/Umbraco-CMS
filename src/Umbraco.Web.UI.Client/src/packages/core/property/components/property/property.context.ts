@@ -160,9 +160,14 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase {
 
 	private async _observeProperty(): Promise<void> {
 		const alias = this.#alias.getValue();
+		const variantIdSource = alias ? await this.#datasetContext?.propertyVariantId?.(alias) : undefined;
+		const valueSource = alias ? await this.#datasetContext?.propertyValueByAlias<ValueType>(alias) : undefined;
+
+		// Guard: this context may have been destroyed while the awaits were in flight.
+		if (!this._host) return;
 
 		this.observe(
-			alias ? await this.#datasetContext?.propertyVariantId?.(alias) : undefined,
+			variantIdSource,
 			(variantId) => {
 				this.#variantId.setValue(variantId);
 			},
@@ -170,7 +175,7 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase {
 		);
 
 		this.observe(
-			alias ? await this.#datasetContext?.propertyValueByAlias<ValueType>(alias) : undefined,
+			valueSource,
 			(value) => {
 				this.#value.setValue(value);
 			},
