@@ -5,7 +5,7 @@ import { customElement, state, css, html } from '@umbraco-cms/backoffice/externa
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbRoute, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
-import { UMB_WORKSPACE_PATH_VARIANT_DELIMITER } from '@umbraco-cms/backoffice/workspace';
+import { resolveStaleVariantRoute, UMB_WORKSPACE_PATH_VARIANT_DELIMITER } from '@umbraco-cms/backoffice/workspace';
 import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
 
 // TODO: Refactor across all four content workspace editors (document, document blueprint, media, member) to use a base component. [NL]
@@ -59,6 +59,7 @@ export class UmbDocumentBlueprintWorkspaceEditorElement extends UmbLitElement {
 			(variants) => {
 				this.#variants = variants;
 				this.#generateRoutes();
+				this.#redirectStaleVariantUrl();
 			},
 			'_observeVariants',
 		);
@@ -105,6 +106,19 @@ export class UmbDocumentBlueprintWorkspaceEditorElement extends UmbLitElement {
 			'',
 			`${this.#workspaceRoute}/${newVariant.unique}${pathSuffix}${window.location.search}`,
 		);
+	}
+
+	#redirectStaleVariantUrl() {
+		if (!this.#workspaceRoute || !this.#variants?.length) return;
+		const newPath = resolveStaleVariantRoute({
+			currentPath: window.location.pathname,
+			workspaceRoute: this.#workspaceRoute,
+			variants: this.#variants,
+			appCulture: this.#appCulture,
+		});
+		if (newPath) {
+			history.replaceState(null, '', newPath + window.location.search);
+		}
 	}
 
 	async #generateRoutes() {
@@ -188,6 +202,7 @@ export class UmbDocumentBlueprintWorkspaceEditorElement extends UmbLitElement {
 	private _gotWorkspaceRoute = (e: UmbRouterSlotInitEvent) => {
 		this.#workspaceRoute = e.target.absoluteRouterPath;
 		this.#workspaceContext?.splitView.setWorkspaceRoute(this.#workspaceRoute);
+		this.#redirectStaleVariantUrl();
 	};
 
 	override render() {
