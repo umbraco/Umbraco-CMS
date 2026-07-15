@@ -16,6 +16,7 @@ public static class GuidExtensions
     /// </remarks>
     public static bool IsFakeGuid(this Guid guid)
     {
+        // Inspect the bytes on the stack to avoid heap allocations.
         Span<byte> bytes = stackalloc byte[16];
         guid.TryWriteBytes(bytes);
 
@@ -42,6 +43,7 @@ public static class GuidExtensions
     /// </remarks>
     public static int ToInt(this Guid guid)
     {
+        // Write to a stack-allocated buffer to avoid the heap allocation of Guid.ToByteArray().
         Span<byte> bytes = stackalloc byte[16];
         guid.TryWriteBytes(bytes);
         return BitConverter.ToInt32(bytes);

@@ -34,6 +34,8 @@ public static class IntExtensions
     public static Guid ToGuid(this int value)
     {
         Span<byte> bytes = stackalloc byte[16];
+
+        // Write directly into the buffer to avoid the intermediate array allocated by BitConverter.GetBytes(value).
         BitConverter.TryWriteBytes(bytes, value);
         return new Guid(bytes);
     }
