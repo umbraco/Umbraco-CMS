@@ -966,6 +966,23 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
                 throw new InvalidOperationException("Cannot mix PublishCulture and SaveAndPublishBranch.");
             }
 
+            // captures the cultures published per document, so the notification can report them per item
+            var publishedCulturesByDocument = new Dictionary<Guid, IReadOnlyCollection<string>>();
+            var variesByCulture = document.ContentType.VariesByCulture();
+
+            void TrackPublishedCultures(IContent publishedDocument, HashSet<string>? documentCulturesToPublish)
+            {
+                // a branch can mix variant and invariant content types, so determine variance per document rather
+                // than from the branch root; snapshot the cultures so the notification never holds a mutable set
+                string[] cultures = publishedDocument.ContentType.VariesByCulture()
+                    ? documentCulturesToPublish?.ToArray() ?? []
+                    : ["*"];
+                if (cultures.Length > 0)
+                {
+                    publishedCulturesByDocument[publishedDocument.Key] = cultures;
+                }
+            }
+
             // deal with the branch root - if it fails, abort
             HashSet<string>? culturesToPublish = shouldPublish(document);
             PublishResult? result = PublishBranchItem(scope, document, culturesToPublish, publishCultures, true, publishedDocuments, eventMessages, userId, allLangs, out IDictionary<string, object?>? notificationState);
@@ -976,6 +993,8 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
                 {
                     return results;
                 }
+
+                TrackPublishedCultures(document, culturesToPublish);
             }
 
             HashSet<string> culturesPublished = culturesToPublish ?? [];
@@ -1013,6 +1032,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
                         if (result.Success)
                         {
                             culturesPublished.UnionWith(culturesToPublish ?? []);
+                            TrackPublishedCultures(d, culturesToPublish);
                             continue;
                         }
                     }
@@ -1029,7 +1049,6 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
 
             // trigger events for the entire branch
             // (SaveAndPublishBranchOne does *not* do it)
-            var variesByCulture = document.ContentType.VariesByCulture();
             scope.Notifications.Publish(
                 new ContentTreeChangeNotification(
                     document,
@@ -1037,7 +1056,14 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
                     variesByCulture ? culturesPublished.IsCollectionEmpty() ? null : culturesPublished : ["*"],
                     null,
                     eventMessages));
-            scope.Notifications.Publish(new ContentPublishedNotification(publishedDocuments, eventMessages, true).WithState(notificationState));
+            scope.Notifications.Publish(
+                new ContentPublishedNotification(
+                    publishedDocuments,
+                    eventMessages,
+                    true,
+                    publishedCulturesByDocument,
+                    null)
+                .WithState(notificationState));
 
             scope.Complete();
         }
@@ -1897,7 +1923,10 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
                 // just raise the event
                 if (content.Trashed == false && content.Published)
                 {
-                    scope.Notifications.Publish(new ContentUnpublishedNotification(content, eventMessages));
+                    scope.Notifications.Publish(new ContentUnpublishedNotification(
+                        content,
+                        eventMessages,
+                        BuildCultureMap(content, content.ContentType.VariesByCulture() ? content.PublishedCultures : ["*"])));
                 }
 
                 // if current content has children, move them to trash
@@ -2251,11 +2280,17 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
     protected override SavedNotification<IContent> SavedNotification(IContent content, EventMessages eventMessages)
         => new ContentSavedNotification(content, eventMessages);
 
+    protected override SavedNotification<IContent> SavedNotification(IContent content, EventMessages eventMessages, IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? savedCultures)
+        => new ContentSavedNotification(content, eventMessages, savedCultures);
+
     protected override SavingNotification<IContent> SavingNotification(IEnumerable<IContent> content, EventMessages eventMessages)
         => new ContentSavingNotification(content, eventMessages);
 
     protected override SavedNotification<IContent> SavedNotification(IEnumerable<IContent> content, EventMessages eventMessages)
         => new ContentSavedNotification(content, eventMessages);
+
+    protected override SavedNotification<IContent> SavedNotification(IEnumerable<IContent> content, EventMessages eventMessages, IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? savedCultures)
+        => new ContentSavedNotification(content, eventMessages, savedCultures);
 
     protected override TreeChangeNotification<IContent> TreeChangeNotification(IContent content, TreeChangeTypes changeTypes, EventMessages eventMessages)
         => new ContentTreeChangeNotification(content, changeTypes, eventMessages);
@@ -2275,6 +2310,9 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
     protected override IStatefulNotification PublishedNotification(IContent content, EventMessages eventMessages)
         => new ContentPublishedNotification(content, eventMessages);
 
+    protected override IStatefulNotification PublishedNotification(IContent content, EventMessages eventMessages, IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? publishedCultures, IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? unpublishedCultures)
+        => new ContentPublishedNotification(content, eventMessages, publishedCultures, unpublishedCultures);
+
     protected override IStatefulNotification PublishedNotification(IEnumerable<IContent> content, EventMessages eventMessages)
         => new ContentPublishedNotification(content, eventMessages);
 
@@ -2283,6 +2321,9 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
 
     protected override IStatefulNotification UnpublishedNotification(IContent content, EventMessages eventMessages)
         => new ContentUnpublishedNotification(content, eventMessages);
+
+    protected override IStatefulNotification UnpublishedNotification(IContent content, EventMessages eventMessages, IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? unpublishedCultures)
+        => new ContentUnpublishedNotification(content, eventMessages, unpublishedCultures);
 
     protected override RollingBackNotification<IContent> RollingBackNotification(IContent target, EventMessages messages)
         => new ContentRollingBackNotification(target, messages);

@@ -116,6 +116,98 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
 
     protected abstract RolledBackNotification<TContent> RolledBackNotification(TContent target, EventMessages messages);
 
+    /// <summary>
+    ///     Creates the "saved" notification for a single item, carrying the cultures that were saved.
+    /// </summary>
+    /// <remarks>
+    ///     Defaults to the culture-agnostic <see cref="SavedNotification(TContent, EventMessages)"/> overload so external
+    ///     subclasses keep working; <c>ContentService</c> and <c>ElementService</c> override this to carry the map on the
+    ///     concrete notification. See <see cref="BuildCultureMap"/> for why the cultures are captured at raise-time.
+    /// </remarks>
+    /// <param name="content">The item that was saved.</param>
+    /// <param name="eventMessages">The event messages collection.</param>
+    /// <param name="savedCultures">The cultures that were saved, keyed by item key, or <c>null</c> if not tracked.</param>
+    /// <returns>The notification to publish.</returns>
+    protected virtual SavedNotification<TContent> SavedNotification(TContent content, EventMessages eventMessages, IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? savedCultures)
+        => SavedNotification(content, eventMessages);
+
+    /// <summary>
+    ///     Creates the "saved" notification for multiple items, carrying the cultures that were saved per item.
+    /// </summary>
+    /// <remarks>
+    ///     Defaults to the culture-agnostic <see cref="SavedNotification(IEnumerable{TContent}, EventMessages)"/> overload
+    ///     so external subclasses keep working; <c>ContentService</c> and <c>ElementService</c> override this to carry the
+    ///     map on the concrete notification.
+    /// </remarks>
+    /// <param name="content">The items that were saved.</param>
+    /// <param name="eventMessages">The event messages collection.</param>
+    /// <param name="savedCultures">The cultures that were saved, keyed by item key.</param>
+    /// <returns>The notification to publish.</returns>
+    protected virtual SavedNotification<TContent> SavedNotification(IEnumerable<TContent> content, EventMessages eventMessages, IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? savedCultures)
+        => SavedNotification(content, eventMessages);
+
+    /// <summary>
+    ///     Creates the "published" notification for a single item, carrying the cultures that were published and
+    ///     unpublished by the operation.
+    /// </summary>
+    /// <remarks>
+    ///     Defaults to the culture-agnostic <see cref="PublishedNotification(TContent, EventMessages)"/> overload so
+    ///     external subclasses keep working; <c>ContentService</c> and <c>ElementService</c> override this to carry the
+    ///     maps on the concrete notification. Unpublishing an individual culture is performed as a publish, so the
+    ///     unpublished cultures are reported here rather than on the "unpublished" notification.
+    /// </remarks>
+    /// <param name="content">The item that was published.</param>
+    /// <param name="eventMessages">The event messages collection.</param>
+    /// <param name="publishedCultures">The cultures that were published, keyed by item key, or <c>null</c> if not tracked.</param>
+    /// <param name="unpublishedCultures">The cultures that were unpublished as part of the publish, keyed by item key, or <c>null</c> if not applicable.</param>
+    /// <returns>The notification to publish.</returns>
+    protected virtual IStatefulNotification PublishedNotification(TContent content, EventMessages eventMessages, IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? publishedCultures, IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? unpublishedCultures)
+        => PublishedNotification(content, eventMessages);
+
+    /// <summary>
+    ///     Creates the "unpublished" notification for a single item, carrying the cultures that were unpublished.
+    /// </summary>
+    /// <remarks>
+    ///     Defaults to the culture-agnostic <see cref="UnpublishedNotification(TContent, EventMessages)"/> overload so
+    ///     external subclasses keep working; <c>ContentService</c> and <c>ElementService</c> override this to carry the map
+    ///     on the concrete notification. This is only raised when the item is unpublished as a whole.
+    /// </remarks>
+    /// <param name="content">The item that was unpublished.</param>
+    /// <param name="eventMessages">The event messages collection.</param>
+    /// <param name="unpublishedCultures">The cultures that were unpublished, keyed by item key, or <c>null</c> if not tracked.</param>
+    /// <returns>The notification to publish.</returns>
+    protected virtual IStatefulNotification UnpublishedNotification(TContent content, EventMessages eventMessages, IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? unpublishedCultures)
+        => UnpublishedNotification(content, eventMessages);
+
+    /// <summary>
+    ///     Builds the per-item culture map carried on the notifications, keyed by item <see cref="Umbraco.Cms.Core.Models.Entities.IEntity.Key"/>.
+    /// </summary>
+    /// <remarks>
+    ///     Persisting the entity resets its change tracking, so the cultures are captured here when the notification is
+    ///     raised, because a handler cannot recompute them from the entity afterwards. <c>ToArray()</c> takes a copy so the
+    ///     notification holds a stable snapshot: some callers pass a live view over the entity's own collection (e.g.
+    ///     <see cref="IPublishableContentBase.PublishedCultures"/>) that would otherwise change as the entity is mutated.
+    /// </remarks>
+    /// <param name="content">The item the cultures belong to.</param>
+    /// <param name="cultures">
+    ///     The affected cultures. A <c>null</c> value means the category of change does not apply to this notification, so
+    ///     the map is <c>null</c>; a non-null-but-empty value means the change was tracked but affected no cultures for
+    ///     this item, so a present-but-empty map is returned rather than conflating that with "not tracked".
+    /// </param>
+    /// <returns>The per-item culture map, or <c>null</c> when <paramref name="cultures"/> is <c>null</c>.</returns>
+    protected static Dictionary<Guid, IReadOnlyCollection<string>>? BuildCultureMap(TContent content, IEnumerable<string>? cultures)
+    {
+        if (cultures is null)
+        {
+            return null;
+        }
+
+        string[] cultureList = cultures.ToArray();
+        return cultureList.Length == 0
+            ? new Dictionary<Guid, IReadOnlyCollection<string>>()
+            : new Dictionary<Guid, IReadOnlyCollection<string>> { [content.Key] = cultureList };
+    }
+
     #region Rollback
 
     /// <inheritdoc/>
@@ -612,6 +704,12 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
                 ? content.CultureInfos?.Values.Where(x => x.IsDirty()).Select(x => x.Culture).ToList()
                 : null;
 
+            // the saved notification reports the changed cultures for variant content, or the "*" marker for invariant
+            // content - but only when something actually changed. Captured here before saving resets change tracking.
+            IReadOnlyCollection<string>? savedCultures = content.ContentType.VariesByCulture()
+                ? culturesChanging
+                : content.IsDirty() ? ["*"] : [];
+
             // TODO: Currently there's no way to change track which variant properties have changed, we only have change
             // tracking enabled on all values on the Property which doesn't allow us to know which variants have changed.
             // in this particular case, determining which cultures have changed works with the above with names since it will
@@ -623,7 +721,8 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
                 _contentRepository.PersistContentSchedule(content, contentSchedule);
             }
 
-            scope.Notifications.Publish(SavedNotification(content, eventMessages).WithStateFrom(savingNotification));
+            scope.Notifications.Publish(
+                SavedNotification(content, eventMessages, BuildCultureMap(content, savedCultures)).WithStateFrom(savingNotification));
 
             // TODO: we had code here to FORCE that this event can never be suppressed. But that just doesn't make a ton of sense?!
             // I understand that if its suppressed that the caches aren't updated, but that would be expected. If someone
@@ -668,6 +767,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
                 return OperationResult.Cancel(eventMessages);
             }
 
+            var savedCultures = new Dictionary<Guid, IReadOnlyCollection<string>>();
             foreach (TContent content in contentsA)
             {
                 if (content.HasIdentity == false)
@@ -677,10 +777,21 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
 
                 content.WriterId = userId;
 
+                // capture the changing cultures before saving resets change tracking on the entity. Invariant content
+                // reports the "*" marker, but only when something actually changed (mirroring the variant delta).
+                IReadOnlyCollection<string>? culturesChanging = content.ContentType.VariesByCulture()
+                    ? content.CultureInfos?.Values.Where(x => x.IsDirty()).Select(x => x.Culture).ToArray()
+                    : content.IsDirty() ? ["*"] : [];
+                if (culturesChanging is { Count: > 0 })
+                {
+                    savedCultures[content.Key] = culturesChanging;
+                }
+
                 _contentRepository.Save(content);
             }
 
-            scope.Notifications.Publish(SavedNotification(contentsA, eventMessages).WithStateFrom(savingNotification));
+            scope.Notifications.Publish(
+                SavedNotification(contentsA, eventMessages, savedCultures).WithStateFrom(savingNotification));
 
             // TODO: See note above about supressing events
             scope.Notifications.Publish(TreeChangeNotification(contentsA, TreeChangeTypes.RefreshNode, eventMessages));
@@ -1435,7 +1546,12 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
             if (unpublishResult?.Success ?? false)
             {
                 // events and audit
-                scope.Notifications.Publish(UnpublishedNotification(content, eventMessages).WithState(notificationState));
+                scope.Notifications.Publish(
+                    UnpublishedNotification(
+                        content,
+                        eventMessages,
+                        BuildCultureMap(content, variesByCulture ? culturesUnpublishing : ["*"]))
+                    .WithState(notificationState));
                 scope.Notifications.Publish(TreeChangeNotification(
                     content,
                     SupportsBranchPublishing ? TreeChangeTypes.RefreshBranch : TreeChangeTypes.RefreshNode,
@@ -1506,7 +1622,12 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
                             variesByCulture ? culturesUnpublishing.IsCollectionEmpty() ? null : culturesUnpublishing : null,
                             eventMessages));
                     scope.Notifications.Publish(
-                        PublishedNotification(content, eventMessages).WithState(notificationState));
+                        PublishedNotification(
+                            content,
+                            eventMessages,
+                            BuildCultureMap(content, variesByCulture ? culturesPublishing : ["*"]),
+                            BuildCultureMap(content, variesByCulture ? culturesUnpublishing : null))
+                        .WithState(notificationState));
                 }
 
                 // it was not published and now is... descendants that were 'published' (but
@@ -1600,7 +1721,10 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
             // just raise the event
             if (content.Trashed == false && content.Published)
             {
-                scope.Notifications.Publish(UnpublishedNotification(content, eventMessages));
+                scope.Notifications.Publish(UnpublishedNotification(
+                    content,
+                    eventMessages,
+                    BuildCultureMap(content, content.ContentType.VariesByCulture() ? content.PublishedCultures : ["*"])));
             }
 
             DeleteLocked(scope, content, eventMessages);
