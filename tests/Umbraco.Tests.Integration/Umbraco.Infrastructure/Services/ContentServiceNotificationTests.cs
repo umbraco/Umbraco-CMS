@@ -824,6 +824,46 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
     }
 
     [Test]
+    public async Task Can_Read_Empty_Not_Null_Saved_Cultures_For_No_Op_Variant_Re_Save()
+    {
+        _contentType.Variations = ContentVariation.Culture;
+        foreach (IPropertyType propertyType in _contentType.PropertyTypes)
+        {
+            propertyType.Variations = ContentVariation.Culture;
+        }
+
+        await ContentTypeService.UpdateAsync(_contentType, Constants.Security.SuperUserKey);
+
+        IContent document = new Content("content", -1, _contentType);
+        document.SetCultureName("hello", "en-US");
+        ContentService.Save(document);
+
+        // re-get so nothing is dirty, then re-save without changes
+        document = ContentService.GetById(document.Id);
+
+        var savedWasCalled = false;
+
+        ContentNotificationHandler.SavedContent = notification =>
+        {
+            // the save tracked cultures and found none changed, so the map is present but empty - not null
+            Assert.IsNotNull(notification.SavedCultures);
+            Assert.IsEmpty(notification.SavedCultures);
+
+            savedWasCalled = true;
+        };
+
+        try
+        {
+            ContentService.Save(document);
+            Assert.IsTrue(savedWasCalled);
+        }
+        finally
+        {
+            ContentNotificationHandler.SavedContent = null;
+        }
+    }
+
+    [Test]
     [LongRunning]
     public async Task Can_Read_All_Unpublished_Cultures_When_Unpublishing_Whole_Variant_Document()
     {
@@ -939,11 +979,11 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
             Assert.IsNotNull(notification.PublishedCultures);
 
             // invariant content, so each published document reports the "*" marker under its own key
-            foreach (IContent published in notification.PublishedEntities)
-            {
-                Assert.IsTrue(notification.PublishedCultures.ContainsKey(published.Key), $"missing entry for {published.Name}");
-                CollectionAssert.AreEquivalent(new[] { "*" }, notification.PublishedCultures[published.Key]);
-            }
+            Assert.AreEqual(2, notification.PublishedCultures.Count);
+            Assert.IsTrue(notification.PublishedCultures.ContainsKey(root.Key), "missing entry for root");
+            Assert.IsTrue(notification.PublishedCultures.ContainsKey(child.Key), "missing entry for child");
+            CollectionAssert.AreEquivalent(new[] { "*" }, notification.PublishedCultures[root.Key]);
+            CollectionAssert.AreEquivalent(new[] { "*" }, notification.PublishedCultures[child.Key]);
 
             publishedWasCalled = true;
         };
@@ -988,6 +1028,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
             Assert.IsNotNull(notification.PublishedCultures);
 
             // variance is per document: the invariant root reports "*", the variant descendant reports its culture
+            Assert.AreEqual(2, notification.PublishedCultures.Count);
             Assert.IsTrue(notification.PublishedCultures.ContainsKey(root.Key));
             Assert.IsTrue(notification.PublishedCultures.ContainsKey(child.Key));
             CollectionAssert.AreEquivalent(new[] { "*" }, notification.PublishedCultures[root.Key]);

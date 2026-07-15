@@ -1346,7 +1346,7 @@ public class ContentService : RepositoryService, IContentService
                 new ContentSavedNotification(
                     contentsA,
                     eventMessages,
-                    savedCultures.Count == 0 ? null : savedCultures)
+                    savedCultures)
                 .WithStateFrom(savingNotification));
 
             // TODO: See note above about supressing events
@@ -2527,7 +2527,7 @@ public class ContentService : RepositoryService, IContentService
                     publishedDocuments,
                     eventMessages,
                     true,
-                    publishedCulturesByDocument.Count == 0 ? null : publishedCulturesByDocument,
+                    publishedCulturesByDocument,
                     null)
                 .WithState(notificationState));
 
@@ -2604,7 +2604,9 @@ public class ContentService : RepositoryService, IContentService
     // entity resets its change tracking, so the cultures are captured here when the notification is raised, because a
     // handler cannot recompute them from the entity afterwards. ToArray() takes a copy so the notification holds a
     // stable snapshot: some callers pass a live view over the entity's own collection (e.g. content.PublishedCultures)
-    // that would otherwise change as the entity is mutated. Returns null (not an empty map) when there is nothing to report.
+    // that would otherwise change as the entity is mutated. A null source means the category of change does not apply to
+    // this notification, so the map is null; a non-null-but-empty source means the change was tracked but affected no
+    // cultures for this document, so we return a present-but-empty map rather than conflating that with "not tracked".
     private static Dictionary<Guid, IReadOnlyCollection<string>>? BuildCultureMap(IContent content, IEnumerable<string>? cultures)
     {
         if (cultures is null)
@@ -2614,7 +2616,7 @@ public class ContentService : RepositoryService, IContentService
 
         string[] cultureList = cultures.ToArray();
         return cultureList.Length == 0
-            ? null
+            ? new Dictionary<Guid, IReadOnlyCollection<string>>()
             : new Dictionary<Guid, IReadOnlyCollection<string>> { [content.Key] = cultureList };
     }
 

@@ -105,8 +105,9 @@ public sealed class ContentPublishedNotification : EnumerableObjectNotification<
     ///     (<see cref="IncludeDescendants"/> is <c>true</c>) each published document has its own entry. Populated at
     ///     raise-time (change tracking on the entity is reset once persisted, so it cannot be recovered from
     ///     <see cref="PublishedEntities"/> afterwards). For invariant content the value is <c>["*"]</c>. A document is
-    ///     absent (and the whole dictionary may be <c>null</c>) when no per-culture delta was tracked — e.g. descendants
-    ///     re-published as a side effect of publishing an ancestor.
+    ///     absent when no per-culture delta was tracked for it — e.g. descendants re-published as a side effect of
+    ///     publishing an ancestor. The dictionary itself is <c>null</c> only when the notification was raised without
+    ///     culture information (for example via a constructor overload that does not accept it).
     /// </remarks>
     public IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? PublishedCultures { get; }
 
@@ -123,7 +124,8 @@ public sealed class ContentPublishedNotification : EnumerableObjectNotification<
     ///     <para>
     ///         Note that unpublishing several cultures at once is processed one culture at a time, so it raises one
     ///         <see cref="ContentPublishedNotification"/> per culture — each carrying a single entry here — rather than one
-    ///         notification listing them all. Populated at raise-time; <c>null</c> when no cultures were unpublished.
+    ///         notification listing them all. Populated at raise-time; <c>null</c> when unpublishing a culture was not part
+    ///         of this operation at all (for invariant content, or a publish that took nothing down).
     ///     </para>
     /// </remarks>
     public IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? UnpublishedCultures { get; }

@@ -76,7 +76,8 @@ public sealed class ContentUnpublishedNotification : EnumerableObjectNotificatio
     ///     </para>
     ///     <para>
     ///         Populated at raise-time (change tracking on the entity is reset once persisted, so it cannot be recovered
-    ///         from <see cref="UnpublishedEntities"/> afterwards). <c>null</c> when no per-culture information was tracked.
+    ///         from <see cref="UnpublishedEntities"/> afterwards). The dictionary is <c>null</c> only when the notification
+    ///         was raised without culture information (for example via a constructor overload that does not accept it).
     ///     </para>
     /// </remarks>
     public IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? UnpublishedCultures { get; }

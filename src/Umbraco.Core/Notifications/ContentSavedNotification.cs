@@ -71,9 +71,11 @@ public sealed class ContentSavedNotification : SavedNotification<IContent>
     ///     <para>
     ///         Populated at raise-time: change tracking on the entity is reset once persisted, so this cannot be recovered
     ///         from <see cref="Umbraco.Cms.Core.Notifications.SavedNotification{T}.SavedEntities"/> afterwards. For
-    ///         invariant content the value is <c>["*"]</c>. A given document is absent from the dictionary (and the whole
-    ///         dictionary may be <c>null</c>) when no culture change was tracked for it — e.g. a no-op re-save of variant
-    ///         content, or a sort operation.
+    ///         invariant content the value is <c>["*"]</c>. A given document is absent from the dictionary when no culture
+    ///         change was tracked for it — e.g. a no-op re-save of variant content, or a sort operation. The dictionary
+    ///         itself is <c>null</c> only when the notification was raised without culture information (for example via a
+    ///         constructor overload that does not accept it); a save that tracked cultures but changed none reports an
+    ///         empty dictionary, not <c>null</c>.
     ///     </para>
     /// </remarks>
     public IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? SavedCultures { get; }
