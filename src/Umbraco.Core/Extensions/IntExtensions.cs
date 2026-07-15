@@ -48,7 +48,7 @@ public static class IntExtensions
     /// </returns>
     public static bool TryParseFromGuid(Guid value, [NotNullWhen(true)] out int? result)
     {
-        if (!value.IsFakeGuid())
+        if (value.IsFakeGuid() is false)
         {
             // We have a proper GUID, not one converted from an integer.
             result = null;
