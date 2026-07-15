@@ -57,19 +57,27 @@ export function resolveStaleVariantRoute(args: UmbStaleVariantRouteResolverArgs)
 
 	if (parts.every(isValid)) return null;
 
-	const resolvedParts = parts.map((part) => {
-		if (isValid(part)) return part;
-		const variantId = UmbVariantId.FromString(part);
-		// Prefer the same culture without a segment, then the app culture, then invariant, then the first option:
-		const fallback =
-			variants.find((v) => v.culture === variantId.culture && v.segment === null) ??
-			variants.find((v) => v.culture === appCulture && v.segment === null) ??
-			variants.find((v) => v.culture === null && v.segment === null) ??
-			variants[0];
-		return fallback.unique;
-	});
+	const resolvedParts = parts.map((part) =>
+		isValid(part) ? part : findFallbackVariant(variants, UmbVariantId.FromString(part), appCulture).unique,
+	);
 
 	const uniqueParts = [...new Set(resolvedParts)];
 
 	return `${workspaceRoute}/${uniqueParts.join(UMB_WORKSPACE_PATH_VARIANT_DELIMITER)}${pathSuffix}`;
+}
+
+/**
+ * Prefers the same culture without a segment, then the app culture, then invariant, then the first option.
+ */
+function findFallbackVariant(
+	variants: Array<UmbStaleVariantRouteResolverVariant>,
+	variantId: UmbVariantId,
+	appCulture?: string,
+): UmbStaleVariantRouteResolverVariant {
+	return (
+		variants.find((v) => v.culture === variantId.culture && v.segment === null) ??
+		variants.find((v) => v.culture === appCulture && v.segment === null) ??
+		variants.find((v) => v.culture === null && v.segment === null) ??
+		variants[0]
+	);
 }
