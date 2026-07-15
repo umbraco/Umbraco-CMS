@@ -60,7 +60,7 @@ export function resolveStaleVariantRoute(args: UmbStaleVariantRouteResolverArgs)
 		const fallback =
 			variants.find((v) => v.culture === variantId.culture && v.segment === null) ??
 			variants.find((v) => v.culture === appCulture && v.segment === null) ??
-			variants.find((v) => v.culture === null) ??
+			variants.find((v) => v.culture === null && v.segment === null) ??
 			variants[0];
 		return fallback.unique;
 	});

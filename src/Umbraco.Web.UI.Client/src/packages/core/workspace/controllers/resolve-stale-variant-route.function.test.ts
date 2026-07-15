@@ -54,6 +54,29 @@ describe('resolveStaleVariantRoute', () => {
 		).to.be.null;
 	});
 
+	it('returns null when the current path is the workspace route with a trailing slash', () => {
+		expect(
+			resolveStaleVariantRoute({
+				currentPath: `${WORKSPACE_ROUTE}/`,
+				workspaceRoute: WORKSPACE_ROUTE,
+				variants: [EN],
+				appCulture: 'en-US',
+			}),
+		).to.be.null;
+	});
+
+	it('falls back to the pure invariant option even when a segment option is listed first', () => {
+		const INVARIANT_SEG = { culture: null, segment: 'seg1', unique: 'invariant_seg1' };
+		expect(
+			resolveStaleVariantRoute({
+				currentPath: `${WORKSPACE_ROUTE}/en-US`,
+				workspaceRoute: WORKSPACE_ROUTE,
+				variants: [INVARIANT_SEG, INVARIANT],
+				appCulture: 'en-US',
+			}),
+		).to.equal(`${WORKSPACE_ROUTE}/invariant`);
+	});
+
 	it('returns null when there are no variant options', () => {
 		expect(
 			resolveStaleVariantRoute({
