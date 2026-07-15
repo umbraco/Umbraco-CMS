@@ -99,6 +99,9 @@ public partial class UmbracoPlan : MigrationPlan
         To<V_17_4_0.AddExternalMemberTables>("{D7E8F9A0-B1C2-4D3E-A5F6-7890ABCDEF12}");
         To<V_17_4_0.FixLabelDataTypeDbTypeFromConfiguration>("{3F9B6A1C-7D84-4E2B-9C15-6A2E8F3D5B47}");
 
+        // To 17.6.0
+        To<V_17_6_0.AddContentTypeIdIndexForContent>("{3A1A8047-74AE-491A-B2C4-0BAE4A1289EC}");
+
         // To 18.0.0
         To<V_18_0_0.AddElementContainerPermissions>("{D00BB11A-DDF8-47C4-B58E-150C123BB3BB}");
         To<V_18_0_0.MigrateSingleBlockList>("{74332C49-B279-4945-8943-F8F00B1F5949}");
@@ -106,6 +109,7 @@ public partial class UmbracoPlan : MigrationPlan
 
         // To 19.0.0
         To<V_19_0_0.AddIndexDocumentTable>("{8A5C1B2E-4F6D-4E1A-9C3B-D2E7F0A16C54}");
+        To<V_19_0_0.AddExternalBlockElementRelationType>("{2D8F1B6E-4C3A-4E7D-9A1B-5F0C7E2D8A93}");
     }
 
     /// <summary>

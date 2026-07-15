@@ -4,7 +4,10 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Persistence.Relations;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Integration.Attributes;
@@ -13,6 +16,14 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.PropertyEditors;
 
 internal class BlockListWithReusableContentTest : BlockEditorWithReusableContentTestBase
 {
+    protected override void CustomTestSetup(IUmbracoBuilder builder)
+    {
+        base.CustomTestSetup(builder);
+        builder
+            .AddNotificationHandler<ContentSavedNotification, ContentRelationsUpdate>()
+            .AddNotificationHandler<ContentPublishedNotification, ContentRelationsUpdate>();
+    }
+
     public static void ConfigureAllowEditInvariantFromNonDefaultTrue(IUmbracoBuilder builder)
         => builder.Services.Configure<ContentSettings>(config =>
             config.AllowEditInvariantFromNonDefault = true);
@@ -785,6 +796,48 @@ internal class BlockListWithReusableContentTest : BlockEditorWithReusableContent
         }
     }
 
+    [Test]
+    public async Task External_Block_Content_Creates_ExternalBlockElement_Relation()
+    {
+        var elementType = await CreateElementType(ContentVariation.Nothing);
+        var blockListDataType = await CreateBlockListDataType(elementType);
+        var contentType = await CreateContentType(ContentVariation.Nothing, blockListDataType);
+
+        var reusableElementKey = await CreateAndPublishInvariantReusableElement(elementType.Key);
+
+        var blockListValue = new BlockListValue
+        {
+            Layout = new Dictionary<string, IEnumerable<IBlockLayoutItem>>
+            {
+                {
+                    Constants.PropertyEditors.Aliases.BlockList,
+                    [new BlockListLayoutItem { ContentKey = reusableElementKey, IsExternalContent = true }]
+                },
+            },
+            ContentData = [],
+            SettingsData = [],
+            Expose = [],
+        };
+
+        var content = new ContentBuilder().WithContentType(contentType).WithName("Page").Build();
+        content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
+        ContentService.Save(content);
+        PublishContent(content, ["*"]);
+
+        var relationService = GetRequiredService<IRelationService>();
+
+        // The document (parent) must be related to the element (child) via the external-block-element relation type.
+        var externalBlockRelations = relationService
+            .GetByParent(content, Constants.Conventions.RelationTypes.RelatedExternalBlockElementAlias)
+            .ToArray();
+        Assert.AreEqual(1, externalBlockRelations.Length, "Expected exactly one umbExternalBlockElement relation from the document to the element.");
+
+        // And it must NOT be related via the generic umbElement relation type.
+        var elementRelations = relationService
+            .GetByParent(content, Constants.Conventions.RelationTypes.RelatedElementAlias)
+            .ToArray();
+        Assert.AreEqual(0, elementRelations.Length, "External block content must not create a generic umbElement relation.");
+    }
 
     private async Task<IDataType> CreateBlockListDataType(IContentType elementType)
         => await CreateBlockEditorDataType(
