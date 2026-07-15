@@ -956,6 +956,69 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
     }
 
     [Test]
+    public void Can_Read_Empty_Saved_Cultures_For_No_Op_Invariant_Re_Save()
+    {
+        IContent document = new Content("content", -1, _contentType);
+        ContentService.Save(document);
+
+        // re-get so nothing is dirty, then re-save without changes
+        document = ContentService.GetById(document.Id);
+
+        var savedWasCalled = false;
+
+        ContentNotificationHandler.SavedContent = notification =>
+        {
+            // invariant content reports the "*" marker only when it changed; a no-op re-save reports nothing
+            Assert.IsNotNull(notification.SavedCultures);
+            Assert.IsEmpty(notification.SavedCultures);
+
+            savedWasCalled = true;
+        };
+
+        try
+        {
+            ContentService.Save(document);
+            Assert.IsTrue(savedWasCalled);
+        }
+        finally
+        {
+            ContentNotificationHandler.SavedContent = null;
+        }
+    }
+
+    [Test]
+    public void Can_Read_Star_Marker_Saved_Cultures_For_Changed_Invariant_Save()
+    {
+        IContent document = new Content("content", -1, _contentType);
+        ContentService.Save(document);
+
+        // re-get so nothing is dirty, then make a genuine change before re-saving
+        document = ContentService.GetById(document.Id);
+        document.SetValue("title", "changed");
+
+        var savedWasCalled = false;
+
+        ContentNotificationHandler.SavedContent = notification =>
+        {
+            Assert.IsNotNull(notification.SavedCultures);
+            Assert.IsTrue(notification.SavedCultures.ContainsKey(document.Key));
+            CollectionAssert.AreEquivalent(new[] { "*" }, notification.SavedCultures[document.Key]);
+
+            savedWasCalled = true;
+        };
+
+        try
+        {
+            ContentService.Save(document);
+            Assert.IsTrue(savedWasCalled);
+        }
+        finally
+        {
+            ContentNotificationHandler.SavedContent = null;
+        }
+    }
+
+    [Test]
     [LongRunning]
     public void Can_Read_Per_Document_Published_Cultures_For_Branch_Publish()
     {

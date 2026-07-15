@@ -69,13 +69,21 @@ public sealed class ContentSavedNotification : SavedNotification<IContent>
     ///         explicitly published regardless of whether its data changed.
     ///     </para>
     ///     <para>
+    ///         For variant content the value is the set of cultures whose data changed; for invariant content it is the
+    ///         <c>["*"]</c> marker, reported only when the document actually changed. A given document is absent from the
+    ///         dictionary when no change was tracked for it — e.g. a no-op re-save, or a sort operation.
+    ///     </para>
+    ///     <para>
+    ///         For variant content a culture is reported when its name or any of its property values changed (setting a
+    ///         value bumps that culture's date). A change to a culture-invariant (shared) property on a variant document
+    ///         is the exception: it belongs to no single culture, so it is not attributed to one here.
+    ///     </para>
+    ///     <para>
     ///         Populated at raise-time: change tracking on the entity is reset once persisted, so this cannot be recovered
-    ///         from <see cref="Umbraco.Cms.Core.Notifications.SavedNotification{T}.SavedEntities"/> afterwards. For
-    ///         invariant content the value is <c>["*"]</c>. A given document is absent from the dictionary when no culture
-    ///         change was tracked for it — e.g. a no-op re-save of variant content, or a sort operation. The dictionary
-    ///         itself is <c>null</c> only when the notification was raised without culture information (for example via a
-    ///         constructor overload that does not accept it); a save that tracked cultures but changed none reports an
-    ///         empty dictionary, not <c>null</c>.
+    ///         from <see cref="Umbraco.Cms.Core.Notifications.SavedNotification{T}.SavedEntities"/> afterwards. The
+    ///         dictionary itself is <c>null</c> only when the notification was raised without culture information (for
+    ///         example via a constructor overload that does not accept it); a save that tracked cultures but changed none
+    ///         reports an empty dictionary, not <c>null</c>.
     ///     </para>
     /// </remarks>
     public IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? SavedCultures { get; }

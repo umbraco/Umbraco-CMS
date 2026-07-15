@@ -1262,6 +1262,12 @@ public class ContentService : RepositoryService, IContentService
                 ? content.CultureInfos?.Values.Where(x => x.IsDirty()).Select(x => x.Culture).ToList()
                 : null;
 
+            // the saved notification reports the changed cultures for variant content, or the "*" marker for invariant
+            // content - but only when something actually changed. Captured here before saving resets change tracking.
+            IReadOnlyCollection<string>? savedCultures = content.ContentType.VariesByCulture()
+                ? culturesChanging
+                : content.IsDirty() ? ["*"] : [];
+
             // TODO: Currently there's no way to change track which variant properties have changed, we only have change
             // tracking enabled on all values on the Property which doesn't allow us to know which variants have changed.
             // in this particular case, determining which cultures have changed works with the above with names since it will
@@ -1277,7 +1283,7 @@ public class ContentService : RepositoryService, IContentService
                 new ContentSavedNotification(
                     content,
                     eventMessages,
-                    BuildCultureMap(content, content.ContentType.VariesByCulture() ? culturesChanging : ["*"]))
+                    BuildCultureMap(content, savedCultures))
                 .WithStateFrom(savingNotification));
 
             // TODO: we had code here to FORCE that this event can never be suppressed. But that just doesn't make a ton of sense?!
@@ -1330,10 +1336,11 @@ public class ContentService : RepositoryService, IContentService
 
                 content.WriterId = userId;
 
-                // capture the changing cultures before saving resets change tracking on the entity
+                // capture the changing cultures before saving resets change tracking on the entity. Invariant content
+                // reports the "*" marker, but only when something actually changed (mirroring the variant delta).
                 IReadOnlyCollection<string>? culturesChanging = content.ContentType.VariesByCulture()
                     ? content.CultureInfos?.Values.Where(x => x.IsDirty()).Select(x => x.Culture).ToArray()
-                    : ["*"];
+                    : content.IsDirty() ? ["*"] : [];
                 if (culturesChanging is { Count: > 0 })
                 {
                     savedCultures[content.Key] = culturesChanging;
