@@ -27,20 +27,7 @@ public class JsonBlockValueConverter : JsonConverter<BlockValue>
             throw new JsonException("Expected start object");
         }
 
-        BlockValue? blockValue;
-        try
-        {
-            blockValue = (BlockValue?)Activator.CreateInstance(typeToConvert);
-        }
-        catch (Exception ex)
-        {
-            throw new JsonException($"Unable to create an instance of {nameof(BlockValue)} from type: {typeToConvert.FullName}. Please make sure the type has an default (parameterless) constructor. See the inner exception for more details.", ex);
-        }
-
-        if (blockValue is null)
-        {
-            throw new JsonException($"Could not create an instance of {nameof(BlockValue)} from type: {typeToConvert.FullName}.");
-        }
+        BlockValue? blockValue = GetBlockValue(typeToConvert);
 
         var exposeSeen = false;
 
@@ -87,6 +74,26 @@ public class JsonBlockValueConverter : JsonConverter<BlockValue>
             blockValue.Expose = blockValue.ContentData
                 .Select(cd => new BlockItemVariation(cd.Key, null, null))
                 .ToList();
+        }
+
+        return blockValue;
+    }
+
+    private static BlockValue GetBlockValue(Type typeToConvert)
+    {
+        BlockValue? blockValue;
+        try
+        {
+            blockValue = (BlockValue?)Activator.CreateInstance(typeToConvert);
+        }
+        catch (Exception ex)
+        {
+            throw new JsonException($"Unable to create an instance of {nameof(BlockValue)} from type: {typeToConvert.FullName}. Please make sure the type has an default (parameterless) constructor. See the inner exception for more details.", ex);
+        }
+
+        if (blockValue is null)
+        {
+            throw new JsonException($"Could not create an instance of {nameof(BlockValue)} from type: {typeToConvert.FullName}.");
         }
 
         return blockValue;
