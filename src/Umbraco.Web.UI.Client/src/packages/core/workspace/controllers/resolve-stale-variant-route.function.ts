@@ -1,12 +1,18 @@
 import { UMB_WORKSPACE_PATH_VARIANT_DELIMITER } from './constants.js';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
+/**
+ * A minimal variant option descriptor consumed by {@link resolveStaleVariantRoute}.
+ */
 export interface UmbStaleVariantRouteResolverVariant {
 	culture: string | null;
 	segment: string | null;
 	unique: string;
 }
 
+/**
+ * The arguments for {@link resolveStaleVariantRoute}.
+ */
 export interface UmbStaleVariantRouteResolverArgs {
 	/**
 	 * The current location pathname, e.g. window.location.pathname.
