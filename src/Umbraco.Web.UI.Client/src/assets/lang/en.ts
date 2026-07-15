@@ -1428,6 +1428,7 @@ export default {
 	propertyEditorPicker: {
 		title: 'Select a property editor',
 		openPropertyEditorPicker: 'Select a property editor UI',
+		selectAction: "Select Property Editor",
 	},
 	propertyEditorUIGroups: {
 		advanced: 'Advanced',

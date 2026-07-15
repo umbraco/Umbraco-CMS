@@ -443,10 +443,6 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 				grid-auto-rows: var(--umb-card-medium-min-width);
 			}
 
-			#dropzone {
-				margin-bottom: var(--uui-size-space-5);
-			}
-
 			#btn-add {
 				text-align: center;
 				height: 100%;

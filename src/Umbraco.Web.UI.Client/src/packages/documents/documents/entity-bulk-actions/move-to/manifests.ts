@@ -4,6 +4,7 @@ import { UMB_DOCUMENT_TREE_ALIAS } from '../../tree/manifests.js';
 import { UMB_USER_PERMISSION_DOCUMENT_MOVE } from '../../user-permissions/document/constants.js';
 import { UMB_BULK_MOVE_DOCUMENT_REPOSITORY_ALIAS } from './repository/constants.js';
 import { manifests as repositoryManifests } from './repository/manifests.js';
+import { UMB_DOCUMENT_SEARCH_PROVIDER_ALIAS } from '../../search/constants.js';
 import { UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS } from '@umbraco-cms/backoffice/recycle-bin';
 import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collection';
 
@@ -18,6 +19,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		meta: {
 			bulkMoveRepositoryAlias: UMB_BULK_MOVE_DOCUMENT_REPOSITORY_ALIAS,
 			treeAlias: UMB_DOCUMENT_TREE_ALIAS,
+			searchProviderAlias: UMB_DOCUMENT_SEARCH_PROVIDER_ALIAS,
 		},
 		conditions: [
 			{

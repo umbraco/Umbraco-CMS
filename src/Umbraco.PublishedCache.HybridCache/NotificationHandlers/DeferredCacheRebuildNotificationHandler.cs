@@ -43,14 +43,14 @@ internal sealed class DeferredCacheRebuildNotificationHandler :
             return;
         }
 
-        var structuralChangeIds = notification.Changes
-            .Where(x => x.ChangeTypes.IsStructuralChange())
+        var rebuildIds = notification.Changes
+            .Where(x => x.ChangeTypes.RequiresRawDataRebuild())
             .Select(x => x.Item.Id)
             .ToArray();
 
-        if (structuralChangeIds.Length > 0)
+        if (rebuildIds.Length > 0)
         {
-            _deferredCacheRebuildService.QueueContentTypeRebuild(structuralChangeIds);
+            _deferredCacheRebuildService.QueueContentTypeRebuild(rebuildIds);
         }
     }
 
@@ -62,14 +62,14 @@ internal sealed class DeferredCacheRebuildNotificationHandler :
             return;
         }
 
-        var structuralChangeIds = notification.Changes
-            .Where(x => x.ChangeTypes.IsStructuralChange())
+        var rebuildIds = notification.Changes
+            .Where(x => x.ChangeTypes.RequiresRawDataRebuild())
             .Select(x => x.Item.Id)
             .ToArray();
 
-        if (structuralChangeIds.Length > 0)
+        if (rebuildIds.Length > 0)
         {
-            _deferredCacheRebuildService.QueueMediaTypeRebuild(structuralChangeIds);
+            _deferredCacheRebuildService.QueueMediaTypeRebuild(rebuildIds);
         }
     }
 }
