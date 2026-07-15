@@ -1,11 +1,11 @@
 import type { UmbElementDetailModel } from '../../types.js';
 import { UMB_ELEMENT_ENTITY_TYPE } from '../../entity.js';
 import { umbMapElementCreateRequestBody, umbMapElementUpdateRequestBody } from './element-detail-request.mappers.js';
+import { umbMapElementResponseToDetailModel } from './element-detail-response.mappers.js';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { ElementService } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDataSourceResponse, UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
-import type { ElementResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
@@ -64,7 +64,7 @@ export class UmbElementServerDataSource implements UmbDetailDataSource<UmbElemen
 			return { error };
 		}
 
-		const element = this.#createElementDetailModel(data);
+		const element = umbMapElementResponseToDetailModel(data);
 
 		return { data: element };
 	}
@@ -132,42 +132,5 @@ export class UmbElementServerDataSource implements UmbDetailDataSource<UmbElemen
 		if (!unique) throw new Error('Unique is missing');
 
 		return tryExecute(this.#host, ElementService.deleteRecycleBinElementById({ path: { id: unique } }));
-	}
-
-	#createElementDetailModel(data: ElementResponseModel): UmbElementDetailModel {
-		return {
-			entityType: UMB_ELEMENT_ENTITY_TYPE,
-			unique: data.id,
-			values: data.values.map((value) => {
-				return {
-					editorAlias: value.editorAlias,
-					culture: value.culture || null,
-					segment: value.segment || null,
-					alias: value.alias,
-					value: value.value,
-				};
-			}),
-			variants: data.variants.map((variant) => {
-				return {
-					culture: variant.culture || null,
-					segment: variant.segment || null,
-					state: variant.state,
-					name: variant.name,
-					publishDate: variant.publishDate || null,
-					createDate: variant.createDate,
-					updateDate: variant.updateDate,
-					scheduledPublishDate: variant.scheduledPublishDate || null,
-					scheduledUnpublishDate: variant.scheduledUnpublishDate || null,
-					flags: variant.flags,
-				};
-			}),
-			documentType: {
-				unique: data.documentType.id,
-				collection: null,
-				icon: data.documentType.icon,
-			},
-			isTrashed: data.isTrashed,
-			flags: data.flags,
-		};
 	}
 }

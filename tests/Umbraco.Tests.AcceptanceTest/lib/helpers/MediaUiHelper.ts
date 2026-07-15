@@ -224,7 +224,22 @@ export class MediaUiHelper extends UiBaseLocators {
     return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.recycleBinMedia, this.clickConfirmEmptyRecycleBinButton(), ConstantHelper.statusCodes.ok);
   }
 
+  async clickChooseModalButtonAndWaitForMediaWithIdsToBeMoved(mediaIds: string[]) {
+    // Wait for the move of each specific media id, so the assertion can't race an unrelated /move response.
+    await Promise.all([
+      ...mediaIds.map((id) =>
+        this.waitForResponse(
+          (resp) =>
+            resp.url().includes(`/media/${id}/move`) &&
+            resp.status() === ConstantHelper.statusCodes.ok,
+        ),
+      ),
+      this.clickChooseModalButton(),
+    ]);
+  }
+
+  /** @deprecated Prefer {@link clickChooseModalButtonAndWaitForMediaWithIdsToBeMoved}, which waits per media id (deterministic); kept for backwards compatibility. */
   async clickChooseModalButtonAndWaitForMediaItemsToBeMoved(movedMediaItems: number) {
-    return await this.waitForMultipleResponsesAfterExecutingPromise('/move', this.clickChooseModalButton(), 200, movedMediaItems);
+    return await this.waitForMultipleResponsesAfterExecutingPromise('/move', this.clickChooseModalButton(), ConstantHelper.statusCodes.ok, movedMediaItems);
   }
 }

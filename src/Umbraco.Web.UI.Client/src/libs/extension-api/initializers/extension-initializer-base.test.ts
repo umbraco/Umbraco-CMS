@@ -127,6 +127,6 @@ describe('UmbExtensionInitializerBase — loaded signal', () => {
 			.asPromise()
 			.then(() => instantiated.includes('Umb.Test.SlowBoot'));
 
-		expect(instantiatedWhenGateOpened, '`loaded` opened the gate before the extension instantiated').to.be.true;
+		expect(instantiatedWhenGateOpened, '`loaded` opened the gate before the extension instantiated').to.equal(true);
 	});
 });

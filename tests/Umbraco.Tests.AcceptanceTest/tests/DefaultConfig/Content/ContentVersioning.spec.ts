@@ -24,7 +24,7 @@ test('can rollback content to a previous published version', {tag: '@smoke'}, as
   await umbracoUi.content.clickInfoTab();
   await umbracoUi.content.clickRollbackButton();
   await umbracoUi.content.waitForRollbackItems();
-  await umbracoUi.content.clickLatestRollBackItem();
+  await umbracoUi.content.clickPreviousRollBackItem();
   await umbracoUi.content.clickRollbackContainerButton(documentId);
 
   // Assert
@@ -48,7 +48,7 @@ test('can rollback to a previous version from the tree action menu', async ({umb
   await umbracoUi.content.clickActionsMenuForContent(contentName);
   await umbracoUi.content.clickRollbackActionMenuOption();
   await umbracoUi.content.waitForRollbackItems();
-  await umbracoUi.content.clickLatestRollBackItem();
+  await umbracoUi.content.clickPreviousRollBackItem();
   await umbracoUi.content.clickRollbackContainerButton();
 
   // Assert
@@ -75,7 +75,7 @@ test('can rollback a variant document to a previous published version', async ({
   await umbracoUi.content.clickInfoTab();
   await umbracoUi.content.clickRollbackButton();
   await umbracoUi.content.waitForRollbackItems();
-  await umbracoUi.content.clickLatestRollBackItem();
+  await umbracoUi.content.clickPreviousRollBackItem();
   await umbracoUi.content.clickRollbackContainerButton(documentId);
 
   // Assert
@@ -96,7 +96,7 @@ test('rollback restores the document name to the previous version', async ({umbr
   await umbracoUi.content.clickInfoTab();
   await umbracoUi.content.clickRollbackButton();
   await umbracoUi.content.waitForRollbackItems();
-  await umbracoUi.content.clickLatestRollBackItem();
+  await umbracoUi.content.clickPreviousRollBackItem();
   await umbracoUi.content.clickRollbackContainerButton(documentId);
 
   // Assert
@@ -117,7 +117,7 @@ test('cancelling the rollback modal leaves the content unchanged', async ({umbra
   await umbracoUi.content.clickInfoTab();
   await umbracoUi.content.clickRollbackButton();
   await umbracoUi.content.waitForRollbackItems();
-  await umbracoUi.content.clickLatestRollBackItem();
+  await umbracoUi.content.clickPreviousRollBackItem();
   await umbracoUi.content.clickRollbackCancelButton();
 
   // Assert
