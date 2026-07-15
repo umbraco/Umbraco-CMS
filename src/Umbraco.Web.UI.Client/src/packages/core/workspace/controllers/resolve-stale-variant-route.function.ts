@@ -48,6 +48,10 @@ export function resolveStaleVariantRoute(args: UmbStaleVariantRouteResolverArgs)
 	const variantPart = slashIndex === -1 ? remainingPath : remainingPath.substring(0, slashIndex);
 	const pathSuffix = slashIndex === -1 ? '' : remainingPath.substring(slashIndex);
 
+	// Skip while a modal is layered on top — closing it restores the pre-modal URL and dispatches
+	// a changestate event, at which point the correction can run against the settled URL:
+	if (pathSuffix.split('/').includes('modal')) return null;
+
 	const parts = variantPart.split(UMB_WORKSPACE_PATH_VARIANT_DELIMITER);
 	const isValid = (part: string) => variants.some((v) => v.unique === part);
 

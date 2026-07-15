@@ -77,6 +77,28 @@ describe('resolveStaleVariantRoute', () => {
 		).to.equal(`${WORKSPACE_ROUTE}/invariant`);
 	});
 
+	it('returns null while a modal is open on top of the workspace', () => {
+		expect(
+			resolveStaleVariantRoute({
+				currentPath: `${WORKSPACE_ROUTE}/invariant/view/info/modal/umb-modal-workspace/edit/456`,
+				workspaceRoute: WORKSPACE_ROUTE,
+				variants: [EN, DA],
+				appCulture: 'en-US',
+			}),
+		).to.be.null;
+	});
+
+	it('returns null while a modal is open directly on the variant route', () => {
+		expect(
+			resolveStaleVariantRoute({
+				currentPath: `${WORKSPACE_ROUTE}/invariant/modal/umb-modal-workspace/edit/456`,
+				workspaceRoute: WORKSPACE_ROUTE,
+				variants: [EN, DA],
+				appCulture: 'en-US',
+			}),
+		).to.be.null;
+	});
+
 	it('returns null when there are no variant options', () => {
 		expect(
 			resolveStaleVariantRoute({

@@ -52,6 +52,20 @@ export class UmbDocumentBlueprintWorkspaceEditorElement extends UmbLitElement {
 		});
 	}
 
+	// Re-validate on every navigation — closing a modal restores the pre-modal URL, which may
+	// hold a variant that no longer exists after the content type changed while the modal was open:
+	#onChangeState = () => this.#redirectStaleVariantUrl();
+
+	override connectedCallback(): void {
+		super.connectedCallback();
+		window.addEventListener('changestate', this.#onChangeState);
+	}
+
+	override disconnectedCallback(): void {
+		super.disconnectedCallback();
+		window.removeEventListener('changestate', this.#onChangeState);
+	}
+
 	#observeVariants() {
 		if (!this.#workspaceContext) return;
 		this.observe(
