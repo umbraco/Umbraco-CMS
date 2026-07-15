@@ -16,7 +16,7 @@ public class ContentRoutingReadinessTests
     [Test]
     public void IsReady_IsFalse_ByDefault()
     {
-        IContentRoutingReadiness readiness = new ContentRoutingReadiness();
+        ContentRoutingReadiness readiness = new();
 
         Assert.That(readiness.IsReady, Is.False);
     }
@@ -24,7 +24,7 @@ public class ContentRoutingReadinessTests
     [Test]
     public void MarkReady_SetsIsReady()
     {
-        IContentRoutingReadiness readiness = new ContentRoutingReadiness();
+        ContentRoutingReadiness readiness = new();
 
         readiness.MarkReady();
 

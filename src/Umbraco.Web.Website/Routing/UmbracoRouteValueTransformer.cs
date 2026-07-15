@@ -55,6 +55,19 @@ public class UmbracoRouteValueTransformer : DynamicRouteValueTransformer
     /// <summary>
     ///     Initializes a new instance of the <see cref="UmbracoRouteValueTransformer" /> class.
     /// </summary>
+    /// <param name="logger">The logger.</param>
+    /// <param name="umbracoContextAccessor">The Umbraco context accessor.</param>
+    /// <param name="publishedRouter">The published router used to route the request to published content.</param>
+    /// <param name="runtime">The runtime state.</param>
+    /// <param name="routeValuesFactory">The factory used to create the Umbraco route values.</param>
+    /// <param name="routableDocumentFilter">The filter that determines whether a request is for a routable document.</param>
+    /// <param name="dataProtectionProvider">The data protection provider used to decrypt the surface controller form post route token (ufprt).</param>
+    /// <param name="controllerActionSearcher">The searcher used to locate the controller action for a posted surface controller request.</param>
+    /// <param name="publicAccessRequestHandler">The handler that rewrites the request for protected (public access) content.</param>
+    /// <param name="umbracoVirtualPageRoute">The virtual page route used to resolve content for custom-routed controllers.</param>
+    /// <param name="globalSettings">The global settings.</param>
+    /// <param name="urlService">The document URL service.</param>
+    /// <param name="contentRoutingReadiness">Signals whether this server has finished seeding the caches required to route front-end content.</param>
     public UmbracoRouteValueTransformer(
         ILogger<UmbracoRouteValueTransformer> logger,
         IUmbracoContextAccessor umbracoContextAccessor,
