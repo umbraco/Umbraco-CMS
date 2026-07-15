@@ -1,4 +1,4 @@
-import {ConstantHelper, MemberTypeBuilder, test} from '@umbraco/acceptance-test-helpers';
+import {ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 import {expect} from "@playwright/test";
 
 const memberTypeFolderName = 'TestMemberTypeFolder';
@@ -147,12 +147,7 @@ test('can find a member type in a sibling nested folder', async ({umbracoApi}) =
   const firstChildFolderId = await umbracoApi.memberType.createFolder(firstChildFolderName, parentFolderId);
   await umbracoApi.memberType.createFolder(nestedFolderName, firstChildFolderId);
   const secondChildFolderId = await umbracoApi.memberType.createFolder(secondChildFolderName, parentFolderId);
-  const targetMemberType = new MemberTypeBuilder()
-    .withName(targetMemberTypeName)
-    .withAlias('targetMemberType')
-    .withFolderId(secondChildFolderId)
-    .build();
-  const targetMemberTypeId = await umbracoApi.memberType.create(targetMemberType);
+  const targetMemberTypeId = await umbracoApi.memberType.createDefaultMemberTypeInFolder(targetMemberTypeName, secondChildFolderId);
 
   // Act
   const memberTypeData = await umbracoApi.memberType.getByName(targetMemberTypeName);

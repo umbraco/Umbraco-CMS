@@ -163,6 +163,17 @@ export class MediaTypeApiHelper {
     return await this.create(mediaType);
   }
 
+  async createDefaultMediaTypeInFolder(mediaTypeName: string, folderId: string) {
+    await this.ensureNameNotExists(mediaTypeName);
+
+    const mediaType = new MediaTypeBuilder()
+      .withName(mediaTypeName)
+      .withAlias(AliasHelper.toAlias(mediaTypeName))
+      .withFolderId(folderId)
+      .build();
+    return await this.create(mediaType);
+  }
+
   async createMediaTypeWithPropertyEditor(mediaTypeName: string, dataTypeName: string, dataTypeId: string, groupName: string = "GroupTest", isAllowAsRoot: boolean = false) {
     const crypto = require('crypto');
     const containerId = crypto.randomUUID();

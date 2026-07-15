@@ -1,4 +1,4 @@
-import {ConstantHelper, DocumentTypeBuilder, test} from '@umbraco/acceptance-test-helpers';
+import {ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 import {expect} from '@playwright/test';
 
 const documentFolderName = 'TestFolder';
@@ -131,11 +131,7 @@ test('can find a document type in a sibling nested folder', async ({umbracoApi})
   const firstChildFolderId = await umbracoApi.documentType.createFolder(firstChildFolderName, parentFolderId);
   await umbracoApi.documentType.createFolder(nestedFolderName, firstChildFolderId);
   const secondChildFolderId = await umbracoApi.documentType.createFolder(secondChildFolderName, parentFolderId);
-  const targetDocumentType = new DocumentTypeBuilder()
-    .withName(targetDocumentTypeName)
-    .withFolderId(secondChildFolderId)
-    .build();
-  const targetDocumentTypeId = await umbracoApi.documentType.create(targetDocumentType);
+  const targetDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeInFolder(targetDocumentTypeName, secondChildFolderId);
 
   // Act
   const documentTypeData = await umbracoApi.documentType.getByName(targetDocumentTypeName);

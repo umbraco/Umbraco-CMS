@@ -149,6 +149,19 @@ export class MemberTypeApiHelper {
     return await this.create(memberType);
   }
 
+  async createDefaultMemberTypeInFolder(memberTypeName: string, folderId: string) {
+    await this.ensureNameNotExists(memberTypeName);
+
+    const memberType = new MemberTypeBuilder()
+      .withName(memberTypeName)
+      .withAlias(AliasHelper.toAlias(memberTypeName))
+      .withAllowedAsRoot(true)
+      .withFolderId(folderId)
+      .build();
+
+    return await this.create(memberType);
+  }
+
   async createMemberTypeWithPropertyEditor(memberTypeName: string, dataTypeName: string, dataTypeId: string, groupName: string = "GroupTest")
   {
     const crypto = require('crypto');
