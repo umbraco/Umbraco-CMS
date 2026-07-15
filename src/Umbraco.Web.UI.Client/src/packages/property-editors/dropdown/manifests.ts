@@ -13,6 +13,15 @@ export const manifests: Array<UmbExtensionManifest> = [
 			group: '#propertyEditorUIGroups_lists',
 			keywords: ['select', 'dropdown', 'choice', 'option', 'list'],
 			supportsReadOnly: true,
+			settings: {
+				properties: [
+					{
+						alias: 'placeholder',
+						label: '#general_placeholder',
+						propertyEditorUiAlias: 'Umb.PropertyEditorUi.TextBox',
+					},
+				],
+			},
 		},
 	},
 	schemaManifest,

@@ -32,7 +32,7 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
     private readonly ILogger<MediaCacheService> _logger;
     private readonly CacheSettings _cacheSettings;
 
-    private readonly ConvertedPublishedContentCache<Guid> _publishedContentCache = new();
+    private readonly IConvertedPublishedContentCache<Guid> _publishedContentCache;
 
     // Monotonic counter bumped whenever the in-memory cache (L0/L1) is invalidated or refreshed.
     // GetNodeAsync captures it before reading the backing store and re-checks it before writing
@@ -79,7 +79,8 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
         IEnumerable<IMediaSeedKeyProvider> seedKeyProviders,
         IPublishedModelFactory publishedModelFactory,
         IOptions<CacheSettings> cacheSettings,
-        ILogger<MediaCacheService> logger)
+        ILogger<MediaCacheService> logger,
+        IConvertedPublishedContentCacheFactory cacheFactory)
     {
         _databaseCacheRepository = databaseCacheRepository;
         _idKeyMap = idKeyMap;
@@ -91,6 +92,7 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
         _publishedModelFactory = publishedModelFactory;
         _cacheSettings = cacheSettings.Value;
         _logger = logger;
+        _publishedContentCache = cacheFactory.Create<Guid>(_cacheSettings.Entry.Media.MaximumLocalCacheItems, CacheName);
     }
 
     /// <inheritdoc />
@@ -102,16 +104,7 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
     /// <inheritdoc />
     public long? GetApproximateBytes() => _publishedContentCache.ApproximateSizeInBytes;
 
-    public async Task<IPublishedContent?> GetByKeyAsync(Guid key)
-    {
-        Attempt<int> idAttempt = _idKeyMap.GetIdForKey(key, UmbracoObjectTypes.Media);
-        if (idAttempt.Success is false)
-        {
-            return null;
-        }
-
-        return await GetNodeAsync(key);
-    }
+    public Task<IPublishedContent?> GetByKeyAsync(Guid key) => GetNodeAsync(key);
 
     public async Task<IPublishedContent?> GetByIdAsync(int id)
     {
