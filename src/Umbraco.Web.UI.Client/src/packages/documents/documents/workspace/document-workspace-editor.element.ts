@@ -7,7 +7,7 @@ import type { UmbRoute, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/r
 import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
 import { createObservablePart } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbDocumentVariantOptionModel } from '../types.js';
-import { UMB_WORKSPACE_PATH_VARIANT_DELIMITER } from '@umbraco-cms/backoffice/workspace';
+import { resolveStaleVariantRoute, UMB_WORKSPACE_PATH_VARIANT_DELIMITER } from '@umbraco-cms/backoffice/workspace';
 
 // TODO: Refactor across all four content workspace editors (document, document blueprint, media, member) to use a base component. [NL]
 // TODO: This seem fully identical with Media Workspace Editor, so we can refactor this to a generic component. [NL]
@@ -67,6 +67,7 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 			(variants) => {
 				this.#variants = variants;
 				this.#generateRoutes();
+				this.#redirectStaleVariantUrl();
 			},
 			'_observeVariants',
 		);
@@ -113,6 +114,19 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 			'',
 			`${this.#workspaceRoute}/${newVariant.unique}${pathSuffix}${window.location.search}`,
 		);
+	}
+
+	#redirectStaleVariantUrl() {
+		if (!this.#workspaceRoute || !this.#variants?.length) return;
+		const newPath = resolveStaleVariantRoute({
+			currentPath: window.location.pathname,
+			workspaceRoute: this.#workspaceRoute,
+			variants: this.#variants,
+			appCulture: this.#appCulture,
+		});
+		if (newPath) {
+			history.replaceState(null, '', newPath + window.location.search);
+		}
 	}
 
 	#generateRoutes() {
@@ -197,6 +211,7 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 	private _gotWorkspaceRoute = (e: UmbRouterSlotInitEvent) => {
 		this.#workspaceRoute = e.target.absoluteRouterPath;
 		this.#workspaceContext?.splitView.setWorkspaceRoute(this.#workspaceRoute);
+		this.#redirectStaleVariantUrl();
 	};
 
 	override render() {
