@@ -17,5 +17,5 @@ public static class ContentRoutingReadinessExtensions
     /// existing runtime-level checks in the routing and maintenance machinery.
     /// </remarks>
     public static bool IsInInitializationWindow(this IContentRoutingReadiness readiness, IRuntimeState runtimeState)
-        => runtimeState.Level == RuntimeLevel.Run && readiness.IsReady is false;
+        => runtimeState.Level is RuntimeLevel.Run && readiness.IsReady is false;
 }

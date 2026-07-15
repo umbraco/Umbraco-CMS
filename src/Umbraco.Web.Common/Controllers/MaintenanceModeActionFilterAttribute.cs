@@ -63,7 +63,7 @@ public sealed class MaintenanceModeActionFilterAttribute : TypeFilterAttribute
             // (RuntimeLevel.Upgrade) the operator needs API access to log in and trigger the upgrade from the
             // backoffice. MVC controllers (website, surface) are blocked during both Upgrade and Upgrading.
             bool shouldBlock = isApiController
-                ? _runtimeState.Level == RuntimeLevel.Upgrading || inInitializationWindow
+                ? _runtimeState.Level is RuntimeLevel.Upgrading || inInitializationWindow
                 : _runtimeState.Level is RuntimeLevel.Upgrade or RuntimeLevel.Upgrading || inInitializationWindow;
 
             if (shouldBlock is false)
@@ -86,7 +86,7 @@ public sealed class MaintenanceModeActionFilterAttribute : TypeFilterAttribute
                 return;
             }
 
-            context.Result = _runtimeState.Level == RuntimeLevel.Upgrading || inInitializationWindow
+            context.Result = _runtimeState.Level is RuntimeLevel.Upgrading || inInitializationWindow
                 ? new MaintenanceResult(_globalSettings.CurrentValue.UpgradingViewPath)
                 : new MaintenanceResult();
         }
