@@ -52,15 +52,75 @@ public sealed class JsonTolerantNumberConverterFactory : JsonConverterFactory
                         ? parsed
                         : T.Zero;
                 case JsonTokenType.Number:
-                    return reader.TryGetDecimal(out decimal decimalValue)
-                        ? T.CreateTruncating(decimalValue)
-                        : T.CreateTruncating(reader.GetDouble());
+                    return ReadNumber(ref reader);
                 default:
                     throw new JsonException($"Unexpected token '{reader.TokenType}' when parsing a number.");
             }
         }
 
         public override void Write(Utf8JsonWriter writer, T value, JsonSerializerOptions options)
-            => writer.WriteRawValue(value.ToString(null, CultureInfo.InvariantCulture) ?? "0");
+        {
+            // Use the typed numeric writers rather than WriteRawValue, which can emit invalid JSON for
+            // floating-point edge cases.
+            if (typeof(T) == typeof(int))
+            {
+                writer.WriteNumberValue((int)(object)value);
+            }
+            else if (typeof(T) == typeof(long))
+            {
+                writer.WriteNumberValue((long)(object)value);
+            }
+            else if (typeof(T) == typeof(short))
+            {
+                writer.WriteNumberValue((int)(short)(object)value);
+            }
+            else if (typeof(T) == typeof(double))
+            {
+                writer.WriteNumberValue((double)(object)value);
+            }
+            else if (typeof(T) == typeof(float))
+            {
+                writer.WriteNumberValue((float)(object)value);
+            }
+            else
+            {
+                writer.WriteNumberValue((decimal)(object)value);
+            }
+        }
+
+        // Read a JSON number token using the typed reader for the target type, so a value that cannot be
+        // represented (e.g. a fractional number for an integer type, or an out-of-range value) resolves to
+        // the default rather than being silently truncated.
+        private static T ReadNumber(ref Utf8JsonReader reader)
+        {
+            if (typeof(T) == typeof(int))
+            {
+                return reader.TryGetInt32(out var intValue) ? (T)(object)intValue : T.Zero;
+            }
+
+            if (typeof(T) == typeof(long))
+            {
+                return reader.TryGetInt64(out var longValue) ? (T)(object)longValue : T.Zero;
+            }
+
+            if (typeof(T) == typeof(short))
+            {
+                return reader.TryGetInt32(out var intValue) && intValue is >= short.MinValue and <= short.MaxValue
+                    ? (T)(object)(short)intValue
+                    : T.Zero;
+            }
+
+            if (typeof(T) == typeof(double))
+            {
+                return reader.TryGetDouble(out var doubleValue) ? (T)(object)doubleValue : T.Zero;
+            }
+
+            if (typeof(T) == typeof(float))
+            {
+                return reader.TryGetSingle(out var floatValue) ? (T)(object)floatValue : T.Zero;
+            }
+
+            return reader.TryGetDecimal(out var decimalValue) ? (T)(object)decimalValue : T.Zero;
+        }
     }
 }
