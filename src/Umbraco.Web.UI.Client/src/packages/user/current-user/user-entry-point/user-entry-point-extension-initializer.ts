@@ -34,7 +34,12 @@ export class UmbUserEntryPointExtensionInitializer extends UmbControllerBase {
 		super(host);
 		this.#host = host;
 		this.#extensionRegistry = extensionRegistry;
+		this.#observeAuthorization();
+		this.#observeCurrentUser();
+		this.#observeExtensions();
+	}
 
+	#observeAuthorization() {
 		this.consumeContext(UMB_AUTH_CONTEXT, (authContext) => {
 			this.observe(
 				authContext?.isAuthorized,
@@ -49,7 +54,9 @@ export class UmbUserEntryPointExtensionInitializer extends UmbControllerBase {
 				'umbObserveIsAuthorized',
 			);
 		});
+	}
 
+	#observeCurrentUser() {
 		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (currentUserContext) => {
 			this.#currentUserContext = currentUserContext;
 			if (this.#isAuthorized) {
@@ -64,28 +71,30 @@ export class UmbUserEntryPointExtensionInitializer extends UmbControllerBase {
 				'umbObserveCurrentUser',
 			);
 		});
+	}
 
+	#observeExtensions() {
 		this.observe(
-			extensionRegistry.byType<'userEntryPoint', ManifestUserEntryPoint>(
-				'userEntryPoint',
-			),
-			(manifests) => {
-				for (const alias of [...this.#manifestMap.keys()]) {
-					if (!manifests.find((manifest) => manifest.alias === alias)) {
-						this.#manifestMap.delete(alias);
-						this.#unloadExtension(alias);
-					}
-				}
-				for (const manifest of manifests) {
-					if (this.#manifestMap.has(manifest.alias)) continue;
-					this.#manifestMap.set(manifest.alias, manifest);
-					if (this.#active) {
-						this.#instantiateExtension(this.#session, manifest);
-					}
-				}
-			},
+			this.#extensionRegistry.byType<'userEntryPoint', ManifestUserEntryPoint>('userEntryPoint'),
+			(manifests) => this.#onManifestsChanged(manifests),
 			'umbObserveUserEntryPoints',
 		);
+	}
+
+	#onManifestsChanged(manifests: Array<ManifestUserEntryPoint>) {
+		for (const alias of [...this.#manifestMap.keys()]) {
+			if (!manifests.find((manifest) => manifest.alias === alias)) {
+				this.#manifestMap.delete(alias);
+				this.#unloadExtension(alias);
+			}
+		}
+		for (const manifest of manifests) {
+			if (this.#manifestMap.has(manifest.alias)) continue;
+			this.#manifestMap.set(manifest.alias, manifest);
+			if (this.#active) {
+				this.#instantiateExtension(this.#session, manifest);
+			}
+		}
 	}
 
 	#update() {
@@ -106,8 +115,10 @@ export class UmbUserEntryPointExtensionInitializer extends UmbControllerBase {
 		if (!manifest.js) return;
 		try {
 			const moduleInstance = await loadManifestPlainJs(manifest.js);
+			if (!moduleInstance) return;
 			// The session may have ended, or the extension been unregistered, while the module loaded.
-			if (!moduleInstance || session !== this.#session || !this.#manifestMap.has(manifest.alias)) return;
+			if (session !== this.#session) return;
+			if (!this.#manifestMap.has(manifest.alias)) return;
 			this.#instanceMap.set(manifest.alias, moduleInstance);
 			if (hasInitExport(moduleInstance)) {
 				await moduleInstance.onInit(this.#host, this.#extensionRegistry);
