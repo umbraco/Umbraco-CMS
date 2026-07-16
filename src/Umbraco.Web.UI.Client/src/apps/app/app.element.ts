@@ -187,6 +187,7 @@ export class UmbAppElement extends UmbLitElement {
 	#serverConnection?: UmbServerConnection;
 	#authController = new UmbAppAuthController(this);
 	#bundleInitializer: UmbBundleExtensionInitializer;
+	#userEntryPointInitializer?: UmbUserEntryPointExtensionInitializer;
 
 	#currentUser?: typeof UMB_CURRENT_USER_CONTEXT.TYPE;
 	#packageModules?: Promise<Array<{ name: string; extensions: Array<ManifestBase | UmbExtensionManifestKind> }>>;
@@ -268,7 +269,7 @@ export class UmbAppElement extends UmbLitElement {
 		await new UmbServerExtensionRegistrator(this, umbExtensionsRegistry).registerPublicExtensions();
 		const entryPointInitializer = new UmbAppEntryPointExtensionInitializer(this, umbExtensionsRegistry);
 
-		new UmbUserEntryPointExtensionInitializer(this, umbExtensionsRegistry);
+		this.#userEntryPointInitializer = new UmbUserEntryPointExtensionInitializer(this, umbExtensionsRegistry);
 
 		// Try to initialise the auth flow and get the runtime status
 		try {

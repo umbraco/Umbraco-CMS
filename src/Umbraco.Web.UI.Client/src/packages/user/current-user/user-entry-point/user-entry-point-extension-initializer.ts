@@ -19,10 +19,10 @@ import {
  * Runs `onUnload` when the session ends (sign-out or timeout) or the extension is unregistered.
  */
 export class UmbUserEntryPointExtensionInitializer extends UmbControllerBase {
-	#host: UmbElement;
-	#extensionRegistry: UmbExtensionRegistry<ManifestUserEntryPoint>;
-	#manifestMap = new Map<string, ManifestUserEntryPoint>();
-	#instanceMap = new Map<string, UmbEntryPointModule>();
+	readonly #host: UmbElement;
+	readonly #extensionRegistry: UmbExtensionRegistry<ManifestUserEntryPoint>;
+	readonly #manifestMap = new Map<string, ManifestUserEntryPoint>();
+	readonly #instanceMap = new Map<string, UmbEntryPointModule>();
 	#currentUserContext?: typeof UMB_CURRENT_USER_CONTEXT.TYPE;
 	#isAuthorized = false;
 	#hasUser = false;
@@ -87,7 +87,7 @@ export class UmbUserEntryPointExtensionInitializer extends UmbControllerBase {
 	}
 
 	#unloadRemovedExtensions(manifests: Array<ManifestUserEntryPoint>) {
-		for (const alias of [...this.#manifestMap.keys()]) {
+		for (const alias of this.#manifestMap.keys()) {
 			if (manifests.some((manifest) => manifest.alias === alias)) continue;
 			this.#manifestMap.delete(alias);
 			this.#unloadExtension(alias);
@@ -111,7 +111,7 @@ export class UmbUserEntryPointExtensionInitializer extends UmbControllerBase {
 		if (active) {
 			this.#manifestMap.forEach((manifest) => this.#instantiateExtension(session, manifest));
 		} else {
-			for (const alias of [...this.#instanceMap.keys()]) {
+			for (const alias of this.#instanceMap.keys()) {
 				this.#unloadExtension(alias);
 			}
 		}
@@ -127,7 +127,7 @@ export class UmbUserEntryPointExtensionInitializer extends UmbControllerBase {
 			if (!this.#manifestMap.has(manifest.alias)) return;
 			this.#instanceMap.set(manifest.alias, moduleInstance);
 			if (hasInitExport(moduleInstance)) {
-				await moduleInstance.onInit(this.#host, this.#extensionRegistry);
+				await Promise.resolve(moduleInstance.onInit(this.#host, this.#extensionRegistry));
 			}
 		} catch (error) {
 			console.error(
@@ -159,7 +159,7 @@ export class UmbUserEntryPointExtensionInitializer extends UmbControllerBase {
 	}
 
 	override destroy() {
-		for (const alias of [...this.#instanceMap.keys()]) {
+		for (const alias of this.#instanceMap.keys()) {
 			this.#unloadExtension(alias);
 		}
 		super.destroy();
