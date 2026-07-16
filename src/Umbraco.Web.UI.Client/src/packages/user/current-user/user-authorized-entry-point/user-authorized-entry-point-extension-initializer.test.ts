@@ -80,6 +80,7 @@ describe('UmbUserAuthorizedEntryPointExtensionInitializer', () => {
 	let currentUserContext: UmbTestCurrentUserContext;
 	let registry: UmbExtensionRegistry<ManifestUserAuthorizedEntryPoint>;
 	let calls: { init: number; unload: number };
+	let initializer: UmbUserAuthorizedEntryPointExtensionInitializer;
 
 	beforeEach(async () => {
 		host = await fixture(html`<umb-test-user-authorized-entry-point-host></umb-test-user-authorized-entry-point-host>`);
@@ -89,7 +90,7 @@ describe('UmbUserAuthorizedEntryPointExtensionInitializer', () => {
 		host.provideContext(UMB_CURRENT_USER_CONTEXT, currentUserContext as never);
 		registry = new UmbExtensionRegistry();
 		calls = { init: 0, unload: 0 };
-		new UmbUserAuthorizedEntryPointExtensionInitializer(host, registry);
+		initializer = new UmbUserAuthorizedEntryPointExtensionInitializer(host, registry);
 	});
 
 	it('does not run onInit before the user is authorized', async () => {
@@ -165,5 +166,29 @@ describe('UmbUserAuthorizedEntryPointExtensionInitializer', () => {
 		authContext.setAuthorized(false);
 		await aTimeout(200);
 		expect(calls.init).to.equal(0);
+	});
+
+	it('unloads all active instances on destroy', async () => {
+		registry.register(createManifest('Umb.Test.A', calls));
+		authContext.setAuthorized(true);
+		await aTimeout(50);
+		expect(calls.init).to.equal(1);
+
+		initializer.destroy();
+		expect(calls.unload).to.equal(1);
+	});
+
+	it('a failing manifest does not prevent a healthy one from initializing', async () => {
+		const failing: ManifestUserAuthorizedEntryPoint = {
+			type: 'userAuthorizedEntryPoint',
+			alias: 'Umb.Test.Failing',
+			name: 'Umb.Test.Failing',
+			js: () => Promise.reject(new Error('boom')),
+		};
+		registry.register(failing);
+		registry.register(createManifest('Umb.Test.Healthy', calls));
+		authContext.setAuthorized(true);
+		await aTimeout(50);
+		expect(calls.init).to.equal(1);
 	});
 });

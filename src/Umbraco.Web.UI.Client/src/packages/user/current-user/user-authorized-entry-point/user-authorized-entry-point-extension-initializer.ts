@@ -104,12 +104,20 @@ export class UmbUserAuthorizedEntryPointExtensionInitializer extends UmbControll
 
 	async #instantiateExtension(session: number, manifest: ManifestUserAuthorizedEntryPoint) {
 		if (!manifest.js) return;
-		const moduleInstance = await loadManifestPlainJs(manifest.js);
-		// The session may have ended, or the extension been unregistered, while the module loaded.
-		if (!moduleInstance || session !== this.#session || !this.#manifestMap.has(manifest.alias)) return;
-		this.#instanceMap.set(manifest.alias, moduleInstance);
-		if (hasInitExport(moduleInstance)) {
-			await moduleInstance.onInit(this.#host, this.#extensionRegistry);
+		try {
+			const moduleInstance = await loadManifestPlainJs(manifest.js);
+			// The session may have ended, or the extension been unregistered, while the module loaded.
+			if (!moduleInstance || session !== this.#session || !this.#manifestMap.has(manifest.alias)) return;
+			this.#instanceMap.set(manifest.alias, moduleInstance);
+			if (hasInitExport(moduleInstance)) {
+				await moduleInstance.onInit(this.#host, this.#extensionRegistry);
+			}
+		} catch (error) {
+			console.error(
+				'[UmbUserAuthorizedEntryPointExtensionInitializer] Failed to instantiate extension',
+				manifest.alias,
+				error,
+			);
 		}
 	}
 
@@ -118,7 +126,15 @@ export class UmbUserAuthorizedEntryPointExtensionInitializer extends UmbControll
 		if (!moduleInstance) return;
 		this.#instanceMap.delete(alias);
 		if (hasOnUnloadExport(moduleInstance)) {
-			moduleInstance.onUnload(this.#host, this.#extensionRegistry);
+			try {
+				moduleInstance.onUnload(this.#host, this.#extensionRegistry);
+			} catch (error) {
+				console.error(
+					'[UmbUserAuthorizedEntryPointExtensionInitializer] Failed to unload extension',
+					alias,
+					error,
+				);
+			}
 		}
 	}
 
