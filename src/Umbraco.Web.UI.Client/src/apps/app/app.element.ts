@@ -187,6 +187,8 @@ export class UmbAppElement extends UmbLitElement {
 	#serverConnection?: UmbServerConnection;
 	#authController = new UmbAppAuthController(this);
 	#bundleInitializer: UmbBundleExtensionInitializer;
+	// The initializer registers itself as a controller on this host; the reference only pins the instantiation to the app's lifetime.
+	// eslint-disable-next-line no-unused-private-class-members
 	#userEntryPointInitializer?: UmbUserEntryPointExtensionInitializer;
 
 	#currentUser?: typeof UMB_CURRENT_USER_CONTEXT.TYPE;
