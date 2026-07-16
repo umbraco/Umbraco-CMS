@@ -43,16 +43,9 @@ export function resolveStaleVariantRoute(args: UmbStaleVariantRouteResolverArgs)
 	const { currentPath, workspaceRoute, variants, appCulture } = args;
 	if (variants.length === 0) return null;
 
-	const routePrefix = workspaceRoute + '/';
-	if (!currentPath.startsWith(routePrefix)) return null;
-
-	const remainingPath = currentPath.substring(routePrefix.length);
-	if (remainingPath.length === 0) return null;
-
-	// Separate the variant part from any trailing path (e.g. /view/info):
-	const slashIndex = remainingPath.indexOf('/');
-	const variantPart = slashIndex === -1 ? remainingPath : remainingPath.substring(0, slashIndex);
-	const pathSuffix = slashIndex === -1 ? '' : remainingPath.substring(slashIndex);
+	const parsed = parseVariantPath(currentPath, workspaceRoute);
+	if (!parsed) return null;
+	const { variantPart, pathSuffix } = parsed;
 
 	// Skip while a modal is layered on top — closing it restores the pre-modal URL and dispatches
 	// a changestate event, at which point the correction can run against the settled URL:
@@ -70,6 +63,26 @@ export function resolveStaleVariantRoute(args: UmbStaleVariantRouteResolverArgs)
 	const uniqueParts = [...new Set(resolvedParts)];
 
 	return `${workspaceRoute}/${uniqueParts.join(UMB_WORKSPACE_PATH_VARIANT_DELIMITER)}${pathSuffix}`;
+}
+
+/**
+ * Separates the variant part of a workspace path from any trailing path (e.g. /view/info).
+ */
+function parseVariantPath(
+	currentPath: string,
+	workspaceRoute: string,
+): { variantPart: string; pathSuffix: string } | null {
+	const routePrefix = workspaceRoute + '/';
+	if (!currentPath.startsWith(routePrefix)) return null;
+
+	const remainingPath = currentPath.substring(routePrefix.length);
+	if (remainingPath.length === 0) return null;
+
+	const slashIndex = remainingPath.indexOf('/');
+	if (slashIndex === -1) {
+		return { variantPart: remainingPath, pathSuffix: '' };
+	}
+	return { variantPart: remainingPath.substring(0, slashIndex), pathSuffix: remainingPath.substring(slashIndex) };
 }
 
 /**
