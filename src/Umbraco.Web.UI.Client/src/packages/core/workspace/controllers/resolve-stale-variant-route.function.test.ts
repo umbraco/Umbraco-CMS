@@ -1,4 +1,4 @@
-import { expect } from '@open-wc/testing';
+import { assert, expect } from '@open-wc/testing';
 import {
 	resolveStaleVariantRoute,
 	type UmbStaleVariantRouteResolverVariant,
@@ -22,23 +22,23 @@ function resolve(
 
 describe('resolveStaleVariantRoute', () => {
 	it('returns null when the variant in the URL exists', () => {
-		expect(resolve(`${WORKSPACE_ROUTE}/en-US`, [EN, DA])).to.be.null;
+		assert.isNull(resolve(`${WORKSPACE_ROUTE}/en-US`, [EN, DA]));
 	});
 
 	it('returns null when the variant is valid and a trailing path is present', () => {
-		expect(resolve(`${WORKSPACE_ROUTE}/en-US/view/info`, [EN, DA])).to.be.null;
+		assert.isNull(resolve(`${WORKSPACE_ROUTE}/en-US/view/info`, [EN, DA]));
 	});
 
 	it('returns null when the current path is outside the workspace route', () => {
-		expect(resolve('/section/media/workspace/media/edit/456/invariant', [EN])).to.be.null;
+		assert.isNull(resolve('/section/media/workspace/media/edit/456/invariant', [EN]));
 	});
 
 	it('returns null when the current path equals the workspace route (default route case)', () => {
-		expect(resolve(WORKSPACE_ROUTE, [EN])).to.be.null;
+		assert.isNull(resolve(WORKSPACE_ROUTE, [EN]));
 	});
 
 	it('returns null when the current path is the workspace route with a trailing slash', () => {
-		expect(resolve(`${WORKSPACE_ROUTE}/`, [EN])).to.be.null;
+		assert.isNull(resolve(`${WORKSPACE_ROUTE}/`, [EN]));
 	});
 
 	it('falls back to the pure invariant option even when a segment option is listed first', () => {
@@ -47,15 +47,15 @@ describe('resolveStaleVariantRoute', () => {
 	});
 
 	it('returns null while a modal is open on top of the workspace', () => {
-		expect(resolve(`${WORKSPACE_ROUTE}/invariant/view/info/modal/umb-modal-workspace/edit/456`, [EN, DA])).to.be.null;
+		assert.isNull(resolve(`${WORKSPACE_ROUTE}/invariant/view/info/modal/umb-modal-workspace/edit/456`, [EN, DA]));
 	});
 
 	it('returns null while a modal is open directly on the variant route', () => {
-		expect(resolve(`${WORKSPACE_ROUTE}/invariant/modal/umb-modal-workspace/edit/456`, [EN, DA])).to.be.null;
+		assert.isNull(resolve(`${WORKSPACE_ROUTE}/invariant/modal/umb-modal-workspace/edit/456`, [EN, DA]));
 	});
 
 	it('returns null when there are no variant options', () => {
-		expect(resolve(`${WORKSPACE_ROUTE}/invariant`, [])).to.be.null;
+		assert.isNull(resolve(`${WORKSPACE_ROUTE}/invariant`, []));
 	});
 
 	it('redirects invariant to the app culture when the type now varies by culture', () => {
@@ -93,6 +93,6 @@ describe('resolveStaleVariantRoute', () => {
 	});
 
 	it('returns null for a valid segment variant', () => {
-		expect(resolve(`${WORKSPACE_ROUTE}/en-US_seg1`, [EN, EN_SEG])).to.be.null;
+		assert.isNull(resolve(`${WORKSPACE_ROUTE}/en-US_seg1`, [EN, EN_SEG]));
 	});
 });
