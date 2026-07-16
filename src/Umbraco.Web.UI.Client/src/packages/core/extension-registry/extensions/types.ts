@@ -10,3 +10,4 @@ export type * from './mfa-login-provider.extension.js';
 export type * from './preview-app.extension.js';
 export type * from './repository.extension.js';
 export type * from './store.extension.js';
+export type * from './user-authorized-entry-point.extension.js';
