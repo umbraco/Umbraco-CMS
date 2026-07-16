@@ -18,14 +18,14 @@ export interface UmbWorkspaceStaleVariantRedirectControllerArgs {
  * navigation, as closing a modal restores the pre-modal URL, which may hold a stale variant.
  */
 export class UmbWorkspaceStaleVariantRedirectController extends UmbControllerBase {
-	#args: UmbWorkspaceStaleVariantRedirectControllerArgs;
+	readonly #args: UmbWorkspaceStaleVariantRedirectControllerArgs;
 
 	constructor(host: UmbControllerHost, args: UmbWorkspaceStaleVariantRedirectControllerArgs) {
 		super(host);
 		this.#args = args;
 	}
 
-	#onChangeState = () => this.redirect();
+	readonly #onChangeState = () => this.redirect();
 
 	override hostConnected(): void {
 		super.hostConnected();

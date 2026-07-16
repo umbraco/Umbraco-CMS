@@ -56,7 +56,7 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 		});
 	}
 
-	#staleVariantRedirect = new UmbWorkspaceStaleVariantRedirectController(this, {
+	readonly #staleVariantRedirect = new UmbWorkspaceStaleVariantRedirectController(this, {
 		getWorkspaceRoute: () => this.#workspaceRoute,
 		getVariants: () => this.#variants,
 		getAppCulture: () => this.#appCulture,
