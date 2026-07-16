@@ -65,6 +65,15 @@ export class UmbCurrentUserContext extends UmbContextBase {
 		return this.#loadPromise;
 	}
 
+	/**
+	 * Invalidates the loaded current user, so that the next call to {@link load} fetches it from the server again.
+	 * Call this when the loaded user can no longer be trusted, e.g. when authorization is lost — a subsequent
+	 * sign-in may be for a different user.
+	 */
+	public invalidate(): void {
+		this.#loadPromise = undefined;
+	}
+
 	async #doLoad(): Promise<void> {
 		const { asObservable } = await this.#currentUserRepository.requestCurrentUser();
 
@@ -83,7 +92,7 @@ export class UmbCurrentUserContext extends UmbContextBase {
 	}
 
 	#loadDebounced = debounce(() => {
-		this.#loadPromise = undefined;
+		this.invalidate();
 		this.load();
 	}, 100);
 
