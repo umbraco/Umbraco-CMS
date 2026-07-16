@@ -101,5 +101,12 @@
       until the referencing packages raise their floor.
     -->
     <PackageVersion Include="Microsoft.OpenApi" Version="2.9.0" />
+    <!--
+      Microsoft.Data.Sqlite and Microsoft.EntityFrameworkCore.Sqlite (via SQLitePCLRaw.bundle_e_sqlite3)
+      otherwise resolve the native SQLitePCLRaw.lib.e_sqlite3 down to a vulnerable 2.1.11
+      (GHSA-2m69-gcr7-jv3q). Pin forward to the patched 2.1.12 until the referencing packages raise
+      their floor.
+    -->
+    <PackageVersion Include="SQLitePCLRaw.lib.e_sqlite3" Version="2.1.12" />
   </ItemGroup>
 </Project>
