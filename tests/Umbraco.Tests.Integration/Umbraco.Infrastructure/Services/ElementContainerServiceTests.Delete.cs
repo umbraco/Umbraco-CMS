@@ -156,7 +156,9 @@ public partial class ElementContainerServiceTests
     [Test]
     public async Task Can_Delete_Container_After_Child_Element_Trashed()
     {
-        EntityContainer container = (await ElementContainerService.CreateAsync(null, "Container", null, Constants.Security.SuperUserKey)).Result;
+        var createResult = await ElementContainerService.CreateAsync(null, "Container", null, Constants.Security.SuperUserKey);
+        Assert.IsTrue(createResult.Success);
+        EntityContainer container = createResult.Result!;
         IContentType elementType = await CreateElementType();
         IElement element = await CreateElement(elementType.Key, container.Key);
 
