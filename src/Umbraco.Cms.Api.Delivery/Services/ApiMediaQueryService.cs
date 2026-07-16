@@ -63,14 +63,21 @@ internal sealed class ApiMediaQueryService : IApiMediaQueryService
     private IPublishedMediaCache GetRequiredPublishedMediaCache()
         => _publishedMediaCache;
 
-    private IPublishedContent? TryGetByPath(string path, IPublishedMediaCache mediaCache)
+    private IPublishedContent? TryGetByPath(ReadOnlySpan<char> path, IPublishedMediaCache mediaCache)
     {
-        var segments = path.Split(Constants.CharArrays.ForwardSlash, StringSplitOptions.RemoveEmptyEntries);
+        MemoryExtensions.SpanSplitEnumerator<char> segments = path.Split(Constants.CharArrays.ForwardSlash);
         IEnumerable<IPublishedContent> currentChildren = GetRootContent(mediaCache);
         IPublishedContent? resolvedMedia = null;
 
-        foreach (var segment in segments)
+        foreach (Range segmentRange in segments)
         {
+            ReadOnlySpan<char> segmentSpan = path[segmentRange];
+            if (segmentSpan.IsEmpty)
+            {
+                continue;
+            }
+
+            string segment = new string(segmentSpan);
             resolvedMedia = currentChildren.FirstOrDefault(c => segment.InvariantEquals(c.Name));
             if (resolvedMedia is null)
             {
@@ -93,15 +100,15 @@ internal sealed class ApiMediaQueryService : IApiMediaQueryService
             return null;
         }
 
-        var childrenOf = fetch.TrimStart(childrenOfParameter);
-        if (childrenOf.IsNullOrWhiteSpace())
+        ReadOnlySpan<char> childrenOf = fetch.AsSpan().TrimStart(childrenOfParameter);
+        if (childrenOf.IsEmpty)
         {
             // this mirrors the current behavior of the Content Delivery API :-)
-            return Array.Empty<IPublishedContent>();
+            return [];
         }
 
         IPublishedMediaCache mediaCache = GetRequiredPublishedMediaCache();
-        if (childrenOf.Trim(Constants.CharArrays.ForwardSlash).Length == 0)
+        if (childrenOf.Trim(Constants.CharArrays.ForwardSlash).IsEmpty)
         {
             return GetRootContent(mediaCache);
         }
@@ -110,28 +117,31 @@ internal sealed class ApiMediaQueryService : IApiMediaQueryService
             ? mediaCache.GetById(parentKey)
             : TryGetByPath(childrenOf, mediaCache);
 
-        return parent?.Children(_mediaNavigationQueryService, _publishedMediaStatusFilteringService) ?? Array.Empty<IPublishedContent>();
+        return parent?.Children(_mediaNavigationQueryService, _publishedMediaStatusFilteringService) ?? [];
     }
 
     private IEnumerable<IPublishedContent>? ApplyFilters(IEnumerable<IPublishedContent> source, IEnumerable<string> filters)
     {
+        Span<Range> partRanges = stackalloc Range[3];
         foreach (var filter in filters)
         {
-            var parts = filter.Split(':');
-            if (parts.Length != 2)
+            ReadOnlySpan<char> filterAsSpan = filter.AsSpan();
+            int partsFound = filterAsSpan.Split(partRanges, ':');
+            if (partsFound != 2)
             {
                 // invalid filter
                 _logger.LogInformation("An invalid filter option was encountered. Please ensure that supplied filter options are two-part, separated by ':'.");
                 return null;
             }
 
-            switch (parts[0])
+            string secondPart = new string(filterAsSpan[partRanges[1]]);
+            switch (filterAsSpan[partRanges[0]])
             {
                 case "mediaType":
-                    source = source.Where(c => c.ContentType.Alias == parts[1]);
+                    source = source.Where(c => c.ContentType.Alias == secondPart);
                     break;
                 case "name":
-                    source = source.Where(c => c.Name.InvariantContains(parts[1]));
+                    source = source.Where(c => c.Name.InvariantContains(secondPart));
                     break;
                 default:
                     // unknown filter
@@ -145,10 +155,12 @@ internal sealed class ApiMediaQueryService : IApiMediaQueryService
 
     private IEnumerable<IPublishedContent>? ApplySorts(IEnumerable<IPublishedContent> source, IEnumerable<string> sorts)
     {
+        Span<Range> partRanges = stackalloc Range[3];
         foreach (var sort in sorts)
         {
-            var parts = sort.Split(':');
-            if (parts.Length != 2)
+            ReadOnlySpan<char> sortAsSpan = sort.AsSpan();
+            int partsFound = sortAsSpan.Split(partRanges, ':');
+            if (partsFound != 2)
             {
                 // invalid sort
                 _logger.LogInformation("An invalid sort option was encountered. Please ensure that the supplied sort options are two-part, separated by ':'.");
@@ -156,7 +168,7 @@ internal sealed class ApiMediaQueryService : IApiMediaQueryService
             }
 
             Func<IPublishedContent, object> keySelector;
-            switch (parts[0])
+            switch (sortAsSpan[partRanges[0]])
             {
                 case "createDate":
                     keySelector = content => content.CreateDate;
@@ -176,7 +188,7 @@ internal sealed class ApiMediaQueryService : IApiMediaQueryService
                     return null;
             }
 
-            source = parts[1].StartsWith("asc")
+            source = sortAsSpan[partRanges[1]].StartsWith("asc")
                 ? source.OrderBy(keySelector)
                 : source.OrderByDescending(keySelector);
         }

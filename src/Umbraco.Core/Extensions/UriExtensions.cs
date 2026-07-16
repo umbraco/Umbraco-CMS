@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using System.Net;
 using System.Web;
 using Umbraco.Cms.Core;
@@ -113,7 +112,7 @@ public static class UriExtensions
         var path = uri.GetSafeAbsolutePath();
         if (uri.IsAbsoluteUri)
         {
-            if (path != "/" && path.EndsWith("/") == false)
+            if (path != "/" && path.EndsWith('/') == false)
             {
                 uri = new Uri(uri.GetLeftPart(UriPartial.Authority) + path + "/" + uri.Query);
             }
@@ -121,7 +120,7 @@ public static class UriExtensions
             return uri;
         }
 
-        if (path != "/" && path.EndsWith("/") == false)
+        if (path != "/" && path.EndsWith('/') == false)
         {
             uri = new Uri(path + "/" + uri.Query, UriKind.Relative);
         }
@@ -142,15 +141,16 @@ public static class UriExtensions
         {
             if (path != "/")
             {
-                uri = new Uri(uri.GetLeftPart(UriPartial.Authority) + path.TrimEnd(Constants.CharArrays.ForwardSlash) +
-                              uri.Query);
+                uri = new Uri(
+                    $"{uri.GetLeftPart(UriPartial.Authority)}{path.AsSpan().TrimEnd(Constants.CharArrays.ForwardSlash)}{uri.Query}"
+                );
             }
         }
         else
         {
             if (path != "/")
             {
-                uri = new Uri(path.TrimEnd(Constants.CharArrays.ForwardSlash) + uri.Query, UriKind.Relative);
+                uri = new Uri($"{path.AsSpan().TrimEnd(Constants.CharArrays.ForwardSlash)}{uri.Query}", UriKind.Relative);
             }
         }
 
