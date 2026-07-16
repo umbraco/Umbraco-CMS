@@ -82,18 +82,24 @@ export class UmbUserEntryPointExtensionInitializer extends UmbControllerBase {
 	}
 
 	#onManifestsChanged(manifests: Array<ManifestUserEntryPoint>) {
+		this.#unloadRemovedExtensions(manifests);
+		this.#trackAddedExtensions(manifests);
+	}
+
+	#unloadRemovedExtensions(manifests: Array<ManifestUserEntryPoint>) {
 		for (const alias of [...this.#manifestMap.keys()]) {
-			if (!manifests.find((manifest) => manifest.alias === alias)) {
-				this.#manifestMap.delete(alias);
-				this.#unloadExtension(alias);
-			}
+			if (manifests.some((manifest) => manifest.alias === alias)) continue;
+			this.#manifestMap.delete(alias);
+			this.#unloadExtension(alias);
 		}
+	}
+
+	#trackAddedExtensions(manifests: Array<ManifestUserEntryPoint>) {
 		for (const manifest of manifests) {
 			if (this.#manifestMap.has(manifest.alias)) continue;
 			this.#manifestMap.set(manifest.alias, manifest);
-			if (this.#active) {
-				this.#instantiateExtension(this.#session, manifest);
-			}
+			if (!this.#active) continue;
+			this.#instantiateExtension(this.#session, manifest);
 		}
 	}
 
