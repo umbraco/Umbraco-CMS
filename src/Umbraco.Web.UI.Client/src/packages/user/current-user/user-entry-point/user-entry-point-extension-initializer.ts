@@ -126,16 +126,19 @@ export class UmbUserEntryPointExtensionInitializer extends UmbControllerBase {
 		if (!moduleInstance) return;
 		this.#instanceMap.delete(alias);
 		if (hasOnUnloadExport(moduleInstance)) {
+			// Promise.resolve also captures rejections from async onUnload exports, which a bare try/catch would miss.
 			try {
-				moduleInstance.onUnload(this.#host, this.#extensionRegistry);
+				Promise.resolve(moduleInstance.onUnload(this.#host, this.#extensionRegistry)).catch((error) => {
+					this.#logUnloadError(alias, error);
+				});
 			} catch (error) {
-				console.error(
-					'[UmbUserEntryPointExtensionInitializer] Failed to unload extension',
-					alias,
-					error,
-				);
+				this.#logUnloadError(alias, error);
 			}
 		}
+	}
+
+	#logUnloadError(alias: string, error: unknown) {
+		console.error('[UmbUserEntryPointExtensionInitializer] Failed to unload extension', alias, error);
 	}
 
 	override destroy() {

@@ -178,6 +178,41 @@ describe('UmbUserEntryPointExtensionInitializer', () => {
 		expect(calls.unload).to.equal(1);
 	});
 
+	it('an async onUnload rejection is caught and does not become an unhandled rejection', async () => {
+		const unhandled: PromiseRejectionEvent[] = [];
+		const onUnhandledRejection = (event: PromiseRejectionEvent) => {
+			event.preventDefault();
+			unhandled.push(event);
+		};
+		window.addEventListener('unhandledrejection', onUnhandledRejection);
+		try {
+			const rejecting: ManifestUserEntryPoint = {
+				type: 'userEntryPoint',
+				alias: 'Umb.Test.RejectingUnload',
+				name: 'Umb.Test.RejectingUnload',
+				js: () =>
+					Promise.resolve({
+						onInit: () => {},
+						onUnload: async () => {
+							throw new Error('boom');
+						},
+					}),
+			};
+			registry.register(rejecting);
+			registry.register(createManifest('Umb.Test.Healthy', calls));
+			authContext.setAuthorized(true);
+			await aTimeout(50);
+			expect(calls.init).to.equal(1);
+
+			authContext.setAuthorized(false);
+			await aTimeout(50);
+			expect(calls.unload).to.equal(1);
+			expect(unhandled, 'async onUnload rejection escaped as an unhandled rejection').to.have.length(0);
+		} finally {
+			window.removeEventListener('unhandledrejection', onUnhandledRejection);
+		}
+	});
+
 	it('a failing manifest does not prevent a healthy one from initializing', async () => {
 		const failing: ManifestUserEntryPoint = {
 			type: 'userEntryPoint',
