@@ -256,6 +256,11 @@ public class MediaPicker3PropertyEditor : DataEditor, IValueSchemaProvider
         /// <inheritdoc/>
         public void CacheReferencedEntities(IEnumerable<object> values)
         {
+            if (CacheReferencedEntitiesSuppression.IsSuppressed)
+            {
+                return;
+            }
+
             var mediaKeys = values
                 .SelectMany(value => Deserialize(_jsonSerializer, value))
                 .Select(dto => dto.MediaKey)

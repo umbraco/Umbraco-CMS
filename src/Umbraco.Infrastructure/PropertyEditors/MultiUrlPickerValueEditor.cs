@@ -113,6 +113,11 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference, I
     /// <inheritdoc/>
     public void CacheReferencedEntities(IEnumerable<object> values)
     {
+        if (CacheReferencedEntitiesSuppression.IsSuppressed)
+        {
+            return;
+        }
+
         var dtos = values
             .Select(value =>
             {
