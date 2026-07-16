@@ -212,6 +212,7 @@ internal abstract class EntityTypeContainerService<TTreeEntity, TEntityContainer
             return Attempt.FailWithStatus<EntityContainer?, EntityContainerOperationStatus>(EntityContainerOperationStatus.CancelledByNotification, container);
         }
 
+        OnDeletingContainer(container);
         _entityContainerRepository.Delete(container);
 
         await AuditAsync(AuditType.Delete, userKey, container.Id);
@@ -220,6 +221,15 @@ internal abstract class EntityTypeContainerService<TTreeEntity, TEntityContainer
         scope.Notifications.Publish(new EntityContainerDeletedNotification(container, eventMessages).WithStateFrom(deletingEntityContainerNotification));
 
         return Attempt.SucceedWithStatus<EntityContainer?, EntityContainerOperationStatus>(EntityContainerOperationStatus.Success, container);
+    }
+
+    /// <summary>
+    ///     Invoked within the delete scope, immediately before the container node is removed, allowing derived
+    ///     services to clean up state that would otherwise prevent deletion (e.g. relations referencing the node).
+    /// </summary>
+    /// <param name="container">The container about to be deleted.</param>
+    protected virtual void OnDeletingContainer(EntityContainer container)
+    {
     }
 
     private async Task<Attempt<EntityContainer?, EntityContainerOperationStatus>> SaveAsync(EntityContainer container, Guid userKey, Func<EntityContainerOperationStatus> operationValidation, AuditType auditType)

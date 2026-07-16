@@ -2,6 +2,7 @@ using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Cms.Core.Services.Querying.RecycleBin;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
@@ -150,5 +151,38 @@ public partial class ElementContainerServiceTests
             EntityContainerNotificationHandler.DeletingContainer = null;
             EntityContainerNotificationHandler.DeletedContainer = null;
         }
+    }
+
+    [Test]
+    public async Task Can_Delete_Container_After_Child_Element_Trashed()
+    {
+        EntityContainer container = (await ElementContainerService.CreateAsync(null, "Container", null, Constants.Security.SuperUserKey)).Result;
+        IContentType elementType = await CreateElementType();
+        IElement element = await CreateElement(elementType.Key, container.Key);
+
+        // Trashing the element creates a "relate parent element container on element delete" relation whose parent is
+        // the container node, so that the element can be restored to its original location later.
+        var trashResult = await ElementEditingService.MoveToRecycleBinAsync(element.Key, Constants.Security.SuperUserKey);
+        Assert.IsTrue(trashResult.Success);
+        Assert.IsNotEmpty(RelationService.GetByParentOrChildId(container.Id));
+
+        // Deleting the now-empty container must clean up that relation, otherwise the FK on umbracoRelation is violated.
+        var result = await ElementContainerService.DeleteAsync(container.Key, Constants.Security.SuperUserKey);
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(EntityContainerOperationStatus.Success, result.Status);
+        });
+
+        Assert.IsNull(await ElementContainerService.GetAsync(container.Key));
+        Assert.IsEmpty(RelationService.GetByParentOrChildId(container.Id));
+
+        // The trashed element is untouched and, having lost its original-parent relation, is restorable to the root.
+        IElement? trashedElement = await ElementEditingService.GetAsync(element.Key);
+        Assert.IsNotNull(trashedElement);
+        Assert.IsTrue(trashedElement.Trashed);
+
+        var originalParent = await ElementRecycleBinQueryService.GetOriginalParentAsync(element.Key);
+        Assert.AreEqual(RecycleBinQueryResultType.NoParentRecycleRelation, originalParent.Status);
     }
 }

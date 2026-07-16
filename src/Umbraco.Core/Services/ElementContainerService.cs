@@ -478,6 +478,10 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
         return descendantElement;
     }
 
+    /// <inheritdoc />
+    protected override void OnDeletingContainer(EntityContainer container)
+        => DeleteContainerRelations(container);
+
     private void DeleteContainerRelations(IEntity container)
     {
         // Even though a container is in the recycle bin, it can still be both parent and child in one or
