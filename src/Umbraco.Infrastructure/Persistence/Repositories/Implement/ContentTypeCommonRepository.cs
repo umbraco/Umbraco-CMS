@@ -48,19 +48,33 @@ internal sealed class ContentTypeCommonRepository : IContentTypeCommonRepository
 
     /// <inheritdoc />
     public Task<IEnumerable<IContentTypeComposition>?> GetAllTypesAsync()
-        => _appCaches.RuntimeCache.GetCacheItemAsync<IEnumerable<IContentTypeComposition>>(
+    {
+        EnsureAmbientScopeOnCallerContext();
+
+        return _appCaches.RuntimeCache.GetCacheItemAsync<IEnumerable<IContentTypeComposition>>(
             CacheKey,
             async () => await FetchAllTypesFromDatabaseAsync(),
             RepositoryCacheConstants.DefaultCacheDuration,
             isSliding: true);
+    }
 
     /// <inheritdoc />
     public void ClearCache() => _appCaches.RuntimeCache.Clear(CacheKey);
 
+    /// <summary>
+    /// Touches the ambient EF Core scope on the caller's execution context before entering the async flow.
+    /// AsyncLocal changes made inside an async method are invisible to its synchronous caller, so when this
+    /// repository is bridged from synchronous callers (e.g. <c>GetAllTypesAsync().GetAwaiter().GetResult()</c>
+    /// in the NPoco media/member type repositories) and the bridge scope were first created inside the async
+    /// flow, the ambient scope stack bookkeeping would diverge, leaving a stale scope ambient for subsequent
+    /// operations.
+    /// </summary>
+    private void EnsureAmbientScopeOnCallerContext() => _ = AmbientScope;
+
     private async Task<IEnumerable<IContentTypeComposition>> FetchAllTypesFromDatabaseAsync() =>
         await AmbientScope.ExecuteWithContextAsync<IEnumerable<IContentTypeComposition>>(async db =>
         {
-            // Query 1: content types with their nodes, ordered so pointer-walking below works
+            // Query 1: content types with their nodes
             List<ContentTypeDto> contentTypeDtos = await db.ContentTypes
                 .Include(ct => ct.NodeDto)
                 .OrderBy(ct => ct.NodeId)
@@ -71,9 +85,8 @@ internal sealed class ContentTypeCommonRepository : IContentTypeCommonRepository
                 return [];
             }
 
-            // Query 2: allowed content types (parent content type id is ordered to align with Query 1)
+            // Query 2: allowed content types
             List<ContentTypeAllowedContentTypeDto> allowedDtos = await db.ContentTypeAllowedContentTypes
-                .OrderBy(a => a.Id)
                 .ToListAsync();
 
             // Query 3: property type groups, ordered for the group pointer-walk in MapGroupsAndProperties
@@ -107,13 +120,8 @@ internal sealed class ContentTypeCommonRepository : IContentTypeCommonRepository
                 .OrderBy(p => p.ContentTypeId)
                 .ToListAsync();
 
-            // Build alias and key lookups for resolving AllowedContentTypes
-            var aliases = contentTypeDtos.ToDictionary(x => x.NodeId, x => x.Alias);
-            var keys = contentTypeDtos.ToDictionary(x => x.NodeId, x => x.NodeDto.UniqueId);
-
-            // Instantiate content type entities and wire up allowed child types
+            // Instantiate content type entities; all relationships are wired up by the Map* calls below
             var contentTypes = new Dictionary<int, IContentTypeComposition>(contentTypeDtos.Count);
-            var allowedIx = 0;
             foreach (ContentTypeDto dto in contentTypeDtos)
             {
                 IContentTypeComposition contentType;
@@ -135,25 +143,11 @@ internal sealed class ContentTypeCommonRepository : IContentTypeCommonRepository
                 }
 
                 contentTypes.Add(contentType.Id, contentType);
-
-                var allowedContentTypes = new List<ContentTypeSort>();
-                while (allowedIx < allowedDtos.Count && allowedDtos[allowedIx].Id == dto.NodeId)
-                {
-                    ContentTypeAllowedContentTypeDto allowedDto = allowedDtos[allowedIx];
-                    if (aliases.TryGetValue(allowedDto.AllowedId, out var alias)
-                        && keys.TryGetValue(allowedDto.AllowedId, out Guid key))
-                    {
-                        allowedContentTypes.Add(new ContentTypeSort(key, allowedDto.SortOrder, alias!));
-                    }
-
-                    allowedIx++;
-                }
-
-                contentType.AllowedContentTypes = allowedContentTypes;
             }
 
+            MapAllowedContentTypes(contentTypes, allowedDtos);
             MapTemplates(contentTypes, templateDtos);
-            MapComposition(contentTypes, compositionDtos);
+            MapCompositions(contentTypes, compositionDtos);
             MapGroupsAndProperties(contentTypes, groupDtos, propertyDtos);
             MapHistoryCleanup(contentTypes, cleanupDtos);
 
@@ -165,30 +159,33 @@ internal sealed class ContentTypeCommonRepository : IContentTypeCommonRepository
             return contentTypes.Values;
         });
 
-    private static void MapHistoryCleanup(
-        Dictionary<int, IContentTypeComposition> contentTypes,
-        List<ContentVersionCleanupPolicyDto> cleanupDtos)
+    private static void MapAllowedContentTypes(
+        IDictionary<int, IContentTypeComposition> contentTypes,
+        List<ContentTypeAllowedContentTypeDto> allowedDtos)
     {
-        Dictionary<int, ContentVersionCleanupPolicyDto> cleanupByContentTypeId =
-            cleanupDtos.ToDictionary(x => x.ContentTypeId);
+        // ContentTypeAllowedContentTypeDto.Id is the *parent* content type's node id
+        Dictionary<int, List<ContentTypeAllowedContentTypeDto>> allowedByParentId = allowedDtos
+            .GroupBy(a => a.Id)
+            .ToDictionary(g => g.Key, g => g.ToList());
 
-        foreach (IContentTypeComposition c in contentTypes.Values)
+        foreach (IContentTypeComposition contentType in contentTypes.Values)
         {
-            if (c is not ContentType contentType)
+            var allowedContentTypes = new List<ContentTypeSort>();
+            if (allowedByParentId.TryGetValue(contentType.Id, out List<ContentTypeAllowedContentTypeDto>? allowed))
             {
-                continue;
+                foreach (ContentTypeAllowedContentTypeDto allowedDto in allowed)
+                {
+                    if (contentTypes.TryGetValue(allowedDto.AllowedId, out IContentTypeComposition? allowedContentType))
+                    {
+                        allowedContentTypes.Add(new ContentTypeSort(
+                            allowedContentType.Key,
+                            allowedDto.SortOrder,
+                            allowedContentType.Alias));
+                    }
+                }
             }
 
-            var historyCleanup = new HistoryCleanup();
-
-            if (cleanupByContentTypeId.TryGetValue(contentType.Id, out ContentVersionCleanupPolicyDto? versionCleanup))
-            {
-                historyCleanup.PreventCleanup = versionCleanup.PreventCleanup;
-                historyCleanup.KeepAllVersionsNewerThanDays = versionCleanup.KeepAllVersionsNewerThanDays;
-                historyCleanup.KeepLatestVersionPerDayForDays = versionCleanup.KeepLatestVersionPerDayForDays;
-            }
-
-            contentType.HistoryCleanup = historyCleanup;
+            contentType.AllowedContentTypes = allowedContentTypes;
         }
     }
 
@@ -236,7 +233,7 @@ internal sealed class ContentTypeCommonRepository : IContentTypeCommonRepository
         }
     }
 
-    private static void MapComposition(
+    private static void MapCompositions(
         IDictionary<int, IContentTypeComposition> contentTypes,
         List<ContentType2ContentTypeDto> compositionDtos)
     {
@@ -390,5 +387,32 @@ internal sealed class ContentTypeCommonRepository : IContentTypeCommonRepository
             Variations = (ContentVariation)dto.Variations,
             LabelOnTop = dto.LabelOnTop,
         };
+    }
+
+    private static void MapHistoryCleanup(
+        Dictionary<int, IContentTypeComposition> contentTypes,
+        List<ContentVersionCleanupPolicyDto> cleanupDtos)
+    {
+        Dictionary<int, ContentVersionCleanupPolicyDto> cleanupByContentTypeId =
+            cleanupDtos.ToDictionary(x => x.ContentTypeId);
+
+        foreach (IContentTypeComposition c in contentTypes.Values)
+        {
+            if (c is not ContentType contentType)
+            {
+                continue;
+            }
+
+            var historyCleanup = new HistoryCleanup();
+
+            if (cleanupByContentTypeId.TryGetValue(contentType.Id, out ContentVersionCleanupPolicyDto? versionCleanup))
+            {
+                historyCleanup.PreventCleanup = versionCleanup.PreventCleanup;
+                historyCleanup.KeepAllVersionsNewerThanDays = versionCleanup.KeepAllVersionsNewerThanDays;
+                historyCleanup.KeepLatestVersionPerDayForDays = versionCleanup.KeepLatestVersionPerDayForDays;
+            }
+
+            contentType.HistoryCleanup = historyCleanup;
+        }
     }
 }
