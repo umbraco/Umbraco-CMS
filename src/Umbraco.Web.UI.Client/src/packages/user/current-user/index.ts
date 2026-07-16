@@ -5,7 +5,7 @@ export * from './conditions/constants.js';
 export * from './current-user.context.js';
 export * from './history/current-user-history.store.js';
 export * from './repository/index.js';
-export * from './user-authorized-entry-point/index.js';
+export * from './user-entry-point/index.js';
 export * from './utils/index.js';
 
 export type * from './types.js';

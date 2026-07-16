@@ -2,7 +2,7 @@ import { UMB_CURRENT_USER_CONTEXT } from '../current-user.context.token.js';
 import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbElement } from '@umbraco-cms/backoffice/element-api';
-import type { ManifestUserAuthorizedEntryPoint } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestUserEntryPoint } from '@umbraco-cms/backoffice/extension-registry';
 import {
 	hasInitExport,
 	hasOnUnloadExport,
@@ -12,16 +12,16 @@ import {
 } from '@umbraco-cms/backoffice/extension-api';
 
 /**
- * Extension initializer for the `userAuthorizedEntryPoint` extension type.
+ * Extension initializer for the `userEntryPoint` extension type.
  *
  * Runs `onInit` once the user is authorized AND the current user data is available,
  * so extensions can rely on `UMB_CURRENT_USER_CONTEXT` being populated.
  * Runs `onUnload` when the session ends (sign-out or timeout) or the extension is unregistered.
  */
-export class UmbUserAuthorizedEntryPointExtensionInitializer extends UmbControllerBase {
+export class UmbUserEntryPointExtensionInitializer extends UmbControllerBase {
 	#host: UmbElement;
-	#extensionRegistry: UmbExtensionRegistry<ManifestUserAuthorizedEntryPoint>;
-	#manifestMap = new Map<string, ManifestUserAuthorizedEntryPoint>();
+	#extensionRegistry: UmbExtensionRegistry<ManifestUserEntryPoint>;
+	#manifestMap = new Map<string, ManifestUserEntryPoint>();
 	#instanceMap = new Map<string, UmbEntryPointModule>();
 	#currentUserContext?: typeof UMB_CURRENT_USER_CONTEXT.TYPE;
 	#isAuthorized = false;
@@ -30,7 +30,7 @@ export class UmbUserAuthorizedEntryPointExtensionInitializer extends UmbControll
 	// Invalidates in-flight instantiations when the session state flips while a module is loading.
 	#session = 0;
 
-	constructor(host: UmbElement, extensionRegistry: UmbExtensionRegistry<ManifestUserAuthorizedEntryPoint>) {
+	constructor(host: UmbElement, extensionRegistry: UmbExtensionRegistry<ManifestUserEntryPoint>) {
 		super(host);
 		this.#host = host;
 		this.#extensionRegistry = extensionRegistry;
@@ -66,8 +66,8 @@ export class UmbUserAuthorizedEntryPointExtensionInitializer extends UmbControll
 		});
 
 		this.observe(
-			extensionRegistry.byType<'userAuthorizedEntryPoint', ManifestUserAuthorizedEntryPoint>(
-				'userAuthorizedEntryPoint',
+			extensionRegistry.byType<'userEntryPoint', ManifestUserEntryPoint>(
+				'userEntryPoint',
 			),
 			(manifests) => {
 				for (const alias of [...this.#manifestMap.keys()]) {
@@ -84,7 +84,7 @@ export class UmbUserAuthorizedEntryPointExtensionInitializer extends UmbControll
 					}
 				}
 			},
-			'umbObserveUserAuthorizedEntryPoints',
+			'umbObserveUserEntryPoints',
 		);
 	}
 
@@ -102,7 +102,7 @@ export class UmbUserAuthorizedEntryPointExtensionInitializer extends UmbControll
 		}
 	}
 
-	async #instantiateExtension(session: number, manifest: ManifestUserAuthorizedEntryPoint) {
+	async #instantiateExtension(session: number, manifest: ManifestUserEntryPoint) {
 		if (!manifest.js) return;
 		try {
 			const moduleInstance = await loadManifestPlainJs(manifest.js);
@@ -114,7 +114,7 @@ export class UmbUserAuthorizedEntryPointExtensionInitializer extends UmbControll
 			}
 		} catch (error) {
 			console.error(
-				'[UmbUserAuthorizedEntryPointExtensionInitializer] Failed to instantiate extension',
+				'[UmbUserEntryPointExtensionInitializer] Failed to instantiate extension',
 				manifest.alias,
 				error,
 			);
@@ -130,7 +130,7 @@ export class UmbUserAuthorizedEntryPointExtensionInitializer extends UmbControll
 				moduleInstance.onUnload(this.#host, this.#extensionRegistry);
 			} catch (error) {
 				console.error(
-					'[UmbUserAuthorizedEntryPointExtensionInitializer] Failed to unload extension',
+					'[UmbUserEntryPointExtensionInitializer] Failed to unload extension',
 					alias,
 					error,
 				);

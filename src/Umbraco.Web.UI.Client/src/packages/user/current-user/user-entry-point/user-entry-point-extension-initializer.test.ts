@@ -1,4 +1,4 @@
-import { UmbUserAuthorizedEntryPointExtensionInitializer } from './user-authorized-entry-point-extension-initializer.js';
+import { UmbUserEntryPointExtensionInitializer } from './user-entry-point-extension-initializer.js';
 import { UMB_CURRENT_USER_CONTEXT } from '../current-user.context.token.js';
 import { aTimeout, expect, fixture } from '@open-wc/testing';
 import { customElement, html } from '@umbraco-cms/backoffice/external/lit';
@@ -6,11 +6,11 @@ import type { UmbElement } from '@umbraco-cms/backoffice/element-api';
 import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
 import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 import { UmbExtensionRegistry } from '@umbraco-cms/backoffice/extension-api';
-import type { ManifestUserAuthorizedEntryPoint } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestUserEntryPoint } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { filter } from '@umbraco-cms/backoffice/external/rxjs';
 
-@customElement('umb-test-user-authorized-entry-point-host')
+@customElement('umb-test-user-entry-point-host')
 class UmbTestHostElement extends UmbElementMixin(HTMLElement) {}
 
 class UmbTestAuthContext {
@@ -51,9 +51,9 @@ function createManifest(
 	alias: string,
 	calls: { init: number; unload: number },
 	loadDelayMs = 0,
-): ManifestUserAuthorizedEntryPoint {
+): ManifestUserEntryPoint {
 	return {
-		type: 'userAuthorizedEntryPoint',
+		type: 'userEntryPoint',
 		alias,
 		name: alias,
 		js: () =>
@@ -74,23 +74,23 @@ function createManifest(
 	};
 }
 
-describe('UmbUserAuthorizedEntryPointExtensionInitializer', () => {
+describe('UmbUserEntryPointExtensionInitializer', () => {
 	let host: UmbElement;
 	let authContext: UmbTestAuthContext;
 	let currentUserContext: UmbTestCurrentUserContext;
-	let registry: UmbExtensionRegistry<ManifestUserAuthorizedEntryPoint>;
+	let registry: UmbExtensionRegistry<ManifestUserEntryPoint>;
 	let calls: { init: number; unload: number };
-	let initializer: UmbUserAuthorizedEntryPointExtensionInitializer;
+	let initializer: UmbUserEntryPointExtensionInitializer;
 
 	beforeEach(async () => {
-		host = await fixture(html`<umb-test-user-authorized-entry-point-host></umb-test-user-authorized-entry-point-host>`);
+		host = await fixture(html`<umb-test-user-entry-point-host></umb-test-user-entry-point-host>`);
 		authContext = new UmbTestAuthContext(host);
 		currentUserContext = new UmbTestCurrentUserContext(host);
 		host.provideContext(UMB_AUTH_CONTEXT, authContext as never);
 		host.provideContext(UMB_CURRENT_USER_CONTEXT, currentUserContext as never);
 		registry = new UmbExtensionRegistry();
 		calls = { init: 0, unload: 0 };
-		initializer = new UmbUserAuthorizedEntryPointExtensionInitializer(host, registry);
+		initializer = new UmbUserEntryPointExtensionInitializer(host, registry);
 	});
 
 	it('does not run onInit before the user is authorized', async () => {
@@ -179,8 +179,8 @@ describe('UmbUserAuthorizedEntryPointExtensionInitializer', () => {
 	});
 
 	it('a failing manifest does not prevent a healthy one from initializing', async () => {
-		const failing: ManifestUserAuthorizedEntryPoint = {
-			type: 'userAuthorizedEntryPoint',
+		const failing: ManifestUserEntryPoint = {
+			type: 'userEntryPoint',
 			alias: 'Umb.Test.Failing',
 			name: 'Umb.Test.Failing',
 			js: () => Promise.reject(new Error('boom')),
