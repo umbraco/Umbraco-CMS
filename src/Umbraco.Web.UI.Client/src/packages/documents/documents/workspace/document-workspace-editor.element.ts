@@ -7,7 +7,10 @@ import type { UmbRoute, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/r
 import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
 import { createObservablePart } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbDocumentVariantOptionModel } from '../types.js';
-import { resolveStaleVariantRoute, UMB_WORKSPACE_PATH_VARIANT_DELIMITER } from '@umbraco-cms/backoffice/workspace';
+import {
+	UmbWorkspaceStaleVariantRedirectController,
+	UMB_WORKSPACE_PATH_VARIANT_DELIMITER,
+} from '@umbraco-cms/backoffice/workspace';
 
 // TODO: Refactor across all four content workspace editors (document, document blueprint, media, member) to use a base component. [NL]
 // TODO: This seem fully identical with Media Workspace Editor, so we can refactor this to a generic component. [NL]
@@ -53,19 +56,11 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 		});
 	}
 
-	// Re-validate on every navigation — closing a modal restores the pre-modal URL, which may
-	// hold a variant that no longer exists after the content type changed while the modal was open:
-	#onChangeState = () => this.#redirectStaleVariantUrl();
-
-	override connectedCallback(): void {
-		super.connectedCallback();
-		window.addEventListener('changestate', this.#onChangeState);
-	}
-
-	override disconnectedCallback(): void {
-		super.disconnectedCallback();
-		window.removeEventListener('changestate', this.#onChangeState);
-	}
+	#staleVariantRedirect = new UmbWorkspaceStaleVariantRedirectController(this, {
+		getWorkspaceRoute: () => this.#workspaceRoute,
+		getVariants: () => this.#variants,
+		getAppCulture: () => this.#appCulture,
+	});
 
 	#observeVariants() {
 		this.observe(
@@ -81,7 +76,7 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 			(variants) => {
 				this.#variants = variants;
 				this.#generateRoutes();
-				this.#redirectStaleVariantUrl();
+				this.#staleVariantRedirect.redirect();
 			},
 			'_observeVariants',
 		);
@@ -128,19 +123,6 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 			'',
 			`${this.#workspaceRoute}/${newVariant.unique}${pathSuffix}${window.location.search}`,
 		);
-	}
-
-	#redirectStaleVariantUrl() {
-		if (!this.#workspaceRoute || !this.#variants?.length) return;
-		const newPath = resolveStaleVariantRoute({
-			currentPath: window.location.pathname,
-			workspaceRoute: this.#workspaceRoute,
-			variants: this.#variants,
-			appCulture: this.#appCulture,
-		});
-		if (newPath) {
-			history.replaceState(null, '', newPath + window.location.search);
-		}
 	}
 
 	#generateRoutes() {
@@ -225,7 +207,7 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 	private _gotWorkspaceRoute = (e: UmbRouterSlotInitEvent) => {
 		this.#workspaceRoute = e.target.absoluteRouterPath;
 		this.#workspaceContext?.splitView.setWorkspaceRoute(this.#workspaceRoute);
-		this.#redirectStaleVariantUrl();
+		this.#staleVariantRedirect.redirect();
 	};
 
 	override render() {
