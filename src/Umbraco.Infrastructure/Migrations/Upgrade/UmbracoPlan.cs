@@ -138,9 +138,9 @@ public partial class UmbracoPlan : MigrationPlan
             if (match.Success)
             {
                 trackedVersion = new SemVersion(
-                    int.Parse(match.Groups[1].Value),
-                    int.Parse(match.Groups[2].Value),
-                    int.Parse(match.Groups[3].Value));
+                    int.Parse(match.Groups[1].ValueSpan),
+                    int.Parse(match.Groups[2].ValueSpan),
+                    int.Parse(match.Groups[3].ValueSpan));
             }
 
             if (string.Equals(transition.TargetState, state, StringComparison.OrdinalIgnoreCase))

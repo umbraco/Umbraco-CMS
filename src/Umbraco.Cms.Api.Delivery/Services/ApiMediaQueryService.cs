@@ -63,14 +63,21 @@ internal sealed class ApiMediaQueryService : IApiMediaQueryService
     private IPublishedMediaCache GetRequiredPublishedMediaCache()
         => _publishedMediaCache;
 
-    private IPublishedContent? TryGetByPath(string path, IPublishedMediaCache mediaCache)
+    private IPublishedContent? TryGetByPath(ReadOnlySpan<char> path, IPublishedMediaCache mediaCache)
     {
-        var segments = path.Split(Constants.CharArrays.ForwardSlash, StringSplitOptions.RemoveEmptyEntries);
+        MemoryExtensions.SpanSplitEnumerator<char> segments = path.Split(Constants.CharArrays.ForwardSlash);
         IEnumerable<IPublishedContent> currentChildren = GetRootContent(mediaCache);
         IPublishedContent? resolvedMedia = null;
 
-        foreach (var segment in segments)
+        foreach (Range segmentRange in segments)
         {
+            ReadOnlySpan<char> segmentSpan = path[segmentRange];
+            if (segmentSpan.IsEmpty)
+            {
+                continue;
+            }
+
+            string segment = new string(segmentSpan);
             resolvedMedia = currentChildren.FirstOrDefault(c => segment.InvariantEquals(c.Name));
             if (resolvedMedia is null)
             {
@@ -93,15 +100,15 @@ internal sealed class ApiMediaQueryService : IApiMediaQueryService
             return null;
         }
 
-        var childrenOf = fetch.TrimStart(childrenOfParameter);
-        if (childrenOf.IsNullOrWhiteSpace())
+        ReadOnlySpan<char> childrenOf = fetch.AsSpan().TrimStart(childrenOfParameter);
+        if (childrenOf.IsEmpty)
         {
             // this mirrors the current behavior of the Content Delivery API :-)
-            return Array.Empty<IPublishedContent>();
+            return [];
         }
 
         IPublishedMediaCache mediaCache = GetRequiredPublishedMediaCache();
-        if (childrenOf.Trim(Constants.CharArrays.ForwardSlash).Length == 0)
+        if (childrenOf.Trim(Constants.CharArrays.ForwardSlash).IsEmpty)
         {
             return GetRootContent(mediaCache);
         }

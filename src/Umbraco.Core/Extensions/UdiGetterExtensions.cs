@@ -425,7 +425,7 @@ public static class UdiGetterExtensions
     /// </returns>
     private static StringUdi GetUdiFromPath(string entityType, string path)
     {
-        string id = path.TrimStart(Constants.CharArrays.ForwardSlash).Replace("\\", "/");
+        string id = path.TrimStart(Constants.CharArrays.ForwardSlash).Replace('\\', '/');
 
         return new StringUdi(entityType, id).EnsureClosed();
     }

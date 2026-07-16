@@ -278,7 +278,7 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
             return Attempt.Fail(EntityContainerOperationStatus.CancelledByNotification);
         }
 
-        var newContainerPath = $"{parentPath.TrimEnd(Constants.CharArrays.Comma)},{container.Id}";
+        var newContainerPath = $"{parentPath.AsSpan().TrimEnd(Constants.CharArrays.Comma)},{container.Id}";
         var levelDelta = 1 - container.Level + parentLevel;
         var movedElements = new List<IElement>();
 
