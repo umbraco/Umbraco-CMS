@@ -62,7 +62,7 @@ public static class UriUtilityCore
         var pos = IndexOfPathEnd(uriSpan);
 
         ReadOnlySpan<char> path = pos > 0 ? uriSpan[..pos] : uriSpan;
-        path = path.TrimEnd(Constants.CharArrays.ForwardSlash);
+        path = path.TrimEnd('/');
 
         if (pos > 0)
         {

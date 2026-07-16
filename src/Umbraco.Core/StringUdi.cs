@@ -23,7 +23,7 @@ public class StringUdi : Udi
     /// <param name="uriValue">The uri value of the udi.</param>
     public StringUdi(Uri uriValue)
         : base(uriValue) =>
-        Id = Uri.UnescapeDataString(uriValue.AbsolutePath.AsSpan().TrimStart(Constants.CharArrays.ForwardSlash));
+        Id = Uri.UnescapeDataString(uriValue.AbsolutePath.AsSpan().TrimStart('/'));
 
     /// <summary>
     ///     The string part of the identifier.

@@ -21,7 +21,7 @@ public static class UriExtensions
     /// <remarks>Everything else remains unchanged, except for the fragment which is removed.</remarks>
     public static Uri Rewrite(this Uri uri, string path)
     {
-        if (path.StartsWith("/", StringComparison.Ordinal) == false)
+        if (path.StartsWith('/') == false)
         {
             throw new ArgumentException("Path must start with a slash.", "path");
         }
@@ -41,12 +41,12 @@ public static class UriExtensions
     /// <remarks>Everything else remains unchanged, except for the fragment which is removed.</remarks>
     public static Uri Rewrite(this Uri uri, string path, string query)
     {
-        if (path.StartsWith("/", StringComparison.Ordinal) == false)
+        if (path.StartsWith('/') == false)
         {
             throw new ArgumentException("Path must start with a slash.", "path");
         }
 
-        if (query.Length > 0 && query.StartsWith("?", StringComparison.Ordinal) == false)
+        if (query.Length > 0 && query.StartsWith('?') == false)
         {
             throw new ArgumentException("Query must start with a question mark.", "query");
         }
@@ -142,7 +142,7 @@ public static class UriExtensions
             if (path != "/")
             {
                 uri = new Uri(
-                    $"{uri.GetLeftPart(UriPartial.Authority)}{path.AsSpan().TrimEnd(Constants.CharArrays.ForwardSlash)}{uri.Query}"
+                    $"{uri.GetLeftPart(UriPartial.Authority)}{path.AsSpan().TrimEnd('/')}{uri.Query}"
                 );
             }
         }
@@ -150,7 +150,7 @@ public static class UriExtensions
         {
             if (path != "/")
             {
-                uri = new Uri($"{path.AsSpan().TrimEnd(Constants.CharArrays.ForwardSlash)}{uri.Query}", UriKind.Relative);
+                uri = new Uri($"{path.AsSpan().TrimEnd('/')}{uri.Query}", UriKind.Relative);
             }
         }
 

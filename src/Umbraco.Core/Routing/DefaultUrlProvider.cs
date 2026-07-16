@@ -315,8 +315,8 @@ public class DefaultUrlProvider : IUrlProvider
 
     private static string CombinePaths(string path1, string path2)
     {
-        var path = $"{path1.AsSpan().TrimEnd(Constants.CharArrays.ForwardSlash)}{path2}";
-        return path == "/" ? path : path.TrimEnd(Constants.CharArrays.ForwardSlash);
+        var path = $"{path1.AsSpan().TrimEnd('/')}{path2}";
+        return path == "/" ? path : path.TrimEnd('/');
     }
 
     #endregion

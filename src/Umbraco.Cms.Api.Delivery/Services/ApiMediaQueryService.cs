@@ -100,7 +100,12 @@ internal sealed class ApiMediaQueryService : IApiMediaQueryService
             return null;
         }
 
-        ReadOnlySpan<char> childrenOf = fetch.AsSpan().TrimStart(childrenOfParameter);
+        ReadOnlySpan<char> childrenOf = fetch.AsSpan();
+        if (fetch.StartsWith(childrenOfParameter, StringComparison.InvariantCultureIgnoreCase))
+        {
+            childrenOf = childrenOf[childrenOfParameter.Length..];
+        }
+
         if (childrenOf.IsEmpty)
         {
             // this mirrors the current behavior of the Content Delivery API :-)
@@ -108,7 +113,7 @@ internal sealed class ApiMediaQueryService : IApiMediaQueryService
         }
 
         IPublishedMediaCache mediaCache = GetRequiredPublishedMediaCache();
-        if (childrenOf.Trim(Constants.CharArrays.ForwardSlash).IsEmpty)
+        if (childrenOf.Trim('/').IsEmpty)
         {
             return GetRootContent(mediaCache);
         }
