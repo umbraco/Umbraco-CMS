@@ -105,6 +105,10 @@ public class BlockEditorDataConverterTests
 #pragma warning disable CS0618 // Type or member is obsolete
             Assert.IsEmpty(settings.RawPropertyValues);
 #pragma warning restore CS0618 // Type or member is obsolete
+
+            // ...and the content block must still be exposed - AmendExpose is the other half of the migration.
+            Assert.AreEqual(1, result.BlockValue.Expose.Count);
+            Assert.AreEqual(_contentKey, result.BlockValue.Expose[0].ContentKey);
         });
     }
 
@@ -167,6 +171,9 @@ public class BlockEditorDataConverterTests
 #pragma warning disable CS0618 // Type or member is obsolete
             Assert.IsEmpty(settings.RawPropertyValues);
 #pragma warning restore CS0618 // Type or member is obsolete
+
+            Assert.AreEqual(1, result.BlockValue.Expose.Count);
+            Assert.AreEqual(_contentKey, result.BlockValue.Expose[0].ContentKey);
         });
     }
 
