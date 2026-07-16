@@ -402,7 +402,8 @@ export class UmbTableElement extends UmbLitElement {
 		// Compute the header state against the current page only — the selection can span multiple
 		// pages, so comparing its total length against the page size gives the wrong state.
 		const selectableIds = this.items.filter((item) => this.#isSelectableItem(item)).map((item) => item.id);
-		const allSelected = selectableIds.length > 0 && selectableIds.every((id) => this.selection.includes(id));
+		const selectionSet = new Set(this.selection);
+		const allSelected = selectableIds.length > 0 && selectableIds.every((id) => selectionSet.has(id));
 		return html`
 			<uui-table-head-cell style="--uui-table-cell-padding: 0; text-align: center;">
 				${when(
