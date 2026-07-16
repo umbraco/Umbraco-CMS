@@ -35,6 +35,8 @@ internal sealed class ElementPermissionServiceTests : UmbracoIntegrationTest
 
     private IElementEditingService ElementEditingService => GetRequiredService<IElementEditingService>();
 
+    private IElementContainerService ElementContainerService => GetRequiredService<IElementContainerService>();
+
     private IEntityService EntityService => GetRequiredService<IEntityService>();
 
     [Test]
@@ -84,7 +86,40 @@ internal sealed class ElementPermissionServiceTests : UmbracoIntegrationTest
         Assert.That(viaService[0].Permissions, Is.EquivalentTo(viaPath));
     }
 
-    private async Task<Guid> CreateElement()
+    [Test]
+    public async Task GetPermissionsAsync_Returns_Permissions_Granted_At_An_Ancestor_ElementContainer()
+    {
+        // Arrange - the grant lives on the folder (via ElementContainerGranularPermission), not the
+        // element itself, proving the element-family verb cascades down through the ancestor path.
+        var folderResult = await ElementContainerService.CreateAsync(
+            null,
+            Guid.NewGuid().ToString(),
+            null,
+            Constants.Security.SuperUserKey);
+        Assert.IsTrue(folderResult.Success, $"Failed to create folder: {folderResult.Status}");
+        var folderKey = folderResult.Result!.Key;
+
+        var elementKey = await CreateElement(folderKey);
+        var user = await CreateUserInGroupWithContainerGrant(
+            granularPermissions: [ActionElementNew.ActionLetter],
+            containerKey: folderKey);
+
+        // Act
+        NodePermissions[] viaService = (await ElementPermissionService.GetPermissionsAsync(user, [elementKey])).ToArray();
+        ISet<string> viaPath = UserService.GetPermissionsForPath(user, GetPath(elementKey)).GetAllPermissions();
+
+        // Assert - the ancestor folder's grant surfaces for the descendant element...
+        Assert.That(viaService, Has.Length.EqualTo(1));
+        Assert.That(viaService[0].NodeKey, Is.EqualTo(elementKey));
+        Assert.That(viaService[0].Permissions, Contains.Item(ActionElementNew.ActionLetter));
+
+        // ...but a verb that was never granted is absent.
+        Assert.That(viaService[0].Permissions, Does.Not.Contain(ActionElementDelete.ActionLetter));
+
+        Assert.That(viaService[0].Permissions, Is.EquivalentTo(viaPath));
+    }
+
+    private async Task<Guid> CreateElement(Guid? parentKey = null)
     {
         var contentType = ContentTypeBuilder.CreateBasicContentType(
             name: Guid.NewGuid().ToString(),
@@ -97,7 +132,7 @@ internal sealed class ElementPermissionServiceTests : UmbracoIntegrationTest
             new ElementCreateModel
             {
                 ContentTypeKey = contentType.Key,
-                ParentKey = null,
+                ParentKey = parentKey,
                 Variants = [new VariantModel { Name = "Test Element" }],
             },
             Constants.Security.SuperUserKey);
@@ -106,6 +141,28 @@ internal sealed class ElementPermissionServiceTests : UmbracoIntegrationTest
     }
 
     private string GetPath(Guid elementKey) => EntityService.Get(elementKey)!.Path;
+
+    private async Task<IUser> CreateUserInGroupWithContainerGrant(string[] granularPermissions, Guid containerKey)
+    {
+        IGranularPermission[] granular = granularPermissions
+            .Select(verb => (IGranularPermission)new ElementContainerGranularPermission { Key = containerKey, Permission = verb })
+            .ToArray();
+
+        var userGroup = new UserGroupBuilder()
+            .WithName(Guid.NewGuid().ToString())
+            .WithAlias(Guid.NewGuid().ToString())
+            .WithPermissions(new HashSet<string>())
+            .WithGranularPermissions(granular)
+            .Build();
+        var createGroupResult = await UserGroupService.CreateAsync(userGroup, Constants.Security.SuperUserKey);
+        Assert.IsTrue(createGroupResult.Success, $"Failed to create user group with status {createGroupResult.Status}.");
+
+        var user = UserService.CreateUserWithIdentity(Guid.NewGuid().ToString(), $"{Guid.NewGuid()}@test.com");
+        user.AddGroup(userGroup.ToReadOnlyGroup());
+        UserService.Save(user);
+
+        return user;
+    }
 
     private async Task<IUser> CreateUserInGroup(string[] granularPermissions, string[] defaultPermissions, Guid elementKey)
     {
