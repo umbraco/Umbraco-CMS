@@ -30,7 +30,10 @@ import { UmbViewContext } from '@umbraco-cms/backoffice/view';
 import { umbLocalizationRegistry } from '@umbraco-cms/backoffice/localization';
 
 import './app-logo.element.js';
-import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
+import {
+	UMB_CURRENT_USER_CONTEXT,
+	UmbUserAuthorizedEntryPointExtensionInitializer,
+} from '@umbraco-cms/backoffice/current-user';
 import { UmbOutlineStyleController } from './outline-style.controller.js';
 
 const CORE_PACKAGES: Array<Promise<{ name: string; extensions: Array<ManifestBase | UmbExtensionManifestKind> }>> = [
@@ -264,6 +267,8 @@ export class UmbAppElement extends UmbLitElement {
 		// Register public extensions (login extensions)
 		await new UmbServerExtensionRegistrator(this, umbExtensionsRegistry).registerPublicExtensions();
 		const entryPointInitializer = new UmbAppEntryPointExtensionInitializer(this, umbExtensionsRegistry);
+
+		new UmbUserAuthorizedEntryPointExtensionInitializer(this, umbExtensionsRegistry);
 
 		// Try to initialise the auth flow and get the runtime status
 		try {
