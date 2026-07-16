@@ -153,7 +153,7 @@ internal sealed class DataTypeServiceTests : UmbracoIntegrationTest
         await ContentTypeService.CreateAsync(doctype, Constants.Security.SuperUserKey);
 
         // validate the assumptions used for assertions later in this test
-        var contentType = ContentTypeService.GetAsync(doctype.Id).GetAwaiter().GetResult();
+        var contentType = await ContentTypeService.GetAsync(doctype.Id);
         Assert.AreEqual(3, contentType.PropertyTypes.Count());
         Assert.IsNotNull(contentType.PropertyTypes.SingleOrDefault(pt => pt.PropertyEditorAlias is Constants.PropertyEditors.Aliases.RichText));
 
@@ -172,7 +172,7 @@ internal sealed class DataTypeServiceTests : UmbracoIntegrationTest
         Assert.That(deletedDefinition, Is.Null);
 
         // Further assertions against the ContentType that contains PropertyTypes based on the TextField
-        contentType = ContentTypeService.GetAsync(doctype.Id).GetAwaiter().GetResult();
+        contentType = await ContentTypeService.GetAsync(doctype.Id);
         Assert.That(contentType.Alias, Is.EqualTo("umbTextpage"));
         Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(2));
     }
@@ -463,7 +463,7 @@ internal sealed class DataTypeServiceTests : UmbracoIntegrationTest
         IMediaType mediaType = MediaTypeBuilder.CreateSimpleMediaType("umbMediaItem", "Media Item");
         await MediaTypeService.CreateAsync(mediaType, Constants.Security.SuperUserKey);
 
-        documentType = ContentTypeService.GetAsync(documentType.Id).GetAwaiter().GetResult();
+        documentType = await ContentTypeService.GetAsync(documentType.Id);
         Assert.IsNotNull(documentType.PropertyTypes.SingleOrDefault(pt => pt.PropertyEditorAlias is Constants.PropertyEditors.Aliases.RichText));
 
         mediaType = MediaTypeService.Get(mediaType.Id);

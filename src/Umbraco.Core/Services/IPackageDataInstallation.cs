@@ -73,6 +73,9 @@ public interface IPackageDataInstallation
         IContentTypeService typeService,
         IContentServiceBase<TContentBase> service)
         where TContentBase : class, IContentBase
+
+        // The throwing default implementation is temporary; this method is removed again once media and member
+        // types have been migrated and the generic ImportContentBase overload can be used instead.
         => throw new NotImplementedException();
 
     /// <summary>

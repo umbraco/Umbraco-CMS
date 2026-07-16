@@ -514,15 +514,7 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
         if (contentType.Level != 1 && masterContentType == null)
         {
             // get URL encoded folder names
-            var ancestorIds = contentType.Path
-                .Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries)
-                .Select(x => int.TryParse(x, NumberStyles.Integer, CultureInfo.InvariantCulture, out var asInt) ? asInt : int.MinValue)
-                .Where(x => x != int.MinValue && x != contentType.Id)
-                .ToArray();
-
-            IOrderedEnumerable<EntityContainer> folders = _contentTypeContainerService.GetAllAsync().GetAwaiter().GetResult()
-                .Where(x => ancestorIds.Contains(x.Id))
-                .OrderBy(x => x.Level);
+            EntityContainer[] folders = _contentTypeContainerService.GetAncestorsAsync(contentType).GetAwaiter().GetResult().ToArray();
 
             folderNames = string.Join("/", folders.Select(x => WebUtility.UrlEncode(x.Name)).ToArray());
             folderKeys = string.Join("/", folders.Select(x => x.Key).ToArray());

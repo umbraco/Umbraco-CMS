@@ -1,6 +1,4 @@
-using System.Globalization;
 using Umbraco.Cms.Api.Management.ViewModels;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
@@ -21,17 +19,6 @@ internal abstract class ContentTypeEditingPresentationFactory<TContentType>
     {
         _containerService = containerService;
         _getAllContentTypes = getAllContentTypes;
-    }
-
-    private IEnumerable<EntityContainer> GetContainersForType(TContentType contentType)
-    {
-        IEnumerable<EntityContainer> allContainers = _containerService.GetAllAsync().GetAwaiter().GetResult();
-        var containerById = allContainers.ToDictionary(c => c.Id);
-        return contentType.Path
-            .Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries)
-            .Select(s => int.TryParse(s, NumberStyles.Integer, CultureInfo.InvariantCulture, out int id) ? id : int.MinValue)
-            .Where(id => id > 0 && containerById.ContainsKey(id))
-            .Select(id => containerById[id]);
     }
 
     private IEnumerable<TContentType> GetAllContentTypes() => _getAllContentTypes();
@@ -82,7 +69,19 @@ internal abstract class ContentTypeEditingPresentationFactory<TContentType>
             : parentId;
     }
 
-    protected T MapCompositionModel<T>(ContentTypeAvailableCompositionsResult compositionResult)
+    protected async Task<IEnumerable<T>> MapCompositionModelsAsync<T>(IEnumerable<ContentTypeAvailableCompositionsResult> compositionResults)
+        where T : ContentTypeViewModels.AvailableContentTypeCompositionResponseModelBase, new()
+    {
+        var compositionModels = new List<T>();
+        foreach (ContentTypeAvailableCompositionsResult compositionResult in compositionResults)
+        {
+            compositionModels.Add(await MapCompositionModelAsync<T>(compositionResult));
+        }
+
+        return compositionModels;
+    }
+
+    private async Task<T> MapCompositionModelAsync<T>(ContentTypeAvailableCompositionsResult compositionResult)
         where T : ContentTypeViewModels.AvailableContentTypeCompositionResponseModelBase, new()
     {
         IContentTypeComposition composition = compositionResult.Composition;
@@ -90,7 +89,7 @@ internal abstract class ContentTypeEditingPresentationFactory<TContentType>
 
         if (composition is TContentType contentType)
         {
-            folders = GetContainersForType(contentType).Select(c => c.Name).WhereNotNull();
+            folders = (await _containerService.GetAncestorsAsync(contentType)).Select(c => c.Name).WhereNotNull();
         }
 
         T compositionModel = new()

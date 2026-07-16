@@ -7,6 +7,11 @@ namespace Umbraco.Cms.Api.Management.Factories;
 
 internal sealed class DocumentTypeEditingPresentationFactory : ContentTypeEditingPresentationFactory<IContentType>, IDocumentTypeEditingPresentationFactory
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DocumentTypeEditingPresentationFactory"/> class, using the specified content type service.
+    /// </summary>
+    /// <param name="contentTypeService">The service used to manage and retrieve content types.</param>
+    /// <param name="containerService">The service used to retrieve content type containers (folders).</param>
     public DocumentTypeEditingPresentationFactory(IContentTypeService contentTypeService, IContentTypeContainerService containerService)
         : base(containerService, () => contentTypeService.GetAllAsync().GetAwaiter().GetResult())
     {
@@ -71,8 +76,8 @@ internal sealed class DocumentTypeEditingPresentationFactory : ContentTypeEditin
         return updateModel;
     }
 
-    public IEnumerable<AvailableDocumentTypeCompositionResponseModel> MapCompositionModels(IEnumerable<ContentTypeAvailableCompositionsResult> compositionResults)
-        => compositionResults.Select(MapCompositionModel<AvailableDocumentTypeCompositionResponseModel>);
+    public Task<IEnumerable<AvailableDocumentTypeCompositionResponseModel>> MapCompositionModelsAsync(IEnumerable<ContentTypeAvailableCompositionsResult> compositionResults)
+        => MapCompositionModelsAsync<AvailableDocumentTypeCompositionResponseModel>(compositionResults);
 
     private void MapCleanup(ContentTypeModelBase model, DocumentTypeCleanup cleanup)
         => model.Cleanup = new ContentTypeCleanup

@@ -27,6 +27,6 @@ public interface IMemberTypeEditingPresentationFactory
     /// Maps a collection of content type available compositions to a collection of available member type composition response models.
     /// </summary>
     /// <param name="compositionResults">The collection of content type available compositions to map.</param>
-    /// <returns>A collection of available member type composition response models.</returns>
-    IEnumerable<AvailableMemberTypeCompositionResponseModel> MapCompositionModels(IEnumerable<ContentTypeAvailableCompositionsResult> compositionResults);
+    /// <returns>A task that represents the asynchronous operation. The task result contains the available member type composition response models.</returns>
+    Task<IEnumerable<AvailableMemberTypeCompositionResponseModel>> MapCompositionModelsAsync(IEnumerable<ContentTypeAvailableCompositionsResult> compositionResults);
 }

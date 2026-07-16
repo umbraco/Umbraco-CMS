@@ -7,6 +7,12 @@ namespace Umbraco.Cms.Api.Management.Factories;
 
 internal sealed class MediaTypeEditingPresentationFactory : ContentTypeEditingPresentationFactory<IMediaType>, IMediaTypeEditingPresentationFactory
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Factories.MediaTypeEditingPresentationFactory"/> class,
+    /// providing the required media type service dependency.
+    /// </summary>
+    /// <param name="mediaTypeService">The service used to manage media types.</param>
+    /// <param name="containerService">The service used to retrieve media type containers (folders).</param>
     public MediaTypeEditingPresentationFactory(IMediaTypeService mediaTypeService, IMediaTypeContainerService containerService)
         : base(containerService, () => mediaTypeService.GetAll())
     {
@@ -60,9 +66,9 @@ internal sealed class MediaTypeEditingPresentationFactory : ContentTypeEditingPr
     /// Maps a collection of content type available compositions to a collection of available media type composition response models.
     /// </summary>
     /// <param name="compositionResults">The collection of content type available compositions to map.</param>
-    /// <returns>A collection of available media type composition response models.</returns>
-    public IEnumerable<AvailableMediaTypeCompositionResponseModel> MapCompositionModels(IEnumerable<ContentTypeAvailableCompositionsResult> compositionResults)
-        => compositionResults.Select(MapCompositionModel<AvailableMediaTypeCompositionResponseModel>);
+    /// <returns>A task that represents the asynchronous operation. The task result contains the available media type composition response models.</returns>
+    public Task<IEnumerable<AvailableMediaTypeCompositionResponseModel>> MapCompositionModelsAsync(IEnumerable<ContentTypeAvailableCompositionsResult> compositionResults)
+        => MapCompositionModelsAsync<AvailableMediaTypeCompositionResponseModel>(compositionResults);
 
     private IEnumerable<ContentTypeSort> MapAllowedContentTypes(IEnumerable<MediaTypeSort> allowedMediaTypes)
         => MapAllowedContentTypes(allowedMediaTypes

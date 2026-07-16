@@ -138,9 +138,9 @@ public class LoadTestController : Controller
     /// Displays the load test index page with available actions.
     /// </summary>
     /// <returns>An HTML page listing available load test operations.</returns>
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
-        var res = EnsureInitialize();
+        var res = await EnsureInitializeAsync();
         if (res != null)
         {
             return res;
@@ -161,11 +161,23 @@ public class LoadTestController : Controller
         return ContentHtml(html);
     }
 
-    private IActionResult EnsureInitialize()
+    private async Task<IActionResult> EnsureInitializeAsync()
     {
         if (_containerId > 0)
         {
             return null;
+        }
+
+        var contentType = await _contentTypeService.GetAsync(ContentAlias);
+        if (contentType == null)
+        {
+            return ContentHtml("Not installed, first you must <a href=\"/LoadTest/Install\">install</a>.");
+        }
+
+        var containerType = await _contentTypeService.GetAsync(ContainerAlias);
+        if (containerType == null)
+        {
+            return ContentHtml("Panic! Container type is missing.");
         }
 
         lock (_locko)
@@ -173,18 +185,6 @@ public class LoadTestController : Controller
             if (_containerId > 0)
             {
                 return null;
-            }
-
-            var contentType = _contentTypeService.GetAsync(ContentAlias).GetAwaiter().GetResult();
-            if (contentType == null)
-            {
-                return ContentHtml("Not installed, first you must <a href=\"/LoadTest/Install\">install</a>.");
-            }
-
-            var containerType = _contentTypeService.GetAsync(ContainerAlias).GetAwaiter().GetResult();
-            if (containerType == null)
-            {
-                return ContentHtml("Panic! Container type is missing.");
             }
 
             var container = _contentService.GetPagedOfType(containerType.Id, 0, 100, out _, null).FirstOrDefault();
@@ -275,9 +275,9 @@ public class LoadTestController : Controller
     /// <param name="r">The restart probability percentage (0-100). If triggered, the application will restart after creating content.</param>
     /// <param name="o">The origin identifier to tag created content with.</param>
     /// <returns>An HTML response indicating the number of items created.</returns>
-    public IActionResult Create(int n = 1, int r = 0, string o = null)
+    public async Task<IActionResult> Create(int n = 1, int r = 0, string o = null)
     {
-        var res = EnsureInitialize();
+        var res = await EnsureInitializeAsync();
         if (res != null)
         {
             return res;
@@ -336,15 +336,15 @@ public class LoadTestController : Controller
     /// Clears all load test content items from the container.
     /// </summary>
     /// <returns>An HTML response indicating the content has been cleared.</returns>
-    public IActionResult Clear()
+    public async Task<IActionResult> Clear()
     {
-        var res = EnsureInitialize();
+        var res = await EnsureInitializeAsync();
         if (res != null)
         {
             return res;
         }
 
-        var contentType = _contentTypeService.GetAsync(ContentAlias).GetAwaiter().GetResult();
+        var contentType = await _contentTypeService.GetAsync(ContentAlias);
         _contentService.DeleteOfType(contentType.Id);
 
         return ContentHtml("Cleared.");

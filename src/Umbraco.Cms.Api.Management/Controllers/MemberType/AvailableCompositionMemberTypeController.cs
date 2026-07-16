@@ -51,7 +51,7 @@ public class AvailableCompositionMemberTypeController : MemberTypeControllerBase
             compositionModel.CurrentCompositeIds,
             compositionModel.CurrentPropertyAliases);
 
-        IEnumerable<AvailableMemberTypeCompositionResponseModel> responseModels = _presentationFactory.MapCompositionModels(availableCompositions);
+        IEnumerable<AvailableMemberTypeCompositionResponseModel> responseModels = await _presentationFactory.MapCompositionModelsAsync(availableCompositions);
 
         return Ok(responseModels);
     }

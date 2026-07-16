@@ -2153,7 +2153,7 @@ internal partial class BlockListElementLevelVariationTests
         // RefreshContentTypeCache(elementType, contentType);
 
         // Verify element type properties are now invariant
-        var refreshedElementType = ContentTypeService.GetAsync(elementType.Key).GetAwaiter().GetResult();
+        var refreshedElementType = await ContentTypeService.GetAsync(elementType.Key);
         Assert.IsNotNull(refreshedElementType, "Element type should exist after save");
         var variantTextProperty = refreshedElementType!.PropertyTypes.FirstOrDefault(p => p.Alias == "variantText");
         Assert.IsNotNull(variantTextProperty, "variantText property should exist");
@@ -2334,7 +2334,7 @@ internal partial class BlockListElementLevelVariationTests
         await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
 
         // Verify element type properties are now variant
-        var refreshedElementType = ContentTypeService.GetAsync(elementType.Key).GetAwaiter().GetResult();
+        var refreshedElementType = await ContentTypeService.GetAsync(elementType.Key);
         Assert.IsNotNull(refreshedElementType, "Element type should exist after save");
         var variantTextProperty = refreshedElementType!.PropertyTypes.FirstOrDefault(p => p.Alias == "variantText");
         Assert.IsNotNull(variantTextProperty, "variantText property should exist");

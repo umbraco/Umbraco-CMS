@@ -1,3 +1,4 @@
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -31,6 +32,19 @@ public interface IEntityTypeContainerService<TTreeEntity>
     /// </summary>
     /// <returns>A task that represents the asynchronous operation. The task result contains all containers.</returns>
     Task<IEnumerable<EntityContainer>> GetAllAsync();
+
+    /// <summary>
+    /// Gets the ancestor containers on the entity's tree path, ordered by level.
+    /// </summary>
+    /// <param name="entity">The entity whose ancestor containers to get.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the ancestor containers ordered by level.</returns>
+    async Task<IEnumerable<EntityContainer>> GetAncestorsAsync(TTreeEntity entity)
+    {
+        var ancestorIds = entity.AncestorIds();
+        return (await GetAllAsync())
+            .Where(container => ancestorIds.Contains(container.Id))
+            .OrderBy(container => container.Level);
+    }
 
     /// <summary>
     /// Gets the parent container of a container.

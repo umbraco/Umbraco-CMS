@@ -951,9 +951,9 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void EntityService_Siblings_ReturnsExpectedSiblings()
+    public async Task EntityService_Siblings_ReturnsExpectedSiblings()
     {
-        var children = CreateDocumentSiblingsTestData();
+        var children = await CreateDocumentSiblingsTestData();
 
         var target = children[1];
 
@@ -967,9 +967,9 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void EntityService_Siblings_SkipsTrashedEntities()
+    public async Task EntityService_Siblings_SkipsTrashedEntities()
     {
-        var children = CreateDocumentSiblingsTestData();
+        var children = await CreateDocumentSiblingsTestData();
 
         var trash = children[1];
         ContentService.MoveToRecycleBin(trash);
@@ -986,10 +986,10 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void EntityService_Siblings_Returns_Trashed_Siblings()
+    public async Task EntityService_Siblings_Returns_Trashed_Siblings()
     {
         ContentService.EmptyRecycleBin();
-        var children = CreateDocumentSiblingsTestData();
+        var children = await CreateDocumentSiblingsTestData();
 
         for (int i = 0; i <= 3; i++)
         {
@@ -1007,9 +1007,9 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void EntityService_Siblings_SkipsFilteredEntities_UsingFilterWithSet()
+    public async Task EntityService_Siblings_SkipsFilteredEntities_UsingFilterWithSet()
     {
-        var children = CreateDocumentSiblingsTestData();
+        var children = await CreateDocumentSiblingsTestData();
 
         // Apply a filter that excludes the child at index 1. We'd expect to not get this, but
         // get still get one previous sibling, i.e. the entity at index 0.
@@ -1028,9 +1028,9 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void EntityService_Siblings_SkipsFilteredEntities_UsingFilterWithoutSet()
+    public async Task EntityService_Siblings_SkipsFilteredEntities_UsingFilterWithoutSet()
     {
-        var children = CreateDocumentSiblingsTestData();
+        var children = await CreateDocumentSiblingsTestData();
 
         // Apply a filter that excludes the child at index 1. We'd expect to not get this, but
         // get still get one previous sibling, i.e. the entity at index 0.
@@ -1049,9 +1049,9 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void EntityService_Siblings_RespectsOrdering()
+    public async Task EntityService_Siblings_RespectsOrdering()
     {
-        var children = CreateDocumentSiblingsTestData();
+        var children = await CreateDocumentSiblingsTestData();
 
         // Order the children by name to ensure the ordering works when differing from the default sort order, the name is a GUID.
         children = children.OrderBy(x => x.Name).ToList();
@@ -1067,9 +1067,9 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void EntityService_Siblings_IgnoresOutOfBoundsLower()
+    public async Task EntityService_Siblings_IgnoresOutOfBoundsLower()
     {
-        var children = CreateDocumentSiblingsTestData();
+        var children = await CreateDocumentSiblingsTestData();
 
         var target = children[1];
         var result = EntityService.GetSiblings(target.Key, [UmbracoObjectTypes.Document], 100, 1, out long totalBefore, out long totalAfter).ToArray();
@@ -1082,9 +1082,9 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void EntityService_Siblings_IgnoresOutOfBoundsUpper()
+    public async Task EntityService_Siblings_IgnoresOutOfBoundsUpper()
     {
-        var children = CreateDocumentSiblingsTestData();
+        var children = await CreateDocumentSiblingsTestData();
 
         var target = children[^2];
         var result = EntityService.GetSiblings(target.Key, [UmbracoObjectTypes.Document], 1, 100, out long totalBefore, out long totalAfter).ToArray();
@@ -1121,9 +1121,9 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void EntityService_Siblings_ReturnsEmpty_WhenTargetKeyDoesNotExist()
+    public async Task EntityService_Siblings_ReturnsEmpty_WhenTargetKeyDoesNotExist()
     {
-        CreateDocumentSiblingsTestData();
+        await CreateDocumentSiblingsTestData();
 
         var result = EntityService.GetSiblings(Guid.NewGuid(), [UmbracoObjectTypes.Document], 1, 1, out long totalBefore, out long totalAfter).ToArray();
         Assert.AreEqual(0, totalBefore);
@@ -1132,9 +1132,9 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void EntityService_Siblings_ReturnsOnlyTarget_WhenItIsTheSoleChild()
+    public async Task EntityService_Siblings_ReturnsOnlyTarget_WhenItIsTheSoleChild()
     {
-        var children = CreateDocumentSiblingsTestData(count: 1);
+        var children = await CreateDocumentSiblingsTestData(count: 1);
 
         var result = EntityService.GetSiblings(children[0].Key, [UmbracoObjectTypes.Document], 1, 1, out long totalBefore, out long totalAfter).ToArray();
         Assert.AreEqual(0, totalBefore);
@@ -1144,9 +1144,9 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void EntityService_Siblings_ReportsCorrectTotalsOnBothSides_WhenTargetIsInTheMiddle()
+    public async Task EntityService_Siblings_ReportsCorrectTotalsOnBothSides_WhenTargetIsInTheMiddle()
     {
-        var children = CreateDocumentSiblingsTestData();
+        var children = await CreateDocumentSiblingsTestData();
 
         // Target is at index 4 (position 5 of 10). With a window of 2 before and 2 after,
         // the result should include indices 2-6, leaving 2 siblings before and 3 after the window.
@@ -1160,9 +1160,9 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
         Assert.IsTrue(result[4].Key == children[6].Key);
     }
 
-    private List<Content> CreateDocumentSiblingsTestData(int count = 10)
+    private async Task<List<Content>> CreateDocumentSiblingsTestData(int count = 10)
     {
-        var contentType = ContentTypeService.GetAsync("umbTextpage").GetAwaiter().GetResult();
+        var contentType = await ContentTypeService.GetAsync("umbTextpage");
 
         var root = ContentBuilder.CreateSimpleContent(contentType);
         ContentService.Save(root);
