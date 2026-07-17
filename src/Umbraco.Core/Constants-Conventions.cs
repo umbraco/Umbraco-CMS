@@ -36,6 +36,14 @@ public static partial class Constants
             ///     The key used to store the Umbraco pre-migrations upgrade plan state.
             /// </summary>
             public const string UmbracoUpgradePlanPremigrationsKey = KeyValuePrefix + UmbracoUpgradePlanPremigrationsName;
+
+            /// <summary>
+            ///     The key used to coordinate migration leadership across servers in a load-balanced
+            ///     environment. The value is either empty (no active leader) or
+            ///     <c>"{machineIdentifier}|{claimedAtUtc:O}"</c> when a server holds the claim,
+            ///     where <c>machineIdentifier</c> is the value returned by <see cref="Umbraco.Cms.Core.Factories.IMachineInfoFactory.GetMachineIdentifier"/>.
+            /// </summary>
+            public const string UpgradeLockKey = "Umbraco.Core.Upgrader.Lock";
         }
 
         /// <summary>
@@ -161,6 +169,25 @@ public static partial class Constants
             ///     Suffix added to media files when moved to the recycle bin when recycle bin media protection is enabled.
             /// </summary>
             public const string TrashedMediaSuffix = ".deleted";
+
+            /// <summary>
+            ///     Constants for the keys of built-in Umbraco media property types.
+            /// </summary>
+            public static class PropertyTypeKeys
+            {
+                // Must stay in sync between the clean install (DatabaseDataCreator) and the AddDimensionsToSvg
+                // upgrade migration so upgraded and clean-installed sites end up identical.
+
+                /// <summary>
+                ///     Key of the Width property type on the built-in Vector Graphics media type.
+                /// </summary>
+                public const string VectorGraphicsWidth = "5BC7E468-C53E-41A6-A522-2723F3B94514";
+
+                /// <summary>
+                ///     Key of the Height property type on the built-in Vector Graphics media type.
+                /// </summary>
+                public const string VectorGraphicsHeight = "9E4C2B59-6BC6-4648-BB71-B0F45DDBC274";
+            }
         }
 
         /// <summary>

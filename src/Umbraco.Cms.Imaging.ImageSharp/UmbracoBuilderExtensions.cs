@@ -32,6 +32,10 @@ public static class UmbracoBuilderExtensions
 
         builder.Services.AddSingleton<IImageUrlGenerator, ImageSharpImageUrlGenerator>();
 
+        // Replaces the no-op IImageUrlTokenGenerator registered in Core; allows rich text render
+        // paths to re-sign image URLs against the current HMACSecretKey after a key rotation.
+        builder.Services.AddSingleton<IImageUrlTokenGenerator, ImageSharpImageUrlTokenGenerator>();
+
         builder.Services.AddImageSharp()
             // Replace default image provider
             .ClearProviders()

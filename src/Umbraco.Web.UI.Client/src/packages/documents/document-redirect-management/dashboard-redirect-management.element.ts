@@ -9,7 +9,7 @@ import {
 	state,
 	when,
 } from '@umbraco-cms/backoffice/external/lit';
-import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
+import { umbConfirmModal, umbInfoModal } from '@umbraco-cms/backoffice/modal';
 import { UmbDocumentRedirectManagementRepository } from '@umbraco-cms/backoffice/document';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -113,26 +113,19 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 		this.#getRedirectData(this._search.value);
 	}
 
-	async #onRequestTrackerToggle() {
-		if (!this._trackerEnabled) {
-			this.#trackerToggle();
-			return;
-		}
-
-		await umbConfirmModal(this, {
-			headline: '#redirectUrls_disableUrlTracker',
-			content: '#redirectUrls_confirmDisable',
-			color: 'danger',
-			confirmLabel: '#actions_disable',
-		});
-
-		this.#trackerToggle();
-	}
-
-	async #trackerToggle() {
-		const { error } = await this.#repository.setStatus(!this._trackerEnabled);
-		if (error) return;
-		this._trackerEnabled = !this._trackerEnabled;
+	async #showTrackerInfo() {
+		const isEnabled = this._trackerEnabled;
+		await umbInfoModal(this, {
+			headline: isEnabled ? '#redirectUrls_disableUrlTracker' : '#redirectUrls_enableUrlTracker',
+			content: html`
+				<p>
+					${this.localize.term(
+						isEnabled ? 'redirectUrls_disableUrlTrackerInstruction' : 'redirectUrls_enableUrlTrackerInstruction',
+					)}
+				</p>
+				<p><code>Umbraco:CMS:WebRouting:DisableRedirectUrlTracking</code></p>
+			`,
+		}).catch(() => undefined);
 	}
 
 	override render() {
@@ -144,6 +137,7 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 						<div id="search-wrapper">
 							<uui-input
 								id="search"
+								name="redirect-search"
 								label=${this.localize.term('redirectUrls_originalUrl')}
 								placeholder=${this.localize.term('redirectUrls_originalUrl')}
 								@keypress=${this.#onKeypress}></uui-input>
@@ -153,20 +147,24 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 								@click=${this.#onSearch}
 								.state=${this._buttonState}></uui-button>
 						</div>
-						<uui-button
-							look="outline"
-							label=${this.localize.term('redirectUrls_disableUrlTracker')}
-							@click=${this.#onRequestTrackerToggle}></uui-button>
 					`,
-					() => html`
-						<div></div>
-						<uui-button
-							color="positive"
-							look="outline"
-							label=${this.localize.term('redirectUrls_enableUrlTracker')}
-							@click=${this.#onRequestTrackerToggle}></uui-button>
-					`,
+					() => html`<div></div>`,
 				)}
+				<uui-button
+					id="tracker-status"
+					compact
+					label=${this.localize.term(
+						this._trackerEnabled ? 'redirectUrls_urlTrackerEnabled' : 'redirectUrls_urlTrackerDisabled',
+					)}
+					@click=${this.#showTrackerInfo}>
+					<uui-tag color="default">
+						<uui-icon name="icon-info"></uui-icon>
+						<umb-localize
+							key=${this._trackerEnabled
+								? 'redirectUrls_urlTrackerEnabled'
+								: 'redirectUrls_urlTrackerDisabled'}></umb-localize>
+					</uui-tag>
+				</uui-button>
 			</div>
 			${when(
 				this._redirectData?.length,
@@ -285,6 +283,20 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 			#redirect-actions {
 				display: flex;
 				justify-content: space-between;
+			}
+
+			#tracker-status {
+				--uui-button-background-color: transparent;
+				--uui-button-background-color-hover: transparent;
+			}
+
+			uui-tag {
+				display: inline-flex;
+				align-items: center;
+				gap: var(--uui-size-1);
+				text-wrap: nowrap;
+				background-color: transparent;
+				color: var(--uui-color-text);
 			}
 
 			#search-wrapper {

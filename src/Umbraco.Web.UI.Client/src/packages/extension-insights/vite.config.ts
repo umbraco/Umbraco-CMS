@@ -8,5 +8,5 @@ const dist = '../../../dist-cms/packages/extension-insights';
 rmSync(dist, { recursive: true, force: true });
 
 export default defineConfig({
-	...getDefaultConfig({ dist, entry: ['manifests.ts', 'umbraco-package.ts'] }),
+	...getDefaultConfig({ dist, entry: ['umbraco-package.ts'] }),
 });

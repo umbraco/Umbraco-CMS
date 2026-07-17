@@ -5,6 +5,7 @@ import { manifests as propertyValueClonerManifests } from './property-value-clon
 import { manifests as validationManifests } from './validation/manifests.js';
 import { manifests as workspaceManifests } from './workspace/manifests.js';
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
+import { manifests as valueSummaryManifests } from './property-editors/block-list-editor/value-summary/manifests.js';
 
 export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
 	...clipboardManifests,
@@ -12,6 +13,7 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 	...propertyValueClonerManifests,
 	...validationManifests,
 	...workspaceManifests,
+	...valueSummaryManifests,
 	{
 		type: 'propertyAction',
 		kind: 'clear',
