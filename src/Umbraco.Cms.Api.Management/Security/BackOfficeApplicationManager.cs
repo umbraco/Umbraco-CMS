@@ -324,5 +324,5 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
         return descriptor;
     }
 
-    private static Uri CallbackUrlFor(Uri url, string relativePath) => new Uri($"{url.GetLeftPart(UriPartial.Authority)}/{relativePath.TrimStart(Constants.CharArrays.ForwardSlash)}");
+    private static Uri CallbackUrlFor(Uri url, string relativePath) => new Uri($"{url.GetLeftPart(UriPartial.Authority)}/{relativePath.AsSpan().TrimStart('/')}");
 }

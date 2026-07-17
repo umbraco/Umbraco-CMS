@@ -165,7 +165,7 @@ public class AspNetCoreHostingEnvironment : IHostingEnvironment
     /// <inheritdoc />
     public string ToAbsolute(string virtualPath)
     {
-        if (!virtualPath.StartsWith("~/") && !virtualPath.StartsWith("/") && _urlProviderMode != UrlMode.Absolute)
+        if (!virtualPath.StartsWith("~/") && !virtualPath.StartsWith('/') && _urlProviderMode != UrlMode.Absolute)
         {
             throw new InvalidOperationException(
                 $"The value {virtualPath} for parameter {nameof(virtualPath)} must start with ~/ or /");
@@ -177,8 +177,7 @@ public class AspNetCoreHostingEnvironment : IHostingEnvironment
             return virtualPath;
         }
 
-        var fullPath = ApplicationVirtualPath.EnsureEndsWith('/') +
-                       virtualPath.TrimStart(Core.Constants.CharArrays.TildeForwardSlash);
+        var fullPath = $"{ApplicationVirtualPath.EnsureEndsWith('/')}{virtualPath.AsSpan().TrimStart(Core.Constants.CharArrays.TildeForwardSlash)}";
 
         return fullPath;
     }
