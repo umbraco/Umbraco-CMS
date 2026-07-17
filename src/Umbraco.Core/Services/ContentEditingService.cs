@@ -352,7 +352,7 @@ internal sealed class ContentEditingService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Content save operation failed");
+            _logger.LogError(ex, "Content save and publish operation failed");
             return ContentEditingOperationStatus.Unknown;
         }
     }

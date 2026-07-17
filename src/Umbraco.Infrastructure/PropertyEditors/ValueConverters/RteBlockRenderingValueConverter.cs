@@ -342,7 +342,7 @@ public class RteBlockRenderingValueConverter : SimpleRichTextValueConverter, IDe
         var blocksByKey = richTextBlockModel.ToDictionary(block => block.ContentKey);
 
         string RenderBlock(Match match) =>
-            Guid.TryParse(match.Groups["key"].Value, out Guid key) && blocksByKey.TryGetValue(key, out RichTextBlockItem? richTextBlockItem)
+            Guid.TryParse(match.Groups["key"].ValueSpan, out Guid key) && blocksByKey.TryGetValue(key, out RichTextBlockItem? richTextBlockItem)
                 ? _partialViewBlockEngine.ExecuteAsync(richTextBlockItem).GetAwaiter().GetResult()
                 : string.Empty;
 

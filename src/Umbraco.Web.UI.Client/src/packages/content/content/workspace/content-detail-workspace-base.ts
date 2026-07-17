@@ -249,7 +249,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			this.view.hints,
 		);
 
-		new UmbContentDetailWorkspaceTypeTransformController(this as any);
+		new UmbContentDetailWorkspaceTypeTransformController(this as any, this._data);
 
 		this.variantOptions = mergeObservables(
 			[this.variesByCulture, this.variesBySegment, this.variants, this.languages, this._segments.asObservable()],
