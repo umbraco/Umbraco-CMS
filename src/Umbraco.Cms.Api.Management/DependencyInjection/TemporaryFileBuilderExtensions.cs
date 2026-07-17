@@ -14,6 +14,9 @@ internal static class TemporaryFileBuilderExtensions
     {
         builder.WithCollectionBuilder<MapDefinitionCollectionBuilder>()
             .Add<TemporaryFileViewModelsMapDefinition>();
+
+        // TODO (V19): Revert to the simple AddTransient<ITemporaryFileConfigurationPresentationFactory, TemporaryFileConfigurationPresentationFactory>()
+        // registration once the obsolete constructors on TemporaryFileConfigurationPresentationFactory are removed.
         builder.Services.AddTransient<ITemporaryFileConfigurationPresentationFactory>(serviceProvider => new TemporaryFileConfigurationPresentationFactory(
             serviceProvider.GetRequiredService<IOptionsSnapshot<ContentSettings>>(),
             serviceProvider.GetRequiredService<IOptionsSnapshot<RuntimeSettings>>()));

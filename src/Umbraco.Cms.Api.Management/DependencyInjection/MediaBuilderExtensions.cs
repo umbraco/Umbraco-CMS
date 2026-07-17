@@ -20,6 +20,9 @@ internal static class MediaBuilderExtensions
         builder.Services.AddTransient<IMediaEditingPresentationFactory, MediaEditingPresentationFactory>();
         builder.Services.AddTransient<IUrlAssembler, DefaultUrlAssembler>();
         builder.Services.AddTransient<IMediaUrlFactory, MediaUrlFactory>();
+
+        // TODO (V19): Revert to the simple AddTransient<IReziseImageUrlFactory, ReziseImageUrlFactory>() registration once the
+        // obsolete constructors on ReziseImageUrlFactory are removed.
         builder.Services.AddTransient<IReziseImageUrlFactory>(serviceProvider => new ReziseImageUrlFactory(
             serviceProvider.GetRequiredService<IImageUrlGenerator>(),
             serviceProvider.GetRequiredService<IOptions<ContentSettings>>(),
