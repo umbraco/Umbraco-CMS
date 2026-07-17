@@ -1,6 +1,8 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.Mapping.TemporaryFile;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 
@@ -12,7 +14,9 @@ internal static class TemporaryFileBuilderExtensions
     {
         builder.WithCollectionBuilder<MapDefinitionCollectionBuilder>()
             .Add<TemporaryFileViewModelsMapDefinition>();
-        builder.Services.AddTransient<ITemporaryFileConfigurationPresentationFactory, TemporaryFileConfigurationPresentationFactory>();
+        builder.Services.AddTransient<ITemporaryFileConfigurationPresentationFactory>(serviceProvider => new TemporaryFileConfigurationPresentationFactory(
+            serviceProvider.GetRequiredService<IOptionsSnapshot<ContentSettings>>(),
+            serviceProvider.GetRequiredService<IOptionsSnapshot<RuntimeSettings>>()));
 
         return builder;
     }
