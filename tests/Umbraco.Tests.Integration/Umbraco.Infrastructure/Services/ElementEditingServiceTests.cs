@@ -235,6 +235,10 @@ public partial class ElementEditingServiceTests : UmbracoIntegrationTest
         => builder.Services.Configure<ContentSettings>(config =>
             config.DisableUnpublishWhenReferenced = true);
 
+    public static void ConfigureDisableDeleteWhenReferenced(IUmbracoBuilder builder)
+        => builder.Services.Configure<ContentSettings>(config =>
+            config.DisableDeleteWhenReferenced = true);
+
     internal sealed class ElementNotificationHandler : INotificationHandler<ElementUnpublishingNotification>
     {
         public static Action<ElementUnpublishingNotification>? UnpublishingElement { get; set; }

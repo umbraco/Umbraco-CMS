@@ -2,10 +2,10 @@ import { UmbDocumentPublishingRepository } from '../../index.js';
 import { UmbDocumentVariantState } from '../../../variant-state.js';
 import type { UmbDocumentVariantOptionModel } from '../../../types.js';
 import type { UmbDocumentItemModel } from '../../../item/types.js';
-import { UMB_DOCUMENT_PUBLISH_MODAL } from '../../../constants.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../../entity.js';
-import { UmbPublishDocumentEntityAction } from '../entity-action/index.js';
+import { UmbDocumentPublishManifestEntityActionMeta } from '../entity-action/constants.js';
 import { UmbDocumentItemRepository } from '../../../item/repository/index.js';
+import { UMB_CONTENT_PUBLISH_MODAL, UmbContentPublishEntityAction } from '@umbraco-cms/backoffice/content';
 import { UmbEntityBulkActionBase } from '@umbraco-cms/backoffice/entity-bulk-action';
 import { UmbLanguageCollectionRepository, type UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
@@ -140,10 +140,10 @@ export class UmbDocumentPublishEntityBulkAction extends UmbEntityBulkActionBase<
 
 		// If there is only one selection, we can refer to the regular publish entity action:
 		if (this.selection.length === 1) {
-			const action = new UmbPublishDocumentEntityAction(this._host, {
+			const action = new UmbContentPublishEntityAction(this._host, {
 				unique: this.selection[0],
 				entityType: UMB_DOCUMENT_ENTITY_TYPE,
-				meta: {} as never,
+				meta: UmbDocumentPublishManifestEntityActionMeta,
 			});
 			await action.execute();
 			return;
@@ -198,7 +198,7 @@ export class UmbDocumentPublishEntityBulkAction extends UmbEntityBulkActionBase<
 		// Pre-select all cultures from the selected documents
 		const selection: Array<string> = options.map((o) => o.unique);
 
-		const result = await umbOpenModal(this, UMB_DOCUMENT_PUBLISH_MODAL, {
+		const result = await umbOpenModal(this, UMB_CONTENT_PUBLISH_MODAL, {
 			data: {
 				options,
 			},

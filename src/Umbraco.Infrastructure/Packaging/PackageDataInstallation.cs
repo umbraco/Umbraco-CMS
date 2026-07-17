@@ -537,14 +537,24 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             var sortOrder = element.Attribute("sortOrder")?.Value ?? string.Empty;
             var nodeName = element.Attribute("nodeName")?.Value ?? string.Empty;
             var templateId = element.AttributeValue<int?>("template");
+            var templateAlias = element.AttributeValue<string?>("templateAlias");
 
             IEnumerable<XElement>? properties = from property in element.Elements()
                                                 where property.Attribute("isDoc") == null
                                                 select property;
 
-            //TODO: This will almost never work, we can't reference a template by an INT Id within a package manifest, we need to change the
-            // packager to package templates by UDI and resolve by the same, in 98% of cases, this isn't going to work, or it will resolve the wrong template.
-            ITemplate? template = templateId.HasValue ? _templateService.GetAsync(templateId.Value).GetAwaiter().GetResult() : null;
+            // Resolve template by alias (stable across installs). Fall back to int ID for packages
+            // exported before templateAlias was introduced, though that lookup will rarely succeed
+            // since int IDs are database-specific and won't match across systems.
+            ITemplate? template = null;
+            if (!string.IsNullOrEmpty(templateAlias))
+            {
+                template = _templateService.GetAsync(templateAlias).GetAwaiter().GetResult();
+            }
+            else if (templateId.HasValue)
+            {
+                template = _templateService.GetAsync(templateId.Value).GetAwaiter().GetResult();
+            }
 
             //now double check this is correct since its an INT it could very well be pointing to an invalid template :/
             if (template != null && contentType is IContentType contentTypex)
@@ -2261,7 +2271,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         /// <param name="userId">The identifier of the user performing the import operation.</param>
         /// <returns>A task representing the asynchronous operation, containing a collection of the imported <see cref="ITemplate"/> objects.</returns>
         public async Task<IEnumerable<ITemplate>> ImportTemplateAsync(XElement templateElement, int userId)
-            => ImportTemplatesAsync(new[] {templateElement}, userId).GetAwaiter().GetResult();
+            => ImportTemplatesAsync(new[] { templateElement }, userId).GetAwaiter().GetResult();
 
         /// <summary>
         /// Imports and saves package xml as <see cref="ITemplate"/>

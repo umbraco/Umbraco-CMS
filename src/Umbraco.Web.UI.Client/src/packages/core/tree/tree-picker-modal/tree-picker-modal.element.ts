@@ -378,7 +378,7 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 
 	override render() {
 		return html`
-			<umb-body-layout headline=${this.localize.term('general_choose')}>
+			<umb-body-layout headline=${this.localize.string(this.data?.headline ?? '#general_choose')}>
 				${this.#renderSearch()} ${this.#renderTree()} ${this.#renderActions()}
 			</umb-body-layout>
 		`;
@@ -456,7 +456,7 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 							href=${this._createPath}></uui-button>`
 					: nothing}
 				<uui-button
-					label=${this.localize.term('general_choose')}
+					label=${this.localize.string(this.data?.confirmLabel ?? '#general_choose')}
 					look="primary"
 					color="positive"
 					@click=${this._submitModal}
