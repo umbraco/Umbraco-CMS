@@ -45483,6 +45483,9 @@
             "$ref": "#/components/schemas/IPermissionPresentationModelDocumentPropertyValuePermissionPresentationModel"
           },
           {
+            "$ref": "#/components/schemas/IPermissionPresentationModelElementContainerPermissionPresentationModel"
+          },
+          {
             "$ref": "#/components/schemas/IPermissionPresentationModelElementPermissionPresentationModel"
           },
           {
@@ -45494,6 +45497,7 @@
           "mapping": {
             "DocumentPermissionPresentationModel": "#/components/schemas/IPermissionPresentationModelDocumentPermissionPresentationModel",
             "DocumentPropertyValuePermissionPresentationModel": "#/components/schemas/IPermissionPresentationModelDocumentPropertyValuePermissionPresentationModel",
+            "ElementContainerPermissionPresentationModel": "#/components/schemas/IPermissionPresentationModelElementContainerPermissionPresentationModel",
             "ElementPermissionPresentationModel": "#/components/schemas/IPermissionPresentationModelElementPermissionPresentationModel",
             "UnknownTypePermissionPresentationModel": "#/components/schemas/IPermissionPresentationModelUnknownTypePermissionPresentationModel"
           }
@@ -45541,6 +45545,30 @@
             "$ref": "#/components/schemas/ReferenceByIdModel"
           },
           "propertyType": {
+            "$ref": "#/components/schemas/ReferenceByIdModel"
+          },
+          "verbs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "IPermissionPresentationModelElementContainerPermissionPresentationModel": {
+        "required": [
+          "elementContainer",
+          "verbs",
+          "$type"
+        ],
+        "properties": {
+          "$type": {
+            "enum": [
+              "ElementContainerPermissionPresentationModel"
+            ],
+            "type": "string"
+          },
+          "elementContainer": {
             "$ref": "#/components/schemas/ReferenceByIdModel"
           },
           "verbs": {
