@@ -6,7 +6,7 @@ import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { Observable } from '@umbraco-cms/backoffice/observable-api';
-import { map } from '@umbraco-cms/backoffice/external/rxjs';
+import { from, map, switchMap } from '@umbraco-cms/backoffice/external/rxjs';
 
 // SVG is rendered natively by browsers but can never appear in the server's imageFileTypes,
 // because the imaging pipeline cannot process it (#20574).
@@ -15,6 +15,7 @@ const ADDITIONAL_DISPLAYABLE_IMAGE_FILE_TYPES = ['svg'];
 export class UmbTemporaryFileConfigRepository extends UmbRepositoryBase implements UmbApi {
 	/**
 	 * Promise that resolves when the repository has been initialized, i.e. when the configuration has been fetched from the server.
+	 * Awaiting this is no longer required before calling all(), part() or displayableImageFileTypes() — they defer internally.
 	 */
 	initialized;
 
@@ -57,11 +58,7 @@ export class UmbTemporaryFileConfigRepository extends UmbRepositoryBase implemen
 	 * @returns {Observable<UmbTemporaryFileConfigurationModel>}
 	 */
 	all() {
-		if (!this.#dataStore) {
-			throw new Error('Data store not initialized');
-		}
-
-		return this.#dataStore.all();
+		return from(this.initialized).pipe(switchMap(() => this.#dataStore!.all()));
 	}
 
 	/**
@@ -72,11 +69,7 @@ export class UmbTemporaryFileConfigRepository extends UmbRepositoryBase implemen
 	part<Part extends keyof UmbTemporaryFileConfigurationModel>(
 		part: Part,
 	): Observable<UmbTemporaryFileConfigurationModel[Part]> {
-		if (!this.#dataStore) {
-			throw new Error('Data store not initialized');
-		}
-
-		return this.#dataStore.part(part);
+		return from(this.initialized).pipe(switchMap(() => this.#dataStore!.part(part)));
 	}
 
 	/**
