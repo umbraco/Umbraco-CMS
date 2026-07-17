@@ -16,7 +16,7 @@ export class UmbExtensionCollectionRepository
 				return {
 					unique: manifest.alias,
 					name: manifest.name,
-					description: manifest.alias,
+					description: null,
 					icon: 'icon-plugin',
 					entityType: UMB_EXTENSION_ENTITY_TYPE,
 					manifest: {
