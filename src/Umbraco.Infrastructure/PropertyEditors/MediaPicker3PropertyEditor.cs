@@ -256,10 +256,12 @@ public class MediaPicker3PropertyEditor : DataEditor, IValueSchemaProvider
         /// <inheritdoc/>
         public void CacheReferencedEntities(IEnumerable<object> values)
         {
+#pragma warning disable CS0618 // Type or member is obsolete
             if (CacheReferencedEntitiesSuppression.IsSuppressed)
             {
                 return;
             }
+#pragma warning restore CS0618 // Type or member is obsolete
 
             var mediaKeys = values
                 .SelectMany(value => Deserialize(_jsonSerializer, value))

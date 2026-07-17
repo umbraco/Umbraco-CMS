@@ -1,6 +1,5 @@
 using NUnit.Framework;
 using Umbraco.Cms.Core.PropertyEditors;
-using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Infrastructure.Serialization;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Serialization;
@@ -8,8 +7,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Serialization;
 [TestFixture]
 public class JsonTolerantNumberConverterFactoryTests
 {
-    private readonly IConfigurationEditorJsonSerializer _serializer =
-        new SystemTextConfigurationEditorJsonSerializer(new DefaultJsonSerializerEncoderFactory());
+    private readonly SystemTextConfigurationEditorJsonSerializer _serializer =
+        new(new DefaultJsonSerializerEncoderFactory());
 
     [TestCase("\"\"")]
     [TestCase("\" \"")]

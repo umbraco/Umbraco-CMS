@@ -58,27 +58,75 @@ public sealed class JsonTolerantNumberConverterFactory : JsonConverterFactory
             }
         }
 
+        // Read a JSON number token using the typed reader for the target type, so a value that cannot be
+        // represented (e.g. a fractional number for an integer type, or an out-of-range value) resolves to
+        // the default rather than being silently truncated.
+        private static T ReadNumber(ref Utf8JsonReader reader)
+        {
+            if (IsInt())
+            {
+                return reader.TryGetInt32(out var intValue) ? (T)(object)intValue : T.Zero;
+            }
+
+            if (IsLong())
+            {
+                return reader.TryGetInt64(out var longValue) ? (T)(object)longValue : T.Zero;
+            }
+
+            if (IsShort())
+            {
+                return reader.TryGetInt16(out var shortValue) ? (T)(object)shortValue : T.Zero;
+            }
+
+            return ReadFloatingPointNumber(ref reader);
+        }
+
+        private static T ReadFloatingPointNumber(ref Utf8JsonReader reader)
+        {
+            if (IsDouble())
+            {
+                return reader.TryGetDouble(out var doubleValue) ? (T)(object)doubleValue : T.Zero;
+            }
+
+            if (IsFloat())
+            {
+                return reader.TryGetSingle(out var floatValue) ? (T)(object)floatValue : T.Zero;
+            }
+
+            return reader.TryGetDecimal(out var decimalValue) ? (T)(object)decimalValue : T.Zero;
+        }
+
+        private static bool IsInt() => typeof(T) == typeof(int);
+
+        private static bool IsLong() => typeof(T) == typeof(long);
+
+        private static bool IsShort() => typeof(T) == typeof(short);
+
+        private static bool IsDouble() => typeof(T) == typeof(double);
+
+        private static bool IsFloat() => typeof(T) == typeof(float);
+
         public override void Write(Utf8JsonWriter writer, T value, JsonSerializerOptions options)
         {
             // Use the typed numeric writers rather than WriteRawValue, which can emit invalid JSON for
             // floating-point edge cases.
-            if (typeof(T) == typeof(int))
+            if (IsInt())
             {
                 writer.WriteNumberValue((int)(object)value);
             }
-            else if (typeof(T) == typeof(long))
+            else if (IsLong())
             {
                 writer.WriteNumberValue((long)(object)value);
             }
-            else if (typeof(T) == typeof(short))
+            else if (IsShort())
             {
                 writer.WriteNumberValue((int)(short)(object)value);
             }
-            else if (typeof(T) == typeof(double))
+            else if (IsDouble())
             {
                 writer.WriteNumberValue((double)(object)value);
             }
-            else if (typeof(T) == typeof(float))
+            else if (IsFloat())
             {
                 writer.WriteNumberValue((float)(object)value);
             }
@@ -86,41 +134,6 @@ public sealed class JsonTolerantNumberConverterFactory : JsonConverterFactory
             {
                 writer.WriteNumberValue((decimal)(object)value);
             }
-        }
-
-        // Read a JSON number token using the typed reader for the target type, so a value that cannot be
-        // represented (e.g. a fractional number for an integer type, or an out-of-range value) resolves to
-        // the default rather than being silently truncated.
-        private static T ReadNumber(ref Utf8JsonReader reader)
-        {
-            if (typeof(T) == typeof(int))
-            {
-                return reader.TryGetInt32(out var intValue) ? (T)(object)intValue : T.Zero;
-            }
-
-            if (typeof(T) == typeof(long))
-            {
-                return reader.TryGetInt64(out var longValue) ? (T)(object)longValue : T.Zero;
-            }
-
-            if (typeof(T) == typeof(short))
-            {
-                return reader.TryGetInt32(out var intValue) && intValue is >= short.MinValue and <= short.MaxValue
-                    ? (T)(object)(short)intValue
-                    : T.Zero;
-            }
-
-            if (typeof(T) == typeof(double))
-            {
-                return reader.TryGetDouble(out var doubleValue) ? (T)(object)doubleValue : T.Zero;
-            }
-
-            if (typeof(T) == typeof(float))
-            {
-                return reader.TryGetSingle(out var floatValue) ? (T)(object)floatValue : T.Zero;
-            }
-
-            return reader.TryGetDecimal(out var decimalValue) ? (T)(object)decimalValue : T.Zero;
         }
     }
 }
