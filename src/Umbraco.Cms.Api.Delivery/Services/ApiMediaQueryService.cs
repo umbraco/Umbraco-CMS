@@ -100,12 +100,8 @@ internal sealed class ApiMediaQueryService : IApiMediaQueryService
             return null;
         }
 
-        ReadOnlySpan<char> childrenOf = fetch.AsSpan();
-        if (fetch.StartsWith(childrenOfParameter, StringComparison.InvariantCultureIgnoreCase))
-        {
-            childrenOf = childrenOf[childrenOfParameter.Length..];
-        }
-
+        // The guard above guarantees fetch starts with the prefix, so we can strip it unconditionally.
+        ReadOnlySpan<char> childrenOf = fetch.AsSpan(childrenOfParameter.Length);
         if (childrenOf.IsEmpty)
         {
             // this mirrors the current behavior of the Content Delivery API :-)
