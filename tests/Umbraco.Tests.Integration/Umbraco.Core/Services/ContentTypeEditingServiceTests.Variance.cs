@@ -68,6 +68,230 @@ internal sealed partial class ContentTypeEditingServiceTests
         Assert.IsNull(reloaded.GetValue<string>(VarianceTestPropertyAlias, "da-DK"));
     }
 
+    [TestCase(false)]
+    [TestCase(true)]
+    public async Task Can_Migrate_Composed_Property_Value_When_Composing_Type_Variance_Changes(bool isElement)
+    {
+        var secondLanguage = new LanguageBuilder().WithCultureInfo("da-DK").Build();
+        await LanguageService.CreateAsync(secondLanguage, Constants.Security.SuperUserKey);
+
+        var composition = new ContentTypeBuilder()
+            .WithAlias("varianceComposition" + Guid.NewGuid().ToString("N"))
+            .WithName("Variance Composition")
+            .WithIsElement(isElement)
+            .WithAllowAsRoot(false)
+            .WithAllowedInLibrary(true)
+            .WithContentVariation(ContentVariation.Nothing)
+            .AddPropertyType()
+            .WithAlias(VarianceTestPropertyAlias)
+            .WithName("Test Property")
+            .WithVariations(ContentVariation.Nothing)
+            .Done()
+            .Build();
+        await ContentTypeService.CreateAsync(composition, Constants.Security.SuperUserKey);
+
+        var contentType = new ContentTypeBuilder()
+            .WithAlias("varianceComposed" + Guid.NewGuid().ToString("N"))
+            .WithName("Variance Composed")
+            .WithIsElement(isElement)
+            .WithAllowAsRoot(true)
+            .WithAllowedInLibrary(true)
+            .WithContentVariation(ContentVariation.Nothing)
+            .Build();
+        contentType.AddContentType(composition);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+
+        IPublishableContentBase instance = isElement
+            ? await CreateElementInstanceWithValue(contentType, (null, "composed invariant value"))
+            : await CreateContentInstanceWithValue(contentType, (null, "composed invariant value"));
+
+        composition.Variations = ContentVariation.Culture;
+        var composedProperty = composition.PropertyTypes.Single(p => p.Alias == VarianceTestPropertyAlias);
+        composedProperty.Variations = ContentVariation.Culture;
+        await ContentTypeService.UpdateAsync(composition, Constants.Security.SuperUserKey);
+
+        contentType = await ContentTypeService.GetAsync(contentType.Key);
+        contentType!.Variations = ContentVariation.Culture;
+        await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
+
+        var defaultCulture = await LanguageService.GetDefaultIsoCodeAsync();
+        IPublishableContentBase? reloaded = isElement
+            ? ElementService.GetById(instance.Key)
+            : ContentService.GetById(instance.Key);
+
+        Assert.IsNotNull(reloaded);
+        Assert.AreEqual("composed invariant value", reloaded!.GetValue<string>(VarianceTestPropertyAlias, defaultCulture));
+        Assert.IsNull(reloaded.GetValue<string>(VarianceTestPropertyAlias));
+        Assert.IsNull(reloaded.GetValue<string>(VarianceTestPropertyAlias, "da-DK"));
+    }
+
+    [TestCase(false)]
+    [TestCase(true)]
+    public async Task Can_Migrate_Composed_Property_Value_When_Composing_Type_Variance_Changes_To_Invariant(bool isElement)
+    {
+        var secondLanguage = new LanguageBuilder().WithCultureInfo("da-DK").Build();
+        await LanguageService.CreateAsync(secondLanguage, Constants.Security.SuperUserKey);
+        var defaultCulture = await LanguageService.GetDefaultIsoCodeAsync();
+
+        var composition = new ContentTypeBuilder()
+            .WithAlias("varianceComposition" + Guid.NewGuid().ToString("N"))
+            .WithName("Variance Composition")
+            .WithIsElement(isElement)
+            .WithAllowAsRoot(false)
+            .WithAllowedInLibrary(true)
+            .WithContentVariation(ContentVariation.Culture)
+            .AddPropertyType()
+            .WithAlias(VarianceTestPropertyAlias)
+            .WithName("Test Property")
+            .WithVariations(ContentVariation.Culture)
+            .Done()
+            .Build();
+        await ContentTypeService.CreateAsync(composition, Constants.Security.SuperUserKey);
+
+        var contentType = new ContentTypeBuilder()
+            .WithAlias("varianceComposed" + Guid.NewGuid().ToString("N"))
+            .WithName("Variance Composed")
+            .WithIsElement(isElement)
+            .WithAllowAsRoot(true)
+            .WithAllowedInLibrary(true)
+            .WithContentVariation(ContentVariation.Culture)
+            .Build();
+        contentType.AddContentType(composition);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+
+        IPublishableContentBase instance = isElement
+            ? await CreateElementInstanceWithValue(contentType, (defaultCulture, "composed variant value"), ("da-DK", "composed danish value"))
+            : await CreateContentInstanceWithValue(contentType, (defaultCulture, "composed variant value"), ("da-DK", "composed danish value"));
+
+        composition.Variations = ContentVariation.Nothing;
+        var composedProperty = composition.PropertyTypes.Single(p => p.Alias == VarianceTestPropertyAlias);
+        composedProperty.Variations = ContentVariation.Nothing;
+        await ContentTypeService.UpdateAsync(composition, Constants.Security.SuperUserKey);
+
+        contentType = await ContentTypeService.GetAsync(contentType.Key);
+        contentType!.Variations = ContentVariation.Nothing;
+        await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
+
+        IPublishableContentBase? reloaded = isElement
+            ? ElementService.GetById(instance.Key)
+            : ContentService.GetById(instance.Key);
+
+        Assert.IsNotNull(reloaded);
+        Assert.AreEqual("composed variant value", reloaded!.GetValue<string>(VarianceTestPropertyAlias));
+        Assert.IsNull(reloaded.GetValue<string>(VarianceTestPropertyAlias, defaultCulture));
+        Assert.IsNull(reloaded.GetValue<string>(VarianceTestPropertyAlias, "da-DK"));
+    }
+
+    // Composing type variance is fixed at Culture from creation and is never itself updated below -
+    // only the composition's variance changes. This isolates whether variance-change propagation via
+    // composition (GetImpactedContentTypes) correctly reaches the composing type's instances even when
+    // only the composition is saved, not the composing type.
+    [TestCase(false)]
+    [TestCase(true)]
+    public async Task Can_Migrate_Composed_Property_Value_When_Only_Composition_Variance_Changes_To_Variant(bool isElement)
+    {
+        var secondLanguage = new LanguageBuilder().WithCultureInfo("da-DK").Build();
+        await LanguageService.CreateAsync(secondLanguage, Constants.Security.SuperUserKey);
+        var defaultCulture = await LanguageService.GetDefaultIsoCodeAsync();
+
+        var composition = new ContentTypeBuilder()
+            .WithAlias("varianceComposition" + Guid.NewGuid().ToString("N"))
+            .WithName("Variance Composition")
+            .WithIsElement(isElement)
+            .WithAllowAsRoot(false)
+            .WithAllowedInLibrary(true)
+            .WithContentVariation(ContentVariation.Nothing)
+            .AddPropertyType()
+            .WithAlias(VarianceTestPropertyAlias)
+            .WithName("Test Property")
+            .WithVariations(ContentVariation.Nothing)
+            .Done()
+            .Build();
+        await ContentTypeService.CreateAsync(composition, Constants.Security.SuperUserKey);
+
+        var contentType = new ContentTypeBuilder()
+            .WithAlias("varianceComposed" + Guid.NewGuid().ToString("N"))
+            .WithName("Variance Composed")
+            .WithIsElement(isElement)
+            .WithAllowAsRoot(true)
+            .WithAllowedInLibrary(true)
+            .WithContentVariation(ContentVariation.Culture)
+            .Build();
+        contentType.AddContentType(composition);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+
+        IPublishableContentBase instance = isElement
+            ? await CreateElementInstanceWithValue(contentType, (null, "composed invariant value"))
+            : await CreateContentInstanceWithValue(contentType, (null, "composed invariant value"));
+
+        composition.Variations = ContentVariation.Culture;
+        var composedProperty = composition.PropertyTypes.Single(p => p.Alias == VarianceTestPropertyAlias);
+        composedProperty.Variations = ContentVariation.Culture;
+        await ContentTypeService.UpdateAsync(composition, Constants.Security.SuperUserKey);
+
+        IPublishableContentBase? reloaded = isElement
+            ? ElementService.GetById(instance.Key)
+            : ContentService.GetById(instance.Key);
+
+        Assert.IsNotNull(reloaded);
+        Assert.AreEqual("composed invariant value", reloaded!.GetValue<string>(VarianceTestPropertyAlias, defaultCulture));
+        Assert.IsNull(reloaded.GetValue<string>(VarianceTestPropertyAlias));
+        Assert.IsNull(reloaded.GetValue<string>(VarianceTestPropertyAlias, "da-DK"));
+    }
+
+    [TestCase(false)]
+    [TestCase(true)]
+    public async Task Can_Migrate_Composed_Property_Value_When_Only_Composition_Variance_Changes_To_Invariant(bool isElement)
+    {
+        var secondLanguage = new LanguageBuilder().WithCultureInfo("da-DK").Build();
+        await LanguageService.CreateAsync(secondLanguage, Constants.Security.SuperUserKey);
+        var defaultCulture = await LanguageService.GetDefaultIsoCodeAsync();
+
+        var composition = new ContentTypeBuilder()
+            .WithAlias("varianceComposition" + Guid.NewGuid().ToString("N"))
+            .WithName("Variance Composition")
+            .WithIsElement(isElement)
+            .WithAllowAsRoot(false)
+            .WithAllowedInLibrary(true)
+            .WithContentVariation(ContentVariation.Culture)
+            .AddPropertyType()
+            .WithAlias(VarianceTestPropertyAlias)
+            .WithName("Test Property")
+            .WithVariations(ContentVariation.Culture)
+            .Done()
+            .Build();
+        await ContentTypeService.CreateAsync(composition, Constants.Security.SuperUserKey);
+
+        var contentType = new ContentTypeBuilder()
+            .WithAlias("varianceComposed" + Guid.NewGuid().ToString("N"))
+            .WithName("Variance Composed")
+            .WithIsElement(isElement)
+            .WithAllowAsRoot(true)
+            .WithAllowedInLibrary(true)
+            .WithContentVariation(ContentVariation.Culture)
+            .Build();
+        contentType.AddContentType(composition);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+
+        IPublishableContentBase instance = isElement
+            ? await CreateElementInstanceWithValue(contentType, (defaultCulture, "composed variant value"), ("da-DK", "composed danish value"))
+            : await CreateContentInstanceWithValue(contentType, (defaultCulture, "composed variant value"), ("da-DK", "composed danish value"));
+
+        composition.Variations = ContentVariation.Nothing;
+        var composedProperty = composition.PropertyTypes.Single(p => p.Alias == VarianceTestPropertyAlias);
+        composedProperty.Variations = ContentVariation.Nothing;
+        await ContentTypeService.UpdateAsync(composition, Constants.Security.SuperUserKey);
+
+        IPublishableContentBase? reloaded = isElement
+            ? ElementService.GetById(instance.Key)
+            : ContentService.GetById(instance.Key);
+
+        Assert.IsNotNull(reloaded);
+        Assert.AreEqual("composed variant value", reloaded!.GetValue<string>(VarianceTestPropertyAlias));
+        Assert.IsNull(reloaded.GetValue<string>(VarianceTestPropertyAlias, defaultCulture));
+        Assert.IsNull(reloaded.GetValue<string>(VarianceTestPropertyAlias, "da-DK"));
+    }
+
     private async Task<IContentType> CreateVarianceCapableType(bool isElement, ContentVariation propertyVariation = ContentVariation.Nothing)
     {
         var contentType = new ContentTypeBuilder()
