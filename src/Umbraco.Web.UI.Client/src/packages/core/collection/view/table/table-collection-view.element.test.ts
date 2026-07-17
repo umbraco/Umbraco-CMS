@@ -132,9 +132,6 @@ describe('UmbTableCollectionViewElement', () => {
 		});
 
 		it('resolves nested field values using dot-notation', async () => {
-			interface NestedItem extends UmbCollectionItemModel {
-				meta: { status: string };
-			}
 			element.manifest = makeManifest([{ label: 'Status', field: 'meta.status' }]);
 			const item = { ...makeItem('1'), meta: { status: 'Published' } } as unknown as TestCollectionItemModel;
 			setCollectionItems([item]);
