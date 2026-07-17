@@ -64,6 +64,31 @@ public class WebhookPresentationFactoryTests
         Assert.AreEqual("InternalServerError (500)", result.StatusCode);
     }
 
+    [TestCase("OK (200)", 200)]
+    [TestCase("NotFound (404)", 404)]
+    [TestCase("InternalServerError (500)", 500)]
+    public void CreateResponseModel_For_WebhookLog_Parses_HttpStatusCode_From_StatusCode(string statusCode, int expected)
+    {
+        _hostingEnvironment.SetupGet(x => x.IsDebugMode).Returns(false);
+        WebhookLog log = CreateWebhookLog(statusCode: statusCode);
+
+        var result = _factory.CreateResponseModel(log);
+
+        Assert.AreEqual(expected, result.HttpStatusCode);
+    }
+
+    [TestCase("ConnectionError")]
+    [TestCase("")]
+    public void CreateResponseModel_For_WebhookLog_HttpStatusCode_Is_Null_When_No_Numeric_Code(string statusCode)
+    {
+        _hostingEnvironment.SetupGet(x => x.IsDebugMode).Returns(false);
+        WebhookLog log = CreateWebhookLog(statusCode: statusCode);
+
+        var result = _factory.CreateResponseModel(log);
+
+        Assert.IsNull(result.HttpStatusCode);
+    }
+
     [Test]
     public void CreateResponseModel_For_WebhookLog_Passes_Through_ExceptionOccured_When_Debug_Mode_Is_Off()
     {

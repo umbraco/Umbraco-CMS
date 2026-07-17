@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using Umbraco.Cms.Api.Management.ViewModels.Webhook;
 using Umbraco.Cms.Api.Management.ViewModels.Webhook.Logs;
 using Umbraco.Cms.Core;
@@ -93,6 +94,7 @@ internal sealed class WebhookPresentationFactory : IWebhookPresentationFactory
             WebhookKey = webhookLog.WebhookKey,
             IsSuccessStatusCode = webhookLog.IsSuccessStatusCode,
             StatusCode = webhookLog.StatusCode,
+            HttpStatusCode = ParseHttpStatusCode(webhookLog.StatusCode),
             ExceptionOccured = webhookLog.ExceptionOccured,
         };
 
@@ -107,6 +109,15 @@ internal sealed class WebhookPresentationFactory : IWebhookPresentationFactory
         }
 
         return webhookLogResponseModel;
+    }
+
+    // Status codes are persisted as a formatted string, e.g. "OK (200)" or "NotFound (404)", so the numeric
+    // code is parsed back out of the parentheses. Delivery failures without an HTTP response (e.g. a connection
+    // error) are stored as a plain string with no code, in which case null is returned.
+    private static int? ParseHttpStatusCode(string statusCode)
+    {
+        Match match = Regex.Match(statusCode, @"\((\d+)\)");
+        return match.Success && int.TryParse(match.Groups[1].Value, out var code) ? code : null;
     }
 
     private WebhookEventResponseModel Create(string alias)

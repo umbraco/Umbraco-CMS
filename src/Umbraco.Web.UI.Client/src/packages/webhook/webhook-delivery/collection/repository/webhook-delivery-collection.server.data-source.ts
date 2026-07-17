@@ -50,7 +50,7 @@ export class UmbWebhookDeliveryCollectionServerDataSource implements UmbWebhookD
 				date: item.date,
 				url: item.url,
 				retryCount: item.retryCount,
-				statusCode: item.statusCode,
+				statusCode: { label: item.statusCode, code: item.httpStatusCode ?? null },
 			};
 
 			return model;

@@ -1,18 +1,21 @@
+import type { UmbWebhookDeliveryStatusCodeValue } from '../value-type/constants.js';
 import { css, customElement, html, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbValueSummaryElementBase } from '@umbraco-cms/backoffice/value-summary';
 
 @customElement('umb-webhook-delivery-status-code-value-summary')
-export class UmbWebhookDeliveryStatusCodeValueSummaryElement extends UmbValueSummaryElementBase<string | null> {
+export class UmbWebhookDeliveryStatusCodeValueSummaryElement extends UmbValueSummaryElementBase<UmbWebhookDeliveryStatusCodeValue | null> {
 	#getTagColor() {
-		if (this._value?.includes('(2')) return 'positive';
-		if (this._value?.includes('(4')) return 'warning';
-		if (this._value?.includes('(5')) return 'danger';
+		const code = this._value?.code;
+		if (code == null) return 'default';
+		if (code >= 200 && code < 300) return 'positive';
+		if (code >= 400 && code < 500) return 'warning';
+		if (code >= 500) return 'danger';
 		return 'default';
 	}
 
 	override render() {
-		if (!this._value) return nothing;
-		return html`<uui-tag color=${this.#getTagColor()} look="secondary">${this._value}</uui-tag>`;
+		if (!this._value?.label) return nothing;
+		return html`<uui-tag color=${this.#getTagColor()} look="secondary">${this._value.label}</uui-tag>`;
 	}
 
 	static override styles = css`
