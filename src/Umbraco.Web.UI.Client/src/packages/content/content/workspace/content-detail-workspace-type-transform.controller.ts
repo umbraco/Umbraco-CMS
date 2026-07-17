@@ -4,6 +4,11 @@ import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type'
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbEntityVariantModel } from '@umbraco-cms/backoffice/variant';
 
+interface UmbTypeTransformPersistedDataAccessor<DetailModelType> {
+	getPersisted(): DetailModelType | undefined;
+	setPersisted(data: DetailModelType | undefined): void;
+}
+
 /**
  * @class UmbContentDetailWorkspaceTypeTransformController
  * @description - Controller to handle content detail workspace type transformations, such as property variation changes.
@@ -12,14 +17,19 @@ export class UmbContentDetailWorkspaceTypeTransformController<
 	DetailModelType extends UmbContentDetailModel<UmbEntityVariantModel>,
 > extends UmbControllerBase {
 	#workspace: UmbContentDetailWorkspaceContextBase<DetailModelType, any, any, any>;
+	#persistedData?: UmbTypeTransformPersistedDataAccessor<DetailModelType>;
 	// Current property types, currently used to detect variation changes:
 	#propertyTypes?: Array<UmbPropertyTypeModel>;
 	#variesByCulture?: boolean;
 
-	constructor(host: UmbContentDetailWorkspaceContextBase<DetailModelType, any, any, any>) {
+	constructor(
+		host: UmbContentDetailWorkspaceContextBase<DetailModelType, any, any, any>,
+		persistedData?: UmbTypeTransformPersistedDataAccessor<DetailModelType>,
+	) {
 		super(host);
 
 		this.#workspace = host;
+		this.#persistedData = persistedData;
 
 		// Observe property variation changes to trigger value migration when properties change
 		// from invariant to variant (or vice versa) via Infinite Editing
@@ -57,11 +67,19 @@ export class UmbContentDetailWorkspaceTypeTransformController<
 		if (!currentData) return;
 
 		const defaultLanguage = this.#getDefaultLanguage();
-		const variants = variesByCulture
-			? this.#transformVariantsToCultureVariant(currentData.variants, defaultLanguage)
-			: this.#transformVariantsToInvariant(currentData.variants, defaultLanguage);
+		const transformVariants = (variants: DetailModelType['variants']) =>
+			variesByCulture
+				? this.#transformVariantsToCultureVariant(variants, defaultLanguage)
+				: this.#transformVariantsToInvariant(variants, defaultLanguage);
 
-		this.#workspace.setData({ ...currentData, variants });
+		this.#workspace.setData({ ...currentData, variants: transformVariants(currentData.variants) });
+
+		// The persisted data must be migrated too — the server migrated its copy when the content type
+		// was saved, and constructing save data merges the persisted variants back in:
+		const persisted = this.#persistedData?.getPersisted();
+		if (persisted) {
+			this.#persistedData?.setPersisted({ ...persisted, variants: transformVariants(persisted.variants) });
+		}
 	}
 
 	/**
@@ -77,10 +95,8 @@ export class UmbContentDetailWorkspaceTypeTransformController<
 				result.push(variant);
 				continue;
 			}
-			const existingCultureVariant = variants.find(
-				(v) => v.culture === defaultLanguage && v.segment === variant.segment,
-			);
-			if (!existingCultureVariant) {
+			const hasCultureVariant = variants.some((v) => v.culture === defaultLanguage && v.segment === variant.segment);
+			if (!hasCultureVariant) {
 				result.push({ ...variant, culture: defaultLanguage });
 			}
 		}
@@ -103,8 +119,8 @@ export class UmbContentDetailWorkspaceTypeTransformController<
 			if (variant.culture === null) {
 				result.push(variant);
 			} else if (variant.culture === cultureToKeep) {
-				const existingInvariantVariant = variants.find((v) => v.culture === null && v.segment === variant.segment);
-				if (!existingInvariantVariant) {
+				const hasInvariantVariant = variants.some((v) => v.culture === null && v.segment === variant.segment);
+				if (!hasInvariantVariant) {
 					result.push({ ...variant, culture: null });
 				}
 			}

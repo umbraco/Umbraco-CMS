@@ -4,6 +4,7 @@ import { useMockSet } from '@umbraco-cms/internal/mock-manager';
 import { UmbDocumentWorkspaceContext } from './document-workspace.context.js';
 import { TEST_MANIFESTS, UmbTestDocumentWorkspaceHostElement } from './document-workspace-context.test-utils.js';
 import { umbDocumentTypeMockDb } from '../../../../../../mocks/db/document-type.db.js';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbEntityUpdatedEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/document-type';
@@ -86,6 +87,26 @@ describe('UmbDocumentWorkspaceContext content type variance transform', () => {
 		expect(variants).to.have.length(1);
 		assert.isNull(variants[0].culture);
 		expect(variants[0].name).to.equal('Variant Document');
+	});
+
+	it('does not include the stale invariant variant in the save data after the type becomes culture variant', async () => {
+		await context.load(INVARIANT_DOCUMENT_ID);
+		await setContentTypeVariesByCulture(true);
+
+		const saveData = await context.constructSaveData([UmbVariantId.Create({ culture: 'en-US', segment: null })]);
+
+		expect(saveData.variants.filter((v) => v.culture === null)).to.have.length(0);
+		expect(saveData.variants.some((v) => v.culture === 'en-US')).to.equal(true);
+	});
+
+	it('does not include stale culture variants in the save data after the type becomes invariant', async () => {
+		await context.load(VARIANT_DOCUMENT_ID);
+		await setContentTypeVariesByCulture(false);
+
+		const saveData = await context.constructSaveData([UmbVariantId.CreateInvariant()]);
+
+		expect(saveData.variants.filter((v) => v.culture !== null)).to.have.length(0);
+		expect(saveData.variants.some((v) => v.culture === null)).to.equal(true);
 	});
 
 	it('does not change the variants when the type variance is unchanged', async () => {
