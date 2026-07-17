@@ -247,11 +247,11 @@ export class UmbImageCropperFocusSetterElement extends UmbLitElement {
 				@touchstart=${this._handleGridDrag}>
 				<img id="image" @keydown=${() => nothing} src=${this.src} alt="" />
 				${when(
-					this.focalPoint !== null,
+					this.focalPoint !== null && !this.hideFocalPoint,
 					() => html`
 						<span
 							id="focal-point"
-							class=${classMap({ 'focal-point--dragging': this._isDraggingGridHandle, hidden: this.hideFocalPoint })}
+							class=${classMap({ 'focal-point--dragging': this._isDraggingGridHandle })}
 							tabindex=${ifDefined(this.disabled ? undefined : '0')}
 							aria-label=${this.localize.term('general_focalPoint')}
 							@keydown=${this.#handleGridKeyDown}>
@@ -318,9 +318,6 @@ export class UmbImageCropperFocusSetterElement extends UmbLitElement {
 		.focal-point--dragging {
 			cursor: none;
 			transform: scale(1.5);
-		}
-		#focal-point.hidden {
-			display: none;
 		}
 	`;
 }
