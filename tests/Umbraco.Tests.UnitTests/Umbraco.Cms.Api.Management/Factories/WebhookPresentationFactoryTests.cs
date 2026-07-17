@@ -196,7 +196,7 @@ public class WebhookPresentationFactoryTests
 
         var result = _factory.CreateResponseModel(webhook);
 
-        Assert.AreEqual(1, result.Events.Count());
+        Assert.AreEqual(1, result.Events.Length);
         WebhookEventResponseModel mappedEvent = result.Events.Single();
         Assert.AreEqual("Umbraco.ContentPublish", mappedEvent.Alias);
         Assert.AreEqual("Content Published", mappedEvent.EventName);

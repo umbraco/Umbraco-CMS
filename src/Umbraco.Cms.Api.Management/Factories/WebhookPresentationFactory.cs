@@ -9,7 +9,7 @@ using Umbraco.Cms.Core.Webhooks;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
-internal sealed class WebhookPresentationFactory : IWebhookPresentationFactory
+internal sealed partial class WebhookPresentationFactory : IWebhookPresentationFactory
 {
     private readonly WebhookEventCollection _webhookEventCollection;
     private readonly IHostingEnvironment _hostingEnvironment;
@@ -116,7 +116,7 @@ internal sealed class WebhookPresentationFactory : IWebhookPresentationFactory
     // error) are stored as a plain string with no code, in which case null is returned.
     private static int? ParseHttpStatusCode(string statusCode)
     {
-        Match match = Regex.Match(statusCode, @"\((\d+)\)");
+        Match match = StatusCodePattern().Match(statusCode);
         return match.Success && int.TryParse(match.Groups[1].Value, out var code) ? code : null;
     }
 
@@ -131,4 +131,7 @@ internal sealed class WebhookPresentationFactory : IWebhookPresentationFactory
             Alias = alias,
         };
     }
+
+    [GeneratedRegex(@"\((\d+)\)")]
+    private static partial Regex StatusCodePattern();
 }
