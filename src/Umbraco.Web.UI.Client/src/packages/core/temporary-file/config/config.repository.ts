@@ -17,7 +17,7 @@ export class UmbTemporaryFileConfigRepository extends UmbRepositoryBase implemen
 	 * Promise that resolves when the repository has been initialized, i.e. when the configuration has been fetched from the server.
 	 * Awaiting this is no longer required before calling all(), part() or displayableImageFileTypes() — they defer internally.
 	 */
-	initialized;
+	initialized: Promise<void>;
 
 	#dataStore?: typeof UMB_TEMPORARY_FILE_CONFIG_STORE_CONTEXT.TYPE;
 	#dataSource = new UmbTemporaryFileConfigServerDataSource(this);

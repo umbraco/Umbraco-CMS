@@ -30,6 +30,9 @@ describe('UmbTemporaryFileConfigRepository', () => {
 		document.body.innerHTML = '';
 	});
 
+	// The shared MSW mock returns imageFileTypes ['jpg','png','gif','jpeg','svg']. Production never
+	// includes svg there (the imaging pipeline cannot process it, #20574) — the mock includes it so the
+	// displayableImageFileTypes() de-duplication path is exercised below without svg appearing twice.
 	it('part() subscribed before the store resolves does not throw and still delivers', async () => {
 		let observable!: ReturnType<typeof repository.part<'imageFileTypes'>>;
 		expect(() => (observable = repository.part('imageFileTypes'))).to.not.throw();
