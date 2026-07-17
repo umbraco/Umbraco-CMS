@@ -14,6 +14,7 @@ export class UmbContentDetailWorkspaceTypeTransformController<
 	#workspace: UmbContentDetailWorkspaceContextBase<DetailModelType, any, any, any>;
 	// Current property types, currently used to detect variation changes:
 	#propertyTypes?: Array<UmbPropertyTypeModel>;
+	#variesByCulture?: boolean;
 
 	constructor(host: UmbContentDetailWorkspaceContextBase<DetailModelType, any, any, any>) {
 		super(host);
@@ -30,6 +31,85 @@ export class UmbContentDetailWorkspaceTypeTransformController<
 			},
 			null,
 		);
+
+		// Observe the owner content type's culture variance to migrate the variants collection alongside
+		// the values, so the active variant keeps its name, state and dates and the next save matches the type
+		this.observe(
+			host.structure.ownerContentTypeObservablePart((x) => x?.variesByCulture),
+			(variesByCulture: boolean | undefined) => {
+				const previousVariesByCulture = this.#variesByCulture;
+				this.#variesByCulture = variesByCulture;
+				if (
+					previousVariesByCulture === undefined ||
+					variesByCulture === undefined ||
+					previousVariesByCulture === variesByCulture
+				) {
+					return;
+				}
+				this.#handleContentTypeVarianceChange(variesByCulture);
+			},
+			null,
+		);
+	}
+
+	#handleContentTypeVarianceChange(variesByCulture: boolean): void {
+		const currentData = this.#workspace.getData();
+		if (!currentData) return;
+
+		const defaultLanguage = this.#getDefaultLanguage();
+		const variants = variesByCulture
+			? this.#transformVariantsToCultureVariant(currentData.variants, defaultLanguage)
+			: this.#transformVariantsToInvariant(currentData.variants, defaultLanguage);
+
+		this.#workspace.setData({ ...currentData, variants });
+	}
+
+	/**
+	 * Moves invariant variant entries to the default language, keeping existing culture entries as-is.
+	 */
+	#transformVariantsToCultureVariant(
+		variants: DetailModelType['variants'],
+		defaultLanguage: string,
+	): DetailModelType['variants'] {
+		const result: DetailModelType['variants'] = [];
+		for (const variant of variants) {
+			if (variant.culture !== null) {
+				result.push(variant);
+				continue;
+			}
+			const existingCultureVariant = variants.find(
+				(v) => v.culture === defaultLanguage && v.segment === variant.segment,
+			);
+			if (!existingCultureVariant) {
+				result.push({ ...variant, culture: defaultLanguage });
+			}
+		}
+		return result;
+	}
+
+	/**
+	 * Collapses culture variant entries to invariant, preferring the default language and discarding other cultures.
+	 */
+	#transformVariantsToInvariant(
+		variants: DetailModelType['variants'],
+		defaultLanguage: string,
+	): DetailModelType['variants'] {
+		const cultureToKeep = variants.some((v) => v.culture === defaultLanguage)
+			? defaultLanguage
+			: variants.find((v) => v.culture !== null)?.culture;
+
+		const result: DetailModelType['variants'] = [];
+		for (const variant of variants) {
+			if (variant.culture === null) {
+				result.push(variant);
+			} else if (variant.culture === cultureToKeep) {
+				const existingInvariantVariant = variants.find((v) => v.culture === null && v.segment === variant.segment);
+				if (!existingInvariantVariant) {
+					result.push({ ...variant, culture: null });
+				}
+			}
+		}
+		return result;
 	}
 
 	async #handlePropertyTypeVariationChanges(
