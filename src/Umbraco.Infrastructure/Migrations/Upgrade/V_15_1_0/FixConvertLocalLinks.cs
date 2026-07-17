@@ -4,6 +4,7 @@ using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
+using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
@@ -283,7 +284,18 @@ public class FixConvertLocalLinks : MigrationBase
         }
 
         var editorValue = _jsonSerializer.Serialize(toEditorValue);
-        var dbValue = valueEditor.FromEditor(new ContentPropertyData(editorValue, null), null);
+
+        // Re-running FromEditor here is only to re-serialize the converted value; the referenced-entity
+        // caching it would otherwise trigger is wasted work that issues per-property content/media reads
+        // in separate scopes, contending with this migration's own scope. Suppress it.
+        object? dbValue;
+#pragma warning disable CS0618 // Type or member is obsolete
+        using (CacheReferencedEntitiesSuppression.Suppress())
+        {
+            dbValue = valueEditor.FromEditor(new ContentPropertyData(editorValue, null), null);
+        }
+#pragma warning restore CS0618 // Type or member is obsolete
+
         if (dbValue is not string stringValue || stringValue.DetectIsJson() is false)
         {
             _logger.LogWarning(
