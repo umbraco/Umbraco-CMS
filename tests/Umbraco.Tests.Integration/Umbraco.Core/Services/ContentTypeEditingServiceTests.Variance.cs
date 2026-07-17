@@ -292,6 +292,57 @@ internal sealed partial class ContentTypeEditingServiceTests
         Assert.IsNull(reloaded.GetValue<string>(VarianceTestPropertyAlias, "da-DK"));
     }
 
+    [TestCase(false)]
+    [TestCase(true)]
+    public async Task Can_Migrate_Value_For_Both_Published_And_Draft_Versions(bool isElement)
+    {
+        var secondLanguage = new LanguageBuilder().WithCultureInfo("da-DK").Build();
+        await LanguageService.CreateAsync(secondLanguage, Constants.Security.SuperUserKey);
+
+        var contentType = await CreateVarianceCapableType(isElement);
+        IPublishableContentBase instance = isElement
+            ? await CreateElementInstanceWithValue(contentType, (null, "published value"))
+            : await CreateContentInstanceWithValue(contentType, (null, "published value"));
+
+        if (isElement)
+        {
+            ElementService.Publish((IElement)instance, ["*"]);
+            var elementToEdit = ElementService.GetById(instance.Key);
+            elementToEdit!.SetValue(VarianceTestPropertyAlias, "draft edited value", null);
+            ElementService.Save(elementToEdit);
+        }
+        else
+        {
+            ContentService.Publish((IContent)instance, ["*"]);
+            var contentToEdit = ContentService.GetById(instance.Key);
+            contentToEdit!.SetValue(VarianceTestPropertyAlias, "draft edited value", null);
+            ContentService.Save(contentToEdit);
+        }
+
+        var propertyType = contentType.PropertyTypes.Single(p => p.Alias == VarianceTestPropertyAlias);
+        propertyType.Variations = ContentVariation.Culture;
+        await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
+
+        var defaultCulture = await LanguageService.GetDefaultIsoCodeAsync();
+
+        IPublishableContentBase? reloadedDraft = isElement
+            ? ElementService.GetById(instance.Key)
+            : ContentService.GetById(instance.Key);
+        Assert.IsNotNull(reloadedDraft);
+        Assert.AreEqual("draft edited value", reloadedDraft!.GetValue<string>(VarianceTestPropertyAlias, defaultCulture));
+        Assert.IsNull(reloadedDraft.GetValue<string>(VarianceTestPropertyAlias));
+        Assert.IsNull(reloadedDraft.GetValue<string>(VarianceTestPropertyAlias, "da-DK"));
+
+        var publishedVersionId = reloadedDraft.PublishedVersionId;
+        IPublishableContentBase? publishedVersion = isElement
+            ? ElementService.GetVersions(instance.Id).FirstOrDefault(v => v.VersionId == publishedVersionId)
+            : ContentService.GetVersions(instance.Id).FirstOrDefault(v => v.VersionId == publishedVersionId);
+        Assert.IsNotNull(publishedVersion, "Expected the originally-published version to still exist after the variance change.");
+        Assert.AreEqual("published value", publishedVersion!.GetValue<string>(VarianceTestPropertyAlias, defaultCulture));
+        Assert.IsNull(publishedVersion.GetValue<string>(VarianceTestPropertyAlias));
+        Assert.IsNull(publishedVersion.GetValue<string>(VarianceTestPropertyAlias, "da-DK"));
+    }
+
     private async Task<IContentType> CreateVarianceCapableType(bool isElement, ContentVariation propertyVariation = ContentVariation.Nothing)
     {
         var contentType = new ContentTypeBuilder()
