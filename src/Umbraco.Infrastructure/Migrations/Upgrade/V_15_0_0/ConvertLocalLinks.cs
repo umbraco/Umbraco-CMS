@@ -369,10 +369,12 @@ public class ConvertLocalLinks : MigrationBase
         // caching it would otherwise trigger is wasted work that issues per-property content/media reads
         // in separate scopes, contending with this migration's own scope. Suppress it.
         object? dbValue;
+#pragma warning disable CS0618 // Type or member is obsolete
         using (CacheReferencedEntitiesSuppression.Suppress())
         {
             dbValue = valueEditor.FromEditor(new ContentPropertyData(editorValue, null), null);
         }
+#pragma warning restore CS0618 // Type or member is obsolete
 
         if (dbValue is not string stringValue || stringValue.DetectIsJson() is false)
         {

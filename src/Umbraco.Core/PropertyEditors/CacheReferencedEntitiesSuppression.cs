@@ -19,6 +19,10 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// removed alongside it once referenced entities are loaded via lazy read locks.
 /// </para>
 /// </remarks>
+[Obsolete("The ICacheReferencedEntities interface is available for support of request caching retrieved entities in property value editors that implement it. " +
+          "The intention is to supersede this with lazy loaded read locks, which will make this unnecessary. " +
+          "When the interface is removed, these extension methods will also be removed. " +
+          "Scheduled for removal in Umbraco 19.")]
 public static class CacheReferencedEntitiesSuppression
 {
     private static readonly AsyncLocal<bool> _suppressedState = new();

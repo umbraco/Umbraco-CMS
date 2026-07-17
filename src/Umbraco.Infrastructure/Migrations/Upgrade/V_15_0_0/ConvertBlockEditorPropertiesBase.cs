@@ -255,10 +255,12 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
                             // referenced-entity caching it would otherwise trigger is wasted work during a
                             // migration and issues per-property reads that contend with the migration's scope.
                             object? dbValue;
+#pragma warning disable CS0618 // Type or member is obsolete
                             using (CacheReferencedEntitiesSuppression.Suppress())
                             {
                                 dbValue = valueEditor.FromEditor(new ContentPropertyData(editorValue, null), null);
                             }
+#pragma warning restore CS0618 // Type or member is obsolete
 
                             if (dbValue is not string stringValue || stringValue.DetectIsJson() is false)
                             {
