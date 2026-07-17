@@ -1,4 +1,4 @@
-import { umbUrlPatternToString } from '../utils/path/url-pattern-to-string.function.js';
+import { umbUrlPatternToString } from '@umbraco-cms/backoffice/utils';
 
 export type UmbPathPatternParamsType = { [key: string]: any };
 

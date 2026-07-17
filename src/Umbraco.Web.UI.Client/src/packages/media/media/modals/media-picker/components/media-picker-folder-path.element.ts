@@ -13,7 +13,7 @@ import {
 	property,
 	type PropertyValues,
 } from '@umbraco-cms/backoffice/external/lit';
-import type { UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbMediaTypeStructureRepository, type UmbAllowedMediaTypeModel } from '@umbraco-cms/backoffice/media-type';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -150,13 +150,26 @@ export class UmbMediaPickerFolderPathElement extends UmbLitElement {
 
 	#cancelFolderTypeSelection() {
 		this._selectingFolderType = false;
+		this.#focusAddFolderButton();
 	}
 
-	async #addFolder(e: UUIInputEvent) {
-		e.stopPropagation();
+	#focusAddFolderButton() {
+		requestAnimationFrame(() => {
+			this.getHostElement().shadowRoot!.querySelector<HTMLElement>('#add-folder')?.focus();
+		});
+	}
 
-		const newName = e.target.value as string;
+	#onSubmit(e: SubmitEvent) {
+		e.preventDefault();
+		const folderName = new FormData(e.target as HTMLFormElement).get('folderName');
+		this.#addFolder(typeof folderName === 'string' ? folderName : undefined);
+	}
+
+	async #addFolder(newName?: string) {
+		if (!this._typingNewFolder) return;
+
 		this._typingNewFolder = false;
+		this.#focusAddFolderButton();
 		if (!newName || !this.#selectedFolderType?.unique) return;
 
 		const newUnique = UmbId.new();
@@ -196,12 +209,17 @@ export class UmbMediaPickerFolderPathElement extends UmbLitElement {
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
-	#onKeypress(e: KeyboardEvent) {
-		if (e.key === 'Enter') {
-			requestAnimationFrame(() => {
-				const element = this.getHostElement().shadowRoot!.querySelector('#new-folder') as UUIInputElement;
-				element.blur();
-			});
+	#cancelFolderCreation() {
+		this._typingNewFolder = false;
+		this._selectingFolderType = false;
+		this.#focusAddFolderButton();
+	}
+
+	#onKeydown(e: KeyboardEvent) {
+		if (e.key === 'Escape') {
+			e.preventDefault();
+			e.stopImmediatePropagation();
+			this.#cancelFolderCreation();
 		}
 	}
 
@@ -225,12 +243,28 @@ export class UmbMediaPickerFolderPathElement extends UmbLitElement {
 
 	#renderFolderCreation() {
 		if (this._typingNewFolder) {
-			return html`<uui-input
-				id="new-folder"
-				label=${this.localize.term('create_enterFolderName')}
-				placeholder=${this.localize.term('create_enterFolderName')}
-				@blur=${this.#addFolder}
-				@keypress=${this.#onKeypress}></uui-input>`;
+			return html`
+				<uui-form>
+					<form id="new-folder-form" novalidate @submit=${this.#onSubmit}>
+						<uui-input
+							id="new-folder"
+							name="folderName"
+							label=${this.localize.term('create_enterFolderName')}
+							placeholder=${this.localize.term('create_enterFolderName')}
+							@keydown=${this.#onKeydown}>
+							<uui-button
+								slot="append"
+								type="button"
+								compact
+								label=${this.localize.term('general_cancel')}
+								@click=${this.#cancelFolderCreation}>
+								<uui-icon name="remove"></uui-icon>
+							</uui-button>
+						</uui-input>
+						<uui-button look="outline" type="submit" label=${this.localize.term('actions_create')}></uui-button>
+					</form>
+				</uui-form>
+			`;
 		}
 
 		if (this._selectingFolderType) {
@@ -254,6 +288,7 @@ export class UmbMediaPickerFolderPathElement extends UmbLitElement {
 		}
 
 		return html`<uui-button
+			id="add-folder"
 			label=${this.localize.term('visuallyHiddenTexts_createNewFolder')}
 			compact
 			@click=${this.#onAddFolderClick}>
@@ -267,15 +302,19 @@ export class UmbMediaPickerFolderPathElement extends UmbLitElement {
 				display: flex;
 				align-items: center;
 				margin: 0 var(--uui-size-3);
-				overflow: hidden;
 				min-width: 0;
 			}
 
-			#new-folder {
+			#new-folder-form {
+				display: flex;
+				align-items: center;
+				gap: var(--uui-size-2);
 				margin-left: var(--uui-size-2);
-				width: 150px;
-				height: 100%;
 				flex-shrink: 0;
+			}
+
+			#new-folder {
+				width: 220px;
 			}
 
 			#folder-type-selection {

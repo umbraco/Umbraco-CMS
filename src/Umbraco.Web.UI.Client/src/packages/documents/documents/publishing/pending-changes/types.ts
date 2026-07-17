@@ -1,11 +1,7 @@
 import type { UmbDocumentDetailModel } from '../../types.js';
-import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import type { UmbContentPublishedPendingChangesManagerProcessArgs } from '@umbraco-cms/backoffice/content';
 
-export interface UmbDocumentPublishedPendingChangesManagerProcessArgs {
-	persistedData: UmbDocumentDetailModel;
-	publishedData: UmbDocumentDetailModel;
-}
+export type UmbDocumentPublishedPendingChangesManagerProcessArgs =
+	UmbContentPublishedPendingChangesManagerProcessArgs<UmbDocumentDetailModel>;
 
-export interface UmbPublishedVariantWithPendingChanges {
-	variantId: UmbVariantId;
-}
+export type { UmbPublishedVariantWithPendingChanges } from '@umbraco-cms/backoffice/content';

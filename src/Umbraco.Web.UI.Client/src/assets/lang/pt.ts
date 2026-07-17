@@ -428,7 +428,7 @@ export default {
 		enterFolderName: 'Introduza um nome de pasta',
 		updateData: 'Escolha um tipo e um título',
 		noDocumentTypes:
-			'Não existem Tipos de Documento permitidos disponíveis para criar conteúdo aqui. Deve ativá-los em <strong>Tipos de Documento</strong> na secção <strong>Definições</strong>, editando os <strong>Tipos de nó filho permitidos</strong> em <strong>Permissões</strong>.',
+			'Não existem Tipos de Documento permitidos disponíveis para criar conteúdo aqui. Deve ativá-los em <strong>Tipos de Documento</strong> na secção <strong>Definições</strong>, editando os <strong>Tipos de nó filho permitidos</strong> em <strong>Estrutura</strong>.',
 		noDocumentTypesAtRoot:
 			'Não existem Tipos de Documento disponíveis para criar conteúdo aqui. Deve criá-los em <strong>Tipos de Documento</strong> na secção <strong>Definições</strong>.',
 		noDocumentTypesWithNoSettingsAccess:
@@ -436,9 +436,9 @@ export default {
 		noDocumentTypesEditPermissions: 'Editar permissões para este Tipo de Documento',
 		noDocumentTypesCreateNew: 'Criar um novo Tipo de Documento',
 		noDocumentTypesAllowedAtRoot:
-			'Não existem Tipos de Documento permitidos disponíveis para criar conteúdo aqui. Deve ativá-los em <strong>Tipos de Documento</strong> na secção <strong>Definições</strong>, alterando a opção <strong>Permitir como raiz</strong> em <strong>Permissões</strong>.',
+			'Não existem Tipos de Documento permitidos disponíveis para criar conteúdo aqui. Deve ativá-los em <strong>Tipos de Documento</strong> na secção <strong>Definições</strong>, alterando a opção <strong>Permitir como raiz</strong> em <strong>Estrutura</strong>.',
 		noMediaTypes:
-			'Não existem Tipos de Multimédia permitidos disponíveis para criar multimédia aqui. Deve ativá-los em <strong>Tipos de Multimédia</strong> na secção <strong>Definições</strong>, editando os <strong>Tipos de nó filho permitidos</strong> em <strong>Permissões</strong>.',
+			'Não existem Tipos de Multimédia permitidos disponíveis para criar multimédia aqui. Deve ativá-los em <strong>Tipos de Multimédia</strong> na secção <strong>Definições</strong>, editando os <strong>Tipos de nó filho permitidos</strong> em <strong>Estrutura</strong>.',
 		noMediaTypesWithNoSettingsAccess:
 			'A multimédia selecionada na árvore não permite a criação de nenhuma outra multimédia abaixo dela.',
 		noMediaTypesEditPermissions: 'Editar permissões para este Tipo de Multimédia',
@@ -1728,8 +1728,16 @@ export default {
 		chooseChildNode: 'Escolher nó filho',
 		compositionsDescription:
 			'Herde separadores e propriedades de um Tipo de Documento existente. Novos separadores serão adicionados ao Tipo de Documento atual ou fundidos se existir um separador com um nome idêntico.',
+		compositionsDescriptionMediaType:
+			'Herde separadores e propriedades de um Tipo de Multimédia existente. Novos separadores serão adicionados ao Tipo de Multimédia atual ou fundidos se existir um separador com um nome idêntico.',
+		compositionsDescriptionMemberType:
+			'Herde separadores e propriedades de um Tipo de Membro existente. Novos separadores serão adicionados ao Tipo de Membro atual ou fundidos se existir um separador com um nome idêntico.',
 		compositionInUse: 'Este Tipo de Conteúdo é usado numa composição e, portanto, não pode ser composto ele próprio.',
+		compositionInUseMediaType: 'Este Tipo de Multimédia é usado numa composição e, portanto, não pode ser composto ele próprio.',
+		compositionInUseMemberType: 'Este Tipo de Membro é usado numa composição e, portanto, não pode ser composto ele próprio.',
 		noAvailableCompositions: 'Não existem Tipos de Conteúdo disponíveis para usar como composição.',
+		noAvailableCompositionsMediaType: 'Não existem Tipos de Multimédia disponíveis para usar como composição.',
+		noAvailableCompositionsMemberType: 'Não existem Tipos de Membro disponíveis para usar como composição.',
 		compositionRemoveWarning:
 			'Remover uma composição eliminará todos os dados de propriedade associados. Depois de guardar o Tipo de Documento, não há como voltar atrás.',
 		availableEditors: 'Criar novo',
@@ -1766,6 +1774,8 @@ export default {
 		tabHasNoSortOrder: 'o separador não tem ordem',
 		compositionUsageHeading: 'Onde é usada esta composição?',
 		compositionUsageSpecification: 'Esta composição é atualmente usada na composição dos seguintes Tipos de Conteúdo:',
+		compositionUsageSpecificationMediaType: 'Esta composição é atualmente usada na composição dos seguintes Tipos de Multimédia:',
+		compositionUsageSpecificationMemberType: 'Esta composição é atualmente usada na composição dos seguintes Tipos de Membro:',
 		variantsHeading: 'Variação',
 		cultureVariantHeading: 'Permitir variar por cultura',
 		segmentVariantHeading: 'Permitir segmentação',
