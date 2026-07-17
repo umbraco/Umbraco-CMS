@@ -10,6 +10,10 @@ export const manifests: Array<UmbExtensionManifest> = [
 		meta: {
 			columns: [
 				{
+					field: 'manifest.alias',
+					label: '#general_alias',
+				},
+				{
 					field: 'manifest.type',
 					label: '#general_type',
 				},
