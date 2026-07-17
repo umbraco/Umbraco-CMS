@@ -34,8 +34,6 @@ internal sealed class ElementContainerPermissionServiceTests : UmbracoIntegratio
     [Test]
     public async Task GetPermissionsAsync_Returns_Mixed_Container_And_Element_Granular_Permissions()
     {
-        // Arrange - a single folder grant mixes a container-family verb and an element-family verb,
-        // proving both resolve together from the same ElementContainerGranularPermission key.
         var folderKey = await CreateFolder();
         var user = await CreateUserInGroup(
             granularPermissions: [ActionElementContainerNew.ActionLetter, ActionElementNew.ActionLetter],
@@ -72,9 +70,32 @@ internal sealed class ElementContainerPermissionServiceTests : UmbracoIntegratio
         Assert.That(result[0].Permissions, Is.EquivalentTo(new[] { ActionElementContainerBrowse.ActionLetter }));
     }
 
-    private async Task<Guid> CreateFolder()
+    [Test]
+    public async Task GetPermissionsAsync_Cascades_Grant_To_A_Nested_Subfolder()
     {
-        var result = await ElementContainerService.CreateAsync(null, Guid.NewGuid().ToString(), null, Constants.Security.SuperUserKey);
+        var parentFolderKey = await CreateFolder();
+        var subfolderKey = await CreateFolder(parentFolderKey);
+
+        var user = await CreateUserInGroup(
+            granularPermissions: [ActionElementContainerNew.ActionLetter],
+            defaultPermissions: [],
+            folderKey: parentFolderKey);
+
+        // Act
+        NodePermissions[] result = (await ElementContainerPermissionService.GetPermissionsAsync(user, [subfolderKey])).ToArray();
+
+        // Assert - the parent's grant surfaces for the subfolder...
+        Assert.That(result, Has.Length.EqualTo(1));
+        Assert.That(result[0].NodeKey, Is.EqualTo(subfolderKey));
+        Assert.That(result[0].Permissions, Contains.Item(ActionElementContainerNew.ActionLetter));
+
+        // ...but a verb that was never granted is absent.
+        Assert.That(result[0].Permissions, Does.Not.Contain(ActionElementContainerDelete.ActionLetter));
+    }
+
+    private async Task<Guid> CreateFolder(Guid? parentKey = null)
+    {
+        var result = await ElementContainerService.CreateAsync(null, Guid.NewGuid().ToString(), parentKey, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success, $"Failed to create folder: {result.Status}");
         return result.Result!.Key;
     }

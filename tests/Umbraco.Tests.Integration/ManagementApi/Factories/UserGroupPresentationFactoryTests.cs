@@ -391,8 +391,68 @@ internal sealed class UserGroupPresentationFactoryTests : UmbracoIntegrationTest
         Assert.Multiple(() =>
         {
             Assert.IsTrue(containerGranularPermissions.All(x => x.Key == folderKey));
-            Assert.IsTrue(containerGranularPermissions.Select(x => x.Permission).Contains("Umb.ElementContainer.Create"));
-            Assert.IsTrue(containerGranularPermissions.Select(x => x.Permission).Contains("Umb.Element.Create"));
+            Assert.That(
+                containerGranularPermissions.Select(x => x.Permission),
+                Is.EquivalentTo(new[] { "Umb.ElementContainer.Create", "Umb.Element.Create" }));
+        });
+
+        // Reload to prove the rows persist and deserialize back via MapFromDto, not just the in-memory save object.
+        var reloadedGroup = await UserGroupService.GetAsync(userGroup.Key);
+        Assert.IsNotNull(reloadedGroup);
+
+        var reloadedContainerGranularPermissions = reloadedGroup!.GranularPermissions.OfType<ElementContainerGranularPermission>().ToArray();
+        Assert.AreEqual(2, reloadedContainerGranularPermissions.Length);
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(reloadedContainerGranularPermissions.All(x => x.Key == folderKey));
+            Assert.That(
+                reloadedContainerGranularPermissions.Select(x => x.Permission),
+                Is.EquivalentTo(new[] { "Umb.ElementContainer.Create", "Umb.Element.Create" }));
+        });
+    }
+
+    [Test]
+    public async Task Usergroup_Granular_Permissions_For_ElementContainer_Merge_Back_Into_One_Presentation_Model()
+    {
+        var containerResult = await ElementContainerService.CreateAsync(
+            null,
+            "Test Container",
+            null,
+            Constants.Security.SuperUserKey);
+        var folderKey = containerResult.Result.Key;
+
+        var createModel = new CreateUserGroupRequestModel
+        {
+            Alias = "testAlias",
+            FallbackPermissions = new HashSet<string>(),
+            HasAccessToAllLanguages = true,
+            Languages = new List<string>(),
+            Name = "Test Name",
+            Sections = ["Umb.Section.Content"],
+            Permissions = new HashSet<IPermissionPresentationModel>
+            {
+                new ElementContainerPermissionPresentationModel
+                {
+                    ElementContainer = new ReferenceByIdModel(folderKey),
+                    Verbs = new HashSet<string>(["Umb.ElementContainer.Create", "Umb.Element.Create"]),
+                },
+            },
+        };
+
+        var attempt = await UserGroupPresentationFactory.CreateAsync(createModel);
+        var userGroupCreateAttempt = await UserGroupService.CreateAsync(attempt.Result, Constants.Security.SuperUserKey);
+        var userGroup = userGroupCreateAttempt.Result;
+        Assert.IsTrue(userGroupCreateAttempt.Success);
+
+        var responseModel = await UserGroupPresentationFactory.CreateAsync(userGroup);
+        var elementContainerPresentationModels = responseModel.Permissions.OfType<ElementContainerPermissionPresentationModel>().ToArray();
+        Assert.AreEqual(1, elementContainerPresentationModels.Length);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(folderKey, elementContainerPresentationModels[0].ElementContainer.Id);
+            Assert.That(
+                elementContainerPresentationModels[0].Verbs,
+                Is.EquivalentTo(new[] { "Umb.ElementContainer.Create", "Umb.Element.Create" }));
         });
     }
 
@@ -437,6 +497,17 @@ internal sealed class UserGroupPresentationFactoryTests : UmbracoIntegrationTest
             Assert.IsNotEmpty(userGroup.GranularPermissions);
             Assert.AreEqual(folderKey, userGroup.GranularPermissions.First().Key);
             Assert.AreEqual(string.Empty, userGroup.GranularPermissions.First().Permission);
+        });
+
+        var reloadedGroup = await UserGroupService.GetAsync(userGroup.Key);
+        Assert.IsNotNull(reloadedGroup);
+
+        var reloadedPermission = reloadedGroup!.GranularPermissions.OfType<ElementContainerGranularPermission>().SingleOrDefault();
+        Assert.IsNotNull(reloadedPermission);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(folderKey, reloadedPermission!.Key);
+            Assert.AreEqual(string.Empty, reloadedPermission!.Permission);
         });
     }
 

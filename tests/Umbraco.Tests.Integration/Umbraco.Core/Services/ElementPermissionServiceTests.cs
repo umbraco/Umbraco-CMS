@@ -89,8 +89,6 @@ internal sealed class ElementPermissionServiceTests : UmbracoIntegrationTest
     [Test]
     public async Task GetPermissionsAsync_Returns_Permissions_Granted_At_An_Ancestor_ElementContainer()
     {
-        // Arrange - the grant lives on the folder (via ElementContainerGranularPermission), not the
-        // element itself, proving the element-family verb cascades down through the ancestor path.
         var folderResult = await ElementContainerService.CreateAsync(
             null,
             Guid.NewGuid().ToString(),
