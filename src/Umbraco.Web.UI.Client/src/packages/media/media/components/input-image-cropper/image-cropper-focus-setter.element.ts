@@ -15,6 +15,7 @@ import {
 	state,
 	property,
 	query,
+	when,
 } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
