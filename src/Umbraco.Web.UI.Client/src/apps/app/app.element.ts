@@ -246,6 +246,9 @@ export class UmbAppElement extends UmbLitElement {
 					// TODO: Remove dependency on current user context from the app element in future [MR]
 					this.#loadCurrentUser();
 				} else {
+					// Authorization was lost (e.g. session timeout). Invalidate the loaded current user,
+					// as a subsequent sign-in may be for a different user.
+					this.#currentUser?.invalidate();
 					// TODO: Unregistering all extensions from v.18 [NL]
 					//void this.#unregisterExtensions();
 				}
