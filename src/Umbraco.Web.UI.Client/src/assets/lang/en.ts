@@ -1022,6 +1022,7 @@ export default {
 		username: 'Username',
 		value: 'Value',
 		view: 'View',
+		weight: 'Weight',
 		welcome: 'Welcome...',
 		width: 'Width',
 		yes: 'Yes',
