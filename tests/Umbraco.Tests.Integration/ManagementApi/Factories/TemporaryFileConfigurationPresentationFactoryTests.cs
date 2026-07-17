@@ -12,15 +12,9 @@ using Umbraco.Cms.Tests.Integration.Testing;
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.Factories;
 
 /// <summary>
-/// Regression tests ensuring that configuration supplied under Umbraco:CMS:Content:Imaging reaches the
+/// Verifies that image file type configuration under Umbraco:CMS:Content:Imaging is surfaced by the
 /// temporary file configuration presentation factory.
 /// </summary>
-/// <remarks>
-/// TemporaryFileConfigurationPresentationFactory previously read a standalone ContentImagingSettings options
-/// instance that was never bound to a configuration section, so user configuration was silently ignored and only
-/// the compiled defaults were returned. Imaging settings are now read from the bound ContentSettings.Imaging
-/// nested section.
-/// </remarks>
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
 internal sealed class TemporaryFileConfigurationPresentationFactoryTests : UmbracoIntegrationTest
