@@ -1,4 +1,5 @@
 import { UMB_WORKSPACE_PATH_VARIANT_DELIMITER } from './constants.js';
+import { UMB_MODAL_ROUTE_PATH_SEGMENT } from '@umbraco-cms/backoffice/router';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 /**
@@ -49,7 +50,7 @@ export function resolveStaleVariantRoute(args: UmbStaleVariantRouteResolverArgs)
 
 	// Skip while a modal is layered on top — closing it restores the pre-modal URL and dispatches
 	// a changestate event, at which point the correction can run against the settled URL:
-	if (pathSuffix.split('/').includes('modal')) return null;
+	if (pathSuffix.split('/').includes(UMB_MODAL_ROUTE_PATH_SEGMENT)) return null;
 
 	const parts = variantPart.split(UMB_WORKSPACE_PATH_VARIANT_DELIMITER);
 	const isValid = (part: string) => variants.some((v) => v.unique === part);
