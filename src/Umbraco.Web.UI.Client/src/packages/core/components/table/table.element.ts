@@ -404,6 +404,7 @@ export class UmbTableElement extends UmbLitElement {
 		const selectableIds = this.items.filter((item) => this.#isSelectableItem(item)).map((item) => item.id);
 		const selectionSet = new Set(this.selection);
 		const allSelected = selectableIds.length > 0 && selectableIds.every((id) => selectionSet.has(id));
+		const indeterminate = !allSelected && selectableIds.some((id) => selectionSet.has(id));
 		return html`
 			<uui-table-head-cell style="--uui-table-cell-padding: 0; text-align: center;">
 				${when(
@@ -413,7 +414,8 @@ export class UmbTableElement extends UmbLitElement {
 							aria-label=${this.localize.term('general_selectAll')}
 							style="padding: var(--uui-size-4) var(--uui-size-5);"
 							@change="${this._handleAllRowsCheckboxChange}"
-							?checked=${allSelected}></uui-checkbox>
+							?checked=${allSelected}
+							.indeterminate=${indeterminate}></uui-checkbox>
 					`,
 				)}
 			</uui-table-head-cell>
