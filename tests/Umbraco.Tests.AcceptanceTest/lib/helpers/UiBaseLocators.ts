@@ -2071,7 +2071,7 @@ export class UiBaseLocators extends BasePage {
   ) {
     const responses: Response[] = [];
 
-    let resolveResponses: () => void;
+    let resolveResponses!: () => void;
     const responsePromise = new Promise<void>((resolve) => {
       resolveResponses = resolve;
     });

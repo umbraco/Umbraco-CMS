@@ -163,9 +163,11 @@ export class ApiHelpers {
 
   // Asserts a create/POST succeeded and returns the new entity id from the Location header.
   // Surfaces a failed create as a clear assertion instead of an opaque crash on a missing header.
-  getIdFromLocation(response: APIResponse) {
+  getIdFromLocation(response: APIResponse): string {
     expect(response.ok(), `Expected a successful response but got ${response.status()} for ${response.url()}`).toBeTruthy();
-    return response.headers()['location']?.split('/').pop();
+    const location = response.headers()['location'];
+    expect(location, `Expected Location header to be present for ${response.url()}`).toBeTruthy();
+    return location.split('/').pop()!;
   }
 
   // Examine indexes asynchronously after create; await this before a UI search so the item is findable.

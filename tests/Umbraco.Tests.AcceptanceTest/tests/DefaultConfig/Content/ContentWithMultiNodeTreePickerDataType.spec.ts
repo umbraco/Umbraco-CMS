@@ -158,8 +158,8 @@ test('can search and see only allowed member types', async ({umbracoApi, umbraco
     password : '0123456789',
   };
   const notAllowedTestMemberId = await umbracoApi.member.createDefaultMember(notAllowedTestMember.name, notAllowedMemberTypeId, notAllowedTestMember.email, notAllowedTestMember.username, notAllowedTestMember.password);
-  await umbracoApi.member.waitUntilIndexed('Allowed Test Member', allowedTestMemberId);
-  await umbracoApi.member.waitUntilIndexed('Allowed Test Member', notAllowedTestMemberId);
+  await umbracoApi.member.waitUntilIndexed(allowedTestMemberName, allowedTestMemberId);
+  await umbracoApi.member.waitUntilIndexed(notAllowedTestMemberName, notAllowedTestMemberId);
   // Create a content with custom tree picker with predefined allowed member types
   const customDataTypeId = await umbracoApi.dataType.createMultiNodeTreePickerDataTypeWithAllowedTypes(customDataTypeName, allowedMemberTypeData.id, 'member');
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
