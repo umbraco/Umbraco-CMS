@@ -38,7 +38,7 @@ Umbraco.Cms.Imaging.ImageSharp/
 
 Two imaging packages exist:
 - **Umbraco.Cms.Imaging.ImageSharp** (this package) - Uses ImageSharp 4.x (default)
-- **Umbraco.Cms.Imaging.ImageSharp2** - Uses ImageSharp 2.x for backwards compatibility, and as the option free of ImageSharp's changed licence requirements from 3+
+- **Umbraco.Cms.Imaging.ImageSharp2** - Uses ImageSharp 2.x for backwards compatibility, and as the option free of ImageSharp's changed license requirements from 3+
 
 **Key difference**: ImageSharp 3.x+ WebP encoder defaults to Lossless (10x larger files), so this package explicitly sets `WebpFileFormatType.Lossy` at `ConfigureImageSharpMiddlewareOptions.cs:108-115`.
 

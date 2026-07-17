@@ -84,7 +84,7 @@ Size size = image.Image.Size;
 - Migrating from Umbraco versions that used ImageSharp 2.x
 - Third-party packages have hard dependency on ImageSharp 2.x
 - Need exact byte-for-byte output compatibility with existing cached images
-- Prefer to avoid ImageSharp changed license from 3+
+- Prefer to avoid ImageSharp's license change in v3+
 
 **Use ImageSharp (4.x) when:**
 - New installations (this is the default, referenced by the `Umbraco.Cms` meta-package)
