@@ -4,8 +4,6 @@ Image processing library using **ImageSharp 2.x** for backwards compatibility wi
 
 **Namespace Note**: Uses `Umbraco.Cms.Imaging.ImageSharp` (same as the v4 package) for drop-in replacement - no code changes needed when switching.
 
-**Licensing Note**: ImageSharp 2.x predates the build-time licence enforcement introduced in ImageSharp 4 (see the v4 package's `CLAUDE.md` §6). This package therefore has **no licence machinery at all**, making it the option for users who prefer to avoid the Six Labors Community licence entirely.
-
 ---
 
 ## 1. Architecture
@@ -46,7 +44,6 @@ Umbraco.Cms.Imaging.ImageSharp2/
 | Feature | ImageSharp2 (this) | ImageSharp (4.x) |
 |---------|-------------------|------------------|
 | **Package version** | 2.1.13 - 2.x | 4.x |
-| **Build-time licence check** | None (predates enforcement) | Present (suppressed via `ExcludeAssets="build"`) |
 | **HMAC signing** | Not supported | Supported |
 | **WebP default** | Lossy (native) | Lossless (overridden to Lossy) |
 | **Cache buster param** | `rnd` only | `rnd` or `v` |
@@ -87,7 +84,7 @@ Size size = image.Image.Size;
 - Migrating from Umbraco versions that used ImageSharp 2.x
 - Third-party packages have hard dependency on ImageSharp 2.x
 - Need exact byte-for-byte output compatibility with existing cached images
-- Prefer to avoid ImageSharp 4's Six Labors Community licence / build-time enforcement entirely
+- Prefer to avoid ImageSharp changed license from 3+
 
 **Use ImageSharp (4.x) when:**
 - New installations (this is the default, referenced by the `Umbraco.Cms` meta-package)
