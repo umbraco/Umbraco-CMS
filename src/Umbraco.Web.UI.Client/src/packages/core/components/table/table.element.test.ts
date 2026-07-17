@@ -57,7 +57,7 @@ describe('UmbTableElement', () => {
 			await toggleSelectAll(true);
 
 			expect(element.selection).to.have.members(['1', '2', '3']);
-			expect(element.selection.length).to.equal(3);
+			expect(element.selection).to.have.lengthOf(3);
 		});
 
 		it('excludes non-selectable rows from the current page', async () => {
