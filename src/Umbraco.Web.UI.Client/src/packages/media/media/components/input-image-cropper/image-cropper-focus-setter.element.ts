@@ -15,7 +15,6 @@ import {
 	state,
 	property,
 	query,
-	when,
 } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
@@ -247,18 +246,16 @@ export class UmbImageCropperFocusSetterElement extends UmbLitElement {
 				@mousedown=${this._handleGridDrag}
 				@touchstart=${this._handleGridDrag}>
 				<img id="image" @keydown=${() => nothing} src=${this.src} alt="" />
-				${when(
-					this.focalPoint !== null && !this.hideFocalPoint,
-					() => html`
-						<span
-							id="focal-point"
-							class=${classMap({ 'focal-point--dragging': this._isDraggingGridHandle })}
-							tabindex=${ifDefined(this.disabled ? undefined : '0')}
-							aria-label=${this.localize.term('general_focalPoint')}
-							@keydown=${this.#handleGridKeyDown}>
-						</span>
-					`,
-				)}
+				<span
+					id="focal-point"
+					class=${classMap({ 
+						'focal-point--dragging': this._isDraggingGridHandle, 
+						hidden: this.focalPoint === null || this.hideFocalPoint 
+					})}
+					tabindex=${ifDefined(this.disabled ? undefined : '0')}
+					aria-label=${this.localize.term('general_focalPoint')}
+					@keydown=${this.#handleGridKeyDown}>
+				</span>
 			</div>
 		`;
 	}
@@ -319,6 +316,9 @@ export class UmbImageCropperFocusSetterElement extends UmbLitElement {
 		.focal-point--dragging {
 			cursor: none;
 			transform: scale(1.5);
+		}
+		#focal-point.hidden {
+			display: none;
 		}
 	`;
 }
