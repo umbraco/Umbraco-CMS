@@ -16,6 +16,11 @@ export class DocumentApiHelper {
     return await response.json();
   }
 
+  // Wait until the document is searchable (Examine index caught up) before searching for it in the UI.
+  async waitUntilIndexed(query: string, id: string) {
+    await this.api.waitUntilItemIsIndexed(ConstantHelper.apiEndpoints.documentSearch, query, id);
+  }
+
   async doesExist(id: string) {
     const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/document/' + id);
     return response.status() === 200;
@@ -26,7 +31,7 @@ export class DocumentApiHelper {
       return;
     }
     const response = await this.api.post(this.api.baseUrl + '/umbraco/management/api/v1/document', document);
-    return response.headers().location.split("v1/document/").pop();
+    return this.api.getIdFromLocation(response);
   }
 
   async delete(id: string) {
@@ -121,7 +126,12 @@ export class DocumentApiHelper {
     for (const document of jsonDocuments.items) {
       for (const variant of document.variants) {
         if (variant.name === name) {
-          return this.get(document.id);
+          const found = await this.get(document.id);
+          // A trashed document can still be returned by the tree endpoint; it only "exists" in the
+          // recycle bin (checked via doesItemExistInRecycleBin), so don't report it as present.
+          if (!found.isTrashed) {
+            return found;
+          }
         }
       }
       if (document.hasChildren) {

@@ -24,7 +24,7 @@ export class DocumentBlueprintApiHelper {
       return;
     }
     const response = await this.api.post(this.api.baseUrl + '/umbraco/management/api/v1/document-blueprint', documentBlueprint);
-    return response.headers().location.split("v1/document-blueprint/").pop();
+    return this.api.getIdFromLocation(response);
   }
 
   async delete(id: string) {
@@ -143,7 +143,7 @@ export class DocumentBlueprintApiHelper {
       }
     };
     const response = await this.api.post(this.api.baseUrl + '/umbraco/management/api/v1/document-blueprint/from-document', documentBlueprintData);
-    return response.headers().location.split("v1/document-blueprint/").pop();
+    return this.api.getIdFromLocation(response);
   }
 
   async createDocumentBlueprintWithTextBoxValue(documentBlueprintName: string, documentTypeId: string, dataTypeName: string, text: string) {
@@ -198,7 +198,7 @@ export class DocumentBlueprintApiHelper {
           .done()
         .done()
       .build();
-    
+
     return await this.create(documentBlueprint);
   }
 
@@ -264,4 +264,4 @@ export class DocumentBlueprintApiHelper {
 
     return await this.create(documentBlueprint);
   }
-} 
+}

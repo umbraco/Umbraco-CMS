@@ -98,6 +98,7 @@ test('can edit password', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   const updatedPassword = '9876543210';
   memberTypeId = await umbracoApi.memberType.createDefaultMemberType(memberTypeName);
   memberId = await umbracoApi.member.createDefaultMember(memberName, memberTypeId, email, username, password);
+  const passwordChangeDateBeforeEdit = (await umbracoApi.member.get(memberId)).lastPasswordChangeDate;
   await umbracoUi.member.goToMembers();
 
   // Act
@@ -106,6 +107,10 @@ test('can edit password', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.member.enterNewPassword(updatedPassword);
   await umbracoUi.member.enterConfirmNewPassword(updatedPassword);
   await umbracoUi.member.clickSaveButtonAndWaitForMemberToBeUpdated();
+
+  // Assert
+  const memberData = await umbracoApi.member.get(memberId);
+  expect(memberData.lastPasswordChangeDate).not.toBe(passwordChangeDateBeforeEdit);
 });
 
 test('can add member group', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {

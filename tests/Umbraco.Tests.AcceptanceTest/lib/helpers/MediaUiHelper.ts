@@ -129,23 +129,23 @@ export class MediaUiHelper extends UiBaseLocators {
       await this.clickMediaCaretButtonForName(name);
     }
   }
-  
+
   async doesMediaGridValuesMatch(expectedValues: string[]) {
-    return expectedValues.forEach((text, index) => {
-      expect(this.mediaCardItemsValues.nth(index)).toHaveText(text);
-    });
+    for (const [index, text] of expectedValues.entries()) {
+      await expect(this.mediaCardItemsValues.nth(index)).toHaveText(text);
+    }
   }
 
   async doesMediaListHeaderValuesMatch(expectedValues: string[]) {
-    return expectedValues.forEach((text, index) => {
-      expect(this.mediaListHeader.nth(index)).toHaveText(text);
-    });
+    for (const [index, text] of expectedValues.entries()) {
+      await expect(this.mediaListHeader.nth(index)).toHaveText(text);
+    }
   }
 
   async doesMediaListNameValuesMatch(expectedValues: string[]) {
-    return expectedValues.forEach((text, index) => {
-      expect(this.mediaListNameValues.nth(index)).toHaveText(text);
-    });
+    for (const [index, text] of expectedValues.entries()) {
+      await expect(this.mediaListNameValues.nth(index)).toHaveText(text);
+    }
   }
 
   async isMediaGridViewVisible(isVisible: boolean = true) {

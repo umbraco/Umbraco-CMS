@@ -81,7 +81,7 @@ export class MediaTypeApiHelper {
       return;
     }
     const response = await this.api.post(this.api.baseUrl + '/umbraco/management/api/v1/media-type', mediaType);
-    return response.headers().location.split("/").pop();
+    return this.api.getIdFromLocation(response);
   }
 
 
@@ -142,7 +142,7 @@ export class MediaTypeApiHelper {
       "parent": parentId ? {"id": parentId} : null
     }
     const response =  await this.api.post(this.api.baseUrl + '/umbraco/management/api/v1/media-type/folder', folder);
-    return response.headers().location.split("/").pop();
+    return this.api.getIdFromLocation(response);
   }
 
   async renameFolder(folderId: string, folderName: string) {

@@ -4,6 +4,9 @@ import {expect} from "@playwright/test";
 const contentName = 'TestContent';
 const documentTypeName = 'TestDocumentTypeForContent';
 const customDataTypeName = 'CustomMultiNodeTreePicker';
+const allowedTestMemberName = 'Allowed Test Member';
+const notAllowedTestMemberName = 'Not Allowed Test Member';
+const notAllowedMemberTypeName = 'Not Allowed Member Type';
 
 test.beforeEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
@@ -14,6 +17,9 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.document.ensureNameNotExists(contentName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
+  await umbracoApi.member.ensureNameNotExists(allowedTestMemberName);
+  await umbracoApi.member.ensureNameNotExists(notAllowedTestMemberName);
+  await umbracoApi.memberType.ensureNameNotExists(notAllowedMemberTypeName);
 });
 
 test('can create content with content picker with allowed types', async ({umbracoApi, umbracoUi}) => {
@@ -62,7 +68,9 @@ test('can search and see only allowed content types', async ({umbracoApi, umbrac
   const customDataTypeId = await umbracoApi.dataType.createMultiNodeTreePickerDataTypeWithAllowedTypes(customDataTypeName, allowedContentPickerDocumentTypeId);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
-  await umbracoApi.document.createDefaultDocument(notAllowedContentPickerName, documentTypeId);
+  const notAllowedContentPickerId = await umbracoApi.document.createDefaultDocument(notAllowedContentPickerName, documentTypeId);
+  await umbracoApi.document.waitUntilIndexed('Picker', allowedContentPickerId);
+  await umbracoApi.document.waitUntilIndexed('Picker', notAllowedContentPickerId);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
@@ -94,7 +102,9 @@ test('can search and see only allowed media types', async ({umbracoApi, umbracoU
   const allowedMediaPickerName = 'Test Image';
   const notAllowedMediaPickerName = 'Test Article';
   const allowedMediaPickerId = await umbracoApi.media.createDefaultMediaWithImage(allowedMediaPickerName);
-  await umbracoApi.media.createDefaultMediaWithArticle(notAllowedMediaPickerName);
+  const notAllowedMediaPickerId = await umbracoApi.media.createDefaultMediaWithArticle(notAllowedMediaPickerName);
+  await umbracoApi.media.waitUntilIndexed('Test', allowedMediaPickerId);
+  await umbracoApi.media.waitUntilIndexed('Test', notAllowedMediaPickerId);
   const imageMediaTypeData = await umbracoApi.mediaType.getByName('Image');
   // Create a content with custom tree picker with predefined allowed media types
   const customDataTypeId = await umbracoApi.dataType.createMultiNodeTreePickerDataTypeWithAllowedTypes(customDataTypeName, imageMediaTypeData.id, 'media');
@@ -129,13 +139,12 @@ test('can search and see only allowed media types', async ({umbracoApi, umbracoU
 test('can search and see only allowed member types', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   // Not allowed member type
-  const notAllowedMemberTypeName = 'Not Allowed Member Type';
   const notAllowedMemberTypeId = await umbracoApi.memberType.createDefaultMemberType(notAllowedMemberTypeName);
   // Allowed member type
   const allowedMemberTypeData = await umbracoApi.memberType.getByName('Member');
   // Allowed member
   const allowedTestMember = {
-    name : 'Allowed Test Member',
+    name : allowedTestMemberName,
     username : 'allowedTestMember',
     email : 'allowedTestMember@acceptance.test',
     password : '0123456789',
@@ -143,12 +152,14 @@ test('can search and see only allowed member types', async ({umbracoApi, umbraco
   const allowedTestMemberId = await umbracoApi.member.createDefaultMember(allowedTestMember.name, allowedMemberTypeData.id, allowedTestMember.email, allowedTestMember.username, allowedTestMember.password);
   // Not allowed member
   const notAllowedTestMember = {
-    name : 'Not Allowed Test Member',
+    name : notAllowedTestMemberName,
     username : 'notAllowedTestMember',
     email : 'notAllowedTestMember@acceptance.test',
     password : '0123456789',
   };
-  await umbracoApi.member.createDefaultMember(notAllowedTestMember.name, notAllowedMemberTypeId, notAllowedTestMember.email, notAllowedTestMember.username, notAllowedTestMember.password);
+  const notAllowedTestMemberId = await umbracoApi.member.createDefaultMember(notAllowedTestMember.name, notAllowedMemberTypeId, notAllowedTestMember.email, notAllowedTestMember.username, notAllowedTestMember.password);
+  await umbracoApi.member.waitUntilIndexed('Allowed Test Member', allowedTestMemberId);
+  await umbracoApi.member.waitUntilIndexed('Allowed Test Member', notAllowedTestMemberId);
   // Create a content with custom tree picker with predefined allowed member types
   const customDataTypeId = await umbracoApi.dataType.createMultiNodeTreePickerDataTypeWithAllowedTypes(customDataTypeName, allowedMemberTypeData.id, 'member');
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
@@ -171,9 +182,4 @@ test('can search and see only allowed member types', async ({umbracoApi, umbraco
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].value[0]['unique']).toEqual(allowedTestMemberId);
   expect(contentData.values[0].value[0]['type']).toEqual('member');
-
-  // Clean
-  await umbracoApi.member.ensureNameNotExists(allowedTestMember.name);
-  await umbracoApi.member.ensureNameNotExists(notAllowedTestMember.name);
-  await umbracoApi.memberType.ensureNameNotExists(notAllowedMemberTypeName);
 });

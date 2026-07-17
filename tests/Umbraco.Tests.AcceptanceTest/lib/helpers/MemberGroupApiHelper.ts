@@ -18,7 +18,7 @@ export class MemberGroupApiHelper {
       "id": id ? id : null,
     };
     const response = await this.api.post(this.api.baseUrl + '/umbraco/management/api/v1/member-group', memberGroupData);
-    return response.headers().location.split("v1/member-group/").pop();
+    return this.api.getIdFromLocation(response);
   }
 
   async rename(id: string, name: string) {

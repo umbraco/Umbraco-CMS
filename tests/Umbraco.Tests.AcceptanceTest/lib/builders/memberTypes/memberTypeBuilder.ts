@@ -13,6 +13,7 @@ export class MemberTypeBuilder {
   variesBySegment: boolean;
   collectionId: string;
   isElement: boolean;
+  allowedInLibrary: boolean;
   memberTypePropertyBuilder: MemberTypePropertyBuilder[];
   memberTypeContainerBuilder: MemberTypeContainerBuilder[];
   id: string;
@@ -64,6 +65,11 @@ export class MemberTypeBuilder {
     return this;
   }
 
+  withAllowedInLibrary(allowedInLibrary: boolean) {
+    this.allowedInLibrary = allowedInLibrary;
+    return this;
+  }
+
   addProperty() {
     const builder = new MemberTypePropertyBuilder(this);
     this.memberTypePropertyBuilder.push(builder);
@@ -100,6 +106,7 @@ export class MemberTypeBuilder {
       variesBySegment: this.variesBySegment || false,
       collection: this.collectionId ? {id: this.collectionId} : null,
       isElement: this.isElement || false,
+      allowedInLibrary: this.allowedInLibrary || false,
       properties: this.memberTypePropertyBuilder.map((builder) => {
         return builder.build();
       }) || [],

@@ -31,7 +31,7 @@ export class TemplateApiHelper {
     };
     const response = await this.api.post(this.api.baseUrl + '/umbraco/management/api/v1/template', templateData);
     // Returns the id of the created template
-    return response.headers().location.split("/").pop();
+    return this.api.getIdFromLocation(response);
   }
 
   async delete(id: string) {

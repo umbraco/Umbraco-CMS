@@ -57,7 +57,7 @@ export class MemberUiHelper extends UiBaseLocators {
   }
 
   async clickMemberLinkByName(memberName: string) {
-    await this.click(this.page.getByRole('link', {name: memberName}));
+    await this.click(this.page.getByRole('link', {name: memberName, exact: true}));
   }
 
   async isMemberWithNameVisible(memberName: string, isVisible: boolean = true) {

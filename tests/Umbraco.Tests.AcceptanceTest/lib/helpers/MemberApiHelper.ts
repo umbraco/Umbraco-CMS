@@ -1,4 +1,5 @@
 ﻿import {ApiHelpers} from "./ApiHelpers";
+import {ConstantHelper} from "./ConstantHelper";
 import {MemberBuilder} from "../builders";
 
 export class MemberApiHelper {
@@ -13,12 +14,17 @@ export class MemberApiHelper {
     return await response.json();
   }
 
+  // Wait until the member is searchable (Examine index caught up) before searching for it in the UI.
+  async waitUntilIndexed(query: string, id: string) {
+    await this.api.waitUntilItemIsIndexed(ConstantHelper.apiEndpoints.memberSearch, query, id);
+  }
+
   async create(member) {
     if (member == null) {
       return;
     }
     const response = await this.api.post(this.api.baseUrl + '/umbraco/management/api/v1/member', member);
-    return response.headers().location.split("v1/member/").pop();
+    return this.api.getIdFromLocation(response);
   }
 
   async setLockedOut(id: string, isLockedOut: boolean) {

@@ -1,5 +1,6 @@
 ﻿import {ApiHelpers} from "./ApiHelpers";
 import {AliasHelper} from "./AliasHelper";
+import {ConstantHelper} from "./ConstantHelper";
 import {MediaBuilder} from "../builders";
 
 export class MediaApiHelper {
@@ -7,6 +8,11 @@ export class MediaApiHelper {
 
   constructor(api: ApiHelpers) {
     this.api = api;
+  }
+
+  // Wait until the media item is searchable (Examine index caught up) before searching for it in the UI.
+  async waitUntilIndexed(query: string, id: string) {
+    await this.api.waitUntilItemIsIndexed(ConstantHelper.apiEndpoints.mediaSearch, query, id);
   }
 
   async ensureNameNotExists(name: string) {
@@ -46,7 +52,7 @@ export class MediaApiHelper {
       }
       if (child.hasChildren) {
         const result = await this.recurseChildren(name, child.id, toDelete);
-        if (result) { 
+        if (result) {
           return result;
         }
       }
@@ -90,7 +96,7 @@ export class MediaApiHelper {
       return;
     }
     const response = await this.api.post(this.api.baseUrl + '/umbraco/management/api/v1/media', media);
-    return response.headers().location.split("/").pop();
+    return this.api.getIdFromLocation(response);
   }
 
   async doesNameExist(name: string) {
@@ -103,10 +109,15 @@ export class MediaApiHelper {
 
     for (const media of jsonMedia.items) {
       if (media.variants[0].name === name) {
-        return await this.get(media.id);
+        const found = await this.get(media.id);
+        // A trashed media item can still be returned by the tree endpoint; it only "exists" in the
+        // recycle bin (checked via doesMediaItemExistInRecycleBin), so don't report it as present.
+        if (!found.isTrashed) {
+          return found;
+        }
       } else if (media.hasChildren) {
         const result = await this.recurseChildren(name, media.id, false);
-        if (result) { 
+        if (result) {
           return result;
         }
       }
@@ -120,7 +131,7 @@ export class MediaApiHelper {
 
     return urls[0].urlInfos[0].url;
   }
-  
+
   async getRecycleBinItems() {
     return await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/recycle-bin/media/root?skip=0&take=10000');
   }
@@ -148,8 +159,8 @@ export class MediaApiHelper {
   async getMediaPathByName(name: string) {
     const media = await this.getByName(name);
     const mediaUrl = await this.getMediaUrlWithoutBaseUrl(media.id);
-    
-    if (media && mediaUrl > 0) {
+
+    if (media && mediaUrl && mediaUrl.length > 0) {
       // Gets the random mediaPath for the media
       const mediaPath = mediaUrl.split('/media/').pop()?.split('/')[0];
       // Gets the file name from the mediaUrl
@@ -211,7 +222,7 @@ export class MediaApiHelper {
 
     return await this.create(media);
   }
-  
+
   async createDefaultMediaWithImage(mediaName: string) {
     const temporaryFile = await this.api.temporaryFile.createDefaultTemporaryImageFile();
     return await this.createDefaultMediaItem(mediaName, temporaryFile);
@@ -221,7 +232,7 @@ export class MediaApiHelper {
     const temporaryFile = await this.api.temporaryFile.createDefaultTemporaryArticleFile();
     return await this.createDefaultMediaItem(mediaName, temporaryFile);
   }
-  
+
   async createDefaultMediaWithImageAndParentId(mediaName: string, parentId: string) {
     const temporaryFile = await this.api.temporaryFile.createDefaultTemporaryImageFile();
     return await this.createDefaultMediaItemWithParentId(mediaName, parentId, temporaryFile);
@@ -282,7 +293,7 @@ export class MediaApiHelper {
           .done()
         .done()
       .build();
-    
+
     return await this.create(media);
   }
 

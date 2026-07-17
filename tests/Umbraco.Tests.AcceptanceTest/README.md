@@ -10,7 +10,7 @@ You can watch a video following these instructions [here](https://www.youtube.co
 
 ## Prerequisites
 
-- **Node.js 22+**
+- **Node.js 24** (see [`.nvmrc`](./.nvmrc); minimum enforced via `engines` is 20.19)
 - **A running installed Umbraco instance** on URL: [https://localhost:44339](https://localhost:44339) (default development port)
   - Install using `SqlServer`/`LocalDb` as the tests execute too fast for `SQLite` to handle
 

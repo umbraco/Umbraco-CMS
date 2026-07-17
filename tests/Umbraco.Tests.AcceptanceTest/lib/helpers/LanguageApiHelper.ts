@@ -29,7 +29,7 @@ export class LanguageApiHelper {
     };
     const response = await this.api.post(this.api.baseUrl + '/umbraco/management/api/v1/language', languageData);
     // Returns the id of the created language
-    return response.headers().location.split("/").pop();
+    return this.api.getIdFromLocation(response);
   }
 
   async update(isoCode: string, language: object) {
@@ -57,19 +57,19 @@ export class LanguageApiHelper {
     const jsonLanguages = await allLanguages.json();
 
     for (const language of jsonLanguages.items) {
-      if (language.name === name && language.isoCode !== null) {     
+      if (language.name === name && language.isoCode !== null) {
         return await this.delete(language.isoCode);
       }
     }
     return null;
   }
-  
+
   async ensureIsoCodeNotExists(isoCode: string) {
     const allLanguages = await this.getAll();
     const jsonLanguages = await allLanguages.json();
 
     for (const language of jsonLanguages.items) {
-      if (language.isoCode === isoCode) {     
+      if (language.isoCode === isoCode) {
         return await this.delete(language.isoCode);
       }
     }
@@ -79,12 +79,12 @@ export class LanguageApiHelper {
   async getAll() {
     return await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/language?skip=0&take=10000');
   }
-  
+
   async createDanishLanguage() {
     await this.ensureNameNotExists('Danish');
     return await this.create('Danish', false, false, 'da');
   }
-  
+
   async createFrenchLanguage() {
     await this.ensureNameNotExists('French');
     return await this.create('French', false, false, 'fr-FR');

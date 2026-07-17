@@ -78,7 +78,7 @@ export class PackageApiHelper {
 
     const response = await this.api.post(this.api.baseUrl + '/umbraco/management/api/v1/package/created', packageData);
     // Returns the id of the created package
-    return response.headers().location.split("/").pop();
+    return this.api.getIdFromLocation(response);
   }
 
   async getByName(name: string) {

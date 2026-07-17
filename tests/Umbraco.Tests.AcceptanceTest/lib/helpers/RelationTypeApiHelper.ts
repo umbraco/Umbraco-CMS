@@ -29,7 +29,7 @@ export class RelationTypeApiHelper {
 
     const response = await this.api.post(this.api.baseUrl + '/umbraco/management/api/v1/relation-type', relationTypeData);
     // Returns the id of the created relationType
-    return response.headers().location.split("/").pop();
+    return this.api.getIdFromLocation(response);
   }
 
   async update(id: string, relationType) {

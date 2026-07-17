@@ -25,7 +25,7 @@ export class DictionaryApiHelper {
     }
     const response = await this.api.post(this.api.baseUrl + '/umbraco/management/api/v1/dictionary', dictionary);
     // Returns the id of the created dictionary
-    return response.headers().location.split("/").pop();
+    return this.api.getIdFromLocation(response);
   }
 
   async update(id: string, dictionary: object) {
