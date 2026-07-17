@@ -114,7 +114,7 @@ internal sealed class RedirectTracker : IRedirectTracker
             {
                 try
                 {
-                    var route = _publishedUrlProvider.GetUrl(publishedContent.Key, UrlMode.Relative, culture).TrimEnd(Constants.CharArrays.ForwardSlash);
+                    var route = _publishedUrlProvider.GetUrl(publishedContent.Key, UrlMode.Relative, culture).TrimEnd('/');
                     if (IsValidRoute(route) && HasPublishedUrlSegment(publishedContent.Key, culture))
                     {
                         StoreRoute(oldRoutes, publishedContent, culture, route, domainRootId.Value);
@@ -227,7 +227,7 @@ internal sealed class RedirectTracker : IRedirectTracker
             .FirstOrDefault(x => _domainCache.HasAssigned(x, includeWildcards: true));
 
     private string GetUrl(Guid contentKey, string languageIsoCode) =>
-        _publishedUrlProvider.GetUrl(contentKey, UrlMode.Relative, languageIsoCode).TrimEnd(Constants.CharArrays.ForwardSlash);
+        _publishedUrlProvider.GetUrl(contentKey, UrlMode.Relative, languageIsoCode).TrimEnd('/');
 
     /// <summary>
     /// Strips the domain's path prefix from a relative URL so that the route stored for redirect
@@ -309,7 +309,7 @@ internal sealed class RedirectTracker : IRedirectTracker
                 // to the original. We resolve this by removing any existing redirect that points to the new route.
                 RemoveSelfReferencingRedirect(contentKey, newRoute);
 
-                _redirectUrlService.Register(oldRoute, contentKey, culture);
+                _redirectUrlService.RegisterWithStatus(oldRoute, contentKey, culture);
             }
             catch (Exception ex)
             {
@@ -341,7 +341,7 @@ internal sealed class RedirectTracker : IRedirectTracker
         {
             if (redirectUrl.Url == route)
             {
-                _redirectUrlService.Delete(redirectUrl.Key);
+                _redirectUrlService.DeleteWithStatus(redirectUrl.Key);
             }
         }
     }

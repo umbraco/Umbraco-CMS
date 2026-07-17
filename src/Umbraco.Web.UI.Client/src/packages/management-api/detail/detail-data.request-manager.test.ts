@@ -415,6 +415,40 @@ describe('UmbManagementApiDetailDataRequestManager', () => {
 			expect(result.data?.items).to.have.lengthOf(2);
 		});
 
+		it('returns all items when the number of IDs exceeds the batch size (chunked requests)', async () => {
+			const requestedIdBatches: Array<Array<string>> = [];
+			mockReadMany = async (ids: Array<string>) => {
+				requestedIdBatches.push([...ids]);
+				return {
+					data: {
+						items: ids.map((id) => ({ id, name: `Item ${id}` })),
+					},
+				};
+			};
+
+			manager = new UmbManagementApiDetailDataRequestManager(hostElement, {
+				create: mockCreate,
+				read: mockRead,
+				update: mockUpdate,
+				delete: mockDelete,
+				readMany: mockReadMany,
+				dataCache,
+				inflightRequestCache,
+			});
+
+			// 45 IDs forces UmbItemDataApiGetRequestController to chunk the request (batch size is 40).
+			const ids = Array.from({ length: 45 }, (_, index) => `item-${index}`);
+
+			const result = await manager.readMany(ids);
+
+			// The request should have been split into more than one chunk.
+			expect(requestedIdBatches.length).to.be.greaterThan(1);
+
+			// Every requested item must be returned, regardless of which chunk it was fetched in.
+			expect(result.data?.items).to.have.lengthOf(45);
+			expect(result.data?.items.map((item) => item.id)).to.include.members(ids);
+		});
+
 		it('uses cached items and only fetches non-cached items when connected', async () => {
 			mockServerEventContext.setIsConnected(true);
 

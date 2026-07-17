@@ -85,7 +85,7 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 	}
 
 	async #observeLanguages() {
-		const { data } = await this.#collectionRepository.requestCollection({});
+		const { data } = await this.#collectionRepository.requestAllItems();
 
 		// TODO: listen to changes
 		if (data) {

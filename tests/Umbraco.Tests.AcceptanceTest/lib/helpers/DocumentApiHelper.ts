@@ -1,6 +1,7 @@
 ﻿import {expect} from "@playwright/test";
 import {AliasHelper} from "./AliasHelper";
 import {ApiHelpers} from "./ApiHelpers";
+import {ConstantHelper} from "./ConstantHelper";
 import {DocumentBuilder, DocumentDomainBuilder} from "../builders";
 
 export class DocumentApiHelper {
@@ -159,6 +160,18 @@ export class DocumentApiHelper {
     }
     const response = await this.api.put(this.api.baseUrl + '/umbraco/management/api/v1/document/' + id + '/publish', publishSchedulesData);
     return response.status();
+  }
+
+  async unpublish(id: string, cultures: string[] | null = null) {
+    if (id == null) {
+      return;
+    }
+    const response = await this.api.put(this.api.baseUrl + '/umbraco/management/api/v1/document/' + id + '/unpublish', {cultures});
+    return response.status();
+  }
+
+  async unpublishDocumentWithCulture(id: string, culture: string) {
+    return await this.unpublish(id, [culture]);
   }
 
   async getDocumentUrl(id: string) {
@@ -461,6 +474,55 @@ export class DocumentApiHelper {
     return await this.create(document);
   }
 
+  async createVariantDocumentWithParent(documentTypeId: string, parentId: string | null, cultureVariants: {culture: string, name: string}[]) {
+    const builder = new DocumentBuilder()
+      .withDocumentTypeId(documentTypeId);
+
+    if (parentId !== null) {
+      builder.withParentId(parentId);
+    }
+
+    for (const variant of cultureVariants) {
+      builder.addVariant()
+        .withName(variant.name)
+        .withCulture(variant.culture)
+        .done();
+    }
+
+    return await this.create(builder.build());
+  }
+
+  // Creates and publishes a chain of variant documents (each the parent of the next) and returns their ids in order.
+  // Each level maps culture => name; the cultures to publish are derived from those keys.
+  async createPublishedVariantChain(documentTypeId: string, levels: {[culture: string]: string}[]) {
+    const ids: string[] = [];
+    let parentId: string | null = null;
+    for (const level of levels) {
+      const cultures = Object.keys(level);
+      const variants = cultures.map(culture => ({culture, name: level[culture]}));
+      const id = await this.createVariantDocumentWithParent(documentTypeId, parentId, variants);
+      await this.publishDocumentWithCultures(id, cultures);
+      ids.push(id);
+      parentId = id;
+    }
+    return ids;
+  }
+
+  // Creates and publishes a chain of invariant documents (each the parent of the next) and returns their ids in order.
+  async createPublishedInvariantChain(documentTypeId: string, names: string[]) {
+    const ids: string[] = [];
+    let parentId: string | null = null;
+    for (const name of names) {
+      const id = parentId === null
+        ? await this.createDefaultDocument(name, documentTypeId)
+        : await this.createDefaultDocumentWithParent(name, documentTypeId, parentId);
+      await this.publish(id);
+      ids.push(id);
+      parentId = id;
+    }
+    return ids;
+  }
+
   async createDocumentWithMultipleVariants(documentName: string, documentTypeId: string, dataTypeAlias: string, cultureVariants: {isoCode: string, name: string, value: string}[]) {
     await this.ensureNameNotExists(documentName);
 
@@ -482,6 +544,24 @@ export class DocumentApiHelper {
         segment: null,
         editorAlias: 'Umbraco.TextBox',
         entityType: 'document-property-value'
+      });
+    }
+
+    return await this.create(document);
+  }
+
+  async createDocumentWithMultipleVariantsAndNoValues(documentName: string, documentTypeId: string, cultureVariants: {isoCode: string, name: string}[]) {
+    await this.ensureNameNotExists(documentName);
+
+    const document = new DocumentBuilder()
+      .withDocumentTypeId(documentTypeId)
+      .build();
+
+    for (const variant of cultureVariants) {
+      document.variants.push({
+        name: variant.name,
+        culture: variant.isoCode,
+        segment: null,
       });
     }
 
@@ -564,6 +644,14 @@ export class DocumentApiHelper {
   async isDocumentPublished(id: string) {
     const document = await this.get(id);
     return document.variants[0].state === 'Published';
+  }
+
+  async waitUntilDocumentIsPublished(id: string) {
+    await expect.poll(() => this.isDocumentPublished(id), {timeout: ConstantHelper.timeout.veryLong}).toBeTruthy();
+  }
+
+  async waitUntilImageMediaPickerDoesNotContainImage(id: string, propertyAlias: string, mediaKey: string) {
+    await expect.poll(() => this.doesImageMediaPickerContainImage(id, propertyAlias, mediaKey), {timeout: ConstantHelper.timeout.veryLong}).toBeFalsy();
   }
 
   async createPublishedDocumentWithImageCropper(documentName: string, cropValue: any, dataTypeId: string, templateId: string, propertyName: string = 'Test Property Name', documentTypeName: string = 'Test Document Type', focalPoint: {left: number, top: number} = {left: 0.5, top: 0.5}) {
@@ -1447,14 +1535,14 @@ export class DocumentApiHelper {
 
     const documentBuilder = new DocumentBuilder()
       .withDocumentTypeId(documentTypeId);
-    
+
     for (const culture of cultures) {
       documentBuilder.addVariant()
         .withName(documentName)
         .withCulture(culture)
         .done();
     }
-    
+
     const alias = AliasHelper.toAlias(dataTypeName);
     for (const value of values) {
       const valueBuilder = documentBuilder.addValue()
@@ -1504,6 +1592,14 @@ export class DocumentApiHelper {
           "culture": culture
         }
       ]
+    };
+
+    return await this.publish(id, publishScheduleData);
+  }
+
+  async publishDocumentWithCultures(id: string, cultures: string[]) {
+    const publishScheduleData = {
+      "publishSchedules": cultures.map(culture => ({culture}))
     };
 
     return await this.publish(id, publishScheduleData);
@@ -1810,6 +1906,7 @@ export class DocumentApiHelper {
   }
 
   async createPublishedDocumentWithTwoNameVersionsAndTwoTextVersions(originalName: string, updatedName: string, documentTypeName: string, dataTypeName: string, originalText: string, updatedText: string) {
+    await this.ensureNameNotExists(updatedName);
     const dataTypeData = await this.api.dataType.getByName(dataTypeName);
     const documentTypeId = await this.api.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
     const documentId = await this.createDocumentWithTextContent(originalName, documentTypeId, originalText, dataTypeName);

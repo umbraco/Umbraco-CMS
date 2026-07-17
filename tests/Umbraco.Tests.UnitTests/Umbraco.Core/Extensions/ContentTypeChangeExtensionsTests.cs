@@ -133,4 +133,34 @@ public class ContentTypeChangeExtensionsTests
     [TestCase(ContentTypeChangeTypes.CompositionAdded, ContentTypeChangeTypes.PropertyAdded)]
     public void Sub_Flag_Yields_Negative_For_Other_Sub_Flag(ContentTypeChangeTypes subFlag1, ContentTypeChangeTypes subFlag2)
         => Assert.IsFalse(subFlag1.HasFlag(subFlag2));
+
+    // Structural changes require a raw cmsContentNu rebuild UNLESS flagged RawDataUnaffected (property removal).
+    [TestCase(ContentTypeChangeTypes.RefreshMain, true)]
+    [TestCase(ContentTypeChangeTypes.AliasChanged, true)]
+    [TestCase(ContentTypeChangeTypes.PropertyRemoved, true)]
+    [TestCase(ContentTypeChangeTypes.VariationChanged, true)]
+    [TestCase(ContentTypeChangeTypes.PropertyRemoved | ContentTypeChangeTypes.RawDataUnaffected, false)]
+    [TestCase(ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RawDataUnaffected, false)]
+    [TestCase(ContentTypeChangeTypes.RefreshOther, false)]
+    [TestCase(ContentTypeChangeTypes.PropertyAdded, false)]
+    [TestCase(ContentTypeChangeTypes.RawDataUnaffected, false)] // never set without RefreshMain, but guard anyway
+    [TestCase(ContentTypeChangeTypes.None, false)]
+    [TestCase(ContentTypeChangeTypes.Create, false)]
+    public void RequiresRawDataRebuild(ContentTypeChangeTypes change, bool expected) =>
+        Assert.AreEqual(expected, change.RequiresRawDataRebuild());
+
+    // Only the converted (in-memory) cache needs clearing for non-structural changes and for a structural
+    // change flagged RawDataUnaffected (property removal) — the stored blob and HybridCache entries stay valid.
+    [TestCase(ContentTypeChangeTypes.RefreshOther, true)]
+    [TestCase(ContentTypeChangeTypes.PropertyAdded, true)]
+    [TestCase(ContentTypeChangeTypes.PropertyRemoved | ContentTypeChangeTypes.RawDataUnaffected, true)]
+    [TestCase(ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RawDataUnaffected, true)]
+    [TestCase(ContentTypeChangeTypes.RefreshMain, false)]
+    [TestCase(ContentTypeChangeTypes.PropertyRemoved, false)]
+    [TestCase(ContentTypeChangeTypes.AliasChanged, false)]
+    [TestCase(ContentTypeChangeTypes.None, false)]
+    [TestCase(ContentTypeChangeTypes.Create, false)]
+    [TestCase(ContentTypeChangeTypes.Remove, false)]
+    public void RequiresConvertedCacheClearOnly(ContentTypeChangeTypes change, bool expected) =>
+        Assert.AreEqual(expected, change.RequiresConvertedCacheClearOnly());
 }

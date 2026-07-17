@@ -61,7 +61,25 @@ export class MemberUiHelper extends UiBaseLocators {
   }
 
   async isMemberWithNameVisible(memberName: string, isVisible: boolean = true) {
-    await this.isVisible(this.memberTableCollectionRow.getByText(memberName, {exact: true}), isVisible);
+    const memberRow = this.memberTableCollectionRow.getByText(memberName, {exact: true});
+    if (!isVisible) {
+      await this.isVisible(memberRow, false);
+      return;
+    }
+    await expect(async () => {
+      if (!(await memberRow.isVisible())) {
+        await this.reopenMembersCollection();
+      }
+      await expect(memberRow).toBeVisible({timeout: ConstantHelper.timeout.medium});
+    }).toPass({timeout: ConstantHelper.timeout.navigation});
+  }
+
+  // Leave and re-enter the Members collection so the table remounts and refetches, without a full page reload.
+  // skipReload guards against goToSection falling back to a page reload if we were already on the section.
+  private async reopenMembersCollection() {
+    await this.goToSection(ConstantHelper.sections.content, true, true);
+    await this.goToSection(ConstantHelper.sections.members, true, true);
+    await this.clickMembersSidebarButton();
   }
 
   async clickMembersSidebarButton() {
@@ -74,6 +92,8 @@ export class MemberUiHelper extends UiBaseLocators {
 
   async enterComments(comment: string) {
     await this.enterText(this.commentsTxt, comment);
+    // Blur to commit the value: the uui textarea commits on change/blur, not on fill, so a later save would miss it.
+    await this.commentsTxt.blur();
   }
 
   async enterUsername(username: string) {
@@ -154,7 +174,7 @@ export class MemberUiHelper extends UiBaseLocators {
   }
 
   async clickSaveButtonAndWaitForMemberToBeUpdated() {
-    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.member, this.clickSaveButton(), ConstantHelper.statusCodes.ok);
+    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.member, this.clickSaveButton(), ConstantHelper.statusCodes.ok, ConstantHelper.httpMethods.put);
   }
 
   async clickConfirmToDeleteButtonAndWaitForMemberToBeDeleted() {

@@ -56,6 +56,7 @@ export class LibraryUiHelper extends UiBaseLocators {
   private readonly elementWorkspace: Locator;
   private readonly selectAVariantBtn: Locator;
   private readonly variantAddModeBtn: Locator;
+  private readonly cultureVariant: Locator;
   private readonly saveAndCloseBtn: Locator;
   private readonly enterNameInContainerTxt: Locator;
   private readonly elementCollectionView: Locator;
@@ -95,6 +96,7 @@ export class LibraryUiHelper extends UiBaseLocators {
   private readonly selectLoginPageElement: Locator;
   private readonly selectErrorPageElement: Locator;
   private readonly rollbackItem: Locator;
+  private readonly activeRollbackItem: Locator;
   private readonly actionsMenu: Locator;
   private readonly linkToElementBtn: Locator;
   private readonly linkToMediaBtn: Locator;
@@ -230,6 +232,7 @@ export class LibraryUiHelper extends UiBaseLocators {
     this.elementWorkspace = page.locator('umb-element-workspace-editor');
     this.selectAVariantBtn = page.getByRole('button', {name: 'Open version selector'});
     this.variantAddModeBtn = page.locator('.switch-button.add-mode').locator('.variant-name');
+    this.cultureVariant = page.locator('.variant.culture-variant');
     this.saveAndCloseBtn = page.getByLabel('Save and close');
     this.elementTreeItem = page.locator('umb-tree-item');
     this.elementLanguageSelect = page.locator('umb-app-language-select');
@@ -293,6 +296,7 @@ export class LibraryUiHelper extends UiBaseLocators {
     this.selectLoginPageElement = page.locator('.select-item').filter({hasText: 'Login Page'}).locator('umb-input-element').locator('#button');
     this.selectErrorPageElement = page.locator('.select-item').filter({hasText: 'Error Page'}).locator('umb-input-element').locator('#button');
     this.rollbackItem = page.locator('.rollback-item');
+    this.activeRollbackItem = page.locator('.rollback-item.active');
     this.actionsMenu = page.locator('uui-scroll-container');
     this.linkToElementBtn = this.linkPickerModal.getByTestId('action:element').locator('#button');
     this.linkToMediaBtn = this.linkPickerModal.getByTestId('action:media').locator('#button');
@@ -550,7 +554,7 @@ export class LibraryUiHelper extends UiBaseLocators {
   }
 
   async clickSaveModalButtonAndWaitForElementToBeUpdated(){
-    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.element, this.clickSaveModalButton(), ConstantHelper.statusCodes.ok);
+    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.element, this.clickSaveModalButton(), ConstantHelper.statusCodes.ok, ConstantHelper.httpMethods.put);
   }
 
   async clickSaveAndPublishButtonAndWaitForElementToBeCreated(){
@@ -913,11 +917,18 @@ export class LibraryUiHelper extends UiBaseLocators {
   }
 
   async clickSelectVariantButton() {
-    await this.click(this.selectAVariantBtn);
+    // Retry the open: an early click can be lost to the async variant load, leaving the list closed.
+    const variantRow = this.cultureVariant.first();
+    await expect(async () => {
+      if (!(await variantRow.isVisible())) {
+        await this.click(this.selectAVariantBtn);
+      }
+      await expect(variantRow).toBeVisible({timeout: ConstantHelper.timeout.short});
+    }).toPass({timeout: ConstantHelper.timeout.medium});
   }
 
   async clickExpendSegmentButton(elementName: string) {
-    await this.page.locator('.variant.culture-variant').filter({hasText: elementName}).locator(this.expandSegmentBtn).click();
+    await this.click(this.cultureVariant.filter({hasText: elementName}).locator(this.expandSegmentBtn));
   }
 
   async clickVariantAddModeButtonForLanguageName(language: string) {
@@ -1119,6 +1130,15 @@ export class LibraryUiHelper extends UiBaseLocators {
     await this.click(this.rollbackContainerBtn);
   }
 
+  async clickPreviousRollBackItem() {
+    // Wait for the modal's async pre-selection of the current version, otherwise it clobbers our pick.
+    await expect(this.activeRollbackItem).toBeVisible();
+    const previousVersion = this.rollbackItem.filter({hasNotText: "Current published version"}).last();
+    await this.click(previousVersion);
+    await expect(previousVersion).toHaveClass(/active/);
+  }
+
+  /** @deprecated Prefer {@link clickPreviousRollBackItem}; kept for backwards compatibility. */
   async clickLatestRollBackItem() {
     await this.click(this.rollbackItem.last());
   }

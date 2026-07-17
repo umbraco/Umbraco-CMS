@@ -70,7 +70,8 @@ public static partial class UmbracoBuilderExtensions
                 factory.GetRequiredService<IScopeAccessor>(),
                 factory.GetRequiredService<ITemplateService>(),
                 factory.GetRequiredService<IDictionaryItemService>(),
-                factory.GetRequiredService<ILanguageService>()));
+                factory.GetRequiredService<ILanguageService>(),
+                factory.GetRequiredService<IElementService>()));
         builder.Services.AddUnique<IPackageDataInstallation, PackageDataInstallation>();
         builder.Services.AddUnique<IPackageInstallation, PackageInstallation>();
         builder.Services.AddTransient<IExamineIndexCountService, ExamineIndexCountService>();

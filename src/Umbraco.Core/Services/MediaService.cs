@@ -1309,6 +1309,15 @@ namespace Umbraco.Cms.Core.Services
             {
                 scope.WriteLock(Constants.Locks.MediaTree);
 
+                // Reload within the lock so sorting operates on fully-loaded entities. Callers may pass
+                // partially-loaded media (e.g. without property data), and saving those directly would
+                // wipe the property data (#23120). Preserve the caller's ordering, which drives the sort.
+                var reloadedById = GetByIds(itemsA.Select(x => x.Id)).ToDictionary(x => x.Id);
+                itemsA = itemsA
+                    .Select(x => reloadedById.TryGetValue(x.Id, out IMedia? media) ? media : null)
+                    .WhereNotNull()
+                    .ToArray();
+
                 var savingNotification = new MediaSavingNotification(itemsA, messages);
                 if (scope.Notifications.PublishCancelable(savingNotification))
                 {
@@ -1345,6 +1354,43 @@ namespace Umbraco.Cms.Core.Services
 
             return true;
 
+        }
+
+        /// <inheritdoc />
+        public OperationResult SortChildren(int parentId, IReadOnlyList<int> orderedChildIds, int userId = Constants.Security.SuperUserId)
+        {
+            EventMessages evtMsgs = EventMessagesFactory.Get();
+            if (orderedChildIds.Count == 0)
+            {
+                return new OperationResult(OperationResultType.NoOperation, evtMsgs);
+            }
+
+            using ICoreScope scope = ScopeProvider.CreateCoreScope();
+            scope.WriteLock(Constants.Locks.MediaTree);
+
+            _mediaRepository.UpdateSortOrder(orderedChildIds);
+
+            // Sort order lives in umbracoNode; neither the published cache nor the media repository cache keeps
+            // a separate serialized copy of it, so refreshing the affected branch (which invalidates both and has
+            // them reload from umbracoNode) is enough to pick up the new order without re-saving each child.
+            if (parentId == Constants.System.Root)
+            {
+                IMedia[] roots = GetByIds(orderedChildIds).ToArray();
+                scope.Notifications.Publish(new MediaTreeChangeNotification(roots, TreeChangeTypes.RefreshNode, evtMsgs));
+            }
+            else
+            {
+                IMedia? parent = GetById(parentId);
+                if (parent is not null)
+                {
+                    scope.Notifications.Publish(new MediaTreeChangeNotification(parent, TreeChangeTypes.RefreshBranch, evtMsgs));
+                }
+            }
+
+            Audit(AuditType.Sort, userId, parentId);
+
+            scope.Complete();
+            return OperationResult.Succeed(evtMsgs);
         }
 
         /// <summary>
