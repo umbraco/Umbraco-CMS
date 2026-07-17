@@ -2,10 +2,7 @@ import { UmbPropertyEditorUIStaticFilePickerElement } from '../static-file-picke
 import { customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTemporaryFileConfigRepository } from '@umbraco-cms/backoffice/temporary-file';
 import { UmbServerFilePathUniqueSerializer } from '@umbraco-cms/backoffice/server-file-system';
-
-// SVG is rendered natively by browsers and was an allowed thumbnail format in v13, but it can
-// never appear in the server's imageFileTypes because the imaging pipeline cannot process it (#20574).
-const ADDITIONAL_IMAGE_FILE_TYPES = ['svg'];
+import { getFileExtension } from '@umbraco-cms/backoffice/utils';
 
 /**
  * Decides whether a static file can be picked as an image.
@@ -21,9 +18,8 @@ export function isPickableImageFile(
 ): boolean {
 	if (isFolder) return false;
 	if (!imageFileTypes || imageFileTypes.length === 0) return true;
-	const lastDotIndex = path.lastIndexOf('.');
-	if (lastDotIndex === -1) return false;
-	const extension = path.substring(lastDotIndex + 1).toLowerCase();
+	const extension = getFileExtension(path)?.toLowerCase();
+	if (!extension) return false;
 	return imageFileTypes.includes(extension);
 }
 
@@ -48,11 +44,9 @@ export class UmbPropertyEditorUIStaticImageFilePickerElement extends UmbProperty
 		await this.#temporaryFileConfigRepository.initialized;
 		if (!this.isConnected) return;
 		this.observe(
-			this.#temporaryFileConfigRepository.part('imageFileTypes'),
+			this.#temporaryFileConfigRepository.displayableImageFileTypes(),
 			(fileTypes) => {
-				this._imageFileTypes = [
-					...new Set([...(fileTypes ?? []).map((type) => type.toLowerCase()), ...ADDITIONAL_IMAGE_FILE_TYPES]),
-				];
+				this._imageFileTypes = fileTypes;
 			},
 			'_observeImageFileTypes',
 		);
