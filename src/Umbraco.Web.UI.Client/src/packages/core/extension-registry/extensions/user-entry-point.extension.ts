@@ -12,6 +12,16 @@ import type { ManifestPlainJs, UmbEntryPointModule } from '@umbraco-cms/backoffi
  *
  * This type of extension gives full control and will simply load the specified JS file.
  * You could have custom logic to decide which extensions to load/register by using extensionRegistry.
+ * @example
+ * ```ts
+ * export const onInit: UmbEntryPointOnInit = async (host) => {
+ * 	const currentUserContext = await host.getContext(UMB_CURRENT_USER_CONTEXT);
+ * 	// Guaranteed to be populated — never undefined:
+ * 	console.log(currentUserContext?.getAllowedSection());
+ * 	// React to changes during the session:
+ * 	host.observe(currentUserContext?.allowedSections, (allowedSections) => {});
+ * };
+ * ```
  */
 export interface ManifestUserEntryPoint extends ManifestPlainJs<UmbEntryPointModule> {
 	type: 'userEntryPoint';
