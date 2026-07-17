@@ -49,7 +49,6 @@ export class UmbWebhookDeliveryCollectionServerDataSource implements UmbWebhookD
 				icon: 'icon-box-alt',
 				date: item.date,
 				url: item.url,
-				eventAlias: item.eventAlias,
 				retryCount: item.retryCount,
 				statusCode: item.statusCode,
 			};
