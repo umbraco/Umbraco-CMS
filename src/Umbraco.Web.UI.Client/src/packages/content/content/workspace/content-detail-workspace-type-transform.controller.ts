@@ -17,7 +17,7 @@ export class UmbContentDetailWorkspaceTypeTransformController<
 	DetailModelType extends UmbContentDetailModel<UmbEntityVariantModel>,
 > extends UmbControllerBase {
 	#workspace: UmbContentDetailWorkspaceContextBase<DetailModelType, any, any, any>;
-	#persistedData?: UmbTypeTransformPersistedDataAccessor<DetailModelType>;
+	readonly #persistedData?: UmbTypeTransformPersistedDataAccessor<DetailModelType>;
 	// Current property types, currently used to detect variation changes:
 	#propertyTypes?: Array<UmbPropertyTypeModel>;
 	#variesByCulture?: boolean;
