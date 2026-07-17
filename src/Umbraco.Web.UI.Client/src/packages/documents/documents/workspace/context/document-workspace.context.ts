@@ -18,29 +18,28 @@ import { UmbDocumentValidationRepository } from '../../repository/validation/ind
 import { UMB_DOCUMENT_CONFIGURATION_CONTEXT } from '../../index.js';
 import { UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD, UMB_DOCUMENT_WORKSPACE_ALIAS } from '../constants.js';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
-import { umbPeekError } from '@umbraco-cms/backoffice/notification';
 import { UmbContentDetailWorkspaceContextBase } from '@umbraco-cms/backoffice/content';
 import { UmbDeprecation, type UmbVariantGuardRule } from '@umbraco-cms/backoffice/utils';
 import { UmbDocumentBlueprintDetailRepository } from '@umbraco-cms/backoffice/document-blueprint';
 import { UmbEntityContentTypeEntityContext } from '@umbraco-cms/backoffice/content-type';
-import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/document-type';
 import {
 	UmbEntityRestoredFromRecycleBinEvent,
 	UmbEntityTrashedEvent,
 	UmbIsTrashedEntityContext,
 } from '@umbraco-cms/backoffice/recycle-bin';
+import { UmbPreviewController } from '@umbraco-cms/backoffice/preview';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import {
 	UmbWorkspaceIsNewRedirectController,
 	UmbWorkspaceIsNewRedirectControllerAlias,
 } from '@umbraco-cms/backoffice/workspace';
+import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/document-type';
+import type { UmbWorkspaceActionExecutionOptions } from '@umbraco-cms/backoffice/workspace';
 import type { UmbContentWorkspaceContext } from '@umbraco-cms/backoffice/content';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/document-type';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
-import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
-import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
-import { UmbPreviewRepository } from '@umbraco-cms/backoffice/preview';
 
 type ContentModel = UmbDocumentDetailModel;
 type ContentTypeModel = UmbDocumentTypeDetailModel;
@@ -71,10 +70,8 @@ export class UmbDocumentWorkspaceContext
 	#isTrashedContext = new UmbIsTrashedEntityContext(this);
 	#entityContentTypeContext = new UmbEntityContentTypeEntityContext(this);
 	#documentSegmentRepository = new UmbDocumentSegmentRepository(this);
+	#previewController = new UmbPreviewController(this);
 	#actionEventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
-	#localize = new UmbLocalizationController(this);
-	#previewWindow?: WindowProxy | null = null;
-	#previewWindowDocumentId?: string | null = null;
 
 	constructor(host: UmbControllerHost) {
 		super(host, {
@@ -306,13 +303,13 @@ export class UmbDocumentWorkspaceContext
 		this._data.updateCurrent({ template: templateUnique ? { unique: templateUnique } : null });
 	}
 
-	protected override async _handleSave() {
+	protected override async _handleSave(executionOptions?: UmbWorkspaceActionExecutionOptions) {
 		const elementStyle = (this.getHostElement() as HTMLElement).style;
 		elementStyle.setProperty('--uui-color-invalid', 'var(--uui-color-warning)');
 		elementStyle.setProperty('--uui-color-invalid-emphasis', 'var(--uui-color-warning-emphasis)');
 		elementStyle.setProperty('--uui-color-invalid-standalone', 'var(--uui-color-warning-standalone)');
 		elementStyle.setProperty('--uui-color-invalid-contrast', 'var(--uui-color-warning-contrast)');
-		await super._handleSave();
+		await super._handleSave(executionOptions);
 	}
 
 	public async saveAndPreview(urlProviderAlias?: string): Promise<void> {
@@ -344,46 +341,12 @@ export class UmbDocumentWorkspaceContext
 			await this.performCreateOrUpdate(variantIds, saveData);
 		}
 
-		// Check if preview window is still open and showing the same document
-		// If so, just focus it and let SignalR handle the refresh
-		try {
-			if (this.#previewWindow && !this.#previewWindow.closed && this.#previewWindowDocumentId === unique) {
-				this.#previewWindow.focus();
-				return;
-			}
-		} catch {
-			// Window reference is stale, continue to create new preview session
-			this.#previewWindow = null;
-			this.#previewWindowDocumentId = null;
-		}
-
-		// Preview not open, create new preview session and open window
-		const previewRepository = new UmbPreviewRepository(this);
-		const previewUrlData = await previewRepository.getPreviewUrl(
+		await this.#previewController.preview({
 			unique,
 			urlProviderAlias,
-			firstVariantId.culture ?? undefined,
-			firstVariantId.segment ?? undefined,
-		);
-
-		if (previewUrlData.url) {
-			// Add cache-busting parameter to ensure the preview tab reloads with the new preview session
-			const previewUrl = new URL(previewUrlData.url, window.document.baseURI);
-			previewUrl.searchParams.set('rnd', Date.now().toString());
-			this.#previewWindow = window.open(previewUrl.toString(), `umbpreview-${unique}`);
-			this.#previewWindowDocumentId = unique;
-			this.#previewWindow?.focus();
-			return;
-		}
-
-		if (previewUrlData.message) {
-			umbPeekError(this._host, {
-				color: 'danger',
-				headline: this.#localize.term('general_preview'),
-				message: previewUrlData.message,
-			});
-			throw new Error(previewUrlData.message);
-		}
+			culture: firstVariantId.culture,
+			segment: firstVariantId.segment,
+		});
 	}
 
 	public createPropertyDatasetContext(
