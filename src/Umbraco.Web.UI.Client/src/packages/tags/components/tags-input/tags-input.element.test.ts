@@ -58,6 +58,32 @@ describe('UmbTagsInputElement', () => {
 			expect(element.items).to.deep.equal(['one', 'two']);
 		});
 
+		it('de-duplicates repeated values within a single paste', async () => {
+			dispatchPaste('one,one,two');
+			await element.updateComplete;
+			expect(element.items).to.deep.equal(['one', 'two']);
+		});
+
+		it('does not update or fire a change event when every pasted value already exists', async () => {
+			element.items = ['one', 'two'];
+			let changeCount = 0;
+			element.addEventListener(UmbChangeEvent.TYPE, () => changeCount++);
+			dispatchPaste('one,two');
+			await element.updateComplete;
+			expect(element.items).to.deep.equal(['one', 'two']);
+			expect(changeCount).to.equal(0);
+		});
+
+		it('clears the input after a paste that adds tags', async () => {
+			const input = getInput();
+			input.value = 'hello';
+			input.dispatchEvent(new InputEvent('input', { bubbles: true }));
+			dispatchPaste('one,two');
+			await element.updateComplete;
+			expect(element.items).to.deep.equal(['one', 'two']);
+			expect(getInput().value).to.equal('');
+		});
+
 		it('dispatches a change event when tags are added', async () => {
 			let changeCount = 0;
 			element.addEventListener(UmbChangeEvent.TYPE, () => changeCount++);

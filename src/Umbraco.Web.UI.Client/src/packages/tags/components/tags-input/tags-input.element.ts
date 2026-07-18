@@ -217,6 +217,8 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 
 		this.#inputError(false);
 		this.items = [...this.items, ...newTags];
+		this._tagInput.value = '';
+		this._currentInput = '';
 		this._matches = [];
 		this.dispatchEvent(new UmbChangeEvent());
 	}
