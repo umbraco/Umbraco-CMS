@@ -48,6 +48,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 	#publishedDocumentData?: UmbDocumentDetailModel;
 	#loadingPublishedData = false;
 	#currentUnique?: UmbEntityUnique;
+	#variesByCulture?: boolean;
 	#notificationContext?: typeof UMB_NOTIFICATION_CONTEXT.TYPE;
 	readonly #localize = new UmbLocalizationController(this);
 
@@ -564,6 +565,26 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 				}
 			},
 			'umbPersistedDataObserver',
+		);
+
+		this.observe(
+			this.#documentWorkspaceContext.variesByCulture,
+			(variesByCulture) => {
+				const previousVariesByCulture = this.#variesByCulture;
+				this.#variesByCulture = variesByCulture;
+				if (
+					previousVariesByCulture === undefined ||
+					variesByCulture === undefined ||
+					previousVariesByCulture === variesByCulture
+				) {
+					return;
+				}
+				// The server migrates the published version when the content type's variance changes,
+				// so the cached copy no longer compares correctly against the persisted data:
+				this.#publishedDocumentData = undefined;
+				this.#loadAndProcessLastPublished().catch(() => undefined);
+			},
+			'umbVariesByCultureObserver',
 		);
 	}
 

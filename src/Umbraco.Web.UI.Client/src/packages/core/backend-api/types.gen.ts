@@ -3541,6 +3541,7 @@ export type WebhookLogResponseModel = {
     key: string;
     webhookKey: string;
     statusCode: string;
+    httpStatusCode?: number | null;
     isSuccessStatusCode: boolean;
     date: string;
     eventAlias: string;
