@@ -757,6 +757,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
 
     #region Save, Publish, Unpublish
 
+    /// <inheritdoc />
     /// <summary>
     ///     Publishes/unpublishes any pending publishing changes made to the document.
     /// </summary>
@@ -764,7 +765,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
     ///     <para>
     ///         This MUST NOT be called from within this service, this used to be a public API and must only be used outside of
     ///         this service.
-    ///         Internally in this service, calls must be made to CommitDocumentChangesInternal
+    ///         Internally in this service, calls must be made to CommitContentChangesInternal
     ///     </para>
     ///     <para>This is the underlying logic for both publishing and unpublishing any document</para>
     ///     <para>
@@ -965,6 +966,23 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
                 throw new InvalidOperationException("Cannot mix PublishCulture and SaveAndPublishBranch.");
             }
 
+            // captures the cultures published per document, so the notification can report them per item
+            var publishedCulturesByDocument = new Dictionary<Guid, IReadOnlyCollection<string>>();
+            var variesByCulture = document.ContentType.VariesByCulture();
+
+            void TrackPublishedCultures(IContent publishedDocument, HashSet<string>? documentCulturesToPublish)
+            {
+                // a branch can mix variant and invariant content types, so determine variance per document rather
+                // than from the branch root; snapshot the cultures so the notification never holds a mutable set
+                string[] cultures = publishedDocument.ContentType.VariesByCulture()
+                    ? documentCulturesToPublish?.ToArray() ?? []
+                    : ["*"];
+                if (cultures.Length > 0)
+                {
+                    publishedCulturesByDocument[publishedDocument.Key] = cultures;
+                }
+            }
+
             // deal with the branch root - if it fails, abort
             HashSet<string>? culturesToPublish = shouldPublish(document);
             PublishResult? result = PublishBranchItem(scope, document, culturesToPublish, publishCultures, true, publishedDocuments, eventMessages, userId, allLangs, out IDictionary<string, object?>? notificationState);
@@ -975,6 +993,8 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
                 {
                     return results;
                 }
+
+                TrackPublishedCultures(document, culturesToPublish);
             }
 
             HashSet<string> culturesPublished = culturesToPublish ?? [];
@@ -1012,6 +1032,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
                         if (result.Success)
                         {
                             culturesPublished.UnionWith(culturesToPublish ?? []);
+                            TrackPublishedCultures(d, culturesToPublish);
                             continue;
                         }
                     }
@@ -1028,7 +1049,6 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
 
             // trigger events for the entire branch
             // (SaveAndPublishBranchOne does *not* do it)
-            var variesByCulture = document.ContentType.VariesByCulture();
             scope.Notifications.Publish(
                 new ContentTreeChangeNotification(
                     document,
@@ -1036,7 +1056,14 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
                     variesByCulture ? culturesPublished.IsCollectionEmpty() ? null : culturesPublished : ["*"],
                     null,
                     eventMessages));
-            scope.Notifications.Publish(new ContentPublishedNotification(publishedDocuments, eventMessages, true).WithState(notificationState));
+            scope.Notifications.Publish(
+                new ContentPublishedNotification(
+                    publishedDocuments,
+                    eventMessages,
+                    true,
+                    publishedCulturesByDocument,
+                    null)
+                .WithState(notificationState));
 
             scope.Complete();
         }
@@ -1652,7 +1679,13 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
         {
             scope.WriteLock(Constants.Locks.ContentTree);
 
-            OperationResult ret = Sort(scope, itemsA, userId, evtMsgs);
+            // Reload within the lock so sorting operates on fully-loaded entities. Callers may pass
+            // partially-loaded content (e.g. loaded with loadTemplates: false or without property data),
+            // and saving those directly would wipe the template and property data (#23120).
+            // GetByIds returns items in the requested order, preserving the caller's ordering that drives the sort.
+            IContent[] reloaded = GetByIds(itemsA.Select(x => x.Id).ToArray()).ToArray();
+
+            OperationResult ret = Sort(scope, reloaded, userId, evtMsgs);
             scope.Complete();
             return ret;
         }
@@ -1688,6 +1721,43 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
             scope.Complete();
             return ret;
         }
+    }
+
+    /// <inheritdoc />
+    public OperationResult SortChildren(int parentId, IReadOnlyList<int> orderedChildIds, int userId = Constants.Security.SuperUserId)
+    {
+        EventMessages evtMsgs = EventMessagesFactory.Get();
+        if (orderedChildIds.Count == 0)
+        {
+            return new OperationResult(OperationResultType.NoOperation, evtMsgs);
+        }
+
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.WriteLock(Constants.Locks.ContentTree);
+
+        _documentRepository.UpdateSortOrder(orderedChildIds);
+
+        // Sort order lives in umbracoNode; neither the published cache nor the content repository cache keeps
+        // a separate serialized copy of it, so refreshing the affected branch (which invalidates both and has
+        // them reload from umbracoNode) is enough to pick up the new order without re-saving each child.
+        if (parentId == Constants.System.Root)
+        {
+            IContent[] roots = GetByIds(orderedChildIds).ToArray();
+            scope.Notifications.Publish(new ContentTreeChangeNotification(roots, TreeChangeTypes.RefreshNode, evtMsgs));
+        }
+        else
+        {
+            IContent? parent = GetById(parentId);
+            if (parent is not null)
+            {
+                scope.Notifications.Publish(new ContentTreeChangeNotification(parent, TreeChangeTypes.RefreshBranch, evtMsgs));
+            }
+        }
+
+        Audit(AuditType.Sort, userId, parentId);
+
+        scope.Complete();
+        return OperationResult.Succeed(evtMsgs);
     }
 
     private OperationResult Sort(ICoreScope scope, IContent[] itemsA, int userId, EventMessages eventMessages)
@@ -1853,7 +1923,10 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
                 // just raise the event
                 if (content.Trashed == false && content.Published)
                 {
-                    scope.Notifications.Publish(new ContentUnpublishedNotification(content, eventMessages));
+                    scope.Notifications.Publish(new ContentUnpublishedNotification(
+                        content,
+                        eventMessages,
+                        BuildCultureMap(content, content.ContentType.VariesByCulture() ? content.PublishedCultures : ["*"])));
                 }
 
                 // if current content has children, move them to trash
@@ -2207,11 +2280,17 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
     protected override SavedNotification<IContent> SavedNotification(IContent content, EventMessages eventMessages)
         => new ContentSavedNotification(content, eventMessages);
 
+    protected override SavedNotification<IContent> SavedNotification(IContent content, EventMessages eventMessages, IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? savedCultures)
+        => new ContentSavedNotification(content, eventMessages, savedCultures);
+
     protected override SavingNotification<IContent> SavingNotification(IEnumerable<IContent> content, EventMessages eventMessages)
         => new ContentSavingNotification(content, eventMessages);
 
     protected override SavedNotification<IContent> SavedNotification(IEnumerable<IContent> content, EventMessages eventMessages)
         => new ContentSavedNotification(content, eventMessages);
+
+    protected override SavedNotification<IContent> SavedNotification(IEnumerable<IContent> content, EventMessages eventMessages, IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? savedCultures)
+        => new ContentSavedNotification(content, eventMessages, savedCultures);
 
     protected override TreeChangeNotification<IContent> TreeChangeNotification(IContent content, TreeChangeTypes changeTypes, EventMessages eventMessages)
         => new ContentTreeChangeNotification(content, changeTypes, eventMessages);
@@ -2231,6 +2310,9 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
     protected override IStatefulNotification PublishedNotification(IContent content, EventMessages eventMessages)
         => new ContentPublishedNotification(content, eventMessages);
 
+    protected override IStatefulNotification PublishedNotification(IContent content, EventMessages eventMessages, IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? publishedCultures, IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? unpublishedCultures)
+        => new ContentPublishedNotification(content, eventMessages, publishedCultures, unpublishedCultures);
+
     protected override IStatefulNotification PublishedNotification(IEnumerable<IContent> content, EventMessages eventMessages)
         => new ContentPublishedNotification(content, eventMessages);
 
@@ -2239,6 +2321,9 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
 
     protected override IStatefulNotification UnpublishedNotification(IContent content, EventMessages eventMessages)
         => new ContentUnpublishedNotification(content, eventMessages);
+
+    protected override IStatefulNotification UnpublishedNotification(IContent content, EventMessages eventMessages, IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? unpublishedCultures)
+        => new ContentUnpublishedNotification(content, eventMessages, unpublishedCultures);
 
     protected override RollingBackNotification<IContent> RollingBackNotification(IContent target, EventMessages messages)
         => new ContentRollingBackNotification(target, messages);

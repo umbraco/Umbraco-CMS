@@ -317,21 +317,28 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     /// <inheritdoc/>
     public async Task<IEnumerable<ContentCacheNode>> GetDocumentSourcesAsync(IEnumerable<Guid> keys, bool preview = false)
     {
-        Sql<ISqlContext>? sql = SqlContentSourcesSelect()
-            .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Document))
-            .WhereIn<NodeDto>(x => x.UniqueId, keys)
-            .Append(SqlOrderByLevelIdSortOrder(SqlContext));
+        // Batch the WHERE IN to stay within SQL Server's parameter limit.
+        // The configurable document seed batch size is applied upstream; this method only enforces MaxParameterCount.
+        Guid[] keysArray = keys as Guid[] ?? keys.ToArray();
+        var dtos = new List<ContentSourceDto>(keysArray.Length);
+        foreach (IEnumerable<Guid> group in keysArray.InGroupsOf(Constants.Sql.MaxParameterCount))
+        {
+            Sql<ISqlContext>? sql = SqlContentSourcesSelect()
+                .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Document))
+                .WhereIn<NodeDto>(x => x.UniqueId, group)
+                .Append(SqlOrderByLevelIdSortOrder(SqlContext));
 
-        List<ContentSourceDto> dtos = await Database.FetchAsync<ContentSourceDto>(sql);
+            dtos.AddRange(await Database.FetchAsync<ContentSourceDto>(sql));
+        }
 
-        dtos = dtos
+        var filtered = dtos
             .Where(x => x is not null)
             .Where(x => preview || ((x.PubDataRaw is not null || x.PubData is not null) && (!x.Published || x.PubName is not null)))
             .ToList();
 
         IContentCacheDataSerializer serializer =
             _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Document);
-        return dtos
+        return filtered
             .Select(x => CreateContentNodeKit(x, serializer, preview))
             .OfType<ContentCacheNode>();
     }
@@ -496,20 +503,27 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     /// <inheritdoc/>
     public async Task<IEnumerable<ContentCacheNode>> GetMediaSourcesAsync(IEnumerable<Guid> keys)
     {
-        Sql<ISqlContext>? sql = SqlMediaSourcesSelect()
-            .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Media))
-            .WhereIn<NodeDto>(x => x.UniqueId, keys)
-            .Append(SqlOrderByLevelIdSortOrder(SqlContext));
+        // Batch the WHERE IN by Constants.Sql.MaxParameterCount so callers configuring
+        // CacheSettings.MediaSeedBatchSize above that limit do not hit SQL Server's 2100 parameter limit.
+        Guid[] keysArray = keys as Guid[] ?? keys.ToArray();
+        var dtos = new List<ContentSourceDto>(keysArray.Length);
+        foreach (IEnumerable<Guid> group in keysArray.InGroupsOf(Constants.Sql.MaxParameterCount))
+        {
+            Sql<ISqlContext>? sql = SqlMediaSourcesSelect()
+                .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Media))
+                .WhereIn<NodeDto>(x => x.UniqueId, group)
+                .Append(SqlOrderByLevelIdSortOrder(SqlContext));
 
-        List<ContentSourceDto> dtos = await Database.FetchAsync<ContentSourceDto>(sql);
+            dtos.AddRange(await Database.FetchAsync<ContentSourceDto>(sql));
+        }
 
-        dtos = dtos
+        var filtered = dtos
             .Where(x => x is not null)
             .ToList();
 
         IContentCacheDataSerializer serializer =
             _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Media);
-        return dtos
+        return filtered
             .Select(x => CreateMediaNodeKit(x, serializer));
     }
 
@@ -582,43 +596,25 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
             return;
         }
 
-        long total = 0;
         Dictionary<int, byte>? contentTypeVariations = null;
         Dictionary<short, string>? languageMap = null;
         Dictionary<int, List<PropertyTypeInfo>>? propertyInfoByContentType = null;
 
-        // Delete and pre-fetch in one step, then release locks before the paging loop.
-        executeStep(() =>
-        {
-            RemoveByObjectType(objectType, contentTypeIds);
-
-            Sql<ISqlContext> countSql = Sql()
-                .SelectCount()
-                .From<NodeDto>()
-                .InnerJoin<ContentDto>().On<NodeDto, ContentDto>((n, c) => n.NodeId == c.NodeId)
-                .Where<NodeDto>(x => x.NodeObjectType == objectType);
-
-            if (contentTypeIds.Count > 0)
-            {
-                countSql = countSql.WhereIn<ContentDto>(x => x.ContentTypeId, contentTypeIds);
-            }
-
-            total = Database.ExecuteScalar<long>(countSql);
-
-            if (total == 0)
-            {
-                return;
-            }
-
-            contentTypeVariations = GetContentTypeVariations(contentTypeIds);
-            languageMap = GetLanguageMap();
-            propertyInfoByContentType = GetPropertyInfoByContentType(contentTypeIds);
-        });
+        // Delete stale rows in batches (each its own step); the returned count of affected nodes is the
+        // number to repopulate, so no separate count query is needed.
+        long total = RemoveByObjectTypeInBatches(objectType, contentTypeIds, executeStep);
 
         if (total == 0)
         {
             return;
         }
+
+        executeStep(() =>
+        {
+            contentTypeVariations = GetContentTypeVariations(contentTypeIds);
+            languageMap = GetLanguageMap();
+            propertyInfoByContentType = GetPropertyInfoByContentType(contentTypeIds);
+        });
 
         long processed = 0;
         long pageIndex = 0;
@@ -663,10 +659,16 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
                 pageComplete = true;
             });
 
+            // The break IS reachable: the executeStep delegate's early return (a page yielding no nodes — e.g.
+            // content removed concurrently, leaving the total row count stale) leaves pageComplete false, which
+            // guards against looping indefinitely. SonarLint cannot see through the delegate, so it incorrectly
+            // reports the condition as always false.
+#pragma warning disable S2583 // Conditionally executed code should be reachable
             if (!pageComplete)
             {
                 break;
             }
+#pragma warning restore S2583
 
             pageIndex++;
         }
@@ -729,107 +731,135 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     /// </summary>
     private List<CacheRebuildPublishableContentDto> GetDocumentMetadataForNodes(List<int> nodeIds)
     {
-        // Query content metadata with both edit and published version info
+        // Query content metadata with both edit and published version info.
         // Uses nested join pattern to ensure we only get the published ContentVersion
-        // (where a DocumentVersionDto with Published=true exists)
-        Sql<ISqlContext> sql = Sql()
-            .Select<NodeDto>(
-                x => x.NodeId,
-                x => x.UniqueId,
-                x => x.Text,
-                x => x.Path,
-                x => x.Level,
-                x => x.ParentId,
-                x => x.SortOrder,
-                x => x.CreateDate,
-                x => Alias(x.UserId, "CreatorId"))
-            .AndSelect<ContentDto>(x => x.ContentTypeId)
-            .AndSelect<DocumentDto>(x => x.Published)
-            .AndSelect<ContentVersionDto>(
-                x => Alias(x.Id, "EditVersionId"),
-                x => Alias(x.Text, "EditName"),
-                x => Alias(x.VersionDate, "EditVersionDate"),
-                x => Alias(x.UserId, "EditWriterId"))
-            .AndSelect<ContentVersionDto>(
-                "pcv",
-                x => Alias(x.Id, "PublishedVersionId"),
-                x => Alias(x.Text, "PublishedName"),
-                x => Alias(x.VersionDate, "PublishedVersionDate"),
-                x => Alias(x.UserId, "PublishedWriterId"))
-            .From<NodeDto>()
-            .InnerJoin<ContentDto>().On<NodeDto, ContentDto>((n, c) => n.NodeId == c.NodeId)
-            .InnerJoin<DocumentDto>().On<NodeDto, DocumentDto>((n, d) => n.NodeId == d.NodeId)
-            .InnerJoin<ContentVersionDto>().On<NodeDto, ContentVersionDto>((n, cv) => n.NodeId == cv.NodeId && cv.Current)
+        // (where a DocumentVersionDto with Published=true exists).
+        // Batched on nodeIds so a NuCacheSettings.SqlPageSize larger than MaxParameterCount still works.
+        var results = new List<CacheRebuildPublishableContentDto>(nodeIds.Count);
+        foreach (IEnumerable<int> group in nodeIds.InGroupsOf(Constants.Sql.MaxParameterCount))
+        {
+            Sql<ISqlContext> sql = Sql()
+                .Select<NodeDto>(
+                    x => x.NodeId,
+                    x => x.UniqueId,
+                    x => x.Text,
+                    x => x.Path,
+                    x => x.Level,
+                    x => x.ParentId,
+                    x => x.SortOrder,
+                    x => x.CreateDate,
+                    x => Alias(x.UserId, "CreatorId"))
+                .AndSelect<ContentDto>(x => x.ContentTypeId)
+                .AndSelect<DocumentDto>(x => x.Published)
+                .AndSelect<ContentVersionDto>(
+                    x => Alias(x.Id, "EditVersionId"),
+                    x => Alias(x.Text, "EditName"),
+                    x => Alias(x.VersionDate, "EditVersionDate"),
+                    x => Alias(x.UserId, "EditWriterId"))
+                .AndSelect<ContentVersionDto>(
+                    "pcv",
+                    x => Alias(x.Id, "PublishedVersionId"),
+                    x => Alias(x.Text, "PublishedName"),
+                    x => Alias(x.VersionDate, "PublishedVersionDate"),
+                    x => Alias(x.UserId, "PublishedWriterId"))
+                .From<NodeDto>()
+                .InnerJoin<ContentDto>().On<NodeDto, ContentDto>((n, c) => n.NodeId == c.NodeId)
+                .InnerJoin<DocumentDto>().On<NodeDto, DocumentDto>((n, d) => n.NodeId == d.NodeId)
+                .InnerJoin<ContentVersionDto>().On<NodeDto, ContentVersionDto>((n, cv) => n.NodeId == cv.NodeId && cv.Current)
 
-            // Nested join: ContentVersionDto "pcv" INNER JOIN DocumentVersionDto "pdv" ON published=true
-            // This ensures pcv only includes rows where there's a published DocumentVersion
-            .LeftJoin<ContentVersionDto>(
-                j => j.InnerJoin<DocumentVersionDto>("pdv")
-                      .On<ContentVersionDto, DocumentVersionDto>(
-                          (left, right) => left.Id == right.Id && right.Published == true, "pcv", "pdv"),
-                "pcv")
+                // Nested join: ContentVersionDto "pcv" INNER JOIN DocumentVersionDto "pdv" ON published=true.
+                // This ensures pcv only includes rows where there's a published DocumentVersion.
+                .LeftJoin<ContentVersionDto>(
+                    j => j.InnerJoin<DocumentVersionDto>("pdv")
+                          .On<ContentVersionDto, DocumentVersionDto>(
+                              (left, right) => left.Id == right.Id && right.Published == true, "pcv", "pdv"),
+                    "pcv")
 
-            .On<NodeDto, ContentVersionDto>((n, cv) => n.NodeId == cv.NodeId, aliasRight: "pcv")
-            .WhereIn<NodeDto>(x => x.NodeId, nodeIds);
+                .On<NodeDto, ContentVersionDto>((n, cv) => n.NodeId == cv.NodeId, aliasRight: "pcv")
+                .WhereIn<NodeDto>(x => x.NodeId, group);
 
-        return Database.Fetch<CacheRebuildPublishableContentDto>(sql);
+            results.AddRange(Database.Fetch<CacheRebuildPublishableContentDto>(sql));
+        }
+
+        return results;
     }
 
     /// <summary>
     /// Gets property data for the specified node IDs using efficient JOIN on nodeId.
     /// This avoids the expensive WHERE IN on versionId that causes index scans.
+    /// Batched on nodeIds so a NuCacheSettings.SqlPageSize larger than MaxParameterCount still works.
     /// </summary>
     private List<CacheRebuildPropertyDto> GetPropertyDataForNodes(List<int> nodeIds)
     {
-        // JOIN through nodeId → versionId path for efficient query plan
-        Sql<ISqlContext> sql = Sql()
-            .Select<PropertyDataDto>(
-                x => x.VersionId,
-                x => x.LanguageId,
-                x => x.Segment,
-                x => x.IntegerValue,
-                x => x.DecimalValue,
-                x => x.DateValue,
-                x => x.VarcharValue,
-                x => x.TextValue)
-            .AndSelect<PropertyTypeDto>(x => Alias(x.Alias, "PropertyAlias"))
-            .From<PropertyDataDto>()
-            .InnerJoin<PropertyTypeDto>().On<PropertyDataDto, PropertyTypeDto>((pd, pt) => pd.PropertyTypeId == pt.Id)
-            .InnerJoin<ContentVersionDto>().On<PropertyDataDto, ContentVersionDto>((pd, cv) => pd.VersionId == cv.Id)
-            .WhereIn<ContentVersionDto>(x => x.NodeId, nodeIds);
+        var results = new List<CacheRebuildPropertyDto>();
+        foreach (IEnumerable<int> group in nodeIds.InGroupsOf(Constants.Sql.MaxParameterCount))
+        {
+            // JOIN through nodeId → versionId path for efficient query plan.
+            Sql<ISqlContext> sql = Sql()
+                .Select<PropertyDataDto>(
+                    x => x.VersionId,
+                    x => x.LanguageId,
+                    x => x.Segment,
+                    x => x.IntegerValue,
+                    x => x.DecimalValue,
+                    x => x.DateValue,
+                    x => x.VarcharValue,
+                    x => x.TextValue)
+                .AndSelect<PropertyTypeDto>(x => Alias(x.Alias, "PropertyAlias"))
+                .From<PropertyDataDto>()
+                .InnerJoin<PropertyTypeDto>().On<PropertyDataDto, PropertyTypeDto>((pd, pt) => pd.PropertyTypeId == pt.Id)
+                .InnerJoin<ContentVersionDto>().On<PropertyDataDto, ContentVersionDto>((pd, cv) => pd.VersionId == cv.Id)
+                .WhereIn<ContentVersionDto>(x => x.NodeId, group);
 
-        return Database.Fetch<CacheRebuildPropertyDto>(sql);
+            results.AddRange(Database.Fetch<CacheRebuildPropertyDto>(sql));
+        }
+
+        return results;
     }
 
     /// <summary>
     /// Gets culture variation data for the specified node IDs.
+    /// Batched on nodeIds so a NuCacheSettings.SqlPageSize larger than MaxParameterCount still works.
     /// </summary>
     private List<CacheRebuildCultureDto> GetCultureDataForNodes(List<int> nodeIds)
     {
-        Sql<ISqlContext> sql = Sql()
-            .Select<ContentVersionCultureVariationDto>(x => x.VersionId, x => x.Name, x => x.UpdateDate)
-            .AndSelect<LanguageDto>(x => Alias(x.IsoCode, "IsoCode"))
-            .From<ContentVersionCultureVariationDto>()
-            .InnerJoin<LanguageDto>().On<ContentVersionCultureVariationDto, LanguageDto>((cv, l) => cv.LanguageId == l.Id)
-            .InnerJoin<ContentVersionDto>().On<ContentVersionCultureVariationDto, ContentVersionDto>((ccv, cv) => ccv.VersionId == cv.Id)
-            .WhereIn<ContentVersionDto>(x => x.NodeId, nodeIds);
+        var results = new List<CacheRebuildCultureDto>();
+        foreach (IEnumerable<int> group in nodeIds.InGroupsOf(Constants.Sql.MaxParameterCount))
+        {
+            Sql<ISqlContext> sql = Sql()
+                .Select<ContentVersionCultureVariationDto>(x => x.VersionId, x => x.Name, x => x.UpdateDate)
+                .AndSelect<LanguageDto>(x => Alias(x.IsoCode, "IsoCode"))
+                .From<ContentVersionCultureVariationDto>()
+                .InnerJoin<LanguageDto>().On<ContentVersionCultureVariationDto, LanguageDto>((cv, l) => cv.LanguageId == l.Id)
+                .InnerJoin<ContentVersionDto>().On<ContentVersionCultureVariationDto, ContentVersionDto>((ccv, cv) => ccv.VersionId == cv.Id)
+                .WhereIn<ContentVersionDto>(x => x.NodeId, group);
 
-        return Database.Fetch<CacheRebuildCultureDto>(sql);
+            results.AddRange(Database.Fetch<CacheRebuildCultureDto>(sql));
+        }
+
+        return results;
     }
 
     /// <summary>
     /// Gets document culture variation data (edited status per culture) for the specified node IDs. Used for documents.
+    /// Batched on nodeIds so a NuCacheSettings.SqlPageSize larger than MaxParameterCount still works.
     /// </summary>
     private List<CacheRebuildPublishableCultureDto> GetDocumentCultureDataForNodes(List<int> nodeIds)
     {
-        Sql<ISqlContext> sql = Sql()
-            .Select<DocumentCultureVariationDto>(x => x.NodeId, x => x.Edited)
-            .AndSelect<LanguageDto>(x => Alias(x.IsoCode, "IsoCode"))
-            .From<DocumentCultureVariationDto>()
-            .InnerJoin<LanguageDto>().On<DocumentCultureVariationDto, LanguageDto>((dcv, l) => dcv.LanguageId == l.Id)
-            .WhereIn<DocumentCultureVariationDto>(x => x.NodeId, nodeIds);
+        var results = new List<CacheRebuildPublishableCultureDto>();
+        foreach (IEnumerable<int> group in nodeIds.InGroupsOf(Constants.Sql.MaxParameterCount))
+        {
+            Sql<ISqlContext> sql = Sql()
+                .Select<DocumentCultureVariationDto>(x => x.NodeId, x => x.Edited)
+                .AndSelect<LanguageDto>(x => Alias(x.IsoCode, "IsoCode"))
+                .From<DocumentCultureVariationDto>()
+                .InnerJoin<LanguageDto>().On<DocumentCultureVariationDto, LanguageDto>((dcv, l) => dcv.LanguageId == l.Id)
+                .WhereIn<DocumentCultureVariationDto>(x => x.NodeId, group);
 
-        return Database.Fetch<CacheRebuildPublishableCultureDto>(sql);
+            results.AddRange(Database.Fetch<CacheRebuildPublishableCultureDto>(sql));
+        }
+
+        return results;
     }
 
     /// <summary>
@@ -1132,38 +1162,21 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
 
         Guid mediaObjectType = Constants.ObjectTypes.Media;
 
-        long total = 0;
         Dictionary<int, List<string>>? propertyAliasesByContentType = null;
 
-        executeStep(() =>
-        {
-            RemoveByObjectType(mediaObjectType, contentTypeIds);
-
-            Sql<ISqlContext> countSql = Sql()
-                .SelectCount()
-                .From<NodeDto>()
-                .InnerJoin<ContentDto>().On<NodeDto, ContentDto>((n, c) => n.NodeId == c.NodeId)
-                .Where<NodeDto>(x => x.NodeObjectType == mediaObjectType);
-
-            if (contentTypeIds.Count > 0)
-            {
-                countSql = countSql.WhereIn<ContentDto>(x => x.ContentTypeId, contentTypeIds);
-            }
-
-            total = Database.ExecuteScalar<long>(countSql);
-
-            if (total == 0)
-            {
-                return;
-            }
-
-            propertyAliasesByContentType = GetPropertyAliasesByContentType(contentTypeIds);
-        });
+        // Delete stale rows in batches (each its own step); the returned count of affected nodes is the
+        // number to repopulate, so no separate count query is needed.
+        long total = RemoveByObjectTypeInBatches(mediaObjectType, contentTypeIds, executeStep);
 
         if (total == 0)
         {
             return;
         }
+
+        executeStep(() =>
+        {
+            propertyAliasesByContentType = GetPropertyAliasesByContentType(contentTypeIds);
+        });
 
         long processed = 0;
         long pageIndex = 0;
@@ -1195,10 +1208,16 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
                 pageComplete = true;
             });
 
+            // The break IS reachable: the executeStep delegate's early return (a page yielding no nodes — e.g.
+            // content removed concurrently, leaving the total row count stale) leaves pageComplete false, which
+            // guards against looping indefinitely. SonarLint cannot see through the delegate, so it incorrectly
+            // reports the condition as always false.
+#pragma warning disable S2583 // Conditionally executed code should be reachable
             if (!pageComplete)
             {
                 break;
             }
+#pragma warning restore S2583
 
             pageIndex++;
         }
@@ -1358,31 +1377,38 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
 
     /// <summary>
     /// Gets content metadata for the specified node IDs using efficient JOIN. Used for media and members.
+    /// Batched on nodeIds so a NuCacheSettings.SqlPageSize larger than MaxParameterCount still works.
     /// </summary>
     private List<CacheRebuildContentDto> GetContentMetadataForNodes(List<int> nodeIds)
     {
-        Sql<ISqlContext> sql = Sql()
-            .Select<NodeDto>(
-                x => x.NodeId,
-                x => x.UniqueId,
-                x => x.Text,
-                x => x.Path,
-                x => x.Level,
-                x => x.ParentId,
-                x => x.SortOrder,
-                x => x.CreateDate,
-                x => Alias(x.UserId, "CreatorId"))
-            .AndSelect<ContentDto>(x => x.ContentTypeId)
-            .AndSelect<ContentVersionDto>(
-                x => Alias(x.Id, "VersionId"),
-                x => Alias(x.VersionDate, "VersionDate"),
-                x => Alias(x.UserId, "WriterId"))
-            .From<NodeDto>()
-            .InnerJoin<ContentDto>().On<NodeDto, ContentDto>((n, c) => n.NodeId == c.NodeId)
-            .InnerJoin<ContentVersionDto>().On<NodeDto, ContentVersionDto>((n, cv) => n.NodeId == cv.NodeId && cv.Current)
-            .WhereIn<NodeDto>(x => x.NodeId, nodeIds);
+        var results = new List<CacheRebuildContentDto>(nodeIds.Count);
+        foreach (IEnumerable<int> group in nodeIds.InGroupsOf(Constants.Sql.MaxParameterCount))
+        {
+            Sql<ISqlContext> sql = Sql()
+                .Select<NodeDto>(
+                    x => x.NodeId,
+                    x => x.UniqueId,
+                    x => x.Text,
+                    x => x.Path,
+                    x => x.Level,
+                    x => x.ParentId,
+                    x => x.SortOrder,
+                    x => x.CreateDate,
+                    x => Alias(x.UserId, "CreatorId"))
+                .AndSelect<ContentDto>(x => x.ContentTypeId)
+                .AndSelect<ContentVersionDto>(
+                    x => Alias(x.Id, "VersionId"),
+                    x => Alias(x.VersionDate, "VersionDate"),
+                    x => Alias(x.UserId, "WriterId"))
+                .From<NodeDto>()
+                .InnerJoin<ContentDto>().On<NodeDto, ContentDto>((n, c) => n.NodeId == c.NodeId)
+                .InnerJoin<ContentVersionDto>().On<NodeDto, ContentVersionDto>((n, cv) => n.NodeId == cv.NodeId && cv.Current)
+                .WhereIn<NodeDto>(x => x.NodeId, group);
 
-        return Database.Fetch<CacheRebuildContentDto>(sql);
+            results.AddRange(Database.Fetch<CacheRebuildContentDto>(sql));
+        }
+
+        return results;
     }
 
     /// <summary>
@@ -1446,37 +1472,21 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
 
         Guid memberObjectType = Constants.ObjectTypes.Member;
 
-        long total = 0;
         Dictionary<int, List<string>>? propertyAliasesByContentType = null;
 
-        executeStep(() =>
-        {
-            RemoveByObjectType(memberObjectType, contentTypeIds);
-
-            Sql<ISqlContext> countSql = Sql()
-                .SelectCount()
-                .From<NodeDto>()
-                .InnerJoin<ContentDto>().On<NodeDto, ContentDto>((n, c) => n.NodeId == c.NodeId)
-                .Where<NodeDto>(x => x.NodeObjectType == memberObjectType);
-
-            if (contentTypeIds.Count > 0)
-            {
-                countSql = countSql.WhereIn<ContentDto>(x => x.ContentTypeId, contentTypeIds);
-            }
-
-            total = Database.ExecuteScalar<long>(countSql);
-            if (total == 0)
-            {
-                return;
-            }
-
-            propertyAliasesByContentType = GetPropertyAliasesByContentType(contentTypeIds);
-        });
+        // Delete stale rows in batches (each its own step); the returned count of affected nodes is the
+        // number to repopulate, so no separate count query is needed.
+        long total = RemoveByObjectTypeInBatches(memberObjectType, contentTypeIds, executeStep);
 
         if (total == 0)
         {
             return;
         }
+
+        executeStep(() =>
+        {
+            propertyAliasesByContentType = GetPropertyAliasesByContentType(contentTypeIds);
+        });
 
         long processed = 0;
         long pageIndex = 0;
@@ -1508,13 +1518,131 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
                 pageComplete = true;
             });
 
+            // The break IS reachable: the executeStep delegate's early return (a page yielding no nodes — e.g.
+            // content removed concurrently, leaving the total row count stale) leaves pageComplete false, which
+            // guards against looping indefinitely. SonarLint cannot see through the delegate, so it incorrectly
+            // reports the condition as always false.
+#pragma warning disable S2583 // Conditionally executed code should be reachable
             if (!pageComplete)
             {
                 break;
             }
+#pragma warning restore S2583
 
             pageIndex++;
         }
+    }
+
+    /// <summary>
+    ///     Deletes the <c>cmsContentNu</c> rows for the given object type in batches, running each batch through
+    ///     the supplied <paramref name="executeStep" /> delegate.
+    /// </summary>
+    /// <remarks>
+    ///     Batching avoids a single unbounded DELETE that can escalate to a table lock, bloat the transaction
+    ///     log, and (for a content type backing a lot of content) exceed the command timeout. When the caller's
+    ///     <paramref name="executeStep" /> opens a fresh scope per step (the deferred rebuild path), each batch
+    ///     commits in its own transaction, so the locks and log space it uses are released between batches
+    ///     instead of accumulating across the whole delete. When it runs inline (the immediate path) the batches
+    ///     share the ambient transaction, but each DELETE statement is still individually bounded.
+    /// </remarks>
+    /// <returns>The number of content nodes affected, i.e. the number that will need repopulating.</returns>
+    private long RemoveByObjectTypeInBatches(Guid objectType, IReadOnlyCollection<int> contentTypeIds, Action<Action> executeStep)
+    {
+        // A full clear (no content type filter) is only used by full rebuilds, where the table has typically
+        // already been truncated, so keep it as a single statement.
+        if (contentTypeIds.Count == 0)
+        {
+            long allCount = 0;
+            executeStep(() =>
+            {
+                RemoveByObjectType(objectType, contentTypeIds);
+                allCount = CountByObjectType(objectType, contentTypeIds);
+            });
+            return allCount;
+        }
+
+        // The node ids come from the (stable) source tables, not cmsContentNu, so fetching them once up front
+        // is safe: concurrent foreground saves during a deferred rebuild only add/remove rows we either
+        // correctly skip (new rows are preserved) or harmlessly no-op on (already-removed rows).
+        List<int> nodeIds = [];
+        executeStep(() => nodeIds = GetNodeIdsByContentTypes(objectType, contentTypeIds));
+
+        var batchSize = Math.Clamp(_nucacheSettings.Value.ContentTypeRebuildDeleteBatchSize, 1, Constants.Sql.MaxParameterCount);
+        var totalBatches = (int)Math.Ceiling(nodeIds.Count / (double)batchSize);
+
+        if (_logger.IsEnabled(LogLevel.Debug))
+        {
+            _logger.LogDebug(
+                "Rebuild: deleting cmsContentNu rows for object type {ObjectType} — {NodeCount} node(s) in {BatchCount} batch(es) of up to {BatchSize}.",
+                objectType,
+                nodeIds.Count,
+                totalBatches,
+                batchSize);
+        }
+
+        var batchNumber = 0;
+        foreach (IEnumerable<int> batch in nodeIds.InGroupsOf(batchSize))
+        {
+            var nodeIdBatch = batch.ToArray();
+            var currentBatchNumber = ++batchNumber;
+            executeStep(() =>
+            {
+                DeleteContentNuByNodeIds(nodeIdBatch);
+                if (_logger.IsEnabled(LogLevel.Debug))
+                {
+                    _logger.LogDebug(
+                        "Rebuild: deleted cmsContentNu batch {BatchNumber}/{BatchCount} ({NodeCount} node(s)) for object type {ObjectType}.",
+                        currentBatchNumber,
+                        totalBatches,
+                        nodeIdBatch.Length,
+                        objectType);
+                }
+            });
+        }
+
+        return nodeIds.Count;
+    }
+
+    private List<int> GetNodeIdsByContentTypes(Guid objectType, IReadOnlyCollection<int> contentTypeIds)
+    {
+        Sql<ISqlContext> sql = Sql()
+            .Select<NodeDto>(x => x.NodeId)
+            .From<NodeDto>()
+            .InnerJoin<ContentDto>().On<NodeDto, ContentDto>((n, c) => n.NodeId == c.NodeId)
+            .Where<NodeDto>(x => x.NodeObjectType == objectType)
+            .WhereIn<ContentDto>(x => x.ContentTypeId, contentTypeIds);
+
+        return Database.Fetch<int>(sql);
+    }
+
+    private long CountByObjectType(Guid objectType, IReadOnlyCollection<int> contentTypeIds)
+    {
+        Sql<ISqlContext> sql = Sql()
+            .SelectCount()
+            .From<NodeDto>()
+            .InnerJoin<ContentDto>().On<NodeDto, ContentDto>((n, c) => n.NodeId == c.NodeId)
+            .Where<NodeDto>(x => x.NodeObjectType == objectType);
+
+        if (contentTypeIds.Count > 0)
+        {
+            sql = sql.WhereIn<ContentDto>(x => x.ContentTypeId, contentTypeIds);
+        }
+
+        return Database.ExecuteScalar<long>(sql);
+    }
+
+    private void DeleteContentNuByNodeIds(int[] nodeIds)
+    {
+        if (nodeIds.Length == 0)
+        {
+            return;
+        }
+
+        Sql<ISqlContext> sql = Sql()
+            .Delete<ContentNuDto>()
+            .WhereIn<ContentNuDto>(x => x.NodeId, nodeIds);
+
+        Database.Execute(sql);
     }
 
     /// <summary>
@@ -1651,13 +1779,18 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
 
         foreach (ContentNuDto dto in items)
         {
-            Database.Execute($@"
-                INSERT INTO [{tableName}] ({nodeId}, {published}, {C("data")}, {C("dataRaw")}, {C("rv")})
+            Database.Execute(
+                $@"INSERT INTO [{tableName}] ({nodeId}, {published}, {C("data")}, {C("dataRaw")}, {C("rv")})
                 SELECT @0, @1, @2, @3, @4
                 WHERE NOT EXISTS (
                     SELECT 1 FROM [{tableName}]
                     WHERE {nodeId} = @0 AND {published} = @1
-                )", dto.NodeId, dto.Published, (object?)dto.Data ?? DBNull.Value, (object?)dto.RawData ?? DBNull.Value, dto.Rv);
+                )",
+                dto.NodeId,
+                dto.Published,
+                (object?)dto.Data ?? DBNull.Value,
+                (object?)dto.RawData ?? DBNull.Value,
+                dto.Rv);
         }
     }
 

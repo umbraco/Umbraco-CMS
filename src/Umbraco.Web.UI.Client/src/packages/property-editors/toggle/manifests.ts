@@ -1,4 +1,5 @@
 import { manifest as trueFalseSchemaManifest } from './Umbraco.TrueFalse.js';
+import { manifests as valueSummaryManifests } from './value-summary/manifests.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -89,4 +90,5 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 	},
 	trueFalseSchemaManifest,
+	...valueSummaryManifests,
 ];

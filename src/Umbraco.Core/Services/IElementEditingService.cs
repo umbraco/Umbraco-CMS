@@ -39,6 +39,17 @@ public interface IElementEditingService
     Task<Attempt<ElementCreateResult, ContentEditingOperationStatus>> CreateAsync(ElementCreateModel createModel, Guid userKey);
 
     /// <summary>
+    ///     Creates and publishes a new element.
+    /// </summary>
+    /// <param name="createModel">The model containing the element data.</param>
+    /// <param name="culturesToPublish">The cultures to publish.</param>
+    /// <param name="userKey">The unique identifier of the user performing the action.</param>
+    /// <returns>An attempt containing the creation result or an error status.</returns>
+    // TODO (V19): Remove default implementation.
+    Task<Attempt<ElementCreateResult, ContentEditingOperationStatus>> CreateAndPublishAsync(ElementCreateModel createModel, string[] culturesToPublish, Guid userKey)
+        => throw new NotImplementedException();
+
+    /// <summary>
     ///     Updates an existing element.
     /// </summary>
     /// <param name="key">The unique identifier of the element to update.</param>
@@ -46,6 +57,18 @@ public interface IElementEditingService
     /// <param name="userKey">The unique identifier of the user performing the action.</param>
     /// <returns>An attempt containing the update result or an error status.</returns>
     Task<Attempt<ElementUpdateResult, ContentEditingOperationStatus>> UpdateAsync(Guid key, ElementUpdateModel updateModel, Guid userKey);
+
+    /// <summary>
+    ///     Updates and publishes an existing element.
+    /// </summary>
+    /// <param name="key">The unique identifier of the element to update.</param>
+    /// <param name="updateModel">The model containing the updated element data.</param>
+    /// <param name="culturesToPublish">The cultures to publish.</param>
+    /// <param name="userKey">The unique identifier of the user performing the action.</param>
+    /// <returns>An attempt containing the update result or an error status.</returns>
+    // TODO (V19): Remove default implementation.
+    Task<Attempt<ElementUpdateResult, ContentEditingOperationStatus>> UpdateAndPublishAsync(Guid key, ElementUpdateModel updateModel, string[] culturesToPublish, Guid userKey)
+        => throw new NotImplementedException();
 
     /// <summary>
     ///     Deletes an element whether it is in the recycle bin or not.

@@ -375,14 +375,8 @@ export default {
 		editscript: 'Editar arquivo de script',
 	},
 	sections: {
-		concierge: 'Porteiro',
-		courier: 'Mensageiro',
-		developer: 'Desenvolvedor',
-		installer: 'Assistente de Configuração Umbraco',
 		media: 'Mídia',
-		newsletters: 'Boletins Informativos',
 		settings: 'Configurações',
-		statistics: 'Estatísticas',
 		users: 'Usuários',
 	},
 	settings: {

@@ -22,6 +22,10 @@ export class UserGroupUiHelper extends UiBaseLocators {
   private readonly sectionList: Locator;
   private readonly documentPermissionsGroups: Locator;
   private readonly elementPermissionsGroups: Locator;
+  private readonly elementFolderPermissionsGroups: Locator;
+  private readonly workspaceUsersSection: Locator;
+  private readonly chooseUserButton: Locator;
+  private readonly workspaceUserItemRefs: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -44,6 +48,10 @@ export class UserGroupUiHelper extends UiBaseLocators {
     this.iconChecked = page.locator('uui-toggle').locator('#icon-checked').getByRole('img');
     this.documentPermissionsGroups = page.locator('umb-user-group-entity-type-permission-groups uui-box').filter({hasText: 'Document permissions'});
     this.elementPermissionsGroups = page.locator('umb-user-group-entity-type-permission-groups uui-box').filter({hasText: 'Element permissions'});
+    this.elementFolderPermissionsGroups = page.locator('umb-user-group-entity-type-permission-groups uui-box').filter({hasText: 'Element Folder permissions'});
+    this.workspaceUsersSection = page.locator('umb-user-group-workspace-users');
+    this.chooseUserButton = this.workspaceUsersSection.locator('#btn-add');
+    this.workspaceUserItemRefs = this.workspaceUsersSection.locator('umb-entity-item-ref');
   }
 
   async clickUserGroupsButton() {
@@ -236,5 +244,68 @@ export class UserGroupUiHelper extends UiBaseLocators {
       if (description !== '')
         await expect(permissionItemLocator.locator('#setting small')).toHaveText(description);
     }
+  }
+
+  async clickElementFolderPermissionsByName(permissionName: string[]) {
+    for (let i = 0; i < permissionName.length; i++) {
+      await this.click(this.elementFolderPermissionsGroups.getByText(permissionName[i], {exact: true}));
+    }
+  }
+
+  async doesUserGroupHaveElementFolderPermission(permissionName: string, hasPermission = true) {
+    await this.isVisible(this.elementFolderPermissionsGroups.locator('umb-input-user-permission-verb[label="' + permissionName + '"]').filter({has: this.iconChecked}), hasPermission);
+  }
+
+  async doesUserGroupHaveElementFolderPermissionsEnabled(permissionName: string[]) {
+    return await Promise.all(
+      permissionName.map(permission => this.doesUserGroupHaveElementFolderPermission(permission))
+    );
+  }
+
+  async doesElementFolderPermissionsSettingsHaveValue(settings) {
+    for (let index = 0; index < Object.keys(settings).length; index++) {
+      const [name, description] = settings[index];
+      const permissionItemLocator = this.elementFolderPermissionsGroups.locator(this.permissionVerbBtn).nth(index);
+      await expect(permissionItemLocator.locator('#name')).toHaveText(name);
+      if (description !== '')
+        await expect(permissionItemLocator.locator('#setting small')).toHaveText(description);
+    }
+  }
+
+  // Workspace users section (Manage Users From Group)
+  async clickChooseUserButton() {
+    await this.click(this.chooseUserButton);
+  }
+
+  async clickRemoveButtonForUserWithName(userName: string) {
+    await this.click(this.workspaceUserItemRefs.filter({hasText: userName}).getByLabel('Remove'));
+  }
+
+  async isUserVisibleInUserGroup(userName: string, isVisible = true) {
+    await this.isVisible(this.workspaceUserItemRefs.filter({hasText: userName}), isVisible);
+  }
+
+  async getUsersInGroupCount() {
+    await this.waitForVisible(this.workspaceUsersSection);
+    return await this.workspaceUserItemRefs.count();
+  }
+
+  async clickUserCardWithName(userName: string) {
+    await this.click(this.page.locator('uui-card-user', {hasText: userName}));
+  }
+
+  async clickChooseModalButtonAndWaitForGroupUsersUpdate() {
+    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.userGroup, this.clickChooseModalButton(), ConstantHelper.statusCodes.ok);
+  }
+
+  async clickConfirmRemoveButtonAndWaitForGroupUsersUpdate() {
+    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.userGroup, this.clickConfirmRemoveButton(), ConstantHelper.statusCodes.ok);
+  }
+
+  async clickSaveButtonAndWaitForUserGroupWithUsersToBeCreated() {
+    return await Promise.all([
+      this.page.waitForResponse((resp) => resp.url().includes(ConstantHelper.apiEndpoints.userGroup) && resp.status() === ConstantHelper.statusCodes.ok),
+      this.clickSaveButtonAndWaitForUserGroupToBeCreated(),
+    ]);
   }
 }

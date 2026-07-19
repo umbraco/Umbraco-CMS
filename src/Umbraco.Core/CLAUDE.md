@@ -133,6 +133,23 @@ builder.AddNotificationHandler<ContentSavedNotification, MyNotificationHandler>(
 
 **Key interface**: `IEventAggregator` - publishes notifications to handlers
 
+#### Durable handlers vs. distributed-cache-only publishers
+
+A handler that only implements `INotificationHandler<T>` / `INotificationAsyncHandler<T>`
+is **silently skipped** when the notification is dispatched through a publisher restricted to
+distributed-cache handlers — i.e. `ScopedNotificationPublisher<IDistributedCacheNotificationHandler>`.
+Umbraco Deploy installs exactly such a publisher on its restore/import scopes, and `EventAggregator`
+filters handlers with `.Where(x => x is TNotificationHandler)`.
+
+If a handler must run for **every** change — especially durable database writes that back the
+in-memory cache — implement `IDistributedCacheNotificationHandler` (sync) or
+`IDistributedCacheAsyncNotificationHandler<T>` (async) instead. These derive from the plain handler
+interfaces, so the handler still fires on normal publishes *and* survives the distributed-cache-only
+filter. No DI change is needed — filtering is by resolved instance type.
+
+When you do this, ensure the handler is safe in the extra scopes it now runs in — e.g. guard against
+DB writes on read-only `Subscriber` servers (see `DocumentUrlService.SkipDatabaseWrites()`).
+
 ### 3. Composer Pattern (DI Registration)
 
 Composers register services and configure the application, this is to make the system easily extendible by package developers and implementors.
@@ -305,6 +322,8 @@ public class MyEntityCacheRefresher : CacheRefresherBase<MyEntityCacheRefresher>
    - Result pattern for operations that can fail
    - `Attempt.Succeed(value)` / `Attempt.Fail<T>()`
    - `Attempt<Content, ContentEditingOperationStatus>` - typed result with status
+
+> Writing or reviewing a query with a `WHERE IN` on a runtime-sized collection? See "Avoiding the SQL Server 2100-parameter limit" in `/src/Umbraco.Infrastructure/CLAUDE.md` — that's where the full helper list (`Constants.Sql.MaxParameterCount`, `InGroupsOf`, NPoco's `FetchByGroups`) and the decision rules live.
 
 ### Configuration
 
@@ -498,6 +517,7 @@ Internal types are accessible in test projects for more thorough testing.
 6. **Culture handling** - Many operations require explicit culture parameter
 7. **Published vs Draft** - `IContent` is draft, `IPublishedContent` is published
 8. **Constants** - Use constants instead of magic strings (property editor aliases, etc.)
+9. **Distributed-cache-only publishers skip plain handlers** - handlers doing durable work (e.g. DB writes) must implement `IDistributedCacheNotificationHandler` / `IDistributedCacheAsyncNotificationHandler<T>`, or they won't fire under Umbraco Deploy and similar restricted scopes.
 
 ## Navigation Tips
 

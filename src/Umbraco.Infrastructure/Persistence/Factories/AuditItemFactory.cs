@@ -31,10 +31,10 @@ internal static class AuditItemFactory
             dto.Datestamp.EnsureUtc());
 
     /// <summary>
-    /// Builds a <see cref="Umbraco.Cms.Core.Models.Membership.LogDto"/> from the given <see cref="Umbraco.Cms.Core.Models.IAuditItem"/> entity.
+    /// Builds a <see cref="LogDto"/> from the given <see cref="Umbraco.Cms.Core.Models.IAuditItem"/> entity.
     /// </summary>
     /// <param name="entity">The audit item entity to convert.</param>
-    /// <returns>A <see cref="Umbraco.Cms.Core.Models.Membership.LogDto"/> representing the audit item.</returns>
+    /// <returns>A <see cref="LogDto"/> representing the audit item.</returns>
     public static LogDto BuildDto(IAuditItem entity) =>
         new LogDto
         {

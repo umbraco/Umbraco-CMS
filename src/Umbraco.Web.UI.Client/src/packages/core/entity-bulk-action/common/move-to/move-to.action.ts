@@ -11,17 +11,25 @@ import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UMB_TREE_PICKER_MODAL } from '@umbraco-cms/backoffice/tree';
 import type { MetaEntityBulkActionMoveToKind } from '@umbraco-cms/backoffice/extension-registry';
 
-export class UmbMediaMoveEntityBulkAction extends UmbEntityBulkActionBase<MetaEntityBulkActionMoveToKind> {
+export class UmbMoveToEntityBulkAction extends UmbEntityBulkActionBase<MetaEntityBulkActionMoveToKind> {
+	#searchConfig() {
+		const alias = this.args.meta.searchProviderAlias;
+		return alias ? { providerAlias: alias } : undefined;
+	}
+
 	async execute() {
 		if (this.selection?.length === 0) return;
 
 		const value = await umbOpenModal(this, UMB_TREE_PICKER_MODAL, {
 			data: {
+				headline: '#actions_move',
+				confirmLabel: '#general_move',
 				foldersOnly: this.args.meta.foldersOnly,
 				hideTreeRoot: this.args.meta.hideTreeRoot,
 				treeAlias: this.args.meta.treeAlias,
+				search: this.#searchConfig(),
 			},
-		});
+		}).catch(() => undefined);
 
 		if (!value?.selection?.length) return;
 
@@ -57,4 +65,4 @@ export class UmbMediaMoveEntityBulkAction extends UmbEntityBulkActionBase<MetaEn
 	}
 }
 
-export { UmbMediaMoveEntityBulkAction as api };
+export { UmbMoveToEntityBulkAction as api };

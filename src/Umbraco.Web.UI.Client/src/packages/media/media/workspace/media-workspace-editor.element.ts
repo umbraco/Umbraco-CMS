@@ -5,7 +5,9 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { customElement, state, css, html } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbRoute, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
+import { createObservablePart } from '@umbraco-cms/backoffice/observable-api';
 
+// TODO: Refactor across all four content workspace editors (document, document blueprint, media, member) to use a base component. [NL]
 @customElement('umb-media-workspace-editor')
 export class UmbMediaWorkspaceEditorElement extends UmbLitElement {
 	//
@@ -13,8 +15,9 @@ export class UmbMediaWorkspaceEditorElement extends UmbLitElement {
 	private _splitViewElement = new UmbMediaWorkspaceSplitViewElement();
 
 	#workspaceContext?: typeof UMB_MEDIA_WORKSPACE_CONTEXT.TYPE;
-	#variants?: Array<UmbMediaVariantOptionModel>;
-	#isForbidden = false;
+
+	#workspaceRoute?: string;
+	#variants?: Array<Pick<UmbMediaVariantOptionModel, 'culture' | 'segment' | 'unique'>>;
 
 	@state()
 	private _routes?: Array<UmbRoute>;
@@ -28,30 +31,26 @@ export class UmbMediaWorkspaceEditorElement extends UmbLitElement {
 		this.consumeContext(UMB_MEDIA_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
 			this.#observeVariants();
-			this.#observeForbidden();
 			this.#observeLoading();
 		});
 	}
 
 	#observeVariants() {
 		this.observe(
-			this.#workspaceContext?.variantOptions,
+			this.#workspaceContext
+				? createObservablePart(this.#workspaceContext.variantOptions, (variants) =>
+						variants.map((v) => ({
+							culture: v.culture,
+							segment: v.segment,
+							unique: v.unique,
+						})),
+					)
+				: undefined,
 			(options) => {
 				this.#variants = options;
 				this._generateRoutes();
 			},
 			'_observeVariants',
-		);
-	}
-
-	#observeForbidden() {
-		this.observe(
-			this.#workspaceContext?.forbidden.isOn,
-			(forbidden) => {
-				this.#isForbidden = forbidden ?? false;
-				this._generateRoutes();
-			},
-			'_observeForbidden',
 		);
 	}
 
@@ -67,75 +66,81 @@ export class UmbMediaWorkspaceEditorElement extends UmbLitElement {
 
 	private async _generateRoutes() {
 		if (!this.#variants || this.#variants.length === 0) {
-			this._routes = [];
-			this.#ensureForbiddenRoute(this._routes);
+			this._routes = [this.#createNotFoundRoute()];
 			return;
 		}
 
 		// Generate split view routes for all available routes
 		const routes: Array<UmbRoute> = [];
 
-		// Split view routes:
-		this.#variants?.forEach((variantA) => {
-			this.#variants?.forEach((variantB) => {
-				routes.push({
-					// TODO: When implementing Segments, be aware if using the unique is URL Safe... [NL]
-					path: variantA.unique + '_&_' + variantB.unique,
-					component: this._splitViewElement,
-					setup: (_component, info) => {
-						// Set split view/active info..
-						this.#workspaceContext?.splitView.setVariantParts(info.match.fragments.consumed);
-					},
-				});
-			});
+		routes.push({
+			path: '/:variantPath/',
+			preserveQuery: true,
+			component: this._splitViewElement,
+			setup: async (_component, info) => {
+				const variants = this.#variants;
+				if (!variants) {
+					throw new Error('Variants are not available when resolving the route.');
+				}
+				if (!this.#workspaceContext) {
+					throw new Error('Workspace context is not available when resolving the route.');
+				}
+
+				const consumed = info.match.fragments.consumed;
+
+				this.#workspaceContext?.splitView.setVariantParts(consumed);
+			},
 		});
 
-		// Single view:
-		this.#variants?.forEach((variant) => {
-			routes.push({
-				// TODO: When implementing Segments, be aware if using the unique is URL Safe... [NL]
-				path: variant.unique,
-				component: this._splitViewElement,
-				setup: (_component, info) => {
-					// cause we might come from a split-view, we need to reset index 1.
-					this.#workspaceContext?.splitView.removeActiveVariant(1);
-					this.#workspaceContext?.splitView.handleVariantFolderPart(0, info.match.fragments.consumed);
-				},
-			});
-		});
-
-		if (routes.length !== 0 && this.#variants?.length) {
-			// Using first single view as the default route for now (hence the math below):
+		if (routes.length !== 0) {
+			// Find a decent variant to use as the default route:
 			routes.push({
 				path: '',
+				preserveQuery: true,
 				pathMatch: 'full',
-				redirectTo: routes[this.#variants.length * this.#variants.length]?.path,
+				resolve: async () => {
+					if (!this.#workspaceContext) {
+						throw new Error('Workspace context is not available when resolving the default route.');
+					}
+
+					// get current get variables from url, and check if openCollection is set:
+					const urlSearchParams = new URLSearchParams(window.location.search);
+					const openCollection = urlSearchParams.has('openCollection');
+					const view = openCollection ? `/view/collection` : '';
+
+					// Is there a path matching the current culture?
+					let variant = this.#variants?.find((v) => !v.culture);
+
+					if (!variant) {
+						// If none then just use the first variant as a fallback.
+						variant = this.#variants?.[0];
+					}
+
+					history.replaceState({}, '', `${this.#workspaceRoute}/${variant?.unique}${view}`);
+				},
 			});
 		}
 
-		this.#ensureForbiddenRoute(routes);
+		routes.push(this.#createNotFoundRoute());
 
 		this._routes = routes;
 	}
 
-	/**
-	 * Ensure that there is a route to handle forbidden access.
-	 * This route will display a forbidden message when the user does not have permission to access certain resources.
-	 * Also handles not found routes.
-	 * @param {Array<UmbRoute>} routes - The array of routes to append the forbidden route to
-	 */
-	#ensureForbiddenRoute(routes: Array<UmbRoute> = []) {
-		routes.push({
+	#createNotFoundRoute(): UmbRoute {
+		return {
 			path: '**',
 			component: async () => {
 				const router = await import('@umbraco-cms/backoffice/router');
-				return this.#isForbidden ? router.UmbRouteForbiddenElement : router.UmbRouteNotFoundElement;
+				return this.#workspaceContext?.forbidden.getIsOn()
+					? router.UmbRouteForbiddenElement
+					: router.UmbRouteNotFoundElement;
 			},
-		});
+		};
 	}
 
 	private _gotWorkspaceRoute = (e: UmbRouterSlotInitEvent) => {
-		this.#workspaceContext?.splitView.setWorkspaceRoute(e.target.absoluteRouterPath);
+		this.#workspaceRoute = e.target.absoluteRouterPath;
+		this.#workspaceContext?.splitView.setWorkspaceRoute(this.#workspaceRoute);
 	};
 
 	override render() {

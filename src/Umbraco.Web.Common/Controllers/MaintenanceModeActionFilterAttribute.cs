@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.ActionsResults;
 
@@ -26,11 +27,16 @@ public sealed class MaintenanceModeActionFilterAttribute : TypeFilterAttribute
     {
         private readonly IRuntimeState _runtimeState;
         private readonly IOptionsMonitor<GlobalSettings> _globalSettings;
+        private readonly IContentRoutingReadiness _contentRoutingReadiness;
 
-        public MaintenanceModeActionFilter(IRuntimeState runtimeState, IOptionsMonitor<GlobalSettings> globalSettings)
+        public MaintenanceModeActionFilter(
+            IRuntimeState runtimeState,
+            IOptionsMonitor<GlobalSettings> globalSettings,
+            IContentRoutingReadiness contentRoutingReadiness)
         {
             _runtimeState = runtimeState;
             _globalSettings = globalSettings;
+            _contentRoutingReadiness = contentRoutingReadiness;
         }
 
         public void OnActionExecuting(ActionExecutingContext context)
@@ -47,13 +53,18 @@ public sealed class MaintenanceModeActionFilterAttribute : TypeFilterAttribute
 
             bool isApiController = context.ActionDescriptor.EndpointMetadata.OfType<ApiControllerAttribute>().Any();
 
+            // After a background unattended upgrade the runtime reaches Run before this server has finished
+            // seeding its per-server content caches. Treat that window like an ongoing unattended upgrade so
+            // requests don't reach the pipeline before it's ready to serve. See #22581.
+            bool inInitializationWindow = _contentRoutingReadiness.IsInInitializationWindow(_runtimeState);
+
             // API controllers (Management/Delivery API) are only blocked during an unattended upgrade
-            // (RuntimeLevel.Upgrading). During an attended upgrade (RuntimeLevel.Upgrade) the operator
-            // needs API access to log in and trigger the upgrade from the backoffice.
-            // MVC controllers (website, surface) are blocked during both Upgrade and Upgrading.
+            // (RuntimeLevel.Upgrading) and the subsequent initialization window. During an attended upgrade
+            // (RuntimeLevel.Upgrade) the operator needs API access to log in and trigger the upgrade from the
+            // backoffice. MVC controllers (website, surface) are blocked during both Upgrade and Upgrading.
             bool shouldBlock = isApiController
-                ? _runtimeState.Level == RuntimeLevel.Upgrading
-                : _runtimeState.Level is RuntimeLevel.Upgrade or RuntimeLevel.Upgrading;
+                ? _runtimeState.Level is RuntimeLevel.Upgrading || inInitializationWindow
+                : _runtimeState.Level is RuntimeLevel.Upgrade or RuntimeLevel.Upgrading || inInitializationWindow;
 
             if (shouldBlock is false)
             {
@@ -62,17 +73,20 @@ public sealed class MaintenanceModeActionFilterAttribute : TypeFilterAttribute
 
             if (isApiController)
             {
+                // Distinguish the two blocking states so clients can tell "still starting up" from an actual upgrade.
                 var problem = new ProblemDetails
                 {
                     Status = StatusCodes.Status503ServiceUnavailable,
                     Title = "Service Unavailable",
-                    Detail = "The application is currently being upgraded. Please try again later.",
+                    Detail = inInitializationWindow
+                        ? "The application is starting up and is not yet ready to handle requests. Please try again shortly."
+                        : "The application is currently being upgraded. Please try again later.",
                 };
                 context.Result = new ObjectResult(problem) { StatusCode = StatusCodes.Status503ServiceUnavailable };
                 return;
             }
 
-            context.Result = _runtimeState.Level == RuntimeLevel.Upgrading
+            context.Result = _runtimeState.Level is RuntimeLevel.Upgrading || inInitializationWindow
                 ? new MaintenanceResult(_globalSettings.CurrentValue.UpgradingViewPath)
                 : new MaintenanceResult();
         }

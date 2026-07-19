@@ -121,3 +121,6 @@ trace.zip
 /tests/Umbraco.Tests.Integration/umbraco-package-schema.json
 /src/Umbraco.Cms/appsettings-schema.json
 .playwright-mcp/
+
+# SonarQube local analysis cache
+.sonarqube/

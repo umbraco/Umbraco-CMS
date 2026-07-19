@@ -147,10 +147,11 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 	renderSearch() {
 		return html`
 			<uui-input
+				id="search"
+				name="icon-search"
 				type="search"
 				placeholder=${this.localize.term('placeholders_filter')}
 				label=${this.localize.term('placeholders_filter')}
-				id="search"
 				@input=${this.#onSearchInput}
 				${umbFocus()}>
 				<uui-icon name="search" slot="prepend" id="search_icon"></uui-icon>

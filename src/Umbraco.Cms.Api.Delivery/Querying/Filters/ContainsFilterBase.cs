@@ -42,7 +42,7 @@ public abstract class ContainsFilterBase : IFilterHandler
             return DefaultFilterOption();
         }
 
-        FilterOperation? filterOperation = ParseFilterOperation(operatorGroup.Value);
+        FilterOperation? filterOperation = ParseFilterOperation(operatorGroup.ValueSpan);
         if (filterOperation.HasValue is false)
         {
             return DefaultFilterOption();
@@ -64,7 +64,7 @@ public abstract class ContainsFilterBase : IFilterHandler
             };
     }
 
-    private FilterOperation? ParseFilterOperation(string filterOperation)
+    private static FilterOperation? ParseFilterOperation(ReadOnlySpan<char> filterOperation)
         => filterOperation switch
         {
             ":" => FilterOperation.Is,

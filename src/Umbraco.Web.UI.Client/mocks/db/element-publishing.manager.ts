@@ -1,8 +1,10 @@
 import type { UmbMockElementModel } from '../data/mock-data-set.types.js';
 import type { UmbElementMockDB } from './element.db.js';
 import type {
+	CreateAndPublishElementRequestModel,
 	PublishElementRequestModel,
 	UnpublishElementRequestModel,
+	UpdateAndPublishElementRequestModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbElementVariantState } from '@umbraco-cms/backoffice/element';
 
@@ -11,6 +13,33 @@ export class UmbMockElementPublishingManager {
 
 	constructor(elementDb: UmbElementMockDB) {
 		this.#elementDb = elementDb;
+	}
+
+	createAndPublish(data: CreateAndPublishElementRequestModel) {
+		const id = this.#elementDb.detail.create(data);
+		this.#publishCultures(id, data.culturesToPublish);
+		return id;
+	}
+
+	updateAndPublish(id: string, data: UpdateAndPublishElementRequestModel) {
+		this.#elementDb.detail.update(id, data);
+		this.#publishCultures(id, data.culturesToPublish);
+	}
+
+	#publishCultures(id: string, culturesToPublish: Array<string>) {
+		const element: UmbMockElementModel = this.#elementDb.detail.read(id);
+
+		// Invariant content types publish with an empty cultures array; publish the invariant variant in that case.
+		const cultures: Array<string | null> = culturesToPublish.length > 0 ? culturesToPublish : [null];
+
+		cultures.forEach((culture) => {
+			const variant = element.variants.find((x) => x.culture === culture);
+			if (variant) {
+				variant.state = UmbElementVariantState.PUBLISHED;
+			}
+		});
+
+		this.#elementDb.detail.update(id, element);
 	}
 
 	publish(id: string, data: PublishElementRequestModel) {

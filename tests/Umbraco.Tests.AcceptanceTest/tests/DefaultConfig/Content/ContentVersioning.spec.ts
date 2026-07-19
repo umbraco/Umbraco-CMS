@@ -15,7 +15,7 @@ test.afterEach(async ({umbracoApi}) => {
 
 test('can rollback content to a previous published version', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  await umbracoApi.document.createPublishedDocumentWithTwoNameVersionsAndTwoTextVersions(contentName, contentName, documentTypeName, dataTypeName, originalText, updatedText);
+  const documentId = await umbracoApi.document.createPublishedDocumentWithTwoNameVersionsAndTwoTextVersions(contentName, contentName, documentTypeName, dataTypeName, originalText, updatedText);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
   await umbracoUi.content.goToContentWithName(contentName);
@@ -24,8 +24,8 @@ test('can rollback content to a previous published version', {tag: '@smoke'}, as
   await umbracoUi.content.clickInfoTab();
   await umbracoUi.content.clickRollbackButton();
   await umbracoUi.content.waitForRollbackItems();
-  await umbracoUi.content.clickLatestRollBackItem();
-  await umbracoUi.content.clickRollbackContainerButton();
+  await umbracoUi.content.clickPreviousRollBackItem();
+  await umbracoUi.content.clickRollbackContainerButton(documentId);
 
   // Assert
   await umbracoUi.content.isSuccessNotificationVisible();
@@ -48,7 +48,7 @@ test('can rollback to a previous version from the tree action menu', async ({umb
   await umbracoUi.content.clickActionsMenuForContent(contentName);
   await umbracoUi.content.clickRollbackActionMenuOption();
   await umbracoUi.content.waitForRollbackItems();
-  await umbracoUi.content.clickLatestRollBackItem();
+  await umbracoUi.content.clickPreviousRollBackItem();
   await umbracoUi.content.clickRollbackContainerButton();
 
   // Assert
@@ -75,8 +75,8 @@ test('can rollback a variant document to a previous published version', async ({
   await umbracoUi.content.clickInfoTab();
   await umbracoUi.content.clickRollbackButton();
   await umbracoUi.content.waitForRollbackItems();
-  await umbracoUi.content.clickLatestRollBackItem();
-  await umbracoUi.content.clickRollbackContainerButton();
+  await umbracoUi.content.clickPreviousRollBackItem();
+  await umbracoUi.content.clickRollbackContainerButton(documentId);
 
   // Assert
   await umbracoUi.content.isSuccessNotificationVisible();
@@ -96,8 +96,8 @@ test('rollback restores the document name to the previous version', async ({umbr
   await umbracoUi.content.clickInfoTab();
   await umbracoUi.content.clickRollbackButton();
   await umbracoUi.content.waitForRollbackItems();
-  await umbracoUi.content.clickLatestRollBackItem();
-  await umbracoUi.content.clickRollbackContainerButton();
+  await umbracoUi.content.clickPreviousRollBackItem();
+  await umbracoUi.content.clickRollbackContainerButton(documentId);
 
   // Assert
   await umbracoUi.content.isSuccessNotificationVisible();
@@ -117,7 +117,7 @@ test('cancelling the rollback modal leaves the content unchanged', async ({umbra
   await umbracoUi.content.clickInfoTab();
   await umbracoUi.content.clickRollbackButton();
   await umbracoUi.content.waitForRollbackItems();
-  await umbracoUi.content.clickLatestRollBackItem();
+  await umbracoUi.content.clickPreviousRollBackItem();
   await umbracoUi.content.clickRollbackCancelButton();
 
   // Assert

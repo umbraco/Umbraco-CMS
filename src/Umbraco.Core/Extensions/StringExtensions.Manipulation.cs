@@ -194,7 +194,7 @@ public static partial class StringExtensions
         for (var i = 0; i < queryStrings.Length; i++)
         {
             queryStrings[i] = queryStrings[i].TrimStart(Constants.CharArrays.QuestionMarkAmpersand)
-                .TrimEnd(Constants.CharArrays.Ampersand);
+                .TrimEnd('&');
         }
 
         var nonEmpty = queryStrings.Where(x => !x.IsNullOrWhiteSpace()).ToArray();
@@ -730,6 +730,10 @@ public static partial class StringExtensions
     /// </summary>
     /// <param name="fileName">The file name to convert.</param>
     /// <returns>A friendly name with the extension stripped, underscores and dashes converted to spaces, and title case applied.</returns>
+    /// <remarks>
+    /// Mirrored client-side in <c>src/Umbraco.Web.UI.Client/src/packages/media/media/utils/to-friendly-name.function.ts</c>;
+    /// keep the two implementations in sync.
+    /// </remarks>
     public static string ToFriendlyName(this string fileName)
     {
         // strip the file extension
