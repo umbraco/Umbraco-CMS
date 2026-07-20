@@ -1,5 +1,6 @@
 import type { UmbLinkPickerLink } from '../../link-picker-modal/types.js';
 import { UMB_LINK_PICKER_MODAL } from '../../link-picker-modal/link-picker-modal.token.js';
+import type { UmbLinkPickerDocumentLinksConfig } from '../../link-picker-modal/link-picker-modal.token.js';
 import {
 	css,
 	customElement,
@@ -68,7 +69,7 @@ export class UmbInputMultiUrlElement extends UmbFormControlMixin<string, typeof 
 
 	/**
 	 * Min validation message.
-	 * @type {boolean}
+	 * @type {string}
 	 * @attr
 	 * @default
 	 */
@@ -86,7 +87,7 @@ export class UmbInputMultiUrlElement extends UmbFormControlMixin<string, typeof 
 
 	/**
 	 * Max validation message.
-	 * @type {boolean}
+	 * @type {string}
 	 * @attr
 	 * @default
 	 */
@@ -98,6 +99,9 @@ export class UmbInputMultiUrlElement extends UmbFormControlMixin<string, typeof 
 	 */
 	@property({ type: Boolean, attribute: 'hide-anchor' })
 	hideAnchor?: boolean;
+
+	@property({ type: Object, attribute: false })
+	documentLinksConfig?: UmbLinkPickerDocumentLinksConfig;
 
 	/**
 	 * @type {UUIModalSidebarSize}
@@ -174,7 +178,7 @@ export class UmbInputMultiUrlElement extends UmbFormControlMixin<string, typeof 
 		this.addValidator(
 			'valueMissing',
 			() => this.requiredMessage,
-			() => !this.readonly && this.required && (!this.value || this.value === ''),
+			() => !this.readonly && this.required && this.urls.length === 0,
 		);
 
 		this.addValidator(
@@ -215,6 +219,7 @@ export class UmbInputMultiUrlElement extends UmbFormControlMixin<string, typeof 
 						isNew: index === null,
 						config: {
 							hideAnchor: this.hideAnchor,
+							documentLinksConfig: this.documentLinksConfig,
 						},
 					},
 					value: {
@@ -228,6 +233,7 @@ export class UmbInputMultiUrlElement extends UmbFormControlMixin<string, typeof 
 							type: data?.type,
 							unique: data?.unique,
 							url: data?.url,
+							culture: data?.culture,
 						},
 					},
 				};
@@ -347,6 +353,7 @@ export class UmbInputMultiUrlElement extends UmbFormControlMixin<string, typeof 
 	}
 
 	#dispatchChangeEvent() {
+		super.value = this.#urls.map((x) => x.url).join(',');
 		this.requestUpdate();
 		this.dispatchEvent(new UmbChangeEvent());
 	}
@@ -356,10 +363,10 @@ export class UmbInputMultiUrlElement extends UmbFormControlMixin<string, typeof 
 	}
 
 	#getResolvedItemUrl(link: UmbLinkPickerLink): string {
-		return (
-			(this._resolvedLinkUrls.find((url) => url.unique === link.unique)?.url ?? link.url ?? '') +
-			(link.queryString || '')
-		);
+		const baseUrl = link.culture
+			? (link.url ?? '')
+			: (this._resolvedLinkUrls.find((url) => url.unique === link.unique)?.url ?? link.url ?? '');
+		return baseUrl + (link.queryString || '');
 	}
 
 	override render() {
@@ -407,7 +414,8 @@ export class UmbInputMultiUrlElement extends UmbFormControlMixin<string, typeof 
 				href=${ifDefined(href)}
 				name=${name || url}
 				detail=${ifDefined(name ? url : undefined)}
-				?readonly=${this.readonly}>
+				?readonly=${this.readonly}
+				?standalone=${this.max === 1 && this.urls?.length === 1}>
 				<umb-icon slot="icon" name=${link.icon || 'icon-link'}></umb-icon>
 				${when(
 					!this.readonly,

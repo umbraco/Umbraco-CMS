@@ -7,9 +7,19 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Webhooks.Events;
 
+/// <summary>
+/// Webhook event that fires when a user successfully logs in.
+/// </summary>
 [WebhookEvent("User Login Success")]
 public class UserLoginSuccessWebhookEvent : WebhookEventBase<UserLoginSuccessNotification>
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UserLoginSuccessWebhookEvent"/> class.
+    /// </summary>
+    /// <param name="webhookFiringService">The webhook firing service.</param>
+    /// <param name="webHookService">The webhook service.</param>
+    /// <param name="webhookSettings">The webhook settings.</param>
+    /// <param name="serverRoleAccessor">The server role accessor.</param>
     public UserLoginSuccessWebhookEvent(
         IWebhookFiringService webhookFiringService,
         IWebhookService webHookService,
@@ -19,8 +29,10 @@ public class UserLoginSuccessWebhookEvent : WebhookEventBase<UserLoginSuccessNot
     {
     }
 
+    /// <inheritdoc />
     public override string Alias => Constants.WebhookEvents.Aliases.UserLoginSuccess;
 
+    /// <inheritdoc />
     public override object ConvertNotificationToRequestPayload(UserLoginSuccessNotification notification)
         => new DefaultPayloadModel
         {

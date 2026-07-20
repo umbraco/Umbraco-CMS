@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Runtime.Serialization;
 using Umbraco.Cms.Core.Collections;
 using Umbraco.Cms.Core.Models.Entities;
@@ -175,8 +175,16 @@ public class Property : EntityBase, IProperty
             : null;
     }
 
-    // internal - must be invoked by the content item
-    // does *not* validate the value - content item must validate first
+    /// <summary>
+    ///     Publishes partial property values for a specific culture by merging edited and published values.
+    /// </summary>
+    /// <param name="dataEditor">The data editor used for merging values.</param>
+    /// <param name="culture">The culture to publish values for.</param>
+    /// <remarks>
+    ///     This method is for internal use and must be invoked by the content item.
+    ///     It does not validate the value - the content item must validate first.
+    /// </remarks>
+    /// <exception cref="NotSupportedException">Thrown when attempting to publish merged culture values for culture variant properties.</exception>
     public void PublishPartialValues(IDataEditor dataEditor, string? culture)
     {
         if (PropertyType.VariesByCulture())
@@ -190,8 +198,15 @@ public class Property : EntityBase, IProperty
         PublishValue(_pvalue, value);
     }
 
-    // internal - must be invoked by the content item
-    // does *not* validate the value - content item must validate first
+    /// <summary>
+    ///     Publishes property values for the specified culture and segment.
+    /// </summary>
+    /// <param name="culture">The culture to publish, or "*" for all cultures, or null for invariant.</param>
+    /// <param name="segment">The segment to publish, or "*" for all segments, or null for neutral.</param>
+    /// <remarks>
+    ///     This method is for internal use and must be invoked by the content item.
+    ///     It does not validate the value - the content item must validate first.
+    /// </remarks>
     public void PublishValues(string? culture = "*", string? segment = "*")
     {
         culture = culture?.NullOrWhiteSpaceAsNull();
@@ -224,7 +239,14 @@ public class Property : EntityBase, IProperty
         }
     }
 
-    // internal - must be invoked by the content item
+    /// <summary>
+    ///     Unpublishes property values for the specified culture and segment.
+    /// </summary>
+    /// <param name="culture">The culture to unpublish, or "*" for all cultures, or null for invariant.</param>
+    /// <param name="segment">The segment to unpublish, or "*" for all segments, or null for neutral.</param>
+    /// <remarks>
+    ///     This method is for internal use and must be invoked by the content item.
+    /// </remarks>
     public void UnpublishValues(string? culture = "*", string? segment = "*")
     {
         culture = culture?.NullOrWhiteSpaceAsNull();
@@ -285,9 +307,15 @@ public class Property : EntityBase, IProperty
         return changed;
     }
 
+    /// <summary>
+    ///     Converts an assigned value to the appropriate type for this property.
+    /// </summary>
+    /// <param name="value">The value to convert.</param>
+    /// <returns>The converted value, or null if conversion fails.</returns>
     public object? ConvertAssignedValue(object? value) =>
         TryConvertAssignedValue(value, true, out var converted) ? converted : null;
 
+    /// <inheritdoc />
     protected override void PerformDeepClone(object clone)
     {
         base.PerformDeepClone(clone);
@@ -570,6 +598,13 @@ public class Property : EntityBase, IProperty
     /// </summary>
     public class InitialPropertyValue
     {
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="InitialPropertyValue" /> class.
+        /// </summary>
+        /// <param name="culture">The culture for this value.</param>
+        /// <param name="segment">The segment for this value.</param>
+        /// <param name="published">Whether this is a published value.</param>
+        /// <param name="value">The property value.</param>
         public InitialPropertyValue(string? culture, string? segment, bool published, object? value)
         {
             Culture = culture;
@@ -578,12 +613,24 @@ public class Property : EntityBase, IProperty
             Value = value;
         }
 
+        /// <summary>
+        ///     Gets the culture for this value.
+        /// </summary>
         public string? Culture { get; }
 
+        /// <summary>
+        ///     Gets the segment for this value.
+        /// </summary>
         public string? Segment { get; }
 
+        /// <summary>
+        ///     Gets a value indicating whether this is a published value.
+        /// </summary>
         public bool Published { get; }
 
+        /// <summary>
+        ///     Gets the property value.
+        /// </summary>
         public object? Value { get; }
     }
 
@@ -604,8 +651,10 @@ public class Property : EntityBase, IProperty
         /// </remarks>
         public string? Culture { get; set; }
 
+        /// <inheritdoc />
         public object DeepClone() => Clone();
 
+        /// <inheritdoc />
         public bool Equals(PropertyValue? other) =>
             other != null &&
             Culture == other.Culture &&
@@ -644,8 +693,10 @@ public class Property : EntityBase, IProperty
                 EditedValue = EditedValue,
             };
 
+        /// <inheritdoc />
         public override bool Equals(object? obj) => Equals(obj as PropertyValue);
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             var hashCode = 1885328050;

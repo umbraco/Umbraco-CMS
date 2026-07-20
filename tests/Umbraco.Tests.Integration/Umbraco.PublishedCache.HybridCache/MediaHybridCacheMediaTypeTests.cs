@@ -23,11 +23,12 @@ internal sealed class MediaHybridCacheMediaTypeTests : UmbracoIntegrationTestWit
     protected override void CustomTestSetup(IUmbracoBuilder builder)
     {
         builder.AddNotificationHandler<MediaTreeChangeNotification, MediaTreeChangeDistributedCacheNotificationHandler>();
+        builder.AddNotificationHandler<MediaTypeChangedNotification, MediaTypeChangedDistributedCacheNotificationHandler>();
         builder.Services.AddUnique<IServerMessenger, ContentEventsTests.LocalServerMessenger>();
     }
 
     [Test]
-    public async Task Cannot_Get_Property_From_Media_After_It_Is_Removed_From_MediaType_By_Id()
+    public async Task Structural_Update_Removes_Property_From_Media_By_Id()
     {
         // Arrange
         var oldMedia = await PublishedMediaHybridCache.GetByIdAsync(SubTestMediaId);
@@ -46,7 +47,7 @@ internal sealed class MediaHybridCacheMediaTypeTests : UmbracoIntegrationTestWit
     }
 
     [Test]
-    public async Task Cannot_Get_Property_From_Media_After_It_Is_Removed_From_MediaType_By_Key()
+    public async Task Structural_Update_Removes_Property_From_Media_By_Key()
     {
         // Arrange
         var oldMedia = await PublishedMediaHybridCache.GetByIdAsync(SubTestMedia.Key.Value);
@@ -62,6 +63,27 @@ internal sealed class MediaHybridCacheMediaTypeTests : UmbracoIntegrationTestWit
         // Assert
         var newMedia = await PublishedMediaHybridCache.GetByIdAsync(SubTestMedia.Key.Value);
         Assert.IsNull(newMedia.Value("testProperty"));
+    }
+
+    [Test]
+    public async Task Non_Structural_Update_Preserves_Property_Values_In_Media()
+    {
+        // Arrange - load media into cache and verify the property has a value.
+        var oldMedia = await PublishedMediaHybridCache.GetByIdAsync(SubTestMediaId);
+        Assert.IsNotNull(oldMedia);
+        var originalValue = oldMedia.Value("testProperty");
+        Assert.IsNotNull(originalValue);
+        MediaTypeUpdateHelper mediaTypeUpdateHelper = new MediaTypeUpdateHelper();
+
+        // Act - perform a non-structural change (rename the media type).
+        var updateModel = mediaTypeUpdateHelper.CreateMediaTypeUpdateModel(CustomMediaType);
+        updateModel.Name = "Renamed Media Type";
+        await MediaTypeEditingService.UpdateAsync(CustomMediaType, updateModel, Constants.Security.SuperUserKey);
+
+        // Assert - property values should still be available from cache
+        var newMedia = await PublishedMediaHybridCache.GetByIdAsync(SubTestMediaId);
+        Assert.IsNotNull(newMedia);
+        Assert.AreEqual(originalValue, newMedia.Value("testProperty"));
     }
 
     [Test]

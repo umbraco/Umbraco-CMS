@@ -9,6 +9,10 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_16_2_0;
 [Obsolete("Remove in Umbraco 18.")]
 internal class AddDocumentUrlLock : MigrationBase
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AddDocumentUrlLock"/> class with the specified migration context.
+    /// </summary>
+    /// <param name="context">The <see cref="IMigrationContext"/> to be used for the migration.</param>
     public AddDocumentUrlLock(IMigrationContext context)
         : base(context)
     {

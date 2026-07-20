@@ -19,6 +19,9 @@ public interface IContent : IContentBase
     /// <remarks>The <see cref="PublishedVersionId" /> property tells you which version of the content is currently published.</remarks>
     bool Published { get; set; }
 
+    /// <summary>
+    ///     Gets or sets the published state of the content.
+    /// </summary>
     PublishedState PublishedState { get; set; }
 
     /// <summary>

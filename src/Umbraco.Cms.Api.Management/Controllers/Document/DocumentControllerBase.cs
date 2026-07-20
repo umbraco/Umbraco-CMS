@@ -12,6 +12,10 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Document;
 
+/// <summary>
+/// Serves as the base controller for implementing document management operations within the Umbraco CMS Management API.
+/// Provides shared functionality for derived document controllers.
+/// </summary>
 [VersionedApiBackOfficeRoute(Constants.UdiEntityType.Document)]
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Document))]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessDocuments)]

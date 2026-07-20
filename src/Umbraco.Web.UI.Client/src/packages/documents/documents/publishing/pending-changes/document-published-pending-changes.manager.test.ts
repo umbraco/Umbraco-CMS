@@ -3,9 +3,9 @@ import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import { UmbDocumentPublishedPendingChangesManager } from './document-published-pending-changes.manager.js';
-import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { UmbDocumentVariantState } from '../../variant-state.js';
 import { type UmbDocumentDetailModel } from '../../types.js';
-import { UMB_DOCUMENT_ENTITY_TYPE, UMB_DOCUMENT_PROPERTY_VALUE_ENTITY_TYPE } from '../../entity.js';
+import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
 
 @customElement('test-my-controller-host')
 class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
@@ -58,7 +58,7 @@ describe('UmbSelectionManager', () => {
 				flags: [],
 				variants: [
 					{
-						state: DocumentVariantStateModel.PUBLISHED,
+						state: UmbDocumentVariantState.PUBLISHED,
 						publishDate: '2023-02-06T15:32:24.957009',
 						culture: null,
 						segment: null,
@@ -73,7 +73,6 @@ describe('UmbSelectionManager', () => {
 				values: [
 					{
 						editorAlias: 'Umbraco.TextBox',
-						entityType: UMB_DOCUMENT_PROPERTY_VALUE_ENTITY_TYPE,
 						alias: 'prop1',
 						culture: null,
 						segment: null,
@@ -107,6 +106,12 @@ describe('UmbSelectionManager', () => {
 				expect(variantsWithChanges).to.have.lengthOf(1);
 				expect(variantsWithChanges[0].variantId.toString()).to.equal('invariant');
 			});
+
+			it('should not have variants with changes when only template differs', async () => {
+				persistedDocument.template = { unique: 'template-1' };
+				await manager.process({ persistedData: persistedDocument, publishedData: publishedDocument });
+				expect(manager.getVariantsWithChanges()).to.be.an('array').that.is.empty;
+			});
 		});
 
 		describe('variant data', () => {
@@ -125,7 +130,7 @@ describe('UmbSelectionManager', () => {
 				flags: [],
 				variants: [
 					{
-						state: DocumentVariantStateModel.PUBLISHED,
+						state: UmbDocumentVariantState.PUBLISHED,
 						publishDate: '2023-02-06T15:32:24.957009',
 						culture: 'en-US',
 						segment: null,
@@ -137,7 +142,7 @@ describe('UmbSelectionManager', () => {
 						flags: [],
 					},
 					{
-						state: DocumentVariantStateModel.PUBLISHED,
+						state: UmbDocumentVariantState.PUBLISHED,
 						publishDate: '2023-02-06T15:32:24.957009',
 						culture: 'da-DK',
 						segment: null,
@@ -152,7 +157,6 @@ describe('UmbSelectionManager', () => {
 				values: [
 					{
 						editorAlias: 'Umbraco.TextBox',
-						entityType: UMB_DOCUMENT_PROPERTY_VALUE_ENTITY_TYPE,
 						alias: 'prop1',
 						culture: 'en-US',
 						segment: null,
@@ -160,7 +164,6 @@ describe('UmbSelectionManager', () => {
 					},
 					{
 						editorAlias: 'Umbraco.TextBox',
-						entityType: UMB_DOCUMENT_PROPERTY_VALUE_ENTITY_TYPE,
 						alias: 'prop1',
 						culture: 'da-DK',
 						segment: null,

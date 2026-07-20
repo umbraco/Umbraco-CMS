@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Infrastructure.Persistence;
@@ -7,11 +7,20 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_14_0_0;
 
+/// <summary>
+/// Cleans up data type configurations as part of the upgrade process to version 14.0.0.
+/// </summary>
 public class CleanUpDataTypeConfigurations : MigrationBase
 {
     private readonly IConfigurationEditorJsonSerializer _configurationEditorJsonSerializer;
     private readonly ILogger<MigrateDataTypeConfigurations> _logger;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="CleanUpDataTypeConfigurations"/> class.
+    /// </summary>
+    /// <param name="context">The migration context used for managing the migration process.</param>
+    /// <param name="configurationEditorJsonSerializer">The serializer used for handling configuration editor JSON data.</param>
+    /// <param name="logger">The logger used to record migration-related events and information.</param>
     public CleanUpDataTypeConfigurations(
         IMigrationContext context,
         IConfigurationEditorJsonSerializer configurationEditorJsonSerializer,

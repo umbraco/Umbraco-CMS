@@ -1,3 +1,4 @@
+import { ensureMediaNameFromFile } from '../../utils/ensure-media-name-from-file.function.js';
 import type { UmbImageCropperPropertyEditorValue } from './types.js';
 import type { UmbInputImageCropperFieldElement } from './image-cropper-field.element.js';
 import { css, customElement, html, ifDefined, property, state } from '@umbraco-cms/backoffice/external/lit';
@@ -95,6 +96,11 @@ export class UmbInputImageCropperElement extends UmbFormControlMixin<
 		if (file?.status !== UmbFileDropzoneItemStatus.COMPLETE) return;
 
 		this._file = file;
+
+		const underlyingFile = file.temporaryFile?.file;
+		if (underlyingFile) {
+			void ensureMediaNameFromFile(this, underlyingFile);
+		}
 
 		this.value = assignToFrozenObject(this.value ?? DefaultValue, {
 			temporaryFileId: file.temporaryFile?.temporaryUnique,

@@ -1,5 +1,8 @@
 namespace Umbraco.Cms.Core.Webhooks;
 
+/// <summary>
+/// Specifies the type of payload to include in webhook requests.
+/// </summary>
 public enum WebhookPayloadType
 {
     /// <summary>
@@ -22,6 +25,6 @@ public enum WebhookPayloadType
     /// This is the default option for Umbraco 16 and will be available as a configurable option for Umbraco 17.
     /// Expected to be removed in Umbraco 18.
     /// </remarks>
-    [Obsolete("Planned for removal in v18")]
+    [Obsolete("Scheduled for removal in Umbraco 18.")]
     Legacy = 2,
 }

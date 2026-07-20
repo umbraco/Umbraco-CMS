@@ -63,6 +63,13 @@ public class EventNameExtractor
         }
     }
 
+    /// <summary>
+    /// Finds all events on the sender type that match the args type.
+    /// </summary>
+    /// <param name="senderType">The type of the event sender.</param>
+    /// <param name="argsType">The type of the event arguments.</param>
+    /// <param name="exclude">A filter to exclude matched event names. Return true to exclude.</param>
+    /// <returns>An array of matching event names.</returns>
     public static string[] FindEvents(Type senderType, Type argsType, Func<string, bool> exclude)
     {
         var found = MatchedEventNames.GetOrAdd(new Tuple<Type, Type>(senderType, argsType), tuple =>

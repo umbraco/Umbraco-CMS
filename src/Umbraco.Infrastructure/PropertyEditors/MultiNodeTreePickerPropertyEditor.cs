@@ -24,18 +24,71 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     Constants.PropertyEditors.Aliases.MultiNodeTreePicker,
     ValueType = ValueTypes.Text,
     ValueEditorIsReusable = true)]
-public class MultiNodeTreePickerPropertyEditor : DataEditor
+public class MultiNodeTreePickerPropertyEditor : DataEditor, IValueSchemaProvider
 {
     private readonly IIOHelper _ioHelper;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="MultiNodeTreePickerPropertyEditor"/> class.
     /// </summary>
+    /// <param name="dataValueEditorFactory">Factory used to create data value editors for property values.</param>
+    /// <param name="ioHelper">Helper for IO operations, such as path and file handling.</param>
     public MultiNodeTreePickerPropertyEditor(IDataValueEditorFactory dataValueEditorFactory, IIOHelper ioHelper)
         : base(dataValueEditorFactory)
     {
         _ioHelper = ioHelper;
         SupportsReadOnly = true;
+    }
+
+    /// <inheritdoc />
+    public Type? GetValueType(object? configuration) => typeof(MultiNodeTreePickerPropertyValueEditor.EditorEntityReference[]);
+
+    /// <inheritdoc />
+    public JsonObject? GetValueSchema(object? configuration)
+    {
+        var schema = new JsonObject
+        {
+            ["$schema"] = "https://json-schema.org/draft/2020-12/schema",
+            ["type"] = new JsonArray("array", "null"),
+            ["items"] = new JsonObject
+            {
+                ["type"] = "object",
+                ["properties"] = new JsonObject
+                {
+                    ["type"] = new JsonObject
+                    {
+                        ["type"] = "string",
+                        ["enum"] = new JsonArray("content", "media", "member"),
+                        ["description"] = "Entity type (content, media, or member)",
+                    },
+                    ["unique"] = new JsonObject
+                    {
+                        ["type"] = "string",
+                        ["format"] = "uuid",
+                        ["pattern"] = ValueSchemaPatterns.Uuid,
+                        ["description"] = "GUID of the selected entity",
+                    },
+                },
+                ["required"] = new JsonArray("type", "unique"),
+            },
+            ["description"] = "Array of selected entity references",
+        };
+
+        // Add minItems/maxItems from configuration if available
+        if (configuration is MultiNodePickerConfiguration pickerConfig)
+        {
+            if (pickerConfig.MinNumber > 0)
+            {
+                schema["minItems"] = pickerConfig.MinNumber;
+            }
+
+            if (pickerConfig.MaxNumber > 0)
+            {
+                schema["maxItems"] = pickerConfig.MaxNumber;
+            }
+        }
+
+        return schema;
     }
 
     /// <inheritdoc/>
@@ -231,6 +284,9 @@ public class MultiNodeTreePickerPropertyEditor : DataEditor
             /// <summary>
             /// Initializes a new instance of the <see cref="ObjectTypeValidator"/> class.
             /// </summary>
+            /// <param name="localizedTextService">Service used for retrieving localized text strings.</param>
+            /// <param name="coreScopeProvider">Provider for managing database transaction scopes.</param>
+            /// <param name="entityService">Service for accessing and managing Umbraco entities.</param>
             public ObjectTypeValidator(
                 ILocalizedTextService localizedTextService,
                 ICoreScopeProvider coreScopeProvider,
@@ -321,6 +377,11 @@ public class MultiNodeTreePickerPropertyEditor : DataEditor
             /// <summary>
             /// Initializes a new instance of the <see cref="ContentTypeValidator"/> class.
             /// </summary>
+            /// <param name="localizedTextService">Service used for retrieving localized text strings.</param>
+            /// <param name="coreScopeProvider">Provider for managing database transaction scopes.</param>
+            /// <param name="contentService">Service for accessing and managing content items.</param>
+            /// <param name="mediaService">Service for accessing and managing media items.</param>
+            /// <param name="memberService">Service for accessing and managing member entities.</param>
             public ContentTypeValidator(
                 ILocalizedTextService localizedTextService,
                 ICoreScopeProvider coreScopeProvider,

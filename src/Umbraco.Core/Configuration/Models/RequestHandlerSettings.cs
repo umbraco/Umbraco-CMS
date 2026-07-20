@@ -12,11 +12,29 @@ namespace Umbraco.Cms.Core.Configuration.Models;
 [UmbracoOptions(Constants.Configuration.ConfigRequestHandler)]
 public class RequestHandlerSettings
 {
+    /// <summary>
+    ///     The default value for adding a trailing slash to URLs.
+    /// </summary>
     internal const bool StaticAddTrailingSlash = true;
+
+    /// <summary>
+    ///     The default value for converting URLs to ASCII.
+    /// </summary>
     internal const string StaticConvertUrlsToAscii = "try";
+
+    /// <summary>
+    ///     The default value for converting file names to ASCII.
+    /// </summary>
     internal const string StaticConvertFileNamesToAscii = "false";
+
+    /// <summary>
+    ///     The default value for enabling default character replacements.
+    /// </summary>
     internal const bool StaticEnableDefaultCharReplacements = true;
 
+    /// <summary>
+    ///     The default collection of character replacements for URL generation.
+    /// </summary>
     internal static readonly CharItem[] DefaultCharCollection =
     {
         new() { Char = " ", Replacement = "-" },

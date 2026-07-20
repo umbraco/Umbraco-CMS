@@ -122,7 +122,7 @@ namespace Umbraco.Cms.Core.Semver
 #if NETSTANDARD
             var major = int.Parse(match.Groups["major"].Value);
 #else
-            var major = int.Parse(match.Groups["major"].Value, CultureInfo.InvariantCulture);
+            var major = int.Parse(match.Groups["major"].ValueSpan, CultureInfo.InvariantCulture);
 #endif
 
             Group minorMatch = match.Groups["minor"];
@@ -132,7 +132,7 @@ namespace Umbraco.Cms.Core.Semver
 #if NETSTANDARD
                 minor = int.Parse(minorMatch.Value);
 #else
-                minor = int.Parse(minorMatch.Value, CultureInfo.InvariantCulture);
+                minor = int.Parse(minorMatch.ValueSpan, CultureInfo.InvariantCulture);
 #endif
             }
             else if (strict)
@@ -147,7 +147,7 @@ namespace Umbraco.Cms.Core.Semver
 #if NETSTANDARD
                 patch = int.Parse(patchMatch.Value);
 #else
-                patch = int.Parse(patchMatch.Value, CultureInfo.InvariantCulture);
+                patch = int.Parse(patchMatch.ValueSpan, CultureInfo.InvariantCulture);
 #endif
             }
             else if (strict)
@@ -501,6 +501,12 @@ namespace Umbraco.Cms.Core.Semver
         }
 
 #if !NETSTANDARD
+        /// <summary>
+        ///     Populates a <see cref="SerializationInfo" /> with the data needed to serialize this instance.
+        /// </summary>
+        /// <param name="info">The <see cref="SerializationInfo" /> to populate with data.</param>
+        /// <param name="context">The destination for this serialization.</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="info" /> is null.</exception>
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             if (info == null)

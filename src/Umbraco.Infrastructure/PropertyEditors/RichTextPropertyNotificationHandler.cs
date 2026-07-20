@@ -11,6 +11,10 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// </summary>
 public class RichTextPropertyNotificationHandler : BlockEditorPropertyNotificationHandlerBase<RichTextBlockLayoutItem>
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Core.PropertyEditors.RichTextPropertyNotificationHandler"/> class.
+    /// </summary>
+    /// <param name="logger">An <see cref="ILogger{RichTextPropertyNotificationHandler}"/> used for logging within the handler.</param>
     public RichTextPropertyNotificationHandler(ILogger<RichTextPropertyNotificationHandler> logger)
         : base(logger)
     {

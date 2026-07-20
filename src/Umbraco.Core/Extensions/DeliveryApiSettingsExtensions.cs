@@ -9,10 +9,22 @@ namespace Umbraco.Extensions;
 /// </summary>
 public static class DeliveryApiSettingsExtensions
 {
+    /// <summary>
+    ///     Determines whether a content item is allowed to be exposed through the Delivery API.
+    /// </summary>
+    /// <param name="settings">The Delivery API settings.</param>
+    /// <param name="content">The content item to check.</param>
+    /// <returns><c>true</c> if the content type is allowed; otherwise, <c>false</c>.</returns>
     [Obsolete("Please use the overload of IsAllowedContentType taking a content type alias. Scheduled for removal in Umbraco 19.")]
     public static bool IsAllowedContentType(this DeliveryApiSettings settings, IPublishedContent content)
         => settings.IsAllowedContentType(content.ContentType.Alias);
 
+    /// <summary>
+    ///     Determines whether a content item is disallowed from being exposed through the Delivery API.
+    /// </summary>
+    /// <param name="settings">The Delivery API settings.</param>
+    /// <param name="content">The content item to check.</param>
+    /// <returns><c>true</c> if the content type is disallowed; otherwise, <c>false</c>.</returns>
     [Obsolete("Please use IsAllowedContentType and negate the result instead. Scheduled for removal in Umbraco 19.")]
     public static bool IsDisallowedContentType(this DeliveryApiSettings settings, IPublishedContent content)
         => settings.IsDisallowedContentType(content.ContentType.Alias);
@@ -42,6 +54,12 @@ public static class DeliveryApiSettingsExtensions
         return settings.DisallowedContentTypeAliases.InvariantContains(contentTypeAlias) is false;
     }
 
+    /// <summary>
+    ///     Determines whether a content type alias is disallowed from being exposed through the Delivery API.
+    /// </summary>
+    /// <param name="settings">The Delivery API settings.</param>
+    /// <param name="contentTypeAlias">The content type alias to check.</param>
+    /// <returns><c>true</c> if the content type is disallowed; otherwise, <c>false</c>.</returns>
     [Obsolete("Please use IsAllowedContentType and negate the result instead. Scheduled for removal in Umbraco 19.")]
     public static bool IsDisallowedContentType(this DeliveryApiSettings settings, string contentTypeAlias)
         => settings.IsAllowedContentType(contentTypeAlias) is false;

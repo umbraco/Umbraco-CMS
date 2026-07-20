@@ -1,10 +1,12 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 
 namespace Umbraco.Cms.Core.Sync;
 
-/// <inheritdoc/>
+/// <summary>
+/// Default implementation of <see cref="ILastSyncedManager"/> that manages last synced IDs with caching.
+/// </summary>
 internal sealed class LastSyncedManager : ILastSyncedManager
 {
     private readonly ILastSyncedRepository _lastSyncedRepository;
@@ -12,6 +14,11 @@ internal sealed class LastSyncedManager : ILastSyncedManager
     private int? _lastSyncedInternalId;
     private int? _lastSyncedExternalId;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="LastSyncedManager"/> class.
+    /// </summary>
+    /// <param name="lastSyncedRepository">The repository for persisting last synced data.</param>
+    /// <param name="coreScopeProvider">The scope provider for database transactions.</param>
     public LastSyncedManager(ILastSyncedRepository lastSyncedRepository, ICoreScopeProvider coreScopeProvider)
     {
         _lastSyncedRepository = lastSyncedRepository;
@@ -84,7 +91,12 @@ internal sealed class LastSyncedManager : ILastSyncedManager
         scope.Complete();
     }
 
-    // Used for testing purposes only
+    /// <summary>
+    /// Clears the local cache of last synced IDs.
+    /// </summary>
+    /// <remarks>
+    /// This method is intended for testing purposes only.
+    /// </remarks>
     [EditorBrowsable(EditorBrowsableState.Never)]
     internal void ClearLocalCache()
     {

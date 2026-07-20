@@ -44,7 +44,7 @@ public abstract class DatabaseServerMessenger : ServerMessengerBase, IDisposable
     /// <summary>
     ///     Initializes a new instance of the <see cref="DatabaseServerMessenger" /> class.
     /// </summary>
-    [Obsolete("Use the non-obsolete constructor. Scheduled for removal in V18.")]
+    [Obsolete("Use the non-obsolete constructor. Scheduled for removal in Umbraco 18.")]
     protected DatabaseServerMessenger(
         IMainDom mainDom,
         CacheRefresherCollection cacheRefreshers,
@@ -75,7 +75,7 @@ public abstract class DatabaseServerMessenger : ServerMessengerBase, IDisposable
     /// <summary>
     ///     Initializes a new instance of the <see cref="DatabaseServerMessenger" /> class.
     /// </summary>
-    [Obsolete("Use the non-obsolete constructor. Scheduled for removal in V18.")]
+    [Obsolete("Use the non-obsolete constructor. Scheduled for removal in Umbraco 18.")]
     protected DatabaseServerMessenger(
         IMainDom mainDom,
         CacheRefresherCollection cacheRefreshers,
@@ -138,6 +138,9 @@ public abstract class DatabaseServerMessenger : ServerMessengerBase, IDisposable
         _initialized = new Lazy<SyncBootState?>(InitializeWithMainDom);
     }
 
+    /// <summary>
+    /// Gets the global Umbraco CMS configuration settings used by the DatabaseServerMessenger.
+    /// </summary>
     public GlobalSettings GlobalSettings { get; private set; }
 
     protected ILogger<DatabaseServerMessenger> Logger { get; }
@@ -234,7 +237,17 @@ public abstract class DatabaseServerMessenger : ServerMessengerBase, IDisposable
     // we don't care if there are servers listed or not,
     // if distributed call is enabled we will make the call
     protected override bool RequiresDistributed(ICacheRefresher refresher, MessageType dispatchType)
-        => EnsureInitialized() && DistributedEnabled;
+    {
+        // Attempt initialization so the sync boot state is established as early as possible, but do not
+        // gate the instruction write on its success. Writing cache instructions requires no exclusivity,
+        // and a process that could not register with MainDom (e.g. it lost it to an overlapping worker
+        // during an app pool recycle or deployment slot swap) must still broadcast its local cache changes,
+        // otherwise other servers silently never refresh (#23219). Only processing instructions (Sync)
+        // remains gated on MainDom.
+        EnsureInitialized();
+
+        return DistributedEnabled;
+    }
 
     protected override void DeliverRemote(
         ICacheRefresher refresher,
@@ -292,7 +305,8 @@ public abstract class DatabaseServerMessenger : ServerMessengerBase, IDisposable
 
         if (registered == false)
         {
-            // return null if we cannot initialize
+            Logger.LogError(
+                "Could not register with MainDom; this instance will not process distributed cache instructions and its published cache may become stale until the application is restarted.");
             return null;
         }
 
@@ -343,6 +357,7 @@ public abstract class DatabaseServerMessenger : ServerMessengerBase, IDisposable
             if (disposing)
             {
                 _syncIdle.Dispose();
+                _cancellationTokenSource.Dispose();
             }
 
             _disposedValue = true;

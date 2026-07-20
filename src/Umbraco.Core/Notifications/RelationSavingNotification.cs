@@ -10,6 +10,12 @@ namespace Umbraco.Cms.Core.Notifications;
 /// </summary>
 public class RelationSavingNotification : SavingNotification<IRelation>
 {
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="RelationSavingNotification"/> class
+    ///     with a single relation.
+    /// </summary>
+    /// <param name="target">The relation being saved.</param>
+    /// <param name="messages">The event messages collection.</param>
     public RelationSavingNotification(IRelation target, EventMessages messages)
         : base(target, messages)
     {

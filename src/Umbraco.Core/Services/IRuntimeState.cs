@@ -44,6 +44,12 @@ public interface IRuntimeState
     string? FinalMigrationState { get; }
 
     /// <summary>
+    ///     Gets the semantic version corresponding to the current migration state.
+    /// </summary>
+    // TODO (V19): Remove the default implementation.
+    SemVersion? CurrentMigrationVersion => null;
+
+    /// <summary>
     ///     Gets the exception that caused the boot to fail.
     /// </summary>
     BootFailedException? BootFailedException { get; }
@@ -58,5 +64,11 @@ public interface IRuntimeState
     /// </summary>
     void DetermineRuntimeLevel();
 
+    /// <summary>
+    ///     Configures the runtime state with the specified level and reason.
+    /// </summary>
+    /// <param name="level">The runtime level to set.</param>
+    /// <param name="reason">The reason for the runtime level.</param>
+    /// <param name="bootFailedException">An optional exception that caused a boot failure.</param>
     void Configure(RuntimeLevel level, RuntimeLevelReason reason, Exception? bootFailedException = null);
 }

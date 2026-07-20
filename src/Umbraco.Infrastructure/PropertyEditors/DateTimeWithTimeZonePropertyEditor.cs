@@ -22,6 +22,9 @@ public class DateTimeWithTimeZonePropertyEditor : DateTimePropertyEditorBase
     /// <summary>
     /// Initializes a new instance of the <see cref="DateTimeWithTimeZonePropertyEditor"/> class.
     /// </summary>
+    /// <param name="dataValueEditorFactory">Factory used to create data value editors for property values.</param>
+    /// <param name="ioHelper">Helper for IO operations, such as path resolution.</param>
+    /// <param name="propertyIndexValueFactory">Factory for creating index values for date and time properties with time zone support.</param>
     public DateTimeWithTimeZonePropertyEditor(
         IDataValueEditorFactory dataValueEditorFactory,
         IIOHelper ioHelper,

@@ -9,12 +9,21 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <summary>
+/// Base class for content validation services that validates properties against content types.
+/// </summary>
+/// <typeparam name="TContentType">The type of content type composition.</typeparam>
 internal abstract class ContentValidationServiceBase<TContentType>
     where TContentType : IContentTypeComposition
 {
     private readonly ILanguageService _languageService;
     private readonly IPropertyValidationService _propertyValidationService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ContentValidationServiceBase{TContentType}"/> class.
+    /// </summary>
+    /// <param name="propertyValidationService">The property validation service.</param>
+    /// <param name="languageService">The language service.</param>
     protected ContentValidationServiceBase(
         IPropertyValidationService propertyValidationService,
         ILanguageService languageService)
@@ -23,6 +32,13 @@ internal abstract class ContentValidationServiceBase<TContentType>
         _languageService = languageService;
     }
 
+    /// <summary>
+    /// Handles the validation of properties against the content type.
+    /// </summary>
+    /// <param name="contentEditingModelBase">The content editing model to validate.</param>
+    /// <param name="contentType">The content type to validate against.</param>
+    /// <param name="culturesToValidate">Optional cultures to restrict validation to.</param>
+    /// <returns>The validation result containing any validation errors.</returns>
     protected async Task<ContentValidationResult> HandlePropertiesValidationAsync(
         ContentEditingModelBase contentEditingModelBase,
         TContentType contentType,
@@ -144,6 +160,11 @@ internal abstract class ContentValidationServiceBase<TContentType>
         return new ContentValidationResult { ValidationErrors = validationErrors };
     }
 
+    /// <summary>
+    /// Validates that all cultures specified in the content editing model are valid.
+    /// </summary>
+    /// <param name="contentEditingModelBase">The content editing model to validate.</param>
+    /// <returns><c>true</c> if all cultures are valid; otherwise, <c>false</c>.</returns>
     public async Task<bool> ValidateCulturesAsync(ContentEditingModelBase contentEditingModelBase)
     {
         var cultures = await GetCultureCodes();

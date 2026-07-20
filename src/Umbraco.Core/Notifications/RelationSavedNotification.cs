@@ -3,6 +3,7 @@
 
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
 
 namespace Umbraco.Cms.Core.Notifications;
 /// <summary>
@@ -10,10 +11,17 @@ namespace Umbraco.Cms.Core.Notifications;
 /// </summary>
 public class RelationSavedNotification : SavedNotification<IRelation>
 {
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="RelationSavedNotification"/> class
+    ///     with a single relation.
+    /// </summary>
+    /// <param name="target">The relation that was saved.</param>
+    /// <param name="messages">The event messages collection.</param>
     public RelationSavedNotification(IRelation target, EventMessages messages)
         : base(target, messages)
     {
     }
+
     /// <summary>
     /// Initializes a new instance of the <see cref="RelationSavedNotification"/>.
     /// </summary>
@@ -27,4 +35,17 @@ public class RelationSavedNotification : SavedNotification<IRelation>
         : base(target, messages)
     {
     }
+
+    /// <summary>
+    ///     Gets or sets a value indicating whether the relations were saved automatically
+    ///     as a side-effect of content being saved (e.g. umbMedia, umbDocument, umbMember),
+    ///     rather than explicitly via <see cref="Services.IRelationService"/>.
+    /// </summary>
+    /// <remarks>
+    ///     When <c>true</c>, the <see cref="IEntity.Id"/> of each saved entity may be <c>0</c>
+    ///     because automatic relations are persisted via a bulk operation that does not return
+    ///     database identities. <see cref="IRelation.ParentId"/>, <see cref="IRelation.ChildId"/>,
+    ///     and <see cref="IRelation.RelationType"/> are always populated.
+    /// </remarks>
+    public bool IsAutomatic { get; set; }
 }

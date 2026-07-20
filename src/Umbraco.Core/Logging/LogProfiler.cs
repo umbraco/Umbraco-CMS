@@ -10,6 +10,10 @@ public class LogProfiler : IProfiler
 {
     private readonly ILogger<LogProfiler> _logger;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="LogProfiler"/> class.
+    /// </summary>
+    /// <param name="logger">The logger to write profiling results to.</param>
     public LogProfiler(ILogger<LogProfiler> logger) => _logger = logger;
 
     /// <inheritdoc />
@@ -38,17 +42,24 @@ public class LogProfiler : IProfiler
     /// <inheritdoc />
     public bool IsEnabled => _logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug);
 
-    // a lightweight disposable timer
+    /// <summary>
+    ///     A lightweight disposable timer that invokes a callback with the elapsed time upon disposal.
+    /// </summary>
     private sealed class LightDisposableTimer : DisposableObjectSlim
     {
         private readonly Action<long> _callback;
         private readonly Stopwatch _stopwatch = Stopwatch.StartNew();
 
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="LightDisposableTimer"/> class.
+        /// </summary>
+        /// <param name="callback">The callback to invoke with the elapsed milliseconds when disposed.</param>
         internal LightDisposableTimer(Action<long> callback)
         {
             _callback = callback ?? throw new ArgumentNullException(nameof(callback));
         }
 
+        /// <inheritdoc/>
         protected override void DisposeResources()
         {
             _stopwatch.Stop();

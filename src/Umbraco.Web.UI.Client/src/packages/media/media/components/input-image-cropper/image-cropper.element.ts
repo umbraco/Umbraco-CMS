@@ -90,12 +90,12 @@ export class UmbImageCropperElement extends UmbLitElement {
 		const cropAspectRatio = this.value.width / this.value.height;
 
 		// Init variables
-		let maskWidth = 0,
-			maskHeight = 0,
-			imageWidth = 0,
-			imageHeight = 0,
-			imageLeft = 0,
-			imageTop = 0;
+		let maskWidth: number,
+			maskHeight: number,
+			imageWidth: number,
+			imageHeight: number,
+			imageLeft: number,
+			imageTop: number;
 
 		// NOTE {} are used to keep some variables in scope, preventing them from being used outside.
 
@@ -189,7 +189,7 @@ export class UmbImageCropperElement extends UmbLitElement {
 		const mask = this.maskElement.getBoundingClientRect();
 		const image = this.imageElement.getBoundingClientRect();
 
-		let fixedLocation = { left: 0, top: 0 };
+		let fixedLocation: { left: number; top: number };
 
 		// If mouse position is provided, use that as the fixed location
 		// Else use the center of the mask
@@ -366,8 +366,14 @@ export class UmbImageCropperElement extends UmbLitElement {
 			position: relative;
 			width: 100%;
 			height: 100%;
-			outline: 1px solid var(--uui-color-border);
+			border: 1px solid var(--uui-color-border);
 			border-radius: var(--uui-border-radius);
+		}
+		:host(:not([disabled]):hover) #viewport {
+			border-color: var(--uui-color-border-standalone);
+		}
+		:host(:not([disabled]):focus-within) #viewport {
+			border-color: var(--uui-color-border-emphasis);
 		}
 		#actions {
 			display: flex;

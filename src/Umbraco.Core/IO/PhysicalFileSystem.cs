@@ -77,7 +77,7 @@ public class PhysicalFileSystem : IPhysicalFileSystem, IFileProviderFactory
 
         _rootPath = EnsureDirectorySeparatorChar(rootPath).TrimEnd(Path.DirectorySeparatorChar);
         _rootPathFwd = EnsureUrlSeparatorChar(_rootPath);
-        _rootUrl = EnsureUrlSeparatorChar(rootUrl).TrimEnd(Constants.CharArrays.ForwardSlash);
+        _rootUrl = EnsureUrlSeparatorChar(rootUrl).TrimEnd('/');
     }
 
     /// <summary>
@@ -300,18 +300,18 @@ public class PhysicalFileSystem : IPhysicalFileSystem, IFileProviderFactory
         // or on unix systems "/var/wwwroot/test/Meia/1234/img.jpg"
         if (_ioHelper.PathStartsWith(path, _rootPathFwd, '/'))
         {
-            return path.Substring(_rootPathFwd.Length).TrimStart(Constants.CharArrays.ForwardSlash);
+            return path.Substring(_rootPathFwd.Length).TrimStart('/');
         }
 
         // if it starts with the root URL, strip it and trim the starting slash to make it relative
         // eg "/Media/1234/img.jpg" => "1234/img.jpg"
         if (_ioHelper.PathStartsWith(path, _rootUrl, '/'))
         {
-            return path.Substring(_rootUrl.Length).TrimStart(Constants.CharArrays.ForwardSlash);
+            return path.Substring(_rootUrl.Length).TrimStart('/');
         }
 
         // unchanged - what else?
-        return path.TrimStart(Constants.CharArrays.ForwardSlash);
+        return path.TrimStart('/');
     }
 
     /// <summary>
@@ -354,13 +354,6 @@ public class PhysicalFileSystem : IPhysicalFileSystem, IFileProviderFactory
         // our root path, due to relative segments, so better check
         if (_ioHelper.PathStartsWith(path, _rootPath, Path.DirectorySeparatorChar))
         {
-            // this says that 4.7.2 supports long paths - but Windows does not
-            // https://docs.microsoft.com/en-us/dotnet/api/system.io.pathtoolongexception?view=netframework-4.7.2
-            if (path.Length > 260)
-            {
-                throw new PathTooLongException($"Path {path} is too long.");
-            }
-
             return path;
         }
 
@@ -377,7 +370,7 @@ public class PhysicalFileSystem : IPhysicalFileSystem, IFileProviderFactory
     /// <remarks>All separators are forward-slashes.</remarks>
     public string GetUrl(string? path)
     {
-        path = EnsureUrlSeparatorChar(path ?? string.Empty).Trim(Constants.CharArrays.ForwardSlash);
+        path = EnsureUrlSeparatorChar(path ?? string.Empty).Trim('/');
         return _rootUrl + "/" + path;
     }
 
@@ -585,7 +578,11 @@ public class PhysicalFileSystem : IPhysicalFileSystem, IFileProviderFactory
     /// Creates a file provider.
     /// </summary>
     /// <returns>The file provider.</returns>
-    public IFileProvider Create() => new PhysicalFileProvider(_rootPath);
+    public IFileProvider Create()
+    {
+        Directory.CreateDirectory(_rootPath);
+        return new PhysicalFileProvider(_rootPath);
+    }
 
     #endregion
 }

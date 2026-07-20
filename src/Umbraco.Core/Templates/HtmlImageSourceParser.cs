@@ -1,40 +1,79 @@
-﻿using System.Text.RegularExpressions;
+using System.Text.RegularExpressions;
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Templates;
 
-public sealed class HtmlImageSourceParser
+/// <summary>
+///     Utility class used to parse and update image sources in HTML content based on Umbraco media references.
+/// </summary>
+public sealed partial class HtmlImageSourceParser
 {
-    private static readonly Regex ResolveImgPattern = new(
-        @"<img[^>]*(data-udi=""([^""]*)"")[^>]*>",
-        RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
+    private static readonly Regex _resolveImgRegex = ResolveImgRegex();
 
-    private static readonly Regex SrcAttributeRegex = new(
-        @"src=""([^""\?]*)(\?[^""]*)?""",
-        RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
+    private static readonly Regex _srcAttributeRegex = SrcAttributeRegex();
 
-    private static readonly Regex DataUdiAttributeRegex = new(
-        @"data-udi=\\?(?:""|')(?<udi>umb://[A-z0-9\-]+/[A-z0-9]+)\\?(?:""|')",
-        RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
+    private static readonly Regex _dataUdiAttributeRegex = DataUdiAttributeRegex();
 
     private readonly IPublishedUrlProvider? _publishedUrlProvider;
+    private readonly IImageUrlTokenGenerator _imageUrlTokenGenerator;
 
     private Func<Guid, string?>? _getMediaUrl;
 
-    public HtmlImageSourceParser(Func<Guid, string> getMediaUrl) => _getMediaUrl = getMediaUrl;
-
-    public HtmlImageSourceParser(IPublishedUrlProvider publishedUrlProvider) =>
-        _publishedUrlProvider = publishedUrlProvider;
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="HtmlImageSourceParser"/> class.
+    /// </summary>
+    /// <param name="getMediaUrl">A function that retrieves the media URL for a given GUID.</param>
+    /// <param name="imageUrlTokenGenerator">Used to re-sign rendered image URLs against the current HMAC secret key.</param>
+    public HtmlImageSourceParser(Func<Guid, string> getMediaUrl, IImageUrlTokenGenerator imageUrlTokenGenerator)
+    {
+        _getMediaUrl = getMediaUrl;
+        _imageUrlTokenGenerator = imageUrlTokenGenerator;
+    }
 
     /// <summary>
-    ///     Parses out media UDIs from an html string based on 'data-udi' html attributes
+    ///     Initializes a new instance of the <see cref="HtmlImageSourceParser"/> class.
     /// </summary>
-    /// <param name="text"></param>
-    /// <returns></returns>
+    /// <param name="publishedUrlProvider">The published URL provider for resolving media URLs.</param>
+    /// <param name="imageUrlTokenGenerator">Used to re-sign rendered image URLs against the current HMAC secret key.</param>
+    public HtmlImageSourceParser(IPublishedUrlProvider publishedUrlProvider, IImageUrlTokenGenerator imageUrlTokenGenerator)
+    {
+        _publishedUrlProvider = publishedUrlProvider;
+        _imageUrlTokenGenerator = imageUrlTokenGenerator;
+    }
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="HtmlImageSourceParser"/> class.
+    /// </summary>
+    /// <param name="getMediaUrl">A function that retrieves the media URL for a given GUID.</param>
+    [Obsolete("Please use the constructor that accepts IImageUrlTokenGenerator. Scheduled for removal in Umbraco 19.")]
+    public HtmlImageSourceParser(Func<Guid, string> getMediaUrl)
+        : this(getMediaUrl, StaticServiceProvider.Instance.GetRequiredService<IImageUrlTokenGenerator>())
+    {
+    }
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="HtmlImageSourceParser"/> class.
+    /// </summary>
+    /// <param name="publishedUrlProvider">The published URL provider for resolving media URLs.</param>
+    [Obsolete("Please use the constructor that accepts IImageUrlTokenGenerator. Scheduled for removal in Umbraco 19.")]
+    public HtmlImageSourceParser(IPublishedUrlProvider publishedUrlProvider)
+        : this(publishedUrlProvider, StaticServiceProvider.Instance.GetRequiredService<IImageUrlTokenGenerator>())
+    {
+    }
+
+    /// <summary>
+    ///     Parses media UDIs out of an HTML string by reading <c>data-udi</c> attributes on
+    ///     <c>&lt;a&gt;</c> and <c>&lt;img&gt;</c> tags.
+    /// </summary>
+    /// <param name="text">The HTML text to scan.</param>
+    /// <returns>The parseable UDIs found on <c>data-udi</c> attributes, in document order.</returns>
     public IEnumerable<Udi> FindUdisFromDataAttributes(string text)
     {
-        MatchCollection matches = DataUdiAttributeRegex.Matches(text);
+        MatchCollection matches = _dataUdiAttributeRegex.Matches(text);
         if (matches.Count == 0)
         {
             yield break;
@@ -50,19 +89,21 @@ public sealed class HtmlImageSourceParser
     }
 
     /// <summary>
-    ///     Parses the string looking for Umbraco image tags and updates them to their up-to-date image sources.
+    ///     Refreshes the <c>src</c> attribute of every Umbraco <c>&lt;img&gt;</c> tag in the supplied HTML
+    ///     so the rendered URL points at the current media path and carries an up-to-date HMAC signature.
     /// </summary>
-    /// <param name="text"></param>
-    /// <returns></returns>
-    /// <remarks>Umbraco image tags are identified by their data-udi attributes</remarks>
+    /// <param name="text">The HTML text to process.</param>
+    /// <returns>
+    ///     The HTML with each <c>&lt;img data-udi="..."&gt;</c> rewritten: the path is replaced with the
+    ///     current media URL (preserving the persisted query string), and any HMAC token in the query
+    ///     is re-signed against the currently configured secret key. Other tags are returned unchanged.
+    /// </returns>
+    /// <remarks>Umbraco image tags are identified by their <c>data-udi</c> attributes.</remarks>
     public string EnsureImageSources(string text)
     {
-        if (_getMediaUrl == null)
-        {
-            _getMediaUrl = guid => _publishedUrlProvider?.GetMediaUrl(guid);
-        }
+        _getMediaUrl ??= guid => _publishedUrlProvider?.GetMediaUrl(guid);
 
-        return ResolveImgPattern.Replace(text, match =>
+        return _resolveImgRegex.Replace(text, match =>
         {
             // match groups:
             // - 1 = the data-udi attribute
@@ -77,7 +118,7 @@ public sealed class HtmlImageSourceParser
             // src match groups:
             // - 1 = the src attribute value until the query string
             // - 2 = the src attribute query string including the '?'
-            Match src = SrcAttributeRegex.Match(match.Value);
+            Match src = _srcAttributeRegex.Match(match.Value);
 
             if (src.Success == false)
             {
@@ -93,29 +134,48 @@ public sealed class HtmlImageSourceParser
                 return match.Value;
             }
 
-            var newImgTag = match.Value.Replace(src.Value, $"src=\"{mediaUrl}{src.Groups[2].Value}\"");
+            // Re-sign the URL so a rotated HMAC secret key doesn't break previously-authored images.
+            // No-op when HMAC isn't configured.
+            var queryString = src.Groups[2].Value;
+            var composedUrl = queryString.IsNullOrWhiteSpace()
+                ? mediaUrl
+                : mediaUrl.AppendQueryStringToUrl(queryString);
+            var refreshedSrc = _imageUrlTokenGenerator.RefreshSignature(composedUrl);
 
-            return newImgTag;
+            return match.Value.Replace(src.Value, $"src=\"{refreshedSrc}\"");
         });
     }
 
     /// <summary>
-    ///     Removes media URLs from &lt;img&gt; tags where a data-udi attribute is present
+    ///     Clears the media path from the <c>src</c> attribute of every <c>&lt;img&gt;</c> tag that has a
+    ///     <c>data-udi</c> attribute, preserving any query string the URL carried.
     /// </summary>
-    /// <param name="text"></param>
-    /// <returns></returns>
+    /// <param name="text">The HTML text to process.</param>
+    /// <returns>
+    ///     The HTML with the path portion of each Umbraco-managed image <c>src</c> emptied (the query
+    ///     string, if present, is left in place). Tags without a <c>data-udi</c> attribute are unchanged.
+    /// </returns>
     public string RemoveImageSources(string text)
 
         // find each ResolveImgPattern match in the text, then find each
         // SrcAttributeRegex match in the match value, then replace the src
         // attribute value with an empty string
         // (see comment in ResolveMediaFromTextString for group reference)
-        => ResolveImgPattern.Replace(text, match =>
+        => _resolveImgRegex.Replace(text, match =>
         {
             // Find the src attribute
-            Match src = SrcAttributeRegex.Match(match.Value);
+            Match src = _srcAttributeRegex.Match(match.Value);
 
             return src.Success == false || string.IsNullOrWhiteSpace(src.Groups[1].Value) ?
                 match.Value : match.Value.Replace(src.Groups[1].Value, string.Empty);
         });
+
+    [GeneratedRegex(@"<img[^>]*(data-udi=""([^""]*)"")[^>]*>", RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.IgnorePatternWhitespace, "en-GB")]
+    private static partial Regex ResolveImgRegex();
+
+    [GeneratedRegex(@"src=""([^""\?]*)(\?[^""]*)?""", RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.IgnorePatternWhitespace, "en-GB")]
+    private static partial Regex SrcAttributeRegex();
+
+    [GeneratedRegex(@"data-udi=\\?(?:""|')(?<udi>umb://[A-z0-9\-]+/[A-z0-9]+)\\?(?:""|')", RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.CultureInvariant)]
+    private static partial Regex DataUdiAttributeRegex();
 }

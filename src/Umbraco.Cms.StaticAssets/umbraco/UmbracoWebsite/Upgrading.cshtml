@@ -1,0 +1,48 @@
+@using Umbraco.Cms.Core.Hosting
+@using Umbraco.Cms.Core.Routing
+@inject IHostingEnvironment HostingEnvironment
+@{
+    var backOfficePath = HostingEnvironment.GetBackOfficePath();
+}
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <title>Site is Being Upgraded</title>
+
+    <link rel="stylesheet" href="@WebPath.Combine(backOfficePath , "website", "/nonodes.css")" />
+    <style type="text/css">
+        body {
+            color: initial;
+        }
+
+        section {
+            background: none;
+        }
+
+        h1 {
+            margin-bottom: 0.5em;
+        }
+
+        h2 {
+            margin-bottom: 0.2em;
+        }
+    </style>
+</head>
+<body>
+
+    <section>
+        <article>
+            <div>
+                <h1>Website is Under Maintenance</h1>
+                <h2>Automatic upgrade in progress</h2>
+                <p>The site is currently running an automatic upgrade. It will be available again shortly.</p>
+            </div>
+        </article>
+    </section>
+
+</body>
+</html>

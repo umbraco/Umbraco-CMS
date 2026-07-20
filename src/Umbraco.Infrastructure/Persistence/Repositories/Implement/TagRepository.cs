@@ -17,6 +17,14 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
 internal sealed class TagRepository : EntityRepositoryBase<int, ITag>, ITagRepository
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.TagRepository"/> class.
+    /// </summary>
+    /// <param name="scopeAccessor">Provides access to the current database scope for repository operations.</param>
+    /// <param name="cache">The application-level caches used for optimizing repository queries.</param>
+    /// <param name="logger">The logger used for logging repository events and errors.</param>
+    /// <param name="repositoryCacheVersionService">Service for managing cache versioning for repository data.</param>
+    /// <param name="cacheSyncService">Service responsible for synchronizing cache across distributed environments.</param>
     public TagRepository(
         IScopeAccessor scopeAccessor,
         AppCaches cache,
@@ -152,7 +160,7 @@ SELECT tagset.tag, tagset.{group}, tagset.languageid
 FROM {tagSetSql}
 LEFT OUTER JOIN {cmsTags}
 ON (LOWER(tagset.tag) = LOWER({cmsTags}.tag) AND LOWER(tagset.{group}) = LOWER({cmsTags}.{group}) AND COALESCE(tagset.languageid, -1) = COALESCE({cmsTagsLanguageIdCol}, -1))
-WHERE {cmsTags}.id IS NULL"; // cmsTags.id is never null
+WHERE {cmsTags}.id IS NULL";
 
         Database.Execute(sql1);
 
@@ -160,13 +168,13 @@ WHERE {cmsTags}.id IS NULL"; // cmsTags.id is never null
         var sql2 = $@"INSERT INTO {QuoteTableName(TagRelationshipDto.TableName)} ({nodeId}, {QuoteColumnName("propertyTypeId")}, {QuoteColumnName("tagId")})
 SELECT {contentId}, {propertyTypeId}, tagset2.Id
 FROM (
-    SELECT t.{QuoteColumnName("Id")}
+    SELECT t.id
     FROM {tagSetSql}
     INNER JOIN {cmsTags} as t ON (LOWER(tagset.tag) = LOWER(t.tag) AND LOWER(tagset.{group}) = LOWER(t.{group}) AND COALESCE(tagset.languageid, -1) = COALESCE(t.{languageIdCol}, -1))
 ) AS tagset2
 LEFT OUTER JOIN {QuoteTableName(TagRelationshipDto.TableName)} r
-ON (tagset2.id = r.{QuoteColumnName("tagId")} AND r.{nodeId} = {contentId} AND r.{QuoteColumnName("propertyTypeID")} = {propertyTypeId})
-WHERE r.{QuoteColumnName("tagId")} IS NULL"; // cmsTagRelationship.tagId is never null
+ON (tagset2.id = r.{QuoteColumnName("tagId")} AND r.{nodeId} = {contentId} AND r.{QuoteColumnName("propertyTypeId")} = {propertyTypeId})
+WHERE r.{QuoteColumnName("tagId")} IS NULL";
 
         Database.Execute(sql2);
     }
@@ -256,7 +264,7 @@ ON (tagset.tag = {cmsTags}.tag AND tagset.{group} = {cmsTags}.{group} AND COALES
             }
             else
             {
-                sql.Append("NULL");
+                sql.Append("NULL" + SqlSyntax.GetNullCastSuffix<int?>());
             }
             sql.Append(" AS languageid");
         }
@@ -269,6 +277,12 @@ ON (tagset.tag = {cmsTags}.tag AND tagset.{group} = {cmsTags}.{group} AND COALES
     // used to run Distinct() on tags
     private sealed class TagComparer : IEqualityComparer<ITag>
     {
+        /// <summary>
+        /// Determines whether the specified tags are equal by comparing their <c>Text</c> and <c>Group</c> properties (case-insensitive), and their <c>LanguageId</c>.
+        /// </summary>
+        /// <param name="x">The first tag to compare.</param>
+        /// <param name="y">The second tag to compare.</param>
+        /// <returns><c>true</c> if both tags are non-null and have equal <c>Text</c>, <c>Group</c> (case-insensitive), and <c>LanguageId</c>; or if both are <c>null</c>. Otherwise, <c>false</c>.</returns>
         public bool Equals(ITag? x, ITag? y) =>
             ReferenceEquals(x, y) // takes care of both being null
             || (x != null &&
@@ -277,6 +291,13 @@ ON (tagset.tag = {cmsTags}.tag AND tagset.{group} = {cmsTags}.{group} AND COALES
                 string.Equals(x.Group, y.Group, StringComparison.OrdinalIgnoreCase) &&
             x.LanguageId == y.LanguageId);
 
+        /// <summary>
+        /// Returns a hash code for the specified <see cref="Umbraco.Cms.Core.Models.ITag"/> object.
+        /// The hash code is computed using the tag's <c>Text</c> and <c>Group</c> properties (case-insensitive),
+        /// and the <c>LanguageId</c> property if present.
+        /// </summary>
+        /// <param name="obj">The tag object to get the hash code for.</param>
+        /// <returns>A hash code for the specified tag, based on its text, group, and language ID.</returns>
         public int GetHashCode(ITag obj)
         {
             unchecked
@@ -300,12 +321,31 @@ ON (tagset.tag = {cmsTags}.tag AND tagset.{group} = {cmsTags}.{group} AND COALES
     // ReSharper disable UnusedAutoPropertyAccessor.Local
     private sealed class TaggedEntityDto
     {
+        /// <summary>
+        /// Gets or sets the identifier of the node associated with the tag.
+        /// </summary>
         public int NodeId { get; set; }
+
+        /// <summary>Gets or sets the alias of the property type associated with the tagged entity.</summary>
         public string? PropertyTypeAlias { get; set; }
+
+        /// <summary>
+        /// Gets or sets the identifier of the property type associated with the tagged entity.
+        /// </summary>
         public int PropertyTypeId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the identifier of the tag.
+        /// </summary>
         public int TagId { get; set; }
+
+        /// <summary>Gets or sets the text of the tag.</summary>
         public string TagText { get; set; } = null!;
+
+        /// <summary>Gets or sets the tag group associated with the tagged entity.</summary>
         public string TagGroup { get; set; } = null!;
+
+        /// <summary>Gets or sets the language identifier associated with the tag.</summary>
         public int? TagLanguage { get; set; }
     }
     // ReSharper restore UnusedAutoPropertyAccessor.Local
@@ -452,7 +492,8 @@ ON (tagset.tag = {cmsTags}.tag AND tagset.{group} = {cmsTags}.{group} AND COALES
         }
 
         sql = sql
-            .GroupBy<TagDto>(x => x.Id, x => x.Text, x => x.Group, x => x.LanguageId);
+            .GroupBy<TagDto>(x => x.Id, x => x.Text, x => x.Group, x => x.LanguageId)
+            .OrderBy<TagDto>(o => o.Text);
 
         return ExecuteTagsQuery(sql);
     }
@@ -472,6 +513,9 @@ ON (tagset.tag = {cmsTags}.tag AND tagset.{group} = {cmsTags}.{group} AND COALES
             sql = sql
                 .Where<TagDto>(dto => dto.Group == group);
         }
+
+        sql = sql
+            .OrderBy<TagDto>(o => o.Text);
 
         return ExecuteTagsQuery(sql);
     }

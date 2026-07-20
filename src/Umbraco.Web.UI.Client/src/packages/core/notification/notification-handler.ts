@@ -7,12 +7,11 @@ const DEFAULT_LAYOUT = 'umb-notification-layout-default';
 /**
  * @class UmbNotificationHandler
  */
-export class UmbNotificationHandler<UmbNotificationData = UmbNotificationDefaultData> {
+export class UmbNotificationHandler {
 	private _closeResolver: any;
 	private _closePromise: Promise<any>;
 	private _elementName?: string;
-	private _data?: UmbNotificationData;
-	private _layoutElement: HTMLElement & { data?: UmbNotificationData };
+	private _data?: UmbNotificationDefaultData;
 
 	private _defaultColor: UmbNotificationColor = 'default';
 	private _defaultDuration = 6000;
@@ -27,7 +26,7 @@ export class UmbNotificationHandler<UmbNotificationData = UmbNotificationDefault
 	 * @param {UmbNotificationOptions} options
 	 * @memberof UmbNotificationHandler
 	 */
-	constructor(options: UmbNotificationOptions<UmbNotificationData>) {
+	constructor(options: UmbNotificationOptions) {
 		this.key = UmbId.new();
 		this.color = options.color || this._defaultColor;
 		this.duration = options.duration !== undefined ? options.duration : this._defaultDuration;
@@ -44,33 +43,13 @@ export class UmbNotificationHandler<UmbNotificationData = UmbNotificationDefault
 		notification.color = this.color;
 		notification.autoClose = this.duration;
 
-		this._layoutElement = document.createElement(this._elementName) as HTMLElement & { data?: UmbNotificationData };
-		this._layoutElement.data = this._data;
-		(this._layoutElement as any).notificationHandler = this;
+		const element: any = document.createElement(this._elementName);
+		element.data = this._data;
+		element.notificationHandler = this;
 
-		notification.appendChild(this._layoutElement);
+		notification.appendChild(element);
 
 		this.element = notification;
-	}
-
-	/**
-	 * Updates the notification data and refreshes the layout element.
-	 * @param {UmbNotificationData} data - The new data to display
-	 * @memberof UmbNotificationHandler
-	 */
-	public updateData(data: UmbNotificationData): void {
-		this._data = data;
-		this._layoutElement.data = data;
-	}
-
-	/**
-	 * Updates the notification color.
-	 * @param {UmbNotificationColor} color - The new color for the notification
-	 * @memberof UmbNotificationHandler
-	 */
-	public updateColor(color: UmbNotificationColor): void {
-		this.color = color;
-		this.element.color = color;
 	}
 
 	/**

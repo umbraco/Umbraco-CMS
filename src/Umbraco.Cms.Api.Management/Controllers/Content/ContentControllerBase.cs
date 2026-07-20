@@ -8,6 +8,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Content;
 
+/// <summary>
+/// Serves as the base controller for content management operations in the Umbraco CMS API, providing shared functionality for content-related controllers.
+/// </summary>
 public abstract class ContentControllerBase : ManagementApiControllerBase
 {
     protected IActionResult ContentEditingOperationStatusResult(ContentEditingOperationStatus status)
@@ -53,6 +56,15 @@ public abstract class ContentControllerBase : ManagementApiControllerBase
             ContentEditingOperationStatus.PropertyTypeNotFound => NotFound(problemDetailsBuilder
                 .WithTitle("One or more property types could not be found")
                 .Build()),
+            ContentEditingOperationStatus.PropertyTypeCultureVarianceMismatch => BadRequest(problemDetailsBuilder
+                .WithTitle("Property type culture variance mismatch")
+                .WithDetail("One or more property values specify a culture for an invariant property, or are missing a culture for a culture-variant property. "
+                    + "This can happen when a property is inherited from a variant composition on an invariant content type, which downgrades it to invariant.")
+                .Build()),
+            ContentEditingOperationStatus.PropertyTypeSegmentVarianceMismatch => BadRequest(problemDetailsBuilder
+                .WithTitle("Property type segment variance mismatch")
+                .WithDetail("One or more property values have a segment that does not match the property type's segment variance.")
+                .Build()),
             ContentEditingOperationStatus.InTrash => BadRequest(problemDetailsBuilder
                 .WithTitle("Content is in the recycle bin")
                 .WithDetail("Could not perform the operation because the targeted content was in the recycle bin.")
@@ -79,11 +91,11 @@ public abstract class ContentControllerBase : ManagementApiControllerBase
                 .Build()),
             ContentEditingOperationStatus.CannotDeleteWhenReferenced => BadRequest(problemDetailsBuilder
                 .WithTitle("Cannot delete a referenced content item")
-                .WithDetail("Cannot delete a referenced document, while the setting ContentSettings.DisableDeleteWhenReferenced is enabled.")
+                .WithDetail("Cannot delete a referenced content item, while the setting ContentSettings.DisableDeleteWhenReferenced is enabled.")
                 .Build()),
             ContentEditingOperationStatus.CannotMoveToRecycleBinWhenReferenced => BadRequest(problemDetailsBuilder
-                .WithTitle("Cannot move a referenced document to the recycle bin")
-                .WithDetail("Cannot move a referenced document to the recycle bin, while the setting ContentSettings.DisableUnpublishWhenReferenced is enabled.")
+                .WithTitle("Cannot move a referenced content item to the recycle bin")
+                .WithDetail("Cannot move a referenced content item to the recycle bin, while the setting ContentSettings.DisableDeleteWhenReferenced is enabled.")
                 .Build()),
             ContentEditingOperationStatus.Unknown => StatusCode(
                 StatusCodes.Status500InternalServerError,

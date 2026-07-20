@@ -5,12 +5,21 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <summary>
+/// Provides services for checking data type usage information.
+/// </summary>
 public class DataTypeUsageService : IDataTypeUsageService
 {
     private readonly IDataTypeUsageRepository _dataTypeUsageRepository;
     private readonly IDataTypeService _dataTypeService;
     private readonly ICoreScopeProvider _scopeProvider;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DataTypeUsageService"/> class.
+    /// </summary>
+    /// <param name="dataTypeUsageRepository">The data type usage repository.</param>
+    /// <param name="dataTypeService">The data type service.</param>
+    /// <param name="scopeProvider">The scope provider.</param>
     public DataTypeUsageService(
         IDataTypeUsageRepository dataTypeUsageRepository,
         IDataTypeService dataTypeService,

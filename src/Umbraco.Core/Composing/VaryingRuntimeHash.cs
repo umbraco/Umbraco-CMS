@@ -7,7 +7,15 @@ public sealed class VaryingRuntimeHash : IRuntimeHash
 {
     private readonly string _hash;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="VaryingRuntimeHash" /> class.
+    /// </summary>
+    /// <remarks>
+    /// The hash value is generated based on the current timestamp, ensuring
+    /// a unique hash on each application startup.
+    /// </remarks>
     public VaryingRuntimeHash() => _hash = DateTime.Now.Ticks.ToString();
 
+    /// <inheritdoc />
     public string GetHashValue() => _hash;
 }

@@ -10,7 +10,24 @@ namespace Umbraco.Cms.Infrastructure.Migrations;
 /// </summary>
 public abstract partial class AsyncMigrationBase
 {
-    // provides extra methods for migrations
+    /// <summary>
+    /// Ensures that the command timeout for the specified database is set to a minimum of 300 seconds.
+    /// </summary>
+    /// <remarks>
+    /// Adjusts the command timeout to prevent potential timeouts during long-running
+    /// database operations.
+    /// If the command timeout is already longer, applied via the connection string with "Connect Timeout={timeout}" we leave it as is.
+    /// </remarks>
+    /// <param name="database">The database instance for which the command timeout is being ensured.</param>
+    protected static void EnsureLongCommandTimeout(NPoco.IDatabase database)
+    {
+        const int CommandTimeoutInSeconds = 300;
+        if (database.CommandTimeout < CommandTimeoutInSeconds)
+        {
+            database.CommandTimeout = CommandTimeoutInSeconds;
+        }
+    }
+
     protected void AddColumn<T>(string columnName)
     {
         TableDefinition? table = DefinitionFactory.GetTableDefinition(typeof(T), SqlSyntax);

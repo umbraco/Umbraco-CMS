@@ -9,8 +9,13 @@ import { html, state } from '@umbraco-cms/backoffice/external/lit';
 
 class UmbTestContextConsumerClass implements UmbContextMinimal {
 	public prop: string = 'value from provider';
+	#host: Element;
+
+	constructor(host: Element) {
+		this.#host = host;
+	}
 	getHostElement() {
-		return undefined as any;
+		return this.#host;
 	}
 }
 
@@ -35,7 +40,7 @@ describe('@consume decorator', () => {
 	let element: MyTestElement;
 
 	beforeEach(async () => {
-		provider = new UmbContextProvider(document.body, testToken, new UmbTestContextConsumerClass());
+		provider = new UmbContextProvider(document.body, testToken, new UmbTestContextConsumerClass(document.body));
 		provider.hostConnected();
 
 		element = await fixture<MyTestElement>(`<my-consume-test-element></my-consume-test-element>`);
@@ -95,7 +100,7 @@ describe('@consume decorator', () => {
 	});
 
 	it('should update the context value when the provider instance changes', async () => {
-		const newProviderInstance = new UmbTestContextConsumerClass();
+		const newProviderInstance = new UmbTestContextConsumerClass(document.body);
 		newProviderInstance.prop = 'new value from provider';
 
 		const newProvider = new UmbContextProvider(element, testToken, newProviderInstance);
@@ -118,7 +123,7 @@ describe('@consume decorator', () => {
 
 		expect(controller.contextValue).to.equal(provider.providerInstance());
 
-		const newProviderInstance = new UmbTestContextConsumerClass();
+		const newProviderInstance = new UmbTestContextConsumerClass(document.body);
 		newProviderInstance.prop = 'new value from provider';
 
 		const newProvider = new UmbContextProvider(element, testToken, newProviderInstance);

@@ -4,11 +4,19 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_16_3_0;
 
+/// <summary>
+/// Represents a migration that adds rich text editor capabilities to the system as part of the upgrade to version 16.3.0.
+/// </summary>
 [Obsolete("Remove in Umbraco 18.")]
 public class AddRichTextEditorCapabilities : AsyncMigrationBase
 {
     private readonly IDataTypeService _dataTypeService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AddRichTextEditorCapabilities"/> class, used to add capabilities to the rich text editor during the migration process.
+    /// </summary>
+    /// <param name="context">The <see cref="IMigrationContext"/> for the migration operation.</param>
+    /// <param name="dataTypeService">The <see cref="IDataTypeService"/> used to manage data types.</param>
     public AddRichTextEditorCapabilities(IMigrationContext context, IDataTypeService dataTypeService)
         : base(context)
     {

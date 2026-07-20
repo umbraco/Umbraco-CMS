@@ -7,6 +7,7 @@ export interface UmbTrashWithRelationConfirmModalData {
 	itemRepositoryAlias: string;
 	referenceRepositoryAlias: string;
 	itemDataResolver?: UmbItemDataResolverConstructor;
+	disableDeleteWhenReferenced?: boolean;
 }
 
 export type UmbTrashWithRelationConfirmModalValue = undefined;

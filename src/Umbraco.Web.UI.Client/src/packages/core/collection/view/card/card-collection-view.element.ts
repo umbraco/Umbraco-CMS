@@ -30,10 +30,7 @@ export class UmbCardCollectionViewElement extends UmbCollectionViewElementBase {
 			?selected=${this._isSelectedItem(item.unique)}
 			@selected=${() => this._selectItem(item.unique)}
 			@deselected=${() => this._deselectItem(item.unique)}>
-			<umb-entity-actions-bundle
-				slot="actions"
-				.entityType=${item.entityType}
-				.unique=${item.unique}></umb-entity-actions-bundle>
+			<umb-entity-actions-bundle slot="actions"></umb-entity-actions-bundle>
 		</umb-entity-collection-item-card>`;
 	}
 

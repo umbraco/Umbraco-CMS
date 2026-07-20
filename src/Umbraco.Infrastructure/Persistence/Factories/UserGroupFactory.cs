@@ -10,6 +10,18 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories;
 
 internal static class UserGroupFactory
 {
+    /// <summary>
+    /// Constructs an <see cref="IUserGroup"/> entity from the provided <see cref="UserGroupDto"/>,
+    /// mapping its properties, permissions, allowed sections, and languages. Granular permissions are
+    /// mapped using the supplied <paramref name="permissionMappers"/>; unknown types are handled with a fallback.
+    /// </summary>
+    /// <param name="shortStringHelper">The helper used for processing and normalizing string aliases.</param>
+    /// <param name="dto">The data transfer object containing user group data to map from.</param>
+    /// <param name="permissionMappers">A dictionary of permission mappers, keyed by context, used to map granular permissions.</param>
+    /// <returns>
+    /// The constructed <see cref="IUserGroup"/> entity with properties, permissions, allowed sections, languages,
+    /// and granular permissions mapped from the DTO.
+    /// </returns>
     public static IUserGroup BuildEntity(IShortStringHelper shortStringHelper, UserGroupDto dto, IDictionary<string, IPermissionMapper> permissionMappers)
     {
         var userGroup = new UserGroup(
@@ -78,6 +90,14 @@ internal static class UserGroupFactory
         }
     }
 
+    /// <summary>
+    /// Creates a <see cref="UserGroupDto"/> from the specified <see cref="IUserGroup"/> entity.
+    /// Copies all basic properties, and populates related collections such as allowed sections and permissions.
+    /// </summary>
+    /// <param name="entity">The user group entity to convert.</param>
+    /// <returns>
+    /// A <see cref="UserGroupDto"/> representing the user group, including its allowed sections and permissions.
+    /// </returns>
     public static UserGroupDto BuildDto(IUserGroup entity)
     {
         var dto = new UserGroupDto

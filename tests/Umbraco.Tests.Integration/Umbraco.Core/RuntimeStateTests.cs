@@ -46,11 +46,11 @@ internal sealed class RuntimeStateTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void GivenPackageMigrationsExist_WhenUnattendedMigrations_ThenLevelIsRun()
+    public void GivenPackageMigrationsExist_WhenUnattendedMigrations_ThenLevelIsUpgrading()
     {
         RuntimeState.DetermineRuntimeLevel();
 
-        Assert.AreEqual(RuntimeLevel.Run, RuntimeState.Level);
+        Assert.AreEqual(RuntimeLevel.Upgrading, RuntimeState.Level);
         Assert.AreEqual(RuntimeLevelReason.UpgradePackageMigrations, RuntimeState.Reason);
     }
 

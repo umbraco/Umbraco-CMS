@@ -7,6 +7,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories;
 
 internal static class WebhookLogFactory
 {
+    /// <summary>
+    /// Creates a <see cref="WebhookLogDto"/> from the given <see cref="WebhookLog"/> instance.
+    /// </summary>
+    /// <param name="log">The <see cref="WebhookLog"/> instance to convert.</param>
+    /// <returns>A <see cref="WebhookLogDto"/> representing the provided <paramref name="log"/>.</returns>
     public static WebhookLogDto CreateDto(WebhookLog log) =>
         new()
         {
@@ -25,6 +30,11 @@ internal static class WebhookLogFactory
             ExceptionOccured = log.ExceptionOccured,
         };
 
+    /// <summary>
+    /// Creates a <see cref="WebhookLog"/> entity from the specified <see cref="WebhookLogDto"/>.
+    /// </summary>
+    /// <param name="dto">The <see cref="WebhookLogDto"/> instance to convert.</param>
+    /// <returns>A new <see cref="WebhookLog"/> entity populated with values from the <paramref name="dto"/>.</returns>
     public static WebhookLog DtoToEntity(WebhookLogDto dto) =>
         new()
         {

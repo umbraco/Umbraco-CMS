@@ -4,11 +4,14 @@ import { getItemFallbackName, getItemFallbackIcon } from '@umbraco-cms/backoffic
 import { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
 import { customElement, html, ifDefined, nothing, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { UmbWithOptionalDescriptionModel } from '@umbraco-cms/backoffice/models';
+
+type UmbDefaultCollectionItemRefItemModel = UmbCollectionItemModel & UmbWithOptionalDescriptionModel;
 
 @customElement('umb-default-collection-item-ref')
 export class UmbDefaultCollectionItemRefElement extends UmbLitElement implements UmbEntityCollectionItemElement {
 	@property({ type: Object })
-	item?: UmbCollectionItemModel;
+	item?: UmbDefaultCollectionItemRefItemModel;
 
 	@property({ type: Boolean })
 	selectable = false;
@@ -42,6 +45,7 @@ export class UmbDefaultCollectionItemRefElement extends UmbLitElement implements
 
 		return html`<uui-ref-node
 			name=${this.item.name ?? `${getItemFallbackName(this.item)}`}
+			detail=${ifDefined(this.item.description ?? undefined)}
 			@selected=${this.#onSelected}
 			@deselected=${this.#onDeselected}
 			?selectable=${this.selectable}
@@ -55,7 +59,7 @@ export class UmbDefaultCollectionItemRefElement extends UmbLitElement implements
 		</uui-ref-node>`;
 	}
 
-	#renderIcon(item: UmbCollectionItemModel) {
+	#renderIcon(item: UmbDefaultCollectionItemRefItemModel) {
 		const icon = item.icon || getItemFallbackIcon();
 		return html`<umb-icon slot="icon" name=${icon}></umb-icon>`;
 	}

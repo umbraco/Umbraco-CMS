@@ -2,9 +2,13 @@
 // See LICENSE for more details.
 
 using System.Diagnostics.CodeAnalysis;
+using Umbraco.Cms.Core.Extensions;
 
 namespace Umbraco.Extensions;
 
+/// <summary>
+/// Provides extension methods for <see cref="int"/>.
+/// </summary>
 public static class IntExtensions
 {
     /// <summary>
@@ -30,7 +34,9 @@ public static class IntExtensions
     public static Guid ToGuid(this int value)
     {
         Span<byte> bytes = stackalloc byte[16];
-        BitConverter.GetBytes(value).CopyTo(bytes);
+
+        // Write directly into the buffer to avoid the intermediate array allocated by BitConverter.GetBytes(value).
+        BitConverter.TryWriteBytes(bytes, value);
         return new Guid(bytes);
     }
 
@@ -44,14 +50,14 @@ public static class IntExtensions
     /// </returns>
     public static bool TryParseFromGuid(Guid value, [NotNullWhen(true)] out int? result)
     {
-        if (value.ToString().EndsWith("-0000-0000-0000-000000000000") is false)
+        if (value.IsFakeGuid() is false)
         {
             // We have a proper GUID, not one converted from an integer.
             result = null;
             return false;
         }
 
-        result = BitConverter.ToInt32(value.ToByteArray());
+        result = value.ToInt();
         return true;
     }
 }

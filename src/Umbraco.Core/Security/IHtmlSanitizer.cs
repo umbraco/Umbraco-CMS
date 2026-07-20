@@ -1,5 +1,8 @@
 namespace Umbraco.Cms.Core.Security;
 
+/// <summary>
+///     Provides HTML sanitization functionality to prevent XSS attacks.
+/// </summary>
 public interface IHtmlSanitizer
 {
     /// <summary>

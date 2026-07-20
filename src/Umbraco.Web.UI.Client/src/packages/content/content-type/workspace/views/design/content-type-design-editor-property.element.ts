@@ -138,7 +138,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 		await umbConfirmModal(this, {
 			headline: `${this.localize.term('actions_delete')} property`,
 			content: html`<umb-localize key="contentTypeEditor_confirmDeletePropertyMessage" .args=${[this._property.name ?? unique]}>Are you sure you want to delete the property <strong>${this._property.name ?? unique}</strong></umb-localize></div>`,
-			confirmLabel: this.localize.term('actions_delete'),
+			confirmLabel: '#actions_delete',
 			color: 'danger',
 		});
 
@@ -166,7 +166,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 			return html`
 				<div id="header">
 					<p>${this.localize.string(this.property.name)}<i>${this.property.alias}</i></p>
-					<p>${this.property.description}</p>
+					<p>${this.property.description ?? ''}</p>
 				</div>
 				<div id="editor">
 					${this.#renderPropertyName()} ${this.#renderPropertyTags()}
@@ -195,7 +195,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 			return html`
 				<div id="header">
 					<umb-input-with-alias
-						name="name"
+						name="propertyTypeName"
 						id="name-alias-input"
 						required
 						.placeholder=${this.localize.term('placeholders_label')}
@@ -210,11 +210,11 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 					<slot name="action-menu"></slot>
 					<p>
 						<uui-textarea
-							label="description"
-							name="description"
+							data-mark="input:description"
 							id="description-input"
-							placeholder=${this.localize.term('placeholders_enterDescription')}
-							.value=${this.property.description}
+							.label=${this.localize.term('general_description')}
+							.placeholder=${this.localize.term('placeholders_enterDescription')}
+							.value=${this.property.description ?? ''}
 							@input=${(e: CustomEvent) => {
 								if (e.target) this.#singleValueUpdate('description', (e.target as HTMLInputElement).value);
 							}}
@@ -225,11 +225,15 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 					id="editor"
 					look="outline"
 					label=${this.localize.term('contentTypeEditor_editorSettings')}
+					data-mark="action:editor-settings"
 					href=${this.editPropertyTypePath +
 					UMB_EDIT_PROPERTY_TYPE_WORKSPACE_PATH_PATTERN.generateLocal({ unique: this.property.unique })}>
 					${this.#renderPropertyName()} ${this.#renderPropertyTags()}
 					<uui-action-bar>
-						<uui-button label="${this.localize.term('actions_delete')}" @click="${this.#requestRemove}">
+						<uui-button
+							label="${this.localize.term('actions_delete')}"
+							data-mark="action:delete"
+							@click="${this.#requestRemove}">
 							<uui-icon name="delete"></uui-icon>
 						</uui-button>
 					</uui-action-bar>
@@ -253,6 +257,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 				type="number"
 				?disabled=${this._inherited}
 				label="sort order"
+				data-mark="input:sort-order"
 				@change=${this.#onPropertyOrderChanged}
 				.value=${(this.property.sortOrder ?? 0).toString()}></uui-input>
 		`;
@@ -337,22 +342,30 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 	static override styles = [
 		UmbTextStyles,
 		css`
-			:host(:not([sort-mode-active])) {
-				display: grid;
-				grid-template-columns: 300px auto;
-				column-gap: var(--uui-size-layout-2);
+			:host {
+				display: block;
 				border-bottom: 1px solid var(--uui-color-divider);
 				padding: var(--uui-size-layout-1) 0;
+			}
+			:host(:not([sort-mode-active])) {
+				display: grid;
+				grid-template-columns: 320px auto;
+				column-gap: var(--uui-size-space-5);
 				container-type: inline-size;
 			}
 
-			:host > div {
+			:host > * {
 				grid-column: span 2;
 			}
 
 			@container (width > 700px) {
-				:host(:not([orientation='vertical'])) > div {
+				:host(:not([orientation='vertical'])) > * {
 					grid-column: span 1;
+				}
+				#header {
+					position: sticky;
+					top: var(--uui-size-space-4);
+					height: min-content;
 				}
 			}
 
@@ -367,15 +380,13 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 				position: relative;
 				display: flex;
 				padding: 0;
-				margin-bottom: var(--uui-size-3);
-			}
-
-			:host([sort-mode-active]:last-of-type) {
-				margin-bottom: 0;
 			}
 
 			:host([sort-mode-active]:not([_inherited])) {
 				cursor: grab;
+			}
+			:host([sort-mode-active][_inherited]) {
+				cursor: not-allowed;
 			}
 
 			:host([sort-mode-active]) .sortable {
@@ -387,9 +398,6 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 			}
 			:host([sort-mode-active][_inherited]) .sortable {
 				color: var(--uui-color-disabled-contrast);
-			}
-			:host([sort-mode-active]:not([_inherited])) .sortable {
-				background-color: var(--uui-color-divider);
 			}
 
 			:host([sort-mode-active]) uui-input {
@@ -420,12 +428,6 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 				margin-bottom: 0;
 			}
 
-			#header {
-				position: sticky;
-				top: var(--uui-size-space-4);
-				height: min-content;
-			}
-
 			#header i {
 				opacity: 0.55;
 				float: right;
@@ -434,8 +436,8 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 			#header umb-input-with-alias {
 				--uui-input-border-color: transparent;
 			}
-			#name-alias-input,
-			#description-input {
+			#header umb-input-with-alias,
+			#header uui-textarea {
 				width: 100%;
 			}
 
@@ -445,6 +447,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 
 			#editor {
 				position: relative;
+				min-height: 80px;
 				--uui-button-background-color: var(--uui-color-background);
 				--uui-button-background-color-hover: var(--uui-color-background);
 			}

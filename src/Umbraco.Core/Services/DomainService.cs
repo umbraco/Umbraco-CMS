@@ -10,12 +10,24 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <summary>
+/// Provides services for managing domains (hostnames and culture assignments for content).
+/// </summary>
 public class DomainService : RepositoryService, IDomainService
 {
     private readonly IDomainRepository _domainRepository;
     private readonly ILanguageService _languageService;
     private readonly IContentService _contentService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DomainService"/> class.
+    /// </summary>
+    /// <param name="provider">The core scope provider.</param>
+    /// <param name="loggerFactory">The logger factory.</param>
+    /// <param name="eventMessagesFactory">The event messages factory.</param>
+    /// <param name="domainRepository">The domain repository.</param>
+    /// <param name="languageService">The language service.</param>
+    /// <param name="contentService">The content service.</param>
     public DomainService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -30,6 +42,7 @@ public class DomainService : RepositoryService, IDomainService
         _contentService = contentService;
     }
 
+    /// <inheritdoc />
     public bool Exists(string domainName)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -38,7 +51,12 @@ public class DomainService : RepositoryService, IDomainService
         }
     }
 
-    [Obsolete($"Please use {nameof(UpdateDomainsAsync)}. Will be removed in V15")]
+    /// <summary>
+    /// Deletes a domain.
+    /// </summary>
+    /// <param name="domain">The domain to delete.</param>
+    /// <returns>An attempt result indicating the success or failure of the operation.</returns>
+    [Obsolete($"Please use {nameof(UpdateDomainsAsync)}. Scheduled for removal in Umbraco 18.")]
     public Attempt<OperationResult?> Delete(IDomain domain)
     {
         EventMessages eventMessages = EventMessagesFactory.Get();
@@ -50,6 +68,7 @@ public class DomainService : RepositoryService, IDomainService
         return result ? OperationResult.Attempt.Succeed(eventMessages) : OperationResult.Attempt.Cancel(eventMessages);
     }
 
+    /// <inheritdoc />
     public IDomain? GetByName(string name)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -58,6 +77,7 @@ public class DomainService : RepositoryService, IDomainService
         }
     }
 
+    /// <inheritdoc />
     public IDomain? GetById(int id)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -66,7 +86,12 @@ public class DomainService : RepositoryService, IDomainService
         }
     }
 
-    [Obsolete($"Please use {nameof(GetAllAsync)}. Will be removed in V15")]
+    /// <summary>
+    /// Gets all domains.
+    /// </summary>
+    /// <param name="includeWildcards">A value indicating whether to include wildcard domains.</param>
+    /// <returns>A collection of all domains.</returns>
+    [Obsolete($"Please use {nameof(GetAllAsync)}. Scheduled for removal in Umbraco 18.")]
     public IEnumerable<IDomain> GetAll(bool includeWildcards)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -75,7 +100,13 @@ public class DomainService : RepositoryService, IDomainService
         }
     }
 
-    [Obsolete($"Please use {nameof(GetAssignedDomainsAsync)}. Will be removed in V15")]
+    /// <summary>
+    /// Gets the domains assigned to a specific content item.
+    /// </summary>
+    /// <param name="contentId">The identifier of the content item.</param>
+    /// <param name="includeWildcards">A value indicating whether to include wildcard domains.</param>
+    /// <returns>A collection of domains assigned to the content item.</returns>
+    [Obsolete($"Please use {nameof(GetAssignedDomainsAsync)}. Scheduled for removal in Umbraco 18.")]
     public IEnumerable<IDomain> GetAssignedDomains(int contentId, bool includeWildcards)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -84,7 +115,12 @@ public class DomainService : RepositoryService, IDomainService
         }
     }
 
-    [Obsolete($"Please use {nameof(UpdateDomainsAsync)}. Will be removed in V15")]
+    /// <summary>
+    /// Saves a domain.
+    /// </summary>
+    /// <param name="domainEntity">The domain entity to save.</param>
+    /// <returns>An attempt result indicating the success or failure of the operation.</returns>
+    [Obsolete($"Please use {nameof(UpdateDomainsAsync)}. Scheduled for removal in Umbraco 18.")]
     public Attempt<OperationResult?> Save(IDomain domainEntity)
     {
         EventMessages eventMessages = EventMessagesFactory.Get();
@@ -96,7 +132,12 @@ public class DomainService : RepositoryService, IDomainService
         return result ? OperationResult.Attempt.Succeed(eventMessages) : OperationResult.Attempt.Cancel(eventMessages);
     }
 
-    [Obsolete($"Please use {nameof(UpdateDomainsAsync)}. Will be removed in V15")]
+    /// <summary>
+    /// Sorts domains.
+    /// </summary>
+    /// <param name="items">The domains to sort.</param>
+    /// <returns>An attempt result indicating the success or failure of the operation.</returns>
+    [Obsolete($"Please use {nameof(UpdateDomainsAsync)}. Scheduled for removal in Umbraco 18.")]
     public Attempt<OperationResult?> Sort(IEnumerable<IDomain> items)
     {
         EventMessages eventMessages = EventMessagesFactory.Get();

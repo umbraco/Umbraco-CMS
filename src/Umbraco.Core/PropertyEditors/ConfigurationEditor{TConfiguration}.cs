@@ -46,6 +46,12 @@ public abstract class ConfigurationEditor<TConfiguration> : ConfigurationEditor
         }
     }
 
+    /// <summary>
+    ///     Converts a configuration dictionary to the typed configuration object.
+    /// </summary>
+    /// <param name="configuration">The configuration dictionary.</param>
+    /// <param name="configurationEditorJsonSerializer">The configuration editor JSON serializer.</param>
+    /// <returns>The typed configuration object, or default if conversion fails.</returns>
     protected TConfiguration? AsConfigurationObject(
         IDictionary<string, object> configuration,
         IConfigurationEditorJsonSerializer configurationEditorJsonSerializer) =>

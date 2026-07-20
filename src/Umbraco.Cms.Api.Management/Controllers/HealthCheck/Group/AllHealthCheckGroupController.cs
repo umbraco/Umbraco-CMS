@@ -8,12 +8,20 @@ using Umbraco.Cms.Core.Mapping;
 
 namespace Umbraco.Cms.Api.Management.Controllers.HealthCheck.Group;
 
+/// <summary>
+/// Controller responsible for managing operations related to all health check groups in the system.
+/// </summary>
 [ApiVersion("1.0")]
 public class AllHealthCheckGroupController : HealthCheckGroupControllerBase
 {
     private readonly IHealthCheckGroupPresentationFactory _healthCheckGroupPresentationFactory;
     private readonly IUmbracoMapper _umbracoMapper;
 
+    /// <summary>
+    /// Constructor for the <see cref="Umbraco.Cms.Api.Management.Controllers.HealthCheck.Group.AllHealthCheckGroupController"/> class.
+    /// </summary>
+    /// <param name="healthCheckGroupPresentationFactory">Factory used to create health check group presentations.</param>
+    /// <param name="umbracoMapper">The mapper for Umbraco objects.</param>
     public AllHealthCheckGroupController(
         IHealthCheckGroupPresentationFactory healthCheckGroupPresentationFactory,
         IUmbracoMapper umbracoMapper)
@@ -32,6 +40,8 @@ public class AllHealthCheckGroupController : HealthCheckGroupControllerBase
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<HealthCheckGroupResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a collection of health check groups.")]
+    [EndpointDescription("Gets a collection of health check groups with their associated health checks.")]
     public Task<ActionResult<PagedViewModel<HealthCheckGroupResponseModel>>> All(
         CancellationToken cancellationToken,
         int skip = 0,

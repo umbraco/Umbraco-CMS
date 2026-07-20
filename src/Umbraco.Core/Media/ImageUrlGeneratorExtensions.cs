@@ -3,6 +3,9 @@ using Umbraco.Cms.Core.Media;
 
 namespace Umbraco.Extensions;
 
+/// <summary>
+///     Provides extension methods for <see cref="IImageUrlGenerator"/>.
+/// </summary>
 public static class ImageUrlGeneratorExtensions
 {
     /// <summary>

@@ -93,5 +93,10 @@ public static class ConfigurationExtensions
     public static RuntimeMode GetRuntimeMode(this IConfiguration configuration)
         => configuration.GetValue<RuntimeMode>(Constants.Configuration.ConfigRuntimeMode);
 
+    /// <summary>
+    /// Gets the configured ModelsBuilder mode.
+    /// </summary>
+    /// <param name="configuration">The configuration.</param>
+    /// <returns>The ModelsBuilder mode string.</returns>
     public static string GetModelsMode(this IConfiguration configuration) => (configuration.GetSection(Constants.Configuration.ConfigModelsBuilder).Get<ModelsBuilderSettings>() ?? new ModelsBuilderSettings()).ModelsMode;
 }

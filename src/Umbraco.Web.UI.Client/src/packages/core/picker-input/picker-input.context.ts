@@ -32,8 +32,15 @@ export class UmbPickerInputContext<
 	public readonly statuses;
 	public readonly interactionMemory = new UmbInteractionMemoryManager(this);
 
+	#modalRouteRegistered = false;
 	#modalRoute = new UmbStringState<string | undefined>(undefined);
-	public readonly modalRoute = this.#modalRoute.asObservable();
+	public get modalRoute() {
+		if (!this.#modalRouteRegistered) {
+			this.#modalRouteRegistered = true;
+			this.#createPickerModalRoute();
+		}
+		return this.#modalRoute.asObservable();
+	}
 
 	#modalData?: Partial<PickerModalConfigType>;
 
@@ -108,7 +115,9 @@ export class UmbPickerInputContext<
 	 */
 	setModalAlias(modalAlias: string | UmbModalToken<UmbPickerModalData<PickerItemType>, PickerModalValueType>) {
 		this.modalAlias = modalAlias;
-		this.#createPickerModalRoute();
+		if (this.#modalRouteRegistered) {
+			this.#createPickerModalRoute();
+		}
 	}
 
 	/**
@@ -153,6 +162,14 @@ export class UmbPickerInputContext<
 		this.#applyModalValue(modalValue);
 	}
 
+	protected _combinePickableFilters<ItemType>(
+		internalFilter: (item: ItemType) => boolean,
+		externalFilter?: (item: ItemType) => boolean,
+	): (item: ItemType) => boolean {
+		if (!externalFilter) return internalFilter;
+		return (item) => internalFilter(item) && externalFilter(item);
+	}
+
 	protected async _requestItemName(unique: string) {
 		return this.getSelectedItemByUnique(unique)?.name ?? '#general_notFound';
 	}
@@ -187,7 +204,6 @@ export class UmbPickerInputContext<
 		}
 
 		this.#pickerModalRouteRegistration = new UmbModalRouteRegistrationController(this, this.modalAlias)
-			.addUniquePaths(['picker'])
 			.onSetup(() => {
 				return {
 					data: this.#getPickerModalDataArgs(),

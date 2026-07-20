@@ -1,5 +1,8 @@
 namespace Umbraco.Cms.Core.Logging.Viewer;
 
+/// <summary>
+///     Represents a single log entry with its associated metadata and content.
+/// </summary>
 public class LogEntry : ILogEntry
 {
     /// <summary>

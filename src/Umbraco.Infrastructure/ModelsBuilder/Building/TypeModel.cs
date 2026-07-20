@@ -73,10 +73,11 @@ public class TypeModel
     ///     Gets the base model.
     /// </summary>
     /// <remarks>
+    ///     <para>The parent type in Umbraco (type inherits its properties).</para>
     ///     <para>If the content type does not have a base content type, then returns <c>null</c>.</para>
     ///     <para>The current model inherits from its base model.</para>
     /// </remarks>
-    public TypeModel? BaseType; // the parent type in Umbraco (type inherits its properties)
+    public TypeModel? BaseType;
 
     /// <summary>
     ///     Gets the clr name of the model.
@@ -202,8 +203,11 @@ public class TypeModel
     }
 
     /// <summary>
-    ///     Maps ModelType.
+    ///     Updates the <see cref="PropertyModel.ClrTypeName"/> of each property in the provided <see cref="TypeModel"/> list
+    ///     by mapping their model CLR types to fully qualified type names, optionally prepending the specified namespace.
     /// </summary>
+    /// <param name="typeModels">The list of <see cref="TypeModel"/> instances whose property type names will be mapped.</param>
+    /// <param name="ns">The namespace to prepend to the CLR type names, or an empty string to use no namespace.</param>
     public static void MapModelTypes(IList<TypeModel> typeModels, string ns)
     {
         var hasNs = !string.IsNullOrWhiteSpace(ns);

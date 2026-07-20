@@ -1,5 +1,8 @@
 namespace Umbraco.Cms.Api.Management.ViewModels.ContentType;
 
+/// <summary>
+/// Serves as the base class for models used in content type composition requests within the Umbraco CMS Management API.
+/// </summary>
 public abstract class ContentTypeCompositionRequestModelBase
 {
     /// <summary>

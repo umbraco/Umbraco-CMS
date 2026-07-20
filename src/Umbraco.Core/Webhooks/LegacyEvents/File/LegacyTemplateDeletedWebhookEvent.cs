@@ -6,9 +6,19 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Webhooks.Events;
 
+/// <summary>
+/// Legacy webhook event that fires when a template is deleted, using the legacy payload format.
+/// </summary>
 [WebhookEvent("Template Deleted")]
 public class LegacyTemplateDeletedWebhookEvent : WebhookEventBase<TemplateDeletedNotification>
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="LegacyTemplateDeletedWebhookEvent"/> class.
+    /// </summary>
+    /// <param name="webhookFiringService">The webhook firing service.</param>
+    /// <param name="webHookService">The webhook service.</param>
+    /// <param name="webhookSettings">The webhook settings.</param>
+    /// <param name="serverRoleAccessor">The server role accessor.</param>
     public LegacyTemplateDeletedWebhookEvent(
         IWebhookFiringService webhookFiringService,
         IWebhookService webHookService,
@@ -18,8 +28,10 @@ public class LegacyTemplateDeletedWebhookEvent : WebhookEventBase<TemplateDelete
     {
     }
 
+    /// <inheritdoc />
     public override string Alias => Constants.WebhookEvents.Aliases.TemplateDeleted;
 
+    /// <inheritdoc />
     public override object ConvertNotificationToRequestPayload(TemplateDeletedNotification notification) =>
         notification.DeletedEntities;
 }

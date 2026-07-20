@@ -1,9 +1,13 @@
 import { UMB_DUPLICATE_DOCUMENT_MODAL_ALIAS } from './manifests.js';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
+import type { UmbDocumentTreeItemModel } from '../../../types.js';
+import type { UmbEntityExpansionModel } from '@umbraco-cms/backoffice/utils';
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface UmbDuplicateDocumentModalData extends UmbEntityModel {}
+export interface UmbDuplicateDocumentModalData extends UmbEntityModel {
+	selectableFilter?: (item: UmbDocumentTreeItemModel) => boolean;
+	treeExpansion?: UmbEntityExpansionModel;
+}
 
 export interface UmbDuplicateDocumentModalValue {
 	destination: {

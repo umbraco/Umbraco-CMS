@@ -1,4 +1,4 @@
-import type { UmbCollectionSelectionConfiguration } from '../types.js';
+import type { UmbCollectionLayoutConfiguration, UmbCollectionSelectionConfiguration } from '../types.js';
 import { UmbCollectionItemPickerContext } from './collection-item-picker-modal.context.js';
 import type { UmbCollectionItemPickerModalData, UmbCollectionItemPickerModalValue } from './types.js';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
@@ -144,10 +144,18 @@ export class UmbCollectionItemPickerModalElement extends UmbModalBaseElement<
 	}
 
 	#renderCollection() {
+		const layouts: Array<UmbCollectionLayoutConfiguration> =
+			this.data?.collection.views?.map((view) => {
+				return {
+					collectionView: view.alias,
+				};
+			}) ?? [];
+
 		return html`
 			<umb-collection
 				alias=${ifDefined(this.data?.collection.alias)}
 				.config=${{
+					layouts,
 					selectionConfiguration: this._selectionConfiguration,
 					bulkActionConfiguration: { enabled: false },
 				}}

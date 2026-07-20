@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Core.Routing;
 ///         TODO: Kill this, but we need to port all of its functionality.
 ///     </para>
 /// </remarks>
-[Obsolete("This class is deprecated and will be removed in a future version. Use IPublishedRequest instead. Scheduled for removal in Umbraco 19.")]
+[Obsolete("This class is deprecated. Use IPublishedRequest instead. Scheduled for removal in Umbraco 19.")]
 public class PublishedRequestOld // : IPublishedRequest
 {
     private readonly IPublishedRouter _publishedRouter;

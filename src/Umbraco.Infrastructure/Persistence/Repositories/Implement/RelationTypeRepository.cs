@@ -19,6 +19,14 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 /// </summary>
 internal sealed class RelationTypeRepository : EntityRepositoryBase<int, IRelationType>, IRelationTypeRepository
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="RelationTypeRepository"/> class with the specified dependencies.
+    /// </summary>
+    /// <param name="scopeAccessor">Provides access to the current database scope.</param>
+    /// <param name="cache">The application-level cache manager.</param>
+    /// <param name="logger">The logger used for logging repository operations.</param>
+    /// <param name="repositoryCacheVersionService">Service for managing repository cache versions.</param>
+    /// <param name="cacheSyncService">Service for synchronizing cache across distributed environments.</param>
     public RelationTypeRepository(
         IScopeAccessor scopeAccessor,
         AppCaches cache,
@@ -52,17 +60,37 @@ internal sealed class RelationTypeRepository : EntityRepositoryBase<int, IRelati
 
     #region Overrides of RepositoryBase<int,RelationType>
 
-    protected override IRelationType? PerformGet(int id) =>
+    /// <summary>
+    /// Gets the cache policy as <see cref="FullDataSetRepositoryCachePolicy{TEntity, TId}"/> for predicate-based lookups.
+    /// Returns null when caching is disabled (e.g. <see cref="AppCaches.NoCache"/>).
+    /// </summary>
+    private FullDataSetRepositoryCachePolicy<IRelationType, int>? TypedCachePolicy
+        => CachePolicy as FullDataSetRepositoryCachePolicy<IRelationType, int>;
 
-        // use the underlying GetAll which will force cache all content types
+    // Note: PerformGet(int) is passed as a callback to the cache policy's Get(TId) method,
+    // but FullDataSetRepositoryCachePolicy.Get() never invokes it — it uses GetAllCached()
+    // internally and clones only the matched entity. This override exists only as a required
+    // implementation of the abstract base and as a fallback for non-FullDataSet policies.
+    protected override IRelationType? PerformGet(int id) =>
         GetMany()?.FirstOrDefault(x => x.Id == id);
 
+    /// <summary>
+    /// Gets a relation type by its unique identifier.
+    /// </summary>
+    /// <param name="id">The unique identifier of the relation type.</param>
+    /// <returns>The relation type matching the specified identifier, or null if not found.</returns>
     public IRelationType? Get(Guid id) =>
+        TypedCachePolicy?.FindCached(x => x.Key == id, PerformGetAll)
+        ?? GetMany()?.FirstOrDefault(x => x.Key == id);
 
-        // use the underlying GetAll which will force cache all content types
-        GetMany()?.FirstOrDefault(x => x.Key == id);
-
-    public bool Exists(Guid id) => Get(id) != null;
+    /// <summary>
+    /// Determines whether a relation type with the specified identifier exists.
+    /// </summary>
+    /// <param name="id">The unique identifier of the relation type.</param>
+    /// <returns>True if the relation type exists; otherwise, false.</returns>
+    public bool Exists(Guid id) =>
+        TypedCachePolicy?.ExistsCached(x => x.Key == id, PerformGetAll)
+        ?? GetMany()?.Any(x => x.Key == id) == true;
 
     protected override IEnumerable<IRelationType> PerformGetAll(params int[]? ids)
     {
@@ -73,6 +101,11 @@ internal sealed class RelationTypeRepository : EntityRepositoryBase<int, IRelati
         return dtos.Select(x => DtoToEntity(x));
     }
 
+    /// <summary>
+    /// Retrieves multiple relation types by their unique identifiers.
+    /// </summary>
+    /// <param name="ids">An optional array of unique identifiers for the relation types to retrieve. If no identifiers are provided, all relation types are returned.</param>
+    /// <returns>An enumerable collection of relation types matching the specified identifiers, or all relation types if no identifiers are specified.</returns>
     public IEnumerable<IRelationType> GetMany(params Guid[]? ids)
     {
         // should not happen due to the cache policy

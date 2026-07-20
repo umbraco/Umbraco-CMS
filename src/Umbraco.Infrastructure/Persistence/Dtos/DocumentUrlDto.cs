@@ -5,6 +5,10 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
+/// <summary>
+/// Represents a data transfer object that encapsulates URL-related information for a document entity in Umbraco CMS.
+/// This DTO is typically used for persisting or transferring document URL data between application layers or for database operations.
+/// </summary>
 [TableName(TableName)]
 [PrimaryKey(PrimaryKeyColumnName, AutoIncrement = true)]
 [ExplicitColumns]
@@ -18,26 +22,60 @@ public class DocumentUrlDto
     public const string UrlSegmentColumnName = "urlSegment";
     public const string IsPrimaryColumnName = "isPrimary";
 
+    /// <summary>
+    /// Gets or sets the unique identifier for the node.
+    /// </summary>
     [Column(PrimaryKeyColumnName)]
     [PrimaryKeyColumn(Clustered = false, AutoIncrement = true)]
     public int NodeId { get; set; }
 
+    /// <summary>
+    /// Gets or sets the unique identifier (GUID) of the document node associated with this URL.
+    /// </summary>
     [Index(IndexTypes.UniqueClustered, ForColumns = $"{UniqueIdColumnName}, {LanguageIdColumnName}, {IsDraftColumnName}, {UrlSegmentColumnName}", Name = "IX_" + TableName)]
     [Column(UniqueIdColumnName)]
     [ForeignKey(typeof(NodeDto), Column = NodeDto.KeyColumnName)]
     public Guid UniqueId { get; set; }
 
+    /// <summary>
+    /// Gets or sets a value indicating whether the document URL is a draft.
+    /// </summary>
     [Column(IsDraftColumnName)]
     public bool IsDraft { get; set; }
 
-    [Column(LanguageIdColumnName)]
-    [ForeignKey(typeof(LanguageDto))]
-    public int LanguageId { get; set; }
+    /// <summary>
+    /// Gets or sets the language identifier associated with the document URL.
+    /// </summary>
+    /// <remarks>
+    /// This property returns 0 for invariant content. Use <see cref="NullableLanguageId"/> instead,
+    /// which correctly returns <c>null</c> for invariant content.
+    /// </remarks>
+    [Obsolete("Use NullableLanguageId instead. This property returns 0 for invariant content. Scheduled for removal in Umbraco 18, when the NullableLanguageId will also be renamed to LanguageId.")]
+    [Ignore]
+    public int LanguageId
+    {
+        get => NullableLanguageId ?? 0;
+        set => NullableLanguageId = value;
+    }
 
+    /// <summary>
+    /// Gets or sets the language Id. NULL indicates invariant content (not language-specific).
+    /// </summary>
+    [Column(LanguageIdColumnName)]
+    [NullSetting(NullSetting = NullSettings.Null)]
+    [ForeignKey(typeof(LanguageDto))]
+    public int? NullableLanguageId { get; set; }
+
+    /// <summary>
+    /// Gets or sets the URL segment, which is the part of the document's URL typically used for routing and identifying the document in URLs.
+    /// </summary>
     [Column(UrlSegmentColumnName)]
     [NullSetting(NullSetting = NullSettings.NotNull)]
     public string UrlSegment { get; set; } = string.Empty;
 
+    /// <summary>
+    /// Gets or sets a value indicating whether this URL is the primary URL.
+    /// </summary>
     [Column(IsPrimaryColumnName)]
     [Constraint(Default = 1)]
     public bool IsPrimary { get; set; }

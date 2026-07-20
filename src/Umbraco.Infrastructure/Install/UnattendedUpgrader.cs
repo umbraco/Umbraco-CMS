@@ -11,6 +11,7 @@ using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Migrations;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade;
 using Umbraco.Cms.Infrastructure.Runtime;
@@ -33,6 +34,15 @@ public class UnattendedUpgrader : INotificationAsyncHandler<RuntimeUnattendedUpg
     private readonly DistributedCache _distributedCache;
     private readonly ILogger<UnattendedUpgrader> _logger;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.Install.UnattendedUpgrader"/> class, responsible for performing unattended upgrades of the Umbraco CMS database and executing package migrations.
+    /// </summary>
+    /// <param name="profilingLogger">The logger used for profiling and logging upgrade operations.</param>
+    /// <param name="umbracoVersion">Provides information about the current Umbraco version.</param>
+    /// <param name="databaseBuilder">Handles database schema creation and upgrades.</param>
+    /// <param name="runtimeState">Represents the current runtime state of the Umbraco application.</param>
+    /// <param name="packageMigrationRunner">Executes package migrations during the upgrade process.</param>
+    /// <param name="unattendedSettings">The configuration options for unattended upgrades.</param>
     [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
     public UnattendedUpgrader(
         IProfilingLogger profilingLogger,
@@ -53,6 +63,17 @@ public class UnattendedUpgrader : INotificationAsyncHandler<RuntimeUnattendedUpg
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UnattendedUpgrader"/> class, responsible for performing unattended upgrades of the Umbraco database and executing package migrations.
+    /// </summary>
+    /// <param name="profilingLogger">The logger used for profiling and diagnostic logging during the upgrade process.</param>
+    /// <param name="umbracoVersion">Provides information about the current Umbraco version.</param>
+    /// <param name="databaseBuilder">Handles database schema creation and upgrades.</param>
+    /// <param name="runtimeState">Represents the current runtime state of the Umbraco application.</param>
+    /// <param name="packageMigrationRunner">Executes package migrations as part of the upgrade process.</param>
+    /// <param name="unattendedSettings">The configuration options for unattended upgrades.</param>
+    /// <param name="distributedCache">Manages distributed cache invalidation during the upgrade.</param>
+    /// <param name="logger">The logger instance for logging upgrade operations and errors.</param>
     public UnattendedUpgrader(
         IProfilingLogger profilingLogger,
         IUmbracoVersion umbracoVersion,
@@ -73,6 +94,13 @@ public class UnattendedUpgrader : INotificationAsyncHandler<RuntimeUnattendedUpg
         _logger = logger;
     }
 
+    /// <summary>
+    /// Asynchronously handles the unattended upgrade process for the application, executing core and package migrations as required based on the provided notification.
+    /// </summary>
+    /// <param name="notification">The notification containing information about the runtime unattended upgrade, including upgrade results and migration status.</param>
+    /// <param name="cancellationToken">A cancellation token to observe while waiting for the task to complete.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
+    /// <exception cref="InvalidOperationException">Thrown if the runtime state reason is not recognized as a valid upgrade scenario.</exception>
     public async Task HandleAsync(RuntimeUnattendedUpgradeNotification notification, CancellationToken cancellationToken)
     {
         if (_runtimeState.RunUnattendedBootLogic())
@@ -136,7 +164,23 @@ public class UnattendedUpgrader : INotificationAsyncHandler<RuntimeUnattendedUpg
 
         try
         {
-            await _packageMigrationRunner.RunPackagePlansAsync(pendingMigrations);
+            IEnumerable<ExecutedMigrationPlan> executedPlans =
+                await _packageMigrationRunner.RunPackagePlansAsync(pendingMigrations);
+
+            // Failed plans are reported via the result, not by throwing (the runner deliberately runs all plans to
+            // completion so one package's failure doesn't block another's). Surface them as a boot failure here so the
+            // failure is observable, mirroring the core upgrade path - otherwise the migration stays pending and the
+            // runtime re-derives Upgrading on every boot, leaving the site stuck on the maintenance page.
+            // All failures are reported together.
+            var failedPlans = executedPlans.Where(plan => plan.Successful is false).ToList();
+            if (failedPlans.Count > 0)
+            {
+                SetRuntimeError(CreatePackageMigrationError(failedPlans));
+                notification.UnattendedUpgradeResult =
+                    RuntimeUnattendedUpgradeNotification.UpgradeResult.HasErrors;
+                return;
+            }
+
             notification.UnattendedUpgradeResult = RuntimeUnattendedUpgradeNotification.UpgradeResult.PackageMigrationComplete;
 
             // Migration plans may have changed published content, so refresh the distributed cache to ensure consistency on first request.
@@ -171,6 +215,22 @@ public class UnattendedUpgrader : INotificationAsyncHandler<RuntimeUnattendedUpg
             notification.UnattendedUpgradeResult =
                 RuntimeUnattendedUpgradeNotification.UpgradeResult.CoreUpgradeComplete;
         }
+    }
+
+    private static Exception CreatePackageMigrationError(IReadOnlyList<ExecutedMigrationPlan> failedPlans)
+    {
+        static Exception ToException(ExecutedMigrationPlan plan)
+            => plan.Exception ?? new UnattendedInstallException(
+                $"An error occurred while running the unattended package migration '{plan.Plan.Name}'.");
+
+        if (failedPlans.Count == 1)
+        {
+            return ToException(failedPlans[0]);
+        }
+
+        return new AggregateException(
+            $"{failedPlans.Count} unattended package migrations failed: {string.Join(", ", failedPlans.Select(plan => plan.Plan.Name))}.",
+            failedPlans.Select(ToException));
     }
 
     private void SetRuntimeError(Exception exception)

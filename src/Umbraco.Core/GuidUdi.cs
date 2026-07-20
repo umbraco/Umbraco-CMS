@@ -25,7 +25,7 @@ public class GuidUdi : Udi
     public GuidUdi(Uri uriValue)
         : base(uriValue)
     {
-        if (Guid.TryParse(uriValue.AbsolutePath.TrimStart(Constants.CharArrays.ForwardSlash), out Guid guid) == false)
+        if (Guid.TryParse(uriValue.AbsolutePath.AsSpan().TrimStart('/'), out Guid guid) == false)
         {
             throw new FormatException("URI \"" + uriValue + "\" is not a GUID entity ID.");
         }
@@ -41,6 +41,7 @@ public class GuidUdi : Udi
     /// <inheritdoc />
     public override bool IsRoot => Guid == Guid.Empty;
 
+    /// <inheritdoc />
     public override bool Equals(object? obj)
     {
         if (obj is not GuidUdi other)
@@ -51,8 +52,14 @@ public class GuidUdi : Udi
         return EntityType == other.EntityType && Guid == other.Guid;
     }
 
+    /// <inheritdoc />
     public override int GetHashCode() => base.GetHashCode();
 
+    /// <summary>
+    ///     Ensures that this GuidUdi is not a root Udi.
+    /// </summary>
+    /// <returns>This GuidUdi.</returns>
+    /// <exception cref="Exception">When this Udi is a root Udi.</exception>
     public GuidUdi EnsureClosed()
     {
         EnsureNotRoot();

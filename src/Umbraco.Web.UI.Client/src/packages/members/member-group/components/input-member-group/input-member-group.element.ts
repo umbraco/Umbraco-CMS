@@ -48,7 +48,7 @@ export class UmbInputMemberGroupElement extends UmbFormControlMixin<string, type
 
 	/**
 	 * Min validation message.
-	 * @type {boolean}
+	 * @type {string}
 	 * @attr
 	 * @default
 	 */
@@ -71,7 +71,7 @@ export class UmbInputMemberGroupElement extends UmbFormControlMixin<string, type
 
 	/**
 	 * Max validation message.
-	 * @type {boolean}
+	 * @type {string}
 	 * @attr
 	 * @default
 	 */
@@ -85,9 +85,6 @@ export class UmbInputMemberGroupElement extends UmbFormControlMixin<string, type
 	public get selection(): Array<string> {
 		return this.#pickerContext.getSelection();
 	}
-
-	@property({ type: Array })
-	allowedContentTypeIds?: string[] | undefined;
 
 	@property({ type: String })
 	public override set value(selectionString: string | undefined) {

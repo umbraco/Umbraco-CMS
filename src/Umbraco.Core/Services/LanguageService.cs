@@ -9,6 +9,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <summary>
+///     Service for managing languages in Umbraco, including CRUD operations and validation.
+/// </summary>
 internal sealed class LanguageService : RepositoryService, ILanguageService
 {
     private readonly ILanguageRepository _languageRepository;
@@ -16,6 +19,16 @@ internal sealed class LanguageService : RepositoryService, ILanguageService
     private readonly IUserIdKeyResolver _userIdKeyResolver;
     private readonly IIsoCodeValidator _isoCodeValidator;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="LanguageService" /> class.
+    /// </summary>
+    /// <param name="provider">The core scope provider.</param>
+    /// <param name="loggerFactory">The logger factory.</param>
+    /// <param name="eventMessagesFactory">The event messages factory.</param>
+    /// <param name="languageRepository">The language repository.</param>
+    /// <param name="auditService">The audit service.</param>
+    /// <param name="userIdKeyResolver">The user ID key resolver.</param>
+    /// <param name="isoCodeValidator">The ISO code validator.</param>
     public LanguageService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -68,6 +81,7 @@ internal sealed class LanguageService : RepositoryService, ILanguageService
         }
     }
 
+    /// <inheritdoc />
     public Task<string[]> GetIsoCodesByIdsAsync(ICollection<int> ids)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete:true);
@@ -75,6 +89,7 @@ internal sealed class LanguageService : RepositoryService, ILanguageService
         return Task.FromResult(_languageRepository.GetIsoCodesByIds(ids, throwOnNotFound: true));
     }
 
+    /// <inheritdoc />
     public async Task<IEnumerable<ILanguage>> GetMultipleAsync(IEnumerable<string> isoCodes) => (await GetAllAsync()).Where(x => isoCodes.Contains(x.IsoCode));
 
     /// <inheritdoc />

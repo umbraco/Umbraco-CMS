@@ -22,11 +22,20 @@ public class DictionaryItem : EntityBase, IDictionaryItem
     private Guid? _parentId;
     private IEnumerable<IDictionaryTranslation> _translations;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="DictionaryItem" /> class with the specified key.
+    /// </summary>
+    /// <param name="itemKey">The key for the dictionary item.</param>
     public DictionaryItem(string itemKey)
         : this(null, itemKey)
     {
     }
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="DictionaryItem" /> class with a parent and key.
+    /// </summary>
+    /// <param name="parentId">The unique identifier of the parent dictionary item.</param>
+    /// <param name="itemKey">The key for the dictionary item.</param>
     public DictionaryItem(Guid? parentId, string itemKey)
     {
         _parentId = parentId;

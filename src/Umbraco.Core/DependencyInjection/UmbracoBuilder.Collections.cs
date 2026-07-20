@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.DynamicRoot.Origin;
 using Umbraco.Cms.Core.DynamicRoot.QuerySteps;
 using Umbraco.Cms.Core.Editors;
+using Umbraco.Cms.Core.Factories;
 using Umbraco.Cms.Core.HealthChecks;
 using Umbraco.Cms.Core.HealthChecks.NotificationMethods;
 using Umbraco.Cms.Core.Mapping;
@@ -67,6 +68,11 @@ public static partial class UmbracoBuilderExtensions
             .Append<NearestDescendantOrSelfDynamicRootQueryStep>()
             .Append<FurthestDescendantOrSelfDynamicRootQueryStep>();
 
+        builder.MachineIdentityProviders()
+            .Append<ConfiguredMachineIdentityProvider>()
+            .Append<AzureWebsiteInstanceIdMachineIdentityProvider>()
+            .Append<DefaultMachineIdentityProvider>();
+
         builder.Components();
         builder.PartialViewSnippets();
         builder.DataValueReferenceFactories();
@@ -124,6 +130,11 @@ public static partial class UmbracoBuilderExtensions
     public static ContentFinderCollectionBuilder ContentFinders(this IUmbracoBuilder builder)
         => builder.WithCollectionBuilder<ContentFinderCollectionBuilder>();
 
+    /// <summary>
+    ///     Gets the event source authorizers collection builder.
+    /// </summary>
+    /// <param name="builder">The builder.</param>
+    /// <returns>The <see cref="EventSourceAuthorizerCollectionBuilder" />.</returns>
     public static EventSourceAuthorizerCollectionBuilder EventSourceAuthorizers(this IUmbracoBuilder builder)
         => builder.WithCollectionBuilder<EventSourceAuthorizerCollectionBuilder>();
 
@@ -141,6 +152,11 @@ public static partial class UmbracoBuilderExtensions
     public static HealthCheckCollectionBuilder HealthChecks(this IUmbracoBuilder builder)
         => builder.WithCollectionBuilder<HealthCheckCollectionBuilder>();
 
+    /// <summary>
+    ///     Gets the health check notification methods collection builder.
+    /// </summary>
+    /// <param name="builder">The builder.</param>
+    /// <returns>The <see cref="HealthCheckNotificationMethodCollectionBuilder" />.</returns>
     public static HealthCheckNotificationMethodCollectionBuilder HealthCheckNotificationMethods(this IUmbracoBuilder builder)
         => builder.WithCollectionBuilder<HealthCheckNotificationMethodCollectionBuilder>();
 
@@ -158,9 +174,19 @@ public static partial class UmbracoBuilderExtensions
     public static MediaUrlProviderCollectionBuilder MediaUrlProviders(this IUmbracoBuilder builder)
         => builder.WithCollectionBuilder<MediaUrlProviderCollectionBuilder>();
 
+    /// <summary>
+    ///     Gets the dynamic root origin finders collection builder.
+    /// </summary>
+    /// <param name="builder">The builder.</param>
+    /// <returns>The <see cref="DynamicRootOriginFinderCollectionBuilder" />.</returns>
     public static DynamicRootOriginFinderCollectionBuilder DynamicRootOriginFinders(this IUmbracoBuilder builder)
         => builder.WithCollectionBuilder<DynamicRootOriginFinderCollectionBuilder>();
 
+    /// <summary>
+    ///     Gets the dynamic root query steps collection builder.
+    /// </summary>
+    /// <param name="builder">The builder.</param>
+    /// <returns>The <see cref="DynamicRootQueryStepCollectionBuilder" />.</returns>
     public static DynamicRootQueryStepCollectionBuilder DynamicRootSteps(this IUmbracoBuilder builder)
         => builder.WithCollectionBuilder<DynamicRootQueryStepCollectionBuilder>();
 
@@ -240,33 +266,50 @@ public static partial class UmbracoBuilderExtensions
         => builder.WithCollectionBuilder<EmbedProvidersCollectionBuilder>();
 
     /// <summary>
-    /// Gets the Delivery API selector handler collection builder
+    ///     Gets the Delivery API selector handler collection builder.
     /// </summary>
+    /// <param name="builder">The builder.</param>
+    /// <returns>The <see cref="SelectorHandlerCollectionBuilder" />.</returns>
     public static SelectorHandlerCollectionBuilder SelectorHandlers(this IUmbracoBuilder builder)
         => builder.WithCollectionBuilder<SelectorHandlerCollectionBuilder>();
 
     /// <summary>
-    /// Gets the Delivery API filter handler collection builder
+    ///     Gets the Delivery API filter handler collection builder.
     /// </summary>
+    /// <param name="builder">The builder.</param>
+    /// <returns>The <see cref="FilterHandlerCollectionBuilder" />.</returns>
     public static FilterHandlerCollectionBuilder FilterHandlers(this IUmbracoBuilder builder)
         => builder.WithCollectionBuilder<FilterHandlerCollectionBuilder>();
 
     /// <summary>
-    /// Gets the Delivery API sort handler collection builder
+    ///     Gets the Delivery API sort handler collection builder.
     /// </summary>
+    /// <param name="builder">The builder.</param>
+    /// <returns>The <see cref="SortHandlerCollectionBuilder" />.</returns>
     public static SortHandlerCollectionBuilder SortHandlers(this IUmbracoBuilder builder)
         => builder.WithCollectionBuilder<SortHandlerCollectionBuilder>();
 
     /// <summary>
-    /// Gets the Delivery API content index handler collection builder
+    ///     Gets the Delivery API content index handler collection builder.
     /// </summary>
+    /// <param name="builder">The builder.</param>
+    /// <returns>The <see cref="ContentIndexHandlerCollectionBuilder" />.</returns>
     public static ContentIndexHandlerCollectionBuilder ContentIndexHandlers(this IUmbracoBuilder builder)
         => builder.WithCollectionBuilder<ContentIndexHandlerCollectionBuilder>();
 
     /// <summary>
-    /// Gets the content type filters collection builder.
+    ///     Gets the content type filters collection builder.
     /// </summary>
     /// <param name="builder">The builder.</param>
+    /// <returns>The <see cref="ContentTypeFilterCollectionBuilder" />.</returns>
     public static ContentTypeFilterCollectionBuilder ContentTypeFilters(this IUmbracoBuilder builder)
         => builder.WithCollectionBuilder<ContentTypeFilterCollectionBuilder>();
+
+    /// <summary>
+    ///     Gets the machine identity providers collection builder.
+    /// </summary>
+    /// <param name="builder">The builder.</param>
+    /// <returns>The <see cref="MachineIdentityProviderCollectionBuilder" />.</returns>
+    public static MachineIdentityProviderCollectionBuilder MachineIdentityProviders(this IUmbracoBuilder builder)
+        => builder.WithCollectionBuilder<MachineIdentityProviderCollectionBuilder>();
 }

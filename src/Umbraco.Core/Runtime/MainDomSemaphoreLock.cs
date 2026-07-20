@@ -18,6 +18,12 @@ public class MainDomSemaphoreLock : IMainDomLock
     private readonly SystemLock _systemLock;
     private IDisposable? _lockRelease;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MainDomSemaphoreLock"/> class.
+    /// </summary>
+    /// <param name="logger">The logger instance.</param>
+    /// <param name="hostingEnvironment">The hosting environment for generating lock names.</param>
+    /// <exception cref="PlatformNotSupportedException">Thrown when not running on Windows.</exception>
     public MainDomSemaphoreLock(ILogger<MainDomSemaphoreLock> logger, IHostingEnvironment hostingEnvironment)
     {
         if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -34,9 +40,14 @@ public class MainDomSemaphoreLock : IMainDomLock
         _logger = logger;
     }
 
-    // WaitOneAsync (ext method) will wait for a signal without blocking the main thread, the waiting is done on a background thread
+    /// <inheritdoc />
+    /// <remarks>
+    /// WaitOneAsync (extension method) will wait for a signal without blocking the main thread;
+    /// the waiting is done on a background thread.
+    /// </remarks>
     public Task ListenAsync() => _signal.WaitOneAsync();
 
+    /// <inheritdoc />
     public Task<bool> AcquireLockAsync(int millisecondsTimeout)
     {
         // signal other instances that we want the lock, then wait on the lock,
@@ -75,6 +86,10 @@ public class MainDomSemaphoreLock : IMainDomLock
 
     private bool disposedValue; // To detect redundant calls
 
+    /// <summary>
+    /// Releases the unmanaged resources used by the <see cref="MainDomSemaphoreLock"/> and optionally releases the managed resources.
+    /// </summary>
+    /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
     protected virtual void Dispose(bool disposing)
     {
         if (!disposedValue)
@@ -90,9 +105,8 @@ public class MainDomSemaphoreLock : IMainDomLock
         }
     }
 
-    // This code added to correctly implement the disposable pattern.
+    /// <inheritdoc />
     public void Dispose() =>
-
         // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
         Dispose(true);
 

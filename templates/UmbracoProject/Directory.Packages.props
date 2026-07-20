@@ -1,0 +1,20 @@
+<Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <CentralPackageFloatingVersionsEnabled>true</CentralPackageFloatingVersionsEnabled>
+    <!--
+      Default must match UmbracoAppLocalIcuVersion in UmbracoProject.csproj. Defined here too because this file
+      is imported before the main project's own PropertyGroup runs, so under CPM the PackageVersion below needs
+      its own fallback to stay in sync with the RuntimeHostConfigurationOption value set from the same property.
+    -->
+    <UmbracoAppLocalIcuVersion Condition="'$(UmbracoAppLocalIcuVersion)' == ''">72.1.0.3</UmbracoAppLocalIcuVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageVersion Include="Umbraco.Cms" Version="UMBRACO_VERSION_FROM_TEMPLATE" />
+    <PackageVersion Include="Umbraco.Cms.DevelopmentMode.Backoffice" Version="UMBRACO_VERSION_FROM_TEMPLATE" />
+    <PackageVersion Include="Microsoft.ICU.ICU4C.Runtime" Version="$(UmbracoAppLocalIcuVersion)" />
+    <!--#if (StarterKit != "None") -->
+    <PackageVersion Include="STARTER_KIT_NAME" Version="STARTER_KIT_VERSION" />
+    <!--#endif -->
+  </ItemGroup>
+</Project>

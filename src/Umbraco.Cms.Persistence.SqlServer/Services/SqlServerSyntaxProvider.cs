@@ -88,10 +88,10 @@ public class SqlServerSyntaxProvider : MicrosoftSqlSyntaxProviderBase<SqlServerS
 
         if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
         {
-            _logger.LogDebug("SqlServer {SqlServerVersion}, DatabaseType is {DatabaseType} ({Source}).", versionName, DatabaseType.SqlServer2012, fromSettings ? "settings" : "detected");
+            _logger.LogDebug("SqlServer {SqlServerVersion}, DatabaseType is {DatabaseType} ({Source}).", versionName, nameof(UmbracoSqlServerDatabaseType), fromSettings ? "settings" : "detected");
         }
 
-        return DatabaseType.SqlServer2012;
+        return new UmbracoSqlServerDatabaseType();
     }
 
     private static VersionName MapProductVersion(string productVersion)
@@ -282,7 +282,7 @@ where tbl.[name]=@0 and col.[name]=@1;",
 
     public override bool DoesPrimaryKeyExist(IDatabase db, string tableName, string primaryKeyName)
     {
-        IEnumerable<SqlPrimaryKey>? keys = db.Fetch<SqlPrimaryKey>($"select * from sysobjects where xtype='pk' and  parent_obj in (select id from sysobjects where name='{tableName}')")
+        IEnumerable<SqlPrimaryKey>? keys = db.Fetch<SqlPrimaryKey>("select * from sysobjects where xtype='pk' and parent_obj in (select id from sysobjects where name=@0)", tableName)
             .Where(x => x.Name == primaryKeyName);
         return keys.FirstOrDefault() is not null;
     }
@@ -465,6 +465,17 @@ _sqlInspector ??= new SqlInspectionUtilities();
     }
 
     #endregion
+
+    /// <inheritdoc />
+    public override string CreateTempTable(string tableName, string columnDefinitionSql)
+        => $"CREATE TABLE #{tableName} ({columnDefinitionSql})";
+
+    /// <inheritdoc />
+    public override string TempTableName(string baseName) => $"#{baseName}";
+
+    /// <inheritdoc />
+    public override string DropTempTable(string tableName)
+        => $"DROP TABLE IF EXISTS #{tableName}";
 
     private sealed class SqlPrimaryKey
     {

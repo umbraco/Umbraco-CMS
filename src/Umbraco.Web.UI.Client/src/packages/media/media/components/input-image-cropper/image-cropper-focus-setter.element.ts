@@ -8,6 +8,7 @@ import {
 	css,
 	customElement,
 	classMap,
+	eventOptions,
 	ifDefined,
 	html,
 	nothing,
@@ -138,7 +139,8 @@ export class UmbImageCropperFocusSetterElement extends UmbLitElement {
 		this._coords.y = this.imageElement.clientHeight / 2;
 	}
 
-	#handleGridDrag(event: PointerEvent) {
+	@eventOptions({ passive: false })
+	private _handleGridDrag(event: PointerEvent) {
 		if (this.disabled || this.hideFocalPoint) return;
 		if (event.button !== 0) {
 			// This is not a primary mouse button click, so lets not do anything.
@@ -239,8 +241,8 @@ export class UmbImageCropperFocusSetterElement extends UmbLitElement {
 			<div
 				id="wrapper"
 				@click=${this.#changeFocalPoint}
-				@mousedown=${this.#handleGridDrag}
-				@touchstart=${this.#handleGridDrag}>
+				@mousedown=${this._handleGridDrag}
+				@touchstart=${this._handleGridDrag}>
 				<img id="image" @keydown=${() => nothing} src=${this.src} alt="" />
 				<span
 					id="focal-point"
@@ -261,8 +263,16 @@ export class UmbImageCropperFocusSetterElement extends UmbLitElement {
 			position: relative;
 			user-select: none;
 			background-color: var(--uui-color-surface);
-			outline: 1px solid var(--uui-color-border);
+			border: 1px solid var(--uui-color-border);
+			border-radius: var(--uui-border-radius);
 		}
+		:host(:not([disabled]):hover) {
+			border-color: var(--uui-color-border-standalone);
+		}
+		:host(:not([disabled]):focus-within) {
+			border-color: var(--uui-color-border-emphasis);
+		}
+
 		/* Wrapper is used to make the focal point position responsive to the image size */
 		#wrapper {
 			position: relative;
@@ -279,6 +289,8 @@ export class UmbImageCropperFocusSetterElement extends UmbLitElement {
 		#image {
 			margin: auto;
 			position: relative;
+			max-width: 100%;
+			max-height: 100%;
 		}
 		#focal-point {
 			content: '';

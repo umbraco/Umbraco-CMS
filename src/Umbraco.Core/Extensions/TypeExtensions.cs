@@ -11,8 +11,16 @@ using Umbraco.Cms.Core.Strings;
 
 namespace Umbraco.Extensions;
 
+/// <summary>
+/// Provides extension methods for <see cref="Type"/>.
+/// </summary>
 public static class TypeExtensions
 {
+    /// <summary>
+    /// Gets the default value for the specified type.
+    /// </summary>
+    /// <param name="t">The type to get the default value for.</param>
+    /// <returns>The default value for the type (null for reference types, the default instance for value types).</returns>
     public static object? GetDefaultValue(this Type t) =>
         t.IsValueType
             ? Activator.CreateInstance(t)
@@ -39,6 +47,12 @@ public static class TypeExtensions
                && (type.Attributes & TypeAttributes.NotPublic) == TypeAttributes.NotPublic;
     }
 
+    /// <summary>
+    /// Gets all base types of the specified type.
+    /// </summary>
+    /// <param name="type">The type to get base types for.</param>
+    /// <param name="andSelf">If <c>true</c>, includes the type itself in the results.</param>
+    /// <returns>An enumerable of base types.</returns>
     public static IEnumerable<Type?> GetBaseTypes(this Type? type, bool andSelf)
     {
         if (andSelf)
@@ -52,6 +66,13 @@ public static class TypeExtensions
         }
     }
 
+    /// <summary>
+    /// Gets a generic method by name and parameter types.
+    /// </summary>
+    /// <param name="type">The type to search for the method.</param>
+    /// <param name="name">The name of the method.</param>
+    /// <param name="parameterTypes">The parameter types of the method.</param>
+    /// <returns>The method info if found; otherwise, null.</returns>
     internal static MethodInfo? GetGenericMethod(this Type type, string name, params Type[] parameterTypes)
     {
         IEnumerable<MethodInfo> methods = type.GetMethods().Where(method => method.Name == name);
@@ -68,10 +89,11 @@ public static class TypeExtensions
     }
 
     /// <summary>
-    ///     Determines whether the specified type is enumerable.
+    /// Determines whether the method has the specified parameter types.
     /// </summary>
-    /// <param name="method">The type.</param>
-    /// <param name="parameterTypes"></param>
+    /// <param name="method">The method to check.</param>
+    /// <param name="parameterTypes">The expected parameter types.</param>
+    /// <returns><c>true</c> if the method has the specified parameter types; otherwise, <c>false</c>.</returns>
     internal static bool HasParameters(this MethodInfo method, params Type[] parameterTypes)
     {
         Type[] methodParameters = method.GetParameters().Select(parameter => parameter.ParameterType).ToArray();
@@ -92,6 +114,11 @@ public static class TypeExtensions
         return true;
     }
 
+    /// <summary>
+    /// Gets all methods from the type and its interfaces.
+    /// </summary>
+    /// <param name="target">The type to get methods from.</param>
+    /// <returns>An enumerable of all methods.</returns>
     public static IEnumerable<MethodInfo> AllMethods(this Type target)
     {
         // var allTypes = target.AllInterfaces().ToList();
@@ -101,6 +128,10 @@ public static class TypeExtensions
         return allTypes.SelectMany(t => t.GetMethods());
     }
 
+    /// <summary>
+    /// Determines whether the specified type implements <see cref="IEnumerable"/>.
+    /// </summary>
+    /// <param name="type">The type to check.</param>
     /// <returns>
     ///     <c>true</c> if the specified type is enumerable; otherwise, <c>false</c>.
     /// </returns>
@@ -269,32 +300,89 @@ public static class TypeExtensions
     /// </returns>
     public static bool IsType<T>(this Type actualType) => TypeHelper.IsTypeAssignableFrom<T>(actualType);
 
+    /// <summary>
+    /// Determines whether the type inherits from the specified base type.
+    /// </summary>
+    /// <typeparam name="TBase">The base type to check.</typeparam>
+    /// <param name="type">The type to check.</param>
+    /// <returns><c>true</c> if the type inherits from the base type; otherwise, <c>false</c>.</returns>
     public static bool Inherits<TBase>(this Type type) => typeof(TBase).IsAssignableFrom(type);
 
+    /// <summary>
+    /// Determines whether the type inherits from the specified base type.
+    /// </summary>
+    /// <param name="type">The type to check.</param>
+    /// <param name="tbase">The base type to check.</param>
+    /// <returns><c>true</c> if the type inherits from the base type; otherwise, <c>false</c>.</returns>
     public static bool Inherits(this Type type, Type tbase) => tbase.IsAssignableFrom(type);
 
+    /// <summary>
+    /// Determines whether the type implements the specified interface.
+    /// </summary>
+    /// <typeparam name="TInterface">The interface type to check.</typeparam>
+    /// <param name="type">The type to check.</param>
+    /// <returns><c>true</c> if the type implements the interface; otherwise, <c>false</c>.</returns>
     public static bool Implements<TInterface>(this Type type) => typeof(TInterface).IsAssignableFrom(type);
 
+    /// <summary>
+    /// Gets the first attribute of the specified type from the type.
+    /// </summary>
+    /// <typeparam name="TAttribute">The type of attribute to get.</typeparam>
+    /// <param name="type">The type to get the attribute from.</param>
+    /// <returns>The first attribute of the specified type, or null if not found.</returns>
     public static TAttribute? FirstAttribute<TAttribute>(this Type type) => type.FirstAttribute<TAttribute>(true);
 
+    /// <summary>
+    /// Gets the first attribute of the specified type from the type.
+    /// </summary>
+    /// <typeparam name="TAttribute">The type of attribute to get.</typeparam>
+    /// <param name="type">The type to get the attribute from.</param>
+    /// <param name="inherit">Whether to search the inheritance chain.</param>
+    /// <returns>The first attribute of the specified type, or null if not found.</returns>
     public static TAttribute? FirstAttribute<TAttribute>(this Type type, bool inherit)
     {
         var attrs = type.GetCustomAttributes(typeof(TAttribute), inherit);
         return (TAttribute?)(attrs.Length > 0 ? attrs[0] : null);
     }
 
+    /// <summary>
+    /// Gets the first attribute of the specified type from the property.
+    /// </summary>
+    /// <typeparam name="TAttribute">The type of attribute to get.</typeparam>
+    /// <param name="propertyInfo">The property to get the attribute from.</param>
+    /// <returns>The first attribute of the specified type, or null if not found.</returns>
     public static TAttribute? FirstAttribute<TAttribute>(this PropertyInfo propertyInfo) =>
         propertyInfo.FirstAttribute<TAttribute>(true);
 
+    /// <summary>
+    /// Gets the first attribute of the specified type from the property.
+    /// </summary>
+    /// <typeparam name="TAttribute">The type of attribute to get.</typeparam>
+    /// <param name="propertyInfo">The property to get the attribute from.</param>
+    /// <param name="inherit">Whether to search the inheritance chain.</param>
+    /// <returns>The first attribute of the specified type, or null if not found.</returns>
     public static TAttribute? FirstAttribute<TAttribute>(this PropertyInfo propertyInfo, bool inherit)
     {
         var attrs = propertyInfo.GetCustomAttributes(typeof(TAttribute), inherit);
         return (TAttribute?)(attrs.Length > 0 ? attrs[0] : null);
     }
 
+    /// <summary>
+    /// Gets all attributes of the specified type from the property.
+    /// </summary>
+    /// <typeparam name="TAttribute">The type of attribute to get.</typeparam>
+    /// <param name="propertyInfo">The property to get the attributes from.</param>
+    /// <returns>An enumerable of attributes, or null if none found.</returns>
     public static IEnumerable<TAttribute>? MultipleAttribute<TAttribute>(this PropertyInfo propertyInfo) =>
         propertyInfo.MultipleAttribute<TAttribute>(true);
 
+    /// <summary>
+    /// Gets all attributes of the specified type from the property.
+    /// </summary>
+    /// <typeparam name="TAttribute">The type of attribute to get.</typeparam>
+    /// <param name="propertyInfo">The property to get the attributes from.</param>
+    /// <param name="inherit">Whether to search the inheritance chain.</param>
+    /// <returns>An enumerable of attributes, or null if none found.</returns>
     public static IEnumerable<TAttribute>? MultipleAttribute<TAttribute>(this PropertyInfo propertyInfo, bool inherit)
     {
         var attrs = propertyInfo.GetCustomAttributes(typeof(TAttribute), inherit);
@@ -321,6 +409,46 @@ public static class TypeExtensions
 
         return string.Concat(type.FullName, ", ", assemblyName.FullName.StartsWith("App_Code.") ? "App_Code" : assemblyName.Name);
     }
+
+    /// <summary>
+    /// Gets a custom attribute of the specified type from the type.
+    /// </summary>
+    /// <typeparam name="T">The type of attribute to get.</typeparam>
+    /// <param name="type">The type to get the attribute from.</param>
+    /// <param name="inherit">Whether to search the inheritance chain.</param>
+    /// <returns>The custom attribute, or null if not found.</returns>
+    public static T? GetCustomAttribute<T>(this Type type, bool inherit)
+        where T : Attribute =>
+        type.GetCustomAttributes<T>(inherit).SingleOrDefault();
+
+    /// <summary>
+    /// Gets all custom attributes of the specified type from the type.
+    /// </summary>
+    /// <typeparam name="T">The type of attributes to get.</typeparam>
+    /// <param name="type">The type to get the attributes from.</param>
+    /// <param name="inherited">Whether to search the inheritance chain.</param>
+    /// <returns>An enumerable of custom attributes.</returns>
+    public static IEnumerable<T> GetCustomAttributes<T>(this Type? type, bool inherited)
+        where T : Attribute
+    {
+        if (type == null)
+        {
+            return Enumerable.Empty<T>();
+        }
+
+        return type.GetCustomAttributes(typeof(T), inherited).OfType<T>();
+    }
+
+    /// <summary>
+    /// Determines whether the type has a custom attribute of the specified type.
+    /// </summary>
+    /// <typeparam name="T">The type of attribute to check for.</typeparam>
+    /// <param name="type">The type to check.</param>
+    /// <param name="inherit">Whether to search the inheritance chain.</param>
+    /// <returns><c>true</c> if the type has the attribute; otherwise, <c>false</c>.</returns>
+    public static bool HasCustomAttribute<T>(this Type type, bool inherit)
+        where T : Attribute =>
+        type.GetCustomAttribute<T>(inherit) != null;
 
     /// <summary>
     ///     Determines whether an instance of a specified type can be assigned to the current type instance.
@@ -388,25 +516,6 @@ public static class TypeExtensions
         // otherwise is not an 'enumerated' type
         return null;
     }
-
-    public static T? GetCustomAttribute<T>(this Type type, bool inherit)
-        where T : Attribute =>
-        type.GetCustomAttributes<T>(inherit).SingleOrDefault();
-
-    public static IEnumerable<T> GetCustomAttributes<T>(this Type? type, bool inherited)
-        where T : Attribute
-    {
-        if (type == null)
-        {
-            return Enumerable.Empty<T>();
-        }
-
-        return type.GetCustomAttributes(typeof(T), inherited).OfType<T>();
-    }
-
-    public static bool HasCustomAttribute<T>(this Type type, bool inherit)
-        where T : Attribute =>
-        type.GetCustomAttribute<T>(inherit) != null;
 
     /// <summary>
     ///     Tries to return a value based on a property name for an object but ignores case sensitivity

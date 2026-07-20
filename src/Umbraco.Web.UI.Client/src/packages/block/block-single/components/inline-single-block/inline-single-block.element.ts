@@ -7,7 +7,12 @@ import { UmbLanguageItemRepository } from '@umbraco-cms/backoffice/language';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbApiConstructorArgumentsMethodType } from '@umbraco-cms/backoffice/extension-api';
-import type { UmbBlockDataType, UMB_BLOCK_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/block';
+import type {
+	UmbBlockDataType,
+	UmbBlockLabelUfmValueType,
+	UMB_BLOCK_WORKSPACE_CONTEXT,
+} from '@umbraco-cms/backoffice/block';
+import type { UmbUfmResolvedEvent } from '@umbraco-cms/backoffice/ufm';
 
 import '../../../block/workspace/views/edit/block-workspace-view-edit-content-no-router.element.js';
 
@@ -76,6 +81,7 @@ export class UmbInlineSingleBlockElement extends UmbLitElement {
 				if (permitted && context) {
 					this.#workspaceContext = context;
 					this.#workspaceContext.establishLiveSync();
+					this.#workspaceContext.autoReportValidation();
 					this.#load();
 
 					this.observe(
@@ -127,6 +133,10 @@ export class UmbInlineSingleBlockElement extends UmbLitElement {
 		this.#workspaceContext?.expose();
 	};
 
+	#onUfmResolved = (event: UmbUfmResolvedEvent) => {
+		this.#blockContext?.setName(event.detail.text);
+	};
+
 	override render() {
 		return html`
 			<div id="host">
@@ -153,14 +163,20 @@ export class UmbInlineSingleBlockElement extends UmbLitElement {
 	}
 
 	#renderBlockInfo() {
-		const blockValue = { ...this.content, $settings: this.settings };
+		const blockValue: UmbBlockLabelUfmValueType = { ...this.content, $settings: this.settings };
 		return html`
 			<span id="content">
 				<span id="icon">
 					<umb-icon .name=${this.icon}></umb-icon>
 				</span>
 				<div id="info">
-					<umb-ufm-render id="name" inline .markdown=${this.label} .value=${blockValue}></umb-ufm-render>
+					<umb-ufm-render
+						id="name"
+						inline
+						.markdown=${this.label}
+						.value=${blockValue}
+						@umb-ufm-resolved=${this.#onUfmResolved}>
+					</umb-ufm-render>
 				</div>
 			</span>
 			${when(

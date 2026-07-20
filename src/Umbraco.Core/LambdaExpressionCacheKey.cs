@@ -13,6 +13,12 @@ public struct LambdaExpressionCacheKey
     /// </summary>
     public readonly HashSet<string?> ArgTypes;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="LambdaExpressionCacheKey" /> struct.
+    /// </summary>
+    /// <param name="returnType">The return type of the lambda expression.</param>
+    /// <param name="expression">The string representation of the lambda expression.</param>
+    /// <param name="argTypes">The argument type names of the lambda expression.</param>
     public LambdaExpressionCacheKey(string returnType, string expression, params string[] argTypes)
     {
         ReturnType = returnType;
@@ -21,6 +27,10 @@ public struct LambdaExpressionCacheKey
         _toString = null;
     }
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="LambdaExpressionCacheKey" /> struct from a <see cref="LambdaExpression" />.
+    /// </summary>
+    /// <param name="obj">The lambda expression to create a cache key from.</param>
     public LambdaExpressionCacheKey(LambdaExpression obj)
     {
         ReturnType = obj.ReturnType.FullName;

@@ -47,7 +47,7 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
 
         protected LinkGenerator LinkGenerator => Factory.Services.GetRequiredService<LinkGenerator>();
 
-        protected void CustomMvcSetup(IMvcBuilder mvcBuilder)
+        protected virtual void CustomMvcSetup(IMvcBuilder mvcBuilder)
         {
         }
 
@@ -287,7 +287,8 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
                 .AddWebComponents()
                 .AddUmbracoHybridCache()
                 .AddBackOfficeCore()
-                .AddBackOfficeAuthentication()
+                .AddBackOfficeCookieAuthentication()
+                .AddBackOfficeOpenIddictServices()
                 .AddBackOfficeIdentity()
                 .AddMembersIdentity()
                 // .AddBackOfficeAuthorizationPolicies(TestAuthHandler.TestAuthenticationScheme)

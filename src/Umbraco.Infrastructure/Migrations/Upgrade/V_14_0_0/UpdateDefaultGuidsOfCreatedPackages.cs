@@ -4,10 +4,17 @@ using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_14_0_0;
 
+/// <summary>
+/// Migration that updates the default GUID values assigned to newly created packages in version 14.0.0.
+/// </summary>
 public class UpdateDefaultGuidsOfCreatedPackages : MigrationBase
 {
     private readonly PackageDefinitionXmlParser _xmlParser;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UpdateDefaultGuidsOfCreatedPackages"/> class with the specified migration context.
+    /// </summary>
+    /// <param name="context">The <see cref="IMigrationContext"/> to be used for the migration.</param>
     public UpdateDefaultGuidsOfCreatedPackages(IMigrationContext context)
         : base(context)
     {

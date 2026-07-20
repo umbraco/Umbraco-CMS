@@ -3,19 +3,32 @@ using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Exceptions;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Navigation;
-using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Extensions;
-using Umbraco.Cms.Core.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache;
 
 internal class PublishedContent : PublishedContentBase
 {
-    private IPublishedProperty[] _properties;
+    /// <summary>
+    /// Backing array of materialized properties for this content item. Built lazily on first
+    /// access via <see cref="EnsureProperties"/>; <c>null</c> until then.
+    /// </summary>
+    /// <remarks>
+    /// Lazy construction avoids allocating a <see cref="PublishedProperty"/> wrapper per
+    /// property type for traversal-only operations (e.g. <c>Children().Count()</c>,
+    /// <c>Descendants()</c> without property reads), which is a significant slice of
+    /// allocation for tree traversals.
+    /// </remarks>
+    private IPublishedProperty[]? _properties;
+
+    private readonly Dictionary<string, PropertyData[]> _propertyData;
+    private readonly IElementsCache _elementsCache;
+
     private readonly ContentNode _contentNode;
     private IReadOnlyDictionary<string, PublishedCultureInfo>? _cultures;
     private readonly string? _urlSegment;
@@ -27,10 +40,12 @@ internal class PublishedContent : PublishedContentBase
         ContentNode contentNode,
         bool preview,
         IElementsCache elementsCache,
-        IVariationContextAccessor variationContextAccessor)
+        IVariationContextAccessor variationContextAccessor,
+        IPropertyRenderingContextAccessor propertyRenderingContextAccessor)
         : base(variationContextAccessor)
     {
         VariationContextAccessor = variationContextAccessor;
+        PropertyRenderingContextAccessor = propertyRenderingContextAccessor;
         _contentNode = contentNode;
         ContentData? contentData = preview ? _contentNode.DraftModel : _contentNode.PublishedModel;
         if (contentData is null)
@@ -42,20 +57,10 @@ internal class PublishedContent : PublishedContentBase
         _contentName = contentData.Name;
         _urlSegment = contentData.UrlSegment;
         _published = contentData.Published;
+        _propertyData = contentData.Properties;
+        _elementsCache = elementsCache;
 
         IsPreviewing = preview;
-
-        var properties = new IPublishedProperty[_contentNode.ContentType.PropertyTypes.Count()];
-        var i = 0;
-        foreach (IPublishedPropertyType propertyType in _contentNode.ContentType.PropertyTypes)
-        {
-            // add one property per property type - this is required, for the indexing to work
-            // if contentData supplies pdatas, use them, else use null
-            contentData.Properties.TryGetValue(propertyType.Alias, out PropertyData[]? propertyDatas); // else will be null
-            properties[i++] = new PublishedProperty(propertyType, this, propertyDatas, elementsCache, propertyType.CacheLevel);
-        }
-
-        _properties = properties;
 
         Id = contentNode.Id;
         Key = contentNode.Key;
@@ -71,7 +76,7 @@ internal class PublishedContent : PublishedContentBase
 
     public override Guid Key { get; }
 
-    public override IEnumerable<IPublishedProperty> Properties => _properties;
+    public override IEnumerable<IPublishedProperty> Properties => EnsureProperties();
 
     public override int Id { get; }
 
@@ -135,7 +140,9 @@ internal class PublishedContent : PublishedContentBase
     // Needed for publishedProperty
     internal IVariationContextAccessor VariationContextAccessor { get; }
 
-    [Obsolete("Use the INavigationQueryService instead, scheduled for removal in v17")]
+    internal IPropertyRenderingContextAccessor PropertyRenderingContextAccessor { get; }
+
+    [Obsolete("Use the INavigationQueryService instead. Scheduled for removal in Umbraco 18.")]
     public override int Level
     {
         get
@@ -163,7 +170,7 @@ internal class PublishedContent : PublishedContentBase
         }
     }
 
-    [Obsolete("Please use TryGetParentKey() on IDocumentNavigationQueryService or IMediaNavigationQueryService instead. Scheduled for removal in V16.")]
+    [Obsolete("Please use TryGetParentKey() on IDocumentNavigationQueryService or IMediaNavigationQueryService instead. Scheduled for removal in Umbraco 18.")]
     public override IPublishedContent? Parent => GetParent();
 
     /// <inheritdoc />
@@ -209,15 +216,45 @@ internal class PublishedContent : PublishedContentBase
             return null; // happens when 'alias' does not match a content type property alias
         }
 
+        IPublishedProperty[] properties = EnsureProperties();
+
         // should never happen - properties array must be in sync with property type
-        if (index >= _properties.Length)
+        if (index >= properties.Length)
         {
             throw new IndexOutOfRangeException(
                 "Index points outside the properties array, which means the properties array is corrupt.");
         }
 
-        IPublishedProperty property = _properties[index];
-        return property;
+        return properties[index];
+    }
+
+    private IPublishedProperty[] EnsureProperties()
+    {
+        IPublishedProperty[]? properties = _properties;
+        if (properties is not null)
+        {
+            return properties;
+        }
+
+        return BuildProperties();
+    }
+
+    private IPublishedProperty[] BuildProperties()
+    {
+        IEnumerable<IPublishedPropertyType> propertyTypes = _contentNode.ContentType.PropertyTypes;
+        var newProperties = new IPublishedProperty[propertyTypes.Count()];
+        var i = 0;
+        foreach (IPublishedPropertyType propertyType in propertyTypes)
+        {
+            // add one property per property type - this is required for the indexing to work
+            // if propertyData supplies pdatas, use them, else use null
+            _propertyData.TryGetValue(propertyType.Alias, out PropertyData[]? propertyDatas);
+            newProperties[i++] = new PublishedProperty(propertyType, this, propertyDatas, _elementsCache, propertyType.CacheLevel);
+        }
+
+        // Use CompareExchange so concurrent first-access threads agree on a single canonical
+        // array — losers discard their newly built array and use the winner's.
+        return Interlocked.CompareExchange(ref _properties, newProperties, null) ?? newProperties;
     }
 
     public override bool IsDraft(string? culture = null)
@@ -251,6 +288,17 @@ internal class PublishedContent : PublishedContentBase
         // if there is no 'published' published content, no culture can be published
         if (!_contentNode.HasPublished)
         {
+            // In preview mode, the ContentNode only has draft data loaded (published data
+            // is stored in a separate cache entry). Fall back to IPublishStatusQueryService
+            // which is an in-memory service that tracks actual document publish status.
+            if (IsPreviewing && ItemType == PublishedItemType.Content)
+            {
+                culture ??= VariationContextAccessor.VariationContext?.Culture ?? string.Empty;
+                IPublishStatusQueryService publishStatusQueryService =
+                    StaticServiceProvider.Instance.GetRequiredService<IPublishStatusQueryService>();
+                return publishStatusQueryService.IsDocumentPublished(Key, culture);
+            }
+
             return false;
         }
 

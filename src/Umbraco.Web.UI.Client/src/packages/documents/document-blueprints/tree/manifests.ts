@@ -7,10 +7,13 @@ import {
 	UMB_DOCUMENT_BLUEPRINT_TREE_ALIAS,
 	UMB_DOCUMENT_BLUEPRINT_TREE_REPOSITORY_ALIAS,
 	UMB_DOCUMENT_BLUEPRINT_TREE_STORE_ALIAS,
+	UMB_DOCUMENT_BLUEPRINT_TREE_ITEM_CHILDREN_COLLECTION_ALIAS,
 } from './constants.js';
 import { UmbDocumentBlueprintTreeStore } from './document-blueprint-tree.store.js';
 import { manifests as folderManifests } from './folder/manifests.js';
 import { manifests as reloadManifests } from './reload-tree-item-children/manifests.js';
+import { manifests as treeItemChildrenManifests } from './tree-item-children/manifests.js';
+import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -55,6 +58,25 @@ export const manifests: Array<UmbExtensionManifest> = [
 			headline: '#treeHeaders_contentBlueprints',
 		},
 	},
+	{
+		type: 'workspaceView',
+		kind: 'collection',
+		alias: 'Umb.WorkspaceView.DocumentBlueprint.TreeItemChildrenCollection',
+		name: 'Document Blueprint Tree Item Children Collection Workspace View',
+		meta: {
+			label: '#general_items',
+			pathname: 'items',
+			icon: 'icon-grid',
+			collectionAlias: UMB_DOCUMENT_BLUEPRINT_TREE_ITEM_CHILDREN_COLLECTION_ALIAS,
+		},
+		conditions: [
+			{
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
+				oneOf: ['Umb.Workspace.DocumentBlueprint.Root', 'Umb.Workspace.DocumentBlueprint.Folder'],
+			},
+		],
+	},
 	...reloadManifests,
 	...folderManifests,
+	...treeItemChildrenManifests,
 ];

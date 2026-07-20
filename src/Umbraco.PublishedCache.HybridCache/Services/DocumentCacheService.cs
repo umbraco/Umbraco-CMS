@@ -1,11 +1,11 @@
 #if DEBUG
     using System.Diagnostics;
 #endif
-using System.Collections.Concurrent;
 using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
@@ -20,7 +20,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache.Services;
 
-internal sealed class DocumentCacheService : IDocumentCacheService
+internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCacheSizeReporter
 {
     private readonly IDatabaseCacheRepository _databaseCacheRepository;
     private readonly IIdKeyMap _idKeyMap;
@@ -36,7 +36,21 @@ internal sealed class DocumentCacheService : IDocumentCacheService
     private readonly ILogger<DocumentCacheService> _logger;
     private HashSet<Guid>? _seedKeys;
 
-    private readonly ConcurrentDictionary<string, IPublishedContent> _publishedContentCache = [];
+    private readonly IConvertedPublishedContentCache<string> _publishedContentCache;
+
+    // Monotonic counter bumped whenever the in-memory cache (L0/L1) is invalidated or refreshed.
+    // GetNodeAsync captures it before reading the backing store and re-checks it before writing
+    // back, so a snapshot read before a concurrent publish/refresh is never written over the
+    // refreshed entry — preventing the stale-set clobber that otherwise persists until a full clear.
+    //
+    // Deliberately a single global counter, not per-key: any invalidation invalidates every in-flight
+    // read-through. The only cost is an occasional skipped cache population when a read-through for one
+    // key overlaps an unrelated publish — a re-miss on the next request, never stale data. A per-key
+    // scheme would avoid that but needs a global epoch for bulk clears plus an exact per-key bump on
+    // every mutated cache key, which is easy to get wrong and would silently reintroduce the clobber.
+    // Global is correctness-robust; only revisit if read-through churn under heavy concurrent
+    // publishing ever shows up in profiling.
+    private long _cacheGeneration;
 
     private HashSet<Guid> SeedKeys
     {
@@ -70,7 +84,8 @@ internal sealed class DocumentCacheService : IDocumentCacheService
         IPublishedModelFactory publishedModelFactory,
         IPreviewService previewService,
         IPublishStatusQueryService publishStatusQueryService,
-        ILogger<DocumentCacheService> logger)
+        ILogger<DocumentCacheService> logger,
+        IConvertedPublishedContentCacheFactory cacheFactory)
     {
         _databaseCacheRepository = databaseCacheRepository;
         _idKeyMap = idKeyMap;
@@ -84,7 +99,17 @@ internal sealed class DocumentCacheService : IDocumentCacheService
         _publishStatusQueryService = publishStatusQueryService;
         _cacheSettings = cacheSettings.Value;
         _logger = logger;
+        _publishedContentCache = cacheFactory.Create<string>(_cacheSettings.Entry.Document.MaximumLocalCacheItems, CacheName);
     }
+
+    /// <inheritdoc />
+    public string CacheName => "Published content (converted, L0)";
+
+    /// <inheritdoc />
+    public long GetApproximateCount() => _publishedContentCache.Count;
+
+    /// <inheritdoc />
+    public long? GetApproximateBytes() => _publishedContentCache.ApproximateSizeInBytes;
 
     public async Task<IPublishedContent?> GetByKeyAsync(Guid key, bool? preview = null)
     {
@@ -107,38 +132,58 @@ internal sealed class DocumentCacheService : IDocumentCacheService
         return await GetNodeAsync(key, calculatedPreview);
     }
 
+    public bool TryGetCached(Guid key, bool preview, out IPublishedContent? content)
+    {
+        // Mirror the L0 (published content cache) fast path in GetNodeAsync.
+        if (preview is false && _publishedContentCache.TryGet(GetCacheKey(key, preview), out content))
+        {
+            return true;
+        }
+
+        content = null;
+        return false;
+    }
+
     private async Task<IPublishedContent?> GetNodeAsync(Guid key, bool preview)
     {
         var cacheKey = GetCacheKey(key, preview);
 
-        if (preview is false && _publishedContentCache.TryGetValue(cacheKey, out IPublishedContent? cached))
+        if (preview is false && _publishedContentCache.TryGet(cacheKey, out IPublishedContent? cached))
         {
             return cached;
         }
 
-        ContentCacheNode? contentCacheNode = await _hybridCache.GetOrCreateAsync(
-            cacheKey,
-            async cancel =>
+        (bool exists, ContentCacheNode? contentCacheNode) = await _hybridCache.TryGetValueAsync<ContentCacheNode?>(cacheKey, CancellationToken.None);
+
+        // A value found in the backing store is already current, so it can always populate the caches
+        // below; only a value built from the read-through DB fetch needs the generation guard.
+        bool snapshotIsCurrent = true;
+        if (exists is false)
+        {
+            // Capture the cache generation before reading the backing store. If a concurrent publish or
+            // invalidation bumps the generation while we read and build below, the snapshot we hold is
+            // stale and must not be written back over the refreshed entries (the clobber that leaves
+            // memory permanently stale until a full clear).
+            long generation = Interlocked.Read(ref _cacheGeneration);
+
+            bool ancestorCheckFailed;
+            (contentCacheNode, ancestorCheckFailed) = await GetContentCacheNodeFromRepo();
+
+            snapshotIsCurrent = IsCacheGenerationCurrent(generation);
+
+            // Only cache the result if the ancestor check didn't fail.
+            // When content exists in DB but the ancestor check fails, this could be a transient
+            // race condition during cache rebuild. Caching null would poison the distributed cache.
+            // Skip the write when the generation moved — a refresh has superseded this snapshot.
+            if (ancestorCheckFailed is false && snapshotIsCurrent)
             {
-                using ICoreScope scope = _scopeProvider.CreateCoreScope();
-                ContentCacheNode? contentCacheNode = await _databaseCacheRepository.GetContentSourceAsync(key, preview);
-
-                // If we can resolve the content cache node, we still need to check if the ancestor path is published.
-                // This does cost some performance, but it's necessary to ensure that the content is actually published.
-                // When unpublishing a node, a payload with RefreshBranch is published, so we don't have to worry about this.
-                // Similarly, when a branch is published, next time the content is requested, the parent will be published,
-                // this works because we don't cache null values.
-                if (preview is false && contentCacheNode is not null && _publishStatusQueryService.HasPublishedAncestorPath(contentCacheNode.Key) is false)
-                {
-                    // Careful not to early return here. We need to complete the scope even if returning null.
-                    contentCacheNode = null;
-                }
-
-                scope.Complete();
-                return contentCacheNode;
-            },
-            GetEntryOptions(key, preview),
-            GenerateTags(key));
+                await _hybridCache.SetAsync(
+                    cacheKey,
+                    contentCacheNode,
+                    GetEntryOptions(key, preview),
+                    GenerateTags(contentCacheNode));
+            }
+        }
 
         if (contentCacheNode is null)
         {
@@ -146,15 +191,56 @@ internal sealed class DocumentCacheService : IDocumentCacheService
         }
 
         IPublishedContent? result = _publishedContentFactory.ToIPublishedContent(contentCacheNode, preview).CreateModel(_publishedModelFactory);
-        if (result is not null)
+
+        // Only published content is stored in L0: the read fast path above is guarded by preview is false, so a
+        // draft entry would never be served back, and draft keys have no per-key invalidation (RemoveFromMemoryCacheAsync
+        // only removes the published key) so they would linger until a full clear. In bounded mode they would also
+        // waste eviction slots and dilute the W-TinyLFU frequency signal.
+        //
+        // Only populate when our snapshot is still current; otherwise a concurrent refresh has already written
+        // fresher content and we must not overwrite it with this stale one (the clobber that leaves L0 stale
+        // until a full clear).
+        if (result is not null && preview is false && snapshotIsCurrent)
         {
-            _publishedContentCache[cacheKey] = result;
+            // The size estimate runs unconditionally (not only when reporting is enabled): it is cheap
+            // (O(properties), no IO/decompression) and only on the cache-miss path, and keeping the running
+            // total always-current means it is accurate the moment debug reporting is switched on.
+            _publishedContentCache.Set(cacheKey, result, ContentCacheNodeSizeEstimator.EstimateBytes(contentCacheNode));
         }
 
         return result;
+
+        async Task<(ContentCacheNode? Node, bool AncestorCheckFailed)> GetContentCacheNodeFromRepo()
+        {
+            using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
+            ContentCacheNode? contentCacheNode = await _databaseCacheRepository.GetContentSourceAsync(key, preview);
+
+            // If we can resolve the content cache node, we still need to check if the ancestor path is published.
+            // This does cost some performance, but it's necessary to ensure that the content is actually published.
+            // When unpublishing a node, a payload with RefreshBranch is published, so we don't have to worry about this.
+            // Similarly, when a branch is published, next time the content is requested, the parent will be published.
+            // Null values are cached here are tagged and cleared by ClearMemoryCacheAsync, so the next request after a
+            // cache clear will re-query the database.
+            if (preview is false && contentCacheNode is not null && _publishStatusQueryService.HasPublishedAncestorPath(contentCacheNode.Key) is false)
+            {
+                // Content exists in the DB but the ancestor path is not published. Return null but
+                // signal to the caller that this should NOT be cached — the ancestor check may be
+                // transiently wrong during a cache rebuild.
+                return (null, true);
+            }
+
+            return (contentCacheNode, false);
+        }
     }
 
     private bool GetPreview() => _previewService.IsInPreview();
+
+    // Bumped after every in-memory cache invalidation/refresh so in-flight read-through snapshots
+    // (see GetNodeAsync) can detect they have been superseded and skip writing back stale content.
+    private void InvalidateMemoryCacheGeneration() => Interlocked.Increment(ref _cacheGeneration);
+
+    private bool IsCacheGenerationCurrent(long capturedGeneration)
+        => Interlocked.Read(ref _cacheGeneration) == capturedGeneration;
 
     public IEnumerable<IPublishedContent> GetByContentType(IPublishedContentType contentType)
     {
@@ -169,6 +255,11 @@ internal sealed class DocumentCacheService : IDocumentCacheService
 
     public async Task ClearMemoryCacheAsync(CancellationToken cancellationToken)
     {
+        // Bump first so any read-through that read the backing store before this clear is rejected
+        // when it tries to write back, even while the reseed below is still running.
+        InvalidateMemoryCacheGeneration();
+
+        _publishedContentCache.Clear();
         await _hybridCache.RemoveByTagAsync(Constants.Cache.Tags.Content, cancellationToken);
 
         // We have to run seeding again after the cache is cleared
@@ -184,14 +275,27 @@ internal sealed class DocumentCacheService : IDocumentCacheService
 
         if (draftNode is not null)
         {
-            await _hybridCache.SetAsync(GetCacheKey(draftNode.Key, true), draftNode, GetEntryOptions(draftNode.Key, true), GenerateTags(key));
+            await _hybridCache.SetAsync(GetCacheKey(draftNode.Key, true), draftNode, GetEntryOptions(draftNode.Key, true), GenerateTags(draftNode));
+        }
+        else
+        {
+            // No draft in the database cache — remove any stale draft entry from the local memory cache.
+            await _hybridCache.RemoveAsync(GetCacheKey(key, true));
         }
 
         if (publishedNode is not null && _publishStatusQueryService.HasPublishedAncestorPath(publishedNode.Key))
         {
             var cacheKey = GetCacheKey(publishedNode.Key, false);
-            await _hybridCache.SetAsync(cacheKey, publishedNode, GetEntryOptions(publishedNode.Key, false), GenerateTags(key));
-            _publishedContentCache.Remove(cacheKey, out _);
+            await _hybridCache.SetAsync(cacheKey, publishedNode, GetEntryOptions(publishedNode.Key, false), GenerateTags(publishedNode));
+            _publishedContentCache.Remove(cacheKey);
+            InvalidateMemoryCacheGeneration();
+        }
+        else
+        {
+            // Either no published node in the database cache, or the ancestor path is no longer published —
+            // remove any stale published entry from the local memory cache. ClearPublishedCacheAsync
+            // bumps the generation itself, so this path is already covered.
+            await ClearPublishedCacheAsync(key);
         }
 
         scope.Complete();
@@ -251,7 +355,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService
                     cacheKey,
                     cacheNode,
                     GetSeedEntryOptions(),
-                    GenerateTags(cacheNode.Key),
+                    GenerateTags(cacheNode),
                     cancellationToken: cancellationToken);
             }
         }
@@ -302,23 +406,29 @@ internal sealed class DocumentCacheService : IDocumentCacheService
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
 
+        if (content.Trashed)
+        {
+            await _databaseCacheRepository.DeleteContentItemAsync(content.Id);
+            await RemoveFromMemoryCacheAsync(content.Key);
+            scope.Complete();
+            return;
+        }
+
         // Always set draft node
         // We have nodes seperate in the cache, cause 99% of the time, you are only using one
         // and thus we won't get too much data when retrieving from the cache.
         var draftCacheNode = _cacheNodeFactory.ToContentCacheNode(content, true);
+        await _databaseCacheRepository.RefreshContentAsync(draftCacheNode);
 
-        await _databaseCacheRepository.RefreshContentAsync(draftCacheNode, content.PublishedState);
-
-        if (content.PublishedState == PublishedState.Publishing || content.PublishedState == PublishedState.Unpublishing)
+        if (content.PublishedState is PublishedState.Publishing)
         {
             var publishedCacheNode = _cacheNodeFactory.ToContentCacheNode(content, false);
-
-            await _databaseCacheRepository.RefreshContentAsync(publishedCacheNode, content.PublishedState);
-
-            if (content.PublishedState == PublishedState.Unpublishing)
-            {
-                await ClearPublishedCacheAsync(publishedCacheNode.Key);
-            }
+            await _databaseCacheRepository.RefreshContentAsync(publishedCacheNode);
+        }
+        else if (content.PublishedState is PublishedState.Unpublishing)
+        {
+            await _databaseCacheRepository.RemovePublishedContentAsync(content.Id);
+            await ClearPublishedCacheAsync(content.Key);
         }
 
         scope.Complete();
@@ -326,10 +436,25 @@ internal sealed class DocumentCacheService : IDocumentCacheService
 
     private static string GetCacheKey(Guid key, bool preview) => preview ? $"{key}+draft" : $"{key}";
 
-    // Generates the cache tags for a given CacheNode
-    // We use the tags to be able to clear all cache entries that are related to a given content item.
-    // Tags for now are only content/media, but can be expanded with draft/published later.
-    private static HashSet<string> GenerateTags(Guid? key) => key is null ? [] : [Constants.Cache.Tags.Content];
+    /// <summary>
+    /// Generates the cache tags for a given <see cref="ContentCacheNode"/>.
+    /// </summary>
+    /// <param name="cacheNode">The cache node to generate tags for, or <c>null</c> for a negative-cache entry.</param>
+    /// <returns>
+    /// A set of tags that always includes <see cref="Constants.Cache.Tags.Content"/>.
+    /// When <paramref name="cacheNode"/> is non-null, the content type ID tag is also included.
+    /// </returns>
+    /// <remarks>
+    /// Tags are used to clear all cache entries related to a given content item or type.
+    /// The <see cref="Constants.Cache.Tags.Content"/> tag is always included — even for null entries — so
+    /// that <see cref="ClearMemoryCacheAsync"/> (which clears by this tag) can evict negative-cache entries.
+    /// Without this, null entries survive tag-based cache clears and become permanently stale.
+    /// Tags currently cover content/media distinctions but can be expanded with draft/published later.
+    /// </remarks>
+    private static HashSet<string> GenerateTags(ContentCacheNode? cacheNode) =>
+        cacheNode is null
+            ? [Constants.Cache.Tags.Content]
+            : [Constants.Cache.Tags.Content, ContentTypeIdTag(cacheNode.ContentTypeId)];
 
     public async Task DeleteItemAsync(IContentBase content)
     {
@@ -339,45 +464,49 @@ internal sealed class DocumentCacheService : IDocumentCacheService
     }
 
     public void Rebuild(IReadOnlyCollection<int> contentTypeIds)
-    {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope();
-        _databaseCacheRepository.Rebuild(contentTypeIds.ToList());
-        scope.Complete();
-
-        RebuildMemoryCacheByContentTypeAsync(contentTypeIds).GetAwaiter().GetResult();
-
-        // Clear the entire published content cache.
-        // It doesn't seem feasible to be smarter about this, as a changed content type could be used for a document,
-        // an elements within the document, an ancestor or a composition.
-        _publishedContentCache.Clear();
-    }
+        => _databaseCacheRepository.Rebuild(
+            contentTypeIds.ToList(),
+            null,
+            null,
+            action =>
+            {
+                using ICoreScope scope = _scopeProvider.CreateCoreScope();
+                action();
+                scope.Complete();
+            });
 
     public async Task RebuildMemoryCacheByContentTypeAsync(IEnumerable<int> contentTypeIds)
     {
-        // Use lightweight query to get only keys and draft status - avoids loading all serialized data.
-        IReadOnlyList<(Guid Key, bool IsDraft)> contentKeys;
-        using (ICoreScope scope = _scopeProvider.CreateCoreScope())
-        {
-            contentKeys = _databaseCacheRepository.GetDocumentKeysWithPublishedStatus(
-                contentTypeIds.Select(x => _idKeyMap.GetKeyForId(x, UmbracoObjectTypes.DocumentType).Result)).ToList();
-            scope.Complete();
-        }
+        // Clear the hybrid cache by content type tag for the affected content types.
+        var contentTypeIdsAsArray = contentTypeIds as int[] ?? contentTypeIds.ToArray();
+        var contentTypeIdTags = contentTypeIdsAsArray.Select(ContentTypeIdTag).ToArray();
+        await _hybridCache.RemoveByTagAsync(contentTypeIdTags);
 
-        foreach ((Guid key, bool isDraft) in contentKeys)
-        {
-            await _hybridCache.RemoveAsync(GetCacheKey(key, true));
+        // Clear converted content for the affected types so entries are re-converted when next requested.
+        ClearConvertedContentCache(contentTypeIdsAsArray);
+    }
 
-            if (isDraft is false)
-            {
-                await ClearPublishedCacheAsync(key);
-            }
-        }
+    public void ClearConvertedContentCache()
+    {
+        _publishedContentCache.Clear();
+        InvalidateMemoryCacheGeneration();
+    }
+
+    public void ClearConvertedContentCache(IReadOnlyCollection<int> contentTypeIds)
+    {
+        var ids = contentTypeIds as int[] ?? contentTypeIds.ToArray();
+        _publishedContentCache.RemoveWhere(content => ids.Contains(content.ContentType.Id));
+        InvalidateMemoryCacheGeneration();
     }
 
     private async Task ClearPublishedCacheAsync(Guid key)
     {
         var cacheKey = GetCacheKey(key, false);
         await _hybridCache.RemoveAsync(cacheKey);
-        _publishedContentCache.Remove(cacheKey, out _);
+        _publishedContentCache.Remove(cacheKey);
+        InvalidateMemoryCacheGeneration();
     }
+
+    private static string ContentTypeIdTag(int contentTypeId)
+        => $"ct:{contentTypeId}";
 }

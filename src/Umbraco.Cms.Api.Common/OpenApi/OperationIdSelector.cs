@@ -13,7 +13,7 @@ public class OperationIdSelector : IOperationIdSelector
     /// <summary>
     ///     Initializes a new instance of the <see cref="OperationIdSelector"/> class.
     /// </summary>
-    [Obsolete("Use non-obsolete constructor. This will be removed in Umbraco 15.")]
+    [Obsolete("Use non-obsolete constructor. Scheduled for removal in Umbraco 18.")]
     public OperationIdSelector()
         : this(Enumerable.Empty<IOperationIdHandler>())
     {

@@ -5,6 +5,9 @@ using Umbraco.Cms.Core.Models.Membership;
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <summary>
+///     Provides operations for managing user notifications related to content changes.
+/// </summary>
 public interface INotificationService : IService
 {
     /// <summary>

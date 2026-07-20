@@ -42,6 +42,13 @@ internal class CacheInstructionsPruningJob : IDistributedBackgroundJob
         _lastSyncedManager = lastSyncedManager;
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="CacheInstructionsPruningJob"/> class, responsible for pruning cache instructions in a distributed environment.
+    /// </summary>
+    /// <param name="globalSettings">The global settings for the Umbraco application.</param>
+    /// <param name="cacheInstructionRepository">The repository used to access and manage cache instructions.</param>
+    /// <param name="scopeProvider">The provider for managing database transaction scopes.</param>
+    /// <param name="timeProvider">The provider used to obtain the current time.</param>
     [Obsolete("Use the constructor with ILastSyncedManager parameter instead. Scheduled for removal in Umbraco 18.")]
     public CacheInstructionsPruningJob(
         IOptions<GlobalSettings> globalSettings,
@@ -57,6 +64,9 @@ internal class CacheInstructionsPruningJob : IDistributedBackgroundJob
     {
     }
 
+    /// <summary>
+    /// Gets the display name of the CacheInstructionsPruningJob, used to identify this background job.
+    /// </summary>
     public string Name => "CacheInstructionsPruningJob";
 
     /// <inheritdoc />

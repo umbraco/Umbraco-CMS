@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.ViewModels.Folder;
@@ -11,6 +11,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers;
 
+/// <summary>
+/// Serves as a base controller for managing folder-related operations for a specified tree entity type in the management API.
+/// </summary>
 public abstract class FolderManagementControllerBase<TTreeEntity> : ManagementApiControllerBase
     where TTreeEntity : ITreeEntity
 {

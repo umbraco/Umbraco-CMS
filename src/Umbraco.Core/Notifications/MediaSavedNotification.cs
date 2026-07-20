@@ -5,24 +5,31 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Notifications;
+
 /// <summary>
-///  A notification that is used to trigger the IMediaService when the Save method is called in the API and after the data has been persisted.
+///     Notification that is published after media has been saved.
 /// </summary>
+/// <remarks>
+///     This notification is published by the <see cref="Services.IMediaService"/> after media has been persisted.
+///     It is not cancelable since the save operation has already completed.
+/// </remarks>
 public sealed class MediaSavedNotification : SavedNotification<IMedia>
 {
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="MediaSavedNotification"/> class with a single media item.
+    /// </summary>
+    /// <param name="target">The media item that was saved.</param>
+    /// <param name="messages">The event messages collection.</param>
     public MediaSavedNotification(IMedia target, EventMessages messages)
         : base(target, messages)
     {
     }
+
     /// <summary>
-    /// Initializes a new instance of the <see cref="MediaSavedNotification"/>.
+    ///     Initializes a new instance of the <see cref="MediaSavedNotification"/> class with multiple media items.
     /// </summary>
-    /// <param name="target">
-    ///  Gets the saved collection of <see cref="IMedia"/> objects.
-    /// </param>
-    /// <param name="messages">
-    /// Initializes a new instance of the <see cref="EventMessages"/>.
-    /// </param>
+    /// <param name="target">The collection of media items that were saved.</param>
+    /// <param name="messages">The event messages collection.</param>
     public MediaSavedNotification(IEnumerable<IMedia> target, EventMessages messages)
         : base(target, messages)
     {

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.Builders;
@@ -9,6 +9,10 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DataType;
 
+/// <summary>
+/// Serves as the base controller for managing data types in the Umbraco CMS API.
+/// This class is intended to be inherited by controllers that handle data type operations.
+/// </summary>
 [VersionedApiBackOfficeRoute(Constants.UdiEntityType.DataType)]
 [ApiExplorerSettings(GroupName = "Data Type")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentsOrMediaOrMembersOrContentTypes)]
@@ -54,6 +58,21 @@ public abstract class DataTypeControllerBase : ManagementApiControllerBase
         });
 
     protected IActionResult DataTypeNotFound() => OperationStatusResult(DataTypeOperationStatus.NotFound, DataTypeNotFound);
+
+    protected IActionResult PropertyEditorSchemaOperationStatusResult(PropertyEditorSchemaOperationStatus status) =>
+        OperationStatusResult(status, problemDetailsBuilder => status switch
+        {
+            PropertyEditorSchemaOperationStatus.DataTypeNotFound => NotFound(problemDetailsBuilder
+                .WithTitle("The data type could not be found")
+                .Build()),
+            PropertyEditorSchemaOperationStatus.SchemaNotSupported => NotFound(problemDetailsBuilder
+                .WithTitle("Schema not supported")
+                .WithDetail("The property editor for this data type does not support schema information.")
+                .Build()),
+            _ => StatusCode(StatusCodes.Status500InternalServerError, problemDetailsBuilder
+                .WithTitle("Unknown property editor schema operation status.")
+                .Build()),
+        });
 
     private IActionResult DataTypeNotFound(ProblemDetailsBuilder problemDetailsBuilder)
         => NotFound(problemDetailsBuilder

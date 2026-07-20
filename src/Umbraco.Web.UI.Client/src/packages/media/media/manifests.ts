@@ -1,8 +1,11 @@
+import { manifests as startNodeManifests } from './user-start-node/manifests.js';
 import { manifests as auditLogManifests } from './audit-log/manifests.js';
 import { manifests as collectionManifests } from './collection/manifests.js';
+import { manifests as configurationManifests } from './configuration/manifests.js';
 import { manifests as entityActionsManifests } from './entity-actions/manifests.js';
 import { manifests as entityBulkActionsManifests } from './entity-bulk-actions/manifests.js';
 import { manifests as fileUploadPreviewManifests } from './components/input-upload-field/manifests.js';
+import { manifests as globalContextManifests } from './global-contexts/manifests.js';
 import { manifests as itemManifests } from './item/manifests.js';
 import { manifests as menuManifests } from './menu/manifests.js';
 import { manifests as modalManifests } from './modals/manifests.js';
@@ -18,11 +21,14 @@ import { manifests as workspaceManifests } from './workspace/manifests.js';
 import * as entryPointModule from './entry-point.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
+	...startNodeManifests,
 	...auditLogManifests,
 	...collectionManifests,
+	...configurationManifests,
 	...entityActionsManifests,
 	...entityBulkActionsManifests,
 	...fileUploadPreviewManifests,
+	...globalContextManifests,
 	...itemManifests,
 	...menuManifests,
 	...modalManifests,

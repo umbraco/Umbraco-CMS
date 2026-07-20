@@ -2,10 +2,22 @@ using System.Text;
 
 namespace Umbraco.Cms.Core.Routing;
 
+/// <summary>
+///     Provides utilities for manipulating web paths.
+/// </summary>
 public class WebPath
 {
+    /// <summary>
+    ///     The path separator character.
+    /// </summary>
     public const char PathSeparator = '/';
 
+    /// <summary>
+    ///     Combines multiple path segments into a single path.
+    /// </summary>
+    /// <param name="paths">The path segments to combine.</param>
+    /// <returns>The combined path.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="paths"/> is null.</exception>
     public static string Combine(params string[]? paths)
     {
         if (paths == null)

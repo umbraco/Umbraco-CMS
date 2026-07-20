@@ -11,6 +11,10 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_13_3_0;
 /// </summary>
 public class AlignUpgradedDatabase : MigrationBase
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AlignUpgradedDatabase"/> class with the specified migration context.
+    /// </summary>
+    /// <param name="context">The <see cref="IMigrationContext"/> to be used for the migration operation.</param>
     public AlignUpgradedDatabase(IMigrationContext context)
         : base(context)
     {

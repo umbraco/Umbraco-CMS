@@ -7,6 +7,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Packaging;
 
+/// <summary>
+/// Provides functionality for installing and managing Umbraco packages, including handling package files, dependencies, and installation steps.
+/// </summary>
 public class PackageInstallation : IPackageInstallation
 {
     private readonly IPackageDataInstallation _packageDataInstallation;
@@ -22,6 +25,12 @@ public class PackageInstallation : IPackageInstallation
         _parser = parser ?? throw new ArgumentNullException(nameof(parser));
     }
 
+    /// <summary>
+    /// Reads the package information from the provided XML document.
+    /// </summary>
+    /// <param name="packageXmlFile">The XML document representing the package file. Cannot be <c>null</c>.</param>
+    /// <returns>A <see cref="CompiledPackage"/> representing the compiled package data.</returns>
+    /// <exception cref="ArgumentNullException">Thrown if <paramref name="packageXmlFile"/> is <c>null</c>.</exception>
     public CompiledPackage ReadPackage(XDocument? packageXmlFile)
     {
         if (packageXmlFile == null)
@@ -33,6 +42,13 @@ public class PackageInstallation : IPackageInstallation
         return compiledPackage;
     }
 
+    /// <summary>
+    /// Installs data from the specified compiled package, updating the package definition with details of the installed items.
+    /// </summary>
+    /// <param name="compiledPackage">The compiled package containing the data to be installed.</param>
+    /// <param name="userId">The ID of the user performing the installation.</param>
+    /// <param name="packageDefinition">When this method returns, contains a <see cref="PackageDefinition"/> populated with details of the installed items.</param>
+    /// <returns>An <see cref="InstallationSummary"/> containing details of the installed package data.</returns>
     public InstallationSummary InstallPackageData(CompiledPackage compiledPackage, int userId, out PackageDefinition packageDefinition)
     {
         packageDefinition = new PackageDefinition { Name = compiledPackage.Name };

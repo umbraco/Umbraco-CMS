@@ -11,7 +11,14 @@ namespace Umbraco.Cms.Core.Configuration.Models;
 [UmbracoOptions(Constants.Configuration.ConfigHosting)]
 public class HostingSettings
 {
+    /// <summary>
+    ///     The default local temporary storage location.
+    /// </summary>
     internal const string StaticLocalTempStorageLocation = "Default";
+
+    /// <summary>
+    ///     The default value for debug mode.
+    /// </summary>
     internal const bool StaticDebug = false;
 
     /// <summary>
@@ -42,4 +49,25 @@ public class HostingSettings
     ///     Gets or sets a value specifying the name of the site.
     /// </summary>
     public string? SiteName { get; set; }
+
+    /// <summary>
+    ///     Gets or sets a stable identifier for this server instance used to track cache synchronization state.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Set this when the machine name is not stable across restarts — for example on Azure App Service Linux,
+    ///         where the container hostname changes on each recycle. Use a value that is unique per server instance
+    ///         (e.g. the site name for single-server deployments, or a per-instance value for scale-out).
+    ///     </para>
+    ///     <para>
+    ///         When not set, Umbraco automatically uses the <c>WEBSITE_INSTANCE_ID</c> environment variable on
+    ///         Azure App Service, or falls back to <c>Environment.MachineName</c>.
+    ///     </para>
+    ///     <para>
+    ///         The value of <see cref="SiteName" /> is still appended when set, matching the behaviour of the
+    ///         default <c>Environment.MachineName</c>-based identifier.
+    ///     </para>
+    ///     <para>The combined value of this setting and <see cref="SiteName" /> must not exceed 255 characters.</para>
+    /// </remarks>
+    public string? MachineIdentifier { get; set; }
 }

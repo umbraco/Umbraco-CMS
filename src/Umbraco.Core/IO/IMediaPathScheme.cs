@@ -6,6 +6,12 @@ namespace Umbraco.Cms.Core.IO;
 public interface IMediaPathScheme
 {
     /// <summary>
+    /// Gets a value indicating whether GUID version 7 is supported.
+    /// </summary>
+    // TODO (V18): Remove default implementation.
+    bool SupportsGuid7 => false;
+
+    /// <summary>
     ///     Gets a media file path.
     /// </summary>
     /// <param name="fileManager">The media filesystem.</param>

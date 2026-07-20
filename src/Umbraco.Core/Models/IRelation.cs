@@ -3,6 +3,9 @@ using Umbraco.Cms.Core.Models.Entities;
 
 namespace Umbraco.Cms.Core.Models;
 
+/// <summary>
+///     Represents a relation between two entities.
+/// </summary>
 public interface IRelation : IEntity, IRememberBeingDirty
 {
     /// <summary>
@@ -11,6 +14,9 @@ public interface IRelation : IEntity, IRememberBeingDirty
     [DataMember]
     int ParentId { get; set; }
 
+    /// <summary>
+    ///     Gets or sets the object type of the parent entity.
+    /// </summary>
     [DataMember]
     Guid ParentObjectType { get; set; }
 
@@ -20,6 +26,9 @@ public interface IRelation : IEntity, IRememberBeingDirty
     [DataMember]
     int ChildId { get; set; }
 
+    /// <summary>
+    ///     Gets or sets the object type of the child entity.
+    /// </summary>
     [DataMember]
     Guid ChildObjectType { get; set; }
 

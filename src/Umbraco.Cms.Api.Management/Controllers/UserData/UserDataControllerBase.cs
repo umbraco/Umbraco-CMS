@@ -1,10 +1,14 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.UserData;
 
+/// <summary>
+/// Serves as the base controller for managing user data within the Umbraco CMS Management API.
+/// Provides common functionality for derived user data controllers.
+/// </summary>
 [VersionedApiBackOfficeRoute("user-data")]
 [ApiExplorerSettings(GroupName = "User Data")]
 public class UserDataControllerBase : ManagementApiControllerBase

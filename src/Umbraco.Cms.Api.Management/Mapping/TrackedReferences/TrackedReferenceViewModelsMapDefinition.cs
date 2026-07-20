@@ -5,8 +5,16 @@ using Umbraco.Cms.Api.Management.ViewModels.TrackedReferences;
 
 namespace Umbraco.Cms.Api.Management.Mapping.TrackedReferences;
 
+/// <summary>
+/// Defines the mapping configuration for converting tracked reference entities to their corresponding view models.
+/// </summary>
 public class TrackedReferenceViewModelsMapDefinition : IMapDefinition
 {
+    /// <summary>
+    /// Configures the object mappings between <see cref="RelationItemModel"/>, <see cref="Guid"/>, and various tracked reference response models.
+    /// This method registers the mapping definitions used to convert tracked reference data into their corresponding API response view models.
+    /// </summary>
+    /// <param name="mapper">The <see cref="IUmbracoMapper"/> instance on which to define the mappings.</param>
     public void DefineMaps(IUmbracoMapper mapper)
     {
         mapper.Define<RelationItemModel, DocumentReferenceResponseModel>((source, context) => new DocumentReferenceResponseModel(), Map);

@@ -7,8 +7,17 @@ using Umbraco.Cms.Infrastructure.Persistence.FaultHandling;
 
 namespace Umbraco.Extensions;
 
+/// <summary>
+/// Contains extension methods for <see cref="System.Data.Common.DbConnection"/> to extend database connection capabilities.
+/// </summary>
 public static class DbConnectionExtensions
 {
+    /// <summary>
+    /// Determines whether a database connection can be successfully opened using the specified connection string and provider factory.
+    /// </summary>
+    /// <param name="connectionString">The connection string used to establish the database connection.</param>
+    /// <param name="factory">The database provider factory used to create the connection.</param>
+    /// <returns>True if the connection is available and can be opened; otherwise, false.</returns>
     public static bool IsConnectionAvailable(string? connectionString, DbProviderFactory? factory)
     {
         DbConnection? connection = factory?.CreateConnection();
@@ -25,6 +34,13 @@ public static class DbConnectionExtensions
         }
     }
 
+    /// <summary>
+    /// Checks whether the specified database connection is available by attempting to open and close it.
+    /// </summary>
+    /// <param name="connection">The <see cref="IDbConnection"/> to test for availability.</param>
+    /// <returns>
+    /// <c>true</c> if the connection can be opened and closed without throwing a <see cref="DbException"/>; otherwise, <c>false</c>.
+    /// </returns>
     public static bool IsAvailable(this IDbConnection connection)
     {
         try

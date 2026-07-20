@@ -95,7 +95,7 @@ public abstract class PublishedContentWrapped : IPublishedContent
     public virtual PublishedItemType ItemType => _content.ItemType;
 
     /// <inheritdoc />
-    [Obsolete("Please use TryGetParentKey() on IDocumentNavigationQueryService or IMediaNavigationQueryService instead. Scheduled for removal in V16.")]
+    [Obsolete("Please use TryGetParentKey() on IDocumentNavigationQueryService or IMediaNavigationQueryService instead. Scheduled for removal in Umbraco 18.")]
     public virtual IPublishedContent? Parent => _content.Parent;
 
     /// <inheritdoc />
@@ -105,7 +105,7 @@ public abstract class PublishedContentWrapped : IPublishedContent
     public virtual bool IsPublished(string? culture = null) => _content.IsPublished(culture);
 
     /// <inheritdoc />
-    [Obsolete("Please use TryGetChildrenKeys() on IDocumentNavigationQueryService or IMediaNavigationQueryService instead. Scheduled for removal in V16.")]
+    [Obsolete("Please use TryGetChildrenKeys() on IDocumentNavigationQueryService or IMediaNavigationQueryService instead. Scheduled for removal in Umbraco 18.")]
     public virtual IEnumerable<IPublishedContent> Children => _content.Children;
 
     /// <inheritdoc cref="IPublishedElement.Properties" />

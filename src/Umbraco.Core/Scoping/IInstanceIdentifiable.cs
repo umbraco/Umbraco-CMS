@@ -10,5 +10,8 @@ public interface IInstanceIdentifiable
     /// </summary>
     Guid InstanceId { get; }
 
+    /// <summary>
+    ///     Gets the managed thread ID on which this instance was created.
+    /// </summary>
     int CreatedThreadId { get; }
 }

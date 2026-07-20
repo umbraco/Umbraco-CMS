@@ -11,12 +11,19 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.MemberType;
 
+/// <summary>
+/// Controller for handling move operations on member types.
+/// </summary>
 [ApiVersion("1.0")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessMemberTypes)]
 public class MoveMemberTypeController : MemberTypeControllerBase
 {
     private readonly IMemberTypeService _memberTypeService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MoveMemberTypeController"/> class, which handles operations related to moving member types.
+    /// </summary>
+    /// <param name="memberTypeService">The service used to manage member types.</param>
     public MoveMemberTypeController(IMemberTypeService memberTypeService)
         => _memberTypeService = memberTypeService;
 
@@ -25,6 +32,8 @@ public class MoveMemberTypeController : MemberTypeControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Moves a member type.")]
+    [EndpointDescription("Moves a member type identified by the provided Id to a different location.")]
     public async Task<IActionResult> Move(
         CancellationToken cancellationToken,
         Guid id,

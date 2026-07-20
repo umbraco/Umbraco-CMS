@@ -1,0 +1,103 @@
+import { UMB_WORKSPACE_PATH_VARIANT_DELIMITER } from './constants.js';
+import { UMB_MODAL_ROUTE_PATH_SEGMENT } from '@umbraco-cms/backoffice/router';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+
+/**
+ * A minimal variant option descriptor consumed by {@link resolveStaleVariantRoute}.
+ */
+export interface UmbStaleVariantRouteResolverVariant {
+	culture: string | null;
+	segment: string | null;
+	unique: string;
+}
+
+/**
+ * The arguments for {@link resolveStaleVariantRoute}.
+ */
+export interface UmbStaleVariantRouteResolverArgs {
+	/**
+	 * The current location pathname, e.g. window.location.pathname.
+	 */
+	currentPath: string;
+	/**
+	 * The absolute router path of the workspace, without a trailing slash.
+	 */
+	workspaceRoute: string;
+	/**
+	 * The available variant options.
+	 */
+	variants: Array<UmbStaleVariantRouteResolverVariant>;
+	/**
+	 * The culture currently selected in the app language switcher.
+	 */
+	appCulture?: string;
+}
+
+/**
+ * Checks whether the variant part of a workspace URL refers to variant options that no longer exist —
+ * e.g. after the content type's Vary by Culture setting changed — and resolves a corrected path.
+ * Split-view parts are resolved individually and deduplicated.
+ * @param {UmbStaleVariantRouteResolverArgs} args - The current path, workspace route, variant options and app culture.
+ * @returns {string | null} The corrected path without the query string, or null when the URL is valid or not applicable.
+ */
+export function resolveStaleVariantRoute(args: UmbStaleVariantRouteResolverArgs): string | null {
+	const { currentPath, workspaceRoute, variants, appCulture } = args;
+	if (variants.length === 0) return null;
+
+	const parsed = parseVariantPath(currentPath, workspaceRoute);
+	if (!parsed) return null;
+	const { variantPart, pathSuffix } = parsed;
+
+	// Skip while a modal is layered on top — closing it restores the pre-modal URL and dispatches
+	// a changestate event, at which point the correction can run against the settled URL:
+	if (pathSuffix.split('/').includes(UMB_MODAL_ROUTE_PATH_SEGMENT)) return null;
+
+	const parts = variantPart.split(UMB_WORKSPACE_PATH_VARIANT_DELIMITER);
+	const isValid = (part: string) => variants.some((v) => v.unique === part);
+
+	if (parts.every(isValid)) return null;
+
+	const resolvedParts = parts.map((part) =>
+		isValid(part) ? part : findFallbackVariant(variants, UmbVariantId.FromString(part), appCulture).unique,
+	);
+
+	const uniqueParts = [...new Set(resolvedParts)];
+
+	return `${workspaceRoute}/${uniqueParts.join(UMB_WORKSPACE_PATH_VARIANT_DELIMITER)}${pathSuffix}`;
+}
+
+/**
+ * Separates the variant part of a workspace path from any trailing path (e.g. /view/info).
+ */
+function parseVariantPath(
+	currentPath: string,
+	workspaceRoute: string,
+): { variantPart: string; pathSuffix: string } | null {
+	const routePrefix = workspaceRoute + '/';
+	if (!currentPath.startsWith(routePrefix)) return null;
+
+	const remainingPath = currentPath.substring(routePrefix.length);
+	if (remainingPath.length === 0) return null;
+
+	const slashIndex = remainingPath.indexOf('/');
+	if (slashIndex === -1) {
+		return { variantPart: remainingPath, pathSuffix: '' };
+	}
+	return { variantPart: remainingPath.substring(0, slashIndex), pathSuffix: remainingPath.substring(slashIndex) };
+}
+
+/**
+ * Prefers the same culture without a segment, then the app culture, then invariant, then the first option.
+ */
+function findFallbackVariant(
+	variants: Array<UmbStaleVariantRouteResolverVariant>,
+	variantId: UmbVariantId,
+	appCulture?: string,
+): UmbStaleVariantRouteResolverVariant {
+	return (
+		variants.find((v) => v.culture === variantId.culture && v.segment === null) ??
+		variants.find((v) => v.culture === appCulture && v.segment === null) ??
+		variants.find((v) => v.culture === null && v.segment === null) ??
+		variants[0]
+	);
+}

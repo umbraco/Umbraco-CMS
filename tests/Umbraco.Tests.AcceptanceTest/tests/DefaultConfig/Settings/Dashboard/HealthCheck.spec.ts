@@ -1,5 +1,7 @@
 import {expect} from '@playwright/test';
-import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
+import {ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
+
+const healthCheckName = 'Imaging HMAC Secret Key';
 
 test.beforeEach(async ({umbracoUi}) => {
   await umbracoUi.goToBackOffice();
@@ -24,13 +26,13 @@ test('can perform all health checks', async ({umbracoApi, umbracoUi}) => {
     await umbracoUi.healthCheck.isHealthCheckGroupVisible(healthCheck.name);
     const resultCount = await umbracoApi.healthCheck.getResultsCountByName(healthCheck.name);
     if (resultCount.success > 0) {
-      await umbracoUi.healthCheck.doesHeathCheckGroupHaveSuccessItemsCount(healthCheck.name, resultCount.success);
+      await umbracoUi.healthCheck.doesHealthCheckGroupHaveSuccessItemsCount(healthCheck.name, resultCount.success);
     }
     if (resultCount.warning > 0) {
-      await umbracoUi.healthCheck.doesHeathCheckGroupHaveWarningItemsCount(healthCheck.name, resultCount.warning);
+      await umbracoUi.healthCheck.doesHealthCheckGroupHaveWarningItemsCount(healthCheck.name, resultCount.warning);
     }
     if (resultCount.error > 0) {
-      await umbracoUi.healthCheck.doesHeathCheckGroupHaveErrorItemsCount(healthCheck.name, resultCount.error);
+      await umbracoUi.healthCheck.doesHealthCheckGroupHaveErrorItemsCount(healthCheck.name, resultCount.error);
     }
   }
 });
@@ -44,14 +46,38 @@ test('can view the details of a health check', async ({umbracoApi, umbracoUi}) =
       const healthCheckData = await umbracoApi.healthCheck.getByName(healthCheckName);
 
       // Act
-      await umbracoUi.healthCheck.clickHeathCheckGroupByName(healthCheckName);
+      await umbracoUi.healthCheck.clickHealthCheckGroupByName(healthCheckName);
 
       // Assert
       for (const check of healthCheckData.checks) {
-        await umbracoUi.healthCheck.isCheckNameVisible(check.name);
-        await umbracoUi.healthCheck.isCheckDescriptionVisible(check.description);
+        await umbracoUi.healthCheck.isHealthCheckNameVisible(check.name);
+        await umbracoUi.healthCheck.isHealthCheckDescriptionVisible(check.description);
       }
       await umbracoUi.goBackPage();
     }
   }
+});
+
+test('can see the HMAC secret key health check in the Security group', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const healthCheckGroupName = 'Security';
+  const healthCheckData = await umbracoApi.healthCheck.getByName(healthCheckGroupName);
+
+  // Act
+  await umbracoUi.healthCheck.clickHealthCheckGroupByName(healthCheckGroupName);
+
+  // Assert
+  await umbracoUi.healthCheck.isHealthCheckNameVisible(healthCheckName);
+  const hmacCheck = healthCheckData.checks.find((check: {name: string}) => check.name === healthCheckName);
+  await umbracoUi.healthCheck.isHealthCheckDescriptionVisible(hmacCheck.description);
+});
+
+test('can see success status for HMAC secret key after performing checks', async ({umbracoApi, umbracoUi}) => {
+  // Act
+  await umbracoUi.healthCheck.clickHealthCheckGroupByName('Security');
+  await umbracoUi.healthCheck.clickPerformChecksButton();
+
+  // Assert
+  await umbracoUi.healthCheck.doesHealthCheckHaveResultMessage(healthCheckName, ConstantHelper.healthCheckMessages.imagingHMACSecretKeyIsConfigured);
+  await umbracoUi.healthCheck.isHealthCheckReadMoreLinkVisible(healthCheckName, false);
 });

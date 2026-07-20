@@ -10,12 +10,20 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Member.References;
 
+/// <summary>
+/// Controller for handling requests to determine if a member is referenced elsewhere.
+/// </summary>
 [ApiVersion("1.0")]
 public class AreReferencedMemberController : MemberControllerBase
 {
     private readonly ITrackedReferencesService _trackedReferencesSkipTakeService;
     private readonly IUmbracoMapper _umbracoMapper;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AreReferencedMemberController"/> class, which handles API requests related to checking if members are referenced.
+    /// </summary>
+    /// <param name="trackedReferencesSkipTakeService">The service used for tracking referenced members with skip and take functionality.</param>
+    /// <param name="umbracoMapper">The Umbraco mapper instance used for mapping between models.</param>
     public AreReferencedMemberController(ITrackedReferencesService trackedReferencesSkipTakeService, IUmbracoMapper umbracoMapper)
     {
         _trackedReferencesSkipTakeService = trackedReferencesSkipTakeService;
@@ -33,6 +41,8 @@ public class AreReferencedMemberController : MemberControllerBase
     [HttpGet("are-referenced")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<ReferenceByIdModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a collection of items that reference members.")]
+    [EndpointDescription("Gets a paginated collection of items that reference the members identified by the provided Ids.")]
     public async Task<ActionResult<PagedViewModel<ReferenceByIdModel>>> GetPagedReferencedItems(
         CancellationToken cancellationToken,
         [FromQuery(Name="id")] HashSet<Guid> ids,

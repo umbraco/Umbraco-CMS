@@ -23,7 +23,7 @@ public class StringUdi : Udi
     /// <param name="uriValue">The uri value of the udi.</param>
     public StringUdi(Uri uriValue)
         : base(uriValue) =>
-        Id = Uri.UnescapeDataString(uriValue.AbsolutePath.TrimStart(Constants.CharArrays.ForwardSlash));
+        Id = Uri.UnescapeDataString(uriValue.AbsolutePath.AsSpan().TrimStart('/'));
 
     /// <summary>
     ///     The string part of the identifier.
@@ -33,6 +33,11 @@ public class StringUdi : Udi
     /// <inheritdoc />
     public override bool IsRoot => Id == string.Empty;
 
+    /// <summary>
+    ///     Ensures that this StringUdi is not a root Udi.
+    /// </summary>
+    /// <returns>This StringUdi.</returns>
+    /// <exception cref="Exception">When this Udi is a root Udi.</exception>
     public StringUdi EnsureClosed()
     {
         EnsureNotRoot();

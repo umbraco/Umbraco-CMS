@@ -13,42 +13,42 @@ namespace Umbraco.Cms.Api.Management.ViewModels.UserGroup;
 public class UserGroupBase
 {
     /// <summary>
-    /// The name of the user groups
+    /// Gets or sets the name of the user group.
     /// </summary>
     public required string Name { get; init; }
 
     /// <summary>
-    /// The alias of the user groups
+    /// Gets or sets the alias of the user group.
     /// </summary>
     public required string Alias { get; init; }
 
     /// <summary>
-    /// The description of the user group
+    /// Gets or sets the description of the user group.
     /// </summary>
     public string? Description { get; set; }
 
     /// <summary>
-    /// The Icon for the user group
+    /// Gets or sets the icon for the user group.
     /// </summary>
     public string? Icon { get; init; }
 
     /// <summary>
-    /// The sections that the user group has access to
+    /// Gets or sets the sections that the user group has access to.
     /// </summary>
     public required IEnumerable<string> Sections { get; init; }
 
     /// <summary>
-    /// The languages that the user group has access to
+    /// Gets or sets the languages that the user group has access to.
     /// </summary>
     public required IEnumerable<string> Languages { get; init; }
 
     /// <summary>
-    /// Flag indicating if the user group gives access to all languages, regardless of <see cref="UserGroupBase.Languages"/>.
+    /// Gets or sets a value indicating whether the user group gives access to all languages, regardless of <see cref="UserGroupBase.Languages"/>.
     /// </summary>
     public required bool HasAccessToAllLanguages { get; init; }
 
     /// <summary>
-    /// The key of the document that should act as root node for the user group
+    /// Gets or sets the key of the document that should act as root node for the user group.
     /// <remarks>
     /// This can be overwritten by a different user group if a user is a member of multiple groups
     /// </remarks>
@@ -56,7 +56,7 @@ public class UserGroupBase
     public ReferenceByIdModel? DocumentStartNode { get; init; }
 
     /// <summary>
-    /// If the group should have access to the document root.
+    /// Gets or sets a value indicating whether the group should have access to the document root.
     /// <remarks>
     /// This will be ignored if an explicit start node has been specified in <see cref="DocumentStartNode"/>.
     /// </remarks>
@@ -64,7 +64,7 @@ public class UserGroupBase
     public bool DocumentRootAccess { get; init; }
 
     /// <summary>
-    /// The Id of the media that should act as root node for the user group
+    /// Gets or sets the ID of the media that should act as root node for the user group.
     /// <remarks>
     /// This can be overwritten by a different user group if a user is a member of multiple groups
     /// </remarks>
@@ -72,7 +72,7 @@ public class UserGroupBase
     public ReferenceByIdModel? MediaStartNode { get; init; }
 
     /// <summary>
-    /// If the group should have access to the media root.
+    /// Gets or sets a value indicating whether the group should have access to the media root.
     /// <remarks>
     /// This will be ignored if an explicit start node has been specified in <see cref="MediaStartNode"/>.
     /// </remarks>
@@ -80,8 +80,11 @@ public class UserGroupBase
     public bool MediaRootAccess { get; init; }
 
     /// <summary>
-    /// List of permissions provided, and maintained by the front-end. The server has no concept all of them, but some can be used on the server.
+    /// Gets or sets the list of permissions provided and maintained by the front-end. The server has no concept of all of them, but some can be used on the server.
     /// </summary>
     public required ISet<string> FallbackPermissions { get; init; }
+    /// <summary>
+    /// Gets or sets the set of permissions associated with the user group.
+    /// </summary>
     public required ISet<IPermissionPresentationModel> Permissions { get; init; }
 }

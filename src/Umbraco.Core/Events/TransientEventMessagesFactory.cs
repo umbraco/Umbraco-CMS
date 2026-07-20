@@ -5,7 +5,9 @@ namespace Umbraco.Cms.Core.Events;
 /// </summary>
 public class TransientEventMessagesFactory : IEventMessagesFactory
 {
+    /// <inheritdoc />
     public EventMessages Get() => new EventMessages();
 
+    /// <inheritdoc />
     public EventMessages? GetOrDefault() => null;
 }

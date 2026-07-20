@@ -3,6 +3,9 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Models;
 
+/// <summary>
+///     Represents a server registration for distributed environments.
+/// </summary>
 public interface IServerRegistration : IServerAddress, IEntity, IRememberBeingDirty
 {
     /// <summary>
@@ -10,6 +13,9 @@ public interface IServerRegistration : IServerAddress, IEntity, IRememberBeingDi
     /// </summary>
     string? ServerIdentity { get; set; }
 
+    /// <summary>
+    ///     Gets or sets the server address URL.
+    /// </summary>
     new string? ServerAddress { get; set; }
 
     /// <summary>

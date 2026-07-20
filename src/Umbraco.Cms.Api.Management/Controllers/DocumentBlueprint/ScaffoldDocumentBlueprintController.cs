@@ -10,6 +10,9 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DocumentBlueprint;
 
+/// <summary>
+/// Provides endpoints for scaffolding document blueprints in the Umbraco CMS Management API.
+/// </summary>
 [ApiVersion("1.0")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessDocuments)]
 public class ScaffoldDocumentBlueprintController : DocumentBlueprintControllerBase
@@ -27,6 +30,8 @@ public class ScaffoldDocumentBlueprintController : DocumentBlueprintControllerBa
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(DocumentBlueprintResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Scaffolds a document blueprint.")]
+    [EndpointDescription("Creates a scaffold for a new document blueprint with default values.")]
     public async Task<IActionResult> Scaffold(CancellationToken cancellationToken, Guid id)
     {
         IContent? blueprint = await _contentBlueprintEditingService.GetScaffoldedAsync(id);

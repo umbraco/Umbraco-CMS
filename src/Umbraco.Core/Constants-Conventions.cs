@@ -7,31 +7,95 @@ public static partial class Constants
     /// </summary>
     public static class Conventions
     {
+        /// <summary>
+        ///     Contains constants related to database migrations.
+        /// </summary>
         public static class Migrations
         {
+            /// <summary>
+            ///     The name of the Umbraco core upgrade plan.
+            /// </summary>
             public const string UmbracoUpgradePlanName = "Umbraco.Core";
+
+            /// <summary>
+            ///     The name of the Umbraco core pre-migrations upgrade plan.
+            /// </summary>
             public const string UmbracoUpgradePlanPremigrationsName = "Umbraco.Core.Premigrations";
+
+            /// <summary>
+            ///     The prefix used for key-value storage of upgrade state.
+            /// </summary>
             public const string KeyValuePrefix = "Umbraco.Core.Upgrader.State+";
+
+            /// <summary>
+            ///     The key used to store the Umbraco upgrade plan state.
+            /// </summary>
             public const string UmbracoUpgradePlanKey = KeyValuePrefix + UmbracoUpgradePlanName;
+
+            /// <summary>
+            ///     The key used to store the Umbraco pre-migrations upgrade plan state.
+            /// </summary>
             public const string UmbracoUpgradePlanPremigrationsKey = KeyValuePrefix + UmbracoUpgradePlanPremigrationsName;
+
+            /// <summary>
+            ///     The key used to coordinate migration leadership across servers in a load-balanced
+            ///     environment. The value is either empty (no active leader) or
+            ///     <c>"{machineIdentifier}|{claimedAtUtc:O}"</c> when a server holds the claim,
+            ///     where <c>machineIdentifier</c> is the value returned by <see cref="Umbraco.Cms.Core.Factories.IMachineInfoFactory.GetMachineIdentifier"/>.
+            /// </summary>
+            public const string UpgradeLockKey = "Umbraco.Core.Upgrader.Lock";
         }
 
+        /// <summary>
+        ///     Contains constants for permission category identifiers.
+        /// </summary>
         public static class PermissionCategories
         {
+            /// <summary>
+            ///     The content permission category.
+            /// </summary>
             public const string ContentCategory = "content";
+
+            /// <summary>
+            ///     The administration permission category.
+            /// </summary>
             public const string AdministrationCategory = "administration";
+
+            /// <summary>
+            ///     The structure permission category.
+            /// </summary>
             public const string StructureCategory = "structure";
+
+            /// <summary>
+            ///     The other permission category.
+            /// </summary>
             public const string OtherCategory = "other";
         }
 
+        /// <summary>
+        ///     Contains constants for public access rule types.
+        /// </summary>
         public static class PublicAccess
         {
+            /// <summary>
+            ///     The rule type for member username-based access.
+            /// </summary>
             public const string MemberUsernameRuleType = "MemberUsername";
+
+            /// <summary>
+            ///     The rule type for member role-based access.
+            /// </summary>
             public const string MemberRoleRuleType = "MemberRole";
         }
 
+        /// <summary>
+        ///     Contains constants for data type naming conventions.
+        /// </summary>
         public static class DataTypes
         {
+            /// <summary>
+            ///     The prefix used for list view data type names.
+            /// </summary>
             public const string ListViewPrefix = "List View - ";
         }
 
@@ -105,6 +169,25 @@ public static partial class Constants
             ///     Suffix added to media files when moved to the recycle bin when recycle bin media protection is enabled.
             /// </summary>
             public const string TrashedMediaSuffix = ".deleted";
+
+            /// <summary>
+            ///     Constants for the keys of built-in Umbraco media property types.
+            /// </summary>
+            public static class PropertyTypeKeys
+            {
+                // Must stay in sync between the clean install (DatabaseDataCreator) and the AddDimensionsToSvg
+                // upgrade migration so upgraded and clean-installed sites end up identical.
+
+                /// <summary>
+                ///     Key of the Width property type on the built-in Vector Graphics media type.
+                /// </summary>
+                public const string VectorGraphicsWidth = "5BC7E468-C53E-41A6-A522-2723F3B94514";
+
+                /// <summary>
+                ///     Key of the Height property type on the built-in Vector Graphics media type.
+                /// </summary>
+                public const string VectorGraphicsHeight = "9E4C2B59-6BC6-4648-BB71-B0F45DDBC274";
+            }
         }
 
         /// <summary>
@@ -183,6 +266,9 @@ public static partial class Constants
             /// </summary>
             public const string Comments = "umbracoMemberComments";
 
+            /// <summary>
+            ///     The label for the Comments property.
+            /// </summary>
             public const string CommentsLabel = "Comments";
 
             /// <summary>
@@ -199,6 +285,18 @@ public static partial class Constants
             ///     if a role starts with __umbracoRole we won't show it as it's an internal role used for public access
             /// </summary>
             public static readonly string InternalRolePrefix = "__umbracoRole";
+
+            /// <summary>
+            ///     Notification-state key that flags a save as touching only login-related properties
+            ///     (e.g. <c>LastLoginDate</c>, <c>SecurityStamp</c>).
+            /// </summary>
+            public const string LoginPropertiesOnlyStateKey = "LoginPropertiesOnly";
+
+            /// <summary>
+            ///     Notification-state key that indicates whether any indexable field changed as part of the save.
+            ///     When explicitly set to <c>false</c>, Examine indexing for the affected member is skipped.
+            /// </summary>
+            public const string IndexableFieldsChangedStateKey = "IndexableFieldsChanged";
         }
 
         /// <summary>
@@ -211,8 +309,14 @@ public static partial class Constants
             /// </summary>
             public const string DefaultAlias = "Member";
 
+            /// <summary>
+            ///     The system default protect type alias.
+            /// </summary>
             public const string SystemDefaultProtectType = "_umbracoSystemDefaultProtectType";
 
+            /// <summary>
+            ///     The identifier for the all members list.
+            /// </summary>
             public const string AllMembersListId = "all-members";
         }
 
@@ -304,8 +408,14 @@ public static partial class Constants
             // TODO: return a list of built in types so we can use that to prevent deletion in the UI
         }
 
+        /// <summary>
+        ///     Contains constants for UDI (Umbraco Data Identifier) conventions.
+        /// </summary>
         public static class Udi
         {
+            /// <summary>
+            ///     The prefix for all Umbraco Data Identifiers.
+            /// </summary>
             public const string Prefix = "umb://";
         }
 

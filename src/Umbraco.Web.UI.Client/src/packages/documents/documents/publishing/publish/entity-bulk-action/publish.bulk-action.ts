@@ -1,17 +1,13 @@
 import { UmbDocumentPublishingRepository } from '../../index.js';
-import { processDocumentsInBatches, showBulkResultNotification } from '../../bulk-publish.utils.js';
-import { UmbDocumentVariantState, type UmbDocumentVariantOptionModel } from '../../../types.js';
+import { UmbDocumentVariantState } from '../../../variant-state.js';
+import type { UmbDocumentVariantOptionModel } from '../../../types.js';
 import type { UmbDocumentItemModel } from '../../../item/types.js';
-import { UMB_DOCUMENT_PUBLISH_MODAL } from '../../../constants.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../../entity.js';
-import { UmbPublishDocumentEntityAction } from '../entity-action/index.js';
+import { UmbDocumentPublishManifestEntityActionMeta } from '../entity-action/constants.js';
 import { UmbDocumentItemRepository } from '../../../item/repository/index.js';
+import { UMB_CONTENT_PUBLISH_MODAL, UmbContentPublishEntityAction } from '@umbraco-cms/backoffice/content';
 import { UmbEntityBulkActionBase } from '@umbraco-cms/backoffice/entity-bulk-action';
-import {
-	UMB_APP_LANGUAGE_CONTEXT,
-	UmbLanguageCollectionRepository,
-	type UmbLanguageDetailModel,
-} from '@umbraco-cms/backoffice/language';
+import { UmbLanguageCollectionRepository, type UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { umbConfirmModal, umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
@@ -119,6 +115,7 @@ export class UmbDocumentPublishEntityBulkAction extends UmbEntityBulkActionBase<
 	 * If all states are the same, returns that state.
 	 * If states differ, returns DRAFT (displays as "Unpublished") since mixed states can't be meaningfully represented
 	 * and DRAFT is more accurate than showing "Not created" (which shouldn't appear since those variants are filtered out).
+	 * @param states
 	 */
 	static #determineRepresentativeState(states: Array<UmbDocumentVariantState | null>): UmbDocumentVariantState | null {
 		if (states.length === 0) return null;
@@ -129,33 +126,24 @@ export class UmbDocumentPublishEntityBulkAction extends UmbEntityBulkActionBase<
 	}
 
 	async execute() {
-		// Fetch contexts in parallel
-		const [entityContext, notificationContext, eventContext, appLanguageContext] = await Promise.all([
-			this.getContext(UMB_ENTITY_CONTEXT),
-			this.getContext(UMB_NOTIFICATION_CONTEXT),
-			this.getContext(UMB_ACTION_EVENT_CONTEXT),
-			this.getContext(UMB_APP_LANGUAGE_CONTEXT),
-		]);
-
-		if (!entityContext) throw new Error('Entity context not found');
-		if (!eventContext) throw new Error('Event context not found');
-		if (!appLanguageContext) throw new Error('App language context not found');
-
+		const entityContext = await this.getContext(UMB_ENTITY_CONTEXT);
+		if (!entityContext) {
+			throw new Error('Entity context not found');
+		}
 		const entityType = entityContext.getEntityType();
 		const unique = entityContext.getUnique();
 
 		const localize = new UmbLocalizationController(this);
-		const repository = new UmbDocumentPublishingRepository(this._host);
 
 		if (!entityType) throw new Error('Entity type not found');
 		if (unique === undefined) throw new Error('Entity unique not found');
 
 		// If there is only one selection, we can refer to the regular publish entity action:
 		if (this.selection.length === 1) {
-			const action = new UmbPublishDocumentEntityAction(this._host, {
+			const action = new UmbContentPublishEntityAction(this._host, {
 				unique: this.selection[0],
 				entityType: UMB_DOCUMENT_ENTITY_TYPE,
-				meta: {} as never,
+				meta: UmbDocumentPublishManifestEntityActionMeta,
 			});
 			await action.execute();
 			return;
@@ -167,7 +155,7 @@ export class UmbDocumentPublishEntityBulkAction extends UmbEntityBulkActionBase<
 
 		const [{ data: documentItems }, { data: languageData }] = await Promise.all([
 			itemRepository.requestItems(this.selection),
-			languageRepository.requestCollection({}),
+			languageRepository.requestAllItems(),
 		]);
 
 		if (!documentItems?.length) return;
@@ -180,10 +168,10 @@ export class UmbDocumentPublishEntityBulkAction extends UmbEntityBulkActionBase<
 		// If there is only one language available, or all selected documents are invariant, we can skip the modal and publish directly:
 		if (options.length === 1 || allInvariant) {
 			const confirm = await umbConfirmModal(this, {
-				headline: localize.term('content_readyToPublish'),
-				content: localize.term('prompt_confirmListViewPublish'),
+				headline: '#content_readyToPublish',
+				content: '#prompt_confirmListViewPublish',
 				color: 'positive',
-				confirmLabel: localize.term('actions_publish'),
+				confirmLabel: '#actions_publish',
 			}).catch(() => false);
 
 			if (confirm !== false) {
@@ -210,7 +198,7 @@ export class UmbDocumentPublishEntityBulkAction extends UmbEntityBulkActionBase<
 		// Pre-select all cultures from the selected documents
 		const selection: Array<string> = options.map((o) => o.unique);
 
-		const result = await umbOpenModal(this, UMB_DOCUMENT_PUBLISH_MODAL, {
+		const result = await umbOpenModal(this, UMB_CONTENT_PUBLISH_MODAL, {
 			data: {
 				options,
 			},
@@ -241,29 +229,6 @@ export class UmbDocumentPublishEntityBulkAction extends UmbEntityBulkActionBase<
 
 			await this.#reloadChildren(entityType, unique);
 		}
-
-		// Publish documents
-		const variants = variantIds.map((variantId) => ({ variantId }));
-		const { succeeded, failed } = await processDocumentsInBatches(
-			this.selection,
-			(unique) => repository.publish(unique, variants),
-			notificationContext,
-			localize.term('speechBubbles_editContentPublishedHeader'),
-		);
-
-		// Show result notification
-		showBulkResultNotification(
-			notificationContext,
-			localize,
-			'publish',
-			succeeded,
-			failed,
-			this.selection.length,
-			variantIds,
-		);
-
-		// Reload children
-		eventContext.dispatchEvent(new UmbRequestReloadChildrenOfEntityEvent({ entityType, unique }));
 	}
 
 	async #publishDocuments(uniques: Array<string>, variants: Array<{ variantId: UmbVariantId }>): Promise<number> {

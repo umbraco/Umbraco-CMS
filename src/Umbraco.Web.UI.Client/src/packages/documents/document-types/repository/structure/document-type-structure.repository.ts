@@ -7,6 +7,14 @@ export class UmbDocumentTypeStructureRepository extends UmbContentTypeStructureR
 	constructor(host: UmbControllerHost) {
 		super(host, UmbDocumentTypeStructureServerDataSource);
 	}
+
+	get #documentTypeDataSource() {
+		return this._dataSource as UmbDocumentTypeStructureServerDataSource;
+	}
+
+	async requestAllowedParentsOf(unique: string) {
+		return this.#documentTypeDataSource.getAllowedParentsOf(unique);
+	}
 }
 
 export { UmbDocumentTypeStructureRepository as api };

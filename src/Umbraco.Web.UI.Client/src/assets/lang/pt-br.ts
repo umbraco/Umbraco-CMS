@@ -525,6 +525,8 @@ export default {
 		changePassword: 'Alterar Sua Senha',
 		changePasswordDescription:
 			"você pode alterar sua senha para acessar a área administrativa do Umbraco preenchendo o formulário abaixo e clicando no botão 'Alterar Senha'",
+		confirmNewPassword: 'Confirmar nova senha',
+		confirmPassword: 'Confirmar senha',
 		disabled: 'Desabilitar Usuário',
 		language: 'Linguagem',
 		loginname: 'Login',

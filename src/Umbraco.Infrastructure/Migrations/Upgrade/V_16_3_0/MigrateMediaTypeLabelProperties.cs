@@ -12,6 +12,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_16_3_0;
 
+/// <summary>
+/// Handles the migration of label properties for media types to the updated format introduced in version 16.3.0.
+/// </summary>
 [Obsolete("Remove in Umbraco 18.")]
 public class MigrateMediaTypeLabelProperties : AsyncMigrationBase
 {
@@ -23,6 +26,12 @@ public class MigrateMediaTypeLabelProperties : AsyncMigrationBase
     private readonly Guid _labelBytesDataTypeKey = new(Constants.DataTypes.Guids.LabelBytes);
     private readonly Guid _labelPixelsDataTypeKey = new(Constants.DataTypes.Guids.LabelPixels);
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MigrateMediaTypeLabelProperties"/> class.
+    /// </summary>
+    /// <param name="context">The migration context used for logging and state management during the migration.</param>
+    /// <param name="mediaTypeService">The service used to manage media types.</param>
+    /// <param name="installDefaultDataSettings">The monitor for <see cref="InstallDefaultDataSettings"/> options.</param>
     public MigrateMediaTypeLabelProperties(
         IMigrationContext context,
         IMediaTypeService mediaTypeService,

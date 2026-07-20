@@ -129,7 +129,7 @@ internal sealed partial class MediaTypeEditingServiceTests
         Assert.Multiple(() =>
         {
             Assert.IsFalse(result.Success);
-            Assert.AreEqual(ContentTypeOperationStatus.NotAllowed, result.Status);
+            Assert.AreEqual(ContentTypeOperationStatus.SystemAliasChangeNotAllowed, result.Status);
         });
     }
 }

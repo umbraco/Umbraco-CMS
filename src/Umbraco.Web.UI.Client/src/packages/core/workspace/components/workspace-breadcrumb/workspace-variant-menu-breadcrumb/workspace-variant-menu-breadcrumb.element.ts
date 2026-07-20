@@ -9,6 +9,11 @@ import { UMB_MENU_VARIANT_STRUCTURE_WORKSPACE_CONTEXT } from '@umbraco-cms/backo
 import type { UmbAppLanguageContext } from '@umbraco-cms/backoffice/language';
 import type { UmbVariantStructureItemModel } from '@umbraco-cms/backoffice/menu';
 
+const observeDefaultLanguageSymbol = Symbol();
+const observeCurrentLanguageSymbol = Symbol();
+const observeWorkspaceActiveVariantSymbol = Symbol();
+const observeWorkspaceNameSymbol = Symbol();
+
 @customElement('umb-workspace-variant-menu-breadcrumb')
 export class UmbWorkspaceVariantMenuBreadcrumbElement extends UmbLitElement {
 	@state()
@@ -23,6 +28,9 @@ export class UmbWorkspaceVariantMenuBreadcrumbElement extends UmbLitElement {
 	@state()
 	private _appDefaultCulture?: string;
 
+	@state()
+	private _appCurrentCulture?: string;
+
 	#workspaceContext?: UmbVariantDatasetWorkspaceContext;
 	#appLanguageContext?: UmbAppLanguageContext;
 	#menuStructureContext?: typeof UMB_MENU_VARIANT_STRUCTURE_WORKSPACE_CONTEXT.TYPE;
@@ -32,7 +40,20 @@ export class UmbWorkspaceVariantMenuBreadcrumbElement extends UmbLitElement {
 
 		this.consumeContext(UMB_APP_LANGUAGE_CONTEXT, (instance) => {
 			this.#appLanguageContext = instance;
-			this.#observeDefaultCulture();
+			this.observe(
+				this.#appLanguageContext?.appDefaultLanguage,
+				(value) => {
+					this._appDefaultCulture = value?.unique;
+				},
+				observeDefaultLanguageSymbol,
+			);
+			this.observe(
+				this.#appLanguageContext?.appLanguageCulture,
+				(value) => {
+					this._appCurrentCulture = value;
+				},
+				observeCurrentLanguageSymbol,
+			);
 		});
 
 		this.consumeContext(UMB_VARIANT_WORKSPACE_CONTEXT, (instance) => {
@@ -60,22 +81,15 @@ export class UmbWorkspaceVariantMenuBreadcrumbElement extends UmbLitElement {
 		});
 	}
 
-	#observeDefaultCulture() {
-		this.observe(this.#appLanguageContext?.appDefaultLanguage, (value) => {
-			this._appDefaultCulture = value?.unique;
-		});
-	}
-
 	#observeWorkspaceActiveVariant() {
 		this.observe(
-			this.#workspaceContext?.splitView.activeVariantsInfo,
-			(value) => {
-				if (!value) return;
-				this._workspaceActiveVariantId = UmbVariantId.Create(value[0]);
+			this.#workspaceContext?.splitView.firstActiveVariantInfo,
+			(variantInfo) => {
+				if (!variantInfo) return;
+				this._workspaceActiveVariantId = UmbVariantId.Create(variantInfo);
 				this.#observeActiveVariantName();
 			},
-
-			'breadcrumbWorkspaceActiveVariantObserver',
+			observeWorkspaceActiveVariantSymbol,
 		);
 	}
 
@@ -83,7 +97,7 @@ export class UmbWorkspaceVariantMenuBreadcrumbElement extends UmbLitElement {
 		this.observe(
 			this.#workspaceContext?.name(this._workspaceActiveVariantId),
 			(value) => (this._name = value || ''),
-			'breadcrumbWorkspaceNameObserver',
+			observeWorkspaceNameSymbol,
 		);
 	}
 
@@ -97,14 +111,38 @@ export class UmbWorkspaceVariantMenuBreadcrumbElement extends UmbLitElement {
 			}
 		}
 
-		// If the active workspace is invariant, we will try to find the variant that matches the app default culture.
-		const variant = structureItem.variants.find((variant) => variant.culture === this._appDefaultCulture);
+		// Next try to find the variant that matches the current app culture.
+		const variant = structureItem.variants.find(
+			(variant) => variant.culture === this._appCurrentCulture && variant.segment === null,
+		);
 		if (variant) {
+			if (this._workspaceActiveVariantId?.isInvariant()) {
+				// If the active variant is invariant, we return the default name as the name without parentheses.
+				// Cause it is the name, not an inherited/borrowed name. [NL]
+				return variant.name;
+			}
 			return `(${variant.name})`;
 		}
 
-		// If an active variant can not be found, then we fallback to the first variant name or a generic "unknown" label.
-		return structureItem.variants?.[0]?.name ?? '(#general_unknown)';
+		// Next try to find the variant that matches the app default culture.
+		const defaultVariant = structureItem.variants.find(
+			(variant) => variant.culture === this._appDefaultCulture && variant.segment === null,
+		);
+		if (defaultVariant) {
+			return `(${defaultVariant.name})`;
+		}
+
+		// Next try to find the invariant variant name.
+		const invariantVariant = structureItem.variants.find(
+			(variant) => variant.culture === null && variant.segment === null,
+		);
+		if (invariantVariant) {
+			return invariantVariant.name;
+		}
+
+		// Last return the name of the first variant in the list.
+		const lastResort = structureItem.variants?.[0]?.name;
+		return lastResort ? `(${lastResort})` : '(#general_unknown)';
 	}
 
 	#getHref(structureItem: UmbVariantStructureItemModel) {

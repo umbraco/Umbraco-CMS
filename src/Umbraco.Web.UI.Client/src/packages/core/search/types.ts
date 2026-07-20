@@ -3,6 +3,7 @@ import type { UmbItemModel } from '@umbraco-cms/backoffice/entity-item';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import type { FieldPresentationModel, SearchResultResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbPagedModel, UmbRepositoryResponse } from '@umbraco-cms/backoffice/repository';
+import type { UmbOffsetPaginationRequestModel } from '@umbraco-cms/backoffice/utils';
 
 export type { UmbSearchDataSource } from './search-data-source.interface.js';
 export type { UmbSearchRepository } from './search-repository.interface.js';
@@ -19,6 +20,7 @@ export interface UmbSearchResultItemModel extends UmbItemModel {
 export type UmbSearchRequestArgs = {
 	query: string;
 	searchFrom?: UmbEntityModel;
+	paging?: UmbOffsetPaginationRequestModel;
 };
 
 export type UmbSearchFieldPresentationModel = FieldPresentationModel;

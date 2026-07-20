@@ -7,7 +7,14 @@ namespace Umbraco.Cms.Infrastructure.ModelsBuilder;
 [AttributeUsage(AttributeTargets.Property /*, AllowMultiple = false, Inherited = false*/)]
 public class ImplementPropertyTypeAttribute : Attribute
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ImplementPropertyTypeAttribute"/> class using the specified property alias.
+    /// </summary>
+    /// <param name="alias">The property alias associated with this attribute.</param>
     public ImplementPropertyTypeAttribute(string alias) => Alias = alias;
 
+    /// <summary>
+    /// Gets the alias that identifies the property type implemented by this attribute.
+    /// </summary>
     public string Alias { get; }
 }

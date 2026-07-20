@@ -1,27 +1,68 @@
 namespace Umbraco.Cms.Core.Services.Changes;
 
+/// <summary>
+///     Represents the types of changes that can occur on a content type.
+/// </summary>
 [Flags]
 public enum ContentTypeChangeTypes : byte
 {
+    /// <summary>
+    ///     No change has occurred.
+    /// </summary>
     None = 0,
 
     /// <summary>
-    ///     Item type has been created, no impact
+    ///     Item type has been created, no impact.
     /// </summary>
     Create = 1,
 
     /// <summary>
-    ///     Content type changes impact only the Content type being saved
+    ///     Content type changes directly impact existing content of this content type.
     /// </summary>
+    /// <remarks>
+    ///     These changes are "destructive" of nature. They include:
+    ///     - Changing the content type alias.
+    ///     - Removing a property type or a composition.
+    ///     - Changing the alias of a property type (this effectively corresponds to removing a property type).
+    ///     - Changing variance, either at property or content type level.
+    /// </remarks>
     RefreshMain = 2,
 
     /// <summary>
-    ///     Content type changes impacts the content type being saved and others used that are composed of it
+    ///     Content type changes that do not directly impact existing content of this content type.
     /// </summary>
-    RefreshOther = 4, // changed, other change
+    /// <remarks>
+    ///     These changes are "constructive" of nature, and include all changes not included in
+    ///     <see cref="RefreshMain"/> - for example:
+    ///     - Adding a property type or a composition.
+    ///     - Rearranging property types or groups.
+    ///     - Changes to name, description, icon etc.
+    ///     - Changes to other content type settings, i.e. allowed child types and version cleanup.
+    /// </remarks>
+    RefreshOther = 4,
 
     /// <summary>
-    ///     Content type was removed
+    ///     Content type was removed.
     /// </summary>
     Remove = 8,
+
+    /// <summary>
+    ///     Content type variation setting has changed (e.g., from invariant to variant or vice versa).
+    ///     This impacts how URL segments and aliases are stored (NULL languageId for invariant, specific ID for variant).
+    /// </summary>
+    VariationChanged = 16,
+
+    /// <summary>
+    ///     Supplements <see cref="RefreshMain"/> to indicate that, although the change is structural, the raw
+    ///     content data stored in the database cache (<c>cmsContentNu</c>) does not need rebuilding.
+    /// </summary>
+    /// <remarks>
+    ///     Set for a change whose only structural impact is the removal of a property type: the stored blob keeps
+    ///     the removed property's data, but it is never read because published content is always resolved against
+    ///     the current content type (a removed alias simply no longer maps to a property type). The converted
+    ///     in-memory cache is still cleared, and all other <see cref="RefreshMain"/> handling (e.g. search
+    ///     re-indexing, published content type cache clearing) still runs — only the expensive
+    ///     <c>cmsContentNu</c> rebuild is skipped.
+    /// </remarks>
+    RawDataUnaffected = 32,
 }

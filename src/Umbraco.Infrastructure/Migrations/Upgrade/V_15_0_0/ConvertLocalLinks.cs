@@ -6,6 +6,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
+using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
@@ -40,6 +41,17 @@ public class ConvertLocalLinks : MigrationBase
     /// <summary>
     /// Initializes a new instance of the <see cref="ConvertLocalLinks"/> class.
     /// </summary>
+    /// <param name="context">The migration context for the upgrade process.</param>
+    /// <param name="umbracoContextFactory">Factory for creating Umbraco context instances.</param>
+    /// <param name="contentTypeService">Service for managing content types.</param>
+    /// <param name="logger">The logger used for logging migration operations.</param>
+    /// <param name="dataTypeService">Service for managing data types.</param>
+    /// <param name="languageService">Service for managing languages.</param>
+    /// <param name="jsonSerializer">Serializer for handling JSON data.</param>
+    /// <param name="localLinkProcessor">Processor for handling local links in content.</param>
+    /// <param name="mediaTypeService">Service for managing media types.</param>
+    /// <param name="coreScopeProvider">Provider for managing database scopes.</param>
+    /// <param name="linkMigrationTracker">Tracks the progress of local link migrations.</param>
     public ConvertLocalLinks(
         IMigrationContext context,
         IUmbracoContextFactory umbracoContextFactory,
@@ -67,8 +79,18 @@ public class ConvertLocalLinks : MigrationBase
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="ConvertLocalLinks"/> class.
+    /// Initializes a new instance of the <see cref="ConvertLocalLinks"/> class, used for migrating and converting local links during the upgrade process.
     /// </summary>
+    /// <param name="context">The migration context providing state and services for the migration.</param>
+    /// <param name="umbracoContextFactory">Factory for creating Umbraco context instances.</param>
+    /// <param name="contentTypeService">Service for managing content types.</param>
+    /// <param name="logger">The logger used for logging migration operations.</param>
+    /// <param name="dataTypeService">Service for managing data types.</param>
+    /// <param name="languageService">Service for managing languages.</param>
+    /// <param name="jsonSerializer">Serializer for handling JSON data.</param>
+    /// <param name="localLinkProcessor">Processor for handling local link conversion logic.</param>
+    /// <param name="mediaTypeService">Service for managing media types.</param>
+    /// <param name="coreScopeProvider">Provider for managing database transaction scopes.</param>
     [Obsolete("Please use the constructor taking all parameters. Scheduled for removal along with all other migrations to 17 in Umbraco 18.")]
     public ConvertLocalLinks(
         IMigrationContext context,
@@ -311,31 +333,23 @@ public class ConvertLocalLinks : MigrationBase
         IDictionary<int, ILanguage> languagesById,
         IDataValueEditor valueEditor)
     {
-        // NOTE: some old property data DTOs can have variance defined, even if the property type no longer varies
-        var culture = propertyType.VariesByCulture()
-                      && propertyDataDto.LanguageId.HasValue
-                      && languagesById.TryGetValue(propertyDataDto.LanguageId.Value, out ILanguage? language)
-            ? language.IsoCode
-            : null;
-
-        if (culture is null && propertyType.VariesByCulture())
+        var cultureResult = PropertyDataCultureResolver.ResolveCulture(propertyType, propertyDataDto.LanguageId, languagesById);
+        if (cultureResult.ShouldSkip)
         {
-            // if we end up here, the property DTO is bound to a language that no longer exists. this is an error scenario,
-            // and we can't really handle it in any other way than logging; in all likelihood this is an old property version,
-            // and it won't cause any runtime issues
             _logger.LogWarning(
-                "    - property data with id: {propertyDataId} references a language that does not exist - language id: {languageId} (property type: {propertyTypeName}, id: {propertyTypeId}, alias: {propertyTypeAlias})",
+                PropertyDataCultureResolver.OrphanedLanguageWarningTemplate,
                 propertyDataDto.Id,
-                propertyDataDto.LanguageId,
+                cultureResult.OrphanedLanguageId,
                 propertyType.Name,
                 propertyType.Id,
                 propertyType.Alias);
             return false;
         }
 
+        var culture = cultureResult.Culture;
+
         var segment = propertyType.VariesBySegment() ? propertyDataDto.Segment : null;
-        var property = new Property(propertyType);
-        property.SetValue(propertyDataDto.Value, culture, segment);
+        var property = PropertyDataCultureResolver.CreateMigrationProperty(propertyType, propertyDataDto.Value, culture, segment);
         var toEditorValue = valueEditor.ToEditor(property, culture, segment);
 
         if (_localLinkProcessor.ProcessToEditorValue(toEditorValue) == false)
@@ -350,7 +364,18 @@ public class ConvertLocalLinks : MigrationBase
         }
 
         var editorValue = _jsonSerializer.Serialize(toEditorValue);
-        var dbValue = valueEditor.FromEditor(new ContentPropertyData(editorValue, null), null);
+
+        // Re-running FromEditor here is only to re-serialize the converted value; the referenced-entity
+        // caching it would otherwise trigger is wasted work that issues per-property content/media reads
+        // in separate scopes, contending with this migration's own scope. Suppress it.
+        object? dbValue;
+#pragma warning disable CS0618 // Type or member is obsolete
+        using (CacheReferencedEntitiesSuppression.Suppress())
+        {
+            dbValue = valueEditor.FromEditor(new ContentPropertyData(editorValue, null), null);
+        }
+#pragma warning restore CS0618 // Type or member is obsolete
+
         if (dbValue is not string stringValue || stringValue.DetectIsJson() is false)
         {
             _logger.LogWarning(

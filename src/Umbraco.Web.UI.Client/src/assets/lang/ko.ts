@@ -261,6 +261,7 @@ export default {
 		constrainProportions: '비율 맞추기',
 		continue: '계속',
 		copy: '복사',
+		copied: '복사됨!',
 		create: '생성',
 		database: '데이타베이스',
 		date: '날짜',
@@ -759,6 +760,8 @@ export default {
 		changePassword: 'Change Your Password',
 		changePasswordDescription:
 			"You can change your password for accessing the Umbraco backoffice by filling out the form below and click the 'Change Password' button",
+		confirmNewPassword: '새 비밀번호 확인',
+		confirmPassword: '비밀번호 확인',
 		contentChannel: '컨텐츠 채널',
 		descriptionField: '설명 필드',
 		disabled: '사용자 비활성화',

@@ -88,4 +88,18 @@ public abstract class RepositoryBase : IRepository
     /// Quotes a column name according to the registered SQL syntax provider.
     /// </summary>
     protected string QuoteColumnName(string? columnName) => SqlSyntax.GetQuotedColumnName(columnName);
+
+    /// <summary>
+    /// Returns the column name, qualified by the specified table name, with appropriate quoting for use in SQL
+    /// statements.
+    /// </summary>
+    /// <param name="tableName">The name of the table to qualify the column with. Cannot be null or empty.</param>
+    /// <param name="columnName">The name of the column to quote. Cannot be null or empty.</param>
+    /// <returns>A string containing the quoted and qualified column name suitable for use in SQL queries.</returns>
+    protected string QuoteColumnName(string tableName, string columnName) => SqlSyntax.GetQuotedColumn(tableName, columnName);
+
+    /// <summary>
+    /// Quotes a column name according to the registered SQL syntax provider.
+    /// </summary>
+    protected string QuoteName(string? name) => SqlSyntax.GetQuotedName(name);
 }

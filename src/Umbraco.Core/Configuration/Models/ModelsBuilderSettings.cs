@@ -12,12 +12,36 @@ namespace Umbraco.Cms.Core.Configuration.Models;
 [UmbracoOptions(Constants.Configuration.ConfigModelsBuilder, BindNonPublicProperties = true)]
 public class ModelsBuilderSettings
 {
+    /// <summary>
+    ///     The default models mode.
+    /// </summary>
     internal const string StaticModelsMode = "InMemoryAuto";
+
+    /// <summary>
+    ///     The default models directory path.
+    /// </summary>
     internal const string StaticModelsDirectory = "~/umbraco/models";
+
+    /// <summary>
+    ///     The default value for accepting unsafe models directory.
+    /// </summary>
     internal const bool StaticAcceptUnsafeModelsDirectory = false;
+
+    /// <summary>
+    ///     The default debug level.
+    /// </summary>
     internal const int StaticDebugLevel = 0;
+
+    /// <summary>
+    ///     The default value for including version number in generated models.
+    /// </summary>
     internal const bool StaticIncludeVersionNumberInGeneratedModels = true;
+
+    /// <summary>
+    ///     The default value for generating virtual properties.
+    /// </summary>
     internal const bool StaticGenerateVirtualProperties = true;
+
     private bool _flagOutOfDateModels = true;
 
     /// <summary>

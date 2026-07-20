@@ -7,9 +7,19 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Webhooks.Events;
 
+/// <summary>
+/// Webhook event that fires when a public access entry is saved.
+/// </summary>
 [WebhookEvent("Public Access Entry Saved")]
 public class PublicAccessEntrySavedWebhookEvent : WebhookEventBase<PublicAccessEntrySavedNotification>
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PublicAccessEntrySavedWebhookEvent"/> class.
+    /// </summary>
+    /// <param name="webhookFiringService">The webhook firing service.</param>
+    /// <param name="webHookService">The webhook service.</param>
+    /// <param name="webhookSettings">The webhook settings.</param>
+    /// <param name="serverRoleAccessor">The server role accessor.</param>
     public PublicAccessEntrySavedWebhookEvent(
         IWebhookFiringService webhookFiringService,
         IWebhookService webHookService,
@@ -19,8 +29,10 @@ public class PublicAccessEntrySavedWebhookEvent : WebhookEventBase<PublicAccessE
     {
     }
 
+    /// <inheritdoc />
     public override string Alias => Constants.WebhookEvents.Aliases.PublicAccessEntrySaved;
 
+    /// <inheritdoc />
     public override object ConvertNotificationToRequestPayload(PublicAccessEntrySavedNotification notification)
         => notification.SavedEntities.Select(entity => new DefaultPayloadModel { Id = entity.Key });
 }

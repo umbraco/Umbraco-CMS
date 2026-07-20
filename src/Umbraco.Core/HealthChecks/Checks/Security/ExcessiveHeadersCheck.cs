@@ -32,15 +32,11 @@ public class ExcessiveHeadersCheck : HealthCheck
 
     private static HttpClient HttpClient => httpClient ??= new HttpClient();
 
-    /// <summary>
-    ///     Get the status for this health check
-    /// </summary>
+    /// <inheritdoc />
     public override async Task<IEnumerable<HealthCheckStatus>> GetStatusAsync()
         => [await CheckForHeaders()];
 
-    /// <summary>
-    ///     Executes the action and returns it's status
-    /// </summary>
+    /// <inheritdoc />
     public override HealthCheckStatus ExecuteAction(HealthCheckAction action)
         => throw new InvalidOperationException("ExcessiveHeadersCheck has no executable actions");
 
@@ -49,6 +45,16 @@ public class ExcessiveHeadersCheck : HealthCheck
         string message;
         var success = false;
         var url = _hostingEnvironment.ApplicationMainUrl?.GetLeftPart(UriPartial.Authority);
+
+        if (url is null)
+        {
+            return new HealthCheckStatus(
+                _textService.Localize("healthcheck", "httpsCheckNoApplicationUrl"))
+            {
+                ResultType = StatusResultType.Info,
+                ReadMoreLink = Constants.HealthChecks.DocumentationLinks.Security.ExcessiveHeadersCheck,
+            };
+        }
 
         // Access the site home page and check for the headers
         using var request = new HttpRequestMessage(HttpMethod.Head, url);

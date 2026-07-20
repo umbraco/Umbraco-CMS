@@ -10,6 +10,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
+/// <summary>
+/// Provides methods for generating URLs for documents within the Umbraco CMS management API.
+/// </summary>
 public class DocumentUrlFactory : IDocumentUrlFactory
 {
     private readonly IPublishedUrlInfoProvider _publishedUrlInfoProvider;
@@ -18,6 +21,14 @@ public class DocumentUrlFactory : IDocumentUrlFactory
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly ILogger<DocumentUrlFactory> _logger;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DocumentUrlFactory"/> class.
+    /// </summary>
+    /// <param name="publishedUrlInfoProvider">Provides information about published URLs.</param>
+    /// <param name="urlProviders">A collection of URL providers used to resolve document URLs.</param>
+    /// <param name="previewService">Service for handling content preview functionality.</param>
+    /// <param name="backOfficeSecurityAccessor">Provides access to the back office security context.</param>
+    /// <param name="logger">The logger used for logging within this factory.</param>
     public DocumentUrlFactory(
         IPublishedUrlInfoProvider publishedUrlInfoProvider,
         UrlProviderCollection urlProviders,
@@ -32,21 +43,49 @@ public class DocumentUrlFactory : IDocumentUrlFactory
         _logger = logger;
     }
 
-    public async Task<IEnumerable<DocumentUrlInfo>> CreateUrlsAsync(IContent content)
+    /// <summary>
+    /// Asynchronously generates a collection of <see cref="DocumentUrlInfo"/> instances representing the URLs for the specified content item.
+    /// </summary>
+    /// <param name="content">The content item for which to generate URLs.</param>
+    /// <returns>A task representing the asynchronous operation. The task result contains an <see cref="IEnumerable{DocumentUrlInfo}"/> with the generated URLs.</returns>
+    public Task<IEnumerable<DocumentUrlInfo>> CreateUrlsAsync(IContent content)
+        => CreateUrlsAsync(content, culture: null);
+
+    /// <summary>
+    /// Asynchronously generates a collection of <see cref="DocumentUrlInfo"/> instances representing the URLs for the specified content item, optionally restricted to a single culture.
+    /// </summary>
+    /// <param name="content">The content item for which to generate URLs.</param>
+    /// <param name="culture">The culture to restrict variant content urls to, or <c>null</c> for all cultures.</param>
+    /// <returns>A task representing the asynchronous operation. The task result contains an <see cref="IEnumerable{DocumentUrlInfo}"/> with the generated URLs.</returns>
+    public async Task<IEnumerable<DocumentUrlInfo>> CreateUrlsAsync(IContent content, string? culture)
     {
-        ISet<UrlInfo> urlInfos = await _publishedUrlInfoProvider.GetAllAsync(content);
+        ISet<UrlInfo> urlInfos = await _publishedUrlInfoProvider.GetAllAsync(content, culture);
         return urlInfos
             .Select(CreateDocumentUrlInfo)
             .ToArray();
     }
 
-    public async Task<IEnumerable<DocumentUrlInfoResponseModel>> CreateUrlSetsAsync(IEnumerable<IContent> contentItems)
+    /// <summary>
+    /// Asynchronously creates URL sets for the specified collection of content items.
+    /// </summary>
+    /// <param name="contentItems">The collection of <see cref="IContent"/> items for which to generate URL sets.</param>
+    /// <returns>A task representing the asynchronous operation. The task result contains a collection of <see cref="DocumentUrlInfoResponseModel"/> objects, each representing the URL set for a content item.</returns>
+    public Task<IEnumerable<DocumentUrlInfoResponseModel>> CreateUrlSetsAsync(IEnumerable<IContent> contentItems)
+        => CreateUrlSetsAsync(contentItems, culture: null);
+
+    /// <summary>
+    /// Asynchronously creates URL sets for the specified collection of content items, optionally restricted to a single culture.
+    /// </summary>
+    /// <param name="contentItems">The collection of <see cref="IContent"/> items for which to generate URL sets.</param>
+    /// <param name="culture">The culture to restrict variant content urls to, or <c>null</c> for all cultures.</param>
+    /// <returns>A task representing the asynchronous operation. The task result contains a collection of <see cref="DocumentUrlInfoResponseModel"/> objects, each representing the URL set for a content item.</returns>
+    public async Task<IEnumerable<DocumentUrlInfoResponseModel>> CreateUrlSetsAsync(IEnumerable<IContent> contentItems, string? culture)
     {
         var documentUrlInfoResourceSets = new List<DocumentUrlInfoResponseModel>();
 
         foreach (IContent content in contentItems)
         {
-            IEnumerable<DocumentUrlInfo> urls = await CreateUrlsAsync(content);
+            IEnumerable<DocumentUrlInfo> urls = await CreateUrlsAsync(content, culture);
             documentUrlInfoResourceSets.Add(new DocumentUrlInfoResponseModel(content.Key, urls));
         }
 
@@ -81,7 +120,7 @@ public class DocumentUrlFactory : IDocumentUrlFactory
 
             if (await _previewService.TryEnterPreviewAsync(currentUser) is false)
             {
-                _logger.LogError("A server error occured, could not initiate an authenticated preview state for the current user.");
+                _logger.LogError("A server error occurred, could not initiate an authenticated preview state for the current user.");
                 return null;
             }
         }

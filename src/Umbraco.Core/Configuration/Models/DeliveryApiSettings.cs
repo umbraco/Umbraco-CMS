@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 
 namespace Umbraco.Cms.Core.Configuration.Models;
 
@@ -225,9 +225,15 @@ public class DeliveryApiSettings
         [DefaultValue(StaticEnabled)]
         public bool Enabled { get; set; } = StaticEnabled;
 
+        /// <summary>
+        ///     Gets or sets the collection of members associated with client credentials for authorization.
+        /// </summary>
         public IEnumerable<ClientCredentialsFlowMemberSettings> AssociatedMembers { get; set; } = [];
     }
 
+    /// <summary>
+    ///     Typed configuration options for Client Credentials Flow member association settings.
+    /// </summary>
     public class ClientCredentialsFlowMemberSettings
     {
         /// <summary>

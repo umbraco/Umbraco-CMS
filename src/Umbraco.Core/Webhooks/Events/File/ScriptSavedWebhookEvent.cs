@@ -7,9 +7,19 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Webhooks.Events;
 
+/// <summary>
+/// Webhook event that fires when a script is saved.
+/// </summary>
 [WebhookEvent("Script Saved")]
 public class ScriptSavedWebhookEvent : WebhookEventBase<ScriptSavedNotification>
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ScriptSavedWebhookEvent"/> class.
+    /// </summary>
+    /// <param name="webhookFiringService">The webhook firing service.</param>
+    /// <param name="webHookService">The webhook service.</param>
+    /// <param name="webhookSettings">The webhook settings.</param>
+    /// <param name="serverRoleAccessor">The server role accessor.</param>
     public ScriptSavedWebhookEvent(
         IWebhookFiringService webhookFiringService,
         IWebhookService webHookService,
@@ -19,8 +29,10 @@ public class ScriptSavedWebhookEvent : WebhookEventBase<ScriptSavedNotification>
     {
     }
 
+    /// <inheritdoc />
     public override string Alias => Constants.WebhookEvents.Aliases.ScriptSaved;
 
+    /// <inheritdoc />
     public override object ConvertNotificationToRequestPayload(ScriptSavedNotification notification)
         => notification.SavedEntities.Select(entity => new DefaultPayloadModel { Id = entity.Key });
 }

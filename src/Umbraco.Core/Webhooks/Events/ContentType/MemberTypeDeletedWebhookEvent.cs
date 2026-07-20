@@ -7,9 +7,19 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Webhooks.Events;
 
+/// <summary>
+/// Webhook event that fires when a member type is deleted.
+/// </summary>
 [WebhookEvent("Member Type Deleted")]
 public class MemberTypeDeletedWebhookEvent : WebhookEventBase<MemberTypeDeletedNotification>
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MemberTypeDeletedWebhookEvent"/> class.
+    /// </summary>
+    /// <param name="webhookFiringService">The webhook firing service.</param>
+    /// <param name="webHookService">The webhook service.</param>
+    /// <param name="webhookSettings">The webhook settings.</param>
+    /// <param name="serverRoleAccessor">The server role accessor.</param>
     public MemberTypeDeletedWebhookEvent(
         IWebhookFiringService webhookFiringService,
         IWebhookService webHookService,
@@ -19,8 +29,10 @@ public class MemberTypeDeletedWebhookEvent : WebhookEventBase<MemberTypeDeletedN
     {
     }
 
+    /// <inheritdoc />
     public override string Alias => Constants.WebhookEvents.Aliases.MemberTypeDeleted;
 
+    /// <inheritdoc />
     public override object ConvertNotificationToRequestPayload(MemberTypeDeletedNotification notification)
         => notification.DeletedEntities.Select(entity => new DefaultPayloadModel { Id = entity.Key });
 }

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Controllers.RecycleBin;
 using Umbraco.Cms.Api.Management.Factories;
@@ -13,6 +13,9 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Document.RecycleBin;
 
+/// <summary>
+/// Serves as the base controller for handling operations related to the document recycle bin in the management API.
+/// </summary>
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.RecycleBin}/{Constants.UdiEntityType.Document}")]
 [RequireDocumentTreeRootAccess]
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Document))]
@@ -21,6 +24,11 @@ public class DocumentRecycleBinControllerBase : RecycleBinControllerBase<Documen
 {
     private readonly IDocumentPresentationFactory _documentPresentationFactory;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DocumentRecycleBinControllerBase"/> class.
+    /// </summary>
+    /// <param name="entityService">Service used for entity operations within the recycle bin.</param>
+    /// <param name="documentPresentationFactory">Factory responsible for creating document presentation models.</param>
     public DocumentRecycleBinControllerBase(IEntityService entityService, IDocumentPresentationFactory documentPresentationFactory)
         : base(entityService)
         => _documentPresentationFactory = documentPresentationFactory;

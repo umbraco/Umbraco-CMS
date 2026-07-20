@@ -1,41 +1,98 @@
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.ActionsResults;
 
 namespace Umbraco.Cms.Web.Common.Controllers;
 
-internal sealed class MaintenanceModeActionFilterAttribute : TypeFilterAttribute
+/// <summary>
+/// Represents an action filter attribute that enforces maintenance mode by displaying a maintenance page during
+/// application upgrades.
+/// </summary>
+public sealed class MaintenanceModeActionFilterAttribute : TypeFilterAttribute
 {
 
-    public MaintenanceModeActionFilterAttribute() : base(typeof(MaintenanceModeActionFilter)) => Order = int.MinValue; // Ensures this run as the first filter.
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MaintenanceModeActionFilterAttribute"/> class.
+    /// </summary>
+    public MaintenanceModeActionFilterAttribute()
+        : base(typeof(MaintenanceModeActionFilter)) => Order = int.MinValue; // Ensures this run as the first filter.
 
     private sealed class MaintenanceModeActionFilter : IActionFilter
     {
         private readonly IRuntimeState _runtimeState;
         private readonly IOptionsMonitor<GlobalSettings> _globalSettings;
+        private readonly IContentRoutingReadiness _contentRoutingReadiness;
 
-        public MaintenanceModeActionFilter(IRuntimeState runtimeState, IOptionsMonitor<GlobalSettings> globalSettings)
+        public MaintenanceModeActionFilter(
+            IRuntimeState runtimeState,
+            IOptionsMonitor<GlobalSettings> globalSettings,
+            IContentRoutingReadiness contentRoutingReadiness)
         {
             _runtimeState = runtimeState;
             _globalSettings = globalSettings;
+            _contentRoutingReadiness = contentRoutingReadiness;
         }
 
         public void OnActionExecuting(ActionExecutingContext context)
         {
-            if (_runtimeState.Level == RuntimeLevel.Upgrade && _globalSettings.CurrentValue.ShowMaintenancePageWhenInUpgradeState)
+            if (context.ActionDescriptor.EndpointMetadata.OfType<SkipMaintenanceModeFilterAttribute>().Any())
             {
-                context.Result = new MaintenanceResult();
+                return;
             }
 
+            if (_globalSettings.CurrentValue.ShowMaintenancePageWhenInUpgradeState is false)
+            {
+                return;
+            }
+
+            bool isApiController = context.ActionDescriptor.EndpointMetadata.OfType<ApiControllerAttribute>().Any();
+
+            // After a background unattended upgrade the runtime reaches Run before this server has finished
+            // seeding its per-server content caches. Treat that window like an ongoing unattended upgrade so
+            // requests don't reach the pipeline before it's ready to serve. See #22581.
+            bool inInitializationWindow = _contentRoutingReadiness.IsInInitializationWindow(_runtimeState);
+
+            // API controllers (Management/Delivery API) are only blocked during an unattended upgrade
+            // (RuntimeLevel.Upgrading) and the subsequent initialization window. During an attended upgrade
+            // (RuntimeLevel.Upgrade) the operator needs API access to log in and trigger the upgrade from the
+            // backoffice. MVC controllers (website, surface) are blocked during both Upgrade and Upgrading.
+            bool shouldBlock = isApiController
+                ? _runtimeState.Level is RuntimeLevel.Upgrading || inInitializationWindow
+                : _runtimeState.Level is RuntimeLevel.Upgrade or RuntimeLevel.Upgrading || inInitializationWindow;
+
+            if (shouldBlock is false)
+            {
+                return;
+            }
+
+            if (isApiController)
+            {
+                // Distinguish the two blocking states so clients can tell "still starting up" from an actual upgrade.
+                var problem = new ProblemDetails
+                {
+                    Status = StatusCodes.Status503ServiceUnavailable,
+                    Title = "Service Unavailable",
+                    Detail = inInitializationWindow
+                        ? "The application is starting up and is not yet ready to handle requests. Please try again shortly."
+                        : "The application is currently being upgraded. Please try again later.",
+                };
+                context.Result = new ObjectResult(problem) { StatusCode = StatusCodes.Status503ServiceUnavailable };
+                return;
+            }
+
+            context.Result = _runtimeState.Level is RuntimeLevel.Upgrading || inInitializationWindow
+                ? new MaintenanceResult(_globalSettings.CurrentValue.UpgradingViewPath)
+                : new MaintenanceResult();
         }
 
         public void OnActionExecuted(ActionExecutedContext context)
         {
-
         }
     }
 }

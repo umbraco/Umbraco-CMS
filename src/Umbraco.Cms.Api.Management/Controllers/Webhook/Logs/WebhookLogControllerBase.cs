@@ -10,6 +10,9 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Webhook.Logs;
 
+/// <summary>
+/// Serves as the base controller for handling operations related to webhook logs in the management API.
+/// </summary>
 [VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.Webhook}")]
 [ApiExplorerSettings(GroupName = "Webhook")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessWebhooks)]

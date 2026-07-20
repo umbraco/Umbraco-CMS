@@ -2,8 +2,16 @@ using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Persistence.Repositories;
 
+/// <summary>
+///     Represents a repository for <see cref="ILanguage" /> entities.
+/// </summary>
 public interface ILanguageRepository : IReadWriteQueryRepository<int, ILanguage>
 {
+    /// <summary>
+    ///     Gets a language by its ISO code.
+    /// </summary>
+    /// <param name="isoCode">The ISO code of the language.</param>
+    /// <returns>The language if found; otherwise, <c>null</c>.</returns>
     ILanguage? GetByIsoCode(string isoCode);
 
     /// <summary>

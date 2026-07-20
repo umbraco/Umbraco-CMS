@@ -1,21 +1,21 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
 using System.Text.RegularExpressions;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Logging;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Implementations;
 using Umbraco.Cms.Tests.Integration.Testing;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.NPocoTests;
 
-// TODO: npoco - is this still appropriate?
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
 internal sealed class NPocoBulkInsertTests : UmbracoIntegrationTest
@@ -204,6 +204,124 @@ internal sealed class NPocoBulkInsertTests : UmbracoIntegrationTest
         foreach (var s in commands.Select(x => x.CommandText))
         {
             Assert.LessOrEqual(Regex.Matches(s, "@\\d+").Count, 2000);
+        }
+    }
+
+    [Test]
+    public async Task InsertBulk_Does_Not_Create_Untrusted_Foreign_Key_Constraints()
+    {
+        if (BaseTestDatabase.IsSqlServer() is false)
+        {
+            Assert.Ignore("This test only applies to SQL Server (SQLite has no constraint trust concept).");
+        }
+
+        // Updating property data invokes SQL bulk insert, so we'll replicate that scenario for testing.
+
+        // Create a content item so we have valid FK references for PropertyDataDto.
+        var contentTypeService = Services.GetRequiredService<IContentTypeService>();
+        var contentService = Services.GetRequiredService<IContentService>();
+        var templateService = Services.GetRequiredService<ITemplateService>();
+
+        var template = TemplateBuilder.CreateTextPageTemplate("defaultTemplate");
+        await templateService.CreateAsync(template, Constants.Security.SuperUserKey);
+
+        var contentType = ContentTypeBuilder.CreateSimpleContentType("testPage", "Test Page", defaultTemplateId: template.Id);
+        await contentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+
+        var content = ContentBuilder.CreateSimpleContent(contentType);
+        contentService.Save(content);
+
+        // Replicate what ContentRepositoryBase.ReplacePropertyValues does:
+        // delete existing property data for the version, then re-insert via InsertBulk.
+        //
+        // NPoco's Database.InsertBulk() dispatches to DatabaseType.InsertBulk() →
+        // SqlBulkCopyHelper.BulkInsert(). Without our UmbracoSqlServerDatabaseType override,
+        // NPoco uses SqlBulkCopyOptions.Default which bypasses FK validation during SqlBulkCopy,
+        // causing SQL Server to mark constraints as untrusted (is_not_trusted = 1).
+        using (ScopeProvider.CreateScope(autoComplete: true))
+        {
+            var db = ScopeAccessor.AmbientScope!.Database;
+
+            // Fetch existing property data for this content's version.
+            var versionId = content.VersionId;
+            var existing = db.Fetch<PropertyDataDto>(
+                db.SqlContext.Sql()
+                    .Select("*")
+                    .From<PropertyDataDto>()
+                    .Where<PropertyDataDto>(x => x.VersionId == versionId));
+            Assert.That(existing, Has.Count.GreaterThan(0), "Content save should have created property data.");
+
+            // Delete existing rows, then re-insert them via InsertBulk (mirroring ReplacePropertyValues).
+            db.Execute(
+                db.SqlContext.Sql()
+                    .Delete<PropertyDataDto>()
+                    .Where<PropertyDataDto>(x => x.VersionId == versionId));
+
+            foreach (var dto in existing)
+            {
+                dto.Id = 0; // reset PK so InsertBulk generates new identity values
+            }
+
+            db.InsertBulk(existing);
+
+            var untrustedCount = db.ExecuteScalar<int>(
+                @"SELECT COUNT(*)
+                  FROM sys.foreign_keys
+                  WHERE is_not_trusted = 1
+                    AND OBJECT_NAME(parent_object_id) = @0",
+                "umbracoPropertyData");
+
+            Assert.That(
+                untrustedCount,
+                Is.EqualTo(0),
+                "FK constraints on umbracoPropertyData should be trusted after InsertBulk. " +
+                "NPoco's InsertBulk with SqlBulkCopyOptions.Default causes constraints to become untrusted.");
+        }
+    }
+
+    [Test]
+    public async Task InsertBulkAsync_Does_Not_Create_Untrusted_Foreign_Key_Constraints()
+    {
+        if (BaseTestDatabase.IsSqlServer() is false)
+        {
+            Assert.Ignore("This test only applies to SQL Server (SQLite has no constraint trust concept).");
+        }
+
+        // Replicate what WebhookRepository does when saving a webhook with associated events:
+        // insert the webhook row, then InsertBulkAsync the event associations.
+        using (ScopeProvider.CreateScope(autoComplete: true))
+        {
+            var db = ScopeAccessor.AmbientScope!.Database;
+
+            // Insert a parent webhook row so the FK reference is valid.
+            var webhookDto = new WebhookDto
+            {
+                Key = Guid.NewGuid(),
+                Url = "https://example.com/hook",
+                Enabled = true,
+            };
+            await db.InsertAsync(webhookDto);
+
+            // InsertBulkAsync the event associations (mirrors WebhookRepository.CreateAsync).
+            var eventDtos = new List<Webhook2EventsDto>
+            {
+                new() { WebhookId = webhookDto.Id, Event = "Umbraco.ContentPublish" },
+                new() { WebhookId = webhookDto.Id, Event = "Umbraco.ContentUnpublish" },
+            };
+            await db.InsertBulkAsync(eventDtos);
+
+            var untrustedCount = db.ExecuteScalar<int>(
+                @"SELECT COUNT(*)
+                  FROM sys.foreign_keys
+                  WHERE is_not_trusted = 1
+                    AND OBJECT_NAME(parent_object_id) = @0",
+                Constants.DatabaseSchema.Tables.Webhook2Events);
+
+            Assert.That(
+                untrustedCount,
+                Is.EqualTo(0),
+                "FK constraints on umbracoWebhook2Events should be trusted after InsertBulkAsync. " +
+                "NPoco's InsertBulkAsync with SqlBulkCopyOptions.Default causes constraints to become untrusted.");
         }
     }
 }

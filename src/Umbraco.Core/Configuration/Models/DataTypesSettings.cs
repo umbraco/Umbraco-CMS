@@ -1,10 +1,16 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 
 namespace Umbraco.Cms.Core.Configuration.Models;
 
+/// <summary>
+///     Typed configuration options for data types settings.
+/// </summary>
 [UmbracoOptions(Constants.Configuration.ConfigDataTypes)]
 public class DataTypesSettings
 {
+    /// <summary>
+    ///     The default value for the <see cref="CanBeChanged" /> setting.
+    /// </summary>
     internal const DataTypeChangeMode StaticDataTypeChangeMode = DataTypeChangeMode.True;
 
     /// <summary>

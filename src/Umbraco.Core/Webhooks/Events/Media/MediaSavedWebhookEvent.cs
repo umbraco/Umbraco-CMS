@@ -10,12 +10,24 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Webhooks.Events;
 
+/// <summary>
+/// Webhook event that fires when media is saved.
+/// </summary>
 [WebhookEvent("Media Saved", Constants.WebhookEvents.Types.Media)]
 public class MediaSavedWebhookEvent : WebhookEventContentBase<MediaSavedNotification, IMedia>
 {
     private readonly IPublishedMediaCache _mediaCache;
     private readonly IApiMediaBuilder _apiMediaBuilder;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MediaSavedWebhookEvent"/> class.
+    /// </summary>
+    /// <param name="webhookFiringService">The webhook firing service.</param>
+    /// <param name="webhookService">The webhook service.</param>
+    /// <param name="webhookSettings">The webhook settings.</param>
+    /// <param name="serverRoleAccessor">The server role accessor.</param>
+    /// <param name="mediaCache">The published media cache.</param>
+    /// <param name="apiMediaBuilder">The API media builder.</param>
     public MediaSavedWebhookEvent(
         IWebhookFiringService webhookFiringService,
         IWebhookService webhookService,
@@ -33,11 +45,14 @@ public class MediaSavedWebhookEvent : WebhookEventContentBase<MediaSavedNotifica
         _apiMediaBuilder = apiMediaBuilder;
     }
 
+    /// <inheritdoc />
     public override string Alias => Constants.WebhookEvents.Aliases.MediaSave;
 
+    /// <inheritdoc />
     protected override IEnumerable<IMedia> GetEntitiesFromNotification(MediaSavedNotification notification)
         => notification.SavedEntities;
 
+    /// <inheritdoc />
     protected override object? ConvertEntityToRequestPayload(IMedia entity)
         => new DefaultPayloadModel { Id = entity.Key };
 }

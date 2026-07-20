@@ -378,6 +378,8 @@ export default {
 		renameFolderFailed: 'Das Verzeichnis mit Id %0% konnte nicht umbenannt werden',
 		dragAndDropYourFilesIntoTheArea: 'Wählen Sie Dateien aus und ziehen Sie diese in diesen Bereich',
 		uploadNotAllowed: 'Hochladen ist in diesem Bereich nicht erlaubt.',
+		uploadValidationFailed: (mediaTypeName: string) =>
+			`Der Medientyp ${mediaTypeName} hat eine oder mehrere erforderliche Eigenschaften. Er muss einzeln über das Menü 'Erstellen' hochgeladen werden`,
 	},
 	member: {
 		createNewMember: 'Neues Mitglied anlegen',
@@ -761,6 +763,7 @@ export default {
 		content: 'Inhalt',
 		continue: 'Weiter',
 		copy: 'Kopieren',
+		copied: 'Kopiert!',
 		create: 'Neu',
 		cropSection: 'Ausschnitte Bereich',
 		database: 'Datenbank',
@@ -1054,7 +1057,7 @@ export default {
 		greeting5: 'Willkommen',
 		greeting6: 'Willkommen',
 		instruction: 'Hier anmelden:',
-		signInWith: 'Anmelden mit',
+		signInWith: 'Anmelden mit {0}',
 		timeout: 'Sitzung abgelaufen',
 		bottomText:
 			'<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">umbraco.org</a></p> ',
@@ -1257,7 +1260,8 @@ export default {
 		created: 'Erstellt',
 		headline: 'Wählen Sie eine Version, um diese mit der aktuellen zu vergleichen',
 		currentVersion: 'Aktuelle Version',
-		diffHelp: '<del>Roter Text</del> wird in der ausgewählten Version entfernt, <ins>grüner Text</ins> wird hinzugefügt.',
+		diffHelp:
+			'<del>Roter Text</del> wird in der ausgewählten Version entfernt, <ins>grüner Text</ins> wird hinzugefügt.',
 		showDiff: 'Unterschiede zwischen der aktuellen Version und der ausgewählten Version anzeigen.',
 		noDiff: 'Keine Unterschiede zwischen den beiden Versionen gefunden.',
 		documentRolledBack: 'Dokument wurde zurückgesetzt',
@@ -1296,6 +1300,7 @@ export default {
 		tab: 'Registerkarte',
 		tabname: 'Registerkartenbeschriftung',
 		tabs: 'Registerkarten',
+		changeIcon: 'Symbol ändern',
 		contentTypeEnabled: 'Masterdokumenttyp aktiviert',
 		contentTypeUses: 'Dieser Dokumenttyp verwendet',
 		noPropertiesDefinedOnTab:
@@ -1548,9 +1553,19 @@ export default {
 		chooseChildNode: 'Wählen Sie einen Unterknoten',
 		compositionsDescription:
 			'Übernimm Tabs und Eigenschaften vone einem vorhandenen Inhaltstyp. Neue Tabs werden zum vorliegenden Inhaltstyp hinzugefügt oder mit einem gleichnamigen Tab zusammengeführt.',
+		compositionsDescriptionMediaType:
+			'Übernimm Tabs und Eigenschaften vone einem vorhandenen Medientyp. Neue Tabs werden zum vorliegenden Medientyp hinzugefügt oder mit einem gleichnamigen Tab zusammengeführt.',
+		compositionsDescriptionMemberType:
+			'Übernimm Tabs und Eigenschaften vone einem vorhandenen Mitgliedstyp. Neue Tabs werden zum vorliegenden Mitgliedstyp hinzugefügt oder mit einem gleichnamigen Tab zusammengeführt.',
 		compositionInUse:
 			'Dieser Inhaltstyp wird in einer Mischung verwendet und kann deshalb nicht selbst zusammengemischt werden.',
+		compositionInUseMediaType:
+			'Dieser Medientyp wird in einer Mischung verwendet und kann deshalb nicht selbst zusammengemischt werden.',
+		compositionInUseMemberType:
+			'Dieser Mitgliedstyp wird in einer Mischung verwendet und kann deshalb nicht selbst zusammengemischt werden.',
 		noAvailableCompositions: 'Es sind keine Inhaltstypen für eine Mischung vorhanden.',
+		noAvailableCompositionsMediaType: 'Es sind keine Medientypen für eine Mischung vorhanden.',
+		noAvailableCompositionsMemberType: 'Es sind keine Mitgliedstypen für eine Mischung vorhanden.',
 		availableEditors: 'Neu anlegen',
 		reuse: 'Vorhandenen nutzen',
 		editorSettings: 'Editor-Einstellungen',
@@ -1585,6 +1600,10 @@ export default {
 		compositionUsageHeading: 'Wo wird diese Mischung verwendet?',
 		compositionUsageSpecification:
 			'\n      Diese Mischung wird aktuell in den Mischungen folgender Dokumenttypen verwendet:\n    ',
+		compositionUsageSpecificationMediaType:
+			'\n      Diese Mischung wird aktuell in den Mischungen folgender Medientypen verwendet:\n    ',
+		compositionUsageSpecificationMemberType:
+			'\n      Diese Mischung wird aktuell in den Mischungen folgender Mitgliedstypen verwendet:\n    ',
 		variantsHeading: 'Kultur basierte Variationen zulassen',
 		variantsDescription: 'Editoren erlauben, Inhalt dieses Typs in verschiedenen Sprachen anzulegen',
 		allowVaryByCulture: 'Kultur basierte Variationen zulassen',
@@ -1740,6 +1759,7 @@ export default {
 		noLockouts: 'wurde nicht ausgeschlossen',
 		noPasswordChange: 'Das Kennwort wurde nicht geändert',
 		confirmNewPassword: 'Neues Kennwort (Bestätigung)',
+		confirmPassword: 'Kennwort bestätigen',
 		changePasswordDescription:
 			"Sie können Ihr Kennwort für den Zugriff auf den Umbraco-Verwaltungsbereich ändern, indem Sie das nachfolgende Formular ausfüllen und auf 'Kennwort ändern' klicken",
 		contentChannel: 'Schnittstelle für externe Editoren',
@@ -1907,6 +1927,8 @@ export default {
 	redirectUrls: {
 		disableUrlTracker: 'URL-Änderungsaufzeichnung abschalten',
 		enableUrlTracker: 'URL-Änderungsaufzeichnung einschalten',
+		urlTrackerEnabled: 'Aktiviert',
+		urlTrackerDisabled: 'Deaktiviert',
 		culture: 'Kultur',
 		originalUrl: 'Original URL',
 		redirectedTo: 'Weiterleiten zu',
@@ -1930,7 +1952,8 @@ export default {
 		emptyDictionaryTree: 'Das Wörterbuch ist leer',
 	},
 	textbox: {
-		characters_left: 'Buchstaben verbleiben',
+		characters_left: '<strong>%0%</strong> Zeichen verbleiben.',
+		characters_exceed: 'Maximal %0% Zeichen, <strong>%1%</strong> zu viele.',
 	},
 	recycleBin: {
 		contentTrashed: 'Inhalt mit Id = {0} des Oberknotens mit Id = {1} wurde verworfen',
@@ -1981,7 +2004,8 @@ export default {
 		openBackofficeSearch: 'Back-Office Suche öffnen',
 		openCloseBackofficeHelp: 'Back-Office Hilfe öffnen / schliessen',
 		openCloseBackofficeProfileOptions: 'Ihre Profil-Einstellungen öffnen / schliessen',
-		profileOptions: 'Profil-Einstellungen',
+		profileOptions: 'Benutzerprofil für %0% (%1%)',
+		profileOptionsDefault: 'Benutzerprofil',
 	},
 	logViewer: {
 		selectAllLogLevelFilters: 'Wählen Sie Alle',

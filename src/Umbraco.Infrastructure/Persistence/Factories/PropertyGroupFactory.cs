@@ -69,6 +69,16 @@ internal static class PropertyGroupFactory
 
     #region Implementation of IEntityFactory<IEnumerable<PropertyGroup>,IEnumerable<TabDto>>
 
+    /// <summary>
+    /// Constructs a collection of <see cref="Umbraco.Cms.Core.Models.PropertyGroup"/> entities from the provided group DTOs, including their associated property types.
+    /// </summary>
+    /// <param name="groupDtos">A collection of <see cref="Umbraco.Cms.Infrastructure.Persistence.Dtos.PropertyTypeGroupDto"/> objects representing property groups and their property types.</param>
+    /// <param name="isPublishing">Indicates whether the property groups are being built for publishing scenarios.</param>
+    /// <param name="contentTypeId">The identifier of the content type that owns the property groups.</param>
+    /// <param name="createDate">The creation date to assign to each property type within the groups.</param>
+    /// <param name="updateDate">The update date to assign to each property type within the groups.</param>
+    /// <param name="propertyTypeCtor">A factory function used to construct <see cref="Umbraco.Cms.Core.Models.PropertyType"/> instances, given the editor alias, value storage type, and property type alias.</param>
+    /// <returns>A collection of <see cref="Umbraco.Cms.Core.Models.PropertyGroup"/> entities, each populated with their corresponding property types.</returns>
     public static IEnumerable<PropertyGroup> BuildEntity(
         IEnumerable<PropertyTypeGroupDto> groupDtos,
         bool isPublishing,
@@ -158,6 +168,11 @@ internal static class PropertyGroupFactory
         return propertyGroups;
     }
 
+    /// <summary>
+    /// Converts a collection of <see cref="PropertyGroup"/> entities into a collection of <see cref="PropertyTypeGroupDto"/> objects.
+    /// </summary>
+    /// <param name="entity">The collection of <see cref="PropertyGroup"/> entities to convert.</param>
+    /// <returns>An <see cref="IEnumerable{PropertyTypeGroupDto}"/> representing the converted property groups.</returns>
     public static IEnumerable<PropertyTypeGroupDto> BuildDto(IEnumerable<PropertyGroup> entity) =>
         entity.Select(BuildGroupDto).ToList();
 

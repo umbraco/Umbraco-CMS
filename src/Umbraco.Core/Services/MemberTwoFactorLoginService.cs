@@ -10,6 +10,13 @@ internal sealed class MemberTwoFactorLoginService : TwoFactorLoginServiceBase, I
 {
     private readonly IMemberService _memberService;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="MemberTwoFactorLoginService" /> class.
+    /// </summary>
+    /// <param name="twoFactorLoginService">The two-factor login service.</param>
+    /// <param name="twoFactorSetupGenerators">The collection of two-factor providers.</param>
+    /// <param name="memberService">The member service.</param>
+    /// <param name="scopeProvider">The core scope provider.</param>
     public MemberTwoFactorLoginService(
         ITwoFactorLoginService twoFactorLoginService,
         IEnumerable<ITwoFactorProvider> twoFactorSetupGenerators,

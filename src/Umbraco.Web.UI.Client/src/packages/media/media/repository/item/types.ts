@@ -1,8 +1,9 @@
 import type { UmbMediaEntityType } from '../../entity.js';
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
+import type { UmbEntityWithOptionalFlags } from '@umbraco-cms/backoffice/entity-flag';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 
-export interface UmbMediaItemModel {
+export interface UmbMediaItemModel extends UmbEntityWithOptionalFlags {
 	entityType: UmbMediaEntityType;
 	hasChildren: boolean;
 	isTrashed: boolean;

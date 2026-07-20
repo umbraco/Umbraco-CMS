@@ -14,8 +14,17 @@ public static class PublishedElementExtensions
 {
     #region OfTypes
 
-    // the .OfType<T>() filter is nice when there's only one type
-    // this is to support filtering with multiple types
+    /// <summary>
+    /// Filters published elements by their content type alias.
+    /// </summary>
+    /// <typeparam name="T">The type of published elements.</typeparam>
+    /// <param name="contents">The elements to filter.</param>
+    /// <param name="types">The content type aliases to include.</param>
+    /// <returns>Elements whose content type alias matches any of the specified types.</returns>
+    /// <remarks>
+    /// The .OfType&lt;T&gt;() filter is nice when there's only one type.
+    /// This method supports filtering with multiple types.
+    /// </remarks>
     public static IEnumerable<T> OfTypes<T>(this IEnumerable<T> contents, params string[] types)
         where T : IPublishedElement
     {
@@ -177,7 +186,7 @@ public static class PublishedElementExtensions
         // if we have a property, and it has a value, return that value
         if (property != null && property.HasValue(culture, segment))
         {
-            return property.Value<T>(publishedValueFallback, culture, segment);
+            return property.Value<T>(publishedValueFallback, culture, segment, fallback);
         }
 
         // else let fallback try to get a value
@@ -188,13 +197,19 @@ public static class PublishedElementExtensions
 
         // else... if we have a property, at least let the converter return its own
         // vision of 'no value' (could be an empty enumerable) - otherwise, default
-        return property == null ? default : property.Value<T>(publishedValueFallback, culture, segment);
+        return property == null ? default : property.Value<T>(publishedValueFallback, culture, segment, fallback);
     }
 
     #endregion
 
     #region ToIndexedArray
 
+    /// <summary>
+    /// Converts an enumerable of published elements to an indexed array with positional information.
+    /// </summary>
+    /// <typeparam name="TContent">The type of published elements.</typeparam>
+    /// <param name="source">The source enumerable.</param>
+    /// <returns>An array of indexed items containing positional information.</returns>
     public static IndexedArrayItem<TContent>[] ToIndexedArray<TContent>(this IEnumerable<TContent> source)
         where TContent : class, IPublishedElement
     {

@@ -2,6 +2,9 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 
 namespace Umbraco.Cms.Core.DeliveryApi;
 
+/// <summary>
+///     Defines a provider that retrieves the start item for Delivery API requests.
+/// </summary>
 public interface IRequestStartItemProvider
 {
     /// <summary>

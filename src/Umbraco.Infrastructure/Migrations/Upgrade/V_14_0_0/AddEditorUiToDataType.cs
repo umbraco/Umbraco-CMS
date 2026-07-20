@@ -10,12 +10,22 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_14_0_0;
 
+/// <summary>
+/// Represents a migration that adds Editor UI configuration support to data types in Umbraco.
+/// </summary>
 public class AddEditorUiToDataType : MigrationBase
 {
     private readonly IKeyValueService _keyValueService;
     private readonly IJsonSerializer _jsonSerializer;
     private readonly ILogger<AddEditorUiToDataType> _logger;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AddEditorUiToDataType"/> class with the specified migration context, key-value service, JSON serializer, and logger.
+    /// </summary>
+    /// <param name="context">The migration context used to manage the migration process.</param>
+    /// <param name="keyValueService">Service for accessing key-value storage.</param>
+    /// <param name="jsonSerializer">Serializer for handling JSON data.</param>
+    /// <param name="logger">The logger used for logging migration operations.</param>
     public AddEditorUiToDataType(IMigrationContext context, IKeyValueService keyValueService, IJsonSerializer jsonSerializer, ILogger<AddEditorUiToDataType> logger)
         : base(context)
     {
@@ -116,12 +126,19 @@ public class AddEditorUiToDataType : MigrationBase
 
     private class DataTypeEditorAliasMigrationData
     {
+        /// <summary>Gets or sets the identifier of the data type.</summary>
         [JsonPropertyName("DataTypeId")]
         public int DataTypeId { get; set; }
 
+        /// <summary>
+        /// Gets the alias of the editor UI associated with the data type.
+        /// </summary>
         [JsonPropertyName("EditorUiAlias")]
         public string? EditorUiAlias { get; init; }
 
+        /// <summary>
+        /// Gets the editor alias associated with the data type.
+        /// </summary>
         [JsonPropertyName("EditorAlias")]
         public string? EditorAlias { get; init; }
     }

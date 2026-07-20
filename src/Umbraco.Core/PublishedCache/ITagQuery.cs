@@ -3,6 +3,14 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 
 namespace Umbraco.Cms.Core.PublishedCache;
 
+/// <summary>
+/// Provides methods for querying content and media by their associated tags.
+/// </summary>
+/// <remarks>
+/// Tags are organized into groups and can be culture-specific.
+/// This interface allows retrieval of content, media, and member items by their tags,
+/// as well as listing all available tags.
+/// </remarks>
 public interface ITagQuery
 {
     /// <summary>

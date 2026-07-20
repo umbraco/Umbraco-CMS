@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.ViewModels.UserData;
@@ -11,6 +11,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.UserData;
 
+/// <summary>
+/// Controller responsible for handling operations related to updating user data in the management API.
+/// </summary>
 [ApiVersion("1.0")]
 public class UpdateUserDataController : UserDataControllerBase
 {
@@ -18,6 +21,12 @@ public class UpdateUserDataController : UserDataControllerBase
     private readonly IUserDataService _userDataService;
     private readonly IUmbracoMapper _umbracoMapper;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UpdateUserDataController"/> class.
+    /// </summary>
+    /// <param name="backOfficeSecurityAccessor">Provides access to back office security features for authentication and authorization.</param>
+    /// <param name="userDataService">Service used to manage and manipulate user data.</param>
+    /// <param name="umbracoMapper">The mapper used to convert between Umbraco domain models and API models.</param>
     public UpdateUserDataController(
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
         IUserDataService userDataService,
@@ -33,6 +42,8 @@ public class UpdateUserDataController : UserDataControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(UserDataOperationStatus), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(UserDataOperationStatus), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Updates user data.")]
+    [EndpointDescription("Updates user-specific data for the current authenticated user.")]
     public async Task<IActionResult> Update(CancellationToken cancellationToken, UpdateUserDataRequestModel model)
     {
         Guid currentUserKey = CurrentUserKey(_backOfficeSecurityAccessor);

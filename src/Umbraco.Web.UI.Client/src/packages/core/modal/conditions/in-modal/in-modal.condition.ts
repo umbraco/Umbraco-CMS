@@ -1,5 +1,5 @@
-import type { UmbInModalConditionConfig } from './in-modal.condition-config.js';
 import { UMB_MODAL_CONTEXT } from '../../context/modal.context-token.js';
+import type { UmbInModalConditionConfig } from './in-modal.condition-config.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbConditionControllerArguments, UmbExtensionCondition } from '@umbraco-cms/backoffice/extension-api';
 import { UmbConditionBase } from '@umbraco-cms/backoffice/extension-registry';

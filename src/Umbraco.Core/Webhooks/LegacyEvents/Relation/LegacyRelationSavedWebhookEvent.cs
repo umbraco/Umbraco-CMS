@@ -6,9 +6,19 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Webhooks.Events;
 
+/// <summary>
+/// Legacy webhook event that fires when a relation is saved, using the legacy payload format.
+/// </summary>
 [WebhookEvent("Relation Saved")]
 public class LegacyRelationSavedWebhookEvent : WebhookEventBase<RelationSavedNotification>
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="LegacyRelationSavedWebhookEvent"/> class.
+    /// </summary>
+    /// <param name="webhookFiringService">The webhook firing service.</param>
+    /// <param name="webHookService">The webhook service.</param>
+    /// <param name="webhookSettings">The webhook settings.</param>
+    /// <param name="serverRoleAccessor">The server role accessor.</param>
     public LegacyRelationSavedWebhookEvent(
         IWebhookFiringService webhookFiringService,
         IWebhookService webHookService,
@@ -18,8 +28,10 @@ public class LegacyRelationSavedWebhookEvent : WebhookEventBase<RelationSavedNot
     {
     }
 
+    /// <inheritdoc />
     public override string Alias => Constants.WebhookEvents.Aliases.RelationSaved;
 
+    /// <inheritdoc />
     public override object ConvertNotificationToRequestPayload(RelationSavedNotification notification)
         => notification.SavedEntities;
 }

@@ -1,5 +1,5 @@
-import { UmbModalToken } from '../../modal/token/index.js';
 import type { UmbUserLoginState } from '../types.js';
+import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export type UmbModalAppAuthConfig = {
 	userLoginState: UmbUserLoginState;
@@ -8,7 +8,6 @@ export type UmbModalAppAuthConfig = {
 export type UmbModalAppAuthValue = {
 	/**
 	 * An indicator of whether the authentication was successful.
-	 * @required
 	 */
 	success?: boolean;
 };

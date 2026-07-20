@@ -3,6 +3,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <summary>
+/// Service for managing webhooks.
+/// </summary>
 public interface IWebhookService
 {
     /// <summary>

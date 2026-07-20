@@ -5,6 +5,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.User;
 
+/// <summary>
+/// Serves as a base controller for API endpoints that operate on either a specified user or the current user.
+/// </summary>
 [ApiExplorerSettings(GroupName = "User")]
 public abstract class UserOrCurrentUserControllerBase : ManagementApiControllerBase
 {
@@ -59,6 +62,10 @@ public abstract class UserOrCurrentUserControllerBase : ManagementApiControllerB
             UserOperationStatus.CannotDelete => BadRequest(problemDetailsBuilder
                 .WithTitle("Cannot delete user")
                 .WithDetail("The user cannot be deleted.")
+                .Build()),
+            UserOperationStatus.CannotDeleteUserWithLoginHistory => BadRequest(problemDetailsBuilder
+                .WithTitle("Cannot delete user")
+                .WithDetail("This user has logged in and may be referenced by audit logs or content history. Disable the user instead of deleting them.")
                 .Build()),
             UserOperationStatus.CannotDisableSelf => BadRequest(problemDetailsBuilder
                 .WithTitle("Cannot disable")
@@ -137,6 +144,10 @@ public abstract class UserOrCurrentUserControllerBase : ManagementApiControllerB
                 .WithDetail("The target user type does not support this operation.")
                 .Build()),
             UserOperationStatus.Forbidden => Forbidden(),
+            UserOperationStatus.ApplicationUrlNotConfigured => BadRequest(problemDetailsBuilder
+                .WithTitle("Application URL not configured")
+                .WithDetail("The application URL is not configured. Set Umbraco:CMS:WebRouting:UmbracoApplicationUrl in configuration, or change Umbraco:CMS:WebRouting:ApplicationUrlDetection to 'FirstRequest' or 'EveryRequest'.")
+                .Build()),
             _ => StatusCode(StatusCodes.Status500InternalServerError, problemDetailsBuilder
                 .WithTitle("Unknown user operation status.")
                 .Build()),

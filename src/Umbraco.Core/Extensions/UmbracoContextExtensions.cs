@@ -5,6 +5,9 @@ using Umbraco.Cms.Core.Web;
 
 namespace Umbraco.Extensions;
 
+/// <summary>
+/// Provides extension methods for <see cref="IUmbracoContext"/>.
+/// </summary>
 public static class UmbracoContextExtensions
 {
     /// <summary>

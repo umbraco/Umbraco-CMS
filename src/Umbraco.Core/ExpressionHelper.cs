@@ -11,6 +11,9 @@ namespace Umbraco.Cms.Core;
 /// <remarks></remarks>
 public static class ExpressionHelper
 {
+    /// <summary>
+    ///     Cache for storing <see cref="PropertyInfo" /> objects retrieved from expressions.
+    /// </summary>
     private static readonly ConcurrentDictionary<LambdaExpressionCacheKey, PropertyInfo> PropertyInfoCache = new();
 
     /// <summary>
@@ -87,6 +90,13 @@ public static class ExpressionHelper
                 return propInfo;
             });
 
+    /// <summary>
+    ///     Finds the property or member referenced by a lambda expression.
+    /// </summary>
+    /// <param name="lambda">The lambda expression to analyze.</param>
+    /// <returns>A tuple containing the <see cref="MemberInfo" /> and an optional alias string.</returns>
+    /// <exception cref="ArgumentException">The expression does not resolve to a top-level member.</exception>
+    /// <exception cref="Exception">The expression configuration is invalid.</exception>
     public static (MemberInfo, string?) FindProperty(LambdaExpression lambda)
     {
         void Throw()
@@ -139,6 +149,16 @@ public static class ExpressionHelper
         throw new Exception("Configuration for members is only supported for top-level individual members on a type.");
     }
 
+    /// <summary>
+    ///     Gets the method parameters from an expression as a dictionary.
+    /// </summary>
+    /// <typeparam name="T1">The input type of the expression.</typeparam>
+    /// <typeparam name="T2">The return type of the expression.</typeparam>
+    /// <param name="fromExpression">The expression containing the method call.</param>
+    /// <returns>
+    ///     A dictionary mapping parameter names to their values, an empty dictionary if the expression is not a method call,
+    ///     or null if the expression is null.
+    /// </returns>
     public static IDictionary<string, object?>? GetMethodParams<T1, T2>(Expression<Func<T1, T2>> fromExpression)
     {
         if (fromExpression == null)

@@ -433,6 +433,13 @@ public class PublishedRouter : IPublishedRouter
         }
     }
 
+    /// <summary>
+    ///     Finds a template rendering engine in the specified directory.
+    /// </summary>
+    /// <param name="directory">The directory to search.</param>
+    /// <param name="alias">The template alias.</param>
+    /// <param name="extensions">The file extensions to search for.</param>
+    /// <returns><c>true</c> if the template was found; otherwise, <c>false</c>.</returns>
     internal bool FindTemplateRenderingEngineInDirectory(DirectoryInfo? directory, string alias, string[] extensions)
     {
         if (directory == null || directory.Exists == false)
@@ -906,7 +913,7 @@ public class PublishedRouter : IPublishedRouter
         }
 
         var redirectId = request.PublishedContent.Value(_publishedValueFallback, Constants.Conventions.Content.Redirect, defaultValue: -1);
-        var redirectUrl = "#";
+        var redirectUrl = Constants.Routing.Unroutable;
         if (redirectId > 0)
         {
             redirectUrl = _publishedUrlProvider.GetUrl(redirectId);
@@ -924,7 +931,7 @@ public class PublishedRouter : IPublishedRouter
             }
         }
 
-        if (redirectUrl != "#")
+        if (redirectUrl != Constants.Routing.Unroutable)
         {
             request.SetRedirect(redirectUrl);
         }

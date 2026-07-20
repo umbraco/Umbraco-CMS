@@ -455,6 +455,7 @@ export default {
 		content: 'Innhold',
 		continue: 'Fortsett',
 		copy: 'Kopier',
+		copied: 'Kopiert!',
 		create: 'Opprett',
 		cropSection: 'Utsnitt',
 		current: 'nåværende',
@@ -712,7 +713,7 @@ export default {
 		greeting5: 'Velkommen',
 		greeting6: 'Velkommen',
 		instruction: 'Logg på nedenfor',
-		signInWith: 'Logg på med',
+		signInWith: 'Logg på med {0}',
 		timeout: 'Din sesjon er utløpt',
 		bottomText:
 			'<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">umbraco.com</a></p> ',
@@ -1068,6 +1069,7 @@ export default {
 		changePassword: 'Bytt passord',
 		newPassword: 'Nytt passord',
 		confirmNewPassword: 'Bekreft nytt passord',
+		confirmPassword: 'Bekreft passord',
 		changePasswordDescription:
 			'Du kan endre passordet til Umbraco ved å fylle ut skjemaet under og klikke "Bytt passord" knappen.',
 		contentChannel: 'Innholdskanal',

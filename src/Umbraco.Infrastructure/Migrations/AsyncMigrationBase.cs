@@ -96,8 +96,10 @@ public abstract partial class AsyncMigrationBase : IDiscoverable
     public bool InvalidateBackofficeUserAccess { get; set; }
 
     /// <summary>
-    /// Runs the migration.
+    /// Executes the migration asynchronously and ensures that all migration expressions are completed.
+    /// Throws an <see cref="IncompleteMigrationExpressionException"/> if any migration expression is left incomplete.
     /// </summary>
+    /// <returns>A task representing the asynchronous migration operation.</returns>
     public async Task RunAsync()
     {
         await MigrateAsync().ConfigureAwait(false);

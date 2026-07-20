@@ -54,11 +54,17 @@ steps:
   - pwsh: |
       $sourcePath = "$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/tests/${{ parameters.testFolder }}/AdditionalSetup"
       $destinationPath = "UmbracoProject"
-      $csharpFiles = Get-ChildItem -Path $sourcePath -Filter "*.cs"
+      $csharpFiles = Get-ChildItem -Path $sourcePath -Filter "*.cs" -Recurse
       if ($csharpFiles) {
         $csharpFiles | ForEach-Object {
-          Write-Host "Copying: $($_.FullName)"
-          Copy-Item -Path $_.FullName -Destination $destinationPath -Force
+          $relativePath = $_.FullName.Substring($sourcePath.Length + 1)
+          $targetPath = Join-Path -Path $destinationPath -ChildPath $relativePath
+          $targetDir = Split-Path -Path $targetPath -Parent
+          if (-not (Test-Path -Path $targetDir)) {
+            New-Item -ItemType Directory -Path $targetDir -Force | Out-Null
+          }
+          Write-Host "Copying: $($_.FullName) -> $targetPath"
+          Copy-Item -Path $_.FullName -Destination $targetPath -Force
         }
       } else {
         Write-Host "No C# files found."

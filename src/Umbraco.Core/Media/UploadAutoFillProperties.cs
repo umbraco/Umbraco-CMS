@@ -16,6 +16,12 @@ public class UploadAutoFillProperties
     private readonly ILogger<UploadAutoFillProperties> _logger;
     private readonly MediaFileManager _mediaFileManager;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="UploadAutoFillProperties"/> class.
+    /// </summary>
+    /// <param name="mediaFileManager">The media file manager.</param>
+    /// <param name="logger">The logger.</param>
+    /// <param name="imageDimensionExtractor">The image dimension extractor.</param>
     public UploadAutoFillProperties(
         MediaFileManager mediaFileManager,
         ILogger<UploadAutoFillProperties> logger,
@@ -124,7 +130,7 @@ public class UploadAutoFillProperties
 
     private void SetProperties(IContentBase content, ImagingAutoFillUploadField autoFillConfig, string filepath, Stream filestream, string? culture, string? segment)
     {
-        var extension = (Path.GetExtension(filepath) ?? string.Empty).TrimStart(Constants.CharArrays.Period);
+        var extension = (Path.GetExtension(filepath) ?? string.Empty).TrimStart('.');
 
         Size? size = _imageDimensionExtractor.IsSupportedImageFormat(extension)
             ? _imageDimensionExtractor.GetDimensions(filestream) ?? new Size(Constants.Conventions.Media.DefaultSize, Constants.Conventions.Media.DefaultSize)

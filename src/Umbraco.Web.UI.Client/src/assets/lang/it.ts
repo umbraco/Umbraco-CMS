@@ -357,6 +357,8 @@ export default {
 		renameFolderFailed: 'Impossibile rinominare la cartella con id %0%',
 		dragAndDropYourFilesIntoTheArea: "Trascina e rilascia i tuoi file nell'area",
 		uploadNotAllowed: 'Il caricamento non è consentito in questa posizione.',
+		uploadValidationFailed: (mediaTypeName: string) =>
+			`Il tipo di media ${mediaTypeName} ha una o più proprietà richieste. Dovrà essere caricato singolarmente tramite il menu 'Crea'`,
 	},
 	member: {
 		createNewMember: 'Crea un nuovo membro',
@@ -382,7 +384,7 @@ export default {
 		enterFolderName: 'Inserisci il nome della cartella',
 		updateData: 'Scegli il tipo ed il titolo',
 		noDocumentTypes:
-			'Non ci sono tipi di documento abilitati disponibili per creare un contenuto qui. Devi abilitarli in <strong>Tipi di documento</strong> dentro la sezione <strong>Impostazioni</strong>, modificando <strong>Tipi di nodi figlio consentiti</strong> sotto <strong>Permessi</strong>.',
+			'Non ci sono tipi di documento abilitati disponibili per creare un contenuto qui. Devi abilitarli in <strong>Tipi di documento</strong> dentro la sezione <strong>Impostazioni</strong>, modificando <strong>Tipi di nodi figlio consentiti</strong> sotto <strong>Struttura</strong>.',
 		noDocumentTypesAtRoot:
 			'Non ci sono tipi di documento abilitati disponibili per creare un contenuto qui. Devi crearli in <strong>Tipi di documento</strong> dentro la sezione <strong>Impostazioni</strong>.',
 		noDocumentTypesWithNoSettingsAccess:
@@ -390,9 +392,9 @@ export default {
 		noDocumentTypesEditPermissions: 'Modifica permessi per questo tipo di documento',
 		noDocumentTypesCreateNew: 'Crea un nuovo tipo di documento',
 		noDocumentTypesAllowedAtRoot:
-			"Non ci sono tipi di documento abilitati disponibili per creare un contenuto qui. Devi abilitarli in <strong>Tipi di documento</strong> dentro la sezione <strong>Impostazioni</strong>, cambiando l'opzione <strong>Consenti come root</strong> sotto <strong>Permessi</strong>.",
+			"Non ci sono tipi di documento abilitati disponibili per creare un contenuto qui. Devi abilitarli in <strong>Tipi di documento</strong> dentro la sezione <strong>Impostazioni</strong>, cambiando l'opzione <strong>Consenti come root</strong> sotto <strong>Struttura</strong>.",
 		noMediaTypes:
-			'Non ci sono tipi di documento abilitati disponibili per creare un media qui. Devi abilitarli in <strong>Tipi di documento</strong> dentro la sezione <strong>Impostazioni</strong>, modificando <strong>Tipi di nodi figlio consentiti</strong> sotto <strong>Permessi</strong>.',
+			'Non ci sono tipi di documento abilitati disponibili per creare un media qui. Devi abilitarli in <strong>Tipi di documento</strong> dentro la sezione <strong>Impostazioni</strong>, modificando <strong>Tipi di nodi figlio consentiti</strong> sotto <strong>Struttura</strong>.',
 		noMediaTypesWithNoSettingsAccess:
 			'Il media selezionato non consente la creazione di altri media al di\n      sotto di esso.\n    ',
 		noMediaTypesEditPermissions: 'Modifica permessi per questo tipo di media',
@@ -719,6 +721,7 @@ export default {
 		content: 'Contenuto',
 		continue: 'Continua',
 		copy: 'Copia',
+		copied: 'Copiato!',
 		create: 'Crea',
 		cropSection: 'Selezione di ritaglio',
 		database: 'Database',
@@ -1220,7 +1223,8 @@ export default {
 	rollback: {
 		changes: 'Modifiche',
 		headline: 'Seleziona una versione da confrontare con la versione corrente',
-		diffHelp: '<del>Il testo rosso</del> verrà rimosso nella versione selezionata, <ins>il testo verde</ins> verrà aggiunto.',
+		diffHelp:
+			'<del>Il testo rosso</del> verrà rimosso nella versione selezionata, <ins>il testo verde</ins> verrà aggiunto.',
 		showDiff: 'Mostra le differenze tra la versione corrente (bozza) e la versione selezionata.',
 		documentRolledBack: 'Il documento è stato riportato alla versione scelta.',
 		htmlHelp:
@@ -1260,6 +1264,7 @@ export default {
 			'Non ci sono proprietà definite per questa tab. Clicca sul link "aggiungi una nuova proprietà" in cima per creare una nuova proprietà.',
 		createMatchingTemplate: 'Crea un template corrispondente',
 		addIcon: 'Aggiungi icona',
+		changeIcon: 'Cambia icona',
 	},
 	sort: {
 		sortOrder: 'Ordinamento',
@@ -1523,9 +1528,19 @@ export default {
 		chooseChildNode: 'Scegli nodo figlio',
 		compositionsDescription:
 			'Eredita schede e proprietà da un tipo di documento esistente. Le nuove schede verranno aggiunte al tipo di documento corrente o unite se esiste una scheda con un nome identico.',
+		compositionsDescriptionMediaType:
+			'Eredita schede e proprietà da un tipo di media esistente. Le nuove schede verranno aggiunte al tipo di media corrente o unite se esiste una scheda con un nome identico.',
+		compositionsDescriptionMemberType:
+			'Eredita schede e proprietà da un tipo di membro esistente. Le nuove schede verranno aggiunte al tipo di membro corrente o unite se esiste una scheda con un nome identico.',
 		compositionInUse:
-			'Questo tipo di contenuto è utlizzato in una composizione, e quindi non può essere composto da se stesso.',
+			'Questo tipo di contenuto è utilizzato in una composizione, e quindi non può essere composto da se stesso.',
+		compositionInUseMediaType:
+			'Questo tipo di media è utilizzato in una composizione, e quindi non può essere composto da se stesso.',
+		compositionInUseMemberType:
+			'Questo tipo di membro è utilizzato in una composizione, e quindi non può essere composto da se stesso.',
 		noAvailableCompositions: 'Non ci sono tipi di contenuto utilizzabili come composizione.',
+		noAvailableCompositionsMediaType: 'Non ci sono tipi di media utilizzabili come composizione.',
+		noAvailableCompositionsMemberType: 'Non ci sono tipi di membro utilizzabili come composizione.',
 		compositionRemoveWarning:
 			'Rimuovendo una composizione si elimineranno tutti i dati associati ad essa. Una volta salvato il tipo di documento non ci sarà nessun modo di recuperare i dati.',
 		availableEditors: 'Crea nuovo',
@@ -1563,6 +1578,8 @@ export default {
 		tabHasNoSortOrder: 'la scheda non ha un ordine',
 		compositionUsageHeading: 'Dove è usata questa composizione?',
 		compositionUsageSpecification: 'Questa composizione è usata nella composizione dei seguenti tipi di contenuto:',
+		compositionUsageSpecificationMediaType: 'Questa composizione è usata nella composizione dei seguenti tipi di media:',
+		compositionUsageSpecificationMemberType: 'Questa composizione è usata nella composizione dei seguenti tipi di membro:',
 		variantsHeading: 'Consenti variazioni',
 		cultureVariantHeading: 'Consenti variazioni in base alla lingua',
 		segmentVariantHeading: 'Consenti segmentazione',
@@ -1738,6 +1755,7 @@ export default {
 		noLockouts: 'non è stato bloccato',
 		noPasswordChange: 'La password non è stata modificata',
 		confirmNewPassword: 'Conferma la nuova password',
+		confirmPassword: 'Conferma password',
 		changePasswordDescription:
 			"È possibile modificare la password di accesso al backoffice Umbraco compilando il form sottostante e clicca sul pulsante 'Modifica password'",
 		contentChannel: 'Contenuto del canale',
@@ -1992,6 +2010,8 @@ export default {
 	redirectUrls: {
 		disableUrlTracker: 'Disabilita tracciamento degli URL',
 		enableUrlTracker: 'Abilita tracciamento degli URL',
+		urlTrackerEnabled: 'Abilitato',
+		urlTrackerDisabled: 'Disabilitato',
 		culture: 'Cultura',
 		originalUrl: 'URL originale',
 		redirectedTo: 'Reindirizzato a',
@@ -2069,7 +2089,8 @@ export default {
 		openBackofficeSearch: 'Apri la ricerca nel backoffice',
 		openCloseBackofficeHelp: "Apri/chiudi l'aiuto del backoffice",
 		openCloseBackofficeProfileOptions: 'Apri/chiudi le opzioni del tuo profilo',
-		profileOptions: 'Opzioni del profilo',
+		profileOptions: 'Profilo utente per %0% (%1%)',
+		profileOptionsDefault: 'Profilo utente',
 		assignDomainDescription: 'Imposta le Culture e gli Hostnames per %0%',
 		createDescription: 'Crea nuovo nodo sotto %0%',
 		protectDescription: 'Imposta le restrizioni di accesso per %0%',

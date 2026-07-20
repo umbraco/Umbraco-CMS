@@ -15,6 +15,7 @@ export default {
 		auditTrail: 'Historial',
 		browse: 'Nodo de Exploración',
 		changeDocType: 'Cambiar tipo de documento',
+		clear: 'Eliminar todo',
 		copy: 'Copiar',
 		create: 'Crear',
 		createPackage: 'Crear Paquete',
@@ -476,6 +477,7 @@ export default {
 		constrainProportions: 'Mantener proporciones',
 		continue: 'Continuar',
 		copy: 'Copiar',
+		copied: '¡Copiado!',
 		create: 'Crear',
 		database: 'Base de datos',
 		date: 'Fecha',
@@ -921,6 +923,7 @@ export default {
 		noPropertiesDefinedOnTab:
 			'No existen propiedades para esta pestaña. Haz clic en el enlace "añadir nueva propiedad" para crear una nueva propiedad.',
 		addIcon: 'Añadir icono',
+		changeIcon: 'Cambiar icono',
 	},
 	sort: {
 		sortOrder: 'Ordenar',
@@ -1128,9 +1131,19 @@ export default {
 		chooseChildNode: 'Elegir nodo hijo',
 		compositionsDescription:
 			'Heredar pestañas y propiedades de un tipo de documento existente. Nuevas pestañas serán añadidas al tipo de documento actual o mezcladas si una pestaña con nombre idéntico ya existe.',
+		compositionsDescriptionMediaType:
+			'Heredar pestañas y propiedades de un tipo de medio existente. Nuevas pestañas serán añadidas al tipo de medio actual o mezcladas si una pestaña con nombre idéntico ya existe.',
+		compositionsDescriptionMemberType:
+			'Heredar pestañas y propiedades de un tipo de miembro existente. Nuevas pestañas serán añadidas al tipo de miembro actual o mezcladas si una pestaña con nombre idéntico ya existe.',
 		compositionInUse:
-			'Este tipo de contenido es usado en una composición, y por tanto no puede no puede ser compuesto.',
+			'Este tipo de contenido es usado en una composición, y por tanto no puede ser compuesto.',
+		compositionInUseMediaType:
+			'Este tipo de medio es usado en una composición, y por tanto no puede ser compuesto.',
+		compositionInUseMemberType:
+			'Este tipo de miembro es usado en una composición, y por tanto no puede ser compuesto.',
 		noAvailableCompositions: 'No hay tipos de contenido disponibles para usar como composición.',
+		noAvailableCompositionsMediaType: 'No hay tipos de medio disponibles para usar como composición.',
+		noAvailableCompositionsMemberType: 'No hay tipos de miembro disponibles para usar como composición.',
 		availableEditors: 'Editores disponibles',
 		reuse: 'Reusar',
 		editorSettings: 'Configuración de editor',
@@ -1292,6 +1305,7 @@ export default {
 		noLockouts: 'no ha sido bloqueado',
 		noPasswordChange: 'La contraseña no se ha cambiado',
 		confirmNewPassword: 'Confirma nueva contraseña',
+		confirmPassword: 'Confirmar contraseña',
 		changePasswordDescription:
 			"Puedes cambiar tu contraseña para acceder al 'back office' de Umbraco rellenando el siguiente formulario y haciendo clic en el botón 'Cambiar contraseña'",
 		contentChannel: 'Canal de contenido',
@@ -1433,6 +1447,8 @@ export default {
 	redirectUrls: {
 		disableUrlTracker: 'Desactivar URL tracker',
 		enableUrlTracker: 'Activar URL tracker',
+		urlTrackerEnabled: 'Activado',
+		urlTrackerDisabled: 'Desactivado',
 		originalUrl: 'URL Original',
 		redirectedTo: 'Redirigido a To',
 		noRedirects: 'No se ha creado ninguna redirección',
@@ -1450,7 +1466,8 @@ export default {
 		emptyDictionaryTree: 'No hay elementos de Diccionario para elegir',
 	},
 	textbox: {
-		characters_left: 'caracteres restantes',
+		characters_left: '<strong>%0%</strong> caracteres restantes.',
+		characters_exceed: 'Máximo %0% caracteres, <strong>%1%</strong> de más.',
 	},
 	logViewer: {
 		selectAllLogLevelFilters: 'Seleccionar todo',

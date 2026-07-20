@@ -26,6 +26,21 @@ public class RepositoryCacheKeysTests
         Assert.AreEqual("uRepo_IContent_1000", key);
     }
 
+    [Test]
+    public void GetGuidKey_Returns_Expected_Key_For_Type_And_Id()
+    {
+        var guid = Guid.Parse("A1B2C3D4-E5F6-7890-ABCD-EF1234567890");
+        var key = RepositoryCacheKeys.GetGuidKey<IContent>(guid);
+        Assert.AreEqual("uRepoGuid_IContent_a1b2c3d4-e5f6-7890-abcd-ef1234567890", key);
+    }
+
+    [Test]
+    public void GetGuidKey_Returns_Empty_For_Empty_Guid()
+    {
+        var key = RepositoryCacheKeys.GetGuidKey<IContent>(Guid.Empty);
+        Assert.AreEqual(string.Empty, key);
+    }
+
     /// <summary>
     /// Verifies that the RepositoryCacheKeys.GetKey{T}() method is thread-safe when accessed concurrently with a large
     /// number of unique types.

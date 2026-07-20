@@ -14,6 +14,12 @@ internal class MigrateTours : UnscopedMigrationBase
     private readonly IJsonSerializer _jsonSerializer;
     private readonly IScopeProvider _scopeProvider;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MigrateTours"/> class.
+    /// </summary>
+    /// <param name="context">The <see cref="IMigrationContext"/> providing migration state and services.</param>
+    /// <param name="jsonSerializer">The <see cref="IJsonSerializer"/> used for serializing and deserializing JSON data.</param>
+    /// <param name="scopeProvider">The <see cref="IScopeProvider"/> that manages database transaction scopes.</param>
     public MigrateTours(
         IMigrationContext context,
         IJsonSerializer jsonSerializer,
@@ -147,6 +153,9 @@ internal class MigrateTours : UnscopedMigrationBase
     }
 
 
+    /// <summary>
+    /// Represents a data transfer object for an old user, used during the migration process in version 14.0.0.
+    /// </summary>
     [TableName(TableName)]
     [PrimaryKey("id", AutoIncrement = true)]
     [ExplicitColumns]
@@ -154,38 +163,63 @@ internal class MigrateTours : UnscopedMigrationBase
     {
         public const string TableName = Constants.DatabaseSchema.Tables.User;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="OldUserDto"/> class with default values.
+        /// </summary>
         public OldUserDto()
         {
             UserGroupDtos = new List<UserGroupDto>();
             UserStartNodeDtos = new HashSet<UserStartNodeDto>();
         }
 
+        /// <summary>
+        /// Gets or sets the unique identifier for the user.
+        /// </summary>
         [Column("id")]
         [PrimaryKeyColumn(Name = "PK_user")]
         public int Id { get; set; }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether the user is disabled.
+        /// </summary>
         [Column("userDisabled")]
         [Constraint(Default = "0")]
         public bool Disabled { get; set; }
 
+        /// <summary>
+        /// Gets or sets the unique key identifier for the user.
+        /// </summary>
         [Column("key")]
         [NullSetting(NullSetting = NullSettings.NotNull)]
         [Constraint(Default = SystemMethods.NewGuid)]
         [Index(IndexTypes.UniqueNonClustered, Name = "IX_umbracoUser_userKey")]
         public Guid Key { get; set; }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether console access is disabled for the user.
+        /// A value of <c>true</c> means the user cannot access the console.
+        /// </summary>
         [Column("userNoConsole")]
         [Constraint(Default = "0")]
         public bool NoConsole { get; set; }
 
+        /// <summary>
+        /// Gets or sets the username associated with the user.
+        /// </summary>
         [Column("userName")]
         public string UserName { get; set; } = null!;
 
+        /// <summary>
+        /// Gets or sets the login name of the user.
+        /// </summary>
         [Column("userLogin")]
         [Length(125)]
         [Index(IndexTypes.NonClustered)]
         public string? Login { get; set; }
 
+        /// <summary>
+        /// Gets or sets the password associated with the old user.
+        /// </summary>
         [Column("userPassword")]
         [Length(500)]
         public string? Password { get; set; }
@@ -198,48 +232,79 @@ internal class MigrateTours : UnscopedMigrationBase
         [Length(500)]
         public string? PasswordConfig { get; set; }
 
+        /// <summary>
+        /// Gets or sets the email address of the user.
+        /// </summary>
         [Column("userEmail")]
         public string Email { get; set; } = null!;
 
+        /// <summary>
+        /// Gets or sets the preferred language of the user, or <c>null</c> if not specified.
+        /// </summary>
         [Column("userLanguage")]
         [NullSetting(NullSetting = NullSettings.Null)]
         [Length(10)]
         public string? UserLanguage { get; set; }
 
+        /// <summary>
+        /// Gets or sets the security stamp token used to validate the user's security credentials.
+        /// </summary>
         [Column("securityStampToken")]
         [NullSetting(NullSetting = NullSettings.Null)]
         [Length(255)]
         public string? SecurityStampToken { get; set; }
 
+        /// <summary>Gets or sets the number of failed login attempts for the user.</summary>
         [Column("failedLoginAttempts")]
         [NullSetting(NullSetting = NullSettings.Null)]
         public int? FailedLoginAttempts { get; set; }
 
+        /// <summary>
+        /// Gets or sets the date and time when the user was last locked out.
+        /// </summary>
         [Column("lastLockoutDate")]
         [NullSetting(NullSetting = NullSettings.Null)]
         public DateTime? LastLockoutDate { get; set; }
 
+        /// <summary>
+        /// Gets or sets the date and time when the user's password was last changed.
+        /// </summary>
         [Column("lastPasswordChangeDate")]
         [NullSetting(NullSetting = NullSettings.Null)]
         public DateTime? LastPasswordChangeDate { get; set; }
 
+        /// <summary>
+        /// Gets or sets the date and time of the user's last login.
+        /// </summary>
         [Column("lastLoginDate")]
         [NullSetting(NullSetting = NullSettings.Null)]
         public DateTime? LastLoginDate { get; set; }
 
+        /// <summary>
+        /// Gets or sets the date and time when the user's email was confirmed.
+        /// </summary>
         [Column("emailConfirmedDate")]
         [NullSetting(NullSetting = NullSettings.Null)]
         public DateTime? EmailConfirmedDate { get; set; }
 
+        /// <summary>
+        /// Gets or sets the date and time when the user was invited.
+        /// </summary>
         [Column("invitedDate")]
         [NullSetting(NullSetting = NullSettings.Null)]
         public DateTime? InvitedDate { get; set; }
 
+        /// <summary>
+        /// Gets or sets the date and time when the user was created.
+        /// </summary>
         [Column("createDate")]
         [NullSetting(NullSetting = NullSettings.NotNull)]
         [Constraint(Default = SystemMethods.CurrentDateTime)]
         public DateTime CreateDate { get; set; } = DateTime.Now;
 
+        /// <summary>
+        /// Gets or sets the date and time when the user was last updated.
+        /// </summary>
         [Column("updateDate")]
         [NullSetting(NullSetting = NullSettings.NotNull)]
         [Constraint(Default = SystemMethods.CurrentDateTime)]
@@ -261,15 +326,24 @@ internal class MigrateTours : UnscopedMigrationBase
         [SpecialDbType(SpecialDbTypes.NVARCHARMAX)]
         public string? TourData { get; set; }
 
+        /// <summary>
+        /// Gets or sets the user groups associated with this user.
+        /// </summary>
         [ResultColumn]
         [Reference(ReferenceType.Many, ReferenceMemberName = "UserId")]
         public List<UserGroupDto> UserGroupDtos { get; set; }
 
+        /// <summary>
+        /// Gets or sets the collection of start node DTOs for the user.
+        /// </summary>
         [ResultColumn]
         [Reference(ReferenceType.Many, ReferenceMemberName = "UserId")]
         public HashSet<UserStartNodeDto> UserStartNodeDtos { get; set; }
     }
 
+    /// <summary>
+    /// Represents a data transfer object (DTO) containing information about a new user created during the migration tours process.
+    /// </summary>
     [TableName(TableName)]
     [PrimaryKey("id", AutoIncrement = true)]
     [ExplicitColumns]
@@ -277,38 +351,63 @@ internal class MigrateTours : UnscopedMigrationBase
     {
         public const string TableName = Constants.DatabaseSchema.Tables.User;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="NewUserDto"/> class with default values.
+        /// </summary>
         public NewUserDto()
         {
             UserGroupDtos = new List<UserGroupDto>();
             UserStartNodeDtos = new HashSet<UserStartNodeDto>();
         }
 
+        /// <summary>
+        /// Gets or sets the unique identifier for the user.
+        /// </summary>
         [Column("id")]
         [PrimaryKeyColumn(Name = "PK_user")]
         public int Id { get; set; }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether the user is disabled.
+        /// </summary>
         [Column("userDisabled")]
         [Constraint(Default = "0")]
         public bool Disabled { get; set; }
 
+        /// <summary>
+        /// Gets or sets the unique key identifier for the user.
+        /// </summary>
         [Column("key")]
         [NullSetting(NullSetting = NullSettings.NotNull)]
         [Constraint(Default = SystemMethods.NewGuid)]
         [Index(IndexTypes.UniqueNonClustered, Name = "IX_umbracoUser_userKey")]
         public Guid Key { get; set; }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether the user is denied access to the console.
+        /// A value of <c>true</c> means the user cannot access the console.
+        /// </summary>
         [Column("userNoConsole")]
         [Constraint(Default = "0")]
         public bool NoConsole { get; set; }
 
+        /// <summary>
+        /// Gets or sets the username associated with the new user.
+        /// </summary>
         [Column("userName")]
         public string UserName { get; set; } = null!;
 
+        /// <summary>
+        /// Gets or sets the login name of the new user.
+        /// </summary>
         [Column("userLogin")]
         [Length(125)]
         [Index(IndexTypes.NonClustered)]
         public string? Login { get; set; }
 
+        /// <summary>
+        /// Gets or sets the password of the new user.
+        /// </summary>
         [Column("userPassword")]
         [Length(500)]
         public string? Password { get; set; }
@@ -321,48 +420,80 @@ internal class MigrateTours : UnscopedMigrationBase
         [Length(500)]
         public string? PasswordConfig { get; set; }
 
+        /// <summary>Gets or sets the email address of the user.</summary>
         [Column("userEmail")]
         public string Email { get; set; } = null!;
 
+        /// <summary>
+        /// Gets or sets the user's preferred language, represented as a language code (e.g., "en-US").
+        /// </summary>
         [Column("userLanguage")]
         [NullSetting(NullSetting = NullSettings.Null)]
         [Length(10)]
         public string? UserLanguage { get; set; }
 
+        /// <summary>
+        /// Gets or sets the security stamp token used to identify changes to the user's security credentials.
+        /// This token is typically updated when sensitive user information, such as a password, is changed.
+        /// </summary>
         [Column("securityStampToken")]
         [NullSetting(NullSetting = NullSettings.Null)]
         [Length(255)]
         public string? SecurityStampToken { get; set; }
 
+        /// <summary>
+        /// Gets or sets the number of failed login attempts for the user.
+        /// </summary>
         [Column("failedLoginAttempts")]
         [NullSetting(NullSetting = NullSettings.Null)]
         public int? FailedLoginAttempts { get; set; }
 
+        /// <summary>
+        /// Gets or sets the date and time when the user was last locked out.
+        /// </summary>
         [Column("lastLockoutDate")]
         [NullSetting(NullSetting = NullSettings.Null)]
         public DateTime? LastLockoutDate { get; set; }
 
+        /// <summary>
+        /// Gets or sets the date and time when the user's password was last changed.
+        /// </summary>
         [Column("lastPasswordChangeDate")]
         [NullSetting(NullSetting = NullSettings.Null)]
         public DateTime? LastPasswordChangeDate { get; set; }
 
+        /// <summary>
+        /// Gets or sets the date and time when the user last logged in.
+        /// </summary>
         [Column("lastLoginDate")]
         [NullSetting(NullSetting = NullSettings.Null)]
         public DateTime? LastLoginDate { get; set; }
 
+        /// <summary>
+        /// Gets or sets the date and time when the user's email was confirmed.
+        /// </summary>
         [Column("emailConfirmedDate")]
         [NullSetting(NullSetting = NullSettings.Null)]
         public DateTime? EmailConfirmedDate { get; set; }
 
+        /// <summary>
+        /// Gets or sets the date when the user was invited.
+        /// </summary>
         [Column("invitedDate")]
         [NullSetting(NullSetting = NullSettings.Null)]
         public DateTime? InvitedDate { get; set; }
 
+        /// <summary>
+        /// Gets or sets the creation date of the user.
+        /// </summary>
         [Column("createDate")]
         [NullSetting(NullSetting = NullSettings.NotNull)]
         [Constraint(Default = SystemMethods.CurrentDateTime)]
         public DateTime CreateDate { get; set; } = DateTime.Now;
 
+        /// <summary>
+        /// Gets or sets the date when the user was last updated.
+        /// </summary>
         [Column("updateDate")]
         [NullSetting(NullSetting = NullSettings.NotNull)]
         [Constraint(Default = SystemMethods.CurrentDateTime)]
@@ -376,15 +507,24 @@ internal class MigrateTours : UnscopedMigrationBase
         [Length(500)]
         public string? Avatar { get; set; }
 
+        /// <summary>
+        /// Gets or sets the list of user group DTOs associated with the user.
+        /// </summary>
         [ResultColumn]
         [Reference(ReferenceType.Many, ReferenceMemberName = "UserId")]
         public List<UserGroupDto> UserGroupDtos { get; set; }
 
+        /// <summary>
+        /// Gets or sets the collection of start node DTOs for this user.
+        /// </summary>
         [ResultColumn]
         [Reference(ReferenceType.Many, ReferenceMemberName = "UserId")]
         public HashSet<UserStartNodeDto> UserStartNodeDtos { get; set; }
     }
 
+    /// <summary>
+    /// Data structure representing a tour used during the migration process.
+    /// </summary>
     public class TourData()
     {
         /// <summary>
@@ -406,6 +546,9 @@ internal class MigrateTours : UnscopedMigrationBase
         public bool Disabled { get; set; }
     }
 
+    /// <summary>
+    /// Represents a value associated with a tour during the migration process in Umbraco upgrades.
+    /// </summary>
     public class TourValue()
     {
         /// <summary>

@@ -67,8 +67,8 @@ export class UmbBlockListManagerContext<
 		originData: UmbBlockListWorkspaceOriginData,
 	) {
 		this._layouts.appendOneAt(layoutEntry, originData.index ?? -1);
-
 		this.insertBlockData(layoutEntry, content, settings, originData);
+		this.notifyBlockInserted(layoutEntry, originData);
 
 		return true;
 	}

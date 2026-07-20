@@ -5,6 +5,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Management.ServerEvents;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
@@ -12,6 +13,7 @@ using Umbraco.Cms.Core.Models.ServerEvents;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.ServerEvents;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Changes;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Management.ServerEvents;
 
@@ -1376,6 +1378,366 @@ internal sealed class ServerEventSenderTests
 
         // Assert
         AssertPrimaryRoutedEvent(recordingRouter, entityKey, Constants.ServerEvents.EventType.Trashed, Constants.ServerEvents.EventSource.Media);
+    }
+
+    [Test]
+    public async Task HandleAsync_ContentTypeChangedNotification_RoutesUpdatedEventForComposingTypes()
+    {
+        // Arrange
+        var deletedTypeKey = Guid.NewGuid();
+        var composingTypeKey = Guid.NewGuid();
+
+        var deletedType = Mock.Of<IContentType>(t => t.Key == deletedTypeKey);
+        var composingType = Mock.Of<IContentType>(t => t.Key == composingTypeKey);
+
+        var changes = new[]
+        {
+            new ContentTypeChange<IContentType>(deletedType, ContentTypeChangeTypes.Remove),
+            new ContentTypeChange<IContentType>(composingType, ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RefreshOther),
+        };
+
+        var notification = new ContentTypeChangedNotification(changes, new EventMessages());
+        var recordingRouter = new RecordingServerEventRouter();
+        var serverEventSender = CreateServerEventSender(recordingRouter);
+
+        // Act
+        await serverEventSender.HandleAsync(notification, CancellationToken.None);
+
+        // Assert - only the composing type should be routed (removed types are skipped).
+        Assert.That(recordingRouter.RoutedEvents, Has.Count.EqualTo(1));
+        var serverEvent = recordingRouter.RoutedEvents[0];
+        Assert.Multiple(() =>
+        {
+            Assert.That(serverEvent.EventType, Is.EqualTo(Constants.ServerEvents.EventType.Updated));
+            Assert.That(serverEvent.EventSource, Is.EqualTo(Constants.ServerEvents.EventSource.DocumentType));
+            Assert.That(serverEvent.Key, Is.EqualTo(composingTypeKey));
+        });
+    }
+
+    [Test]
+    public async Task HandleAsync_ContentTypeChangedNotification_SkipsRemovedTypes()
+    {
+        // Arrange
+        var removedTypeKey = Guid.NewGuid();
+        var removedType = Mock.Of<IContentType>(t => t.Key == removedTypeKey);
+
+        var changes = new[]
+        {
+            new ContentTypeChange<IContentType>(removedType, ContentTypeChangeTypes.Remove),
+        };
+
+        var notification = new ContentTypeChangedNotification(changes, new EventMessages());
+        var recordingRouter = new RecordingServerEventRouter();
+        var serverEventSender = CreateServerEventSender(recordingRouter);
+
+        // Act
+        await serverEventSender.HandleAsync(notification, CancellationToken.None);
+
+        // Assert - no events should be routed for removed types.
+        Assert.That(recordingRouter.RoutedEvents, Has.Count.EqualTo(0));
+    }
+
+    [Test]
+    public async Task HandleAsync_ContentTypeChangedNotification_SkipsCreatedTypes()
+    {
+        // Arrange
+        var createdTypeKey = Guid.NewGuid();
+        var createdType = Mock.Of<IContentType>(t => t.Key == createdTypeKey);
+
+        var changes = new[]
+        {
+            new ContentTypeChange<IContentType>(createdType, ContentTypeChangeTypes.Create),
+        };
+
+        var notification = new ContentTypeChangedNotification(changes, new EventMessages());
+        var recordingRouter = new RecordingServerEventRouter();
+        var serverEventSender = CreateServerEventSender(recordingRouter);
+
+        // Act
+        await serverEventSender.HandleAsync(notification, CancellationToken.None);
+
+        // Assert - no events should be routed for created types (already handled by Saved notification).
+        Assert.That(recordingRouter.RoutedEvents, Has.Count.EqualTo(0));
+    }
+
+    [Test]
+    public async Task HandleAsync_MediaTypeChangedNotification_RoutesUpdatedEventForComposingTypes()
+    {
+        // Arrange
+        var deletedTypeKey = Guid.NewGuid();
+        var composingTypeKey = Guid.NewGuid();
+
+        var deletedType = Mock.Of<IMediaType>(t => t.Key == deletedTypeKey);
+        var composingType = Mock.Of<IMediaType>(t => t.Key == composingTypeKey);
+
+        var changes = new[]
+        {
+            new ContentTypeChange<IMediaType>(deletedType, ContentTypeChangeTypes.Remove),
+            new ContentTypeChange<IMediaType>(composingType, ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RefreshOther),
+        };
+
+        var notification = new MediaTypeChangedNotification(changes, new EventMessages());
+        var recordingRouter = new RecordingServerEventRouter();
+        var serverEventSender = CreateServerEventSender(recordingRouter);
+
+        // Act
+        await serverEventSender.HandleAsync(notification, CancellationToken.None);
+
+        // Assert - only the composing type should be routed.
+        Assert.That(recordingRouter.RoutedEvents, Has.Count.EqualTo(1));
+        var serverEvent = recordingRouter.RoutedEvents[0];
+        Assert.Multiple(() =>
+        {
+            Assert.That(serverEvent.EventType, Is.EqualTo(Constants.ServerEvents.EventType.Updated));
+            Assert.That(serverEvent.EventSource, Is.EqualTo(Constants.ServerEvents.EventSource.MediaType));
+            Assert.That(serverEvent.Key, Is.EqualTo(composingTypeKey));
+        });
+    }
+
+    [Test]
+    public async Task HandleAsync_MemberTypeChangedNotification_RoutesUpdatedEventForComposingTypes()
+    {
+        // Arrange
+        var deletedTypeKey = Guid.NewGuid();
+        var composingTypeKey = Guid.NewGuid();
+
+        var deletedType = Mock.Of<IMemberType>(t => t.Key == deletedTypeKey);
+        var composingType = Mock.Of<IMemberType>(t => t.Key == composingTypeKey);
+
+        var changes = new[]
+        {
+            new ContentTypeChange<IMemberType>(deletedType, ContentTypeChangeTypes.Remove),
+            new ContentTypeChange<IMemberType>(composingType, ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RefreshOther),
+        };
+
+        var notification = new MemberTypeChangedNotification(changes, new EventMessages());
+        var recordingRouter = new RecordingServerEventRouter();
+        var serverEventSender = CreateServerEventSender(recordingRouter);
+
+        // Act
+        await serverEventSender.HandleAsync(notification, CancellationToken.None);
+
+        // Assert - only the composing type should be routed.
+        Assert.That(recordingRouter.RoutedEvents, Has.Count.EqualTo(1));
+        var serverEvent = recordingRouter.RoutedEvents[0];
+        Assert.Multiple(() =>
+        {
+            Assert.That(serverEvent.EventType, Is.EqualTo(Constants.ServerEvents.EventType.Updated));
+            Assert.That(serverEvent.EventSource, Is.EqualTo(Constants.ServerEvents.EventSource.MemberType));
+            Assert.That(serverEvent.Key, Is.EqualTo(composingTypeKey));
+        });
+    }
+
+    [Test]
+    public void ServerEventSender_Implements_IDistributedCacheNotificationHandler()
+    {
+        // The marker opts the sender into distributed cache notification dispatch — used here to keep the
+        // per-client caches in connected backoffice apps in sync, rather than the usual cross-server case.
+        Assert.That(typeof(IDistributedCacheNotificationHandler).IsAssignableFrom(typeof(ServerEventSender)), Is.True);
+    }
+
+    [Test]
+    public async Task HandleAsync_BatchedContentDeletedNotifications_DeduplicatesByKey()
+    {
+        // Arrange
+        var entityKey = Guid.NewGuid();
+        var entityA = Mock.Of<IContent>(e => e.Key == entityKey);
+        var entityB = Mock.Of<IContent>(e => e.Key == entityKey);
+
+        var notifications = new[]
+        {
+            new ContentDeletedNotification(entityA, new EventMessages()),
+            new ContentDeletedNotification(entityB, new EventMessages()),
+        };
+        var recordingRouter = new RecordingServerEventRouter();
+        var serverEventSender = CreateServerEventSender(recordingRouter);
+
+        // Act
+        await serverEventSender.HandleAsync(notifications, CancellationToken.None);
+
+        // Assert
+        AssertPrimaryRoutedEvent(recordingRouter, entityKey, Constants.ServerEvents.EventType.Deleted, Constants.ServerEvents.EventSource.Document);
+    }
+
+    [Test]
+    public async Task HandleAsync_BatchedContentSavedNotifications_DeduplicatesByKey()
+    {
+        // Arrange
+        var entityKey = Guid.NewGuid();
+        var now = DateTime.UtcNow;
+        var entityA = Mock.Of<IContent>(e => e.Key == entityKey && e.CreateDate == now && e.UpdateDate == now);
+        var entityB = Mock.Of<IContent>(e => e.Key == entityKey && e.CreateDate == now && e.UpdateDate == now);
+
+        var notifications = new[]
+        {
+            new ContentSavedNotification(entityA, new EventMessages()),
+            new ContentSavedNotification(entityB, new EventMessages()),
+        };
+        var recordingRouter = new RecordingServerEventRouter();
+        var serverEventSender = CreateServerEventSender(recordingRouter);
+
+        // Act
+        await serverEventSender.HandleAsync(notifications, CancellationToken.None);
+
+        // Assert
+        AssertPrimaryRoutedEvent(recordingRouter, entityKey, Constants.ServerEvents.EventType.Created, Constants.ServerEvents.EventSource.Document);
+    }
+
+    [Test]
+    public async Task HandleAsync_BatchedContentMovedToRecycleBinNotifications_DeduplicatesByKey()
+    {
+        // Arrange
+        var entityKey = Guid.NewGuid();
+        var entityA = Mock.Of<IContent>(e => e.Key == entityKey);
+        var entityB = Mock.Of<IContent>(e => e.Key == entityKey);
+
+        var notifications = new[]
+        {
+            new ContentMovedToRecycleBinNotification(new MoveToRecycleBinEventInfo<IContent>(entityA, "-1,123"), new EventMessages()),
+            new ContentMovedToRecycleBinNotification(new MoveToRecycleBinEventInfo<IContent>(entityB, "-1,123"), new EventMessages()),
+        };
+        var recordingRouter = new RecordingServerEventRouter();
+        var serverEventSender = CreateServerEventSender(recordingRouter);
+
+        // Act
+        await serverEventSender.HandleAsync(notifications, CancellationToken.None);
+
+        // Assert
+        AssertPrimaryRoutedEvent(recordingRouter, entityKey, Constants.ServerEvents.EventType.Trashed, Constants.ServerEvents.EventSource.Document);
+    }
+
+    [Test]
+    public async Task HandleAsync_BatchedContentSavedBlueprintNotifications_DeduplicatesByKey()
+    {
+        // Arrange
+        var blueprintKey = Guid.NewGuid();
+        var now = DateTime.UtcNow;
+        var blueprintA = Mock.Of<IContent>(c => c.Key == blueprintKey && c.CreateDate == now && c.UpdateDate == now);
+        var blueprintB = Mock.Of<IContent>(c => c.Key == blueprintKey && c.CreateDate == now && c.UpdateDate == now);
+
+        var notifications = new[]
+        {
+            new ContentSavedBlueprintNotification(blueprintA, new EventMessages()),
+            new ContentSavedBlueprintNotification(blueprintB, new EventMessages()),
+        };
+        var recordingRouter = new RecordingServerEventRouter();
+        var serverEventSender = CreateServerEventSender(recordingRouter);
+
+        // Act
+        await serverEventSender.HandleAsync(notifications, CancellationToken.None);
+
+        // Assert
+        AssertPrimaryRoutedEvent(recordingRouter, blueprintKey, Constants.ServerEvents.EventType.Created, Constants.ServerEvents.EventSource.DocumentBlueprint);
+    }
+
+    [Test]
+    public async Task HandleAsync_BatchedContentDeletedBlueprintNotifications_DeduplicatesByKey()
+    {
+        // Arrange
+        var blueprintKey = Guid.NewGuid();
+        var blueprintA = Mock.Of<IContent>(e => e.Key == blueprintKey);
+        var blueprintB = Mock.Of<IContent>(e => e.Key == blueprintKey);
+
+        var notifications = new[]
+        {
+            new ContentDeletedBlueprintNotification(blueprintA, new EventMessages()),
+            new ContentDeletedBlueprintNotification(blueprintB, new EventMessages()),
+        };
+        var recordingRouter = new RecordingServerEventRouter();
+        var serverEventSender = CreateServerEventSender(recordingRouter);
+
+        // Act
+        await serverEventSender.HandleAsync(notifications, CancellationToken.None);
+
+        // Assert
+        AssertPrimaryRoutedEvent(recordingRouter, blueprintKey, Constants.ServerEvents.EventType.Deleted, Constants.ServerEvents.EventSource.DocumentBlueprint);
+    }
+
+    [Test]
+    public async Task HandleAsync_BatchedPublicAccessEntrySavedNotifications_DeduplicatesProtectedDocumentEvents()
+    {
+        // Arrange
+        var entryKey = Guid.NewGuid();
+        var protectedDocumentKey = Guid.NewGuid();
+        var protectedNodeId = 123;
+        var now = DateTime.UtcNow;
+
+        var entryA = new PublicAccessEntry(entryKey, protectedNodeId, loginNodeId: 456, noAccessNodeId: 789, [])
+        {
+            CreateDate = now,
+            UpdateDate = now,
+        };
+        var entryB = new PublicAccessEntry(entryKey, protectedNodeId, loginNodeId: 456, noAccessNodeId: 789, [])
+        {
+            CreateDate = now,
+            UpdateDate = now,
+        };
+
+        var idKeyMapMock = new Mock<IIdKeyMap>();
+        idKeyMapMock
+            .Setup(x => x.GetKeyForId(protectedNodeId, UmbracoObjectTypes.Document))
+            .Returns(Attempt<Guid>.Succeed(protectedDocumentKey));
+
+        var notifications = new[]
+        {
+            new PublicAccessEntrySavedNotification(entryA, new EventMessages()),
+            new PublicAccessEntrySavedNotification(entryB, new EventMessages()),
+        };
+        var recordingRouter = new RecordingServerEventRouter();
+        var serverEventSender = CreateServerEventSender(recordingRouter, idKeyMapMock.Object);
+
+        // Act
+        await serverEventSender.HandleAsync(notifications, CancellationToken.None);
+
+        // Assert - both the primary entry event and the secondary document update should appear only once.
+        AssertPrimaryRoutedEvent(
+            recordingRouter,
+            entryKey,
+            Constants.ServerEvents.EventType.Created,
+            Constants.ServerEvents.EventSource.PublicAccessEntry,
+            expectedNumberOfRoutedEvents: 2);
+
+        var documentEvent = recordingRouter.RoutedEvents[1];
+        Assert.Multiple(() =>
+        {
+            Assert.That(documentEvent.EventType, Is.EqualTo(Constants.ServerEvents.EventType.Updated));
+            Assert.That(documentEvent.EventSource, Is.EqualTo(Constants.ServerEvents.EventSource.Document));
+            Assert.That(documentEvent.Key, Is.EqualTo(protectedDocumentKey));
+        });
+    }
+
+    [Test]
+    public async Task HandleAsync_BatchedUserSavedNotifications_DeduplicatesCurrentUserNotifications()
+    {
+        // Arrange
+        var userKey = Guid.NewGuid();
+        var now = DateTime.UtcNow;
+        var userA = Mock.Of<IUser>(u => u.Key == userKey && u.CreateDate == now && u.UpdateDate == now);
+        var userB = Mock.Of<IUser>(u => u.Key == userKey && u.CreateDate == now && u.UpdateDate == now);
+
+        var notifications = new[]
+        {
+            new UserSavedNotification(userA, new EventMessages()),
+            new UserSavedNotification(userB, new EventMessages()),
+        };
+        var recordingRouter = new RecordingServerEventRouter();
+        var serverEventSender = CreateServerEventSender(recordingRouter);
+
+        // Act
+        await serverEventSender.HandleAsync(notifications, CancellationToken.None);
+
+        // Assert - both the primary User event and the secondary CurrentUser notification should appear only once.
+        AssertPrimaryRoutedEvent(recordingRouter, userKey, Constants.ServerEvents.EventType.Created, Constants.ServerEvents.EventSource.User);
+
+        Assert.That(recordingRouter.UserNotifications, Has.Count.EqualTo(1));
+        var (serverEvent, notifiedUserKey) = recordingRouter.UserNotifications[0];
+        Assert.Multiple(() =>
+        {
+            Assert.That(serverEvent.EventType, Is.EqualTo(Constants.ServerEvents.EventType.Updated));
+            Assert.That(serverEvent.EventSource, Is.EqualTo(Constants.ServerEvents.EventSource.CurrentUser));
+            Assert.That(serverEvent.Key, Is.EqualTo(userKey));
+            Assert.That(notifiedUserKey, Is.EqualTo(userKey));
+        });
     }
 
     private static ServerEventSender CreateServerEventSender(RecordingServerEventRouter recordingRouter) => new(recordingRouter, Mock.Of<IIdKeyMap>());

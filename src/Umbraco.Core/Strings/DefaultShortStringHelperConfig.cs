@@ -4,14 +4,34 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Strings;
 
+/// <summary>
+///     Provides configuration for the <see cref="DefaultShortStringHelper"/>.
+/// </summary>
+/// <remarks>
+///     This class manages culture-specific and string-type-specific configurations
+///     for cleaning and transforming strings.
+/// </remarks>
 public class DefaultShortStringHelperConfig
 {
+    /// <summary>
+    ///     The dictionary of configurations per culture and string type.
+    /// </summary>
     private readonly Dictionary<string, Dictionary<CleanStringType, Config>> _configs = new();
 
+    /// <summary>
+    ///     Gets or sets the default culture to use for string operations.
+    /// </summary>
     public string DefaultCulture { get; set; } = string.Empty; // invariant
 
+    /// <summary>
+    ///     Gets or sets the dictionary of character replacements for URL generation.
+    /// </summary>
     public Dictionary<string, string>? UrlReplaceCharacters { get; set; }
 
+    /// <summary>
+    ///     Creates a deep copy of this configuration.
+    /// </summary>
+    /// <returns>A new <see cref="DefaultShortStringHelperConfig"/> instance with the same settings.</returns>
     public DefaultShortStringHelperConfig Clone()
     {
         var config = new DefaultShortStringHelperConfig
@@ -33,12 +53,31 @@ public class DefaultShortStringHelperConfig
         return config;
     }
 
+    /// <summary>
+    ///     Adds or updates a configuration for the default culture and all string roles.
+    /// </summary>
+    /// <param name="config">The configuration to set.</param>
+    /// <returns>This instance for method chaining.</returns>
     public DefaultShortStringHelperConfig WithConfig(Config config) =>
         WithConfig(DefaultCulture, CleanStringType.RoleMask, config);
 
+    /// <summary>
+    ///     Adds or updates a configuration for the default culture and a specific string role.
+    /// </summary>
+    /// <param name="stringRole">The string role to configure.</param>
+    /// <param name="config">The configuration to set.</param>
+    /// <returns>This instance for method chaining.</returns>
     public DefaultShortStringHelperConfig WithConfig(CleanStringType stringRole, Config config) =>
         WithConfig(DefaultCulture, stringRole, config);
 
+    /// <summary>
+    ///     Adds or updates a configuration for a specific culture and string role.
+    /// </summary>
+    /// <param name="culture">The culture to configure, or <c>null</c> for the default culture.</param>
+    /// <param name="stringRole">The string role to configure.</param>
+    /// <param name="config">The configuration to set.</param>
+    /// <returns>This instance for method chaining.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="config"/> is <c>null</c>.</exception>
     public DefaultShortStringHelperConfig WithConfig(string? culture, CleanStringType stringRole, Config config)
     {
         if (config == null)
@@ -127,8 +166,16 @@ public class DefaultShortStringHelperConfig
         });
     }
 
-    // internal: we don't want ppl to retrieve a config and modify it
-    // (the helper uses a private clone to prevent modifications)
+    /// <summary>
+    ///     Gets the configuration for the specified string type and culture.
+    /// </summary>
+    /// <param name="stringType">The type of string cleaning.</param>
+    /// <param name="culture">The culture name.</param>
+    /// <returns>The configuration for the specified string type and culture.</returns>
+    /// <remarks>
+    ///     Internal: we don't want people to retrieve a config and modify it.
+    ///     The helper uses a private clone to prevent modifications.
+    /// </remarks>
     internal Config For(CleanStringType stringType, string? culture)
     {
         culture = culture ?? string.Empty;
@@ -174,13 +221,31 @@ public class DefaultShortStringHelperConfig
     public string ApplyUrlReplaceCharacters(string s) =>
         UrlReplaceCharacters == null ? s : s.ReplaceMany(UrlReplaceCharacters);
 
+    /// <summary>
+    ///     Cuts a string to a maximum length.
+    /// </summary>
+    /// <param name="text">The text to cut.</param>
+    /// <param name="length">The maximum length.</param>
+    /// <returns>The original text if shorter than or equal to <paramref name="length"/>; otherwise, the first <paramref name="length"/> characters.</returns>
     public static string CutMaxLength(string text, int length) =>
         text.Length <= length ? text : text.Substring(0, length);
 
+    /// <summary>
+    ///     Represents configuration settings for a specific string type and culture combination.
+    /// </summary>
+    /// <summary>
+    ///     Represents configuration settings for a specific string type and culture combination.
+    /// </summary>
     public sealed class Config
     {
+        /// <summary>
+        ///     The default configuration instance returned when no configuration is found.
+        /// </summary>
         internal static readonly Config NotConfigured = new();
 
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="Config"/> class with default settings.
+        /// </summary>
         public Config()
         {
             StringType = CleanStringType.Utf8 | CleanStringType.Unchanged;
@@ -193,31 +258,59 @@ public class DefaultShortStringHelperConfig
             Separator = char.MinValue;
         }
 
+        /// <summary>
+        ///     Gets or sets a function to apply before string processing.
+        /// </summary>
         public Func<string, string>? PreFilter { get; set; }
 
+        /// <summary>
+        ///     Gets or sets a function to apply after string processing.
+        /// </summary>
         public Func<string, string>? PostFilter { get; set; }
 
+        /// <summary>
+        ///     Gets or sets a function that determines whether a character is a valid term character.
+        /// </summary>
+        /// <remarks>
+        ///     The first parameter is the character, the second indicates whether it is a leading character.
+        /// </remarks>
         public Func<char, bool, bool> IsTerm { get; set; }
 
+        /// <summary>
+        ///     Gets or sets the target string type (casing and encoding).
+        /// </summary>
         public CleanStringType StringType { get; set; }
 
-        // indicate whether an uppercase within a term eg "fooBar" is to break
-        // into a new term, or to be considered as part of the current term
+        /// <summary>
+        ///     Gets or sets a value indicating whether an uppercase character within a term (e.g., "fooBar")
+        ///     should break into a new term, or be considered as part of the current term.
+        /// </summary>
         public bool BreakTermsOnUpper { get; set; }
 
-        // indicate whether a non-uppercase within an acronym eg "FOOBar" is to cut
-        // the acronym (at "B" or "a" depending on GreedyAcronyms) or to give
-        // up the acronym and treat the term as a word
+        /// <summary>
+        ///     Gets or sets a value indicating whether a non-uppercase character within an acronym (e.g., "FOOBar")
+        ///     should cut the acronym or give up the acronym and treat the term as a word.
+        /// </summary>
         public bool CutAcronymOnNonUpper { get; set; }
 
-        // indicates whether acronyms parsing is greedy ie whether "FOObar" is
-        // "FOO" + "bar" (greedy) or "FO" + "Obar" (non-greedy)
+        /// <summary>
+        ///     Gets or sets a value indicating whether acronym parsing is greedy,
+        ///     i.e., whether "FOObar" is "FOO" + "bar" (greedy) or "FO" + "Obar" (non-greedy).
+        /// </summary>
         public bool GreedyAcronyms { get; set; }
 
-        // the separator char
-        // but then how can we tell we don't want any?
+        /// <summary>
+        ///     Gets or sets the separator character to use between terms.
+        /// </summary>
+        /// <remarks>
+        ///     Use <see cref="char.MinValue"/> to indicate no separator.
+        /// </remarks>
         public char Separator { get; set; }
 
+        /// <summary>
+        ///     Creates a deep copy of this configuration.
+        /// </summary>
+        /// <returns>A new <see cref="Config"/> instance with the same settings.</returns>
         public Config Clone() =>
             new Config
             {
@@ -231,7 +324,11 @@ public class DefaultShortStringHelperConfig
                 Separator = Separator,
             };
 
-        // extends the config
+        /// <summary>
+        ///     Extends the configuration's string type with values from the specified string type.
+        /// </summary>
+        /// <param name="stringType">The string type to merge into this configuration.</param>
+        /// <returns>The merged string type.</returns>
         public CleanStringType StringTypeExtend(CleanStringType stringType)
         {
             CleanStringType st = StringType;

@@ -1,3 +1,4 @@
+import { UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN } from '../paths.js';
 import type { UmbDocumentCollectionFilterModel, UmbDocumentCollectionItemModel } from './types.js';
 import { UMB_DOCUMENT_TABLE_COLLECTION_VIEW_ALIAS } from './constants.js';
 import { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
@@ -55,6 +56,15 @@ export class UmbDocumentCollectionContext extends UmbDefaultCollectionContext<
 	protected override async _requestCollection() {
 		await this.observe(this.#displayCultureObservable)?.asPromise();
 		await super._requestCollection();
+	}
+
+	/**
+	 * Returns the href for a specific Document collection item.
+	 * @param {UmbDocumentCollectionItemModel} item - The document item to get the href for.
+	 * @returns {Promise<string | undefined>} - The edit workspace href for the document.
+	 */
+	override async requestItemHref(item: UmbDocumentCollectionItemModel): Promise<string | undefined> {
+		return `${UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: item.unique })}`;
 	}
 }
 

@@ -1,4 +1,6 @@
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbDefaultPickerSearchResultItemContext } from './default-picker-search-result-item.context.js';
+import { UmbDefaultPickerSearchResultItemElement } from './default-picker-search-result-item.element.js';
 
 export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
 	{
@@ -8,8 +10,8 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 		matchType: 'pickerSearchResultItem',
 		manifest: {
 			type: 'pickerSearchResultItem',
-			api: () => import('./default-picker-search-result-item.context.js'),
-			element: () => import('./default-picker-search-result-item.element.js'),
+			api: UmbDefaultPickerSearchResultItemContext,
+			element: UmbDefaultPickerSearchResultItemElement,
 		},
 	},
 ];

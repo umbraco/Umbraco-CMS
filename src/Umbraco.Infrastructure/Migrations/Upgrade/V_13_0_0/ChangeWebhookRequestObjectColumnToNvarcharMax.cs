@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using System.Text;
 using NPoco;
 using Umbraco.Cms.Core;
@@ -8,8 +8,15 @@ using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_13_0_0;
 
+/// <summary>
+/// Represents a migration that updates the data type of the WebhookRequestObject column to <c>nvarchar(max)</c>.
+/// </summary>
 public class ChangeWebhookRequestObjectColumnToNvarcharMax : MigrationBase
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ChangeWebhookRequestObjectColumnToNvarcharMax"/> migration class.
+    /// </summary>
+    /// <param name="context">The <see cref="IMigrationContext"/> for the migration.</param>
     public ChangeWebhookRequestObjectColumnToNvarcharMax(IMigrationContext context) : base(context)
     {
     }

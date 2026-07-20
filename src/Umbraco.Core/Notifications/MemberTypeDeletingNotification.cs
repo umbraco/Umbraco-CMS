@@ -7,6 +7,12 @@ namespace Umbraco.Cms.Core.Notifications;
 /// </summary>
 public class MemberTypeDeletingNotification : DeletingNotification<IMemberType>
 {
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="MemberTypeDeletingNotification"/> class
+    ///     with a single member type.
+    /// </summary>
+    /// <param name="target">The member type being deleted.</param>
+    /// <param name="messages">The event messages collection.</param>
     public MemberTypeDeletingNotification(IMemberType target, EventMessages messages)
         : base(target, messages)
     {

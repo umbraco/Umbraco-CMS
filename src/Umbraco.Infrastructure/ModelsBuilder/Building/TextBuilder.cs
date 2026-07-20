@@ -42,7 +42,14 @@ public class TextBuilder : Builder
     {
     }
 
-    // internal for unit tests only
+    /// <summary>
+    /// Initializes a new instance of the <see cref="TextBuilder"/> class.
+    /// </summary>
+    /// <remarks>
+    /// Internal for unit tests only.
+    /// </remarks>
+    // TODO (V19): Remove obsoletion and make internal (so still available for unit tests). Also remove pragma warning disable CS0618 in BuilderTests.
+    [Obsolete("This constructor is not expected to be called from external libraries. Scheduled to be made internal in Umbraco 19.")]
     public TextBuilder()
     {
     }
@@ -68,7 +75,7 @@ public class TextBuilder : Builder
             sb.AppendFormat("using {0};\n", t);
         }
 
-        sb.Append("\n");
+        sb.Append('\n');
         sb.AppendFormat("namespace {0}\n", GetModelsNamespace());
         sb.Append("{\n");
 
@@ -112,7 +119,14 @@ public class TextBuilder : Builder
         sb.Append("}\n");
     }
 
-    // internal for unit tests
+    /// <summary>
+    /// Appends a string representation of the specified CLR type to the provided <see cref="StringBuilder"/>, including
+    /// generic type arguments if present.
+    /// </summary>
+    /// <param name="sb">The <see cref="StringBuilder"/> instance to which the type representation will be appended.</param>
+    /// <param name="type">The <see cref="Type"/> to represent as a string, including its generic arguments if applicable.</param>
+    // TODO (V19): Remove obsoletion and make internal (so still available for unit tests). Also remove pragma warning disable CS0618 in BuilderTests.
+    [Obsolete("This method is not expected to be called from external libraries. Scheduled to be made internal in Umbraco 19.")]
     public void WriteClrType(StringBuilder sb, Type type)
     {
         var s = type.ToString();
@@ -120,8 +134,8 @@ public class TextBuilder : Builder
         if (type.IsGenericType)
         {
             var p = s.IndexOf('`');
-            WriteNonGenericClrType(sb, s.Substring(0, p));
-            sb.Append("<");
+            WriteNonGenericClrType(sb, s[..p]);
+            sb.Append('<');
             Type[] args = type.GetGenericArguments();
             for (var i = 0; i < args.Length; i++)
             {
@@ -180,7 +194,7 @@ public class TextBuilder : Builder
                 break;
             }
 
-            yield return error.Substring(p, n - p);
+            yield return error[p..n];
             p = n + 1;
         }
 
@@ -228,7 +242,7 @@ public class TextBuilder : Builder
             {
                 if (more)
                 {
-                    sb.Append("\n");
+                    sb.Append('\n');
                 }
 
                 more = true;
@@ -329,7 +343,7 @@ public class TextBuilder : Builder
         // write the properties
         foreach (PropertyModel prop in type.Properties.OrderBy(x => x.ClrName))
         {
-            WriteProperty(sb, type, prop, staticMixinGetters && type.IsMixin ? type.ClrName : null);
+            WriteProperty(sb, prop, staticMixinGetters && type.IsMixin ? type.ClrName : null);
         }
 
         // no need to write the parent properties since we inherit from the parent
@@ -347,7 +361,7 @@ public class TextBuilder : Builder
                 }
                 else
                 {
-                    WriteProperty(sb, mixinType, prop);
+                    WriteProperty(sb, prop);
                 }
             }
         }
@@ -355,7 +369,7 @@ public class TextBuilder : Builder
 
     private void WriteMixinProperty(StringBuilder sb, PropertyModel property, string mixinClrName)
     {
-        sb.Append("\n");
+        sb.Append('\n');
 
         // Adds xml summary to each property containing
         // property name and property description
@@ -403,11 +417,11 @@ public class TextBuilder : Builder
             MixinStaticGetterName(property.ClrName));
     }
 
-    private void WriteProperty(StringBuilder sb, TypeModel type, PropertyModel property, string? mixinClrName = null)
+    private void WriteProperty(StringBuilder sb, PropertyModel property, string? mixinClrName = null)
     {
         var mixinStatic = mixinClrName != null;
 
-        sb.Append("\n");
+        sb.Append('\n');
 
         if (property.Errors != null)
         {
@@ -430,12 +444,12 @@ public class TextBuilder : Builder
                 {
                     sb.Append("\t\t * ");
                     sb.Append(s);
-                    sb.Append("\n");
+                    sb.Append('\n');
                 }
             }
 
             sb.Append("\t\t *\n");
-            sb.Append("\n");
+            sb.Append('\n');
         }
 
         // Adds xml summary to each property containing
@@ -493,9 +507,9 @@ public class TextBuilder : Builder
                 property.ClrName);
             if (property.ModelClrType != typeof(object))
             {
-                sb.Append("<");
+                sb.Append('<');
                 WriteClrType(sb, property.ClrTypeName);
-                sb.Append(">");
+                sb.Append('>');
             }
 
             sb.AppendFormat(
@@ -505,7 +519,7 @@ public class TextBuilder : Builder
 
         if (property.Errors != null)
         {
-            sb.Append("\n");
+            sb.Append('\n');
             sb.Append("\t\t *\n");
             sb.Append("\t\t */\n");
         }
@@ -518,7 +532,7 @@ public class TextBuilder : Builder
         var mixinStaticGetterName = MixinStaticGetterName(property.ClrName);
 
         // if (type.StaticMixinMethods.Contains(mixinStaticGetterName)) return;
-        sb.Append("\n");
+        sb.Append('\n');
 
         if (!string.IsNullOrWhiteSpace(property.Name))
         {
@@ -539,9 +553,9 @@ public class TextBuilder : Builder
             mixinClrName);
         if (property.ModelClrType != typeof(object))
         {
-            sb.Append("<");
+            sb.Append('<');
             WriteClrType(sb, property.ClrTypeName);
-            sb.Append(">");
+            sb.Append('>');
         }
 
         sb.AppendFormat(
@@ -572,12 +586,12 @@ public class TextBuilder : Builder
                 {
                     sb.Append("\t\t * ");
                     sb.Append(s);
-                    sb.Append("\n");
+                    sb.Append('\n');
                 }
             }
 
             sb.Append("\t\t *\n");
-            sb.Append("\n");
+            sb.Append('\n');
         }
 
         if (!string.IsNullOrWhiteSpace(property.Name))
@@ -599,22 +613,30 @@ public class TextBuilder : Builder
 
         if (property.Errors != null)
         {
-            sb.Append("\n");
+            sb.Append('\n');
             sb.Append("\t\t *\n");
             sb.Append("\t\t */\n");
         }
     }
 
+    /// <summary>
+    /// Appends a formatted representation of a CLR type name, including generic type arguments, to the specified
+    /// StringBuilder.
+    /// </summary>
+    /// <param name="sb">The <see cref="StringBuilder"/> instance to which the type representation will be appended.</param>
+    /// <param name="type">The <see cref="string"/> representing the full name of the type, including its generic arguments if applicable.</param>
     internal void WriteClrType(StringBuilder sb, string type)
     {
         var p = type.IndexOf('<');
-        if (type.Contains('<'))
+        if (p >= 0)
         {
             WriteNonGenericClrType(sb, type[..p]);
-            sb.Append("<");
-            var args = type[(p + 1)..].TrimEnd(Constants.CharArrays.GreaterThan)
-                .Split(Constants.CharArrays.Comma); // TODO: will NOT work with nested generic types
-            for (var i = 0; i < args.Length; i++)
+            sb.Append('<');
+
+            var argsString = type[(p + 1)..^1]; // Extract content between '<' and the final '>'
+            IReadOnlyList<string> args = SplitGenericArguments(argsString);
+
+            for (var i = 0; i < args.Count; i++)
             {
                 if (i > 0)
                 {
@@ -624,12 +646,72 @@ public class TextBuilder : Builder
                 WriteClrType(sb, args[i]);
             }
 
-            sb.Append(">");
+            sb.Append('>');
         }
         else
         {
             WriteNonGenericClrType(sb, type);
         }
+    }
+
+    /// <summary>
+    /// Splits generic type arguments while respecting nested generic brackets.
+    /// For example, "Tuple&lt;string, string&gt;, int" splits into ["Tuple&lt;string, string&gt;", "int"].
+    /// </summary>
+    /// <exception cref="ArgumentException">Thrown when the input has mismatched generic type brackets.</exception>
+    private static IReadOnlyList<string> SplitGenericArguments(string argsString)
+    {
+        var result = new List<string>();
+        var currentArg = new StringBuilder();
+        var depth = 0;
+
+        foreach (var c in argsString)
+        {
+            switch (c)
+            {
+                case '<':
+                    depth++;
+                    currentArg.Append(c);
+                    break;
+                case '>':
+                    depth--;
+                    if (depth < 0)
+                    {
+                        throw new ArgumentException("Mismatched generic type brackets: too many closing brackets.", nameof(argsString));
+                    }
+
+                    currentArg.Append(c);
+                    break;
+                case ',':
+                    if (depth == 0)
+                    {
+                        result.Add(currentArg.ToString().Trim());
+                        currentArg.Clear();
+                    }
+                    else
+                    {
+                        currentArg.Append(c);
+                    }
+
+                    break;
+                default:
+                    currentArg.Append(c);
+                    break;
+            }
+        }
+
+        if (depth != 0)
+        {
+            throw new ArgumentException("Mismatched generic type brackets: unclosed brackets.", nameof(argsString));
+        }
+
+        var lastArg = currentArg.ToString().Trim();
+        if (!string.IsNullOrEmpty(lastArg))
+        {
+            result.Add(lastArg);
+        }
+
+        return result;
     }
 
     private static string XmlCommentString(string s) =>
@@ -638,7 +720,7 @@ public class TextBuilder : Builder
     private void WriteNonGenericClrType(StringBuilder sb, string s)
     {
         // map model types
-        s = Regex.Replace(s, @"\{(.*)\}\[\*\]", m => ModelsMap[m.Groups[1].Value + "[]"]);
+        s = Regex.Replace(s, @"\{(.*)\}\[\*\]", m => ModelsMap[$"{m.Groups[1].ValueSpan}[]"]);
 
         // takes care eg of "System.Int32" vs. "int"
         if (_typesMap.TryGetValue(s, out var typeName))
@@ -655,15 +737,15 @@ public class TextBuilder : Builder
         var p = typeName.LastIndexOf('.');
         if (p > 0)
         {
-            var x = typeName.Substring(0, p);
+            var x = typeName[..p];
             if (Using.Contains(x))
             {
-                typeName = typeName.Substring(p + 1);
+                typeName = typeName[(p + 1)..];
                 typeUsing = x;
             }
             else if (x == ModelsNamespace) // that one is used by default
             {
-                typeName = typeName.Substring(p + 1);
+                typeName = typeName[(p + 1)..];
                 typeUsing = ModelsNamespace;
             }
         }
@@ -674,7 +756,7 @@ public class TextBuilder : Builder
         // symbol to test is the first part of the name
         // so if type name is Foo.Bar.Nil we want to ensure that Foo is not ambiguous
         p = typeName.IndexOf('.');
-        var symbol = p > 0 ? typeName.Substring(0, p) : typeName;
+        var symbol = p > 0 ? typeName[..p] : typeName;
 
         // what we should find - WITHOUT any generic <T> thing - just the type
         // no 'using' = the exact symbol
@@ -701,7 +783,7 @@ public class TextBuilder : Builder
         // note: all-or-nothing, not trying to segment the using clause
         typeName = s.Replace("+", ".");
         p = typeName.IndexOf('.');
-        symbol = typeName.Substring(0, p);
+        symbol = typeName[..p];
         match = symbol;
 
         // still ambiguous, must prepend global::

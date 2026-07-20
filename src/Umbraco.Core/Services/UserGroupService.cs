@@ -8,6 +8,7 @@ using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services.AuthorizationStatus;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
@@ -17,7 +18,14 @@ namespace Umbraco.Cms.Core.Services;
 /// <inheritdoc cref="Umbraco.Cms.Core.Services.IUserGroupService" />
 internal sealed class UserGroupService : RepositoryService, IUserGroupService
 {
+    /// <summary>
+    ///     The maximum length of a user group name.
+    /// </summary>
     public const int MaxUserGroupNameLength = 200;
+
+    /// <summary>
+    ///     The maximum length of a user group alias.
+    /// </summary>
     public const int MaxUserGroupAliasLength = 200;
 
     private readonly IUserGroupRepository _userGroupRepository;
@@ -26,6 +34,17 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
     private readonly IUserService _userService;
     private readonly ILogger<UserGroupService> _logger;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="UserGroupService" /> class.
+    /// </summary>
+    /// <param name="provider">The core scope provider for database operations.</param>
+    /// <param name="loggerFactory">The logger factory for creating loggers.</param>
+    /// <param name="eventMessagesFactory">The factory for creating event messages.</param>
+    /// <param name="userGroupRepository">The repository for user group operations.</param>
+    /// <param name="userGroupPermissionService">The service for user group permission operations.</param>
+    /// <param name="entityService">The entity service for entity-related operations.</param>
+    /// <param name="userService">The user service for user-related operations.</param>
+    /// <param name="logger">The logger for this service.</param>
     public UserGroupService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -119,6 +138,7 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
         return Task.FromResult(groups);
     }
 
+    /// <inheritdoc />
     public Task<IEnumerable<IUserGroup>> GetAsync(IEnumerable<Guid> keys)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
@@ -210,9 +230,26 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
         return Attempt.Succeed(UserGroupOperationStatus.Success);
     }
 
-    public async Task<Attempt<UserGroupOperationStatus>> UpdateUserGroupsOnUsersAsync(
+    // TODO (V19): Collapse the following three methods into a single one, once the obsolete overload
+    // of UpdateUserGroupsOnUsersAsync is removed from the interface.
+
+    /// <inheritdoc />
+    public Task<Attempt<UserGroupOperationStatus>> UpdateUserGroupsOnUsersAsync(
         ISet<Guid> userGroupKeys,
         ISet<Guid> userKeys)
+        => UpdateUserGroupsOnUsersInternalAsync(userGroupKeys, userKeys, performingUserKey: null);
+
+    /// <inheritdoc />
+    public Task<Attempt<UserGroupOperationStatus>> UpdateUserGroupsOnUsersAsync(
+        ISet<Guid> userGroupKeys,
+        ISet<Guid> userKeys,
+        Guid performingUserKey)
+        => UpdateUserGroupsOnUsersInternalAsync(userGroupKeys, userKeys, performingUserKey);
+
+    private async Task<Attempt<UserGroupOperationStatus>> UpdateUserGroupsOnUsersInternalAsync(
+        ISet<Guid> userGroupKeys,
+        ISet<Guid> userKeys,
+        Guid? performingUserKey)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
@@ -221,6 +258,40 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
         IReadOnlyUserGroup[] userGroups = (await GetAsync(userGroupKeys))
             .Select(x => x.ToReadOnlyGroup())
             .ToArray();
+
+        // Authorize the performing user if provided.
+        if (performingUserKey.HasValue)
+        {
+            IUser? performingUser = await _userService.GetAsync(performingUserKey.Value);
+            if (performingUser is null)
+            {
+                scope.Complete();
+                return Attempt.Fail(UserGroupOperationStatus.MissingUser);
+            }
+
+            if (performingUser.IsAdmin() is false)
+            {
+                string[] performingUserGroupAliases = performingUser.Groups.Select(g => g.Alias).ToArray();
+                string[] requestedGroupAliases = userGroups.Select(g => g.Alias).ToArray();
+
+                foreach (IUser user in users)
+                {
+                    IEnumerable<string> existingGroupAliases = user.Groups.Select(g => g.Alias);
+
+                    IReadOnlyList<string> unauthorized = UserGroupAssignmentAuthorization
+                        .GetUnauthorizedGroupAssignments(performingUserGroupAliases, requestedGroupAliases, existingGroupAliases);
+
+                    if (unauthorized.Count > 0)
+                    {
+                        _logger.LogInformation(
+                            "The performing user is not allowed to assign user group(s) '{GroupAliases}' because they do not belong to them.",
+                            string.Join(", ", unauthorized));
+                        scope.Complete();
+                        return Attempt.Fail(UserGroupOperationStatus.Unauthorized);
+                    }
+                }
+            }
+        }
 
         // This means that we're potentially de-admining a user, which might cause the admin group to be empty.
         if (userGroupKeys.Contains(Constants.Security.AdminGroupKey) is false)
@@ -254,6 +325,11 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
         return Attempt.Succeed(UserGroupOperationStatus.Success);
     }
 
+    /// <summary>
+    ///     Validates that a user group can be deleted.
+    /// </summary>
+    /// <param name="userGroup">The user group to validate for deletion.</param>
+    /// <returns>An <see cref="Attempt{T}" /> indicating whether the user group can be deleted.</returns>
     private Attempt<UserGroupOperationStatus> ValidateUserGroupDeletion(IUserGroup? userGroup)
     {
         if (userGroup is null)
@@ -331,6 +407,11 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
         return Attempt.SucceedWithStatus(UserGroupOperationStatus.Success, userGroup);
     }
 
+    /// <summary>
+    ///     Validates a user group for creation.
+    /// </summary>
+    /// <param name="userGroup">The user group to validate.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains an <see cref="Attempt{TResult,TStatus}" /> with the validation result.</returns>
     private async Task<Attempt<IUserGroup, UserGroupOperationStatus>> ValidateUserGroupCreationAsync(
         IUserGroup userGroup)
     {
@@ -410,6 +491,7 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
         return Attempt.SucceedWithStatus(UserGroupOperationStatus.Success, userGroup);
     }
 
+    /// <inheritdoc />
     public async Task<Attempt<UserGroupOperationStatus>> AddUsersToUserGroupAsync(UsersToUserGroupManipulationModel addUsersModel, Guid performingUserKey)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
@@ -440,6 +522,7 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
         return Attempt.Succeed(UserGroupOperationStatus.Success);
     }
 
+    /// <inheritdoc />
     public async Task<Attempt<UserGroupOperationStatus>> RemoveUsersFromUserGroupAsync(UsersToUserGroupManipulationModel removeUsersModel, Guid performingUserKey)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
@@ -518,6 +601,11 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
         return Attempt.SucceedWithStatus<ResolvedUserToUserGroupManipulationModel?, UserGroupOperationStatus>(UserGroupOperationStatus.Success, resolvedModel);
     }
 
+    /// <summary>
+    ///     Validates a user group for update operations.
+    /// </summary>
+    /// <param name="userGroup">The user group to validate.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the <see cref="UserGroupOperationStatus" /> indicating validation result.</returns>
     private async Task<UserGroupOperationStatus> ValidateUserGroupUpdateAsync(IUserGroup userGroup)
     {
         UserGroupOperationStatus commonValidationStatus = ValidateCommon(userGroup);
@@ -581,6 +669,11 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
         return UserGroupOperationStatus.Success;
     }
 
+    /// <summary>
+    ///     Determines whether the user group is new (not yet persisted).
+    /// </summary>
+    /// <param name="userGroup">The user group to check.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result is true if the user group is new; otherwise, false.</returns>
     private async Task<bool> IsNewUserGroup(IUserGroup userGroup)
     {
         if (userGroup.Id != 0 && userGroup.HasIdentity is false)
@@ -591,6 +684,11 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
         return await GetAsync(userGroup.Key) is null;
     }
 
+    /// <summary>
+    ///     Validates that the start nodes specified in the user group exist.
+    /// </summary>
+    /// <param name="userGroup">The user group containing start node references.</param>
+    /// <returns>The <see cref="UserGroupOperationStatus" /> indicating whether validation passed.</returns>
     private UserGroupOperationStatus ValidateStartNodesExists(IUserGroup userGroup)
     {
         if (userGroup.StartContentId is not null
@@ -610,6 +708,11 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
         return UserGroupOperationStatus.Success;
     }
 
+    /// <summary>
+    ///     Validates that the granular permissions specified in the user group reference existing entities.
+    /// </summary>
+    /// <param name="userGroup">The user group containing granular permission references.</param>
+    /// <returns>The <see cref="UserGroupOperationStatus" /> indicating whether validation passed.</returns>
     private UserGroupOperationStatus ValidateGranularPermissionsExists(IUserGroup userGroup)
     {
         Guid[] documentKeys = userGroup.GranularPermissions

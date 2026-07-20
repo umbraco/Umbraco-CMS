@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.Logging;
@@ -7,6 +7,10 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
+/// <summary>
+/// Provides a base class for handling notifications when block editor property values change.
+/// Intended to be inherited by classes that process block layout item notifications.
+/// </summary>
 public abstract class BlockEditorPropertyNotificationHandlerBase<TBlockLayoutItem> : ComplexPropertyEditorContentNotificationHandler
     where TBlockLayoutItem : IBlockLayoutItem, new()
 {
@@ -60,7 +64,7 @@ public abstract class BlockEditorPropertyNotificationHandlerBase<TBlockLayoutIte
                     return match.Value;
                 }
 
-                var oldKey = Guid.Parse(match.Value);
+                var oldKey = Guid.Parse(match.ValueSpan);
                 if (oldToNewKeys.ContainsKey(oldKey) == false)
                 {
                     oldToNewKeys[oldKey] = createGuid(oldKey);

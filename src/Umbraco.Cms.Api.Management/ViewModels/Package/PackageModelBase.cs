@@ -1,5 +1,8 @@
 namespace Umbraco.Cms.Api.Management.ViewModels.Package;
 
+/// <summary>
+/// Base model for a package in the Umbraco CMS Management API.
+/// </summary>
 public class PackageModelBase
 {
     /// <summary>

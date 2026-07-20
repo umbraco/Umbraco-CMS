@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 
 namespace Umbraco.Cms.Core.Configuration.Models;
 
@@ -8,8 +8,19 @@ namespace Umbraco.Cms.Core.Configuration.Models;
 [UmbracoOptions(Constants.Configuration.ConfigDistributedJobs)]
 public class DistributedJobSettings
 {
+    /// <summary>
+    ///     The default period for checking if there are runnable distributed jobs.
+    /// </summary>
     internal const string StaticPeriod = "00:00:05";
+
+    /// <summary>
+    ///     The default delay before starting to check for distributed jobs.
+    /// </summary>
     internal const string StaticDelay = "00:01:00";
+
+    /// <summary>
+    ///     The default maximum execution time for a distributed job.
+    /// </summary>
     internal const string StaticMaxExecutionTime = "00:05:00";
 
     /// <summary>

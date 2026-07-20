@@ -1,13 +1,25 @@
 import { UMB_BLOCK_LIST_ENTRY_CONTEXT } from '../../context/index.js';
-import { UMB_BLOCK_WORKSPACE_ALIAS } from '@umbraco-cms/backoffice/block';
+import type { UmbBlockListLayoutModel, UmbBlockListWorkspaceOriginData } from '../../index.js';
 import { css, customElement, html, nothing, property, state, when } from '@umbraco-cms/backoffice/external/lit';
-import { UmbExtensionApiInitializer, UmbExtensionsApiInitializer } from '@umbraco-cms/backoffice/extension-api';
+import {
+	UmbBlockInsertedEvent,
+	UMB_BLOCK_MANAGER_CONTEXT,
+	UMB_BLOCK_WORKSPACE_ALIAS,
+} from '@umbraco-cms/backoffice/block';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbExtensionApiInitializer, UmbExtensionsApiInitializer } from '@umbraco-cms/backoffice/extension-api';
+import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { UmbLanguageItemRepository } from '@umbraco-cms/backoffice/language';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { UmbContextBoundary } from '@umbraco-cms/backoffice/context-api';
+import { UMB_VIEW_CONTEXT } from '@umbraco-cms/backoffice/view';
 import type { UmbApiConstructorArgumentsMethodType } from '@umbraco-cms/backoffice/extension-api';
-import type { UmbBlockDataType, UMB_BLOCK_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/block';
+import type {
+	UmbBlockDataType,
+	UMB_BLOCK_WORKSPACE_CONTEXT,
+	UmbBlockLabelUfmValueType,
+} from '@umbraco-cms/backoffice/block';
 
 import '../../../block/workspace/views/edit/block-workspace-view-edit-content-no-router.element.js';
 
@@ -15,17 +27,41 @@ const apiArgsCreator: UmbApiConstructorArgumentsMethodType<unknown> = (manifest:
 	return [{ manifest }];
 };
 
+let hasWarnedLabelDeprecation = false;
+
 /**
  * @element umb-inline-list-block
+ * @slot name - Content rendered as the block's primary label. The expected projection is a `<umb-ufm-render>` element owned by the parent block-list entry.
  */
 @customElement('umb-inline-list-block')
 export class UmbInlineListBlockElement extends UmbLitElement {
+	#manager?: typeof UMB_BLOCK_MANAGER_CONTEXT.TYPE;
 	#blockContext?: typeof UMB_BLOCK_LIST_ENTRY_CONTEXT.TYPE;
 	#workspaceContext?: typeof UMB_BLOCK_WORKSPACE_CONTEXT.TYPE;
 	#contentKey?: string;
 
+	/**
+	 * @deprecated Use the `name` slot to project a `<umb-ufm-render>` instead. Will be removed in Umbraco 19.
+	 */
 	@property({ type: String, reflect: false })
-	label?: string;
+	public set label(value: string | undefined) {
+		if (value !== undefined && value !== this._label) {
+			if (!hasWarnedLabelDeprecation) {
+				hasWarnedLabelDeprecation = true;
+				new UmbDeprecation({
+					deprecated: 'umb-inline-list-block.label property',
+					solution: 'Project a `<umb-ufm-render>` into the `name` slot instead.',
+					removeInVersion: '19.0.0',
+				}).warn();
+			}
+		}
+		this._label = value;
+	}
+	public get label(): string | undefined {
+		return this._label;
+	}
+	@state()
+	private _label?: string;
 
 	@property({ type: String, reflect: false })
 	icon?: string;
@@ -54,6 +90,14 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 	@state()
 	private _variantName?: string;
 
+	@state()
+	private _hasNameSlotContent = false;
+
+	#onNameSlotChange = (event: Event) => {
+		const slot = event.target as HTMLSlotElement;
+		this._hasNameSlotContent = slot.assignedNodes({ flatten: true }).length > 0;
+	};
+
 	constructor() {
 		super();
 
@@ -69,6 +113,17 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 			);
 		});
 
+		this.consumeContext(UMB_BLOCK_MANAGER_CONTEXT, (manager) => {
+			if (this.#manager) {
+				this.#manager.removeEventListener(UmbBlockInsertedEvent.TYPE, this.#onBlockInserted);
+			}
+			this.#manager = manager;
+			this.#manager?.addEventListener(UmbBlockInsertedEvent.TYPE, this.#onBlockInserted);
+		});
+
+		// Block the access to the View Context for this inline block workspace: [NL]
+		new UmbContextBoundary(this, UMB_VIEW_CONTEXT);
+
 		new UmbExtensionApiInitializer(
 			this,
 			umbExtensionsRegistry,
@@ -79,6 +134,10 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 				if (permitted && context) {
 					this.#workspaceContext = context;
 					this.#workspaceContext.establishLiveSync();
+					// Avoid view context becoming active: [NL]
+					// in this case its not a routable workspace and we do not want it to become an active view, appending shortcuts or setting browser title. (maybe this code needs to be more explicit. Like a inlineMode()?) [NL]
+					this.#workspaceContext.view.destroy();
+					this.#workspaceContext.autoReportValidation();
 					this.#load();
 
 					this.observe(
@@ -126,6 +185,13 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 		this.#workspaceContext.load(this.#contentKey);
 	}
 
+	#onBlockInserted = (event: Event) => {
+		const blockEvent = event as UmbBlockInsertedEvent<UmbBlockListLayoutModel, UmbBlockListWorkspaceOriginData>;
+		if (blockEvent.detail.layout.contentKey === this.#contentKey) {
+			this._isOpen = true;
+		}
+	};
+
 	#expose = () => {
 		this.#workspaceContext?.expose();
 	};
@@ -156,14 +222,19 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 	}
 
 	#renderBlockInfo() {
-		const blockValue = { ...this.content, $settings: this.settings, $index: this.index };
+		const blockValue: UmbBlockLabelUfmValueType = { ...this.content, $settings: this.settings, $index: this.index };
 		return html`
 			<span id="content">
 				<span id="icon">
 					<umb-icon .name=${this.icon}></umb-icon>
 				</span>
 				<div id="info">
-					<umb-ufm-render id="name" inline .markdown=${this.label} .value=${blockValue}></umb-ufm-render>
+					<slot name="name" @slotchange=${this.#onNameSlotChange}></slot>
+					${when(
+						!this._hasNameSlotContent && this._label !== undefined,
+						() =>
+							html`<umb-ufm-render id="name" inline .markdown=${this._label} .value=${blockValue}></umb-ufm-render>`,
+					)}
 				</div>
 			</span>
 			${when(
@@ -197,6 +268,7 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 				position: relative;
 				display: block;
 				width: 100%;
+				margin-bottom: 1px;
 
 				box-sizing: border-box;
 				border-radius: var(--uui-border-radius);
@@ -302,14 +374,16 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 			:host(:not([disabled])) #open-part:hover #icon {
 				color: var(--uui-color-interactive-emphasis);
 			}
-			:host(:not([disabled])) #open-part:hover #name {
+			:host(:not([disabled])) #open-part:hover #name,
+			:host(:not([disabled])) #open-part:hover ::slotted([slot='name']) {
 				color: var(--uui-color-interactive-emphasis);
 			}
 
 			:host([disabled]) #icon {
 				color: var(--uui-color-disabled-contrast);
 			}
-			:host([disabled]) #name {
+			:host([disabled]) #name,
+			:host([disabled]) ::slotted([slot='name']) {
 				color: var(--uui-color-disabled-contrast);
 			}
 		`,

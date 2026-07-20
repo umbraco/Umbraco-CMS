@@ -1,9 +1,9 @@
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using AutoFixture.NUnit3;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
@@ -26,7 +26,7 @@ internal class ContentVersionCleanupServiceTest
         DateTime aDateTime,
         ContentVersionService sut)
     {
-        documentVersionRepository.Setup(x => x.GetDocumentVersionsEligibleForCleanup())
+        documentVersionRepository.Setup(x => x.GetDocumentVersionsEligibleForCleanup(It.IsAny<DateTime>(), It.IsAny<int?>()))
             .Returns(someHistoricVersions);
 
         eventAggregator.Setup(x => x.PublishCancelable(It.IsAny<ContentDeletingVersionsNotification>()))
@@ -58,7 +58,7 @@ internal class ContentVersionCleanupServiceTest
         DateTime aDateTime,
         ContentVersionService sut)
     {
-        documentVersionRepository.Setup(x => x.GetDocumentVersionsEligibleForCleanup())
+        documentVersionRepository.Setup(x => x.GetDocumentVersionsEligibleForCleanup(It.IsAny<DateTime>(), It.IsAny<int?>()))
             .Returns(someHistoricVersions);
 
         eventAggregator
@@ -84,7 +84,7 @@ internal class ContentVersionCleanupServiceTest
         DateTime aDateTime,
         ContentVersionService sut)
     {
-        documentVersionRepository.Setup(x => x.GetDocumentVersionsEligibleForCleanup())
+        documentVersionRepository.Setup(x => x.GetDocumentVersionsEligibleForCleanup(It.IsAny<DateTime>(), It.IsAny<int?>()))
             .Returns(someHistoricVersions);
 
         eventAggregator
@@ -111,7 +111,7 @@ internal class ContentVersionCleanupServiceTest
         DateTime aDateTime,
         ContentVersionService sut)
     {
-        documentVersionRepository.Setup(x => x.GetDocumentVersionsEligibleForCleanup())
+        documentVersionRepository.Setup(x => x.GetDocumentVersionsEligibleForCleanup(It.IsAny<DateTime>(), It.IsAny<int?>()))
             .Returns(someHistoricVersions);
 
         eventAggregator
@@ -133,9 +133,6 @@ internal class ContentVersionCleanupServiceTest
         });
     }
 
-    /// <remarks>
-    ///     For v9 this just needs a rewrite, no static events, no service location etc
-    /// </remarks>
     [Test]
     [AutoMoqData]
     public void PerformContentVersionCleanup_HasVersionsToDelete_CallsDeleteOnRepositoryWithFilteredSet(
@@ -146,7 +143,7 @@ internal class ContentVersionCleanupServiceTest
         DateTime aDateTime,
         ContentVersionService sut)
     {
-        documentVersionRepository.Setup(x => x.GetDocumentVersionsEligibleForCleanup())
+        documentVersionRepository.Setup(x => x.GetDocumentVersionsEligibleForCleanup(It.IsAny<DateTime>(), It.IsAny<int?>()))
             .Returns(someHistoricVersions);
 
         eventAggregator
@@ -167,6 +164,120 @@ internal class ContentVersionCleanupServiceTest
 
         documentVersionRepository.Verify(
             x => x.DeleteVersions(It.Is<IEnumerable<int>>(y => y.Single() == expectedId)),
+            Times.Once);
+    }
+
+    [Test]
+    [AutoMoqData]
+    public void PerformContentVersionCleanup_WithOverrideSmallerKeepAllDays_UsesSmallestAsCutoff(
+        [Frozen] Mock<IOptionsMonitor<ContentSettings>> contentSettings,
+        [Frozen] Mock<IDocumentVersionRepository> documentVersionRepository,
+        ContentVersionService sut)
+    {
+        var asAtDate = new DateTime(2026, 3, 24, 12, 0, 0, DateTimeKind.Utc);
+
+        contentSettings.Setup(x => x.CurrentValue).Returns(new ContentSettings
+        {
+            ContentVersionCleanupPolicy = new Umbraco.Cms.Core.Configuration.Models.ContentVersionCleanupPolicySettings
+            {
+                EnableCleanup = true,
+                KeepAllVersionsNewerThanDays = 7,
+                KeepLatestVersionPerDayForDays = 0,
+            },
+        });
+
+        // Override with a smaller KeepAllVersionsNewerThanDays (2 < 7).
+        documentVersionRepository.Setup(x => x.GetCleanupPolicies())
+            .Returns(
+            [
+                new() { ContentTypeId = 1, KeepAllVersionsNewerThanDays = 2 },
+            ]);
+
+        documentVersionRepository.Setup(x => x.GetDocumentVersionsEligibleForCleanup(It.IsAny<DateTime>(), It.IsAny<int?>()))
+            .Returns(Array.Empty<ContentVersionMeta>());
+
+        sut.PerformContentVersionCleanup(asAtDate);
+
+        // The effective cutoff should be 2 days (the override's value, not the global 7).
+        DateTime expectedCutoff = asAtDate.AddDays(-2);
+        documentVersionRepository.Verify(
+            x => x.GetDocumentVersionsEligibleForCleanup(expectedCutoff, It.IsAny<int?>()),
+            Times.Once);
+    }
+
+    [Test]
+    [AutoMoqData]
+    public void PerformContentVersionCleanup_WithOverrideNullKeepAllDays_UsesGlobalValue(
+        [Frozen] Mock<IOptionsMonitor<ContentSettings>> contentSettings,
+        [Frozen] Mock<IDocumentVersionRepository> documentVersionRepository,
+        ContentVersionService sut)
+    {
+        var asAtDate = new DateTime(2026, 3, 24, 12, 0, 0, DateTimeKind.Utc);
+
+        contentSettings.Setup(x => x.CurrentValue).Returns(new ContentSettings
+        {
+            ContentVersionCleanupPolicy = new Umbraco.Cms.Core.Configuration.Models.ContentVersionCleanupPolicySettings
+            {
+                EnableCleanup = true,
+                KeepAllVersionsNewerThanDays = 7,
+                KeepLatestVersionPerDayForDays = 0,
+            },
+        });
+
+        // Override with null KeepAllVersionsNewerThanDays — should not affect global.
+        documentVersionRepository.Setup(x => x.GetCleanupPolicies())
+            .Returns(
+            [
+                new() { ContentTypeId = 1, KeepAllVersionsNewerThanDays = null, PreventCleanup = true },
+            ]);
+
+        documentVersionRepository.Setup(x => x.GetDocumentVersionsEligibleForCleanup(It.IsAny<DateTime>(), It.IsAny<int?>()))
+            .Returns(Array.Empty<ContentVersionMeta>());
+
+        sut.PerformContentVersionCleanup(asAtDate);
+
+        // The effective cutoff should remain 7 days (the global value).
+        DateTime expectedCutoff = asAtDate.AddDays(-7);
+        documentVersionRepository.Verify(
+            x => x.GetDocumentVersionsEligibleForCleanup(expectedCutoff, It.IsAny<int?>()),
+            Times.Once);
+    }
+
+    [Test]
+    [AutoMoqData]
+    public void PerformContentVersionCleanup_WithMultipleOverrides_UsesSmallestKeepAllDays(
+        [Frozen] Mock<IOptionsMonitor<ContentSettings>> contentSettings,
+        [Frozen] Mock<IDocumentVersionRepository> documentVersionRepository,
+        ContentVersionService sut)
+    {
+        var asAtDate = new DateTime(2026, 3, 24, 12, 0, 0, DateTimeKind.Utc);
+
+        contentSettings.Setup(x => x.CurrentValue).Returns(new ContentSettings
+        {
+            ContentVersionCleanupPolicy = new Umbraco.Cms.Core.Configuration.Models.ContentVersionCleanupPolicySettings
+            {
+                EnableCleanup = true,
+                KeepAllVersionsNewerThanDays = 7,
+                KeepLatestVersionPerDayForDays = 0,
+            },
+        });
+
+        // Multiple overrides — smallest (1) should win over global (7) and the other override (5).
+        documentVersionRepository.Setup(x => x.GetCleanupPolicies())
+            .Returns(
+            [
+                new() { ContentTypeId = 1, KeepAllVersionsNewerThanDays = 5 },
+                new() { ContentTypeId = 2, KeepAllVersionsNewerThanDays = 1 },
+            ]);
+
+        documentVersionRepository.Setup(x => x.GetDocumentVersionsEligibleForCleanup(It.IsAny<DateTime>(), It.IsAny<int?>()))
+            .Returns(Array.Empty<ContentVersionMeta>());
+
+        sut.PerformContentVersionCleanup(asAtDate);
+
+        DateTime expectedCutoff = asAtDate.AddDays(-1);
+        documentVersionRepository.Verify(
+            x => x.GetDocumentVersionsEligibleForCleanup(expectedCutoff, It.IsAny<int?>()),
             Times.Once);
     }
 }

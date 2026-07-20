@@ -31,6 +31,7 @@ export default class UmbTiptapToolbarLinkExtensionApi extends UmbTiptapToolbarEl
 
 	#getLinkData(attrs: Record<string, any>): UmbLinkPickerLink {
 		const queryString = attrs['data-anchor'];
+		const culture = attrs['data-culture'];
 		const url = attrs.href?.substring(0, attrs.href.length - (queryString?.length ?? 0));
 		const unique = url?.includes('localLink:') ? url.substring(url.indexOf(':') + 1, url.indexOf('}')) : null;
 
@@ -41,11 +42,12 @@ export default class UmbTiptapToolbarLinkExtensionApi extends UmbTiptapToolbarEl
 			type: attrs.type,
 			unique,
 			url,
+			culture,
 		};
 	}
 
 	#parseLinkData(link: UmbLinkPickerLink) {
-		const { name, target, type, unique } = link;
+		const { name, target, type, unique, culture } = link;
 		let { queryString, url } = link;
 
 		// If an anchor exists, check that it is appropriately prefixed
@@ -84,6 +86,7 @@ export default class UmbTiptapToolbarLinkExtensionApi extends UmbTiptapToolbarEl
 			'data-anchor': anchor,
 			target,
 			title: name ?? url,
+			'data-culture': culture,
 		};
 	}
 

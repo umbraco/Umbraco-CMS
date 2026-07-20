@@ -1,5 +1,5 @@
 import {expect} from "@playwright/test";
-import {test} from '@umbraco/playwright-testhelpers';
+import {test} from '@umbraco/acceptance-test-helpers';
 
 const webhookName = 'Test Webhook';
 let webhookSiteToken = '';

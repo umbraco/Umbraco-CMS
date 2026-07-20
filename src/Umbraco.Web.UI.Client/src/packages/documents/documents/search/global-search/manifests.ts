@@ -13,6 +13,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		meta: {
 			label: 'Documents',
 			searchProviderAlias: UMB_DOCUMENT_SEARCH_PROVIDER_ALIAS,
+			sectionAlias: UMB_CONTENT_SECTION_ALIAS,
 		},
 		conditions: [
 			{

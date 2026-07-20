@@ -8,8 +8,12 @@
   },
   "symbolInfo": [
     {
-      "id": "UmbracoVersion",
-      "isVisible": false
+      "id": "PackageManagement",
+      "isVisible": true,
+      "defaultValue": "Central",
+      "description": {
+        "text": "Choose how to manage NuGet package versions"
+      }
     },
     {
       "id": "UseHttpsRedirect",

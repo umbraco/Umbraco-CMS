@@ -10,6 +10,9 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.MemberType;
 
+/// <summary>
+/// API controller responsible for exporting member types in Umbraco CMS.
+/// </summary>
 [ApiVersion("1.0")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessMemberTypes)]
 public class ExportMemberTypeController : MemberTypeControllerBase
@@ -17,6 +20,11 @@ public class ExportMemberTypeController : MemberTypeControllerBase
     private readonly IMemberTypeService _memberTypeService;
     private readonly IUdtFileContentFactory _fileContentFactory;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ExportMemberTypeController"/> class, responsible for exporting member types.
+    /// </summary>
+    /// <param name="memberTypeService">The <see cref="IMemberTypeService"/> used to manage member types.</param>
+    /// <param name="fileContentFactory">The <see cref="IUdtFileContentFactory"/> used to create UDT file content.</param>
     public ExportMemberTypeController(
         IMemberTypeService memberTypeService,
         IUdtFileContentFactory fileContentFactory)
@@ -29,6 +37,8 @@ public class ExportMemberTypeController : MemberTypeControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(FileContentResult), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Exports a member type.")]
+    [EndpointDescription("Exports the member type identified by the provided Id to a downloadable format.")]
     public IActionResult Export(
         CancellationToken cancellationToken,
         Guid id)

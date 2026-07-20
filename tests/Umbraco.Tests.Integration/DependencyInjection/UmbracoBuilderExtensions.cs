@@ -20,8 +20,9 @@ using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
+using Umbraco.Cms.Core.HostedServices;
 using Umbraco.Cms.Infrastructure.Examine;
-using Umbraco.Cms.Infrastructure.HostedServices;
+using Umbraco.Cms.Infrastructure.Services;
 using Umbraco.Cms.Infrastructure.PublishedCache;
 using Umbraco.Cms.Persistence.EFCore.Locking;
 using Umbraco.Cms.Persistence.EFCore.Scoping;
@@ -93,6 +94,7 @@ public static class UmbracoBuilderExtensions
                 }
             });
 
+        builder.Services.AddSingleton(new EFCoreScopeConfiguration<TestUmbracoDbContext>());
         builder.Services.AddUnique<IAmbientEFCoreScopeStack<TestUmbracoDbContext>, AmbientEFCoreScopeStack<TestUmbracoDbContext>>();
         builder.Services.AddUnique<IEFCoreScopeAccessor<TestUmbracoDbContext>, EFCoreScopeAccessor<TestUmbracoDbContext>>();
         builder.Services.AddUnique<IEFCoreScopeProvider<TestUmbracoDbContext>, EFCoreScopeProvider<TestUmbracoDbContext>>();
@@ -155,22 +157,24 @@ public static class UmbracoBuilderExtensions
             ILogger<ExamineIndexRebuilder> logger,
             IExamineManager examineManager,
             IEnumerable<IIndexPopulator> populators,
-            ILongRunningOperationService longRunningOperationService)
+            IBackgroundTaskQueue backgroundTaskQueue)
             : base(
             mainDom,
             runtimeState,
             logger,
             examineManager,
             populators,
-            longRunningOperationService)
+            backgroundTaskQueue)
         {
         }
 
+        [Obsolete("Use RebuildIndexAsync() instead. Scheduled for removal in Umbraco 19.")]
         public override void RebuildIndex(string indexName, TimeSpan? delay = null, bool useBackgroundThread = true)
         {
             // noop
         }
 
+        [Obsolete("Use RebuildIndexesAsync() instead. Scheduled for removal in Umbraco 19.")]
         public override void RebuildIndexes(bool onlyEmptyIndexes, TimeSpan? delay = null, bool useBackgroundThread = true)
         {
             // noop

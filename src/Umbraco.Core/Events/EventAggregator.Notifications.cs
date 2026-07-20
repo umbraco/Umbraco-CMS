@@ -8,6 +8,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Events;
 
+/// <summary>
+///     Default implementation of <see cref="IEventAggregator" /> that channels events from multiple objects into a single object.
+/// </summary>
 public partial class EventAggregator : IEventAggregator
 {
     private static readonly ConcurrentDictionary<Type, NotificationAsyncHandlerWrapper> _notificationAsyncHandlers = new();
@@ -21,6 +24,12 @@ public partial class EventAggregator : IEventAggregator
     public EventAggregator(ServiceFactory serviceFactory)
         => _serviceFactory = serviceFactory;
 
+    /// <summary>
+    ///     Publishes notifications synchronously to registered handlers.
+    /// </summary>
+    /// <typeparam name="TNotification">The type of notification being handled.</typeparam>
+    /// <typeparam name="TNotificationHandler">The type of the notification handler.</typeparam>
+    /// <param name="notifications">The notifications to publish.</param>
     private void PublishNotifications<TNotification, TNotificationHandler>(IEnumerable<TNotification> notifications)
         where TNotification : INotification
         where TNotificationHandler : INotificationHandler
@@ -40,6 +49,14 @@ public partial class EventAggregator : IEventAggregator
         }
     }
 
+    /// <summary>
+    ///     Publishes notifications asynchronously to registered handlers.
+    /// </summary>
+    /// <typeparam name="TNotification">The type of notification being handled.</typeparam>
+    /// <typeparam name="TNotificationHandler">The type of the notification handler.</typeparam>
+    /// <param name="notifications">The notifications to publish.</param>
+    /// <param name="cancellationToken">An optional cancellation token.</param>
+    /// <returns>A task that represents the publish operation.</returns>
     private async Task PublishNotificationsAsync<TNotification, TNotificationHandler>(IEnumerable<TNotification> notifications, CancellationToken cancellationToken = default)
         where TNotification : INotification
         where TNotificationHandler : INotificationHandler
@@ -64,6 +81,12 @@ public partial class EventAggregator : IEventAggregator
         }
     }
 
+    /// <summary>
+    ///     Invokes all synchronous handlers with the provided notifications.
+    /// </summary>
+    /// <typeparam name="TNotification">The type of notification being handled.</typeparam>
+    /// <param name="allHandlers">The handlers to invoke.</param>
+    /// <param name="notifications">The notifications to handle.</param>
     private static void PublishCore<TNotification>(IEnumerable<Action<IEnumerable<TNotification>>> allHandlers, IEnumerable<TNotification> notifications)
     {
         foreach (Action<IEnumerable<TNotification>> handler in allHandlers)
@@ -72,6 +95,14 @@ public partial class EventAggregator : IEventAggregator
         }
     }
 
+    /// <summary>
+    ///     Invokes all asynchronous handlers with the provided notifications.
+    /// </summary>
+    /// <typeparam name="TNotification">The type of notification being handled.</typeparam>
+    /// <param name="allHandlers">The handlers to invoke.</param>
+    /// <param name="notifications">The notifications to handle.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
     private static async Task PublishCoreAsync<TNotification>(IEnumerable<Func<IEnumerable<TNotification>, CancellationToken, Task>> allHandlers, IEnumerable<TNotification> notifications, CancellationToken cancellationToken)
     {
         foreach (Func<IEnumerable<TNotification>, CancellationToken, Task> handler in allHandlers)
@@ -85,6 +116,12 @@ public partial class EventAggregator : IEventAggregator
         }
     }
 
+    /// <summary>
+    ///     Chunks a sequence of items into groups by their runtime type.
+    /// </summary>
+    /// <typeparam name="T">The type of items in the sequence.</typeparam>
+    /// <param name="source">The source sequence to chunk.</param>
+    /// <returns>An enumerable of groupings by type.</returns>
     private static IEnumerable<IGrouping<Type, T>> ChunkByType<T>(IEnumerable<T> source)
         where T : notnull
     {
@@ -124,17 +161,40 @@ public partial class EventAggregator : IEventAggregator
         yield return grouping;
     }
 
+    /// <summary>
+    ///     A helper class for grouping items by a key while implementing <see cref="IGrouping{TKey, TElement}" />.
+    /// </summary>
+    /// <typeparam name="TKey">The type of the grouping key.</typeparam>
+    /// <typeparam name="TElement">The type of elements in the group.</typeparam>
     private sealed class ChunkGrouping<TKey, TElement> : List<TElement>, IGrouping<TKey, TElement>
     {
+        /// <summary>
+        ///     Gets the key of the grouping.
+        /// </summary>
         public TKey Key { get; }
 
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="ChunkGrouping{TKey, TElement}" /> class.
+        /// </summary>
+        /// <param name="key">The key for this grouping.</param>
         public ChunkGrouping(TKey key)
             => Key = key;
     }
 }
 
+/// <summary>
+///     Abstract wrapper for synchronous notification handlers.
+/// </summary>
 internal abstract class NotificationHandlerWrapper
 {
+    /// <summary>
+    ///     Handles the notifications by invoking the appropriate handlers.
+    /// </summary>
+    /// <typeparam name="TNotification">The type of notification being handled.</typeparam>
+    /// <typeparam name="TNotificationHandler">The type of the notification handler.</typeparam>
+    /// <param name="notifications">The notifications to handle.</param>
+    /// <param name="serviceFactory">The service factory for resolving handlers.</param>
+    /// <param name="publish">The publish action to invoke handlers.</param>
     public abstract void Handle<TNotification, TNotificationHandler>(
         IEnumerable<TNotification> notifications,
         ServiceFactory serviceFactory,
@@ -143,8 +203,21 @@ internal abstract class NotificationHandlerWrapper
         where TNotificationHandler : INotificationHandler;
 }
 
+/// <summary>
+///     Abstract wrapper for asynchronous notification handlers.
+/// </summary>
 internal abstract class NotificationAsyncHandlerWrapper
 {
+    /// <summary>
+    ///     Handles the notifications asynchronously by invoking the appropriate handlers.
+    /// </summary>
+    /// <typeparam name="TNotification">The type of notification being handled.</typeparam>
+    /// <typeparam name="TNotificationHandler">The type of the notification handler.</typeparam>
+    /// <param name="notifications">The notifications to handle.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <param name="serviceFactory">The service factory for resolving handlers.</param>
+    /// <param name="publish">The publish function to invoke handlers.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
     public abstract Task HandleAsync<TNotification, TNotificationHandler>(
         IEnumerable<TNotification> notifications,
         CancellationToken cancellationToken,
@@ -154,6 +227,10 @@ internal abstract class NotificationAsyncHandlerWrapper
         where TNotificationHandler : INotificationHandler;
 }
 
+/// <summary>
+///     Implementation of <see cref="NotificationAsyncHandlerWrapper" /> for a specific notification type.
+/// </summary>
+/// <typeparam name="TNotificationType">The type of notification being handled.</typeparam>
 internal sealed class NotificationAsyncHandlerWrapperImpl<TNotificationType> : NotificationAsyncHandlerWrapper
     where TNotificationType : INotification
 {
@@ -222,6 +299,10 @@ internal sealed class NotificationAsyncHandlerWrapperImpl<TNotificationType> : N
     }
 }
 
+/// <summary>
+///     Implementation of <see cref="NotificationHandlerWrapper" /> for a specific notification type.
+/// </summary>
+/// <typeparam name="TNotificationType">The type of notification being handled.</typeparam>
 internal sealed class NotificationHandlerWrapperImpl<TNotificationType> : NotificationHandlerWrapper
     where TNotificationType : INotification
 {

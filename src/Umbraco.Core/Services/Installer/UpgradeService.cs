@@ -1,16 +1,30 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Installer;
 using Umbraco.Cms.Core.Models.Installer;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services.Installer;
 
+/// <summary>
+/// Provides functionality for upgrading an existing Umbraco CMS installation to a newer version.
+/// </summary>
+/// <remarks>
+/// This service orchestrates the upgrade process by executing all registered upgrade steps
+/// in the <see cref="UpgradeStepCollection"/>. It validates that the runtime is in the correct
+/// state before proceeding with the upgrade.
+/// </remarks>
 public class UpgradeService : IUpgradeService
 {
     private readonly UpgradeStepCollection _upgradeSteps;
     private readonly IRuntimeState _runtimeState;
     private readonly ILogger<UpgradeService> _logger;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UpgradeService"/> class.
+    /// </summary>
+    /// <param name="upgradeSteps">The collection of upgrade steps to execute.</param>
+    /// <param name="runtimeState">The runtime state used to verify the system is ready for upgrade.</param>
+    /// <param name="logger">The logger for recording upgrade progress and errors.</param>
     public UpgradeService(
         UpgradeStepCollection upgradeSteps,
         IRuntimeState runtimeState,

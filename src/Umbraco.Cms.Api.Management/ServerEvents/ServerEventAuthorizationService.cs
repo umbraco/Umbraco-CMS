@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using Umbraco.Cms.Core.Models.ServerEvents;
 using Umbraco.Cms.Core.ServerEvents;
 
@@ -9,6 +9,10 @@ internal sealed class ServerEventAuthorizationService : IServerEventAuthorizatio
     private readonly EventSourceAuthorizerCollection _eventSourceAuthorizers;
     private Dictionary<string, List<IEventSourceAuthorizer>>? _groupedAuthorizersByEventSource;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ServerEventAuthorizationService"/> class, which manages authorization for server events.
+    /// </summary>
+    /// <param name="eventSourceAuthorizers">A collection of authorizers used to determine access permissions for server event sources.</param>
     public ServerEventAuthorizationService(EventSourceAuthorizerCollection eventSourceAuthorizers)
     {
         _eventSourceAuthorizers = eventSourceAuthorizers;
@@ -51,6 +55,12 @@ internal sealed class ServerEventAuthorizationService : IServerEventAuthorizatio
         return groupedAuthorizers;
     }
 
+    /// <summary>
+    /// Asynchronously determines which event sources the specified user is authorized to access by evaluating all configured event source authorizers.
+    /// Returns a result indicating the event sources for which the user is authorized or unauthorized.
+    /// </summary>
+    /// <param name="user">The <see cref="ClaimsPrincipal"/> representing the user to authorize.</param>
+    /// <returns>A task representing the asynchronous operation. The task result contains a <see cref="SeverEventAuthorizationResult"/> with lists of authorized and unauthorized event sources.</returns>
     public async Task<SeverEventAuthorizationResult> AuthorizeAsync(ClaimsPrincipal user)
     {
         var authorizedEventSources = new List<string>();

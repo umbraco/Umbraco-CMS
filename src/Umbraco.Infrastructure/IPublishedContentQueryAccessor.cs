@@ -2,6 +2,9 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Umbraco.Cms.Core;
 
+/// <summary>
+/// Provides access to the current <see cref="IPublishedContentQuery" /> instance for the active request context.
+/// </summary>
 /// <remarks>
 ///     Not intended for use in background threads where you should make use of
 ///     <see cref="Umbraco.Cms.Core.Web.IUmbracoContextFactory.EnsureUmbracoContext" />
@@ -19,5 +22,10 @@ namespace Umbraco.Cms.Core;
 /// </remarks>
 public interface IPublishedContentQueryAccessor
 {
+    /// <summary>
+    /// Attempts to get the current <see cref="Umbraco.Cms.Core.IPublishedContentQuery"/> instance.
+    /// </summary>
+    /// <param name="publishedContentQuery">When this method returns, contains the <see cref="Umbraco.Cms.Core.IPublishedContentQuery"/> instance if available; otherwise, null.</param>
+    /// <returns><c>true</c> if the <see cref="Umbraco.Cms.Core.IPublishedContentQuery"/> instance was retrieved successfully; otherwise, <c>false</c>.</returns>
     bool TryGetValue([MaybeNullWhen(false)] out IPublishedContentQuery publishedContentQuery);
 }

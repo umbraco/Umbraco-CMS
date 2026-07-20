@@ -2,6 +2,9 @@ using System.Text.Json.Serialization;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
+/// <summary>
+/// Serves as a base class for value converters that process temporary file uploads in property editors.
+/// </summary>
 public abstract class TemporaryFileUploadValueBase
 {
     /// <summary>

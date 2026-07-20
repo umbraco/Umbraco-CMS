@@ -2,6 +2,9 @@ using Umbraco.Cms.Core.Cache;
 
 namespace Umbraco.Extensions;
 
+/// <summary>
+///     Provides extension methods for retrieving HTTP request identifiers for logging purposes.
+/// </summary>
 public static class LogHttpRequest
 {
     private static readonly string RequestIdItemName = typeof(LogHttpRequest).Name + "+RequestId";

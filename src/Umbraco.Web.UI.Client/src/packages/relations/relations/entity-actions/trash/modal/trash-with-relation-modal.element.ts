@@ -1,22 +1,18 @@
-import type { UmbConfirmActionModalEntityReferencesConfig } from '../../../global-components/types.js';
+import type {
+	UmbConfirmActionModalEntityReferencesConfig,
+	UmbConfirmActionModalEntityReferencesElement,
+} from '../../../global-components/types.js';
 import type {
 	UmbTrashWithRelationConfirmModalData,
 	UmbTrashWithRelationConfirmModalValue,
 } from './trash-with-relation-modal.token.js';
-import {
-	html,
-	customElement,
-	css,
-	state,
-	type PropertyValues,
-	nothing,
-	unsafeHTML,
-} from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, css, state, type PropertyValues, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 @customElement('umb-trash-with-relation-confirm-modal')
 export class UmbTrashWithRelationConfirmModalElement extends UmbModalBaseElement<
@@ -28,6 +24,13 @@ export class UmbTrashWithRelationConfirmModalElement extends UmbModalBaseElement
 
 	@state()
 	private _referencesConfig?: UmbConfirmActionModalEntityReferencesConfig;
+
+	// Three-state model for reference-aware trashing:
+	//   undefined = loading (button disabled, no message yet)
+	//   false     = blocked (button disabled, "cannot trash" message)
+	//   true      = allowed (button enabled, normal confirmation message)
+	@state()
+	private _canTrash: boolean | undefined = undefined;
 
 	#itemRepository?: UmbItemRepository<any>;
 
@@ -56,6 +59,12 @@ export class UmbTrashWithRelationConfirmModalElement extends UmbModalBaseElement
 			this._name = item.name;
 		}
 
+		// If disableDeleteWhenReferenced is not set, allow trashing immediately.
+		// Otherwise stay in loading state until the references component reports totals.
+		if (!this.data.disableDeleteWhenReferenced) {
+			this._canTrash = true;
+		}
+
 		this._referencesConfig = {
 			unique: this.data.unique,
 			itemRepositoryAlias: this.data.itemRepositoryAlias,
@@ -63,20 +72,32 @@ export class UmbTrashWithRelationConfirmModalElement extends UmbModalBaseElement
 		};
 	}
 
+	#onReferencesChange(event: UmbChangeEvent) {
+		event.stopPropagation();
+		if (this._canTrash !== undefined) return;
+		const target = event.target as UmbConfirmActionModalEntityReferencesElement;
+		const total = target.getTotalReferencedBy() + target.getTotalDescendantsWithReferences();
+		this._canTrash = total === 0;
+	}
+
 	override render() {
 		const headline = this.localize.string('#actions_trash');
-		const content = this.localize.string('#defaultdialogs_confirmTrash', this._name);
+		const messageKey = this._canTrash ? '#defaultdialogs_confirmTrash' : '#defaultdialogs_cannotTrashWhenReferenced';
 
 		return html`
 			<uui-dialog-layout class="uui-text" headline=${headline}>
-				<p>${unsafeHTML(content)}</p>
-
+				${this._canTrash !== undefined ? html`<p>${this.localize.htmlString(messageKey, this._name)}</p>` : nothing}
 				${this._referencesConfig
 					? html`<umb-confirm-action-modal-entity-references
-							.config=${this._referencesConfig}></umb-confirm-action-modal-entity-references>`
+							.config=${this._referencesConfig}
+							@change=${this.#onReferencesChange}></umb-confirm-action-modal-entity-references>`
 					: nothing}
 
-				<uui-button slot="actions" id="cancel" label="Cancel" @click=${this._rejectModal}></uui-button>
+				<uui-button
+					slot="actions"
+					id="cancel"
+					label=${this.localize.term('general_cancel')}
+					@click=${this._rejectModal}></uui-button>
 
 				<uui-button
 					slot="actions"
@@ -84,6 +105,7 @@ export class UmbTrashWithRelationConfirmModalElement extends UmbModalBaseElement
 					color="danger"
 					look="primary"
 					label=${this.localize.term('actions_trash')}
+					?disabled=${!this._canTrash}
 					@click=${this._submitModal}
 					${umbFocus()}></uui-button>
 			</uui-dialog-layout>

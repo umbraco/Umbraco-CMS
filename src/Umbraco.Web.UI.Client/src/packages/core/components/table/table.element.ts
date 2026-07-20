@@ -4,7 +4,10 @@ import {
 	customElement,
 	html,
 	ifDefined,
+	keyed,
+	nothing,
 	property,
+	ref,
 	repeat,
 	state,
 	when,
@@ -19,6 +22,14 @@ export interface UmbTableItem {
 	entityType?: string;
 	data: Array<UmbTableItemData>;
 	selectable?: boolean;
+	active?: boolean;
+	/** When set, the row shows a children indicator. The nested options control what activating it does. */
+	childrenIndicator?: {
+		/** When set, the indicator becomes an anchor linking to this href. */
+		href?: string;
+		/** When set (and no `href` is provided), the indicator becomes a button invoking this callback. */
+		onOpen?: () => void;
+	};
 }
 
 export interface UmbTableItemData {
@@ -28,6 +39,7 @@ export interface UmbTableItemData {
 
 export interface UmbTableColumn {
 	name: string;
+	/** Unique identifier for the column — must be unique within a given table instance, as it is used as the key for header and cell reconciliation. */
 	alias: string;
 	elementName?: string;
 	width?: string;
@@ -148,6 +160,9 @@ export class UmbTableElement extends UmbLitElement {
 	@property({ type: Array, attribute: false })
 	public selection: Array<string> = [];
 
+	@property({ attribute: false })
+	public onRowRendered?: (element: HTMLElement | undefined, item: UmbTableItem) => void;
+
 	@property({ type: String, attribute: false })
 	public orderingColumn = '';
 
@@ -176,10 +191,59 @@ export class UmbTableElement extends UmbLitElement {
 	@state()
 	private _selectionMode = false;
 
-	override updated(changedProperties: Map<string | number | symbol, unknown>) {
-		super.updated(changedProperties);
+	@state()
+	private _columnConfigurationHash = '';
+
+	@state()
+	private _hasChildrenColumn = false;
+
+	#cellElementCache = new WeakMap<UmbTableItem, Map<string, UmbTableColumnLayoutElement>>();
+
+	#rowRenderedCallbacks = new Map<string, { fn: (el: Element | undefined) => void; current: UmbTableItem }>();
+
+	#getRowRenderedCallback(item: UmbTableItem): (el: Element | undefined) => void {
+		const existing = this.#rowRenderedCallbacks.get(item.id);
+		if (existing) {
+			existing.current = item;
+			return existing.fn;
+		}
+		const entry = {
+			current: item,
+			fn: (el: Element | undefined) => this.onRowRendered?.(el as HTMLElement | undefined, entry.current),
+		};
+		this.#rowRenderedCallbacks.set(item.id, entry);
+		return entry.fn;
+	}
+
+	override willUpdate(changedProperties: Map<string | number | symbol, unknown>) {
+		super.willUpdate(changedProperties);
 		if (changedProperties.has('selection')) {
 			this._selectionMode = this.selection.length > 0;
+		}
+		if (changedProperties.has('_items')) {
+			const currentIds = new Set(this._items.map((i) => i.id));
+			for (const id of this.#rowRenderedCallbacks.keys()) {
+				if (!currentIds.has(id)) this.#rowRenderedCallbacks.delete(id);
+			}
+			this._hasChildrenColumn = this._items.some((i) => i.childrenIndicator);
+		}
+		if (changedProperties.has('_items') || changedProperties.has('columns')) {
+			this._columnConfigurationHash = JSON.stringify([
+				this._hasChildrenColumn,
+				...this.columns.map((column) => column.alias),
+			]);
+		}
+	}
+
+	override updated(changedProperties: Map<string | number | symbol, unknown>) {
+		super.updated(changedProperties);
+
+		// The `keyed` directive in `render()` rebuilds the `<uui-table>` element when the column
+		// configuration changes. The sorter caches its container element on first initialization, so
+		// when the table is replaced we need to reattach it to the fresh node.
+		if (this._sortable && changedProperties.has('_columnConfigurationHash')) {
+			this.#sorter.disable();
+			this.#sorter.enable();
 		}
 	}
 
@@ -245,7 +309,10 @@ export class UmbTableElement extends UmbLitElement {
 			throw new Error('Select all is not allowed in the current table configuration.');
 		}
 
-		this.selection = this.items.filter((item) => this.#isSelectableItem(item)).map((item) => item.id);
+		// Merge the current page's selectable rows into the existing selection so selections
+		// accumulate across pages rather than replacing the previous page's selection.
+		const currentPageIds = this.items.filter((item) => this.#isSelectableItem(item)).map((item) => item.id);
+		this.selection = [...new Set([...this.selection, ...currentPageIds])];
 		this._selectionMode = true;
 		this.dispatchEvent(new UmbTableSelectedEvent());
 	}
@@ -255,8 +322,10 @@ export class UmbTableElement extends UmbLitElement {
 			throw new Error('Select all is not allowed in the current table configuration.');
 		}
 
-		this.selection = [];
-		this._selectionMode = false;
+		// Only remove the current page's rows, leaving any selection from other pages intact.
+		const currentPageIds = new Set(this.items.map((item) => item.id));
+		this.selection = this.selection.filter((id) => !currentPageIds.has(id));
+		this._selectionMode = this.selection.length > 0;
 		this.dispatchEvent(new UmbTableDeselectedEvent());
 	}
 
@@ -278,24 +347,40 @@ export class UmbTableElement extends UmbLitElement {
 	}
 
 	override render() {
-		const style = !(this.config.allowSelection === false && this.config.hideIcon === true) ? 'width: 60px' : undefined;
-		return html`
-			<uui-table class="uui-text">
-				<uui-table-column style=${ifDefined(style)}></uui-table-column>
-				<uui-table-head>
-					${this._renderHeaderCheckboxCell()} ${this.columns.map((column) => this._renderHeaderCell(column))}
-				</uui-table-head>
-				${repeat(this.items, (item) => item.id, this._renderRow)}
-			</uui-table>
-		`;
+		const iconColumnWidth = this._hasChildrenColumn ? '45px' : '60px';
+		const style = !(this.config.allowSelection === false && this.config.hideIcon === true)
+			? `width: ${iconColumnWidth}`
+			: undefined;
+		// Firefox's `display: table-*` engine does not reliably relayout when cells are
+		// inserted or removed from existing rows. Key the whole table on the column
+		// configuration so the table is rebuilt whenever the column set changes.
+		return keyed(
+			this._columnConfigurationHash,
+			html`
+				<uui-table class="uui-text">
+					${this._hasChildrenColumn ? html`<uui-table-column style="width: 24px;"></uui-table-column>` : nothing}
+					<uui-table-column style=${ifDefined(style)}></uui-table-column>
+					<uui-table-head>
+						${this._hasChildrenColumn
+							? html`<uui-table-head-cell class="children-indicator-cell"></uui-table-head-cell>`
+							: nothing}
+						${this._renderHeaderCheckboxCell()}
+						${repeat(
+							this.columns,
+							(column) => column.alias,
+							(column) => this._renderHeaderCell(column),
+						)}
+					</uui-table-head>
+					${repeat(this.items, (item) => item.id, this._renderRow)}
+				</uui-table>
+			`,
+		);
 	}
 
 	private _renderHeaderCell(column: UmbTableColumn) {
 		return html`
-			<uui-table-head-cell style="--uui-table-cell-padding: 0 var(--uui-size-5)">
-				${column.allowSorting
-					? html`${this._renderSortingUI(column)}`
-					: html`<span style="text-align:${column.align ?? 'left'};">${column.name}</span>`}
+			<uui-table-head-cell style="--uui-table-cell-padding: 0 var(--uui-size-5); text-align:${column.align ?? 'left'};">
+				${column.allowSorting ? html`${this._renderSortingUI(column)}` : html`<span>${column.name}</span>`}
 			</uui-table-head-cell>
 		`;
 	}
@@ -305,7 +390,7 @@ export class UmbTableElement extends UmbLitElement {
 			<button
 				style="padding: var(--uui-size-5) var(--uui-size-1);"
 				@click="${() => this._handleOrderingChange(column)}">
-				<span style="text-align:${column.align ?? 'left'};">${column.name}</span>
+				<span>${column.name}</span>
 				<uui-symbol-sort ?active=${this.orderingColumn === column.alias} ?descending=${this.orderingDesc}>
 				</uui-symbol-sort>
 			</button>
@@ -314,6 +399,12 @@ export class UmbTableElement extends UmbLitElement {
 
 	private _renderHeaderCheckboxCell() {
 		if (this.config.hideIcon && !this.config.allowSelection) return;
+		// Compute the header state against the current page only — the selection can span multiple
+		// pages, so comparing its total length against the page size gives the wrong state.
+		const selectableIds = this.items.filter((item) => this.#isSelectableItem(item)).map((item) => item.id);
+		const selectionSet = new Set(this.selection);
+		const allSelected = selectableIds.length > 0 && selectableIds.every((id) => selectionSet.has(id));
+		const indeterminate = !allSelected && selectableIds.some((id) => selectionSet.has(id));
 		return html`
 			<uui-table-head-cell style="--uui-table-cell-padding: 0; text-align: center;">
 				${when(
@@ -323,7 +414,8 @@ export class UmbTableElement extends UmbLitElement {
 							aria-label=${this.localize.term('general_selectAll')}
 							style="padding: var(--uui-size-4) var(--uui-size-5);"
 							@change="${this._handleAllRowsCheckboxChange}"
-							?checked=${this.selection.length === this.items.length}></uui-checkbox>
+							?checked=${allSelected}
+							.indeterminate=${indeterminate}></uui-checkbox>
 					`,
 				)}
 			</uui-table-head-cell>
@@ -334,16 +426,57 @@ export class UmbTableElement extends UmbLitElement {
 		const isItemSelectable = this.#isSelectableItem(item);
 		return html`
 			<uui-table-row
+				${ref(this.#getRowRenderedCallback(item))}
 				data-sortable-id=${item.id}
 				?selectable=${this.config.allowSelection && !this._sortable && isItemSelectable}
 				?select-only=${this._selectionMode || this.config.selectOnly}
 				?selected=${this._isSelected(item.id)}
+				?active=${item.active ?? false}
 				@selected=${() => this._selectRow(item)}
 				@deselected=${() => this._deselectRow(item)}>
-				${this._renderRowCheckboxCell(item)} ${this.columns.map((column) => this._renderRowCell(column, item))}
+				${this._hasChildrenColumn
+					? html`<uui-table-cell class="children-indicator-cell">
+							${this.#renderChildrenIndicator(item)}
+						</uui-table-cell>`
+					: nothing}
+				${this._renderRowCheckboxCell(item)}
+				${repeat(
+					this.columns,
+					(column) => column.alias,
+					(column) => this._renderRowCell(column, item),
+				)}
 			</uui-table-row>
 		`;
 	};
+
+	#renderChildrenIndicator(item: UmbTableItem) {
+		const indicator = item.childrenIndicator;
+		if (!indicator) return nothing;
+
+		const symbol = html`<uui-symbol-expand></uui-symbol-expand>`;
+
+		if (indicator.href) {
+			return html`
+				<uui-button compact label=${this.localize.term('general_open')} href=${indicator.href}>${symbol}</uui-button>
+			`;
+		}
+
+		if (indicator.onOpen) {
+			return html`
+				<uui-button
+					compact
+					label=${this.localize.term('general_open')}
+					@click=${(e: Event) => {
+						e.stopPropagation();
+						indicator.onOpen?.();
+					}}>
+					${symbol}
+				</uui-button>
+			`;
+		}
+
+		return symbol;
+	}
 
 	private _renderRowCheckboxCell(item: UmbTableItem) {
 		if (this.sortable === true) {
@@ -378,12 +511,11 @@ export class UmbTableElement extends UmbLitElement {
 	private _renderRowCell(column: UmbTableColumn, item: UmbTableItem) {
 		return html`
 			<uui-table-cell
-				style="--uui-table-cell-padding: 0 var(--uui-size-5); text-align:${column.align ?? 'left'}; width: ${column.width || 'auto'};"
-				?clip-text=${column.clipText}
-				>
-					${this._renderCellContent(column, item)}
+				style="--uui-table-cell-padding: 0 var(--uui-size-5); text-align:${column.align ??
+				'left'}; width: ${column.width || 'auto'};"
+				?clip-text=${column.clipText}>
+				${this._renderCellContent(column, item)}
 			</uui-table-cell>
-		</uui-table-cell>
 		`;
 	}
 
@@ -391,7 +523,18 @@ export class UmbTableElement extends UmbLitElement {
 		const value = item.data.find((data) => data.columnAlias === column.alias)?.value;
 
 		if (column.elementName) {
-			const element = document.createElement(column.elementName) as UmbTableColumnLayoutElement;
+			let itemCache = this.#cellElementCache.get(item);
+			if (!itemCache) {
+				itemCache = new Map();
+				this.#cellElementCache.set(item, itemCache);
+			}
+
+			let element = itemCache.get(column.alias);
+			if (!element || element.tagName.toLowerCase() !== column.elementName.toLowerCase()) {
+				element = document.createElement(column.elementName) as UmbTableColumnLayoutElement;
+				itemCache.set(column.alias, element);
+			}
+
 			element.column = column;
 			element.item = item;
 			element.value = value;
@@ -456,6 +599,17 @@ export class UmbTableElement extends UmbLitElement {
 				display: inline-block;
 			}
 
+			.children-indicator-cell {
+				padding-right: 0;
+				display: flex;
+				align-items: center;
+			}
+
+			.children-indicator-cell uui-button {
+				--uui-button-padding-left-factor: 0;
+				--uui-button-padding-right-factor: 0;
+			}
+
 			uui-table-head-cell:focus,
 			uui-table-head-cell:focus-within,
 			uui-table-head-cell:hover {
@@ -474,6 +628,7 @@ export class UmbTableElement extends UmbLitElement {
 				align-items: center;
 				justify-content: space-between;
 				width: 100%;
+				text-align: inherit;
 			}
 
 			uui-table-head-cell button > span {

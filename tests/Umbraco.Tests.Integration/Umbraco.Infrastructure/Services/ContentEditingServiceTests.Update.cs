@@ -409,7 +409,7 @@ public partial class ContentEditingServiceTests
 
         var result = await ContentEditingService.UpdateAsync(content.Key, updateModel, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.PropertyTypeNotFound, result.Status);
+        Assert.AreEqual(ContentEditingOperationStatus.PropertyTypeCultureVarianceMismatch, result.Status);
 
         // re-get and validate
         content = await ContentEditingService.GetAsync(content.Key);
@@ -440,7 +440,7 @@ public partial class ContentEditingServiceTests
 
         var result = await ContentEditingService.UpdateAsync(content.Key, updateModel, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.PropertyTypeNotFound, result.Status);
+        Assert.AreEqual(ContentEditingOperationStatus.PropertyTypeCultureVarianceMismatch, result.Status);
         Assert.IsNotNull(result.Result.Content);
 
         // re-get and validate

@@ -25,6 +25,7 @@ public class DataValueReferenceFactoryCollection : BuilderCollectionBase<IDataVa
 
     /// <summary>
     /// Gets all unique references from the specified properties.
+    /// Includes both <see cref="IPropertyValue.EditedValue" /> and <see cref="IPropertyValue.PublishedValue" /> for each property.
     /// </summary>
     /// <param name="properties">The properties.</param>
     /// <param name="propertyEditors">The property editors.</param>
@@ -32,6 +33,22 @@ public class DataValueReferenceFactoryCollection : BuilderCollectionBase<IDataVa
     /// The unique references from the specified properties.
     /// </returns>
     public ISet<UmbracoEntityReference> GetAllReferences(IPropertyCollection properties, PropertyEditorCollection propertyEditors)
+        => GetAllReferences(properties, propertyEditors, trackPublishedValues: true);
+
+    /// <summary>
+    /// Gets all unique references from the specified properties.
+    /// </summary>
+    /// <param name="properties">The properties.</param>
+    /// <param name="propertyEditors">The property editors.</param>
+    /// <param name="trackPublishedValues">
+    /// When <c>true</c>, both <see cref="IPropertyValue.EditedValue" /> and <see cref="IPropertyValue.PublishedValue" /> are included.
+    /// When <c>false</c>, only <see cref="IPropertyValue.EditedValue" /> is included — use this for unpublished content
+    /// to avoid retaining stale relations from the previously-published property snapshot.
+    /// </param>
+    /// <returns>
+    /// The unique references from the specified properties.
+    /// </returns>
+    public ISet<UmbracoEntityReference> GetAllReferences(IPropertyCollection properties, PropertyEditorCollection propertyEditors, bool trackPublishedValues)
     {
         var references = new HashSet<UmbracoEntityReference>();
 
@@ -48,7 +65,11 @@ public class DataValueReferenceFactoryCollection : BuilderCollectionBase<IDataVa
             foreach (IPropertyValue propertyValue in propertyValuesByPropertyEditorAlias.SelectMany(x => x))
             {
                 values.Add(propertyValue.EditedValue);
-                values.Add(propertyValue.PublishedValue);
+
+                if (trackPublishedValues)
+                {
+                    values.Add(propertyValue.PublishedValue);
+                }
             }
 
             references.UnionWith(GetReferences(dataEditor, values, propertyValuesByPropertyEditorAlias.Key));
@@ -77,7 +98,7 @@ public class DataValueReferenceFactoryCollection : BuilderCollectionBase<IDataVa
     /// The references.
     /// </returns>
     public ISet<UmbracoEntityReference> GetReferences(IDataEditor dataEditor, IEnumerable<object?> values) =>
-        GetReferencesEnumerable(dataEditor, values, null).ToHashSet();
+        GetReferencesEnumerable(dataEditor, values, dataEditor.Alias).ToHashSet();
 
     private ISet<UmbracoEntityReference> GetReferences(IDataEditor dataEditor, IEnumerable<object?> values, string propertyEditorAlias) =>
         GetReferencesEnumerable(dataEditor, values, propertyEditorAlias).ToHashSet();
@@ -106,7 +127,7 @@ public class DataValueReferenceFactoryCollection : BuilderCollectionBase<IDataVa
             if (dataValueReferenceFactory.IsForEditor(dataEditor))
         {
                 IDataValueReference factoryDataValueReference = dataValueReferenceFactory.GetDataValueReference();
-                foreach (UmbracoEntityReference reference in values.SelectMany(factoryDataValueReference.GetReferences))
+                foreach (UmbracoEntityReference reference in GetReferencesFromPropertyValues(values, factoryDataValueReference, propertyEditorAlias))
             {
                     yield return reference;
                 }
@@ -139,13 +160,17 @@ public class DataValueReferenceFactoryCollection : BuilderCollectionBase<IDataVa
                     value,
                     dataValueReference.GetType().FullName,
                     propertyEditorAlias ?? "n/a");
-                throw;
             }
         }
 
         return result;
     }
 
+    /// <summary>
+    /// Gets all automatic relation type aliases for all property editors.
+    /// </summary>
+    /// <param name="propertyEditors">The property editors collection.</param>
+    /// <returns>A set of automatic relation type aliases.</returns>
     public ISet<string> GetAllAutomaticRelationTypesAliases(PropertyEditorCollection propertyEditors)
     {
         // Always add default automatic relation types

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.Builders;
@@ -8,6 +8,10 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.UserGroup;
 
+/// <summary>
+/// Serves as the base controller for API endpoints related to managing user groups in Umbraco CMS.
+/// Provides common functionality for derived user group management controllers.
+/// </summary>
 [VersionedApiBackOfficeRoute("user-group")]
 [ApiExplorerSettings(GroupName = "User Group")]
 [Authorize(Policy = AuthorizationPolicies.SectionAccessUsers)]

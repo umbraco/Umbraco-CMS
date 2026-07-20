@@ -5,6 +5,9 @@ using Umbraco.Cms.Infrastructure.Examine;
 
 namespace Umbraco.Extensions;
 
+/// <summary>
+/// Contains extension methods that enhance or simplify working with Umbraco Examine.
+/// </summary>
 public static partial class UmbracoExamineExtensions
 {
     /// <summary>
@@ -66,6 +69,12 @@ public static partial class UmbracoExamineExtensions
         }
     }
 
+    /// <summary>
+    /// Extends the specified <see cref="IQuery"/> to filter results by the given integer ID.
+    /// </summary>
+    /// <param name="query">The query to extend.</param>
+    /// <param name="id">The integer ID value to filter by.</param>
+    /// <returns>An <see cref="IBooleanOperation"/> representing the query filtered by ID.</returns>
     public static IBooleanOperation Id(this IQuery query, int id)
     {
         IBooleanOperation? fieldQuery = query.Id(id.ToInvariantString());

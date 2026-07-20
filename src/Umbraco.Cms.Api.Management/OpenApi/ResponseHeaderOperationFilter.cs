@@ -9,6 +9,14 @@ namespace Umbraco.Cms.Api.Management.OpenApi;
 
 internal sealed class ResponseHeaderOperationFilter : IOperationFilter
 {
+    /// <summary>
+    /// Modifies the specified OpenAPI operation by adding response headers to 201 Created responses, if the operation is mapped to the management API.
+    /// </summary>
+    /// <param name="operation">The OpenAPI operation whose responses may be modified.</param>
+    /// <param name="context">The filter context containing metadata about the API operation.</param>
+    /// <remarks>
+    /// This method adds the <c>GeneratedResource</c> and <c>Location</c> headers to 201 Created responses. Header order is important for the back-office client.
+    /// </remarks>
     public void Apply(OpenApiOperation operation, OperationFilterContext context)
     {
         if (context.MethodInfo.HasMapToApiAttribute(ManagementApiConfiguration.ApiName) is false || operation.Responses is null)

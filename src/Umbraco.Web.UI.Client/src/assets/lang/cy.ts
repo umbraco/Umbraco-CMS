@@ -354,6 +354,8 @@ export default {
 		renameFolderFailed: "Methwyd ailenwi'r ffolder gyda id %0%",
 		dragAndDropYourFilesIntoTheArea: "Llusgo a gollwng eich ffeil(iau) i mewn i'r ardal",
 		uploadNotAllowed: 'Ni chaniateir llwytho i fyny yn y lleoliad hwn.',
+		uploadValidationFailed: (mediaTypeName: string) =>
+			`Mae gan y math cyfryngau ${mediaTypeName} un neu fwy o briodweddau gofynnol. Bydd angen ei huwchlwytho'n unigol drwy'r ddewislen 'Creu'`,
 		disallowedMediaType: "Ni ellir lanlwytho'r ffeil yma, ni chaniateir y math cyfrwng gydag alias '%0%' yma",
 		invalidFileName: "Ni ellir lanlwytho'r ffeil yma, nid oes ganddi enw ffeil dilys",
 		fileSecurityValidationFailure: 'Mae un neu fwy o ddilysiadau diogelwch ffeil wedi methu',
@@ -388,7 +390,7 @@ export default {
 		enterFolderName: 'Rhoi enw ffolder i mewn',
 		updateData: 'Dewiswch fath a theitl',
 		noDocumentTypes:
-			"Nid oes unrhyw fathau o ddogfennau caniataol ar gael am greu cynnwys fan hyn. Rhaid i chi alluogi'r rhain yn <strong>Mathau o Ddogfennau</strong> o fewn y adran <strong>Gosodiadau</strong>, gan olygu y opsiwn <strong>Mathau o nod blentyn caniataol</strong> o dan <strong>Caniatadau</strong>",
+			"Nid oes unrhyw fathau o ddogfennau caniataol ar gael am greu cynnwys fan hyn. Rhaid i chi alluogi'r rhain yn <strong>Mathau o Ddogfennau</strong> o fewn y adran <strong>Gosodiadau</strong>, gan olygu y opsiwn <strong>Mathau o nod blentyn caniataol</strong> o dan <strong>Strwythyr</strong>",
 		noDocumentTypesAtRoot:
 			'Nid oes unrhyw fathau o ddogfennau ar gael. Rhaid i chi creu rhain yn <strong>Mathau o Ddogfennau</strong> tu fewn y adran <strong>Gosodiadau</strong>.',
 		noDocumentTypesWithNoSettingsAccess:
@@ -396,7 +398,7 @@ export default {
 		noDocumentTypesEditPermissions: 'Golygu caniatâd ar gyfer y math hwn o ddogfen',
 		noDocumentTypesCreateNew: 'Creu Math o Ddogfen newydd',
 		noDocumentTypesAllowedAtRoot:
-			"Nid oes unrhyw fathau o ddogfennau caniataol ar gael am greu cynnwys fan hyn. Rhaid i chi alluogi'r rhain yn <strong>Mathau o Ddogfennau</strong> o fewn y adran <strong>Gosodiadau</strong>, gan olygu y opsiwn <strong>Caniatáu fel gwraidd</strong> o dan <strong>Caniatadau</strong>",
+			"Nid oes unrhyw fathau o ddogfennau caniataol ar gael am greu cynnwys fan hyn. Rhaid i chi alluogi'r rhain yn <strong>Mathau o Ddogfennau</strong> o fewn y adran <strong>Gosodiadau</strong>, gan olygu y opsiwn <strong>Caniatáu fel gwraidd</strong> o dan <strong>Strwythyr</strong>",
 		noMediaTypes:
 			'Nid oes unrhyw fathau o gyfrwng caniataol ar gael. Rhaid i chi alluogi\'r rhain yn yr adran gosodiadau o dan <strong>"mathau o gyfrwng"</strong>.',
 		noMediaTypesWithNoSettingsAccess:
@@ -745,6 +747,7 @@ export default {
 		content: 'Cynnwys',
 		continue: 'Bwrw ymlaen',
 		copy: 'Copïo',
+		copied: 'Wedi gopïo!',
 		create: 'Creu',
 		cropSection: 'Adran tocio',
 		database: 'Cronfa ddata',
@@ -1277,7 +1280,8 @@ export default {
 	rollback: {
 		headline: 'Dewis fersiwn i gymharu efo fersiwn bresennol',
 		changes: 'Newidiadau',
-		diffHelp: "Bydd <del>testun coch</del> yn cael ei dynnu yn y fersiwn a ddewiswyd, bydd <ins>testun gwyrdd</ins> yn cael ei ychwanegu.",
+		diffHelp:
+			'Bydd <del>testun coch</del> yn cael ei dynnu yn y fersiwn a ddewiswyd, bydd <ins>testun gwyrdd</ins> yn cael ei ychwanegu.',
 		showDiff: "Dangos gwahaniaethau rhwng y fersiwn (drafft) gyfredol a'r fersiwn a ddewiswyd.",
 		documentRolledBack: "Dogfen wedi'i rolio yn ôl",
 		htmlHelp:
@@ -1602,9 +1606,19 @@ export default {
 		chooseChildNode: 'Dewis nod blentyn',
 		compositionsDescription:
 			"Etifeddu tabiau a phriodweddau o fath o ddogfen sy'n bodoli eisoes. Bydd tabiau newydd yn cael eu ychwanegu at y fath o ddogfen bresennol neu eu cyfuno os mae tab gyda enw yr union yr un fath yn bodoli eisoes.",
+		compositionsDescriptionMediaType:
+			"Etifeddu tabiau a phriodweddau o fath o gyfrwng sy'n bodoli eisoes. Bydd tabiau newydd yn cael eu ychwanegu at y fath o gyfrwng bresennol neu eu cyfuno os mae tab gyda enw yr union yr un fath yn bodoli eisoes.",
+		compositionsDescriptionMemberType:
+			"Etifeddu tabiau a phriodweddau o fath o aelod sy'n bodoli eisoes. Bydd tabiau newydd yn cael eu ychwanegu at y fath o aelod bresennol neu eu cyfuno os mae tab gyda enw yr union yr un fath yn bodoli eisoes.",
 		compositionInUse:
 			"Mae'r math o gynnwys yma wedi'i ddefnyddio mewn cyfansoddiad, felly ni ellir ei gyfansoddi ei hunan.",
+		compositionInUseMediaType:
+			"Mae'r math o gyfrwng yma wedi'i ddefnyddio mewn cyfansoddiad, felly ni ellir ei gyfansoddi ei hunan.",
+		compositionInUseMemberType:
+			"Mae'r math o aelod yma wedi'i ddefnyddio mewn cyfansoddiad, felly ni ellir ei gyfansoddi ei hunan.",
 		noAvailableCompositions: "Nid oes unrhyw fathau o gynnwys ar gael i'w defnyddio fel cyfansoddiad.",
+		noAvailableCompositionsMediaType: "Nid oes unrhyw fathau o gyfrwng ar gael i'w defnyddio fel cyfansoddiad.",
+		noAvailableCompositionsMemberType: "Nid oes unrhyw fathau o aelod ar gael i'w defnyddio fel cyfansoddiad.",
 		compositionRemoveWarning:
 			"Bydd dileu cyfansoddiad yn dileu'r holl ddata eiddo priodwedd gysylltiedig. Ar ôl i chi arbed y math o ddogfen, bydd ddim ffordd nôl.",
 		availableEditors: 'Golygyddion ar gael',
@@ -1642,6 +1656,10 @@ export default {
 		compositionUsageHeading: "Ble mae'r cyfansoddiad yma'n cael ei ddefnyddio?",
 		compositionUsageSpecification:
 			"Mae'r cyfansoddiad yma yn cael ei ddefnyddio'n bresennol yng nghyfansoddiad o'r mathau o gynnwys ganlynol:",
+		compositionUsageSpecificationMediaType:
+			"Mae'r cyfansoddiad yma yn cael ei ddefnyddio'n bresennol yng nghyfansoddiad o'r mathau o gyfrwng ganlynol:",
+		compositionUsageSpecificationMemberType:
+			"Mae'r cyfansoddiad yma yn cael ei ddefnyddio'n bresennol yng nghyfansoddiad o'r mathau o aelod ganlynol:",
 		variantsHeading: 'Caniatáu amrywiadau',
 		cultureVariantHeading: 'Caniatáu amrywiad  yn ôl ddiwylliant',
 		segmentVariantHeading: 'Caniatáu segmentiad',
@@ -1861,6 +1879,7 @@ export default {
 		noLockouts: 'ddim wedi cloi allan',
 		noPasswordChange: "Nid yw'r cyfrinair wedi'i newid",
 		confirmNewPassword: 'Cadarnhau cyfrinair newydd',
+		confirmPassword: 'Cadarnhau cyfrinair',
 		changePasswordDescription:
 			"Gallwch newid eich cyfrinair i gyrchu Swyddfa Gefn Umbracogan lenwi allan y ffurflen isod a chlicio'r botwm 'Newid Cyfrinair'",
 		contentChannel: 'Sianel Gynnwys',
@@ -2083,6 +2102,8 @@ export default {
 	redirectUrls: {
 		disableUrlTracker: 'Analluogi olinydd URL',
 		enableUrlTracker: 'Galluogi olinydd URL',
+		urlTrackerEnabled: "Wedi'i alluogi",
+		urlTrackerDisabled: "Wedi'i analluogi",
 		culture: 'Diwylliant',
 		originalUrl: 'URL gwreiddiol',
 		redirectedTo: 'Ailgyfeirwyd I',
@@ -2104,7 +2125,7 @@ export default {
 		emptyDictionaryTree: 'Dim eitemau Geiriadur i ddewis ohonynt',
 	},
 	textbox: {
-		characters_left: 'o nodau ar ôl',
+		characters_left: '<strong>%0%</strong> o nodau ar ôl.',
 		characters_exceed: 'Uchafswm o %0% nodau cyfrannol, <strong>%1%</strong> gormod.',
 	},
 	recycleBin: {
@@ -2162,7 +2183,8 @@ export default {
 		openBackofficeSearch: 'Agor chwiliad swyddfa gefn',
 		openCloseBackofficeHelp: 'Agor/Cau cymorth swyddfa gefn',
 		openCloseBackofficeProfileOptions: 'Agor/Cau eich opsiynau proffil',
-		profileOptions: 'Opsiynau proffil',
+		profileOptions: 'Proffil defnyddiwr ar gyfer %0% (%1%)',
+		profileOptionsDefault: 'Proffil defnyddiwr',
 		assignDomainDescription: 'Sefydli Diwylliannau ac Enwau Gwesteia am %0%',
 		createDescription: 'Creu nod newydd o dan %0%',
 		protectDescription: 'Sefydli Mynediad Cyhoeddus ar %0%',

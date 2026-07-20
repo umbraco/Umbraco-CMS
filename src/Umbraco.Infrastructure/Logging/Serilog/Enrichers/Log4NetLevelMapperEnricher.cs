@@ -9,6 +9,12 @@ namespace Umbraco.Cms.Core.Logging.Serilog.Enrichers;
 /// </summary>
 internal sealed class Log4NetLevelMapperEnricher : ILogEventEnricher
 {
+    /// <summary>
+    /// Enriches the specified log event by adding a <c>Log4NetLevel</c> property with a value mapped from the Serilog log level to a Log4Net-compatible string.
+    /// The mapped value is padded to five characters to align log output formatting, matching Log4Net conventions.
+    /// </summary>
+    /// <param name="logEvent">The log event to enrich. This parameter must not be null.</param>
+    /// <param name="propertyFactory">The factory used to create log event properties. This parameter must not be null.</param>
     public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
     {
         string log4NetLevel;

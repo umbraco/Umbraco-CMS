@@ -1,5 +1,8 @@
 namespace Umbraco.Cms.Core.Configuration.Models;
 
+/// <summary>
+///     Typed configuration options for help page settings.
+/// </summary>
 [UmbracoOptions(Constants.Configuration.ConfigHelpPage)]
 public class HelpPageSettings
 {

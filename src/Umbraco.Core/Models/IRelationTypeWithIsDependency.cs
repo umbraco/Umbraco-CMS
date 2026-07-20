@@ -3,6 +3,9 @@ using Umbraco.Cms.Core.Models.Entities;
 
 namespace Umbraco.Cms.Core.Models;
 
+/// <summary>
+///     Represents a relation type that includes dependency information.
+/// </summary>
 public interface IRelationTypeWithIsDependency : IRelationType
 {
     /// <summary>
@@ -12,6 +15,9 @@ public interface IRelationTypeWithIsDependency : IRelationType
     bool IsDependency { get; set; }
 }
 
+/// <summary>
+///     Represents a type that defines how two entities are related.
+/// </summary>
 public interface IRelationType : IEntity, IRememberBeingDirty
 {
     /// <summary>

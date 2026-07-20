@@ -12,6 +12,7 @@ import type { ManifestCollection } from '../extensions/types.js';
 import { UmbCollectionBulkActionManager } from '../bulk-action/collection-bulk-action.manager.js';
 import { UmbCollectionSelectionManager } from '../selection/collection-selection.manager.js';
 import { UMB_COLLECTION_CONTEXT } from './collection-default.context-token.js';
+import { UmbValueSummaryCoordinatorContext } from '@umbraco-cms/backoffice/value-summary';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import {
 	UmbArrayState,
@@ -79,6 +80,7 @@ export class UmbDefaultCollectionContext<
 	public readonly selection = new UmbCollectionSelectionManager(this);
 	public readonly view = new UmbCollectionViewManager(this);
 	public readonly bulkAction = new UmbCollectionBulkActionManager(this);
+	public readonly valueSummaryCoordinator = new UmbValueSummaryCoordinatorContext(this);
 
 	#defaultViewAlias: string;
 	#defaultFilter: Partial<FilterModelType>;
@@ -109,18 +111,23 @@ export class UmbDefaultCollectionContext<
 		// The parent entity context is used to get the parent entity for the collection items
 		// All items in the collection are children of the current entity context
 		this.consumeContext(UMB_ENTITY_CONTEXT, (context) => {
-			const currentEntityUnique = context?.getUnique();
-			const currentEntityType = context?.getEntityType();
+			this.observe(
+				context?.unique,
+				(currentEntityUnique) => {
+					const currentEntityType = context?.getEntityType();
 
-			const parent: UmbEntityModel | undefined =
-				currentEntityUnique && currentEntityType
-					? {
-							unique: currentEntityUnique,
-							entityType: currentEntityType,
-						}
-					: undefined;
+					const parent: UmbEntityModel | undefined =
+						currentEntityUnique && currentEntityType
+							? ({
+									unique: currentEntityUnique,
+									entityType: currentEntityType,
+								} satisfies UmbEntityModel)
+							: undefined;
 
-			this.#parentEntityContext?.setParent(parent);
+					this.#parentEntityContext?.setParent(parent);
+				},
+				'_observeEntityContextUnique',
+			);
 		});
 	}
 
@@ -199,9 +206,7 @@ export class UmbDefaultCollectionContext<
 			'umbCollectionHasBulkActionsObserver',
 		);
 
-		if (this.#config.pageSize) {
-			this.pagination.setPageSize(this.#config.pageSize);
-		}
+		this.pagination.setPageSize(this.#config.pageSize ?? 50);
 
 		const filterValue = this._filter.getValue() as FilterModelType;
 
@@ -210,20 +215,12 @@ export class UmbDefaultCollectionContext<
 			...this.#config,
 			...filterValue,
 			skip: filterValue.skip ?? 0,
-			take: this.#config.pageSize,
+			take: this.pagination.getPageSize(),
 		});
 
 		this.#userDefinedProperties.setValue(this.#config?.userDefinedProperties ?? []);
 
-		const viewManagerConfig: UmbCollectionViewManagerConfig = { defaultViewAlias: this.#defaultViewAlias };
-
-		if (this.#config.layouts && this.#config.layouts.length > 0) {
-			this.#viewLayouts.setValue(this.#config.layouts);
-			const aliases = this.#config.layouts.map((layout) => layout.collectionView);
-			viewManagerConfig.manifestFilter = (manifest) => aliases.includes(manifest.alias);
-		}
-
-		this.view.setConfig(viewManagerConfig);
+		this.#configureViews();
 
 		this._configured = true;
 	}
@@ -451,5 +448,15 @@ export class UmbDefaultCollectionContext<
 				this._selectOnly.setValue(selection.length > 0);
 			}
 		});
+	}
+
+	#configureViews() {
+		const viewManagerConfig: UmbCollectionViewManagerConfig = { defaultViewAlias: this.#defaultViewAlias };
+		const layouts = this.#config?.layouts;
+		if (layouts && layouts.length > 0) {
+			this.#viewLayouts.setValue(layouts);
+			viewManagerConfig.viewsOverride = layouts;
+		}
+		this.view.setConfig(viewManagerConfig);
 	}
 }

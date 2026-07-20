@@ -5,10 +5,18 @@ using Umbraco.Cms.Core.Serialization;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
+/// <summary>
+/// Provides index value factory for tag properties.
+/// </summary>
 public class TagPropertyIndexValueFactory : JsonPropertyIndexValueFactoryBase<string[]>, ITagPropertyIndexValueFactory
 {
     private IndexingSettings _indexingSettings;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="TagPropertyIndexValueFactory"/> class.
+    /// </summary>
+    /// <param name="jsonSerializer">The JSON serializer.</param>
+    /// <param name="indexingSettings">The indexing settings.</param>
     public TagPropertyIndexValueFactory(
         IJsonSerializer jsonSerializer,
         IOptionsMonitor<IndexingSettings> indexingSettings)
@@ -19,6 +27,7 @@ public class TagPropertyIndexValueFactory : JsonPropertyIndexValueFactoryBase<st
         indexingSettings.OnChange(newValue => _indexingSettings = newValue);
     }
 
+    /// <inheritdoc />
     protected override IEnumerable<IndexValue> Handle(
         string[] deserializedPropertyValue,
         IProperty property,
@@ -37,6 +46,7 @@ public class TagPropertyIndexValueFactory : JsonPropertyIndexValueFactoryBase<st
             }
         ];
 
+    /// <inheritdoc />
     public override IEnumerable<IndexValue> GetIndexValues(
         IProperty property,
         string? culture,

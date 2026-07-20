@@ -11,6 +11,7 @@ export interface ManifestGlobalSearch
 export interface MetaGlobalSearch {
 	label: string;
 	searchProviderAlias: string;
+	sectionAlias?: string;
 }
 
 declare global {

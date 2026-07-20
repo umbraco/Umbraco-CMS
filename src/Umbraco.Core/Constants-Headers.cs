@@ -2,6 +2,9 @@ namespace Umbraco.Cms.Core;
 
 public static partial class Constants
 {
+    /// <summary>
+    ///     Contains HTTP header name constants used by Umbraco.
+    /// </summary>
     public static class Headers
     {
         /// <summary>

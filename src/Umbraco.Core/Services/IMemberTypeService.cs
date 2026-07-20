@@ -7,5 +7,9 @@ namespace Umbraco.Cms.Core.Services;
 /// </summary>
 public interface IMemberTypeService : IContentTypeBaseService<IMemberType>
 {
+    /// <summary>
+    ///     Gets the alias of the default <see cref="IMemberType" />.
+    /// </summary>
+    /// <returns>The alias of the default member type.</returns>
     string GetDefault();
 }

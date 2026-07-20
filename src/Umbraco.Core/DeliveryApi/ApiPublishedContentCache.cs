@@ -6,6 +6,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.DeliveryApi;
 
+/// <summary>
+///     Default implementation of <see cref="IApiPublishedContentCache"/> that provides access to published content for the Delivery API.
+/// </summary>
 public sealed class ApiPublishedContentCache : IApiPublishedContentCache
 {
     private readonly IRequestPreviewService _requestPreviewService;
@@ -14,6 +17,14 @@ public sealed class ApiPublishedContentCache : IApiPublishedContentCache
     private readonly IVariationContextAccessor _variationContextAccessor;
     private DeliveryApiSettings _deliveryApiSettings;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="ApiPublishedContentCache"/> class.
+    /// </summary>
+    /// <param name="requestPreviewService">The request preview service.</param>
+    /// <param name="deliveryApiSettings">The Delivery API settings.</param>
+    /// <param name="apiDocumentUrlService">The API document URL service.</param>
+    /// <param name="publishedContentCache">The published content cache.</param>
+    /// <param name="variationContextAccessor">The variation context accessor.</param>
     public ApiPublishedContentCache(
         IRequestPreviewService requestPreviewService,
         IOptionsMonitor<DeliveryApiSettings> deliveryApiSettings,
@@ -29,6 +40,7 @@ public sealed class ApiPublishedContentCache : IApiPublishedContentCache
         deliveryApiSettings.OnChange(settings => _deliveryApiSettings = settings);
     }
 
+    /// <inheritdoc />
     public async Task<IPublishedContent?> GetByRouteAsync(string route)
     {
         var isPreviewMode = _requestPreviewService.IsPreview();
@@ -45,6 +57,7 @@ public sealed class ApiPublishedContentCache : IApiPublishedContentCache
         return ContentOrNullIfDisallowed(content);
     }
 
+    /// <inheritdoc />
     public IPublishedContent? GetByRoute(string route)
     {
         var isPreviewMode = _requestPreviewService.IsPreview();
@@ -58,7 +71,7 @@ public sealed class ApiPublishedContentCache : IApiPublishedContentCache
         // e.g. "1234/second-root-url-segment". in V15+, IDocumentUrlService won't resolve this anymore; it will
         // however resolve "1234/" correctly, so to remain backwards compatible, we need to perform this extra step.
         var verifyUrlSegment = false;
-        if (documentKey is null && route.TrimEnd('/').CountOccurrences("/") is 1)
+        if (documentKey is null && route.AsSpan().TrimEnd('/').Count('/') is 1)
         {
             documentKey = _apiDocumentUrlService.GetDocumentKeyByRoute(
                 route[..(route.IndexOf('/') + 1)],
@@ -86,18 +99,21 @@ public sealed class ApiPublishedContentCache : IApiPublishedContentCache
         return ContentOrNullIfDisallowed(content);
     }
 
+    /// <inheritdoc />
     public async Task<IPublishedContent?> GetByIdAsync(Guid contentId)
     {
         IPublishedContent? content = await _publishedContentCache.GetByIdAsync(contentId, _requestPreviewService.IsPreview()).ConfigureAwait(false);
         return ContentOrNullIfDisallowed(content);
     }
 
+    /// <inheritdoc />
     public IPublishedContent? GetById(Guid contentId)
     {
         IPublishedContent? content = _publishedContentCache.GetById(_requestPreviewService.IsPreview(), contentId);
         return ContentOrNullIfDisallowed(content);
     }
 
+    /// <inheritdoc />
     public async Task<IEnumerable<IPublishedContent>> GetByIdsAsync(IEnumerable<Guid> contentIds)
     {
         var isPreviewMode = _requestPreviewService.IsPreview();
@@ -113,6 +129,7 @@ public sealed class ApiPublishedContentCache : IApiPublishedContentCache
             .ToArray();
     }
 
+    /// <inheritdoc />
     public IEnumerable<IPublishedContent> GetByIds(IEnumerable<Guid> contentIds)
     {
         var isPreviewMode = _requestPreviewService.IsPreview();

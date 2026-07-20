@@ -21,8 +21,8 @@ public class RichTextPropertyIndexValueFactoryTests
     /// <param name="expected"></param>
     [TestCase("<p>Sample text</p>", "Sample text")]
     [TestCase("<p>John Smith<br>Company ABC<br>London</p>", "John Smith Company ABC London")]
-    [TestCase("<p>John Smith<break>Company ABC<break>London</p>", "John SmithCompany ABCLondon")]
-    [TestCase("<p>John Smith<br>Company ABC<branything>London</p>", "John Smith Company ABCLondon")]
+    [TestCase("<p>John Smith<break>Company ABC<break>London</p>", "John Smith Company ABC London")]
+    [TestCase("<p>John Smith<br>Company ABC<branything>London</p>", "John Smith Company ABC London")]
     [TestCase("<p>Another sample text with <strong>bold</strong> content</p>", "Another sample text with bold content")]
     [TestCase("<p>Text with <a href=\"https://example.com\">link</a></p>", "Text with link")]
     [TestCase("<p>Text with <img src=\"image.jpg\" alt=\"image\" /></p>", "Text with")]
@@ -34,10 +34,10 @@ public class RichTextPropertyIndexValueFactoryTests
     [TestCase("<p>Text with <blockquote>quoted text</blockquote></p>", "Text with quoted text")]
     [TestCase(
         "<p>Text with <ul><li>list item 1</li><li>list item 2</li></ul></p>",
-        "Text with list item 1list item 2")]
+        "Text with list item 1 list item 2")]
     [TestCase(
         "<p>Text with <ol><li>ordered item 1</li><li>ordered item 2</li></ol></p>",
-        "Text with ordered item 1ordered item 2")]
+        "Text with ordered item 1 ordered item 2")]
     [TestCase("<p>Text with <div class=\"class-name\">div content</div></p>", "Text with div content")]
     [TestCase("<p>Text with <span class=\"class-name\">span content</span></p>", "Text with span content")]
     [TestCase(
@@ -79,6 +79,6 @@ public class RichTextPropertyIndexValueFactoryTests
         // assert that index the value is created correctly (it might contain a trailing whitespace, but that's OK)
         var expectedIndexValue = indexValue.Values.SingleOrDefault() as string;
         Assert.IsNotNull(expectedIndexValue);
-        Assert.AreEqual(expected, expectedIndexValue.TrimEnd());
+        Assert.AreEqual(expected, expectedIndexValue);
     }
 }

@@ -41,6 +41,7 @@ internal sealed class EagerMatcherPolicy : MatcherPolicy, IEndpointSelectorPolic
     private readonly UmbracoRequestPaths _umbracoRequestPaths;
     private readonly IUmbracoContextAccessor _umbracoContextAccessor;
     private readonly IPublishedRouter _publishedRouter;
+    private readonly IContentRoutingReadiness _contentRoutingReadiness;
     private GlobalSettings _globalSettings;
     private readonly Lazy<Endpoint> _installEndpoint;
     private readonly Lazy<Endpoint> _renderEndpoint;
@@ -51,13 +52,15 @@ internal sealed class EagerMatcherPolicy : MatcherPolicy, IEndpointSelectorPolic
         UmbracoRequestPaths umbracoRequestPaths,
         IOptionsMonitor<GlobalSettings> globalSettings,
         IUmbracoContextAccessor umbracoContextAccessor,
-        IPublishedRouter publishedRouter)
+        IPublishedRouter publishedRouter,
+        IContentRoutingReadiness contentRoutingReadiness)
     {
         _runtimeState = runtimeState;
         _endpointDataSource = endpointDataSource;
         _umbracoRequestPaths = umbracoRequestPaths;
         _umbracoContextAccessor = umbracoContextAccessor;
         _publishedRouter = publishedRouter;
+        _contentRoutingReadiness = contentRoutingReadiness;
         _globalSettings = globalSettings.CurrentValue;
         globalSettings.OnChange(settings => _globalSettings = settings);
         _installEndpoint = new Lazy<Endpoint>(GetInstallEndpoint);
@@ -76,6 +79,23 @@ internal sealed class EagerMatcherPolicy : MatcherPolicy, IEndpointSelectorPolic
         {
             var handled = await HandleInstallUpgrade(httpContext, candidates);
             if (handled)
+            {
+                return;
+            }
+        }
+        else if (_contentRoutingReadiness.IsInInitializationWindow(_runtimeState))
+        {
+            // The runtime is at Run, but this server hasn't finished seeding its per-server content caches
+            // yet (background unattended upgrade). Show the maintenance page instead of letting the request
+            // enter the content pipeline, where it could observe and cache a negative result that persists
+            // until the process restarts. See #22581.
+            //
+            // If TryRouteToMaintenancePage returns false here (maintenance page disabled, or a static route
+            // can serve the request) we intentionally fall through to normal candidate evaluation. That does
+            // NOT drop the initialization-window protection: UmbracoRouteValueTransformer.TransformAsync gates
+            // the same window independently and returns null for the dynamic content route, so the content
+            // pipeline is still not entered. These are two deliberate layers of the same guard.
+            if (TryRouteToMaintenancePage(candidates))
             {
                 return;
             }
@@ -231,7 +251,7 @@ internal sealed class EagerMatcherPolicy : MatcherPolicy, IEndpointSelectorPolic
 
     private Task<bool> HandleInstallUpgrade(HttpContext httpContext, CandidateSet candidates)
     {
-        if (_runtimeState.Level != RuntimeLevel.Upgrade)
+        if (_runtimeState.Level is not RuntimeLevel.Upgrade and not RuntimeLevel.Upgrading)
         {
             // We need to let the installer API requests through
             // Currently we do this with a check for the installer path
@@ -250,30 +270,39 @@ internal sealed class EagerMatcherPolicy : MatcherPolicy, IEndpointSelectorPolic
             return Task.FromResult(true);
         }
 
-        // Check if maintenance page should be shown
-        // Current behaviour is that statically routed endpoints still work in upgrade state
-        // This means that IF there is a static route, we should not show the maintenance page.
-        // And instead carry on as we normally would.
-        var hasStaticRoute = false;
+        // Upgrade / Upgrading: show the maintenance page (unless disabled or handled by a static route).
+        return Task.FromResult(TryRouteToMaintenancePage(candidates));
+    }
+
+    /// <summary>
+    /// Re-routes the request to the render controller so the maintenance page is shown (through a filter),
+    /// unless the maintenance page is disabled or a statically routed endpoint can handle the request.
+    /// </summary>
+    /// <remarks>
+    /// Shared by the upgrade/upgrading path and the post-upgrade initialization window (see <see cref="ApplyAsync"/>).
+    /// Current behaviour is that statically routed endpoints still work, so if there is a static route we do
+    /// not show the maintenance page and instead carry on as normal.
+    /// </remarks>
+    /// <returns><c>true</c> if the request was re-routed to the maintenance page; otherwise <c>false</c>.</returns>
+    private bool TryRouteToMaintenancePage(CandidateSet candidates)
+    {
+        if (_globalSettings.ShowMaintenancePageWhenInUpgradeState is false)
+        {
+            return false;
+        }
+
         for (var i = 0; i < candidates.Count; i++)
         {
             CandidateState candidate = candidates[i];
             IDynamicEndpointMetadata? dynamicEndpointMetadata = candidate.Endpoint.Metadata.GetMetadata<IDynamicEndpointMetadata>();
             if (dynamicEndpointMetadata is null || dynamicEndpointMetadata.IsDynamic is false)
             {
-                hasStaticRoute = true;
-                break;
+                // A statically routed endpoint can handle this request, so let it through.
+                return false;
             }
         }
 
-        if (_runtimeState.Level != RuntimeLevel.Upgrade
-            || _globalSettings.ShowMaintenancePageWhenInUpgradeState is false
-            || hasStaticRoute)
-        {
-            return Task.FromResult(false);
-        }
-
-        // Otherwise we'll re-route to the render controller (this will in turn show the maintenance page through a filter)
+        // Re-route to the render controller (this will in turn show the maintenance page through a filter).
         // With this approach however this could really just be a plain old endpoint instead of a filter.
         SetEndpoint(candidates, _renderEndpoint.Value, new RouteValueDictionary
         {
@@ -281,7 +310,6 @@ internal sealed class EagerMatcherPolicy : MatcherPolicy, IEndpointSelectorPolic
             [Constants.Web.Routing.ActionToken] = nameof(RenderController.Index),
         });
 
-        return Task.FromResult(true);
-
+        return true;
     }
 }

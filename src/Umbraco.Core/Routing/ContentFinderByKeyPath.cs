@@ -18,6 +18,7 @@ public class ContentFinderByKeyPath : ContentFinderByIdentifierPathBase, IConten
     private readonly IUmbracoContextAccessor _umbracoContextAccessor;
     private WebRoutingSettings _webRoutingSettings;
 
+    /// <inheritdoc />
     protected override string FailureLogMessageTemplate => "Not a node key";
 
     /// <summary>
@@ -64,7 +65,7 @@ public class ContentFinderByKeyPath : ContentFinderByIdentifierPathBase, IConten
             return LogAndReturnFailure();
         }
 
-        var noSlashPath = path.Substring(1);
+        ReadOnlySpan<char> noSlashPath = path.AsSpan(1);
 
         if (Guid.TryParse(noSlashPath, out var nodeKey) == false)
         {

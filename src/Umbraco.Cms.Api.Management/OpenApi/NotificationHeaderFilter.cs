@@ -9,6 +9,12 @@ namespace Umbraco.Cms.Api.Management.OpenApi;
 
 internal sealed class NotificationHeaderFilter : IOperationFilter
 {
+    /// <summary>
+    /// Adds a notification header to the OpenAPI operation's responses, if the operation is part of the Umbraco CMS Management API and is not a GET request.
+    /// The header describes the list of notifications that may be produced during the request.
+    /// </summary>
+    /// <param name="operation">The OpenAPI operation to which the notification header may be added.</param>
+    /// <param name="context">The filter context containing information about the API operation and schema generation.</param>
     public void Apply(OpenApiOperation operation, OperationFilterContext context)
     {
         // Only apply to the Umbraco CMS Management API.

@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Migrations;
+using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Migrations;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
@@ -155,6 +156,37 @@ internal sealed class PartialMigrationsTests : UmbracoIntegrationTest
     }
 
     [Test]
+    public async Task PackageMigrationPlan_ResumesFromSavedState_WhenNewStepIsAdded()
+    {
+        // Run a package migration plan with 2 steps.
+        var plan1 = new TwoStepTestPackageMigrationPlan();
+        var upgrader1 = new Upgrader(plan1);
+        var result1 = await upgrader1.ExecuteAsync(MigrationPlanExecutor, ScopeProvider, KeyValueService);
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(result1.Successful);
+            Assert.AreEqual(string.Empty, result1.InitialState);
+            Assert.AreEqual("b", result1.FinalState);
+            Assert.AreEqual(2, result1.CompletedTransitions.Count);
+        });
+
+        // Run an extended plan with 3 steps under the same plan name.
+        // Only the new step should execute.
+        var plan2 = new ThreeStepTestPackageMigrationPlan();
+        var upgrader2 = new Upgrader(plan2);
+        var result2 = await upgrader2.ExecuteAsync(MigrationPlanExecutor, ScopeProvider, KeyValueService);
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(result2.Successful);
+            Assert.AreEqual("b", result2.InitialState);
+            Assert.AreEqual("c", result2.FinalState);
+            Assert.AreEqual(1, result2.CompletedTransitions.Count);
+        });
+    }
+
+    [Test]
     [TestCase(true)]
     [TestCase(false)]
     public async Task UmbracoPlanExecutedNotificationIsAlwaysPublished(bool shouldSucceed)
@@ -193,6 +225,48 @@ internal sealed class PartialMigrationsTests : UmbracoIntegrationTest
         await databaseBuilder.UpgradeSchemaAndDataAsync(plan).ConfigureAwait(false);
 
         Assert.IsTrue(notificationPublished);
+    }
+
+    private class TwoStepTestPackageMigrationPlan : PackageMigrationPlan
+    {
+        public const string TestPlanName = "TestPackagePlan";
+
+        public TwoStepTestPackageMigrationPlan()
+            : base(TestPlanName)
+        {
+        }
+
+        protected override void DefinePlan()
+        {
+            To<NoOpMigration>("a");
+            To<NoOpMigration>("b");
+        }
+    }
+
+    private class ThreeStepTestPackageMigrationPlan : PackageMigrationPlan
+    {
+        public ThreeStepTestPackageMigrationPlan()
+            : base(TwoStepTestPackageMigrationPlan.TestPlanName)
+        {
+        }
+
+        protected override void DefinePlan()
+        {
+            To<NoOpMigration>("a");
+            To<NoOpMigration>("b");
+            To<NoOpMigration>("c");
+        }
+    }
+
+    private class NoOpMigration : MigrationBase
+    {
+        public NoOpMigration(IMigrationContext context) : base(context)
+        {
+        }
+
+        protected override void Migrate()
+        {
+        }
     }
 
     private bool ColumnExists(string tableName, string columnName, IScope scope) =>
@@ -333,6 +407,7 @@ internal class TestUmbracoPlan : UmbracoPlan
         To<AddColumnMigration>("c");
     }
 }
+
 
 internal class SimpleMigrationPlan : MigrationPlan
 {

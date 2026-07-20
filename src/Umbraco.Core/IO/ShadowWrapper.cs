@@ -5,6 +5,13 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.IO;
 
+/// <summary>
+/// Wraps a file system to support shadow mode for transactional file operations.
+/// </summary>
+/// <remarks>
+/// When in shadow mode, all file operations are captured and can be applied or discarded
+/// when the shadow scope ends.
+/// </remarks>
 internal sealed class ShadowWrapper : IFileSystem, IFileProviderFactory
 {
     private const string ShadowFsPath = "ShadowFs";
@@ -18,6 +25,15 @@ internal sealed class ShadowWrapper : IFileSystem, IFileProviderFactory
     private string? _shadowDir;
     private ShadowFileSystem? _shadowFileSystem;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ShadowWrapper"/> class.
+    /// </summary>
+    /// <param name="innerFileSystem">The inner file system to wrap.</param>
+    /// <param name="ioHelper">The IO helper.</param>
+    /// <param name="hostingEnvironment">The hosting environment.</param>
+    /// <param name="loggerFactory">The logger factory.</param>
+    /// <param name="shadowPath">The shadow path for temporary files.</param>
+    /// <param name="isScoped">A function that returns whether the file system is currently scoped.</param>
     public ShadowWrapper(IFileSystem innerFileSystem, IIOHelper ioHelper, IHostingEnvironment hostingEnvironment, ILoggerFactory loggerFactory, string shadowPath, Func<bool?>? isScoped = null)
     {
         InnerFileSystem = innerFileSystem;
@@ -29,10 +45,17 @@ internal sealed class ShadowWrapper : IFileSystem, IFileProviderFactory
         _isScoped = isScoped;
     }
 
+    /// <summary>
+    /// Gets the inner file system being wrapped.
+    /// </summary>
     public IFileSystem InnerFileSystem { get; }
 
+    /// <inheritdoc />
     public bool CanAddPhysical => FileSystem.CanAddPhysical;
 
+    /// <summary>
+    /// Gets the current file system, which may be the shadow or inner file system depending on scope.
+    /// </summary>
     private IFileSystem FileSystem
     {
         get
@@ -61,42 +84,70 @@ internal sealed class ShadowWrapper : IFileSystem, IFileProviderFactory
     /// <inheritdoc />
     public IFileProvider? Create() => InnerFileSystem.TryCreateFileProvider(out IFileProvider? fileProvider) ? fileProvider : null;
 
+    /// <inheritdoc />
     public IEnumerable<string> GetDirectories(string path) => FileSystem.GetDirectories(path);
 
+    /// <inheritdoc />
     public void DeleteDirectory(string path) => FileSystem.DeleteDirectory(path);
 
+    /// <inheritdoc />
     public void DeleteDirectory(string path, bool recursive) => FileSystem.DeleteDirectory(path, recursive);
 
+    /// <inheritdoc />
     public bool DirectoryExists(string path) => FileSystem.DirectoryExists(path);
 
+    /// <inheritdoc />
     public void AddFile(string path, Stream stream) => FileSystem.AddFile(path, stream);
 
+    /// <inheritdoc />
     public void AddFile(string path, Stream stream, bool overrideExisting) => FileSystem.AddFile(path, stream, overrideExisting);
 
+    /// <inheritdoc />
     public IEnumerable<string> GetFiles(string path) => FileSystem.GetFiles(path);
 
+    /// <inheritdoc />
     public IEnumerable<string> GetFiles(string path, string filter) => FileSystem.GetFiles(path, filter);
 
+    /// <inheritdoc />
     public Stream OpenFile(string path) => FileSystem.OpenFile(path);
 
+    /// <inheritdoc />
     public void DeleteFile(string path) => FileSystem.DeleteFile(path);
 
+    /// <summary>
+    /// Moves a file from the source path to the target path.
+    /// </summary>
+    /// <param name="source">The source file path.</param>
+    /// <param name="target">The target file path.</param>
     public void MoveFile(string source, string target) => FileSystem.MoveFile(source, target);
 
+    /// <inheritdoc />
     public bool FileExists(string path) => FileSystem.FileExists(path);
 
+    /// <inheritdoc />
     public string GetRelativePath(string fullPathOrUrl) => FileSystem.GetRelativePath(fullPathOrUrl);
 
+    /// <inheritdoc />
     public string GetFullPath(string path) => FileSystem.GetFullPath(path);
 
+    /// <inheritdoc />
     public string GetUrl(string? path) => FileSystem.GetUrl(path);
 
+    /// <inheritdoc />
     public DateTimeOffset GetLastModified(string path) => FileSystem.GetLastModified(path);
 
+    /// <inheritdoc />
     public DateTimeOffset GetCreated(string path) => FileSystem.GetCreated(path);
 
+    /// <inheritdoc />
     public long GetSize(string path) => FileSystem.GetSize(path);
 
+    /// <summary>
+    /// Creates a unique shadow identifier for a shadow scope.
+    /// </summary>
+    /// <param name="hostingEnvironment">The hosting environment.</param>
+    /// <returns>A unique identifier for the shadow scope.</returns>
+    /// <exception cref="Exception">Thrown when unable to create a unique identifier after multiple retries.</exception>
     public static string CreateShadowId(IHostingEnvironment hostingEnvironment)
     {
         const int retries = 50; // avoid infinite loop
@@ -123,9 +174,14 @@ internal sealed class ShadowWrapper : IFileSystem, IFileProviderFactory
         throw new Exception($"Could not get a shadow identifier (tried {retries} times)");
     }
 
+    /// <inheritdoc />
     public void AddFile(string path, string physicalPath, bool overrideIfExists = true, bool copy = false) =>
         FileSystem.AddFile(path, physicalPath, overrideIfExists, copy);
 
+    /// <summary>
+    /// Enters shadow mode with the specified identifier.
+    /// </summary>
+    /// <param name="id">The shadow identifier.</param>
     internal void Shadow(string id)
     {
         // note: no thread-safety here, because ShadowFs is thread-safe due to the check
@@ -138,6 +194,10 @@ internal sealed class ShadowWrapper : IFileSystem, IFileProviderFactory
         _shadowFileSystem = new ShadowFileSystem(InnerFileSystem, tempfs);
     }
 
+    /// <summary>
+    /// Exits shadow mode, optionally applying the changes.
+    /// </summary>
+    /// <param name="complete">If <c>true</c>, apply the shadow changes to the inner file system; otherwise, discard them.</param>
     internal void UnShadow(bool complete)
     {
         ShadowFileSystem? shadowFileSystem = _shadowFileSystem;

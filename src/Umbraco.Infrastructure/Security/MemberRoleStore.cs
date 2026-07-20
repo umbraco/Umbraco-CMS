@@ -22,7 +22,12 @@ public class MemberRoleStore : IQueryableRoleStore<UmbracoIdentityRole>
 
     private bool _disposed;
 
-    // private const string genericIdentityErrorCode = "IdentityErrorUserStore";
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Core.Security.MemberRoleStore"/> class.
+    /// </summary>
+    /// <remarks>private const string genericIdentityErrorCode = "IdentityErrorUserStore";</remarks>
+    /// <param name="memberGroupService">Service used to manage and retrieve member groups.</param>
+    /// <param name="errorDescriber">Provides error messages for identity-related operations.</param>
     public MemberRoleStore(IMemberGroupService memberGroupService, IdentityErrorDescriber errorDescriber)
     {
         _memberGroupService = memberGroupService ?? throw new ArgumentNullException(nameof(memberGroupService));
@@ -34,6 +39,9 @@ public class MemberRoleStore : IQueryableRoleStore<UmbracoIdentityRole>
     /// </summary>
     public IdentityErrorDescriber ErrorDescriber { get; set; }
 
+    /// <summary>
+    /// Gets a queryable collection of all member roles, represented as <see cref="UmbracoIdentityRole"/>, retrieved from the member group service.
+    /// </summary>
     public IQueryable<UmbracoIdentityRole> Roles =>
         _memberGroupService.GetAll().Select(MapFromMemberGroup).AsQueryable();
 
@@ -240,8 +248,8 @@ public class MemberRoleStore : IQueryableRoleStore<UmbracoIdentityRole>
     /// <summary>
     ///     Maps a member group to an identity role
     /// </summary>
-    /// <param name="memberGroup"></param>
-    /// <returns></returns>
+    /// <param name="memberGroup">The member group to map.</param>
+    /// <returns>The mapped identity role.</returns>
     private UmbracoIdentityRole MapFromMemberGroup(IMemberGroup memberGroup)
     {
         // NOTE: there is a ConcurrencyStamp property but we don't use it. The purpose
@@ -257,9 +265,9 @@ public class MemberRoleStore : IQueryableRoleStore<UmbracoIdentityRole>
     /// <summary>
     ///     Map an identity role to a member group
     /// </summary>
-    /// <param name="role"></param>
-    /// <param name="memberGroup"></param>
-    /// <returns></returns>
+    /// <param name="role">The identity role to map.</param>
+    /// <param name="memberGroup">The member group to update.</param>
+    /// <returns>True if any properties were changed.</returns>
     private bool MapToMemberGroup(UmbracoIdentityRole role, IMemberGroup memberGroup)
     {
         var anythingChanged = false;

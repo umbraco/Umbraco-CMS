@@ -1,7 +1,7 @@
 namespace Umbraco.Cms.Core.Composing;
 
 /// <inheritdoc />
-[Obsolete("Use IAsyncComponent instead. This interface will be removed in a future version.")]
+[Obsolete("Use IAsyncComponent instead. Scheduled for removal in Umbraco 18.")]
 public interface IComponent : IAsyncComponent
 {
     /// <summary>

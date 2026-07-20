@@ -16,3 +16,18 @@ export interface UmbAuditLogRequestArgs {
 	skip?: number;
 	take?: number;
 }
+
+export interface UmbAuditLogTagStyleMap {
+	look: 'default' | 'primary' | 'secondary' | 'outline' | 'placeholder';
+	color: 'default' | 'danger' | 'warning' | 'positive';
+}
+
+export interface UmbAuditLogTagLocalizeKeys {
+	label: string;
+	desc: string;
+}
+
+export interface UmbAuditLogTagData {
+	style: UmbAuditLogTagStyleMap;
+	text: UmbAuditLogTagLocalizeKeys;
+}

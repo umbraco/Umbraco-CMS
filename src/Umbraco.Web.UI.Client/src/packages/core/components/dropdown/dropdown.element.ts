@@ -5,7 +5,7 @@ import type {
 	UUIPopoverContainerElement,
 } from '@umbraco-cms/backoffice/external/uui';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, customElement, property, query, when } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property, query, when, eventOptions } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbClosedEvent, UmbOpenedEvent } from '@umbraco-cms/backoffice/event';
 
@@ -43,6 +43,9 @@ export class UmbDropdownElement extends UmbLitElement {
 	@property({ type: Boolean })
 	compact = false;
 
+	@property({ type: Boolean, reflect: true })
+	disabled = false;
+
 	@property({ type: Boolean, attribute: 'hide-expand' })
 	hideExpand = false;
 
@@ -78,6 +81,16 @@ export class UmbDropdownElement extends UmbLitElement {
 		}
 	}
 
+	// Capture phase so this runs before a menu item's action opens its modal: WebKit otherwise
+	// leaves the popovertarget toggle state "open" after the modal light-dismisses the popover,
+	// and the trigger then stops responding until the page is reloaded.
+	@eventOptions({ capture: true })
+	private _onPopoverClickCapture() {
+		if (this.#open) {
+			this.closeDropdown();
+		}
+	}
+
 	override render() {
 		return html`
 			<uui-button
@@ -87,14 +100,19 @@ export class UmbDropdownElement extends UmbLitElement {
 				.look=${this.look}
 				.color=${this.color}
 				.label=${this.label ?? ''}
-				.compact=${this.compact}>
+				.compact=${this.compact}
+				?disabled=${this.disabled}>
 				<slot name="label"></slot>
 				${when(
 					!this.hideExpand,
 					() => html`<uui-symbol-expand id="symbol-expand" .open=${this.#open}></uui-symbol-expand>`,
 				)}
 			</uui-button>
-			<uui-popover-container id="dropdown-popover" .placement=${this.placement} @toggle=${this.#onToggle}>
+			<uui-popover-container
+				id="dropdown-popover"
+				.placement=${this.placement}
+				@toggle=${this.#onToggle}
+				@click=${this._onPopoverClickCapture}>
 				<umb-popover-layout>
 					<slot></slot>
 				</umb-popover-layout>
