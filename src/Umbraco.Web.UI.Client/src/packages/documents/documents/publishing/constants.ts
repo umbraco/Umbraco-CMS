@@ -1,4 +1,3 @@
-export * from './bulk-publishing-progress-modal/constants.js';
 export * from './publish-with-descendants/constants.js';
 export * from './publish/constants.js';
 export * from './repository/constants.js';

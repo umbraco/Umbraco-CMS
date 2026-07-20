@@ -2,14 +2,16 @@ import { UmbDocumentUnpublishManifestEntityActionMeta } from '../entity-action/c
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../../constants.js';
 import type { UmbDocumentVariantOptionModel } from '../../../types.js';
 import { UmbDocumentPublishingRepository } from '../../repository/index.js';
-import { UmbDocumentBulkPublishingProgressController } from '../../bulk-publishing-progress-modal/index.js';
 import { UmbDocumentPublishEntityBulkAction } from '../../publish/entity-bulk-action/publish.bulk-action.js';
 import { UmbDocumentItemRepository } from '../../../item/repository/index.js';
 import { UMB_CONTENT_UNPUBLISH_MODAL, UmbContentUnpublishEntityAction } from '@umbraco-cms/backoffice/content';
 import { html, nothing } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';
 import { umbConfirmModal, umbOpenModal } from '@umbraco-cms/backoffice/modal';
-import { UmbEntityBulkActionBase } from '@umbraco-cms/backoffice/entity-bulk-action';
+import {
+	UmbEntityBulkActionBase,
+	UmbEntityBulkActionProgressController,
+} from '@umbraco-cms/backoffice/entity-bulk-action';
 import { UmbLanguageCollectionRepository } from '@umbraco-cms/backoffice/language';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
@@ -129,7 +131,7 @@ export class UmbDocumentUnpublishEntityBulkAction extends UmbEntityBulkActionBas
 		const repository = new UmbDocumentPublishingRepository(this._host);
 		const localize = new UmbLocalizationController(this);
 
-		const result = await new UmbDocumentBulkPublishingProgressController(this).run({
+		const result = await new UmbEntityBulkActionProgressController(this).runWithProgress({
 			headline: localize.term('unpublish_inProgress'),
 			uniques: this.selection,
 			process: (documentUnique) => repository.unpublish(documentUnique, variantIds),

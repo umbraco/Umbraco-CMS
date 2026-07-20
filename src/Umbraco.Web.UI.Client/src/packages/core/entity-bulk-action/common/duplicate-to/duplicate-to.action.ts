@@ -1,4 +1,5 @@
 import { UmbEntityBulkActionBase } from '../../entity-bulk-action-base.js';
+import { UmbEntityBulkActionProgressController } from '../../progress/index.js';
 import type { UmbBulkDuplicateToRepository } from './duplicate-to-repository.interface.js';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import {
@@ -8,6 +9,7 @@ import {
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
+import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import { UMB_TREE_PICKER_MODAL } from '@umbraco-cms/backoffice/tree';
 import type { MetaEntityBulkActionDuplicateToKind } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -42,9 +44,14 @@ export class UmbDuplicateToEntityBulkAction extends UmbEntityBulkActionBase<Meta
 		);
 		if (!bulkDuplicateRepository) throw new Error('Bulk Duplicate Repository is not available');
 
-		await bulkDuplicateRepository.requestBulkDuplicateTo({
-			uniques: this.selection,
-			destination: { unique: destinationUnique },
+		const localize = new UmbLocalizationController(this);
+		await new UmbEntityBulkActionProgressController(this).runIndeterminate({
+			headline: localize.term('actions_copyInProgress'),
+			operation: bulkDuplicateRepository.requestBulkDuplicateTo({
+				uniques: this.selection,
+				destination: { unique: destinationUnique },
+			}),
+			delayMs: 400,
 		});
 
 		const entityContext = await this.getContext(UMB_ENTITY_CONTEXT);

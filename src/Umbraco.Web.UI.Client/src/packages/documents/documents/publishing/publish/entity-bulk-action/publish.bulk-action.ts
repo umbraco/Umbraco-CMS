@@ -1,5 +1,4 @@
 import { UmbDocumentPublishingRepository } from '../../index.js';
-import { UmbDocumentBulkPublishingProgressController } from '../../bulk-publishing-progress-modal/index.js';
 import { UmbDocumentVariantState } from '../../../variant-state.js';
 import type { UmbDocumentVariantOptionModel } from '../../../types.js';
 import type { UmbDocumentItemModel } from '../../../item/types.js';
@@ -7,7 +6,10 @@ import { UMB_DOCUMENT_ENTITY_TYPE } from '../../../entity.js';
 import { UmbDocumentPublishManifestEntityActionMeta } from '../entity-action/constants.js';
 import { UmbDocumentItemRepository } from '../../../item/repository/index.js';
 import { UMB_CONTENT_PUBLISH_MODAL, UmbContentPublishEntityAction } from '@umbraco-cms/backoffice/content';
-import { UmbEntityBulkActionBase } from '@umbraco-cms/backoffice/entity-bulk-action';
+import {
+	UmbEntityBulkActionBase,
+	UmbEntityBulkActionProgressController,
+} from '@umbraco-cms/backoffice/entity-bulk-action';
 import { UmbLanguageCollectionRepository, type UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { umbConfirmModal, umbOpenModal } from '@umbraco-cms/backoffice/modal';
@@ -221,7 +223,7 @@ export class UmbDocumentPublishEntityBulkAction extends UmbEntityBulkActionBase<
 	): Promise<void> {
 		const repository = new UmbDocumentPublishingRepository(this._host);
 
-		const result = await new UmbDocumentBulkPublishingProgressController(this).run({
+		const result = await new UmbEntityBulkActionProgressController(this).runWithProgress({
 			headline: localize.term('publish_inProgress'),
 			uniques: this.selection,
 			process: (documentUnique) => repository.publish(documentUnique, variants),
