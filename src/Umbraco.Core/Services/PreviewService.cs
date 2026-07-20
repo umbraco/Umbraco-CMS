@@ -37,29 +37,6 @@ public class PreviewService : IPreviewService
     /// <param name="previewTokenGenerator">The generator for creating and validating preview tokens.</param>
     /// <param name="serviceScopeFactory">The factory for creating service scopes.</param>
     /// <param name="requestCache">The request cache for caching preview state per request.</param>
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
-    public PreviewService(
-        ICookieManager cookieManager,
-        IPreviewTokenGenerator previewTokenGenerator,
-        IServiceScopeFactory serviceScopeFactory,
-        IRequestCache requestCache)
-        : this(
-            cookieManager,
-            previewTokenGenerator,
-            serviceScopeFactory,
-            requestCache,
-            StaticServiceProvider.Instance.GetRequiredService<IOptions<GlobalSettings>>(),
-            StaticServiceProvider.Instance.GetRequiredService<IRequestAccessor>())
-    {
-    }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="PreviewService" /> class.
-    /// </summary>
-    /// <param name="cookieManager">The cookie manager for handling preview cookies.</param>
-    /// <param name="previewTokenGenerator">The generator for creating and validating preview tokens.</param>
-    /// <param name="serviceScopeFactory">The factory for creating service scopes.</param>
-    /// <param name="requestCache">The request cache for caching preview state per request.</param>
     /// <param name="globalSettings">The global settings.</param>
     /// <param name="requestAccessor">The request accessor for determining the current request scheme.</param>
     public PreviewService(
@@ -76,6 +53,29 @@ public class PreviewService : IPreviewService
         _requestCache = requestCache;
         _globalSettings = globalSettings.Value;
         _requestAccessor = requestAccessor;
+    }
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="PreviewService" /> class.
+    /// </summary>
+    /// <param name="cookieManager">The cookie manager for handling preview cookies.</param>
+    /// <param name="previewTokenGenerator">The generator for creating and validating preview tokens.</param>
+    /// <param name="serviceScopeFactory">The factory for creating service scopes.</param>
+    /// <param name="requestCache">The request cache for caching preview state per request.</param>
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
+    public PreviewService(
+        ICookieManager cookieManager,
+        IPreviewTokenGenerator previewTokenGenerator,
+        IServiceScopeFactory serviceScopeFactory,
+        IRequestCache requestCache)
+        : this(
+            cookieManager,
+            previewTokenGenerator,
+            serviceScopeFactory,
+            requestCache,
+            StaticServiceProvider.Instance.GetRequiredService<IOptions<GlobalSettings>>(),
+            StaticServiceProvider.Instance.GetRequiredService<IRequestAccessor>())
+    {
     }
 
     /// <inheritdoc />

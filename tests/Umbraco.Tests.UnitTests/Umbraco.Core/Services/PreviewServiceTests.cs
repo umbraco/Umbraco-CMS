@@ -56,7 +56,19 @@ public class PreviewServiceTests
         Assert.IsTrue(result);
     }
 
-    private static PreviewService CreatePreviewService(Mock<ICookieManager> cookieManagerMock, out IUser user, bool useHttps, string requestUrl)
+    [Test]
+    public async Task TryEnterPreviewAsync_Sets_NonSecure_SameSiteLax_Cookie_When_Request_Url_Is_Unavailable()
+    {
+        var cookieManagerMock = new Mock<ICookieManager>();
+        var previewService = CreatePreviewService(cookieManagerMock, out var user, useHttps: false, requestUrl: null);
+
+        var result = await previewService.TryEnterPreviewAsync(user);
+
+        VerifyCookie(cookieManagerMock, secure: false, sameSiteMode: SameSiteMode.Lax);
+        Assert.IsTrue(result);
+    }
+
+    private static PreviewService CreatePreviewService(Mock<ICookieManager> cookieManagerMock, out IUser user, bool useHttps, string? requestUrl)
     {
         var userKey = Guid.NewGuid();
 
@@ -68,7 +80,7 @@ public class PreviewServiceTests
         var requestAccessorMock = new Mock<IRequestAccessor>();
         requestAccessorMock
             .Setup(x => x.GetRequestUrl())
-            .Returns(new Uri(requestUrl));
+            .Returns(requestUrl is null ? null : new Uri(requestUrl));
 
         user = new UserBuilder()
             .WithKey(userKey)
