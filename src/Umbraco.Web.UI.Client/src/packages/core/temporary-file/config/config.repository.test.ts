@@ -59,8 +59,15 @@ describe('UmbTemporaryFileConfigRepository', () => {
 		expect(types).to.deep.equal(['jpg', 'png', 'gif', 'jpeg', 'svg']);
 	});
 
-	it('still resolves the initialized promise (backward compatible)', async () => {
+	it('still supports the legacy await-initialized-then-subscribe pattern (backward compatible)', async () => {
 		document.body.appendChild(hostElement);
 		await repository.initialized;
+		expect(await firstValueFrom(repository.part('imageFileTypes'))).to.deep.equal([
+			'jpg',
+			'png',
+			'gif',
+			'jpeg',
+			'svg',
+		]);
 	});
 });
