@@ -1777,6 +1777,11 @@ export class UiBaseLocators extends BasePage {
         timeout: ConstantHelper.timeout.short,
       });
     }).toPass({timeout: ConstantHelper.timeout.medium});
+    // The action buttons mount async and reflow the modal; wait for both so later clicks aren't lost mid-render.
+    await expect(this.currentUserModal.getByLabel('Edit', {exact: true}))
+      .toBeVisible({timeout: ConstantHelper.timeout.long});
+    await expect(this.currentUserModal.getByLabel('Change your password'))
+      .toBeVisible({timeout: ConstantHelper.timeout.long});
   }
 
   // Collection Methods

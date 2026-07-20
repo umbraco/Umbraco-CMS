@@ -1256,10 +1256,7 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   async clickConfirmEmptyRecycleBinButton() {
-    // The confirm dialog re-renders as it settles, detaching the button mid-click; retry until the click lands.
-    await expect(async () => {
-      await this.click(this.confirmEmptyRecycleBinBtn, {force: true, timeout: ConstantHelper.timeout.short});
-    }).toPass({timeout: ConstantHelper.timeout.medium});
+    await this.click(this.confirmEmptyRecycleBinBtn, {force: true, timeout: ConstantHelper.timeout.long});
   }
 
   async isDocumentPropertyEditable(propertyName: string, isEditable: boolean = true) {

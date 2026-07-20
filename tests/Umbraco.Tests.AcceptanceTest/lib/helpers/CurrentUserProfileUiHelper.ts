@@ -1,4 +1,4 @@
-import {expect, Locator, Page} from "@playwright/test";
+import {Locator, Page} from "@playwright/test";
 import {UiBaseLocators} from "./UiBaseLocators";
 import {ConstantHelper} from "./ConstantHelper";
 
@@ -19,10 +19,7 @@ export class CurrentUserProfileUiHelper extends UiBaseLocators {
   }
 
   async clickChangePasswordButton() {
-    // The modal body re-renders once the current-user data loads, detaching the button; retry until the click lands.
-    await expect(async () => {
-      await this.click(this.changePasswordBtn, {timeout: ConstantHelper.timeout.short});
-    }).toPass({timeout: ConstantHelper.timeout.medium});
+    await this.click(this.changePasswordBtn);
   }
 
   async changePassword(currentPassword: string, newPassword: string) {
@@ -45,10 +42,7 @@ export class CurrentUserProfileUiHelper extends UiBaseLocators {
   }
 
   async clickEditButton() {
-    // The modal body re-renders once the current-user data loads, detaching the button; retry until the click lands.
-    await expect(async () => {
-      await this.click(this.editBtn, {timeout: ConstantHelper.timeout.short});
-    }).toPass({timeout: ConstantHelper.timeout.medium});
+    await this.click(this.editBtn);
   }
 
   async isCurrentUserWorkspaceVisible(isVisible: boolean = true) {
