@@ -37,15 +37,15 @@ export abstract class UmbConfigRepositoryBase<ConfigModel> extends UmbRepository
 		repositoryAlias?: string,
 	) {
 		super(host, repositoryAlias);
-		this.#initialized = new Promise<void>((resolve) => {
-			this.consumeContext(storeContext, async (store) => {
-				if (store) {
-					this.#dataStore = store;
-					await this.#init();
-					resolve();
-				}
-			});
-		});
+		this.#initialized = this.consumeContext(storeContext, (store) => {
+			if (store) {
+				this.#dataStore = store;
+			}
+		})
+			.asPromise({ preventTimeout: true })
+			.then(() => this.#init())
+			// Ignore the error; a failed asPromise means the flow was stopped, not that consumption failed.
+			.catch(() => undefined);
 	}
 
 	/**
