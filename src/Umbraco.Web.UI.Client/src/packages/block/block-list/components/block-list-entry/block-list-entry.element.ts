@@ -134,7 +134,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	@state()
 	private _isSortMode?: boolean;
 
-	// TODO: consumed by <umb-entity-frame> label, landing in a follow-up PR; add `@state()` when used in render [LK]
+	@state()
 	private _name?: string;
 
 	// 'content-invalid' attribute is used for styling purpose.
@@ -490,7 +490,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 						() => this.#renderRefBlock(),
 						() => html`
 							<umb-entity-frame>
-								${when(this._isExternalContent, () => html`<uui-icon name="link"></uui-icon>`)} ${this._label}
+								${when(this._isExternalContent, () => html`<uui-icon name="link"></uui-icon>`)} ${this._name}
 							</umb-entity-frame>
 							<umb-extension-slot
 								single
