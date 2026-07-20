@@ -231,7 +231,16 @@ export function transformDocuments(): void {
 						value = pd.textValue;
 					}
 				} else if (pd.varcharValue !== null) {
-					value = pd.varcharValue;
+					// Try to parse as JSON if it looks like an object or array
+					if (pd.varcharValue.startsWith('{') || pd.varcharValue.startsWith('[')) {
+						try {
+							value = JSON.parse(pd.varcharValue);
+						} catch {
+							value = pd.varcharValue;
+						}
+					} else {
+						value = pd.varcharValue;
+					}
 				} else if (pd.intValue !== null) {
 					value = pd.intValue;
 				} else if (pd.decimalValue !== null) {
@@ -304,18 +313,9 @@ export function transformDocuments(): void {
 	// Generate TypeScript content
 	// Note: variants.state needs to be converted to enum values
 	const content = `import type { UmbMockDocumentModel } from '../../mock-data-set.types.js';
-import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { DocumentVariantResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 
-// Map string state to enum
-function mapState(state: string): DocumentVariantStateModel {
-	switch (state) {
-		case 'Published': return DocumentVariantStateModel.PUBLISHED;
-		case 'Draft': return DocumentVariantStateModel.DRAFT;
-		case 'NotCreated': return DocumentVariantStateModel.NOT_CREATED;
-		case 'PublishedPendingChanges': return DocumentVariantStateModel.PUBLISHED_PENDING_CHANGES;
-		default: return DocumentVariantStateModel.DRAFT;
-	}
-}
+type UmbDocumentVariantState = DocumentVariantResponseModel['state'];
 
 const rawData = ${JSON.stringify(nonTrashedDocuments, null, '\t')};
 
@@ -323,7 +323,7 @@ export const data: Array<UmbMockDocumentModel> = rawData.map(doc => ({
 	...doc,
 	variants: doc.variants.map(v => ({
 		...v,
-		state: mapState(v.state),
+		state: v.state as UmbDocumentVariantState,
 	})),
 }));
 `;

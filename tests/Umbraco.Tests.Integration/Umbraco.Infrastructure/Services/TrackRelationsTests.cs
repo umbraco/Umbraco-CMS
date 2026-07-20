@@ -1,16 +1,16 @@
-using System.Linq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Infrastructure.Persistence.Relations;
 using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
+using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
@@ -31,36 +31,49 @@ internal sealed class TrackRelationsTests : UmbracoIntegrationTestWithContent
 
     private IRelationService RelationService => GetRequiredService<IRelationService>();
 
+    private ITemplateService TemplateService => GetRequiredService<ITemplateService>();
+
     protected override void CustomTestSetup(IUmbracoBuilder builder)
     {
         base.CustomTestSetup(builder);
         builder
-            .AddNotificationHandler<ContentSavedNotification, ContentRelationsUpdate>();
+            .AddNotificationHandler<ContentSavedNotification, ContentRelationsUpdate>()
+            .AddNotificationHandler<ContentPublishedNotification, ContentRelationsUpdate>()
+            .AddNotificationHandler<ContentUnpublishedNotification, ContentRelationsUpdate>()
+            .AddNotificationHandler<RelationSavedNotification, RelationSavedTracker>()
+            .AddNotificationHandler<RelationDeletedNotification, RelationDeletedTracker>();
+    }
+
+    [SetUp]
+    public override void Setup()
+    {
+        RelationSavedTracker.Reset();
+        RelationDeletedTracker.Reset();
+        base.Setup();
     }
 
     [Test]
     [LongRunning]
-    public void Automatically_Track_Relations()
+    public async Task Automatically_Track_Relations()
     {
         var mt = MediaTypeBuilder.CreateSimpleMediaType("testMediaType", "Test Media Type");
-        MediaTypeService.Save(mt);
+        await MediaTypeService.CreateAsync(mt, Constants.Security.SuperUserKey);
         var m1 = MediaBuilder.CreateSimpleMedia(mt, "hello 1", -1);
         var m2 = MediaBuilder.CreateSimpleMedia(mt, "hello 1", -1);
         MediaService.Save(m1);
         MediaService.Save(m2);
 
         var memberType = MemberTypeBuilder.CreateSimpleMemberType("testMemberType", "Test Member Type");
-        MemberTypeService.Save(memberType);
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
         var member = MemberBuilder.CreateSimpleMember(memberType, "Test Member", "test@test.com", "xxxxxxxx", "testMember");
         MemberService.Save(member);
 
         var template = TemplateBuilder.CreateTextPageTemplate();
-        FileService.SaveTemplate(template);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
 
         var ct = ContentTypeBuilder.CreateTextPageContentType("richTextTest", defaultTemplateId: template.Id);
         ct.AllowedTemplates = Enumerable.Empty<ITemplate>();
-
-        ContentTypeService.Save(ct);
+        await ContentTypeService.CreateAsync(ct, Constants.Security.SuperUserKey);
 
         var c1 = ContentBuilder.CreateTextpageContent(ct, "my content 1", -1);
         ContentService.Save(c1);
@@ -92,5 +105,295 @@ internal sealed class TrackRelationsTests : UmbracoIntegrationTestWithContent
         Assert.AreEqual(c1.Id, relations[2].ChildId);
         Assert.AreEqual(Constants.Conventions.RelationTypes.RelatedMemberAlias, relations[3].RelationType.Alias);
         Assert.AreEqual(member.Id, relations[3].ChildId);
+    }
+
+    [Test]
+    [LongRunning]
+    public async Task Automatic_Relations_Publish_Saved_Notification()
+    {
+        var mt = MediaTypeBuilder.CreateSimpleMediaType("testMediaType", "Test Media Type");
+        await MediaTypeService.CreateAsync(mt, Constants.Security.SuperUserKey);
+        var m1 = MediaBuilder.CreateSimpleMedia(mt, "media 1", -1);
+        var m2 = MediaBuilder.CreateSimpleMedia(mt, "media 2", -1);
+        MediaService.Save(m1);
+        MediaService.Save(m2);
+
+        var template = TemplateBuilder.CreateTextPageTemplate();
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        var ct = ContentTypeBuilder.CreateTextPageContentType("richTextTest", defaultTemplateId: template.Id);
+        ct.AllowedTemplates = Enumerable.Empty<ITemplate>();
+        await ContentTypeService.CreateAsync(ct, Constants.Security.SuperUserKey);
+
+        var content = ContentBuilder.CreateTextpageContent(ct, "my content", -1);
+        content.Properties["bodyText"]!.SetValue(
+            "<p><img src='/media/1.jpg' data-udi='umb://media/" + m1.Key.ToString("N") + "' /></p>" +
+            "<p><img src='/media/2.jpg' data-udi='umb://media/" + m2.Key.ToString("N") + "' /></p>");
+
+        RelationSavedTracker.Reset();
+        ContentService.Save(content);
+
+        // Verify the saved notification was published with the correct relations.
+        Assert.AreEqual(2, RelationSavedTracker.SavedRelations.Count);
+        Assert.IsTrue(RelationSavedTracker.SavedRelations.Any(r => r.ChildId == m1.Id && r.RelationType.Alias == Constants.Conventions.RelationTypes.RelatedMediaAlias));
+        Assert.IsTrue(RelationSavedTracker.SavedRelations.Any(r => r.ChildId == m2.Id && r.RelationType.Alias == Constants.Conventions.RelationTypes.RelatedMediaAlias));
+        Assert.IsTrue(RelationSavedTracker.SavedRelations.All(r => r.ParentId == content.Id));
+        Assert.IsTrue(RelationSavedTracker.LastIsAutomatic);
+    }
+
+    [Test]
+    [LongRunning]
+    public async Task Automatic_Relations_Publish_Deleted_Notification_When_References_Removed()
+    {
+        var mt = MediaTypeBuilder.CreateSimpleMediaType("testMediaType", "Test Media Type");
+        await MediaTypeService.CreateAsync(mt, Constants.Security.SuperUserKey);
+        var m1 = MediaBuilder.CreateSimpleMedia(mt, "media 1", -1);
+        var m2 = MediaBuilder.CreateSimpleMedia(mt, "media 2", -1);
+        MediaService.Save(m1);
+        MediaService.Save(m2);
+
+        var template = TemplateBuilder.CreateTextPageTemplate();
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        var ct = ContentTypeBuilder.CreateTextPageContentType("richTextTest", defaultTemplateId: template.Id);
+        ct.AllowedTemplates = Enumerable.Empty<ITemplate>();
+        await ContentTypeService.CreateAsync(ct, Constants.Security.SuperUserKey);
+
+        // Save content with two media references.
+        var content = ContentBuilder.CreateTextpageContent(ct, "my content", -1);
+        content.Properties["bodyText"]!.SetValue(
+            "<p><img src='/media/1.jpg' data-udi='umb://media/" + m1.Key.ToString("N") + "' /></p>" +
+            "<p><img src='/media/2.jpg' data-udi='umb://media/" + m2.Key.ToString("N") + "' /></p>");
+        ContentService.Save(content);
+
+        // Remove one media reference, keeping only m1.
+        RelationDeletedTracker.Reset();
+        content.Properties["bodyText"]!.SetValue(
+            "<p><img src='/media/1.jpg' data-udi='umb://media/" + m1.Key.ToString("N") + "' /></p>");
+        ContentService.Save(content);
+
+        // Verify the deleted notification was published for the removed relation.
+        Assert.AreEqual(1, RelationDeletedTracker.DeletedRelations.Count);
+        Assert.AreEqual(m2.Id, RelationDeletedTracker.DeletedRelations[0].ChildId);
+        Assert.AreEqual(content.Id, RelationDeletedTracker.DeletedRelations[0].ParentId);
+        Assert.IsTrue(RelationDeletedTracker.LastIsAutomatic);
+    }
+
+    [Test]
+    [LongRunning]
+    public async Task Automatic_Relations_Publish_Deleted_Notification_When_All_References_Removed()
+    {
+        var mt = MediaTypeBuilder.CreateSimpleMediaType("testMediaType", "Test Media Type");
+        await MediaTypeService.CreateAsync(mt, Constants.Security.SuperUserKey);
+        var m1 = MediaBuilder.CreateSimpleMedia(mt, "media 1", -1);
+        MediaService.Save(m1);
+
+        var template = TemplateBuilder.CreateTextPageTemplate();
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        var ct = ContentTypeBuilder.CreateTextPageContentType("richTextTest", defaultTemplateId: template.Id);
+        ct.AllowedTemplates = Enumerable.Empty<ITemplate>();
+        await ContentTypeService.CreateAsync(ct, Constants.Security.SuperUserKey);
+
+        // Save content with a media reference.
+        var content = ContentBuilder.CreateTextpageContent(ct, "my content", -1);
+        content.Properties["bodyText"]!.SetValue(
+            "<p><img src='/media/1.jpg' data-udi='umb://media/" + m1.Key.ToString("N") + "' /></p>");
+        ContentService.Save(content);
+
+        // Remove all references (hits the early-exit path in ContentRelationsUpdate).
+        RelationDeletedTracker.Reset();
+        content.Properties["bodyText"]!.SetValue("<p>no references</p>");
+        ContentService.Save(content);
+
+        // Verify the deleted notification was published for the removed relation.
+        Assert.AreEqual(1, RelationDeletedTracker.DeletedRelations.Count);
+        Assert.AreEqual(m1.Id, RelationDeletedTracker.DeletedRelations[0].ChildId);
+        Assert.AreEqual(content.Id, RelationDeletedTracker.DeletedRelations[0].ParentId);
+        Assert.IsTrue(RelationDeletedTracker.LastIsAutomatic);
+    }
+
+    [Test]
+    [LongRunning]
+    public async Task Automatic_Relations_No_Notification_When_Unchanged()
+    {
+        var mt = MediaTypeBuilder.CreateSimpleMediaType("testMediaType", "Test Media Type");
+        await MediaTypeService.CreateAsync(mt, Constants.Security.SuperUserKey);
+        var m1 = MediaBuilder.CreateSimpleMedia(mt, "media 1", -1);
+        MediaService.Save(m1);
+
+        var template = TemplateBuilder.CreateTextPageTemplate();
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        var ct = ContentTypeBuilder.CreateTextPageContentType("richTextTest", defaultTemplateId: template.Id);
+        ct.AllowedTemplates = Enumerable.Empty<ITemplate>();
+        await ContentTypeService.CreateAsync(ct, Constants.Security.SuperUserKey);
+
+        // Save content with a media reference.
+        var content = ContentBuilder.CreateTextpageContent(ct, "my content", -1);
+        content.Properties["bodyText"]!.SetValue(
+            "<p><img src='/media/1.jpg' data-udi='umb://media/" + m1.Key.ToString("N") + "' /></p>");
+        ContentService.Save(content);
+
+        // Save again with the same references - no notifications should fire.
+        RelationSavedTracker.Reset();
+        RelationDeletedTracker.Reset();
+        ContentService.Save(content);
+
+        Assert.AreEqual(0, RelationSavedTracker.SavedRelations.Count);
+        Assert.AreEqual(0, RelationDeletedTracker.DeletedRelations.Count);
+        Assert.IsNull(RelationSavedTracker.LastIsAutomatic);
+        Assert.IsNull(RelationDeletedTracker.LastIsAutomatic);
+    }
+
+    [Test]
+    [LongRunning]
+    public async Task Can_Remove_Stale_Published_Relation_When_Saving_Draft_After_Unpublish()
+    {
+        (IContent source, IContent targetA, IContent targetB) = await CreatePublishedContentPickerScenario();
+
+        // The published document references target A via the content picker.
+        Assert.That(RelationService.GetByParentId(source.Id).Select(x => x.ChildId), Is.EquivalentTo(new[] { targetA.Id }));
+
+        // Unpublish. The document no longer has a live published version, but the property's PublishedValue still holds target A.
+        Assert.IsTrue(ContentService.Unpublish(source).Success);
+
+        // Save a draft that re-points the picker to target B.
+        IContent draft = ContentService.GetById(source.Id)!;
+        draft.Properties["contentPicker"]!.SetValue(Udi.Create(Constants.UdiEntityType.Document, targetB.Key).ToString());
+        ContentService.Save(draft);
+
+        // The stale relation to target A (from the previously-published snapshot) must be gone; only the draft reference to B remains.
+        Assert.That(RelationService.GetByParentId(source.Id).Select(x => x.ChildId), Is.EquivalentTo(new[] { targetB.Id }));
+    }
+
+    [Test]
+    [LongRunning]
+    public async Task Can_Remove_Stale_Published_Relation_When_Unpublishing()
+    {
+        (IContent source, IContent targetA, IContent targetB) = await CreatePublishedContentPickerScenario();
+
+        // Save a draft that re-points the picker to target B, without publishing. The document remains published, so both the
+        // live (published A) and draft (edited B) references are legitimately tracked.
+        IContent draft = ContentService.GetById(source.Id)!;
+        draft.Properties["contentPicker"]!.SetValue(Udi.Create(Constants.UdiEntityType.Document, targetB.Key).ToString());
+        ContentService.Save(draft);
+        Assert.That(RelationService.GetByParentId(source.Id).Select(x => x.ChildId), Is.EquivalentTo(new[] { targetA.Id, targetB.Id }));
+
+        // Unpublish. There is no longer a live published version, so the stale published reference to A must be removed,
+        // leaving only the draft reference to B.
+        Assert.IsTrue(ContentService.Unpublish(draft).Success);
+
+        Assert.That(RelationService.GetByParentId(source.Id).Select(x => x.ChildId), Is.EquivalentTo(new[] { targetB.Id }));
+    }
+
+    [Test]
+    [LongRunning]
+    public async Task Can_Delete_Content_Type_Of_Published_Content_With_Relation()
+    {
+        // The relation target uses a different, unrelated content type so that it survives the deletion below -
+        // this is what allows ContentRelationsUpdate to still resolve the (now-deleted) target's node ID when
+        // it re-runs for the source's ContentUnpublishedNotification, and therefore attempt the FK-violating INSERT.
+        var targetType = new ContentTypeBuilder().WithAlias("target").WithName("Target Type").Build();
+        await ContentTypeService.CreateAsync(targetType, Constants.Security.SuperUserKey);
+
+        var sourceType = new ContentTypeBuilder()
+            .WithAlias("source")
+            .WithName("Source Type")
+            .AddPropertyType()
+                .WithAlias("contentPicker")
+                .WithName("Content Picker")
+                .WithDataTypeId(1046)
+                .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.ContentPicker)
+                .Done()
+            .Build();
+        await ContentTypeService.CreateAsync(sourceType, Constants.Security.SuperUserKey);
+
+        var target = new ContentBuilder().WithContentType(targetType).WithName("Target").Build();
+        ContentService.Save(target);
+
+        var source = new ContentBuilder().WithContentType(sourceType).WithName("Source").Build();
+        source.Properties["contentPicker"]!.SetValue(Udi.Create(Constants.UdiEntityType.Document, target.Key).ToString());
+        ContentService.Save(source);
+        PublishResult publishResult = ContentService.Publish(source, ["*"]);
+        Assert.IsTrue(publishResult.Success, publishResult.Result.ToString());
+
+        // The automatic relation exists for the published content before its content type (and the content
+        // itself) is deleted.
+        Assert.That(RelationService.GetByParentId(source.Id).Select(x => x.ChildId), Is.EquivalentTo(new[] { target.Id }));
+
+        // Deleting the content type cascades to permanently deleting the published content within the same scope
+        // that later raises ContentUnpublishedNotification for it. Before the fix, ContentRelationsUpdate would
+        // try to re-persist the relation for the now-deleted node and throw a foreign key violation.
+        ContentTypeOperationStatus status = await ContentTypeService.DeleteAsync(sourceType.Key, Constants.Security.SuperUserKey);
+        Assert.AreEqual(ContentTypeOperationStatus.Success, status);
+
+        Assert.IsNull(ContentService.GetById(source.Id));
+        Assert.IsEmpty(RelationService.GetByChildId(target.Id));
+    }
+
+    private async Task<(IContent Source, IContent TargetA, IContent TargetB)> CreatePublishedContentPickerScenario()
+    {
+        var contentType = new ContentTypeBuilder()
+            .WithName("Page")
+            .AddPropertyType()
+                .WithAlias("contentPicker")
+                .WithName("Content Picker")
+                .WithDataTypeId(1046)
+                .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.ContentPicker)
+                .Done()
+            .Build();
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+        contentType.AllowedContentTypes = [new ContentTypeSort(contentType.Key, 0, contentType.Alias)];
+        await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
+
+        var targetA = new ContentBuilder().WithContentType(contentType).WithName("Target A").Build();
+        ContentService.Save(targetA);
+        var targetB = new ContentBuilder().WithContentType(contentType).WithName("Target B").Build();
+        ContentService.Save(targetB);
+
+        // Publish the source document with the picker pointing at target A. Both the edited and published property
+        // snapshots now reference target A.
+        var source = new ContentBuilder().WithContentType(contentType).WithName("Source").Build();
+        source.Properties["contentPicker"]!.SetValue(Udi.Create(Constants.UdiEntityType.Document, targetA.Key).ToString());
+        ContentService.Save(source);
+        PublishResult publishResult = ContentService.Publish(source, ["*"]);
+        Assert.IsTrue(publishResult.Success, publishResult.Result.ToString());
+
+        return (source, targetA, targetB);
+    }
+
+    private sealed class RelationSavedTracker : INotificationHandler<RelationSavedNotification>
+    {
+        public static List<IRelation> SavedRelations { get; } = new();
+
+        public static bool? LastIsAutomatic { get; private set; }
+
+        public static void Reset()
+        {
+            SavedRelations.Clear();
+            LastIsAutomatic = null;
+        }
+
+        public void Handle(RelationSavedNotification notification)
+        {
+            SavedRelations.AddRange(notification.SavedEntities);
+            LastIsAutomatic = notification.IsAutomatic;
+        }
+    }
+
+    private sealed class RelationDeletedTracker : INotificationHandler<RelationDeletedNotification>
+    {
+        public static List<IRelation> DeletedRelations { get; } = new();
+
+        public static bool? LastIsAutomatic { get; private set; }
+
+        public static void Reset()
+        {
+            DeletedRelations.Clear();
+            LastIsAutomatic = null;
+        }
+
+        public void Handle(RelationDeletedNotification notification)
+        {
+            DeletedRelations.AddRange(notification.DeletedEntities);
+            LastIsAutomatic = notification.IsAutomatic;
+        }
     }
 }

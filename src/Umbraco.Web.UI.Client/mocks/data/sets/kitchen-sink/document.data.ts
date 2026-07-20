@@ -1,25 +1,7 @@
 import type { UmbMockDocumentModel } from '../../mock-data-set.types.js';
-import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { DocumentVariantResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 
-// Map string state to enum
-/**
- *
- * @param state
- */
-function mapState(state: string): DocumentVariantStateModel {
-	switch (state) {
-		case 'Published':
-			return DocumentVariantStateModel.PUBLISHED;
-		case 'Draft':
-			return DocumentVariantStateModel.DRAFT;
-		case 'NotCreated':
-			return DocumentVariantStateModel.NOT_CREATED;
-		case 'PublishedPendingChanges':
-			return DocumentVariantStateModel.PUBLISHED_PENDING_CHANGES;
-		default:
-			return DocumentVariantStateModel.DRAFT;
-	}
-}
+type UmbDocumentVariantState = DocumentVariantResponseModel['state'];
 
 const rawData = [
 	{
@@ -763,14 +745,14 @@ const rawData = [
 				alias: 'colorPickerNoLabels',
 				culture: null,
 				segment: null,
-				value: '{\r\n  "value": "cc0000",\r\n  "label": "cc0000",\r\n  "sortOrder": 1,\r\n  "id": "2"\r\n}',
+				value: { value: 'cc0000', label: 'cc0000' },
 			},
 			{
 				editorAlias: 'Umbraco.ColorPicker',
 				alias: 'colorPickerLabels',
 				culture: null,
 				segment: null,
-				value: '{\r\n  "value": "cc0000",\r\n  "label": "Red",\r\n  "sortOrder": 1,\r\n  "id": "2"\r\n}',
+				value: { value: 'cc0000', label: 'Red' },
 			},
 		],
 		flags: [],
@@ -988,14 +970,14 @@ const rawData = [
 				alias: 'dropdownMultiValue',
 				culture: null,
 				segment: null,
-				value: '["One","Three"]',
+				value: ['One', 'Three'],
 			},
 			{
 				editorAlias: 'Umbraco.DropDown.Flexible',
 				alias: 'dropdownSingleValue',
 				culture: null,
 				segment: null,
-				value: '["Two"]',
+				value: ['Two'],
 			},
 		],
 		flags: [],
@@ -1209,7 +1191,7 @@ const rawData = [
 				culture: null,
 				segment: null,
 				value: {
-					src: '/umbraco/backoffice/assets/umb-pattern-pink.png',
+					src: '/umbraco/backoffice/assets/umb-pattern-blue.png',
 					focalPoint: {
 						left: 0.7736573381473065,
 						top: 0.6536672841836085,
@@ -1731,7 +1713,7 @@ const rawData = [
 						unique: '2329915b-fb6b-4c2f-9179-8c16ba125cea',
 					},
 					{
-						name: 'Pexels Mark Stebnicki 2255924',
+						name: 'Placeholder 2255924',
 						type: 'media',
 						unique: 'a0651d98-14a9-4d92-8133-6f59b248d31',
 					},
@@ -1767,7 +1749,7 @@ const rawData = [
 						unique: '0865b2ab-ad7c-48d4-a8c6-608986a0e942',
 					},
 					{
-						name: 'Pexels Dxt 73640',
+						name: 'Placeholder 73640',
 						type: 'media',
 						unique: '76c02ec8-6a82-4c47-95da-56f6628b58fb',
 					},
@@ -1804,7 +1786,7 @@ const rawData = [
 						unique: '9394af8f-d306-4778-9f03-2431eb8f5b6b',
 					},
 					{
-						name: 'Pexels Engin Akyurt 1435904',
+						name: 'Placeholder 1435904',
 						type: 'media',
 						unique: 'b44956af-620a-4e17-bbce-3987446fb2f1',
 					},
@@ -2204,7 +2186,7 @@ const rawData = [
 				segment: null,
 				value: {
 					markup:
-						'<p>Yikes so many buttons!</p><ul><li><p>Button</p></li><li><p>Button</p></li><li><p>More button!</p></li></ul><p><img data-udi="umb://media/f06adb918cdd408d83ddf7b833fc393c" src="" alt="" width="426" height="284" style="display: block; margin-left: auto; margin-right: auto;"></p><p>&nbsp;</p>',
+						'<p>Yikes so many buttons!</p><ul><li><p>Button</p></li><li><p>Button</p></li><li><p>More button!</p></li></ul><p><img data-udi="umb://media/f06adb918cdd408d83ddf7b833fc393c" src="/umbraco/backoffice/assets/umb-pattern-blue.png" alt="" width="284" height="284"></p><p>&nbsp;</p>',
 					blocks: {
 						contentData: [],
 						settingsData: [],
@@ -2566,10 +2548,51 @@ const rawData = [
 	},
 ];
 
-export const data: Array<UmbMockDocumentModel> = rawData.map((doc) => ({
-	...doc,
-	variants: doc.variants.map((v) => ({
-		...v,
-		state: mapState(v.state),
+const HOME_DOCUMENT_ID = 'db79156b-3d5b-43d6-ab32-902dc423bec3';
+const ALL_DATA_TYPES_DOCUMENT_TYPE_ID = '8b1d6f2a-7c4e-4a9b-bf13-2e5d9a0c4f76';
+const ALL_DATA_TYPES_DOCUMENT_ID = '3f7c2e9d-5a14-4b8e-9c0a-6d2f8b1e4a37';
+
+// A single document showcasing every data type, reusing the values from the individual showcase documents.
+const allDataTypesValues = rawData
+	.filter((document) => document.parent?.id === HOME_DOCUMENT_ID)
+	.flatMap((document) => document.values as UmbMockDocumentModel['values']);
+
+export const data: Array<UmbMockDocumentModel> = [
+	...rawData.map((doc) => ({
+		...doc,
+		variants: doc.variants.map((v) => ({
+			...v,
+			state: v.state as UmbDocumentVariantState,
+		})),
 	})),
-}));
+	{
+		ancestors: [{ id: HOME_DOCUMENT_ID }],
+		template: null,
+		id: ALL_DATA_TYPES_DOCUMENT_ID,
+		createDate: '2023-02-20 16:30:00',
+		parent: { id: HOME_DOCUMENT_ID },
+		documentType: {
+			id: ALL_DATA_TYPES_DOCUMENT_TYPE_ID,
+			icon: 'icon-documents color-green',
+		},
+		hasChildren: false,
+		noAccess: false,
+		isProtected: false,
+		isTrashed: false,
+		variants: [
+			{
+				state: 'Published' as UmbDocumentVariantState,
+				publishDate: '2026-04-16 11:10:37.0000000',
+				culture: null,
+				segment: null,
+				name: 'All Data Types',
+				createDate: '2023-02-20 16:30:00',
+				updateDate: '2026-04-16 11:10:37.0000000',
+				id: ALL_DATA_TYPES_DOCUMENT_ID,
+				flags: [],
+			},
+		],
+		values: allDataTypesValues,
+		flags: [],
+	},
+];

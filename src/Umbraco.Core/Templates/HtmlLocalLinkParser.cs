@@ -148,28 +148,30 @@ public sealed partial class HtmlLocalLinkParser
         {
             return _linkPattern.Replace(text, match =>
             {
-                if (match.Groups["culture"].Value.Equals(culture, StringComparison.OrdinalIgnoreCase)
+                if (match.Groups["culture"].ValueSpan.Equals(culture, StringComparison.OrdinalIgnoreCase)
                     && match.Groups["href"].Value == tagHref)
                 {
-                    return match.Groups[1].Value + newLink + match.Groups["closequote"].Value;
+                    return $"{match.Groups[1].ValueSpan}{newLink}{match.Groups["closequote"].ValueSpan}";
                 }
                 return match.Value;
             });
         }
     }
 
-    // under normal circumstances, the type attribute is preceded by a space
+    // Under normal circumstances, the type attribute is preceded by a space
     // to cover the rare occasion where it isn't, we first replace with a space and then without.
+    // Case-insensitive to tolerate historic mis-cased values written by the (now fixed) ConvertLocalLinks
+    // migration for Umbraco 15 (see #22597).
     private static string StripTypeAttributeFromTag(string tag, string type) =>
-        tag.Replace($" type=\"{type}\"", string.Empty)
-            .Replace($"type=\"{type}\"", string.Empty);
+        tag.Replace($" type=\"{type}\"", string.Empty, StringComparison.OrdinalIgnoreCase)
+            .Replace($"type=\"{type}\"", string.Empty, StringComparison.OrdinalIgnoreCase);
 
     private IEnumerable<LocalLinkTag> FindLocalLinkIds(string text)
     {
         MatchCollection localLinkTagMatches = _localLinkTagPattern.Matches(text);
         foreach (Match linkTag in localLinkTagMatches)
         {
-            if (Guid.TryParse(linkTag.Groups["guid"].Value, out Guid guid) is false)
+            if (Guid.TryParse(linkTag.Groups["guid"].ValueSpan, out Guid guid) is false)
             {
                 continue;
             }
@@ -184,12 +186,13 @@ public sealed partial class HtmlLocalLinkParser
             // Find the culture attribute if it exists
             Match cultureMatch = _culturePattern.Match(linkTag.Value);
 
+            // Normalize the type to lower case to tolerate historic mis-cased values written by the (now fixed)
+            // ConvertLocalLinks migration (see #22597). Constants.UdiEntityType.* values are lower case.
             yield return new LocalLinkTag(
                 null,
-                new GuidUdi(typeMatch.Groups["type"].Value, guid),
+                new GuidUdi(typeMatch.Groups["type"].Value.ToLowerInvariant(), guid),
                 linkTag.Groups["locallink"].Value,
-                cultureMatch.Success ? cultureMatch.Groups["culture"].Value : null
-            );
+                cultureMatch.Success ? cultureMatch.Groups["culture"].Value : null);
         }
 
         // also return legacy results for values that have not been migrated

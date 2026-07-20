@@ -1,4 +1,4 @@
-import { UmbModalToken } from '../../modal/token/modal-token.js';
+import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export type UmbModalAuthTimeoutConfig = {
 	remainingTimeInSeconds: number;

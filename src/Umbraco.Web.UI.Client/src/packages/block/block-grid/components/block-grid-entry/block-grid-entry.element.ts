@@ -4,6 +4,7 @@ import { UmbBlockGridEntryContext } from './block-grid-entry.context.js';
 import { css, customElement, html, nothing, property, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
 import { UmbDataPathBlockElementDataQuery } from '@umbraco-cms/backoffice/block';
+import { renderHiddenUfm } from '@umbraco-cms/backoffice/ufm';
 import { umbDestroyOnDisconnect, UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbObserveValidationStateController } from '@umbraco-cms/backoffice/validation';
 import { UUIBlinkAnimationValue, UUIBlinkKeyframes } from '@umbraco-cms/backoffice/external/uui';
@@ -14,6 +15,9 @@ import type {
 } from '@umbraco-cms/backoffice/block-custom-view';
 import type { UmbExtensionElementInitializer } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
+import type { UmbUfmResolvedEvent } from '@umbraco-cms/backoffice/ufm';
+
+import '../../../block/action/block-action-list.element.js';
 
 /**
  * @element umb-block-grid-entry
@@ -53,6 +57,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 
 	#context = new UmbBlockGridEntryContext(this);
 	#renderTimeout: number | undefined;
+	#layoutContainerResizeObserver = new ResizeObserver(() => this.#callUpdateInlineCreateButtons());
 
 	@state()
 	private _contentTypeAlias?: string;
@@ -68,9 +73,6 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 
 	@state()
 	private _showContentEdit = false;
-
-	@state()
-	private _hasSettings = false;
 
 	// If _createPath is undefined, its because no blocks are allowed to be created here[NL]
 	@state()
@@ -88,7 +90,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	@state()
 	private _exposed?: boolean;
 
-	// Unuspported is triggerede if the Block Type is not reconized, it can also be triggerede by the Content Element Type not existing any longer. [NL]
+	// Unsupported is triggered if the Block Type is not recognized, it can also be triggered by the Content Element Type not existing any longer. [NL]
 	@state()
 	private _unsupported?: boolean;
 
@@ -96,16 +98,13 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	private _showActions?: boolean;
 
 	@state()
-	private _workspaceEditContentPath?: string;
-
-	@state()
-	private _workspaceEditSettingsPath?: string;
-
-	@state()
 	private _inlineEditingMode?: boolean;
 
 	@state()
 	private _isSortMode?: boolean;
+
+	// TODO: consumed by <umb-entity-frame> label, landing in a follow-up PR; add `@state()` when used in render [LK]
+	private _name?: string;
 
 	@state()
 	private _canScale?: boolean;
@@ -166,7 +165,6 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		this.observe(
 			this.#context.settingsElementTypeKey,
 			(key) => {
-				this._hasSettings = !!key;
 				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config!, showSettingsEdit: !!key } });
 			},
 			null,
@@ -218,6 +216,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		this.observe(this.#context.actionsVisibility, (showActions) => (this._showActions = showActions), null);
 		this.observe(this.#context.inlineEditingMode, (mode) => (this._inlineEditingMode = mode), null);
 		this.observe(this.#context.isSortMode, (isSortMode) => (this._isSortMode = isSortMode), null);
+		this.observe(this.#context.name, (name) => (this._name = name), null);
 
 		// Data:
 		this.observe(
@@ -267,7 +266,6 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		this.observe(
 			this.#context.workspaceEditContentPath,
 			(path) => {
-				this._workspaceEditContentPath = path;
 				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config!, editContentPath: path } });
 			},
 			null,
@@ -275,7 +273,6 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		this.observe(
 			this.#context.workspaceEditSettingsPath,
 			(path) => {
-				this._workspaceEditSettingsPath = path;
 				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config!, editSettingsPath: path } });
 			},
 			null,
@@ -283,7 +280,10 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 
 		this.observe(
 			this.#context.readOnlyGuard.permitted,
-			(isReadOnly) => (this._isReadOnly = isReadOnly),
+			(isReadOnly) => {
+				this._isReadOnly = isReadOnly;
+				this.#updateBlockViewProps({ readonly: isReadOnly });
+			},
 			'umbReadOnlyObserver',
 		);
 	}
@@ -354,6 +354,19 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		);
 
 		this.#callUpdateInlineCreateButtons();
+		if (this.parentElement) {
+			this.#layoutContainerResizeObserver.observe(this.parentElement);
+		}
+	}
+
+	override disconnectedCallback(): void {
+		super.disconnectedCallback();
+		this.#layoutContainerResizeObserver.disconnect();
+	}
+
+	override destroy(): void {
+		this.#layoutContainerResizeObserver.disconnect();
+		super.destroy();
 	}
 
 	protected override updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
@@ -366,6 +379,19 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	#expose = () => {
 		this.#context.expose();
 	};
+
+	#onUfmResolved = (event: UmbUfmResolvedEvent) => {
+		this.#context.setName(event.detail.text);
+	};
+
+	#renderHiddenUfm() {
+		const blockValue = {
+			...this._blockViewProps.content,
+			$settings: this._blockViewProps.settings,
+			$index: this.index,
+		};
+		return renderHiddenUfm(this._label, blockValue, this.#onUfmResolved);
+	}
 
 	#callUpdateInlineCreateButtons() {
 		clearTimeout(this.#renderTimeout);
@@ -428,17 +454,18 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			ext.component.classList.add('umb-block-grid__block--view');
 			ext.component.setAttribute('part', 'component');
 		}
-		if (this._exposed || this._isReadOnly) {
-			return ext.component;
-		} else {
-			return html`
+		return html`${this.#renderHiddenUfm()}
+		${when(
+			this._exposed || this._isReadOnly,
+			() => ext.component,
+			() => html`
 				<div>
 					${ext.component}
 					<umb-block-overlay-expose-button .contentTypeName=${this._contentTypeName} @click=${this.#expose}>
 					</umb-block-overlay-expose-button>
 				</div>
-			`;
-		}
+			`,
+		)}`;
 	};
 
 	override render() {
@@ -501,6 +528,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 
 	#renderUnsupportedBlock() {
 		return html`
+			${this.#renderHiddenUfm()}
 			<umb-block-grid-block-unsupported
 				class="umb-block-grid__block--view"
 				.config=${this._blockViewProps.config}
@@ -573,93 +601,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	#renderActionBar() {
 		if (this._isSortMode) return nothing;
 		if (!this._showActions) return nothing;
-		return html`
-			<uui-action-bar>
-				${this.#renderEditAction()} ${this.#renderEditSettingsAction()} ${this.#renderCopyToClipboardAction()}
-				${this.#renderDeleteAction()}
-			</uui-action-bar>
-		`;
-	}
-
-	#renderEditAction() {
-		if (this._isReadOnly) return nothing;
-		return html`
-			${when(
-				this._showContentEdit && this._workspaceEditContentPath,
-				() => html`
-					<uui-button
-						label="edit"
-						look="secondary"
-						color=${this._contentInvalid ? 'danger' : ''}
-						href=${this._workspaceEditContentPath!}
-						title=${this.localize.term('general_edit')}>
-						<uui-icon name=${this._exposed === false ? 'icon-add' : 'icon-edit'}></uui-icon>
-						${when(
-							this._contentInvalid,
-							() => html`<uui-badge attention color="invalid" label="Invalid content">!</uui-badge>`,
-						)}
-					</uui-button>
-				`,
-			)}
-			${when(
-				this._showContentEdit === false && this._exposed === false,
-				() => html`
-					<uui-button
-						@click=${this.#expose}
-						label=${this.localize.term('blockEditor_createThisFor', this._contentTypeName)}
-						look="secondary">
-						<uui-icon name="icon-add"></uui-icon>
-					</uui-button>
-				`,
-			)}
-		`;
-	}
-
-	#renderEditSettingsAction() {
-		if (this._isReadOnly) return nothing;
-		return html`
-			${this._hasSettings && this._workspaceEditSettingsPath
-				? html`
-						<uui-button
-							label="Edit settings"
-							look="secondary"
-							color=${this._settingsInvalid ? 'invalid' : ''}
-							href=${this._workspaceEditSettingsPath}
-							title=${this.localize.term('general_settings')}>
-							<uui-icon name="icon-settings"></uui-icon>
-							${when(
-								this._settingsInvalid,
-								() => html`<uui-badge attention color="invalid" label="Invalid settings">!</uui-badge>`,
-							)}
-						</uui-button>
-					`
-				: nothing}
-		`;
-	}
-
-	#renderCopyToClipboardAction() {
-		return html`
-			<uui-button
-				label=${this.localize.term('clipboard_labelForCopyToClipboard')}
-				look="secondary"
-				@click=${() => this.#context.copyToClipboard()}
-				title=${this.localize.term('general_copy')}>
-				<uui-icon name="icon-clipboard-copy"></uui-icon>
-			</uui-button>
-		`;
-	}
-
-	#renderDeleteAction() {
-		if (this._isReadOnly) return nothing;
-		return html`
-			<uui-button
-				label="delete"
-				look="secondary"
-				@click=${() => this.#context.requestDelete()}
-				title=${this.localize.term('general_delete')}>
-				<uui-icon name="icon-remove"></uui-icon>
-			</uui-button>
-		`;
+		return html`<umb-block-action-list id="actions" block-editor=${UMB_BLOCK_GRID}></umb-block-action-list>`;
 	}
 
 	static override styles = [
@@ -708,14 +650,6 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 				z-index: 2;
 			}
 
-			uui-action-bar {
-				position: absolute;
-				top: var(--uui-size-2);
-				right: var(--uui-size-2);
-				opacity: var(--umb-block-grid-entry-actions-opacity, 0);
-				transition: opacity 120ms;
-			}
-
 			uui-button-inline-create {
 				top: 0px;
 				position: absolute;
@@ -731,6 +665,15 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 
 			:host(:not([index='0'])) uui-button-inline-create:not([vertical]) {
 				top: calc(var(--umb-block-grid--row-gap, 0px) * -0.5);
+			}
+
+			#actions {
+				position: absolute;
+				top: var(--uui-size-2);
+				right: var(--uui-size-2);
+				opacity: var(--umb-block-grid-entry-actions-opacity, 0);
+				transition: opacity 120ms;
+				z-index: 1;
 			}
 
 			uui-button-inline-create[vertical] {

@@ -72,7 +72,8 @@ tools/docfx/
 /src/Umbraco.Cms.StaticAssets/wwwroot/umbraco/assets
 /src/Umbraco.Cms.StaticAssets/wwwroot/umbraco/js
 /src/Umbraco.Cms.StaticAssets/wwwroot/umbraco/lib
-/src/Umbraco.Cms.StaticAssets/wwwroot/umbraco/views
+/src/Umbraco.Cms.StaticAssets/wwwroot/umbraco/views/*
+!/src/Umbraco.Cms.StaticAssets/wwwroot/umbraco/views/errors
 /src/Umbraco.Cms.StaticAssets/wwwroot/umbraco/login
 
 # Environment specific data
@@ -119,3 +120,6 @@ trace.zip
 /tests/Umbraco.Tests.Integration/appsettings-schema.*.json
 /tests/Umbraco.Tests.Integration/umbraco-package-schema.json
 /src/Umbraco.Cms/appsettings-schema.json
+
+# SonarQube local analysis cache
+.sonarqube/

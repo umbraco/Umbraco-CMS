@@ -26,6 +26,7 @@ export class UmbPropertyEditorUiInteractionMemoryManager extends UmbControllerBa
 		this.#init = Promise.all([
 			this.consumeContext(UMB_INTERACTION_MEMORY_CONTEXT, (context) => {
 				this.#interactionMemoryContext = context;
+				this.#observeInteractionMemory();
 			}).asPromise(),
 		]);
 	}
@@ -37,7 +38,7 @@ export class UmbPropertyEditorUiInteractionMemoryManager extends UmbControllerBa
 	 */
 	setPropertyEditorConfig(config: UmbPropertyEditorConfigCollection | undefined) {
 		this.#setConfigHash(config);
-		this.#getInteractionMemory();
+		this.#observeInteractionMemory();
 	}
 
 	/**
@@ -75,14 +76,17 @@ export class UmbPropertyEditorUiInteractionMemoryManager extends UmbControllerBa
 		return `${this.#memoryUniquePrefix}PropertyEditorUi${this.#configHashCode ? '-' + this.#configHashCode : ''}`;
 	}
 
-	async #getInteractionMemory() {
-		await this.#init;
+	async #observeInteractionMemory() {
+		if (!this.#interactionMemoryContext || !this.#configHashCode) return;
 		const memoryUnique = this.#getInteractionMemoryUnique();
 		if (!memoryUnique) return;
-		if (!this.#interactionMemoryContext) return;
-
-		const memory = this.#interactionMemoryContext.memory.getMemory(memoryUnique);
-		this.#memories.setValue(memory?.memories ?? []);
+		this.observe(
+			this.#interactionMemoryContext?.memory.memory(memoryUnique),
+			(memory) => {
+				this.#memories.setValue(memory?.memories ?? []);
+			},
+			'observeMemory',
+		);
 	}
 
 	#setConfigHash(config: UmbPropertyEditorConfigCollection | undefined) {

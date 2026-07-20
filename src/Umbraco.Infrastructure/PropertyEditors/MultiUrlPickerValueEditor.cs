@@ -113,6 +113,13 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference, I
     /// <inheritdoc/>
     public void CacheReferencedEntities(IEnumerable<object> values)
     {
+#pragma warning disable CS0618 // Type or member is obsolete
+        if (CacheReferencedEntitiesSuppression.IsSuppressed)
+        {
+            return;
+        }
+#pragma warning restore CS0618 // Type or member is obsolete
+
         var dtos = values
             .Select(value =>
             {
@@ -286,7 +293,7 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference, I
             _logger.LogError(ex, "Error getting links");
         }
 
-        return base.ToEditor(property, culture, segment);
+        return Enumerable.Empty<object>();
     }
 
     /// <summary>

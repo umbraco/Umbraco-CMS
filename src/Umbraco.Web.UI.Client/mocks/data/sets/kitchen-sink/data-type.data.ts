@@ -1112,6 +1112,10 @@ export const data: Array<UmbMockDataTypeModel> = [
 		flags: [],
 		values: [
 			{
+				alias: 'inputType',
+				value: 'email',
+			},
+			{
 				alias: 'umbMigrationV14',
 				value: '2026-04-16T09:54:45.5052869+00:00',
 			},

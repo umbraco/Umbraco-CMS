@@ -213,7 +213,15 @@ export function transformMembers(): void {
 							value = pd.textValue;
 						}
 					} else if (pd.varcharValue !== null) {
-						value = pd.varcharValue;
+						if (pd.varcharValue.startsWith('{') || pd.varcharValue.startsWith('[')) {
+							try {
+								value = JSON.parse(pd.varcharValue);
+							} catch {
+								value = pd.varcharValue;
+							}
+						} else {
+							value = pd.varcharValue;
+						}
 					} else if (pd.intValue !== null) {
 						value = pd.intValue;
 					} else if (pd.decimalValue !== null) {

@@ -112,6 +112,11 @@ export type BatchResponseModelMemberTypeResponseModel = {
     items: Array<MemberTypeResponseModel>;
 };
 
+export type BatchResponseModelUserResponseModel = {
+    total: number;
+    items: Array<UserResponseModel>;
+};
+
 export type CalculatedUserStartNodesResponseModel = {
     id: string;
     documentStartNodeIds: Array<ReferenceByIdModel>;
@@ -139,6 +144,12 @@ export type ConsentLevelPresentationModel = {
     description: string;
 };
 
+export enum ContentSortFieldModel {
+    NAME = 'Name',
+    CREATE_DATE = 'CreateDate',
+    UPDATE_DATE = 'UpdateDate'
+}
+
 export type CopyDataTypeRequestModel = {
     target?: ReferenceByIdModel | null;
 };
@@ -159,6 +170,16 @@ export type CopyMediaTypeRequestModel = {
 
 export type CopyMemberTypeRequestModel = {
     target?: ReferenceByIdModel | null;
+};
+
+export type CreateAndPublishDocumentRequestModel = {
+    values: Array<DocumentValueModel>;
+    variants: Array<DocumentVariantRequestModel>;
+    id?: string | null;
+    parent?: ReferenceByIdModel | null;
+    documentType: ReferenceByIdModel;
+    template: ReferenceByIdModel | null;
+    culturesToPublish: Array<string>;
 };
 
 export type CreateDataTypeRequestModel = {
@@ -1315,6 +1336,7 @@ export type ManifestResponseModel = {
     name: string;
     id?: string | null;
     version?: string | null;
+    cacheBuster?: string | null;
     extensions: Array<unknown>;
 };
 
@@ -1557,7 +1579,8 @@ export type MemberItemResponseModel = {
 
 export enum MemberKindModel {
     DEFAULT = 'Default',
-    API = 'Api'
+    API = 'Api',
+    EXTERNAL_ONLY = 'ExternalOnly'
 }
 
 export type MemberReferenceResponseModel = {
@@ -1584,6 +1607,7 @@ export type MemberResponseModel = {
     lastPasswordChangeDate?: string | null;
     groups: Array<string>;
     kind: MemberKindModel;
+    profileData?: string | null;
 };
 
 export type MemberTypeCompositionModel = {
@@ -2199,6 +2223,16 @@ export type PasswordConfigurationResponseModel = {
     requireUppercase: boolean;
 };
 
+export type PatchDocumentRequestModel = {
+    operations: Array<PatchOperationRequestModel>;
+};
+
+export type PatchOperationRequestModel = {
+    op: string;
+    path: string;
+    value?: unknown;
+};
+
 export type ProblemDetails = {
     type?: string | null;
     title?: string | null;
@@ -2444,6 +2478,7 @@ export type ServerConfigurationResponseModel = {
     versionCheckPeriod: number;
     allowLocalLogin: boolean;
     umbracoCssPath: string;
+    signalR: SignalRClientSettingsResponseModel;
 };
 
 export type ServerInformationResponseModel = {
@@ -2463,6 +2498,21 @@ export type ServerTroubleshootingResponseModel = {
 
 export type SetAvatarRequestModel = {
     file: ReferenceByIdModel;
+};
+
+export type SignalRClientSettingsResponseModel = {
+    skipNegotiation: boolean;
+};
+
+export type SortDocumentChildrenByFieldRequestModel = {
+    field: ContentSortFieldModel;
+    direction: DirectionModel;
+    culture?: string | null;
+};
+
+export type SortMediaChildrenByFieldRequestModel = {
+    field: ContentSortFieldModel;
+    direction: DirectionModel;
 };
 
 export type SortingRequestModel = {
@@ -2715,6 +2765,17 @@ export type UnlockUsersRequestModel = {
 
 export type UnpublishDocumentRequestModel = {
     cultures?: Array<string> | null;
+};
+
+export type UpdateAndPublishDocumentRequestModel = {
+    values: Array<DocumentValueModel>;
+    variants: Array<DocumentVariantRequestModel>;
+    template?: ReferenceByIdModel | null;
+    culturesToPublish: Array<string>;
+};
+
+export type UpdateCurrentUserRequestModel = {
+    languageIsoCode: string;
 };
 
 export type UpdateDataTypeRequestModel = {
@@ -3205,6 +3266,7 @@ export type WebhookLogResponseModel = {
     key: string;
     webhookKey: string;
     statusCode: string;
+    httpStatusCode?: number | null;
     isSuccessStatusCode: boolean;
     date: string;
     eventAlias: string;
@@ -6815,6 +6877,47 @@ export type PutDocumentByIdNotificationsResponses = {
     200: unknown;
 };
 
+export type PatchDocumentByIdPatchData = {
+    body?: PatchDocumentRequestModel;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/umbraco/management/api/v1/document/{id}/patch';
+};
+
+export type PatchDocumentByIdPatchErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+    /**
+     * Unprocessable Content
+     */
+    422: ProblemDetails;
+};
+
+export type PatchDocumentByIdPatchError = PatchDocumentByIdPatchErrors[keyof PatchDocumentByIdPatchErrors];
+
+export type PatchDocumentByIdPatchResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
 export type GetDocumentByIdPreviewUrlData = {
     body?: never;
     path: {
@@ -7221,6 +7324,43 @@ export type GetDocumentByIdReferencedDescendantsResponses = {
 
 export type GetDocumentByIdReferencedDescendantsResponse = GetDocumentByIdReferencedDescendantsResponses[keyof GetDocumentByIdReferencedDescendantsResponses];
 
+export type PutDocumentByIdSortChildrenData = {
+    body?: SortDocumentChildrenByFieldRequestModel;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/umbraco/management/api/v1/document/{id}/sort-children';
+};
+
+export type PutDocumentByIdSortChildrenErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type PutDocumentByIdSortChildrenError = PutDocumentByIdSortChildrenErrors[keyof PutDocumentByIdSortChildrenErrors];
+
+export type PutDocumentByIdSortChildrenResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
 export type PutDocumentByIdUnpublishData = {
     body?: UnpublishDocumentRequestModel;
     path: {
@@ -7252,6 +7392,43 @@ export type PutDocumentByIdUnpublishErrors = {
 export type PutDocumentByIdUnpublishError = PutDocumentByIdUnpublishErrors[keyof PutDocumentByIdUnpublishErrors];
 
 export type PutDocumentByIdUnpublishResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
+export type PutDocumentByIdUpdateAndPublishData = {
+    body?: UpdateAndPublishDocumentRequestModel;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/umbraco/management/api/v1/document/{id}/update-and-publish';
+};
+
+export type PutDocumentByIdUpdateAndPublishErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type PutDocumentByIdUpdateAndPublishError = PutDocumentByIdUpdateAndPublishErrors[keyof PutDocumentByIdUpdateAndPublishErrors];
+
+export type PutDocumentByIdUpdateAndPublishResponses = {
     /**
      * OK
      */
@@ -7353,6 +7530,72 @@ export type GetDocumentConfigurationResponses = {
 
 export type GetDocumentConfigurationResponse = GetDocumentConfigurationResponses[keyof GetDocumentConfigurationResponses];
 
+export type PostDocumentCreateAndPublishData = {
+    body?: CreateAndPublishDocumentRequestModel;
+    path?: never;
+    query?: never;
+    url: '/umbraco/management/api/v1/document/create-and-publish';
+};
+
+export type PostDocumentCreateAndPublishErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type PostDocumentCreateAndPublishError = PostDocumentCreateAndPublishErrors[keyof PostDocumentCreateAndPublishErrors];
+
+export type PostDocumentCreateAndPublishResponses = {
+    /**
+     * Created
+     */
+    201: unknown;
+};
+
+export type PutDocumentRootSortChildrenData = {
+    body?: SortDocumentChildrenByFieldRequestModel;
+    path?: never;
+    query?: never;
+    url: '/umbraco/management/api/v1/document/root/sort-children';
+};
+
+export type PutDocumentRootSortChildrenErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+};
+
+export type PutDocumentRootSortChildrenError = PutDocumentRootSortChildrenErrors[keyof PutDocumentRootSortChildrenErrors];
+
+export type PutDocumentRootSortChildrenResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
 export type PutDocumentSortData = {
     body?: SortingRequestModel;
     path?: never;
@@ -7393,6 +7636,7 @@ export type GetDocumentUrlsData = {
     path?: never;
     query?: {
         id?: Array<string>;
+        culture?: string;
     };
     url: '/umbraco/management/api/v1/document/urls';
 };
@@ -10399,6 +10643,43 @@ export type GetMediaByIdReferencedDescendantsResponses = {
 
 export type GetMediaByIdReferencedDescendantsResponse = GetMediaByIdReferencedDescendantsResponses[keyof GetMediaByIdReferencedDescendantsResponses];
 
+export type PutMediaByIdSortChildrenData = {
+    body?: SortMediaChildrenByFieldRequestModel;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/umbraco/management/api/v1/media/{id}/sort-children';
+};
+
+export type PutMediaByIdSortChildrenErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type PutMediaByIdSortChildrenError = PutMediaByIdSortChildrenErrors[keyof PutMediaByIdSortChildrenErrors];
+
+export type PutMediaByIdSortChildrenResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
 export type PutMediaByIdValidateData = {
     body?: UpdateMediaRequestModel;
     path: {
@@ -10493,6 +10774,37 @@ export type GetMediaConfigurationResponses = {
 };
 
 export type GetMediaConfigurationResponse = GetMediaConfigurationResponses[keyof GetMediaConfigurationResponses];
+
+export type PutMediaRootSortChildrenData = {
+    body?: SortMediaChildrenByFieldRequestModel;
+    path?: never;
+    query?: never;
+    url: '/umbraco/management/api/v1/media/root/sort-children';
+};
+
+export type PutMediaRootSortChildrenErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+};
+
+export type PutMediaRootSortChildrenError = PutMediaRootSortChildrenErrors[keyof PutMediaRootSortChildrenErrors];
+
+export type PutMediaRootSortChildrenResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
 
 export type PutMediaSortData = {
     body?: SortingRequestModel;
@@ -17101,6 +17413,35 @@ export type PostUserAvatarByIdResponses = {
     200: unknown;
 };
 
+export type GetUserBatchData = {
+    body?: never;
+    path?: never;
+    query?: {
+        id?: Array<string>;
+    };
+    url: '/umbraco/management/api/v1/user/batch';
+};
+
+export type GetUserBatchErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+};
+
+export type GetUserBatchResponses = {
+    /**
+     * OK
+     */
+    200: BatchResponseModelUserResponseModel;
+};
+
+export type GetUserBatchResponse = GetUserBatchResponses[keyof GetUserBatchResponses];
+
 export type GetUserConfigurationData = {
     body?: never;
     path?: never;
@@ -17279,6 +17620,37 @@ export type PostUserCurrent2FaByProviderNameResponses = {
 
 export type PostUserCurrent2FaByProviderNameResponse = PostUserCurrent2FaByProviderNameResponses[keyof PostUserCurrent2FaByProviderNameResponses];
 
+export type DeleteUserCurrentAvatarData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/umbraco/management/api/v1/user/current/avatar';
+};
+
+export type DeleteUserCurrentAvatarErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type DeleteUserCurrentAvatarError = DeleteUserCurrentAvatarErrors[keyof DeleteUserCurrentAvatarErrors];
+
+export type DeleteUserCurrentAvatarResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
 export type PostUserCurrentAvatarData = {
     body?: SetAvatarRequestModel;
     path?: never;
@@ -17440,7 +17812,7 @@ export type GetUserCurrentPermissionsDocumentResponses = {
     /**
      * OK
      */
-    200: Array<UserPermissionsResponseModel>;
+    200: UserPermissionsResponseModel;
 };
 
 export type GetUserCurrentPermissionsDocumentResponse = GetUserCurrentPermissionsDocumentResponses[keyof GetUserCurrentPermissionsDocumentResponses];
@@ -17475,6 +17847,37 @@ export type GetUserCurrentPermissionsMediaResponses = {
 };
 
 export type GetUserCurrentPermissionsMediaResponse = GetUserCurrentPermissionsMediaResponses[keyof GetUserCurrentPermissionsMediaResponses];
+
+export type PutUserCurrentProfileData = {
+    body?: UpdateCurrentUserRequestModel;
+    path?: never;
+    query?: never;
+    url: '/umbraco/management/api/v1/user/current/profile';
+};
+
+export type PutUserCurrentProfileErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type PutUserCurrentProfileError = PutUserCurrentProfileErrors[keyof PutUserCurrentProfileErrors];
+
+export type PutUserCurrentProfileResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
 
 export type PostUserDisableData = {
     body?: DisableUserRequestModel;

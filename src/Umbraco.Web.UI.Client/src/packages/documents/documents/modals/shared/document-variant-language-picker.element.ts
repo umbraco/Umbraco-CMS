@@ -1,19 +1,12 @@
-import { UmbDocumentVariantState, type UmbDocumentVariantOptionModel } from '../../types.js';
-import { sortVariants } from '../../utils.js';
-import type { UUIBooleanInputElement } from '@umbraco-cms/backoffice/external/uui';
-import {
-	css,
-	customElement,
-	html,
-	nothing,
-	property,
-	repeat,
-	state,
-	type PropertyValues,
-} from '@umbraco-cms/backoffice/external/lit';
+import { UmbDocumentVariantState } from '../../variant-state.js';
+import type { UmbDocumentVariantOptionModel } from '../../types.js';
+import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import { sortVariants } from '@umbraco-cms/backoffice/variant';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import type { PropertyValues } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
+import type { UUIBooleanInputElement } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-document-variant-language-picker')
 export class UmbDocumentVariantLanguagePickerElement extends UmbLitElement {

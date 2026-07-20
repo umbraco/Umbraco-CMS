@@ -436,6 +436,11 @@ export default {
 		memberHasPassword: 'The member already has a password set',
 		memberKindDefault: 'Member',
 		memberKindApi: 'API Member',
+		memberKindExternalOnly: 'External',
+		profileData: 'Profile data',
+		externalMemberTitle: 'External member',
+		externalMemberDescription:
+			'This member is managed by an external authentication provider. Identity data such as email and username is maintained by the provider, not Umbraco.',
 		memberLockoutNotEnabled: 'Lockout is not enabled for this member',
 		memberNotInGroup: "The member is not in group '%0%'",
 	},
@@ -459,7 +464,7 @@ export default {
 		enterFolderName: 'Enter a folder name',
 		updateData: 'Choose a type and a title',
 		noDocumentTypes:
-			'There are no allowed Document Types available for creating content here. You must enable these in <strong>Document Types</strong> within the <strong>Settings</strong> section, by editing the <strong>Allowed child node types</strong> under <strong>Permissions</strong>.',
+			'There are no allowed Document Types available for creating content here. You must enable these in <strong>Document Types</strong> within the <strong>Settings</strong> section, by editing the <strong>Allowed child node types</strong> under <strong>Structure</strong>.',
 		noDocumentTypesAtRoot:
 			'There are no Document Types available for creating content here. You must create these in <strong>Document Types</strong> within the <strong>Settings</strong> section.',
 		noDocumentTypesWithNoSettingsAccess:
@@ -467,9 +472,9 @@ export default {
 		noDocumentTypesEditPermissions: 'Edit permissions for this Document Type',
 		noDocumentTypesCreateNew: 'Create a new Document Type',
 		noDocumentTypesAllowedAtRoot:
-			'There are no allowed Document Types available for creating content here. You must enable these in <strong>Document Types</strong> within the <strong>Settings</strong> section, by changing the <strong>Allow as root</strong> option under <strong>Permissions</strong>.',
+			'There are no allowed Document Types available for creating content here. You must enable these in <strong>Document Types</strong> within the <strong>Settings</strong> section, by changing the <strong>Allow as root</strong> option under <strong>Structure</strong>.',
 		noMediaTypes:
-			'There are no allowed Media Types available for creating media here. You must enable these in <strong>Media Types</strong> within the <strong>Settings</strong> section, by editing the <strong>Allowed child node types</strong> under <strong>Permissions</strong>.',
+			'There are no allowed Media Types available for creating media here. You must enable these in <strong>Media Types</strong> within the <strong>Settings</strong> section, by editing the <strong>Allowed child node types</strong> under <strong>Structure</strong>.',
 		noMediaTypesWithNoSettingsAccess:
 			"The selected media in the tree doesn't allow for any other media to be created below it.",
 		noMediaTypesEditPermissions: 'Edit permissions for this Media Type',
@@ -863,6 +868,7 @@ export default {
 		content: 'Content',
 		continue: 'Continue',
 		copy: 'Copy',
+		copied: 'Copied!',
 		create: 'Create',
 		database: 'Database',
 		date: 'Date',
@@ -943,6 +949,7 @@ export default {
 		password: 'Password',
 		path: 'Path',
 		pixels: 'pixels',
+		placeholder: 'Placeholder',
 		pleasewait: 'One moment please...',
 		previous: 'Previous',
 		properties: 'Properties',
@@ -996,6 +1003,7 @@ export default {
 		username: 'Username',
 		value: 'Value',
 		view: 'View',
+		weight: 'Weight',
 		welcome: 'Welcome...',
 		width: 'Width',
 		yes: 'Yes',
@@ -1199,6 +1207,7 @@ export default {
 		instruction: 'Sign in to Umbraco',
 		signInWith: 'Sign in with {0}',
 		timeout: 'Your session has timed out. Please sign in again below.',
+		invalidPasswordMessage: 'The password is not strong enough.',
 	},
 	main: {
 		dashboard: 'Dashboard',
@@ -1420,6 +1429,18 @@ export default {
 	propertyEditorPicker: {
 		title: 'Select a property editor',
 		openPropertyEditorPicker: 'Select a property editor UI',
+		selectAction: "Select Property Editor",
+	},
+	propertyEditorUIGroups: {
+		advanced: 'Advanced',
+		blocks: 'Blocks',
+		common: 'Common',
+		date: 'Date',
+		lists: 'Lists',
+		media: 'Media',
+		people: 'People',
+		pickers: 'Pickers',
+		richContent: 'Rich Content',
 	},
 	relatedlinks: {
 		enterExternal: 'enter external link',
@@ -1443,6 +1464,7 @@ export default {
 		showDiff: 'Show differences between the current (draft) version and the selected version.',
 		diffHelp: '<del>Red text</del> will be removed in the selected version, <ins>green text</ins> will be added.',
 		noDiff: 'There are no differences between the current (draft) version and the selected version.',
+		contentRolledBack: 'Content has been rolled back',
 		documentRolledBack: 'Document has been rolled back',
 		headline: 'Select a version to compare with the current version',
 		htmlHelp:
@@ -1523,9 +1545,11 @@ export default {
 		cssSavedText: 'Stylesheet saved without any errors',
 		dataTypeSaved: 'Datatype saved',
 		dictionaryItemSaved: 'Dictionary item saved',
+		editContentPublishedFailed: 'Document could not be published or saved',
 		editContentPublishedFailedByValidation: 'Document could not be published, but we saved it for you',
 		editContentPublishedFailedByParent: 'Document could not be published, because a parent page is not published',
 		editContentPublishedHeader: 'Document published',
+		editContentPublishedReloadFailed: 'Document published, but the editor could not be refreshed',
 		editContentPublishedText: 'and is visible on the website',
 		editContentUnpublishedHeader: 'Document unpublished',
 		editContentUnpublishedText: 'and is no longer visible on the website',
@@ -1783,8 +1807,16 @@ export default {
 		chooseChildNode: 'Choose child node',
 		compositionsDescription:
 			'Inherit tabs and properties from an existing Document Type. New tabs will be added to the current Document Type or merged if a tab with an identical name exists.',
-		compositionInUse: 'This Content Type is used in a composition, and therefore cannot be composed itself.',
-		noAvailableCompositions: 'There are no Content Types available to use as a composition.',
+		compositionsDescriptionMediaType:
+			'Inherit tabs and properties from an existing Media Type. New tabs will be added to the current Media Type or merged if a tab with an identical name exists.',
+		compositionsDescriptionMemberType:
+			'Inherit tabs and properties from an existing Member Type. New tabs will be added to the current Member Type or merged if a tab with an identical name exists.',
+		compositionInUse: 'This Document Type is used in a composition, and therefore cannot be composed itself.',
+		compositionInUseMediaType: 'This Media Type is used in a composition, and therefore cannot be composed itself.',
+		compositionInUseMemberType: 'This Member Type is used in a composition, and therefore cannot be composed itself.',
+		noAvailableCompositions: 'There are no Document Types available to use as a composition.',
+		noAvailableCompositionsMediaType: 'There are no Media Types available to use as a composition.',
+		noAvailableCompositionsMemberType: 'There are no Member Types available to use as a composition.',
 		compositionRemoveWarning:
 			"Removing a composition will delete all the associated property data. Once you save the Document Type there's no way back.",
 		availableEditors: 'Create new',
@@ -1792,6 +1824,7 @@ export default {
 		editorSettings: 'Editor settings',
 		searchResultSettings: 'Available configurations',
 		searchResultEditors: 'Create a new configuration',
+		suggestedEditors: 'Suggestions',
 		configuration: 'Configuration',
 		yesDelete: 'Yes, delete',
 		movedUnderneath: 'was moved underneath',
@@ -1821,7 +1854,11 @@ export default {
 		tabHasNoSortOrder: 'tab has no sort order',
 		compositionUsageHeading: 'Where is this composition used?',
 		compositionUsageSpecification:
-			'This composition is currently used in the composition of the following Content Types:',
+			'This composition is currently used in the composition of the following Document Types:',
+		compositionUsageSpecificationMediaType:
+			'This composition is currently used in the composition of the following Media Types:',
+		compositionUsageSpecificationMemberType:
+			'This composition is currently used in the composition of the following Member Types:',
 		variantsHeading: 'Variation',
 		cultureVariantHeading: 'Allow vary by culture',
 		segmentVariantHeading: 'Allow segmentation',
@@ -2037,6 +2074,13 @@ export default {
 		advancedGroup: 'Advanced',
 		webhooks: 'Webhooks',
 	},
+	tree: {
+		classicViewLabel: 'Tree',
+		cardViewLabel: 'Cards',
+		tableViewLabel: 'Table',
+		children: 'Children',
+		noItems: 'No items',
+	},
 	update: {
 		updateAvailable: 'New update ready',
 		updateDownloadText: '%0% is ready, click here for download',
@@ -2118,6 +2162,7 @@ export default {
 		password: 'Password',
 		resetPassword: 'Reset password',
 		passwordChanged: 'Your password has been changed!',
+		passwordCopied: 'Password copied',
 		passwordChangedGeneric: 'Password changed',
 		passwordConfirm: 'Please confirm the new password',
 		passwordEnterNew: 'Enter your new password',
@@ -2171,6 +2216,7 @@ export default {
 		updateDate: 'User last updated',
 		userCreated: 'has been created',
 		userCreatedSuccessHelp: 'The new user has successfully been created. To log in to Umbraco use the password below.',
+		userCreatedApiSuccessHelp: "Set client credentials for the account via the user's profile.",
 		userHasPassword: 'The user already has a password set',
 		userHasGroup: "The user is already in group '%0%'",
 		userLockoutNotEnabled: 'Lockout is not enabled for this user',
@@ -2230,6 +2276,13 @@ export default {
 		'2faCodeInput': 'Verification code',
 		'2faCodeInputHelp': 'Please enter the verification code',
 		'2faInvalidCode': 'Invalid code entered',
+		addUsersToGroupError: 'Could not add users to the group.',
+		removeUsersFromGroupError: 'Could not remove users from the group.',
+		andMore: 'and %0% more',
+		avatarUploadSuccess: 'Avatar uploaded',
+		avatarDeleteSuccess: 'Avatar deleted',
+		unknownFailure: 'Unknown failure',
+		usersNotManagedFromGroup: 'not manageable from this screen.',
 	},
 	validation: {
 		validation: 'Validation',
@@ -2277,6 +2330,7 @@ export default {
 		numberMaximum: "Value must be less than or equal to '%0%'.",
 		numberMisconfigured: "Minimum value '%0%' must be less than the maximum value '%1%'.",
 		rangeExceeds: 'The low value must not exceed the high value.',
+		minimumRange: "The range between low and high values must be at least '%0%'.",
 		invalidExtensions: 'One or more of the extensions are invalid.',
 		allowedExtensions: 'Allowed extensions are:',
 		aliasInvalidFormat: 'Special characters are not allowed in alias',
@@ -2342,7 +2396,13 @@ export default {
 	},
 	redirectUrls: {
 		disableUrlTracker: 'Disable URL tracker',
+		disableUrlTrackerInstruction:
+			'Redirect URL tracking is configured through application settings. To disable tracking, set the following configuration key to true:',
 		enableUrlTracker: 'Enable URL tracker',
+		enableUrlTrackerInstruction:
+			'Redirect URL tracking is configured through application settings. To enable tracking, set the following configuration key to false:',
+		urlTrackerEnabled: 'Enabled',
+		urlTrackerDisabled: 'Disabled',
 		originalUrl: 'Original URL',
 		redirectedTo: 'Redirected To',
 		redirectUrlManagement: 'Redirect URL Management',
@@ -2350,9 +2410,11 @@ export default {
 		noRedirects: 'No redirects have been made',
 		noRedirectsDescription:
 			'When a published page gets renamed or moved a redirect will automatically be made to the new page.',
+		noRedirectsForSearch: 'No redirects matching this search criteria',
+		noRedirectsForSearchDescription: 'Double check your search for any error or spelling mistakes.',
 		redirectRemoved: 'Redirect URL removed.',
 		redirectRemoveError: 'Error removing redirect URL.',
-		redirectRemoveWarning: 'This will remove the redirect',
+		redirectRemoveWarning: 'This will remove the redirect.',
 		confirmDisable: 'Are you sure you want to disable the URL tracker?',
 		disabledConfirm: 'URL tracker has now been disabled.',
 		disableError: 'Error disabling the URL tracker, more information can be found in your log file.',
@@ -2370,6 +2432,8 @@ export default {
 	textbox: {
 		characters_left: '<strong>%0%</strong> characters left.',
 		characters_exceed: 'Maximum %0% characters, <strong>%1%</strong> too many.',
+		maxCharsLabel: 'Maximum allowed characters',
+		autocompleteLabel: 'Autocomplete',
 	},
 	recycleBin: {
 		contentTrashed: 'Trashed content with Id: {0} related to original parent content with Id: {1}',
@@ -2645,6 +2709,7 @@ export default {
 			'Master Umbraco with official training. Get practical experience through instructor-led courses and earn certifications that help you grow your skills and career.',
 	},
 	blockEditor: {
+		labelCreateModalSize: 'Create modal size',
 		headlineCreateBlock: 'Pick Element Type',
 		headlineAddSettingsElementType: 'Attach a settings Element Type',
 		headlineAddCustomView: 'Select view',

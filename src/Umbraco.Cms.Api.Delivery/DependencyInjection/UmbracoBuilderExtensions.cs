@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Primitives;
 using Umbraco.Cms.Api.Common.DependencyInjection;
 using Umbraco.Cms.Api.Delivery.Accessors;
@@ -106,6 +107,10 @@ public static class UmbracoBuilderExtensions
         builder.AddNotificationAsyncHandler<MemberDeletedNotification, RevokeMemberAuthenticationTokensNotificationHandler>();
         builder.AddNotificationAsyncHandler<AssignedMemberRolesNotification, RevokeMemberAuthenticationTokensNotificationHandler>();
         builder.AddNotificationAsyncHandler<RemovedMemberRolesNotification, RevokeMemberAuthenticationTokensNotificationHandler>();
+        builder.AddNotificationAsyncHandler<ExternalMemberSavedNotification, RevokeMemberAuthenticationTokensNotificationHandler>();
+        builder.AddNotificationAsyncHandler<ExternalMemberDeletedNotification, RevokeMemberAuthenticationTokensNotificationHandler>();
+        builder.AddNotificationAsyncHandler<AssignedExternalMemberRolesNotification, RevokeMemberAuthenticationTokensNotificationHandler>();
+        builder.AddNotificationAsyncHandler<RemovedExternalMemberRolesNotification, RevokeMemberAuthenticationTokensNotificationHandler>();
 
         // FIXME: remove this when Delivery API V1 is removed
         builder.Services.AddSingleton<MatcherPolicy, DeliveryApiItemsEndpointsMatcherPolicy>();
@@ -157,6 +162,12 @@ public static class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IDeliveryApiOutputCacheTagProvider, DeliveryApiContentTypeOutputCacheTagProvider>();
         builder.Services.AddUnique<IDeliveryApiOutputCacheRequestFilter, DefaultDeliveryApiOutputCacheRequestFilter>();
         builder.Services.AddUnique<IDeliveryApiOutputCacheManager, DeliveryApiOutputCacheManager>();
+
+        // Signal that Umbraco has enabled output caching so the application builder registers
+        // the output cache middleware. Gated via a marker rather than IOutputCacheStore so that
+        // applications calling services.AddOutputCache(...) for their own purposes are not
+        // affected by Umbraco's automatic middleware registration.
+        builder.Services.TryAddSingleton<IUmbracoManagedOutputCacheMarker, UmbracoManagedOutputCacheMarker>();
 
         return builder;
     }

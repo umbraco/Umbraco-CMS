@@ -1,18 +1,22 @@
-﻿using Umbraco.Cms.Core.Cache;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.Entities;
-using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Notifications;
-using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PublishedCache;
-using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Services.Changes;
-using Umbraco.Cms.Infrastructure.HybridCache.Services;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache.NotificationHandlers;
 
+/// <summary>
+///     Handles content and media cache invalidation in response to content, media, and type change notifications.
+/// </summary>
+/// <remarks>
+///     For structural content/media type changes, the rebuild can run immediately (default) or be deferred
+///     to a background task via <see cref="DeferredCacheRebuildNotificationHandler" /> when
+///     <see cref="CacheSettings.ContentTypeRebuildMode" /> is set to <see cref="ContentTypeRebuildMode.Deferred" />.
+/// </remarks>
+#pragma warning disable CS0618 // Type or member is obsolete
 internal sealed class CacheRefreshingNotificationHandler :
     INotificationAsyncHandler<ContentRefreshNotification>,
     INotificationAsyncHandler<ContentDeletedNotification>,
@@ -22,24 +26,43 @@ internal sealed class CacheRefreshingNotificationHandler :
     INotificationAsyncHandler<ContentTypeDeletedNotification>,
     INotificationAsyncHandler<MediaTypeRefreshedNotification>,
     INotificationAsyncHandler<MediaTypeDeletedNotification>
+#pragma warning restore CS0618 // Type or member is obsolete
 {
     private readonly IDocumentCacheService _documentCacheService;
     private readonly IMediaCacheService _mediaCacheService;
     private readonly IPublishedContentTypeCache _publishedContentTypeCache;
+    private readonly CacheSettings _cacheSettings;
+    private readonly ILogger<CacheRefreshingNotificationHandler> _logger;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="CacheRefreshingNotificationHandler" /> class.
+    /// </summary>
+    /// <param name="documentCacheService">The document cache service.</param>
+    /// <param name="mediaCacheService">The media cache service.</param>
+    /// <param name="publishedContentTypeCache">The published content type cache.</param>
+    /// <param name="cacheSettings">The cache settings.</param>
+    /// <param name="logger">The logger.</param>
     public CacheRefreshingNotificationHandler(
         IDocumentCacheService documentCacheService,
         IMediaCacheService mediaCacheService,
-        IPublishedContentTypeCache publishedContentTypeCache)
+        IPublishedContentTypeCache publishedContentTypeCache,
+        IOptions<CacheSettings> cacheSettings,
+        ILogger<CacheRefreshingNotificationHandler> logger)
     {
         _documentCacheService = documentCacheService;
         _mediaCacheService = mediaCacheService;
         _publishedContentTypeCache = publishedContentTypeCache;
+        _cacheSettings = cacheSettings.Value;
+        _logger = logger;
     }
 
+    /// <inheritdoc />
+#pragma warning disable CS0618 // Type or member is obsolete
     public async Task HandleAsync(ContentRefreshNotification notification, CancellationToken cancellationToken)
+#pragma warning restore CS0618 // Type or member is obsolete
         => await _documentCacheService.RefreshContentAsync(notification.Entity);
 
+    /// <inheritdoc />
     public async Task HandleAsync(ContentDeletedNotification notification, CancellationToken cancellationToken)
     {
         foreach (IContent deletedEntity in notification.DeletedEntities)
@@ -48,9 +71,13 @@ internal sealed class CacheRefreshingNotificationHandler :
         }
     }
 
+    /// <inheritdoc />
+#pragma warning disable CS0618 // Type or member is obsolete
     public async Task HandleAsync(MediaRefreshNotification notification, CancellationToken cancellationToken)
+#pragma warning restore CS0618 // Type or member is obsolete
         => await _mediaCacheService.RefreshMediaAsync(notification.Entity);
 
+    /// <inheritdoc />
     public async Task HandleAsync(MediaDeletedNotification notification, CancellationToken cancellationToken)
     {
         foreach (IMedia deletedEntity in notification.DeletedEntities)
@@ -59,11 +86,15 @@ internal sealed class CacheRefreshingNotificationHandler :
         }
     }
 
+    /// <inheritdoc />
+#pragma warning disable CS0618 // Type or member is obsolete
     public Task HandleAsync(ContentTypeRefreshedNotification notification, CancellationToken cancellationToken)
+#pragma warning restore CS0618 // Type or member is obsolete
     {
-        // Separate structural changes (RefreshMain) from non-structural changes (RefreshOther).
-        // Structural changes require a full rebuild, while non-structural changes only need
-        // the converted content cache cleared since ContentCacheNode only stores ContentTypeId.
+        // These two sets identify every refreshed content type (structural + non-structural) purely so their
+        // content type cache is cleared below. The rebuild-vs-clear-converted decision is made separately
+        // further down via RequiresRawDataRebuild()/RequiresConvertedCacheClearOnly(), because a structural
+        // change flagged RawDataUnaffected (a property removal) needs the converted clear, not a rebuild.
         var structuralChangeIds = notification.Changes
             .Where(x => x.ChangeTypes.IsStructuralChange())
             .Select(x => x.Item.Id)
@@ -80,23 +111,57 @@ internal sealed class CacheRefreshingNotificationHandler :
             _publishedContentTypeCache.ClearContentType(contentTypeId);
         }
 
-        // Full rebuild only for structural changes (property removed, alias changed, variation changed, etc.)
-        if (structuralChangeIds.Length > 0)
+        // Rebuild only for structural changes that actually affect the stored data (alias/variation changes, etc.).
+        // In deferred mode, the rebuild is queued from the ContentTypeChangedNotification handler instead,
+        // which fires after the scope is disposed — avoiding database lock contention between the
+        // deferred rebuild's transaction and the original save transaction.
+        var rebuildIds = notification.Changes
+            .Where(x => x.ChangeTypes.RequiresRawDataRebuild())
+            .Select(x => x.Item.Id)
+            .ToArray();
+
+        if (rebuildIds.Length > 0)
         {
-            _documentCacheService.Rebuild(structuralChangeIds);
+            if (_cacheSettings.ContentTypeRebuildMode != ContentTypeRebuildMode.Deferred)
+            {
+                if (_logger.IsEnabled(LogLevel.Debug))
+                {
+                    _logger.LogDebug("Content type change: rebuilding the document database cache for content type(s) {ContentTypeIds}.", rebuildIds);
+                }
+
+                _documentCacheService.Rebuild(rebuildIds);
+            }
+            else if (_logger.IsEnabled(LogLevel.Debug))
+            {
+                // In deferred mode this handler does nothing here; DeferredCacheRebuildNotificationHandler
+                // performs the rebuild in response to ContentTypeChangedNotification after the scope commits.
+                _logger.LogDebug("Content type change: document database cache rebuild for content type(s) {ContentTypeIds} left to the deferred rebuild (ContentTypeRebuildMode.Deferred).", rebuildIds);
+            }
         }
 
-        // For non-structural changes (name, icon, description, new property added),
-        // just clear the converted content cache - HybridCache entries remain valid.
-        // Selective clearing is safe here because no model factory reset occurs in this handler.
-        if (nonStructuralChangeIds.Length > 0)
+        // Non-structural changes (name, icon, description, new property added), plus structural changes whose
+        // raw data is unaffected (a property removal): the stored cmsContentNu blob stays valid, so only the
+        // converted content cache needs clearing. Selective clearing is safe here because no model factory
+        // reset occurs in this handler.
+        var clearConvertedCacheIds = notification.Changes
+            .Where(x => x.ChangeTypes.RequiresConvertedCacheClearOnly())
+            .Select(x => x.Item.Id)
+            .ToArray();
+
+        if (clearConvertedCacheIds.Length > 0)
         {
-            _documentCacheService.ClearConvertedContentCache(nonStructuralChangeIds);
+            if (_logger.IsEnabled(LogLevel.Debug))
+            {
+                _logger.LogDebug("Content type change: clearing the converted document cache only (no database rebuild) for content type(s) {ContentTypeIds}.", clearConvertedCacheIds);
+            }
+
+            _documentCacheService.ClearConvertedContentCache(clearConvertedCacheIds);
         }
 
         return Task.CompletedTask;
     }
 
+    /// <inheritdoc />
     public Task HandleAsync(ContentTypeDeletedNotification notification, CancellationToken cancellationToken)
     {
         foreach (IContentType deleted in notification.DeletedEntities)
@@ -107,11 +172,15 @@ internal sealed class CacheRefreshingNotificationHandler :
         return Task.CompletedTask;
     }
 
+    /// <inheritdoc />
+#pragma warning disable CS0618 // Type or member is obsolete
     public Task HandleAsync(MediaTypeRefreshedNotification notification, CancellationToken cancellationToken)
+#pragma warning restore CS0618 // Type or member is obsolete
     {
-        // Separate structural changes (RefreshMain) from non-structural changes (RefreshOther).
-        // Structural changes require a full rebuild, while non-structural changes only need
-        // the converted content cache cleared since ContentCacheNode only stores ContentTypeId.
+        // These two sets identify every refreshed media type (structural + non-structural) purely so their
+        // content type cache is cleared below. The rebuild-vs-clear-converted decision is made separately
+        // further down via RequiresRawDataRebuild()/RequiresConvertedCacheClearOnly(), because a structural
+        // change flagged RawDataUnaffected (a property removal) needs the converted clear, not a rebuild.
         var structuralChangeIds = notification.Changes
             .Where(x => x.ChangeTypes.IsStructuralChange())
             .Select(x => x.Item.Id)
@@ -128,23 +197,57 @@ internal sealed class CacheRefreshingNotificationHandler :
             _publishedContentTypeCache.ClearContentType(mediaTypeId);
         }
 
-        // Full rebuild only for structural changes (property removed, alias changed, variation changed, etc.)
-        if (structuralChangeIds.Length > 0)
+        // Rebuild only for structural changes that actually affect the stored data (alias/variation changes, etc.).
+        // In deferred mode, the rebuild is queued from the MediaTypeChangedNotification handler instead,
+        // which fires after the scope is disposed — avoiding database lock contention between the
+        // deferred rebuild's transaction and the original save transaction.
+        var rebuildIds = notification.Changes
+            .Where(x => x.ChangeTypes.RequiresRawDataRebuild())
+            .Select(x => x.Item.Id)
+            .ToArray();
+
+        if (rebuildIds.Length > 0)
         {
-            _mediaCacheService.Rebuild(structuralChangeIds);
+            if (_cacheSettings.ContentTypeRebuildMode != ContentTypeRebuildMode.Deferred)
+            {
+                if (_logger.IsEnabled(LogLevel.Debug))
+                {
+                    _logger.LogDebug("Media type change: rebuilding the media database cache for media type(s) {MediaTypeIds}.", rebuildIds);
+                }
+
+                _mediaCacheService.Rebuild(rebuildIds);
+            }
+            else if (_logger.IsEnabled(LogLevel.Debug))
+            {
+                // In deferred mode this handler does nothing here; DeferredCacheRebuildNotificationHandler
+                // performs the rebuild in response to MediaTypeChangedNotification after the scope commits.
+                _logger.LogDebug("Media type change: media database cache rebuild for media type(s) {MediaTypeIds} left to the deferred rebuild (ContentTypeRebuildMode.Deferred).", rebuildIds);
+            }
         }
 
-        // For non-structural changes (name, icon, description, new property added),
-        // just clear the converted content cache - HybridCache entries remain valid.
-        // Selective clearing is safe here because no model factory reset occurs in this handler.
-        if (nonStructuralChangeIds.Length > 0)
+        // Non-structural changes (name, icon, description, new property added), plus structural changes whose
+        // raw data is unaffected (a property removal): the stored cmsContentNu blob stays valid, so only the
+        // converted content cache needs clearing. Selective clearing is safe here because no model factory
+        // reset occurs in this handler.
+        var clearConvertedCacheIds = notification.Changes
+            .Where(x => x.ChangeTypes.RequiresConvertedCacheClearOnly())
+            .Select(x => x.Item.Id)
+            .ToArray();
+
+        if (clearConvertedCacheIds.Length > 0)
         {
-            _mediaCacheService.ClearConvertedContentCache(nonStructuralChangeIds);
+            if (_logger.IsEnabled(LogLevel.Debug))
+            {
+                _logger.LogDebug("Media type change: clearing the converted media cache only (no database rebuild) for media type(s) {MediaTypeIds}.", clearConvertedCacheIds);
+            }
+
+            _mediaCacheService.ClearConvertedContentCache(clearConvertedCacheIds);
         }
 
         return Task.CompletedTask;
     }
 
+    /// <inheritdoc />
     public Task HandleAsync(MediaTypeDeletedNotification notification, CancellationToken cancellationToken)
     {
         foreach (IMediaType deleted in notification.DeletedEntities )

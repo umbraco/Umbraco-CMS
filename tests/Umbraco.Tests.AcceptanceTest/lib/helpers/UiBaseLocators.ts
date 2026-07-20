@@ -341,14 +341,14 @@ export class UiBaseLocators extends BasePage {
     // Document Type & Property Editor
     this.documentTypeNode = page.locator("uui-ref-node-document-type");
     this.propertyNameTxt = page
-      .getByTestId("input:entity-name")
+      .getByTestId("input:propertytype-name")
       .locator("#input")
       .first();
     this.selectPropertyEditorBtn = page.getByLabel("Select Property Editor");
     this.editorSettingsBtn = page.getByLabel("Editor settings");
     this.enterPropertyEditorDescriptionTxt = page
       .locator("uui-modal-sidebar")
-      .getByTestId("input:entity-description")
+      .getByTestId("input:propertytype-description")
       .locator("#textarea");
     this.property = page.locator("umb-property");
     this.addPropertyBtn = page.getByLabel("Add property", { exact: true });
@@ -597,8 +597,10 @@ export class UiBaseLocators extends BasePage {
     // Editor
     this.monacoEditor = page.locator(".monaco-editor");
 
-    // Loader
-    this.uiLoader = page.locator("uui-loader");
+    // Loader (excludes the global app-level loader at #loader)
+    this.uiLoader = page.locator(
+      "uui-loader:not([data-mark='app-router-loader'])",
+    );
 
     // Block
     this.blockTypeCard = page.locator("uui-card-block-type");
@@ -1047,9 +1049,7 @@ export class UiBaseLocators extends BasePage {
 
   async goToSettingsTreeItem(settingsTreeItemName: string) {
     await this.goToSection(ConstantHelper.sections.settings);
-    await this.click(
-      this.page.getByLabel(settingsTreeItemName, { exact: true }),
-    );
+    await this.clickTreeItemWithName(settingsTreeItemName);
   }
 
   async isSectionWithNameVisible(
@@ -1090,6 +1090,14 @@ export class UiBaseLocators extends BasePage {
     await this.click(this.page.getByLabel(name, { exact: isExact }), {
       force: toForce,
     });
+  }
+
+  // Clicks a tree item by its visible label text, like the content/media tree helpers do. We target the
+  // rendered text rather than the menu item's accessible name (its <a> lives in uui-menu-item's shadow), so
+  // the click keeps working regardless of how the tree item renders its label HTML. Scope defaults to the
+  // section sidebar; pass a modal/other root for trees rendered elsewhere (e.g. pickers).
+  async clickTreeItemWithName(name: string, scope?: Locator | Page) {
+    await this.click((scope ?? this.sectionSidebar).getByText(name, { exact: true }));
   }
 
   async clickButtonWithName(name: string, isExact: boolean = false) {
@@ -1458,7 +1466,7 @@ export class UiBaseLocators extends BasePage {
     await this.clickInsertButton();
     await this.click(this.insertDictionaryItemBtn);
     await this.clickSubmitButton();
-    await this.click(this.page.getByLabel(dictionaryName));
+    await this.clickTreeItemWithName(dictionaryName, this.page);
     await this.click(this.chooseBtn);
   }
 
@@ -1477,7 +1485,7 @@ export class UiBaseLocators extends BasePage {
     await this.clickInsertButton();
     await this.click(this.insertPartialViewBtn);
     await this.clickSubmitButton();
-    await this.click(this.page.getByLabel(partialViewName));
+    await this.clickTreeItemWithName(partialViewName, this.page);
     await this.clickChooseButton();
   }
 
@@ -1590,15 +1598,17 @@ export class UiBaseLocators extends BasePage {
   }
 
   async selectMediaWithName(mediaName: string) {
-    const mediaLocator = this.mediaCardItems.filter({ hasText: mediaName });
+    const mediaLocator = this.mediaCardItems.filter({hasText: mediaName});
     await this.waitForVisible(mediaLocator);
-    await this.click(mediaLocator.locator("#select-checkbox"), { force: true });
+    await this.hover(mediaLocator);
+    await this.click(mediaLocator.locator("#select-checkbox"), {force: true});
   }
 
   async selectMediaWithTestId(mediaKey: string) {
     const mediaLocator = this.page.getByTestId("media:" + mediaKey);
     await this.waitForVisible(mediaLocator);
-    await this.click(mediaLocator.locator("#select-checkbox"), { force: true });
+    await this.hover(mediaLocator);
+    await this.click(mediaLocator.locator("#select-checkbox"), {force: true});
   }
 
   async clickMediaPickerModalSubmitButton() {

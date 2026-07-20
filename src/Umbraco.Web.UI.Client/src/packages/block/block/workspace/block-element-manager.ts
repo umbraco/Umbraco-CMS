@@ -17,6 +17,7 @@ import { UmbValidationController } from '@umbraco-cms/backoffice/validation';
 import {
 	UmbContentValidationToHintsManager,
 	UmbElementWorkspaceDataManager,
+	umbExtractVariantValues,
 	type UmbElementPropertyDataOwner,
 } from '@umbraco-cms/backoffice/content';
 import { UmbReadOnlyVariantGuardManager } from '@umbraco-cms/backoffice/utils';
@@ -61,6 +62,25 @@ export class UmbBlockElementManager<LayoutDataType extends UmbBlockLayoutBaseMod
 		new UmbDocumentTypeDetailRepository(this),
 	);
 
+	// The values resolved to a single entry per property, matching the current variant. [NL]
+	readonly variantValues = mergeObservables(
+		[this.structure.contentTypeProperties, this.values, this.variantId],
+		([properties, values, variantId]) => {
+			if (!variantId) {
+				return [];
+			}
+			const propertyVariantIds = properties.map((property) => ({
+				alias: property.alias,
+				variantId: this.#createPropertyVariantId(property, variantId),
+			}));
+			return umbExtractVariantValues(propertyVariantIds, values);
+		},
+	);
+	#variantValuesSnapshot: Array<UmbBlockDataValueModel> = [];
+	getVariantValues() {
+		return this.#variantValuesSnapshot;
+	}
+
 	public readonly propertyViewGuard = new UmbVariantPropertyGuardManager(this);
 	public readonly propertyWriteGuard = new UmbVariantPropertyGuardManager(this);
 
@@ -96,22 +116,38 @@ export class UmbBlockElementManager<LayoutDataType extends UmbBlockLayoutBaseMod
 		this.propertyViewGuard.fallbackToPermitted();
 		this.propertyWriteGuard.fallbackToPermitted();
 
-		this.observe(this.contentTypeId, (id) => {
-			if (id) {
-				this.structure.loadType(id);
-			}
-		});
+		this.observe(
+			this.contentTypeId,
+			(id) => {
+				if (id) {
+					this.structure.loadType(id);
+				}
+			},
+			null,
+		);
 
-		this.observe(this.unique, (key) => {
-			if (key) {
-				this.validation.setDataPath('$.' + dataPathPropertyName + `[?(@.key == '${key}')]`);
-			}
-		});
+		this.observe(
+			this.unique,
+			(key) => {
+				if (key) {
+					this.validation.setDataPath('$.' + dataPathPropertyName + `[?(@.key == '${key}')]`);
+				}
+			},
+			null,
+		);
 
 		this.observe(
 			this.structure.contentTypeDataTypeUniques,
 			(dataTypeUniques: Array<string>) => {
 				this.#dataTypeItemManager.setUniques(dataTypeUniques);
+			},
+			null,
+		);
+
+		this.observe(
+			this.variantValues,
+			(resolvedValues) => {
+				this.#variantValuesSnapshot = resolvedValues;
 			},
 			null,
 		);

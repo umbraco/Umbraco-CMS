@@ -17,6 +17,11 @@ public class ContentSettings
     internal const bool StaticResolveUrlsFromTextString = false;
 
     /// <summary>
+    ///     The default value for whether sorting children by a field fires per-item notifications.
+    /// </summary>
+    internal const bool StaticSortChildrenByFieldFiresNotifications = false;
+
+    /// <summary>
     ///     The default preview badge markup template.
     /// </summary>
     internal const string StaticDefaultPreviewBadge = @"
@@ -109,6 +114,18 @@ public class ContentSettings
     /// </summary>
     [DefaultValue(StaticResolveUrlsFromTextString)]
     public bool ResolveUrlsFromTextString { get; set; } = StaticResolveUrlsFromTextString;
+
+    /// <summary>
+    ///     Gets or sets a value indicating whether sorting the children of a node by a field fires
+    ///     per-item save/sort notifications (and therefore webhooks).
+    /// </summary>
+    /// <remarks>
+    ///     Defaults to <c>false</c>: the children are reordered with a single set-based update and a branch
+    ///     cache refresh, without per-item notifications. Set to <c>true</c> to restore per-item notifications
+    ///     (and webhooks), accepting the additional performance cost on nodes with many children.
+    /// </remarks>
+    [DefaultValue(StaticSortChildrenByFieldFiresNotifications)]
+    public bool SortChildrenByFieldFiresNotifications { get; set; } = StaticSortChildrenByFieldFiresNotifications;
 
     /// <summary>
     ///     Gets or sets a value for the collection of error pages.

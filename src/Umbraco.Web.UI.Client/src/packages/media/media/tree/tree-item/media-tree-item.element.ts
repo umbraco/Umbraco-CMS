@@ -5,13 +5,6 @@ import { UmbTreeItemElementBase } from '@umbraco-cms/backoffice/tree';
 
 @customElement('umb-media-tree-item')
 export class UmbMediaTreeItemElement extends UmbTreeItemElementBase<UmbMediaTreeItemModel, UmbMediaTreeItemContext> {
-	public override set api(value: UmbMediaTreeItemContext | undefined) {
-		// Observe noAccess from context and update base class property (_noAccess).
-		// This enables access restriction behavior (click prevention) and styling from the base class.
-		this.observe(value?.noAccess, (noAccess) => (this._noAccess = noAccess ?? false));
-		super.api = value;
-	}
-
 	override renderIconContainer() {
 		return html`
 			<div id="icon-container" slot="icon">

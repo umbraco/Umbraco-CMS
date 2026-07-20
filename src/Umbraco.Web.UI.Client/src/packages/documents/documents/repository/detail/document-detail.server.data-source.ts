@@ -9,9 +9,9 @@ import type {
 import { DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { umbDeepMerge, type UmbDeepPartialObject } from '@umbraco-cms/backoffice/utils';
-import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 import { UmbDocumentTypeDetailServerDataSource } from '@umbraco-cms/backoffice/document-type';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import { umbMapDocumentCreateRequestBody, umbMapDocumentUpdateRequestBody } from './document-detail-request.mappers.js';
 
 /**
  * A data source for the Document that fetches data from the server
@@ -29,9 +29,6 @@ export class UmbDocumentServerDataSource
 	 * @memberof UmbDocumentServerDataSource
 	 */
 	async createScaffold(preset: UmbDeepPartialObject<UmbDocumentDetailModel> = {}) {
-		let documentTypeIcon: string | null = null;
-		let documentTypeCollection: UmbReferenceByUnique | null = null;
-
 		const documentTypeUnique = preset.documentType?.unique;
 
 		if (!documentTypeUnique) {
@@ -40,13 +37,14 @@ export class UmbDocumentServerDataSource
 
 		// TODO: investigate if we can use the repository here instead
 		const { data } = await new UmbDocumentTypeDetailServerDataSource(this).read(documentTypeUnique);
-		documentTypeIcon = data?.icon ?? null;
-		documentTypeCollection = data?.collection ?? null;
+		const documentTypeIcon = data?.icon ?? null;
+		const documentTypeCollection = data?.collection ?? null;
+		const defaultTemplate = data?.defaultTemplate ? { unique: data.defaultTemplate.id } : null;
 
 		const defaultData: UmbDocumentDetailModel = {
 			entityType: UMB_DOCUMENT_ENTITY_TYPE,
 			unique: UmbId.new(),
-			template: null,
+			template: defaultTemplate,
 			documentType: {
 				unique: documentTypeUnique,
 				collection: documentTypeCollection,
@@ -129,15 +127,7 @@ export class UmbDocumentServerDataSource
 		if (!model) throw new Error('Document is missing');
 		if (!model.unique) throw new Error('Document unique is missing');
 
-		// TODO: make data mapper to prevent errors
-		const body: CreateDocumentRequestModel = {
-			id: model.unique,
-			parent: parentUnique ? { id: parentUnique } : null,
-			documentType: { id: model.documentType.unique },
-			template: model.template ? { id: model.template.unique } : null,
-			values: model.values,
-			variants: model.variants,
-		};
+		const body: CreateDocumentRequestModel = umbMapDocumentCreateRequestBody(model, parentUnique);
 
 		const { data, error } = await tryExecute(
 			this,
@@ -162,12 +152,7 @@ export class UmbDocumentServerDataSource
 	async update(model: UmbDocumentDetailModel) {
 		if (!model.unique) throw new Error('Unique is missing');
 
-		// TODO: make data mapper to prevent errors
-		const body: UpdateDocumentRequestModel = {
-			template: model.template ? { id: model.template.unique } : null,
-			values: model.values,
-			variants: model.variants,
-		};
+		const body: UpdateDocumentRequestModel = umbMapDocumentUpdateRequestBody(model);
 
 		const { error } = await tryExecute(
 			this,

@@ -20,6 +20,9 @@ import {
 	type UmbDocumentBlueprintItemBaseModel,
 } from '@umbraco-cms/backoffice/document-blueprint';
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
+import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/section';
+import { UMB_SETTINGS_SECTION_ALIAS } from '@umbraco-cms/backoffice/settings';
 
 @customElement('umb-document-create-options-modal')
 export class UmbDocumentCreateOptionsModalElement extends UmbModalBaseElement<
@@ -46,11 +49,47 @@ export class UmbDocumentCreateOptionsModalElement extends UmbModalBaseElement<
 	@state()
 	private _loading = true;
 
+	@state()
+	private _hasSettingsAccess = false;
+
+	constructor() {
+		super();
+
+		createExtensionApiByAlias(this, UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS, [
+			{
+				config: {
+					match: UMB_SETTINGS_SECTION_ALIAS,
+				},
+				onChange: (permitted: boolean) => {
+					this._hasSettingsAccess = permitted;
+				},
+			},
+		]);
+	}
+
 	override async firstUpdated() {
 		const parentUnique = this.data?.parent.unique;
 		const documentTypeUnique = this.data?.documentType?.unique || null;
+		const preselectedDocumentType = this.data?.preselectedDocumentType;
 
-		this.#retrieveAllowedDocumentTypesOf(documentTypeUnique, parentUnique || null);
+		if (preselectedDocumentType?.unique) {
+			this.#documentTypeUnique = preselectedDocumentType.unique;
+			this.#documentTypeIcon = preselectedDocumentType.icon ?? '';
+			if (preselectedDocumentType.blueprints) {
+				this._availableBlueprints = preselectedDocumentType.blueprints;
+			} else {
+				const { data } = await this.#documentBlueprintItemRepository.requestItemsByDocumentType(
+					preselectedDocumentType.unique,
+				);
+				this._availableBlueprints = data ?? [];
+			}
+			if (!this._availableBlueprints.length) {
+				this.#onNavigate(preselectedDocumentType.unique);
+			}
+			this._loading = false;
+		} else {
+			this.#retrieveAllowedDocumentTypesOf(documentTypeUnique, parentUnique || null);
+		}
 
 		if (parentUnique) {
 			this.#retrieveHeadline(parentUnique);
@@ -111,7 +150,10 @@ export class UmbDocumentCreateOptionsModalElement extends UmbModalBaseElement<
 			throw new Error('Document type unique is not defined');
 		}
 		this.#documentTypeUnique = documentTypeUnique;
-		this.#documentTypeIcon = this._allowedDocumentTypes.find((dt) => dt.unique === documentTypeUnique)?.icon ?? '';
+		const matchedDocumentType = this._allowedDocumentTypes.find((dt) => dt.unique === documentTypeUnique);
+		if (matchedDocumentType) {
+			this.#documentTypeIcon = matchedDocumentType.icon ?? '';
+		}
 
 		const { data } = await this.#documentBlueprintItemRepository.requestItemsByDocumentType(documentTypeUnique);
 
@@ -150,13 +192,18 @@ export class UmbDocumentCreateOptionsModalElement extends UmbModalBaseElement<
 					<strong>Document Types</strong> within the <strong>Settings</strong> section, by editing the
 					<strong>Allowed child node types</strong> under <strong>Structure</strong>.
 				</umb-localize>
-				<br />
-				<uui-button
-					id="edit-permissions"
-					look="secondary"
-					href=${`/section/settings/workspace/document-type/edit/${this.data?.documentType?.unique}/view/structure`}
-					label=${this.localize.term('create_noDocumentTypesEditPermissions')}
-					@click=${() => this._rejectModal()}></uui-button>
+				${when(
+					this._hasSettingsAccess,
+					() => html`
+						<br />
+						<uui-button
+							id="edit-permissions"
+							look="secondary"
+							href=${`/section/settings/workspace/document-type/edit/${this.data?.documentType?.unique}/view/structure`}
+							label=${this.localize.term('create_noDocumentTypesEditPermissions')}
+							@click=${() => this._rejectModal()}></uui-button>
+					`,
+				)}
 			`;
 		} else {
 			return html`

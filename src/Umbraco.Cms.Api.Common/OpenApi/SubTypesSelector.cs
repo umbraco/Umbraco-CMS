@@ -47,7 +47,7 @@ public class SubTypesSelector : ISubTypesSelector
         {
             // Split the path into segments
             var segments = _httpContextAccessor.HttpContext.Request.Path.Value![swaggerPath.Length..]
-                .TrimStart(Constants.CharArrays.ForwardSlash)
+                .TrimStart('/')
                 .Split(Constants.CharArrays.ForwardSlash);
 
             // Extract the document name from the path

@@ -1,6 +1,7 @@
 import { manifests as sectionContextManifests } from './section-context/manifests.js';
 import { manifests as globalContextManifests } from './global-context/manifests.js';
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
+import UmbSectionSidebarMenuElement from './section-sidebar-menu.element.js';
 
 export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
 	{
@@ -10,7 +11,7 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 		matchType: 'sectionSidebarApp',
 		manifest: {
 			type: 'sectionSidebarApp',
-			element: () => import('./section-sidebar-menu.element.js'),
+			element: UmbSectionSidebarMenuElement,
 		},
 	},
 	...sectionContextManifests,

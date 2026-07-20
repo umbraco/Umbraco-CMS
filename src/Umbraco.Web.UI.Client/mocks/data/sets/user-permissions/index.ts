@@ -10,12 +10,11 @@ import { data as userGroup } from './user-group.data.js';
 export { dataType, document, documentType, language, user, userGroup };
 
 // Type assertion to ensure this module satisfies UmbMockDataSet
-const _typeCheck: UmbMockDataSet = {
+({
 	dataType,
 	document,
 	documentType,
 	language,
 	user,
 	userGroup,
-};
-void _typeCheck;
+} satisfies UmbMockDataSet);

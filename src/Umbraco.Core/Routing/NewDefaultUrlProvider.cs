@@ -123,7 +123,7 @@ public class NewDefaultUrlProvider : IUrlProvider
 
             // although we are passing in culture here, if any node in this path is invariant, it ignores the culture anyways so this is ok
             var route = GetLegacyRouteFormatById(key, culture);
-            if (route == null || route == "#")
+            if (route == null || route == Constants.Routing.Unroutable)
             {
                 continue;
             }
@@ -184,7 +184,7 @@ public class NewDefaultUrlProvider : IUrlProvider
         var isDraft = _umbracoContextAccessor.GetRequiredUmbracoContext().InPreviewMode;
         if (isDraft is false && string.IsNullOrWhiteSpace(culture) is false && content.Cultures.Any() && content.IsInvariantOrHasCulture(culture) is false)
         {
-            route = "#";
+            route = Constants.Routing.Unroutable;
         }
         else
         {
@@ -206,7 +206,7 @@ public class NewDefaultUrlProvider : IUrlProvider
         UrlMode mode,
         string? culture)
     {
-        if (string.IsNullOrWhiteSpace(route) || route.Equals("#"))
+        if (string.IsNullOrWhiteSpace(route) || route.Equals(Constants.Routing.Unroutable))
         {
             if (_logger.IsEnabled(LogLevel.Debug))
             {
@@ -313,9 +313,9 @@ public class NewDefaultUrlProvider : IUrlProvider
         return _uriUtility.UriFromUmbraco(uri, _requestSettings);
     }
 
-    private string CombinePaths(string path1, string path2)
+    private static string CombinePaths(string path1, string path2)
     {
-        var path = path1.TrimEnd(Constants.CharArrays.ForwardSlash) + path2;
-        return path == "/" ? path : path.TrimEnd(Constants.CharArrays.ForwardSlash);
+        var path = $"{path1.AsSpan().TrimEnd('/')}{path2}";
+        return path == "/" ? path : path.TrimEnd('/');
     }
 }

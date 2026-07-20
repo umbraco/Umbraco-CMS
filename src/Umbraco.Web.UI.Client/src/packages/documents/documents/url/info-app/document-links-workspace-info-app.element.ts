@@ -18,7 +18,7 @@ import type { UmbEntityActionEvent } from '@umbraco-cms/backoffice/entity-action
 import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
-import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { UmbDocumentVariantState } from '../../variant-state.js';
 import { debounce } from '@umbraco-cms/backoffice/utils';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
@@ -26,7 +26,7 @@ import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 interface UmbDocumentInfoViewLink {
 	culture: string | null;
 	url: string | null | undefined;
-	state: DocumentVariantStateModel | null | undefined;
+	state: UmbDocumentVariantState | null | undefined;
 }
 
 @customElement('umb-document-links-workspace-info-app')
@@ -84,7 +84,7 @@ export class UmbDocumentLinksWorkspaceInfoAppElement extends UmbLitElement {
 
 						if (unique !== this._unique) {
 							this._unique = unique;
-							this.#requestUrls();
+							this.#scheduleRequestUrls();
 						}
 					},
 					'observeWorkspaceState',
@@ -98,6 +98,13 @@ export class UmbDocumentLinksWorkspaceInfoAppElement extends UmbLitElement {
 				this.#setLinks();
 			});
 		});
+
+		// Re-request when the displayed culture changes, so switching language fetches that culture.
+		this.observe(
+			this.#documentUrlsDataResolver?.requestCulture,
+			() => this.#scheduleRequestUrls(),
+			'observeRequestCulture',
+		);
 
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (context) => {
 			this.#propertyDataSetVariantId = context?.getVariantId();
@@ -136,31 +143,44 @@ export class UmbDocumentLinksWorkspaceInfoAppElement extends UmbLitElement {
 		return url;
 	}
 
+	// Show the loading indicator immediately (synchronously), before the debounced request runs, so no
+	// stale "no URL" message is shown while the URL is (re)resolved - e.g. on load or when switching culture.
+	#scheduleRequestUrls() {
+		if (this._isNew || !this._unique) return;
+
+		this._loading = true;
+		this.#debounceRequestUrls();
+	}
+
 	async #requestUrls() {
-		if (this._isNew) return;
-		if (!this._unique) return;
+		if (this._isNew || !this._unique) return;
 
 		this._loading = true;
 		this.#documentUrlsDataResolver?.setData([]);
 
-		const { data } = await this.#documentUrlRepository.requestItems([this._unique]);
+		try {
+			// Only request the culture currently being displayed for variant documents. Invariant documents
+			// return all of their domain urls, so no culture is passed (getRequestCulture resolves undefined).
+			const culture = await this.#documentUrlsDataResolver?.getRequestCulture();
+			const { data } = await this.#documentUrlRepository.requestUrls([this._unique], culture);
 
-		if (data?.length) {
-			this.#documentUrlsDataResolver?.setData(data[0].urls);
+			if (data?.length) {
+				this.#documentUrlsDataResolver?.setData(data[0].urls);
+			}
+		} finally {
+			this._loading = false;
 		}
-
-		this._loading = false;
 	}
 
-	#getStateLocalizationKey(state: DocumentVariantStateModel | null | undefined): string {
+	#getStateLocalizationKey(state: UmbDocumentVariantState | null | undefined): string {
 		switch (state) {
 			case null:
 			case undefined:
-			case DocumentVariantStateModel.NOT_CREATED:
+			case UmbDocumentVariantState.NOT_CREATED:
 				return 'content_notCreated';
-			case DocumentVariantStateModel.DRAFT:
+			case UmbDocumentVariantState.DRAFT:
 				return 'content_itemNotPublished';
-			case DocumentVariantStateModel.PUBLISHED:
+			case UmbDocumentVariantState.PUBLISHED:
 				return 'content_routeErrorCannotRoute';
 			default:
 				return 'content_parentNotPublishedAnomaly';
@@ -173,7 +193,7 @@ export class UmbDocumentLinksWorkspaceInfoAppElement extends UmbLitElement {
 		// TODO: Introduce "Published Event". We only need to update the url when the document is published.
 		if (event.getUnique() !== this.#documentWorkspaceContext?.getUnique()) return;
 		if (event.getEntityType() !== this.#documentWorkspaceContext.getEntityType()) return;
-		this.#debounceRequestUrls();
+		this.#scheduleRequestUrls();
 	};
 
 	override render() {
@@ -238,7 +258,7 @@ export class UmbDocumentLinksWorkspaceInfoAppElement extends UmbLitElement {
 			.map((variantOption) => this.#renderEmptyLink(variantOption.culture, variantOption.variant?.state))}`;
 	}
 
-	#renderEmptyLink(culture: string | null, state: DocumentVariantStateModel | null | undefined) {
+	#renderEmptyLink(culture: string | null, state: UmbDocumentVariantState | null | undefined) {
 		return html`<div class="link-item">
 			<span>
 				${this.#renderLinkCulture(culture)}

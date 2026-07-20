@@ -21,6 +21,20 @@ export class MemberApiHelper {
     return response.headers().location.split("v1/member/").pop();
   }
 
+  async setLockedOut(id: string, isLockedOut: boolean) {
+    const data = await this.get(id);
+    return await this.api.put(this.api.baseUrl + '/umbraco/management/api/v1/member/' + id, {
+      variants: data.variants,
+      values: data.values,
+      email: data.email,
+      username: data.username,
+      isApproved: data.isApproved,
+      isLockedOut,
+      isTwoFactorEnabled: data.isTwoFactorEnabled,
+      groups: (data.groups ?? []).map((g: any) => typeof g === 'string' ? g : g.id),
+    });
+  }
+
   async delete(id: string) {
     if (id == null) {
       return;
@@ -61,8 +75,8 @@ export class MemberApiHelper {
   async ensureNameNotExists(name: string) {
     const rootMembers = await this.getAll();
     const jsonMembers = await rootMembers.json();
-    
-    for (const member of jsonMembers.items) {       
+
+    for (const member of jsonMembers.items) {
       if (member.variants[0].name === name) {
         return await this.delete(member.id);
       }
@@ -72,11 +86,11 @@ export class MemberApiHelper {
 
   async createDefaultMember(memberName: string, memberTypeId: string, email: string, username: string, password: string) {
     await this.ensureNameNotExists(memberName);
-    
+
     const member = new MemberBuilder()
       .addVariant()
         .withName(memberName)
-        .done()
+      .done()
       .withEmail(email)
       .withUsername(username)
       .withPassword(password)
@@ -85,11 +99,27 @@ export class MemberApiHelper {
     return await this.create(member);
   }
 
+  async createApprovedMember(memberName: string, memberTypeId: string, email: string, username: string, password: string) {
+    await this.ensureNameNotExists(memberName);
+
+    const member = new MemberBuilder()
+      .addVariant()
+        .withName(memberName)
+      .done()
+      .withEmail(email)
+      .withUsername(username)
+      .withPassword(password)
+      .withMemberTypeId(memberTypeId)
+      .withIsApproved(true)
+      .build();
+    return await this.create(member);
+  }
+
   async createMemberWithMemberGroup(memberName: string, memberTypeId: string, email: string, username: string, password: string, memberGroupId: string) {
     const member = new MemberBuilder()
       .addVariant()
         .withName(memberName)
-        .done()
+      .done()
       .withEmail(email)
       .withUsername(username)
       .withPassword(password)

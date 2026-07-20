@@ -54,9 +54,19 @@ internal sealed class PublishedContentStatusFilteringService : IPublishedContent
             ? candidateKeysAsArray
             : candidateKeysAsArray.Where(key =>
                 _publishStatusQueryService.IsDocumentPublished(key, culture)
-                && _publishStatusQueryService.HasPublishedAncestorPath(key));
+                && _publishStatusQueryService.HasPublishedAncestorPath(key, culture));
 
-        return WhereIsInvariantOrHasCultureOrRequestedAllCultures(candidateKeys, culture, preview).ToArray();
+        // Returned lazily so consumers like .FirstOrDefault() / .Take(n) can short-circuit
+        // without materialising the full result. Callers that need to enumerate the result
+        // more than once should buffer it themselves (.ToList() / .ToArray()).
+        return WhereIsInvariantOrHasCultureOrRequestedAllCultures(candidateKeys, culture, preview);
+    }
+
+    /// <inheritdoc />
+    public IEnumerable<IPublishedContent> Unfiltered(IEnumerable<Guid> candidateKeys)
+    {
+        var preview = _previewService.IsInPreview();
+        return candidateKeys.Select(key => _publishedContentCache.GetById(preview, key)).WhereNotNull();
     }
 
     /// <summary>

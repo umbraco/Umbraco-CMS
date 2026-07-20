@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
@@ -11,6 +12,10 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_15_0_0.LocalLinks;
 [Obsolete("Scheduled for removal in Umbraco 18.")]
 public class LocalLinkProcessor
 {
+    private static readonly Regex _dataAnchorPattern = new(
+        @"data-anchor=['""](?<anchor>[^'""]*)['""]",
+        RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
     private readonly HtmlLocalLinkParser _localLinkParser;
     private readonly IIdKeyMap _idKeyMap;
     private readonly IEnumerable<ITypedLocalLinkProcessor> _localLinkProcessors;
@@ -66,11 +71,12 @@ public class LocalLinkProcessor
 
         foreach (HtmlLocalLinkParser.LocalLinkTag tag in tags)
         {
-            string newTagHref;
+            string convertedLocalLink;
+            string entityType;
             if (tag.Udi is not null)
             {
-                newTagHref = tag.TagHref.Replace(tag.Udi.ToString(), tag.Udi.Guid.ToString())
-                             + $"\" type=\"{tag.Udi.EntityType}";
+                convertedLocalLink = tag.TagHref.Replace(tag.Udi.ToString(), tag.Udi.Guid.ToString());
+                entityType = tag.Udi.EntityType;
             }
             else if (tag.IntId is not null)
             {
@@ -81,8 +87,8 @@ public class LocalLinkProcessor
                     continue;
                 }
 
-                newTagHref = tag.TagHref.Replace(tag.IntId.Value.ToString(), conversionResult.Value.Key.ToString())
-                             + $"\" type=\"{conversionResult.Value.EntityType}";
+                convertedLocalLink = tag.TagHref.Replace(tag.IntId.Value.ToString(), conversionResult.Value.Key.ToString());
+                entityType = conversionResult.Value.EntityType;
             }
             else
             {
@@ -90,25 +96,115 @@ public class LocalLinkProcessor
                 continue;
             }
 
-            input = input.Replace(tag.TagHref, newTagHref);
+            // Find where the TagHref occurs in the input, then locate the closing quote of the
+            // href attribute so we can insert the type attribute after it. The href value may
+            // contain trailing content after the localLink closing brace (e.g. #fragment or ?query).
+            var tagHrefIndex = input.IndexOf(tag.TagHref, StringComparison.Ordinal);
+            if (tagHrefIndex < 0)
+            {
+                continue;
+            }
+
+            // Determine the quote character used to open the href attribute. The regex matches
+            // href=['"]..., so the character immediately before the TagHref match is the opening quote.
+            var openingQuoteIndex = tagHrefIndex - 1;
+            if (openingQuoteIndex < 0 || (input[openingQuoteIndex] != '"' && input[openingQuoteIndex] != '\''))
+            {
+                input = input.Replace(tag.TagHref, convertedLocalLink);
+                continue;
+            }
+
+            var quoteChar = input[openingQuoteIndex];
+            var afterTagHref = tagHrefIndex + tag.TagHref.Length;
+            var closingQuoteIndex = input.IndexOf(quoteChar, afterTagHref);
+
+            if (closingQuoteIndex < 0)
+            {
+                // No closing quote found; fall back to simple replacement without type attribute.
+                input = input.Replace(tag.TagHref, convertedLocalLink);
+                continue;
+            }
+
+            // Extract any trailing href content (fragment, query string) between the localLink and closing quote.
+            var existingTrailingHrefContent = input.Substring(afterTagHref, closingQuoteIndex - afterTagHref);
+            var closingQuote = input[closingQuoteIndex];
+
+            // If the anchor tag carries a data-anchor attribute and that value is not already part
+            // of the href (e.g. when migrating older content that stored the anchor only in data-anchor),
+            // append it to the href so the link resolves correctly in the v15+ RTE (#22860).
+            // When the href already contains a different fragment, we trust the href and skip the append
+            // rather than producing an invalid URL with two '#' separators.
+            var newTrailingHrefContent = existingTrailingHrefContent;
+            var anchorFromAttribute = ExtractDataAnchorValue(input, tagHrefIndex);
+            if (anchorFromAttribute is not null
+                && existingTrailingHrefContent.Contains(anchorFromAttribute, StringComparison.Ordinal) is false
+                && existingTrailingHrefContent.Contains('#') is false)
+            {
+                newTrailingHrefContent += anchorFromAttribute;
+            }
+
+            // Build the replacement: converted localLink + trailing content + close quote + type attribute
+            var oldSegment = tag.TagHref + existingTrailingHrefContent + closingQuote;
+            var newSegment = convertedLocalLink + newTrailingHrefContent + closingQuote + $" type=\"{entityType}\"";
+            input = input.Remove(tagHrefIndex, oldSegment.Length).Insert(tagHrefIndex, newSegment);
         }
 
         return input;
     }
 
+    // Searches for a non-empty data-anchor attribute within the opening anchor tag that contains the
+    // local link href at tagHrefIndex. Returns the attribute value (e.g. "#" or "#section-1"),
+    // or null when no usable data-anchor is present.
+    // The legacy local link pattern matches any href attribute (not just anchors), so this check
+    // is scoped to elements whose tag name is "a" — data-anchor on other elements is not relevant.
+    private static string? ExtractDataAnchorValue(string input, int tagHrefIndex)
+    {
+        var tagStartIndex = input.LastIndexOf('<', tagHrefIndex);
+        if (tagStartIndex < 0 || tagStartIndex + 2 >= input.Length)
+        {
+            return null;
+        }
+
+        // Verify the surrounding element is an anchor tag: "<a" followed by whitespace.
+        // (An href attribute always implies at least one whitespace separator after the tag name.)
+        var nameChar = input[tagStartIndex + 1];
+        if ((nameChar != 'a' && nameChar != 'A') || char.IsWhiteSpace(input[tagStartIndex + 2]) is false)
+        {
+            return null;
+        }
+
+        var tagEndIndex = input.IndexOf('>', tagHrefIndex);
+        if (tagEndIndex < tagStartIndex)
+        {
+            return null;
+        }
+
+        var openingTag = input.Substring(tagStartIndex, tagEndIndex - tagStartIndex);
+        Match anchorMatch = _dataAnchorPattern.Match(openingTag);
+        if (anchorMatch.Success is false)
+        {
+            return null;
+        }
+
+        var anchorValue = anchorMatch.Groups["anchor"].Value;
+        return string.IsNullOrEmpty(anchorValue) ? null : anchorValue;
+    }
+
     private (Guid Key, string EntityType)? CreateIntBasedKeyType(int id)
     {
-        // very old data, best effort replacement
+        // very old data, best effort replacement.
+        // entity type must match the lowercase UDI entity type, which is what the tiptap RTE
+        // expects in the "type" attribute (and what the UDI-based branch above produces).
         Attempt<Guid> documentAttempt = _idKeyMap.GetKeyForId(id, UmbracoObjectTypes.Document);
         if (documentAttempt.Success)
         {
-            return (Key: documentAttempt.Result, EntityType: UmbracoObjectTypes.Document.ToString());
+            return (Key: documentAttempt.Result, EntityType: Constants.UdiEntityType.Document);
         }
 
         Attempt<Guid> mediaAttempt = _idKeyMap.GetKeyForId(id, UmbracoObjectTypes.Media);
         if (mediaAttempt.Success)
         {
-            return (Key: mediaAttempt.Result, EntityType: UmbracoObjectTypes.Media.ToString());
+            return (Key: mediaAttempt.Result, EntityType: Constants.UdiEntityType.Media);
         }
 
         return null;

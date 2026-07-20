@@ -82,7 +82,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="loggerFactory">The <see cref="ILoggerFactory"/> for creating loggers.</param>
         /// <param name="eventMessagesFactory">The <see cref="IEventMessagesFactory"/> for creating event messages.</param>
         /// <param name="mediaRepository">The <see cref="IMediaRepository"/> for media persistence.</param>
-        /// <param name="auditRepository">The audit repository (obsolete, not used).</param>
+        /// <param name="auditService">The <see cref="IAuditService"/> for audit handling.</param>
         /// <param name="mediaTypeRepository">The <see cref="IMediaTypeRepository"/> for media type persistence.</param>
         /// <param name="entityRepository">The <see cref="IEntityRepository"/> for entity operations.</param>
         /// <param name="shortStringHelper">The <see cref="IShortStringHelper"/> for string operations.</param>
@@ -1280,7 +1280,7 @@ namespace Umbraco.Cms.Core.Services
             //media.Path = (parent == null ? "-1" : parent.Path) + "," + media.Id;
             //media.SortOrder = ((MediaRepository) repository).NextChildSortOrder(parentId);
             //media.Level += levelDelta;
-            PerformMoveMediaLocked(media, trash);
+            PerformMoveMediaLocked(media, userId, trash);
 
             // if uow is not immediate, content.Path will be updated only when the UOW commits,
             // and because we want it now, we have to calculate it by ourselves
@@ -1302,7 +1302,7 @@ namespace Umbraco.Cms.Core.Services
                     // update path and level since we do not update parentId
                     descendant.Path = paths[descendant.Id] = paths[descendant.ParentId] + "," + descendant.Id;
                     descendant.Level += levelDelta;
-                    PerformMoveMediaLocked(descendant, trash);
+                    PerformMoveMediaLocked(descendant, userId, trash);
                 }
 
             }
@@ -1313,16 +1313,21 @@ namespace Umbraco.Cms.Core.Services
         ///     Performs the actual save of a media item during a move operation while holding a write lock.
         /// </summary>
         /// <param name="media">The media item to save.</param>
+        /// <param name="userId">The identifier of the user performing the move.</param>
         /// <param name="trash">
         ///     If <c>true</c>, marks the item as trashed; if <c>false</c>, marks the item as not trashed;
         ///     if <c>null</c>, leaves the trashed status unchanged.
         /// </param>
-        private void PerformMoveMediaLocked(IMedia media, bool? trash)
+        private void PerformMoveMediaLocked(IMedia media, int userId, bool? trash)
         {
             if (trash.HasValue)
             {
                 ((ContentBase)media).Trashed = trash.Value;
             }
+
+            // Track who moved/trashed the item so the audit trail (and any consumer of WriterId)
+            // reflects the acting user, not the original creator. Mirrors PerformMoveContentLocked.
+            media.WriterId = userId;
 
             _mediaRepository.Save(media);
         }
@@ -1409,6 +1414,15 @@ namespace Umbraco.Cms.Core.Services
             {
                 scope.WriteLock(Constants.Locks.MediaTree);
 
+                // Reload within the lock so sorting operates on fully-loaded entities. Callers may pass
+                // partially-loaded media (e.g. without property data), and saving those directly would
+                // wipe the property data (#23120). Preserve the caller's ordering, which drives the sort.
+                var reloadedById = GetByIds(itemsA.Select(x => x.Id)).ToDictionary(x => x.Id);
+                itemsA = itemsA
+                    .Select(x => reloadedById.TryGetValue(x.Id, out IMedia? media) ? media : null)
+                    .WhereNotNull()
+                    .ToArray();
+
                 var savingNotification = new MediaSavingNotification(itemsA, messages);
                 if (scope.Notifications.PublishCancelable(savingNotification))
                 {
@@ -1445,6 +1459,43 @@ namespace Umbraco.Cms.Core.Services
 
             return true;
 
+        }
+
+        /// <inheritdoc />
+        public OperationResult SortChildren(int parentId, IReadOnlyList<int> orderedChildIds, int userId = Constants.Security.SuperUserId)
+        {
+            EventMessages evtMsgs = EventMessagesFactory.Get();
+            if (orderedChildIds.Count == 0)
+            {
+                return new OperationResult(OperationResultType.NoOperation, evtMsgs);
+            }
+
+            using ICoreScope scope = ScopeProvider.CreateCoreScope();
+            scope.WriteLock(Constants.Locks.MediaTree);
+
+            _mediaRepository.UpdateSortOrder(orderedChildIds);
+
+            // Sort order lives in umbracoNode; neither the published cache nor the media repository cache keeps
+            // a separate serialized copy of it, so refreshing the affected branch (which invalidates both and has
+            // them reload from umbracoNode) is enough to pick up the new order without re-saving each child.
+            if (parentId == Constants.System.Root)
+            {
+                IMedia[] roots = GetByIds(orderedChildIds).ToArray();
+                scope.Notifications.Publish(new MediaTreeChangeNotification(roots, TreeChangeTypes.RefreshNode, evtMsgs));
+            }
+            else
+            {
+                IMedia? parent = GetById(parentId);
+                if (parent is not null)
+                {
+                    scope.Notifications.Publish(new MediaTreeChangeNotification(parent, TreeChangeTypes.RefreshBranch, evtMsgs));
+                }
+            }
+
+            Audit(AuditType.Sort, userId, parentId);
+
+            scope.Complete();
+            return OperationResult.Succeed(evtMsgs);
         }
 
         /// <summary>
