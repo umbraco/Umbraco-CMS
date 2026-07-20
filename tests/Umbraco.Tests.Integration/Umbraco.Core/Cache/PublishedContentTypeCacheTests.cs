@@ -138,6 +138,29 @@ internal sealed class PublishedContentTypeCacheTests : UmbracoIntegrationTestWit
         Assert.AreEqual(primed.PropertyTypes.Count(), after.PropertyTypes.Count());
     }
 
+    [Test]
+    public async Task Published_Child_Type_Exposes_Property_From_Composition_On_Inherited_Parent()
+    {
+        // A composition that carries a "title" property.
+        var composition = (await ContentTypeEditingService.CreateAsync(
+            ContentTypeEditingBuilder.CreateSimpleContentType("composition", "Composition"),
+            Constants.Security.SuperUserKey)).Result!;
+
+        // A parent that already has the composition applied, and a child that inherits from it.
+        var parentModel = ContentTypeEditingBuilder.CreateBasicContentType("parent", "Parent");
+        parentModel.Compositions = [new Composition { CompositionType = CompositionType.Composition, Key = composition.Key }];
+        var parent = (await ContentTypeEditingService.CreateAsync(parentModel, Constants.Security.SuperUserKey)).Result!;
+
+        var childModel = ContentTypeEditingBuilder.CreateBasicContentType("child", "Child");
+        childModel.Compositions = new[] { new Composition { CompositionType = CompositionType.Inheritance, Key = parent.Key } };
+        var child = (await ContentTypeEditingService.CreateAsync(childModel, Constants.Security.SuperUserKey)).Result!;
+
+        // The published child exposes the composition's "title" property, inherited through its parent.
+        var publishedChild = PublishedContentTypeCache.Get(PublishedItemType.Content, child.Key);
+        Assert.IsNotNull(publishedChild);
+        Assert.IsTrue(publishedChild.PropertyTypes.Any(p => p.Alias == "title"));
+    }
+
     private async Task<IContentType> CreateElementTypeAsync(string alias)
     {
         ContentTypeCreateModel createModel = ContentTypeEditingBuilder.CreateElementType(alias, alias);

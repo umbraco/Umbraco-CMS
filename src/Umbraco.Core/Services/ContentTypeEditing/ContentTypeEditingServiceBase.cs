@@ -271,6 +271,13 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
             return operationStatus;
         }
 
+        // verify that no newly added property/composition alias collides with a descendant's own property
+        operationStatus = ValidateDescendantPropertyAliases(contentType, model, allContentTypeCompositions);
+        if (operationStatus is not ContentTypeOperationStatus.Success)
+        {
+            return operationStatus;
+        }
+
         // verify that all property/container relationships (groups/tabs) are valid
         operationStatus = ValidateContainers(model, allContentTypeCompositions);
         if (operationStatus is not ContentTypeOperationStatus.Success)
@@ -484,6 +491,97 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         }
 
         return ContentTypeOperationStatus.Success;
+    }
+
+    /// <summary>
+    ///     Validates that no property alias newly introduced on this content type (via its own properties or
+    ///     its compositions) collides with a property alias already effective on one of its descendants.
+    /// </summary>
+    /// <remarks>
+    ///     Descendants inherit this content type's properties (through tree inheritance and/or composition), so a
+    ///     newly introduced alias that a descendant already defines would produce a duplicate effective alias on that
+    ///     descendant. <see cref="ValidateProperties"/> only guards the edited type's own model, so this handles the
+    ///     case where the edited type is itself inherited from or composed by others. Only genuinely new aliases are
+    ///     checked so that pre-existing configurations are never retroactively rejected.
+    /// </remarks>
+    private static ContentTypeOperationStatus ValidateDescendantPropertyAliases(
+        TContentType? contentType,
+        ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model,
+        IContentTypeComposition[] allContentTypeCompositions)
+    {
+        // on create the content type has no descendants yet, so there is nothing to collide with
+        if (contentType is null)
+        {
+            return ContentTypeOperationStatus.Success;
+        }
+
+        Dictionary<Guid, IContentTypeComposition> compositionsByKey = allContentTypeCompositions.ToDictionary(c => c.Key);
+
+        // the aliases this content type would push down to its descendants: its own properties plus the
+        // property types of every composition/inheritance it references
+        Guid[] modelCompositionKeys = KeysForCompositionTypes(model, CompositionType.Composition, CompositionType.Inheritance);
+        IEnumerable<string> modelDownwardAliases = model.Properties
+            .Select(p => p.Alias)
+            .Concat(modelCompositionKeys
+                .Where(compositionsByKey.ContainsKey)
+                .SelectMany(k => compositionsByKey[k].CompositionPropertyTypes.Select(pt => pt.Alias)));
+
+        // the aliases already pushed down by the persisted type - anything here is not newly introduced
+        IEnumerable<string> persistedDownwardAliases = contentType.PropertyTypes
+            .Select(pt => pt.Alias)
+            .Concat(contentType.ContentTypeComposition.SelectMany(c => c.CompositionPropertyTypes.Select(pt => pt.Alias)));
+
+        var newAliases = new HashSet<string>(modelDownwardAliases.Select(a => a.ToLowerInvariant()));
+        newAliases.ExceptWith(persistedDownwardAliases.Select(a => a.ToLowerInvariant()));
+        if (newAliases.Count == 0)
+        {
+            return ContentTypeOperationStatus.Success;
+        }
+
+        HashSet<int> descendantIds = GetTransitiveDescendantIds(contentType.Id, allContentTypeCompositions);
+
+        // compare against each descendant's full effective property set (its own properties plus everything it
+        // gets from its other compositions), not just its own properties - otherwise a newly introduced alias
+        // could still collide with an alias a descendant inherits from one of its other compositions. newAliases
+        // already excludes what this content type currently pushes down, so aliases the descendant inherits from
+        // this content type cannot cause a false positive.
+        var collision = allContentTypeCompositions
+            .Where(c => descendantIds.Contains(c.Id))
+            .SelectMany(c => c.CompositionPropertyTypes.Select(pt => pt.Alias.ToLowerInvariant()))
+            .Any(newAliases.Contains);
+
+        return collision
+            ? ContentTypeOperationStatus.DuplicatePropertyTypeAlias
+            : ContentTypeOperationStatus.Success;
+    }
+
+    /// <summary>
+    ///     Gets the ids of all content types that descend from the specified content type, across both the tree
+    ///     inheritance and composition axes.
+    /// </summary>
+    /// <remarks>
+    ///     Inheritance children hold their parent in their own <see cref="IContentTypeComposition.ContentTypeComposition"/>,
+    ///     so walking the composition graph downward captures inheritance and composition descendants alike.
+    /// </remarks>
+    private static HashSet<int> GetTransitiveDescendantIds(int contentTypeId, IContentTypeComposition[] allContentTypeCompositions)
+    {
+        var descendantIds = new HashSet<int>();
+        var stack = new Stack<int>();
+        stack.Push(contentTypeId);
+        while (stack.Count > 0)
+        {
+            var currentId = stack.Pop();
+            foreach (IContentTypeComposition descendant in allContentTypeCompositions
+                         .Where(x => x.ContentTypeComposition.Any(y => y.Id == currentId)))
+            {
+                if (descendantIds.Add(descendant.Id))
+                {
+                    stack.Push(descendant.Id);
+                }
+            }
+        }
+
+        return descendantIds;
     }
 
     /// <summary>
