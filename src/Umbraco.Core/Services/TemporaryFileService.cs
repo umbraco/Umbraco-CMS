@@ -107,7 +107,7 @@ internal sealed class TemporaryFileService : ITemporaryFileService
     /// <returns><c>true</c> if the file extension is allowed; otherwise, <c>false</c>.</returns>
     private bool IsAllowedFileExtension(string fileName)
     {
-        var extension = Path.GetExtension(fileName)[1..];
+        var extension = fileName.GetFileExtension().TrimStart(Constants.CharArrays.Period);
         return _contentSettings.IsFileAllowedForUpload(extension);
     }
 

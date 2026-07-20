@@ -418,6 +418,9 @@
     <Compile Update="Umbraco.Core\Services\ContentTypeEditingServiceTests.ChangeTypes.cs">
       <DependentUpon>ContentTypeEditingServiceTests.cs</DependentUpon>
     </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\UserServiceTests.SetAvatar.cs">
+      <DependentUpon>UserServiceTests.cs</DependentUpon>
+    </Compile>
     <Compile Update="Umbraco.Infrastructure\Services\ContentEditingServiceTests.CreateAndPublish.cs">
       <DependentUpon>ContentEditingServiceTests.cs</DependentUpon>
     </Compile>
