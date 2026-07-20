@@ -82,7 +82,10 @@ public class HttpSessionIdEnricherTests
                 SessionIdReadCount++;
 
                 // Simulate the log-during-load that triggers the recursion, but cap the depth so the
-                // unguarded code path terminates for the test rather than overflowing the stack.
+                // unguarded code path terminates cleanly for the test rather than overflowing the stack.
+                // 50 is well below the frame depth a StackOverflowException needs (~hundreds to low
+                // thousands), so it reliably distinguishes "guarded" (one read) from "unguarded" (many
+                // reads) without ever actually overflowing the test host.
                 if (_depth++ < 50)
                 {
                     Enricher!.Enrich(CreateLogEvent(), new PassthroughPropertyFactory());
