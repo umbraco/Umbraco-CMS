@@ -27,12 +27,10 @@ describe('UmbEntityBulkActionProgressModalElement', () => {
 			await element.updateComplete;
 		});
 
-		it('renders a determinate loader circle', () => {
-			expect(element.shadowRoot!.querySelector('uui-loader-circle')).to.exist;
-		});
-
-		it('does not render an indeterminate loader', () => {
-			expect(element.shadowRoot!.querySelector('uui-loader')).to.not.exist;
+		it('renders a determinate progress bar reflecting the completed count', () => {
+			const bar = element.shadowRoot!.querySelector('uui-loader-bar');
+			expect(bar).to.exist;
+			expect((bar as any).progress).to.equal(40); // 2 / 5
 		});
 
 		it('renders the "X / Y" counter text', () => {
@@ -55,12 +53,10 @@ describe('UmbEntityBulkActionProgressModalElement', () => {
 			await element.updateComplete;
 		});
 
-		it('renders an indeterminate loader', () => {
-			expect(element.shadowRoot!.querySelector('uui-loader')).to.exist;
-		});
-
-		it('does not render a determinate loader circle', () => {
-			expect(element.shadowRoot!.querySelector('uui-loader-circle')).to.not.exist;
+		it('renders a looped (indeterminate) progress bar', () => {
+			const bar = element.shadowRoot!.querySelector('uui-loader-bar');
+			expect(bar).to.exist;
+			expect((bar as any).progress).to.equal(0); // 0 => looped animation
 		});
 
 		it('does not render a counter', () => {

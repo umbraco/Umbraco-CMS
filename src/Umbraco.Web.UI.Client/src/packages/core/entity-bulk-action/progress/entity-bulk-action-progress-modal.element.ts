@@ -25,7 +25,8 @@ export class UmbEntityBulkActionProgressModalElement extends UmbModalBaseElement
 	}
 
 	#renderIndeterminate() {
-		return html`<uui-loader></uui-loader>`;
+		// Leaving progress unset makes uui-loader-bar run its looped (indeterminate) animation.
+		return html`<uui-loader-bar></uui-loader-bar>`;
 	}
 
 	#renderDeterminate() {
@@ -35,7 +36,7 @@ export class UmbEntityBulkActionProgressModalElement extends UmbModalBaseElement
 
 		return html`
 			<div id="progress">
-				<uui-loader-circle .progress=${progress}></uui-loader-circle>
+				<uui-loader-bar .progress=${progress}></uui-loader-bar>
 				<span>${completed} / ${total}</span>
 			</div>
 			<uui-button slot="actions" label=${this.localize.term('general_cancel')} @click=${this.#onCancel}></uui-button>
@@ -47,8 +48,11 @@ export class UmbEntityBulkActionProgressModalElement extends UmbModalBaseElement
 		css`
 			#progress {
 				display: flex;
-				align-items: center;
-				gap: var(--uui-size-space-4);
+				flex-direction: column;
+				gap: var(--uui-size-space-2);
+			}
+			uui-loader-bar {
+				width: 100%;
 			}
 		`,
 	];
