@@ -57,8 +57,14 @@ function rotr(x: number, n: number): number {
 }
 
 /**
- * Plain-JavaScript SHA-256 (FIPS 180-4), used only when `crypto.subtle` is unavailable.
- * Verified against `crypto.subtle.digest` in unit tests.
+ * Plain-JavaScript SHA-256 (FIPS 180-4), used ONLY to derive the PKCE code challenge when
+ * `crypto.subtle` is unavailable (insecure contexts, e.g. http://<ip> dev setups).
+ * Verified byte-for-byte against `crypto.subtle.digest` in unit tests.
+ *
+ * An in-repo implementation is acceptable for this narrow case because a wrong digest fails
+ * closed: the server recomputes and compares the challenge at token exchange, so any deviation
+ * breaks login — it cannot weaken the flow. Do NOT reuse this for anything security-sensitive;
+ * use `crypto.subtle`. Removed together with the PKCE flow in V19.
  * @param {Uint8Array} data The bytes to hash.
  * @returns {ArrayBuffer} The 32-byte digest.
  */
