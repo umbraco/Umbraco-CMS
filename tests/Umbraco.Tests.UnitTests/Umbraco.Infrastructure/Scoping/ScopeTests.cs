@@ -115,7 +115,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Scoping
         }
 
         [Test]
-        public void Uncompleted_Child_Scope_Is_Logged_When_LogIncompletedScopes_Enabled()
+        public void Can_Log_Uncompleted_Child_Scope_When_LogIncompletedScopes_Enabled()
         {
             var loggerMock = new Mock<ILogger>();
             var loggerFactoryMock = new Mock<ILoggerFactory>();
@@ -147,7 +147,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Scoping
         }
 
         [Test]
-        public void Uncompleted_Child_Scope_Is_Not_Logged_When_LogIncompletedScopes_Disabled()
+        public void Cannot_Log_Uncompleted_Child_Scope_When_LogIncompletedScopes_Disabled()
         {
             var loggerMock = new Mock<ILogger>();
             var loggerFactoryMock = new Mock<ILoggerFactory>();
