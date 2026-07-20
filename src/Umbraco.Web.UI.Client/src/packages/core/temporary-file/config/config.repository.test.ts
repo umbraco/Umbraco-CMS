@@ -73,7 +73,8 @@ describe('UmbTemporaryFileConfigRepository', () => {
 			console.warn = originalWarn;
 		}
 
-		expect(warned).to.contain('initialized is deprecated');
+		expect(warned).to.contain('deprecated');
+		expect(warned).to.contain('initialized');
 		expect(await firstValueFrom(repository.part('imageFileTypes'))).to.deep.equal([
 			'jpg',
 			'png',
