@@ -61,9 +61,13 @@ export interface UmbEntityBulkActionIndeterminateArgs<T> {
  * spinner if it takes longer than a short delay.
  */
 export class UmbEntityBulkActionProgressController extends UmbControllerBase {
-	// Runs a bulk operation sequentially while presenting a determinate progress dialog.
-	// Closing the dialog (cancel button, escape or backdrop) stops the operation after the item
-	// currently being processed.
+	/**
+	 * Runs a bulk operation sequentially while presenting a determinate progress dialog with a
+	 * "X / Y" counter and a cancel affordance. Closing the dialog (cancel button, escape or backdrop)
+	 * stops the operation after the item currently being processed.
+	 * @param {UmbEntityBulkActionProgressArgs} args - The dialog headline, the uniques to process and the per-item processor.
+	 * @returns {Promise<UmbEntityBulkActionProgressResult>} The succeeded/failed counts and whether the user cancelled.
+	 */
 	async runWithProgress(args: UmbEntityBulkActionProgressArgs): Promise<UmbEntityBulkActionProgressResult> {
 		const total = args.uniques.length;
 
@@ -112,9 +116,14 @@ export class UmbEntityBulkActionProgressController extends UmbControllerBase {
 		return { succeeded, failed, cancelled };
 	}
 
-	// Awaits a single operation, showing an indeterminate progress dialog only if it does not settle
-	// within delayMs (default 400ms). There is no cancel affordance. The dialog is closed when the
-	// operation settles.
+	/**
+	 * Awaits a single operation, showing an indeterminate progress dialog only if it does not settle
+	 * within `delayMs` (default 400ms). There is no cancel affordance. The dialog is closed once the
+	 * operation settles.
+	 * @template T The type the awaited operation resolves to.
+	 * @param {UmbEntityBulkActionIndeterminateArgs<T>} args - The dialog headline, the operation to await and the optional delay.
+	 * @returns {Promise<T>} The resolved value of the awaited operation.
+	 */
 	async runIndeterminate<T>(args: UmbEntityBulkActionIndeterminateArgs<T>): Promise<T> {
 		const delayMs = args.delayMs ?? 400;
 

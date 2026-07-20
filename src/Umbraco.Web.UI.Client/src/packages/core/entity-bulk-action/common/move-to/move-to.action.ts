@@ -1,77 +1,33 @@
 import { UmbEntityBulkActionBase } from '../../entity-bulk-action-base.js';
-import { UmbEntityBulkActionProgressController } from '../../progress/index.js';
+import { UmbBulkMoveOrCopyController } from '../bulk-move-or-copy.controller.js';
 import type { UmbBulkMoveToRepository } from './move-to-repository.interface.js';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
-import {
-	UmbRequestReloadChildrenOfEntityEvent,
-	UmbRequestReloadStructureForEntityEvent,
-} from '@umbraco-cms/backoffice/entity-action';
-import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
-import { UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
-import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
-import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
-import { UMB_TREE_PICKER_MODAL } from '@umbraco-cms/backoffice/tree';
 import type { MetaEntityBulkActionMoveToKind } from '@umbraco-cms/backoffice/extension-registry';
 
 export class UmbMoveToEntityBulkAction extends UmbEntityBulkActionBase<MetaEntityBulkActionMoveToKind> {
-	#searchConfig() {
-		const alias = this.args.meta.searchProviderAlias;
-		return alias ? { providerAlias: alias } : undefined;
-	}
-
 	async execute() {
-		if (this.selection?.length === 0) return;
+		await new UmbBulkMoveOrCopyController(this).run({
+			selection: this.selection,
+			pickerHeadline: '#actions_move',
+			pickerConfirmLabel: '#general_move',
+			progressHeadlineKey: 'actions_moveInProgress',
+			foldersOnly: this.args.meta.foldersOnly,
+			hideTreeRoot: this.args.meta.hideTreeRoot,
+			treeAlias: this.args.meta.treeAlias,
+			searchProviderAlias: this.args.meta.searchProviderAlias,
+			perform: async (destinationUnique) => {
+				const bulkMoveRepository = await createExtensionApiByAlias<UmbBulkMoveToRepository>(
+					this,
+					this.args.meta.bulkMoveRepositoryAlias,
+				);
+				if (!bulkMoveRepository) throw new Error('Bulk Move Repository is not available');
 
-		const value = await umbOpenModal(this, UMB_TREE_PICKER_MODAL, {
-			data: {
-				headline: '#actions_move',
-				confirmLabel: '#general_move',
-				foldersOnly: this.args.meta.foldersOnly,
-				hideTreeRoot: this.args.meta.hideTreeRoot,
-				treeAlias: this.args.meta.treeAlias,
-				search: this.#searchConfig(),
+				return bulkMoveRepository.requestBulkMoveTo({
+					uniques: this.selection,
+					destination: { unique: destinationUnique },
+				});
 			},
-		}).catch(() => undefined);
-
-		if (!value?.selection?.length) return;
-
-		const destinationUnique = value.selection[0];
-		if (destinationUnique === undefined) throw new Error('Destination Unique is not available');
-
-		const bulkMoveRepository = await createExtensionApiByAlias<UmbBulkMoveToRepository>(
-			this,
-			this.args.meta.bulkMoveRepositoryAlias,
-		);
-		if (!bulkMoveRepository) throw new Error('Bulk Move Repository is not available');
-
-		const localize = new UmbLocalizationController(this);
-		await new UmbEntityBulkActionProgressController(this).runIndeterminate({
-			headline: localize.term('actions_moveInProgress'),
-			operation: bulkMoveRepository.requestBulkMoveTo({
-				uniques: this.selection,
-				destination: { unique: destinationUnique },
-			}),
-			delayMs: 400,
 		});
-
-		const entityContext = await this.getContext(UMB_ENTITY_CONTEXT);
-		if (!entityContext) throw new Error('Entity Context is not available');
-
-		const entityType = entityContext.getEntityType();
-		const unique = entityContext.getUnique();
-
-		if (entityType && unique !== undefined) {
-			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
-			if (!eventContext) throw new Error('Event Context is not available');
-
-			const args = { entityType, unique };
-
-			const reloadChildren = new UmbRequestReloadChildrenOfEntityEvent(args);
-			eventContext.dispatchEvent(reloadChildren);
-
-			const reloadStructure = new UmbRequestReloadStructureForEntityEvent(args);
-			eventContext.dispatchEvent(reloadStructure);
-		}
 	}
 }
 

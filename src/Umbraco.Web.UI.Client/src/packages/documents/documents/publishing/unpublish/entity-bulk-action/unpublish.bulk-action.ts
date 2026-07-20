@@ -2,6 +2,7 @@ import { UmbDocumentUnpublishManifestEntityActionMeta } from '../entity-action/c
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../../constants.js';
 import type { UmbDocumentVariantOptionModel } from '../../../types.js';
 import { UmbDocumentPublishingRepository } from '../../repository/index.js';
+import { showBulkPublishingResultNotification } from '../../bulk-publishing-result-notification.js';
 import { UmbDocumentPublishEntityBulkAction } from '../../publish/entity-bulk-action/publish.bulk-action.js';
 import { UmbDocumentItemRepository } from '../../../item/repository/index.js';
 import { UMB_CONTENT_UNPUBLISH_MODAL, UmbContentUnpublishEntityAction } from '@umbraco-cms/backoffice/content';
@@ -137,28 +138,12 @@ export class UmbDocumentUnpublishEntityBulkAction extends UmbEntityBulkActionBas
 			process: (documentUnique) => repository.unpublish(documentUnique, variantIds),
 		});
 
-		const total = this.selection.length;
 		const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
-		const headline = localize.term('speechBubbles_contentUnpublished');
-
-		if (result.succeeded === total) {
-			const message =
-				variantIds.length > 1
-					? localize.term(
-							'speechBubbles_editMultiVariantUnpublishedText',
-							result.succeeded,
-							localize.list(variantIds.map((v) => v.culture ?? '')),
-						)
-					: localize.term('speechBubbles_editMultiContentUnpublishedText', result.succeeded);
-			notificationContext?.peek('positive', { data: { headline, message } });
-		} else {
-			notificationContext?.peek('warning', {
-				data: {
-					headline,
-					message: localize.term('speechBubbles_editMultiContentUnpublishedPartialText', result.succeeded, total),
-				},
-			});
-		}
+		showBulkPublishingResultNotification(notificationContext, localize, 'unpublish', {
+			succeeded: result.succeeded,
+			total: this.selection.length,
+			variantIds,
+		});
 
 		if (result.succeeded > 0) {
 			await this.#reloadChildren(entityType, unique);

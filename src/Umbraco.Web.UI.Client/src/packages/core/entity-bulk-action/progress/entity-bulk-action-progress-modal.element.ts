@@ -12,7 +12,7 @@ export class UmbEntityBulkActionProgressModalElement extends UmbModalBaseElement
 	UmbEntityBulkActionProgressModalValue
 > {
 	#onCancel() {
-		// Closing the dialog stops the operation; the initiator observes this rejection.
+		// Rejecting resolves the modal; the running operation observes this via modal.isResolved() and stops.
 		this._rejectModal();
 	}
 

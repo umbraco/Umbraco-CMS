@@ -1,4 +1,5 @@
 import { UmbDocumentPublishingRepository } from '../../index.js';
+import { showBulkPublishingResultNotification } from '../../bulk-publishing-result-notification.js';
 import { UmbDocumentVariantState } from '../../../variant-state.js';
 import type { UmbDocumentVariantOptionModel } from '../../../types.js';
 import type { UmbDocumentItemModel } from '../../../item/types.js';
@@ -229,28 +230,12 @@ export class UmbDocumentPublishEntityBulkAction extends UmbEntityBulkActionBase<
 			process: (documentUnique) => repository.publish(documentUnique, variants),
 		});
 
-		const total = this.selection.length;
 		const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
-		const headline = localize.term('speechBubbles_editContentPublishedHeader');
-
-		if (result.succeeded === total) {
-			const message =
-				variantIds.length > 1
-					? localize.term(
-							'speechBubbles_editMultiVariantPublishedText',
-							result.succeeded,
-							localize.list(variantIds.map((v) => v.culture ?? '')),
-						)
-					: localize.term('speechBubbles_editMultiContentPublishedText', result.succeeded);
-			notificationContext?.peek('positive', { data: { headline, message } });
-		} else {
-			notificationContext?.peek('warning', {
-				data: {
-					headline,
-					message: localize.term('speechBubbles_editMultiContentPublishedPartialText', result.succeeded, total),
-				},
-			});
-		}
+		showBulkPublishingResultNotification(notificationContext, localize, 'publish', {
+			succeeded: result.succeeded,
+			total: this.selection.length,
+			variantIds,
+		});
 
 		if (result.succeeded > 0) {
 			await this.#reloadChildren(entityType, unique);
