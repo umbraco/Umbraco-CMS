@@ -203,6 +203,7 @@ export class UiBaseLocators extends BasePage {
   public readonly createNewDocumentBlueprintBtn: Locator;
 
   // User
+  public readonly currentUserHeaderApp: Locator;
   public readonly currentUserAvatarBtn: Locator;
   public readonly currentUserModal: Locator;
   public readonly newPasswordTxt: Locator;
@@ -559,9 +560,8 @@ export class UiBaseLocators extends BasePage {
       .locator("umb-ref-item", { hasText: "Document Blueprint for" });
 
     // User
-    this.currentUserAvatarBtn = page
-      .getByTestId("header-app:Umb.HeaderApp.CurrentUser")
-      .locator("uui-avatar");
+    this.currentUserHeaderApp = page.getByTestId("header-app:Umb.HeaderApp.CurrentUser");
+    this.currentUserAvatarBtn = this.currentUserHeaderApp.locator("uui-avatar");
     this.currentUserModal = page.locator("umb-current-user-modal");
     this.currentPasswordTxt = page.locator('input[name="oldPassword"]');
     this.newPasswordTxt = page.locator('input[name="newPassword"]');
@@ -1768,21 +1768,18 @@ export class UiBaseLocators extends BasePage {
 
   // User Methods
   async clickCurrentUserAvatarButton() {
-    const editBtn = this.currentUserModal.getByLabel('Edit', {exact: true});
-    const changePasswordBtn = this.currentUserModal.getByLabel('Change your password');
-    // The action buttons load into an async extension slot. If the modal opens before the current-user context is
-    // ready it renders empty and never fills, so reopen (close + re-click the avatar) until the buttons appear.
+    // The current-user header app renders its loaded label ("User profile for ...") only once the current-user
+    // context has finished loading. Opening the modal before then leaves its async extension slot empty, so wait
+    // for the loaded state first (the default pre-load label is just "User profile").
+    await expect(this.currentUserHeaderApp.getByLabel(/^User profile for/))
+      .toBeVisible({timeout: ConstantHelper.timeout.pageLoad});
+    // Retry the open: the first click can land before the avatar is interactive, leaving the modal closed.
     await expect(async () => {
-      if (!(await editBtn.isVisible())) {
-        if (await this.currentUserModal.isVisible()) {
-          await this.page.keyboard.press('Escape');
-          await expect(this.currentUserModal).toBeHidden({timeout: ConstantHelper.timeout.short});
-        }
+      if (!(await this.currentUserModal.isVisible())) {
         await this.click(this.currentUserAvatarBtn);
       }
-      await expect(editBtn).toBeVisible({timeout: ConstantHelper.timeout.medium});
-      await expect(changePasswordBtn).toBeVisible({timeout: ConstantHelper.timeout.medium});
-    }).toPass({timeout: ConstantHelper.timeout.veryLong});
+      await expect(this.currentUserModal).toBeVisible({timeout: ConstantHelper.timeout.short});
+    }).toPass({timeout: ConstantHelper.timeout.medium});
   }
 
   // Collection Methods
