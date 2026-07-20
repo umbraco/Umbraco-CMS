@@ -40,7 +40,7 @@ describe('UmbEntityBulkActionProgressModalElement', () => {
 		});
 
 		it('renders a Cancel button', () => {
-			expect(element.shadowRoot!.querySelector('uui-button[slot="actions"]')).to.not.be.null;
+			expect(element.shadowRoot!.querySelectorAll('uui-button[slot="actions"]')).to.have.lengthOf(1);
 		});
 	});
 
@@ -60,11 +60,11 @@ describe('UmbEntityBulkActionProgressModalElement', () => {
 		});
 
 		it('does not render a counter', () => {
-			expect(element.shadowRoot!.querySelector('#progress')).to.be.null;
+			expect(element.shadowRoot!.querySelectorAll('#progress')).to.have.lengthOf(0);
 		});
 
 		it('does not render a Cancel button', () => {
-			expect(element.shadowRoot!.querySelector('uui-button[slot="actions"]')).to.be.null;
+			expect(element.shadowRoot!.querySelectorAll('uui-button[slot="actions"]')).to.have.lengthOf(0);
 		});
 	});
 });
