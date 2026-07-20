@@ -565,14 +565,35 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
     /// </remarks>
     private static HashSet<int> GetTransitiveDescendantIds(int contentTypeId, IContentTypeComposition[] allContentTypeCompositions)
     {
+        // build a "referenced id -> types that directly reference it" lookup once, so the traversal is O(n + d)
+        // rather than rescanning every content type for each descendant
+        var directReferencingTypes = new Dictionary<int, List<IContentTypeComposition>>();
+        foreach (IContentTypeComposition contentType in allContentTypeCompositions)
+        {
+            foreach (IContentTypeComposition referenced in contentType.ContentTypeComposition)
+            {
+                if (directReferencingTypes.TryGetValue(referenced.Id, out List<IContentTypeComposition>? referencingTypes) is false)
+                {
+                    referencingTypes = new List<IContentTypeComposition>();
+                    directReferencingTypes[referenced.Id] = referencingTypes;
+                }
+
+                referencingTypes.Add(contentType);
+            }
+        }
+
         var descendantIds = new HashSet<int>();
         var stack = new Stack<int>();
         stack.Push(contentTypeId);
         while (stack.Count > 0)
         {
             var currentId = stack.Pop();
-            foreach (IContentTypeComposition descendant in allContentTypeCompositions
-                         .Where(x => x.ContentTypeComposition.Any(y => y.Id == currentId)))
+            if (directReferencingTypes.TryGetValue(currentId, out List<IContentTypeComposition>? descendants) is false)
+            {
+                continue;
+            }
+
+            foreach (IContentTypeComposition descendant in descendants)
             {
                 if (descendantIds.Add(descendant.Id))
                 {

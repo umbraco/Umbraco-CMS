@@ -92,7 +92,8 @@ public interface IContentTypeBaseService<TItem> : IContentTypeBaseService, IServ
     /// <returns>A collection of content types that use the specified composition.</returns>
     /// <remarks>
     ///     To restrict the result to a single relationship kind use the
-    ///     <see cref="Umbraco.Extensions.ContentTypeServiceExtensions.GetComposedOf{TItem}" /> extension.
+    ///     <see cref="Umbraco.Extensions.ContentTypeServiceExtensions.GetComposedOf{TItem}(IContentTypeBaseService{TItem}, int, ComposedOfType)" />
+    ///     extension.
     /// </remarks>
     IEnumerable<TItem> GetComposedOf(int id); // composition axis
 

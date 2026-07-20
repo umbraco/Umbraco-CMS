@@ -223,6 +223,28 @@ public class ContentTypeServiceExtensionsTests
         Assert.AreEqual(0, availableTypes.Count());
     }
 
+    // Being inherited from does not free a type that is ALSO used as a true composition - the composition
+    // usage must still lock it.
+    [Test]
+    public void GetAvailableCompositeContentTypes_No_Results_If_Inherited_From_And_Used_As_A_Composition()
+    {
+        var ct1 = ContentTypeBuilder.CreateBasicContentType("ct1", "CT1");
+        ct1.Id = 1;
+        var ct2 = ContentTypeBuilder.CreateBasicContentType("ct2", "CT2", ct1); // ct2 inherits ct1
+        ct2.Id = 2;
+        var ct3 = ContentTypeBuilder.CreateBasicContentType("ct3", "CT3");
+        ct3.Id = 3;
+        ct3.AddContentType(ct1); // ct3 uses ct1 as a true composition
+
+        var service = new Mock<IContentTypeService>();
+
+        var availableTypes = service.Object.GetAvailableCompositeContentTypes(
+            ct1,
+            new[] { ct1, ct2, ct3 }).Results;
+
+        Assert.AreEqual(0, availableTypes.Count());
+    }
+
     [Test]
     public void GetAvailableCompositeContentTypes_Do_Not_Include_Other_Composed_Types()
     {
