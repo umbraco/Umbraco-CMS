@@ -136,7 +136,7 @@ internal sealed class ContentServiceVariantTests : UmbracoIntegrationTest
         await LanguageService.CreateAsync(new Language("en-GB", "English (UK)"), Constants.Security.SuperUserKey);
 
         IContent content = ContentService.Create("Test Item", Constants.System.Root, contentType);
-        content.SetCultureInfo("en-gb", "Test item", DateTime.Now);
+        content.SetCultureInfo("en-gb", "Test item", DateTime.UtcNow);
         content.SetValue("title", "Title", "en-gb");
         ContentService.Save(content);
 
