@@ -54450,6 +54450,11 @@
           "statusCode": {
             "type": "string"
           },
+          "httpStatusCode": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
           "isSuccessStatusCode": {
             "type": "boolean"
           },
