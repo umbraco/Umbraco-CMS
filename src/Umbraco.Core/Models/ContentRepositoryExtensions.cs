@@ -43,7 +43,7 @@ public static class ContentRepositoryExtensions
                 nameof(culture));
         }
 
-        content.CultureInfos?.AddOrUpdate(culture, name, date);
+        content.CultureInfos?.AddOrUpdate(culture.EnsureCultureCode()!, name, date);
     }
 
     /// <summary>
@@ -287,7 +287,7 @@ public static class ContentRepositoryExtensions
                 nameof(culture));
         }
 
-        content.PublishCultureInfos?.AddOrUpdate(culture, name, date);
+        content.PublishCultureInfos?.AddOrUpdate(culture.EnsureCultureCode()!, name, date);
     }
 
     /// <summary>
