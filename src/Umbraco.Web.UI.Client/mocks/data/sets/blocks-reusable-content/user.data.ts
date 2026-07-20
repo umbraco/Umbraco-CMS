@@ -11,7 +11,7 @@ export const data: Array<UmbMockUserModel> = [
 		isAdmin: true,
 		kind: UserKindModel.DEFAULT,
 		state: UserStateModel.ACTIVE,
-		languageIsoCode: 'en-us',
+		languageIsoCode: 'en-US',
 		avatarUrls: [],
 		createDate: '2024-01-15T10:00:00.000Z',
 		updateDate: '2024-01-15T10:00:00.000Z',
