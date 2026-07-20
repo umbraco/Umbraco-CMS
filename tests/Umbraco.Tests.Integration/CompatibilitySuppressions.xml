@@ -16,6 +16,13 @@
     <IsBaselineSuppression>true</IsBaselineSuppression>
   </Suppression>
   <Suppression>
+    <DiagnosticId>CP0001</DiagnosticId>
+    <Target>T:Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Services.TemporaryFileServiceTests</Target>
+    <Left>lib/net10.0/Umbraco.Tests.Integration.dll</Left>
+    <Right>lib/net10.0/Umbraco.Tests.Integration.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
     <DiagnosticId>CP0002</DiagnosticId>
     <Target>M:Umbraco.Cms.Tests.Integration.ManagementApi.Services.Trees.PartialViewTreeServiceTests.Can_Get_Ancestors_From_StyleSheet_Tree_Service</Target>
     <Left>lib/net10.0/Umbraco.Tests.Integration.dll</Left>
