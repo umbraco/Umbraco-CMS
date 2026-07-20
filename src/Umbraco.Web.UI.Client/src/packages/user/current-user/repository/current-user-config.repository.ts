@@ -5,7 +5,7 @@ import { UmbConfigRepositoryBase } from '@umbraco-cms/backoffice/repository';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbCurrentUserConfigRepository extends UmbConfigRepositoryBase<UmbCurrentUserConfigurationModel> {
-	#dataSource = new UmbCurrentUserConfigServerDataSource(this);
+	readonly #dataSource = new UmbCurrentUserConfigServerDataSource(this);
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_CURRENT_USER_CONFIG_STORE_CONTEXT);

@@ -11,7 +11,7 @@ import { type Observable, map } from '@umbraco-cms/backoffice/external/rxjs';
 const ADDITIONAL_DISPLAYABLE_IMAGE_FILE_TYPES = ['svg'];
 
 export class UmbTemporaryFileConfigRepository extends UmbConfigRepositoryBase<UmbTemporaryFileConfigurationModel> {
-	#dataSource = new UmbTemporaryFileConfigServerDataSource(this);
+	readonly #dataSource = new UmbTemporaryFileConfigServerDataSource(this);
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_TEMPORARY_FILE_CONFIG_STORE_CONTEXT, UMB_TEMPORARY_FILE_REPOSITORY_ALIAS.toString());

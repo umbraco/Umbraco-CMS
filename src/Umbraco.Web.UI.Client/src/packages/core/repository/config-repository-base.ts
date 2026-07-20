@@ -12,7 +12,7 @@ import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
  * until it is ready, so consumers can subscribe immediately without awaiting.
  */
 export abstract class UmbConfigRepositoryBase<ConfigModel> extends UmbRepositoryBase implements UmbApi {
-	#initialized: Promise<void>;
+	readonly #initialized: Promise<void>;
 	#dataStore?: UmbStoreObjectBase<ConfigModel>;
 
 	/**
