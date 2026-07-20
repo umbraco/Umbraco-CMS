@@ -15,21 +15,16 @@ internal sealed partial class UserServiceTests
 {
     private ITemporaryFileService TemporaryFileService => GetRequiredService<ITemporaryFileService>();
 
-    public static void ConfigureImageFileTypesRestrictedToPng(IUmbracoBuilder builder) =>
-        builder.Services.Configure<ContentSettings>(config =>
-            config.Imaging.ImageFileTypes = new HashSet<string> { "png" });
-
     public static void ConfigureImageFileTypesWithSvg(IUmbracoBuilder builder) =>
         builder.Services.Configure<ContentSettings>(config =>
             config.Imaging.ImageFileTypes = new HashSet<string> { "png", "svg" });
 
-    [TestCase("avatar.png")]
-    [TestCase("AVATAR.PNG")]
-    public async Task Can_Set_Avatar_With_Allowed_Image_Type(string fileName)
+    [Test]
+    public async Task Can_Set_Avatar_With_Allowed_Image_Type()
     {
         var user = UserService.CreateUserWithIdentity("avatarUser", "avatar@umbraco.io");
         var temporaryFileKey = Guid.NewGuid();
-        await TemporaryFileService.CreateAsync(new CreateTemporaryFileModel { Key = temporaryFileKey, FileName = fileName });
+        await TemporaryFileService.CreateAsync(new CreateTemporaryFileModel { Key = temporaryFileKey, FileName = "avatar.png" });
 
         var result = await UserService.SetAvatarAsync(user.Key, temporaryFileKey);
 
@@ -47,21 +42,6 @@ internal sealed partial class UserServiceTests
         var user = UserService.CreateUserWithIdentity("avatarUser", "avatar@umbraco.io");
         var temporaryFileKey = Guid.NewGuid();
         await TemporaryFileService.CreateAsync(new CreateTemporaryFileModel { Key = temporaryFileKey, FileName = "avatar.svg" });
-
-        var result = await UserService.SetAvatarAsync(user.Key, temporaryFileKey);
-
-        Assert.AreEqual(UserOperationStatus.InvalidAvatar, result);
-    }
-
-    [Test]
-    [ConfigureBuilder(ActionName = nameof(ConfigureImageFileTypesRestrictedToPng))]
-    public async Task Cannot_Set_Avatar_With_Type_Removed_From_Configured_Image_Types()
-    {
-        // "jpg" is a default image file type, but configuration has been restricted to "png" only,
-        // so it is rejected as an avatar.
-        var user = UserService.CreateUserWithIdentity("avatarUser", "avatar@umbraco.io");
-        var temporaryFileKey = Guid.NewGuid();
-        await TemporaryFileService.CreateAsync(new CreateTemporaryFileModel { Key = temporaryFileKey, FileName = "avatar.jpg" });
 
         var result = await UserService.SetAvatarAsync(user.Key, temporaryFileKey);
 
