@@ -1768,18 +1768,16 @@ export class UiBaseLocators extends BasePage {
 
   // User Methods
   async clickCurrentUserAvatarButton() {
-    // The current-user header app renders its loaded label ("User profile for ...") only once the current-user
-    // context has finished loading. Opening the modal before then leaves its async extension slot empty, so wait
-    // for the loaded state first (the default pre-load label is just "User profile").
+    // Wait for the current-user context to load, otherwise the modal opens with an empty extension slot.
     await expect(this.currentUserHeaderApp.getByLabel(/^User profile for/))
       .toBeVisible({timeout: ConstantHelper.timeout.pageLoad});
-    // Retry the open: the first click can land before the avatar is interactive, leaving the modal closed.
-    await expect(async () => {
-      if (!(await this.currentUserModal.isVisible())) {
-        await this.click(this.currentUserAvatarBtn);
-      }
-      await expect(this.currentUserModal).toBeVisible({timeout: ConstantHelper.timeout.short});
-    }).toPass({timeout: ConstantHelper.timeout.medium});
+    await this.click(this.currentUserAvatarBtn);
+    await expect(this.currentUserModal).toBeVisible({timeout: ConstantHelper.timeout.long});
+    // Wait for the action buttons to finish mounting so a later click isn't lost mid-render.
+    await expect(this.currentUserModal.getByLabel('Edit', {exact: true}))
+      .toBeVisible({timeout: ConstantHelper.timeout.long});
+    await expect(this.currentUserModal.getByLabel('Change your password'))
+      .toBeVisible({timeout: ConstantHelper.timeout.long});
   }
 
   // Collection Methods
