@@ -1,4 +1,5 @@
 import { UmbDocumentPublishingRepository } from '../../index.js';
+import { UmbDocumentBulkPublishingProgressController } from '../../bulk-publishing-progress-modal/index.js';
 import { UmbDocumentVariantState } from '../../../variant-state.js';
 import type { UmbDocumentVariantOptionModel } from '../../../types.js';
 import type { UmbDocumentItemModel } from '../../../item/types.js';
@@ -180,17 +181,7 @@ export class UmbDocumentPublishEntityBulkAction extends UmbEntityBulkActionBase<
 					? UmbVariantId.CreateInvariant()
 					: new UmbVariantId(options[0].language.unique, null);
 
-				const documentCnt = await this.#publishDocuments(this.selection, [{ variantId }]);
-
-				const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
-				notificationContext?.peek('positive', {
-					data: {
-						headline: localize.term('speechBubbles_editContentPublishedHeader'),
-						message: localize.term('speechBubbles_editMultiContentPublishedText', documentCnt),
-					},
-				});
-
-				await this.#reloadChildren(entityType, unique);
+				await this.#bulkPublish([{ variantId }], [variantId], entityType, unique, localize);
 			}
 			return;
 		}
@@ -210,35 +201,58 @@ export class UmbDocumentPublishEntityBulkAction extends UmbEntityBulkActionBase<
 		const variantIds = result?.selection.map((x) => UmbVariantId.FromString(x)) ?? [];
 
 		if (variantIds.length) {
-			const documentCnt = await this.#publishDocuments(
-				this.selection,
+			await this.#bulkPublish(
 				variantIds.map((variantId) => ({ variantId })),
+				variantIds,
+				entityType,
+				unique,
+				localize,
 			);
-
-			const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
-			notificationContext?.peek('positive', {
-				data: {
-					headline: localize.term('speechBubbles_editContentPublishedHeader'),
-					message: localize.term(
-						'speechBubbles_editMultiVariantPublishedText',
-						documentCnt,
-						localize.list(variantIds.map((v) => v.culture ?? '')),
-					),
-				},
-			});
-
-			await this.#reloadChildren(entityType, unique);
 		}
 	}
 
-	async #publishDocuments(uniques: Array<string>, variants: Array<{ variantId: UmbVariantId }>): Promise<number> {
+	// Publishes the selection sequentially in a progress dialog, then reports the outcome and reloads.
+	async #bulkPublish(
+		variants: Array<{ variantId: UmbVariantId }>,
+		variantIds: Array<UmbVariantId>,
+		entityType: string,
+		unique: string | null,
+		localize: UmbLocalizationController,
+	): Promise<void> {
 		const repository = new UmbDocumentPublishingRepository(this._host);
-		let successCount = 0;
-		for (const unique of uniques) {
-			const { error } = await repository.publish(unique, variants);
-			if (!error) successCount++;
+
+		const result = await new UmbDocumentBulkPublishingProgressController(this).run({
+			headline: localize.term('publish_inProgress'),
+			uniques: this.selection,
+			process: (documentUnique) => repository.publish(documentUnique, variants),
+		});
+
+		const total = this.selection.length;
+		const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
+		const headline = localize.term('speechBubbles_editContentPublishedHeader');
+
+		if (result.succeeded === total) {
+			const message =
+				variantIds.length > 1
+					? localize.term(
+							'speechBubbles_editMultiVariantPublishedText',
+							result.succeeded,
+							localize.list(variantIds.map((v) => v.culture ?? '')),
+						)
+					: localize.term('speechBubbles_editMultiContentPublishedText', result.succeeded);
+			notificationContext?.peek('positive', { data: { headline, message } });
+		} else {
+			notificationContext?.peek('warning', {
+				data: {
+					headline,
+					message: localize.term('speechBubbles_editMultiContentPublishedPartialText', result.succeeded, total),
+				},
+			});
 		}
-		return successCount;
+
+		if (result.succeeded > 0) {
+			await this.#reloadChildren(entityType, unique);
+		}
 	}
 
 	async #reloadChildren(entityType: string, unique: string | null): Promise<void> {

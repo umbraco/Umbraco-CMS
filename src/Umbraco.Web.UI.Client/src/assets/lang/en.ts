@@ -1348,6 +1348,9 @@ export default {
 		contentPublishedFailedReqCultureValidationError:
 			"Validation failed for required language '%0%'. This language was saved but not published.",
 	},
+	unpublish: {
+		inProgress: 'Unpublishing in progress - please wait...',
+	},
 	colorpicker: {
 		noColors: 'You have not configured any approved colours',
 	},
@@ -1622,9 +1625,9 @@ export default {
 		cannotCopyInformation: 'Could not copy your system information to the clipboard',
 		webhookSaved: 'Webhook saved',
 		editMultiContentPublishedText: '%0% documents published and are visible on the website',
-		editMultiContentPublishedPartialText: '%0% of %1% documents published. %2% failed.',
+		editMultiContentPublishedPartialText: '%0% of %1% documents published.',
 		editMultiContentUnpublishedText: '%0% documents unpublished and are no longer visible on the website',
-		editMultiContentUnpublishedPartialText: '%0% of %1% documents unpublished. %2% failed.',
+		editMultiContentUnpublishedPartialText: '%0% of %1% documents unpublished.',
 		editVariantUnpublishedText: '%0% unpublished and is no longer visible on the website',
 		editMultiVariantPublishedText: '%0% documents published for languages %1% and are visible on the website',
 		editMultiVariantUnpublishedText:

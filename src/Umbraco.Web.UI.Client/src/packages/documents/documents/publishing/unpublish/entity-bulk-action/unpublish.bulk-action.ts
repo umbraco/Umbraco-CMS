@@ -2,6 +2,7 @@ import { UmbDocumentUnpublishManifestEntityActionMeta } from '../entity-action/c
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../../constants.js';
 import type { UmbDocumentVariantOptionModel } from '../../../types.js';
 import { UmbDocumentPublishingRepository } from '../../repository/index.js';
+import { UmbDocumentBulkPublishingProgressController } from '../../bulk-publishing-progress-modal/index.js';
 import { UmbDocumentPublishEntityBulkAction } from '../../publish/entity-bulk-action/publish.bulk-action.js';
 import { UmbDocumentItemRepository } from '../../../item/repository/index.js';
 import { UMB_CONTENT_UNPUBLISH_MODAL, UmbContentUnpublishEntityAction } from '@umbraco-cms/backoffice/content';
@@ -89,18 +90,7 @@ export class UmbDocumentUnpublishEntityBulkAction extends UmbEntityBulkActionBas
 			? UmbVariantId.CreateInvariant()
 			: new UmbVariantId(options[0].language.unique, null);
 
-		const documentCnt = await this.#unpublishDocuments(this.selection, [variantId]);
-
-		const localize = new UmbLocalizationController(this);
-		const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
-		notificationContext?.peek('positive', {
-			data: {
-				headline: localize.term('speechBubbles_contentUnpublished'),
-				message: localize.term('speechBubbles_editMultiContentUnpublishedText', documentCnt),
-			},
-		});
-
-		await this.#reloadChildren(entityType, unique);
+		await this.#bulkUnpublish([variantId], entityType, unique);
 	}
 
 	async #unpublishSelectedVariants(
@@ -122,22 +112,7 @@ export class UmbDocumentUnpublishEntityBulkAction extends UmbEntityBulkActionBas
 		const variantIds = result?.selection.map((x) => UmbVariantId.FromString(x)) ?? [];
 		if (!variantIds.length) return;
 
-		const documentCnt = await this.#unpublishDocuments(this.selection, variantIds);
-
-		const localize = new UmbLocalizationController(this);
-		const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
-		notificationContext?.peek('positive', {
-			data: {
-				headline: localize.term('speechBubbles_contentUnpublished'),
-				message: localize.term(
-					'speechBubbles_editMultiVariantUnpublishedText',
-					documentCnt,
-					localize.list(variantIds.map((v) => v.culture ?? '')),
-				),
-			},
-		});
-
-		await this.#reloadChildren(entityType, unique);
+		await this.#bulkUnpublish(variantIds, entityType, unique);
 	}
 
 	static #renderDocumentCountLabel(option: UmbEntityVariantOptionModel) {
@@ -149,14 +124,43 @@ export class UmbDocumentUnpublishEntityBulkAction extends UmbEntityBulkActionBas
 			: nothing;
 	}
 
-	async #unpublishDocuments(uniques: Array<string>, variantIds: Array<UmbVariantId>): Promise<number> {
+	// Unpublishes the selection sequentially in a progress dialog, then reports the outcome and reloads.
+	async #bulkUnpublish(variantIds: Array<UmbVariantId>, entityType: string, unique: string | null): Promise<void> {
 		const repository = new UmbDocumentPublishingRepository(this._host);
-		let successCount = 0;
-		for (const unique of uniques) {
-			const { error } = await repository.unpublish(unique, variantIds);
-			if (!error) successCount++;
+		const localize = new UmbLocalizationController(this);
+
+		const result = await new UmbDocumentBulkPublishingProgressController(this).run({
+			headline: localize.term('unpublish_inProgress'),
+			uniques: this.selection,
+			process: (documentUnique) => repository.unpublish(documentUnique, variantIds),
+		});
+
+		const total = this.selection.length;
+		const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
+		const headline = localize.term('speechBubbles_contentUnpublished');
+
+		if (result.succeeded === total) {
+			const message =
+				variantIds.length > 1
+					? localize.term(
+							'speechBubbles_editMultiVariantUnpublishedText',
+							result.succeeded,
+							localize.list(variantIds.map((v) => v.culture ?? '')),
+						)
+					: localize.term('speechBubbles_editMultiContentUnpublishedText', result.succeeded);
+			notificationContext?.peek('positive', { data: { headline, message } });
+		} else {
+			notificationContext?.peek('warning', {
+				data: {
+					headline,
+					message: localize.term('speechBubbles_editMultiContentUnpublishedPartialText', result.succeeded, total),
+				},
+			});
 		}
-		return successCount;
+
+		if (result.succeeded > 0) {
+			await this.#reloadChildren(entityType, unique);
+		}
 	}
 
 	async #reloadChildren(entityType: string, unique: string | null): Promise<void> {
