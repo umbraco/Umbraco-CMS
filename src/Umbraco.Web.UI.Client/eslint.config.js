@@ -2,7 +2,7 @@
 
 import js from '@eslint/js';
 import globals from 'globals';
-import importPlugin from 'eslint-plugin-import';
+import importPlugin from 'eslint-plugin-import-x';
 import localRules from 'eslint-plugin-local-rules';
 import storybook from 'eslint-plugin-storybook';
 import wcPlugin from 'eslint-plugin-wc';
@@ -48,11 +48,11 @@ export default [
 			semi: ['warn', 'always'],
 			'prettier/prettier': ['warn', { endOfLine: 'auto' }],
 			'no-var': 'error',
-			'import/namespace': 'off',
-			'import/no-unresolved': 'off',
-			'import/order': ['warn', { groups: ['builtin', 'parent', 'sibling', 'index', 'external'] }],
-			'import/no-self-import': 'error',
-			'import/no-cycle': ['error', { maxDepth: 6, allowUnsafeDynamicCyclicDependency: true }],
+			'import-x/namespace': 'off',
+			'import-x/no-unresolved': 'off',
+			'import-x/order': ['warn', { groups: ['builtin', 'parent', 'sibling', 'index', 'external'] }],
+			'import-x/no-self-import': 'error',
+			'import-x/no-cycle': ['error', { maxDepth: 6, allowUnsafeDynamicCyclicDependency: true }],
 			'local-rules/enforce-manifest-alias': 'warn',
 			'local-rules/prefer-static-styles-last': 'warn',
 			'local-rules/no-unsafe-localize': 'error',

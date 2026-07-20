@@ -5,8 +5,8 @@
  * @author Umbraco HQ
  */
 
-import madge from 'madge';
 import { join } from 'path';
+import madge from 'madge';
 //import { mkdirSync } from 'fs';
 
 //const __dirname = import.meta.dirname;
