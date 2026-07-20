@@ -32,39 +32,30 @@ export function showBulkPublishingResultNotification(
 	args: UmbBulkPublishingResultArgs,
 ): void {
 	const { succeeded, total, variantIds } = args;
+	const isPublish = type === 'publish';
+
 	const headline = localize.term(
-		type === 'publish' ? 'speechBubbles_editContentPublishedHeader' : 'speechBubbles_contentUnpublished',
+		isPublish ? 'speechBubbles_editContentPublishedHeader' : 'speechBubbles_contentUnpublished',
 	);
 
 	if (succeeded === total) {
+		const variantMessageKey = isPublish
+			? 'speechBubbles_editMultiVariantPublishedText'
+			: 'speechBubbles_editMultiVariantUnpublishedText';
+		const contentMessageKey = isPublish
+			? 'speechBubbles_editMultiContentPublishedText'
+			: 'speechBubbles_editMultiContentUnpublishedText';
 		const message =
 			variantIds.length > 1
-				? localize.term(
-						type === 'publish'
-							? 'speechBubbles_editMultiVariantPublishedText'
-							: 'speechBubbles_editMultiVariantUnpublishedText',
-						succeeded,
-						localize.list(variantIds.map((v) => v.culture ?? '')),
-					)
-				: localize.term(
-						type === 'publish'
-							? 'speechBubbles_editMultiContentPublishedText'
-							: 'speechBubbles_editMultiContentUnpublishedText',
-						succeeded,
-					);
+				? localize.term(variantMessageKey, succeeded, localize.list(variantIds.map((v) => v.culture ?? '')))
+				: localize.term(contentMessageKey, succeeded);
 		notificationContext?.peek('positive', { data: { headline, message } });
 	} else {
+		const partialMessageKey = isPublish
+			? 'speechBubbles_editMultiContentPublishedPartialText'
+			: 'speechBubbles_editMultiContentUnpublishedPartialText';
 		notificationContext?.peek('warning', {
-			data: {
-				headline,
-				message: localize.term(
-					type === 'publish'
-						? 'speechBubbles_editMultiContentPublishedPartialText'
-						: 'speechBubbles_editMultiContentUnpublishedPartialText',
-					succeeded,
-					total,
-				),
-			},
+			data: { headline, message: localize.term(partialMessageKey, succeeded, total) },
 		});
 	}
 }

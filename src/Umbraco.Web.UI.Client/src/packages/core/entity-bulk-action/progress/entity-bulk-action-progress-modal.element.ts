@@ -43,7 +43,7 @@ export class UmbEntityBulkActionProgressModalElement extends UmbModalBaseElement
 		`;
 	}
 
-	static override styles = [
+	static override readonly styles = [
 		UmbTextStyles,
 		css`
 			#progress {

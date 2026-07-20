@@ -29,18 +29,18 @@ describe('UmbEntityBulkActionProgressModalElement', () => {
 
 		it('renders a determinate progress bar reflecting the completed count', () => {
 			const bar = element.shadowRoot!.querySelector('uui-loader-bar');
-			expect(bar).to.exist;
+			expect(bar).to.not.equal(null);
 			expect((bar as any).progress).to.equal(40); // 2 / 5
 		});
 
 		it('renders the "X / Y" counter text', () => {
 			const counter = element.shadowRoot!.querySelector('#progress span');
-			expect(counter).to.exist;
+			expect(counter).to.not.equal(null);
 			expect(counter!.textContent!.replace(/\s+/g, ' ').trim()).to.equal('2 / 5');
 		});
 
 		it('renders a Cancel button', () => {
-			expect(element.shadowRoot!.querySelector('uui-button[slot="actions"]')).to.exist;
+			expect(element.shadowRoot!.querySelector('uui-button[slot="actions"]')).to.not.equal(null);
 		});
 	});
 
@@ -55,16 +55,16 @@ describe('UmbEntityBulkActionProgressModalElement', () => {
 
 		it('renders a looped (indeterminate) progress bar', () => {
 			const bar = element.shadowRoot!.querySelector('uui-loader-bar');
-			expect(bar).to.exist;
+			expect(bar).to.not.equal(null);
 			expect((bar as any).progress).to.equal(0); // 0 => looped animation
 		});
 
 		it('does not render a counter', () => {
-			expect(element.shadowRoot!.querySelector('#progress')).to.not.exist;
+			expect(element.shadowRoot!.querySelector('#progress')).to.equal(null);
 		});
 
 		it('does not render a Cancel button', () => {
-			expect(element.shadowRoot!.querySelector('uui-button[slot="actions"]')).to.not.exist;
+			expect(element.shadowRoot!.querySelector('uui-button[slot="actions"]')).to.equal(null);
 		});
 	});
 });
