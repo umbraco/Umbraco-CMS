@@ -1082,7 +1082,7 @@ export class LibraryUiHelper extends UiBaseLocators {
   async clickEmptyRecycleBinButton() {
     // Use the workspace's plain <button> (the hover tree entity-action doesn't open the confirm dialog).
     // The click can land before its handler is wired, leaving the dialog closed; retry the open until it appears.
-    const emptyRecycleBinBtn = this.page.locator('button', {hasText: 'Empty recycle bin'}).first();
+    const emptyRecycleBinBtn = this.page.locator('button', {hasText: 'Empty recycle bin'});
     await expect(async () => {
       if (!(await this.confirmEmptyRecycleBinBtn.isVisible())) {
         await this.click(emptyRecycleBinBtn, {force: true});
