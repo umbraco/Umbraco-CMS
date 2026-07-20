@@ -1,9 +1,12 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Preview;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
@@ -15,39 +18,77 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Services;
 [TestFixture]
 public class PreviewServiceTests
 {
+    private const string Token = "token";
+
     [Test]
-    public async Task TryEnterPreviewAsync_Sets_Expected_Cookie_On_Successful_Token_Generation()
+    public async Task TryEnterPreviewAsync_Sets_Secure_SameSiteNone_Cookie_On_Https_Request()
+    {
+        var cookieManagerMock = new Mock<ICookieManager>();
+        var previewService = CreatePreviewService(cookieManagerMock, out var user, useHttps: false, requestUrl: "https://localhost/umbraco");
+
+        var result = await previewService.TryEnterPreviewAsync(user);
+
+        VerifyCookie(cookieManagerMock, secure: true, sameSiteMode: SameSiteMode.None);
+        Assert.IsTrue(result);
+    }
+
+    [Test]
+    public async Task TryEnterPreviewAsync_Sets_NonSecure_SameSiteLax_Cookie_On_Http_Request()
+    {
+        var cookieManagerMock = new Mock<ICookieManager>();
+        var previewService = CreatePreviewService(cookieManagerMock, out var user, useHttps: false, requestUrl: "http://192.168.0.10:30645/umbraco");
+
+        var result = await previewService.TryEnterPreviewAsync(user);
+
+        VerifyCookie(cookieManagerMock, secure: false, sameSiteMode: SameSiteMode.Lax);
+        Assert.IsTrue(result);
+    }
+
+    [Test]
+    public async Task TryEnterPreviewAsync_Sets_Secure_SameSiteNone_Cookie_When_UseHttps_Is_Configured()
+    {
+        var cookieManagerMock = new Mock<ICookieManager>();
+        var previewService = CreatePreviewService(cookieManagerMock, out var user, useHttps: true, requestUrl: "http://localhost/umbraco");
+
+        var result = await previewService.TryEnterPreviewAsync(user);
+
+        VerifyCookie(cookieManagerMock, secure: true, sameSiteMode: SameSiteMode.None);
+        Assert.IsTrue(result);
+    }
+
+    private static PreviewService CreatePreviewService(Mock<ICookieManager> cookieManagerMock, out IUser user, bool useHttps, string requestUrl)
     {
         var userKey = Guid.NewGuid();
-        const string Token = "token";
-
-        var cookieManagerMock = new Mock<ICookieManager>();
 
         var previewTokenGeneratorMock = new Mock<IPreviewTokenGenerator>();
         previewTokenGeneratorMock
             .Setup(x => x.GenerateTokenAsync(It.Is<Guid>(y => y == userKey)))
             .ReturnsAsync(Attempt<string?>.Succeed(Token));
 
-        var previewService = new PreviewService(
-            cookieManagerMock.Object,
-            previewTokenGeneratorMock.Object,
-            Mock.Of<IServiceScopeFactory>(),
-            Mock.Of<IRequestCache>());
+        var requestAccessorMock = new Mock<IRequestAccessor>();
+        requestAccessorMock
+            .Setup(x => x.GetRequestUrl())
+            .Returns(new Uri(requestUrl));
 
-        var user = new UserBuilder()
+        user = new UserBuilder()
             .WithKey(userKey)
             .Build();
 
-        var result = await previewService.TryEnterPreviewAsync(user);
+        return new PreviewService(
+            cookieManagerMock.Object,
+            previewTokenGeneratorMock.Object,
+            Mock.Of<IServiceScopeFactory>(),
+            Mock.Of<IRequestCache>(),
+            Options.Create(new GlobalSettings { UseHttps = useHttps }),
+            requestAccessorMock.Object);
+    }
 
-        cookieManagerMock
+    private static void VerifyCookie(Mock<ICookieManager> cookieManagerMock, bool secure, SameSiteMode sameSiteMode)
+        => cookieManagerMock
             .Verify(x => x.SetCookieValue(
                 It.Is<string>(y => y == Constants.Web.PreviewCookieName),
                 It.Is<string>(y => y == Token),
                 It.Is<bool>(y => y == true),
-                It.Is<bool>(y => y == true),
-                It.Is<string>(y => y == SameSiteMode.None.ToString())));
-
-        Assert.IsTrue(result);
-    }
+                It.Is<bool>(y => y == secure),
+                It.Is<string>(y => y == sameSiteMode.ToString())));
 }
