@@ -22,6 +22,7 @@ public class ContentTypeCacheRefresherTests
 {
     private Mock<IDocumentCacheService> _documentCacheService = null!;
     private Mock<IMediaCacheService> _mediaCacheService = null!;
+    private Mock<IElementCacheService> _elementCacheService = null!;
 
     private ContentTypeCacheRefresher CreateRefresher(IPublishedModelFactory publishedModelFactory)
     {
@@ -50,7 +51,8 @@ public class ContentTypeCacheRefresherTests
             publishedContentTypeFactory.Object,
             _documentCacheService.Object,
             publishedContentTypeCache.Object,
-            _mediaCacheService.Object);
+            _mediaCacheService.Object,
+            _elementCacheService.Object);
     }
 
     [SetUp]
@@ -58,6 +60,7 @@ public class ContentTypeCacheRefresherTests
     {
         _documentCacheService = new Mock<IDocumentCacheService>(MockBehavior.Strict);
         _mediaCacheService = new Mock<IMediaCacheService>(MockBehavior.Strict);
+        _elementCacheService = new Mock<IElementCacheService>(MockBehavior.Strict);
     }
 
     [Test]
@@ -73,15 +76,24 @@ public class ContentTypeCacheRefresherTests
         _documentCacheService
             .Setup(x => x.RebuildMemoryCacheByContentTypeAsync(It.Is<int[]>(ids => ids.Length == 1 && ids[0] == 100)))
             .Returns(Task.CompletedTask);
+        _elementCacheService
+            .Setup(x => x.RebuildMemoryCacheByContentTypeAsync(It.Is<int[]>(ids => ids.Length == 1 && ids[0] == 100)))
+            .Returns(Task.CompletedTask);
 
         // Act
         refresher.Refresh(payloads);
 
-        // Assert
+        // Assert — Document and Element share the IContentType payload, so both caches rebuild.
         _documentCacheService.Verify(
             x => x.RebuildMemoryCacheByContentTypeAsync(It.Is<int[]>(ids => ids.Length == 1 && ids[0] == 100)),
             Times.Once);
         _documentCacheService.Verify(
+            x => x.ClearConvertedContentCache(),
+            Times.Never);
+        _elementCacheService.Verify(
+            x => x.RebuildMemoryCacheByContentTypeAsync(It.Is<int[]>(ids => ids.Length == 1 && ids[0] == 100)),
+            Times.Once);
+        _elementCacheService.Verify(
             x => x.ClearConvertedContentCache(),
             Times.Never);
     }
@@ -124,11 +136,13 @@ public class ContentTypeCacheRefresherTests
 
         _documentCacheService
             .Setup(x => x.ClearConvertedContentCache(It.Is<IReadOnlyCollection<int>>(ids => ids.Count == 1 && ids.Contains(100))));
+        _elementCacheService
+            .Setup(x => x.ClearConvertedContentCache(It.Is<IReadOnlyCollection<int>>(ids => ids.Count == 1 && ids.Contains(100))));
 
         // Act
         refresher.Refresh(payloads);
 
-        // Assert — selective clear called, full clear NOT called.
+        // Assert — selective clear called, full clear NOT called, for both Document and Element.
         _documentCacheService.Verify(
             x => x.ClearConvertedContentCache(It.Is<IReadOnlyCollection<int>>(ids => ids.Count == 1 && ids.Contains(100))),
             Times.Once);
@@ -136,6 +150,15 @@ public class ContentTypeCacheRefresherTests
             x => x.ClearConvertedContentCache(),
             Times.Never);
         _documentCacheService.Verify(
+            x => x.RebuildMemoryCacheByContentTypeAsync(It.IsAny<IEnumerable<int>>()),
+            Times.Never);
+        _elementCacheService.Verify(
+            x => x.ClearConvertedContentCache(It.Is<IReadOnlyCollection<int>>(ids => ids.Count == 1 && ids.Contains(100))),
+            Times.Once);
+        _elementCacheService.Verify(
+            x => x.ClearConvertedContentCache(),
+            Times.Never);
+        _elementCacheService.Verify(
             x => x.RebuildMemoryCacheByContentTypeAsync(It.IsAny<IEnumerable<int>>()),
             Times.Never);
     }
@@ -181,11 +204,13 @@ public class ContentTypeCacheRefresherTests
 
         _documentCacheService
             .Setup(x => x.ClearConvertedContentCache(It.Is<IReadOnlyCollection<int>>(ids => ids.Count == 1 && ids.Contains(100))));
+        _elementCacheService
+            .Setup(x => x.ClearConvertedContentCache(It.Is<IReadOnlyCollection<int>>(ids => ids.Count == 1 && ids.Contains(100))));
 
         // Act
         refresher.Refresh(payloads);
 
-        // Assert — selective converted-cache clear, no memory rebuild, no full clear.
+        // Assert — selective converted-cache clear, no memory rebuild, no full clear, for both Document and Element.
         _documentCacheService.Verify(
             x => x.ClearConvertedContentCache(It.Is<IReadOnlyCollection<int>>(ids => ids.Count == 1 && ids.Contains(100))),
             Times.Once);
@@ -193,6 +218,15 @@ public class ContentTypeCacheRefresherTests
             x => x.RebuildMemoryCacheByContentTypeAsync(It.IsAny<IEnumerable<int>>()),
             Times.Never);
         _documentCacheService.Verify(
+            x => x.ClearConvertedContentCache(),
+            Times.Never);
+        _elementCacheService.Verify(
+            x => x.ClearConvertedContentCache(It.Is<IReadOnlyCollection<int>>(ids => ids.Count == 1 && ids.Contains(100))),
+            Times.Once);
+        _elementCacheService.Verify(
+            x => x.RebuildMemoryCacheByContentTypeAsync(It.IsAny<IEnumerable<int>>()),
+            Times.Never);
+        _elementCacheService.Verify(
             x => x.ClearConvertedContentCache(),
             Times.Never);
     }
@@ -211,11 +245,14 @@ public class ContentTypeCacheRefresherTests
         _documentCacheService
             .Setup(x => x.RebuildMemoryCacheByContentTypeAsync(It.Is<int[]>(ids => ids.Length == 1 && ids[0] == 100)))
             .Returns(Task.CompletedTask);
+        _elementCacheService
+            .Setup(x => x.RebuildMemoryCacheByContentTypeAsync(It.Is<int[]>(ids => ids.Length == 1 && ids[0] == 100)))
+            .Returns(Task.CompletedTask);
 
         // Act
         refresher.Refresh(payloads);
 
-        // Assert — should rebuild, not clear.
+        // Assert — should rebuild, not clear, for both Document and Element.
         _documentCacheService.Verify(
             x => x.RebuildMemoryCacheByContentTypeAsync(It.Is<int[]>(ids => ids.Length == 1 && ids[0] == 100)),
             Times.Once);
@@ -223,6 +260,15 @@ public class ContentTypeCacheRefresherTests
             x => x.ClearConvertedContentCache(),
             Times.Never);
         _documentCacheService.Verify(
+            x => x.ClearConvertedContentCache(It.IsAny<IReadOnlyCollection<int>>()),
+            Times.Never);
+        _elementCacheService.Verify(
+            x => x.RebuildMemoryCacheByContentTypeAsync(It.Is<int[]>(ids => ids.Length == 1 && ids[0] == 100)),
+            Times.Once);
+        _elementCacheService.Verify(
+            x => x.ClearConvertedContentCache(),
+            Times.Never);
+        _elementCacheService.Verify(
             x => x.ClearConvertedContentCache(It.IsAny<IReadOnlyCollection<int>>()),
             Times.Never);
     }
@@ -245,6 +291,11 @@ public class ContentTypeCacheRefresherTests
             .Returns(Task.CompletedTask);
         _documentCacheService
             .Setup(x => x.ClearConvertedContentCache(It.Is<IReadOnlyCollection<int>>(ids => ids.Count == 1 && ids.Contains(101))));
+        _elementCacheService
+            .Setup(x => x.RebuildMemoryCacheByContentTypeAsync(It.Is<int[]>(ids => ids.Length == 1 && ids[0] == 100)))
+            .Returns(Task.CompletedTask);
+        _elementCacheService
+            .Setup(x => x.ClearConvertedContentCache(It.Is<IReadOnlyCollection<int>>(ids => ids.Count == 1 && ids.Contains(101))));
 
         _mediaCacheService
             .Setup(x => x.RebuildMemoryCacheByContentTypeAsync(It.Is<int[]>(ids => ids.Length == 1 && ids[0] == 200)))
@@ -259,6 +310,9 @@ public class ContentTypeCacheRefresherTests
         _documentCacheService.Verify(
             x => x.RebuildMemoryCacheByContentTypeAsync(It.Is<int[]>(ids => ids.Length == 1 && ids[0] == 100)),
             Times.Once);
+        _elementCacheService.Verify(
+            x => x.RebuildMemoryCacheByContentTypeAsync(It.Is<int[]>(ids => ids.Length == 1 && ids[0] == 100)),
+            Times.Once);
         _mediaCacheService.Verify(
             x => x.RebuildMemoryCacheByContentTypeAsync(It.Is<int[]>(ids => ids.Length == 1 && ids[0] == 200)),
             Times.Once);
@@ -267,12 +321,16 @@ public class ContentTypeCacheRefresherTests
         _documentCacheService.Verify(
             x => x.ClearConvertedContentCache(It.Is<IReadOnlyCollection<int>>(ids => ids.Count == 1 && ids.Contains(101))),
             Times.Once);
+        _elementCacheService.Verify(
+            x => x.ClearConvertedContentCache(It.Is<IReadOnlyCollection<int>>(ids => ids.Count == 1 && ids.Contains(101))),
+            Times.Once);
         _mediaCacheService.Verify(
             x => x.ClearConvertedContentCache(It.Is<IReadOnlyCollection<int>>(ids => ids.Count == 1 && ids.Contains(201))),
             Times.Once);
 
         // Assert — no full clear in non-auto mode.
         _documentCacheService.Verify(x => x.ClearConvertedContentCache(), Times.Never);
+        _elementCacheService.Verify(x => x.ClearConvertedContentCache(), Times.Never);
         _mediaCacheService.Verify(x => x.ClearConvertedContentCache(), Times.Never);
     }
 
@@ -298,6 +356,15 @@ public class ContentTypeCacheRefresherTests
             x => x.ClearConvertedContentCache(),
             Times.Never);
         _documentCacheService.Verify(
+            x => x.ClearConvertedContentCache(It.IsAny<IReadOnlyCollection<int>>()),
+            Times.Never);
+        _elementCacheService.Verify(
+            x => x.RebuildMemoryCacheByContentTypeAsync(It.IsAny<IEnumerable<int>>()),
+            Times.Never);
+        _elementCacheService.Verify(
+            x => x.ClearConvertedContentCache(),
+            Times.Never);
+        _elementCacheService.Verify(
             x => x.ClearConvertedContentCache(It.IsAny<IReadOnlyCollection<int>>()),
             Times.Never);
         _mediaCacheService.Verify(
@@ -331,11 +398,13 @@ public class ContentTypeCacheRefresherTests
 
         _documentCacheService
             .Setup(x => x.ClearConvertedContentCache());
+        _elementCacheService
+            .Setup(x => x.ClearConvertedContentCache());
 
         // Act
         refresher.Refresh(payloads);
 
-        // Assert — full clear called (not selective) due to auto factory reset.
+        // Assert — full clear called (not selective) due to auto factory reset, for both Document and Element.
         _documentCacheService.Verify(
             x => x.ClearConvertedContentCache(),
             Times.Once);
@@ -343,6 +412,15 @@ public class ContentTypeCacheRefresherTests
             x => x.ClearConvertedContentCache(It.IsAny<IReadOnlyCollection<int>>()),
             Times.Never);
         _documentCacheService.Verify(
+            x => x.RebuildMemoryCacheByContentTypeAsync(It.IsAny<IEnumerable<int>>()),
+            Times.Never);
+        _elementCacheService.Verify(
+            x => x.ClearConvertedContentCache(),
+            Times.Once);
+        _elementCacheService.Verify(
+            x => x.ClearConvertedContentCache(It.IsAny<IReadOnlyCollection<int>>()),
+            Times.Never);
+        _elementCacheService.Verify(
             x => x.RebuildMemoryCacheByContentTypeAsync(It.IsAny<IEnumerable<int>>()),
             Times.Never);
     }
@@ -363,17 +441,28 @@ public class ContentTypeCacheRefresherTests
             .Returns(Task.CompletedTask);
         _documentCacheService
             .Setup(x => x.ClearConvertedContentCache());
+        _elementCacheService
+            .Setup(x => x.RebuildMemoryCacheByContentTypeAsync(It.Is<int[]>(ids => ids.Length == 1 && ids[0] == 100)))
+            .Returns(Task.CompletedTask);
+        _elementCacheService
+            .Setup(x => x.ClearConvertedContentCache());
 
         // Act
         refresher.Refresh(payloads);
 
-        // Assert — rebuild for structural change.
+        // Assert — rebuild for structural change, for both Document and Element.
         _documentCacheService.Verify(
+            x => x.RebuildMemoryCacheByContentTypeAsync(It.Is<int[]>(ids => ids.Length == 1 && ids[0] == 100)),
+            Times.Once);
+        _elementCacheService.Verify(
             x => x.RebuildMemoryCacheByContentTypeAsync(It.Is<int[]>(ids => ids.Length == 1 && ids[0] == 100)),
             Times.Once);
 
         // Assert — full clear also called due to auto factory reset.
         _documentCacheService.Verify(
+            x => x.ClearConvertedContentCache(),
+            Times.Once);
+        _elementCacheService.Verify(
             x => x.ClearConvertedContentCache(),
             Times.Once);
     }
