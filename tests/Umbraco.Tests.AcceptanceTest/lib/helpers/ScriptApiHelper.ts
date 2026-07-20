@@ -88,7 +88,7 @@ export class ScriptApiHelper {
     const rootScripts = await this.getAllAtRoot();
     const jsonScripts = await rootScripts.json();
 
-    for (const script of jsonScripts.items) {
+    for (const script of this.api.itemsOf(jsonScripts)) {
       if (script.name === name) {
         if (script.isFolder) {
           return this.getFolder(script.path);
@@ -150,7 +150,7 @@ export class ScriptApiHelper {
     const rootScripts = await this.getAllAtRoot();
     const jsonScripts = await rootScripts.json();
 
-    for (const script of jsonScripts.items) {
+    for (const script of this.api.itemsOf(jsonScripts)) {
       if (script.name === name) {
         if (script.isFolder) {
           return await this.recurseDeleteChildren(script);

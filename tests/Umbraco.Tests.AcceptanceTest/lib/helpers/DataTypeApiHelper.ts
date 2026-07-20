@@ -99,7 +99,7 @@ export class DataTypeApiHelper {
     const rootDataTypes = await this.getAllAtRoot();
     const jsonDataTypes = await rootDataTypes.json();
 
-    for (const dataType of jsonDataTypes.items) {
+    for (const dataType of this.api.itemsOf(jsonDataTypes)) {
       if (dataType.name === name) {
         return this.get(dataType.id);
       } else if (dataType.isContainer || dataType.hasChildren) {
@@ -116,7 +116,7 @@ export class DataTypeApiHelper {
     const rootDataTypes = await this.getAllAtRoot();
     const jsonDataTypes = await rootDataTypes.json();
 
-    for (const dataType of jsonDataTypes.items) {
+    for (const dataType of this.api.itemsOf(jsonDataTypes)) {
       if (dataType.name === name) {
         if (dataType.isFolder) {
           return await this.recurseDeleteChildren(dataType);

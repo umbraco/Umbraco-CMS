@@ -13,7 +13,7 @@ export class MediaTypeApiHelper {
     const rootMediaTypes = await this.getAllAtRoot();
     const jsonMediaTypes = await rootMediaTypes.json();
 
-    for (const mediaType of jsonMediaTypes.items) {
+    for (const mediaType of this.api.itemsOf(jsonMediaTypes)) {
       if (mediaType.name === name) {
         if (mediaType.isFolder) {
           return await this.recurseDeleteChildren(mediaType);
@@ -97,7 +97,7 @@ export class MediaTypeApiHelper {
     const rootMediaTypes = await this.getAllAtRoot();
     const jsonMediaTypes = await rootMediaTypes.json();
 
-    for (const mediaType of jsonMediaTypes.items) {
+    for (const mediaType of this.api.itemsOf(jsonMediaTypes)) {
       if (mediaType.name === name) {
         if (mediaType.isFolder) {
           return this.getFolder(mediaType.id);

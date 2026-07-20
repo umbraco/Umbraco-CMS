@@ -1251,12 +1251,12 @@ export class ContentUiHelper extends UiBaseLocators {
 
   async clickEmptyRecycleBinButton() {
     await this.hover(this.recycleBinMenuItem);
-    // Force click is needed
-    await this.click(this.emptyRecycleBinBtn, {force: true});
+    await this.click(this.emptyRecycleBinBtn, {force: true, timeout: ConstantHelper.timeout.long});
+    await expect(this.confirmEmptyRecycleBinBtn).toBeVisible({timeout: ConstantHelper.timeout.long});
   }
 
   async clickConfirmEmptyRecycleBinButton() {
-    await this.click(this.confirmEmptyRecycleBinBtn);
+    await this.click(this.confirmEmptyRecycleBinBtn, {force: true, timeout: ConstantHelper.timeout.long});
   }
 
   async isDocumentPropertyEditable(propertyName: string, isEditable: boolean = true) {
@@ -1976,6 +1976,9 @@ export class ContentUiHelper extends UiBaseLocators {
     const blockWithNameLocator = this.page.locator('uui-card-block-type', {
       hasText: name,
     });
+    // In the nested-block picker the target card can sit below the fold; scroll it in so the click is
+    // not lost to "element is outside of the viewport".
+    await blockWithNameLocator.scrollIntoViewIfNeeded();
     await this.click(blockWithNameLocator, {force: toForce});
   }
 

@@ -17,7 +17,7 @@ export class MemberTypeApiHelper {
     // Delete every match, comparing alias (case-insensitive) as well as name: a renamed type keeps its
     // old alias, which a name-only match misses, causing a "Duplicate alias" 400 on the next create.
     const alias = AliasHelper.toAlias(name).toLowerCase();
-    for (const memberType of jsonMemberTypes.items) {
+    for (const memberType of this.api.itemsOf(jsonMemberTypes)) {
       if (memberType.isFolder) {
         if (memberType.name === name) {
           await this.recurseDeleteChildren(memberType);
@@ -121,7 +121,7 @@ export class MemberTypeApiHelper {
     const rootMemberTypes = await this.getAllAtRoot();
     const jsonMemberTypes = await rootMemberTypes.json();
 
-    for (const memberType of jsonMemberTypes.items) {
+    for (const memberType of this.api.itemsOf(jsonMemberTypes)) {
       if (memberType.name === name) {
         if (memberType.isFolder) {
           return this.getFolder(memberType.id);

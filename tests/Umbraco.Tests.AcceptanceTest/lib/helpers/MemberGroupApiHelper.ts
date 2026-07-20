@@ -49,7 +49,7 @@ export class MemberGroupApiHelper {
     const rootMemberGroups = await this.getAll();
     const jsonMemberGroups = await rootMemberGroups.json();
 
-    for (const memberGroup of jsonMemberGroups.items) {
+    for (const memberGroup of this.api.itemsOf(jsonMemberGroups)) {
       if (memberGroup.name === name) {
         return this.get(memberGroup.id);
       }
@@ -61,7 +61,7 @@ export class MemberGroupApiHelper {
     const rootMemberGroups = await this.getAll();
     const jsonMemberGroups = await rootMemberGroups.json();
 
-    for (const memberGroup of jsonMemberGroups.items) {
+    for (const memberGroup of this.api.itemsOf(jsonMemberGroups)) {
       if (memberGroup.name === name) {
         return this.delete(memberGroup.id);
       }

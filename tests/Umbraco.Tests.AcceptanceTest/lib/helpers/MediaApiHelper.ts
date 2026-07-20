@@ -19,7 +19,7 @@ export class MediaApiHelper {
     const rootMedia = await this.getAllAtRoot();
     const jsonMedia = await rootMedia.json();
 
-    for (const media of jsonMedia.items) {
+    for (const media of this.api.itemsOf(jsonMedia)) {
       if (media.variants[0].name === name) {
         if (media.hasChildren) {
           return await this.recurseDeleteChildren(media);
@@ -107,7 +107,7 @@ export class MediaApiHelper {
     const rootMedia = await this.getAllAtRoot();
     const jsonMedia = await rootMedia.json();
 
-    for (const media of jsonMedia.items) {
+    for (const media of this.api.itemsOf(jsonMedia)) {
       if (media.variants[0].name === name) {
         const found = await this.get(media.id);
         // A trashed media item can still be returned by the tree endpoint; it only "exists" in the
@@ -143,7 +143,7 @@ export class MediaApiHelper {
   async doesMediaItemExistInRecycleBin(mediaItemName: string) {
     const recycleBin = await this.getRecycleBinItems();
     const jsonRecycleBin = await recycleBin.json();
-    for (const media of jsonRecycleBin.items) {
+    for (const media of this.api.itemsOf(jsonRecycleBin)) {
       if (media.variants[0].name === mediaItemName) {
         return true;
       }
@@ -242,7 +242,7 @@ export class MediaApiHelper {
     let mediaNames: string[] = [];
     const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/collection/media?id=&dataTypeId=&orderBy=' + orderBy + '&orderDirection=' + orderDirection + '&skip=0&take=100');
     const mediaItems = await response.json();
-    for (const media of mediaItems.items) {
+    for (const media of this.api.itemsOf(mediaItems)) {
       mediaNames.push(media.variants[0].name);
     }
     return mediaNames;

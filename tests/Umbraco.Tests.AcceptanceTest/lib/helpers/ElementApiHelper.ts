@@ -123,7 +123,7 @@ export class ElementApiHelper {
     const rootElements = await this.getAllAtRoot();
     const jsonElements = await rootElements.json();
 
-    for (const element of jsonElements.items) {
+    for (const element of this.api.itemsOf(jsonElements)) {
       // Use root level 'name' property for both folders and elements
       if (element.name === name) {
         const found = element.isFolder ? await this.getFolder(element.id) : await this.get(element.id);
@@ -149,7 +149,7 @@ export class ElementApiHelper {
     const rootElements = await this.getAllAtRoot();
     const jsonElements = await rootElements.json();
 
-    for (const element of jsonElements.items) {
+    for (const element of this.api.itemsOf(jsonElements)) {
       // Use root level 'name' property for both folders and elements
       if (element.name === name) {
         if (element.hasChildren) {
@@ -192,7 +192,7 @@ export class ElementApiHelper {
   async doesItemExistInRecycleBin(elementName: string) {
     const recycleBin = await this.getAllRecycleBinItems();
     const jsonRecycleBin = await recycleBin.json();
-    for (const element of jsonRecycleBin.items) {
+    for (const element of this.api.itemsOf(jsonRecycleBin)) {
       if (element.name === elementName) {
         return true;
       }

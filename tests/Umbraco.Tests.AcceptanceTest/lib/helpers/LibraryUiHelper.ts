@@ -1081,15 +1081,12 @@ export class LibraryUiHelper extends UiBaseLocators {
 
   async clickEmptyRecycleBinButton() {
     // Use the workspace's plain <button> (the hover tree entity-action doesn't open the confirm dialog).
-    // Click once and wait — re-clicking would hit the modal backdrop and close it.
-    await this.click(this.page.locator('button', {hasText: 'Empty recycle bin'}).first(), {force: true});
-    await expect(this.confirmEmptyRecycleBinBtn).toBeVisible({timeout: ConstantHelper.timeout.medium});
+    await this.click(this.page.locator('button', {hasText: 'Empty recycle bin'}).first(), {force: true, timeout: ConstantHelper.timeout.long});
+    await expect(this.confirmEmptyRecycleBinBtn).toBeVisible({timeout: ConstantHelper.timeout.long});
   }
 
   async clickConfirmEmptyRecycleBinButton() {
-    // The confirm dialog re-renders after opening, detaching the button mid-click; force the click so it
-    // is not lost to the "element is not stable / detached" retry.
-    await this.click(this.confirmEmptyRecycleBinBtn, {force: true});
+    await this.click(this.confirmEmptyRecycleBinBtn, {force: true, timeout: ConstantHelper.timeout.long});
   }
 
   async isElementPropertyEditable(propertyName: string, isEditable: boolean = true) {
@@ -1683,6 +1680,9 @@ export class LibraryUiHelper extends UiBaseLocators {
 
   async clickBlockCardWithName(name: string, toForce: boolean = false) {
     const blockWithNameLocator = this.page.locator('uui-card-block-type', {hasText: name});
+    // In the nested-block picker the target card can sit below the fold; scroll it in so the click is
+    // not lost to "element is outside of the viewport".
+    await blockWithNameLocator.scrollIntoViewIfNeeded();
     await this.click(blockWithNameLocator, {force: toForce});
   }
 

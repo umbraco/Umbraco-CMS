@@ -44,7 +44,7 @@ export class LanguageApiHelper {
     const allLanguages = await this.getAll();
     const jsonLanguages = await allLanguages.json();
 
-    for (const language of jsonLanguages.items) {
+    for (const language of this.api.itemsOf(jsonLanguages)) {
       if (language.name === name && language.isoCode !== null) {
         return await this.get(language.isoCode);
       }
@@ -56,7 +56,7 @@ export class LanguageApiHelper {
     const allLanguages = await this.getAll();
     const jsonLanguages = await allLanguages.json();
 
-    for (const language of jsonLanguages.items) {
+    for (const language of this.api.itemsOf(jsonLanguages)) {
       if (language.name === name && language.isoCode !== null) {
         return await this.delete(language.isoCode);
       }
@@ -68,7 +68,7 @@ export class LanguageApiHelper {
     const allLanguages = await this.getAll();
     const jsonLanguages = await allLanguages.json();
 
-    for (const language of jsonLanguages.items) {
+    for (const language of this.api.itemsOf(jsonLanguages)) {
       if (language.isoCode === isoCode) {
         return await this.delete(language.isoCode);
       }

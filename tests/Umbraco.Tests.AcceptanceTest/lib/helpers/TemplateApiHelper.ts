@@ -110,7 +110,7 @@ export class TemplateApiHelper {
     const rootTemplates = await this.getAllAtRoot();
     const jsonTemplates = await rootTemplates.json();
 
-    for (const template of jsonTemplates.items) {
+    for (const template of this.api.itemsOf(jsonTemplates)) {
       if (template.name === name) {
         return this.get(template.id);
       } else if (template.isContainer || template.hasChildren) {
@@ -127,7 +127,7 @@ export class TemplateApiHelper {
     const rootTemplates = await this.getAllAtRoot();
     const jsonTemplates = await rootTemplates.json();
 
-    for (const template of jsonTemplates.items) {
+    for (const template of this.api.itemsOf(jsonTemplates)) {
       if (template.name === name) {
         if (template.isContainer || template.hasChildren) {
           await this.recurseDeleteChildren(template.id);

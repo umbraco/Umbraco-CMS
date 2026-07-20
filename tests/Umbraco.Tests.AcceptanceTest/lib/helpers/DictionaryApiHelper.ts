@@ -99,7 +99,7 @@ export class DictionaryApiHelper {
     const rootDictionary = await this.getAllAtRoot();
     const jsonDictionary = await rootDictionary.json();
 
-    for (const dictionaryItem of jsonDictionary.items) {
+    for (const dictionaryItem of this.api.itemsOf(jsonDictionary)) {
       if (dictionaryItem.name === name) {
         return this.get(dictionaryItem.id);
       } else if (dictionaryItem.isContainer || dictionaryItem.hasChildren) {
@@ -120,7 +120,7 @@ export class DictionaryApiHelper {
     const rootDictionary = await this.getAllAtRoot();
     const jsonDictionary = await rootDictionary.json();
 
-    for (const dictionaryItem of jsonDictionary.items) {
+    for (const dictionaryItem of this.api.itemsOf(jsonDictionary)) {
       if (dictionaryItem.name === name) {
         if (dictionaryItem.isContainer || dictionaryItem.hasChildren) {
           await this.recurseDeleteChildren(dictionaryItem.id);

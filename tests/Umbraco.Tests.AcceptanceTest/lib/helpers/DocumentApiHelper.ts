@@ -123,7 +123,7 @@ export class DocumentApiHelper {
     const rootDocuments = await this.getAllAtRoot();
     const jsonDocuments = await rootDocuments.json();
 
-    for (const document of jsonDocuments.items) {
+    for (const document of this.api.itemsOf(jsonDocuments)) {
       for (const variant of document.variants) {
         if (variant.name === name) {
           const found = await this.get(document.id);
@@ -148,7 +148,7 @@ export class DocumentApiHelper {
     const rootDocuments = await this.getAllAtRoot();
     const jsonDocuments = await rootDocuments.json();
 
-    for (const document of jsonDocuments.items) {
+    for (const document of this.api.itemsOf(jsonDocuments)) {
       for (const variant of document.variants) {
         if (variant.name === name) {
           if (document.hasChildren) {
@@ -1673,7 +1673,7 @@ export class DocumentApiHelper {
   async doesItemExistInRecycleBin(documentItemName: string) {
     const recycleBin = await this.getRecycleBinItems();
     const jsonRecycleBin = await recycleBin.json();
-    for (const document of jsonRecycleBin.items) {
+    for (const document of this.api.itemsOf(jsonRecycleBin)) {
       if (document.variants[0].name === documentItemName) {
         return true;
       }

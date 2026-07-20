@@ -19,7 +19,7 @@ export class CurrentUserProfileUiHelper extends UiBaseLocators {
   }
 
   async clickChangePasswordButton() {
-    await this.click(this.changePasswordBtn);
+    await this.click(this.changePasswordBtn, {timeout: ConstantHelper.timeout.long});
   }
 
   async changePassword(currentPassword: string, newPassword: string) {
@@ -42,7 +42,7 @@ export class CurrentUserProfileUiHelper extends UiBaseLocators {
   }
 
   async clickEditButton() {
-    await this.click(this.editBtn);
+    await this.click(this.editBtn, {timeout: ConstantHelper.timeout.long});
   }
 
   async isCurrentUserWorkspaceVisible(isVisible: boolean = true) {

@@ -15,7 +15,7 @@ export class UserGroupApiHelper {
     // Delete every match, not just the first: repeated runs can otherwise accumulate duplicate groups
     // (cleanup used to stop after one), which pollute the collection list and break UI assertions.
     let lastResponse = null;
-    for (const sb of json.items) {
+    for (const sb of this.api.itemsOf(json)) {
       if (sb.name === name && sb.id !== null) {
         lastResponse = await this.api.delete(this.api.baseUrl + '/umbraco/management/api/v1/user-group/' + sb.id);
       }
@@ -37,7 +37,7 @@ export class UserGroupApiHelper {
   async getByName(name: string) {
     const json = await this.getAll();
 
-    for (const sb of json.items) {
+    for (const sb of this.api.itemsOf(json)) {
       if (sb.name === name) {
         if (sb.id !== null) {
           const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/user-group/' + sb.id);
@@ -76,7 +76,7 @@ export class UserGroupApiHelper {
   async doesNameExist(name: string) {
     const json = await this.getAll();
 
-    for (const sb of json.items) {
+    for (const sb of this.api.itemsOf(json)) {
       if (sb.name === name) {
         return true;
       }

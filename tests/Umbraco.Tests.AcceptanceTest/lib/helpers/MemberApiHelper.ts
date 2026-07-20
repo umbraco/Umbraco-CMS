@@ -70,7 +70,7 @@ export class MemberApiHelper {
     const rootMembers = await this.getAll();
     const jsonMembers = await rootMembers.json();
 
-    for (const member of jsonMembers.items) {
+    for (const member of this.api.itemsOf(jsonMembers)) {
       if (member.variants[0].name === name) {
         return await this.get(member.id);
       }
@@ -82,7 +82,7 @@ export class MemberApiHelper {
     const rootMembers = await this.getAll();
     const jsonMembers = await rootMembers.json();
 
-    for (const member of jsonMembers.items) {
+    for (const member of this.api.itemsOf(jsonMembers)) {
       if (member.variants[0].name === name) {
         return await this.delete(member.id);
       }

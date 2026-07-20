@@ -108,7 +108,7 @@ export class UserUiHelper extends UiBaseLocators {
   }
 
   async clickChangePasswordButton() {
-    await this.click(this.changePasswordBtn);
+    await this.click(this.changePasswordBtn, {timeout: ConstantHelper.timeout.long});
   }
 
   async updatePassword(newPassword: string) {

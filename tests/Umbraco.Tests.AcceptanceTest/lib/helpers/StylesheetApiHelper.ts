@@ -72,7 +72,7 @@ export class StylesheetApiHelper {
     const rootStylesheet = await this.getAllAtRoot();
     const jsonStylesheet = await rootStylesheet.json();
 
-    for (const stylesheet of jsonStylesheet.items) {
+    for (const stylesheet of this.api.itemsOf(jsonStylesheet)) {
       if (stylesheet.name === name) {
         if (stylesheet.isFolder) {
           return this.getFolder(stylesheet.path);
@@ -93,7 +93,7 @@ export class StylesheetApiHelper {
     const rootStylesheet = await this.getAllAtRoot();
     const jsonStylesheet = await rootStylesheet.json();
 
-    for (const stylesheet of jsonStylesheet.items) {
+    for (const stylesheet of this.api.itemsOf(jsonStylesheet)) {
       if (stylesheet.name === name) {
         if (stylesheet.isFolder) {
           return await this.recurseDeleteChildren(stylesheet);

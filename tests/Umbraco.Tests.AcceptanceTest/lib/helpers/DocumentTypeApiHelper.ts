@@ -13,7 +13,7 @@ export class DocumentTypeApiHelper {
     const rootDocumentTypes = await this.getAllAtRoot();
     const jsonDocumentTypes = await rootDocumentTypes.json();
 
-    for (const documentType of jsonDocumentTypes.items) {
+    for (const documentType of this.api.itemsOf(jsonDocumentTypes)) {
       if (documentType.name === name) {
         if (documentType.isFolder) {
           return await this.recurseDeleteChildren(documentType);
@@ -105,7 +105,7 @@ export class DocumentTypeApiHelper {
     const rootDocumentTypes = await this.getAllAtRoot();
     const jsonDocumentTypes = await rootDocumentTypes.json();
 
-    for (const documentType of jsonDocumentTypes.items) {
+    for (const documentType of this.api.itemsOf(jsonDocumentTypes)) {
       if (documentType.name === name) {
         if (documentType.isFolder) {
           return this.getFolder(documentType.id);

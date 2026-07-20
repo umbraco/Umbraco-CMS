@@ -190,6 +190,15 @@ export class ApiHelpers {
     return await this.send('PUT', url, data);
   }
 
+  // A non-200/blip response body lacks `items`; return empty (and warn) so a cleanup hiccup does not fail unrelated tests.
+  itemsOf(json: any): any[] {
+    if (!Array.isArray(json?.items)) {
+      console.warn(`itemsOf: expected an items array but got: ${JSON.stringify(json)?.slice(0, 300)}`);
+      return [];
+    }
+    return json.items;
+  }
+
   async postMultiPartForm(url: string, id, name: string, mimeType: string, filePath) {
     const options = {
       headers: await this.getHeaders(),

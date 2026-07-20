@@ -57,7 +57,7 @@ export class WebhookApiHelper {
     const allWebhooks = await this.getAll();
     const jsonWebhooks = await allWebhooks.json();
 
-    for (const webhook of jsonWebhooks.items) {
+    for (const webhook of this.api.itemsOf(jsonWebhooks)) {
       if (webhook.name === name) {
         return await this.get(webhook.id);
       }
@@ -69,7 +69,7 @@ export class WebhookApiHelper {
     const allWebhooks = await this.getAll();
     const jsonWebhooks = await allWebhooks.json();
 
-    for (const webhook of jsonWebhooks.items) {
+    for (const webhook of this.api.itemsOf(jsonWebhooks)) {
       if (webhook.name === name) {
         return await this.delete(webhook.id);
       }

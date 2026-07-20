@@ -93,7 +93,7 @@ export class DocumentBlueprintApiHelper {
     const rootDocumentBlueprints = await this.getAllAtRoot();
     const jsonDocumentBlueprints = await rootDocumentBlueprints.json();
 
-    for (const blueprint of jsonDocumentBlueprints.items) {
+    for (const blueprint of this.api.itemsOf(jsonDocumentBlueprints)) {
       if (blueprint.name === name) {
         return this.get(blueprint.id);
       } else if (blueprint.hasChildren) {
@@ -110,7 +110,7 @@ export class DocumentBlueprintApiHelper {
     const rootDocumentBlueprints = await this.getAllAtRoot();
     const jsonDocumentBlueprints = await rootDocumentBlueprints.json();
 
-    for (const blueprint of jsonDocumentBlueprints.items) {
+    for (const blueprint of this.api.itemsOf(jsonDocumentBlueprints)) {
       if (blueprint.name === name) {
         if (blueprint.hasChildren) {
           await this.recurseDeleteChildren(blueprint.id);

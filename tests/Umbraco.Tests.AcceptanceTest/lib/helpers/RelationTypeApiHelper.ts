@@ -65,7 +65,7 @@ export class RelationTypeApiHelper {
     const rootRelationType = await this.getAllAtRoot();
     const jsonRelationType = await rootRelationType.json();
 
-    for (const relationType of jsonRelationType.items) {
+    for (const relationType of this.api.itemsOf(jsonRelationType)) {
       if (relationType.name === name && relationType.id !== null) {
           return await this.api.delete(this.api.baseUrl + '/umbraco/management/api/v1/relation-type/' + relationType.id);
       }
@@ -77,7 +77,7 @@ export class RelationTypeApiHelper {
     const rootRelationType = await this.getAllAtRoot();
     const jsonRelationType = await rootRelationType.json();
 
-    for (const relationType of jsonRelationType.items) {
+    for (const relationType of this.api.itemsOf(jsonRelationType)) {
       if (relationType.name === name && relationType.id !== null ) {
           const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/relation-type/' + relationType.id);
           return await response.json();
@@ -91,7 +91,7 @@ export class RelationTypeApiHelper {
     const jsonRelationType = await rootRelationType.json();
 
     if (name !== null) {
-      for (const relationType of jsonRelationType.items) {
+      for (const relationType of this.api.itemsOf(jsonRelationType)) {
         if (relationType.name === name) {
           return true;
         }

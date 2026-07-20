@@ -69,7 +69,7 @@ export class PartialViewApiHelper {
     const rootPartialView = await this.getAllAtRoot();
     const jsonPartialView = await rootPartialView.json();
 
-    for (const partialView of jsonPartialView.items) {
+    for (const partialView of this.api.itemsOf(jsonPartialView)) {
       if (partialView.name === name) {
         if (partialView.isFolder) {
           return this.getFolder(partialView.path);
@@ -90,7 +90,7 @@ export class PartialViewApiHelper {
     const rootPartialView = await this.getAllAtRoot();
     const jsonPartialView = await rootPartialView.json();
 
-    for (const partialView of jsonPartialView.items) {
+    for (const partialView of this.api.itemsOf(jsonPartialView)) {
       if (partialView.name === name) {
         if (partialView.isFolder) {
           return await this.recurseDeleteChildren(partialView);
