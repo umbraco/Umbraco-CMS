@@ -117,6 +117,11 @@ stages:
               artifactName: csharp-docs-dlls
           - powershell: |
               dotnet tool install --global Umbraco.Internal.Sbom
+              # umbraco-sbom scans every project in the solution and requires each to be restored.
+              # These two are excluded from the Release build config, so the solution restore/build
+              # skips them; restore them explicitly to avoid a failure.
+              dotnet restore $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest.UmbracoProject/Umbraco.Tests.AcceptanceTest.UmbracoProject.csproj
+              dotnet restore $(Build.SourcesDirectory)/tools/Umbraco.JsonSchema/Umbraco.JsonSchema.csproj
               umbraco-sbom $(solution) --output-file $(Build.ArtifactStagingDirectory)/bom/bom-dotnet.xml --allow-package nuget:SixLabors.*
               if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne 10) { exit $LASTEXITCODE }
               exit 0
