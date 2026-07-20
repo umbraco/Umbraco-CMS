@@ -143,12 +143,109 @@ internal sealed class ElementHybridCacheVarianceTests : UmbracoIntegrationTest
         });
     }
 
-    private async Task<IContentType> CreateElementType(ContentVariation variation)
+    [Test]
+    public async Task Published_Output_Reflects_Property_Variance_Change_Without_Republishing_Invariant_To_Variant_When_Type_Stays_Variant()
+    {
+        var elementType = await CreateElementType(ContentVariation.Culture, ContentVariation.Nothing);
+
+        await CreateAdditionalLanguage("da-DK");
+        var defaultCulture = await LanguageService.GetDefaultIsoCodeAsync();
+
+        var createResult = await ElementEditingService.CreateAsync(
+            new ElementCreateModel
+            {
+                ContentTypeKey = elementType.Key,
+                Variants = [new() { Culture = defaultCulture, Name = "Variance Render Test" }],
+                Properties = [new PropertyValueModel { Alias = "title", Value = "invariant title" }],
+            },
+            Constants.Security.SuperUserKey);
+        Assert.That(createResult.Success, Is.True);
+        var elementKey = createResult.Result.Content!.Key;
+
+        await PublishCultures(elementKey, defaultCulture);
+
+        // Routing sets this before rendering; simulate it so a culture-less read resolves like a real request.
+        VariationContextAccessor.VariationContext = new VariationContext(defaultCulture);
+
+        var beforeChange = await PublishedElementCache.GetByIdAsync(elementKey, preview: false);
+        Assert.That(beforeChange, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(beforeChange!.Value<string>("title"), Is.EqualTo("invariant title"));
+            Assert.That(beforeChange!.Value<string>("title", defaultCulture), Is.EqualTo("invariant title"));
+            Assert.That(beforeChange!.Value<string>("title", "da-DK"), Is.EqualTo("invariant title"));
+        });
+
+        elementType = await ContentTypeService.GetAsync(elementType.Key);
+        var titleProperty = elementType!.PropertyTypes.Single(p => p.Alias == "title");
+        titleProperty.Variations = ContentVariation.Culture;
+        await ContentTypeService.UpdateAsync(elementType, Constants.Security.SuperUserKey);
+
+        var afterChange = await PublishedElementCache.GetByIdAsync(elementKey, preview: false);
+        Assert.That(afterChange, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(afterChange!.Value<string>("title"), Is.EqualTo("invariant title"));
+            Assert.That(afterChange!.Value<string>("title", defaultCulture), Is.EqualTo("invariant title"));
+            Assert.That(afterChange!.Value<string>("title", "da-DK"), Is.Empty);
+        });
+    }
+
+    [Test]
+    public async Task Published_Output_Reflects_Property_Variance_Change_Without_Republishing_Variant_To_Invariant_When_Type_Stays_Variant()
+    {
+        var elementType = await CreateElementType(ContentVariation.Culture, ContentVariation.Culture);
+
+        await CreateAdditionalLanguage("da-DK");
+        var defaultCulture = await LanguageService.GetDefaultIsoCodeAsync();
+
+        var createResult = await ElementEditingService.CreateAsync(
+            new ElementCreateModel
+            {
+                ContentTypeKey = elementType.Key,
+                Variants = [new() { Culture = defaultCulture, Name = "Variance Render Test" }],
+                Properties = [new PropertyValueModel { Alias = "title", Value = "variant title", Culture = defaultCulture }],
+            },
+            Constants.Security.SuperUserKey);
+        Assert.That(createResult.Success, Is.True);
+        var elementKey = createResult.Result.Content!.Key;
+
+        await PublishCultures(elementKey, defaultCulture);
+
+        // Routing sets this before rendering; simulate it so a culture-less read resolves like a real request.
+        VariationContextAccessor.VariationContext = new VariationContext(defaultCulture);
+
+        var beforeChange = await PublishedElementCache.GetByIdAsync(elementKey, preview: false);
+        Assert.That(beforeChange, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(beforeChange!.Value<string>("title", defaultCulture), Is.EqualTo("variant title"));
+            Assert.That(beforeChange!.Value<string>("title", "da-DK"), Is.Empty);
+        });
+
+        elementType = await ContentTypeService.GetAsync(elementType.Key);
+        var titleProperty = elementType!.PropertyTypes.Single(p => p.Alias == "title");
+        titleProperty.Variations = ContentVariation.Nothing;
+        await ContentTypeService.UpdateAsync(elementType, Constants.Security.SuperUserKey);
+
+        var afterChange = await PublishedElementCache.GetByIdAsync(elementKey, preview: false);
+        Assert.That(afterChange, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(afterChange!.Value<string>("title"), Is.EqualTo("variant title"));
+            Assert.That(afterChange!.Value<string>("title", defaultCulture), Is.EqualTo("variant title"));
+
+            // Invariant properties ignore the requested culture and always resolve to the same value.
+            Assert.That(afterChange!.Value<string>("title", "da-DK"), Is.EqualTo("variant title"));
+        });
+    }
+
+    private async Task<IContentType> CreateElementType(ContentVariation typeVariation, ContentVariation? propertyVariation = null)
     {
         var elementType = ContentTypeBuilder.CreateSimpleElementType();
         elementType.AllowedAsRoot = true;
-        elementType.Variations = variation;
-        elementType.PropertyTypes.Single(p => p.Alias == "title").Variations = variation;
+        elementType.Variations = typeVariation;
+        elementType.PropertyTypes.Single(p => p.Alias == "title").Variations = propertyVariation ?? typeVariation;
         await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
         return elementType;
     }

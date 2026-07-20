@@ -129,17 +129,105 @@ internal sealed class DocumentHybridCacheVarianceTests : UmbracoIntegrationTest
         });
     }
 
-    private async Task<IContentType> CreateDocumentType(ContentVariation variation)
+    [Test]
+    public async Task Published_Output_Reflects_Property_Variance_Change_Without_Republishing_Invariant_To_Variant_When_Type_Stays_Variant()
+    {
+        var documentType = await CreateDocumentType(ContentVariation.Culture, ContentVariation.Nothing);
+
+        await CreateAdditionalLanguage("da-DK");
+        var defaultCulture = await LanguageService.GetDefaultIsoCodeAsync();
+
+        var content = new ContentBuilder()
+            .WithContentType(documentType)
+            .WithCultureName(defaultCulture, "Variance Render Test")
+            .Build();
+        content.SetValue("title", "invariant title");
+        ContentService.Save(content);
+        ContentService.Publish(content, ["*"]);
+
+        // Routing sets this before rendering; simulate it so a culture-less read resolves like a real request.
+        VariationContextAccessor.VariationContext = new VariationContext(defaultCulture);
+
+        var beforeChange = await PublishedContentCache.GetByIdAsync(content.Key, preview: false);
+        Assert.That(beforeChange, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(beforeChange!.Value<string>("title"), Is.EqualTo("invariant title"));
+            Assert.That(beforeChange!.Value<string>("title", defaultCulture), Is.EqualTo("invariant title"));
+            Assert.That(beforeChange!.Value<string>("title", "da-DK"), Is.EqualTo("invariant title"));
+        });
+
+        documentType = await ContentTypeService.GetAsync(documentType.Key);
+        var titleProperty = documentType!.PropertyTypes.Single(p => p.Alias == "title");
+        titleProperty.Variations = ContentVariation.Culture;
+        await ContentTypeService.UpdateAsync(documentType, Constants.Security.SuperUserKey);
+
+        var afterChange = await PublishedContentCache.GetByIdAsync(content.Key, preview: false);
+        Assert.That(afterChange, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(afterChange!.Value<string>("title"), Is.EqualTo("invariant title"));
+            Assert.That(afterChange!.Value<string>("title", defaultCulture), Is.EqualTo("invariant title"));
+            Assert.That(afterChange!.Value<string>("title", "da-DK"), Is.Empty);
+        });
+    }
+
+    [Test]
+    public async Task Published_Output_Reflects_Property_Variance_Change_Without_Republishing_Variant_To_Invariant_When_Type_Stays_Variant()
+    {
+        var documentType = await CreateDocumentType(ContentVariation.Culture, ContentVariation.Culture);
+
+        await CreateAdditionalLanguage("da-DK");
+        var defaultCulture = await LanguageService.GetDefaultIsoCodeAsync();
+
+        var content = new ContentBuilder()
+            .WithContentType(documentType)
+            .WithCultureName(defaultCulture, "Variance Render Test")
+            .Build();
+        content.SetValue("title", "variant title", defaultCulture);
+        ContentService.Save(content);
+        ContentService.Publish(content, ["*"]);
+
+        // Routing sets this before rendering; simulate it so a culture-less read resolves like a real request.
+        VariationContextAccessor.VariationContext = new VariationContext(defaultCulture);
+
+        var beforeChange = await PublishedContentCache.GetByIdAsync(content.Key, preview: false);
+        Assert.That(beforeChange, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(beforeChange!.Value<string>("title"), Is.EqualTo("variant title"));
+            Assert.That(beforeChange!.Value<string>("title", defaultCulture), Is.EqualTo("variant title"));
+            Assert.That(beforeChange!.Value<string>("title", "da-DK"), Is.Empty);
+        });
+
+        documentType = await ContentTypeService.GetAsync(documentType.Key);
+        var titleProperty = documentType!.PropertyTypes.Single(p => p.Alias == "title");
+        titleProperty.Variations = ContentVariation.Nothing;
+        await ContentTypeService.UpdateAsync(documentType, Constants.Security.SuperUserKey);
+
+        var afterChange = await PublishedContentCache.GetByIdAsync(content.Key, preview: false);
+        Assert.That(afterChange, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(afterChange!.Value<string>("title"), Is.EqualTo("variant title"));
+            Assert.That(afterChange!.Value<string>("title", defaultCulture), Is.EqualTo("variant title"));
+
+            // Invariant properties ignore the requested culture and always resolve to the same value.
+            Assert.That(afterChange!.Value<string>("title", "da-DK"), Is.EqualTo("variant title"));
+        });
+    }
+
+    private async Task<IContentType> CreateDocumentType(ContentVariation typeVariation, ContentVariation? propertyVariation = null)
     {
         var documentType = new ContentTypeBuilder()
             .WithAlias("varianceRenderTest" + Guid.NewGuid().ToString("N"))
             .WithName("Variance Render Test")
             .WithAllowAsRoot(true)
-            .WithContentVariation(variation)
+            .WithContentVariation(typeVariation)
             .AddPropertyType()
             .WithAlias("title")
             .WithName("Title")
-            .WithVariations(variation)
+            .WithVariations(propertyVariation ?? typeVariation)
             .Done()
             .Build();
         await ContentTypeService.CreateAsync(documentType, Constants.Security.SuperUserKey);
