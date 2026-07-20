@@ -65,6 +65,7 @@ internal sealed class ElementHybridCacheVarianceTests : UmbracoIntegrationTest
 
         await PublishCultures(elementKey, defaultCulture);
 
+        // Routing sets this before rendering; simulate it so a culture-less read resolves like a real request.
         VariationContextAccessor.VariationContext = new VariationContext(defaultCulture);
 
         var beforeChange = await PublishedElementCache.GetByIdAsync(elementKey, preview: false);
@@ -112,6 +113,7 @@ internal sealed class ElementHybridCacheVarianceTests : UmbracoIntegrationTest
 
         await PublishCultures(elementKey, defaultCulture);
 
+        // Routing sets this before rendering; simulate it so a culture-less read resolves like a real request.
         VariationContextAccessor.VariationContext = new VariationContext(defaultCulture);
 
         var beforeChange = await PublishedElementCache.GetByIdAsync(elementKey, preview: false);
@@ -135,6 +137,8 @@ internal sealed class ElementHybridCacheVarianceTests : UmbracoIntegrationTest
         {
             Assert.That(afterChange!.Value<string>("title"), Is.EqualTo("variant title"));
             Assert.That(afterChange!.Value<string>("title", defaultCulture), Is.EqualTo("variant title"));
+
+            // Invariant properties ignore the requested culture and always resolve to the same value.
             Assert.That(afterChange!.Value<string>("title", "da-DK"), Is.EqualTo("variant title"));
         });
     }
