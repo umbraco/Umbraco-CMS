@@ -343,6 +343,49 @@ internal sealed partial class ContentTypeEditingServiceTests
         Assert.IsNull(publishedVersion.GetValue<string>(VarianceTestPropertyAlias, "da-DK"));
     }
 
+    [TestCase(false)]
+    [TestCase(true)]
+    public async Task Can_Renormalize_Edited_Flag_When_Property_Becomes_Invariant(bool isElement)
+    {
+        var secondLanguage = new LanguageBuilder().WithCultureInfo("da-DK").Build();
+        await LanguageService.CreateAsync(secondLanguage, Constants.Security.SuperUserKey);
+        var defaultCulture = await LanguageService.GetDefaultIsoCodeAsync();
+
+        var contentType = await CreateVarianceCapableType(isElement, ContentVariation.Culture);
+        IPublishableContentBase instance = isElement
+            ? await CreateElementInstanceWithValue(contentType, (defaultCulture, "default value"), ("da-DK", "danish value"))
+            : await CreateContentInstanceWithValue(contentType, (defaultCulture, "default value"), ("da-DK", "danish value"));
+
+        // Publish both cultures, then leave an unpublished edit in da-DK only - the default culture stays
+        // clean (current == published). The da-DK edit is what will get discarded by the variance change below.
+        if (isElement)
+        {
+            ElementService.Publish((IElement)instance, ["*"]);
+            var elementToEdit = ElementService.GetById(instance.Key);
+            elementToEdit!.SetValue(VarianceTestPropertyAlias, "unpublished danish edit", "da-DK");
+            ElementService.Save(elementToEdit);
+        }
+        else
+        {
+            ContentService.Publish((IContent)instance, ["*"]);
+            var contentToEdit = ContentService.GetById(instance.Key);
+            contentToEdit!.SetValue(VarianceTestPropertyAlias, "unpublished danish edit", "da-DK");
+            ContentService.Save(contentToEdit);
+        }
+
+        var propertyType = contentType.PropertyTypes.Single(p => p.Alias == VarianceTestPropertyAlias);
+        propertyType.Variations = ContentVariation.Nothing;
+        await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
+
+        IPublishableContentBase? reloaded = isElement
+            ? ElementService.GetById(instance.Key)
+            : ContentService.GetById(instance.Key);
+
+        Assert.IsNotNull(reloaded);
+        Assert.AreEqual("default value", reloaded!.GetValue<string>(VarianceTestPropertyAlias));
+        Assert.IsFalse(reloaded.Edited, "The only pending edit was in a culture discarded by the variance change, so the content should no longer be considered edited.");
+    }
+
     private async Task<IContentType> CreateVarianceCapableType(bool isElement, ContentVariation propertyVariation = ContentVariation.Nothing)
     {
         var contentType = new ContentTypeBuilder()
