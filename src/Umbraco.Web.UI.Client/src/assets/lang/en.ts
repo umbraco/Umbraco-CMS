@@ -968,6 +968,7 @@ export default {
 		password: 'Password',
 		path: 'Path',
 		pixels: 'pixels',
+		placeholder: 'Placeholder',
 		pleasewait: 'One moment please...',
 		previous: 'Previous',
 		properties: 'Properties',
@@ -1021,6 +1022,7 @@ export default {
 		username: 'Username',
 		value: 'Value',
 		view: 'View',
+		weight: 'Weight',
 		welcome: 'Welcome...',
 		width: 'Width',
 		yes: 'Yes',
@@ -1494,6 +1496,7 @@ export default {
 	propertyEditorPicker: {
 		title: 'Select a property editor',
 		openPropertyEditorPicker: 'Select a property editor UI',
+		selectAction: "Select Property Editor",
 	},
 	propertyEditorUIGroups: {
 		advanced: 'Advanced',
@@ -1611,10 +1614,14 @@ export default {
 		cssSavedText: 'Stylesheet saved without any errors',
 		dataTypeSaved: 'Datatype saved',
 		dictionaryItemSaved: 'Dictionary item saved',
+		editContentPublishedFailed: 'Document could not be published or saved',
 		editContentPublishedFailedByValidation: 'Document could not be published, but we saved it for you',
 		editContentPublishedFailedByParent: 'Document could not be published, because a parent page is not published',
 		editContentPublishedHeader: 'Document published',
+		editElementPublishedFailed: 'Element could not be published or saved',
 		editElementPublishedHeader: 'Element published',
+		editContentPublishedReloadFailed: 'Document published, but the editor could not be refreshed',
+		editElementPublishedReloadFailed: 'Element published, but the editor could not be refreshed',
 		editContentPublishedText: 'and is visible on the website',
 		editContentUnpublishedHeader: 'Document unpublished',
 		editContentUnpublishedText: 'and is no longer visible on the website',
@@ -1882,8 +1889,16 @@ export default {
 		chooseChildNode: 'Choose child node',
 		compositionsDescription:
 			'Inherit tabs and properties from an existing Document Type. New tabs will be added to the current Document Type or merged if a tab with an identical name exists.',
-		compositionInUse: 'This Content Type is used in a composition, and therefore cannot be composed itself.',
-		noAvailableCompositions: 'There are no Content Types available to use as a composition.',
+		compositionsDescriptionMediaType:
+			'Inherit tabs and properties from an existing Media Type. New tabs will be added to the current Media Type or merged if a tab with an identical name exists.',
+		compositionsDescriptionMemberType:
+			'Inherit tabs and properties from an existing Member Type. New tabs will be added to the current Member Type or merged if a tab with an identical name exists.',
+		compositionInUse: 'This Document Type is used in a composition, and therefore cannot be composed itself.',
+		compositionInUseMediaType: 'This Media Type is used in a composition, and therefore cannot be composed itself.',
+		compositionInUseMemberType: 'This Member Type is used in a composition, and therefore cannot be composed itself.',
+		noAvailableCompositions: 'There are no Document Types available to use as a composition.',
+		noAvailableCompositionsMediaType: 'There are no Media Types available to use as a composition.',
+		noAvailableCompositionsMemberType: 'There are no Member Types available to use as a composition.',
 		compositionRemoveWarning:
 			"Removing a composition will delete all the associated property data. Once you save the Document Type there's no way back.",
 		availableEditors: 'Create new',
@@ -1921,7 +1936,11 @@ export default {
 		tabHasNoSortOrder: 'tab has no sort order',
 		compositionUsageHeading: 'Where is this composition used?',
 		compositionUsageSpecification:
-			'This composition is currently used in the composition of the following Content Types:',
+			'This composition is currently used in the composition of the following Document Types:',
+		compositionUsageSpecificationMediaType:
+			'This composition is currently used in the composition of the following Media Types:',
+		compositionUsageSpecificationMemberType:
+			'This composition is currently used in the composition of the following Member Types:',
 		variantsHeading: 'Variation',
 		cultureVariantHeading: 'Allow vary by culture',
 		segmentVariantHeading: 'Allow segmentation',
@@ -2137,6 +2156,13 @@ export default {
 		structureGroup: 'Structure',
 		advancedGroup: 'Advanced',
 		webhooks: 'Webhooks',
+	},
+	tree: {
+		classicViewLabel: 'Tree',
+		cardViewLabel: 'Cards',
+		tableViewLabel: 'Table',
+		children: 'Children',
+		noItems: 'No items',
 	},
 	update: {
 		updateAvailable: 'New update ready',
@@ -2522,6 +2548,8 @@ export default {
 	textbox: {
 		characters_left: '<strong>%0%</strong> characters left.',
 		characters_exceed: 'Maximum %0% characters, <strong>%1%</strong> too many.',
+		maxCharsLabel: 'Maximum allowed characters',
+		autocompleteLabel: 'Autocomplete',
 	},
 	recycleBin: {
 		contentTrashed: 'Trashed content with Id: {0} related to original parent content with Id: {1}',

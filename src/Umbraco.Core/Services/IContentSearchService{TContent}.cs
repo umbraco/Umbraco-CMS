@@ -5,7 +5,6 @@ namespace Umbraco.Cms.Core.Services;
 /// <summary>
 ///     Provides search services for content items of a specific type.
 /// </summary>
-/// <typeparam name="TContent">The type of content to search for.</typeparam>
 /// <typeparam name="TContent">The type of content item to search for. Must implement <see cref="IContentBase"/>.</typeparam>
 public interface IContentSearchService<TContent>
     where TContent : class, IContentBase

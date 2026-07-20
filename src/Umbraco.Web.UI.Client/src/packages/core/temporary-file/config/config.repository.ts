@@ -6,6 +6,11 @@ import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { Observable } from '@umbraco-cms/backoffice/observable-api';
+import { map } from '@umbraco-cms/backoffice/external/rxjs';
+
+// SVG is rendered natively by browsers but can never appear in the server's imageFileTypes,
+// because the imaging pipeline cannot process it (#20574).
+const ADDITIONAL_DISPLAYABLE_IMAGE_FILE_TYPES = ['svg'];
 
 export class UmbTemporaryFileConfigRepository extends UmbRepositoryBase implements UmbApi {
 	/**
@@ -72,6 +77,25 @@ export class UmbTemporaryFileConfigRepository extends UmbRepositoryBase implemen
 		}
 
 		return this.#dataStore.part(part);
+	}
+
+	/**
+	 * Subscribe to the image file types that can be displayed directly by the browser.
+	 * This is the configured `imageFileTypes` plus formats browsers render natively but the server's
+	 * imaging pipeline cannot process (e.g. svg), so it is suited for display-only consumers such as
+	 * image pickers and previews — not for upload or cropping contexts, where the server-configured
+	 * `imageFileTypes` applies as-is.
+	 * @returns {Observable<Array<string>>} The file extensions, lowercased and without leading dots.
+	 */
+	displayableImageFileTypes(): Observable<Array<string>> {
+		return this.part('imageFileTypes').pipe(
+			map((fileTypes) => [
+				...new Set([
+					...(fileTypes ?? []).map((type) => type.toLowerCase()),
+					...ADDITIONAL_DISPLAYABLE_IMAGE_FILE_TYPES,
+				]),
+			]),
+		);
 	}
 }
 

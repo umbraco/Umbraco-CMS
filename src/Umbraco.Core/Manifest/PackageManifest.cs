@@ -26,6 +26,13 @@ public class PackageManifest
     public bool AllowPublicAccess { get; set; }
 
     /// <summary>
+    ///     Gets or sets a value indicating whether Umbraco automatically appends a cache-buster to this package's clean
+    ///     <c>/App_Plugins</c> URLs (importmap and extensions). <c>true</c> by default; set <c>false</c> to opt out of the
+    ///     automatic stamping only.
+    /// </summary>
+    public bool AllowCacheBusting { get; set; } = true;
+
+    /// <summary>
     ///     Gets or sets a value indicating whether the package allows telemetry collection.
     /// </summary>
     public bool AllowTelemetry { get; set; } = true;

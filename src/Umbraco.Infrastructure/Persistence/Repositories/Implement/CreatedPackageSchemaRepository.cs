@@ -1,8 +1,10 @@
 using System.ComponentModel.DataAnnotations;
 using System.IO.Compression;
 using System.Xml.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using NPoco;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
@@ -32,6 +34,7 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
     private readonly MediaFileManager _mediaFileManager;
     private readonly IMediaService _mediaService;
     private readonly IMediaTypeService _mediaTypeService;
+    private readonly IElementService _elementService;
     private readonly IEntityXmlSerializer _serializer;
     private readonly string _tempFolderPath;
     private readonly PackageDefinitionXmlParser _xmlParser;
@@ -53,6 +56,7 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
     /// <param name="templateService">Service for managing templates.</param>
     /// <param name="dictionaryItemService">Service for managing dictionary items for localization.</param>
     /// <param name="languageService">Service for managing languages.</param>
+    /// <param name="elementService">Service for managing elements.</param>
     /// <param name="mediaFolderPath">The file system path to the media folder, if specified.</param>
     /// <param name="tempFolderPath">The file system path to the temporary folder, if specified.</param>
     public CreatedPackageSchemaRepository(
@@ -70,6 +74,7 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
         ITemplateService templateService,
         IDictionaryItemService dictionaryItemService,
         ILanguageService languageService,
+        IElementService elementService,
         string? mediaFolderPath = null,
         string? tempFolderPath = null)
     {
@@ -87,9 +92,68 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
         _templateService = templateService;
         _dictionaryItemService = dictionaryItemService;
         _languageService = languageService;
+        _elementService = elementService;
         _xmlParser = new PackageDefinitionXmlParser();
         _createdPackagesFolderPath = mediaFolderPath ?? Constants.SystemDirectories.CreatedPackages;
         _tempFolderPath = tempFolderPath ?? Constants.SystemDirectories.TempData + "/PackageFiles";
+    }
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="CreatedPackageSchemaRepository" /> class.
+    /// </summary>
+    /// <param name="hostingEnvironment">Provides information about the web hosting environment.</param>
+    /// <param name="fileSystems">Manages access to various file systems used by the application.</param>
+    /// <param name="serializer">Serializes and deserializes entities to and from XML.</param>
+    /// <param name="dataTypeService">Service for managing data types.</param>
+    /// <param name="stylesheetService">Service for managing stylesheets.</param>
+    /// <param name="mediaService">Service for managing media items.</param>
+    /// <param name="mediaTypeService">Service for managing media types.</param>
+    /// <param name="contentService">Service for managing content items.</param>
+    /// <param name="mediaFileManager">Handles media file management operations.</param>
+    /// <param name="contentTypeService">Service for managing content types.</param>
+    /// <param name="scopeAccessor">Provides access to the current database scope.</param>
+    /// <param name="templateService">Service for managing templates.</param>
+    /// <param name="dictionaryItemService">Service for managing dictionary items for localization.</param>
+    /// <param name="languageService">Service for managing languages.</param>
+    /// <param name="mediaFolderPath">The file system path to the media folder, if specified.</param>
+    /// <param name="tempFolderPath">The file system path to the temporary folder, if specified.</param>
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 20.")]
+    public CreatedPackageSchemaRepository(
+        IHostingEnvironment hostingEnvironment,
+        FileSystems fileSystems,
+        IEntityXmlSerializer serializer,
+        IDataTypeService dataTypeService,
+        IStylesheetService stylesheetService,
+        IMediaService mediaService,
+        IMediaTypeService mediaTypeService,
+        IContentService contentService,
+        MediaFileManager mediaFileManager,
+        IContentTypeService contentTypeService,
+        IScopeAccessor scopeAccessor,
+        ITemplateService templateService,
+        IDictionaryItemService dictionaryItemService,
+        ILanguageService languageService,
+        string? mediaFolderPath = null,
+        string? tempFolderPath = null)
+        : this(
+            hostingEnvironment,
+            fileSystems,
+            serializer,
+            dataTypeService,
+            stylesheetService,
+            mediaService,
+            mediaTypeService,
+            contentService,
+            mediaFileManager,
+            contentTypeService,
+            scopeAccessor,
+            templateService,
+            dictionaryItemService,
+            languageService,
+            StaticServiceProvider.Instance.GetRequiredService<IElementService>(),
+            mediaFolderPath,
+            tempFolderPath)
+    {
     }
 
     private IUmbracoDatabase Database => _scopeAccessor.AmbientScope?.Database ?? throw new InvalidOperationException("A scope is required to query the database");
@@ -301,6 +365,7 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
             PackageDictionaryItems(definition, root);
             PackageLanguages(definition, root);
             PackageDataTypes(definition, root);
+            PackageElements(definition, root);
             Dictionary<string, Stream> mediaFiles = PackageMedia(definition, root);
 
             string fileName;
@@ -692,6 +757,22 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
                     "DocumentSet",
                     new XAttribute("importMode", "root"),
                     contentXml)));
+    }
+
+    private void PackageElements(PackageDefinition definition, XContainer root)
+    {
+        // Each element's container (folder) ancestry is encoded on the serialized element and recreated on import.
+        IEnumerable<IElement> elements = _elementService.GetByIds(definition.Elements);
+
+        var elementsXml = new XElement(
+            "Elements",
+            elements.Select(element =>
+                new XElement(
+                    "ElementSet",
+                    new XAttribute("importMode", "root"),
+                    _serializer.Serialize(element))));
+
+        root.Add(elementsXml);
     }
 
     private Dictionary<string, Stream> PackageMedia(PackageDefinition definition, XElement root)
