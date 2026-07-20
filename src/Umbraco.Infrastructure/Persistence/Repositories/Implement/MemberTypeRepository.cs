@@ -79,7 +79,7 @@ internal sealed class MemberTypeRepository : ContentTypeRepositoryBase<IMemberTy
         => GetMany().FirstOrDefault(x => x.Id == id);
 
     protected override IEnumerable<IMemberType>? GetAllWithFullCachePolicy() =>
-        CommonRepository.GetAllTypes()?.OfType<IMemberType>();
+        CommonRepository.GetAllTypesAsync().GetAwaiter().GetResult()?.OfType<IMemberType>();
 
     protected override IEnumerable<IMemberType> PerformGetByQuery(IQuery<IMemberType> query)
     {

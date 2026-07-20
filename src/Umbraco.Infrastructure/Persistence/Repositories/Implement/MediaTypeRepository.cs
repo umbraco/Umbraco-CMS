@@ -74,7 +74,7 @@ internal sealed class MediaTypeRepository : ContentTypeRepositoryBase<IMediaType
         => GetMany().FirstOrDefault(x => x.Id == id);
 
     protected override IEnumerable<IMediaType>? GetAllWithFullCachePolicy() =>
-        CommonRepository.GetAllTypes()?.OfType<IMediaType>();
+        CommonRepository.GetAllTypesAsync().GetAwaiter().GetResult()?.OfType<IMediaType>();
 
     protected override IEnumerable<IMediaType> PerformGetByQuery(IQuery<IMediaType> query)
     {
