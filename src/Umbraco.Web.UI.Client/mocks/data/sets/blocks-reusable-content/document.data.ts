@@ -180,6 +180,7 @@ export const data: Array<UmbMockDocumentModel> = [
 								settingsKey: null,
 							},
 							{
+								key: 'block-list-item-library-element-one-a',
 								contentKey: 'library-element-one-id',
 								settingsKey: null,
 								isExternalContent: true,
@@ -190,12 +191,20 @@ export const data: Array<UmbMockDocumentModel> = [
 								isExternalContent: true,
 							},
 							{
+								key: 'block-list-item-library-element-three',
 								contentKey: 'library-element-three-id',
 								settingsKey: null,
 								isExternalContent: true,
 							},
 							{
+								key: 'block-list-item-library-element-four',
 								contentKey: 'library-element-four-id',
+								settingsKey: null,
+								isExternalContent: true,
+							},
+							{
+								key: 'block-list-item-library-element-one-b',
+								contentKey: 'library-element-one-id',
 								settingsKey: null,
 								isExternalContent: true,
 							},
