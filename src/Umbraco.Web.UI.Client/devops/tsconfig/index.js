@@ -29,7 +29,6 @@ const tsConfigBase = {
 		experimentalDecorators: true,
 		forceConsistentCasingInFileNames: true,
 		useDefineForClassFields: false,
-		baseUrl: '.',
 		incremental: true,
 		skipLibCheck: true,
 		noImplicitOverride: true,
