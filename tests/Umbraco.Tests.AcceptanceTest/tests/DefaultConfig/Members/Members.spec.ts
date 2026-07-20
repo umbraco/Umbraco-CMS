@@ -109,8 +109,9 @@ test('can edit password', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.member.clickSaveButtonAndWaitForMemberToBeUpdated();
 
   // Assert
-  const memberData = await umbracoApi.member.get(memberId);
-  expect(memberData.lastPasswordChangeDate).not.toBe(passwordChangeDateBeforeEdit);
+  // lastPasswordChangeDate settles async after the update response, so poll instead of reading once.
+  await expect.poll(async () => (await umbracoApi.member.get(memberId)).lastPasswordChangeDate)
+    .not.toBe(passwordChangeDateBeforeEdit);
 });
 
 test('can add member group', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
