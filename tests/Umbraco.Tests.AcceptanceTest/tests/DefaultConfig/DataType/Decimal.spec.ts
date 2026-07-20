@@ -75,3 +75,22 @@ test('can update step size value', async ({umbracoApi, umbracoUi}) => {
   // Assert
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'step', stepSizeValue)).toBeTruthy();
 });
+
+test('the default configuration is correct', async ({umbracoApi, umbracoUi}) => {
+  // Act
+  await umbracoUi.dataType.clickActionsMenuForName('Data Types');
+  await umbracoUi.dataType.clickCreateActionMenuOption();
+  await umbracoUi.dataType.clickDataTypeButton();
+  await umbracoUi.dataType.enterDataTypeName(customDataTypeName);
+  await umbracoUi.dataType.clickSelectAPropertyEditorButton();
+  await umbracoUi.dataType.selectAPropertyEditor(propertyEditorName);
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeCreated();
+
+  // Assert
+  const dataTypeData = await umbracoApi.dataType.getByName(customDataTypeName);
+  expect(dataTypeData.editorAlias).toBe(editorAlias);
+  expect(dataTypeData.editorUiAlias).toBe(editorUiAlias);
+  expect(dataTypeData.values).toEqual([{alias: 'step', value: '0.01'}]);
+  expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'min')).toBeFalsy();
+  expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'max')).toBeFalsy();
+});

@@ -28,6 +28,7 @@ test.afterEach(async ({umbracoApi}) => {
 
 test('can create content with the user picker data type', async ({umbracoApi, umbracoUi}) => {
   // Arrange
+  const expectedState = 'Draft';
   await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeId);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
@@ -43,6 +44,7 @@ test('can create content with the user picker data type', async ({umbracoApi, um
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.variants[0].state).toBe(expectedState);
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
   expect(contentData.values[0].value).toEqual(userId);
 });

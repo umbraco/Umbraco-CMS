@@ -33,3 +33,45 @@ test('can create a slider data type', async ({umbracoApi, umbracoUi}) => {
   expect(dataTypeData.editorAlias).toBe(editorAlias);
   expect(dataTypeData.editorUiAlias).toBe(editorUiAlias);
 });
+
+test('can update minimum value', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const minimumValue = 1;
+  await umbracoApi.dataType.createSliderDataType(customDataTypeName);
+  await umbracoUi.dataType.goToDataType(customDataTypeName);
+
+  // Act
+  await umbracoUi.dataType.enterSliderMinimumValue(minimumValue.toString());
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
+
+  // Assert
+  expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'minVal', minimumValue)).toBeTruthy();
+});
+
+test('can update maximum value', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const maximumValue = 50;
+  await umbracoApi.dataType.createSliderDataType(customDataTypeName);
+  await umbracoUi.dataType.goToDataType(customDataTypeName);
+
+  // Act
+  await umbracoUi.dataType.enterSliderMaximumValue(maximumValue.toString());
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
+
+  // Assert
+  expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'maxVal', maximumValue)).toBeTruthy();
+});
+
+test('can update step size value', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const stepSizeValue = 5;
+  await umbracoApi.dataType.createSliderDataType(customDataTypeName);
+  await umbracoUi.dataType.goToDataType(customDataTypeName);
+
+  // Act
+  await umbracoUi.dataType.enterStepSizeValue(stepSizeValue.toString());
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
+
+  // Assert
+  expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'step', stepSizeValue)).toBeTruthy();
+});
