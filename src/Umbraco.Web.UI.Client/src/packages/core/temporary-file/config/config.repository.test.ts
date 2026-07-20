@@ -59,9 +59,21 @@ describe('UmbTemporaryFileConfigRepository', () => {
 		expect(types).to.deep.equal(['jpg', 'png', 'gif', 'jpeg', 'svg']);
 	});
 
-	it('still supports the legacy await-initialized-then-subscribe pattern (backward compatible)', async () => {
+	it('deprecated initialized still resolves and warns, keeping the legacy await-then-subscribe pattern working', async () => {
 		document.body.appendChild(hostElement);
-		await repository.initialized;
+
+		const originalWarn = console.warn;
+		let warned = '';
+		console.warn = (...args: Array<unknown>) => {
+			warned += args.map(String).join(' ');
+		};
+		try {
+			await repository.initialized;
+		} finally {
+			console.warn = originalWarn;
+		}
+
+		expect(warned).to.contain('initialized is deprecated');
 		expect(await firstValueFrom(repository.part('imageFileTypes'))).to.deep.equal([
 			'jpg',
 			'png',

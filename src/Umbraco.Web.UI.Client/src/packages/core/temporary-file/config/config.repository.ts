@@ -7,24 +7,38 @@ import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { Observable } from '@umbraco-cms/backoffice/observable-api';
 import { from, map, switchMap } from '@umbraco-cms/backoffice/external/rxjs';
+import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 
 // SVG is rendered natively by browsers but can never appear in the server's imageFileTypes,
 // because the imaging pipeline cannot process it (#20574).
 const ADDITIONAL_DISPLAYABLE_IMAGE_FILE_TYPES = ['svg'];
 
 export class UmbTemporaryFileConfigRepository extends UmbRepositoryBase implements UmbApi {
+	#initialized: Promise<void>;
+
 	/**
 	 * Promise that resolves when the repository has been initialized, i.e. when the configuration has been fetched from the server.
-	 * Awaiting this is no longer required before calling all(), part() or displayableImageFileTypes() — they defer internally.
+	 * @deprecated Deprecated since v17. Awaiting this is no longer necessary — all(), part() and
+	 * displayableImageFileTypes() defer internally until the configuration is ready, so you can subscribe
+	 * directly. Scheduled for removal in Umbraco 19.
+	 * @returns {Promise<void>} A promise that resolves once the configuration has been fetched.
 	 */
-	initialized: Promise<void>;
+	get initialized(): Promise<void> {
+		new UmbDeprecation({
+			deprecated: 'UmbTemporaryFileConfigRepository.initialized is deprecated.',
+			removeInVersion: '19.0.0',
+			solution:
+				'Awaiting initialized is no longer necessary — all(), part() and displayableImageFileTypes() defer internally until the configuration is ready. Subscribe directly.',
+		}).warn();
+		return this.#initialized;
+	}
 
 	#dataStore?: typeof UMB_TEMPORARY_FILE_CONFIG_STORE_CONTEXT.TYPE;
 	#dataSource = new UmbTemporaryFileConfigServerDataSource(this);
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_TEMPORARY_FILE_REPOSITORY_ALIAS.toString());
-		this.initialized = new Promise<void>((resolve) => {
+		this.#initialized = new Promise<void>((resolve) => {
 			this.consumeContext(UMB_TEMPORARY_FILE_CONFIG_STORE_CONTEXT, async (store) => {
 				if (store) {
 					this.#dataStore = store;
@@ -58,7 +72,7 @@ export class UmbTemporaryFileConfigRepository extends UmbRepositoryBase implemen
 	 * @returns {Observable<UmbTemporaryFileConfigurationModel>}
 	 */
 	all() {
-		return from(this.initialized).pipe(switchMap(() => this.#dataStore!.all()));
+		return from(this.#initialized).pipe(switchMap(() => this.#dataStore!.all()));
 	}
 
 	/**
@@ -69,7 +83,7 @@ export class UmbTemporaryFileConfigRepository extends UmbRepositoryBase implemen
 	part<Part extends keyof UmbTemporaryFileConfigurationModel>(
 		part: Part,
 	): Observable<UmbTemporaryFileConfigurationModel[Part]> {
-		return from(this.initialized).pipe(switchMap(() => this.#dataStore!.part(part)));
+		return from(this.#initialized).pipe(switchMap(() => this.#dataStore!.part(part)));
 	}
 
 	/**
