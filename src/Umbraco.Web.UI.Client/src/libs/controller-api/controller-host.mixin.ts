@@ -59,7 +59,7 @@ export const UmbControllerHostMixin = <T extends ClassConstructor>(superClass: T
 			const controllers = (this._controllers ??= []);
 
 			// If this specific class is already added, then skip out.
-			if (controllers.indexOf(ctrl) !== -1) {
+			if (controllers.includes(ctrl)) {
 				return;
 			}
 
