@@ -1250,13 +1250,21 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   async clickEmptyRecycleBinButton() {
-    await this.hover(this.recycleBinMenuItem);
-    await this.click(this.emptyRecycleBinBtn, {force: true, timeout: ConstantHelper.timeout.long});
-    await expect(this.confirmEmptyRecycleBinBtn).toBeVisible({timeout: ConstantHelper.timeout.long});
+    // The menu-action click can land before its handler is wired, leaving the dialog closed; retry the open until it appears.
+    await expect(async () => {
+      if (!(await this.confirmEmptyRecycleBinBtn.isVisible())) {
+        await this.hover(this.recycleBinMenuItem);
+        await this.click(this.emptyRecycleBinBtn, {force: true});
+      }
+      await expect(this.confirmEmptyRecycleBinBtn).toBeVisible({timeout: ConstantHelper.timeout.short});
+    }).toPass({timeout: ConstantHelper.timeout.medium});
   }
 
   async clickConfirmEmptyRecycleBinButton() {
-    await this.click(this.confirmEmptyRecycleBinBtn, {force: true, timeout: ConstantHelper.timeout.long});
+    // The confirm dialog can re-render after opening, detaching the button; retry the click until it lands.
+    await expect(async () => {
+      await this.click(this.confirmEmptyRecycleBinBtn, {force: true, timeout: ConstantHelper.timeout.short});
+    }).toPass({timeout: ConstantHelper.timeout.medium});
   }
 
   async isDocumentPropertyEditable(propertyName: string, isEditable: boolean = true) {

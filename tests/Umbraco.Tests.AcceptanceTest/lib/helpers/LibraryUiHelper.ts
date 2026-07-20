@@ -1081,12 +1081,21 @@ export class LibraryUiHelper extends UiBaseLocators {
 
   async clickEmptyRecycleBinButton() {
     // Use the workspace's plain <button> (the hover tree entity-action doesn't open the confirm dialog).
-    await this.click(this.page.locator('button', {hasText: 'Empty recycle bin'}).first(), {force: true, timeout: ConstantHelper.timeout.long});
-    await expect(this.confirmEmptyRecycleBinBtn).toBeVisible({timeout: ConstantHelper.timeout.long});
+    // The click can land before its handler is wired, leaving the dialog closed; retry the open until it appears.
+    const emptyRecycleBinBtn = this.page.locator('button', {hasText: 'Empty recycle bin'}).first();
+    await expect(async () => {
+      if (!(await this.confirmEmptyRecycleBinBtn.isVisible())) {
+        await this.click(emptyRecycleBinBtn, {force: true});
+      }
+      await expect(this.confirmEmptyRecycleBinBtn).toBeVisible({timeout: ConstantHelper.timeout.short});
+    }).toPass({timeout: ConstantHelper.timeout.medium});
   }
 
   async clickConfirmEmptyRecycleBinButton() {
-    await this.click(this.confirmEmptyRecycleBinBtn, {force: true, timeout: ConstantHelper.timeout.long});
+    // The confirm dialog can re-render after opening, detaching the button; retry the click until it lands.
+    await expect(async () => {
+      await this.click(this.confirmEmptyRecycleBinBtn, {force: true, timeout: ConstantHelper.timeout.short});
+    }).toPass({timeout: ConstantHelper.timeout.medium});
   }
 
   async isElementPropertyEditable(propertyName: string, isEditable: boolean = true) {
