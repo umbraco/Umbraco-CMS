@@ -8,6 +8,7 @@ using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -94,6 +95,17 @@ public class ElementService : PublishableContentServiceBase<IElement>, IElementS
 
         foreach (IElement element in elements)
         {
+            // if it's not trashed yet, and published, we should unpublish
+            // but... Unpublishing event makes no sense (not going to cancel?) and no need to save
+            // just raise the event
+            if (element.Trashed == false && element.Published)
+            {
+                scope.Notifications.Publish(new ElementUnpublishedNotification(
+                    element,
+                    eventMessages,
+                    BuildCultureMap(element, element.ContentType.VariesByCulture() ? element.PublishedCultures : ["*"])));
+            }
+
             // delete content
             // triggers the deleted event
             DeleteLocked(scope, element, eventMessages);
@@ -133,11 +145,17 @@ public class ElementService : PublishableContentServiceBase<IElement>, IElementS
     protected override SavedNotification<IElement> SavedNotification(IElement content, EventMessages eventMessages)
         => new ElementSavedNotification(content, eventMessages);
 
+    protected override SavedNotification<IElement> SavedNotification(IElement content, EventMessages eventMessages, IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? savedCultures)
+        => new ElementSavedNotification(content, eventMessages, savedCultures);
+
     protected override SavingNotification<IElement> SavingNotification(IEnumerable<IElement> content, EventMessages eventMessages)
         => new ElementSavingNotification(content, eventMessages);
 
     protected override SavedNotification<IElement> SavedNotification(IEnumerable<IElement> content, EventMessages eventMessages)
         => new ElementSavedNotification(content, eventMessages);
+
+    protected override SavedNotification<IElement> SavedNotification(IEnumerable<IElement> content, EventMessages eventMessages, IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? savedCultures)
+        => new ElementSavedNotification(content, eventMessages, savedCultures);
 
     protected override TreeChangeNotification<IElement> TreeChangeNotification(IElement content, TreeChangeTypes changeTypes, EventMessages eventMessages)
         => new ElementTreeChangeNotification(content, changeTypes, eventMessages);
@@ -157,6 +175,9 @@ public class ElementService : PublishableContentServiceBase<IElement>, IElementS
     protected override IStatefulNotification PublishedNotification(IElement content, EventMessages eventMessages)
         => new ElementPublishedNotification(content, eventMessages);
 
+    protected override IStatefulNotification PublishedNotification(IElement content, EventMessages eventMessages, IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? publishedCultures, IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? unpublishedCultures)
+        => new ElementPublishedNotification(content, eventMessages, publishedCultures, unpublishedCultures);
+
     protected override IStatefulNotification PublishedNotification(IEnumerable<IElement> content, EventMessages eventMessages)
         => new ElementPublishedNotification(content, eventMessages);
 
@@ -165,6 +186,9 @@ public class ElementService : PublishableContentServiceBase<IElement>, IElementS
 
     protected override IStatefulNotification UnpublishedNotification(IElement content, EventMessages eventMessages)
         => new ElementUnpublishedNotification(content, eventMessages);
+
+    protected override IStatefulNotification UnpublishedNotification(IElement content, EventMessages eventMessages, IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? unpublishedCultures)
+        => new ElementUnpublishedNotification(content, eventMessages, unpublishedCultures);
 
     protected override RollingBackNotification<IElement> RollingBackNotification(IElement target, EventMessages messages)
         => new ElementRollingBackNotification(target, messages);

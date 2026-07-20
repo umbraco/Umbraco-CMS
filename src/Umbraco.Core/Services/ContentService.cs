@@ -757,129 +757,6 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
 
     #region Save, Publish, Unpublish
 
-    public PublishResult SaveAndPublish(IContent content, string[] culturesToPublish, int userId = Constants.Security.SuperUserId)
-    {
-        if (content == null)
-        {
-            throw new ArgumentNullException(nameof(content));
-        }
-
-        if (culturesToPublish == null)
-        {
-            throw new ArgumentNullException(nameof(culturesToPublish));
-        }
-
-        // wildcards and nulls are not accepted here; cultures must be explicit
-        if (culturesToPublish.Any(x => x == null || x == "*"))
-        {
-            throw new InvalidOperationException(
-                "Only valid cultures are allowed to be used in this method, wildcards or nulls are not allowed");
-        }
-
-        EnsureCulturesAreValid(culturesToPublish, nameof(culturesToPublish));
-
-        culturesToPublish = culturesToPublish.Select(x => x.EnsureCultureCode()!).ToArray();
-
-        EnsureNameLengthIsValid(content);
-
-        EnsurePublishedStateAllowsPublish(content);
-
-        var varies = content.ContentType.VariesByCulture();
-        if (varies is false)
-        {
-            if (culturesToPublish.Length > 0)
-            {
-                throw new ArgumentException(
-                    "Cultures cannot be specified when publishing invariant content types.",
-                    nameof(culturesToPublish));
-            }
-
-            // doesn't vary; publish the invariant culture in a single scope alongside the save
-            return SaveAndPublish(content, userId: userId);
-        }
-
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
-        scope.WriteLock(Constants.Locks.ContentTree);
-
-        var allLangs = _languageRepository.GetMany().ToList();
-
-        EventMessages evtMsgs = EventMessagesFactory.Get();
-
-        var savingNotification = new ContentSavingNotification(content, evtMsgs);
-        if (scope.Notifications.PublishCancelable(savingNotification))
-        {
-            return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, content);
-        }
-
-        IEnumerable<CultureImpact> impacts =
-            culturesToPublish.Select(x => _cultureImpactFactory.ImpactExplicit(x, IsDefaultCulture(allLangs, x)));
-
-        // publish the culture(s)
-        // we don't care about the response here, this response will be rechecked below but we need to set the culture info values now.
-        foreach (CultureImpact impact in impacts)
-        {
-            content.PublishCulture(impact, DateTime.UtcNow, _propertyEditorCollection);
-        }
-
-        PublishResult result = CommitContentChangesInternal(scope, content, evtMsgs, allLangs, savingNotification.State, userId);
-        scope.Complete();
-        return result;
-    }
-
-    private PublishResult SaveAndPublish(IContent content, string culture = "*", int userId = Constants.Security.SuperUserId)
-    {
-        EventMessages evtMsgs = EventMessagesFactory.Get();
-
-        EnsurePublishedStateAllowsPublish(content);
-
-        // cannot accept invariant (null or empty) culture for variant content type
-        // cannot accept a specific culture for invariant content type (but '*' is ok)
-        if (content.ContentType.VariesByCulture())
-        {
-            if (culture.IsNullOrWhiteSpace())
-            {
-                throw new NotSupportedException("Invariant culture is not supported by variant content types.");
-            }
-        }
-        else
-        {
-            if (!culture.IsNullOrWhiteSpace() && culture != "*")
-            {
-                throw new NotSupportedException(
-                    $"Culture \"{culture}\" is not supported by invariant content types.");
-            }
-        }
-
-        EnsureNameLengthIsValid(content);
-
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
-        scope.WriteLock(Constants.Locks.ContentTree);
-
-        var allLangs = _languageRepository.GetMany().ToList();
-
-        // Change state to publishing
-        content.PublishedState = PublishedState.Publishing;
-        var savingNotification = new ContentSavingNotification(content, evtMsgs);
-        if (scope.Notifications.PublishCancelable(savingNotification))
-        {
-            return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, content);
-        }
-
-        // if culture is specific, first publish the invariant values, then publish the culture itself.
-        // if culture is '*', then publish them all (including variants)
-
-        // this will create the correct culture impact even if culture is * or null
-        var impact = _cultureImpactFactory.Create(culture, IsDefaultCulture(allLangs, culture), content);
-
-        // publish the culture(s)
-        // we don't care about the response here, this response will be rechecked below but we need to set the culture info values now.
-        content.PublishCulture(impact, DateTime.UtcNow, _propertyEditorCollection);
-
-        PublishResult result = CommitContentChangesInternal(scope, content, evtMsgs, allLangs, savingNotification.State, userId);
-        scope.Complete();
-        return result;
-    }
-
     /// <inheritdoc />
     /// <summary>
     ///     Publishes/unpublishes any pending publishing changes made to the document.
@@ -1031,34 +908,6 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
         return PublishBranch(content, ShouldPublish, PublishBranch_PublishCultures, userId);
     }
 
-    private const int MaxContentNameLength = 255;
-
-    private static void EnsureNameLengthIsValid(IContent content)
-    {
-        if (content.Name?.Length > MaxContentNameLength)
-        {
-            throw new InvalidOperationException($"Name cannot be more than {MaxContentNameLength} characters in length.");
-        }
-    }
-
-    private static void EnsureCulturesAreValid(string[] cultures, string paramName)
-    {
-        if (cultures.Any(c => c.IsNullOrWhiteSpace()) || cultures.Distinct().Count() != cultures.Length)
-        {
-            throw new ArgumentException("Cultures cannot be null or whitespace, and must be distinct.", paramName);
-        }
-    }
-
-    private static void EnsurePublishedStateAllowsPublish(IContent content)
-    {
-        PublishedState publishedState = content.PublishedState;
-        if (publishedState != PublishedState.Published && publishedState != PublishedState.Unpublished)
-        {
-            throw new InvalidOperationException(
-                $"Cannot save-and-publish (un)publishing content, use the dedicated {nameof(CommitDocumentChanges)} method.");
-        }
-    }
-
     private static string[] EnsureCultures(IContent content, string[] cultures)
     {
         // Ensure consistent indication of "all cultures" for variant content.
@@ -1117,6 +966,23 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
                 throw new InvalidOperationException("Cannot mix PublishCulture and SaveAndPublishBranch.");
             }
 
+            // captures the cultures published per document, so the notification can report them per item
+            var publishedCulturesByDocument = new Dictionary<Guid, IReadOnlyCollection<string>>();
+            var variesByCulture = document.ContentType.VariesByCulture();
+
+            void TrackPublishedCultures(IContent publishedDocument, HashSet<string>? documentCulturesToPublish)
+            {
+                // a branch can mix variant and invariant content types, so determine variance per document rather
+                // than from the branch root; snapshot the cultures so the notification never holds a mutable set
+                string[] cultures = publishedDocument.ContentType.VariesByCulture()
+                    ? documentCulturesToPublish?.ToArray() ?? []
+                    : ["*"];
+                if (cultures.Length > 0)
+                {
+                    publishedCulturesByDocument[publishedDocument.Key] = cultures;
+                }
+            }
+
             // deal with the branch root - if it fails, abort
             HashSet<string>? culturesToPublish = shouldPublish(document);
             PublishResult? result = PublishBranchItem(scope, document, culturesToPublish, publishCultures, true, publishedDocuments, eventMessages, userId, allLangs, out IDictionary<string, object?>? notificationState);
@@ -1127,6 +993,8 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
                 {
                     return results;
                 }
+
+                TrackPublishedCultures(document, culturesToPublish);
             }
 
             HashSet<string> culturesPublished = culturesToPublish ?? [];
@@ -1164,6 +1032,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
                         if (result.Success)
                         {
                             culturesPublished.UnionWith(culturesToPublish ?? []);
+                            TrackPublishedCultures(d, culturesToPublish);
                             continue;
                         }
                     }
@@ -1180,7 +1049,6 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
 
             // trigger events for the entire branch
             // (SaveAndPublishBranchOne does *not* do it)
-            var variesByCulture = document.ContentType.VariesByCulture();
             scope.Notifications.Publish(
                 new ContentTreeChangeNotification(
                     document,
@@ -1188,7 +1056,14 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
                     variesByCulture ? culturesPublished.IsCollectionEmpty() ? null : culturesPublished : ["*"],
                     null,
                     eventMessages));
-            scope.Notifications.Publish(new ContentPublishedNotification(publishedDocuments, eventMessages, true).WithState(notificationState));
+            scope.Notifications.Publish(
+                new ContentPublishedNotification(
+                    publishedDocuments,
+                    eventMessages,
+                    true,
+                    publishedCulturesByDocument,
+                    null)
+                .WithState(notificationState));
 
             scope.Complete();
         }
@@ -2048,7 +1923,10 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
                 // just raise the event
                 if (content.Trashed == false && content.Published)
                 {
-                    scope.Notifications.Publish(new ContentUnpublishedNotification(content, eventMessages));
+                    scope.Notifications.Publish(new ContentUnpublishedNotification(
+                        content,
+                        eventMessages,
+                        BuildCultureMap(content, content.ContentType.VariesByCulture() ? content.PublishedCultures : ["*"])));
                 }
 
                 // if current content has children, move them to trash
@@ -2402,11 +2280,17 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
     protected override SavedNotification<IContent> SavedNotification(IContent content, EventMessages eventMessages)
         => new ContentSavedNotification(content, eventMessages);
 
+    protected override SavedNotification<IContent> SavedNotification(IContent content, EventMessages eventMessages, IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? savedCultures)
+        => new ContentSavedNotification(content, eventMessages, savedCultures);
+
     protected override SavingNotification<IContent> SavingNotification(IEnumerable<IContent> content, EventMessages eventMessages)
         => new ContentSavingNotification(content, eventMessages);
 
     protected override SavedNotification<IContent> SavedNotification(IEnumerable<IContent> content, EventMessages eventMessages)
         => new ContentSavedNotification(content, eventMessages);
+
+    protected override SavedNotification<IContent> SavedNotification(IEnumerable<IContent> content, EventMessages eventMessages, IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? savedCultures)
+        => new ContentSavedNotification(content, eventMessages, savedCultures);
 
     protected override TreeChangeNotification<IContent> TreeChangeNotification(IContent content, TreeChangeTypes changeTypes, EventMessages eventMessages)
         => new ContentTreeChangeNotification(content, changeTypes, eventMessages);
@@ -2426,6 +2310,9 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
     protected override IStatefulNotification PublishedNotification(IContent content, EventMessages eventMessages)
         => new ContentPublishedNotification(content, eventMessages);
 
+    protected override IStatefulNotification PublishedNotification(IContent content, EventMessages eventMessages, IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? publishedCultures, IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? unpublishedCultures)
+        => new ContentPublishedNotification(content, eventMessages, publishedCultures, unpublishedCultures);
+
     protected override IStatefulNotification PublishedNotification(IEnumerable<IContent> content, EventMessages eventMessages)
         => new ContentPublishedNotification(content, eventMessages);
 
@@ -2434,6 +2321,9 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
 
     protected override IStatefulNotification UnpublishedNotification(IContent content, EventMessages eventMessages)
         => new ContentUnpublishedNotification(content, eventMessages);
+
+    protected override IStatefulNotification UnpublishedNotification(IContent content, EventMessages eventMessages, IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? unpublishedCultures)
+        => new ContentUnpublishedNotification(content, eventMessages, unpublishedCultures);
 
     protected override RollingBackNotification<IContent> RollingBackNotification(IContent target, EventMessages messages)
         => new ContentRollingBackNotification(target, messages);

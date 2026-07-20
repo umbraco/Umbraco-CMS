@@ -130,6 +130,13 @@ internal sealed class ElementEditingService
     }
 
     public async Task<Attempt<ElementCreateResult, ContentEditingOperationStatus>> CreateAsync(ElementCreateModel createModel, Guid userKey)
+        => await HandleCreateAsync(createModel, null, userKey);
+
+    /// <inheritdoc />
+    public async Task<Attempt<ElementCreateResult, ContentEditingOperationStatus>> CreateAndPublishAsync(ElementCreateModel createModel, string[] culturesToPublish, Guid userKey)
+        => await HandleCreateAsync(createModel, culturesToPublish, userKey);
+
+    private async Task<Attempt<ElementCreateResult, ContentEditingOperationStatus>> HandleCreateAsync(ElementCreateModel createModel, string[]? culturesToPublish, Guid userKey)
     {
         if (await ValidateCulturesAsync(createModel) is false)
         {
@@ -149,13 +156,22 @@ internal sealed class ElementEditingService
 
         IElement element = await EnsureOnlyAllowedFieldsAreUpdated(result.Result.Content!, userKey);
 
-        ContentEditingOperationStatus saveStatus = await SaveAsync(element, userKey);
+        ContentEditingOperationStatus saveStatus = culturesToPublish is null
+            ? await SaveAsync(element, userKey)
+            : await SaveAndPublish(element, culturesToPublish, userKey);
         return saveStatus == ContentEditingOperationStatus.Success
             ? Attempt.SucceedWithStatus(validationStatus, new ElementCreateResult { Content = element, ValidationResult = validationResult })
             : Attempt.FailWithStatus(saveStatus, new ElementCreateResult { Content = element });
     }
 
     public async Task<Attempt<ElementUpdateResult, ContentEditingOperationStatus>> UpdateAsync(Guid key, ElementUpdateModel updateModel, Guid userKey)
+        => await HandleUpdateAsync(key, updateModel, null, userKey);
+
+    /// <inheritdoc />
+    public async Task<Attempt<ElementUpdateResult, ContentEditingOperationStatus>> UpdateAndPublishAsync(Guid key, ElementUpdateModel updateModel, string[] culturesToPublish, Guid userKey)
+        => await HandleUpdateAsync(key, updateModel, culturesToPublish, userKey);
+
+    private async Task<Attempt<ElementUpdateResult, ContentEditingOperationStatus>> HandleUpdateAsync(Guid key, ElementUpdateModel updateModel, string[]? culturesToPublish, Guid userKey)
     {
         IElement? element = ContentService.GetById(key);
         if (element is null)
@@ -181,7 +197,9 @@ internal sealed class ElementEditingService
 
         element = await EnsureOnlyAllowedFieldsAreUpdated(element, userKey);
 
-        ContentEditingOperationStatus saveStatus = await SaveAsync(element, userKey);
+        ContentEditingOperationStatus saveStatus = culturesToPublish is null
+            ? await SaveAsync(element, userKey)
+            : await SaveAndPublish(element, culturesToPublish, userKey);
         return saveStatus == ContentEditingOperationStatus.Success
             ? Attempt.SucceedWithStatus(validationStatus, new ElementUpdateResult { Content = element, ValidationResult = validationResult })
             : Attempt.FailWithStatus(saveStatus, new ElementUpdateResult { Content = element });
@@ -562,6 +580,30 @@ internal sealed class ElementEditingService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Content save operation failed");
+            return ContentEditingOperationStatus.Unknown;
+        }
+    }
+
+    private async Task<ContentEditingOperationStatus> SaveAndPublish(IElement content, string[] culturesToPublish, Guid userKey)
+    {
+        try
+        {
+            var currentUserId = await GetUserIdAsync(userKey);
+            PublishResult publishResult = ContentService.SaveAndPublish(content, culturesToPublish, userId: currentUserId);
+            if (publishResult.Success)
+            {
+                return ContentEditingOperationStatus.Success;
+            }
+
+            return publishResult.Result switch
+            {
+                PublishResultType.FailedPublishCancelledByEvent => ContentEditingOperationStatus.CancelledByNotification,
+                _ => ContentEditingOperationStatus.Unknown,
+            };
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Content save and publish operation failed");
             return ContentEditingOperationStatus.Unknown;
         }
     }

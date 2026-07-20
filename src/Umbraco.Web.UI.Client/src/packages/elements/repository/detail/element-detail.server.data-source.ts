@@ -1,15 +1,12 @@
 import type { UmbElementDetailModel } from '../../types.js';
 import { UMB_ELEMENT_ENTITY_TYPE } from '../../entity.js';
+import { umbMapElementCreateRequestBody, umbMapElementUpdateRequestBody } from './element-detail-request.mappers.js';
+import { umbMapElementResponseToDetailModel } from './element-detail-response.mappers.js';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { ElementService } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDataSourceResponse, UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
-import type {
-	CreateElementRequestModel,
-	UpdateElementRequestModel,
-} from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { umbMapElementResponseToDetailModel } from './element-detail-response.mappers.js';
 
 /**
  * A data source for the Element that fetches data from the server
@@ -83,14 +80,7 @@ export class UmbElementServerDataSource implements UmbDetailDataSource<UmbElemen
 		if (!model) throw new Error('Element is missing');
 		if (!model.unique) throw new Error('Element unique is missing');
 
-		// TODO: make data mapper to prevent errors
-		const body: CreateElementRequestModel = {
-			id: model.unique,
-			parent: parentUnique ? { id: parentUnique } : null,
-			documentType: { id: model.documentType.unique },
-			values: model.values,
-			variants: model.variants,
-		};
+		const body = umbMapElementCreateRequestBody(model, parentUnique);
 
 		const { data, error } = await tryExecute(
 			this.#host,
@@ -115,11 +105,7 @@ export class UmbElementServerDataSource implements UmbDetailDataSource<UmbElemen
 	async update(model: UmbElementDetailModel) {
 		if (!model.unique) throw new Error('Unique is missing');
 
-		// TODO: make data mapper to prevent errors
-		const body: UpdateElementRequestModel = {
-			values: model.values,
-			variants: model.variants,
-		};
+		const body = umbMapElementUpdateRequestBody(model);
 
 		const { error } = await tryExecute(
 			this.#host,
