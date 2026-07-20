@@ -32,10 +32,12 @@ public static class ContentSettingsExtensions
     /// </returns>
     public static bool IsAllowedImageFileType(this ContentSettings contentSettings, string extension)
     {
-        if (string.IsNullOrEmpty(extension))
+        if (string.IsNullOrWhiteSpace(extension))
         {
             return false;
         }
+
+        extension = extension.Trim();
 
         if (contentSettings.DisallowedUploadedFileExtensions.InvariantContains(extension))
         {

@@ -78,6 +78,7 @@ public class ContentSettingsExtensionsTests
     [TestCase("jpg")]
     [TestCase("webp")]
     [TestCase("PNG")]
+    [TestCase(" png ")]
     public void IsAllowedImageFileType_Allows_Default_Image_Type(string extension)
         => Assert.IsTrue(new ContentSettings().IsAllowedImageFileType(extension));
 
