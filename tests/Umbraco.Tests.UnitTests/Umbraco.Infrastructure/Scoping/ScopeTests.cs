@@ -24,7 +24,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Scoping
         /// <summary>
         /// Creates a ScopeProvider with mocked internals.
         /// </summary>
-        private ScopeProvider GetScopeProvider(
+        private static ScopeProvider GetScopeProvider(
             out Mock<IDistributedLockingMechanism> lockingMechanism,
             CoreDebugSettings coreDebugSettings = null,
             ILoggerFactory loggerFactory = null)
@@ -589,7 +589,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Scoping
 
                 var readDict = new Dictionary<int, int>
                 {
-                    [Constants.Locks.Languages] = 1
+                    [Constants.Locks.Languages] = 1,
                 };
                 scope.GetReadLocks()[Guid.NewGuid()] = readDict;
 
@@ -616,7 +616,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Scoping
 
                 var writeDict = new Dictionary<int, int>
                 {
-                    [Constants.Locks.Languages] = 1
+                    [Constants.Locks.Languages] = 1,
                 };
                 scope.GetWriteLocks()[Guid.NewGuid()] = writeDict;
 
@@ -661,10 +661,9 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Scoping
 
             using (var scope = scopeProvider.CreateScope())
             {
-                Assert.AreEqual(0,scope.Depth);
+                Assert.AreEqual(0, scope.Depth);
             }
         }
-
 
         [Test]
         public void Depth_WhenChildScope_ReturnsDepth()
