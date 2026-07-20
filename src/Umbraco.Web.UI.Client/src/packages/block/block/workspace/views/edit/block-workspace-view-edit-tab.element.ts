@@ -1,13 +1,12 @@
 import { UMB_BLOCK_WORKSPACE_CONTEXT } from '../../block-workspace.context-token.js';
+import type { UmbBlockWorkspaceElementManagerNames } from '../../block-workspace.context.js';
 import { css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UmbContentTypeModel, UmbPropertyTypeContainerMergedModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbContentTypeContainerStructureHelper } from '@umbraco-cms/backoffice/content-type';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import type { UmbContentTypeModel, UmbPropertyTypeContainerMergedModel } from '@umbraco-cms/backoffice/content-type';
 
 import './block-workspace-view-edit-properties.element.js';
-// eslint-disable-next-line import/order
-import type { UmbBlockWorkspaceElementManagerNames } from '../../block-workspace.context.js';
 
 @customElement('umb-block-workspace-view-edit-tab')
 export class UmbBlockWorkspaceViewEditTabElement extends UmbLitElement {

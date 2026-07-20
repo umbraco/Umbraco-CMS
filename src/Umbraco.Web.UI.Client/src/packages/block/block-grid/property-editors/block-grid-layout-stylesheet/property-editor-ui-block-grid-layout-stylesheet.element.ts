@@ -1,18 +1,16 @@
-// Needed to disable the import/no-duplicates rule, cause otherwise we do not get the custom element registered:
-
+import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbServerFilePathUniqueSerializer } from '@umbraco-cms/backoffice/server-file-system';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbInputStaticFileElement } from '@umbraco-cms/backoffice/static-file';
-
-import '@umbraco-cms/backoffice/static-file';
-import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
 import type {
 	UmbPropertyEditorUiElement,
 	UmbPropertyEditorConfigCollection,
 } from '@umbraco-cms/backoffice/property-editor';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbServerFilePathUniqueSerializer } from '@umbraco-cms/backoffice/server-file-system';
-import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
-import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+
+import '@umbraco-cms/backoffice/static-file';
 
 @customElement('umb-property-editor-ui-block-grid-layout-stylesheet')
 export class UmbPropertyEditorUIBlockGridLayoutStylesheetElement
