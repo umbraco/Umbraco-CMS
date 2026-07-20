@@ -180,7 +180,22 @@ export const data: Array<UmbMockDocumentModel> = [
 								settingsKey: null,
 							},
 							{
+								contentKey: 'library-element-one-id',
+								settingsKey: null,
+								isExternalContent: true,
+							},
+							{
 								contentKey: 'library-element-two-id',
+								settingsKey: null,
+								isExternalContent: true,
+							},
+							{
+								contentKey: 'library-element-three-id',
+								settingsKey: null,
+								isExternalContent: true,
+							},
+							{
+								contentKey: 'library-element-four-id',
 								settingsKey: null,
 								isExternalContent: true,
 							},
