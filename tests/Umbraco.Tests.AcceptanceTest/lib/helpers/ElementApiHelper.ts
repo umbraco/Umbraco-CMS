@@ -288,6 +288,13 @@ export class ElementApiHelper {
     await expect.poll(() => this.getFirstPropertyValue(id)).toBe(expectedValue);
   }
 
+  async updateFirstPropertyValueAndPublish(id: string, value: string) {
+    const element = await this.get(id);
+    element.values[0].value = value;
+    await this.update(id, element);
+    await this.publish(id);
+  }
+
   async isElementPublished(id: string) {
     const element = await this.get(id);
     return element.variants[0].state === 'Published';

@@ -1875,6 +1875,12 @@ export class ContentUiHelper extends UiBaseLocators {
     await this.clickConfirmTransferToLibraryButton();
   }
 
+  async transferBlockToLibraryFolder(name: string, folderName: string) {
+    await this.enterNameInTransferToLibraryModal(name);
+    await this.selectFolderInTransferToLibraryModal(folderName);
+    await this.clickConfirmTransferToLibraryButton();
+  }
+
   async clickSaveInReferencedElementWorkspace() {
     await this.click(this.elementWorkspaceSaveBtn);
   }

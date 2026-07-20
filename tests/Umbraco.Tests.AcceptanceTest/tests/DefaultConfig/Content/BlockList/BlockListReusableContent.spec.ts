@@ -2,6 +2,7 @@ import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/accepta
 import {expect} from "@playwright/test";
 
 const contentName = 'TestContentReusable';
+const secondContentName = 'TestContentReusableSecond';
 const documentTypeName = 'TestDocumentTypeForReusableContent';
 const customDataTypeName = 'Custom Block List Reusable';
 const elementTypeName = 'BlockListReusableElement';
@@ -14,6 +15,7 @@ const blockListEditorAlias = 'Umbraco.BlockList';
 const elementPickerDataTypeName = 'Element Picker For Reusable Usage';
 const pickerContentName = 'PickerReferencingContent';
 const pickerDocumentTypeName = 'PickerReferencingDocumentType';
+const templateName = 'ReusableBlockCrossDocTemplate';
 let elementTypeId = '';
 
 test.beforeEach(async ({umbracoApi}) => {
@@ -24,6 +26,7 @@ test.beforeEach(async ({umbracoApi}) => {
 test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.document.ensureNameNotExists(contentName);
   await umbracoApi.document.ensureNameNotExists(contentName + ' (1)');
+  await umbracoApi.document.ensureNameNotExists(secondContentName);
   await umbracoApi.element.ensureNameNotExists(libraryElementName);
   await umbracoApi.element.ensureNameNotExists(transferElementName);
   await umbracoApi.element.ensureNameNotExists(libraryFolderName);
@@ -33,6 +36,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(elementTypeName);
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
   await umbracoApi.dataType.ensureNameNotExists(elementPickerDataTypeName);
+  await umbracoApi.template.ensureNameNotExists(templateName);
 });
 
 test('can insert a block from the Library', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
@@ -323,4 +327,118 @@ test('shows the referencing content in the Element info tab when referenced via 
 
   // Assert
   await umbracoUi.library.doesReferencesItemsInInfoTabHaveCount(1);
+});
+
+test('can transfer a local block to a Library folder', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const localBlockText = 'Local block content for folder transfer';
+  const folderId = await umbracoApi.element.createDefaultElementFolder(libraryFolderName);
+  await umbracoApi.document.createDefaultDocumentWithAnEmptyBlockListEditor(contentName, elementTypeId, documentTypeName, customDataTypeName);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickAddBlockElementButton();
+  await umbracoUi.content.clickBlockElementWithName(elementTypeName);
+  await umbracoUi.content.enterTextstring(localBlockText);
+  await umbracoUi.content.clickCreateModalButton();
+  await umbracoUi.content.clickTransferToLibraryBlockButton();
+  await umbracoUi.content.transferBlockToLibraryFolder(transferElementName, libraryFolderName);
+  await umbracoUi.content.isBlockMarkedAsReference(true);
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
+
+  // Assert
+  const transferredElement = await umbracoApi.element.getByName(transferElementName);
+  expect(transferredElement).toBeTruthy();
+  const folderChildren = await umbracoApi.element.getChildren(folderId);
+  expect(folderChildren.some(child => child.id === transferredElement.id)).toBeTruthy();
+  const blockListValue = await umbracoApi.document.getBlockListValue(contentName);
+  const layoutItem = blockListValue.layout[blockListEditorAlias][0];
+  expect(layoutItem.isExternalContent).toBe(true);
+  expect(layoutItem.contentKey).toBe(transferredElement.id);
+});
+
+test('disconnecting a block in one document leaves the reference intact in another document', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const libraryElementId = await umbracoApi.element.createDefaultElement(libraryElementName, elementTypeId);
+  await umbracoApi.element.publish(libraryElementId);
+  const blockListDataTypeId = await umbracoApi.dataType.createBlockListDataTypeWithABlock(customDataTypeName, elementTypeId);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, blockListDataTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoApi.document.createDefaultDocument(secondContentName, documentTypeId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.insertBlockFromLibraryWithName(libraryElementName);
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(secondContentName);
+  await umbracoUi.reloadPage();
+  await umbracoUi.content.insertBlockFromLibraryWithName(libraryElementName);
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
+
+  // Act
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickDisconnectFromLibraryBlockButton();
+  await umbracoUi.content.clickConfirmDisconnectFromLibraryButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
+
+  // Assert
+  const firstValue = await umbracoApi.document.getBlockListValue(contentName);
+  const firstLayoutItem = firstValue.layout[blockListEditorAlias][0];
+  expect(firstLayoutItem.isExternalContent).not.toBe(true);
+  expect(firstLayoutItem.contentKey).not.toBe(libraryElementId);
+  const secondValue = await umbracoApi.document.getBlockListValue(secondContentName);
+  const secondLayoutItem = secondValue.layout[blockListEditorAlias][0];
+  expect(secondLayoutItem.isExternalContent).toBe(true);
+  expect(secondLayoutItem.contentKey).toBe(libraryElementId);
+  expect(await umbracoApi.element.doesNameExist(libraryElementName)).toBeTruthy();
+});
+
+test('shares a Library element across two documents and reflects updates in both', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const initialText = 'Shared reusable text';
+  const updatedText = 'Shared reusable text (updated)';
+  const libraryElementId = await umbracoApi.element.createElementWithTextContent(libraryElementName, elementTypeId, initialText, propertyInBlock);
+  await umbracoApi.element.publish(libraryElementId);
+  const templateId = await umbracoApi.template.createTemplateWithDisplayingBlockListItems(templateName, customDataTypeName, propertyInBlock);
+  const customDataTypeId = await umbracoApi.dataType.createBlockListDataTypeWithABlock(customDataTypeName, elementTypeId);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditorAndAllowedTemplate(documentTypeName, customDataTypeId, customDataTypeName, templateId);
+  const firstDocumentId = await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  const secondDocumentId = await umbracoApi.document.createDefaultDocument(secondContentName, documentTypeId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.insertBlockFromLibraryWithName(libraryElementName);
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(secondContentName);
+  await umbracoUi.reloadPage();
+  await umbracoUi.content.insertBlockFromLibraryWithName(libraryElementName);
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
+
+  // Assert
+  const firstValue = await umbracoApi.document.getBlockListValue(contentName);
+  const secondValue = await umbracoApi.document.getBlockListValue(secondContentName);
+  expect(firstValue.layout[blockListEditorAlias][0].contentKey).toBe(libraryElementId);
+  expect(secondValue.layout[blockListEditorAlias][0].contentKey).toBe(libraryElementId);
+  await umbracoUi.library.goToSection(ConstantHelper.sections.library);
+  await umbracoUi.library.goToElementWithName(libraryElementName);
+  await umbracoUi.library.clickInfoTab();
+  await umbracoUi.library.doesReferencesItemsInInfoTabHaveCount(2);
+
+  // Act
+  await umbracoApi.element.updateFirstPropertyValueAndPublish(libraryElementId, updatedText);
+
+  // Assert
+  const firstUrl = await umbracoApi.document.getDocumentUrl(firstDocumentId);
+  await umbracoUi.contentRender.navigateToRenderedContentPage(firstUrl);
+  await umbracoUi.contentRender.doesContentRenderValueContainText(updatedText);
+  const secondUrl = await umbracoApi.document.getDocumentUrl(secondDocumentId);
+  await umbracoUi.contentRender.navigateToRenderedContentPage(secondUrl);
+  await umbracoUi.contentRender.doesContentRenderValueContainText(updatedText);
 });
