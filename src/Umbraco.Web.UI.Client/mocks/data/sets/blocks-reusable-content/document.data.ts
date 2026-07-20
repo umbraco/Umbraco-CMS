@@ -85,8 +85,7 @@ export const data: Array<UmbMockDocumentModel> = [
 								columnSpan: 12,
 								rowSpan: 1,
 								areas: [],
-								contentUdi: 'umb://element/73f797f1353848f39ab857b7b6528ff4',
-								settingsUdi: null,
+								key: '73f797f1-3538-48f3-9ab8-57b7b6528ff4',
 								contentKey: '73f797f1-3538-48f3-9ab8-57b7b6528ff4',
 								settingsKey: null,
 							},
@@ -94,8 +93,7 @@ export const data: Array<UmbMockDocumentModel> = [
 								columnSpan: 6,
 								rowSpan: 1,
 								areas: [],
-								contentUdi: 'umb://element/4b97e38d176d4ffda51fff4e461f7b5d',
-								settingsUdi: null,
+								key: '4b97e38d-176d-4ffd-a51f-ff4e461f7b5d',
 								contentKey: '4b97e38d-176d-4ffd-a51f-ff4e461f7b5d',
 								settingsKey: null,
 							},
@@ -103,6 +101,7 @@ export const data: Array<UmbMockDocumentModel> = [
 								columnSpan: 6,
 								rowSpan: 1,
 								areas: [],
+								key: 'block-grid-item-library-element-two',
 								contentKey: 'library-element-two-id',
 								settingsKey: null,
 								isExternalContent: true,
@@ -174,8 +173,7 @@ export const data: Array<UmbMockDocumentModel> = [
 					layout: {
 						'Umbraco.BlockList': [
 							{
-								contentUdi: 'umb://element/a08c8c6a8da246d087b7536985985b24',
-								settingsUdi: null,
+								key: 'a08c8c6a-8da2-46d0-87b7-536985985b24',
 								contentKey: 'a08c8c6a-8da2-46d0-87b7-536985985b24',
 								settingsKey: null,
 							},
@@ -186,6 +184,7 @@ export const data: Array<UmbMockDocumentModel> = [
 								isExternalContent: true,
 							},
 							{
+								key: 'block-list-item-library-element-two',
 								contentKey: 'library-element-two-id',
 								settingsKey: null,
 								isExternalContent: true,
@@ -255,6 +254,7 @@ export const data: Array<UmbMockDocumentModel> = [
 					layout: {
 						'Umbraco.SingleBlock': [
 							{
+								key: 'block-single-item-library-element-one',
 								contentKey: 'library-element-one-id',
 								settingsKey: null,
 								isExternalContent: true,
@@ -329,8 +329,7 @@ export const data: Array<UmbMockDocumentModel> = [
 						layout: {
 							'Umbraco.RichText': [
 								{
-									contentUdi: 'umb://element/f3a1c8d45b2e4a978d6f3c9e7b2a5d10',
-									settingsUdi: null,
+									key: 'f3a1c8d4-5b2e-4a97-8d6f-3c9e7b2a5d10',
 									contentKey: 'f3a1c8d4-5b2e-4a97-8d6f-3c9e7b2a5d10',
 									settingsKey: null,
 								},
