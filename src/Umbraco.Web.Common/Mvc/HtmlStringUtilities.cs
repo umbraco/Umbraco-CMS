@@ -29,10 +29,10 @@ public sealed partial class HtmlStringUtilities
         return new HtmlString(value);
     }
 
-    [GeneratedRegex("\\s{2,}")]
+    [GeneratedRegex(@"\s{2,}")]
     private static partial Regex MultiSpaceRegex();
 
-    [GeneratedRegex("\\s(\\p{P})")]
+    [GeneratedRegex(@"\s([\.,;:!])")]
     private static partial Regex PunctuationRegex();
 
 
