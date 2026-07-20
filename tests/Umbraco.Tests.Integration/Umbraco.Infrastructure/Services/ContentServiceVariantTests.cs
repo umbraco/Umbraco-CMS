@@ -22,6 +22,8 @@ internal sealed class ContentServiceVariantTests : UmbracoIntegrationTest
 
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
+    private ILanguageService LanguageService => GetRequiredService<ILanguageService>();
+
     /// <summary>
     /// Provides both happy path with correctly cased cultures, and originally failing test cases for
     /// https://github.com/umbraco/Umbraco-CMS/issues/19287, where the culture codes are provided with inconsistent casing.
@@ -117,6 +119,35 @@ internal sealed class ContentServiceVariantTests : UmbracoIntegrationTest
             Assert.IsTrue(child.Published);
             Assert.AreEqual(1, child.PublishedCultures.Count());
             Assert.AreEqual("en-US", child.PublishedCultures.FirstOrDefault());
+        });
+    }
+
+    /// <summary>
+    /// Reproduces https://github.com/umbraco/Umbraco-CMS/issues/19287 via the reported path: setting the culture
+    /// directly with non-canonical casing through <see cref="ContentRepositoryExtensions.SetCultureInfo" /> (rather
+    /// than <c>SetCultureName</c>, which already normalises) and then publishing.
+    /// </summary>
+    [Test]
+    public async Task Can_Publish_Content_With_Culture_Set_Directly_With_Inconsistent_Casing()
+    {
+        var contentType = await SetupVariantTest();
+
+        // en-GB is not installed by default; add it so the non-canonical "en-gb" can be published.
+        await LanguageService.CreateAsync(new Language("en-GB", "English (UK)"), Constants.Security.SuperUserKey);
+
+        IContent content = ContentService.Create("Test Item", Constants.System.Root, contentType);
+        content.SetCultureInfo("en-gb", "Test item", DateTime.Now);
+        content.SetValue("title", "Title", "en-gb");
+        ContentService.Save(content);
+
+        var publishResult = ContentService.Publish(content, ["en-gb"]);
+        Assert.IsTrue(publishResult.Success);
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(content.Published);
+            Assert.AreEqual("en-GB", content.AvailableCultures.FirstOrDefault());
+            Assert.AreEqual("en-GB", content.PublishedCultures.FirstOrDefault());
         });
     }
 
