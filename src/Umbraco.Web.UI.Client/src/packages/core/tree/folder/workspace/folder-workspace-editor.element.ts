@@ -25,6 +25,6 @@ export class UmbFolderWorkspaceEditorElement extends UmbLitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		['umb-folder-workspace-editor']: UmbFolderWorkspaceEditorElement;
+		'umb-folder-workspace-editor': UmbFolderWorkspaceEditorElement;
 	}
 }

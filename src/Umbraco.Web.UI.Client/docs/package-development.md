@@ -57,7 +57,7 @@ export class UmbFeatureElement extends UmbLitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    ['umb-feature']: UmbFeatureElement;
+    'umb-feature': UmbFeatureElement;
   }
 }
 ```

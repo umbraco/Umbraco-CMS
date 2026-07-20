@@ -12,6 +12,6 @@ export { UmbDocumentBlueprintFolderWorkspaceEditorElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		['umb-document-blueprint-folder-workspace-editor']: UmbDocumentBlueprintFolderWorkspaceEditorElement;
+		'umb-document-blueprint-folder-workspace-editor': UmbDocumentBlueprintFolderWorkspaceEditorElement;
 	}
 }

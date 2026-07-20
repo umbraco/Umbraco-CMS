@@ -24,8 +24,7 @@ import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
 
 import '@umbraco-cms/backoffice/imaging';
 
-const elementName = 'umb-input-media';
-@customElement(elementName)
+@customElement('umb-input-media')
 export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined, typeof UmbLitElement>(UmbLitElement) {
 	#sorter = new UmbSorterController<string>(this, {
 		getUniqueOfElement: (element) => {
@@ -346,6 +345,6 @@ export { UmbInputMediaElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbInputMediaElement;
+		'umb-input-media': UmbInputMediaElement;
 	}
 }

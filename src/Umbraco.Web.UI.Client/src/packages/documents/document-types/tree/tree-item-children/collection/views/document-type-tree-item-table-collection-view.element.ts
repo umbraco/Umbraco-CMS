@@ -10,12 +10,10 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController, type UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 
-const elementName = 'umb-document-type-tree-item-table-collection-view';
-
 /**
  * @deprecated Deprecated since v18. Scheduled for removal in Umbraco 20.
  */
-@customElement(elementName)
+@customElement('umb-document-type-tree-item-table-collection-view')
 export class UmbDocumentTypeTreeItemTableCollectionViewElement extends UmbLitElement {
 	@state()
 	private _tableConfig: UmbTableConfig = {
@@ -136,6 +134,6 @@ export { UmbDocumentTypeTreeItemTableCollectionViewElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbDocumentTypeTreeItemTableCollectionViewElement;
+		'umb-document-type-tree-item-table-collection-view': UmbDocumentTypeTreeItemTableCollectionViewElement;
 	}
 }
