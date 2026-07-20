@@ -1768,20 +1768,21 @@ export class UiBaseLocators extends BasePage {
 
   // User Methods
   async clickCurrentUserAvatarButton() {
-    // Retry the open: the first click can land before the avatar is interactive, leaving the modal closed.
+    const editBtn = this.currentUserModal.getByLabel('Edit', {exact: true});
+    const changePasswordBtn = this.currentUserModal.getByLabel('Change your password');
+    // The action buttons load into an async extension slot. If the modal opens before the current-user context is
+    // ready it renders empty and never fills, so reopen (close + re-click the avatar) until the buttons appear.
     await expect(async () => {
-      if (!(await this.currentUserModal.isVisible())) {
+      if (!(await editBtn.isVisible())) {
+        if (await this.currentUserModal.isVisible()) {
+          await this.page.keyboard.press('Escape');
+          await expect(this.currentUserModal).toBeHidden({timeout: ConstantHelper.timeout.short});
+        }
         await this.click(this.currentUserAvatarBtn);
       }
-      await expect(this.currentUserModal).toBeVisible({
-        timeout: ConstantHelper.timeout.short,
-      });
-    }).toPass({timeout: ConstantHelper.timeout.medium});
-    // The action buttons mount async and reflow the modal; wait for both so later clicks aren't lost mid-render.
-    await expect(this.currentUserModal.getByLabel('Edit', {exact: true}))
-      .toBeVisible({timeout: ConstantHelper.timeout.long});
-    await expect(this.currentUserModal.getByLabel('Change your password'))
-      .toBeVisible({timeout: ConstantHelper.timeout.long});
+      await expect(editBtn).toBeVisible({timeout: ConstantHelper.timeout.medium});
+      await expect(changePasswordBtn).toBeVisible({timeout: ConstantHelper.timeout.medium});
+    }).toPass({timeout: ConstantHelper.timeout.veryLong});
   }
 
   // Collection Methods
