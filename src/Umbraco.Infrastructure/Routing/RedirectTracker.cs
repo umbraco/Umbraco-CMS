@@ -114,7 +114,7 @@ internal sealed class RedirectTracker : IRedirectTracker
             {
                 try
                 {
-                    var route = _publishedUrlProvider.GetUrl(publishedContent.Key, UrlMode.Relative, culture).TrimEnd(Constants.CharArrays.ForwardSlash);
+                    var route = _publishedUrlProvider.GetUrl(publishedContent.Key, UrlMode.Relative, culture).TrimEnd('/');
                     if (IsValidRoute(route) && HasPublishedUrlSegment(publishedContent.Key, culture))
                     {
                         StoreRoute(oldRoutes, publishedContent, culture, route, domainRootId.Value);
@@ -227,7 +227,7 @@ internal sealed class RedirectTracker : IRedirectTracker
             .FirstOrDefault(x => _domainCache.HasAssigned(x, includeWildcards: true));
 
     private string GetUrl(Guid contentKey, string languageIsoCode) =>
-        _publishedUrlProvider.GetUrl(contentKey, UrlMode.Relative, languageIsoCode).TrimEnd(Constants.CharArrays.ForwardSlash);
+        _publishedUrlProvider.GetUrl(contentKey, UrlMode.Relative, languageIsoCode).TrimEnd('/');
 
     /// <summary>
     /// Strips the domain's path prefix from a relative URL so that the route stored for redirect

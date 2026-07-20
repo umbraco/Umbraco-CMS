@@ -5,7 +5,7 @@ import type { UmbElementPublishModalData, UmbElementPublishModalValue } from './
 import { css, customElement, html, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
+import { UmbDeprecation, UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 import '../../../modals/shared/element-variant-language-picker.element.js';
@@ -22,12 +22,23 @@ function isNotPublishedMandatory(option: UmbElementVariantOptionModel) {
 	);
 }
 
+/** @deprecated Use `umb-content-publish-modal` from `@umbraco-cms/backoffice/content` instead. Scheduled for removal in Umbraco 20. */
 @customElement('umb-element-publish-modal')
 export class UmbElementPublishModalElement extends UmbModalBaseElement<
 	UmbElementPublishModalData,
 	UmbElementPublishModalValue
 > {
 	#selectionManager = new UmbSelectionManager<string>(this);
+
+	constructor() {
+		super();
+
+		new UmbDeprecation({
+			deprecated: 'UmbElementPublishModalElement is deprecated.',
+			removeInVersion: '20.0.0',
+			solution: 'Use umb-content-publish-modal from @umbraco-cms/backoffice/content instead.',
+		}).warn();
+	}
 
 	@state()
 	private _options: Array<UmbElementVariantOptionModel> = [];

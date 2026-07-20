@@ -112,6 +112,11 @@ export type BatchResponseModelMemberTypeResponseModel = {
     items: Array<MemberTypeResponseModel>;
 };
 
+export type BatchResponseModelUserResponseModel = {
+    total: number;
+    items: Array<UserResponseModel>;
+};
+
 export type CalculatedUserStartNodesResponseModel = {
     id: string;
     documentStartNodeIds: Array<ReferenceByIdModel>;
@@ -181,6 +186,15 @@ export type CreateAndPublishDocumentRequestModel = {
     id?: null | string;
     values: Array<DocumentValueModel>;
     variants: Array<DocumentVariantRequestModel>;
+};
+
+export type CreateAndPublishElementRequestModel = {
+    culturesToPublish: Array<string>;
+    documentType: ReferenceByIdModel;
+    parent?: null | ReferenceByIdModel;
+    id?: null | string;
+    values: Array<ElementValueModel>;
+    variants: Array<ElementVariantRequestModel>;
 };
 
 export type CreateDataTypeRequestModel = {
@@ -3006,6 +3020,12 @@ export type UpdateAndPublishDocumentRequestModel = {
     variants: Array<DocumentVariantRequestModel>;
 };
 
+export type UpdateAndPublishElementRequestModel = {
+    culturesToPublish: Array<string>;
+    values: Array<ElementValueModel>;
+    variants: Array<ElementVariantRequestModel>;
+};
+
 export type UpdateCurrentUserRequestModel = {
     languageIsoCode: string;
 };
@@ -3521,6 +3541,7 @@ export type WebhookLogResponseModel = {
     key: string;
     webhookKey: string;
     statusCode: string;
+    httpStatusCode?: number | null;
     isSuccessStatusCode: boolean;
     date: string;
     eventAlias: string;
@@ -6051,6 +6072,7 @@ export type GetDocumentUrlsData = {
     path?: never;
     query?: {
         id?: Array<string>;
+        culture?: string;
     };
     url: '/umbraco/management/api/v1/document/urls';
 };
@@ -8856,6 +8878,43 @@ export type PutElementByIdUnpublishResponses = {
     200: unknown;
 };
 
+export type PutElementByIdUpdateAndPublishData = {
+    body: UpdateAndPublishElementRequestModel;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/umbraco/management/api/v1/element/{id}/update-and-publish';
+};
+
+export type PutElementByIdUpdateAndPublishErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type PutElementByIdUpdateAndPublishError = PutElementByIdUpdateAndPublishErrors[keyof PutElementByIdUpdateAndPublishErrors];
+
+export type PutElementByIdUpdateAndPublishResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
 export type PutElementByIdValidateData = {
     body: ValidateUpdateElementRequestModel;
     path: {
@@ -8950,6 +9009,41 @@ export type GetElementConfigurationResponses = {
 };
 
 export type GetElementConfigurationResponse = GetElementConfigurationResponses[keyof GetElementConfigurationResponses];
+
+export type PostElementCreateAndPublishData = {
+    body: CreateAndPublishElementRequestModel;
+    path?: never;
+    query?: never;
+    url: '/umbraco/management/api/v1/element/create-and-publish';
+};
+
+export type PostElementCreateAndPublishErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type PostElementCreateAndPublishError = PostElementCreateAndPublishErrors[keyof PostElementCreateAndPublishErrors];
+
+export type PostElementCreateAndPublishResponses = {
+    /**
+     * Created
+     */
+    201: unknown;
+};
 
 export type PostElementFolderData = {
     body: CreateFolderRequestModel;
@@ -18680,6 +18774,35 @@ export type PostUserAvatarByIdResponses = {
      */
     200: unknown;
 };
+
+export type GetUserBatchData = {
+    body?: never;
+    path?: never;
+    query?: {
+        id?: Array<string>;
+    };
+    url: '/umbraco/management/api/v1/user/batch';
+};
+
+export type GetUserBatchErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+};
+
+export type GetUserBatchResponses = {
+    /**
+     * OK
+     */
+    200: BatchResponseModelUserResponseModel;
+};
+
+export type GetUserBatchResponse = GetUserBatchResponses[keyof GetUserBatchResponses];
 
 export type GetUserConfigurationData = {
     body?: never;

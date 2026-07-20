@@ -218,7 +218,7 @@ internal sealed partial class SimilarNodeName
             {
                 Match match = matches[0];
                 Text = match.Groups[1].Value;
-                int number = int.TryParse(match.Groups[2].Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out number)
+                int number = int.TryParse(match.Groups[2].ValueSpan, NumberStyles.Integer, CultureInfo.InvariantCulture, out number)
                     ? number
                     : 0;
                 Suffix = (uint?)number;

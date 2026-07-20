@@ -1030,12 +1030,10 @@ internal partial class UserService : RepositoryService, IUserService
             return UserOperationStatus.AvatarFileNotFound;
         }
 
-        const string allowedAvatarFileTypes = "jpeg,jpg,gif,bmp,png,tiff,tif,webp";
-
         // This shouldn't really be necessary since we're just gonna use it to generate a hash, but that's how it was.
         var avatarFileName = avatarTemporaryFile.FileName.ToSafeFileName(_shortStringHelper);
-        var extension = Path.GetExtension(avatarFileName)[1..];
-        if(allowedAvatarFileTypes.Contains(extension) is false || _contentSettings.DisallowedUploadedFileExtensions.Contains(extension))
+        var extension = avatarFileName.GetFileExtension().TrimStart(Constants.CharArrays.Period);
+        if (_contentSettings.IsAllowedImageFileType(extension) is false)
         {
             return UserOperationStatus.InvalidAvatar;
         }

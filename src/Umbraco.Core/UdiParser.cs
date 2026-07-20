@@ -170,11 +170,11 @@ public sealed class UdiParser
             throw new FormatException($"Unknown entity type \"{entityType}\".");
         }
 
-        var path = uri.AbsolutePath.TrimStart('/');
+        ReadOnlySpan<char> path = uri.AbsolutePath.AsSpan().TrimStart('/');
 
         if (udiType == UdiType.GuidUdi)
         {
-            if (path == string.Empty)
+            if (path.IsEmpty)
             {
                 udi = GetRootUdi(uri.Host);
                 return true;
@@ -196,7 +196,7 @@ public sealed class UdiParser
 
         if (udiType == UdiType.StringUdi)
         {
-            udi = path == string.Empty ? GetRootUdi(uri.Host) : new StringUdi(uri.Host, Uri.UnescapeDataString(path));
+            udi = path.IsEmpty ? GetRootUdi(uri.Host) : new StringUdi(uri.Host, Uri.UnescapeDataString(path));
             return true;
         }
 
