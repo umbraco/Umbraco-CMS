@@ -35,7 +35,6 @@ public sealed partial class HtmlStringUtilities
     [GeneratedRegex(@"\s([\.,;:!])")]
     private static partial Regex PunctuationRegex();
 
-
     public HtmlString StripHtmlTags(string html, params string[]? tags)
     {
         var doc = new HtmlDocument();
@@ -75,6 +74,7 @@ public sealed partial class HtmlStringUtilities
         {
             return new HtmlString(html);
         }
+
         var text = MultiSpaceRegex().Replace(doc.DocumentNode.InnerHtml, " ").Trim();
         text = PunctuationRegex().Replace(text, "$1");
         return new HtmlString(text);
