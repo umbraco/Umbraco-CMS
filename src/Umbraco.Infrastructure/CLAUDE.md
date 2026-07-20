@@ -1,6 +1,6 @@
 # Umbraco CMS - Infrastructure
 
-Implementation layer for Umbraco CMS, providing concrete implementations of all Core interfaces. Handles database access (NPoco), caching, background jobs, migrations, search indexing (Examine), email (MailKit), and logging (Serilog).
+Implementation layer for Umbraco CMS, providing concrete implementations of all Core interfaces. Handles database access (NPoco), caching, background jobs, migrations, email (MailKit), and logging (Serilog). Search indexing (Examine) now lives entirely in `Umbraco.Cms.Search.Provider.Examine` — this project has no Examine dependency.
 
 **Project**: `Umbraco.Infrastructure`
 **Type**: .NET Library
@@ -22,7 +22,6 @@ Implementation layer for Umbraco CMS, providing concrete implementations of all 
 - **Database Access**: NPoco (micro-ORM) with SQL Server & SQLite support
 - **Caching**: In-memory + distributed cache via `IAppCache`
 - **Background Jobs**: Recurring jobs via `IRecurringBackgroundJob` and `IDistributedBackgroundJob`
-- **Search**: Examine (Lucene.NET wrapper) for full-text search
 - **Email**: MailKit for SMTP email
 - **Logging**: Serilog with structured logging
 - **Migrations**: Custom migration framework for database schema + data
@@ -71,13 +70,6 @@ src/Umbraco.Infrastructure/
 │   │   └── ServerRegistration/    # Multi-server coordination
 │   └── RecurringBackgroundJobHostedService.cs # Job scheduler
 │
-├── Examine/                       # Search indexing (Lucene)
-│   ├── ContentValueSetBuilder.cs  # Index document content
-│   ├── MediaValueSetBuilder.cs    # Index media
-│   ├── MemberValueSetBuilder.cs   # Index members
-│   ├── DeliveryApiContentIndexPopulator.cs # Delivery API indexing
-│   └── Deferred/                  # Deferred index updates
-│
 ├── Security/                      # Identity & authentication
 │   ├── BackOfficeUserStore.cs     # User store (Identity)
 │   ├── MemberUserStore.cs         # Member store (Identity)
@@ -123,7 +115,6 @@ src/Umbraco.Infrastructure/
 ### Dependencies
 - **Umbraco.Core** - All interface contracts (only dependency)
 - **NPoco** - Micro-ORM for database access
-- **Examine.Core** - Search indexing abstraction
 - **MailKit** - Email sending
 - **HtmlAgilityPack** - HTML parsing
 - **Serilog** - Structured logging
@@ -671,12 +662,6 @@ using (var outer = ScopeProvider.CreateCoreScope())
 - Configured via `IOptions<EmailSenderSettings>`
 - Supports TLS, SSL, authentication
 
-**Search (Examine)**:
-- Lucene.NET wrapper
-- Indexes content, media, members
-- `ValueSetBuilder` classes convert entities → search documents
-- Located in `Examine/` directory
-
 **Logging (Serilog)**:
 - Structured logging throughout
 - Enrichers: Process ID, Thread ID
@@ -785,7 +770,6 @@ dotnet pack src/Umbraco.Infrastructure -c Release
 ### Key Dependencies
 - **Umbraco.Core** - Interface contracts (only project dependency)
 - **NPoco** - Database access
-- **Examine.Core** - Search indexing
 - **MailKit** - Email sending
 - **Serilog** - Logging
 

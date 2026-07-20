@@ -28,7 +28,7 @@ Enterprise-grade CMS built on .NET 10.0. This repository contains 21 production 
 3. **Specialized Features** (Pluggable Modules)
    - Persistence: EF Core (modern), NPoco (legacy) for SQL Server & SQLite
    - Caching: `PublishedCache.HybridCache` (in-memory + distributed)
-   - Search: `Examine.Lucene` (full-text search)
+   - Search: `Umbraco.Cms.Search.*` (search abstractions + Examine/Lucene provider)
    - Imaging: `Imaging.ImageSharp` v1 & v2 (image processing)
    - Other: Static assets, targets, development tools
 
@@ -68,7 +68,10 @@ Umbraco-CMS/
 │   ├── Umbraco.Cms.Api.Common/            # Shared API infrastructure
 │   │   └── CLAUDE.md                      # ⭐ API patterns guide
 │   ├── Umbraco.PublishedCache.HybridCache/ # Content caching
-│   ├── Umbraco.Examine.Lucene/            # Search indexing
+│   ├── Umbraco.Cms.Search.Core/           # Search abstractions
+│   ├── Umbraco.Cms.Search.BackOffice/     # Backoffice search integration
+│   ├── Umbraco.Cms.Search.DeliveryApi/    # Delivery API search integration
+│   ├── Umbraco.Cms.Search.Provider.Examine/ # Examine (Lucene) search provider
 │   ├── Umbraco.Cms.Persistence.EFCore/    # EF Core data access
 │   ├── Umbraco.Cms.Persistence.EFCore.Sqlite/
 │   ├── Umbraco.Cms.Persistence.EFCore.SqlServer/
@@ -124,7 +127,8 @@ Web.UI → Web.Common → Infrastructure → Core
 **Infrastructure Layer**:
 - `Umbraco.Infrastructure` → `Umbraco.Core`
 - `Umbraco.PublishedCache.*` → `Umbraco.Infrastructure`
-- `Umbraco.Examine.Lucene` → `Umbraco.Infrastructure`
+- `Umbraco.Cms.Search.Core` → `Umbraco.Infrastructure` + `Umbraco.Web.Common`
+- `Umbraco.Cms.Search.Provider.Examine` → `Umbraco.Cms.Search.Core`
 - `Umbraco.Cms.Persistence.*` → `Umbraco.Infrastructure`
 
 **Web Layer**:
@@ -604,7 +608,8 @@ SQL Server-specific tests use `BaseTestDatabase.IsSqlite()` to skip when running
 | **Umbraco.Cms.Api.Delivery** | Library | Delivery API (headless CMS) |
 | **Umbraco.Cms.Api.Common** | Library | Shared API infrastructure |
 | **Umbraco.PublishedCache.HybridCache** | Library | Published content caching |
-| **Umbraco.Examine.Lucene** | Library | Full-text search indexing |
+| **Umbraco.Cms.Search.Core** | Library | Search abstractions and indexing pipeline |
+| **Umbraco.Cms.Search.Provider.Examine** | Library | Examine (Lucene) search provider |
 
 ### Important Files
 

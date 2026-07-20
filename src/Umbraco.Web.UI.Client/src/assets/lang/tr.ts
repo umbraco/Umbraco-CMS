@@ -515,33 +515,6 @@ export default {
 		changeKeyError: "'%0%' anahtarı zaten var.",
 		overviewTitle: 'Sözlüğe genel bakış',
 	},
-	examineManagement: {
-		configuredSearchers: 'Yapılandırılmış Arayıcılar',
-		configuredSearchersDescription:
-			'Yapılandırılmış herhangi bir Searcher için özellikleri ve araçları gösterir (yani, çoklu dizin arayıcı gibi)',
-		fieldValues: 'Alan değerleri',
-		healthStatus: 'Sağlık durumu',
-		healthStatusDescription: 'Dizinin sağlık durumu ve okunabiliyorsa',
-		indexers: 'Dizin oluşturucular',
-		indexInfo: 'Dizin bilgisi',
-		indexInfoDescription: 'Dizinin özelliklerini listeler',
-		manageIndexes: 'İnceleme dizinlerini yönetin',
-		manageIndexesDescription:
-			'Her dizinin ayrıntılarını görüntülemenizi sağlar ve dizinleri yönetmek için bazı araçlar sağlar',
-		rebuildIndex: 'Dizini yeniden oluştur',
-		rebuildIndexWarning:
-			'\n      Bu, dizinin yeniden oluşturulmasına neden olacaktır. <br />\n      Sitenizde ne kadar içerik olduğuna bağlı olarak bu biraz zaman alabilir. <br />\n      Yüksek web sitesi trafiğinin olduğu zamanlarda veya editörler içeriği düzenlerken bir dizinin yeniden oluşturulması önerilmez.\n     ',
-		searchers: 'Arayanlar',
-		searchDescription: 'Dizini arayın ve sonuçları görüntüleyin',
-		tools: 'Araçlar',
-		toolsDescription: 'Dizini yönetmek için araçlar',
-		fields: 'alanlar',
-		indexCannotRead: 'Dizin okunamıyor ve yeniden oluşturulması gerekecek',
-		processIsTakingLonger:
-			'İşlem beklenenden uzun sürüyor, bu işlem sırasında herhangi bir hata olup olmadığını görmek için Umbraco günlüğünü kontrol edin',
-		indexCannotRebuild: 'Bu dizin, atanmış olmadığı için yeniden oluşturulamaz',
-		iIndexPopulator: 'IIndexPopulator',
-	},
 	placeholders: {
 		username: 'Kullanıcı adınızı girin',
 		password: 'Şifrenizi girin',
@@ -1783,7 +1756,6 @@ export default {
 		contentRedirectManager: 'Yeniden Yönlendirme URL Yönetimi',
 		mediaFolderBrowser: 'İçerik',
 		settingsWelcome: 'Hoş Geldiniz',
-		settingsExamine: 'Yönetimi İnceleyin',
 		settingsPublishedStatus: 'Yayınlanma Durumu',
 		settingsModelsBuilder: 'Model Oluşturucu',
 		settingsHealthCheck: 'Durum Kontrolü',

@@ -6,7 +6,7 @@ Shared ASP.NET Core web functionality for Umbraco CMS. Provides controllers, mid
 **Target Framework**: net10.0
 **Package ID**: Umbraco.Cms.Web.Common
 **Namespace**: Umbraco.Cms.Web.Common
-**Dependencies**: Umbraco.Examine.Lucene, Umbraco.PublishedCache.HybridCache, MiniProfiler, Serilog, Asp.Versioning
+**Dependencies**: Umbraco.PublishedCache.HybridCache, MiniProfiler, Serilog, Asp.Versioning
 
 ---
 
@@ -381,7 +381,6 @@ Most extensions are in `Umbraco.Extensions` namespace:
 |---------|--------------|
 | `Umbraco.Core` | Interface contracts |
 | `Umbraco.Infrastructure` | Service implementations |
-| `Umbraco.Examine.Lucene` | Search dependency |
 | `Umbraco.PublishedCache.HybridCache` | Caching dependency |
 | `Umbraco.Web.UI` | Main web application (references this) |
 | `Umbraco.Cms.Api.Common` | API layer (references this) |

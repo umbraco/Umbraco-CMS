@@ -1,14 +1,11 @@
 using System.Collections;
 using System.Globalization;
-using Examine;
-using Examine.Search;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services.Navigation;
-using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure;
@@ -19,50 +16,27 @@ namespace Umbraco.Cms.Infrastructure;
 /// <seealso cref="Umbraco.Cms.Core.IPublishedContentQuery" />
 public class PublishedContentQuery : IPublishedContentQuery
 {
-    private readonly IExamineManager _examineManager;
     private readonly IPublishedContentCache _publishedContent;
     private readonly IPublishedMediaCache _publishedMediaCache;
     private readonly IVariationContextAccessor _variationContextAccessor;
     private readonly IDocumentNavigationQueryService _documentNavigationQueryService;
     private readonly IMediaNavigationQueryService _mediaNavigationQueryService;
 
-    private static readonly HashSet<string> _returnedQueryFields =
-        new() { ExamineFieldNames.ItemIdFieldName, ExamineFieldNames.CategoryFieldName };
-
     /// <summary>
     ///     Initializes a new instance of the <see cref="PublishedContentQuery" /> class.
     /// </summary>
     public PublishedContentQuery(
         IVariationContextAccessor variationContextAccessor,
-        IExamineManager examineManager,
         IPublishedContentCache publishedContent,
         IPublishedMediaCache publishedMediaCache,
         IDocumentNavigationQueryService documentNavigationQueryService,
         IMediaNavigationQueryService mediaNavigationQueryService)
     {
         _variationContextAccessor = variationContextAccessor ?? throw new ArgumentNullException(nameof(variationContextAccessor));
-        _examineManager = examineManager ?? throw new ArgumentNullException(nameof(examineManager));
         _publishedContent = publishedContent;
         _publishedMediaCache = publishedMediaCache;
         _documentNavigationQueryService = documentNavigationQueryService;
         _mediaNavigationQueryService = mediaNavigationQueryService;
-    }
-
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
-    public PublishedContentQuery(
-        IVariationContextAccessor variationContextAccessor,
-        IExamineManager examineManager,
-        IPublishedContentCache publishedContent,
-        IPublishedMediaCache publishedMediaCache,
-        IDocumentNavigationQueryService documentNavigationQueryService)
-        : this(
-            variationContextAccessor,
-            examineManager,
-            publishedContent,
-            publishedMediaCache,
-            documentNavigationQueryService,
-            StaticServiceProvider.Instance.GetRequiredService<IMediaNavigationQueryService>())
-    {
     }
 
     #region Convert Helpers
@@ -316,129 +290,26 @@ public class PublishedContentQuery : IPublishedContentQuery
     public IEnumerable<PublishedSearchResult> Search(
         string term,
         string culture = "*",
-        string indexName = Constants.UmbracoIndexes.ExternalIndexName)
+        string indexName = Constants.IndexAliases.PublishedContent)
         => Search(term, 0, 0, out _, culture, indexName);
 
     /// <inheritdoc />
-    public IEnumerable<PublishedSearchResult> Search(
+    public virtual IEnumerable<PublishedSearchResult> Search(
         string term,
         int skip,
         int take,
         out long totalRecords,
         string culture = "*",
-        string indexName = Constants.UmbracoIndexes.ExternalIndexName,
+        string indexName = Constants.IndexAliases.PublishedContent,
         ISet<string>? loadedFields = null)
-    {
-        if (skip < 0)
-        {
-            throw new ArgumentOutOfRangeException(
-                nameof(skip),
-                skip,
-                "The value must be greater than or equal to zero.");
-        }
-
-        if (take < 0)
-        {
-            throw new ArgumentOutOfRangeException(
-                nameof(take),
-                take,
-                "The value must be greater than or equal to zero.");
-        }
-
-        if (string.IsNullOrEmpty(indexName))
-        {
-            indexName = Constants.UmbracoIndexes.ExternalIndexName;
-        }
-
-        if (!_examineManager.TryGetIndex(indexName, out IIndex? index) || index is not IUmbracoIndex umbIndex)
-        {
-            throw new InvalidOperationException(
-                $"No index found by name {indexName} or is not of type {typeof(IUmbracoIndex)}");
-        }
-
-        IQuery? query = umbIndex.Searcher.CreateQuery(IndexTypes.Content);
-
-        IOrdering ordering;
-        if (culture == "*")
-        {
-            // Search everything
-            ordering = query.ManagedQuery(term);
-        }
-        else if (string.IsNullOrWhiteSpace(culture))
-        {
-            // Only search invariant
-            ordering = query
-                .Field(UmbracoExamineFieldNames.VariesByCultureFieldName, "n") // Must not vary by culture
-                .And().ManagedQuery(term);
-        }
-        else
-        {
-            // Only search the specified culture
-            var fields =
-                umbIndex.GetCultureAndInvariantFields(culture)
-                    .ToArray(); // Get all index fields suffixed with the culture name supplied
-
-            // Filter out unpublished content for the specified culture if the content varies by culture
-            // The published__{culture} field is not populated when the content is not published in that culture
-            ordering = query
-                .ManagedQuery(term, fields)
-                .Not().Group(q => q
-                    .Field(UmbracoExamineFieldNames.VariesByCultureFieldName, "y")
-                    .Not().Field($"{UmbracoExamineFieldNames.PublishedFieldName}_{culture.ToLowerInvariant()}", "y"));
-        }
-
-        return Search(ordering, skip, take, out totalRecords, culture);
-    }
-
-    /// <inheritdoc />
-    public IEnumerable<PublishedSearchResult> Search(IQueryExecutor query)
-        => Search(query, 0, 0, out _);
-
-    /// <inheritdoc />
-    public IEnumerable<PublishedSearchResult> Search(IQueryExecutor query, int skip, int take, out long totalRecords)
-        => Search(query, skip, take, out totalRecords, null);
-
-    /// <inheritdoc />
-    public IEnumerable<PublishedSearchResult> Search(IQueryExecutor query, int skip, int take, out long totalRecords, string? culture)
-    {
-        if (skip < 0)
-        {
-            throw new ArgumentOutOfRangeException(
-                nameof(skip),
-                skip,
-                "The value must be greater than or equal to zero.");
-        }
-
-        if (take < 0)
-        {
-            throw new ArgumentOutOfRangeException(
-                nameof(take),
-                take,
-                "The value must be greater than or equal to zero.");
-        }
-
-        if (query is IOrdering ordering)
-        {
-            // Filter selected fields because results are loaded from the published snapshot based on these
-            query = ordering.SelectFields(_returnedQueryFields);
-        }
-
-        ISearchResults? results = skip == 0 && take == 0
-            ? query.Execute()
-            : query.Execute(QueryOptions.SkipTake(skip, take));
-
-        totalRecords = results.TotalItemCount;
-
-        return culture.IsNullOrWhiteSpace()
-            ? results.ToPublishedSearchResults(_publishedContent)
-            : new CultureContextualSearchResults(results.ToPublishedSearchResults(_publishedContent), _variationContextAccessor, culture);
-    }
+        => throw new NotSupportedException(
+            "Content search requires Umbraco Search. The search enabled implementation replaces this one when Umbraco Search is composed (see Umbraco.Cms.Search.Core).");
 
     /// <summary>
     ///     This is used to contextualize the values in the search results when enumerating over them, so that the correct
     ///     culture values are used.
     /// </summary>
-    private sealed class CultureContextualSearchResults : IEnumerable<PublishedSearchResult>
+    protected sealed class CultureContextualSearchResults : IEnumerable<PublishedSearchResult>
     {
         private readonly string _culture;
         private readonly IVariationContextAccessor _variationContextAccessor;

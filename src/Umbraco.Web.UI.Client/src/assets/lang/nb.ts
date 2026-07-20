@@ -1144,7 +1144,6 @@ export default {
 		contentRedirectManager: 'URL-håndtering',
 		mediaFolderBrowser: 'Innhold',
 		settingsWelcome: 'Velkommen',
-		settingsExamine: 'Examine innstillinger',
 		settingsPublishedStatus: 'Publiseringsstatus',
 		settingsModelsBuilder: 'Models Builder',
 		settingsHealthCheck: 'Helsesjekk',

@@ -1,4 +1,3 @@
-using Examine;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
@@ -43,7 +42,6 @@ using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.Configuration;
 using Umbraco.Cms.Infrastructure.DeliveryApi;
 using Umbraco.Cms.Infrastructure.DistributedLocking;
-using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Infrastructure.HealthChecks;
 using Umbraco.Cms.Infrastructure.Install;
 using Umbraco.Cms.Infrastructure.Mail;
@@ -60,7 +58,6 @@ using Umbraco.Cms.Infrastructure.Routing;
 using Umbraco.Cms.Infrastructure.Runtime;
 using Umbraco.Cms.Infrastructure.Runtime.RuntimeModeValidators;
 using Umbraco.Cms.Infrastructure.Scoping;
-using Umbraco.Cms.Infrastructure.Search;
 using Umbraco.Cms.Infrastructure.Security;
 using Umbraco.Cms.Infrastructure.Serialization;
 using Umbraco.Cms.Infrastructure.Services.Implement;
@@ -199,12 +196,8 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddTransient<IUserInviteSender, EmailUserInviteSender>();
         builder.Services.AddTransient<IUserForgotPasswordSender, EmailUserForgotPasswordSender>();
 
-        builder.Services.AddSingleton<IExamineManager, NoopExamineManager>();
-        builder.Services.AddSingleton<IIndexRebuilder, NoopIndexRebuilder>();
-
         builder.Services.AddScoped<ITagQuery, TagQuery>();
 
-        builder.Services.AddSingleton<IUmbracoTreeSearcherFields, UmbracoTreeSearcherFields>();
         builder.Services.AddSingleton<IPublishedContentQueryAccessor, PublishedContentQueryAccessor>(sp =>
             new PublishedContentQueryAccessor(sp.GetRequiredService<IScopedServiceProvider>()));
         builder.Services.AddScoped<IPublishedContentQuery>(factory =>
@@ -212,7 +205,6 @@ public static partial class UmbracoBuilderExtensions
             IUmbracoContextAccessor umbCtx = factory.GetRequiredService<IUmbracoContextAccessor>();
             return new PublishedContentQuery(
                 factory.GetRequiredService<IVariationContextAccessor>(),
-                factory.GetRequiredService<IExamineManager>(),
                 factory.GetRequiredService<IPublishedContentCache>(),
                 factory.GetRequiredService<IPublishedMediaCache>(),
                 factory.GetRequiredService<IDocumentNavigationQueryService>(),
@@ -226,7 +218,6 @@ public static partial class UmbracoBuilderExtensions
 
         builder.Services.AddSingleton<IUmbracoComponentRenderer, UmbracoComponentRenderer>();
 
-        builder.Services.AddSingleton<IBackOfficeExamineSearcher, NoopBackOfficeExamineSearcher>();
 
         builder.Services.AddSingleton<UploadAutoFillProperties>();
         builder.Services.AddSingleton<IImageDimensionExtractor, NoopImageDimensionExtractor>();
@@ -247,8 +238,6 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IBackgroundTaskQueue>(s => s.GetRequiredService<HostedServices.BackgroundTaskQueue>());
 
         builder.Services.AddTransient<IFireAndForgetRunner, FireAndForgetRunner>();
-
-        builder.AddPropertyIndexValueFactories();
 
         builder.AddDeliveryApiCoreServices();
         builder.Services.AddTransient<IWebhookFiringService, WebhookFiringService>();
@@ -274,26 +263,6 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IRichTextRequiredValidator, RichTextRequiredValidator>();
 
         builder.Services.AddSingleton<IRichTextRegexValidator, RichTextRegexValidator>();
-
-        return builder;
-    }
-
-    /// <summary>
-    /// Registers the default property index value factories used for indexing property values in Umbraco's search infrastructure.
-    /// </summary>
-    /// <param name="builder">The <see cref="IUmbracoBuilder"/> to add the property index value factories to.</param>
-    /// <returns>The same <see cref="Umbraco.Cms.Core.DependencyInjection.IUmbracoBuilder"/> instance so that multiple calls can be chained.</returns>
-    public static IUmbracoBuilder AddPropertyIndexValueFactories(this IUmbracoBuilder builder)
-    {
-        builder.Services.AddSingleton<IBlockListPropertyIndexValueFactory, BlockListPropertyIndexValueFactory>();
-        builder.Services.AddSingleton<IBlockGridPropertyIndexValueFactory, BlockGridPropertyIndexValueFactory>();
-        builder.Services.AddSingleton<ISingleBlockPropertyIndexValueFactory, SingleBlockPropertyIndexValueFactory>();
-        builder.Services.AddSingleton<ITagPropertyIndexValueFactory, TagPropertyIndexValueFactory>();
-        builder.Services.AddSingleton<IRichTextPropertyIndexValueFactory, RichTextPropertyIndexValueFactory>();
-        builder.Services.AddSingleton<IDateOnlyPropertyIndexValueFactory, DateOnlyPropertyIndexValueFactory>();
-        builder.Services.AddSingleton<ITimeOnlyPropertyIndexValueFactory, TimeOnlyPropertyIndexValueFactory>();
-        builder.Services.AddSingleton<IDateTimeUnspecifiedPropertyIndexValueFactory, DateTimeUnspecifiedPropertyIndexValueFactory>();
-        builder.Services.AddSingleton<IDateTimeWithTimeZonePropertyIndexValueFactory, DateTimeWithTimeZonePropertyIndexValueFactory>();
 
         return builder;
     }

@@ -80,12 +80,6 @@ public class ImageCropperPropertyEditor : DataEditor,
         SupportsReadOnly = true;
     }
 
-    /// <summary>
-    /// Gets the <see cref="IPropertyIndexValueFactory"/> instance used by the image cropper property editor to provide index values for properties.
-    /// For this editor, a <see cref="NoopPropertyIndexValueFactory"/> is used, meaning no index values are generated.
-    /// </summary>
-    public override IPropertyIndexValueFactory PropertyIndexValueFactory { get; } = new NoopPropertyIndexValueFactory();
-
     /// <inheritdoc />
     public Type? GetValueType(object? configuration) => typeof(ImageCropperValue);
 

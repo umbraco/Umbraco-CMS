@@ -50,8 +50,8 @@
     <PackageVersion Include="Asp.Versioning.Mvc.ApiExplorer" Version="10.0.0" />
     <PackageVersion Include="BitFaster.Caching" Version="2.6.0" />
     <PackageVersion Include="Dazinator.Extensions.FileProviders" Version="2.0.0" />
-    <PackageVersion Include="Examine" Version="3.9.0" />
-    <PackageVersion Include="Examine.Core" Version="3.9.0" />
+    <PackageVersion Include="Examine" Version="4.0.0-beta.9" />
+    <PackageVersion Include="Examine.Core" Version="4.0.0-beta.9" />
     <PackageVersion Include="HtmlAgilityPack" Version="1.12.4" />
     <PackageVersion Include="JsonPatch.Net" Version="3.3.0" />
     <PackageVersion Include="K4os.Compression.LZ4" Version="1.3.8" />

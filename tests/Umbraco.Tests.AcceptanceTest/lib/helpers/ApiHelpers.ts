@@ -24,7 +24,6 @@ import {MediaApiHelper} from "./MediaApiHelper";
 import {ObjectTypesApiHelper} from "./ObjectTypesApiHelper";
 import {ModelsBuilderApiHelper} from "./ModelsBuilderApiHelper";
 import {HealthCheckApiHelper} from "./HealthCheckApiHelper";
-import {IndexerApiHelper} from "./IndexerApiHelper";
 import {PublishedCacheApiHelper} from "./PublishedCacheApiHelper";
 import {RedirectManagementApiHelper} from './RedirectManagementApiHelper';
 import {MemberGroupApiHelper} from './MemberGroupApiHelper';
@@ -64,7 +63,6 @@ export class ApiHelpers {
   objectTypes: ObjectTypesApiHelper;
   modelsBuilder: ModelsBuilderApiHelper;
   healthCheck: HealthCheckApiHelper;
-  indexer: IndexerApiHelper;
   publishedCache: PublishedCacheApiHelper;
   redirectManagement: RedirectManagementApiHelper;
   memberGroup: MemberGroupApiHelper;
@@ -103,7 +101,6 @@ export class ApiHelpers {
     this.objectTypes = new ObjectTypesApiHelper(this);
     this.modelsBuilder = new ModelsBuilderApiHelper(this);
     this.healthCheck = new HealthCheckApiHelper(this);
-    this.indexer = new IndexerApiHelper(this);
     this.publishedCache = new PublishedCacheApiHelper(this);
     this.redirectManagement = new RedirectManagementApiHelper(this);
     this.memberGroup = new MemberGroupApiHelper(this);

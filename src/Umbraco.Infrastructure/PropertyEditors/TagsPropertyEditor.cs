@@ -25,7 +25,6 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     ValueType = ValueTypes.Text)]
 public class TagsPropertyEditor : DataEditor, IValueSchemaProvider
 {
-    private readonly ITagPropertyIndexValueFactory _tagPropertyIndexValueFactory;
     private readonly IIOHelper _ioHelper;
 
     /// <summary>
@@ -33,21 +32,13 @@ public class TagsPropertyEditor : DataEditor, IValueSchemaProvider
     /// </summary>
     /// <param name="dataValueEditorFactory">Factory used to create data value editors for property editors.</param>
     /// <param name="ioHelper">Helper for IO (input/output) operations, such as file and path handling.</param>
-    /// <param name="tagPropertyIndexValueFactory">Factory responsible for creating index values for tag properties.</param>
     public TagsPropertyEditor(
         IDataValueEditorFactory dataValueEditorFactory,
-        IIOHelper ioHelper,
-        ITagPropertyIndexValueFactory tagPropertyIndexValueFactory)
+        IIOHelper ioHelper)
         : base(dataValueEditorFactory)
     {
         _ioHelper = ioHelper;
-        _tagPropertyIndexValueFactory = tagPropertyIndexValueFactory;
     }
-
-    /// <summary>
-    /// Gets the <see cref="IPropertyIndexValueFactory"/> used to index values for the tags property editor.
-    /// </summary>
-    public override IPropertyIndexValueFactory PropertyIndexValueFactory => _tagPropertyIndexValueFactory;
 
     /// <inheritdoc />
     public Type? GetValueType(object? configuration) => typeof(IEnumerable<string>);

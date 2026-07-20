@@ -1,7 +1,5 @@
 using System.Collections;
 using System.Globalization;
-using Examine;
-using Examine.Search;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
@@ -16,14 +14,12 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure;
 internal sealed class PublishedContentQueryTests
 {
     private PublishedContentQuery CreatePublishedContentQuery(
-        IExamineManager? examineManager = null,
         IPublishedContentCache? contentCache = null,
         IPublishedMediaCache? mediaCache = null,
         IVariationContextAccessor? variationContextAccessor = null,
         IDocumentNavigationQueryService? documentNavigationQueryService = null,
         IMediaNavigationQueryService? mediaNavigationQueryService = null)
     {
-        examineManager ??= Mock.Of<IExamineManager>();
 
         if (contentCache is null)
         {
@@ -47,7 +43,6 @@ internal sealed class PublishedContentQueryTests
 
         return new PublishedContentQuery(
             variationContextAccessor,
-            examineManager,
             contentCache,
             mediaCache,
             documentNavigationQueryService,
@@ -88,37 +83,10 @@ internal sealed class PublishedContentQueryTests
         return mediaCache;
     }
 
-    private static ISearchResults CreateSearchResults(long totalItemCount, params string[] ids)
-    {
-        var searchResults = ids.Select(CreateSearchResult).ToArray();
-        return new TestSearchResults(searchResults, totalItemCount);
-    }
-
-    private static ISearchResult CreateSearchResult(string id)
-    {
-        var searchResult = new Mock<ISearchResult>(MockBehavior.Strict);
-        searchResult.SetupGet(x => x.Id).Returns(id);
-        searchResult.SetupGet(x => x.Score).Returns(1f);
-        return searchResult.Object;
-    }
-
     [Test]
     public void Constructor_WithNullVariationContextAccessor_Throws()
     {
         Assert.Throws<ArgumentNullException>(() => new PublishedContentQuery(
-            null!,
-            Mock.Of<IExamineManager>(),
-            Mock.Of<IPublishedContentCache>(),
-            Mock.Of<IPublishedMediaCache>(),
-            Mock.Of<IDocumentNavigationQueryService>(),
-            Mock.Of<IMediaNavigationQueryService>()));
-    }
-
-    [Test]
-    public void Constructor_WithNullExamineManager_Throws()
-    {
-        Assert.Throws<ArgumentNullException>(() => new PublishedContentQuery(
-            Mock.Of<IVariationContextAccessor>(),
             null!,
             Mock.Of<IPublishedContentCache>(),
             Mock.Of<IPublishedMediaCache>(),
@@ -322,211 +290,4 @@ internal sealed class PublishedContentQueryTests
 
         Assert.IsEmpty(query.MediaAtRoot());
     }
-
-    [Test]
-    public void Search_WithNegativeSkip_Throws()
-    {
-        var query = CreatePublishedContentQuery();
-        Assert.Throws<ArgumentOutOfRangeException>(() => query.Search("Products", -1, 0, out _));
-    }
-
-    [Test]
-    public void Search_WithNegativeTake_Throws()
-    {
-        var query = CreatePublishedContentQuery();
-        Assert.Throws<ArgumentOutOfRangeException>(() => query.Search("Products", 0, -1, out _));
-    }
-
-    [Test]
-    public void Search_WithMissingIndex_Throws()
-    {
-        var query = CreatePublishedContentQuery(examineManager: Mock.Of<IExamineManager>());
-        Assert.Throws<InvalidOperationException>(() => query.Search("Products", "*", "MissingIndex"));
-    }
-
-    [Test]
-    public void Search_QueryOverload_WithNegativeSkip_Throws()
-    {
-        var query = CreatePublishedContentQuery();
-        var queryExecutor = new TestQueryExecutor(CreateSearchResults(0));
-        Assert.Throws<ArgumentOutOfRangeException>(() => query.Search(queryExecutor, -1, 0, out _, "en-US"));
-    }
-
-    [Test]
-    public void Search_QueryOverload_WithNegativeTake_Throws()
-    {
-        var query = CreatePublishedContentQuery();
-        var queryExecutor = new TestQueryExecutor(CreateSearchResults(0));
-        Assert.Throws<ArgumentOutOfRangeException>(() => query.Search(queryExecutor, 0, -1, out _, "en-US"));
-    }
-
-    [Test]
-    public void Search_QueryOverload_ExecutesAndMapsResults()
-    {
-        var content = Mock.Of<IPublishedContent>(x => x.Id == 11);
-        var contentCache = CreateContentCache(new Dictionary<int, IPublishedContent> { [11] = content });
-        var query = CreatePublishedContentQuery(contentCache: contentCache.Object);
-        var queryExecutor = new TestQueryExecutor(CreateSearchResults(1, "11"));
-
-        var results = query.Search(queryExecutor).ToArray();
-
-        CollectionAssert.AreEqual(new[] { 11 }, results.Select(x => x.Content.Id).ToArray());
-        Assert.AreEqual(1, queryExecutor.ExecuteCount);
-        Assert.AreEqual(0, queryExecutor.LastQueryOptions.Skip);
-        Assert.AreEqual(100, queryExecutor.LastQueryOptions.Take);
-    }
-
-    [Test]
-    public void Search_QueryPagingOverload_UsesSkipAndTakeAndReturnsTotalRecords()
-    {
-        var content = Mock.Of<IPublishedContent>(x => x.Id == 12);
-        var contentCache = CreateContentCache(new Dictionary<int, IPublishedContent> { [12] = content });
-        var query = CreatePublishedContentQuery(contentCache: contentCache.Object);
-        var queryExecutor = new TestQueryExecutor(CreateSearchResults(44, "12"));
-
-        var results = query.Search(queryExecutor, 3, 2, out var totalRecords).ToArray();
-
-        Assert.AreEqual(44, totalRecords);
-        CollectionAssert.AreEqual(new[] { 12 }, results.Select(x => x.Content.Id).ToArray());
-        Assert.AreEqual(3, queryExecutor.LastQueryOptions.Skip);
-        Assert.AreEqual(2, queryExecutor.LastQueryOptions.Take);
-    }
-
-    [Test]
-    public void Search_WithOrdering_SelectsExpectedReturnedFields()
-    {
-        var content = Mock.Of<IPublishedContent>(x => x.Id == 99);
-        var contentCache = CreateContentCache(new Dictionary<int, IPublishedContent> { [99] = content });
-        var query = CreatePublishedContentQuery(contentCache: contentCache.Object);
-        var ordering = new TestOrderingQueryExecutor(CreateSearchResults(1, "99"));
-
-        var results = query.Search(ordering, 0, 0, out var totalRecords).ToArray();
-
-        Assert.AreEqual(1, totalRecords);
-        CollectionAssert.AreEquivalent(
-            new[] { ExamineFieldNames.ItemIdFieldName, ExamineFieldNames.CategoryFieldName },
-            ordering.SelectedFieldNames);
-        CollectionAssert.AreEqual(new[] { 99 }, results.Select(x => x.Content.Id).ToArray());
-    }
-
-    [Test]
-    public void Search_WithCulture_ContextualizesDuringEnumerationAndResetsAfterDispose()
-    {
-        var content = Mock.Of<IPublishedContent>(x => x.Id == 14);
-        var contentCache = CreateContentCache(new Dictionary<int, IPublishedContent> { [14] = content });
-        var variationContextAccessor = new Mock<IVariationContextAccessor>();
-        variationContextAccessor.SetupProperty(x => x.VariationContext, new VariationContext("en-US"));
-
-        var query = CreatePublishedContentQuery(
-            contentCache: contentCache.Object,
-            variationContextAccessor: variationContextAccessor.Object);
-
-        var queryExecutor = new TestQueryExecutor(CreateSearchResults(1, "14"));
-        var results = query.Search(queryExecutor, 0, 0, out _, "fr-FR");
-
-        Assert.AreEqual("en-US", variationContextAccessor.Object.VariationContext?.Culture);
-
-        using (var enumerator = results.GetEnumerator())
-        {
-            Assert.AreEqual("fr-FR", variationContextAccessor.Object.VariationContext?.Culture);
-            Assert.IsTrue(enumerator.MoveNext());
-            Assert.AreEqual(14, enumerator.Current.Content.Id);
-        }
-
-        Assert.AreEqual("en-US", variationContextAccessor.Object.VariationContext?.Culture);
-    }
-
-    [Test]
-    public void Search_WithExistingCulture_DoesNotReplaceVariationContext()
-    {
-        var content = Mock.Of<IPublishedContent>(x => x.Id == 15);
-        var contentCache = CreateContentCache(new Dictionary<int, IPublishedContent> { [15] = content });
-        var variationContextAccessor = new Mock<IVariationContextAccessor>();
-        variationContextAccessor.SetupProperty(x => x.VariationContext, new VariationContext("fr-FR"));
-
-        var query = CreatePublishedContentQuery(
-            contentCache: contentCache.Object,
-            variationContextAccessor: variationContextAccessor.Object);
-
-        var queryExecutor = new TestQueryExecutor(CreateSearchResults(1, "15"));
-        var results = query.Search(queryExecutor, 0, 0, out _, "fr-FR");
-
-        using (var enumerator = results.GetEnumerator())
-        {
-            Assert.AreEqual("fr-FR", variationContextAccessor.Object.VariationContext?.Culture);
-            Assert.IsTrue(enumerator.MoveNext());
-            Assert.AreEqual(15, enumerator.Current.Content.Id);
-        }
-
-        Assert.AreEqual("fr-FR", variationContextAccessor.Object.VariationContext?.Culture);
-    }
-
-    private class TestQueryExecutor : IQueryExecutor
-    {
-        private readonly ISearchResults _searchResults;
-
-        public TestQueryExecutor(ISearchResults searchResults) => _searchResults = searchResults;
-
-        public int ExecuteCount { get; private set; }
-
-        public QueryOptions LastQueryOptions { get; private set; } = QueryOptions.Default;
-
-        public ISearchResults Execute(QueryOptions options)
-        {
-            options ??= QueryOptions.Default;
-            LastQueryOptions = options;
-            ExecuteCount++;
-            return _searchResults;
-        }
-    }
-
-    private sealed class TestOrderingQueryExecutor : TestQueryExecutor, IOrdering
-    {
-        public TestOrderingQueryExecutor(ISearchResults searchResults)
-            : base(searchResults)
-        {
-        }
-
-        public ISet<string> SelectedFieldNames { get; private set; } = new HashSet<string>();
-
-        public IOrdering OrderBy(params SortableField[] fields) => this;
-
-        public IOrdering OrderByDescending(params SortableField[] fields) => this;
-
-        public IOrdering SelectAllFields()
-        {
-            SelectedFieldNames = new HashSet<string>();
-            return this;
-        }
-
-        public IOrdering SelectField(string fieldName)
-        {
-            SelectedFieldNames = new HashSet<string> { fieldName };
-            return this;
-        }
-
-        public IOrdering SelectFields(ISet<string> fieldNames)
-        {
-            SelectedFieldNames = fieldNames;
-            return this;
-        }
-    }
-
-    private sealed class TestSearchResults : ISearchResults
-    {
-        private readonly IReadOnlyCollection<ISearchResult> _searchResults;
-
-        public TestSearchResults(IReadOnlyCollection<ISearchResult> searchResults, long totalItemCount)
-        {
-            _searchResults = searchResults;
-            TotalItemCount = totalItemCount;
-        }
-
-        public long TotalItemCount { get; }
-
-        public IEnumerator<ISearchResult> GetEnumerator() => _searchResults.GetEnumerator();
-
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-    }
-
 }

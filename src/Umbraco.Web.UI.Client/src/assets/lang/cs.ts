@@ -503,33 +503,6 @@ export default {
 		changeKeyError: "Klíč '%0%' již existuje.",
 		overviewTitle: 'Přehled slovníku',
 	},
-	examineManagement: {
-		configuredSearchers: 'Konfigurovaní vyhledávače',
-		configuredSearchersDescription:
-			'Zobrazuje vlastnosti a nástroje pro libovolný konfigurovaný vyhledávač (např. pro víceindexový vyhledávač)',
-		fieldValues: 'Hodnoty pole',
-		healthStatus: 'Stav',
-		healthStatusDescription: 'Stav indexu a jeho čitelnost',
-		indexers: 'Indexery',
-		indexInfo: 'Informace o indexu',
-		indexInfoDescription: 'Uvádí vlastnosti indexu',
-		manageIndexes: 'Spravovat indexy Examine',
-		manageIndexesDescription:
-			'Umožňuje zobrazit podrobnosti každého indexu a poskytuje některé nástroje pro správu indexů',
-		rebuildIndex: 'Znovu vytvořit index',
-		rebuildIndexWarning:
-			'\n      To způsobí opětovné sestavení indexu.<br />V závislosti na tom, kolik obsahu je na vašem webu, může to chvíli trvat.<br />Nedoporučuje se znovu vytvářet index v době vysokého provozu na webu nebo při úpravách obsahu editory.\n     ',
-		searchers: 'Vyhledávače',
-		searchDescription: 'Prohledat index a zobrazit výsledky',
-		tools: 'Nástroje',
-		toolsDescription: 'Nástroje pro správu indexu',
-		fields: 'pole',
-		indexCannotRead: 'Index nelze číst a bude nutné jej znovu sestavit',
-		processIsTakingLonger:
-			'Proces trvá déle, než se očekávalo, zkontrolujte Umbraco log a zkontrolujte, zda během této operace nedošlo k chybám',
-		indexCannotRebuild: 'Tento index nelze znovu sestavit, protože nemá přiřazen',
-		iIndexPopulator: 'IIndexPopulator',
-	},
 	placeholders: {
 		username: 'Zadejte Vaše uživatelské jméno',
 		password: 'Zadejte Vaše heslo',
@@ -1788,7 +1761,6 @@ export default {
 		contentRedirectManager: 'Správa přesměrování',
 		mediaFolderBrowser: 'Obsah',
 		settingsWelcome: 'Vítejte',
-		settingsExamine: 'Správa Examine',
 		settingsPublishedStatus: 'Stav publikování',
 		settingsModelsBuilder: 'Tvůrce modelů',
 		settingsHealthCheck: 'Health Check',
