@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
@@ -20,16 +19,18 @@ using Umbraco.Cms.Tests.Common;
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Scoping
 {
     [TestFixture]
-    public class ScopeUnitTests
+    public class ScopeTests
     {
         /// <summary>
         /// Creates a ScopeProvider with mocked internals.
         /// </summary>
-        /// <param name="lockingMechanism"></param>
-        /// <returns></returns>
-        private ScopeProvider GetScopeProvider(out Mock<IDistributedLockingMechanism> lockingMechanism)
+        private ScopeProvider GetScopeProvider(
+            out Mock<IDistributedLockingMechanism> lockingMechanism,
+            CoreDebugSettings coreDebugSettings = null,
+            ILoggerFactory loggerFactory = null)
         {
-            var loggerFactory = NullLoggerFactory.Instance;
+            coreDebugSettings ??= new CoreDebugSettings();
+            loggerFactory ??= NullLoggerFactory.Instance;
             var fileSystems = new FileSystems(
                 loggerFactory,
                 Mock.Of<IIOHelper>(),
@@ -74,7 +75,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Scoping
                 lockingMechanismFactory.Object,
                 databaseFactory.Object,
                 fileSystems,
-                new TestOptionsMonitor<CoreDebugSettings>(new CoreDebugSettings()),
+                new TestOptionsMonitor<CoreDebugSettings>(coreDebugSettings),
                 mediaFileManager,
                 loggerFactory,
                 Mock.Of<IEventAggregator>());
@@ -111,6 +112,70 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Scoping
             outerScope.Complete();
 
             Assert.DoesNotThrow(() => outerScope.Dispose());
+        }
+
+        [Test]
+        public void Uncompleted_Child_Scope_Is_Logged_When_LogIncompletedScopes_Enabled()
+        {
+            var loggerMock = new Mock<ILogger>();
+            var loggerFactoryMock = new Mock<ILoggerFactory>();
+            loggerFactoryMock.Setup(x => x.CreateLogger(It.IsAny<string>())).Returns(loggerMock.Object);
+
+            var scopeProvider = GetScopeProvider(
+                out _,
+                new CoreDebugSettings { LogIncompletedScopes = true },
+                loggerFactoryMock.Object);
+
+            using (var outerScope = (Scope)scopeProvider.CreateScope())
+            {
+                using (var childScope = (Scope)scopeProvider.CreateScope())
+                {
+                    // Deliberately not completed.
+                }
+
+                outerScope.Complete();
+            }
+
+            loggerMock.Verify(
+                x => x.Log(
+                    LogLevel.Warning,
+                    It.IsAny<EventId>(),
+                    It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("Uncompleted Child Scope")),
+                    It.IsAny<Exception>(),
+                    It.IsAny<Func<It.IsAnyType, Exception, string>>()),
+                Times.Once);
+        }
+
+        [Test]
+        public void Uncompleted_Child_Scope_Is_Not_Logged_When_LogIncompletedScopes_Disabled()
+        {
+            var loggerMock = new Mock<ILogger>();
+            var loggerFactoryMock = new Mock<ILoggerFactory>();
+            loggerFactoryMock.Setup(x => x.CreateLogger(It.IsAny<string>())).Returns(loggerMock.Object);
+
+            var scopeProvider = GetScopeProvider(
+                out _,
+                new CoreDebugSettings { LogIncompletedScopes = false },
+                loggerFactoryMock.Object);
+
+            using (var outerScope = (Scope)scopeProvider.CreateScope())
+            {
+                using (var childScope = (Scope)scopeProvider.CreateScope())
+                {
+                    // Deliberately not completed.
+                }
+
+                outerScope.Complete();
+            }
+
+            loggerMock.Verify(
+                x => x.Log(
+                    LogLevel.Warning,
+                    It.IsAny<EventId>(),
+                    It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("Uncompleted Child Scope")),
+                    It.IsAny<Exception>(),
+                    It.IsAny<Func<It.IsAnyType, Exception, string>>()),
+                Times.Never);
         }
 
         [Test]
@@ -522,8 +587,10 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Scoping
                 // Request a lock to create the ReadLocks dict.
                 scope.ReadLock(Constants.Locks.Domains);
 
-                var readDict = new Dictionary<int, int>();
-                readDict[Constants.Locks.Languages] = 1;
+                var readDict = new Dictionary<int, int>
+                {
+                    [Constants.Locks.Languages] = 1
+                };
                 scope.GetReadLocks()[Guid.NewGuid()] = readDict;
 
                 Assert.Throws<InvalidOperationException>(() => scope.Dispose());
@@ -547,8 +614,10 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Scoping
                 // Request a lock to create the WriteLocks dict.
                 scope.WriteLock(Constants.Locks.Domains);
 
-                var writeDict = new Dictionary<int, int>();
-                writeDict[Constants.Locks.Languages] = 1;
+                var writeDict = new Dictionary<int, int>
+                {
+                    [Constants.Locks.Languages] = 1
+                };
                 scope.GetWriteLocks()[Guid.NewGuid()] = writeDict;
 
                 Assert.Throws<InvalidOperationException>(() => scope.Dispose());
