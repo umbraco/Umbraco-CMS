@@ -305,7 +305,7 @@ public abstract class DatabaseServerMessenger : ServerMessengerBase, IDisposable
 
         if (registered == false)
         {
-            Logger.LogWarning(
+            Logger.LogError(
                 "Could not register with MainDom; this instance will not process distributed cache instructions and its published cache may become stale until the application is restarted.");
             return null;
         }

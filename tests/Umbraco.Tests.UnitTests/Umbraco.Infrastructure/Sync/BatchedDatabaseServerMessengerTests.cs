@@ -60,7 +60,7 @@ public class BatchedDatabaseServerMessengerTests
     }
 
     [Test]
-    public void QueueRefresh_WhenMainDomRegistrationFails_LogsWarning()
+    public void QueueRefresh_WhenMainDomRegistrationFails_LogsError()
     {
         BatchedDatabaseServerMessenger sut = CreateMessenger(mainDomRegistered: false);
 
@@ -68,7 +68,7 @@ public class BatchedDatabaseServerMessengerTests
 
         _loggerMock.Verify(
             x => x.Log(
-                LogLevel.Warning,
+                LogLevel.Error,
                 It.IsAny<EventId>(),
                 It.IsAny<It.IsAnyType>(),
                 It.IsAny<Exception?>(),
