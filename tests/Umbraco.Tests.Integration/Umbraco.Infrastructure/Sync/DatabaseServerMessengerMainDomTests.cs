@@ -3,7 +3,6 @@
 
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Runtime;
@@ -13,7 +12,6 @@ using Umbraco.Cms.Infrastructure.Sync;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Sync;
 
@@ -33,7 +31,7 @@ internal sealed class DatabaseServerMessengerMainDomTests : UmbracoIntegrationTe
 
     private ICacheInstructionService CacheInstructionService => GetRequiredService<ICacheInstructionService>();
 
-    private IFileService FileService => GetRequiredService<IFileService>();
+    private ITemplateService TemplateService => GetRequiredService<ITemplateService>();
 
     protected override void CustomTestSetup(IUmbracoBuilder builder)
     {
@@ -43,15 +41,15 @@ internal sealed class DatabaseServerMessengerMainDomTests : UmbracoIntegrationTe
     }
 
     [Test]
-    public void Publish_WhenMainDomRegistrationFails_StillWritesCacheInstructions()
+    public async Task Publish_WhenMainDomRegistrationFails_StillWritesCacheInstructions()
     {
         var maxInstructionIdBeforePublish = CacheInstructionService.GetMaxInstructionId();
 
         var template = TemplateBuilder.CreateTextPageTemplate("testPageTemplate");
-        FileService.SaveTemplate(template);
+        await TemplateService.CreateAsync(template, Cms.Core.Constants.Security.SuperUserKey);
 
         var contentType = ContentTypeBuilder.CreateSimpleContentType("testPage", "Test Page", defaultTemplateId: template.Id);
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Cms.Core.Constants.Security.SuperUserKey);
         var content = ContentBuilder.CreateSimpleContent(contentType, "Test Content");
         ContentService.Save(content);
 
