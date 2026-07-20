@@ -71,18 +71,20 @@ class UmbUserMockDB extends UmbEntityMockDbBase<UmbMockUserModel> {
 		return [];
 	}
 
+	#passwordConfiguration = {
+		minimumPasswordLength: 8,
+		requireDigit: true,
+		requireLowercase: true,
+		requireUppercase: true,
+		requireNonLetterOrDigit: true,
+	};
+
 	getConfiguration(): UserConfigurationResponseModel {
 		return {
 			allowChangePassword: true,
 			allowTwoFactor: true,
 			canInviteUsers: true,
-			passwordConfiguration: {
-				minimumPasswordLength: 8,
-				requireDigit: true,
-				requireLowercase: true,
-				requireUppercase: true,
-				requireNonLetterOrDigit: true,
-			},
+			passwordConfiguration: this.#passwordConfiguration,
 			usernameIsEmail: true,
 		};
 	}
@@ -92,13 +94,7 @@ class UmbUserMockDB extends UmbEntityMockDbBase<UmbMockUserModel> {
 			allowChangePassword: true,
 			allowTwoFactor: true,
 			keepUserLoggedIn: true,
-			passwordConfiguration: {
-				minimumPasswordLength: 8,
-				requireDigit: true,
-				requireLowercase: true,
-				requireUppercase: true,
-				requireNonLetterOrDigit: true,
-			},
+			passwordConfiguration: this.#passwordConfiguration,
 		};
 	}
 
