@@ -119,7 +119,10 @@ export class PartialViewApiHelper {
         }
         return await this.delete(child.path);
       } else if (child.hasChildren) {
-        return await this.recurseChildren(name, child.path, toDelete);
+        const result = await this.recurseChildren(name, child.path, toDelete);
+        if (result) {
+          return result;
+        }
       }
     }
     return false;

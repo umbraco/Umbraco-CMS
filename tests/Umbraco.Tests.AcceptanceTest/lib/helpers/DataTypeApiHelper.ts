@@ -30,8 +30,12 @@ import {
   TagsDataTypeBuilder,
   MultiNodeTreePickerDataTypeBuilder,
   DateTimeWithTimeZonePickerDataTypeBuilder,
+  DateOnlyPickerDataTypeBuilder,
+  TimeOnlyPickerDataTypeBuilder,
   EntityDataPickerDataTypeBuilder,
-  ElementPickerDataTypeBuilder
+  ElementPickerDataTypeBuilder,
+  UserPickerDataTypeBuilder,
+  MemberGroupPickerDataTypeBuilder
 } from "../builders";
 
 export class DataTypeApiHelper {
@@ -224,7 +228,10 @@ export class DataTypeApiHelper {
         }
         return await this.delete(child.id);
       } else if (child.hasChildren) {
-        return await this.recurseChildren(name, child.id, toDelete);
+        const result = await this.recurseChildren(name, child.id, toDelete);
+        if (result) {
+          return result;
+        }
       }
     }
     return false;
@@ -2101,6 +2108,46 @@ export class DataTypeApiHelper {
     await this.ensureNameNotExists(name);
 
     const dataType = new DateTimeWithTimeZonePickerDataTypeBuilder()
+      .withName(name)
+      .build();
+
+    return await this.save(dataType);
+  }
+
+  async createDefaultDateOnlyPickerDataType(name: string) {
+    await this.ensureNameNotExists(name);
+
+    const dataType = new DateOnlyPickerDataTypeBuilder()
+      .withName(name)
+      .build();
+
+    return await this.save(dataType);
+  }
+
+  async createDefaultTimeOnlyPickerDataType(name: string) {
+    await this.ensureNameNotExists(name);
+
+    const dataType = new TimeOnlyPickerDataTypeBuilder()
+      .withName(name)
+      .build();
+
+    return await this.save(dataType);
+  }
+
+  async createDefaultUserPickerDataType(name: string) {
+    await this.ensureNameNotExists(name);
+
+    const dataType = new UserPickerDataTypeBuilder()
+      .withName(name)
+      .build();
+
+    return await this.save(dataType);
+  }
+
+  async createDefaultMemberGroupPickerDataType(name: string) {
+    await this.ensureNameNotExists(name);
+
+    const dataType = new MemberGroupPickerDataTypeBuilder()
       .withName(name)
       .build();
 

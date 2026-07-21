@@ -17,6 +17,7 @@ export class MemberTypeBuilder {
   memberTypePropertyBuilder: MemberTypePropertyBuilder[];
   memberTypeContainerBuilder: MemberTypeContainerBuilder[];
   id: string;
+  folderId: string;
   memberTypeCompositionBuilder: MemberTypeCompositionBuilder[];
 
   constructor() {
@@ -93,6 +94,11 @@ export class MemberTypeBuilder {
     return this;
   }
 
+  withFolderId(folderId: string) {
+    this.folderId = folderId;
+    return this;
+  }
+
   build() {
     this.id = ensureIdExists(this.id);
 
@@ -114,6 +120,7 @@ export class MemberTypeBuilder {
         return builder.build();
       }) || [],
       id: this.id,
+      folder: this.folderId ? {id: this.folderId} : null,
       compositions: this.memberTypeCompositionBuilder.map((builder) => {
         return builder.build();
       }) || []

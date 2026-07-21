@@ -28,6 +28,8 @@ export class DataTypeUiHelper extends UiBaseLocators {
   private readonly minimumTxt: Locator;
   private readonly maximumTxt: Locator;
   private readonly stepSizeTxt: Locator;
+  private readonly sliderMinimumTxt: Locator;
+  private readonly sliderMaximumTxt: Locator;
   private readonly optionTxt: Locator;
   private readonly addOptionBtn: Locator;
   private readonly maximumAllowedCharsTxt: Locator;
@@ -200,6 +202,10 @@ export class DataTypeUiHelper extends UiBaseLocators {
     this.maximumTxt = page.getByTestId('property:max').locator('#input');
     this.stepSizeTxt = page.getByTestId('property:step').locator('#input');
     this.allowDecimalsToggle = page.locator('umb-property[label="Allow decimals"] #toggle');
+
+    // Slider (uses minVal/maxVal aliases rather than the Numeric min/max)
+    this.sliderMinimumTxt = page.getByTestId('property:minVal').locator('#input');
+    this.sliderMaximumTxt = page.getByTestId('property:maxVal').locator('#input');
 
     // Radiobox
     this.optionTxt = page.getByTestId('property:items').locator('#input');
@@ -599,6 +605,14 @@ export class DataTypeUiHelper extends UiBaseLocators {
 
   async enterStepSizeValue(value: string) {
     await this.enterText(this.stepSizeTxt, value);
+  }
+
+  async enterSliderMinimumValue(value: string) {
+    await this.enterText(this.sliderMinimumTxt, value);
+  }
+
+  async enterSliderMaximumValue(value: string) {
+    await this.enterText(this.sliderMaximumTxt, value);
   }
 
   async clickAllowDecimalsToggle() {

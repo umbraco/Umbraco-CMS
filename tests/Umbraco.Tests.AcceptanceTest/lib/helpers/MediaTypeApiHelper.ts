@@ -46,7 +46,10 @@ export class MediaTypeApiHelper {
         }
         return await this.delete(child.id);
       } else if (child.hasChildren) {
-        return await this.recurseChildren(name, child.id, toDelete);
+        const result = await this.recurseChildren(name, child.id, toDelete);
+        if (result) {
+          return result;
+        }
       }
     }
     return false;
@@ -156,6 +159,17 @@ export class MediaTypeApiHelper {
     const mediaType = new MediaTypeBuilder()
       .withName(mediaTypeName)
       .withAlias(AliasHelper.toAlias(mediaTypeName))
+      .build();
+    return await this.create(mediaType);
+  }
+
+  async createDefaultMediaTypeInFolder(mediaTypeName: string, folderId: string) {
+    await this.ensureNameNotExists(mediaTypeName);
+
+    const mediaType = new MediaTypeBuilder()
+      .withName(mediaTypeName)
+      .withAlias(AliasHelper.toAlias(mediaTypeName))
+      .withFolderId(folderId)
       .build();
     return await this.create(mediaType);
   }
