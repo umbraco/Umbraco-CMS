@@ -15,7 +15,6 @@ export class ElementApiHelper {
     return await response.json();
   }
 
-  // Wait until the element is searchable (Examine index caught up) before searching for it in the UI.
   async waitUntilIndexed(query: string, id: string) {
     await this.api.waitUntilItemIsIndexed(ConstantHelper.apiEndpoints.elementSearch, query, id);
   }
@@ -65,7 +64,7 @@ export class ElementApiHelper {
   async getChildren(id: string) {
     const response = await this.api.get(`${this.api.baseUrl}${ConstantHelper.apiEndpoints.treeElementChildren}?parentId=${id}&skip=0&take=10000`);
     const items = await response.json();
-    return items.items;
+    return this.api.itemsOf(items);
   }
 
   async getChildrenAmount(id: string) {

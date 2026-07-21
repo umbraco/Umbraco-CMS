@@ -10,7 +10,6 @@ export class MediaApiHelper {
     this.api = api;
   }
 
-  // Wait until the media item is searchable (Examine index caught up) before searching for it in the UI.
   async waitUntilIndexed(query: string, id: string) {
     await this.api.waitUntilItemIsIndexed(ConstantHelper.apiEndpoints.mediaSearch, query, id);
   }
@@ -88,7 +87,7 @@ export class MediaApiHelper {
   async getChildren(id: string) {
     const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/tree/media/children?parentId=' + id + '&skip=0&take=10000');
     const items = await response.json();
-    return items.items;
+    return this.api.itemsOf(items);
   }
 
   async create(media) {

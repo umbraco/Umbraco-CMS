@@ -58,7 +58,7 @@ export class PartialViewApiHelper {
   async getChildren(path: string) {
     const response = await this.api.get(`${this.api.baseUrl}/umbraco/management/api/v1/tree/partial-view/children?parentPath=${path}&skip=0&take=10000`);
     const items = await response.json();
-    return items.items;
+    return this.api.itemsOf(items);
   }
 
   async getAllAtRoot() {

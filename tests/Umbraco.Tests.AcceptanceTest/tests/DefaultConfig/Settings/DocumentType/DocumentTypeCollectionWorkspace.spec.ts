@@ -87,7 +87,7 @@ test('can create a document type folder using create options', {tag: '@release'}
 
 test('can create a document type in a folder using create options', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  await umbracoApi.documentType.createFolder(documentFolderName);
+  const parentFolderId = await umbracoApi.documentType.createFolder(documentFolderName);
   await umbracoUi.documentType.reloadDocumentTypeTree();
 
   // Act
@@ -99,12 +99,15 @@ test('can create a document type in a folder using create options', async ({umbr
 
   // Assert
   expect(await umbracoApi.documentType.doesNameExist(documentTypeName)).toBeTruthy();
+  // Verify the document type is inside the parent folder
+  const parentFolderChildren = await umbracoApi.documentType.getChildren(parentFolderId);
+  expect(parentFolderChildren[0].name).toBe(documentTypeName);
 });
 
 test('can create a document type with a template in a folder using create options', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.template.ensureNameNotExists(documentTypeName);
-  await umbracoApi.documentType.createFolder(documentFolderName);
+  const parentFolderId = await umbracoApi.documentType.createFolder(documentFolderName);
   await umbracoUi.documentType.reloadDocumentTypeTree();
 
   // Act
@@ -119,6 +122,9 @@ test('can create a document type with a template in a folder using create option
   const documentTypeData = await umbracoApi.documentType.get(documentTypeId);
   expect(documentTypeData.allowedTemplates[0].id).toEqual(templateId);
   expect(await umbracoApi.documentType.doesNameExist(documentTypeName)).toBeTruthy();
+  // Verify the document type is inside the parent folder
+  const parentFolderChildren = await umbracoApi.documentType.getChildren(parentFolderId);
+  expect(parentFolderChildren[0].name).toBe(documentTypeName);
 
   // Clean
   await umbracoApi.template.ensureNameNotExists(documentTypeName);
@@ -126,7 +132,7 @@ test('can create a document type with a template in a folder using create option
 
 test('can create a element type in a folder using create options', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  await umbracoApi.documentType.createFolder(documentFolderName);
+  const parentFolderId = await umbracoApi.documentType.createFolder(documentFolderName);
   await umbracoUi.documentType.reloadDocumentTypeTree();
 
   // Act
@@ -141,6 +147,9 @@ test('can create a element type in a folder using create options', async ({umbra
   // Checks if the isElement is true
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
   expect(documentTypeData.isElement).toBeTruthy();
+  // Verify the element type is inside the parent folder
+  const parentFolderChildren = await umbracoApi.documentType.getChildren(parentFolderId);
+  expect(parentFolderChildren[0].name).toBe(documentTypeName);
 });
 
 test('can create a document type folder in a folder using create options', async ({umbracoApi, umbracoUi}) => {

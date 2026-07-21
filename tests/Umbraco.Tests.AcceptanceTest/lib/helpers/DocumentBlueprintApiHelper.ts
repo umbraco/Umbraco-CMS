@@ -49,7 +49,7 @@ export class DocumentBlueprintApiHelper {
   async getChildren(id: string) {
     const response = await this.api.get(`${this.api.baseUrl}/umbraco/management/api/v1/tree/document-blueprint/children?parentId=${id}&skip=0&take=10000&foldersOnly=false`);
     const items = await response.json();
-    return items.items;
+    return this.api.itemsOf(items);
   }
 
   async doesNameExist(name: string) {

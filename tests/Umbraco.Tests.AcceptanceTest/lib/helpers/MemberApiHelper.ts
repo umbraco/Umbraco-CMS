@@ -14,7 +14,6 @@ export class MemberApiHelper {
     return await response.json();
   }
 
-  // Wait until the member is searchable (Examine index caught up) before searching for it in the UI.
   async waitUntilIndexed(query: string, id: string) {
     await this.api.waitUntilItemIsIndexed(ConstantHelper.apiEndpoints.memberSearch, query, id);
   }

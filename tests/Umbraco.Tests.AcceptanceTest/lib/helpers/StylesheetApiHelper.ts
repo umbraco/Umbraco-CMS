@@ -57,7 +57,7 @@ export class StylesheetApiHelper {
   async getChildren(path: string) {
     const response = await this.api.get(`${this.api.baseUrl}/umbraco/management/api/v1/tree/stylesheet/children?parentPath=${path}&skip=0&take=10000`);
     const items = await response.json();
-    return items.items;
+    return this.api.itemsOf(items);
   }
 
   async doesNameExist(name: string) {
