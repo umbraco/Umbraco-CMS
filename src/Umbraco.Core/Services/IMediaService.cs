@@ -206,7 +206,17 @@ public interface IMediaService : IContentServiceBase<IMedia>
     /// <param name="userId">Id of the User moving the Media</param>
     /// <returns>True if moving succeeded, otherwise False</returns>
     Attempt<OperationResult?> Move(IMedia media, int parentId, bool includeDescendants, int userId = Constants.Security.SuperUserId)
-        => Move(media, parentId, userId);
+    {
+        // Only the whole-tree move can be satisfied by delegating to the existing method; there is no way to honour
+        // includeDescendants: false without the concrete implementation, so fail fast rather than silently move
+        // the descendants after all.
+        if (includeDescendants is false)
+        {
+            throw new NotImplementedException("This IMediaService implementation does not support moving without descendants. Override the Move overload that takes an includeDescendants parameter to support it.");
+        }
+
+        return Move(media, parentId, userId);
+    }
 
     /// <summary>
     ///     Deletes an <see cref="IMedia" /> object by moving it to the Recycle Bin

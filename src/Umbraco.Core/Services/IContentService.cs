@@ -491,7 +491,17 @@ public interface IContentService : IContentServiceBase<IContent>
     /// <param name="userId">The identifier of the user performing the action.</param>
     /// <returns>The operation result.</returns>
     OperationResult Move(IContent content, int parentId, bool includeDescendants, int userId = Constants.Security.SuperUserId)
-        => Move(content, parentId, userId);
+    {
+        // Only the whole-tree move can be satisfied by delegating to the existing method; there is no way to honour
+        // includeDescendants: false without the concrete implementation, so fail fast rather than silently move
+        // the descendants after all.
+        if (includeDescendants is false)
+        {
+            throw new NotImplementedException("This IContentService implementation does not support moving without descendants. Override the Move overload that takes an includeDescendants parameter to support it.");
+        }
+
+        return Move(content, parentId, userId);
+    }
 
     /// <summary>
     ///     Copies a document.

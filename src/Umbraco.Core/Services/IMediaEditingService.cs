@@ -175,7 +175,17 @@ public interface IMediaEditingService
     /// </returns>
     // TODO (V19): Remove the default implementation when the obsolete overload without includeDescendants is removed.
     Task<Attempt<IMedia?, ContentEditingOperationStatus>> RestoreAsync(Guid key, Guid? parentKey, Guid userKey, bool includeDescendants)
+    {
+        // Only the whole-tree restore can be satisfied by delegating to the existing method; there is no way to honour
+        // includeDescendants: false without the concrete implementation, so fail fast rather than silently restore
+        // the descendants after all.
+        if (includeDescendants is false)
+        {
+            throw new NotImplementedException("This IMediaEditingService implementation does not support restoring without descendants. Override the RestoreAsync overload that takes an includeDescendants parameter to support it.");
+        }
+
 #pragma warning disable CS0618 // Type or member is obsolete
-        => RestoreAsync(key, parentKey, userKey);
+        return RestoreAsync(key, parentKey, userKey);
 #pragma warning restore CS0618 // Type or member is obsolete
+    }
 }
