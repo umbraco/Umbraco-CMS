@@ -152,6 +152,8 @@ public class MediaUniqueNameBenchmarks
         return siblings;
     }
 
+    // Mirrors ContentRepositoryBase.GetSafeLikePrefix so this benchmark builds the same prefix as
+    // production; keep the two in sync if the truncation logic changes.
     private static string GetSafeLikePrefix(string baseText)
     {
         var index = baseText.IndexOf('[');

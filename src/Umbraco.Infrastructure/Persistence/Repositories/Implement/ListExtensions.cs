@@ -34,6 +34,8 @@ internal sealed partial class SimilarNodeName
     /// matches the base text that <see cref="GetUniqueName(IEnumerable{string?}, string?)"/> compares
     /// siblings against, so it can be used to fetch only the siblings that could actually collide.
     /// </summary>
+    /// <param name="name">The name to extract the base text from.</param>
+    /// <returns>The name with any trailing " (n)" suffix removed.</returns>
     internal static string GetBaseText(string? name) => new StructuredName(name).Text;
 
     /// <summary>
