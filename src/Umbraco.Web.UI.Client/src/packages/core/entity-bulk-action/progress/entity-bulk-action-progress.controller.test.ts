@@ -133,6 +133,28 @@ describe('UmbEntityBulkActionProgressController', () => {
 			expect(nextModal.setValueCalls).to.have.lengthOf(0);
 			expect(nextModal.submitCalls).to.equal(0);
 		});
+
+		it('rethrows and still closes the modal when process rejects', async () => {
+			let threw = false;
+			try {
+				await controller.runWithProgress({
+					headline: 'Working',
+					uniques: ['a', 'b'],
+					// Contract violation: process rejects instead of returning `{ error }`.
+					process: async (unique) => {
+						if (unique === 'a') throw new Error('boom');
+						return {};
+					},
+				});
+			} catch (error) {
+				threw = true;
+				expect((error as Error).message).to.equal('boom');
+			}
+
+			expect(threw).to.be.true;
+			// The finally guard must close the dialog so a rejecting process can't leave it blocking the UI.
+			expect(nextModal.submitCalls).to.equal(1);
+		});
 	});
 
 	describe('runIndeterminate', () => {

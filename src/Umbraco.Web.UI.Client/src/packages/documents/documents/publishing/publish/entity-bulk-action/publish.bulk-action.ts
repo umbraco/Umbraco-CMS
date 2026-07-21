@@ -129,8 +129,9 @@ export class UmbDocumentPublishEntityBulkAction extends UmbEntityBulkActionBase<
 	/**
 	 * Fetches the selected documents and the available languages, then builds the variant options for a
 	 * bulk publish/unpublish. Returns `undefined` when none of the selected documents could be loaded.
-	 * @param host - The controller host used to resolve the repositories.
-	 * @param selection - The uniques of the selected documents.
+	 * @param {UmbControllerHost} host - The controller host used to resolve the repositories.
+	 * @param {Array<string>} selection - The uniques of the selected documents.
+	 * @returns {Promise<UmbBulkVariantOptions | undefined>} The variant options, or `undefined` if no documents loaded.
 	 */
 	static async requestBulkVariantOptions(
 		host: UmbControllerHost,
@@ -236,7 +237,7 @@ export class UmbDocumentPublishEntityBulkAction extends UmbEntityBulkActionBase<
 			selection: this.selection,
 			entityType,
 			unique,
-			headlineKey: 'publish_inProgress',
+			headline: '#publish_inProgress',
 			variantIds,
 			labels: {
 				headline: 'speechBubbles_editContentPublishedHeader',

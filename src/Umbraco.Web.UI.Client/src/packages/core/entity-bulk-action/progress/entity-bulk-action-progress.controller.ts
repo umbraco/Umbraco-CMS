@@ -84,33 +84,36 @@ export class UmbEntityBulkActionProgressController extends UmbControllerBase {
 		let completed = 0;
 		let cancelled = false;
 
-		for (const unique of args.uniques) {
-			// Closing the dialog (cancel, escape, backdrop or navigation) resolves the modal — stop here.
-			// We must not touch the modal once resolved, as its state is torn down.
-			if (modal.isResolved()) {
-				cancelled = true;
-				break;
+		try {
+			for (const unique of args.uniques) {
+				// Closing the dialog (cancel, escape, backdrop or navigation) resolves the modal — stop here.
+				// We must not touch the modal once resolved, as its state is torn down.
+				if (modal.isResolved()) {
+					cancelled = true;
+					break;
+				}
+
+				const { error } = await args.process(unique);
+				completed++;
+				if (error) {
+					failed++;
+				} else {
+					succeeded++;
+				}
+
+				if (modal.isResolved()) {
+					cancelled = true;
+					break;
+				}
+
+				modal.setValue({ total, completed });
 			}
-
-			const { error } = await args.process(unique);
-			completed++;
-			if (error) {
-				failed++;
-			} else {
-				succeeded++;
+		} finally {
+			// Close the dialog now that the operation has finished — including if `process` threw,
+			// so a contract violation can never leave the dialog blocking the UI.
+			if (!modal.isResolved()) {
+				modal.submit();
 			}
-
-			if (modal.isResolved()) {
-				cancelled = true;
-				break;
-			}
-
-			modal.setValue({ total, completed });
-		}
-
-		// If the dialog is still open, close it now that the operation has finished.
-		if (!modal.isResolved()) {
-			modal.submit();
 		}
 
 		return { succeeded, failed, cancelled };

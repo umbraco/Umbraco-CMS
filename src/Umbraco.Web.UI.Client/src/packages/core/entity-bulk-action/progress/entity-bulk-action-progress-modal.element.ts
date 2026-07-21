@@ -18,7 +18,7 @@ export class UmbEntityBulkActionProgressModalElement extends UmbModalBaseElement
 
 	override render() {
 		return html`
-			<uui-dialog-layout class="uui-text" .headline=${this.data?.headline ?? ''}>
+			<uui-dialog-layout class="uui-text" .headline=${this.localize.string(this.data?.headline ?? '')}>
 				${this.data?.mode === 'indeterminate' ? this.#renderIndeterminate() : this.#renderDeterminate()}
 			</uui-dialog-layout>
 		`;

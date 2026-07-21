@@ -42,9 +42,9 @@ export interface UmbBulkContentPublishingArgs {
 	entityType: string;
 	unique: string | null;
 	/**
-	 * Localization key for the progress dialog headline.
+	 * Headline for the progress dialog (localization alias, e.g. `#publish_inProgress`).
 	 */
-	headlineKey: string;
+	headline: string;
 	/**
 	 * The variants the operation is performed for, used to phrase the result notification.
 	 */
@@ -70,7 +70,7 @@ export class UmbBulkContentPublishingController extends UmbControllerBase {
 		const localize = new UmbLocalizationController(this);
 
 		const result = await new UmbEntityBulkActionProgressController(this).runWithProgress({
-			headline: localize.term(args.headlineKey),
+			headline: args.headline,
 			uniques: args.selection,
 			process: args.process,
 		});

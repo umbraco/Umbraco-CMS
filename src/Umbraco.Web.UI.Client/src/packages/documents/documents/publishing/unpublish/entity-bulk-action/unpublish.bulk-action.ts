@@ -121,7 +121,7 @@ export class UmbDocumentUnpublishEntityBulkAction extends UmbEntityBulkActionBas
 			selection: this.selection,
 			entityType,
 			unique,
-			headlineKey: 'unpublish_inProgress',
+			headline: '#unpublish_inProgress',
 			variantIds,
 			labels: {
 				headline: 'speechBubbles_contentUnpublished',

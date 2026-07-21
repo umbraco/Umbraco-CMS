@@ -2,7 +2,6 @@ import { UmbEntityBulkActionProgressController } from '../progress/index.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UMB_TREE_PICKER_MODAL } from '@umbraco-cms/backoffice/tree';
-import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import { UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import {
@@ -10,9 +9,9 @@ import {
 	UmbRequestReloadStructureForEntityEvent,
 } from '@umbraco-cms/backoffice/entity-action';
 
-export interface UmbBulkMoveOrCopyArgs {
+export interface UmbBulkTreePickerActionArgs {
 	/**
-	 * The entities to move or copy.
+	 * The entities the operation is performed for.
 	 */
 	selection: Array<string>;
 	/**
@@ -24,9 +23,9 @@ export interface UmbBulkMoveOrCopyArgs {
 	 */
 	pickerConfirmLabel: string;
 	/**
-	 * Localization term key for the progress dialog headline.
+	 * Headline for the progress dialog (localization alias, e.g. `#actions_moveInProgress`).
 	 */
-	progressHeadlineKey: string;
+	progressHeadline: string;
 	foldersOnly?: boolean;
 	hideTreeRoot?: boolean;
 	treeAlias?: string;
@@ -39,11 +38,12 @@ export interface UmbBulkMoveOrCopyArgs {
 }
 
 /**
- * Shared flow for the "move to" and "copy to" bulk actions: pick a destination, run the (single,
- * server-side) bulk operation behind an indeterminate progress dialog, then reload the parent entity.
+ * Shared flow for bulk actions that pick a destination from a tree and then run a single, server-side
+ * operation against it (e.g. "move to" and "duplicate to"): open the destination tree picker, await the
+ * operation behind an indeterminate progress dialog, then reload the parent entity.
  */
-export class UmbBulkMoveOrCopyController extends UmbControllerBase {
-	async run(args: UmbBulkMoveOrCopyArgs): Promise<void> {
+export class UmbBulkTreePickerActionController extends UmbControllerBase {
+	async run(args: UmbBulkTreePickerActionArgs): Promise<void> {
 		if (args.selection.length === 0) return;
 
 		const value = await umbOpenModal(this, UMB_TREE_PICKER_MODAL, {
@@ -62,9 +62,8 @@ export class UmbBulkMoveOrCopyController extends UmbControllerBase {
 		const destinationUnique = value.selection[0];
 		if (destinationUnique === undefined) throw new Error('Destination Unique is not available');
 
-		const localize = new UmbLocalizationController(this);
 		await new UmbEntityBulkActionProgressController(this).runIndeterminate({
-			headline: localize.term(args.progressHeadlineKey),
+			headline: args.progressHeadline,
 			operation: args.perform(destinationUnique),
 			delayMs: 400,
 		});

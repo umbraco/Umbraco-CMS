@@ -78,7 +78,7 @@ export class UmbDeleteEntityBulkAction<
 		const succeeded: Array<string> = [];
 
 		await new UmbEntityBulkActionProgressController(this).runWithProgress({
-			headline: this.#localize.term('actions_deleteInProgress'),
+			headline: '#actions_deleteInProgress',
 			uniques,
 			process: async (unique) => {
 				const { error } = await detailRepository.delete(unique);
