@@ -19,8 +19,7 @@ import type { UmbDocumentItemModel } from '@umbraco-cms/backoffice/document';
 import type { UmbDocumentTypeItemModel } from '@umbraco-cms/backoffice/document-type';
 import type { UmbModalContext } from '@umbraco-cms/backoffice/modal';
 
-const elementName = 'umb-input-content-picker-document-root';
-@customElement(elementName)
+@customElement('umb-input-content-picker-document-root')
 export class UmbInputContentPickerDocumentRootElement extends UmbFormControlMixin<
 	string | undefined,
 	typeof UmbLitElement
@@ -321,6 +320,6 @@ export { UmbInputContentPickerDocumentRootElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbInputContentPickerDocumentRootElement;
+		'umb-input-content-picker-document-root': UmbInputContentPickerDocumentRootElement;
 	}
 }
