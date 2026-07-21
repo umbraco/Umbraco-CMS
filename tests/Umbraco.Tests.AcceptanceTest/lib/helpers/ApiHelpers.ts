@@ -173,6 +173,8 @@ export class ApiHelpers {
   // Examine indexes asynchronously after create; await this before a UI search so the item is findable.
   async waitUntilItemIsIndexed(searchEndpoint: string, query: string, id: string, timeout: number = ConstantHelper.timeout.veryLong) {
     await expect.poll(async () => {
+      // take: 100 — the search is filtered by `query`, so the target is expected within the first page for
+      // test-sized data. If a suite ever creates >100 items matching `query`, raise this or paginate.
       const response = await this.get(this.baseUrl + searchEndpoint, {query: query, take: 100});
       if (!response.ok()) {
         return false;
@@ -212,7 +214,9 @@ export class ApiHelpers {
       },
       ignoreHTTPSErrors: true
     }
-    return await this.page.request.post(url, options);
+    const response = await this.page.request.post(url, options);
+    this.assertNoServerError(response);
+    return response;
   }
 
   async isLoginStateValid() {
