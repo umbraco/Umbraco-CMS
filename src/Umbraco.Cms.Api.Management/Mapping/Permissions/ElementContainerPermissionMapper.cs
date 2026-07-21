@@ -21,6 +21,10 @@ public class ElementContainerPermissionMapper : IPermissionPresentationMapper, I
 {
     private readonly Lazy<IElementContainerPermissionService> _elementContainerPermissionService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ElementContainerPermissionMapper"/> class.
+    /// </summary>
+    /// <param name="elementContainerPermissionService">The element container permission service.</param>
     public ElementContainerPermissionMapper(Lazy<IElementContainerPermissionService> elementContainerPermissionService)
         => _elementContainerPermissionService = elementContainerPermissionService;
 

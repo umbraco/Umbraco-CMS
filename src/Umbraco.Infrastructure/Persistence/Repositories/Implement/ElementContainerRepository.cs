@@ -3,7 +3,9 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Scoping;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
@@ -55,6 +57,9 @@ internal sealed class ElementContainerRepository : EntityContainerRepository, IE
                SET {QuoteColumnName("startElementId")} = NULL
                WHERE {QuoteColumnName("startElementId")} = @id",
             args);
+
+        // delete all granular permissions for this element container
+        Database.Delete<UserGroup2GranularPermissionDto>(Sql().Where<UserGroup2GranularPermissionDto>(dto => dto.UniqueId == entity.Key));
 
         base.PersistDeletedItem(entity);
     }
