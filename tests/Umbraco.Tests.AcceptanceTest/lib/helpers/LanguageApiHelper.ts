@@ -1,4 +1,6 @@
-﻿import {ApiHelpers} from "./ApiHelpers";
+﻿import {expect} from "@playwright/test";
+import {ApiHelpers} from "./ApiHelpers";
+import {ConstantHelper} from "./ConstantHelper";
 
 export class LanguageApiHelper {
   api: ApiHelpers
@@ -50,6 +52,12 @@ export class LanguageApiHelper {
       }
     }
     return null;
+  }
+
+  // Poll variant of getByName: the list projection lags a create, so wait for the language to be readable
+  // before a UI step navigates to the collection (which would otherwise fetch a pre-create snapshot).
+  async waitUntilNameExists(name: string, timeout: number = ConstantHelper.timeout.long) {
+    await expect.poll(() => this.getByName(name), {timeout}).toBeTruthy();
   }
 
   async ensureNameNotExists(name: string) {

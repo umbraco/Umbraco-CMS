@@ -1,4 +1,6 @@
-﻿import {ApiHelpers} from "./ApiHelpers";
+﻿import {expect} from "@playwright/test";
+import {ApiHelpers} from "./ApiHelpers";
+import {ConstantHelper} from "./ConstantHelper";
 
 export class MemberGroupApiHelper {
   api: ApiHelpers;
@@ -43,6 +45,12 @@ export class MemberGroupApiHelper {
 
   async doesNameExist(name: string) {
     return await this.getByName(name);
+  }
+
+  // Poll variant of doesNameExist: the list projection lags a create, so wait for the group to be readable
+  // before a UI step navigates to the collection (which would otherwise fetch a pre-create snapshot).
+  async waitUntilNameExists(name: string, timeout: number = ConstantHelper.timeout.long) {
+    await expect.poll(() => this.doesNameExist(name), {timeout}).toBeTruthy();
   }
 
   async getByName(name: string) {
