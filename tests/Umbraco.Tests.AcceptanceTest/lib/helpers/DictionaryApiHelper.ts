@@ -89,7 +89,10 @@ export class DictionaryApiHelper {
           return await this.delete(child.id);
         }
       } else if (child.isContainer || child.hasChildren) {
-        await this.recurseChildren(name, child.id, toDelete);
+        const result = await this.recurseChildren(name, child.id, toDelete);
+        if (result) {
+          return result;
+        }
       }
     }
     return false;
