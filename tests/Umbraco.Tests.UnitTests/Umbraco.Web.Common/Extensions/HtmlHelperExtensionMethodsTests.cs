@@ -119,14 +119,19 @@ public class HtmlHelperExtensionMethodsTests
         Assert.AreEqual("Hello world, is some text with a link", result);
     }
 
-    [Test]
-    public void Strip_Html_Ensure_Spacing()
+    [TestCase("<p>A</p><p>B</p>", "A B")]
+    [TestCase("<div><h1>Title</h1><p>Body</p></div>", "Title Body")]
+    [TestCase("<p>Hello <strong>world</strong>!</p>", "Hello world!")]
+    [TestCase("<h1>Test header</h1><p>Some <strong>text</strong>, content</p>", "Test header Some text, content")]
+    [TestCase("<p>Visit our site (the best)</p>", "Visit our site (the best)")]
+    [TestCase("<p>Umbraco - the friendly CMS</p>", "Umbraco - the friendly CMS")]
+    [TestCase("<p>He said \"hello\"</p>", "He said \"hello\"")]
+    [TestCase("<p>See [the docs] here</p>", "See [the docs] here")]
+    public void Strip_Html_Ensure_Spacing(string input, string expected)
     {
-        const string text = "<h1>Test header</h1><p>Some <strong>text</strong>, content</p>";
+        var result = _htmlHelper.StripHtml(input).ToString();
 
-        var result = _htmlHelper.StripHtml(text).ToString();
-
-        Assert.AreEqual("Test header Some text, content", result);
+        Assert.AreEqual(expected, result);
     }
 
 }
