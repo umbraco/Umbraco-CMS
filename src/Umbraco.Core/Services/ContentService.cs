@@ -2852,15 +2852,18 @@ public class ContentService : RepositoryService, IContentService
     ///     published after being moved to its new location. Otherwise it'll just
     ///     be saved with a new parent id.
     /// </remarks>
-    /// <param name="content">The <see cref="IContent" /> to move</param>
-    /// <param name="parentId">Id of the Content's new Parent</param>
+    /// <param name="content">The <see cref="IContent" /> to move.</param>
+    /// <param name="parentId">Id of the Content's new Parent.</param>
     /// <param name="includeDescendants">
     ///     Whether to move the descendants of the content along with it. When restoring an item out of the recycle bin
     ///     this can be set to <c>false</c> to restore only the item itself, leaving its descendants in the recycle bin
     ///     as top-level bin items.
     /// </param>
-    /// <param name="userId">Optional Id of the User moving the Content</param>
+    /// <param name="userId">Optional Id of the User moving the Content.</param>
+    /// <returns>The operation result.</returns>
+#pragma warning disable CS0618 // Type or member is obsolete - the int-userId overloads still default to SuperUserId; there is no non-obsolete int equivalent until it is removed in v18
     public OperationResult Move(IContent content, int parentId, bool includeDescendants, int userId = Constants.Security.SuperUserId)
+#pragma warning restore CS0618 // Type or member is obsolete
     {
         EventMessages eventMessages = EventMessagesFactory.Get();
 
@@ -2957,7 +2960,7 @@ public class ContentService : RepositoryService, IContentService
 
     // MUST be called from within WriteLock
     // trash indicates whether we are trashing, un-trashing, or not changing anything
-    private void PerformMoveLocked(IContent content, int parentId, IContent? parent, int userId, ICollection<(IContent, string)> moves, bool? trash, bool includeDescendants = true)
+    private void PerformMoveLocked(IContent content, int parentId, IContent? parent, int userId, List<(IContent Content, string OriginalPath)> moves, bool? trash, bool includeDescendants = true)
     {
         content.WriterId = userId;
         content.ParentId = parentId;
@@ -3010,31 +3013,41 @@ public class ContentService : RepositoryService, IContentService
 
                 if (leaveDescendantsInRecycleBin)
                 {
-                    // the restored item's direct children become top-level recycle bin items; deeper descendants keep
-                    // their relative structure below their (now re-homed) ancestor
-                    var isDirectChild = descendant.ParentId == content.Id;
-                    descendant.Path = paths[descendant.Id] = isDirectChild
-                        ? Constants.System.RecycleBinContentPathPrefix + descendant.Id
-                        : paths[descendant.ParentId] + "," + descendant.Id;
-                    descendant.Level -= originalLevel;
-                    if (isDirectChild)
-                    {
-                        descendant.ParentId = Constants.System.RecycleBinContent;
-                    }
-
-                    // leave the trashed state untouched - these items remain in the recycle bin
-                    PerformMoveContentLocked(descendant, userId, null);
+                    LeaveDescendantInRecycleBinLocked(descendant, content.Id, originalLevel, userId, paths);
                 }
                 else
                 {
-                    // update path and level since we do not update parentId
-                    descendant.Path = paths[descendant.Id] = paths[descendant.ParentId] + "," + descendant.Id;
-                    descendant.Level += levelDelta;
-                    PerformMoveContentLocked(descendant, userId, trash);
+                    PerformMoveDescendantLocked(descendant, levelDelta, userId, trash, paths);
                 }
             }
         }
         while (total > pageSize);
+    }
+
+    // Re-homes a descendant of a restored item within the recycle bin: the restored item's direct children become
+    // top-level recycle bin items, while deeper descendants keep their relative structure below their (now re-homed)
+    // ancestor. The trashed state is left untouched so these items remain in the recycle bin.
+    private void LeaveDescendantInRecycleBinLocked(IContent descendant, int restoredItemId, int originalLevel, int userId, Dictionary<int, string> paths)
+    {
+        var isDirectChild = descendant.ParentId == restoredItemId;
+        descendant.Path = paths[descendant.Id] = isDirectChild
+            ? Constants.System.RecycleBinContentPathPrefix + descendant.Id
+            : paths[descendant.ParentId] + "," + descendant.Id;
+        descendant.Level -= originalLevel;
+        if (isDirectChild)
+        {
+            descendant.ParentId = Constants.System.RecycleBinContent;
+        }
+
+        PerformMoveContentLocked(descendant, userId, null);
+    }
+
+    // Moves a descendant along with the item being moved, updating its path and level (parentId is unchanged).
+    private void PerformMoveDescendantLocked(IContent descendant, int levelDelta, int userId, bool? trash, Dictionary<int, string> paths)
+    {
+        descendant.Path = paths[descendant.Id] = paths[descendant.ParentId] + "," + descendant.Id;
+        descendant.Level += levelDelta;
+        PerformMoveContentLocked(descendant, userId, trash);
     }
 
     private void PerformMoveContentLocked(IContent content, int userId, bool? trash)

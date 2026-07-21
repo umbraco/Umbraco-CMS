@@ -490,7 +490,9 @@ public interface IContentService : IContentServiceBase<IContent>
     /// </param>
     /// <param name="userId">The identifier of the user performing the action.</param>
     /// <returns>The operation result.</returns>
+#pragma warning disable CS0618 // Type or member is obsolete - the int-userId overloads still default to SuperUserId; there is no non-obsolete int equivalent until it is removed in v18
     OperationResult Move(IContent content, int parentId, bool includeDescendants, int userId = Constants.Security.SuperUserId)
+#pragma warning restore CS0618 // Type or member is obsolete
     {
         // Only the whole-tree move can be satisfied by delegating to the existing method; there is no way to honour
         // includeDescendants: false without the concrete implementation, so fail fast rather than silently move

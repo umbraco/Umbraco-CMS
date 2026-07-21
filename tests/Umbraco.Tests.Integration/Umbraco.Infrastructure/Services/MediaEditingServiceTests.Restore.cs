@@ -69,7 +69,7 @@ internal sealed partial class MediaEditingServiceTests
         });
     }
 
-    private async Task<(IMedia topRoot, IMedia parent, IMedia child, IMedia grandchild)> CreateFourLevelStructureAsync()
+    private async Task<(IMedia TopRoot, IMedia Parent, IMedia Child, IMedia Grandchild)> CreateFourLevelStructureAsync()
     {
         var topRoot = await CreateFolderMediaAsync("Top Root", Constants.Security.SuperUserKey, parentKey: null);
         var parent = await CreateFolderMediaAsync("Parent", Constants.Security.SuperUserKey, topRoot.Key);

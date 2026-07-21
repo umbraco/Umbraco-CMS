@@ -72,7 +72,7 @@ public partial class ContentEditingServiceTests
         });
     }
 
-    private async Task<(IContent topRoot, IContent parent, IContent child, IContent grandchild)> CreateFourLevelStructureAsync(IContentType contentType)
+    private async Task<(IContent TopRoot, IContent Parent, IContent Child, IContent Grandchild)> CreateFourLevelStructureAsync(IContentType contentType)
     {
         contentType.AllowedContentTypes = new List<ContentTypeSort> { new(contentType.Key, 1, contentType.Alias) };
         await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
