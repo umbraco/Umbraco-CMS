@@ -13524,6 +13524,52 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/element/batch": {
+      "get": {
+        "tags": [
+          "Element"
+        ],
+        "summary": "Gets multiple elements.",
+        "description": "Gets multiple elements identified by the provided Ids.",
+        "operationId": "GetElementBatch",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BatchResponseModelElementResponseModel"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/element/configuration": {
       "get": {
         "tags": [
@@ -40592,6 +40638,25 @@
           }
         }
       },
+      "BatchResponseModelElementResponseModel": {
+        "required": [
+          "total",
+          "items"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ElementResponseModel"
+            }
+          }
+        }
+      },
       "BatchResponseModelMediaTypeResponseModel": {
         "required": [
           "total",
@@ -54249,9 +54314,11 @@
             "type": "string"
           },
           "httpStatusCode": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
           },
           "isSuccessStatusCode": {
             "type": "boolean"
