@@ -962,6 +962,7 @@ export default {
 		username: 'Brugernavn',
 		value: 'Værdi',
 		view: 'Vis',
+		weight: 'Vægt',
 		welcome: 'Velkommen...',
 		width: 'Bredde',
 		yes: 'Ja',
@@ -2065,6 +2066,13 @@ export default {
 		structureGroup: 'Struktur',
 		advancedGroup: 'Avanceret',
 		webhooks: 'Webhooks',
+	},
+	tree: {
+		classicViewLabel: 'Træ',
+		cardViewLabel: 'Kort',
+		tableViewLabel: 'Tabel',
+		children: 'Underelementer',
+		noItems: 'Ingen elementer',
 	},
 	update: {
 		updateAvailable: 'Ny opdatering er klar',

@@ -159,7 +159,8 @@ internal sealed class MemberFilterRepository : IMemberFilterRepository
                     ON em2mg.{QCol(ExternalMember2MemberGroupDto.ExternalMemberColumnName)} = em.{QCol(ExternalMemberDto.PrimaryKeyColumnName)}
                 INNER JOIN {QTab(NodeDto.TableName)} emgn
                     ON emgn.{QCol(NodeDto.PrimaryKeyColumnName)} = em2mg.{QCol(ExternalMember2MemberGroupDto.MemberGroupColumnName)}
-                    AND emgn.{QCol(NodeDto.TextColumnName)} = @groupName", new { groupName = filter.MemberGroupName });
+                    AND emgn.{QCol(NodeDto.TextColumnName)} = @groupName",
+                new { groupName = filter.MemberGroupName });
         }
 
         AppendWhereFilters(ref sql, filter, $"em.{QCol("email")}", $"em.{QCol("userName")}", $"em.{QCol("name")}", $"em.{QCol("isApproved")}", $"em.{QCol("isLockedOut")}", hasWhereAlready: false);

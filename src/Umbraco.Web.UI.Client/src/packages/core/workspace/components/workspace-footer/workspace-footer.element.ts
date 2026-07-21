@@ -57,7 +57,7 @@ export class UmbWorkspaceFooterLayoutElement extends UmbLitElement {
 				${this._modalContext
 					? html`<uui-button
 							slot="actions"
-							label=${this._isNew ? 'Cancel' : 'Close'}
+							label=${this.localize.term(this._isNew ? 'general_cancel' : 'general_close')}
 							@click=${this.#rejectModal}></uui-button>`
 					: ''}
 

@@ -538,6 +538,17 @@ using (var outer = ScopeProvider.CreateCoreScope())
 - Large data migrations (> 100k rows) should be chunked
 - All migrations use `AsyncMigrationBase`
 
+**Schema-seeding migrations MUST assign the same fixed keys as a clean install**:
+- A migration that adds built-in schema entities (media/content/member types, property types,
+  property groups, data types, etc.) must set each entity's `Key` explicitly to the **same Guid**
+  used for that entity in `Migrations/Install/DatabaseDataCreator.cs`.
+- If you don't set `Key`, `EntityBase.Key` lazily generates a **random `Guid.NewGuid()`** — so every
+  upgraded site (and every environment) ends up with a **different** key, none of which match a clean
+  install. Umbraco Deploy / uSync key their schema artifacts by `Key`, so this shows up as spurious
+  "the key changed" schema diffs across environments (see issue #23337).
+- Keep the Guids in **one place** (a shared `Constants` value referenced by both `DatabaseDataCreator`
+  and the migration) so they cannot drift.
+
 ### Repository Edge Cases
 
 **Cache Invalidation**:

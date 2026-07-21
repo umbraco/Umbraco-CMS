@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Mapping.Content;
+using Umbraco.Cms.Api.Management.ViewModels.Content;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
 using Umbraco.Cms.Api.Management.ViewModels.Element;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -31,6 +32,7 @@ public class ElementMapDefinition : ContentMapDefinition<IElement, ElementValueR
     public void DefineMaps(IUmbracoMapper mapper)
     {
         mapper.Define<IElement, ElementResponseModel>((_, _) => new ElementResponseModel(), Map);
+        mapper.Define<IElement, PublishedElementResponseModel>((_, _) => new PublishedElementResponseModel(), Map);
         mapper.Define<ContentScheduleCollection, ElementResponseModel>(Map);
     }
 
@@ -46,6 +48,28 @@ public class ElementMapDefinition : ContentMapDefinition<IElement, ElementValueR
             {
                 documentVariantViewModel.State = PublishableVariantStateHelper.GetState(source, culture);
                 documentVariantViewModel.PublishDate = culture == null
+                    ? source.PublishDate
+                    : source.GetPublishDate(culture);
+            });
+        target.IsTrashed = source.Trashed;
+    }
+
+    // Umbraco.Code.MapAll -Flags
+    private void Map(IElement source, PublishedElementResponseModel target, MapperContext context)
+    {
+        target.Id = source.Key;
+        target.DocumentType = context.Map<DocumentTypeReferenceResponseModel>(source.ContentType)!;
+        target.Values = MapValueViewModels(source.Properties, published: true);
+        target.Variants = MapVariantViewModels(
+            source,
+            (culture, _, elementVariantViewModel) =>
+            {
+                elementVariantViewModel.Name = source.GetPublishName(culture) ?? elementVariantViewModel.Name;
+                PublishableVariantState variantState = PublishableVariantStateHelper.GetState(source, culture);
+                elementVariantViewModel.State = variantState == PublishableVariantState.PublishedPendingChanges
+                    ? PublishableVariantState.Published
+                    : variantState;
+                elementVariantViewModel.PublishDate = culture == null
                     ? source.PublishDate
                     : source.GetPublishDate(culture);
             });

@@ -704,7 +704,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         /// </summary>
         /// <param name="options">Specifies options for the integrity check, such as whether to automatically fix issues found.</param>
         /// <returns>
-        /// A <see cref="Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.ContentDataIntegrityReport"/> detailing any nodes with invalid paths or levels, and indicating which issues were fixed if applicable.
+        /// A <see cref="ContentDataIntegrityReport"/> detailing any nodes with invalid paths or levels, and indicating which issues were fixed if applicable.
         /// </returns>
         public ContentDataIntegrityReport CheckDataIntegrity(ContentDataIntegrityReportOptions options)
         {
@@ -1076,7 +1076,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             // so... if query contains "[umbracoNode].[nodeId] AS [umbracoNode__nodeId]"
             // then GetAliased for "[umbracoNode].[nodeId]" returns "[umbracoNode__nodeId]"
             MatchCollection matches = SqlContext.SqlSyntax.AliasRegex.Matches(sql.SQL);
-            Match? match = matches.Cast<Match>().FirstOrDefault(m => m.Groups[1].Value.InvariantEquals(field));
+            Match? match = matches.FirstOrDefault(m => m.Groups[1].ValueSpan.Equals(field, StringComparison.InvariantCultureIgnoreCase));
             return match == null ? field : match.Groups[2].Value;
         }
 

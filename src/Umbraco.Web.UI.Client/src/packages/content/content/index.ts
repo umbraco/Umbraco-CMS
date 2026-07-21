@@ -10,6 +10,7 @@ export * from './publishing/index.js';
 export * from './rollback/index.js';
 export * from './workspace/index.js';
 
+export type * from './configuration/index.js';
 export type * from './repository/index.js';
 export type * from './types.js';
 export type * from './variant-picker/index.js';

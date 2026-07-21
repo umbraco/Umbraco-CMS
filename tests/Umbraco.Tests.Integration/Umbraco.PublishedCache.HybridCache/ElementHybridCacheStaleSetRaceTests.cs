@@ -91,7 +91,8 @@ internal sealed class ElementHybridCacheStaleSetRaceTests : UmbracoIntegrationTe
             GetRequiredService<IPublishedModelFactory>(),
             GetRequiredService<IPreviewService>(),
             GetRequiredService<IOptions<CacheSettings>>(),
-            new NullLogger<ElementCacheService>());
+            new NullLogger<ElementCacheService>(),
+            GetRequiredService<IConvertedPublishedContentCacheFactory>());
     }
 
     [Test]

@@ -28,6 +28,8 @@ export class DataTypeUiHelper extends UiBaseLocators {
   private readonly minimumTxt: Locator;
   private readonly maximumTxt: Locator;
   private readonly stepSizeTxt: Locator;
+  private readonly sliderMinimumTxt: Locator;
+  private readonly sliderMaximumTxt: Locator;
   private readonly optionTxt: Locator;
   private readonly addOptionBtn: Locator;
   private readonly maximumAllowedCharsTxt: Locator;
@@ -201,6 +203,10 @@ export class DataTypeUiHelper extends UiBaseLocators {
     this.stepSizeTxt = page.getByTestId('property:step').locator('#input');
     this.allowDecimalsToggle = page.locator('umb-property[label="Allow decimals"] #toggle');
 
+    // Slider (uses minVal/maxVal aliases rather than the Numeric min/max)
+    this.sliderMinimumTxt = page.getByTestId('property:minVal').locator('#input');
+    this.sliderMaximumTxt = page.getByTestId('property:maxVal').locator('#input');
+
     // Radiobox
     this.optionTxt = page.getByTestId('property:items').locator('#input');
     this.addOptionBtn = page.getByTestId('property:items').getByLabel('Add', {exact: true});
@@ -354,6 +360,10 @@ export class DataTypeUiHelper extends UiBaseLocators {
     await this.openCaretButtonForName('Data Types');
   }
 
+  async reloadDataTypeTree() {
+    await this.reloadTree('Data Types');
+  }
+
   async createDataTypeFolder(folderName: string) {
     await this.clickCreateActionMenuOption();
     await this.clickFolderButton();
@@ -370,7 +380,7 @@ export class DataTypeUiHelper extends UiBaseLocators {
 
   async goToDataType(dataTypeName: string) {
     await this.clickRootFolderCaretButton();
-    await this.click(this.sectionSidebar.getByLabel(dataTypeName, {exact: true}));
+    await this.clickTreeItemWithName(dataTypeName);
   }
 
   async clickMoveToButton() {
@@ -595,6 +605,14 @@ export class DataTypeUiHelper extends UiBaseLocators {
     await this.enterText(this.stepSizeTxt, value);
   }
 
+  async enterSliderMinimumValue(value: string) {
+    await this.enterText(this.sliderMinimumTxt, value);
+  }
+
+  async enterSliderMaximumValue(value: string) {
+    await this.enterText(this.sliderMaximumTxt, value);
+  }
+
   async clickAllowDecimalsToggle() {
     await this.click(this.allowDecimalsToggle);
   }
@@ -719,7 +737,7 @@ export class DataTypeUiHelper extends UiBaseLocators {
 
   async addStylesheet(stylesheetName: string) {
     await this.click(this.addStylesheetBtn);
-    await this.click(this.page.getByLabel(stylesheetName));
+    await this.clickTreeItemWithName(stylesheetName, this.page);
     await this.click(this.chooseModalBtn);
   }
 
@@ -937,7 +955,7 @@ export class DataTypeUiHelper extends UiBaseLocators {
     await this.click(this.chooseCustomStylesheetBtn);
     await this.openCaretButtonForName('wwwroot');
     await this.openCaretButtonForName('css');
-    await this.clickLabelWithName(name, true);
+    await this.clickTreeItemWithName(name, this.sidebarModal);
     await this.clickChooseModalButton();
   }
 
@@ -948,7 +966,7 @@ export class DataTypeUiHelper extends UiBaseLocators {
     await this.clickExpandChildItemsForMediaButton();
     for (let i = 0; i < mediaItems.length; i++) {
       if (i === mediaItems.length - 1) {
-        await this.clickLabelWithName(mediaItems[i], true);
+        await this.clickTreeItemWithName(mediaItems[i], this.sidebarModal);
       } else {
         await this.click(this.sidebarModal.locator(`uui-menu-item[label="${mediaItems[i]}"] #caret-button`));
       }

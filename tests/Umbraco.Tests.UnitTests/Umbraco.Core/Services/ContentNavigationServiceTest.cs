@@ -104,7 +104,7 @@ public class ContentNavigationServiceTest
         ];
 
         var navigationRepoMock = new Mock<INavigationRepository>();
-        navigationRepoMock.Setup(x => x.GetContentNodesByObjectType(Constants.ObjectTypes.Document))
+        navigationRepoMock.Setup(x => x.GetContentNodesByObjectType(It.Is<IEnumerable<Guid>>(keys => keys.Count() == 1 && keys.Contains(Constants.ObjectTypes.Document))))
             .Returns(navigationNodes);
 
         var contentNavigationService = new DocumentNavigationService(GetScopeProvider(), navigationRepoMock.Object, Mock.Of<IContentTypeService>());
@@ -145,7 +145,7 @@ public class ContentNavigationServiceTest
         ];
 
         var navigationRepoMock = new Mock<INavigationRepository>();
-        navigationRepoMock.Setup(x => x.GetContentNodesByObjectType(Constants.ObjectTypes.Document))
+        navigationRepoMock.Setup(x => x.GetContentNodesByObjectType(It.Is<IEnumerable<Guid>>(keys => keys.Count() == 1 && keys.Contains(Constants.ObjectTypes.Document))))
             .Returns(navigationNodes);
 
         var contentNavigationService = new DocumentNavigationService(GetScopeProvider(), navigationRepoMock.Object, Mock.Of<IContentTypeService>());

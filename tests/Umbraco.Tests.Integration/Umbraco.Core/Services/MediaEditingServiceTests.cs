@@ -23,7 +23,7 @@ internal sealed class MediaEditingServiceTests : UmbracoIntegrationTest
     private IMediaType ArticleMediaType { get; set; }
 
     [SetUp]
-    public async Task Setup()
+    public new async Task Setup()
     {
         ImageMediaType = MediaTypeService.Get(Constants.Conventions.MediaTypes.Image);
         ArticleMediaType = MediaTypeService.Get(Constants.Conventions.MediaTypes.ArticleAlias);

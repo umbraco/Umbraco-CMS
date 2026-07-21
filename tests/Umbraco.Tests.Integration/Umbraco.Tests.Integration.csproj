@@ -44,6 +44,7 @@
     <ProjectReference Include="..\..\src\Umbraco.Cms.Persistence.EFCore\Umbraco.Cms.Persistence.EFCore.csproj" />
     <ProjectReference Include="..\..\src\Umbraco.Cms\Umbraco.Cms.csproj" />
     <ProjectReference Include="..\..\src\Umbraco.PublishedCache.HybridCache\Umbraco.PublishedCache.HybridCache.csproj" />
+    <ProjectReference Include="..\..\src\Umbraco.PublishedCache.HybridCache.Bounded\Umbraco.PublishedCache.HybridCache.Bounded.csproj" />
     <ProjectReference Include="..\Umbraco.Tests.Common\Umbraco.Tests.Common.csproj" />
   </ItemGroup>
 
@@ -387,6 +388,12 @@
     <Compile Update="Umbraco.Infrastructure\Services\ElementEditingServiceTests.Restore.cs">
       <DependentUpon>ElementEditingServiceTests.cs</DependentUpon>
     </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\ElementEditingServiceTests.CreateAndPublish.cs">
+      <DependentUpon>ElementEditingServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\ElementEditingServiceTests.UpdateAndPublish.cs">
+      <DependentUpon>ElementEditingServiceTests.cs</DependentUpon>
+    </Compile>
     <Compile Update="Umbraco.Infrastructure\Services\ElementContainerServiceTests.Restore.cs">
       <DependentUpon>ElementContainerServiceTests.cs</DependentUpon>
     </Compile>
@@ -410,6 +417,15 @@
     </Compile>
     <Compile Update="Umbraco.Core\Services\ContentTypeEditingServiceTests.ChangeTypes.cs">
       <DependentUpon>ContentTypeEditingServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\UserServiceTests.SetAvatar.cs">
+      <DependentUpon>UserServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\ContentEditingServiceTests.CreateAndPublish.cs">
+      <DependentUpon>ContentEditingServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\ContentEditingServiceTests.UpdateAndPublish.cs">
+      <DependentUpon>ContentEditingServiceTests.cs</DependentUpon>
     </Compile>
   </ItemGroup>
 </Project>

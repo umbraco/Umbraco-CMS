@@ -56,7 +56,7 @@ public interface IPublishedContentQuery
     IEnumerable<IPublishedContent> Content(IEnumerable<object> ids);
 
     /// <summary>Gets the published content items at the root level of the content tree.</summary>
-    /// <returns>An enumerable collection of root-level <see cref="Umbraco.Cms.Core.Models.IPublishedContent"/> items.</returns>
+    /// <returns>An enumerable collection of root-level <see cref="IPublishedContent"/> items.</returns>
     IEnumerable<IPublishedContent> ContentAtRoot();
 
     /// <summary>
@@ -89,14 +89,14 @@ public interface IPublishedContentQuery
 
     /// <summary>Gets the media items corresponding to the specified IDs.</summary>
     /// <param name="ids">The collection of media item IDs to retrieve.</param>
-    /// <returns>An <see cref="IEnumerable{T}"/> of <see cref="Umbraco.Cms.Core.Models.IPublishedContent"/> representing the found media items.</returns>
+    /// <returns>An <see cref="IEnumerable{T}"/> of <see cref="IPublishedContent"/> representing the found media items.</returns>
     IEnumerable<IPublishedContent> Media(IEnumerable<int> ids);
 
     /// <summary>
     /// Retrieves media items corresponding to the specified identifiers.
     /// </summary>
     /// <param name="ids">A collection of identifiers for the media items to retrieve.</param>
-    /// <returns>An <see cref="IEnumerable{T}"/> of <see cref="Umbraco.Cms.Core.Models.IPublishedContent"/> representing the found media items.</returns>
+    /// <returns>An <see cref="IEnumerable{T}"/> of <see cref="IPublishedContent"/> representing the found media items.</returns>
     IEnumerable<IPublishedContent> Media(IEnumerable<object> ids);
 
     /// <summary>
