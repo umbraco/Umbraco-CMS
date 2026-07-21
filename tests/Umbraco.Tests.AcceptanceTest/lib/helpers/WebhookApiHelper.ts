@@ -88,7 +88,7 @@ export class WebhookApiHelper {
     return webhookToken;
   }
 
-  async getWebhookSiteRequestResponse(webhookSiteToken: string, timeoutMs: number = 15000, pollInterval: number = 1000) {
+  async getWebhookSiteRequestResponse(webhookSiteToken: string, timeoutMs: number = 15000, pollInterval: number = 1000, expectedContentFragment?: string) {
     const requestUrl = this.webhookSiteUrl + 'token/' + webhookSiteToken + '/requests';
     const start = Date.now();
 
@@ -99,11 +99,21 @@ export class WebhookApiHelper {
         }
       });
       const requestJson = await requestResponse.json();
-      if (requestJson.total > 0) {
-        return requestJson.data;
+      const requests = requestJson.data ?? [];
+      // Delivery to webhook.site is async and an unrelated request can arrive first, so when an
+      // expected content is given, keep polling until the matching webhook has actually been received.
+      if (expectedContentFragment === undefined) {
+        if (requests.length > 0) {
+          return requests;
+        }
+      } else {
+        const matches = requests.filter((request) => (request.content ?? '').includes(expectedContentFragment));
+        if (matches.length > 0) {
+          return matches;
+        }
       }
-      
-      // Polling again if there is no webhook received yet
+
+      // Polling again if the expected webhook has not been received yet
       await new Promise((resolve) => setTimeout(resolve, pollInterval));
     }
     return null;

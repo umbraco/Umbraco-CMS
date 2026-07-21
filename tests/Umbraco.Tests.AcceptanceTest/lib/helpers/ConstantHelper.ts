@@ -54,7 +54,7 @@
   public static readonly access = {
     denied: 'Access denied'
   }
-  
+
   public static readonly approvedColorSettings = {
     0: ['Include labels?', 'Displays colored field and a label for each color in the color picker, rather than just a colored field.'],
     1: ['Colors', 'Add, remove or sort colors (and labels).'],
@@ -273,8 +273,19 @@
     created: 201
   }
 
+  public static readonly httpMethods = {
+    get: 'GET',
+    post: 'POST',
+    put: 'PUT',
+    delete: 'DELETE'
+  }
+
+  // Matched against response URLs via url().includes(), so entries are either full paths
+  // (e.g. '/umbraco/management/api/v1/document') or path fragments (e.g. '/update-and-publish').
   public static readonly apiEndpoints = {
+    profilingStatus: '/umbraco/management/api/v1/profiling/status',
     document: '/umbraco/management/api/v1/document',
+    updateAndPublish: '/update-and-publish',
     documentType: '/umbraco/management/api/v1/document-type',
     documentTypeFolder: '/umbraco/management/api/v1/document-type/folder',
     documentBlueprint: '/umbraco/management/api/v1/document-blueprint',
@@ -332,7 +343,7 @@
     confirmation: 'We sent an email with password reset instructions, if the email address matches a registered user.',
     notFoundUserError: 'The specified user was not found.'
   }
-  
+
   public static readonly auditTrailMessages = {
     contentSaved: 'Content saved',
     contentSavedAndPublished: 'Content saved and Published',

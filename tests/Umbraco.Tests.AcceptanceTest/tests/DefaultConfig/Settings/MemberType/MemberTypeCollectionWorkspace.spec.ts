@@ -54,6 +54,7 @@ test('can create a member type folder using create options', async ({umbracoApi,
 test('can create a member type in a folder using create options', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const parentFolderId = await umbracoApi.memberType.createFolder(memberTypeFolderName);
+  await umbracoUi.memberType.reloadMemberTypeTree();
   await umbracoUi.memberType.goToMemberType(memberTypeFolderName);
 
   // Act
@@ -77,6 +78,7 @@ test('can create a member type folder in a folder using create options', async (
   const childFolderName = 'Test Child Folder';
   await umbracoApi.memberType.ensureNameNotExists(childFolderName);
   const parentFolderId = await umbracoApi.memberType.createFolder(memberTypeFolderName);
+  await umbracoUi.memberType.reloadMemberTypeTree();
   await umbracoUi.memberType.goToMemberType(memberTypeFolderName);
 
   // Act
