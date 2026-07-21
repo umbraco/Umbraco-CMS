@@ -98,6 +98,20 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     protected abstract OperationResult? Move(TContent content, int newParentId, int userId);
 
     /// <summary>
+    /// Moves content to a new parent, optionally leaving its descendants behind.
+    /// </summary>
+    /// <param name="content">The content to move.</param>
+    /// <param name="newParentId">The new parent identifier.</param>
+    /// <param name="includeDescendants">
+    /// Whether to move the descendants along with the content. When restoring content out of the recycle bin this can
+    /// be set to <c>false</c> to restore only the content item itself, leaving its descendants in the recycle bin.
+    /// </param>
+    /// <param name="userId">The user performing the operation.</param>
+    /// <returns>The operation result.</returns>
+    protected virtual OperationResult? Move(TContent content, int newParentId, bool includeDescendants, int userId)
+        => Move(content, newParentId, userId);
+
+    /// <summary>
     /// Copies content to a new parent.
     /// </summary>
     /// <param name="content">The content to copy.</param>
@@ -354,8 +368,12 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     /// <param name="parentKey">The new parent key, or null for root.</param>
     /// <param name="userKey">The user key performing the operation.</param>
     /// <param name="mustBeInRecycleBin">Whether the content must be in the recycle bin (for restore operations).</param>
+    /// <param name="includeDescendants">
+    /// Whether to move the descendants along with the content. When restoring out of the recycle bin this can be set to
+    /// <c>false</c> to restore only the content item itself, leaving its descendants in the recycle bin.
+    /// </param>
     /// <returns>An attempt containing the content and operation status.</returns>
-    protected async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleMoveAsync(Guid key, Guid? parentKey, Guid userKey, bool mustBeInRecycleBin = false)
+    protected async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleMoveAsync(Guid key, Guid? parentKey, Guid userKey, bool mustBeInRecycleBin = false, bool includeDescendants = true)
     {
         using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
         TContent? content = ContentService.GetById(key);
@@ -396,7 +414,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         }
 
         var userId = await GetUserIdAsync(userKey);
-        OperationResult? moveResult = Move(content, parent.ParentId ?? Constants.System.Root, userId);
+        OperationResult? moveResult = Move(content, parent.ParentId ?? Constants.System.Root, includeDescendants, userId);
 
         scope.Complete();
 

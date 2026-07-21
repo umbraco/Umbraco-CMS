@@ -166,8 +166,13 @@ internal sealed class MediaEditingService
         => await HandleMoveAsync(key, parentKey, userKey);
 
     /// <inheritdoc />
+    [Obsolete("Use the overload that takes an includeDescendants parameter instead. Scheduled for removal in Umbraco 19.")]
     public async Task<Attempt<IMedia?, ContentEditingOperationStatus>> RestoreAsync(Guid key, Guid? parentKey, Guid userKey)
-        => await HandleMoveAsync(key, parentKey, userKey, true);
+        => await RestoreAsync(key, parentKey, userKey, true);
+
+    /// <inheritdoc />
+    public async Task<Attempt<IMedia?, ContentEditingOperationStatus>> RestoreAsync(Guid key, Guid? parentKey, Guid userKey, bool includeDescendants)
+        => await HandleMoveAsync(key, parentKey, userKey, true, includeDescendants);
 
     /// <inheritdoc />
     public async Task<ContentEditingOperationStatus> SortAsync(Guid? parentKey, IEnumerable<SortingModel> sortingModels, Guid userKey)
@@ -186,6 +191,10 @@ internal sealed class MediaEditingService
     /// <inheritdoc />
     protected override OperationResult? Move(IMedia media, int newParentId, int userId)
         => ContentService.Move(media, newParentId, userId).Result;
+
+    /// <inheritdoc />
+    protected override OperationResult? Move(IMedia media, int newParentId, bool includeDescendants, int userId)
+        => ContentService.Move(media, newParentId, includeDescendants, userId).Result;
 
     /// <inheritdoc />
     /// <exception cref="NotSupportedException">Copy is not supported for media items.</exception>

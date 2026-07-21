@@ -479,6 +479,21 @@ public interface IContentService : IContentServiceBase<IContent>
     OperationResult Move(IContent content, int parentId, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
+    ///     Moves a document under a new parent, optionally leaving its descendants behind.
+    /// </summary>
+    /// <param name="content">The document to move.</param>
+    /// <param name="parentId">The identifier of the new parent.</param>
+    /// <param name="includeDescendants">
+    ///     Whether to move the descendants of the document along with it. When restoring a document out of the recycle
+    ///     bin this can be set to <c>false</c> to restore only the document itself, leaving its descendants in the
+    ///     recycle bin as top-level bin items.
+    /// </param>
+    /// <param name="userId">The identifier of the user performing the action.</param>
+    /// <returns>The operation result.</returns>
+    OperationResult Move(IContent content, int parentId, bool includeDescendants, int userId = Constants.Security.SuperUserId)
+        => Move(content, parentId, userId);
+
+    /// <summary>
     ///     Copies a document.
     /// </summary>
     /// <param name="content">The document to copy.</param>

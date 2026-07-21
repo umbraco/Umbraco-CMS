@@ -2842,6 +2842,25 @@ public class ContentService : RepositoryService, IContentService
     /// <param name="parentId">Id of the Content's new Parent</param>
     /// <param name="userId">Optional Id of the User moving the Content</param>
     public OperationResult Move(IContent content, int parentId, int userId = Constants.Security.SuperUserId)
+        => Move(content, parentId, true, userId);
+
+    /// <summary>
+    ///     Moves an <see cref="IContent" /> object to a new location by changing its parent id.
+    /// </summary>
+    /// <remarks>
+    ///     If the <see cref="IContent" /> object is already published it will be
+    ///     published after being moved to its new location. Otherwise it'll just
+    ///     be saved with a new parent id.
+    /// </remarks>
+    /// <param name="content">The <see cref="IContent" /> to move</param>
+    /// <param name="parentId">Id of the Content's new Parent</param>
+    /// <param name="includeDescendants">
+    ///     Whether to move the descendants of the content along with it. When restoring an item out of the recycle bin
+    ///     this can be set to <c>false</c> to restore only the item itself, leaving its descendants in the recycle bin
+    ///     as top-level bin items.
+    /// </param>
+    /// <param name="userId">Optional Id of the User moving the Content</param>
+    public OperationResult Move(IContent content, int parentId, bool includeDescendants, int userId = Constants.Security.SuperUserId)
     {
         EventMessages eventMessages = EventMessagesFactory.Get();
 
@@ -2883,6 +2902,10 @@ public class ContentService : RepositoryService, IContentService
             // leave it unchanged
             var trashed = content.Trashed ? false : (bool?)null;
 
+            // when restoring a single item out of the recycle bin without its descendants, those descendants stay
+            // trashed and are re-homed under the recycle bin root - see PerformMoveLocked
+            var leaveDescendantsInRecycleBin = includeDescendants is false && content.Trashed && parentId != Constants.System.RecycleBinContent;
+
             // if the content was trashed under another content, and so has a published version,
             // it cannot move back as published but has to be unpublished first - that's for the
             // root content, everything underneath will retain its published status
@@ -2893,10 +2916,25 @@ public class ContentService : RepositoryService, IContentService
                 content.PublishedState = PublishedState.Unpublishing;
             }
 
-            PerformMoveLocked(content, parentId, parent, userId, moves, trashed);
+            PerformMoveLocked(content, parentId, parent, userId, moves, trashed, includeDescendants);
 
-            scope.Notifications.Publish(
-                new ContentTreeChangeNotification(content, TreeChangeTypes.RefreshBranch, eventMessages));
+            if (leaveDescendantsInRecycleBin)
+            {
+                // The single RefreshBranch above cannot reconcile the descendants left in the bin (they are no longer
+                // descendants of the restored item), so also refresh the re-homed direct children. The navigation
+                // reconciler then moves them - and their sub-trees - back under the recycle bin root.
+                IContent[] rehomedChildren = moves
+                    .Select(x => x.Item1)
+                    .Where(x => x.ParentId == Constants.System.RecycleBinContent)
+                    .ToArray();
+                scope.Notifications.Publish(
+                    new ContentTreeChangeNotification(content.Yield().Concat(rehomedChildren), TreeChangeTypes.RefreshBranch, eventMessages));
+            }
+            else
+            {
+                scope.Notifications.Publish(
+                    new ContentTreeChangeNotification(content, TreeChangeTypes.RefreshBranch, eventMessages));
+            }
 
             // changes
             MoveEventInfo<IContent>[] moveInfo = moves
@@ -2919,7 +2957,7 @@ public class ContentService : RepositoryService, IContentService
 
     // MUST be called from within WriteLock
     // trash indicates whether we are trashing, un-trashing, or not changing anything
-    private void PerformMoveLocked(IContent content, int parentId, IContent? parent, int userId, ICollection<(IContent, string)> moves, bool? trash)
+    private void PerformMoveLocked(IContent content, int parentId, IContent? parent, int userId, ICollection<(IContent, string)> moves, bool? trash, bool includeDescendants = true)
     {
         content.WriterId = userId;
         content.ParentId = parentId;
@@ -2927,6 +2965,7 @@ public class ContentService : RepositoryService, IContentService
         // get the level delta (old pos to new pos)
         // note that recycle bin (id:-20) level is 0!
         var levelDelta = 1 - content.Level + (parent?.Level ?? 0);
+        var originalLevel = content.Level;
 
         var paths = new Dictionary<int, string>();
 
@@ -2949,6 +2988,13 @@ public class ContentService : RepositoryService, IContentService
                 ? parentId == Constants.System.RecycleBinContent ? "-1,-20" : Constants.System.RootString
                 : parent.Path) + "," + content.Id;
 
+        // When restoring a single item out of the recycle bin without its descendants, the descendants must stay
+        // trashed: the item's direct children are re-homed to the recycle bin root (and the rest of the subtree keeps
+        // its relative structure), so nothing is orphaned and it can still be restored on its own later.
+        var leaveDescendantsInRecycleBin = includeDescendants is false
+            && parentId != Constants.System.RecycleBinContent
+            && originalPath.Contains(Constants.System.RecycleBinContentString);
+
         const int pageSize = 500;
         IQuery<IContent>? query = GetPagedDescendantQuery(originalPath);
         long total;
@@ -2962,10 +3008,30 @@ public class ContentService : RepositoryService, IContentService
             {
                 moves.Add((descendant, descendant.Path)); // capture original path
 
-                // update path and level since we do not update parentId
-                descendant.Path = paths[descendant.Id] = paths[descendant.ParentId] + "," + descendant.Id;
-                descendant.Level += levelDelta;
-                PerformMoveContentLocked(descendant, userId, trash);
+                if (leaveDescendantsInRecycleBin)
+                {
+                    // the restored item's direct children become top-level recycle bin items; deeper descendants keep
+                    // their relative structure below their (now re-homed) ancestor
+                    var isDirectChild = descendant.ParentId == content.Id;
+                    descendant.Path = paths[descendant.Id] = isDirectChild
+                        ? Constants.System.RecycleBinContentPathPrefix + descendant.Id
+                        : paths[descendant.ParentId] + "," + descendant.Id;
+                    descendant.Level -= originalLevel;
+                    if (isDirectChild)
+                    {
+                        descendant.ParentId = Constants.System.RecycleBinContent;
+                    }
+
+                    // leave the trashed state untouched - these items remain in the recycle bin
+                    PerformMoveContentLocked(descendant, userId, null);
+                }
+                else
+                {
+                    // update path and level since we do not update parentId
+                    descendant.Path = paths[descendant.Id] = paths[descendant.ParentId] + "," + descendant.Id;
+                    descendant.Level += levelDelta;
+                    PerformMoveContentLocked(descendant, userId, trash);
+                }
             }
         }
         while (total > pageSize);

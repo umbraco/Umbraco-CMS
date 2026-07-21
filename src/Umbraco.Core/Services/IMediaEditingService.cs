@@ -153,5 +153,29 @@ public interface IMediaEditingService
     ///     <see cref="Attempt{TResult,TStatus}"/> with the restored <see cref="IMedia"/> item (if successful)
     ///     and <see cref="ContentEditingOperationStatus"/> indicating the operation outcome.
     /// </returns>
+    [Obsolete("Use the overload that takes an includeDescendants parameter instead. Scheduled for removal in Umbraco 19.")]
     Task<Attempt<IMedia?, ContentEditingOperationStatus>> RestoreAsync(Guid key, Guid? parentKey, Guid userKey);
+
+    /// <summary>
+    ///     Restores a media item from the recycle bin to a specified parent location, optionally leaving its
+    ///     descendants behind.
+    /// </summary>
+    /// <param name="key">The unique identifier of the media item to restore.</param>
+    /// <param name="parentKey">The unique identifier of the parent to restore to, or <c>null</c> to restore to the root.</param>
+    /// <param name="userKey">The unique identifier of the user performing the operation.</param>
+    /// <param name="includeDescendants">
+    ///     Whether to restore the descendants of the media item along with it. When <c>false</c>, only the media item
+    ///     itself is restored and its descendants remain in the recycle bin as top-level bin items, ready to be
+    ///     restored later.
+    /// </param>
+    /// <returns>
+    ///     A task that represents the asynchronous operation. The task result contains an
+    ///     <see cref="Attempt{TResult,TStatus}"/> with the restored <see cref="IMedia"/> item (if successful)
+    ///     and <see cref="ContentEditingOperationStatus"/> indicating the operation outcome.
+    /// </returns>
+    // TODO (V19): Remove the default implementation when the obsolete overload without includeDescendants is removed.
+    Task<Attempt<IMedia?, ContentEditingOperationStatus>> RestoreAsync(Guid key, Guid? parentKey, Guid userKey, bool includeDescendants)
+#pragma warning disable CS0618 // Type or member is obsolete
+        => RestoreAsync(key, parentKey, userKey);
+#pragma warning restore CS0618 // Type or member is obsolete
 }

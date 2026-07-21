@@ -145,5 +145,24 @@ public interface IContentEditingService
     /// <param name="parentKey">The unique identifier of the parent to restore to, or <c>null</c> for the original location.</param>
     /// <param name="userKey">The unique identifier of the user performing the action.</param>
     /// <returns>An attempt containing the restored content item or an error status.</returns>
+    [Obsolete("Use the overload that takes an includeDescendants parameter instead. Scheduled for removal in Umbraco 19.")]
     Task<Attempt<IContent?, ContentEditingOperationStatus>> RestoreAsync(Guid key, Guid? parentKey, Guid userKey);
+
+    /// <summary>
+    ///     Restores a content item from the recycle bin, optionally leaving its descendants behind.
+    /// </summary>
+    /// <param name="key">The unique identifier of the content item to restore.</param>
+    /// <param name="parentKey">The unique identifier of the parent to restore to, or <c>null</c> for the original location.</param>
+    /// <param name="userKey">The unique identifier of the user performing the action.</param>
+    /// <param name="includeDescendants">
+    ///     Whether to restore the descendants of the content item along with it. When <c>false</c>, only the content
+    ///     item itself is restored and its descendants remain in the recycle bin as top-level bin items, ready to be
+    ///     restored later.
+    /// </param>
+    /// <returns>An attempt containing the restored content item or an error status.</returns>
+    // TODO (V19): Remove the default implementation when the obsolete overload without includeDescendants is removed.
+    Task<Attempt<IContent?, ContentEditingOperationStatus>> RestoreAsync(Guid key, Guid? parentKey, Guid userKey, bool includeDescendants)
+#pragma warning disable CS0618 // Type or member is obsolete
+        => RestoreAsync(key, parentKey, userKey);
+#pragma warning restore CS0618 // Type or member is obsolete
 }

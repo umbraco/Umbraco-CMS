@@ -194,6 +194,21 @@ public interface IMediaService : IContentServiceBase<IMedia>
     Attempt<OperationResult?> Move(IMedia media, int parentId, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
+    ///     Moves an <see cref="IMedia" /> object to a new location, optionally leaving its descendants behind
+    /// </summary>
+    /// <param name="media">The <see cref="IMedia" /> to move</param>
+    /// <param name="parentId">Id of the Media's new Parent</param>
+    /// <param name="includeDescendants">
+    ///     Whether to move the descendants of the media along with it. When restoring media out of the recycle bin
+    ///     this can be set to <c>false</c> to restore only the media item itself, leaving its descendants in the
+    ///     recycle bin as top-level bin items.
+    /// </param>
+    /// <param name="userId">Id of the User moving the Media</param>
+    /// <returns>True if moving succeeded, otherwise False</returns>
+    Attempt<OperationResult?> Move(IMedia media, int parentId, bool includeDescendants, int userId = Constants.Security.SuperUserId)
+        => Move(media, parentId, userId);
+
+    /// <summary>
     ///     Deletes an <see cref="IMedia" /> object by moving it to the Recycle Bin
     /// </summary>
     /// <param name="media">The <see cref="IMedia" /> to delete</param>
