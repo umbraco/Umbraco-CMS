@@ -7,6 +7,7 @@ import type {
 	CreateUserRequestModel,
 	UpdateUserRequestModel,
 	UserKindModel,
+	UserResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { UserService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -80,8 +81,31 @@ export class UmbUserServerDataSource implements UmbDetailDataSource<UmbUserDetai
 			return { error };
 		}
 
-		// TODO: make data mapper to prevent errors
-		const user: UmbUserDetailModel = {
+		return { data: this.#mapToDetailModel(data) };
+	}
+
+	/**
+	 * Fetches the Users with the given ids from the server
+	 * @param {Array<string>} uniques
+	 * @returns {*}
+	 * @memberof UmbUserServerDataSource
+	 */
+	async readMany(uniques: Array<string>) {
+		if (!uniques.length) {
+			return { data: [] };
+		}
+
+		const { data, error } = await tryExecute(this.#host, UserService.getUserBatch({ query: { id: uniques } }));
+
+		return {
+			data: data?.items.map((item) => this.#mapToDetailModel(item)),
+			error,
+		};
+	}
+
+	// TODO: make data mapper to prevent errors
+	#mapToDetailModel(data: UserResponseModel): UmbUserDetailModel {
+		return {
 			avatarUrls: data.avatarUrls,
 			createDate: data.createDate,
 			hasDocumentRootAccess: data.hasDocumentRootAccess,
@@ -106,8 +130,6 @@ export class UmbUserServerDataSource implements UmbDetailDataSource<UmbUserDetai
 			userGroupUniques: data.userGroupIds.map((reference) => ({ unique: reference.id })),
 			userName: data.userName,
 		};
-
-		return { data: user };
 	}
 
 	/**

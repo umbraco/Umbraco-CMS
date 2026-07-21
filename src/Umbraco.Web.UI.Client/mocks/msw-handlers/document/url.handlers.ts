@@ -10,13 +10,20 @@ export const urlHandlers = [
 		const ids = url.searchParams.getAll('id');
 		if (!ids.length) return new HttpResponse(null, { status: 400 });
 
+		// When a culture is provided, variant URLs are restricted to that culture (invariant URLs, which have
+		// no culture, are always kept). This mirrors the Management API's document URLs endpoint.
+		const culture = url.searchParams.get('culture');
+
 		const response: GetDocumentUrlsResponse = ids.map((id) => ({
 			id,
-			urlInfos: umbDocumentMockDb.url.getUrls(id).map((urlInfo) => ({
-				...urlInfo,
-				message: null,
-				provider: 'Default',
-			})),
+			urlInfos: umbDocumentMockDb.url
+				.getUrls(id)
+				.filter((urlInfo) => !culture || urlInfo.culture === null || urlInfo.culture === culture)
+				.map((urlInfo) => ({
+					...urlInfo,
+					message: null,
+					provider: 'Default',
+				})),
 		}));
 
 		return HttpResponse.json(response);

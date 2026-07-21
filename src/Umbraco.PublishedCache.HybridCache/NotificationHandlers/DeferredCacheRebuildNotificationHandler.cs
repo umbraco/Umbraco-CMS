@@ -47,12 +47,12 @@ internal sealed class DeferredCacheRebuildNotificationHandler :
         // so the appropriate cache is rebuilt (rebuilding document cache for element type changes
         // would be a no-op and leave the element cache stale).
         var documentStructuralIds = notification.Changes
-            .Where(x => x.ChangeTypes.IsStructuralChange() && x.Item.IsElement is false)
+            .Where(x => x.ChangeTypes.RequiresRawDataRebuild() && x.Item.IsElement is false)
             .Select(x => x.Item.Id)
             .ToArray();
 
         var elementStructuralIds = notification.Changes
-            .Where(x => x.ChangeTypes.IsStructuralChange() && x.Item.IsElement)
+            .Where(x => x.ChangeTypes.RequiresRawDataRebuild() && x.Item.IsElement)
             .Select(x => x.Item.Id)
             .ToArray();
 
@@ -76,7 +76,7 @@ internal sealed class DeferredCacheRebuildNotificationHandler :
         }
 
         var structuralChangeIds = notification.Changes
-            .Where(x => x.ChangeTypes.IsStructuralChange())
+            .Where(x => x.ChangeTypes.RequiresRawDataRebuild())
             .Select(x => x.Item.Id)
             .ToArray();
 

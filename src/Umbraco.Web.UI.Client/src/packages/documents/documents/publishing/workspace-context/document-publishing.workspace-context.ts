@@ -6,17 +6,17 @@ import type {
 } from '../../types.js';
 import { UmbDocumentPublishingRepository } from '../repository/index.js';
 import { UmbDocumentPublishedPendingChangesManager } from '../pending-changes/index.js';
-import { UmbDocumentVariantState } from '../../variant-state.js';
 import { UMB_DOCUMENT_SCHEDULE_MODAL } from '../schedule-publish/constants.js';
 import { UMB_DOCUMENT_PUBLISH_WITH_DESCENDANTS_MODAL } from '../publish-with-descendants/constants.js';
-import { UMB_DOCUMENT_PUBLISH_MODAL } from '../publish/constants.js';
-import { UmbUnpublishDocumentEntityAction } from '../unpublish/index.js';
+import { UmbDocumentUnpublishManifestEntityActionMeta } from '../unpublish/entity-action/constants.js';
 import { UMB_DOCUMENT_ENTITY_TYPE, UMB_DOCUMENT_WORKSPACE_ALIAS } from '../../constants.js';
 import { UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT } from './document-publishing.workspace-context.token.js';
 import { UMB_DOCUMENT_PUBLISHING_SHORTCUT_UNIQUE } from './constants.js';
+import { UmbDocumentVariantState } from '../../variant-state.js';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
+import { UMB_CONTENT_PUBLISH_MODAL, UmbContentUnpublishEntityAction } from '@umbraco-cms/backoffice/content';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import {
@@ -48,6 +48,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 	#publishedDocumentData?: UmbDocumentDetailModel;
 	#loadingPublishedData = false;
 	#currentUnique?: UmbEntityUnique;
+	#variesByCulture?: boolean;
 	#notificationContext?: typeof UMB_NOTIFICATION_CONTEXT.TYPE;
 	readonly #localize = new UmbLocalizationController(this);
 
@@ -331,8 +332,13 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 		const entityType = this.#documentWorkspaceContext.getEntityType();
 		if (!entityType) throw new Error('Entity type is missing');
 
-		// TODO: remove meta
-		await new UmbUnpublishDocumentEntityAction(this, { unique, entityType, meta: {} as never }).execute();
+		const action = new UmbContentUnpublishEntityAction(this, {
+			unique,
+			entityType,
+			meta: UmbDocumentUnpublishManifestEntityActionMeta,
+		});
+		const didUnpublish = await action.executeWithResult();
+		if (!didUnpublish) return;
 
 		// Reload workspace data to reflect the unpublished state
 		// TODO: It seems wrong to make a full reload, In this case I think we can just update the variants status? [NL]
@@ -359,11 +365,13 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 			variantIds.push(UmbVariantId.Create(options[0]));
 		} else {
 			// If there are multiple variants, we will open the modal to let the user pick which variants to publish.
-			const result = await umbOpenModal(this, UMB_DOCUMENT_PUBLISH_MODAL, {
+			const result = await umbOpenModal(this, UMB_CONTENT_PUBLISH_MODAL, {
 				data: {
 					headline: this.#localize.term('content_saveAndPublishModalTitle'),
 					options,
-					pickableFilter: this.#publishableVariantsFilter,
+					// The shared modal's pickableFilter is typed against the generic UmbEntityVariantOptionModel, but
+					// #determineVariantOptions() (which supplies `options` above) only ever returns document variants here.
+					pickableFilter: (option) => this.#publishableVariantsFilter(option as UmbDocumentVariantOptionModel),
 				},
 				value: { selection: selected },
 			}).catch(() => undefined);
@@ -396,12 +404,8 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 				// If data of the selection is not valid Then just save:
 				await this.#documentWorkspaceContext!.performCreateOrUpdate(variantIds, saveData);
 				// Notifying that the save was successful, but we did not publish, which is what we want to symbolize here. [NL]
-				const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
-				if (!notificationContext) {
-					throw new Error('Notification context is missing');
-				}
 				// TODO: Get rid of the save notification.
-				notificationContext.peek('danger', {
+				this.#notificationContext?.peek('danger', {
 					data: { message: this.#localize.term('speechBubbles_editContentPublishedFailedByValidation') },
 				});
 				// Reject even thought the save was successful, but we did not publish, which is what we want to symbolize here. [NL]
@@ -561,6 +565,26 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 				}
 			},
 			'umbPersistedDataObserver',
+		);
+
+		this.observe(
+			this.#documentWorkspaceContext.variesByCulture,
+			(variesByCulture) => {
+				const previousVariesByCulture = this.#variesByCulture;
+				this.#variesByCulture = variesByCulture;
+				if (
+					previousVariesByCulture === undefined ||
+					variesByCulture === undefined ||
+					previousVariesByCulture === variesByCulture
+				) {
+					return;
+				}
+				// The server migrates the published version when the content type's variance changes,
+				// so the cached copy no longer compares correctly against the persisted data:
+				this.#publishedDocumentData = undefined;
+				this.#loadAndProcessLastPublished().catch(() => undefined);
+			},
+			'umbVariesByCultureObserver',
 		);
 	}
 

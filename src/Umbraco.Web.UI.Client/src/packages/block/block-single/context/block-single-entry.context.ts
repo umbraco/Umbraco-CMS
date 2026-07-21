@@ -33,6 +33,12 @@ export class UmbBlockSingleEntryContext extends UmbBlockEntryContext<
 		super(host, UMB_BLOCK_SINGLE_MANAGER_CONTEXT, UMB_BLOCK_SINGLE_ENTRIES_CONTEXT);
 	}
 
+	protected override _needsLegacyLabelRenderer(): boolean {
+		// Block Single entry element owns the canonical `<umb-ufm-render>` (via its child
+		// views) and pushes resolved text via `setName()`. No hidden virtual renderer needed.
+		return false;
+	}
+
 	protected override _gotManager() {
 		this.observe(
 			this._manager?.inlineEditingMode,

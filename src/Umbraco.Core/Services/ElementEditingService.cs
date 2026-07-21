@@ -23,6 +23,7 @@ internal sealed class ElementEditingService
     private readonly ILogger<ElementEditingService> _logger;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
     private readonly IElementContainerService _containerService;
+    private readonly ContentTypeFilterCollection _contentTypeFilters;
     private readonly IEventMessagesFactory _eventMessagesFactory;
     private readonly IIdKeyMap _idKeyMap;
     private readonly IAuditService _auditService;
@@ -65,6 +66,7 @@ internal sealed class ElementEditingService
         _logger = logger;
         _userIdKeyResolver = userIdKeyResolver;
         _containerService = containerService;
+        _contentTypeFilters = contentTypeFilters;
         _eventMessagesFactory = eventMessagesFactory;
         _idKeyMap = idKeyMap;
         _auditService = auditService;
@@ -111,6 +113,15 @@ internal sealed class ElementEditingService
             return Attempt.FailWithStatus(ContentEditingOperationStatus.NotAllowed, new ContentValidationResult());
         }
 
+        // A content type filter could prevent the element from being created under the requested parent,
+        // consistent with the validation applied when actually creating the element. Treat an empty key as the
+        // library root, consistent with the create/move paths.
+        Guid? parentKey = createModel.ParentKey == Guid.Empty ? null : createModel.ParentKey;
+        if (await IsAllowedInLibraryByContentTypeFilters(contentType, parentKey) is false)
+        {
+            return Attempt.FailWithStatus(ContentEditingOperationStatus.NotAllowed, new ContentValidationResult());
+        }
+
         return await ValidateCulturesAndPropertiesAsync(
             createModel,
             createModel.ContentTypeKey,
@@ -119,6 +130,13 @@ internal sealed class ElementEditingService
     }
 
     public async Task<Attempt<ElementCreateResult, ContentEditingOperationStatus>> CreateAsync(ElementCreateModel createModel, Guid userKey)
+        => await HandleCreateAsync(createModel, null, userKey);
+
+    /// <inheritdoc />
+    public async Task<Attempt<ElementCreateResult, ContentEditingOperationStatus>> CreateAndPublishAsync(ElementCreateModel createModel, string[] culturesToPublish, Guid userKey)
+        => await HandleCreateAsync(createModel, culturesToPublish, userKey);
+
+    private async Task<Attempt<ElementCreateResult, ContentEditingOperationStatus>> HandleCreateAsync(ElementCreateModel createModel, string[]? culturesToPublish, Guid userKey)
     {
         if (await ValidateCulturesAsync(createModel) is false)
         {
@@ -138,13 +156,22 @@ internal sealed class ElementEditingService
 
         IElement element = await EnsureOnlyAllowedFieldsAreUpdated(result.Result.Content!, userKey);
 
-        ContentEditingOperationStatus saveStatus = await SaveAsync(element, userKey);
+        ContentEditingOperationStatus saveStatus = culturesToPublish is null
+            ? await SaveAsync(element, userKey)
+            : await SaveAndPublish(element, culturesToPublish, userKey);
         return saveStatus == ContentEditingOperationStatus.Success
             ? Attempt.SucceedWithStatus(validationStatus, new ElementCreateResult { Content = element, ValidationResult = validationResult })
             : Attempt.FailWithStatus(saveStatus, new ElementCreateResult { Content = element });
     }
 
     public async Task<Attempt<ElementUpdateResult, ContentEditingOperationStatus>> UpdateAsync(Guid key, ElementUpdateModel updateModel, Guid userKey)
+        => await HandleUpdateAsync(key, updateModel, null, userKey);
+
+    /// <inheritdoc />
+    public async Task<Attempt<ElementUpdateResult, ContentEditingOperationStatus>> UpdateAndPublishAsync(Guid key, ElementUpdateModel updateModel, string[] culturesToPublish, Guid userKey)
+        => await HandleUpdateAsync(key, updateModel, culturesToPublish, userKey);
+
+    private async Task<Attempt<ElementUpdateResult, ContentEditingOperationStatus>> HandleUpdateAsync(Guid key, ElementUpdateModel updateModel, string[]? culturesToPublish, Guid userKey)
     {
         IElement? element = ContentService.GetById(key);
         if (element is null)
@@ -170,7 +197,9 @@ internal sealed class ElementEditingService
 
         element = await EnsureOnlyAllowedFieldsAreUpdated(element, userKey);
 
-        ContentEditingOperationStatus saveStatus = await SaveAsync(element, userKey);
+        ContentEditingOperationStatus saveStatus = culturesToPublish is null
+            ? await SaveAsync(element, userKey)
+            : await SaveAndPublish(element, culturesToPublish, userKey);
         return saveStatus == ContentEditingOperationStatus.Success
             ? Attempt.SucceedWithStatus(validationStatus, new ElementUpdateResult { Content = element, ValidationResult = validationResult })
             : Attempt.FailWithStatus(saveStatus, new ElementUpdateResult { Content = element });
@@ -208,15 +237,41 @@ internal sealed class ElementEditingService
 
     protected override async Task<(int? ParentId, ContentEditingOperationStatus OperationStatus)> TryGetAndValidateParentIdAsync(Guid? parentKey, IContentType contentType)
     {
+        // Treat an empty key as the library root, consistent with the move/restore and container operations.
+        if (parentKey == Guid.Empty)
+        {
+            parentKey = null;
+        }
+
         if (parentKey.HasValue is false)
         {
-            return (Constants.System.Root, ContentEditingOperationStatus.Success);
+            // We could have a content type filter registered that prevents the element from being created at the library root.
+            return await IsAllowedInLibraryByContentTypeFilters(contentType, null)
+                ? (Constants.System.Root, ContentEditingOperationStatus.Success)
+                : (null, ContentEditingOperationStatus.NotAllowed);
         }
 
         EntityContainer? container = await _containerService.GetAsync(parentKey.Value);
-        return container is not null
+        if (container is null)
+        {
+            return (null, ContentEditingOperationStatus.ParentNotFound);
+        }
+
+        // We could have a content type filter registered that prevents the element from being created under this container.
+        return await IsAllowedInLibraryByContentTypeFilters(contentType, parentKey.Value)
             ? (container.Id, ContentEditingOperationStatus.Success)
-            : (null, ContentEditingOperationStatus.ParentNotFound);
+            : (null, ContentEditingOperationStatus.NotAllowed);
+    }
+
+    private async Task<bool> IsAllowedInLibraryByContentTypeFilters(IContentType contentType, Guid? parentKey)
+    {
+        IEnumerable<IContentType> filteredContentTypes = [contentType];
+        foreach (IContentTypeFilter filter in _contentTypeFilters)
+        {
+            filteredContentTypes = await filter.FilterAllowedInLibraryAsync(filteredContentTypes, parentKey);
+        }
+
+        return filteredContentTypes.Any();
     }
 
     /// <inheritdoc/>
@@ -305,6 +360,20 @@ internal sealed class ElementEditingService
             }
 
             parentId = container.Id;
+        }
+
+        IContentType? contentType = ContentTypeService.Get(element.ContentType.Key);
+        if (contentType is null)
+        {
+            return Attempt.Fail(ContentEditingOperationStatus.ContentTypeNotFound);
+        }
+
+        // A content type filter could prevent the element from being moved to (or restored at) this destination,
+        // consistent with the validation applied when creating an element.
+        Guid? targetParentKey = containerKey.HasValue && containerKey.Value != Guid.Empty ? containerKey.Value : null;
+        if (await IsAllowedInLibraryByContentTypeFilters(contentType, targetParentKey) is false)
+        {
+            return Attempt.Fail(ContentEditingOperationStatus.NotAllowed);
         }
 
         var originalPath = element.Path;
@@ -511,6 +580,30 @@ internal sealed class ElementEditingService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Content save operation failed");
+            return ContentEditingOperationStatus.Unknown;
+        }
+    }
+
+    private async Task<ContentEditingOperationStatus> SaveAndPublish(IElement content, string[] culturesToPublish, Guid userKey)
+    {
+        try
+        {
+            var currentUserId = await GetUserIdAsync(userKey);
+            PublishResult publishResult = ContentService.SaveAndPublish(content, culturesToPublish, userId: currentUserId);
+            if (publishResult.Success)
+            {
+                return ContentEditingOperationStatus.Success;
+            }
+
+            return publishResult.Result switch
+            {
+                PublishResultType.FailedPublishCancelledByEvent => ContentEditingOperationStatus.CancelledByNotification,
+                _ => ContentEditingOperationStatus.Unknown,
+            };
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Content save and publish operation failed");
             return ContentEditingOperationStatus.Unknown;
         }
     }

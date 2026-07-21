@@ -212,13 +212,14 @@ public class ElementOnlyOutputExpansionStrategy : IOutputExpansionStrategy
         public static Node Parse(string value)
         {
             // verify that there are as many start brackets as there are end brackets
-            if (value.CountOccurrences("[") != value.CountOccurrences("]"))
+            ReadOnlySpan<char> valueAsSpan = value.AsSpan();
+            if (valueAsSpan.Count('[') != valueAsSpan.Count(']'))
             {
                 throw new ArgumentException("Value did not contain an equal number of start and end brackets");
             }
 
             // verify that the value does not start with a start bracket
-            if (value.StartsWith("["))
+            if (value.StartsWith('['))
             {
                 throw new ArgumentException("Value cannot start with a bracket");
             }
