@@ -110,6 +110,9 @@ export class ContentUiHelper extends UiBaseLocators {
   private readonly linkToManualBtn: Locator;
   private readonly umbDocumentCollection: Locator;
   private readonly documentTableColumnName: Locator;
+  private readonly blockListEditor: Locator;
+  private readonly blockGridEditor: Locator;
+  private readonly blockSingleEditor: Locator;
   private readonly addBlockElementBtn: Locator;
   private readonly formValidationMessage: Locator;
   private readonly blockName: Locator;
@@ -370,7 +373,15 @@ export class ContentUiHelper extends UiBaseLocators {
       "umb-document-table-column-name",
     );
     //Block Grid - Block List
-    this.addBlockElementBtn = page
+    this.blockListEditor = page.locator('umb-property-editor-ui-block-list');
+    this.blockGridEditor = page.locator('umb-property-editor-ui-block-grid');
+    this.blockSingleEditor = page.locator('umb-property-editor-ui-block-single');
+    // Scope to the block editors: a bare 'uui-button-group > uui-button' also matches the workspace
+    // footer's Save-and-publish split button, so before the block's add button renders .first() could
+    // resolve to Save and clicking it opened the publish modal instead of the block picker.
+    this.addBlockElementBtn = this.blockListEditor
+      .or(this.blockGridEditor)
+      .or(this.blockSingleEditor)
       .locator('uui-button-group > uui-button')
       .first()
       .filter({has: page.locator('#button')});
