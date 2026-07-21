@@ -328,9 +328,7 @@ export class ContentUiHelper extends UiBaseLocators {
     this.duplicateBtn = page.getByLabel('Duplicate', {exact: true});
     this.contentTreeRefreshBtn = page.locator('#header').getByLabel('#actions_refreshNode');
     this.sortChildrenBtn = page.getByRole('button', {name: 'Sort children'});
-    this.rollbackBtn = this.documentWorkspace.getByRole('button', {
-      name: /^Rollback(…)?$/,
-    });
+    this.rollbackBtn = this.documentWorkspace.locator('[data-mark="audit-log-action:Umb.AuditLogAction.Document.Rollback"]');
     this.publishModalBtn = this.backofficeModalContainer.getByLabel('Publish', {exact: true});
     this.unpublishModalBtn = this.backofficeModalContainer.getByLabel('Unpublish', {exact: true});
     this.rollbackContainerBtn = this.container.getByLabel("Rollback");
@@ -1356,11 +1354,13 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   async clickRollbackButton() {
-    // Opening Rollback triggers a GET /document-version to load the version history;
-    // wait for that response so the versions are ready before we pick one.
+    // Opening Rollback triggers a GET /document-version to load the version history; wait for that response
+    // so the versions are ready before we pick one. The button is located by its stable data-mark (see
+    // rollbackBtn) rather than an accessible-name match, which could resolve late/to a transient element
+    // and swallow the click, opening no modal and hanging this wait.
     await this.waitForResponseAfterExecutingPromise(
       '/document-version',
-      this.click(this.rollbackBtn, { force: true }),
+      this.click(this.rollbackBtn),
       ConstantHelper.statusCodes.ok,
       ConstantHelper.httpMethods.get,
     );
