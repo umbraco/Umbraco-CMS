@@ -7,6 +7,7 @@ export {BlockListDataTypeBuilder} from './blockListDataTypeBuilder';
 export {CheckboxListDataTypeBuilder} from './checkboxListDataTypeBuilder';
 export {ContentPickerDataTypeBuilder} from './contentPickerDataTypeBuilder';
 export {BlockGridDataTypeBuilder} from './blockGridDataTypeBuilder';
+export {SingleBlockDataTypeBuilder} from './singleBlockDataTypeBuilder';
 export {DropdownDataTypeBuilder} from './dropdownDataTypeBuilder';
 export {ImageCropperDataTypeBuilder} from './imageCropperDataTypeBuilder';
 export {MediaPickerDataTypeBuilder} from './mediaPickerDataTypeBuilder';
