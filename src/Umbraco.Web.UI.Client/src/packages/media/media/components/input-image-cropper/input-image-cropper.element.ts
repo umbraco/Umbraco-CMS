@@ -75,8 +75,7 @@ export class UmbInputImageCropperElement extends UmbFormControlMixin<
 		this.#observeAcceptedFileTypes();
 	}
 
-	async #observeAcceptedFileTypes() {
-		await this.#config.initialized;
+	#observeAcceptedFileTypes() {
 		this.observe(
 			this.#config.part('imageFileTypes'),
 			(imageFileTypes) => {
