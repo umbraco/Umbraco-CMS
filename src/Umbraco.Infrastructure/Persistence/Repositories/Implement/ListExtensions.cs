@@ -30,6 +30,13 @@ internal sealed partial class SimilarNodeName
     public string? Name { get; set; }
 
     /// <summary>
+    /// Returns the base text of a name, i.e. the name with any trailing " (n)" suffix removed. This
+    /// matches the base text that <see cref="GetUniqueName(IEnumerable{string?}, string?)"/> compares
+    /// siblings against, so it can be used to fetch only the siblings that could actually collide.
+    /// </summary>
+    internal static string GetBaseText(string? name) => new StructuredName(name).Text;
+
+    /// <summary>
     /// Returns a unique node name by comparing the proposed name against a collection of similar node names, excluding the node with the specified ID.
     /// </summary>
     /// <param name="names">A collection of <see cref="SimilarNodeName"/> objects to check for name uniqueness.</param>
