@@ -1471,7 +1471,7 @@ export class DocumentApiHelper {
         .withValue(value.value)
         .withCulture(value.culture)
         .withEditorAlias(editorAlias);
-      if (value.segment) {
+      if (value.segment !== null) {
         valueBuilder.withSegment(value.segment);
       }
       valueBuilder.done();
@@ -1496,7 +1496,7 @@ export class DocumentApiHelper {
         .withAlias(alias)
         .withValue(value.value)
         .withEditorAlias(editorAlias);
-      if (value.segment) {
+      if (value.segment !== null) {
         valueBuilder.withSegment(value.segment);
       }
       valueBuilder.done();

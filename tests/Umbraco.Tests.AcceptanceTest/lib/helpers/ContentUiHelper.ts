@@ -325,44 +325,7 @@ export class ContentUiHelper extends UiBaseLocators {
     this.backofficeModalContainer = page.locator('umb-backoffice-modal-container');
     this.publishModalBtn = this.backofficeModalContainer.getByLabel('Publish', {exact: true});
     this.unpublishModalBtn = this.backofficeModalContainer.getByLabel('Unpublish', {exact: true});
-    this.rollbackContainerBtn = this.container.getByLabel("Rollback");
-    this.rollbackCancelBtn = page.locator('umb-content-rollback-modal').getByRole('button', { name: 'Cancel', exact: true });
-    this.publicAccessBtn = page.getByRole("button", { name: "Public Access" });
-    this.uuiCheckbox = page.locator("uui-checkbox");
-    this.sortBtn = page.getByLabel("Sort", { exact: true });
-    this.containerSaveBtn = this.container.getByLabel("Save");
-    this.groupBasedProtectionBtn = page
-      .locator("span")
-      .filter({ hasText: "Group based protection" });
-    this.chooseMemberGroupBtn = page
-      .locator("umb-input-member-group")
-      .getByLabel("Choose");
-    this.selectLoginPageDocument = page
-      .locator(".select-item")
-      .filter({ hasText: "Login Page" })
-      .locator("umb-input-document")
-      .locator("#button");
-    this.selectErrorPageDocument = page
-      .locator(".select-item")
-      .filter({ hasText: "Error Page" })
-      .locator("umb-input-document")
-      .locator("#button");
-    this.rollbackItem = page.locator(".rollback-item");
-    this.activeRollbackItem = page.locator(".rollback-item.active");
-    this.actionsMenu = page.locator("uui-scroll-container");
-    this.linkToDocumentBtn = this.linkPickerModal
-      .getByTestId("action:document")
-      .locator("#button");
-    this.linkToMediaBtn = this.linkPickerModal
-      .getByTestId("action:media")
-      .locator("#button");
-    this.linkToManualBtn = this.linkPickerModal
-      .getByTestId("action:external")
-      .locator("#button");
-    this.umbDocumentCollection = page.locator("umb-document-collection");
-    this.documentTableColumnName = this.listView.locator(
-      "umb-document-table-column-name",
-    );
+    this.activeRollbackItem = page.locator('.rollback-item.active');
     //Block Grid - Block List
     this.addBlockElementBtn = page.locator('uui-button-group > uui-button').first().filter({has: page.locator('#button')});
     this.formValidationMessage = page.locator('#splitViews umb-form-validation-message #messages');
@@ -653,7 +616,7 @@ export class ContentUiHelper extends UiBaseLocators {
   /**
    * @deprecated Save-and-publish waits on the publish response, not a plain update.
    * Prefer {@link clickSaveAndPublishButtonAndWaitForContentToBePublished}.
-   * TODO: remove once all callers have migrated.
+   * TODO (V18): remove once all callers have migrated.
    */
   async clickSaveAndPublishButtonAndWaitForContentToBeUpdated() {
     return await this.clickSaveAndPublishButtonAndWaitForContentToBePublished();
