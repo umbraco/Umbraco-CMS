@@ -12,7 +12,7 @@ import type {
 } from './types.js';
 import type { UmbPropertyEditorConfig } from '@umbraco-cms/backoffice/property-editor';
 import { UmbPropertyValuePresetVariantBuilderController } from './property-value-preset-variant-builder.controller.js';
-import { UmbVariantId } from '../../variant/variant-id.class.js';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 @customElement('umb-test-controller-host')
 export class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}

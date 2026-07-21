@@ -5,6 +5,7 @@ TypeScript/Lit web components library for the Umbraco CMS backoffice. Published 
 ## Documentation Structure
 
 ### Architecture & Design
+
 - **[Architecture](./docs/architecture.md)** - Technology stack, design philosophy, developer roles, package system, import map pipeline, design patterns
 - **[Manifests & Aliases](./docs/manifests.md)** - Manifest shape, alias conventions, alias constants, how aliases connect extensions, registration, registry operations, kind merging
 - **[Entities](./docs/entities.md)** - Entity types, entity context, how entityType connects workspaces/trees/actions/routing
@@ -18,9 +19,11 @@ TypeScript/Lit web components library for the Umbraco CMS backoffice. Published 
 - **[Value Summary](./docs/value-summary.md)** - `valueSummary` extension type; rendering compact values in collection views, batch resolver pattern, coordinator
 
 ### Development
+
 - **[Commands](./docs/commands.md)** - Build, test, and development commands
 
 ### Code Quality
+
 - **[Style Guide](./docs/style-guide.md)** - Naming and formatting conventions
 - **[Design Choices](./docs/design-choices.md)** - Visual restraint: icons, colours, buttons, and UX copy
 - **[Clean Code](./docs/clean-code.md)** - Best practices and SOLID principles
@@ -28,10 +31,12 @@ TypeScript/Lit web components library for the Umbraco CMS backoffice. Published 
 - **[Testing](./docs/testing.md)** - Testing strategy, priority by code area, MSW mocking, test patterns
 
 ### Troubleshooting
+
 - **[Error Handling](./docs/error-handling.md)** - Error patterns and debugging
 - **[Edge Cases](./docs/edge-cases.md)** - Common pitfalls and gotchas
 
 ### Security & AI
+
 - **[Security](./docs/security.md)** - XSS prevention, authentication, input validation
 - **[Agentic Workflow](./docs/agentic-workflow.md)** - Three-phase AI development process
 
@@ -41,17 +46,17 @@ TypeScript/Lit web components library for the Umbraco CMS backoffice. Published 
 
 **Before performing any of these actions, you MUST read the linked doc first:**
 
-| Before you... | Read |
-|----------------|------|
-| Deprecate or remove a public API | [docs/deprecation.md](./docs/deprecation.md) — requires **both** `@deprecated` JSDoc **and** runtime `UmbDeprecation` warning |
-| Create a new element or component | [docs/style-guide.md](./docs/style-guide.md) |
-| Build, style, or write copy for any UI | [docs/design-choices.md](./docs/design-choices.md) — default to no icon, no colour, terse contextual copy |
-| Create a repository or data source | [docs/repositories.md](./docs/repositories.md) + [docs/data-flow.md](./docs/data-flow.md) |
-| Add error handling or debugging | [docs/error-handling.md](./docs/error-handling.md) |
-| Write or modify tests | [docs/testing.md](./docs/testing.md) |
-| Work with auth or security | [docs/security.md](./docs/security.md) + [docs/edge-cases.md](./docs/edge-cases.md) |
-| Scaffold a new package or module | [docs/package-development.md](./docs/package-development.md) |
-| Write or change observers / `Umb*State` usage | [docs/state-system.md](./docs/state-system.md) — states already deduplicate; do not add "is this a re-emit?" guards |
+| Before you...                                 | Read                                                                                                                          |
+| --------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| Deprecate or remove a public API              | [docs/deprecation.md](./docs/deprecation.md) — requires **both** `@deprecated` JSDoc **and** runtime `UmbDeprecation` warning |
+| Create a new element or component             | [docs/style-guide.md](./docs/style-guide.md)                                                                                  |
+| Build, style, or write copy for any UI        | [docs/design-choices.md](./docs/design-choices.md) — default to no icon, no colour, terse contextual copy                     |
+| Create a repository or data source            | [docs/repositories.md](./docs/repositories.md) + [docs/data-flow.md](./docs/data-flow.md)                                     |
+| Add error handling or debugging               | [docs/error-handling.md](./docs/error-handling.md)                                                                            |
+| Write or modify tests                         | [docs/testing.md](./docs/testing.md)                                                                                          |
+| Work with auth or security                    | [docs/security.md](./docs/security.md) + [docs/edge-cases.md](./docs/edge-cases.md)                                           |
+| Scaffold a new package or module              | [docs/package-development.md](./docs/package-development.md)                                                                  |
+| Write or change observers / `Umb*State` usage | [docs/state-system.md](./docs/state-system.md) — states already deduplicate; do not add "is this a re-emit?" guards           |
 | Add, rename, or remove a key in `src/assets/lang/en.ts` | [docs/package-development.md](./docs/package-development.md#type-safe-localization-keys) — also run `npm run generate:localization-keys` (or `npm run build`, which triggers the `prebuild` hook) and commit the updated `known-keys.generated.ts`. `known-keys.test.ts` + the `local-rules/no-unknown-localization-key` ESLint rule catch drift, but regenerating up front saves a CI cycle |
 
 This is not optional. Skipping these leads to convention violations that are caught in review.
@@ -80,24 +85,24 @@ cd src/Umbraco.Web.UI.Client && npm install && npm run dev
 
 See **[Commands](./docs/commands.md)** for all available commands.
 
-| Task | Command |
-|------|---------|
-| Development | `npm run dev` |
-| Testing (all) | `npm test` |
+| Task                    | Command                                                   |
+| ----------------------- | --------------------------------------------------------- |
+| Development             | `npm run dev`                                             |
+| Testing (all)           | `npm test`                                                |
 | Testing (specific file) | `npm test -- --files "src/packages/path/to/file.test.ts"` |
-| Build | `npm run build` |
-| Lint | `npm run lint:fix` |
-| Circular dep check | `npm run check:circular` |
+| Build                   | `npm run build`                                           |
+| Lint                    | `npm run lint:fix`                                        |
+| Circular dep check      | `npm run check:circular`                                  |
 
 ---
 
 ## Quick Reference
 
-| Item | Details |
-|------|---------|
-| **Config** | `package.json`, `vite.config.ts`, `.env` (create `.env.local`) |
-| **Element naming** | `umb-{feature}-{component}` for core; package devs use own prefix |
-| **Directory structure** | See [Architecture](./docs/architecture.md#architecture-pattern) |
+| Item                    | Details                                                           |
+| ----------------------- | ----------------------------------------------------------------- |
+| **Config**              | `package.json`, `vite.config.ts`, `.env` (create `.env.local`)    |
+| **Element naming**      | `umb-{feature}-{component}` for core; package devs use own prefix |
+| **Directory structure** | See [Architecture](./docs/architecture.md#architecture-pattern)   |
 
 ---
 
@@ -118,6 +123,7 @@ The `npm pack` process (prepack hook) runs `devops/publish/cleanse-pkg.js` which
 Uses the `semver` package (npm's own semver library) for robust parsing:
 
 **Pre-release packages (0.x.y)**
+
 ```
 Input:  ^0.85.0    or    0.85.0
 Output: >=0.85.0 <1.0.0
@@ -127,6 +133,7 @@ Why: Pre-release caret (^0.85.0) only allows patch updates (0.85.x).
 ```
 
 **Stable packages with caret (major ≥ 1)**
+
 ```
 Input:  ^3.3.1
 Output: ^3.3.1    (kept as-is)
@@ -135,6 +142,7 @@ Why: Caret already implements the correct range: >=3.3.1 <4.0.0
 ```
 
 **Stable exact versions (major ≥ 1)**
+
 ```
 Input:  3.16.0    (from @tiptap/*)
 Output: ^3.16.0
@@ -146,14 +154,14 @@ Why: Normalizes to conventional semver format
 
 ```json
 {
-  "peerDependencies": {
-    "lit": "^3.3.1",
-    "rxjs": "^7.8.2",
-    "@umbraco-ui/uui": "^2.0.0-alpha.1",
-    "monaco-editor": "^0.55.1",
-    "@tiptap/core": "^3.16.0",
-    "@hey-api/openapi-ts": ">=0.85.0 <1.0.0"
-  }
+	"peerDependencies": {
+		"lit": "^3.3.1",
+		"rxjs": "^7.8.2",
+		"@umbraco-ui/uui": "^2.0.0",
+		"monaco-editor": "^0.55.1",
+		"@tiptap/core": "^3.16.0",
+		"@hey-api/openapi-ts": ">=0.85.0 <1.0.0"
+	}
 }
 ```
 
@@ -169,9 +177,9 @@ When using `@umbraco-cms/backoffice`:
 
 ### Key Files
 
-| File | Purpose |
-|------|---------|
-| `package.json` | Root package with exports and workspace references |
+| File                            | Purpose                                                          |
+| ------------------------------- | ---------------------------------------------------------------- |
+| `package.json`                  | Root package with exports and workspace references               |
 | `devops/publish/cleanse-pkg.js` | Script that runs during `npm pack` to hoist and convert versions |
-| `src/external/*` | Dependency wrapper packages |
-| `src/packages/core` | Contains `@hey-api/openapi-ts` and other utilities |
+| `src/external/*`                | Dependency wrapper packages                                      |
+| `src/packages/core`             | Contains `@hey-api/openapi-ts` and other utilities               |

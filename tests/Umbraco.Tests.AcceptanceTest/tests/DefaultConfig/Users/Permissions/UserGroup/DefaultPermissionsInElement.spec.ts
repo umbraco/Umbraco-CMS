@@ -123,7 +123,7 @@ test('can trash element with delete permission enabled', async ({umbracoApi, umb
   await umbracoUi.library.clickConfirmTrashButtonAndWaitForElementToBeTrashed();
 
   // Assert
-  await umbracoUi.library.isItemVisibleInRecycleBin(elementName, true, false);
+  await umbracoUi.library.isItemVisibleInRecycleBin(elementName);
 });
 
 test('can not trash element with delete permission disabled', async ({umbracoApi, umbracoUi}) => {
@@ -140,8 +140,7 @@ test('can not trash element with delete permission disabled', async ({umbracoApi
   await umbracoUi.library.isActionsMenuForNameVisible(elementName, false);
 });
 
-// Issue link: https://github.com/umbraco/Umbraco-CMS/issues/22798
-test.skip('can empty recycle bin with delete permission enabled', async ({umbracoApi, umbracoUi}) => {
+test('can empty recycle bin with delete permission enabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.element.moveToRecycleBin(elementId);
   userGroupId = await umbracoApi.userGroup.createUserGroupWithDeleteElementPermission(userGroupName);
@@ -382,13 +381,18 @@ test('can rollback element with rollback permission enabled', async ({umbracoApi
   await umbracoUi.library.doesElementPropertyHaveValue(dataTypeName, updatedTextStringText);
   await umbracoUi.library.clickInfoTab();
   await umbracoUi.library.clickRollbackButton();
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.medium);// Wait for the rollback items to load
-  await umbracoUi.library.clickLatestRollBackItem();
+  await umbracoUi.library.clickPreviousRollBackItem();
   await umbracoUi.library.clickRollbackContainerButton();
 
   // Assert
   await umbracoUi.library.clickContentTab();
   await umbracoUi.library.doesElementPropertyHaveValue(dataTypeName, elementText);
+  // Verify audit trail
+  await umbracoUi.library.clickInfoTab();
+  await umbracoUi.library.doesHistoryItemHaveTag(ConstantHelper.auditTrailTypes.rollback);
+  await umbracoUi.library.doesHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.elementRolledBack);
+  const currentUser = await umbracoApi.user.getCurrentUser();
+  await umbracoUi.library.doesHistoryItemHaveUsername(currentUser.name);
 });
 
 test('can not rollback element with rollback permission disabled', async ({umbracoApi, umbracoUi}) => {

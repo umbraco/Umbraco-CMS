@@ -1,8 +1,8 @@
 import { UMB_EXTENSION_COLLECTION_REPOSITORY_ALIAS } from './repository/index.js';
 import { manifests as collectionRepositoryManifests } from './repository/manifests.js';
 import { manifests as collectionViewManifests } from './views/manifests.js';
-
-export const UMB_EXTENSION_COLLECTION_ALIAS = 'Umb.Collection.Extension';
+import UmbExtensionCollectionElement from './extension-collection.element.js';
+import { UMB_EXTENSION_COLLECTION_ALIAS } from './constants.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -10,7 +10,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		kind: 'default',
 		alias: UMB_EXTENSION_COLLECTION_ALIAS,
 		name: 'Extension Collection',
-		element: () => import('./extension-collection.element.js'),
+		element: UmbExtensionCollectionElement,
 		meta: {
 			repositoryAlias: UMB_EXTENSION_COLLECTION_REPOSITORY_ALIAS,
 		},

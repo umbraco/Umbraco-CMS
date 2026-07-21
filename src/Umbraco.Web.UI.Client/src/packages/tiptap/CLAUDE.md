@@ -143,13 +143,15 @@ export default class UmbTiptapBoldToolbarApi extends UmbTiptapToolbarElementApiB
 	}
 }
 
-// manifests.ts
+// manifests.ts — uses dynamic-import thunks pointing at the SHARED boundary file,
+// so manifest registration stays slim and the implementation code is only fetched
+// the first time `umb-input-tiptap` actually mounts.
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'tiptapExtension',
 		alias: 'Umb.Tiptap.Bold',
 		name: 'Bold Tiptap Extension',
-		api: () => import('./bold.tiptap-api.js'),
+		api: () => import('../extension-apis.bundle.js').then((m) => ({ default: m.UmbTiptapBoldExtensionApi })),
 		meta: {
 			icon: 'icon-bold',
 			label: 'Bold',
@@ -161,7 +163,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		kind: 'button',
 		alias: 'Umb.Tiptap.Toolbar.Bold',
 		name: 'Bold Tiptap Toolbar Extension',
-		api: () => import('./bold.tiptap-toolbar-api.js'),
+		api: () => import('../extension-apis.bundle.js').then((m) => ({ default: m.UmbTiptapBoldToolbarApi })),
 		forExtensions: ['Umb.Tiptap.Bold'],
 		meta: {
 			alias: 'bold',
@@ -171,6 +173,14 @@ export const manifests: Array<UmbExtensionManifest> = [
 	},
 ];
 ```
+
+To register the new extension's API class, add a re-export line to `extensions/extension-apis.bundle.ts` (the shared boundary file).
+
+> **Why the indirection?** The data-type configuration UIs (`extensions-configuration`, `toolbar-configuration`, `statusbar-configuration`) enumerate the extension registry at boot to populate their pickers — they need every extension's manifest metadata (alias, label, icon, group). If the manifest were a static `api: SomeClass`, the implementation bytes would ship with the manifest registration and load on every workspace, including ones without an RTE.
+>
+> Routing all first-party API/element references through one shared bundle gives us the best of both worlds: manifests register at boot (so the config UIs work), but the implementation code lives in a single chunk that's only fetched the first time `umb-input-tiptap` actually renders. The Tiptap toolbar/statusbar/modal elements piggyback on the same chunk, so an RTE-bearing workspace pays one round-trip for everything Tiptap.
+>
+> External (plugin-supplied) Tiptap extensions may still use the per-file `() => import('./my-thing.api.js')` form when they want their API code in a separately fetched chunk — `loadManifestApi` accepts both forms.
 
 ### Extension with Custom Styles
 

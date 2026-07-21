@@ -46,11 +46,41 @@ export class UmbEntityDataPickerInputContext extends UmbPickerInputContext<
 	}
 
 	/**
+	 * Resolves the display name for a picked item. If the data source provides a
+	 * {@link UmbPickerDataSource.createItemDataResolver | createItemDataResolver} factory, the resolver is
+	 * instantiated with this context as the host so it can reach local DOM contexts
+	 * (e.g. UMB_VARIANT_CONTEXT).
+	 * @param {string} unique The unique identifier of the item.
+	 * @returns {Promise<string>} The resolved display name.
+	 * @memberof UmbEntityDataPickerInputContext
+	 */
+	protected override async _requestItemName(unique: string): Promise<string> {
+		const item = this.getSelectedItemByUnique(unique);
+		if (item && this.#dataSourceApi?.createItemDataResolver) {
+			const resolver = this.#dataSourceApi.createItemDataResolver(this);
+			resolver.setData(item);
+			try {
+				const name = await resolver.getName();
+				if (name) {
+					return name;
+				}
+			} finally {
+				this.removeUmbController(resolver);
+			}
+		}
+		return super._requestItemName(unique);
+	}
+
+	/**
 	 * Sets the data source API for the input context and updates the modal token accordingly.
 	 * @param {UmbPickerDataSource | undefined} api The data source API to set for the input context.
 	 * @memberof UmbEntityDataPickerInputContext
 	 */
 	setDataSourceApi(api: UmbPickerDataSource | undefined) {
+		// Skip if unchanged: re-setting the same API rebuilds the modal token/route, which would
+		// close and reopen an already-open picker modal on every re-render. [MR]
+		if (api === this.#dataSourceApi) return;
+
 		if (api) {
 			this.#dataSourceApi = api;
 			api.setConfig?.(this.#dataSourceConfig);

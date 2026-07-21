@@ -11,6 +11,10 @@ import { UmbModalRouteRegistrationController, type UmbModalRouteBuilder } from '
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 
 const elementName = 'umb-document-type-tree-item-table-collection-view';
+
+/**
+ * @deprecated Deprecated since v18. Scheduled for removal in Umbraco 20.
+ */
 @customElement(elementName)
 export class UmbDocumentTypeTreeItemTableCollectionViewElement extends UmbLitElement {
 	@state()

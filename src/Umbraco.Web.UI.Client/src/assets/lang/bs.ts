@@ -367,7 +367,7 @@ export default {
 		enterFolderName: 'Unesite naziv foldera',
 		updateData: 'Odaberite vrstu i naslov',
 		noDocumentTypes:
-			'Nema dozvoljenih tipova dokumenata dostupnih za kreiranje sadržaja ovdje. Morate ih omogućiti u <strong>Dokument Tip</strong> unutar sekcije <strong>Postavke</strong>, uređivanjem <strong>Dozvoljeni tipovi podređenih čvorova</strong> unutar <strong>Dozvole</strong>.',
+			'Nema dozvoljenih tipova dokumenata dostupnih za kreiranje sadržaja ovdje. Morate ih omogućiti u <strong>Dokument Tip</strong> unutar sekcije <strong>Postavke</strong>, uređivanjem <strong>Dozvoljeni tipovi podređenih čvorova</strong> unutar <strong>Struktura</strong>.',
 		noDocumentTypesAtRoot:
 			'Nema dozvoljenih tipova dokumenata dostupnih za kreiranje sadržaja ovdje. Morate ih kreirati u <strong>Dokument Tip</strong> unutar sekcije <strong>Postavke</strong>.',
 		noDocumentTypesWithNoSettingsAccess:
@@ -375,9 +375,9 @@ export default {
 		noDocumentTypesEditPermissions: 'Uredi dozvole za ovaj tip dokumenta',
 		noDocumentTypesCreateNew: 'Kreiraj novi tip dokumenta',
 		noDocumentTypesAllowedAtRoot:
-			'Nema dozvoljenih tipova dokumenata dostupnih za kreiranje sadržaja ovdje. Morate ih omogućiti u <strong>Dokument Tip</strong> unutar sekcije <strong>Postavke</strong>, izmjenom <strong>Dozvoli kao root</strong> opcije unutar <strong>Dozvole</strong>.',
+			'Nema dozvoljenih tipova dokumenata dostupnih za kreiranje sadržaja ovdje. Morate ih omogućiti u <strong>Dokument Tip</strong> unutar sekcije <strong>Postavke</strong>, izmjenom <strong>Dozvoli kao root</strong> opcije unutar <strong>Struktura</strong>.',
 		noMediaTypes:
-			'Nema dozvoljenih tipova medija dostupnih za kreiranje medija ovdje. Morate ih omogućiti u <strong>Media Tip</strong> unutar sekcije <strong>Postavke</strong>, uređivanjem <strong>Dozvoljeni tipovi podređenih čvorova</strong> unutar <strong>Dozvole</strong>.',
+			'Nema dozvoljenih tipova medija dostupnih za kreiranje medija ovdje. Morate ih omogućiti u <strong>Media Tip</strong> unutar sekcije <strong>Postavke</strong>, uređivanjem <strong>Dozvoljeni tipovi podređenih čvorova</strong> unutar <strong>Struktura</strong>.',
 		noMediaTypesWithNoSettingsAccess:
 			'Odabrani medij u stablu ne dopušta bilo koji drugi medij\n       kreiran ispod njega.\n    ',
 		noMediaTypesEditPermissions: 'Uredi dozvole za ovaj tip medija',
@@ -1185,20 +1185,13 @@ export default {
 		editscript: 'Uredite datoteku skripte',
 	},
 	sections: {
-		concierge: 'Portirnica',
 		content: 'Sadržaj',
-		courier: 'Kurir',
-		developer: 'Developer',
-		forms: 'Forme',
-		help: 'Pomoć',
-		installer: 'Umbraco Konfiguracijski Čarobnjak',
+		library: 'Biblioteka',
 		media: 'Mediji',
 		member: 'Članovi',
-		newsletters: 'Bilteni',
 		packages: 'Paketi',
 		marketplace: 'Marketplace',
 		settings: 'Postavke',
-		statistics: 'Statistika',
 		translation: 'Prevodi',
 		users: 'Korisnici',
 	},
@@ -1476,8 +1469,16 @@ export default {
 		chooseChildNode: 'Odaberite podređeni čvor',
 		compositionsDescription:
 			'Naslijediti kartice i svojstva iz postojeće vrste dokumenta. Nove kartice će biti\n      dodano trenutnoj vrsti dokumenta ili spojeno ako postoji kartica s identičnim imenom.\n    ',
+		compositionsDescriptionMediaType:
+			'Naslijediti kartice i svojstva iz postojeće vrste medija. Nove kartice će biti\n      dodano trenutnoj vrsti medija ili spojeno ako postoji kartica s identičnim imenom.\n    ',
+		compositionsDescriptionMemberType:
+			'Naslijediti kartice i svojstva iz postojeće vrste člana. Nove kartice će biti\n      dodano trenutnoj vrsti člana ili spojeno ako postoji kartica s identičnim imenom.\n    ',
 		compositionInUse: 'Ovaj tip sadržaja se koristi u kompoziciji i stoga se ne može sam sastaviti.\n    ',
+		compositionInUseMediaType: 'Ovaj tip medija se koristi u kompoziciji i stoga se ne može sam sastaviti.\n    ',
+		compositionInUseMemberType: 'Ovaj tip člana se koristi u kompoziciji i stoga se ne može sam sastaviti.\n    ',
 		noAvailableCompositions: 'Nema dostupnih tipova sadržaja za upotrebu kao kompozicija.',
+		noAvailableCompositionsMediaType: 'Nema dostupnih tipova medija za upotrebu kao kompozicija.',
+		noAvailableCompositionsMemberType: 'Nema dostupnih tipova člana za upotrebu kao kompozicija.',
 		compositionRemoveWarning:
 			'Uklanjanje kompozicije će izbrisati sve povezane podatke o svojstvu. Jednom ti\n      sačuvajte tip dokumenta, nema povratka.\n    ',
 		availableEditors: 'Napravi novi',
@@ -1512,6 +1513,8 @@ export default {
 		tabHasNoSortOrder: 'kartica nema redoslijed sortiranja',
 		compositionUsageHeading: 'Gdje se koristi ovaj sastav?',
 		compositionUsageSpecification: 'Ovaj sastav se trenutno koristi u sastavu sljedećih\n      tipa sadržaja:\n    ',
+		compositionUsageSpecificationMediaType: 'Ovaj sastav se trenutno koristi u sastavu sljedećih\n      tipa medija:\n    ',
+		compositionUsageSpecificationMemberType: 'Ovaj sastav se trenutno koristi u sastavu sljedećih\n      tipa člana:\n    ',
 		variantsHeading: 'Dozvoli varijacije',
 		cultureVariantHeading: 'Dozvolite varirati u zavisnosti od kulture',
 		segmentVariantHeading: 'Dozvoli segmentaciju',

@@ -9,6 +9,7 @@ import {
 	UMB_ELEMENT_REFERENCE_REPOSITORY_ALIAS,
 	UMB_ELEMENT_USER_PERMISSION_CONDITION_ALIAS,
 	UMB_USER_PERMISSION_ELEMENT_DELETE,
+	UMB_USER_PERMISSION_ELEMENT_MOVE,
 } from '../../constants.js';
 import { UMB_ELEMENT_ENTITY_TYPE, UMB_ELEMENT_FOLDER_ENTITY_TYPE, UMB_ELEMENT_ROOT_ENTITY_TYPE } from '../../entity.js';
 import {
@@ -19,6 +20,7 @@ import {
 import {
 	UMB_ELEMENT_FOLDER_USER_PERMISSION_CONDITION_ALIAS,
 	UMB_USER_PERMISSION_ELEMENT_FOLDER_DELETE,
+	UMB_USER_PERMISSION_ELEMENT_FOLDER_MOVE,
 } from '../../folder/user-permissions/constants.js';
 import { UMB_ENTITY_HAS_CHILDREN_CONDITION_ALIAS } from '@umbraco-cms/backoffice/entity-action';
 import {
@@ -32,6 +34,7 @@ const elementActions: Array<UmbExtensionManifest> = [
 		kind: 'trashWithRelation',
 		alias: 'Umb.EntityAction.Element.RecycleBin.Trash',
 		name: 'Trash Element Entity Action',
+		api: () => import('./trash/element-trash-with-relation.action.js'),
 		forEntityTypes: [UMB_ELEMENT_ENTITY_TYPE],
 		meta: {
 			itemDataResolver: UmbElementItemDataResolver,
@@ -39,7 +42,6 @@ const elementActions: Array<UmbExtensionManifest> = [
 			recycleBinRepositoryAlias: UMB_ELEMENT_RECYCLE_BIN_REPOSITORY_ALIAS,
 			referenceRepositoryAlias: UMB_ELEMENT_REFERENCE_REPOSITORY_ALIAS,
 		},
-
 		conditions: [
 			{
 				alias: UMB_ELEMENT_USER_PERMISSION_CONDITION_ALIAS,
@@ -87,6 +89,10 @@ const elementActions: Array<UmbExtensionManifest> = [
 		},
 		conditions: [
 			{
+				alias: UMB_ELEMENT_USER_PERMISSION_CONDITION_ALIAS,
+				allOf: [UMB_USER_PERMISSION_ELEMENT_MOVE],
+			},
+			{
 				alias: UMB_ENTITY_IS_TRASHED_CONDITION_ALIAS,
 			},
 		],
@@ -126,7 +132,13 @@ const folderActions: Array<UmbExtensionManifest> = [
 			pickerModal: UMB_ELEMENT_FOLDER_PICKER_MODAL,
 			recycleBinRepositoryAlias: UMB_ELEMENT_FOLDER_RECYCLE_BIN_REPOSITORY_ALIAS,
 		},
-		conditions: [{ alias: UMB_ENTITY_IS_TRASHED_CONDITION_ALIAS }],
+		conditions: [
+			{
+				alias: UMB_ELEMENT_FOLDER_USER_PERMISSION_CONDITION_ALIAS,
+				allOf: [UMB_USER_PERMISSION_ELEMENT_FOLDER_MOVE],
+			},
+			{ alias: UMB_ENTITY_IS_TRASHED_CONDITION_ALIAS },
+		],
 	},
 ];
 

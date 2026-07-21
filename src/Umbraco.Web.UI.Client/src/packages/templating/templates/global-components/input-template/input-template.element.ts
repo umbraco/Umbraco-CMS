@@ -24,7 +24,7 @@ export class UmbInputTemplateElement extends UUIFormControlWithBasicsMixin(UmbLi
 
 	/**
 	 * Min validation message.
-	 * @type {boolean}
+	 * @type {string}
 	 * @attr
 	 * @default
 	 */
@@ -42,11 +42,11 @@ export class UmbInputTemplateElement extends UUIFormControlWithBasicsMixin(UmbLi
 
 	/**
 	 * Max validation message.
-	 * @type {boolean}
+	 * @type {string}
 	 * @attr
 	 * @default
 	 */
-	@property({ type: String, attribute: 'min-message' })
+	@property({ type: String, attribute: 'max-message' })
 	maxMessage = 'This field exceeds the allowed amount of items';
 
 	@property({ type: Array })

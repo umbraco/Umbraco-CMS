@@ -1,6 +1,8 @@
 import type { Editor } from '../../externals.js';
 import { NodeSelection } from '../../externals.js';
 import { UmbTiptapToolbarElementApiBase } from '../tiptap-toolbar-element-api-base.js';
+import { extractFigureAttrs, extractFigureImageData, extractImageMarks } from './media-picker.tiptap-toolbar.utils.js';
+import type { UmbTiptapMarkInput } from './media-picker.tiptap-toolbar.utils.js';
 import { getGuidFromUdi, splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { ImageCropModeModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbImagingRepository } from '@umbraco-cms/backoffice/imaging';
@@ -48,19 +50,23 @@ export default class UmbTiptapToolbarMediaPickerToolbarExtensionApi extends UmbT
 		let currentTarget = editor.getAttributes('image');
 		let currentMediaUdi = this.#extractMediaUdi(currentTarget);
 		let currentCaption: string | undefined;
+		let currentMarks: Array<UmbTiptapMarkInput> = [];
+		const currentFigureAttrs = extractFigureAttrs(editor);
 
 		// If no image found directly, check if cursor is inside a figure (e.g. in figcaption)
 		if (!currentMediaUdi) {
-			const figureData = this.#extractFigureImageData(editor);
+			const figureData = extractFigureImageData(editor);
 			if (figureData) {
 				currentTarget = figureData.imageAttrs;
 				currentMediaUdi = this.#extractMediaUdi(currentTarget);
 				currentCaption = figureData.caption;
+				currentMarks = figureData.marks;
 				// Select the figure so insertContent replaces it instead of inserting at cursor
 				editor.commands.setNodeSelection(figureData.pos);
 			}
 		} else {
 			currentCaption = this.#extractCaption(editor.state.selection);
+			currentMarks = extractImageMarks(editor.state.selection);
 		}
 
 		// If editing existing image, use its UDI; otherwise open media picker
@@ -76,7 +82,7 @@ export default class UmbTiptapToolbarMediaPickerToolbarExtensionApi extends UmbT
 		);
 		if (!media) return;
 
-		this.#insertInEditor(editor, mediaGuid, media);
+		this.#insertInEditor(editor, mediaGuid, media, currentMarks, currentFigureAttrs);
 	}
 
 	#extractMediaUdi(imageAttributes: Record<string, unknown>): string | undefined {
@@ -96,38 +102,6 @@ export default class UmbTiptapToolbarMediaPickerToolbarExtensionApi extends UmbT
 			return true;
 		});
 		return caption;
-	}
-
-	#extractFigureImageData(
-		editor: Editor,
-	): { imageAttrs: Record<string, unknown>; caption?: string; pos: number } | undefined {
-		const { $from } = editor.state.selection;
-
-		for (let depth = $from.depth; depth >= 0; depth--) {
-			const node = $from.node(depth);
-			if (node.type.name === 'figure') {
-				let imageAttrs: Record<string, unknown> = {};
-				let caption: string | undefined;
-
-				node.descendants((child) => {
-					if (child.type.name === 'image') {
-						imageAttrs = { ...child.attrs };
-						return false;
-					}
-					if (child.type.name === 'figcaption') {
-						caption = child.textContent || undefined;
-						return false;
-					}
-					return true;
-				});
-
-				if (imageAttrs['data-udi']) {
-					return { imageAttrs, caption, pos: $from.before(depth) };
-				}
-			}
-		}
-
-		return undefined;
 	}
 
 	async #openMediaPicker(currentMediaUdi?: string): Promise<string | undefined> {
@@ -162,7 +136,13 @@ export default class UmbTiptapToolbarMediaPickerToolbarExtensionApi extends UmbT
 		return modalHandler?.onSubmit().catch(() => undefined);
 	}
 
-	async #insertInEditor(editor: Editor, mediaUnique: string, media: UmbMediaCaptionAltTextModalValue) {
+	async #insertInEditor(
+		editor: Editor,
+		mediaUnique: string,
+		media: UmbMediaCaptionAltTextModalValue,
+		currentMarks: Array<UmbTiptapMarkInput> = [],
+		currentFigureAttrs?: Record<string, unknown>,
+	) {
 		if (!media?.url) return;
 
 		const width = media.width || this.maxImageSize;
@@ -187,16 +167,20 @@ export default class UmbTiptapToolbarMediaPickerToolbarExtensionApi extends UmbT
 			height: height.toString(),
 		};
 
+		// Forward inline marks (e.g. umbLink for a wrapping `<a>`) onto the replacement node.
+		const marks = currentMarks.length ? currentMarks : undefined;
+
 		if (media.caption) {
 			return editor.commands.insertContent({
 				type: 'figure',
+				attrs: currentFigureAttrs,
 				content: [
-					{ type: 'paragraph', content: [{ type: 'image', attrs: img }] },
+					{ type: 'paragraph', content: [{ type: 'image', attrs: img, marks }] },
 					{ type: 'figcaption', content: [{ type: 'text', text: media.caption }] },
 				],
 			});
 		}
 
-		return editor.commands.setImage(img);
+		return editor.commands.insertContent({ type: 'image', attrs: img, marks });
 	}
 }

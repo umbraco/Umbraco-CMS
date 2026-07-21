@@ -46,7 +46,10 @@ export class DocumentTypeApiHelper {
         }
         return await this.delete(child.id);
       } else if (child.hasChildren) {
-        return await this.recurseChildren(name, child.id, toDelete);
+        const result = await this.recurseChildren(name, child.id, toDelete);
+        if (result) {
+          return result;
+        }
       }
     }
     return false;
@@ -82,6 +85,14 @@ export class DocumentTypeApiHelper {
     }
     const response = await this.api.post(this.api.baseUrl + '/umbraco/management/api/v1/document-type', documentType);
     return response.headers().location.split("/").pop();
+  }
+
+  async update(id: string, documentType) {
+    if (documentType == null) {
+      return;
+    }
+    const response = await this.api.put(this.api.baseUrl + '/umbraco/management/api/v1/document-type/' + id, documentType);
+    return response.status();
   }
 
   async get(id: string) {
@@ -158,6 +169,17 @@ export class DocumentTypeApiHelper {
     const documentType = new DocumentTypeBuilder()
       .withName(documentTypeName)
       .withAlias(AliasHelper.toAlias(documentTypeName))
+      .build();
+    return await this.create(documentType);
+  }
+
+  async createDefaultDocumentTypeInFolder(documentTypeName: string, folderId: string) {
+    await this.ensureNameNotExists(documentTypeName);
+
+    const documentType = new DocumentTypeBuilder()
+      .withName(documentTypeName)
+      .withAlias(AliasHelper.toAlias(documentTypeName))
+      .withFolderId(folderId)
       .build();
     return await this.create(documentType);
   }
@@ -593,13 +615,14 @@ export class DocumentTypeApiHelper {
     return await this.create(documentType);
   }
 
-  async createElementTypeWithAComposition(elementTypeName: string, compositionId: string) {
+  async createElementTypeWithAComposition(elementTypeName: string, compositionId: string, isAllowedInLibrary: boolean = false) {
     await this.ensureNameNotExists(elementTypeName);
 
     const documentType = new DocumentTypeBuilder()
       .withName(elementTypeName)
       .withAlias(AliasHelper.toAlias(elementTypeName))
       .withIsElement(true)
+      .withAllowedInLibrary(isAllowedInLibrary)
       .withIcon("icon-plugin")
       .addComposition()
         .withDocumentTypeId(compositionId)
@@ -609,14 +632,14 @@ export class DocumentTypeApiHelper {
     return await this.create(documentType);
   }
 
-  async createEmptyElementType(elementTypeName: string) {
+  async createEmptyElementType(elementTypeName: string, isAllowedInLibrary: boolean = false) {
     await this.ensureNameNotExists(elementTypeName);
 
     const documentType = new DocumentTypeBuilder()
       .withName(elementTypeName)
       .withAlias(AliasHelper.toAlias(elementTypeName))
       .withIsElement(true)
-      .withAllowedInLibrary(true)
+      .withAllowedInLibrary(isAllowedInLibrary)
       .withIcon("icon-plugin")
       .build();
 
@@ -756,7 +779,7 @@ export class DocumentTypeApiHelper {
     return await this.create(documentType);
   }
 
-  async createElementTypeWithPropertyInTab(elementName: string, tabName: string = 'ContentTab', groupName: string = 'TestGroup', dataTypeName: string = 'Textstring', dataTypeId: string, isMandatory: boolean = false) {
+  async createElementTypeWithPropertyInTab(elementName: string, tabName: string = 'ContentTab', groupName: string = 'TestGroup', dataTypeName: string = 'Textstring', dataTypeId: string, isMandatory: boolean = false, elementVariesByCulture: boolean = false, propertyVariesByCulture: boolean = false) {
     await this.ensureNameNotExists(elementName);
 
     const crypto = require('crypto');
@@ -768,6 +791,7 @@ export class DocumentTypeApiHelper {
       .withAlias(AliasHelper.toAlias(elementName))
       .withIsElement(true)
       .withAllowedInLibrary(true)
+      .withVariesByCulture(elementVariesByCulture)
       .withIcon("icon-plugin")
       .addContainer()
         .withName(tabName)
@@ -786,6 +810,7 @@ export class DocumentTypeApiHelper {
         .withName(dataTypeName)
         .withDataTypeId(dataTypeId)
         .withMandatory(isMandatory)
+        .withVariesByCulture(propertyVariesByCulture)
         .done()
       .build();
     return await this.create(documentType);
@@ -941,6 +966,46 @@ export class DocumentTypeApiHelper {
     return await this.create(documentType);
   }
 
+  async createDocumentTypeWithTextstringAndAllowAsRootAndAllowSelfAsChild(documentTypeName: string, variesByCulture: boolean = false) {
+    await this.ensureNameNotExists(documentTypeName);
+    const crypto = require('crypto');
+    const documentTypeId = crypto.randomUUID();
+    const containerId = crypto.randomUUID();
+    const dataType = await this.api.dataType.getByName('Textstring');
+
+    const buildDocumentType = (allowSelfAsChild: boolean) => {
+      const builder = new DocumentTypeBuilder()
+        .withId(documentTypeId)
+        .withName(documentTypeName)
+        .withAlias(AliasHelper.toAlias(documentTypeName))
+        .withAllowedAsRoot(true)
+        .withVariesByCulture(variesByCulture)
+        .addContainer()
+          .withName('Content')
+          .withId(containerId)
+          .withType('Group')
+          .done()
+        .addProperty()
+          .withContainerId(containerId)
+          .withAlias('title')
+          .withName('Title')
+          .withDataTypeId(dataType.id)
+          .done();
+      if (allowSelfAsChild) {
+        builder.addAllowedDocumentType()
+          .withId(documentTypeId)
+          .done();
+      }
+      return builder.build();
+    };
+
+    // A document type cannot reference itself as an allowed child during creation (it does not exist yet),
+    // so create it first and then update it to allow itself as a child.
+    await this.create(buildDocumentType(false));
+    await this.update(documentTypeId, buildDocumentType(true));
+    return documentTypeId;
+  }
+
   async createDocumentTypeWithPropertyEditorAndAllowedTemplate(documentTypeName: string, dataTypeId: string, propertyName: string, templateId: string) {
     const crypto = require('crypto');
     const containerId = crypto.randomUUID();
@@ -960,6 +1025,37 @@ export class DocumentTypeApiHelper {
         .withAlias(AliasHelper.toAlias(propertyName))
         .withName(propertyName)
         .withDataTypeId(dataTypeId)
+        .done()
+      .addAllowedTemplateId()
+        .withId(templateId)
+        .done()
+      .withDefaultTemplateId(templateId)
+      .build();
+
+    return await this.create(documentType);
+  }
+
+  async createVariantDocumentTypeWithInvariantPropertyEditorAndAllowedTemplate(documentTypeName: string, propertyName: string, dataTypeId: string, templateId: string) {
+    const crypto = require('crypto');
+    const containerId = crypto.randomUUID();
+    await this.ensureNameNotExists(documentTypeName);
+
+    const documentType = new DocumentTypeBuilder()
+      .withName(documentTypeName)
+      .withAlias(AliasHelper.toAlias(documentTypeName))
+      .withAllowedAsRoot(true)
+      .withVariesByCulture(true)
+      .addContainer()
+        .withName('TestGroup')
+        .withId(containerId)
+        .withType('Group')
+        .done()
+      .addProperty()
+        .withContainerId(containerId)
+        .withAlias(AliasHelper.toAlias(propertyName))
+        .withName(propertyName)
+        .withDataTypeId(dataTypeId)
+        .withVariesByCulture(false)
         .done()
       .addAllowedTemplateId()
         .withId(templateId)
@@ -1190,6 +1286,113 @@ export class DocumentTypeApiHelper {
         .withDataTypeId(blockList2DataTypeId)
         .withVariesByCulture(false)
         .withSortOrder(3)
+        .done()
+      .build();
+
+    return await this.create(documentType);
+  }
+
+  /**
+   * Creates a document type with a nested Block List structure for testing the
+   * AllowEditInvariantFromNonDefault matrix.
+   *
+   * Structure created:
+   * - Document Type (Vary by culture)
+   *   - Outer Block List property (variance per `variance.outerBlockList`)
+   *     -> Outer Block List Data Type
+   *        -> Outer Element Type (variance per `variance.outerElement`)
+   *           - Inner Block List property (variance per `variance.innerBlockList`)
+   *             -> Inner Block List Data Type
+   *                -> Inner Element Type (variance per `variance.innerElement`)
+   *                   - Text property (variance per `variance.text`)
+   *
+   * Note: a property can only vary by culture when its containing type also varies.
+   * The caller is responsible for passing a consistent combination
+   * (e.g. when innerElement = false, text must also be false).
+   */
+  async createDocumentTypeWithNestedBlockList(
+    documentTypeName: string,
+    outerBlockListDataTypeName: string,
+    outerElementTypeName: string,
+    innerBlockListDataTypeName: string,
+    innerElementTypeName: string,
+    textPropertyName: string,
+    textDataTypeId: string,
+    variance: {
+      outerBlockList: boolean,
+      outerElement: boolean,
+      innerBlockList: boolean,
+      innerElement: boolean,
+      text: boolean,
+    }
+  ) {
+    // A property can only vary by culture when its containing element type also varies.
+    if (variance.text && !variance.innerElement) {
+      throw new Error('Invalid variance combination: "text" can only vary by culture when "innerElement" varies.');
+    }
+    if (variance.innerBlockList && !variance.outerElement) {
+      throw new Error('Invalid variance combination: "innerBlockList" can only vary by culture when "outerElement" varies.');
+    }
+
+    const crypto = require('crypto');
+    await this.ensureNameNotExists(documentTypeName);
+    await this.api.dataType.ensureNameNotExists(outerBlockListDataTypeName);
+    await this.api.dataType.ensureNameNotExists(innerBlockListDataTypeName);
+
+    // 1. Inner Element Type (with Text property)
+    const innerElementTypeId = await this.createElementTypeWithPropertyInTab(
+      innerElementTypeName,
+      undefined,
+      undefined,
+      textPropertyName,
+      textDataTypeId,
+      false,
+      variance.innerElement,
+      variance.text
+    ) as string;
+
+    // 2. Inner Block List Data Type
+    const innerBlockListDataTypeId = await this.api.dataType.createBlockListDataTypeWithABlock(
+      innerBlockListDataTypeName,
+      innerElementTypeId
+    ) as string;
+
+    // 3. Outer Element Type (with Inner Block List property)
+    const outerElementTypeId = await this.createElementTypeWithPropertyInTab(
+      outerElementTypeName,
+      undefined,
+      undefined,
+      innerBlockListDataTypeName,
+      innerBlockListDataTypeId,
+      false,
+      variance.outerElement,
+      variance.innerBlockList
+    ) as string;
+
+    // 4. Outer Block List Data Type
+    const outerBlockListDataTypeId = await this.api.dataType.createBlockListDataTypeWithABlock(
+      outerBlockListDataTypeName,
+      outerElementTypeId
+    ) as string;
+
+    // 5. Document Type (Vary by culture) with Outer Block List property
+    const documentTypeContainerId = crypto.randomUUID();
+    const documentType = new DocumentTypeBuilder()
+      .withName(documentTypeName)
+      .withAlias(AliasHelper.toAlias(documentTypeName))
+      .withAllowedAsRoot(true)
+      .withVariesByCulture(true)
+      .addContainer()
+        .withName('Content')
+        .withId(documentTypeContainerId)
+        .withType('Group')
+        .done()
+      .addProperty()
+        .withContainerId(documentTypeContainerId)
+        .withAlias(AliasHelper.toAlias(outerBlockListDataTypeName))
+        .withName(outerBlockListDataTypeName)
+        .withDataTypeId(outerBlockListDataTypeId)
+        .withVariesByCulture(variance.outerBlockList)
         .done()
       .build();
 

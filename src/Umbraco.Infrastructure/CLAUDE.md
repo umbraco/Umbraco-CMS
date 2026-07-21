@@ -384,6 +384,57 @@ using (ICoreScope scope = ScopeProvider.CreateCoreScope())
 3. **Lazy loading outside scope** - NPoco relationships must load within scope
 4. **Large migrations** - Split into multiple steps if > 1000 lines
 5. **Repository logic in services** - Keep repos thin, logic in services
+6. **Unbatched `WHERE IN` on user-sized collections** - See "Avoiding the SQL Server 2100-parameter limit" below
+
+### Avoiding the SQL Server 2100-parameter limit
+
+SQL Server caps a single statement at 2100 parameters. When an `IN` clause is built from a collection sized by user data, that cap can be hit — and the symptom is a runtime `SqlException` (error 8003) on customer installs that nobody hit in dev.
+
+**The constant and helpers**:
+- `Constants.Sql.MaxParameterCount = 2000` (in `Umbraco.Core`, `Constants-Sql.cs`) — the ceiling we target (2100 minus headroom for joined predicates already in the SQL).
+- `IEnumerable<T>.InGroupsOf(groupSize)` (in `Umbraco.Core`, `Extensions/EnumerableExtensions.cs`) — extension method to batch a collection.
+- `Database.FetchByGroups<TResult, TSource>(source, groupSize, sqlFactory)` (in `Umbraco.Infrastructure`, `Persistence/NPocoDatabaseExtensions.cs`) — NPoco helper that batches a fetch.
+
+**The safe patterns** (use one of these any time the collection size is user-driven):
+
+```csharp
+// Pattern 1: batch a DeleteMany / Execute / Fetch by looping.
+foreach (IEnumerable<int> group in ids.InGroupsOf(Constants.Sql.MaxParameterCount))
+{
+    Database.DeleteMany<FooDto>().Where(x => group.Contains(x.Id)).Execute();
+}
+
+// Pattern 2: batched fetch with NPoco helper.
+List<FooDto> dtos = Database.FetchByGroups<FooDto, int>(
+    ids,
+    Constants.Sql.MaxParameterCount,
+    batch => Sql().Select<FooDto>().From<FooDto>().WhereIn<FooDto>(x => x.Id, batch));
+
+// Pattern 3: reserve headroom for other parameters in the same statement.
+foreach (IEnumerable<int> group in entityIds.InGroupsOf(Constants.Sql.MaxParameterCount - userGroupIds.Length))
+{
+    // statement uses entityIds + userGroupIds, so subtract the other predicate's parameter count from the budget
+}
+```
+
+**Decision rule when writing or reviewing a `WHERE IN`-style query**:
+
+Look at what drives the size of the collection feeding the `IN`. Ask: *could this realistically exceed 2000 on a large install?* Risky drivers — batch any query backed by these:
+- All content / media / member nodes (or descendants of a deep tree).
+- A product of two scaling dimensions, e.g. `documents × languages`, `properties × versions`, `relations × endpoints`.
+- Configuration-tunable batch sizes (`CacheSettings.DocumentSeedBatchSize`, `NuCacheSettings.SqlPageSize`, etc.). The default may be safe but the customer can raise it.
+- Anything that scans property data, version history, relations, or audit logs across many nodes.
+
+Safe drivers — don't bother batching:
+- Languages / content types / member groups / user groups — bounded by install configuration, typically <100.
+- "Per single content item" collections — properties on one document, versions of one document, tokens for one external login.
+- IDs supplied directly by a user action through the UI (picker selections, bulk actions on a page of results).
+
+If you're not sure, batch — the cost is one loop and an `IEnumerable<T>` allocation per batch; the cost of being wrong is a SqlException on a customer's biggest site.
+
+**For new public APIs** that take an `IEnumerable<int>`/`IEnumerable<Guid>` and feed it into a query, batch internally even if no current caller is large — package authors and future callers will not know about the 2000-limit ceiling.
+
+**Don't** rely on `if (ids.Length > MaxParameterCount) throw` as a substitute for batching. Throwing only moves the problem; the caller has no obvious way to recover and will most likely just fail in production.
 
 ---
 
@@ -486,6 +537,17 @@ using (var outer = ScopeProvider.CreateCoreScope())
 - Migrations run at startup (blocking)
 - Large data migrations (> 100k rows) should be chunked
 - All migrations use `AsyncMigrationBase`
+
+**Schema-seeding migrations MUST assign the same fixed keys as a clean install**:
+- A migration that adds built-in schema entities (media/content/member types, property types,
+  property groups, data types, etc.) must set each entity's `Key` explicitly to the **same Guid**
+  used for that entity in `Migrations/Install/DatabaseDataCreator.cs`.
+- If you don't set `Key`, `EntityBase.Key` lazily generates a **random `Guid.NewGuid()`** — so every
+  upgraded site (and every environment) ends up with a **different** key, none of which match a clean
+  install. Umbraco Deploy / uSync key their schema artifacts by `Key`, so this shows up as spurious
+  "the key changed" schema diffs across environments (see issue #23337).
+- Keep the Guids in **one place** (a shared `Constants` value referenced by both `DatabaseDataCreator`
+  and the migration) so they cannot drift.
 
 ### Repository Edge Cases
 

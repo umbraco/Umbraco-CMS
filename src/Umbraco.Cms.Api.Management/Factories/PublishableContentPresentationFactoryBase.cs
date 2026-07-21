@@ -30,6 +30,7 @@ internal abstract class PublishableContentPresentationFactoryBase<TEntity, TVari
     /// </summary>
     /// <param name="umbracoMapper">The <see cref="IUmbracoMapper"/> instance used for mapping between models.</param>
     /// <param name="flagProviderCollection">The <see cref="FlagProviderCollection"/> instance used for determining flags to populate on response models.</param>
+    /// <param name="timeProvider">The <see cref="TimeProvider"/> instance used for time-related operations.</param>
     protected PublishableContentPresentationFactoryBase(
         IUmbracoMapper umbracoMapper,
         FlagProviderCollection flagProviderCollection,
@@ -128,6 +129,13 @@ internal abstract class PublishableContentPresentationFactoryBase<TEntity, TVari
         }
     }
 
+    /// <summary>
+    /// Creates a list of <see cref="CulturePublishScheduleModel"/> instances from the specified culture publish schedules.
+    /// Validates the publish and unpublish times for each culture's schedule, ensuring they are in the future and that unpublish times are after publish times.
+    /// Returns an <see cref="Attempt"/> containing the resulting list and a <see cref="ContentPublishingOperationStatus"/> indicating the outcome of the validation.
+    /// </summary>
+    /// <param name="cultureAndScheduleRequestModels">The culture-specific publish schedules to process.</param>
+    /// <returns>An <see cref="Attempt"/> with a list of <see cref="CulturePublishScheduleModel"/> and the validation status.</returns>
     protected Attempt<List<CulturePublishScheduleModel>, ContentPublishingOperationStatus> CreateCulturePublishScheduleModels(IEnumerable<CultureAndScheduleRequestModel> cultureAndScheduleRequestModels)
     {
         var model = new List<CulturePublishScheduleModel>();
