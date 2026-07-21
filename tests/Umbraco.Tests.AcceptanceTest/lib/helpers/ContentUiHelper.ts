@@ -705,11 +705,15 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   async clickSaveButtonAndWaitForContentToBeCreated() {
-    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.document, this.clickSaveButtonForContent(), ConstantHelper.statusCodes.created);
+    const contentId = await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.document, this.clickSaveButtonForContent(), ConstantHelper.statusCodes.created);
+    await this.waitForWorkspaceEditRoute('document');
+    return contentId;
   }
 
   async clickSaveModalButtonAndWaitForContentToBeCreated() {
-    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.document, this.clickSaveModalButton(), ConstantHelper.statusCodes.created);
+    const contentId = await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.document, this.clickSaveModalButton(), ConstantHelper.statusCodes.created);
+    await this.waitForWorkspaceEditRoute('document');
+    return contentId;
   }
 
   async clickSaveModalButtonAndWaitForContentToBeUpdated() {

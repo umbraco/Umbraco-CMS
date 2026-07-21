@@ -563,7 +563,9 @@ export class LibraryUiHelper extends UiBaseLocators {
   }
 
   async clickSaveModalButtonAndWaitForElementToBeCreated(){
-    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.element, this.clickSaveModalButton(), ConstantHelper.statusCodes.created);
+    const elementId = await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.element, this.clickSaveModalButton(), ConstantHelper.statusCodes.created);
+    await this.waitForWorkspaceEditRoute('element');
+    return elementId;
   }
 
   async clickSaveModalButtonAndWaitForElementToBeUpdated(){

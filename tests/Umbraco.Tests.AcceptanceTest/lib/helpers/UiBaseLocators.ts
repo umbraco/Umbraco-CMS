@@ -2052,6 +2052,16 @@ export class UiBaseLocators extends BasePage {
   }
 
   /**
+   * Waits until the workspace has re-routed from .../{entityType}/create/... to .../{entityType}/edit/{id}.
+   * A create isn't finished until this reload lands: a follow-up variant/segment switch started beforehand
+   * is discarded (the workspace reverts to the default culture), losing its edits so the awaited update
+   * response never fires.
+   */
+  async waitForWorkspaceEditRoute(entityType: 'document' | 'element') {
+    await expect(this.page).toHaveURL(new RegExp(`/workspace/${entityType}/edit/`), {timeout: ConstantHelper.timeout.long});
+  }
+
+  /**
    * Runs an action that triggers several matching API calls (e.g. moving multiple
    * items) and resolves once `expectedCount` responses matching `url` + `statusCode`
    * have arrived. Uses the same loose `includes` URL matching as
