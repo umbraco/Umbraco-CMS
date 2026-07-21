@@ -22,6 +22,7 @@ export default {
 		chooseWhereToMove: 'Choose where to move',
 		clear: 'Clear',
 		copy: 'Duplicate',
+		copyInProgress: 'Duplication in progress - please wait...',
 		copyTo: 'Duplicate to',
 		create: 'Create',
 		createFor: (name: string) => (name ? `Create item for ${name}` : 'Create'),
@@ -29,6 +30,7 @@ export default {
 		createGroup: 'Create group',
 		createPackage: 'Create Package',
 		delete: 'Delete',
+		deleteInProgress: 'Deletion in progress - please wait...',
 		disable: 'Disable',
 		editContent: 'Edit content',
 		editSettings: 'Edit settings',
@@ -47,6 +49,7 @@ export default {
 		liveEdit: 'Edit in Canvas',
 		logout: 'Exit',
 		move: 'Move to',
+		moveInProgress: 'Move in progress - please wait...',
 		notify: 'Notifications',
 		protect: 'Public Access',
 		publish: 'Publish',
@@ -1348,6 +1351,9 @@ export default {
 		contentPublishedFailedReqCultureValidationError:
 			"Validation failed for required language '%0%'. This language was saved but not published.",
 	},
+	unpublish: {
+		inProgress: 'Unpublishing in progress - please wait...',
+	},
 	colorpicker: {
 		noColors: 'You have not configured any approved colours',
 	},
@@ -1622,7 +1628,9 @@ export default {
 		cannotCopyInformation: 'Could not copy your system information to the clipboard',
 		webhookSaved: 'Webhook saved',
 		editMultiContentPublishedText: '%0% documents published and are visible on the website',
+		editMultiContentPublishedPartialText: '%0% of %1% documents published.',
 		editMultiContentUnpublishedText: '%0% documents unpublished and are no longer visible on the website',
+		editMultiContentUnpublishedPartialText: '%0% of %1% documents unpublished.',
 		editVariantUnpublishedText: '%0% unpublished and is no longer visible on the website',
 		editMultiVariantPublishedText: '%0% documents published for languages %1% and are visible on the website',
 		editMultiVariantUnpublishedText:
