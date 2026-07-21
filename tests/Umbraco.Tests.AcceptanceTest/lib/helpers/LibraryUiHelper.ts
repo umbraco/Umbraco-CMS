@@ -1077,6 +1077,13 @@ export class LibraryUiHelper extends UiBaseLocators {
     await this.isActionsMenuForNameVisible('Recycle Bin', isVisible);
   }
 
+  async isElementVisibleInRecycleBinCollection(name: string, isVisible: boolean = true) {
+    const row = this.page
+      .locator('[data-mark="collection-view:Umb.CollectionView.ElementRecycleBin.TreeItem.Table"] uui-table-row')
+      .filter({hasText: name});
+    await this.isVisible(row, isVisible);
+  }
+
   async isActionsMenuForRootVisible(isVisible: boolean = true) {
     await this.isActionsMenuForNameVisible('Element', isVisible);
   }

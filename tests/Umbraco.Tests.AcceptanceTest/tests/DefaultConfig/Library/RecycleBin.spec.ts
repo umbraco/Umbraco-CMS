@@ -75,6 +75,9 @@ test('can empty recycle bin', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.library.clickRecycleBinButton();
+  // Wait for the recycle bin to finish loading (the trashed item is shown in the collection) before opening
+  // the empty dialog: a late load re-render otherwise dismisses the just-opened confirm modal.
+  await umbracoUi.library.isElementVisibleInRecycleBinCollection(elementName);
   await umbracoUi.library.clickEmptyRecycleBinButton();
   await umbracoUi.library.clickConfirmEmptyRecycleBinButtonAndWaitForRecycleBinToBeEmptied();
 
