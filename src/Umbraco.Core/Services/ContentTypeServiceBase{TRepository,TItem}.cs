@@ -410,9 +410,10 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
 
             // A composition change dirties the composition collection (add or remove). Both directions change the
             // set of properties this content type - and every type composed of or inheriting from it - exposes, so
-            // it is a main-impact change that must refresh this type and its descendants. Adding a composition can
-            // also reintroduce a just-removed alias behind a different property type, and the cmsContentNu blob is
-            // keyed by alias, so it additionally requires a raw data rebuild.
+            // it is a main-impact change that must refresh this type and its descendants. Whether it also needs a
+            // raw cmsContentNu rebuild is decided separately below: an addition on its own does not (its aliases
+            // have no stored values yet), but a removal - or an addition that reintroduces a just-removed alias -
+            // does. See the rawDataAffected calculation.
             var hasCompositionChanged = dirty.WasPropertyDirty("ContentTypeComposition");
 
             // main impact on properties?

@@ -271,7 +271,7 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
             return operationStatus;
         }
 
-        // verify that no newly added property/composition alias collides with a descendant's own property
+        // verify that no newly introduced property/composition alias collides with a property already effective on a descendant
         operationStatus = ValidateDescendantPropertyAliases(contentType, model, allContentTypeCompositions);
         if (operationStatus is not ContentTypeOperationStatus.Success)
         {
@@ -567,20 +567,11 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
     {
         // build a "referenced id -> types that directly reference it" lookup once, so the traversal is O(n + d)
         // rather than rescanning every content type for each descendant
-        var directReferencingTypes = new Dictionary<int, List<IContentTypeComposition>>();
-        foreach (IContentTypeComposition contentType in allContentTypeCompositions)
-        {
-            foreach (IContentTypeComposition referenced in contentType.ContentTypeComposition)
-            {
-                if (directReferencingTypes.TryGetValue(referenced.Id, out List<IContentTypeComposition>? referencingTypes) is false)
-                {
-                    referencingTypes = new List<IContentTypeComposition>();
-                    directReferencingTypes[referenced.Id] = referencingTypes;
-                }
-
-                referencingTypes.Add(contentType);
-            }
-        }
+        ILookup<int, IContentTypeComposition> directReferencingTypes = allContentTypeCompositions
+            .SelectMany(
+                contentType => contentType.ContentTypeComposition,
+                (contentType, referenced) => (ReferencedId: referenced.Id, ContentType: contentType))
+            .ToLookup(x => x.ReferencedId, x => x.ContentType);
 
         var descendantIds = new HashSet<int>();
         var stack = new Stack<int>();
@@ -588,12 +579,9 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         while (stack.Count > 0)
         {
             var currentId = stack.Pop();
-            if (directReferencingTypes.TryGetValue(currentId, out List<IContentTypeComposition>? descendants) is false)
-            {
-                continue;
-            }
 
-            foreach (IContentTypeComposition descendant in descendants)
+            // ILookup returns an empty sequence for an unknown key, so no explicit "contains" guard is needed
+            foreach (IContentTypeComposition descendant in directReferencingTypes[currentId])
             {
                 if (descendantIds.Add(descendant.Id))
                 {
