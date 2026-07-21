@@ -1,12 +1,15 @@
 import { UmbDocumentPublishingRepository } from '../../index.js';
-import { UmbBulkDocumentPublishingController } from '../../bulk-publishing.controller.js';
 import { UmbDocumentVariantState } from '../../../variant-state.js';
 import type { UmbDocumentVariantOptionModel } from '../../../types.js';
 import type { UmbDocumentItemModel } from '../../../item/types.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../../entity.js';
 import { UmbDocumentPublishManifestEntityActionMeta } from '../entity-action/constants.js';
 import { UmbDocumentItemRepository } from '../../../item/repository/index.js';
-import { UMB_CONTENT_PUBLISH_MODAL, UmbContentPublishEntityAction } from '@umbraco-cms/backoffice/content';
+import {
+	UMB_CONTENT_PUBLISH_MODAL,
+	UmbBulkContentPublishingController,
+	UmbContentPublishEntityAction,
+} from '@umbraco-cms/backoffice/content';
 import { UmbEntityBulkActionBase } from '@umbraco-cms/backoffice/entity-bulk-action';
 import { UmbLanguageCollectionRepository, type UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
@@ -229,13 +232,18 @@ export class UmbDocumentPublishEntityBulkAction extends UmbEntityBulkActionBase<
 	): Promise<void> {
 		const repository = new UmbDocumentPublishingRepository(this._host);
 
-		await new UmbBulkDocumentPublishingController(this).run({
+		await new UmbBulkContentPublishingController(this).run({
 			selection: this.selection,
 			entityType,
 			unique,
-			type: 'publish',
 			headlineKey: 'publish_inProgress',
 			variantIds,
+			labels: {
+				headline: 'speechBubbles_editContentPublishedHeader',
+				multiVariant: 'speechBubbles_editMultiVariantPublishedText',
+				multiContent: 'speechBubbles_editMultiContentPublishedText',
+				partial: 'speechBubbles_editMultiContentPublishedPartialText',
+			},
 			process: (documentUnique) => repository.publish(documentUnique, variants),
 		});
 	}

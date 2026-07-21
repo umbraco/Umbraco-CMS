@@ -2,9 +2,12 @@ import { UmbDocumentUnpublishManifestEntityActionMeta } from '../entity-action/c
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../../constants.js';
 import type { UmbDocumentVariantOptionModel } from '../../../types.js';
 import { UmbDocumentPublishingRepository } from '../../repository/index.js';
-import { UmbBulkDocumentPublishingController } from '../../bulk-publishing.controller.js';
 import { UmbDocumentPublishEntityBulkAction } from '../../publish/entity-bulk-action/publish.bulk-action.js';
-import { UMB_CONTENT_UNPUBLISH_MODAL, UmbContentUnpublishEntityAction } from '@umbraco-cms/backoffice/content';
+import {
+	UMB_CONTENT_UNPUBLISH_MODAL,
+	UmbBulkContentPublishingController,
+	UmbContentUnpublishEntityAction,
+} from '@umbraco-cms/backoffice/content';
 import { html, nothing } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';
 import { umbConfirmModal, umbOpenModal } from '@umbraco-cms/backoffice/modal';
@@ -114,13 +117,18 @@ export class UmbDocumentUnpublishEntityBulkAction extends UmbEntityBulkActionBas
 	async #bulkUnpublish(variantIds: Array<UmbVariantId>, entityType: string, unique: string | null): Promise<void> {
 		const repository = new UmbDocumentPublishingRepository(this._host);
 
-		await new UmbBulkDocumentPublishingController(this).run({
+		await new UmbBulkContentPublishingController(this).run({
 			selection: this.selection,
 			entityType,
 			unique,
-			type: 'unpublish',
 			headlineKey: 'unpublish_inProgress',
 			variantIds,
+			labels: {
+				headline: 'speechBubbles_contentUnpublished',
+				multiVariant: 'speechBubbles_editMultiVariantUnpublishedText',
+				multiContent: 'speechBubbles_editMultiContentUnpublishedText',
+				partial: 'speechBubbles_editMultiContentUnpublishedPartialText',
+			},
 			process: (documentUnique) => repository.unpublish(documentUnique, variantIds),
 		});
 	}
