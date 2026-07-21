@@ -32,7 +32,7 @@ public sealed partial class HtmlStringUtilities
     [GeneratedRegex(@"\s{2,}")]
     private static partial Regex MultiSpaceRegex();
 
-    [GeneratedRegex(@"\s([\.,;:!])")]
+    [GeneratedRegex(@"\s([\.,;:!?)\]}])")]
     private static partial Regex PunctuationRegex();
 
     /// <summary>

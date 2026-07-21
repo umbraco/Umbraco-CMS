@@ -127,6 +127,10 @@ public class HtmlHelperExtensionMethodsTests
     [TestCase("<p>Umbraco - the friendly CMS</p>", "Umbraco - the friendly CMS")]
     [TestCase("<p>He said \"hello\"</p>", "He said \"hello\"")]
     [TestCase("<p>See [the docs] here</p>", "See [the docs] here")]
+    [TestCase("<p>Is this <strong>working</strong>?</p>", "Is this working?")]
+    [TestCase("<p>Say <em>hi</em>...</p>", "Say hi...")]
+    [TestCase("<p>Read <em>this</em> (please)</p>", "Read this (please)")]
+    [TestCase("<p>Here (<em>note</em>) go</p>", "Here (note) go")]
     public void Strip_Html_Ensure_Spacing(string input, string expected)
     {
         var result = _htmlHelper.StripHtml(input).ToString();
