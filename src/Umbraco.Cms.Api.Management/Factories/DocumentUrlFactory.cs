@@ -137,6 +137,7 @@ public class DocumentUrlFactory : IDocumentUrlFactory
             Url = url,
             Message = urlInfo.Message,
             Provider = urlInfo.Provider,
+            IsExternal = urlInfo.IsExternal,
         };
     }
 }
