@@ -2,24 +2,15 @@ import { UmbDocumentUnpublishManifestEntityActionMeta } from '../entity-action/c
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../../constants.js';
 import type { UmbDocumentVariantOptionModel } from '../../../types.js';
 import { UmbDocumentPublishingRepository } from '../../repository/index.js';
-import { showBulkPublishingResultNotification } from '../../bulk-publishing-result-notification.js';
+import { UmbBulkDocumentPublishingController } from '../../bulk-publishing.controller.js';
 import { UmbDocumentPublishEntityBulkAction } from '../../publish/entity-bulk-action/publish.bulk-action.js';
-import { UmbDocumentItemRepository } from '../../../item/repository/index.js';
 import { UMB_CONTENT_UNPUBLISH_MODAL, UmbContentUnpublishEntityAction } from '@umbraco-cms/backoffice/content';
 import { html, nothing } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';
 import { umbConfirmModal, umbOpenModal } from '@umbraco-cms/backoffice/modal';
-import {
-	UmbEntityBulkActionBase,
-	UmbEntityBulkActionProgressController,
-} from '@umbraco-cms/backoffice/entity-bulk-action';
-import { UmbLanguageCollectionRepository } from '@umbraco-cms/backoffice/language';
+import { UmbEntityBulkActionBase } from '@umbraco-cms/backoffice/entity-bulk-action';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
-import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import { UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
-import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
-import { UmbRequestReloadChildrenOfEntityEvent } from '@umbraco-cms/backoffice/entity-action';
-import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 
 export class UmbDocumentUnpublishEntityBulkAction extends UmbEntityBulkActionBase<object> {
 	async execute() {
@@ -49,21 +40,13 @@ export class UmbDocumentUnpublishEntityBulkAction extends UmbEntityBulkActionBas
 	}
 
 	async #unpublishMultipleSelections(entityType: string, unique: string | null): Promise<void> {
-		// Fetch document items and languages in parallel
-		const itemRepository = new UmbDocumentItemRepository(this._host);
-		const languageRepository = new UmbLanguageCollectionRepository(this._host);
-
-		const [{ data: documentItems }, { data: languageData }] = await Promise.all([
-			itemRepository.requestItems(this.selection),
-			languageRepository.requestAllItems(),
-		]);
-
-		if (!documentItems?.length) return;
-
-		const { allInvariant, options } = UmbDocumentPublishEntityBulkAction.buildVariantOptions(
-			documentItems,
-			languageData?.items ?? [],
+		const variantOptions = await UmbDocumentPublishEntityBulkAction.requestBulkVariantOptions(
+			this._host,
+			this.selection,
 		);
+		if (!variantOptions) return;
+
+		const { allInvariant, options } = variantOptions;
 
 		// If there is only one language available, or all selected documents are invariant, we can skip the modal and unpublish directly:
 		if (options.length === 1 || allInvariant) {
@@ -130,31 +113,16 @@ export class UmbDocumentUnpublishEntityBulkAction extends UmbEntityBulkActionBas
 	// Unpublishes the selection sequentially in a progress dialog, then reports the outcome and reloads.
 	async #bulkUnpublish(variantIds: Array<UmbVariantId>, entityType: string, unique: string | null): Promise<void> {
 		const repository = new UmbDocumentPublishingRepository(this._host);
-		const localize = new UmbLocalizationController(this);
 
-		const result = await new UmbEntityBulkActionProgressController(this).runWithProgress({
-			headline: localize.term('unpublish_inProgress'),
-			uniques: this.selection,
+		await new UmbBulkDocumentPublishingController(this).run({
+			selection: this.selection,
+			entityType,
+			unique,
+			type: 'unpublish',
+			headlineKey: 'unpublish_inProgress',
+			variantIds,
 			process: (documentUnique) => repository.unpublish(documentUnique, variantIds),
 		});
-
-		const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
-		showBulkPublishingResultNotification(notificationContext, localize, 'unpublish', {
-			succeeded: result.succeeded,
-			total: this.selection.length,
-			variantIds,
-		});
-
-		if (result.succeeded > 0) {
-			await this.#reloadChildren(entityType, unique);
-		}
-	}
-
-	async #reloadChildren(entityType: string, unique: string | null): Promise<void> {
-		const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
-		if (!eventContext) return;
-		const event = new UmbRequestReloadChildrenOfEntityEvent({ entityType, unique });
-		eventContext.dispatchEvent(event);
 	}
 }
 
