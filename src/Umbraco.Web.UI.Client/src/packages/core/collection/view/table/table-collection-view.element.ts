@@ -125,7 +125,9 @@ export class UmbTableCollectionViewElement extends UmbCollectionViewElementBase<
 			const href = item.unique ? this._itemHrefs.get(item.unique) : undefined;
 
 			const manifestColumnData = this.#manifestColumns.map((col) => {
-				const rawValue = (item as unknown as Record<string, unknown>)[col.field];
+				const rawValue = col.field
+					.split('.')
+					.reduce((obj, key) => (obj as Record<string, unknown>)?.[key], item as unknown);
 				if (col.valueType) {
 					return {
 						columnAlias: col.field,

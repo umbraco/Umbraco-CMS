@@ -15,7 +15,7 @@ public class ByKeyDocumentTypeControllerTests : ManagementApiUserGroupTestBase<B
     private Guid _key;
 
     [SetUp]
-    public async Task Setup()
+    public new async Task Setup()
     {
         _key = Guid.NewGuid();
         await ContentTypeEditingService.CreateAsync(new ContentTypeCreateModel { Key = _key, Name = Guid.NewGuid().ToString(), Alias = Guid.NewGuid().ToString() }, Constants.Security.SuperUserKey);

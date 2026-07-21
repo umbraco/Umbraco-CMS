@@ -388,6 +388,12 @@
     <Compile Update="Umbraco.Infrastructure\Services\ElementEditingServiceTests.Restore.cs">
       <DependentUpon>ElementEditingServiceTests.cs</DependentUpon>
     </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\ElementEditingServiceTests.CreateAndPublish.cs">
+      <DependentUpon>ElementEditingServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\ElementEditingServiceTests.UpdateAndPublish.cs">
+      <DependentUpon>ElementEditingServiceTests.cs</DependentUpon>
+    </Compile>
     <Compile Update="Umbraco.Infrastructure\Services\ElementContainerServiceTests.Restore.cs">
       <DependentUpon>ElementContainerServiceTests.cs</DependentUpon>
     </Compile>
@@ -411,6 +417,9 @@
     </Compile>
     <Compile Update="Umbraco.Core\Services\ContentTypeEditingServiceTests.ChangeTypes.cs">
       <DependentUpon>ContentTypeEditingServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\UserServiceTests.SetAvatar.cs">
+      <DependentUpon>UserServiceTests.cs</DependentUpon>
     </Compile>
     <Compile Update="Umbraco.Infrastructure\Services\ContentEditingServiceTests.CreateAndPublish.cs">
       <DependentUpon>ContentEditingServiceTests.cs</DependentUpon>

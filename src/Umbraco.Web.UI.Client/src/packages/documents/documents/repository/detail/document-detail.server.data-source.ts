@@ -39,11 +39,12 @@ export class UmbDocumentServerDataSource
 		const { data } = await new UmbDocumentTypeDetailServerDataSource(this).read(documentTypeUnique);
 		const documentTypeIcon = data?.icon ?? null;
 		const documentTypeCollection = data?.collection ?? null;
+		const defaultTemplate = data?.defaultTemplate ? { unique: data.defaultTemplate.id } : null;
 
 		const defaultData: UmbDocumentDetailModel = {
 			entityType: UMB_DOCUMENT_ENTITY_TYPE,
 			unique: UmbId.new(),
-			template: null,
+			template: defaultTemplate,
 			documentType: {
 				unique: documentTypeUnique,
 				collection: documentTypeCollection,
