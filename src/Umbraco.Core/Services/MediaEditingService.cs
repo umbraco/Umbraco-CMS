@@ -189,10 +189,6 @@ internal sealed class MediaEditingService
         => new Models.Media(name, parentId, mediaType);
 
     /// <inheritdoc />
-    protected override OperationResult? Move(IMedia media, int newParentId, int userId)
-        => ContentService.Move(media, newParentId, userId).Result;
-
-    /// <inheritdoc />
     protected override OperationResult? Move(IMedia media, int newParentId, bool includeDescendants, int userId)
         => ContentService.Move(media, newParentId, includeDescendants, userId).Result;
 

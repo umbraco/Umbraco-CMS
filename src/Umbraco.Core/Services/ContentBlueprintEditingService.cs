@@ -270,7 +270,7 @@ internal sealed class ContentBlueprintEditingService
     /// Some methods from ContentEditingServiceBase are needed, so we need to inherit from it
     /// but there are others that are not required to be implemented in the case of blueprints.
     /// </remarks>
-    protected override OperationResult? Move(IContent content, int newParentId, int userId) => throw new NotImplementedException();
+    protected override OperationResult? Move(IContent content, int newParentId, bool includeDescendants, int userId) => throw new NotImplementedException();
 
     /// <summary>
     /// Copies the specified content to a new parent. Not supported for blueprints.

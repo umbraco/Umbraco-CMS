@@ -410,10 +410,6 @@ internal sealed class ContentEditingService
         => new Content(name, parentId, contentType);
 
     /// <inheritdoc />
-    protected override OperationResult? Move(IContent content, int newParentId, int userId)
-        => ContentService.Move(content, newParentId, userId);
-
-    /// <inheritdoc />
     protected override OperationResult? Move(IContent content, int newParentId, bool includeDescendants, int userId)
         => ContentService.Move(content, newParentId, includeDescendants, userId);
 

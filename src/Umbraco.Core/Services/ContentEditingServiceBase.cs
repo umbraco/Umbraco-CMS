@@ -95,7 +95,8 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     /// <param name="newParentId">The new parent identifier.</param>
     /// <param name="userId">The user performing the operation.</param>
     /// <returns>The operation result.</returns>
-    protected abstract OperationResult? Move(TContent content, int newParentId, int userId);
+    protected OperationResult? Move(TContent content, int newParentId, int userId)
+        => Move(content, newParentId, includeDescendants: true, userId);
 
     /// <summary>
     /// Moves content to a new parent, optionally leaving its descendants behind.
@@ -108,8 +109,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     /// </param>
     /// <param name="userId">The user performing the operation.</param>
     /// <returns>The operation result.</returns>
-    protected virtual OperationResult? Move(TContent content, int newParentId, bool includeDescendants, int userId)
-        => Move(content, newParentId, userId);
+    protected abstract OperationResult? Move(TContent content, int newParentId, bool includeDescendants, int userId);
 
     /// <summary>
     /// Copies content to a new parent.

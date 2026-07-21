@@ -1192,7 +1192,9 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="media">The <see cref="IMedia"/> to move</param>
         /// <param name="parentId">Id of the Media's new Parent</param>
         /// <param name="userId">Id of the User moving the Media</param>
+#pragma warning disable CS0618 // Type or member is obsolete - the int-userId overloads still default to SuperUserId; there is no non-obsolete int equivalent until it is removed in v18
         public Attempt<OperationResult?> Move(IMedia media, int parentId, int userId = Constants.Security.SuperUserId)
+#pragma warning restore CS0618 // Type or member is obsolete
             => Move(media, parentId, true, userId);
 
         /// <summary>
