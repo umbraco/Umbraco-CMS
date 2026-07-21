@@ -1,4 +1,3 @@
-import {expect} from '@playwright/test';
 import {ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 
 test.beforeEach(async ({umbracoUi}) => {
@@ -13,10 +12,10 @@ test('can view indexers information', async ({umbracoApi, umbracoUi}) => {
   const indexerCount = allIndexersData.total;
 
   // Assert
-  allIndexersData.items.forEach(async index => {
+  for (const index of allIndexersData.items) {
     await umbracoUi.examineManagement.doesIndexersHaveText(index.name);
-  });
-  expect(await umbracoUi.examineManagement.checkIndexersCount()).toBe(indexerCount);
+  }
+  await umbracoUi.examineManagement.doesIndexersHaveCount(indexerCount);
 });
 
 test('can view the details of an index', async ({umbracoApi, umbracoUi}) => {

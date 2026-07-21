@@ -7,8 +7,7 @@ import type { UmbUserGroupInputElement } from '@umbraco-cms/backoffice/user-grou
 import type { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 
-const elementName = 'umb-user-workspace-assign-access';
-@customElement(elementName)
+@customElement('umb-user-workspace-assign-access')
 export class UmbUserWorkspaceAssignAccessElement extends UmbLitElement {
 	@state()
 	private _userGroupUniques: UmbUserDetailModel['userGroupUniques'] = [];
@@ -204,6 +203,6 @@ export class UmbUserWorkspaceAssignAccessElement extends UmbLitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbUserWorkspaceAssignAccessElement;
+		'umb-user-workspace-assign-access': UmbUserWorkspaceAssignAccessElement;
 	}
 }

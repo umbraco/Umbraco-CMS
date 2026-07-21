@@ -97,6 +97,7 @@ test('can create a document type folder using create options', {tag: '@release'}
 test('can create a document type in a folder using create options', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.documentType.createFolder(documentFolderName);
+  await umbracoUi.documentType.reloadDocumentTypeTree();
   await umbracoUi.documentType.goToDocumentType(documentFolderName);
 
   // Act
@@ -116,6 +117,7 @@ test('can create a document type with a template in a folder using create option
   // Arrange
   await umbracoApi.template.ensureNameNotExists(documentTypeName);
   await umbracoApi.documentType.createFolder(documentFolderName);
+  await umbracoUi.documentType.reloadDocumentTypeTree();
   await umbracoUi.documentType.goToDocumentType(documentFolderName);
 
   // Act
@@ -140,6 +142,7 @@ test('can create a document type with a template in a folder using create option
 test('can create a element type in a folder using create options', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.documentType.createFolder(documentFolderName);
+  await umbracoUi.documentType.reloadDocumentTypeTree();
   await umbracoUi.documentType.goToDocumentType(documentFolderName);
 
   // Act
@@ -163,7 +166,7 @@ test('can create a document type folder in a folder using create options', async
   const childFolderName = 'Test Child Folder';
   await umbracoApi.documentType.ensureNameNotExists(childFolderName);
   await umbracoApi.documentType.createFolder(documentFolderName);
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.short); // Wait for folder to be created before navigating to it
+  await umbracoUi.documentType.reloadDocumentTypeTree();
   await umbracoUi.documentType.goToDocumentType(documentFolderName);
 
   // Act
