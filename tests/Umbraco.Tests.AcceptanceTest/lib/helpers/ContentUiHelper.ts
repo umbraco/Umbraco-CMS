@@ -809,6 +809,22 @@ export class ContentUiHelper extends UiBaseLocators {
     await this.clickConfirmRemoveButton();
   }
 
+  // User Picker
+  async addUserPicker(userName: string) {
+    await this.clickChooseButton();
+    await this.click(
+      this.sidebarModal.locator("uui-card-user").filter({ hasText: userName }),
+    );
+    await this.clickChooseModalButton();
+  }
+
+  // Member Group Picker
+  async addMemberGroupPicker(memberGroupName: string) {
+    await this.clickChooseButton();
+    await this.click(this.sidebarModal.getByText(memberGroupName, { exact: true }));
+    await this.clickChooseModalButton();
+  }
+
   // Numeric
   async enterNumeric(number: number) {
     await this.enterText(this.numericTxt, number.toString());

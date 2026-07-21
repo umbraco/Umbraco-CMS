@@ -28,7 +28,12 @@ import {
   NumericDataTypeBuilder,
   TagsDataTypeBuilder,
   MultiNodeTreePickerDataTypeBuilder,
-  DateTimeWithTimeZonePickerDataTypeBuilder, EntityDataPickerDataTypeBuilder
+  DateTimeWithTimeZonePickerDataTypeBuilder,
+  DateOnlyPickerDataTypeBuilder,
+  TimeOnlyPickerDataTypeBuilder,
+  EntityDataPickerDataTypeBuilder,
+  UserPickerDataTypeBuilder,
+  MemberGroupPickerDataTypeBuilder
 } from "../builders";
 import {AliasHelper} from "./AliasHelper";
 
@@ -2063,6 +2068,46 @@ export class DataTypeApiHelper {
     await this.ensureNameNotExists(name);
 
     const dataType = new DateTimeWithTimeZonePickerDataTypeBuilder()
+      .withName(name)
+      .build();
+
+    return await this.save(dataType);
+  }
+
+  async createDefaultDateOnlyPickerDataType(name: string) {
+    await this.ensureNameNotExists(name);
+
+    const dataType = new DateOnlyPickerDataTypeBuilder()
+      .withName(name)
+      .build();
+
+    return await this.save(dataType);
+  }
+
+  async createDefaultTimeOnlyPickerDataType(name: string) {
+    await this.ensureNameNotExists(name);
+
+    const dataType = new TimeOnlyPickerDataTypeBuilder()
+      .withName(name)
+      .build();
+
+    return await this.save(dataType);
+  }
+
+  async createDefaultUserPickerDataType(name: string) {
+    await this.ensureNameNotExists(name);
+
+    const dataType = new UserPickerDataTypeBuilder()
+      .withName(name)
+      .build();
+
+    return await this.save(dataType);
+  }
+
+  async createDefaultMemberGroupPickerDataType(name: string) {
+    await this.ensureNameNotExists(name);
+
+    const dataType = new MemberGroupPickerDataTypeBuilder()
       .withName(name)
       .build();
 
