@@ -408,30 +408,37 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
             // property variation change?
             var hasAnyPropertyVariationChanged = contentType.WasPropertyTypeVariationChanged();
 
+            // A composition change dirties the composition collection (add or remove). Both directions change the
+            // set of properties this content type - and every type composed of or inheriting from it - exposes, so
+            // it is a main-impact change that must refresh this type and its descendants. Adding a composition can
+            // also reintroduce a just-removed alias behind a different property type, and the cmsContentNu blob is
+            // keyed by alias, so it additionally requires a raw data rebuild.
+            var hasCompositionChanged = dirty.WasPropertyDirty("ContentTypeComposition");
+
             // main impact on properties?
             var hasPropertyMainImpact = hasContentTypeVariationChanged || hasAnyPropertyVariationChanged
-                                                                       || hasAnyCompositionBeenRemoved || hasAnyPropertyBeenRemoved || hasAnyPropertyChangedAlias;
-
-            // A composition change dirties the composition collection (add or remove). Adding a composition can
-            // reintroduce a just-removed alias behind a different property type, and the cmsContentNu blob is
-            // keyed by alias — so the stale value would resolve to the new property. Treat any composition
-            // change as requiring a rebuild.
-            var hasCompositionChanged = dirty.WasPropertyDirty("ContentTypeComposition");
+                                                                       || hasAnyCompositionBeenRemoved || hasAnyPropertyBeenRemoved || hasAnyPropertyChangedAlias
+                                                                       || hasCompositionChanged;
 
             if (hasAliasChanged || hasPropertyMainImpact)
             {
-                // A property removal is the only structural change that does not require a raw cmsContentNu
-                // rebuild: the removed alias simply stops resolving against the content type, so the stored
-                // blob's orphaned value is never read. This holds only when nothing in the same change
-                // reintroduces that alias (e.g. an added composition bringing it back), so any composition
-                // change disqualifies it. Any other structural cause also needs a rebuild.
-                var rawDataUnaffected = hasAnyPropertyBeenRemoved &&
-                    hasAliasChanged is false &&
-                    hasAnyPropertyChangedAlias is false &&
-                    hasContentTypeVariationChanged is false &&
-                    hasAnyPropertyVariationChanged is false &&
-                    hasAnyCompositionBeenRemoved is false &&
-                    hasCompositionChanged is false;
+                // The raw cmsContentNu blob is keyed by property alias, so a structural change only requires a
+                // rebuild when it re-keys existing stored values or lets a stale value resolve to a different
+                // property. It does NOT when the only structural change is:
+                //  - a property removal - the orphaned value simply stops resolving and is never read again, or
+                //  - a composition being added - its new aliases have no stored value yet.
+                // In those cases clearing the converted content cache is enough (the content type cache is
+                // refreshed regardless). An alias or variation change, a composition removal, or a property
+                // removal combined with a composition change (which can reintroduce the removed alias behind a
+                // different property type) all re-key or revive stored values and therefore need a rebuild.
+                var rawDataAffected =
+                    hasAliasChanged ||
+                    hasAnyPropertyChangedAlias ||
+                    hasContentTypeVariationChanged ||
+                    hasAnyPropertyVariationChanged ||
+                    hasAnyCompositionBeenRemoved ||
+                    (hasAnyPropertyBeenRemoved && hasCompositionChanged);
+                var rawDataUnaffected = rawDataAffected is false;
 
                 // add that one, as a main change
                 AddChange(changes, contentType, ContentTypeChangeTypes.RefreshMain);

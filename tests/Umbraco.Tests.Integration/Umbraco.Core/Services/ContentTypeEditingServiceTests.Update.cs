@@ -807,8 +807,11 @@ internal sealed partial class ContentTypeEditingServiceTests
         Assert.IsTrue(propertyTypeAliases.Contains("testProperty1"));
         Assert.IsTrue(propertyTypeAliases.Contains("testProperty2"));
 
-        // expect RefreshOther when adding compositions (corresponds to adding properties)
-        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.RefreshOther);
+        // expect RefreshMain when adding compositions - the composition's properties become part of this
+        // content type (and any type composed of or inheriting from it), so it is a main-impact change.
+        // It is also flagged RawDataUnaffected: the composed-in aliases have no stored values yet, so the
+        // cmsContentNu blobs stay valid and only the converted content cache needs clearing (no rebuild).
+        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RawDataUnaffected);
     }
 
     [Test]
