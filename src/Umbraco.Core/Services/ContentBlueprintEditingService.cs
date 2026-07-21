@@ -263,6 +263,7 @@ internal sealed class ContentBlueprintEditingService
     /// </summary>
     /// <param name="content">The content to move.</param>
     /// <param name="newParentId">The ID of the new parent.</param>
+    /// <param name="includeDescendants">Whether to move the descendants along with the content. Not supported for blueprints.</param>
     /// <param name="userId">The ID of the user performing the operation.</param>
     /// <returns>Not supported for blueprints.</returns>
     /// <exception cref="NotImplementedException">Always thrown as this operation is not supported for blueprints.</exception>
