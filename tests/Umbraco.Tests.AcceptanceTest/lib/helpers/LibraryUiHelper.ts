@@ -1698,9 +1698,8 @@ export class LibraryUiHelper extends UiBaseLocators {
 
   async clickBlockCardWithName(name: string, toForce: boolean = false) {
     const blockWithNameLocator = this.page.locator('uui-card-block-type', {hasText: name});
-    // In the nested-block picker the target card can sit below the fold; scroll it in so the click is
-    // not lost to "element is outside of the viewport". scrollIntoView waits for visibility first, so a
-    // missing card fails fast instead of hanging the raw scrollIntoViewIfNeeded until the test timeout.
+    // The card can sit below the fold in the nested-block picker; scrollIntoView brings it in and, unlike
+    // the raw scrollIntoViewIfNeeded, waits for visibility first so a missing card fails fast.
     await this.scrollIntoView(blockWithNameLocator);
     await this.click(blockWithNameLocator, {force: toForce});
   }
