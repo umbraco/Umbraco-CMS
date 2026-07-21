@@ -579,8 +579,6 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         while (stack.Count > 0)
         {
             var currentId = stack.Pop();
-
-            // ILookup returns an empty sequence for an unknown key, so no explicit "contains" guard is needed
             foreach (IContentTypeComposition descendant in directReferencingTypes[currentId])
             {
                 if (descendantIds.Add(descendant.Id))
