@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Core.Services;
 /// Provides services for creating, updating, and managing content (documents).
 /// </summary>
 internal sealed class ContentEditingService
-    : ContentEditingServiceWithSortingBase<IContent, IContentType, IContentService, IContentTypeService>, IContentEditingService
+    : AsyncContentEditingServiceWithSortingBase<IContent, IContentType, IContentService, IContentTypeService>, IContentEditingService
 {
     private readonly ITemplateService _templateService;
     private readonly ILogger<ContentEditingService> _logger;
@@ -225,7 +225,7 @@ internal sealed class ContentEditingService
             return ContentEditingOperationStatus.TemplateNotFound;
         }
 
-        IContentType contentType = ContentTypeService.Get(content.ContentTypeId)
+        IContentType contentType = await ContentTypeService.GetAsync(content.ContentTypeId)
                                    ?? throw new ArgumentException("The content type was not found", nameof(content));
         if (contentType.IsAllowedTemplate(template.Alias) == false)
         {
@@ -258,8 +258,11 @@ internal sealed class ContentEditingService
     protected override OperationResult? Delete(IContent content, int userId) => ContentService.Delete(content, userId);
 
     /// <inheritdoc />
-    protected override IEnumerable<IContent> GetPagedChildren(int parentId, int pageIndex, int pageSize, out long total)
-        => ContentService.GetPagedChildren(parentId, pageIndex, pageSize, out total, propertyAliases: null, filter: null, ordering: null);
+    protected override Task<IEnumerable<IContent>> GetPagedChildrenAsync(int parentId, int pageIndex, int pageSize, out long total)
+    {
+        IEnumerable<IContent> pagedChildren = ContentService.GetPagedChildren(parentId, pageIndex, pageSize, out total, propertyAliases: null, filter: null, ordering: null);
+        return Task.FromResult(pagedChildren);
+    }
 
     /// <inheritdoc />
     protected override ContentEditingOperationStatus Sort(IEnumerable<IContent> items, int userId)

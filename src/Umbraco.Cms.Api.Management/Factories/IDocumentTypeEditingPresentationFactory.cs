@@ -27,6 +27,6 @@ public interface IDocumentTypeEditingPresentationFactory
     /// Maps a collection of content type available compositions to a collection of available document type composition response models.
     /// </summary>
     /// <param name="compositionResults">The collection of content type available compositions to map.</param>
-    /// <returns>An enumerable of available document type composition response models.</returns>
-    IEnumerable<AvailableDocumentTypeCompositionResponseModel> MapCompositionModels(IEnumerable<ContentTypeAvailableCompositionsResult> compositionResults);
+    /// <returns>A task that represents the asynchronous operation. The task result contains the available document type composition response models.</returns>
+    Task<IEnumerable<AvailableDocumentTypeCompositionResponseModel>> MapCompositionModelsAsync(IEnumerable<ContentTypeAvailableCompositionsResult> compositionResults);
 }

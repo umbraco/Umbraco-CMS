@@ -42,7 +42,7 @@ public class ContentNavigationDescendantsCacheTests
         }).ToArray();
 
         var contentTypeService = new Mock<IContentTypeService>();
-        contentTypeService.Setup(s => s.GetAll()).Returns(contentTypes);
+        contentTypeService.Setup(s => s.GetAllAsync()).ReturnsAsync(contentTypes);
 
         return new DocumentNavigationService(
             Mock.Of<ICoreScopeProvider>(),

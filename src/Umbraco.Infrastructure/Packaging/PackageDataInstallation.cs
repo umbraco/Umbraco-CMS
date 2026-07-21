@@ -52,6 +52,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         private readonly IContentTypeService _contentTypeService;
         private readonly IContentService _contentService;
         private readonly IMemberTypeService _memberTypeService;
+        private readonly IContentTypeContainerService _contentTypeContainerService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PackageDataInstallation"/> class.
@@ -81,7 +82,8 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             IScriptService scriptService,
             IScriptFolderService scriptFolderService,
             IMemberTypeService memberTypeService,
-            IDataTypeContainerService dataTypeContainerService)
+            IDataTypeContainerService dataTypeContainerService,
+            IContentTypeContainerService contentTypeContainerService)
         {
             _dataValueEditorFactory = dataValueEditorFactory;
             _logger = logger;
@@ -107,6 +109,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             _scriptFolderService = scriptFolderService;
             _memberTypeService = memberTypeService;
             _dataTypeContainerService = dataTypeContainerService;
+            _contentTypeContainerService = contentTypeContainerService;
             _userIdKeyResolver = userIdKeyResolver;
         }
 
@@ -242,13 +245,48 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             IContentServiceBase<TContentBase> service)
             where TContentBase : class, IContentBase
             where TContentTypeComposition : IContentTypeComposition
+            => ImportContentBase(docs, importedDocumentTypes, userId, alias => typeService.Get(alias), service);
+
+        /// <summary>
+        /// Imports content base items of a specified type from the provided compiled package content documents using the
+        /// (asynchronous) document type service.
+        /// </summary>
+        /// <typeparam name="TContentBase">The type of content base item to import.</typeparam>
+        /// <param name="docs">A collection of <see cref="CompiledPackageContentBase"/> documents to import content from.</param>
+        /// <param name="importedDocumentTypes">A dictionary mapping document type aliases to their imported content types.</param>
+        /// <param name="userId">The identifier of the user performing the import operation.</param>
+        /// <param name="typeService">The document type service.</param>
+        /// <param name="service">The service used to manage content base items.</param>
+        /// <returns>A read-only list containing the imported content base items.</returns>
+        public IReadOnlyList<TContentBase> ImportContentBase<TContentBase>(
+            IEnumerable<CompiledPackageContentBase> docs,
+            IDictionary<string, IContentType> importedDocumentTypes,
+            int userId,
+            IContentTypeService typeService,
+            IContentServiceBase<TContentBase> service)
+            where TContentBase : class, IContentBase
+            => ImportContentBase(
+                docs,
+                importedDocumentTypes,
+                userId,
+                alias => typeService.GetAsync(alias).GetAwaiter().GetResult(),
+                service);
+
+        private IReadOnlyList<TContentBase> ImportContentBase<TContentBase, TContentTypeComposition>(
+            IEnumerable<CompiledPackageContentBase> docs,
+            IDictionary<string, TContentTypeComposition> importedDocumentTypes,
+            int userId,
+            Func<string, TContentTypeComposition?> findContentType,
+            IContentServiceBase<TContentBase> service)
+            where TContentBase : class, IContentBase
+            where TContentTypeComposition : IContentTypeComposition
             => docs.SelectMany(x =>
                 ImportContentBase(
                     x.XmlData.Elements().Where(doc => (string?)doc.Attribute("isDoc") == string.Empty),
                     -1,
                     importedDocumentTypes,
                     userId,
-                    typeService,
+                    findContentType,
                     service)).ToList();
 
         /// <summary>
@@ -270,8 +308,19 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             IContentServiceBase<TContentBase> service)
             where TContentBase : class, IContentBase
             where TContentTypeComposition : IContentTypeComposition
+            => ImportContentBase(roots, parentId, importedDocumentTypes, userId, alias => typeService.Get(alias), service);
+
+        private IEnumerable<TContentBase> ImportContentBase<TContentBase, TContentTypeComposition>(
+            IEnumerable<XElement> roots,
+            int parentId,
+            IDictionary<string, TContentTypeComposition> importedDocumentTypes,
+            int userId,
+            Func<string, TContentTypeComposition?> findContentType,
+            IContentServiceBase<TContentBase> service)
+            where TContentBase : class, IContentBase
+            where TContentTypeComposition : IContentTypeComposition
         {
-            var contents = ParseContentBaseRootXml(roots, parentId, importedDocumentTypes, typeService, service)
+            var contents = ParseContentBaseRootXml(roots, parentId, importedDocumentTypes, findContentType, service)
                 .ToList();
             if (contents.Any())
             {
@@ -301,7 +350,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             IEnumerable<XElement> roots,
             int parentId,
             IDictionary<string, TContentTypeComposition> importedContentTypes,
-            IContentTypeBaseService<TContentTypeComposition> typeService,
+            Func<string, TContentTypeComposition?> findContentType,
             IContentServiceBase<TContentBase> service)
             where TContentBase : class, IContentBase
             where TContentTypeComposition : IContentTypeComposition
@@ -313,7 +362,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
 
                 if (!importedContentTypes.ContainsKey(contentTypeAlias))
                 {
-                    TContentTypeComposition contentType = FindContentTypeByAlias(contentTypeAlias, typeService)
+                    TContentTypeComposition contentType = FindContentTypeByAlias(contentTypeAlias, findContentType)
                         ?? throw new InvalidOperationException("Could not find content type with alias "
                         + contentTypeAlias);
 
@@ -329,7 +378,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 if (children.Count > 0)
                 {
                     contents.AddRange(
-                        CreateContentFromXml(children, content, importedContentTypes, typeService, service)
+                        CreateContentFromXml(children, content, importedContentTypes, findContentType, service)
                             .WhereNotNull());
                 }
             }
@@ -341,7 +390,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             IEnumerable<XElement> children,
             TContentBase parent,
             IDictionary<string, TContentTypeComposition> importedContentTypes,
-            IContentTypeBaseService<TContentTypeComposition> typeService,
+            Func<string, TContentTypeComposition?> findContentType,
             IContentServiceBase<TContentBase> service)
             where TContentBase : class, IContentBase
             where TContentTypeComposition : IContentTypeComposition
@@ -353,7 +402,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 string contentTypeAlias = child.Name.LocalName;
                 if (importedContentTypes.ContainsKey(contentTypeAlias) == false)
                 {
-                    TContentTypeComposition contentType = FindContentTypeByAlias(contentTypeAlias, typeService);
+                    TContentTypeComposition contentType = FindContentTypeByAlias(contentTypeAlias, findContentType);
 
                     importedContentTypes.Add(contentTypeAlias, contentType);
                 }
@@ -378,7 +427,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                         grandChildren,
                         content,
                         importedContentTypes,
-                        typeService,
+                        findContentType,
                         service));
                 }
             }
@@ -584,7 +633,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         /// <param name="userId">Optional id of the User performing the operation. Default is zero (admin).</param>
         /// <returns>An enumerable list of generated ContentTypes</returns>
         public IReadOnlyList<IContentType> ImportDocumentTypes(IEnumerable<XElement> docTypeElements, int userId)
-            => ImportDocumentTypes(docTypeElements.ToList(), true, userId, _contentTypeService, out _);
+            => ImportDocumentTypes(docTypeElements.ToList(), true, userId, new DocumentTypeImportService(_contentTypeService), out _);
 
         /// <summary>
         /// Imports and saves package xml as <see cref="IContentType"/>
@@ -601,7 +650,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 docTypeElements.ToList(),
                 true,
                 userId,
-                _contentTypeService,
+                new DocumentTypeImportService(_contentTypeService),
                 out entityContainersInstalled);
 
         /// <summary>
@@ -614,7 +663,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         /// <returns>An enumerable list of generated ContentTypes</returns>
         public IReadOnlyList<T> ImportDocumentTypes<T>(IReadOnlyCollection<XElement> unsortedDocumentTypes, bool importStructure, int userId, IContentTypeBaseService<T> service)
             where T : class, IContentTypeComposition
-            => ImportDocumentTypes(unsortedDocumentTypes, importStructure, userId, service);
+            => ImportDocumentTypes(unsortedDocumentTypes, importStructure, userId, new SyncContentTypeImportService<T>(service), out _);
 
         /// <summary>
         /// Imports and saves package xml as <see cref="IContentType"/>
@@ -630,6 +679,15 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             bool importStructure,
             int userId,
             IContentTypeBaseService<T> service,
+            out IEnumerable<EntityContainer> entityContainersInstalled)
+            where T : class, IContentTypeComposition
+            => ImportDocumentTypes(unsortedDocumentTypes, importStructure, userId, new SyncContentTypeImportService<T>(service), out entityContainersInstalled);
+
+        private IReadOnlyList<T> ImportDocumentTypes<T>(
+            IReadOnlyCollection<XElement> unsortedDocumentTypes,
+            bool importStructure,
+            int userId,
+            IContentTypeImportService<T> service,
             out IEnumerable<EntityContainer> entityContainersInstalled)
             where T : class, IContentTypeComposition
         {
@@ -798,33 +856,31 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                     if (folderKeys.Length == folders.Length && folderKeys.Length > 0)
                     {
                         rootFolderKey = folderKeys[0];
-                        current = _contentTypeService.GetContainer(rootFolderKey.Value);
+                        current = _contentTypeContainerService.GetAsync(rootFolderKey.Value).GetAwaiter().GetResult();
                     }
 
                     // The folder might already exist, but with a different key, so check if it exists, even if there is a key.
                     // Level 1 = root level folders, there can only be one with the same name
-                    current ??= _contentTypeService.GetContainers(rootFolder, 1).FirstOrDefault();
+                    current ??= _contentTypeContainerService.GetAsync(rootFolder, 1).GetAwaiter().GetResult().FirstOrDefault();
 
                     if (current == null)
                     {
-                        Attempt<OperationResult<OperationResultType, EntityContainer>?> tryCreateFolder =
-                            _contentTypeService.CreateContainer(-1, rootFolderKey ?? Guid.NewGuid(), rootFolder);
+                        Attempt<EntityContainer?, EntityContainerOperationStatus> tryCreateFolder = _contentTypeContainerService
+                            .CreateAsync(rootFolderKey ?? Guid.NewGuid(), rootFolder, parentKey: null, Constants.Security.SuperUserKey)
+                            .GetAwaiter()
+                            .GetResult();
 
-                        if (tryCreateFolder == false)
+                        if (tryCreateFolder.Success is false)
                         {
                             _logger.LogError(
-                                tryCreateFolder.Exception,
-                                "Could not create folder: {FolderName}",
-                                rootFolder);
-                            throw tryCreateFolder.Exception!;
+                                "Could not create folder: {FolderName}. Status: {Status}",
+                                rootFolder,
+                                tryCreateFolder.Status);
+                            throw new InvalidOperationException($"Could not create folder '{rootFolder}'. Status: {tryCreateFolder.Status}");
                         }
 
-                        var rootFolderId = tryCreateFolder.Result?.Entity?.Id;
-                        if (rootFolderId is not null)
-                        {
-                            current = _contentTypeService.GetContainer(rootFolderId.Value);
-                            trackEntityContainersInstalled.Add(current!);
-                        }
+                        current = tryCreateFolder.Result;
+                        trackEntityContainersInstalled.Add(current!);
                     }
 
                     importedFolders.Add(alias!, current!.Id);
@@ -853,17 +909,20 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                                          ?? children.FirstOrDefault(x => x.Name.InvariantEquals(folderName));
             if (matchingChild is not null)
             {
-                return _contentTypeService.GetContainer(matchingChild.Id);
+                return _contentTypeContainerService.GetAsync(matchingChild.Key).GetAwaiter().GetResult();
             }
 
-            Attempt<OperationResult<OperationResultType, EntityContainer>?> tryCreateFolder = _contentTypeService.CreateContainer(current.Id, folderKey, folderName);
-            if (tryCreateFolder == false)
+            Attempt<EntityContainer?, EntityContainerOperationStatus> tryCreateFolder = _contentTypeContainerService
+                .CreateAsync(folderKey, folderName, current.Key, Constants.Security.SuperUserKey)
+                .GetAwaiter()
+                .GetResult();
+            if (tryCreateFolder.Success is false)
             {
-                _logger.LogError(tryCreateFolder.Exception, "Could not create folder: {FolderName}", folderName);
-                throw tryCreateFolder.Exception!;
+                _logger.LogError("Could not create folder: {FolderName}. Status: {Status}", folderName, tryCreateFolder.Status);
+                throw new InvalidOperationException($"Could not create folder '{folderName}'. Status: {tryCreateFolder.Status}");
             }
 
-            return _contentTypeService.GetContainer(tryCreateFolder.Result!.Entity!.Id);
+            return tryCreateFolder.Result;
         }
 
         /// <summary>
@@ -885,7 +944,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         private T CreateContentTypeFromXml<T>(
             XElement documentType,
             IReadOnlyDictionary<string, T> importedContentTypes,
-            IContentTypeBaseService<T> service)
+            IContentTypeImportService<T> service)
             where T : class, IContentTypeComposition
         {
             Guid key = GetContentTypeKey(documentType);
@@ -946,8 +1005,8 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             XElement documentType,
             T? contentType,
             IReadOnlyDictionary<string, T> importedContentTypes,
-            IContentTypeBaseService<T> service)
-            where T : IContentTypeComposition
+            IContentTypeImportService<T> service)
+            where T : class, IContentTypeComposition
         {
             var key = Guid.Parse(documentType.Element("Info")!.Element("Key")!.Value);
 
@@ -1299,8 +1358,8 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             T contentType,
             XElement structureElement,
             IReadOnlyDictionary<string, T> importedContentTypes,
-            IContentTypeBaseService<T> service)
-            where T : IContentTypeComposition
+            IContentTypeImportService<T> service)
+            where T : class, IContentTypeComposition
         {
             var allowedChildren = contentType.AllowedContentTypes?.ToList();
             int sortOrder = allowedChildren?.Any() ?? false ? allowedChildren.Last().SortOrder : 0;
@@ -1337,10 +1396,10 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         /// Used during Content import to ensure that the ContentType of a content item exists
         /// </summary>
         /// <returns></returns>
-        private T FindContentTypeByAlias<T>(string contentTypeAlias, IContentTypeBaseService<T> typeService)
+        private T FindContentTypeByAlias<T>(string contentTypeAlias, Func<string, T?> findContentType)
             where T : IContentTypeComposition
         {
-            T? contentType = typeService.Get(contentTypeAlias)
+            T? contentType = findContentType(contentTypeAlias)
                 ?? throw new Exception($"ContentType matching the passed in Alias: '{contentTypeAlias}' " +
                 $"was null");
 
@@ -2096,6 +2155,52 @@ namespace Umbraco.Cms.Infrastructure.Packaging
 
                 accumulated = fullPath;
             }
+        }
+
+        // Abstracts the content-type operations the importer needs (alias lookup + create/update), so the shared import
+        // logic can run against the async document-type service and the (still synchronous) media/member type services
+        // alike, without depending on the obsolete IContentTypeBaseService<IContentType> bridge.
+        private interface IContentTypeImportService<T>
+            where T : class, IContentTypeComposition
+        {
+            T? Get(string alias);
+
+            Task<Attempt<ContentTypeOperationStatus>> CreateAsync(T item, Guid performingUserKey);
+
+            Task<Attempt<ContentTypeOperationStatus>> UpdateAsync(T item, Guid performingUserKey);
+        }
+
+        // Adapter over the synchronous media/member type services.
+        private sealed class SyncContentTypeImportService<T> : IContentTypeImportService<T>
+            where T : class, IContentTypeComposition
+        {
+            private readonly IContentTypeBaseService<T> _inner;
+
+            public SyncContentTypeImportService(IContentTypeBaseService<T> inner) => _inner = inner;
+
+            public T? Get(string alias) => _inner.Get(alias);
+
+            public Task<Attempt<ContentTypeOperationStatus>> CreateAsync(T item, Guid performingUserKey)
+                => _inner.CreateAsync(item, performingUserKey);
+
+            public Task<Attempt<ContentTypeOperationStatus>> UpdateAsync(T item, Guid performingUserKey)
+                => _inner.UpdateAsync(item, performingUserKey);
+        }
+
+        // Adapter over the asynchronous document-type service.
+        private sealed class DocumentTypeImportService : IContentTypeImportService<IContentType>
+        {
+            private readonly IContentTypeService _inner;
+
+            public DocumentTypeImportService(IContentTypeService inner) => _inner = inner;
+
+            public IContentType? Get(string alias) => _inner.GetAsync(alias).GetAwaiter().GetResult();
+
+            public Task<Attempt<ContentTypeOperationStatus>> CreateAsync(IContentType item, Guid performingUserKey)
+                => _inner.CreateAsync(item, performingUserKey);
+
+            public Task<Attempt<ContentTypeOperationStatus>> UpdateAsync(IContentType item, Guid performingUserKey)
+                => _inner.UpdateAsync(item, performingUserKey);
         }
     }
 }

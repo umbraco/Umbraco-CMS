@@ -30,9 +30,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.EFCore;
 
 /// <summary>
 ///     Provides the shared functionality for the content-type composition repositories (document, media and member
-///     types), running entirely on the EF Core <see cref="UmbracoDbContext"/> (async base) while still exposing the
-///     synchronous <see cref="IContentTypeRepositoryBase{TEntity}"/> contract that the content-type service layer
-///     calls; the sync members bridge to the async work via <c>GetAwaiter().GetResult()</c>.
+///     types), running entirely on the EF Core <see cref="UmbracoDbContext"/> via the asynchronous
+///     <see cref="IAsyncContentTypeRepositoryBase{TEntity}"/> contract.
 /// </summary>
 /// <remarks>
 ///     Derived repositories supply the entity-specific <see cref="NodeObjectTypeId"/> and <see cref="SupportsPublishing"/>,
@@ -115,8 +114,8 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
         => Task.FromResult(GetAllCached().FirstOrDefault(x => x.Key == key));
 
     /// <inheritdoc />
-    protected override Task<IEnumerable<TEntity>?> PerformGetAllAsync()
-        => Task.FromResult(CommonRepository.GetAllTypes()?.OfType<TEntity>());
+    protected override async Task<IEnumerable<TEntity>?> PerformGetAllAsync()
+        => (await CommonRepository.GetAllTypesAsync())?.OfType<TEntity>();
 
     /// <inheritdoc />
     protected override Task<IEnumerable<TEntity>?> PerformGetManyAsync(Guid[]? keys)
@@ -282,9 +281,8 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
             .ToArray();
 
     // ----------------------------------------------------------------------------------------------------
-    // IQuery read path — the where clauses captured by the IQuery (SQL text + args) are appended to a
-    // hand-written id-select and executed by EF Core as raw SQL; matching entities are then hydrated from
-    // the cached full set.
+    // IQuery translation helper — used by the document-type repository's GetByQuery(IQuery<PropertyType>) to
+    // append an IQuery's captured where clauses (SQL text + args) to a hand-written id-select run as raw SQL.
     // ----------------------------------------------------------------------------------------------------
 
     private async Task<IEnumerable<TEntity>> PerformGetByQueryAsync(IQuery<TEntity> query)

@@ -16,7 +16,7 @@ namespace Umbraco.Cms.Core.Services.Navigation;
 ///     so the rebuild queries both object types to build the full tree hierarchy.
 /// </remarks>
 internal sealed class ElementNavigationService :
-    ContentNavigationServiceBase<IContentType, IContentTypeService>,
+    AsyncContentNavigationServiceBase<IContentType, IContentTypeService>,
     IElementNavigationQueryService,
     IElementNavigationManagementService
 {

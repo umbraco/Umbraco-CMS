@@ -56,6 +56,29 @@ public interface IPackageDataInstallation
         where TContentTypeComposition : IContentTypeComposition;
 
     /// <summary>
+    ///     Imports and saves content base items from a compiled package, using the (asynchronous) document type service.
+    /// </summary>
+    /// <typeparam name="TContentBase">The type of content base being imported (e.g., <see cref="IContent"/>).</typeparam>
+    /// <param name="docs">The compiled package content base items to import.</param>
+    /// <param name="importedDocumentTypes">A dictionary of imported document types keyed by their alias.</param>
+    /// <param name="userId">The id of the user performing the import.</param>
+    /// <param name="typeService">The document type service.</param>
+    /// <param name="service">The service for managing content.</param>
+    /// <returns>A read-only list of imported content base items.</returns>
+    /// TODO EFCore : Remove this once media and member types have been migrated, and we can use IContentTypeBaseService again.
+    IReadOnlyList<TContentBase> ImportContentBase<TContentBase>(
+        IEnumerable<CompiledPackageContentBase> docs,
+        IDictionary<string, IContentType> importedDocumentTypes,
+        int userId,
+        IContentTypeService typeService,
+        IContentServiceBase<TContentBase> service)
+        where TContentBase : class, IContentBase
+
+        // TODO (EF Core): Remove this method and its throwing default implementation once media and member
+        // types have been migrated and the generic ImportContentBase overload can be used instead.
+        => throw new NotImplementedException();
+
+    /// <summary>
     ///     Imports and saves a single document type from an <see cref="XElement"/>.
     /// </summary>
     /// <param name="docTypeElement">The XML element representing the document type.</param>

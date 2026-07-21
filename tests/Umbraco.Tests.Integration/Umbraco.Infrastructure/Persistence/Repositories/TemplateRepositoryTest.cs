@@ -519,7 +519,7 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
             var serializer = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
             var tagRepository = new TagRepository(scopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<TagRepository>(), Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
             var commonRepository =
-                new ContentTypeCommonRepository(scopeAccessor, templateRepository, AppCaches, ShortStringHelper);
+                new ContentTypeCommonRepository(newScopeAccessor, templateRepository, AppCaches, ShortStringHelper);
             var languageRepository = new LanguageRepository(newScopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<LanguageRepository>(), Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
             var contentTypeRepository = new ContentTypeRepository(AppCaches.Disabled, LoggerFactory.CreateLogger<ContentTypeRepository>(), commonRepository, languageRepository, Mock.Of<IRepositoryCacheVersionService>(), IdKeyMap, Mock.Of<ICacheSyncService>(), newScopeAccessor);
             var relationTypeRepository = new RelationTypeRepository(newScopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<RelationTypeRepository>(), Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
@@ -553,7 +553,7 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
 
             var contentType =
                 ContentTypeBuilder.CreateSimpleContentType("umbTextpage2", "Textpage", defaultTemplateId: template.Id);
-            contentTypeRepository.Save(contentType);
+            await contentTypeRepository.SaveAsync(contentType, CancellationToken.None);
 
             var textpage = ContentBuilder.CreateSimpleContent(contentType);
             contentRepo.Save(textpage);

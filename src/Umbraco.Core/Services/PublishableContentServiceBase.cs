@@ -1675,8 +1675,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
 
         scope.ReadLock(ReadLockIds);
 
-        IQuery<IContentType> query = Query<IContentType>().Where(x => x.Alias == contentTypeAlias);
-        IContentType? contentType = _contentTypeRepository.Get(query).FirstOrDefault()
+        IContentType? contentType = _contentTypeRepository.GetAsync(contentTypeAlias, CancellationToken.None).GetAwaiter().GetResult()
                                     ??
                                     // causes rollback
                                     throw new Exception($"No ContentType matching the passed in Alias: '{contentTypeAlias}'" +

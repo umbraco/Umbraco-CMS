@@ -12,8 +12,9 @@ internal sealed class MemberTypeEditingPresentationFactory : ContentTypeEditingP
     /// providing functionality for creating member type editing presentations.
     /// </summary>
     /// <param name="memberTypeService">The service used to manage and retrieve member types.</param>
-    public MemberTypeEditingPresentationFactory(IMemberTypeService memberTypeService)
-        : base(memberTypeService)
+    /// <param name="containerService">The service used to retrieve member type containers (folders).</param>
+    public MemberTypeEditingPresentationFactory(IMemberTypeService memberTypeService, IMemberTypeContainerService containerService)
+        : base(containerService, () => memberTypeService.GetAll())
     {
     }
 
@@ -72,9 +73,9 @@ internal sealed class MemberTypeEditingPresentationFactory : ContentTypeEditingP
     /// Maps a collection of <see cref="ContentTypeAvailableCompositionsResult"/> objects to their corresponding <see cref="AvailableMemberTypeCompositionResponseModel"/> representations.
     /// </summary>
     /// <param name="compositionResults">The collection of composition results to map.</param>
-    /// <returns>An enumerable of mapped <see cref="AvailableMemberTypeCompositionResponseModel"/> objects.</returns>
-    public IEnumerable<AvailableMemberTypeCompositionResponseModel> MapCompositionModels(IEnumerable<ContentTypeAvailableCompositionsResult> compositionResults)
-        => compositionResults.Select(MapCompositionModel<AvailableMemberTypeCompositionResponseModel>);
+    /// <returns>A task that represents the asynchronous operation. The task result contains the mapped <see cref="AvailableMemberTypeCompositionResponseModel"/> objects.</returns>
+    public Task<IEnumerable<AvailableMemberTypeCompositionResponseModel>> MapCompositionModelsAsync(IEnumerable<ContentTypeAvailableCompositionsResult> compositionResults)
+        => MapCompositionModelsAsync<AvailableMemberTypeCompositionResponseModel>(compositionResults);
 
     private IEnumerable<Composition> MapCompositions(IEnumerable<MemberTypeComposition> documentTypeCompositions)
         => MapCompositions(documentTypeCompositions

@@ -1,10 +1,7 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
-using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Changes;
@@ -17,7 +14,7 @@ namespace Umbraco.Cms.Core.Services;
 /// <summary>
 ///     Represents the ContentType Service, which is an easy access to operations involving <see cref="IContentType" />
 /// </summary>
-public class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository, IContentType>, IContentTypeService
+public class ContentTypeService : AsyncContentTypeServiceBase<IContentTypeRepository, IContentType>, IContentTypeService
 {
     private readonly ITemplateService _templateService;
     private readonly IContentService _contentService;
@@ -67,248 +64,6 @@ public class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository,
         _templateService = templateService;
         _contentService = contentService;
         _elementService = elementService;
-    }
-
-    [Obsolete("Use the non-obsolete constructor. Scheduled for removal in Umbraco 19.")]
-    public ContentTypeService(
-        ICoreScopeProvider provider,
-        ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory,
-        IContentService contentService,
-        IContentTypeRepository repository,
-        IAuditService auditService,
-        IDocumentTypeContainerRepository entityContainerRepository,
-        IEntityRepository entityRepository,
-        IEventAggregator eventAggregator,
-        IUserIdKeyResolver userIdKeyResolver,
-        ContentTypeFilterCollection contentTypeFilters,
-        ITemplateService templateService)
-        : this(
-            provider,
-            loggerFactory,
-            eventMessagesFactory,
-            contentService,
-            StaticServiceProvider.Instance.GetRequiredService<IElementService>(),
-            repository,
-            auditService,
-            entityContainerRepository,
-            entityRepository,
-            eventAggregator,
-            userIdKeyResolver,
-            contentTypeFilters,
-            templateService)
-    {
-    }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="ContentTypeService" /> class.
-    /// </summary>
-    /// <param name="provider">The core scope provider.</param>
-    /// <param name="loggerFactory">The logger factory.</param>
-    /// <param name="eventMessagesFactory">The event messages factory.</param>
-    /// <param name="contentService">The content service.</param>
-    /// <param name="repository">The content type repository.</param>
-    /// <param name="auditService">The audit service.</param>
-    /// <param name="entityContainerRepository">The document type container repository.</param>
-    /// <param name="entityRepository">The entity repository.</param>
-    /// <param name="eventAggregator">The event aggregator.</param>
-    /// <param name="userIdKeyResolver">The user ID key resolver.</param>
-    /// <param name="contentTypeFilters">The content type filter collection.</param>
-    [Obsolete("Use the non-obsolete constructor. Scheduled for removal in Umbraco 19.")]
-    public ContentTypeService(
-        ICoreScopeProvider provider,
-        ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory,
-        IContentService contentService,
-        IContentTypeRepository repository,
-        IAuditService auditService,
-        IDocumentTypeContainerRepository entityContainerRepository,
-        IEntityRepository entityRepository,
-        IEventAggregator eventAggregator,
-        IUserIdKeyResolver userIdKeyResolver,
-        ContentTypeFilterCollection contentTypeFilters)
-        : this(
-            provider,
-            loggerFactory,
-            eventMessagesFactory,
-            contentService,
-            repository,
-            auditService,
-            entityContainerRepository,
-            entityRepository,
-            eventAggregator,
-            userIdKeyResolver,
-            contentTypeFilters,
-            StaticServiceProvider.Instance.GetRequiredService<ITemplateService>())
-    {
-    }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="ContentTypeService" /> class.
-    /// </summary>
-    /// <param name="provider">The core scope provider.</param>
-    /// <param name="loggerFactory">The logger factory.</param>
-    /// <param name="eventMessagesFactory">The event messages factory.</param>
-    /// <param name="contentService">The content service.</param>
-    /// <param name="repository">The content type repository.</param>
-    /// <param name="auditRepository">The audit repository (obsolete).</param>
-    /// <param name="entityContainerRepository">The document type container repository.</param>
-    /// <param name="entityRepository">The entity repository.</param>
-    /// <param name="eventAggregator">The event aggregator.</param>
-    /// <param name="userIdKeyResolver">The user ID key resolver.</param>
-    /// <param name="contentTypeFilters">The content type filter collection.</param>
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
-    public ContentTypeService(
-        ICoreScopeProvider provider,
-        ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory,
-        IContentService contentService,
-        IContentTypeRepository repository,
-        IAuditRepository auditRepository,
-        IDocumentTypeContainerRepository entityContainerRepository,
-        IEntityRepository entityRepository,
-        IEventAggregator eventAggregator,
-        IUserIdKeyResolver userIdKeyResolver,
-        ContentTypeFilterCollection contentTypeFilters)
-        : this(
-            provider,
-            loggerFactory,
-            eventMessagesFactory,
-            contentService,
-            repository,
-            StaticServiceProvider.Instance.GetRequiredService<IAuditService>(),
-            entityContainerRepository,
-            entityRepository,
-            eventAggregator,
-            userIdKeyResolver,
-            contentTypeFilters,
-            StaticServiceProvider.Instance.GetRequiredService<ITemplateService>())
-    {
-    }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="ContentTypeService" /> class.
-    /// </summary>
-    /// <param name="provider">The core scope provider.</param>
-    /// <param name="loggerFactory">The logger factory.</param>
-    /// <param name="eventMessagesFactory">The event messages factory.</param>
-    /// <param name="contentService">The content service.</param>
-    /// <param name="repository">The content type repository.</param>
-    /// <param name="auditRepository">The audit repository (obsolete).</param>
-    /// <param name="auditService">The audit service.</param>
-    /// <param name="entityContainerRepository">The document type container repository.</param>
-    /// <param name="entityRepository">The entity repository.</param>
-    /// <param name="eventAggregator">The event aggregator.</param>
-    /// <param name="userIdKeyResolver">The user ID key resolver.</param>
-    /// <param name="contentTypeFilters">The content type filter collection.</param>
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
-    public ContentTypeService(
-        ICoreScopeProvider provider,
-        ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory,
-        IContentService contentService,
-        IContentTypeRepository repository,
-        IAuditRepository auditRepository,
-        IAuditService auditService,
-        IDocumentTypeContainerRepository entityContainerRepository,
-        IEntityRepository entityRepository,
-        IEventAggregator eventAggregator,
-        IUserIdKeyResolver userIdKeyResolver,
-        ContentTypeFilterCollection contentTypeFilters)
-        : this(
-            provider,
-            loggerFactory,
-            eventMessagesFactory,
-            contentService,
-            repository,
-            auditService,
-            entityContainerRepository,
-            entityRepository,
-            eventAggregator,
-            userIdKeyResolver,
-            contentTypeFilters,
-            StaticServiceProvider.Instance.GetRequiredService<ITemplateService>())
-    {
-    }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="ContentTypeService" /> class.
-    /// </summary>
-    /// <param name="provider">The core scope provider.</param>
-    /// <param name="loggerFactory">The logger factory.</param>
-    /// <param name="eventMessagesFactory">The event messages factory.</param>
-    /// <param name="contentService">The content service.</param>
-    /// <param name="repository">The content type repository.</param>
-    /// <param name="auditRepository">The audit repository (obsolete).</param>
-    /// <param name="auditService">The audit service.</param>
-    /// <param name="entityContainerRepository">The document type container repository.</param>
-    /// <param name="entityRepository">The entity repository.</param>
-    /// <param name="eventAggregator">The event aggregator.</param>
-    /// <param name="userIdKeyResolver">The user ID key resolver.</param>
-    /// <param name="contentTypeFilters">The content type filter collection.</param>
-    /// <param name="templateService">The template service.</param>
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
-    public ContentTypeService(
-        ICoreScopeProvider provider,
-        ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory,
-        IContentService contentService,
-        IContentTypeRepository repository,
-        IAuditRepository auditRepository,
-        IAuditService auditService,
-        IDocumentTypeContainerRepository entityContainerRepository,
-        IEntityRepository entityRepository,
-        IEventAggregator eventAggregator,
-        IUserIdKeyResolver userIdKeyResolver,
-        ContentTypeFilterCollection contentTypeFilters,
-        ITemplateService templateService)
-        : this(
-            provider,
-            loggerFactory,
-            eventMessagesFactory,
-            contentService,
-            repository,
-            auditService,
-            entityContainerRepository,
-            entityRepository,
-            eventAggregator,
-            userIdKeyResolver,
-            contentTypeFilters,
-            templateService)
-    {
-    }
-
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
-    public ContentTypeService(
-        ICoreScopeProvider provider,
-        ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory,
-        IContentService contentService,
-        IElementService elementService,
-        IContentTypeRepository repository,
-        IAuditRepository auditRepository,
-        IAuditService auditService,
-        IDocumentTypeContainerRepository entityContainerRepository,
-        IEntityRepository entityRepository,
-        IEventAggregator eventAggregator,
-        IUserIdKeyResolver userIdKeyResolver,
-        ContentTypeFilterCollection contentTypeFilters,
-        ITemplateService templateService)
-        : this(
-            provider,
-            loggerFactory,
-            eventMessagesFactory,
-            contentService,
-            elementService,
-            repository,
-            auditService,
-            entityContainerRepository,
-            entityRepository,
-            eventAggregator,
-            userIdKeyResolver,
-            contentTypeFilters,
-            templateService)
-    {
     }
 
     /// <inheritdoc />
@@ -370,22 +125,6 @@ public class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository,
         }
     }
 
-    /// <summary>
-    ///     Gets content types by query.
-    /// </summary>
-    /// <param name="query">The query to filter content types.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>A collection of content types matching the query.</returns>
-    public async Task<IEnumerable<IContentType>> GetByQueryAsync(IQuery<IContentType> query, CancellationToken cancellationToken)
-    {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
-        // that one is special because it works across content, media and member types
-        scope.ReadLock(Constants.Locks.ContentTypes);
-        IEnumerable<IContentType> contentTypes = Repository.Get(query);
-        scope.Complete();
-        return contentTypes;
-    }
-
     /// <inheritdoc />
     public async Task<Attempt<Guid?, ContentTypeOperationStatus>> CreateTemplateAsync(
         Guid contentTypeKey,
@@ -429,7 +168,7 @@ public class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository,
     }
 
     /// <inheritdoc />
-    protected override void DeleteItemsOfTypes(IEnumerable<int> typeIds)
+    protected override Task DeleteItemsOfTypesAsync(IEnumerable<int> typeIds)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
@@ -439,6 +178,8 @@ public class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository,
             _elementService.DeleteOfTypes(typeIdsA);
             scope.Complete();
         }
+
+        return Task.CompletedTask;
     }
 
     #region Notifications

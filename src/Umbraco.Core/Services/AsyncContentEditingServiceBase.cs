@@ -1,0 +1,881 @@
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Extensions;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.Editors;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Services.Filters;
+using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Extensions;
+using IDataEditor = Umbraco.Cms.Core.PropertyEditors.IDataEditor;
+using PropertyEditorCollection = Umbraco.Cms.Core.PropertyEditors.PropertyEditorCollection;
+
+namespace Umbraco.Cms.Core.Services;
+
+internal abstract class AsyncContentEditingServiceBase<TContent, TContentType, TContentService, TContentTypeService>
+    where TContent : class, IContentBase
+    where TContentType : class, IContentTypeComposition
+    where TContentService : IContentServiceBase<TContent>
+    where TContentTypeService : IAsyncContentTypeBaseService<TContentType>
+{
+    private readonly PropertyEditorCollection _propertyEditorCollection;
+    private readonly IDataTypeService _dataTypeService;
+    private readonly ILogger<AsyncContentEditingServiceBase<TContent, TContentType, TContentService, TContentTypeService>> _logger;
+    private readonly IUserIdKeyResolver _userIdKeyResolver;
+    private readonly IContentValidationServiceBase<TContentType> _validationService;
+    private readonly IRelationService _relationService;
+    private readonly ContentTypeFilterCollection _contentTypeFilters;
+    private readonly ILanguageService _languageService;
+    private readonly IUserService _userService;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AsyncContentEditingServiceBase{TContent, TContentType, TContentService, TContentTypeService}"/> class.
+    /// </summary>
+    /// <param name="contentService">The content service.</param>
+    /// <param name="contentTypeService">The content type service.</param>
+    /// <param name="propertyEditorCollection">The property editor collection.</param>
+    /// <param name="dataTypeService">The data type service.</param>
+    /// <param name="logger">The logger.</param>
+    /// <param name="scopeProvider">The scope provider.</param>
+    /// <param name="userIdKeyResolver">The user ID key resolver.</param>
+    /// <param name="validationService">The validation service.</param>
+    /// <param name="optionsMonitor">The content settings options monitor.</param>
+    /// <param name="relationService">The relation service.</param>
+    /// <param name="contentTypeFilters">The content type filter collection.</param>
+    /// <param name="languageService"></param>
+    /// <param name="userService"></param>
+    protected AsyncContentEditingServiceBase(
+        TContentService contentService,
+        TContentTypeService contentTypeService,
+        PropertyEditorCollection propertyEditorCollection,
+        IDataTypeService dataTypeService,
+        ILogger<AsyncContentEditingServiceBase<TContent, TContentType, TContentService, TContentTypeService>> logger,
+        ICoreScopeProvider scopeProvider,
+        IUserIdKeyResolver userIdKeyResolver,
+        IContentValidationServiceBase<TContentType> validationService,
+        IOptionsMonitor<ContentSettings> optionsMonitor,
+        IRelationService relationService,
+        ContentTypeFilterCollection contentTypeFilters,
+        ILanguageService languageService,
+        IUserService userService)
+    {
+        _propertyEditorCollection = propertyEditorCollection;
+        _dataTypeService = dataTypeService;
+        _logger = logger;
+        _userIdKeyResolver = userIdKeyResolver;
+        _validationService = validationService;
+        ContentSettings = optionsMonitor.CurrentValue;
+        optionsMonitor.OnChange((contentSettings) =>
+        {
+            ContentSettings = contentSettings;
+        });
+
+        _relationService = relationService;
+        CoreScopeProvider = scopeProvider;
+        ContentService = contentService;
+        ContentTypeService = contentTypeService;
+        _contentTypeFilters = contentTypeFilters;
+        _languageService = languageService;
+        _userService = userService;
+    }
+
+    public abstract Task<TContent?> GetAsync(Guid key);
+
+    /// <summary>
+    /// Creates a new content entity.
+    /// </summary>
+    /// <param name="name">The name of the content.</param>
+    /// <param name="parentId">The parent identifier.</param>
+    /// <param name="contentType">The content type.</param>
+    /// <returns>A new content entity.</returns>
+    protected abstract TContent New(string name, int parentId, TContentType contentType);
+
+    /// <summary>
+    /// Moves content to a new parent.
+    /// </summary>
+    /// <param name="content">The content to move.</param>
+    /// <param name="newParentId">The new parent identifier.</param>
+    /// <param name="userId">The user performing the operation.</param>
+    /// <returns>The operation result.</returns>
+    protected abstract OperationResult? Move(TContent content, int newParentId, int userId);
+
+    /// <summary>
+    /// Copies content to a new parent.
+    /// </summary>
+    /// <param name="content">The content to copy.</param>
+    /// <param name="newParentId">The new parent identifier.</param>
+    /// <param name="relateToOriginal">Whether to create a relation to the original.</param>
+    /// <param name="includeDescendants">Whether to include descendants in the copy.</param>
+    /// <param name="userKey">The key of the user performing the operation.</param>
+    /// <returns>The copied content, or null if the operation failed.</returns>
+    protected abstract Task<TContent?> CopyAsync(TContent content, int newParentId, bool relateToOriginal, bool includeDescendants, Guid userKey);
+
+    /// <summary>
+    /// Moves content to the recycle bin.
+    /// </summary>
+    /// <param name="content">The content to move to recycle bin.</param>
+    /// <param name="userId">The user performing the operation.</param>
+    /// <returns>The operation result.</returns>
+    protected abstract OperationResult? MoveToRecycleBin(TContent content, int userId);
+
+    /// <summary>
+    /// Deletes content.
+    /// </summary>
+    /// <param name="content">The content to delete.</param>
+    /// <param name="userId">The user performing the operation.</param>
+    /// <returns>The operation result.</returns>
+    protected abstract OperationResult? Delete(TContent content, int userId);
+
+    /// <summary>
+    /// Gets the current content settings.
+    /// </summary>
+    protected ContentSettings ContentSettings { get; private set; }
+
+    /// <summary>
+    /// Gets the core scope provider.
+    /// </summary>
+    protected ICoreScopeProvider CoreScopeProvider { get; }
+
+    /// <summary>
+    /// Gets the content service.
+    /// </summary>
+    protected TContentService ContentService { get; }
+
+    /// <summary>
+    /// Gets the content type service.
+    /// </summary>
+    protected TContentTypeService ContentTypeService { get; }
+
+    /// <summary>
+    /// Gets the alias used to relate the parent entity when handling content (document or media) delete operations.
+    /// </summary>
+    protected virtual string? RelateParentOnDeleteAlias => null;
+
+    /// <summary>
+    /// Maps a content creation model to a new content entity.
+    /// </summary>
+    /// <typeparam name="TContentCreateResult">The type of the creation result.</typeparam>
+    /// <param name="contentCreationModelBase">The content creation model.</param>
+    /// <returns>An attempt containing the creation result and operation status.</returns>
+    protected async Task<Attempt<TContentCreateResult, ContentEditingOperationStatus>> MapCreate<TContentCreateResult>(ContentCreationModelBase contentCreationModelBase)
+        where TContentCreateResult : ContentCreateResultBase<TContent>, new()
+    {
+        Attempt<TContentType?, ContentEditingOperationStatus> validateContentTypeAttempt = await TryGetAndValidateContentTypeAsync(contentCreationModelBase.ContentTypeKey, contentCreationModelBase);
+        TContentType? contentType = validateContentTypeAttempt.Result;
+        if (validateContentTypeAttempt.Success is false || contentType is null)
+        {
+            return Attempt.FailWithStatus(validateContentTypeAttempt.Status, new TContentCreateResult());
+        }
+
+        (int? ParentId, ContentEditingOperationStatus OperationStatus) parent = await TryGetAndValidateParentIdAsync(contentCreationModelBase.ParentKey, contentType);
+        if (parent.OperationStatus != ContentEditingOperationStatus.Success)
+        {
+            return Attempt.FailWithStatus(parent.OperationStatus, new TContentCreateResult());
+        }
+
+        // NOTE: property level validation errors must NOT fail the update - it must be possible to save invalid properties.
+        //       instead, the error state and validation errors will be communicated in the return value.
+        Attempt<ContentValidationResult, ContentEditingOperationStatus> validationResult = await ValidatePropertiesAsync(contentCreationModelBase, contentType);
+
+        TContent content = New(string.Empty, parent.ParentId ?? Constants.System.Root, contentType);
+        if (contentCreationModelBase.Key.HasValue)
+        {
+            content.Key = contentCreationModelBase.Key.Value;
+        }
+
+        UpdateNames(contentCreationModelBase, content, contentType);
+        await UpdateExistingProperties(contentCreationModelBase, content, contentType);
+
+        return Attempt.SucceedWithStatus(validationResult.Status, new TContentCreateResult { Content = content, ValidationResult = validationResult.Result });
+    }
+
+    /// <summary>
+    /// Maps a content editing model to an existing content entity for update.
+    /// </summary>
+    /// <typeparam name="TContentUpdateResult">The type of the update result.</typeparam>
+    /// <param name="content">The existing content entity to update.</param>
+    /// <param name="contentEditingModelBase">The content editing model.</param>
+    /// <returns>An attempt containing the update result and operation status.</returns>
+    protected async Task<Attempt<TContentUpdateResult, ContentEditingOperationStatus>> MapUpdate<TContentUpdateResult>(TContent content, ContentEditingModelBase contentEditingModelBase)
+        where TContentUpdateResult : ContentUpdateResultBase<TContent>, new()
+    {
+        Attempt<TContentType?, ContentEditingOperationStatus> validateContentTypeAttempt = await TryGetAndValidateContentTypeAsync(content.ContentType.Key, contentEditingModelBase);
+        TContentType? contentType = validateContentTypeAttempt.Result;
+        if (validateContentTypeAttempt.Success is false || contentType is null)
+        {
+            return Attempt.FailWithStatus(validateContentTypeAttempt.Status, new TContentUpdateResult { Content = content });
+        }
+
+        // NOTE: property level validation errors must NOT fail the update - it must be possible to save invalid properties.
+        //       instead, the error state and validation errors will be communicated in the return value.
+        Attempt<ContentValidationResult, ContentEditingOperationStatus> validationResult = await ValidatePropertiesAsync(contentEditingModelBase, contentType);
+
+        UpdateNames(contentEditingModelBase, content, contentType);
+        await UpdateExistingProperties(contentEditingModelBase, content, contentType);
+        RemoveMissingProperties(contentEditingModelBase, content, contentType);
+
+        return Attempt.SucceedWithStatus(validationResult.Status, new TContentUpdateResult { Content = content, ValidationResult = validationResult.Result });
+    }
+
+    /// <summary>
+    /// Validates the cultures in the content editing model.
+    /// </summary>
+    /// <param name="contentEditingModelBase">The content editing model to validate.</param>
+    /// <returns><c>true</c> if all cultures are valid; otherwise, <c>false</c>.</returns>
+    protected async Task<bool> ValidateCulturesAsync(ContentEditingModelBase contentEditingModelBase)
+        => await _validationService.ValidateCulturesAsync(contentEditingModelBase);
+
+    protected async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateCulturesAndPropertiesAsync(
+        ContentEditingModelBase contentEditingModelBase,
+        Guid contentTypeKey,
+        IEnumerable<string?>? cultures,
+        Guid userKey)
+    {
+        if (await ValidateCulturesAsync(contentEditingModelBase) is false)
+        {
+            return Attempt.FailWithStatus(ContentEditingOperationStatus.InvalidCulture, new ContentValidationResult());
+        }
+
+        IEnumerable<string?>? culturesToValidate = await GetCulturesToValidate(cultures, userKey);
+        return await ValidatePropertiesAsync(contentEditingModelBase, contentTypeKey, culturesToValidate);
+    }
+
+    /// <summary>
+    /// Validates the properties in the content editing model against the content type.
+    /// </summary>
+    /// <param name="contentEditingModelBase">The content editing model to validate.</param>
+    /// <param name="contentTypeKey">The content type key.</param>
+    /// <param name="culturesToValidate">Optional cultures to restrict validation to.</param>
+    /// <returns>An attempt containing the validation result and operation status.</returns>
+    protected async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidatePropertiesAsync(
+        ContentEditingModelBase contentEditingModelBase,
+        Guid contentTypeKey,
+        IEnumerable<string?>? culturesToValidate = null)
+    {
+        TContentType? contentType = await ContentTypeService.GetAsync(contentTypeKey);
+        if (contentType is null)
+        {
+            return Attempt.FailWithStatus(ContentEditingOperationStatus.ContentTypeNotFound, new ContentValidationResult());
+        }
+
+        return await ValidatePropertiesAsync(contentEditingModelBase, contentType, culturesToValidate);
+    }
+
+    private async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidatePropertiesAsync(
+        ContentEditingModelBase contentEditingModelBase,
+        TContentType contentType,
+        IEnumerable<string?>? culturesToValidate = null)
+    {
+        ContentValidationResult result = await _validationService.ValidatePropertiesAsync(contentEditingModelBase, contentType, culturesToValidate);
+        return result.ValidationErrors.Any() is false
+            ? Attempt.SucceedWithStatus(ContentEditingOperationStatus.Success, result)
+            : Attempt.FailWithStatus(ContentEditingOperationStatus.PropertyValidationError, result);
+    }
+
+    protected async Task<IEnumerable<string?>?> GetCulturesToValidate(IEnumerable<string?>? cultures, Guid userKey)
+    {
+        // Cultures to validate can be provided by the calling code, but if the editor is restricted to only have
+        // access to certain languages, we don't want to validate by any they aren't allowed to edit.
+        HashSet<string> allowedCultures = await GetAllowedCulturesForEditingUser(userKey);
+
+        if (cultures == null)
+        {
+            // If no cultures are provided, we are asking to validate all cultures. But if the user doesn't have access to all, we
+            // should only validate the ones they do.
+            IEnumerable<string> allCultures = await _languageService.GetAllIsoCodesAsync();
+            return allowedCultures.Count == allCultures.Count() ? null : allowedCultures;
+        }
+
+        // If explicit cultures are provided, we should only validate the ones the user has access to.
+        return cultures.Where(x => !string.IsNullOrEmpty(x) && allowedCultures.Contains(x)).ToList();
+    }
+
+    /// <summary>
+    /// Handles moving content to the recycle bin.
+    /// </summary>
+    /// <param name="key">The content key.</param>
+    /// <param name="userKey">The user key performing the operation.</param>
+    /// <returns>An attempt containing the content and operation status.</returns>
+    protected async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleMoveToRecycleBinAsync(Guid key, Guid userKey)
+        => await HandleDeletionAsync(
+                key,
+                userKey,
+                ContentTrashStatusRequirement.MustNotBeTrashed,
+                MoveToRecycleBin,
+                ContentSettings.DisableDeleteWhenReferenced,
+                ContentEditingOperationStatus.CannotMoveToRecycleBinWhenReferenced);
+
+    /// <summary>
+    /// Handles deleting content.
+    /// </summary>
+    /// <param name="key">The content key.</param>
+    /// <param name="userKey">The user key performing the operation.</param>
+    /// <param name="mustBeTrashed">Whether the content must be in the recycle bin to be deleted.</param>
+    /// <returns>An attempt containing the content and operation status.</returns>
+    protected async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleDeleteAsync(Guid key, Guid userKey, bool mustBeTrashed = true)
+        => await HandleDeletionAsync(
+                key,
+                userKey,
+                mustBeTrashed
+                    ? ContentTrashStatusRequirement.MustBeTrashed
+                    : ContentTrashStatusRequirement.Irrelevant,
+                Delete,
+                ContentSettings.DisableDeleteWhenReferenced,
+                ContentEditingOperationStatus.CannotDeleteWhenReferenced);
+
+    // helper method to perform move-to-recycle-bin, delete-from-recycle-bin and delete for content as they are very much handled in the same way
+    // IContentEditingService methods hitting this (ContentTrashStatusRequirement, calledFunction):
+    // DeleteAsync (irrelevant, Delete)
+    // MoveToRecycleBinAsync (MustNotBeTrashed, MoveToRecycleBin)
+    // DeleteFromRecycleBinAsync (MustBeTrashed, Delete)
+    private async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleDeletionAsync(
+        Guid key,
+        Guid userKey,
+        ContentTrashStatusRequirement trashStatusRequirement,
+        Func<TContent, int, OperationResult?> performDelete,
+        bool disabledWhenReferenced,
+        ContentEditingOperationStatus referenceFailStatus)
+    {
+        using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
+        TContent? content = ContentService.GetById(key);
+        if (content == null)
+        {
+            return Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, content);
+        }
+
+        // checking the trash status is not done when it is irrelevant
+        if ((trashStatusRequirement is ContentTrashStatusRequirement.MustBeTrashed && content.Trashed is false)
+            || (trashStatusRequirement is ContentTrashStatusRequirement.MustNotBeTrashed && content.Trashed is true))
+        {
+            ContentEditingOperationStatus status = trashStatusRequirement is ContentTrashStatusRequirement.MustBeTrashed
+                ? ContentEditingOperationStatus.NotInTrash
+                : ContentEditingOperationStatus.InTrash;
+            return Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(status, content);
+        }
+
+        if (disabledWhenReferenced)
+        {
+            // When checking if an item is related, we may need to exclude the "relate parent on delete" relation type, as this prevents
+            // deleting from the recycle bin.
+            int[]? excludeRelationTypeIds = null;
+            if (string.IsNullOrWhiteSpace(RelateParentOnDeleteAlias) is false)
+            {
+                IRelationType? relateParentOnDeleteRelationType = await _relationService.GetRelationTypeByAliasAsync(RelateParentOnDeleteAlias);
+                if (relateParentOnDeleteRelationType is not null)
+                {
+                    excludeRelationTypeIds = [relateParentOnDeleteRelationType.Id];
+                }
+            }
+
+            if (await _relationService.IsRelatedAsync(
+                content.Id,
+                RelationDirectionFilter.Child,
+                excludeRelationTypeIds: excludeRelationTypeIds))
+            {
+                return Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(referenceFailStatus, content);
+            }
+        }
+
+        var userId = await GetUserIdAsync(userKey);
+        OperationResult? deleteResult = performDelete(content, userId);
+
+        scope.Complete();
+
+        return OperationResultToAttempt(content, deleteResult);
+    }
+
+    /// <summary>
+    /// Handles moving content to a new parent.
+    /// </summary>
+    /// <param name="key">The content key.</param>
+    /// <param name="parentKey">The new parent key, or null for root.</param>
+    /// <param name="userKey">The user key performing the operation.</param>
+    /// <param name="mustBeInRecycleBin">Whether the content must be in the recycle bin (for restore operations).</param>
+    /// <returns>An attempt containing the content and operation status.</returns>
+    protected async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleMoveAsync(Guid key, Guid? parentKey, Guid userKey, bool mustBeInRecycleBin = false)
+    {
+        using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
+        TContent? content = ContentService.GetById(key);
+        if (content is null)
+        {
+            return Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, content);
+        }
+
+        if (mustBeInRecycleBin && content.Trashed is false)
+        {
+            return Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(ContentEditingOperationStatus.NotInTrash, content);
+        }
+
+        TContentType? contentType = await ContentTypeService.GetAsync(content.ContentType.Key);
+
+        if (contentType is null)
+        {
+            return Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(ContentEditingOperationStatus.ContentTypeNotFound, content);
+        }
+
+        (int? ParentId, ContentEditingOperationStatus OperationStatus) parent = await TryGetAndValidateParentIdAsync(parentKey, contentType);
+        if (parent.OperationStatus != ContentEditingOperationStatus.Success)
+        {
+            return Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(parent.OperationStatus, content);
+        }
+
+        // special case for move: short circuit the operation if the content is already under the correct parent.
+        if ((parent.ParentId == null && content.ParentId == Constants.System.Root) || (parent.ParentId != null && parent.ParentId == content.ParentId))
+        {
+            return Attempt.SucceedWithStatus<TContent?, ContentEditingOperationStatus>(ContentEditingOperationStatus.Success, content);
+        }
+
+        // special case for move: do not allow moving an item beneath itself.
+        if (parentKey.HasValue)
+        {
+            // at this point the parent MUST exist - unless someone starts using this move method
+            // e.g. for blueprints (which should be handled elsewhere).
+            TContent parentContent = ContentService.GetById(parentKey.Value) ?? throw new InvalidOperationException("The content parent ID was validated, but the parent was not found");
+            if (parentContent.Path.GetIdsFromPath().Contains(content.Id))
+            {
+                return Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(ContentEditingOperationStatus.ParentInvalid, content);
+            }
+        }
+
+        var userId = await GetUserIdAsync(userKey);
+        OperationResult? moveResult = Move(content, parent.ParentId ?? Constants.System.Root, userId);
+
+        scope.Complete();
+
+        return OperationResultToAttempt(content, moveResult);
+    }
+
+    /// <summary>
+    /// Handles copying content to a new parent.
+    /// </summary>
+    /// <param name="key">The content key to copy.</param>
+    /// <param name="parentKey">The new parent key, or null for root.</param>
+    /// <param name="relateToOriginal">Whether to create a relation to the original.</param>
+    /// <param name="includeDescendants">Whether to include descendants in the copy.</param>
+    /// <param name="userKey">The user key performing the operation.</param>
+    /// <returns>An attempt containing the copied content and operation status.</returns>
+    protected async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleCopyAsync(Guid key, Guid? parentKey, bool relateToOriginal, bool includeDescendants, Guid userKey)
+    {
+        using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
+        TContent? content = ContentService.GetById(key);
+        if (content is null)
+        {
+            return Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, content);
+        }
+
+        TContentType? contentType = await ContentTypeService.GetAsync(content.ContentType.Key);
+        if (contentType is null)
+        {
+            return Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(ContentEditingOperationStatus.ContentTypeNotFound, content);
+        }
+
+        (int? ParentId, ContentEditingOperationStatus OperationStatus) parent = await TryGetAndValidateParentIdAsync(parentKey, contentType);
+        if (parent.OperationStatus != ContentEditingOperationStatus.Success)
+        {
+            return Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(parent.OperationStatus, content);
+        }
+
+        TContent? copy = await CopyAsync(content, parent.ParentId ?? Constants.System.Root, relateToOriginal, includeDescendants, userKey);
+        scope.Complete();
+
+        // we'll assume that we have performed all validations for unsuccessful scenarios above, so a null result here
+        // means the copy operation was cancelled by a notification handler
+        return copy != null
+            ? Attempt.SucceedWithStatus<TContent?, ContentEditingOperationStatus>(ContentEditingOperationStatus.Success, copy)
+            : Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(ContentEditingOperationStatus.CancelledByNotification, null);
+    }
+
+    private Attempt<TContent?, ContentEditingOperationStatus> OperationResultToAttempt(TContent? content, OperationResult? operationResult)
+    {
+        ContentEditingOperationStatus operationStatus = OperationResultToOperationStatus(operationResult);
+        return operationStatus == ContentEditingOperationStatus.Success
+            ? Attempt.SucceedWithStatus(operationStatus, content)
+            : Attempt.FailWithStatus(operationStatus, content);
+    }
+
+    /// <summary>
+    /// Converts an operation result to a content editing operation status.
+    /// </summary>
+    /// <param name="operationResult">The operation result to convert.</param>
+    /// <returns>The corresponding content editing operation status.</returns>
+    protected ContentEditingOperationStatus OperationResultToOperationStatus(OperationResult? operationResult)
+        => operationResult?.Result switch
+        {
+            // these are the only result states currently expected from the invoked IContentService operations
+            OperationResultType.Success => ContentEditingOperationStatus.Success,
+            OperationResultType.FailedCancelledByEvent => ContentEditingOperationStatus.CancelledByNotification,
+            OperationResultType.FailedCannot => ContentEditingOperationStatus.CannotDeleteWhenReferenced,
+
+            // for any other state we'll return "unknown" so we know that we need to amend this switch statement
+            _ => ContentEditingOperationStatus.Unknown
+        };
+
+    /// <summary>
+    /// Gets the user ID from the user key.
+    /// </summary>
+    /// <param name="userKey">The user key.</param>
+    /// <returns>The user ID.</returns>
+    protected async Task<int> GetUserIdAsync(Guid userKey) => await _userIdKeyResolver.GetAsync(userKey);
+
+    protected virtual async Task<Attempt<TContentType?, ContentEditingOperationStatus>> TryGetAndValidateContentTypeAsync(Guid contentTypeKey, ContentEditingModelBase contentEditingModelBase)
+    {
+        TContentType? contentType = await ContentTypeService.GetAsync(contentTypeKey);
+        if (contentType == null)
+        {
+            return Attempt.FailWithStatus<TContentType?, ContentEditingOperationStatus>(ContentEditingOperationStatus.ContentTypeNotFound, null);
+        }
+
+        if (contentType.VariesByNothing() && contentEditingModelBase.Variants.Any(v => v.Culture is null && v.Segment is null) is false)
+        {
+            // does not vary by anything and is missing the invariant name = invalid
+            return Attempt.FailWithStatus<TContentType?, ContentEditingOperationStatus>(ContentEditingOperationStatus.ContentTypeCultureVarianceMismatch, null);
+        }
+
+        if (contentType.VariesByCulture() && contentEditingModelBase.Variants.Any(v => v.Culture is null))
+        {
+            // varies by culture with one or more variants not bound to a culture = invalid
+            return Attempt.FailWithStatus<TContentType?, ContentEditingOperationStatus>(ContentEditingOperationStatus.ContentTypeCultureVarianceMismatch, null);
+        }
+
+        if (contentType.VariesBySegment() && contentEditingModelBase.Variants.Any(v => v.Segment is null) is false)
+        {
+            // varies by segment with no default segment variants = invalid
+            return Attempt.FailWithStatus<TContentType?, ContentEditingOperationStatus>(ContentEditingOperationStatus.ContentTypeSegmentVarianceMismatch, null);
+        }
+
+        var propertyTypesByAlias = contentType.CompositionPropertyTypes.ToDictionary(pt => pt.Alias);
+        var propertyValuesAndVariance = contentEditingModelBase
+            .Properties
+            .Select(pv => new
+            {
+                VariesByCulture = pv.Culture is not null,
+                VariesBySegment = pv.Segment is not null,
+                PropertyValue = pv
+            })
+            .ToArray();
+
+        // verify that all property values are defined as property types
+        if (propertyValuesAndVariance.Any(pv => propertyTypesByAlias.ContainsKey(pv.PropertyValue.Alias) == false))
+        {
+            return Attempt.FailWithStatus<TContentType?, ContentEditingOperationStatus>(ContentEditingOperationStatus.PropertyTypeNotFound, null);
+        }
+
+        // verify that all properties match their respective property type culture variance
+        if (propertyValuesAndVariance.Any(pv =>
+            {
+                IPropertyType propertyType = propertyTypesByAlias[pv.PropertyValue.Alias];
+                return propertyType.VariesByCulture() != pv.VariesByCulture;
+            }))
+        {
+            return Attempt.FailWithStatus<TContentType?, ContentEditingOperationStatus>(ContentEditingOperationStatus.PropertyTypeCultureVarianceMismatch, null);
+        }
+
+        // verify that all properties match their respective property type segment variance
+        if (propertyValuesAndVariance.Any(pv =>
+            {
+                IPropertyType propertyType = propertyTypesByAlias[pv.PropertyValue.Alias];
+                return propertyType.VariesBySegment() is false && pv.VariesBySegment;
+            }))
+        {
+            return Attempt.FailWithStatus<TContentType?, ContentEditingOperationStatus>(ContentEditingOperationStatus.PropertyTypeSegmentVarianceMismatch, null);
+        }
+
+        return Attempt.SucceedWithStatus<TContentType?, ContentEditingOperationStatus>(ContentEditingOperationStatus.Success, contentType);
+    }
+
+    /// <summary>
+    /// Attempts to get and validate the parent ID for content creation or move operations.
+    /// </summary>
+    /// <param name="parentKey">The parent key, or null for root.</param>
+    /// <param name="contentType">The content type being created or moved.</param>
+    /// <returns>A tuple containing the parent ID (if valid) and the operation status.</returns>
+    protected virtual async Task<(int? ParentId, ContentEditingOperationStatus OperationStatus)> TryGetAndValidateParentIdAsync(Guid? parentKey, TContentType contentType)
+    {
+        TContent? parent = parentKey.HasValue
+            ? ContentService.GetById(parentKey.Value)
+            : null;
+
+        if (parentKey.HasValue && parent == null)
+        {
+            return (null, ContentEditingOperationStatus.ParentNotFound);
+        }
+
+        if (parent == null &&
+            (contentType.AllowedAsRoot == false ||
+
+            // We could have a content type filter registered that prevents the content from being created at the root level,
+            // even if it's allowed in the content type definition.
+            await IsAllowedAtRootByContentTypeFilters(contentType) == false))
+        {
+            return (null, ContentEditingOperationStatus.NotAllowed);
+        }
+
+        if (parent != null)
+        {
+            if (parent.Trashed)
+            {
+                return (null, ContentEditingOperationStatus.InTrash);
+            }
+
+            TContentType? parentContentType = await ContentTypeService.GetAsync(parent.ContentType.Key);
+            Guid[] allowedContentTypeKeys = parentContentType?.AllowedContentTypes?.Select(c => c.Key).ToArray()
+                                            ?? Array.Empty<Guid>();
+
+            if (allowedContentTypeKeys.Contains(contentType.Key) == false ||
+
+                // We could have a content type filter registered that prevents the content from being created as a child,
+                // even if it's allowed in the content type definition.
+                await IsAllowedAsChildByContentTypeFilters(contentType, parentContentType!.Key, parent.Key) == false)
+            {
+                return (null, ContentEditingOperationStatus.NotAllowed);
+            }
+        }
+
+        return (parent?.Id ?? Constants.System.Root, ContentEditingOperationStatus.Success);
+    }
+
+    private async Task<bool> IsAllowedAtRootByContentTypeFilters(TContentType contentType)
+    {
+        IEnumerable<TContentType> filteredContentTypes = [contentType];
+        foreach (IContentTypeFilter filter in _contentTypeFilters)
+        {
+            filteredContentTypes = await filter.FilterAllowedAtRootAsync(filteredContentTypes);
+        }
+
+        return filteredContentTypes.Any();
+    }
+
+    private async Task<bool> IsAllowedAsChildByContentTypeFilters(TContentType contentType, Guid parentContentTypeKey, Guid parentKey)
+    {
+        IEnumerable<ContentTypeSort> filteredContentTypes = [new ContentTypeSort(contentType.Key, contentType.SortOrder, contentType.Alias)];
+        foreach (IContentTypeFilter filter in _contentTypeFilters)
+        {
+            filteredContentTypes = await filter.FilterAllowedChildrenAsync(filteredContentTypes, parentContentTypeKey, parentKey);
+        }
+
+        return filteredContentTypes.Any();
+    }
+
+    private void UpdateNames(ContentEditingModelBase contentEditingModelBase, TContent content, TContentType contentType)
+    {
+        if (contentType.VariesByCulture())
+        {
+            // get the content names for each culture, keeping in mind that there may be multiple per culture
+            // as each culture can have several segments. we'll prioritize the segment-less names
+            var variantNamesByCulture = contentEditingModelBase.Variants
+                .Where(v => v.Culture.IsNullOrWhiteSpace() == false)
+                .OrderBy(v => v.Segment.IsNullOrWhiteSpace() ? 0 : 1)
+                .GroupBy(v => v.Culture!)
+                .ToDictionary(g => g.Key, g => g.First().Name);
+
+            // update the content names for all cultures
+            foreach (var (culture, name) in variantNamesByCulture)
+            {
+                content.SetCultureName(name, culture);
+            }
+        }
+        else if (contentType.VariesBySegment())
+        {
+            // this should be validated already so it's OK to throw an exception here
+            content.Name = contentEditingModelBase.Variants.FirstOrDefault(v => v.Segment is null)?.Name
+                           ?? throw new ArgumentException("Could not find the default segment variant", nameof(contentEditingModelBase));
+        }
+        else
+        {
+            // this should be validated already so it's OK to throw an exception here
+            content.Name = contentEditingModelBase.Variants.FirstOrDefault(v => v.Culture is null && v.Segment is null)?.Name
+                           ?? throw new ArgumentException("Could not find a culture invariant variant", nameof(contentEditingModelBase));
+        }
+    }
+
+    private async Task UpdateExistingProperties(ContentEditingModelBase contentEditingModelBase, TContent content, TContentType contentType)
+    {
+        // create a mapping dictionary for all content type property types by their property aliases
+        Dictionary<string, IPropertyType> propertyTypesByAlias = GetPropertyTypesByAlias(contentType);
+
+        // remove any properties that do not exist on the content type
+        PropertyValueModel[] propertyValues = contentEditingModelBase
+            .Properties
+            .Where(propertyValue => propertyTypesByAlias.ContainsKey(propertyValue.Alias))
+            .ToArray();
+
+        // update all properties on the content item
+        foreach (PropertyValueModel propertyValue in propertyValues)
+        {
+            // the following checks should already have been validated by now, so it's OK to throw exceptions here
+            if(propertyTypesByAlias.TryGetValue(propertyValue.Alias, out IPropertyType? propertyType) == false
+               || (propertyType.VariesByCulture() && propertyValue.Culture.IsNullOrWhiteSpace())
+               || (propertyType.VariesBySegment() is false && propertyValue.Segment.IsNullOrWhiteSpace() is false))
+            {
+                throw new ArgumentException($"Culture or segment variance mismatch for property: {propertyValue.Alias}", nameof(contentEditingModelBase));
+            }
+
+            // pass the value through the data editor to construct the value to store in the content
+            var dataEditorValue = await GetDataEditorValue(propertyValue.Value, propertyValue.Culture, propertyValue.Segment, propertyType, content);
+            content.SetValue(propertyValue.Alias, dataEditorValue, propertyValue.Culture, propertyValue.Segment);
+        }
+    }
+
+    private void RemoveMissingProperties(ContentEditingModelBase contentEditingModelBase, TContent content, TContentType contentType)
+    {
+        // create a mapping dictionary for all content type property types by their property aliases
+        Dictionary<string, IPropertyType> propertyTypesByAlias = GetPropertyTypesByAlias(contentType);
+        var knownPropertyAliases = contentEditingModelBase
+            .Properties
+            .Select(pv => pv.Alias)
+            .Distinct()
+            .ToArray();
+
+        var missingPropertyAliases = propertyTypesByAlias.Keys.Except(knownPropertyAliases).ToArray();
+        foreach (var propertyAlias in missingPropertyAliases)
+        {
+            content.RemoveValue(propertyAlias);
+        }
+    }
+
+    private async Task<object?> GetDataEditorValue(object? value, string? culture, string? segment, IPropertyType propertyType, TContent content)
+    {
+        // this should already have been validated by now, so it's OK to throw exceptions here
+        if (_propertyEditorCollection.TryGet(propertyType.PropertyEditorAlias, out IDataEditor? dataEditor) == false)
+        {
+            _logger.LogWarning(
+                "Unable to find property editor {PropertyEditorAlias}, for property {PropertyAlias}. Leaving property value unchanged.",
+                propertyType.PropertyEditorAlias,
+                propertyType.Alias);
+
+            return content.GetValue(propertyType.Alias, culture, segment);
+        }
+
+        IDataValueEditor dataValueEditor = dataEditor.GetValueEditor();
+        if (dataValueEditor.IsReadOnly)
+        {
+            // read-only property editor - get and return the current value
+            return content.GetValue(propertyType.Alias, culture, segment);
+        }
+
+        IDataType? dataType = await _dataTypeService.GetAsync(propertyType.DataTypeKey);
+        var data = new ContentPropertyData(value, dataType?.ConfigurationObject)
+        {
+            ContentKey = content.Key,
+            PropertyTypeKey = propertyType.Key
+        };
+
+        var currentValue = content.GetValue(propertyType.Alias, culture, segment);
+        return dataValueEditor.FromEditor(data, currentValue);
+    }
+
+    private static Dictionary<string, IPropertyType> GetPropertyTypesByAlias(TContentType contentType)
+        => contentType.CompositionPropertyTypes.ToDictionary(pt => pt.Alias);
+
+    protected async Task<HashSet<string>> GetAllowedCulturesForEditingUser(Guid userKey)
+    {
+        IUser user = await _userService.GetAsync(userKey)
+                      ?? throw new InvalidOperationException($"Could not find user by key {userKey} when editing or validating content.");
+
+        var allowedLanguageIds = (await user.CalculateAllowedLanguageIdsAsync(_languageService))!;
+
+        return (await _languageService.GetIsoCodesByIdsAsync(allowedLanguageIds)).ToHashSet();
+    }
+
+    /// <summary>
+    /// A temporary method that ensures the data is sent in is overridden by the original data, in cases where the user do not have permissions to change the data.
+    /// </summary>
+    protected async Task<TPublishableContent> EnsureOnlyAllowedFieldsAreUpdated<TPublishableContent>(TPublishableContent contentWithPotentialUnallowedChanges, Guid userKey)
+        where TPublishableContent : IPublishableContentBase, TContent
+    {
+        if (contentWithPotentialUnallowedChanges.ContentType.VariesByCulture() is false)
+        {
+            return contentWithPotentialUnallowedChanges;
+        }
+
+        TContent? existingContent = await GetAsync(contentWithPotentialUnallowedChanges.Key);
+
+        HashSet<string>? allowedCultures = await GetAllowedCulturesForEditingUser(userKey);
+
+        ILanguage? defaultLanguage = await _languageService.GetDefaultLanguageAsync();
+
+        var disallowedCultures = (contentWithPotentialUnallowedChanges.EditedCultures ??
+                               contentWithPotentialUnallowedChanges.PublishedCultures)
+            .Where(culture => allowedCultures.Contains(culture) is false).ToList();
+
+        var allowedToEditDefaultLanguage = allowedCultures.Contains(defaultLanguage?.IsoCode ?? string.Empty);
+
+        var variantProperties = new List<IProperty>();
+        var invariantWithVariantSupportProperties = new List<(IProperty Property, IDataEditor DataEditor)>();
+        var invariantProperties = new List<IProperty>();
+
+        // group properties in processing groups
+        foreach (IProperty property in contentWithPotentialUnallowedChanges.Properties)
+        {
+            if (property.PropertyType.VariesByCulture())
+            {
+                variantProperties.Add(property);
+            }
+            else if (_propertyEditorCollection.TryGet(property.PropertyType.PropertyEditorAlias, out IDataEditor? dataEditor) && dataEditor.CanMergePartialPropertyValues(property.PropertyType))
+            {
+                invariantWithVariantSupportProperties.Add((property, dataEditor));
+            }
+            else
+            {
+                invariantProperties.Add(property);
+            }
+        }
+
+        // if the property varies by culture, simply overwrite the edited property value with the current property value for every culture
+        foreach (IProperty property in variantProperties)
+        {
+            foreach (var culture in disallowedCultures)
+            {
+                    var currentValue = existingContent?.Properties.First(x => x.Alias == property.Alias)
+                        .GetValue(culture, null, false);
+                    property.SetValue(currentValue, culture, null);
+            }
+        }
+
+        // If property does not support merging, we still need to overwrite if we are not allowed to edit invariant properties.
+        if (ContentSettings.AllowEditInvariantFromNonDefault is false && allowedToEditDefaultLanguage is false)
+        {
+            foreach (IProperty property in invariantProperties)
+            {
+                var currentValue = existingContent?.Properties.First(x => x.Alias == property.Alias)
+                    .GetValue(null, null, false);
+                property.SetValue(currentValue, null, null);
+            }
+        }
+
+        // if the property does not vary by culture and the data editor supports variance within invariant property values,
+        // we need perform a merge between the edited property value and the current property value
+        foreach ((IProperty Property, IDataEditor DataEditor) propertyWithEditor in invariantWithVariantSupportProperties)
+        {
+            var currentValue = existingContent?.Properties.First(x => x.Alias == propertyWithEditor.Property.Alias)
+                .GetValue(null, null, false);
+            var editedValue = contentWithPotentialUnallowedChanges.Properties
+                .First(x => x.Alias == propertyWithEditor.Property.Alias).GetValue(null, null, false);
+
+            // update the editedValue with a merged value of invariant data and allowed culture data using the currentValue as a fallback.
+            var mergedValue = propertyWithEditor.DataEditor.MergeVariantInvariantPropertyValue(
+                currentValue,
+                editedValue,
+                ContentSettings.AllowEditInvariantFromNonDefault || (defaultLanguage is not null && allowedCultures.Contains(defaultLanguage.IsoCode)),
+                allowedCultures);
+
+            propertyWithEditor.Property.SetValue(mergedValue, null, null);
+        }
+
+        return contentWithPotentialUnallowedChanges;
+    }
+
+    /// <summary>
+    /// Should never be made public, serves the purpose of a nullable bool but more readable.
+    /// </summary>
+    protected internal enum ContentTrashStatusRequirement
+    {
+        Irrelevant,
+        MustBeTrashed,
+        MustNotBeTrashed
+    }
+}
+

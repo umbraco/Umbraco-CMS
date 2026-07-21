@@ -609,6 +609,36 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                     b.ToTable("umbracoContentVersionCleanupPolicy", (string)null);
                 });
 
+            modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.DataTypeDto", b =>
+                {
+                    b.Property<int>("NodeId")
+                        .HasColumnType("int")
+                        .HasColumnName("nodeId");
+
+                    b.Property<string>("Configuration")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("config");
+
+                    b.Property<string>("DbType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
+                        .HasColumnName("dbType");
+
+                    b.Property<string>("EditorAlias")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("propertyEditorAlias");
+
+                    b.Property<string>("EditorUiAlias")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("propertyEditorUiAlias");
+
+                    b.HasKey("NodeId");
+
+                    b.ToTable("umbracoDataType", (string)null);
+                });
+
             modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.DictionaryDto", b =>
                 {
                     b.Property<int>("Id")
@@ -681,36 +711,6 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("umbracoDistributedJob", (string)null);
-                });
-
-            modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.DataTypeDto", b =>
-                {
-                    b.Property<int>("NodeId")
-                        .HasColumnType("int")
-                        .HasColumnName("nodeId");
-
-                    b.Property<string>("Configuration")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("config");
-
-                    b.Property<string>("DbType")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)")
-                        .HasColumnName("dbType");
-
-                    b.Property<string>("EditorAlias")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("propertyEditorAlias");
-
-                    b.Property<string>("EditorUiAlias")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("propertyEditorUiAlias");
-
-                    b.HasKey("NodeId");
-
-                    b.ToTable("umbracoDataType", (string)null);
                 });
 
             modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.DomainDto", b =>
@@ -976,6 +976,49 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                         .HasName("PK_umbracoLongRunningOperation");
 
                     b.ToTable("umbracoLongRunningOperation", (string)null);
+                });
+
+            modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.MemberPropertyTypeDto", b =>
+                {
+                    b.Property<int>("PrimaryKey")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("pk");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PrimaryKey"));
+
+                    b.Property<bool>("CanEdit")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false)
+                        .HasColumnName("memberCanEdit");
+
+                    b.Property<bool>("IsSensitive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false)
+                        .HasColumnName("isSensitive");
+
+                    b.Property<int>("NodeId")
+                        .HasColumnType("int")
+                        .HasColumnName("NodeId");
+
+                    b.Property<int>("PropertyTypeId")
+                        .HasColumnType("int")
+                        .HasColumnName("propertytypeId");
+
+                    b.Property<bool>("ViewOnProfile")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false)
+                        .HasColumnName("viewOnProfile");
+
+                    b.HasKey("PrimaryKey");
+
+                    b.HasIndex("PropertyTypeId")
+                        .IsUnique();
+
+                    b.ToTable("cmsMemberType", (string)null);
                 });
 
             modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.NodeDto", b =>
@@ -1557,17 +1600,6 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                     b.Navigation("Access");
                 });
 
-            modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.DictionaryDto", b =>
-                {
-                    b.HasOne("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.DictionaryDto", "ParentEntry")
-                        .WithMany()
-                        .HasForeignKey("Parent")
-                        .HasPrincipalKey("UniqueId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.Navigation("ParentEntry");
-                });
-
             modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.ContentType2ContentTypeDto", b =>
                 {
                     b.HasOne("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.NodeDto", "ChildNode")
@@ -1588,7 +1620,6 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
 
                     b.Navigation("ParentNode");
                 });
-
 
             modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.ContentTypeDto", b =>
                 {
@@ -1612,6 +1643,17 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                         .HasConstraintName("FK_umbracoDataType_umbracoNode");
 
                     b.Navigation("NodeDto");
+                });
+
+            modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.DictionaryDto", b =>
+                {
+                    b.HasOne("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.DictionaryDto", "ParentEntry")
+                        .WithMany()
+                        .HasForeignKey("Parent")
+                        .HasPrincipalKey("UniqueId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("ParentEntry");
                 });
 
             modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.LanguageDto", b =>
@@ -1652,6 +1694,18 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                         .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.MemberPropertyTypeDto", b =>
+                {
+                    b.HasOne("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.PropertyTypeDto", "PropertyTypeDto")
+                        .WithOne("MemberPropertyTypeDto")
+                        .HasForeignKey("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.MemberPropertyTypeDto", "PropertyTypeId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired()
+                        .HasConstraintName("FK_cmsMemberType_cmsPropertyType");
+
+                    b.Navigation("PropertyTypeDto");
                 });
 
             modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.NodeDto", b =>
@@ -1765,6 +1819,11 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
             modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.DictionaryDto", b =>
                 {
                     b.Navigation("LanguageText");
+                });
+
+            modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.PropertyTypeDto", b =>
+                {
+                    b.Navigation("MemberPropertyTypeDto");
                 });
 
             modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.PropertyTypeGroupDto", b =>

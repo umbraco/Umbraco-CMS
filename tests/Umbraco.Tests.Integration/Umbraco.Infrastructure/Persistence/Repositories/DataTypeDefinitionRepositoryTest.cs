@@ -34,7 +34,7 @@ internal sealed class DataTypeDefinitionRepositoryTest : UmbracoIntegrationTest
         GetRequiredService<IConfigurationEditorJsonSerializer>();
 
     [Test]
-    public void Can_Find_Usages()
+    public async Task Can_Find_Usages()
     {
         using (ScopeProvider.CreateScope())
         {
@@ -68,7 +68,7 @@ internal sealed class DataTypeDefinitionRepositoryTest : UmbracoIntegrationTest
                     }
                 }
             };
-            ContentTypeRepository.Save(ct);
+            await ContentTypeRepository.SaveAsync(ct, CancellationToken.None);
 
             var usages = DataTypeRepository.FindUsages(dataType1.Id);
 

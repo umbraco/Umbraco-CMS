@@ -616,7 +616,7 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
                 continue;
             }
 
-            IContentType? contentType = _contentTypeService.Get(documentTypeKey);
+            IContentType? contentType = _contentTypeService.GetAsync(documentTypeKey).GetAwaiter().GetResult();
             if (contentType is null)
             {
                 continue;
@@ -758,7 +758,7 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
     {
         if (dt.ParentId > 0)
         {
-            IContentType? parent = _contentTypeService.Get(dt.ParentId);
+            IContentType? parent = _contentTypeService.GetAsync(dt.ParentId).GetAwaiter().GetResult();
             if (parent != null)
             {
                 AddDocumentType(parent, dtl);

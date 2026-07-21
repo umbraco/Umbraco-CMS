@@ -68,13 +68,13 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
         });
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
-        contentType = ContentTypeService.Get(contentType.Id);
+        contentType = await ContentTypeService.GetAsync(contentType.Id);
         Assert.IsFalse(contentType.IsElement);
 
         contentType.IsElement = true;
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
-        contentType = ContentTypeService.Get(contentType.Id);
+        contentType = await ContentTypeService.GetAsync(contentType.Id);
         Assert.IsTrue(contentType.IsElement);
     }
 
@@ -119,7 +119,7 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
         }
 
         // delete the first content type, all other content of different content types should be in the recycle bin
-        ContentTypeService.Delete(contentTypes[0]);
+        await ContentTypeService.DeleteAsync(contentTypes[0], Constants.Security.SuperUserKey);
 
         var found = ContentService.GetByIds(ids);
 
@@ -172,7 +172,7 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
 
             foreach (var contentType in contentTypes.Reverse())
             {
-                ContentTypeService.Delete(contentType);
+                await ContentTypeService.DeleteAsync(contentType, Constants.Security.SuperUserKey);
             }
         }
         finally
@@ -220,7 +220,7 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
                 ContentService.Publish(level3, new[] { "*" });
             }
 
-            ContentTypeService.Delete(contentType1);
+            await ContentTypeService.DeleteAsync(contentType1, Constants.Security.SuperUserKey);
         }
         finally
         {
@@ -278,7 +278,7 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
         var master = hierarchy.First();
 
         // Act
-        var descendants = contentTypeService.GetDescendants(master.Id, false);
+        var descendants = await contentTypeService.GetDescendantsAsync(master.Id, false);
 
         // Assert
         Assert.AreEqual(10, descendants.Count());
@@ -297,7 +297,7 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
         var master = hierarchy.First();
 
         // Act
-        var descendants = contentTypeService.GetDescendants(master.Id, true);
+        var descendants = await contentTypeService.GetDescendantsAsync(master.Id, true);
 
         // Assert
         Assert.AreEqual(11, descendants.Count());
@@ -493,7 +493,7 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
         var content = ContentService.Create("Page 1", -1, childContentType.Alias);
         ContentService.Save(content);
 
-        ContentTypeService.Delete(contentType);
+        await ContentTypeService.DeleteAsync(contentType, Constants.Security.SuperUserKey);
 
         Assert.IsNotNull(content.Id);
         Assert.AreNotEqual(0, content.Id);
@@ -502,8 +502,8 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
         Assert.IsNotNull(contentType.Id);
         Assert.AreNotEqual(0, contentType.Id);
         var deletedContent = ContentService.GetById(content.Id);
-        var deletedChildContentType = ContentTypeService.Get(childContentType.Id);
-        var deletedContentType = ContentTypeService.Get(contentType.Id);
+        var deletedChildContentType = await ContentTypeService.GetAsync(childContentType.Id);
+        var deletedContentType = await ContentTypeService.GetAsync(contentType.Id);
 
         Assert.IsNull(deletedChildContentType);
         Assert.IsNull(deletedContent);
@@ -548,7 +548,7 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
         ContentTypeNotificationHandler.Deleted +=
             notification => deletedEntities += notification.DeletedEntities.Count();
 
-        ContentTypeService.Delete(contentType);
+        await ContentTypeService.DeleteAsync(contentType, Constants.Security.SuperUserKey);
 
         Assert.AreEqual(deletedEntities, 1);
     }
@@ -570,8 +570,8 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
         ContentTypeNotificationHandler.Deleted +=
             notification => deletedEntities += notification.DeletedEntities.Count();
 
-        ContentTypeService.Delete(contentType);
-        ContentTypeService.Delete(contentType2);
+        await ContentTypeService.DeleteAsync(contentType, Constants.Security.SuperUserKey);
+        await ContentTypeService.DeleteAsync(contentType2, Constants.Security.SuperUserKey);
 
         Assert.AreEqual(2, deletedEntities);
     }
@@ -594,7 +594,7 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
         ContentTypeNotificationHandler.Deleted +=
             notification => deletedEntities += notification.DeletedEntities.Count();
 
-        ContentTypeService.Delete(contentType);
+        await ContentTypeService.DeleteAsync(contentType, Constants.Security.SuperUserKey);
 
         Assert.AreEqual(2, deletedEntities);
     }
@@ -618,7 +618,7 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
             Assert.AreEqual(ContentTypeOperationStatus.CancelledByNotification, result);
 
             // Verify the content type was NOT deleted
-            var stillExists = ContentTypeService.Get(contentType.Id);
+            var stillExists = await ContentTypeService.GetAsync(contentType.Id);
             Assert.IsNotNull(stillExists);
         }
         finally
@@ -769,8 +769,8 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
         // Assert
         Assert.That(sut.HasIdentity, Is.True);
 
-        var contentType = ContentTypeService.Get(sut.Id);
-        var category = ContentTypeService.Get(categoryId);
+        var contentType = await ContentTypeService.GetAsync(sut.Id);
+        var category = await ContentTypeService.GetAsync(categoryId);
 
         Assert.That(contentType.CompositionAliases().Any(x => x.Equals("meta")), Is.True);
         Assert.AreEqual(contentType.ParentId, category.ParentId);
@@ -824,8 +824,8 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
         // Assert
         Assert.That(clone.HasIdentity, Is.True);
 
-        var clonedContentType = ContentTypeService.Get(clone.Id);
-        var originalContentType = ContentTypeService.Get(simpleContentType.Id);
+        var clonedContentType = await ContentTypeService.GetAsync(clone.Id);
+        var originalContentType = await ContentTypeService.GetAsync(simpleContentType.Id);
 
         Assert.That(clonedContentType.CompositionAliases().Any(x => x.Equals("parent2")), Is.True);
         Assert.That(clonedContentType.CompositionAliases().Any(x => x.Equals("parent1")), Is.False);
@@ -875,7 +875,7 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
         Assert.IsNotNull(cloned);
         Assert.That(cloned.HasIdentity, Is.True);
 
-        var original = ContentTypeService.Get(categoryId);
+        var original = await ContentTypeService.GetAsync(categoryId);
 
         Assert.AreEqual(cloned.ParentId, -1);
         Assert.AreEqual(cloned.Level, 1);
@@ -941,8 +941,8 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
         // Assert
         Assert.That(clone.HasIdentity, Is.True);
 
-        var clonedContentType = ContentTypeService.Get(clone.Id);
-        var originalContentType = ContentTypeService.Get(simpleContentType.Id);
+        var clonedContentType = await ContentTypeService.GetAsync(clone.Id);
+        var originalContentType = await ContentTypeService.GetAsync(simpleContentType.Id);
 
         Assert.That(clonedContentType.CompositionAliases().Any(x => x.Equals("parent2")), Is.True);
         Assert.That(clonedContentType.CompositionAliases().Any(x => x.Equals("parent1")), Is.False);
@@ -1009,7 +1009,7 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
         // Assert
         Assert.That(added, Is.True);
         Assert.ThrowsAsync<InvalidCompositionException>(async () => await ContentTypeService.CreateAsync(composition, Constants.Security.SuperUserKey));
-        Assert.DoesNotThrow(() => ContentTypeService.Get("simpleChildPage"));
+        Assert.DoesNotThrowAsync(() => ContentTypeService.GetAsync("simpleChildPage"));
     }
 
     [Test]
@@ -1081,10 +1081,10 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
         Assert.ThrowsAsync<InvalidCompositionException>(async () => await ContentTypeService.CreateAsync(metaComposition, Constants.Security.SuperUserKey));
         Assert.ThrowsAsync<InvalidCompositionException>(async () => await ContentTypeService.CreateAsync(seoComposition, Constants.Security.SuperUserKey));
 
-        Assert.DoesNotThrow(() => ContentTypeService.Get("contentPage"));
-        Assert.DoesNotThrow(() => ContentTypeService.Get("advancedPage"));
-        Assert.DoesNotThrow(() => ContentTypeService.Get("meta"));
-        Assert.DoesNotThrow(() => ContentTypeService.Get("seo"));
+        Assert.DoesNotThrowAsync(() => ContentTypeService.GetAsync("contentPage"));
+        Assert.DoesNotThrowAsync(() => ContentTypeService.GetAsync("advancedPage"));
+        Assert.DoesNotThrowAsync(() => ContentTypeService.GetAsync("meta"));
+        Assert.DoesNotThrowAsync(() => ContentTypeService.GetAsync("seo"));
     }
 
     [Test]
@@ -1171,8 +1171,8 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
 
         Assert.ThrowsAsync<InvalidCompositionException>(async () => await ContentTypeService.CreateAsync(basePage, Constants.Security.SuperUserKey));
 
-        Assert.DoesNotThrow(() => ContentTypeService.Get("contentPage"));
-        Assert.DoesNotThrow(() => ContentTypeService.Get("advancedPage"));
+        Assert.DoesNotThrowAsync(() => ContentTypeService.GetAsync("contentPage"));
+        Assert.DoesNotThrowAsync(() => ContentTypeService.GetAsync("advancedPage"));
     }
 
     [Test]
@@ -1300,9 +1300,9 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
 
         Assert.ThrowsAsync<InvalidCompositionException>(async () => await ContentTypeService.CreateAsync(metaComposition, Constants.Security.SuperUserKey));
 
-        Assert.DoesNotThrow(() => ContentTypeService.Get("contentPage"));
-        Assert.DoesNotThrow(() => ContentTypeService.Get("advancedPage"));
-        Assert.DoesNotThrow(() => ContentTypeService.Get("moreAdvancedPage"));
+        Assert.DoesNotThrowAsync(() => ContentTypeService.GetAsync("contentPage"));
+        Assert.DoesNotThrowAsync(() => ContentTypeService.GetAsync("advancedPage"));
+        Assert.DoesNotThrowAsync(() => ContentTypeService.GetAsync("moreAdvancedPage"));
     }
 
     [Test]
@@ -1429,9 +1429,9 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
 
         Assert.That(testAdded, Is.True);
 
-        Assert.DoesNotThrow(() => ContentTypeService.Get("contentPage"));
-        Assert.DoesNotThrow(() => ContentTypeService.Get("advancedPage"));
-        Assert.DoesNotThrow(() => ContentTypeService.Get("moreAdvancedPage"));
+        Assert.DoesNotThrowAsync(() => ContentTypeService.GetAsync("contentPage"));
+        Assert.DoesNotThrowAsync(() => ContentTypeService.GetAsync("advancedPage"));
+        Assert.DoesNotThrowAsync(() => ContentTypeService.GetAsync("moreAdvancedPage"));
     }
 
     [Test]
@@ -1518,8 +1518,8 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
         Assert.That(subtitleAdded, Is.True);
         Assert.That(authorAdded, Is.True);
 
-        Assert.DoesNotThrow(() => ContentTypeService.Get("contentPage"));
-        Assert.DoesNotThrow(() => ContentTypeService.Get("advancedPage"));
+        Assert.DoesNotThrowAsync(() => ContentTypeService.GetAsync("contentPage"));
+        Assert.DoesNotThrowAsync(() => ContentTypeService.GetAsync("advancedPage"));
     }
 
     [Test]
@@ -1606,8 +1606,8 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
 
         Assert.ThrowsAsync<InvalidCompositionException>(async () => await ContentTypeService.CreateAsync(advancedPage, Constants.Security.SuperUserKey));
 
-        Assert.DoesNotThrow(() => ContentTypeService.Get("contentPage"));
-        Assert.DoesNotThrow(() => ContentTypeService.Get("advancedPage"));
+        Assert.DoesNotThrowAsync(() => ContentTypeService.GetAsync("contentPage"));
+        Assert.DoesNotThrowAsync(() => ContentTypeService.GetAsync("advancedPage"));
     }
 
     [Test]
@@ -1776,7 +1776,7 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
         Assert.AreEqual(3, page.PropertyTypes.Count());
 
         // get 'contentPage' content type again
-        var contentPageAgain = ContentTypeService.Get("contentPage");
+        var contentPageAgain = await ContentTypeService.GetAsync("contentPage");
         Assert.IsNotNull(contentPageAgain);
 
         // assert that 'Content_' group is still there because we don't propagate renames
@@ -1944,10 +1944,10 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
         Assert.That(descriptionAdded, Is.True);
         Assert.That(keywordsAdded, Is.True);
 
-        Assert.DoesNotThrow(() => ContentTypeService.Get("contentPage"));
-        Assert.DoesNotThrow(() => ContentTypeService.Get("advancedPage"));
+        Assert.DoesNotThrowAsync(() => ContentTypeService.GetAsync("contentPage"));
+        Assert.DoesNotThrowAsync(() => ContentTypeService.GetAsync("advancedPage"));
 
-        var advancedPageReloaded = ContentTypeService.Get("advancedPage");
+        var advancedPageReloaded = await ContentTypeService.GetAsync("advancedPage");
         var contentUnderscoreTabExists =
             advancedPageReloaded.CompositionPropertyGroups.Any(x => x.Name.Equals("Content_"));
 
@@ -2051,7 +2051,7 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
         Assert.That(subtitleAdded, Is.True);
         Assert.That(authorAdded, Is.True);
 
-        Assert.DoesNotThrow(() => ContentTypeService.Get("contentPage"));
+        Assert.DoesNotThrowAsync(() => ContentTypeService.GetAsync("contentPage"));
     }
 
     [Test]
@@ -2114,10 +2114,10 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
         Assert.That(authorAdded, Is.True);
         Assert.That(compositionAdded, Is.True);
 
-        Assert.DoesNotThrow(() => ContentTypeService.Get("contentPage"));
-        Assert.DoesNotThrow(() => ContentTypeService.Get("advancedPage"));
+        Assert.DoesNotThrowAsync(() => ContentTypeService.GetAsync("contentPage"));
+        Assert.DoesNotThrowAsync(() => ContentTypeService.GetAsync("advancedPage"));
 
-        var contentType = ContentTypeService.Get("contentPage");
+        var contentType = await ContentTypeService.GetAsync("contentPage");
         var propertyGroup = contentType.PropertyGroups["content"];
     }
 
@@ -2160,7 +2160,7 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
         Assert.IsTrue(basePage.AddPropertyType(titlePropertyType, "meta", "Meta"));
 
         await ContentTypeService.CreateAsync(basePage, Constants.Security.SuperUserKey);
-        basePage = ContentTypeService.Get(basePage.Id);
+        basePage = await ContentTypeService.GetAsync(basePage.Id);
 
         var count = basePage.PropertyTypes.Count();
         Assert.AreEqual(2, count);
@@ -2168,7 +2168,7 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
         basePage.RemovePropertyGroup("content");
 
         await ContentTypeService.CreateAsync(basePage, Constants.Security.SuperUserKey);
-        basePage = ContentTypeService.Get(basePage.Id);
+        basePage = await ContentTypeService.GetAsync(basePage.Id);
 
         Assert.AreEqual(count, basePage.PropertyTypes.Count());
     }
@@ -2237,10 +2237,10 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
         Assert.That(authorAdded, Is.True);
         Assert.That(compositionAdded, Is.True);
 
-        Assert.DoesNotThrow(() => ContentTypeService.Get("contentPage"));
-        Assert.DoesNotThrow(() => ContentTypeService.Get("advancedPage"));
+        Assert.DoesNotThrowAsync(() => ContentTypeService.GetAsync("contentPage"));
+        Assert.DoesNotThrowAsync(() => ContentTypeService.GetAsync("advancedPage"));
 
-        var contentType = ContentTypeService.Get("contentPage");
+        var contentType = await ContentTypeService.GetAsync("contentPage");
         var propertyGroup = contentType.PropertyGroups["content"];
 
         var numberOfContentTabs = contentType.CompositionPropertyGroups.Count(x => x.Name.Equals("Content"));
@@ -2264,7 +2264,7 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
         Assert.That(descriptionAdded, Is.True);
 
-        var contentPageReloaded = ContentTypeService.Get("contentPage");
+        var contentPageReloaded = await ContentTypeService.GetAsync("contentPage");
         var propertyGroupReloaded = contentPageReloaded.PropertyGroups["content"];
         var hasDescriptionPropertyType = propertyGroupReloaded.PropertyTypes.Contains("description");
         Assert.That(hasDescriptionPropertyType, Is.True);
@@ -2318,7 +2318,7 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
         await ContentTypeService.CreateAsync(typeC, Constants.Security.SuperUserKey);
 
         // property is variant on A
-        var test = ContentTypeService.Get(typeA.Id);
+        var test = await ContentTypeService.GetAsync(typeA.Id);
         Assert.AreEqual(
             ContentVariation.Culture,
             test.CompositionPropertyTypes.First(x => x.Alias.InvariantEquals("title")).Variations);
@@ -2328,7 +2328,7 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
                 .Variations);
 
         // but not on B
-        test = ContentTypeService.Get(typeB.Id);
+        test = await ContentTypeService.GetAsync(typeB.Id);
         Assert.AreEqual(
             ContentVariation.Nothing,
             test.CompositionPropertyTypes.First(x => x.Alias.InvariantEquals("title")).Variations);
@@ -2338,7 +2338,7 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
                 .Variations);
 
         // but on C
-        test = ContentTypeService.Get(typeC.Id);
+        test = await ContentTypeService.GetAsync(typeC.Id);
         Assert.AreEqual(
             ContentVariation.Culture,
             test.CompositionPropertyTypes.First(x => x.Alias.InvariantEquals("title")).Variations);
@@ -2369,7 +2369,7 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
         await cts.CreateAsync(ctBase, Constants.Security.SuperUserKey);
 
         // Assert
-        ctBase = cts.Get(ctBase.Key);
+        ctBase = await cts.GetAsync(ctBase.Key);
         Assert.That(ctBase, Is.Not.Null);
         Assert.That(ctBase.HasIdentity, Is.True);
         Assert.That(ctBase.PropertyTypes.Count(), Is.EqualTo(1));
@@ -2398,7 +2398,7 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
         await cts.CreateAsync(ctBase, Constants.Security.SuperUserKey);
 
         // Assert
-        ctBase = cts.Get(ctBase.Key);
+        ctBase = await cts.GetAsync(ctBase.Key);
         Assert.That(ctBase, Is.Not.Null);
         Assert.That(ctBase.HasIdentity, Is.True);
         Assert.That(ctBase.PropertyTypes.Count(), Is.EqualTo(1));
@@ -2427,7 +2427,7 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
         Assert.That(result.Status, Is.EqualTo(ContentTypeOperationStatus.Success));
 
         // Verify template was associated with content type
-        var updatedContentType = ContentTypeService.Get(contentType.Key);
+        var updatedContentType = await ContentTypeService.GetAsync(contentType.Key);
         Assert.That(updatedContentType!.AllowedTemplates.Any(t => t.Key == result.Result), Is.True);
     }
 
@@ -2511,7 +2511,7 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
         Assert.That(result.Result, Is.Not.Null);
 
         // Verify template was set as default
-        var updatedContentType = ContentTypeService.Get(contentType.Key);
+        var updatedContentType = await ContentTypeService.GetAsync(contentType.Key);
         Assert.That(updatedContentType!.DefaultTemplate, Is.Not.Null);
         Assert.That(updatedContentType.DefaultTemplate!.Key, Is.EqualTo(result.Result));
     }

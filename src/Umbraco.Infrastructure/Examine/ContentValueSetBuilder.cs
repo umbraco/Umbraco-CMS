@@ -87,7 +87,7 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
 
     private IEnumerable<ValueSet> GetValueSetsEnumerable(IContent[] content, Dictionary<int, IProfile> creatorIds, Dictionary<int, IProfile> writerIds)
     {
-        IDictionary<Guid, IContentType> contentTypeDictionary = _contentTypeService.GetAll().ToDictionary(x => x.Key);
+        IDictionary<Guid, IContentType> contentTypeDictionary = _contentTypeService.GetAllAsync().GetAwaiter().GetResult().ToDictionary(x => x.Key);
 
         var defaultCulture = _languageService.GetDefaultIsoCodeAsync().GetAwaiter().GetResult();
         // TODO: There is a lot of boxing going on here and ultimately all values will be boxed by Lucene anyways

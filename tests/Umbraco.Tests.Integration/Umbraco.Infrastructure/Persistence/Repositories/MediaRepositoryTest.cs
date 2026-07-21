@@ -53,9 +53,9 @@ internal sealed class MediaRepositoryTest : UmbracoIntegrationTest
     {
         appCaches ??= AppCaches.NoCache;
         var scopeAccessor = (IScopeAccessor)provider;
-        var commonRepository =
-            new ContentTypeCommonRepository(scopeAccessor, TemplateRepository, appCaches, ShortStringHelper);
         var efCoreScopeAccessor = GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>();
+        var commonRepository =
+            new ContentTypeCommonRepository(efCoreScopeAccessor, TemplateRepository, appCaches, ShortStringHelper);
         var languageRepository =
             new LanguageRepository(efCoreScopeAccessor, appCaches, LoggerFactory.CreateLogger<LanguageRepository>(), Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
         mediaTypeRepository = new MediaTypeRepository(scopeAccessor, appCaches, LoggerFactory.CreateLogger<MediaTypeRepository>(), commonRepository, languageRepository, ShortStringHelper, Mock.Of<IRepositoryCacheVersionService>(), IdKeyMap, Mock.Of<ICacheSyncService>());

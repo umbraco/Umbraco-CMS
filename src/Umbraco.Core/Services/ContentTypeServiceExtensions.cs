@@ -24,7 +24,7 @@ public static class ContentTypeServiceExtensions
             return Enumerable.Empty<IContentType>();
         }
 
-        return contentTypeService.GetAll().Where(x => x.IsElement);
+        return contentTypeService.GetAllAsync().GetAwaiter().GetResult().Where(x => x.IsElement);
     }
 
     /// <summary>

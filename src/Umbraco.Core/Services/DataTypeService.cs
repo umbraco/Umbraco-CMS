@@ -304,7 +304,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 // what IS weird is that a content type is losing a property and we do NOT raise any
                 // content type event... so ppl better listen on the data type events too.
 
-                _contentTypeRepository.Save(contentType);
+                await _contentTypeRepository.SaveAsync(contentType, CancellationToken.None);
             }
 
             _dataTypeRepository.Delete(dataType);
@@ -319,7 +319,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         }
 
         /// <inheritdoc />
-        public Task<PagedModel<RelationItemModel>> GetPagedRelationsAsync(Guid key, int skip, int take)
+        public async Task<PagedModel<RelationItemModel>> GetPagedRelationsAsync(Guid key, int skip, int take)
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
 
@@ -328,7 +328,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             {
                 // Is an unexpected response, but returning an empty collection aligns with how we handle retrieval of concrete Umbraco
                 // relations based on documents, media and members.
-                return Task.FromResult(new PagedModel<RelationItemModel>());
+                return new PagedModel<RelationItemModel>();
             }
 
             // We don't really need true paging here, as the number of data type relations will be small compared to what there could
@@ -356,7 +356,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
             // Get the content types for the UDIs referenced in the page of items to construct the response from.
             // They could be document, media or member types.
-            List<IContentTypeComposition> contentTypes = GetReferencedContentTypes(pagedUsages);
+            List<IContentTypeComposition> contentTypes = await GetReferencedContentTypesAsync(pagedUsages);
 
             IEnumerable<RelationItemModel> relations = pagedUsages
                 .Select(x =>
@@ -387,8 +387,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                     };
                 });
 
-            var pagedModel = new PagedModel<RelationItemModel>(totalItems, relations);
-            return Task.FromResult(pagedModel);
+            return new PagedModel<RelationItemModel>(totalItems, relations);
         }
 
         /// <summary>
@@ -396,12 +395,14 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// </summary>
         /// <param name="pagedUsages">The paged usages containing property aliases and UDIs.</param>
         /// <returns>A list of content type compositions.</returns>
-        private List<IContentTypeComposition> GetReferencedContentTypes(List<(string PropertyAlias, Udi Udi)> pagedUsages)
+        private async Task<List<IContentTypeComposition>> GetReferencedContentTypesAsync(List<(string PropertyAlias, Udi Udi)> pagedUsages)
         {
-            IEnumerable<IContentTypeComposition> documentTypes = GetContentTypes(
-                pagedUsages,
-                Constants.UdiEntityType.DocumentType,
-                _contentTypeRepository);
+            // The document-type repository is async-only. Media/member repositories are still
+            // synchronous (NPoco) and use the generic helper below.
+            Guid[] documentTypeKeys = GetContentTypeKeys(pagedUsages, Constants.UdiEntityType.DocumentType);
+            IEnumerable<IContentTypeComposition> documentTypes = documentTypeKeys.Length > 0
+                ? await _contentTypeRepository.GetManyAsync(documentTypeKeys, CancellationToken.None)
+                : [];
             IEnumerable<IContentTypeComposition> mediaTypes = GetContentTypes(
                 pagedUsages,
                 Constants.UdiEntityType.MediaType,
@@ -427,15 +428,20 @@ namespace Umbraco.Cms.Core.Services.Implement
             IContentTypeRepositoryBase<T> repository)
             where T : IContentTypeComposition
         {
-            Guid[] contentTypeKeys = dataTypeUsages
-                .Where(x => x.Udi is GuidUdi && x.Udi.EntityType == entityType)
-                .Select(x => ((GuidUdi)x.Udi).Guid)
-                .Distinct()
-                .ToArray();
+            Guid[] contentTypeKeys = GetContentTypeKeys(dataTypeUsages, entityType);
             return contentTypeKeys.Length > 0
                 ? repository.GetMany(contentTypeKeys)
                 : [];
         }
+
+        private static Guid[] GetContentTypeKeys(
+            IEnumerable<(string PropertyAlias, Udi Udi)> dataTypeUsages,
+            string entityType)
+            => dataTypeUsages
+                .Where(x => x.Udi is GuidUdi && x.Udi.EntityType == entityType)
+                .Select(x => ((GuidUdi)x.Udi).Guid)
+                .Distinct()
+                .ToArray();
 
         /// <inheritdoc />
         public IEnumerable<ValidationResult> ValidateConfigurationData(IDataType dataType)

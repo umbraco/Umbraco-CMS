@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Api.Management.ViewModels;
+using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
@@ -10,10 +10,18 @@ namespace Umbraco.Cms.Api.Management.Factories;
 internal abstract class ContentTypeEditingPresentationFactory<TContentType>
     where TContentType : IContentTypeComposition
 {
-    private readonly IContentTypeBaseService<TContentType> _contentTypeService;
+    private readonly IEntityTypeContainerService<TContentType> _containerService;
+    private readonly Func<IEnumerable<TContentType>> _getAllContentTypes;
 
-    protected ContentTypeEditingPresentationFactory(IContentTypeBaseService<TContentType> contentTypeService)
-        => _contentTypeService = contentTypeService;
+    protected ContentTypeEditingPresentationFactory(
+        IEntityTypeContainerService<TContentType> containerService,
+        Func<IEnumerable<TContentType>> getAllContentTypes)
+    {
+        _containerService = containerService;
+        _getAllContentTypes = getAllContentTypes;
+    }
+
+    private IEnumerable<TContentType> GetAllContentTypes() => _getAllContentTypes();
 
     protected TContentTypeEditingModel MapContentTypeEditingModel<
         TContentTypeEditingModel,
@@ -61,7 +69,19 @@ internal abstract class ContentTypeEditingPresentationFactory<TContentType>
             : parentId;
     }
 
-    protected T MapCompositionModel<T>(ContentTypeAvailableCompositionsResult compositionResult)
+    protected async Task<IEnumerable<T>> MapCompositionModelsAsync<T>(IEnumerable<ContentTypeAvailableCompositionsResult> compositionResults)
+        where T : ContentTypeViewModels.AvailableContentTypeCompositionResponseModelBase, new()
+    {
+        var compositionModels = new List<T>();
+        foreach (ContentTypeAvailableCompositionsResult compositionResult in compositionResults)
+        {
+            compositionModels.Add(await MapCompositionModelAsync<T>(compositionResult));
+        }
+
+        return compositionModels;
+    }
+
+    private async Task<T> MapCompositionModelAsync<T>(ContentTypeAvailableCompositionsResult compositionResult)
         where T : ContentTypeViewModels.AvailableContentTypeCompositionResponseModelBase, new()
     {
         IContentTypeComposition composition = compositionResult.Composition;
@@ -69,8 +89,7 @@ internal abstract class ContentTypeEditingPresentationFactory<TContentType>
 
         if (composition is TContentType contentType)
         {
-            var containers = _contentTypeService.GetContainers(contentType);
-            folders = containers.Select(c => c.Name).WhereNotNull();
+            folders = (await _containerService.GetAncestorsAsync(contentType)).Select(c => c.Name).WhereNotNull();
         }
 
         T compositionModel = new()
@@ -88,8 +107,7 @@ internal abstract class ContentTypeEditingPresentationFactory<TContentType>
     protected ContentTypeSort[] MapAllowedContentTypes(IDictionary<Guid, int> allowedContentTypesAndSortOrder)
     {
         // need to fetch the content type aliases to construct the corresponding ContentTypeSort entities
-        IDictionary<Guid, string> contentTypeAliasesByKey = _contentTypeService
-            .GetAll()
+        IDictionary<Guid, string> contentTypeAliasesByKey = GetAllContentTypes()
             .Where(c => allowedContentTypesAndSortOrder.Keys.Contains(c.Key))
             .ToDictionary(c => c.Key, c => c.Alias);
 

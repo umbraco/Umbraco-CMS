@@ -77,9 +77,9 @@ public class ElementRepositoryTest : UmbracoIntegrationTest
 
         var templateRepository = new TemplateRepository(scopeAccessor, appCaches, LoggerFactory.CreateLogger<TemplateRepository>(), LoggerFactory, GetRequiredService<FileSystems>(), ShortStringHelper, Mock.Of<IViewHelper>(), runtimeSettingsMock.Object,  Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
         var tagRepository = new TagRepository(scopeAccessor, appCaches, LoggerFactory.CreateLogger<TagRepository>(), Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
-        var commonRepository =
-            new ContentTypeCommonRepository(scopeAccessor, templateRepository, appCaches, ShortStringHelper);
         var efCoreScopeAccessor = GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>();
+        var commonRepository =
+            new ContentTypeCommonRepository(efCoreScopeAccessor, templateRepository, appCaches, ShortStringHelper);
         var languageRepository =
             new LanguageRepository(efCoreScopeAccessor, appCaches, LoggerFactory.CreateLogger<LanguageRepository>(), Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
         contentTypeRepository = new ContentTypeRepository(appCaches, LoggerFactory.CreateLogger<ContentTypeRepository>(), commonRepository, languageRepository, Mock.Of<IRepositoryCacheVersionService>(), IdKeyMap, Mock.Of<ICacheSyncService>(), efCoreScopeAccessor);
@@ -112,7 +112,7 @@ public class ElementRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void CacheActiveForIntsAndGuids()
+    public async Task CacheActiveForIntsAndGuids()
     {
         var realCache = new AppCaches(
             new ObjectCacheAppCache(),
@@ -131,7 +131,7 @@ public class ElementRepositoryTest : UmbracoIntegrationTest
             udb.EnableSqlCount = false;
 
             var contentType = ContentTypeBuilder.CreateBasicElementType();
-            contentTypeRepository.Save(contentType);
+            await contentTypeRepository.SaveAsync(contentType, CancellationToken.None);
             var content = ElementBuilder.CreateBasicElement(contentType);
             repository.Save(content);
 
@@ -161,7 +161,7 @@ public class ElementRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void CreateVersions()
+    public async Task CreateVersions()
     {
         var provider = ScopeProvider;
         using (var scope = provider.CreateScope())
@@ -169,7 +169,7 @@ public class ElementRepositoryTest : UmbracoIntegrationTest
             var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository, out DataTypeRepository _);
             var versions = new List<int>();
             var hasPropertiesContentType = ContentTypeBuilder.CreateSimpleElementType();
-            contentTypeRepository.Save(hasPropertiesContentType);
+            await contentTypeRepository.SaveAsync(hasPropertiesContentType, CancellationToken.None);
 
             IElement element1 = ElementBuilder.CreateSimpleElement(hasPropertiesContentType);
 

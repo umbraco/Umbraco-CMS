@@ -271,7 +271,7 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
             var contentTypeId = dto.ContentDto.ContentTypeId;
             if (contentTypes.TryGetValue(contentTypeId, out IContentType? contentType) == false)
             {
-                contentTypes[contentTypeId] = contentType = _contentTypeRepository.Get(contentTypeId);
+                contentTypes[contentTypeId] = contentType = _contentTypeRepository.GetAsync(contentTypeId, CancellationToken.None).GetAwaiter().GetResult();
             }
 
             TEntity c = content[i] = BuildEntity(dto, contentType);
@@ -362,7 +362,7 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
     /// <returns>A fully populated content entity.</returns>
     protected TEntity MapDtoToContent(TEntityDto dto)
     {
-        IContentType? contentType = _contentTypeRepository.Get(dto.ContentDto.ContentTypeId);
+        IContentType? contentType = _contentTypeRepository.GetAsync(dto.ContentDto.ContentTypeId, CancellationToken.None).GetAwaiter().GetResult();
         TEntity content = BuildEntity(dto, contentType);
 
         try

@@ -178,7 +178,7 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
     {
         SanitizeModelAliases(model);
 
-        if (ContentTypeAliasCanBeUsedFor(model.Alias, contentType.Key) is false)
+        if (await ContentTypeAliasCanBeUsedForAsync(model.Alias, contentType.Key) is false)
         {
             return Attempt.FailWithStatus<TContentType?, ContentTypeOperationStatus>(ContentTypeOperationStatus.InvalidAlias, null);
         }
@@ -542,9 +542,9 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
     /// <param name="alias">The alias to check.</param>
     /// <param name="key">The key of the content type that wants to use the alias.</param>
     /// <returns><c>true</c> if the alias can be used; otherwise, <c>false</c>.</returns>
-    private bool ContentTypeAliasCanBeUsedFor(string alias, Guid key)
+    private async Task<bool> ContentTypeAliasCanBeUsedForAsync(string alias, Guid key)
     {
-        IContentType? existingContentType = _contentTypeService.Get(alias);
+        IContentType? existingContentType = await _contentTypeService.GetAsync(alias);
         if (existingContentType is null || existingContentType.Key == key)
         {
             return true;

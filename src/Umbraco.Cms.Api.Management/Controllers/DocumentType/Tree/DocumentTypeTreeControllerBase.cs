@@ -57,8 +57,8 @@ public class DocumentTypeTreeControllerBase : FolderTreeControllerBase<DocumentT
 
     protected override async Task<DocumentTypeTreeItemResponseModel[]> MapTreeItemViewModelsAsync(Guid? parentKey, IEntitySlim[] entities)
     {
-        var contentTypes = _contentTypeService
-            .GetMany(entities.Select(entity => entity.Id).ToArray())
+        var contentTypes = (await _contentTypeService
+            .GetManyAsync(entities.Select(entity => entity.Id).ToArray()))
             .ToDictionary(contentType => contentType.Id);
 
         IEnumerable<Task<DocumentTypeTreeItemResponseModel>> tasks = entities.Select(async entity =>

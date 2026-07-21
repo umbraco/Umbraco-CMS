@@ -79,7 +79,7 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
     // TODO: Add test to verify SetDefaultTemplates updates both AllowedTemplates and DefaultTemplate(id).
 
     [Test]
-    public void Retrieval_By_Id_After_Retrieval_By_Id_Is_Cached()
+    public async Task Retrieval_By_Id_After_Retrieval_By_Id_Is_Cached()
     {
         var realCache = new AppCaches(
             new ObjectCacheAppCache(),
@@ -101,7 +101,7 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
         realCache.IsolatedCaches.ClearCache<IContentType>();
 
         // Initial request by Id should hit the database.
-        repository.Get(contentType.Id);
+        await repository.GetAsync(contentType.Id, CancellationToken.None);
         Assert.Greater(database.SqlCount, 0);
 
         // Reset counter.
@@ -109,12 +109,12 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
         database.EnableSqlCount = true;
 
         // Subsequent requests should use the cache.
-        repository.Get(contentType.Id);
+        await repository.GetAsync(contentType.Id, CancellationToken.None);
         Assert.AreEqual(0, database.SqlCount);
     }
 
     [Test]
-    public void Retrieval_By_Key_After_Retrieval_By_Key_Is_Cached()
+    public async Task Retrieval_By_Key_After_Retrieval_By_Key_Is_Cached()
     {
         var realCache = new AppCaches(
             new ObjectCacheAppCache(),
@@ -136,7 +136,7 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
         realCache.IsolatedCaches.ClearCache<IContentType>();
 
         // Initial request by key should hit the database.
-        repository.Get(contentType.Key);
+        await repository.GetAsync(contentType.Key, CancellationToken.None);
         Assert.Greater(database.SqlCount, 0);
 
         // Reset counter.
@@ -144,12 +144,12 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
         database.EnableSqlCount = true;
 
         // Subsequent requests should use the cache.
-        repository.Get(contentType.Key);
+        await repository.GetAsync(contentType.Key, CancellationToken.None);
         Assert.AreEqual(0, database.SqlCount);
     }
 
     [Test]
-    public void Retrieval_By_Key_After_Retrieval_By_Id_Is_Cached()
+    public async Task Retrieval_By_Key_After_Retrieval_By_Id_Is_Cached()
     {
         var realCache = new AppCaches(
             new ObjectCacheAppCache(),
@@ -171,7 +171,7 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
         realCache.IsolatedCaches.ClearCache<IContentType>();
 
         // Initial request by ID should hit the database.
-        repository.Get(contentType.Id);
+        await repository.GetAsync(contentType.Id, CancellationToken.None);
         Assert.Greater(database.SqlCount, 0);
 
         // Reset counter.
@@ -179,15 +179,15 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
         database.EnableSqlCount = true;
 
         // Subsequent requests should use the cache, since the cache by Id and Key was populated on retrieval.
-        repository.Get(contentType.Id);
+        await repository.GetAsync(contentType.Id, CancellationToken.None);
         Assert.AreEqual(0, database.SqlCount);
 
-        repository.Get(contentType.Key);
+        await repository.GetAsync(contentType.Key, CancellationToken.None);
         Assert.AreEqual(0, database.SqlCount);
     }
 
     [Test]
-    public void Retrieval_By_Id_After_Retrieval_By_Key_Is_Cached()
+    public async Task Retrieval_By_Id_After_Retrieval_By_Key_Is_Cached()
     {
         var realCache = new AppCaches(
             new ObjectCacheAppCache(),
@@ -209,7 +209,7 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
         realCache.IsolatedCaches.ClearCache<IContentType>();
 
         // Initial request by key should hit the database.
-        repository.Get(contentType.Key);
+        await repository.GetAsync(contentType.Key, CancellationToken.None);
         Assert.Greater(database.SqlCount, 0);
 
         // Reset counter.
@@ -217,10 +217,10 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
         database.EnableSqlCount = true;
 
         // Subsequent requests should use the cache, since the cache by Id and Key was populated on retrieval.
-        repository.Get(contentType.Key);
+        await repository.GetAsync(contentType.Key, CancellationToken.None);
         Assert.AreEqual(0, database.SqlCount);
 
-        repository.Get(contentType.Id);
+        await repository.GetAsync(contentType.Id, CancellationToken.None);
         Assert.AreEqual(0, database.SqlCount);
     }
 
@@ -228,8 +228,9 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
     {
         appCaches ??= AppCaches;
 
+        var efCoreScopeAccessor = GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>();
         var commonRepository =
-            new ContentTypeCommonRepository(scopeAccessor, TemplateRepository, appCaches, ShortStringHelper);
+            new ContentTypeCommonRepository(efCoreScopeAccessor, TemplateRepository, appCaches, ShortStringHelper);
 
         return new ContentTypeRepository(
             appCaches,
@@ -239,11 +240,11 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
             Mock.Of<IRepositoryCacheVersionService>(),
             IdKeyMap,
             Mock.Of<ICacheSyncService>(),
-            GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>());
+            efCoreScopeAccessor);
     }
 
     [Test]
-    public void Maps_Templates_Correctly()
+    public async Task Maps_Templates_Correctly()
     {
         // Arrange
         var provider = ScopeProvider;
@@ -277,10 +278,10 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
             var contentType = ContentTypeBuilder.CreateSimpleContentType();
             contentType.AllowedTemplates = new[] { templates[0], templates[1] };
             contentType.SetDefaultTemplate(templates[0]);
-            repository.Save(contentType);
+            await repository.SaveAsync(contentType, CancellationToken.None);
 
             // re-get
-            var result = repository.Get(contentType.Id);
+            var result = await repository.GetAsync(contentType.Id, CancellationToken.None);
 
             Assert.AreEqual(2, result.AllowedTemplates.Count());
             Assert.AreEqual(templates[0].Id, result.DefaultTemplate.Id);
@@ -288,7 +289,7 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Move()
+    public async Task Can_Move()
     {
         var provider = ScopeProvider;
         using (var scope = provider.CreateScope())
@@ -303,21 +304,21 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
 
             var contentType = (IContentType)ContentTypeBuilder.CreateBasicContentType("asdfasdf");
             contentType.ParentId = container2.Id;
-            repository.Save(contentType);
+            await repository.SaveAsync(contentType, CancellationToken.None);
 
             // create a
             var contentType2 =
                 (IContentType)new ContentType(ShortStringHelper, contentType, "hello") { Name = "Blahasdfsadf" };
             contentType.ParentId = contentType.Id;
-            repository.Save(contentType2);
+            await repository.SaveAsync(contentType2, CancellationToken.None);
 
-            var result = repository.Move(contentType, container1).ToArray();
+            var result = (await repository.MoveAsync(contentType, container1, CancellationToken.None)).ToArray();
 
             Assert.AreEqual(2, result.Count());
 
             // re-get
-            contentType = repository.Get(contentType.Id);
-            contentType2 = repository.Get(contentType2.Id);
+            contentType = await repository.GetAsync(contentType.Id, CancellationToken.None);
+            contentType2 = await repository.GetAsync(contentType2.Id, CancellationToken.None);
 
             Assert.AreEqual(container1.Id, contentType.ParentId);
             Assert.AreNotEqual(result.Single(x => x.Entity.Id == contentType.Id).OriginalPath, contentType.Path);
@@ -389,7 +390,7 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Create_Container_Containing_Media_Types()
+    public async Task Can_Create_Container_Containing_Media_Types()
     {
         var provider = ScopeProvider;
         using (var scope = provider.CreateScope())
@@ -400,7 +401,7 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
 
             var contentType = ContentTypeBuilder.CreateSimpleContentType("test", "Test", propertyGroupAlias: "testGroup", propertyGroupName: "testGroup", defaultTemplateId: 0);
             contentType.ParentId = container.Id;
-            repository.Save(contentType);
+            await repository.SaveAsync(contentType, CancellationToken.None);
 
             Assert.AreEqual(container.Id, contentType.ParentId);
         }
@@ -432,7 +433,7 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Perform_Add_On_ContentTypeRepository()
+    public async Task Can_Perform_Add_On_ContentTypeRepository()
     {
         // Arrange
         var provider = ScopeProvider;
@@ -440,9 +441,9 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
         {
             // Act
             var contentType = ContentTypeBuilder.CreateSimpleContentType("test", "Test", propertyGroupAlias: "testGroup", propertyGroupName: "testGroup");
-            ContentTypeRepository.Save(contentType);
+            await ContentTypeRepository.SaveAsync(contentType, CancellationToken.None);
 
-            var fetched = ContentTypeRepository.Get(contentType.Id);
+            var fetched = await ContentTypeRepository.GetAsync(contentType.Id, CancellationToken.None);
 
             // Assert
             Assert.That(contentType.HasIdentity, Is.True);
@@ -465,7 +466,7 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Perform_Update_On_ContentTypeRepository()
+    public async Task Can_Perform_Update_On_ContentTypeRepository()
     {
         // Arrange
         var provider = ScopeProvider;
@@ -474,7 +475,7 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
             var repository = ContentTypeRepository;
 
             // Act
-            var contentType = repository.Get(_textpageContentType.Id);
+            var contentType = await repository.GetAsync(_textpageContentType.Id, CancellationToken.None);
 
             contentType.Thumbnail = "Doc2.png";
             contentType.PropertyGroups["content"].PropertyTypes.Add(
@@ -487,7 +488,7 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
                     DataTypeId = -88,
                     LabelOnTop = true
                 });
-            repository.Save(contentType);
+            await repository.SaveAsync(contentType, CancellationToken.None);
 
             var dirty = contentType.IsDirty();
 
@@ -501,7 +502,7 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Perform_Delete_On_ContentTypeRepository()
+    public async Task Can_Perform_Delete_On_ContentTypeRepository()
     {
         // Arrange
         var provider = ScopeProvider;
@@ -511,12 +512,12 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
 
             // Act
             var contentType = ContentTypeBuilder.CreateSimpleContentType(defaultTemplateId: 0);
-            repository.Save(contentType);
+            await repository.SaveAsync(contentType, CancellationToken.None);
 
-            var contentType2 = repository.Get(contentType.Id);
-            repository.Delete(contentType2);
+            var contentType2 = await repository.GetAsync(contentType.Id, CancellationToken.None);
+            await repository.DeleteAsync(contentType2, CancellationToken.None);
 
-            var exists = repository.Exists(contentType.Id);
+            var exists = await repository.ExistsAsync(contentType.Id, CancellationToken.None);
 
             // Assert
             Assert.That(exists, Is.False);
@@ -524,7 +525,7 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Perform_Delete_With_Heirarchy_On_ContentTypeRepository()
+    public async Task Can_Perform_Delete_With_Heirarchy_On_ContentTypeRepository()
     {
         // Arrange
         var provider = ScopeProvider;
@@ -535,23 +536,23 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
             var ctChild1 = ContentTypeBuilder.CreateSimpleContentType("child1", "Child 1", ctMain, randomizeAliases: true, defaultTemplateId: 0);
             var ctChild2 = ContentTypeBuilder.CreateSimpleContentType("child2", "Child 2", ctChild1, randomizeAliases: true, defaultTemplateId: 0);
 
-            repository.Save(ctMain);
-            repository.Save(ctChild1);
-            repository.Save(ctChild2);
+            await repository.SaveAsync(ctMain, CancellationToken.None);
+            await repository.SaveAsync(ctChild1, CancellationToken.None);
+            await repository.SaveAsync(ctChild2, CancellationToken.None);
 
             // Act
-            var resolvedParent = repository.Get(ctMain.Id);
-            repository.Delete(resolvedParent);
+            var resolvedParent = await repository.GetAsync(ctMain.Id, CancellationToken.None);
+            await repository.DeleteAsync(resolvedParent, CancellationToken.None);
 
             // Assert
-            Assert.That(repository.Exists(ctMain.Id), Is.False);
-            Assert.That(repository.Exists(ctChild1.Id), Is.False);
-            Assert.That(repository.Exists(ctChild2.Id), Is.False);
+            Assert.That(await repository.ExistsAsync(ctMain.Id, CancellationToken.None), Is.False);
+            Assert.That(await repository.ExistsAsync(ctChild1.Id, CancellationToken.None), Is.False);
+            Assert.That(await repository.ExistsAsync(ctChild2.Id, CancellationToken.None), Is.False);
         }
     }
 
     [Test]
-    public void Can_Perform_Query_On_ContentTypeRepository_Sort_By_Name()
+    public async Task Can_Perform_Query_On_ContentTypeRepository_Sort_By_Name()
     {
         IContentType contentType;
 
@@ -560,13 +561,13 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
         using (var scope = provider.CreateScope())
         {
             var repository = ContentTypeRepository;
-            contentType = repository.Get(_textpageContentType.Id);
+            contentType = await repository.GetAsync(_textpageContentType.Id, CancellationToken.None);
             var child1 = ContentTypeBuilder.CreateSimpleContentType("abc", "abc", contentType, randomizeAliases: true, defaultTemplateId: 0);
-            repository.Save(child1);
+            await repository.SaveAsync(child1, CancellationToken.None);
             var child3 = ContentTypeBuilder.CreateSimpleContentType("zyx", "zyx", contentType, randomizeAliases: true, defaultTemplateId: 0);
-            repository.Save(child3);
+            await repository.SaveAsync(child3, CancellationToken.None);
             var child2 = ContentTypeBuilder.CreateSimpleContentType("a123", "a123", contentType, randomizeAliases: true, defaultTemplateId: 0);
-            repository.Save(child2);
+            await repository.SaveAsync(child2, CancellationToken.None);
 
             scope.Complete();
         }
@@ -576,7 +577,7 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
             var repository = ContentTypeRepository;
 
             // Act
-            var contentTypes = repository.Get(provider.CreateQuery<IContentType>().Where(x => x.ParentId == contentType.Id)).ToArray();
+            var contentTypes = (await repository.GetByParentIdAsync(contentType.Id, CancellationToken.None)).ToArray();
 
             // Assert
             Assert.That(contentTypes.Count(), Is.EqualTo(3));
@@ -587,7 +588,7 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Perform_Get_On_ContentTypeRepository()
+    public async Task Can_Perform_Get_On_ContentTypeRepository()
     {
         // Arrange
         var provider = ScopeProvider;
@@ -596,7 +597,7 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
             var repository = ContentTypeRepository;
 
             // Act
-            var contentType = repository.Get(_textpageContentType.Id);
+            var contentType = await repository.GetAsync(_textpageContentType.Id, CancellationToken.None);
 
             // Assert
             Assert.That(contentType, Is.Not.Null);
@@ -605,19 +606,19 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Perform_Get_By_Guid_On_ContentTypeRepository()
+    public async Task Can_Perform_Get_By_Guid_On_ContentTypeRepository()
     {
         // Arrange
         var provider = ScopeProvider;
         using (var scope = provider.CreateScope())
         {
             var repository = ContentTypeRepository;
-            var contentType = repository.Get(_textpageContentType.Id);
+            var contentType = await repository.GetAsync(_textpageContentType.Id, CancellationToken.None);
             var childContentType = ContentTypeBuilder.CreateSimpleContentType("blah", "Blah", contentType, randomizeAliases: true, defaultTemplateId: 0);
-            repository.Save(childContentType);
+            await repository.SaveAsync(childContentType, CancellationToken.None);
 
             // Act
-            var result = repository.Get(childContentType.Key);
+            var result = await repository.GetAsync(childContentType.Key, CancellationToken.None);
 
             // Assert
             Assert.That(result, Is.Not.Null);
@@ -626,7 +627,7 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Perform_Get_By_Missing_Guid_On_ContentTypeRepository()
+    public async Task Can_Perform_Get_By_Missing_Guid_On_ContentTypeRepository()
     {
         // Arrange
         var provider = ScopeProvider;
@@ -635,7 +636,7 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
             var repository = ContentTypeRepository;
 
             // Act
-            var result = repository.Get(Guid.NewGuid());
+            var result = await repository.GetAsync(Guid.NewGuid(), CancellationToken.None);
 
             // Assert
             Assert.That(result, Is.Null);
@@ -643,7 +644,7 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Perform_GetAll_On_ContentTypeRepository()
+    public async Task Can_Perform_GetAll_On_ContentTypeRepository()
     {
         // Arrange
         var provider = ScopeProvider;
@@ -652,7 +653,7 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
             var repository = ContentTypeRepository;
 
             // Act
-            var contentTypes = repository.GetMany().ToArray();
+            var contentTypes = (await repository.GetAllAsync(CancellationToken.None)).ToArray();
             var count =
                 ScopeAccessor.AmbientScope.Database.ExecuteScalar<int>(
                     "SELECT COUNT(*) FROM umbracoNode WHERE nodeObjectType = @NodeObjectType",
@@ -665,17 +666,17 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Perform_GetAll_By_Guid_On_ContentTypeRepository()
+    public async Task Can_Perform_GetAll_By_Guid_On_ContentTypeRepository()
     {
         // Arrange
         var provider = ScopeProvider;
         using (var scope = provider.CreateScope())
         {
             var repository = ContentTypeRepository;
-            var allGuidIds = repository.GetMany().Select(x => x.Key).ToArray();
+            var allGuidIds = (await repository.GetAllAsync(CancellationToken.None)).Select(x => x.Key).ToArray();
 
             // Act
-            var contentTypes = ((IReadRepository<Guid, IContentType>)repository).GetMany(allGuidIds).ToArray();
+            var contentTypes = (await repository.GetManyAsync(allGuidIds, CancellationToken.None)).ToArray();
             var count =
                 ScopeAccessor.AmbientScope.Database.ExecuteScalar<int>(
                     "SELECT COUNT(*) FROM umbracoNode WHERE nodeObjectType = @NodeObjectType",
@@ -688,7 +689,7 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Perform_Exists_On_ContentTypeRepository()
+    public async Task Can_Perform_Exists_On_ContentTypeRepository()
     {
         // Arrange
         var provider = ScopeProvider;
@@ -697,7 +698,7 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
             var repository = ContentTypeRepository;
 
             // Act
-            var exists = repository.Exists(_simpleContentType.Id);
+            var exists = await repository.ExistsAsync(_simpleContentType.Id, CancellationToken.None);
 
             // Assert
             Assert.That(exists, Is.True);
@@ -705,20 +706,20 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Update_ContentType_With_PropertyType_Removed()
+    public async Task Can_Update_ContentType_With_PropertyType_Removed()
     {
         // Arrange
         var provider = ScopeProvider;
         using (var scope = provider.CreateScope())
         {
             var repository = ContentTypeRepository;
-            var contentType = repository.Get(_textpageContentType.Id);
+            var contentType = await repository.GetAsync(_textpageContentType.Id, CancellationToken.None);
 
             // Act
             contentType.PropertyGroups["meta"].PropertyTypes.Remove("description");
-            repository.Save(contentType);
+            await repository.SaveAsync(contentType, CancellationToken.None);
 
-            var result = repository.Get(_textpageContentType.Id);
+            var result = await repository.GetAsync(_textpageContentType.Id, CancellationToken.None);
 
             // Assert
             Assert.That(result.PropertyTypes.Any(x => x.Alias == "description"), Is.False);
@@ -728,7 +729,7 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Verify_PropertyTypes_On_SimpleTextpage()
+    public async Task Can_Verify_PropertyTypes_On_SimpleTextpage()
     {
         // Arrange
         var provider = ScopeProvider;
@@ -737,7 +738,7 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
             var repository = ContentTypeRepository;
 
             // Act
-            var contentType = repository.Get(_simpleContentType.Id);
+            var contentType = await repository.GetAsync(_simpleContentType.Id, CancellationToken.None);
 
             // Assert
             Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(3));
@@ -746,7 +747,7 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Verify_PropertyTypes_On_Textpage()
+    public async Task Can_Verify_PropertyTypes_On_Textpage()
     {
         // Arrange
         var provider = ScopeProvider;
@@ -755,7 +756,7 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
             var repository = ContentTypeRepository;
 
             // Act
-            var contentType = repository.Get(_textpageContentType.Id);
+            var contentType = await repository.GetAsync(_textpageContentType.Id, CancellationToken.None);
 
             // Assert
             Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(4));
@@ -764,14 +765,14 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Verify_PropertyType_With_No_Group()
+    public async Task Can_Verify_PropertyType_With_No_Group()
     {
         // Arrange
         var provider = ScopeProvider;
         using (var scope = provider.CreateScope())
         {
             var repository = ContentTypeRepository;
-            var contentType = repository.Get(_textpageContentType.Id);
+            var contentType = await repository.GetAsync(_textpageContentType.Id, CancellationToken.None);
 
             Assert.That(contentType.PropertyGroups.Count, Is.EqualTo(2));
             Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(4));
@@ -791,10 +792,10 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
             Assert.That(contentType.PropertyGroups.Count, Is.EqualTo(2));
             Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(5));
 
-            repository.Save(contentType);
+            await repository.SaveAsync(contentType, CancellationToken.None);
 
             // Assert
-            var updated = repository.Get(_textpageContentType.Id);
+            var updated = await repository.GetAsync(_textpageContentType.Id, CancellationToken.None);
             Assert.That(addedPropertyType, Is.True);
             Assert.That(updated.PropertyGroups.Count, Is.EqualTo(2));
             Assert.That(updated.PropertyTypes.Count(), Is.EqualTo(5));
@@ -804,7 +805,7 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Verify_AllowedChildContentTypes_On_ContentType()
+    public async Task Can_Verify_AllowedChildContentTypes_On_ContentType()
     {
         // Arrange
         var provider = ScopeProvider;
@@ -815,20 +816,20 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
             var subpageContentType = ContentTypeBuilder.CreateSimpleContentType("umbSubpage", "Subpage");
             var simpleSubpageContentType =
                 ContentTypeBuilder.CreateSimpleContentType("umbSimpleSubpage", "Simple Subpage");
-            repository.Save(subpageContentType);
-            repository.Save(simpleSubpageContentType);
+            await repository.SaveAsync(subpageContentType, CancellationToken.None);
+            await repository.SaveAsync(simpleSubpageContentType, CancellationToken.None);
 
             // Act
-            var contentType = repository.Get(_simpleContentType.Id);
+            var contentType = await repository.GetAsync(_simpleContentType.Id, CancellationToken.None);
             contentType.AllowedContentTypes = new List<ContentTypeSort>
             {
                 new(subpageContentType.Key, 0, subpageContentType.Alias),
                 new(simpleSubpageContentType.Key, 1, simpleSubpageContentType.Alias)
             };
-            repository.Save(contentType);
+            await repository.SaveAsync(contentType, CancellationToken.None);
 
             // Assert
-            var updated = repository.Get(_simpleContentType.Id);
+            var updated = await repository.GetAsync(_simpleContentType.Id, CancellationToken.None);
 
             Assert.That(updated.AllowedContentTypes.Any(), Is.True);
             Assert.That(updated.AllowedContentTypes.Any(x => x.Alias == subpageContentType.Alias), Is.True);
@@ -837,21 +838,21 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Verify_Removal_Of_Used_PropertyType_From_ContentType()
+    public async Task Can_Verify_Removal_Of_Used_PropertyType_From_ContentType()
     {
         // Arrange
         var provider = ScopeProvider;
         using (var scope = provider.CreateScope())
         {
             var repository = ContentTypeRepository;
-            var contentType = repository.Get(_textpageContentType.Id);
+            var contentType = await repository.GetAsync(_textpageContentType.Id, CancellationToken.None);
 
             var subpage = ContentBuilder.CreateTextpageContent(contentType, "Text Page 1", contentType.Id);
             DocumentRepository.Save(subpage);
 
             // Act
             contentType.RemovePropertyType("keywords");
-            repository.Save(contentType);
+            await repository.SaveAsync(contentType, CancellationToken.None);
 
             // Assert
             Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(3));
@@ -862,14 +863,14 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
 
     [Test]
     [LongRunning]
-    public void Can_Verify_Addition_Of_PropertyType_After_ContentType_Is_Used()
+    public async Task Can_Verify_Addition_Of_PropertyType_After_ContentType_Is_Used()
     {
         // Arrange
         var provider = ScopeProvider;
         using (var scope = provider.CreateScope())
         {
             var repository = ContentTypeRepository;
-            var contentType = repository.Get(_textpageContentType.Id);
+            var contentType = await repository.GetAsync(_textpageContentType.Id, CancellationToken.None);
 
             var subpage = ContentBuilder.CreateTextpageContent(contentType, "Text Page 1", contentType.Id);
             DocumentRepository.Save(subpage);
@@ -885,7 +886,7 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
                     SortOrder = 1,
                     DataTypeId = -88
                 });
-            repository.Save(contentType);
+            await repository.SaveAsync(contentType, CancellationToken.None);
 
             // Assert
             Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(5));
@@ -894,7 +895,7 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Verify_Usage_Of_New_PropertyType_On_Content()
+    public async Task Can_Verify_Usage_Of_New_PropertyType_On_Content()
     {
         // Arrange
         var provider = ScopeProvider;
@@ -902,7 +903,7 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
         {
             var repository = ContentTypeRepository;
 
-            var contentType = repository.Get(_textpageContentType.Id);
+            var contentType = await repository.GetAsync(_textpageContentType.Id, CancellationToken.None);
 
             var subpage = ContentBuilder.CreateTextpageContent(contentType, "Text Page 1", contentType.Id);
             DocumentRepository.Save(subpage);
@@ -917,7 +918,7 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
                     SortOrder = 1,
                     DataTypeId = -88
                 });
-            repository.Save(contentType);
+            await repository.SaveAsync(contentType, CancellationToken.None);
 
             // Act
             var content = DocumentRepository.Get(subpage.Id);
@@ -933,7 +934,7 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void
+    public async Task
         Can_Verify_That_A_Combination_Of_Adding_And_Deleting_PropertyTypes_Doesnt_Cause_Issues_For_Content_And_ContentType()
     {
         // Arrange
@@ -942,7 +943,7 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
         {
             var repository = ContentTypeRepository;
 
-            var contentType = repository.Get(_textpageContentType.Id);
+            var contentType = await repository.GetAsync(_textpageContentType.Id, CancellationToken.None);
 
             var subpage = ContentBuilder.CreateTextpageContent(contentType, "Text Page 1", contentType.Id);
             DocumentRepository.Save(subpage);
@@ -961,7 +962,7 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
                     SortOrder = 1,
                     DataTypeId = -88
                 });
-            repository.Save(contentType);
+            await repository.SaveAsync(contentType, CancellationToken.None);
 
             // Act
             var content = DocumentRepository.Get(subpage.Id);
@@ -980,7 +981,7 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Verify_Content_Type_Has_Content_Nodes()
+    public async Task Can_Verify_Content_Type_Has_Content_Nodes()
     {
         // Arrange
         var provider = ScopeProvider;
@@ -989,15 +990,15 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
             var repository = ContentTypeRepository;
 
             var contentTypeId = _textpageContentType.Id;
-            var contentType = repository.Get(contentTypeId);
+            var contentType = await repository.GetAsync(contentTypeId, CancellationToken.None);
 
             // Act
-            var result = repository.HasContentNodes(contentTypeId);
+            var result = await repository.HasContentNodesAsync(contentTypeId, CancellationToken.None);
 
             var subpage = ContentBuilder.CreateTextpageContent(contentType, "Test Page 1", contentType.Id);
             DocumentRepository.Save(subpage);
 
-            var result2 = repository.HasContentNodes(contentTypeId);
+            var result2 = await repository.HasContentNodesAsync(contentTypeId, CancellationToken.None);
 
             // Assert
             Assert.That(result, Is.False);
@@ -1006,7 +1007,7 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Update_Variation_Of_Element_Type_Property()
+    public async Task Can_Update_Variation_Of_Element_Type_Property()
     {
         var provider = ScopeProvider;
         using (var scope = provider.CreateScope())
@@ -1047,7 +1048,7 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
                 new PropertyGroup(contentCollection) { Name = "Content", Alias = "content", SortOrder = 1 });
             elementType.ResetDirtyProperties(false);
             elementType.SetDefaultTemplate(new Template(ShortStringHelper, "ElementType", "elementType"));
-            repository.Save(elementType);
+            await repository.SaveAsync(elementType, CancellationToken.None);
 
             // Create the basic "home" doc type that uses element type as comp
             var docType = new ContentType(ShortStringHelper, -1)
@@ -1067,7 +1068,7 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
                 elementType
             };
             docType.ContentTypeComposition = comp;
-            repository.Save(docType);
+            await repository.SaveAsync(docType, CancellationToken.None);
 
             // Create "home" content
             var content = new Content("Home", -1, docType) { Level = 1, SortOrder = 1, CreatorId = 0, WriterId = 0 };
@@ -1079,11 +1080,11 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
             // Update variation on element type
             elementType.Variations = ContentVariation.Culture;
             elementType.PropertyTypes.First().Variations = ContentVariation.Culture;
-            repository.Save(elementType);
+            await repository.SaveAsync(elementType, CancellationToken.None);
 
             // Update variation on doc type
             docType.Variations = ContentVariation.Culture;
-            repository.Save(docType);
+            await repository.SaveAsync(docType, CancellationToken.None);
 
             // Re fetch renewedContent and make sure that the culture has been set.
             var renewedContent = ContentService.GetById(content.Id);
@@ -1093,51 +1094,51 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Remove_Property_Value_Permissions_On_Removal_Of_Property_Types()
+    public async Task Can_Remove_Property_Value_Permissions_On_Removal_Of_Property_Types()
     {
         var provider = ScopeProvider;
         using (var scope = provider.CreateScope())
         {
             // Create, save and re-retrieve a content type and user group.
             IContentType contentType = ContentTypeBuilder.CreateSimpleContentType(defaultTemplateId: 0);
-            ContentTypeRepository.Save(contentType);
-            contentType = ContentTypeRepository.Get(contentType.Id);
+            await ContentTypeRepository.SaveAsync(contentType, CancellationToken.None);
+            contentType = await ContentTypeRepository.GetAsync(contentType.Id, CancellationToken.None);
 
             var userGroup = CreateUserGroupWithGranularPermissions(contentType);
 
             // Remove property types and verify that the permission is removed from the user group.
             contentType.RemovePropertyType("author");
-            ContentTypeRepository.Save(contentType);
+            await ContentTypeRepository.SaveAsync(contentType, CancellationToken.None);
             userGroup = UserGroupRepository.Get(userGroup.Id);
             Assert.AreEqual(3, userGroup.GranularPermissions.Count);
 
             contentType.RemovePropertyType("bodyText");
-            ContentTypeRepository.Save(contentType);
+            await ContentTypeRepository.SaveAsync(contentType, CancellationToken.None);
             userGroup = UserGroupRepository.Get(userGroup.Id);
             Assert.AreEqual(2, userGroup.GranularPermissions.Count);
 
             contentType.RemovePropertyType("title");
-            ContentTypeRepository.Save(contentType);
+            await ContentTypeRepository.SaveAsync(contentType, CancellationToken.None);
             userGroup = UserGroupRepository.Get(userGroup.Id);
             Assert.AreEqual(0, userGroup.GranularPermissions.Count);
         }
     }
 
     [Test]
-    public void Can_Remove_Property_Value_Permissions_On_Removal_Of_Content_Type()
+    public async Task Can_Remove_Property_Value_Permissions_On_Removal_Of_Content_Type()
     {
         var provider = ScopeProvider;
         using (var scope = provider.CreateScope())
         {
             // Create, save and re-retrieve a content type and user group.
             IContentType contentType = ContentTypeBuilder.CreateSimpleContentType(defaultTemplateId: 0);
-            ContentTypeRepository.Save(contentType);
-            contentType = ContentTypeRepository.Get(contentType.Id);
+            await ContentTypeRepository.SaveAsync(contentType, CancellationToken.None);
+            contentType = await ContentTypeRepository.GetAsync(contentType.Id, CancellationToken.None);
 
             var userGroup = CreateUserGroupWithGranularPermissions(contentType);
 
             // Remove the content type and verify all permissions are removed from the user group.
-            ContentTypeRepository.Delete(contentType);
+            await ContentTypeRepository.DeleteAsync(contentType, CancellationToken.None);
             userGroup = UserGroupRepository.Get(userGroup.Id);
             Assert.AreEqual(0, userGroup.GranularPermissions.Count);
         }
@@ -1172,15 +1173,15 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Get_By_Guid_Returns_Deep_Clone_Not_Cached_Instance()
+    public async Task Get_By_Guid_Returns_Deep_Clone_Not_Cached_Instance()
     {
         var provider = ScopeProvider;
         using (var scope = provider.CreateScope())
         {
             var repository = ContentTypeRepository;
 
-            var first = repository.Get(_simpleContentType.Key);
-            var second = repository.Get(_simpleContentType.Key);
+            var first = await repository.GetAsync(_simpleContentType.Key, CancellationToken.None);
+            var second = await repository.GetAsync(_simpleContentType.Key, CancellationToken.None);
 
             Assert.IsNotNull(first);
             Assert.IsNotNull(second);
@@ -1192,7 +1193,7 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Get_By_Alias_Returns_Correct_ContentType()
+    public async Task Get_By_Alias_Returns_Correct_ContentType()
     {
         var provider = ScopeProvider;
         using (var scope = provider.CreateScope())
@@ -1200,7 +1201,7 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
             var repository = ContentTypeRepository;
 
             // Case-insensitive alias lookup.
-            var result = repository.Get("UMBTEXTPAGE");
+            var result = await repository.GetAsync("UMBTEXTPAGE", CancellationToken.None);
 
             Assert.IsNotNull(result);
             Assert.AreEqual(_simpleContentType.Id, result!.Id);
@@ -1209,15 +1210,15 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Get_By_Alias_Returns_Deep_Clone_Not_Cached_Instance()
+    public async Task Get_By_Alias_Returns_Deep_Clone_Not_Cached_Instance()
     {
         var provider = ScopeProvider;
         using (var scope = provider.CreateScope())
         {
             var repository = ContentTypeRepository;
 
-            var first = repository.Get("umbTextpage");
-            var second = repository.Get("umbTextpage");
+            var first = await repository.GetAsync("umbTextpage", CancellationToken.None);
+            var second = await repository.GetAsync("umbTextpage", CancellationToken.None);
 
             Assert.IsNotNull(first);
             Assert.IsNotNull(second);
@@ -1227,35 +1228,35 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Exists_By_Guid_Returns_True_For_Existing_Type()
+    public async Task Exists_By_Guid_Returns_True_For_Existing_Type()
     {
         var provider = ScopeProvider;
         using (var scope = provider.CreateScope())
         {
             var repository = ContentTypeRepository;
 
-            var exists = repository.Exists(_simpleContentType.Key);
+            var exists = await repository.ExistsAsync(_simpleContentType.Key, CancellationToken.None);
 
             Assert.IsTrue(exists);
         }
     }
 
     [Test]
-    public void Exists_By_Guid_Returns_False_For_NonExisting_Type()
+    public async Task Exists_By_Guid_Returns_False_For_NonExisting_Type()
     {
         var provider = ScopeProvider;
         using (var scope = provider.CreateScope())
         {
             var repository = ContentTypeRepository;
 
-            var exists = repository.Exists(Guid.NewGuid());
+            var exists = await repository.ExistsAsync(Guid.NewGuid(), CancellationToken.None);
 
             Assert.IsFalse(exists);
         }
     }
 
     [Test]
-    public void Get_By_Guid_Mutation_Does_Not_Affect_Subsequent_Get()
+    public async Task Get_By_Guid_Mutation_Does_Not_Affect_Subsequent_Get()
     {
         var provider = ScopeProvider;
         using (var scope = provider.CreateScope())
@@ -1263,13 +1264,13 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
             var repository = ContentTypeRepository;
 
             // Get a content type and mutate its name.
-            var first = repository.Get(_simpleContentType.Key);
+            var first = await repository.GetAsync(_simpleContentType.Key, CancellationToken.None);
             Assert.IsNotNull(first);
             var originalName = first!.Name;
             first.Name = "MUTATED_NAME_" + Guid.NewGuid();
 
             // A subsequent Get should return an unmodified clone.
-            var second = repository.Get(_simpleContentType.Key);
+            var second = await repository.GetAsync(_simpleContentType.Key, CancellationToken.None);
             Assert.IsNotNull(second);
             Assert.AreEqual(originalName, second!.Name, "Mutation of a returned entity should not affect the cached copy");
         }

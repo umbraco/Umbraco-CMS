@@ -63,7 +63,9 @@ internal sealed class ContentTypeRepository : AsyncContentTypeRepositoryBase<ICo
     public IEnumerable<IContentType> GetByQuery(IQuery<PropertyType> query)
     {
         var ints = PerformGetByQueryAsync(query).GetAwaiter().GetResult();
-        return ints.Length > 0 ? GetMany(ints) : Enumerable.Empty<IContentType>();
+        return ints.Length > 0
+            ? GetManyAsync(ints, CancellationToken.None).GetAwaiter().GetResult()
+            : Enumerable.Empty<IContentType>();
     }
 
     private Task<int[]> PerformGetByQueryAsync(IQuery<PropertyType> query)
