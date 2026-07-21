@@ -105,7 +105,7 @@ export class UserGroupUiHelper extends UiBaseLocators {
 
   async clickUserGroupWithName(name: string) {
     await this.click(this.page.getByRole('link', {name: name, exact: true}));
-    await this.page.waitForTimeout(ConstantHelper.wait.short);
+    await expect(this.page).toHaveURL(/\/workspace\/user-group\/edit\//);
   }
 
   async clickDocumentPermissionsByName(permissionName: string[]) {
