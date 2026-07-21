@@ -1,21 +1,8 @@
 using System.Globalization;
 using System.Text.RegularExpressions;
 using Umbraco.Extensions;
-using static Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.SimilarNodeName;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
-
-internal static class ListExtensions
-{
-    internal static bool Contains(this IEnumerable<StructuredName> items, StructuredName model) =>
-        items.Any(x => x.FullName.InvariantEquals(model.FullName));
-
-    internal static bool SimpleNameExists(this IEnumerable<StructuredName> items, string name) =>
-        items.Any(x => x.FullName.InvariantEquals(name));
-
-    internal static bool SuffixedNameExists(this IEnumerable<StructuredName> items) =>
-        items.Any(x => x.Suffix.HasValue);
-}
 
 internal sealed partial class SimilarNodeName
 {
@@ -56,6 +43,13 @@ internal sealed partial class SimilarNodeName
         return uniqueName;
     }
 
+    /// <summary>
+    /// Returns a unique name by comparing the proposed name against a collection of existing names,
+    /// appending or incrementing a " (n)" suffix as required to avoid a collision.
+    /// </summary>
+    /// <param name="names">The existing names to compare against.</param>
+    /// <param name="name">The proposed name to make unique.</param>
+    /// <returns>A unique name derived from <paramref name="name"/>.</returns>
     public static string? GetUniqueName(IEnumerable<string?> names, string? name)
     {
         var model = new StructuredName(name);
@@ -72,7 +66,7 @@ internal sealed partial class SimilarNodeName
         }
 
         // name is empty, and there are other names with suffixes
-        if (model.IsEmptyName() && items.SuffixedNameExists())
+        if (model.IsEmptyName() && SuffixedNameExists(items))
         {
             var emptyNameSuffix = GetSuffixNumber(items);
 
@@ -85,7 +79,7 @@ internal sealed partial class SimilarNodeName
         }
 
         // no suffix - name without suffix does NOT exist - we can just use the name without suffix.
-        if (!model.Suffix.HasValue && !items.SimpleNameExists(model.Text))
+        if (!model.Suffix.HasValue && !SimpleNameExists(items, model.Text))
         {
             model.Suffix = StructuredName._nosuffix;
 
@@ -94,13 +88,13 @@ internal sealed partial class SimilarNodeName
 
         // suffix - name with suffix does NOT exist
         // We can just return the full name as it is as there's no conflict.
-        if (model.Suffix.HasValue && !items.SimpleNameExists(model.FullName))
+        if (model.Suffix.HasValue && !SimpleNameExists(items, model.FullName))
         {
             return model.FullName;
         }
 
         // no suffix - name without suffix does NOT exist, AND name with suffix does NOT exist
-        if (!model.Suffix.HasValue && !items.SimpleNameExists(model.Text) && !items.SuffixedNameExists())
+        if (!model.Suffix.HasValue && !SimpleNameExists(items, model.Text) && !SuffixedNameExists(items))
         {
             model.Suffix = StructuredName._nosuffix;
 
@@ -108,7 +102,7 @@ internal sealed partial class SimilarNodeName
         }
 
         // no suffix - name without suffix exists, however name with suffix does NOT exist
-        if (!model.Suffix.HasValue && items.SimpleNameExists(model.Text) && !items.SuffixedNameExists())
+        if (!model.Suffix.HasValue && SimpleNameExists(items, model.Text) && !SuffixedNameExists(items))
         {
             var firstSuffix = GetFirstSuffix(items);
             model.Suffix = (uint?)firstSuffix;
@@ -117,7 +111,7 @@ internal sealed partial class SimilarNodeName
         }
 
         // no suffix - name without suffix exists, AND name with suffix does exist
-        if (!model.Suffix.HasValue && items.SimpleNameExists(model.Text) && items.SuffixedNameExists())
+        if (!model.Suffix.HasValue && SimpleNameExists(items, model.Text) && SuffixedNameExists(items))
         {
             var nextSuffix = GetSuffixNumber(items);
             model.Suffix = (uint?)nextSuffix;
@@ -126,7 +120,7 @@ internal sealed partial class SimilarNodeName
         }
 
         // no suffix - name without suffix does NOT exist, however name with suffix exists
-        if (!model.Suffix.HasValue && !items.SimpleNameExists(model.Text) && items.SuffixedNameExists())
+        if (!model.Suffix.HasValue && !SimpleNameExists(items, model.Text) && SuffixedNameExists(items))
         {
             var nextSuffix = GetSuffixNumber(items);
             model.Suffix = (uint?)nextSuffix;
@@ -135,7 +129,7 @@ internal sealed partial class SimilarNodeName
         }
 
         // has suffix - name without suffix exists
-        if (model.Suffix.HasValue && items.SimpleNameExists(model.Text))
+        if (model.Suffix.HasValue && SimpleNameExists(items, model.Text))
         {
             var nextSuffix = GetSuffixNumber(items);
             model.Suffix = (uint?)nextSuffix;
@@ -145,7 +139,7 @@ internal sealed partial class SimilarNodeName
 
         // has suffix - name without suffix does NOT exist
         // a case where the user added the suffix, so add a secondary suffix
-        if (model.Suffix.HasValue && !items.SimpleNameExists(model.Text))
+        if (model.Suffix.HasValue && !SimpleNameExists(items, model.Text))
         {
             model.Text = model.FullName;
             model.Suffix = StructuredName._nosuffix;
@@ -159,7 +153,7 @@ internal sealed partial class SimilarNodeName
         }
 
         // has suffix - name without suffix also exists, therefore we simply increment
-        if (model.Suffix.HasValue && items.SimpleNameExists(model.Text))
+        if (model.Suffix.HasValue && SimpleNameExists(items, model.Text))
         {
             var nextSuffix = GetSuffixNumber(items);
             model.Suffix = (uint?)nextSuffix;
@@ -169,6 +163,12 @@ internal sealed partial class SimilarNodeName
 
         return name;
     }
+
+    private static bool SimpleNameExists(IEnumerable<StructuredName> items, string name) =>
+        items.Any(x => x.FullName.InvariantEquals(name));
+
+    private static bool SuffixedNameExists(IEnumerable<StructuredName> items) =>
+        items.Any(x => x.Suffix.HasValue);
 
     private static int GetFirstSuffix(IEnumerable<StructuredName> items)
     {
@@ -205,14 +205,26 @@ internal sealed partial class SimilarNodeName
 
     internal sealed partial class StructuredName
     {
+        /// <summary>
+        /// The suffix applied to the first duplicate of a name (i.e. the "1" in "Name (1)").
+        /// </summary>
         internal const uint Initialsuffix = 1;
+
         private const string Spacecharacter = " ";
 
         [GeneratedRegex(@"(.*) \(([1-9]\d*)\)$")]
         private static partial Regex SuffixedPatternRegex();
 
+        /// <summary>
+        /// Represents the absence of a numeric suffix.
+        /// </summary>
         internal static readonly uint? _nosuffix = default;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="StructuredName"/> class, splitting
+        /// <paramref name="name"/> into its base text and any trailing " (n)" numeric suffix.
+        /// </summary>
+        /// <param name="name">The name to parse.</param>
         internal StructuredName(string? name)
         {
             if (string.IsNullOrWhiteSpace(name))
@@ -252,10 +264,20 @@ internal sealed partial class SimilarNodeName
             }
         }
 
+        /// <summary>
+        /// Gets or sets the base text of the name, i.e. the name without its numeric suffix.
+        /// </summary>
         internal string Text { get; set; }
 
+        /// <summary>
+        /// Gets or sets the numeric suffix parsed from the name, or <c>null</c> when the name has none.
+        /// </summary>
         internal uint? Suffix { get; set; }
 
+        /// <summary>
+        /// Returns a value indicating whether the name has no meaningful base text.
+        /// </summary>
+        /// <returns><c>true</c> if the base text is null or whitespace; otherwise, <c>false</c>.</returns>
         internal bool IsEmptyName() => string.IsNullOrWhiteSpace(Text);
     }
 }
