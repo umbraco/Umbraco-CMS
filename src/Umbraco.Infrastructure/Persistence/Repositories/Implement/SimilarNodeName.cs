@@ -4,6 +4,10 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
+/// <summary>
+/// Represents the name of a node that is similar to another, and provides the logic for resolving a
+/// unique name among a set of siblings by appending or incrementing a " (n)" suffix.
+/// </summary>
 internal sealed partial class SimilarNodeName
 {
     /// <summary>
@@ -55,113 +59,76 @@ internal sealed partial class SimilarNodeName
         var model = new StructuredName(name);
         IEnumerable<StructuredName> items = names
             .Where(x => x?.InvariantStartsWith(model.Text) ?? false) // ignore non-matching names
-            .Select(x => new StructuredName(x)).ToArray();
+            .Select(x => new StructuredName(x))
+            .ToArray();
 
-        // name is empty, and there are no other names with suffixes, so just return " (1)"
-        if (model.IsEmptyName() && !items.Any())
+        if (model.IsEmptyName())
         {
+            return ResolveEmptyName(model, items);
+        }
+
+        return model.Suffix.HasValue
+            ? ResolveSuffixedName(model, items)
+            : ResolveUnsuffixedName(model, items);
+    }
+
+    private static string ResolveEmptyName(StructuredName model, IEnumerable<StructuredName> items)
+    {
+        if (!items.Any())
+        {
+            // Nothing to clash with, so the first duplicate suffix (" (1)") is enough.
             model.Suffix = StructuredName.Initialsuffix;
-
-            return model.FullName;
+        }
+        else if (SuffixedNameExists(items))
+        {
+            model.Suffix = (uint?)GetSuffixNumber(items);
         }
 
-        // name is empty, and there are other names with suffixes
-        if (model.IsEmptyName() && SuffixedNameExists(items))
+        return model.FullName;
+    }
+
+    private static string ResolveUnsuffixedName(StructuredName model, IEnumerable<StructuredName> items)
+    {
+        if (!SimpleNameExists(items, model.Text))
         {
-            var emptyNameSuffix = GetSuffixNumber(items);
-
-            if (emptyNameSuffix > 0)
-            {
-                model.Suffix = (uint?)emptyNameSuffix;
-
-                return model.FullName;
-            }
-        }
-
-        // no suffix - name without suffix does NOT exist - we can just use the name without suffix.
-        if (!model.Suffix.HasValue && !SimpleNameExists(items, model.Text))
-        {
+            // The plain name is free.
             model.Suffix = StructuredName._nosuffix;
-
-            return model.FullName;
+        }
+        else
+        {
+            // The plain name is taken, so take the next free suffix (or the first, if none exist yet).
+            model.Suffix = (uint?)(SuffixedNameExists(items)
+                ? GetSuffixNumber(items)
+                : GetFirstSuffix(items));
         }
 
-        // suffix - name with suffix does NOT exist
-        // We can just return the full name as it is as there's no conflict.
-        if (model.Suffix.HasValue && !SimpleNameExists(items, model.FullName))
+        return model.FullName;
+    }
+
+    private static string ResolveSuffixedName(StructuredName model, IEnumerable<StructuredName> items)
+    {
+        // The suffixed name itself is free, so there is no conflict.
+        if (!SimpleNameExists(items, model.FullName))
         {
             return model.FullName;
         }
 
-        // no suffix - name without suffix does NOT exist, AND name with suffix does NOT exist
-        if (!model.Suffix.HasValue && !SimpleNameExists(items, model.Text) && !SuffixedNameExists(items))
+        // The base name (without the supplied suffix) also exists, so simply take the next suffix.
+        if (SimpleNameExists(items, model.Text))
         {
-            model.Suffix = StructuredName._nosuffix;
+            model.Suffix = (uint?)GetSuffixNumber(items);
 
             return model.FullName;
         }
 
-        // no suffix - name without suffix exists, however name with suffix does NOT exist
-        if (!model.Suffix.HasValue && SimpleNameExists(items, model.Text) && !SuffixedNameExists(items))
-        {
-            var firstSuffix = GetFirstSuffix(items);
-            model.Suffix = (uint?)firstSuffix;
+        // The user supplied a suffix that has no base name of its own, so treat the whole thing as
+        // the base name and add a secondary suffix.
+        model.Text = model.FullName;
+        model.Suffix = StructuredName._nosuffix;
+        items = items.Where(x => x.Text.InvariantStartsWith(model.FullName));
+        model.Suffix = (uint?)GetFirstSuffix(items);
 
-            return model.FullName;
-        }
-
-        // no suffix - name without suffix exists, AND name with suffix does exist
-        if (!model.Suffix.HasValue && SimpleNameExists(items, model.Text) && SuffixedNameExists(items))
-        {
-            var nextSuffix = GetSuffixNumber(items);
-            model.Suffix = (uint?)nextSuffix;
-
-            return model.FullName;
-        }
-
-        // no suffix - name without suffix does NOT exist, however name with suffix exists
-        if (!model.Suffix.HasValue && !SimpleNameExists(items, model.Text) && SuffixedNameExists(items))
-        {
-            var nextSuffix = GetSuffixNumber(items);
-            model.Suffix = (uint?)nextSuffix;
-
-            return model.FullName;
-        }
-
-        // has suffix - name without suffix exists
-        if (model.Suffix.HasValue && SimpleNameExists(items, model.Text))
-        {
-            var nextSuffix = GetSuffixNumber(items);
-            model.Suffix = (uint?)nextSuffix;
-
-            return model.FullName;
-        }
-
-        // has suffix - name without suffix does NOT exist
-        // a case where the user added the suffix, so add a secondary suffix
-        if (model.Suffix.HasValue && !SimpleNameExists(items, model.Text))
-        {
-            model.Text = model.FullName;
-            model.Suffix = StructuredName._nosuffix;
-
-            // filter items based on full name with suffix
-            items = items.Where(x => x.Text.InvariantStartsWith(model.FullName));
-            var secondarySuffix = GetFirstSuffix(items);
-            model.Suffix = (uint?)secondarySuffix;
-
-            return model.FullName;
-        }
-
-        // has suffix - name without suffix also exists, therefore we simply increment
-        if (model.Suffix.HasValue && SimpleNameExists(items, model.Text))
-        {
-            var nextSuffix = GetSuffixNumber(items);
-            model.Suffix = (uint?)nextSuffix;
-
-            return model.FullName;
-        }
-
-        return name;
+        return model.FullName;
     }
 
     private static bool SimpleNameExists(IEnumerable<StructuredName> items, string name) =>
@@ -203,6 +170,9 @@ internal sealed partial class SimilarNodeName
         return current;
     }
 
+    /// <summary>
+    /// Represents a name split into its base text and an optional trailing " (n)" numeric suffix.
+    /// </summary>
     internal sealed partial class StructuredName
     {
         /// <summary>

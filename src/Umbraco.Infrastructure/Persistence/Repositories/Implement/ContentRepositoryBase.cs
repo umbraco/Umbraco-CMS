@@ -1218,10 +1218,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         {
             // Fetch only the siblings whose name can collide with nodeName (i.e. share its base
             // text), instead of every sibling under the parent. This is critical for flat trees
-            // such as large media libraries, where "all siblings" is the entire library and the
-            // full fetch scales O(total items) on every write. GetUniqueName still applies the
-            // authoritative uniqueness filter, so narrowing the fetch to a superset of the names
-            // it cares about preserves behaviour.
+            // such as large media libraries, where "all siblings" could be the majority or all
+            // of the entire library and the full fetch scales O(total items) on every write.
+            // GetUniqueName still applies the authoritative uniqueness filter, so narrowing the
+            // fetch to a superset of the names it cares about preserves behaviour.
             var prefix = GetSafeLikePrefix(SimilarNodeName.GetBaseText(nodeName));
 
             Sql<ISqlContext> sql = Sql()

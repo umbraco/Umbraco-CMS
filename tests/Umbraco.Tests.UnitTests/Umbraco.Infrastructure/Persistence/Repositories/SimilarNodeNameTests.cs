@@ -211,6 +211,46 @@ internal sealed class SimilarNodeNameTests
         Assert.AreEqual("Test", res);
     }
 
+    [Test]
+    public void Free_Name_Is_Used_Even_When_Suffixed_Names_Exist()
+    {
+        // The plain "Foxtrot" is free, so it must be returned as-is rather than jumping to a suffix
+        // just because numbered variants happen to exist.
+        SimilarNodeName[] names =
+        [
+            new() { Id = 1, Name = "Foxtrot (1)" },
+            new() { Id = 2, Name = "Foxtrot (2)" },
+        ];
+
+        var res = SimilarNodeName.GetUniqueName(names, 0, "Foxtrot");
+
+        Assert.AreEqual("Foxtrot", res);
+    }
+
+    [Test]
+    public void Empty_Name_With_Suffixed_Siblings_Is_Numbered()
+    {
+        // A sibling beginning with a space (" (1)") parses to an empty base name with suffix 1, so
+        // resolving an empty name against it must continue the numbering.
+        SimilarNodeName[] names = [new() { Id = 1, Name = " (1)" }];
+
+        var res = SimilarNodeName.GetUniqueName(names, 0, string.Empty);
+
+        Assert.AreEqual(" (2)", res);
+    }
+
+    [Test]
+    public void Empty_Name_With_No_Suffixed_Siblings_Is_Empty()
+    {
+        // Empty name, and the only sibling (though it starts with a space) carries no suffix, so
+        // there is nothing to number against and the empty name is returned.
+        SimilarNodeName[] names = [new() { Id = 1, Name = " leading-space" }];
+
+        var res = SimilarNodeName.GetUniqueName(names, 0, string.Empty);
+
+        Assert.AreEqual(string.Empty, res);
+    }
+
     [TestCase("Echo", "Echo")]
     [TestCase("Echo (2)", "Echo")]
     [TestCase("Echo (1) (2)", "Echo (1)")]
