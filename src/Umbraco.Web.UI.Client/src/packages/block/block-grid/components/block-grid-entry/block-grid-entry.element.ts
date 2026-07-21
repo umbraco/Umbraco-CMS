@@ -4,6 +4,7 @@ import { UmbBlockGridEntryContext } from './block-grid-entry.context.js';
 import { css, customElement, html, nothing, property, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { stringOrStringArrayContains, UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { UmbDataPathBlockElementDataQuery } from '@umbraco-cms/backoffice/block';
+import { renderHiddenUfm } from '@umbraco-cms/backoffice/ufm';
 import { umbDestroyOnDisconnect, UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbElementVariantState } from '@umbraco-cms/backoffice/element';
 import { UmbObserveValidationStateController } from '@umbraco-cms/backoffice/validation';
@@ -15,6 +16,7 @@ import type {
 } from '@umbraco-cms/backoffice/block-custom-view';
 import type { UmbExtensionElementInitializer } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
+import type { UmbUfmResolvedEvent } from '@umbraco-cms/backoffice/ufm';
 
 import '../../../block/action/block-action-list.element.js';
 
@@ -151,6 +153,9 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	private _isSortMode?: boolean;
 
 	@state()
+	private _name?: string;
+
+	@state()
 	private _canScale?: boolean;
 
 	@state()
@@ -261,6 +266,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		this.observe(this.#context.actionsVisibility, (showActions) => (this._showActions = showActions), null);
 		this.observe(this.#context.inlineEditingMode, (mode) => (this._inlineEditingMode = mode), null);
 		this.observe(this.#context.isSortMode, (isSortMode) => (this._isSortMode = isSortMode), null);
+		this.observe(this.#context.name, (name) => (this._name = name), null);
 		this.observe(
 			this.#context.isExternalContent,
 			(isExternalContent) => {
@@ -455,6 +461,19 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		this._exposed = isExposed;
 	}
 
+	#onUfmResolved = (event: UmbUfmResolvedEvent) => {
+		this.#context.setName(event.detail.text);
+	};
+
+	#renderHiddenUfm() {
+		const blockValue = {
+			...this._blockViewProps.content,
+			$settings: this._blockViewProps.settings,
+			$index: this.index,
+		};
+		return renderHiddenUfm(this._label, blockValue, this.#onUfmResolved);
+	}
+
 	#callUpdateInlineCreateButtons() {
 		clearTimeout(this.#renderTimeout);
 		this.#renderTimeout = setTimeout(this.#updateInlineCreateButtons, 100) as unknown as number;
@@ -516,17 +535,18 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			ext.component.classList.add('umb-block-grid__block--view');
 			ext.component.setAttribute('part', 'component');
 		}
-		if (this._exposed || this._isReadOnly) {
-			return ext.component;
-		} else {
-			return html`
+		return html`${this.#renderHiddenUfm()}
+		${when(
+			this._exposed || this._isReadOnly,
+			() => ext.component,
+			() => html`
 				<div>
 					${ext.component}
 					<umb-block-overlay-expose-button .contentTypeName=${this._contentTypeName} @click=${this.#expose}>
 					</umb-block-overlay-expose-button>
 				</div>
-			`;
-		}
+			`,
+		)}`;
 	};
 
 	override render() {
@@ -540,7 +560,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 						() => this.#renderRefBlock(),
 						() => html`
 							<umb-entity-frame>
-								${when(this._isExternalContent, () => html`<uui-icon name="link"></uui-icon>`)} ${this._label}
+								${when(this._isExternalContent, () => html`<uui-icon name="link"></uui-icon>`)} ${this._name}
 							</umb-entity-frame>
 							<umb-extension-slot
 								single
@@ -592,6 +612,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 
 	#renderUnsupportedBlock() {
 		return html`
+			${this.#renderHiddenUfm()}
 			<umb-block-grid-block-unsupported
 				class="umb-block-grid__block--view"
 				.config=${this._blockViewProps.config}

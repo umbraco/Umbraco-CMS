@@ -45,6 +45,29 @@ internal sealed class PublishedUrlInfoProviderTests : PublishedUrlInfoProviderTe
     }
 
     [Test]
+    public async Task Can_Ignore_Requested_Culture_For_Invariant_Content()
+    {
+        // Arrange: Add a second language (Danish) alongside the default English
+        var danishLanguage = new LanguageBuilder()
+            .WithCultureInfo("da-DK")
+            .WithCultureName("Danish")
+            .Build();
+        await LanguageService.CreateAsync(danishLanguage, Constants.Security.SuperUserKey);
+
+        // The base class creates invariant content
+        ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
+
+        // Act: request with and without a culture
+        var allUrls = await PublishedUrlInfoProvider.GetAllAsync(Textpage);
+        var cultureScopedUrls = await PublishedUrlInfoProvider.GetAllAsync(Textpage, "da-DK");
+
+        // Assert: invariant content ignores the requested culture and returns the same urls
+        CollectionAssert.AreEquivalent(
+            allUrls.Select(x => x.Url?.ToString()),
+            cultureScopedUrls.Select(x => x.Url?.ToString()));
+    }
+
+    [Test]
     public async Task Invariant_Content_Under_Non_Default_Language_Domain_Returns_Only_Domain_Url()
     {
         // Arrange: Add a second language (Danish) alongside the default English
