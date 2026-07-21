@@ -37,7 +37,7 @@ test('can rename a data type folder', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickRootFolderCaretButton();
   await umbracoUi.dataType.clickActionsMenuForDataType(wrongDataTypeFolderName);
   await umbracoUi.dataType.clickRenameActionMenuOption();
-  await umbracoUi.dataType.enterFolderName(dataTypeFolderName);
+  await umbracoUi.dataType.enterRenameFolderName(dataTypeFolderName);
   await umbracoUi.dataType.clickConfirmRenameButtonAndWaitForDataTypeToBeRenamed();
 
   // Assert

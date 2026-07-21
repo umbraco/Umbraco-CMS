@@ -336,7 +336,7 @@ export class DataTypeUiHelper extends UiBaseLocators {
     // Date Time with Time Zone Picker
     this.addTimeZoneBtn = page.locator('#add-time-zone [name="icon-add"] svg');
     this.timeZoneDropDown = page.locator('umb-input-time-zone-picker uui-combobox');
-    
+
     // Entity Picker Source
     this.dataSourceChooseBtn = page.locator('[label="Data Source"]').locator(this.chooseBtn);
 
@@ -358,6 +358,10 @@ export class DataTypeUiHelper extends UiBaseLocators {
 
   async clickRootFolderCaretButton() {
     await this.openCaretButtonForName('Data Types');
+  }
+
+  async reloadDataTypeTree() {
+    await this.reloadTree('Data Types');
   }
 
   async createDataTypeFolder(folderName: string) {
@@ -1110,7 +1114,7 @@ export class DataTypeUiHelper extends UiBaseLocators {
       await this.focus(minInput); // Focus is needed
       await this.clearText(minInput);
       return;
-    } 
+    }
     await this.enterText(minInput, value.toString());
   }
 
