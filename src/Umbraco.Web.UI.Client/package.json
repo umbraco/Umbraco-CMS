@@ -235,7 +235,7 @@
 		"element-internals-polyfill": "^3.0.2"
 	},
 	"devDependencies": {
-		"@babel/core": "^7.29.0",
+		"@babel/core": "^8.0.1",
 		"@eslint/js": "^10.0.1",
 		"@open-wc/testing": "^4.0.0",
 		"@playwright/test": "^1.59.1",
