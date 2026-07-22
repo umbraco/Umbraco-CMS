@@ -2,7 +2,6 @@ import { onInit } from '../../packages/core/entry-point.js';
 import { UmbAppErrorElement } from './app-error.element.js';
 import { UmbAppAuthController } from './app-auth.controller.js';
 import { UmbAppAuthElement } from './app-auth.element.js';
-import { UmbAppOauthElement } from './app-oauth.element.js';
 import { UmbNetworkConnectionStatusManager } from './network-connection-status.manager.js';
 import type { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 import { UmbAuthContext } from '@umbraco-cms/backoffice/auth';
@@ -277,14 +276,6 @@ export class UmbAppElement extends UmbLitElement {
 			throw new Error('[Fatal] AuthContext requested before it was initialized');
 		}
 
-		// The oauth_complete popup must not call setInitialState(): a successful silent
-		// refresh would set isAuthorized=true and cause the oauth_complete handler to
-		// redirect the popup to the backoffice instead of completing the code exchange.
-		// Other windows opened via window.open() (e.g. the preview window) DO need
-		// setInitialState() so they can restore the session from a peer tab.
-		const pathname = pathWithoutBasePath({ start: true, end: false });
-		if (window.opener && pathname === '/oauth_complete') return;
-
 		// Auth context configures umbHttpClient in its constructor, so we only need to set initial state
 		await this.#authContext.setInitialState();
 	}
@@ -319,8 +310,8 @@ export class UmbAppElement extends UmbLitElement {
 	#redirect() {
 		const pathname = pathWithoutBasePath({ start: true, end: false });
 
-		// If we are on the oauth_complete or error page, we should not redirect
-		if (pathname === '/oauth_complete' || pathname === '/error') {
+		// If we are on the error page, we should not redirect
+		if (pathname === '/error') {
 			// Initialize the router
 			history.replaceState(null, '', location.href);
 			return;
