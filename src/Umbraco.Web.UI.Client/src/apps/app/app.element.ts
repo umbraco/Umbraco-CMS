@@ -115,50 +115,6 @@ export class UmbAppElement extends UmbLitElement {
 			component: () => import('../installer/installer.element.js'),
 		},
 		{
-			path: 'oauth_complete',
-			component: UmbAppOauthElement,
-			setup: async (component) => {
-				if (!this.#authContext) {
-					(component as UmbAppOauthElement).failure = true;
-					console.error('[Fatal] Auth context is not available');
-					return;
-				}
-
-				const searchParams = new URLSearchParams(window.location.search);
-				const hasCode = searchParams.has('code');
-				if (!hasCode) {
-					(component as UmbAppOauthElement).failure = true;
-					console.error('[Fatal] No code in query parameters');
-					return;
-				}
-
-				// Check that we are not already authorized
-				if (this.#authContext.getIsAuthorized()) {
-					redirectToStoredPath(this.backofficePath, true);
-					return;
-				}
-
-				// Complete the authorization request (exchanges code, saves session, broadcasts to other tabs)
-				try {
-					const result = await this.#authContext.completeAuthorizationRequest();
-
-					if (result === null) {
-						// No authorization was pending — redirect the user
-						redirectToStoredPath(this.backofficePath, true);
-						return;
-					}
-
-					// For redirect flows (no popup), navigate to the stored path.
-					// Use force=true for a full page navigation so the new page
-					// runs setInitialState() with the fresh httpOnly cookies.
-					redirectToStoredPath(this.backofficePath, true);
-				} catch {
-					(component as UmbAppOauthElement).failure = true;
-					console.error('[Fatal] Authorization request failed');
-				}
-			},
-		},
-		{
 			path: 'upgrade',
 			component: () => import('../upgrader/upgrader.element.js'),
 			guards: [this.#isAuthorizedGuard()],
