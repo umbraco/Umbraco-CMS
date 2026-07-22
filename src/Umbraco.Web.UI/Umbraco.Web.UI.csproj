@@ -26,7 +26,7 @@
 
   <ItemGroup>
     <!-- Add design/build time support for EF Core migrations -->
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" PrivateAssets="all" Version="10.0.9" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" PrivateAssets="all" Version="10.0.10" />
   </ItemGroup>
 
   <ItemGroup>
@@ -36,7 +36,17 @@
     of the vulnerable 2.0.0 that Swashbuckle / Microsoft.AspNetCore.OpenApi otherwise resolve
     (CVE-2026-49451, GHSA-v5pm-xwqc-g5wc).
     -->
-    <PackageReference Include="Microsoft.OpenApi" Version="2.9.0" />
+    <PackageReference Include="Microsoft.OpenApi" Version="2.11.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!--
+    Umbraco.Web.UI opts out of central package management, so the SQLitePCLRaw.lib.e_sqlite3 transitive pin in
+    Directory.Packages.props does not reach it. Reference it directly to force the patched version instead
+    of the vulnerable 2.1.11 that Microsoft.Data.Sqlite / Microsoft.EntityFrameworkCore.Sqlite otherwise
+    resolve (GHSA-2m69-gcr7-jv3q).
+    -->
+    <PackageReference Include="SQLitePCLRaw.lib.e_sqlite3" Version="2.1.12" />
   </ItemGroup>
 
   <PropertyGroup>
