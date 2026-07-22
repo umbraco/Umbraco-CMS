@@ -18,6 +18,7 @@ import {
 import type { UmbBackofficeExtensionRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbApiClient, umbHttpClient } from '@umbraco-cms/backoffice/http-client';
 import { isTestEnvironment } from '@umbraco-cms/backoffice/utils';
+import { UserService } from '@umbraco-cms/backoffice/external/backend-api';
 
 /**
  * The multiplier for the token expiry time.
@@ -357,7 +358,7 @@ export class UmbAuthContext extends UmbContextBase {
 
 		if (!codeVerifier && window.opener) {
 			// Popup flow: request code_verifier from parent via postMessage.
-			codeVerifier = await this.#requestCodeVerifierFromOpener(state);
+			//codeVerifier = await this.#requestCodeVerifierFromOpener(state);
 		}
 
 		if (!codeVerifier) {
@@ -376,6 +377,7 @@ export class UmbAuthContext extends UmbContextBase {
 		this.#isAuthorized.setValue(true);
 
 		// Broadcast to all tabs that authorization is complete
+		// TODO: Is this still needed for v19 auth?
 		this.#channel.postMessage({
 			type: 'authorized',
 			expiresIn: response.expiresIn,
@@ -390,11 +392,6 @@ export class UmbAuthContext extends UmbContextBase {
 	 * @returns True if the user is authorized, otherwise false.
 	 */
 	getIsAuthorized() {
-		if (COOKIE_AUTH_BYPASS) {
-			// TEMP: trust the server-issued login cookie; never redirect to /authorize.
-			this.#isAuthorized.setValue(true);
-			return true;
-		}
 		if (this.#isBypassed) {
 			this.#isAuthorized.setValue(true);
 			return true;
@@ -412,14 +409,7 @@ export class UmbAuthContext extends UmbContextBase {
 	 * @returns {Promise<void>}
 	 */
 	async setInitialState(): Promise<void> {
-		if (COOKIE_AUTH_BYPASS) {
-			// TEMP: skip the OIDC token exchange. Establish a long-lived in-memory session
-			// so the app treats us as authorized and the timeout machinery stays dormant.
-			// Real auth rides on the httpOnly login cookie sent with every request.
-			if (!this.#session.getValue()) {
-				const oneYearInSeconds = 365 * 24 * 60 * 60;
-				this.#setSessionLocally(oneYearInSeconds, Math.floor(Date.now() / 1000));
-			}
+		if (this.#isBypassed) {
 			return;
 		}
 
@@ -428,19 +418,46 @@ export class UmbAuthContext extends UmbContextBase {
 			return;
 		}
 
-		// Ask existing tabs for their session state (avoids a /token call for new tabs)
-		const peerSession = await this.#requestSessionFromPeers();
-		if (peerSession) {
-			this.#sessionDead = false;
-			this.#session.setValue(peerSession);
-			this.#isAuthorized.setValue(true);
-			return;
-		}
+		// Cookie auth: ask the server whether we're logged in. current-user/configuration is
+		// behind BackOfficeAccess, so a 200 means authorized, anything else means not. Raw fetch
+		// (not the configured client) so a boot 401 doesn't feed the interceptor's re-auth retry
+		// machinery.
+		//
+		// redirect: 'manual' is important. When unauthenticated, the back-office cookie middleware's
+		// OnRedirectToLogin issues a 302 to /umbraco/login for non-XHR requests; following it would
+		// return the login HTML as a 200 that we'd mistake for a valid session. Manual mode turns any
+		// such redirect into an opaque, non-ok response (status 0) so it's correctly read as
+		// unauthorized — the actual navigation to the login screen is driven solely by the app auth
+		// controller, never by this probe.
+		try {
+			// This is a direct call to the backend API to check the current user configuration, so we have to avoid tryExecute() here, otherwise it will trigger a redirect to the login page if the user is not authenticated. Instead, we want to handle the response manually and set the session state accordingly.
+			// eslint-disable-next-line local-rules/no-direct-api-import
+			const { data, response } = await UserService.getUserCurrentConfiguration({
+				credentials: 'include',
+				redirect: 'manual',
+			});
 
-		// No peer responded — try a server refresh.
-		// Uses the Web Lock so concurrent calls (from API requests via getLatestToken)
-		// are deduplicated — only one actual /token call is made.
-		await this.makeRefreshTokenRequest();
+			if (!response.ok) {
+				this.#session.setValue(undefined);
+				this.#isAuthorized.setValue(false);
+				return;
+			}
+
+			const issuedAt = Math.floor(Date.now() / 1000);
+			const expiresIn = data.timeoutUtc
+				? Math.max(0, Math.floor(new Date(data.timeoutUtc).getTime() / 1000) - issuedAt)
+				: 60 * 60;
+			this.#setSessionLocally(expiresIn, issuedAt);
+
+			// Tell other tabs a session is (re)established. A tab that was showing the timeout
+			// modal (its own session near expiry) adopts this fresh expiry via the 'authorized'
+			// handler and dismisses the modal, instead of waiting for its own countdown to lapse.
+			// The handler applies the session locally without re-broadcasting, so no message storm.
+			this.#channel.postMessage({ type: 'authorized', expiresIn, issuedAt });
+		} catch {
+			this.#session.setValue(undefined);
+			this.#isAuthorized.setValue(false);
+		}
 	}
 
 	/**
@@ -731,7 +748,7 @@ export class UmbAuthContext extends UmbContextBase {
 	 * @returns The redirect url, which is the backoffice path.
 	 */
 	getRedirectUrl() {
-		return `${window.location.origin}${this.#backofficePath}${this.#backofficePath.endsWith('/') ? '' : '/'}oauth_complete`;
+		return `${window.location.origin}${this.#backofficePath}`;
 	}
 
 	/**
@@ -829,66 +846,6 @@ export class UmbAuthContext extends UmbContextBase {
 			type: 'sessionUpdate',
 			accessTokenExpiresAt: session.accessTokenExpiresAt,
 			expiresAt: session.expiresAt,
-		});
-	}
-
-	/**
-	 * Asks other tabs for their current session state via BroadcastChannel.
-	 * Returns the first response within 300ms, or undefined if no peer responds.
-	 * The 300ms window is empirical — long enough for a loaded peer tab to respond
-	 * via the event loop, short enough to not noticeably delay login.
-	 */
-	#requestSessionFromPeers(): Promise<UmbAuthSession | undefined> {
-		return new Promise((resolve) => {
-			const timeout = setTimeout(() => {
-				this.#channel.removeEventListener('message', handler);
-				resolve(undefined);
-			}, 300);
-
-			const handler = (evt: MessageEvent) => {
-				if (evt.data?.type === 'sessionResponse' && evt.data.session) {
-					clearTimeout(timeout);
-					this.#channel.removeEventListener('message', handler);
-					resolve(evt.data.session);
-				}
-			};
-
-			this.#channel.addEventListener('message', handler);
-			this.#channel.postMessage({ type: 'sessionRequest' });
-		});
-	}
-
-	/**
-	 * Requests the code_verifier from the parent window via postMessage (popup flow).
-	 */
-	#requestCodeVerifierFromOpener(state: string | null): Promise<string | undefined> {
-		return new Promise((resolve) => {
-			if (!window.opener) {
-				resolve(undefined);
-				return;
-			}
-
-			// Short timeout: a real OAuth popup parent responds within milliseconds. Any
-			// longer is just a hang for the unrelated-opener case (e.g. an arbitrary
-			// `window.open(...)` target that incidentally landed on `oauth_complete`).
-			const timeout = setTimeout(() => {
-				window.removeEventListener('message', handler);
-				resolve(undefined);
-			}, 1500);
-
-			const handler = (evt: MessageEvent) => {
-				if (evt.origin !== window.location.origin) return;
-				if (evt.data?.type === 'pkceResponse' && evt.data?.state === state) {
-					clearTimeout(timeout);
-					window.removeEventListener('message', handler);
-					resolve(evt.data.codeVerifier);
-				}
-			};
-
-			window.addEventListener('message', handler);
-
-			// Ask the parent for the code_verifier
-			window.opener.postMessage({ type: 'pkceRequest', state }, window.location.origin);
 		});
 	}
 
