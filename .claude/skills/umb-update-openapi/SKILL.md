@@ -13,7 +13,7 @@ This replaces the old manual routine (run the app, open Swagger UI, copy JSON, p
 
 ## Key facts
 
-- **OpenAPI endpoint:** `/umbraco/openapi/management.json`, served over HTTPS with a dev cert (so fetches need `curl -k`).
+- **OpenAPI endpoint:** `/umbraco/swagger/management/swagger.json`, served over HTTPS with a dev cert (so fetches need `curl -k`).
 - **Port:** default **`44339`** (the `launchSettings.json` https profile). Assume it unless the user says otherwise.
 - **Target file:** `src/Umbraco.Cms.Api.Management/OpenApi.json` — git-tracked, so git is the safety net for a bad fetch.
 - **Client regeneration:** `npm --prefix src/Umbraco.Web.UI.Client run generate:server-api` (delegates to the `@umbraco-backoffice/core` workspace). Reads the freshly-updated `OpenApi.json` and rewrites the generated client under `src/Umbraco.Web.UI.Client/src/packages/core/backend-api/`.
@@ -33,11 +33,11 @@ Verify `src/Umbraco.Cms.Api.Management/OpenApi.json` is present. If it isn't, yo
 Probe for a live document (short timeout, accept the dev cert):
 
 ```bash
-CODE=$(curl -sk --max-time 5 -o /dev/null -w "%{http_code}" "https://localhost:44339/umbraco/openapi/management.json")
+CODE=$(curl -sk --max-time 5 -o /dev/null -w "%{http_code}" "https://localhost:44339/umbraco/swagger/management/swagger.json")
 ```
 
 - **`200`** → a backend is already up. Reuse it; do **not** stop it afterward (the user had it running).
-- **anything else** → start one yourself, in the background, on 44339, and remember that *you* started it so you can stop it in step 5. No `--no-build` here on purpose, so a cold repo still works:
+- **`000`** → nothing is listening on 44339. Start one yourself, in the background, on 44339, and remember that *you* started it so you can stop it in step 5. No `--no-build` here on purpose, so a cold repo still works. If `CODE` is neither `200` nor `000`, something is already listening on 44339 but isn't serving the expected OpenAPI document. Don’t try to start another instance on the same port; surface the HTTP status and stop:
 
 ```bash
 dotnet run --project src/Umbraco.Web.UI --no-launch-profile -- \
@@ -53,7 +53,7 @@ Curl writes the raw response directly into the target — that's the byte-for-by
 ```bash
 TARGET=src/Umbraco.Cms.Api.Management/OpenApi.json
 if curl -sk --fail --retry-connrefused --retry 60 --retry-delay 3 --retry-max-time 300 \
-     "https://localhost:44339/umbraco/openapi/management.json" -o "$TARGET" \
+     "https://localhost:44339/umbraco/swagger/management/swagger.json" -o "$TARGET" \
    && node -e "JSON.parse(require('fs').readFileSync('$TARGET','utf8'))"; then
   echo "OK"
 else
@@ -81,7 +81,10 @@ git diff --stat -- src/Umbraco.Cms.Api.Management/OpenApi.json
 Only if **you** started it in step 2 (it wasn't already running), stop it — don't leave a stray process, and never kill a server the user already had up:
 
 ```bash
-PIDS=$(lsof -ti tcp:44339); [ -n "$PIDS" ] && kill $PIDS
+PIDS=$(lsof -ti tcp:44339)
+for PID in $PIDS; do
+  ps -p "$PID" -o command= | grep -q "Umbraco.Web.UI" && kill "$PID"
+done
 ```
 
 ### 6. Offer to regenerate the backoffice client
