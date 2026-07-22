@@ -1,41 +1,29 @@
-import { UMB_AUTH_CONTEXT, UMB_MODAL_APP_AUTH } from '@umbraco-cms/backoffice/auth';
-import type { UmbUserLoginState } from '@umbraco-cms/backoffice/auth';
+import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { umbOpenModal, UmbPersistentModalDialogElement } from '@umbraco-cms/backoffice/modal';
-import { setStoredPath } from '@umbraco-cms/backoffice/utils';
 
 export class UmbAppAuthController extends UmbControllerBase {
-	#retrievedModal: Promise<unknown>;
+	#retrievedContext: Promise<unknown>;
 	#authContext?: typeof UMB_AUTH_CONTEXT.TYPE;
 
 	constructor(host: UmbControllerHost) {
 		super(host);
 
-		this.#retrievedModal = this.consumeContext(UMB_AUTH_CONTEXT, (context) => {
+		this.#retrievedContext = this.consumeContext(UMB_AUTH_CONTEXT, (context) => {
 			this.#authContext = context;
 
-			// Observe the user's authorization state and start the authorization flow if the user is not authorized
-			this.observe(
-				context?.timeoutSignal,
-				() => {
-					console.log('[UmbAppAuthController] Authorization timed out, starting authorization flow');
-					this.makeAuthorizationRequest('timedOut');
-				},
-				'_authState',
-			);
+			// If the session times out mid-use, send the user to the login screen.
+			this.observe(context?.timeoutSignal, () => this.#redirectToLogin(), '_authState');
 		}).asPromise({ preventTimeout: true });
 	}
 
 	/**
-	 * Checks if the user is authorized.
-	 * If not, the authorization flow is started.
-	 * Session verification is handled by setInitialState() before the router evaluates guards.
+	 * Checks if the user is authorized; if not, redirects to the server login screen.
+	 * Session verification is handled by setInitialState() (the current-user/configuration
+	 * cookie probe) before the router evaluates guards.
 	 */
 	async isAuthorized(): Promise<boolean> {
-		await this.#retrievedModal.catch(() => undefined);
+		await this.#retrievedContext.catch(() => undefined);
 		if (!this.#authContext) {
 			throw new Error('[Fatal] Auth context is not available');
 		}
@@ -44,91 +32,22 @@ export class UmbAppAuthController extends UmbControllerBase {
 			return true;
 		}
 
-		// Make a request to the auth server to start the auth flow
-		return this.makeAuthorizationRequest();
+		this.#redirectToLogin();
+		return false;
 	}
 
 	/**
-	 * Starts the authorization flow.
-	 * It will check which providers are available and either redirect directly to the provider or show a provider selection screen.
-	 * @param userLoginState
+	 * Cookie auth: authentication happens on the server-rendered login screen. Redirect there;
+	 * on success it sets the session cookie and returns to the backoffice, where the boot probe
+	 * then sees an authenticated session.
 	 */
-	async makeAuthorizationRequest(userLoginState: UmbUserLoginState = 'loggingIn'): Promise<boolean> {
-		await this.#retrievedModal.catch(() => undefined);
+	#redirectToLogin() {
 		if (!this.#authContext) {
 			throw new Error('[Fatal] Auth context is not available');
 		}
-
-		// Save the current state
-		let currentUrl = window.location.href;
-		const searchParams = new URLSearchParams(window.location.search);
-		if (searchParams.has('returnPath')) {
-			currentUrl = decodeURIComponent(searchParams.get('returnPath') || currentUrl);
-		}
-		setStoredPath(currentUrl);
-
-		// Figure out which providers are available
-		const availableProviders = await firstValueFrom(this.#authContext.getAuthProviders(umbExtensionsRegistry));
-
-		if (availableProviders.length === 0) {
-			throw new Error('[Fatal] No auth providers available');
-		}
-
-		// If we are logging in, we need to check if we can redirect directly to the provider
-		if (userLoginState === 'loggingIn') {
-			// One provider available (most likely the Umbraco provider), so initiate the authorization request to the default provider
-			if (availableProviders.length === 1) {
-				await this.#authContext.makeAuthorizationRequest(availableProviders[0].forProviderName, true);
-				return this.#updateState();
-			}
-
-			// Check if any provider is redirecting directly to the provider
-			const redirectProvider = availableProviders.find((provider) => provider.meta?.behavior?.autoRedirect);
-
-			// Redirect directly to the provider
-			if (redirectProvider) {
-				await this.#authContext.makeAuthorizationRequest(redirectProvider.forProviderName, true);
-				return this.#updateState();
-			}
-		}
-
-		// Otherwise we can show the provider selection screen directly, because the user is either logged out, timed out, or has more than one provider available
-		const selected = await this.#showLoginModal(userLoginState);
-
-		if (!selected) {
-			return false;
-		}
-
-		return this.#updateState();
-	}
-
-	async #showLoginModal(userLoginState: UmbUserLoginState): Promise<boolean> {
-		await this.#retrievedModal.catch(() => undefined);
-		if (!this.#authContext) {
-			throw new Error('[Fatal] Auth context is not available');
-		}
-
-		// Show the provider selection screen
-		const selected = await umbOpenModal(this._host, UMB_MODAL_APP_AUTH, {
-			data: {
-				userLoginState,
-			},
-			modal: {
-				type: 'custom',
-				element: UmbPersistentModalDialogElement,
-				backdropBackground: 'var(--umb-auth-backdrop, var(--uui-color-surface))',
-			},
-		}).catch(() => undefined);
-
-		return selected?.success ?? false;
-	}
-
-	#updateState() {
-		if (!this.#authContext) {
-			throw new Error('[Fatal] Auth context is not available');
-		}
-
-		// The authorization flow is finished, so let the caller know if the user is authorized
-		return this.#authContext.getIsAuthorized();
+		// Preserve where the user was (potentially deep in an editor) so the login screen returns
+		// them there afterwards. Pass a relative path only — the server rejects non-local URLs.
+		const returnUrl = encodeURIComponent(window.location.pathname + window.location.search);
+		location.href = `${this.#authContext.getServerUrl()}/umbraco/login?ReturnUrl=${returnUrl}`;
 	}
 }
