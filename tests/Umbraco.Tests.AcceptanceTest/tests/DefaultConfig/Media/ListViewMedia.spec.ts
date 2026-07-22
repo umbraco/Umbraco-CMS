@@ -42,11 +42,13 @@ test('can change the the default sort order for the list in the media section', 
 });
 
 test('can change the the order direction for the list in the media section', async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  const expectedMediaValues = await umbracoApi.media.getAllMediaNames('updateDate', 'Ascending');
+  // Arrange - order by name so the two items sort distinctly and the direction is observable
+  // (created back-to-back in beforeEach, they share the same "Last edited" timestamp).
+  await umbracoApi.dataType.updateListViewMediaDataType('orderBy', 'name');
+  await umbracoApi.dataType.updateListViewMediaDataType('orderDirection', 'asc');
+  const expectedMediaValues = await umbracoApi.media.getAllMediaNames('name', 'Ascending');
 
   // Act
-  await umbracoApi.dataType.updateListViewMediaDataType('orderDirection', 'asc');
   await umbracoUi.media.goToSection(ConstantHelper.sections.media);
 
   // Assert
