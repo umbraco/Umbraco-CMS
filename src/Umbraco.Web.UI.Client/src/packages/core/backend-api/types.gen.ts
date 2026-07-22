@@ -547,6 +547,7 @@ export type CultureReponseModel = {
 
 export type CurrentUserConfigurationResponseModel = {
     keepUserLoggedIn: boolean;
+    timeoutUtc?: string;
     passwordConfiguration: PasswordConfigurationResponseModel;
     allowChangePassword: boolean;
     allowTwoFactor: boolean;
@@ -3541,7 +3542,7 @@ export type WebhookLogResponseModel = {
     key: string;
     webhookKey: string;
     statusCode: string;
-    httpStatusCode?: number | null;
+    httpStatusCode?: number;
     isSuccessStatusCode: boolean;
     date: string;
     eventAlias: string;
