@@ -350,7 +350,7 @@ Remove from `auth.context.ts`: `makeAuthorizationRequest`, `completeAuthorizatio
 
 - [ ] **Step 2: Convert token accessors to deprecated shims (BOTH methods)**
 
-Deprecate `getLatestToken` AND `getOpenApiConfiguration` for external consumers — each with a `@deprecated` JSDoc tag AND a `UmbDeprecation` runtime warning (check `docs/deprecation.md` first; confirm the exact `removeInVersion` against the repo's deprecation policy — N+2 from v19 → `21.0.0`).
+Deprecate `getLatestToken` AND `getOpenApiConfiguration` for external consumers — each with a `@deprecated` JSDoc tag AND a `UmbDeprecation` runtime warning (see `docs/deprecation.md` for the format). Shipping in v19 → remove in v21, so `removeInVersion: '21.0.0'`.
 
 ```ts
 /** @deprecated Cookie auth carries credentials automatically; no bearer token exists. Scheduled for removal in Umbraco 21. */
