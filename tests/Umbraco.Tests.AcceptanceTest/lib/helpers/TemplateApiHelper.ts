@@ -31,7 +31,7 @@ export class TemplateApiHelper {
     };
     const response = await this.api.post(this.api.baseUrl + '/umbraco/management/api/v1/template', templateData);
     // Returns the id of the created template
-    return response.headers().location.split("/").pop();
+    return this.api.getIdFromLocation(response);
   }
 
   async delete(id: string) {
@@ -45,7 +45,7 @@ export class TemplateApiHelper {
   async getChildren(id: string) {
     const response = await this.api.get(`${this.api.baseUrl}/umbraco/management/api/v1/tree/template/children?parentId=${id}&skip=0&take=10000`);
     const items = await response.json();
-    return items.items;
+    return this.api.itemsOf(items);
   }
 
   async getItems(ids: string[]) {
@@ -113,7 +113,7 @@ export class TemplateApiHelper {
     const rootTemplates = await this.getAllAtRoot();
     const jsonTemplates = await rootTemplates.json();
 
-    for (const template of jsonTemplates.items) {
+    for (const template of this.api.itemsOf(jsonTemplates)) {
       if (template.name === name) {
         return this.get(template.id);
       } else if (template.isContainer || template.hasChildren) {
@@ -130,7 +130,7 @@ export class TemplateApiHelper {
     const rootTemplates = await this.getAllAtRoot();
     const jsonTemplates = await rootTemplates.json();
 
-    for (const template of jsonTemplates.items) {
+    for (const template of this.api.itemsOf(jsonTemplates)) {
       if (template.name === name) {
         if (template.isContainer || template.hasChildren) {
           await this.recurseDeleteChildren(template.id);

@@ -14,14 +14,26 @@ export class MemberTypeApiHelper {
     const rootMemberTypes = await this.getAllAtRoot();
     const jsonMemberTypes = await rootMemberTypes.json();
 
-    for (const memberType of jsonMemberTypes.items) {
-      if (memberType.name === name) {
-        if (memberType.isFolder) {
-          return await this.recurseDeleteChildren(memberType);
+    // Delete every match, comparing alias (case-insensitive) as well as name: a renamed type keeps its
+    // old alias, which a name-only match misses, causing a "Duplicate alias" 400 on the next create.
+    const alias = AliasHelper.toAlias(name).toLowerCase();
+    for (const memberType of this.api.itemsOf(jsonMemberTypes)) {
+      if (memberType.isFolder) {
+        if (memberType.name === name) {
+          await this.recurseDeleteChildren(memberType);
+        } else if (memberType.hasChildren) {
+          await this.recurseChildren(name, memberType.id, true);
         }
-        return await this.delete(memberType.id);
-      } else if (memberType.hasChildren) {
-        await this.recurseChildren(name, memberType.id, true);
+        continue;
+      }
+
+      let matches = memberType.name === name;
+      if (!matches) {
+        const full = await this.get(memberType.id);
+        matches = full.alias?.toLowerCase() === alias;
+      }
+      if (matches) {
+        await this.delete(memberType.id);
       }
     }
     return null;
@@ -75,7 +87,7 @@ export class MemberTypeApiHelper {
       return;
     }
     const response = await this.api.post(this.api.baseUrl + ConstantHelper.apiEndpoints.memberType, memberType);
-    return response.headers().location.split("v1/member-type/").pop();
+    return this.api.getIdFromLocation(response);
   }
 
   async update(id: string, updatedMemberType) {
@@ -105,14 +117,14 @@ export class MemberTypeApiHelper {
   async getChildren(id: string) {
     const response = await this.api.get(`${this.api.baseUrl}/umbraco/management/api/v1/tree/member-type/children?parentId=${id}&skip=0&take=10000&foldersOnly=false`);
     const items = await response.json();
-    return items.items;
+    return this.api.itemsOf(items);
   }
 
   async getByName(name: string) {
     const rootMemberTypes = await this.getAllAtRoot();
     const jsonMemberTypes = await rootMemberTypes.json();
 
-    for (const memberType of jsonMemberTypes.items) {
+    for (const memberType of this.api.itemsOf(jsonMemberTypes)) {
       if (memberType.name === name) {
         if (memberType.isFolder) {
           return this.getFolder(memberType.id);
@@ -244,7 +256,7 @@ export class MemberTypeApiHelper {
       "parent": parentId ? {"id": parentId} : null
     }
     const response = await this.api.post(this.api.baseUrl + ConstantHelper.apiEndpoints.memberTypeFolder, folder);
-    return response.headers().location.split("/").pop();
+    return this.api.getIdFromLocation(response);
   }
 
   async renameFolder(folderId: string, folderName: string) {

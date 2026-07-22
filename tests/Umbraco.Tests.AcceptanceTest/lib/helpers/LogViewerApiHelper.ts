@@ -87,7 +87,7 @@ export class LogViewerApiHelper {
     }
 
     const response = await this.api.post(this.api.baseUrl + `/umbraco/management/api/v1/log-viewer/saved-search`, searchData);
-    return response.headers().location.split("/").pop();
+    return this.api.getIdFromLocation(response);
   }
 
   async getSavedSearch(name: string) {
