@@ -42604,6 +42604,11 @@
           "keepUserLoggedIn": {
             "type": "boolean"
           },
+          "timeoutUtc": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
           "passwordConfiguration": {
             "$ref": "#/components/schemas/PasswordConfigurationResponseModel"
           },

@@ -1,3 +1,5 @@
+using System.Security.Claims;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Factories;
@@ -5,6 +7,7 @@ using Umbraco.Cms.Api.Management.Mapping.Permissions;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Api.Management.ViewModels.UserGroup.Permissions;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Membership;
@@ -39,6 +42,9 @@ public class UserPresentationFactoryTests : UmbracoIntegrationTestWithContent
 
     protected override void ConfigureTestServices(IServiceCollection services)
     {
+        // Pin KeepUserLoggedIn so the TimeoutUtc tests are deterministic regardless of test appsettings.
+        services.PostConfigure<SecuritySettings>(options => options.KeepUserLoggedIn = false);
+
         services.AddTransient<IUserPresentationFactory, UserPresentationFactory>();
         services.AddTransient<IUserGroupPresentationFactory, UserGroupPresentationFactory>();
         services.AddSingleton<IAbsoluteUrlBuilder, DefaultAbsoluteUrlBuilder>();
@@ -417,6 +423,31 @@ public class UserPresentationFactoryTests : UmbracoIntegrationTestWithContent
         // while other fallback verbs remain. This is what hides default-permission actions (e.g. Trash) in the UI.
         Assert.That(model.FallbackPermissions, Does.Not.Contain(FallbackFilteringElementPermissionService.StrippedVerb));
         Assert.That(model.FallbackPermissions, Contains.Item("Umb.Element.Read"));
+    }
+
+    [Test]
+    public async Task Current_User_Configuration_Populates_TimeoutUtc_From_Ticket_Claim()
+    {
+        var expiry = new DateTimeOffset(2030, 1, 1, 12, 0, 0, TimeSpan.Zero);
+        var principal = new ClaimsPrincipal(new ClaimsIdentity(
+        [
+            new Claim(Constants.Security.TicketExpiresClaimType, expiry.ToString("o")),
+        ]));
+        GetRequiredService<IHttpContextAccessor>().HttpContext = new DefaultHttpContext { User = principal };
+
+        var model = await UserPresentationFactory.CreateCurrentUserConfigurationModelAsync();
+
+        Assert.AreEqual(expiry, model.TimeoutUtc);
+    }
+
+    [Test]
+    public async Task Current_User_Configuration_Leaves_TimeoutUtc_Null_When_No_Ticket_Claim()
+    {
+        GetRequiredService<IHttpContextAccessor>().HttpContext = new DefaultHttpContext();
+
+        var model = await UserPresentationFactory.CreateCurrentUserConfigurationModelAsync();
+
+        Assert.IsNull(model.TimeoutUtc);
     }
 
     private sealed class FallbackFilteringElementPermissionService : IElementPermissionService
