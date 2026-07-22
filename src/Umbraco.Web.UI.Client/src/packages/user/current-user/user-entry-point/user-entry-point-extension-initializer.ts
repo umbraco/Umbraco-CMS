@@ -25,7 +25,7 @@ export class UmbUserEntryPointExtensionInitializer extends UmbExtensionInitializ
 	ManifestUserEntryPoint
 > {
 	readonly #active: UmbBooleanState<boolean>;
-	#instanceMap = new Map<string, UmbEntryPointModule>();
+	readonly #instanceMap = new Map<string, UmbEntryPointModule>();
 	#currentUserContext?: typeof UMB_CURRENT_USER_CONTEXT.TYPE;
 	#isAuthorized = false;
 	#hasUser = false;
@@ -80,7 +80,8 @@ export class UmbUserEntryPointExtensionInitializer extends UmbExtensionInitializ
 		if (!moduleInstance || !this.#active.getValue()) return;
 		this.#instanceMap.set(manifest.alias, moduleInstance);
 		if (hasInitExport(moduleInstance)) {
-			await moduleInstance.onInit(this.host, this.extensionRegistry);
+			// Promise.resolve so an async onInit is awaited even though the export type is `void`.
+			await Promise.resolve(moduleInstance.onInit(this.host, this.extensionRegistry));
 		}
 	}
 
