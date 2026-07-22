@@ -41,9 +41,7 @@ test('can change the the default sort order for the list in the media section', 
   await umbracoUi.media.doesMediaListNameValuesMatch(expectedMediaValues);
 });
 
-// fixme: product/UI issue (confirmed via trace) - the media card-grid view renders the reverse of the
-// configured order direction: the API returns ascending but the grid displays descending. Not test-side fixable.
-test.fixme('can change the the order direction for the list in the media section', async ({umbracoApi, umbracoUi}) => {
+test('can change the the order direction for the list in the media section', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedMediaValues = await umbracoApi.media.getAllMediaNames('updateDate', 'Ascending');
 
