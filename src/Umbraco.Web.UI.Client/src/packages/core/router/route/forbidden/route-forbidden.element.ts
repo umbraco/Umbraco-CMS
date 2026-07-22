@@ -10,6 +10,10 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
  */
 @customElement('umb-route-forbidden')
 export class UmbRouteForbiddenElement extends UmbLitElement {
+	#close() {
+		history.back();
+	}
+
 	override render() {
 		return html`
 			<div class="uui-text">
@@ -17,6 +21,7 @@ export class UmbRouteForbiddenElement extends UmbLitElement {
 				<umb-localize key="routing_routeForbiddenDescription">
 					You do not have permission to access this resource. Please contact your administrator for assistance.
 				</umb-localize>
+				<uui-button look="secondary" label=${this.localize.term('general_close')} @click=${this.#close}></uui-button>
 			</div>
 		`;
 	}
@@ -37,6 +42,7 @@ export class UmbRouteForbiddenElement extends UmbLitElement {
 				justify-content: center;
 				align-items: center;
 				height: 100%;
+				gap: var(--uui-size-space-4);
 				opacity: 0;
 				animation: fadeIn 2s 0s forwards;
 			}
