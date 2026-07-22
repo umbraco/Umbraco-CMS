@@ -35,6 +35,9 @@
     Directory.Packages.props does not reach it. Reference it directly to force the patched version instead
     of the vulnerable 2.0.0 that Swashbuckle / Microsoft.AspNetCore.OpenApi otherwise resolve
     (CVE-2026-49451, GHSA-v5pm-xwqc-g5wc).
+
+    HOLD at 2.9.0 - do not bump; keep in sync with the central pin in Directory.Packages.props. 2.10.0+
+    regresses OpenAPI 3.0 nullability serialization. See https://github.com/microsoft/OpenAPI.NET/issues/2967.
     -->
     <PackageReference Include="Microsoft.OpenApi" Version="2.9.0" />
   </ItemGroup>
