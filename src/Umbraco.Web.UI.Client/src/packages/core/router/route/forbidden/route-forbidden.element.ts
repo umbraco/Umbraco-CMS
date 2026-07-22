@@ -1,6 +1,8 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UMB_MODAL_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import type { UmbModalContext } from '@umbraco-cms/backoffice/modal';
 
 /**
  * A component that displays a "Forbidden" message when a user tries to access a route they do not have permission for.
@@ -10,8 +12,23 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
  */
 @customElement('umb-route-forbidden')
 export class UmbRouteForbiddenElement extends UmbLitElement {
+	#modalContext?: UmbModalContext;
+
+	constructor() {
+		super();
+		this.consumeContext(UMB_MODAL_CONTEXT, (context) => {
+			this.#modalContext = context;
+		});
+	}
+
 	#close() {
-		history.back();
+		// When shown inside a modal (e.g. opened from a picker), reject it so it closes
+		// deterministically. Otherwise fall back to navigating back in the browser history.
+		if (this.#modalContext) {
+			this.#modalContext.reject();
+		} else {
+			history.back();
+		}
 	}
 
 	override render() {
