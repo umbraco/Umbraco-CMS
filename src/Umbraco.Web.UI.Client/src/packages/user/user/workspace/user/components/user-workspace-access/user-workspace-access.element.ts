@@ -6,8 +6,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 import '../user-workspace-assign-access/user-workspace-assign-access.element.js';
 
-const elementName = 'umb-user-workspace-access';
-@customElement(elementName)
+@customElement('umb-user-workspace-access')
 export class UmbUserWorkspaceAccessElement extends UmbLitElement {
 	@state()
 	private _calculatedStartNodes?: UmbUserStartNodesModel;
@@ -99,6 +98,6 @@ export default UmbUserWorkspaceAccessElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbUserWorkspaceAccessElement;
+		'umb-user-workspace-access': UmbUserWorkspaceAccessElement;
 	}
 }
