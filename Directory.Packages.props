@@ -99,6 +99,14 @@
       Microsoft.AspNetCore.OpenApi and Swashbuckle only require Microsoft.OpenApi >= 2.0.0, which otherwise
       resolves to a vulnerable 2.0.0 (CVE-2026-49451, GHSA-v5pm-xwqc-g5wc). Pin forward to a patched 2.x
       until the referencing packages raise their floor.
+
+      HOLD at 2.9.0 - do not bump. Microsoft.OpenApi 2.10.0+ reworked OpenAPI 3.0 nullability serialization
+      (regression confirmed in 2.11.0): nullable, type-less schemas emit "enum": [null] and nullable oneOf
+      $refs drop "nullable" entirely, which corrupts the generated Delivery API 3.0 contract (fails
+      OpenApiContractTest) and misleads client code generation. 2.9.0 is already CVE-patched, so holding
+      carries no security cost. Tracked upstream at https://github.com/microsoft/OpenAPI.NET/issues/2967;
+      bump only once the 2.x track ships a fix. If a security advisory forces a bump sooner, a Swashbuckle
+      schema-filter workaround will be needed to restore the 3.0 nullable output.
     -->
     <PackageVersion Include="Microsoft.OpenApi" Version="2.9.0" />
     <!--
