@@ -690,7 +690,8 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   async doesHistoryHaveCount(count: number) {
-    await this.hasCount(this.historyItems, count);
+    // The Info tab's history list loads async after the audit-log fetch, which can lag under load.
+    await this.hasCount(this.historyItems, count, ConstantHelper.timeout.veryLong);
   }
 
   async doesDocumentStateHaveText(text: string) {
