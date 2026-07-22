@@ -1,5 +1,5 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_MODAL_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import type { UmbModalContext } from '@umbraco-cms/backoffice/modal';
@@ -14,21 +14,19 @@ import type { UmbModalContext } from '@umbraco-cms/backoffice/modal';
 export class UmbRouteForbiddenElement extends UmbLitElement {
 	#modalContext?: UmbModalContext;
 
+	@state()
+	private _isInModal = false;
+
 	constructor() {
 		super();
 		this.consumeContext(UMB_MODAL_CONTEXT, (context) => {
 			this.#modalContext = context;
+			this._isInModal = !!context;
 		});
 	}
 
 	#close() {
-		// When shown inside a modal (e.g. opened from a picker), reject it so it closes
-		// deterministically. Otherwise fall back to navigating back in the browser history.
-		if (this.#modalContext) {
-			this.#modalContext.reject();
-		} else {
-			history.back();
-		}
+		this.#modalContext?.reject();
 	}
 
 	override render() {
@@ -38,7 +36,12 @@ export class UmbRouteForbiddenElement extends UmbLitElement {
 				<umb-localize key="routing_routeForbiddenDescription">
 					You do not have permission to access this resource. Please contact your administrator for assistance.
 				</umb-localize>
-				<uui-button look="secondary" label=${this.localize.term('general_close')} @click=${this.#close}></uui-button>
+				${this._isInModal
+					? html`<uui-button
+							look="secondary"
+							label=${this.localize.term('general_close')}
+							@click=${this.#close}></uui-button>`
+					: nothing}
 			</div>
 		`;
 	}
