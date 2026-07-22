@@ -160,7 +160,7 @@ describe('UmbAuthContext', () => {
 	describe('URL generation', () => {
 		it('generates correct redirect URL', () => {
 			const url = context.getRedirectUrl();
-			expect(url).to.contain('/umbraco/oauth_complete');
+			expect(url).to.contain('/umbraco');
 		});
 
 		it('generates correct post-logout redirect URL', () => {

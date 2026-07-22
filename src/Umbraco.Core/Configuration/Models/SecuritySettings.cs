@@ -91,6 +91,7 @@ public class SecuritySettings
     /// <summary>
     ///     The default path for the authorization callback.
     /// </summary>
+    [Obsolete("This property is no longer in use. Scheduled for removal in Umbraco 21.")]
     internal const string StaticAuthorizeCallbackPathName = "/umbraco/oauth_complete";
 
     /// <summary>
@@ -247,6 +248,7 @@ public class SecuritySettings
     ///     Gets or sets the path to use for authorization callback. Will be appended to the BackOfficeHost.
     /// </summary>
     [DefaultValue(StaticAuthorizeCallbackPathName)]
+    [Obsolete("This property is no longer in use. Scheduled for removal in Umbraco 21.")]
     public string AuthorizeCallbackPathName { get; set; } = StaticAuthorizeCallbackPathName;
 
     /// <summary>
