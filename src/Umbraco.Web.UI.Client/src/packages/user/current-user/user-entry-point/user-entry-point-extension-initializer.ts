@@ -1,12 +1,13 @@
 import { UMB_CURRENT_USER_CONTEXT } from '../current-user.context.token.js';
 import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
-import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import type { UmbElement } from '@umbraco-cms/backoffice/element-api';
 import type { ManifestUserEntryPoint } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbElement } from '@umbraco-cms/backoffice/element-api';
+import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 import {
 	hasInitExport,
 	hasOnUnloadExport,
 	loadManifestPlainJs,
+	UmbExtensionInitializerBase,
 	type UmbEntryPointModule,
 	type UmbExtensionRegistry,
 } from '@umbraco-cms/backoffice/extension-api';
@@ -14,32 +15,28 @@ import {
 /**
  * Extension initializer for the `userEntryPoint` extension type.
  *
- * Runs `onInit` once the user is authorized AND the current user data is available,
- * so extensions can rely on `UMB_CURRENT_USER_CONTEXT` being populated.
- * Runs `onUnload` when the session ends (sign-out or timeout) or the extension is unregistered.
+ * Runs `onInit` once the user is authorized AND the current user data is available, so extensions
+ * can rely on `UMB_CURRENT_USER_CONTEXT` being populated. Runs `onUnload` when the session ends
+ * (sign-out or timeout) or the extension is unregistered. If the user authorizes again, `onInit`
+ * runs again — potentially for a different user.
  */
-export class UmbUserEntryPointExtensionInitializer extends UmbControllerBase {
-	readonly #host: UmbElement;
-	readonly #extensionRegistry: UmbExtensionRegistry<ManifestUserEntryPoint>;
-	readonly #manifestMap = new Map<string, ManifestUserEntryPoint>();
-	readonly #instanceMap = new Map<string, UmbEntryPointModule>();
+export class UmbUserEntryPointExtensionInitializer extends UmbExtensionInitializerBase<
+	'userEntryPoint',
+	ManifestUserEntryPoint
+> {
+	readonly #active: UmbBooleanState<boolean>;
+	#instanceMap = new Map<string, UmbEntryPointModule>();
 	#currentUserContext?: typeof UMB_CURRENT_USER_CONTEXT.TYPE;
 	#isAuthorized = false;
 	#hasUser = false;
-	#active = false;
-	// Invalidates in-flight instantiations when the session state flips while a module is loading.
-	#session = 0;
 
 	constructor(host: UmbElement, extensionRegistry: UmbExtensionRegistry<ManifestUserEntryPoint>) {
-		super(host);
-		this.#host = host;
-		this.#extensionRegistry = extensionRegistry;
-		this.#observeAuthorization();
-		this.#observeCurrentUser();
-		this.#observeExtensions();
-	}
+		// Create the gate before super() (no `this` access yet) and hand it to the base, which empties
+		// the observed set while it is false — so extensions unload on sign-out and instantiate on sign-in.
+		const active = new UmbBooleanState<boolean>(false);
+		super(host, extensionRegistry, 'userEntryPoint', active.asObservable());
+		this.#active = active;
 
-	#observeAuthorization() {
 		this.consumeContext(UMB_AUTH_CONTEXT, (authContext) => {
 			this.observe(
 				authContext?.isAuthorized,
@@ -49,14 +46,12 @@ export class UmbUserEntryPointExtensionInitializer extends UmbControllerBase {
 						// Deduplicated in the context; ensures the user loads even if nothing else requests it.
 						this.#currentUserContext?.load();
 					}
-					this.#update();
+					this.#updateActive();
 				},
 				'umbObserveIsAuthorized',
 			);
 		});
-	}
 
-	#observeCurrentUser() {
 		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (currentUserContext) => {
 			this.#currentUserContext = currentUserContext;
 			if (this.#isAuthorized) {
@@ -66,102 +61,46 @@ export class UmbUserEntryPointExtensionInitializer extends UmbControllerBase {
 				currentUserContext?.currentUser,
 				(currentUser) => {
 					this.#hasUser = !!currentUser;
-					this.#update();
+					this.#updateActive();
 				},
 				'umbObserveCurrentUser',
 			);
 		});
 	}
 
-	#observeExtensions() {
-		this.observe(
-			this.#extensionRegistry.byType<'userEntryPoint', ManifestUserEntryPoint>('userEntryPoint'),
-			(manifests) => this.#onManifestsChanged(manifests),
-			'umbObserveUserEntryPoints',
-		);
+	#updateActive() {
+		this.#active.setValue(this.#isAuthorized && this.#hasUser);
 	}
 
-	#onManifestsChanged(manifests: Array<ManifestUserEntryPoint>) {
-		this.#unloadRemovedExtensions(manifests);
-		this.#trackAddedExtensions(manifests);
-	}
-
-	#unloadRemovedExtensions(manifests: Array<ManifestUserEntryPoint>) {
-		for (const alias of this.#manifestMap.keys()) {
-			if (manifests.some((manifest) => manifest.alias === alias)) continue;
-			this.#manifestMap.delete(alias);
-			this.#unloadExtension(alias);
-		}
-	}
-
-	#trackAddedExtensions(manifests: Array<ManifestUserEntryPoint>) {
-		for (const manifest of manifests) {
-			if (this.#manifestMap.has(manifest.alias)) continue;
-			this.#manifestMap.set(manifest.alias, manifest);
-			if (!this.#active) continue;
-			this.#instantiateExtension(this.#session, manifest);
-		}
-	}
-
-	#update() {
-		const active = this.#isAuthorized && this.#hasUser;
-		if (active === this.#active) return;
-		this.#active = active;
-		const session = ++this.#session;
-		if (active) {
-			this.#manifestMap.forEach((manifest) => this.#instantiateExtension(session, manifest));
-		} else {
-			for (const alias of this.#instanceMap.keys()) {
-				this.#unloadExtension(alias);
-			}
-		}
-	}
-
-	async #instantiateExtension(session: number, manifest: ManifestUserEntryPoint) {
+	async instantiateExtension(manifest: ManifestUserEntryPoint) {
 		if (!manifest.js) return;
-		try {
-			const moduleInstance = await loadManifestPlainJs(manifest.js);
-			if (!moduleInstance) return;
-			// The session may have ended, or the extension been unregistered, while the module loaded.
-			if (session !== this.#session) return;
-			if (!this.#manifestMap.has(manifest.alias)) return;
-			this.#instanceMap.set(manifest.alias, moduleInstance);
-			if (hasInitExport(moduleInstance)) {
-				await Promise.resolve(moduleInstance.onInit(this.#host, this.#extensionRegistry));
-			}
-		} catch (error) {
-			console.error(
-				'[UmbUserEntryPointExtensionInitializer] Failed to instantiate extension',
-				manifest.alias,
-				error,
-			);
+		const moduleInstance = await loadManifestPlainJs(manifest.js);
+		// The gate may have closed (sign-out/timeout) while the module was loading; if so, the base has
+		// already unloaded this alias, so skip onInit rather than run it for an ended session.
+		if (!moduleInstance || !this.#active.getValue()) return;
+		this.#instanceMap.set(manifest.alias, moduleInstance);
+		if (hasInitExport(moduleInstance)) {
+			await moduleInstance.onInit(this.host, this.extensionRegistry);
 		}
 	}
 
-	#unloadExtension(alias: string) {
-		const moduleInstance = this.#instanceMap.get(alias);
+	unloadExtension(manifest: ManifestUserEntryPoint) {
+		const moduleInstance = this.#instanceMap.get(manifest.alias);
 		if (!moduleInstance) return;
-		this.#instanceMap.delete(alias);
+		this.#instanceMap.delete(manifest.alias);
 		if (hasOnUnloadExport(moduleInstance)) {
 			// Promise.resolve also captures rejections from async onUnload exports, which a bare try/catch would miss.
 			try {
-				Promise.resolve(moduleInstance.onUnload(this.#host, this.#extensionRegistry)).catch((error) => {
-					this.#logUnloadError(alias, error);
+				Promise.resolve(moduleInstance.onUnload(this.host, this.extensionRegistry)).catch((error) => {
+					this.#logUnloadError(manifest.alias, error);
 				});
 			} catch (error) {
-				this.#logUnloadError(alias, error);
+				this.#logUnloadError(manifest.alias, error);
 			}
 		}
 	}
 
 	#logUnloadError(alias: string, error: unknown) {
 		console.error('[UmbUserEntryPointExtensionInitializer] Failed to unload extension', alias, error);
-	}
-
-	override destroy() {
-		for (const alias of this.#instanceMap.keys()) {
-			this.#unloadExtension(alias);
-		}
-		super.destroy();
 	}
 }

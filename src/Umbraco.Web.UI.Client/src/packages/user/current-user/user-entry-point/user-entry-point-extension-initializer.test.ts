@@ -168,14 +168,15 @@ describe('UmbUserEntryPointExtensionInitializer', () => {
 		expect(calls.init).to.equal(0);
 	});
 
-	it('unloads all active instances on destroy', async () => {
+	it('does not run onUnload on host destroy (the hook is session-scoped, not host-scoped)', async () => {
 		registry.register(createManifest('Umb.Test.A', calls));
 		authContext.setAuthorized(true);
 		await aTimeout(50);
 		expect(calls.init).to.equal(1);
 
 		initializer.destroy();
-		expect(calls.unload).to.equal(1);
+		await aTimeout(50);
+		expect(calls.unload).to.equal(0);
 	});
 
 	it('an async onUnload rejection is caught and does not become an unhandled rejection', async () => {

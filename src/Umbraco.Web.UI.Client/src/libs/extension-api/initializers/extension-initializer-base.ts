@@ -4,6 +4,7 @@ import type { SpecificManifestTypeOrManifestBase } from '../types/map.types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbElement } from '@umbraco-cms/backoffice/element-api';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
+import { combineLatest, map, type Observable } from '@umbraco-cms/backoffice/external/rxjs';
 
 /**
  * Base class for extension initializers, which are responsible for loading and unloading extensions.
@@ -25,11 +26,26 @@ export abstract class UmbExtensionInitializerBase<
 	// cannot unblock waiters before the newest set of extensions has finished instantiating.
 	#loadPass = 0;
 
-	constructor(host: UmbElement, extensionRegistry: UmbExtensionRegistry<T>, manifestType: Key) {
+	/**
+	 * @param activeGate An optional observable that gates instantiation. While it emits `false` the
+	 * observed set is treated as empty, so all extensions of the type unload; when it emits `true`
+	 * they instantiate. Lets a subclass defer extensions until some external state is ready (e.g. an
+	 * authorized user) and tear them down again when it is lost. Omit for the default always-on behaviour.
+	 */
+	constructor(
+		host: UmbElement,
+		extensionRegistry: UmbExtensionRegistry<T>,
+		manifestType: Key,
+		activeGate?: Observable<boolean>,
+	) {
 		super(host);
 		this.host = host;
 		this.extensionRegistry = extensionRegistry;
-		this.observe(extensionRegistry.byType<Key, T>(manifestType), async (extensions) => {
+		const extensions$ = extensionRegistry.byType<Key, T>(manifestType);
+		const source = activeGate
+			? combineLatest([extensions$, activeGate]).pipe(map(([extensions, active]) => (active ? extensions : [])))
+			: extensions$;
+		this.observe(source, async (extensions) => {
 			const pass = ++this.#loadPass;
 
 			// Re-arm while this pass is in flight so a consumer awaiting `loaded` waits for it to
