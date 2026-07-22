@@ -1,8 +1,9 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_MODAL_CONTEXT } from '@umbraco-cms/backoffice/modal';
-import type { UmbModalContext } from '@umbraco-cms/backoffice/modal';
+// Import directly from token file to avoid circular dependency with modal package
+import { UMB_MODAL_CONTEXT } from '../../../modal/context/modal.context-token.js';
+import type { UmbModalContext } from '../../../modal/context/modal.context.js';
 
 /**
  * A component that displays a "Forbidden" message when a user tries to access a route they do not have permission for.
