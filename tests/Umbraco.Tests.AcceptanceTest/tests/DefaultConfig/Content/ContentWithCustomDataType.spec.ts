@@ -76,6 +76,8 @@ test('can create content with the custom data type with decimal property editor'
 
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.values).toEqual([]);
 });
 
 test('can add decimal number to the decimal in the content section', async ({umbracoApi, umbracoUi}) => {
