@@ -129,6 +129,17 @@ public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAut
 
                 EnsureTicketRenewalIfKeepUserLoggedIn(ctx);
 
+                // An explicit keep-alive request renews the ticket for an actively-working user,
+                // regardless of KeepUserLoggedIn. This is what lets the session-timeout warning offer
+                // a working "Stay logged in" action even when the session has a fixed expiry.
+                // Scoped strictly to this one endpoint so we never set ShouldRenew unconditionally
+                // (see the note below the SecurityStampValidator call — that would break the
+                // validation-interval behaviour and AllowConcurrentLogins enforcement).
+                if (ctx.Request.Path.StartsWithSegments(Paths.BackOfficeApi.KeepAliveEndpoint, StringComparison.OrdinalIgnoreCase))
+                {
+                    ctx.ShouldRenew = true;
+                }
+
                 // add or update a claim to track when the cookie expires, we use this to track time remaining
                 backOfficeIdentity?.AddOrUpdateClaim(new Claim(
                     Constants.Security.TicketExpiresClaimType,
