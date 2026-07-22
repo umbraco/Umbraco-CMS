@@ -938,6 +938,7 @@ export type DocumentUrlInfoModel = {
     url: string | null;
     message: string | null;
     provider: string;
+    isExternal: boolean;
 };
 
 export type DocumentUrlInfoResponseModel = {
