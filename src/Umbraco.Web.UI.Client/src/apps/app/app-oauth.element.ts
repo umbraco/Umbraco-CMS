@@ -1,10 +1,12 @@
 import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 
 import './app-error.element.js';
 
 /**
  * A full page error element that can be used either solo or for instance as the error 500 page and BootFailed
+ * @deprecated This element is no longer needed and is scheduled for removal in Umbraco 21.
  */
 @customElement('umb-app-oauth')
 export class UmbAppOauthElement extends UmbLitElement {
@@ -14,6 +16,14 @@ export class UmbAppOauthElement extends UmbLitElement {
 	 */
 	@property({ type: Boolean })
 	failure = false;
+
+	override firstUpdated() {
+		new UmbDeprecation({
+			deprecated: 'umb-app-oauth',
+			removeInVersion: '21.0.0',
+			solution: 'This element is no longer needed and is scheduled for removal in Umbraco 21.',
+		}).warn();
+	}
 
 	override render() {
 		// If we have a message, we show the error page
