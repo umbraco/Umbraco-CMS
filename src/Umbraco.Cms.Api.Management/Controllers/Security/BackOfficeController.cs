@@ -380,6 +380,25 @@ public class BackOfficeController : SecurityControllerBase
         return SignOut(Constants.Security.BackOfficeAuthenticationType, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
     }
 
+    /// <summary>
+    /// Keeps the current back-office session alive by renewing the authentication ticket.
+    /// </summary>
+    /// <remarks>
+    /// The renewal itself is performed by the cookie middleware's OnValidatePrincipal, which forces
+    /// a ticket renewal when it sees a request to this endpoint (see ConfigureBackOfficeCookieOptions).
+    /// The cookie is re-issued with a fresh expiry regardless of the KeepUserLoggedIn setting, so an
+    /// actively-working user can dismiss the session-timeout warning without being logged out. The
+    /// updated expiry is observed on the next request (e.g. GET current-user/configuration).
+    /// </remarks>
+    /// <returns>200 OK once the session ticket has been renewed.</returns>
+    [HttpPost("keep-alive")]
+    [MapToApiVersion("1.0")]
+    [Authorize(Policy = AuthorizationPolicies.BackOfficeAccess)]
+    [EndpointSummary("Keeps the current back-office session alive.")]
+    [EndpointDescription("Renews the current user's authentication ticket to extend the session.")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public IActionResult KeepAlive() => Ok();
+
     // Creates and retains a short lived secret to use in the link-login
     // endpoint because we can not protect that method with a bearer token for reasons explained there
     /// <summary>
