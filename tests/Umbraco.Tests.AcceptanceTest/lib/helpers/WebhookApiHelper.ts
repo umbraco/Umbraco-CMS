@@ -87,7 +87,7 @@ export class WebhookApiHelper {
     return webhookData.uuid;
   }
 
-  async getWebhookSiteRequestResponse(webhookSiteToken: string, timeoutMs: number = ConstantHelper.timeout.veryLong, pollInterval: number = ConstantHelper.timeout.short, expectedContent?: string) {
+  async getWebhookSiteRequestResponse(webhookSiteToken: string, timeoutMs: number = ConstantHelper.timeout.veryLong, pollInterval: number = ConstantHelper.timeout.short, expectedContentFragment?: string) {
     const requestUrl = this.webhookSiteUrl + 'token/' + webhookSiteToken + '/requests';
     const start = Date.now();
 
@@ -101,12 +101,12 @@ export class WebhookApiHelper {
       const requests = requestJson.data ?? [];
       // Delivery to webhook.site is async and an unrelated request can arrive first, so when an
       // expected content is given, keep polling until the matching webhook has actually been received.
-      if (expectedContent === undefined) {
+      if (expectedContentFragment === undefined) {
         if (requests.length > 0) {
           return requests;
         }
       } else {
-        const matches = requests.filter((request) => (request.content ?? '').includes(expectedContent));
+        const matches = requests.filter((request) => (request.content ?? '').includes(expectedContentFragment));
         if (matches.length > 0) {
           return matches;
         }
