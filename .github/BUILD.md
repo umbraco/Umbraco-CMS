@@ -6,8 +6,8 @@ This guide will explain how you can build the Umbraco CMS from the source code. 
 
 In order to use Umbraco as a CMS and build your website with it, you should not build it yourself. If you're reading this then you're trying to contribute to Umbraco or you're debugging a complex issue.
 
--   Are you about to [create a pull request for Umbraco][contribution guidelines]?
--   Are you trying to get to the bottom of a problem in your existing Umbraco installation?
+- Are you about to [create a pull request for Umbraco][contribution guidelines]?
+- Are you trying to get to the bottom of a problem in your existing Umbraco installation?
 
 If the answer is yes, please read on. Otherwise, make sure to head on over [to the releases page](https://releases.umbraco.com) and start using Umbraco CMS as intended.
 
@@ -29,11 +29,11 @@ If you've got this far and are keen to get stuck in helping us fix a bug or impl
 
 In order to work with the Umbraco source code locally, first make sure you have the following installed.
 
--   Your favourite IDE: [Visual Studio 2022 v17+ with .NET 7+](https://visualstudio.microsoft.com/vs/), [Rider](https://www.jetbrains.com/rider/) or [Visual Studio Code](https://code.visualstudio.com/)
--   [dotnet SDK v9+](https://dotnet.microsoft.com/en-us/download)
--   [Node.js v20+](https://nodejs.org/en/download/)
--   npm v10+ (installed with Node.js)
--   [Git command line](https://git-scm.com/download/)
+- Your favourite IDE: [Visual Studio 2022 v17+ with .NET 7+](https://visualstudio.microsoft.com/vs/), [Rider](https://www.jetbrains.com/rider/) or [Visual Studio Code](https://code.visualstudio.com/)
+- [dotnet SDK v9+](https://dotnet.microsoft.com/en-us/download)
+- [Node.js v20+](https://nodejs.org/en/download/)
+- npm v10+ (installed with Node.js)
+- [Git command line](https://git-scm.com/download/)
 
 ### Familiarizing yourself with the code
 
@@ -75,7 +75,6 @@ Conversely, if you are working on front-end only, you want to build the back-end
 
 ```json
 "BackOfficeHost": "http://localhost:5173",
-"AuthorizeCallbackPathName": "/oauth_complete",
 "AuthorizeCallbackLogoutPathName": "/logout",
 "AuthorizeCallbackErrorPathName": "/error",
 "BackOfficeTokenCookie": {
@@ -159,8 +158,8 @@ Once the solution has been used to run a site, one may want to "reset" the solut
 
 The easiest way to do this by deleting the following files and folders:
 
--   src/Umbraco.Web.UI/appsettings.json
--   src/Umbraco.Web.UI/umbraco/Data
+- src/Umbraco.Web.UI/appsettings.json
+- src/Umbraco.Web.UI/umbraco/Data
 
 You only have to remove the connection strings from the appsettings, but removing the data folder ensures that the sqlite database gets deleted too.
 
@@ -176,8 +175,8 @@ The following command will force remove all untracked files and directories, whe
 
 For git documentation see:
 
--   git [clean](https://git-scm.com/docs/git-clean)
--   git [reset](https://git-scm.com/docs/git-reset)
+- git [clean](https://git-scm.com/docs/git-clean)
+- git [reset](https://git-scm.com/docs/git-reset)
 
 ## Azure DevOps
 
