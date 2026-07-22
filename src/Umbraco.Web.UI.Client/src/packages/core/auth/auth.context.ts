@@ -13,13 +13,11 @@ import {
 	Subject,
 	switchMap,
 	distinctUntilChanged,
-	throttleTime,
 	auditTime,
 } from '@umbraco-cms/backoffice/external/rxjs';
-import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbBackofficeExtensionRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbApiClient, umbHttpClient } from '@umbraco-cms/backoffice/http-client';
-import { isTestEnvironment, UmbDeprecation } from '@umbraco-cms/backoffice/utils';
+import { isTestEnvironment } from '@umbraco-cms/backoffice/utils';
 
 /**
  * The multiplier for the token expiry time.
@@ -83,11 +81,6 @@ export class UmbAuthContext extends UmbContextBase {
 	#authWindowProxy?: WindowProxy | null;
 	#popupCleanup?: () => void;
 
-	/**
-	 * @deprecated Observe isAuthorized instead. Scheduled for removal in Umbraco 19.
-	 */
-	readonly #authorizationSignal = new Subject<void>();
-
 	// Track clients that have been configured to prevent duplicate interceptor binding
 	#configuredClients = new WeakSet();
 
@@ -125,25 +118,6 @@ export class UmbAuthContext extends UmbContextBase {
 		// This is useful to prevent the UI from being flooded with timeout events.
 		auditTime(1000),
 	);
-
-	/**
-	 * Observable that acts as a signal for when the authorization state changes.
-	 * @deprecated Observe isAuthorized instead. Scheduled for removal in Umbraco 19.
-	 * @remark It will emit once per second, so it can be used to trigger UI updates or other actions when the authorization state changes.
-	 * @returns An observable that emits when the authorization state changes.
-	 */
-	get authorizationSignal(): Observable<void> {
-		new UmbDeprecation({
-			deprecated: 'get authorizationSignal',
-			solution:
-				'Observe isAuthorized instead. This provides more useful information (authorized or not) and is more efficient to consume. Scheduled for removal in Umbraco 19.',
-			removeInVersion: '19.0.0',
-		}).warn();
-		return this.#authorizationSignal.asObservable().pipe(
-			// Throttle the signal to ensure that it emits once, then waits for 1s before allowing another emission.
-			throttleTime(1000),
-		);
-	}
 
 	/**
 	 * Whether the server is configured to keep users logged in by auto-refreshing before session expiry.
@@ -189,7 +163,6 @@ export class UmbAuthContext extends UmbContextBase {
 				case 'authorized': {
 					// Apply locally — do NOT call #updateSession which would re-broadcast.
 					this.#setSessionLocally(evt.data.expiresIn, evt.data.issuedAt);
-					this.#authorizationSignal.next();
 					break;
 				}
 				case 'sessionUpdate':
@@ -408,9 +381,6 @@ export class UmbAuthContext extends UmbContextBase {
 			expiresIn: response.expiresIn,
 			issuedAt: response.issuedAt,
 		});
-
-		// Fire the deprecated signal for external consumers
-		this.#authorizationSignal.next();
 
 		return response;
 	}
