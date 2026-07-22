@@ -1114,7 +1114,7 @@ export class DataTypeUiHelper extends UiBaseLocators {
       await this.focus(minInput); // Focus is needed
       await this.clearText(minInput);
       return;
-    } 
+    }
     await this.enterText(minInput, value.toString());
   }
 

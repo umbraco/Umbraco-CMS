@@ -129,7 +129,7 @@ export class MediaUiHelper extends UiBaseLocators {
       await this.clickMediaCaretButtonForName(name);
     }
   }
-  
+
   async doesMediaGridValuesMatch(expectedValues: string[]) {
     return expectedValues.forEach((text, index) => {
       expect(this.mediaCardItemsValues.nth(index)).toHaveText(text);

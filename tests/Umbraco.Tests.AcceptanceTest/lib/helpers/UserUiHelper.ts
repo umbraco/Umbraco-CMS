@@ -249,7 +249,7 @@ export class UserUiHelper extends UiBaseLocators {
     await this.clickUserWithName(name);
     await this.hasValue(this.nameOfUserInput, name);
   }
-  
+
   async clickUserButton() {
     await this.click(this.userBtn);
   }

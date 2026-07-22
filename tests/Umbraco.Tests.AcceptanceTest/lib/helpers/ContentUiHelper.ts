@@ -644,6 +644,16 @@ export class ContentUiHelper extends UiBaseLocators {
     await this.hasText(description, descriptionText);
   }
 
+  async doesAnyHistoryItemHaveTag(tagText: string) {
+    const tag = this.historyItems.locator('.log-type uui-tag').filter({hasText: tagText}).first();
+    await this.containsText(tag, tagText);
+  }
+
+  async doesAnyHistoryItemHaveDescription(descriptionText: string) {
+    const description = this.historyItems.locator('.log-type span').filter({hasText: descriptionText}).first();
+    await this.containsText(description, descriptionText);
+  }
+
   async doesHistoryItemHaveUsername(usernameText: string, index: number = 0) {
     const username = this.historyItems.nth(index).locator('.user-info .name');
     await this.containsText(username, usernameText);
@@ -724,7 +734,7 @@ export class ContentUiHelper extends UiBaseLocators {
 
   async clickContainerSaveAndPublishButtonAndWaitForContentToBePublished() {
     return await this.waitForResponseAfterExecutingPromise(
-      ConstantHelper.apiEndpoints.document,
+      ConstantHelper.apiEndpoints.updateAndPublish,
       this.clickContainerSaveAndPublishButton(),
       ConstantHelper.statusCodes.ok,
     );

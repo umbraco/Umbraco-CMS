@@ -11,8 +11,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_MODAL_MANAGER_CONTEXT, umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 
-const elementName = 'umb-user-workspace-client-credentials';
-@customElement(elementName)
+@customElement('umb-user-workspace-client-credentials')
 export class UmbUserWorkspaceClientCredentialsElement extends UmbLitElement {
 	@state()
 	private _userUnique?: string;
@@ -161,6 +160,6 @@ export class UmbUserWorkspaceClientCredentialsElement extends UmbLitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbUserWorkspaceClientCredentialsElement;
+		'umb-user-workspace-client-credentials': UmbUserWorkspaceClientCredentialsElement;
 	}
 }
