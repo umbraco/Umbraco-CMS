@@ -45,7 +45,7 @@ public class BlockEditorComponentTests
 
         Assert.AreEqual(5, guidMap.Count); // 5 keys from Block List (with no sub features)
         var expected = ReplaceGuids(json, guidMap);
-        var expectedJson = _jsonSerializer.Serialize( _jsonSerializer.Deserialize<BlockListValue>(expected));
+        var expectedJson = _jsonSerializer.Serialize(_jsonSerializer.Deserialize<BlockListValue>(expected));
         var resultJson = _jsonSerializer.Serialize(_jsonSerializer.Deserialize<BlockListValue>(result));
         Assert.IsNotEmpty(resultJson);
         Assert.AreEqual(expectedJson, resultJson);
@@ -77,7 +77,7 @@ public class BlockEditorComponentTests
         Assert.AreEqual(10, guidMap.Count); // 5 keys from each Block List
         var expected = ReplaceGuids(GetBlockListJson(innerJsonEscaped), guidMap);
 
-        var expectedJson = _jsonSerializer.Serialize( _jsonSerializer.Deserialize<BlockListValue>(expected));
+        var expectedJson = _jsonSerializer.Serialize(_jsonSerializer.Deserialize<BlockListValue>(expected));
         var resultJson = _jsonSerializer.Serialize(_jsonSerializer.Deserialize<BlockListValue>(result));
         Assert.IsNotEmpty(resultJson);
         Assert.AreEqual(expectedJson, resultJson);
@@ -104,7 +104,7 @@ public class BlockEditorComponentTests
 
         Assert.AreEqual(10, guidMap.Count); // 5 keys from each Block List
         var expected = ReplaceGuids(GetBlockListJson(innerJson), guidMap);
-        var expectedJson = _jsonSerializer.Serialize( _jsonSerializer.Deserialize<BlockListValue>(expected));
+        var expectedJson = _jsonSerializer.Serialize(_jsonSerializer.Deserialize<BlockListValue>(expected));
         var resultJson = _jsonSerializer.Serialize(_jsonSerializer.Deserialize<BlockListValue>(result));
         Assert.IsNotEmpty(resultJson);
         Assert.AreEqual(expectedJson, resultJson);
@@ -138,7 +138,7 @@ public class BlockEditorComponentTests
         Assert.AreEqual(10, guidMap.Count); // 5 keys from each Block List
         var expected = ReplaceGuids(GetBlockListJson(GetGridJson(innerJsonEscaped)), guidMap);
 
-        var expectedJson = _jsonSerializer.Serialize( _jsonSerializer.Deserialize<BlockListValue>(expected));
+        var expectedJson = _jsonSerializer.Serialize(_jsonSerializer.Deserialize<BlockListValue>(expected));
         var resultJson = _jsonSerializer.Serialize(_jsonSerializer.Deserialize<BlockListValue>(result));
         Assert.IsNotEmpty(resultJson);
         Assert.AreEqual(expectedJson, resultJson);
@@ -169,7 +169,7 @@ public class BlockEditorComponentTests
         Assert.AreEqual(21, guidMap.Count); // 16 keys from Block Grid + 5 keys from Block List
         var expected = ReplaceGuids(GetBlockGridJson(innerJsonEscaped), guidMap);
 
-        var expectedJson = _jsonSerializer.Serialize( _jsonSerializer.Deserialize<BlockGridValue>(expected));
+        var expectedJson = _jsonSerializer.Serialize(_jsonSerializer.Deserialize<BlockGridValue>(expected));
         var resultJson = _jsonSerializer.Serialize(_jsonSerializer.Deserialize<BlockGridValue>(result));
         Assert.IsNotEmpty(resultJson);
         Assert.AreEqual(expectedJson, resultJson);
@@ -196,7 +196,7 @@ public class BlockEditorComponentTests
         Assert.AreEqual(21, guidMap.Count); // 16 keys from Block Grid + 5 keys from Block List
         var expected = ReplaceGuids(GetBlockGridJson(innerJson), guidMap);
 
-        var expectedJson = _jsonSerializer.Serialize( _jsonSerializer.Deserialize<BlockGridValue>(expected));
+        var expectedJson = _jsonSerializer.Serialize(_jsonSerializer.Deserialize<BlockGridValue>(expected));
         var resultJson = _jsonSerializer.Serialize(_jsonSerializer.Deserialize<BlockGridValue>(result));
         Assert.IsNotEmpty(resultJson);
         Assert.AreEqual(expectedJson, resultJson);
@@ -229,7 +229,7 @@ public class BlockEditorComponentTests
         Assert.AreEqual(16, guidMap.Count); // 16 keys from Block Grid (with no sub features applicable for replacement)
         var expected = ReplaceGuids(GetBlockGridJson(innerJson), guidMap);
 
-        var expectedJson = _jsonSerializer.Serialize( _jsonSerializer.Deserialize<BlockGridValue>(expected));
+        var expectedJson = _jsonSerializer.Serialize(_jsonSerializer.Deserialize<BlockGridValue>(expected));
         var resultJson = _jsonSerializer.Serialize(_jsonSerializer.Deserialize<BlockGridValue>(result));
         Assert.IsNotEmpty(resultJson);
         Assert.AreEqual(expectedJson, resultJson);

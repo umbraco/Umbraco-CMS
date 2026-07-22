@@ -62,7 +62,8 @@ export class UmbCreateElementCollectionActionElement extends UmbLitElement {
 	}
 
 	override async firstUpdated() {
-		const { data } = await this.#elementTypeStructureRepository.requestAllowedChildrenOf(null, null);
+		const parentUnique = this._parentUnique ?? null;
+		const { data } = await this.#elementTypeStructureRepository.requestAllowedChildrenOf(null, parentUnique);
 		if (data?.items) {
 			this._allowedElementTypes = data.items;
 		}

@@ -30,7 +30,10 @@ export class UmbDuplicateDocumentEntityAction extends UmbEntityActionBase<never>
 				selectableFilter,
 				treeExpansion: ancestors.length ? linkEntityExpansionEntries(ancestors) : undefined,
 			},
-		});
+		}).catch(() => undefined);
+
+		// The modal was cancelled.
+		if (!value) return;
 
 		const destinationUnique = value.destination.unique;
 		if (destinationUnique === undefined) throw new Error('Destination Unique is not available');

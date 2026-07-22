@@ -1076,7 +1076,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             // so... if query contains "[umbracoNode].[nodeId] AS [umbracoNode__nodeId]"
             // then GetAliased for "[umbracoNode].[nodeId]" returns "[umbracoNode__nodeId]"
             MatchCollection matches = SqlContext.SqlSyntax.AliasRegex.Matches(sql.SQL);
-            Match? match = matches.Cast<Match>().FirstOrDefault(m => m.Groups[1].Value.InvariantEquals(field));
+            Match? match = matches.FirstOrDefault(m => m.Groups[1].ValueSpan.Equals(field, StringComparison.InvariantCultureIgnoreCase));
             return match == null ? field : match.Groups[2].Value;
         }
 

@@ -92,7 +92,7 @@ public sealed class ModelBindingExceptionAttribute : TypeFilterAttribute
 
             if (matches.Count >= 2)
             {
-                return string.Equals(matches[0].Value, matches[1].Value, StringComparison.InvariantCulture);
+                return matches[0].ValueSpan.Equals(matches[1].ValueSpan, StringComparison.InvariantCulture);
             }
 
             return false;

@@ -4,8 +4,7 @@ import { UmbElementVariantState } from '../../variant-state.js';
 import { UmbElementPublishingRepository } from '../repository/index.js';
 import { UmbElementPublishedPendingChangesManager } from '../pending-changes/index.js';
 import type { UmbElementVariantPublishModel } from '../types.js';
-import { UMB_ELEMENT_PUBLISH_MODAL } from '../publish/constants.js';
-import { UMB_ELEMENT_UNPUBLISH_MODAL } from '../unpublish/constants.js';
+import { UmbElementUnpublishManifestEntityActionMeta } from '../unpublish/entity-action/constants.js';
 import { UMB_ELEMENT_SCHEDULE_MODAL } from '../schedule-publish/constants.js';
 import { UMB_ELEMENT_ENTITY_TYPE } from '../../entity.js';
 import { UMB_ELEMENT_WORKSPACE_ALIAS } from '../../workspace/constants.js';
@@ -14,6 +13,7 @@ import { UMB_ELEMENT_PUBLISHING_SHORTCUT_UNIQUE } from './constants.js';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
+import { UMB_CONTENT_PUBLISH_MODAL, UmbContentUnpublishEntityAction } from '@umbraco-cms/backoffice/content';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
@@ -122,59 +122,17 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 		const entityType = this.#elementWorkspaceContext.getEntityType();
 		if (!entityType) throw new Error('Entity type is missing');
 
-		const { options, selected } = await this.#determineVariantOptions();
+		const action = new UmbContentUnpublishEntityAction(this, {
+			unique,
+			entityType,
+			meta: UmbElementUnpublishManifestEntityActionMeta,
+		});
+		const didUnpublish = await action.executeWithResult();
+		if (!didUnpublish) return;
 
-		// Filter to only show published variants
-		const publishedOptions = options.filter(
-			(option) =>
-				option.variant?.state === UmbElementVariantState.PUBLISHED ||
-				option.variant?.state === UmbElementVariantState.PUBLISHED_PENDING_CHANGES,
-		);
-
-		if (publishedOptions.length === 0) {
-			this.#notificationContext?.peek('warning', {
-				data: { message: this.#localize.term('content_itemNotPublished') },
-			});
-			return;
-		}
-
-		// If invariant (single culture = null), unpublish directly without modal
-		if (publishedOptions.length === 1 && publishedOptions[0].culture === null) {
-			const variantIds = [UmbVariantId.CreateInvariant()];
-			await this.#performUnpublish(unique, entityType, variantIds);
-			return;
-		}
-
-		const result = await umbOpenModal(this, UMB_ELEMENT_UNPUBLISH_MODAL, {
-			data: {
-				options: publishedOptions,
-				pickableFilter: this.#publishableVariantsFilter,
-			},
-			value: { selection: selected.filter((s) => publishedOptions.some((o) => o.unique === s)) },
-		}).catch(() => undefined);
-
-		if (!result?.selection.length) return;
-
-		const variantIds = result.selection.map((x) => UmbVariantId.FromString(x));
-		await this.#performUnpublish(unique, entityType, variantIds);
-	}
-
-	async #performUnpublish(unique: string, entityType: string, variantIds: Array<UmbVariantId>) {
-		const { error } = await this.#publishingRepository.unpublish(unique, variantIds);
-
-		if (!error) {
-			this.#notificationContext?.peek('positive', {
-				data: { message: this.#localize.term('speechBubbles_editElementUnpublishedHeader') },
-			});
-
-			this.#clear();
-
-			await this.#elementWorkspaceContext?.reload();
-			await this.#loadAndProcessLastPublished();
-
-			const event = new UmbRequestReloadStructureForEntityEvent({ unique, entityType });
-			this.#eventContext?.dispatchEvent(event);
-		}
+		// Reload workspace data to reflect the unpublished state
+		await this.#elementWorkspaceContext.reload();
+		await this.#loadAndProcessLastPublished();
 	}
 
 	/**
@@ -228,30 +186,43 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 		await this.#elementWorkspaceContext.runMandatoryValidationForSaveData(saveData, variantIds);
 		await this.#elementWorkspaceContext.askServerToValidate(saveData, variantIds);
 
-		return this.#elementWorkspaceContext.validateAndSubmit(
+		return this.#elementWorkspaceContext.validateVariantsAndSubmit(
+			variantIds,
 			async () => {
-				if (!this.#elementWorkspaceContext) {
-					throw new Error('Element workspace context is missing');
-				}
+				try {
+					if (!this.#elementWorkspaceContext) {
+						throw new Error('Element workspace context is missing');
+					}
 
-				// Save the element before scheduling
-				await this.#elementWorkspaceContext.performCreateOrUpdate(variantIds, saveData);
+					// Save the element before scheduling
+					await this.#elementWorkspaceContext.performCreateOrUpdate(variantIds, saveData);
 
-				// Schedule the element
-				const { error } = await this.#publishingRepository.publish(unique, variants);
-				if (error) {
+					// Schedule the element
+					const { error } = await this.#publishingRepository.publish(unique, variants);
+					if (error) {
+						throw error;
+					}
+
+					const notification = {
+						data: { message: this.#localize.term('speechBubbles_editContentScheduledSavedText') },
+					};
+					this.#notificationContext?.peek('positive', notification);
+
+					// reload the element so all states are updated after the schedule operation
+					await this.#elementWorkspaceContext.reload();
+
+					// request reload of this entity
+					const structureEvent = new UmbRequestReloadStructureForEntityEvent({ entityType, unique });
+					this.#eventContext?.dispatchEvent(structureEvent);
+				} catch (error) {
+					// Notify only on the publish path. The validation-failure path below already
+					// notifies, so a shared top-level .catch would fire a second toast.
+					this.#notificationContext?.peek('danger', {
+						data: { message: this.#localize.term('speechBubbles_editContentScheduledNotSavedText') },
+					});
+
 					return Promise.reject(error);
 				}
-
-				const notification = { data: { message: this.#localize.term('speechBubbles_editContentScheduledSavedText') } };
-				this.#notificationContext?.peek('positive', notification);
-
-				// reload the element so all states are updated after the schedule operation
-				await this.#elementWorkspaceContext.reload();
-
-				// request reload of this entity
-				const structureEvent = new UmbRequestReloadStructureForEntityEvent({ entityType, unique });
-				this.#eventContext?.dispatchEvent(structureEvent);
 			},
 			async (reason?: unknown) => {
 				this.#notificationContext?.peek('danger', {
@@ -304,12 +275,11 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 			variantIds.push(UmbVariantId.Create(options[0]));
 		} else {
 			// If there are multiple variants, we will open the modal to let the user pick which variants to publish.
-			const result = await umbOpenModal(this, UMB_ELEMENT_PUBLISH_MODAL, {
+			const result = await umbOpenModal(this, UMB_CONTENT_PUBLISH_MODAL, {
 				data: {
 					headline: this.#localize.term('content_saveAndPublishModalTitle'),
 					options,
-					pickableFilter: this.#publishableVariantsFilter,
-					unique,
+					pickableFilter: (option) => this.#publishableVariantsFilter(option as UmbElementVariantOptionModel),
 				},
 				value: { selection: selected },
 			}).catch(() => undefined);
@@ -326,9 +296,17 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 		await this.#elementWorkspaceContext.runMandatoryValidationForSaveData(saveData, variantIds);
 		await this.#elementWorkspaceContext.askServerToValidate(saveData, variantIds);
 
-		return this.#elementWorkspaceContext.validateAndSubmit(
-			async () => {
-				return this.#performSaveAndPublish(variantIds, saveData);
+		return this.#elementWorkspaceContext.validateVariantsAndSubmit(
+			variantIds,
+			() => {
+				// Notify only on the publish path. The validation-failure path below already
+				// notifies, so a shared top-level .catch would fire a second, contradictory toast.
+				return this.#performSaveAndPublish(variantIds, saveData).catch((error) => {
+					this.#notificationContext?.peek('danger', {
+						data: { message: this.#localize.term('speechBubbles_editElementPublishedFailed') },
+					});
+					return Promise.reject(error);
+				});
 			},
 			async (reason?: unknown) => {
 				// If data of the selection is not valid Then just save:
@@ -352,31 +330,49 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 		const entityType = this.#elementWorkspaceContext.getEntityType();
 		if (!entityType) throw new Error('Entity type is missing');
 
-		await this.#elementWorkspaceContext.performCreateOrUpdate(variantIds, saveData);
+		// The publish already succeeded server-side once we reach the read-back; a failed read-back must not be
+		// reported as a publish failure, so we fall back to the submitted data and flag the editor as stale.
+		let reloadAfterPublishFailed = false;
+		const loadAfterPublish = async (): Promise<UmbElementDetailModel> => {
+			try {
+				return await this.#elementWorkspaceContext!.loadWithoutPersist();
+			} catch {
+				reloadAfterPublishFailed = true;
+				return saveData;
+			}
+		};
 
-		const { error } = await this.#publishingRepository.publish(
-			unique,
-			variantIds.map((variantId) => ({ variantId })),
-		);
+		await this.#elementWorkspaceContext.performCreateOrUpdate(variantIds, saveData, {
+			create: async (data, ids, parent) => {
+				const { error } = await this.#publishingRepository.createAndPublish(data, ids, parent.unique);
+				if (error) throw new Error('Error creating and publishing element', { cause: error });
+				return loadAfterPublish();
+			},
+			update: async (data, ids) => {
+				const { error } = await this.#publishingRepository.updateAndPublish(data, ids);
+				if (error) throw new Error('Error updating and publishing element', { cause: error });
+				return loadAfterPublish();
+			},
+		});
 
-		if (!error) {
-			this.#notificationContext?.peek('positive', {
-				data: { message: this.#localize.term('speechBubbles_editElementPublishedHeader') },
+		this.#notificationContext?.peek('positive', {
+			data: {
+				message: this.#localize.term('speechBubbles_editElementPublishedHeader'),
+			},
+		});
+
+		if (reloadAfterPublishFailed) {
+			this.#notificationContext?.peek('warning', {
+				data: {
+					message: this.#localize.term('speechBubbles_editElementPublishedReloadFailed'),
+				},
 			});
-
-			// Clear stale published data and pending changes state so the
-			// persistedData observer does not run a comparison against outdated
-			// data during reload, which would briefly show a false-positive
-			// "pending changes" state.
-			this.#clear();
-
-			// reload the element so all states are updated after the publish operation
-			await this.#elementWorkspaceContext.reload();
-			await this.#loadAndProcessLastPublished();
-
-			const event = new UmbRequestReloadStructureForEntityEvent({ unique, entityType });
-			this.#eventContext?.dispatchEvent(event);
 		}
+
+		await this.#loadAndProcessLastPublished();
+
+		const event = new UmbRequestReloadStructureForEntityEvent({ unique, entityType });
+		this.#eventContext?.dispatchEvent(event);
 	}
 
 	#publishableVariantsFilter = (option: UmbElementVariantOptionModel) => {
@@ -488,10 +484,9 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 		const hasPublishedVariant = this.#hasPublishedVariant();
 		if (!hasPublishedVariant) return;
 
-		// TODO: Implement once ElementService.getElementByIdPublished endpoint exists [LK]
-		// const { data } = await this.#publishingRepository.published(unique);
-		// this.#publishedElementData = data;
-		// this.#processPendingChanges();
+		const { data } = await this.#publishingRepository.published(unique);
+		this.#publishedElementData = data;
+		this.#processPendingChanges();
 	}
 
 	#processPendingChanges() {

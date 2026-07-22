@@ -1,3 +1,4 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
@@ -7,6 +8,7 @@ using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Notifications;
+using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence;
@@ -199,6 +201,12 @@ public class CoreRuntime : IRuntime
             _hostApplicationLifetime?.ApplicationStarted.Register(() => _eventAggregator.Publish(new UmbracoApplicationStartedNotification(false)));
             _hostApplicationLifetime?.ApplicationStopped.Register(() => _eventAggregator.Publish(new UmbracoApplicationStoppedNotification(false)));
         }
+
+        // Per-server caches are now seeded (UmbracoApplicationStartingNotification has completed), so the
+        // front-end may route content. BootUmbracoAsync awaits this method before adding middleware, so on a
+        // normal boot the app never serves before this point. During an unattended upgrade the runtime returns
+        // early above (Upgrading) and UnattendedUpgradeBackgroundService marks readiness once it finishes seeding.
+        _serviceProvider?.GetService<IContentRoutingReadiness>()?.MarkReady();
     }
 
     private async Task StopAsync(CancellationToken cancellationToken, bool isRestarting)

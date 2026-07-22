@@ -1,9 +1,8 @@
-import { UmbPreviewRepository } from '../repository/preview.repository.js';
+import { UmbPreviewController } from '../controllers/preview.controller.js';
 import { UMB_PREVIEW_CONTEXT } from '../context/preview.context-token.js';
 import type { UmbPopoverToggleEvent } from './types.js';
 import { css, customElement, html, nothing, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { umbPeekError } from '@umbraco-cms/backoffice/notification';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 type UmbPreviewEnvironmentItem = {
@@ -32,7 +31,7 @@ export class UmbPreviewEnvironmentsElement extends UmbLitElement {
 	@state()
 	private _unique?: string;
 
-	#previewRepository = new UmbPreviewRepository(this);
+	#previewController = new UmbPreviewController(this);
 
 	constructor() {
 		super();
@@ -70,28 +69,15 @@ export class UmbPreviewEnvironmentsElement extends UmbLitElement {
 		if (!this._unique) return;
 		if (!item.urlProviderAlias) return;
 
-		const previewUrlData = await this.#previewRepository.getPreviewUrl(
-			this._unique,
-			item.urlProviderAlias,
-			this._culture,
-			this._segment,
-		);
-
-		if (previewUrlData.url) {
-			// Add cache-busting parameter to ensure the preview tab reloads with the new preview session
-			const previewUrl = new URL(previewUrlData.url, window.document.baseURI);
-			previewUrl.searchParams.set('rnd', Date.now().toString());
-			const previewWindow = window.open(previewUrl.toString(), `umbpreview-${this._unique}`);
-			previewWindow?.focus();
-			return;
-		}
-
-		if (previewUrlData.message) {
-			umbPeekError(this, {
-				color: 'danger',
-				headline: this.localize.term('general_preview'),
-				message: previewUrlData.message,
+		try {
+			await this.#previewController.preview({
+				unique: this._unique,
+				urlProviderAlias: item.urlProviderAlias,
+				culture: this._culture,
+				segment: this._segment,
 			});
+		} catch {
+			// The controller already shows an error notification; nothing more to do here.
 		}
 	}
 

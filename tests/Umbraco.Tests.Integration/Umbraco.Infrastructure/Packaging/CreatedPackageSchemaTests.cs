@@ -15,7 +15,7 @@ internal sealed class CreatedPackageSchemaTests : UmbracoIntegrationTest
     private ICreatedPackagesRepository CreatedPackageSchemaRepository =>
         GetRequiredService<ICreatedPackagesRepository>();
 
-    private ICoreScopeProvider ScopeProvider => GetRequiredService<ICoreScopeProvider>();
+    private new ICoreScopeProvider ScopeProvider => GetRequiredService<ICoreScopeProvider>();
 
     [Test]
     public void PackagesRepository_Can_Save_PackageDefinition()
