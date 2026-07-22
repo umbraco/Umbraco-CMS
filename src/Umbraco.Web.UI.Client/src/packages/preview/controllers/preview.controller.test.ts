@@ -47,10 +47,6 @@ class FakePreviewRepository {
 		this.#response = response;
 	}
 
-	setResponse(response: DocumentUrlInfoModel) {
-		this.#response = response;
-	}
-
 	async getPreviewUrl(unique: string, providerAlias: string): Promise<DocumentUrlInfoModel> {
 		this.getPreviewUrlCalls.push({ unique, providerAlias });
 		return this.#response;

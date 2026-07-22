@@ -20,5 +20,5 @@ public class DocumentUrlInfo : ContentUrlInfoBase
     /// <summary>
     /// Gets or sets a value indicating whether the URL points to an external (remote host) destination.
     /// </summary>
-    public required bool IsExternal { get; init; }
+    public bool IsExternal { get; init; }
 }

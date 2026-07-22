@@ -19,6 +19,12 @@ export class UmbPreviewController extends UmbControllerBase {
 	#previewRepository: UmbPreviewRepository;
 	#localize = new UmbLocalizationController(this);
 
+	/**
+	 * Creates a new {@link UmbPreviewController}.
+	 * @param {UmbControllerHost} host - The controller host.
+	 * @param {UmbPreviewRepository} [previewRepository] - Optional repository override; defaults to a new
+	 * {@link UmbPreviewRepository}. Intended for testing.
+	 */
 	constructor(host: UmbControllerHost, previewRepository?: UmbPreviewRepository) {
 		super(host);
 		this.#previewRepository = previewRepository ?? new UmbPreviewRepository(this);
@@ -91,6 +97,7 @@ export class UmbPreviewController extends UmbControllerBase {
 			// Window reference is stale, continue to create new preview session
 			this.#previewWindow = null;
 			this.#previewWindowKey = null;
+			this.#previewIsExternal = false;
 		}
 
 		return false;
