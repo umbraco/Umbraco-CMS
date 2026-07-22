@@ -348,21 +348,25 @@ git commit -m "feat(auth): drive timeout modal from cookie expiry; dormant when 
 
 Remove from `auth.context.ts`: `makeAuthorizationRequest`, `completeAuthorizationRequest`, `validateToken`, `makeRefreshTokenRequest`, `#performRefresh`, `#ensureTokenReady`, `#isAccessTokenValid`, `#requestCodeVerifierFromOpener`, `#setSessionLocally`/`#updateSession` (token-timing helpers), the popup fields (`#authWindowProxy`, `#popupCleanup`), `#sessionDead`, `#inSessionUpdateCallback`, PKCE endpoints, and the `#client = new UmbAuthClient(...)` wiring. Delete `umb-auth-client.ts` and remove the `src/external/openid` import from the auth path. Remove `UmbAppOauthElement` if now unreferenced.
 
-- [ ] **Step 2: Convert token accessors to deprecated no-op shims**
+- [ ] **Step 2: Convert token accessors to deprecated shims (BOTH methods)**
+
+Deprecate `getLatestToken` AND `getOpenApiConfiguration` for external consumers — each with a `@deprecated` JSDoc tag AND a `UmbDeprecation` runtime warning (check `docs/deprecation.md` first; confirm the exact `removeInVersion` against the repo's deprecation policy — N+2 from v19 → `21.0.0`).
 
 ```ts
-/** @deprecated Cookie auth carries credentials automatically; no bearer token exists. Scheduled for removal in a later major. */
+/** @deprecated Cookie auth carries credentials automatically; no bearer token exists. Scheduled for removal in Umbraco 21. */
 async getLatestToken(): Promise<string> {
-	new UmbDeprecation({ deprecated: 'getLatestToken', solution: 'Requests use the httpOnly session cookie automatically (credentials: "include").', removeInVersion: '20.0.0' }).warn();
+	new UmbDeprecation({ deprecated: 'getLatestToken', solution: 'Requests are authenticated by the httpOnly session cookie automatically (credentials: "include").', removeInVersion: '21.0.0' }).warn();
 	return '';
 }
 
+/** @deprecated Cookie auth carries credentials automatically; construct requests with `credentials: "include"`. Scheduled for removal in Umbraco 21. */
 getOpenApiConfiguration(): UmbOpenApiConfiguration {
+	new UmbDeprecation({ deprecated: 'getOpenApiConfiguration', solution: 'Use credentials: "include" directly; the httpOnly session cookie authenticates requests.', removeInVersion: '21.0.0' }).warn();
 	return { base: this.#serverUrl, credentials: 'include', token: undefined };
 }
 ```
 
-Confirm `UmbOpenApiConfiguration.token` is optional; make it optional if not. `configureClient` sets `{ baseUrl, credentials: 'include' }` and no `auth` callback.
+Confirm `UmbOpenApiConfiguration.token` is optional; make it optional if not. `configureClient` sets `{ baseUrl, credentials: 'include' }` and no `auth` callback. Note: both methods have zero internal callers, so the runtime warning only ever fires for external extensions — exactly the audience we want to nudge off them.
 
 - [ ] **Step 3: Simplify `signOut`**
 
