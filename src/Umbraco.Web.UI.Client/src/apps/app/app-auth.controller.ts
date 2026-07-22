@@ -45,9 +45,14 @@ export class UmbAppAuthController extends UmbControllerBase {
 		if (!this.#authContext) {
 			throw new Error('[Fatal] Auth context is not available');
 		}
+		const loginUrl = new URL(`${this.#authContext.getServerUrl()}/umbraco/login`);
 		// Preserve where the user was (potentially deep in an editor) so the login screen returns
-		// them there afterwards. Pass a relative path only — the server rejects non-local URLs.
-		const returnUrl = encodeURIComponent(window.location.pathname + window.location.search);
-		location.href = `${this.#authContext.getServerUrl()}/umbraco/login?ReturnUrl=${returnUrl}`;
+		// them there afterwards. A relative path only — the server rejects non-local URLs. Skip a
+		// bare "/": the server already defaults to the backoffice root, so ?ReturnUrl=%2F is just noise.
+		const returnUrl = window.location.pathname + window.location.search;
+		if (returnUrl !== '/') {
+			loginUrl.searchParams.set('ReturnUrl', returnUrl);
+		}
+		location.href = loginUrl.href;
 	}
 }
