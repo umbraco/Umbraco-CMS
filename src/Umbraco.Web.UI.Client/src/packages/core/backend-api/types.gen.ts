@@ -547,6 +547,7 @@ export type CultureReponseModel = {
 
 export type CurrentUserConfigurationResponseModel = {
     keepUserLoggedIn: boolean;
+    timeoutUtc?: string;
     passwordConfiguration: PasswordConfigurationResponseModel;
     allowChangePassword: boolean;
     allowTwoFactor: boolean;
