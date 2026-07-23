@@ -93,20 +93,20 @@ export class UmbAuthContext extends UmbContextBase {
 
 	/**
 	 * Observable that emits true when the auth context is initialized.
-	 * @remark It will only emit once and then complete itself.
+	 * It will only emit once and then complete itself.
 	 */
 	readonly isInitialized = this.#isInitialized.asObservable();
 
 	/**
 	 * Observable that emits true if the user is authorized, otherwise false.
-	 * @remark It will only emit when the authorization state changes.
+	 * It will only emit when the authorization state changes.
 	 */
 	readonly isAuthorized = this.#isAuthorized.asObservable().pipe(distinctUntilChanged());
 
 	/**
 	 * Observable that acts as a signal and emits when the user has timed out, i.e. the token has expired.
 	 * This can be used to show a timeout message to the user.
-	 * @remark It will emit once per second, so it can be used to trigger UI updates or other actions when the user has timed out.
+	 * It will emit once per second, so it can be used to trigger UI updates or other actions when the user has timed out.
 	 */
 	readonly timeoutSignal = this.#isTimeout.asObservable().pipe(
 		// Audit the timeout signal to ensure that it waits for 1s before allowing another emission, which prevents rapid firing of the signal.
@@ -433,7 +433,7 @@ export class UmbAuthContext extends UmbContextBase {
 	 * future activity-based auto-renewer, or an extension that needs to hold a session open during
 	 * long-running work. Safe to call repeatedly; it returns `false` (rather than throwing) when the
 	 * renewal fails, so callers can decide whether to fall back to sign-out / re-login.
-	 * @returns True if the session was renewed, otherwise false.
+	 * @returns {boolean} True if the session was renewed, otherwise false.
 	 */
 	async keepAlive(): Promise<boolean> {
 		try {
@@ -467,6 +467,7 @@ export class UmbAuthContext extends UmbContextBase {
 	 * the login HTML as a 200 that we'd mistake for a valid session. Manual mode turns any such
 	 * redirect into an opaque, non-ok response (status 0) so it reads as unauthorized — navigation to
 	 * the login screen is driven solely by the app auth controller, never by this probe.
+	 * @returns {Promise<boolean>} True if the session was established, otherwise false.
 	 */
 	async #establishSessionFromServer(): Promise<boolean> {
 		try {
@@ -506,7 +507,6 @@ export class UmbAuthContext extends UmbContextBase {
 	 * Gets the latest token from the Management API.
 	 * With cookie auth, this returns '[redacted]' — the real token is in the httpOnly cookie.
 	 * If the session has expired, it will attempt a refresh first.
-	 *
 	 * @example <caption>Using the latest token</caption>
 	 * ```js
 	 *   const token = await authContext.getLatestToken();
@@ -514,8 +514,9 @@ export class UmbAuthContext extends UmbContextBase {
 	 * ```
 	 * @see {@link configureClient} for automatic token handling with `@hey-api/openapi-ts` clients.
 	 * @see {@link getOpenApiConfiguration} for manual fetch calls with cookie-based auth.
+	 * @deprecated Use {@link configureClient}, {@link getOpenApiConfiguration}, or remove `"auth"` and set `"include": "credentials"` on fetch calls instead. Scheduled for removal in Umbraco 21.
 	 * @memberof UmbAuthContext
-	 * @returns The latest token from the Management API
+	 * @returns {Promise<string>} The latest token from the Management API
 	 */
 	async getLatestToken(): Promise<string> {
 		await this.#ensureTokenReady();
@@ -529,7 +530,7 @@ export class UmbAuthContext extends UmbContextBase {
 	 * call when the access token is still valid.
 	 * Uses Web Locks to deduplicate concurrent refresh requests across tabs.
 	 * @memberof UmbAuthContext
-	 * @returns True if the refresh succeeded, otherwise false
+	 * @returns {Promise<boolean>} True if the refresh succeeded, otherwise false
 	 */
 	async validateToken(): Promise<boolean> {
 		return this.#isBypassed || this.makeRefreshTokenRequest();
@@ -537,7 +538,7 @@ export class UmbAuthContext extends UmbContextBase {
 
 	/**
 	 * Attempts to refresh the token using Web Locks to prevent concurrent refresh requests.
-	 * @returns True if the refresh was successful, otherwise false.
+	 * @returns {Promise<boolean>} True if the refresh was successful, otherwise false.
 	 */
 	async makeRefreshTokenRequest(): Promise<boolean> {
 		// A previous refresh was definitively rejected — retrying cannot succeed
@@ -597,7 +598,7 @@ export class UmbAuthContext extends UmbContextBase {
 
 	/**
 	 * Checks if the current session is still valid.
-	 * @returns True if the session has not expired.
+	 * @returns {boolean} True if the session has not expired.
 	 */
 	isSessionValid(): boolean {
 		const session = this.#session.getValue();
@@ -696,22 +697,23 @@ export class UmbAuthContext extends UmbContextBase {
 	 * 		headers: { Authorization: `Bearer ${await config.token()}` },
 	 * 	});
 	 * ```
-	 * @returns The server url to the Management API
+	 * @returns {string} The server url to the Management API
 	 */
-	getServerUrl() {
+	getServerUrl(): string {
 		return this.#serverUrl;
 	}
 
 	/**
-	 * Get the default OpenAPI configuration, which is set up to communicate with the Management API.
-	 * @remark This is useful if you want to communicate with your own resources generated by the [@hey-api/openapi-ts](https://github.com/hey-api/openapi-ts) library.
+	 * Get the default OpenAPI configuration, which is set up to communicate with the Management API
+	 * or any other API that uses the same cookie-based authentication.
+	 * This is useful if you want to communicate with your own resources generated by the [@hey-api/openapi-ts](https://github.com/hey-api/openapi-ts) library.
 	 * @memberof UmbAuthContext
 	 * @example <caption>Using the default OpenAPI configuration</caption>
 	 * ```js
 	 * const defaultOpenApi = authContext.getOpenApiConfiguration();
 	 * client.setConfig({
 	 *   base: defaultOpenApi.base,
-	 *   auth: defaultOpenApi.token,
+	 *   credentials: defaultOpenApi.credentials,
 	 * });
 	 * ```
 	 * @returns {UmbOpenApiConfiguration} The default OpenAPI configuration
@@ -720,15 +722,13 @@ export class UmbAuthContext extends UmbContextBase {
 		return {
 			base: this.#serverUrl,
 			credentials: 'include',
-			token: this.getLatestToken.bind(this),
 		};
 	}
 
 	/**
 	 * Configures a `@hey-api/openapi-ts` generated client for authenticated API calls.
 	 *
-	 * Sets `baseUrl`, `credentials`, and the `auth` callback (cookie-based with
-	 * automatic token refresh via {@link getLatestToken}), and binds the default
+	 * Sets `baseUrl` and `credentials`, and binds the default
 	 * response interceptors (401 retry, problem-details error notifications, etc.)
 	 * to the client.
 	 *
@@ -736,15 +736,14 @@ export class UmbAuthContext extends UmbContextBase {
 	 * the lifetime of the host (`<umb-app>`), so it's safe to call this method for
 	 * multiple clients (the core's {@link umbHttpClient} *and* an extension's own
 	 * generated client) without registering duplicate auth-signaler contexts.
-	 *
 	 * @example
 	 * ```js
 	 * const authContext = await this.getContext(UMB_AUTH_CONTEXT);
 	 * authContext.configureClient(myClient);
 	 * // Now myClient automatically includes auth headers and interceptors
 	 * ```
-	 * @param client A `@hey-api/openapi-ts` client instance — either {@link umbHttpClient}
-	 * or one regenerated by an extension package against its own OpenAPI document.
+	 * @param {UmbApiClient} client A `@hey-api/openapi-ts` client instance — either {@link umbHttpClient}
+	 * or one regenerated by an extension package against its own OpenAPI document. You can see {@link UmbApiClient} for the expected interface.
 	 */
 	configureClient(client: UmbApiClient): void {
 		if (this.#configuredClients.has(client)) return;
@@ -770,7 +769,7 @@ export class UmbAuthContext extends UmbContextBase {
 
 	/**
 	 * Sets the auth context as initialized, which means that the auth context is ready to be used.
-	 * @remark This is used to let the app context know that the core module is ready, which means that the core auth providers are available.
+	 * This is used to let the app context know that the core module is ready, which means that the core auth providers are available.
 	 */
 	setInitialized() {
 		this.#isInitialized.next();
@@ -789,23 +788,23 @@ export class UmbAuthContext extends UmbContextBase {
 
 	/**
 	 * Gets the authorized redirect url.
-	 * @returns The redirect url, which is the backoffice path.
+	 * @returns {string} The redirect url, which is the backoffice path.
 	 */
-	getRedirectUrl() {
+	getRedirectUrl(): string {
 		return `${window.location.origin}${this.#backofficePath}`;
 	}
 
 	/**
 	 * Gets the post logout redirect url.
-	 * @returns The post logout redirect url, which is the backoffice path with the logout path appended.
+	 * @returns {string} The post logout redirect url, which is the backoffice path with the logout path appended.
 	 */
-	getPostLogoutRedirectUrl() {
+	getPostLogoutRedirectUrl(): string {
 		return `${window.location.origin}${this.#backofficePath}${this.#backofficePath.endsWith('/') ? '' : '/'}logout`;
 	}
 
 	/**
 	 * Links the current user to the specified provider by redirecting to the link endpoint.
-	 * @param provider The provider to link to.
+	 * @param {string} provider The provider to link to.
 	 */
 	async linkLogin(provider: string): Promise<void> {
 		const linkKey = await this.#makeLinkTokenRequest(provider);
@@ -831,14 +830,16 @@ export class UmbAuthContext extends UmbContextBase {
 
 	/**
 	 * Unlinks the current user from the specified provider.
-	 * @param loginProvider
-	 * @param providerKey
+	 * @param {string} loginProvider The provider to unlink from.
+	 * @param {string} providerKey The provider key to unlink from.
+	 * @returns {Promise<boolean>} True if the unlink was successful, otherwise false.
 	 */
 	async unlinkLogin(loginProvider: string, providerKey: string): Promise<boolean> {
+		const config = this.getOpenApiConfiguration();
 		const request = new Request(this.#unlinkEndpoint, {
 			method: 'POST',
-			credentials: 'include',
-			headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${await this.getLatestToken()}` },
+			credentials: config.credentials ?? 'include',
+			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ loginProvider, providerKey }),
 		});
 
@@ -864,6 +865,8 @@ export class UmbAuthContext extends UmbContextBase {
 	 * Sets #inSessionUpdateCallback around the setValue calls to prevent re-entrant /token
 	 * requests triggered by session$ observers firing synchronously (e.g. keepUserLoggedIn=true
 	 * with a short expiresIn causes #onSessionExpiring to fire immediately).
+	 * @param {number} expiresIn The number of seconds until the session expires.
+	 * @param {number} issuedAt The timestamp when the session was issued.
 	 */
 	#setSessionLocally(expiresIn: number, issuedAt: number) {
 		// Cookie auth: the session has a single, server-owned expiry (the auth cookie's), so both
@@ -882,6 +885,8 @@ export class UmbAuthContext extends UmbContextBase {
 
 	/**
 	 * Updates the in-memory session state and broadcasts to other tabs.
+	 * @param {number} expiresIn The number of seconds until the session expires.
+	 * @param {number} issuedAt The timestamp when the session was issued.
 	 */
 	#updateSession(expiresIn: number, issuedAt: number) {
 		this.#setSessionLocally(expiresIn, issuedAt);
@@ -894,10 +899,10 @@ export class UmbAuthContext extends UmbContextBase {
 	}
 
 	async #makeLinkTokenRequest(provider: string) {
+		const config = this.getOpenApiConfiguration();
 		const request = await fetch(`${this.#linkKeyEndpoint}?provider=${provider}`, {
-			credentials: 'include',
+			credentials: config.credentials ?? 'include',
 			headers: {
-				Authorization: `Bearer ${await this.getLatestToken()}`,
 				'Content-Type': 'application/json',
 			},
 		});
