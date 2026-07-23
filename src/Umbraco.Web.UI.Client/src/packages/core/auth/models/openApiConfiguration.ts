@@ -16,7 +16,8 @@ export interface UmbOpenApiConfiguration {
 
 	/**
 	 * The token to use for the Authorization header.
+	 * @deprecated Use `credentials: 'include'` instead, as the Management API uses cookie-based authentication. Scheduled for removal in Umbraco 21.
 	 * @returns A resolver for the token to use for the Authorization header.
 	 */
-	readonly token: () => Promise<string | undefined>;
+	readonly token?: () => Promise<string | undefined>;
 }
