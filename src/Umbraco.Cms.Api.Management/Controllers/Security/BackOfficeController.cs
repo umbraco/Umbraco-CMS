@@ -449,7 +449,7 @@ public class BackOfficeController : SecurityControllerBase
 
         if (claimsPrincipleAttempt.Success == false)
         {
-            return Redirect(_securitySettings.Value.BackOfficeHost + "/" + _securitySettings.Value.AuthorizeCallbackErrorPathName.TrimStart('/').AppendQueryStringToUrl(
+            return Redirect(_securitySettings.Value.BackOfficeHost + "/" + _securitySettings.Value.GetEffectiveErrorPathName().TrimStart('/').AppendQueryStringToUrl(
                 $"{RedirectFlowParameter}=link-login",
                 $"{RedirectStatusParameter}=unauthorized"));
         }
@@ -457,7 +457,7 @@ public class BackOfficeController : SecurityControllerBase
         BackOfficeIdentityUser? user = await _backOfficeUserManager.GetUserAsync(claimsPrincipleAttempt.Result!);
         if (user == null)
         {
-            return Redirect(_securitySettings.Value.BackOfficeHost + "/" + _securitySettings.Value.AuthorizeCallbackErrorPathName.TrimStart('/').AppendQueryStringToUrl(
+            return Redirect(_securitySettings.Value.BackOfficeHost + "/" + _securitySettings.Value.GetEffectiveErrorPathName().TrimStart('/').AppendQueryStringToUrl(
                 $"{RedirectFlowParameter}=link-login",
                 $"{RedirectStatusParameter}=user-not-found"));
         }
@@ -651,7 +651,7 @@ public class BackOfficeController : SecurityControllerBase
     private RedirectResult CallbackErrorRedirectWithStatus(string flowType, string status, IEnumerable<IdentityError> identityErrors)
     {
         var redirectUrl = _securitySettings.Value.BackOfficeHost + "/" +
-                          _securitySettings.Value.AuthorizeCallbackErrorPathName.TrimStart('/').AppendQueryStringToUrl(
+                          _securitySettings.Value.GetEffectiveErrorPathName().TrimStart('/').AppendQueryStringToUrl(
                               $"{RedirectFlowParameter}={flowType}",
                               $"{RedirectStatusParameter}={status}");
         foreach (IdentityError identityError in identityErrors)
