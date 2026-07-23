@@ -54,9 +54,11 @@ function parseLocalDate(date: string): { year: number; month: number; day: numbe
 	}
 
 	// Confirm the date round-trips: if the constructor normalized it (e.g. day 0 or month 13),
-	// the read-back components will not match the input, so treat it as unparseable.
+	// the read-back components will not match the input, so treat it as unparseable. Both sides
+	// are built from the numeric values, so zero-padding differences are normalized away.
 	const probe = new Date(year, month - 1, day);
-	if (probe.getFullYear() !== year || probe.getMonth() !== month - 1 || probe.getDate() !== day) {
+	const roundTrip = `${probe.getFullYear()}-${probe.getMonth() + 1}-${probe.getDate()}`;
+	if (roundTrip !== `${year}-${month}-${day}`) {
 		return null;
 	}
 
