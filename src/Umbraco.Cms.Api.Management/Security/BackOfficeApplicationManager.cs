@@ -22,6 +22,7 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
     private readonly IRuntimeState _runtimeState;
     private readonly ILogger<BackOfficeApplicationManager> _logger;
     private readonly Uri? _backOfficeHost;
+    private readonly string _authorizeCallbackPathName;
     private readonly string _authorizeCallbackLogoutPathName;
 
     /// <summary>
@@ -44,6 +45,7 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
         _runtimeState = runtimeState;
         _logger = logger;
         _backOfficeHost = securitySettings.Value.BackOfficeHost;
+        _authorizeCallbackPathName = securitySettings.Value.AuthorizeCallbackPathName;
         _authorizeCallbackLogoutPathName = securitySettings.Value.AuthorizeCallbackLogoutPathName;
     }
 
@@ -258,8 +260,8 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
 
         foreach (Uri backOfficeHost in backOfficeHosts)
         {
-            descriptor.RedirectUris.Add(CallbackUrlFor(backOfficeHost, string.Empty));
-            descriptor.PostLogoutRedirectUris.Add(CallbackUrlFor(backOfficeHost, string.Empty));
+            descriptor.RedirectUris.Add(CallbackUrlFor(backOfficeHost, _authorizeCallbackPathName));
+            descriptor.PostLogoutRedirectUris.Add(CallbackUrlFor(backOfficeHost, _authorizeCallbackPathName));
             descriptor.PostLogoutRedirectUris.Add(CallbackUrlFor(backOfficeHost, _authorizeCallbackLogoutPathName));
         }
 
