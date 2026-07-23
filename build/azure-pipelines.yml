@@ -844,9 +844,12 @@ stages:
                 publishFeedCredentials: 'MyGet - Pre-releases'
   - stage: Deploy_NuGet
     displayName: NuGet release
+    # Note: this stage intentionally does not depend on Build_Docs. The C# API docs build on an
+    # out-of-support version can fail due to old DocFX/MSBuild tooling, and we don't want that to
+    # block the NuGet release. The docs are still published (see Upload_API_Docs) when they build
+    # successfully.
     dependsOn:
       - Deploy_MyGet
-      - Build_Docs
     condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.nuGetDeploy}}))
     jobs:
       - job:
@@ -874,8 +877,11 @@ stages:
     variables:
       umbracoMajorVersion: $[ stageDependencies.Build.A.outputs['build.NBGV_VersionMajor'] ]
     displayName: Upload API Documention
+    # Depends on Build_Docs so we only upload docs that actually built; if the docs build failed,
+    # this stage is skipped but the NuGet release (Deploy_NuGet) is unaffected.
     dependsOn:
       - Build
+      - Build_Docs
       - Deploy_NuGet
     condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.uploadApiDocs}}))
     jobs:
