@@ -1364,6 +1364,8 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
 
         var defaultLang = LanguageRepository.GetDefaultId();
 
+        // This will build up a query to get the property values of both the current and the published version so that we can check
+        // based on the current variance of each item to see if it's 'edited' value should be true/false.
         var whereInArgsCount = propertyTypeIds.Count + (contentTypeIds?.Count ?? 0);
         if (whereInArgsCount > Constants.Sql.MaxParameterCount)
         {
@@ -1402,15 +1404,22 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
             .OrderBy<ContentVersionDto>(x => x.NodeId)
             .OrderBy<PropertyDataDto>(x => x.PropertyTypeId, x => x.LanguageId, x => x.VersionId);
 
+        // keep track of this node/lang to mark or unmark a culture as edited
         var editedLanguageVersions = new Dictionary<(int nodeId, int? langId), bool>();
+
+        // keep track of which node to mark or unmark as edited
         var editedDocument = new Dictionary<int, bool>();
         var nodeId = -1;
         var propertyTypeId = -1;
 
         PropertyValueVersionDto? pubRow = null;
 
+        // This is a reader (Query), we are not fetching this all into memory so we cannot make any changes during this iteration, we are just collecting data.
+        // Published data will always come before Current data based on the version id sort.
+        // There will only be one published row (max) and one current row per property.
         foreach (PropertyValueVersionDto? row in Database.Query<PropertyValueVersionDto>(propertySql))
         {
+            // make sure to reset on each node/property change
             if (nodeId != row.NodeId || propertyTypeId != row.PropertyTypeId)
             {
                 nodeId = row.NodeId;
@@ -1427,34 +1436,44 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
             {
                 var propVariations = (ContentVariation)row.Variations;
 
+                // if this prop doesn't vary but the row has a lang assigned or vice versa, flag this as not edited
                 if ((!propVariations.VariesByCulture() && row.LanguageId.HasValue)
                     || (propVariations.VariesByCulture() && !row.LanguageId.HasValue))
                 {
+                    // Flag this as not edited for this node/lang if the key doesn't exist
                     if (!editedLanguageVersions.TryGetValue((row.NodeId, row.LanguageId), out _))
                     {
                         editedLanguageVersions.Add((row.NodeId, row.LanguageId), false);
                     }
 
+                    // mark as false if the item doesn't exist, else coerce to true
                     editedDocument[row.NodeId] = editedDocument.TryGetValue(row.NodeId, out var edited)
                         ? edited |= false
                         : false;
                 }
                 else if (pubRow == null)
                 {
+                    // this would mean that that this property is 'edited' since there is no published version
                     editedLanguageVersions[(row.NodeId, row.LanguageId)] = true;
                     editedDocument[row.NodeId] = true;
                 }
+
+                // compare the property values, if they differ from versions then flag the current version as edited
                 else if (IsPropertyValueChanged(pubRow, row))
                 {
+                    // Here we would check if the property is invariant, in which case the edited language should be indicated by the default lang
                     editedLanguageVersions[
                         (row.NodeId, !propVariations.VariesByCulture() ? defaultLang : row.LanguageId)] = true;
                     editedDocument[row.NodeId] = true;
                 }
 
+                // reset
                 pubRow = null;
             }
         }
 
+        // lookup all matching rows in the culture-variation table
+        // fetch in batches to account for maximum parameter count (distinct languages can't exceed 2000)
         var languageIds = editedLanguageVersions.Keys.Select(x => x.langId).Distinct().ToArray();
         IEnumerable<int> nodeIds = editedLanguageVersions.Keys.Select(x => x.nodeId).Distinct();
         var cultureVariationsToUpdate = nodeIds.InGroupsOf(Constants.Sql.MaxParameterCount - languageIds.Length)
@@ -1468,13 +1487,14 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
             })
             .ToDictionary(
                 x => (x.NodeId, (int?)x.LanguageId),
-                x => x);
+                x => x); // convert to dictionary with the same key type
 
         var toUpdate = new List<TCultureVariationDto>();
         foreach (KeyValuePair<(int nodeId, int? langId), bool> ev in editedLanguageVersions)
         {
             if (cultureVariationsToUpdate.TryGetValue(ev.Key, out TCultureVariationDto? variations))
             {
+                // check if it needs updating
                 if (variations.Edited != ev.Value)
                 {
                     variations.Edited = ev.Value;
@@ -1483,12 +1503,20 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
             }
             else if (ev.Key.langId.HasValue)
             {
+                // This can happen when a property changes from invariant to variant and the content
+                // was only created in non-default languages. The invariant property data gets migrated
+                // to the default language, but no culture-variation row exists for the default
+                // language because the content was never created in that language.
+                // In this case, we simply skip updating the edited flag since there's no content
+                // culture variation record to update.
                 continue;
             }
         }
 
+        // Now bulk update the culture-variation table, once for edited = true, another for edited = false
         foreach (IGrouping<bool, TCultureVariationDto> editValue in toUpdate.GroupBy(x => x.Edited))
         {
+            // update in batches to account for maximum parameter count
             foreach (IEnumerable<TCultureVariationDto> batchedValues in editValue.InGroupsOf(Constants.Sql.MaxParameterCount))
             {
                 Database.Execute(Sql().Update<TCultureVariationDto>(u => u.Set(x => x.Edited, editValue.Key))
@@ -1496,8 +1524,10 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
             }
         }
 
+        // Now bulk update the top-level content table
         foreach (IGrouping<bool, KeyValuePair<int, bool>> groupByValue in editedDocument.GroupBy(x => x.Value))
         {
+            // update in batches to account for maximum parameter count
             foreach (IEnumerable<KeyValuePair<int, bool>> batch in groupByValue.InGroupsOf(Constants.Sql.MaxParameterCount))
             {
                 Database.Execute(Sql().Update<TContentDto>(u => u.Set(x => x.Edited, groupByValue.Key))
