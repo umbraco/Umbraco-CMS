@@ -45,6 +45,13 @@ export class UmbAppAuthController extends UmbControllerBase {
 		if (!this.#authContext) {
 			throw new Error('[Fatal] Auth context is not available');
 		}
+		// Stay put on the logout landing: a just-logged-out user is unauthorized, but bouncing them
+		// to the login screen here would capture /logout as the ReturnUrl and loop them straight back
+		// into logging out after they sign in again.
+		const logoutPath = new URL(this.#authContext.getPostLogoutRedirectUrl()).pathname;
+		if (window.location.pathname === logoutPath) {
+			return;
+		}
 		const loginUrl = new URL(`${this.#authContext.getServerUrl()}/umbraco/login`);
 		// Preserve where the user was (potentially deep in an editor) so the login screen returns
 		// them there afterwards. A relative path only — the server rejects non-local URLs. Skip a
