@@ -226,7 +226,7 @@ public partial class ContentEditingServiceTests
                 Is.Not.EqualTo("-"),
                 "ar-EG NegativeSign is plain ASCII hyphen on this host; cannot reproduce #22610.");
 
-            var result = await ContentEditingService.RestoreAsync(child.Key, root.Key, Constants.Security.SuperUserKey);
+            var result = await ContentEditingService.RestoreAsync(child.Key, root.Key, Constants.Security.SuperUserKey, includeDescendants: true);
 
             Assert.IsTrue(result.Success);
             Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
