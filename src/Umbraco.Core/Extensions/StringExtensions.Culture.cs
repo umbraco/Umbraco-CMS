@@ -184,9 +184,7 @@ public static partial class StringExtensions
             return culture;
         }
 
-        // Create as CultureInfo instance from provided name so we can ensure consistent casing of culture code when persisting.
-        // This will accept mixed case but once created have a `Name` property that is consistently and correctly cased.
-        // Will throw if an invalid culture code is provided.
-        return new CultureInfo(culture).Name;
+        // GetCultureInfo returns a cached instance and exposes a correctly cased Name; throws for invalid codes.
+        return CultureInfo.GetCultureInfo(culture).Name;
     }
 }

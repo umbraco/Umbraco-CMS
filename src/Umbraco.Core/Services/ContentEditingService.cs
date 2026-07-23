@@ -223,8 +223,13 @@ internal sealed class ContentEditingService
         => await HandleMoveAsync(key, parentKey, userKey);
 
     /// <inheritdoc />
+    [Obsolete("Use the overload that takes an includeDescendants parameter instead. Scheduled for removal in Umbraco 19.")]
     public async Task<Attempt<IContent?, ContentEditingOperationStatus>> RestoreAsync(Guid key, Guid? parentKey, Guid userKey)
-        => await HandleMoveAsync(key, parentKey, userKey, true);
+        => await RestoreAsync(key, parentKey, userKey, true);
+
+    /// <inheritdoc />
+    public async Task<Attempt<IContent?, ContentEditingOperationStatus>> RestoreAsync(Guid key, Guid? parentKey, Guid userKey, bool includeDescendants)
+        => await HandleMoveAsync(key, parentKey, userKey, true, includeDescendants);
 
     /// <inheritdoc />
     public async Task<Attempt<IContent?, ContentEditingOperationStatus>> CopyAsync(Guid key, Guid? parentKey, bool relateToOriginal, bool includeDescendants, Guid userKey)
@@ -276,8 +281,8 @@ internal sealed class ContentEditingService
         => new Content(name, parentId, contentType);
 
     /// <inheritdoc />
-    protected override OperationResult? Move(IContent content, int newParentId, int userId)
-        => ContentService.Move(content, newParentId, userId);
+    protected override OperationResult? Move(IContent content, int newParentId, bool includeDescendants, int userId)
+        => ContentService.Move(content, newParentId, includeDescendants, userId);
 
     /// <inheritdoc />
     protected override async Task<IContent?> CopyAsync(IContent content, int newParentId, bool relateToOriginal, bool includeDescendants, Guid userKey)
@@ -352,7 +357,7 @@ internal sealed class ContentEditingService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Content save operation failed");
+            _logger.LogError(ex, "Content save and publish operation failed");
             return ContentEditingOperationStatus.Unknown;
         }
     }

@@ -1,7 +1,7 @@
 import { expect } from '@open-wc/testing';
-import type { UmbEntityVariantOptionModel } from './types.js';
 import { sortVariants } from './sort-variants.function.js';
-import { PublishableVariantStateModel as State } from '@umbraco-cms/backoffice/external/backend-api';
+import { UmbPublishableVariantState } from './constants.js';
+import type { UmbEntityVariantOptionModel } from './types.js';
 
 function makeVariant(
 	name: string,
@@ -36,8 +36,8 @@ function makeVariant(
 describe('sortVariants', () => {
 	it('sorts the default language first', () => {
 		const result = [
-			makeVariant('Danish', { state: State.PUBLISHED }),
-			makeVariant('English', { isDefault: true, state: State.PUBLISHED }),
+			makeVariant('Danish', { state: UmbPublishableVariantState.PUBLISHED }),
+			makeVariant('English', { isDefault: true, state: UmbPublishableVariantState.PUBLISHED }),
 		].sort(sortVariants);
 
 		expect(result.map((v) => v.language.name)).to.deep.equal(['English', 'Danish']);
@@ -45,8 +45,8 @@ describe('sortVariants', () => {
 
 	it('sorts mandatory (non-published) variants above non-mandatory variants', () => {
 		const result = [
-			makeVariant('German', { state: State.DRAFT }),
-			makeVariant('Danish', { isMandatory: true, state: State.DRAFT }),
+			makeVariant('German', { state: UmbPublishableVariantState.DRAFT }),
+			makeVariant('Danish', { isMandatory: true, state: UmbPublishableVariantState.DRAFT }),
 		].sort(sortVariants);
 
 		expect(result.map((v) => v.language.name)).to.deep.equal(['Danish', 'German']);
@@ -54,9 +54,9 @@ describe('sortVariants', () => {
 
 	it('does not apply mandatory boost when the variant is already published', () => {
 		const result = [
-			makeVariant('German', { isMandatory: true, state: State.PUBLISHED }),
-			makeVariant('Danish', { isMandatory: true, state: State.PUBLISHED }),
-			makeVariant('French', { isMandatory: true, state: State.PUBLISHED }),
+			makeVariant('German', { isMandatory: true, state: UmbPublishableVariantState.PUBLISHED }),
+			makeVariant('Danish', { isMandatory: true, state: UmbPublishableVariantState.PUBLISHED }),
+			makeVariant('French', { isMandatory: true, state: UmbPublishableVariantState.PUBLISHED }),
 		].sort(sortVariants);
 
 		// All published-mandatory — falls through to alphabetical
@@ -65,10 +65,10 @@ describe('sortVariants', () => {
 
 	it('sorts by publish state: published → draft → not-created → trashed', () => {
 		const result = [
-			makeVariant('D', { state: State.TRASHED }),
-			makeVariant('A', { state: State.NOT_CREATED }),
-			makeVariant('B', { state: State.DRAFT }),
-			makeVariant('C', { state: State.PUBLISHED }),
+			makeVariant('D', { state: UmbPublishableVariantState.TRASHED }),
+			makeVariant('A', { state: UmbPublishableVariantState.NOT_CREATED }),
+			makeVariant('B', { state: UmbPublishableVariantState.DRAFT }),
+			makeVariant('C', { state: UmbPublishableVariantState.PUBLISHED }),
 		].sort(sortVariants);
 
 		expect(result.map((v) => v.language.name)).to.deep.equal(['C', 'B', 'A', 'D']);
@@ -76,9 +76,9 @@ describe('sortVariants', () => {
 
 	it('sorts alphabetically by language name when all other criteria are equal', () => {
 		const result = [
-			makeVariant('Swedish', { state: State.DRAFT }),
-			makeVariant('Danish', { state: State.DRAFT }),
-			makeVariant('French', { state: State.DRAFT }),
+			makeVariant('Swedish', { state: UmbPublishableVariantState.DRAFT }),
+			makeVariant('Danish', { state: UmbPublishableVariantState.DRAFT }),
+			makeVariant('French', { state: UmbPublishableVariantState.DRAFT }),
 		].sort(sortVariants);
 
 		expect(result.map((v) => v.language.name)).to.deep.equal(['Danish', 'French', 'Swedish']);
@@ -86,10 +86,10 @@ describe('sortVariants', () => {
 
 	it('applies all criteria in priority order', () => {
 		const result = [
-			makeVariant('French', { state: State.PUBLISHED }),
-			makeVariant('Danish', { isMandatory: true, state: State.DRAFT }),
-			makeVariant('German', { state: State.DRAFT }),
-			makeVariant('English', { isDefault: true, state: State.PUBLISHED }),
+			makeVariant('French', { state: UmbPublishableVariantState.PUBLISHED }),
+			makeVariant('Danish', { isMandatory: true, state: UmbPublishableVariantState.DRAFT }),
+			makeVariant('German', { state: UmbPublishableVariantState.DRAFT }),
+			makeVariant('English', { isDefault: true, state: UmbPublishableVariantState.PUBLISHED }),
 		].sort(sortVariants);
 
 		expect(result.map((v) => v.language.name)).to.deep.equal([

@@ -1,8 +1,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Web;
 using SixLabors.ImageSharp.Web.Caching;
-using SixLabors.ImageSharp.Web.DependencyInjection;
 using SixLabors.ImageSharp.Web.Middleware;
 using SixLabors.ImageSharp.Web.Providers;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -31,6 +31,10 @@ public static class UmbracoBuilderExtensions
         builder.Services.AddUnique<IImageDimensionExtractor, ImageSharpDimensionExtractor>();
 
         builder.Services.AddSingleton<IImageUrlGenerator, ImageSharpImageUrlGenerator>();
+
+        // Replaces the no-op IImageUrlTokenGenerator registered in Core; allows rich text render
+        // paths to re-sign image URLs against the current HMACSecretKey after a key rotation.
+        builder.Services.AddSingleton<IImageUrlTokenGenerator, ImageSharpImageUrlTokenGenerator>();
 
         builder.Services.AddImageSharp()
             // Replace default image provider

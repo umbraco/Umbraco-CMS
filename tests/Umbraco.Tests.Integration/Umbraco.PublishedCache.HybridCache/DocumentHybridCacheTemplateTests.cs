@@ -25,8 +25,6 @@ internal sealed class DocumentHybridCacheTemplateTests : UmbracoIntegrationTestW
 
     private IPublishedContentCache PublishedContentHybridCache => GetRequiredService<IPublishedContentCache>();
 
-    private IContentEditingService ContentEditingService => GetRequiredService<IContentEditingService>();
-
     [Test]
     public async Task Can_Get_Document_After_Removing_Template()
     {

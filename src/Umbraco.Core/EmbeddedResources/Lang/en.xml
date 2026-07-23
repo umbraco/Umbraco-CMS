@@ -540,4 +540,7 @@
 <em>We might change what we send on the Detailed level in the future. If so, it will be listed above.
 <br>By choosing "Detailed" you agree to current and future anonymized information being collected.</em>]]></key>
   </area>
+  <area alias="webhooks">
+    <key alias="toggleDebug">Toggle debug mode for more information.</key>
+  </area>
 </language>

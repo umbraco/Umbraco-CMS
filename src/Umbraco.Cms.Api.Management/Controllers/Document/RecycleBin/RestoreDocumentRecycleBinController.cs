@@ -84,7 +84,8 @@ public class RestoreDocumentRecycleBinController : DocumentRecycleBinControllerB
         Attempt<IContent?, ContentEditingOperationStatus> result = await _contentEditingService.RestoreAsync(
             id,
             moveDocumentRequestModel.Target?.Id,
-            CurrentUserKey(_backOfficeSecurityAccessor));
+            CurrentUserKey(_backOfficeSecurityAccessor),
+            includeDescendants: true);
 
         return result.Success
             ? Ok()

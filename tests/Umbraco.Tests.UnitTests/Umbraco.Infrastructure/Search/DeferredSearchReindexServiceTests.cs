@@ -10,6 +10,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
@@ -30,6 +31,7 @@ public class DeferredSearchReindexServiceTests
     private Mock<IUmbracoIndexingHandler> _umbracoIndexingHandler = null!;
     private Mock<IPublishStatusQueryService> _publishStatusQueryService = null!;
     private Mock<ICoreScopeProvider> _scopeProvider = null!;
+    private Mock<IRelationService> _relationService = null!;
     private DeferredSearchReindexService _service = null!;
 
     [SetUp]
@@ -41,6 +43,7 @@ public class DeferredSearchReindexServiceTests
         _umbracoIndexingHandler = new Mock<IUmbracoIndexingHandler>();
         _publishStatusQueryService = new Mock<IPublishStatusQueryService>();
         _scopeProvider = new Mock<ICoreScopeProvider>();
+        _relationService = new Mock<IRelationService>();
         _scopeProvider
             .Setup(x => x.CreateCoreScope(
                 It.IsAny<System.Data.IsolationLevel>(),
@@ -66,13 +69,13 @@ public class DeferredSearchReindexServiceTests
     [TearDown]
     public void TearDown() => _service.Dispose();
 
-    private DeferredSearchReindexService CreateService(CancellationToken shutdownToken = default)
+    private DeferredSearchReindexService CreateService(CancellationToken shutdownToken = default, bool indexExternalBlockElements = false)
     {
         var lifetime = new Mock<IHostApplicationLifetime>();
         lifetime.Setup(x => x.ApplicationStopping).Returns(shutdownToken);
 
         var indexingSettings = new Mock<IOptionsMonitor<IndexingSettings>>();
-        indexingSettings.Setup(x => x.CurrentValue).Returns(new IndexingSettings { BatchSize = 100 });
+        indexingSettings.Setup(x => x.CurrentValue).Returns(new IndexingSettings { BatchSize = 100, IndexExternalBlockElements = indexExternalBlockElements });
 
         return new DeferredSearchReindexService(
             _documentRepository.Object,
@@ -83,7 +86,8 @@ public class DeferredSearchReindexServiceTests
             indexingSettings.Object,
             _scopeProvider.Object,
             Mock.Of<ILogger<DeferredSearchReindexService>>(),
-            lifetime.Object);
+            lifetime.Object,
+            _relationService.Object);
     }
 
     /// <summary>
@@ -433,6 +437,98 @@ public class DeferredSearchReindexServiceTests
                 It.IsAny<Ordering?>()),
             Times.Once);
     }
+
+    /// <summary>
+    ///     Verifies that a document transitively embedding an element (via an intermediate element) is included in the
+    ///     reindex set.
+    /// </summary>
+    [Test]
+    public void Finds_Document_Transitively_Referencing_Element()
+    {
+        // Document 100 embeds element 1; element 1 embeds element 2 (the one that changes).
+        SetupRelationGraph(new Dictionary<int, (int id, Guid objectType)[]>
+        {
+            { 2, [(1, Constants.ObjectTypes.Element)] },
+            { 1, [(100, Constants.ObjectTypes.Document)] },
+        });
+
+        var documentIds = _service.FindDocumentIdsReferencingElements([2]);
+
+        CollectionAssert.AreEquivalent(new[] { 100 }, documentIds);
+    }
+
+    /// <summary>
+    ///     Verifies that the BFS terminates and does not loop when element references are cyclic.
+    /// </summary>
+    [Test]
+    public void Terminates_On_Cyclic_Element_References()
+    {
+        // Element 1 <-> element 2 (cycle); document 100 embeds element 1. Element 2 changes.
+        SetupRelationGraph(new Dictionary<int, (int id, Guid objectType)[]>
+        {
+            { 2, [(1, Constants.ObjectTypes.Element)] },
+            { 1, [(100, Constants.ObjectTypes.Document), (2, Constants.ObjectTypes.Element)] },
+        });
+
+        var documentIds = _service.FindDocumentIdsReferencingElements([2]);
+
+        CollectionAssert.AreEquivalent(new[] { 100 }, documentIds);
+    }
+
+    /// <summary>
+    ///     Verifies that when external block element indexing is disabled, queuing an element reindex neither traverses
+    ///     relations nor reindexes any document - the service guard short-circuits (the other half of the double guard
+    ///     also enforced by the notification handler).
+    /// </summary>
+    [Test]
+    public async Task QueueReindexOnElementChange_WhenExternalBlockElementIndexingDisabled_SkipsTraversalAndReindex()
+    {
+        // A relation graph that would otherwise yield document 100 to reindex, proving the guard short-circuits first.
+        SetupRelationGraph(new Dictionary<int, (int id, Guid objectType)[]>
+        {
+            { 1, [(100, Constants.ObjectTypes.Document)] },
+        });
+
+        using var service = CreateService(indexExternalBlockElements: false);
+        service.QueueReindexOnElementChange([1]);
+        using var cts = new CancellationTokenSource(_testTimeout);
+        await service.WaitForWorkerIdleAsync(cts.Token);
+
+        _relationService.Verify(
+            x => x.GetParentEntitiesByChildIds(
+                It.IsAny<IEnumerable<int>>(),
+                It.IsAny<IEnumerable<string>>(),
+                It.IsAny<UmbracoObjectTypes>()),
+            Times.Never);
+        _umbracoIndexingHandler.Verify(
+            x => x.ReIndexForContent(It.IsAny<IContent>(), It.IsAny<bool>()),
+            Times.Never);
+    }
+
+    private void SetupRelationGraph(Dictionary<int, (int id, Guid objectType)[]> graph)
+    {
+        _relationService
+            .Setup(r => r.GetParentEntitiesByChildIds(
+                It.IsAny<IEnumerable<int>>(),
+                It.IsAny<IEnumerable<string>>(),
+                It.IsAny<UmbracoObjectTypes>()))
+            .Returns((IEnumerable<int> childIds, IEnumerable<string> aliases, UmbracoObjectTypes type) =>
+            {
+                // The service queries one object type per call, so mirror the real repository and return only the
+                // parents of the requested type.
+                var wantedType = type.GetGuid();
+                return childIds
+                    .SelectMany(id => graph.TryGetValue(id, out (int id, Guid objectType)[]? parents) ? parents : [])
+                    .Where(parent => parent.objectType == wantedType)
+                    .Select(parent => CreateEntity(parent.id, parent.objectType))
+                    .ToArray();
+            });
+    }
+
+    private static IEntitySlim CreateEntity(int id, Guid nodeObjectType)
+        => nodeObjectType == Constants.ObjectTypes.Element
+            ? Mock.Of<IPublishableContentEntitySlim>(e => e.Id == id && e.NodeObjectType == nodeObjectType && e.Published)
+            : Mock.Of<IEntitySlim>(e => e.Id == id && e.NodeObjectType == nodeObjectType);
 
     private static IContent CreateContent(int id, bool published)
     {

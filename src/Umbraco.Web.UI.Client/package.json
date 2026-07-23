@@ -180,7 +180,7 @@
 		"build:for:npm": "npm run build -- --declaration && npm run package:validate",
 		"build:for:static": "cross-env VITE_UMBRACO_USE_MSW=on vite build",
 		"build:vite": "tsc && vite build --mode staging",
-		"build:workspaces": "npm run build -ws --if-present",
+		"build:workspaces": "npm run build --workspaces true --if-present",
 		"build": "tsc --project ./src/tsconfig.build.json",
 		"postbuild": "node ./devops/build/global-types.js",
 		"check": "npm run lint:errors && npm run compile && npm run build-storybook && npm run generate:jsonschema:dist",
@@ -228,14 +228,14 @@
 		"generate:ui-api-docs": "npm run generate:check-const-test && typedoc --options typedoc.config.js"
 	},
 	"engines": {
-		"node": ">=22.17.1",
-		"npm": ">=10.9.2"
+		"node": ">=24.13",
+		"npm": ">=11"
 	},
 	"dependencies": {
 		"element-internals-polyfill": "^3.0.2"
 	},
 	"devDependencies": {
-		"@babel/core": "^7.29.0",
+		"@babel/core": "^8.0.1",
 		"@eslint/js": "^10.0.1",
 		"@open-wc/testing": "^4.0.0",
 		"@playwright/test": "^1.59.1",
@@ -246,7 +246,7 @@
 		"@types/chai": "^5.2.3",
 		"@types/eslint__js": "^8.42.3",
 		"@types/mocha": "^10.0.10",
-		"@web/dev-server-esbuild": "^1.0.5",
+		"@web/dev-server-esbuild": "^2.0.0",
 		"@web/dev-server-import-maps": "^0.2.1",
 		"@web/test-runner": "^0.20.2",
 		"@web/test-runner-playwright": "^0.11.1",
@@ -266,19 +266,19 @@
 		"madge": "^8.0.0",
 		"msw": "^2.13.5",
 		"playwright-msw": "^3.0.1",
-		"postcss": "^8.5.9",
+		"postcss": "^8.5.16",
 		"postcss-cli": "^11.0.1",
 		"prettier": "3.8.2",
 		"remark-gfm": "^4.0.1",
 		"semver": "^7.7.4",
-		"storybook": "10.3.5",
+		"storybook": "10.4.6",
 		"tiny-glob": "^0.2.9",
 		"tsc-alias": "^1.8.16",
 		"typedoc": "^0.28.19",
 		"typescript": "6.0.3",
 		"typescript-eslint": "^8.59.0",
 		"typescript-json-schema": "^0.67.1",
-		"vite": "^7.3.2",
+		"vite": "^7.3.6",
 		"vite-plugin-static-copy": "^3.2.0",
 		"vite-tsconfig-paths": "^6.1.1",
 		"web-component-analyzer": "^2.0.0"

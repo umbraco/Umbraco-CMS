@@ -415,8 +415,9 @@ internal sealed partial class ContentTypeEditingServiceTests
 
         Assert.AreEqual(0, contentType.NoGroupPropertyTypes.Count());
 
-        // expect PropertyRemoved (which includes RefreshMain) when removing properties
-        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.PropertyRemoved);
+        // expect PropertyRemoved (which includes RefreshMain) flagged RawDataUnaffected when the only change is
+        // removing properties — the stored cmsContentNu blob stays valid, so no raw rebuild is required
+        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.PropertyRemoved | ContentTypeChangeTypes.RawDataUnaffected);
     }
 
     [TestCase(false)]
@@ -463,8 +464,9 @@ internal sealed partial class ContentTypeEditingServiceTests
 
         Assert.AreEqual(0, contentType.NoGroupPropertyTypes.Count());
 
-        // expect PropertyRemoved (which includes RefreshMain) when removing properties
-        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.PropertyRemoved);
+        // expect PropertyRemoved (which includes RefreshMain) flagged RawDataUnaffected when the only change is
+        // removing properties — the stored cmsContentNu blob stays valid, so no raw rebuild is required
+        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.PropertyRemoved | ContentTypeChangeTypes.RawDataUnaffected);
     }
 
     [Test]
@@ -506,8 +508,9 @@ internal sealed partial class ContentTypeEditingServiceTests
         Assert.AreEqual(0, contentType.PropertyTypes.Count());
         Assert.AreEqual(0, contentType.NoGroupPropertyTypes.Count());
 
-        // expect PropertyRemoved (which includes RefreshMain) when removing properties
-        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.PropertyRemoved);
+        // expect PropertyRemoved (which includes RefreshMain) flagged RawDataUnaffected when the only change is
+        // removing properties — the stored cmsContentNu blob stays valid, so no raw rebuild is required
+        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.PropertyRemoved | ContentTypeChangeTypes.RawDataUnaffected);
     }
 
     [TestCase(false)]
