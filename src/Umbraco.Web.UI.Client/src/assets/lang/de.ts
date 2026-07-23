@@ -11,6 +11,9 @@
 import type { UmbLocalizationDictionary } from '@umbraco-cms/backoffice/localization-api';
 export default {
 	actions: {
+		copyInProgress: 'Bitte warten, Kopieren läuft...',
+		deleteInProgress: 'Bitte warten, Entfernen läuft...',
+		moveInProgress: 'Bitte warten, Verschieben läuft...',
 		assigndomain: 'Kulturen und Hostnamen',
 		auditTrail: 'Protokoll',
 		browse: 'Durchsuchen',
@@ -1187,6 +1190,9 @@ export default {
 		paMembers: 'Mitglieder basierte Zugriffsberechtigung',
 		paMembersHelp: 'Falls Sie Mitglieder basierte Zugriffsberechtigung gewähren wollen',
 	},
+	unpublish: {
+		inProgress: 'Bitte warten, Rücknahme der Veröffentlichung läuft...',
+	},
 	publish: {
 		invalidPublishBranchPermissions:
 			'Die Zugriffsrechte des Benutzers sind ungenügend, um alle Unterknoten zu veröffentlichen',
@@ -1317,6 +1323,8 @@ export default {
 		sortEmptyState: 'Dieser Knoten hat keine Unterknoten zum Sortieren',
 	},
 	speechBubbles: {
+		editMultiContentPublishedPartialText: '%0% von %1% Dokumenten veröffentlicht.',
+		editMultiContentUnpublishedPartialText: 'Bei %0% von %1% Dokumenten wurde die Veröffentlichung zurückgenommen.',
 		validationFailedHeader: 'Validierung',
 		validationFailedMessage: 'Validierungsfehler müssen behoben werden, bevor das Element gesichert werden kann',
 		operationFailedHeader: 'Fehlgeschlagen',

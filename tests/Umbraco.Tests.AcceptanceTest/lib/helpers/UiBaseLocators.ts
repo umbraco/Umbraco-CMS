@@ -1753,11 +1753,15 @@ export class UiBaseLocators extends BasePage {
 
   // User Methods
   async clickCurrentUserAvatarButton() {
-    // Wait for the backoffice to finish loading; clicking before the current-user extension bundle is ready
-    // no-ops, so the modal never opens.
-    await this.waitForPageLoad();
-    await this.click(this.currentUserAvatarBtn);
-    await expect(this.currentUserModal).toBeVisible({timeout: ConstantHelper.timeout.long});
+    // Retry the open: the first click can land before the avatar is interactive, leaving the modal closed.
+    await expect(async () => {
+      if (!(await this.currentUserModal.isVisible())) {
+        await this.click(this.currentUserAvatarBtn);
+      }
+      await expect(this.currentUserModal).toBeVisible({
+        timeout: ConstantHelper.timeout.short,
+      });
+    }).toPass({timeout: ConstantHelper.timeout.medium});
   }
 
   // Collection Methods

@@ -124,3 +124,6 @@ trace.zip
 
 # SonarQube local analysis cache
 .sonarqube/
+
+# Playwright local cache
+.playwright-mcp/

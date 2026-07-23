@@ -89,6 +89,7 @@ test('can create a document type in a folder using create options', async ({umbr
   // Arrange
   const parentFolderId = await umbracoApi.documentType.createFolder(documentFolderName);
   await umbracoUi.documentType.reloadDocumentTypeTree();
+  await umbracoUi.documentType.reloadDocumentTypeTree();
 
   // Act
   await umbracoUi.documentType.clickActionsMenuForDocumentType(documentFolderName);
@@ -108,6 +109,7 @@ test('can create a document type with a template in a folder using create option
   // Arrange
   await umbracoApi.template.ensureNameNotExists(documentTypeName);
   const parentFolderId = await umbracoApi.documentType.createFolder(documentFolderName);
+  await umbracoUi.documentType.reloadDocumentTypeTree();
   await umbracoUi.documentType.reloadDocumentTypeTree();
 
   // Act
@@ -133,6 +135,7 @@ test('can create a document type with a template in a folder using create option
 test('can create a element type in a folder using create options', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const parentFolderId = await umbracoApi.documentType.createFolder(documentFolderName);
+  await umbracoUi.documentType.reloadDocumentTypeTree();
   await umbracoUi.documentType.reloadDocumentTypeTree();
 
   // Act
