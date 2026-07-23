@@ -14,6 +14,11 @@ internal interface ICultureVariationDto : INodeDto
     internal static class Columns
     {
         /// <summary>
+        /// The column name for the culture variation identifier.
+        /// </summary>
+        internal const string Id = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
+
+        /// <summary>
         /// The column name for the node identifier.
         /// </summary>
         internal const string NodeId = INodeDto.Columns.NodeId;
@@ -47,7 +52,7 @@ internal interface ICultureVariationDto : INodeDto
     /// <summary>
     /// Gets or sets the unique identifier for this culture variation row.
     /// </summary>
-    [Column(Constants.DatabaseSchema.Columns.PrimaryKeyNameId)]
+    [Column(Columns.Id)]
     int Id { get; set; }
 
     /// <summary>
