@@ -53,7 +53,6 @@ test('can update the alias for a member type', async ({umbracoApi, umbracoUi}) =
 
   // Act
   await umbracoUi.memberType.goToMemberType(memberTypeName);
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
   await umbracoUi.memberType.enterAliasName(updatedAlias);
   await umbracoUi.memberType.clickSaveButtonAndWaitForMemberTypeToBeUpdated();
 
@@ -69,7 +68,6 @@ test('can add an icon for a member type', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.memberType.goToMemberType(memberTypeName);
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
   await umbracoUi.memberType.updateIcon(bugIcon);
   await umbracoUi.memberType.clickSaveButtonAndWaitForMemberTypeToBeUpdated();
 

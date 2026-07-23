@@ -464,37 +464,40 @@ public abstract class ContentTypeBase : TreeEntityBase, IContentTypeBase
     }
 
     /// <summary>
-    ///     Resets dirty properties by clearing the dictionary used to track changes.
+    ///     Resets dirty properties, cascading into property groups and property types.
     /// </summary>
+    /// <param name="rememberDirty">
+    ///     If <c>true</c>, the properties that were dirty are remembered so <see cref="IRememberBeingDirty.WasPropertyDirty"/>
+    ///     can still report them after the reset; if <c>false</c>, both the current and remembered dirty state are cleared.
+    /// </param>
     /// <remarks>
     ///     Please note that resetting the dirty properties could potentially
     ///     obstruct the saving of a new or updated entity.
     /// </remarks>
-    public override void ResetDirtyProperties()
+    public override void ResetDirtyProperties(bool rememberDirty)
     {
-        base.ResetDirtyProperties();
+        base.ResetDirtyProperties(rememberDirty);
 
-        // loop through each property group to reset the property types
         var propertiesReset = new List<int>();
 
         foreach (PropertyGroup propertyGroup in PropertyGroups)
         {
-            propertyGroup.ResetDirtyProperties();
-            if (propertyGroup.PropertyTypes is not null)
+            propertyGroup.ResetDirtyProperties(rememberDirty);
+            if (propertyGroup.PropertyTypes is null)
             {
-                foreach (IPropertyType propertyType in propertyGroup.PropertyTypes)
-                {
-                    propertyType.ResetDirtyProperties();
-                    propertiesReset.Add(propertyType.Id);
-                }
+                continue;
+            }
+
+            foreach (IPropertyType propertyType in propertyGroup.PropertyTypes)
+            {
+                propertyType.ResetDirtyProperties(rememberDirty);
+                propertiesReset.Add(propertyType.Id);
             }
         }
 
-        // then loop through our property type collection since some might not exist on a property group
-        // but don't re-reset ones we've already done.
         foreach (IPropertyType propertyType in PropertyTypes.Where(x => propertiesReset.Contains(x.Id) == false))
         {
-            propertyType.ResetDirtyProperties();
+            propertyType.ResetDirtyProperties(rememberDirty);
         }
     }
 

@@ -136,3 +136,23 @@ test('can create a member type folder in a folder in a folder', async ({umbracoA
   await umbracoApi.memberType.ensureNameNotExists(childFolderName);
   await umbracoApi.memberType.ensureNameNotExists(grandparentFolderName);
 });
+
+test('can find a member type in a sibling nested folder', async ({umbracoApi}) => {
+  // Arrange
+  const firstChildFolderName = 'AAFirstChildFolder';
+  const nestedFolderName = 'NestedFolder';
+  const secondChildFolderName = 'ZZSecondChildFolder';
+  const targetMemberTypeName = 'TargetMemberType';
+  const parentFolderId = await umbracoApi.memberType.createFolder(memberTypeFolderName);
+  const firstChildFolderId = await umbracoApi.memberType.createFolder(firstChildFolderName, parentFolderId);
+  await umbracoApi.memberType.createFolder(nestedFolderName, firstChildFolderId);
+  const secondChildFolderId = await umbracoApi.memberType.createFolder(secondChildFolderName, parentFolderId);
+  const targetMemberTypeId = await umbracoApi.memberType.createDefaultMemberTypeInFolder(targetMemberTypeName, secondChildFolderId);
+
+  // Act
+  const memberTypeData = await umbracoApi.memberType.getByName(targetMemberTypeName);
+
+  // Assert
+  expect(memberTypeData).toBeTruthy();
+  expect(memberTypeData.id).toBe(targetMemberTypeId);
+});

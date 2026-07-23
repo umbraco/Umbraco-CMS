@@ -146,10 +146,11 @@ internal sealed class DocumentHybridCacheDocumentTypeTests : UmbracoIntegrationT
         renamedProperty.Alias = "compPropRenamed";
 
         // ComposeContentTypeChanges runs after commit and reads WasPropertyDirty(...), so remember the pending
-        // changes to mirror that state without going through a save.
+        // changes to mirror that state without going through a save. Resetting the content type cascades to its
+        // property types (so the renamed property's alias change is remembered too) — resetting the property
+        // again here would clear that remembered state, because a second reset has no current changes to capture.
         ((IRememberBeingDirty)composing).ResetDirtyProperties(true);
         ((IRememberBeingDirty)composition).ResetDirtyProperties(true);
-        ((IRememberBeingDirty)renamedProperty).ResetDirtyProperties(true);
 
         // Act - classify both types in a single call (the path that exercises the by-Id multi-type guard).
         IContentTypeService contentTypeService = ContentTypeService;
