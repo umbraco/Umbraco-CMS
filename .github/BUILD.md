@@ -75,8 +75,7 @@ Conversely, if you are working on front-end only, you want to build the back-end
 
 ```json
 "BackOfficeHost": "http://localhost:5173",
-"AuthorizeCallbackLogoutPathName": "/logout",
-"AuthorizeCallbackErrorPathName": "/error",
+"CallbackPathName": "/",
 "AuthCookieSameSite": "None"
 ```
 

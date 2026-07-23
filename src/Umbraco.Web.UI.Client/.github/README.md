@@ -37,9 +37,7 @@ Open this file in an editor: `/src/Umbraco.Web.UI/appsettings.Development.json` 
 	"CMS": {
 		"Security":{
 			"BackOfficeHost": "http://localhost:5173",
-			"AuthorizeCallbackPathName": "/",
-			"AuthorizeCallbackLogoutPathName": "/logout",
-			"AuthorizeCallbackErrorPathName": "/error",
+			"CallbackPathName": "/",
 			"AuthCookieSameSite": "None"
 		},
 	},
