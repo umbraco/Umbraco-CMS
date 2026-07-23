@@ -44193,6 +44193,7 @@
       },
       "DocumentUrlInfoModel": {
         "required": [
+          "isExternal",
           "message",
           "provider",
           "culture",
@@ -44208,6 +44209,9 @@
           },
           "provider": {
             "type": "string"
+          },
+          "isExternal": {
+            "type": "boolean"
           },
           "culture": {
             "type": [
