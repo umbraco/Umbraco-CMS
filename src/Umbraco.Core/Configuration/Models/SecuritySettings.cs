@@ -53,6 +53,11 @@ public class SecuritySettings
     internal const string StaticAuthCookieName = "UMB_UCONTEXT";
 
     /// <summary>
+    ///     The default authentication cookie SameSite mode.
+    /// </summary>
+    internal const string StaticAuthCookieSameSite = "Lax";
+
+    /// <summary>
     ///     The default value for using email as username.
     /// </summary>
     internal const bool StaticUsernameIsEmail = true;
@@ -141,6 +146,17 @@ public class SecuritySettings
     ///     Gets or sets a value for the authorization cookie domain.
     /// </summary>
     public string? AuthCookieDomain { get; set; }
+
+    /// <summary>
+    ///     Gets or sets the SameSite mode for the back-office authentication cookie.
+    /// </summary>
+    /// <remarks>
+    ///     Valid values are "Unspecified", "None", "Lax" and "Strict" (default "Lax"). Set to "None"
+    ///     (which also requires HTTPS) when the back office is served from a different origin than the
+    ///     server — e.g. a front-end dev server or Umbraco Cloud — so the cookie is sent on cross-site requests.
+    /// </remarks>
+    [DefaultValue(StaticAuthCookieSameSite)]
+    public string AuthCookieSameSite { get; set; } = StaticAuthCookieSameSite;
 
     /// <summary>
     ///     Gets or sets a value indicating whether the user's email address is to be considered as their username.
