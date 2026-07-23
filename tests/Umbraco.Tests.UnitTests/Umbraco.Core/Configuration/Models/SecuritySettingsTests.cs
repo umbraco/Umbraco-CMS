@@ -115,4 +115,47 @@ public class SecuritySettingsTests
         Assert.That(settings.GetUserAllowConcurrentLogins(), Is.True);
         Assert.That(settings.GetMemberAllowConcurrentLogins(), Is.False);
     }
+
+    [Test]
+    public void CallbackPathName_Defaults_To_Umbraco()
+    {
+        var settings = new SecuritySettings();
+
+        Assert.That(settings.CallbackPathName, Is.EqualTo("/umbraco"));
+    }
+
+    [Test]
+    public void AuthorizeCallbackPathName_Reads_Through_To_CallbackPathName()
+    {
+        var settings = new SecuritySettings();
+
+#pragma warning disable CS0618 // Type or member is obsolete
+        settings.AuthorizeCallbackPathName = "/custom";
+        Assert.That(settings.CallbackPathName, Is.EqualTo("/custom"));
+
+        settings.CallbackPathName = "/other";
+        Assert.That(settings.AuthorizeCallbackPathName, Is.EqualTo("/other"));
+#pragma warning restore CS0618
+    }
+
+    [Test]
+    public void Effective_Logout_And_Error_Default_From_CallbackPathName()
+    {
+        var settings = new SecuritySettings();
+
+        Assert.That(settings.GetEffectiveLogoutPathName(), Is.EqualTo("/umbraco/logout"));
+        Assert.That(settings.GetEffectiveErrorPathName(), Is.EqualTo("/umbraco/error"));
+    }
+
+    [Test]
+    public void Effective_Logout_Prefers_Explicit_Value_Over_Derived()
+    {
+        var settings = new SecuritySettings();
+
+#pragma warning disable CS0618 // Type or member is obsolete
+        settings.AuthorizeCallbackLogoutPathName = "/backoffice/bye";
+#pragma warning restore CS0618
+
+        Assert.That(settings.GetEffectiveLogoutPathName(), Is.EqualTo("/backoffice/bye"));
+    }
 }

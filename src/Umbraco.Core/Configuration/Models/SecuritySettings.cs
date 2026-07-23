@@ -3,6 +3,7 @@
 
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Configuration.Models;
 
@@ -94,9 +95,9 @@ public class SecuritySettings
     internal const long StaticUserMinimumFailedLoginDurationInMilliseconds = 250;
 
     /// <summary>
-    ///     The default path for the authorization callback.
+    ///     The default path the back office is served at.
     /// </summary>
-    internal const string StaticAuthorizeCallbackPathName = "/umbraco";
+    internal const string StaticCallbackPathName = "/umbraco";
 
     /// <summary>
     ///     The default path for the authorization callback logout.
@@ -260,25 +261,65 @@ public class SecuritySettings
     public Uri? BackOfficeHost { get; set; }
 
     /// <summary>
+    ///     Gets or sets the path the back office is served at; the return URL is
+    ///     <c>BackOfficeHost + CallbackPathName</c>, and logout/error are derived from it.
+    /// </summary>
+    [DefaultValue(StaticCallbackPathName)]
+    public string CallbackPathName { get; set; } = StaticCallbackPathName;
+
+    /// <summary>
     ///     Gets or sets the path at which the back-office client is served. Used as the default
     ///     post-login return target: appended to <see cref="BackOfficeHost" /> when that is set (e.g.
     ///     "/" when the client runs at the root of a separate host such as a dev server), and used
     ///     as-is on the current host otherwise. Defaults to the standard back-office path.
     /// </summary>
-    [DefaultValue(StaticAuthorizeCallbackPathName)]
-    public string AuthorizeCallbackPathName { get; set; } = StaticAuthorizeCallbackPathName;
+    [Obsolete("Use CallbackPathName; logout/error paths are derived from it. Scheduled for removal in Umbraco 21.")]
+    [DefaultValue(StaticCallbackPathName)]
+    public string AuthorizeCallbackPathName
+    {
+        get => CallbackPathName;
+        set => CallbackPathName = value;
+    }
+
+    private string? _authorizeCallbackLogoutPathName;
+
+    private string? _authorizeCallbackErrorPathName;
 
     /// <summary>
     ///     Gets or sets the path to use for authorization callback logout. Will be appended to the BackOfficeHost.
     /// </summary>
+    [Obsolete("Use CallbackPathName; logout/error paths are derived from it. Scheduled for removal in Umbraco 21.")]
     [DefaultValue(StaticAuthorizeCallbackLogoutPathName)]
-    public string AuthorizeCallbackLogoutPathName { get; set; } = StaticAuthorizeCallbackLogoutPathName;
+    public string AuthorizeCallbackLogoutPathName
+    {
+        get => _authorizeCallbackLogoutPathName ?? StaticAuthorizeCallbackLogoutPathName;
+        set => _authorizeCallbackLogoutPathName = value;
+    }
 
     /// <summary>
     ///     Gets or sets the path to use for authorization callback error. Will be appended to the BackOfficeHost.
     /// </summary>
+    [Obsolete("Use CallbackPathName; logout/error paths are derived from it. Scheduled for removal in Umbraco 21.")]
     [DefaultValue(StaticAuthorizeCallbackErrorPathName)]
-    public string AuthorizeCallbackErrorPathName { get; set; } = StaticAuthorizeCallbackErrorPathName;
+    public string AuthorizeCallbackErrorPathName
+    {
+        get => _authorizeCallbackErrorPathName ?? StaticAuthorizeCallbackErrorPathName;
+        set => _authorizeCallbackErrorPathName = value;
+    }
+
+    /// <summary>
+    ///     Gets the effective path to use for authorization callback logout: the explicitly configured
+    ///     <see cref="AuthorizeCallbackLogoutPathName"/> if set, otherwise derived from <see cref="CallbackPathName"/>.
+    /// </summary>
+    public string GetEffectiveLogoutPathName() =>
+        _authorizeCallbackLogoutPathName ?? CallbackPathName.EnsureEndsWith('/') + "logout";
+
+    /// <summary>
+    ///     Gets the effective path to use for authorization callback error: the explicitly configured
+    ///     <see cref="AuthorizeCallbackErrorPathName"/> if set, otherwise derived from <see cref="CallbackPathName"/>.
+    /// </summary>
+    public string GetEffectiveErrorPathName() =>
+        _authorizeCallbackErrorPathName ?? CallbackPathName.EnsureEndsWith('/') + "error";
 
     /// <summary>
     ///     Gets or sets the expiry time for password reset emails.
