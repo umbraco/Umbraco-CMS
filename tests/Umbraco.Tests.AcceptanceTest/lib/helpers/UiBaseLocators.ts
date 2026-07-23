@@ -933,10 +933,10 @@ export class UiBaseLocators extends BasePage {
     );
   }
 
-  async isSuccessButtonWithTextVisible(text: string) {
-    // The success state can follow a slow server operation (e.g. rebuilding the database cache), which under
-    // load takes longer than the default timeout to complete.
-    return await this.isVisible(this.successState.filter({ hasText: text }), true, ConstantHelper.timeout.veryLong);
+  // timeout is overridable because the success state can follow a slow server operation (e.g. rebuilding the
+  // database cache) that exceeds the default timeout under load; most callers can use the default.
+  async isSuccessButtonWithTextVisible(text: string, timeout?: number) {
+    return await this.isVisible(this.successState.filter({ hasText: text }), true, timeout);
   }
 
   async isSuccessStateIconVisible() {

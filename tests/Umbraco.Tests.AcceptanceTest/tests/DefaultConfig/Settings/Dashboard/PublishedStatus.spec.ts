@@ -21,5 +21,5 @@ test('can rebuild the database cache', async ({umbracoUi}) => {
   await umbracoUi.publishedStatus.clickContinueButton();
 
   // Assert
-  await umbracoUi.publishedStatus.isSuccessButtonWithTextVisible('Rebuild Database Cache');
+  await umbracoUi.publishedStatus.isSuccessButtonWithTextVisible('Rebuild Database Cache', ConstantHelper.timeout.veryLong);
 });

@@ -347,10 +347,10 @@ export class ContentUiHelper extends UiBaseLocators {
     this.formValidationMessage = page.locator('#splitViews umb-form-validation-message #messages');
     this.blockName = page.locator('#editor umb-ufm-render[slot="name"]');
     this.addBlockSettingsTabBtn = page.locator('umb-body-layout').getByRole('tab', {name: 'Settings'});
-    this.editBlockEntryBtn = page.locator('[label="Edit"]');
+    this.editBlockEntryBtn = page.locator('umb-block-list-entry, umb-block-grid-entry').locator('[label="Edit"]');
     this.copyBlockEntryBtn = page.getByLabel('Copy to clipboard');
     this.exactCopyBtn = page.getByRole('button', {name: 'Copy', exact: true});
-    this.deleteBlockEntryBtn = page.locator('[label="Delete"]');
+    this.deleteBlockEntryBtn = page.locator('umb-block-list-entry, umb-block-grid-entry').locator('[label="Delete"]');
     this.blockGridEntry = page.locator('umb-block-grid-entry');
     this.blockGridBlock = page.locator('umb-block-grid-block');
     this.blockListEntry = page.locator('umb-block-list-entry');
