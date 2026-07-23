@@ -54,7 +54,7 @@ public class LogViewerRepository : LogViewerRepositoryBase
             {
                 try
                 {
-                    ReadLogFile(filePath, logFilter, logs);
+                    ReadLogFile(filePath, logTimePeriod, logFilter, logs);
                 }
                 catch (Exception ex)
                 {
@@ -79,7 +79,7 @@ public class LogViewerRepository : LogViewerRepositoryBase
             }).ToArray();
     }
 
-    private void ReadLogFile(string filePath, ILogFilter logFilter, List<LogEvent> logs)
+    private void ReadLogFile(string filePath, LogTimePeriod logTimePeriod, ILogFilter logFilter, List<LogEvent> logs)
     {
         using var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
         using var stream = new StreamReader(fs);
@@ -116,6 +116,14 @@ public class LogViewerRepository : LogViewerRepositoryBase
 
             // LogEventReader may return true with a null event for a benign skip.
             if (evt is null)
+            {
+                continue;
+            }
+
+            // Files are bucketed by calendar date, so a boundary file can hold entries outside the
+            // requested range — the range's time-of-day only narrows which entries apply, not just
+            // which files are opened. Exclude entries falling outside the exact range (#14710).
+            if (IsWithinTimePeriod(evt, logTimePeriod) is false)
             {
                 continue;
             }
@@ -169,4 +177,15 @@ public class LogViewerRepository : LogViewerRepositoryBase
     }
 
     private static string GetSearchPattern(DateTime day) => $"*{day:yyyyMMdd}*.json";
+
+    private static bool IsWithinTimePeriod(LogEvent evt, LogTimePeriod logTimePeriod)
+    {
+        // The period bounds are server-local wall-clock times (from DateTimeOffset.LocalDateTime);
+        // interpret them as local instants so the comparison against the entry's absolute timestamp
+        // is offset-correct regardless of the entry's own recorded offset.
+        var start = new DateTimeOffset(DateTime.SpecifyKind(logTimePeriod.StartTime, DateTimeKind.Local));
+        var end = new DateTimeOffset(DateTime.SpecifyKind(logTimePeriod.EndTime, DateTimeKind.Local));
+
+        return evt.Timestamp >= start && evt.Timestamp <= end;
+    }
 }

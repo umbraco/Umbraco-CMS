@@ -38,6 +38,15 @@ internal sealed class LogViewerServiceTests : UmbracoIntegrationTest
     private const string CorruptFileValidLineAfter =
         """{"@t":"2024-01-09T09:00:02.0000000Z","@mt":"Second valid entry","SourceContext":"Test","ProcessId":1,"ProcessName":"Test","ThreadId":1,"MachineName":"TEST","Log4NetLevel":"INFO "}""";
 
+    // Three consecutive day files written in OneTimeSetUp, each holding an early and a late entry.
+    // Timestamps and filenames are derived from *local* time so file selection (by local calendar
+    // date) and the per-entry range check (by absolute instant) line up on any machine time zone.
+    // A range starting midday on the first day and ending midday on the last day therefore includes
+    // the whole middle day but only the in-range entries from the boundary day files (#14710).
+    private readonly DateTime _boundaryStartDate = new(2026, 7, 21, 12, 0, 0);
+    private readonly DateTime _boundaryEndDate = new(2026, 7, 23, 12, 0, 0);
+    private readonly List<string> _boundaryLogfilePaths = new();
+
     private string _sampleLogfilePath;
     private string _corruptLogfilePath;
 
@@ -63,6 +72,35 @@ internal sealed class LogViewerServiceTests : UmbracoIntegrationTest
             Environment.NewLine,
             new[] { CorruptFileValidLineBefore, CorruptFileTruncatedLine, CorruptFileValidLineAfter }) + Environment.NewLine;
         File.WriteAllText(_corruptLogfilePath, corruptContent);
+
+        // Boundary-trimming fixture: one file per local day, each with an entry before and after
+        // midday. With a range of [day1 12:00, day3 12:00] the "early" entry on day1 and the "late"
+        // entry on day3 fall outside the range and must be excluded, while the middle day is whole.
+        WriteBoundaryLogfile(newLogfileDirPath, _boundaryStartDate.Date, "Day21 early", "Day21 late");
+        WriteBoundaryLogfile(newLogfileDirPath, _boundaryStartDate.Date.AddDays(1), "Day22 early", "Day22 late");
+        WriteBoundaryLogfile(newLogfileDirPath, _boundaryEndDate.Date, "Day23 early", "Day23 late");
+    }
+
+    private void WriteBoundaryLogfile(string logfileDirPath, DateTime localDay, string earlyMessage, string lateMessage)
+    {
+        var path = Path.Combine(logfileDirPath, $"UmbracoTraceLog.BOUNDARYTEST.{localDay:yyyyMMdd}.json");
+        var content = string.Join(
+            Environment.NewLine,
+            new[]
+            {
+                BoundaryLogLine(localDay.AddHours(6), earlyMessage),
+                BoundaryLogLine(localDay.AddHours(18), lateMessage),
+            }) + Environment.NewLine;
+        File.WriteAllText(path, content);
+        _boundaryLogfilePaths.Add(path);
+    }
+
+    private static string BoundaryLogLine(DateTime localTime, string message)
+    {
+        // Serilog Compact records the timestamp as an absolute instant; write the local wall time as
+        // its UTC equivalent so the entry's instant matches what the range comparison expects.
+        DateTime utc = DateTime.SpecifyKind(localTime, DateTimeKind.Local).ToUniversalTime();
+        return $$"""{"@t":"{{utc:o}}","@mt":"{{message}}","SourceContext":"Test","ProcessId":1,"ProcessName":"Test","ThreadId":1,"MachineName":"TEST","Log4NetLevel":"INFO "}""";
     }
 
     [OneTimeTearDown]
@@ -76,6 +114,11 @@ internal sealed class LogViewerServiceTests : UmbracoIntegrationTest
         if (File.Exists(_corruptLogfilePath))
         {
             File.Delete(_corruptLogfilePath);
+        }
+
+        foreach (var path in _boundaryLogfilePaths.Where(File.Exists))
+        {
+            File.Delete(path);
         }
     }
 
@@ -178,6 +221,28 @@ internal sealed class LogViewerServiceTests : UmbracoIntegrationTest
             Assert.AreEqual("Create Index:\n {Sql}", mostPopularTemplate.MessageTemplate);
             Assert.AreEqual(74, mostPopularTemplate.Count);
             Assert.AreEqual(attempt.Result.Items, attempt.Result.Items.OrderByDescending(x => x.Count));
+        });
+    }
+
+    /// <summary>
+    /// Verifies that a range spanning several day files returns every entry from the fully-covered
+    /// day but only the in-range entries from the boundary day files, rather than the whole of those
+    /// files. Coverage for the server side of https://github.com/umbraco/Umbraco-CMS/issues/14710.
+    /// </summary>
+    [Test]
+    public async Task Get_Logs_Excludes_Boundary_File_Entries_Outside_Time_Range()
+    {
+        var attempt = await LogViewerService.GetPagedLogsAsync(_boundaryStartDate, _boundaryEndDate, 0, int.MaxValue);
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(attempt.Success);
+            Assert.AreEqual(LogViewerOperationStatus.Success, attempt.Status);
+            Assert.IsNotNull(attempt.Result);
+            Assert.AreEqual(4, attempt.Result.Total, "Entries outside the range in the boundary day files should be excluded.");
+            Assert.That(
+                attempt.Result.Items.Select(x => x.RenderedMessage),
+                Is.EquivalentTo(new[] { "Day21 late", "Day22 early", "Day22 late", "Day23 early" }));
         });
     }
 
