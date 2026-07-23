@@ -229,7 +229,7 @@ public class DefaultUrlProvider : IUrlProvider
         var path = pos == 0 ? route : route[pos..];
 
         DomainAndUri? domainUri = null;
-        if (pos > 0 && int.TryParse(route[..pos], NumberStyles.None, CultureInfo.InvariantCulture, out var nodeId))
+        if (pos > 0 && int.TryParse(route.AsSpan(0, pos), NumberStyles.None, CultureInfo.InvariantCulture, out var nodeId))
         {
             domainUri = DomainUtilities.DomainForNode(
                 _domainCache,
@@ -313,9 +313,9 @@ public class DefaultUrlProvider : IUrlProvider
         return _uriUtility.UriFromUmbraco(uri, _requestSettings);
     }
 
-    private string CombinePaths(string path1, string path2)
+    private static string CombinePaths(string path1, string path2)
     {
-        var path = path1.TrimEnd(Constants.CharArrays.ForwardSlash) + path2;
-        return path == "/" ? path : path.TrimEnd(Constants.CharArrays.ForwardSlash);
+        var path = $"{path1.AsSpan().TrimEnd('/')}{path2}";
+        return path == "/" ? path : path.TrimEnd('/');
     }
 }

@@ -33,6 +33,8 @@ export class BasePage {
 
   /**
    * Clicks an element after verifying it is visible.
+   * Note: the visibility wait defaults to `timeout.long`, longer than the other
+   * wrappers (`timeout.medium`), to absorb slow-rendering interactive elements.
    * @param locator - The element to click
    * @param options - Optional click configuration
    */
@@ -461,7 +463,9 @@ export class BasePage {
   }
 
   /**
-   * Asserts that an element is visible.
+   * Asserts that an element is (or, with `isVisible=false`, is not) visible, waiting
+   * up to the timeout. This is an assertion: it returns `void` and throws on mismatch.
+   * Do NOT use it as a boolean predicate — for a non-throwing check use {@link checkIsVisible}.
    * @param locator - The element to check
    * @param isVisible - Whether the element should be visible (default: true)
    */
@@ -572,7 +576,9 @@ export class BasePage {
   }
 
   /**
-   * Checks if an element is currently visible.
+   * Returns whether an element is visible right now as a boolean. Unlike
+   * {@link isVisible}, this does NOT wait or assert — it reads the current state,
+   * so it can race with rendering. Prefer `isVisible` for assertions.
    * @param locator - The element to check
    * @returns True if visible, false otherwise
    */

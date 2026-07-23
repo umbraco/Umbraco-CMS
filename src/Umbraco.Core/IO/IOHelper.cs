@@ -29,15 +29,14 @@ public abstract class IOHelper : IIOHelper
     {
         var retval = virtualPath;
 
-        if (virtualPath.StartsWith("~"))
+        if (virtualPath.StartsWith('~'))
         {
             retval = virtualPath.Replace("~", _hostingEnvironment.ApplicationVirtualPath);
         }
 
-        if (virtualPath.StartsWith("/") && !PathStartsWith(virtualPath, _hostingEnvironment.ApplicationVirtualPath))
+        if (virtualPath.StartsWith('/') && !PathStartsWith(virtualPath, _hostingEnvironment.ApplicationVirtualPath))
         {
-            retval = _hostingEnvironment.ApplicationVirtualPath + "/" +
-                     virtualPath.TrimStart(Constants.CharArrays.ForwardSlash);
+            retval = $"{_hostingEnvironment.ApplicationVirtualPath}/{virtualPath.AsSpan().TrimStart('/')}";
         }
 
         return retval;
@@ -71,9 +70,9 @@ public abstract class IOHelper : IIOHelper
         if (_hostingEnvironment.IsHosted)
         {
             var result = !string.IsNullOrEmpty(path) &&
-                         (path.StartsWith("~") || PathStartsWith(path, _hostingEnvironment.ApplicationVirtualPath))
+                         (path.StartsWith('~') || PathStartsWith(path, _hostingEnvironment.ApplicationVirtualPath))
                 ? _hostingEnvironment.MapPathWebRoot(path)
-                : _hostingEnvironment.MapPathWebRoot("~/" + path.TrimStart(Constants.CharArrays.ForwardSlash));
+                : _hostingEnvironment.MapPathWebRoot($"~/{path.AsSpan().TrimStart('/')}");
 
             if (result != null)
             {
@@ -149,7 +148,7 @@ public abstract class IOHelper : IIOHelper
     public bool VerifyFileExtension(string filePath, IEnumerable<string> validFileExtensions)
     {
         var ext = Path.GetExtension(filePath);
-        return ext != null && validFileExtensions.Contains(ext.TrimStart(Constants.CharArrays.Period));
+        return ext != null && validFileExtensions.Contains(ext.TrimStart('.'));
     }
 
     /// <inheritdoc />

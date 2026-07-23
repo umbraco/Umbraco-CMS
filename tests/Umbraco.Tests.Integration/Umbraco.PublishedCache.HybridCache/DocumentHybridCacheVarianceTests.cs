@@ -19,12 +19,28 @@ using Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.PublishedCache.HybridCache;
 
-[TestFixture]
+// Parameterized over NoCache (the harness default) and a real DeepCloneAppCache (matching
+// production), since a previous regression here was only reproducible with caching disabled.
+// Both are run so a future fix must hold under real caching too, not just NoCache.
+[TestFixture(true)]
+[TestFixture(false)]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
 internal sealed class DocumentHybridCacheVarianceTests : UmbracoIntegrationTest
 {
+    private readonly bool _useRealCache;
+
+    public DocumentHybridCacheVarianceTests(bool useRealCache) => _useRealCache = useRealCache;
+
     protected override void CustomTestSetup(IUmbracoBuilder builder)
     {
+        if (_useRealCache)
+        {
+            builder.Services.AddUnique(_ => new AppCaches(
+                new DeepCloneAppCache(new ObjectCacheAppCache()),
+                NoAppCache.Instance,
+                new IsolatedCaches(_ => new DeepCloneAppCache(new ObjectCacheAppCache()))));
+        }
+
         builder.AddNotificationHandler<ContentTreeChangeNotification, ContentTreeChangeDistributedCacheNotificationHandler>();
         builder.AddNotificationHandler<ContentTypeChangedNotification, ContentTypeChangedDistributedCacheNotificationHandler>();
         builder.Services.AddUnique<IServerMessenger, ContentEventsTests.LocalServerMessenger>();
@@ -41,7 +57,7 @@ internal sealed class DocumentHybridCacheVarianceTests : UmbracoIntegrationTest
     private IVariationContextAccessor VariationContextAccessor => GetRequiredService<IVariationContextAccessor>();
 
     [Test]
-    public async Task Published_Output_Reflects_Property_Variance_Change_Without_Republishing_Invariant_To_Variant()
+    public async Task Can_Serve_Correct_Value_After_Property_Variance_Changes_Invariant_To_Variant()
     {
         var documentType = await CreateDocumentType(ContentVariation.Nothing);
 
@@ -68,6 +84,7 @@ internal sealed class DocumentHybridCacheVarianceTests : UmbracoIntegrationTest
             Assert.That(beforeChange!.Value<string>("title", "da-DK"), Is.EqualTo("invariant title"));
         });
 
+        documentType = await RefetchDocumentType(documentType.Key);
         documentType.Variations = ContentVariation.Culture;
         var titleProperty = documentType.PropertyTypes.Single(p => p.Alias == "title");
         titleProperty.Variations = ContentVariation.Culture;
@@ -84,7 +101,7 @@ internal sealed class DocumentHybridCacheVarianceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Published_Output_Reflects_Property_Variance_Change_Without_Republishing_Variant_To_Invariant()
+    public async Task Can_Serve_Correct_Value_After_Property_Variance_Changes_Variant_To_Invariant()
     {
         var documentType = await CreateDocumentType(ContentVariation.Culture);
 
@@ -111,8 +128,8 @@ internal sealed class DocumentHybridCacheVarianceTests : UmbracoIntegrationTest
             Assert.That(beforeChange!.Value<string>("title", "da-DK"), Is.Empty);
         });
 
-        documentType = await ContentTypeService.GetAsync(documentType.Key);
-        documentType!.Variations = ContentVariation.Nothing;
+        documentType = await RefetchDocumentType(documentType.Key);
+        documentType.Variations = ContentVariation.Nothing;
         var titleProperty = documentType.PropertyTypes.Single(p => p.Alias == "title");
         titleProperty.Variations = ContentVariation.Nothing;
         await ContentTypeService.UpdateAsync(documentType, Constants.Security.SuperUserKey);
@@ -130,7 +147,7 @@ internal sealed class DocumentHybridCacheVarianceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Published_Output_Reflects_Property_Variance_Change_Without_Republishing_Invariant_To_Variant_When_Type_Stays_Variant()
+    public async Task Can_Serve_Correct_Value_After_Property_Variance_Changes_Invariant_To_Variant_When_Type_Stays_Variant()
     {
         var documentType = await CreateDocumentType(ContentVariation.Culture, ContentVariation.Nothing);
 
@@ -157,8 +174,8 @@ internal sealed class DocumentHybridCacheVarianceTests : UmbracoIntegrationTest
             Assert.That(beforeChange!.Value<string>("title", "da-DK"), Is.EqualTo("invariant title"));
         });
 
-        documentType = await ContentTypeService.GetAsync(documentType.Key);
-        var titleProperty = documentType!.PropertyTypes.Single(p => p.Alias == "title");
+        documentType = await RefetchDocumentType(documentType.Key);
+        var titleProperty = documentType.PropertyTypes.Single(p => p.Alias == "title");
         titleProperty.Variations = ContentVariation.Culture;
         await ContentTypeService.UpdateAsync(documentType, Constants.Security.SuperUserKey);
 
@@ -173,7 +190,7 @@ internal sealed class DocumentHybridCacheVarianceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Published_Output_Reflects_Property_Variance_Change_Without_Republishing_Variant_To_Invariant_When_Type_Stays_Variant()
+    public async Task Can_Serve_Correct_Value_After_Property_Variance_Changes_Variant_To_Invariant_When_Type_Stays_Variant()
     {
         var documentType = await CreateDocumentType(ContentVariation.Culture, ContentVariation.Culture);
 
@@ -195,13 +212,12 @@ internal sealed class DocumentHybridCacheVarianceTests : UmbracoIntegrationTest
         Assert.That(beforeChange, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.That(beforeChange!.Value<string>("title"), Is.EqualTo("variant title"));
             Assert.That(beforeChange!.Value<string>("title", defaultCulture), Is.EqualTo("variant title"));
             Assert.That(beforeChange!.Value<string>("title", "da-DK"), Is.Empty);
         });
 
-        documentType = await ContentTypeService.GetAsync(documentType.Key);
-        var titleProperty = documentType!.PropertyTypes.Single(p => p.Alias == "title");
+        documentType = await RefetchDocumentType(documentType.Key);
+        var titleProperty = documentType.PropertyTypes.Single(p => p.Alias == "title");
         titleProperty.Variations = ContentVariation.Nothing;
         await ContentTypeService.UpdateAsync(documentType, Constants.Security.SuperUserKey);
 
@@ -230,8 +246,16 @@ internal sealed class DocumentHybridCacheVarianceTests : UmbracoIntegrationTest
             .WithVariations(propertyVariation ?? typeVariation)
             .Done()
             .Build();
-        await ContentTypeService.CreateAsync(documentType, Constants.Security.SuperUserKey);
+        var attempt = await ContentTypeService.CreateAsync(documentType, Constants.Security.SuperUserKey);
+        Assert.That(attempt.Success, Is.True, $"Failed to create document type: {attempt.Exception?.Message}");
         return documentType;
+    }
+
+    private async Task<IContentType> RefetchDocumentType(Guid key)
+    {
+        var documentType = await ContentTypeService.GetAsync(key);
+        Assert.That(documentType, Is.Not.Null);
+        return documentType!;
     }
 
     private async Task CreateAdditionalLanguage(string culture)

@@ -60,6 +60,11 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
               "Scheduled for removal in Umbraco 19.")]
     protected void CacheReferencedEntities(BlockEditorData<TValue, TLayout>? blockEditorData)
     {
+        if (CacheReferencedEntitiesSuppression.IsSuppressed)
+        {
+            return;
+        }
+
         // Group property values by their associated data editor alias.
         IEnumerable<IGrouping<string, BlockPropertyValue>> valuesByDataEditors = (blockEditorData?.BlockValue.ContentData ?? []).Union(blockEditorData?.BlockValue.SettingsData ?? [])
             .SelectMany(x => x.Values)

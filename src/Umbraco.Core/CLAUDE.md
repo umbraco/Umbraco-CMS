@@ -334,6 +334,8 @@ Configuration models in `/Configuration/Models`:
 - `DeliveryApiSettings` - Delivery API configuration
 - Access via `IOptionsMonitor<TSettings>`
 
+**Only top-level settings are bound as options.** A settings class is bound to configuration *only* when it has an explicit `AddUmbracoOptions<T>()` registration in `UmbracoBuilder.Configuration.cs` (the `[UmbracoOptions]` attribute alone does nothing — nothing scans for it). A **nested** settings class exposed as a property of another settings class (e.g. `ContentSettings.Imaging`, `SecuritySettings.UserPassword`) is populated as part of binding its parent — it is *not* independently bound. Do **not** inject a nested settings type directly as `IOptions<TNested>`/`IOptionsSnapshot<TNested>`: with no registration the options system silently hands back a **default-constructed** instance and all user configuration is ignored. Instead inject the parent and read the nested property (`_contentSettings.Imaging`). The `UserPassword`/`MemberPassword` settings that *are* separately registered are a legacy exception slated for removal (see the `TODO (V18)` in `UmbracoBuilder.Configuration.cs`); don't copy that pattern for new nested settings.
+
 ## Dependencies
 
 ### What Umbraco.Core Depends On

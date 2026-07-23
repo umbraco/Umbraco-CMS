@@ -161,6 +161,6 @@ export { UmbPropertyEditorUIMediaPickerElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		['umb-property-editor-ui-media-picker']: UmbPropertyEditorUIMediaPickerElement;
+		'umb-property-editor-ui-media-picker': UmbPropertyEditorUIMediaPickerElement;
 	}
 }
