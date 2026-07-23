@@ -1133,6 +1133,9 @@ export class UiBaseLocators extends BasePage {
       name: name,
       exact: isExact,
     });
+    // In scrollable pickers (e.g. the user-group modal) the target button can render below the fold,
+    // where a force click fails with "element is outside of the viewport". Scroll it in first.
+    await this.scrollIntoView(exactButtonWithNameLocator);
     await this.click(exactButtonWithNameLocator, { force: true });
   }
 

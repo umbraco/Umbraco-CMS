@@ -30,7 +30,10 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
 
-test('can disable URL tracker', async ({umbracoApi, umbracoUi}) => {
+// TODO: v17 removed the enable/disable URL tracker button from the redirect dashboard; the tracker is now
+// config-only (Umbraco:CMS:WebRouting:DisableRedirectUrlTracking) with a status/info modal. Re-enable when
+// the UI toggle returns or rewrite against the config-based flow.
+test.skip('can disable URL tracker', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
   await umbracoUi.redirectManagement.clickRedirectManagementTab();
@@ -53,7 +56,10 @@ test('can disable URL tracker', async ({umbracoApi, umbracoUi}) => {
   expect(statusData.status).toBe(disableStatus);
 });
 
-test('can re-enable URL tracker', async ({umbracoApi, umbracoUi}) => {
+// TODO: v17 removed the enable/disable URL tracker button from the redirect dashboard; the tracker is now
+// config-only (Umbraco:CMS:WebRouting:DisableRedirectUrlTracking) with a status/info modal. Re-enable when
+// the UI toggle returns or rewrite against the config-based flow.
+test.skip('can re-enable URL tracker', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.redirectManagement.setStatus(disableStatus);
 

@@ -129,7 +129,7 @@ export class UserGroupUiHelper extends UiBaseLocators {
   }
 
   async doesUserGroupTableHaveSection(userGroupName: string, sectionName: string, hasSection = true) {
-    await this.isVisible(this.page.locator('uui-table-row', {hasText: userGroupName}).locator('umb-user-group-table-sections-column-layout', {hasText: sectionName}), hasSection);
+    await this.isVisible(this.page.locator('uui-table-row', {hasText: userGroupName}).locator('umb-section-aliases-value-summary', {hasText: sectionName}), hasSection);
   }
 
   async doesUserGroupContainLanguage(languageName: string, isVisible = true) {
