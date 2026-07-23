@@ -189,6 +189,9 @@ export class UmbTagsInputElement extends UUIFormControlWithBasicsMixin(UmbLitEle
 	}
 
 	protected override updated(): void {
+		// #main-tag is not rendered in readonly mode, and the queries can resolve to null
+		// during transient re-renders, so guard before touching the elements.
+		if (!this._mainTag || !this._widthTracker) return;
 		this._mainTag.style.width = `${this._widthTracker.offsetWidth - 4}px`;
 	}
 

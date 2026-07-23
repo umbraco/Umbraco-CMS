@@ -1,13 +1,26 @@
+import { UMB_BLOCK_SINGLE_ENTRY_CONTEXT } from '../../context/index.js';
 import { css, customElement, html, property, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbBlockDataType } from '@umbraco-cms/backoffice/block';
-
-import '@umbraco-cms/backoffice/ufm';
+import type { UmbBlockDataType, UmbBlockLabelUfmValueType } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockEditorCustomViewConfiguration } from '@umbraco-cms/backoffice/block-custom-view';
+import type { UmbUfmResolvedEvent } from '@umbraco-cms/backoffice/ufm';
 
 @customElement('umb-ref-single-block')
 export class UmbRefSingleBlockElement extends UmbLitElement {
 	//
+	#blockContext?: typeof UMB_BLOCK_SINGLE_ENTRY_CONTEXT.TYPE;
+
+	constructor() {
+		super();
+		this.consumeContext(UMB_BLOCK_SINGLE_ENTRY_CONTEXT, (blockContext) => {
+			this.#blockContext = blockContext;
+		});
+	}
+
+	#onUfmResolved = (event: UmbUfmResolvedEvent) => {
+		this.#blockContext?.setName(event.detail.text);
+	};
+
 	@property({ type: String, reflect: false })
 	label?: string;
 
@@ -27,14 +40,20 @@ export class UmbRefSingleBlockElement extends UmbLitElement {
 	config?: UmbBlockEditorCustomViewConfiguration;
 
 	override render() {
-		const blockValue = { ...this.content, $settings: this.settings };
+		const blockValue: UmbBlockLabelUfmValueType = { ...this.content, $settings: this.settings };
 		return html`
 			<uui-ref-node
 				standalone
 				.readonly=${!(this.config?.showContentEdit ?? false)}
 				.href=${this.config?.showContentEdit ? this.config?.editContentPath : undefined}>
 				<umb-icon slot="icon" .name=${this.icon}></umb-icon>
-				<umb-ufm-render slot="name" inline .markdown=${this.label} .value=${blockValue}></umb-ufm-render>
+				<umb-ufm-render
+					slot="name"
+					inline
+					.markdown=${this.label}
+					.value=${blockValue}
+					@umb-ufm-resolved=${this.#onUfmResolved}>
+				</umb-ufm-render>
 				${when(
 					this.unpublished,
 					() => html`

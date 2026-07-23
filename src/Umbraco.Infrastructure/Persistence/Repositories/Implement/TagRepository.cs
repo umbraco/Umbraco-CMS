@@ -647,6 +647,8 @@ ON (tagset.tag = {cmsTags}.tag AND tagset.{group} = {cmsTags}.{group} AND COALES
                 return Constants.ObjectTypes.Media;
             case TaggableObjectTypes.Member:
                 return Constants.ObjectTypes.Member;
+            case TaggableObjectTypes.Element:
+                return Constants.ObjectTypes.Element;
             default:
                 throw new ArgumentOutOfRangeException(nameof(type));
         }

@@ -159,6 +159,39 @@ internal sealed class RelationServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
+    public async Task GetParentEntitiesByChildIds_Returns_Parents_For_All_Children_Filtered_By_Alias()
+    {
+        var contentType = ContentTypeBuilder.CreateBasicContentType("blah");
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+
+        var parentA = ContentBuilder.CreateBasicContent(contentType);
+        ContentService.Save(parentA);
+        var childA = ContentBuilder.CreateBasicContent(contentType);
+        ContentService.Save(childA);
+        var parentB = ContentBuilder.CreateBasicContent(contentType);
+        ContentService.Save(parentB);
+        var childB = ContentBuilder.CreateBasicContent(contentType);
+        ContentService.Save(childB);
+
+        RelationService.Relate(parentA.Id, childA.Id, Constants.Conventions.RelationTypes.RelatedElementAlias);
+        RelationService.Relate(parentB.Id, childB.Id, Constants.Conventions.RelationTypes.RelatedElementAlias);
+
+        // A single batched call returns the union of parents for all supplied children (parent-side rows only).
+        var parents = RelationService.GetParentEntitiesByChildIds(
+            new[] { childA.Id, childB.Id },
+            new[] { Constants.Conventions.RelationTypes.RelatedElementAlias },
+            UmbracoObjectTypes.Document).Select(x => x.Id).ToArray();
+        CollectionAssert.AreEquivalent(new[] { parentA.Id, parentB.Id }, parents);
+
+        // A non-matching alias filters everything out, rather than falling back to "all".
+        var none = RelationService.GetParentEntitiesByChildIds(
+            new[] { childA.Id, childB.Id },
+            new[] { "aliasThatDoesNotExist" },
+            UmbracoObjectTypes.Document).ToArray();
+        Assert.IsEmpty(none);
+    }
+
+    [Test]
     public void Can_Create_RelationType_Without_Name()
     {
         var rs = RelationService;

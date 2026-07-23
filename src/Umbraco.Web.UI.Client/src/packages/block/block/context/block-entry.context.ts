@@ -50,7 +50,9 @@ export abstract class UmbBlockEntryContext<
 	BlockLayoutType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel,
 	BlockOriginData extends UmbBlockWorkspaceOriginData = UmbBlockWorkspaceOriginData,
 > extends UmbContextBase {
-	//
+	// TODO: [V19] Remove together with the legacy label renderer warning. [LK]
+	static #hasWarnedLegacyLabelRenderer = false;
+
 	protected _manager?: BlockManagerContextType;
 	protected _entries?: BlockEntriesContextType;
 
@@ -64,6 +66,9 @@ export abstract class UmbBlockEntryContext<
 
 	#isExternalContent = new UmbBooleanState(false);
 	readonly isExternalContent = this.#isExternalContent.asObservable();
+
+	#isAllowedInLibrary = new UmbBooleanState(undefined);
+	readonly isAllowedInLibrary = this.#isAllowedInLibrary.asObservable();
 
 	#externalContentVariantState = new UmbStringState(undefined);
 	readonly externalContentVariantState = this.#externalContentVariantState.asObservable();
@@ -166,7 +171,34 @@ export abstract class UmbBlockEntryContext<
 		return this.#label.getValue();
 	}
 
-	#labelRender = new UmbUfmVirtualRenderController(this);
+	#name = new UmbStringState<string>('');
+	/** Observable of the block's resolved label text (UFM rendered as plain text). */
+	public readonly name = this.#name.asObservable();
+
+	/**
+	 * Set the resolved name text. Intended to be called by the block entry element
+	 * when its canonical `<umb-ufm-render>` reports updated text via `umb-ufm-resolved`.
+	 * @param {string} text the resolved text.
+	 */
+	public setName(text: string): void {
+		this.#name.setValue(text);
+	}
+
+	// TODO: [V19] Remove `#labelRender` and the related plumbing once the legacy renderer is gone. [LK]
+	#labelRender?: UmbUfmVirtualRenderController;
+
+	/**
+	 * Whether this context should run its own hidden `UmbUfmVirtualRenderController` as the
+	 * source of `getName()`. Subclasses whose entry element owns a canonical `<umb-ufm-render>`
+	 * (and pushes text via {@link setName}) should override this to return `false`.
+	 * @deprecated Scheduled for removal in Umbraco 19. Subclasses must own their own
+	 * `<umb-ufm-render>` and push resolved text via {@link setName} — the hidden virtual
+	 * renderer fallback will be removed entirely.
+	 * @returns {boolean} `true` to create the legacy hidden renderer; `false` to skip it.
+	 */
+	protected _needsLegacyLabelRenderer(): boolean {
+		return true;
+	}
 
 	#generateWorkspaceEditContentPath = (path?: string, contentKey?: string) =>
 		path && contentKey ? path + 'edit/' + encodeFilePath(contentKey) + '/view/content' : '';
@@ -349,10 +381,25 @@ export abstract class UmbBlockEntryContext<
 	) {
 		super(host, 'UmbBlockEntryContext');
 
-		this.observe(this.label, (label) => {
-			this.#labelRender.markdown = label;
-		});
-		this.#watchContentForLabelRender();
+		// TODO: [V19] Drop this conditional and the legacy renderer plumbing entirely. [LK]
+		if (this._needsLegacyLabelRenderer()) {
+			if (!UmbBlockEntryContext.#hasWarnedLegacyLabelRenderer) {
+				UmbBlockEntryContext.#hasWarnedLegacyLabelRenderer = true;
+				new UmbDeprecation({
+					deprecated: 'UmbBlockEntryContext hidden virtual label renderer (legacy)',
+					solution:
+						'In your UmbBlockEntryContext subclass, override _needsLegacyLabelRenderer() to return false and push the resolved UFM text via setName() — e.g. by listening to @umb-ufm-resolved on a <umb-ufm-render> in your entry element.',
+					removeInVersion: '19.0.0',
+				}).warn();
+			}
+			this.#labelRender = new UmbUfmVirtualRenderController(this);
+			this.observe(this.label, (label) => {
+				if (this.#labelRender) {
+					this.#labelRender.markdown = label;
+				}
+			});
+			this.#watchContentForLabelRender();
+		}
 
 		// Consume block manager:
 		this.consumeContext(blockManagerContextToken, (manager) => {
@@ -463,7 +510,9 @@ export abstract class UmbBlockEntryContext<
 
 	async #watchContentForLabelRender() {
 		this.observe(await this.contentValues(), (content) => {
-			this.#labelRender.value = content;
+			if (this.#labelRender) {
+				this.#labelRender.value = content;
+			}
 		});
 	}
 
@@ -511,7 +560,8 @@ export abstract class UmbBlockEntryContext<
 	 * @returns {string} - the value of the label.
 	 */
 	getName() {
-		return this.#labelRender.toString();
+		// TODO: [V19] Drop the `#labelRender?.toString()` fallback once the legacy renderer is gone. [LK]
+		return this.#name.getValue() || this.#labelRender?.toString() || '';
 	}
 
 	#updateCreatePaths() {
@@ -579,6 +629,20 @@ export abstract class UmbBlockEntryContext<
 			},
 			'observeWorkspacePath',
 		);
+
+		if (this._entries) {
+			this.observe(
+				mergeObservables(
+					[this.contentElementTypeKey, this._entries.libraryAllowedElementTypeKeys],
+					([contentElementTypeKey, libraryAllowedElementTypeKeys]) =>
+						contentElementTypeKey ? libraryAllowedElementTypeKeys.includes(contentElementTypeKey) : undefined,
+				),
+				(isAllowedInLibrary) => {
+					this.#isAllowedInLibrary.setValue(isAllowedInLibrary);
+				},
+				'observeIsAllowedInLibrary',
+			);
+		}
 
 		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
 			.addAdditionalPath('element')

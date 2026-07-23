@@ -28,6 +28,8 @@ export class DataTypeUiHelper extends UiBaseLocators {
   private readonly minimumTxt: Locator;
   private readonly maximumTxt: Locator;
   private readonly stepSizeTxt: Locator;
+  private readonly sliderMinimumTxt: Locator;
+  private readonly sliderMaximumTxt: Locator;
   private readonly optionTxt: Locator;
   private readonly addOptionBtn: Locator;
   private readonly maximumAllowedCharsTxt: Locator;
@@ -178,13 +180,13 @@ export class DataTypeUiHelper extends UiBaseLocators {
     this.ascendingRadioBtn = page.locator('uui-radio[label="Ascending [a-z]"] #button');
     this.descendingRadioBtn = page.locator('uui-radio[label="Descending [z-a]"] #button');
     this.chooseColumnsDisplayedBtn = page.getByTestId('property:includeProperties').getByLabel('Choose');
-    this.columnsDisplayedItems = page.getByTestId('property:includeProperties').locator('.layout-item');
+    this.columnsDisplayedItems = page.getByTestId('property:includeProperties').locator('umb-sortable-list-item');
     this.workspaceViewName = page.getByTestId('property:tabName').locator('#input');
     this.showWorkspaceViewFirstToggle = page.getByTestId('property:showContentFirst').locator('#toggle');
     this.editInInfiniteEditorToggle = page.locator('umb-property[label="Edit in Infinite Editor"] #toggle');
     this.orderByDropDownBox = page.getByTestId('property:orderBy').locator('select');
     this.chooseLayoutsBtn = page.getByTestId('property:layouts').getByLabel('Choose');
-    this.layoutsItems = page.getByTestId('property:layouts').locator('.layout-item');
+    this.layoutsItems = page.getByTestId('property:layouts').locator('umb-sortable-list-item');
 
     // Image Cropper
     this.labelTxt = page.getByLabel('Label', {exact: true});
@@ -200,6 +202,10 @@ export class DataTypeUiHelper extends UiBaseLocators {
     this.maximumTxt = page.getByTestId('property:max').locator('#input');
     this.stepSizeTxt = page.getByTestId('property:step').locator('#input');
     this.allowDecimalsToggle = page.locator('umb-property[label="Allow decimals"] #toggle');
+
+    // Slider (uses minVal/maxVal aliases rather than the Numeric min/max)
+    this.sliderMinimumTxt = page.getByTestId('property:minVal').locator('#input');
+    this.sliderMaximumTxt = page.getByTestId('property:maxVal').locator('#input');
 
     // Radiobox
     this.optionTxt = page.getByTestId('property:items').locator('#input');
@@ -354,6 +360,10 @@ export class DataTypeUiHelper extends UiBaseLocators {
     await this.openCaretButtonForName('Data Types');
   }
 
+  async reloadDataTypeTree() {
+    await this.reloadTree('Data Types');
+  }
+
   async createDataTypeFolder(folderName: string) {
     await this.clickCreateActionMenuOption();
     await this.clickFolderButton();
@@ -370,7 +380,7 @@ export class DataTypeUiHelper extends UiBaseLocators {
 
   async goToDataType(dataTypeName: string) {
     await this.clickRootFolderCaretButton();
-    await this.click(this.sectionSidebar.getByLabel(dataTypeName, {exact: true}));
+    await this.clickTreeItemWithName(dataTypeName);
   }
 
   async clickMoveToButton() {
@@ -516,7 +526,8 @@ export class DataTypeUiHelper extends UiBaseLocators {
   }
 
   async removeColumnDisplayed(propertyAlias: string) {
-    await this.click(this.columnsDisplayedItems.filter({has: this.page.getByText(propertyAlias, {exact: true})}).getByText('Remove'));
+    await this.click(this.columnsDisplayedItems.filter({has: this.page.getByText(propertyAlias, {exact: true})}).getByLabel('Remove', {exact: true}), {force: true});
+    await this.click(this.confirmToRemoveBtn);
   }
 
   async addLayouts(layoutName: string) {
@@ -525,7 +536,8 @@ export class DataTypeUiHelper extends UiBaseLocators {
   }
 
   async removeLayouts(layoutAlias: string) {
-    await this.click(this.layoutsItems.filter({has: this.page.getByText(layoutAlias, {exact: true})}).getByText('Remove'));
+    await this.click(this.layoutsItems.filter({has: this.page.getByText(layoutAlias, {exact: true})}).getByLabel('Remove', {exact: true}), {force: true});
+    await this.click(this.confirmToRemoveBtn);
   }
 
   async chooseOrderByValue(value: string) {
@@ -593,6 +605,14 @@ export class DataTypeUiHelper extends UiBaseLocators {
 
   async enterStepSizeValue(value: string) {
     await this.enterText(this.stepSizeTxt, value);
+  }
+
+  async enterSliderMinimumValue(value: string) {
+    await this.enterText(this.sliderMinimumTxt, value);
+  }
+
+  async enterSliderMaximumValue(value: string) {
+    await this.enterText(this.sliderMaximumTxt, value);
   }
 
   async clickAllowDecimalsToggle() {
@@ -719,7 +739,7 @@ export class DataTypeUiHelper extends UiBaseLocators {
 
   async addStylesheet(stylesheetName: string) {
     await this.click(this.addStylesheetBtn);
-    await this.click(this.page.getByLabel(stylesheetName));
+    await this.clickTreeItemWithName(stylesheetName, this.page);
     await this.click(this.chooseModalBtn);
   }
 
@@ -937,7 +957,7 @@ export class DataTypeUiHelper extends UiBaseLocators {
     await this.click(this.chooseCustomStylesheetBtn);
     await this.openCaretButtonForName('wwwroot');
     await this.openCaretButtonForName('css');
-    await this.clickLabelWithName(name, true);
+    await this.clickTreeItemWithName(name, this.sidebarModal);
     await this.clickChooseModalButton();
   }
 
@@ -948,7 +968,7 @@ export class DataTypeUiHelper extends UiBaseLocators {
     await this.clickExpandChildItemsForMediaButton();
     for (let i = 0; i < mediaItems.length; i++) {
       if (i === mediaItems.length - 1) {
-        await this.clickLabelWithName(mediaItems[i], true);
+        await this.clickTreeItemWithName(mediaItems[i], this.sidebarModal);
       } else {
         await this.click(this.sidebarModal.locator(`uui-menu-item[label="${mediaItems[i]}"] #caret-button`));
       }
@@ -1096,7 +1116,7 @@ export class DataTypeUiHelper extends UiBaseLocators {
       await this.focus(minInput); // Focus is needed
       await this.clearText(minInput);
       return;
-    } 
+    }
     await this.enterText(minInput, value.toString());
   }
 

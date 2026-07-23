@@ -105,7 +105,21 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     /// <param name="newParentId">The new parent identifier.</param>
     /// <param name="userId">The user performing the operation.</param>
     /// <returns>The operation result.</returns>
-    protected abstract OperationResult? Move(TContent content, int newParentId, int userId);
+    protected OperationResult? Move(TContent content, int newParentId, int userId)
+        => Move(content, newParentId, includeDescendants: true, userId);
+
+    /// <summary>
+    /// Moves content to a new parent, optionally leaving its descendants behind.
+    /// </summary>
+    /// <param name="content">The content to move.</param>
+    /// <param name="newParentId">The new parent identifier.</param>
+    /// <param name="includeDescendants">
+    /// Whether to move the descendants along with the content. When restoring content out of the recycle bin this can
+    /// be set to <c>false</c> to restore only the content item itself, leaving its descendants in the recycle bin.
+    /// </param>
+    /// <param name="userId">The user performing the operation.</param>
+    /// <returns>The operation result.</returns>
+    protected abstract OperationResult? Move(TContent content, int newParentId, bool includeDescendants, int userId);
 
     /// <summary>
     /// Copies content to a new parent.
@@ -397,8 +411,12 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     /// <param name="parentKey">The new parent key, or null for root.</param>
     /// <param name="userKey">The user key performing the operation.</param>
     /// <param name="mustBeInRecycleBin">Whether the content must be in the recycle bin (for restore operations).</param>
+    /// <param name="includeDescendants">
+    /// Whether to move the descendants along with the content. When restoring out of the recycle bin this can be set to
+    /// <c>false</c> to restore only the content item itself, leaving its descendants in the recycle bin.
+    /// </param>
     /// <returns>An attempt containing the content and operation status.</returns>
-    protected async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleMoveAsync(Guid key, Guid? parentKey, Guid userKey, bool mustBeInRecycleBin = false)
+    protected async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleMoveAsync(Guid key, Guid? parentKey, Guid userKey, bool mustBeInRecycleBin = false, bool includeDescendants = true)
     {
         using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
         TContent? content = ContentService.GetById(key);
@@ -439,7 +457,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         }
 
         var userId = await GetUserIdAsync(userKey);
-        OperationResult? moveResult = Move(content, parent.ParentId ?? Constants.System.Root, userId);
+        OperationResult? moveResult = Move(content, parent.ParentId ?? Constants.System.Root, includeDescendants, userId);
 
         scope.Complete();
 
@@ -500,6 +518,10 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         {
             // these are the only result states currently expected from the invoked IContentService operations
             OperationResultType.Success => ContentEditingOperationStatus.Success,
+
+            // a no-op (e.g. sorting children when nothing needs reordering) is a successful outcome, not an error
+            OperationResultType.NoOperation => ContentEditingOperationStatus.Success,
+
             OperationResultType.FailedCancelledByEvent => ContentEditingOperationStatus.CancelledByNotification,
             OperationResultType.FailedCannot => ContentEditingOperationStatus.CannotDeleteWhenReferenced,
 
@@ -659,6 +681,25 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         }
 
         return filteredContentTypes.Any();
+    }
+
+    /// <summary>
+    /// Validates that content of the requested type is allowed to be created under the requested parent, applying the
+    /// same "allowed at root", "allowed as child" and content type filter rules that are enforced when the content is
+    /// actually created. This allows the validation endpoints to be consistent with creation.
+    /// </summary>
+    /// <param name="createModel">The content creation model.</param>
+    /// <returns>The operation status; <see cref="ContentEditingOperationStatus.Success"/> when creation is allowed.</returns>
+    protected async Task<ContentEditingOperationStatus> ValidateCreationAllowedAsync(ContentCreationModelBase createModel)
+    {
+        TContentType? contentType = ContentTypeService.Get(createModel.ContentTypeKey);
+        if (contentType is null)
+        {
+            return ContentEditingOperationStatus.ContentTypeNotFound;
+        }
+
+        (int? _, ContentEditingOperationStatus operationStatus) = await TryGetAndValidateParentIdAsync(createModel.ParentKey, contentType);
+        return operationStatus;
     }
 
     private void UpdateNames(ContentEditingModelBase contentEditingModelBase, TContent content, TContentType contentType)

@@ -86,6 +86,12 @@ export class UmbBlockGridEntryContext
 		super(host, UMB_BLOCK_GRID_MANAGER_CONTEXT, UMB_BLOCK_GRID_ENTRIES_CONTEXT);
 	}
 
+	protected override _needsLegacyLabelRenderer(): boolean {
+		// Block Grid entry element owns the canonical `<umb-ufm-render>` (via its child
+		// views) and pushes resolved text via `setName()`. No hidden virtual renderer needed.
+		return false;
+	}
+
 	layoutsOfArea(areaKey: string) {
 		return this._layout.asObservablePart((x) => x?.areas?.find((x) => x.key === areaKey)?.items);
 	}

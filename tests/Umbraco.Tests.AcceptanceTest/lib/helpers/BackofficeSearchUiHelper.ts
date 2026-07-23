@@ -1,4 +1,4 @@
-import {Page, Locator} from "@playwright/test";
+import {Page, Locator, expect} from "@playwright/test";
 import {UiBaseLocators} from "./UiBaseLocators";
 import {ConstantHelper} from "./ConstantHelper";
 
@@ -24,17 +24,24 @@ export class BackofficeSearchUiHelper extends UiBaseLocators {
     this.navigationTips = this.searchModal.locator('#navigation-tips');
   }
 
+  async goToSection(sectionName: string, checkSections = true, skipReload = false) {
+    await super.goToSection(sectionName, checkSections, skipReload);
+    await this.waitForVisible(this.activeSectionLink.getByText(sectionName));
+  }
+
   async clickSearchHeaderButton() {
     await this.waitForPageLoad();
-    await this.click(this.searchHeaderBtn);
-    await this.waitForLoadState();
-    await this.waitForVisible(this.searchModal, ConstantHelper.timeout.long);
+    await expect(async () => {
+      if (!(await this.searchModal.isVisible())) {
+        await this.click(this.searchHeaderBtn);
+      }
+      await expect(this.searchModal).toBeVisible({
+        timeout: ConstantHelper.timeout.short,
+      });
+    }).toPass({timeout: ConstantHelper.timeout.long});
   }
 
   async clickOutsideToCloseModal() {
-    // The modal closes when a click is dispatched anywhere outside of
-    // <umb-search-modal>. Coord (0, 0) of the viewport sits in the top-left,
-    // outside the centered modal, so the document click handler fires.
     await this.page.mouse.click(0, 0);
   }
 
@@ -84,6 +91,10 @@ export class BackofficeSearchUiHelper extends UiBaseLocators {
 
   async isSearchProviderActive(providerName: string) {
     await this.hasText(this.activeProvider, providerName);
+  }
+  
+  async doesSearchResultHaveCount(count: number) {
+    expect(await this.results.count()).toBe(count);
   }
 
   async isSearchProviderVisible(providerName: string, isVisible: boolean = true) {

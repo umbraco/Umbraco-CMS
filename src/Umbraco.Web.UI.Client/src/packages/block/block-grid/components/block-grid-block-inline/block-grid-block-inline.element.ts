@@ -10,11 +10,16 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_BLOCK_WORKSPACE_ALIAS } from '@umbraco-cms/backoffice/block';
 import type { UmbApiConstructorArgumentsMethodType } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbUfmResolvedEvent } from '@umbraco-cms/backoffice/ufm';
 import type { UmbBlockEditorCustomViewConfiguration } from '@umbraco-cms/backoffice/block-custom-view';
 import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
 import type { UmbDataTypeDetailModel } from '@umbraco-cms/backoffice/data-type';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
-import type { UMB_BLOCK_WORKSPACE_CONTEXT, UmbBlockDataType } from '@umbraco-cms/backoffice/block';
+import type {
+	UMB_BLOCK_WORKSPACE_CONTEXT,
+	UmbBlockDataType,
+	UmbBlockLabelUfmValueType,
+} from '@umbraco-cms/backoffice/block';
 
 const apiArgsCreator: UmbApiConstructorArgumentsMethodType<unknown> = (manifest: unknown) => {
 	return [{ manifest }];
@@ -190,6 +195,10 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 		this.#workspaceContext?.expose();
 	};
 
+	#onUfmResolved = (event: UmbUfmResolvedEvent) => {
+		this.#blockContext?.setName(event.detail.text);
+	};
+
 	override render() {
 		return html`
 			<div id="host">
@@ -204,14 +213,20 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 	}
 
 	#renderBlockInfo() {
-		const blockValue = { ...this.content, $settings: this.settings, $index: this.index };
+		const blockValue: UmbBlockLabelUfmValueType = { ...this.content, $settings: this.settings, $index: this.index };
 		return html`
 			<span id="content">
 				<span id="icon">
 					<umb-icon .name=${this.icon}></umb-icon>
 				</span>
 				<div id="info">
-					<umb-ufm-render id="name" inline .markdown=${this.label} .value=${blockValue}></umb-ufm-render>
+					<umb-ufm-render
+						id="name"
+						inline
+						.markdown=${this.label}
+						.value=${blockValue}
+						@umb-ufm-resolved=${this.#onUfmResolved}>
+					</umb-ufm-render>
 				</div>
 			</span>
 			${when(

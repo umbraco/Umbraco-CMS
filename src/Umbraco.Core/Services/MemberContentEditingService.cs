@@ -118,7 +118,7 @@ internal sealed class MemberContentEditingService
         => throw new NotSupportedException("Member creation is not supported by this service. This should never be called.");
 
     /// <inheritdoc />
-    protected override OperationResult? Move(IMember member, int newParentId, int userId)
+    protected override OperationResult? Move(IMember member, int newParentId, bool includeDescendants, int userId)
         => throw new InvalidOperationException("Move is not supported for members");
 
     /// <inheritdoc />

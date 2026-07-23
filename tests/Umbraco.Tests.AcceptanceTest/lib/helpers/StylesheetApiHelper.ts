@@ -57,7 +57,7 @@ export class StylesheetApiHelper {
   async getChildren(path: string) {
     const response = await this.api.get(`${this.api.baseUrl}/umbraco/management/api/v1/tree/stylesheet/children?parentPath=${path}&skip=0&take=10000`);
     const items = await response.json();
-    return items.items;
+    return this.api.itemsOf(items);
   }
 
   async doesNameExist(name: string) {
@@ -72,7 +72,7 @@ export class StylesheetApiHelper {
     const rootStylesheet = await this.getAllAtRoot();
     const jsonStylesheet = await rootStylesheet.json();
 
-    for (const stylesheet of jsonStylesheet.items) {
+    for (const stylesheet of this.api.itemsOf(jsonStylesheet)) {
       if (stylesheet.name === name) {
         if (stylesheet.isFolder) {
           return this.getFolder(stylesheet.path);
@@ -93,7 +93,7 @@ export class StylesheetApiHelper {
     const rootStylesheet = await this.getAllAtRoot();
     const jsonStylesheet = await rootStylesheet.json();
 
-    for (const stylesheet of jsonStylesheet.items) {
+    for (const stylesheet of this.api.itemsOf(jsonStylesheet)) {
       if (stylesheet.name === name) {
         if (stylesheet.isFolder) {
           return await this.recurseDeleteChildren(stylesheet);
@@ -124,7 +124,10 @@ export class StylesheetApiHelper {
         return await this.delete(child.path);
 
       } else if (child.hasChildren) {
-        return await this.recurseChildren(name, child.path, toDelete);
+        const result = await this.recurseChildren(name, child.path, toDelete);
+        if (result) {
+          return result;
+        }
       }
     }
     return false;

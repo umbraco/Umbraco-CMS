@@ -39,6 +39,12 @@ export class UmbBlockListEntryContext extends UmbBlockEntryContext<
 		super(host, UMB_BLOCK_LIST_MANAGER_CONTEXT, UMB_BLOCK_LIST_ENTRIES_CONTEXT);
 	}
 
+	protected override _needsLegacyLabelRenderer(): boolean {
+		// Block List entry element owns the canonical `<umb-ufm-render>` and pushes
+		// resolved text via `setName()`. No hidden virtual renderer is needed here.
+		return false;
+	}
+
 	protected override _gotManager() {
 		if (!this._manager) return;
 

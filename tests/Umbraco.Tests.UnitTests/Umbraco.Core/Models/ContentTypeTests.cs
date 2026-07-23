@@ -189,6 +189,85 @@ public class ContentTypeTests
     }
 
     [Test]
+    public void Can_Reset_Dirty_Properties_Cascades_Into_Property_Types()
+    {
+        var contentType = BuildContentType();
+
+        // Add an un-grouped property type so both cascade paths are covered: property types held
+        // on a property group, and property types held directly on the content type (no group).
+        contentType.AddPropertyType(new PropertyTypeBuilder().WithAlias("noGroup").WithName("No Group").Build());
+
+        var groupedPropertyTypes = contentType.PropertyGroups
+            .Where(g => g.PropertyTypes is not null)
+            .SelectMany(g => g.PropertyTypes!)
+            .ToList();
+        var noGroupPropertyTypes = contentType.NoGroupPropertyTypes.ToList();
+        Assert.Multiple(() =>
+        {
+            Assert.That(groupedPropertyTypes, Is.Not.Empty, "expected at least one grouped property type");
+            Assert.That(noGroupPropertyTypes, Is.Not.Empty, "expected at least one no-group property type");
+        });
+
+        var allPropertyTypes = groupedPropertyTypes.Concat(noGroupPropertyTypes).ToList();
+
+        // Establish a clean baseline on each property type directly, not via the content type,
+        // so the arrange step does not depend on the behaviour under test. Then dirty every one.
+        foreach (var propertyType in allPropertyTypes)
+        {
+            propertyType.ResetDirtyProperties(false);
+            propertyType.Variations = ContentVariation.Culture;
+            Assert.That(propertyType.IsDirty(), Is.True, $"'{propertyType.Alias}' should be dirty before the reset");
+        }
+
+        // The (bool) overload is the one the repository cache calls on every round-trip.
+        contentType.ResetDirtyProperties(false);
+
+        Assert.Multiple(() =>
+        {
+            foreach (var propertyType in allPropertyTypes)
+            {
+                Assert.That(propertyType.IsDirty(), Is.False, $"'{propertyType.Alias}' should not be dirty after the reset");
+            }
+        });
+    }
+
+    [Test]
+    public void Can_Reset_Dirty_Properties_Cascades_And_Remembers_When_Requested()
+    {
+        var contentType = BuildContentType();
+        var property = contentType.PropertyGroups.First().PropertyTypes!.First();
+
+        property.ResetDirtyProperties(false);
+        property.Variations = ContentVariation.Culture;
+        Assert.That(property.IsDirty(), Is.True);
+
+        contentType.ResetDirtyProperties(true);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(property.IsDirty(), Is.False);
+            Assert.That(property.WasDirty(), Is.True);
+            Assert.That(property.WasPropertyDirty("Variations"), Is.True);
+        });
+    }
+
+    [Test]
+    public void Can_Reset_Dirty_Properties_Cascades_Via_Parameterless_Overload()
+    {
+        var contentType = BuildContentType();
+        var property = contentType.PropertyGroups.First().PropertyTypes!.First();
+
+        property.ResetDirtyProperties(false);
+        property.Variations = ContentVariation.Culture;
+        Assert.That(property.IsDirty(), Is.True);
+
+        // The parameterless overload delegates to ResetDirtyProperties(true) and must still cascade.
+        contentType.ResetDirtyProperties();
+
+        Assert.That(property.IsDirty(), Is.False);
+    }
+
+    [Test]
     public void Can_Deep_Clone_Media_Type()
     {
         // Arrange

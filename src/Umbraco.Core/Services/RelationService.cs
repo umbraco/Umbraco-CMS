@@ -433,6 +433,43 @@ public class RelationService : RepositoryService, IRelationService
     }
 
     /// <inheritdoc />
+    public IEnumerable<IUmbracoEntity> GetParentEntitiesByChildIds(
+        IEnumerable<int> childIds,
+        IEnumerable<string> relationTypeAliases,
+        UmbracoObjectTypes entityType)
+    {
+        var childIdsArray = childIds as int[] ?? childIds.ToArray();
+        if (childIdsArray.Length == 0)
+        {
+            return [];
+        }
+
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+
+        ICollection<string> aliases = relationTypeAliases as ICollection<string> ?? relationTypeAliases.ToArray();
+        var relationTypeIds = ResolveRelationTypeIdFilter(aliases);
+        if (relationTypeIds is { Length: 0 })
+        {
+            return [];
+        }
+
+        return _relationRepository.GetParentEntitiesByChildIds(
+            childIdsArray,
+            relationTypeIds ?? [],
+            entityType.GetGuid());
+    }
+
+    // Resolves relation type aliases to their ids. Returns null when no alias filter is requested (match all
+    // relation types); returns an empty array when a filter was requested but no alias matched (match none).
+    private int[]? ResolveRelationTypeIdFilter(ICollection<string> relationTypeAliases)
+        => relationTypeAliases.Count == 0
+            ? null
+            : _relationTypeRepository.GetMany(Array.Empty<int>())
+                .Where(relationType => relationTypeAliases.Contains(relationType.Alias))
+                .Select(relationType => relationType.Id)
+                .ToArray();
+
+    /// <inheritdoc />
     public IEnumerable<IUmbracoEntity> GetPagedChildEntitiesByParentId(int id, long pageIndex, int pageSize, out long totalChildren, params UmbracoObjectTypes[] entityTypes)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
@@ -803,6 +840,8 @@ public class RelationService : RepositoryService, IRelationService
             UmbracoObjectTypes.MemberType,
             UmbracoObjectTypes.DataType,
             UmbracoObjectTypes.MemberGroup,
+            UmbracoObjectTypes.Element,
+            UmbracoObjectTypes.ElementContainer,
             UmbracoObjectTypes.ROOT,
             UmbracoObjectTypes.RecycleBin,
         ];

@@ -23,7 +23,7 @@ internal sealed partial class DocumentNavigationServiceTests
         var beforeRestoreDescendants = initialDescendantsKeys.ToList();
 
         // Act
-        var restoreAttempt = await ContentEditingService.RestoreAsync(nodeToRestore, targetParentKey, Constants.Security.SuperUserKey);
+        var restoreAttempt = await ContentEditingService.RestoreAsync(nodeToRestore, targetParentKey, Constants.Security.SuperUserKey, includeDescendants: true);
         Guid restoredItemKey = restoreAttempt.Result.Key;
 
         // Assert
@@ -52,6 +52,35 @@ internal sealed partial class DocumentNavigationServiceTests
     }
 
     [Test]
+    public async Task Structure_Updates_When_Restoring_Content_Without_Descendants()
+    {
+        // Trash Child 2 and its subtree (Child 2 > Grandchild 3 > Great-grandchild 1).
+        await ContentEditingService.MoveToRecycleBinAsync(Child2.Key, Constants.Security.SuperUserKey);
+
+        // Restore only Child 2, leaving its descendants in the recycle bin.
+        var restoreAttempt = await ContentEditingService.RestoreAsync(Child2.Key, Root.Key, Constants.Security.SuperUserKey, includeDescendants: false);
+        Assert.IsTrue(restoreAttempt.Success);
+
+        Assert.Multiple(() =>
+        {
+            // Child 2 is back in the tree under Root, with no children (they stayed behind).
+            Assert.IsTrue(DocumentNavigationQueryService.TryGetParentKey(Child2.Key, out Guid? restoredParentKey));
+            Assert.AreEqual(Root.Key, restoredParentKey);
+            DocumentNavigationQueryService.TryGetChildrenKeys(Child2.Key, out IEnumerable<Guid> restoredChildren);
+            Assert.IsEmpty(restoredChildren);
+
+            // Grandchild 3 is now a top-level recycle bin item (its former parent left the bin).
+            Assert.IsFalse(DocumentNavigationQueryService.TryGetParentKey(Grandchild3.Key, out _), "Grandchild 3 should not be in the main tree.");
+            Assert.IsTrue(DocumentNavigationQueryService.TryGetParentKeyInBin(Grandchild3.Key, out Guid? binParentKey));
+            Assert.IsNull(binParentKey, "Grandchild 3 should be a top-level recycle bin item.");
+
+            // Great-grandchild 1 remains trashed underneath Grandchild 3.
+            Assert.IsTrue(DocumentNavigationQueryService.TryGetParentKeyInBin(GreatGrandchild1.Key, out Guid? greatGrandchildBinParentKey));
+            Assert.AreEqual(Grandchild3.Key, greatGrandchildBinParentKey);
+        });
+    }
+
+    [Test]
     [TestCase(null)] // Content root
     [TestCase("E48DD82A-7059-418E-9B82-CDD5205796CF")] // Root
     [TestCase("C6173927-0C59-4778-825D-D7B9F45D8DDE")] // Child 1
@@ -69,7 +98,7 @@ internal sealed partial class DocumentNavigationServiceTests
         await ContentEditingService.MoveToRecycleBinAsync(nodeToRestore, Constants.Security.SuperUserKey);
 
         // Act
-        await ContentEditingService.RestoreAsync(nodeToRestore, targetParentKey, Constants.Security.SuperUserKey);
+        await ContentEditingService.RestoreAsync(nodeToRestore, targetParentKey, Constants.Security.SuperUserKey, includeDescendants: true);
 
         // Assert
         if (targetParentKey is null)

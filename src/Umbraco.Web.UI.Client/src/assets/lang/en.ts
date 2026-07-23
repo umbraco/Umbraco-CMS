@@ -22,6 +22,7 @@ export default {
 		chooseWhereToMove: 'Choose where to move',
 		clear: 'Clear',
 		copy: 'Duplicate',
+		copyInProgress: 'Duplication in progress - please wait...',
 		copyTo: 'Duplicate to',
 		create: 'Create',
 		createFor: (name: string) => (name ? `Create item for ${name}` : 'Create'),
@@ -29,6 +30,7 @@ export default {
 		createGroup: 'Create group',
 		createPackage: 'Create Package',
 		delete: 'Delete',
+		deleteInProgress: 'Deletion in progress - please wait...',
 		disable: 'Disable',
 		editContent: 'Edit content',
 		editSettings: 'Edit settings',
@@ -47,6 +49,7 @@ export default {
 		liveEdit: 'Edit in Canvas',
 		logout: 'Exit',
 		move: 'Move to',
+		moveInProgress: 'Move in progress - please wait...',
 		notify: 'Notifications',
 		protect: 'Public Access',
 		publish: 'Publish',
@@ -968,6 +971,7 @@ export default {
 		password: 'Password',
 		path: 'Path',
 		pixels: 'pixels',
+		placeholder: 'Placeholder',
 		pleasewait: 'One moment please...',
 		previous: 'Previous',
 		properties: 'Properties',
@@ -1021,6 +1025,7 @@ export default {
 		username: 'Username',
 		value: 'Value',
 		view: 'View',
+		weight: 'Weight',
 		welcome: 'Welcome...',
 		width: 'Width',
 		yes: 'Yes',
@@ -1111,6 +1116,7 @@ export default {
 		text: 'Text',
 	},
 	globalSearch: {
+		documents: 'Documents',
 		navigateSearchProviders: 'Navigate search providers',
 		navigateSearchResults: 'Navigate search results',
 	},
@@ -1412,6 +1418,9 @@ export default {
 		contentPublishedFailedReqCultureValidationError:
 			"Validation failed for required language '%0%'. This language was saved but not published.",
 	},
+	unpublish: {
+		inProgress: 'Unpublishing in progress - please wait...',
+	},
 	colorpicker: {
 		noColors: 'You have not configured any approved colours',
 	},
@@ -1493,6 +1502,7 @@ export default {
 	propertyEditorPicker: {
 		title: 'Select a property editor',
 		openPropertyEditorPicker: 'Select a property editor UI',
+		selectAction: "Select Property Editor",
 	},
 	propertyEditorUIGroups: {
 		advanced: 'Advanced',
@@ -1610,10 +1620,14 @@ export default {
 		cssSavedText: 'Stylesheet saved without any errors',
 		dataTypeSaved: 'Datatype saved',
 		dictionaryItemSaved: 'Dictionary item saved',
+		editContentPublishedFailed: 'Document could not be published or saved',
 		editContentPublishedFailedByValidation: 'Document could not be published, but we saved it for you',
 		editContentPublishedFailedByParent: 'Document could not be published, because a parent page is not published',
 		editContentPublishedHeader: 'Document published',
+		editElementPublishedFailed: 'Element could not be published or saved',
 		editElementPublishedHeader: 'Element published',
+		editContentPublishedReloadFailed: 'Document published, but the editor could not be refreshed',
+		editElementPublishedReloadFailed: 'Element published, but the editor could not be refreshed',
 		editContentPublishedText: 'and is visible on the website',
 		editContentUnpublishedHeader: 'Document unpublished',
 		editContentUnpublishedText: 'and is no longer visible on the website',
@@ -1686,10 +1700,13 @@ export default {
 			'There is no hostname configured for %0%, please contact an administrator, see log for more information',
 		copySuccessMessage: 'Your system information has successfully been copied to the clipboard',
 		cannotCopyInformation: 'Could not copy your system information to the clipboard',
+		cannotCopyToClipboard: 'Could not copy to the clipboard',
 		webhookSaved: 'Webhook saved',
 		editMultiContentPublishedText: '%0% documents published and are visible on the website',
+		editMultiContentPublishedPartialText: '%0% of %1% documents published.',
 		editMultiContentUnpublishedText: '%0% documents unpublished and are no longer visible on the website',
 		editMultiElementPublishedText: '%0% elements published',
+		editMultiContentUnpublishedPartialText: '%0% of %1% documents unpublished.',
 		editMultiElementUnpublishedText: '%0% elements unpublished',
 		editVariantUnpublishedText: '%0% unpublished and is no longer visible on the website',
 		editMultiVariantPublishedText: '%0% documents published for languages %1% and are visible on the website',
@@ -1881,8 +1898,16 @@ export default {
 		chooseChildNode: 'Choose child node',
 		compositionsDescription:
 			'Inherit tabs and properties from an existing Document Type. New tabs will be added to the current Document Type or merged if a tab with an identical name exists.',
-		compositionInUse: 'This Content Type is used in a composition, and therefore cannot be composed itself.',
-		noAvailableCompositions: 'There are no Content Types available to use as a composition.',
+		compositionsDescriptionMediaType:
+			'Inherit tabs and properties from an existing Media Type. New tabs will be added to the current Media Type or merged if a tab with an identical name exists.',
+		compositionsDescriptionMemberType:
+			'Inherit tabs and properties from an existing Member Type. New tabs will be added to the current Member Type or merged if a tab with an identical name exists.',
+		compositionInUse: 'This Document Type is used in a composition, and therefore cannot be composed itself.',
+		compositionInUseMediaType: 'This Media Type is used in a composition, and therefore cannot be composed itself.',
+		compositionInUseMemberType: 'This Member Type is used in a composition, and therefore cannot be composed itself.',
+		noAvailableCompositions: 'There are no Document Types available to use as a composition.',
+		noAvailableCompositionsMediaType: 'There are no Media Types available to use as a composition.',
+		noAvailableCompositionsMemberType: 'There are no Member Types available to use as a composition.',
 		compositionRemoveWarning:
 			"Removing a composition will delete all the associated property data. Once you save the Document Type there's no way back.",
 		availableEditors: 'Create new',
@@ -1920,7 +1945,11 @@ export default {
 		tabHasNoSortOrder: 'tab has no sort order',
 		compositionUsageHeading: 'Where is this composition used?',
 		compositionUsageSpecification:
-			'This composition is currently used in the composition of the following Content Types:',
+			'This composition is currently used in the composition of the following Document Types:',
+		compositionUsageSpecificationMediaType:
+			'This composition is currently used in the composition of the following Media Types:',
+		compositionUsageSpecificationMemberType:
+			'This composition is currently used in the composition of the following Member Types:',
 		variantsHeading: 'Variation',
 		cultureVariantHeading: 'Allow vary by culture',
 		segmentVariantHeading: 'Allow segmentation',
@@ -2136,6 +2165,13 @@ export default {
 		structureGroup: 'Structure',
 		advancedGroup: 'Advanced',
 		webhooks: 'Webhooks',
+	},
+	tree: {
+		classicViewLabel: 'Tree',
+		cardViewLabel: 'Cards',
+		tableViewLabel: 'Table',
+		children: 'Children',
+		noItems: 'No items',
 	},
 	update: {
 		updateAvailable: 'New update ready',
@@ -2521,6 +2557,8 @@ export default {
 	textbox: {
 		characters_left: '<strong>%0%</strong> characters left.',
 		characters_exceed: 'Maximum %0% characters, <strong>%1%</strong> too many.',
+		maxCharsLabel: 'Maximum allowed characters',
+		autocompleteLabel: 'Autocomplete',
 	},
 	recycleBin: {
 		contentTrashed: 'Trashed content with Id: {0} related to original parent content with Id: {1}',

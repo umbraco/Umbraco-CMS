@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 internal sealed partial class DocumentNavigationServiceTests : DocumentNavigationServiceTestsBase
 {
     [SetUp]
-    public async Task Setup()
+    public new async Task Setup()
     {
         // Root
         //    - Child 1

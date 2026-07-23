@@ -192,9 +192,9 @@ internal class EntityContainerRepository : EntityRepositoryBase<int, EntityConta
     }
 
     /// <summary>
-    /// Determines whether an entity container with the specified <paramref name="name"/> exists under the parent container identified by <paramref name="parentKey"/>.
+    /// Determines whether an entity container with the specified <paramref name="name"/> exists under the parent container identified by <paramref name="parentId"/>.
     /// </summary>
-    /// <param name="parentKey">The unique identifier (GUID) of the parent container.</param>
+    /// <param name="parentId">The id of the parent container.</param>
     /// <param name="name">The name to check for duplicates within the parent container.</param>
     /// <returns><c>true</c> if a container with the same name exists under the specified parent; otherwise, <c>false</c>.</returns>
     public bool HasDuplicateName(int parentId, string name)

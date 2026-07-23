@@ -46,7 +46,7 @@ test('can trash an element folder', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.library.clickConfirmTrashButtonAndWaitForElementFolderToBeTrashed();
 
   // Assert
-  expect(await umbracoApi.element.doesNameExist(elementFolderName)).toBeFalsy();
+  await expect.poll(() => umbracoApi.element.doesNameExist(elementFolderName)).toBeFalsy();
   await umbracoUi.library.isElementInTreeVisible(elementFolderName, false);
 });
 
@@ -60,7 +60,7 @@ test('can rename an element folder', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.library.goToSection(ConstantHelper.sections.library);
   await umbracoUi.library.clickActionsMenuForElement(oldFolderName);
   await umbracoUi.library.clickRenameActionMenuOption();
-  await umbracoUi.library.enterFolderName(elementFolderName);
+  await umbracoUi.library.enterRenameFolderName(elementFolderName);
   await umbracoUi.library.clickConfirmRenameFolderButtonAndWaitForElementFolderToBeRenamed();
 
   // Assert

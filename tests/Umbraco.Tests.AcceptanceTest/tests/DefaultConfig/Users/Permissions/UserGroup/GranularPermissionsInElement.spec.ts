@@ -72,10 +72,10 @@ test('can trash a specific element with delete permission enabled', async ({umbr
   await umbracoUi.library.clickEntityActionOnElementWithName(firstElementName);
   await umbracoUi.library.clickConfirmTrashButtonAndWaitForElementToBeTrashed();
 
-  // Assert
-  await umbracoUi.library.clickCaretButtonForName('Recycle Bin');
-  await umbracoUi.library.isItemVisibleInRecycleBin(firstElementName, true, false);
-  
+  // Assert - a user with element-specific delete permission has no Recycle Bin tree node, so verify the
+  // element was trashed (removed from its location) via the API rather than the absent recycle-bin UI.
+  await expect.poll(() => umbracoApi.element.doesNameExist(firstElementName)).toBeFalsy();
+
 });
 
 test('can publish a specific element with publish permission enabled', async ({umbracoApi, umbracoUi}) => {
@@ -215,8 +215,7 @@ test('can rollback a specific element with rollback permission enabled', async (
   await umbracoUi.library.doesElementPropertyHaveValue(dataTypeName, updatedTextStringText);
   await umbracoUi.library.clickInfoTab();
   await umbracoUi.library.clickRollbackButton();
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.medium);
-  await umbracoUi.library.clickLatestRollBackItem();
+  await umbracoUi.library.clickPreviousRollBackItem();
   await umbracoUi.library.clickRollbackContainerButton();
 
   // Assert
