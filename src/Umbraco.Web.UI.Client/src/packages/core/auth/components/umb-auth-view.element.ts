@@ -171,6 +171,16 @@ export class UmbAuthViewElement extends UmbLitElement {
 			const providerName =
 				typeof providerOrManifest === 'string' ? providerOrManifest : providerOrManifest.forProviderName;
 
+			// TODO: The built-in "Umbraco" provider (username/password) is routed through
+			// startExternalLogin like any real external provider, but the server's external-login
+			// endpoint issues a ChallengeResult for the given provider/scheme name, and "Umbraco" is
+			// not a registered authentication scheme (the back-office cookie scheme is
+			// "UmbracoBackOffice", not "Umbraco") — so this likely fails for local login today.
+			// There is no client-side local-login form/POST to route to instead (no username/password
+			// fields are collected anywhere), and the legacy /umbraco/login page's separate bundle no
+			// longer exists in the Vite build, so neither of the previously-considered fallbacks works
+			// without new UI. Needs a design decision (real inline local-login form, or a local
+			// challenge scheme) before this can be fixed.
 			authContext.startExternalLogin(providerName, manifest);
 		} catch (error) {
 			console.error('[AuthView] Error submitting auth request', error);
