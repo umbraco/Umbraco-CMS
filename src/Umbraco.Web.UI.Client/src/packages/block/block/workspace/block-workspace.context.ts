@@ -83,6 +83,9 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	#exposed = new UmbBooleanState<undefined>(undefined);
 	readonly exposed = this.#exposed.asObservable();
 
+	#hasContent = new UmbBooleanState<undefined>(undefined);
+	readonly hasContent = this.#hasContent.asObservable();
+
 	public readonly readOnlyGuard = new UmbReadOnlyVariantGuardManager(this);
 
 	constructor(host: UmbControllerHost, workspaceArgs: { manifest: ManifestWorkspace }) {
@@ -236,18 +239,35 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 			'observeVariantIds',
 		);
 
-		this.removeUmbControllerByAlias('observeHasExpose');
 		this.observe(
 			observeMultiple([this.contentKey, this.variantId]),
 			([contentKey, variantId]) => {
+				this.removeUmbControllerByAlias('observeExposeShared');
+				this.removeUmbControllerByAlias('observeHasExpose');
 				if (!contentKey || !variantId) return;
 
 				this.observe(
-					manager.hasExposeOf(contentKey, variantId),
-					(exposed) => {
-						this.#exposed.setValue(exposed ?? false);
+					manager.isExternalContentOf(contentKey),
+					(isExternalContent) => {
+						if (isExternalContent) {
+							// External content does not keep an exposed state, so we default to true.
+							this.#exposed.setValue(true);
+							return;
+						}
+
+						const exposeObs = manager.hasExposeOf(contentKey, variantId);
+						this.#exposed.setValue(false);
+						if (!exposeObs) return;
+
+						this.observe(
+							exposeObs,
+							(exposed) => {
+								this.#exposed.setValue(exposed ?? false);
+							},
+							'observeHasExpose',
+						);
 					},
-					'observeHasExpose',
+					'observeExposeShared',
 				);
 			},
 			'observeContentKeyAndVariantId',
@@ -277,6 +297,23 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 				);
 			},
 			'observeContentTypeId',
+		);
+
+		this.observe(
+			this.contentKey,
+			(contentKey) => {
+				this.removeUmbControllerByAlias('observeHasContent');
+				if (!contentKey) {
+					this.#hasContent.setValue(false);
+					return;
+				}
+				this.observe(
+					manager.isExternalContentOf(contentKey),
+					(isExternalContent) => this.#hasContent.setValue(!isExternalContent),
+					'observeHasContent',
+				);
+			},
+			'observeContentKeyForHasContent',
 		);
 	}
 
@@ -669,9 +706,9 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 			// Did it exist before?
 			if (this.getIsNew() === true) {
 				// Remove the block?
-				const contentKey = this.#layout.value?.contentKey;
-				if (contentKey) {
-					this.#blockEntries?.delete(contentKey);
+				const key = this.#layout.value?.key;
+				if (key) {
+					this.#blockEntries?.delete(key);
 				}
 			} else {
 				// Revert the layout, content & settings data to the original state: [NL]

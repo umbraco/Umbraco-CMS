@@ -3,7 +3,7 @@ import { UMB_BLOCK_RTE } from '../../constants.js';
 import type { UmbBlockRteLayoutModel } from '../../types.js';
 import { css, customElement, html, nothing, property, when, state } from '@umbraco-cms/backoffice/external/lit';
 import { renderHiddenUfm } from '@umbraco-cms/backoffice/ufm';
-import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
+import { stringOrStringArrayContains, UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { UmbDataPathBlockElementDataQuery } from '@umbraco-cms/backoffice/block';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbObserveValidationStateController } from '@umbraco-cms/backoffice/validation';
@@ -24,10 +24,35 @@ import '../../../block/action/block-action-list.element.js';
  */
 @customElement('umb-rte-block')
 export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropertyEditorUiElement {
+	/**
+	 * The unique key of this block layout entry.
+	 */
+	@property({ type: String, attribute: 'data-key', reflect: true })
+	public set key(value: string | undefined) {
+		if (!value) return;
+		this._key = value;
+		this.#context.setKey(value);
+	}
+	public get key(): string | undefined {
+		return this._key;
+	}
+	private _key?: string | undefined;
+
+	/**
+	 * @deprecated Use `key` instead. Will be removed in Umbraco 20.
+	 */
 	@property({ type: String, attribute: 'data-content-key', reflect: true })
 	public set contentKey(value: string | undefined) {
 		if (!value) return;
+		new UmbDeprecation({
+			deprecated: 'umb-rte-block.contentKey property',
+			solution: 'Use the `key` property instead.',
+			removeInVersion: '20.0.0',
+		}).warn();
 		this._contentKey = value;
+		if (!this._key) {
+			this.#context.setKey(value);
+		}
 		this.#context.setContentKey(value);
 
 		new UmbObserveValidationStateController(
@@ -320,7 +345,7 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 
 	#renderActionBar() {
 		if (!this._showActions) return nothing;
-		return html`<umb-block-action-list id="actions" block-editor=${UMB_BLOCK_RTE}></umb-block-action-list>`;
+		return html`<umb-block-action-list id="actions" .blockEditor=${UMB_BLOCK_RTE}></umb-block-action-list>`;
 	}
 
 	#renderUnsupportedBlock() {
@@ -343,7 +368,8 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 				.unpublished=${!this._exposed}
 				.content=${this._blockViewProps.content}
 				.settings=${this._blockViewProps.settings}
-				.config=${this._blockViewProps.config}></umb-ref-rte-block>
+				.config=${this._blockViewProps.config}>
+			</umb-ref-rte-block>
 		`;
 	}
 
@@ -389,6 +415,21 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 
 			:host([drag-placeholder]) {
 				opacity: 0.2;
+			}
+
+			:host([is-reference]) .umb-block-rte__block {
+				--umb-entity-frame-color: var(--umb-color-reference, #7532c8);
+				--umb-entity-frame-contrast-color: var(--umb-color-reference-contrast, #ffffff);
+			}
+
+			.umb-block-rte__block {
+				--umb-entity-frame-opacity: 0;
+				--umb-entity-frame-color: var(--uui-color-interactive-emphasis);
+
+				&:hover,
+				&:focus-within {
+					--umb-entity-frame-opacity: 1;
+				}
 			}
 		`,
 	];

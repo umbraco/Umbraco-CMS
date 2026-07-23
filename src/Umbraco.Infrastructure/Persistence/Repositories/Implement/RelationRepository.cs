@@ -339,6 +339,54 @@ internal sealed class RelationRepository : EntityRepositoryBase<int, IRelation>,
                 }
             });
 
+    /// <inheritdoc />
+    public IEnumerable<IUmbracoEntity> GetParentEntitiesByChildIds(
+        int[] childIds,
+        int[] relationTypes,
+        Guid entityType)
+    {
+        if (childIds.Length == 0)
+        {
+            return [];
+        }
+
+        // A parent relates to a separate row per child, so it can be returned more than once (within a batch or
+        // across batches); de-duplicate by node id so each parent entity is returned once.
+        var results = new Dictionary<int, IUmbracoEntity>();
+        var childIdsPerQuery = Constants.Sql.MaxParameterCount - relationTypes.Length - 1;
+        foreach (IEnumerable<int> group in childIds.InGroupsOf(childIdsPerQuery))
+        {
+            var batch = group.ToArray();
+            IEnumerable<IUmbracoEntity> parents = _entityRepository.GetPagedResultsByQuery(
+                Query<IUmbracoEntity>(),
+                [entityType],
+                0,
+                int.MaxValue,
+                out _,
+                null,
+                null,
+                sql =>
+                {
+                    SqlJoinRelations(sql);
+
+                    sql.WhereIn<RelationDto>(rel => rel.ChildId, batch);
+                    sql.Where<RelationDto, NodeDto>((rel, node) => node.NodeId == rel.ParentId);
+
+                    if (relationTypes.Length > 0)
+                    {
+                        sql.WhereIn<RelationDto>(rel => rel.RelationType, relationTypes);
+                    }
+                });
+
+            foreach (IUmbracoEntity parent in parents)
+            {
+                results.TryAdd(parent.Id, parent);
+            }
+        }
+
+        return results.Values;
+    }
+
     /// <summary>
     /// Retrieves a paged collection of child entities related to the specified parent entity by its ID.
     /// </summary>

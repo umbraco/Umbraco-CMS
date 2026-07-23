@@ -14,6 +14,7 @@ import { manifests as recycleBinManifests } from './recycle-bin/manifests.js';
 import { manifests as referenceManifests } from './reference/manifests.js';
 import { manifests as repositoryManifests } from './repository/manifests.js';
 import { manifests as rollbackManifests } from './rollback/manifests.js';
+import { manifests as pickerManifests } from './picker/manifests.js';
 import { manifests as searchManifests } from './search/manifests.js';
 import { manifests as treeManifests } from './tree/manifests.js';
 import { manifests as workspaceManifests } from './workspace/manifests.js';
@@ -39,6 +40,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 	...referenceManifests,
 	...repositoryManifests,
 	...rollbackManifests,
+	...pickerManifests,
 	...searchManifests,
 	...treeManifests,
 	...workspaceManifests,

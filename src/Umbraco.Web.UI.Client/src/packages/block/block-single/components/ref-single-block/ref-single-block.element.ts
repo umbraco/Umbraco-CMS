@@ -56,10 +56,11 @@ export class UmbRefSingleBlockElement extends UmbLitElement {
 				</umb-ufm-render>
 				${when(
 					this.unpublished,
-					() =>
-						html`<uui-tag slot="name" look="secondary" title=${this.localize.term('blockEditor_notExposedDescription')}
-							><umb-localize key="blockEditor_notExposedLabel"></umb-localize
-						></uui-tag>`,
+					() => html`
+						<uui-tag slot="name" look="secondary" title=${this.localize.term('blockEditor_notExposedDescription')}>
+							<umb-localize key="blockEditor_notExposedLabel"></umb-localize>
+						</uui-tag>
+					`,
 				)}
 			</uui-ref-node>
 		`;

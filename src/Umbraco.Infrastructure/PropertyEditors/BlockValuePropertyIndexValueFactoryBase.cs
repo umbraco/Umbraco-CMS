@@ -4,6 +4,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Extensions;
 
@@ -12,16 +13,22 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 internal abstract class BlockValuePropertyIndexValueFactoryBase<TSerialized> : JsonPropertyIndexValueFactoryBase<TSerialized>
 {
     private readonly PropertyEditorCollection _propertyEditorCollection;
+    private readonly IElementService _elementService;
+    private readonly IOptionsMonitor<IndexingSettings> _indexingSettings;
 
     protected BlockValuePropertyIndexValueFactoryBase(
         PropertyEditorCollection propertyEditorCollection,
+        IElementService elementService,
         IJsonSerializer jsonSerializer,
         IOptionsMonitor<IndexingSettings> indexingSettings)
         : base(jsonSerializer, indexingSettings)
     {
         _propertyEditorCollection = propertyEditorCollection;
+        _elementService = elementService;
+        _indexingSettings = indexingSettings;
     }
 
+    /// <inheritdoc/>
     protected override IEnumerable<IndexValue> Handle(
         TSerialized deserializedPropertyValue,
         IProperty property,
@@ -104,18 +111,48 @@ internal abstract class BlockValuePropertyIndexValueFactoryBase<TSerialized> : J
     protected abstract IEnumerable<RawDataItem> GetDataItems(TSerialized input, bool published);
 
     /// <summary>
-    /// Unwraps block item data as data items.
+    /// Unwraps block item data as data items, in layout order.
     /// </summary>
-    protected IEnumerable<RawDataItem> GetDataItems(IList<BlockItemData> contentData, IList<BlockItemVariation> expose, bool published)
+    protected IEnumerable<RawDataItem> GetDataItems(IEnumerable<IBlockLayoutItem> layouts, IList<BlockItemData> contentData, IList<BlockItemVariation> expose, bool published)
     {
-        if (published is false)
-        {
-            return contentData.Select(ToRawData);
-        }
+        IBlockLayoutItem[] layoutsAsArray = layouts as IBlockLayoutItem[] ?? layouts.ToArray();
 
-        var indexData = new List<RawDataItem>();
-        foreach (BlockItemData blockItemData in contentData)
+        // NOTE: While the Grid areas are modeled to contain areas within areas, in reality it cannot be configured as
+        //       such, so this "top-level aggregation" of layout items works in effect.
+        IBlockLayoutItem[] allLayouts = layoutsAsArray
+            .Union(layoutsAsArray.SelectMany(l => l.GetContainedLayouts()))
+            .ToArray();
+
+        var contentDataByKey = contentData.ToDictionary(d => d.Key);
+
+        // External element content is only flattened into the published value set (the external index); the draft
+        // value set (the internal/back-office index) excludes it, so shared element content is not searchable there.
+        Dictionary<Guid, RawDataItem>? externalDataByKey = _indexingSettings.CurrentValue.IndexExternalBlockElements && published
+            ? GetExternalElementDataItems(allLayouts)
+            : null;
+        foreach (IBlockLayoutItem layout in allLayouts)
         {
+            if (layout.IsExternalContent)
+            {
+                if (externalDataByKey?.TryGetValue(layout.ContentKey, out RawDataItem? elementData) == true)
+                {
+                    yield return elementData;
+                }
+
+                continue;
+            }
+
+            if (!contentDataByKey.TryGetValue(layout.ContentKey, out BlockItemData? blockItemData))
+            {
+                continue;
+            }
+
+            if (published is false)
+            {
+                yield return ToRawData(blockItemData);
+                continue;
+            }
+
             var exposedCultures = expose
                 .Where(e => e.ContentKey == blockItemData.Key)
                 .Select(e => e.Culture)
@@ -129,17 +166,41 @@ internal abstract class BlockValuePropertyIndexValueFactoryBase<TSerialized> : J
             if (exposedCultures.Contains(null)
                 || exposedCultures.ContainsAll(blockItemData.Values.Select(v => v.Culture)))
             {
-                indexData.Add(ToRawData(blockItemData));
+                yield return ToRawData(blockItemData);
                 continue;
             }
 
-            indexData.Add(
-                ToRawData(
-                    blockItemData.ContentTypeKey,
-                    blockItemData.Values.Where(value => value.Culture is null || exposedCultures.Contains(value.Culture))));
+            yield return ToRawData(
+                blockItemData.ContentTypeKey,
+                blockItemData.Values.Where(value => value.Culture is null || exposedCultures.Contains(value.Culture)));
         }
+    }
 
-        return indexData;
+    // External element content is only ever flattened into the published value set (see the caller), so this always
+    // takes the published value.
+    private Dictionary<Guid, RawDataItem> GetExternalElementDataItems(IBlockLayoutItem[] allLayouts)
+    {
+        Guid[] externalKeys = allLayouts.Where(l => l.IsExternalContent).Select(l => l.ContentKey).ToArray();
+        return _elementService.GetByIds(externalKeys)
+            // A trashed or unpublished element is not live, so its content must not be flattened into a referencing document's index.
+            .Where(element => element.Trashed is false && element.Published)
+            .ToDictionary(
+                element => element.Key,
+                element => new RawDataItem
+                {
+                    ContentTypeKey = element.ContentType.Key,
+                    Properties = element
+                        .Properties
+                        .SelectMany(property => property
+                            .Values
+                            .Select(value => new RawPropertyData
+                            {
+                                Alias = property.Alias,
+                                Culture = value.Culture,
+                                Value = value.PublishedValue,
+                            }))
+                        .ToArray(),
+                });
     }
 
     /// <summary>

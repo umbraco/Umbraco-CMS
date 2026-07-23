@@ -2,10 +2,11 @@ import type { UmbBlockGridLayoutModel } from '../../types.js';
 import { UMB_BLOCK_GRID } from '../../constants.js';
 import { UmbBlockGridEntryContext } from './block-grid-entry.context.js';
 import { css, customElement, html, nothing, property, state, when } from '@umbraco-cms/backoffice/external/lit';
-import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
+import { stringOrStringArrayContains, UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { UmbDataPathBlockElementDataQuery } from '@umbraco-cms/backoffice/block';
 import { renderHiddenUfm } from '@umbraco-cms/backoffice/ufm';
 import { umbDestroyOnDisconnect, UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbElementVariantState } from '@umbraco-cms/backoffice/element';
 import { UmbObserveValidationStateController } from '@umbraco-cms/backoffice/validation';
 import { UUIBlinkAnimationValue, UUIBlinkKeyframes } from '@umbraco-cms/backoffice/external/uui';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
@@ -32,15 +33,61 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		this.#context.setIndex(value);
 	}
 
+	/**
+	 * Set the layout entry for this block.
+	 */
+	public set layout(value: UmbBlockGridLayoutModel | undefined) {
+		if (!value) return;
+		const key = value.key;
+		const contentKey = value.contentKey;
+
+		if (key && key !== this._key) {
+			this._key = key;
+			this.#context.setKey(key);
+		}
+
+		if (contentKey && contentKey !== this._contentKey) {
+			this._contentKey = contentKey;
+			this._blockViewProps.contentKey = contentKey;
+			this.setAttribute('data-element-key', contentKey);
+
+			new UmbObserveValidationStateController(
+				this,
+				`$.contentData[${UmbDataPathBlockElementDataQuery({ key: contentKey })}]`,
+				(hasMessages) => {
+					this._contentInvalid = hasMessages;
+					this._blockViewProps.contentInvalid = hasMessages;
+				},
+				'observeMessagesForContent',
+			);
+		}
+	}
+
+	public get key(): string | undefined {
+		return this._key;
+	}
+	private _key?: string | undefined;
+
+	/**
+	 * @deprecated Use the `layout` property instead. Will be removed in Umbraco 20.
+	 */
 	@property({ attribute: false })
 	public get contentKey(): string | undefined {
 		return this._contentKey;
 	}
 	public set contentKey(key: string | undefined) {
 		if (!key || key === this._contentKey) return;
+		new UmbDeprecation({
+			deprecated: 'umb-block-grid-entry.contentKey property',
+			solution: 'Use the `layout` property instead.',
+			removeInVersion: '20.0.0',
+		}).warn();
 		this._contentKey = key;
 		this._blockViewProps.contentKey = key;
 		this.setAttribute('data-element-key', key);
+		if (!this._key) {
+			this.#context.setKey(key);
+		}
 		this.#context.setContentKey(key);
 
 		new UmbObserveValidationStateController(
@@ -90,6 +137,8 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	@state()
 	private _exposed?: boolean;
 
+	private _localExpose?: boolean;
+
 	// Unsupported is triggered if the Block Type is not recognized, it can also be triggered by the Content Element Type not existing any longer. [NL]
 	@state()
 	private _unsupported?: boolean;
@@ -103,7 +152,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	@state()
 	private _isSortMode?: boolean;
 
-	// TODO: consumed by <umb-entity-frame> label, landing in a follow-up PR; add `@state()` when used in render [LK]
+	@state()
 	private _name?: string;
 
 	@state()
@@ -139,10 +188,11 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		config: { showContentEdit: false, showSettingsEdit: false },
 	}; // Set to undefined cause it will be set before we render.
 
-	#updateBlockViewProps(incoming: Partial<UmbBlockEditorCustomViewProperties<UmbBlockGridLayoutModel>>) {
-		this._blockViewProps = { ...this._blockViewProps, ...incoming };
-		this.requestUpdate('_blockViewProps');
-	}
+	@property({ type: Boolean, attribute: 'is-reference', reflect: true })
+	private _isExternalContent = false;
+
+	@state()
+	private _externalContentVariantState: string | null | undefined;
 
 	@state()
 	private _isReadOnly = false;
@@ -198,8 +248,8 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		this.observe(
 			this.#context.hasExpose,
 			(exposed) => {
-				this.#updateBlockViewProps({ unpublished: !exposed });
-				this._exposed = exposed;
+				this._localExpose = exposed;
+				this.#updateExposedState();
 			},
 			null,
 		);
@@ -217,6 +267,22 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		this.observe(this.#context.inlineEditingMode, (mode) => (this._inlineEditingMode = mode), null);
 		this.observe(this.#context.isSortMode, (isSortMode) => (this._isSortMode = isSortMode), null);
 		this.observe(this.#context.name, (name) => (this._name = name), null);
+		this.observe(
+			this.#context.isExternalContent,
+			(isExternalContent) => {
+				this._isExternalContent = isExternalContent;
+				this.#updateExposedState();
+			},
+			null,
+		);
+		this.observe(
+			this.#context.externalContentVariantState,
+			(state) => {
+				this._externalContentVariantState = state;
+				this.#updateExposedState();
+			},
+			null,
+		);
 
 		// Data:
 		this.observe(
@@ -305,6 +371,11 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		);
 	}
 
+	#updateBlockViewProps(incoming: Partial<UmbBlockEditorCustomViewProperties<UmbBlockGridLayoutModel>>) {
+		this._blockViewProps = { ...this._blockViewProps, ...incoming };
+		this.requestUpdate('_blockViewProps');
+	}
+
 	override connectedCallback(): void {
 		super.connectedCallback();
 		// element styling:
@@ -379,6 +450,16 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	#expose = () => {
 		this.#context.expose();
 	};
+
+	#updateExposedState() {
+		// External content blocks use the element's variant state; local blocks use the expose entry
+		const isExposed = this._isExternalContent
+			? this._externalContentVariantState === UmbElementVariantState.PUBLISHED ||
+				this._externalContentVariantState === UmbElementVariantState.PUBLISHED_PENDING_CHANGES
+			: this._localExpose;
+		this.#updateBlockViewProps({ unpublished: !isExposed });
+		this._exposed = isExposed;
+	}
 
 	#onUfmResolved = (event: UmbUfmResolvedEvent) => {
 		this.#context.setName(event.detail.text);
@@ -478,6 +559,9 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 						this._isSortMode,
 						() => this.#renderRefBlock(),
 						() => html`
+							<umb-entity-frame>
+								${when(this._isExternalContent, () => html`<uui-icon name="link"></uui-icon>`)} ${this._name}
+							</umb-entity-frame>
 							<umb-extension-slot
 								single
 								type="blockEditorCustomView"
@@ -601,7 +685,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	#renderActionBar() {
 		if (this._isSortMode) return nothing;
 		if (!this._showActions) return nothing;
-		return html`<umb-block-action-list id="actions" block-editor=${UMB_BLOCK_GRID}></umb-block-action-list>`;
+		return html`<umb-block-action-list id="actions" .blockEditor=${UMB_BLOCK_GRID}></umb-block-action-list>`;
 	}
 
 	static override styles = [
@@ -680,10 +764,6 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 				right: calc(1px - (var(--umb-block-grid--column-gap, 0px) * 0.5));
 			}
 
-			.umb-block-grid__block {
-				height: 100%;
-			}
-
 			:host(:hover):not(:drop)::after {
 				display: block;
 				border-color: var(--uui-color-interactive-emphasis);
@@ -716,6 +796,23 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 
 			uui-badge {
 				z-index: 2;
+			}
+
+			:host([is-reference]) .umb-block-grid__block {
+				--umb-entity-frame-color: var(--umb-color-reference, #7532c8);
+				--umb-entity-frame-contrast-color: var(--umb-color-reference-contrast, #ffffff);
+			}
+
+			.umb-block-grid__block {
+				--umb-entity-frame-opacity: 0;
+				--umb-entity-frame-color: var(--uui-color-interactive-emphasis);
+
+				height: 100%;
+
+				&:hover,
+				&:focus-within {
+					--umb-entity-frame-opacity: 1;
+				}
 			}
 		`,
 	];

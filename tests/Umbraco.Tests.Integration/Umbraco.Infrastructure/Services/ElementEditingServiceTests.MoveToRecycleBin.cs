@@ -126,6 +126,34 @@ public partial class ElementEditingServiceTests
 
     [Test]
     [ConfigureBuilder(ActionName = nameof(ConfigureDisableUnpublishWhenReferenced))]
+    public async Task Cannot_Move_To_Recycle_Bin_When_Element_Is_Referenced_By_External_Block_Content_And_Configured_To_Disable_When_Referenced()
+    {
+        var elementType = await CreateInvariantElementType();
+        var referencingElement = await CreateInvariantElement(contentTypeKey: elementType.Key);
+        var referencedElement = await CreateInvariantElement(contentTypeKey: elementType.Key);
+
+        // Embedding an element as external block content records this relation, which must protect it the same way.
+        RelationService.Relate(
+            referencingElement.Id,
+            referencedElement.Id,
+            Constants.Conventions.RelationTypes.RelatedExternalBlockElementAlias);
+
+        var moveResult = await ElementEditingService.MoveToRecycleBinAsync(
+            referencedElement.Key,
+            Constants.Security.SuperUserKey);
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(moveResult.Success);
+            Assert.AreEqual(ContentEditingOperationStatus.CannotMoveToRecycleBinWhenReferenced, moveResult.Result);
+        });
+
+        var element = await ElementEditingService.GetAsync(referencedElement.Key);
+        Assert.IsNotNull(element);
+        Assert.IsFalse(element!.Trashed);
+    }
+
+    [Test]
+    [ConfigureBuilder(ActionName = nameof(ConfigureDisableUnpublishWhenReferenced))]
     public async Task Can_Move_To_Recycle_Bin_When_Element_Is_Referencing_And_Configured_To_Disable_When_Referenced()
     {
         var elementType = await CreateInvariantElementType();
