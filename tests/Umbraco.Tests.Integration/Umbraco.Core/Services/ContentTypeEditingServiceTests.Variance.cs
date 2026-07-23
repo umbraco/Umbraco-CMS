@@ -406,9 +406,6 @@ internal sealed partial class ContentTypeEditingServiceTests
         return contentType;
     }
 
-    // Deliberately not using ElementBuilder.CreateSimpleElement/ContentBuilder.CreateSimpleContent's
-    // "simple" overloads: they hardcode property values for title/bodyText/author aliases, which
-    // throw InvalidOperationException against a content type that only has `testProperty`.
     private async Task<IElement> CreateElementInstanceWithValue(IContentType contentType, params (string? Culture, string Value)[] values)
     {
         var elementBuilder = new ElementBuilder()
