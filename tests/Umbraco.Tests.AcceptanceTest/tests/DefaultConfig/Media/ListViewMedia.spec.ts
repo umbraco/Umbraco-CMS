@@ -41,22 +41,45 @@ test('can change the the default sort order for the list in the media section', 
   await umbracoUi.media.doesMediaListNameValuesMatch(expectedMediaValues);
 });
 
-test('can change the the order direction for the list in the media section', async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  await umbracoApi.dataType.updateListViewMediaDataType('orderBy', 'name');
-  await umbracoApi.dataType.updateListViewMediaDataType('orderDirection', 'asc');
-  const expectedMediaValues = await umbracoApi.media.getAllMediaNames('name', 'Ascending');
+const orderDirections = [
+  {value: 'asc', name: 'ascending', queryDirection: 'Ascending'},
+  {value: 'desc', name: 'descending', queryDirection: 'Descending'}
+];
 
-  // Act
-  await umbracoUi.media.goToSection(ConstantHelper.sections.media);
+for (const orderDirection of orderDirections) {
+  test(`can order the grid view ${orderDirection.name} in the media section`, async ({umbracoApi, umbracoUi}) => {
+    // Arrange
+    await umbracoApi.dataType.updateListViewMediaDataTypeValues([
+      {alias: 'orderBy', value: 'name'},
+      {alias: 'orderDirection', value: orderDirection.value}
+    ]);
+    const expectedMediaValues = await umbracoApi.media.getAllMediaNames('name', orderDirection.queryDirection);
 
-  // Assert
-  await umbracoUi.media.isMediaGridViewVisible();
-  await umbracoUi.media.doesMediaGridValuesMatch(expectedMediaValues);
-  await umbracoUi.media.changeToListView();
-  await umbracoUi.media.isMediaListViewVisible();
-  await umbracoUi.media.doesMediaListNameValuesMatch(expectedMediaValues);
-});
+    // Act
+    await umbracoUi.media.goToSection(ConstantHelper.sections.media);
+
+    // Assert
+    await umbracoUi.media.isMediaGridViewVisible();
+    await umbracoUi.media.doesMediaGridValuesMatch(expectedMediaValues);
+  });
+
+  test(`can order the list view ${orderDirection.name} in the media section`, async ({umbracoApi, umbracoUi}) => {
+    // Arrange
+    await umbracoApi.dataType.updateListViewMediaDataTypeValues([
+      {alias: 'orderBy', value: 'name'},
+      {alias: 'orderDirection', value: orderDirection.value}
+    ]);
+    const expectedMediaValues = await umbracoApi.media.getAllMediaNames('name', orderDirection.queryDirection);
+
+    // Act
+    await umbracoUi.media.goToSection(ConstantHelper.sections.media);
+    await umbracoUi.media.changeToListView();
+
+    // Assert
+    await umbracoUi.media.isMediaListViewVisible();
+    await umbracoUi.media.doesMediaListNameValuesMatch(expectedMediaValues);
+  });
+}
 
 test('can add more columns to the list in the media section', async ({umbracoApi, umbracoUi}) => {
   // Arrange
