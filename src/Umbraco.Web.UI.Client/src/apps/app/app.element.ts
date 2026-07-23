@@ -230,12 +230,17 @@ export class UmbAppElement extends UmbLitElement {
 			// If the runtime level is "install" or ?status=false is set, we should clear any cached tokens
 			// else we should try and set the auth status
 			const searchParams = new URLSearchParams(window.location.search);
+			// /logout and /error render regardless of session state, so skip the session probe for
+			// them — it's an unnecessary network round-trip before those unauth routes can render.
+			const pathname = pathWithoutBasePath({ start: true, end: false });
+			const isUnauthenticatedRoute = pathname === '/logout' || pathname === '/error';
+
 			if (
 				(searchParams.has('status') && searchParams.get('status') === 'false') ||
 				this.#serverConnection.getStatus() === RuntimeLevelModel.INSTALL
 			) {
 				await this.#authContext.clearTokenStorage();
-			} else {
+			} else if (!isUnauthenticatedRoute) {
 				await this.#setAuthStatus();
 			}
 
