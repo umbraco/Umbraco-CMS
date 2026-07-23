@@ -661,19 +661,17 @@ export class UmbAuthContext extends UmbContextBase {
 	}
 
 	/**
-	 * Signs the user out by revoking tokens and redirecting to the end session endpoint.
+	 * Signs the user out by clearing the local session and redirecting to the server sign-out
+	 * endpoint, which clears the authentication cookie.
 	 * @memberof UmbAuthContext
 	 */
 	async signOut(): Promise<void> {
-		// Revoke the token (best-effort)
-		await this.#client.revokeToken().catch(() => {});
-
 		// Clear local state (don't call clearTokenStorage — signedOut covers other tabs)
 		this.#session.setValue(undefined);
 		this.#isAuthorized.setValue(false);
 		this.#channel.postMessage({ type: 'signedOut' });
 
-		// Redirect to end session endpoint
+		// Redirect to the server sign-out endpoint, which clears the auth cookie.
 		const postLogoutRedirectUri = new URL(this.#postLogoutRedirectUri, window.location.origin);
 		const endSessionEndpoint = `${this.#serverUrl}/umbraco/management/api/v1/security/back-office/signout`;
 		const postLogoutLocation = new URL(endSessionEndpoint);
