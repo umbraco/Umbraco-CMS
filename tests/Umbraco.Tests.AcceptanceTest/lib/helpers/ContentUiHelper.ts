@@ -1277,16 +1277,16 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   async clickRollbackButton() {
-    // Opening Rollback triggers a GET /document-version to load the version history; wait for that response
-    // so the versions are ready before we pick one. The button is located by its stable data-mark (see
-    // rollbackBtn) rather than an accessible-name match, which could resolve late/to a transient element
-    // and swallow the click, opening no modal and hanging this wait.
-    await this.waitForResponseAfterExecutingPromise(
-      '/document-version',
-      this.click(this.rollbackBtn),
-      ConstantHelper.statusCodes.ok,
-      ConstantHelper.httpMethods.get,
-    );
+    // Opening Rollback loads the version history into the modal. On the slow Windows CI leg the click can be
+    // swallowed - it resolves but the handler isn't wired yet, so the modal never opens and a plain
+    // response-wait hangs to timeout. Retry the open (located by its stable data-mark) until the version
+    // list renders, guarded so we don't re-click once it is already showing.
+    await expect(async () => {
+      if ((await this.rollbackItem.count()) === 0) {
+        await this.click(this.rollbackBtn, {force: true});
+      }
+      await expect(this.rollbackItem.first()).toBeVisible({timeout: ConstantHelper.timeout.medium});
+    }).toPass({timeout: ConstantHelper.timeout.veryLong});
   }
 
   async clickRollbackContainerButton(documentId?: string) {
