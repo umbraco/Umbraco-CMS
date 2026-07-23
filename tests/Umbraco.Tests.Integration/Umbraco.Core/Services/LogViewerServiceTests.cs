@@ -246,6 +246,49 @@ internal sealed class LogViewerServiceTests : UmbracoIntegrationTest
         });
     }
 
+    /// <summary>
+    /// The level-counts path reads through the same file reader as the paged logs, so it must apply
+    /// the same range trimming — only the four in-range entries (all Information level) from the
+    /// boundary day files should be counted, not the two that fall outside the range.
+    /// </summary>
+    [Test]
+    public async Task Get_Log_Count_Excludes_Boundary_File_Entries_Outside_Time_Range()
+    {
+        var attempt = await LogViewerService.GetLogLevelCountsAsync(_boundaryStartDate, _boundaryEndDate);
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(attempt.Success);
+            Assert.AreEqual(LogViewerOperationStatus.Success, attempt.Status);
+            Assert.IsNotNull(attempt.Result);
+            Assert.AreEqual(4, attempt.Result.Information, "Only the in-range entries should be counted.");
+            Assert.AreEqual(0, attempt.Result.Warning);
+            Assert.AreEqual(0, attempt.Result.Error);
+            Assert.AreEqual(0, attempt.Result.Fatal);
+        });
+    }
+
+    /// <summary>
+    /// The message-templates path also reads through the same file reader, so it must likewise only
+    /// tally the in-range entries from the boundary day files.
+    /// </summary>
+    [Test]
+    public async Task Get_Message_Templates_Excludes_Boundary_File_Entries_Outside_Time_Range()
+    {
+        var attempt = await LogViewerService.GetMessageTemplatesAsync(_boundaryStartDate, _boundaryEndDate, 0, int.MaxValue);
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(attempt.Success);
+            Assert.AreEqual(LogViewerOperationStatus.Success, attempt.Status);
+            Assert.IsNotNull(attempt.Result);
+            Assert.AreEqual(4, attempt.Result.Total);
+            Assert.That(
+                attempt.Result.Items.Select(x => x.MessageTemplate),
+                Is.EquivalentTo(new[] { "Day21 late", "Day22 early", "Day22 late", "Day23 early" }));
+        });
+    }
+
     [Test]
     public async Task Can_Add_Saved_Query()
     {
