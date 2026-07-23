@@ -1,6 +1,6 @@
 import { UmbLogViewerRepository } from '../repository/log-viewer.repository.js';
 import type { UmbLogLevelCounts } from '../types.js';
-import { umbGetEndOfDayInLocalTime, umbGetStartOfDayInLocalTime } from '../utils.js';
+import { getEndOfDayInLocalTime, getStartOfDayInLocalTime } from '../utils.js';
 import { UMB_APP_LOG_VIEWER_CONTEXT } from './logviewer-workspace.context-token.js';
 import { UmbBasicState, UmbArrayState, UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import type {
@@ -186,8 +186,8 @@ export class UmbLogViewerWorkspaceContext extends UmbContextBase implements UmbW
 	#getRequestDateRange(): UmbLogViewerDateRange {
 		const { startDate, endDate } = this.#dateRange.getValue();
 		return {
-			startDate: umbGetStartOfDayInLocalTime(startDate),
-			endDate: umbGetEndOfDayInLocalTime(endDate),
+			startDate: getStartOfDayInLocalTime(startDate),
+			endDate: getEndOfDayInLocalTime(endDate),
 		};
 	}
 

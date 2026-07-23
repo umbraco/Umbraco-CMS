@@ -1,17 +1,17 @@
-import { umbGetEndOfDayInLocalTime, umbGetStartOfDayInLocalTime } from './utils.js';
+import { getEndOfDayInLocalTime, getStartOfDayInLocalTime } from './utils.js';
 import { expect } from '@open-wc/testing';
 
 describe('log viewer date range utils', () => {
-	describe('umbGetStartOfDayInLocalTime', () => {
+	describe('getStartOfDayInLocalTime', () => {
 		it('returns an absolute UTC timestamp', () => {
-			const result = umbGetStartOfDayInLocalTime('2023-08-22');
+			const result = getStartOfDayInLocalTime('2023-08-22');
 			// A bare date is no longer sent; the server needs an instant to resolve the correct log files (#14710).
 			expect(result).to.not.equal('2023-08-22');
 			expect(result.endsWith('Z')).to.be.true;
 		});
 
 		it('represents the very start of the given day in local time', () => {
-			const result = new Date(umbGetStartOfDayInLocalTime('2023-08-22'));
+			const result = new Date(getStartOfDayInLocalTime('2023-08-22'));
 			expect(result.getFullYear()).to.equal(2023);
 			expect(result.getMonth()).to.equal(7); // August (0-indexed)
 			expect(result.getDate()).to.equal(22);
@@ -22,23 +22,23 @@ describe('log viewer date range utils', () => {
 		});
 
 		it('returns the input unchanged when it cannot be parsed', () => {
-			expect(umbGetStartOfDayInLocalTime('')).to.equal('');
-			expect(umbGetStartOfDayInLocalTime('not-a-date')).to.equal('not-a-date');
-			expect(umbGetStartOfDayInLocalTime('2023-08-')).to.equal('2023-08-'); // partial: day would become 0
-			expect(umbGetStartOfDayInLocalTime('2023-13-40')).to.equal('2023-13-40'); // out of range: would roll over
-			expect(umbGetStartOfDayInLocalTime('2023-02-29')).to.equal('2023-02-29'); // not a leap year
+			expect(getStartOfDayInLocalTime('')).to.equal('');
+			expect(getStartOfDayInLocalTime('not-a-date')).to.equal('not-a-date');
+			expect(getStartOfDayInLocalTime('2023-08-')).to.equal('2023-08-'); // partial: day would become 0
+			expect(getStartOfDayInLocalTime('2023-13-40')).to.equal('2023-13-40'); // out of range: would roll over
+			expect(getStartOfDayInLocalTime('2023-02-29')).to.equal('2023-02-29'); // not a leap year
 		});
 	});
 
-	describe('umbGetEndOfDayInLocalTime', () => {
+	describe('getEndOfDayInLocalTime', () => {
 		it('returns an absolute UTC timestamp', () => {
-			const result = umbGetEndOfDayInLocalTime('2023-08-22');
+			const result = getEndOfDayInLocalTime('2023-08-22');
 			expect(result).to.not.equal('2023-08-22');
 			expect(result.endsWith('Z')).to.be.true;
 		});
 
 		it('represents the very end of the given day in local time', () => {
-			const result = new Date(umbGetEndOfDayInLocalTime('2023-08-22'));
+			const result = new Date(getEndOfDayInLocalTime('2023-08-22'));
 			expect(result.getFullYear()).to.equal(2023);
 			expect(result.getMonth()).to.equal(7); // August (0-indexed)
 			expect(result.getDate()).to.equal(22);
@@ -49,11 +49,11 @@ describe('log viewer date range utils', () => {
 		});
 
 		it('returns the input unchanged when it cannot be parsed', () => {
-			expect(umbGetEndOfDayInLocalTime('')).to.equal('');
-			expect(umbGetEndOfDayInLocalTime('not-a-date')).to.equal('not-a-date');
-			expect(umbGetEndOfDayInLocalTime('2023-08-')).to.equal('2023-08-'); // partial: day would become 0
-			expect(umbGetEndOfDayInLocalTime('2023-13-40')).to.equal('2023-13-40'); // out of range: would roll over
-			expect(umbGetEndOfDayInLocalTime('2023-02-29')).to.equal('2023-02-29'); // not a leap year
+			expect(getEndOfDayInLocalTime('')).to.equal('');
+			expect(getEndOfDayInLocalTime('not-a-date')).to.equal('not-a-date');
+			expect(getEndOfDayInLocalTime('2023-08-')).to.equal('2023-08-'); // partial: day would become 0
+			expect(getEndOfDayInLocalTime('2023-13-40')).to.equal('2023-13-40'); // out of range: would roll over
+			expect(getEndOfDayInLocalTime('2023-02-29')).to.equal('2023-02-29'); // not a leap year
 		});
 	});
 });

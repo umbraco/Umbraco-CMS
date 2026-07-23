@@ -4,13 +4,8 @@
  * @param {string} date A calendar date in `YYYY-MM-DD` format, as produced by `<umb-input-date type="date">`.
  * @returns {string} The ISO 8601 timestamp, or the original string if it cannot be parsed.
  */
-export function umbGetStartOfDayInLocalTime(date: string): string {
-	const parsed = parseLocalDate(date);
-	if (!parsed) {
-		return date;
-	}
-
-	return new Date(parsed.year, parsed.month - 1, parsed.day, 0, 0, 0, 0).toISOString();
+export function getStartOfDayInLocalTime(date: string): string {
+	return toLocalInstant(date, 0, 0, 0, 0);
 }
 
 /**
@@ -24,13 +19,27 @@ export function umbGetStartOfDayInLocalTime(date: string): string {
  * @param {string} date A calendar date in `YYYY-MM-DD` format, as produced by `<umb-input-date type="date">`.
  * @returns {string} The ISO 8601 timestamp, or the original string if it cannot be parsed.
  */
-export function umbGetEndOfDayInLocalTime(date: string): string {
+export function getEndOfDayInLocalTime(date: string): string {
+	return toLocalInstant(date, 23, 59, 59, 999);
+}
+
+/**
+ * Converts a `YYYY-MM-DD` calendar date to the absolute (UTC) ISO 8601 timestamp for the given
+ * time of day in the browser's local time zone.
+ * @param {string} date A calendar date in `YYYY-MM-DD` format.
+ * @param {number} hours The local hour of day (0-23).
+ * @param {number} minutes The local minutes (0-59).
+ * @param {number} seconds The local seconds (0-59).
+ * @param {number} milliseconds The local milliseconds (0-999).
+ * @returns {string} The ISO 8601 timestamp, or the original string if the date cannot be parsed.
+ */
+function toLocalInstant(date: string, hours: number, minutes: number, seconds: number, milliseconds: number): string {
 	const parsed = parseLocalDate(date);
 	if (!parsed) {
 		return date;
 	}
 
-	return new Date(parsed.year, parsed.month - 1, parsed.day, 23, 59, 59, 999).toISOString();
+	return new Date(parsed.year, parsed.month - 1, parsed.day, hours, minutes, seconds, milliseconds).toISOString();
 }
 
 /**
