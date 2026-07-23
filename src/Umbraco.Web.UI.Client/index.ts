@@ -1,4 +1,4 @@
-import { startMockServiceWorker } from './src/mocks/index.js';
+import { startMockServiceWorker } from './mocks/index.js';
 import { UmbAppElement } from '@umbraco-cms/backoffice/app';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -9,13 +9,26 @@ async function bootstrap() {
 	const appElement = new UmbAppElement();
 	appElement.backofficePath = '/';
 
-	//#region Vite Mock Setup
 	if (import.meta.env.VITE_UMBRACO_USE_MSW === 'on') {
 		appElement.bypassAuth = true;
-		await startMockServiceWorker();
+
+		const mockSet = localStorage.getItem('umb:mockSet') || import.meta.env.VITE_MOCK_SET || 'default';
+		await startMockServiceWorker({
+			mockSet,
+			useCustomServiceWorker: true,
+		});
+
+		// Register mock set switcher header app
+		// TODO: implement for the static build too. We need to be able load the mock sets
+		if (import.meta.env.MODE === 'development') {
+			const { manifests } = await import('./mocks/backoffice-extensions/manifests.js');
+			umbExtensionsRegistry.registerMany(manifests);
+		}
 	} else {
 		appElement.serverUrl = import.meta.env.VITE_UMBRACO_API_URL;
 	}
+
+	document.body.append(appElement);
 
 	// Example injector:
 	if (import.meta.env.VITE_EXAMPLE_PATH) {
@@ -34,8 +47,6 @@ async function bootstrap() {
 		});
 	}
 	//#endregion
-
-	document.body.append(appElement);
 }
 
 bootstrap();

@@ -46,43 +46,6 @@ public class RuntimeState : IRuntimeState
     { }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="RuntimeState" /> class with the specified configuration and services.
-    /// </summary>
-    /// <param name="globalSettings">The global settings for the Umbraco application.</param>
-    /// <param name="unattendedSettings">The unattended installation and upgrade settings.</param>
-    /// <param name="umbracoVersion">Provides information about the current Umbraco version.</param>
-    /// <param name="databaseFactory">Factory for creating Umbraco database connections.</param>
-    /// <param name="logger">The logger used for logging runtime state information.</param>
-    /// <param name="packageMigrationState">Tracks the state of pending package migrations.</param>
-    /// <param name="conflictingRouteService">Service for detecting conflicting routes in the application.</param>
-    /// <param name="databaseProviderMetadata">A collection of metadata describing available database providers.</param>
-    /// <param name="runtimeModeValidationService">Service for validating the runtime mode of the application.</param>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
-    public RuntimeState(
-       IOptions<GlobalSettings> globalSettings,
-       IOptions<UnattendedSettings> unattendedSettings,
-       IUmbracoVersion umbracoVersion,
-       IUmbracoDatabaseFactory databaseFactory,
-       ILogger<RuntimeState> logger,
-       PendingPackageMigrations packageMigrationState,
-       IConflictingRouteService conflictingRouteService,
-       IEnumerable<IDatabaseProviderMetadata> databaseProviderMetadata,
-       IRuntimeModeValidationService runtimeModeValidationService)
-       : this(
-             globalSettings,
-             unattendedSettings,
-             umbracoVersion,
-             databaseFactory,
-             logger,
-             packageMigrationState,
-             conflictingRouteService,
-             databaseProviderMetadata,
-             runtimeModeValidationService,
-             StaticServiceProvider.Instance.GetRequiredService<IDatabaseAvailabilityCheck>())
-    {
-    }
-
-    /// <summary>
     /// Initializes a new instance of the <see cref="RuntimeState" /> class.
     /// </summary>
     /// <param name="globalSettings">The global settings for the Umbraco application.</param>
@@ -133,6 +96,9 @@ public class RuntimeState : IRuntimeState
 
     /// <inheritdoc />
     public string? FinalMigrationState { get; private set; }
+
+    /// <inheritdoc />
+    public SemVersion? CurrentMigrationVersion { get; private set; }
 
     /// <inheritdoc />
     public RuntimeLevel Level { get; internal set; } = RuntimeLevel.Unknown;
@@ -359,7 +325,8 @@ public class RuntimeState : IRuntimeState
 
     private bool DoesUmbracoRequireUpgrade(IReadOnlyDictionary<string, string?>? keyValues)
     {
-        var upgrader = new Upgrader(new UmbracoPlan(_umbracoVersion));
+        var plan = new UmbracoPlan(_umbracoVersion);
+        var upgrader = new Upgrader(plan);
         var stateValueKey = upgrader.StateValueKey;
 
         if (keyValues?.TryGetValue(stateValueKey, out var value) ?? false)
@@ -367,11 +334,13 @@ public class RuntimeState : IRuntimeState
             CurrentMigrationState = value;
         }
 
-        FinalMigrationState = upgrader.Plan.FinalState;
-        if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+        FinalMigrationState = plan.FinalState;
+        CurrentMigrationVersion = plan.GetVersionForState(CurrentMigrationState);
+        if (_logger.IsEnabled(LogLevel.Debug))
         {
             _logger.LogDebug("Final upgrade state is {FinalMigrationState}, database contains {DatabaseState}", FinalMigrationState, CurrentMigrationState ?? "<null>");
         }
+
         return CurrentMigrationState != FinalMigrationState;
     }
 }

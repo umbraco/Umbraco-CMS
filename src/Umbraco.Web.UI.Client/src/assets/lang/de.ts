@@ -11,6 +11,9 @@
 import type { UmbLocalizationDictionary } from '@umbraco-cms/backoffice/localization-api';
 export default {
 	actions: {
+		copyInProgress: 'Bitte warten, Kopieren läuft...',
+		deleteInProgress: 'Bitte warten, Entfernen läuft...',
+		moveInProgress: 'Bitte warten, Verschieben läuft...',
 		assigndomain: 'Kulturen und Hostnamen',
 		auditTrail: 'Protokoll',
 		browse: 'Durchsuchen',
@@ -763,6 +766,7 @@ export default {
 		content: 'Inhalt',
 		continue: 'Weiter',
 		copy: 'Kopieren',
+		copied: 'Kopiert!',
 		create: 'Neu',
 		cropSection: 'Ausschnitte Bereich',
 		database: 'Datenbank',
@@ -1056,10 +1060,8 @@ export default {
 		greeting5: 'Willkommen',
 		greeting6: 'Willkommen',
 		instruction: 'Hier anmelden:',
-		signInWith: 'Anmelden mit',
+		signInWith: 'Anmelden mit {0}',
 		timeout: 'Sitzung abgelaufen',
-		bottomText:
-			'<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">umbraco.org</a></p> ',
 		forgottenPassword: 'Kennwort vergessen?',
 		forgottenPasswordInstruction:
 			'Es wird eine E-Mail mit einem Kennwort-Zurücksetzen-Link an die angegebene Adresse geschickt.',
@@ -1071,9 +1073,41 @@ export default {
 		setPasswordInstruction: 'Bitte wählen Sie ein neues Kennwort',
 		setPasswordConfirmation: 'Ihr Kennwort wurde aktualisiert',
 		resetCodeExpired: 'Der aufgerufene Link ist ungültig oder abgelaufen',
-		resetPasswordEmailCopySubject: 'Umbraco: Kennwort zurücksetzen',
-		resetPasswordEmailCopyFormat:
-			"\n<html>\n\t<head>\n\t\t<meta name='viewport' content='width=device-width'>\n\t\t<meta http-equiv='Content-Type' content='text/html; charset=UTF-8'>\n\t</head>\n\t<body class='' style='font-family: sans-serif; -webkit-font-smoothing: antialiased; font-size: 14px; color: #392F54; line-height: 22px; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; background: #1d1333; margin: 0; padding: 0;' bgcolor='#1d1333'>\n\t\t<style type='text/css'> @media only screen and (max-width: 620px) {table[class=body] h1 {font-size: 28px !important; margin-bottom: 10px !important; } table[class=body] .wrapper {padding: 32px !important; } table[class=body] .article {padding: 32px !important; } table[class=body] .content {padding: 24px !important; } table[class=body] .container {padding: 0 !important; width: 100% !important; } table[class=body] .main {border-left-width: 0 !important; border-radius: 0 !important; border-right-width: 0 !important; } table[class=body] .btn table {width: 100% !important; } table[class=body] .btn a {width: 100% !important; } table[class=body] .img-responsive {height: auto !important; max-width: 100% !important; width: auto !important; } } .btn-primary table td:hover {background-color: #34495e !important; } .btn-primary a:hover {background-color: #34495e !important; border-color: #34495e !important; } .btn  a:visited {color:#FFFFFF;} </style>\n\t\t<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" class=\"body\" style=\"border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #1d1333;\" bgcolor=\"#1d1333\">\n\t\t\t<tr>\n\t\t\t\t<td style=\"font-family: sans-serif; font-size: 14px; vertical-align: top; padding: 24px;\" valign=\"top\">\n\t\t\t\t\t<table style=\"border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;\">\n\t\t\t\t\t\t<tr>\n\t\t\t\t\t\t\t<td background=\"https://umbraco.com/umbraco/assets/img/application/logo.png\" bgcolor=\"#1d1333\" width=\"28\" height=\"28\" valign=\"top\" style=\"font-family: sans-serif; font-size: 14px; vertical-align: top;\">\n\t\t\t\t\t\t\t\t<!--[if gte mso 9]> <v:rect xmlns:v=\"urn:schemas-microsoft-com:vml\" fill=\"true\" stroke=\"false\" style=\"width:30px;height:30px;\"> <v:fill type=\"tile\" src=\"https://umbraco.com/umbraco/assets/img/application/logo.png\" color=\"#1d1333\" /> <v:textbox inset=\"0,0,0,0\"> <![endif]-->\n\t\t\t\t\t\t\t\t<div> </div>\n\t\t\t\t\t\t\t\t<!--[if gte mso 9]> </v:textbox> </v:rect> <![endif]-->\n\t\t\t\t\t\t\t</td>\n\t\t\t\t\t\t\t<td style=\"font-family: sans-serif; font-size: 14px; vertical-align: top;\" valign=\"top\"></td>\n\t\t\t\t\t\t</tr>\n\t\t\t\t\t</table>\n\t\t\t\t</td>\n\t\t\t</tr>\n\t\t</table>\n\t\t<table border='0' cellpadding='0' cellspacing='0' class='body' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #1d1333;' bgcolor='#1d1333'>\n\t\t\t<tr>\n\t\t\t\t<td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'> </td>\n\t\t\t\t<td class='container' style='font-family: sans-serif; font-size: 14px; vertical-align: top; display: block; max-width: 560px; width: 560px; margin: 0 auto; padding: 10px;' valign='top'>\n\t\t\t\t\t<div class='content' style='box-sizing: border-box; display: block; max-width: 560px; margin: 0 auto; padding: 10px;'>\n\t\t\t\t\t\t<br>\n\t\t\t\t\t\t<table class='main' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; border-radius: 3px; background: #FFFFFF;' bgcolor='#FFFFFF'>\n\t\t\t\t\t\t\t<tr>\n\t\t\t\t\t\t\t\t<td class='wrapper' style='font-family: sans-serif; font-size: 14px; vertical-align: top; box-sizing: border-box; padding: 50px;' valign='top'>\n\t\t\t\t\t\t\t\t\t<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;'>\n\t\t\t\t\t\t\t\t\t\t<tr>\n\t\t\t\t\t\t\t\t\t\t\t<td style='line-height: 24px; font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'>\n\t\t\t\t\t\t\t\t\t\t\t\t<h1 style='color: #392F54; font-family: sans-serif; font-weight: bold; line-height: 1.4; font-size: 24px; text-align: left; margin: 0 0 30px;' align='left'>\n\t\t\t\t\t\t\t\t\t\t\t\t\tDas Zurücksetzen Ihres Kennwortes wurde angefordert\n\t\t\t\t\t\t\t\t\t\t\t\t</h1>\n\t\t\t\t\t\t\t\t\t\t\t\t<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>\n\t\t\t\t\t\t\t\t\t\t\t\t\tIhr Benutzername für das Umbraco-Administration lautet: <strong>%0%</strong>\n\t\t\t\t\t\t\t\t\t\t\t\t</p>\n\t\t\t\t\t\t\t\t\t\t\t\t<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: auto;'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<tbody>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<tr>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<td style='font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background: #35C786;' align='center' bgcolor='#35C786' valign='top'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<a href='%1%' target='_blank' rel='noopener' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tKlicken Sie hier, um Ihr Kennwort zurück zu setzen\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t</a>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t</td>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t</tr>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t</tbody>\n\t\t\t\t\t\t\t\t\t\t\t\t\t</table>\n\t\t\t\t\t\t\t\t\t\t\t\t</p>\n\t\t\t\t\t\t\t\t\t\t\t\t<p style='max-width: 400px; display: block; color: #392F54; font-family: sans-serif; font-size: 14px; line-height: 20px; font-weight: normal; margin: 15px 0;'>Wenn Sie den Link nicht klicken können, kopieren Sie den fogenden URL und fügen Sie ihn direkt im Browser-Fenster ein:</p>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<table border='0' cellpadding='0' cellspacing='0'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<tr>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<td style='-ms-word-break: break-all; word-break: break-all; font-family: sans-serif; font-size: 11px; line-height:14px;'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<font style=\"-ms-word-break: break-all; word-break: break-all; font-size: 11px; line-height:14px;\">\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<a style='-ms-word-break: break-all; word-break: break-all; color: #392F54; text-decoration: underline; font-size: 11px; line-height:15px;' href='%1%'>%1%</a>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t</font>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t</td>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t</tr>\n\t\t\t\t\t\t\t\t\t\t\t\t\t</table>\n\t\t\t\t\t\t\t\t\t\t\t\t</p>\n\t\t\t\t\t\t\t\t\t\t\t</td>\n\t\t\t\t\t\t\t\t\t\t</tr>\n\t\t\t\t\t\t\t\t\t</table>\n\t\t\t\t\t\t\t\t</td>\n\t\t\t\t\t\t\t</tr>\n\t\t\t\t\t\t</table>\n\t\t\t\t\t\t<br><br><br>\n\t\t\t\t\t</div>\n\t\t\t\t</td>\n\t\t\t\t<td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'> </td>\n\t\t\t</tr>\n\t\t</table>\n\t</body>\n</html>\n\t",
+		continue: 'Weiter',
+		validate: 'Validieren',
+		login: 'Anmelden',
+		email: 'Bitte E-Mail eingeben',
+		username: 'Bitte Benutzername eingeben',
+		password: 'Kennwort',
+		submit: 'Senden',
+		required: 'Pflichtangabe',
+		success: 'Erfolg',
+		rememberMe: 'Angemeldet bleiben',
+		error: 'Fehler',
+		defaultError: 'Ein unbekannter Fehler ist passiert.',
+		errorInPasswordFormat:
+			'Für das Kennwort ist eine Mindestlänge von {0} Zeichen vorgesehen, wovon mindestens {1} Sonderzeichen (nicht alphanumerisch) sein müssen',
+		passwordMismatch: 'Die Bestätigung Ihres Kennworts stimmt nicht mit dem angegebenen neuen Kennwort überein!',
+		passwordMinLength: 'Ihr Kennwort muss mindestens {0} Zeichen lang sein.',
+		passwordIsBlank: 'Ihr neues Kennwort darf nicht leer sein!',
+		userFailedLogin:
+			'Hoppla! Wir konnten Sie nicht anmelden. Bitte überprüfen Sie Ihre Anmeldeinformationen und versuchen Sie es erneut.',
+		userLockedOut: 'Ihr Konto wurde gesperrt. Bitte versuchen Sie es später erneut.',
+		receivedErrorFromServer: 'Der Server hat einen Fehler gemeldet',
+		userInviteWelcomeMessage:
+			'Hallo und Willkommen bei Umbraco! In nur einer Minute sind Sie bereit loszulegen, Sie müssen nur ein Kennwort festlegen.',
+		userInviteExpiredMessage:
+			'Willkommen bei Umbraco! Bedauerlicherweise ist Ihre Einladung verfallen. Bitte kontaktieren Sie Ihren Administrator und bitten Sie ihn, diese erneut zu schicken.',
+		newPassword: 'Neues Kennwort',
+		confirmNewPassword: 'Neues Kennwort (Bestätigung)',
+		mfaTitle: 'Ein letzter Schritt',
+		mfaCodeInputHelp: 'Geben Sie den Code aus Ihrer Authentifizierungs-App ein',
+		mfaText: 'Sie haben die Multi-Faktor-Authentifizierung aktiviert und müssen Ihre Identität bestätigen.',
+		mfaMultipleText: 'Bitte wählen Sie einen Multi-Faktor-Anbieter',
+		mfaCodeInput: 'Bestätigungscode',
+		mfaInvalidCode: 'Ungültiger Code eingegeben',
+		localLoginDisabled: 'Leider ist eine direkte Anmeldung nicht möglich. Sie wurde von einem Anbieter deaktiviert.',
+		friendlyGreeting: 'Hallo!',
 	},
 	main: {
 		dashboard: 'Dashboard',
@@ -1186,6 +1220,9 @@ export default {
 		paMembers: 'Mitglieder basierte Zugriffsberechtigung',
 		paMembersHelp: 'Falls Sie Mitglieder basierte Zugriffsberechtigung gewähren wollen',
 	},
+	unpublish: {
+		inProgress: 'Bitte warten, Rücknahme der Veröffentlichung läuft...',
+	},
 	publish: {
 		invalidPublishBranchPermissions:
 			'Die Zugriffsrechte des Benutzers sind ungenügend, um alle Unterknoten zu veröffentlichen',
@@ -1279,7 +1316,7 @@ export default {
 	},
 	sections: {
 		content: 'Inhalte',
-		forms: 'Formulare',
+		library: 'Bibliothek',
 		media: 'Medien',
 		member: 'Mitglieder',
 		packages: 'Pakete',
@@ -1316,6 +1353,8 @@ export default {
 		sortEmptyState: 'Dieser Knoten hat keine Unterknoten zum Sortieren',
 	},
 	speechBubbles: {
+		editMultiContentPublishedPartialText: '%0% von %1% Dokumenten veröffentlicht.',
+		editMultiContentUnpublishedPartialText: 'Bei %0% von %1% Dokumenten wurde die Veröffentlichung zurückgenommen.',
 		validationFailedHeader: 'Validierung',
 		validationFailedMessage: 'Validierungsfehler müssen behoben werden, bevor das Element gesichert werden kann',
 		operationFailedHeader: 'Fehlgeschlagen',
@@ -1552,9 +1591,19 @@ export default {
 		chooseChildNode: 'Wählen Sie einen Unterknoten',
 		compositionsDescription:
 			'Übernimm Tabs und Eigenschaften vone einem vorhandenen Inhaltstyp. Neue Tabs werden zum vorliegenden Inhaltstyp hinzugefügt oder mit einem gleichnamigen Tab zusammengeführt.',
+		compositionsDescriptionMediaType:
+			'Übernimm Tabs und Eigenschaften vone einem vorhandenen Medientyp. Neue Tabs werden zum vorliegenden Medientyp hinzugefügt oder mit einem gleichnamigen Tab zusammengeführt.',
+		compositionsDescriptionMemberType:
+			'Übernimm Tabs und Eigenschaften vone einem vorhandenen Mitgliedstyp. Neue Tabs werden zum vorliegenden Mitgliedstyp hinzugefügt oder mit einem gleichnamigen Tab zusammengeführt.',
 		compositionInUse:
 			'Dieser Inhaltstyp wird in einer Mischung verwendet und kann deshalb nicht selbst zusammengemischt werden.',
+		compositionInUseMediaType:
+			'Dieser Medientyp wird in einer Mischung verwendet und kann deshalb nicht selbst zusammengemischt werden.',
+		compositionInUseMemberType:
+			'Dieser Mitgliedstyp wird in einer Mischung verwendet und kann deshalb nicht selbst zusammengemischt werden.',
 		noAvailableCompositions: 'Es sind keine Inhaltstypen für eine Mischung vorhanden.',
+		noAvailableCompositionsMediaType: 'Es sind keine Medientypen für eine Mischung vorhanden.',
+		noAvailableCompositionsMemberType: 'Es sind keine Mitgliedstypen für eine Mischung vorhanden.',
 		availableEditors: 'Neu anlegen',
 		reuse: 'Vorhandenen nutzen',
 		editorSettings: 'Editor-Einstellungen',
@@ -1589,6 +1638,10 @@ export default {
 		compositionUsageHeading: 'Wo wird diese Mischung verwendet?',
 		compositionUsageSpecification:
 			'\n      Diese Mischung wird aktuell in den Mischungen folgender Dokumenttypen verwendet:\n    ',
+		compositionUsageSpecificationMediaType:
+			'\n      Diese Mischung wird aktuell in den Mischungen folgender Medientypen verwendet:\n    ',
+		compositionUsageSpecificationMemberType:
+			'\n      Diese Mischung wird aktuell in den Mischungen folgender Mitgliedstypen verwendet:\n    ',
 		variantsHeading: 'Kultur basierte Variationen zulassen',
 		variantsDescription: 'Editoren erlauben, Inhalt dieses Typs in verschiedenen Sprachen anzulegen',
 		allowVaryByCulture: 'Kultur basierte Variationen zulassen',
@@ -1912,6 +1965,8 @@ export default {
 	redirectUrls: {
 		disableUrlTracker: 'URL-Änderungsaufzeichnung abschalten',
 		enableUrlTracker: 'URL-Änderungsaufzeichnung einschalten',
+		urlTrackerEnabled: 'Aktiviert',
+		urlTrackerDisabled: 'Deaktiviert',
 		culture: 'Kultur',
 		originalUrl: 'Original URL',
 		redirectedTo: 'Weiterleiten zu',

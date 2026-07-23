@@ -1,12 +1,12 @@
 import type { UmbStylesheetItemModel } from '../../types.js';
 import { UmbStylesheetPickerInputContext } from './stylesheet-input.context.js';
 import { css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
-import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { UUIFormControlWithBasicsMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-stylesheet-input')
-export class UmbStylesheetInputElement extends UUIFormControlMixin(UmbLitElement, '') {
+export class UmbStylesheetInputElement extends UUIFormControlWithBasicsMixin(UmbLitElement, '') {
 	/**
 	 * This is a minimum amount of selected items in this input.
 	 * @type {number}
@@ -23,12 +23,12 @@ export class UmbStylesheetInputElement extends UUIFormControlMixin(UmbLitElement
 
 	/**
 	 * Min validation message.
-	 * @type {boolean}
+	 * @type {string}
 	 * @attr
 	 * @default
 	 */
 	@property({ type: String, attribute: 'min-message' })
-	minMessage = 'This field need more items';
+	minMessage = 'This field needs more items';
 
 	/**
 	 * This is a maximum amount of selected items in this input.
@@ -46,11 +46,11 @@ export class UmbStylesheetInputElement extends UUIFormControlMixin(UmbLitElement
 
 	/**
 	 * Max validation message.
-	 * @type {boolean}
+	 * @type {string}
 	 * @attr
 	 * @default
 	 */
-	@property({ type: String, attribute: 'min-message' })
+	@property({ type: String, attribute: 'max-message' })
 	maxMessage = 'This field exceeds the allowed amount of items';
 
 	@property({ type: Array })

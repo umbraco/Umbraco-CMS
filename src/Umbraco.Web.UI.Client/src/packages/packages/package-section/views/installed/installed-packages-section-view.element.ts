@@ -1,6 +1,6 @@
 import { UmbPackageRepository } from '../../../package/repository/package.repository.js';
 import type { UmbPackageWithMigrationStatus } from '../../../types.js';
-import { html, css, customElement, state, repeat, nothing, unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
+import { html, css, customElement, state, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -63,7 +63,7 @@ export class UmbInstalledPackagesSectionViewElement extends UmbLitElement implem
 		return html`
 			<div class="no-packages">
 				<h2><strong>${this.localize.term('packager_noPackages')}</strong></h2>
-				<p>${unsafeHTML(this.localize.term('packager_noPackagesDescription'))}</p>
+				<p>${this.localize.htmlString('#packager_noPackagesDescription')}</p>
 			</div>
 		`;
 	}

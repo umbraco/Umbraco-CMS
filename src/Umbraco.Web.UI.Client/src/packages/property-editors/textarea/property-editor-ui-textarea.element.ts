@@ -7,7 +7,6 @@ import {
 	property,
 	state,
 	styleMap,
-	unsafeHTML,
 } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { StyleInfo } from '@umbraco-cms/backoffice/external/lit';
@@ -58,19 +57,19 @@ export class UmbPropertyEditorUITextareaElement
 	private _rows?: number;
 
 	@state()
+	private _placeholder?: string;
+
+	@state()
 	private _css: StyleInfo = {};
 
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		this._maxChars = Number(config?.getValueByAlias('maxChars')) || undefined;
 		this._rows = Number(config?.getValueByAlias('rows')) || undefined;
-		// min/max height where for a short period present in the config, but we do not want this complexity of our configuration.
-		// @deprecated remove config option in v.18, leave good default.
-		const _minHeight = Number(config?.getValueByAlias('minHeight')) || undefined;
-		const _maxHeight = Number(config?.getValueByAlias('maxHeight')) || undefined;
+		this._placeholder = this.localize.string(config?.getValueByAlias<string>('placeholder'));
 
 		this._css = {
-			'--uui-textarea-min-height': _minHeight ? `${_minHeight}px` : 'reset',
-			'--uui-textarea-max-height': _maxHeight ? `${_maxHeight}px` : '33vh',
+			'--uui-textarea-min-height': 'reset',
+			'--uui-textarea-max-height': '33vh',
 		};
 	}
 
@@ -108,7 +107,7 @@ export class UmbPropertyEditorUITextareaElement
 		const { remaining, visible } = getCharacterCountState(this._maxChars, this.value?.length ?? 0);
 		if (!visible) return nothing;
 
-		return html`<div class="char-count">${unsafeHTML(this.localize.term('textbox_characters_left', remaining))}</div>`;
+		return html`<div class="char-count">${this.localize.htmlString('#textbox_characters_left', remaining)}</div>`;
 	}
 
 	override render() {
@@ -120,6 +119,7 @@ export class UmbPropertyEditorUITextareaElement
 				.autoHeight=${this._rows ? false : true}
 				maxlength=${ifDefined(this._maxChars)}
 				rows=${ifDefined(this._rows)}
+				placeholder=${ifDefined(this._placeholder)}
 				.value=${this.value ?? ''}
 				@input=${this.#onInput}
 				?required=${this.mandatory}

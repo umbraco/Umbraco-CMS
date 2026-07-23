@@ -20,7 +20,7 @@ RESTful API for Umbraco backoffice operations. Manages content, media, users, an
 
 ### Key Technologies
 - **Web Framework**: ASP.NET Core MVC with `Asp.Versioning.Mvc` (v1.0 currently)
-- **OpenAPI**: Swashbuckle.AspNetCore with custom schema/operation filters
+- **OpenAPI**: Microsoft.AspNetCore.OpenApi with custom transformers, Swagger UI via Swashbuckle
 - **Authentication**: OpenIddict via `Umbraco.Cms.Api.Common` (reference tokens, not JWT)
 - **Authorization**: Policy-based with `IAuthorizationService`
 - **Validation**: FluentValidation via base controllers
@@ -57,7 +57,7 @@ src/Umbraco.Cms.Api.Management/
 ├── Services/                      # Business logic (thin layer over Core.Services)
 ├── Mapping/                       # ViewModel → domain model mappers
 ├── Security/                      # Auth providers, sign-in manager, external logins
-├── OpenApi/                       # Swashbuckle filters (schema, operation, security)
+├── OpenApi/                       # OpenAPI transformers (schema, operation, security)
 ├── Routing/                       # Route configuration, SignalR hubs
 ├── DependencyInjection/           # Service registration (55+ files)
 ├── Middleware/                    # Preview, server events
@@ -71,7 +71,8 @@ src/Umbraco.Cms.Api.Management/
 - **Umbraco.Cms.Api.Common** - Shared API infrastructure (base controllers, OpenAPI config)
 - **Umbraco.Infrastructure** - Service implementations, data access
 - **Umbraco.PublishedCache.HybridCache** - Published content queries
-- **Swashbuckle.AspNetCore** - OpenAPI generation
+- **Microsoft.AspNetCore.OpenApi** - OpenAPI document generation
+- **Swashbuckle.AspNetCore.SwaggerUI** - Swagger UI
 
 ### Design Patterns
 1. **Controller-per-Operation** - Each endpoint is a separate controller class
@@ -93,6 +94,34 @@ src/Umbraco.Cms.Api.Management/
 5. **Options Pattern** - All configuration via `IOptions<T>` (security, routing, OpenAPI)
 
 6. **SignalR Event Broadcasting** - Real-time notifications via `BackofficeHub` and `ServerEventHub`
+
+### API Response & Endpoint Conventions
+
+These are firm design rules for this API. Prefer an extra round-trip over bending them.
+
+1. **Create/update (and other mutation) endpoints must not return the changed entity.**
+   A `POST`/`PUT`/`PATCH` that mutates state returns only status (e.g. `Ok()`, or `CreatedAtId`
+   with the new id/`Location`) — never the updated entity in the body. Clients that need the
+   resulting representation issue a separate `GET`. This keeps mutation endpoints minimal and
+   avoids clients depending on server-computed fields sneaking back through a write.
+   - **Why it matters**: server-computed state can differ from what the client optimistically
+     expects (e.g. enabling a never-logged-in user leaves them `Inactive`, not `Active`).
+     The correct fix is a read-back, not returning state from the mutation.
+   - **Batch read-back**: when a client just mutated N entities and needs their fresh state,
+     add/use a bulk retrieval endpoint rather than N single `GET`s. Pattern:
+     `GET {resource}/batch?id=...&id=...` returning `BatchResponseModel<TResponseModel>`
+     (see `BatchDataTypesController`, `BatchUsersController`). The batch controller lives under
+     the resource's normal controller base so it carries the **same authorization** as the
+     single-item `GET` (section access + per-resource checks).
+
+2. **Do not add data to item endpoints (`/item/{resource}`).**
+   Item endpoints (`Item*Controller`, used to hydrate pickers/lists) sit on
+   `ManagementApiControllerBase` with only `BackOfficeAccess` — deliberately looser
+   authorization than the section-scoped, per-resource `GET`s. Any authenticated backoffice
+   user can call them. Never widen an item response model with fields that require stricter
+   authorization to see (state, permissions, sensitive/computed data) — that leaks information
+   past the resource's real authorization boundary. Put such fields on the properly-authorized
+   detail or batch endpoint instead.
 
 ---
 
@@ -122,8 +151,8 @@ dotnet build src/Umbraco.Cms.Api.Management /p:TreatWarningsAsErrors=true
 ### OpenAPI Documentation
 The project embeds a pre-generated `OpenApi.json` (1.3MB). To regenerate:
 ```bash
-# Run Umbraco.Web.UI, access /umbraco/swagger
-# Export JSON from Swagger UI
+# Run Umbraco.Web.UI, access /umbraco/openapi/
+# Download JSON from /umbraco/openapi/management.json
 ```
 
 ### Package Management
@@ -201,7 +230,7 @@ dotnet test --filter "FullyQualifiedName~Management.Controllers.Document"
 1. **Controller logic** - Request validation, authorization checks, status code mapping
 2. **Factories** - ViewModel ↔ Domain model conversion accuracy
 3. **Authorization** - Policy enforcement for each operation
-4. **OpenAPI schema** - Ensure Swagger generation doesn't break
+4. **OpenAPI schema** - Ensure OpenAPI document generation doesn't break
 
 ### InternalsVisibleTo
 Tests have access to internal types (see .csproj:44-52):
@@ -465,7 +494,7 @@ TODO: [NL] This must return path segments for a query to work
 1. All tests pass
 2. Code formatted (`dotnet format`)
 3. No new warnings (check suppressed warnings list in .csproj:23)
-4. OpenAPI schema valid (run Swagger UI)
+4. OpenAPI schema valid (check at `/umbraco/openapi/`)
 5. Authorization tested (unit + integration tests)
 
 ### Common Pitfalls
@@ -474,6 +503,8 @@ TODO: [NL] This must return path segments for a query to work
 3. **Large factory classes** - Split by operation if >500 lines
 4. **Missing ProducesResponseType** - Breaks OpenAPI client generation
 5. **Not handling Attempt failures** - Always check `result.Success`
+6. **Returning the entity from a mutation** - Create/update endpoints return status only; the client does a follow-up `GET` (or `{resource}/batch` for many). See "API Response & Endpoint Conventions" in §1.
+7. **Widening item endpoints** - Never add authorization-sensitive fields to `/item/{resource}` responses; they have looser auth. See "API Response & Endpoint Conventions" in §1.
 
 ---
 
@@ -612,7 +643,7 @@ Examples:
 - `PUT /umbraco/management/api/v1/document/{id}` - Update document
 - `DELETE /umbraco/management/api/v1/document/{id}` - Delete document
 
-Full spec: See OpenApi.json or Swagger UI at `/umbraco/swagger`
+Full spec: See OpenApi.json or Swagger UI at `/umbraco/openapi/`
 
 ### Getting Help
 - **Root Documentation**: `/CLAUDE.md` (repository overview)

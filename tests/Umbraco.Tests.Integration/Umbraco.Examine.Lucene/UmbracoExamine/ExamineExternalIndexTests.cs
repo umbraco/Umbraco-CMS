@@ -30,7 +30,7 @@ internal sealed class ExamineExternalIndexTests : ExamineBaseTest
     private const string ContentName = "TestContent";
 
     [SetUp]
-    public void Setup()
+    public new void Setup()
     {
         TestHelper.DeleteDirectory(GetIndexPath(Constants.UmbracoIndexes.InternalIndexName));
         TestHelper.DeleteDirectory(GetIndexPath(Constants.UmbracoIndexes.ExternalIndexName));
@@ -42,7 +42,7 @@ internal sealed class ExamineExternalIndexTests : ExamineBaseTest
     }
 
     [TearDown]
-    public void TearDown()
+    public new void TearDown()
     {
         // When disposing examine, it does a final write, which ends up locking the file if the indexing is not done yet. So we have this wait to circumvent that.
         Thread.Sleep(1500);
@@ -104,7 +104,7 @@ internal sealed class ExamineExternalIndexTests : ExamineBaseTest
         var contentType = new ContentTypeBuilder()
             .WithId(0)
             .Build();
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var content = new ContentBuilder()
             .WithId(0)
@@ -140,7 +140,7 @@ internal sealed class ExamineExternalIndexTests : ExamineBaseTest
         var contentType = new ContentTypeBuilder()
             .WithId(0)
             .Build();
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var content = new ContentBuilder()
             .WithId(0)

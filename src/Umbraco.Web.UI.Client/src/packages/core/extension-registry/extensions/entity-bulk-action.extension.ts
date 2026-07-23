@@ -32,7 +32,7 @@ export interface MetaEntityBulkActionDefaultKind extends MetaEntityBulkAction {
 	 *   "icon-grid"
 	 * ]
 	 */
-	icon: string;
+	icon?: string;
 
 	/**
 	 * The friendly name of the action to perform
@@ -56,6 +56,10 @@ export interface MetaEntityBulkActionDuplicateToKind extends ManifestEntityBulkA
 	hideTreeRoot?: boolean;
 	foldersOnly?: boolean;
 	treeAlias: string;
+	/**
+	 * The alias of a search provider used to enable search in the destination picker.
+	 */
+	searchProviderAlias?: string;
 }
 
 // MOVE TO
@@ -69,6 +73,10 @@ export interface MetaEntityBulkActionMoveToKind extends MetaEntityBulkActionDefa
 	hideTreeRoot?: boolean;
 	foldersOnly?: boolean;
 	treeAlias: string;
+	/**
+	 * The alias of a search provider used to enable search in the destination picker.
+	 */
+	searchProviderAlias?: string;
 }
 
 // TRASH

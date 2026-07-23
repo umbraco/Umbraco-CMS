@@ -20,7 +20,6 @@ import { UmbBlockEntryContext } from '@umbraco-cms/backoffice/block';
 import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import { UMB_CLIPBOARD_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/clipboard';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 
 export class UmbBlockGridEntryContext
 	extends UmbBlockEntryContext<
@@ -61,8 +60,6 @@ export class UmbBlockGridEntryContext
 		return this.#relevantColumnSpanOptions.getValue();
 	}
 
-	#localize = new UmbLocalizationController(this);
-
 	#canScale = new UmbBooleanState(false);
 	readonly canScale = this.#canScale.asObservable();
 
@@ -84,6 +81,12 @@ export class UmbBlockGridEntryContext
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_BLOCK_GRID_MANAGER_CONTEXT, UMB_BLOCK_GRID_ENTRIES_CONTEXT);
+	}
+
+	protected override _needsLegacyLabelRenderer(): boolean {
+		// Block Grid entry element owns the canonical `<umb-ufm-render>` (via its child
+		// views) and pushes resolved text via `setName()`. No hidden virtual renderer needed.
+		return false;
 	}
 
 	layoutsOfArea(areaKey: string) {
@@ -300,7 +303,7 @@ export class UmbBlockGridEntryContext
 		return columnSpan;
 	}
 
-	async copyToClipboard() {
+	override async copyToClipboard() {
 		if (!this._manager) return;
 
 		const propertyDatasetContext = await this.getContext(UMB_PROPERTY_DATASET_CONTEXT);
@@ -310,8 +313,9 @@ export class UmbBlockGridEntryContext
 			throw new Error('No clipboard context found');
 		}
 
-		const workspaceName = this.#localize.string(propertyDatasetContext?.getName());
-		const propertyLabel = this.#localize.string(propertyContext?.getLabel());
+		const workspaceName = this.localize.string(propertyDatasetContext?.getName());
+		const propertyLabel = this.localize.string(propertyContext?.getLabel());
+
 		const blockLabel = this.getName();
 
 		const entryName = workspaceName

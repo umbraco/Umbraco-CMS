@@ -362,6 +362,7 @@ export default {
 		constrainProportions: '強制屬性',
 		continue: '繼續',
 		copy: '複製',
+		copied: '已複製！',
 		create: '創建',
 		database: '資料庫',
 		date: '時間',
@@ -571,8 +572,6 @@ export default {
 		instruction: '下方登入',
 		signInWith: '登入使用',
 		timeout: '連線時間過了',
-		bottomText:
-			'<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">Umbraco.com</a></p> ',
 		forgottenPassword: '忘記密碼？',
 		forgottenPasswordInstruction: '一封內有重設密碼連結的電子郵件已經寄出給您',
 		requestPasswordResetConfirmation: '一封內有重設密碼連結的電子郵件已經寄到此信箱',
@@ -580,9 +579,6 @@ export default {
 		setPasswordInstruction: '請輸入新密碼',
 		setPasswordConfirmation: '您的密碼已經更新',
 		resetCodeExpired: '您點選的連結是無效或過期的',
-		resetPasswordEmailCopySubject: 'Umbraco：重設密碼',
-		resetPasswordEmailCopyFormat:
-			'<p>您登入到後台的使用者名稱是：<strong>%0%</strong></p><p>點選<a href="%1%"><strong>這裡</strong></a>來重設您的密碼或將此連結複製/貼上到您的瀏覽器：</p><p><em>%1%</em></p>',
 	},
 	main: {
 		dashboard: '儀錶板',
@@ -696,20 +692,13 @@ export default {
 		editscript: '編輯腳本',
 	},
 	sections: {
-		concierge: 'Concierge',
 		content: '內容',
-		courier: 'Courier',
-		developer: '開發',
-		installer: '設定精靈',
+		library: '資源庫',
 		media: '媒體',
 		member: '會員',
-		newsletters: '消息',
 		settings: '設置',
-		statistics: '統計',
 		translation: '翻譯',
 		users: '用戶',
-		help: '說明',
-		forms: '表單',
 	},
 	settings: {
 		defaulttemplate: '預設範本',
@@ -860,8 +849,16 @@ export default {
 		chooseChildNode: '選擇子節點',
 		compositionsDescription:
 			'從已存在的文檔類別中繼承選項卡以及屬性。新選項卡將被新增至目前文檔種類或合併至已存在同名的選項卡中。',
+		compositionsDescriptionMediaType:
+			'從已存在的媒體類別中繼承選項卡以及屬性。新選項卡將被新增至目前媒體種類或合併至已存在同名的選項卡中。',
+		compositionsDescriptionMemberType:
+			'從已存在的會員類別中繼承選項卡以及屬性。新選項卡將被新增至目前會員種類或合併至已存在同名的選項卡中。',
 		compositionInUse: '此內容種類已經用於集合中，因此不能重複添加本身。',
+		compositionInUseMediaType: '此媒體種類已經用於集合中，因此不能重複添加本身。',
+		compositionInUseMemberType: '此會員種類已經用於集合中，因此不能重複添加本身。',
 		noAvailableCompositions: '沒有可用於集合的內容種類。',
+		noAvailableCompositionsMediaType: '沒有可用於集合的媒體種類。',
+		noAvailableCompositionsMemberType: '沒有可用於集合的會員種類。',
 		availableEditors: '可用的編輯器',
 		reuse: '重複使用',
 		editorSettings: '編輯器設定',
@@ -1042,6 +1039,8 @@ export default {
 	redirectUrls: {
 		disableUrlTracker: '停止網址追蹤器',
 		enableUrlTracker: '啟動網址追蹤器',
+		urlTrackerEnabled: '已啟用',
+		urlTrackerDisabled: '已停用',
 		originalUrl: '原本網址',
 		redirectedTo: '轉址成',
 		noRedirects: '沒有任何轉址',

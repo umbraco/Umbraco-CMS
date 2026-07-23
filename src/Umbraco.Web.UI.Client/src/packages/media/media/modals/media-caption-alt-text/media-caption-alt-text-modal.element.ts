@@ -111,12 +111,15 @@ export class UmbMediaCaptionAltTextModalElement extends UmbModalBaseElement<
 						@change=${this.#onDimensionsChange}></umb-input-dimensions>
 
 					<figure id="mainobject">
-						<img
-							src=${this.value?.url ?? ''}
-							alt=${this.value?.altText ?? ''}
-							style=${this.value?.width && this.value?.height
-								? `width: ${this.value.width}px; aspect-ratio: ${this.value.width} / ${this.value.height}`
-								: ''} />
+						${this.value?.url
+							? html`<img
+									src=${this.value.url}
+									alt=${this.value?.altText ?? ''}
+									decoding="async"
+									style=${this.value?.width && this.value?.height
+										? `width: ${this.value.width}px; aspect-ratio: ${this.value.width} / ${this.value.height}`
+										: ''} />`
+							: ''}
 						<figcaption>${this.value?.caption ?? ''}</figcaption>
 					</figure>
 				</div>

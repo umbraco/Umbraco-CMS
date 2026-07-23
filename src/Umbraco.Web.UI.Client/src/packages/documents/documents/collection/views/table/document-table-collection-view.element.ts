@@ -109,6 +109,7 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 					elementName: item.elementName || 'umb-document-table-column-property-value',
 					labelTemplate: item.nameTemplate,
 					allowSorting: true,
+					clipText: true,
 				};
 			});
 

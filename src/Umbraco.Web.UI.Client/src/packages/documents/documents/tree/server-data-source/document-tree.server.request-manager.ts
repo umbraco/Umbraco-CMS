@@ -2,7 +2,10 @@
 
 import type { UmbDocumentTreeChildrenOfRequestArgs, UmbDocumentTreeRootItemsRequestArgs } from '../types.js';
 import { DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
-import { UmbManagementApiTreeDataRequestManager } from '@umbraco-cms/backoffice/management-api';
+import {
+	UmbManagementApiInFlightRequestCache,
+	UmbManagementApiTreeDataRequestManager,
+} from '@umbraco-cms/backoffice/management-api';
 import type {
 	DocumentTreeItemResponseModel,
 	PagedDocumentTreeItemResponseModel,
@@ -41,6 +44,8 @@ export class UmbManagementApiDocumentTreeDataRequestManager extends UmbManagemen
 	UmbManagementApiDocumentTreeSiblingsFromRequestArgs,
 	SubsetDocumentTreeItemResponseModel
 > {
+	static #inflightRequestCache = new UmbManagementApiInFlightRequestCache<unknown>();
+
 	constructor(host: UmbControllerHost) {
 		super(host, {
 			getRootItems: (args) =>
@@ -78,6 +83,8 @@ export class UmbManagementApiDocumentTreeDataRequestManager extends UmbManagemen
 						after: args.paging.takeAfter,
 					},
 				}),
+
+			inflightRequestCache: UmbManagementApiDocumentTreeDataRequestManager.#inflightRequestCache,
 		});
 	}
 }

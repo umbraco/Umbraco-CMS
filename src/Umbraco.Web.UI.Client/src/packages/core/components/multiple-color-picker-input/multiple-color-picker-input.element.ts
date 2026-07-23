@@ -1,6 +1,6 @@
 import type { UmbMultipleColorPickerItemInputElement } from './multiple-color-picker-item-input.element.js';
 import { css, customElement, html, nothing, repeat, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { UUIFormControlWithBasicsMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
@@ -12,7 +12,7 @@ import type { UmbSwatchDetails } from '@umbraco-cms/backoffice/models';
  * @element umb-multiple-color-picker-input
  */
 @customElement('umb-multiple-color-picker-input')
-export class UmbMultipleColorPickerInputElement extends UUIFormControlMixin(UmbLitElement, '') {
+export class UmbMultipleColorPickerInputElement extends UUIFormControlWithBasicsMixin(UmbLitElement, '') {
 	#sorter = new UmbSorterController(this, {
 		getUniqueOfElement: (element: UmbMultipleColorPickerItemInputElement) => {
 			return element.value.toString();
@@ -42,12 +42,12 @@ export class UmbMultipleColorPickerInputElement extends UUIFormControlMixin(UmbL
 
 	/**
 	 * Min validation message.
-	 * @type {boolean}
+	 * @type {string}
 	 * @attr
 	 * @default
 	 */
 	@property({ type: String, attribute: 'min-message' })
-	minMessage = 'This field need more items';
+	minMessage = 'This field needs more items';
 
 	/**
 	 * This is a maximum amount of selected items in this input.
@@ -60,11 +60,11 @@ export class UmbMultipleColorPickerInputElement extends UUIFormControlMixin(UmbL
 
 	/**
 	 * Max validation message.
-	 * @type {boolean}
+	 * @type {string}
 	 * @attr
 	 * @default
 	 */
-	@property({ type: String, attribute: 'min-message' })
+	@property({ type: String, attribute: 'max-message' })
 	maxMessage = 'This field exceeds the allowed amount of items';
 
 	/**

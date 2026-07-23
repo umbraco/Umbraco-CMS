@@ -1,4 +1,5 @@
 import { UmbEntityBulkActionBase } from '../../entity-bulk-action-base.js';
+import { UmbEntityBulkActionProgressController } from '../../progress/index.js';
 import type { MetaEntityBulkActionDeleteKind } from './types.js';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
@@ -18,18 +19,6 @@ export class UmbDeleteEntityBulkAction<
 > extends UmbEntityBulkActionBase<MetaKindType> {
 	#localize = new UmbLocalizationController(this);
 	#items: Array<any> = [];
-	/**
-	 * @deprecated this has been turned into a private property and cannot be used from v.18. Will be removed in v.18
-	 */
-	protected get _items() {
-		return this.#items;
-	}
-	/**
-	 * @deprecated this has been turned into a private property and cannot be used from v.18. Will be removed in v.18
-	 */
-	protected set _items(value: Array<any>) {
-		this.#items = value;
-	}
 
 	override async execute() {
 		if (this.selection?.length === 0) {
@@ -76,16 +65,22 @@ export class UmbDeleteEntityBulkAction<
 
 		const succeeded: Array<string> = [];
 
-		for (const unique of uniques) {
-			const { error } = await detailRepository.delete(unique);
+		await new UmbEntityBulkActionProgressController(this).runWithProgress({
+			headline: '#actions_deleteInProgress',
+			uniques,
+			process: async (unique) => {
+				const { error } = await detailRepository.delete(unique);
 
-			if (error) {
-				const notification = { data: { message: error.message } };
-				notificationContext?.peek('danger', notification);
-			} else {
-				succeeded.push(unique);
-			}
-		}
+				if (error) {
+					const notification = { data: { message: error.message } };
+					notificationContext?.peek('danger', notification);
+				} else {
+					succeeded.push(unique);
+				}
+
+				return { error };
+			},
+		});
 
 		if (succeeded.length > 0) {
 			const notification = {

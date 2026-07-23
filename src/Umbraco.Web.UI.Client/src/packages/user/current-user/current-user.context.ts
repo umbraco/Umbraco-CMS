@@ -3,11 +3,15 @@ import { UmbCurrentUserRepository } from './repository/current-user.repository.j
 import { UMB_CURRENT_USER_CONTEXT } from './current-user.context.token.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { debounce } from '@umbraco-cms/backoffice/utils';
 import { filter, firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
-import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { umbLocalizationRegistry } from '@umbraco-cms/backoffice/localization';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
+import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import { UmbEntityDeletedEvent, UmbEntityUpdatedEvent } from '@umbraco-cms/backoffice/entity-action';
+import { UMB_USER_ENTITY_TYPE } from '@umbraco-cms/backoffice/user';
+import { UMB_USER_GROUP_ENTITY_TYPE } from '@umbraco-cms/backoffice/user-group';
 
 export class UmbCurrentUserContext extends UmbContextBase {
 	#currentUser = new UmbObjectState<UmbCurrentUserModel | undefined>(undefined);
@@ -15,11 +19,13 @@ export class UmbCurrentUserContext extends UmbContextBase {
 	readonly allowedSections = this.#currentUser.asObservablePart((user) => user?.allowedSections);
 	readonly avatarUrls = this.#currentUser.asObservablePart((user) => user?.avatarUrls);
 	readonly documentStartNodeUniques = this.#currentUser.asObservablePart((user) => user?.documentStartNodeUniques);
+	readonly elementStartNodeUniques = this.#currentUser.asObservablePart((user) => user?.elementStartNodeUniques);
 	readonly email = this.#currentUser.asObservablePart((user) => user?.email);
 	readonly fallbackPermissions = this.#currentUser.asObservablePart((user) => user?.fallbackPermissions);
 	readonly hasAccessToAllLanguages = this.#currentUser.asObservablePart((user) => user?.hasAccessToAllLanguages);
 	readonly hasAccessToSensitiveData = this.#currentUser.asObservablePart((user) => user?.hasAccessToSensitiveData);
 	readonly hasDocumentRootAccess = this.#currentUser.asObservablePart((user) => user?.hasDocumentRootAccess);
+	readonly hasElementRootAccess = this.#currentUser.asObservablePart((user) => user?.hasElementRootAccess);
 	readonly hasMediaRootAccess = this.#currentUser.asObservablePart((user) => user?.hasMediaRootAccess);
 	readonly isAdmin = this.#currentUser.asObservablePart((user) => user?.isAdmin);
 	readonly languageIsoCode = this.#currentUser.asObservablePart((user) => user?.languageIsoCode);
@@ -30,15 +36,16 @@ export class UmbCurrentUserContext extends UmbContextBase {
 	readonly unique = this.#currentUser.asObservablePart((user) => user?.unique);
 	readonly userName = this.#currentUser.asObservablePart((user) => user?.userName);
 
-	#authContext?: typeof UMB_AUTH_CONTEXT.TYPE;
 	#currentUserRepository = new UmbCurrentUserRepository(this);
+	#actionEventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_CURRENT_USER_CONTEXT);
 
-		this.consumeContext(UMB_AUTH_CONTEXT, (instance) => {
-			this.#authContext = instance;
-			this.#observeIsAuthorized();
+		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (context) => {
+			this.#removeActionEventListeners();
+			this.#actionEventContext = context;
+			this.#addActionEventListeners();
 		});
 
 		this.observe(this.languageIsoCode, (currentLanguageIsoCode) => {
@@ -47,21 +54,55 @@ export class UmbCurrentUserContext extends UmbContextBase {
 		});
 	}
 
+	#loadPromise?: Promise<void>;
 	/**
-	 * Loads the current user
+	 * Loads the current user. Concurrent callers share the same in-flight promise,
+	 * so awaiting `load()` always waits for `#currentUser` to be populated.
+	 * @returns {Promise<void>} Resolves once the current user observable has emitted.
 	 */
-	async load() {
+	public async load(): Promise<void> {
+		if (!this.#loadPromise) {
+			this.#loadPromise = this.#doLoad();
+		}
+		return this.#loadPromise;
+	}
+
+	/**
+	 * Invalidates the loaded current user, so that the next call to {@link load} fetches it from the server again.
+	 * Call this when the loaded user can no longer be trusted, e.g. when authorization is lost — a subsequent
+	 * sign-in may be for a different user.
+	 * @remarks The `#currentUser` state is deliberately NOT cleared here. The backoffice stays mounted behind
+	 * the login overlay during a session timeout, and several consumers observe the unfiltered observable
+	 * parts (e.g. recycle-bin conditions, sensitive-data property gating, language read-only checks) without
+	 * guarding against `undefined` — clearing would tear down or read-only-flip open workspaces mid-edit for
+	 * the common case of the same user signing back in. Consumers of the filtered {@link currentUser}
+	 * observable hold their last value until the fresh user has been fetched and then re-evaluate.
+	 */
+	public invalidate(): void {
+		this.#loadPromise = undefined;
+	}
+
+	async #doLoad(): Promise<void> {
 		const { asObservable } = await this.#currentUserRepository.requestCurrentUser();
 
 		if (asObservable) {
-			await this.observe(asObservable(), (currentUser) => {
-				this.#currentUser?.setValue(currentUser);
-			})
+			await this.observe(
+				asObservable(),
+				(currentUser) => {
+					this.#currentUser?.setValue(currentUser);
+				},
+				'observeUser',
+			)
 				.asPromise()
 				// Ignore the error, we can assume that the flow was stopped (asPromise failed), but it does not mean that the consumption was not successful.
 				.catch(() => undefined);
 		}
 	}
+
+	#loadDebounced = debounce(() => {
+		this.invalidate();
+		this.load();
+	}, 100);
 
 	/**
 	 * Checks if a user is the current user.
@@ -218,13 +259,63 @@ export class UmbCurrentUserContext extends UmbContextBase {
 		return this.#currentUser.getValue()?.userName;
 	}
 
-	#observeIsAuthorized() {
-		if (!this.#authContext) return;
-		this.observe(this.#authContext.isAuthorized, (isAuthorized) => {
-			if (isAuthorized) {
-				this.load();
+	#isInGroup(groupUnique: string): boolean {
+		return this.#currentUser.getValue()?.userGroupUniques.includes(groupUnique) ?? false;
+	}
+
+	#onEntityUpdatedEvent = (event: UmbEntityUpdatedEvent) => {
+		const entityType = event.getEntityType();
+		const unique = event.getUnique();
+		if (!unique) return;
+
+		if (entityType === UMB_USER_GROUP_ENTITY_TYPE) {
+			if (this.#isInGroup(unique)) {
+				this.#loadDebounced();
 			}
-		});
+			return;
+		}
+
+		const isCurrentUser = entityType === UMB_USER_ENTITY_TYPE && unique === this.#currentUser.getValue()?.unique;
+		if (isCurrentUser) {
+			this.#loadDebounced();
+		}
+	};
+
+	#onEntityDeletedEvent = (event: UmbEntityDeletedEvent) => {
+		if (event.getEntityType() !== UMB_USER_GROUP_ENTITY_TYPE) return;
+		const unique = event.getUnique();
+		if (!unique) return;
+		if (this.#isInGroup(unique)) {
+			this.#loadDebounced();
+		}
+	};
+
+	#addActionEventListeners(): void {
+		this.#actionEventContext?.addEventListener(
+			UmbEntityUpdatedEvent.TYPE,
+			this.#onEntityUpdatedEvent as unknown as EventListener,
+		);
+		this.#actionEventContext?.addEventListener(
+			UmbEntityDeletedEvent.TYPE,
+			this.#onEntityDeletedEvent as unknown as EventListener,
+		);
+	}
+
+	#removeActionEventListeners(): void {
+		this.#actionEventContext?.removeEventListener(
+			UmbEntityUpdatedEvent.TYPE,
+			this.#onEntityUpdatedEvent as unknown as EventListener,
+		);
+		this.#actionEventContext?.removeEventListener(
+			UmbEntityDeletedEvent.TYPE,
+			this.#onEntityDeletedEvent as unknown as EventListener,
+		);
+	}
+
+	override destroy(): void {
+		this.#removeActionEventListeners();
+		this.#loadDebounced.cancel();
+		super.destroy();
 	}
 }
 

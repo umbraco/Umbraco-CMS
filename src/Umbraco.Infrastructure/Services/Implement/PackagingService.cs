@@ -125,7 +125,7 @@ public class PackagingService : IPackagingService
     /// <summary>
     /// Installs compiled package data from the specified package XML document.
     /// </summary>
-    /// <param name="packageXml">The XML document containing the compiled package data to install.</param>
+    /// <param name="packageXmlFile">The XML document containing the compiled package data to install.</param>
     /// <param name="userId">The ID of the user performing the installation. Defaults to the super user ID.</param>
     /// <returns>An <see cref="InstallationSummary"/> representing the result of the installation process.</returns>
     public InstallationSummary InstallCompiledPackageData(FileInfo packageXmlFile, int userId = Constants.Security.SuperUserId)
@@ -357,7 +357,7 @@ public class PackagingService : IPackagingService
             }
 
             // Set additional values
-            installedPackage.AllowPackageTelemetry = packageManifest is { AllowTelemetry: true, AllowPackageTelemetry: true };
+            installedPackage.AllowPackageTelemetry = packageManifest is { AllowTelemetry: true };
 
             if (!string.IsNullOrEmpty(packageManifest.Version))
             {

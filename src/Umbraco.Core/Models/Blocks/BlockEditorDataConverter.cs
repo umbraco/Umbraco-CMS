@@ -74,10 +74,13 @@ public abstract class BlockEditorDataConverter<TValue, TLayout>
     {
         if (value is not null)
         {
-            var converted = ConvertOriginalBlockFormat(value.ContentData);
-            if (converted)
+            // Content and settings must be converted independently: a block can have no content
+            // property values to migrate (e.g. a structural element type) while its settings still
+            // carry legacy flat values that need relocating.
+            var contentConverted = ConvertOriginalBlockFormat(value.ContentData);
+            var settingsConverted = ConvertOriginalBlockFormat(value.SettingsData);
+            if (contentConverted || settingsConverted)
             {
-                ConvertOriginalBlockFormat(value.SettingsData);
                 AmendExpose(value);
             }
         }
@@ -117,16 +120,6 @@ public abstract class BlockEditorDataConverter<TValue, TLayout>
 
             // no matter what, clear the RawPropertyValues collection so it is not saved back to the DB
             blockItemData.RawPropertyValues.Clear();
-
-            // assign the correct Key if only a UDI is set
-            if (blockItemData.Key == Guid.Empty && blockItemData.Udi is GuidUdi guidUdi)
-            {
-                blockItemData.Key = guidUdi.Guid;
-                converted = true;
-            }
-
-            // no matter what, clear the UDI value so it's not saved back to the DB
-            blockItemData.Udi = null;
         }
 
         return converted;

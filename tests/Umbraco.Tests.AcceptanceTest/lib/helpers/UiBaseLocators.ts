@@ -9,6 +9,7 @@ export class UiBaseLocators extends BasePage {
   public readonly confirmBtn: Locator;
   public readonly chooseBtn: Locator;
   public readonly chooseModalBtn: Locator;
+  public readonly chooseModalLink: Locator;
   public readonly createBtn: Locator;
   public readonly addBtn: Locator;
   public readonly updateBtn: Locator;
@@ -55,6 +56,7 @@ export class UiBaseLocators extends BasePage {
   public readonly backOfficeHeader: Locator;
   public readonly backOfficeMain: Locator;
   public readonly sectionLinks: Locator;
+  public readonly activeSectionLink: Locator;
   public readonly sectionSidebar: Locator;
   public readonly menuItem: Locator;
   public readonly actionsMenuContainer: Locator;
@@ -74,6 +76,7 @@ export class UiBaseLocators extends BasePage {
   public readonly containerSaveAndPublishBtn: Locator;
   public readonly createModalBtn: Locator;
   public readonly copyModalBtn: Locator;
+  public readonly restoreModalBtn: Locator;
 
   // Document Type & Property Editor
   public readonly documentTypeNode: Locator;
@@ -84,6 +87,7 @@ export class UiBaseLocators extends BasePage {
   public readonly property: Locator;
   public readonly addPropertyBtn: Locator;
   public readonly labelAboveBtn: Locator;
+  public readonly propertyEditorChangeBtn: Locator;
 
   // Group & Tab Management
   public readonly addGroupBtn: Locator;
@@ -105,6 +109,7 @@ export class UiBaseLocators extends BasePage {
   public readonly allowAtRootBtn: Locator;
   public readonly allowedChildNodesModal: Locator;
   public readonly addCollectionBtn: Locator;
+  public readonly allowInLibraryBtn: Locator;
 
   // Reorder
   public readonly iAmDoneReorderingBtn: Locator;
@@ -132,6 +137,7 @@ export class UiBaseLocators extends BasePage {
   public readonly systemFieldsOption: Locator;
   public readonly chooseFieldValueDropDown: Locator;
   public readonly breadcrumbsTemplateModal: Locator;
+  public readonly pageFieldBuilderSubmitBtn: Locator;
 
   // Rename
   public readonly newNameTxt: Locator;
@@ -197,15 +203,22 @@ export class UiBaseLocators extends BasePage {
   public readonly createNewDocumentBlueprintBtn: Locator;
 
   // User
+  public readonly currentUserHeaderApp: Locator;
   public readonly currentUserAvatarBtn: Locator;
+  public readonly currentUserModal: Locator;
   public readonly newPasswordTxt: Locator;
   public readonly confirmPasswordTxt: Locator;
   public readonly currentPasswordTxt: Locator;
+  public readonly changePhotoBtn: Locator;
+  public readonly removePhotoBtn: Locator;
+  public readonly languageBtn: Locator;
+  public readonly uiCultureInput: Locator;
 
   // Collection & Table
   public readonly collectionTreeItemTableRow: Locator;
   public readonly createActionButtonCollection: Locator;
   public readonly createActionBtn: Locator;
+  public readonly createActionExpandSymbol: Locator;
   public readonly createOptionActionListModal: Locator;
   public readonly clearSelectionBtn: Locator;
   public readonly collectionSelectionActions: Locator;
@@ -234,6 +247,11 @@ export class UiBaseLocators extends BasePage {
 
   // Block
   public readonly blockTypeCard: Locator;
+  public readonly backofficeModalContainer: Locator;
+
+  // User & User Group
+  public readonly allowAccessToAllElementsBtn: Locator;
+  public readonly elementStartNode: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -242,11 +260,18 @@ export class UiBaseLocators extends BasePage {
     this.saveBtn = page.getByLabel("Save", { exact: true });
     this.submitBtn = page.getByLabel("Submit");
     this.confirmBtn = page.getByLabel("Confirm");
-    this.chooseBtn = page.getByLabel("Choose", { exact: true });
+    // The element/entity pickers render two "Choose" controls (a modal-opening link and a button)
+    // with the same accessible name; .first() keeps this unambiguous (a no-op for single-Choose pickers).
+    this.chooseBtn = page.getByLabel("Choose", { exact: true }).first();
+    // The tree-picker modal's primary confirm button is labelled by its action: "Choose" for entity
+    // pickers, "Move" for a move, "Copy" for a duplicate. Match any so one helper covers all three.
     this.chooseModalBtn = page
       .locator("uui-modal-sidebar")
       .locator('[look="primary"]')
-      .getByLabel("Choose");
+      .getByLabel(/^(Choose|Move|Copy)$/);
+    // The element/entity picker renders both a "Choose" link (opens the tree-picker modal) and a button;
+    // target the link specifically so the shared chooseModalBtn's strict-mode match isn't tripped.
+    this.chooseModalLink = page.getByRole("link", { name: "Choose", exact: true });
     this.createBtn = page.getByRole("button", { name: /^Create(…)?$/ });
     this.addBtn = page.getByRole("button", { name: "Add", exact: true });
     this.updateBtn = page.getByLabel("Update");
@@ -310,6 +335,7 @@ export class UiBaseLocators extends BasePage {
     this.backOfficeHeader = page.locator("umb-backoffice-header");
     this.backOfficeMain = page.locator("umb-backoffice-main");
     this.sectionLinks = page.getByTestId("section-links");
+    this.activeSectionLink = this.sectionLinks.locator("[active]");
     this.sectionSidebar = page.locator("umb-section-sidebar");
     this.menuItem = page.locator("uui-menu-item");
     this.actionsMenuContainer = page.locator("uui-scroll-container");
@@ -325,30 +351,32 @@ export class UiBaseLocators extends BasePage {
     this.sidebarSaveBtn = this.sidebarModal.getByLabel("Save", { exact: true });
     this.openedModal = page.locator("uui-modal-container[backdrop]");
     this.container = page.locator("#container");
-    this.containerChooseBtn = page.locator("#container").getByLabel("Choose");
+    // Like chooseModalBtn: the confirm button in a #container picker is labelled by its action -
+    // "Choose" for a destination picker, "Move"/"Copy" for a move/duplicate. Match any of them.
+    this.containerChooseBtn = page.locator("#container").getByLabel(/^(Choose|Move|Copy)$/);
+    this.backofficeModalContainer = page.locator('umb-backoffice-modal-container');
     this.containerSaveAndPublishBtn = page
       .locator("#container")
       .getByLabel("Save and Publish");
-    this.createModalBtn = page
-      .locator("uui-modal-sidebar")
-      .getByLabel("Create", { exact: true });
     this.createModalBtn = this.sidebarModal.getByLabel("Create", {
       exact: true,
     });
     this.copyModalBtn = this.sidebarModal.getByLabel("Copy", { exact: true });
+    this.restoreModalBtn = this.sidebarModal.getByLabel("Restore", { exact: true });
 
     // Document Type & Property Editor
     this.documentTypeNode = page.locator("uui-ref-node-document-type");
     this.propertyNameTxt = page
-      .getByTestId("input:entity-name")
+      .getByTestId("input:propertytype-name")
       .locator("#input")
       .first();
     this.selectPropertyEditorBtn = page.getByLabel("Select Property Editor");
     this.editorSettingsBtn = page.getByLabel("Editor settings");
     this.enterPropertyEditorDescriptionTxt = page
       .locator("uui-modal-sidebar")
-      .getByTestId("input:entity-description")
+      .getByTestId("input:propertytype-description")
       .locator("#textarea");
+    this.propertyEditorChangeBtn = page.locator('[label="Property editor"]').getByLabel('Change');
     this.property = page.locator("umb-property");
     this.addPropertyBtn = page.getByLabel("Add property", { exact: true });
     this.labelAboveBtn = page
@@ -387,6 +415,7 @@ export class UiBaseLocators extends BasePage {
     this.addCollectionBtn = page.locator(
       "umb-input-content-type-collection-configuration #create-button",
     );
+    this.allowInLibraryBtn = page.locator("label").filter({ hasText: "Allow in library" });
 
     // Reorder
     this.iAmDoneReorderingBtn = page.getByLabel("I am done reordering");
@@ -413,14 +442,12 @@ export class UiBaseLocators extends BasePage {
 
     // Insert & Template
     this.insertValueBtn = page
-      .locator("uui-button")
+      .locator("uui-card")
       .filter({ has: page.locator('[key="template_insertPageField"]') });
     this.insertPartialViewBtn = page
-      .locator("uui-button")
+      .locator("uui-card")
       .filter({ has: page.locator('[key="template_insertPartialView"]') });
-    this.insertDictionaryItemBtn = page
-      .locator("uui-button")
-      .filter({ has: page.locator('[key="template_insertDictionaryItem"]') });
+    this.insertDictionaryItemBtn = page.locator('uui-card[label="Dictionary item"]');
     this.chooseFieldDropDown = page.locator("#preview #expand-symbol-wrapper");
     this.systemFieldsOption = page.getByText("System fields");
     this.chooseFieldValueDropDown = page.locator(
@@ -429,6 +456,7 @@ export class UiBaseLocators extends BasePage {
     this.breadcrumbsTemplateModal = page
       .locator("uui-modal-sidebar")
       .locator("umb-template-workspace-editor uui-breadcrumbs");
+    this.pageFieldBuilderSubmitBtn = page.locator('umb-templating-page-field-builder-modal').getByRole('button', {name: 'Submit'});
 
     // Rename
     this.newNameTxt = page.getByRole("textbox", { name: "Enter new name..." });
@@ -532,12 +560,16 @@ export class UiBaseLocators extends BasePage {
       .locator("umb-ref-item", { hasText: "Document Blueprint for" });
 
     // User
-    this.currentUserAvatarBtn = page
-      .getByTestId("header-app:Umb.HeaderApp.CurrentUser")
-      .locator("uui-avatar");
+    this.currentUserHeaderApp = page.getByTestId("header-app:Umb.HeaderApp.CurrentUser");
+    this.currentUserAvatarBtn = this.currentUserHeaderApp.locator("uui-avatar");
+    this.currentUserModal = page.locator("umb-current-user-modal");
     this.currentPasswordTxt = page.locator('input[name="oldPassword"]');
     this.newPasswordTxt = page.locator('input[name="newPassword"]');
     this.confirmPasswordTxt = page.locator('input[name="confirmPassword"]');
+    this.changePhotoBtn = page.getByLabel('Change photo');
+    this.removePhotoBtn = page.getByLabel('Remove photo');
+    this.languageBtn = page.locator('[label="UI Culture"] select');
+    this.uiCultureInput = page.locator('umb-ui-culture-input');
 
     // Collection & Table
     this.collectionTreeItemTableRow = page.locator(
@@ -549,6 +581,9 @@ export class UiBaseLocators extends BasePage {
     this.createActionBtn = page
       .locator("umb-collection-create-action-button")
       .locator('[label="Create"]');
+    this.createActionExpandSymbol = page
+      .locator("umb-collection-create-action-button")
+      .locator("uui-symbol-expand");
     this.createOptionActionListModal = page.locator(
       "umb-entity-create-option-action-list-modal",
     );
@@ -559,19 +594,13 @@ export class UiBaseLocators extends BasePage {
     this.confirmActionModalEntityReferences = page.locator(
       "umb-confirm-action-modal-entity-references,umb-confirm-bulk-action-modal-entity-references",
     );
+    this.entityItemRef = page.locator('umb-confirm-action-modal-entity-references,umb-confirm-bulk-action-modal-entity-references,umb-entity-references-workspace-info-app').locator('uui-ref-list').first().getByTestId('entity-item-ref');
     this.referenceHeadline = page
       .locator(
         "umb-confirm-action-modal-entity-references,umb-confirm-bulk-action-modal-entity-references",
       )
       .locator("#reference-headline")
       .first();
-    this.entityItemRef = page
-      .locator(
-        "umb-confirm-action-modal-entity-references,umb-confirm-bulk-action-modal-entity-references",
-      )
-      .locator("uui-ref-list")
-      .first()
-      .getByTestId("entity-item-ref");
     this.entityItem = page.locator("umb-entity-item-ref");
 
     // Workspace & Action
@@ -597,11 +626,17 @@ export class UiBaseLocators extends BasePage {
     // Editor
     this.monacoEditor = page.locator(".monaco-editor");
 
-    // Loader
-    this.uiLoader = page.locator("uui-loader");
+    // Loader (excludes the global app-level loader at #loader)
+    this.uiLoader = page.locator(
+      "uui-loader:not([data-mark='app-router-loader'])",
+    );
 
     // Block
     this.blockTypeCard = page.locator("uui-card-block-type");
+
+    // User & User Group
+    this.allowAccessToAllElementsBtn = page.getByText('Allow access to all elements');
+    this.elementStartNode = page.locator('[label="Select element start node"]').locator('umb-input-entity-data');
   }
 
   // Helper Methods
@@ -826,7 +861,6 @@ export class UiBaseLocators extends BasePage {
 
   async clickConfirmTrashButton() {
     await this.click(this.confirmTrashBtn);
-    await this.page.waitForTimeout(ConstantHelper.wait.short);
   }
 
   async clickDeleteAndConfirmButton() {
@@ -845,6 +879,12 @@ export class UiBaseLocators extends BasePage {
   }
 
   async enterFolderName(folderName: string) {
+    await this.enterText(this.folderNameTxt, folderName, { verify: true });
+  }
+
+  async enterRenameFolderName(folderName: string) {
+    await expect(this.folderNameTxt).toBeVisible();
+    await expect(this.folderNameTxt).not.toHaveValue("");
     await this.enterText(this.folderNameTxt, folderName, { verify: true });
   }
 
@@ -1009,6 +1049,10 @@ export class UiBaseLocators extends BasePage {
     await this.click(this.copyModalBtn);
   }
 
+  async clickRestoreModalButton() {
+    await this.click(this.restoreModalBtn);
+  }
+
   // Container Methods
   async clickContainerSaveAndPublishButton() {
     await this.click(this.containerSaveAndPublishBtn);
@@ -1032,8 +1076,7 @@ export class UiBaseLocators extends BasePage {
         );
       }
     }
-    const alreadySelected = await this.sectionLinks
-      .locator("[active]")
+    const alreadySelected = await this.activeSectionLink
       .getByText(sectionName)
       .isVisible();
     if (alreadySelected && !skipReload) {
@@ -1047,9 +1090,11 @@ export class UiBaseLocators extends BasePage {
 
   async goToSettingsTreeItem(settingsTreeItemName: string) {
     await this.goToSection(ConstantHelper.sections.settings);
-    await this.click(
-      this.page.getByLabel(settingsTreeItemName, { exact: true }),
-    );
+    await this.clickTreeItemWithName(settingsTreeItemName);
+  }
+
+  async goToWorkspacePath(path: string) {
+    await this.page.goto(`${this.page.url()}${path}`);
   }
 
   async isSectionWithNameVisible(
@@ -1063,8 +1108,7 @@ export class UiBaseLocators extends BasePage {
   }
 
   async isBackOfficeMainVisible(isVisible: boolean = true) {
-    await this.page.waitForTimeout(ConstantHelper.timeout.medium);
-    await this.isVisible(this.backOfficeMain, isVisible);
+    await this.isVisible(this.backOfficeMain, isVisible, ConstantHelper.timeout.navigation);
   }
 
   // Link & Button Click by Name Methods
@@ -1090,6 +1134,14 @@ export class UiBaseLocators extends BasePage {
     await this.click(this.page.getByLabel(name, { exact: isExact }), {
       force: toForce,
     });
+  }
+
+  // Clicks a tree item by its visible label text, like the content/media tree helpers do. We target the
+  // rendered text rather than the menu item's accessible name (its <a> lives in uui-menu-item's shadow), so
+  // the click keeps working regardless of how the tree item renders its label HTML. Scope defaults to the
+  // section sidebar; pass a modal/other root for trees rendered elsewhere (e.g. pickers).
+  async clickTreeItemWithName(name: string, scope?: Locator | Page) {
+    await this.click((scope ?? this.sectionSidebar).getByText(name, { exact: true }));
   }
 
   async clickButtonWithName(name: string, isExact: boolean = false) {
@@ -1137,8 +1189,14 @@ export class UiBaseLocators extends BasePage {
 
   // Alias & Icon Methods
   async enterAliasName(aliasName: string) {
-    await this.page.waitForTimeout(ConstantHelper.wait.short);
-    await this.click(this.aliasLockBtn, { force: true });
+    // Retry unlocking until the field is editable (an early toggle click can be lost). The toggle only
+    // shows while locked, so the visibility guard avoids re-locking it.
+    await expect(async () => {
+      if (await this.aliasLockBtn.isVisible()) {
+        await this.click(this.aliasLockBtn, { force: true });
+      }
+      await expect(this.aliasNameTxt).toBeEditable({ timeout: ConstantHelper.timeout.short });
+    }).toPass({ timeout: ConstantHelper.timeout.medium });
     await this.enterText(this.aliasNameTxt, aliasName);
   }
 
@@ -1174,7 +1232,7 @@ export class UiBaseLocators extends BasePage {
 
   async updatePropertyEditor(propertyEditorName: string) {
     await this.clickEditorSettingsButton();
-    await this.clickChangeButton();
+    await this.click(this.propertyEditorChangeBtn);
     await this.searchForTypeToFilterValue(propertyEditorName);
     await this.click(this.page.getByText(propertyEditorName, { exact: true }));
     await this.enterAPropertyName(propertyEditorName);
@@ -1360,6 +1418,10 @@ export class UiBaseLocators extends BasePage {
     await this.click(this.allowAtRootBtn);
   }
 
+  async clickAllowInLibraryButton() {
+    await this.click(this.allowInLibraryBtn);
+  }
+
   async clickAllowedChildNodesButton() {
     await this.click(this.allowedChildNodesModal.locator(this.chooseBtn));
   }
@@ -1457,24 +1519,29 @@ export class UiBaseLocators extends BasePage {
   async insertDictionaryItem(dictionaryName: string) {
     await this.clickInsertButton();
     await this.click(this.insertDictionaryItemBtn);
-    await this.click(this.page.getByLabel(dictionaryName));
+    await this.clickSubmitButton();
+    await this.clickTreeItemWithName(dictionaryName, this.page);
     await this.click(this.chooseBtn);
+    // Wait for the snippet to land in the editor before returning, so a following save can't race the insert.
+    await this.containsText(this.monacoEditor, dictionaryName);
   }
 
   async insertSystemFieldValue(fieldValue: string) {
     await this.clickInsertButton();
     await this.click(this.insertValueBtn);
+    await this.clickSubmitButton();
     await this.click(this.chooseFieldDropDown);
     await this.click(this.systemFieldsOption);
     await this.click(this.chooseFieldValueDropDown);
     await this.click(this.page.getByText(fieldValue));
-    await this.clickSubmitButton();
+    await this.click(this.pageFieldBuilderSubmitBtn);
   }
 
   async insertPartialView(partialViewName: string) {
     await this.clickInsertButton();
     await this.click(this.insertPartialViewBtn);
-    await this.click(this.page.getByLabel(partialViewName));
+    await this.clickSubmitButton();
+    await this.clickTreeItemWithName(partialViewName, this.page);
     await this.clickChooseButton();
   }
 
@@ -1587,15 +1654,17 @@ export class UiBaseLocators extends BasePage {
   }
 
   async selectMediaWithName(mediaName: string) {
-    const mediaLocator = this.mediaCardItems.filter({ hasText: mediaName });
+    const mediaLocator = this.mediaCardItems.filter({hasText: mediaName});
     await this.waitForVisible(mediaLocator);
-    await this.click(mediaLocator.locator("#select-checkbox"), { force: true });
+    await this.hover(mediaLocator);
+    await this.click(mediaLocator.locator("#select-checkbox"), {force: true});
   }
 
   async selectMediaWithTestId(mediaKey: string) {
     const mediaLocator = this.page.getByTestId("media:" + mediaKey);
     await this.waitForVisible(mediaLocator);
-    await this.click(mediaLocator.locator("#select-checkbox"), { force: true });
+    await this.hover(mediaLocator);
+    await this.click(mediaLocator.locator("#select-checkbox"), {force: true});
   }
 
   async clickMediaPickerModalSubmitButton() {
@@ -1670,7 +1739,7 @@ export class UiBaseLocators extends BasePage {
   async uploadFile(filePath: string) {
     const [fileChooser] = await Promise.all([
       this.page.waitForEvent("filechooser"),
-      await this.clickToUploadButton(),
+      this.clickToUploadButton(),
     ]);
     await fileChooser.setFiles(filePath);
   }
@@ -1699,7 +1768,11 @@ export class UiBaseLocators extends BasePage {
 
   // User Methods
   async clickCurrentUserAvatarButton() {
-    await this.click(this.currentUserAvatarBtn, { force: true });
+    // Wait for the backoffice to finish loading; clicking before the current-user extension bundle is ready
+    // no-ops, so the modal never opens.
+    await this.waitForPageLoad();
+    await this.click(this.currentUserAvatarBtn);
+    await expect(this.currentUserModal).toBeVisible({timeout: ConstantHelper.timeout.long});
   }
 
   // Collection Methods
@@ -1716,6 +1789,10 @@ export class UiBaseLocators extends BasePage {
   }
 
   async clickCreateActionWithOptionName(optionName: string) {
+    // Before its options load the button renders a single-option variant whose click
+    // executes that option directly instead of opening a menu. Wait for the multi-option
+    // dropdown (its expand chevron) so the click opens the options menu.
+    await this.waitForVisible(this.createActionExpandSymbol);
     await this.clickCreateActionButton();
     const createOptionLocator = this.createActionButtonCollection.locator(
       '[label="' + optionName + '"], [label="' + optionName + '..."]',
@@ -1943,15 +2020,27 @@ export class UiBaseLocators extends BasePage {
     return await this.isVisible(this.page.getByText(message), isVisible);
   }
 
-  // Executes a promise (e.g. button click) and waits for a single API response.
+  /**
+   * Runs an action and resolves on the first response whose URL contains `url`
+   * and whose status matches.
+   *
+   * `url` is matched with `includes`, so endpoint constants are prefixes of each
+   * other (e.g. `.../document` also matches `.../document-type` and `.../document/{id}/publish`).
+   * When more than one such call is in flight, pass `method` and/or a more specific
+   * `url` fragment to disambiguate.
+   *
+   * @returns the trailing path segment of the response URL (the created/affected id),
+   *          or the `Location` header's last segment for 201 responses.
+   */
   async waitForResponseAfterExecutingPromise(
     url: string,
     promise: Promise<void>,
     statusCode: number,
+    method?: string,
   ) {
     const [response] = await Promise.all([
       this.page.waitForResponse(
-        (resp) => resp.url().includes(url) && resp.status() === statusCode,
+        (resp) => resp.url().includes(url) && resp.status() === statusCode && (method === undefined || resp.request().method() === method),
       ),
       promise,
     ]);
@@ -1962,9 +2051,24 @@ export class UiBaseLocators extends BasePage {
     return response.url().split("?")[0].split("/").pop();
   }
 
-  // Executes a promise (e.g. button click) and waits for multiple API responses.
-  // Use when an action triggers multiple API calls (e.g. moving multiple items).
-  // Returns an array of IDs extracted from the responses.
+  /**
+   * Waits until the workspace has re-routed from .../{entityType}/create/... to .../{entityType}/edit/{id}.
+   * A create isn't finished until this reload lands: a follow-up variant/segment switch started beforehand
+   * is discarded (the workspace reverts to the default culture), losing its edits so the awaited update
+   * response never fires.
+   */
+  async waitForWorkspaceEditRoute(entityType: 'document' | 'element') {
+    await expect(this.page).toHaveURL(new RegExp(`/workspace/${entityType}/edit/`), {timeout: ConstantHelper.timeout.long});
+  }
+
+  /**
+   * Runs an action that triggers several matching API calls (e.g. moving multiple
+   * items) and resolves once `expectedCount` responses matching `url` + `statusCode`
+   * have arrived. Uses the same loose `includes` URL matching as
+   * {@link waitForResponseAfterExecutingPromise}.
+   *
+   * @returns the ids extracted from each collected response, in arrival order.
+   */
   async waitForMultipleResponsesAfterExecutingPromise(
     url: string,
     promise: Promise<void>,
@@ -1973,21 +2077,27 @@ export class UiBaseLocators extends BasePage {
   ) {
     const responses: Response[] = [];
 
-    // Create a promise that resolves when we've collected enough responses
+    let resolveResponses!: () => void;
     const responsePromise = new Promise<void>((resolve) => {
-      this.page.on("response", (resp) => {
-        if (resp.url().includes(url) && resp.status() === statusCode) {
-          responses.push(resp);
-          // Resolve once we have all expected responses
-          if (responses.length >= expectedCount) {
-            resolve();
-          }
-        }
-      });
+      resolveResponses = resolve;
     });
+    // Named handler so it can be removed afterwards — otherwise every call leaks a
+    // listener that keeps mutating this (and prior calls') response arrays.
+    const onResponse = (resp) => {
+      if (resp.url().includes(url) && resp.status() === statusCode) {
+        responses.push(resp);
+        if (responses.length >= expectedCount) {
+          resolveResponses();
+        }
+      }
+    };
+    this.page.on("response", onResponse);
 
-    // Execute action and wait for responses simultaneously
-    await Promise.all([responsePromise, promise]);
+    try {
+      await Promise.all([responsePromise, promise]);
+    } finally {
+      this.page.off("response", onResponse);
+    }
 
     // Extract IDs from responses
     return responses.map((resp) => {
@@ -1998,8 +2108,13 @@ export class UiBaseLocators extends BasePage {
     });
   }
 
-  // Executes a promise and waits for multiple 201 Created responses matching URL endings.
-  // Returns array of IDs extracted from Location headers, in same order as urlEndings.
+  /**
+   * Runs an action and waits for one 201 Created response per entry in `urlEndings`.
+   * Unlike the sibling helpers this matches with `endsWith` (exact URL suffix), so
+   * prefix-overlapping endpoints do not collide.
+   *
+   * @returns the created ids from each `Location` header, in the order of `urlEndings`.
+   */
   async waitForCreatedResponsesAfterExecutingPromise(
     urlEndings: string[],
     promise: Promise<void>,
@@ -2052,13 +2167,47 @@ export class UiBaseLocators extends BasePage {
     await this.page.waitForTimeout(ConstantHelper.wait.medium);
   }
 
-  async isSelectCheckboxVisibleForMediaName(
-    mediaName: string,
-    isVisible: boolean = true,
-  ) {
-    const selectCheckboxLocator = this.mediaCardItems
-      .filter({ hasText: mediaName })
-      .locator("#select-checkbox");
+  async clickAllowAccessToAllElements() {
+    await this.click(this.allowAccessToAllElementsBtn);
+  }
+
+  async clickChooseElementStartNodeButton() {
+    await this.click(this.elementStartNode.getByLabel('Choose'));
+  }
+
+  async clickRemoveButtonForElementNodeWithName(elementStartNodeName: string) {
+    await this.click(this.elementStartNode.filter({hasText: elementStartNodeName}).getByLabel('Remove'));
+  }
+
+  async isRestoreFromRecycleBinMessageVisible(restoreItem: string, targetFolderName: string) {
+    const message = 'Restore ' + restoreItem + ' to ' + targetFolderName;
+    return await this.doesModalHaveText(message);
+  }
+
+  async isSelectCheckboxVisibleForMediaName(mediaName: string, isVisible: boolean = true) {
+    const selectCheckboxLocator = this.mediaCardItems.filter({hasText: mediaName}).locator('#select-checkbox');
     await this.isVisible(selectCheckboxLocator, isVisible);
+  }
+
+  async clickChangePhotoButton() {
+    await this.click(this.changePhotoBtn);
+  }
+
+  async clickRemovePhotoButton() {
+    await this.click(this.removePhotoBtn);
+  }
+
+  async changePhotoWithFileChooser(filePath: string) {
+    const fileChooserPromise = this.page.waitForEvent('filechooser');
+    await this.clickChangePhotoButton();
+    const fileChooser = await fileChooserPromise;
+    await fileChooser.setFiles(filePath);
+  }
+
+  async selectUserLanguage(language: string) {
+    await expect(async () => {
+      await this.languageBtn.selectOption(language, {force: true});
+      await expect(this.uiCultureInput).toHaveAttribute('value', language.toLowerCase(), {timeout: ConstantHelper.timeout.short});
+    }).toPass({timeout: ConstantHelper.timeout.medium});
   }
 }

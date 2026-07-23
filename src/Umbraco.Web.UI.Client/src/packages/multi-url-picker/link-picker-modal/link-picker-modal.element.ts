@@ -183,10 +183,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 			switch (type) {
 				case 'document': {
 					await this.#loadPickedDocumentItem(unique);
-					if (this._documentItem) {
-						this.#documentItemDataResolver?.destroy();
-						this.#documentItemDataResolver = new UmbDocumentItemDataResolver(this);
-						this.#documentItemDataResolver.setData(this._documentItem);
+					if (this._documentItem && this.#documentItemDataResolver) {
 						icon = await this.#documentItemDataResolver.getIcon();
 						name = await this.#documentItemDataResolver.getName();
 						url = await this.#getUrlForDocument(unique);
@@ -228,6 +225,12 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 		this.#documentItemRepository ??= new UmbDocumentItemRepository(this);
 		const { data: documentItems } = await this.#documentItemRepository.requestItems([unique]);
 		this._documentItem = documentItems?.[0];
+
+		if (this._documentItem) {
+			this.#documentItemDataResolver?.destroy();
+			this.#documentItemDataResolver = new UmbDocumentItemDataResolver(this);
+			this.#documentItemDataResolver.setData(this._documentItem);
+		}
 	}
 
 	async #getUrlForDocument(unique: string) {
@@ -252,9 +255,9 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 		if (this.value.link.url) {
 			await umbConfirmModal(this, {
 				color: 'danger',
-				headline: this.localize.term('linkPicker_resetUrlHeadline'),
-				content: this.localize.term('linkPicker_resetUrlMessage'),
-				confirmLabel: this.localize.term('linkPicker_resetUrlLabel'),
+				headline: '#linkPicker_resetUrlHeadline',
+				content: '#linkPicker_resetUrlMessage',
+				confirmLabel: '#linkPicker_resetUrlLabel',
 			});
 		}
 
@@ -370,7 +373,11 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 				?hidden=${!this.value.link.unique || this.value.link.type !== 'document' || !this._documentItem}
 				orientation=${this.#propertyLayoutOrientation}
 				label=${this.localize.term('general_content')}>
-				<umb-entity-item-ref slot="editor" .item=${this._documentItem} standalone>
+				<umb-entity-item-ref
+					slot="editor"
+					.item=${this._documentItem}
+					standalone
+					?readonly=${!this.modalContext?.router}>
 					<uui-action-bar slot="actions">
 						<uui-button
 							label=${this.localize.term('general_remove')}

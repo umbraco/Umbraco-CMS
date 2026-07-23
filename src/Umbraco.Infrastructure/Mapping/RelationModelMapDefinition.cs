@@ -5,7 +5,7 @@ using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 namespace Umbraco.Cms.Infrastructure.Mapping;
 
 /// <summary>
-/// Provides mapping configuration for the <see cref="RelationModel"/> entity within the Umbraco infrastructure.
+/// Provides mapping configuration for the <see cref="RelationItemModel"/> entity within the Umbraco infrastructure.
 /// </summary>
 public class RelationModelMapDefinition : IMapDefinition
 {

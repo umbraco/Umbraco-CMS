@@ -1,28 +1,25 @@
 import { UmbBlockSingleEntryContext } from '../../context/block-single-entry.context.js';
-import type { UmbBlockSingleLayoutModel, UmbBlockSingleValueModel } from '../../types.js';
-import {
-	UMB_BLOCK_SINGLE,
-	UMB_BLOCK_SINGLE_PROPERTY_EDITOR_SCHEMA_ALIAS,
-	UMB_BLOCK_SINGLE_PROPERTY_EDITOR_UI_ALIAS,
-} from '../../constants.js';
-import { css, customElement, html, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement, umbDestroyOnDisconnect } from '@umbraco-cms/backoffice/lit-element';
+import type { UmbBlockSingleLayoutModel } from '../../types.js';
+import { UMB_BLOCK_SINGLE } from '../../constants.js';
+import { css, customElement, html, nothing, property, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
+import { UmbLitElement, umbDestroyOnDisconnect } from '@umbraco-cms/backoffice/lit-element';
 import { UmbDataPathBlockElementDataQuery } from '@umbraco-cms/backoffice/block';
+import { renderHiddenUfm } from '@umbraco-cms/backoffice/ufm';
 import { UmbObserveValidationStateController } from '@umbraco-cms/backoffice/validation';
 import { UUIBlinkAnimationValue, UUIBlinkKeyframes } from '@umbraco-cms/backoffice/external/uui';
-import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
-import { UMB_CLIPBOARD_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/clipboard';
 import type {
 	ManifestBlockEditorCustomView,
 	UmbBlockEditorCustomViewProperties,
 } from '@umbraco-cms/backoffice/block-custom-view';
 import type { UmbExtensionElementInitializer } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
+import type { UmbUfmResolvedEvent } from '@umbraco-cms/backoffice/ufm';
 
 import '../ref-single-block/index.js';
 import '../inline-single-block/index.js';
 import '../unsupported-single-block/index.js';
+import '../../../block/action/block-action-list.element.js';
 
 /**
  * @element umb-block-single-entry
@@ -71,9 +68,6 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 	private _showContentEdit = false;
 
 	@state()
-	private _hasSettings = false;
-
-	@state()
 	private _label = '';
 
 	@state()
@@ -89,13 +83,10 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 	private _showActions?: boolean;
 
 	@state()
-	private _workspaceEditContentPath?: string;
-
-	@state()
-	private _workspaceEditSettingsPath?: string;
-
-	@state()
 	private _inlineEditingMode?: boolean;
+
+	// TODO: consumed by <umb-entity-frame> label, landing in a follow-up PR; add `@state()` when used in render [LK]
+	private _name?: string;
 
 	// 'content-invalid' attribute is used for styling purpose.
 	@property({ type: Boolean, attribute: 'content-invalid', reflect: true })
@@ -135,7 +126,6 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 		this.observe(
 			this.#context.settingsElementTypeKey,
 			(key) => {
-				this._hasSettings = !!key;
 				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config!, showSettingsEdit: !!key } });
 			},
 			null,
@@ -182,13 +172,7 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 			},
 			null,
 		);
-		this.observe(
-			this.#context.actionsVisibility,
-			(showActions) => {
-				this._showActions = showActions;
-			},
-			null,
-		);
+		this.observe(this.#context.actionsVisibility, (showActions) => (this._showActions = showActions), null);
 		this.observe(
 			this.#context.inlineEditingMode,
 			(mode) => {
@@ -196,6 +180,7 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 			},
 			null,
 		);
+		this.observe(this.#context.name, (name) => (this._name = name), null);
 		// Data props:
 		this.observe(
 			this.#context.layout,
@@ -228,7 +213,6 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 		this.observe(
 			this.#context.workspaceEditContentPath,
 			(path) => {
-				this._workspaceEditContentPath = path;
 				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config!, editContentPath: path } });
 			},
 			null,
@@ -236,14 +220,16 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 		this.observe(
 			this.#context.workspaceEditSettingsPath,
 			(path) => {
-				this._workspaceEditSettingsPath = path;
 				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config!, editSettingsPath: path } });
 			},
 			null,
 		);
 		this.observe(
 			this.#context.readOnlyGuard.permitted,
-			(isReadOnly) => (this._isReadOnly = isReadOnly),
+			(isReadOnly) => {
+				this._isReadOnly = isReadOnly;
+				this.#updateBlockViewProps({ readonly: isReadOnly });
+			},
 			'umbReadOnlyObserver',
 		);
 	}
@@ -300,42 +286,16 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 		this.#context.expose();
 	};
 
-	async #copyToClipboard() {
-		const propertyDatasetContext = await this.getContext(UMB_PROPERTY_DATASET_CONTEXT);
-		const propertyContext = await this.getContext(UMB_PROPERTY_CONTEXT);
-		const clipboardContext = await this.getContext(UMB_CLIPBOARD_PROPERTY_CONTEXT);
-		if (!propertyDatasetContext || !propertyContext || !clipboardContext) {
-			throw new Error('Could not get required contexts to copy.');
-		}
+	#onUfmResolved = (event: UmbUfmResolvedEvent) => {
+		this.#context.setName(event.detail.text);
+	};
 
-		const workspaceName = this.localize.string(propertyDatasetContext?.getName());
-		const propertyLabel = this.localize.string(propertyContext?.getLabel());
-		const blockLabel = this.#context.getName();
-
-		const entryName = workspaceName
-			? `${workspaceName} - ${propertyLabel} - ${blockLabel}`
-			: `${propertyLabel} - ${blockLabel}`;
-
-		const content = this.#context.getContent();
-		const layout = this.#context.getLayout();
-		const settings = this.#context.getSettings();
-		const expose = this.#context.getExpose();
-
-		const propertyValue: UmbBlockSingleValueModel = {
-			contentData: content ? [structuredClone(content)] : [],
-			layout: {
-				[UMB_BLOCK_SINGLE_PROPERTY_EDITOR_SCHEMA_ALIAS]: layout ? [structuredClone(layout)] : undefined,
-			},
-			settingsData: settings ? [structuredClone(settings)] : [],
-			expose: expose ? [structuredClone(expose)] : [],
+	#renderHiddenUfm() {
+		const blockValue = {
+			...this._blockViewProps.content,
+			$settings: this._blockViewProps.settings,
 		};
-
-		clipboardContext.write({
-			icon: this._icon,
-			name: entryName,
-			propertyValue,
-			propertyEditorUiAlias: UMB_BLOCK_SINGLE_PROPERTY_EDITOR_UI_ALIAS,
-		});
+		return renderHiddenUfm(this._label, blockValue, this.#onUfmResolved);
 	}
 
 	#extensionSlotFilterMethod = (manifest: ManifestBlockEditorCustomView) => {
@@ -358,16 +318,19 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 
 	#extensionSlotRenderMethod = (ext: UmbExtensionElementInitializer<ManifestBlockEditorCustomView>) => {
 		ext.component?.setAttribute('part', 'component');
-		if (this._exposed || this._isReadOnly) {
-			return ext.component;
-		} else {
-			return html`<div style="min-height: var(--uui-size-16);">
-				${ext.component}
-				<umb-block-overlay-expose-button
-					.contentTypeName=${this._contentTypeName}
-					@click=${this.#expose}></umb-block-overlay-expose-button>
-			</div>`;
-		}
+		return html`${this.#renderHiddenUfm()}
+		${when(
+			this._exposed || this._isReadOnly,
+			() => ext.component,
+			() => html`
+				<div style="min-height: var(--uui-size-16);">
+					${ext.component}
+					<umb-block-overlay-expose-button
+						.contentTypeName=${this._contentTypeName}
+						@click=${this.#expose}></umb-block-overlay-expose-button>
+				</div>
+			`,
+		)}`;
 	};
 
 	#renderRefBlock() {
@@ -393,11 +356,14 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 	}
 
 	#renderUnsupportedBlock() {
-		return html`<umb-unsupported-single-block
-			.config=${this._blockViewProps.config}
-			.content=${this._blockViewProps.content}
-			.settings=${this._blockViewProps.settings}
-			${umbDestroyOnDisconnect()}></umb-unsupported-single-block>`;
+		return html`
+			${this.#renderHiddenUfm()}
+			<umb-unsupported-single-block
+				.config=${this._blockViewProps.config}
+				.content=${this._blockViewProps.content}
+				.settings=${this._blockViewProps.settings}
+				${umbDestroyOnDisconnect()}></umb-unsupported-single-block>
+		`;
 	}
 
 	#renderBuiltinBlockView = () => {
@@ -432,71 +398,8 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 	}
 
 	#renderActionBar() {
-		return this._showActions
-			? html`<uui-action-bar>
-					${this.#renderEditContentAction()} ${this.#renderEditSettingsAction()} ${this.#renderCopyToClipboardAction()}
-					${this.#renderDeleteAction()}
-				</uui-action-bar>`
-			: nothing;
-	}
-
-	#renderEditContentAction() {
-		if (this._isReadOnly) return nothing;
-		return this._showContentEdit && this._workspaceEditContentPath
-			? html`<uui-button
-					label="edit"
-					look="secondary"
-					color=${this._contentInvalid ? 'invalid' : ''}
-					href=${this._workspaceEditContentPath}>
-					<uui-icon name=${this._exposed === false && this._isReadOnly === false ? 'icon-add' : 'icon-edit'}></uui-icon>
-					${this._contentInvalid
-						? html`<uui-badge attention color="invalid" label="Invalid content">!</uui-badge>`
-						: nothing}
-				</uui-button>`
-			: this._showContentEdit === false && this._exposed === false
-				? html`<uui-button
-						@click=${this.#expose}
-						label=${this.localize.term('blockEditor_createThisFor', this._contentTypeName)}
-						look="secondary"
-						><uui-icon name="icon-add"></uui-icon
-					></uui-button>`
-				: nothing;
-	}
-
-	#renderEditSettingsAction() {
-		if (this._isReadOnly) return nothing;
-		return html`
-			${this._hasSettings && this._workspaceEditSettingsPath
-				? html`<uui-button
-						label="Edit settings"
-						look="secondary"
-						color=${this._settingsInvalid ? 'invalid' : ''}
-						href=${this._workspaceEditSettingsPath}>
-						<uui-icon name="icon-settings"></uui-icon>
-						${this._settingsInvalid
-							? html`<uui-badge attention color="invalid" label="Invalid settings">!</uui-badge>`
-							: nothing}
-					</uui-button>`
-				: nothing}
-		`;
-	}
-
-	#renderDeleteAction() {
-		if (this._isReadOnly) return nothing;
-		return html` <uui-button label="delete" look="secondary" @click=${() => this.#context.requestDelete()}>
-			<uui-icon name="icon-remove"></uui-icon>
-		</uui-button>`;
-	}
-
-	#renderCopyToClipboardAction() {
-		return html`
-			<uui-button
-				label=${this.localize.term('clipboard_labelForCopyToClipboard')}
-				look="secondary"
-				@click=${() => this.#copyToClipboard()}>
-				<uui-icon name="icon-clipboard-copy"></uui-icon>
-			</uui-button>
-		`;
+		if (!this._showActions) return nothing;
+		return html`<umb-block-action-list id="actions" block-editor=${UMB_BLOCK_SINGLE}></umb-block-action-list>`;
 	}
 
 	override render() {
@@ -541,12 +444,13 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 				z-index: 0;
 			}
 
-			uui-action-bar {
+			#actions {
 				position: absolute;
 				top: var(--uui-size-2);
 				right: var(--uui-size-2);
 				opacity: var(--umb-block-single-entry-actions-opacity, 0);
 				transition: opacity 120ms;
+				z-index: 1;
 			}
 
 			uui-badge {

@@ -1,19 +1,13 @@
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { UMB_WORKSPACE_PATH_VARIANT_DELIMITER } from './constants.js';
 
 export type UmbActiveVariant = {
 	index: number;
 	culture: string | null;
 	segment: string | null;
 };
-
-/**
- * @deprecated Use {@link UmbActiveVariant} instead. This will be removed in Umbraco 18.
- */
-// eslint-disable-next-line @typescript-eslint/naming-convention
-export type ActiveVariant = UmbActiveVariant;
-
-const UBM_VARIANT_DELIMITER = '_&_';
 
 /**
  * @class UmbWorkspaceSplitViewManager
@@ -53,6 +47,24 @@ export class UmbWorkspaceSplitViewManager {
 		return this.#activeVariantsInfo.asObservablePart((data) => data.find((x) => x.index === index) || undefined);
 	}
 
+	/**
+	 * @param {Array<UmbVariantId>} variants - An array of UmbVariantId objects representing the variants to be opened in the split view.
+	 * @description - Updates the active variants in the split view based on the provided array of UmbVariantId objects. This will not merge with existing variants, removing any excess variants and adding new ones as necessary.
+	 */
+	public openVariants(variants: Array<UmbVariantId>) {
+		const active = this.getActiveVariants();
+		this.#activeVariantsInfo.mute();
+		active.forEach((v, index) => {
+			if (index >= variants.length) {
+				this.removeActiveVariant(v.index);
+			}
+		});
+		variants.forEach((variant, index) => {
+			this.setActiveVariant(index, variant.culture, variant.segment);
+		});
+		this.#activeVariantsInfo.unmute();
+	}
+
 	public switchVariant(index: number, variantId: UmbVariantId) {
 		// TODO: remember current path and extend url with it.
 		// TODO: construct URl with all active routes:
@@ -66,7 +78,7 @@ export class UmbWorkspaceSplitViewManager {
 
 				const variantPart: string = newVariants
 					.map((v) => UmbVariantId.Create(v).toString())
-					.join(UBM_VARIANT_DELIMITER);
+					.join(UMB_WORKSPACE_PATH_VARIANT_DELIMITER);
 
 				const additionalPathname = this.#getAdditionalPathname();
 				history.pushState(null, '', `${workspaceRoute}/${variantPart}${additionalPathname}`);
@@ -84,10 +96,11 @@ export class UmbWorkspaceSplitViewManager {
 		const currentVariant = this.getActiveVariants()[0];
 		const workspaceRoute = this.getWorkspaceRoute();
 		if (currentVariant && workspaceRoute) {
+			const currentVariantId = UmbVariantId.Create(currentVariant);
 			history.pushState(
 				null,
 				'',
-				`${workspaceRoute}/${UmbVariantId.Create(currentVariant)}${UBM_VARIANT_DELIMITER}${newVariant}`,
+				`${workspaceRoute}/${currentVariantId}${UMB_WORKSPACE_PATH_VARIANT_DELIMITER}${newVariant}`,
 			);
 			return true;
 		}
@@ -101,7 +114,9 @@ export class UmbWorkspaceSplitViewManager {
 			if (activeVariants && index < activeVariants.length) {
 				const newVariants = activeVariants.filter((x) => x.index !== index);
 
-				const variantPart: string = newVariants.map((v) => UmbVariantId.Create(v)).join(UBM_VARIANT_DELIMITER);
+				const variantPart: string = newVariants
+					.map((v) => UmbVariantId.Create(v))
+					.join(UMB_WORKSPACE_PATH_VARIANT_DELIMITER);
 
 				history.pushState(null, '', `${workspaceRoute}/${variantPart}`);
 				return true;
@@ -111,13 +126,19 @@ export class UmbWorkspaceSplitViewManager {
 	}
 
 	public setVariantParts(routeFragment: string) {
-		const variantSplit = routeFragment.split(UBM_VARIANT_DELIMITER);
-		variantSplit.forEach((part, index) => {
-			this.handleVariantFolderPart(index, part);
-		});
+		const variantSplit = routeFragment.split(UMB_WORKSPACE_PATH_VARIANT_DELIMITER);
+		this.openVariants(variantSplit.map((v) => UmbVariantId.FromString(v)));
 	}
 
+	/**
+	 * @deprecated Use {@link openVariants} instead. This will be removed in Umbraco 20.
+	 */
 	public handleVariantFolderPart(index: number, folderPart: string) {
+		new UmbDeprecation({
+			deprecated: 'UmbWorkspaceSplitViewManager .handleVariantFolderPart method.',
+			removeInVersion: '20',
+			solution: 'Use the .openVariants method instead.',
+		}).warn();
 		const variantId = UmbVariantId.FromString(folderPart);
 		this.setActiveVariant(index, variantId.culture, variantId.segment);
 	}
@@ -127,7 +148,7 @@ export class UmbWorkspaceSplitViewManager {
 		const activeVariants = this.getActiveVariants();
 		const currentVariantPart: string = activeVariants
 			.map((v) => UmbVariantId.Create(v).toString())
-			.join(UBM_VARIANT_DELIMITER);
+			.join(UMB_WORKSPACE_PATH_VARIANT_DELIMITER);
 
 		return `${workspaceRoute}/${currentVariantPart}`;
 	}

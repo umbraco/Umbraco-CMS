@@ -1,8 +1,6 @@
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Mapping.Content;
 using Umbraco.Cms.Api.Management.ViewModels.Member;
 using Umbraco.Cms.Api.Management.ViewModels.MemberType;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -27,28 +25,13 @@ public class MemberMapDefinition : ContentMapDefinition<IMember, MemberValueResp
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Mapping.Member.MemberMapDefinition"/> class with the specified property editor collection.
-    /// </summary>
-    /// <param name="propertyEditorCollection">
-    /// The <see cref="PropertyEditorCollection"/> representing the collection of property editors to be used.
-    /// </param>
-    [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in Umbraco 18.")]
-    public MemberMapDefinition(
-        PropertyEditorCollection propertyEditorCollection)
-        : this(
-            propertyEditorCollection,
-            StaticServiceProvider.Instance.GetRequiredService<IDataValueEditorFactory>())
-    {
-    }
-
-    /// <summary>
     /// Configures the mapping between <see cref="IMember"/> entities and <see cref="MemberResponseModel"/> response models.
     /// </summary>
     /// <param name="mapper">The <see cref="IUmbracoMapper"/> instance used to define the mapping configuration.</param>
     public void DefineMaps(IUmbracoMapper mapper)
         => mapper.Define<IMember, MemberResponseModel>((_, _) => new MemberResponseModel(), Map);
 
-    // Umbraco.Code.MapAll -IsTwoFactorEnabled -Groups -Kind -Flags
+    // Umbraco.Code.MapAll -IsTwoFactorEnabled -Groups -Kind -Flags -ProfileData
     private void Map(IMember source, MemberResponseModel target, MapperContext context)
     {
         target.Id = source.Key;

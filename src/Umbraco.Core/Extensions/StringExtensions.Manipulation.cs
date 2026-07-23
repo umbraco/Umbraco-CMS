@@ -19,6 +19,9 @@ public static partial class StringExtensions
     [GeneratedRegex(@"<[a-zA-Z/!][\s\S]*?>")]
     private static partial Regex StringHtmlRegex();
 
+    [GeneratedRegex(@"(?<extension>\.[^\.\?]+)(\?.*|$)")]
+    private static partial Regex GetFileExtensionRegex();
+
     /// <summary>
     /// Removes all whitespace characters including new lines, tabs, and spaces.
     /// </summary>
@@ -98,8 +101,7 @@ public static partial class StringExtensions
     public static string GetFileExtension(this string file)
     {
         // Find any characters between the last . and the start of a query string or the end of the string
-        const string pattern = @"(?<extension>\.[^\.\?]+)(\?.*|$)";
-        Match match = Regex.Match(file, pattern);
+        Match match = GetFileExtensionRegex().Match(file);
         return match.Success
             ? match.Groups["extension"].Value
             : string.Empty;
@@ -192,7 +194,7 @@ public static partial class StringExtensions
         for (var i = 0; i < queryStrings.Length; i++)
         {
             queryStrings[i] = queryStrings[i].TrimStart(Constants.CharArrays.QuestionMarkAmpersand)
-                .TrimEnd(Constants.CharArrays.Ampersand);
+                .TrimEnd('&');
         }
 
         var nonEmpty = queryStrings.Where(x => !x.IsNullOrWhiteSpace()).ToArray();
@@ -728,6 +730,10 @@ public static partial class StringExtensions
     /// </summary>
     /// <param name="fileName">The file name to convert.</param>
     /// <returns>A friendly name with the extension stripped, underscores and dashes converted to spaces, and title case applied.</returns>
+    /// <remarks>
+    /// Mirrored client-side in <c>src/Umbraco.Web.UI.Client/src/packages/media/media/utils/to-friendly-name.function.ts</c>;
+    /// keep the two implementations in sync.
+    /// </remarks>
     public static string ToFriendlyName(this string fileName)
     {
         // strip the file extension

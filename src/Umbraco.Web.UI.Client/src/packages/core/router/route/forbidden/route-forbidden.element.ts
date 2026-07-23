@@ -1,6 +1,9 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+// Import directly from token file to avoid circular dependency with modal package
+import { UMB_MODAL_CONTEXT } from '../../../modal/context/modal.context-token.js';
+import type { UmbModalContext } from '../../../modal/context/modal.context.js';
 
 /**
  * A component that displays a "Forbidden" message when a user tries to access a route they do not have permission for.
@@ -10,6 +13,23 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
  */
 @customElement('umb-route-forbidden')
 export class UmbRouteForbiddenElement extends UmbLitElement {
+	#modalContext?: UmbModalContext;
+
+	@state()
+	private _isInModal = false;
+
+	constructor() {
+		super();
+		this.consumeContext(UMB_MODAL_CONTEXT, (context) => {
+			this.#modalContext = context;
+			this._isInModal = !!context;
+		});
+	}
+
+	#close() {
+		this.#modalContext?.reject();
+	}
+
 	override render() {
 		return html`
 			<div class="uui-text">
@@ -17,6 +37,12 @@ export class UmbRouteForbiddenElement extends UmbLitElement {
 				<umb-localize key="routing_routeForbiddenDescription">
 					You do not have permission to access this resource. Please contact your administrator for assistance.
 				</umb-localize>
+				${this._isInModal
+					? html`<uui-button
+							look="secondary"
+							label=${this.localize.term('general_close')}
+							@click=${this.#close}></uui-button>`
+					: nothing}
 			</div>
 		`;
 	}
@@ -37,6 +63,7 @@ export class UmbRouteForbiddenElement extends UmbLitElement {
 				justify-content: center;
 				align-items: center;
 				height: 100%;
+				gap: var(--uui-size-space-4);
 				opacity: 0;
 				animation: fadeIn 2s 0s forwards;
 			}

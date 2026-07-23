@@ -31,6 +31,8 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
 
     private IDocumentUrlAliasService DocumentUrlAliasService => GetRequiredService<IDocumentUrlAliasService>();
 
+    private IDocumentUrlService DocumentUrlService => GetRequiredService<IDocumentUrlService>();
+
     private IDocumentUrlAliasRepository DocumentUrlAliasRepository => GetRequiredService<IDocumentUrlAliasRepository>();
 
     private ICoreScopeProvider CoreScopeProvider => GetRequiredService<ICoreScopeProvider>();
@@ -65,6 +67,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
     [SetUp]
     public async Task SetupTestData()
     {
+        await DocumentUrlService.InitAsync(false, CancellationToken.None);
         await DocumentUrlAliasService.InitAsync(false, CancellationToken.None);
 
         // Create template
@@ -818,6 +821,107 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
+    public async Task RebuildAllAliasesAsync_Ignores_Draft_Alias_Edit_On_Published_Document()
+    {
+        var isoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
+        var documentKey = new Guid(PageWithSingleAliasKey);
+
+        // The page is published (from setup) with alias "my-single-alias". Edit the alias as a draft only.
+        var content = ContentService.GetById(documentKey)!;
+        content.SetValue(Constants.Conventions.Content.UrlAlias, "my-single-alias-draft-edit");
+        ContentService.Save(content, -1);
+
+        // Act - a full rebuild (as happens on startup after the rebuild key changes) must read the
+        // published property value, not the current draft one.
+        await DocumentUrlAliasService.RebuildAllAliasesAsync();
+
+        // Assert - the published alias should still resolve; the unpublished draft alias should not.
+        Assert.That(await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("my-single-alias", isoCode), Does.Contain(documentKey));
+        Assert.That(await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("my-single-alias-draft-edit", isoCode), Is.Empty);
+    }
+
+    [Test]
+    public async Task RebuildAllAliasesAsync_Removes_Orphaned_Alias_For_Document_Without_Published_Alias()
+    {
+        var isoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
+        var documentKey = new Guid(PageWithNoAliasKey);
+
+        // Simulate a stale row persisted by an older (buggy) version: an alias row exists in the table for a
+        // published document whose published version has no umbracoUrlAlias value. The rebuild must clear it.
+        using (CoreScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            DocumentUrlAliasRepository.Save(new[]
+            {
+                new PublishedDocumentUrlAlias
+                {
+                    DocumentKey = documentKey,
+                    LanguageId = null,
+                    Alias = "orphaned-alias",
+                },
+            });
+        }
+
+        // Act - rebuild.
+        await DocumentUrlAliasService.RebuildAllAliasesAsync();
+
+        // Assert - the orphaned alias is gone from the database (and so cannot be reloaded into the cache).
+        Assert.That(await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("orphaned-alias", isoCode), Is.Empty);
+
+        List<PublishedDocumentUrlAlias> storedAliases;
+        using (CoreScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            storedAliases = DocumentUrlAliasRepository.GetAll().Where(a => a.DocumentKey == documentKey).ToList();
+        }
+
+        Assert.That(storedAliases, Is.Empty);
+    }
+
+    [Test]
+    public async Task RebuildAllAliasesAsync_Ignores_Alias_For_Unpublished_Culture()
+    {
+        // Arrange - a second language and a culture-variant content type with a culture-varied alias.
+        var secondLanguage = new LanguageBuilder()
+            .WithCultureInfo("fr-FR")
+            .WithIsDefault(false)
+            .Build();
+        await LanguageService.CreateAsync(secondLanguage, Constants.Security.SuperUserKey);
+
+        var defaultIsoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
+
+        var template = TemplateBuilder.CreateTextPageTemplate("unpublishCultureTemplate");
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+
+        var variantContentType = CreateCultureVariantContentTypeWithUrlAlias(template.Id, "pageWithAliasUnpublishCulture");
+        await ContentTypeService.CreateAsync(variantContentType, Constants.Security.SuperUserKey);
+
+        var content = new ContentBuilder()
+            .WithContentType(variantContentType)
+            .WithCultureName(defaultIsoCode, "Multi Culture Page")
+            .WithCultureName("fr-FR", "Page Multi Culture")
+            .Build();
+        content.ParentId = RootPage.Id;
+        content.SetValue(Constants.Conventions.Content.UrlAlias, "default-culture-alias", defaultIsoCode);
+        content.SetValue(Constants.Conventions.Content.UrlAlias, "french-culture-alias", "fr-FR");
+        ContentService.Save(content, -1);
+        ContentService.Publish(content, [defaultIsoCode, "fr-FR"]);
+
+        await DocumentUrlAliasService.CreateOrUpdateAliasesAsync(content.Key);
+
+        // Sanity check - both aliases resolve while both cultures are published.
+        Assert.That(await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("default-culture-alias", defaultIsoCode), Does.Contain(content.Key));
+        Assert.That(await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("french-culture-alias", "fr-FR"), Does.Contain(content.Key));
+
+        // Act - unpublish only the French culture (the document stays published via the default culture),
+        // then rebuild the whole table from scratch.
+        ContentService.Unpublish(content, "fr-FR");
+        await DocumentUrlAliasService.RebuildAllAliasesAsync();
+
+        // Assert - the still-published culture's alias resolves; the unpublished culture's alias does not.
+        Assert.That(await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("default-culture-alias", defaultIsoCode), Does.Contain(content.Key));
+        Assert.That(await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("french-culture-alias", "fr-FR"), Is.Empty);
+    }
+
+    [Test]
     public async Task RebuildAllAliasesAsync_Handles_Empty_Database()
     {
         // Arrange - clear all aliases from documents
@@ -885,7 +989,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         {
             Assert.That(singleAlias.DocumentKey, Is.EqualTo(singleAliasKey), "DocumentKey should match PageWithSingleAlias key");
             Assert.That(singleAlias.DocumentKey, Is.Not.EqualTo(Guid.Empty), "DocumentKey should not be empty GUID");
-            Assert.That(singleAlias.NullableLanguageId, Is.Null, "Invariant content should have NULL LanguageId");
+            Assert.That(singleAlias.LanguageId, Is.Null, "Invariant content should have NULL LanguageId");
             Assert.That(singleAlias.Alias, Is.EqualTo("my-single-alias"), "Alias should be normalized (lowercase, no leading slash)");
         });
 
@@ -907,7 +1011,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
             Assert.Multiple(() =>
             {
                 Assert.That(alias.DocumentKey, Is.Not.EqualTo(Guid.Empty), "DocumentKey should not be empty GUID");
-                Assert.That(alias.NullableLanguageId, Is.Null, "Invariant content should have NULL LanguageId");
+                Assert.That(alias.LanguageId, Is.Null, "Invariant content should have NULL LanguageId");
             });
         }
 
@@ -921,7 +1025,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         {
             Assert.That(childAlias.DocumentKey, Is.EqualTo(childPageKey), "DocumentKey should match ChildPage key");
             Assert.That(childAlias.DocumentKey, Is.Not.EqualTo(Guid.Empty), "DocumentKey should not be empty GUID");
-            Assert.That(childAlias.NullableLanguageId, Is.Null, "Invariant content should have NULL LanguageId");
+            Assert.That(childAlias.LanguageId, Is.Null, "Invariant content should have NULL LanguageId");
             Assert.That(childAlias.Alias, Is.EqualTo("child-alias"), "Alias should be 'child-alias'");
         });
 
@@ -965,7 +1069,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
 
         // Assert - invariant content should have NULL languageId
         Assert.That(storedAliases, Has.Count.EqualTo(1));
-        Assert.That(storedAliases[0].NullableLanguageId, Is.Null, "Invariant content should have NULL LanguageId");
+        Assert.That(storedAliases[0].LanguageId, Is.Null, "Invariant content should have NULL LanguageId");
     }
 
     [Test]
@@ -998,7 +1102,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         // Assert - variant content should have specific languageId (not NULL)
         var defaultLanguage = await LanguageService.GetDefaultLanguageAsync();
         Assert.That(storedAliases, Has.Count.EqualTo(1));
-        Assert.That(storedAliases[0].NullableLanguageId, Is.EqualTo(defaultLanguage.Id), "Variant content should have specific LanguageId");
+        Assert.That(storedAliases[0].LanguageId, Is.EqualTo(defaultLanguage.Id), "Variant content should have specific LanguageId");
     }
 
     [Test]
@@ -1020,7 +1124,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         }
 
         Assert.That(aliasesBefore, Has.Count.GreaterThan(0), "Should have aliases before change");
-        Assert.That(aliasesBefore.All(a => a.NullableLanguageId == null), Is.True, "All aliases should have NULL languageId before change");
+        Assert.That(aliasesBefore.All(a => a.LanguageId == null), Is.True, "All aliases should have NULL languageId before change");
 
         // Act - change content type from invariant to variant
         ContentType.Variations = ContentVariation.Culture;
@@ -1050,8 +1154,8 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         }
 
         Assert.That(aliasesAfter, Has.Count.GreaterThan(0), "Should have aliases after change");
-        Assert.That(aliasesAfter.All(a => a.NullableLanguageId != null), Is.True, "All aliases should have specific languageId after change to variant");
-        Assert.That(aliasesAfter.Any(a => a.NullableLanguageId == defaultLanguage.Id), Is.True, "Should have alias for default language");
+        Assert.That(aliasesAfter.All(a => a.LanguageId != null), Is.True, "All aliases should have specific languageId after change to variant");
+        Assert.That(aliasesAfter.Any(a => a.LanguageId == defaultLanguage.Id), Is.True, "Should have alias for default language");
     }
 
     [Test]
@@ -1073,7 +1177,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         }
 
         Assert.That(invariantAliases, Has.Count.GreaterThan(0), "Should have invariant aliases");
-        Assert.That(invariantAliases.All(a => a.NullableLanguageId == null), Is.True, "Invariant aliases should have NULL languageId");
+        Assert.That(invariantAliases.All(a => a.LanguageId == null), Is.True, "Invariant aliases should have NULL languageId");
 
         // Change content type to variant
         ContentType.Variations = ContentVariation.Culture;
@@ -1103,7 +1207,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         }
 
         Assert.That(variantAliases, Has.Count.GreaterThan(0), "Should have variant aliases after change to variant");
-        Assert.That(variantAliases.All(a => a.NullableLanguageId != null), Is.True, "All aliases should have specific languageId after change to variant");
+        Assert.That(variantAliases.All(a => a.LanguageId != null), Is.True, "All aliases should have specific languageId after change to variant");
 
         // Act - change content type from variant to invariant
         ContentType.Variations = ContentVariation.Nothing;
@@ -1129,7 +1233,183 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         }
 
         Assert.That(aliasesAfter, Has.Count.GreaterThan(0), "Should have aliases after change to invariant");
-        Assert.That(aliasesAfter.All(a => a.NullableLanguageId == null), Is.True, "All aliases should have NULL languageId after change to invariant");
+        Assert.That(aliasesAfter.All(a => a.LanguageId == null), Is.True, "All aliases should have NULL languageId after change to invariant");
+    }
+
+    #endregion
+
+    #region Duplicate Alias Handling Tests
+
+    // Regression for the 17.1 -> 17.2.x upgrade failure: umbracoUrlAlias property values whose
+    // tokens collide after normalization (literal dup, case-only, slash-only) produced two
+    // PublishedDocumentUrlAlias entries with the same (DocumentKey, LanguageId, Alias) tuple,
+    // which ToDictionary in Save() rejected with ArgumentException "An item with the same key
+    // has already been added".
+    [TestCase("foelelser, foelelser", "foelelser")]
+    [TestCase("UTM, utm", "utm")]
+    [TestCase("/foo/, foo", "foo")]
+    public void CreateOrUpdateAliasesAsync_Deduplicates_Normalization_Colliding_Aliases(string propertyValue, string expectedAlias)
+    {
+        var newPage = ContentBuilder.CreateSimpleContent(ContentType, "Duplicate Alias Page", RootPage.Id);
+        newPage.SetValue(Constants.Conventions.Content.UrlAlias, propertyValue);
+        ContentService.Save(newPage, -1);
+
+        Assert.DoesNotThrow(
+            () => ContentService.Publish(newPage, []),
+            "Publishing content with normalization-colliding tokens in umbracoUrlAlias should not throw.");
+
+        Assert.DoesNotThrowAsync(
+            () => DocumentUrlAliasService.CreateOrUpdateAliasesAsync(newPage.Key),
+            "CreateOrUpdateAliasesAsync should collapse duplicates, not throw.");
+
+        List<PublishedDocumentUrlAlias> stored;
+        using (CoreScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            stored = DocumentUrlAliasRepository.GetAll()
+                .Where(a => a.DocumentKey == newPage.Key)
+                .ToList();
+        }
+
+        Assert.That(stored, Has.Count.EqualTo(1), "Expected a single row after dedupe.");
+        Assert.That(stored[0].Alias, Is.EqualTo(expectedAlias));
+    }
+
+    [Test]
+    public void RebuildAllAliasesAsync_Deduplicates_Duplicates_From_Existing_Property_Data()
+    {
+        // Simulates the upgrade path: property data already contains "foelelser, foelelser" and
+        // RebuildAllAliasesAsync runs during InitAsync when the rebuild key changes.
+        var newPage = ContentBuilder.CreateSimpleContent(ContentType, "Rebuild Dup Page", RootPage.Id);
+        newPage.SetValue(Constants.Conventions.Content.UrlAlias, "foelelser, foelelser");
+        ContentService.Save(newPage, -1);
+
+        Assert.DoesNotThrow(() => ContentService.Publish(newPage, []));
+
+        Assert.DoesNotThrowAsync(
+            () => DocumentUrlAliasService.RebuildAllAliasesAsync(),
+            "Rebuild should collapse literal duplicates from existing property data, not throw.");
+
+        List<PublishedDocumentUrlAlias> stored;
+        using (CoreScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            stored = DocumentUrlAliasRepository.GetAll()
+                .Where(a => a.DocumentKey == newPage.Key)
+                .ToList();
+        }
+
+        Assert.That(stored, Has.Count.EqualTo(1));
+        Assert.That(stored[0].Alias, Is.EqualTo("foelelser"));
+    }
+
+    [Test]
+    public void DocumentUrlAliasRepository_Save_Silently_Dedupes_Duplicate_Input()
+    {
+        // Defensive: if a caller ever passes a list containing duplicate (DocumentKey, LanguageId, Alias)
+        // tuples, Save should collapse them rather than throwing ArgumentException from ToDictionary.
+        var documentKey = new Guid(PageWithNoAliasKey);
+        var duplicates = new List<PublishedDocumentUrlAlias>
+        {
+            new() { DocumentKey = documentKey, LanguageId = null, Alias = "dup-test" },
+            new() { DocumentKey = documentKey, LanguageId = null, Alias = "dup-test" },
+        };
+
+        using (ICoreScope scope = CoreScopeProvider.CreateCoreScope())
+        {
+            Assert.DoesNotThrow(() => DocumentUrlAliasRepository.Save(duplicates));
+            scope.Complete();
+        }
+
+        List<PublishedDocumentUrlAlias> stored;
+        using (CoreScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            stored = DocumentUrlAliasRepository.GetAll()
+                .Where(a => a.DocumentKey == documentKey && a.Alias == "dup-test")
+                .ToList();
+        }
+
+        Assert.That(stored, Has.Count.EqualTo(1));
+    }
+
+    #endregion
+
+    #region Draft Alias Should Not Affect Published Routing (Issue #23206)
+
+    [Test]
+    public async Task CreateOrUpdateAliasesAsync_Ignores_Draft_Alias_Colliding_With_Published_Alias_On_Another_Document()
+    {
+        var isoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
+
+        // Page A is already published (from setup) with alias "my-single-alias".
+        // Page B is saved as a draft only, reusing the same alias.
+        var pageB = ContentBuilder.CreateSimpleContent(ContentType, "Page B", RootPage.Id);
+        pageB.SetValue(Constants.Conventions.Content.UrlAlias, "my-single-alias");
+        ContentService.Save(pageB, -1);
+
+        await DocumentUrlAliasService.CreateOrUpdateAliasesAsync(pageB.Key);
+
+        // Only the published page (A) should resolve for the shared alias - the unpublished
+        // draft (B) must not evict or shadow it.
+        var result = (await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("my-single-alias", isoCode)).ToList();
+
+        Assert.That(result, Does.Contain(new Guid(PageWithSingleAliasKey)), "Published page should still resolve for the alias.");
+        Assert.That(result, Does.Not.Contain(pageB.Key), "Unpublished draft should not be resolvable via the alias.");
+    }
+
+    [Test]
+    public async Task CreateOrUpdateAliasesAsync_Ignores_Draft_Alias_Edit_On_Published_Document()
+    {
+        var isoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
+        var documentKey = new Guid(PageWithSingleAliasKey);
+
+        // Re-fetch the published content and change its alias without publishing.
+        var content = ContentService.GetById(documentKey)!;
+        content.SetValue(Constants.Conventions.Content.UrlAlias, "my-single-alias-draft-edit");
+        ContentService.Save(content, -1);
+
+        await DocumentUrlAliasService.CreateOrUpdateAliasesAsync(content.Key);
+
+        // The still-published alias should keep resolving; the unpublished draft alias should not.
+        Assert.That(await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("my-single-alias", isoCode), Does.Contain(documentKey));
+        Assert.That(await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("my-single-alias-draft-edit", isoCode), Is.Empty);
+    }
+
+    [Test]
+    public async Task CreateOrUpdateAliasesAsync_Ignores_Draft_Alias_Edit_On_Published_Variant_Culture()
+    {
+        // Arrange - create a culture-variant content type with a CULTURE-VARIED umbracoUrlAlias property,
+        // publish one culture with an alias, then edit that culture's alias as a draft without re-publishing.
+        var template = TemplateBuilder.CreateTextPageTemplate("variantDraftEditTemplate");
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+
+        var variantContentType = CreateCultureVariantContentTypeWithUrlAlias(template.Id, "pageWithVariantAliasDraftEdit");
+        await ContentTypeService.CreateAsync(variantContentType, Constants.Security.SuperUserKey);
+
+        var defaultLanguage = (await LanguageService.GetDefaultLanguageAsync())!;
+
+        var content = new ContentBuilder()
+            .WithContentType(variantContentType)
+            .WithCultureName(defaultLanguage.IsoCode, "Page With Variant Alias Draft Edit")
+            .Build();
+        content.SetValue(Constants.Conventions.Content.UrlAlias, "variant-published-alias", defaultLanguage.IsoCode);
+        content.ParentId = RootPage.Id;
+        ContentService.Save(content, -1);
+        ContentService.Publish(content, [defaultLanguage.IsoCode]);
+
+        await DocumentUrlAliasService.CreateOrUpdateAliasesAsync(content.Key);
+
+        // Sanity check - the published alias resolves before the draft edit.
+        Assert.That(await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("variant-published-alias", defaultLanguage.IsoCode), Does.Contain(content.Key));
+
+        // Act - edit the alias for the published culture and save without re-publishing.
+        var draftContent = ContentService.GetById(content.Key)!;
+        draftContent.SetValue(Constants.Conventions.Content.UrlAlias, "variant-draft-alias", defaultLanguage.IsoCode);
+        ContentService.Save(draftContent, -1);
+
+        await DocumentUrlAliasService.CreateOrUpdateAliasesAsync(draftContent.Key);
+
+        // Assert - the published alias should still resolve; the unpublished draft alias should not.
+        Assert.That(await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("variant-published-alias", defaultLanguage.IsoCode), Does.Contain(content.Key));
+        Assert.That(await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("variant-draft-alias", defaultLanguage.IsoCode), Is.Empty);
     }
 
     #endregion

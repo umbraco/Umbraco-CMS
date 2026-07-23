@@ -1,0 +1,278 @@
+import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/acceptance-test-helpers';
+import {expect} from '@playwright/test';
+
+const elementName = 'TestElementForRecycleBin';
+const elementFolderName = 'TestElementFolderForRecycleBin';
+const elementTypeName = 'TestElementTypeForRecycleBin';
+const dataTypeName = 'Textstring';
+let elementTypeId = '';
+
+test.beforeEach(async ({umbracoUi, umbracoApi}) => {
+  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+  elementTypeId = await umbracoApi.documentType.createElementTypeWithPropertyInTab(elementTypeName, 'TestTab', 'TestGroup', dataTypeName, dataTypeData.id);
+  await umbracoUi.goToBackOffice();
+});
+
+test.afterEach(async ({umbracoApi}) => {
+  await umbracoApi.element.ensureNameNotExists(elementName);
+  await umbracoApi.element.ensureNameNotExists(elementFolderName);
+  await umbracoApi.documentType.ensureNameNotExists(elementTypeName);
+  await umbracoApi.element.emptyRecycleBin();
+});
+
+test('can trash an element', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoApi.element.createDefaultElement(elementName, elementTypeId);
+  expect(await umbracoApi.element.doesNameExist(elementName)).toBeTruthy();
+  await umbracoUi.library.goToSection(ConstantHelper.sections.library);
+
+  // Act
+  await umbracoUi.library.clickActionsMenuForElement(elementName);
+  await umbracoUi.library.clickTrashActionMenuOption();
+  await umbracoUi.library.clickConfirmTrashButtonAndWaitForElementToBeTrashed();
+
+  // Assert
+  await expect.poll(() => umbracoApi.element.doesNameExist(elementName)).toBeFalsy();
+  await expect.poll(() => umbracoApi.element.doesItemExistInRecycleBin(elementName)).toBeTruthy();
+  await umbracoUi.library.isElementInTreeVisible(elementName, false);
+  await umbracoUi.library.isItemVisibleInRecycleBin(elementName);
+  // Verify audit trail
+  await umbracoUi.library.goToElementWithName(elementName);
+  await umbracoUi.library.clickInfoTab();
+  await umbracoUi.library.doesAnyHistoryItemHaveTag(ConstantHelper.auditTrailTypes.move);
+  await umbracoUi.library.doesAnyHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.elementMoved);
+  const currentUser = await umbracoApi.user.getCurrentUser();
+  await umbracoUi.library.doesHistoryItemHaveUsername(currentUser.name);
+  await umbracoUi.library.doesHistoryItemHaveUsername(currentUser.name, 1);
+});
+
+test('can trash an element folder with children', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const folderId = await umbracoApi.element.createDefaultElementFolder(elementFolderName);
+  await umbracoApi.element.createDefaultElementWithParent(elementName, elementTypeId, folderId);
+  expect(await umbracoApi.element.doesNameExist(elementFolderName)).toBeTruthy();
+  expect(await umbracoApi.element.doesNameExist(elementName)).toBeTruthy();
+  await umbracoUi.library.goToSection(ConstantHelper.sections.library);
+
+  // Act
+  await umbracoUi.library.clickActionsMenuForElement(elementFolderName);
+  await umbracoUi.library.clickTrashActionMenuOption();
+  await umbracoUi.library.clickConfirmTrashButtonAndWaitForElementFolderToBeTrashed();
+
+  // Assert
+  expect(await umbracoApi.element.doesNameExist(elementFolderName)).toBeFalsy();
+  expect(await umbracoApi.element.doesNameExist(elementName)).toBeFalsy();
+  expect(await umbracoApi.element.doesItemExistInRecycleBin(elementFolderName)).toBeTruthy();
+  await umbracoUi.library.isElementInTreeVisible(elementFolderName, false);
+});
+
+test('can empty recycle bin', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const elementId = await umbracoApi.element.createDefaultElement(elementName, elementTypeId);
+  await umbracoApi.element.moveToRecycleBin(elementId);
+  expect(await umbracoApi.element.doesItemExistInRecycleBin(elementName)).toBeTruthy();
+  await umbracoUi.library.goToSection(ConstantHelper.sections.library);
+
+  // Act
+  await umbracoUi.library.clickRecycleBinButton();
+  // Wait for the recycle bin to finish loading (the trashed item is shown in the collection) before opening
+  // the empty dialog: a late load re-render otherwise dismisses the just-opened confirm modal.
+  await umbracoUi.library.isElementVisibleInRecycleBinCollection(elementName);
+  await umbracoUi.library.clickEmptyRecycleBinButton();
+  await umbracoUi.library.clickConfirmEmptyRecycleBinButtonAndWaitForRecycleBinToBeEmptied();
+
+  // Assert
+  await expect.poll(() => umbracoApi.element.doesItemExistInRecycleBin(elementName)).toBeFalsy();
+});
+
+test('can see trashed element in recycle bin', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const elementId = await umbracoApi.element.createDefaultElement(elementName, elementTypeId);
+  await umbracoApi.element.moveToRecycleBin(elementId);
+
+  // Act
+  await umbracoUi.library.goToSection(ConstantHelper.sections.library);
+
+  // Assert
+  await umbracoUi.library.isItemVisibleInRecycleBin(elementName);
+});
+
+test('can see trashed element folder in recycle bin', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const elementFolderId = await umbracoApi.element.createDefaultElementFolder(elementFolderName);
+  await umbracoApi.element.moveToRecycleBin(elementFolderId, true);
+
+  // Act
+  await umbracoUi.library.goToSection(ConstantHelper.sections.library);
+
+  // Assert
+  await umbracoUi.library.isItemVisibleInRecycleBin(elementFolderName);
+});
+
+test('can delete element from recycle bin', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const elementId = await umbracoApi.element.createDefaultElement(elementName, elementTypeId);
+  await umbracoApi.element.moveToRecycleBin(elementId);
+  expect(await umbracoApi.element.doesItemExistInRecycleBin(elementName)).toBeTruthy();
+  await umbracoUi.library.goToSection(ConstantHelper.sections.library);
+  await umbracoUi.library.isItemVisibleInRecycleBin(elementName);
+
+  // Act
+  await umbracoUi.library.clickDeleteButtonForTrashedElememtWithName(elementName);
+  await umbracoUi.library.clickConfirmToDeleteButtonAndWaitForElementToBeDeleted();
+
+  // Assert
+  expect(await umbracoApi.element.doesItemExistInRecycleBin(elementName)).toBeFalsy();
+});
+
+test('can delete element folder from recycle bin', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const elementFolderId = await umbracoApi.element.createDefaultElementFolder(elementFolderName);
+  await umbracoApi.element.moveToRecycleBin(elementFolderId, true);
+  expect(await umbracoApi.element.doesItemExistInRecycleBin(elementFolderName)).toBeTruthy();
+  await umbracoUi.library.goToSection(ConstantHelper.sections.library);
+  await umbracoUi.library.isItemVisibleInRecycleBin(elementFolderName);
+
+  // Act
+  await umbracoUi.library.clickDeleteButtonForTrashedElememtWithName(elementFolderName);
+  await umbracoUi.library.clickConfirmToDeleteButtonAndWaitForElementToBeDeleted();
+
+  // Assert
+  expect(await umbracoApi.element.doesItemExistInRecycleBin(elementFolderName)).toBeFalsy();
+});
+
+test('can delete element folder with children from recycle bin', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const folderId = await umbracoApi.element.createDefaultElementFolder(elementFolderName);
+  await umbracoApi.element.createDefaultElementWithParent(elementName, elementTypeId, folderId);
+  await umbracoApi.element.moveToRecycleBin(folderId, true);
+  expect(await umbracoApi.element.doesItemExistInRecycleBin(elementFolderName)).toBeTruthy();
+  await umbracoUi.library.goToSection(ConstantHelper.sections.library);
+  await umbracoUi.library.isItemVisibleInRecycleBin(elementFolderName);
+
+  // Act
+  await umbracoUi.library.clickDeleteButtonForTrashedElememtWithName(elementFolderName);
+  await umbracoUi.library.clickConfirmToDeleteButtonAndWaitForElementToBeDeleted();
+
+  // Assert
+  expect(await umbracoApi.element.doesItemExistInRecycleBin(elementFolderName)).toBeFalsy();
+  expect(await umbracoApi.element.doesNameExist(elementName)).toBeFalsy();
+});
+
+test('can delete child element from recycle bin', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const folderId = await umbracoApi.element.createDefaultElementFolder(elementFolderName);
+  const elementId = await umbracoApi.element.createDefaultElementWithParent(elementName, elementTypeId, folderId);
+  await umbracoApi.element.moveToRecycleBin(elementId);
+  expect(await umbracoApi.element.doesItemExistInRecycleBin(elementName)).toBeTruthy();
+  await umbracoUi.library.goToSection(ConstantHelper.sections.library);
+  await umbracoUi.library.isItemVisibleInRecycleBin(elementName);
+
+  // Act
+  await umbracoUi.library.clickDeleteButtonForTrashedElememtWithName(elementName);
+  await umbracoUi.library.clickConfirmToDeleteButtonAndWaitForElementToBeDeleted();
+
+  // Assert
+  expect(await umbracoApi.element.doesItemExistInRecycleBin(elementName)).toBeFalsy();
+  // Verify the parent folder still exists
+  expect(await umbracoApi.element.doesNameExist(elementFolderName)).toBeTruthy();
+});
+
+test('can restore element from recycle bin', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const elementId = await umbracoApi.element.createDefaultElement(elementName, elementTypeId);
+  await umbracoApi.element.moveToRecycleBin(elementId);
+  expect(await umbracoApi.element.doesItemExistInRecycleBin(elementName)).toBeTruthy();
+
+  // Act
+  await umbracoUi.library.goToSection(ConstantHelper.sections.library);
+  await umbracoUi.library.isItemVisibleInRecycleBin(elementName);
+  await umbracoUi.library.clickActionsMenuForElement(elementName);
+  await umbracoUi.library.clickRestoreActionMenuOption();
+  await umbracoUi.library.isRestoreFromRecycleBinMessageVisible(elementName, 'Root');
+  await umbracoUi.library.clickRestoreButton();
+
+  // Assert
+  await umbracoUi.library.doesSuccessNotificationHaveText(NotificationConstantHelper.success.restored);
+  expect(await umbracoApi.element.doesItemExistInRecycleBin(elementName)).toBeFalsy();
+  expect(await umbracoApi.element.doesNameExist(elementName)).toBeTruthy();
+  await umbracoUi.library.isElementInTreeVisible(elementName);
+  // Verify audit trail
+  await umbracoUi.reloadPage();
+  await umbracoUi.library.goToElementWithName(elementName);
+  await umbracoUi.library.clickInfoTab();
+  await umbracoUi.library.doesAnyHistoryItemHaveTag(ConstantHelper.auditTrailTypes.move);
+  await umbracoUi.library.doesAnyHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.elementMoved);
+  const currentUser = await umbracoApi.user.getCurrentUser();
+  await umbracoUi.library.doesHistoryItemHaveUsername(currentUser.name);
+});
+
+test('can restore element folder from recycle bin', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const elementFolderId = await umbracoApi.element.createDefaultElementFolder(elementFolderName);
+  await umbracoApi.element.moveToRecycleBin(elementFolderId, true);
+  expect(await umbracoApi.element.doesItemExistInRecycleBin(elementFolderName)).toBeTruthy();
+
+  // Act
+  await umbracoUi.library.goToSection(ConstantHelper.sections.library);
+  await umbracoUi.library.isItemVisibleInRecycleBin(elementFolderName);
+  await umbracoUi.library.clickActionsMenuForElement(elementFolderName);
+  await umbracoUi.library.clickRestoreActionMenuOption();
+  await umbracoUi.library.isRestoreFromRecycleBinMessageVisible(elementFolderName, 'Root');
+  await umbracoUi.library.clickRestoreButton();
+
+  // Assert
+  await umbracoUi.library.doesSuccessNotificationHaveText(NotificationConstantHelper.success.restored);
+  expect(await umbracoApi.element.doesItemExistInRecycleBin(elementFolderName)).toBeFalsy();
+  expect(await umbracoApi.element.doesNameExist(elementFolderName)).toBeTruthy();
+  await umbracoUi.library.isElementInTreeVisible(elementFolderName);
+});
+
+test('can restore child element from recycle bin back to its parent folder', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const folderId = await umbracoApi.element.createDefaultElementFolder(elementFolderName);
+  const elementId = await umbracoApi.element.createDefaultElementWithParent(elementName, elementTypeId, folderId);
+  await umbracoApi.element.moveToRecycleBin(elementId);
+  expect(await umbracoApi.element.doesItemExistInRecycleBin(elementName)).toBeTruthy();
+  expect(await umbracoApi.element.doesNameExist(elementFolderName)).toBeTruthy();
+
+  // Act
+  await umbracoUi.library.goToSection(ConstantHelper.sections.library);
+  await umbracoUi.library.isItemVisibleInRecycleBin(elementName);
+  await umbracoUi.library.clickActionsMenuForElement(elementName);
+  await umbracoUi.library.clickRestoreActionMenuOption();
+  await umbracoUi.library.isRestoreFromRecycleBinMessageVisible(elementName, elementFolderName);
+  await umbracoUi.library.clickRestoreButton();
+
+  // Assert
+  await umbracoUi.library.doesSuccessNotificationHaveText(NotificationConstantHelper.success.restored);
+  expect(await umbracoApi.element.doesItemExistInRecycleBin(elementName)).toBeFalsy();
+  expect(await umbracoApi.element.doesNameExist(elementName)).toBeTruthy();
+  // Verify the element is restored back under its parent folder
+  const children = await umbracoApi.element.getChildren(folderId);
+  expect(children.some(child => child.name === elementName)).toBeTruthy();
+});
+
+test('can restore element folder with children from recycle bin', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const folderId = await umbracoApi.element.createDefaultElementFolder(elementFolderName);
+  await umbracoApi.element.createDefaultElementWithParent(elementName, elementTypeId, folderId);
+  await umbracoApi.element.moveToRecycleBin(folderId, true);
+  expect(await umbracoApi.element.doesItemExistInRecycleBin(elementFolderName)).toBeTruthy();
+
+  // Act
+  await umbracoUi.library.goToSection(ConstantHelper.sections.library);
+  await umbracoUi.library.isItemVisibleInRecycleBin(elementFolderName);
+  await umbracoUi.library.clickActionsMenuForElement(elementFolderName);
+  await umbracoUi.library.clickRestoreActionMenuOption();
+  await umbracoUi.library.isRestoreFromRecycleBinMessageVisible(elementFolderName, 'Root');
+  await umbracoUi.library.clickRestoreButton();
+
+  // Assert
+  await umbracoUi.library.doesSuccessNotificationHaveText(NotificationConstantHelper.success.restored);
+  expect(await umbracoApi.element.doesItemExistInRecycleBin(elementFolderName)).toBeFalsy();
+  expect(await umbracoApi.element.doesNameExist(elementFolderName)).toBeTruthy();
+  expect(await umbracoApi.element.doesNameExist(elementName)).toBeTruthy();
+  await umbracoUi.library.isElementInTreeVisible(elementFolderName);
+});
+

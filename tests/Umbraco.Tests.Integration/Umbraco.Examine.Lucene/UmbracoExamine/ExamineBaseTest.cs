@@ -138,11 +138,20 @@ public abstract class ExamineBaseTest : UmbracoIntegrationTest
 
     protected async Task ExecuteAndWaitForIndexing(Action indexUpdatingAction, string indexName) =>
         await ExecuteAndWaitForIndexing<int?>(
-            () =>
+            (Func<int?>)(() =>
             {
                 indexUpdatingAction();
                 return null;
-            },
+            }),
+            indexName);
+
+    protected async Task ExecuteAndWaitForIndexing(Func<Task> indexUpdatingAction, string indexName) =>
+        await ExecuteAndWaitForIndexing<int?>(
+            (Func<Task<int?>>)(async () =>
+            {
+                await indexUpdatingAction();
+                return null;
+            }),
             indexName);
 
     /// <summary>
@@ -167,6 +176,25 @@ public abstract class ExamineBaseTest : UmbracoIntegrationTest
 
         // Perform the action, and wait for the handle to be freed, meaning the index is done populating.
         var result = indexUpdatingAction();
+        await indexingHandle.WaitOneAsync(millisecondsTimeout: IndexingTimoutInMilliseconds);
+        return result;
+    }
+
+    protected async Task<T> ExecuteAndWaitForIndexing<T> (Func<Task<T>> indexUpdatingAction, string indexName)
+    {
+        // Set up an action to release the handle when the index is populated.
+        if (ExamineManager.TryGetIndex(indexName, out IIndex index) is false)
+        {
+            throw new InvalidOperationException($"Could not find index: {indexName}");
+        }
+
+        index.IndexOperationComplete += (_, _) =>
+        {
+            indexingHandle.Set();
+        };
+
+        // Perform the action, and wait for the handle to be freed, meaning the index is done populating.
+        var result = await indexUpdatingAction();
         await indexingHandle.WaitOneAsync(millisecondsTimeout: IndexingTimoutInMilliseconds);
         return result;
     }

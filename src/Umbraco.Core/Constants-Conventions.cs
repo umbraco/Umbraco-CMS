@@ -36,6 +36,14 @@ public static partial class Constants
             ///     The key used to store the Umbraco pre-migrations upgrade plan state.
             /// </summary>
             public const string UmbracoUpgradePlanPremigrationsKey = KeyValuePrefix + UmbracoUpgradePlanPremigrationsName;
+
+            /// <summary>
+            ///     The key used to coordinate migration leadership across servers in a load-balanced
+            ///     environment. The value is either empty (no active leader) or
+            ///     <c>"{machineIdentifier}|{claimedAtUtc:O}"</c> when a server holds the claim,
+            ///     where <c>machineIdentifier</c> is the value returned by <see cref="Umbraco.Cms.Core.Factories.IMachineInfoFactory.GetMachineIdentifier"/>.
+            /// </summary>
+            public const string UpgradeLockKey = "Umbraco.Core.Upgrader.Lock";
         }
 
         /// <summary>
@@ -161,6 +169,25 @@ public static partial class Constants
             ///     Suffix added to media files when moved to the recycle bin when recycle bin media protection is enabled.
             /// </summary>
             public const string TrashedMediaSuffix = ".deleted";
+
+            /// <summary>
+            ///     Constants for the keys of built-in Umbraco media property types.
+            /// </summary>
+            public static class PropertyTypeKeys
+            {
+                // Must stay in sync between the clean install (DatabaseDataCreator) and the AddDimensionsToSvg
+                // upgrade migration so upgraded and clean-installed sites end up identical.
+
+                /// <summary>
+                ///     Key of the Width property type on the built-in Vector Graphics media type.
+                /// </summary>
+                public const string VectorGraphicsWidth = "5BC7E468-C53E-41A6-A522-2723F3B94514";
+
+                /// <summary>
+                ///     Key of the Height property type on the built-in Vector Graphics media type.
+                /// </summary>
+                public const string VectorGraphicsHeight = "9E4C2B59-6BC6-4648-BB71-B0F45DDBC274";
+            }
         }
 
         /// <summary>
@@ -258,6 +285,18 @@ public static partial class Constants
             ///     if a role starts with __umbracoRole we won't show it as it's an internal role used for public access
             /// </summary>
             public static readonly string InternalRolePrefix = "__umbracoRole";
+
+            /// <summary>
+            ///     Notification-state key that flags a save as touching only login-related properties
+            ///     (e.g. <c>LastLoginDate</c>, <c>SecurityStamp</c>).
+            /// </summary>
+            public const string LoginPropertiesOnlyStateKey = "LoginPropertiesOnly";
+
+            /// <summary>
+            ///     Notification-state key that indicates whether any indexable field changed as part of the save.
+            ///     When explicitly set to <c>false</c>, Examine indexing for the affected member is skipped.
+            /// </summary>
+            public const string IndexableFieldsChangedStateKey = "IndexableFieldsChanged";
         }
 
         /// <summary>
@@ -328,6 +367,16 @@ public static partial class Constants
             public const string RelatedDocumentAlias = "umbDocument";
 
             /// <summary>
+            ///     Name for default relation type "Related Element".
+            /// </summary>
+            public const string RelatedElementName = "Related Element";
+
+            /// <summary>
+            ///     Alias for default relation type "Related Element".
+            /// </summary>
+            public const string RelatedElementAlias = "umbElement";
+
+            /// <summary>
             ///     Name for default relation type "Relate Document On Copy".
             /// </summary>
             public const string RelateDocumentOnCopyName = "Relate Document On Copy";
@@ -358,13 +407,33 @@ public static partial class Constants
             public const string RelateParentMediaFolderOnDeleteAlias = "relateParentMediaFolderOnDelete";
 
             /// <summary>
+            ///     Name for default relation type "Relate Parent Element Container On Element Delete".
+            /// </summary>
+            public const string RelateParentElementContainerOnElementDeleteName = "Relate Parent Element Container On Element Delete";
+
+            /// <summary>
+            ///     Alias for default relation type "Relate Parent Element Container On Element Delete".
+            /// </summary>
+            public const string RelateParentElementContainerOnElementDeleteAlias = "relateParentElementContainerOnElementDelete";
+
+            /// <summary>
+            ///     Name for default relation type "Relate Parent Element Container On Container Delete".
+            /// </summary>
+            public const string RelateParentElementContainerOnContainerDeleteName = "Relate Parent Element Container On Container Delete";
+
+            /// <summary>
+            ///     Alias for default relation type "Relate Parent Element Container On Container Delete".
+            /// </summary>
+            public const string RelateParentElementContainerOnContainerDeleteAlias = "relateParentElementContainerOnContainerDelete";
+
+            /// <summary>
             ///     Returns the types of relations that are automatically tracked.
             /// </summary>
             /// <remarks>
             ///     Developers should not manually use these relation types since they will all be cleared whenever an entity
-            ///     (content, media or member) is saved since they are auto-populated based on property values.
+            ///     (content, media, member or element) is saved since they are auto-populated based on property values.
             /// </remarks>
-            public static string[] AutomaticRelationTypes { get; } = { RelatedMediaAlias, RelatedMemberAlias, RelatedDocumentAlias };
+            public static string[] AutomaticRelationTypes { get; } = { RelatedMediaAlias, RelatedMemberAlias, RelatedDocumentAlias, RelatedElementAlias };
 
             // TODO: return a list of built in types so we can use that to prevent deletion in the UI
         }
