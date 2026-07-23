@@ -67,23 +67,18 @@ describe('UmbAuthSessionTimeoutController', () => {
 
 	/**
 	 * Injects a session into the auth context via the cross-tab BroadcastChannel,
-	 * the same way a peer tab would share a refreshed session.
-	 * @param accessTokenExpiresInSeconds Seconds until the access token expires.
-	 * @param sessionExpiresInSeconds Seconds until the full session (refresh token) expires.
+	 * the same way a peer tab would share a newly-established session.
+	 * @param expiresInSeconds Seconds until the session expires.
 	 */
-	async function injectSession(accessTokenExpiresInSeconds: number, sessionExpiresInSeconds: number) {
+	async function injectSession(expiresInSeconds: number) {
 		const now = Math.floor(Date.now() / 1000);
-		channel.postMessage({
-			type: 'sessionUpdate',
-			accessTokenExpiresAt: now + accessTokenExpiresInSeconds,
-			expiresAt: now + sessionExpiresInSeconds,
-		});
+		channel.postMessage({ type: 'authorized', expiresIn: expiresInSeconds, issuedAt: now });
 		// Wait for the BroadcastChannel message to be delivered and observed
 		await aTimeout(50);
 	}
 
 	it('opens the timeout modal when the session enters the warning zone', async () => {
-		await injectSession(5, 10);
+		await injectSession(10);
 
 		expect(openedModals).to.have.lengthOf(1);
 		expect(openedModals[0].remainingTimeInSeconds).to.be.greaterThan(0);
@@ -93,7 +88,7 @@ describe('UmbAuthSessionTimeoutController', () => {
 
 	it('does not time out when "Stay logged in" successfully renews the session', async () => {
 		context.keepAlive = async () => true;
-		await injectSession(5, 10);
+		await injectSession(10);
 
 		expect(openedModals).to.have.lengthOf(1);
 		openedModals[0].onContinue();
@@ -104,7 +99,7 @@ describe('UmbAuthSessionTimeoutController', () => {
 
 	it('times out when "Stay logged in" fails to renew the session', async () => {
 		context.keepAlive = async () => false;
-		await injectSession(5, 10);
+		await injectSession(10);
 
 		expect(openedModals).to.have.lengthOf(1);
 		openedModals[0].onContinue();
@@ -117,7 +112,7 @@ describe('UmbAuthSessionTimeoutController', () => {
 		this.timeout(5000);
 
 		// Session expires in 17s, warning buffer is 15s, so the warning timer is scheduled 2s out.
-		await injectSession(5, 17);
+		await injectSession(17);
 		expect(openedModals).to.have.lengthOf(0);
 
 		// Simulate system sleep / background-tab throttling: the wall clock jumps past the
