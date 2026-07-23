@@ -48,7 +48,6 @@ test('can create a member type in a folder using create options', async ({umbrac
   // Arrange
   const parentFolderId = await umbracoApi.memberType.createFolder(memberTypeFolderName);
   await umbracoUi.memberType.reloadMemberTypeTree();
-  await umbracoUi.memberType.reloadMemberTypeTree();
 
   // Act
   await umbracoUi.memberType.clickActionsMenuForMemberType(memberTypeFolderName);
@@ -69,7 +68,6 @@ test('can create a member type folder in a folder using create options', async (
   const childFolderName = 'Test Child Folder';
   await umbracoApi.memberType.ensureNameNotExists(childFolderName);
   const parentFolderId = await umbracoApi.memberType.createFolder(memberTypeFolderName);
-  await umbracoUi.memberType.reloadMemberTypeTree();
   await umbracoUi.memberType.reloadMemberTypeTree();
 
   // Act
