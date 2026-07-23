@@ -91,8 +91,8 @@ describe('UmbAuthSessionTimeoutController', () => {
 		expect(timeOutCalls).to.equal(0);
 	});
 
-	it('does not time out when "Stay logged in" successfully refreshes the session', async () => {
-		context.validateToken = async () => true;
+	it('does not time out when "Stay logged in" successfully renews the session', async () => {
+		context.keepAlive = async () => true;
 		await injectSession(5, 10);
 
 		expect(openedModals).to.have.lengthOf(1);
@@ -102,8 +102,8 @@ describe('UmbAuthSessionTimeoutController', () => {
 		expect(timeOutCalls).to.equal(0);
 	});
 
-	it('times out when "Stay logged in" fails to refresh the session', async () => {
-		context.validateToken = async () => false;
+	it('times out when "Stay logged in" fails to renew the session', async () => {
+		context.keepAlive = async () => false;
 		await injectSession(5, 10);
 
 		expect(openedModals).to.have.lengthOf(1);
