@@ -213,30 +213,6 @@ stages:
                     throw ("Error installing DocFX")
                 }
           - task: PowerShell@2
-            displayName: Pin MSBuild for DocFX
-            inputs:
-              targetType: inline
-              script: |
-                # DocFX 2.59.4 is old and, left to discover MSBuild itself, ends up mixing
-                # Microsoft.Build.* assemblies from different locations on the hosted
-                # 'windows-latest' image. Since that image was updated, this surfaces as a
-                # TypeLoadException ("Method 'DisposeAsync' in type
-                # Microsoft.Build.Experimental.ProjectCache.ProjectCacheService ... does not have
-                # an implementation") and 'docfx metadata' fails. Pin DocFX to the single,
-                # coherent MSBuild that ships with the SDK resolved from global.json so every
-                # Microsoft.Build.* assembly loads from the same place. This is an out-of-support
-                # version so we are not upgrading DocFX; if this best-effort fix stops working the
-                # docs stage may fail, but it no longer blocks the NuGet release.
-                $sdkVersion = (& dotnet --version).Trim()
-                $sdkLine = & dotnet --list-sdks | Where-Object { $_ -like "$sdkVersion *" } | Select-Object -First 1
-                $sdkBase = [regex]::Match($sdkLine, '\[(.+)\]').Groups[1].Value
-                $msbuildPath = Join-Path (Join-Path $sdkBase $sdkVersion) 'MSBuild.dll'
-                if (-not (Test-Path $msbuildPath)) {
-                    throw ("Could not locate MSBuild to pin for DocFX at '$msbuildPath'.")
-                }
-                Write-Host "Pinning MSBUILD_EXE_PATH to $msbuildPath"
-                Write-Host "##vso[task.setvariable variable=MSBUILD_EXE_PATH]$msbuildPath"
-          - task: PowerShell@2
             displayName: Generate metadata
             inputs:
               targetType: inline
