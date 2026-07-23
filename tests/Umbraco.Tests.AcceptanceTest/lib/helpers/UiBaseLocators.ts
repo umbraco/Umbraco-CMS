@@ -255,7 +255,7 @@ export class UiBaseLocators extends BasePage {
     this.confirmBtn = page.getByLabel("Confirm");
     // The element/entity pickers render two "Choose" controls (a modal-opening link and a button)
     // with the same accessible name; .first() keeps this unambiguous (a no-op for single-Choose pickers).
-    this.chooseBtn = page.getByLabel("Choose", { exact: true }).first();
+    this.chooseBtn = page.getByLabel("Choose", { exact: true });
     // The tree-picker modal's primary confirm button is labelled by its action: "Choose" for entity
     // pickers, "Move" for a move, "Copy" for a duplicate. Match any so one helper covers all three.
     this.chooseModalBtn = page
