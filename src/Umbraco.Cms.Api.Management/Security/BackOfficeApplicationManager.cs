@@ -22,8 +22,8 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
     private readonly IRuntimeState _runtimeState;
     private readonly ILogger<BackOfficeApplicationManager> _logger;
     private readonly Uri? _backOfficeHost;
-    private readonly string _authorizeCallbackPathName;
-    private readonly string _authorizeCallbackLogoutPathName;
+    private readonly string _callbackPathName;
+    private readonly string _effectiveLogoutPathName;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="BackOfficeApplicationManager"/> class.
@@ -45,8 +45,8 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
         _runtimeState = runtimeState;
         _logger = logger;
         _backOfficeHost = securitySettings.Value.BackOfficeHost;
-        _authorizeCallbackPathName = securitySettings.Value.AuthorizeCallbackPathName;
-        _authorizeCallbackLogoutPathName = securitySettings.Value.AuthorizeCallbackLogoutPathName;
+        _callbackPathName = securitySettings.Value.CallbackPathName;
+        _effectiveLogoutPathName = securitySettings.Value.GetEffectiveLogoutPathName();
     }
 
     /// <summary>
@@ -260,9 +260,9 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
 
         foreach (Uri backOfficeHost in backOfficeHosts)
         {
-            descriptor.RedirectUris.Add(CallbackUrlFor(backOfficeHost, _authorizeCallbackPathName));
-            descriptor.PostLogoutRedirectUris.Add(CallbackUrlFor(backOfficeHost, _authorizeCallbackPathName));
-            descriptor.PostLogoutRedirectUris.Add(CallbackUrlFor(backOfficeHost, _authorizeCallbackLogoutPathName));
+            descriptor.RedirectUris.Add(CallbackUrlFor(backOfficeHost, _callbackPathName));
+            descriptor.PostLogoutRedirectUris.Add(CallbackUrlFor(backOfficeHost, _callbackPathName));
+            descriptor.PostLogoutRedirectUris.Add(CallbackUrlFor(backOfficeHost, _effectiveLogoutPathName));
         }
 
         return descriptor;
