@@ -9,15 +9,15 @@
     }
   },
   "profiles": {
-    "Umbraco.Web.UI": {
+    "Kestrel": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": true,
       "applicationUrl": "https://localhost:HTTPS_PORT_FROM_TEMPLATE;http://localhost:HTTP_PORT_FROM_TEMPLATE",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
-      }      
-    },    
+      }
+    },
     "IIS Express": {
       "commandName": "IISExpress",
       "launchBrowser": true,
