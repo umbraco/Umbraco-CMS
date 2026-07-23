@@ -303,6 +303,34 @@ export class UmbAuthContext extends UmbContextBase {
 	}
 
 	/**
+	 * Initiates external login for the given provider by opening a popup pointed at the server's
+	 * cookie-based external login challenge endpoint. The server redirects to the provider, then
+	 * back through its callback (which sets the auth cookie), then to the client's auth-callback
+	 * lander, which broadcasts `authorized` and closes the popup. No PKCE/OIDC state is involved —
+	 * the httpOnly auth cookie set by the server is the sole credential.
+	 * @param {string} provider The provider to log in with.
+	 * @param {ManifestAuthProvider} manifest The manifest for the registered provider, used for the popup target/features.
+	 */
+	startExternalLogin(provider: string, manifest?: ManifestAuthProvider): void {
+		const challengeUrl = new URL(`${this.#serverUrl}/umbraco/management/api/v1/security/back-office/external-login`);
+		challengeUrl.searchParams.set('provider', provider);
+
+		// Preserve where the user was so context carries through the flow. Skip a bare backoffice
+		// root — the server already defaults there, so a returnUrl would just be noise.
+		const returnPath = window.location.pathname + window.location.search;
+		if (returnPath !== this.#backofficePath) {
+			challengeUrl.searchParams.set('returnUrl', returnPath);
+		}
+
+		const popupTarget = manifest?.meta?.behavior?.popupTarget ?? 'umbracoAuthPopup';
+		const popupFeatures =
+			manifest?.meta?.behavior?.popupFeatures ??
+			'width=600,height=600,menubar=no,location=no,resizable=yes,scrollbars=yes,status=no,toolbar=no';
+
+		window.open(challengeUrl.href, popupTarget, popupFeatures);
+	}
+
+	/**
 	 * Completes the login flow.
 	 * This is called on the oauth_complete page to exchange the authorization code for tokens.
 	 * @returns The token response timing, or null if no authorization was pending.
