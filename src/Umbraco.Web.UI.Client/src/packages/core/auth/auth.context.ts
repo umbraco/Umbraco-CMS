@@ -21,13 +21,6 @@ import { isTestEnvironment } from '@umbraco-cms/backoffice/utils';
 import { UserService } from '@umbraco-cms/backoffice/external/backend-api';
 
 /**
- * The multiplier for the token expiry time.
- * In Umbraco, access_tokens live for a quarter of the time of the refresh_token.
- * We multiply by this to get the full session lifetime.
- */
-const TOKEN_EXPIRY_MULTIPLIER = 4;
-
-/**
  * TEMPORARY TESTING BYPASS — NOT FOR PRODUCTION.
  *
  * When true, the backoffice skips the OpenID Connect authorization-code / token-exchange
@@ -95,6 +88,7 @@ export class UmbAuthContext extends UmbContextBase {
 	#linkEndpoint;
 	#linkKeyEndpoint;
 	#unlinkEndpoint;
+	#keepAliveEndpoint;
 	#postLogoutRedirectUri;
 
 	/**
@@ -154,6 +148,7 @@ export class UmbAuthContext extends UmbContextBase {
 		this.#linkEndpoint = endpoints.linkEndpoint;
 		this.#linkKeyEndpoint = endpoints.linkKeyEndpoint;
 		this.#unlinkEndpoint = endpoints.unlinkEndpoint;
+		this.#keepAliveEndpoint = `${serverUrl}/umbraco/management/api/v1/security/back-office/keep-alive`;
 
 		this.#client = new UmbAuthClient(endpoints, redirectUri);
 
@@ -418,17 +413,57 @@ export class UmbAuthContext extends UmbContextBase {
 			return;
 		}
 
-		// Cookie auth: ask the server whether we're logged in. current-user/configuration is
-		// behind BackOfficeAccess, so a 200 means authorized, anything else means not. Raw fetch
-		// (not the configured client) so a boot 401 doesn't feed the interceptor's re-auth retry
-		// machinery.
-		//
-		// redirect: 'manual' is important. When unauthenticated, the back-office cookie middleware's
-		// OnRedirectToLogin issues a 302 to /umbraco/login for non-XHR requests; following it would
-		// return the login HTML as a 200 that we'd mistake for a valid session. Manual mode turns any
-		// such redirect into an opaque, non-ok response (status 0) so it's correctly read as
-		// unauthorized — the actual navigation to the login screen is driven solely by the app auth
-		// controller, never by this probe.
+		await this.#establishSessionFromServer();
+	}
+
+	/**
+	 * Extends the current back-office session and returns whether it succeeded.
+	 *
+	 * This is the canonical, reusable way to keep a session alive: it pings the server keep-alive
+	 * endpoint (which re-issues the auth cookie with a fresh expiry, regardless of the
+	 * `KeepUserLoggedIn` setting), then re-reads the new expiry and refreshes the local session — so
+	 * `session$` emits, the timeout is rescheduled, and any open timeout modal is dismissed.
+	 *
+	 * Call it from anywhere holding the auth context: the session-timeout "Stay logged in" action, a
+	 * future activity-based auto-renewer, or an extension that needs to hold a session open during
+	 * long-running work. Safe to call repeatedly; it returns `false` (rather than throwing) when the
+	 * renewal fails, so callers can decide whether to fall back to sign-out / re-login.
+	 * @returns True if the session was renewed, otherwise false.
+	 */
+	async keepAlive(): Promise<boolean> {
+		try {
+			// The keep-alive endpoint is on BackOfficeController, which is [ApiExplorerSettings(IgnoreApi
+			// = true)] — it never appears in OpenApi.json, so there is no generated client method and a
+			// direct fetch is the intended approach, not a stopgap. redirect: 'manual' stops an
+			// unauthenticated 302 from being followed and mistaken for success.
+			const response = await fetch(this.#keepAliveEndpoint, {
+				method: 'POST',
+				credentials: 'include',
+				redirect: 'manual',
+				headers: { Accept: 'application/json' },
+			});
+			if (!response.ok) {
+				return false;
+			}
+		} catch {
+			return false;
+		}
+
+		// The cookie's expiry was renewed server-side; re-read it and refresh the local session.
+		return this.#establishSessionFromServer();
+	}
+
+	/**
+	 * Probes current-user/configuration and applies the resulting session locally (and broadcasts to
+	 * peer tabs). Returns true when authorized, false otherwise.
+	 *
+	 * redirect: 'manual' is important. When unauthenticated, the back-office cookie middleware's
+	 * OnRedirectToLogin issues a 302 to /umbraco/login for non-XHR requests; following it would return
+	 * the login HTML as a 200 that we'd mistake for a valid session. Manual mode turns any such
+	 * redirect into an opaque, non-ok response (status 0) so it reads as unauthorized — navigation to
+	 * the login screen is driven solely by the app auth controller, never by this probe.
+	 */
+	async #establishSessionFromServer(): Promise<boolean> {
 		try {
 			// This is a direct call to the backend API to check the current user configuration, so we have to avoid tryExecute() here, otherwise it will trigger a redirect to the login page if the user is not authenticated. Instead, we want to handle the response manually and set the session state accordingly.
 			// eslint-disable-next-line local-rules/no-direct-api-import
@@ -440,7 +475,7 @@ export class UmbAuthContext extends UmbContextBase {
 			if (!response.ok) {
 				this.#session.setValue(undefined);
 				this.#isAuthorized.setValue(false);
-				return;
+				return false;
 			}
 
 			const issuedAt = Math.floor(Date.now() / 1000);
@@ -454,9 +489,11 @@ export class UmbAuthContext extends UmbContextBase {
 			// handler and dismisses the modal, instead of waiting for its own countdown to lapse.
 			// The handler applies the session locally without re-broadcasting, so no message storm.
 			this.#channel.postMessage({ type: 'authorized', expiresIn, issuedAt });
+			return true;
 		} catch {
 			this.#session.setValue(undefined);
 			this.#isAuthorized.setValue(false);
+			return false;
 		}
 	}
 
@@ -822,14 +859,14 @@ export class UmbAuthContext extends UmbContextBase {
 	 * with a short expiresIn causes #onSessionExpiring to fire immediately).
 	 */
 	#setSessionLocally(expiresIn: number, issuedAt: number) {
-		const accessTokenExpiresAt = issuedAt + expiresIn;
-		// The access_token lives for 1/4 of the refresh_token lifetime.
-		// Multiply to get the full session expiry.
-		const expiresAt = issuedAt + expiresIn * TOKEN_EXPIRY_MULTIPLIER;
+		// Cookie auth: the session has a single, server-owned expiry (the auth cookie's), so both
+		// timestamps are the same — the historical access-vs-refresh token split (and its ×4
+		// multiplier) no longer applies. TODO (V19 cleanup): collapse UmbAuthSession to one expiresAt.
+		const expiresAt = issuedAt + expiresIn;
 		this.#sessionDead = false;
 		this.#inSessionUpdateCallback = true;
 		try {
-			this.#session.setValue({ accessTokenExpiresAt, expiresAt });
+			this.#session.setValue({ accessTokenExpiresAt: expiresAt, expiresAt });
 			this.#isAuthorized.setValue(true);
 		} finally {
 			this.#inSessionUpdateCallback = false;
