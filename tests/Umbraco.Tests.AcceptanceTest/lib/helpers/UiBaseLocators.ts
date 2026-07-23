@@ -934,7 +934,9 @@ export class UiBaseLocators extends BasePage {
   }
 
   async isSuccessButtonWithTextVisible(text: string) {
-    return await this.isVisible(this.successState.filter({ hasText: text }));
+    // The success state can follow a slow server operation (e.g. rebuilding the database cache), which under
+    // load takes longer than the default timeout to complete.
+    return await this.isVisible(this.successState.filter({ hasText: text }), true, ConstantHelper.timeout.veryLong);
   }
 
   async isSuccessStateIconVisible() {

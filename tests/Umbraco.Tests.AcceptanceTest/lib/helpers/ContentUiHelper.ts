@@ -567,7 +567,13 @@ export class ContentUiHelper extends UiBaseLocators {
     await this.waitForNavigation();
     // Workspace view-links render after the document loads, which can lag under load.
     await this.waitForVisible(this.infoTab, ConstantHelper.timeout.veryLong);
-    await this.click(this.infoTab);
+    // A late workspace load-completion reload can revert the active view to the default Content tab right
+    // after the Info tab is clicked, leaving later assertions (e.g. history) on the wrong view. Retry the
+    // click until the Info view actually sticks (URL settles on the info view route).
+    await expect(async () => {
+      await this.click(this.infoTab);
+      await expect(this.page).toHaveURL(/\/view\/info\b/, {timeout: ConstantHelper.timeout.medium});
+    }).toPass({timeout: ConstantHelper.timeout.veryLong});
   }
 
   async doesDocumentHaveLink(link: string) {
