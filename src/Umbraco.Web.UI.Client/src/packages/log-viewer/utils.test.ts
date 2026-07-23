@@ -23,6 +23,10 @@ describe('log viewer date range utils', () => {
 
 		it('returns the input unchanged when it cannot be parsed', () => {
 			expect(umbGetStartOfDayInLocalTime('')).to.equal('');
+			expect(umbGetStartOfDayInLocalTime('not-a-date')).to.equal('not-a-date');
+			expect(umbGetStartOfDayInLocalTime('2023-08-')).to.equal('2023-08-'); // partial: day would become 0
+			expect(umbGetStartOfDayInLocalTime('2023-13-40')).to.equal('2023-13-40'); // out of range: would roll over
+			expect(umbGetStartOfDayInLocalTime('2023-02-29')).to.equal('2023-02-29'); // not a leap year
 		});
 	});
 
@@ -46,6 +50,10 @@ describe('log viewer date range utils', () => {
 
 		it('returns the input unchanged when it cannot be parsed', () => {
 			expect(umbGetEndOfDayInLocalTime('')).to.equal('');
+			expect(umbGetEndOfDayInLocalTime('not-a-date')).to.equal('not-a-date');
+			expect(umbGetEndOfDayInLocalTime('2023-08-')).to.equal('2023-08-'); // partial: day would become 0
+			expect(umbGetEndOfDayInLocalTime('2023-13-40')).to.equal('2023-13-40'); // out of range: would roll over
+			expect(umbGetEndOfDayInLocalTime('2023-02-29')).to.equal('2023-02-29'); // not a leap year
 		});
 	});
 });

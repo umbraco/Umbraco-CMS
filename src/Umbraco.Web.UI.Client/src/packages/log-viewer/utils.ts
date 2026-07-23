@@ -5,7 +5,12 @@
  * @returns {string} The ISO 8601 timestamp, or the original string if it cannot be parsed.
  */
 export function umbGetStartOfDayInLocalTime(date: string): string {
-	return toLocalInstant(date, 0, 0, 0, 0);
+	const parsed = parseLocalDate(date);
+	if (!parsed) {
+		return date;
+	}
+
+	return new Date(parsed.year, parsed.month - 1, parsed.day, 0, 0, 0, 0).toISOString();
 }
 
 /**
@@ -20,33 +25,40 @@ export function umbGetStartOfDayInLocalTime(date: string): string {
  * @returns {string} The ISO 8601 timestamp, or the original string if it cannot be parsed.
  */
 export function umbGetEndOfDayInLocalTime(date: string): string {
-	return toLocalInstant(date, 23, 59, 59, 999);
+	const parsed = parseLocalDate(date);
+	if (!parsed) {
+		return date;
+	}
+
+	return new Date(parsed.year, parsed.month - 1, parsed.day, 23, 59, 59, 999).toISOString();
 }
 
 /**
- * Builds an absolute (UTC) ISO 8601 timestamp for a `YYYY-MM-DD` date at a specific local time of day.
+ * Parses a strict `YYYY-MM-DD` calendar date into its numeric parts.
+ *
+ * Returns `null` for anything that is not a real calendar date, including partial input
+ * (`2023-08-`) and out-of-range values (`2023-13-40`, `2023-02-29`) that the `Date` constructor
+ * would otherwise silently normalize to a different day.
  * @param {string} date A calendar date in `YYYY-MM-DD` format.
- * @param {number} hours The local hours component.
- * @param {number} minutes The local minutes component.
- * @param {number} seconds The local seconds component.
- * @param {number} milliseconds The local milliseconds component.
- * @returns {string} The ISO 8601 timestamp, or the original string if it cannot be parsed.
+ * @returns {{ year: number; month: number; day: number } | null} The parsed parts, or `null` if invalid.
  */
-function toLocalInstant(date: string, hours: number, minutes: number, seconds: number, milliseconds: number): string {
+function parseLocalDate(date: string): { year: number; month: number; day: number } | null {
 	const parts = date.split('-');
 	if (parts.length !== 3) {
-		return date;
+		return null;
 	}
 
 	const [year, month, day] = parts.map(Number);
-	if ([year, month, day].some((part) => !Number.isFinite(part))) {
-		return date;
+	if ([year, month, day].some((part) => !Number.isInteger(part))) {
+		return null;
 	}
 
-	const instant = new Date(year, month - 1, day, hours, minutes, seconds, milliseconds);
-	if (Number.isNaN(instant.getTime())) {
-		return date;
+	// Confirm the date round-trips: if the constructor normalized it (e.g. day 0 or month 13),
+	// the read-back components will not match the input, so treat it as unparseable.
+	const probe = new Date(year, month - 1, day);
+	if (probe.getFullYear() !== year || probe.getMonth() !== month - 1 || probe.getDate() !== day) {
+		return null;
 	}
 
-	return instant.toISOString();
+	return { year, month, day };
 }
