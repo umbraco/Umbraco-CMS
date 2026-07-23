@@ -40,7 +40,7 @@ test('can create content with the member group picker data type', async ({umbrac
   await umbracoUi.content.clickSaveButtonAndWaitForContentToBeCreated();
 
   // Assert
-  expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
+  await expect.poll(() => umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
@@ -61,7 +61,7 @@ test('can publish content with the member group picker data type', async ({umbra
   await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
+  await expect.poll(() => umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));

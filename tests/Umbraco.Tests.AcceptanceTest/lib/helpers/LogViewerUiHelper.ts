@@ -94,7 +94,7 @@ export class LogViewerUiHelper extends UiBaseLocators {
     await this.clickSavedSearchesButton();
     // Click the item's search button (the <li> also holds a delete button); clicking the button is what
     // applies the saved query.
-    await this.click(this.page.locator('.saved-search-item').filter({hasText: name}).locator('.saved-search-item-button').first());
+    await this.click(this.checkSavedSearch(name).locator('.saved-search-item-button').first());
   }
 
   async doesSearchBoxHaveValue(searchValue: string) {

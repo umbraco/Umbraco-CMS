@@ -131,7 +131,13 @@ export class ApiHelpers {
       params: params,
       ignoreHTTPSErrors: true
     }
-    return await this.page.request.get(url, options);
+    const response = await this.page.request.get(url, options);
+    // GETs aren't asserted (they can legitimately 404/403), but a 5xx here silently yields e.g. false from
+    // doesNameExist and masks the real error - surface it as a warning to aid debugging.
+    if (response.status() >= 500) {
+      console.warn(`GET ${url} returned server error ${response.status()}`);
+    }
+    return response;
   }
 
   async post(url: string, data?: object) {
