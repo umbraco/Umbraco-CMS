@@ -53,6 +53,7 @@ public class BackOfficeController : SecurityControllerBase
     private const string RedirectFlowParameter = "flow";
     private const string RedirectStatusParameter = "status";
     private const string RedirectErrorCodeParameter = "errorCode";
+    private const string ExternalLoginReturnUrlKey = "returnUrl";
 
     /// <summary>
     /// Initializes a new instance of the <see cref="BackOfficeController"/> class.
@@ -509,6 +510,88 @@ public class BackOfficeController : SecurityControllerBase
     }
 
     /// <summary>
+    ///     Initiates an anonymous, cookie-based external login challenge for the back office.
+    /// </summary>
+    /// <remarks>
+    ///     This is the initial-login counterpart to <see cref="LinkLogin(LinkLoginRequestModel)" />: there is
+    ///     no authenticated user to link to. The <see cref="ExternalLoginCallback" /> completes the flow by
+    ///     signing the user into the back-office cookie, without issuing an OpenIddict token.
+    /// </remarks>
+    /// <param name="provider">The scheme name of the external login provider to challenge.</param>
+    /// <param name="returnUrl">An optional local URL to return to once login completes.</param>
+    /// <returns>A challenge (302) redirecting to the external provider, or 400 for invalid input.</returns>
+    [HttpGet("external-login")]
+    [EndpointSummary("Initiates an external login.")]
+    [EndpointDescription("Initiates a cookie-based external login challenge for the back office.")]
+    [AllowAnonymous]
+    [MapToApiVersion("1.0")]
+    public IActionResult ExternalLogin(string provider, string? returnUrl = null)
+    {
+        if (string.IsNullOrWhiteSpace(provider))
+        {
+            return BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Missing provider")
+                .WithDetail("An external login provider must be specified.")
+                .Build());
+        }
+
+        if (returnUrl is not null && Url.IsLocalUrl(returnUrl) is false)
+        {
+            return BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Invalid returnUrl")
+                .WithDetail("The returnUrl must be a local URL.")
+                .Build());
+        }
+
+        var callbackUrl = Url.Action(nameof(ExternalLoginCallback), this.GetControllerName());
+        AuthenticationProperties properties =
+            _backOfficeSignInManager.ConfigureExternalAuthenticationProperties(provider, callbackUrl);
+        if (string.IsNullOrWhiteSpace(returnUrl) is false)
+        {
+            properties.Items[ExternalLoginReturnUrlKey] = returnUrl;
+        }
+
+        return new ChallengeResult(provider, properties);
+    }
+
+    /// <summary>
+    ///     Callback for the anonymous external login flow initiated by <see cref="ExternalLogin" />. Signs the
+    ///     user into the back-office cookie and redirects to the client lander, without issuing an OpenIddict token.
+    /// </summary>
+    [HttpGet("ExternalLoginCallback")]
+    [EndpointSummary("Handles an external login callback.")]
+    [EndpointDescription("Handles the callback from an external login provider and signs the user into the back office.")]
+    [AllowAnonymous]
+    [MapToApiVersion("1.0")]
+    public async Task<IActionResult> ExternalLoginCallback()
+    {
+        ExternalLoginInfo? loginInfo = await _backOfficeSignInManager.GetExternalLoginInfoAsync();
+        if (loginInfo?.Principal is null)
+        {
+            return ExternalLoginErrorRedirect("external-info-not-found");
+        }
+
+        IdentitySignInResult result = await _backOfficeSignInManager.ExternalLoginSignInAsync(
+            loginInfo, false, _securitySettings.Value.UserBypassTwoFactorForExternalLogins);
+
+        if (result.Succeeded)
+        {
+            await _backOfficeSignInManager.UpdateExternalAuthenticationTokensAsync(loginInfo);
+
+            string? returnUrl = null;
+            loginInfo.AuthenticationProperties?.Items.TryGetValue(ExternalLoginReturnUrlKey, out returnUrl);
+            return Redirect(ExternalLoginSuccessRedirectUrl(returnUrl));
+        }
+
+        return result switch
+        {
+            { IsLockedOut: true } => ExternalLoginErrorRedirect("locked-out"),
+            { IsNotAllowed: true } => ExternalLoginErrorRedirect("not-allowed"),
+            _ => ExternalLoginErrorRedirect("failed"),
+        };
+    }
+
+    /// <summary>
     /// Unlinks an external login provider from the current user's account.
     /// </summary>
     /// <param name="unlinkLoginRequestModel">The request model containing the external login provider and provider key to unlink.</param>
@@ -647,6 +730,23 @@ public class BackOfficeController : SecurityControllerBase
     }
 
     private static IActionResult DefaultChallengeResult() => new ChallengeResult(Constants.Security.BackOfficeAuthenticationType);
+
+    private string ExternalLoginSuccessRedirectUrl(string? returnUrl)
+    {
+        var origin = _securitySettings.Value.BackOfficeHost?.GetLeftPart(UriPartial.Authority) ?? string.Empty;
+        var url = origin + _securitySettings.Value.CallbackPathName.EnsureEndsWith('/') + "auth-callback";
+
+        // The value round-trips through the external provider's state, so re-validate it as untrusted input.
+        if (string.IsNullOrWhiteSpace(returnUrl) is false && Url.IsLocalUrl(returnUrl))
+        {
+            url = url.AppendQueryStringToUrl($"{ExternalLoginReturnUrlKey}={Uri.EscapeDataString(returnUrl!)}");
+        }
+
+        return url;
+    }
+
+    private RedirectResult ExternalLoginErrorRedirect(string status)
+        => CallbackErrorRedirectWithStatus("external-login", status, Array.Empty<IdentityError>());
 
     private RedirectResult CallbackErrorRedirectWithStatus(string flowType, string status, IEnumerable<IdentityError> identityErrors)
     {
