@@ -15,6 +15,10 @@ export class ElementApiHelper {
     return await response.json();
   }
 
+  async waitUntilIndexed(query: string, id: string) {
+    await this.api.waitUntilItemIsIndexed(ConstantHelper.apiEndpoints.elementSearch, query, id);
+  }
+
   async doesExist(id: string) {
     const response = await this.api.get(`${this.api.baseUrl}${ConstantHelper.apiEndpoints.element}/${id}`);
     return response.status() === 200;
@@ -25,7 +29,7 @@ export class ElementApiHelper {
       return;
     }
     const response = await this.api.post(`${this.api.baseUrl}${ConstantHelper.apiEndpoints.element}`, element);
-    return response.headers().location.split("v1/element/").pop();
+    return this.api.getIdFromLocation(response);
   }
 
   async delete(id: string) {
@@ -60,7 +64,7 @@ export class ElementApiHelper {
   async getChildren(id: string) {
     const response = await this.api.get(`${this.api.baseUrl}${ConstantHelper.apiEndpoints.treeElementChildren}?parentId=${id}&skip=0&take=10000`);
     const items = await response.json();
-    return items.items;
+    return this.api.itemsOf(items);
   }
 
   async getChildrenAmount(id: string) {
@@ -118,10 +122,15 @@ export class ElementApiHelper {
     const rootElements = await this.getAllAtRoot();
     const jsonElements = await rootElements.json();
 
-    for (const element of jsonElements.items) {
+    for (const element of this.api.itemsOf(jsonElements)) {
       // Use root level 'name' property for both folders and elements
       if (element.name === name) {
-        return element.isFolder ? await this.getFolder(element.id) : await this.get(element.id);
+        const found = element.isFolder ? await this.getFolder(element.id) : await this.get(element.id);
+        // A trashed element can still be returned by the tree endpoint; it only "exists" in the
+        // recycle bin (checked separately), so don't report it as present.
+        if (!found.isTrashed) {
+          return found;
+        }
       }
 
       // Recursively search children
@@ -139,7 +148,7 @@ export class ElementApiHelper {
     const rootElements = await this.getAllAtRoot();
     const jsonElements = await rootElements.json();
 
-    for (const element of jsonElements.items) {
+    for (const element of this.api.itemsOf(jsonElements)) {
       // Use root level 'name' property for both folders and elements
       if (element.name === name) {
         if (element.hasChildren) {
@@ -182,7 +191,7 @@ export class ElementApiHelper {
   async doesItemExistInRecycleBin(elementName: string) {
     const recycleBin = await this.getAllRecycleBinItems();
     const jsonRecycleBin = await recycleBin.json();
-    for (const element of jsonRecycleBin.items) {
+    for (const element of this.api.itemsOf(jsonRecycleBin)) {
       if (element.name === elementName) {
         return true;
       }
@@ -207,7 +216,7 @@ export class ElementApiHelper {
 
     }
     const response = await this.api.post(`${this.api.baseUrl}${ConstantHelper.apiEndpoints.elementFolder}`, folder);
-    return response.headers().location.split("/").pop();
+    return this.api.getIdFromLocation(response);
   }
 
   async createFolderResponse(name: string, parentId?: string) {

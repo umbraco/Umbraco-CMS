@@ -9,6 +9,7 @@ import { UmbId } from '@umbraco-cms/backoffice/id';
 import type {
 	CalculatedUserStartNodesResponseModel,
 	CreateUserRequestModel,
+	CurrentUserConfigurationResponseModel,
 	CurrentUserResponseModel,
 	InviteUserRequestModel,
 	PagedUserResponseModel,
@@ -72,19 +73,30 @@ class UmbUserMockDB extends UmbEntityMockDbBase<UmbMockUserModel> {
 		return [];
 	}
 
+	#passwordConfiguration = {
+		minimumPasswordLength: 8,
+		requireDigit: true,
+		requireLowercase: true,
+		requireUppercase: true,
+		requireNonLetterOrDigit: true,
+	};
+
 	getConfiguration(): UserConfigurationResponseModel {
 		return {
 			allowChangePassword: true,
 			allowTwoFactor: true,
 			canInviteUsers: true,
-			passwordConfiguration: {
-				minimumPasswordLength: 8,
-				requireDigit: true,
-				requireLowercase: true,
-				requireUppercase: true,
-				requireNonLetterOrDigit: true,
-			},
+			passwordConfiguration: this.#passwordConfiguration,
 			usernameIsEmail: true,
+		};
+	}
+
+	getCurrentConfiguration(): CurrentUserConfigurationResponseModel {
+		return {
+			allowChangePassword: true,
+			allowTwoFactor: true,
+			keepUserLoggedIn: true,
+			passwordConfiguration: this.#passwordConfiguration,
 		};
 	}
 

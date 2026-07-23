@@ -109,10 +109,19 @@
     <Compile Update="Umbraco.Infrastructure\Services\ContentEditingServiceTests.Validate.cs">
       <DependentUpon>ContentEditingServiceTests.cs</DependentUpon>
     </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\ContentEditingServiceTests.Restore.cs">
+      <DependentUpon>ContentEditingServiceTests.cs</DependentUpon>
+    </Compile>
     <Compile Update="Umbraco.Infrastructure\Services\MediaEditingServiceTests.MoveToRecycleBin.cs">
       <DependentUpon>MediaEditingServiceTests.cs</DependentUpon>
     </Compile>
     <Compile Update="Umbraco.Infrastructure\Services\MediaEditingServiceTests.SortByField.cs">
+      <DependentUpon>MediaEditingServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\MediaEditingServiceTests.Validate.cs">
+      <DependentUpon>MediaEditingServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\MediaEditingServiceTests.Restore.cs">
       <DependentUpon>MediaEditingServiceTests.cs</DependentUpon>
     </Compile>
     <Compile Update="Umbraco.Infrastructure\Services\ContentPublishingServiceTests.Publish.cs">
