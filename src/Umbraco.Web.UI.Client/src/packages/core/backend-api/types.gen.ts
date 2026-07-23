@@ -928,6 +928,7 @@ export type DocumentTypeTreeItemResponseModel = {
 export type DocumentUrlInfoModel = {
     message: null | string;
     provider: string;
+    isExternal: boolean;
     culture: null | string;
     url: null | string;
 };

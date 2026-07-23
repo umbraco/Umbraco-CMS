@@ -14,10 +14,9 @@ export class UmbPropertyEditorUIAcceptedUploadTypesElement
 {
 	#temporaryFileConfigRepository = new UmbTemporaryFileConfigRepository(this);
 
-	override async connectedCallback() {
+	override connectedCallback() {
 		super.connectedCallback();
 
-		await this.#temporaryFileConfigRepository.initialized;
 		this.observe(this.#temporaryFileConfigRepository.all(), (config) => {
 			if (!config) return;
 

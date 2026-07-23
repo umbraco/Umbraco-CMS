@@ -40,9 +40,7 @@ export class UmbPropertyEditorUIStaticImageFilePickerElement extends UmbProperty
 		this.#observeImageFileTypes();
 	}
 
-	async #observeImageFileTypes() {
-		await this.#temporaryFileConfigRepository.initialized;
-		if (!this.isConnected) return;
+	#observeImageFileTypes() {
 		this.observe(
 			this.#temporaryFileConfigRepository.displayableImageFileTypes(),
 			(fileTypes) => {

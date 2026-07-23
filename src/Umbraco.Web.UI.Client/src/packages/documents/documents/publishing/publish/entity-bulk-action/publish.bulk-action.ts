@@ -5,16 +5,17 @@ import type { UmbDocumentItemModel } from '../../../item/types.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../../entity.js';
 import { UmbDocumentPublishManifestEntityActionMeta } from '../entity-action/constants.js';
 import { UmbDocumentItemRepository } from '../../../item/repository/index.js';
-import { UMB_CONTENT_PUBLISH_MODAL, UmbContentPublishEntityAction } from '@umbraco-cms/backoffice/content';
+import {
+	UMB_CONTENT_PUBLISH_MODAL,
+	UmbBulkContentPublishingController,
+	UmbContentPublishEntityAction,
+} from '@umbraco-cms/backoffice/content';
 import { UmbEntityBulkActionBase } from '@umbraco-cms/backoffice/entity-bulk-action';
 import { UmbLanguageCollectionRepository, type UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { umbConfirmModal, umbOpenModal } from '@umbraco-cms/backoffice/modal';
-import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import { UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
-import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
-import { UmbRequestReloadChildrenOfEntityEvent } from '@umbraco-cms/backoffice/entity-action';
-import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export interface UmbBulkVariantOptions {
 	allInvariant: boolean;
@@ -125,6 +126,30 @@ export class UmbDocumentPublishEntityBulkAction extends UmbEntityBulkActionBase<
 		return uniqueStates.size === 1 ? states[0] : UmbDocumentVariantState.DRAFT;
 	}
 
+	/**
+	 * Fetches the selected documents and the available languages, then builds the variant options for a
+	 * bulk publish/unpublish. Returns `undefined` when none of the selected documents could be loaded.
+	 * @param {UmbControllerHost} host - The controller host used to resolve the repositories.
+	 * @param {Array<string>} selection - The uniques of the selected documents.
+	 * @returns {Promise<UmbBulkVariantOptions | undefined>} The variant options, or `undefined` if no documents loaded.
+	 */
+	static async requestBulkVariantOptions(
+		host: UmbControllerHost,
+		selection: Array<string>,
+	): Promise<UmbBulkVariantOptions | undefined> {
+		const itemRepository = new UmbDocumentItemRepository(host);
+		const languageRepository = new UmbLanguageCollectionRepository(host);
+
+		const [{ data: documentItems }, { data: languageData }] = await Promise.all([
+			itemRepository.requestItems(selection),
+			languageRepository.requestAllItems(),
+		]);
+
+		if (!documentItems?.length) return undefined;
+
+		return UmbDocumentPublishEntityBulkAction.buildVariantOptions(documentItems, languageData?.items ?? []);
+	}
+
 	async execute() {
 		const entityContext = await this.getContext(UMB_ENTITY_CONTEXT);
 		if (!entityContext) {
@@ -132,8 +157,6 @@ export class UmbDocumentPublishEntityBulkAction extends UmbEntityBulkActionBase<
 		}
 		const entityType = entityContext.getEntityType();
 		const unique = entityContext.getUnique();
-
-		const localize = new UmbLocalizationController(this);
 
 		if (!entityType) throw new Error('Entity type not found');
 		if (unique === undefined) throw new Error('Entity unique not found');
@@ -149,21 +172,13 @@ export class UmbDocumentPublishEntityBulkAction extends UmbEntityBulkActionBase<
 			return;
 		}
 
-		// Fetch document items and languages in parallel
-		const itemRepository = new UmbDocumentItemRepository(this._host);
-		const languageRepository = new UmbLanguageCollectionRepository(this._host);
-
-		const [{ data: documentItems }, { data: languageData }] = await Promise.all([
-			itemRepository.requestItems(this.selection),
-			languageRepository.requestAllItems(),
-		]);
-
-		if (!documentItems?.length) return;
-
-		const { allInvariant, options } = UmbDocumentPublishEntityBulkAction.buildVariantOptions(
-			documentItems,
-			languageData?.items ?? [],
+		const variantOptions = await UmbDocumentPublishEntityBulkAction.requestBulkVariantOptions(
+			this._host,
+			this.selection,
 		);
+		if (!variantOptions) return;
+
+		const { allInvariant, options } = variantOptions;
 
 		// If there is only one language available, or all selected documents are invariant, we can skip the modal and publish directly:
 		if (options.length === 1 || allInvariant) {
@@ -180,17 +195,7 @@ export class UmbDocumentPublishEntityBulkAction extends UmbEntityBulkActionBase<
 					? UmbVariantId.CreateInvariant()
 					: new UmbVariantId(options[0].language.unique, null);
 
-				const documentCnt = await this.#publishDocuments(this.selection, [{ variantId }]);
-
-				const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
-				notificationContext?.peek('positive', {
-					data: {
-						headline: localize.term('speechBubbles_editContentPublishedHeader'),
-						message: localize.term('speechBubbles_editMultiContentPublishedText', documentCnt),
-					},
-				});
-
-				await this.#reloadChildren(entityType, unique);
+				await this.#bulkPublish([{ variantId }], [variantId], entityType, unique);
 			}
 			return;
 		}
@@ -210,42 +215,38 @@ export class UmbDocumentPublishEntityBulkAction extends UmbEntityBulkActionBase<
 		const variantIds = result?.selection.map((x) => UmbVariantId.FromString(x)) ?? [];
 
 		if (variantIds.length) {
-			const documentCnt = await this.#publishDocuments(
-				this.selection,
+			await this.#bulkPublish(
 				variantIds.map((variantId) => ({ variantId })),
+				variantIds,
+				entityType,
+				unique,
 			);
-
-			const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
-			notificationContext?.peek('positive', {
-				data: {
-					headline: localize.term('speechBubbles_editContentPublishedHeader'),
-					message: localize.term(
-						'speechBubbles_editMultiVariantPublishedText',
-						documentCnt,
-						localize.list(variantIds.map((v) => v.culture ?? '')),
-					),
-				},
-			});
-
-			await this.#reloadChildren(entityType, unique);
 		}
 	}
 
-	async #publishDocuments(uniques: Array<string>, variants: Array<{ variantId: UmbVariantId }>): Promise<number> {
+	// Publishes the selection sequentially in a progress dialog, then reports the outcome and reloads.
+	async #bulkPublish(
+		variants: Array<{ variantId: UmbVariantId }>,
+		variantIds: Array<UmbVariantId>,
+		entityType: string,
+		unique: string | null,
+	): Promise<void> {
 		const repository = new UmbDocumentPublishingRepository(this._host);
-		let successCount = 0;
-		for (const unique of uniques) {
-			const { error } = await repository.publish(unique, variants);
-			if (!error) successCount++;
-		}
-		return successCount;
-	}
 
-	async #reloadChildren(entityType: string, unique: string | null): Promise<void> {
-		const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
-		if (!eventContext) return;
-		const event = new UmbRequestReloadChildrenOfEntityEvent({ entityType, unique });
-		eventContext.dispatchEvent(event);
+		await new UmbBulkContentPublishingController(this).run({
+			selection: this.selection,
+			entityType,
+			unique,
+			headline: '#publish_inProgress',
+			variantIds,
+			labels: {
+				headline: 'speechBubbles_editContentPublishedHeader',
+				multiVariant: 'speechBubbles_editMultiVariantPublishedText',
+				multiContent: 'speechBubbles_editMultiContentPublishedText',
+				partial: 'speechBubbles_editMultiContentPublishedPartialText',
+			},
+			process: (documentUnique) => repository.publish(documentUnique, variants),
+		});
 	}
 }
 

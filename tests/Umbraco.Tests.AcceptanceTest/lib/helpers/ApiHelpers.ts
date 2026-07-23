@@ -1,5 +1,6 @@
-import {Page} from "@playwright/test"
+import {Page, expect, APIResponse} from "@playwright/test"
 import {umbracoConfig} from "../umbraco.config";
+import {ConstantHelper} from "./ConstantHelper";
 import {ReportHelper} from "./ReportHelper";
 import {TelemetryDataApiHelper} from "./TelemetryDataApiHelper";
 import {LanguageApiHelper} from "./LanguageApiHelper";
@@ -137,30 +138,67 @@ export class ApiHelpers {
   }
 
   async post(url: string, data?: object) {
+    return await this.send('POST', url, data);
+  }
+
+  // No retry on 5xx: re-issuing a deadlocked mutation into a contended DB amplifies the contention.
+  private async send(method: 'POST' | 'PUT' | 'DELETE', url: string, data?: object): Promise<APIResponse> {
     const options = {
+      method: method,
       headers: await this.getHeaders(),
       data: data,
       ignoreHTTPSErrors: true
     }
-    return await this.page.request.post(url, options);
+    const response = await this.page.request.fetch(url, options);
+    this.assertNoServerError(response);
+    return response;
+  }
+
+  private assertNoServerError(response: APIResponse): void {
+    expect(
+      response.status(),
+      `API request to ${response.url()} returned server error ${response.status()}`,
+    ).toBeLessThan(500);
+  }
+
+  // Asserts a create/POST succeeded and returns the new entity id from the Location header.
+  // Surfaces a failed create as a clear assertion instead of an opaque crash on a missing header.
+  getIdFromLocation(response: APIResponse): string {
+    expect(response.ok(), `Expected a successful response but got ${response.status()} for ${response.url()}`).toBeTruthy();
+    const location = response.headers()['location'];
+    expect(location, `Expected Location header to be present for ${response.url()}`).toBeTruthy();
+    return location.split('/').pop()!;
+  }
+
+  // Examine indexes asynchronously after create; await this before a UI search so the item is findable.
+  async waitUntilItemIsIndexed(searchEndpoint: string, query: string, id: string, timeout: number = ConstantHelper.timeout.veryLong) {
+    await expect.poll(async () => {
+      // take: 100 — the search is filtered by `query`, so the target is expected within the first page for
+      // test-sized data. If a suite ever creates >100 items matching `query`, raise this or paginate.
+      const response = await this.get(this.baseUrl + searchEndpoint, {query: query, take: 100});
+      if (!response.ok()) {
+        return false;
+      }
+      const body = await response.json();
+      return body.items?.some((item: {id: string}) => item.id === id) ?? false;
+    }, {timeout: timeout}).toBeTruthy();
   }
 
   async delete(url: string, data?: object) {
-    const options = {
-      headers: await this.getHeaders(),
-      data: data,
-      ignoreHTTPSErrors: true
-    }
-    return await this.page.request.delete(url, options);
+    return await this.send('DELETE', url, data);
   }
 
   async put(url: string, data?: object) {
-    const options = {
-      headers: await this.getHeaders(),
-      data: data,
-      ignoreHTTPSErrors: true
+    return await this.send('PUT', url, data);
+  }
+
+  // A non-200/blip response body lacks `items`; return empty (and warn) so a cleanup hiccup does not fail unrelated tests.
+  itemsOf(json: any): any[] {
+    if (!Array.isArray(json?.items)) {
+      console.warn(`itemsOf: expected an items array but got: ${JSON.stringify(json)?.slice(0, 300)}`);
+      return [];
     }
-    return await this.page.request.put(url, options);
+    return json.items;
   }
 
   async postMultiPartForm(url: string, id, name: string, mimeType: string, filePath) {
@@ -176,11 +214,24 @@ export class ApiHelpers {
       },
       ignoreHTTPSErrors: true
     }
-    return await this.page.request.post(url, options);
+    const response = await this.page.request.post(url, options);
+    this.assertNoServerError(response);
+    return response;
   }
 
   async isLoginStateValid() {
-    return await this.refreshLoginState(umbracoConfig.user.login, umbracoConfig.user.password);
+    await this.refreshLoginState(umbracoConfig.user.login, umbracoConfig.user.password);
+    // A refresh only proves some session is valid, not that it's the admin's (a prior user-switching
+    // test can leave a non-admin session). Only re-login on a positively-read different user - a
+    // speculative re-login runs password verification and degrades the full run.
+    const response = await this.get(this.baseUrl + ConstantHelper.apiEndpoints.currentUser);
+    if (response.status() === 200) {
+      const currentUser = await response.json();
+      const currentEmail = currentUser.email?.toLowerCase();
+      if (currentEmail && currentEmail !== umbracoConfig.user.login.toLowerCase()) {
+        await this.updateTokenAndCookie(umbracoConfig.user.login, umbracoConfig.user.password);
+      }
+    }
   }
 
   async refreshLoginState(userEmail: string, userPassword: string) {

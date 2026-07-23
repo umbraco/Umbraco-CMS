@@ -20,6 +20,19 @@ import type { UmbApiClient, umbHttpClient } from '@umbraco-cms/backoffice/http-c
 import { isTestEnvironment } from '@umbraco-cms/backoffice/utils';
 import { UserService } from '@umbraco-cms/backoffice/external/backend-api';
 
+/**
+ * TEMPORARY TESTING BYPASS — NOT FOR PRODUCTION.
+ *
+ * When true, the backoffice skips the OpenID Connect authorization-code / token-exchange
+ * flow entirely and trusts the authentication cookie(s) issued by the server login at
+ * `/umbraco/login`. Those cookies are already sent on every Management API request
+ * (`credentials: 'include'`), so the client only needs to consider itself authorized.
+ *
+ * This deliberately ignores access-token expiry, refresh, and "seconds until logout" UX.
+ * Flip back to `false` (or delete the gated branches) to restore the real OIDC flow.
+ */
+const COOKIE_AUTH_BYPASS = true;
+
 export interface UmbAuthSession {
 	/** When the access token expires (issuedAt + expiresIn). Used to decide when to refresh. */
 	accessTokenExpiresAt: number;
@@ -374,6 +387,11 @@ export class UmbAuthContext extends UmbContextBase {
 	 * @returns True if the user is authorized, otherwise false.
 	 */
 	getIsAuthorized() {
+		if (COOKIE_AUTH_BYPASS) {
+			// TEMP: trust the server-issued login cookie; never redirect to /authorize.
+			this.#isAuthorized.setValue(true);
+			return true;
+		}
 		if (this.#isBypassed) {
 			this.#isAuthorized.setValue(true);
 			return true;
