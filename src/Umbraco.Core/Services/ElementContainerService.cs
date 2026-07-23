@@ -119,7 +119,25 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
             scope,
             key,
             userKey,
-            true);
+            mustBeTrashed: true,
+            requireEmpty: false);
+
+        scope.Complete();
+        return deleteResult;
+    }
+
+    /// <inheritdoc />
+    public override async Task<Attempt<EntityContainer?, EntityContainerOperationStatus>> DeleteAsync(Guid id, Guid userKey)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.WriteLock(Constants.Locks.ElementTree);
+
+        Attempt<EntityContainer?, EntityContainerOperationStatus> deleteResult = await DeleteLockedAsync(
+            scope,
+            id,
+            userKey,
+            mustBeTrashed: false,
+            requireEmpty: true);
 
         scope.Complete();
         return deleteResult;
@@ -354,7 +372,8 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
         ICoreScope scope,
         Guid key,
         Guid userKey,
-        bool mustBeTrashed)
+        bool mustBeTrashed,
+        bool requireEmpty)
     {
         EntityContainer? container = _entityContainerRepository.Get(key);
         if (container is null)
@@ -367,6 +386,13 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
             return Attempt.FailWithStatus<EntityContainer?, EntityContainerOperationStatus>(EntityContainerOperationStatus.NotInTrash, container);
         }
 
+        // 'container' here does not know about its children, so we need
+        // to get it again from the entity service, as a light entity
+        if (requireEmpty && _entityService.Get(container.Key)?.HasChildren is true)
+        {
+            return Attempt.FailWithStatus<EntityContainer?, EntityContainerOperationStatus>(EntityContainerOperationStatus.NotEmpty, container);
+        }
+
         EventMessages eventMessages = EventMessagesFactory.Get();
 
         // fire the deleting notification and handle cancellation
@@ -376,7 +402,9 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
             return Attempt.FailWithStatus<EntityContainer?, EntityContainerOperationStatus>(EntityContainerOperationStatus.CancelledByNotification, container);
         }
 
-        List<IElement> deletedElements = DeleteDescendantsLocked(container.Key, UmbracoObjectTypes.ElementContainer, scope, eventMessages);
+        List<IElement> deletedElements = requireEmpty
+            ? []
+            : DeleteDescendantsLocked(container.Key, UmbracoObjectTypes.ElementContainer, scope, eventMessages);
 
         DeleteContainerRelations(container);
         _entityContainerRepository.Delete(container);
@@ -477,10 +505,6 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
         scope.Notifications.Publish(new ElementDeletedNotification(descendantElement, eventMessages));
         return descendantElement;
     }
-
-    /// <inheritdoc />
-    protected override void OnDeletingContainer(EntityContainer container)
-        => DeleteContainerRelations(container);
 
     private void DeleteContainerRelations(IEntity container)
     {
