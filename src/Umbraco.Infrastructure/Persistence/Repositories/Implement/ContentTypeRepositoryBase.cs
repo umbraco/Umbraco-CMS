@@ -927,8 +927,9 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
     {
         var defaultLanguageId = GetDefaultLanguageId();
         var impactedList = impacted.ToList();
-        var impactedDocumentIds = impactedList.Where(x => x.IsElement is false).Select(x => x.Id).ToList();
-        var impactedElementIds = impactedList.Where(x => x.IsElement).Select(x => x.Id).ToList();
+        ILookup<bool, IContentTypeComposition> impactedByIsElement = impactedList.ToLookup(x => x.IsElement);
+        var impactedDocumentIds = impactedByIsElement[false].Select(x => x.Id).ToList();
+        var impactedElementIds = impactedByIsElement[true].Select(x => x.Id).ToList();
 
         // Group by the "To" variation so we can bulk update in the correct batches
         foreach (IGrouping<(ContentVariation FromVariation, ContentVariation ToVariation),
