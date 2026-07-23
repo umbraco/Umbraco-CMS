@@ -160,7 +160,7 @@ export class UmbAuthViewElement extends UmbLitElement {
 		return provider.forProviderName.toLowerCase() !== 'umbraco';
 	};
 
-	#onSubmit = async (providerOrManifest: string | ManifestAuthProvider, loginHint?: string) => {
+	#onSubmit = async (providerOrManifest: string | ManifestAuthProvider, _loginHint?: string) => {
 		try {
 			const authContext = await this.getContext(UMB_AUTH_CONTEXT);
 			if (!authContext) {
@@ -171,16 +171,7 @@ export class UmbAuthViewElement extends UmbLitElement {
 			const providerName =
 				typeof providerOrManifest === 'string' ? providerOrManifest : providerOrManifest.forProviderName;
 
-			// If the user is timed out, we do not want to lose the state, so avoid redirecting to the provider
-			// and instead just make the authorization request. In all other cases, we want to redirect to the provider.
-			const isTimedOut = this.userLoginState === 'timedOut';
-
-			await authContext.makeAuthorizationRequest(providerName, isTimedOut ? false : true, loginHint, manifest);
-
-			const isAuthed = authContext.getIsAuthorized();
-			if (isAuthed) {
-				this.onSuccess?.();
-			}
+			authContext.startExternalLogin(providerName, manifest);
 		} catch (error) {
 			console.error('[AuthView] Error submitting auth request', error);
 			this._error = error instanceof Error ? error.message : 'Unknown error (see console)';
