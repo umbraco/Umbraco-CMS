@@ -62,6 +62,11 @@ public partial class UmbracoPlan : MigrationPlan
         //   .With()
         //     .To<ChangeB>("state-b")
         //   .As("state-2");
+        //
+        // Merging a migration UP into an already-released version line: it lands here in namespace order,
+        // BEFORE that line's own migrations, so sites already on that line skip it (they only walk forward).
+        // Re-apply it at the END of the plan as an empty subclass of the original, in the new version's
+        // namespace. See V_18_1_0.AddContentTypeIdIndexForContent and the Migration Edge Cases in CLAUDE.md.
 
         From(InitialState);
 
