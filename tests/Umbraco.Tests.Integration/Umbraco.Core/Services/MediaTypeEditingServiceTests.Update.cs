@@ -1,6 +1,7 @@
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentTypeEditing;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
@@ -131,5 +132,67 @@ internal sealed partial class MediaTypeEditingServiceTests
             Assert.IsFalse(result.Success);
             Assert.AreEqual(ContentTypeOperationStatus.SystemAliasChangeNotAllowed, result.Status);
         });
+    }
+
+    [Test]
+    public async Task Can_Add_Composition_To_Media_Type_That_Has_Inheriting_Child()
+    {
+        var composition = (await MediaTypeEditingService.CreateAsync(MediaTypeCreateModel("Composition", "composition"), Constants.Security.SuperUserKey)).Result!;
+        var parent = (await MediaTypeEditingService.CreateAsync(MediaTypeCreateModel("Parent", "parent"), Constants.Security.SuperUserKey)).Result!;
+        await MediaTypeEditingService.CreateAsync(
+            MediaTypeCreateModel(
+                "Child",
+                "child",
+                compositions: [new Composition { CompositionType = CompositionType.Inheritance, Key = parent.Key }]),
+            Constants.Security.SuperUserKey);
+
+        var updateModel = MediaTypeUpdateModel(
+            "Parent",
+            "parent",
+            compositions: [new() { CompositionType = CompositionType.Composition, Key = composition.Key }]);
+
+        var result = await MediaTypeEditingService.UpdateAsync(parent, updateModel, Constants.Security.SuperUserKey);
+
+        Assert.IsTrue(result.Success, result.Status.ToString());
+
+        parent = await MediaTypeService.GetAsync(parent.Key);
+        Assert.IsNotNull(parent);
+        Assert.AreEqual(1, parent.ContentTypeComposition.Count());
+        Assert.AreEqual(composition.Key, parent.ContentTypeComposition.Single().Key);
+    }
+
+    [Test]
+    public async Task Cannot_Add_Composition_Whose_Property_Alias_Collides_With_Descendant_Own_Property()
+    {
+        var compositionContainer = MediaTypePropertyContainerModel();
+        var composition = (await MediaTypeEditingService.CreateAsync(
+            MediaTypeCreateModel(
+                "Composition",
+                "composition",
+                propertyTypes: [MediaTypePropertyTypeModel("sharedAlias", "sharedAlias", containerKey: compositionContainer.Key)],
+                containers: [compositionContainer]),
+            Constants.Security.SuperUserKey)).Result!;
+
+        var parent = (await MediaTypeEditingService.CreateAsync(MediaTypeCreateModel("Parent", "parent"), Constants.Security.SuperUserKey)).Result!;
+
+        var childContainer = MediaTypePropertyContainerModel();
+        await MediaTypeEditingService.CreateAsync(
+            MediaTypeCreateModel(
+                "Child",
+                "child",
+                propertyTypes: [MediaTypePropertyTypeModel("sharedAlias", "sharedAlias", containerKey: childContainer.Key)],
+                containers: [childContainer],
+                compositions: [new Composition { CompositionType = CompositionType.Inheritance, Key = parent.Key }]),
+            Constants.Security.SuperUserKey);
+
+        var updateModel = MediaTypeUpdateModel(
+            "Parent",
+            "parent",
+            compositions: [new() { CompositionType = CompositionType.Composition, Key = composition.Key }]);
+
+        var result = await MediaTypeEditingService.UpdateAsync(parent, updateModel, Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentTypeOperationStatus.DuplicatePropertyTypeAlias, result.Status);
     }
 }

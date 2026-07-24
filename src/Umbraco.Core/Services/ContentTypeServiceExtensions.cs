@@ -28,6 +28,31 @@ public static class ContentTypeServiceExtensions
     }
 
     /// <summary>
+    ///     Gets the content types that are composed of a given content type, restricted to the requested relationship kind.
+    /// </summary>
+    /// <typeparam name="TItem">The content type kind (document, media or member type).</typeparam>
+    /// <param name="contentTypeBaseService">The content type service.</param>
+    /// <param name="id">The identifier of the composition content type.</param>
+    /// <param name="composedOfType">Which relationships to include: composition, inheritance, or both.</param>
+    /// <returns>The content types that build upon the specified content type in the requested way.</returns>
+    /// <remarks>
+    ///     A convenience filter over <see cref="IContentTypeBaseService{TItem}.GetComposedOf(int)" />. Inheritance and
+    ///     composition share the same underlying storage; a referencing content type is an inheritance child when its
+    ///     tree parent is <paramref name="id" />, otherwise it is a true composition user.
+    /// </remarks>
+    public static IEnumerable<TItem> GetComposedOf<TItem>(
+        this IContentTypeBaseService<TItem> contentTypeBaseService,
+        int id,
+        ComposedOfType composedOfType)
+        where TItem : IContentTypeComposition
+        => composedOfType switch
+        {
+            ComposedOfType.Composition => contentTypeBaseService.GetComposedOf(id).Where(x => x.ParentId != id),
+            ComposedOfType.Inheritance => contentTypeBaseService.GetComposedOf(id).Where(x => x.ParentId == id),
+            _ => contentTypeBaseService.GetComposedOf(id),
+        };
+
+    /// <summary>
     ///     Returns the available composite content types for a given content type
     /// </summary>
     /// <param name="allContentTypes"></param>
@@ -75,9 +100,14 @@ public static class ContentTypeServiceExtensions
 
         var sourceId = source?.Id ?? 0;
 
-        // find out if any content type uses this content type
+        // find out if any content type uses this content type as a true composition.
+        // an entry whose ParentId == sourceId is a tree-inheritance child (which stores its parent in its
+        // own ContentTypeComposition), not a composition user - so being inherited from must not block
+        // this type from having compositions of its own.
         IContentTypeComposition[] isUsing =
-            allContentTypes.Where(x => x.ContentTypeComposition.Any(y => y.Id == sourceId)).ToArray();
+            allContentTypes
+                .Where(x => x.ParentId != sourceId && x.ContentTypeComposition.Any(y => y.Id == sourceId))
+                .ToArray();
         if (isUsing.Length > 0)
         {
             // if already in use a composition, do not allow any composited types
