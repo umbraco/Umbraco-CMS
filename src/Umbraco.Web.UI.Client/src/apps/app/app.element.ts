@@ -13,17 +13,13 @@ import type { Guard, UmbRoute } from '@umbraco-cms/backoffice/router';
 import { pathWithoutBasePath } from '@umbraco-cms/backoffice/router';
 import { RuntimeLevelModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbContextDebugController } from '@umbraco-cms/backoffice/debug';
-import {
-	UmbBundleExtensionInitializer,
-	UmbServerExtensionRegistrator,
-	type ManifestBase,
-} from '@umbraco-cms/backoffice/extension-api';
+import { UmbBundleExtensionInitializer, UmbServerExtensionRegistrator } from '@umbraco-cms/backoffice/extension-api';
+import type { ManifestBase } from '@umbraco-cms/backoffice/extension-api';
 import {
 	UmbAppEntryPointExtensionInitializer,
 	umbExtensionsRegistry,
-	type UmbExtensionManifestKind,
 } from '@umbraco-cms/backoffice/extension-registry';
-import { redirectToStoredPath } from '@umbraco-cms/backoffice/utils';
+import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 import { umbHttpClient } from '@umbraco-cms/backoffice/http-client';
 import { UmbViewContext } from '@umbraco-cms/backoffice/view';
 import { umbLocalizationRegistry } from '@umbraco-cms/backoffice/localization';
