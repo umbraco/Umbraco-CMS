@@ -376,9 +376,12 @@ public class BackOfficeController : SecurityControllerBase
             return Redirect(redirectUri.ToString());
         }
 
-        // Returning a SignOutResult will ask OpenIddict to redirect the user agent
-        // to the post_logout_redirect_uri specified by the client application.
-        return SignOut(Constants.Security.BackOfficeAuthenticationType, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+        // The auth cookie was already cleared by SignOutAsync above, and back-office auth is
+        // cookie-only, so there is no OpenIddict end-session to run. Redirect straight to the client
+        // logout landing (BackOfficeHost + the effective logout path); a plain redirect also avoids
+        // OpenIddict's post_logout_redirect_uri validation, which rejected client hosts not registered
+        // on the OpenIddict client (ID2052).
+        return Redirect(_securitySettings.Value.BackOfficeHost + "/" + _securitySettings.Value.GetEffectiveLogoutPathName().TrimStart('/'));
     }
 
     /// <summary>
