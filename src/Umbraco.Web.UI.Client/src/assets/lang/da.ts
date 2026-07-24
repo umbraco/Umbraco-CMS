@@ -2674,6 +2674,8 @@ export default {
 		connectionFailed:
 			'Kunne ikke etablere forbindelse til serveren, forhåndsvisning af liveopdateringer vil ikke fungere.',
 		connectionLost: 'Forbindelse til serveren mistet, forhåndsvisning af liveopdateringer vil ikke fungere.',
+		connectionReconnecting: 'Forbindelse til serveren mistet, forsøger at genoprette forbindelsen…',
+		connectionRestored: 'Forbindelse til serveren genoprettet, forhåndsvisning af liveopdateringer fungerer igen.',
 	},
 	permissions: {
 		FolderCreation: 'Mappeoprettelse',
