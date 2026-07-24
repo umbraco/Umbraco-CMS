@@ -565,7 +565,8 @@ export class UmbAuthContext extends UmbContextBase {
 
 	/**
 	 * Gets all registered auth providers.
-	 * @param extensionsRegistry
+	 * @param {UmbBackofficeExtensionRegistry} extensionsRegistry The extensions registry to get auth providers from.
+	 * @returns {Observable<ManifestAuthProvider[]>} An observable that emits the registered auth providers.
 	 */
 	getAuthProviders(extensionsRegistry: UmbBackofficeExtensionRegistry) {
 		return this.#isInitialized.pipe(
