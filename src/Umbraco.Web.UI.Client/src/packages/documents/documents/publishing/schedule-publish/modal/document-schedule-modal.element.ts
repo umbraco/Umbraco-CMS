@@ -285,7 +285,7 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 							type="datetime-local"
 							.value=${this.#formatDate(fromDate)}
 							@change=${(e: Event) => this.#onFromDateChange(e, option.unique)}
-							label=${this.localize.term('general_publishDate')}>
+							label=${this.localize.term('content_releaseDate')}>
 							<div slot="append">
 								${when(
 									fromDate,
@@ -313,7 +313,7 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 							type="datetime-local"
 							.value=${this.#formatDate(toDate)}
 							@change=${(e: Event) => this.#onToDateChange(e, option.unique)}
-							label=${this.localize.term('general_publishDate')}>
+							label=${this.localize.term('content_unpublishDate')}>
 							<div slot="append">
 								${when(
 									toDate,

@@ -58,7 +58,7 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 				this.#elementWorkspaceContext = context;
 				this.#elementWorkspaceContext?.view.shortcuts.addOne({
 					unique: UMB_ELEMENT_PUBLISHING_SHORTCUT_UNIQUE,
-					label: this.#localize.term('content_saveAndPublishShortcut'),
+					label: this.#localize.term('buttons_saveAndPublish'),
 					key: 'p',
 					modifier: true,
 					action: () => this.saveAndPublish(),

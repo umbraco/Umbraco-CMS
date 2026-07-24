@@ -61,3 +61,4 @@ src/Umbraco.Web.UI.Client/src/packages/core/backend-api/** linguist-generated
 src/Umbraco.Web.UI.Login/src/api/** linguist-generated
 templates/UmbracoExtension/Client/src/api/** linguist-generated
 src/Umbraco.Cms.Api.Management/OpenApi.json linguist-generated
+src/Umbraco.Web.UI.Client/src/libs/localization-api/known-keys.generated.ts linguist-generated
