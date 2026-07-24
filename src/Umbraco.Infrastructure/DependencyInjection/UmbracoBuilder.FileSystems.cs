@@ -6,6 +6,8 @@ using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.IO.MediaPathSchemes;
+using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Infrastructure.PropertyEditors;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.DependencyInjection;
@@ -38,6 +40,9 @@ public static partial class UmbracoBuilderExtensions
 
         // register the scheme for media paths
         builder.Services.AddUnique<IMediaPathScheme, UniqueMediaPathScheme>();
+
+        // register the resolver that determines where file upload editor files are stored
+        builder.Services.AddUnique<IFileUploadPathResolver, FileUploadPathResolver>();
 
         builder.Services.AddUnique<IViewHelper, ViewHelper>();
         builder.Services.AddUnique<IDefaultViewContentProvider, DefaultViewContentProvider>();
