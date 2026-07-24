@@ -195,11 +195,12 @@ export class UmbAuthContext extends UmbContextBase {
 	startLocalLogin(manifest?: ManifestAuthProvider): void {
 		const loginUrl = new URL(`${this.#serverUrl}/umbraco/login`);
 
-		// The login app redirects to a same-origin `ReturnUrl` on success; point it at our
-		// auth-callback lander. `document.baseURI` reflects the base path the client is served under
-		// (equal to the server's CallbackPathName in a valid setup), so this resolves to the same
-		// lander URL the server builds for external login.
-		loginUrl.searchParams.set('ReturnUrl', new URL('auth-callback', document.baseURI).href);
+		// Return the popup to our auth-callback lander after login. Pass a LOCAL, RELATIVE path: the
+		// server login controller validates ReturnUrl with Url.IsLocalUrl (which rejects absolute /
+		// cross-origin URLs), and the login app then resolves it against its configured back-office-host
+		// — so in a split-origin setup (dev server / Umbraco Cloud) the popup still lands on the client
+		// host, not the backend's. `document.baseURI` gives the path under the client's base.
+		loginUrl.searchParams.set('ReturnUrl', new URL('auth-callback', document.baseURI).pathname);
 
 		const popupTarget = manifest?.meta?.behavior?.popupTarget ?? 'umbracoAuthPopup';
 		const popupFeatures =
