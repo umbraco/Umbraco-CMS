@@ -57,10 +57,6 @@ export class UmbAuthContext extends UmbContextBase {
 	#externalLoginEndpoint;
 	#postLogoutRedirectUri;
 
-	// Warn-once guard for the deprecated members — they can be called per request, and
-	// UmbDeprecation.warn() does not de-duplicate, so an unguarded warning would flood the console.
-	#warnedDeprecations = new Set<string>();
-
 	/**
 	 * Observable that emits true when the auth context is initialized.
 	 * It will only emit once and then complete itself.
@@ -159,12 +155,6 @@ export class UmbAuthContext extends UmbContextBase {
 		this.#channel.close();
 	}
 
-	#warnDeprecated(deprecated: string, solution: string): void {
-		if (this.#warnedDeprecations.has(deprecated)) return;
-		this.#warnedDeprecations.add(deprecated);
-		new UmbDeprecation({ deprecated, removeInVersion: '21.0.0', solution }).warn();
-	}
-
 	/* eslint-disable @typescript-eslint/no-unused-vars */
 	/**
 	 * Initiates the login flow.
@@ -180,10 +170,11 @@ export class UmbAuthContext extends UmbContextBase {
 		usernameHint?: string,
 		manifest?: ManifestAuthProvider,
 	): Promise<void> {
-		this.#warnDeprecated(
-			'UmbAuthContext.makeAuthorizationRequest()',
-			'Use startLocalLogin() or startExternalLogin() instead.',
-		);
+		new UmbDeprecation({
+			deprecated: 'UmbAuthContext.makeAuthorizationRequest()',
+			removeInVersion: '21.0.0',
+			solution: 'Use startLocalLogin() or startExternalLogin() instead.',
+		}).warn();
 	}
 	/* eslint-enable @typescript-eslint/no-unused-vars */
 
@@ -216,10 +207,11 @@ export class UmbAuthContext extends UmbContextBase {
 	 * @deprecated No-op — the server sets the auth cookie directly, there is no code exchange. Always returns null. Scheduled for removal in Umbraco 21.
 	 */
 	async completeAuthorizationRequest(): Promise<null> {
-		this.#warnDeprecated(
-			'UmbAuthContext.completeAuthorizationRequest()',
-			'There is no authorization code exchange with cookie auth; remove the call.',
-		);
+		new UmbDeprecation({
+			deprecated: 'UmbAuthContext.completeAuthorizationRequest()',
+			removeInVersion: '21.0.0',
+			solution: 'There is no authorization code exchange with cookie auth; remove the call.',
+		}).warn();
 		return null;
 	}
 
@@ -428,10 +420,12 @@ export class UmbAuthContext extends UmbContextBase {
 	 * @returns {Promise<string>} The latest token from the Management API
 	 */
 	async getLatestToken(): Promise<string> {
-		this.#warnDeprecated(
-			'UmbAuthContext.getLatestToken()',
-			'Back-office auth is cookie-based and carries no client token. Use configureClient()/getOpenApiConfiguration(), or set credentials: "include" on fetch calls.',
-		);
+		new UmbDeprecation({
+			deprecated: 'UmbAuthContext.getLatestToken()',
+			removeInVersion: '21.0.0',
+			solution:
+				'Back-office auth is cookie-based and carries no client token. Use configureClient()/getOpenApiConfiguration(), or set credentials: "include" on fetch calls.',
+		}).warn();
 		return '[redacted]';
 	}
 
@@ -446,7 +440,11 @@ export class UmbAuthContext extends UmbContextBase {
 	 * @returns {Promise<boolean>} True if the refresh succeeded, otherwise false
 	 */
 	async validateToken(): Promise<boolean> {
-		this.#warnDeprecated('UmbAuthContext.validateToken()', 'Use getIsAuthorized() or keepAlive() instead.');
+		new UmbDeprecation({
+			deprecated: 'UmbAuthContext.validateToken()',
+			removeInVersion: '21.0.0',
+			solution: 'Use getIsAuthorized() or keepAlive() instead.',
+		}).warn();
 		return this.getIsAuthorized();
 	}
 
@@ -456,7 +454,11 @@ export class UmbAuthContext extends UmbContextBase {
 	 * @returns {Promise<boolean>} True if the refresh was successful, otherwise false.
 	 */
 	async makeRefreshTokenRequest(): Promise<boolean> {
-		this.#warnDeprecated('UmbAuthContext.makeRefreshTokenRequest()', 'Use getIsAuthorized() or keepAlive() instead.');
+		new UmbDeprecation({
+			deprecated: 'UmbAuthContext.makeRefreshTokenRequest()',
+			removeInVersion: '21.0.0',
+			solution: 'Use getIsAuthorized() or keepAlive() instead.',
+		}).warn();
 		return this.getIsAuthorized();
 	}
 
@@ -549,12 +551,13 @@ export class UmbAuthContext extends UmbContextBase {
 			credentials: 'include',
 			// Deprecated (removal v21): cookie auth carries no client token — the auth cookie rides along
 			// via credentials: 'include'. Kept as a shim so existing `await config.token()` callers don't
-			// throw; returns the redacted placeholder and warns once.
+			// throw; returns the redacted placeholder.
 			token: async () => {
-				this.#warnDeprecated(
-					'UmbOpenApiConfiguration.token',
-					'The auth cookie is sent automatically with credentials: "include"; remove the token() call.',
-				);
+				new UmbDeprecation({
+					deprecated: 'UmbOpenApiConfiguration.token',
+					removeInVersion: '21.0.0',
+					solution: 'The auth cookie is sent automatically with credentials: "include"; remove the token() call.',
+				}).warn();
 				return '[redacted]';
 			},
 		};
