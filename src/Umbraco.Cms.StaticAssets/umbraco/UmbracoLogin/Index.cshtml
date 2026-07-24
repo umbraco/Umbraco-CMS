@@ -35,11 +35,11 @@
 
     // Where to send the user after login: the path they came from (client-supplied, validated local
     // by the controller) when present, otherwise the configured back-office path
-    // (AuthorizeCallbackPathName — e.g. "/" when the client is served at the root of a separate host).
+    // (CallbackPathName — e.g. "/" when the client is served at the root of a separate host).
     // The login app resolves this path against back-office-host below, so a configured BackOfficeHost
     // (dev server / Umbraco Cloud) returns the user to the client host, not this backend's origin.
     var backOfficeHostOrigin = SecuritySettings.Value.BackOfficeHost?.GetLeftPart(UriPartial.Authority);
-    var returnPath = string.IsNullOrEmpty(Model.ReturnUrl) ? SecuritySettings.Value.AuthorizeCallbackPathName : Model.ReturnUrl;
+    var returnPath = string.IsNullOrEmpty(Model.ReturnUrl) ? SecuritySettings.Value.CallbackPathName : Model.ReturnUrl;
 }
 
 <!DOCTYPE html>
