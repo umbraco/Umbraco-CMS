@@ -634,32 +634,3 @@ routes.push({ ...defaultRoute, path: '' });
 `umb-workspace-editor` uses this pattern — see the `// Duplicate first workspace and use it for the empty path scenario.` block in `workspace-editor.element.ts`.
 
 Do **not** add `pathMatch: 'full'` to the duplicated empty-path route. The modal sub-router appends modal paths (e.g. `/add-property/-1/container-root`) to the current active local path. With `path: ''` matching prefix-wise (regex `/^/`), the main route stays matched and the modal-router can resolve the appended segment. With `pathMatch: 'full'`, the empty-path route only matches an exactly-empty URL — modal URLs fall through to the catch-all, the route component unmounts, the modal registration is torn down, and the modal never opens.
-
----
-
-### Auth & Cross-tab
-
-Auth state is coordinated across tabs on the `umb:auth` BroadcastChannel (`authorized` / `sessionCleared` / `signedOut` — see `packages/core/auth/auth.context.ts`). Three gotchas:
-
-**BroadcastChannel does NOT deliver to the sender's own tab**
-
-`postMessage` on a BroadcastChannel reaches every *other* same-origin context, never the sender. Any state a broadcast is meant to convey must also be applied locally by the sender:
-
-```typescript
-// ✅ Apply locally first, then tell the other tabs
-this.#setSessionLocally(expiresIn, issuedAt);
-this.#channel.postMessage({ type: 'authorized', expiresIn, issuedAt });
-
-// ❌ Broadcasting alone leaves the sending tab out of date — the message never comes back
-this.#channel.postMessage({ type: 'authorized', expiresIn, issuedAt });
-```
-
-**Avoid re-broadcast storms**
-
-A message handler must apply the received state locally *without* re-broadcasting it — the sender already reached every tab. The `authorized` handler in `UmbAuthContext` does exactly this; if it re-broadcast, every tab would echo every message indefinitely.
-
-**Do not probe the session per request**
-
-The session probe (a plain `fetch` of `user/current/configuration` with `credentials: 'include'` and `redirect: 'manual'`) runs once at boot and after `keepAlive()`. It deliberately bypasses the intercepted client: a 401 there is the expected "no session" answer, but routed through the interceptor it would be queued for re-authentication (boot hangs) and raise a spurious timeout signal. Never add a per-request session check — the auth cookie rides along automatically with `credentials: 'include'`. (The historical version of this mistake was calling the now-removed `validateToken()` per request, which revoked the previous reference token and caused ID2019 errors.)
-
-**Related**: `window.opener` is set for ANY `window.open()` target, not only auth popups — guards must check the opener's origin *and* pathname (see `hasOwnOpener()` in `packages/core/utils/path/has-own-opener.function.ts`).
