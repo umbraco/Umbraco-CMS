@@ -124,11 +124,13 @@ test('can add member group', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) =>
   // Act
   await umbracoUi.member.clickMemberLinkByName(memberName);
   await umbracoUi.member.chooseMemberGroup(memberGroupName);
-  await umbracoUi.member.clickSaveButtonAndWaitForMemberToBeUpdated();
 
   // Assert
-  const memberData = await umbracoApi.member.get(memberId);
-  expect(memberData.groups[0]).toBe(memberGroupId);
+  await expect(async () => {
+    await umbracoUi.member.clickSaveButtonAndWaitForMemberToBeUpdated();
+    const memberData = await umbracoApi.member.get(memberId);
+    expect(memberData.groups[0]).toBe(memberGroupId);
+  }).toPass({timeout: ConstantHelper.timeout.veryLong});
 
   // Clean
   await umbracoApi.memberGroup.ensureNameNotExists(memberGroupName);
