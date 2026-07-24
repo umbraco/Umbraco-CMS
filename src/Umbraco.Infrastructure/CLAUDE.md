@@ -549,6 +549,22 @@ using (var outer = ScopeProvider.CreateCoreScope())
 - Keep the Guids in **one place** (a shared `Constants` value referenced by both `DatabaseDataCreator`
   and the migration) so they cannot drift.
 
+**Migrations merged UP into an already-released version line must be re-applied at the plan's end**:
+- The upgrader only ever walks the migration chain **forward** from the state stored in the database.
+  A migration merged up from a lower version (e.g. a 17.6 migration merged into v18) lands in the
+  `UmbracoPlan` in namespace order — i.e. **before** the higher line's own migrations.
+- Sites already released on the higher line have a stored state **past** that insertion point, so they
+  will **never** run it (e.g. sites on 18.0.x skip a 17.6-positioned migration when upgrading to 18.1).
+- **Fix**: re-apply the migration at the **end** of the plan under a new version section with a new GUID.
+  Migrations are already required to be idempotent (guard with `IndexExists`, existence checks, etc.),
+  so upgrade paths that hit it twice are unaffected.
+- Implement the re-run as an **empty subclass of the original migration** placed in the **new version's**
+  namespace (e.g. `V_18_1_0.AddContentTypeIdIndexForContent : V_17_6_0.AddContentTypeIdIndexForContent`).
+  Do **not** re-list the original type directly: `UmbracoPlan.GetVersionForState` (used by
+  `RuntimeState.CurrentMigrationVersion`) derives the database version from the **final** migration
+  type's `V_{major}_{minor}_{patch}` namespace, so the last step must live in the new version's namespace
+  to report the correct version. See PR #23328 (original) and #23466 (re-application).
+
 ### Repository Edge Cases
 
 **Cache Invalidation**:
