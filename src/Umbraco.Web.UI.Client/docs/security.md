@@ -42,32 +42,28 @@ private _validateName(name: string): boolean {
 
 ### Authentication & Authorization
 
-**Cookie-based authentication** (v19+):
+**OpenID Connect with PKCE** (v17+):
 
-- The back-office session is a single httpOnly authentication cookie (default name `UMB_UCONTEXT`, configurable via `Security:AuthCookieName`) — JavaScript cannot read it, and there are NO client-side tokens and NO PKCE/OAuth authorization-code flow for the back-office session
-- Login is server-owned: local login navigates to the server login app at `/umbraco/login`; external providers challenge the anonymous `security/back-office/external-login` endpoint. Both flows land the popup on the client `auth-callback` route, which lets the `umb:auth` BroadcastChannel `authorized` message carry the new session to the main window (see `UmbAuthContext.startLocalLogin()` / `startExternalLogin()`)
-- The auth cookie is the sole credential — every API request must send it via `credentials: 'include'` (handled automatically by `configureClient()`)
-- Session boot probe: `UmbAuthContext` establishes the session by plain-fetching `user/current/configuration` with `credentials: 'include'` and `redirect: 'manual'` — a non-ok response means "not logged in". It deliberately bypasses the intercepted client, since a 401 there would queue the request for re-authentication and hang boot
-- Session extension: `UmbAuthContext.keepAlive()` POSTs the `security/back-office/keep-alive` endpoint, which re-issues the cookie with a fresh expiry
-- Sign-out navigates to the server `security/back-office/signout` endpoint, which clears the cookie and redirects to the client logout landing (no OpenIddict end-session)
-- OpenIddict still exists server-side, but only for API users (client credentials), Swagger, and similar external clients — never for the back-office session
+- Backoffice uses PKCE authorization code flow
+- Real tokens are stored exclusively in `__Host-umbAccessToken` / `__Host-umbRefreshToken` httpOnly cookies — JavaScript cannot read them
+- The client-side bearer token value is always the literal string `'[redacted]'` — the server (`HideBackOfficeTokensHandler`) swaps it for the real cookie on each request
+- Never try to read or store real tokens client-side; they are intentionally inaccessible
 
 **Configuring API clients**:
 
 ```typescript
-// ✅ One-liner for @hey-api/openapi-ts clients — sets credentials + binds interceptors
+// ✅ One-liner for @hey-api/openapi-ts clients — handles auth + credentials automatically
 authContext.configureClient(myClient);
 
-// ✅ For manual fetch calls — use base + credentials
+// ✅ For manual fetch calls
 const config = authContext.getOpenApiConfiguration();
 
-// ❌ getLatestToken() and getOpenApiConfiguration().token() are deprecated shims —
-// they return the literal string '[redacted]' and warn once; scheduled for removal v21
+// ❌ getLatestToken() is deprecated (returns '[redacted]' anyway) — scheduled for removal v19
 const token = await authContext.getLatestToken();
 ```
 
-**Do NOT probe the session per request**:
-The session probe (`user/current/configuration`) runs once at boot and after `keepAlive()` — never per API call. The auth cookie rides along automatically with `credentials: 'include'`, so there is nothing to check or refresh client-side before a request. (Historically, calling the now-removed `validateToken()` per request revoked the previous reference token and caused ID2019 errors — the lesson carries over: auth endpoints are not per-request plumbing.)
+**Do NOT call `validateToken()` per request**:
+`validateToken()` forces a `/token` network call and revokes the previous access token as a side effect (OpenIddict reference tokens). Calling it on every API request causes token churn and ID2019 "token no longer valid" errors in concurrent requests. Use `configureClient()` instead — it has a built-in guard that only refreshes when the access token is actually expired.
 
 **Authorization Checks**:
 
@@ -88,8 +84,8 @@ async #handleDelete() {
 **Context Security**:
 
 - Use Context API for auth state (`UMB_AUTH_CONTEXT`)
-- Never store credentials in localStorage, sessionStorage, or JS variables — session timing lives in-memory only
-- The server owns cookie renewal; the client only tracks the expiry for timeout UI
+- Never store tokens in localStorage, sessionStorage, or JS variables
+- Backend handles token refresh via httpOnly cookies
 - All API requests must use `credentials: 'include'` (handled automatically by `configureClient()`)
 
 ### API Security
@@ -371,7 +367,7 @@ render() {
 console.log('Operation completed');
 
 // Backend manages secrets
-// The session is an httpOnly cookie; the frontend never holds a credential
+// Frontend receives tokens via httpOnly cookies
 
 // Fix TypeScript/ESLint issues properly
 // Don't suppress warnings
