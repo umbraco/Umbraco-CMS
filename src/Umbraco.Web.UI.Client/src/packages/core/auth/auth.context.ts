@@ -138,8 +138,14 @@ export class UmbAuthContext extends UmbContextBase {
 		this.consumeContext(UMB_AUTH_SIGNALER_CONTEXT, (signaler) => {
 			// Keep the signaler's authorization state in sync with ours
 			this.observe(this.isAuthorized, (isAuthorized) => signaler?.setAuthorized(isAuthorized ?? false));
-			// React to timeout requests from the interceptor
-			this.observe(signaler?.timeoutRequest, () => this.timeOut());
+			// React to timeout requests from the interceptor. A 401 while we were never authorized
+			// (e.g. the cold-boot session probe) means "not logged in", not a session timeout — raising
+			// the timeout signal there would wrongly show the "session timed out" state on a fresh login.
+			this.observe(signaler?.timeoutRequest, () => {
+				if (this.getIsAuthorized()) {
+					this.timeOut();
+				}
+			});
 		});
 	}
 
